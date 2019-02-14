@@ -1,0 +1,11 @@
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+.idea
+
+# https://github.com/b3log/header
+header
+header.exe
