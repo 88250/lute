@@ -67,8 +67,8 @@ var itemName = map[itemType]string{
 	itemOpenLinkHref:  "(",
 	itemCloseLinkHref: ")",
 	itemImg:           "!",
-	itemCodeBlock:     "```",
 	itemSpace:         "space",
+	itemNewline:       "newline",
 }
 
 func (i itemType) String() string {
@@ -96,9 +96,8 @@ const (
 	itemOpenLinkHref                  // (
 	itemCloseLinkHref                 // )
 	itemImg                           // !
-	itemCodeBlock                     // ```
-
-	itemSpace // space
+	itemSpace                         // space
+	itemNewline                       // newline
 )
 
 const (
@@ -248,8 +247,14 @@ func lexText(l *lexer) stateFn {
 		return lexEmorStrong
 	case '`' == r:
 		return lexCode
-	case unicode.IsSpace(r):
-		return lexSpace
+	case ' ' == r, '\t' == r:
+		l.emit(itemSpace)
+
+		return lexText
+	case '\n' == r:
+		l.emit(itemNewline)
+
+		return lexText
 	case '[' == r:
 		l.emit(itemOpenLinkText)
 
@@ -303,11 +308,11 @@ func lexHeader(l *lexer) stateFn {
 func lexQuote(l *lexer) stateFn {
 	r := l.next()
 	switch {
-	case unicode.IsSpace(r):
-		return lexSpace
-	default:
-		return lexText
+	case ' ' == r:
+		l.emit(itemSpace)
 	}
+
+	return lexText
 }
 
 // lexEmOrStrong scans '*' or '**'.
@@ -330,13 +335,6 @@ func lexEmorStrong(l *lexer) stateFn {
 func lexCode(l *lexer) stateFn {
 	l.acceptRun("`")
 	l.emit(itemCode)
-
-	return lexText
-}
-
-// lexSpace scans a run of space characters.
-func lexSpace(l *lexer) stateFn {
-	l.emit(itemSpace)
 
 	return lexText
 }
