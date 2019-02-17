@@ -285,7 +285,7 @@ func lexText(l *lexer) stateFn {
 
 // lexHeader scans '#'.
 func lexHeader(l *lexer) stateFn {
-	l.accept("#")
+	l.acceptRun("#")
 	l.emit(itemHeader)
 
 	r := l.next()

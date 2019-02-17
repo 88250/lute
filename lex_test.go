@@ -38,6 +38,12 @@ var (
 )
 
 var lexTests = []lexTest{
+
+	// combined cases
+	{"comb1", "### foo\n## foo", []item{mkItem(itemHeader, "###"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), mkItem(itemSpace, "\n"), mkItem(itemHeader, "##"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), tEOF}},
+	{"comb0", "# h\n\nl**u**te", []item{mkItem(itemHeader, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "h"), mkItem(itemSpace, "\n"), mkItem(itemSpace, "\n"), mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
+
+	// simple cases
 	{"paragraph", "p1\n\np2", []item{mkItem(itemStr, "p1"), mkItem(itemSpace, "\n"), mkItem(itemSpace, "\n"), mkItem(itemStr, "p2"), tEOF}},
 	{"img", `![alt](/uri "title")`, []item{mkItem(itemImg, "!"), mkItem(itemOpenLinkText, "["), mkItem(itemStr, "alt"),
 		mkItem(itemCloseLinkText, "]"), mkItem(itemOpenLinkHref, "("), mkItem(itemStr, "/uri"), mkItem(itemSpace, " "), mkItem(itemStr, `"title"`), mkItem(itemCloseLinkHref, ")"), tEOF}},
