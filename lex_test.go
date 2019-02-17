@@ -38,6 +38,7 @@ var (
 )
 
 var lexTests = []lexTest{
+	{"paragraph", "p1\n\np2", []item{mkItem(itemStr, "p1"), mkItem(itemSpace, "\n"), mkItem(itemSpace, "\n"), mkItem(itemStr, "p2"), tEOF}},
 	{"img", `![alt](/uri "title")`, []item{mkItem(itemImg, "!"), mkItem(itemOpenLinkText, "["), mkItem(itemStr, "alt"),
 		mkItem(itemCloseLinkText, "]"), mkItem(itemOpenLinkHref, "("), mkItem(itemStr, "/uri"), mkItem(itemSpace, " "), mkItem(itemStr, `"title"`), mkItem(itemCloseLinkHref, ")"), tEOF}},
 	{"link", `[link](/uri "title")`, []item{mkItem(itemOpenLinkText, "["), mkItem(itemStr, "link"),
@@ -48,7 +49,7 @@ var lexTests = []lexTest{
 	{"em", "l*u*te", []item{mkItem(itemStr, "l"), mkItem(itemEm, "*"), mkItem(itemStr, "u"), mkItem(itemEm, "*"), mkItem(itemStr, "te"), tEOF}},
 	{"code", "l`u`te", []item{mkItem(itemStr, "l"), mkItem(itemCode, "`"), mkItem(itemStr, "u"), mkItem(itemCode, "`"), mkItem(itemStr, "te"), tEOF}},
 	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
-	{"spaces", " \t\n", []item{mkItem(itemSpace, " \t\n"), tEOF}},
+	{"spaces", " \t\n", []item{mkItem(itemSpace, " "), mkItem(itemSpace, "\t"), mkItem(itemSpace, "\n"), tEOF}},
 	{"empty", "", []item{tEOF}},
 }
 
