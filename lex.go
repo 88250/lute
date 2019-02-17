@@ -40,8 +40,6 @@ func (i item) String() string {
 		return "EOF"
 	case i.typ == itemError:
 		return i.val
-	case i.typ > _itemDirectiveBeg && i.typ < _itemDirectiveEnd:
-		return fmt.Sprintf("<%s>", i.val)
 	case len(i.val) > 10:
 		return fmt.Sprintf("%.10q...", i.val)
 	}
@@ -70,16 +68,7 @@ var itemName = map[itemType]string{
 	itemCloseLinkHref: ")",
 	itemImg:           "!",
 	itemCodeBlock:     "```",
-
-	itemLeftParen:  "(",
-	itemRightParen: ")",
 	itemSpace:      "space",
-
-	// directives
-	itemDirectiveIf:     "if",
-	itemDirectiveElseif: "elseif",
-	itemDirectiveElse:   "else",
-	itemDirectiveList:   "list",
 }
 
 func (i itemType) String() string {
@@ -110,21 +99,6 @@ const (
 	itemCodeBlock                     // ```
 
 	itemSpace  // run of spaces separating arguments
-
-	itemLeftInterpolation   // ${
-	itemRightInterpolation  // }
-	itemStartDirective      // <#
-	itemCloseDirective      // >
-	itemEndDirective        // </#
-	itemLeftParen           // (
-	itemRightParen          // )
-
-	_itemDirectiveBeg
-	itemDirectiveIf      // if directive
-	itemDirectiveElseif  // elseif directive
-	itemDirectiveElse    // else directive
-	itemDirectiveList    // list directive
-	_itemDirectiveEnd
 )
 
 const (
