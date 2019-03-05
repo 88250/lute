@@ -26,6 +26,10 @@ import (
 // Pos represents a byte position in the original input text.
 type Pos int
 
+func (p Pos) Position() Pos {
+	return p
+}
+
 // item represents a token returned from the scanner.
 type item struct {
 	typ  itemType // the type of this item

@@ -16,15 +16,21 @@
 
 package lute
 
+import "fmt"
+
 // Node represents a node in ast. https://github.com/syntax-tree/mdast
-type Node struct {
-	NodeType
-	Position Pos
-	tree     *Tree
+type Node interface {
+	Type() NodeType
+	Position() Pos
+	String() string
 }
 
 // NodeType identifies the type of a parse tree node.
 type NodeType int
+
+func (t NodeType) Type() NodeType {
+	return t
+}
 
 const (
 	NodeParent NodeType = iota
@@ -61,17 +67,27 @@ const (
 // Nodes.
 
 type Parent struct {
-	Node
+	NodeType
+	Pos
 	Children []Node // element nodes in lexical order
 }
 
-func (c *Parent) append(n Node) {
-	c.Children = append(c.Children, n)
+func (parent *Parent) append(n Node) {
+	parent.Children = append(parent.Children, n)
+}
+
+func (parent *Parent) String() string {
+	return fmt.Sprintf("%s", parent.Children)
 }
 
 type Literal struct {
-	Node
+	NodeType
+	Pos
 	Value string
+}
+
+func (literal *Literal) String() string {
+	return fmt.Sprintf("%s", literal.Value)
 }
 
 type Root struct {
@@ -90,7 +106,8 @@ type Heading struct {
 }
 
 type ThematicBreak struct {
-	Node
+	NodeType
+	Pos
 }
 
 type Blockquote struct {
@@ -144,7 +161,8 @@ type YAML struct {
 }
 
 type Definition struct {
-	Node
+	NodeType
+	Pos
 	Association
 	Resource
 }
@@ -157,6 +175,10 @@ type FootnoteDefinition struct {
 
 type Text struct {
 	Literal
+}
+
+func (text Text) String() string {
+	return fmt.Sprintf("%s", text.Value)
 }
 
 type Emphasis struct {
@@ -179,7 +201,8 @@ type InlineCode struct {
 }
 
 type Break struct {
-	Node
+	NodeType
+	Pos
 }
 
 type Link struct {
@@ -189,7 +212,8 @@ type Link struct {
 }
 
 type Image struct {
-	Node
+	NodeType
+	Pos
 	Resource
 	Alternative
 }
@@ -201,7 +225,8 @@ type LinkReference struct {
 }
 
 type ImageReference struct {
-	Node
+	NodeType
+	Pos
 	Reference
 	Alternative
 }
@@ -212,7 +237,8 @@ type Footnote struct {
 }
 
 type FootnoteReference struct {
-	Node
+	NodeType
+	Pos
 	Association
 }
 

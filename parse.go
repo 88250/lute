@@ -117,12 +117,9 @@ func (t *Tree) peekNonSpace() (token item) {
 // The receiver is only used when the node does not have a pointer to the tree inside,
 // which can occur in old code.
 func (t *Tree) ErrorContext(n Node) (location string) {
-	pos := int(n.Position)
-	tree := n.tree
-	if tree == nil {
-		tree = t
-	}
-	text := tree.text[:pos]
+	pos := int(n.Position())
+
+	text := t.text[:pos]
 	byteNum := strings.LastIndex(text, "\n")
 	if byteNum == -1 {
 		byteNum = pos // On first line.
@@ -132,7 +129,7 @@ func (t *Tree) ErrorContext(n Node) (location string) {
 	}
 	lineNum := 1 + strings.Count(text, "\n")
 
-	return fmt.Sprintf("%s:%d:%d", tree.name, lineNum, byteNum)
+	return fmt.Sprintf("%s:%d:%d", t.name, lineNum, byteNum)
 }
 
 // errorf formats the error and terminates processing.
@@ -210,16 +207,14 @@ func (t *Tree) Parse(text string) (tree *Tree, err error) {
 
 func (t *Tree) parse() {
 	pos := t.peek().pos
-	t.Root = &Root{
-		 Parent{
-			Node: Node{
-				NodeRoot,
-				pos,
-				t,
-			},
-		},
-	}
+	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: pos}}
 
-	for t.peek().typ != itemEOF {
+	for token := t.next(); itemEOF != token.typ; token = t.next() {
+		switch token.typ {
+		case itemStr:
+			node := Text{Literal{NodeLiteral, token.pos, token.val}}
+			t.Root.append(node)
+		}
+
 	}
 }
