@@ -20,7 +20,7 @@ package lute
 type Node struct {
 	NodeType
 	Position Pos
-	tr       *Tree
+	tree     *Tree
 }
 
 // NodeType identifies the type of a parse tree node.
@@ -63,6 +63,10 @@ const (
 type Parent struct {
 	Node
 	Children []Node // element nodes in lexical order
+}
+
+func (c *Parent) append(n Node) {
+	c.Children = append(c.Children, n)
 }
 
 type Literal struct {

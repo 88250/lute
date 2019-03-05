@@ -11,3 +11,7 @@
 
 ## 目标代码生成
 
+## 鸣谢
+
+* golang template：很多代码偷师自该包
+* [mdast](https://github.com/syntax-tree/mdast)：Markdown 语法树规范
