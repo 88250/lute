@@ -29,63 +29,159 @@ type NodeType int
 const (
 	NodeParent NodeType = iota
 	NodeLiteral
+	NodeRoot
+	NodeParagraph
+	NodeHeading
+	NodeThematicBreak
+	NodeBlockquote
+	NodeList
+	NodeListItem
+	NodeTable
+	NodeTableRow
+	NodeTableCell
 	NodeHTML
 	NodeCode
+	NodeYAML
+	NodeDefinition
+	NodeFootnoteDefinition
 	NodeText
-	NodeInlineCode
 	NodeEmphasis
 	NodeStrong
+	NodeDelete
+	NodeInlineCode
+	NodeBreak
+	NodeLink
 	NodeImage
+	NodeLinkReference
+	NodeImageReference
+	NodeFootnote
+	NodeFootnoteReference
 )
 
 // Nodes.
 
-// ParentNode holds a sequence of nodes.
-type ParentNode struct {
+type Parent struct {
 	Node
 	Children []Node // element nodes in lexical order
 }
 
-type LiteralNode struct {
+type Literal struct {
 	Node
 	Value string
 }
 
-type HTMLNode struct {
-	LiteralNode
+type Root struct {
+	Parent
 }
 
-type CodeNode struct {
-	LiteralNode
+type Paragraph struct {
+	Parent
+	Children []Node
+}
+
+type Heading struct {
+	Parent
+	Depth    int8
+	Children []Node
+}
+
+type ThematicBreak struct {
+	Node
+}
+
+type Blockquote struct {
+	Parent
+	Children []Node
+}
+
+type List struct {
+	Parent
+	Ordered  bool
+	Start    int8
+	Spread   bool
+	Children []Node
+}
+
+type ListItem struct {
+	Parent
+	Checked  bool
+	Spread   bool
+	Children []Node
+}
+
+type Table struct {
+	Parent
+	Align    alignType
+	Children []Node
+}
+
+type TableRow struct {
+	Parent
+	Children []Node
+}
+
+type TableCell struct {
+	Parent
+	Children []Node
+}
+
+type HTML struct {
+	Literal
+}
+
+type Code struct {
+	Literal
 	Lang string
 	Meta string
 }
 
-type TextNode struct {
-	LiteralNode
+type YAML struct {
+	Literal
 }
 
-type InlineCode struct {
-	LiteralNode
+type Definition struct {
+	Node
+	Association
+	Resource
+}
+
+type FootnoteDefinition struct {
+	Parent
+	Association
+	Children []Node
+}
+
+type Text struct {
+	Literal
 }
 
 type Emphasis struct {
-	ParentNode
+	Parent
 	Children []Node
 }
 
 type Strong struct {
-	ParentNode
+	Parent
 	Children []Node
 }
 
 type Delete struct {
-	ParentNode
+	Parent
 	Children []Node
+}
+
+type InlineCode struct {
+	Literal
 }
 
 type Break struct {
 	Node
+}
+
+type Link struct {
+	Parent
+	Resource
+	Children []Node
 }
 
 type Image struct {
@@ -94,8 +190,26 @@ type Image struct {
 	Alternative
 }
 
+type LinkReference struct {
+	Parent
+	Reference
+	Children []Node
+}
+
 type ImageReference struct {
-	
+	Node
+	Reference
+	Alternative
+}
+
+type Footnote struct {
+	Parent
+	Children []Node
+}
+
+type FootnoteReference struct {
+	Node
+	Association
 }
 
 // Mixins.
@@ -121,5 +235,5 @@ type Alternative struct {
 
 // Enumerations.
 
-type alignType string     // "left" | "right" | "center" | null
-type referenceType string // "shortcut" | "collapsed" | "full"
+type alignType string
+type referenceType string
