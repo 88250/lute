@@ -210,20 +210,28 @@ func (t *Tree) parse() {
 	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: pos}}
 
 	for itemEOF != t.peek().typ {
-		n := t.textOrMark()
+		n := t.parseParagraph()
 		t.Root.append(n)
 	}
 }
 
-func (t *Tree) textOrMark() Node {
+func (t *Tree) parseParagraph() Node {
 	token := t.next()
 
-	switch token.typ {
-	case itemStr:
-		return Text{Literal{NodeLiteral, token.pos, token.val}}
-	case itemCode:
-		return InlineCode{Literal{NodeInlineCode, token.pos, token.val}}
+	ret := &Paragraph{
+		Parent{NodeParagraph, token.pos, nil},
+		[]Node{},
 	}
 
-	return nil
+	var c Node
+	switch token.typ {
+	case itemStr:
+		c = Text{Literal{NodeText, token.pos, token.val}}
+	case itemCode:
+		c = InlineCode{Literal{NodeInlineCode, token.pos, token.val}}
+	}
+
+	ret.append(c)
+
+	return ret
 }

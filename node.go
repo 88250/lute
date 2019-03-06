@@ -34,7 +34,6 @@ func (t NodeType) Type() NodeType {
 
 const (
 	NodeParent NodeType = iota
-	NodeLiteral
 	NodeRoot
 	NodeParagraph
 	NodeHeading
@@ -72,14 +71,6 @@ type Parent struct {
 	Children []Node // element nodes in lexical order
 }
 
-func (parent *Parent) append(n Node) {
-	parent.Children = append(parent.Children, n)
-}
-
-func (n *Parent) String() string {
-	return fmt.Sprintf("%s", n.Children)
-}
-
 type Literal struct {
 	NodeType
 	Pos
@@ -94,9 +85,25 @@ type Root struct {
 	Parent
 }
 
+func (n *Root) String() string {
+	return fmt.Sprintf("%s", n.Children)
+}
+
+func (n *Root) append(c Node) {
+	n.Children = append(n.Children, c)
+}
+
 type Paragraph struct {
 	Parent
 	Children []Node
+}
+
+func (n *Paragraph) String() string {
+	return fmt.Sprintf("%s", n.Children)
+}
+
+func (n *Paragraph) append(c Node) {
+	n.Children = append(n.Children, c)
 }
 
 type Heading struct {
