@@ -24,35 +24,23 @@ import (
 type parseTest struct {
 	name   string
 	input  string
-	ok     bool
 	result string // what the user would see in an error message.
 }
 
-const (
-	noError = true
-)
-
 var parseTests = []parseTest{
-	{"str", "lute", noError, ``},
+	{"code", "l`u`te", ``},
+	{"str", "lute", ``},
 	//{"empty", "", noError, ``},
 }
 
 func testParse(t *testing.T) {
 	for _, test := range parseTests {
 		tree, err := Parse(test.name, test.input)
-		switch {
-		case err == nil && !test.ok:
-			t.Errorf("%q: expected error; got none", test.name)
-			continue
-		case err != nil && test.ok:
+		if nil != err {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
-			continue
-		case err != nil && !test.ok:
-			// expected error, got one
-			continue
 		}
 
-		fmt.Printf("%+v", tree)
+		fmt.Printf("%+v\n", tree)
 	}
 }
 

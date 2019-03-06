@@ -76,8 +76,8 @@ func (parent *Parent) append(n Node) {
 	parent.Children = append(parent.Children, n)
 }
 
-func (parent *Parent) String() string {
-	return fmt.Sprintf("%s", parent.Children)
+func (n *Parent) String() string {
+	return fmt.Sprintf("%s", n.Children)
 }
 
 type Literal struct {
@@ -86,8 +86,8 @@ type Literal struct {
 	Value string
 }
 
-func (literal *Literal) String() string {
-	return fmt.Sprintf("%s", literal.Value)
+func (n *Literal) String() string {
+	return fmt.Sprintf("%s", n.Value)
 }
 
 type Root struct {
@@ -177,8 +177,8 @@ type Text struct {
 	Literal
 }
 
-func (text Text) String() string {
-	return fmt.Sprintf("%s", text.Value)
+func (n Text) String() string {
+	return fmt.Sprintf("%s", n.Value)
 }
 
 type Emphasis struct {
@@ -186,9 +186,17 @@ type Emphasis struct {
 	Children []Node
 }
 
+func (n Emphasis) String() string {
+	return fmt.Sprintf("%v", n.Children)
+}
+
 type Strong struct {
 	Parent
 	Children []Node
+}
+
+func (n Strong) String() string {
+	return fmt.Sprintf("%v", n.Children)
 }
 
 type Delete struct {
@@ -196,8 +204,16 @@ type Delete struct {
 	Children []Node
 }
 
+func (n Delete) String() string {
+	return fmt.Sprintf("%v", n.Children)
+}
+
 type InlineCode struct {
 	Literal
+}
+
+func (n InlineCode) String() string {
+	return fmt.Sprintf("%s", n.Value)
 }
 
 type Break struct {
