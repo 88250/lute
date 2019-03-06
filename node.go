@@ -185,7 +185,7 @@ type Text struct {
 }
 
 func (n Text) String() string {
-	return fmt.Sprintf("%s", n.Value)
+	return fmt.Sprintf("'%s'", n.Value)
 }
 
 type Emphasis struct {
@@ -194,7 +194,7 @@ type Emphasis struct {
 }
 
 func (n Emphasis) String() string {
-	return fmt.Sprintf("%v", n.Children)
+	return fmt.Sprintf("*%v*", n.Children)
 }
 
 type Strong struct {
@@ -203,7 +203,7 @@ type Strong struct {
 }
 
 func (n Strong) String() string {
-	return fmt.Sprintf("%v", n.Children)
+	return fmt.Sprintf("**%v**", n.Children)
 }
 
 type Delete struct {
@@ -212,7 +212,7 @@ type Delete struct {
 }
 
 func (n Delete) String() string {
-	return fmt.Sprintf("%v", n.Children)
+	return fmt.Sprintf("~~%v~~", n.Children)
 }
 
 type InlineCode struct {
@@ -220,7 +220,7 @@ type InlineCode struct {
 }
 
 func (n InlineCode) String() string {
-	return fmt.Sprintf("%s", n.Value)
+	return fmt.Sprintf("`%s`", n.Value)
 }
 
 type Break struct {

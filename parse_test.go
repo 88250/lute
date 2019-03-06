@@ -47,3 +47,30 @@ func testParse(t *testing.T) {
 func TestParse(t *testing.T) {
 	testParse(t)
 }
+
+func TestStack(t *testing.T) {
+	e1 := mkItem(itemCode, "`")
+	e2 := mkItem(itemStr, "lute")
+	e3 := mkItem(itemCode, "`")
+
+	s := &stack{}
+	s.push(&e1)
+	s.push(&e2)
+	s.push(&e3)
+
+	if "`" != s.pop().(*item).val {
+		t.Log("unexpected stack item")
+	}
+
+	if "lute" != s.pop().(*item).val {
+		t.Log("unexpected stack item")
+	}
+
+	if "`" != s.peek().(*item).val {
+		t.Log("unexpected stack item")
+	}
+
+	if "`" != s.pop().(*item).val {
+		t.Log("unexpected stack item")
+	}
+}

@@ -206,17 +206,23 @@ func (t *Tree) Parse(text string) (tree *Tree, err error) {
 }
 
 func (t *Tree) parse() {
-	pos := t.peek().pos
-	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: pos}}
+	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: 0}}
 
-	for itemEOF != t.peek().typ {
-		n := t.parseParagraph()
-		t.Root.append(n)
+	var c Node
+	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
+		switch token.typ {
+		case itemStr:
+			c = t.parseParagraph()
+		case itemCode:
+			c = t.parseCode()
+		}
+
+		t.Root.append(c)
 	}
 }
 
 func (t *Tree) parseParagraph() Node {
-	token := t.next()
+	token := t.peek()
 
 	ret := &Paragraph{
 		Parent{NodeParagraph, token.pos, nil},
@@ -224,14 +230,69 @@ func (t *Tree) parseParagraph() Node {
 	}
 
 	var c Node
-	switch token.typ {
-	case itemStr:
-		c = Text{Literal{NodeText, token.pos, token.val}}
-	case itemCode:
-		c = InlineCode{Literal{NodeInlineCode, token.pos, token.val}}
+	for ; itemEOF != token.typ; token = t.peek() {
+		switch token.typ {
+		case itemStr:
+			c = t.parseText()
+		case itemCode:
+			c = t.parseCode()
+		}
+
+		ret.append(c)
 	}
 
-	ret.append(c)
-
 	return ret
+}
+
+func (t *Tree) parseText() Node {
+	token := t.next()
+
+	return Text{Literal{NodeText, token.pos, token.val}}
+}
+
+func (t *Tree) parseCode() (ret Node) {
+	token := t.next() // consume start ` or ```
+
+	code := t.next()
+	if "`" == token.val {
+		ret = InlineCode{Literal{NodeInlineCode, code.pos, code.val}}
+	} else { // ```
+		ret = InlineCode{Literal{NodeCode, code.pos, code.val}}
+	}
+
+	t.next() // consume close ` or ```
+
+	return
+}
+
+type stack struct {
+	items []interface{}
+	count int
+}
+
+func (s *stack) push(e interface{}) {
+	s.items = append(s.items[:s.count], e)
+	s.count++
+}
+
+func (s *stack) pop() interface{} {
+	if s.count == 0 {
+		return nil
+	}
+
+	s.count--
+
+	return s.items[s.count]
+}
+
+func (s *stack) peek() interface{} {
+	if s.count == 0 {
+		return nil
+	}
+
+	return s.items[s.count-1]
+}
+
+func (s *stack) isEmpty() bool {
+	return 0 == len(s.items)
 }
