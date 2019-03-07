@@ -219,6 +219,19 @@ func (t *Tree) parseTopLevelContent() Node {
 	return nil
 }
 
+func (t *Tree) parseBlockContent() (ret Node) {
+	switch token := t.peek(); token.typ {
+	case itemStr:
+		return t.parseParagraph()
+	case itemHeading:
+		ret = t.parseHeading()
+	default:
+		t.unexpected(token, "input")
+	}
+
+	return
+}
+
 func (t *Tree) parseListContent() Node {
 
 	return nil
@@ -245,7 +258,7 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	case itemStr:
 		return t.parseText()
 	case itemCode:
-		ret = t.parseCode()
+		ret = t.parseInlineCode()
 	case itemEm:
 		ret = t.parseEm()
 	default:
@@ -255,52 +268,33 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	return
 }
 
-func (t *Tree) parseParagraph() Node {
+func (t *Tree) parseParagraph() (ret Node) {
 	token := t.peek()
 
-	ret := &Paragraph{
+	ret = &Paragraph{
 		Parent{NodeParagraph, token.pos, nil},
-		[]Node{},
+		[]Node{t.parsePhrasingContent()},
 	}
 
-	var c Node
-	for ; itemEOF != token.typ; token = t.peek() {
-		switch token.typ {
-		case itemStr:
-			c = t.parseText()
-		case itemEm:
-			c = t.parseEm()
-		case itemCode:
-			c = t.parseCode()
-		default:
-			t.unexpected(token, "input")
-		}
+	return
+}
 
-		ret.append(c)
+func (t *Tree) parseHeading() (ret Node) {
+	token := t.peek()
+
+	ret = &Heading{
+		Parent{NodeParagraph, token.pos, nil},
+		int8(len(token.val)),
+		[]Node{t.parsePhrasingContent()},
 	}
 
-	return ret
+	return
 }
 
 func (t *Tree) parseText() Node {
 	token := t.next()
 
 	return Text{Literal{NodeText, token.pos, token.val}}
-}
-
-func (t *Tree) parseCode() (ret Node) {
-	token := t.next() // consume open ` or ```
-
-	code := t.next()
-	if "`" == token.val {
-		ret = InlineCode{Literal{NodeInlineCode, code.pos, code.val}}
-	} else { // ```
-		ret = InlineCode{Literal{NodeCode, code.pos, code.val}}
-	}
-
-	t.next() // consume close ` or ```
-
-	return
 }
 
 func (t *Tree) parseEm() (ret Node) {
@@ -311,6 +305,52 @@ func (t *Tree) parseEm() (ret Node) {
 		[]Node{t.parsePhrasingContent()},
 	}
 	t.next() // consume close *
+
+	return
+}
+
+func (t *Tree) parseStrong() (ret Node) {
+	t.next() // consume open **
+	token := t.peek()
+	ret = Strong{
+		Parent{NodeStrong, token.pos, nil},
+		[]Node{t.parsePhrasingContent()},
+	}
+	t.next() // consume close **
+
+	return
+}
+
+func (t *Tree) parseDelete() (ret Node) {
+	t.next() // consume open ~~
+	token := t.peek()
+	ret = Delete{
+		Parent{NodeDelete, token.pos, nil},
+		[]Node{t.parsePhrasingContent()},
+	}
+	t.next() // consume close ~~
+
+	return
+}
+
+func (t *Tree) parseHTML() (ret Node) {
+	return nil
+}
+
+func (t *Tree) parseBreak() (ret Node) {
+	token := t.next()
+	ret = Break{NodeBreak, token.pos}
+
+	return
+}
+
+func (t *Tree) parseInlineCode() (ret Node) {
+	t.next() // consume open `
+
+	code := t.next()
+	ret = InlineCode{Literal{NodeInlineCode, code.pos, code.val}}
+
+	t.next() // consume close `
 
 	return
 }

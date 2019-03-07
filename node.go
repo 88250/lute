@@ -112,6 +112,10 @@ type Heading struct {
 	Children []Node
 }
 
+func (n Heading) String() string {
+	return fmt.Sprintf("%s", n.Children)
+}
+
 type ThematicBreak struct {
 	NodeType
 	Pos
@@ -228,6 +232,10 @@ type Break struct {
 	Pos
 }
 
+func (n Break) String() string {
+	return fmt.Sprintf("'\n'")
+}
+
 type Link struct {
 	Parent
 	Resource
@@ -239,6 +247,10 @@ type Image struct {
 	Pos
 	Resource
 	Alternative
+}
+
+func (n Image) String() string {
+	return fmt.Sprintf("%s", n.URL)
 }
 
 type LinkReference struct {

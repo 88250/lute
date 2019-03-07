@@ -39,15 +39,15 @@ var (
 
 var lexTests = []lexTest{
 
-	{"comb1", "### foo\n## foo", []item{mkItem(itemHeader, "###"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n"), mkItem(itemHeader, "##"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), tEOF}},
-	{"comb0", "# h\n\nl**u**te", []item{mkItem(itemHeader, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "h"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
+	{"comb1", "### foo\n## foo", []item{mkItem(itemHeading, "###"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n"), mkItem(itemHeading, "##"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), tEOF}},
+	{"comb0", "# h\n\nl**u**te", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "h"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
 
 	{"paragraph", "p1\n\np2", []item{mkItem(itemStr, "p1"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemStr, "p2"), tEOF}},
 	{"img", `![alt](/uri "title")`, []item{mkItem(itemImg, "!"), mkItem(itemOpenLinkText, "["), mkItem(itemStr, "alt"),
 		mkItem(itemCloseLinkText, "]"), mkItem(itemOpenLinkHref, "("), mkItem(itemStr, "/uri"), mkItem(itemSpace, " "), mkItem(itemStr, `"title"`), mkItem(itemCloseLinkHref, ")"), tEOF}},
 	{"link", `[link](/uri "title")`, []item{mkItem(itemOpenLinkText, "["), mkItem(itemStr, "link"),
 		mkItem(itemCloseLinkText, "]"), mkItem(itemOpenLinkHref, "("), mkItem(itemStr, "/uri"), mkItem(itemSpace, " "), mkItem(itemStr, `"title"`), mkItem(itemCloseLinkHref, ")"), tEOF}},
-	{"header", "# lute", []item{mkItem(itemHeader, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
+	{"header", "# lute", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"quote", "> lute", []item{mkItem(itemQuote, ">"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"strong", "l**u**te", []item{mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
 	{"em", "l*u*te", []item{mkItem(itemStr, "l"), mkItem(itemEm, "*"), mkItem(itemStr, "u"), mkItem(itemEm, "*"), mkItem(itemStr, "te"), tEOF}},

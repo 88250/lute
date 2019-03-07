@@ -59,7 +59,7 @@ var itemName = map[itemType]string{
 	itemError:         "error",
 	itemEOF:           "EOF",
 	itemStr:           "str",
-	itemHeader:        "#",
+	itemHeading:       "#",
 	itemQuote:         ">",
 	itemListItem:      "-",
 	itemCode:          "`",
@@ -88,7 +88,7 @@ const (
 	itemError         itemType = iota // error occurred; value is text of error
 	itemEOF                           // EOF
 	itemStr                           // plain text
-	itemHeader                        // #
+	itemHeading                       // #
 	itemQuote                         // >
 	itemListItem                      // -
 	itemCode                          // `
@@ -242,7 +242,7 @@ func lexText(l *lexer) stateFn {
 	r := l.next()
 	switch {
 	case '#' == r:
-		return lexHeader
+		return lexHeading
 	case '>' == r:
 		l.emit(itemQuote)
 
@@ -292,10 +292,10 @@ func lexText(l *lexer) stateFn {
 	return nil
 }
 
-// lexHeader scans '#'.
-func lexHeader(l *lexer) stateFn {
+// lexHeading scans '#'.
+func lexHeading(l *lexer) stateFn {
 	l.acceptRun("#")
-	l.emit(itemHeader)
+	l.emit(itemHeading)
 
 	r := l.next()
 	switch {
