@@ -199,26 +199,60 @@ func (t *Tree) Parse(text string) (tree *Tree, err error) {
 	defer t.recover(&err)
 	t.startParse(lex(t.name, text))
 	t.text = text
-	t.parse()
+	t.parseContent()
 	t.stopParse()
 
 	return t, nil
 }
 
-func (t *Tree) parse() {
+func (t *Tree) parseContent() {
 	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: 0}}
 
-	var c Node
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
-		switch token.typ {
-		case itemStr:
-			c = t.parseParagraph()
-		case itemCode:
-			c = t.parseCode()
-		}
-
+		c := t.parsePhrasingContent()
 		t.Root.append(c)
 	}
+}
+
+func (t *Tree) parseTopLevelContent() Node {
+
+	return nil
+}
+
+func (t *Tree) parseListContent() Node {
+
+	return nil
+}
+
+func (t *Tree) parseTableContent() Node {
+
+	return nil
+}
+
+func (t *Tree) parseRowContent() Node {
+
+	return nil
+}
+
+func (t *Tree) parsePhrasingContent() (ret Node) {
+	ret = t.parseStaticPhrasingContent()
+
+	return
+}
+
+func (t *Tree) parseStaticPhrasingContent() (ret Node) {
+	switch token := t.peek(); token.typ {
+	case itemStr:
+		return t.parseText()
+	case itemCode:
+		ret = t.parseCode()
+	case itemEm:
+		ret = t.parseEm()
+	default:
+		t.unexpected(token, "input")
+	}
+
+	return
 }
 
 func (t *Tree) parseParagraph() Node {
@@ -234,8 +268,12 @@ func (t *Tree) parseParagraph() Node {
 		switch token.typ {
 		case itemStr:
 			c = t.parseText()
+		case itemEm:
+			c = t.parseEm()
 		case itemCode:
 			c = t.parseCode()
+		default:
+			t.unexpected(token, "input")
 		}
 
 		ret.append(c)
@@ -251,7 +289,7 @@ func (t *Tree) parseText() Node {
 }
 
 func (t *Tree) parseCode() (ret Node) {
-	token := t.next() // consume start ` or ```
+	token := t.next() // consume open ` or ```
 
 	code := t.next()
 	if "`" == token.val {
@@ -261,6 +299,18 @@ func (t *Tree) parseCode() (ret Node) {
 	}
 
 	t.next() // consume close ` or ```
+
+	return
+}
+
+func (t *Tree) parseEm() (ret Node) {
+	t.next() // consume open *
+	token := t.peek()
+	ret = Emphasis{
+		Parent{NodeEmphasis, token.pos, nil},
+		[]Node{t.parsePhrasingContent()},
+	}
+	t.next() // consume close *
 
 	return
 }
