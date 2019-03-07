@@ -113,7 +113,7 @@ type Heading struct {
 }
 
 func (n Heading) String() string {
-	return fmt.Sprintf("%s", n.Children)
+	return fmt.Sprintf("# %s", n.Children)
 }
 
 type ThematicBreak struct {
@@ -124,6 +124,10 @@ type ThematicBreak struct {
 type Blockquote struct {
 	Parent
 	Children []Node
+}
+
+func (n Blockquote) String() string {
+	return fmt.Sprintf("%s", n.Children)
 }
 
 type List struct {

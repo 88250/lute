@@ -47,7 +47,7 @@ var lexTests = []lexTest{
 		mkItem(itemCloseLinkText, "]"), mkItem(itemOpenLinkHref, "("), mkItem(itemStr, "/uri"), mkItem(itemSpace, " "), mkItem(itemStr, `"title"`), mkItem(itemCloseLinkHref, ")"), tEOF}},
 	{"link", `[link](/uri "title")`, []item{mkItem(itemOpenLinkText, "["), mkItem(itemStr, "link"),
 		mkItem(itemCloseLinkText, "]"), mkItem(itemOpenLinkHref, "("), mkItem(itemStr, "/uri"), mkItem(itemSpace, " "), mkItem(itemStr, `"title"`), mkItem(itemCloseLinkHref, ")"), tEOF}},
-	{"header", "# lute", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
+	{"heading", "# lute", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"quote", "> lute", []item{mkItem(itemQuote, ">"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"strong", "l**u**te", []item{mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
 	{"em", "l*u*te", []item{mkItem(itemStr, "l"), mkItem(itemEm, "*"), mkItem(itemStr, "u"), mkItem(itemEm, "*"), mkItem(itemStr, "te"), tEOF}},

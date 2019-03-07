@@ -209,7 +209,16 @@ func (t *Tree) parseContent() {
 	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: 0}}
 
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
-		c := t.parsePhrasingContent()
+		var c Node
+		switch token.typ {
+		case itemQuote:
+			c = t.parseBlockquote()
+		case itemHeading:
+			c = t.parseHeading()
+		default:
+			c = t.parsePhrasingContent()
+		}
+
 		t.Root.append(c)
 	}
 }
@@ -222,9 +231,11 @@ func (t *Tree) parseTopLevelContent() Node {
 func (t *Tree) parseBlockContent() (ret Node) {
 	switch token := t.peek(); token.typ {
 	case itemStr:
-		return t.parseParagraph()
+		return t.parseText()
 	case itemHeading:
 		ret = t.parseHeading()
+	case itemQuote:
+		ret = t.parseBlockquote()
 	default:
 		t.unexpected(token, "input")
 	}
@@ -261,8 +272,8 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 		ret = t.parseInlineCode()
 	case itemEm:
 		ret = t.parseEm()
-	default:
-		t.unexpected(token, "input")
+	case itemStrong:
+		ret = t.parseStrong()
 	}
 
 	return
@@ -280,12 +291,25 @@ func (t *Tree) parseParagraph() (ret Node) {
 }
 
 func (t *Tree) parseHeading() (ret Node) {
-	token := t.peek()
+	token := t.next()
+	t.next() // consume spaces
 
 	ret = &Heading{
-		Parent{NodeParagraph, token.pos, nil},
+		Parent{NodeHeading, token.pos, nil},
 		int8(len(token.val)),
 		[]Node{t.parsePhrasingContent()},
+	}
+
+	return
+}
+
+func (t *Tree) parseBlockquote() (ret Node) {
+	token := t.next()
+	t.next() // consume spaces
+
+	ret = &Blockquote{
+		Parent{NodeParagraph, token.pos, nil},
+		[]Node{t.parseBlockContent()},
 	}
 
 	return
