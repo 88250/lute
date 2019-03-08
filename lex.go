@@ -248,7 +248,7 @@ func lexText(l *lexer) stateFn {
 
 		return lexQuote
 	case '*' == r:
-		return lexEmorStrong
+		return lexEmOrStrong
 	case '`' == r:
 		return lexCode
 	case ' ' == r, '\t' == r:
@@ -320,7 +320,7 @@ func lexQuote(l *lexer) stateFn {
 }
 
 // lexEmOrStrong scans '*' or '**'.
-func lexEmorStrong(l *lexer) stateFn {
+func lexEmOrStrong(l *lexer) stateFn {
 	r := l.next()
 	switch {
 	case '*' == r:

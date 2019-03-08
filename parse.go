@@ -231,7 +231,7 @@ func (t *Tree) parseTopLevelContent() Node {
 func (t *Tree) parseBlockContent() (ret Node) {
 	switch token := t.peek(); token.typ {
 	case itemStr:
-		return t.parseText()
+		return t.parseParagraph()
 	case itemHeading:
 		ret = t.parseHeading()
 	case itemQuote:
@@ -299,6 +299,13 @@ func (t *Tree) parseHeading() (ret Node) {
 		int8(len(token.val)),
 		[]Node{t.parsePhrasingContent()},
 	}
+
+	return
+}
+
+func (t *Tree) parseThematicBreak() (ret Node) {
+	token := t.next()
+	ret = &ThematicBreak{NodeThematicBreak, token.pos}
 
 	return
 }

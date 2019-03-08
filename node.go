@@ -121,6 +121,10 @@ type ThematicBreak struct {
 	Pos
 }
 
+func (n ThematicBreak) String() string {
+	return fmt.Sprintf("'***'")
+}
+
 type Blockquote struct {
 	Parent
 	Children []Node
