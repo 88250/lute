@@ -21,56 +21,25 @@ import (
 	"testing"
 )
 
-type parseTest struct {
+type htmlTest struct {
 	name   string
 	input  string
 	result string // what the user would see in an error message.
 }
 
-var parseTests = []parseTest{
-	{"heading", "# lute", ``},
-	{"quote", "> lute", ``},
-	{"strong", "l**u**te", ``},
-	{"em", "l*u*te", ``},
+var htmlTests = []htmlTest{
 	{"inlineCode", "l`u`te", ``},
 	{"str", "lute", ``},
 	{"empty", "", ``},
 }
 
-func TestParse(t *testing.T) {
-	for _, test := range parseTests {
+func TestHTML(t *testing.T) {
+	for _, test := range htmlTests {
 		tree, err := Parse(test.name, test.input)
 		if nil != err {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		fmt.Printf("%+v\n", tree)
-	}
-}
-
-func TestStack(t *testing.T) {
-	e1 := mkItem(itemInlineCode, "`")
-	e2 := mkItem(itemStr, "lute")
-	e3 := mkItem(itemInlineCode, "`")
-
-	s := &stack{}
-	s.push(&e1)
-	s.push(&e2)
-	s.push(&e3)
-
-	if "`" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
-	}
-
-	if "lute" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
-	}
-
-	if "`" != s.peek().(*item).val {
-		t.Log("unexpected stack item")
-	}
-
-	if "`" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
+		fmt.Printf("%s: %s\n", tree.name, tree.HTML())
 	}
 }

@@ -32,6 +32,10 @@ type Tree struct {
 	peekCount int
 }
 
+func (t *Tree) HTML() string {
+	return t.Root.HTML()
+}
+
 func Parse(name, text string) (*Tree, error) {
 	t := &Tree{
 		name: name,

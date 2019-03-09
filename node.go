@@ -86,6 +86,12 @@ func (n *Root) String() string {
 	return fmt.Sprintf("%s", n.Children)
 }
 
+func (n *Root) HTML() string {
+	content := html(n.Children)
+
+	return fmt.Sprintf("%s", content)
+}
+
 func (n *Root) append(c Node) {
 	n.Children = append(n.Children, c)
 }
