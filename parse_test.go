@@ -34,7 +34,7 @@ var parseTests = []parseTest{
 	{"em", "l*u*te", ``},
 	{"code", "l`u`te", ``},
 	{"str", "lute", ``},
-	//{"empty", "", noError, ``},
+	{"empty", "", ``},
 }
 
 func testParse(t *testing.T) {
