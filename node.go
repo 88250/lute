@@ -23,6 +23,7 @@ type Node interface {
 	Type() NodeType
 	Position() Pos
 	String() string
+	HTML() string
 }
 
 // NodeType identifies the type of a parse tree node.
@@ -77,10 +78,6 @@ type Literal struct {
 	Value string
 }
 
-func (n *Literal) String() string {
-	return fmt.Sprintf("%s", n.Value)
-}
-
 type Root struct {
 	Parent
 }
@@ -102,6 +99,12 @@ func (n *Paragraph) String() string {
 	return fmt.Sprintf("%s", n.Children)
 }
 
+func (n *Paragraph) HTML() string {
+	content := html(n.Children)
+
+	return fmt.Sprintf("<p>%s</p>", content)
+}
+
 func (n *Paragraph) append(c Node) {
 	n.Children = append(n.Children, c)
 }
@@ -116,13 +119,23 @@ func (n Heading) String() string {
 	return fmt.Sprintf("# %s", n.Children)
 }
 
+func (n *Heading) HTML() string {
+	content := html(n.Children)
+
+	return fmt.Sprintf("<p>%s</p>", content)
+}
+
 type ThematicBreak struct {
 	NodeType
 	Pos
 }
 
-func (n ThematicBreak) String() string {
+func (n *ThematicBreak) String() string {
 	return fmt.Sprintf("'***'")
+}
+
+func (n *ThematicBreak) HTML() string {
+	return fmt.Sprintf("<hr>")
 }
 
 type Blockquote struct {
@@ -130,8 +143,14 @@ type Blockquote struct {
 	Children []Node
 }
 
-func (n Blockquote) String() string {
+func (n *Blockquote) String() string {
 	return fmt.Sprintf("%s", n.Children)
+}
+
+func (n *Blockquote) HTML() string {
+	content := html(n.Children)
+
+	return content
 }
 
 type List struct {
@@ -175,8 +194,12 @@ type Code struct {
 	Meta string
 }
 
-func (n Code) String() string {
+func (n *Code) String() string {
 	return fmt.Sprintf("```%s```", n.Value)
+}
+
+func (n *Code) HTML() string {
+	return fmt.Sprintf("<pre><code>%s</code></pre>", n.Value)
 }
 
 type YAML struct {
@@ -200,8 +223,12 @@ type Text struct {
 	Literal
 }
 
-func (n Text) String() string {
+func (n *Text) String() string {
 	return fmt.Sprintf("'%s'", n.Value)
+}
+
+func (n *Text) HTML() string {
+	return fmt.Sprintf("%s", n.Value)
 }
 
 type Emphasis struct {
@@ -209,8 +236,14 @@ type Emphasis struct {
 	Children []Node
 }
 
-func (n Emphasis) String() string {
+func (n *Emphasis) String() string {
 	return fmt.Sprintf("*%v*", n.Children)
+}
+
+func (n *Emphasis) HTML() string {
+	content := html(n.Children)
+
+	return fmt.Sprintf("<em>%s</em>", content)
 }
 
 type Strong struct {
@@ -218,8 +251,14 @@ type Strong struct {
 	Children []Node
 }
 
-func (n Strong) String() string {
+func (n *Strong) String() string {
 	return fmt.Sprintf("**%v**", n.Children)
+}
+
+func (n *Strong) HTML() string {
+	content := html(n.Children)
+
+	return fmt.Sprintf("<strong>%s</strong>", content)
 }
 
 type Delete struct {
@@ -227,8 +266,14 @@ type Delete struct {
 	Children []Node
 }
 
-func (n Delete) String() string {
+func (n *Delete) String() string {
 	return fmt.Sprintf("~~%v~~", n.Children)
+}
+
+func (n *Delete) HTML() string {
+	content := html(n.Children)
+
+	return fmt.Sprintf("<del>%s</del>", content)
 }
 
 type InlineCode struct {
@@ -239,13 +284,21 @@ func (n InlineCode) String() string {
 	return fmt.Sprintf("`%s`", n.Value)
 }
 
+func (n InlineCode) HTML() string {
+	return fmt.Sprintf("<code>%s</code>", n.Value)
+}
+
 type Break struct {
 	NodeType
 	Pos
 }
 
-func (n Break) String() string {
+func (n *Break) String() string {
 	return fmt.Sprintf("'\n'")
+}
+
+func (n *Break) HTML() string {
+	return fmt.Sprintf("<br>")
 }
 
 type Link struct {
@@ -314,3 +367,12 @@ type Alternative struct {
 
 type alignType string
 type referenceType string
+
+func html(children []Node) string {
+	var ret string
+	for _, c := range children {
+		ret += c.HTML()
+	}
+
+	return ret
+}
