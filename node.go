@@ -128,7 +128,7 @@ func (n Heading) String() string {
 func (n *Heading) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<p>%s</p>", content)
+	return fmt.Sprintf("<h%d>%s</h%d>", n.Depth, content, n.Depth)
 }
 
 type ThematicBreak struct {
@@ -156,7 +156,7 @@ func (n *Blockquote) String() string {
 func (n *Blockquote) HTML() string {
 	content := html(n.Children)
 
-	return content
+	return fmt.Sprintf("<blockquote>%s</blockquote>", content)
 }
 
 type List struct {

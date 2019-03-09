@@ -17,7 +17,6 @@
 package lute
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -28,8 +27,17 @@ type htmlTest struct {
 }
 
 var htmlTests = []htmlTest{
-	{"inlineCode", "l`u`te", ``},
-	{"str", "lute", ``},
+	{"heading6", "###### lute", `<h6>lute</h6>`},
+	{"heading5", "##### lute", `<h5>lute</h5>`},
+	{"heading4", "#### lute", `<h4>lute</h4>`},
+	{"heading3", "### lute", `<h3>lute</h3>`},
+	{"heading2", "## lute", `<h2>lute</h2>`},
+	{"heading1", "# lute", `<h1>lute</h1>`},
+	{"quote", "> lute", `<blockquote><p>lute</p></blockquote>`},
+	{"strong", "l**u**te", `<p>l<strong>u</strong>te</p>`},
+	{"em", "l*u*te", `<p>l<em>u</em>te</p>`},
+	{"inlineCode", "l`u`te", `<p>l<code>u</code>te</p>`},
+	{"str", "lute", `<p>lute</p>`},
 	{"empty", "", ``},
 }
 
@@ -40,6 +48,9 @@ func TestHTML(t *testing.T) {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		fmt.Printf("%s: %s\n", tree.name, tree.HTML())
+		html := tree.HTML()
+		if test.result != html {
+			t.Errorf("%s: expected is %s, but actual is %s\n", tree.name, test.result, html)
+		}
 	}
 }

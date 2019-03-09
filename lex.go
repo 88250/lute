@@ -184,10 +184,13 @@ func (l *lexer) accept(valid string) bool {
 }
 
 // acceptRun consumes a run of runes from the valid set.
-func (l *lexer) acceptRun(valid string) {
+func (l *lexer) acceptRun(valid string) (count int8) {
 	for strings.ContainsRune(valid, l.next()) {
+		count++
 	}
 	l.backup()
+
+	return
 }
 
 // errorf returns an error token and terminates the scan by passing
