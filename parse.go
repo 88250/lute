@@ -211,10 +211,8 @@ func (t *Tree) parseContent() {
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
 		var c Node
 		switch token.typ {
-		case itemQuote:
-			c = t.parseBlockquote()
-		case itemHeading:
-			c = t.parseHeading()
+		case itemStr, itemHeading, itemThematicBreak, itemQuote /* List, Table, HTML */, itemInlineCode:
+			c = t.parseBlockContent()
 		default:
 			c = t.parsePhrasingContent()
 		}
@@ -223,19 +221,26 @@ func (t *Tree) parseContent() {
 	}
 }
 
-func (t *Tree) parseTopLevelContent() Node {
+func (t *Tree) parseTopLevelContent() (ret Node) {
+	ret = t.parseBlockContent()
 
-	return nil
+	return
 }
 
 func (t *Tree) parseBlockContent() (ret Node) {
 	switch token := t.peek(); token.typ {
 	case itemStr:
-		return t.parseParagraph()
+		return t.parseText()
 	case itemHeading:
 		ret = t.parseHeading()
+	case itemThematicBreak:
+		ret = t.parseThematicBreak()
 	case itemQuote:
 		ret = t.parseBlockquote()
+	case itemInlineCode:
+		ret = t.parseInlineCode()
+	case itemCode:
+		ret = t.parseCode()
 	default:
 		t.unexpected(token, "input")
 	}
@@ -268,7 +273,7 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	switch token := t.peek(); token.typ {
 	case itemStr:
 		return t.parseText()
-	case itemCode:
+	case itemInlineCode:
 		ret = t.parseInlineCode()
 	case itemEm:
 		ret = t.parseEm()
@@ -382,6 +387,17 @@ func (t *Tree) parseInlineCode() (ret Node) {
 	ret = InlineCode{Literal{NodeInlineCode, code.pos, code.val}}
 
 	t.next() // consume close `
+
+	return
+}
+
+func (t *Tree) parseCode() (ret Node) {
+	t.next() // consume open ```
+
+	code := t.next()
+	ret = Code{Literal{NodeCode, code.pos, code.val}, "", ""}
+
+	t.next() // consume close ```
 
 	return
 }

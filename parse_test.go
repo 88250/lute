@@ -53,9 +53,9 @@ func TestParse(t *testing.T) {
 }
 
 func TestStack(t *testing.T) {
-	e1 := mkItem(itemCode, "`")
+	e1 := mkItem(itemInlineCode, "`")
 	e2 := mkItem(itemStr, "lute")
-	e3 := mkItem(itemCode, "`")
+	e3 := mkItem(itemInlineCode, "`")
 
 	s := &stack{}
 	s.push(&e1)

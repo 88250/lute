@@ -62,7 +62,7 @@ var itemName = map[itemType]string{
 	itemHeading:       "#",
 	itemQuote:         ">",
 	itemListItem:      "-",
-	itemCode:          "`",
+	itemInlineCode:    "`",
 	itemStrong:        "**",
 	itemEm:            "*",
 	itemDel:           "~~",
@@ -91,9 +91,11 @@ const (
 	itemHeading                       // #
 	itemQuote                         // >
 	itemListItem                      // -
-	itemCode                          // `
+	itemInlineCode                    // `
+	itemCode                          // ```
 	itemStrong                        // **
 	itemEm                            // *
+	itemThematicBreak                 // ***
 	itemDel                           // ~~
 	itemOpenLinkText                  // [
 	itemCloseLinkText                 // ]
@@ -321,13 +323,20 @@ func lexQuote(l *lexer) stateFn {
 
 // lexEmOrStrong scans '*' or '**'.
 func lexEmOrStrong(l *lexer) stateFn {
-	r := l.next()
+	second := l.next()
+	third := l.next()
 	switch {
-	case '*' == r:
+	case '*' == second && '*' == third:
+		l.emit(itemThematicBreak)
+
+		return lexText
+	case '*' == second:
+		l.backup()
 		l.emit(itemStrong)
 
 		return lexText
 	default:
+		l.backup()
 		l.backup()
 		l.emit(itemEm)
 
@@ -337,8 +346,16 @@ func lexEmOrStrong(l *lexer) stateFn {
 
 // lexCode scans '`' or '```'.
 func lexCode(l *lexer) stateFn {
-	l.acceptRun("`")
-	l.emit(itemCode)
+	second := l.next()
+	third := l.next()
+	switch {
+	case '`' == second && '`' == third:
+		l.emit(itemCode)
+	default:
+		l.backup()
+		l.backup()
+		l.emit(itemInlineCode)
+	}
 
 	return lexText
 }

@@ -175,6 +175,10 @@ type Code struct {
 	Meta string
 }
 
+func (n Code) String() string {
+	return fmt.Sprintf("```%s```", n.Value)
+}
+
 type YAML struct {
 	Literal
 }
