@@ -26,9 +26,9 @@ import (
 type testcase struct {
 	EndLine   int    `json:"end_line"`
 	Section   string `json:"section"`
-	Html      string `json:"html"`
+	HTML      string `json:"html"`
 	Markdown  string `json:"markdown"`
-	Example   int    `json:"example"`
+	Example   string `json:"example"`
 	StartLine int    `json:"start_line"`
 }
 
@@ -45,5 +45,14 @@ func TestSpec(t *testing.T) {
 
 	for _, tc := range testcases {
 		fmt.Printf("%v", tc)
+		tree, err := Parse(tc.Section+" "+tc.Example, tc.Markdown)
+		if nil != err {
+			t.Errorf("parse [%s] failed: %s", tree.name, err.Error())
+		}
+
+		html := tree.HTML()
+		if tc.HTML != html {
+			t.Errorf("%s: expected is %s, but actual is %s\n", tree.name, tc.HTML, html)
+		}
 	}
 }
