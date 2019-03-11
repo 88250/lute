@@ -27,18 +27,18 @@ type htmlTest struct {
 }
 
 var htmlTests = []htmlTest{
-	{"heading6", "###### lute", `<h6>lute</h6>`},
-	{"heading5", "##### lute", `<h5>lute</h5>`},
-	{"heading4", "#### lute", `<h4>lute</h4>`},
-	{"heading3", "### lute", `<h3>lute</h3>`},
-	{"heading2", "## lute", `<h2>lute</h2>`},
-	{"heading1", "# lute", `<h1>lute</h1>`},
-	{"quote", "> lute", `<blockquote><p>lute</p></blockquote>`},
-	{"strong", "l**u**te", `<p>l<strong>u</strong>te</p>`},
-	{"em", "l*u*te", `<p>l<em>u</em>te</p>`},
-	{"inlineCode", "l`u`te", `<p>l<code>u</code>te</p>`},
-	{"str", "lute", `<p>lute</p>`},
-	{"empty", "", ``},
+	{"heading6", "###### lute", "<h6>lute</h6>\n"},
+	{"heading5", "##### lute", "<h5>lute</h5>\n"},
+	{"heading4", "#### lute", "<h4>lute</h4>\n"},
+	{"heading3", "### lute", "<h3>lute</h3>\n"},
+	{"heading2", "## lute", "<h2>lute</h2>\n"},
+	{"heading1", "# lute", "<h1>lute</h1>\n"},
+	{"quote", "> lute", "<blockquote><p>lute</p></blockquote>\n"},
+	{"strong", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
+	{"em", "l*u*te", "<p>l<em>u</em>te</p>\n"},
+	{"inlineCode", "l`u`te", "<p>l<code>u</code>te</p>\n"},
+	{"str", "lute", "<p>lute</p>\n"},
+	{"empty", "", "\n"},
 }
 
 func TestHTML(t *testing.T) {
@@ -50,7 +50,7 @@ func TestHTML(t *testing.T) {
 
 		html := tree.HTML()
 		if test.result != html {
-			t.Fatalf("%s: expected is %s, but actual is %s\n", tree.name, test.result, html)
+			t.Fatalf("%s:\nexpected\n\t%s\ngot\n\t%s\n", tree.name, test.result, html)
 		}
 	}
 }

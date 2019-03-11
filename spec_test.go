@@ -52,7 +52,7 @@ func TestSpec(t *testing.T) {
 
 		html := tree.HTML()
 		if tc.HTML != html {
-			t.Fatalf("test case [%s] failed\nexpected is:\n%q\nbut actual is:\n%q\noriginal markdown text is:\n%q", tree.name, tc.HTML, html, tc.Markdown)
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, tc.HTML, html, tc.Markdown)
 		}
 	}
 }
