@@ -45,12 +45,12 @@ func TestHTML(t *testing.T) {
 	for _, test := range htmlTests {
 		tree, err := Parse(test.name, test.input)
 		if nil != err {
-			t.Errorf("%q: unexpected error: %v", test.name, err)
+			t.Fatalf("%q: unexpected error: %v", test.name, err)
 		}
 
 		html := tree.HTML()
 		if test.result != html {
-			t.Errorf("%s: expected is %s, but actual is %s\n", tree.name, test.result, html)
+			t.Fatalf("%s: expected is %s, but actual is %s\n", tree.name, test.result, html)
 		}
 	}
 }

@@ -18,7 +18,6 @@ package lute
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"strconv"
 	"testing"
@@ -36,24 +35,24 @@ type testcase struct {
 func TestSpec(t *testing.T) {
 	bytes, err := ioutil.ReadFile("commonmark-0.28-spec.json")
 	if nil != err {
-		t.Error("read spec test cases failed: " + err.Error())
+		t.Fatalf("read spec test cases failed: " + err.Error())
 	}
 
 	var testcases []testcase
 	if err = json.Unmarshal(bytes, &testcases); nil != err {
-		t.Error("read spec test caes failed: " + err.Error())
+		t.Fatalf("read spec test caes failed: " + err.Error())
 	}
 
 	for _, tc := range testcases {
-		fmt.Printf("%+v", tc)
-		tree, err := Parse(tc.Section+" "+strconv.Itoa(tc.Example), tc.Markdown)
+		tcn := tc.Section+" "+strconv.Itoa(tc.Example)
+		tree, err := Parse(tcn, tc.Markdown)
 		if nil != err {
-			t.Errorf("parse [%s] failed: %s", tree.name, err.Error())
+			t.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
 		}
 
 		html := tree.HTML()
 		if tc.HTML != html {
-			t.Errorf("%s: expected is %s, but actual is %s\n", tree.name, tc.HTML, html)
+			t.Fatalf("test case [%s] failed\nexpected is:\n%q\nbut actual is:\n%q\noriginal markdown text is:\n%q", tree.name, tc.HTML, html, tc.Markdown)
 		}
 	}
 }
