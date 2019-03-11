@@ -89,7 +89,7 @@ func (n *Root) String() string {
 func (n *Root) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("%s\n", content)
+	return fmt.Sprintf("%s", content)
 }
 
 func (n *Root) append(c Node) {
