@@ -344,6 +344,12 @@ func lexEmOrStrong(l *lexer) stateFn {
 		l.emit(itemStrong)
 
 		return lexText
+	case ' ' == second:
+		l.backup()
+		l.backup()
+		l.emit(itemListItem)
+
+		return lexText
 	default:
 		l.backup()
 		l.backup()

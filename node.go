@@ -167,11 +167,35 @@ type List struct {
 	Children []Node
 }
 
+func (n *List) String() string {
+	return fmt.Sprintf("%s", n.Children)
+}
+
+func (n *List) HTML() string {
+	content := html(n.Children)
+
+	return fmt.Sprintf("<ul>%s</ul>", content)
+}
+
+func (n *List) append(c Node) {
+	n.Children = append(n.Children, c)
+}
+
 type ListItem struct {
 	Parent
 	Checked  bool
 	Spread   bool
 	Children []Node
+}
+
+func (n *ListItem) String() string {
+	return fmt.Sprintf("%s", n.Children)
+}
+
+func (n *ListItem) HTML() string {
+	content := html(n.Children)
+
+	return fmt.Sprintf("<li>%s</li>", content)
 }
 
 type Table struct {

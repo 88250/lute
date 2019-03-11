@@ -241,7 +241,7 @@ func (t *Tree) parseContent() {
 			}
 
 			fallthrough
-		case itemStr, itemHeading, itemThematicBreak, itemQuote /* List, Table, HTML */, itemCode, // BlockContent
+		case itemStr, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
 			itemTab:
 			c = t.parseTopLevelContent()
 		default:
@@ -272,6 +272,8 @@ func (t *Tree) parseBlockContent() (ret Node) {
 		ret = t.parseInlineCode()
 	case itemCode, itemTab:
 		ret = t.parseCode()
+	case itemListItem:
+		ret = t.parseList()
 	default:
 		t.unexpected(token, "input")
 	}
@@ -458,6 +460,42 @@ func (t *Tree) parseCode() (ret Node) {
 	}
 
 	t.next() // consume close ```
+
+	return
+}
+
+func (t *Tree) parseList() Node {
+	t.next() // *
+	t.next() // space
+
+	token := t.peek()
+	list := &List{
+		Parent:   Parent{NodeList, token.pos, nil},
+		Ordered:  false,
+		Start:    1,
+		Spread:   false,
+		Children: []Node{},
+	}
+
+	for {
+		c := t.parseListItem()
+		if nil == c {
+			break
+		}
+		list.append(c)
+	}
+
+	return list
+}
+
+func (t *Tree) parseListItem() (ret Node) {
+	token := t.peek()
+	ret = &ListItem{
+		Parent:   Parent{NodeListItem, token.pos, nil},
+		Checked:  false,
+		Spread:   false,
+		Children: []Node{t.parseBlockContent()},
+	}
 
 	return
 }
