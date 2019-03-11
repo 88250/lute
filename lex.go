@@ -72,6 +72,7 @@ var itemName = map[itemType]string{
 	itemCloseLinkHref: ")",
 	itemImg:           "!",
 	itemSpace:         "space",
+	itemTab:           "tab",
 	itemNewline:       "newline",
 }
 
@@ -103,6 +104,7 @@ const (
 	itemCloseLinkHref                 // )
 	itemImg                           // !
 	itemSpace                         // space
+	itemTab                           // \t
 	itemNewline                       // newline
 )
 
@@ -256,8 +258,12 @@ func lexText(l *lexer) stateFn {
 		return lexEmOrStrong
 	case '`' == r:
 		return lexCode
-	case ' ' == r, '\t' == r:
+	case ' ' == r:
 		l.emit(itemSpace)
+
+		return lexText
+	case '\t' == r:
+		l.emit(itemTab)
 
 		return lexText
 	case '\n' == r:

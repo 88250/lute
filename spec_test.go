@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"testing"
 )
 
@@ -28,7 +29,7 @@ type testcase struct {
 	Section   string `json:"section"`
 	HTML      string `json:"html"`
 	Markdown  string `json:"markdown"`
-	Example   string `json:"example"`
+	Example   int    `json:"example"`
 	StartLine int    `json:"start_line"`
 }
 
@@ -44,8 +45,8 @@ func TestSpec(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		fmt.Printf("%v", tc)
-		tree, err := Parse(tc.Section+" "+tc.Example, tc.Markdown)
+		fmt.Printf("%+v", tc)
+		tree, err := Parse(tc.Section+" "+strconv.Itoa(tc.Example), tc.Markdown)
 		if nil != err {
 			t.Errorf("parse [%s] failed: %s", tree.name, err.Error())
 		}

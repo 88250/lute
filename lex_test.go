@@ -51,10 +51,12 @@ var lexTests = []lexTest{
 	{"quote", "> lute", []item{mkItem(itemQuote, ">"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"strong", "l**u**te", []item{mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
 	{"em", "l*u*te", []item{mkItem(itemStr, "l"), mkItem(itemEm, "*"), mkItem(itemStr, "u"), mkItem(itemEm, "*"), mkItem(itemStr, "te"), tEOF}},
-	{"inlineCode", "l`u`te", []item{mkItem(itemStr, "l"), mkItem(itemInlineCode, "`"), mkItem(itemStr, "u"), mkItem(itemInlineCode, "`"), mkItem(itemStr, "te"), tEOF}},
+	{"tab code block", "\tlute", []item{mkItem(itemTab, "\t"), mkItem(itemStr, "lute"), tEOF}},
+	{"inline code", "l`u`te", []item{mkItem(itemStr, "l"), mkItem(itemInlineCode, "`"), mkItem(itemStr, "u"), mkItem(itemInlineCode, "`"), mkItem(itemStr, "te"), tEOF}},
 	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
 	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemNewline, "\n"), tEOF}},
-	{"space", " \t", []item{mkItem(itemSpace, " "), mkItem(itemSpace, "\t"), tEOF}},
+	{"tab", "\t", []item{mkItem(itemTab, "\t"), tEOF}},
+	{"space", " ", []item{mkItem(itemSpace, " "), tEOF}},
 	{"empty", "", []item{tEOF}},
 }
 

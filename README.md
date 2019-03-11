@@ -25,6 +25,10 @@ Lute 的目标是构建一个结构化的 Markdown 引擎。所谓的“结构�
 除了结构化，追求高性能也是很重要的目标。
 </details>
 
+## 特性
+
+* 完整实现 [CommonMark 规范](https://spec.commonmark.org)
+
 ## 词法分析
 
 
