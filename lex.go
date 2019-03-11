@@ -255,7 +255,9 @@ func lexText(l *lexer) stateFn {
 
 		return lexQuote
 	case '*' == r:
-		return lexEmOrStrong
+		return lexEmStrongListItem
+	case '-' == r:
+		return lexListItem
 	case '`' == r:
 		return lexCode
 	case ' ' == r:
@@ -330,8 +332,8 @@ func lexQuote(l *lexer) stateFn {
 	return lexText
 }
 
-// lexEmOrStrong scans '*' or '**'.
-func lexEmOrStrong(l *lexer) stateFn {
+// lexEmStrongListItem scans '*', '**' or '* '.
+func lexEmStrongListItem(l *lexer) stateFn {
 	second := l.next()
 	third := l.next()
 	switch {
@@ -356,6 +358,19 @@ func lexEmOrStrong(l *lexer) stateFn {
 		l.emit(itemEm)
 
 		return lexText
+	}
+}
+
+func lexListItem(l *lexer) stateFn {
+	second := l.next()
+	switch {
+	case ' ' == second:
+		l.backup()
+		l.emit(itemListItem)
+
+		return lexText
+	default:
+		return l.errorf("- must be followed by a space")
 	}
 }
 

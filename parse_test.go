@@ -28,13 +28,14 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
-	{"heading", "# lute", ``},
-	{"quote", "> lute", ``},
-	{"strong", "l**u**te", ``},
-	{"em", "l*u*te", ``},
-	{"inlineCode", "l`u`te", ``},
-	{"str", "lute", ``},
-	{"empty", "", ``},
+	{"list", "* lute", ""},
+	{"heading", "# lute", ""},
+	{"quote", "> lute", ""},
+	{"strong", "l**u**te", ""},
+	{"em", "l*u*te", ""},
+	{"inlineCode", "l`u`te", ""},
+	{"str", "lute", ""},
+	{"empty", "", ""},
 }
 
 func TestParse(t *testing.T) {
@@ -44,7 +45,7 @@ func TestParse(t *testing.T) {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		fmt.Printf("%+v\n", tree)
+		fmt.Printf("%+v\n", tree.HTML())
 	}
 }
 

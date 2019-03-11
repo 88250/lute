@@ -274,8 +274,6 @@ func (t *Tree) parseBlockContent() (ret Node) {
 		ret = t.parseCode()
 	case itemListItem:
 		ret = t.parseList()
-	default:
-		t.unexpected(token, "input")
 	}
 
 	return
@@ -490,6 +488,10 @@ func (t *Tree) parseList() Node {
 
 func (t *Tree) parseListItem() (ret Node) {
 	token := t.peek()
+	if itemEOF == token.typ {
+		return
+	}
+
 	ret = &ListItem{
 		Parent:   Parent{NodeListItem, token.pos, nil},
 		Checked:  false,
