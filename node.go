@@ -108,7 +108,7 @@ func (n *Paragraph) String() string {
 func (n *Paragraph) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<p>%s</p>", content)
+	return fmt.Sprintf("<p>%s</p>\n", content)
 }
 
 func (n *Paragraph) append(c Node) {
@@ -174,7 +174,7 @@ func (n *List) String() string {
 func (n *List) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<ul>%s</ul>", content)
+	return fmt.Sprintf("<ul>\n%s</ul>", content)
 }
 
 func (n *List) append(c Node) {
@@ -195,7 +195,11 @@ func (n *ListItem) String() string {
 func (n *ListItem) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<li>%s</li>", content)
+	return fmt.Sprintf("<li>\n%s</li>\n", content)
+}
+
+func (n *ListItem) append(c Node) {
+	n.Children = append(n.Children, c)
 }
 
 type Table struct {
@@ -324,11 +328,11 @@ type Break struct {
 }
 
 func (n *Break) String() string {
-	return fmt.Sprintf("'\n'")
+	return fmt.Sprint("\n")
 }
 
 func (n *Break) HTML() string {
-	return fmt.Sprintf("<br>")
+	return fmt.Sprintf("\n")
 }
 
 type Link struct {

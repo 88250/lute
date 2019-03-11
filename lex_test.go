@@ -42,10 +42,10 @@ var lexTests = []lexTest{
 	{"li2", "- lute", []item{mkItem(itemListItem, "-"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"li", "* lute", []item{mkItem(itemListItem, "*"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 
-	{"comb1", "### foo\n## foo", []item{mkItem(itemHeading, "###"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n"), mkItem(itemHeading, "##"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), tEOF}},
-	{"comb0", "# h\n\nl**u**te", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "h"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
+	{"comb1", "### foo\n## foo", []item{mkItem(itemHeading, "###"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), mkItem(itemBreak, "\n"), mkItem(itemHeading, "##"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), tEOF}},
+	{"comb0", "# h\n\nl**u**te", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "h"), mkItem(itemParagraph, "\n\n"), mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
 
-	{"paragraph", "p1\n\np2", []item{mkItem(itemStr, "p1"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemStr, "p2"), tEOF}},
+	{"paragraph", "p1\n\np2", []item{mkItem(itemStr, "p1"), mkItem(itemParagraph, "\n\n"), mkItem(itemStr, "p2"), tEOF}},
 	{"img", `![alt](/uri "title")`, []item{mkItem(itemImg, "!"), mkItem(itemOpenLinkText, "["), mkItem(itemStr, "alt"),
 		mkItem(itemCloseLinkText, "]"), mkItem(itemOpenLinkHref, "("), mkItem(itemStr, "/uri"), mkItem(itemSpace, " "), mkItem(itemStr, `"title"`), mkItem(itemCloseLinkHref, ")"), tEOF}},
 	{"link", `[link](/uri "title")`, []item{mkItem(itemOpenLinkText, "["), mkItem(itemStr, "link"),
@@ -57,7 +57,7 @@ var lexTests = []lexTest{
 	{"tab code block", "\tlute", []item{mkItem(itemTab, "\t"), mkItem(itemStr, "lute"), tEOF}},
 	{"inline code", "l`u`te", []item{mkItem(itemStr, "l"), mkItem(itemInlineCode, "`"), mkItem(itemStr, "u"), mkItem(itemInlineCode, "`"), mkItem(itemStr, "te"), tEOF}},
 	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
-	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemNewline, "\n"), tEOF}},
+	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemBreak, "\n"), tEOF}},
 	{"tab", "\t", []item{mkItem(itemTab, "\t"), tEOF}},
 	{"space", " ", []item{mkItem(itemSpace, " "), tEOF}},
 	{"empty", "", []item{tEOF}},

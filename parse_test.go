@@ -28,6 +28,9 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
+
+	{"list4", "  - foo\n\n\tbar\n", ""},
+
 	{"list", "* lute", ""},
 	{"heading", "# lute", ""},
 	{"quote", "> lute", ""},

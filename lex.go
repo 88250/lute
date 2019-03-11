@@ -73,7 +73,8 @@ var itemName = map[itemType]string{
 	itemImg:           "!",
 	itemSpace:         "space",
 	itemTab:           "tab",
-	itemNewline:       "newline",
+	itemBreak:         "break",
+	itemParagraph:     "paragraph",
 }
 
 func (i itemType) String() string {
@@ -105,7 +106,8 @@ const (
 	itemImg                           // !
 	itemSpace                         // space
 	itemTab                           // \t
-	itemNewline                       // newline
+	itemBreak                         // one newline
+	itemParagraph                     // two newlines
 )
 
 const (
@@ -269,7 +271,14 @@ func lexText(l *lexer) stateFn {
 
 		return lexText
 	case '\n' == r:
-		l.emit(itemNewline)
+		if '\n' == l.next() {
+			l.emit(itemParagraph)
+
+			return lexText
+		}
+
+		l.backup()
+		l.emit(itemBreak)
 
 		return lexText
 	case '[' == r:

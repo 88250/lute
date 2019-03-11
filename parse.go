@@ -229,7 +229,7 @@ func (t *Tree) acceptSpaces() (ret int) {
 func (t *Tree) parseContent() {
 	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: 0}}
 
-	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
+	for token := t.peek(); itemEOF != token.typ && itemError != token.typ; token = t.peek() {
 		var c Node
 		switch token.typ {
 		case itemSpace:
@@ -241,7 +241,7 @@ func (t *Tree) parseContent() {
 			}
 
 			fallthrough
-		case itemStr, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
+		case itemStr, itemParagraph, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
 			itemTab:
 			c = t.parseTopLevelContent()
 		default:
@@ -260,6 +260,9 @@ func (t *Tree) parseTopLevelContent() (ret Node) {
 
 func (t *Tree) parseBlockContent() (ret Node) {
 	switch token := t.peek(); token.typ {
+	case itemParagraph:
+		t.next() // consume \n\n
+		fallthrough
 	case itemStr:
 		return t.parseParagraph()
 	case itemHeading:
@@ -302,14 +305,16 @@ func (t *Tree) parsePhrasingContent() (ret Node) {
 
 func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	switch token := t.peek(); token.typ {
-	case itemStr:
+	case itemStr, itemTab:
 		return t.parseText()
-	case itemInlineCode:
-		ret = t.parseInlineCode()
 	case itemEm:
 		ret = t.parseEm()
 	case itemStrong:
 		ret = t.parseStrong()
+	case itemInlineCode:
+		ret = t.parseInlineCode()
+	case itemBreak:
+		ret = t.parseBreak()
 	}
 
 	return
@@ -439,7 +444,7 @@ func (t *Tree) parseCode() (ret Node) {
 	var code string
 	for ; itemCode != token.typ; token = t.next() {
 		code += token.val
-		if itemNewline == token.typ {
+		if itemBreak == token.typ {
 			if itemCode == t.peek().typ {
 				break
 			}
@@ -486,20 +491,29 @@ func (t *Tree) parseList() Node {
 	return list
 }
 
-func (t *Tree) parseListItem() (ret Node) {
+func (t *Tree) parseListItem() Node {
 	token := t.peek()
 	if itemEOF == token.typ {
-		return
+		return nil
 	}
 
-	ret = &ListItem{
+	ret := &ListItem{
 		Parent:   Parent{NodeListItem, token.pos, nil},
 		Checked:  false,
 		Spread:   false,
-		Children: []Node{t.parseBlockContent()},
+		Children: []Node{},
 	}
 
-	return
+	for {
+		c := t.parseBlockContent()
+		if nil == c {
+			break
+		}
+
+		ret.append(c)
+	}
+
+	return ret
 }
 
 type stack struct {
