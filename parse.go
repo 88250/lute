@@ -209,6 +209,23 @@ func (t *Tree) Parse(text string) (tree *Tree, err error) {
 	return t, nil
 }
 
+func (t *Tree) acceptSpaces() (ret int) {
+	for {
+		token := t.next()
+		if itemSpace != token.typ {
+			t.backup()
+
+			break
+		}
+		ret++
+	}
+	if 4 <= ret {
+		t.backup()
+	}
+
+	return
+}
+
 func (t *Tree) parseContent() {
 	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: 0}}
 
@@ -216,14 +233,13 @@ func (t *Tree) parseContent() {
 		var c Node
 		switch token.typ {
 		case itemSpace:
-			for {
-				token := t.next()
-				if itemSpace != token.typ {
-					t.backup()
+			spaces := t.acceptSpaces()
+			if 4 <= spaces {
+				c = t.parseCode()
 
-					break
-				}
+				break
 			}
+
 			fallthrough
 		case itemStr, itemHeading, itemThematicBreak, itemQuote /* List, Table, HTML */, itemCode, // BlockContent
 			itemTab:
@@ -254,10 +270,8 @@ func (t *Tree) parseBlockContent() (ret Node) {
 		ret = t.parseBlockquote()
 	case itemInlineCode:
 		ret = t.parseInlineCode()
-	case itemCode:
+	case itemCode, itemTab:
 		ret = t.parseCode()
-	case itemTab:
-		ret = t.parseTabCode()
 	default:
 		t.unexpected(token, "input")
 	}
@@ -420,30 +434,30 @@ func (t *Tree) parseInlineCode() (ret Node) {
 func (t *Tree) parseCode() (ret Node) {
 	t.next() // consume open ```
 
-	code := t.next()
-	ret = &Code{Literal{NodeCode, code.pos, code.val}, "", ""}
-
-	t.next() // consume close ```
-
-	return
-}
-
-func (t *Tree) parseTabCode() (ret Node) {
-	t.next() // consume \t
-	var code string
 	token := t.next()
 	pos := token.pos
-	for {
+	var code string
+	for ; itemCode != token.typ; token = t.next() {
 		code += token.val
 		if itemNewline == token.typ {
-			if itemTab != t.peek().typ {
+			if itemCode == t.peek().typ {
+				break
+			}
+
+			spaces := t.acceptSpaces()
+			if 4 > spaces {
 				break
 			}
 		}
-		token = t.next()
 	}
 
 	ret = &Code{Literal{NodeCode, pos, code}, "", ""}
+
+	if itemEOF == t.peek().typ {
+		return
+	}
+
+	t.next() // consume close ```
 
 	return
 }
