@@ -16,12 +16,6 @@
 
 package lute
 
-import (
-	"fmt"
-	"runtime"
-	"strings"
-)
-
 // Tree is the representation of the markdown ast.
 type Tree struct {
 	Root      *Root
@@ -37,11 +31,8 @@ func (t *Tree) HTML() string {
 }
 
 func Parse(name, text string) (*Tree, error) {
-	t := &Tree{
-		name: name,
-		text: text,
-	}
-	_, err := t.Parse(text)
+	t := &Tree{name: name, text: text}
+	err := t.parse()
 
 	return t, err
 }
@@ -102,84 +93,12 @@ func (t *Tree) nextNonSpace() (token item) {
 	return token
 }
 
-// peekNonSpace returns but does not consume the next non-space token.
-func (t *Tree) peekNonSpace() (token item) {
-	for {
-		token = t.next()
-		if token.typ != itemSpace {
-			break
-		}
-	}
-	t.backup()
-
-	return token
-}
-
 // Parsing.
-
-// ErrorContext returns a textual representation of the location of the node in the input text.
-// The receiver is only used when the node does not have a pointer to the tree inside,
-// which can occur in old code.
-func (t *Tree) ErrorContext(n Node) (location string) {
-	pos := int(n.Position())
-
-	text := t.text[:pos]
-	byteNum := strings.LastIndex(text, "\n")
-	if byteNum == -1 {
-		byteNum = pos // On first line.
-	} else {
-		byteNum++ // After the newline.
-		byteNum = pos - byteNum
-	}
-	lineNum := 1 + strings.Count(text, "\n")
-
-	return fmt.Sprintf("%s:%d:%d", t.name, lineNum, byteNum)
-}
-
-// errorf formats the error and terminates processing.
-func (t *Tree) errorf(format string, args ...interface{}) {
-	t.Root = nil
-	format = fmt.Sprintf("tree: %s:%d: %s", t.name, t.token[0].line, format)
-	panic(fmt.Errorf(format, args...))
-}
-
-// error terminates processing.
-func (t *Tree) error(err error) {
-	t.errorf("%s", err)
-}
-
-// expect consumes the next token and guarantees it has the required type.
-func (t *Tree) expect(expected itemType, context string) item {
-	token := t.nextNonSpace()
-	if token.typ != expected {
-		t.unexpected(token, context)
-	}
-
-	return token
-}
-
-// expectOneOf consumes the next token and guarantees it has one of the required types.
-func (t *Tree) expectOneOf(expected1, expected2 itemType, context string) item {
-	token := t.nextNonSpace()
-	if token.typ != expected1 && token.typ != expected2 {
-		t.unexpected(token, context)
-	}
-
-	return token
-}
-
-// unexpected complains about the token and terminates processing.
-func (t *Tree) unexpected(token item, context string) {
-	t.errorf("unexpected %s in %s", token, context)
-}
 
 // recover is the handler that turns panics into returns from the top level of Parse.
 func (t *Tree) recover(errp *error) {
 	e := recover()
 	if e != nil {
-		if _, ok := e.(runtime.Error); ok {
-			panic(e)
-		}
 		if t != nil {
 			t.lex.drain()
 			t.stopParse()
@@ -199,14 +118,13 @@ func (t *Tree) stopParse() {
 	t.lex = nil
 }
 
-func (t *Tree) Parse(text string) (tree *Tree, err error) {
+func (t *Tree) parse() (err error) {
 	defer t.recover(&err)
-	t.startParse(lex(t.name, text))
-	t.text = text
+	t.startParse(lex(t.name, t.text))
 	t.parseContent()
 	t.stopParse()
 
-	return t, nil
+	return nil
 }
 
 func (t *Tree) acceptSpaces() (ret int) {
@@ -224,6 +142,17 @@ func (t *Tree) acceptSpaces() (ret int) {
 	}
 
 	return
+}
+
+func (t *Tree) acceptTabs(tabs int) {
+	for i := 0; i < tabs; i++ {
+		token := t.next()
+		if itemTab != token.typ {
+			t.backup()
+
+			break
+		}
+	}
 }
 
 func (t *Tree) parseContent() {
@@ -253,33 +182,45 @@ func (t *Tree) parseContent() {
 }
 
 func (t *Tree) parseTopLevelContent() (ret Node) {
-	ret = t.parseBlockContent()
+	ret = t.parseBlockContent(0)
 
 	return
 }
 
-func (t *Tree) parseBlockContent() (ret Node) {
-	switch token := t.peek(); token.typ {
-	case itemParagraph:
-		t.next() // consume \n\n
-		fallthrough
-	case itemStr:
-		return t.parseParagraph()
-	case itemHeading:
-		ret = t.parseHeading()
-	case itemThematicBreak:
-		ret = t.parseThematicBreak()
-	case itemQuote:
-		ret = t.parseBlockquote()
-	case itemInlineCode:
-		ret = t.parseInlineCode()
-	case itemCode, itemTab:
-		ret = t.parseCode()
-	case itemListItem:
-		ret = t.parseList()
+func (t *Tree) acceptIndent(indentLevel int) {
+	if 1 > indentLevel {
+		return
 	}
 
-	return
+	t.acceptTabs(indentLevel)
+}
+
+func (t *Tree) parseBlockContent(indentLevel int) Node {
+	for {
+		t.acceptTabs(indentLevel)
+
+		switch token := t.peek(); token.typ {
+		case itemParagraph:
+			t.next() // consume \n\n
+			continue
+		case itemStr:
+			return t.parseParagraph()
+		case itemHeading:
+			return t.parseHeading()
+		case itemThematicBreak:
+			return t.parseThematicBreak()
+		case itemQuote:
+			return t.parseBlockquote()
+		case itemInlineCode:
+			return t.parseInlineCode()
+		case itemCode, itemTab:
+			return t.parseCode()
+		case itemListItem:
+			return t.parseList()
+		default:
+			return nil
+		}
+	}
 }
 
 func (t *Tree) parseListContent() Node {
@@ -305,7 +246,7 @@ func (t *Tree) parsePhrasingContent() (ret Node) {
 
 func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	switch token := t.peek(); token.typ {
-	case itemStr, itemTab:
+	case itemStr:
 		return t.parseText()
 	case itemEm:
 		ret = t.parseEm()
@@ -331,6 +272,8 @@ func (t *Tree) parseParagraph() Node {
 	for {
 		c := t.parsePhrasingContent()
 		if nil == c {
+			ret.trim()
+
 			break
 		}
 
@@ -346,7 +289,7 @@ func (t *Tree) parseHeading() (ret Node) {
 
 	ret = &Heading{
 		Parent{NodeHeading, token.pos, nil},
-		int8(len(token.val)),
+		len(token.val),
 		[]Node{t.parsePhrasingContent()},
 	}
 
@@ -366,7 +309,7 @@ func (t *Tree) parseBlockquote() (ret Node) {
 
 	ret = &Blockquote{
 		Parent{NodeParagraph, token.pos, nil},
-		[]Node{t.parseBlockContent()},
+		[]Node{t.parseBlockContent(0)},
 	}
 
 	return
@@ -442,7 +385,7 @@ func (t *Tree) parseCode() (ret Node) {
 	token := t.next()
 	pos := token.pos
 	var code string
-	for ; itemCode != token.typ; token = t.next() {
+	for ; itemCode != token.typ && itemEOF != token.typ; token = t.next() {
 		code += token.val
 		if itemBreak == token.typ {
 			if itemCode == t.peek().typ {
@@ -505,7 +448,7 @@ func (t *Tree) parseListItem() Node {
 	}
 
 	for {
-		c := t.parseBlockContent()
+		c := t.parseBlockContent(1)
 		if nil == c {
 			break
 		}

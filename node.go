@@ -16,7 +16,9 @@
 
 package lute
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Node represents a node in ast. https://github.com/syntax-tree/mdast
 type Node interface {
@@ -115,9 +117,32 @@ func (n *Paragraph) append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
+func (n *Paragraph) trim() {
+	size := len(n.Children)
+	if 1 > size {
+		return
+	}
+
+	initialNoneWhitespace := 0
+	for i := initialNoneWhitespace; i < size/2; i++ {
+		if NodeBreak == n.Children[i].Type() {
+			initialNoneWhitespace++
+		}
+	}
+
+	finalNoneWhitespace := size
+	for i := finalNoneWhitespace - 1; size/2 <= i; i-- {
+		if NodeBreak == n.Children[i].Type() {
+			finalNoneWhitespace--
+		}
+	}
+
+	n.Children = n.Children[initialNoneWhitespace:finalNoneWhitespace]
+}
+
 type Heading struct {
 	Parent
-	Depth    int8
+	Depth    int
 	Children []Node
 }
 
@@ -162,7 +187,7 @@ func (n *Blockquote) HTML() string {
 type List struct {
 	Parent
 	Ordered  bool
-	Start    int8
+	Start    int
 	Spread   bool
 	Children []Node
 }

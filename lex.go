@@ -414,8 +414,3 @@ func lexStr(l *lexer) stateFn {
 		}
 	}
 }
-
-// isEndOfLine reports whether r is an end-of-line character.
-func isEndOfLine(r rune) bool {
-	return r == '\r' || r == '\n'
-}
