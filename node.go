@@ -30,6 +30,8 @@ type Node interface {
 
 // NodeType identifies the type of a parse tree node.
 type NodeType int
+// Children represents the children nodes of a tree node.
+type Children []Node
 
 func (t NodeType) Type() NodeType {
 	return t
@@ -71,7 +73,8 @@ const (
 type Root struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 }
 
 func (n *Root) String() string {
@@ -91,8 +94,8 @@ func (n *Root) append(c Node) {
 type Paragraph struct {
 	NodeType
 	Pos
-
-	Children []Node
+	*Tree
+	Children
 }
 
 func (n *Paragraph) String() string {
@@ -135,7 +138,8 @@ func (n *Paragraph) trim() {
 type Heading struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 
 	Depth int
 }
@@ -166,7 +170,7 @@ func (n *ThematicBreak) HTML() string {
 type Blockquote struct {
 	NodeType
 	Pos
-	Children []Node
+	Children
 }
 
 func (n *Blockquote) String() string {
@@ -182,7 +186,8 @@ func (n *Blockquote) HTML() string {
 type List struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 
 	Ordered bool
 	Start   int
@@ -206,12 +211,11 @@ func (n *List) append(c Node) {
 type ListItem struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 
-	Checked  bool
-	Spread   bool
-
-	Tree *Tree
+	Checked bool
+	Spread  bool
 }
 
 func (n *ListItem) String() string {
@@ -232,32 +236,37 @@ func (n *ListItem) append(c Node) {
 type Table struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 
-	Align    alignType
+	Align alignType
 }
 
 type TableRow struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 }
 
 type TableCell struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 }
 
 type HTML struct {
 	NodeType
 	Pos
+	*Tree
 	Value string
 }
 
 type Code struct {
 	NodeType
 	Pos
+	*Tree
 	Value string
 
 	Lang string
@@ -275,12 +284,15 @@ func (n *Code) HTML() string {
 type YAML struct {
 	NodeType
 	Pos
+	*Tree
 	Value string
 }
 
 type Definition struct {
 	NodeType
 	Pos
+	*Tree
+
 	Association
 	Resource
 }
@@ -288,7 +300,8 @@ type Definition struct {
 type FootnoteDefinition struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 
 	Association
 }
@@ -296,6 +309,7 @@ type FootnoteDefinition struct {
 type Text struct {
 	NodeType
 	Pos
+	*Tree
 	Value string
 }
 
@@ -310,7 +324,8 @@ func (n *Text) HTML() string {
 type Emphasis struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 }
 
 func (n *Emphasis) String() string {
@@ -326,7 +341,8 @@ func (n *Emphasis) HTML() string {
 type Strong struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 }
 
 func (n *Strong) String() string {
@@ -342,7 +358,8 @@ func (n *Strong) HTML() string {
 type Delete struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 }
 
 func (n *Delete) String() string {
@@ -358,6 +375,7 @@ func (n *Delete) HTML() string {
 type InlineCode struct {
 	NodeType
 	Pos
+	*Tree
 	Value string
 }
 
@@ -372,6 +390,7 @@ func (n InlineCode) HTML() string {
 type Break struct {
 	NodeType
 	Pos
+	*Tree
 }
 
 func (n *Break) String() string {
@@ -385,7 +404,8 @@ func (n *Break) HTML() string {
 type Link struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 
 	Resource
 }
@@ -393,6 +413,8 @@ type Link struct {
 type Image struct {
 	NodeType
 	Pos
+	*Tree
+
 	Resource
 	Alternative
 }
@@ -404,7 +426,8 @@ func (n Image) String() string {
 type LinkReference struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 
 	Reference
 }
@@ -412,6 +435,8 @@ type LinkReference struct {
 type ImageReference struct {
 	NodeType
 	Pos
+	*Tree
+
 	Reference
 	Alternative
 }
@@ -419,12 +444,15 @@ type ImageReference struct {
 type Footnote struct {
 	NodeType
 	Pos
-	Children []Node
+	*Tree
+	Children
 }
 
 type FootnoteReference struct {
 	NodeType
 	Pos
+	*Tree
+
 	Association
 }
 
@@ -454,7 +482,7 @@ type Alternative struct {
 type alignType string
 type referenceType string
 
-func html(children []Node) string {
+func html(children Children) string {
 	var ret string
 	for _, c := range children {
 		ret += c.HTML()

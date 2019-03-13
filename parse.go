@@ -180,7 +180,6 @@ func (t *Tree) acceptSpaces() (ret int) {
 func (t *Tree) parseBlockContent() Node {
 	for {
 
-
 		switch token := t.peek(); token.typ {
 		case itemParagraph:
 			t.next() // consume \n\n
@@ -246,7 +245,7 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 func (t *Tree) parseParagraph() Node {
 	token := t.peek()
 
-	ret := &Paragraph{NodeParagraph, token.pos, []Node{}}
+	ret := &Paragraph{NodeParagraph, token.pos, t, Children{}}
 
 	for {
 		c := t.parsePhrasingContent()
@@ -267,7 +266,7 @@ func (t *Tree) parseHeading() (ret Node) {
 	t.next() // consume spaces
 
 	ret = &Heading{
-		NodeHeading, token.pos, []Node{t.parsePhrasingContent()},
+		NodeHeading, token.pos, t, Children{t.parsePhrasingContent()},
 		len(token.val),
 	}
 
@@ -285,7 +284,7 @@ func (t *Tree) parseBlockquote() (ret Node) {
 	token := t.next()
 	t.next() // consume spaces
 
-	ret = &Blockquote{NodeParagraph, token.pos, []Node{t.parseBlockContent()}}
+	ret = &Blockquote{NodeParagraph, token.pos, Children{t.parseBlockContent()}}
 
 	return
 }
@@ -293,13 +292,13 @@ func (t *Tree) parseBlockquote() (ret Node) {
 func (t *Tree) parseText() Node {
 	token := t.next()
 
-	return &Text{NodeText, token.pos, token.val}
+	return &Text{NodeText, token.pos, t, token.val}
 }
 
 func (t *Tree) parseEm() (ret Node) {
 	t.next() // consume open *
 	token := t.peek()
-	ret = &Emphasis{NodeEmphasis, token.pos, []Node{t.parsePhrasingContent()}}
+	ret = &Emphasis{NodeEmphasis, token.pos, t, Children{t.parsePhrasingContent()}}
 	t.next() // consume close *
 
 	return
@@ -308,7 +307,7 @@ func (t *Tree) parseEm() (ret Node) {
 func (t *Tree) parseStrong() (ret Node) {
 	t.next() // consume open **
 	token := t.peek()
-	ret = &Strong{NodeStrong, token.pos, []Node{t.parsePhrasingContent()}}
+	ret = &Strong{NodeStrong, token.pos, t, Children{t.parsePhrasingContent()}}
 	t.next() // consume close **
 
 	return
@@ -317,7 +316,7 @@ func (t *Tree) parseStrong() (ret Node) {
 func (t *Tree) parseDelete() (ret Node) {
 	t.next() // consume open ~~
 	token := t.peek()
-	ret = &Delete{NodeDelete, token.pos, []Node{t.parsePhrasingContent()}}
+	ret = &Delete{NodeDelete, token.pos, t, Children{t.parsePhrasingContent()}}
 	t.next() // consume close ~~
 
 	return
@@ -329,7 +328,7 @@ func (t *Tree) parseHTML() (ret Node) {
 
 func (t *Tree) parseBreak() (ret Node) {
 	token := t.next()
-	ret = &Break{NodeBreak, token.pos}
+	ret = &Break{NodeBreak, token.pos, t}
 
 	return
 }
@@ -338,7 +337,7 @@ func (t *Tree) parseInlineCode() (ret Node) {
 	t.next() // consume open `
 
 	code := t.next()
-	ret = &InlineCode{NodeInlineCode, code.pos, code.val}
+	ret = &InlineCode{NodeInlineCode, code.pos, t, code.val}
 
 	t.next() // consume close `
 
@@ -365,7 +364,7 @@ func (t *Tree) parseCode() (ret Node) {
 		}
 	}
 
-	ret = &Code{NodeCode, pos, code, "", ""}
+	ret = &Code{NodeCode, pos, t, code, "", ""}
 
 	if itemEOF == t.peek().typ {
 		return
@@ -382,7 +381,7 @@ func (t *Tree) parseList() Node {
 
 	token := t.peek()
 	list := &List{
-		NodeList, token.pos, []Node{},
+		NodeList, token.pos, t, Children{},
 		false,
 		1,
 		false,
@@ -406,10 +405,9 @@ func (t *Tree) parseListItem() Node {
 	}
 
 	ret := &ListItem{
-		NodeListItem, token.pos, []Node{},
+		NodeListItem, token.pos, t, Children{},
 		false,
 		false,
-		t,
 	}
 
 	for {
