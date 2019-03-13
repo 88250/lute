@@ -68,20 +68,10 @@ const (
 
 // Nodes.
 
-type Parent struct {
-	NodeType
-	Pos
-	Children []Node // element nodes in lexical order
-}
-
-type Literal struct {
-	NodeType
-	Pos
-	Value string
-}
-
 type Root struct {
-	Parent
+	NodeType
+	Pos
+	Children []Node
 }
 
 func (n *Root) String() string {
@@ -99,7 +89,9 @@ func (n *Root) append(c Node) {
 }
 
 type Paragraph struct {
-	Parent
+	NodeType
+	Pos
+
 	Children []Node
 }
 
@@ -141,9 +133,11 @@ func (n *Paragraph) trim() {
 }
 
 type Heading struct {
-	Parent
-	Depth    int
+	NodeType
+	Pos
 	Children []Node
+
+	Depth int
 }
 
 func (n Heading) String() string {
@@ -170,7 +164,8 @@ func (n *ThematicBreak) HTML() string {
 }
 
 type Blockquote struct {
-	Parent
+	NodeType
+	Pos
 	Children []Node
 }
 
@@ -185,11 +180,13 @@ func (n *Blockquote) HTML() string {
 }
 
 type List struct {
-	Parent
-	Ordered  bool
-	Start    int
-	Spread   bool
+	NodeType
+	Pos
 	Children []Node
+
+	Ordered bool
+	Start   int
+	Spread  bool
 }
 
 func (n *List) String() string {
@@ -207,10 +204,14 @@ func (n *List) append(c Node) {
 }
 
 type ListItem struct {
-	Parent
+	NodeType
+	Pos
+	Children []Node
+
 	Checked  bool
 	Spread   bool
-	Children []Node
+
+	Tree *Tree
 }
 
 func (n *ListItem) String() string {
@@ -225,30 +226,40 @@ func (n *ListItem) HTML() string {
 
 func (n *ListItem) append(c Node) {
 	n.Children = append(n.Children, c)
+	n.Tree.CurNode = c
 }
 
 type Table struct {
-	Parent
-	Align    alignType
+	NodeType
+	Pos
 	Children []Node
+
+	Align    alignType
 }
 
 type TableRow struct {
-	Parent
+	NodeType
+	Pos
 	Children []Node
 }
 
 type TableCell struct {
-	Parent
+	NodeType
+	Pos
 	Children []Node
 }
 
 type HTML struct {
-	Literal
+	NodeType
+	Pos
+	Value string
 }
 
 type Code struct {
-	Literal
+	NodeType
+	Pos
+	Value string
+
 	Lang string
 	Meta string
 }
@@ -262,7 +273,9 @@ func (n *Code) HTML() string {
 }
 
 type YAML struct {
-	Literal
+	NodeType
+	Pos
+	Value string
 }
 
 type Definition struct {
@@ -273,13 +286,17 @@ type Definition struct {
 }
 
 type FootnoteDefinition struct {
-	Parent
-	Association
+	NodeType
+	Pos
 	Children []Node
+
+	Association
 }
 
 type Text struct {
-	Literal
+	NodeType
+	Pos
+	Value string
 }
 
 func (n *Text) String() string {
@@ -291,7 +308,8 @@ func (n *Text) HTML() string {
 }
 
 type Emphasis struct {
-	Parent
+	NodeType
+	Pos
 	Children []Node
 }
 
@@ -306,7 +324,8 @@ func (n *Emphasis) HTML() string {
 }
 
 type Strong struct {
-	Parent
+	NodeType
+	Pos
 	Children []Node
 }
 
@@ -321,7 +340,8 @@ func (n *Strong) HTML() string {
 }
 
 type Delete struct {
-	Parent
+	NodeType
+	Pos
 	Children []Node
 }
 
@@ -336,7 +356,9 @@ func (n *Delete) HTML() string {
 }
 
 type InlineCode struct {
-	Literal
+	NodeType
+	Pos
+	Value string
 }
 
 func (n InlineCode) String() string {
@@ -361,9 +383,11 @@ func (n *Break) HTML() string {
 }
 
 type Link struct {
-	Parent
-	Resource
+	NodeType
+	Pos
 	Children []Node
+
+	Resource
 }
 
 type Image struct {
@@ -378,9 +402,11 @@ func (n Image) String() string {
 }
 
 type LinkReference struct {
-	Parent
-	Reference
+	NodeType
+	Pos
 	Children []Node
+
+	Reference
 }
 
 type ImageReference struct {
@@ -391,7 +417,8 @@ type ImageReference struct {
 }
 
 type Footnote struct {
-	Parent
+	NodeType
+	Pos
 	Children []Node
 }
 

@@ -29,7 +29,8 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 
-	{"list4", "  - foo\n\n\tbar\n", ""},
+	{"Tabs5", "- foo\n\n\t\tbar\n", ""},
+	{"Tabs4", "  - foo\n\n\tbar\n", ""},
 
 	{"list", "* lute", ""},
 	{"heading", "# lute", ""},
@@ -48,7 +49,7 @@ func TestParse(t *testing.T) {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		fmt.Printf("%+v\n", tree.HTML())
+		fmt.Printf("%s: %q\n",tree.name, tree.HTML())
 	}
 }
 

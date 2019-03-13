@@ -16,25 +16,26 @@
 
 package lute
 
-// Tree is the representation of the markdown ast.
-type Tree struct {
-	Root      *Root
-	name      string // the name of the input; used only for error reports
-	text      string
-	lex       *lexer
-	token     [3]item
-	peekCount int
-}
-
-func (t *Tree) HTML() string {
-	return t.Root.HTML()
-}
-
 func Parse(name, text string) (*Tree, error) {
 	t := &Tree{name: name, text: text}
 	err := t.parse()
 
 	return t, err
+}
+
+// Tree is the representation of the markdown ast.
+type Tree struct {
+	Root      *Root
+	CurNode   Node
+	name      string // the name of the input; used only for error reports
+	text      string
+	lex       *lexer
+	token     [128]item
+	peekCount int
+}
+
+func (t *Tree) HTML() string {
+	return t.Root.HTML()
 }
 
 // next returns the next token.
@@ -127,36 +128,8 @@ func (t *Tree) parse() (err error) {
 	return nil
 }
 
-func (t *Tree) acceptSpaces() (ret int) {
-	for {
-		token := t.next()
-		if itemSpace != token.typ {
-			t.backup()
-
-			break
-		}
-		ret++
-	}
-	if 4 <= ret {
-		t.backup()
-	}
-
-	return
-}
-
-func (t *Tree) acceptTabs(tabs int) {
-	for i := 0; i < tabs; i++ {
-		token := t.next()
-		if itemTab != token.typ {
-			t.backup()
-
-			break
-		}
-	}
-}
-
 func (t *Tree) parseContent() {
-	t.Root = &Root{Parent{NodeType: NodeRoot, Pos: 0}}
+	t.Root = &Root{NodeType: NodeRoot, Pos: 0}
 
 	for token := t.peek(); itemEOF != token.typ && itemError != token.typ; token = t.peek() {
 		var c Node
@@ -182,22 +155,31 @@ func (t *Tree) parseContent() {
 }
 
 func (t *Tree) parseTopLevelContent() (ret Node) {
-	ret = t.parseBlockContent(0)
+	ret = t.parseBlockContent()
 
 	return
 }
 
-func (t *Tree) acceptIndent(indentLevel int) {
-	if 1 > indentLevel {
-		return
+func (t *Tree) acceptSpaces() (ret int) {
+	for {
+		token := t.next()
+		if itemSpace != token.typ {
+			t.backup()
+
+			break
+		}
+		ret++
+	}
+	if 4 <= ret {
+		t.backup()
 	}
 
-	t.acceptTabs(indentLevel)
+	return
 }
 
-func (t *Tree) parseBlockContent(indentLevel int) Node {
+func (t *Tree) parseBlockContent() Node {
 	for {
-		t.acceptTabs(indentLevel)
+
 
 		switch token := t.peek(); token.typ {
 		case itemParagraph:
@@ -246,7 +228,7 @@ func (t *Tree) parsePhrasingContent() (ret Node) {
 
 func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	switch token := t.peek(); token.typ {
-	case itemStr:
+	case itemStr, itemTab:
 		return t.parseText()
 	case itemEm:
 		ret = t.parseEm()
@@ -264,10 +246,7 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 func (t *Tree) parseParagraph() Node {
 	token := t.peek()
 
-	ret := &Paragraph{
-		Parent{NodeParagraph, token.pos, nil},
-		[]Node{},
-	}
+	ret := &Paragraph{NodeParagraph, token.pos, []Node{}}
 
 	for {
 		c := t.parsePhrasingContent()
@@ -288,9 +267,8 @@ func (t *Tree) parseHeading() (ret Node) {
 	t.next() // consume spaces
 
 	ret = &Heading{
-		Parent{NodeHeading, token.pos, nil},
+		NodeHeading, token.pos, []Node{t.parsePhrasingContent()},
 		len(token.val),
-		[]Node{t.parsePhrasingContent()},
 	}
 
 	return
@@ -307,10 +285,7 @@ func (t *Tree) parseBlockquote() (ret Node) {
 	token := t.next()
 	t.next() // consume spaces
 
-	ret = &Blockquote{
-		Parent{NodeParagraph, token.pos, nil},
-		[]Node{t.parseBlockContent(0)},
-	}
+	ret = &Blockquote{NodeParagraph, token.pos, []Node{t.parseBlockContent()}}
 
 	return
 }
@@ -318,16 +293,13 @@ func (t *Tree) parseBlockquote() (ret Node) {
 func (t *Tree) parseText() Node {
 	token := t.next()
 
-	return &Text{Literal{NodeText, token.pos, token.val}}
+	return &Text{NodeText, token.pos, token.val}
 }
 
 func (t *Tree) parseEm() (ret Node) {
 	t.next() // consume open *
 	token := t.peek()
-	ret = &Emphasis{
-		Parent{NodeEmphasis, token.pos, nil},
-		[]Node{t.parsePhrasingContent()},
-	}
+	ret = &Emphasis{NodeEmphasis, token.pos, []Node{t.parsePhrasingContent()}}
 	t.next() // consume close *
 
 	return
@@ -336,10 +308,7 @@ func (t *Tree) parseEm() (ret Node) {
 func (t *Tree) parseStrong() (ret Node) {
 	t.next() // consume open **
 	token := t.peek()
-	ret = &Strong{
-		Parent{NodeStrong, token.pos, nil},
-		[]Node{t.parsePhrasingContent()},
-	}
+	ret = &Strong{NodeStrong, token.pos, []Node{t.parsePhrasingContent()}}
 	t.next() // consume close **
 
 	return
@@ -348,10 +317,7 @@ func (t *Tree) parseStrong() (ret Node) {
 func (t *Tree) parseDelete() (ret Node) {
 	t.next() // consume open ~~
 	token := t.peek()
-	ret = &Delete{
-		Parent{NodeDelete, token.pos, nil},
-		[]Node{t.parsePhrasingContent()},
-	}
+	ret = &Delete{NodeDelete, token.pos, []Node{t.parsePhrasingContent()}}
 	t.next() // consume close ~~
 
 	return
@@ -372,7 +338,7 @@ func (t *Tree) parseInlineCode() (ret Node) {
 	t.next() // consume open `
 
 	code := t.next()
-	ret = &InlineCode{Literal{NodeInlineCode, code.pos, code.val}}
+	ret = &InlineCode{NodeInlineCode, code.pos, code.val}
 
 	t.next() // consume close `
 
@@ -399,7 +365,7 @@ func (t *Tree) parseCode() (ret Node) {
 		}
 	}
 
-	ret = &Code{Literal{NodeCode, pos, code}, "", ""}
+	ret = &Code{NodeCode, pos, code, "", ""}
 
 	if itemEOF == t.peek().typ {
 		return
@@ -416,11 +382,10 @@ func (t *Tree) parseList() Node {
 
 	token := t.peek()
 	list := &List{
-		Parent:   Parent{NodeList, token.pos, nil},
-		Ordered:  false,
-		Start:    1,
-		Spread:   false,
-		Children: []Node{},
+		NodeList, token.pos, []Node{},
+		false,
+		1,
+		false,
 	}
 
 	for {
@@ -441,14 +406,14 @@ func (t *Tree) parseListItem() Node {
 	}
 
 	ret := &ListItem{
-		Parent:   Parent{NodeListItem, token.pos, nil},
-		Checked:  false,
-		Spread:   false,
-		Children: []Node{},
+		NodeListItem, token.pos, []Node{},
+		false,
+		false,
+		t,
 	}
 
 	for {
-		c := t.parseBlockContent(1)
+		c := t.parseBlockContent()
 		if nil == c {
 			break
 		}
