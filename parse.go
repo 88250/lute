@@ -143,7 +143,7 @@ func (t *Tree) parseContent() {
 			}
 
 			fallthrough
-		case itemStr, itemParagraph, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
+		case itemStr, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
 			itemTab:
 			c = t.parseTopLevelContent()
 		default:
@@ -181,9 +181,6 @@ func (t *Tree) parseBlockContent() Node {
 	for {
 
 		switch token := t.peek(); token.typ {
-		case itemParagraph:
-			t.next() // consume \n\n
-			continue
 		case itemStr:
 			return t.parseParagraph()
 		case itemHeading:

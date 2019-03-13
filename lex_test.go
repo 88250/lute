@@ -43,9 +43,9 @@ var lexTests = []lexTest{
 	{"li", "* lute", []item{mkItem(itemListItem, "*"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 
 	{"comb1", "### foo\n## foo", []item{mkItem(itemHeading, "###"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), mkItem(itemBreak, "\n"), mkItem(itemHeading, "##"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), tEOF}},
-	{"comb0", "# h\n\nl**u**te", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "h"), mkItem(itemParagraph, "\n\n"), mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
+	{"comb0", "# h\n\nl**u**te", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "h"), mkItem(itemBreak, "\n"), mkItem(itemBreak, "\n"), mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
 
-	{"paragraph", "p1\n\np2", []item{mkItem(itemStr, "p1"), mkItem(itemParagraph, "\n\n"), mkItem(itemStr, "p2"), tEOF}},
+	{"paragraph", "p1\n\np2", []item{mkItem(itemStr, "p1"), mkItem(itemBreak, "\n"), mkItem(itemBreak, "\n"), mkItem(itemStr, "p2"), tEOF}},
 	{"img", `![alt](/uri "title")`, []item{mkItem(itemImg, "!"), mkItem(itemOpenLinkText, "["), mkItem(itemStr, "alt"),
 		mkItem(itemCloseLinkText, "]"), mkItem(itemOpenLinkHref, "("), mkItem(itemStr, "/uri"), mkItem(itemSpace, " "), mkItem(itemStr, `"title"`), mkItem(itemCloseLinkHref, ")"), tEOF}},
 	{"link", `[link](/uri "title")`, []item{mkItem(itemOpenLinkText, "["), mkItem(itemStr, "link"),
@@ -63,7 +63,15 @@ var lexTests = []lexTest{
 	{"empty", "", []item{tEOF}},
 }
 
-// collect gathers the emitted items into a slice.
+func TestLex(t *testing.T) {
+	for _, test := range lexTests {
+		items := collect(&test)
+		if !equal(items, test.items, false) {
+			t.Fatalf("%s:\nexpected\n\t%v\ngot\n\t%+v\n", test.name, test.items, items)
+		}
+	}
+}
+
 func collect(t *lexTest) (items []item) {
 	l := lex(t.name, t.input)
 	for {
@@ -95,13 +103,4 @@ func equal(i1, i2 []item, checkPos bool) bool {
 	}
 
 	return true
-}
-
-func TestLex(t *testing.T) {
-	for _, test := range lexTests {
-		items := collect(&test)
-		if !equal(items, test.items, false) {
-			t.Fatalf("%s:\nexpected\n\t%v\ngot\n\t%+v\n", test.name, test.items, items)
-		}
-	}
 }
