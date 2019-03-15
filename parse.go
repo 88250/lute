@@ -154,7 +154,6 @@ func (t *Tree) parseContent() {
 		default:
 			c = t.parsePhrasingContent()
 		}
-
 		t.Root.append(c)
 	}
 }
@@ -217,7 +216,7 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 		ret = t.parseStrong()
 	case itemInlineCode:
 		ret = t.parseInlineCode()
-	case itemBreak:
+	case itemNewline:
 		ret = t.parseBreak()
 	}
 
@@ -236,8 +235,18 @@ func (t *Tree) parseParagraph() Node {
 
 			break
 		}
-
 		ret.append(c)
+
+		token = t.peek()
+		if itemNewline == t.peek().typ {
+			t.next()
+			if itemNewline == t.peek().typ {
+				t.next()
+				break
+			}
+
+			t.backup()
+		}
 	}
 
 	return ret
@@ -334,7 +343,7 @@ func (t *Tree) parseCode() (ret Node) {
 	var code string
 	for ; itemCode != token.typ && itemEOF != token.typ; token = t.next() {
 		code += token.val
-		if itemBreak == token.typ {
+		if itemNewline == token.typ {
 			if itemCode == t.peek().typ {
 				break
 			}
@@ -361,7 +370,7 @@ func (t *Tree) parseList() Node {
 		false,
 		1,
 		false,
-		"marker", 1,
+		marker.val,
 	}
 
 	for {
@@ -393,7 +402,6 @@ func (t *Tree) parseListItem() Node {
 		if nil == c {
 			break
 		}
-
 		ret.append(c)
 	}
 

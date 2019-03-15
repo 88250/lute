@@ -84,7 +84,7 @@ func (n *Root) String() string {
 func (n *Root) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("%s\n", content)
+	return fmt.Sprintf("%s", content)
 }
 
 func (n *Root) append(c Node) {
@@ -107,7 +107,11 @@ func (n *Paragraph) String() string {
 func (n *Paragraph) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
+	if "" != n.OpenTag {
+		return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag+"\n", content)
+	}
+
+	return  fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
 }
 
 func (n *Paragraph) append(c Node) {
@@ -121,16 +125,26 @@ func (n *Paragraph) trim() {
 	}
 
 	initialNoneWhitespace := 0
+	notBreak := true
 	for i := initialNoneWhitespace; i < size/2; i++ {
 		if NodeBreak == n.Children[i].Type() {
 			initialNoneWhitespace++
+			notBreak = false
+		}
+		if notBreak {
+			break
 		}
 	}
 
 	finalNoneWhitespace := size
+	notBreak = true
 	for i := finalNoneWhitespace - 1; size/2 <= i; i-- {
 		if NodeBreak == n.Children[i].Type() {
 			finalNoneWhitespace--
+			notBreak = false
+		}
+		if notBreak {
+			break
 		}
 	}
 
@@ -153,7 +167,7 @@ func (n Heading) String() string {
 func (n *Heading) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<h%d>%s</h%d>", n.Depth, content, n.Depth)
+	return fmt.Sprintf("<h%d>%s</h%d>\n", n.Depth, content, n.Depth)
 }
 
 type ThematicBreak struct {
@@ -182,7 +196,7 @@ func (n *Blockquote) String() string {
 func (n *Blockquote) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<blockquote>%s</blockquote>", content)
+	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
 }
 
 type List struct {
@@ -196,7 +210,6 @@ type List struct {
 	Spread  bool
 
 	Marker string
-	Indent int
 }
 
 func (n *List) String() string {
@@ -206,7 +219,7 @@ func (n *List) String() string {
 func (n *List) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<ul>\n%s</ul>", content)
+	return fmt.Sprintf("<ul>\n%s</ul>\n", content)
 }
 
 func (n *List) append(c Node) {

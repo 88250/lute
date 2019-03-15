@@ -32,14 +32,16 @@ var parseTests = []parseTest{
 	{"Tabs4", "  - foo\n\n\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>\n"},
 
 	// some simple cases
+	{"paragraph2", "p1\n\np2", "<p>p1</p>\n<p>p2</p>\n"},
+	{"paragraph", "p", "<p>p</p>\n"},
 	{"list", "* lute", "<ul>\n<li>\nlute</li>\n</ul>\n"},
 	{"heading", "# lute", "<h1>lute</h1>\n"},
-	{"quote", "> lute", "<blockquote><p>lute</p></blockquote>\n"},
+	{"quote", "> lute", "<blockquote>\n<p>lute</p>\n</blockquote>\n"},
 	{"strong", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
 	{"em", "l*u*te", "<p>l<em>u</em>te</p>\n"},
 	{"inlineCode", "l`u`te", "<p>l<code>u</code>te</p>\n"},
 	{"str", "lute", "<p>lute</p>\n"},
-	{"empty", "", "\n"},
+	{"empty", "", ""},
 }
 
 func TestParse(t *testing.T) {
