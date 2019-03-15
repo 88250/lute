@@ -16,11 +16,25 @@
 
 package lute
 
+import "regexp"
+
 func Parse(name, text string) (*Tree, error) {
+	text = sanitize(text)
+
 	t := &Tree{name: name, text: text}
 	err := t.parse()
 
 	return t, err
+}
+
+var newlinesRe = regexp.MustCompile("\r[\n\u0085]?|[\u2424\u2028\u0085]")
+var nullRe = regexp.MustCompile("\u0000")
+
+func sanitize(text string) (ret string) {
+	ret = newlinesRe.ReplaceAllString(text, "\n")
+	nullRe.ReplaceAllString(ret, "\uFFFD") // https://github.github.com/gfm/#insecure-characters
+
+	return
 }
 
 // Tree is the representation of the markdown ast.
@@ -134,15 +148,6 @@ func (t *Tree) parseContent() {
 	for token := t.peek(); itemEOF != token.typ && itemError != token.typ; token = t.peek() {
 		var c Node
 		switch token.typ {
-		case itemSpace:
-			spaces := t.acceptSpaces()
-			if 4 <= spaces {
-				c = t.parseCode()
-
-				break
-			}
-
-			fallthrough
 		case itemStr, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
 			itemTab:
 			c = t.parseTopLevelContent()
@@ -160,44 +165,26 @@ func (t *Tree) parseTopLevelContent() (ret Node) {
 	return
 }
 
-func (t *Tree) acceptSpaces() (ret int) {
-	for {
-		token := t.next()
-		if itemSpace != token.typ {
-			t.backup()
-
-			break
-		}
-		ret++
-	}
-	if 4 <= ret {
-		t.backup()
-	}
-
-	return
-}
-
 func (t *Tree) parseBlockContent() Node {
-	for {
 
-		switch token := t.peek(); token.typ {
-		case itemStr:
-			return t.parseParagraph()
-		case itemHeading:
-			return t.parseHeading()
-		case itemThematicBreak:
-			return t.parseThematicBreak()
-		case itemQuote:
-			return t.parseBlockquote()
-		case itemInlineCode:
-			return t.parseInlineCode()
-		case itemCode, itemTab:
-			return t.parseCode()
-		case itemListItem:
-			return t.parseList()
-		default:
-			return nil
-		}
+	switch token := t.peek(); token.typ {
+	case itemStr:
+		return t.parseParagraph()
+	case itemHeading:
+		return t.parseHeading()
+	case itemThematicBreak:
+		return t.parseThematicBreak()
+	case itemQuote:
+		return t.parseBlockquote()
+	case itemInlineCode:
+		return t.parseInlineCode()
+	case itemCode, itemTab:
+		return t.parseCode()
+	case itemListItem:
+
+		return t.parseList()
+	default:
+		return nil
 	}
 }
 
@@ -353,11 +340,6 @@ func (t *Tree) parseCode() (ret Node) {
 			if itemCode == t.peek().typ {
 				break
 			}
-
-			spaces := t.acceptSpaces()
-			if 4 > spaces {
-				break
-			}
 		}
 	}
 
@@ -382,6 +364,7 @@ func (t *Tree) parseList() Node {
 		false,
 		1,
 		false,
+		"marker", 1,
 	}
 
 	for {
@@ -404,8 +387,9 @@ func (t *Tree) parseListItem() Node {
 	ret := &ListItem{
 		NodeListItem, token.pos, t, Children{},
 		false,
-		false,
+		false, 1,
 	}
+	t.CurNode = ret
 
 	for {
 		c := t.parseBlockContent()

@@ -261,9 +261,7 @@ func lexText(l *lexer) stateFn {
 	case '`' == r:
 		return lexCode
 	case ' ' == r:
-		l.emit(itemSpace)
-
-		return lexText
+		return lexSpace
 	case '\t' == r:
 		l.emit(itemTab)
 
@@ -348,7 +346,6 @@ func lexEmStrongListItem(l *lexer) stateFn {
 		return lexText
 	case ' ' == second:
 		l.backup()
-		l.backup()
 		l.emit(itemListItem)
 
 		return lexText
@@ -365,7 +362,6 @@ func lexListItem(l *lexer) stateFn {
 	second := l.next()
 	switch {
 	case ' ' == second:
-		l.backup()
 		l.emit(itemListItem)
 
 		return lexText
@@ -404,4 +400,35 @@ func lexStr(l *lexer) stateFn {
 			return lexText
 		}
 	}
+}
+
+func lexSpace(l *lexer) stateFn {
+	nextCnt := 0
+
+Loop:
+	for {
+		r := l.next()
+		nextCnt++
+		switch r {
+		case '\n', eof:
+			break Loop
+		case '*':
+			if ' ' == l.next() {
+				l.emit(itemListItem)
+
+				return lexText
+			}
+		case ' ':
+		default:
+			break Loop
+		}
+	}
+
+	for i := 0; i < nextCnt; i++ {
+		l.backup()
+	}
+
+	l.emit(itemSpace)
+
+	return lexText
 }

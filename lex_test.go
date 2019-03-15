@@ -39,8 +39,10 @@ var (
 
 var lexTests = []lexTest{
 
-	{"li2", "- lute", []item{mkItem(itemListItem, "-"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
-	{"li", "* lute", []item{mkItem(itemListItem, "*"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
+	{"0", "  * a", []item{mkItem(itemListItem, "  * "), mkItem(itemStr, "a"), tEOF}},
+
+	{"li2", "- lute", []item{mkItem(itemListItem, "- "), mkItem(itemStr, "lute"), tEOF}},
+	{"li", "* lute", []item{mkItem(itemListItem, "* "), mkItem(itemStr, "lute"), tEOF}},
 
 	{"comb1", "### foo\n## foo", []item{mkItem(itemHeading, "###"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), mkItem(itemBreak, "\n"), mkItem(itemHeading, "##"), mkItem(itemSpace, " "), mkItem(itemStr, "foo"), tEOF}},
 	{"comb0", "# h\n\nl**u**te", []item{mkItem(itemHeading, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "h"), mkItem(itemBreak, "\n"), mkItem(itemBreak, "\n"), mkItem(itemStr, "l"), mkItem(itemStrong, "**"), mkItem(itemStr, "u"), mkItem(itemStrong, "**"), mkItem(itemStr, "te"), tEOF}},
@@ -67,7 +69,7 @@ func TestLex(t *testing.T) {
 	for _, test := range lexTests {
 		items := collect(&test)
 		if !equal(items, test.items, false) {
-			t.Fatalf("%s:\nexpected\n\t%v\ngot\n\t%+v\n", test.name, test.items, items)
+			t.Fatalf("%s:\nexpected\n\t%v\ngot\n\t%v\n", test.name, test.items, items)
 		}
 	}
 }

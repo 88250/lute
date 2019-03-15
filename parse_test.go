@@ -28,10 +28,11 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
-
+	// commonmark spec cases
 	{"Tabs5", "- foo\n\n\t\tbar\n", ""},
 	{"Tabs4", "  - foo\n\n\tbar\n", ""},
 
+	// some simple cases
 	{"list", "* lute", ""},
 	{"heading", "# lute", ""},
 	{"quote", "> lute", ""},
@@ -49,7 +50,7 @@ func TestParse(t *testing.T) {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		fmt.Printf("%s: %q\n",tree.name, tree.HTML())
+		fmt.Printf("%s: %q\n", tree.name, tree.HTML())
 	}
 }
 

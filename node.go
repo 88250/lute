@@ -30,6 +30,7 @@ type Node interface {
 
 // NodeType identifies the type of a parse tree node.
 type NodeType int
+
 // Children represents the children nodes of a tree node.
 type Children []Node
 
@@ -38,8 +39,7 @@ func (t NodeType) Type() NodeType {
 }
 
 const (
-	NodeParent NodeType = iota
-	NodeRoot
+	NodeRoot NodeType = iota
 	NodeParagraph
 	NodeHeading
 	NodeThematicBreak
@@ -192,6 +192,9 @@ type List struct {
 	Ordered bool
 	Start   int
 	Spread  bool
+
+	Marker string
+	Indent int
 }
 
 func (n *List) String() string {
@@ -216,6 +219,8 @@ type ListItem struct {
 
 	Checked bool
 	Spread  bool
+
+	Spaces int
 }
 
 func (n *ListItem) String() string {
@@ -230,7 +235,6 @@ func (n *ListItem) HTML() string {
 
 func (n *ListItem) append(c Node) {
 	n.Children = append(n.Children, c)
-	n.Tree.CurNode = c
 }
 
 type Table struct {
