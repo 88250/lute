@@ -412,7 +412,7 @@ Loop:
 		switch r {
 		case '\n', eof:
 			break Loop
-		case '*':
+		case '*', '-':
 			if ' ' == l.next() {
 				l.emit(itemListItem)
 

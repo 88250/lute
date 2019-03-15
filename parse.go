@@ -149,7 +149,7 @@ func (t *Tree) parseContent() {
 		var c Node
 		switch token.typ {
 		case itemStr, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
-			itemTab:
+			itemTab, itemSpace:
 			c = t.parseTopLevelContent()
 		default:
 			c = t.parsePhrasingContent()
@@ -166,7 +166,6 @@ func (t *Tree) parseTopLevelContent() (ret Node) {
 }
 
 func (t *Tree) parseBlockContent() Node {
-
 	switch token := t.peek(); token.typ {
 	case itemStr:
 		return t.parseParagraph()
@@ -228,7 +227,7 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 func (t *Tree) parseParagraph() Node {
 	token := t.peek()
 
-	ret := &Paragraph{NodeParagraph, token.pos, t, Children{}}
+	ret := &Paragraph{NodeParagraph, token.pos, t, Children{}, "<p>", "</p>"}
 
 	for {
 		c := t.parsePhrasingContent()
@@ -354,7 +353,7 @@ func (t *Tree) parseCode() (ret Node) {
 }
 
 func (t *Tree) parseList() Node {
-	t.next() // *
+	marker := t.next()
 
 	token := t.peek()
 	list := &List{

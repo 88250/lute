@@ -96,6 +96,8 @@ type Paragraph struct {
 	Pos
 	*Tree
 	Children
+
+	OpenTag, CloseTag string
 }
 
 func (n *Paragraph) String() string {
@@ -105,7 +107,7 @@ func (n *Paragraph) String() string {
 func (n *Paragraph) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<p>%s</p>", content)
+	return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
 }
 
 func (n *Paragraph) append(c Node) {
@@ -218,7 +220,7 @@ type ListItem struct {
 	Children
 
 	Checked bool
-	Spread  bool
+	Spread  bool // loose or tight
 
 	Spaces int
 }
@@ -228,7 +230,15 @@ func (n *ListItem) String() string {
 }
 
 func (n *ListItem) HTML() string {
-	content := html(n.Children)
+	var content string
+	for _, c := range n.Children {
+		if !n.Spread && NodeParagraph == c.Type() {
+			p := c.(*Paragraph)
+			p.OpenTag, p.CloseTag = "", ""
+		}
+
+		content += c.HTML()
+	}
 
 	return fmt.Sprintf("<li>\n%s</li>\n", content)
 }
