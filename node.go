@@ -105,7 +105,7 @@ func (n *Paragraph) String() string {
 func (n *Paragraph) HTML() string {
 	content := html(n.Children)
 
-	return fmt.Sprintf("<p>%s</p>\n", content)
+	return fmt.Sprintf("<p>%s</p>", content)
 }
 
 func (n *Paragraph) append(c Node) {

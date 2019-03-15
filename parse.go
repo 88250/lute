@@ -181,7 +181,6 @@ func (t *Tree) parseBlockContent() Node {
 	case itemCode, itemTab:
 		return t.parseCode()
 	case itemListItem:
-
 		return t.parseList()
 	default:
 		return nil
@@ -356,7 +355,6 @@ func (t *Tree) parseCode() (ret Node) {
 
 func (t *Tree) parseList() Node {
 	t.next() // *
-	t.next() // space
 
 	token := t.peek()
 	list := &List{

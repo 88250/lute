@@ -17,30 +17,29 @@
 package lute
 
 import (
-	"fmt"
 	"testing"
 )
 
 type parseTest struct {
 	name   string
 	input  string
-	result string // what the user would see in an error message.
+	result string
 }
 
 var parseTests = []parseTest{
 	// commonmark spec cases
-	{"Tabs5", "- foo\n\n\t\tbar\n", ""},
-	{"Tabs4", "  - foo\n\n\tbar\n", ""},
-
+	//{"Tabs5", "- foo\n\n\t\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<pre><code>  bar\n</code></pre>\n</li>\n</ul>\n"},
+	//{"Tabs4", "  - foo\n\n\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>\n"},
+	//
 	// some simple cases
-	{"list", "* lute", ""},
-	{"heading", "# lute", ""},
-	{"quote", "> lute", ""},
-	{"strong", "l**u**te", ""},
-	{"em", "l*u*te", ""},
-	{"inlineCode", "l`u`te", ""},
-	{"str", "lute", ""},
-	{"empty", "", ""},
+	{"list", "* lute", "<ul>\n<li>\nlute\n</li>\n</ul>\n"},
+	{"heading", "# lute", "<h1>lute</h1>\n"},
+	{"quote", "> lute", "<blockquote><p>lute</p></blockquote>\n"},
+	{"strong", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
+	{"em", "l*u*te", "<p>l<em>u</em>te</p>\n"},
+	{"inlineCode", "l`u`te", "<p>l<code>u</code>te</p>\n"},
+	{"str", "lute", "<p>lute</p>\n"},
+	{"empty", "", "\n"},
 }
 
 func TestParse(t *testing.T) {
@@ -50,7 +49,10 @@ func TestParse(t *testing.T) {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		fmt.Printf("%s: %q\n", tree.name, tree.HTML())
+		html := tree.HTML()
+		if test.result != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.result, html, test.input)
+		}
 	}
 }
 
