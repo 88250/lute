@@ -39,8 +39,9 @@ var (
 
 var lexTests = []lexTest{
 
-	{"0", "  * a", []item{mkItem(itemListItem, "  * "), mkItem(itemStr, "a"), tEOF}},
+	{"spec5", "- foo\n\n\t\tbar\n", []item{mkItem(itemListItem, "- "), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemTab, "\t"), mkItem(itemTab, "\t"), mkItem(itemStr, "bar"), mkItem(itemNewline, "\n"), tEOF}},
 
+	{"li3", "  * lute", []item{mkItem(itemListItem, "  * "), mkItem(itemStr, "lute"), tEOF}},
 	{"li2", "- lute", []item{mkItem(itemListItem, "- "), mkItem(itemStr, "lute"), tEOF}},
 	{"li", "* lute", []item{mkItem(itemListItem, "* "), mkItem(itemStr, "lute"), tEOF}},
 

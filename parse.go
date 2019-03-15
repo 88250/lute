@@ -44,7 +44,7 @@ type Tree struct {
 	name      string // the name of the input; used only for error reports
 	text      string
 	lex       *lexer
-	token     [128]item
+	token     [64]item
 	peekCount int
 }
 
@@ -84,6 +84,15 @@ func (t *Tree) backup3(t2, t1 item) {
 	t.peekCount = 3
 }
 
+func (t *Tree) backups(tokens []item) {
+	i := 0
+	l := len(tokens)
+	for ; i < l; i++ {
+		t.token[l-1-i] = tokens[i] // pushing back
+	}
+	t.peekCount = i
+}
+
 // peek returns but does not consume the next token.
 func (t *Tree) peek() item {
 	if t.peekCount > 0 {
@@ -96,24 +105,21 @@ func (t *Tree) peek() item {
 	return t.token[0]
 }
 
-func (t *Tree) nextNonWhitespace() (spaces int, token item) {
+func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item) {
 	for {
-		token = t.next()
-		if itemTab == token.typ {
-			spaces += 4
-
+		token := t.next()
+		tokens = append(tokens, token)
+		switch token.typ {
+		case itemTab:
+			tabs++
 			continue
-		}
-		if itemSpace == token.typ {
+		case itemSpace:
 			spaces++
-
 			continue
+		default:
+			return
 		}
-
-		break
 	}
-
-	return
 }
 
 // Parsing.
@@ -392,6 +398,15 @@ func (t *Tree) parseList() Node {
 		if c.Spread {
 			loose = true
 		}
+
+		token := t.peek()
+		if itemNewline == token.typ {
+			t.next()
+			continue
+		}
+		if marker.val != token.val {
+			break
+		}
 	}
 
 	list.Spread = loose
@@ -399,7 +414,7 @@ func (t *Tree) parseList() Node {
 	return list
 }
 
-func (t *Tree) parseListItem(spaces int) *ListItem {
+func (t *Tree) parseListItem(indentSpaces int) *ListItem {
 	token := t.peek()
 	if itemEOF == token.typ {
 		return nil
@@ -409,7 +424,7 @@ func (t *Tree) parseListItem(spaces int) *ListItem {
 		NodeListItem, token.pos, t, Children{},
 		false,
 		false,
-		spaces,
+		indentSpaces,
 	}
 	t.CurNode = ret
 
@@ -421,15 +436,51 @@ func (t *Tree) parseListItem(spaces int) *ListItem {
 		}
 		ret.append(c)
 
-		if NodeParagraph == c.Type() {
+		if NodeParagraph == c.Type() || NodeCode == c.Type() {
 			paragraphs++
 		}
 
-		indentSpaces, _ := t.nextNonWhitespace()
-		if indentSpaces < spaces {
+		spaces, tabs, tokens := t.nextNonWhitespace()
+		totalSpaces := spaces + tabs*4
+		if totalSpaces < indentSpaces {
+			t.backups(tokens)
 			break
 		}
-		t.backup()
+		if totalSpaces == indentSpaces {
+			t.backups(tokens)
+			continue
+		}
+
+		var restoreTokens, nonWhitespaces []item
+		compSpaces := 0
+		i := 0
+		for ; i < len(tokens); i++ {
+			if itemSpace == tokens[i].typ {
+				compSpaces++
+			} else if itemTab == tokens[i].typ {
+				compSpaces += 4
+			} else {
+				nonWhitespaces = append(nonWhitespaces, tokens[i])
+			}
+		}
+
+		remains := compSpaces - indentSpaces
+		if 0 > remains {
+			break
+		}
+
+		if 4 <= remains {
+			for j := 0; j < remains/4; j++ {
+				restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
+			}
+			for j := 0; j < remains%4; j++ {
+				restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
+			}
+			restoreTokens = append(restoreTokens, nonWhitespaces...)
+			t.backups(restoreTokens)
+		} else {
+			t.backup()
+		}
 	}
 
 	if 1 < paragraphs {

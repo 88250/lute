@@ -111,7 +111,7 @@ func (n *Paragraph) HTML() string {
 		return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag+"\n", content)
 	}
 
-	return  fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
+	return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
 }
 
 func (n *Paragraph) append(c Node) {
@@ -253,7 +253,11 @@ func (n *ListItem) HTML() string {
 		content += c.HTML()
 	}
 
-	return fmt.Sprintf("<li>\n%s</li>\n", content)
+	if 1 < len(n.Children) {
+		return fmt.Sprintf("<li>\n%s</li>\n", content)
+	}
+
+	return fmt.Sprintf("<li>%s</li>\n", content)
 }
 
 func (n *ListItem) append(c Node) {
@@ -305,7 +309,7 @@ func (n *Code) String() string {
 }
 
 func (n *Code) HTML() string {
-	return fmt.Sprintf("<pre><code>%s</code></pre>", n.Value)
+	return fmt.Sprintf("<pre><code>%s</code></pre>\n", n.Value)
 }
 
 type YAML struct {

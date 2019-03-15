@@ -28,8 +28,9 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 	// commonmark spec cases
-	//{"Tabs5", "- foo\n\n\t\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<pre><code>  bar\n</code></pre>\n</li>\n</ul>\n"},
-	{"Tabs4", "  - foo\n\n\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>\n"},
+	//{"spec5", "- foo\n\n\t\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<pre><code>  bar\n</code></pre>\n</li>\n</ul>\n"},
+	//{"spec4", "  - foo\n\n\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>\n"},
+	{"spec4", "   - foo\n\n\tbar\n", "<ul>\n<li>foo</li>\n</ul>\n<pre></code>bar</code></pre>\n"},
 
 	// some simple cases
 	{"paragraph2", "p1\n\np2", "<p>p1</p>\n<p>p2</p>\n"},
