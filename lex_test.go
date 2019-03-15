@@ -79,7 +79,7 @@ func collect(t *lexTest) (items []item) {
 	for {
 		item := l.nextItem()
 		items = append(items, item)
-		if item.typ == itemEOF || item.typ == itemError {
+		if item.typ == itemEOF {
 			break
 		}
 	}

@@ -96,16 +96,24 @@ func (t *Tree) peek() item {
 	return t.token[0]
 }
 
-// nextNonSpace returns the next non-space token.
-func (t *Tree) nextNonSpace() (token item) {
+func (t *Tree) nextNonWhitespace() (spaces int, token item) {
 	for {
 		token = t.next()
-		if token.typ != itemSpace {
-			break
+		if itemTab == token.typ {
+			spaces += 4
+
+			continue
 		}
+		if itemSpace == token.typ {
+			spaces++
+
+			continue
+		}
+
+		break
 	}
 
-	return token
+	return
 }
 
 // Parsing.
@@ -145,7 +153,7 @@ func (t *Tree) parse() (err error) {
 func (t *Tree) parseContent() {
 	t.Root = &Root{NodeType: NodeRoot, Pos: 0}
 
-	for token := t.peek(); itemEOF != token.typ && itemError != token.typ; token = t.peek() {
+	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
 		var c Node
 		switch token.typ {
 		case itemStr, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
@@ -373,18 +381,25 @@ func (t *Tree) parseList() Node {
 		marker.val,
 	}
 
+	loose := false
 	for {
-		c := t.parseListItem()
+		c := t.parseListItem(len(marker.val))
 		if nil == c {
 			break
 		}
 		list.append(c)
+
+		if c.Spread {
+			loose = true
+		}
 	}
+
+	list.Spread = loose
 
 	return list
 }
 
-func (t *Tree) parseListItem() Node {
+func (t *Tree) parseListItem(spaces int) *ListItem {
 	token := t.peek()
 	if itemEOF == token.typ {
 		return nil
@@ -393,16 +408,32 @@ func (t *Tree) parseListItem() Node {
 	ret := &ListItem{
 		NodeListItem, token.pos, t, Children{},
 		false,
-		false, 1,
+		false,
+		spaces,
 	}
 	t.CurNode = ret
 
+	paragraphs := 0
 	for {
 		c := t.parseBlockContent()
 		if nil == c {
 			break
 		}
 		ret.append(c)
+
+		if NodeParagraph == c.Type() {
+			paragraphs++
+		}
+
+		indentSpaces, _ := t.nextNonWhitespace()
+		if indentSpaces < spaces {
+			break
+		}
+		t.backup()
+	}
+
+	if 1 < paragraphs {
+		ret.Spread = true
 	}
 
 	return ret

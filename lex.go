@@ -42,8 +42,6 @@ func (i item) String() string {
 	switch {
 	case i.typ == itemEOF:
 		return "EOF"
-	case i.typ == itemError:
-		return i.val
 	case len(i.val) > 10:
 		return fmt.Sprintf("%.10q...", i.val)
 	}
@@ -56,7 +54,6 @@ type itemType int
 
 // Make the types pretty print.
 var itemName = map[itemType]string{
-	itemError:         "error",
 	itemEOF:           "EOF",
 	itemStr:           "str",
 	itemHeading:       "#",
@@ -86,8 +83,7 @@ func (i itemType) String() string {
 }
 
 const (
-	itemError         itemType = iota // error occurred; value is text of error
-	itemEOF                           // EOF
+	itemEOF           itemType = iota // EOF
 	itemStr                           // plain text
 	itemHeading                       // #
 	itemQuote                         // >
@@ -193,14 +189,6 @@ func (l *lexer) acceptRun(valid string) (count int8) {
 	l.backup()
 
 	return
-}
-
-// errorf returns an error token and terminates the scan by passing
-// back a nil pointer that will be the next state, terminating l.nextItem.
-func (l *lexer) errorf(format string, args ...interface{}) stateFn {
-	l.items <- item{itemError, l.start, fmt.Sprintf(format, args...), l.line}
-
-	return nil
 }
 
 // nextItem returns the next item from the input.
@@ -315,7 +303,7 @@ func lexHeading(l *lexer) stateFn {
 
 		return lexStr
 	default:
-		return l.errorf("# must be followed by a space")
+		return lexStr
 	}
 }
 
@@ -366,7 +354,7 @@ func lexListItem(l *lexer) stateFn {
 
 		return lexText
 	default:
-		return l.errorf("- must be followed by a space")
+		return lexText
 	}
 }
 
