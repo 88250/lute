@@ -54,23 +54,25 @@ type itemType int
 
 // Make the types pretty print.
 var itemName = map[itemType]string{
-	itemEOF:           "EOF",
-	itemStr:           "str",
-	itemHeading:       "#",
-	itemQuote:         ">",
-	itemListItem:      "-",
-	itemInlineCode:    "`",
-	itemStrong:        "**",
-	itemEm:            "*",
-	itemDel:           "~~",
-	itemOpenLinkText:  "[",
-	itemCloseLinkText: "]",
-	itemOpenLinkHref:  "(",
-	itemCloseLinkHref: ")",
-	itemImg:           "!",
-	itemSpace:         "space",
-	itemTab:           "tab",
-	itemNewline:       "break",
+	itemEOF:          "EOF",
+	itemStr:          "str",
+	itemBackquote:    "`",
+	itemTilde:        "~",
+	itemExclamation:  "!",
+	itemCrosshatch:   "#",
+	itemAsterisk:     "*",
+	itemOpenParen:    "(",
+	itemCloseParen:   ")",
+	itemHyphen:       "-",
+	itemTab:          "tab",
+	itemOpenBracket:  "[",
+	itemCloseBracket: "]",
+	itemGreater:      ">",
+	itemStrong:       "**",
+
+	itemImg:     "!",
+	itemSpace:   "space",
+	itemNewline: "break",
 }
 
 func (i itemType) String() string {
@@ -85,22 +87,22 @@ func (i itemType) String() string {
 const (
 	itemEOF           itemType = iota // EOF
 	itemStr                           // plain text
-	itemHeading                       // #
-	itemQuote                         // >
-	itemListItem                      // -
-	itemInlineCode                    // `
-	itemCode                          // ```
+	itemBackquote                     // `
+	itemTilde                         // ~
+	itemExclamation                   // !
+	itemCrosshatch                    // #
+	itemAsterisk                      // *
+	itemOpenParen                     // (
+	itemCloseParen                    // )
+	itemHyphen                        // -
+	itemTab                           // \t
+	itemOpenBracket                   // [
+	itemCloseBracket                  // ]
+	itemGreater                       // >
 	itemStrong                        // **
-	itemEm                            // *
 	itemThematicBreak                 // ***
-	itemDel                           // ~~
-	itemOpenLinkText                  // [
-	itemCloseLinkText                 // ]
-	itemOpenLinkHref                  // (
-	itemCloseLinkHref                 // )
 	itemImg                           // !
 	itemSpace                         // space
-	itemTab                           // \t
 	itemNewline                       // \n
 )
 
@@ -240,66 +242,47 @@ func (l *lexer) run() {
 func lexText(l *lexer) stateFn {
 	r := l.next()
 	switch {
+	case '`' == r:
+		l.emit(itemBackquote)
+	case '!' == r:
+		l.emit(itemExclamation)
 	case '#' == r:
 		return lexHeading
 	case '>' == r:
-		l.emit(itemQuote)
-
-		return lexQuote
+		l.emit(itemGreater)
 	case '*' == r:
-		return lexEmStrongListItem
+		l.emit(itemAsterisk)
+	case '(' == r:
+		l.emit(itemOpenParen)
+	case ')' == r:
+		l.emit(itemCloseParen)
 	case '-' == r:
-		return lexListItem
-	case '`' == r:
-		return lexCode
-	case ' ' == r:
-		l.backup()
-		return lexSpace
+		l.emit(itemHyphen)
 	case '\t' == r:
 		l.emit(itemTab)
+	case '[' == r:
+		l.emit(itemOpenBracket)
+	case ']' == r:
+		l.emit(itemCloseBracket)
 
-		return lexText
+	case ' ' == r:
+		l.emit(itemSpace)
 	case '\n' == r:
 		l.emit(itemNewline)
 
-		return lexText
-	case '[' == r:
-		l.emit(itemOpenLinkText)
-
-		return lexStr
-	case ']' == r:
-		l.emit(itemCloseLinkText)
-		l.next()
-		l.emit(itemOpenLinkHref)
-
-		return lexStr
-	case ')' == r:
-		l.emit(itemCloseLinkHref)
-
-		return lexText
-	case '!' == r:
-		if '[' == l.peek() {
-			l.emit(itemImg)
-
-			return lexText
-		} else {
-			l.emit(itemStr)
-
-			return lexText
-		}
 	case eof == r:
 		l.emit(itemEOF)
 	default:
 		return lexStr
 	}
 
-	return nil
+	return lexText
 }
 
 // lexHeading scans '#'.
 func lexHeading(l *lexer) stateFn {
 	l.acceptRun("#")
-	l.emit(itemHeading)
+	l.emit(itemCrosshatch)
 
 	r := l.next()
 	switch {
@@ -310,79 +293,6 @@ func lexHeading(l *lexer) stateFn {
 	default:
 		return lexStr
 	}
-}
-
-// lexQuote scans '>'.
-func lexQuote(l *lexer) stateFn {
-	r := l.next()
-	switch {
-	case ' ' == r:
-		l.emit(itemSpace)
-	case '\t' == r:
-		l.emit(itemTab)
-	}
-
-	return lexText
-}
-
-// lexEmStrongListItem scans '*', '**' or '* '.
-func lexEmStrongListItem(l *lexer) stateFn {
-	second := l.next()
-	third := l.next()
-	switch {
-	case '*' == second && '*' == third:
-		l.emit(itemThematicBreak)
-
-		return lexText
-	case '*' == second:
-		l.backup()
-		l.emit(itemStrong)
-
-		return lexText
-	case ' ' == second:
-		l.backup()
-		l.emit(itemListItem)
-
-		return lexText
-	default:
-		l.backup()
-		l.backup()
-		l.emit(itemEm)
-
-		return lexText
-	}
-}
-
-func lexListItem(l *lexer) stateFn {
-	second := l.next()
-	switch {
-	case ' ' == second:
-		l.emit(itemListItem)
-
-		return lexText
-	case '\t' == second:
-		l.emit(itemListItem)
-
-		return lexText
-	default:
-		return lexText
-	}
-}
-
-// lexCode scans '`' or '```'.
-func lexCode(l *lexer) stateFn {
-	second := l.next()
-	third := l.next()
-	switch {
-	case '`' == second && '`' == third:
-		l.emit(itemCode)
-	default:
-		l.backup()
-		l.backup()
-		l.emit(itemInlineCode)
-	}
-
-	return lexText
 }
 
 // lexStr scans a str.
@@ -399,35 +309,4 @@ func lexStr(l *lexer) stateFn {
 			return lexText
 		}
 	}
-}
-
-func lexSpace(l *lexer) stateFn {
-	nextCnt := 0
-	var spaceTokens []item
-Loop:
-	for {
-		r := l.next()
-		nextCnt++
-		switch r {
-		case '\n', eof:
-			l.backup()
-			break Loop
-		case '*', '-':
-			if ' ' == l.next() {
-				l.emit(itemListItem)
-				return lexText
-			}
-		case ' ':
-			spaceTokens = append(spaceTokens, item{itemSpace, l.pos, " ", l.line})
-		default:
-			l.backup()
-			break Loop
-		}
-	}
-
-	for i := 0; i < len(spaceTokens); i++ {
-		l.emitItem(spaceTokens[i])
-	}
-
-	return lexText
 }

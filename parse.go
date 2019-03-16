@@ -162,7 +162,7 @@ func (t *Tree) parseContent() {
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
 		var c Node
 		switch token.typ {
-		case itemStr, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
+		case itemStr, itemCrosshatch, itemThematicBreak, itemGreater, itemAsterisk /* Table, HTML */, // BlockContent
 			itemTab:
 			c = t.parseTopLevelContent()
 		case itemSpace:
@@ -191,17 +191,17 @@ func (t *Tree) parseBlockContent() Node {
 	switch token := t.peek(); token.typ {
 	case itemStr:
 		return t.parseParagraph()
-	case itemHeading:
+	case itemCrosshatch:
 		return t.parseHeading()
 	case itemThematicBreak:
 		return t.parseThematicBreak()
-	case itemQuote:
+	case itemGreater:
 		return t.parseBlockquote()
-	case itemInlineCode:
+	case itemBackquote:
 		return t.parseInlineCode()
-	case itemCode, itemTab:
+	case itemTab:
 		return t.parseCode()
-	case itemListItem:
+	case itemAsterisk:
 		return t.parseList()
 	default:
 		return nil
@@ -233,11 +233,11 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	switch token := t.peek(); token.typ {
 	case itemStr, itemTab:
 		return t.parseText()
-	case itemEm:
+	case itemAsterisk:
 		ret = t.parseEm()
 	case itemStrong:
 		ret = t.parseStrong()
-	case itemInlineCode:
+	case itemBackquote:
 		ret = t.parseInlineCode()
 	case itemNewline:
 		ret = t.parseBreak()
@@ -388,7 +388,7 @@ Loop:
 		}
 
 		token := t.next()
-		for ; itemCode != token.typ && itemEOF != token.typ; token = t.next() {
+		for ; itemBackquote != token.typ && itemEOF != token.typ; token = t.next() {
 			code += token.val
 			if itemNewline == token.typ {
 				spaces, tabs, tokens := t.nextNonWhitespace()
@@ -414,10 +414,10 @@ func (t *Tree) parseCode() (ret Node) {
 	token := t.next()
 	pos := token.pos
 	var code string
-	for ; itemCode != token.typ && itemEOF != token.typ; token = t.next() {
+	for ; itemBackquote != token.typ && itemEOF != token.typ; token = t.next() {
 		code += token.val
 		if itemNewline == token.typ {
-			if itemCode == t.peek().typ {
+			if itemBackquote == t.peek().typ {
 				break
 			}
 		}
