@@ -295,8 +295,45 @@ func (t *Tree) parseThematicBreak() (ret Node) {
 }
 
 func (t *Tree) parseBlockquote() (ret Node) {
-	token := t.next()
-	t.next() // consume spaces
+	token := t.next() // >
+
+	indentSpaces := 2
+
+	spaces, tabs, tokens := t.nextNonWhitespace()
+	totalSpaces := spaces + tabs*4
+	if totalSpaces <= indentSpaces {
+		t.backup()
+		ret = &Blockquote{NodeParagraph, token.pos, Children{t.parseBlockContent()}}
+
+		return
+	}
+
+	var restoreTokens, nonWhitespaces []item
+	compSpaces := 0
+	i := 0
+	for ; i < len(tokens); i++ {
+		if itemSpace == tokens[i].typ {
+			compSpaces++
+		} else if itemTab == tokens[i].typ {
+			compSpaces += 4
+		} else {
+			nonWhitespaces = append(nonWhitespaces, tokens[i])
+		}
+	}
+
+	remains := compSpaces - indentSpaces
+	if 4 <= remains {
+		for j := 0; j < remains/4; j++ {
+			restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
+		}
+		for j := 0; j < remains%4; j++ {
+			restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
+		}
+		restoreTokens = append(restoreTokens, nonWhitespaces...)
+		t.backups(restoreTokens)
+	} else {
+		t.backup()
+	}
 
 	ret = &Blockquote{NodeParagraph, token.pos, Children{t.parseBlockContent()}}
 
@@ -359,8 +396,8 @@ func (t *Tree) parseInlineCode() (ret Node) {
 }
 
 func (t *Tree) parseIndentCode() (ret Node) {
-
 	var code string
+
 Loop:
 	for {
 		for i := 0; i < 4; {
@@ -371,7 +408,7 @@ Loop:
 			case itemTab:
 				i += 4
 			default:
-				break;
+				break
 			}
 		}
 

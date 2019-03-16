@@ -39,8 +39,9 @@ var (
 
 var lexTests = []lexTest{
 
-	{"spec3", "    a\ta\n    ὐ\ta\n", []item{mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemStr, "a"), mkItem(itemTab, "\t"), mkItem(itemStr, "a"), mkItem(itemNewline, "\n"), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemStr, "ὐ"), mkItem(itemTab, "\t"), mkItem(itemStr, "a"), mkItem(itemNewline, "\n"), tEOF}},
+	{"spec6", ">\t\tfoo\n", []item{mkItem(itemQuote, ">"), mkItem(itemTab, "\t"), mkItem(itemTab, "\t"), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n"), tEOF}},
 	{"spec5", "- foo\n\n\t\tbar\n", []item{mkItem(itemListItem, "- "), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemTab, "\t"), mkItem(itemTab, "\t"), mkItem(itemStr, "bar"), mkItem(itemNewline, "\n"), tEOF}},
+	{"spec3", "    a\ta\n    ὐ\ta\n", []item{mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemStr, "a"), mkItem(itemTab, "\t"), mkItem(itemStr, "a"), mkItem(itemNewline, "\n"), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemSpace, " "), mkItem(itemStr, "ὐ"), mkItem(itemTab, "\t"), mkItem(itemStr, "a"), mkItem(itemNewline, "\n"), tEOF}},
 
 	{"li3", "  * lute", []item{mkItem(itemListItem, "  * "), mkItem(itemStr, "lute"), tEOF}},
 	{"li2", "- lute", []item{mkItem(itemListItem, "- "), mkItem(itemStr, "lute"), tEOF}},
@@ -62,6 +63,7 @@ var lexTests = []lexTest{
 	{"inline code", "l`u`te", []item{mkItem(itemStr, "l"), mkItem(itemInlineCode, "`"), mkItem(itemStr, "u"), mkItem(itemInlineCode, "`"), mkItem(itemStr, "te"), tEOF}},
 	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
 	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemNewline, "\n"), tEOF}},
+	{"tab2", "\t\t", []item{mkItem(itemTab, "\t"), mkItem(itemTab, "\t"), tEOF}},
 	{"tab", "\t", []item{mkItem(itemTab, "\t"), tEOF}},
 	{"space", " ", []item{mkItem(itemSpace, " "), tEOF}},
 	{"empty", "", []item{tEOF}},

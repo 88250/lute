@@ -318,6 +318,8 @@ func lexQuote(l *lexer) stateFn {
 	switch {
 	case ' ' == r:
 		l.emit(itemSpace)
+	case '\t' == r:
+		l.emit(itemTab)
 	}
 
 	return lexText
@@ -396,7 +398,7 @@ func lexStr(l *lexer) stateFn {
 }
 
 func lexSpace(l *lexer) stateFn {
-	nextCnt:= 0
+	nextCnt := 0
 	var spaceTokens []item
 Loop:
 	for {
