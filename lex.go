@@ -162,7 +162,11 @@ func (l *lexer) backup() {
 // emit passes an item back to the parser.
 func (l *lexer) emit(t itemType) {
 	l.items <- item{t, l.start, l.input[l.start:l.pos], l.line}
+	l.start = l.pos
+}
 
+func (l *lexer) emitItem(item item) {
+	l.items <- item
 	l.start = l.pos
 }
 
@@ -249,6 +253,7 @@ func lexText(l *lexer) stateFn {
 	case '`' == r:
 		return lexCode
 	case ' ' == r:
+		l.backup()
 		return lexSpace
 	case '\t' == r:
 		l.emit(itemTab)
@@ -391,32 +396,32 @@ func lexStr(l *lexer) stateFn {
 }
 
 func lexSpace(l *lexer) stateFn {
-	nextCnt := 0
-
+	nextCnt:= 0
+	var spaceTokens []item
 Loop:
 	for {
 		r := l.next()
 		nextCnt++
 		switch r {
 		case '\n', eof:
+			l.backup()
 			break Loop
 		case '*', '-':
 			if ' ' == l.next() {
 				l.emit(itemListItem)
-
 				return lexText
 			}
 		case ' ':
+			spaceTokens = append(spaceTokens, item{itemSpace, l.pos, " ", l.line})
 		default:
+			l.backup()
 			break Loop
 		}
 	}
 
-	for i := 0; i < nextCnt; i++ {
-		l.backup()
+	for i := 0; i < len(spaceTokens); i++ {
+		l.emitItem(spaceTokens[i])
 	}
-
-	l.emit(itemSpace)
 
 	return lexText
 }

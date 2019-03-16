@@ -163,8 +163,19 @@ func (t *Tree) parseContent() {
 		var c Node
 		switch token.typ {
 		case itemStr, itemHeading, itemThematicBreak, itemQuote, itemListItem /* Table, HTML */, itemCode, // BlockContent
-			itemTab, itemSpace:
+			itemTab:
 			c = t.parseTopLevelContent()
+		case itemSpace:
+			spaces, tabs, tokens := t.nextNonWhitespace()
+			if 1 > tabs && 4 > spaces {
+				continue
+			}
+
+			t.backup()
+			t.backup() // mock code open marker
+			_ = tokens
+
+			c = t.parseCode()
 		default:
 			c = t.parsePhrasingContent()
 		}
@@ -447,7 +458,7 @@ func (t *Tree) parseListItem(indentSpaces int) *ListItem {
 			break
 		}
 		if totalSpaces == indentSpaces {
-			t.backups(tokens)
+			t.backup()
 			continue
 		}
 
