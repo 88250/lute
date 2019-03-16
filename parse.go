@@ -171,11 +171,9 @@ func (t *Tree) parseContent() {
 				continue
 			}
 
-			t.backup()
-			t.backup() // mock code open marker
-			_ = tokens
+			t.backups(tokens)
 
-			c = t.parseCode()
+			c = t.parseIndentCode()
 		default:
 			c = t.parsePhrasingContent()
 		}
@@ -356,6 +354,44 @@ func (t *Tree) parseInlineCode() (ret Node) {
 	ret = &InlineCode{NodeInlineCode, code.pos, t, code.val}
 
 	t.next() // consume close `
+
+	return
+}
+
+func (t *Tree) parseIndentCode() (ret Node) {
+
+	var code string
+Loop:
+	for {
+		for i := 0; i < 4; {
+			token := t.next()
+			switch token.typ {
+			case itemSpace:
+				i++
+			case itemTab:
+				i += 4
+			default:
+				break;
+			}
+		}
+
+		token := t.next()
+		for ; itemCode != token.typ && itemEOF != token.typ; token = t.next() {
+			code += token.val
+			if itemNewline == token.typ {
+				spaces, tabs, tokens := t.nextNonWhitespace()
+				if 1 > tabs && 4 > spaces {
+					t.backup()
+					break Loop
+				} else {
+					t.backups(tokens)
+					continue Loop
+				}
+			}
+		}
+	}
+
+	ret = &Code{NodeCode, 0, t, code, "", ""}
 
 	return
 }
