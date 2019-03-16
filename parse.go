@@ -308,32 +308,7 @@ func (t *Tree) parseBlockquote() (ret Node) {
 		return
 	}
 
-	var restoreTokens, nonWhitespaces []item
-	compSpaces := 0
-	i := 0
-	for ; i < len(tokens); i++ {
-		if itemSpace == tokens[i].typ {
-			compSpaces++
-		} else if itemTab == tokens[i].typ {
-			compSpaces += 4
-		} else {
-			nonWhitespaces = append(nonWhitespaces, tokens[i])
-		}
-	}
-
-	remains := compSpaces - indentSpaces
-	if 4 <= remains {
-		for j := 0; j < remains/4; j++ {
-			restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
-		}
-		for j := 0; j < remains%4; j++ {
-			restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
-		}
-		restoreTokens = append(restoreTokens, nonWhitespaces...)
-		t.backups(restoreTokens)
-	} else {
-		t.backup()
-	}
+	indentOffset(tokens, indentSpaces, t)
 
 	ret = &Blockquote{NodeParagraph, token.pos, Children{t.parseBlockContent()}}
 
@@ -459,119 +434,33 @@ func (t *Tree) parseCode() (ret Node) {
 	return
 }
 
-func (t *Tree) parseList() Node {
-	marker := t.next()
-
-	token := t.peek()
-	list := &List{
-		NodeList, token.pos, t, Children{},
-		false,
-		1,
-		false,
-		marker.val,
-	}
-
-	loose := false
-	for {
-		c := t.parseListItem(len(marker.val))
-		if nil == c {
-			break
-		}
-		list.append(c)
-
-		if c.Spread {
-			loose = true
-		}
-
-		token := t.peek()
-		if itemNewline == token.typ {
-			t.next()
-			continue
-		}
-		if marker.val != token.val {
-			break
-		}
-	}
-
-	list.Spread = loose
-
-	return list
-}
-
-func (t *Tree) parseListItem(indentSpaces int) *ListItem {
-	token := t.peek()
-	if itemEOF == token.typ {
-		return nil
-	}
-
-	ret := &ListItem{
-		NodeListItem, token.pos, t, Children{},
-		false,
-		false,
-		indentSpaces,
-	}
-	t.CurNode = ret
-
-	paragraphs := 0
-	for {
-		c := t.parseBlockContent()
-		if nil == c {
-			break
-		}
-		ret.append(c)
-
-		if NodeParagraph == c.Type() || NodeCode == c.Type() {
-			paragraphs++
-		}
-
-		spaces, tabs, tokens := t.nextNonWhitespace()
-		totalSpaces := spaces + tabs*4
-		if totalSpaces < indentSpaces {
-			t.backups(tokens)
-			break
-		}
-		if totalSpaces == indentSpaces {
-			t.backup()
-			continue
-		}
-
-		var restoreTokens, nonWhitespaces []item
-		compSpaces := 0
-		i := 0
-		for ; i < len(tokens); i++ {
-			if itemSpace == tokens[i].typ {
-				compSpaces++
-			} else if itemTab == tokens[i].typ {
-				compSpaces += 4
-			} else {
-				nonWhitespaces = append(nonWhitespaces, tokens[i])
-			}
-		}
-
-		remains := compSpaces - indentSpaces
-		if 0 > remains {
-			break
-		}
-
-		if 4 <= remains {
-			for j := 0; j < remains/4; j++ {
-				restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
-			}
-			for j := 0; j < remains%4; j++ {
-				restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
-			}
-			restoreTokens = append(restoreTokens, nonWhitespaces...)
-			t.backups(restoreTokens)
+func indentOffset(tokens []item, indentSpaces int, t *Tree) {
+	var restoreTokens, nonWhitespaces []item
+	compSpaces := 0
+	i := 0
+	for ; i < len(tokens); i++ {
+		if itemSpace == tokens[i].typ {
+			compSpaces++
+		} else if itemTab == tokens[i].typ {
+			compSpaces += 4
 		} else {
-			t.backup()
+			nonWhitespaces = append(nonWhitespaces, tokens[i])
 		}
 	}
 
-	if 1 < paragraphs {
-		ret.Spread = true
+	remains := compSpaces - indentSpaces
+	if 4 <= remains {
+		for j := 0; j < remains/4; j++ {
+			restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
+		}
+		for j := 0; j < remains%4; j++ {
+			restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
+		}
+		restoreTokens = append(restoreTokens, nonWhitespaces...)
+		t.backups(restoreTokens)
+	} else {
+		t.backup()
 	}
-
-	return ret
 }
 
 type stack struct {

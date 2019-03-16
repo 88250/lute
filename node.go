@@ -18,6 +18,7 @@ package lute
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Node represents a node in ast. https://github.com/syntax-tree/mdast
@@ -253,7 +254,7 @@ func (n *ListItem) HTML() string {
 		content += c.HTML()
 	}
 
-	if 1 < len(n.Children) {
+	if 1 < len(n.Children) || strings.Contains(content, "<pre><code") {
 		return fmt.Sprintf("<li>\n%s</li>\n", content)
 	}
 

@@ -360,6 +360,10 @@ func lexListItem(l *lexer) stateFn {
 		l.emit(itemListItem)
 
 		return lexText
+	case '\t' == second:
+		l.emit(itemListItem)
+
+		return lexText
 	default:
 		return lexText
 	}
