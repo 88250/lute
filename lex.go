@@ -72,7 +72,7 @@ var itemName = map[itemType]string{
 	itemSinglequote:  "'",
 	itemGreater:      ">",
 	itemSpace:        "space",
-	itemNewline:      "break",
+	itemNewline:      "newline",
 }
 
 func (i itemType) String() string {
@@ -247,7 +247,7 @@ func lexText(l *lexer) stateFn {
 	case '!' == r:
 		l.emit(itemExclamation)
 	case '#' == r:
-		return lexHeading
+		l.emit(itemCrosshatch)
 	case '*' == r:
 		l.emit(itemAsterisk)
 	case '(' == r:
@@ -281,22 +281,6 @@ func lexText(l *lexer) stateFn {
 	}
 
 	return lexText
-}
-
-// lexHeading scans '#'.
-func lexHeading(l *lexer) stateFn {
-	l.acceptRun("#")
-	l.emit(itemCrosshatch)
-
-	r := l.next()
-	switch {
-	case ' ' == r:
-		l.emit(itemSpace)
-
-		return lexStr
-	default:
-		return lexStr
-	}
 }
 
 // lexStr scans a str.

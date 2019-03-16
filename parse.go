@@ -68,27 +68,11 @@ func (t *Tree) backup() {
 	t.peekCount++
 }
 
-// backup2 backs the input stream up two tokens.
-// The zeroth token is already there.
-func (t *Tree) backup2(t1 item) {
-	t.token[1] = t1
-	t.peekCount = 2
-}
-
-// backup3 backs the input stream up three tokens
-// The zeroth token is already there.
-func (t *Tree) backup3(t2, t1 item) {
-	// Reverse order: we're pushing back.
-	t.token[1] = t1
-	t.token[2] = t2
-	t.peekCount = 3
-}
-
 func (t *Tree) backups(tokens []item) {
 	i := 0
 	l := len(tokens)
 	for ; i < l; i++ {
-		t.token[l-1-i] = tokens[i] // pushing back
+		t.token[l-1-i] = tokens[i] // push back
 	}
 	t.peekCount = i
 }
@@ -200,7 +184,6 @@ func (t *Tree) parseBlockContent() Node {
 	case itemTab:
 		return t.parseCode()
 	case itemAsterisk:
-		t.parseThematicBreak()
 		return t.parseList()
 	default:
 		return nil
@@ -233,8 +216,7 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	case itemStr, itemTab:
 		return t.parseText()
 	case itemAsterisk:
-		ret = t.parseEm()
-		ret = t.parseStrong()
+		ret = t.parseEmOrStrong()
 	case itemBackquote:
 		ret = t.parseInlineCode()
 	case itemNewline:
@@ -319,20 +301,24 @@ func (t *Tree) parseText() Node {
 	return &Text{NodeText, token.pos, t, token.val}
 }
 
-func (t *Tree) parseEm() (ret Node) {
+func (t *Tree) parseEmOrStrong() (ret Node) {
 	t.next() // consume open *
 	token := t.peek()
-	ret = &Emphasis{NodeEmphasis, token.pos, t, Children{t.parsePhrasingContent()}}
+	if itemAsterisk == token.typ {
+		ret = t.parseStrong()
+	} else {
+		ret = &Emphasis{NodeEmphasis, token.pos, t, Children{t.parsePhrasingContent()}}
+	}
 	t.next() // consume close *
 
 	return
 }
 
 func (t *Tree) parseStrong() (ret Node) {
-	t.next() // consume open **
+	t.next() // consume open *
 	token := t.peek()
 	ret = &Strong{NodeStrong, token.pos, t, Children{t.parsePhrasingContent()}}
-	t.next() // consume close **
+	t.next() // consume close *
 
 	return
 }
