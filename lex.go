@@ -64,15 +64,15 @@ var itemName = map[itemType]string{
 	itemOpenParen:    "(",
 	itemCloseParen:   ")",
 	itemHyphen:       "-",
+	itemPlus:         "+",
 	itemTab:          "tab",
 	itemOpenBracket:  "[",
 	itemCloseBracket: "]",
+	itemDoublequote:  "\"",
+	itemSinglequote:  "'",
 	itemGreater:      ">",
-	itemStrong:       "**",
-
-	itemImg:     "!",
-	itemSpace:   "space",
-	itemNewline: "break",
+	itemSpace:        "space",
+	itemNewline:      "break",
 }
 
 func (i itemType) String() string {
@@ -85,25 +85,25 @@ func (i itemType) String() string {
 }
 
 const (
-	itemEOF           itemType = iota // EOF
-	itemStr                           // plain text
-	itemBackquote                     // `
-	itemTilde                         // ~
-	itemExclamation                   // !
-	itemCrosshatch                    // #
-	itemAsterisk                      // *
-	itemOpenParen                     // (
-	itemCloseParen                    // )
-	itemHyphen                        // -
-	itemTab                           // \t
-	itemOpenBracket                   // [
-	itemCloseBracket                  // ]
-	itemGreater                       // >
-	itemStrong                        // **
-	itemThematicBreak                 // ***
-	itemImg                           // !
-	itemSpace                         // space
-	itemNewline                       // \n
+	itemEOF          itemType = iota // EOF
+	itemStr                          // plain text
+	itemBackquote                    // `
+	itemTilde                        // ~
+	itemExclamation                  // !
+	itemCrosshatch                   // #
+	itemAsterisk                     // *
+	itemOpenParen                    // (
+	itemCloseParen                   // )
+	itemHyphen                       // -
+	itemPlus                         // +
+	itemTab                          // \t
+	itemOpenBracket                  // [
+	itemCloseBracket                 // ]
+	itemDoublequote                  // "
+	itemSinglequote                  // '
+	itemGreater                      // >
+	itemSpace                        // space
+	itemNewline                      // \n
 )
 
 const (
@@ -248,8 +248,6 @@ func lexText(l *lexer) stateFn {
 		l.emit(itemExclamation)
 	case '#' == r:
 		return lexHeading
-	case '>' == r:
-		l.emit(itemGreater)
 	case '*' == r:
 		l.emit(itemAsterisk)
 	case '(' == r:
@@ -258,18 +256,24 @@ func lexText(l *lexer) stateFn {
 		l.emit(itemCloseParen)
 	case '-' == r:
 		l.emit(itemHyphen)
+	case '+' == r:
+		l.emit(itemPlus)
 	case '\t' == r:
 		l.emit(itemTab)
 	case '[' == r:
 		l.emit(itemOpenBracket)
 	case ']' == r:
 		l.emit(itemCloseBracket)
-
+	case '"' == r:
+		l.emit(itemDoublequote)
+	case '\'' == r:
+		l.emit(itemSinglequote)
+	case '>' == r:
+		l.emit(itemGreater)
 	case ' ' == r:
 		l.emit(itemSpace)
 	case '\n' == r:
 		l.emit(itemNewline)
-
 	case eof == r:
 		l.emit(itemEOF)
 	default:

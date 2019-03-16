@@ -162,7 +162,7 @@ func (t *Tree) parseContent() {
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
 		var c Node
 		switch token.typ {
-		case itemStr, itemCrosshatch, itemThematicBreak, itemGreater, itemAsterisk /* Table, HTML */, // BlockContent
+		case itemStr, itemCrosshatch, itemGreater, itemAsterisk /* Table, HTML */, // BlockContent
 			itemTab:
 			c = t.parseTopLevelContent()
 		case itemSpace:
@@ -193,8 +193,6 @@ func (t *Tree) parseBlockContent() Node {
 		return t.parseParagraph()
 	case itemCrosshatch:
 		return t.parseHeading()
-	case itemThematicBreak:
-		return t.parseThematicBreak()
 	case itemGreater:
 		return t.parseBlockquote()
 	case itemBackquote:
@@ -202,6 +200,7 @@ func (t *Tree) parseBlockContent() Node {
 	case itemTab:
 		return t.parseCode()
 	case itemAsterisk:
+		t.parseThematicBreak()
 		return t.parseList()
 	default:
 		return nil
@@ -235,7 +234,6 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 		return t.parseText()
 	case itemAsterisk:
 		ret = t.parseEm()
-	case itemStrong:
 		ret = t.parseStrong()
 	case itemBackquote:
 		ret = t.parseInlineCode()

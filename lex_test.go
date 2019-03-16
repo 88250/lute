@@ -39,11 +39,10 @@ var (
 
 var lexTests = []lexTest{
 
-	{"paragraph", "p1\n\np2", []item{mkItem(itemStr, "p1"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemStr, "p2"), tEOF}},
 	{"crosshatch", "# lute", []item{mkItem(itemCrosshatch, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"greater", "> lute", []item{mkItem(itemGreater, ">"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
-	{"asterisk", "l*u*te", []item{mkItem(itemStr, "l"), mkItem(itemAsterisk, "*"), mkItem(itemStr, "u"), mkItem(itemAsterisk, "*"), mkItem(itemStr, "te"), tEOF}},
-	{"backquote", "l`u`te", []item{mkItem(itemStr, "l"), mkItem(itemBackquote, "`"), mkItem(itemStr, "u"), mkItem(itemBackquote, "`"), mkItem(itemStr, "te"), tEOF}},
+	{"asterisk", "*lute*", []item{mkItem(itemAsterisk, "*"), mkItem(itemStr, "lute"), mkItem(itemAsterisk, "*"), tEOF}},
+	{"backquote", "`lute`", []item{mkItem(itemBackquote, "`"), mkItem(itemStr, "lute"), mkItem(itemBackquote, "`"),tEOF}},
 	{"tab", "\tlute", []item{mkItem(itemTab, "\t"), mkItem(itemStr, "lute"), tEOF}},
 	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
 	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemNewline, "\n"), tEOF}},
