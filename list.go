@@ -39,7 +39,7 @@ func (t *Tree) parseList() Node {
 
 	loose := false
 	for {
-		c := t.parseListItem(indentSpaces)
+		c := t.parseListItem(indentSpaces + len(marker) + 1)
 		if nil == c {
 			break
 		}
@@ -90,7 +90,12 @@ func (t *Tree) parseListItem(indentSpaces int) *ListItem {
 			paragraphs++
 		}
 
+		if itemEOF == t.peek().typ {
+			break
+		}
+
 		spaces, tabs, tokens := t.nextNonWhitespace()
+
 		totalSpaces := spaces + tabs*4
 		if totalSpaces < indentSpaces {
 			t.backups(tokens)
@@ -100,11 +105,11 @@ func (t *Tree) parseListItem(indentSpaces int) *ListItem {
 			continue
 		}
 
-		if 4 > indentSpaces {
-			t.backups(tokens)
-
-			break
-		}
+		//if 4 > indentSpaces {
+		//	t.backups(tokens)
+		//
+		//	break
+		//}
 
 		indentOffset(tokens, indentSpaces, t)
 	}

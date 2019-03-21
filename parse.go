@@ -146,7 +146,7 @@ func (t *Tree) parseContent() {
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
 		var c Node
 		switch token.typ {
-		case itemAsterisk:
+		case itemAsterisk, itemHyphen:
 			c = t.parseList()
 		case itemStr, itemCrosshatch, itemGreater, itemTab:
 			c = t.parseTopLevelContent()
@@ -247,9 +247,9 @@ func (t *Tree) parseParagraph() Node {
 		ret.append(c)
 
 		token = t.peek()
-		if itemNewline == t.peek().typ {
-			t.next()
-			if itemNewline == t.peek().typ {
+		if itemNewline == token.typ {
+			token = t.next()
+			if itemNewline == token.typ {
 				t.next()
 				break
 			}
