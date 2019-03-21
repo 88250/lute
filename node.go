@@ -210,6 +210,7 @@ type List struct {
 	Start   int
 	Spread  bool
 
+	IdentSpaces int
 	Marker string
 }
 

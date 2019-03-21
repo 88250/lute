@@ -146,17 +146,23 @@ func (t *Tree) parseContent() {
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
 		var c Node
 		switch token.typ {
-		case itemStr, itemCrosshatch, itemGreater, itemAsterisk /* Table, HTML */, // BlockContent
-			itemTab:
+		case itemAsterisk:
+			c = t.parseList()
+		case itemStr, itemCrosshatch, itemGreater, itemTab:
 			c = t.parseTopLevelContent()
 		case itemSpace:
 			spaces, tabs, tokens := t.nextNonWhitespace()
 			if 1 > tabs && 4 > spaces {
+				last := tokens[len(tokens) - 1]
+				if itemAsterisk == last.typ || itemHyphen == last.typ {
+					t.backups(tokens)
+					c = t.parseList()
+				}
+				t.Root.append(c)
 				continue
 			}
 
 			t.backups(tokens)
-
 			c = t.parseIndentCode()
 		default:
 			c = t.parsePhrasingContent()

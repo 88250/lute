@@ -17,20 +17,29 @@
 package lute
 
 func (t *Tree) parseList() Node {
-	marker := t.next()
+	spaces, tabs, tokens := t.nextNonWhitespace()
 
+	marker := tokens[len(tokens)-1].val
 	token := t.peek()
+	if itemSpace != token.typ {
+		t.backup()
+		return t.parseEmOrStrong()
+	}
+	t.next() // consume space
+
+	indentSpaces := spaces + tabs*4
 	list := &List{
 		NodeList, token.pos, t, Children{},
 		false,
 		1,
 		false,
-		marker.val,
+		indentSpaces,
+		marker,
 	}
 
 	loose := false
 	for {
-		c := t.parseListItem(len(marker.val))
+		c := t.parseListItem(indentSpaces)
 		if nil == c {
 			break
 		}
@@ -45,7 +54,7 @@ func (t *Tree) parseList() Node {
 			t.next()
 			continue
 		}
-		if marker.val != token.val {
+		if marker != token.val {
 			break
 		}
 	}
@@ -86,10 +95,15 @@ func (t *Tree) parseListItem(indentSpaces int) *ListItem {
 		if totalSpaces < indentSpaces {
 			t.backups(tokens)
 			break
-		}
-		if totalSpaces == indentSpaces {
+		} else if totalSpaces == indentSpaces {
 			t.backup()
 			continue
+		}
+
+		if 4 > indentSpaces {
+			t.backups(tokens)
+
+			break
 		}
 
 		indentOffset(tokens, indentSpaces, t)
