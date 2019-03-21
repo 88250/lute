@@ -153,7 +153,7 @@ func (t *Tree) parseContent() {
 		case itemSpace:
 			spaces, tabs, tokens := t.nextNonWhitespace()
 			if 1 > tabs && 4 > spaces {
-				last := tokens[len(tokens) - 1]
+				last := tokens[len(tokens)-1]
 				if itemAsterisk == last.typ || itemHyphen == last.typ {
 					t.backups(tokens)
 					c = t.parseList()
@@ -187,7 +187,7 @@ func (t *Tree) parseBlockContent() Node {
 		return t.parseBlockquote()
 	case itemBackquote:
 		return t.parseInlineCode()
-	case itemTab:
+	case itemTab, itemSpace:
 		return t.parseCode()
 	case itemAsterisk:
 		return t.parseList()
@@ -420,6 +420,30 @@ func (t *Tree) parseCode() (ret Node) {
 	}
 
 	t.next() // consume close ```
+
+	return
+}
+
+func (t *Tree) expandSpaces() (offsetSpaces int) {
+	_, _, tokens := t.nextNonWhitespace()
+
+	var restoreTokens, nonWhitespaces []item
+	i := 0
+	for ; i < len(tokens); i++ {
+		if itemSpace == tokens[i].typ {
+			offsetSpaces++
+		} else if itemTab == tokens[i].typ {
+			offsetSpaces += 4
+		} else {
+			nonWhitespaces = append(nonWhitespaces, tokens[i])
+		}
+	}
+
+	for i := 0; i < offsetSpaces; i++ {
+		restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
+	}
+	restoreTokens = append(restoreTokens, nonWhitespaces...)
+	t.backups(restoreTokens)
 
 	return
 }

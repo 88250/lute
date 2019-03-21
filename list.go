@@ -21,11 +21,15 @@ func (t *Tree) parseList() Node {
 
 	marker := tokens[len(tokens)-1].val
 	token := t.peek()
-	if itemSpace != token.typ {
+	if !token.isWhitespace() {
 		t.backup()
 		return t.parseEmOrStrong()
 	}
-	t.next() // consume space
+
+	offsetSpaces := t.expandSpaces()
+	for i := 0; i < offsetSpaces && i < 5; i++ {
+		t.next()
+	}
 
 	indentSpaces := spaces + tabs*4
 	list := &List{

@@ -49,6 +49,11 @@ func (i item) String() string {
 	return fmt.Sprintf("%q", i.val)
 }
 
+// https://github.github.com/gfm/#whitespace-character
+func (i item) isWhitespace() bool {
+	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ // TODO(D): line tabulation (U+000B), form feed (U+000C), or carriage return (U+000D)
+}
+
 // itemType identifies the type of lex items.
 type itemType int
 
