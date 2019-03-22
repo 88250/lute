@@ -1,5 +1,5 @@
 // Lute - A structural markdown engine.
-// Copyright (C) 2019, b3log.org
+// Copyright (C) 2019-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@ package lute
 
 import (
 	"fmt"
-	"strings"
 )
 
 // Node represents a node in ast. https://github.com/syntax-tree/mdast
@@ -92,66 +91,6 @@ func (n *Root) append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
-type Paragraph struct {
-	NodeType
-	Pos
-	*Tree
-	Children
-
-	OpenTag, CloseTag string
-}
-
-func (n *Paragraph) String() string {
-	return fmt.Sprintf("%s", n.Children)
-}
-
-func (n *Paragraph) HTML() string {
-	content := html(n.Children)
-
-	if "" != n.OpenTag {
-		return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag+"\n", content)
-	}
-
-	return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
-}
-
-func (n *Paragraph) append(c Node) {
-	n.Children = append(n.Children, c)
-}
-
-func (n *Paragraph) trim() {
-	size := len(n.Children)
-	if 1 > size {
-		return
-	}
-
-	initialNoneWhitespace := 0
-	notBreak := true
-	for i := initialNoneWhitespace; i < size/2; i++ {
-		if NodeBreak == n.Children[i].Type() {
-			initialNoneWhitespace++
-			notBreak = false
-		}
-		if notBreak {
-			break
-		}
-	}
-
-	finalNoneWhitespace := size
-	notBreak = true
-	for i := finalNoneWhitespace - 1; size/2 <= i; i-- {
-		if NodeBreak == n.Children[i].Type() {
-			finalNoneWhitespace--
-			notBreak = false
-		}
-		if notBreak {
-			break
-		}
-	}
-
-	n.Children = n.Children[initialNoneWhitespace:finalNoneWhitespace]
-}
-
 type Heading struct {
 	NodeType
 	Pos
@@ -198,79 +137,6 @@ func (n *Blockquote) HTML() string {
 	content := html(n.Children)
 
 	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
-}
-
-type ListType int
-
-const (
-	ListTypeBullet  = 0
-	ListTypeOrdered = 1
-)
-
-type List struct {
-	NodeType
-	Pos
-	*Tree
-	Children
-
-	ListType  ListType
-	Start int
-	Tight bool
-
-	IdentSpaces int
-	Marker      string
-}
-
-func (n *List) String() string {
-	return fmt.Sprintf("%s", n.Children)
-}
-
-func (n *List) HTML() string {
-	content := html(n.Children)
-
-	return fmt.Sprintf("<ul>\n%s</ul>\n", content)
-}
-
-func (n *List) append(c Node) {
-	n.Children = append(n.Children, c)
-}
-
-type ListItem struct {
-	NodeType
-	Pos
-	*Tree
-	Children
-
-	Checked bool
-	Spread  bool // loose or tight
-
-	Spaces int
-}
-
-func (n *ListItem) String() string {
-	return fmt.Sprintf("%s", n.Children)
-}
-
-func (n *ListItem) HTML() string {
-	var content string
-	for _, c := range n.Children {
-		if !n.Spread && NodeParagraph == c.Type() {
-			p := c.(*Paragraph)
-			p.OpenTag, p.CloseTag = "", ""
-		}
-
-		content += c.HTML()
-	}
-
-	if 1 < len(n.Children) || strings.Contains(content, "<pre><code") {
-		return fmt.Sprintf("<li>\n%s</li>\n", content)
-	}
-
-	return fmt.Sprintf("<li>%s</li>\n", content)
-}
-
-func (n *ListItem) append(c Node) {
-	n.Children = append(n.Children, c)
 }
 
 type Table struct {

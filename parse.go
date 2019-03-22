@@ -1,5 +1,5 @@
 // Lute - A structural markdown engine.
-// Copyright (C) 2019, b3log.org
+// Copyright (C) 2019-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -237,35 +237,6 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	return
 }
 
-func (t *Tree) parseParagraph() Node {
-	token := t.peek()
-
-	ret := &Paragraph{NodeParagraph, token.pos, t, Children{}, "<p>", "</p>"}
-
-	for {
-		c := t.parsePhrasingContent()
-		if nil == c {
-			ret.trim()
-
-			break
-		}
-		ret.append(c)
-
-		if token = t.peek(); itemNewline == token.typ {
-			t.next()
-			token = t.next()
-			if itemNewline == token.typ || itemEOF == token.typ {
-				break
-			} else if itemTab == token.typ || itemSpace == token.typ {
-				continue
-			}
-
-			t.backup()
-		}
-	}
-
-	return ret
-}
 
 func (t *Tree) parseHeading() (ret Node) {
 	token := t.next()
