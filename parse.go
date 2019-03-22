@@ -171,6 +171,9 @@ func (t *Tree) parseContent() {
 
 			t.backups(tokens)
 			c = t.parseIndentCode()
+		case itemNewline:
+			t.next()
+			continue
 		default:
 			c = t.parsePhrasingContent()
 		}
@@ -234,18 +237,6 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 		ret = t.parseInlineCode()
 	case itemNewline:
 		ret = t.parseBreak()
-	}
-
-	return
-}
-
-func (t *Tree) parseHeading() (ret Node) {
-	token := t.next()
-	t.next() // consume spaces
-
-	ret = &Heading{
-		NodeHeading, token.pos, t, Children{t.parsePhrasingContent()},
-		len(token.val),
 	}
 
 	return

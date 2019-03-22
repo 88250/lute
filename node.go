@@ -91,25 +91,6 @@ func (n *Root) append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
-type Heading struct {
-	NodeType
-	Pos
-	*Tree
-	Children
-
-	Depth int
-}
-
-func (n Heading) String() string {
-	return fmt.Sprintf("# %s", n.Children)
-}
-
-func (n *Heading) HTML() string {
-	content := html(n.Children)
-
-	return fmt.Sprintf("<h%d>%s</h%d>\n", n.Depth, content, n.Depth)
-}
-
 type ThematicBreak struct {
 	NodeType
 	Pos
