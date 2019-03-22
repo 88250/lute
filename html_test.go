@@ -1,5 +1,5 @@
 // Lute - A structural markdown engine.
-// Copyright (C) 2019, b3log.org
+// Copyright (C) 2019-present, b3log.org
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
