@@ -103,6 +103,10 @@ func (n *ListItem) HTML() string {
 		content += c.HTML()
 	}
 
+	if strings.Contains(content, "<ul>") {
+		return fmt.Sprintf("<li>%s</li>\n", content)
+	}
+
 	if 1 < len(n.Children) || strings.Contains(content, "<pre><code") {
 		return fmt.Sprintf("<li>\n%s</li>\n", content)
 	}

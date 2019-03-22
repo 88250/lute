@@ -97,7 +97,14 @@ func (t *Tree) parseParagraph() Node {
 			if token = t.peek();itemNewline == token.typ || itemEOF == token.typ {
 				t.next()
 				break
-			} else if itemTab == token.typ || itemSpace == token.typ {
+			} else{
+				_, _, tokens := t.nextNonWhitespace()
+				last := tokens[len(tokens) - 1]
+				if itemHyphen == last.typ {
+					t.backups(tokens)
+					break
+				}
+
 				continue
 			}
 
