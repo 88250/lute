@@ -242,13 +242,6 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	return
 }
 
-func (t *Tree) parseThematicBreak() (ret Node) {
-	token := t.next()
-	ret = &ThematicBreak{NodeThematicBreak, token.pos}
-
-	return
-}
-
 func (t *Tree) parseBlockquote() (ret Node) {
 	token := t.next() // >
 

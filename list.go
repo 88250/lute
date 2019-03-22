@@ -140,6 +140,25 @@ func (t *Tree) parseList() Node {
 		return t.parseEmOrStrong()
 	}
 
+	// Thematic breaks
+	var backupTokens []item
+	chars := 0
+	for {
+		token = t.next()
+		backupTokens = append(backupTokens, token)
+		if itemNewline == token.typ || itemEOF == token.typ {
+			chars++
+			break
+		}
+		if token.val != marker && itemTab != token.typ && itemSpace != token.typ {
+			break
+		}
+		chars++
+	}
+	if chars == len(backupTokens) {
+		return t.parseThematicBreak()
+	}
+
 	offsetSpaces := t.expandSpaces()
 	for i := 0; i < offsetSpaces && i < 5; i++ {
 		t.next()

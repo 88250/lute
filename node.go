@@ -91,19 +91,6 @@ func (n *Root) append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
-type ThematicBreak struct {
-	NodeType
-	Pos
-}
-
-func (n *ThematicBreak) String() string {
-	return fmt.Sprintf("'***'")
-}
-
-func (n *ThematicBreak) HTML() string {
-	return fmt.Sprintf("<hr>")
-}
-
 type Blockquote struct {
 	NodeType
 	Pos
