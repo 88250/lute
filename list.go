@@ -31,8 +31,9 @@ const (
 type List struct {
 	NodeType
 	Pos
-	*Tree
-	Children
+	t        *Tree
+	Parent   Node
+	Children Children
 
 	ListType ListType
 	Start    int
@@ -49,6 +50,10 @@ func (n *List) String() string {
 func (n *List) HTML() string {
 	content := html(n.Children)
 
+	if NodeListItem == n.Parent.Type() {
+		return fmt.Sprintf("\n<ul>\n%s</ul>\n", content)
+	}
+
 	return fmt.Sprintf("<ul>\n%s</ul>\n", content)
 }
 
@@ -56,11 +61,26 @@ func (n *List) append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
+func newList(marker string, indentSpaces int, t *Tree, token item) *List {
+	ret := &List{
+		NodeList, token.pos, t, t.context.CurNode, Children{},
+		ListTypeBullet,
+		1,
+		false,
+		indentSpaces,
+		marker,
+	}
+	t.context.CurNode = ret
+
+	return ret
+}
+
 type ListItem struct {
 	NodeType
 	Pos
-	*Tree
-	Children
+	t        *Tree
+	Parent   Node
+	Children Children
 
 	Checked bool
 	Spread  bool // loose or tight
@@ -94,6 +114,18 @@ func (n *ListItem) append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
+func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
+	ret := &ListItem{
+		NodeListItem, token.pos, t, t.context.CurNode, Children{},
+		false,
+		false,
+		indentSpaces,
+	}
+	t.context.CurNode = ret
+
+	return ret
+}
+
 func (t *Tree) parseList() Node {
 	spaces, tabs, tokens := t.nextNonWhitespace()
 
@@ -110,14 +142,7 @@ func (t *Tree) parseList() Node {
 	}
 
 	indentSpaces := spaces + tabs*4
-	list := &List{
-		NodeList, token.pos, t, Children{},
-		ListTypeBullet,
-		1,
-		false,
-		indentSpaces,
-		marker,
-	}
+	list := newList(marker, indentSpaces, t, token)
 
 	loose := false
 	for {
@@ -155,13 +180,7 @@ func (t *Tree) parseListItem() *ListItem {
 
 	indentSpaces := t.context.IndentSpaces
 
-	ret := &ListItem{
-		NodeListItem, token.pos, t, Children{},
-		false,
-		false,
-		indentSpaces,
-	}
-
+	ret := newListItem(indentSpaces, t, token)
 	paragraphs := 0
 	for {
 		c := t.parseBlockContent()

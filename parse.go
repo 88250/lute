@@ -39,6 +39,7 @@ func sanitize(text string) (ret string) {
 
 // Context use to store common data in parsing.
 type Context struct {
+	CurNode      Node
 	IndentSpaces int
 }
 
@@ -149,6 +150,7 @@ func (t *Tree) parseContent() {
 	t.Root = &Root{NodeType: NodeRoot, Pos: 0}
 
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
+		t.context.CurNode = t.Root
 		var c Node
 		switch token.typ {
 		case itemAsterisk, itemHyphen:
@@ -236,7 +238,6 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 
 	return
 }
-
 
 func (t *Tree) parseHeading() (ret Node) {
 	token := t.next()

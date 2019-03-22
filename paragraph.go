@@ -94,8 +94,8 @@ func (t *Tree) parseParagraph() Node {
 
 		if token = t.peek(); itemNewline == token.typ {
 			t.next()
-			token = t.next()
-			if itemNewline == token.typ || itemEOF == token.typ {
+			if token = t.peek();itemNewline == token.typ || itemEOF == token.typ {
+				t.next()
 				break
 			} else if itemTab == token.typ || itemSpace == token.typ {
 				continue
