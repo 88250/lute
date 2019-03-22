@@ -34,7 +34,7 @@ func (t *Tree) parseList() Node {
 	indentSpaces := spaces + tabs*4
 	list := &List{
 		NodeList, token.pos, t, Children{},
-		false,
+		ListTypeBullet,
 		1,
 		false,
 		indentSpaces,
@@ -43,7 +43,8 @@ func (t *Tree) parseList() Node {
 
 	loose := false
 	for {
-		c := t.parseListItem(indentSpaces + len(marker) + 1)
+		t.context.IndentSpaces = indentSpaces + len(marker) + 1
+		c := t.parseListItem()
 		if nil == c {
 			break
 		}
@@ -63,16 +64,18 @@ func (t *Tree) parseList() Node {
 		}
 	}
 
-	list.Spread = loose
+	list.Tight = loose
 
 	return list
 }
 
-func (t *Tree) parseListItem(indentSpaces int) *ListItem {
+func (t *Tree) parseListItem() *ListItem {
 	token := t.peek()
 	if itemEOF == token.typ {
 		return nil
 	}
+
+	indentSpaces := t.context.IndentSpaces
 
 	ret := &ListItem{
 		NodeListItem, token.pos, t, Children{},
@@ -80,7 +83,6 @@ func (t *Tree) parseListItem(indentSpaces int) *ListItem {
 		false,
 		indentSpaces,
 	}
-	t.CurNode = ret
 
 	paragraphs := 0
 	for {
@@ -108,12 +110,6 @@ func (t *Tree) parseListItem(indentSpaces int) *ListItem {
 			t.backup()
 			continue
 		}
-
-		//if 4 > indentSpaces {
-		//	t.backups(tokens)
-		//
-		//	break
-		//}
 
 		indentOffset(tokens, indentSpaces, t)
 	}

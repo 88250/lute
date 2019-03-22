@@ -200,18 +200,25 @@ func (n *Blockquote) HTML() string {
 	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
 }
 
+type ListType int
+
+const (
+	ListTypeBullet  = 0
+	ListTypeOrdered = 1
+)
+
 type List struct {
 	NodeType
 	Pos
 	*Tree
 	Children
 
-	Ordered bool
-	Start   int
-	Spread  bool
+	ListType  ListType
+	Start int
+	Tight bool
 
 	IdentSpaces int
-	Marker string
+	Marker      string
 }
 
 func (n *List) String() string {

@@ -21,7 +21,7 @@ import "regexp"
 func Parse(name, text string) (*Tree, error) {
 	text = sanitize(text)
 
-	t := &Tree{name: name, text: text}
+	t := &Tree{name: name, text: text, context: &Context{}}
 	err := t.parse()
 
 	return t, err
@@ -37,15 +37,20 @@ func sanitize(text string) (ret string) {
 	return
 }
 
+// Context use to store common data in parsing.
+type Context struct {
+	IndentSpaces int
+}
+
 // Tree is the representation of the markdown ast.
 type Tree struct {
 	Root      *Root
-	CurNode   Node
-	name      string // the name of the input; used only for error reports
+	name      string
 	text      string
 	lex       *lexer
 	token     [64]item
 	peekCount int
+	context   *Context
 }
 
 func (t *Tree) HTML() string {
@@ -189,7 +194,7 @@ func (t *Tree) parseBlockContent() Node {
 		return t.parseInlineCode()
 	case itemTab, itemSpace:
 		return t.parseCode()
-	case itemAsterisk:
+	case itemAsterisk, itemHyphen:
 		return t.parseList()
 	default:
 		return nil
@@ -246,12 +251,13 @@ func (t *Tree) parseParagraph() Node {
 		}
 		ret.append(c)
 
-		token = t.peek()
-		if itemNewline == token.typ {
+		if token = t.peek(); itemNewline == token.typ {
+			t.next()
 			token = t.next()
-			if itemNewline == token.typ {
-				t.next()
+			if itemNewline == token.typ || itemEOF == token.typ {
 				break
+			} else if itemTab == token.typ || itemSpace == token.typ {
+				continue
 			}
 
 			t.backup()
