@@ -207,7 +207,7 @@ func (t *Tree) parseListItem() *ListItem {
 	ret := newListItem(indentSpaces, t, token)
 	paragraphs := 0
 	for {
-		c := t.parseBlockContent()
+		c := t.parseParagraph()
 		if nil == c {
 			break
 		}

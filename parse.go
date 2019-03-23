@@ -140,70 +140,11 @@ func (t *Tree) stopParse() {
 func (t *Tree) parse() (err error) {
 	defer t.recover(&err)
 	t.startParse(lex(t.name, t.text))
-	t.parseContent()
+	t.parseBlocks()
+	t.parseInlines()
 	t.stopParse()
 
 	return nil
-}
-
-func (t *Tree) parseContent() {
-	t.Root = &Root{NodeType: NodeRoot, Pos: 0}
-
-	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
-		t.context.CurNode = t.Root
-		var c Node
-		switch token.typ {
-		case itemAsterisk, itemHyphen:
-			c = t.parseList()
-		case itemStr, itemCrosshatch, itemGreater, itemTab:
-			c = t.parseTopLevelContent()
-		case itemSpace:
-			spaces, tabs, tokens := t.nextNonWhitespace()
-			if 1 > tabs && 4 > spaces {
-				last := tokens[len(tokens)-1]
-				if itemAsterisk == last.typ || itemHyphen == last.typ {
-					t.backups(tokens)
-					c = t.parseList()
-				}
-				t.Root.append(c)
-				continue
-			}
-
-			t.backups(tokens)
-			c = t.parseIndentCode()
-		case itemNewline:
-			t.next()
-			continue
-		default:
-			c = t.parsePhrasingContent()
-		}
-		t.Root.append(c)
-	}
-}
-
-func (t *Tree) parseTopLevelContent() (ret Node) {
-	ret = t.parseBlockContent()
-
-	return
-}
-
-func (t *Tree) parseBlockContent() Node {
-	switch token := t.peek(); token.typ {
-	case itemStr:
-		return t.parseParagraph()
-	case itemCrosshatch:
-		return t.parseHeading()
-	case itemGreater:
-		return t.parseBlockquote()
-	case itemBacktick:
-		return t.parseInlineCode()
-	case itemTab, itemSpace:
-		return t.parseCode()
-	case itemAsterisk, itemHyphen:
-		return t.parseList()
-	default:
-		return nil
-	}
 }
 
 func (t *Tree) parseListContent() Node {
@@ -251,14 +192,14 @@ func (t *Tree) parseBlockquote() (ret Node) {
 	totalSpaces := spaces + tabs*4
 	if totalSpaces <= indentSpaces {
 		t.backup()
-		ret = &Blockquote{NodeParagraph, token.pos, Children{t.parseBlockContent()}}
+		ret = &Blockquote{NodeParagraph, token.pos, Children{t.parsePhrasingContent()}}
 
 		return
 	}
 
 	indentOffset(tokens, indentSpaces, t)
 
-	ret = &Blockquote{NodeParagraph, token.pos, Children{t.parseBlockContent()}}
+	ret = &Blockquote{NodeParagraph, token.pos, Children{t.parsePhrasingContent()}}
 
 	return
 }
