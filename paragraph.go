@@ -21,6 +21,7 @@ import "fmt"
 type Paragraph struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Children
 
@@ -81,7 +82,7 @@ func (n *Paragraph) trim() {
 func (t *Tree) parseParagraph() Node {
 	token := t.peek()
 
-	ret := &Paragraph{NodeParagraph, token.pos, t, Children{}, "<p>", "</p>"}
+	ret := &Paragraph{NodeParagraph, token.pos, "", t, Children{}, "<p>", "</p>"}
 
 	for {
 		c := t.parsePhrasingContent()

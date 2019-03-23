@@ -31,6 +31,7 @@ const (
 type List struct {
 	NodeType
 	Pos
+	RawText
 	t        *Tree
 	Parent   Node
 	Children Children
@@ -63,7 +64,7 @@ func (n *List) append(c Node) {
 
 func newList(marker string, indentSpaces int, t *Tree, token item) *List {
 	ret := &List{
-		NodeList, token.pos, t, t.context.CurNode, Children{},
+		NodeList, token.pos, "", t, t.context.CurNode, Children{},
 		ListTypeBullet,
 		1,
 		false,
@@ -78,6 +79,7 @@ func newList(marker string, indentSpaces int, t *Tree, token item) *List {
 type ListItem struct {
 	NodeType
 	Pos
+	RawText
 	t        *Tree
 	Parent   Node
 	Children Children
@@ -120,7 +122,7 @@ func (n *ListItem) append(c Node) {
 
 func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 	ret := &ListItem{
-		NodeListItem, token.pos, t, t.context.CurNode, Children{},
+		NodeListItem, token.pos, "", t, t.context.CurNode, Children{},
 		false,
 		false,
 		indentSpaces,

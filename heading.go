@@ -21,6 +21,7 @@ import "fmt"
 type Heading struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Children
 
@@ -46,7 +47,7 @@ func (t *Tree) parseHeading() Node {
 	t.next() // consume spaces
 
 	ret := &Heading{
-		NodeHeading, token.pos, t, Children{},
+		NodeHeading, token.pos, "", t, Children{},
 		len(token.val),
 	}
 

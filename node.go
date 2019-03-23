@@ -24,6 +24,7 @@ import (
 type Node interface {
 	Type() NodeType
 	Position() Pos
+	Raw() RawText
 	String() string
 	HTML() string
 }
@@ -34,8 +35,14 @@ type NodeType int
 // Children represents the children nodes of a tree node.
 type Children []Node
 
-func (t NodeType) Type() NodeType {
-	return t
+func (nt NodeType) Type() NodeType {
+	return nt
+}
+
+type RawText string
+
+func (r RawText) Raw() RawText {
+	return r;
 }
 
 const (
@@ -73,6 +80,7 @@ const (
 type Root struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Children
 }
@@ -94,6 +102,7 @@ func (n *Root) append(c Node) {
 type Blockquote struct {
 	NodeType
 	Pos
+	RawText
 	Children
 }
 
@@ -140,6 +149,7 @@ type HTML struct {
 type Code struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Value string
 
@@ -183,6 +193,7 @@ type FootnoteDefinition struct {
 type Text struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Value string
 }
@@ -198,6 +209,7 @@ func (n *Text) HTML() string {
 type Emphasis struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Children
 }
@@ -215,6 +227,7 @@ func (n *Emphasis) HTML() string {
 type Strong struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Children
 }
@@ -232,6 +245,7 @@ func (n *Strong) HTML() string {
 type Delete struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Children
 }
@@ -249,6 +263,7 @@ func (n *Delete) HTML() string {
 type InlineCode struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 	Value string
 }
@@ -264,6 +279,7 @@ func (n InlineCode) HTML() string {
 type Break struct {
 	NodeType
 	Pos
+	RawText
 	*Tree
 }
 

@@ -16,6 +16,12 @@
 
 package lute
 
+import "fmt"
+
 func (t *Tree) parseInlines() {
 
+	for _, c := range t.Root.Children {
+		raw := c.Raw()
+		fmt.Printf("%s", raw)
+	}
 }

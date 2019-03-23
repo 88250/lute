@@ -21,6 +21,7 @@ import "fmt"
 type ThematicBreak struct {
 	NodeType
 	Pos
+	RawText
 }
 
 func (n *ThematicBreak) String() string {
@@ -33,7 +34,7 @@ func (n *ThematicBreak) HTML() string {
 
 func (t *Tree) parseThematicBreak() (ret Node) {
 	token := t.next()
-	ret = &ThematicBreak{NodeThematicBreak, token.pos}
+	ret = &ThematicBreak{NodeThematicBreak, token.pos, ""}
 
 	return
 }
