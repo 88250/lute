@@ -242,44 +242,6 @@ func (t *Tree) parseBreak() (ret Node) {
 	return
 }
 
-func (t *Tree) parseIndentCode() (ret Node) {
-	var code string
-
-Loop:
-	for {
-		for i := 0; i < 4; {
-			token := t.next()
-			switch token.typ {
-			case itemSpace:
-				i++
-			case itemTab:
-				i += 4
-			default:
-				break
-			}
-		}
-
-		token := t.next()
-		for ; itemBacktick != token.typ && itemEOF != token.typ; token = t.next() {
-			code += token.val
-			if itemNewline == token.typ {
-				spaces, tabs, tokens := t.nextNonWhitespace()
-				if 1 > tabs && 4 > spaces {
-					t.backup()
-					break Loop
-				} else {
-					t.backups(tokens)
-					continue Loop
-				}
-			}
-		}
-	}
-
-	ret = &Code{NodeCode, 0, "", items{},t, code, "", ""}
-
-	return
-}
-
 func (t *Tree) expandSpaces() (offsetSpaces int) {
 	_, _, tokens := t.nextNonWhitespace()
 

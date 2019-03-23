@@ -31,7 +31,7 @@ func (t *Tree) parseBlocks() {
 			c = t.parseHeading()
 		case itemGreater:
 			c = t.parseBlockquote()
-		case itemSpace:
+		case itemSpace, itemTab:
 			spaces, tabs, tokens := t.nextNonWhitespace()
 			if 1 > tabs && 4 > spaces {
 				last := tokens[len(tokens)-1]

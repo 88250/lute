@@ -16,12 +16,13 @@
 
 package lute
 
-import "fmt"
-
 func (t *Tree) parseInlines() {
-
 	for _, c := range t.Root.Children {
-		raw := c.Raw()
+		cType := c.Type()
+		switch cType {
+		case NodeCode, NodeInlineCode:
+			continue
+		}
 
 		tokens := c.Tokens()
 	Block:
@@ -39,8 +40,6 @@ func (t *Tree) parseInlines() {
 
 			c.Append(n)
 		}
-
-		fmt.Printf("%s", raw)
 	}
 }
 

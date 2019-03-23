@@ -51,7 +51,7 @@ var parseTests = []parseTest{
 	//{"strong", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
 	//{"em", "l*u*te", "<p>l<em>u</em>te</p>\n"},
 	//{"indent code block2", "    lute\n", "<pre><code>lute\n</code></pre>\n"},
-	//{"indent code block", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
+	{"indent code block", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
 	{"inline code", "l`u`te", "<p>l<code>u</code>te</p>\n"},
 	{"str", "lute", "<p>lute</p>\n"},
 	{"empty", "", ""},
