@@ -39,7 +39,7 @@ func (t *Tree) parseBlocks() {
 					t.backups(tokens)
 					c = t.parseList()
 				}
-				t.Root.append(c)
+				t.Root.Append(c)
 				continue
 			}
 
@@ -51,6 +51,6 @@ func (t *Tree) parseBlocks() {
 		default:
 			c = t.parsePhrasingContent()
 		}
-		t.Root.append(c)
+		t.Root.Append(c)
 	}
 }

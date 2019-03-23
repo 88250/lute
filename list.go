@@ -32,6 +32,7 @@ type List struct {
 	NodeType
 	Pos
 	RawText
+	items
 	t        *Tree
 	Parent   Node
 	Children Children
@@ -58,13 +59,13 @@ func (n *List) HTML() string {
 	return fmt.Sprintf("<ul>\n%s</ul>\n", content)
 }
 
-func (n *List) append(c Node) {
+func (n *List) Append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
 func newList(marker string, indentSpaces int, t *Tree, token item) *List {
 	ret := &List{
-		NodeList, token.pos, "", t, t.context.CurNode, Children{},
+		NodeList, token.pos, "", items{},t, t.context.CurNode, Children{},
 		ListTypeBullet,
 		1,
 		false,
@@ -80,6 +81,7 @@ type ListItem struct {
 	NodeType
 	Pos
 	RawText
+	items
 	t        *Tree
 	Parent   Node
 	Children Children
@@ -116,13 +118,13 @@ func (n *ListItem) HTML() string {
 	return fmt.Sprintf("<li>%s</li>\n", content)
 }
 
-func (n *ListItem) append(c Node) {
+func (n *ListItem) Append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
 func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 	ret := &ListItem{
-		NodeListItem, token.pos, "", t, t.context.CurNode, Children{},
+		NodeListItem, token.pos, "", items{},t, t.context.CurNode, Children{},
 		false,
 		false,
 		indentSpaces,
@@ -177,7 +179,7 @@ func (t *Tree) parseList() Node {
 		if nil == c {
 			break
 		}
-		list.append(c)
+		list.Append(c)
 
 		if c.Spread {
 			loose = true
@@ -213,7 +215,7 @@ func (t *Tree) parseListItem() *ListItem {
 		if nil == c {
 			break
 		}
-		ret.append(c)
+		ret.Append(c)
 
 		if NodeParagraph == c.Type() || NodeCode == c.Type() {
 			paragraphs++

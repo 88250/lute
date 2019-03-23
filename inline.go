@@ -22,6 +22,71 @@ func (t *Tree) parseInlines() {
 
 	for _, c := range t.Root.Children {
 		raw := c.Raw()
+
+		tokens := c.Tokens()
+	Block:
+		for {
+			token := tokens[0]
+			var n Node
+			switch token.typ {
+			case itemStr:
+				n, tokens = t.parseText(tokens)
+			case itemBacktick:
+				n, tokens = t.parseInlineCode(tokens)
+			case itemEOF:
+				break Block
+			}
+
+			c.Append(n)
+		}
+
 		fmt.Printf("%s", raw)
 	}
+}
+
+func (t *Tree) parseText(tokens items) (n Node, remains items) {
+	token := tokens[0]
+	ret := &Text{NodeText, token.pos, RawText(token.val), items{}, t, token.val}
+
+	return ret, tokens[1:]
+}
+
+func (t *Tree) parseInlineCode(tokens items) (ret Node, remains items) {
+	i := 1
+	token := tokens[i]
+	pos := token.pos
+	var code string
+	for ; itemBacktick != token.typ && itemEOF != token.typ; token = tokens[i] {
+		code += token.val
+		i++
+	}
+
+	ret = &InlineCode{NodeInlineCode, pos, "", items{},t, code}
+	remains = tokens[i+1:]
+
+	if itemEOF == t.peek().typ {
+		return
+	}
+
+	return
+}
+
+func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
+	i := 1
+	token := tokens[i]
+	pos := token.pos
+	var code string
+	for ; itemBacktick != token.typ && itemEOF != token.typ; token = tokens[i] {
+		code += token.val
+		i++
+	}
+
+	ret = &Code{NodeCode, pos, "", items{}, t, code, "", ""}
+	remains = tokens[i+1:]
+
+	if itemEOF == t.peek().typ {
+		return
+	}
+
+	return
 }

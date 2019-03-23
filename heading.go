@@ -22,6 +22,7 @@ type Heading struct {
 	NodeType
 	Pos
 	RawText
+	items
 	*Tree
 	Children
 
@@ -38,7 +39,7 @@ func (n *Heading) HTML() string {
 	return fmt.Sprintf("<h%d>%s</h%d>\n", n.Depth, content, n.Depth)
 }
 
-func (n *Heading) append(c Node) {
+func (n *Heading) Append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
@@ -47,12 +48,12 @@ func (t *Tree) parseHeading() Node {
 	t.next() // consume spaces
 
 	ret := &Heading{
-		NodeHeading, token.pos, "", t, Children{},
+		NodeHeading, token.pos, "", items{}, t, Children{},
 		len(token.val),
 	}
 
 	c := t.parsePhrasingContent()
-	ret.append(c)
+	ret.Append(c)
 
 	return ret
 }

@@ -22,6 +22,7 @@ type Paragraph struct {
 	NodeType
 	Pos
 	RawText
+	items
 	*Tree
 	Children
 
@@ -42,7 +43,7 @@ func (n *Paragraph) HTML() string {
 	return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
 }
 
-func (n *Paragraph) append(c Node) {
+func (n *Paragraph) Append(c Node) {
 	n.Children = append(n.Children, c)
 }
 
@@ -81,34 +82,21 @@ func (n *Paragraph) trim() {
 
 func (t *Tree) parseParagraph() Node {
 	token := t.peek()
-
-	ret := &Paragraph{NodeParagraph, token.pos, "", t, Children{}, "<p>", "</p>"}
-
+	ret := &Paragraph{NodeParagraph, token.pos, "", items{}, t, Children{}, "<p>", "</p>"}
 	for {
-		c := t.parsePhrasingContent()
-		if nil == c {
-			ret.trim()
-
+		token = t.next()
+		ret.RawText += RawText(token.val)
+		ret.items = append(ret.items, token)
+		if itemEOF == token.typ {
 			break
 		}
-		ret.append(c)
 
-		if token = t.peek(); itemNewline == token.typ {
+		if itemNewline == token.typ {
 			t.next()
-			if token = t.peek();itemNewline == token.typ || itemEOF == token.typ {
+			if token = t.peek(); itemNewline == token.typ || itemEOF == token.typ {
 				t.next()
 				break
-			} else{
-				_, _, tokens := t.nextNonWhitespace()
-				last := tokens[len(tokens) - 1]
-				if itemHyphen == last.typ {
-					t.backups(tokens)
-					break
-				}
-
-				continue
 			}
-
 			t.backup()
 		}
 	}

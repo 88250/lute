@@ -170,12 +170,8 @@ func (t *Tree) parsePhrasingContent() (ret Node) {
 
 func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 	switch token := t.peek(); token.typ {
-	case itemStr, itemTab:
-		return t.parseText()
 	case itemAsterisk:
 		ret = t.parseEmOrStrong()
-	case itemBacktick:
-		ret = t.parseInlineCode()
 	case itemNewline:
 		ret = t.parseBreak()
 	}
@@ -192,22 +188,16 @@ func (t *Tree) parseBlockquote() (ret Node) {
 	totalSpaces := spaces + tabs*4
 	if totalSpaces <= indentSpaces {
 		t.backup()
-		ret = &Blockquote{NodeParagraph, token.pos, "", Children{t.parsePhrasingContent()}}
+		ret = &Blockquote{NodeParagraph, token.pos, "", items{},Children{t.parsePhrasingContent()}}
 
 		return
 	}
 
 	indentOffset(tokens, indentSpaces, t)
 
-	ret = &Blockquote{NodeParagraph, token.pos, "", Children{t.parsePhrasingContent()}}
+	ret = &Blockquote{NodeParagraph, token.pos, "", items{},Children{t.parsePhrasingContent()}}
 
 	return
-}
-
-func (t *Tree) parseText() Node {
-	token := t.next()
-
-	return &Text{NodeText, token.pos, "", t, token.val}
 }
 
 func (t *Tree) parseEmOrStrong() (ret Node) {
@@ -216,7 +206,7 @@ func (t *Tree) parseEmOrStrong() (ret Node) {
 	if itemAsterisk == token.typ {
 		ret = t.parseStrong()
 	} else {
-		ret = &Emphasis{NodeEmphasis, token.pos, "", t, Children{t.parsePhrasingContent()}}
+		ret = &Emphasis{NodeEmphasis, token.pos, "", items{},t, Children{t.parsePhrasingContent()}}
 	}
 	t.next() // consume close *
 
@@ -226,7 +216,7 @@ func (t *Tree) parseEmOrStrong() (ret Node) {
 func (t *Tree) parseStrong() (ret Node) {
 	t.next() // consume open *
 	token := t.peek()
-	ret = &Strong{NodeStrong, token.pos, "", t, Children{t.parsePhrasingContent()}}
+	ret = &Strong{NodeStrong, token.pos, "", items{},t, Children{t.parsePhrasingContent()}}
 	t.next() // consume close *
 
 	return
@@ -235,7 +225,7 @@ func (t *Tree) parseStrong() (ret Node) {
 func (t *Tree) parseDelete() (ret Node) {
 	t.next() // consume open ~~
 	token := t.peek()
-	ret = &Delete{NodeDelete, token.pos, "", t, Children{t.parsePhrasingContent()}}
+	ret = &Delete{NodeDelete, token.pos, "", items{},t, Children{t.parsePhrasingContent()}}
 	t.next() // consume close ~~
 
 	return
@@ -247,18 +237,7 @@ func (t *Tree) parseHTML() (ret Node) {
 
 func (t *Tree) parseBreak() (ret Node) {
 	token := t.next()
-	ret = &Break{NodeBreak, token.pos, "", t}
-
-	return
-}
-
-func (t *Tree) parseInlineCode() (ret Node) {
-	t.next() // consume open `
-
-	code := t.next()
-	ret = &InlineCode{NodeInlineCode, code.pos, "", t, code.val}
-
-	t.next() // consume close `
+	ret = &Break{NodeBreak, token.pos, "", items{},t}
 
 	return
 }
@@ -296,33 +275,7 @@ Loop:
 		}
 	}
 
-	ret = &Code{NodeCode, 0, "", t, code, "", ""}
-
-	return
-}
-
-func (t *Tree) parseCode() (ret Node) {
-	t.next() // consume open ```
-
-	token := t.next()
-	pos := token.pos
-	var code string
-	for ; itemBacktick != token.typ && itemEOF != token.typ; token = t.next() {
-		code += token.val
-		if itemNewline == token.typ {
-			if itemBacktick == t.peek().typ {
-				break
-			}
-		}
-	}
-
-	ret = &Code{NodeCode, pos, "", t, code, "", ""}
-
-	if itemEOF == t.peek().typ {
-		return
-	}
-
-	t.next() // consume close ```
+	ret = &Code{NodeCode, 0, "", items{},t, code, "", ""}
 
 	return
 }
