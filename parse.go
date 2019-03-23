@@ -195,7 +195,7 @@ func (t *Tree) parseBlockContent() Node {
 		return t.parseHeading()
 	case itemGreater:
 		return t.parseBlockquote()
-	case itemBackquote:
+	case itemBacktick:
 		return t.parseInlineCode()
 	case itemTab, itemSpace:
 		return t.parseCode()
@@ -233,7 +233,7 @@ func (t *Tree) parseStaticPhrasingContent() (ret Node) {
 		return t.parseText()
 	case itemAsterisk:
 		ret = t.parseEmOrStrong()
-	case itemBackquote:
+	case itemBacktick:
 		ret = t.parseInlineCode()
 	case itemNewline:
 		ret = t.parseBreak()
@@ -340,7 +340,7 @@ Loop:
 		}
 
 		token := t.next()
-		for ; itemBackquote != token.typ && itemEOF != token.typ; token = t.next() {
+		for ; itemBacktick != token.typ && itemEOF != token.typ; token = t.next() {
 			code += token.val
 			if itemNewline == token.typ {
 				spaces, tabs, tokens := t.nextNonWhitespace()
@@ -366,10 +366,10 @@ func (t *Tree) parseCode() (ret Node) {
 	token := t.next()
 	pos := token.pos
 	var code string
-	for ; itemBackquote != token.typ && itemEOF != token.typ; token = t.next() {
+	for ; itemBacktick != token.typ && itemEOF != token.typ; token = t.next() {
 		code += token.val
 		if itemNewline == token.typ {
-			if itemBackquote == t.peek().typ {
+			if itemBacktick == t.peek().typ {
 				break
 			}
 		}

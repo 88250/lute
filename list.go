@@ -158,6 +158,7 @@ func (t *Tree) parseList() Node {
 	if chars == len(backupTokens) {
 		return t.parseThematicBreak()
 	}
+	t.backups(backupTokens)
 
 	offsetSpaces := t.expandSpaces()
 	for i := 0; i < offsetSpaces && i < 5; i++ {

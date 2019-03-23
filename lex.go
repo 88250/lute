@@ -61,7 +61,7 @@ type itemType int
 var itemName = map[itemType]string{
 	itemEOF:          "EOF",
 	itemStr:          "str",
-	itemBackquote:    "`",
+	itemBacktick:     "`",
 	itemTilde:        "~",
 	itemExclamation:  "!",
 	itemCrosshatch:   "#",
@@ -92,7 +92,7 @@ func (i itemType) String() string {
 const (
 	itemEOF          itemType = iota // EOF
 	itemStr                          // plain text
-	itemBackquote                    // `
+	itemBacktick                     // `
 	itemTilde                        // ~
 	itemExclamation                  // !
 	itemCrosshatch                   // #
@@ -248,7 +248,7 @@ func lexText(l *lexer) stateFn {
 	r := l.next()
 	switch {
 	case '`' == r:
-		l.emit(itemBackquote)
+		l.emit(itemBacktick)
 	case '!' == r:
 		l.emit(itemExclamation)
 	case '#' == r:
