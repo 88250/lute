@@ -17,40 +17,44 @@
 package lute
 
 func (t *Tree) parseBlocks() {
-	t.Root = &Root{NodeType: NodeRoot, Pos: 0}
-
+	curNode := t.context.CurNode
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
-		t.context.CurNode = t.Root
-		var c Node
-		switch token.typ {
-		case itemStr:
-			c = t.parseParagraph()
-		case itemAsterisk, itemHyphen:
-			c = t.parseList()
-		case itemCrosshatch:
-			c = t.parseHeading()
-		case itemGreater:
-			c = t.parseBlockquote()
-		case itemSpace, itemTab:
-			spaces, tabs, tokens := t.nextNonWhitespace()
-			if 1 > tabs && 4 > spaces {
-				last := tokens[len(tokens)-1]
-				if itemAsterisk == last.typ || itemHyphen == last.typ {
-					t.backups(tokens)
-					c = t.parseList()
-				}
-				t.Root.Append(c)
-				continue
-			}
-
-			t.backups(tokens)
-			c = t.parseIndentCode()
-		case itemNewline:
-			t.next()
-			continue
-		default:
-			c = t.parsePhrasingContent()
-		}
-		t.Root.Append(c)
+		t.parseBlock()
+		t.context.CurNode = curNode
 	}
+}
+
+func (t *Tree) parseBlock() (ret Node) {
+	curNode := t.context.CurNode
+	token := t.peek()
+
+	switch token.typ {
+	case itemStr:
+		ret = t.parseParagraph()
+	case itemAsterisk, itemHyphen:
+		ret = t.parseList()
+	case itemCrosshatch:
+		ret = t.parseHeading()
+	case itemGreater:
+		ret = t.parseBlockquote()
+	case itemSpace, itemTab:
+		spaces, tabs, tokens := t.nextNonWhitespace()
+		if 1 > tabs && 4 > spaces {
+			last := tokens[len(tokens)-1]
+			if itemAsterisk == last.typ || itemHyphen == last.typ {
+				t.backups(tokens)
+				ret = t.parseList()
+			}
+			curNode.Append(ret)
+			return
+		}
+
+		t.backups(tokens)
+		ret = t.parseIndentCode()
+	case itemNewline:
+		t.next()
+		return
+	}
+	curNode.Append(ret)
+	return
 }

@@ -140,8 +140,12 @@ func (t *Tree) stopParse() {
 func (t *Tree) parse() (err error) {
 	defer t.recover(&err)
 	t.startParse(lex(t.name, t.text))
+
+	t.Root = &Root{NodeType: NodeRoot, Pos: 0}
+	t.context.CurNode = t.Root
 	t.parseBlocks()
 	t.parseInlines()
+
 	t.stopParse()
 
 	return nil

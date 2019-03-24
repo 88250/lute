@@ -219,12 +219,7 @@ func (t *Tree) parseListItem() *ListItem {
 	ret := newListItem(indentSpaces, t, token)
 	paragraphs := 0
 	for {
-		c := t.parseParagraph()
-		if nil == c {
-			break
-		}
-		ret.Append(c)
-
+		c := t.parseBlock()
 		if NodeParagraph == c.Type() || NodeCode == c.Type() {
 			paragraphs++
 		}
