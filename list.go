@@ -141,7 +141,7 @@ func (t *Tree) parseList() Node {
 	token := t.peek()
 	if !token.isWhitespace() {
 		t.backup()
-		return t.parseEmOrStrong()
+		return t.parseParagraph()
 	}
 
 	// Thematic breaks

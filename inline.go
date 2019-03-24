@@ -34,6 +34,8 @@ func (t *Tree) parseInlines() {
 				n, tokens = t.parseText(tokens)
 			case itemBacktick:
 				n, tokens = t.parseInlineCode(tokens)
+			case itemAsterisk:
+				n, tokens = t.parseEmOrStrong(tokens)
 			case itemEOF:
 				break Block
 			}
@@ -41,6 +43,43 @@ func (t *Tree) parseInlines() {
 			c.Append(n)
 		}
 	}
+}
+
+func (t *Tree) parseEmphasis(tokens items) (ret Node, remains items) {
+	token := tokens[0]
+
+	rawText := RawText(token.val)
+	ret = &Emphasis{NodeEmphasis, token.pos, rawText, items{}, t, Children{}}
+	c, remains := t.parseText(tokens)
+	ret.Append(c)
+
+	remains = remains[1:]
+
+	return
+}
+
+func (t *Tree) parseStrong(tokens items) (ret Node, remains items) {
+	token := tokens[0]
+	ret = &Strong{NodeStrong, token.pos, "", items{}, t, Children{}}
+	remains = tokens[1:]
+
+	return
+}
+
+func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
+	if 3 > len(tokens) {
+		return t.parseText(tokens)
+	}
+
+	tokens = tokens[1:]
+	token := tokens[0]
+	if itemAsterisk == token.typ {
+		ret, remains = t.parseStrong(tokens)
+	} else {
+		ret, remains = t.parseEmphasis(tokens)
+	}
+
+	return
 }
 
 func (t *Tree) parseText(tokens items) (n Node, remains items) {
@@ -60,7 +99,7 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node, remains items) {
 		i++
 	}
 
-	ret = &InlineCode{NodeInlineCode, pos, "", items{},t, code}
+	ret = &InlineCode{NodeInlineCode, pos, "", items{}, t, code}
 	remains = tokens[i+1:]
 
 	if itemEOF == t.peek().typ {

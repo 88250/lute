@@ -163,19 +163,6 @@ func (t *Tree) parseRowContent() Node {
 }
 
 func (t *Tree) parsePhrasingContent() (ret Node) {
-	ret = t.parseStaticPhrasingContent()
-
-	return
-}
-
-func (t *Tree) parseStaticPhrasingContent() (ret Node) {
-	switch token := t.peek(); token.typ {
-	case itemAsterisk:
-		ret = t.parseEmOrStrong()
-	case itemNewline:
-		ret = t.parseBreak()
-	}
-
 	return
 }
 
@@ -188,36 +175,14 @@ func (t *Tree) parseBlockquote() (ret Node) {
 	totalSpaces := spaces + tabs*4
 	if totalSpaces <= indentSpaces {
 		t.backup()
-		ret = &Blockquote{NodeParagraph, token.pos, "", items{},Children{t.parsePhrasingContent()}}
+		ret = &Blockquote{NodeParagraph, token.pos, "", items{}, Children{t.parsePhrasingContent()}}
 
 		return
 	}
 
 	indentOffset(tokens, indentSpaces, t)
 
-	ret = &Blockquote{NodeParagraph, token.pos, "", items{},Children{t.parsePhrasingContent()}}
-
-	return
-}
-
-func (t *Tree) parseEmOrStrong() (ret Node) {
-	t.next() // consume open *
-	token := t.peek()
-	if itemAsterisk == token.typ {
-		ret = t.parseStrong()
-	} else {
-		ret = &Emphasis{NodeEmphasis, token.pos, "", items{},t, Children{t.parsePhrasingContent()}}
-	}
-	t.next() // consume close *
-
-	return
-}
-
-func (t *Tree) parseStrong() (ret Node) {
-	t.next() // consume open *
-	token := t.peek()
-	ret = &Strong{NodeStrong, token.pos, "", items{},t, Children{t.parsePhrasingContent()}}
-	t.next() // consume close *
+	ret = &Blockquote{NodeParagraph, token.pos, "", items{}, Children{t.parsePhrasingContent()}}
 
 	return
 }
@@ -225,7 +190,7 @@ func (t *Tree) parseStrong() (ret Node) {
 func (t *Tree) parseDelete() (ret Node) {
 	t.next() // consume open ~~
 	token := t.peek()
-	ret = &Delete{NodeDelete, token.pos, "", items{},t, Children{t.parsePhrasingContent()}}
+	ret = &Delete{NodeDelete, token.pos, "", items{}, t, Children{t.parsePhrasingContent()}}
 	t.next() // consume close ~~
 
 	return
@@ -237,7 +202,7 @@ func (t *Tree) parseHTML() (ret Node) {
 
 func (t *Tree) parseBreak() (ret Node) {
 	token := t.next()
-	ret = &Break{NodeBreak, token.pos, "", items{},t}
+	ret = &Break{NodeBreak, token.pos, "", items{}, t}
 
 	return
 }
