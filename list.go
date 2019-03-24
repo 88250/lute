@@ -35,7 +35,7 @@ type List struct {
 	items
 	t        *Tree
 	Parent   Node
-	Children Children
+	Subnodes Children
 
 	ListType ListType
 	Start    int
@@ -46,11 +46,11 @@ type List struct {
 }
 
 func (n *List) String() string {
-	return fmt.Sprintf("%s", n.Children)
+	return fmt.Sprintf("%s", n.Subnodes)
 }
 
 func (n *List) HTML() string {
-	content := html(n.Children)
+	content := html(n.Subnodes)
 
 	if NodeListItem == n.Parent.Type() {
 		return fmt.Sprintf("\n<ul>\n%s</ul>\n", content)
@@ -60,7 +60,11 @@ func (n *List) HTML() string {
 }
 
 func (n *List) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *List) Children() Children {
+	return n.Subnodes
 }
 
 func newList(marker string, indentSpaces int, t *Tree, token item) *List {
@@ -84,7 +88,7 @@ type ListItem struct {
 	items
 	t        *Tree
 	Parent   Node
-	Children Children
+	Subnodes Children
 
 	Checked bool
 	Spread  bool // loose or tight
@@ -93,12 +97,12 @@ type ListItem struct {
 }
 
 func (n *ListItem) String() string {
-	return fmt.Sprintf("%s", n.Children)
+	return fmt.Sprintf("%s", n.Subnodes)
 }
 
 func (n *ListItem) HTML() string {
 	var content string
-	for _, c := range n.Children {
+	for _, c := range n.Subnodes {
 		if !n.Spread && NodeParagraph == c.Type() {
 			p := c.(*Paragraph)
 			p.OpenTag, p.CloseTag = "", ""
@@ -111,7 +115,7 @@ func (n *ListItem) HTML() string {
 		return fmt.Sprintf("<li>%s</li>\n", content)
 	}
 
-	if 1 < len(n.Children) || strings.Contains(content, "<pre><code") {
+	if 1 < len(n.Subnodes) || strings.Contains(content, "<pre><code") {
 		return fmt.Sprintf("<li>\n%s</li>\n", content)
 	}
 
@@ -119,7 +123,11 @@ func (n *ListItem) HTML() string {
 }
 
 func (n *ListItem) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *ListItem) Children() Children {
+	return n.Subnodes
 }
 
 func newListItem(indentSpaces int, t *Tree, token item) *ListItem {

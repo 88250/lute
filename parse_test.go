@@ -47,7 +47,7 @@ var parseTests = []parseTest{
 	//{"paragraph", "p", "<p>p</p>\n"},
 	//{"list", "* lute", "<ul>\n<li>lute</li>\n</ul>\n"},
 	//{"heading", "# lute", "<h1>lute</h1>\n"},
-	//{"quote", "> lute", "<blockquote>\n<p>lute</p>\n</blockquote>\n"},
+	{"quote", "> lute", "<blockquote>\n<p>lute</p>\n</blockquote>\n"},
 	{"strong", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
 	{"em", "l*u*te", "<p>l<em>u</em>te</p>\n"},
 	{"space indent code block", "    lute\n", "<pre><code>lute\n</code></pre>\n"},

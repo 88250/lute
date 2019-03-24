@@ -24,17 +24,17 @@ type Paragraph struct {
 	RawText
 	items
 	*Tree
-	Children
+	Subnodes Children
 
 	OpenTag, CloseTag string
 }
 
 func (n *Paragraph) String() string {
-	return fmt.Sprintf("%s", n.Children)
+	return fmt.Sprintf("%s", n.Subnodes)
 }
 
 func (n *Paragraph) HTML() string {
-	content := html(n.Children)
+	content := html(n.Subnodes)
 
 	if "" != n.OpenTag {
 		return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag+"\n", content)
@@ -44,11 +44,15 @@ func (n *Paragraph) HTML() string {
 }
 
 func (n *Paragraph) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *Paragraph) Children() Children {
+	return n.Subnodes
 }
 
 func (n *Paragraph) trim() {
-	size := len(n.Children)
+	size := len(n.Subnodes)
 	if 1 > size {
 		return
 	}
@@ -56,7 +60,7 @@ func (n *Paragraph) trim() {
 	initialNoneWhitespace := 0
 	notBreak := true
 	for i := initialNoneWhitespace; i < size/2; i++ {
-		if NodeBreak == n.Children[i].Type() {
+		if NodeBreak == n.Subnodes[i].Type() {
 			initialNoneWhitespace++
 			notBreak = false
 		}
@@ -68,7 +72,7 @@ func (n *Paragraph) trim() {
 	finalNoneWhitespace := size
 	notBreak = true
 	for i := finalNoneWhitespace - 1; size/2 <= i; i-- {
-		if NodeBreak == n.Children[i].Type() {
+		if NodeBreak == n.Subnodes[i].Type() {
 			finalNoneWhitespace--
 			notBreak = false
 		}
@@ -77,7 +81,7 @@ func (n *Paragraph) trim() {
 		}
 	}
 
-	n.Children = n.Children[initialNoneWhitespace:finalNoneWhitespace]
+	n.Subnodes = n.Subnodes[initialNoneWhitespace:finalNoneWhitespace]
 }
 
 func (t *Tree) parseParagraph() Node {

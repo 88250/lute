@@ -24,23 +24,27 @@ type Heading struct {
 	RawText
 	items
 	*Tree
-	Children
+	Subnodes Children
 
 	Depth int
 }
 
 func (n *Heading) String() string {
-	return fmt.Sprintf("# %s", n.Children)
+	return fmt.Sprintf("# %s", n.Subnodes)
 }
 
 func (n *Heading) HTML() string {
-	content := html(n.Children)
+	content := html(n.Subnodes)
 
 	return fmt.Sprintf("<h%d>%s</h%d>\n", n.Depth, content, n.Depth)
 }
 
 func (n *Heading) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *Heading) Children() Children {
+	return n.Subnodes
 }
 
 func (t *Tree) parseHeading() Node {

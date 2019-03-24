@@ -16,32 +16,35 @@
 
 package lute
 
-import "fmt"
+func (t *Tree) parseBlockquote() Node {
+	token := t.peek()
+	ret := &Blockquote{NodeBlockquote, token.pos, "", items{}, Children{}}
+	t.next() // consume >
 
-type ThematicBreak struct {
-	NodeType
-	Pos
-	RawText
-	items
-}
+	t.nextNonWhitespace()
+	t.backup()
+	for {
+		token = t.peek()
+		if itemEOF == token.typ {
+			break
+		}
+		if itemStr == token.typ {
+			c := t.parseParagraph()
+			ret.Append(c)
+			return ret
+		}
 
-func (n *ThematicBreak) String() string {
-	return fmt.Sprintf("'***'")
-}
+		ret.RawText += RawText(token.val)
+		ret.items = append(ret.items, token)
+		if itemNewline == token.typ {
+			t.next()
+			if token = t.peek(); itemNewline == token.typ || itemEOF == token.typ {
+				t.next()
+				break
+			}
+			t.backup()
+		}
+	}
 
-func (n *ThematicBreak) HTML() string {
-	return fmt.Sprintf("<hr />\n")
-}
-
-func (n *ThematicBreak) Append(c Node) {}
-
-func (n *ThematicBreak) Children() Children {
-	return nil
-}
-
-func (t *Tree) parseThematicBreak() (ret Node) {
-	token := t.next()
-	ret = &ThematicBreak{NodeThematicBreak, token.pos, "", items{}}
-
-	return
+	return ret
 }

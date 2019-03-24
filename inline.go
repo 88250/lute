@@ -17,10 +17,21 @@
 package lute
 
 func (t *Tree) parseInlines() {
-	for _, c := range t.Root.Children {
+	t.parseChildren(t.Root.Children())
+}
+
+func (t *Tree) parseChildren(children Children) {
+	for _, c := range children {
 		cType := c.Type()
 		switch cType {
 		case NodeCode, NodeInlineCode:
+			continue
+		}
+
+		cs := c.Children()
+		if 0 < len(cs) {
+			t.parseChildren(cs)
+
 			continue
 		}
 
@@ -41,6 +52,10 @@ func (t *Tree) parseInlines() {
 			}
 
 			c.Append(n)
+
+			if 1 > len(tokens) {
+				break Block
+			}
 		}
 	}
 }

@@ -25,6 +25,7 @@ type Node interface {
 	Type() NodeType
 	Position() Pos
 	Raw() RawText
+	Children() Children
 	Tokens() items
 	Append(child Node)
 	String() string
@@ -91,21 +92,25 @@ type Root struct {
 	RawText
 	items
 	*Tree
-	Children
+	Subnodes Children
 }
 
 func (n *Root) String() string {
-	return fmt.Sprintf("%s", n.Children)
+	return fmt.Sprintf("%s", n.Subnodes)
 }
 
 func (n *Root) HTML() string {
-	content := html(n.Children)
+	content := html(n.Subnodes)
 
 	return fmt.Sprintf("%s", content)
 }
 
 func (n *Root) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *Root) Children() Children {
+	return n.Subnodes
 }
 
 type Blockquote struct {
@@ -113,21 +118,25 @@ type Blockquote struct {
 	Pos
 	RawText
 	items
-	Children
+	Subnodes Children
 }
 
 func (n *Blockquote) String() string {
-	return fmt.Sprintf("%s", n.Children)
+	return fmt.Sprintf("%s", n.Subnodes)
 }
 
 func (n *Blockquote) HTML() string {
-	content := html(n.Children)
+	content := html(n.Subnodes)
 
 	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
 }
 
 func (n *Blockquote) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *Blockquote) Children() Children {
+	return n.Subnodes
 }
 
 type Table struct {
@@ -183,6 +192,10 @@ func (n *Code) HTML() string {
 func (n *Code) Append(c Node) {
 }
 
+func (n *Code) Children() Children {
+	return nil
+}
+
 type YAML struct {
 	NodeType
 	Pos
@@ -228,27 +241,35 @@ func (n *Text) HTML() string {
 func (n *Text) Append(child Node) {
 }
 
+func (n *Text) Children() Children {
+	return nil
+}
+
 type Emphasis struct {
 	NodeType
 	Pos
 	RawText
 	items
 	*Tree
-	Children
+	Subnodes Children
 }
 
 func (n *Emphasis) String() string {
-	return fmt.Sprintf("*%v*", n.Children)
+	return fmt.Sprintf("*%v*", n.Subnodes)
 }
 
 func (n *Emphasis) HTML() string {
-	content := html(n.Children)
+	content := html(n.Subnodes)
 
 	return fmt.Sprintf("<em>%s</em>", content)
 }
 
 func (n *Emphasis) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *Emphasis) Children() Children {
+	return n.Subnodes
 }
 
 type Strong struct {
@@ -257,21 +278,25 @@ type Strong struct {
 	RawText
 	items
 	*Tree
-	Children
+	Subnodes Children
 }
 
 func (n *Strong) String() string {
-	return fmt.Sprintf("**%v**", n.Children)
+	return fmt.Sprintf("**%v**", n.Subnodes)
 }
 
 func (n *Strong) HTML() string {
-	content := html(n.Children)
+	content := html(n.Subnodes)
 
 	return fmt.Sprintf("<strong>%s</strong>", content)
 }
 
 func (n *Strong) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *Strong) Children() Children {
+	return n.Subnodes
 }
 
 type Delete struct {
@@ -280,21 +305,25 @@ type Delete struct {
 	RawText
 	items
 	*Tree
-	Children
+	Subnodes Children
 }
 
 func (n *Delete) String() string {
-	return fmt.Sprintf("~~%v~~", n.Children)
+	return fmt.Sprintf("~~%v~~", n.Subnodes)
 }
 
 func (n *Delete) HTML() string {
-	content := html(n.Children)
+	content := html(n.Subnodes)
 
 	return fmt.Sprintf("<del>%s</del>", content)
 }
 
 func (n *Delete) Append(c Node) {
-	n.Children = append(n.Children, c)
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *Delete) Children() Children {
+	return n.Subnodes
 }
 
 type InlineCode struct {
@@ -314,7 +343,10 @@ func (n *InlineCode) HTML() string {
 	return fmt.Sprintf("<code>%s</code>", n.Value)
 }
 
-func (n *InlineCode) Append(c Node) {
+func (n *InlineCode) Append(c Node) {}
+
+func (n *InlineCode) Children() Children {
+	return nil
 }
 
 type Break struct {
@@ -333,7 +365,10 @@ func (n *Break) HTML() string {
 	return fmt.Sprintf("\n")
 }
 
-func (n *Break) Append(c Node) {
+func (n *Break) Append(c Node) {}
+
+func (n *Break) Children() Children {
+	return nil
 }
 
 type Link struct {

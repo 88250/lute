@@ -166,27 +166,6 @@ func (t *Tree) parsePhrasingContent() (ret Node) {
 	return
 }
 
-func (t *Tree) parseBlockquote() (ret Node) {
-	token := t.next() // >
-
-	indentSpaces := 2
-
-	spaces, tabs, tokens := t.nextNonWhitespace()
-	totalSpaces := spaces + tabs*4
-	if totalSpaces <= indentSpaces {
-		t.backup()
-		ret = &Blockquote{NodeParagraph, token.pos, "", items{}, Children{t.parsePhrasingContent()}}
-
-		return
-	}
-
-	indentOffset(tokens, indentSpaces, t)
-
-	ret = &Blockquote{NodeParagraph, token.pos, "", items{}, Children{t.parsePhrasingContent()}}
-
-	return
-}
-
 func (t *Tree) parseDelete() (ret Node) {
 	t.next() // consume open ~~
 	token := t.peek()
