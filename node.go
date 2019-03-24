@@ -113,31 +113,7 @@ func (n *Root) Children() Children {
 	return n.Subnodes
 }
 
-type Blockquote struct {
-	NodeType
-	Pos
-	RawText
-	items
-	Subnodes Children
-}
 
-func (n *Blockquote) String() string {
-	return fmt.Sprintf("%s", n.Subnodes)
-}
-
-func (n *Blockquote) HTML() string {
-	content := html(n.Subnodes)
-
-	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
-}
-
-func (n *Blockquote) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *Blockquote) Children() Children {
-	return n.Subnodes
-}
 
 type Table struct {
 	NodeType

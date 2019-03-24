@@ -38,9 +38,8 @@ func (t *Tree) parseBlock() (ret Node) {
 	case itemGreater:
 		ret = t.parseBlockquote()
 	case itemSpace, itemTab:
-		spaces, tabs, tokens := t.nextNonWhitespace()
+		spaces, tabs, tokens, last := t.nextNonWhitespace()
 		if 1 > tabs && 4 > spaces {
-			last := tokens[len(tokens)-1]
 			if itemAsterisk == last.typ || itemHyphen == last.typ {
 				t.backups(tokens)
 				ret = t.parseList()
@@ -48,6 +47,11 @@ func (t *Tree) parseBlock() (ret Node) {
 			curNode.Append(ret)
 			return
 		}
+
+		//offsetSpaces := t.expandSpaces()
+		//for i := 0; i < offsetSpaces && i < 5; i++ {
+		//	t.next()
+		//}
 
 		t.backups(tokens)
 		ret = t.parseIndentCode()

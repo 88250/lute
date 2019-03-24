@@ -95,7 +95,7 @@ func (t *Tree) peek() item {
 	return t.token[0]
 }
 
-func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item) {
+func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, last item) {
 	for {
 		token := t.next()
 		tokens = append(tokens, token)
@@ -107,6 +107,7 @@ func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item) {
 			spaces++
 			continue
 		default:
+			last = token
 			return
 		}
 	}
@@ -191,7 +192,7 @@ func (t *Tree) parseBreak() (ret Node) {
 }
 
 func (t *Tree) expandSpaces() (offsetSpaces int) {
-	_, _, tokens := t.nextNonWhitespace()
+	_, _, tokens, _ := t.nextNonWhitespace()
 
 	var restoreTokens, nonWhitespaces []item
 	i := 0

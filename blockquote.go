@@ -16,34 +16,77 @@
 
 package lute
 
-func (t *Tree) parseBlockquote() Node {
-	token := t.peek()
-	ret := &Blockquote{NodeBlockquote, token.pos, "", items{}, Children{}}
-	t.next() // consume >
+import "fmt"
 
-	t.nextNonWhitespace()
-	t.backup()
+type Blockquote struct {
+	NodeType
+	Pos
+	RawText
+	items
+	t        *Tree
+	Parent   Node
+	Subnodes Children
+}
+
+func (n *Blockquote) String() string {
+	return fmt.Sprintf("%s", n.Subnodes)
+}
+
+func (n *Blockquote) HTML() string {
+	content := html(n.Subnodes)
+
+	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
+}
+
+func (n *Blockquote) Append(c Node) {
+	n.Subnodes = append(n.Subnodes, c)
+}
+
+func (n *Blockquote) Children() Children {
+	return n.Subnodes
+}
+
+func newBlockquote(t *Tree, token item) *Blockquote {
+	ret := &Blockquote{
+		NodeBlockquote, token.pos, "", items{}, t, t.context.CurNode, Children{}}
+	t.context.CurNode = ret
+
+	return ret
+}
+
+func (t *Tree) parseBlockquote() Node {
+	token := t.next()
+	if itemEOF == token.typ {
+		return nil
+	}
+
+	indentSpaces := t.context.IndentSpaces + 2
+
+	ret := newBlockquote(t, token)
+	_, _, tokens, _ := t.nextNonWhitespace()
+	indentOffset(tokens, indentSpaces, t)
+
 	for {
-		token = t.peek()
-		if itemEOF == token.typ {
+		c := t.parseBlock()
+		if nil == c {
 			break
 		}
-		if itemStr == token.typ {
-			c := t.parseParagraph()
-			ret.Append(c)
-			return ret
+		if itemEOF == t.peek().typ {
+			break
 		}
 
-		ret.RawText += RawText(token.val)
-		ret.items = append(ret.items, token)
-		if itemNewline == token.typ {
-			t.next()
-			if token = t.peek(); itemNewline == token.typ || itemEOF == token.typ {
-				t.next()
-				break
-			}
+		spaces, tabs, tokens, _ := t.nextNonWhitespace()
+
+		totalSpaces := spaces + tabs*4
+		if totalSpaces < indentSpaces {
+			t.backups(tokens)
+			break
+		} else if totalSpaces == indentSpaces {
 			t.backup()
+			continue
 		}
+
+		indentOffset(tokens, indentSpaces, t)
 	}
 
 	return ret

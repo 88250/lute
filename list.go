@@ -69,7 +69,7 @@ func (n *List) Children() Children {
 
 func newList(marker string, indentSpaces int, t *Tree, token item) *List {
 	ret := &List{
-		NodeList, token.pos, "", items{},t, t.context.CurNode, Children{},
+		NodeList, token.pos, "", items{}, t, t.context.CurNode, Children{},
 		ListTypeBullet,
 		1,
 		false,
@@ -132,7 +132,7 @@ func (n *ListItem) Children() Children {
 
 func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 	ret := &ListItem{
-		NodeListItem, token.pos, "", items{},t, t.context.CurNode, Children{},
+		NodeListItem, token.pos, "", items{}, t, t.context.CurNode, Children{},
 		false,
 		false,
 		indentSpaces,
@@ -143,9 +143,9 @@ func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 }
 
 func (t *Tree) parseList() Node {
-	spaces, tabs, tokens := t.nextNonWhitespace()
+	spaces, tabs, _, last := t.nextNonWhitespace()
 
-	marker := tokens[len(tokens)-1].val
+	marker := last.val
 	token := t.peek()
 	if !token.isWhitespace() {
 		t.backup()
@@ -171,11 +171,6 @@ func (t *Tree) parseList() Node {
 		return t.parseThematicBreak()
 	}
 	t.backups(backupTokens)
-
-	offsetSpaces := t.expandSpaces()
-	for i := 0; i < offsetSpaces && i < 5; i++ {
-		t.next()
-	}
 
 	indentSpaces := spaces + tabs*4
 	list := newList(marker, indentSpaces, t, token)
@@ -217,6 +212,10 @@ func (t *Tree) parseListItem() *ListItem {
 	indentSpaces := t.context.IndentSpaces
 
 	ret := newListItem(indentSpaces, t, token)
+
+	_, _, tokens, _ := t.nextNonWhitespace()
+	indentOffset(tokens, indentSpaces, t)
+
 	paragraphs := 0
 	for {
 		c := t.parseBlock()
@@ -228,7 +227,7 @@ func (t *Tree) parseListItem() *ListItem {
 			break
 		}
 
-		spaces, tabs, tokens := t.nextNonWhitespace()
+		spaces, tabs, tokens, _ := t.nextNonWhitespace()
 
 		totalSpaces := spaces + tabs*4
 		if totalSpaces < indentSpaces {

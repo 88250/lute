@@ -38,7 +38,7 @@ Loop:
 		for ; itemBacktick != token.typ && itemEOF != token.typ; token = t.next() {
 			code += token.val
 			if itemNewline == token.typ {
-				spaces, tabs, tokens := t.nextNonWhitespace()
+				spaces, tabs, tokens, _ := t.nextNonWhitespace()
 				if 1 > tabs && 4 > spaces {
 					t.backup()
 					break Loop

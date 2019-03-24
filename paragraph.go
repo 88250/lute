@@ -95,6 +95,7 @@ func (n *Paragraph) trim() {
 func (t *Tree) parseParagraph() Node {
 	token := t.peek()
 	ret := &Paragraph{NodeParagraph, token.pos, "", items{}, t, Children{}, "<p>", "</p>"}
+Loop:
 	for {
 		token = t.next()
 		ret.RawText += RawText(token.val)
@@ -106,12 +107,18 @@ func (t *Tree) parseParagraph() Node {
 		}
 
 		if itemNewline == token.typ {
-			if token = t.peek(); itemNewline == token.typ || itemEOF == token.typ {
+			token = t.peek()
+			switch token.typ {
+			case itemNewline, itemEOF:
 				t.next()
 				ret.trim()
-
-				break
+				break Loop
+			default:
+				// lazy continuation line https://spec.commonmark.org/0.28/#lazy-continuation-line
+				// spaces, tabs, tokens, last := t.nextNonWhitespace()
+				break Loop
 			}
+
 		}
 	}
 
