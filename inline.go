@@ -60,8 +60,13 @@ func (t *Tree) parseEmphasis(tokens items) (ret Node, remains items) {
 
 func (t *Tree) parseStrong(tokens items) (ret Node, remains items) {
 	token := tokens[0]
-	ret = &Strong{NodeStrong, token.pos, "", items{}, t, Children{}}
-	remains = tokens[1:]
+
+	rawText := RawText(token.val)
+	ret = &Strong{NodeStrong, token.pos, rawText, items{}, t, Children{}}
+	c, remains := t.parseText(tokens)
+	ret.Append(c)
+
+	remains = remains[2:]
 
 	return
 }
@@ -74,6 +79,7 @@ func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
 	tokens = tokens[1:]
 	token := tokens[0]
 	if itemAsterisk == token.typ {
+		tokens = tokens[1:]
 		ret, remains = t.parseStrong(tokens)
 	} else {
 		ret, remains = t.parseEmphasis(tokens)
