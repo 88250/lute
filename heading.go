@@ -49,15 +49,31 @@ func (n *Heading) Children() Children {
 
 func (t *Tree) parseHeading() Node {
 	token := t.next()
-	t.next() // consume spaces
 
 	ret := &Heading{
 		NodeHeading, token.pos, "", items{}, t, Children{},
 		len(token.val),
 	}
 
-	c := t.parsePhrasingContent()
-	ret.Append(c)
+	t.nextNonWhitespace()
+	t.backup()
+	for {
+		token = t.next()
+		if itemEOF == token.typ {
+			break
+		}
+
+		ret.RawText += RawText(token.val)
+		ret.items = append(ret.items, token)
+		if itemNewline == token.typ {
+			t.next()
+			if token = t.peek(); itemNewline == token.typ || itemEOF == token.typ {
+				t.next()
+				break
+			}
+			t.backup()
+		}
+	}
 
 	return ret
 }

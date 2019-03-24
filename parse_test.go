@@ -43,10 +43,10 @@ var parseTests = []parseTest{
 	//{"spce1", "\tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
 
 	// some simple cases
-	//{"paragraph2", "p1\n\np2", "<p>p1</p>\n<p>p2</p>\n"},
-	//{"paragraph", "p", "<p>p</p>\n"},
-	//{"list", "* lute", "<ul>\n<li>lute</li>\n</ul>\n"},
-	//{"heading", "# lute", "<h1>lute</h1>\n"},
+	{"paragraph2", "p1\n\np2", "<p>p1</p>\n<p>p2</p>\n"},
+	{"paragraph", "p", "<p>p</p>\n"},
+	{"list", "* lute", "<ul>\n<li>lute</li>\n</ul>\n"},
+	{"heading", "# lute", "<h1>lute</h1>\n"},
 	{"quote", "> lute", "<blockquote>\n<p>lute</p>\n</blockquote>\n"},
 	{"strong", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
 	{"em", "l*u*te", "<p>l<em>u</em>te</p>\n"},

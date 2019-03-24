@@ -16,13 +16,16 @@
 
 package lute
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Paragraph struct {
 	NodeType
 	Pos
 	RawText
-	items
+	items items
 	*Tree
 	Subnodes Children
 
@@ -51,8 +54,12 @@ func (n *Paragraph) Children() Children {
 	return n.Subnodes
 }
 
+func (n *Paragraph) Tokens() items {
+	return n.items
+}
+
 func (n *Paragraph) trim() {
-	size := len(n.Subnodes)
+	size := len(n.items)
 	if 1 > size {
 		return
 	}
@@ -60,7 +67,7 @@ func (n *Paragraph) trim() {
 	initialNoneWhitespace := 0
 	notBreak := true
 	for i := initialNoneWhitespace; i < size/2; i++ {
-		if NodeBreak == n.Subnodes[i].Type() {
+		if itemNewline == n.items[i].typ {
 			initialNoneWhitespace++
 			notBreak = false
 		}
@@ -72,7 +79,7 @@ func (n *Paragraph) trim() {
 	finalNoneWhitespace := size
 	notBreak = true
 	for i := finalNoneWhitespace - 1; size/2 <= i; i-- {
-		if NodeBreak == n.Subnodes[i].Type() {
+		if itemNewline == n.items[i].typ {
 			finalNoneWhitespace--
 			notBreak = false
 		}
@@ -81,7 +88,8 @@ func (n *Paragraph) trim() {
 		}
 	}
 
-	n.Subnodes = n.Subnodes[initialNoneWhitespace:finalNoneWhitespace]
+	n.items = n.items[initialNoneWhitespace:finalNoneWhitespace]
+	n.RawText = RawText(strings.TrimSpace(string(n.RawText)))
 }
 
 func (t *Tree) parseParagraph() Node {
@@ -92,16 +100,18 @@ func (t *Tree) parseParagraph() Node {
 		ret.RawText += RawText(token.val)
 		ret.items = append(ret.items, token)
 		if itemEOF == token.typ {
+			ret.trim()
+
 			break
 		}
 
 		if itemNewline == token.typ {
-			t.next()
 			if token = t.peek(); itemNewline == token.typ || itemEOF == token.typ {
 				t.next()
+				ret.trim()
+
 				break
 			}
-			t.backup()
 		}
 	}
 
