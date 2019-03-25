@@ -102,10 +102,9 @@ func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhi
 		switch token.typ {
 		case itemTab:
 			tabs++
-			continue
 		case itemSpace:
 			spaces++
-			continue
+		case itemNewline:
 		default:
 			firstNonWhitespace = token
 			return

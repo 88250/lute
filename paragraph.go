@@ -101,21 +101,28 @@ Loop:
 		ret.RawText += RawText(token.val)
 		ret.items = append(ret.items, token)
 		if itemEOF == token.typ {
-			ret.trim()
-
 			break
 		}
 
 		if itemNewline == token.typ {
-			token = t.peek()
-			switch token.typ {
+			spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
+			indentSpaces := spaces + tabs*4
+			if indentSpaces < t.context.IndentSpaces {
+				t.backups(tokens)
+				break
+			}
+			switch firstNonWhitespace.typ {
 			case itemNewline, itemEOF:
 				t.next()
-				ret.trim()
+				break Loop
+			case itemHyphen:
+				t.backups(tokens)
 				break Loop
 			}
 		}
 	}
+
+	ret.trim()
 
 	return ret
 }

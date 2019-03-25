@@ -65,7 +65,6 @@ func (t *Tree) parseBlockquote() Node {
 	ret := newBlockquote(t, token)
 	_, _, tokens, _ := t.nextNonWhitespace()
 	indentOffset(tokens, indentSpaces, t)
-	t.next() // consume one space
 	for {
 		c := t.parseBlock()
 		if nil == c {

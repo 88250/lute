@@ -145,7 +145,7 @@ func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 }
 
 func (t *Tree) parseList() Node {
-	spaces, tabs, _, firstNonWhitespace := t.nextNonWhitespace()
+	spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
 	marker := firstNonWhitespace.val
 	token := t.peek()
 	if !token.isWhitespace() {
@@ -174,14 +174,20 @@ func (t *Tree) parseList() Node {
 	t.backups(backupTokens)
 
 	indentSpaces := spaces + tabs*4
-	spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
-	wnSpaces := len(marker) + spaces + tabs*4
+	spaces, tabs, tokens, firstNonWhitespace = t.nextNonWhitespace()
+	w := len(marker)
+	n := spaces + tabs*4
+	wnSpaces := w + n
 	t.backups(tokens)
-	indentOffset(tokens, indentSpaces, t)
+	if 4 <= n { // rule 2 in https://spec.commonmark.org/0.28/#list-items
+		indentOffset(tokens, w + 1, t)
+	} else {
+		indentOffset(tokens, indentSpaces+wnSpaces, t)
+	}
 	list := newList(indentSpaces, marker, wnSpaces, t, token)
 	loose := false
 	for {
-		t.context.IndentSpaces = indentSpaces
+		t.context.IndentSpaces = indentSpaces + wnSpaces
 		c := t.parseListItem()
 		if nil == c {
 			break
@@ -194,6 +200,13 @@ func (t *Tree) parseList() Node {
 
 		token := t.peek()
 		if itemNewline == token.typ {
+			spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
+			indentSpaces := spaces + tabs*4
+			if indentSpaces < t.context.IndentSpaces {
+				t.backups(tokens)
+				break
+			}
+
 			t.next()
 			continue
 		}
@@ -232,6 +245,12 @@ func (t *Tree) parseListItem() *ListItem {
 		}
 		t.backups(tokens)
 		totalSpaces := spaces + tabs*4
+		if totalSpaces > indentSpaces {
+			if 4 == totalSpaces && 2 != indentSpaces{ // 对齐列表优先级高于缩进代码块
+				break
+			}
+		}
+
 		if totalSpaces < indentSpaces {
 			break
 		}
