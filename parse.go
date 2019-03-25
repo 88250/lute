@@ -95,7 +95,7 @@ func (t *Tree) peek() item {
 	return t.token[0]
 }
 
-func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, last item) {
+func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhitespace item) {
 	for {
 		token := t.next()
 		tokens = append(tokens, token)
@@ -107,7 +107,7 @@ func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, last item) 
 			spaces++
 			continue
 		default:
-			last = token
+			firstNonWhitespace = token
 			return
 		}
 	}
@@ -230,18 +230,14 @@ func indentOffset(tokens []item, indentSpaces int, t *Tree) {
 	}
 
 	remains := compSpaces - indentSpaces
-	if 4 <= remains {
-		for j := 0; j < remains/4; j++ {
-			restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
-		}
-		for j := 0; j < remains%4; j++ {
-			restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
-		}
-		restoreTokens = append(restoreTokens, nonWhitespaces...)
-		t.backups(restoreTokens)
-	} else {
-		t.backup()
+	for j := 0; j < remains/4; j++ {
+		restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
 	}
+	for j := 0; j < remains%4; j++ {
+		restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
+	}
+	restoreTokens = append(restoreTokens, nonWhitespaces...)
+	t.backups(restoreTokens)
 }
 
 type stack struct {

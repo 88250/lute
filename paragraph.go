@@ -113,12 +113,7 @@ Loop:
 				t.next()
 				ret.trim()
 				break Loop
-			default:
-				// lazy continuation line https://spec.commonmark.org/0.28/#lazy-continuation-line
-				// spaces, tabs, tokens, last := t.nextNonWhitespace()
-				break Loop
 			}
-
 		}
 	}
 

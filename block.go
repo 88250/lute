@@ -37,21 +37,17 @@ func (t *Tree) parseBlock() (ret Node) {
 		ret = t.parseHeading()
 	case itemGreater:
 		ret = t.parseBlockquote()
-	case itemSpace, itemTab:
-		spaces, tabs, tokens, last := t.nextNonWhitespace()
-		if 1 > tabs && 4 > spaces {
-			if itemAsterisk == last.typ || itemHyphen == last.typ {
-				t.backups(tokens)
-				ret = t.parseList()
-			}
-			curNode.Append(ret)
-			return
+	case itemSpace:
+		_, _, tokens, last := t.nextNonWhitespace()
+		if itemAsterisk == last.typ || itemHyphen == last.typ {
+			t.backups(tokens)
+			ret = t.parseList()
+		} else {
+			t.backup()
+			ret = t.parseParagraph()
 		}
-
-		//offsetSpaces := t.expandSpaces()
-		//for i := 0; i < offsetSpaces && i < 5; i++ {
-		//	t.next()
-		//}
+		curNode.Append(ret)
+		return
 
 		t.backups(tokens)
 		ret = t.parseIndentCode()

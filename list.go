@@ -41,8 +41,9 @@ type List struct {
 	Start    int
 	Tight    bool
 
-	IdentSpaces int
-	Marker      string
+	IndentSpaces int // #4 Indentation https://spec.commonmark.org/0.28/#list-items
+	Marker       string
+	WNSpaces     int // W + N https://spec.commonmark.org/0.28/#list-items
 }
 
 func (n *List) String() string {
@@ -67,7 +68,7 @@ func (n *List) Children() Children {
 	return n.Subnodes
 }
 
-func newList(marker string, indentSpaces int, t *Tree, token item) *List {
+func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token item) *List {
 	ret := &List{
 		NodeList, token.pos, "", items{}, t, t.context.CurNode, Children{},
 		ListTypeBullet,
@@ -75,6 +76,7 @@ func newList(marker string, indentSpaces int, t *Tree, token item) *List {
 		false,
 		indentSpaces,
 		marker,
+		wnSpaces,
 	}
 	t.context.CurNode = ret
 
@@ -143,9 +145,8 @@ func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 }
 
 func (t *Tree) parseList() Node {
-	spaces, tabs, _, last := t.nextNonWhitespace()
-
-	marker := last.val
+	spaces, tabs, _, firstNonWhitespace := t.nextNonWhitespace()
+	marker := firstNonWhitespace.val
 	token := t.peek()
 	if !token.isWhitespace() {
 		t.backup()
@@ -173,11 +174,14 @@ func (t *Tree) parseList() Node {
 	t.backups(backupTokens)
 
 	indentSpaces := spaces + tabs*4
-	list := newList(marker, indentSpaces, t, token)
-
+	spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
+	wnSpaces := len(marker) + spaces + tabs*4
+	t.backups(tokens)
+	indentOffset(tokens, indentSpaces, t)
+	list := newList(indentSpaces, marker, wnSpaces, t, token)
 	loose := false
 	for {
-		t.context.IndentSpaces = indentSpaces + len(marker) + 1
+		t.context.IndentSpaces = indentSpaces
 		c := t.parseListItem()
 		if nil == c {
 			break
@@ -210,12 +214,7 @@ func (t *Tree) parseListItem() *ListItem {
 	}
 
 	indentSpaces := t.context.IndentSpaces
-
 	ret := newListItem(indentSpaces, t, token)
-
-	_, _, tokens, _ := t.nextNonWhitespace()
-	indentOffset(tokens, indentSpaces, t)
-
 	paragraphs := 0
 	for {
 		c := t.parseBlock()
@@ -227,18 +226,22 @@ func (t *Tree) parseListItem() *ListItem {
 			break
 		}
 
-		spaces, tabs, tokens, _ := t.nextNonWhitespace()
-
+		spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
+		if "-" != firstNonWhitespace.val {
+			// break
+		}
+		t.backups(tokens)
 		totalSpaces := spaces + tabs*4
 		if totalSpaces < indentSpaces {
-			t.backups(tokens)
 			break
-		} else if totalSpaces == indentSpaces {
-			t.backup()
-			continue
 		}
 
 		indentOffset(tokens, indentSpaces, t)
+
+		if itemHyphen == firstNonWhitespace.typ {
+			t.backups(tokens)
+		}
+
 	}
 
 	if 1 < paragraphs {
