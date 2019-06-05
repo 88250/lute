@@ -41,9 +41,9 @@ type List struct {
 	Start    int
 	Tight    bool
 
-	IndentSpaces int // #4 Indentation https://spec.commonmark.org/0.28/#list-items
+	IndentSpaces int // #4 Indentation https://spec.commonmark.org/0.29/#list-items
 	Marker       string
-	WNSpaces     int // W + N https://spec.commonmark.org/0.28/#list-items
+	WNSpaces     int // W + N https://spec.commonmark.org/0.29/#list-items
 }
 
 func (n *List) String() string {
@@ -179,7 +179,7 @@ func (t *Tree) parseList() Node {
 	n := spaces + tabs*4
 	wnSpaces := w + n
 	t.backups(tokens)
-	if 4 <= n { // rule 2 in https://spec.commonmark.org/0.28/#list-items
+	if 4 <= n { // rule 2 in https://spec.commonmark.org/0.29/#list-items
 		indentOffset(tokens, w + 1, t)
 	} else {
 		indentOffset(tokens, indentSpaces+wnSpaces, t)
