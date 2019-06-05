@@ -27,12 +27,12 @@ func Parse(name, text string) (*Tree, error) {
 	return t, err
 }
 
-var newlinesRe = regexp.MustCompile("\r[\n\u0085]?|[\u2424\u2028\u0085]")
-var nullRe = regexp.MustCompile("\u0000")
+var newlinesRegexp = regexp.MustCompile("\r[\n\u0085]?|[\u2424\u2028\u0085]")
+var nullRegexp = regexp.MustCompile("\u0000")
 
 func sanitize(text string) (ret string) {
-	ret = newlinesRe.ReplaceAllString(text, "\n")
-	nullRe.ReplaceAllString(ret, "\uFFFD") // https://github.github.com/gfm/#insecure-characters
+	ret = newlinesRegexp.ReplaceAllString(text, "\n")
+	nullRegexp.ReplaceAllString(ret, "\uFFFD") // https://github.github.com/gfm/#insecure-characters
 
 	return
 }
@@ -115,14 +115,14 @@ func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhi
 // Parsing.
 
 // recover is the handler that turns panics into returns from the top level of Parse.
-func (t *Tree) recover(errp *error) {
+func (t *Tree) recover(err *error) {
 	e := recover()
 	if e != nil {
 		if t != nil {
 			t.lex.drain()
 			t.stopParse()
 		}
-		*errp = e.(error)
+		*err = e.(error)
 	}
 }
 
