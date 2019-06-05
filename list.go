@@ -200,7 +200,7 @@ func (t *Tree) parseList() Node {
 
 		token := t.peek()
 		if itemNewline == token.typ {
-			spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
+			spaces, tabs, tokens, _ := t.nextNonWhitespace()
 			indentSpaces := spaces + tabs*4
 			if indentSpaces < t.context.IndentSpaces {
 				t.backups(tokens)
