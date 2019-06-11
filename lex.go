@@ -119,15 +119,15 @@ type stateFn func(*lexer) stateFn
 
 // lexer holds the state of the scanner.
 type lexer struct {
-	name    string  // the name of the input; used only for error reports
-	input   string  // the string being scanned
-	state   stateFn // the next lexing function to enter
-	pos     Pos     // current position in the input
-	start   Pos     // start position of this item
-	width   Pos     // width of last rune read from input
-	lastPos Pos     // position of most recent item returned by nextItem
-	items   []item  // scanned items
-	line    int     // 1+number of newlines seen
+	name    string   // the name of the input; used only for error reports
+	input   string   // the string being scanned
+	state   stateFn  // the next lexing function to enter
+	pos     Pos      // current position in the input
+	start   Pos      // start position of this item
+	width   Pos      // width of last rune read from input
+	lastPos Pos      // position of most recent item returned by nextItem
+	items   [][]item // scanned items
+	line    int      // 1+number of newlines seen
 }
 
 // next returns the next rune in the input.
@@ -141,7 +141,7 @@ func (l *lexer) next() rune {
 	r, w := utf8.DecodeRuneInString(l.input[l.pos:])
 	l.width = Pos(w)
 	l.pos += l.width
-	if r == '\n' {
+	if '\n' == r {
 		l.line++
 	}
 
@@ -167,14 +167,14 @@ func (l *lexer) backup() {
 
 // emit passes an item back to the parser.
 func (l *lexer) emit(t itemType) {
-	l.items = append(l.items, item{t, l.start, l.input[l.start:l.pos], l.line})
+	l.items[l.line-1] = append(l.items[l.line-1], item{t, l.start, l.input[l.start:l.pos], l.line})
 	l.start = l.pos
 }
 
 // nextItem returns the next item from the input.
 // Called by the parser, not in the lexing goroutine.
 func (l *lexer) nextItem() item {
-	item := l.items[l.lastPos]
+	item := l.items[l.line][l.lastPos]
 	l.lastPos = item.pos
 
 	return item
@@ -192,10 +192,11 @@ func lex(name, input string) *lexer {
 	l := &lexer{
 		name:  name,
 		input: input,
-		items: []item{},
+		items: [][]item{},
 		line:  1,
 	}
 
+	l.items = append(l.items, []item{})
 	l.run()
 
 	return l
@@ -245,6 +246,7 @@ func lexText(l *lexer) stateFn {
 	case ' ' == r:
 		l.emit(itemSpace)
 	case '\n' == r:
+		l.items = append(l.items, []item{})
 		l.emit(itemNewline)
 	case eof == r:
 		l.emit(itemEOF)

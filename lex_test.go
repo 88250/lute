@@ -44,7 +44,7 @@ var lexTests = []lexTest{
 	{"crosshatch", "# lute", []item{mkItem(itemCrosshatch, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"greater", "> lute", []item{mkItem(itemGreater, ">"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
 	{"asterisk", "*lute*", []item{mkItem(itemAsterisk, "*"), mkItem(itemStr, "lute"), mkItem(itemAsterisk, "*"), tEOF}},
-	{"backtick", "`lute`", []item{mkItem(itemBacktick, "`"), mkItem(itemStr, "lute"), mkItem(itemBacktick, "`"),tEOF}},
+	{"backtick", "`lute`", []item{mkItem(itemBacktick, "`"), mkItem(itemStr, "lute"), mkItem(itemBacktick, "`"), tEOF}},
 	{"tab", "\tlute", []item{mkItem(itemTab, "\t"), mkItem(itemStr, "lute"), tEOF}},
 	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
 	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemNewline, "\n"), tEOF}},
@@ -55,7 +55,12 @@ var lexTests = []lexTest{
 func TestLex(t *testing.T) {
 	for _, test := range lexTests {
 		l := lex(test.name, test.input)
-		items := l.items
+		var items []item
+		for _, line := range l.items {
+			for _, item := range line {
+				items = append(items, item)
+			}
+		}
 		if !equal(items, test.items, false) {
 			t.Fatalf("%s:\nexpected\n\t%v\ngot\n\t%v\n", test.name, test.items, items)
 		}
