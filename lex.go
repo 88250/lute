@@ -105,7 +105,7 @@ const (
 )
 
 const (
-	eof = -1
+	end = -1
 )
 
 type lexer struct {
@@ -139,7 +139,14 @@ func (l *lexer) nextItem() item {
 
 // lex creates a new lexer for the input string.
 func lex(name, input string) *lexer {
-	l := &lexer{items: [][]item{}}
+	ret := &lexer{items: [][]item{}}
+	if "" == input {
+		ret.items = append(ret.items, []item{})
+		ret.items[ret.line] = append(ret.items[ret.line], item{typ: itemEOF})
+
+		return ret
+	}
+
 	lines := strings.Split(input, "\n")
 	multipleLines := 1 < len(lines)
 	for _, line := range lines {
@@ -156,10 +163,12 @@ func lex(name, input string) *lexer {
 		}
 		s.run()
 
-		l.items = append(l.items, s.items)
+		ret.items = append(ret.items, s.items)
 	}
 
-	return l
+	ret.items[ret.line] = append(ret.items[ret.line], item{typ: itemEOF})
+
+	return ret
 }
 
 func (s *scanner) run() {
@@ -198,7 +207,7 @@ func (s *scanner) run() {
 			s.newItem(itemSpace)
 		case '\n' == r:
 			s.newItem(itemNewline)
-		case eof == r:
+		case end == r:
 			return
 		default:
 		str:
@@ -223,7 +232,7 @@ func (s *scanner) next() rune {
 	if int(s.pos) >= len(s.input) {
 		s.width = 0
 
-		return eof
+		return end
 	}
 
 	r, w := utf8.DecodeRuneInString(s.input[s.pos:])

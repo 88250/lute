@@ -38,9 +38,9 @@ var parseTests = []parseTest{
 	//{"spec5", "- foo\n\n\t\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<pre><code>  bar\n</code></pre>\n</li>\n</ul>\n"},
 	//{"spec4", "  - foo\n\n\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>\n"},
 	//{"spec4.1", "   - foo\n\n\tbar\n", "<ul>\n<li>foo</li>\n</ul>\n<pre><code>bar\n</code></pre>\n"},
-	{"spec3", "    a\ta\n    ὐ\ta\n", "<pre><code>a\ta\nὐ\ta\n</code></pre>\n"},
-	{"spec2", "  \tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
-	{"spce1", "\tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
+	//{"spec3", "    a\ta\n    ὐ\ta\n", "<pre><code>a\ta\nὐ\ta\n</code></pre>\n"},
+	//{"spec2", "  \tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
+	//{"spce1", "\tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
 
 	// some simple cases
 	//{"paragraph2", "p1\n\np2", "<p>p1</p>\n<p>p2</p>\n"},
@@ -53,8 +53,8 @@ var parseTests = []parseTest{
 	//{"space indent code block", "    lute\n", "<pre><code>lute\n</code></pre>\n"},
 	//{"tab indent code block", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
 	//{"inline code", "l`u`te", "<p>l<code>u</code>te</p>\n"},
-	//{"str", "lute", "<p>lute</p>\n"},
-	//{"empty", "", ""},
+	{"str", "lute", "<p>lute</p>\n"},
+	{"empty", "", ""},
 }
 
 func TestParse(t *testing.T) {
