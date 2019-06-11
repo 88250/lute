@@ -18,7 +18,6 @@ package lute
 
 import (
 	"fmt"
-	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -120,15 +119,15 @@ type stateFn func(*lexer) stateFn
 
 // lexer holds the state of the scanner.
 type lexer struct {
-	name    string    // the name of the input; used only for error reports
-	input   string    // the string being scanned
-	state   stateFn   // the next lexing function to enter
-	pos     Pos       // current position in the input
-	start   Pos       // start position of this item
-	width   Pos       // width of last rune read from input
-	lastPos Pos       // position of most recent item returned by nextItem
-	items   chan item // channel of scanned items
-	line    int       // 1+number of newlines seen
+	name    string  // the name of the input; used only for error reports
+	input   string  // the string being scanned
+	state   stateFn // the next lexing function to enter
+	pos     Pos     // current position in the input
+	start   Pos     // start position of this item
+	width   Pos     // width of last rune read from input
+	lastPos Pos     // position of most recent item returned by nextItem
+	items   []item  // scanned items
+	line    int     // 1+number of newlines seen
 }
 
 // next returns the next rune in the input.
@@ -168,44 +167,14 @@ func (l *lexer) backup() {
 
 // emit passes an item back to the parser.
 func (l *lexer) emit(t itemType) {
-	l.items <- item{t, l.start, l.input[l.start:l.pos], l.line}
+	l.items = append(l.items, item{t, l.start, l.input[l.start:l.pos], l.line})
 	l.start = l.pos
-}
-
-func (l *lexer) emitItem(item item) {
-	l.items <- item
-	l.start = l.pos
-}
-
-// ignore skips over the pending input before this point.
-func (l *lexer) ignore() {
-	l.start = l.pos
-}
-
-// accept consumes the next rune if it's from the valid set.
-func (l *lexer) accept(valid string) bool {
-	if strings.ContainsRune(valid, l.next()) {
-		return true
-	}
-	l.backup()
-
-	return false
-}
-
-// acceptRun consumes a run of runes from the valid set.
-func (l *lexer) acceptRun(valid string) (count int8) {
-	for strings.ContainsRune(valid, l.next()) {
-		count++
-	}
-	l.backup()
-
-	return
 }
 
 // nextItem returns the next item from the input.
 // Called by the parser, not in the lexing goroutine.
 func (l *lexer) nextItem() item {
-	item := <-l.items
+	item := l.items[l.lastPos]
 	l.lastPos = item.pos
 
 	return item
@@ -223,22 +192,20 @@ func lex(name, input string) *lexer {
 	l := &lexer{
 		name:  name,
 		input: input,
-		items: make(chan item),
+		items: []item{},
 		line:  1,
 	}
 
-	go l.run()
+	l.run()
 
 	return l
 }
 
 // run runs the state machine for the lexer.
 func (l *lexer) run() {
-	for l.state = lexText; l.state != nil; {
+	for l.state = lexText; nil != l.state; {
 		l.state = l.state(l)
 	}
-
-	close(l.items)
 }
 
 // State functions.
@@ -281,6 +248,8 @@ func lexText(l *lexer) stateFn {
 		l.emit(itemNewline)
 	case eof == r:
 		l.emit(itemEOF)
+
+		return nil
 	default:
 		return lexStr
 	}

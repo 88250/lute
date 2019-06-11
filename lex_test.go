@@ -54,24 +54,12 @@ var lexTests = []lexTest{
 
 func TestLex(t *testing.T) {
 	for _, test := range lexTests {
-		items := collect(&test)
+		l := lex(test.name, test.input)
+		items := l.items
 		if !equal(items, test.items, false) {
 			t.Fatalf("%s:\nexpected\n\t%v\ngot\n\t%v\n", test.name, test.items, items)
 		}
 	}
-}
-
-func collect(t *lexTest) (items []item) {
-	l := lex(t.name, t.input)
-	for {
-		item := l.nextItem()
-		items = append(items, item)
-		if item.typ == itemEOF {
-			break
-		}
-	}
-
-	return
 }
 
 func equal(i1, i2 []item, checkPos bool) bool {
