@@ -119,7 +119,6 @@ func (t *Tree) recover(err *error) {
 	e := recover()
 	if e != nil {
 		if t != nil {
-			t.lex.drain()
 			t.stopParse()
 		}
 		*err = e.(error)

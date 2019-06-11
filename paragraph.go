@@ -23,7 +23,7 @@ import (
 
 type Paragraph struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items items
 	*Tree
@@ -115,7 +115,7 @@ Loop:
 			case itemNewline, itemEOF:
 				t.next()
 				break Loop
-			case itemHyphen:
+			case itemHyphen, itemStr:
 				t.backups(tokens)
 				break Loop
 			}

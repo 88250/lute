@@ -18,21 +18,15 @@ package lute
 
 import (
 	"fmt"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
 
-// Pos represents a byte position in the original input text.
-type Pos int
-
-func (p Pos) Position() Pos {
-	return p
-}
-
 // item represents a token returned from the scanner.
 type item struct {
 	typ  itemType // the type of this item
-	pos  Pos      // the starting position, in bytes, of this item in the input string
+	pos  int      // the starting position, in bytes, of this item in the input string
 	val  string   // the value of this item, aka lexeme
 	line int      // the line number at the start of this item
 }
@@ -114,163 +108,138 @@ const (
 	eof = -1
 )
 
-// stateFn represents the state of the scanner as a function that returns the next state.
-type stateFn func(*lexer) stateFn
-
-// lexer holds the state of the scanner.
 type lexer struct {
-	name    string   // the name of the input; used only for error reports
-	input   string   // the string being scanned
-	state   stateFn  // the next lexing function to enter
-	pos     Pos      // current position in the input
-	start   Pos      // start position of this item
-	width   Pos      // width of last rune read from input
-	lastPos Pos      // position of most recent item returned by nextItem
-	items   [][]item // scanned items
-	line    int      // 1+number of newlines seen
+	items   [][]item
+	lastPos int
+	line    int
 }
 
-// next returns the next rune in the input.
-func (l *lexer) next() rune {
-	if int(l.pos) >= len(l.input) {
-		l.width = 0
-
-		return eof
-	}
-
-	r, w := utf8.DecodeRuneInString(l.input[l.pos:])
-	l.width = Pos(w)
-	l.pos += l.width
-	if '\n' == r {
-		l.line++
-	}
-
-	return r
-}
-
-// peek returns but does not consume the next rune in the input.
-func (l *lexer) peek() rune {
-	r := l.next()
-	l.backup()
-
-	return r
-}
-
-// backup steps back one rune. Can only be called once per call of next.
-func (l *lexer) backup() {
-	l.pos -= l.width
-	// Correct newline count.
-	if l.width == 1 && l.input[l.pos] == '\n' {
-		l.line--
-	}
-}
-
-// emit passes an item back to the parser.
-func (l *lexer) emit(t itemType) {
-	l.items[l.line-1] = append(l.items[l.line-1], item{t, l.start, l.input[l.start:l.pos], l.line})
-	l.start = l.pos
+type scanner struct {
+	input   string // the string being scanned
+	pos     int    // current position in the input
+	start   int    // start position of this item
+	width   int    // width of last rune read from input
+	lastPos int    // position of most recent item returned by nextItem
+	items   []item // scanned items
 }
 
 // nextItem returns the next item from the input.
 // Called by the parser, not in the lexing goroutine.
 func (l *lexer) nextItem() item {
 	item := l.items[l.line][l.lastPos]
-	l.lastPos = item.pos
+	if itemNewline == item.typ {
+		l.line++
+		l.lastPos = 0
+	} else {
+		l.lastPos++
+	}
 
 	return item
 }
 
-// drain drains the output so the lexing goroutine will exit.
-// Called by the parser, not in the lexing goroutine.
-func (l *lexer) drain() {
-	for range l.items {
-	}
-}
-
-// lex creates a new scanner for the input string.
+// lex creates a new lexer for the input string.
 func lex(name, input string) *lexer {
-	l := &lexer{
-		name:  name,
-		input: input,
-		items: [][]item{},
-		line:  1,
-	}
+	l := &lexer{items: [][]item{}}
+	lines := strings.Split(input, "\n")
+	multipleLines := 1 < len(lines)
+	for _, line := range lines {
+		if "" == line {
+			break
+		}
 
-	l.items = append(l.items, []item{})
-	l.run()
+		if multipleLines {
+			line += "\n"
+		}
+		s := &scanner{
+			input: line,
+			items: []item{},
+		}
+		s.run()
+
+		l.items = append(l.items, s.items)
+	}
 
 	return l
 }
 
-// run runs the state machine for the lexer.
-func (l *lexer) run() {
-	for l.state = lexText; nil != l.state; {
-		l.state = l.state(l)
-	}
-}
-
-// State functions.
-
-// lexText scans until a mark character.
-func lexText(l *lexer) stateFn {
-	r := l.next()
-	switch {
-	case '`' == r:
-		l.emit(itemBacktick)
-	case '!' == r:
-		l.emit(itemExclamation)
-	case '#' == r:
-		l.emit(itemCrosshatch)
-	case '*' == r:
-		l.emit(itemAsterisk)
-	case '(' == r:
-		l.emit(itemOpenParen)
-	case ')' == r:
-		l.emit(itemCloseParen)
-	case '-' == r:
-		l.emit(itemHyphen)
-	case '+' == r:
-		l.emit(itemPlus)
-	case '\t' == r:
-		l.emit(itemTab)
-	case '[' == r:
-		l.emit(itemOpenBracket)
-	case ']' == r:
-		l.emit(itemCloseBracket)
-	case '"' == r:
-		l.emit(itemDoublequote)
-	case '\'' == r:
-		l.emit(itemSinglequote)
-	case '>' == r:
-		l.emit(itemGreater)
-	case ' ' == r:
-		l.emit(itemSpace)
-	case '\n' == r:
-		l.items = append(l.items, []item{})
-		l.emit(itemNewline)
-	case eof == r:
-		l.emit(itemEOF)
-
-		return nil
-	default:
-		return lexStr
-	}
-
-	return lexText
-}
-
-// lexStr scans a str.
-func lexStr(l *lexer) stateFn {
+func (s *scanner) run() {
 	for {
-		r := l.next()
+		r := s.next()
 		switch {
-		case unicode.IsLetter(r), '/' == r, '"' == r, unicode.IsNumber(r):
-		// absorb
+		case '`' == r:
+			s.newItem(itemBacktick)
+		case '!' == r:
+			s.newItem(itemExclamation)
+		case '#' == r:
+			s.newItem(itemCrosshatch)
+		case '*' == r:
+			s.newItem(itemAsterisk)
+		case '(' == r:
+			s.newItem(itemOpenParen)
+		case ')' == r:
+			s.newItem(itemCloseParen)
+		case '-' == r:
+			s.newItem(itemHyphen)
+		case '+' == r:
+			s.newItem(itemPlus)
+		case '\t' == r:
+			s.newItem(itemTab)
+		case '[' == r:
+			s.newItem(itemOpenBracket)
+		case ']' == r:
+			s.newItem(itemCloseBracket)
+		case '"' == r:
+			s.newItem(itemDoublequote)
+		case '\'' == r:
+			s.newItem(itemSinglequote)
+		case '>' == r:
+			s.newItem(itemGreater)
+		case ' ' == r:
+			s.newItem(itemSpace)
+		case '\n' == r:
+			s.newItem(itemNewline)
+		case eof == r:
+			return
 		default:
-			l.backup()
-			l.emit(itemStr)
+		str:
+			for {
+				switch {
+				case unicode.IsLetter(r), unicode.IsNumber(r):
+					// absorb
+					r = s.next()
+				default:
+					s.backup()
+					s.newItem(itemStr)
 
-			return lexText
+					break str
+				}
+			}
 		}
 	}
+}
+
+// next returns the next rune in the input.
+func (s *scanner) next() rune {
+	if int(s.pos) >= len(s.input) {
+		s.width = 0
+
+		return eof
+	}
+
+	r, w := utf8.DecodeRuneInString(s.input[s.pos:])
+	s.width = w
+	s.pos += s.width
+
+	return r
+}
+
+// backup steps back one rune. Can only be called once per call of next.
+func (s *scanner) backup() {
+	s.pos -= s.width
+}
+
+// newItem creates an item with the specified item type.
+func (s *scanner) newItem(t itemType) {
+	s.items = append(s.items, item{t, s.start, s.input[s.start:s.pos], 1})
+	s.start = s.pos
 }

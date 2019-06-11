@@ -23,7 +23,6 @@ import (
 // Node represents a node in ast. https://github.com/syntax-tree/mdast
 type Node interface {
 	Type() NodeType
-	Position() Pos
 	Raw() RawText
 	Children() Children
 	Tokens() items
@@ -88,7 +87,7 @@ const (
 
 type Root struct {
 	NodeType
-	Pos
+	Pos int
 	RawText
 	items
 	*Tree
@@ -117,7 +116,7 @@ func (n *Root) Children() Children {
 
 type Table struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Children
 
@@ -126,28 +125,28 @@ type Table struct {
 
 type TableRow struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Children
 }
 
 type TableCell struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Children
 }
 
 type HTML struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Value string
 }
 
 type Code struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	*Tree
@@ -174,14 +173,14 @@ func (n *Code) Children() Children {
 
 type YAML struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Value string
 }
 
 type Definition struct {
 	NodeType
-	Pos
+	int
 	*Tree
 
 	Association
@@ -190,7 +189,7 @@ type Definition struct {
 
 type FootnoteDefinition struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Children
 
@@ -199,7 +198,7 @@ type FootnoteDefinition struct {
 
 type Text struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	*Tree
@@ -223,7 +222,7 @@ func (n *Text) Children() Children {
 
 type Emphasis struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	*Tree
@@ -250,7 +249,7 @@ func (n *Emphasis) Children() Children {
 
 type Strong struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	*Tree
@@ -277,7 +276,7 @@ func (n *Strong) Children() Children {
 
 type Delete struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	*Tree
@@ -304,7 +303,7 @@ func (n *Delete) Children() Children {
 
 type InlineCode struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	*Tree
@@ -327,7 +326,7 @@ func (n *InlineCode) Children() Children {
 
 type Break struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	*Tree
@@ -349,7 +348,7 @@ func (n *Break) Children() Children {
 
 type Link struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Children
 
@@ -358,7 +357,7 @@ type Link struct {
 
 type Image struct {
 	NodeType
-	Pos
+	int
 	*Tree
 
 	Resource
@@ -371,7 +370,7 @@ func (n Image) String() string {
 
 type LinkReference struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Children
 
@@ -380,7 +379,7 @@ type LinkReference struct {
 
 type ImageReference struct {
 	NodeType
-	Pos
+	int
 	*Tree
 
 	Reference
@@ -389,14 +388,14 @@ type ImageReference struct {
 
 type Footnote struct {
 	NodeType
-	Pos
+	int
 	*Tree
 	Children
 }
 
 type FootnoteReference struct {
 	NodeType
-	Pos
+	int
 	*Tree
 
 	Association

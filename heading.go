@@ -20,7 +20,7 @@ import "fmt"
 
 type Heading struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	*Tree

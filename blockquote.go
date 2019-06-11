@@ -20,7 +20,7 @@ import "fmt"
 
 type Blockquote struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	t        *Tree

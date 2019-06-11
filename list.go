@@ -30,7 +30,7 @@ const (
 
 type List struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	t        *Tree
@@ -85,7 +85,7 @@ func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token item)
 
 type ListItem struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 	t        *Tree
@@ -231,6 +231,10 @@ func (t *Tree) parseListItem() *ListItem {
 	paragraphs := 0
 	for {
 		c := t.parseBlock()
+		if nil == c {
+			continue
+		}
+
 		if NodeParagraph == c.Type() || NodeCode == c.Type() {
 			paragraphs++
 		}
@@ -240,9 +244,10 @@ func (t *Tree) parseListItem() *ListItem {
 		}
 
 		spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
-		if "-" != firstNonWhitespace.val {
-			// break
+		if itemNewline == firstNonWhitespace.typ{
+			ret.Spread = true
 		}
+
 		t.backups(tokens)
 		totalSpaces := spaces + tabs*4
 		if totalSpaces > indentSpaces {
@@ -261,10 +266,6 @@ func (t *Tree) parseListItem() *ListItem {
 			t.backups(tokens)
 		}
 
-	}
-
-	if 1 < paragraphs {
-		ret.Spread = true
 	}
 
 	return ret

@@ -20,7 +20,7 @@ import "fmt"
 
 type ThematicBreak struct {
 	NodeType
-	Pos
+	int
 	RawText
 	items
 }

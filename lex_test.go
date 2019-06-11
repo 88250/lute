@@ -33,23 +33,19 @@ func mkItem(typ itemType, text string) item {
 	}
 }
 
-var (
-	tEOF = mkItem(itemEOF, "")
-)
-
 var lexTests = []lexTest{
 
-	{"spec7", "-\t\tfoo\n", []item{mkItem(itemHyphen, "-"), mkItem(itemTab, "\t"), mkItem(itemTab, "\t"), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n"), tEOF}},
+	{"spec7", "-\t\tfoo\n", []item{mkItem(itemHyphen, "-"), mkItem(itemTab, "\t"), mkItem(itemTab, "\t"), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n")}},
 
-	{"crosshatch", "# lute", []item{mkItem(itemCrosshatch, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
-	{"greater", "> lute", []item{mkItem(itemGreater, ">"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
-	{"asterisk", "*lute*", []item{mkItem(itemAsterisk, "*"), mkItem(itemStr, "lute"), mkItem(itemAsterisk, "*"), tEOF}},
-	{"backtick", "`lute`", []item{mkItem(itemBacktick, "`"), mkItem(itemStr, "lute"), mkItem(itemBacktick, "`"), tEOF}},
-	{"tab", "\tlute", []item{mkItem(itemTab, "\t"), mkItem(itemStr, "lute"), tEOF}},
-	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
-	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemNewline, "\n"), tEOF}},
-	{"space", " ", []item{mkItem(itemSpace, " "), tEOF}},
-	{"empty", "", []item{tEOF}},
+	{"crosshatch", "# lute", []item{mkItem(itemCrosshatch, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute")}},
+	{"greater", "> lute", []item{mkItem(itemGreater, ">"), mkItem(itemSpace, " "), mkItem(itemStr, "lute")}},
+	{"asterisk", "*lute*", []item{mkItem(itemAsterisk, "*"), mkItem(itemStr, "lute"), mkItem(itemAsterisk, "*")}},
+	{"backtick", "`lute`", []item{mkItem(itemBacktick, "`"), mkItem(itemStr, "lute"), mkItem(itemBacktick, "`")}},
+	{"tab", "\tlute", []item{mkItem(itemTab, "\t"), mkItem(itemStr, "lute")}},
+	{"str", "lute", []item{mkItem(itemStr, "lute")}},
+	{"newline", "a\n\tc\n", []item{mkItem(itemStr, "a"), mkItem(itemNewline, "\n"), mkItem(itemTab, "\t"), mkItem(itemStr, "c"), mkItem(itemNewline, "\n")}},
+	{"space", " ", []item{mkItem(itemSpace, " ")}},
+	{"empty", "", nil},
 }
 
 func TestLex(t *testing.T) {
