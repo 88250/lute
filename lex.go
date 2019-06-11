@@ -126,6 +126,10 @@ type scanner struct {
 // nextItem returns the next item from the input.
 // Called by the parser, not in the lexing goroutine.
 func (l *lexer) nextItem() item {
+	if len(l.items) <= l.line || len(l.items[l.line]) <= l.lastPos {
+		return item{typ: itemEOF}
+	}
+
 	item := l.items[l.line][l.lastPos]
 	if itemNewline == item.typ {
 		l.line++

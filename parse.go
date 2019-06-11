@@ -118,34 +118,19 @@ func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhi
 func (t *Tree) recover(err *error) {
 	e := recover()
 	if e != nil {
-		if t != nil {
-			t.stopParse()
-		}
 		*err = e.(error)
 	}
 }
 
-// startParse initializes the parser, using the lexer.
-func (t *Tree) startParse(lex *lexer) {
-	t.Root = nil
-	t.lex = lex
-}
-
-// stopParse terminates parsing.
-func (t *Tree) stopParse() {
-	t.lex = nil
-}
-
 func (t *Tree) parse() (err error) {
 	defer t.recover(&err)
-	t.startParse(lex(t.name, t.text))
 
+	t.lex = lex(t.name, t.text)
 	t.Root = &Root{NodeType: NodeRoot, Pos: 0}
 	t.context.CurNode = t.Root
 	t.parseBlocks()
 	t.parseInlines()
-
-	t.stopParse()
+	t.lex = nil
 
 	return nil
 }
