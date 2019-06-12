@@ -203,11 +203,12 @@ func indentOffset(tokens []item, indentSpaces int, t *Tree) {
 	compSpaces := 0
 	i := 0
 	for ; i < len(tokens); i++ {
-		if itemSpace == tokens[i].typ {
+		typ := tokens[i].typ
+		if itemSpace == typ {
 			compSpaces++
-		} else if itemTab == tokens[i].typ {
+		} else if itemTab == typ {
 			compSpaces += 4
-		} else {
+		} else if itemNewline != typ {
 			nonWhitespaces = append(nonWhitespaces, tokens[i])
 		}
 	}

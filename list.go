@@ -93,7 +93,7 @@ type ListItem struct {
 	Subnodes Children
 
 	Checked bool
-	Spread  bool // loose or tight
+	Tight   bool
 
 	Spaces int
 }
@@ -105,7 +105,7 @@ func (n *ListItem) String() string {
 func (n *ListItem) HTML() string {
 	var content string
 	for _, c := range n.Subnodes {
-		if !n.Spread && NodeParagraph == c.Type() {
+		if !n.Tight && NodeParagraph == c.Type() {
 			p := c.(*Paragraph)
 			p.OpenTag, p.CloseTag = "", ""
 		}
@@ -194,7 +194,7 @@ func (t *Tree) parseList() Node {
 		}
 		list.Append(c)
 
-		if c.Spread {
+		if c.Tight {
 			loose = true
 		}
 
@@ -244,8 +244,8 @@ func (t *Tree) parseListItem() *ListItem {
 		}
 
 		spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
-		if itemNewline == firstNonWhitespace.typ{
-			ret.Spread = true
+		if itemNewline == tokens[0].typ{
+			ret.Tight = true
 		}
 
 		t.backups(tokens)
