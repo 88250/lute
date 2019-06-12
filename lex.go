@@ -18,7 +18,6 @@ package lute
 
 import (
 	"fmt"
-	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -151,16 +150,25 @@ func lex(name, input string) *lexer {
 		return ret
 	}
 
-	lines := strings.Split(input, "\n")
-	multipleLines := 1 < len(lines)
+	var lines []string
+	var line string
+	length := len(input)
+	for i, c := range input {
+		char := string(c)
+		line += char
+		if "\n" == char || i == length-1 {
+			lines = append(lines, line)
+			line = ""
+		}
+	}
+
 	for _, line := range lines {
 		if "" == line {
-			break
+			ret.items = append(ret.items, []item{{typ: itemNewline, val: "\n"}})
+
+			continue
 		}
 
-		if multipleLines {
-			line += "\n"
-		}
 		s := &scanner{
 			input: line,
 			items: []item{},
@@ -170,7 +178,8 @@ func lex(name, input string) *lexer {
 		ret.items = append(ret.items, s.items)
 	}
 
-	ret.items[ret.line] = append(ret.items[ret.line], item{typ: itemEOF})
+	lastLine := len(ret.items) - 1
+	ret.items[lastLine] = append(ret.items[lastLine], item{typ: itemEOF})
 
 	return ret
 }

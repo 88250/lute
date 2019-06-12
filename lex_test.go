@@ -47,6 +47,8 @@ var lexTests = []lexTest{
 	{"backtick", "`lute`", []item{mkItem(itemBacktick, "`"), mkItem(itemStr, "lute"), mkItem(itemBacktick, "`"), tEOF}},
 	{"tab", "\tlute", []item{mkItem(itemTab, "\t"), mkItem(itemStr, "lute"), tEOF}},
 	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
+	{"newline2", "1\n\n2", []item{mkItem(itemStr, "1"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemStr, "2"), tEOF}},
+	{"newline1", "\n\n", []item{mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), tEOF}},
 	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemNewline, "\n"), tEOF}},
 	{"space", " ", []item{mkItem(itemSpace, " "), tEOF}},
 	{"empty", "", []item{tEOF}},
