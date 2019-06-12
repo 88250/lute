@@ -34,24 +34,30 @@ func mkItem(typ itemType, text string) item {
 }
 
 var (
-	tEOF = mkItem(itemEOF, "")
+	tEOF      = mkItem(itemEOF, "")
+	tSpace    = mkItem(itemSpace, " ")
+	tNewLine  = mkItem(itemNewline, "\n")
+	tTab      = mkItem(itemTab, "\t")
+	tBacktick = mkItem(itemBacktick, "`")
+	tAsterisk = mkItem(itemAsterisk, "*")
 )
 
 var lexTests = []lexTest{
 
-	{"spec7", "-\t\tfoo\n", []item{mkItem(itemHyphen, "-"), mkItem(itemTab, "\t"), mkItem(itemTab, "\t"), mkItem(itemStr, "foo"), mkItem(itemNewline, "\n"), tEOF}},
+	//{"spec7", "-\t\tfoo\n", []item{mkItem(itemHyphen, "-"), tTab, tTab, mkItem(itemStr, "foo"), tNewLine, tEOF}},
 
-	{"crosshatch", "# lute", []item{mkItem(itemCrosshatch, "#"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
-	{"greater", "> lute", []item{mkItem(itemGreater, ">"), mkItem(itemSpace, " "), mkItem(itemStr, "lute"), tEOF}},
-	{"asterisk", "*lute*", []item{mkItem(itemAsterisk, "*"), mkItem(itemStr, "lute"), mkItem(itemAsterisk, "*"), tEOF}},
-	{"backtick", "`lute`", []item{mkItem(itemBacktick, "`"), mkItem(itemStr, "lute"), mkItem(itemBacktick, "`"), tEOF}},
-	{"tab", "\tlute", []item{mkItem(itemTab, "\t"), mkItem(itemStr, "lute"), tEOF}},
-	{"str", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
-	{"newline2", "1\n\n2", []item{mkItem(itemStr, "1"), mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), mkItem(itemStr, "2"), tEOF}},
-	{"newline1", "\n\n", []item{mkItem(itemNewline, "\n"), mkItem(itemNewline, "\n"), tEOF}},
-	{"newline", " \n", []item{mkItem(itemSpace, " "), mkItem(itemNewline, "\n"), tEOF}},
-	{"space", " ", []item{mkItem(itemSpace, " "), tEOF}},
-	{"empty", "", []item{tEOF}},
+	{"simple11", "`lu\nte`", []item{tBacktick, mkItem(itemStr, "lu"), tNewLine, mkItem(itemStr, "te"), tBacktick, tEOF}},
+	{"simple10", "# lute", []item{mkItem(itemCrosshatch, "#"), tSpace, mkItem(itemStr, "lute"), tEOF}},
+	{"simple9", "> lute", []item{mkItem(itemGreater, ">"), tSpace, mkItem(itemStr, "lute"), tEOF}},
+	{"simple8", "*lute*", []item{tAsterisk, mkItem(itemStr, "lute"), tAsterisk, tEOF}},
+	{"simple7", "`lute`", []item{tBacktick, mkItem(itemStr, "lute"), tBacktick, tEOF}},
+	{"simple6", "\tlute", []item{tTab, mkItem(itemStr, "lute"), tEOF}},
+	{"simple5", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
+	{"simple4", "1\n\n2", []item{mkItem(itemStr, "1"), tNewLine, tNewLine, mkItem(itemStr, "2"), tEOF}},
+	{"simple3", "\n\n", []item{tNewLine, tNewLine, tEOF}},
+	{"simple2", " \n", []item{tSpace, tNewLine, tEOF}},
+	{"simple1", " ", []item{tSpace, tEOF}},
+	{"simple0", "", []item{tEOF}},
 }
 
 func TestLex(t *testing.T) {
