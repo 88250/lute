@@ -228,15 +228,10 @@ func (t *Tree) parseListItem() *ListItem {
 
 	indentSpaces := t.context.IndentSpaces
 	ret := newListItem(indentSpaces, t, token)
-	paragraphs := 0
 	for {
 		c := t.parseBlock()
 		if nil == c {
 			continue
-		}
-
-		if NodeParagraph == c.Type() || NodeCode == c.Type() {
-			paragraphs++
 		}
 
 		if itemEOF == t.peek().typ {
@@ -265,7 +260,10 @@ func (t *Tree) parseListItem() *ListItem {
 		if itemHyphen == firstNonWhitespace.typ {
 			t.backups(tokens)
 		}
+	}
 
+	if 1 >= len(ret.Subnodes) {
+		ret.Tight = false
 	}
 
 	return ret
