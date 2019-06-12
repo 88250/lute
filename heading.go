@@ -63,16 +63,12 @@ func (t *Tree) parseHeading() Node {
 			break
 		}
 
+		if itemNewline == token.typ {
+			break
+		}
+
 		ret.RawText += RawText(token.val)
 		ret.items = append(ret.items, token)
-		if itemNewline == token.typ {
-			t.next()
-			if token = t.peek(); itemNewline == token.typ || itemEOF == token.typ {
-				t.next()
-				break
-			}
-			t.backup()
-		}
 	}
 
 	return ret

@@ -24,7 +24,7 @@ func (t *Tree) parseChildren(children Children) {
 	for _, c := range children {
 		cType := c.Type()
 		switch cType {
-		case NodeCode, NodeInlineCode:
+		case NodeCode, NodeInlineCode, NodeThematicBreak:
 			continue
 		}
 
