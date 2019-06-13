@@ -4,7 +4,7 @@
 
 ## 简介
 
-[Lute](https://github.com/b3log/lute) 是一款结构化的 Markdown 处理引擎，具备语法报错、格式化等功能。
+[Lute](https://github.com/b3log/lute) 是一款结构化的 Markdown 处理引擎，完整实现了最新的 [CommonMark 规范](https://spec.commonmark.org)，对中文语境支持更好，并具备语法检查、格式化等功能。
 
 ## 背景
 
@@ -27,7 +27,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎。所谓的“结构�
 
 ## 特性
 
-* 完整实现最新版 [CommonMark 规范](https://spec.commonmark.org)
+* 完整实现最新版 CommonMark 规范
 * 更好地支持中文语境
 * 自动格式化、Lint 
 * 可扩展语法树节点类型以实现自定义输出
