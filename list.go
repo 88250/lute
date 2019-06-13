@@ -97,8 +97,11 @@ func (t *Tree) parseList(line line) Node {
 	}
 	list := newList(indentSpaces, marker.val, wnSpaces, t, marker)
 	tight := false
+	oldContextIndentSpaces := t.context.IndentSpaces
+	t.context.IndentSpaces = indentSpaces + wnSpaces
+	defer func() { t.context.IndentSpaces = oldContextIndentSpaces }()
+
 	for {
-		t.context.IndentSpaces = indentSpaces + wnSpaces
 		c := t.parseListItem(line)
 		if nil == c {
 			break
@@ -122,7 +125,7 @@ func (t *Tree) parseList(line line) Node {
 		}
 
 		line = t.skipWhitespaces(line)
-		if marker != line[0]{
+		if marker != line[0] {
 			// TODO: 考虑有序列表序号递增
 			break
 		}

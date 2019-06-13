@@ -59,8 +59,7 @@ func (t *Tree) parseBlockquote(line line) Node {
 	indentSpaces := t.context.IndentSpaces + 2
 
 	ret := newBlockquote(t, token)
-	_, _, tokens, _ := t.nonWhitespace(line[1:])
-	line = indentOffset(tokens, indentSpaces, t)
+	line = indentOffset(line[1:], indentSpaces, t)
 	for {
 		c := t.parseBlock(line)
 		if nil == c {

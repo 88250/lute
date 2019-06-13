@@ -102,20 +102,23 @@ func (t *Tree) parseListItem(line line) *ListItem {
 			break
 		}
 
-		spaces, tabs, tokens, _ := t.nonWhitespace(line)
+		spaces, tabs, _, _ := t.nonWhitespace(line)
 
 		totalSpaces := spaces + tabs*4
-		if totalSpaces > indentSpaces {
-			if 4 == totalSpaces && 2 != indentSpaces { // 对齐列表优先级高于缩进代码块
-				break
-			}
-		}
+		// TODO: 似乎没有用
+		//if totalSpaces > indentSpaces {
+		//	if 4 == totalSpaces && 2 != indentSpaces { // 对齐列表优先级高于缩进代码块
+		//		break
+		//	}
+		//}
 
 		if totalSpaces < indentSpaces {
+			t.backupLine(line)
+
 			break
 		}
 
-		line = indentOffset(tokens, indentSpaces, t)
+		line = indentOffset(line, indentSpaces, t)
 	}
 
 	if 1 < len(ret.Subnodes) && blankLineBetweenBlocks {

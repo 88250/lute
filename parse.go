@@ -147,7 +147,7 @@ func indentOffset(tokens line, indentSpaces int, t *Tree) (ret line) {
 			compSpaces++
 		} else if itemTab == typ {
 			compSpaces += 4
-		} else if itemNewline != typ {
+		} else {
 			nonWhitespaces = append(nonWhitespaces, tokens[i])
 		}
 	}
