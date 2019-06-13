@@ -92,13 +92,12 @@ func (n *Paragraph) trim() {
 	n.RawText = RawText(strings.TrimSpace(string(n.RawText)))
 }
 
-func (t *Tree) parseParagraph() Node {
-	token := t.peek()
-	ret := &Paragraph{NodeParagraph, token.pos, "", items{}, t, Children{}, "<p>", "</p>"}
+func (t *Tree) parseParagraph(line []item) Node {
+	token := line[0]
+	ret := &Paragraph{NodeParagraph, token.pos, "", line, t, Children{}, "<p>", "</p>"}
 
-	for {
-		token = t.nextToken()
-		ret.items = append(ret.items, token)
+	for i:=0;i<len(line);i++{
+		token = line[i]
 		if itemEOF == token.typ {
 			break
 		}
@@ -106,7 +105,6 @@ func (t *Tree) parseParagraph() Node {
 
 		if itemNewline == token.typ {
 			// 判断是否为段落延续文本
-
 			line := t.nextLineEnding()
 			if t.interruptParagrah(line) {
 				t.backups(line)

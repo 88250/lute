@@ -39,9 +39,9 @@ func (n *ThematicBreak) Children() Children {
 	return nil
 }
 
-func (t *Tree) parseThematicBreak() (ret Node) {
-	token := t.nextToken()
-	ret = &ThematicBreak{NodeThematicBreak, token.pos, "", items{}}
+func (t *Tree) parseThematicBreak(line []item) (ret Node) {
+	token := line[0]
+	ret = &ThematicBreak{NodeThematicBreak, token.pos, "", line}
 
 	return
 }

@@ -86,6 +86,35 @@ func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhi
 	}
 }
 
+func (t *Tree) nonWhitespace(line []item) (spaces, tabs int, tokens []item, firstNonWhitespace item) {
+	for i := 0; i < len(line); i++ {
+		token := line[0]
+		tokens = append(tokens, token)
+		switch token.typ {
+		case itemTab:
+			tabs++
+		case itemSpace:
+			spaces++
+		case itemNewline:
+		default:
+			firstNonWhitespace = token
+			return
+		}
+	}
+
+	return
+}
+
+func (t *Tree) skipWhitespace(line [] item) (tokens []item) {
+	for _, token := range line{
+		if !token.isWhitespace() {
+			tokens = append(tokens, token)
+		}
+	}
+
+	return
+}
+
 func (t *Tree) firstNonSpace(line []item) (index int, token item) {
 	for index, token = range line {
 		if itemSpace != token.typ {

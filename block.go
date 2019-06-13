@@ -27,22 +27,21 @@ func (t *Tree) parseBlocks() {
 func (t *Tree) parseBlock() (ret Node) {
 	curNode := t.context.CurNode
 	line := t.nextLineEnding()
-	t.backups(line)
 
 	if t.isThematicBreak(line) {
-		ret = t.parseThematicBreak()
+		ret = t.parseThematicBreak(line)
 	} else if t.isList(line) {
-		ret = t.parseList()
+		ret = t.parseList(line)
 	} else if t.isATXHeading(line) {
-		ret = t.parseHeading()
+		ret = t.parseHeading(line)
 	} else if t.isBlockquote(line) {
-		ret = t.parseBlockquote()
+		ret = t.parseBlockquote(line)
 	} else if t.isIndentCode(line) {
-		ret = t.parseIndentCode()
+		ret = t.parseIndentCode(line)
 	} else if t.isBlankLine(line) {
 		return
 	} else {
-		ret = t.parseParagraph()
+		ret = t.parseParagraph(line)
 	}
 
 	curNode.Append(ret)

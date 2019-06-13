@@ -47,22 +47,19 @@ func (n *Heading) Children() Children {
 	return n.Subnodes
 }
 
-func (t *Tree) parseHeading() Node {
-	token := t.nextToken()
+func (t *Tree) parseHeading(line []item) Node {
+	marker := line[0]
 
 	ret := &Heading{
-		NodeHeading, token.pos, "", items{}, t, Children{},
-		len(token.val),
+		NodeHeading, marker.pos, "", items{}, t, Children{},
+		len(marker.val),
 	}
 
-	t.nextNonWhitespace()
-	t.backup()
-	for {
-		token = t.nextToken()
+	tokens := t.skipWhitespace(line[0:])
+	for _, token := range tokens {
 		if itemEOF == token.typ {
 			break
 		}
-
 		if itemNewline == token.typ {
 			break
 		}

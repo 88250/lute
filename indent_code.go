@@ -16,8 +16,8 @@
 
 package lute
 
-func (t *Tree) parseIndentCode() Node {
-	ret := &Code{NodeCode, 0, "", items{}, t, "", "", ""}
+func (t *Tree) parseIndentCode(line []item) Node {
+	ret := &Code{NodeCode, 0, "", line, t, "", "", ""}
 	var code string
 Loop:
 	for {

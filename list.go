@@ -82,11 +82,11 @@ func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token item)
 	return ret
 }
 
-func (t *Tree) parseList() Node {
-	spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
+func (t *Tree) parseList(line []item) Node {
+	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	marker := firstNonWhitespace
 	indentSpaces := spaces + tabs*4
-	spaces, tabs, tokens, firstNonWhitespace = t.nextNonWhitespace()
+	spaces, tabs, tokens, firstNonWhitespace = t.nonWhitespace(line[len(tokens):])
 	w := len(marker.val)
 	n := spaces + tabs*4
 	wnSpaces := w + n
