@@ -19,14 +19,14 @@ package lute
 func (t *Tree) parseBlocks() {
 	curNode := t.context.CurNode
 	for token := t.peek(); itemEOF != token.typ; token = t.peek() {
-		t.parseBlock()
+		line := t.nextLineEnding()
+		t.parseBlock(line)
 		t.context.CurNode = curNode
 	}
 }
 
-func (t *Tree) parseBlock() (ret Node) {
+func (t *Tree) parseBlock(line []item) (ret Node) {
 	curNode := t.context.CurNode
-	line := t.nextLineEnding()
 
 	if t.isThematicBreak(line) {
 		ret = t.parseThematicBreak(line)

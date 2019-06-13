@@ -88,7 +88,7 @@ func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhi
 
 func (t *Tree) nonWhitespace(line []item) (spaces, tabs int, tokens []item, firstNonWhitespace item) {
 	for i := 0; i < len(line); i++ {
-		token := line[0]
+		token := line[i]
 		tokens = append(tokens, token)
 		switch token.typ {
 		case itemTab:
@@ -105,8 +105,8 @@ func (t *Tree) nonWhitespace(line []item) (spaces, tabs int, tokens []item, firs
 	return
 }
 
-func (t *Tree) skipWhitespace(line [] item) (tokens []item) {
-	for _, token := range line{
+func (t *Tree) skipWhitespace(line []item) (tokens []item) {
+	for _, token := range line {
 		if !token.isWhitespace() {
 			tokens = append(tokens, token)
 		}
@@ -261,6 +261,10 @@ func indentOffset(tokens []item, indentSpaces int, t *Tree) {
 	}
 
 	remains := compSpaces - indentSpaces
+	if 0 >= remains {
+		return
+	}
+
 	for j := 0; j < remains/4; j++ {
 		restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
 	}

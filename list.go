@@ -99,7 +99,7 @@ func (t *Tree) parseList(line []item) Node {
 	loose := false
 	for {
 		t.context.IndentSpaces = indentSpaces + wnSpaces
-		c := t.parseListItem()
+		c := t.parseListItem(line)
 		if nil == c {
 			break
 		}

@@ -82,7 +82,7 @@ func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 	return ret
 }
 
-func (t *Tree) parseListItem() *ListItem {
+func (t *Tree) parseListItem(line []item) *ListItem {
 	token := t.peek()
 	if itemEOF == token.typ {
 		return nil
@@ -91,7 +91,7 @@ func (t *Tree) parseListItem() *ListItem {
 	indentSpaces := t.context.IndentSpaces
 	ret := newListItem(indentSpaces, t, token)
 	for {
-		c := t.parseBlock()
+		c := t.parseBlock(line)
 		if nil == c {
 			continue
 		}

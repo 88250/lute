@@ -55,7 +55,7 @@ func (t *Tree) parseHeading(line []item) Node {
 		len(marker.val),
 	}
 
-	tokens := t.skipWhitespace(line[0:])
+	tokens := t.skipWhitespace(line[1:])
 	for _, token := range tokens {
 		if itemEOF == token.typ {
 			break
