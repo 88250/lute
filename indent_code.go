@@ -35,18 +35,16 @@ Loop:
 			}
 		}
 
-		token := line[0]
-		for i := 0; itemBacktick != token.typ && itemEOF != token.typ; i++ {
+		for i := 0; i < len(line); i++ {
 			token := line[i]
 			code += token.val
 			if itemNewline == token.typ {
-				line = t.nextLineEnding()
-				spaces, tabs, tokens, _ := t.nonWhitespace(line)
+				line = t.nextLine()
+				spaces, tabs, _, _ := t.nonWhitespace(line)
 				if 1 > tabs && 4 > spaces {
-					t.backup()
+					t.backupLine(line)
 					break Loop
 				} else {
-					t.backups(tokens)
 					continue Loop
 				}
 			}

@@ -39,6 +39,7 @@ func sanitize(text string) (ret string) {
 
 // Context use to store common data in parsing.
 type Context struct {
+	CurLine      line
 	CurNode      Node
 	IndentSpaces int
 }
@@ -49,41 +50,12 @@ type Tree struct {
 	name      string
 	text      string
 	lex       *lexer
-	token     [64]item
 	peekCount int
 	context   *Context
 }
 
 func (t *Tree) HTML() string {
 	return t.Root.HTML()
-}
-
-// nextToken returns the next token.
-func (t *Tree) nextToken() item {
-	if t.peekCount > 0 {
-		t.peekCount--
-	} else {
-		t.token[0] = t.lex.nextItem()
-	}
-
-	return t.token[t.peekCount]
-}
-
-func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhitespace item) {
-	for {
-		token := t.nextToken()
-		tokens = append(tokens, token)
-		switch token.typ {
-		case itemTab:
-			tabs++
-		case itemSpace:
-			spaces++
-		case itemNewline:
-		default:
-			firstNonWhitespace = token
-			return
-		}
-	}
 }
 
 func (t *Tree) nonWhitespace(line []item) (spaces, tabs int, tokens []item, firstNonWhitespace item) {
@@ -126,7 +98,11 @@ func (t *Tree) firstNonSpace(line []item) (index int, token item) {
 }
 
 // https://spec.commonmark.org/0.29/#blank-line
-func (t *Tree) isBlankLine(line []item) bool {
+func (t *Tree) isBlankLine(line line) bool {
+	if line.isEOF() {
+		return true
+	}
+
 	for _, token := range line {
 		typ := token.typ
 		if itemSpace != typ && itemTab != typ && itemNewline != typ {
@@ -147,40 +123,62 @@ func (t *Tree) removeSpaces(line []item) (tokens []item) {
 	return
 }
 
-func (t *Tree) nextLineEnding() (tokens []item) {
+func indentOffset(tokens []item, indentSpaces int, t *Tree) (ret []item) {
+	var nonWhitespaces []item
+	compSpaces := 0
+	i := 0
+	for ; i < len(tokens); i++ {
+		typ := tokens[i].typ
+		if itemSpace == typ {
+			compSpaces++
+		} else if itemTab == typ {
+			compSpaces += 4
+		} else if itemNewline != typ {
+			nonWhitespaces = append(nonWhitespaces, tokens[i])
+		}
+	}
+
+	remains := compSpaces - indentSpaces
+	if 0 >= remains {
+		return tokens
+	}
+
+	for j := 0; j < remains/4; j++ {
+		ret = append(ret, item{itemTab, 0, "\t", 0})
+	}
+	for j := 0; j < remains%4; j++ {
+		ret = append(ret, item{itemSpace, 0, " ", 0})
+	}
+	ret = append(ret, nonWhitespaces...)
+
+	return
+}
+
+type line []item
+
+func (line *line) isEOF() bool {
+	return 1 == len(*line) && (*line)[0].isEOF()
+}
+
+func (t *Tree) nextLine() (line line) {
+	if nil != t.context.CurLine {
+		line = t.context.CurLine
+		t.context.CurLine = nil
+
+		return
+	}
+
 	for {
-		token := t.nextToken()
-		tokens = append(tokens, token)
+		token := t.lex.nextItem()
+		line = append(line, token)
 		if token.isLineEnding() || token.isEOF() {
 			return
 		}
 	}
 }
 
-// peek returns but does not consume the next token.
-func (t *Tree) peek() item {
-	if t.peekCount > 0 {
-		return t.token[t.peekCount-1]
-	}
-
-	t.peekCount = 1
-	t.token[0] = t.lex.nextItem()
-
-	return t.token[0]
-}
-
-// backup backs the input stream up one token.
-func (t *Tree) backup() {
-	t.peekCount++
-}
-
-func (t *Tree) backups(tokens []item) {
-	i := 0
-	l := len(tokens)
-	for ; i < l; i++ {
-		t.token[l-1-i] = tokens[i] // push back
-	}
-	t.peekCount = i
+func (t *Tree) backupLine(line []item) {
+	t.context.CurLine = line
 }
 
 // Parsing.
@@ -204,105 +202,4 @@ func (t *Tree) parse() (err error) {
 	t.lex = nil
 
 	return nil
-}
-
-func (t *Tree) parseListContent() Node {
-
-	return nil
-}
-
-func (t *Tree) parseTableContent() Node {
-
-	return nil
-}
-
-func (t *Tree) parseRowContent() Node {
-
-	return nil
-}
-
-func (t *Tree) parsePhrasingContent() (ret Node) {
-	return
-}
-
-func (t *Tree) parseDelete() (ret Node) {
-	t.nextToken() // consume open ~~
-	token := t.peek()
-	ret = &Delete{NodeDelete, token.pos, "", items{}, t, Children{t.parsePhrasingContent()}}
-	t.nextToken() // consume close ~~
-
-	return
-}
-
-func (t *Tree) parseHTML() (ret Node) {
-	return nil
-}
-
-func (t *Tree) parseBreak() (ret Node) {
-	token := t.nextToken()
-	ret = &Break{NodeBreak, token.pos, "", items{}, t}
-
-	return
-}
-
-func indentOffset(tokens []item, indentSpaces int, t *Tree) {
-	var restoreTokens, nonWhitespaces []item
-	compSpaces := 0
-	i := 0
-	for ; i < len(tokens); i++ {
-		typ := tokens[i].typ
-		if itemSpace == typ {
-			compSpaces++
-		} else if itemTab == typ {
-			compSpaces += 4
-		} else if itemNewline != typ {
-			nonWhitespaces = append(nonWhitespaces, tokens[i])
-		}
-	}
-
-	remains := compSpaces - indentSpaces
-	if 0 >= remains {
-		return
-	}
-
-	for j := 0; j < remains/4; j++ {
-		restoreTokens = append(restoreTokens, item{itemTab, 0, "\t", 0})
-	}
-	for j := 0; j < remains%4; j++ {
-		restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
-	}
-	restoreTokens = append(restoreTokens, nonWhitespaces...)
-	t.backups(restoreTokens)
-}
-
-type stack struct {
-	items []interface{}
-	count int
-}
-
-func (s *stack) push(e interface{}) {
-	s.items = append(s.items[:s.count], e)
-	s.count++
-}
-
-func (s *stack) pop() interface{} {
-	if s.count == 0 {
-		return nil
-	}
-
-	s.count--
-
-	return s.items[s.count]
-}
-
-func (s *stack) peek() interface{} {
-	if s.count == 0 {
-		return nil
-	}
-
-	return s.items[s.count-1]
-}
-
-func (s *stack) isEmpty() bool {
-	return 0 == len(s.items)
 }

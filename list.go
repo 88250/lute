@@ -82,7 +82,7 @@ func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token item)
 	return ret
 }
 
-func (t *Tree) parseList(line []item) Node {
+func (t *Tree) parseList(line line) Node {
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	marker := firstNonWhitespace
 	indentSpaces := spaces + tabs*4
@@ -96,7 +96,7 @@ func (t *Tree) parseList(line []item) Node {
 		indentOffset(tokens, indentSpaces+wnSpaces, t)
 	}
 	list := newList(indentSpaces, marker.val, wnSpaces, t, marker)
-	loose := false
+	tight := false
 	for {
 		t.context.IndentSpaces = indentSpaces + wnSpaces
 		c := t.parseListItem(line)
@@ -106,28 +106,29 @@ func (t *Tree) parseList(line []item) Node {
 		list.Append(c)
 
 		if c.Tight {
-			loose = true
+			tight = true
 		}
 
-		token := t.peek()
-		if itemNewline == token.typ {
-			spaces, tabs, tokens, _ := t.nextNonWhitespace()
-			indentSpaces := spaces + tabs*4
-			if indentSpaces < t.context.IndentSpaces {
-				t.backups(tokens)
-				break
-			}
-
-			t.nextToken()
-			continue
+		line = t.nextLine()
+		if line.isEOF() {
+			break
 		}
-		if marker != token {
+
+		spaces, tabs, _, _ := t.nonWhitespace(line)
+		indentSpaces := spaces + tabs*4
+		if indentSpaces < t.context.IndentSpaces {
+			t.backupLine(line)
+			break
+		}
+
+		line = t.skipWhitespace(line)
+		if marker != line[0]{
 			// TODO: 考虑有序列表序号递增
 			break
 		}
 	}
 
-	list.Tight = loose
+	list.Tight = tight
 
 	return list
 }

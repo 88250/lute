@@ -127,10 +127,6 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node, remains items) {
 	ret = &InlineCode{NodeInlineCode, pos, "", items{}, t, code}
 	remains = tokens[i+1:]
 
-	if itemEOF == t.peek().typ {
-		return
-	}
-
 	return
 }
 
@@ -146,10 +142,6 @@ func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
 
 	ret = &Code{NodeCode, pos, "", items{}, t, code, "", ""}
 	remains = tokens[i+1:]
-
-	if itemEOF == t.peek().typ {
-		return
-	}
 
 	return
 }

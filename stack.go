@@ -16,39 +16,34 @@
 
 package lute
 
-func (t *Tree) parseBlocks() {
-	curNode := t.context.CurNode
-	for line := t.nextLine(); ; {
-		t.parseBlock(line)
-		t.context.CurNode = curNode
-
-		line = t.nextLine()
-		if line.isEOF() {
-			break
-		}
-	}
+type stack struct {
+	items []interface{}
+	count int
 }
 
-func (t *Tree) parseBlock(line []item) (ret Node) {
-	curNode := t.context.CurNode
+func (s *stack) push(e interface{}) {
+	s.items = append(s.items[:s.count], e)
+	s.count++
+}
 
-	if t.isThematicBreak(line) {
-		ret = t.parseThematicBreak(line)
-	} else if t.isList(line) {
-		ret = t.parseList(line)
-	} else if t.isATXHeading(line) {
-		ret = t.parseHeading(line)
-	} else if t.isBlockquote(line) {
-		ret = t.parseBlockquote(line)
-	} else if t.isIndentCode(line) {
-		ret = t.parseIndentCode(line)
-	} else if t.isBlankLine(line) {
-		return
-	} else {
-		ret = t.parseParagraph(line)
+func (s *stack) pop() interface{} {
+	if s.count == 0 {
+		return nil
 	}
 
-	curNode.Append(ret)
+	s.count--
 
-	return
+	return s.items[s.count]
+}
+
+func (s *stack) peek() interface{} {
+	if s.count == 0 {
+		return nil
+	}
+
+	return s.items[s.count-1]
+}
+
+func (s *stack) isEmpty() bool {
+	return 0 == len(s.items)
 }

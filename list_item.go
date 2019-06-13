@@ -82,30 +82,25 @@ func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 	return ret
 }
 
-func (t *Tree) parseListItem(line []item) *ListItem {
-	token := t.peek()
-	if itemEOF == token.typ {
-		return nil
-	}
-
+func (t *Tree) parseListItem(line line) *ListItem {
 	indentSpaces := t.context.IndentSpaces
-	ret := newListItem(indentSpaces, t, token)
+	ret := newListItem(indentSpaces, t, line[0])
 	for {
 		c := t.parseBlock(line)
 		if nil == c {
 			continue
 		}
 
-		if itemEOF == t.peek().typ {
+		line = t.nextLine()
+		if line.isEOF() {
 			break
 		}
 
-		spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
+		spaces, tabs, tokens, _ := t.nonWhitespace(line)
 		if itemNewline == tokens[0].typ {
 			ret.Tight = true
 		}
 
-		t.backups(tokens)
 		totalSpaces := spaces + tabs*4
 		if totalSpaces > indentSpaces {
 			if 4 == totalSpaces && 2 != indentSpaces { // 对齐列表优先级高于缩进代码块
@@ -118,10 +113,6 @@ func (t *Tree) parseListItem(line []item) *ListItem {
 		}
 
 		indentOffset(tokens, indentSpaces, t)
-
-		if itemHyphen == firstNonWhitespace.typ {
-			t.backups(tokens)
-		}
 	}
 
 	if 1 >= len(ret.Subnodes) {

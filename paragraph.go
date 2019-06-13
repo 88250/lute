@@ -66,25 +66,23 @@ func (n *Paragraph) trim() {
 
 	initialNoneWhitespace := 0
 	notBreak := true
-	for i := initialNoneWhitespace; i < size/2; i++ {
-		if itemNewline == n.items[i].typ {
+	for i := initialNoneWhitespace; i < size/2 && notBreak; i++ {
+		if n.items[i].isWhitespace() {
 			initialNoneWhitespace++
+			notBreak = true
+		} else {
 			notBreak = false
-		}
-		if notBreak {
-			break
 		}
 	}
 
 	finalNoneWhitespace := size
 	notBreak = true
-	for i := finalNoneWhitespace - 1; size/2 <= i; i-- {
-		if itemNewline == n.items[i].typ {
+	for i := finalNoneWhitespace - 1; size/2 <= i && notBreak; i-- {
+		if n.items[i].isWhitespace(){
 			finalNoneWhitespace--
+			notBreak = true
+		} else {
 			notBreak = false
-		}
-		if notBreak {
-			break
 		}
 	}
 
@@ -96,7 +94,7 @@ func (t *Tree) parseParagraph(line []item) Node {
 	token := line[0]
 	ret := &Paragraph{NodeParagraph, token.pos, "", line, t, Children{}, "<p>", "</p>"}
 
-	for i:=0;i<len(line);i++{
+	for i := 0; i < len(line); i++ {
 		token = line[i]
 		if itemEOF == token.typ {
 			break
@@ -105,9 +103,9 @@ func (t *Tree) parseParagraph(line []item) Node {
 
 		if itemNewline == token.typ {
 			// 判断是否为段落延续文本
-			line := t.nextLineEnding()
+			line := t.nextLine()
 			if t.interruptParagrah(line) {
-				t.backups(line)
+				t.backupLine(line)
 
 				break
 			}

@@ -54,34 +54,36 @@ func newBlockquote(t *Tree, token item) *Blockquote {
 	return ret
 }
 
-func (t *Tree) parseBlockquote(line []item) Node {
+func (t *Tree) parseBlockquote(line line) Node {
 	token := line[0]
 	indentSpaces := t.context.IndentSpaces + 2
 
 	ret := newBlockquote(t, token)
 	_, _, tokens, _ := t.nonWhitespace(line[1:])
-	indentOffset(tokens, indentSpaces, t)
+	line = indentOffset(tokens, indentSpaces, t)
 	for {
 		c := t.parseBlock(line)
 		if nil == c {
 			break
 		}
-		if itemEOF == t.peek().typ {
+
+		line = t.nextLine()
+		if line.isEOF() {
 			break
 		}
 
-		spaces, tabs, tokens, _ := t.nextNonWhitespace()
-
-		totalSpaces := spaces + tabs*4
-		if totalSpaces < indentSpaces {
-			t.backups(tokens)
-			break
-		} else if totalSpaces == indentSpaces {
-			t.backup()
-			continue
-		}
-
-		indentOffset(tokens, indentSpaces, t)
+		//spaces, tabs, tokens, _ := t.nonWhitespace(line)
+		//
+		//totalSpaces := spaces + tabs*4
+		//if totalSpaces < indentSpaces {
+		//	t.backups(tokens)
+		//	break
+		//} else if totalSpaces == indentSpaces {
+		//	t.backup()
+		//	continue
+		//}
+		//
+		//indentOffset(tokens, indentSpaces, t)
 	}
 
 	return ret
