@@ -91,9 +91,9 @@ func (t *Tree) parseList(line line) Node {
 	n := spaces + tabs*4
 	wnSpaces := w + n
 	if 4 <= n { // rule 2 in https://spec.commonmark.org/0.29/#list-items
-		indentOffset(tokens, w+1, t)
+		line = indentOffset(tokens, w+1, t)
 	} else {
-		indentOffset(tokens, indentSpaces+wnSpaces, t)
+		line = indentOffset(tokens, indentSpaces+wnSpaces, t)
 	}
 	list := newList(indentSpaces, marker.val, wnSpaces, t, marker)
 	tight := false

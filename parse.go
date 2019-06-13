@@ -160,6 +160,14 @@ func (line *line) isEOF() bool {
 	return 1 == len(*line) && (*line)[0].isEOF()
 }
 
+func (line *line) rawText() (ret RawText) {
+	for i:=0;i<len(*line);i++ {
+		ret += RawText((*line)[i].val)
+	}
+
+	return
+}
+
 func (t *Tree) nextLine() (line line) {
 	if nil != t.context.CurLine {
 		line = t.context.CurLine
