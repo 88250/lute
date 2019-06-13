@@ -17,27 +17,31 @@
 package lute
 
 func (t *Tree) parseIndentCode(line []item) Node {
-	ret := &Code{NodeCode, 0, "", line, t, "", "", ""}
+	ret := &Code{NodeCode, 0, "", nil, t, "", "", ""}
 	var code string
 Loop:
 	for {
-		for i := 0; i < 4; {
-			token := t.nextToken()
-			switch token.typ {
-			case itemSpace:
-				i++
-			case itemTab:
-				i += 4
-			default:
+		var spaces, tabs int
+		for i := 0; i < 4; i++ {
+			token := line[i]
+			if itemSpace == token.typ {
+				spaces++
+			} else if itemTab == token.typ {
+				tabs++
+			}
+			if 3 < spaces || 0 < tabs {
+				line = line[i+1:]
 				break
 			}
 		}
 
-		token := t.nextToken()
-		for ; itemBacktick != token.typ && itemEOF != token.typ; token = t.nextToken() {
+		token := line[0]
+		for i := 0; itemBacktick != token.typ && itemEOF != token.typ; i++ {
+			token := line[i]
 			code += token.val
 			if itemNewline == token.typ {
-				spaces, tabs, tokens, _ := t.nextNonWhitespace()
+				line = t.nextLineEnding()
+				spaces, tabs, tokens, _ := t.nonWhitespace(line)
 				if 1 > tabs && 4 > spaces {
 					t.backup()
 					break Loop

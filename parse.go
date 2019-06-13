@@ -245,30 +245,6 @@ func (t *Tree) parseBreak() (ret Node) {
 	return
 }
 
-func (t *Tree) expandSpaces() (offsetSpaces int) {
-	_, _, tokens, _ := t.nextNonWhitespace()
-
-	var restoreTokens, nonWhitespaces []item
-	i := 0
-	for ; i < len(tokens); i++ {
-		if itemSpace == tokens[i].typ {
-			offsetSpaces++
-		} else if itemTab == tokens[i].typ {
-			offsetSpaces += 4
-		} else {
-			nonWhitespaces = append(nonWhitespaces, tokens[i])
-		}
-	}
-
-	for i := 0; i < offsetSpaces; i++ {
-		restoreTokens = append(restoreTokens, item{itemSpace, 0, " ", 0})
-	}
-	restoreTokens = append(restoreTokens, nonWhitespaces...)
-	t.backups(restoreTokens)
-
-	return
-}
-
 func indentOffset(tokens []item, indentSpaces int, t *Tree) {
 	var restoreTokens, nonWhitespaces []item
 	compSpaces := 0

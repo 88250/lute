@@ -31,7 +31,7 @@ var parseTests = []parseTest{
 	//{"spec12", "- `one\n- two`\n", "<ul>\n<li>`one</li>\n<li>two`</li>\n</ul>\n"},
 	//{"spec11", "*\t*\t*\t\n", "<hr />\n"},
 	//{"spec10", "#\tFoo\n", "<h1>Foo</h1>\n"},
-	{"spec9", " - foo\n   - bar\n\t - baz\n", "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n"},
+	//{"spec9", " - foo\n   - bar\n\t - baz\n", "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n"},
 	//{"spec8", "    foo\n\tbar\n", "<pre><code>foo\nbar\n</code></pre>\n"},
 	//{"spec7", "-\t\tfoo\n", "<ul>\n<li>\n<pre><code>  foo\n</code></pre>\n</li>\n</ul>\n"},
 	//{"spec6", ">\t\tfoo\n", "<blockquote>\n<pre><code>  foo\n</code></pre>\n</blockquote>\n"},
@@ -52,10 +52,10 @@ var parseTests = []parseTest{
 	//{"simple6", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
 	//{"simple5", "l*u*te", "<p>l<em>u</em>te</p>\n"},
 	//{"simple4", "    lute\n", "<pre><code>lute\n</code></pre>\n"},
-	//{"simple3", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
-	//{"simple2", "l`u`te", "<p>l<code>u</code>te</p>\n"},
-	//{"simple1", "lute", "<p>lute</p>\n"},
-	//{"simple0", "", ""},
+	{"simple3", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
+	{"simple2", "l`u`te", "<p>l<code>u</code>te</p>\n"},
+	{"simple1", "lute", "<p>lute</p>\n"},
+	{"simple0", "", ""},
 }
 
 func TestParse(t *testing.T) {
