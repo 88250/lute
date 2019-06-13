@@ -86,6 +86,38 @@ func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhi
 	}
 }
 
+func (t *Tree) firstNonSpace(line []item) (index int, token item) {
+	for index, token = range line {
+		if itemSpace != token.typ {
+			return
+		}
+	}
+
+	return
+}
+
+// https://spec.commonmark.org/0.29/#blank-line
+func (t *Tree) isBlankLine(line []item) bool {
+	for _, token := range line {
+		typ := token.typ
+		if itemSpace != typ && itemTab != typ && itemNewline != typ {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (t *Tree) removeSpaces(line []item) (tokens []item) {
+	for _, token := range line {
+		if itemSpace != token.typ {
+			tokens = append(tokens, token)
+		}
+	}
+
+	return
+}
+
 func (t *Tree) nextLineEnding() (tokens []item) {
 	for {
 		token := t.nextToken()

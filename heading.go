@@ -73,3 +73,18 @@ func (t *Tree) parseHeading() Node {
 
 	return ret
 }
+
+// https://spec.commonmark.org/0.29/#atx-headings
+func (t *Tree) isATXHeading(line []item) bool {
+	if 2 > len(line) { // at least # and newline
+		return false
+	}
+
+	_, marker := t.firstNonSpace(line)
+	// TODO: # 后面还需要空格才能确认是否是列表
+	if "#" != marker.val {
+		return false
+	}
+
+	return true
+}

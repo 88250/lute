@@ -18,7 +18,6 @@ package lute
 
 import (
 	"fmt"
-	"strings"
 )
 
 type ListType int
@@ -83,108 +82,20 @@ func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token item)
 	return ret
 }
 
-type ListItem struct {
-	NodeType
-	int
-	RawText
-	items
-	t        *Tree
-	Parent   Node
-	Subnodes Children
-
-	Checked bool
-	Tight   bool
-
-	Spaces int
-}
-
-func (n *ListItem) String() string {
-	return fmt.Sprintf("%s", n.Subnodes)
-}
-
-func (n *ListItem) HTML() string {
-	var content string
-	for _, c := range n.Subnodes {
-		if !n.Tight && NodeParagraph == c.Type() {
-			p := c.(*Paragraph)
-			p.OpenTag, p.CloseTag = "", ""
-		}
-
-		content += c.HTML()
-	}
-
-	if strings.Contains(content, "<ul>") {
-		return fmt.Sprintf("<li>%s</li>\n", content)
-	}
-
-	if 1 < len(n.Subnodes) || strings.Contains(content, "<pre><code") {
-		return fmt.Sprintf("<li>\n%s</li>\n", content)
-	}
-
-	return fmt.Sprintf("<li>%s</li>\n", content)
-}
-
-func (n *ListItem) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *ListItem) Children() Children {
-	return n.Subnodes
-}
-
-func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
-	ret := &ListItem{
-		NodeListItem, token.pos, "", items{}, t, t.context.CurNode, Children{},
-		false,
-		false,
-		indentSpaces,
-	}
-	t.context.CurNode = ret
-
-	return ret
-}
-
 func (t *Tree) parseList() Node {
 	spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
-	marker := firstNonWhitespace.val
-	token := t.peek()
-	if !token.isWhitespace() {
-		t.backup()
-		return t.parseParagraph()
-	}
-
-	// Thematic breaks
-	var backupTokens []item
-	chars := 0
-	for {
-		token = t.nextToken()
-		backupTokens = append(backupTokens, token)
-		if itemNewline == token.typ || itemEOF == token.typ {
-			chars++
-			break
-		}
-		if token.val != marker && itemTab != token.typ && itemSpace != token.typ {
-			break
-		}
-		chars++
-	}
-	if chars == len(backupTokens) {
-		return t.parseThematicBreak()
-	}
-	t.backups(backupTokens)
-
+	marker := firstNonWhitespace
 	indentSpaces := spaces + tabs*4
 	spaces, tabs, tokens, firstNonWhitespace = t.nextNonWhitespace()
-	w := len(marker)
+	w := len(marker.val)
 	n := spaces + tabs*4
 	wnSpaces := w + n
-	t.backups(tokens)
 	if 4 <= n { // rule 2 in https://spec.commonmark.org/0.29/#list-items
-		indentOffset(tokens, w + 1, t)
+		indentOffset(tokens, w+1, t)
 	} else {
 		indentOffset(tokens, indentSpaces+wnSpaces, t)
 	}
-	list := newList(indentSpaces, marker, wnSpaces, t, token)
+	list := newList(indentSpaces, marker.val, wnSpaces, t, marker)
 	loose := false
 	for {
 		t.context.IndentSpaces = indentSpaces + wnSpaces
@@ -210,7 +121,8 @@ func (t *Tree) parseList() Node {
 			t.nextToken()
 			continue
 		}
-		if marker != token.val {
+		if marker != token {
+			// TODO: 考虑有序列表序号递增
 			break
 		}
 	}
@@ -220,51 +132,17 @@ func (t *Tree) parseList() Node {
 	return list
 }
 
-func (t *Tree) parseListItem() *ListItem {
-	token := t.peek()
-	if itemEOF == token.typ {
-		return nil
+// https://spec.commonmark.org/0.29/#lists
+func (t *Tree) isList(line []item) bool {
+	if 2 > len(line) { // at least marker and newline
+		return false
 	}
 
-	indentSpaces := t.context.IndentSpaces
-	ret := newListItem(indentSpaces, t, token)
-	for {
-		c := t.parseBlock()
-		if nil == c {
-			continue
-		}
-
-		if itemEOF == t.peek().typ {
-			break
-		}
-
-		spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
-		if itemNewline == tokens[0].typ{
-			ret.Tight = true
-		}
-
-		t.backups(tokens)
-		totalSpaces := spaces + tabs*4
-		if totalSpaces > indentSpaces {
-			if 4 == totalSpaces && 2 != indentSpaces{ // 对齐列表优先级高于缩进代码块
-				break
-			}
-		}
-
-		if totalSpaces < indentSpaces {
-			break
-		}
-
-		indentOffset(tokens, indentSpaces, t)
-
-		if itemHyphen == firstNonWhitespace.typ {
-			t.backups(tokens)
-		}
+	_, marker := t.firstNonSpace(line)
+	// TODO: marker 后面还需要空格才能确认是否是列表
+	if "*" != marker.val && "-" != marker.val && "+" != marker.val {
+		return false
 	}
 
-	if 1 >= len(ret.Subnodes) {
-		ret.Tight = false
-	}
-
-	return ret
+	return true
 }

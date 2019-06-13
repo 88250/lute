@@ -90,3 +90,17 @@ func (t *Tree) parseBlockquote() Node {
 
 	return ret
 }
+
+// https://spec.commonmark.org/0.29/#block-quotes
+func (t *Tree) isBlockquote(line []item) bool {
+	if 2 > len(line) { // at least > and newline
+		return false
+	}
+
+	_, marker := t.firstNonSpace(line)
+	if ">" != marker.val {
+		return false
+	}
+
+	return true
+}

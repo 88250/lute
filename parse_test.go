@@ -31,7 +31,7 @@ var parseTests = []parseTest{
 	//{"spec12", "- `one\n- two`\n", "<ul>\n<li>`one</li>\n<li>two`</li>\n</ul>\n"},
 	//{"spec11", "*\t*\t*\t\n", "<hr />\n"},
 	//{"spec10", "#\tFoo\n", "<h1>Foo</h1>\n"},
-	//{"spec9", " - foo\n   - bar\n\t - baz\n", "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n"},
+	{"spec9", " - foo\n   - bar\n\t - baz\n", "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n"},
 	//{"spec8", "    foo\n\tbar\n", "<pre><code>foo\nbar\n</code></pre>\n"},
 	//{"spec7", "-\t\tfoo\n", "<ul>\n<li>\n<pre><code>  foo\n</code></pre>\n</li>\n</ul>\n"},
 	//{"spec6", ">\t\tfoo\n", "<blockquote>\n<pre><code>  foo\n</code></pre>\n</blockquote>\n"},
@@ -44,7 +44,7 @@ var parseTests = []parseTest{
 
 	// some simple cases
 	//{"simple12", "`lu\nte`", "<p><code>lu te</code></p>\n"},
-	{"simple11", "p1\n\np2", "<p>p1</p>\n<p>p2</p>\n"},
+	//{"simple11", "p1\n\np2", "<p>p1</p>\n<p>p2</p>\n"},
 	//{"simple10", "p", "<p>p</p>\n"},
 	//{"simple9", "* lute", "<ul>\n<li>lute</li>\n</ul>\n"},
 	//{"simple8", "# lute", "<h1>lute</h1>\n"},

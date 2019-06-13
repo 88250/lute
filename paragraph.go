@@ -95,7 +95,7 @@ func (n *Paragraph) trim() {
 func (t *Tree) parseParagraph() Node {
 	token := t.peek()
 	ret := &Paragraph{NodeParagraph, token.pos, "", items{}, t, Children{}, "<p>", "</p>"}
-Loop:
+
 	for {
 		token = t.nextToken()
 		ret.items = append(ret.items, token)
@@ -113,25 +113,6 @@ Loop:
 
 				break
 			}
-
-			//indentSpaces := spaces + tabs*4
-			//if indentSpaces < t.context.IndentSpaces {
-			//	t.backups(tokens)
-			//	// TODO(D): 待确定是否还有用
-			//	break
-			//}
-			switch firstNonWhitespace.typ {
-			case itemEOF:
-				break Loop
-			case itemHyphen, itemAsterisk:
-				t.backups(tokens[1:])
-				break Loop
-			default:
-				t.backups(tokens)
-				continue
-			}
-		} else {
-			t.backups(tokens)
 		}
 	}
 
@@ -141,13 +122,23 @@ Loop:
 }
 
 func (t *Tree) interruptParagrah(line []item) bool {
-	typ := line[0].typ
-	if itemNewline == typ {
+	if t.isBlankLine(line) {
 		return true
 	}
 
-	if itemHyphen == typ || itemAsterisk == typ {
-		// TODO: marker 后面还需要空格才能确认是否是列表
+	/*
+	 * 专题分隔线 `***` 打断段落
+	 * ATX 标题 `# h` 打断段落，Setext 标题不打断，需要用空行分隔之前的内容
+	 * 围栏代码块 <code>```</code> 打断段落
+	 * 大部分 HTML 标签可打断段落，除了带属性的，比如 `<a `、`<img `
+	 * 块引用 `>` 打断段落
+	 * 第一个非空列表项打断段落（即新列表打断段落）
+	 */
+	if t.isThematicBreak(line) {
+		return true
+	}
+
+	if t.isList(line) {
 		return true
 	}
 

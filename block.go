@@ -26,37 +26,26 @@ func (t *Tree) parseBlocks() {
 
 func (t *Tree) parseBlock() (ret Node) {
 	curNode := t.context.CurNode
-	token := t.peek()
+	line := t.nextLineEnding()
+	t.backups(line)
 
-	switch token.typ {
-	case itemAsterisk, itemHyphen:
+	if t.isThematicBreak(line) {
+		ret = t.parseThematicBreak()
+	} else if t.isList(line) {
 		ret = t.parseList()
-	case itemCrosshatch:
+	} else if t.isATXHeading(line) {
 		ret = t.parseHeading()
-	case itemGreater:
+	} else if t.isBlockquote(line) {
 		ret = t.parseBlockquote()
-	case itemSpace, itemTab:
-		spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
-		if itemAsterisk == firstNonWhitespace.typ || itemHyphen == firstNonWhitespace.typ {
-			t.backups(tokens)
-			ret = t.parseList()
-		} else {
-			if 1 <= tabs || 4 <= spaces {
-				t.backups(tokens)
-				ret = t.parseIndentCode()
-			} else {
-				t.backup()
-				ret = t.parseParagraph()
-			}
-		}
-		curNode.Append(ret)
+	} else if t.isIndentCode(line) {
+		ret = t.parseIndentCode()
+	} else if t.isBlankLine(line) {
 		return
-	case itemNewline:
-		t.nextToken()
-		return
-	default:
+	} else {
 		ret = t.parseParagraph()
 	}
+
 	curNode.Append(ret)
+
 	return
 }

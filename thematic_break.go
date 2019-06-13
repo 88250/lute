@@ -45,3 +45,31 @@ func (t *Tree) parseThematicBreak() (ret Node) {
 
 	return
 }
+
+// A line consisting of 0-3 spaces of indentation, followed by a sequence of three or more matching -, _, or * characters, each followed optionally by any number of spaces or tabs, forms a thematic break.
+// https://spec.commonmark.org/0.29/#thematic-break
+func (t *Tree) isThematicBreak(line []item) bool {
+	if 3 > len(line) {
+		return false
+	}
+
+	tokens := t.removeSpaces(line)
+	length := len(tokens)
+	if 3 > length {
+		return false
+	}
+
+	marker := tokens[0]
+	if "-" != marker.val && "_" != marker.val && "*" != marker.val {
+		return false
+	}
+
+	for i := 1; i < length; i++ {
+		token := tokens[i]
+		if marker.typ != token.typ {
+			return false
+		}
+	}
+
+	return true
+}

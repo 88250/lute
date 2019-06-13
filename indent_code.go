@@ -16,9 +16,8 @@
 
 package lute
 
-
 func (t *Tree) parseIndentCode() Node {
-	ret := &Code{NodeCode, 0, "", items{},t, "", "", ""}
+	ret := &Code{NodeCode, 0, "", items{}, t, "", "", ""}
 	var code string
 Loop:
 	for {
@@ -55,4 +54,23 @@ Loop:
 	ret.RawText = RawText(code)
 
 	return ret
+}
+
+// https://spec.commonmark.org/0.29/#indented-code-blocks
+func (t *Tree) isIndentCode(line []item) bool {
+	var tabs, spaces int
+	for _, token := range line {
+		if itemSpace == token.typ {
+			spaces++
+			continue
+		}
+		if itemTab == token.typ {
+			tabs++
+			continue
+		}
+
+		break
+	}
+
+	return 0 < tabs || 3 < spaces
 }
