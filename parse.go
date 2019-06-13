@@ -58,7 +58,7 @@ func (t *Tree) HTML() string {
 	return t.Root.HTML()
 }
 
-func (t *Tree) nonWhitespace(line []item) (spaces, tabs int, tokens []item, firstNonWhitespace item) {
+func (t *Tree) nonWhitespace(line line) (spaces, tabs int, tokens line, firstNonWhitespace item) {
 	for i := 0; i < len(line); i++ {
 		token := line[i]
 		tokens = append(tokens, token)
@@ -77,7 +77,7 @@ func (t *Tree) nonWhitespace(line []item) (spaces, tabs int, tokens []item, firs
 	return
 }
 
-func (t *Tree) skipWhitespace(line []item) (tokens []item) {
+func (t *Tree) skipWhitespaces(line line) (tokens line) {
 	for _, token := range line {
 		if !token.isWhitespace() {
 			tokens = append(tokens, token)
@@ -87,7 +87,21 @@ func (t *Tree) skipWhitespace(line []item) (tokens []item) {
 	return
 }
 
-func (t *Tree) firstNonSpace(line []item) (index int, token item) {
+func (t *Tree) skipBlankLines() (count int) {
+	for {
+		line := t.nextLine()
+		if line.isEOF() {
+			return
+		}
+		if !t.isBlankLine(line) {
+			t.backupLine(line)
+			return
+		}
+		count++
+	}
+}
+
+func (t *Tree) firstNonSpace(line line) (index int, token item) {
 	for index, token = range line {
 		if itemSpace != token.typ {
 			return
@@ -113,7 +127,7 @@ func (t *Tree) isBlankLine(line line) bool {
 	return true
 }
 
-func (t *Tree) removeSpaces(line []item) (tokens []item) {
+func (t *Tree) removeSpaces(line line) (tokens line) {
 	for _, token := range line {
 		if itemSpace != token.typ {
 			tokens = append(tokens, token)
@@ -123,8 +137,8 @@ func (t *Tree) removeSpaces(line []item) (tokens []item) {
 	return
 }
 
-func indentOffset(tokens []item, indentSpaces int, t *Tree) (ret []item) {
-	var nonWhitespaces []item
+func indentOffset(tokens line, indentSpaces int, t *Tree) (ret line) {
+	var nonWhitespaces line
 	compSpaces := 0
 	i := 0
 	for ; i < len(tokens); i++ {
@@ -161,7 +175,7 @@ func (line *line) isEOF() bool {
 }
 
 func (line *line) rawText() (ret RawText) {
-	for i:=0;i<len(*line);i++ {
+	for i := 0; i < len(*line); i++ {
 		ret += RawText((*line)[i].val)
 	}
 
@@ -185,7 +199,7 @@ func (t *Tree) nextLine() (line line) {
 	}
 }
 
-func (t *Tree) backupLine(line []item) {
+func (t *Tree) backupLine(line line) {
 	t.context.CurLine = line
 }
 

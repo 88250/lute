@@ -43,7 +43,7 @@ func (n *ListItem) String() string {
 func (n *ListItem) HTML() string {
 	var content string
 	for _, c := range n.Subnodes {
-		if !n.Tight && NodeParagraph == c.Type() {
+		if n.Tight && NodeParagraph == c.Type() {
 			p := c.(*Paragraph)
 			p.OpenTag, p.CloseTag = "", ""
 		}
@@ -74,7 +74,7 @@ func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 	ret := &ListItem{
 		NodeListItem, token.pos, "", items{}, t, t.context.CurNode, Children{},
 		false,
-		false,
+		true,
 		indentSpaces,
 	}
 	t.context.CurNode = ret
@@ -85,10 +85,16 @@ func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 func (t *Tree) parseListItem(line line) *ListItem {
 	indentSpaces := t.context.IndentSpaces
 	ret := newListItem(indentSpaces, t, line[0])
+	blankLineBetweenBlocks := false
 	for {
 		c := t.parseBlock(line)
 		if nil == c {
 			continue
+		}
+
+		blankLines := t.skipBlankLines()
+		if 1 <= blankLines && !blankLineBetweenBlocks {
+			blankLineBetweenBlocks = true
 		}
 
 		line = t.nextLine()
@@ -97,9 +103,6 @@ func (t *Tree) parseListItem(line line) *ListItem {
 		}
 
 		spaces, tabs, tokens, _ := t.nonWhitespace(line)
-		if itemNewline == tokens[0].typ {
-			ret.Tight = true
-		}
 
 		totalSpaces := spaces + tabs*4
 		if totalSpaces > indentSpaces {
@@ -112,10 +115,10 @@ func (t *Tree) parseListItem(line line) *ListItem {
 			break
 		}
 
-		indentOffset(tokens, indentSpaces, t)
+		line = indentOffset(tokens, indentSpaces, t)
 	}
 
-	if 1 >= len(ret.Subnodes) {
+	if 1 < len(ret.Subnodes) && blankLineBetweenBlocks {
 		ret.Tight = false
 	}
 

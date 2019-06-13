@@ -60,19 +60,19 @@ Loop:
 
 // https://spec.commonmark.org/0.29/#indented-code-blocks
 func (t *Tree) isIndentCode(line []item) bool {
-	var tabs, spaces int
+	var spaces int
 	for _, token := range line {
 		if itemSpace == token.typ {
 			spaces++
 			continue
 		}
 		if itemTab == token.typ {
-			tabs++
+			spaces += 4
 			continue
 		}
 
 		break
 	}
 
-	return 0 < tabs || 3 < spaces
+	return t.context.IndentSpaces+3 < spaces
 }

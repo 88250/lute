@@ -96,6 +96,7 @@ func (t *Tree) parseParagraph(line line) Node {
 
 	for {
 		ret.items = append(ret.items, items(line)...)
+		ret.RawText += line.rawText()
 		line = t.nextLine()
 		if t.interruptParagrah(line) {
 			t.backupLine(line)
