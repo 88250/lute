@@ -107,7 +107,12 @@ Loop:
 		if itemNewline == token.typ {
 			// 判断是否为段落延续文本
 
-			_, _, tokens, firstNonWhitespace := t.nextNonWhitespace()
+			line := t.nextLineEnding()
+			if t.interruptParagrah(line) {
+				t.backups(line)
+
+				break
+			}
 
 			//indentSpaces := spaces + tabs*4
 			//if indentSpaces < t.context.IndentSpaces {
@@ -133,4 +138,18 @@ Loop:
 	ret.trim()
 
 	return ret
+}
+
+func (t *Tree) interruptParagrah(line []item) bool {
+	typ := line[0].typ
+	if itemNewline == typ {
+		return true
+	}
+
+	if itemHyphen == typ || itemAsterisk == typ {
+		// TODO: marker 后面还需要空格才能确认是否是列表
+		return true
+	}
+
+	return false
 }
