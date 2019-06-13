@@ -29,8 +29,6 @@ func (t *Tree) parseBlock() (ret Node) {
 	token := t.peek()
 
 	switch token.typ {
-	case itemStr:
-		ret = t.parseParagraph()
 	case itemAsterisk, itemHyphen:
 		ret = t.parseList()
 	case itemCrosshatch:
@@ -54,8 +52,10 @@ func (t *Tree) parseBlock() (ret Node) {
 		curNode.Append(ret)
 		return
 	case itemNewline:
-		t.next()
+		t.nextToken()
 		return
+	default:
+		ret = t.parseParagraph()
 	}
 	curNode.Append(ret)
 	return

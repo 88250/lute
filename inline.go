@@ -116,7 +116,11 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node, remains items) {
 	pos := token.pos
 	var code string
 	for ; itemBacktick != token.typ && itemEOF != token.typ; token = tokens[i] {
-		code += token.val
+		if itemNewline == token.typ {
+			code += " "
+		} else {
+			code += token.val
+		}
 		i++
 	}
 

@@ -41,9 +41,20 @@ func (i item) String() string {
 	return fmt.Sprintf("%q", i.val)
 }
 
-// https://github.github.com/gfm/#whitespace-character
+// A whitespace character is a space (U+0020), tab (U+0009), newline (U+000A), line tabulation (U+000B), form feed (U+000C), or carriage return (U+000D).
+// https://github.github.com/0.29/#whitespace-character
 func (i item) isWhitespace() bool {
 	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ // TODO(D): line tabulation (U+000B), form feed (U+000C), or carriage return (U+000D)
+}
+
+// A line ending is a newline (U+000A), a carriage return (U+000D) not followed by a newline, or a carriage return and a following newline.
+// https://spec.commonmark.org/0.29/#line-ending
+func (i item) isLineEnding() bool {
+	return itemNewline == i.typ
+}
+
+func (i item) isEOF() bool {
+	return itemEOF == i.typ
 }
 
 // itemType identifies the type of lex items.

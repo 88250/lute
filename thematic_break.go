@@ -40,7 +40,7 @@ func (n *ThematicBreak) Children() Children {
 }
 
 func (t *Tree) parseThematicBreak() (ret Node) {
-	token := t.next()
+	token := t.nextToken()
 	ret = &ThematicBreak{NodeThematicBreak, token.pos, "", items{}}
 
 	return

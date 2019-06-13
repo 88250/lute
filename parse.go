@@ -32,7 +32,7 @@ var nullRegexp = regexp.MustCompile("\u0000")
 
 func sanitize(text string) (ret string) {
 	ret = newlinesRegexp.ReplaceAllString(text, "\n")
-	nullRegexp.ReplaceAllString(ret, "\uFFFD") // https://github.github.com/gfm/#insecure-characters
+	nullRegexp.ReplaceAllString(ret, "\uFFFD") // https://github.github.com/0.29/#insecure-characters
 
 	return
 }
@@ -58,8 +58,8 @@ func (t *Tree) HTML() string {
 	return t.Root.HTML()
 }
 
-// next returns the next token.
-func (t *Tree) next() item {
+// nextToken returns the next token.
+func (t *Tree) nextToken() item {
 	if t.peekCount > 0 {
 		t.peekCount--
 	} else {
@@ -69,18 +69,31 @@ func (t *Tree) next() item {
 	return t.token[t.peekCount]
 }
 
-// backup backs the input stream up one token.
-func (t *Tree) backup() {
-	t.peekCount++
+func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhitespace item) {
+	for {
+		token := t.nextToken()
+		tokens = append(tokens, token)
+		switch token.typ {
+		case itemTab:
+			tabs++
+		case itemSpace:
+			spaces++
+		case itemNewline:
+		default:
+			firstNonWhitespace = token
+			return
+		}
+	}
 }
 
-func (t *Tree) backups(tokens []item) {
-	i := 0
-	l := len(tokens)
-	for ; i < l; i++ {
-		t.token[l-1-i] = tokens[i] // push back
+func (t *Tree) nextLineEnding() (tokens []item) {
+	for {
+		token := t.nextToken()
+		tokens = append(tokens, token)
+		if token.isLineEnding() || token.isEOF() {
+			return
+		}
 	}
-	t.peekCount = i
 }
 
 // peek returns but does not consume the next token.
@@ -95,21 +108,18 @@ func (t *Tree) peek() item {
 	return t.token[0]
 }
 
-func (t *Tree) nextNonWhitespace() (spaces, tabs int, tokens []item, firstNonWhitespace item) {
-	for {
-		token := t.next()
-		tokens = append(tokens, token)
-		switch token.typ {
-		case itemTab:
-			tabs++
-		case itemSpace:
-			spaces++
-		case itemNewline:
-		default:
-			firstNonWhitespace = token
-			return
-		}
+// backup backs the input stream up one token.
+func (t *Tree) backup() {
+	t.peekCount++
+}
+
+func (t *Tree) backups(tokens []item) {
+	i := 0
+	l := len(tokens)
+	for ; i < l; i++ {
+		t.token[l-1-i] = tokens[i] // push back
 	}
+	t.peekCount = i
 }
 
 // Parsing.
@@ -155,10 +165,10 @@ func (t *Tree) parsePhrasingContent() (ret Node) {
 }
 
 func (t *Tree) parseDelete() (ret Node) {
-	t.next() // consume open ~~
+	t.nextToken() // consume open ~~
 	token := t.peek()
 	ret = &Delete{NodeDelete, token.pos, "", items{}, t, Children{t.parsePhrasingContent()}}
-	t.next() // consume close ~~
+	t.nextToken() // consume close ~~
 
 	return
 }
@@ -168,7 +178,7 @@ func (t *Tree) parseHTML() (ret Node) {
 }
 
 func (t *Tree) parseBreak() (ret Node) {
-	token := t.next()
+	token := t.nextToken()
 	ret = &Break{NodeBreak, token.pos, "", items{}, t}
 
 	return

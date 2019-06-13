@@ -48,7 +48,7 @@ func (n *Heading) Children() Children {
 }
 
 func (t *Tree) parseHeading() Node {
-	token := t.next()
+	token := t.nextToken()
 
 	ret := &Heading{
 		NodeHeading, token.pos, "", items{}, t, Children{},
@@ -58,7 +58,7 @@ func (t *Tree) parseHeading() Node {
 	t.nextNonWhitespace()
 	t.backup()
 	for {
-		token = t.next()
+		token = t.nextToken()
 		if itemEOF == token.typ {
 			break
 		}

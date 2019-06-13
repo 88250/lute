@@ -43,19 +43,19 @@ var parseTests = []parseTest{
 	//{"spce1", "\tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
 
 	// some simple cases
-	{"simple12", "`lu\nte`", "<p><code>lu te</code></p>"},
+	//{"simple12", "`lu\nte`", "<p><code>lu te</code></p>\n"},
 	{"simple11", "p1\n\np2", "<p>p1</p>\n<p>p2</p>\n"},
-	{"simple10", "p", "<p>p</p>\n"},
-	{"simple9", "* lute", "<ul>\n<li>lute</li>\n</ul>\n"},
-	{"simple8", "# lute", "<h1>lute</h1>\n"},
-	{"simple7", "> lute", "<blockquote>\n<p>lute</p>\n</blockquote>\n"},
-	{"simple6", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
-	{"simple5", "l*u*te", "<p>l<em>u</em>te</p>\n"},
-	{"simple4", "    lute\n", "<pre><code>lute\n</code></pre>\n"},
-	{"simple3", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
-	{"simple2", "l`u`te", "<p>l<code>u</code>te</p>\n"},
-	{"simple1", "lute", "<p>lute</p>\n"},
-	{"simple0", "", ""},
+	//{"simple10", "p", "<p>p</p>\n"},
+	//{"simple9", "* lute", "<ul>\n<li>lute</li>\n</ul>\n"},
+	//{"simple8", "# lute", "<h1>lute</h1>\n"},
+	//{"simple7", "> lute", "<blockquote>\n<p>lute</p>\n</blockquote>\n"},
+	//{"simple6", "l**u**te", "<p>l<strong>u</strong>te</p>\n"},
+	//{"simple5", "l*u*te", "<p>l<em>u</em>te</p>\n"},
+	//{"simple4", "    lute\n", "<pre><code>lute\n</code></pre>\n"},
+	//{"simple3", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
+	//{"simple2", "l`u`te", "<p>l<code>u</code>te</p>\n"},
+	//{"simple1", "lute", "<p>lute</p>\n"},
+	//{"simple0", "", ""},
 }
 
 func TestParse(t *testing.T) {

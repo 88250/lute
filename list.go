@@ -157,7 +157,7 @@ func (t *Tree) parseList() Node {
 	var backupTokens []item
 	chars := 0
 	for {
-		token = t.next()
+		token = t.nextToken()
 		backupTokens = append(backupTokens, token)
 		if itemNewline == token.typ || itemEOF == token.typ {
 			chars++
@@ -207,7 +207,7 @@ func (t *Tree) parseList() Node {
 				break
 			}
 
-			t.next()
+			t.nextToken()
 			continue
 		}
 		if marker != token.val {

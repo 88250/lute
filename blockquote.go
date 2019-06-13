@@ -55,7 +55,7 @@ func newBlockquote(t *Tree, token item) *Blockquote {
 }
 
 func (t *Tree) parseBlockquote() Node {
-	token := t.next()
+	token := t.nextToken()
 	if itemEOF == token.typ {
 		return nil
 	}

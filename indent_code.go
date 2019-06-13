@@ -23,7 +23,7 @@ func (t *Tree) parseIndentCode() Node {
 Loop:
 	for {
 		for i := 0; i < 4; {
-			token := t.next()
+			token := t.nextToken()
 			switch token.typ {
 			case itemSpace:
 				i++
@@ -34,8 +34,8 @@ Loop:
 			}
 		}
 
-		token := t.next()
-		for ; itemBacktick != token.typ && itemEOF != token.typ; token = t.next() {
+		token := t.nextToken()
+		for ; itemBacktick != token.typ && itemEOF != token.typ; token = t.nextToken() {
 			code += token.val
 			if itemNewline == token.typ {
 				spaces, tabs, tokens, _ := t.nextNonWhitespace()

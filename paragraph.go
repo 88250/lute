@@ -97,28 +97,36 @@ func (t *Tree) parseParagraph() Node {
 	ret := &Paragraph{NodeParagraph, token.pos, "", items{}, t, Children{}, "<p>", "</p>"}
 Loop:
 	for {
-		token = t.next()
-		ret.RawText += RawText(token.val)
+		token = t.nextToken()
 		ret.items = append(ret.items, token)
 		if itemEOF == token.typ {
 			break
 		}
+		ret.RawText += RawText(token.val)
 
 		if itemNewline == token.typ {
-			spaces, tabs, tokens, firstNonWhitespace := t.nextNonWhitespace()
-			indentSpaces := spaces + tabs*4
-			if indentSpaces < t.context.IndentSpaces {
-				t.backups(tokens)
-				break
-			}
+			// 判断是否为段落延续文本
+
+			_, _, tokens, firstNonWhitespace := t.nextNonWhitespace()
+
+			//indentSpaces := spaces + tabs*4
+			//if indentSpaces < t.context.IndentSpaces {
+			//	t.backups(tokens)
+			//	// TODO(D): 待确定是否还有用
+			//	break
+			//}
 			switch firstNonWhitespace.typ {
-			case itemNewline, itemEOF:
-				t.next()
+			case itemEOF:
 				break Loop
-			case itemHyphen, itemStr:
+			case itemHyphen, itemAsterisk:
+				t.backups(tokens[1:])
+				break Loop
+			default:
 				t.backups(tokens)
-				break Loop
+				continue
 			}
+		} else {
+			t.backups(tokens)
 		}
 	}
 
