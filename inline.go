@@ -55,7 +55,7 @@ func (t *Tree) parseChildren(children Children) {
 				c.Append(n)
 			}
 
-			if 1 > len(line) || line.isEOF(){
+			if 1 > len(line) || line.isEOF() {
 				break Block
 			}
 		}
@@ -64,10 +64,19 @@ func (t *Tree) parseChildren(children Children) {
 
 func (t *Tree) parseEmphasis(tokens items) (ret Node, remains items) {
 	token := tokens[0]
-
-	rawText := RawText(token.val)
-	ret = &Emphasis{NodeEmphasis, token.pos, rawText, tokens, t, Children{}}
-	c, remains := t.parseText(tokens)
+	var text string
+	var textTokens = items{}
+	for i := 1; i < len(tokens); i++ {
+		token = tokens[i]
+		if itemAsterisk == token.typ {
+			remains = tokens[i+1:]
+			break
+		}
+		text += token.val
+		textTokens = append(textTokens, token)
+	}
+	c, _ := t.parseText(textTokens)
+	ret = &Emphasis{NodeEmphasis, token.pos, RawText(text), textTokens, t, Children{}}
 	ret.Append(c)
 
 	return
@@ -97,35 +106,41 @@ func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
 func (t *Tree) parseText(tokens items) (ret Node, remains items) {
 	token := tokens[0]
 	var text string
+	var textTokens items
 	for i := 0; i < len(tokens); i++ {
 		token = tokens[i]
-		if itemAsterisk == token.typ {
+		if itemStr != token.typ && itemNewline != token.typ {
 			remains = tokens[i:]
 			break
 		}
 		text += token.val
+		textTokens = append(textTokens, token)
 	}
-	ret = &Text{NodeText, token.pos, RawText(text), items{}, t, text}
+	ret = &Text{NodeText, token.pos, RawText(text), textTokens, t, text}
 
 	return
 }
 
 func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains items) {
-	i := 1
-	token := tokens[i]
-	pos := token.pos
-	var code string
-	for ; itemBacktick != token.typ && itemEOF != token.typ; token = tokens[i] {
-		if itemNewline == token.typ {
-			code += " "
-		} else {
-			code += token.val
+	token := tokens[0]
+	var text string
+	var textTokens = items{}
+	for i := 1; i < len(tokens); i++ {
+		token = tokens[i]
+		if itemBacktick == token.typ {
+			remains = tokens[i+1:]
+			break
 		}
-		i++
+		if itemNewline == token.typ {
+			text += " "
+		} else {
+			text += token.val
+		}
+		textTokens = append(textTokens, token)
 	}
-
-	ret = &InlineCode{NodeInlineCode, pos, "", items{}, t, code}
-	remains = tokens[i+1:]
+	c, _ := t.parseText(textTokens)
+	ret = &InlineCode{NodeInlineCode, token.pos, RawText(text), textTokens, t, text}
+	ret.Append(c)
 
 	return
 }
