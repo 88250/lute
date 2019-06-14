@@ -122,13 +122,14 @@ func (t *Tree) parseText(tokens items) (ret Node, remains items) {
 }
 
 func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains items) {
-	token := tokens[0]
 	var text string
 	var textTokens = items{}
+	var matchEnd bool
 	for i := 1; i < len(tokens); i++ {
-		token = tokens[i]
+		token := tokens[i]
 		if itemBacktick == token.typ {
 			remains = tokens[i+1:]
+			matchEnd = true
 			break
 		}
 		if itemNewline == token.typ {
@@ -138,9 +139,14 @@ func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains items) {
 		}
 		textTokens = append(textTokens, token)
 	}
-	c, _ := t.parseText(textTokens)
-	ret = &InlineCode{NodeInlineCode, token.pos, RawText(text), textTokens, t, text}
-	ret.Append(c)
+
+	if !matchEnd {
+		tokens[0].typ = itemStr
+		ret, remains = t.parseText(tokens)
+		return
+	}
+
+	ret = &InlineCode{NodeInlineCode, RawText(text), textTokens, t, text}
 
 	return
 }

@@ -313,7 +313,6 @@ func (n *Delete) Children() Children {
 
 type InlineCode struct {
 	NodeType
-	int
 	RawText
 	items
 	*Tree
