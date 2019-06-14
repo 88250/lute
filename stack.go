@@ -17,18 +17,31 @@
 package lute
 
 type stack struct {
-	items []interface{}
+	items []*item
 	count int
 }
 
-func (s *stack) push(e interface{}) {
-	s.items = append(s.items[:s.count], e)
+func (s *stack) popMatch(token item) (tokens []*item) {
+	for i := s.count - 1; 0 <= i; i-- {
+		t := s.items[i]
+		if token.typ == t.typ && token.val == t.val {
+			s.count = i
+
+			return s.items[i:]
+		}
+	}
+
+	return nil
+}
+
+func (s *stack) push(token *item) {
+	s.items = append(s.items[:s.count], token)
 	s.count++
 }
 
-func (s *stack) pop() interface{} {
+func (s *stack) pop() *item {
 	if s.count == 0 {
-		return nil
+		return &tokenEOF
 	}
 
 	s.count--
@@ -36,9 +49,9 @@ func (s *stack) pop() interface{} {
 	return s.items[s.count]
 }
 
-func (s *stack) peek() interface{} {
+func (s *stack) peek() *item {
 	if s.count == 0 {
-		return nil
+		return &tokenEOF
 	}
 
 	return s.items[s.count-1]

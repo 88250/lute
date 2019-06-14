@@ -21,28 +21,36 @@ import (
 )
 
 func TestStack(t *testing.T) {
-	e1 := mkItem(itemBacktick, "`")
-	e2 := mkItem(itemStr, "lute")
-	e3 := mkItem(itemBacktick, "`")
+	t1 := mkItem(itemBacktick, "`")
+	t2 := mkItem(itemStr, "lute")
+	t3 := mkItem(itemBacktick, "`")
 
 	s := &stack{}
-	s.push(&e1)
-	s.push(&e2)
-	s.push(&e3)
+	s.push(&t1)
+	s.push(&t2)
+	s.push(&t3)
 
-	if "`" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
+	if "`" != s.pop().val {
+		t.Error("unexpected stack item")
 	}
 
-	if "lute" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
+	if "lute" != s.pop().val {
+		t.Error("unexpected stack item")
 	}
 
-	if "`" != s.peek().(*item).val {
-		t.Log("unexpected stack item")
+	if "`" != s.peek().val {
+		t.Error("unexpected stack item")
 	}
 
-	if "`" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
+	if "`" != s.pop().val {
+		t.Error("unexpected stack item")
+	}
+
+	s.push(&t1)
+	s.push(&t2)
+
+	tokens := s.popMatch(t1)
+	if &t1 != tokens[0] || &t2 != tokens[1] {
+		t.Error("unexpected stack item")
 	}
 }
