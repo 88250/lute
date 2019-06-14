@@ -127,9 +127,9 @@ func (t *Tree) isBlankLine(line line) bool {
 	return true
 }
 
-func (t *Tree) removeSpaces(line line) (tokens line) {
+func (t *Tree) removeSpacesTabs(line line) (tokens line) {
 	for _, token := range line {
-		if itemSpace != token.typ {
+		if itemSpace != token.typ && itemTab != token.typ {
 			tokens = append(tokens, token)
 		}
 	}

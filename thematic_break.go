@@ -53,7 +53,8 @@ func (t *Tree) isThematicBreak(line []item) bool {
 		return false
 	}
 
-	tokens := t.removeSpaces(line)
+	tokens := t.removeSpacesTabs(line)
+	tokens = tokens[:len(tokens)-1] // remove tailing newline
 	length := len(tokens)
 	if 3 > length {
 		return false
