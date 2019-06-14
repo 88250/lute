@@ -121,14 +121,13 @@ func (t *Tree) parseList(line items) Node {
 		}
 
 		t.skipWhitespaces(line)
-		if marker != line[0] {
+		if marker.val != line[0].val {
 			// TODO: 考虑有序列表序号递增
 			t.backupLine(line)
 
 			break
 		} else {
 			line = line[len(marker.val):]
-
 		}
 	}
 

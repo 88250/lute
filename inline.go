@@ -36,31 +36,17 @@ func (t *Tree) parseChildren(children Children) {
 		}
 
 		line := c.Tokens()
-		stack := &stack{}
 	Block:
 		for {
 			token := line[0]
 			var n Node
 			switch token.typ {
-			case itemStr:
-				stack.push(token)
-				line = line[1:]
+			case itemStr, itemNewline:
+				n, line = t.parseText(line)
 			case itemBacktick:
-				tokens := stack.popMatch(token)
-				if nil == tokens {
-					stack.push(token)
-					if 1 < len(line) {
-						line = line[1:]
-						continue
-					} else {
-						line = nil
-						break
-					}
-				}
-
-				n, line = t.parseInlineCode(tokens)
+				n, line = t.parseInlineCode(line)
 			case itemAsterisk:
-				n, line = t.parseEmOrStrong(line)
+				n, line = t.parseEmphasis(line)
 			default:
 				break
 			}
@@ -69,13 +55,7 @@ func (t *Tree) parseChildren(children Children) {
 				c.Append(n)
 			}
 
-			if 1 > len(line) {
-				tokens := stack.popAll()
-				if 0 < len(tokens) {
-					n = t.parseText(tokens)
-					c.Append(n)
-				}
-
+			if 1 > len(line) || line.isEOF(){
 				break Block
 			}
 		}
@@ -86,11 +66,9 @@ func (t *Tree) parseEmphasis(tokens items) (ret Node, remains items) {
 	token := tokens[0]
 
 	rawText := RawText(token.val)
-	ret = &Emphasis{NodeEmphasis, token.pos, rawText, items{}, t, Children{}}
-	c := t.parseText(tokens)
+	ret = &Emphasis{NodeEmphasis, token.pos, rawText, tokens, t, Children{}}
+	c, remains := t.parseText(tokens)
 	ret.Append(c)
-
-	remains = remains[1:]
 
 	return
 }
@@ -99,20 +77,15 @@ func (t *Tree) parseStrong(tokens items) (ret Node, remains items) {
 	token := tokens[0]
 
 	rawText := RawText(token.val)
-	ret = &Strong{NodeStrong, token.pos, rawText, items{}, t, Children{}}
-	c := t.parseText(tokens)
+	ret = &Strong{NodeStrong, token.pos, rawText, tokens, t, Children{}}
+	c, remains := t.parseText(tokens)
 	ret.Append(c)
-
-	remains = remains[2:]
 
 	return
 }
 
 func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
-	tokens = tokens[1:]
-	token := tokens[0]
-	if itemAsterisk == token.typ {
-		tokens = tokens[1:]
+	if itemAsterisk == tokens[0].typ && itemAsterisk == tokens[1].typ {
 		ret, remains = t.parseStrong(tokens)
 	} else {
 		ret, remains = t.parseEmphasis(tokens)
@@ -121,20 +94,23 @@ func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
 	return
 }
 
-func (t *Tree) parseText(tokens items) (n Node) {
+func (t *Tree) parseText(tokens items) (ret Node, remains items) {
 	token := tokens[0]
-	ret := &Text{NodeText, token.pos, RawText(token.val), items{}, t, token.val}
 	var text string
 	for i := 0; i < len(tokens); i++ {
-		text += tokens[i].val
+		token = tokens[i]
+		if itemAsterisk == token.typ {
+			remains = tokens[i:]
+			break
+		}
+		text += token.val
 	}
-	ret.RawText = RawText(text)
-	ret.Value = text
+	ret = &Text{NodeText, token.pos, RawText(text), items{}, t, text}
 
-	return ret
+	return
 }
 
-func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains []*item) {
+func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains items) {
 	i := 1
 	token := tokens[i]
 	pos := token.pos
