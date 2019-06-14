@@ -145,9 +145,11 @@ func (t *Tree) isList(line []item) bool {
 		return false
 	}
 
-	_, marker := t.firstNonSpace(line)
-	// TODO: marker 后面还需要空格才能确认是否是列表
-	if "*" != marker.val && "-" != marker.val && "+" != marker.val {
+	_, _, _, firstNonWhitespace := t.nonWhitespace(line)
+	//indentSpaces := spaces + tabs*4
+	if "*" != firstNonWhitespace.val && "-" != firstNonWhitespace.val && "+" != firstNonWhitespace.val {
+		// TODO: marker 后面还需要空格才能确认是否是列表，以及有序列表判断 . 或者 )
+
 		return false
 	}
 
