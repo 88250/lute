@@ -86,19 +86,22 @@ func (t *Tree) parseList(line line) Node {
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	marker := firstNonWhitespace
 	indentSpaces := spaces + tabs*4
-	spaces, tabs, tokens, firstNonWhitespace = t.nonWhitespace(line[len(tokens):])
+	line = line[len(tokens):]
+	spaces, tabs, _, firstNonWhitespace = t.nonWhitespace(line)
 	w := len(marker.val)
 	n := spaces + tabs*4
 	wnSpaces := w + n
+	oldContextIndentSpaces := t.context.IndentSpaces
+	t.context.IndentSpaces = indentSpaces + wnSpaces
 	if 4 <= n { // rule 2 in https://spec.commonmark.org/0.29/#list-items
-		line = indentOffset(tokens, w+1, t)
+		line = indentOffset(line, w+1, t)
+		t.context.IndentSpaces = 2
 	} else {
-		line = indentOffset(tokens, indentSpaces+wnSpaces, t)
+		line = indentOffset(line, indentSpaces+wnSpaces, t)
 	}
 	list := newList(indentSpaces, marker.val, wnSpaces, t, marker)
 	tight := false
-	oldContextIndentSpaces := t.context.IndentSpaces
-	t.context.IndentSpaces = indentSpaces + wnSpaces
+
 	defer func() { t.context.IndentSpaces = oldContextIndentSpaces }()
 
 	for {
