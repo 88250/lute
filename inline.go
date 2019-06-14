@@ -43,20 +43,39 @@ func (t *Tree) parseChildren(children Children) {
 			var n Node
 			switch token.typ {
 			case itemStr:
-				n, line = t.parseText(line)
+				stack.push(token)
+				line = line[1:]
 			case itemBacktick:
 				tokens := stack.popMatch(token)
+				if nil == tokens {
+					stack.push(token)
+					if 1 < len(line) {
+						line = line[1:]
+						continue
+					} else {
+						line = nil
+						break
+					}
+				}
 
 				n, line = t.parseInlineCode(tokens)
 			case itemAsterisk:
 				n, line = t.parseEmOrStrong(line)
-			case itemEOF:
-				break Block
+			default:
+				break
 			}
 
-			c.Append(n)
+			if nil != n {
+				c.Append(n)
+			}
 
 			if 1 > len(line) {
+				tokens := stack.popAll()
+				if 0 < len(tokens) {
+					n = t.parseText(tokens)
+					c.Append(n)
+				}
+
 				break Block
 			}
 		}
@@ -68,7 +87,7 @@ func (t *Tree) parseEmphasis(tokens items) (ret Node, remains items) {
 
 	rawText := RawText(token.val)
 	ret = &Emphasis{NodeEmphasis, token.pos, rawText, items{}, t, Children{}}
-	c, remains := t.parseText(tokens)
+	c := t.parseText(tokens)
 	ret.Append(c)
 
 	remains = remains[1:]
@@ -81,7 +100,7 @@ func (t *Tree) parseStrong(tokens items) (ret Node, remains items) {
 
 	rawText := RawText(token.val)
 	ret = &Strong{NodeStrong, token.pos, rawText, items{}, t, Children{}}
-	c, remains := t.parseText(tokens)
+	c := t.parseText(tokens)
 	ret.Append(c)
 
 	remains = remains[2:]
@@ -90,10 +109,6 @@ func (t *Tree) parseStrong(tokens items) (ret Node, remains items) {
 }
 
 func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
-	if 3 > len(tokens) {
-		return t.parseText(tokens)
-	}
-
 	tokens = tokens[1:]
 	token := tokens[0]
 	if itemAsterisk == token.typ {
@@ -106,11 +121,17 @@ func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
 	return
 }
 
-func (t *Tree) parseText(tokens items) (n Node, remains items) {
+func (t *Tree) parseText(tokens items) (n Node) {
 	token := tokens[0]
 	ret := &Text{NodeText, token.pos, RawText(token.val), items{}, t, token.val}
+	var text string
+	for i := 0; i < len(tokens); i++ {
+		text += tokens[i].val
+	}
+	ret.RawText = RawText(text)
+	ret.Value = text
 
-	return ret, tokens[1:]
+	return ret
 }
 
 func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains []*item) {

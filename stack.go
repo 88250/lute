@@ -17,7 +17,7 @@
 package lute
 
 type stack struct {
-	items []*item
+	items
 	count int
 }
 
@@ -26,8 +26,10 @@ func (s *stack) popMatch(token *item) (tokens []*item) {
 		t := s.items[i]
 		if token.typ == t.typ && token.val == t.val {
 			s.count = i
+			tokens = append(s.items[i:], token)
+			s.items = s.items[:i]
 
-			return s.items[i:]
+			return
 		}
 	}
 
@@ -47,6 +49,14 @@ func (s *stack) pop() *item {
 	s.count--
 
 	return s.items[s.count]
+}
+
+func (s *stack) popAll() items {
+	ret := s.items
+	s.count = 0
+	s.items = items{}
+
+	return ret
 }
 
 func (s *stack) peek() *item {

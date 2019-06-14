@@ -50,7 +50,7 @@ func TestStack(t *testing.T) {
 	s.push(t2)
 
 	tokens := s.popMatch(t1)
-	if t1 != tokens[0] || t2 != tokens[1] {
+	if t1 != tokens[0] || t2 != tokens[1] || t1 != tokens[2] {
 		t.Error("unexpected stack item")
 	}
 }
