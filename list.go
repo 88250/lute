@@ -67,7 +67,7 @@ func (n *List) Children() Children {
 	return n.Subnodes
 }
 
-func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token item) *List {
+func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item) *List {
 	ret := &List{
 		NodeList, token.pos, "", items{}, t, t.context.CurNode, Children{},
 		ListTypeBullet,
@@ -82,7 +82,7 @@ func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token item)
 	return ret
 }
 
-func (t *Tree) parseList(line line) Node {
+func (t *Tree) parseList(line items) Node {
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	marker := firstNonWhitespace
 	indentSpaces := spaces + tabs*4
@@ -138,7 +138,7 @@ func (t *Tree) parseList(line line) Node {
 }
 
 // https://spec.commonmark.org/0.29/#lists
-func (t *Tree) isList(line []item) bool {
+func (t *Tree) isList(line items) bool {
 	if 2 > len(line) { // at least marker and newline
 		return false
 	}

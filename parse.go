@@ -39,7 +39,7 @@ func sanitize(text string) (ret string) {
 
 // Context use to store common data in parsing.
 type Context struct {
-	CurLine      line
+	CurLine      items
 	CurNode      Node
 	IndentSpaces int
 }
@@ -58,7 +58,7 @@ func (t *Tree) HTML() string {
 	return t.Root.HTML()
 }
 
-func (t *Tree) nonWhitespace(line line) (spaces, tabs int, tokens line, firstNonWhitespace item) {
+func (t *Tree) nonWhitespace(line items) (spaces, tabs int, tokens items, firstNonWhitespace *item) {
 	for i := 0; i < len(line); i++ {
 		token := line[i]
 		tokens = append(tokens, token)
@@ -77,7 +77,7 @@ func (t *Tree) nonWhitespace(line line) (spaces, tabs int, tokens line, firstNon
 	return
 }
 
-func (t *Tree) skipWhitespaces(line line) (tokens line) {
+func (t *Tree) skipWhitespaces(line items) (tokens items) {
 	for i, token := range line {
 		if !token.isWhitespace() {
 			tokens = append(tokens, line[i:]...)
@@ -102,7 +102,7 @@ func (t *Tree) skipBlankLines() (count int) {
 	}
 }
 
-func (t *Tree) firstNonSpace(line line) (index int, token item) {
+func (t *Tree) firstNonSpace(line items) (index int, token *item) {
 	for index, token = range line {
 		if itemSpace != token.typ {
 			return
@@ -113,7 +113,7 @@ func (t *Tree) firstNonSpace(line line) (index int, token item) {
 }
 
 // https://spec.commonmark.org/0.29/#blank-line
-func (t *Tree) isBlankLine(line line) bool {
+func (t *Tree) isBlankLine(line items) bool {
 	if line.isEOF() {
 		return true
 	}
@@ -128,7 +128,7 @@ func (t *Tree) isBlankLine(line line) bool {
 	return true
 }
 
-func (t *Tree) removeSpacesTabs(line line) (tokens line) {
+func (t *Tree) removeSpacesTabs(line items) (tokens items) {
 	for _, token := range line {
 		if itemSpace != token.typ && itemTab != token.typ {
 			tokens = append(tokens, token)
@@ -138,8 +138,8 @@ func (t *Tree) removeSpacesTabs(line line) (tokens line) {
 	return
 }
 
-func indentOffset(tokens line, indentSpaces int, t *Tree) (ret line) {
-	var nonWhitespaces line
+func indentOffset(tokens items, indentSpaces int, t *Tree) (ret items) {
+	var nonWhitespaces items
 	compSpaces := 0
 	i := 0
 	for ; i < len(tokens); i++ {
@@ -160,31 +160,18 @@ func indentOffset(tokens line, indentSpaces int, t *Tree) (ret line) {
 	}
 
 	for j := 0; j < remains/4; j++ {
-		ret = append(ret, item{itemTab, 0, "\t", 0})
+		ret = append(ret, &item{itemTab, 0, "\t", 0})
 	}
 	for j := 0; j < remains%4; j++ {
-		ret = append(ret, item{itemSpace, 0, " ", 0})
+		ret = append(ret, &item{itemSpace, 0, " ", 0})
 	}
 	ret = append(ret, nonWhitespaces...)
 
 	return
 }
 
-type line []item
 
-func (line *line) isEOF() bool {
-	return 1 == len(*line) && (*line)[0].isEOF()
-}
-
-func (line *line) rawText() (ret RawText) {
-	for i := 0; i < len(*line); i++ {
-		ret += RawText((*line)[i].val)
-	}
-
-	return
-}
-
-func (t *Tree) nextLine() (line line) {
+func (t *Tree) nextLine() (line items) {
 	if nil != t.context.CurLine {
 		line = t.context.CurLine
 		t.context.CurLine = nil
@@ -201,7 +188,7 @@ func (t *Tree) nextLine() (line line) {
 	}
 }
 
-func (t *Tree) backupLine(line line) {
+func (t *Tree) backupLine(line items) {
 	t.context.CurLine = line
 }
 

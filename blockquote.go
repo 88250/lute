@@ -46,7 +46,7 @@ func (n *Blockquote) Children() Children {
 	return n.Subnodes
 }
 
-func newBlockquote(t *Tree, token item) *Blockquote {
+func newBlockquote(t *Tree, token *item) *Blockquote {
 	ret := &Blockquote{
 		NodeBlockquote, token.pos, "", items{}, t, t.context.CurNode, Children{}}
 	t.context.CurNode = ret
@@ -54,7 +54,7 @@ func newBlockquote(t *Tree, token item) *Blockquote {
 	return ret
 }
 
-func (t *Tree) parseBlockquote(line line) Node {
+func (t *Tree) parseBlockquote(line items) Node {
 	token := line[0]
 	indentSpaces := t.context.IndentSpaces + 2
 
@@ -89,7 +89,7 @@ func (t *Tree) parseBlockquote(line line) Node {
 }
 
 // https://spec.commonmark.org/0.29/#block-quotes
-func (t *Tree) isBlockquote(line []item) bool {
+func (t *Tree) isBlockquote(line items) bool {
 	if 2 > len(line) { // at least > and newline
 		return false
 	}

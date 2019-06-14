@@ -118,8 +118,10 @@ const (
 	end = -1
 )
 
+var tokenEOF = item{}
+
 type lexer struct {
-	items   [][]item
+	items   []items
 	lastPos int
 	line    int
 }
@@ -130,14 +132,14 @@ type scanner struct {
 	start   int    // start position of this item
 	width   int    // width of last rune read from input
 	lastPos int    // position of most recent item returned by nextItem
-	items   []item // scanned items
+	items   items  // scanned items
 }
 
 // nextItem returns the next item from the input.
 // Called by the parser, not in the lexing goroutine.
-func (l *lexer) nextItem() item {
+func (l *lexer) nextItem() *item {
 	if len(l.items) <= l.line || len(l.items[l.line]) <= l.lastPos {
-		return item{typ: itemEOF}
+		return &item{typ: itemEOF}
 	}
 
 	item := l.items[l.line][l.lastPos]
@@ -153,10 +155,10 @@ func (l *lexer) nextItem() item {
 
 // lex creates a new lexer for the input string.
 func lex(name, input string) *lexer {
-	ret := &lexer{items: [][]item{}}
+	ret := &lexer{items: []items{}}
 	if "" == input {
-		ret.items = append(ret.items, []item{})
-		ret.items[ret.line] = append(ret.items[ret.line], item{typ: itemEOF})
+		ret.items = append(ret.items, items{})
+		ret.items[ret.line] = append(ret.items[ret.line], &item{typ: itemEOF})
 
 		return ret
 	}
@@ -175,14 +177,14 @@ func lex(name, input string) *lexer {
 
 	for _, line := range lines {
 		if "" == line {
-			ret.items = append(ret.items, []item{{typ: itemNewline, val: "\n"}})
+			ret.items = append(ret.items, items{{typ: itemNewline, val: "\n"}})
 
 			continue
 		}
 
 		s := &scanner{
 			input: line,
-			items: []item{},
+			items: items{},
 		}
 		s.run()
 
@@ -190,7 +192,7 @@ func lex(name, input string) *lexer {
 	}
 
 	lastLine := len(ret.items) - 1
-	ret.items[lastLine] = append(ret.items[lastLine], item{typ: itemEOF})
+	ret.items[lastLine] = append(ret.items[lastLine], &item{typ: itemEOF})
 
 	return ret
 }
@@ -273,6 +275,6 @@ func (s *scanner) backup() {
 
 // newItem creates an item with the specified item type.
 func (s *scanner) newItem(t itemType) {
-	s.items = append(s.items, item{t, s.start, s.input[s.start:s.pos], 1})
+	s.items = append(s.items, &item{t, s.start, s.input[s.start:s.pos], 1})
 	s.start = s.pos
 }

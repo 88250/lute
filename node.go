@@ -47,10 +47,22 @@ func (r RawText) Raw() RawText {
 	return r
 }
 
-type items []item
+type items []*item
 
 func (tokens items) Tokens() items {
 	return tokens
+}
+
+func (tokens items) isEOF() bool {
+	return 1 == len(tokens) && (tokens)[0].isEOF()
+}
+
+func (tokens items) rawText() (ret RawText) {
+	for i := 0; i < len(tokens); i++ {
+		ret += RawText((tokens)[i].val)
+	}
+
+	return
 }
 
 const (
@@ -111,8 +123,6 @@ func (n *Root) Append(c Node) {
 func (n *Root) Children() Children {
 	return n.Subnodes
 }
-
-
 
 type Table struct {
 	NodeType

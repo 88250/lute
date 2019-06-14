@@ -25,7 +25,7 @@ type Paragraph struct {
 	NodeType
 	int
 	RawText
-	items items
+	items []*item
 	*Tree
 	Subnodes Children
 
@@ -90,7 +90,7 @@ func (n *Paragraph) trim() {
 	n.RawText = RawText(strings.TrimSpace(string(n.RawText)))
 }
 
-func (t *Tree) parseParagraph(line line) Node {
+func (t *Tree) parseParagraph(line items) Node {
 	ret := &Paragraph{NodeParagraph, line[0].pos, "", nil, t, Children{}, "<p>", "</p>"}
 	defer ret.trim()
 
@@ -108,7 +108,7 @@ func (t *Tree) parseParagraph(line line) Node {
 	return ret
 }
 
-func (t *Tree) interruptParagrah(line []item) bool {
+func (t *Tree) interruptParagrah(line items) bool {
 	if t.isBlankLine(line) {
 		return true
 	}

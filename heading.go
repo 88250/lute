@@ -47,7 +47,7 @@ func (n *Heading) Children() Children {
 	return n.Subnodes
 }
 
-func (t *Tree) parseHeading(line []item) Node {
+func (t *Tree) parseHeading(line items) Node {
 	marker := line[0]
 
 	ret := &Heading{
@@ -72,7 +72,7 @@ func (t *Tree) parseHeading(line []item) Node {
 }
 
 // https://spec.commonmark.org/0.29/#atx-headings
-func (t *Tree) isATXHeading(line []item) bool {
+func (t *Tree) isATXHeading(line items) bool {
 	if 2 > len(line) { // at least # and newline
 		return false
 	}

@@ -35,25 +35,28 @@ func (t *Tree) parseChildren(children Children) {
 			continue
 		}
 
-		tokens := c.Tokens()
+		line := c.Tokens()
+		stack := &stack{}
 	Block:
 		for {
-			token := tokens[0]
+			token := line[0]
 			var n Node
 			switch token.typ {
 			case itemStr:
-				n, tokens = t.parseText(tokens)
+				n, line = t.parseText(line)
 			case itemBacktick:
-				n, tokens = t.parseInlineCode(tokens)
+				tokens := stack.popMatch(token)
+
+				n, line = t.parseInlineCode(tokens)
 			case itemAsterisk:
-				n, tokens = t.parseEmOrStrong(tokens)
+				n, line = t.parseEmOrStrong(line)
 			case itemEOF:
 				break Block
 			}
 
 			c.Append(n)
 
-			if 1 > len(tokens) {
+			if 1 > len(line) {
 				break Block
 			}
 		}
@@ -110,7 +113,7 @@ func (t *Tree) parseText(tokens items) (n Node, remains items) {
 	return ret, tokens[1:]
 }
 
-func (t *Tree) parseInlineCode(tokens items) (ret Node, remains items) {
+func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains []*item) {
 	i := 1
 	token := tokens[i]
 	pos := token.pos

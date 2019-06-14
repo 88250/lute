@@ -21,7 +21,7 @@ type stack struct {
 	count int
 }
 
-func (s *stack) popMatch(token item) (tokens []*item) {
+func (s *stack) popMatch(token *item) (tokens []*item) {
 	for i := s.count - 1; 0 <= i; i-- {
 		t := s.items[i]
 		if token.typ == t.typ && token.val == t.val {

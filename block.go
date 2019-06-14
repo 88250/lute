@@ -29,7 +29,7 @@ func (t *Tree) parseBlocks() {
 	}
 }
 
-func (t *Tree) parseBlock(line []item) (ret Node) {
+func (t *Tree) parseBlock(line items) (ret Node) {
 	curNode := t.context.CurNode
 
 	if t.isThematicBreak(line) {

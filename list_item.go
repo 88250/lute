@@ -70,7 +70,7 @@ func (n *ListItem) Children() Children {
 	return n.Subnodes
 }
 
-func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
+func newListItem(indentSpaces int, t *Tree, token *item) *ListItem {
 	ret := &ListItem{
 		NodeListItem, token.pos, "", items{}, t, t.context.CurNode, Children{},
 		false,
@@ -82,7 +82,7 @@ func newListItem(indentSpaces int, t *Tree, token item) *ListItem {
 	return ret
 }
 
-func (t *Tree) parseListItem(line line) *ListItem {
+func (t *Tree) parseListItem(line items) *ListItem {
 	indentSpaces := t.context.IndentSpaces
 	ret := newListItem(indentSpaces, t, line[0])
 	blankLineBetweenBlocks := false

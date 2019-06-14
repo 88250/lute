@@ -26,9 +26,9 @@ func TestStack(t *testing.T) {
 	t3 := mkItem(itemBacktick, "`")
 
 	s := &stack{}
-	s.push(&t1)
-	s.push(&t2)
-	s.push(&t3)
+	s.push(t1)
+	s.push(t2)
+	s.push(t3)
 
 	if "`" != s.pop().val {
 		t.Error("unexpected stack item")
@@ -46,11 +46,11 @@ func TestStack(t *testing.T) {
 		t.Error("unexpected stack item")
 	}
 
-	s.push(&t1)
-	s.push(&t2)
+	s.push(t1)
+	s.push(t2)
 
 	tokens := s.popMatch(t1)
-	if &t1 != tokens[0] || &t2 != tokens[1] {
+	if t1 != tokens[0] || t2 != tokens[1] {
 		t.Error("unexpected stack item")
 	}
 }

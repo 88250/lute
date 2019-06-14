@@ -39,7 +39,7 @@ func (n *ThematicBreak) Children() Children {
 	return nil
 }
 
-func (t *Tree) parseThematicBreak(line []item) (ret Node) {
+func (t *Tree) parseThematicBreak(line items) (ret Node) {
 	token := line[0]
 	ret = &ThematicBreak{NodeThematicBreak, token.pos, "", line}
 
@@ -48,7 +48,7 @@ func (t *Tree) parseThematicBreak(line []item) (ret Node) {
 
 // A line consisting of 0-3 spaces of indentation, followed by a sequence of three or more matching -, _, or * characters, each followed optionally by any number of spaces or tabs, forms a thematic break.
 // https://spec.commonmark.org/0.29/#thematic-break
-func (t *Tree) isThematicBreak(line []item) bool {
+func (t *Tree) isThematicBreak(line items) bool {
 	if 3 > len(line) {
 		return false
 	}

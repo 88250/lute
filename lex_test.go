@@ -23,11 +23,11 @@ import (
 type lexTest struct {
 	name  string
 	input string
-	items []item
+	items items
 }
 
-func mkItem(typ itemType, text string) item {
-	return item{
+func mkItem(typ itemType, text string) *item {
+	return &item{
 		typ: typ,
 		val: text,
 	}
@@ -46,24 +46,24 @@ var lexTests = []lexTest{
 
 	//{"spec7", "-\t\tfoo\n", []item{mkItem(itemHyphen, "-"), tTab, tTab, mkItem(itemStr, "foo"), tNewLine, tEOF}},
 
-	{"simple11", "`lu\nte`", []item{tBacktick, mkItem(itemStr, "lu"), tNewLine, mkItem(itemStr, "te"), tBacktick, tEOF}},
-	{"simple10", "# lute", []item{mkItem(itemCrosshatch, "#"), tSpace, mkItem(itemStr, "lute"), tEOF}},
-	{"simple9", "> lute", []item{mkItem(itemGreater, ">"), tSpace, mkItem(itemStr, "lute"), tEOF}},
-	{"simple8", "*lute*", []item{tAsterisk, mkItem(itemStr, "lute"), tAsterisk, tEOF}},
-	{"simple7", "`lute`", []item{tBacktick, mkItem(itemStr, "lute"), tBacktick, tEOF}},
-	{"simple6", "\tlute", []item{tTab, mkItem(itemStr, "lute"), tEOF}},
-	{"simple5", "lute", []item{mkItem(itemStr, "lute"), tEOF}},
-	{"simple4", "1\n\n2", []item{mkItem(itemStr, "1"), tNewLine, tNewLine, mkItem(itemStr, "2"), tEOF}},
-	{"simple3", "\n\n", []item{tNewLine, tNewLine, tEOF}},
-	{"simple2", " \n", []item{tSpace, tNewLine, tEOF}},
-	{"simple1", " ", []item{tSpace, tEOF}},
-	{"simple0", "", []item{tEOF}},
+	{"simple11", "`lu\nte`", items{tBacktick, mkItem(itemStr, "lu"), tNewLine, mkItem(itemStr, "te"), tBacktick, tEOF}},
+	{"simple10", "# lute", items{mkItem(itemCrosshatch, "#"), tSpace, mkItem(itemStr, "lute"), tEOF}},
+	{"simple9", "> lute", items{mkItem(itemGreater, ">"), tSpace, mkItem(itemStr, "lute"), tEOF}},
+	{"simple8", "*lute*", items{tAsterisk, mkItem(itemStr, "lute"), tAsterisk, tEOF}},
+	{"simple7", "`lute`", items{tBacktick, mkItem(itemStr, "lute"), tBacktick, tEOF}},
+	{"simple6", "\tlute", items{tTab, mkItem(itemStr, "lute"), tEOF}},
+	{"simple5", "lute", items{mkItem(itemStr, "lute"), tEOF}},
+	{"simple4", "1\n\n2", items{mkItem(itemStr, "1"), tNewLine, tNewLine, mkItem(itemStr, "2"), tEOF}},
+	{"simple3", "\n\n", items{tNewLine, tNewLine, tEOF}},
+	{"simple2", " \n", items{tSpace, tNewLine, tEOF}},
+	{"simple1", " ", items{tSpace, tEOF}},
+	{"simple0", "", items{tEOF}},
 }
 
 func TestLex(t *testing.T) {
 	for _, test := range lexTests {
 		l := lex(test.name, test.input)
-		var items []item
+		var items items
 		for _, line := range l.items {
 			for _, item := range line {
 				items = append(items, item)
@@ -75,7 +75,7 @@ func TestLex(t *testing.T) {
 	}
 }
 
-func equal(i1, i2 []item, checkPos bool) bool {
+func equal(i1, i2 items, checkPos bool) bool {
 	if len(i1) != len(i2) {
 		return false
 	}
