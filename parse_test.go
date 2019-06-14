@@ -17,6 +17,7 @@
 package lute
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -59,6 +60,7 @@ var parseTests = []parseTest{
 
 func TestParse(t *testing.T) {
 	for _, test := range parseTests {
+		fmt.Println("Test [" + test.name + "]")
 		tree, err := Parse(test.name, test.input)
 		if nil != err {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
@@ -68,32 +70,5 @@ func TestParse(t *testing.T) {
 		if test.result != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.result, html, test.input)
 		}
-	}
-}
-
-func TestStack(t *testing.T) {
-	e1 := mkItem(itemBacktick, "`")
-	e2 := mkItem(itemStr, "lute")
-	e3 := mkItem(itemBacktick, "`")
-
-	s := &stack{}
-	s.push(&e1)
-	s.push(&e2)
-	s.push(&e3)
-
-	if "`" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
-	}
-
-	if "lute" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
-	}
-
-	if "`" != s.peek().(*item).val {
-		t.Log("unexpected stack item")
-	}
-
-	if "`" != s.pop().(*item).val {
-		t.Log("unexpected stack item")
 	}
 }

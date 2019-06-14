@@ -78,9 +78,10 @@ func (t *Tree) nonWhitespace(line line) (spaces, tabs int, tokens line, firstNon
 }
 
 func (t *Tree) skipWhitespaces(line line) (tokens line) {
-	for _, token := range line {
+	for i, token := range line {
 		if !token.isWhitespace() {
-			tokens = append(tokens, token)
+			tokens = append(tokens, line[i:]...)
+			break
 		}
 	}
 

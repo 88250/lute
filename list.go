@@ -120,17 +120,15 @@ func (t *Tree) parseList(line line) Node {
 			break
 		}
 
-		spaces, tabs, _, _ := t.nonWhitespace(line)
-		indentSpaces := spaces + tabs*4
-		if indentSpaces < t.context.IndentSpaces {
-			t.backupLine(line)
-			break
-		}
-
-		line = t.skipWhitespaces(line)
+		t.skipWhitespaces(line)
 		if marker != line[0] {
 			// TODO: 考虑有序列表序号递增
+			t.backupLine(line)
+
 			break
+		} else {
+			line = line[len(marker.val):]
+
 		}
 	}
 

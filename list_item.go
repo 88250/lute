@@ -103,15 +103,7 @@ func (t *Tree) parseListItem(line line) *ListItem {
 		}
 
 		spaces, tabs, _, _ := t.nonWhitespace(line)
-
 		totalSpaces := spaces + tabs*4
-		// TODO: 似乎没有用
-		//if totalSpaces > indentSpaces {
-		//	if 4 == totalSpaces && 2 != indentSpaces { // 对齐列表优先级高于缩进代码块
-		//		break
-		//	}
-		//}
-
 		if totalSpaces < indentSpaces {
 			t.backupLine(line)
 
