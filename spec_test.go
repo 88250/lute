@@ -17,6 +17,7 @@ package lute
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"testing"
@@ -42,16 +43,17 @@ func TestSpec(t *testing.T) {
 		t.Fatalf("read spec test caes failed: " + err.Error())
 	}
 
-	for _, tc := range testcases {
-		tcn := tc.Section+" "+strconv.Itoa(tc.Example)
-		tree, err := Parse(tcn, tc.Markdown)
+	for _, test := range testcases {
+		testName := test.Section+" "+strconv.Itoa(test.Example)
+		fmt.Println("Test [" + testName + "]")
+		tree, err := Parse(testName, test.Markdown)
 		if nil != err {
 			t.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
 		}
 
 		html := tree.HTML()
-		if tc.HTML != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, tc.HTML, html, tc.Markdown)
+		if test.HTML != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.HTML, html, test.Markdown)
 		}
 	}
 }

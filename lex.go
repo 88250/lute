@@ -71,6 +71,7 @@ var itemName = map[itemType]string{
 	itemOpenParen:    "(",
 	itemCloseParen:   ")",
 	itemHyphen:       "-",
+	itemUnderscore:   "_",
 	itemPlus:         "+",
 	itemTab:          "tab",
 	itemOpenBracket:  "[",
@@ -102,6 +103,7 @@ const (
 	itemOpenParen                    // (
 	itemCloseParen                   // )
 	itemHyphen                       // -
+	itemUnderscore                   // _
 	itemPlus                         // +
 	itemTab                          // \t
 	itemOpenBracket                  // [
@@ -214,6 +216,8 @@ func (s *scanner) run() {
 			s.newItem(itemCloseParen)
 		case '-' == r:
 			s.newItem(itemHyphen)
+		case '_' == r:
+			s.newItem(itemUnderscore)
 		case '+' == r:
 			s.newItem(itemPlus)
 		case '\t' == r:
