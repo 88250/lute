@@ -17,18 +17,12 @@ package lute
 
 func (t *Tree) parseBlocks() {
 	curNode := t.context.CurNode
-	count := 0
 	for line := t.nextLine(); ; {
 		t.parseBlock(line)
 		t.context.CurNode = curNode
 
 		line = t.nextLine()
 		if line.isEOF() {
-			break
-		}
-
-		count++
-		if count > 2 {
 			break
 		}
 	}
