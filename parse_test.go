@@ -43,6 +43,7 @@ var parseTests = []parseTest{
 	{"spce1", "\tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
 
 	// some simple cases
+	{"simple12", "`l*ut*e", "<p>`l<em>ut</em>e</p>\n"},
 	{"simple11", "`lu\nte`", "<p><code>lu te</code></p>\n"},
 	{"simple10", "lu\n\nte", "<p>lu</p>\n<p>te</p>\n"},
 	{"simple9", "* lute", "<ul>\n<li>lute</li>\n</ul>\n"},

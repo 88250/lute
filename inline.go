@@ -34,18 +34,18 @@ func (t *Tree) parseChildren(children Children) {
 			continue
 		}
 
-		line := c.Tokens()
+		tokens := c.Tokens()
 	Block:
 		for {
-			token := line[0]
+			token := tokens[0]
 			var n Node
 			switch token.typ {
 			case itemStr, itemNewline:
-				n, line = t.parseText(line)
+				n, tokens = t.parseText(tokens)
 			case itemBacktick:
-				n, line = t.parseInlineCode(line)
+				n, tokens = t.parseInlineCode(tokens)
 			case itemAsterisk:
-				n, line = t.parseEmOrStrong(line)
+				n, tokens = t.parseEmOrStrong(tokens)
 			default:
 				break
 			}
@@ -54,7 +54,7 @@ func (t *Tree) parseChildren(children Children) {
 				c.Append(n)
 			}
 
-			if 1 > len(line) || line.isEOF() {
+			if 1 > len(tokens) || tokens.isEOF() {
 				break Block
 			}
 		}
@@ -130,28 +130,28 @@ func (t *Tree) parseText(tokens items) (ret Node, remains items) {
 }
 
 func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains items) {
+	marker := tokens[0]
+	if !t.matchEnd(tokens[1:], marker) {
+		marker.typ = itemStr
+
+		return nil, tokens
+	}
+
 	var text string
 	var textTokens = items{}
-	var matchEnd bool
+
 	for i := 1; i < len(tokens); i++ {
 		token := tokens[i]
-		if itemBacktick == token.typ {
-			remains = tokens[i+1:]
-			matchEnd = true
-			break
-		}
 		if itemNewline == token.typ {
 			text += " "
 		} else {
+			if itemBacktick == token.typ {
+				remains = tokens[i+1:]
+				break
+			}
 			text += token.val
 		}
 		textTokens = append(textTokens, token)
-	}
-
-	if !matchEnd {
-		tokens[0].typ = itemStr
-		ret, remains = t.parseText(tokens)
-		return
 	}
 
 	ret = &InlineCode{NodeInlineCode, RawText(text), textTokens, t, text}
@@ -173,4 +173,14 @@ func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
 	remains = tokens[i+1:]
 
 	return
+}
+
+func (t *Tree) matchEnd(tokens items, marker *item) bool {
+	for _, token := range tokens {
+		if token.typ == marker.typ && token.val == marker.val {
+			return true
+		}
+	}
+
+	return false
 }
