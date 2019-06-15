@@ -41,10 +41,12 @@ var (
 	tAsterisk   = mkItem(itemAsterisk, "*")
 	tHypen      = mkItem(itemHyphen, "-")
 	tUnderscore = mkItem(itemUnderscore, "_")
+	tPlus       = mkItem(itemPlus, "+")
 )
 
 var lexTests = []lexTest{
 
+	{"spec14", "+++\n", items{tPlus, tPlus, tPlus, tNewLine, tEOF}},
 	{"spec13", "***\n---\n___\n", items{tAsterisk, tAsterisk, tAsterisk, tNewLine, tHypen, tHypen, tHypen, tNewLine, tUnderscore, tUnderscore, tUnderscore, tNewLine, tEOF}},
 	{"spec7", "-\t\tfoo\n", items{mkItem(itemHyphen, "-"), tTab, tTab, mkItem(itemStr, "foo"), tNewLine, tEOF}},
 

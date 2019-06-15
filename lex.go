@@ -105,6 +105,7 @@ const (
 	itemHyphen                       // -
 	itemUnderscore                   // _
 	itemPlus                         // +
+	itemEqual                        // =
 	itemTab                          // \t
 	itemOpenBracket                  // [
 	itemCloseBracket                 // ]
@@ -220,6 +221,8 @@ func (s *scanner) run() {
 			s.newItem(itemUnderscore)
 		case '+' == r:
 			s.newItem(itemPlus)
+		case '=' == r:
+			s.newItem(itemEqual)
 		case '\t' == r:
 			s.newItem(itemTab)
 		case '[' == r:
