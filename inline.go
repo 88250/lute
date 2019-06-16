@@ -40,7 +40,7 @@ func (t *Tree) parseChildren(children Children) {
 			token := tokens[0]
 			var n Node
 			switch token.typ {
-			case itemStr, itemPlus, itemEqual, itemNewline:
+			case itemStr, itemPlus, itemEqual, itemHyphen, itemNewline:
 				n, tokens = t.parseText(tokens)
 			case itemBacktick:
 				n, tokens = t.parseInlineCode(tokens)
@@ -117,7 +117,7 @@ func (t *Tree) parseText(tokens items) (ret Node, remains items) {
 	var textTokens items
 	for i := 0; i < len(tokens); i++ {
 		token = tokens[i]
-		if itemEqual != token.typ && itemPlus != token.typ && itemStr != token.typ && itemNewline != token.typ {
+		if itemHyphen != token.typ && itemEqual != token.typ && itemPlus != token.typ && itemStr != token.typ && itemNewline != token.typ {
 			remains = tokens[i:]
 			break
 		}
