@@ -19,37 +19,41 @@ import (
 	"testing"
 )
 
-func TestStack(t *testing.T) {
-	t1 := mkItem(itemBacktick, "`")
-	t2 := mkItem(itemStr, "lute")
-	t3 := mkItem(itemBacktick, "`")
+func TestDelimiterStack(t *testing.T) {
+	t1 := &Text{NodeType:NodeText, Value:"*"}
+	e1 := &delimiterStackElement{node: t1, typ: "*", num: 1}
+	t2 := &Text{NodeType:NodeText, Value:"lute"}
+	e2 := &delimiterStackElement{node: t2, typ: ""}
+	t3 := &Text{NodeType:NodeText, Value:"*"}
+	e3 := &delimiterStackElement{node: t3, typ: "", num: 1}
 
-	s := &stack{}
-	s.push(t1)
-	s.push(t2)
-	s.push(t3)
 
-	if "`" != s.pop().val {
+	s := &delimiterStack{}
+	s.push(e1)
+	s.push(e2)
+	s.push(e3)
+
+	if "*" != s.pop().node.Value {
 		t.Error("unexpected stack item")
 	}
 
-	if "lute" != s.pop().val {
+	if "lute" != s.pop().node.Value {
 		t.Error("unexpected stack item")
 	}
 
-	if "`" != s.peek().val {
+	if "*" != s.peek().node.Value {
 		t.Error("unexpected stack item")
 	}
 
-	if "`" != s.pop().val {
+	if "*" != s.peek().node.Value {
 		t.Error("unexpected stack item")
 	}
 
-	s.push(t1)
-	s.push(t2)
+	s.push(e1)
+	s.push(e2)
 
-	tokens := s.popMatch(t1)
-	if t1 != tokens[0] || t2 != tokens[1] || t1 != tokens[2] {
+	elements := s.popMatch(e1)
+	if t1.Value != elements[0].node.Value || t2.Value != elements[1].node.Value || t3.Value != elements[2].node.Value {
 		t.Error("unexpected stack item")
 	}
 }

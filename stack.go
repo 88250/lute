@@ -16,6 +16,7 @@
 package lute
 
 type delimiterStackElement struct {
+	node             *Text  // the text node point to
 	typ              string // the type of delimiter ([, ![, *, _)
 	num              int    // the number of delimiters
 	active           bool   // whether the delimiter is "active" (all are active to start)
