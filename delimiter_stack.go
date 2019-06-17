@@ -15,8 +15,14 @@
 
 package lute
 
+type openerBottom struct {
+	typ      string
+	num      int
+	position int
+}
+
 type delimiterStackElement struct {
-	node             *Text  // the text node point to
+	node             Node   // the text node point to
 	typ              string // the type of delimiter ([, ![, *, _)
 	num              int    // the number of delimiters
 	active           bool   // whether the delimiter is "active" (all are active to start)
@@ -24,8 +30,25 @@ type delimiterStackElement struct {
 }
 
 type delimiterStack struct {
-	elements []*delimiterStackElement
-	count    int
+	elements      []*delimiterStackElement
+	count         int
+	openersBottom []*openerBottom
+}
+
+func (s *delimiterStack) matchOpener(e *delimiterStackElement) {
+	for i := s.count - 1; 0 <= i; i-- {
+		t := s.elements[i]
+		if e.typ == t.typ && e.num == t.num {
+			e := &delimiterStackElement{}
+			if 1 == e.num {
+				e.node = &Emphasis{NodeType: NodeEmphasis}
+			} else {
+				e.node = &Strong{NodeType: NodeStrong}
+			}
+			s.insert(i, e)
+			s.removeDelimiters(i, s.count)
+		}
+	}
 }
 
 func (s *delimiterStack) popMatch(e *delimiterStackElement) (elements []*delimiterStackElement) {
@@ -41,6 +64,28 @@ func (s *delimiterStack) popMatch(e *delimiterStackElement) (elements []*delimit
 	}
 
 	return nil
+}
+
+func (s *delimiterStack) insert(position int, e *delimiterStackElement) {
+	begin := s.elements[0:position]
+	end := append(s.elements[position:], e)
+	s.elements = append(begin, end...)
+	s.count++
+}
+
+func (s *delimiterStack) removeDelimiters(begin, end int) {
+	for i := begin; i < s.count; i++ {
+		if "*" == s.elements[i].typ {
+			s.remove(i)
+		}
+	}
+}
+
+func (s *delimiterStack) remove(position int) {
+	begin := s.elements[0:position]
+	end := s.elements[position:]
+	s.elements = append(begin, end...)
+	s.count--
 }
 
 func (s *delimiterStack) push(e *delimiterStackElement) {

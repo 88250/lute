@@ -33,19 +33,19 @@ func TestDelimiterStack(t *testing.T) {
 	s.push(e2)
 	s.push(e3)
 
-	if "*" != s.pop().node.Value {
+	if "*" != s.pop().node.(*Text).Value {
 		t.Error("unexpected stack item")
 	}
 
-	if "lute" != s.pop().node.Value {
+	if "lute" != s.pop().node.(*Text).Value {
 		t.Error("unexpected stack item")
 	}
 
-	if "*" != s.peek().node.Value {
+	if "*" != s.peek().node.(*Text).Value {
 		t.Error("unexpected stack item")
 	}
 
-	if "*" != s.peek().node.Value {
+	if "*" != s.peek().node.(*Text).Value {
 		t.Error("unexpected stack item")
 	}
 
@@ -53,7 +53,7 @@ func TestDelimiterStack(t *testing.T) {
 	s.push(e2)
 
 	elements := s.popMatch(e1)
-	if t1.Value != elements[0].node.Value || t2.Value != elements[1].node.Value || t3.Value != elements[2].node.Value {
+	if t1.Value != elements[0].node.(*Text).Value || t2.Value != elements[1].node.(*Text).Value || t3.Value != elements[2].node.(*Text).Value {
 		t.Error("unexpected stack item")
 	}
 }

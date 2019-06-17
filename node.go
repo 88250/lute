@@ -207,7 +207,6 @@ type FootnoteDefinition struct {
 
 type Text struct {
 	NodeType
-	int
 	RawText
 	items
 	*Tree
@@ -231,7 +230,6 @@ func (n *Text) Children() Children {
 
 type Emphasis struct {
 	NodeType
-	int
 	RawText
 	items
 	*Tree
@@ -258,7 +256,6 @@ func (n *Emphasis) Children() Children {
 
 type Strong struct {
 	NodeType
-	int
 	RawText
 	items
 	*Tree
