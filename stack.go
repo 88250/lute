@@ -15,18 +15,25 @@
 
 package lute
 
-type stack struct {
-	items
-	count int
+type delimiterStackElement struct {
+	typ              string // the type of delimiter ([, ![, *, _)
+	num              int    // the number of delimiters
+	active           bool   // whether the delimiter is "active" (all are active to start)
+	openerCloserBoth string // whether the delimiter is a potential opener, a potential closer, or both (which depends on what sort of characters precede and follow the delimiters)
 }
 
-func (s *stack) popMatch(token *item) (tokens []*item) {
+type delimiterStack struct {
+	elements []*delimiterStackElement
+	count    int
+}
+
+func (s *delimiterStack) popMatch(e *delimiterStackElement) (elements []*delimiterStackElement) {
 	for i := s.count - 1; 0 <= i; i-- {
-		t := s.items[i]
-		if token.typ == t.typ && token.val == t.val {
+		t := s.elements[i]
+		if e.typ == t.typ && e.num == t.num {
 			s.count = i
-			tokens = append(s.items[i:], token)
-			s.items = s.items[:i]
+			elements = append(s.elements[i:], e)
+			s.elements = s.elements[:i]
 
 			return
 		}
@@ -35,37 +42,37 @@ func (s *stack) popMatch(token *item) (tokens []*item) {
 	return nil
 }
 
-func (s *stack) push(token *item) {
-	s.items = append(s.items[:s.count], token)
+func (s *delimiterStack) push(e *delimiterStackElement) {
+	s.elements = append(s.elements[:s.count], e)
 	s.count++
 }
 
-func (s *stack) pop() *item {
-	if s.count == 0 {
-		return &tokenEOF
+func (s *delimiterStack) pop() *delimiterStackElement {
+	if 0 == s.count {
+		return nil
 	}
 
 	s.count--
 
-	return s.items[s.count]
+	return s.elements[s.count]
 }
 
-func (s *stack) popAll() items {
-	ret := s.items
+func (s *delimiterStack) popAll() []*delimiterStackElement {
+	ret := s.elements
 	s.count = 0
-	s.items = items{}
+	s.elements = []*delimiterStackElement{}
 
 	return ret
 }
 
-func (s *stack) peek() *item {
-	if s.count == 0 {
-		return &tokenEOF
+func (s *delimiterStack) peek() *delimiterStackElement {
+	if 0 == s.count {
+		return nil
 	}
 
-	return s.items[s.count-1]
+	return s.elements[s.count-1]
 }
 
-func (s *stack) isEmpty() bool {
-	return 0 == len(s.items)
+func (s *delimiterStack) isEmpty() bool {
+	return 0 == len(s.elements)
 }
