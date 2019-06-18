@@ -118,6 +118,15 @@ func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
 			continue
 		}
 
+		// TODO: 判断分隔符序列规则
+
+		e := &delimiterStackElement{node: &Text{NodeType: NodeText, Value: token.val,}, typ: "*", num: 1}
+		if itemAsterisk == tokens[i+1].typ {
+			e.num = 2
+		}
+		delimiterStack.matchOpener(e)
+
+
 	}
 
 	return

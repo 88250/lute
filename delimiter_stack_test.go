@@ -20,32 +20,27 @@ import (
 )
 
 func TestDelimiterStack(t *testing.T) {
-	t1 := &Text{NodeType:NodeText, Value:"*"}
+	t1 := &Text{NodeType: NodeText, Value: "*"}
 	e1 := &delimiterStackElement{node: t1, typ: "*", num: 1}
-	t2 := &Text{NodeType:NodeText, Value:"lute"}
+	t2 := &Text{NodeType: NodeText, Value: "lute"}
 	e2 := &delimiterStackElement{node: t2, typ: ""}
-	t3 := &Text{NodeType:NodeText, Value:"*"}
+	t3 := &Text{NodeType: NodeText, Value: "*"}
 	e3 := &delimiterStackElement{node: t3, typ: "", num: 1}
-
 
 	s := &delimiterStack{}
 	s.push(e1)
 	s.push(e2)
-	s.push(e3)
-
-	if "*" != s.pop().node.(*Text).Value {
-		t.Error("unexpected stack item")
-	}
 
 	if "lute" != s.pop().node.(*Text).Value {
 		t.Error("unexpected stack item")
 	}
 
+	s.push(e3)
+
 	if "*" != s.peek().node.(*Text).Value {
 		t.Error("unexpected stack item")
 	}
-
-	if "*" != s.peek().node.(*Text).Value {
+	if "*" != s.pop().node.(*Text).Value {
 		t.Error("unexpected stack item")
 	}
 
