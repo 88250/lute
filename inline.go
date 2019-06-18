@@ -34,18 +34,21 @@ func (t *Tree) parseChildren(children Children) {
 			continue
 		}
 
+		delimiterStack := &delimiterStack{}
 		tokens := c.Tokens()
 	Block:
 		for {
 			token := tokens[0]
+			e := &delimiterStackElement{node: &Text{NodeType: NodeText, Value: token.val}}
+			delimiterStack.push(e)
+
 			var n Node
 			switch token.typ {
 			case itemStr, itemPlus, itemEqual, itemHyphen, itemNewline:
-				n, tokens = t.parseText(tokens)
+				n = t.parseText(token)
 			case itemBacktick:
 				n, tokens = t.parseInlineCode(tokens)
 			case itemAsterisk, itemUnderscore:
-				n, tokens = t.parseEmOrStrong(tokens)
 			default:
 				break
 			}
@@ -54,64 +57,23 @@ func (t *Tree) parseChildren(children Children) {
 				c.Append(n)
 			}
 
+			tokens = tokens[1:]
 			if 1 > len(tokens) || tokens.isEOF() {
 				break Block
 			}
 		}
 	}
-}
 
-func (t *Tree) parseEmphasis(tokens items) (ret Node, remains items) {
-	var text string
-	var textTokens = items{}
-	for i := 1; i < len(tokens); i++ {
-		token := tokens[i]
-		if itemAsterisk == token.typ {
-			remains = tokens[i+1:]
-			break
-		}
-		text += token.val
-		textTokens = append(textTokens, token)
-	}
-	c, _ := t.parseText(textTokens)
-	ret = &Emphasis{NodeEmphasis, RawText(text), textTokens, t, Children{}}
-	ret.Append(c)
-
-	return
-}
-
-func (t *Tree) parseStrong(tokens items) (ret Node, remains items) {
-	var text string
-	var textTokens = items{}
-	for i := 2; i < len(tokens); i++ {
-		token := tokens[i]
-		if i < len(tokens)-2 {
-			if itemAsterisk == token.typ && itemAsterisk == tokens[i+1].typ {
-				remains = tokens[i+2:]
-				break
-			}
-		}
-		text += token.val
-		textTokens = append(textTokens, token)
-	}
-	c, _ := t.parseText(textTokens)
-	ret = &Strong{NodeStrong, RawText(text), textTokens, t, Children{}}
-	ret.Append(c)
-
-	return
+	t.parseEmOrStrong()
 }
 
 func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
-	delimiterStack := &delimiterStack{}
-
-	e := &delimiterStackElement{node: &Text{NodeType: NodeText, Value: "*"}, typ: "*", num: 1}
-	if itemAsterisk == tokens[0].typ && itemAsterisk == tokens[1].typ {
-		e.num = 2
-	}
-	delimiterStack.push(e)
-
 	for i := e.num; i < len(tokens); i++ {
 		token := tokens[i]
+		if itemEOF == token.typ {
+			break
+		}
+
 		if itemAsterisk != token.typ {
 			e := &delimiterStackElement{node: &Text{NodeType: NodeText, Value: token.val}}
 			delimiterStack.push(e)
@@ -125,21 +87,19 @@ func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
 			e.num = 2
 		}
 		delimiterStack.matchOpener(e)
-
-
 	}
+
+
 
 	return
 }
 
-func (t *Tree) parseText(tokens items) (ret Node, remains items) {
-	token := tokens[0]
+func (t *Tree) parseText(token *item) (ret Node) {
 	var text string
 	var textTokens items
 	for i := 0; i < len(tokens); i++ {
 		token = tokens[i]
 		if itemHyphen != token.typ && itemEqual != token.typ && itemPlus != token.typ && itemStr != token.typ && itemNewline != token.typ {
-			remains = tokens[i:]
 			break
 		}
 		text += token.val
