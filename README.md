@@ -52,6 +52,7 @@ Lute 使用 [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-
 
 ## 鸣谢
 
+* [commonmark.js](https://github.com/commonmark/commonmark.js)：CommonMark 规范的官方 JavaScript 参考实现
 * [mdast](https://github.com/syntax-tree/mdast)：Markdown 语法树规范
 
 ---
