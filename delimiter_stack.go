@@ -21,25 +21,25 @@ type openerBottom struct {
 	position int
 }
 
-type delimiterStackElement struct {
-	node             Node   // the text node point to
-	typ              string // the type of delimiter ([, ![, *, _)
-	num              int    // the number of delimiters
-	active           bool   // whether the delimiter is "active" (all are active to start)
-	openerCloserBoth string // whether the delimiter is a potential opener, a potential closer, or both (which depends on what sort of characters precede and follow the delimiters)
+type delimiter struct {
+	node     Node   // the text node point to
+	typ      string // the type of delimiter ([, ![, *, _)
+	num      int    // the number of delimiters
+	active   bool   // whether the delimiter is "active" (all are active to start)
+	canOpen  bool   // whether the delimiter is a potential opener
+	canClose bool   // whether the delimiter is a potential closer
 }
 
 type delimiterStack struct {
-	elements      []*delimiterStackElement
+	elements      []*delimiter
 	openersBottom []*openerBottom
 }
 
-func (s *delimiterStack) matchOpener(e *delimiterStackElement) {
-	length := len(s.elements) - 1
-	for i := length; 0 <= i; i-- {
+func (s *delimiterStack) matchOpener(e *delimiter) {
+	for i := len(s.elements) - 1; 0 <= i; i-- {
 		t := s.elements[i]
 		if e.typ == t.typ && e.num == t.num {
-			e := &delimiterStackElement{}
+			e := &delimiter{}
 			if 1 == e.num {
 				e.node = &Emphasis{NodeType: NodeEmphasis}
 			} else {
@@ -55,7 +55,7 @@ func (s *delimiterStack) matchOpener(e *delimiterStackElement) {
 	}
 }
 
-func (s *delimiterStack) popMatch(e *delimiterStackElement) (elements []*delimiterStackElement) {
+func (s *delimiterStack) popMatch(e *delimiter) (elements []*delimiter) {
 	for i := len(s.elements) - 1; 0 <= i; i-- {
 		t := s.elements[i]
 		if e.typ == t.typ && e.num == t.num {
@@ -69,7 +69,7 @@ func (s *delimiterStack) popMatch(e *delimiterStackElement) (elements []*delimit
 	return nil
 }
 
-func (s *delimiterStack) insert(position int, e *delimiterStackElement) {
+func (s *delimiterStack) insert(position int, e *delimiter) {
 	begin := append(s.elements[0:position], e)
 	end := s.elements[position+1:]
 	s.elements = append(begin, end...)
@@ -96,11 +96,11 @@ func (s *delimiterStack) remove(position int) {
 	s.elements = append(begin, end...)
 }
 
-func (s *delimiterStack) push(e *delimiterStackElement) {
+func (s *delimiterStack) push(e *delimiter) {
 	s.elements = append(s.elements, e)
 }
 
-func (s *delimiterStack) pop() *delimiterStackElement {
+func (s *delimiterStack) pop() *delimiter {
 	if 0 == len(s.elements) {
 		return nil
 	}
@@ -108,14 +108,14 @@ func (s *delimiterStack) pop() *delimiterStackElement {
 	return s.elements[len(s.elements)-1]
 }
 
-func (s *delimiterStack) popAll() []*delimiterStackElement {
+func (s *delimiterStack) popAll() []*delimiter {
 	ret := s.elements
-	s.elements = []*delimiterStackElement{}
+	s.elements = []*delimiter{}
 
 	return ret
 }
 
-func (s *delimiterStack) peek() *delimiterStackElement {
+func (s *delimiterStack) peek() *delimiter {
 	if 0 == len(s.elements) {
 		return nil
 	}

@@ -21,11 +21,11 @@ import (
 
 func TestDelimiterStack(t *testing.T) {
 	t1 := &Text{NodeType: NodeText, Value: "*"}
-	e1 := &delimiterStackElement{node: t1, typ: "*", num: 1}
+	e1 := &delimiter{node: t1, typ: "*", num: 1}
 	t2 := &Text{NodeType: NodeText, Value: "lute"}
-	e2 := &delimiterStackElement{node: t2, typ: ""}
+	e2 := &delimiter{node: t2, typ: ""}
 	t3 := &Text{NodeType: NodeText, Value: "*"}
-	e3 := &delimiterStackElement{node: t3, typ: "", num: 1}
+	e3 := &delimiter{node: t3, typ: "", num: 1}
 
 	s := &delimiterStack{}
 	s.push(e1)

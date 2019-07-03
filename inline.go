@@ -16,99 +16,67 @@
 package lute
 
 func (t *Tree) parseInlines() {
-	t.parseChildren(t.Root.Children())
+	t.parseBlockInlines(t.Root.Children())
 }
 
-func (t *Tree) parseChildren(children Children) {
-	for _, c := range children {
-		cType := c.Type()
+func (t *Tree) parseBlockInlines(blocks Children) {
+	for _, block := range blocks {
+		cType := block.Type()
 		switch cType {
 		case NodeCode, NodeInlineCode, NodeThematicBreak:
 			continue
 		}
 
-		cs := c.Children()
+		cs := block.Children()
 		if 0 < len(cs) {
-			t.parseChildren(cs)
+			t.parseBlockInlines(cs)
 
 			continue
 		}
 
-		delimiterStack := &delimiterStack{}
-		tokens := c.Tokens()
-	Block:
+		tokens := block.Tokens()
 		for {
 			token := tokens[0]
-			e := &delimiterStackElement{node: &Text{NodeType: NodeText, Value: token.val}}
-			delimiterStack.push(e)
-
 			var n Node
 			switch token.typ {
-			case itemStr, itemPlus, itemEqual, itemHyphen, itemNewline:
-				n = t.parseText(token)
 			case itemBacktick:
 				n, tokens = t.parseInlineCode(tokens)
 			case itemAsterisk, itemUnderscore:
-			default:
-				break
+				n = &Text{NodeType: NodeText, Value: token.val}
+				tokens = tokens[1:]
 			}
 
 			if nil != n {
-				c.Append(n)
+				block.Append(n)
 			}
 
-			tokens = tokens[1:]
 			if 1 > len(tokens) || tokens.isEOF() {
-				break Block
+				break
 			}
 		}
-	}
 
-	t.parseEmOrStrong()
+	}
 }
 
-func (t *Tree) parseEmOrStrong(tokens items) (ret Node, remains items) {
-	for i := e.num; i < len(tokens); i++ {
-		token := tokens[i]
-		if itemEOF == token.typ {
-			break
-		}
-
-		if itemAsterisk != token.typ {
-			e := &delimiterStackElement{node: &Text{NodeType: NodeText, Value: token.val}}
-			delimiterStack.push(e)
-			continue
-		}
-
-		// TODO: 判断分隔符序列规则
-
-		e := &delimiterStackElement{node: &Text{NodeType: NodeText, Value: token.val,}, typ: "*", num: 1}
-		if itemAsterisk == tokens[i+1].typ {
-			e.num = 2
-		}
-		delimiterStack.matchOpener(e)
-	}
-
-
-
+func (t *Tree) parseEmOrStrong(stack *delimiterStack) (ret Node, remains items) {
 	return
 }
 
-func (t *Tree) parseText(token *item) (ret Node) {
-	var text string
-	var textTokens items
-	for i := 0; i < len(tokens); i++ {
-		token = tokens[i]
-		if itemHyphen != token.typ && itemEqual != token.typ && itemPlus != token.typ && itemStr != token.typ && itemNewline != token.typ {
-			break
-		}
-		text += token.val
-		textTokens = append(textTokens, token)
-	}
-	ret = &Text{NodeText, RawText(text), textTokens, t, text}
-
-	return
-}
+//func (t *Tree) parseText(token *item) (ret Node) {
+//	var text string
+//	var textTokens items
+//	for i := 0; i < len(tokens); i++ {
+//		token = tokens[i]
+//		if itemHyphen != token.typ && itemEqual != token.typ && itemPlus != token.typ && itemStr != token.typ && itemNewline != token.typ {
+//			break
+//		}
+//		text += token.val
+//		textTokens = append(textTokens, token)
+//	}
+//	ret = &Text{NodeText, RawText(text), textTokens, t, text}
+//
+//	return
+//}
 
 func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains items) {
 	marker := tokens[0]
