@@ -20,9 +20,7 @@
 
 Lute 的目标是构建一个结构化的 Markdown 引擎。所谓的“结构化”指的是从输入的 MD 文本构建抽象语法树，通过操作树来进行格式化、HTML 输出等。
 
-关于如何实现一个 Markdown 处理器，网上众说纷纭。有的人说 Markdown 适合用正则解析，因为文法规则太简单；也有的人说 Markdown 可以用编译原理来处理，正则太难维护。
-
-我赞同后者，因为只有通过构造 AST 才能进行更多精准操作。另外除了结构化，追求高性能也是很重要的目标。
+关于如何实现一个 Markdown 处理器，网上众说纷纭。有的人说 Markdown 适合用正则解析，因为文法规则太简单；也有的人说 Markdown 可以用编译原理来处理，正则太难维护。我赞同后者，因为正则确实太难维护而且运行效率较低。
 </details>
 
 ## 特性
@@ -33,26 +31,34 @@ Lute 的目标是构建一个结构化的 Markdown 引擎。所谓的“结构�
 * 可扩展语法树节点类型以实现自定义输出
 * 内置缓存以提升性能
 
-## 词法分析
-
-按行进行并发分析。
-
-TBD
-
-## 语法分析
-
-语法树结构参考 [mdast 规范](https://github.com/syntax-tree/mdast)进行设计。
-
-TBD
-
-## 目标代码生成
-
-TBD
-
 ## 性能对比
 
 TBD
 
+## 文档
+
+* [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
+* CommonMark 规范要点解读
+* Lute 使用指南
+
+## 社区
+
+* [讨论区](https://hacpai.com/tag/lute)
+* [报告问题](https://github.com/b3log/lute/issues/new/choose)
+
+## 授权
+
+Lute 使用 [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-2.0) 开源协议。
+
 ## 鸣谢
 
 * [mdast](https://github.com/syntax-tree/mdast)：Markdown 语法树规范
+
+---
+
+## 开源项目推荐
+
+* 如果你需要集成一个浏览器端的 Markdown 编辑器，可以考虑使用 [Vditor](https://github.com/b3log/vditor)
+* 如果你需要搭建一个个人博客系统，可以考虑使用 [Solo](https://github.com/b3log/solo)
+* 如果你需要搭建一个社区平台，可以考虑使用 [Sym](https://github.com/b3log/symphony)
+* 欢迎加入我们的小众开源社区，详情请看[这里](https://hacpai.com/article/1463025124998)
