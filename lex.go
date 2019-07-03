@@ -25,7 +25,7 @@ import (
 type item struct {
 	typ  itemType // the type of this item
 	pos  int      // the starting position, in bytes, of this item in the input string
-	val  string   // the value of this item, aka lexeme
+	val  string     // the value of this item, aka lexeme
 	line int      // the line number at the start of this item
 }
 
@@ -33,20 +33,23 @@ func (i item) String() string {
 	switch {
 	case i.typ == itemEOF:
 		return "EOF"
-	case len(i.val) > 10:
+	case len(string(i.val)) > 10:
 		return fmt.Sprintf("%.10q...", i.val)
 	}
 
 	return fmt.Sprintf("%q", i.val)
 }
 
-// A whitespace character is a space (U+0020), tab (U+0009), newline (U+000A), line tabulation (U+000B), form feed (U+000C), or carriage return (U+000D).
-// https://github.github.com/0.29/#whitespace-character
+// https://spec.commonmark.org/0.29/#whitespace-character
 func (i item) isWhitespace() bool {
 	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ // TODO(D): line tabulation (U+000B), form feed (U+000C), or carriage return (U+000D)
 }
 
-// A line ending is a newline (U+000A), a carriage return (U+000D) not followed by a newline, or a carriage return and a following newline.
+// https://spec.commonmark.org/0.29/#punctuation-character
+func (i item) isPunct() bool {
+	return unicode.IsPunct(rune(i.val[0]))
+}
+
 // https://spec.commonmark.org/0.29/#line-ending
 func (i item) isLineEnding() bool {
 	return itemNewline == i.typ

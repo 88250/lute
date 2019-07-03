@@ -35,22 +35,25 @@ func (t *Tree) parseBlockInlines(blocks Children) {
 		}
 
 		tokens := block.Tokens()
+		pos := 0
+		stack := &delimiterStack{}
 		for {
-			token := tokens[0]
+			token := tokens[pos]
 			var n Node
 			switch token.typ {
 			case itemBacktick:
-				n, tokens = t.parseInlineCode(tokens)
+				n = t.parseInlineCode(tokens, &pos)
 			case itemAsterisk, itemUnderscore:
-				n = &Text{NodeType: NodeText, Value: token.val}
-				tokens = tokens[1:]
+				n = t.parseDelimiter(tokens, &pos, stack)
+			case itemStr:
+				n = t.parseText(tokens, &pos)
 			}
 
 			if nil != n {
 				block.Append(n)
 			}
 
-			if 1 > len(tokens) || tokens.isEOF() {
+			if 1 > len(tokens) || tokens[pos].isEOF() {
 				break
 			}
 		}
@@ -58,44 +61,90 @@ func (t *Tree) parseBlockInlines(blocks Children) {
 	}
 }
 
-func (t *Tree) parseEmOrStrong(stack *delimiterStack) (ret Node, remains items) {
+func (t *Tree) parseDelimiter(tokens items, pos *int, stack *delimiterStack) (ret Node) {
+	startPos := *pos
+	delim := t.scanDelimiter(tokens, pos)
+	stack.push(delim)
+
+	subTokens, text := t.extractTokens(tokens, startPos, *pos)
+	ret = &Text{NodeText, RawText(text), subTokens, t, text}
+
 	return
 }
 
-//func (t *Tree) parseText(token *item) (ret Node) {
-//	var text string
-//	var textTokens items
-//	for i := 0; i < len(tokens); i++ {
-//		token = tokens[i]
-//		if itemHyphen != token.typ && itemEqual != token.typ && itemPlus != token.typ && itemStr != token.typ && itemNewline != token.typ {
-//			break
-//		}
-//		text += token.val
-//		textTokens = append(textTokens, token)
-//	}
-//	ret = &Text{NodeText, RawText(text), textTokens, t, text}
-//
-//	return
-//}
+func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
+	for i:=startPos;i<endPos;i++ {
+		text+=tokens[i].val
+		subTokens = append(subTokens, tokens[i])
+	}
 
-func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains items) {
+	return
+}
+
+func (t *Tree) scanDelimiter(tokens items, pos *int) *delimiter {
+	token := tokens[*pos]
+	delimitersCount := 0
+	for i := *pos; i < len(tokens); i++ {
+		if token.val == tokens[i].val {
+			delimitersCount++
+			*pos++
+		} else {
+			break
+		}
+	}
+
+	var tokenBefore, tokenAfter *item
+	index := *pos - 1
+	if 0 < index {
+		tokenBefore = tokens[index]
+	}
+	index = *pos + 1
+	if len(tokens) < index {
+		tokenAfter = tokens[index]
+	}
+
+	var beforeIsPunct, beforeIsWhitespace, afterIsPunct, afterIsWhitespace, canOpen, canClose bool
+	if nil != tokenBefore {
+		beforeIsWhitespace = tokenBefore.isWhitespace()
+		beforeIsPunct = tokenBefore.isPunct()
+	}
+	if nil != tokenAfter {
+		afterIsWhitespace = tokenAfter.isWhitespace()
+		afterIsPunct = tokenAfter.isPunct()
+	}
+
+	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
+	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
+	if itemUnderscore == token.typ {
+		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
+		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
+	} else {
+		canOpen = isLeftFlanking
+		canClose = isRightFlanking
+	}
+
+	return &delimiter{typ: token.val, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
+}
+
+func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
 	marker := tokens[0]
 	if !t.matchEnd(tokens[1:], marker) {
 		marker.typ = itemStr
+		*pos++
 
-		return nil, tokens
+		return &Text{NodeText, RawText(marker.val), nil, t, marker.val}
 	}
 
 	var text string
 	var textTokens = items{}
 
-	for i := 1; i < len(tokens); i++ {
+	for i := *pos; i < len(tokens); i++ {
 		token := tokens[i]
 		if itemNewline == token.typ {
 			text += " "
 		} else {
 			if itemBacktick == token.typ {
-				remains = tokens[i+1:]
+				*pos = i
 				break
 			}
 			text += token.val
@@ -106,6 +155,13 @@ func (t *Tree) parseInlineCode(tokens []*item) (ret Node, remains items) {
 	ret = &InlineCode{NodeInlineCode, RawText(text), textTokens, t, text}
 
 	return
+}
+
+func (t *Tree) parseText(tokens items, pos *int) (ret Node) {
+	token := tokens[*pos]
+	*pos++
+
+	return &Text{NodeText, RawText(token.val), nil, t, token.val}
 }
 
 func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
