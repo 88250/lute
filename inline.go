@@ -16,12 +16,15 @@
 package lute
 
 func (t *Tree) parseInlines() {
-	t.parseBlockInlines(t.Root.Children())
+	delimiters := &delimiter{}
+	t.parseBlockInlines(t.Root.Children(), delimiters)
+
+	t.parseEmphasis(nil, delimiters)
 }
 
-func (t *Tree) parseBlockInlines(blocks Children) {
+func (t *Tree) parseBlockInlines(blocks []*Node, delimiters *delimiter) {
 	for _, block := range blocks {
-		cType := block.Type()
+		cType := block.NodeType
 		switch cType {
 		case NodeCode, NodeInlineCode, NodeThematicBreak:
 			continue
@@ -29,22 +32,22 @@ func (t *Tree) parseBlockInlines(blocks Children) {
 
 		cs := block.Children()
 		if 0 < len(cs) {
-			t.parseBlockInlines(cs)
+			t.parseBlockInlines(cs, delimiters)
 
 			continue
 		}
 
-		tokens := block.Tokens()
+		tokens := block.Tokens
 		pos := 0
-		stack := &delimiterStack{}
+
 		for {
 			token := tokens[pos]
-			var n Node
+			var n *Node
 			switch token.typ {
 			case itemBacktick:
 				n = t.parseInlineCode(tokens, &pos)
 			case itemAsterisk, itemUnderscore:
-				n = t.parseDelimiter(tokens, &pos, stack)
+				n = t.parseDelimiter(tokens, &pos, delimiters)
 			case itemStr:
 				n = t.parseText(tokens, &pos)
 			}
@@ -57,17 +60,147 @@ func (t *Tree) parseBlockInlines(blocks Children) {
 				break
 			}
 		}
-
 	}
 }
 
-func (t *Tree) parseDelimiter(tokens items, pos *int, stack *delimiterStack) (ret Node) {
+func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
+	var opener, closer, old_closer *delimiter
+	var opener_inl, closer_inl *Node
+	var tempstack *delimiter
+	var use_delims int
+	var tmp, next *delimiter
+	var opener_found bool
+	var openers_bottom = map[itemType]*delimiter{}
+	var odd_match = false
+
+	openers_bottom[itemUnderscore] = stackBottom
+	openers_bottom[itemAsterisk] = stackBottom
+
+	// find first closer above stack_bottom:
+	closer = delimiters
+	for closer != nil && closer.previous != stackBottom {
+		closer = closer.previous
+	}
+
+	// move forward, looking for closers, and handling each
+	for closer != nil {
+		var closercc = closer.typ
+		if !closer.canClose {
+			continue
+		}
+
+		// found emphasis closer. now look back for first matching opener:
+		opener = closer.previous
+		opener_found = false
+		for nil != opener && opener != stackBottom && opener != openers_bottom[closercc] {
+			odd_match = (closer.canOpen || opener.canClose) && closer.originalNum%3 != 0 && (opener.originalNum+closer.originalNum)%3 == 0
+			if opener.typ == closer.typ && opener.canOpen && !odd_match {
+				opener_found = true
+				break
+			}
+			opener = opener.previous
+		}
+		old_closer = closer
+
+		if itemAsterisk == closercc || itemUnderscore == closercc {
+			if !opener_found {
+				closer = closer.next
+			} else {
+				// calculate actual number of delimiters used from closer
+				if closer.num >= 2 && opener.num >= 2 {
+					use_delims = 2
+				} else {
+					use_delims = 1
+				}
+
+				opener_inl = opener.node
+				closer_inl = closer.node
+
+				// remove used delimiters from stack elts and inlines
+				opener.num -= use_delims
+				closer.num -= use_delims
+
+				text := opener_inl.RawText[0 : len(opener_inl.RawText)-use_delims]
+				opener_inl.RawText = text
+
+				text = closer_inl.RawText[0 : len(closer_inl.RawText)-use_delims]
+				closer_inl.RawText = text
+
+				// build contents for new emph element
+				var emph *Node
+				if 1 == use_delims {
+					emph = &Node{NodeType: NodeEmphasis}
+					_ = &Emphasis{Node: emph}
+				} else {
+					emph = &Node{NodeType: NodeStrong}
+					_ = &Strong{Node: emph}
+				}
+
+				tmp.node = opener_inl.Next
+				for nil != tmp && tmp.node != closer_inl {
+					next = tmp.next
+					tmp.node.Unlink()
+					emph.Append(tmp.node)
+					tmp = next
+				}
+
+				opener_inl.InsertAfter(emph)
+
+				// remove elts between opener and closer in delimiters stack
+				if opener.next != closer {
+					opener.next = closer
+					closer.previous = opener
+				}
+
+				// if opener has 0 delims, remove it and the inline
+				if opener.num == 0 {
+					opener_inl.Unlink()
+					delimiters.remove(opener)
+				}
+
+				if closer.num == 0 {
+					closer_inl.Unlink()
+					tempstack = closer.next
+					delimiters.remove(closer)
+					closer = tempstack
+				}
+			}
+		}
+		if !opener_found && !odd_match {
+			// Set lower bound for future searches for openers:
+			// We don't do this with odd_match because a **
+			// that doesn't match an earlier * might turn into
+			// an opener, and the * might be matched by something
+			// else.
+			openers_bottom[closercc] = old_closer.previous
+			if !old_closer.canOpen {
+				// We can remove a closer that can't be an opener,
+				// once we've seen there's no matching opener:
+				delimiters.remove(old_closer)
+			}
+		}
+	}
+
+	// remove all delimiters
+	for delimiters != nil && delimiters != stackBottom {
+		delimiters.remove(delimiters)
+	}
+}
+
+func (t *Tree) parseDelimiter(tokens items, pos *int, delimiters *delimiter) (ret *Node) {
 	startPos := *pos
 	delim := t.scanDelimiter(tokens, pos)
-	stack.push(delim)
 
 	subTokens, text := t.extractTokens(tokens, startPos, *pos)
-	ret = &Text{NodeText, RawText(text), subTokens, t, text}
+	ret = &Node{NodeType: NodeText, RawText: text}
+	_ = &Text{ret, subTokens, t, text}
+	delim.node = ret
+
+	// Add entry to stack for this opener
+	delimiters = delim
+	if delimiters.previous != nil {
+		delimiters.previous.next = delimiters
+	}
 
 	return
 }
@@ -124,16 +257,19 @@ func (t *Tree) scanDelimiter(tokens items, pos *int) *delimiter {
 		canClose = isRightFlanking
 	}
 
-	return &delimiter{typ: token.val, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
+	return &delimiter{typ: token.typ, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
 }
 
-func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
+func (t *Tree) parseInlineCode(tokens items, pos *int) (ret *Node) {
 	marker := tokens[0]
 	if !t.matchEnd(tokens[1:], marker) {
 		marker.typ = itemStr
 		*pos++
 
-		return &Text{NodeText, RawText(marker.val), nil, t, marker.val}
+		ret = &Node{NodeType: NodeText, RawText: marker.val}
+		_ = &Text{ret, nil, t, marker.val}
+
+		return
 	}
 
 	var text string
@@ -153,19 +289,23 @@ func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
 		textTokens = append(textTokens, token)
 	}
 
-	ret = &InlineCode{NodeInlineCode, RawText(text), textTokens, t, text}
+	ret = &Node{NodeType: NodeInlineCode, RawText: text}
+	_ = &InlineCode{ret, textTokens, t, text}
 
 	return
 }
 
-func (t *Tree) parseText(tokens items, pos *int) (ret Node) {
+func (t *Tree) parseText(tokens items, pos *int) (ret *Node) {
 	token := tokens[*pos]
 	*pos++
 
-	return &Text{NodeText, RawText(token.val), nil, t, token.val}
+	ret = &Node{NodeType: NodeText, RawText: token.val}
+	_ = &Text{ret, nil, t, token.val}
+
+	return
 }
 
-func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
+func (t *Tree) parseCode(tokens items) (ret *Node, remains items) {
 	i := 1
 	token := tokens[i]
 	pos := token.pos
@@ -175,7 +315,8 @@ func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
 		i++
 	}
 
-	ret = &Code{NodeCode, pos, "", items{}, t, code, "", ""}
+	ret = &Node{NodeType: NodeCode}
+	_ = &Code{ret, pos, items{}, t, code, "", ""}
 	remains = tokens[i+1:]
 
 	return

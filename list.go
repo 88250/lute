@@ -27,13 +27,10 @@ const (
 )
 
 type List struct {
-	NodeType
+	*Node
 	int
-	RawText
 	items
-	t        *Tree
-	Parent   Node
-	Subnodes Children
+	t *Tree
 
 	ListType ListType
 	Start    int
@@ -45,30 +42,23 @@ type List struct {
 }
 
 func (n *List) String() string {
-	return fmt.Sprintf("%s", n.Subnodes)
+	return fmt.Sprintf("%s", n.Children())
 }
 
 func (n *List) HTML() string {
-	content := html(n.Subnodes)
+	content := html(n.Children())
 
-	if NodeListItem == n.Parent.Type() {
+	if NodeListItem == n.Parent.NodeType {
 		return fmt.Sprintf("\n<ul>\n%s</ul>\n", content)
 	}
 
 	return fmt.Sprintf("<ul>\n%s</ul>\n", content)
 }
 
-func (n *List) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *List) Children() Children {
-	return n.Subnodes
-}
-
-func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item) *List {
-	ret := &List{
-		NodeList, token.pos, "", items{}, t, t.context.CurNode, Children{},
+func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item) (ret *Node, list *List) {
+	ret = &Node{NodeType: NodeList, Parent: t.context.CurNode}
+	list = &List{
+		ret, token.pos, items{}, t,
 		ListTypeBullet,
 		1,
 		false,
@@ -78,10 +68,10 @@ func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item
 	}
 	t.context.CurNode = ret
 
-	return ret
+	return
 }
 
-func (t *Tree) parseList(line items) Node {
+func (t *Tree) parseList(line items) (ret *Node) {
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	marker := firstNonWhitespace
 	indentSpaces := spaces + tabs*4
@@ -98,19 +88,19 @@ func (t *Tree) parseList(line items) Node {
 	} else {
 		line = indentOffset(line, indentSpaces+wnSpaces, t)
 	}
-	list := newList(indentSpaces, marker.val, wnSpaces, t, marker)
+	ret, list := newList(indentSpaces, marker.val, wnSpaces, t, marker)
 	tight := false
 
 	defer func() { t.context.IndentSpaces = oldContextIndentSpaces }()
 
 	for {
-		c := t.parseListItem(line)
-		if nil == c {
+		n, i := t.parseListItem(line)
+		if nil == n {
 			break
 		}
-		list.Append(c)
+		list.Append(n)
 
-		if c.Tight {
+		if i.Tight {
 			tight = true
 		}
 
@@ -132,7 +122,7 @@ func (t *Tree) parseList(line items) Node {
 
 	list.Tight = tight
 
-	return list
+	return
 }
 
 // https://spec.commonmark.org/0.29/#lists

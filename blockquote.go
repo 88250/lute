@@ -18,46 +18,35 @@ package lute
 import "fmt"
 
 type Blockquote struct {
-	NodeType
+	*Node
 	int
-	RawText
 	items
-	t        *Tree
-	Parent   Node
-	Subnodes Children
+	t *Tree
 }
 
 func (n *Blockquote) String() string {
-	return fmt.Sprintf("%s", n.Subnodes)
+	return fmt.Sprintf("%s", n.Children())
 }
 
 func (n *Blockquote) HTML() string {
-	content := html(n.Subnodes)
+	content := html(n.Children())
 
 	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
 }
 
-func (n *Blockquote) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *Blockquote) Children() Children {
-	return n.Subnodes
-}
-
-func newBlockquote(t *Tree, token *item) *Blockquote {
-	ret := &Blockquote{
-		NodeBlockquote, token.pos, "", items{}, t, t.context.CurNode, Children{}}
+func newBlockquote(t *Tree, token *item) (ret *Node) {
+	ret = &Node{NodeType: NodeBlockquote, Parent: t.context.CurNode}
+	_ = &Blockquote{ret, token.pos, items{}, t}
 	t.context.CurNode = ret
 
-	return ret
+	return
 }
 
-func (t *Tree) parseBlockquote(line items) Node {
+func (t *Tree) parseBlockquote(line items) (ret *Node) {
 	token := line[0]
 	indentSpaces := t.context.IndentSpaces + 2
 
-	ret := newBlockquote(t, token)
+	ret = newBlockquote(t, token)
 	line = indentOffset(line[1:], indentSpaces, t)
 	for {
 		c := t.parseBlock(line)
@@ -84,7 +73,7 @@ func (t *Tree) parseBlockquote(line items) Node {
 		//indentOffset(tokens, indentSpaces, t)
 	}
 
-	return ret
+	return
 }
 
 // https://spec.commonmark.org/0.29/#block-quotes

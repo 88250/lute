@@ -19,31 +19,88 @@ import (
 	"fmt"
 )
 
-// Node represents a node in ast. https://github.com/syntax-tree/mdast
-type Node interface {
-	Type() NodeType
-	Raw() RawText
-	Children() Children
-	Tokens() items
-	Append(child Node)
-	String() string
+type HTMLRenderer interface {
 	HTML() string
+	String() string
 }
 
-// NodeType identifies the type of a parse tree node.
-type NodeType int
+// Node represents a node in ast. https://github.com/syntax-tree/mdast
+type Node struct {
+	NodeType   int
+	Parent     *Node
+	Next       *Node
+	Previous   *Node
+	FirstChild *Node
+	LastChild  *Node
+	RawText    string
+	Tokens     items
 
-func (nt NodeType) Type() NodeType {
-	return nt
+	HTMLRenderer
 }
 
-// Children represents the children nodes of a tree node.
-type Children []Node
+func (n *Node) Unlink() {
+	if nil != n.Previous {
+		n.Previous.Next = n.Next
+	} else if nil != n.Parent {
+		n.Parent.FirstChild = n.Next
+	}
+	if nil != n.Next {
+		n.Next.Previous = n.Previous
+	} else if nil != n.Parent {
+		n.Parent.LastChild = n.Previous
+	}
+	n.Parent = nil
+	n.Next = nil
+	n.Previous = nil
+}
 
-type RawText string
+func (n *Node) InsertAfter(sibling *Node) {
+	sibling.Unlink()
+	sibling.Next = n.Next
+	if nil != sibling.Next {
+		sibling.Next.Previous = sibling
+	}
+	sibling.Previous = n
+	n.Next = sibling
+	sibling.Parent = n
+	if nil == sibling.Next {
+		sibling.Parent.LastChild = sibling
+	}
+}
 
-func (r RawText) Raw() RawText {
-	return r
+func (n *Node) InsertBefore(sibling *Node) {
+	sibling.Unlink()
+	sibling.Previous = n.Previous
+	if nil != sibling.Previous {
+		sibling.Previous.Next = sibling
+	}
+	sibling.Next = n
+	n.Previous = sibling
+	sibling.Parent = n.Parent
+	if nil == sibling.Previous {
+		sibling.Parent.FirstChild = sibling
+	}
+}
+
+func (n *Node) Append(child *Node) {
+	child.Unlink()
+	child.Parent = n
+	if nil != n.LastChild {
+		n.LastChild.Next = child
+		child.Previous = n.LastChild
+		n.LastChild = child
+	} else {
+		n.FirstChild = child
+		n.LastChild = child
+	}
+}
+
+func (v *Node) Children() (ret []*Node) {
+	for child := v.FirstChild; nil != child; child = child.Next {
+		ret = append(ret, child)
+	}
+
+	return
 }
 
 type items []*item
@@ -56,16 +113,16 @@ func (tokens items) isEOF() bool {
 	return 1 == len(tokens) && (tokens)[0].isEOF()
 }
 
-func (tokens items) rawText() (ret RawText) {
+func (tokens items) rawText() (ret string) {
 	for i := 0; i < len(tokens); i++ {
-		ret += RawText((tokens)[i].val)
+		ret += (tokens)[i].val
 	}
 
 	return
 }
 
 const (
-	NodeRoot NodeType = iota
+	NodeRoot = iota
 	NodeParagraph
 	NodeHeading
 	NodeThematicBreak
@@ -97,66 +154,52 @@ const (
 // Nodes.
 
 type Root struct {
-	NodeType
+	*Node
 	Pos int
-	RawText
 	items
 	*Tree
-	Subnodes Children
 }
 
 func (n *Root) String() string {
-	return fmt.Sprintf("%s", n.Subnodes)
+	return fmt.Sprintf("%s", n.Children())
 }
 
 func (n *Root) HTML() string {
-	content := html(n.Subnodes)
+	content := html(n.Children())
 
 	return fmt.Sprintf("%s", content)
 }
 
-func (n *Root) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *Root) Children() Children {
-	return n.Subnodes
-}
-
 type Table struct {
-	NodeType
+	*Node
 	int
 	*Tree
-	Children
 
 	Align alignType
 }
 
 type TableRow struct {
-	NodeType
+	*Node
 	int
 	*Tree
-	Children
 }
 
 type TableCell struct {
-	NodeType
+	*Node
 	int
 	*Tree
-	Children
 }
 
 type HTML struct {
-	NodeType
+	*Node
 	int
 	*Tree
 	Value string
 }
 
 type Code struct {
-	NodeType
+	*Node
 	int
-	RawText
 	items
 	*Tree
 	Value string
@@ -173,22 +216,8 @@ func (n *Code) HTML() string {
 	return fmt.Sprintf("<pre><code>%s</code></pre>\n", n.Value)
 }
 
-func (n *Code) Append(c Node) {
-}
-
-func (n *Code) Children() Children {
-	return nil
-}
-
-type YAML struct {
-	NodeType
-	int
-	*Tree
-	Value string
-}
-
 type Definition struct {
-	NodeType
+	*Node
 	int
 	*Tree
 
@@ -197,17 +226,15 @@ type Definition struct {
 }
 
 type FootnoteDefinition struct {
-	NodeType
+	*Node
 	int
 	*Tree
-	Children
 
 	Association
 }
 
 type Text struct {
-	NodeType
-	RawText
+	*Node
 	items
 	*Tree
 	Value string
@@ -221,95 +248,57 @@ func (n *Text) HTML() string {
 	return fmt.Sprintf("%s", n.Value)
 }
 
-func (n *Text) Append(child Node) {
-}
-
-func (n *Text) Children() Children {
-	return nil
-}
-
 type Emphasis struct {
-	NodeType
-	RawText
+	*Node
 	items
 	*Tree
-	Subnodes Children
 }
 
 func (n *Emphasis) String() string {
-	return fmt.Sprintf("*%v*", n.Subnodes)
+	return fmt.Sprintf("*%v*", n.Children())
 }
 
 func (n *Emphasis) HTML() string {
-	content := html(n.Subnodes)
+	content := html(n.Children())
 
 	return fmt.Sprintf("<em>%s</em>", content)
 }
 
-func (n *Emphasis) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *Emphasis) Children() Children {
-	return n.Subnodes
-}
-
 type Strong struct {
-	NodeType
-	RawText
+	*Node
 	items
 	*Tree
-	Subnodes Children
 }
 
 func (n *Strong) String() string {
-	return fmt.Sprintf("**%v**", n.Subnodes)
+	return fmt.Sprintf("**%v**", n.Children())
 }
 
 func (n *Strong) HTML() string {
-	content := html(n.Subnodes)
+	content := html(n.Children())
 
 	return fmt.Sprintf("<strong>%s</strong>", content)
 }
 
-func (n *Strong) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *Strong) Children() Children {
-	return n.Subnodes
-}
-
 type Delete struct {
-	NodeType
+	*Node
 	int
-	RawText
 	items
 	*Tree
-	Subnodes Children
 }
 
 func (n *Delete) String() string {
-	return fmt.Sprintf("~~%v~~", n.Subnodes)
+	return fmt.Sprintf("~~%v~~", n.Children())
 }
 
 func (n *Delete) HTML() string {
-	content := html(n.Subnodes)
+	content := html(n.Children())
 
 	return fmt.Sprintf("<del>%s</del>", content)
 }
 
-func (n *Delete) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *Delete) Children() Children {
-	return n.Subnodes
-}
-
 type InlineCode struct {
-	NodeType
-	RawText
+	*Node
 	items
 	*Tree
 	Value string
@@ -323,16 +312,9 @@ func (n *InlineCode) HTML() string {
 	return fmt.Sprintf("<code>%s</code>", n.Value)
 }
 
-func (n *InlineCode) Append(c Node) {}
-
-func (n *InlineCode) Children() Children {
-	return nil
-}
-
 type Break struct {
-	NodeType
+	*Node
 	int
-	RawText
 	items
 	*Tree
 }
@@ -345,23 +327,16 @@ func (n *Break) HTML() string {
 	return fmt.Sprintf("\n")
 }
 
-func (n *Break) Append(c Node) {}
-
-func (n *Break) Children() Children {
-	return nil
-}
-
 type Link struct {
-	NodeType
+	*Node
 	int
 	*Tree
-	Children
 
 	Resource
 }
 
 type Image struct {
-	NodeType
+	*Node
 	int
 	*Tree
 
@@ -374,16 +349,15 @@ func (n Image) String() string {
 }
 
 type LinkReference struct {
-	NodeType
+	*Node
 	int
 	*Tree
-	Children
 
 	Reference
 }
 
 type ImageReference struct {
-	NodeType
+	*Node
 	int
 	*Tree
 
@@ -392,14 +366,13 @@ type ImageReference struct {
 }
 
 type Footnote struct {
-	NodeType
+	*Node
 	int
 	*Tree
-	Children
 }
 
 type FootnoteReference struct {
-	NodeType
+	*Node
 	int
 	*Tree
 
@@ -432,7 +405,7 @@ type Alternative struct {
 type alignType string
 type referenceType string
 
-func html(children Children) string {
+func html(children []*Node) string {
 	var ret string
 	for _, c := range children {
 		ret += c.HTML()

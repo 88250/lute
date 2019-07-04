@@ -21,13 +21,10 @@ import (
 )
 
 type ListItem struct {
-	NodeType
+	*Node
 	int
-	RawText
 	items
-	t        *Tree
-	Parent   Node
-	Subnodes Children
+	t *Tree
 
 	Checked bool
 	Tight   bool
@@ -36,17 +33,12 @@ type ListItem struct {
 }
 
 func (n *ListItem) String() string {
-	return fmt.Sprintf("%s", n.Subnodes)
+	return fmt.Sprintf("%s", n.Children())
 }
 
 func (n *ListItem) HTML() string {
 	var content string
-	for _, c := range n.Subnodes {
-		if n.Tight && NodeParagraph == c.Type() {
-			p := c.(*Paragraph)
-			p.OpenTag, p.CloseTag = "", ""
-		}
-
+	for _, c := range n.Children() {
 		content += c.HTML()
 	}
 
@@ -54,36 +46,29 @@ func (n *ListItem) HTML() string {
 		return fmt.Sprintf("<li>%s</li>\n", content)
 	}
 
-	if 1 < len(n.Subnodes) || strings.Contains(content, "<pre><code") {
+	if 1 < len(n.Children()) || strings.Contains(content, "<pre><code") {
 		return fmt.Sprintf("<li>\n%s</li>\n", content)
 	}
 
 	return fmt.Sprintf("<li>%s</li>\n", content)
 }
 
-func (n *ListItem) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *ListItem) Children() Children {
-	return n.Subnodes
-}
-
-func newListItem(indentSpaces int, t *Tree, token *item) *ListItem {
-	ret := &ListItem{
-		NodeListItem, token.pos, "", items{}, t, t.context.CurNode, Children{},
+func newListItem(indentSpaces int, t *Tree, token *item) (ret *Node, listItem *ListItem) {
+	ret = &Node{NodeType: NodeListItem}
+	listItem = &ListItem{
+		ret, token.pos, items{}, t,
 		false,
 		true,
 		indentSpaces,
 	}
 	t.context.CurNode = ret
 
-	return ret
+	return
 }
 
-func (t *Tree) parseListItem(line items) *ListItem {
+func (t *Tree) parseListItem(line items) (ret *Node, listItem *ListItem) {
 	indentSpaces := t.context.IndentSpaces
-	ret := newListItem(indentSpaces, t, line[0])
+	ret, listItem = newListItem(indentSpaces, t, line[0])
 	blankLineBetweenBlocks := false
 	for {
 		c := t.parseBlock(line)
@@ -112,9 +97,9 @@ func (t *Tree) parseListItem(line items) *ListItem {
 		line = indentOffset(line, indentSpaces, t)
 	}
 
-	if 1 < len(ret.Subnodes) && blankLineBetweenBlocks {
-		ret.Tight = false
+	if 1 < len(ret.Children()) && blankLineBetweenBlocks {
+		listItem.Tight = false
 	}
 
-	return ret
+	return
 }

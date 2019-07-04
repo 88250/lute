@@ -21,36 +21,26 @@ import (
 )
 
 type Paragraph struct {
-	NodeType
+	*Node
 	int
-	RawText
 	items []*item
 	*Tree
-	Subnodes Children
 
 	OpenTag, CloseTag string
 }
 
 func (n *Paragraph) String() string {
-	return fmt.Sprintf("%s", n.Subnodes)
+	return fmt.Sprintf("%s", n.Children())
 }
 
 func (n *Paragraph) HTML() string {
-	content := html(n.Subnodes)
+	content := html(n.Children())
 
 	if "" != n.OpenTag {
 		return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag+"\n", content)
 	}
 
 	return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
-}
-
-func (n *Paragraph) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *Paragraph) Children() Children {
-	return n.Subnodes
 }
 
 func (n *Paragraph) Tokens() items {
@@ -86,15 +76,16 @@ func (n *Paragraph) trim() {
 	}
 
 	n.items = n.items[initialNoneWhitespace:finalNoneWhitespace]
-	n.RawText = RawText(strings.TrimSpace(string(n.RawText)))
+	n.RawText = strings.TrimSpace(string(n.RawText))
 }
 
-func (t *Tree) parseParagraph(line items) Node {
-	ret := &Paragraph{NodeParagraph, line[0].pos, "", nil, t, Children{}, "<p>", "</p>"}
-	defer ret.trim()
+func (t *Tree) parseParagraph(line items) (ret *Node) {
+	ret = &Node{NodeType:NodeParagraph}
+	p := &Paragraph{ret, line[0].pos, nil, t, "<p>", "</p>"}
+	defer p.trim()
 
 	for {
-		ret.items = append(ret.items, items(line)...)
+		p.items = append(p.items, items(line)...)
 		ret.RawText += line.rawText()
 		line = t.nextLine()
 		if t.interruptParagrah(line) {

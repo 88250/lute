@@ -15,9 +15,10 @@
 
 package lute
 
-func (t *Tree) parseIndentCode(line items) Node {
-	ret := &Code{NodeCode, 0, "", nil, t, "", "", ""}
-	var code string
+func (t *Tree) parseIndentCode(line items) (ret *Node) {
+	ret = &Node{NodeType: NodeCode}
+	code := &Code{ret, 0, nil, t, "", "", ""}
+	var codeValue string
 Loop:
 	for {
 		var spaces, tabs int
@@ -36,7 +37,7 @@ Loop:
 
 		for i := 0; i < len(line); i++ {
 			token := line[i]
-			code += token.val
+			codeValue += token.val
 			if itemNewline == token.typ {
 				line = t.nextLine()
 				spaces, tabs, _, _ := t.nonWhitespace(line)
@@ -47,7 +48,7 @@ Loop:
 					continue Loop
 				}
 			}
-			ret.items = append(ret.items, token)
+			code.items = append(code.items, token)
 		}
 
 		line = t.nextLine()
@@ -57,10 +58,10 @@ Loop:
 		}
 	}
 
-	ret.Value = code
-	ret.RawText = RawText(code)
+	code.Value = codeValue
+	code.RawText = codeValue
 
-	return ret
+	return
 }
 
 // https://spec.commonmark.org/0.29/#indented-code-blocks

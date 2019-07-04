@@ -18,41 +18,29 @@ package lute
 import "fmt"
 
 type Heading struct {
-	NodeType
+	*Node
 	int
-	RawText
 	items
 	*Tree
-	Subnodes Children
 
 	Depth int
 }
 
 func (n *Heading) String() string {
-	return fmt.Sprintf("# %s", n.Subnodes)
+	return fmt.Sprintf("# %s", n.Children())
 }
 
 func (n *Heading) HTML() string {
-	content := html(n.Subnodes)
+	content := html(n.Children())
 
 	return fmt.Sprintf("<h%d>%s</h%d>\n", n.Depth, content, n.Depth)
 }
 
-func (n *Heading) Append(c Node) {
-	n.Subnodes = append(n.Subnodes, c)
-}
-
-func (n *Heading) Children() Children {
-	return n.Subnodes
-}
-
-func (t *Tree) parseHeading(line items) Node {
+func (t *Tree) parseHeading(line items) (ret *Node) {
 	marker := line[0]
 
-	ret := &Heading{
-		NodeHeading, marker.pos, "", items{}, t, Children{},
-		len(marker.val),
-	}
+	ret = &Node{NodeType: NodeHeading}
+	heading := &Heading{ret, marker.pos, items{}, t, len(marker.val)}
 
 	tokens := t.skipWhitespaces(line[1:])
 	for _, token := range tokens {
@@ -63,11 +51,11 @@ func (t *Tree) parseHeading(line items) Node {
 			break
 		}
 
-		ret.RawText += RawText(token.val)
-		ret.items = append(ret.items, token)
+		heading.RawText += token.val
+		heading.items = append(heading.items, token)
 	}
 
-	return ret
+	return
 }
 
 // https://spec.commonmark.org/0.29/#atx-headings
