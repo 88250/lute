@@ -73,8 +73,8 @@ func (t *Tree) parseDelimiter(tokens items, pos *int, stack *delimiterStack) (re
 }
 
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
-	for i:=startPos;i<endPos;i++ {
-		text+=tokens[i].val
+	for i := startPos; i < endPos; i++ {
+		text += tokens[i].val
 		subTokens = append(subTokens, tokens[i])
 	}
 
@@ -82,7 +82,8 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 }
 
 func (t *Tree) scanDelimiter(tokens items, pos *int) *delimiter {
-	token := tokens[*pos]
+	startPos := *pos
+	token := tokens[startPos]
 	delimitersCount := 0
 	for i := *pos; i < len(tokens); i++ {
 		if token.val == tokens[i].val {
@@ -94,12 +95,12 @@ func (t *Tree) scanDelimiter(tokens items, pos *int) *delimiter {
 	}
 
 	var tokenBefore, tokenAfter *item
-	index := *pos - 1
+	index := startPos - 1
 	if 0 < index {
 		tokenBefore = tokens[index]
 	}
-	index = *pos + 1
-	if len(tokens) < index {
+	index = startPos + 1
+	if len(tokens) > index {
 		tokenAfter = tokens[index]
 	}
 
