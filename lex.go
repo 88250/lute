@@ -25,7 +25,7 @@ import (
 type item struct {
 	typ  itemType // the type of this item
 	pos  int      // the starting position, in bytes, of this item in the input string
-	val  string     // the value of this item, aka lexeme
+	val  string   // the value of this item, aka lexeme
 	line int      // the line number at the start of this item
 }
 
@@ -64,26 +64,26 @@ type itemType int
 
 // Make the types pretty print.
 var itemName = map[itemType]string{
-	itemEOF:          "EOF",
-	itemStr:          "str",
-	itemBacktick:     "`",
-	itemTilde:        "~",
-	itemExclamation:  "!",
-	itemCrosshatch:   "#",
-	itemAsterisk:     "*",
-	itemOpenParen:    "(",
-	itemCloseParen:   ")",
-	itemHyphen:       "-",
-	itemUnderscore:   "_",
-	itemPlus:         "+",
-	itemTab:          "tab",
-	itemOpenBracket:  "[",
-	itemCloseBracket: "]",
-	itemDoublequote:  "\"",
-	itemSinglequote:  "'",
-	itemGreater:      ">",
-	itemSpace:        "space",
-	itemNewline:      "newline",
+	itemEOF:             "EOF",
+	itemStr:             "str",
+	itemBacktick:        "`",
+	itemTilde:           "~",
+	itemBangOpenBracket: "![",
+	itemCrosshatch:      "#",
+	itemAsterisk:        "*",
+	itemOpenParen:       "(",
+	itemCloseParen:      ")",
+	itemHyphen:          "-",
+	itemUnderscore:      "_",
+	itemPlus:            "+",
+	itemTab:             "tab",
+	itemOpenBracket:     "[",
+	itemCloseBracket:    "]",
+	itemDoublequote:     "\"",
+	itemSinglequote:     "'",
+	itemGreater:         ">",
+	itemSpace:           "space",
+	itemNewline:         "newline",
 }
 
 func (i itemType) String() string {
@@ -96,27 +96,27 @@ func (i itemType) String() string {
 }
 
 const (
-	itemEOF          itemType = iota // EOF
-	itemStr                          // plain text
-	itemBacktick                     // `
-	itemTilde                        // ~
-	itemExclamation                  // !
-	itemCrosshatch                   // #
-	itemAsterisk                     // *
-	itemOpenParen                    // (
-	itemCloseParen                   // )
-	itemHyphen                       // -
-	itemUnderscore                   // _
-	itemPlus                         // +
-	itemEqual                        // =
-	itemTab                          // \t
-	itemOpenBracket                  // [
-	itemCloseBracket                 // ]
-	itemDoublequote                  // "
-	itemSinglequote                  // '
-	itemGreater                      // >
-	itemSpace                        // space
-	itemNewline                      // \n
+	itemEOF             itemType = iota // EOF
+	itemStr                             // plain text
+	itemBacktick                        // `
+	itemTilde                           // ~
+	itemBangOpenBracket                 // ![
+	itemCrosshatch                      // #
+	itemAsterisk                        // *
+	itemOpenParen                       // (
+	itemCloseParen                      // )
+	itemHyphen                          // -
+	itemUnderscore                      // _
+	itemPlus                            // +
+	itemEqual                           // =
+	itemTab                             // \t
+	itemOpenBracket                     // [
+	itemCloseBracket                    // ]
+	itemDoublequote                     // "
+	itemSinglequote                     // '
+	itemGreater                         // >
+	itemSpace                           // space
+	itemNewline                         // \n
 )
 
 const (
@@ -209,7 +209,12 @@ func (s *scanner) run() {
 		case '`' == r:
 			s.newItem(itemBacktick)
 		case '!' == r:
-			s.newItem(itemExclamation)
+			if '[' == s.next() {
+				s.newItem(itemBangOpenBracket)
+			} else {
+				s.backup()
+				s.newItem(itemStr)
+			}
 		case '#' == r:
 			s.newItem(itemCrosshatch)
 		case '*' == r:

@@ -33,15 +33,20 @@ func mkItem(typ itemType, text string) *item {
 }
 
 var (
-	tEOF        = mkItem(itemEOF, "")
-	tSpace      = mkItem(itemSpace, " ")
-	tNewLine    = mkItem(itemNewline, "\n")
-	tTab        = mkItem(itemTab, "\t")
-	tBacktick   = mkItem(itemBacktick, "`")
-	tAsterisk   = mkItem(itemAsterisk, "*")
-	tHypen      = mkItem(itemHyphen, "-")
-	tUnderscore = mkItem(itemUnderscore, "_")
-	tPlus       = mkItem(itemPlus, "+")
+	tEOF             = mkItem(itemEOF, "")
+	tSpace           = mkItem(itemSpace, " ")
+	tNewLine         = mkItem(itemNewline, "\n")
+	tTab             = mkItem(itemTab, "\t")
+	tBacktick        = mkItem(itemBacktick, "`")
+	tAsterisk        = mkItem(itemAsterisk, "*")
+	tHypen           = mkItem(itemHyphen, "-")
+	tUnderscore      = mkItem(itemUnderscore, "_")
+	tPlus            = mkItem(itemPlus, "+")
+	tBangOpenBracket = mkItem(itemBangOpenBracket, "![")
+	tOpenBracket     = mkItem(itemOpenBracket, "[")
+	tCloseBracket    = mkItem(itemCloseBracket, "]")
+	tOpenParen       = mkItem(itemOpenParen, "(")
+	tCloseParan      = mkItem(itemCloseParen, ")")
 )
 
 var lexTests = []lexTest{
@@ -50,6 +55,8 @@ var lexTests = []lexTest{
 	{"spec13", "***\n---\n___\n", items{tAsterisk, tAsterisk, tAsterisk, tNewLine, tHypen, tHypen, tHypen, tNewLine, tUnderscore, tUnderscore, tUnderscore, tNewLine, tEOF}},
 	{"spec7", "-\t\tfoo\n", items{mkItem(itemHyphen, "-"), tTab, tTab, mkItem(itemStr, "foo"), tNewLine, tEOF}},
 
+	{"simple13", "![lute]()", items{tBangOpenBracket, mkItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
+	{"simple12", "[lute]()", items{tOpenBracket, mkItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
 	{"simple11", "`lu\nte`", items{tBacktick, mkItem(itemStr, "lu"), tNewLine, mkItem(itemStr, "te"), tBacktick, tEOF}},
 	{"simple10", "# lute", items{mkItem(itemCrosshatch, "#"), tSpace, mkItem(itemStr, "lute"), tEOF}},
 	{"simple9", "> lute", items{mkItem(itemGreater, ">"), tSpace, mkItem(itemStr, "lute"), tEOF}},
