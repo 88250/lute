@@ -1,4 +1,4 @@
-// Lute - A structural markdown engine.
+// Lute - A structured markdown engine.
 // Copyright (C) 2019-present, b3log.org
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
