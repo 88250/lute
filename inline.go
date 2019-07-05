@@ -18,8 +18,6 @@ package lute
 func (t *Tree) parseInlines() {
 	delimiters := &delimiter{}
 	t.parseBlockInlines(t.Root.Children(), delimiters)
-
-	t.parseEmphasis(nil, delimiters)
 }
 
 func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
@@ -47,7 +45,7 @@ func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
 			case itemBacktick:
 				n = t.parseInlineCode(tokens, &pos)
 			case itemAsterisk, itemUnderscore:
-				n = t.parseDelimiter(tokens, &pos, delimiters)
+				n = t.handleDelim(tokens, &pos, delimiters)
 			case itemStr:
 				n = t.parseText(tokens, &pos)
 			}
@@ -60,6 +58,8 @@ func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
 				break
 			}
 		}
+
+		t.parseEmphasis(nil, delimiters)
 	}
 }
 
@@ -185,7 +185,7 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 	}
 }
 
-func (t *Tree) parseDelimiter(tokens items, pos *int, delimiters *delimiter) (ret Node) {
+func (t *Tree) handleDelim(tokens items, pos *int, delimiters *delimiter) (ret Node) {
 	startPos := *pos
 	delim := t.scanDelimiter(tokens, pos)
 
@@ -195,7 +195,14 @@ func (t *Tree) parseDelimiter(tokens items, pos *int, delimiters *delimiter) (re
 	delim.node = ret
 
 	// Add entry to stack for this opener
-	delimiters = delim
+	delimiters.typ = delim.typ
+	delimiters.previous = delim.previous
+	delimiters.next = delim.next
+	delimiters.node = delim.node
+	delimiters.canOpen = delim.canOpen
+	delimiters.canClose = delim.canClose
+	delimiters.num = delim.num
+	delimiters.originalNum = delim.originalNum
 	if delimiters.previous != nil {
 		delimiters.previous.next = delimiters
 	}
