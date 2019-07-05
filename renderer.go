@@ -20,34 +20,35 @@ import (
 )
 
 // NodeRendererFunc is a function that renders a given node.
-type NodeRendererFunc func(writer strings.Builder, n Node, entering bool) (WalkStatus, error)
+type NodeRendererFunc func(n Node, entering bool) (WalkStatus, error)
 
 // A Renderer interface renders given AST node to given
 // writer with given Renderer.
 type Renderer struct {
+	writer            strings.Builder
 	nodeRendererFuncs map[NodeType]NodeRendererFunc
 }
 
-func NewRenderer() *Renderer {
-	return &Renderer{nodeRendererFuncs: map[NodeType]NodeRendererFunc{}}
+func NewRenderer() (ret *Renderer) {
+	ret = &Renderer{nodeRendererFuncs: map[NodeType]NodeRendererFunc{}}
+	ret.Register(NodeRoot, ret.renderRoot)
+	ret.Register(NodeParagraph, ret.renderParagraph)
+	ret.Register(NodeText, ret.renderText)
+
+	return
 }
 
 func (r *Renderer) Register(nodeType NodeType, v NodeRendererFunc) {
 	r.nodeRendererFuncs[nodeType] = v
 }
 
-func (r *Renderer) Render(writer strings.Builder, n Node) {
-	r.nodeRendererFuncs = map[NodeType]NodeRendererFunc{}
-	for kind, nr := range r.nodeRendererFuncs {
-		r.nodeRendererFuncs[kind] = nr
-	}
-
+func (r *Renderer) Render(n Node) {
 	err := Walk(n, func(n Node, entering bool) (WalkStatus, error) {
 		s := WalkStatus(WalkContinue)
 		var err error
 		f := r.nodeRendererFuncs[n.Type()]
 		if f != nil {
-			s, err = f(writer, n, entering)
+			s, err = f(n, entering)
 		}
 		return s, err
 	})
@@ -57,13 +58,27 @@ func (r *Renderer) Render(writer strings.Builder, n Node) {
 
 // HTML renderer
 
-func (r *Renderer) renderText(writer strings.Builder, node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		_, _ = r.writer.WriteString("<p>")
+	} else {
+		_, _ = r.writer.WriteString("</p>\n")
+	}
+
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		return WalkContinue, nil
 	}
 
 	n := node.(*Text)
-	writer.WriteString(n.Value)
+	r.writer.WriteString(n.Value)
 
 	return WalkContinue, nil
 }

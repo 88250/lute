@@ -79,8 +79,9 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			break
 		}
 	}
+	ret = p
 
-	return ret
+	return
 }
 
 func (t *Tree) interruptParagrah(line items) bool {
