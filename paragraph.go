@@ -16,7 +16,6 @@
 package lute
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -27,16 +26,6 @@ type Paragraph struct {
 	*Tree
 
 	OpenTag, CloseTag string
-}
-
-func (n *Paragraph) HTML() string {
-	content := html(n.Children())
-
-	if "" != n.OpenTag {
-		return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag+"\n", content)
-	}
-
-	return fmt.Sprintf(n.OpenTag+"%s"+n.CloseTag, content)
 }
 
 func (n *Paragraph) Tokens() items {

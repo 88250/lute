@@ -15,18 +15,10 @@
 
 package lute
 
-import "fmt"
-
 type Blockquote struct {
 	*BaseNode
 	int
 	t *Tree
-}
-
-func (n *Blockquote) HTML() string {
-	content := html(n.Children())
-
-	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
 }
 
 func newBlockquote(t *Tree, token *item) (ret Node) {

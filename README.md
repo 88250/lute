@@ -52,8 +52,9 @@ Lute 使用 [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-
 
 ## 鸣谢
 
-* [commonmark.js](https://github.com/commonmark/commonmark.js)：CommonMark 规范的官方 JavaScript 参考实现
-* [mdast](https://github.com/syntax-tree/mdast)：Markdown 语法树规范
+* [commonmark.js](https://github.com/commonmark/commonmark.js)：CommonMark 规范的官方 JavaScript 参考实现。Lute 的嵌套强调和链接解析算法参考了该项目
+* [mdast](https://github.com/syntax-tree/mdast)：Markdown 语法树规范。Lute 的 AST 结构参考了该项目
+* [goldmark](https://github.com/yuin/goldmark)：Go 实现的 Markdown 解析器。Lute 的 AST 遍历接口参考了该项目
 
 ---
 

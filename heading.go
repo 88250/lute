@@ -15,20 +15,12 @@
 
 package lute
 
-import "fmt"
-
 type Heading struct {
 	*BaseNode
 	int
 	*Tree
 
 	Depth int
-}
-
-func (n *Heading) HTML() string {
-	content := html(n.Children())
-
-	return fmt.Sprintf("<h%d>%s</h%d>\n", n.Depth, content, n.Depth)
 }
 
 func (t *Tree) parseHeading(line items) (ret Node) {

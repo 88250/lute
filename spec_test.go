@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -51,7 +52,9 @@ func TestSpec(t *testing.T) {
 			t.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
 		}
 
-		html := tree.Render()
+		writer := strings.Builder{}
+		tree.Render(writer)
+		html := writer.String()
 		if test.HTML != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.HTML, html, test.Markdown)
 		}

@@ -15,11 +15,6 @@
 
 package lute
 
-import (
-	"fmt"
-	"strings"
-)
-
 type ListItem struct {
 	*BaseNode
 	int
@@ -29,23 +24,6 @@ type ListItem struct {
 	Tight   bool
 
 	Spaces int
-}
-
-func (n *ListItem) HTML() string {
-	var content string
-	for _, c := range n.Children() {
-		content += c.HTML()
-	}
-
-	if strings.Contains(content, "<ul>") {
-		return fmt.Sprintf("<li>%s</li>\n", content)
-	}
-
-	if 1 < len(n.Children()) || strings.Contains(content, "<pre><code") {
-		return fmt.Sprintf("<li>\n%s</li>\n", content)
-	}
-
-	return fmt.Sprintf("<li>%s</li>\n", content)
 }
 
 func newListItem(indentSpaces int, t *Tree, token *item) (ret Node) {

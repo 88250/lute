@@ -17,6 +17,7 @@ package lute
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -69,7 +70,9 @@ func TestParse(t *testing.T) {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		html := tree.Render()
+		writer := strings.Builder{}
+		tree.Render(writer)
+		html := writer.String()
 		if test.result != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.result, html, test.input)
 		}

@@ -15,7 +15,10 @@
 
 package lute
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
 func Parse(name, text string) (*Tree, error) {
 	text = sanitize(text)
@@ -53,8 +56,10 @@ type Tree struct {
 	context   *Context
 }
 
-func (t *Tree) Render() string {
-	return t.Root.Renderer()
+func (t *Tree) Render(writer strings.Builder) {
+	renderer := NewRenderer()
+	renderer.Register(NodeText, renderer.renderText)
+	renderer.Render(writer, t.Root)
 }
 
 func (t *Tree) nonWhitespace(line items) (spaces, tabs int, tokens items, firstNonWhitespace *item) {

@@ -15,10 +15,6 @@
 
 package lute
 
-import (
-	"fmt"
-)
-
 type Node interface {
 	Type() NodeType
 	Unlink()
@@ -58,12 +54,12 @@ func (n*BaseNode) Type() NodeType {
 func (n *BaseNode) Unlink() {
 	if nil != n.previous {
 		n.previous.SetNext(n.next)
-	} else if nil != n.Parent {
+	} else if nil != n.parent {
 		n.parent.SetFirstChild(n.next)
 	}
 	if nil != n.next {
 		n.next.SetPrevious(n.previous)
-	} else if nil != n.Parent {
+	} else if nil != n.parent {
 		n.parent.SetLastChild(n.previous)
 	}
 	n.parent = nil
@@ -134,13 +130,13 @@ func (n *BaseNode) Tokens() items {
 func (n *BaseNode) InsertAfter(this Node, sibling Node) {
 	sibling.Unlink()
 	sibling.SetNext(n.next)
-	if nil != sibling.Next {
+	if nil != sibling.Next() {
 		sibling.Next().SetPrevious(sibling)
 	}
 	sibling.SetPrevious(this)
 	n.next = sibling
 	sibling.SetParent(this)
-	if nil == sibling.Next {
+	if nil == sibling.Next() {
 		sibling.Parent().SetLastChild(sibling)
 	}
 }
@@ -148,13 +144,13 @@ func (n *BaseNode) InsertAfter(this Node, sibling Node) {
 func (n *BaseNode) InsertBefore(this Node, sibling Node) {
 	sibling.Unlink()
 	sibling.SetPrevious(n.previous)
-	if nil != sibling.Previous {
+	if nil != sibling.Previous() {
 		sibling.Previous().SetNext(sibling)
 	}
 	sibling.SetNext(this)
 	n.previous = sibling
 	sibling.SetParent(n.parent)
-	if nil == sibling.Previous {
+	if nil == sibling.Previous() {
 		sibling.Parent().SetFirstChild(sibling)
 	}
 }
@@ -162,7 +158,7 @@ func (n *BaseNode) InsertBefore(this Node, sibling Node) {
 func (n *BaseNode) AppendChild(this, child Node) {
 	child.Unlink()
 	child.SetParent(this)
-	if nil != n.LastChild {
+	if nil != n.lastChild {
 		n.lastChild.SetNext(child)
 		child.SetPrevious(n.lastChild)
 		n.lastChild = child
@@ -228,12 +224,6 @@ type Root struct {
 	*BaseNode
 }
 
-func (n *Root) Renderer() string {
-	content := html(n.Children())
-
-	return fmt.Sprintf("%s", content)
-}
-
 type Table struct {
 	*BaseNode
 	int
@@ -271,14 +261,6 @@ type Code struct {
 	Meta string
 }
 
-func (n *Code) String() string {
-	return fmt.Sprintf("```%s```", n.Value)
-}
-
-func (n *Code) HTML() string {
-	return fmt.Sprintf("<pre><code>%s</code></pre>\n", n.Value)
-}
-
 type Definition struct {
 	*BaseNode
 	int
@@ -302,40 +284,12 @@ type Text struct {
 	Value string
 }
 
-func (n *Text) String() string {
-	return fmt.Sprintf("'%s'", n.Value)
-}
-
-func (n *Text) HTML() string {
-	return fmt.Sprintf("%s", n.Value)
-}
-
 type Emphasis struct {
 	*BaseNode
 }
 
-func (n *Emphasis) String() string {
-	return fmt.Sprintf("*%v*", n.Children())
-}
-
-func (n *Emphasis) HTML() string {
-	content := html(n.Children())
-
-	return fmt.Sprintf("<em>%s</em>", content)
-}
-
 type Strong struct {
 	*BaseNode
-}
-
-func (n *Strong) String() string {
-	return fmt.Sprintf("**%v**", n.Children())
-}
-
-func (n *Strong) HTML() string {
-	content := html(n.Children())
-
-	return fmt.Sprintf("<strong>%s</strong>", content)
 }
 
 type Delete struct {
@@ -345,28 +299,10 @@ type Delete struct {
 	*Tree
 }
 
-func (n *Delete) String() string {
-	return fmt.Sprintf("~~%v~~", n.Children())
-}
-
-func (n *Delete) HTML() string {
-	content := html(n.Children())
-
-	return fmt.Sprintf("<del>%s</del>", content)
-}
-
 type InlineCode struct {
 	*BaseNode
 	*Tree
 	Value string
-}
-
-func (n *InlineCode) String() string {
-	return fmt.Sprintf("`%s`", n.Value)
-}
-
-func (n *InlineCode) HTML() string {
-	return fmt.Sprintf("<code>%s</code>", n.Value)
 }
 
 type Break struct {
@@ -374,14 +310,6 @@ type Break struct {
 	int
 	items
 	*Tree
-}
-
-func (n *Break) String() string {
-	return fmt.Sprint("\n")
-}
-
-func (n *Break) HTML() string {
-	return fmt.Sprintf("\n")
 }
 
 type Link struct {
@@ -399,10 +327,6 @@ type Image struct {
 
 	Resource
 	Alternative
-}
-
-func (n Image) String() string {
-	return fmt.Sprintf("%s", n.URL)
 }
 
 type LinkReference struct {

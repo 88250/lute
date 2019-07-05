@@ -15,18 +15,8 @@
 
 package lute
 
-import "fmt"
-
 type ThematicBreak struct {
 	*BaseNode
-}
-
-func (n *ThematicBreak) String() string {
-	return fmt.Sprintf("'***'")
-}
-
-func (n *ThematicBreak) HTML() string {
-	return fmt.Sprintf("<hr />\n")
 }
 
 func (t *Tree) parseThematicBreak(line items) (ret Node) {

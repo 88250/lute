@@ -15,10 +15,6 @@
 
 package lute
 
-import (
-	"fmt"
-)
-
 type ListType int
 
 const (
@@ -38,16 +34,6 @@ type List struct {
 	IndentSpaces int // #4 Indentation https://spec.commonmark.org/0.29/#list-items
 	Marker       string
 	WNSpaces     int // W + N https://spec.commonmark.org/0.29/#list-items
-}
-
-func (n *List) HTML() string {
-	content := html(n.Children())
-
-	if NodeListItem == n.parent.Type() {
-		return fmt.Sprintf("\n<ul>\n%s</ul>\n", content)
-	}
-
-	return fmt.Sprintf("<ul>\n%s</ul>\n", content)
 }
 
 func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item) (ret Node) {
