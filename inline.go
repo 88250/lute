@@ -26,7 +26,7 @@ func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
 	for _, block := range blocks {
 		cType := block.Type()
 		switch cType {
-		case NodeCode, NodeInlineCode, NodeThematicBreak:
+		case NodeCode, NodeThematicBreak:
 			continue
 		}
 
@@ -259,8 +259,9 @@ func (t *Tree) scanDelimiter(tokens items, pos *int) *delimiter {
 }
 
 func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
-	marker := tokens[0]
-	if !t.matchEnd(tokens[1:], marker) {
+	startPos := *pos
+	marker := tokens[startPos]
+	if !t.matchEnd(tokens[startPos+1:], marker) {
 		marker.typ = itemStr
 		*pos++
 
@@ -273,13 +274,13 @@ func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
 	var text string
 	var textTokens = items{}
 
-	for i := *pos; i < len(tokens); i++ {
+	for i := startPos + 1; i < len(tokens); i++ {
 		token := tokens[i]
 		if itemNewline == token.typ {
 			text += " "
 		} else {
 			if itemBacktick == token.typ {
-				*pos = i
+				*pos = i + 1
 				break
 			}
 			text += token.val

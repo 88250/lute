@@ -60,6 +60,7 @@ Loop:
 
 	code.Value = codeValue
 	code.SetRawText(codeValue)
+	ret = code
 
 	return
 }

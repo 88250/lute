@@ -21,6 +21,9 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeRoot] = ret.renderRoot
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
+	ret.rendererFuncs[NodeInlineCode] = ret.renderInlineCode
+	ret.rendererFuncs[NodeCode] = ret.renderCode
+	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 
 	return
 }
@@ -47,5 +50,34 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Text)
 	r.writer.WriteString(n.Value)
 
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writer.WriteString("<code>" + n.(*InlineCode).Value)
+
+		return WalkSkipChildren, nil
+	}
+	r.writer.WriteString("</code>")
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderCode(n Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writer.WriteString("<pre><code>" + n.(*Code).Value)
+
+		return WalkSkipChildren, nil
+	}
+	r.writer.WriteString("</code></pre>\n")
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writer.WriteString("<em>" + node.(*Emphasis).rawText)
+	} else {
+		r.writer.WriteString("</em>")
+	}
 	return WalkContinue, nil
 }
