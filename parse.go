@@ -55,8 +55,14 @@ type Tree struct {
 	context   *Context
 }
 
-func (t *Tree) Render(renderer *Renderer) {
-	renderer.Render(t.Root)
+func (t *Tree) Render(renderer *Renderer) (output string, err error) {
+	err = renderer.Render(t.Root)
+	if nil != err {
+		return "", err
+	}
+	output = renderer.writer.String()
+
+	return
 }
 
 func (t *Tree) nonWhitespace(line items) (spaces, tabs int, tokens items, firstNonWhitespace *item) {

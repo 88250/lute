@@ -69,9 +69,12 @@ func TestParse(t *testing.T) {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		renderer := NewRenderer()
-		tree.Render(renderer)
-		html := renderer.writer.String()
+		renderer := NewHTMLRenderer()
+		html, err := tree.Render(renderer)
+		if nil != err {
+			t.Fatalf("unexpected: %s", err)
+		}
+
 		if test.result != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.result, html, test.input)
 		}

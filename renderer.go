@@ -16,69 +16,25 @@
 package lute
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 )
 
-// NodeRendererFunc is a function that renders a given node.
-type NodeRendererFunc func(n Node, entering bool) (WalkStatus, error)
+type RendererFunc func(n Node, entering bool) (WalkStatus, error)
 
-// A Renderer interface renders given AST node to given
-// writer with given Renderer.
 type Renderer struct {
-	writer            strings.Builder
-	nodeRendererFuncs map[NodeType]NodeRendererFunc
+	writer        strings.Builder
+	rendererFuncs map[NodeType]RendererFunc
 }
 
-func NewRenderer() (ret *Renderer) {
-	ret = &Renderer{nodeRendererFuncs: map[NodeType]NodeRendererFunc{}}
-	ret.Register(NodeRoot, ret.renderRoot)
-	ret.Register(NodeParagraph, ret.renderParagraph)
-	ret.Register(NodeText, ret.renderText)
-
-	return
-}
-
-func (r *Renderer) Register(nodeType NodeType, v NodeRendererFunc) {
-	r.nodeRendererFuncs[nodeType] = v
-}
-
-func (r *Renderer) Render(n Node) {
-	err := Walk(n, func(n Node, entering bool) (WalkStatus, error) {
-		s := WalkStatus(WalkContinue)
-		var err error
-		f := r.nodeRendererFuncs[n.Type()]
-		if f != nil {
-			s, err = f(n, entering)
+func (r *Renderer) Render(n Node) error {
+	return Walk(n, func(n Node, entering bool) (WalkStatus, error) {
+		f := r.rendererFuncs[n.Type()]
+		if nil == f {
+			return WalkStop, errors.New(fmt.Sprintf("not found render function for node [type=%d, text=%s]", n.Type(), n.RawText()))
 		}
-		return s, err
+
+		return f(n, entering)
 	})
-
-	_ = err
-}
-
-// HTML renderer
-
-func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
-}
-
-func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
-	if entering {
-		_, _ = r.writer.WriteString("<p>")
-	} else {
-		_, _ = r.writer.WriteString("</p>\n")
-	}
-
-	return WalkContinue, nil
-}
-
-func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
-	}
-
-	n := node.(*Text)
-	r.writer.WriteString(n.Value)
-
-	return WalkContinue, nil
 }
