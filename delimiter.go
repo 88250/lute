@@ -16,7 +16,7 @@
 package lute
 
 type delimiter struct {
-	node           *Node       // the text node point to
+	node           Node      // the text node point to
 	typ            itemType   // the type of delimiter ([, ![, *, _)
 	num            int        // the number of delimiters
 	originalNum    int        // the original number of delimiters
@@ -26,14 +26,16 @@ type delimiter struct {
 	previous, next *delimiter // doubly linked list
 }
 
-func (d *delimiter) remove(delimiter *delimiter) {
+func (d *delimiter) remove(delimiter *delimiter) (ret *delimiter) {
 	if delimiter.previous != nil {
 		delimiter.previous.next = delimiter.next
 	}
 	if delimiter.next == nil {
 		// top of stack
-		d = delimiter.previous
+		ret = delimiter.previous
 	} else {
 		delimiter.next.previous = delimiter.previous
 	}
+
+	return
 }

@@ -21,19 +21,14 @@ import (
 )
 
 type ListItem struct {
-	*Node
+	*BaseNode
 	int
-	items
 	t *Tree
 
 	Checked bool
 	Tight   bool
 
 	Spaces int
-}
-
-func (n *ListItem) String() string {
-	return fmt.Sprintf("%s", n.Children())
 }
 
 func (n *ListItem) HTML() string {
@@ -53,10 +48,10 @@ func (n *ListItem) HTML() string {
 	return fmt.Sprintf("<li>%s</li>\n", content)
 }
 
-func newListItem(indentSpaces int, t *Tree, token *item) (ret *Node, listItem *ListItem) {
-	ret = &Node{NodeType: NodeListItem}
-	listItem = &ListItem{
-		ret, token.pos, items{}, t,
+func newListItem(indentSpaces int, t *Tree, token *item) (ret Node) {
+	baseNode := &BaseNode{typ: NodeListItem, tokens:items{}}
+	ret = &ListItem{
+		baseNode, token.pos,  t,
 		false,
 		true,
 		indentSpaces,
@@ -66,9 +61,9 @@ func newListItem(indentSpaces int, t *Tree, token *item) (ret *Node, listItem *L
 	return
 }
 
-func (t *Tree) parseListItem(line items) (ret *Node, listItem *ListItem) {
+func (t *Tree) parseListItem(line items) (ret Node) {
 	indentSpaces := t.context.IndentSpaces
-	ret, listItem = newListItem(indentSpaces, t, line[0])
+	ret = newListItem(indentSpaces, t, line[0])
 	blankLineBetweenBlocks := false
 	for {
 		c := t.parseBlock(line)
@@ -98,7 +93,7 @@ func (t *Tree) parseListItem(line items) (ret *Node, listItem *ListItem) {
 	}
 
 	if 1 < len(ret.Children()) && blankLineBetweenBlocks {
-		listItem.Tight = false
+		ret.(*ListItem).Tight = false
 	}
 
 	return

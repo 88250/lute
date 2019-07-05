@@ -27,9 +27,8 @@ const (
 )
 
 type List struct {
-	*Node
+	*BaseNode
 	int
-	items
 	t *Tree
 
 	ListType ListType
@@ -41,24 +40,20 @@ type List struct {
 	WNSpaces     int // W + N https://spec.commonmark.org/0.29/#list-items
 }
 
-func (n *List) String() string {
-	return fmt.Sprintf("%s", n.Children())
-}
-
 func (n *List) HTML() string {
 	content := html(n.Children())
 
-	if NodeListItem == n.Parent.NodeType {
+	if NodeListItem == n.parent.Type() {
 		return fmt.Sprintf("\n<ul>\n%s</ul>\n", content)
 	}
 
 	return fmt.Sprintf("<ul>\n%s</ul>\n", content)
 }
 
-func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item) (ret *Node, list *List) {
-	ret = &Node{NodeType: NodeList, Parent: t.context.CurNode}
-	list = &List{
-		ret, token.pos, items{}, t,
+func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item) (ret Node) {
+	baseNode := &BaseNode{typ: NodeList, parent: t.context.CurNode, tokens: items{}}
+	ret = &List{
+		baseNode, token.pos, t,
 		ListTypeBullet,
 		1,
 		false,
@@ -71,7 +66,7 @@ func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item
 	return
 }
 
-func (t *Tree) parseList(line items) (ret *Node) {
+func (t *Tree) parseList(line items) (ret Node) {
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	marker := firstNonWhitespace
 	indentSpaces := spaces + tabs*4
@@ -88,19 +83,19 @@ func (t *Tree) parseList(line items) (ret *Node) {
 	} else {
 		line = indentOffset(line, indentSpaces+wnSpaces, t)
 	}
-	ret, list := newList(indentSpaces, marker.val, wnSpaces, t, marker)
+	ret = newList(indentSpaces, marker.val, wnSpaces, t, marker)
 	tight := false
 
 	defer func() { t.context.IndentSpaces = oldContextIndentSpaces }()
 
 	for {
-		n, i := t.parseListItem(line)
+		n := t.parseListItem(line)
 		if nil == n {
 			break
 		}
-		list.Append(n)
+		ret.AppendChild(ret, n)
 
-		if i.Tight {
+		if n.(*ListItem).Tight {
 			tight = true
 		}
 
@@ -120,7 +115,7 @@ func (t *Tree) parseList(line items) (ret *Node) {
 		}
 	}
 
-	list.Tight = tight
+	ret.(*List).Tight = tight
 
 	return
 }

@@ -19,88 +19,157 @@ import (
 	"fmt"
 )
 
-type HTMLRenderer interface {
-	HTML() string
-	String() string
+type Node interface {
+	Type() NodeType
+	Unlink()
+	Parent() Node
+	SetParent(Node)
+	Next() Node
+	SetNext(Node)
+	Previous() Node
+	SetPrevious(Node)
+	FirstChild() Node
+	SetFirstChild(Node)
+	LastChild() Node
+	SetLastChild(Node)
+	Children() []Node
+	AppendChild(this, child Node)
+	InsertAfter(this Node, sibling Node)
+	RawText() string
+	SetRawText(string)
+	Tokens() items
 }
 
-// Node represents a node in ast. https://github.com/syntax-tree/mdast
-type Node struct {
-	NodeType   int
-	Parent     *Node
-	Next       *Node
-	Previous   *Node
-	FirstChild *Node
-	LastChild  *Node
-	RawText    string
-	Tokens     items
-
-	HTMLRenderer
+type BaseNode struct {
+	typ NodeType
+	parent     Node
+	next       Node
+	previous   Node
+	firstChild Node
+	lastChild  Node
+	rawText    string
+	tokens     items
 }
 
-func (n *Node) Unlink() {
-	if nil != n.Previous {
-		n.Previous.Next = n.Next
+func (n*BaseNode) Type() NodeType {
+	return n.typ
+}
+
+func (n *BaseNode) Unlink() {
+	if nil != n.previous {
+		n.previous.SetNext(n.next)
 	} else if nil != n.Parent {
-		n.Parent.FirstChild = n.Next
+		n.parent.SetFirstChild(n.next)
 	}
-	if nil != n.Next {
-		n.Next.Previous = n.Previous
+	if nil != n.next {
+		n.next.SetPrevious(n.previous)
 	} else if nil != n.Parent {
-		n.Parent.LastChild = n.Previous
+		n.parent.SetLastChild(n.previous)
 	}
-	n.Parent = nil
-	n.Next = nil
-	n.Previous = nil
+	n.parent = nil
+	n.next = nil
+	n.previous = nil
 }
 
-func (n *Node) InsertAfter(sibling *Node) {
-	sibling.Unlink()
-	sibling.Next = n.Next
-	if nil != sibling.Next {
-		sibling.Next.Previous = sibling
-	}
-	sibling.Previous = n
-	n.Next = sibling
-	sibling.Parent = n
-	if nil == sibling.Next {
-		sibling.Parent.LastChild = sibling
-	}
+func (n *BaseNode) Parent() Node {
+	return n
 }
 
-func (n *Node) InsertBefore(sibling *Node) {
-	sibling.Unlink()
-	sibling.Previous = n.Previous
-	if nil != sibling.Previous {
-		sibling.Previous.Next = sibling
-	}
-	sibling.Next = n
-	n.Previous = sibling
-	sibling.Parent = n.Parent
-	if nil == sibling.Previous {
-		sibling.Parent.FirstChild = sibling
-	}
+func (n *BaseNode) SetParent(parent Node) {
+	n.parent = parent
 }
 
-func (n *Node) Append(child *Node) {
-	child.Unlink()
-	child.Parent = n
-	if nil != n.LastChild {
-		n.LastChild.Next = child
-		child.Previous = n.LastChild
-		n.LastChild = child
-	} else {
-		n.FirstChild = child
-		n.LastChild = child
-	}
+func (n *BaseNode) Next() Node {
+	return n.next
 }
 
-func (v *Node) Children() (ret []*Node) {
-	for child := v.FirstChild; nil != child; child = child.Next {
+func (n *BaseNode) SetNext(next Node) {
+	n.next = next
+}
+
+func (n *BaseNode) Previous() Node {
+	return n.previous
+}
+
+func (n *BaseNode) SetPrevious(previous Node) {
+	n.previous = previous
+}
+
+func (n *BaseNode) FirstChild() Node {
+	return n.firstChild
+}
+
+func (n *BaseNode) SetFirstChild(firstChild Node) {
+	n.firstChild = firstChild
+}
+
+func (n *BaseNode) LastChild() Node {
+	return n.lastChild
+}
+
+func (n *BaseNode) SetLastChild(lastChild Node) {
+	n.lastChild = lastChild
+}
+
+func (n *BaseNode) Children() (ret []Node) {
+	for child := n.firstChild; nil != child; child = child.Next() {
 		ret = append(ret, child)
 	}
 
 	return
+}
+
+func (n *BaseNode) RawText() string {
+	return n.rawText
+}
+
+func (n *BaseNode) SetRawText(rawText string) {
+	n.rawText = rawText
+}
+
+func (n *BaseNode) Tokens() items {
+	return n.tokens
+}
+
+func (n *BaseNode) InsertAfter(this Node, sibling Node) {
+	sibling.Unlink()
+	sibling.SetNext(n.next)
+	if nil != sibling.Next {
+		sibling.Next().SetPrevious(sibling)
+	}
+	sibling.SetPrevious(this)
+	n.next = sibling
+	sibling.SetParent(this)
+	if nil == sibling.Next {
+		sibling.Parent().SetLastChild(sibling)
+	}
+}
+
+func (n *BaseNode) InsertBefore(this Node, sibling Node) {
+	sibling.Unlink()
+	sibling.SetPrevious(n.previous)
+	if nil != sibling.Previous {
+		sibling.Previous().SetNext(sibling)
+	}
+	sibling.SetNext(this)
+	n.previous = sibling
+	sibling.SetParent(n.parent)
+	if nil == sibling.Previous {
+		sibling.Parent().SetFirstChild(sibling)
+	}
+}
+
+func (n *BaseNode) AppendChild(this, child Node) {
+	child.Unlink()
+	child.SetParent(this)
+	if nil != n.LastChild {
+		n.lastChild.SetNext(child)
+		child.SetPrevious(n.lastChild)
+		n.lastChild = child
+	} else {
+		n.firstChild = child
+		n.lastChild = child
+	}
 }
 
 type items []*item
@@ -121,8 +190,10 @@ func (tokens items) rawText() (ret string) {
 	return
 }
 
+type NodeType int
+
 const (
-	NodeRoot = iota
+	NodeRoot NodeType = iota
 	NodeParagraph
 	NodeHeading
 	NodeThematicBreak
@@ -154,24 +225,17 @@ const (
 // Nodes.
 
 type Root struct {
-	*Node
-	Pos int
-	items
-	*Tree
+	*BaseNode
 }
 
-func (n *Root) String() string {
-	return fmt.Sprintf("%s", n.Children())
-}
-
-func (n *Root) HTML() string {
+func (n *Root) Renderer() string {
 	content := html(n.Children())
 
 	return fmt.Sprintf("%s", content)
 }
 
 type Table struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 
@@ -179,28 +243,27 @@ type Table struct {
 }
 
 type TableRow struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 }
 
 type TableCell struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 }
 
 type HTML struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 	Value string
 }
 
 type Code struct {
-	*Node
+	*BaseNode
 	int
-	items
 	*Tree
 	Value string
 
@@ -217,7 +280,7 @@ func (n *Code) HTML() string {
 }
 
 type Definition struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 
@@ -226,7 +289,7 @@ type Definition struct {
 }
 
 type FootnoteDefinition struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 
@@ -234,8 +297,7 @@ type FootnoteDefinition struct {
 }
 
 type Text struct {
-	*Node
-	items
+	*BaseNode
 	*Tree
 	Value string
 }
@@ -249,9 +311,7 @@ func (n *Text) HTML() string {
 }
 
 type Emphasis struct {
-	*Node
-	items
-	*Tree
+	*BaseNode
 }
 
 func (n *Emphasis) String() string {
@@ -265,9 +325,7 @@ func (n *Emphasis) HTML() string {
 }
 
 type Strong struct {
-	*Node
-	items
-	*Tree
+	*BaseNode
 }
 
 func (n *Strong) String() string {
@@ -281,7 +339,7 @@ func (n *Strong) HTML() string {
 }
 
 type Delete struct {
-	*Node
+	*BaseNode
 	int
 	items
 	*Tree
@@ -298,8 +356,7 @@ func (n *Delete) HTML() string {
 }
 
 type InlineCode struct {
-	*Node
-	items
+	*BaseNode
 	*Tree
 	Value string
 }
@@ -313,7 +370,7 @@ func (n *InlineCode) HTML() string {
 }
 
 type Break struct {
-	*Node
+	*BaseNode
 	int
 	items
 	*Tree
@@ -328,7 +385,7 @@ func (n *Break) HTML() string {
 }
 
 type Link struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 
@@ -336,7 +393,7 @@ type Link struct {
 }
 
 type Image struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 
@@ -349,7 +406,7 @@ func (n Image) String() string {
 }
 
 type LinkReference struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 
@@ -357,7 +414,7 @@ type LinkReference struct {
 }
 
 type ImageReference struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 
@@ -366,13 +423,13 @@ type ImageReference struct {
 }
 
 type Footnote struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 }
 
 type FootnoteReference struct {
-	*Node
+	*BaseNode
 	int
 	*Tree
 
@@ -404,12 +461,3 @@ type Alternative struct {
 
 type alignType string
 type referenceType string
-
-func html(children []*Node) string {
-	var ret string
-	for _, c := range children {
-		ret += c.HTML()
-	}
-
-	return ret
-}

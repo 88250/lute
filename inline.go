@@ -22,9 +22,9 @@ func (t *Tree) parseInlines() {
 	t.parseEmphasis(nil, delimiters)
 }
 
-func (t *Tree) parseBlockInlines(blocks []*Node, delimiters *delimiter) {
+func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
 	for _, block := range blocks {
-		cType := block.NodeType
+		cType := block.Type()
 		switch cType {
 		case NodeCode, NodeInlineCode, NodeThematicBreak:
 			continue
@@ -37,12 +37,12 @@ func (t *Tree) parseBlockInlines(blocks []*Node, delimiters *delimiter) {
 			continue
 		}
 
-		tokens := block.Tokens
+		tokens := block.Tokens()
 		pos := 0
 
 		for {
 			token := tokens[pos]
-			var n *Node
+			var n Node
 			switch token.typ {
 			case itemBacktick:
 				n = t.parseInlineCode(tokens, &pos)
@@ -53,7 +53,7 @@ func (t *Tree) parseBlockInlines(blocks []*Node, delimiters *delimiter) {
 			}
 
 			if nil != n {
-				block.Append(n)
+				block.AppendChild(block, n)
 			}
 
 			if 1 > len(tokens) || tokens[pos].isEOF() {
@@ -65,7 +65,7 @@ func (t *Tree) parseBlockInlines(blocks []*Node, delimiters *delimiter) {
 
 func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 	var opener, closer, old_closer *delimiter
-	var opener_inl, closer_inl *Node
+	var opener_inl, closer_inl Node
 	var tempstack *delimiter
 	var use_delims int
 	var tmp, next *delimiter
@@ -83,7 +83,7 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 	}
 
 	// move forward, looking for closers, and handling each
-	for closer != nil {
+	for itemEOF != closer.typ {
 		var closercc = closer.typ
 		if !closer.canClose {
 			continue
@@ -120,31 +120,29 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 				opener.num -= use_delims
 				closer.num -= use_delims
 
-				text := opener_inl.RawText[0 : len(opener_inl.RawText)-use_delims]
-				opener_inl.RawText = text
+				text := opener_inl.RawText()[0 : len(opener_inl.RawText())-use_delims]
+				opener_inl.SetRawText(text)
 
-				text = closer_inl.RawText[0 : len(closer_inl.RawText)-use_delims]
-				closer_inl.RawText = text
+				text = closer_inl.RawText()[0 : len(closer_inl.RawText())-use_delims]
+				closer_inl.SetRawText(text)
 
 				// build contents for new emph element
-				var emph *Node
+				var emph Node
 				if 1 == use_delims {
-					emph = &Node{NodeType: NodeEmphasis}
-					_ = &Emphasis{Node: emph}
+					emph = &Emphasis{&BaseNode{typ: NodeEmphasis}}
 				} else {
-					emph = &Node{NodeType: NodeStrong}
-					_ = &Strong{Node: emph}
+					emph = &Strong{&BaseNode{typ: NodeStrong}}
 				}
 
-				tmp.node = opener_inl.Next
+				tmp.node = opener_inl.Next()
 				for nil != tmp && tmp.node != closer_inl {
 					next = tmp.next
 					tmp.node.Unlink()
-					emph.Append(tmp.node)
+					emph.AppendChild(emph, tmp.node)
 					tmp = next
 				}
 
-				opener_inl.InsertAfter(emph)
+				opener_inl.InsertAfter(opener_inl, emph)
 
 				// remove elts between opener and closer in delimiters stack
 				if opener.next != closer {
@@ -155,13 +153,13 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 				// if opener has 0 delims, remove it and the inline
 				if opener.num == 0 {
 					opener_inl.Unlink()
-					delimiters.remove(opener)
+					delimiters = delimiters.remove(opener)
 				}
 
 				if closer.num == 0 {
 					closer_inl.Unlink()
 					tempstack = closer.next
-					delimiters.remove(closer)
+					delimiters = delimiters.remove(closer)
 					closer = tempstack
 				}
 			}
@@ -183,17 +181,17 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 
 	// remove all delimiters
 	for delimiters != nil && delimiters != stackBottom {
-		delimiters.remove(delimiters)
+		delimiters = delimiters.remove(delimiters)
 	}
 }
 
-func (t *Tree) parseDelimiter(tokens items, pos *int, delimiters *delimiter) (ret *Node) {
+func (t *Tree) parseDelimiter(tokens items, pos *int, delimiters *delimiter) (ret Node) {
 	startPos := *pos
 	delim := t.scanDelimiter(tokens, pos)
 
 	subTokens, text := t.extractTokens(tokens, startPos, *pos)
-	ret = &Node{NodeType: NodeText, RawText: text}
-	_ = &Text{ret, subTokens, t, text}
+	baseNode := &BaseNode{typ: NodeText, rawText: text, tokens: subTokens}
+	ret = &Text{baseNode, t, text}
 	delim.node = ret
 
 	// Add entry to stack for this opener
@@ -260,14 +258,14 @@ func (t *Tree) scanDelimiter(tokens items, pos *int) *delimiter {
 	return &delimiter{typ: token.typ, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
 }
 
-func (t *Tree) parseInlineCode(tokens items, pos *int) (ret *Node) {
+func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
 	marker := tokens[0]
 	if !t.matchEnd(tokens[1:], marker) {
 		marker.typ = itemStr
 		*pos++
 
-		ret = &Node{NodeType: NodeText, RawText: marker.val}
-		_ = &Text{ret, nil, t, marker.val}
+		baseNode := &BaseNode{typ: NodeText, rawText: marker.val}
+		ret = &Text{baseNode, t, marker.val}
 
 		return
 	}
@@ -289,23 +287,23 @@ func (t *Tree) parseInlineCode(tokens items, pos *int) (ret *Node) {
 		textTokens = append(textTokens, token)
 	}
 
-	ret = &Node{NodeType: NodeInlineCode, RawText: text}
-	_ = &InlineCode{ret, textTokens, t, text}
+	baseNode := &BaseNode{typ: NodeInlineCode, rawText: text, tokens: textTokens}
+	ret = &InlineCode{baseNode, t, text}
 
 	return
 }
 
-func (t *Tree) parseText(tokens items, pos *int) (ret *Node) {
+func (t *Tree) parseText(tokens items, pos *int) (ret Node) {
 	token := tokens[*pos]
 	*pos++
 
-	ret = &Node{NodeType: NodeText, RawText: token.val}
-	_ = &Text{ret, nil, t, token.val}
+	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
+	ret = &Text{baseNode, t, token.val}
 
 	return
 }
 
-func (t *Tree) parseCode(tokens items) (ret *Node, remains items) {
+func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
 	i := 1
 	token := tokens[i]
 	pos := token.pos
@@ -315,8 +313,7 @@ func (t *Tree) parseCode(tokens items) (ret *Node, remains items) {
 		i++
 	}
 
-	ret = &Node{NodeType: NodeCode}
-	_ = &Code{ret, pos, items{}, t, code, "", ""}
+	ret = &Code{&BaseNode{typ: NodeCode}, pos, t, code, "", ""}
 	remains = tokens[i+1:]
 
 	return

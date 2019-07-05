@@ -18,14 +18,9 @@ package lute
 import "fmt"
 
 type Blockquote struct {
-	*Node
+	*BaseNode
 	int
-	items
 	t *Tree
-}
-
-func (n *Blockquote) String() string {
-	return fmt.Sprintf("%s", n.Children())
 }
 
 func (n *Blockquote) HTML() string {
@@ -34,15 +29,15 @@ func (n *Blockquote) HTML() string {
 	return fmt.Sprintf("<blockquote>\n%s</blockquote>\n", content)
 }
 
-func newBlockquote(t *Tree, token *item) (ret *Node) {
-	ret = &Node{NodeType: NodeBlockquote, Parent: t.context.CurNode}
-	_ = &Blockquote{ret, token.pos, items{}, t}
+func newBlockquote(t *Tree, token *item) (ret Node) {
+	baseNode := &BaseNode{typ: NodeBlockquote, parent: t.context.CurNode, tokens:items{}}
+	ret = &Blockquote{baseNode, token.pos, t}
 	t.context.CurNode = ret
 
 	return
 }
 
-func (t *Tree) parseBlockquote(line items) (ret *Node) {
+func (t *Tree) parseBlockquote(line items) (ret Node) {
 	token := line[0]
 	indentSpaces := t.context.IndentSpaces + 2
 

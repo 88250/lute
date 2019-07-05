@@ -57,7 +57,7 @@ var parseTests = []parseTest{
 	//{"simple4", "    lute\n", "<pre><code>lute\n</code></pre>\n"},
 	//{"simple3", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
 	//{"simple2", "l`ut`e", "<p>l<code>ut</code>e</p>\n"},
-	//{"simple1", "lute", "<p>lute</p>\n"},
+	{"simple1", "lute", "<p>lute</p>\n"},
 	{"simple0", "", ""},
 }
 
@@ -69,7 +69,7 @@ func TestParse(t *testing.T) {
 			t.Errorf("%q: unexpected error: %v", test.name, err)
 		}
 
-		html := tree.HTML()
+		html := tree.Render()
 		if test.result != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.result, html, test.input)
 		}

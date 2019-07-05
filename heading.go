@@ -18,16 +18,11 @@ package lute
 import "fmt"
 
 type Heading struct {
-	*Node
+	*BaseNode
 	int
-	items
 	*Tree
 
 	Depth int
-}
-
-func (n *Heading) String() string {
-	return fmt.Sprintf("# %s", n.Children())
 }
 
 func (n *Heading) HTML() string {
@@ -36,11 +31,12 @@ func (n *Heading) HTML() string {
 	return fmt.Sprintf("<h%d>%s</h%d>\n", n.Depth, content, n.Depth)
 }
 
-func (t *Tree) parseHeading(line items) (ret *Node) {
+func (t *Tree) parseHeading(line items) (ret Node) {
 	marker := line[0]
 
-	ret = &Node{NodeType: NodeHeading}
-	heading := &Heading{ret, marker.pos, items{}, t, len(marker.val)}
+	baseNode := &BaseNode{typ: NodeHeading, tokens: items{}}
+	heading := &Heading{baseNode, marker.pos, t, len(marker.val)}
+	ret = heading
 
 	tokens := t.skipWhitespaces(line[1:])
 	for _, token := range tokens {
@@ -51,8 +47,8 @@ func (t *Tree) parseHeading(line items) (ret *Node) {
 			break
 		}
 
-		heading.RawText += token.val
-		heading.items = append(heading.items, token)
+		heading.rawText += token.val
+		heading.tokens = append(heading.tokens, token)
 	}
 
 	return

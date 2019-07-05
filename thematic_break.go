@@ -18,9 +18,7 @@ package lute
 import "fmt"
 
 type ThematicBreak struct {
-	*Node
-	int
-	items
+	*BaseNode
 }
 
 func (n *ThematicBreak) String() string {
@@ -31,10 +29,9 @@ func (n *ThematicBreak) HTML() string {
 	return fmt.Sprintf("<hr />\n")
 }
 
-func (t *Tree) parseThematicBreak(line items) (ret *Node) {
-	token := line[0]
-	ret = &Node{NodeType: NodeThematicBreak}
-	_ = &ThematicBreak{ret, token.pos, line}
+func (t *Tree) parseThematicBreak(line items) (ret Node) {
+	baseNode := &BaseNode{typ: NodeThematicBreak, tokens:line}
+	ret = &ThematicBreak{baseNode}
 
 	return
 }

@@ -21,16 +21,12 @@ import (
 )
 
 type Paragraph struct {
-	*Node
+	*BaseNode
 	int
 	items []*item
 	*Tree
 
 	OpenTag, CloseTag string
-}
-
-func (n *Paragraph) String() string {
-	return fmt.Sprintf("%s", n.Children())
 }
 
 func (n *Paragraph) HTML() string {
@@ -76,17 +72,17 @@ func (n *Paragraph) trim() {
 	}
 
 	n.items = n.items[initialNoneWhitespace:finalNoneWhitespace]
-	n.RawText = strings.TrimSpace(string(n.RawText))
+	n.rawText = strings.TrimSpace(n.rawText)
 }
 
-func (t *Tree) parseParagraph(line items) (ret *Node) {
-	ret = &Node{NodeType:NodeParagraph}
-	p := &Paragraph{ret, line[0].pos, nil, t, "<p>", "</p>"}
+func (t *Tree) parseParagraph(line items) (ret Node) {
+	baseNode := &BaseNode{typ: NodeParagraph}
+	p := &Paragraph{baseNode, line[0].pos, nil, t, "<p>", "</p>"}
 	defer p.trim()
 
 	for {
 		p.items = append(p.items, items(line)...)
-		ret.RawText += line.rawText()
+		p.rawText += line.rawText()
 		line = t.nextLine()
 		if t.interruptParagrah(line) {
 			t.backupLine(line)

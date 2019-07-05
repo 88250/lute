@@ -39,7 +39,7 @@ func sanitize(text string) (ret string) {
 // Context use to store common data in parsing.
 type Context struct {
 	CurLine      items
-	CurNode      *Node
+	CurNode      Node
 	IndentSpaces int
 }
 
@@ -53,8 +53,8 @@ type Tree struct {
 	context   *Context
 }
 
-func (t *Tree) HTML() string {
-	return t.Root.HTML()
+func (t *Tree) Render() string {
+	return t.Root.Renderer()
 }
 
 func (t *Tree) nonWhitespace(line items) (spaces, tabs int, tokens items, firstNonWhitespace *item) {
@@ -204,8 +204,8 @@ func (t *Tree) parse() (err error) {
 	defer t.recover(&err)
 
 	t.lex = lex(t.name, t.text)
-	t.Root = &Root{Node: &Node{NodeType: NodeRoot}, Pos: 0}
-	t.context.CurNode = t.Root.Node
+	t.Root = &Root{&BaseNode{typ: NodeRoot}}
+	t.context.CurNode = t.Root
 	t.parseBlocks()
 	t.parseInlines()
 	t.lex = nil

@@ -44,14 +44,14 @@ func TestSpec(t *testing.T) {
 	}
 
 	for _, test := range testcases {
-		testName := test.Section+" "+strconv.Itoa(test.Example)
+		testName := test.Section + " " + strconv.Itoa(test.Example)
 		fmt.Println("Test [" + testName + "]")
 		tree, err := Parse(testName, test.Markdown)
 		if nil != err {
 			t.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
 		}
 
-		html := tree.HTML()
+		html := tree.Render()
 		if test.HTML != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.HTML, html, test.Markdown)
 		}
