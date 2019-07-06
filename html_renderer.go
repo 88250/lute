@@ -142,15 +142,16 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 		tag = "ol"
 	}
 	if entering {
+		r.Newline()
 		r.WriteString("<" + tag)
 		if ListTypeOrdered == n.ListType && 1 != n.Start {
 			r.WriteString(fmt.Sprintf(" start=\"%d\">", n.Start))
-			r.Newline()
 		} else {
 			r.WriteString(">")
-			r.Newline()
 		}
+		r.Newline()
 	} else {
+		r.Newline()
 		r.WriteString("</" + tag + ">")
 		r.Newline()
 	}
