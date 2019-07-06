@@ -48,6 +48,7 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		if nil == n {
 			continue
 		}
+		ret.AppendChild(ret, n)
 
 		blankLines := t.skipBlankLines()
 		if 1 <= blankLines && !blankLineBetweenBlocks {

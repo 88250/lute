@@ -36,10 +36,11 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 	ret = newBlockquote(t, token)
 	line = indentOffset(line[1:], indentSpaces, t)
 	for {
-		c := t.parseBlock(line)
-		if nil == c {
+		n := t.parseBlock(line)
+		if nil == n {
 			break
 		}
+		ret.AppendChild(ret, n)
 
 		line = t.nextLine()
 		if line.isEOF() {

@@ -31,15 +31,12 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 		cs := block.Children()
 		if 0 < len(cs) {
 			t.parseBlockInlines(cs)
+
+			continue
 		}
 
 		tokens := block.Tokens()
-		if 1 > len(tokens) {
-			return
-		}
-
 		t.context.Pos = 0
-
 		for {
 			token := tokens[t.context.Pos]
 			var n Node

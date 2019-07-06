@@ -54,13 +54,9 @@ func (n*BaseNode) Type() NodeType {
 func (n *BaseNode) Unlink() {
 	if nil != n.previous {
 		n.previous.SetNext(n.next)
-	} else if nil != n.parent {
-		n.parent.SetFirstChild(n.next)
 	}
 	if nil != n.next {
 		n.next.SetPrevious(n.previous)
-	} else if nil != n.parent {
-		n.parent.SetLastChild(n.previous)
 	}
 	n.parent = nil
 	n.next = nil

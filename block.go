@@ -18,7 +18,10 @@ package lute
 func (t *Tree) parseBlocks() {
 	curNode := t.context.CurNode
 	for line := t.nextLine(); ; {
-		t.parseBlock(line)
+		n := t.parseBlock(line)
+		if nil != n {
+			curNode.AppendChild(curNode, n)
+		}
 		t.context.CurNode = curNode
 
 		line = t.nextLine()
@@ -29,8 +32,6 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) parseBlock(line items) (ret Node) {
-	curNode := t.context.CurNode
-
 	if t.isThematicBreak(line) {
 		ret = t.parseThematicBreak(line)
 	} else if t.isList(line) {
@@ -46,8 +47,6 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 	} else {
 		ret = t.parseParagraph(line)
 	}
-
-	curNode.AppendChild(curNode, ret)
 
 	return
 }
