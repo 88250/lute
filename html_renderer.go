@@ -26,6 +26,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
+	ret.rendererFuncs[NodeHeading] = ret.renderHeading
 
 	return
 }
@@ -98,6 +99,17 @@ func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
 		r.WriteString("<blockquote>\n")
 	} else {
 		r.WriteString("</blockquote>\n")
+	}
+	return WalkContinue, nil
+}
+
+
+func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
+	n := node.(*Heading)
+	if entering {
+		r.WriteString("<h" + " 123456"[n.Depth:n.Depth+1] + ">")
+	} else {
+		r.WriteString("</h" + " 123456"[n.Depth:n.Depth+1] + ">\n")
 	}
 	return WalkContinue, nil
 }

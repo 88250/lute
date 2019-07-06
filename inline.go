@@ -54,7 +54,8 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 				block.AppendChild(block, n)
 			}
 
-			if 1 > len(tokens) || tokens[t.context.Pos].isEOF() {
+			len := len(tokens)
+			if 1 > len || t.context.Pos >= len || tokens[t.context.Pos].isEOF() {
 				break
 			}
 		}
