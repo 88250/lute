@@ -27,6 +27,7 @@ type lexTest struct {
 
 var lexTests = []lexTest{
 
+	{"spec35", "\\## foo", items{tBackslash, tCrosshatch, tCrosshatch, tSpace, makeItem(itemStr, "foo"), tEOF}},
 	{"spec14", "+++\n", items{tPlus, tPlus, tPlus, tNewLine, tEOF}},
 	{"spec13", "***\n---\n___\n", items{tAsterisk, tAsterisk, tAsterisk, tNewLine, tHypen, tHypen, tHypen, tNewLine, tUnderscore, tUnderscore, tUnderscore, tNewLine, tEOF}},
 	{"spec7", "-\t\tfoo\n", items{makeItem(itemHyphen, "-"), tTab, tTab, makeItem(itemStr, "foo"), tNewLine, tEOF}},

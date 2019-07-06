@@ -117,6 +117,7 @@ const (
 	itemGreater                         // >
 	itemSpace                           // space
 	itemNewline                         // \n
+	itemBackslash                       // \
 )
 
 var (
@@ -134,6 +135,8 @@ var (
 	tCloseBracket    = makeItem(itemCloseBracket, "]")
 	tOpenParen       = makeItem(itemOpenParen, "(")
 	tCloseParan      = makeItem(itemCloseParen, ")")
+	tBackslash       = makeItem(itemBackslash, "\\")
+	tCrosshatch      = makeItem(itemCrosshatch, "#")
 )
 
 func makeItem(typ itemType, text string) *item {
@@ -271,6 +274,8 @@ func (s *scanner) run() {
 			s.newItem(itemSpace)
 		case '\n' == r:
 			s.newItem(itemNewline)
+		case '\\' == r:
+			s.newItem(itemBackslash)
 		case end == r:
 			return
 		default:
