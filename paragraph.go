@@ -62,13 +62,22 @@ func (t *Tree) trimRight(tokens items) (ret items) {
 }
 
 func (t *Tree) parseParagraph(line items) (ret Node) {
+
 	baseNode := &BaseNode{typ: NodeParagraph}
 	p := &Paragraph{baseNode, "<p>", "</p>"}
 	ret = p
 
 	for {
 		line = t.trimLeft(line)
-		p.tokens = append(p.tokens, line...)
+		len := len(line)
+		for i, token := range line {
+			if itemBackslash != token.typ {
+				p.tokens = append(p.tokens, token)
+			} else if i < len-2 && !line[i+1].isASCIIPunct() {
+				p.tokens = append(p.tokens, token)
+			}
+		}
+
 		p.rawText += line.rawText()
 		line = t.nextLine()
 		if t.isBlankLine(line) {
@@ -76,7 +85,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			break
 		}
 
-		if level := t.isSetextHeading(line);0 < level {
+		if level := t.isSetextHeading(line); 0 < level {
 			ret = t.parseSetextHeading(p, level)
 
 			return

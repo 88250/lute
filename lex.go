@@ -50,6 +50,12 @@ func (i item) isPunct() bool {
 	return unicode.IsPunct(rune(i.val[0]))
 }
 
+func (i item) isASCIIPunct() bool {
+	c := i.val[0]
+
+	return (0x21 <= c && 0x2F >= c) || (0x3A <= c && 0x40 >= c) || (0x5B <= c && 0x60 >= c) || (0x7B <= c && 0x7E >= c)
+}
+
 // https://spec.commonmark.org/0.29/#line-ending
 func (i item) isLineEnding() bool {
 	return itemNewline == i.typ
