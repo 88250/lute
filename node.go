@@ -205,7 +205,8 @@ const (
 	NodeStrong
 	NodeDelete
 	NodeInlineCode
-	NodeBreak
+	NodeHardBreak
+	NodeSoftBreak
 	NodeLink
 	NodeImage
 	NodeLinkReference
@@ -301,11 +302,12 @@ type InlineCode struct {
 	Value string
 }
 
-type Break struct {
+type HardBreak struct {
 	*BaseNode
-	int
-	items
-	*Tree
+}
+
+type SoftBreak struct {
+	*BaseNode
 }
 
 type Link struct {

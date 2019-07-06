@@ -34,6 +34,8 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeList] = ret.renderList
 	ret.rendererFuncs[NodeListItem] = ret.renderListItem
 	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
+	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
+	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
 
 	return
 }
@@ -176,6 +178,22 @@ func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus,err
 	if entering {
 		r.Newline()
 		r.WriteString("<hr />")
+		r.Newline()
+	}
+
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderHardBreak(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.WriteString("<br />")
+	}
+
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderSoftBreak(node Node, entering bool) (WalkStatus, error) {
+	if entering {
 		r.Newline()
 	}
 

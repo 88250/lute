@@ -45,8 +45,10 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 				n = t.parseInlineCode(tokens)
 			case itemAsterisk, itemUnderscore:
 				n = t.handleDelim(tokens)
-			case itemStr:
+			case itemStr, itemPlus, itemHyphen:
 				n = t.parseText(tokens)
+			case itemNewline:
+				n = t.parseNewline(block, tokens)
 			}
 
 			if nil != n {
@@ -87,7 +89,7 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 	for nil != closer {
 		var closercc = closer.typ
 		if !closer.canClose {
-			closer = closer.next;
+			closer = closer.next
 			continue
 		}
 
@@ -306,6 +308,28 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 
 	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
 	ret = &Text{baseNode, t, token.val}
+
+	return
+}
+
+func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
+	t.context.Pos++
+	// check previous node for trailing spaces
+	var lastc = block.LastChild()
+	len := len(lastc.RawText())
+	rawText := lastc.RawText()
+	if nil != lastc && lastc.Type() == NodeText && rawText[len-1] == ' ' {
+		var hardbreak = rawText[len-2] == ' '
+		rawText = rawText[:len-1]
+		lastc.SetRawText(rawText)
+		if hardbreak {
+			ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
+		} else {
+			ret = &SoftBreak{&BaseNode{typ: NodeSoftBreak}}
+		}
+	} else {
+		ret = &SoftBreak{&BaseNode{typ: NodeSoftBreak}}
+	}
 
 	return
 }
