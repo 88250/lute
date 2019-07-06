@@ -15,62 +15,59 @@
 
 package lute
 
-import (
-	"strings"
-)
-
 type Paragraph struct {
 	*BaseNode
-	int
-	items []*item
-	*Tree
 
 	OpenTag, CloseTag string
 }
 
-func (n *Paragraph) Tokens() items {
-	return n.items
-}
+func (t *Tree) trimLeft(tokens items) (ret items) {
+	ret = tokens
 
-func (n *Paragraph) trim() {
-	size := len(n.items)
+	size := len(tokens)
 	if 1 > size {
 		return
 	}
 
-	initialNoneWhitespace := 0
-	notBreak := true
-	for i := initialNoneWhitespace; i < size/2 && notBreak; i++ {
-		if n.items[i].isWhitespace() {
-			initialNoneWhitespace++
-			notBreak = true
-		} else {
-			notBreak = false
+	i := 0
+	for ; i < size; i++ {
+		if !tokens[i].isWhitespace() {
+			break
 		}
 	}
 
-	finalNoneWhitespace := size
-	notBreak = true
-	for i := finalNoneWhitespace - 1; size/2 <= i && notBreak; i-- {
-		if n.items[i].isWhitespace() {
-			finalNoneWhitespace--
-			notBreak = true
-		} else {
-			notBreak = false
+	ret = tokens[i:]
+
+	return
+}
+
+func (t *Tree) trimRight(tokens items) (ret items) {
+	ret = tokens
+
+	size := len(tokens)
+	if 1 > size {
+		return
+	}
+
+	i := size - 1
+	for ; 0 <= size; i-- {
+		if !tokens[i].isWhitespace() {
+			break
 		}
 	}
 
-	n.items = n.items[initialNoneWhitespace:finalNoneWhitespace]
-	n.rawText = strings.TrimSpace(n.rawText)
+	ret = tokens[:i+1]
+
+	return
 }
 
 func (t *Tree) parseParagraph(line items) (ret Node) {
 	baseNode := &BaseNode{typ: NodeParagraph}
-	p := &Paragraph{baseNode, line[0].pos, nil, t, "<p>", "</p>"}
-	defer p.trim()
+	p := &Paragraph{baseNode, "<p>", "</p>"}
 
 	for {
-		p.items = append(p.items, items(line)...)
+		line = t.trimLeft(line)
+		p.tokens = append(p.tokens, line...)
 		p.rawText += line.rawText()
 		line = t.nextLine()
 		if t.interruptParagrah(line) {
@@ -79,6 +76,8 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			break
 		}
 	}
+	p.tokens = t.trimRight(p.tokens)
+	p.rawText = p.tokens.rawText()
 	ret = p
 
 	return
@@ -87,6 +86,10 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 func (t *Tree) interruptParagrah(line items) bool {
 	if t.isBlankLine(line) {
 		return true
+	}
+
+	if t.isIndentCode(line) {
+		return false
 	}
 
 	/*

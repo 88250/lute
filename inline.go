@@ -45,10 +45,10 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 				n = t.parseInlineCode(tokens)
 			case itemAsterisk, itemUnderscore:
 				n = t.handleDelim(tokens)
-			case itemStr, itemPlus, itemHyphen:
-				n = t.parseText(tokens)
 			case itemNewline:
 				n = t.parseNewline(block, tokens)
+			default:
+				n = t.parseText(tokens)
 			}
 
 			if nil != n {
