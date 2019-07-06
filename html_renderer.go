@@ -33,6 +33,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
 	ret.rendererFuncs[NodeList] = ret.renderList
 	ret.rendererFuncs[NodeListItem] = ret.renderListItem
+	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
 
 	return
 }
@@ -168,5 +169,15 @@ func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) 
 		r.WriteString("</li>")
 		r.Newline()
 	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus,error) {
+	if entering {
+		r.Newline()
+		r.WriteString("<hr />")
+		r.Newline()
+	}
+
 	return WalkContinue, nil
 }
