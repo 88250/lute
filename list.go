@@ -102,6 +102,9 @@ func (t *Tree) parseList(line items) (ret Node) {
 	}
 
 	ret.(*List).Tight = tight
+	//for child := ret.FirstChild();nil != child;child = child.Next() {
+	//	child.(*ListItem).Tight = tight
+	//}
 
 	return
 }

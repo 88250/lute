@@ -52,7 +52,8 @@ func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error)
 		}
 	} else {
 		if !inTightList {
-			r.WriteString("</p>\n")
+			r.WriteString("</p>")
+			r.Newline()
 		}
 	}
 
@@ -82,11 +83,13 @@ func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
 
 func (r *Renderer) renderCode(n Node, entering bool) (WalkStatus, error) {
 	if entering {
+		r.Newline()
 		r.WriteString("<pre><code>" + n.(*Code).Value)
 
 		return WalkSkipChildren, nil
 	}
-	r.WriteString("</code></pre>\n")
+	r.WriteString("</code></pre>")
+	r.Newline()
 	return WalkContinue, nil
 }
 
@@ -110,9 +113,13 @@ func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 
 func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<blockquote>\n")
+		r.Newline()
+		r.WriteString("<blockquote>")
+		r.Newline()
 	} else {
-		r.WriteString("</blockquote>\n")
+		r.Newline()
+		r.WriteString("</blockquote>")
+		r.Newline()
 	}
 	return WalkContinue, nil
 }
@@ -122,7 +129,8 @@ func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.WriteString("<h" + " 123456"[n.Depth:n.Depth+1] + ">")
 	} else {
-		r.WriteString("</h" + " 123456"[n.Depth:n.Depth+1] + ">\n")
+		r.WriteString("</h" + " 123456"[n.Depth:n.Depth+1] + ">")
+		r.Newline()
 	}
 	return WalkContinue, nil
 }
@@ -136,12 +144,15 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.WriteString("<" + tag)
 		if ListTypeOrdered == n.ListType && 1 != n.Start {
-			r.WriteString(fmt.Sprintf(" start=\"%d\">\n", n.Start))
+			r.WriteString(fmt.Sprintf(" start=\"%d\">", n.Start))
+			r.Newline()
 		} else {
-			r.WriteString(">\n")
+			r.WriteString(">")
+			r.Newline()
 		}
 	} else {
-		r.WriteString("</" + tag + ">\n")
+		r.WriteString("</" + tag + ">")
+		r.Newline()
 	}
 	return WalkContinue, nil
 }
@@ -149,8 +160,12 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.WriteString("<li>")
+		if !node.(*ListItem).Tight {
+			r.Newline()
+		}
 	} else {
-		r.WriteString("</li>\n")
+		r.WriteString("</li>")
+		r.Newline()
 	}
 	return WalkContinue, nil
 }

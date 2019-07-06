@@ -23,12 +23,16 @@ import (
 
 type RendererFunc func(n Node, entering bool) (WalkStatus, error)
 
+const Newline = "\n"
+
 type Renderer struct {
 	writer        strings.Builder
+	lastOut       string
 	rendererFuncs map[NodeType]RendererFunc
 }
 
 func (r *Renderer) Render(n Node) error {
+	r.lastOut = Newline
 	return Walk(n, func(n Node, entering bool) (WalkStatus, error) {
 		f := r.rendererFuncs[n.Type()]
 		if nil == f {
@@ -41,4 +45,11 @@ func (r *Renderer) Render(n Node) error {
 
 func (r *Renderer) WriteString(content string) {
 	r.writer.WriteString(content)
+	r.lastOut = content
+}
+
+func (r *Renderer) Newline() {
+	if Newline != r.lastOut {
+		r.WriteString(Newline)
+	}
 }
