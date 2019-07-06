@@ -37,7 +37,7 @@ type Node interface {
 }
 
 type BaseNode struct {
-	typ NodeType
+	typ        NodeType
 	parent     Node
 	next       Node
 	previous   Node
@@ -47,16 +47,24 @@ type BaseNode struct {
 	tokens     items
 }
 
-func (n*BaseNode) Type() NodeType {
+func (n *BaseNode) Type() NodeType {
 	return n.typ
 }
 
 func (n *BaseNode) Unlink() {
 	if nil != n.previous {
 		n.previous.SetNext(n.next)
+	} else if nil != n.parent {
+		if nil != n.next {
+			n.parent.SetFirstChild(n.next)
+		}
 	}
 	if nil != n.next {
 		n.next.SetPrevious(n.previous)
+	} else if nil != n.parent {
+		if nil != n.previous {
+			n.parent.SetLastChild(n.previous)
+		}
 	}
 	n.parent = nil
 	n.next = nil
