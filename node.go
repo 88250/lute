@@ -68,7 +68,7 @@ func (n *BaseNode) Unlink() {
 }
 
 func (n *BaseNode) Parent() Node {
-	return n
+	return n.parent
 }
 
 func (n *BaseNode) SetParent(parent Node) {

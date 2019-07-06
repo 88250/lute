@@ -42,10 +42,18 @@ func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
 }
 
 func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
+	inTightList := false
+	if NodeListItem == node.Parent().Type() {
+		inTightList = node.Parent().Parent().(*List).Tight
+	}
 	if entering {
-		r.WriteString("<p>")
+		if !inTightList {
+			r.WriteString("<p>")
+		}
 	} else {
-		r.WriteString("</p>\n")
+		if !inTightList {
+			r.WriteString("</p>\n")
+		}
 	}
 
 	return WalkContinue, nil
@@ -127,7 +135,7 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 	}
 	if entering {
 		r.WriteString("<" + tag)
-		if ListTypeOrdered == n.ListType && n.Start != 1 {
+		if ListTypeOrdered == n.ListType && 1 != n.Start {
 			r.WriteString(fmt.Sprintf(" start=\"%d\">\n", n.Start))
 		} else {
 			r.WriteString(">\n")
@@ -141,12 +149,6 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.WriteString("<li>")
-		fc := node.FirstChild()
-		if fc != nil {
-			if _, ok := fc.(*Text); !ok {
-				r.WriteString("\n")
-			}
-		}
 	} else {
 		r.WriteString("</li>\n")
 	}
