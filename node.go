@@ -285,7 +285,6 @@ type FootnoteDefinition struct {
 
 type Text struct {
 	*BaseNode
-	*Tree
 	Value string
 }
 

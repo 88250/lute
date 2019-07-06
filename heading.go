@@ -17,25 +17,32 @@ package lute
 
 type Heading struct {
 	*BaseNode
-	int
-	*Tree
 
-	Depth int
+	Level int
+}
+
+func (t *Tree) parseSetextHeading(p *Paragraph, level int) (ret Node) {
+	baseNode := &BaseNode{typ: NodeHeading}
+	ret = &Heading{baseNode, level}
+
+	p.tokens = t.trimRight(p.tokens)
+	p.rawText = p.tokens.rawText()
+	text := &Text{BaseNode:&BaseNode{typ:NodeText, tokens:p.tokens}}
+	ret.AppendChild(ret, text)
+
+	return
 }
 
 func (t *Tree) parseHeading(line items) (ret Node) {
 	marker := line[0]
 
 	baseNode := &BaseNode{typ: NodeHeading, tokens: items{}}
-	heading := &Heading{baseNode, marker.pos, t, len(marker.val)}
+	heading := &Heading{baseNode, len(marker.val)}
 	ret = heading
 
 	tokens := t.skipWhitespaces(line[1:])
 	for _, token := range tokens {
-		if itemEOF == token.typ {
-			break
-		}
-		if itemNewline == token.typ {
+		if itemEOF == token.typ || itemNewline == token.typ {
 			break
 		}
 
@@ -46,7 +53,6 @@ func (t *Tree) parseHeading(line items) (ret Node) {
 	return
 }
 
-// https://spec.commonmark.org/0.29/#atx-headings
 func (t *Tree) isATXHeading(line items) bool {
 	if 2 > len(line) { // at least # and newline
 		return false
@@ -59,4 +65,30 @@ func (t *Tree) isATXHeading(line items) bool {
 	}
 
 	return true
+}
+
+func (t *Tree) isSetextHeading(line items) (isSetextHeading bool, level int) {
+	tokens := t.removeSpacesTabs(line)
+	tokens = tokens[:len(tokens)-1] // remove tailing newline
+	length := len(tokens)
+	marker := tokens[0]
+	if itemHyphen != marker.typ && itemEqual != marker.typ {
+		return false, 0
+	}
+
+	for i := 1; i < length; i++ {
+		token := tokens[i]
+		if marker.typ != token.typ {
+			return false, 0
+		}
+	}
+
+	isSetextHeading = true
+	if itemEqual == marker.typ {
+		level = 1
+	} else {
+		level = 2
+	}
+
+	return
 }

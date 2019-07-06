@@ -20,14 +20,12 @@ type ThematicBreak struct {
 }
 
 func (t *Tree) parseThematicBreak(line items) (ret Node) {
-	baseNode := &BaseNode{typ: NodeThematicBreak, tokens:line}
+	baseNode := &BaseNode{typ: NodeThematicBreak, tokens: line}
 	ret = &ThematicBreak{baseNode}
 
 	return
 }
 
-// A line consisting of 0-3 spaces of indentation, followed by a sequence of three or more matching -, _, or * characters, each followed optionally by any number of spaces or tabs, forms a thematic break.
-// https://spec.commonmark.org/0.29/#thematic-break
 func (t *Tree) isThematicBreak(line items) bool {
 	if 3 > len(line) {
 		return false
@@ -41,7 +39,7 @@ func (t *Tree) isThematicBreak(line items) bool {
 	}
 
 	marker := tokens[0]
-	if "-" != marker.val && "_" != marker.val && "*" != marker.val {
+	if itemHyphen != marker.typ && itemUnderscore != marker.typ && itemAsterisk != marker.typ {
 		return false
 	}
 

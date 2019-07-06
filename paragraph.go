@@ -64,12 +64,24 @@ func (t *Tree) trimRight(tokens items) (ret items) {
 func (t *Tree) parseParagraph(line items) (ret Node) {
 	baseNode := &BaseNode{typ: NodeParagraph}
 	p := &Paragraph{baseNode, "<p>", "</p>"}
+	ret = p
 
 	for {
 		line = t.trimLeft(line)
 		p.tokens = append(p.tokens, line...)
 		p.rawText += line.rawText()
 		line = t.nextLine()
+		if t.isBlankLine(line) {
+			t.backupLine(line)
+			break
+		}
+
+		if ok, level := t.isSetextHeading(line);ok {
+			ret = t.parseSetextHeading(p, level)
+
+			return
+		}
+
 		if t.interruptParagrah(line) {
 			t.backupLine(line)
 
@@ -78,16 +90,11 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 	}
 	p.tokens = t.trimRight(p.tokens)
 	p.rawText = p.tokens.rawText()
-	ret = p
 
 	return
 }
 
 func (t *Tree) interruptParagrah(line items) bool {
-	if t.isBlankLine(line) {
-		return true
-	}
-
 	if t.isIndentCode(line) {
 		return false
 	}
@@ -100,6 +107,7 @@ func (t *Tree) interruptParagrah(line items) bool {
 	 * 块引用 `>` 打断段落
 	 * 第一个非空列表项打断段落（即新列表打断段落）
 	 */
+
 	if t.isThematicBreak(line) {
 		return true
 	}

@@ -194,7 +194,7 @@ func (t *Tree) handleDelim(tokens items) (ret Node) {
 
 	subTokens, text := t.extractTokens(tokens, startPos, t.context.Pos)
 	baseNode := &BaseNode{typ: NodeText, rawText: text, tokens: subTokens}
-	ret = &Text{baseNode, t, text}
+	ret = &Text{baseNode, text}
 	delim.node = ret
 
 	// Add entry to stack for this opener
@@ -274,7 +274,7 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 		t.context.Pos++
 
 		baseNode := &BaseNode{typ: NodeText, rawText: marker.val}
-		ret = &Text{baseNode, t, marker.val}
+		ret = &Text{baseNode, marker.val}
 
 		return
 	}
@@ -307,7 +307,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 	t.context.Pos++
 
 	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
-	ret = &Text{baseNode, t, token.val}
+	ret = &Text{baseNode, token.val}
 
 	return
 }
