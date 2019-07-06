@@ -126,7 +126,16 @@ func (t *Tree) firstNonSpace(line items) (index int, token *item) {
 	return
 }
 
-// https://spec.commonmark.org/0.29/#blank-line
+func (t *Tree) accept(line items, itemType itemType) (pos int) {
+	for ; pos < len(line); pos++ {
+		if itemType != line[pos].typ {
+			break
+		}
+	}
+
+	return
+}
+
 func (t *Tree) isBlankLine(line items) bool {
 	if line.isEOF() {
 		return true

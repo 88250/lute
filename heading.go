@@ -27,20 +27,18 @@ func (t *Tree) parseSetextHeading(p *Paragraph, level int) (ret Node) {
 
 	p.tokens = t.trimRight(p.tokens)
 	p.rawText = p.tokens.rawText()
-	text := &Text{BaseNode:&BaseNode{typ:NodeText, tokens:p.tokens}}
+	text := &Text{BaseNode: &BaseNode{typ: NodeText, tokens: p.tokens}}
 	ret.AppendChild(ret, text)
 
 	return
 }
 
-func (t *Tree) parseHeading(line items) (ret Node) {
-	marker := line[0]
-
-	baseNode := &BaseNode{typ: NodeHeading, tokens: items{}}
-	heading := &Heading{baseNode, len(marker.val)}
+func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
+	baseNode := &BaseNode{typ: NodeHeading}
+	heading := &Heading{baseNode, level}
 	ret = heading
 
-	tokens := t.skipWhitespaces(line[1:])
+	tokens := t.skipWhitespaces(line[level:])
 	for _, token := range tokens {
 		if itemEOF == token.typ || itemNewline == token.typ {
 			break
@@ -53,37 +51,41 @@ func (t *Tree) parseHeading(line items) (ret Node) {
 	return
 }
 
-func (t *Tree) isATXHeading(line items) bool {
+func (t *Tree) isATXHeading(line items) (level int) {
 	if 2 > len(line) { // at least # and newline
-		return false
+		return
 	}
 
-	_, marker := t.firstNonSpace(line)
-	// TODO: # 后面还需要空格才能确认是否是列表
-	if "#" != marker.val {
-		return false
+	index, marker := t.firstNonSpace(line)
+	if itemCrosshatch != marker.typ {
+		return
 	}
 
-	return true
+	line = line[index:]
+	level = t.accept(line, itemCrosshatch)
+	if !line[level].isWhitespace() {
+		return
+	}
+
+	return
 }
 
-func (t *Tree) isSetextHeading(line items) (isSetextHeading bool, level int) {
+func (t *Tree) isSetextHeading(line items) (level int) {
 	tokens := t.removeSpacesTabs(line)
 	tokens = tokens[:len(tokens)-1] // remove tailing newline
 	length := len(tokens)
 	marker := tokens[0]
 	if itemHyphen != marker.typ && itemEqual != marker.typ {
-		return false, 0
+		return
 	}
 
 	for i := 1; i < length; i++ {
 		token := tokens[i]
 		if marker.typ != token.typ {
-			return false, 0
+			return
 		}
 	}
 
-	isSetextHeading = true
 	if itemEqual == marker.typ {
 		level = 1
 	} else {

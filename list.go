@@ -90,6 +90,11 @@ func (t *Tree) parseList(line items) (ret Node) {
 			break
 		}
 
+		if t.isThematicBreak(line) {
+			t.backupLine(line)
+			break
+		}
+
 		t.skipWhitespaces(line)
 		if marker.val != line[0].val {
 			// TODO: 考虑有序列表序号递增

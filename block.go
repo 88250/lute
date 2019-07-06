@@ -36,8 +36,8 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 		ret = t.parseIndentCode(line)
 	} else if t.isThematicBreak(line) {
 		ret = t.parseThematicBreak(line)
-	} else if t.isATXHeading(line) {
-		ret = t.parseHeading(line)
+	} else if level:=t.isATXHeading(line);0<level {
+		ret = t.parseATXHeading(line, level)
 	} else if t.isBlockquote(line) {
 		ret = t.parseBlockquote(line)
 	} else  if t.isList(line) {

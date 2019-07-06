@@ -28,6 +28,8 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 	// commonmark spec cases
+	{"spec32", "# foo\n## foo\n### foo\n#### foo\n##### foo\n###### foo\n", "<h1>foo</h1>\n<h2>foo</h2>\n<h3>foo</h3>\n<h4>foo</h4>\n<h5>foo</h5>\n<h6>foo</h6>\n"},
+	{"spec30", "* Foo\n* * *\n* Bar\n", "<ul>\n<li>Foo</li>\n</ul>\n<hr />\n<ul>\n<li>Bar</li>\n</ul>\n"},
 	{"spec29", "Foo\n---\nbar\n", "<h2>Foo</h2>\n<p>bar</p>\n"},
 	{"spec26", " *-*\n", "<p><em>-</em></p>\n"},
 	{"spec18", "Foo\n    ***\n", "<p>Foo\n***</p>\n"},

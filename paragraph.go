@@ -76,7 +76,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			break
 		}
 
-		if ok, level := t.isSetextHeading(line);ok {
+		if level := t.isSetextHeading(line);0 < level {
 			ret = t.parseSetextHeading(p, level)
 
 			return
