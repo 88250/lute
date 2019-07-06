@@ -15,6 +15,10 @@
 
 package lute
 
+import (
+	"fmt"
+)
+
 func NewHTMLRenderer() (ret *Renderer) {
 	ret = &Renderer{rendererFuncs: map[NodeType]RendererFunc{}}
 
@@ -27,6 +31,8 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
+	ret.rendererFuncs[NodeList] = ret.renderList
+	ret.rendererFuncs[NodeListItem] = ret.renderListItem
 
 	return
 }
@@ -103,13 +109,46 @@ func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-
 func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Heading)
 	if entering {
 		r.WriteString("<h" + " 123456"[n.Depth:n.Depth+1] + ">")
 	} else {
 		r.WriteString("</h" + " 123456"[n.Depth:n.Depth+1] + ">\n")
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
+	n := node.(*List)
+	tag := "ul"
+	if ListTypeOrdered == n.ListType {
+		tag = "ol"
+	}
+	if entering {
+		r.WriteString("<" + tag)
+		if ListTypeOrdered == n.ListType && n.Start != 1 {
+			r.WriteString(fmt.Sprintf(" start=\"%d\">\n", n.Start))
+		} else {
+			r.WriteString(">\n")
+		}
+	} else {
+		r.WriteString("</" + tag + ">\n")
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.WriteString("<li>")
+		fc := node.FirstChild()
+		if fc != nil {
+			if _, ok := fc.(*Text); !ok {
+				r.WriteString("\n")
+			}
+		}
+	} else {
+		r.WriteString("</li>\n")
 	}
 	return WalkContinue, nil
 }
