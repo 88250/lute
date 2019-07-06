@@ -25,6 +25,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeCode] = ret.renderCode
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
+	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
 
 	return
 }
@@ -35,9 +36,9 @@ func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
 
 func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writer.WriteString("<p>")
+		r.WriteString("<p>")
 	} else {
-		r.writer.WriteString("</p>\n")
+		r.WriteString("</p>\n")
 	}
 
 	return WalkContinue, nil
@@ -49,45 +50,54 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 	}
 
 	n := node.(*Text)
-	r.writer.WriteString(n.Value)
+	r.WriteString(n.Value)
 
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writer.WriteString("<code>" + n.(*InlineCode).Value)
+		r.WriteString("<code>" + n.(*InlineCode).Value)
 
 		return WalkSkipChildren, nil
 	}
-	r.writer.WriteString("</code>")
+	r.WriteString("</code>")
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderCode(n Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writer.WriteString("<pre><code>" + n.(*Code).Value)
+		r.WriteString("<pre><code>" + n.(*Code).Value)
 
 		return WalkSkipChildren, nil
 	}
-	r.writer.WriteString("</code></pre>\n")
+	r.WriteString("</code></pre>\n")
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writer.WriteString("<em>" + node.(*Emphasis).rawText)
+		r.WriteString("<em>" + node.(*Emphasis).rawText)
 	} else {
-		r.writer.WriteString("</em>")
+		r.WriteString("</em>")
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writer.WriteString("<strong>" + node.(*Strong).rawText)
+		r.WriteString("<strong>" + node.(*Strong).rawText)
 	} else {
-		r.writer.WriteString("</strong>")
+		r.WriteString("</strong>")
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.WriteString("<blockquote>\n")
+	} else {
+		r.WriteString("</blockquote>\n")
 	}
 	return WalkContinue, nil
 }

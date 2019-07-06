@@ -38,3 +38,7 @@ func (r *Renderer) Render(n Node) error {
 		return f(n, entering)
 	})
 }
+
+func (r *Renderer) WriteString(content string) {
+	r.writer.WriteString(content)
+}
