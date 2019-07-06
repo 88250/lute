@@ -62,7 +62,6 @@ func (t *Tree) trimRight(tokens items) (ret items) {
 }
 
 func (t *Tree) parseParagraph(line items) (ret Node) {
-
 	baseNode := &BaseNode{typ: NodeParagraph}
 	p := &Paragraph{baseNode, "<p>", "</p>"}
 	ret = p
