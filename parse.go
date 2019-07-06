@@ -40,12 +40,16 @@ func sanitize(text string) (ret string) {
 
 // Context use to store common data in parsing.
 type Context struct {
+	// Blocks parsing
+
 	CurLine      items
 	CurNode      Node
 	IndentSpaces int
 
+	// Inlines parsing
+
 	Delimiters *delimiter
-	Pos int
+	Pos        int
 }
 
 // Tree is the representation of the markdown ast.

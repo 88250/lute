@@ -119,6 +119,30 @@ const (
 	itemNewline                         // \n
 )
 
+var (
+	tEOF             = makeItem(itemEOF, "")
+	tSpace           = makeItem(itemSpace, " ")
+	tNewLine         = makeItem(itemNewline, "\n")
+	tTab             = makeItem(itemTab, "\t")
+	tBacktick        = makeItem(itemBacktick, "`")
+	tAsterisk        = makeItem(itemAsterisk, "*")
+	tHypen           = makeItem(itemHyphen, "-")
+	tUnderscore      = makeItem(itemUnderscore, "_")
+	tPlus            = makeItem(itemPlus, "+")
+	tBangOpenBracket = makeItem(itemBangOpenBracket, "![")
+	tOpenBracket     = makeItem(itemOpenBracket, "[")
+	tCloseBracket    = makeItem(itemCloseBracket, "]")
+	tOpenParen       = makeItem(itemOpenParen, "(")
+	tCloseParan      = makeItem(itemCloseParen, ")")
+)
+
+func makeItem(typ itemType, text string) *item {
+	return &item{
+		typ: typ,
+		val: text,
+	}
+}
+
 const (
 	end = -1
 )

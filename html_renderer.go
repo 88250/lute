@@ -85,7 +85,7 @@ func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) 
 
 func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writer.WriteString("<strong>" + node.(*Emphasis).rawText)
+		r.writer.WriteString("<strong>" + node.(*Strong).rawText)
 	} else {
 		r.writer.WriteString("</strong>")
 	}

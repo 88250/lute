@@ -87,6 +87,7 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 	for nil != closer {
 		var closercc = closer.typ
 		if !closer.canClose {
+			closer = closer.next;
 			continue
 		}
 
@@ -103,68 +104,67 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 		}
 		old_closer = closer
 
-		if itemAsterisk == closercc || itemUnderscore == closercc {
-			if !opener_found {
-				closer = closer.next
+		if !opener_found {
+			closer = closer.next
+		} else {
+			// calculate actual number of delimiters used from closer
+			if closer.num >= 2 && opener.num >= 2 {
+				use_delims = 2
 			} else {
-				// calculate actual number of delimiters used from closer
-				if closer.num >= 2 && opener.num >= 2 {
-					use_delims = 2
-				} else {
-					use_delims = 1
-				}
+				use_delims = 1
+			}
 
-				opener_inl = opener.node
-				closer_inl = closer.node
+			opener_inl = opener.node
+			closer_inl = closer.node
 
-				// remove used delimiters from stack elts and inlines
-				opener.num -= use_delims
-				closer.num -= use_delims
+			// remove used delimiters from stack elts and inlines
+			opener.num -= use_delims
+			closer.num -= use_delims
 
-				text := opener_inl.RawText()[0 : len(opener_inl.RawText())-use_delims]
-				opener_inl.SetRawText(text)
+			text := opener_inl.RawText()[0 : len(opener_inl.RawText())-use_delims]
+			opener_inl.SetRawText(text)
 
-				text = closer_inl.RawText()[0 : len(closer_inl.RawText())-use_delims]
-				closer_inl.SetRawText(text)
+			text = closer_inl.RawText()[0 : len(closer_inl.RawText())-use_delims]
+			closer_inl.SetRawText(text)
 
-				// build contents for new emph element
-				var emph Node
-				if 1 == use_delims {
-					emph = &Emphasis{&BaseNode{typ: NodeEmphasis}}
-				} else {
-					emph = &Strong{&BaseNode{typ: NodeStrong}}
-				}
+			// build contents for new emph element
+			var emph Node
+			if 1 == use_delims {
+				emph = &Emphasis{&BaseNode{typ: NodeEmphasis}}
+			} else {
+				emph = &Strong{&BaseNode{typ: NodeStrong}}
+			}
 
-				tmp.node = opener_inl.Next()
-				for nil != tmp && tmp.node != closer_inl {
-					next = tmp.next
-					tmp.node.Unlink()
-					emph.AppendChild(emph, tmp.node)
-					tmp = next
-				}
+			tmp.node = opener_inl.Next()
+			for nil != tmp && tmp.node != closer_inl {
+				next = tmp.next
+				tmp.node.Unlink()
+				emph.AppendChild(emph, tmp.node)
+				tmp = next
+			}
 
-				opener_inl.InsertAfter(opener_inl, emph)
+			opener_inl.InsertAfter(opener_inl, emph)
 
-				// remove elts between opener and closer in delimiters stack
-				if opener.next != closer {
-					opener.next = closer
-					closer.previous = opener
-				}
+			// remove elts between opener and closer in delimiters stack
+			if opener.next != closer {
+				opener.next = closer
+				closer.previous = opener
+			}
 
-				// if opener has 0 delims, remove it and the inline
-				if opener.num == 0 {
-					opener_inl.Unlink()
-					t.removeDelimiter(opener)
-				}
+			// if opener has 0 delims, remove it and the inline
+			if opener.num == 0 {
+				opener_inl.Unlink()
+				t.removeDelimiter(opener)
+			}
 
-				if closer.num == 0 {
-					closer_inl.Unlink()
-					tempstack = closer.next
-					t.removeDelimiter(closer)
-					closer = tempstack
-				}
+			if closer.num == 0 {
+				closer_inl.Unlink()
+				tempstack = closer.next
+				t.removeDelimiter(closer)
+				closer = tempstack
 			}
 		}
+
 		if !opener_found && !odd_match {
 			// Set lower bound for future searches for openers:
 			// We don't do this with odd_match because a **
@@ -188,7 +188,7 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 
 func (t *Tree) handleDelim(tokens items) (ret Node) {
 	startPos := t.context.Pos
-	delim := t.scanDelimiter(tokens)
+	delim := t.scanDelims(tokens)
 
 	subTokens, text := t.extractTokens(tokens, startPos, t.context.Pos)
 	baseNode := &BaseNode{typ: NodeText, rawText: text, tokens: subTokens}
@@ -222,7 +222,7 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 	return
 }
 
-func (t *Tree) scanDelimiter(tokens items) *delimiter {
+func (t *Tree) scanDelims(tokens items) *delimiter {
 	startPos := t.context.Pos
 	token := tokens[startPos]
 	delimitersCount := 0
@@ -231,12 +231,12 @@ func (t *Tree) scanDelimiter(tokens items) *delimiter {
 		t.context.Pos++
 	}
 
-	var tokenBefore, tokenAfter *item
+	tokenBefore, tokenAfter := tNewLine, tNewLine
 	index := startPos - 1
 	if 0 < index {
 		tokenBefore = tokens[index]
 	}
-	index = startPos + 1
+	index = t.context.Pos
 	if len(tokens) > index {
 		tokenAfter = tokens[index]
 	}

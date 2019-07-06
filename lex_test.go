@@ -25,46 +25,22 @@ type lexTest struct {
 	items items
 }
 
-func mkItem(typ itemType, text string) *item {
-	return &item{
-		typ: typ,
-		val: text,
-	}
-}
-
-var (
-	tEOF             = mkItem(itemEOF, "")
-	tSpace           = mkItem(itemSpace, " ")
-	tNewLine         = mkItem(itemNewline, "\n")
-	tTab             = mkItem(itemTab, "\t")
-	tBacktick        = mkItem(itemBacktick, "`")
-	tAsterisk        = mkItem(itemAsterisk, "*")
-	tHypen           = mkItem(itemHyphen, "-")
-	tUnderscore      = mkItem(itemUnderscore, "_")
-	tPlus            = mkItem(itemPlus, "+")
-	tBangOpenBracket = mkItem(itemBangOpenBracket, "![")
-	tOpenBracket     = mkItem(itemOpenBracket, "[")
-	tCloseBracket    = mkItem(itemCloseBracket, "]")
-	tOpenParen       = mkItem(itemOpenParen, "(")
-	tCloseParan      = mkItem(itemCloseParen, ")")
-)
-
 var lexTests = []lexTest{
 
 	{"spec14", "+++\n", items{tPlus, tPlus, tPlus, tNewLine, tEOF}},
 	{"spec13", "***\n---\n___\n", items{tAsterisk, tAsterisk, tAsterisk, tNewLine, tHypen, tHypen, tHypen, tNewLine, tUnderscore, tUnderscore, tUnderscore, tNewLine, tEOF}},
-	{"spec7", "-\t\tfoo\n", items{mkItem(itemHyphen, "-"), tTab, tTab, mkItem(itemStr, "foo"), tNewLine, tEOF}},
+	{"spec7", "-\t\tfoo\n", items{makeItem(itemHyphen, "-"), tTab, tTab, makeItem(itemStr, "foo"), tNewLine, tEOF}},
 
-	{"simple13", "![lute]()", items{tBangOpenBracket, mkItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
-	{"simple12", "[lute]()", items{tOpenBracket, mkItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
-	{"simple11", "`lu\nte`", items{tBacktick, mkItem(itemStr, "lu"), tNewLine, mkItem(itemStr, "te"), tBacktick, tEOF}},
-	{"simple10", "# lute", items{mkItem(itemCrosshatch, "#"), tSpace, mkItem(itemStr, "lute"), tEOF}},
-	{"simple9", "> lute", items{mkItem(itemGreater, ">"), tSpace, mkItem(itemStr, "lute"), tEOF}},
-	{"simple8", "*lute*", items{tAsterisk, mkItem(itemStr, "lute"), tAsterisk, tEOF}},
-	{"simple7", "`lute`", items{tBacktick, mkItem(itemStr, "lute"), tBacktick, tEOF}},
-	{"simple6", "\tlute", items{tTab, mkItem(itemStr, "lute"), tEOF}},
-	{"simple5", "lute", items{mkItem(itemStr, "lute"), tEOF}},
-	{"simple4", "1\n\n2", items{mkItem(itemStr, "1"), tNewLine, tNewLine, mkItem(itemStr, "2"), tEOF}},
+	{"simple13", "![lute]()", items{tBangOpenBracket, makeItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
+	{"simple12", "[lute]()", items{tOpenBracket, makeItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
+	{"simple11", "`lu\nte`", items{tBacktick, makeItem(itemStr, "lu"), tNewLine, makeItem(itemStr, "te"), tBacktick, tEOF}},
+	{"simple10", "# lute", items{makeItem(itemCrosshatch, "#"), tSpace, makeItem(itemStr, "lute"), tEOF}},
+	{"simple9", "> lute", items{makeItem(itemGreater, ">"), tSpace, makeItem(itemStr, "lute"), tEOF}},
+	{"simple8", "*lute*", items{tAsterisk, makeItem(itemStr, "lute"), tAsterisk, tEOF}},
+	{"simple7", "`lute`", items{tBacktick, makeItem(itemStr, "lute"), tBacktick, tEOF}},
+	{"simple6", "\tlute", items{tTab, makeItem(itemStr, "lute"), tEOF}},
+	{"simple5", "lute", items{makeItem(itemStr, "lute"), tEOF}},
+	{"simple4", "1\n\n2", items{makeItem(itemStr, "1"), tNewLine, tNewLine, makeItem(itemStr, "2"), tEOF}},
 	{"simple3", "\n\n", items{tNewLine, tNewLine, tEOF}},
 	{"simple2", " \n", items{tSpace, tNewLine, tEOF}},
 	{"simple1", " ", items{tSpace, tEOF}},
