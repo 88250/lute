@@ -52,7 +52,8 @@ func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
 }
 
 func (t *Tree) isATXHeading(line items) (level int) {
-	if 2 > len(line) { // at least # and newline
+	len := len(line)
+	if 2 > len { // at least # and newline
 		return
 	}
 
@@ -63,7 +64,13 @@ func (t *Tree) isATXHeading(line items) (level int) {
 
 	line = line[index:]
 	level = t.accept(line, itemCrosshatch)
+	if 6 < level {
+		level = 0
+		return
+	}
+
 	if !line[level].isWhitespace() {
+		level = 0
 		return
 	}
 
