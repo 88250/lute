@@ -24,6 +24,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeInlineCode] = ret.renderInlineCode
 	ret.rendererFuncs[NodeCode] = ret.renderCode
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
+	ret.rendererFuncs[NodeStrong] = ret.renderStrong
 
 	return
 }
@@ -78,6 +79,15 @@ func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) 
 		r.writer.WriteString("<em>" + node.(*Emphasis).rawText)
 	} else {
 		r.writer.WriteString("</em>")
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writer.WriteString("<strong>" + node.(*Emphasis).rawText)
+	} else {
+		r.writer.WriteString("</strong>")
 	}
 	return WalkContinue, nil
 }

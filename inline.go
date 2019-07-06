@@ -36,25 +36,25 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 		}
 
 		tokens := block.Tokens()
-		pos := 0
+		t.context.Pos = 0
 
 		for {
-			token := tokens[pos]
+			token := tokens[t.context.Pos]
 			var n Node
 			switch token.typ {
 			case itemBacktick:
-				n = t.parseInlineCode(tokens, &pos)
+				n = t.parseInlineCode(tokens)
 			case itemAsterisk, itemUnderscore:
-				n = t.handleDelim(tokens, &pos)
+				n = t.handleDelim(tokens)
 			case itemStr:
-				n = t.parseText(tokens, &pos)
+				n = t.parseText(tokens)
 			}
 
 			if nil != n {
 				block.AppendChild(block, n)
 			}
 
-			if 1 > len(tokens) || tokens[pos].isEOF() {
+			if 1 > len(tokens) || tokens[t.context.Pos].isEOF() {
 				break
 			}
 		}
@@ -68,7 +68,8 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 	var opener_inl, closer_inl Node
 	var tempstack *delimiter
 	var use_delims int
-	var tmp, next *delimiter
+	tmp := &delimiter{}
+	next := &delimiter{}
 	var opener_found bool
 	var openers_bottom = map[itemType]*delimiter{}
 	var odd_match = false
@@ -83,7 +84,7 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 	}
 
 	// move forward, looking for closers, and handling each
-	for itemEOF != closer.typ {
+	for nil != closer {
 		var closercc = closer.typ
 		if !closer.canClose {
 			continue
@@ -185,11 +186,11 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 	}
 }
 
-func (t *Tree) handleDelim(tokens items, pos *int) (ret Node) {
-	startPos := *pos
-	delim := t.scanDelimiter(tokens, pos)
+func (t *Tree) handleDelim(tokens items) (ret Node) {
+	startPos := t.context.Pos
+	delim := t.scanDelimiter(tokens)
 
-	subTokens, text := t.extractTokens(tokens, startPos, *pos)
+	subTokens, text := t.extractTokens(tokens, startPos, t.context.Pos)
 	baseNode := &BaseNode{typ: NodeText, rawText: text, tokens: subTokens}
 	ret = &Text{baseNode, t, text}
 	delim.node = ret
@@ -221,17 +222,13 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 	return
 }
 
-func (t *Tree) scanDelimiter(tokens items, pos *int) *delimiter {
-	startPos := *pos
+func (t *Tree) scanDelimiter(tokens items) *delimiter {
+	startPos := t.context.Pos
 	token := tokens[startPos]
 	delimitersCount := 0
-	for i := *pos; i < len(tokens); i++ {
-		if token.val == tokens[i].val {
-			delimitersCount++
-			*pos++
-		} else {
-			break
-		}
+	for i := t.context.Pos; i < len(tokens) && token.val == tokens[i].val; i++ {
+		delimitersCount++
+		t.context.Pos++
 	}
 
 	var tokenBefore, tokenAfter *item
@@ -267,12 +264,12 @@ func (t *Tree) scanDelimiter(tokens items, pos *int) *delimiter {
 	return &delimiter{typ: token.typ, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
 }
 
-func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
-	startPos := *pos
+func (t *Tree) parseInlineCode(tokens items) (ret Node) {
+	startPos := t.context.Pos
 	marker := tokens[startPos]
 	if !t.matchEnd(tokens[startPos+1:], marker) {
 		marker.typ = itemStr
-		*pos++
+		t.context.Pos++
 
 		baseNode := &BaseNode{typ: NodeText, rawText: marker.val}
 		ret = &Text{baseNode, t, marker.val}
@@ -289,7 +286,7 @@ func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
 			text += " "
 		} else {
 			if itemBacktick == token.typ {
-				*pos = i + 1
+				t.context.Pos = i + 1
 				break
 			}
 			text += token.val
@@ -303,9 +300,9 @@ func (t *Tree) parseInlineCode(tokens items, pos *int) (ret Node) {
 	return
 }
 
-func (t *Tree) parseText(tokens items, pos *int) (ret Node) {
-	token := tokens[*pos]
-	*pos++
+func (t *Tree) parseText(tokens items) (ret Node) {
+	token := tokens[t.context.Pos]
+	t.context.Pos++
 
 	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
 	ret = &Text{baseNode, t, token.val}

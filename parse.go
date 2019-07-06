@@ -43,7 +43,9 @@ type Context struct {
 	CurLine      items
 	CurNode      Node
 	IndentSpaces int
+
 	Delimiters *delimiter
+	Pos int
 }
 
 // Tree is the representation of the markdown ast.
