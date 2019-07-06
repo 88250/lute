@@ -26,15 +26,15 @@ type delimiter struct {
 	previous, next *delimiter // doubly linked list
 }
 
-func (d *delimiter) remove(delimiter *delimiter) (ret *delimiter) {
-	if delimiter.previous != nil {
-		delimiter.previous.next = delimiter.next
+func (t *Tree) removeDelimiter(delim *delimiter) (ret *delimiter) {
+	if delim.previous != nil {
+		delim.previous.next = delim.next
 	}
-	if delimiter.next == nil {
+	if delim.next == nil {
 		// top of stack
-		ret = delimiter.previous
+		t.context.Delimiters = delim.previous
 	} else {
-		delimiter.next.previous = delimiter.previous
+		delim.next.previous = delim.previous
 	}
 
 	return

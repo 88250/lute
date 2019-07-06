@@ -16,11 +16,11 @@
 package lute
 
 func (t *Tree) parseInlines() {
-	delimiters := &delimiter{}
-	t.parseBlockInlines(t.Root.Children(), delimiters)
+	t.context.Delimiters = nil
+	t.parseBlockInlines(t.Root.Children())
 }
 
-func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
+func (t *Tree) parseBlockInlines(blocks []Node) {
 	for _, block := range blocks {
 		cType := block.Type()
 		switch cType {
@@ -30,7 +30,7 @@ func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
 
 		cs := block.Children()
 		if 0 < len(cs) {
-			t.parseBlockInlines(cs, delimiters)
+			t.parseBlockInlines(cs)
 
 			continue
 		}
@@ -45,7 +45,7 @@ func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
 			case itemBacktick:
 				n = t.parseInlineCode(tokens, &pos)
 			case itemAsterisk, itemUnderscore:
-				n = t.handleDelim(tokens, &pos, delimiters)
+				n = t.handleDelim(tokens, &pos)
 			case itemStr:
 				n = t.parseText(tokens, &pos)
 			}
@@ -59,11 +59,11 @@ func (t *Tree) parseBlockInlines(blocks []Node, delimiters *delimiter) {
 			}
 		}
 
-		t.parseEmphasis(nil, delimiters)
+		t.parseEmphasis(nil)
 	}
 }
 
-func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
+func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 	var opener, closer, old_closer *delimiter
 	var opener_inl, closer_inl Node
 	var tempstack *delimiter
@@ -77,7 +77,7 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 	openers_bottom[itemAsterisk] = stackBottom
 
 	// find first closer above stack_bottom:
-	closer = delimiters
+	closer = t.context.Delimiters
 	for closer != nil && closer.previous != stackBottom {
 		closer = closer.previous
 	}
@@ -153,13 +153,13 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 				// if opener has 0 delims, remove it and the inline
 				if opener.num == 0 {
 					opener_inl.Unlink()
-					delimiters = delimiters.remove(opener)
+					t.removeDelimiter(opener)
 				}
 
 				if closer.num == 0 {
 					closer_inl.Unlink()
 					tempstack = closer.next
-					delimiters = delimiters.remove(closer)
+					t.removeDelimiter(closer)
 					closer = tempstack
 				}
 			}
@@ -174,18 +174,18 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter, delimiters *delimiter) {
 			if !old_closer.canOpen {
 				// We can remove a closer that can't be an opener,
 				// once we've seen there's no matching opener:
-				delimiters.remove(old_closer)
+				t.removeDelimiter(old_closer)
 			}
 		}
 	}
 
 	// remove all delimiters
-	for delimiters != nil && delimiters != stackBottom {
-		delimiters = delimiters.remove(delimiters)
+	for t.context.Delimiters != nil && t.context.Delimiters != stackBottom {
+		t.removeDelimiter(t.context.Delimiters)
 	}
 }
 
-func (t *Tree) handleDelim(tokens items, pos *int, delimiters *delimiter) (ret Node) {
+func (t *Tree) handleDelim(tokens items, pos *int) (ret Node) {
 	startPos := *pos
 	delim := t.scanDelimiter(tokens, pos)
 
@@ -195,16 +195,18 @@ func (t *Tree) handleDelim(tokens items, pos *int, delimiters *delimiter) (ret N
 	delim.node = ret
 
 	// Add entry to stack for this opener
-	delimiters.typ = delim.typ
-	delimiters.previous = delim.previous
-	delimiters.next = delim.next
-	delimiters.node = delim.node
-	delimiters.canOpen = delim.canOpen
-	delimiters.canClose = delim.canClose
-	delimiters.num = delim.num
-	delimiters.originalNum = delim.originalNum
-	if delimiters.previous != nil {
-		delimiters.previous.next = delimiters
+	t.context.Delimiters = &delimiter{
+		typ:         delim.typ,
+		num:         delim.num,
+		originalNum: delim.num,
+		node:        ret,
+		previous:    t.context.Delimiters,
+		next:        nil,
+		canOpen:     delim.canOpen,
+		canClose:    delim.canClose,
+	}
+	if t.context.Delimiters.previous != nil {
+		t.context.Delimiters.previous.next = t.context.Delimiters
 	}
 
 	return
