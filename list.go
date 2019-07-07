@@ -95,7 +95,6 @@ func (t *Tree) parseList(line items) (ret Node) {
 			break
 		}
 
-		t.skipWhitespaces(line)
 		if marker.val != line[0].val {
 			// TODO: 考虑有序列表序号递增
 			t.backupLine(line)
@@ -120,7 +119,7 @@ func (t *Tree) isList(line items) bool {
 		return false
 	}
 
-	line = t.skipWhitespaces(line)
+	line = t.trimLeft(line)
 	firstNonWhitespace := line[0]
 	if "*" != firstNonWhitespace.val && "-" != firstNonWhitespace.val && "+" != firstNonWhitespace.val {
 		// TODO: 有序列表判断

@@ -91,13 +91,43 @@ func (t *Tree) nonWhitespace(line items) (spaces, tabs int, tokens items, firstN
 	return
 }
 
-func (t *Tree) skipWhitespaces(line items) (tokens items) {
-	for i, token := range line {
-		if !token.isWhitespace() {
-			tokens = append(tokens, line[i:]...)
+
+func (t *Tree) trimLeft(tokens items) (ret items) {
+	ret = tokens
+
+	size := len(tokens)
+	if 1 > size {
+		return
+	}
+
+	i := 0
+	for ; i < size; i++ {
+		if !tokens[i].isWhitespace() {
 			break
 		}
 	}
+
+	ret = tokens[i:]
+
+	return
+}
+
+func (t *Tree) trimRight(tokens items) (ret items) {
+	ret = tokens
+
+	size := len(tokens)
+	if 1 > size {
+		return
+	}
+
+	i := size - 1
+	for ; 0 <= size; i-- {
+		if !tokens[i].isWhitespace() {
+			break
+		}
+	}
+
+	ret = tokens[:i+1]
 
 	return
 }

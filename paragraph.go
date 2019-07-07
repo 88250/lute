@@ -21,46 +21,6 @@ type Paragraph struct {
 	OpenTag, CloseTag string
 }
 
-func (t *Tree) trimLeft(tokens items) (ret items) {
-	ret = tokens
-
-	size := len(tokens)
-	if 1 > size {
-		return
-	}
-
-	i := 0
-	for ; i < size; i++ {
-		if !tokens[i].isWhitespace() {
-			break
-		}
-	}
-
-	ret = tokens[i:]
-
-	return
-}
-
-func (t *Tree) trimRight(tokens items) (ret items) {
-	ret = tokens
-
-	size := len(tokens)
-	if 1 > size {
-		return
-	}
-
-	i := size - 1
-	for ; 0 <= size; i-- {
-		if !tokens[i].isWhitespace() {
-			break
-		}
-	}
-
-	ret = tokens[:i+1]
-
-	return
-}
-
 func (t *Tree) parseParagraph(line items) (ret Node) {
 	baseNode := &BaseNode{typ: NodeParagraph}
 	p := &Paragraph{baseNode, "<p>", "</p>"}
