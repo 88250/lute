@@ -29,11 +29,11 @@ type List struct {
 	WNSpaces     int
 }
 
-func newList(indentSpaces int, marker string, wnSpaces int, t *Tree) (ret Node) {
+func newList(indentSpaces int, marker string, bullet bool, wnSpaces int, t *Tree) (ret Node) {
 	baseNode := &BaseNode{typ: NodeList}
 	ret = &List{
 		baseNode,
-		true,
+		bullet,
 		1,
 		false,
 		indentSpaces,
@@ -47,11 +47,20 @@ func newList(indentSpaces int, marker string, wnSpaces int, t *Tree) (ret Node) 
 
 func (t *Tree) parseList(line items) (ret Node) {
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
-	marker := firstNonWhitespace
+	var marker items
+	marker = append(marker, firstNonWhitespace)
 	indentSpaces := spaces + tabs*4
 	line = line[len(tokens):]
+	bullet := true
+	if firstNonWhitespace.isNumInt() {
+		bullet = false
+		marker = append(marker, line[0])
+		line = line[1:]
+	}
+
+	markerText := marker.rawText()
 	spaces, tabs, _, firstNonWhitespace = t.nonWhitespace(line)
-	w := len(marker.val)
+	w := len(markerText)
 	n := spaces + tabs*4
 	wnSpaces := w + n
 	oldContextIndentSpaces := t.context.IndentSpaces
@@ -62,7 +71,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 	} else {
 		line = indentOffset(line, indentSpaces+wnSpaces, t)
 	}
-	ret = newList(indentSpaces, marker.val, wnSpaces, t)
+	ret = newList(indentSpaces, markerText, bullet, wnSpaces, t)
 	tight := false
 
 	defer func() { t.context.IndentSpaces = oldContextIndentSpaces }()
@@ -88,13 +97,13 @@ func (t *Tree) parseList(line items) (ret Node) {
 			break
 		}
 
-		if marker.val != line[0].val {
+		if markerText != line[0].val {
 			// TODO: 考虑有序列表序号递增
 			t.backupLine(line)
 
 			break
 		} else {
-			line = line[len(marker.val):]
+			line = line[len(markerText):]
 		}
 	}
 
