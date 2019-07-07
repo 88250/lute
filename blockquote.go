@@ -70,7 +70,7 @@ func (t *Tree) isBlockquote(line items) bool {
 		return false
 	}
 
-	_, marker := t.firstNonSpace(line)
+	_, marker := line.firstNonSpace()
 	if ">" != marker.val {
 		return false
 	}

@@ -42,7 +42,7 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 		ret = t.parseBlockquote(line)
 	} else if t.isList(line) {
 		ret = t.parseList(line)
-	} else if t.isBlankLine(line) {
+	} else if line.isBlankLine() {
 		return
 	} else {
 		ret = t.parseParagraph(line)

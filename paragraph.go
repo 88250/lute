@@ -27,7 +27,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 	ret = p
 
 	for {
-		line = t.trimLeft(line)
+		line = line.trimLeft()
 		len := len(line)
 		for i, token := range line {
 			if itemBackslash != token.typ {
@@ -39,7 +39,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 
 		p.rawText += line.rawText()
 		line = t.nextLine()
-		if t.isBlankLine(line) {
+		if line.isBlankLine() {
 			t.backupLine(line)
 			break
 		}
@@ -56,7 +56,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			break
 		}
 	}
-	p.tokens = t.trimRight(p.tokens)
+	p.tokens = p.tokens.trimRight()
 	p.rawText = p.tokens.rawText()
 
 	return

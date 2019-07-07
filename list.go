@@ -119,7 +119,7 @@ func (t *Tree) isList(line items) bool {
 		return false
 	}
 
-	line = t.trimLeft(line)
+	line = line.trimLeft()
 	firstNonWhitespace := line[0]
 	if "*" != firstNonWhitespace.val && "-" != firstNonWhitespace.val && "+" != firstNonWhitespace.val {
 		// TODO: 有序列表判断

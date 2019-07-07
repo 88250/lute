@@ -190,6 +190,84 @@ func (tokens items) rawText() (ret string) {
 	return
 }
 
+func (tokens items) trimLeft() items {
+	size := len(tokens)
+	if 1 > size {
+		return tokens
+	}
+
+	i := 0
+	for ; i < size; i++ {
+		if !tokens[i].isWhitespace() {
+			break
+		}
+	}
+
+	return tokens[i:]
+}
+
+func (tokens items) trimRight() items {
+	size := len(tokens)
+	if 1 > size {
+		return tokens
+	}
+
+	i := size - 1
+	for ; 0 <= size; i-- {
+		if !tokens[i].isWhitespace() {
+			break
+		}
+	}
+
+	return tokens[:i+1]
+}
+
+
+func (tokens items) firstNonSpace() (index int, token *item) {
+	for index, token = range tokens {
+		if itemSpace != token.typ {
+			return
+		}
+	}
+
+	return
+}
+
+func (tokens items) accept(itemType itemType) (pos int) {
+	for ; pos < len(tokens); pos++ {
+		if itemType != tokens[pos].typ {
+			break
+		}
+	}
+
+	return
+}
+
+func (tokens items) isBlankLine() bool {
+	if tokens.isEOF() {
+		return true
+	}
+
+	for _, token := range tokens {
+		typ := token.typ
+		if itemSpace != typ && itemTab != typ && itemNewline != typ {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (tokens items) removeSpacesTabs() (ret items) {
+	for _, token := range tokens {
+		if itemSpace != token.typ && itemTab != token.typ {
+			ret = append(ret, token)
+		}
+	}
+
+	return
+}
+
 type NodeType int
 
 const (

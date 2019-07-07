@@ -91,104 +91,18 @@ func (t *Tree) nonWhitespace(line items) (spaces, tabs int, tokens items, firstN
 	return
 }
 
-
-func (t *Tree) trimLeft(tokens items) (ret items) {
-	ret = tokens
-
-	size := len(tokens)
-	if 1 > size {
-		return
-	}
-
-	i := 0
-	for ; i < size; i++ {
-		if !tokens[i].isWhitespace() {
-			break
-		}
-	}
-
-	ret = tokens[i:]
-
-	return
-}
-
-func (t *Tree) trimRight(tokens items) (ret items) {
-	ret = tokens
-
-	size := len(tokens)
-	if 1 > size {
-		return
-	}
-
-	i := size - 1
-	for ; 0 <= size; i-- {
-		if !tokens[i].isWhitespace() {
-			break
-		}
-	}
-
-	ret = tokens[:i+1]
-
-	return
-}
-
 func (t *Tree) skipBlankLines() (count int) {
 	for {
 		line := t.nextLine()
 		if line.isEOF() {
 			return
 		}
-		if !t.isBlankLine(line) {
+		if !line.isBlankLine() {
 			t.backupLine(line)
 			return
 		}
 		count++
 	}
-}
-
-func (t *Tree) firstNonSpace(line items) (index int, token *item) {
-	for index, token = range line {
-		if itemSpace != token.typ {
-			return
-		}
-	}
-
-	return
-}
-
-func (t *Tree) accept(line items, itemType itemType) (pos int) {
-	for ; pos < len(line); pos++ {
-		if itemType != line[pos].typ {
-			break
-		}
-	}
-
-	return
-}
-
-func (t *Tree) isBlankLine(line items) bool {
-	if line.isEOF() {
-		return true
-	}
-
-	for _, token := range line {
-		typ := token.typ
-		if itemSpace != typ && itemTab != typ && itemNewline != typ {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (t *Tree) removeSpacesTabs(line items) (tokens items) {
-	for _, token := range line {
-		if itemSpace != token.typ && itemTab != token.typ {
-			tokens = append(tokens, token)
-		}
-	}
-
-	return
 }
 
 func indentOffset(tokens items, indentSpaces int, t *Tree) (ret items) {

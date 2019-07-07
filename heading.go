@@ -25,7 +25,7 @@ func (t *Tree) parseSetextHeading(p *Paragraph, level int) (ret Node) {
 	baseNode := &BaseNode{typ: NodeHeading}
 	ret = &Heading{baseNode, level}
 
-	p.tokens = t.trimRight(p.tokens)
+	p.tokens = p.tokens.trimRight()
 	p.rawText = p.tokens.rawText()
 	text := &Text{BaseNode: &BaseNode{typ: NodeText, tokens: p.tokens}}
 	ret.AppendChild(ret, text)
@@ -38,7 +38,7 @@ func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
 	heading := &Heading{baseNode, level}
 	ret = heading
 
-	tokens := t.trimLeft(line[level:])
+	tokens := line[level:].trimLeft()
 	for _, token := range tokens {
 		if itemEOF == token.typ || itemNewline == token.typ {
 			break
@@ -47,7 +47,7 @@ func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
 		heading.tokens = append(heading.tokens, token)
 	}
 
-	heading.tokens = t.trimRight(heading.tokens)
+	heading.tokens = heading.tokens.trimRight()
 
 	return
 }
@@ -58,13 +58,13 @@ func (t *Tree) isATXHeading(line items) (level int) {
 		return
 	}
 
-	index, marker := t.firstNonSpace(line)
+	index, marker := line.firstNonSpace()
 	if itemCrosshatch != marker.typ {
 		return
 	}
 
 	line = line[index:]
-	level = t.accept(line, itemCrosshatch)
+	level = line.accept(itemCrosshatch)
 	if 6 < level {
 		level = 0
 		return
@@ -79,7 +79,7 @@ func (t *Tree) isATXHeading(line items) (level int) {
 }
 
 func (t *Tree) isSetextHeading(line items) (level int) {
-	tokens := t.removeSpacesTabs(line)
+	tokens := line.removeSpacesTabs()
 	tokens = tokens[:len(tokens)-1] // remove tailing newline
 	length := len(tokens)
 	marker := tokens[0]
