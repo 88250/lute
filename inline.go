@@ -41,6 +41,8 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			token := tokens[t.context.Pos]
 			var n Node
 			switch token.typ {
+			case itemBackslash:
+				n = t.parseBackslash(tokens)
 			case itemBacktick:
 				n = t.parseInlineCode(tokens)
 			case itemAsterisk, itemUnderscore:
@@ -63,6 +65,22 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 
 		t.parseEmphasis(nil)
 	}
+}
+
+func (t *Tree) parseBackslash(tokens items) (ret Node) {
+	t.context.Pos++
+	token := tokens[t.context.Pos]
+	if itemNewline == token.typ {
+		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
+		t.context.Pos++
+	} else if token.isASCIIPunct() {
+		ret = &Text{&BaseNode{typ: NodeText}, token.val}
+		t.context.Pos++
+	} else {
+		ret = &Text{&BaseNode{typ: NodeText}, "\\"}
+	}
+
+	return
 }
 
 func (t *Tree) parseEmphasis(stackBottom *delimiter) {
