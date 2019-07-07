@@ -67,7 +67,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			}
 		}
 
-		t.parseEmphasis(nil)
+		t.processEmphasis(nil)
 	}
 }
 
@@ -87,13 +87,11 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 	return
 }
 
-func (t *Tree) parseEmphasis(stackBottom *delimiter) {
+func (t *Tree) processEmphasis(stackBottom *delimiter) {
 	var opener, closer, old_closer *delimiter
 	var opener_inl, closer_inl Node
 	var tempstack *delimiter
 	var use_delims int
-	tmp := &delimiter{}
-	next := &delimiter{}
 	var opener_found bool
 	var openers_bottom = map[itemType]*delimiter{}
 	var odd_match = false
@@ -159,11 +157,11 @@ func (t *Tree) parseEmphasis(stackBottom *delimiter) {
 				emph = &Strong{&BaseNode{typ: NodeStrong}}
 			}
 
-			tmp.node = opener_inl.Next()
-			for nil != tmp && tmp.node != closer_inl {
-				next = tmp.next
-				tmp.node.Unlink()
-				emph.AppendChild(emph, tmp.node)
+			tmp := opener_inl.Next()
+			for nil != tmp && tmp != closer_inl {
+				next := tmp.Next()
+				tmp.Unlink()
+				emph.AppendChild(emph, tmp)
 				tmp = next
 			}
 
