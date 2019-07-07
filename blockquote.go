@@ -17,13 +17,11 @@ package lute
 
 type Blockquote struct {
 	*BaseNode
-	int
-	t *Tree
 }
 
 func newBlockquote(t *Tree, token *item) (ret Node) {
-	baseNode := &BaseNode{typ: NodeBlockquote, parent: t.context.CurNode, tokens:items{}}
-	ret = &Blockquote{baseNode, token.pos, t}
+	baseNode := &BaseNode{typ: NodeBlockquote, parent: t.context.CurNode}
+	ret = &Blockquote{baseNode}
 	t.context.CurNode = ret
 
 	return
@@ -43,6 +41,11 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 		ret.AppendChild(ret, n)
 
 		line = t.nextLine()
+		if t.isThematicBreak(line) {
+			t.backupLine(line)
+			break
+		}
+
 		if line.isEOF() {
 			break
 		}

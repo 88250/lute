@@ -116,6 +116,11 @@ func (t *Tree) isSetextHeading(line items) (level int) {
 		}
 	}
 
+	parentType := t.context.CurNode.Type()
+	if NodeBlockquote == parentType || NodeListItem == parentType {
+		return
+	}
+
 	if itemEqual == marker.typ {
 		level = 1
 	} else {

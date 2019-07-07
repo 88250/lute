@@ -37,7 +37,6 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			}
 		}
 
-		p.rawText += line.rawText()
 		line = t.nextLine()
 		if line.isBlankLine() {
 			t.backupLine(line)
@@ -50,19 +49,18 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			return
 		}
 
-		if t.interruptParagrah(line) {
+		if t.interruptParagraph(line) {
 			t.backupLine(line)
 
 			break
 		}
 	}
 	p.tokens = p.tokens.trimRight()
-	p.rawText = p.tokens.rawText()
 
 	return
 }
 
-func (t *Tree) interruptParagrah(line items) bool {
+func (t *Tree) interruptParagraph(line items) bool {
 	if t.isIndentCode(line) {
 		return false
 	}

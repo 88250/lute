@@ -28,6 +28,7 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 	// commonmark spec cases
+	{"spec62", "> Foo\n---\n", "<blockquote>\n<p>Foo</p>\n</blockquote>\n<hr />\n"},
 	{"spec61", "`Foo\n----\n`\n\n<a title=\"a lot\n---\nof dashes\"/>\n", "<h2>`Foo</h2>\n<p>`</p>\n<h2>&lt;a title=&quot;a lot</h2>\n<p>of dashes&quot;/&gt;</p>\n"},
 	{"spec60", "Foo\\\n----\n", "<h2>Foo\\</h2>\n"},
 	{"spec56", "Foo\n   ----      \n", "<h2>Foo</h2>\n"},
