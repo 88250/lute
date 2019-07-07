@@ -26,7 +26,6 @@ func (t *Tree) parseSetextHeading(p *Paragraph, level int) (ret Node) {
 	ret = &Heading{baseNode, level}
 
 	p.tokens = p.tokens.trimRight()
-	p.rawText = p.tokens.rawText()
 	text := &Text{BaseNode: &BaseNode{typ: NodeText, tokens: p.tokens}}
 	ret.AppendChild(ret, text)
 

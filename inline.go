@@ -329,7 +329,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 	t.context.Pos++
 
 	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
-	ret = &Text{baseNode, token.val}
+	ret = &Text{baseNode, EscapeHTML(token.val)}
 
 	return
 }
@@ -359,14 +359,13 @@ func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
 	i := 1
 	token := tokens[i]
-	pos := token.pos
 	var code string
 	for ; itemBacktick != token.typ && itemEOF != token.typ; token = tokens[i] {
 		code += token.val
 		i++
 	}
 
-	ret = &Code{&BaseNode{typ: NodeCode}, pos, t, code, "", ""}
+	ret = &Code{&BaseNode{typ: NodeCode}, code, "", ""}
 	remains = tokens[i+1:]
 
 	return

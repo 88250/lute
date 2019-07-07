@@ -240,8 +240,6 @@ type HTML struct {
 
 type Code struct {
 	*BaseNode
-	int
-	*Tree
 	Value string
 
 	Lang string

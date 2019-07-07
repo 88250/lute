@@ -186,7 +186,7 @@ func (tokens items) isEOF() bool {
 
 func (tokens items) rawText() (ret string) {
 	for i := 0; i < len(tokens); i++ {
-		ret += (tokens)[i].val
+		ret += EscapeHTML((tokens)[i].val)
 	}
 
 	return
