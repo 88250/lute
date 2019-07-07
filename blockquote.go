@@ -67,7 +67,6 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 	return
 }
 
-// https://spec.commonmark.org/0.29/#block-quotes
 func (t *Tree) isBlockquote(line items) bool {
 	if 2 > len(line) { // at least > and newline
 		return false

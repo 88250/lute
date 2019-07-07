@@ -33,7 +33,7 @@ var nullRegexp = regexp.MustCompile("\u0000")
 
 func sanitize(text string) (ret string) {
 	ret = newlinesRegexp.ReplaceAllString(text, "\n")
-	nullRegexp.ReplaceAllString(ret, "\uFFFD") // https://spec.commonmark.org/0.29/#insecure-characters
+	nullRegexp.ReplaceAllString(ret, "\uFFFD")
 
 	return
 }
@@ -156,7 +156,7 @@ func (t *Tree) nextLine() (line items) {
 	for {
 		token := t.lex.nextItem()
 		line = append(line, token)
-		if token.isLineEnding() || token.isEOF() {
+		if token.isNewline() || token.isEOF() {
 			return
 		}
 	}

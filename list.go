@@ -17,30 +17,23 @@ package lute
 
 type ListType int
 
-const (
-	ListTypeBullet  = 0
-	ListTypeOrdered = 1
-)
-
 type List struct {
 	*BaseNode
-	int
-	t *Tree
 
-	ListType ListType
-	Start    int
-	Tight    bool
+	Bullet bool
+	Start  int
+	Tight  bool
 
-	IndentSpaces int // #4 Indentation https://spec.commonmark.org/0.29/#list-items
+	IndentSpaces int
 	Marker       string
-	WNSpaces     int // W + N https://spec.commonmark.org/0.29/#list-items
+	WNSpaces     int
 }
 
-func newList(indentSpaces int, marker string, wnSpaces int, t *Tree, token *item) (ret Node) {
-	baseNode := &BaseNode{typ: NodeList, parent: t.context.CurNode, tokens: items{}}
+func newList(indentSpaces int, marker string, wnSpaces int, t *Tree) (ret Node) {
+	baseNode := &BaseNode{typ: NodeList}
 	ret = &List{
-		baseNode, token.pos, t,
-		ListTypeBullet,
+		baseNode,
+		true,
 		1,
 		false,
 		indentSpaces,
@@ -63,13 +56,13 @@ func (t *Tree) parseList(line items) (ret Node) {
 	wnSpaces := w + n
 	oldContextIndentSpaces := t.context.IndentSpaces
 	t.context.IndentSpaces = indentSpaces + wnSpaces
-	if 4 <= n { // rule 2 in https://spec.commonmark.org/0.29/#list-items
+	if 4 <= n {
 		line = indentOffset(line, w+1, t)
 		t.context.IndentSpaces = 2
 	} else {
 		line = indentOffset(line, indentSpaces+wnSpaces, t)
 	}
-	ret = newList(indentSpaces, marker.val, wnSpaces, t, marker)
+	ret = newList(indentSpaces, marker.val, wnSpaces, t)
 	tight := false
 
 	defer func() { t.context.IndentSpaces = oldContextIndentSpaces }()
@@ -113,7 +106,6 @@ func (t *Tree) parseList(line items) (ret Node) {
 	return
 }
 
-// https://spec.commonmark.org/0.29/#lists
 func (t *Tree) isList(line items) bool {
 	if 2 > len(line) { // at least marker and newline
 		return false
@@ -121,14 +113,11 @@ func (t *Tree) isList(line items) bool {
 
 	line = line.trimLeft()
 	firstNonWhitespace := line[0]
-	if "*" != firstNonWhitespace.val && "-" != firstNonWhitespace.val && "+" != firstNonWhitespace.val {
-		// TODO: 有序列表判断
-		return false
+	if itemAsterisk == firstNonWhitespace.typ || itemHyphen == firstNonWhitespace.typ || itemPlus == firstNonWhitespace.typ {
+		return line[1].isWhitespace()
+	} else if firstNonWhitespace.isNumInt() && 9 >= len(firstNonWhitespace.val) {
+		return (itemDot == line[1].typ || itemCloseParen == line[1].typ) && line[2].isWhitespace()
 	}
 
-	if itemSpace != line[1].typ && itemTab != line[1].typ && itemNewline != line[1].typ {
-		return false
-	}
-
-	return true
+	return false
 }

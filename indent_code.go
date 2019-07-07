@@ -68,7 +68,6 @@ Loop:
 	return
 }
 
-// https://spec.commonmark.org/0.29/#indented-code-blocks
 func (t *Tree) isIndentCode(line items) bool {
 	var spaces int
 	for _, token := range line {

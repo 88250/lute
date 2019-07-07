@@ -141,13 +141,13 @@ func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*List)
 	tag := "ul"
-	if ListTypeOrdered == n.ListType {
+	if !n.Bullet {
 		tag = "ol"
 	}
 	if entering {
 		r.Newline()
 		r.WriteString("<" + tag)
-		if ListTypeOrdered == n.ListType && 1 != n.Start {
+		if !n.Bullet && 1 != n.Start {
 			r.WriteString(fmt.Sprintf(" start=\"%d\">", n.Start))
 		} else {
 			r.WriteString(">")
