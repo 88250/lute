@@ -105,7 +105,7 @@ func (t *Tree) skipBlankLines() (count int) {
 	}
 }
 
-func indentOffset(tokens items, indentSpaces int, t *Tree) (ret items) {
+func (t *Tree) indentOffset(tokens items, indentSpaces int) (ret items) {
 	var nonWhitespaces items
 	compSpaces := 0
 	i := 0
@@ -133,14 +133,6 @@ func indentOffset(tokens items, indentSpaces int, t *Tree) (ret items) {
 		ret = append(ret, &item{itemSpace, 0, " ", 0})
 	}
 	ret = append(ret, nonWhitespaces...)
-
-	return
-}
-
-func (t *Tree) nonNewline() (newlines items, line items) {
-	for line = t.nextLine(); line.isNewline(); line = t.nextLine() {
-		newlines = append(newlines, line...)
-	}
 
 	return
 }

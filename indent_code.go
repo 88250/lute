@@ -37,7 +37,7 @@ Loop:
 
 		for i := 0; i < len(line); i++ {
 			token := line[i]
-			codeValue += token.val
+			codeValue += EscapeHTML(token.val)
 			if itemNewline == token.typ {
 				newlines, nonNewline := t.nonNewline()
 				codeValue += newlines.rawText()
@@ -84,4 +84,18 @@ func (t *Tree) isIndentCode(line items) bool {
 	}
 
 	return t.context.IndentSpaces+3 < spaces
+}
+
+func (t *Tree) nonNewline() (newlines items, line items) {
+	for line = t.nextLine(); line.isBlankLine() && !line.isEOF(); line = t.nextLine() {
+		if 5 > len(line) {
+			_, line = line.trimLeftSpace()
+		} else {
+			line = t.indentOffset(line, 4)
+		}
+
+		newlines = append(newlines, line...)
+	}
+
+	return
 }

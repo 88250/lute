@@ -66,10 +66,10 @@ func (t *Tree) parseList(line items) (ret Node) {
 	oldContextIndentSpaces := t.context.IndentSpaces
 	t.context.IndentSpaces = indentSpaces + wnSpaces
 	if 4 <= n {
-		line = indentOffset(line, w+1, t)
+		line = t.indentOffset(line, w+1)
 		t.context.IndentSpaces = 2
 	} else {
-		line = indentOffset(line, indentSpaces+wnSpaces, t)
+		line = t.indentOffset(line, indentSpaces+wnSpaces)
 	}
 	ret = newList(indentSpaces, markerText, bullet, wnSpaces, t)
 	tight := false

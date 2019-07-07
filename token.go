@@ -54,9 +54,10 @@ func (i *item) isTab() bool {
 func (i *item) isNewline() bool {
 	return itemNewline == i.typ
 }
+
 func (i *item) isNumInt() bool {
-	for c := range i.val {
-		if 0 > c || 9 < c {
+	for _, c := range i.val {
+		if '0' > c || '9' < c {
 			return false
 		}
 	}
@@ -293,14 +294,6 @@ func (tokens items) isBlankLine() bool {
 	}
 
 	return true
-}
-
-func (tokens items) isNewline() bool {
-	if 1 != len(tokens) {
-		return false
-	}
-
-	return itemNewline == tokens[0].typ
 }
 
 func (tokens items) removeSpacesTabs() (ret items) {
