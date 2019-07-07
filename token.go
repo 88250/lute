@@ -101,6 +101,7 @@ var itemName = map[itemType]string{
 	itemGreater:         ">",
 	itemSpace:           "space",
 	itemNewline:         "newline",
+	itemDot:             ".",
 }
 
 func (i itemType) String() string {
@@ -137,6 +138,7 @@ const (
 	itemNewline                         // \n
 	itemBackslash                       // \
 	itemSlash                           // /
+	itemDot                             // .
 )
 
 var (
@@ -161,6 +163,7 @@ var (
 	tGreater         = makeItem(itemGreater, ">")
 	tEqual           = makeItem(itemEqual, "=")
 	tDoublequote     = makeItem(itemDoublequote, "\"")
+	tDot             = makeItem(itemDot, ".")
 )
 
 func makeItem(typ itemType, text string) *item {
@@ -168,6 +171,14 @@ func makeItem(typ itemType, text string) *item {
 		typ: typ,
 		val: text,
 	}
+}
+
+func makeItems(typ itemType, text string, num int) (ret items) {
+	for i := 0; i < num; i++ {
+		ret = append(ret, makeItem(typ, text))
+	}
+
+	return
 }
 
 const (

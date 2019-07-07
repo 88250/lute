@@ -148,6 +148,8 @@ func (s *scanner) run() {
 			s.newItem(itemBackslash)
 		case '/' == r:
 			s.newItem(itemSlash)
+		case '.' == r:
+			s.newItem(itemDot)
 		case end == r:
 			return
 		default:
