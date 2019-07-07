@@ -38,7 +38,8 @@ func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
 	heading := &Heading{baseNode, level}
 	ret = heading
 
-	tokens := line[level:].trimLeft()
+	tokens := line.trimLeft()
+	tokens = tokens[level:].trimLeft()
 	for _, token := range tokens {
 		if itemEOF == token.typ || itemNewline == token.typ {
 			break
