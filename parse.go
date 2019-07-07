@@ -137,6 +137,14 @@ func indentOffset(tokens items, indentSpaces int, t *Tree) (ret items) {
 	return
 }
 
+func (t *Tree) nonNewline() (newlines items, line items) {
+	for line = t.nextLine(); line.isNewline(); line = t.nextLine() {
+		newlines = append(newlines, line...)
+	}
+
+	return
+}
+
 func (t *Tree) nextLine() (line items) {
 	if nil != t.context.CurLine {
 		line = t.context.CurLine

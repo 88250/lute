@@ -241,6 +241,14 @@ func (tokens items) isBlankLine() bool {
 	return true
 }
 
+func (tokens items) isNewline() bool {
+	if 1 != len(tokens) {
+		return false
+	}
+
+	return itemNewline == tokens[0].typ
+}
+
 func (tokens items) removeSpacesTabs() (ret items) {
 	for _, token := range tokens {
 		if itemSpace != token.typ && itemTab != token.typ {

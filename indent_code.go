@@ -39,7 +39,11 @@ Loop:
 			token := line[i]
 			codeValue += token.val
 			if itemNewline == token.typ {
-				line = t.nextLine()
+				newlines, nonNewline := t.nonNewline()
+				codeValue += newlines.rawText()
+				newlines = append(newlines, token)
+				code.tokens = append(code.tokens, newlines...)
+				line = nonNewline
 				spaces, tabs, _, _ := t.nonWhitespace(line)
 				if 1 > tabs && 4 > spaces {
 					t.backupLine(line)
