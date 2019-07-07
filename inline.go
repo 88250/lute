@@ -72,7 +72,9 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 }
 
 func (t *Tree) parseBackslash(tokens items) (ret Node) {
-	t.context.Pos++
+	if len(tokens)-1 > t.context.Pos {
+		t.context.Pos++
+	}
 	token := tokens[t.context.Pos]
 	if itemNewline == token.typ {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}

@@ -51,6 +51,10 @@ func (i *item) isTab() bool {
 	return itemTab == i.typ
 }
 
+func (i *item) isNewline() bool {
+	return itemNewline == i.typ
+}
+
 // https://spec.commonmark.org/0.29/#punctuation-character
 func (i *item) isPunct() bool {
 	return unicode.IsPunct(rune(i.val[0]))

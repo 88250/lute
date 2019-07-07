@@ -32,7 +32,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 		for i, token := range line {
 			if itemBackslash != token.typ {
 				p.tokens = append(p.tokens, token)
-			} else if i < len-2 && !line[i+1].isASCIIPunct() {
+			} else if i < len-1 && (!line[i+1].isASCIIPunct() || line[i+1].isNewline()) {
 				p.tokens = append(p.tokens, token)
 			}
 		}
