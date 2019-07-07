@@ -76,7 +76,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 		t.context.Pos++
 	}
 	token := tokens[t.context.Pos]
-	if itemNewline == token.typ {
+	if token.isNewline() {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 		t.context.Pos++
 	} else if token.isASCIIPunct() {
@@ -306,7 +306,7 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 
 	for i := startPos + 1; i < len(tokens); i++ {
 		token := tokens[i]
-		if itemNewline == token.typ {
+		if token.isNewline() {
 			text += " "
 		} else {
 			if itemBacktick == token.typ {

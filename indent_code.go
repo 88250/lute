@@ -35,11 +35,19 @@ Loop:
 			}
 		}
 
+		if line.isBlankLine() {
+			return
+		}
+
 		for i := 0; i < len(line); i++ {
 			token := line[i]
 			codeValue += EscapeHTML(token.val)
-			if itemNewline == token.typ {
+			if token.isNewline() {
 				newlines, nonNewline := t.nonNewline()
+				if nonNewline.isEOF() {
+					break Loop
+				}
+
 				codeValue += newlines.rawText()
 				newlines = append(newlines, token)
 				code.tokens = append(code.tokens, newlines...)
