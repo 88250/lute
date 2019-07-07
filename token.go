@@ -43,6 +43,14 @@ func (i *item) isWhitespace() bool {
 	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ // TODO(D): line tabulation (U+000B), form feed (U+000C), or carriage return (U+000D)
 }
 
+func (i *item) isSpace() bool {
+	return itemSpace == i.typ
+}
+
+func (i *item) isTab() bool {
+	return itemTab == i.typ
+}
+
 // https://spec.commonmark.org/0.29/#punctuation-character
 func (i *item) isPunct() bool {
 	return unicode.IsPunct(rune(i.val[0]))
@@ -154,7 +162,6 @@ const (
 	end = -1
 )
 
-
 type items []*item
 
 func (tokens items) Tokens() items {
@@ -169,6 +176,28 @@ func (tokens items) rawText() (ret string) {
 	for i := 0; i < len(tokens); i++ {
 		ret += (tokens)[i].val
 	}
+
+	return
+}
+
+func (tokens items) trimLeftSpace() (spaces int, remains items) {
+	size := len(tokens)
+	if 1 > size {
+		return 0, tokens
+	}
+
+	i := 0
+	for ; i < size; i++ {
+		if tokens[i].isSpace() {
+			spaces++
+		} else if tokens[i].isTab() {
+			spaces += 4
+		} else {
+			break
+		}
+	}
+
+	remains = tokens[i:]
 
 	return
 }
@@ -204,7 +233,6 @@ func (tokens items) trimRight() items {
 
 	return tokens[:i+1]
 }
-
 
 func (tokens items) firstNonSpace() (index int, token *item) {
 	for index, token = range tokens {
@@ -258,4 +286,3 @@ func (tokens items) removeSpacesTabs() (ret items) {
 
 	return
 }
-

@@ -98,16 +98,20 @@ func (t *Tree) isATXHeading(line items) (level int) {
 }
 
 func (t *Tree) isSetextHeading(line items) (level int) {
-	tokens := line.removeSpacesTabs()
-	tokens = tokens[:len(tokens)-1] // remove tailing newline
-	length := len(tokens)
-	marker := tokens[0]
+	spaces, line := line.trimLeftSpace()
+	if 3 < spaces {
+		return
+	}
+
+	line = line.trimRight()
+	length := len(line)
+	marker := line[0]
 	if itemHyphen != marker.typ && itemEqual != marker.typ {
 		return
 	}
 
 	for i := 1; i < length; i++ {
-		token := tokens[i]
+		token := line[i]
 		if marker.typ != token.typ {
 			return
 		}
