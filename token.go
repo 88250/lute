@@ -97,6 +97,7 @@ var itemName = map[itemType]string{
 	itemCloseBracket:    "]",
 	itemDoublequote:     "\"",
 	itemSinglequote:     "'",
+	itemLess:            "<",
 	itemGreater:         ">",
 	itemSpace:           "space",
 	itemNewline:         "newline",
@@ -130,10 +131,12 @@ const (
 	itemCloseBracket                    // ]
 	itemDoublequote                     // "
 	itemSinglequote                     // '
+	itemLess                            // <
 	itemGreater                         // >
 	itemSpace                           // space
 	itemNewline                         // \n
 	itemBackslash                       // \
+	itemSlash                           // /
 )
 
 var (
@@ -152,7 +155,12 @@ var (
 	tOpenParen       = makeItem(itemOpenParen, "(")
 	tCloseParan      = makeItem(itemCloseParen, ")")
 	tBackslash       = makeItem(itemBackslash, "\\")
+	tSlash           = makeItem(itemSlash, "/")
 	tCrosshatch      = makeItem(itemCrosshatch, "#")
+	tLess            = makeItem(itemLess, "<")
+	tGreater         = makeItem(itemGreater, ">")
+	tEqual           = makeItem(itemEqual, "=")
+	tDoublequote     = makeItem(itemDoublequote, "\"")
 )
 
 func makeItem(typ itemType, text string) *item {

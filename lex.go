@@ -136,6 +136,8 @@ func (s *scanner) run() {
 			s.newItem(itemDoublequote)
 		case '\'' == r:
 			s.newItem(itemSinglequote)
+		case '<' == r:
+			s.newItem(itemLess)
 		case '>' == r:
 			s.newItem(itemGreater)
 		case ' ' == r:
@@ -144,6 +146,8 @@ func (s *scanner) run() {
 			s.newItem(itemNewline)
 		case '\\' == r:
 			s.newItem(itemBackslash)
+		case '/' == r:
+			s.newItem(itemSlash)
 		case end == r:
 			return
 		default:
