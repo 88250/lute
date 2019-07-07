@@ -80,6 +80,10 @@ func (t *Tree) interruptParagrah(line items) bool {
 		return true
 	}
 
+	if 0 < t.isATXHeading(line) {
+		return true
+	}
+
 	if t.isList(line) {
 		return true
 	}

@@ -36,6 +36,10 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 		}
 
 		tokens := block.Tokens()
+		if nil == tokens {
+			return
+		}
+
 		t.context.Pos = 0
 		for {
 			token := tokens[t.context.Pos]
