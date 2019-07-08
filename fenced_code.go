@@ -21,7 +21,6 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 	n := line.accept(marker.typ)
 	line = line[n:]
 	infoStr := line.trim().rawText()
-
 	baseNode := &BaseNode{typ: NodeCode}
 	code := &Code{baseNode, "", infoStr}
 
@@ -29,6 +28,7 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 	if line.isEOF() {
 		return code
 	}
+	line = t.removeStartBlockquoteMarker(line)
 
 	var codeValue string
 	for {
@@ -65,6 +65,10 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 }
 
 func (t *Tree) isFencedCodeClose(line items, openMarker *item, num int) bool {
+	if line.isEOF() || t.isBlockquoteClose(line) {
+		return true
+	}
+
 	spaces, line := line.trimLeftSpace()
 	if t.context.IndentSpaces+3 < spaces {
 		return false

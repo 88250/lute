@@ -41,27 +41,10 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 		ret.AppendChild(ret, n)
 
 		line = t.nextLine()
-		if t.isThematicBreak(line) {
+		if t.isThematicBreak(line) || t.isBlockquoteClose(line) {
 			t.backupLine(line)
 			break
 		}
-
-		if line.isEOF() {
-			break
-		}
-
-		//spaces, tabs, tokens, _ := t.nonWhitespace(line)
-		//
-		//totalSpaces := spaces + tabs*4
-		//if totalSpaces < indentSpaces {
-		//	t.backups(tokens)
-		//	break
-		//} else if totalSpaces == indentSpaces {
-		//	t.backup()
-		//	continue
-		//}
-		//
-		//indentOffset(tokens, indentSpaces, t)
 	}
 
 	return
@@ -75,6 +58,26 @@ func (t *Tree) isBlockquote(line items) bool {
 	_, marker := line.firstNonSpace()
 	if ">" != marker.val {
 		return false
+	}
+
+	return true
+}
+
+func (t *Tree) removeStartBlockquoteMarker(line items) items {
+	if NodeBlockquote != t.context.CurNode.Type() {
+		return line
+	}
+
+	return line[1:].trimLeft()
+}
+
+func (t *Tree) isBlockquoteClose(line items) bool {
+	if line.isEOF() || NodeBlockquote != t.context.CurNode.Type() {
+		return false
+	}
+
+	if itemNewline == line[0].typ {
+		return true
 	}
 
 	return true
