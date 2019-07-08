@@ -302,6 +302,16 @@ func (tokens items) contain(itemType itemType) bool {
 	return 0 < tokens.indexOf(itemType)
 }
 
+func (tokens items) allAre(itemType itemType) bool {
+	for _, token := range tokens {
+		if token.typ != itemType {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (tokens items) isBlankLine() bool {
 	if tokens.isEOF() {
 		return true
