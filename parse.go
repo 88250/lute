@@ -123,7 +123,7 @@ func (t *Tree) indentOffset(tokens items, indentSpaces int) (ret items) {
 
 	remains := compSpaces - indentSpaces
 	if 0 > remains {
-		return tokens
+		return tokens.trimLeft()
 	}
 
 	for j := 0; j < remains/4; j++ {

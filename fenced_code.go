@@ -36,20 +36,6 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 
 	var codeValue string
 	for {
-		var spaces, tabs int
-		for i := 0; i < n && i < len(line); i++ {
-			token := line[i]
-			if itemSpace == token.typ {
-				spaces++
-			} else if itemTab == token.typ {
-				tabs++
-			}
-			if 3 < spaces || 0 < tabs {
-				line = line[i+1:]
-				break
-			}
-		}
-
 		line = t.indentOffset(line, indentSpaces)
 
 		for i := 0; i < len(line); i++ {
