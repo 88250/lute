@@ -291,11 +291,15 @@ func (tokens items) accept(itemType itemType) (pos int) {
 func (tokens items) indexOf(itemType itemType) (pos int) {
 	for ; pos < len(tokens); pos++ {
 		if itemType == tokens[pos].typ {
-			break
+			return
 		}
 	}
 
-	return
+	return -1
+}
+
+func (tokens items) contain(itemType itemType) bool {
+	return 0 < tokens.indexOf(itemType)
 }
 
 func (tokens items) isBlankLine() bool {

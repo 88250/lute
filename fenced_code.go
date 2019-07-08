@@ -84,7 +84,13 @@ func (t *Tree) isFencedCode(line items) bool {
 		return false
 	}
 
-	if 3 > line.accept(marker.typ) {
+	pos := line.accept(marker.typ)
+	if 3 > pos {
+		return false
+	}
+
+	infoStr := line[pos:]
+	if itemBacktick == marker.typ && infoStr.contain(itemBacktick) {
 		return false
 	}
 

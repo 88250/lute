@@ -312,9 +312,12 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 		} else {
 			textTokens = append(textTokens, token)
 		}
-
 	}
-	textTokens = textTokens.trim()
+
+	if 2 < len(textTokens) && textTokens[0].isSpace() && textTokens[len(textTokens)-1].isSpace() && !textTokens.isBlankLine() {
+		textTokens = textTokens[1:]
+		textTokens = textTokens[:len(textTokens)-1]
+	}
 
 	baseNode := &BaseNode{typ: NodeInlineCode, tokens: textTokens}
 	ret = &InlineCode{baseNode, textTokens.rawText()}
