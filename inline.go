@@ -292,7 +292,7 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 	startPos := t.context.Pos
 	marker := tokens[startPos]
 	n := tokens[startPos:].accept(marker.typ)
-	endPos := startPos + t.matchEnd(tokens[startPos+n:], marker, n) + n
+	endPos := t.matchEnd(tokens[startPos+n:], marker, n)
 	if 1 > endPos {
 		marker.typ = itemStr
 		t.context.Pos++
@@ -302,9 +302,10 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 
 		return
 	}
+	endPos = startPos + endPos + n
 
 	var textTokens = items{}
-	for i := startPos + 1; i < len(tokens) && i < endPos; i++ {
+	for i := startPos + n; i < len(tokens) && i < endPos; i++ {
 		token := tokens[i]
 		if token.isNewline() {
 			textTokens = append(textTokens, tSpace)

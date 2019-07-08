@@ -28,6 +28,8 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 	// commonmark spec cases
+	{"spec96", "`````\n\n```\naaa\n", "<pre><code>\n```\naaa\n</code></pre>\n"},
+	{"spec96", "```\n", "<pre><code></code></pre>\n"},
 	{"spec91", "``\nfoo\n``\n", "<p><code>foo</code></p>\n"},
 	{"spec90", "~~~\n<\n >\n~~~\n", "<pre><code>&lt;\n &gt;\n</code></pre>\n"},
 	{"spec87", "\n    \n    foo\n    \n\n", "<pre><code>foo\n</code></pre>\n"},
@@ -68,8 +70,7 @@ var parseTests = []parseTest{
 	{"spec3", "    a\ta\n    ὐ\ta\n", "<pre><code>a\ta\nὐ\ta\n</code></pre>\n"},
 	{"spec2", "  \tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
 	{"spce1", "\tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
-	//
-	//// some simple cases
+	// some simple cases
 	{"simple13", "- lu\n  - te", "<ul>\n<li>lu\n<ul>\n<li>te</li>\n</ul>\n</li>\n</ul>\n"},
 	{"simple12", "`l*ut*e", "<p>`l<em>ut</em>e</p>\n"},
 	{"simple11", "`lu\nte`", "<p><code>lu te</code></p>\n"},

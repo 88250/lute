@@ -21,11 +21,16 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 	n := line.accept(marker.typ)
 	line = line[n:]
 	infoStr := line.trim().rawText()
-	line = t.nextLine()
+
 	baseNode := &BaseNode{typ: NodeCode}
 	code := &Code{baseNode, "", infoStr}
-	var codeValue string
 
+	line = t.nextLine()
+	if line.isEOF() {
+		return code
+	}
+
+	var codeValue string
 	for {
 		var spaces, tabs int
 		for i := 0; i < n && i < len(line); i++ {
