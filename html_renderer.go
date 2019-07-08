@@ -84,11 +84,15 @@ func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderCode(n Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderCode(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.Newline()
-		r.WriteString("<pre><code>" + n.(*Code).Value)
-
+		n := node.(*Code)
+		if "" != n.InfoStr {
+			r.WriteString("<pre><code class=\"language-" + n.InfoStr + "\">" + n.Value)
+		} else {
+			r.WriteString("<pre><code>" + n.Value)
+		}
 		return WalkSkipChildren, nil
 	}
 	r.WriteString("</code></pre>")
