@@ -356,21 +356,6 @@ func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 	return
 }
 
-func (t *Tree) parseCode(tokens items) (ret Node, remains items) {
-	i := 1
-	token := tokens[i]
-	var code string
-	for ; itemBacktick != token.typ && itemEOF != token.typ; token = tokens[i] {
-		code += token.val
-		i++
-	}
-
-	ret = &Code{&BaseNode{typ: NodeCode}, code, "", ""}
-	remains = tokens[i+1:]
-
-	return
-}
-
 func (t *Tree) matchEnd(tokens items, marker *item) bool {
 	for _, token := range tokens {
 		if token.typ == marker.typ && token.val == marker.val {

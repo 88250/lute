@@ -17,7 +17,7 @@ package lute
 
 func (t *Tree) parseIndentCode(line items) (ret Node) {
 	baseNode := &BaseNode{typ: NodeCode}
-	code := &Code{baseNode, "", "", ""}
+	code := &Code{baseNode, "", ""}
 	var codeValue string
 Loop:
 	for {

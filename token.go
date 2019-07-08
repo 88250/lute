@@ -229,6 +229,13 @@ func (tokens items) trimLeftSpace() (spaces int, remains items) {
 	return
 }
 
+func (tokens items) trim() (ret items) {
+	ret = tokens.trimLeft()
+	ret = ret.trimRight()
+
+	return
+}
+
 func (tokens items) trimLeft() items {
 	size := len(tokens)
 	if 1 > size {

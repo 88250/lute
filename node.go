@@ -242,8 +242,7 @@ type Code struct {
 	*BaseNode
 	Value string
 
-	Lang string
-	Meta string
+	InfoStr string
 }
 
 type Definition struct {
