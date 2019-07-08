@@ -122,7 +122,7 @@ func (t *Tree) indentOffset(tokens items, indentSpaces int) (ret items) {
 	}
 
 	remains := compSpaces - indentSpaces
-	if 0 >= remains {
+	if 0 > remains {
 		return tokens
 	}
 

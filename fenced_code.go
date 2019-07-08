@@ -16,7 +16,7 @@
 package lute
 
 func (t *Tree) parseFencedCode(line items) (ret Node) {
-	_, line = line.trimLeftSpace()
+	indentSpaces, line := line.trimLeftSpace()
 	marker := line[0]
 	n := line.accept(marker.typ)
 	line = line[n:]
@@ -28,6 +28,10 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 	if line.isEOF() {
 		return code
 	}
+	if t.isFencedCodeClose(line, marker, n) {
+		return code
+	}
+
 	line = t.removeStartBlockquoteMarker(line)
 
 	var codeValue string
@@ -46,6 +50,8 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 			}
 		}
 
+		line = t.indentOffset(line, indentSpaces)
+
 		for i := 0; i < len(line); i++ {
 			token := line[i]
 			codeValue += EscapeHTML(token.val)
@@ -53,7 +59,7 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 		}
 
 		line = t.nextLine()
-		if t.isFencedCodeClose(line, marker, n) {
+		if t.isFencedCodeClose(line, marker, n) || t.isBlockquoteClose(line) || line.isEOF() {
 			break
 		}
 	}
@@ -65,10 +71,6 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 }
 
 func (t *Tree) isFencedCodeClose(line items, openMarker *item, num int) bool {
-	if line.isEOF() || t.isBlockquoteClose(line) {
-		return true
-	}
-
 	spaces, line := line.trimLeftSpace()
 	if t.context.IndentSpaces+3 < spaces {
 		return false
