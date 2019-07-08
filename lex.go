@@ -103,6 +103,8 @@ func (s *scanner) run() {
 		switch {
 		case '`' == r:
 			s.newItem(itemBacktick)
+		case '~' == r:
+			s.newItem(itemTilde)
 		case '!' == r:
 			if '[' == s.next() {
 				s.newItem(itemBangOpenBracket)

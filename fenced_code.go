@@ -44,24 +44,6 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 		for i := 0; i < len(line); i++ {
 			token := line[i]
 			codeValue += EscapeHTML(token.val)
-			//if token.isNewline() {
-			//	newlines, nonNewline := t.nonNewline()
-			//	if nonNewline.isEOF() {
-			//		break Loop
-			//	}
-			//
-			//	codeValue += newlines.rawText()
-			//	newlines = append(newlines, token)
-			//	code.tokens = append(code.tokens, newlines...)
-			//	line = nonNewline
-			//	spaces, tabs, _, _ := t.nonWhitespace(line)
-			//	if 1 > tabs && 4 > spaces {
-			//		t.backupLine(line)
-			//		break Loop
-			//	} else {
-			//		continue Loop
-			//	}
-			//}
 			code.tokens = append(code.tokens, token)
 		}
 
