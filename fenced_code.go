@@ -15,12 +15,17 @@
 
 package lute
 
+import "strings"
+
 func (t *Tree) parseFencedCode(line items) (ret Node) {
 	indentSpaces, line := line.trimLeftSpace()
 	marker := line[0]
 	n := line.accept(marker.typ)
 	line = line[n:]
 	infoStr := line.trim().rawText()
+	if "" != infoStr {
+		infoStr = strings.Split(infoStr, " ")[0]
+	}
 	baseNode := &BaseNode{typ: NodeCode}
 	code := &Code{baseNode, "", infoStr}
 
