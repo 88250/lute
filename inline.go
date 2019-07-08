@@ -291,7 +291,9 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 	startPos := t.context.Pos
 	marker := tokens[startPos]
-	if !t.matchEnd(tokens[startPos+1:], marker) {
+	n := tokens.accept(marker.typ)
+	endPos := t.matchEnd(tokens[startPos+n:], marker, n) + n
+	if 1 > endPos {
 		marker.typ = itemStr
 		t.context.Pos++
 
@@ -301,25 +303,21 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 		return
 	}
 
-	var text string
 	var textTokens = items{}
-
-	for i := startPos + 1; i < len(tokens); i++ {
+	for i := startPos + n; i < len(tokens) && i < endPos; i++ {
 		token := tokens[i]
 		if token.isNewline() {
-			text += " "
+			textTokens = append(textTokens, tSpace)
 		} else {
-			if itemBacktick == token.typ {
-				t.context.Pos = i + 1
-				break
-			}
-			text += token.val
+			textTokens = append(textTokens, token)
 		}
-		textTokens = append(textTokens, token)
-	}
 
-	baseNode := &BaseNode{typ: NodeInlineCode, rawText: text, tokens: textTokens}
-	ret = &InlineCode{baseNode, t, text}
+	}
+	textTokens = textTokens.trim()
+
+	baseNode := &BaseNode{typ: NodeInlineCode, tokens: textTokens}
+	ret = &InlineCode{baseNode, textTokens.rawText()}
+	t.context.Pos = endPos + n
 
 	return
 }
@@ -356,12 +354,13 @@ func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 	return
 }
 
-func (t *Tree) matchEnd(tokens items, marker *item) bool {
-	for _, token := range tokens {
-		if token.typ == marker.typ && token.val == marker.val {
-			return true
+func (t *Tree) matchEnd(tokens items, openMarker *item, num int) (pos int) {
+	for ; pos < len(tokens); pos++ {
+		len := tokens[pos:].accept(openMarker.typ)
+		if num <= len {
+			return pos
 		}
 	}
 
-	return false
+	return
 }

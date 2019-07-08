@@ -284,7 +284,6 @@ type Delete struct {
 
 type InlineCode struct {
 	*BaseNode
-	*Tree
 	Value string
 }
 

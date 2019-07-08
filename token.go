@@ -288,6 +288,16 @@ func (tokens items) accept(itemType itemType) (pos int) {
 	return
 }
 
+func (tokens items) indexOf(itemType itemType) (pos int) {
+	for ; pos < len(tokens); pos++ {
+		if itemType == tokens[pos].typ {
+			break
+		}
+	}
+
+	return
+}
+
 func (tokens items) isBlankLine() bool {
 	if tokens.isEOF() {
 		return true
