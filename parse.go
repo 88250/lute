@@ -123,13 +123,10 @@ func (t *Tree) indentOffset(tokens items, indentSpaces int) (ret items) {
 
 	remains := compSpaces - indentSpaces
 	if 0 > remains {
-		return tokens.trimLeft()
+		return nonWhitespaces
 	}
 
-	for j := 0; j < remains/4; j++ {
-		ret = append(ret, &item{itemTab, 0, "\t", 0})
-	}
-	for j := 0; j < remains%4; j++ {
+	for j := 0; j < remains; j++ {
 		ret = append(ret, &item{itemSpace, 0, " ", 0})
 	}
 	ret = append(ret, nonWhitespaces...)
