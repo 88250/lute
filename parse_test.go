@@ -28,6 +28,7 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 	// commonmark spec cases
+	{"spec110", "foo\n```\nbar\n```\nbaz\n", "<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>\n"},
 	{"spec108", "``` ```\naaa\n", "<p><code> </code>\naaa</p>\n"},
 	{"spec103", "   ```\n   aaa\n    aaa\n  aaa\n   ```\n", "<pre><code>aaa\n aaa\naaa\n</code></pre>\n"},
 	{"spec101", " ```\n aaa\naaa\n```\n", "<pre><code>aaa\naaa\n</code></pre>\n"},

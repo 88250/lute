@@ -86,5 +86,9 @@ func (t *Tree) interruptParagraph(line items) bool {
 		return true
 	}
 
+	if t.isFencedCode(line) {
+		return true
+	}
+
 	return false
 }
