@@ -291,8 +291,8 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 	startPos := t.context.Pos
 	marker := tokens[startPos]
-	n := tokens.accept(marker.typ)
-	endPos := t.matchEnd(tokens[startPos+n:], marker, n) + n
+	n := tokens[startPos:].accept(marker.typ)
+	endPos := startPos + t.matchEnd(tokens[startPos+n:], marker, n) + n
 	if 1 > endPos {
 		marker.typ = itemStr
 		t.context.Pos++
@@ -304,7 +304,7 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 	}
 
 	var textTokens = items{}
-	for i := startPos + n; i < len(tokens) && i < endPos; i++ {
+	for i := startPos + 1; i < len(tokens) && i < endPos; i++ {
 		token := tokens[i]
 		if token.isNewline() {
 			textTokens = append(textTokens, tSpace)
@@ -362,5 +362,5 @@ func (t *Tree) matchEnd(tokens items, openMarker *item, num int) (pos int) {
 		}
 	}
 
-	return
+	return -1
 }
