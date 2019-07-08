@@ -28,6 +28,7 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 	// commonmark spec cases
+	{"spec113", "~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~\n", "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>\n"},
 	{"spec110", "foo\n```\nbar\n```\nbaz\n", "<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>\n"},
 	{"spec108", "``` ```\naaa\n", "<p><code> </code>\naaa</p>\n"},
 	{"spec103", "   ```\n   aaa\n    aaa\n  aaa\n   ```\n", "<pre><code>aaa\n aaa\naaa\n</code></pre>\n"},

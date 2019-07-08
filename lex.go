@@ -152,6 +152,8 @@ func (s *scanner) run() {
 			s.newItem(itemSlash)
 		case '.' == r:
 			s.newItem(itemDot)
+		case unicode.IsSymbol(r), unicode.IsPunct(r):
+			s.newItem(itemStr)
 		case end == r:
 			return
 		default:
