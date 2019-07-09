@@ -32,21 +32,23 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) parseBlock(line items) (ret Node) {
-	if t.isIndentCode(line) {
+	atxHeadingLevel :=0
+	switch {
+	case t.isIndentCode(line):
 		ret = t.parseIndentCode(line)
-	} else if t.isFencedCode(line){
+	case t.isFencedCode(line):
 		ret = t.parseFencedCode(line)
-	} else if t.isThematicBreak(line) {
+	case t.isThematicBreak(line):
 		ret = t.parseThematicBreak(line)
-	} else if level := t.isATXHeading(line); 0 < level {
-		ret = t.parseATXHeading(line, level)
-	} else if t.isBlockquote(line) {
+	case t.isATXHeading(line, &atxHeadingLevel):
+		ret = t.parseATXHeading(line, atxHeadingLevel)
+	case t.isBlockquote(line):
 		ret = t.parseBlockquote(line)
-	} else if t.isList(line) {
+	case t.isList(line):
 		ret = t.parseList(line)
-	} else if line.isBlankLine() {
+	case line.isBlankLine():
 		return
-	} else {
+	default:
 		ret = t.parseParagraph(line)
 	}
 

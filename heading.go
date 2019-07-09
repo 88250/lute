@@ -70,30 +70,28 @@ func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
 	return
 }
 
-func (t *Tree) isATXHeading(line items) (level int) {
+func (t *Tree) isATXHeading(line items, level *int) bool {
 	len := len(line)
 	if 2 > len { // at least # and newline
-		return
+		return false
 	}
 
 	index, marker := line.firstNonSpace()
 	if itemCrosshatch != marker.typ {
-		return
+		return false
 	}
 
 	line = line[index:]
-	level = line.accept(itemCrosshatch)
-	if 6 < level {
-		level = 0
-		return
+	*level = line.accept(itemCrosshatch)
+	if 6 < *level {
+		return false
 	}
 
-	if !line[level].isWhitespace() {
-		level = 0
-		return
+	if !line[*level].isWhitespace() {
+		return false
 	}
 
-	return
+	return true
 }
 
 func (t *Tree) isSetextHeading(line items) (level int) {

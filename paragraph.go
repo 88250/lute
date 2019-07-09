@@ -78,7 +78,8 @@ func (t *Tree) interruptParagraph(line items) bool {
 		return true
 	}
 
-	if 0 < t.isATXHeading(line) {
+	level := 0
+	if t.isATXHeading(line, &level) {
 		return true
 	}
 

@@ -74,8 +74,8 @@ func (t *Tree) isFencedCodeClose(line items, openMarker *item, num int) bool {
 	if num > line.accept(closeMarker.typ) {
 		return false
 	}
-	if !line.trim().allAre(openMarker.typ){
-		return false;
+	if !line.trim().allAre(openMarker.typ) {
+		return false
 	}
 
 	return true
