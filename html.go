@@ -26,6 +26,10 @@ Loop:
 	for {
 		html.Value += line.rawText()
 		line = t.nextLine()
+		if line.isEOF() {
+			break Loop
+		}
+
 		switch typ {
 		case 1:
 			if line.contain(itemGreater) {
@@ -33,6 +37,9 @@ Loop:
 				if 0 < len(tags) {
 					matchEnd := false
 					for _, tag := range tags {
+						if 3 > len(tag) {
+							break
+						}
 						closeTagName := tag[2].val
 						if openTagName == closeTagName {
 							matchEnd = true
