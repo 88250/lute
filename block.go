@@ -32,7 +32,7 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) parseBlock(line items) (ret Node) {
-	atxHeadingLevel :=0
+	atxHeadingLevel := 0
 	htmlType := -1
 	switch {
 	case t.isIndentCode(line):
