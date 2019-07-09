@@ -50,7 +50,7 @@ var parseTests = []parseTest{
 	{"spec56", "Foo\n   ----      \n", "<h2>Foo</h2>\n"},
 	{"spec55", "    Foo\n    ---\n\n    Foo\n---\n", "<pre><code>Foo\n---\n\nFoo\n</code></pre>\n<hr />\n"},
 	{"spec51", "Foo *bar\nbaz*\n====\n", "<h1>Foo <em>bar\nbaz</em></h1>\n"},
-	{"spec41", "## \n#\n### ###\n", "<h2></h2>\n<h1></h1>\n<h3></h3>\n"},
+	{"spec49", "## \n#\n### ###\n", "<h2></h2>\n<h1></h1>\n<h3></h3>\n"},
 	{"spec41", "## foo ##\n  ###   bar    ###\n", "<h2>foo</h2>\n<h3>bar</h3>\n"},
 	{"spec38", " ### foo\n  ## foo\n   # foo\n", "<h3>foo</h3>\n<h2>foo</h2>\n<h1>foo</h1>\n"},
 	{"spec37", "#                  foo                     \n", "<h1>foo</h1>\n"},

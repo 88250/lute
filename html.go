@@ -68,7 +68,7 @@ func (t *Tree) isHTML(line items, htmlType *int) bool {
 	if slash {
 		i = 2
 	}
-	rule6 := t.equalAnyIgnoreCase(line[i].val, HTMLBlockTags)
+	rule6 := t.equalAnyIgnoreCase(line[i].val, HTMLBlockTags...)
 	if rule6 {
 		i++
 		if line[i].isWhitespace() || itemGreater == line[i].typ {
@@ -114,7 +114,7 @@ func (t *Tree) isHTML(line items, htmlType *int) bool {
 	return false
 }
 
-func (t *Tree) startWithAnyIgnoreCase(s1 string, strs []string) (pos int) {
+func (t *Tree) startWithAnyIgnoreCase(s1 string, strs ...string) (pos int) {
 	for _, s := range strs {
 		s1 = strings.ToLower(s1)
 		s = strings.ToLower(s)
@@ -126,7 +126,7 @@ func (t *Tree) startWithAnyIgnoreCase(s1 string, strs []string) (pos int) {
 	return -1
 }
 
-func (t *Tree) equalAnyIgnoreCase(s1 string, strs []string) bool {
+func (t *Tree) equalAnyIgnoreCase(s1 string, strs ...string) bool {
 	for _, s := range strs {
 		if t.equalIgnoreCase(s1, s) {
 			return true
