@@ -22,16 +22,23 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 	html := &HTML{baseNode, ""}
 	ret = html
 	openTagName := line.split(itemGreater)[0][1].val
-Loop:
 	for {
 		html.Value += line.rawText()
 		line = t.nextLine()
-		if line.isEOF() {
-			break Loop
+		if t.isBlockquoteClose(line) || line.isEOF() {
+			line = t.removeStartBlockquoteMarker(line)
+			html.Value += line.rawText()
+			html.Value = strings.TrimRight(html.Value, "\n")
+			break
 		}
 
-		switch typ {
-		case 1:
+		if t.isList(line) {
+			html.Value = strings.TrimRight(html.Value, "\n")
+			t.backupLine(line)
+			break
+		}
+
+		if 1 == typ {
 			if line.contain(itemGreater) {
 				tags := line.split(itemGreater)
 				if 0 < len(tags) {
@@ -48,18 +55,20 @@ Loop:
 					}
 					if matchEnd {
 						html.Value += line.rawText()
-						break Loop
+						break
 					}
 				}
 			}
-		case 6, 7:
+		} else if 6 == typ || 7 == typ {
 			if line.isBlankLine() {
-				break Loop
+				break
 			}
-		default:
-			break Loop
+		} else {
+			break
 		}
 	}
+
+	html.Value = strings.TrimRight(html.Value, "\n")
 
 	return
 }

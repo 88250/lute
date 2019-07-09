@@ -47,8 +47,10 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 		return WalkContinue, nil
 	}
 
+	r.Newline()
 	n := node.(*HTML)
 	r.WriteString(n.Value)
+	r.Newline()
 
 	return WalkContinue, nil
 }
@@ -202,7 +204,7 @@ func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus,error) {
+func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.Newline()
 		r.WriteString("<hr />")
