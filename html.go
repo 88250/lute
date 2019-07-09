@@ -21,12 +21,30 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 	baseNode := &BaseNode{typ: NodeHTML}
 	html := &HTML{baseNode, ""}
 	ret = html
-
+	openTagName := line.split(itemGreater)[0][1].val
 Loop:
 	for {
 		html.Value += line.rawText()
 		line = t.nextLine()
 		switch typ {
+		case 1:
+			if line.contain(itemGreater) {
+				tags := line.split(itemGreater)
+				if 0 < len(tags) {
+					matchEnd := false
+					for _, tag := range tags {
+						closeTagName := tag[2].val
+						if openTagName == closeTagName {
+							matchEnd = true
+							break
+						}
+					}
+					if matchEnd {
+						html.Value += line.rawText()
+						break Loop
+					}
+				}
+			}
 		case 6, 7:
 			if line.isBlankLine() {
 				break Loop
@@ -52,13 +70,13 @@ func (t *Tree) isHTML(line items, htmlType *int) bool {
 		return false
 	}
 
-	if (t.equalIgnoreCase("script", line[1].val) || t.equalIgnoreCase("pre", line[1].val) || t.equalIgnoreCase("style", line[1].val)) && 0 < line[1:].whitespaceCountLeft() {
-		l := line[1:].trimLeft()
+	if t.equalAnyIgnoreCase(line[1].val, "script", "pre", "style") {
+		l := line[2:]
 		if 1 > len(l) {
 			return false
 		}
 
-		if itemGreater == l[0].typ || l[0].isNewline() || l[0].isEOF() {
+		if l[0].isWhitespace() || itemGreater == l[0].typ || l[0].isEOF() {
 			*htmlType = 1
 			return true
 		}
@@ -85,6 +103,11 @@ func (t *Tree) isHTML(line items, htmlType *int) bool {
 	tag := line.trim()
 	isOpenTag, _ := tag.isOpenTag()
 	if isOpenTag {
+		*htmlType = 7
+		return true
+	}
+	isCloseTag := tag.isCloseTag()
+	if isCloseTag {
 		*htmlType = 7
 		return true
 	}
