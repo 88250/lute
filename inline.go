@@ -341,6 +341,14 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	tag := tokens[t.context.Pos:]
 	tag = tag[:tag.index(itemGreater)+1]
+	if 1 > len(tag) {
+		token := tokens[t.context.Pos]
+		baseNode := &BaseNode{typ: NodeText, rawText: token.val}
+		ret = &Text{baseNode, EscapeHTML(token.val)}
+		t.context.Pos++
+
+		return
+	}
 
 	codeTokens := items{}
 	for _, token := range tag {
