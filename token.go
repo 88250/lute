@@ -75,6 +75,16 @@ func (i *item) isASCIIPunct() bool {
 	return (0x21 <= c && 0x2F >= c) || (0x3A <= c && 0x40 >= c) || (0x5B <= c && 0x60 >= c) || (0x7B <= c && 0x7E >= c)
 }
 
+func (i *item) isASCIILetter() bool {
+	for _, c := range i.val {
+		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (i *item) isASCIILetterNumHyphen() bool {
 	for _, c := range i.val {
 		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) && !('0' <= c && '9' >= c) && '-' != c {
@@ -116,6 +126,7 @@ var itemName = map[itemType]string{
 	itemSpace:           "space",
 	itemNewline:         "newline",
 	itemDot:             ".",
+	itemColon:           ":",
 }
 
 func (i itemType) String() string {
@@ -153,6 +164,7 @@ const (
 	itemBackslash                       // \
 	itemSlash                           // /
 	itemDot                             // .
+	itemColon                           // :
 )
 
 var (
@@ -308,8 +320,26 @@ func (tokens items) index(itemType itemType) (pos int) {
 	return -1
 }
 
-func (tokens items) contain(itemType itemType) bool {
-	return 0 < tokens.index(itemType)
+func (tokens items) contain(itemTypes ...itemType) bool {
+	for _, token := range tokens {
+		for _, it := range itemTypes {
+			if token.typ == it {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (tokens items) containWhitespace() bool {
+	for _, token := range tokens {
+		if token.isWhitespace() {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (tokens items) allAre(itemType itemType) bool {
@@ -357,4 +387,65 @@ func (tokens items) whitespaceCountLeft() (count int) {
 	}
 
 	return
+}
+
+func (tokens items) splitWhitespace() (ret []items) {
+	ret = []items{}
+	i := 0
+	lastIsWhitespace := false
+	for _, token := range tokens {
+		if token.isWhitespace() {
+			if !lastIsWhitespace {
+				i++
+			}
+			lastIsWhitespace = true
+		} else {
+			ret[i] = append(ret[i], token)
+			lastIsWhitespace = false
+		}
+	}
+
+	return
+}
+
+func (tokens items) split(itemType itemType) (ret []items) {
+	ret = []items{}
+	i := 0
+	for j, token := range tokens {
+		if itemType == token.typ {
+			ret[i+1] = append(ret[i+1], tokens[j:]...)
+			return
+		} else {
+			ret[i] = append(ret[i], token)
+		}
+	}
+
+	return
+}
+
+func (tokens items) isASCIILetterNumHyphen() bool {
+	for _, token := range tokens {
+		if !token.isASCIILetterNumHyphen() {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (tokens items) startWith(itemType itemType) bool {
+	if 1 > len(tokens) {
+		return false
+	}
+
+	return itemType == tokens[0].typ
+}
+
+func (tokens items) endWith(itemType itemType) bool {
+	length := len(tokens)
+	if 1 > length {
+		return false
+	}
+
+	return itemType == tokens[length-1].typ
 }

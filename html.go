@@ -31,6 +31,8 @@ Loop:
 			if line.isBlankLine() {
 				break Loop
 			}
+		default:
+			break Loop
 		}
 	}
 
@@ -146,4 +148,71 @@ func (t *Tree) equalAnyIgnoreCase(s1 string, strs []string) bool {
 
 func (t *Tree) equalIgnoreCase(s1, s2 string) bool {
 	return strings.ToLower(s1) == strings.ToLower(s2)
+}
+
+func (tokens items) isOpenTag() bool {
+	tokens = tokens.trim()
+	length := len(tokens)
+	if 3 > length {
+		return false
+	}
+
+	if itemLess != tokens[0].typ {
+		return false
+	}
+	if itemGreater != tokens[length-1].typ {
+		return false
+	}
+
+	if itemSlash == tokens[length-2].typ {
+		tokens = tokens[1 : length-2]
+	} else {
+		tokens = tokens[1:]
+	}
+
+	length = len(tokens)
+	if 0 == length {
+		return false
+	}
+
+	nameAndAttrs := tokens.splitWhitespace()
+	name := nameAndAttrs[0]
+	if !name.isASCIILetterNumHyphen() {
+		return false
+	}
+
+	nameAndAttrs = nameAndAttrs[1:]
+	for _, nameAndAttr := range nameAndAttrs {
+		nameAndValue := nameAndAttr.split(itemEqual)
+		name := nameAndValue[0]
+		if !name[0].isASCIILetter() && itemUnderscore != name[0].typ && itemColon != name[0].typ {
+			return false
+		}
+
+		if 1 < len(name) {
+			name = name[1:]
+			for _, n := range name {
+				if !n.isASCIILetter() && !n.isNumInt() && itemUnderscore != n.typ && itemDot != n.typ && itemColon != n.typ && itemHyphen != n.typ {
+					return false
+				}
+			}
+		}
+
+		if 1 < len(nameAndValue) {
+			value := nameAndValue[1]
+			if value.startWith(itemSinglequote) && value.endWith(itemSinglequote) {
+				value = value[1:]
+				value = value[:len(value)-1]
+				return !value.contain(itemSinglequote)
+			}
+			if value.startWith(itemDoublequote) && value.endWith(itemDoublequote) {
+				value = value[1:]
+				value = value[:len(value)-1]
+				return !value.contain(itemDoublequote)
+			}
+			return !value.containWhitespace() && !value.contain(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick)
+		}
+	}
+
+	return true
 }
