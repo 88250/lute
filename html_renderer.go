@@ -37,6 +37,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
 	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
 	ret.rendererFuncs[NodeHTML] = ret.renderHTML
+	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 
 	return
 }
@@ -47,6 +48,17 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 	}
 
 	n := node.(*HTML)
+	r.WriteString(n.Value)
+
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error) {
+	if !entering {
+		return WalkContinue, nil
+	}
+
+	n := node.(*InlineHTML)
 	r.WriteString(n.Value)
 
 	return WalkContinue, nil

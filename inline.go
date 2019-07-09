@@ -53,6 +53,8 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 				n = t.handleDelim(tokens)
 			case itemNewline:
 				n = t.parseNewline(block, tokens)
+			case itemLess:
+				n = t.parseInlineHTML(tokens)
 			default:
 				n = t.parseText(tokens)
 			}
@@ -332,6 +334,22 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 
 	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
 	ret = &Text{baseNode, EscapeHTML(token.val)}
+
+	return
+}
+
+func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
+	tag := tokens[t.context.Pos:]
+	tag = tag[:tag.index(itemGreater)+1]
+
+	codeTokens := items{}
+	for _, token := range tag {
+		codeTokens = append(codeTokens, token)
+	}
+	t.context.Pos += len(codeTokens)
+
+	baseNode := &BaseNode{typ: NodeInlineHTML, tokens: codeTokens}
+	ret = &InlineHTML{baseNode, codeTokens.rawText()}
 
 	return
 }

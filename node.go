@@ -186,6 +186,7 @@ const (
 	NodeTableRow
 	NodeTableCell
 	NodeHTML
+	NodeInlineHTML
 	NodeCode
 	NodeYAML
 	NodeDefinition
@@ -232,6 +233,11 @@ type TableCell struct {
 }
 
 type HTML struct {
+	*BaseNode
+	Value string
+}
+
+type InlineHTML struct {
 	*BaseNode
 	Value string
 }
