@@ -37,7 +37,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 
 		tokens := block.Tokens()
 		if nil == tokens {
-			return
+			continue
 		}
 
 		t.context.Pos = 0

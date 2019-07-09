@@ -62,7 +62,9 @@ func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
 		}
 	}
 
-	if 0 < closingCrosshatchIndex {
+	if 0 >= closingCrosshatchIndex {
+		heading.tokens = nil
+	} else if 0 < closingCrosshatchIndex {
 		heading.tokens = heading.tokens[:closingCrosshatchIndex]
 		heading.tokens = heading.tokens.trimRight()
 	}
