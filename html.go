@@ -81,21 +81,10 @@ func (t *Tree) isHTML(line items, htmlType *int) bool {
 		}
 	}
 
-	i = 1
-	if slash {
-		i = 2
-	}
-	rule7 := line[i].isASCIILetterNumHyphen()
-	if rule7 {
-		i++
-		if line[i].isWhitespace() || itemGreater == line[i].typ {
-			*htmlType = 7
-			return true
-		}
-		if i < length && itemSlash == line[i].typ && itemGreater == line[i+1].typ {
-			*htmlType = 7
-			return true
-		}
+	tag := line.trim()
+	if tag.isOpenTag() || tag.isCloseTag() {
+		*htmlType = 7
+		return true
 	}
 
 	rawText := line.rawText()
@@ -177,8 +166,16 @@ func (tokens items) isOpenTag() bool {
 
 	nameAndAttrs := tokens.splitWhitespace()
 	name := nameAndAttrs[0]
-	if !name.isASCIILetterNumHyphen() {
+	if !name[0].isASCIILetter() {
 		return false
+	}
+	if 1 < len(name) {
+		name = name[1:]
+		for _, n := range name {
+			if !n.isASCIILetterNumHyphen() {
+				return false
+			}
+		}
 	}
 
 	nameAndAttrs = nameAndAttrs[1:]
@@ -211,6 +208,42 @@ func (tokens items) isOpenTag() bool {
 				return !value.contain(itemDoublequote)
 			}
 			return !value.containWhitespace() && !value.contain(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick)
+		}
+	}
+
+	return true
+}
+
+func (tokens items) isCloseTag() bool {
+	tokens = tokens.trim()
+	length := len(tokens)
+	if 4 > length {
+		return false
+	}
+
+	if itemLess != tokens[0].typ || itemSlash != tokens[1].typ {
+		return false
+	}
+	if itemGreater != tokens[length-1].typ {
+		return false
+	}
+
+	tokens = tokens[2 : length-1]
+	length = len(tokens)
+	if 0 == length {
+		return false
+	}
+
+	name := tokens[0:]
+	if !name[0].isASCIILetter() {
+		return false
+	}
+	if 1 < len(name) {
+		name = name[1:]
+		for _, n := range name {
+			if !n.isASCIILetterNumHyphen() {
+				return false
+			}
 		}
 	}
 
