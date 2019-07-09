@@ -65,15 +65,6 @@ func (t *Tree) interruptParagraph(line items) bool {
 		return false
 	}
 
-	/*
-	 * 专题分隔线 `***` 打断段落
-	 * ATX 标题 `# h` 打断段落，Setext 标题不打断，需要用空行分隔之前的内容
-	 * 围栏代码块 <code>```</code> 打断段落
-	 * 大部分 HTML 标签可打断段落，除了带属性的，比如 `<a `、`<img `
-	 * 块引用 `>` 打断段落
-	 * 第一个非空列表项打断段落（即新列表打断段落）
-	 */
-
 	if t.isThematicBreak(line) {
 		return true
 	}
@@ -91,8 +82,16 @@ func (t *Tree) interruptParagraph(line items) bool {
 		return true
 	}
 
-	isOpenTag, withAttr := line.isOpenTag()
-	if isOpenTag && !withAttr {
+	pos := line.index(itemGreater)
+	if 0 < pos {
+		maybeTag := line[:pos+1]
+		htmlType := -1
+		if t.isHTML(maybeTag, &htmlType) && 7 != htmlType {
+			return true
+		}
+	}
+
+	if t.isBlockquote(line) {
 		return true
 	}
 
