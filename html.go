@@ -27,7 +27,7 @@ Loop:
 		html.Value += line.rawText()
 		line = t.nextLine()
 		switch typ {
-		case 6:
+		case 6, 7:
 			if line.isBlankLine() {
 				break Loop
 			}
@@ -158,7 +158,7 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 	if itemSlash == tokens[length-2].typ {
 		tokens = tokens[1 : length-2]
 	} else {
-		tokens = tokens[1:]
+		tokens = tokens[1 : length-1]
 	}
 
 	length = len(tokens)

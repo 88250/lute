@@ -413,9 +413,11 @@ func (tokens items) splitWhitespace() (ret []items) {
 func (tokens items) split(itemType itemType) (ret []items) {
 	ret = []items{}
 	i := 0
+	ret = append(ret, items{})
 	for j, token := range tokens {
 		if itemType == token.typ {
-			ret[i+1] = append(ret[i+1], tokens[j:]...)
+			ret = append(ret, items{})
+			ret[i+1] = append(ret[i+1], tokens[j+1:]...)
 			return
 		} else {
 			ret[i] = append(ret[i], token)
