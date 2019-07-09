@@ -91,5 +91,10 @@ func (t *Tree) interruptParagraph(line items) bool {
 		return true
 	}
 
+	isOpenTag, withAttr := line.isOpenTag();
+	if isOpenTag && !withAttr {
+		return true
+	}
+
 	return false
 }

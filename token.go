@@ -392,11 +392,13 @@ func (tokens items) whitespaceCountLeft() (count int) {
 func (tokens items) splitWhitespace() (ret []items) {
 	ret = []items{}
 	i := 0
+	ret = append(ret, items{})
 	lastIsWhitespace := false
 	for _, token := range tokens {
 		if token.isWhitespace() {
 			if !lastIsWhitespace {
 				i++
+				ret = append(ret, items{})
 			}
 			lastIsWhitespace = true
 		} else {
