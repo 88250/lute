@@ -233,8 +233,6 @@ type TableCell struct {
 
 type HTML struct {
 	*BaseNode
-	int
-	*Tree
 	Value string
 }
 

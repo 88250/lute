@@ -75,6 +75,16 @@ func (i *item) isASCIIPunct() bool {
 	return (0x21 <= c && 0x2F >= c) || (0x3A <= c && 0x40 >= c) || (0x5B <= c && 0x60 >= c) || (0x7B <= c && 0x7E >= c)
 }
 
+func (i *item) isASCIILetterNumHyphen() bool {
+	for _, c := range i.val {
+		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) && !('0' <= c && '9' >= c) && '-' != c {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (i *item) isEOF() bool {
 	return itemEOF == i.typ
 }
@@ -288,7 +298,7 @@ func (tokens items) accept(itemType itemType) (pos int) {
 	return
 }
 
-func (tokens items) indexOf(itemType itemType) (pos int) {
+func (tokens items) index(itemType itemType) (pos int) {
 	for ; pos < len(tokens); pos++ {
 		if itemType == tokens[pos].typ {
 			return
@@ -299,7 +309,7 @@ func (tokens items) indexOf(itemType itemType) (pos int) {
 }
 
 func (tokens items) contain(itemType itemType) bool {
-	return 0 < tokens.indexOf(itemType)
+	return 0 < tokens.index(itemType)
 }
 
 func (tokens items) allAre(itemType itemType) bool {
@@ -331,6 +341,18 @@ func (tokens items) removeSpacesTabs() (ret items) {
 	for _, token := range tokens {
 		if itemSpace != token.typ && itemTab != token.typ {
 			ret = append(ret, token)
+		}
+	}
+
+	return
+}
+
+func (tokens items) whitespaceCountLeft() (count int) {
+	for _, token := range tokens {
+		if !token.isWhitespace() {
+			break
+		} else {
+			count++
 		}
 	}
 
