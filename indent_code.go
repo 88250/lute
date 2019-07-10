@@ -48,15 +48,16 @@ Loop:
 					break Loop
 				}
 
-				codeValue += newlines.rawText()
-				newlines = append(newlines, token)
-				code.tokens = append(code.tokens, newlines...)
 				line = nonNewline
 				spaces, tabs, _, _ := t.nonWhitespace(line)
 				if 1 > tabs && 4 > spaces {
 					t.backupLine(line)
 					break Loop
 				} else {
+					codeValue += newlines.rawText()
+					newlines = append(newlines, token)
+					code.tokens = append(code.tokens, newlines...)
+
 					continue Loop
 				}
 			}

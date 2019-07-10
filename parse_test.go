@@ -28,6 +28,8 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 	// commonmark spec cases
+	{"spec160", "<table>\n\n  <tr>\n\n    <td>\n      Hi\n    </td>\n\n  </tr>\n\n</table>\n", "<table>\n  <tr>\n<pre><code>&lt;td&gt;\n  Hi\n&lt;/td&gt;\n</code></pre>\n  </tr>\n</table>\n"},
+	{"spec151", "<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\nokay\n", "<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\n<p>okay</p>\n"},
 	{"spec149", "<?php\n\n  echo '>';\n\n?>\nokay\n", "<?php\n\n  echo '>';\n\n?>\n<p>okay</p>\n"},
 	{"spec148", "<!-- Foo\n\nbar\n   baz -->\nokay\n", "<!-- Foo\n\nbar\n   baz -->\n<p>okay</p>\n"},
 	{"spec146", "<!-- foo -->*bar*\n*baz*\n", "<!-- foo -->*bar*\n<p><em>baz</em></p>\n"},

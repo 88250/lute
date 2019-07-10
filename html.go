@@ -32,13 +32,15 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 					}
 				}
 			} else if 2 == typ {
-				if !matchEnd && itemHyphen == token.typ && i < len(line)-2 && itemHyphen == line[i+1].typ {
-					if itemGreater == line[i+2].typ {
-						matchEnd = true
-					}
+				if !matchEnd && itemHyphen == token.typ && i < len(line)-2 && itemHyphen == line[i+1].typ && itemGreater == line[i+2].typ {
+					matchEnd = true
 				}
 			} else if 3 == typ {
 				if !matchEnd && itemQuestion == token.typ && i < len(line)-1 && itemGreater == line[i+1].typ {
+					matchEnd = true
+				}
+			} else if 5 == typ {
+				if !matchEnd && itemCloseBracket == token.typ && i < len(line)-2 && itemCloseBracket == line[i+1].typ && itemGreater == line[i+2].typ {
 					matchEnd = true
 				}
 			}
@@ -64,7 +66,7 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 			break
 		}
 
-		if 1 == typ || 2 == typ || 3 == typ {
+		if 1 == typ || 2 == typ || 4 == typ || 3 == typ || 5 == typ {
 			continue
 		}
 
