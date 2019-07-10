@@ -49,6 +49,7 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 		ret = t.parseList(line)
 	case t.isHTML(line, &htmlType):
 		ret = t.parseHTML(line, htmlType)
+	case t.parseLinkRefDef(line):
 	case line.isBlankLine():
 		return
 	default:

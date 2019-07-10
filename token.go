@@ -455,3 +455,16 @@ func (tokens items) endWith(itemType itemType) bool {
 
 	return itemType == tokens[length-1].typ
 }
+
+func (tokens items) isBackslashEscape(pos int) bool {
+	backslashes := 0
+	for i := pos - 1; 0 <= i; i-- {
+		if itemBackslash != tokens[i].typ {
+			break
+		}
+
+		backslashes++
+	}
+
+	return 0 != backslashes%2
+}

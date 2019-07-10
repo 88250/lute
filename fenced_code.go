@@ -45,7 +45,7 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 
 		for i := 0; i < len(line); i++ {
 			token := line[i]
-			codeValue += EscapeHTML(token.val)
+			codeValue += escapeHTML(token.val)
 			code.tokens = append(code.tokens, token)
 		}
 

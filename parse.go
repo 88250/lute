@@ -45,6 +45,7 @@ type Context struct {
 	CurLine      items
 	CurNode      Node
 	IndentSpaces int
+	LinkRefDef   map[string]*Link
 
 	// Inlines parsing
 

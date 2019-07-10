@@ -41,7 +41,7 @@ Loop:
 
 		for i := 0; i < len(line); i++ {
 			token := line[i]
-			codeValue += EscapeHTML(token.val)
+			codeValue += escapeHTML(token.val)
 			if token.isNewline() {
 				newlines, nonNewline := t.nonNewline()
 				if nonNewline.isEOF() {

@@ -188,9 +188,6 @@ const (
 	NodeHTML
 	NodeInlineHTML
 	NodeCode
-	NodeYAML
-	NodeDefinition
-	NodeFootnoteDefinition
 	NodeText
 	NodeEmphasis
 	NodeStrong
@@ -200,10 +197,6 @@ const (
 	NodeSoftBreak
 	NodeLink
 	NodeImage
-	NodeLinkReference
-	NodeImageReference
-	NodeFootnote
-	NodeFootnoteReference
 )
 
 // Nodes.
@@ -214,16 +207,11 @@ type Root struct {
 
 type Table struct {
 	*BaseNode
-	int
-	*Tree
-
-	Align alignType
+	Align string
 }
 
 type TableRow struct {
 	*BaseNode
-	int
-	*Tree
 }
 
 type TableCell struct {
@@ -245,25 +233,7 @@ type InlineHTML struct {
 type Code struct {
 	*BaseNode
 	Value string
-
 	InfoStr string
-}
-
-type Definition struct {
-	*BaseNode
-	int
-	*Tree
-
-	Association
-	Resource
-}
-
-type FootnoteDefinition struct {
-	*BaseNode
-	int
-	*Tree
-
-	Association
 }
 
 type Text struct {
@@ -281,9 +251,6 @@ type Strong struct {
 
 type Delete struct {
 	*BaseNode
-	int
-	items
-	*Tree
 }
 
 type InlineCode struct {
@@ -301,74 +268,6 @@ type SoftBreak struct {
 
 type Link struct {
 	*BaseNode
-	int
-	*Tree
-
-	Resource
-}
-
-type Image struct {
-	*BaseNode
-	int
-	*Tree
-
-	Resource
-	Alternative
-}
-
-type LinkReference struct {
-	*BaseNode
-	int
-	*Tree
-
-	Reference
-}
-
-type ImageReference struct {
-	*BaseNode
-	int
-	*Tree
-
-	Reference
-	Alternative
-}
-
-type Footnote struct {
-	*BaseNode
-	int
-	*Tree
-}
-
-type FootnoteReference struct {
-	*BaseNode
-	int
-	*Tree
-
-	Association
-}
-
-// Mixins.
-
-type Resource struct {
 	URL   string
 	Title string
 }
-
-type Association struct {
-	Identifier string
-	Label      string
-}
-
-type Reference struct {
-	ReferenceType referenceType
-	Association
-}
-
-type Alternative struct {
-	Alt string
-}
-
-// Enumerations.
-
-type alignType string
-type referenceType string

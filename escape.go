@@ -24,8 +24,6 @@ var htmlEscaper = strings.NewReplacer(
 	`"`, "&quot;",
 )
 
-func EscapeHTML(html string) string {
+func escapeHTML(html string) string {
 	return htmlEscaper.Replace(html)
 }
-
-
