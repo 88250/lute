@@ -154,6 +154,8 @@ func (s *scanner) run() {
 			s.newItem(itemDot)
 		case ':' == r:
 			s.newItem(itemColon)
+		case '?' == r:
+			s.newItem(itemQuestion)
 		case unicode.IsSymbol(r), unicode.IsPunct(r):
 			s.newItem(itemStr)
 		case end == r:

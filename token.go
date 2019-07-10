@@ -127,6 +127,7 @@ var itemName = map[itemType]string{
 	itemNewline:         "newline",
 	itemDot:             ".",
 	itemColon:           ":",
+	itemQuestion:        "?",
 }
 
 func (i itemType) String() string {
@@ -165,6 +166,7 @@ const (
 	itemSlash                           // /
 	itemDot                             // .
 	itemColon                           // :
+	itemQuestion                        // ?
 )
 
 var (

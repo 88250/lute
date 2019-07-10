@@ -23,7 +23,33 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 	ret = html
 	openTagName := line.split(itemGreater)[0][1].val
 	for {
-		html.Value += line.rawText()
+		matchEnd := false
+		for i, token := range line {
+			if 1 == typ {
+				if !matchEnd && itemLess == token.typ && i < len(line)-3 && itemSlash == line[i+1].typ {
+					if openTagName == line[i+2].val && itemGreater == line[i+3].typ {
+						matchEnd = true
+					}
+				}
+			} else if 2 == typ {
+				if !matchEnd && itemHyphen == token.typ && i < len(line)-2 && itemHyphen == line[i+1].typ {
+					if itemGreater == line[i+2].typ {
+						matchEnd = true
+					}
+				}
+			} else if 3 == typ {
+				if !matchEnd && itemQuestion == token.typ && i < len(line)-1 && itemGreater == line[i+1].typ {
+					matchEnd = true
+				}
+			}
+
+			html.Value += token.val
+		}
+
+		if matchEnd && 6 != typ {
+			break
+		}
+
 		line = t.nextLine()
 		if t.isBlockquoteClose(line) || line.isEOF() {
 			line = t.removeStartBlockquoteMarker(line)
@@ -38,28 +64,11 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 			break
 		}
 
-		if 1 == typ {
-			if line.contain(itemGreater) {
-				tags := line.split(itemGreater)
-				if 0 < len(tags) {
-					matchEnd := false
-					for _, tag := range tags {
-						if 3 > len(tag) {
-							break
-						}
-						closeTagName := tag[2].val
-						if openTagName == closeTagName {
-							matchEnd = true
-							break
-						}
-					}
-					if matchEnd {
-						html.Value += line.rawText()
-						break
-					}
-				}
-			}
-		} else if 6 == typ || 7 == typ {
+		if 1 == typ || 2 == typ || 3 == typ {
+			continue
+		}
+
+		if 6 == typ || 7 == typ {
 			if line.isBlankLine() {
 				break
 			}
