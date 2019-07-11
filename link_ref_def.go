@@ -25,57 +25,104 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 		return false
 	}
 
-	linkLabel, tokens, label := t.parseLinkLabel(line)
+	linkLabel, remains, label := t.parseLinkLabel(line)
 	if nil == linkLabel {
 		return false
 	}
 
-	if itemColon != tokens[0].typ {
+	if nil != t.context.LinkRefDef[label] {
 		return false
 	}
 
-	tokens = tokens[1:]
-	whitespaces, tokens := tokens.trimLeft()
+	if itemColon != remains[0].typ {
+		return false
+	}
+
+	remains = remains[1:]
+	whitespaces, remains := remains.trimLeft()
 	newlines, _, _ := whitespaces.statWhitespace()
 	if 1 < newlines {
 		return false
 	}
 
-	linkDest, remains, link := t.parseLinkDest1(tokens)
+	tokens := remains
+	linkDest, remains, url := t.parseLinkDest1(tokens)
 	if nil == linkDest {
-		linkDest, remains, link = t.parseLinkDest2(tokens)
+		linkDest, remains, url = t.parseLinkDest2(tokens)
 	}
 	if nil == linkDest {
 		return false
 	}
 
-	whitespaces, tokens = tokens.trimLeft()
+	whitespaces, remains = remains.trimLeft()
 	newlines, _, _ = whitespaces.statWhitespace()
 	if 1 < newlines {
 		return false
 	}
 
-	_ = remains
-	_ = link
-
-	if nil != t.context.LinkRefDef[label] {
-		link := &Link{&BaseNode{typ: NodeLink}, "url", "title"}
-		t.context.LinkRefDef[label] = link
+	tokens = remains
+	linkTitle, remains, title := t.parseLinkTitle1(tokens)
+	if nil == linkTitle {
+		return false
 	}
+	_ = remains
+	_ = url
+	_ = title
+
+	link := &Link{&BaseNode{typ: NodeLink}, url, title}
+	t.context.LinkRefDef[label] = link
 
 	return true
 }
 
-func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, link string) {
+func (t *Tree) parseLinkTitle1(tokens items) (ret, remains items, title string) {
+	remains = tokens
+	length := len(tokens)
+	if 2 > length {
+		return
+	}
+
+	if itemDoublequote != tokens[0].typ {
+		return
+	}
+
+	close := false
+	i := 0
+	for ; i < length; i++ {
+		token := tokens[i]
+		ret = append(ret, token)
+		if 0 < i {
+			title += token.val
+			if itemDoublequote == token.typ && !tokens.isBackslashEscape(i) {
+				close = true
+				title = title[:len(title)-1]
+				break
+			}
+		}
+	}
+
+	if !close {
+		ret = nil
+		title = ""
+
+		return
+	}
+
+	remains = tokens[i+1:]
+
+	return
+}
+
+func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, url string) {
 	remains = tokens
 	var leftParens, rightParens int
 	i := 0
 	for ; i < len(tokens); i++ {
 		token := tokens[i]
 		ret = append(ret, token)
-		link += token.val
+		url += token.val
 		if itemSpace == token.typ || token.isControl() {
-			link = link[0 : len(link)-1]
+			url = url[0 : len(url)-1]
 			ret = ret[:len(ret)-1]
 			break
 		}
@@ -90,7 +137,7 @@ func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, link string) {
 
 	if leftParens != rightParens {
 		ret = nil
-		link = ""
+		url = ""
 		return
 	}
 
@@ -99,7 +146,7 @@ func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, link string) {
 	return
 }
 
-func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, link string) {
+func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, url string) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -116,23 +163,26 @@ func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, link string) {
 		token := tokens[i]
 		ret = append(ret, token)
 		if 0 < i {
-			link += token.val
+			url += token.val
 			if itemLess == token.typ && !tokens.isBackslashEscape(i) {
 				ret = nil
-				link = ""
+				url = ""
 				return
 			}
 		}
 
 		if itemGreater == token.typ && !tokens.isBackslashEscape(i) {
 			close = true
-			link = link[0 : len(link)-1]
+			url = url[0 : len(url)-1]
 			break
 		}
 	}
 
 	if !close {
 		ret = nil
+		url = ""
+
+		return
 	}
 
 	remains = tokens[i+1:]
