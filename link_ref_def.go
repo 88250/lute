@@ -44,6 +44,14 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	if 1 < newlines {
 		return false
 	}
+	if 1 > len(remains) {
+		remains = t.nextLine()
+		if remains.isBlankLine() {
+			return false
+		}
+
+		_, remains = remains.trimLeft()
+	}
 
 	tokens := remains
 	linkDest, remains, url := t.parseLinkDest(tokens)
@@ -56,9 +64,17 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	if 1 < newlines {
 		return false
 	}
+	if 1 > len(remains) {
+		remains = t.nextLine()
+		if remains.isBlankLine() {
+			return false
+		}
+
+		_, remains = remains.trimLeft()
+	}
 
 	tokens = remains
-	_, remains, title := t.parseLinkTitle1(tokens)
+	_, remains, title := t.parseLinkTitle(tokens)
 	if !remains.isBlankLine() {
 		return false
 	}
@@ -75,19 +91,25 @@ func (t *Tree) parseLinkText(tokens items) (ret, remains items, text string) {
 }
 
 func (t *Tree) parseLinkTitle(tokens items) (ret, remains items, title string) {
-	ret, remains, title = t.parseLinkTitle1(tokens)
+	ret, remains, title = t.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
+	if nil == ret {
+		ret, remains, title = t.parseLinkTitleMatch(itemSinglequote, itemSinglequote, tokens)
+		if nil == ret {
+			ret, remains, title = t.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
+		}
+	}
 
 	return
 }
 
-func (t *Tree) parseLinkTitle1(tokens items) (ret, remains items, title string) {
+func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, remains items, title string) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
 		return
 	}
 
-	if itemDoublequote != tokens[0].typ {
+	if opener != tokens[0].typ {
 		return
 	}
 
@@ -98,7 +120,7 @@ func (t *Tree) parseLinkTitle1(tokens items) (ret, remains items, title string) 
 		ret = append(ret, token)
 		if 0 < i {
 			title += token.val
-			if itemDoublequote == token.typ && !tokens.isBackslashEscape(i) {
+			if closer == token.typ && !tokens.isBackslashEscape(i) {
 				close = true
 				title = title[:len(title)-1]
 				break
