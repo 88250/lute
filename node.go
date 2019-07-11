@@ -55,16 +55,12 @@ func (n *BaseNode) Unlink() {
 	if nil != n.previous {
 		n.previous.SetNext(n.next)
 	} else if nil != n.parent {
-		if nil != n.next {
-			n.parent.SetFirstChild(n.next)
-		}
+		n.parent.SetFirstChild(n.next)
 	}
 	if nil != n.next {
 		n.next.SetPrevious(n.previous)
 	} else if nil != n.parent {
-		if nil != n.previous {
-			n.parent.SetLastChild(n.previous)
-		}
+		n.parent.SetLastChild(n.previous)
 	}
 	n.parent = nil
 	n.next = nil
@@ -232,7 +228,7 @@ type InlineHTML struct {
 
 type Code struct {
 	*BaseNode
-	Value string
+	Value   string
 	InfoStr string
 }
 
@@ -274,6 +270,6 @@ type Link struct {
 
 type Image struct {
 	*BaseNode
-	URL string
+	URL   string
 	Title string
 }

@@ -51,7 +51,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			case itemBacktick:
 				n = t.parseInlineCode(tokens)
 			case itemAsterisk, itemUnderscore:
-				n = t.handleDelim(tokens)
+				t.handleDelim(block, tokens)
 			case itemNewline:
 				n = t.parseNewline(block, tokens)
 			case itemLess:
@@ -59,7 +59,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			case itemOpenBracket:
 				n = t.parseOpenBracket(tokens)
 			case itemCloseBracket:
-				n = t.parseCloseBracket(tokens)
+				t.parseCloseBracket(block, tokens)
 			default:
 				n = t.parseText(tokens)
 			}
@@ -78,7 +78,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 	}
 }
 
-func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
+func (t *Tree) parseCloseBracket(block Node, tokens items) {
 	var startPos int
 	var isImage bool
 	matched := false
@@ -92,14 +92,14 @@ func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
 
 	if nil == opener {
 		// no matched opener, just return a literal
-		ret = &Text{&BaseNode{typ: NodeText}, "]"}
+		block.AppendChild(block, &Text{&BaseNode{typ: NodeText}, "]"})
 
 		return
 	}
 
 	if !opener.active {
 		// no matched opener, just return a literal
-		ret = &Text{&BaseNode{typ: NodeText}, "]"}
+		block.AppendChild(block, &Text{&BaseNode{typ: NodeText}, "]"})
 
 		// take opener off brackets stack
 		t.removeBracket()
@@ -191,7 +191,7 @@ func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
 			tmp = next
 		}
 
-		ret = node
+		block.AppendChild(block, node)
 		t.processEmphasis(opener.previousDelimiter)
 		t.removeBracket()
 		opener.node.Unlink()
@@ -215,7 +215,7 @@ func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
 	} else { // no match
 		t.removeBracket() // remove this opener from stack
 		t.context.Pos = startPos
-		ret = &Text{&BaseNode{typ: NodeText}, "]"}
+		block.AppendChild(block, &Text{&BaseNode{typ: NodeText}, "]"})
 
 		return
 	}
@@ -391,21 +391,21 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 	}
 }
 
-func (t *Tree) handleDelim(tokens items) (ret Node) {
+func (t *Tree) handleDelim(block Node, tokens items) {
 	startPos := t.context.Pos
 	delim := t.scanDelims(tokens)
 
 	subTokens, text := t.extractTokens(tokens, startPos, t.context.Pos)
 	baseNode := &BaseNode{typ: NodeText, rawText: text, tokens: subTokens}
-	ret = &Text{baseNode, text}
-	delim.node = ret
+	node := &Text{baseNode, text}
+	block.AppendChild(block, node)
 
 	// Add entry to stack for this opener
 	t.context.Delimiters = &delimiter{
 		typ:         delim.typ,
 		num:         delim.num,
 		originalNum: delim.num,
-		node:        ret,
+		node:        node,
 		previous:    t.context.Delimiters,
 		next:        nil,
 		canOpen:     delim.canOpen,
@@ -414,8 +414,6 @@ func (t *Tree) handleDelim(tokens items) (ret Node) {
 	if t.context.Delimiters.previous != nil {
 		t.context.Delimiters.previous.next = t.context.Delimiters
 	}
-
-	return
 }
 
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
