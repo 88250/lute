@@ -65,6 +65,10 @@ func (i *item) isNumInt() bool {
 	return true
 }
 
+func (i *item) isControl() bool {
+	return itemControl == i.typ
+}
+
 func (i *item) isPunct() bool {
 	return unicode.IsPunct(rune(i.val[0]))
 }
@@ -167,6 +171,7 @@ const (
 	itemDot                             // .
 	itemColon                           // :
 	itemQuestion                        // ?
+	itemControl
 )
 
 var (
@@ -254,26 +259,28 @@ func (tokens items) trimLeftSpace() (spaces int, remains items) {
 }
 
 func (tokens items) trim() (ret items) {
-	ret = tokens.trimLeft()
+	_, ret = tokens.trimLeft()
 	ret = ret.trimRight()
 
 	return
 }
 
-func (tokens items) trimLeft() items {
+func (tokens items) trimLeft() (whitespaces, remains items) {
 	size := len(tokens)
 	if 1 > size {
-		return tokens
+		return nil, tokens
 	}
 
 	i := 0
 	for ; i < size; i++ {
 		if !tokens[i].isWhitespace() {
 			break
+		} else {
+			whitespaces = append(whitespaces, tokens[i])
 		}
 	}
 
-	return tokens[i:]
+	return whitespaces, tokens[i:]
 }
 
 func (tokens items) trimRight() items {
@@ -467,4 +474,18 @@ func (tokens items) isBackslashEscape(pos int) bool {
 	}
 
 	return 0 != backslashes%2
+}
+
+func (tokens items) statWhitespace() (newlines, spaces, tabs int) {
+	for _, token := range tokens {
+		if itemNewline == token.typ {
+			newlines++
+		} else if itemSpace == token.typ {
+			spaces++
+		} else if itemTab == token.typ {
+			tabs++
+		}
+	}
+
+	return
 }

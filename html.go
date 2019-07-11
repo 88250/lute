@@ -87,7 +87,7 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 var HTMLBlockTags = []string{"address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"}
 
 func (t *Tree) isHTML(line items, htmlType *int) bool {
-	line = line.trimLeft()
+	_, line = line.trimLeft()
 	length := len(line)
 	if 3 > length { // at least <? and a newline
 		return false

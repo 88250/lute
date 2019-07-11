@@ -63,12 +63,14 @@ func (t *Tree) isBlockquote(line items) bool {
 	return true
 }
 
-func (t *Tree) removeStartBlockquoteMarker(line items) items {
+func (t *Tree) removeStartBlockquoteMarker(line items) (ret items) {
 	if NodeBlockquote != t.context.CurNode.Type() {
 		return line
 	}
 
-	return line[1:].trimLeft()
+	_, ret = line[1:].trimLeft()
+
+	return
 }
 
 func (t *Tree) isBlockquoteClose(line items) bool {

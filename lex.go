@@ -158,6 +158,8 @@ func (s *scanner) run() {
 			s.newItem(itemQuestion)
 		case unicode.IsSymbol(r), unicode.IsPunct(r):
 			s.newItem(itemStr)
+		case unicode.IsControl(r):
+			s.newItem(itemControl)
 		case end == r:
 			return
 		default:

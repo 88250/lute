@@ -27,7 +27,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 	ret = p
 
 	for {
-		line = line.trimLeft()
+		_, line = line.trimLeft()
 		len := len(line)
 		for i, token := range line {
 			if itemBackslash != token.typ {
