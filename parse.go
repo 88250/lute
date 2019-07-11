@@ -49,8 +49,10 @@ type Context struct {
 
 	// Inlines parsing
 
-	Delimiters *delimiter
 	Pos        int
+	Delimiters *delimiter
+	Brackets   *delimiter
+	previousDelimiter *delimiter
 }
 
 // Tree is the representation of the markdown ast.

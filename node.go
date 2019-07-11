@@ -271,3 +271,9 @@ type Link struct {
 	URL   string
 	Title string
 }
+
+type Image struct {
+	*BaseNode
+	URL string
+	Title string
+}

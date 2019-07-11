@@ -16,14 +16,19 @@
 package lute
 
 type delimiter struct {
-	node           Node      // the text node point to
+	node           Node       // the text node point to
 	typ            itemType   // the type of delimiter ([, ![, *, _)
 	num            int        // the number of delimiters
 	originalNum    int        // the original number of delimiters
-	active         bool       // whether the delimiter is "active" (all are active to start)
 	canOpen        bool       // whether the delimiter is a potential opener
 	canClose       bool       // whether the delimiter is a potential closer
 	previous, next *delimiter // doubly linked list
+
+	active         bool       // whether the delimiter is "active" (all are active to start)
+	image bool
+	bracketAfter   bool
+	index int
+	previousDelimiter *delimiter
 }
 
 func (t *Tree) removeDelimiter(delim *delimiter) (ret *delimiter) {
