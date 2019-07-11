@@ -61,13 +61,10 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	}
 
 	tokens = remains
-	linkTitle, remains, title := t.parseLinkTitle1(tokens)
-	if nil == linkTitle {
+	_, remains, title := t.parseLinkTitle1(tokens)
+	if !remains.isBlankLine() {
 		return false
 	}
-	_ = remains
-	_ = url
-	_ = title
 
 	link := &Link{&BaseNode{typ: NodeLink}, url, title}
 	t.context.LinkRefDef[label] = link
