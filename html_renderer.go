@@ -38,8 +38,27 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
 	ret.rendererFuncs[NodeHTML] = ret.renderHTML
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
+	ret.rendererFuncs[NodeLink] = ret.renderLink
 
 	return
+}
+
+func (r *Renderer) renderLink(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		n := node.(*Link)
+		out := "<a href=\"" + n.URL + "\""
+		if "" != n.Title {
+			out += " title=\"" + n.Title + "\""
+		}
+		out += ">"
+		r.WriteString(out)
+
+		return WalkContinue, nil
+	}
+
+	r.WriteString("</a>")
+
+	return WalkContinue, nil
 }
 
 func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {

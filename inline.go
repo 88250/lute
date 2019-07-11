@@ -18,7 +18,6 @@ package lute
 func (t *Tree) parseInlines() {
 	t.context.Delimiters = nil
 	t.context.Brackets = nil
-	t.context.LinkRefDef = map[string]*Link{}
 	t.parseBlockInlines(t.Root.Children())
 }
 
@@ -86,7 +85,6 @@ func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
 	var dest, title, reflabel string
 	var opener *delimiter
 
-	t.context.Pos += 1
 	startPos = t.context.Pos
 
 	// get last [ or ![
@@ -149,7 +147,7 @@ func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
 	if !matched {
 		// Next, see if there's a link label
 		//var beforelabel = t.context.Pos
-		_, _, label := t.parseLinkLabel(tokens[:t.context.Pos])
+		_, _, label := t.parseLinkLabel(tokens[:t.context.Pos+1])
 		var n = len(label)
 		if n > 2 {
 			//reflabel = this.subject.slice(beforelabel, beforelabel+n)
@@ -179,9 +177,9 @@ func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
 	if matched {
 		var node Node
 		if isImage {
-			node = &Image{URL: dest, Title: title}
+			node = &Image{&BaseNode{typ: NodeImage}, dest, title}
 		} else {
-			node = &Link{URL: dest, Title: title}
+			node = &Link{&BaseNode{typ: NodeLink}, dest, title}
 		}
 
 		var tmp, next Node
@@ -210,6 +208,8 @@ func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
 				opener = opener.previous
 			}
 		}
+
+		t.context.Pos++
 
 		return
 	} else { // no match

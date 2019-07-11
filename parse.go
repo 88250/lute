@@ -174,6 +174,7 @@ func (t *Tree) parse() (err error) {
 	t.lex = lex(t.name, t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
 	t.context.CurNode = t.Root
+	t.context.LinkRefDef = map[string]*Link{}
 	t.parseBlocks()
 	t.parseInlines()
 	t.lex = nil
