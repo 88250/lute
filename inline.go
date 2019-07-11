@@ -17,6 +17,8 @@ package lute
 
 func (t *Tree) parseInlines() {
 	t.context.Delimiters = nil
+	t.context.Brackets = nil
+	t.context.LinkRefDef = map[string]*Link{}
 	t.parseBlockInlines(t.Root.Children())
 }
 
@@ -55,6 +57,10 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 				n = t.parseNewline(block, tokens)
 			case itemLess:
 				n = t.parseInlineHTML(tokens)
+			case itemOpenBracket:
+				n = t.parseOpenBracket(tokens)
+			case itemCloseBracket:
+				n = t.parseCloseBracket(tokens)
 			default:
 				n = t.parseText(tokens)
 			}
@@ -71,6 +77,179 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 
 		t.processEmphasis(nil)
 	}
+}
+
+func (t *Tree) parseCloseBracket(tokens items) (ret Node) {
+	var startPos int
+	var isImage bool
+	matched := false
+	var dest, title, reflabel string
+	var opener *delimiter
+
+	t.context.Pos += 1
+	startPos = t.context.Pos
+
+	// get last [ or ![
+	opener = t.context.Brackets
+
+	if nil == opener {
+		// no matched opener, just return a literal
+		ret = &Text{&BaseNode{typ: NodeText}, "]"}
+
+		return
+	}
+
+	if !opener.active {
+		// no matched opener, just return a literal
+		ret = &Text{&BaseNode{typ: NodeText}, "]"}
+
+		// take opener off brackets stack
+		t.removeBracket()
+		return
+	}
+
+	// If we got here, open is a potential opener
+	isImage = opener.image
+
+	// Check to see if we have a link/image
+
+	savepos := t.context.Pos
+
+	// Inline link?
+	if itemOpenParen == tokens[t.context.Pos].typ {
+		t.context.Pos++
+
+		tmp := tokens[t.context.Pos:]
+		isLink, tmp := tmp.spnl()
+
+		if isLink {
+			_, tmp, dest := t.parseLinkDest(tmp)
+			if "" != dest {
+				isLink, tmp = tmp.spnl()
+				if isLink {
+					if tmp[0].isWhitespace() { // make sure there's a space before the title
+						_, tmp, title := t.parseLinkTitle(tmp)
+						if "" != title {
+							isLink, tmp = tmp.spnl()
+							if isLink && itemCloseParen == tmp[0].typ {
+								t.context.Pos++
+								matched = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if !matched {
+		t.context.Pos = savepos
+	}
+
+	if !matched {
+		// Next, see if there's a link label
+		//var beforelabel = t.context.Pos
+		_, _, label := t.parseLinkLabel(tokens[:t.context.Pos])
+		var n = len(label)
+		if n > 2 {
+			//reflabel = this.subject.slice(beforelabel, beforelabel+n)
+			reflabel = label
+		} else if !opener.bracketAfter {
+			// Empty or missing second label means to use the first label as the reference.
+			// The reference must not contain a bracket. If we know there's a bracket, we don't even bother checking it.
+			//reflabel = this.subject.slice(opener.index, startpos)
+			reflabel = tokens[opener.index:startPos].rawText()
+		}
+		if n == 0 {
+			// If shortcut reference link, rewind before spaces we skipped.
+			t.context.Pos = savepos
+		}
+
+		if "" != reflabel {
+			// lookup rawlabel in refmap
+			var link = t.context.LinkRefDef[reflabel]
+			if nil != link {
+				dest = link.URL
+				title = link.Title
+				matched = true
+			}
+		}
+	}
+
+	if matched {
+		var node Node
+		if isImage {
+			node = &Image{URL: dest, Title: title}
+		} else {
+			node = &Link{URL: dest, Title: title}
+		}
+
+		var tmp, next Node
+		tmp = opener.node.Next()
+		for nil != tmp {
+			next = tmp.Next()
+			tmp.Unlink()
+			node.AppendChild(node, tmp)
+			tmp = next
+		}
+
+		ret = node
+		t.processEmphasis(opener.previousDelimiter)
+		t.removeBracket()
+		opener.node.Unlink()
+
+		// We remove this bracket and processEmphasis will remove later delimiters.
+		// Now, for a link, we also deactivate earlier link openers.
+		// (no links in links)
+		if !isImage {
+			opener = t.context.Brackets
+			for nil != opener {
+				if !opener.image {
+					opener.active = false // deactivate this opener
+				}
+				opener = opener.previous
+			}
+		}
+
+		return
+	} else { // no match
+		t.removeBracket() // remove this opener from stack
+		t.context.Pos = startPos
+		ret = &Text{&BaseNode{typ: NodeText}, "]"}
+
+		return
+	}
+}
+
+func (t *Tree) parseOpenBracket(tokens items) (ret Node) {
+	startPos := t.context.Pos
+	t.context.Pos++
+
+	ret = &Text{&BaseNode{typ: NodeText}, "["}
+
+	// Add entry to stack for this opener
+	t.addBracket(ret, startPos, false)
+
+	return
+}
+
+func (t *Tree) addBracket(node Node, index int, image bool) {
+	if nil != t.context.Brackets {
+		t.context.Brackets.bracketAfter = true
+	}
+
+	t.context.Brackets = &delimiter{
+		node:              node,
+		previous:          t.context.Brackets,
+		previousDelimiter: t.context.Delimiters,
+		index:             index,
+		image:             image,
+		active:            true,
+	}
+}
+
+func (t *Tree) removeBracket() {
+	t.context.Brackets = t.context.Brackets.previous
 }
 
 func (t *Tree) parseBackslash(tokens items) (ret Node) {
