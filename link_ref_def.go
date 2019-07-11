@@ -16,6 +16,7 @@
 package lute
 
 import (
+	stdurl "net/url"
 	"strings"
 )
 
@@ -144,6 +145,10 @@ func (t *Tree) parseLinkDest(tokens items) (ret, remains items, url string) {
 	ret, remains, url = t.parseLinkDest1(tokens)
 	if nil == ret {
 		ret, remains, url = t.parseLinkDest2(tokens)
+	}
+	if nil != ret {
+		u, _ := stdurl.Parse(url)
+		url = u.String()
 	}
 
 	return
