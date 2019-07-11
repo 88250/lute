@@ -28,13 +28,8 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 
 	for {
 		_, line = line.trimLeft()
-		len := len(line)
-		for i, token := range line {
-			if itemBackslash != token.typ {
+		for _, token := range line {
 				p.tokens = append(p.tokens, token)
-			} else if i < len-1 && (!line[i+1].isASCIIPunct() || line[i+1].isNewline()) {
-				p.tokens = append(p.tokens, token)
-			}
 		}
 
 		line = t.nextLine()

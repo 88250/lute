@@ -322,7 +322,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 	t.context.Pos++
 
 	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
-	ret = &Text{baseNode, escapeHTML(token.val)}
+	ret = &Text{baseNode, token.val}
 
 	return
 }
@@ -333,7 +333,7 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	if 1 > len(tag) {
 		token := tokens[t.context.Pos]
 		baseNode := &BaseNode{typ: NodeText, rawText: token.val}
-		ret = &Text{baseNode, escapeHTML(token.val)}
+		ret = &Text{baseNode, token.val}
 		t.context.Pos++
 
 		return

@@ -114,14 +114,14 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 	}
 
 	n := node.(*Text)
-	r.WriteString(n.Value)
+	r.WriteString(escapeHTML(n.Value))
 
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<code>" + n.(*InlineCode).Value)
+		r.WriteString("<code>" + escapeHTML(n.(*InlineCode).Value))
 
 		return WalkSkipChildren, nil
 	}
@@ -136,7 +136,7 @@ func (r *Renderer) renderCode(node Node, entering bool) (WalkStatus, error) {
 		if "" != n.InfoStr {
 			r.WriteString("<pre><code class=\"language-" + n.InfoStr + "\">" + n.Value)
 		} else {
-			r.WriteString("<pre><code>" + n.Value)
+			r.WriteString("<pre><code>" + escapeHTML(n.Value))
 		}
 		return WalkSkipChildren, nil
 	}
