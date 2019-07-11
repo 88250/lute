@@ -46,10 +46,7 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	}
 
 	tokens := remains
-	linkDest, remains, url := t.parseLinkDest1(tokens)
-	if nil == linkDest {
-		linkDest, remains, url = t.parseLinkDest2(tokens)
-	}
+	linkDest, remains, url := t.parseLinkDest(tokens)
 	if nil == linkDest {
 		return false
 	}
@@ -70,6 +67,17 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	t.context.LinkRefDef[label] = link
 
 	return true
+}
+
+func (t *Tree) parseLinkText(tokens items) (ret, remains items, text string) {
+
+	return
+}
+
+func (t *Tree) parseLinkTitle(tokens items) (ret, remains items, title string) {
+	ret, remains, title = t.parseLinkTitle1(tokens)
+
+	return
 }
 
 func (t *Tree) parseLinkTitle1(tokens items) (ret, remains items, title string) {
@@ -106,6 +114,15 @@ func (t *Tree) parseLinkTitle1(tokens items) (ret, remains items, title string) 
 	}
 
 	remains = tokens[i+1:]
+
+	return
+}
+
+func (t *Tree) parseLinkDest(tokens items) (ret, remains items, url string) {
+	ret, remains, url = t.parseLinkDest1(tokens)
+	if nil == ret {
+		ret, remains, url = t.parseLinkDest2(tokens)
+	}
 
 	return
 }
