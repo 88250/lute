@@ -29,7 +29,8 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec cases
 
-	{"spec173", "[foo]\n\n[foo]: first\n[foo]: second\n", "<p><a href=\"first\">foo</a></p>\n"},
+	//{"spec175", "[ΑΓΩ]: /φου\n\n[αγω]\n", "<p><a href=\"/%CF%86%CE%BF%CF%85\">αγω</a></p>\n"},
+	//{"spec173", "[foo]\n\n[foo]: first\n[foo]: second\n", "<p><a href=\"first\">foo</a></p>\n"},
 	{"spec171", "[foo]: /url\\bar\\*baz \"foo\\\"bar\\baz\"\n\n[foo]\n", "<p><a href=\"/url%5Cbar*baz\" title=\"foo&quot;bar\\baz\">foo</a></p>\n"},
 	{"spec170", "[foo]: <bar>(baz)\n\n[foo]\n", "<p>[foo]: <bar>(baz)</p>\n<p>[foo]</p>\n"},
 	{"spec168", "[foo]:\n\n[foo]\n", "<p>[foo]:</p>\n<p>[foo]</p>\n"},

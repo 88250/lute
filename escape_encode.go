@@ -33,25 +33,27 @@ func escapeHTML(html string) string {
 }
 
 func unescapeString(str string) string {
-	var ret string
-	for i := 0; i < len(str); i++ {
-		if isBackslashEscape(str, i) {
-			ret = ret[:len(ret)-1]
+	runes := []rune(str)
+
+	var retRunes []rune
+	for i := 0; i < len(runes); i++ {
+		if isBackslashEscape(runes, i) {
+			retRunes = retRunes[:len(retRunes)-1]
 		}
-		ret += string(str[i])
+		retRunes = append(retRunes, runes[i])
 	}
 
-	return ret
+	return string(retRunes)
 }
 
-func isBackslashEscape(str string, pos int) bool {
-	if !unicode.IsPunct(rune(str[pos])) {
+func isBackslashEscape(runes []rune, pos int) bool {
+	if !unicode.IsPunct(runes[pos]) {
 		return false
 	}
 
 	backslashes := 0
 	for i := pos - 1; 0 <= i; i-- {
-		if '\\' != str[i] {
+		if '\\' != runes[i] {
 			break
 		}
 
@@ -63,6 +65,7 @@ func isBackslashEscape(str string, pos int) bool {
 
 func encodeDestination(destination string) (ret string) {
 	destination = unescapeString(destination)
+	destination = decodeDestination(destination)
 	u, e := url.Parse(destination)
 	if nil != e {
 		return destination
@@ -71,7 +74,16 @@ func encodeDestination(destination string) (ret string) {
 	ret = u.String()
 	ret = compatibleJSEncodeURIComponent(ret)
 
-	return ret
+	return
+}
+
+func decodeDestination(destination string) (ret string) {
+	ret, e := url.QueryUnescape(destination)
+	if nil != e {
+		return destination
+	}
+
+	return
 }
 
 func compatibleJSEncodeURIComponent(str string) string {
