@@ -64,6 +64,9 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	link := &Link{&BaseNode{typ: NodeLink}, url, ""}
 
 	whitespaces, remains = remains.trimLeft()
+	if nil == whitespaces {
+		return false
+	}
 	newlines, _, _ = whitespaces.statWhitespace()
 	if 1 < newlines {
 		return false
