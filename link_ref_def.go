@@ -60,6 +60,8 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 		return false
 	}
 
+	link := &Link{&BaseNode{typ: NodeLink}, url, ""}
+
 	whitespaces, remains = remains.trimLeft()
 	newlines, _, _ = whitespaces.statWhitespace()
 	if 1 < newlines {
@@ -68,7 +70,8 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	if 1 > len(remains) {
 		remains = t.nextLine()
 		if remains.isBlankLine() {
-			return false
+			t.context.LinkRefDef[label] = link
+			return true
 		}
 
 		_, remains = remains.trimLeft()
@@ -80,7 +83,7 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 		return false
 	}
 
-	link := &Link{&BaseNode{typ: NodeLink}, url, title}
+	link.Title = title
 	t.context.LinkRefDef[label] = link
 
 	return true
@@ -157,8 +160,12 @@ func (t *Tree) parseLinkDest(tokens items) (ret, remains items, url string) {
 		ret, remains, url = t.parseLinkDest2(tokens)
 	}
 	if nil != ret {
-		u, _ := stdurl.Parse(url)
-		url = u.String()
+		u, err := stdurl.Parse(url)
+		if nil == err {
+			url = u.String()
+		} else {
+			url = url
+		}
 	}
 
 	return
@@ -168,12 +175,13 @@ func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, url string) {
 	remains = tokens
 	var leftParens, rightParens int
 	i := 0
-	for ; i < len(tokens); i++ {
+	length := len(tokens)
+	for ; i < length; i++ {
 		token := tokens[i]
 		ret = append(ret, token)
 		url += token.val
 		if itemSpace == token.typ || token.isControl() {
-			url = url[0 : len(url)-1]
+			url = url[:len(url)-1]
 			ret = ret[:len(ret)-1]
 			break
 		}
@@ -190,6 +198,11 @@ func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, url string) {
 		ret = nil
 		url = ""
 		return
+	}
+
+	if length <= i {
+		i = length - 1
+		url = url[:len(url)-1]
 	}
 
 	remains = tokens[i:]
