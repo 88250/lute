@@ -346,14 +346,16 @@ func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 	t.context.Pos++
 	// check previous node for trailing spaces
 	var lastc = block.LastChild()
-	len := len(lastc.RawText())
-	rawText := lastc.RawText()
-	if nil != lastc && lastc.Type() == NodeText && rawText[len-1] == ' ' {
-		var hardbreak = rawText[len-2] == ' '
-		rawText = rawText[:len-1]
-		lastc.SetRawText(rawText)
+	if nil != lastc && lastc.Type() == NodeText && lastc.RawText() == " " {
+		previous := lastc.Previous()
+		hardbreak := nil != previous && previous.RawText() == " "
 		if hardbreak {
 			ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
+			for nil != lastc && lastc.RawText() == " " {
+				tmp := lastc.Previous()
+				lastc.Unlink()
+				lastc = tmp
+			}
 		} else {
 			ret = &SoftBreak{&BaseNode{typ: NodeSoftBreak}}
 		}

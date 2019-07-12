@@ -236,6 +236,7 @@ func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus, er
 func (r *Renderer) renderHardBreak(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.WriteString("<br />")
+		r.Newline()
 	}
 
 	return WalkContinue, nil
