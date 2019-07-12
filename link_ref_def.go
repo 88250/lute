@@ -278,27 +278,36 @@ func (t *Tree) parseLinkLabel(tokens items) (ret, remains items, label string) {
 		return
 	}
 
+	line := tokens
 	close := false
-	i := 0
-	for ; i < length; i++ {
-		token := tokens[i]
+	i := 1
+	for {
+		token := line[i]
 		ret = append(ret, token)
-		if 0 < i {
-			label += token.val
-		}
-
+		label += token.val
 		if itemCloseBracket == token.typ && !tokens.isBackslashEscape(i) {
 			close = true
 			label = label[0 : len(label)-1]
+			remains = line[i+1:]
 			break
 		}
+		if token.isNewline() {
+			line = t.nextLine()
+			if line.isBlankLine() {
+				t.backupLine(line)
+				break
+			}
+			i = 0
+			continue
+		}
+		i++
 	}
 
 	if !close || "" == strings.TrimSpace(label) || 999 < len(label) {
 		ret = nil
 	}
 
-	remains = tokens[i+1:]
+	label = strings.TrimSpace(label)
 
 	return
 }
