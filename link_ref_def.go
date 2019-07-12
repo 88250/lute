@@ -130,6 +130,7 @@ func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, 
 		if token.isNewline() {
 			line = t.nextLine()
 			if line.isBlankLine() {
+				t.backupLine(line)
 				break
 			}
 			i = 0

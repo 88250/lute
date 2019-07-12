@@ -91,18 +91,14 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 	opener = t.context.Brackets
 
 	if nil == opener {
-		// no matched opener, just return a literal
-		block.AppendChild(block, &Text{&BaseNode{typ: NodeText}, "]"})
-
+		t.context.Pos++
 		return
 	}
 
 	if !opener.active {
-		// no matched opener, just return a literal
-		block.AppendChild(block, &Text{&BaseNode{typ: NodeText}, "]"})
-
 		// take opener off brackets stack
 		t.removeBracket()
+		t.context.Pos++
 		return
 	}
 
