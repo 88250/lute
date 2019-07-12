@@ -20,7 +20,7 @@ type Blockquote struct {
 }
 
 func newBlockquote(t *Tree, token *item) (ret Node) {
-	baseNode := &BaseNode{typ: NodeBlockquote, parent: t.context.CurNode}
+	baseNode := &BaseNode{typ: NodeBlockquote}
 	ret = &Blockquote{baseNode}
 	t.context.CurNode = ret
 
