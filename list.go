@@ -121,6 +121,10 @@ func (t *Tree) isList(line items) bool {
 	}
 
 	_, line = line.trimLeft()
+	if 1 > len(line) {
+		return false
+	}
+
 	firstNonWhitespace := line[0]
 	if itemAsterisk == firstNonWhitespace.typ || itemHyphen == firstNonWhitespace.typ || itemPlus == firstNonWhitespace.typ {
 		return line[1].isWhitespace()
