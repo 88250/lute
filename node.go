@@ -264,8 +264,8 @@ type SoftBreak struct {
 
 type Link struct {
 	*BaseNode
-	URL   string
-	Title string
+	Destination string
+	Title       string
 }
 
 type Image struct {

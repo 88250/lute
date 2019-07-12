@@ -16,7 +16,6 @@
 package lute
 
 import (
-	stdurl "net/url"
 	"strings"
 )
 
@@ -56,12 +55,12 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	}
 
 	tokens := remains
-	linkDest, remains, url := t.parseLinkDest(tokens)
+	linkDest, remains, destination := t.parseLinkDest(tokens)
 	if nil == linkDest {
 		return false
 	}
 
-	link := &Link{&BaseNode{typ: NodeLink}, url, ""}
+	link := &Link{&BaseNode{typ: NodeLink}, destination, ""}
 
 	whitespaces, remains = remains.trimLeft()
 	if nil == whitespaces {
@@ -158,24 +157,19 @@ func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, 
 	return
 }
 
-func (t *Tree) parseLinkDest(tokens items) (ret, remains items, url string) {
-	ret, remains, url = t.parseLinkDest1(tokens)
+func (t *Tree) parseLinkDest(tokens items) (ret, remains items, destination string) {
+	ret, remains, destination = t.parseLinkDest1(tokens)
 	if nil == ret {
-		ret, remains, url = t.parseLinkDest2(tokens)
+		ret, remains, destination = t.parseLinkDest2(tokens)
 	}
 	if nil != ret {
-		u, err := stdurl.Parse(url)
-		if nil == err {
-			url = u.String()
-		} else {
-			url = url
-		}
+		destination = encodeDestination(destination)
 	}
 
 	return
 }
 
-func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, url string) {
+func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, destination string) {
 	remains = tokens
 	var leftParens, rightParens int
 	i := 0
@@ -183,9 +177,9 @@ func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, url string) {
 	for ; i < length; i++ {
 		token := tokens[i]
 		ret = append(ret, token)
-		url += token.val
+		destination += token.val
 		if itemSpace == token.typ || token.isControl() {
-			url = url[:len(url)-1]
+			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
 			break
 		}
@@ -200,13 +194,13 @@ func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, url string) {
 
 	if leftParens != rightParens {
 		ret = nil
-		url = ""
+		destination = ""
 		return
 	}
 
 	if length <= i {
 		i = length - 1
-		url = url[:len(url)-1]
+		destination = destination[:len(destination)-1]
 	}
 
 	remains = tokens[i:]
@@ -214,7 +208,7 @@ func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, url string) {
 	return
 }
 
-func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, url string) {
+func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, destination string) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -231,24 +225,24 @@ func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, url string) {
 		token := tokens[i]
 		ret = append(ret, token)
 		if 0 < i {
-			url += token.val
+			destination += token.val
 			if itemLess == token.typ && !tokens.isBackslashEscape(i) {
 				ret = nil
-				url = ""
+				destination = ""
 				return
 			}
 		}
 
 		if itemGreater == token.typ && !tokens.isBackslashEscape(i) {
 			close = true
-			url = url[0 : len(url)-1]
+			destination = destination[0 : len(destination)-1]
 			break
 		}
 	}
 
 	if !close {
 		ret = nil
-		url = ""
+		destination = ""
 
 		return
 	}

@@ -15,7 +15,11 @@
 
 package lute
 
-import "strings"
+import (
+	"net/url"
+	"strings"
+	"unicode"
+)
 
 var htmlEscaper = strings.NewReplacer(
 	`&`, "&amp;",
@@ -26,4 +30,57 @@ var htmlEscaper = strings.NewReplacer(
 
 func escapeHTML(html string) string {
 	return htmlEscaper.Replace(html)
+}
+
+func unescapeString(str string) string {
+	var ret string
+	for i := 0; i < len(str); i++ {
+		if isBlackslashEscape(str, i) {
+			ret = ret[:len(ret)-1]
+		}
+		ret += string(str[i])
+	}
+
+	return ret
+}
+
+func isBlackslashEscape(str string, pos int) bool {
+	if !unicode.IsPunct(rune(str[pos])) {
+		return false
+	}
+
+	backslashes := 0
+	for i := pos - 1; 0 <= i; i-- {
+		if '\\' != str[i] {
+			break
+		}
+
+		backslashes++
+	}
+
+	return 0 != backslashes%2
+}
+
+func encodeDestination(destination string) (ret string) {
+	destination = unescapeString(destination)
+	u, e := url.ParseRequestURI(destination)
+	if nil != e {
+		return destination
+	}
+
+	ret = u.String()
+	ret = compatibleJSEncodeURIComponent(ret)
+
+	return ret
+}
+
+func compatibleJSEncodeURIComponent(str string) string {
+	str = strings.ReplaceAll(str, "+", "%20")
+	str = strings.ReplaceAll(str, "%21", "!")
+	str = strings.ReplaceAll(str, "%27", "'")
+	str = strings.ReplaceAll(str, "%28", "(")
+	str = strings.ReplaceAll(str, "%29", ")")
+	str = strings.ReplaceAll(str, "%2A", "*")
+
+	return str
 }

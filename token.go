@@ -464,6 +464,10 @@ func (tokens items) endWith(itemType itemType) bool {
 }
 
 func (tokens items) isBackslashEscape(pos int) bool {
+	if !tokens[pos].isASCIIPunct() {
+		return false
+	}
+
 	backslashes := 0
 	for i := pos - 1; 0 <= i; i-- {
 		if itemBackslash != tokens[i].typ {

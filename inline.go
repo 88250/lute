@@ -163,7 +163,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 			// lookup rawlabel in refmap
 			var link = t.context.LinkRefDef[reflabel]
 			if nil != link {
-				dest = link.URL
+				dest = link.Destination
 				title = link.Title
 				matched = true
 			}
