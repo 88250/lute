@@ -28,9 +28,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 
 	for {
 		_, line = line.trimLeft()
-		for _, token := range line {
-				p.tokens = append(p.tokens, token)
-		}
+		p.tokens = append(p.tokens, line...)
 
 		line = t.nextLine()
 		if line.isBlankLine() {

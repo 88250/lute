@@ -220,13 +220,12 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 }
 
 func (t *Tree) parseOpenBracket(tokens items) (ret Node) {
-	startPos := t.context.Pos
 	t.context.Pos++
 
 	ret = &Text{&BaseNode{typ: NodeText}, "["}
 
 	// Add entry to stack for this opener
-	t.addBracket(ret, startPos, false)
+	t.addBracket(ret, t.context.Pos, false)
 
 	return
 }
