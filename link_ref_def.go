@@ -114,19 +114,28 @@ func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, 
 		return
 	}
 
+	ret = append(ret, tokens[0])
+	line := tokens
 	close := false
-	i := 0
-	for ; i < length; i++ {
-		token := tokens[i]
+	i := 1
+	for {
+		token := line[i]
 		ret = append(ret, token)
-		if 0 < i {
-			title += token.val
-			if closer == token.typ && !tokens.isBackslashEscape(i) {
-				close = true
-				title = title[:len(title)-1]
+		title += token.val
+		if closer == token.typ && !tokens.isBackslashEscape(i) {
+			close = true
+			title = title[:len(title)-1]
+			break
+		}
+		if token.isNewline() {
+			line = t.nextLine()
+			if line.isBlankLine() {
 				break
 			}
+			i = 0
+			continue
 		}
+		i++
 	}
 
 	if !close {
