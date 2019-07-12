@@ -48,6 +48,7 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	if 1 > len(remains) {
 		remains = t.nextLine()
 		if remains.isBlankLine() {
+			t.backupLine(remains)
 			return false
 		}
 
