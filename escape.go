@@ -35,7 +35,7 @@ func escapeHTML(html string) string {
 func unescapeString(str string) string {
 	var ret string
 	for i := 0; i < len(str); i++ {
-		if isBlackslashEscape(str, i) {
+		if isBackslashEscape(str, i) {
 			ret = ret[:len(ret)-1]
 		}
 		ret += string(str[i])
@@ -44,7 +44,7 @@ func unescapeString(str string) string {
 	return ret
 }
 
-func isBlackslashEscape(str string, pos int) bool {
+func isBackslashEscape(str string, pos int) bool {
 	if !unicode.IsPunct(rune(str[pos])) {
 		return false
 	}
@@ -63,7 +63,7 @@ func isBlackslashEscape(str string, pos int) bool {
 
 func encodeDestination(destination string) (ret string) {
 	destination = unescapeString(destination)
-	u, e := url.ParseRequestURI(destination)
+	u, e := url.Parse(destination)
 	if nil != e {
 		return destination
 	}

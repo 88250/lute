@@ -29,12 +29,14 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec cases
 
+	{"spec173", "[foo]\n\n[foo]: first\n[foo]: second\n", "<p><a href=\"first\">foo</a></p>\n"},
 	{"spec171", "[foo]: /url\\bar\\*baz \"foo\\\"bar\\baz\"\n\n[foo]\n", "<p><a href=\"/url%5Cbar*baz\" title=\"foo&quot;bar\\baz\">foo</a></p>\n"},
 	{"spec170", "[foo]: <bar>(baz)\n\n[foo]\n", "<p>[foo]: <bar>(baz)</p>\n<p>[foo]</p>\n"},
 	{"spec168", "[foo]:\n\n[foo]\n", "<p>[foo]:</p>\n<p>[foo]</p>\n"},
 	{"spec167", "[foo]:\n/url\n\n[foo]\n", "<p><a href=\"/url\">foo</a></p>\n"},
 	{"spec166", "[foo]: /url 'title\n\nwith blank line'\n\n[foo]\n", "<p>[foo]: /url 'title</p>\n<p>with blank line'</p>\n<p>[foo]</p>\n"},
 	{"spec165", "[foo]: /url '\ntitle\nline1\nline2\n'\n\n[foo]\n", "<p><a href=\"/url\" title=\"\ntitle\nline1\nline2\n\">foo</a></p>\n"},
+	{"spec164", "[Foo bar]:\n<my url>\n'title'\n\n[Foo bar]\n", "<p><a href=\"my%20url\" title=\"title\">Foo bar</a></p>\n"},
 	{"spec163", "[Foo*bar\\]]:my_(url) 'title (with parens)'\n\n[Foo*bar\\]]\n", "<p><a href=\"my_(url)\" title=\"title (with parens)\">Foo*bar]</a></p>\n"},
 	{"spec162", "   [foo]: \n      /url  \n           'the title'  \n\n[foo]\n", "<p><a href=\"/url\" title=\"the title\">foo</a></p>\n"},
 	{"spec161", "[foo]: /url \"title\"\n\n[foo]\n", "<p><a href=\"/url\" title=\"title\">foo</a></p>\n"},

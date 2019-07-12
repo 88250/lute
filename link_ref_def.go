@@ -30,10 +30,6 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 		return false
 	}
 
-	if nil != t.context.LinkRefDef[label] {
-		return false
-	}
-
 	if itemColon != remains[0].typ {
 		return false
 	}
@@ -70,24 +66,41 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	if 1 < newlines {
 		return false
 	}
+
+	lowerCaseLabel := strings.ToLower(label)
+
+	var nextLine items
 	if 1 > len(remains) {
-		remains = t.nextLine()
-		if remains.isBlankLine() {
-			t.context.LinkRefDef[label] = link
+		nextLine = t.nextLine()
+		if nextLine.isBlankLine() {
+			if _, ok := t.context.LinkRefDef[lowerCaseLabel]; !ok {
+				t.context.LinkRefDef[lowerCaseLabel] = link
+			}
 			return true
 		}
 
-		_, remains = remains.trimLeft()
+		_, nextLine = nextLine.trimLeft()
+		remains = nextLine
 	}
 
 	tokens = remains
 	_, remains, title := t.parseLinkTitle(tokens)
 	if !remains.isBlankLine() {
+		if nil != nextLine {
+			t.backupLine(nextLine)
+			if _, ok := t.context.LinkRefDef[lowerCaseLabel]; !ok {
+				t.context.LinkRefDef[lowerCaseLabel] = link
+			}
+
+			return true
+		}
 		return false
 	}
 
 	link.Title = title
-	t.context.LinkRefDef[label] = link
+	if _, ok := t.context.LinkRefDef[lowerCaseLabel]; !ok {
+		t.context.LinkRefDef[lowerCaseLabel] = link
+	}
 
 	return true
 }
@@ -104,6 +117,9 @@ func (t *Tree) parseLinkTitle(tokens items) (ret, remains items, title string) {
 		if nil == ret {
 			ret, remains, title = t.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
 		}
+	}
+	if "" != title {
+		title = unescapeString(title)
 	}
 
 	return

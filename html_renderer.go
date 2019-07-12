@@ -46,9 +46,9 @@ func NewHTMLRenderer() (ret *Renderer) {
 func (r *Renderer) renderLink(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*Link)
-		out := "<a href=\"" + n.Destination + "\""
+		out := "<a href=\"" + escapeHTML(n.Destination) + "\""
 		if "" != n.Title {
-			out += " title=\"" + n.Title + "\""
+			out += " title=\"" + escapeHTML(n.Title) + "\""
 		}
 		out += ">"
 		r.WriteString(out)

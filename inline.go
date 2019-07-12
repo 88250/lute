@@ -15,6 +15,8 @@
 
 package lute
 
+import "strings"
+
 func (t *Tree) parseInlines() {
 	t.context.Delimiters = nil
 	t.context.Brackets = nil
@@ -161,7 +163,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 
 		if "" != reflabel {
 			// lookup rawlabel in refmap
-			var link = t.context.LinkRefDef[reflabel]
+			var link = t.context.LinkRefDef[strings.ToLower(reflabel)]
 			if nil != link {
 				dest = link.Destination
 				title = link.Title
