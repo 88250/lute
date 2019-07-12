@@ -138,14 +138,14 @@ func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, 
 
 	ret = append(ret, tokens[0])
 	line := tokens
-	close := false
+	closed := false
 	i := 1
 	for {
 		token := line[i]
 		ret = append(ret, token)
 		title += token.val
 		if closer == token.typ && !tokens.isBackslashEscape(i) {
-			close = true
+			closed = true
 			title = title[:len(title)-1]
 			break
 		}
@@ -161,7 +161,7 @@ func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, 
 		i++
 	}
 
-	if !close {
+	if !closed {
 		ret = nil
 		title = ""
 
@@ -235,7 +235,7 @@ func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, destination str
 		return
 	}
 
-	close := false
+	closed := false
 	i := 0
 	for ; i < length; i++ {
 		token := tokens[i]
@@ -250,13 +250,13 @@ func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, destination str
 		}
 
 		if itemGreater == token.typ && !tokens.isBackslashEscape(i) {
-			close = true
+			closed = true
 			destination = destination[0 : len(destination)-1]
 			break
 		}
 	}
 
-	if !close {
+	if !closed {
 		ret = nil
 		destination = ""
 
@@ -279,14 +279,14 @@ func (t *Tree) parseLinkLabel(tokens items) (ret, remains items, label string) {
 	}
 
 	line := tokens
-	close := false
+	closed := false
 	i := 1
 	for {
 		token := line[i]
 		ret = append(ret, token)
 		label += token.val
 		if itemCloseBracket == token.typ && !tokens.isBackslashEscape(i) {
-			close = true
+			closed = true
 			label = label[0 : len(label)-1]
 			remains = line[i+1:]
 			break
@@ -303,7 +303,7 @@ func (t *Tree) parseLinkLabel(tokens items) (ret, remains items, label string) {
 		i++
 	}
 
-	if !close || "" == strings.TrimSpace(label) || 999 < len(label) {
+	if !closed || "" == strings.TrimSpace(label) || 999 < len(label) {
 		ret = nil
 	}
 

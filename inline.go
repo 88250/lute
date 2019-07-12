@@ -81,16 +81,12 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 }
 
 func (t *Tree) parseCloseBracket(block Node, tokens items) {
-	var startPos int
-	var isImage bool
+	startPos := t.context.Pos
 	matched := false
 	var dest, title, reflabel string
-	var opener *delimiter
-
-	startPos = t.context.Pos
 
 	// get last [ or ![
-	opener = t.context.Brackets
+	opener := t.context.Brackets
 
 	if nil == opener {
 		t.context.Pos++
@@ -105,7 +101,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 	}
 
 	// If we got here, open is a potential opener
-	isImage = opener.image
+	isImage := opener.image
 
 	// Check to see if we have a link/image
 
@@ -144,17 +140,15 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 
 	if !matched {
 		// Next, see if there's a link label
-		//var beforelabel = t.context.Pos
-		_, _, label := t.parseLinkLabel(tokens[:t.context.Pos+1])
+		var beforelabel = t.context.Pos
+		_, _, label := t.parseLinkLabel(tokens[t.context.Pos:])
 		var n = len(label)
 		if n > 2 {
-			//reflabel = this.subject.slice(beforelabel, beforelabel+n)
-			reflabel = label
+			reflabel = tokens[beforelabel:beforelabel+n].rawText()
 		} else if !opener.bracketAfter {
 			// Empty or missing second label means to use the first label as the reference.
 			// The reference must not contain a bracket. If we know there's a bracket, we don't even bother checking it.
-			//reflabel = this.subject.slice(opener.index, startpos)
-			reflabel = tokens[opener.index:startPos].rawText()
+			_, reflabel = t.extractTokens(tokens, opener.index, startPos)
 		}
 		if n == 0 {
 			// If shortcut reference link, rewind before spaces we skipped.
