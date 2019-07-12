@@ -28,6 +28,7 @@ func newBlockquote(t *Tree, token *item) (ret Node) {
 }
 
 func (t *Tree) parseBlockquote(line items) (ret Node) {
+	_, line = line.trimLeft()
 	token := line[0]
 	indentSpaces := t.context.IndentSpaces + 2
 
@@ -41,10 +42,24 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 		ret.AppendChild(ret, n)
 
 		line = t.nextLine()
-		if t.isThematicBreak(line) || t.isBlockquoteClose(line) {
+		if line.isEOF() {
+			break
+		}
+		if t.isThematicBreak(line) {
 			t.backupLine(line)
 			break
 		}
+
+		closed, isContinuation := t.isBlockquoteClose(line)
+		if closed {
+			if !isContinuation {
+				t.backupLine(line)
+			}
+			break
+		}
+
+		_, line = line.trimLeft()
+		line = t.removeStartBlockquoteMarker(line)
 	}
 
 	return
@@ -73,14 +88,42 @@ func (t *Tree) removeStartBlockquoteMarker(line items) (ret items) {
 	return
 }
 
-func (t *Tree) isBlockquoteClose(line items) bool {
-	if line.isEOF() || NodeBlockquote != t.context.CurNode.Type() {
-		return false
+func (t *Tree) isBlockquoteClose(line items) (closed bool, isContinuation bool) {
+	if line.isEOF() {
+		return true, false
+	}
+
+	_, line = line.trimLeftSpace()
+
+	if NodeBlockquote != t.context.CurNode.Type() {
+		return
 	}
 
 	if itemNewline == line[0].typ {
-		return true
+		return true, false
 	}
 
-	return true
+	lastc := t.context.CurNode.LastChild()
+	if nil == lastc {
+		return true, false
+	}
+	if NodeParagraph != lastc.Type() {
+		if itemGreater != line[0].typ {
+			return true, false
+		}
+	} else {
+		line = t.removeStartBlockquoteMarker(line)
+		if t.interruptParagraph(line) {
+			return true, false
+		}
+
+		p := lastc.(*Paragraph)
+		continuation := t.parseParagraph(line)
+		p.tokens = append(p.tokens, tNewLine)
+		p.tokens = append(p.tokens, continuation.Tokens()...)
+
+		return true, true
+	}
+
+	return
 }

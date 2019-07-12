@@ -53,7 +53,8 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 		}
 
 		line = t.nextLine()
-		if t.isBlockquoteClose(line) || line.isEOF() {
+		blockquoteClosed, _ := t.isBlockquoteClose(line)
+		if blockquoteClosed {
 			line = t.removeStartBlockquoteMarker(line)
 			html.Value += line.rawText()
 			html.Value = strings.TrimRight(html.Value, "\n")
