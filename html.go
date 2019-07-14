@@ -53,7 +53,7 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 		}
 
 		line = t.nextLine()
-		blockquoteClosed, _ := t.isBlockquoteClose(line)
+		blockquoteClosed:= t.isBlockquote(line)
 		if blockquoteClosed {
 			line = t.removeStartBlockquoteMarker(line)
 			html.Value += line.rawText()

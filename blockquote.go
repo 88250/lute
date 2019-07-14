@@ -69,11 +69,21 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 			break
 		}
 
-		closed, isContinuation := t.isBlockquoteClose(line)
-		if closed {
-			if !isContinuation {
-				t.backupLine(line)
+		for {
+			if !t.isParagraphContinuation(line) {
+				break
 			}
+			lastc := t.context.CurNode.LastChild()
+			p := lastc.(*Paragraph)
+			line = t.removeStartBlockquoteMarker(line)
+			continuation := t.parseParagraph(line)
+			p.tokens = append(p.tokens, tNewLine)
+			p.tokens = append(p.tokens, continuation.Tokens()...)
+			line = t.nextLine()
+		}
+
+		if !t.isBlockquote(line) {
+			t.backupLine(line)
 			break
 		}
 
@@ -108,48 +118,26 @@ func (t *Tree) removeStartBlockquoteMarker(line items) (ret items) {
 	return
 }
 
-func (t *Tree) isBlockquoteClose(line items) (closed bool, isContinuation bool) {
-	if line.isEOF() {
-		return true, false
-	}
-
-	_, line = line.trimLeftSpace()
-
-	if NodeBlockquote != t.context.CurNode.Type() {
-		return
-	}
-
-	if itemNewline == line[0].typ {
-		return true, false
-	}
-
+func (t *Tree) isParagraphContinuation(line items) bool {
 	lastc := t.context.CurNode.LastChild()
 	if nil == lastc {
-		return true, false
+		return false
 	}
+
 	if NodeParagraph != lastc.Type() {
-		if itemGreater != line[0].typ {
-			return true, false
-		}
-	} else {
-		line = t.removeStartBlockquoteMarker(line)
-		if t.interruptParagraph(line) {
-			return true, false
-		}
-
-		if line.isBlankLine() {
-			return false, false
-		}
-
-		p := lastc.(*Paragraph)
-		continuation := t.parseParagraph(line)
-		p.tokens = append(p.tokens, tNewLine)
-		p.tokens = append(p.tokens, continuation.Tokens()...)
-
-		return true, true
+		return false
 	}
 
-	return
+	line = t.removeStartBlockquoteMarker(line)
+	if t.interruptParagraph(line) {
+		return false
+	}
+
+	if line.isBlankLine() {
+		return false
+	}
+
+	return true
 }
 
 func (t *Tree) blockquoteMarkerCount(line items) (ret int) {
