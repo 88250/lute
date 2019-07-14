@@ -39,6 +39,7 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 	atxHeadingLevel := 0
 	htmlType := -1
 	switch {
+	case line.isBlankLine():
 	case t.isIndentCode(line):
 		ret = t.parseIndentCode(line)
 	case t.isFencedCode(line):
@@ -54,8 +55,6 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 	case t.isHTML(line, &htmlType):
 		ret = t.parseHTML(line, htmlType)
 	case t.parseLinkRefDef(line):
-	case line.isBlankLine():
-		return
 	default:
 		ret = t.parseParagraph(line)
 	}

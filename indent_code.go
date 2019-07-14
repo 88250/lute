@@ -18,8 +18,8 @@ package lute
 func (t *Tree) parseIndentCode(line items) (ret Node) {
 	baseNode := &BaseNode{typ: NodeCode}
 	code := &Code{baseNode, "", ""}
-	var codeValue string
-Loop:
+
+	var chunks []items
 	for {
 		var spaces, tabs int
 		for i := 0; i < 4; i++ {
@@ -35,42 +35,9 @@ Loop:
 			}
 		}
 
-		if line.isBlankLine() {
-			return
-		}
-
-		for i := 0; i < len(line); i++ {
-			token := line[i]
-			codeValue += token.val
-			if token.isNewline() {
-				line = t.nextLine()
-				t.backupLine(line)
-				newlines, nonNewline := t.nonNewline()
-				if nonNewline.isEOF() {
-					break Loop
-				}
-
-				if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
-					t.backupLine(nonNewline)
-					break
-				}
-
-				line = nonNewline
-				spaces, tabs, _, _ := t.nonWhitespace(line)
-				if 1 > tabs && 4 > spaces {
-					t.backupLine(line)
-					break Loop
-				} else {
-					for _, token := range newlines{
-						codeValue += token.val
-						code.tokens = append(code.tokens, token)
-					}
-
-					continue Loop
-				}
-			}
-			code.tokens = append(code.tokens, token)
-		}
+		chunk := items{}
+		chunk = append(chunk, line...)
+		chunks = append(chunks, chunk)
 
 		line = t.nextLine()
 		if !t.isIndentCode(line) {
@@ -82,15 +49,27 @@ Loop:
 			t.backupLine(line)
 			break
 		}
+
 	}
 
-	code.Value = codeValue
+	if 1 > len(chunks) {
+		return nil
+	}
+
+	for _, chunk := range chunks {
+		code.Value += chunk.rawText()
+	}
+
 	ret = code
 
 	return
 }
 
 func (t *Tree) isIndentCode(line items) bool {
+	if line.isBlankLine() {
+		return false
+	}
+
 	var spaces int
 	for _, token := range line {
 		if itemSpace == token.typ {
