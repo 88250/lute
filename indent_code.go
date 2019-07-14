@@ -48,6 +48,11 @@ Loop:
 					break Loop
 				}
 
+				if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
+					t.backupLine(nonNewline)
+					break
+				}
+
 				line = nonNewline
 				spaces, tabs, _, _ := t.nonWhitespace(line)
 				if 1 > tabs && 4 > spaces {
@@ -66,6 +71,11 @@ Loop:
 
 		line = t.nextLine()
 		if !t.isIndentCode(line) {
+			t.backupLine(line)
+			break
+		}
+
+		if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
 			t.backupLine(line)
 			break
 		}
