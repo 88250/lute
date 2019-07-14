@@ -54,7 +54,7 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 		}
 
 		line = t.nextLine()
-		if t.isFencedCodeClose(line, marker, n){
+		if t.isFencedCodeClose(line, marker, n) {
 			break
 		}
 		closed, _ := t.isBlockquoteClose(line)
@@ -95,6 +95,9 @@ func (t *Tree) isFencedCodeClose(line items, openMarker *item, num int) bool {
 }
 
 func (t *Tree) isFencedCode(line items) bool {
+	if 3 > len(line) {
+		return false
+	}
 	spaces, line := line.trimLeftSpace()
 	if t.context.IndentSpaces+3 < spaces {
 		return false

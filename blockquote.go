@@ -44,7 +44,19 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 		n := t.parseBlock(line)
 		t.context.CurNode = curNode
 		if nil == n {
-			break
+			line = t.nextLine()
+			if !t.isBlockquote(line) {
+				t.backupLine(line)
+				break
+			}
+
+			t.backupLine(line)
+			line = t.skipBlankBlockquote()
+			if line.isEOF() {
+				break
+			}
+
+			continue
 		}
 		ret.AppendChild(ret, n)
 
@@ -90,7 +102,8 @@ func (t *Tree) removeStartBlockquoteMarker(line items) (ret items) {
 		return line
 	}
 
-	_, ret = line[1:].trimLeft()
+	for _, ret = line[1:].trimLeft(); 0 < len(ret) && (itemGreater == ret[0].typ || ret[0].isSpaceOrTab()); ret = ret[1:] {
+	}
 
 	return
 }
@@ -124,6 +137,10 @@ func (t *Tree) isBlockquoteClose(line items) (closed bool, isContinuation bool) 
 			return true, false
 		}
 
+		if line.isBlankLine() {
+			return false, false
+		}
+
 		p := lastc.(*Paragraph)
 		continuation := t.parseParagraph(line)
 		p.tokens = append(p.tokens, tNewLine)
@@ -146,4 +163,24 @@ func (t *Tree) blockquoteMarkerCount(line items) (ret int) {
 	}
 
 	return
+}
+
+func (t *Tree) skipBlankBlockquote() (line items) {
+	for {
+		line = t.nextLine()
+		if line.isEOF() {
+			return
+		}
+
+		if !t.isBlockquote(line) {
+			return line
+		}
+
+		remains := t.removeStartBlockquoteMarker(line)
+		if remains.isBlankLine() {
+			continue
+		}
+
+		return remains
+	}
 }

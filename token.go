@@ -43,6 +43,10 @@ func (i *item) isWhitespace() bool {
 	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ // TODO(D): line tabulation (U+000B), form feed (U+000C), or carriage return (U+000D)
 }
 
+func (i *item) isSpaceOrTab() bool {
+	return i.isSpace() || i.isTab()
+}
+
 func (i *item) isSpace() bool {
 	return itemSpace == i.typ
 }

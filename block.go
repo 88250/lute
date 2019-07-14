@@ -32,6 +32,10 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) parseBlock(line items) (ret Node) {
+	if 1 > len(line) || line.isEOF() {
+		return
+	}
+
 	atxHeadingLevel := 0
 	htmlType := -1
 	switch {
