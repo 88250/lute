@@ -40,12 +40,14 @@ func sanitize(text string) (ret string) {
 
 // Context use to store common data in parsing.
 type Context struct {
+	LinkRefDef   map[string]*Link
+	CurLine      items
+
 	// Blocks parsing
 
-	CurLine      items
 	CurNode      Node
 	IndentSpaces int
-	LinkRefDef   map[string]*Link
+	BlockquoteLevel int
 
 	// Inlines parsing
 

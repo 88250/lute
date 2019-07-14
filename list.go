@@ -100,11 +100,15 @@ func (t *Tree) parseList(line items) (ret Node) {
 		if markerText != line[0].val {
 			// TODO: 考虑有序列表序号递增
 			t.backupLine(line)
-
 			break
-		} else {
-			line = line[len(markerText):]
 		}
+
+		if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
+			t.backupLine(line)
+			break
+		}
+
+		line = line[len(markerText):]
 	}
 
 	ret.(*List).Tight = tight

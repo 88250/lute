@@ -31,11 +31,13 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 	_, line = line.trimLeft()
 	token := line[0]
 	indentSpaces := t.context.IndentSpaces + 2
-
+	t.context.BlockquoteLevel++
 	ret = newBlockquote(t, token)
 	line = t.indentOffset(line[1:], indentSpaces)
+	curNode := t.context.CurNode
 	for {
 		n := t.parseBlock(line)
+		t.context.CurNode = curNode
 		if nil == n {
 			break
 		}
@@ -123,6 +125,19 @@ func (t *Tree) isBlockquoteClose(line items) (closed bool, isContinuation bool) 
 		p.tokens = append(p.tokens, continuation.Tokens()...)
 
 		return true, true
+	}
+
+	return
+}
+
+func (t *Tree) blockquoteMarkerCount(line items) (ret int) {
+	_, line = line.trimLeft()
+	for _, token := range line {
+		if itemGreater == token.typ {
+			ret++
+		} else if itemSpace != token.typ && itemTab != token.typ {
+			break
+		}
 	}
 
 	return
