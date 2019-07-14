@@ -37,13 +37,18 @@ func (t *Tree) parseIndentCode(line items) (ret Node) {
 
 		chunk := items{}
 		chunk = append(chunk, line...)
-		chunks = append(chunks, chunk)
-
-		line = t.nextLine()
+		newlines, nonNewline := t.nonNewline()
+		line = nonNewline
 		if !t.isIndentCode(line) {
+			chunks = append(chunks, chunk)
 			t.backupLine(line)
 			break
 		}
+
+		if 0 < len(newlines) {
+			chunk = append(chunk, newlines...)
+		}
+		chunks = append(chunks, chunk)
 
 		if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
 			t.backupLine(line)
