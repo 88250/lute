@@ -41,6 +41,9 @@ func (t *Tree) parseIndentCode(line items) (ret Node) {
 		line = nonNewline
 		if !t.isIndentCode(line) {
 			chunks = append(chunks, chunk)
+			if 0 < len(newlines) {
+				t.backupLine(newlines)
+			}
 			t.backupLine(line)
 			break
 		}
