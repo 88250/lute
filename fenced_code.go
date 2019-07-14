@@ -57,13 +57,12 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 		if t.isFencedCodeClose(line, marker, n) {
 			break
 		}
-		closed := t.isBlockquote(line)
-		if closed {
+		if line.isEOF() {
 			break
 		}
 
 		if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
-			t.backupLine(line)
+			//t.backupLine(line)
 			break
 		}
 	}

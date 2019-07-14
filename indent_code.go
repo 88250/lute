@@ -43,6 +43,8 @@ Loop:
 			token := line[i]
 			codeValue += token.val
 			if token.isNewline() {
+				line = t.nextLine()
+				t.backupLine(line)
 				newlines, nonNewline := t.nonNewline()
 				if nonNewline.isEOF() {
 					break Loop
@@ -59,9 +61,10 @@ Loop:
 					t.backupLine(line)
 					break Loop
 				} else {
-					codeValue += newlines.rawText()
-					newlines = append(newlines, token)
-					code.tokens = append(code.tokens, newlines...)
+					for _, token := range newlines{
+						codeValue += token.val
+						code.tokens = append(code.tokens, token)
+					}
 
 					continue Loop
 				}

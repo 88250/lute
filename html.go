@@ -53,12 +53,12 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 		}
 
 		line = t.nextLine()
-		blockquoteClosed:= t.isBlockquote(line)
-		if blockquoteClosed {
-			line = t.removeStartBlockquoteMarker(line)
-			html.Value += line.rawText()
-			html.Value = strings.TrimRight(html.Value, "\n")
+		if line.isEOF() {
 			break
+		}
+
+		if 0 < t.context.BlockquoteLevel {
+			line = t.removeStartBlockquoteMarker(line)
 		}
 
 		if t.isList(line) {
