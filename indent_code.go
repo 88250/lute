@@ -21,17 +21,21 @@ func (t *Tree) parseIndentCode(line items) (ret Node) {
 
 	var chunks []items
 	for {
-		var spaces, tabs int
-		for i := 0; i < 4; i++ {
-			token := line[i]
-			if itemSpace == token.typ {
-				spaces++
-			} else if itemTab == token.typ {
-				tabs++
-			}
-			if 3 < spaces || 0 < tabs {
-				line = line[i+1:]
-				break
+		if t.context.IndentSpaces + 3 < line.spaceCountLeft() {
+			line = t.indentOffset(line, t.context.IndentSpaces + 4)
+		} else {
+			var spaces, tabs int
+			for i := 0; i < 4; i++ {
+				token := line[i]
+				if itemSpace == token.typ {
+					spaces++
+				} else if itemTab == token.typ {
+					tabs++
+				}
+				if 3 < spaces || 0 < tabs {
+					line = line[i+1:]
+					break
+				}
 			}
 		}
 

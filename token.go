@@ -390,12 +390,14 @@ func (tokens items) removeSpacesTabs() (ret items) {
 	return
 }
 
-func (tokens items) whitespaceCountLeft() (count int) {
+func (tokens items) spaceCountLeft() (count int) {
 	for _, token := range tokens {
-		if !token.isWhitespace() {
-			break
-		} else {
+		if itemSpace == token.typ {
 			count++
+		} else if itemTab == token.typ {
+			count += 4
+		} else {
+			break
 		}
 	}
 

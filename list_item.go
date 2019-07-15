@@ -68,8 +68,6 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 
 			break
 		}
-
-		line = t.indentOffset(line, indentSpaces)
 	}
 
 	if 1 < len(ret.Children()) && blankLineBetweenBlocks {

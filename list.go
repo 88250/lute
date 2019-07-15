@@ -46,10 +46,10 @@ func newList(indentSpaces int, marker string, bullet bool, wnSpaces int, t *Tree
 }
 
 func (t *Tree) parseList(line items) (ret Node) {
+	t.context.ListLevel++
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	var marker items
 	marker = append(marker, firstNonWhitespace)
-	indentSpaces := spaces + tabs*4
 	line = line[len(tokens):]
 	bullet := true
 	if firstNonWhitespace.isNumInt() {
@@ -57,26 +57,18 @@ func (t *Tree) parseList(line items) (ret Node) {
 		marker = append(marker, line[0])
 		line = line[1:]
 	}
-
 	markerText := marker.rawText()
 	spaces, tabs, _, firstNonWhitespace = t.nonWhitespace(line)
 	w := len(markerText)
 	n := spaces + tabs*4
 	wnSpaces := w + n
-	oldContextIndentSpaces := t.context.IndentSpaces
-	t.context.IndentSpaces = indentSpaces + wnSpaces
-	if 4 <= n {
-		line = t.indentOffset(line, w+1)
-		t.context.IndentSpaces = 2
-	} else {
-		line = t.indentOffset(line, indentSpaces+wnSpaces)
-	}
+	indentSpaces := wnSpaces
+	t.context.IndentSpaces = indentSpaces
 	ret = newList(indentSpaces, markerText, bullet, wnSpaces, t)
 	tight := false
 
-	defer func() { t.context.IndentSpaces = oldContextIndentSpaces }()
-
 	for {
+		line = t.indentOffset(line, indentSpaces)
 		n := t.parseListItem(line)
 		if nil == n {
 			break
