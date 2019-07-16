@@ -19,7 +19,7 @@ type Blockquote struct {
 	*BaseNode
 }
 
-func newBlockquote(t *Tree, token *item) (ret Node) {
+func newBlockquote(t *Tree) (ret Node) {
 	baseNode := &BaseNode{typ: NodeBlockquote}
 	ret = &Blockquote{baseNode}
 	t.context.CurNode = ret
@@ -29,18 +29,16 @@ func newBlockquote(t *Tree, token *item) (ret Node) {
 
 func (t *Tree) parseBlockquote(line items) (ret Node) {
 	t.context.BlockquoteLevel++
-	indentSpaces := t.context.IndentSpaces + 2
-	t.context.IndentSpaces += indentSpaces
 	_, line = line.trimLeft()
-	token := line[0]
-	ret = newBlockquote(t, token)
+	ret = newBlockquote(t)
 	line = line[1:]
-	if itemSpace == line[0].typ {
+	if line[0].isSpace() {
 		line = line[1:]
+	} else if line[0].isTab() {
+		line = t.indentOffset(line, 2)
 	}
 	curNode := t.context.CurNode
 	for {
-		line = t.indentOffset(line, t.context.IndentSpaces)
 		n := t.parseBlock(line)
 		t.context.CurNode = curNode
 		if nil == n {

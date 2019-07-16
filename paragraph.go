@@ -42,7 +42,8 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			return
 		}
 
-		if t.interruptParagraph(line) {
+		tokens := t.indentOffset(line, t.context.IndentSpaces)
+		if t.interruptParagraph(tokens) {
 			t.backupLine(line)
 
 			break
