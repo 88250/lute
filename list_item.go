@@ -40,10 +40,12 @@ func newListItem(indentSpaces int, t *Tree, token *item) (ret Node) {
 }
 
 func (t *Tree) parseListItem(line items) (ret Node) {
+	//indentSpaces := t.context.IndentSpaces + 2
 	indentSpaces := t.context.IndentSpaces
 	ret = newListItem(indentSpaces, t, line[0])
 	blankLineBetweenBlocks := false
 	for {
+		line = t.indentOffset(line, t.context.IndentSpaces)
 		n := t.parseBlock(line)
 		if nil == n {
 			line = t.nextLine()

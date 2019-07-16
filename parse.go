@@ -48,7 +48,6 @@ type Context struct {
 	CurNode         Node
 	IndentSpaces    int
 	BlockquoteLevel int
-	ListLevel       int
 
 	// Inlines parsing
 
