@@ -98,7 +98,7 @@ func (t *Tree) isBlockquote(line items) bool {
 	}
 
 	_, marker := line.firstNonSpace()
-	if ">" != marker.val {
+	if itemGreater != marker.typ {
 		return false
 	}
 
