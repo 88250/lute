@@ -57,9 +57,7 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 			break
 		}
 
-		if 0 < t.context.BlockquoteLevel {
-			line = t.removeStartBlockquoteMarker(line)
-		}
+		line = t.removeStartBlockquoteMarker(line)
 
 		if t.isList(line) {
 			html.Value = strings.TrimRight(html.Value, "\n")

@@ -89,6 +89,8 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 		line = t.removeStartBlockquoteMarker(line)
 	}
 
+	t.context.BlockquoteLevel--
+
 	return
 }
 
@@ -110,7 +112,16 @@ func (t *Tree) removeStartBlockquoteMarker(line items) (ret items) {
 		return line
 	}
 
+	count := t.context.BlockquoteLevel
+	if 1 > count {
+		return line
+	}
+
+	i := 0
 	for _, ret = line[1:].trimLeft(); 0 < len(ret) && (itemGreater == ret[0].typ || ret[0].isSpaceOrTab()); ret = ret[1:] {
+		if i++; count < i {
+			break
+		}
 	}
 
 	return
