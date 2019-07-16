@@ -24,19 +24,17 @@ type List struct {
 	Start  int
 	Tight  bool
 
-	IndentSpaces int
-	Marker       string
-	WNSpaces     int
+	Marker   string
+	WNSpaces int
 }
 
-func newList(indentSpaces int, marker string, bullet bool, wnSpaces int, t *Tree) (ret Node) {
+func newList(marker string, bullet bool, wnSpaces int, t *Tree) (ret Node) {
 	baseNode := &BaseNode{typ: NodeList}
 	ret = &List{
 		baseNode,
 		bullet,
 		1,
 		false,
-		indentSpaces,
 		marker,
 		wnSpaces,
 	}
@@ -56,21 +54,21 @@ func (t *Tree) parseList(line items) (ret Node) {
 		marker = append(marker, line[0])
 		line = line[1:]
 	}
+	startIndentSpaces := spaces + tabs*4
 	markerText := marker.rawText()
 	spaces, tabs, _, firstNonWhitespace = t.nonWhitespace(line)
 	w := len(markerText)
 	n := spaces + tabs*4
 	wnSpaces := w + n
-	indentSpaces := wnSpaces
-	if 4 < indentSpaces {
-		indentSpaces = 2
-	}
-	t.context.IndentSpaces += indentSpaces
-	ret = newList(indentSpaces, markerText, bullet, wnSpaces, t)
+	t.context.IndentSpaces += startIndentSpaces + wnSpaces
+	ret = newList(markerText, bullet, wnSpaces, t)
 	tight := false
-
+	if 4 < n {
+		line = t.indentOffset(line, w+1)
+	} else {
+		line = t.indentOffset(line, 1)
+	}
 	for {
-		line = t.indentOffset(line, t.context.IndentSpaces)
 		n := t.parseListItem(line)
 		if nil == n {
 			break
@@ -103,6 +101,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 		}
 
 		line = line[len(markerText):]
+		line = t.indentOffset(line, t.context.IndentSpaces)
 	}
 
 	ret.(*List).Tight = tight

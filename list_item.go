@@ -35,8 +35,6 @@ func newListItem(t *Tree, token *item) (ret Node) {
 }
 
 func (t *Tree) parseListItem(line items) (ret Node) {
-	//indentSpaces := t.context.IndentSpaces + 2
-	indentSpaces := t.context.IndentSpaces
 	ret = newListItem(t, line[0])
 	blankLineBetweenBlocks := false
 	for {
@@ -59,7 +57,7 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 
 		spaces, tabs, _, _ := t.nonWhitespace(line)
 		totalSpaces := spaces + tabs*4
-		if totalSpaces < indentSpaces {
+		if totalSpaces < t.context.IndentSpaces {
 			t.backupLine(line)
 
 			break
