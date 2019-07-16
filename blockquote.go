@@ -30,7 +30,7 @@ func newBlockquote(t *Tree, token *item) (ret Node) {
 func (t *Tree) parseBlockquote(line items) (ret Node) {
 	t.context.BlockquoteLevel++
 	indentSpaces := t.context.IndentSpaces + 2
-	t.context.IndentSpaces = indentSpaces
+	t.context.IndentSpaces += indentSpaces
 	_, line = line.trimLeft()
 	token := line[0]
 	ret = newBlockquote(t, token)

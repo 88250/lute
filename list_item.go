@@ -17,22 +17,17 @@ package lute
 
 type ListItem struct {
 	*BaseNode
-	int
-	t *Tree
 
 	Checked bool
 	Tight   bool
-
-	Spaces int
 }
 
-func newListItem(indentSpaces int, t *Tree, token *item) (ret Node) {
+func newListItem(t *Tree, token *item) (ret Node) {
 	baseNode := &BaseNode{typ: NodeListItem, tokens:items{}}
 	ret = &ListItem{
-		baseNode, token.pos,  t,
+		baseNode,
 		false,
 		true,
-		indentSpaces,
 	}
 	t.context.CurNode = ret
 
@@ -42,7 +37,7 @@ func newListItem(indentSpaces int, t *Tree, token *item) (ret Node) {
 func (t *Tree) parseListItem(line items) (ret Node) {
 	//indentSpaces := t.context.IndentSpaces + 2
 	indentSpaces := t.context.IndentSpaces
-	ret = newListItem(indentSpaces, t, line[0])
+	ret = newListItem(t, line[0])
 	blankLineBetweenBlocks := false
 	for {
 		n := t.parseBlock(line)

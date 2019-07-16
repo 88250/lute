@@ -65,7 +65,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 	if 4 < indentSpaces {
 		indentSpaces = 2
 	}
-	t.context.IndentSpaces = indentSpaces
+	t.context.IndentSpaces += indentSpaces
 	ret = newList(indentSpaces, markerText, bullet, wnSpaces, t)
 	tight := false
 
