@@ -22,7 +22,7 @@ type ListItem struct {
 	Tight   bool
 }
 
-func newListItem(t *Tree, token *item) (ret Node) {
+func newListItem(t *Tree) (ret Node) {
 	baseNode := &BaseNode{typ: NodeListItem, tokens: items{}}
 	ret = &ListItem{
 		baseNode,
@@ -35,7 +35,7 @@ func newListItem(t *Tree, token *item) (ret Node) {
 }
 
 func (t *Tree) parseListItem(line items) (ret Node) {
-	ret = newListItem(t, line[0])
+	ret = newListItem(t)
 	blankLineBetweenBlocks := false
 	for {
 		n := t.parseBlock(line)

@@ -65,6 +65,8 @@ func (t *Tree) parseList(line items) (ret Node) {
 	n := spaces + tabs*4
 	if 4 < n {
 		n = 1
+	} else if 1 > n {
+		n = 1
 	}
 	wnSpaces := w + n
 	t.context.IndentSpaces += startIndentSpaces + wnSpaces
@@ -77,6 +79,15 @@ func (t *Tree) parseList(line items) (ret Node) {
 	}
 
 	for {
+		if line.isBlankLine() {
+			line = t.nextLine()
+			if line.isBlankLine() {
+				ret.AppendChild(ret, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
+				break
+			}
+			line = t.indentOffset(line, t.context.IndentSpaces)
+		}
+
 		n := t.parseListItem(line)
 		if nil == n {
 			break
