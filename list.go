@@ -101,6 +101,8 @@ func (t *Tree) parseList(line items) (ret Node) {
 			tight = true
 		}
 
+		start++
+
 		line = t.nextLine()
 		if line.isEOF() {
 			break
@@ -111,10 +113,16 @@ func (t *Tree) parseList(line items) (ret Node) {
 			break
 		}
 
-		if markerText != line[0].val {
-			// TODO: 考虑有序列表序号递增
-			t.backupLine(line)
-			break
+		if bullet {
+			if markerText != line[0].val {
+				t.backupLine(line)
+				break
+			}
+		} else {
+			if strconv.Itoa(start) != line[0].val {
+				t.backupLine(line)
+				break
+			}
 		}
 
 		if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
@@ -122,7 +130,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 			break
 		}
 
-		line = line[len(markerText):]
+		line = line[w:]
 		line = t.indentOffset(line, t.context.IndentSpaces)
 
 		if line.isBlankLine() {
