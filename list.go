@@ -63,6 +63,9 @@ func (t *Tree) parseList(line items) (ret Node) {
 	spaces, tabs, _, firstNonWhitespace = t.nonWhitespace(line)
 	w := len(markerText)
 	n := spaces + tabs*4
+	if 4 < n {
+		n = 1
+	}
 	wnSpaces := w + n
 	t.context.IndentSpaces += startIndentSpaces + wnSpaces
 	ret = newList(markerText, bullet, start, wnSpaces, t)
