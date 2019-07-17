@@ -67,11 +67,12 @@ func (t *Tree) parseList(line items) (ret Node) {
 	t.context.IndentSpaces += startIndentSpaces + wnSpaces
 	ret = newList(markerText, bullet, start, wnSpaces, t)
 	tight := false
-	if 4 < n {
-		line = t.indentOffset(line, w+1)
+	if line[0].isTab() {
+		line = t.indentOffset(line, 2)
 	} else {
-		line = t.indentOffset(line, 1)
+		line = line[1:]
 	}
+
 	for {
 		n := t.parseListItem(line)
 		if nil == n {

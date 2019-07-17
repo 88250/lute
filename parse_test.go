@@ -29,6 +29,7 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec cases
 
+	{"spec243", "1.     indented code\n\n   paragraph\n\n       more code\n", "<ol>\n<li>\n<pre><code>indented code\n</code></pre>\n<p>paragraph</p>\n<pre><code>more code\n</code></pre>\n</li>\n</ol>\n"},
 	{"spec235", "123456789. ok\n", "<ol start=\"123456789\">\n<li>ok</li>\n</ol>\n"},
 	{"spec234", "- Foo\n\n      bar\n\n\n      baz\n", "<ul>\n<li>\n<p>Foo</p>\n<pre><code>bar\n\n\nbaz\n</code></pre>\n</li>\n</ul>\n"},
 	{"spec233", "1.  foo\n\n    ```\n    bar\n    ```\n\n    baz\n\n    > bam\n", "<ol>\n<li>\n<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>\n<blockquote>\n<p>bam</p>\n</blockquote>\n</li>\n</ol>\n"},
