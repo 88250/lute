@@ -102,7 +102,8 @@ func (t *Tree) skipBlankLines() (count int) {
 		if line.isEOF() {
 			return
 		}
-		if !line.isBlankLine() {
+		tokens := t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
+		if !tokens.isBlankLine() {
 			t.backupLine(line)
 			return
 		}

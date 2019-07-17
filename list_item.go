@@ -23,7 +23,7 @@ type ListItem struct {
 }
 
 func newListItem(t *Tree, token *item) (ret Node) {
-	baseNode := &BaseNode{typ: NodeListItem, tokens:items{}}
+	baseNode := &BaseNode{typ: NodeListItem, tokens: items{}}
 	ret = &ListItem{
 		baseNode,
 		false,
@@ -53,6 +53,10 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		line = t.nextLine()
 		if line.isEOF() {
 			break
+		}
+
+		if 0 < t.blockquoteMarkerCount(line) {
+			line = t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
 		}
 
 		spaces, tabs, _, _ := t.nonWhitespace(line)

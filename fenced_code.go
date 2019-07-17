@@ -44,7 +44,7 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 
 	var codeValue string
 	for {
-		line = t.removeStartBlockquoteMarker(line)
+		line = t.trimBlockquoteMarker(line)
 		line = t.indentOffset(line, indentSpaces)
 
 		for i := 0; i < len(line); i++ {
@@ -62,7 +62,6 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 		}
 
 		if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
-			//t.backupLine(line)
 			break
 		}
 	}

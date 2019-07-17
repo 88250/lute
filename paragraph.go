@@ -85,6 +85,13 @@ func (t *Tree) interruptParagraph(line items) bool {
 		}
 	}
 
+	if 0 < t.context.BlockquoteLevel {
+		tokens := t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
+		if tokens.isBlankLine() {
+			return true
+		}
+	}
+
 	if t.isBlockquote(line) {
 		return true
 	}
