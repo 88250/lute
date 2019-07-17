@@ -59,6 +59,7 @@ func (t *Tree) parseIndentCode(line items) (ret Node) {
 			break
 		}
 
+		line = tokens
 	}
 
 	if 1 > len(chunks) {

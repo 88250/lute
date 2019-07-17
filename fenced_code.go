@@ -45,7 +45,7 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 	var codeValue string
 	for {
 		line = t.trimBlockquoteMarker(line)
-		line = t.indentOffset(line, indentSpaces)
+		line = t.indentOffset(line, t.context.IndentSpaces + indentSpaces)
 
 		for i := 0; i < len(line); i++ {
 			token := line[i]
