@@ -68,7 +68,11 @@ func (t *Tree) interruptParagraph(line items) bool {
 		return true
 	}
 
-	if t.isList(line) {
+	if isList, _ := t.isList(line); isList {
+		if line[1:].isBlankLine() {
+			return false
+		}
+
 		return true
 	}
 

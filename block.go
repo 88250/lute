@@ -38,24 +38,24 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 
 	atxHeadingLevel := 0
 	htmlType := -1
-	switch {
-	case line.isBlankLine():
-	case t.isIndentCode(line):
+
+	if line.isBlankLine() {
+	} else if t.isIndentCode(line) {
 		ret = t.parseIndentCode(line)
-	case t.isFencedCode(line):
+	} else if t.isFencedCode(line) {
 		ret = t.parseFencedCode(line)
-	case t.isThematicBreak(line):
+	} else if t.isThematicBreak(line) {
 		ret = t.parseThematicBreak(line)
-	case t.isATXHeading(line, &atxHeadingLevel):
+	} else if t.isATXHeading(line, &atxHeadingLevel) {
 		ret = t.parseATXHeading(line, atxHeadingLevel)
-	case t.isBlockquote(line):
+	} else if t.isBlockquote(line) {
 		ret = t.parseBlockquote(line)
-	case t.isList(line):
+	} else if isList, _ := t.isList(line); isList {
 		ret = t.parseList(line)
-	case t.isHTML(line, &htmlType):
+	} else if t.isHTML(line, &htmlType) {
 		ret = t.parseHTML(line, htmlType)
-	case t.parseLinkRefDef(line):
-	default:
+	} else if t.parseLinkRefDef(line) {
+	} else {
 		ret = t.parseParagraph(line)
 	}
 

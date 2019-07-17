@@ -139,9 +139,9 @@ func (t *Tree) parseList(line items) (ret Node) {
 				ret.AppendChild(ret, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
 				break
 			} else {
-				if t.isList(line) {
+				if isList, marker := t.isList(line); isList {
 					ret.AppendChild(ret, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
-					line = line[len(markerText):]
+					line = line[len(marker):]
 				}
 
 				line = t.indentOffset(line, t.context.IndentSpaces)
@@ -157,22 +157,39 @@ func (t *Tree) parseList(line items) (ret Node) {
 	return
 }
 
-func (t *Tree) isList(line items) bool {
+func (t *Tree) isList(line items) (isList bool, marker string) {
 	if 2 > len(line) { // at least marker and newline
-		return false
+		return
 	}
 
 	_, line = line.trimLeft()
 	if 1 > len(line) {
-		return false
+		return
 	}
 
 	firstNonWhitespace := line[0]
-	if itemAsterisk == firstNonWhitespace.typ || itemHyphen == firstNonWhitespace.typ || itemPlus == firstNonWhitespace.typ {
-		return line[1].isWhitespace()
+
+	if itemAsterisk == firstNonWhitespace.typ {
+		isList = line[1].isWhitespace()
+		marker = "*"
+		return
+	} else if itemHyphen == firstNonWhitespace.typ {
+		isList = line[1].isWhitespace()
+		marker = "-"
+		return
+	} else if itemPlus == firstNonWhitespace.typ {
+		isList = line[1].isWhitespace()
+		marker = "+"
+		return
 	} else if firstNonWhitespace.isNumInt() && 9 >= len(firstNonWhitespace.val) {
-		return (itemDot == line[1].typ || itemCloseParen == line[1].typ) && line[2].isWhitespace()
+		isList = line[2].isWhitespace()
+		if itemDot == line[1].typ {
+			marker = firstNonWhitespace.val + "."
+		} else if itemCloseParen == line[1].typ {
+			marker = firstNonWhitespace.val + ")"
+		}
+		return
 	}
 
-	return false
+	return
 }
