@@ -55,7 +55,7 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 			break
 		}
 
-		if 0 < t.blockquoteMarkerCount(line) {
+		if 0 < t.blockquoteMarkerCount(line) && 0 < t.context.BlockquoteLevel {
 			line = t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
 		}
 
