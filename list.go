@@ -15,6 +15,8 @@
 
 package lute
 
+import "strconv"
+
 type ListType int
 
 type List struct {
@@ -28,12 +30,12 @@ type List struct {
 	WNSpaces int
 }
 
-func newList(marker string, bullet bool, wnSpaces int, t *Tree) (ret Node) {
+func newList(marker string, bullet bool, start int, wnSpaces int, t *Tree) (ret Node) {
 	baseNode := &BaseNode{typ: NodeList}
 	ret = &List{
 		baseNode,
 		bullet,
-		1,
+		start,
 		false,
 		marker,
 		wnSpaces,
@@ -49,8 +51,10 @@ func (t *Tree) parseList(line items) (ret Node) {
 	marker = append(marker, firstNonWhitespace)
 	line = line[len(tokens):]
 	bullet := true
+	start := 1
 	if firstNonWhitespace.isNumInt() {
 		bullet = false
+		start, _ = strconv.Atoi(firstNonWhitespace.val)
 		marker = append(marker, line[0])
 		line = line[1:]
 	}
@@ -61,7 +65,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 	n := spaces + tabs*4
 	wnSpaces := w + n
 	t.context.IndentSpaces += startIndentSpaces + wnSpaces
-	ret = newList(markerText, bullet, wnSpaces, t)
+	ret = newList(markerText, bullet, start, wnSpaces, t)
 	tight := false
 	if 4 < n {
 		line = t.indentOffset(line, w+1)
