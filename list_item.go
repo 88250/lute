@@ -75,7 +75,7 @@ func (t *Tree) parseListItem(line items) (ret Node, withBlankLine bool) {
 	return
 }
 
-func (t *Tree) parseListItemMarker(line items) (remains items, marker, delim string, startIndentSpaces, indentSpaces int) {
+func (t *Tree) parseListItemMarker(line items, list Node) (remains items, marker, delim string, startIndentSpaces, indentSpaces int) {
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	var markers items
 	markers = append(markers, firstNonWhitespace)
@@ -113,6 +113,22 @@ func (t *Tree) parseListItemMarker(line items) (remains items, marker, delim str
 		line = t.indentOffset(line, 2)
 	} else {
 		line = line[1:]
+	}
+
+	if line.isBlankLine() {
+		line = t.nextLine()
+		if line.isBlankLine() {
+			list.AppendChild(list, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
+
+			return
+		}
+
+		if isList, marker := t.isList(line); isList {
+			list.AppendChild(list, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
+			line = line[len(marker):]
+		}
+
+		line = t.indentOffset(line, t.context.IndentSpaces)
 	}
 
 	remains = line

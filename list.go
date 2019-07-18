@@ -138,7 +138,12 @@ func (t *Tree) parseList(line items) (ret Node) {
 
 		start++
 
-		nextLine, nextMarker, nextDelim, startIndentSpaces, indentSpaces := t.parseListItemMarker(line)
+		if isList, _ := t.isList(line);!isList {
+			t.backupLine(line)
+			break
+		}
+
+		nextLine, nextMarker, nextDelim, startIndentSpaces, indentSpaces := t.parseListItemMarker(line, ret)
 		if bullet {
 			if marker != nextMarker {
 				t.backupLine(line)
@@ -151,6 +156,11 @@ func (t *Tree) parseList(line items) (ret Node) {
 			}
 		}
 
+		if nextLine.isBlankLine() && withBlankLine && t.context.IndentSpaces > line.spaceCountLeft() {
+			t.backupLine(line)
+			break
+		}
+
 		if withBlankLine && startIndentSpaces < t.context.IndentSpaces && 3 < startIndentSpaces {
 			t.backupLine(line)
 			break
@@ -158,22 +168,6 @@ func (t *Tree) parseList(line items) (ret Node) {
 
 		t.context.IndentSpaces = indentSpaces
 		line = nextLine
-		line = t.indentOffset(line, t.context.IndentSpaces)
-
-		if line.isBlankLine() {
-			line = t.nextLine()
-			if line.isBlankLine() {
-				ret.AppendChild(ret, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
-				break
-			} else {
-				if isList, marker := t.isList(line); isList {
-					ret.AppendChild(ret, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
-					line = line[len(marker):]
-				}
-
-				line = t.indentOffset(line, t.context.IndentSpaces)
-			}
-		}
 
 		if 2 <= start && tight && withBlankLine {
 			tight = false

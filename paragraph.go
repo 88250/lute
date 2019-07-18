@@ -84,7 +84,7 @@ func (t *Tree) interruptParagraph(startIndentSpaces int, line items) bool {
 			return false
 		}
 
-		_, marker, delim, _, _ := t.parseListItemMarker(line)
+		_, marker, delim, _, _ := t.parseListItemMarker(line, nil)
 		if " " != delim && "1" != marker[:markerLen-1] {
 			return false
 		}
