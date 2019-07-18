@@ -120,11 +120,6 @@ func (t *Tree) parseList(line items) (ret Node) {
 		if !node.(*ListItem).Tight {
 			tight = false
 		}
-		if 1 < start && tight && withBlankLine {
-			tight = false
-		}
-
-		start++
 
 		line = t.nextLine()
 		if line.isEOF() {
@@ -140,6 +135,8 @@ func (t *Tree) parseList(line items) (ret Node) {
 			t.backupLine(line)
 			break
 		}
+
+		start++
 
 		nextLine, nextMarker, nextDelim := t.parseListItemMarker(line)
 		if bullet {
@@ -170,6 +167,10 @@ func (t *Tree) parseList(line items) (ret Node) {
 
 				line = t.indentOffset(line, t.context.IndentSpaces)
 			}
+		}
+
+		if 2 < start && tight && withBlankLine {
+			tight = false
 		}
 	}
 
