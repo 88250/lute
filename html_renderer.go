@@ -179,6 +179,7 @@ func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Heading)
 	if entering {
+		r.Newline()
 		r.WriteString("<h" + " 123456"[n.Level:n.Level+1] + ">")
 	} else {
 		r.WriteString("</h" + " 123456"[n.Level:n.Level+1] + ">")

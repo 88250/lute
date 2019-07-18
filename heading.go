@@ -109,6 +109,10 @@ func (t *Tree) isSetextHeading(line items) (level int) {
 		return
 	}
 
+	if 1 == length && itemHyphen == marker.typ {
+		return
+	}
+
 	for i := 1; i < length; i++ {
 		token := line[i]
 		if marker.typ != token.typ {
@@ -117,9 +121,15 @@ func (t *Tree) isSetextHeading(line items) (level int) {
 	}
 
 	parentType := t.context.CurNode.Type()
-	if NodeBlockquote == parentType || NodeListItem == parentType {
+	if NodeBlockquote == parentType {
 		return
 	}
+	if NodeListItem == parentType {
+		if t.context.IndentSpaces > spaces {
+			return
+		}
+	}
+
 
 	if itemEqual == marker.typ {
 		level = 1
