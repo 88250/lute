@@ -156,17 +156,17 @@ func (t *Tree) parseList(line items) (ret Node) {
 			break
 		}
 
-		if withBlankLine && startIndentSpaces < t.context.IndentSpaces && 3 < startIndentSpaces {
+		if 2 <= start && withBlankLine {
+			node.(*ListItem).Tight = false
+		}
+
+		if withBlankLine && startIndentSpaces < t.context.IndentSpaces && (3 < startIndentSpaces || t.context.IndentSpaces > indentSpaces){
 			t.backupLine(line)
 			break
 		}
 
 		t.context.IndentSpaces = indentSpaces
 		line = nextLine
-
-		if 2 <= start && withBlankLine {
-			node.(*ListItem).Tight = false
-		}
 	}
 
 	tight := true

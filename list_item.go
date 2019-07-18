@@ -39,8 +39,7 @@ func (t *Tree) parseListItem(line items) (ret Node, withBlankLine bool) {
 	for {
 		n := t.parseBlock(line)
 		if nil == n {
-			line = t.nextLine()
-			continue
+			break
 		}
 		ret.AppendChild(ret, n)
 
