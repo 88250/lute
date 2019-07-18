@@ -81,7 +81,7 @@ func (t *Tree) parseListItemMarker(line items, list Node) (remains items, marker
 	if remains.isBlankLine() {
 		remains = t.nextLine()
 		if remains.isBlankLine() {
-			list.AppendChild(list, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
+			list.AppendChild(list, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: false})
 			t.skipBlankLines()
 			remains = t.nextLine()
 			remains, marker, delim, startIndentSpaces, indentSpaces = t.parseListItemMarker0(remains)
