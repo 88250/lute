@@ -76,3 +76,48 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 
 	return
 }
+
+func (t *Tree) parseListItemMarker(line items) (remains items, marker, delim string) {
+	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
+	var markers items
+	markers = append(markers, firstNonWhitespace)
+	line = line[len(tokens):]
+	if firstNonWhitespace.isNumInt() {
+		markers = append(markers, line[0])
+		line = line[1:]
+	}
+	switch markers[len(markers)-1].typ {
+	case itemAsterisk:
+		delim = "*"
+	case itemHyphen:
+		delim = "-"
+	case itemPlus:
+		delim = "+"
+	case itemCloseParen:
+		delim = ")"
+	case itemDot:
+		delim = "."
+	}
+	startIndentSpaces := spaces + tabs*4
+	marker = markers.rawText()
+	spaces, tabs, _, firstNonWhitespace = t.nonWhitespace(line)
+
+	w := len(marker)
+	n := spaces + tabs*4
+	if 4 < n {
+		n = 1
+	} else if 1 > n {
+		n = 1
+	}
+	wnSpaces := w + n
+	t.context.IndentSpaces = startIndentSpaces + wnSpaces
+	if line[0].isTab() {
+		line = t.indentOffset(line, 2)
+	} else {
+		line = line[1:]
+	}
+
+	remains = line
+
+	return
+}

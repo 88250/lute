@@ -45,7 +45,7 @@ func newList(marker string, bullet bool, start int, wnSpaces int, t *Tree) (ret 
 	return
 }
 
-func (t *Tree) parseListMarker(line items) (remains items, marker string, bullet bool, start, startIndentSpaces, w, n int) {
+func (t *Tree) parseListMarker(line items) (remains items, marker, delim string, bullet bool, start, startIndentSpaces, w, n int) {
 	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
 	var markers items
 	markers = append(markers, firstNonWhitespace)
@@ -57,6 +57,18 @@ func (t *Tree) parseListMarker(line items) (remains items, marker string, bullet
 		start, _ = strconv.Atoi(firstNonWhitespace.val)
 		markers = append(markers, line[0])
 		line = line[1:]
+	}
+	switch markers[len(markers)-1].typ {
+	case itemAsterisk:
+		delim = "*"
+	case itemHyphen:
+		delim = "-"
+	case itemPlus:
+		delim = "+"
+	case itemCloseParen:
+		delim = ")"
+	case itemDot:
+		delim = "."
 	}
 	startIndentSpaces = spaces + tabs*4
 	marker = markers.rawText()
@@ -81,40 +93,8 @@ func (t *Tree) parseListMarker(line items) (remains items, marker string, bullet
 	return
 }
 
-func (t *Tree) parseListItemMarker(line items) (remains items, marker string) {
-	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
-	var markers items
-	markers = append(markers, firstNonWhitespace)
-	line = line[len(tokens):]
-	if firstNonWhitespace.isNumInt() {
-		markers = append(markers, line[0])
-		line = line[1:]
-	}
-	startIndentSpaces := spaces + tabs*4
-	marker = markers.rawText()
-	spaces, tabs, _, firstNonWhitespace = t.nonWhitespace(line)
-	w := len(marker)
-	n := spaces + tabs*4
-	if 4 < n {
-		n = 1
-	} else if 1 > n {
-		n = 1
-	}
-	wnSpaces := w + n
-	t.context.IndentSpaces = startIndentSpaces + wnSpaces
-	if line[0].isTab() {
-		line = t.indentOffset(line, 2)
-	} else {
-		line = line[1:]
-	}
-
-	remains = line
-
-	return
-}
-
 func (t *Tree) parseList(line items) (ret Node) {
-	line, marker, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
+	line, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
 	ret = newList(marker, bullet, start, w+n, t)
 
 	tight := false
@@ -158,14 +138,14 @@ func (t *Tree) parseList(line items) (ret Node) {
 			break
 		}
 
-		nextLine, nextMarker := t.parseListItemMarker(line)
+		nextLine, nextMarker, nextDelim := t.parseListItemMarker(line)
 		if bullet {
 			if marker != nextMarker {
 				t.backupLine(line)
 				break
 			}
 		} else {
-			if strconv.Itoa(start) != nextMarker[:1] {
+			if delim != nextDelim || strconv.Itoa(start) != nextMarker[:1] {
 				t.backupLine(line)
 				break
 			}
