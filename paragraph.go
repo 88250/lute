@@ -42,8 +42,10 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 			return
 		}
 
+		startIndentSpaces := line.spaceCountLeft()
+
 		tokens := t.indentOffset(line, t.context.IndentSpaces)
-		if t.interruptParagraph(tokens) {
+		if t.interruptParagraph(startIndentSpaces, tokens) {
 			t.backupLine(line)
 
 			break
@@ -54,7 +56,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 	return
 }
 
-func (t *Tree) interruptParagraph(line items) bool {
+func (t *Tree) interruptParagraph(startIndentSpaces int, line items) bool {
 	if t.isIndentCode(line) {
 		return false
 	}
@@ -70,6 +72,10 @@ func (t *Tree) interruptParagraph(line items) bool {
 
 	if isList, marker := t.isList(line); isList {
 		if NodeListItem == t.context.CurNode.Type() {
+			if 2 < t.context.IndentSpaces && 3 < startIndentSpaces && t.context.IndentSpaces > startIndentSpaces {
+				return false
+			}
+
 			return true
 		}
 
@@ -78,7 +84,7 @@ func (t *Tree) interruptParagraph(line items) bool {
 			return false
 		}
 
-		_, marker, delim := t.parseListItemMarker(line)
+		_, marker, delim, _, _ := t.parseListItemMarker(line)
 		if " " != delim && "1" != marker[:markerLen-1] {
 			return false
 		}

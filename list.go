@@ -138,7 +138,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 
 		start++
 
-		nextLine, nextMarker, nextDelim := t.parseListItemMarker(line)
+		nextLine, nextMarker, nextDelim, startIndentSpaces, indentSpaces := t.parseListItemMarker(line)
 		if bullet {
 			if marker != nextMarker {
 				t.backupLine(line)
@@ -151,6 +151,12 @@ func (t *Tree) parseList(line items) (ret Node) {
 			}
 		}
 
+		if withBlankLine && startIndentSpaces < t.context.IndentSpaces && 3 < startIndentSpaces {
+			t.backupLine(line)
+			break
+		}
+
+		t.context.IndentSpaces = indentSpaces
 		line = nextLine
 		line = t.indentOffset(line, t.context.IndentSpaces)
 
@@ -169,7 +175,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 			}
 		}
 
-		if 2 < start && tight && withBlankLine {
+		if 2 <= start && tight && withBlankLine {
 			tight = false
 		}
 	}

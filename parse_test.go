@@ -29,6 +29,8 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec cases
 
+	{"spec283", "1. a\n\n  2. b\n\n    3. c\n", "<ol>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n</ol>\n<pre><code>3. c\n</code></pre>\n"},
+	{"spec282", "- a\n - b\n  - c\n   - d\n    - e\n", "<ul>\n<li>a</li>\n<li>b</li>\n<li>c</li>\n<li>d\n- e</li>\n</ul>\n"},
 	{"spec278", "- foo\n- bar\n\n<!-- -->\n\n- baz\n- bim\n", "<ul>\n<li>foo</li>\n<li>bar</li>\n</ul>\n<!-- -->\n<ul>\n<li>baz</li>\n<li>bim</li>\n</ul>\n"},
 	{"spec277", "- foo\n  - bar\n    - baz\n\n\n      bim\n", "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>\n<p>baz</p>\n<p>bim</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n"},
 	{"spec276", "- foo\n\n- bar\n\n\n- baz\n", "<ul>\n<li>\n<p>foo</p>\n</li>\n<li>\n<p>bar</p>\n</li>\n<li>\n<p>baz</p>\n</li>\n</ul>\n"},

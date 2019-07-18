@@ -153,7 +153,8 @@ func (t *Tree) isParagraphContinuation(line items) bool {
 	}
 
 	line = t.trimBlockquoteMarker(line)
-	if t.interruptParagraph(line) {
+	startIndentSpaces := line.spaceCountLeft()
+	if t.interruptParagraph(startIndentSpaces, line) {
 		return false
 	}
 
