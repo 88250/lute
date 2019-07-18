@@ -60,11 +60,11 @@ func (t *Tree) parseListMarker(line items) (remains items, marker, delim string,
 	}
 	switch markers[len(markers)-1].typ {
 	case itemAsterisk:
-		delim = "*"
+		delim = " "
 	case itemHyphen:
-		delim = "-"
+		delim = " "
 	case itemPlus:
-		delim = "+"
+		delim = " "
 	case itemCloseParen:
 		delim = ")"
 	case itemDot:
@@ -97,13 +97,13 @@ func (t *Tree) parseList(line items) (ret Node) {
 	line, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
 	ret = newList(marker, bullet, start, w+n, t)
 
-	tight := false
+	tight := true
 	if line.isBlankLine() {
 		t.context.IndentSpaces = startIndentSpaces + w + 1
 
 		line = t.nextLine()
 		if line.isBlankLine() {
-			ret.AppendChild(ret, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
+			ret.AppendChild(ret, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: tight})
 			ret.(*List).Tight = tight
 
 			return
@@ -111,14 +111,17 @@ func (t *Tree) parseList(line items) (ret Node) {
 	}
 
 	for {
-		node := t.parseListItem(line)
+		node, withBlankLine := t.parseListItem(line)
 		if nil == node {
 			break
 		}
 		ret.AppendChild(ret, node)
 
-		if node.(*ListItem).Tight {
-			tight = true
+		if !node.(*ListItem).Tight {
+			tight = false
+		}
+		if 1 < start && tight && withBlankLine {
+			tight = false
 		}
 
 		start++
@@ -171,9 +174,9 @@ func (t *Tree) parseList(line items) (ret Node) {
 	}
 
 	ret.(*List).Tight = tight
-	//for child := ret.FirstChild();nil != child;child = child.Next() {
-	//	child.(*ListItem).Tight = tight
-	//}
+	for child := ret.FirstChild(); nil != child; child = child.Next() {
+		child.(*ListItem).Tight = tight
+	}
 
 	return
 }

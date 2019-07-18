@@ -34,9 +34,8 @@ func newListItem(t *Tree) (ret Node) {
 	return
 }
 
-func (t *Tree) parseListItem(line items) (ret Node) {
+func (t *Tree) parseListItem(line items) (ret Node, withBlankLine bool) {
 	ret = newListItem(t)
-	blankLineBetweenBlocks := false
 	for {
 		n := t.parseBlock(line)
 		if nil == n {
@@ -46,8 +45,8 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		ret.AppendChild(ret, n)
 
 		blankLines := t.skipBlankLines()
-		if 1 <= blankLines && !blankLineBetweenBlocks {
-			blankLineBetweenBlocks = true
+		if 1 <= blankLines && !withBlankLine {
+			withBlankLine = true
 		}
 
 		line = t.nextLine()
@@ -70,7 +69,7 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		line = t.indentOffset(line, t.context.IndentSpaces)
 	}
 
-	if 1 < len(ret.Children()) && blankLineBetweenBlocks {
+	if 1 < len(ret.Children()) && withBlankLine {
 		ret.(*ListItem).Tight = false
 	}
 
@@ -88,13 +87,13 @@ func (t *Tree) parseListItemMarker(line items) (remains items, marker, delim str
 	}
 	switch markers[len(markers)-1].typ {
 	case itemAsterisk:
-		delim = "*"
+		delim = " "
 	case itemHyphen:
-		delim = "-"
+		delim = " "
 	case itemPlus:
-		delim = "+"
+		delim = " "
 	case itemCloseParen:
-		delim = ")"
+		delim = " "
 	case itemDot:
 		delim = "."
 	}

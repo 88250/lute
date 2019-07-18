@@ -69,10 +69,18 @@ func (t *Tree) interruptParagraph(line items) bool {
 	}
 
 	if isList, marker := t.isList(line); isList {
-		if NodeListItem != t.context.CurNode.Type() {
-			if line[len(marker):].isBlankLine() {
-				return false
-			}
+		if NodeListItem == t.context.CurNode.Type() {
+			return true
+		}
+
+		markerLen := len(marker)
+		if line[markerLen:].isBlankLine() {
+			return false
+		}
+
+		_, marker, delim := t.parseListItemMarker(line)
+		if " " != delim && "1" != marker[:markerLen-1] {
+			return false
 		}
 
 		return true
