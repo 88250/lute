@@ -132,7 +132,7 @@ var parseTests = []parseTest{
 	//{"spec29", "Foo\n---\nbar\n", "<h2>Foo</h2>\n<p>bar</p>\n"},
 	{"spec27", "- foo\n***\n- bar\n", "<ul>\n<li>foo</li>\n</ul>\n<hr />\n<ul>\n<li>bar</li>\n</ul>\n"},
 	{"spec26", " *-*\n", "<p><em>-</em></p>\n"},
-	{"spec18", "Foo\n    ***\n", "<p>Foo\n***</p>\n"},
+	{"spec19", "Foo\n    ***\n", "<p>Foo\n***</p>\n"},
 	{"spec18", "    ***\n", "<pre><code>***\n</code></pre>\n"},
 	{"spec16", "--\n**\n__\n", "<p>--\n**\n__</p>\n"},
 	{"spec14", "+++\n", "<p>+++</p>\n"},

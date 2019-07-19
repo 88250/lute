@@ -16,13 +16,8 @@
 package lute
 
 func (t *Tree) parseBlocks() {
-	curNode := t.context.BlockContainers.peek()
 	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
-		n := t.parseBlock(line)
-		if nil != n {
-			curNode.AppendChild(curNode, n)
-		}
-		curNode = t.context.BlockContainers.peek()
+		t.parseBlock(line)
 	}
 
 	for child := t.Root.FirstChild(); nil != child; child = child.Next() {
@@ -30,7 +25,7 @@ func (t *Tree) parseBlocks() {
 	}
 }
 
-func (t *Tree) parseBlock(line items) (ret Node) {
+func (t *Tree) parseBlock(line items) {
 	if 1 > len(line) || line.isEOF() {
 		return
 	}
@@ -40,27 +35,25 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 
 	if line.isBlankLine() {
 	} else if t.isIndentCode(line) {
-		ret = t.parseIndentCode(line)
+		t.parseIndentCode(line)
 	} else if t.isFencedCode(line) {
-		ret = t.parseFencedCode(line)
+		t.parseFencedCode(line)
 	} else if t.isThematicBreak(line) {
-		ret = t.parseThematicBreak(line)
+		t.parseThematicBreak(line)
 	} else if t.isATXHeading(line, &atxHeadingLevel) {
-		ret = t.parseATXHeading(line, atxHeadingLevel)
+		t.parseATXHeading(line, atxHeadingLevel)
 	} else if t.isBlockquote(line) {
-		ret = t.parseBlockquote(line)
+		t.parseBlockquote(line)
 	} else if isList, _ := t.isList(line); isList {
 		if NodeList == t.context.BlockContainers.peek().Type() {
-			ret = t.parseListItem(line)
+			t.parseListItem(line)
 		} else {
-			ret = t.parseList(line)
+			t.parseList(line)
 		}
 	} else if t.isHTML(line, &htmlType) {
-		ret = t.parseHTML(line, htmlType)
+		t.parseHTML(line, htmlType)
 	} else if t.parseLinkRefDef(line) {
 	} else {
-		ret = t.parseParagraph(line)
+		t.parseParagraph(line)
 	}
-
-	return
 }

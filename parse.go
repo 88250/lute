@@ -76,7 +76,6 @@ type Context struct {
 
 	BlockContainers *BlockContainer
 	IndentSpaces    int
-	BlockquoteLevel int
 
 	// Inlines parsing
 
@@ -131,8 +130,9 @@ func (t *Tree) skipBlankLines() (blankLines []items) {
 		if line.isEOF() {
 			return
 		}
-		tokens := t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
-		if !tokens.isBlankLine() {
+
+		//tokens := t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
+		if !line.isBlankLine() {
 			t.backupLine(line)
 			return
 		}

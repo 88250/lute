@@ -57,11 +57,11 @@ func (n *List) Close() {
 	n.close = true
 }
 
-func (t *Tree) parseList(line items) (ret Node) {
+func (t *Tree) parseList(line items) {
 	indentSpaces := t.context.IndentSpaces
 
 	remains, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
-	ret = &List{
+	list := &List{
 		&BaseNode{typ: NodeList},
 		bullet,
 		start,
@@ -76,14 +76,15 @@ func (t *Tree) parseList(line items) (ret Node) {
 	if remains.isBlankLine() {
 		t.context.IndentSpaces = startIndentSpaces + w + 1
 	}
-	t.context.BlockContainers.push(ret)
 
-	node := t.parseListItem(line)
-	if nil == node {
-		return
-	}
-	ret.AppendChild(ret, node)
+	curContainer := t.context.BlockContainers.peek()
+	curContainer.AppendChild(curContainer, list)
+	t.context.BlockContainers.push(list)
+
+	t.parseListItem(line)
+
 	t.context.IndentSpaces = indentSpaces
+	t.context.BlockContainers.pop()
 
 	return
 }

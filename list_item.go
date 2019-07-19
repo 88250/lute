@@ -18,8 +18,14 @@ package lute
 type ListItem struct {
 	*BaseNode
 
-	Checked bool
-	Tight   bool
+	Bullet bool
+	Start  int
+	Delim  string
+	Tight  bool
+
+	Marker            string
+	startIndentSpaces int
+	indentSpaces      int
 }
 
 func (n *ListItem) Close() {
@@ -32,38 +38,36 @@ func (n *ListItem) Close() {
 	}
 }
 
-func (t *Tree) newListItem(marker string, bullet bool, start int, delim string, startIndentSpaces, indentSpaces int) (ret Node) {
-	baseNode := &BaseNode{typ: NodeListItem, tokens: items{}}
-	ret = &ListItem{
-		baseNode,
-		false,
-		true,
-	}
-
-	return
-}
-
-func (t *Tree) parseListItem(line items) (ret Node) {
+func (t *Tree) parseListItem(line items) {
+	var li Node
 	if line.isBlankLine() {
-		ret = &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true}
+		li = &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true}
 		return
 	}
 
 	indentSpaces := t.context.IndentSpaces
 
 	line, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
-	ret = t.newListItem(marker, bullet, start, delim, startIndentSpaces, startIndentSpaces+w+n)
+	li = &ListItem{
+		&BaseNode{typ: NodeListItem, tokens: items{}},
+		bullet,
+		start,
+		delim,
+		true,
+		marker,
+		startIndentSpaces,
+		startIndentSpaces + w + n,
+	}
+	curContainer := t.context.BlockContainers.peek()
+	curContainer.AppendChild(curContainer, li)
+	t.context.BlockContainers.push(li)
 
 	var blankLineIndices []int
 	i := 0
 	for ; ; i++ {
-		n := t.parseBlock(line)
-		if nil == n {
-			break
-		}
-		ret.AppendChild(ret, n)
-		t.context.IndentSpaces = indentSpaces
+		t.parseBlock(line)
 
+		t.context.IndentSpaces = indentSpaces
 		blankLines := t.skipBlankLines()
 		if 0 < len(blankLines) {
 			blankLineIndices = append(blankLineIndices, i)
@@ -74,9 +78,9 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 			break
 		}
 
-		if 0 < t.blockquoteMarkerCount(line) && 0 < t.context.BlockquoteLevel {
-			line = t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
-		}
+		//if 0 < t.blockquoteMarkerCount(line) && 0 < t.context.BlockquoteLevel {
+		//	line = t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
+		//}
 
 		if t.context.IndentSpaces <= line.spaceCountLeft() {
 			line = t.indentOffset(line, t.context.IndentSpaces)
@@ -89,12 +93,13 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 	}
 
 	if 1 < len(blankLineIndices) {
-		ret.(*ListItem).Tight = false
+		li.(*ListItem).Tight = false
 	} else if 1 == len(blankLineIndices) {
-		ret.(*ListItem).Tight = 1 == len(blankLineIndices) && blankLineIndices[0] == i
+		li.(*ListItem).Tight = 1 == len(blankLineIndices) && blankLineIndices[0] == i
 	}
 
-	t.context.BlockContainers.push(ret)
+	t.context.IndentSpaces = indentSpaces
+	t.context.BlockContainers.pop()
 
 	return
 }

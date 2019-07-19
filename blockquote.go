@@ -19,12 +19,10 @@ type Blockquote struct {
 	*BaseNode
 }
 
-
-func (t *Tree) parseBlockquote(line items) (ret Node) {
-	t.context.BlockquoteLevel++
+func (t *Tree) parseBlockquote(line items)  {
 	_, line = line.trimLeft()
-	ret = &Blockquote{&BaseNode{typ: NodeBlockquote}}
-	t.context.BlockContainers.push(ret)
+	blockquote := &Blockquote{&BaseNode{typ: NodeBlockquote}}
+	t.context.BlockContainers.push(blockquote)
 	line = line[1:]
 	if line[0].isSpace() {
 		line = line[1:]
@@ -33,58 +31,15 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 	}
 
 	for {
-		n := t.parseBlock(line)
-		if nil == n {
-			line = t.nextLine()
-			if !t.isBlockquote(line) {
-				t.backupLine(line)
-				break
-			}
-
-			t.backupLine(line)
-			line = t.skipBlankBlockquote()
-			if line.isEOF() {
-				break
-			}
-
-			continue
-		}
-		ret.AppendChild(ret, n)
-
-		line = t.nextLine()
-		if line.isEOF() {
-			break
-		}
-		if t.isThematicBreak(line) {
-			t.backupLine(line)
-			break
-		}
-
-		for {
-			if !t.isParagraphContinuation(line) {
-				break
-			}
-			lastc := t.context.BlockContainers.peek().LastChild()
-			p := lastc.(*Paragraph)
-			line = t.trimBlockquoteMarker(line)
-			continuation := t.parseParagraph(line)
-			p.tokens = append(p.tokens, tNewLine)
-			p.tokens = append(p.tokens, continuation.Tokens()...)
-			line = t.nextLine()
-		}
-
-		if !t.isBlockquote(line) {
-			t.backupLine(line)
-			break
-		}
+		t.parseBlock(line)
 
 		_, line = line.trimLeft()
 		line = t.trimBlockquoteMarker(line)
+
+		break
 	}
 
-	t.context.BlockquoteLevel--
-
-	return
+	t.context.BlockContainers.pop()
 }
 
 func (t *Tree) isBlockquote(line items) bool {
@@ -100,31 +55,12 @@ func (t *Tree) isBlockquote(line items) bool {
 	return true
 }
 
-func (t *Tree) removeStartBlockquoteMarker(line items, count int) (ret items) {
-	i := 0
-	_, ret = line.trimLeft()
-	for ; 0 < len(ret) && (itemGreater == ret[0].typ || ret[0].isSpaceOrTab()); ret = ret[1:] {
-		if i++; count < i {
-			break
-		}
-	}
-	if 0 < len(ret) && ret[0].isSpace() {
-		ret = ret[1:]
-	}
-
-	return ret
-}
-
 func (t *Tree) trimBlockquoteMarker(line items) (ret items) {
 	if NodeBlockquote != t.context.BlockContainers.peek().Type() {
 		return line
 	}
 
-	count := t.context.BlockquoteLevel
-	if 1 > count {
-		return line
-	}
-
+	count := 1
 	i := 0
 	for _, ret = line[1:].trimLeft(); 0 < len(ret) && (itemGreater == ret[0].typ || ret[0].isSpaceOrTab()); ret = ret[1:] {
 		if i++; count < i {

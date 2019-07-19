@@ -21,10 +21,11 @@ type Paragraph struct {
 	OpenTag, CloseTag string
 }
 
-func (t *Tree) parseParagraph(line items) (ret Node) {
+func (t *Tree) parseParagraph(line items) {
 	baseNode := &BaseNode{typ: NodeParagraph}
 	p := &Paragraph{baseNode, "<p>", "</p>"}
-	ret = p
+	curContainer := t.context.BlockContainers.peek()
+	curContainer.AppendChild(curContainer, p)
 
 	for {
 		_, line = line.trimLeft()
@@ -37,7 +38,7 @@ func (t *Tree) parseParagraph(line items) (ret Node) {
 		}
 
 		if level := t.isSetextHeading(line); 0 < level {
-			ret = t.parseSetextHeading(p, level)
+			t.parseSetextHeading(p, level)
 
 			return
 		}
@@ -105,12 +106,12 @@ func (t *Tree) interruptParagraph(startIndentSpaces int, line items) bool {
 		}
 	}
 
-	if 0 < t.context.BlockquoteLevel {
-		tokens := t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
-		if tokens.isBlankLine() {
-			return true
-		}
-	}
+	//if 0 < t.context.BlockquoteLevel {
+	//	tokens := t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
+	//	if tokens.isBlankLine() {
+	//		return true
+	//	}
+	//}
 
 	if t.isBlockquote(line) {
 		return true

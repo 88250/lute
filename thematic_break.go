@@ -19,11 +19,11 @@ type ThematicBreak struct {
 	*BaseNode
 }
 
-func (t *Tree) parseThematicBreak(line items) (ret Node) {
+func (t *Tree) parseThematicBreak(line items) {
 	baseNode := &BaseNode{typ: NodeThematicBreak, tokens: line}
-	ret = &ThematicBreak{baseNode}
-
-	return
+	thematicBreak := &ThematicBreak{baseNode}
+	curContainer := t.context.BlockContainers.peek()
+	curContainer.AppendChild(curContainer, thematicBreak)
 }
 
 func (t *Tree) isThematicBreak(line items) bool {
