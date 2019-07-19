@@ -38,6 +38,35 @@ func sanitize(text string) (ret string) {
 	return
 }
 
+type CurNodes struct {
+	nodes []Node
+}
+
+func (curNodes *CurNodes) push(node Node) {
+	curNodes.nodes = append(curNodes.nodes, node)
+}
+
+func (curNodes *CurNodes) pop() (ret Node) {
+	length := len(curNodes.nodes)
+	if 1 > length {
+		return nil
+	}
+
+	ret = curNodes.nodes[length-1]
+	curNodes.nodes = curNodes.nodes[:1]
+
+	return
+}
+
+func (curNodes *CurNodes) peek() Node {
+	length := len(curNodes.nodes)
+	if 1 > length {
+		return nil
+	}
+
+	return curNodes.nodes[length-1]
+}
+
 // Context use to store common data in parsing.
 type Context struct {
 	LinkRefDef map[string]*Link
@@ -45,7 +74,7 @@ type Context struct {
 
 	// Blocks parsing
 
-	CurNode         Node
+	CurNodes        *CurNodes
 	IndentSpaces    int
 	BlockquoteLevel int
 
@@ -182,7 +211,8 @@ func (t *Tree) parse() (err error) {
 
 	t.lex = lex(t.name, t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
-	t.context.CurNode = t.Root
+	t.context.CurNodes = &CurNodes{}
+	t.context.CurNodes.push(t.Root)
 	t.context.LinkRefDef = map[string]*Link{}
 	t.parseBlocks()
 	t.parseInlines()

@@ -19,28 +19,21 @@ type Blockquote struct {
 	*BaseNode
 }
 
-func newBlockquote(t *Tree) (ret Node) {
-	baseNode := &BaseNode{typ: NodeBlockquote}
-	ret = &Blockquote{baseNode}
-	t.context.CurNode = ret
-
-	return
-}
 
 func (t *Tree) parseBlockquote(line items) (ret Node) {
 	t.context.BlockquoteLevel++
 	_, line = line.trimLeft()
-	ret = newBlockquote(t)
+	ret = &Blockquote{&BaseNode{typ: NodeBlockquote}}
+	t.context.CurNodes.push(ret)
 	line = line[1:]
 	if line[0].isSpace() {
 		line = line[1:]
 	} else if line[0].isTab() {
 		line = t.indentOffset(line, 2)
 	}
-	curNode := t.context.CurNode
+
 	for {
 		n := t.parseBlock(line)
-		t.context.CurNode = curNode
 		if nil == n {
 			line = t.nextLine()
 			if !t.isBlockquote(line) {
@@ -71,7 +64,7 @@ func (t *Tree) parseBlockquote(line items) (ret Node) {
 			if !t.isParagraphContinuation(line) {
 				break
 			}
-			lastc := t.context.CurNode.LastChild()
+			lastc := t.context.CurNodes.peek().LastChild()
 			p := lastc.(*Paragraph)
 			line = t.trimBlockquoteMarker(line)
 			continuation := t.parseParagraph(line)
@@ -123,7 +116,7 @@ func (t *Tree) removeStartBlockquoteMarker(line items, count int) (ret items) {
 }
 
 func (t *Tree) trimBlockquoteMarker(line items) (ret items) {
-	if NodeBlockquote != t.context.CurNode.Type() {
+	if NodeBlockquote != t.context.CurNodes.peek().Type() {
 		return line
 	}
 
@@ -143,7 +136,7 @@ func (t *Tree) trimBlockquoteMarker(line items) (ret items) {
 }
 
 func (t *Tree) isParagraphContinuation(line items) bool {
-	lastc := t.context.CurNode.LastChild()
+	lastc := t.context.CurNodes.peek().LastChild()
 	if nil == lastc {
 		return false
 	}

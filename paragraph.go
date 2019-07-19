@@ -71,7 +71,7 @@ func (t *Tree) interruptParagraph(startIndentSpaces int, line items) bool {
 	}
 
 	if isList, marker := t.isList(line); isList {
-		if NodeListItem == t.context.CurNode.Type() {
+		if NodeListItem == t.context.CurNodes.peek().Type() {
 			if 2 < t.context.IndentSpaces && 3 < startIndentSpaces && t.context.IndentSpaces > startIndentSpaces {
 				return false
 			}

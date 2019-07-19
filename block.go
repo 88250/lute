@@ -16,13 +16,13 @@
 package lute
 
 func (t *Tree) parseBlocks() {
-	curNode := t.context.CurNode
+	curNode := t.context.CurNodes.peek()
 	for line := t.nextLine(); ; {
 		n := t.parseBlock(line)
 		if nil != n {
 			curNode.AppendChild(curNode, n)
 		}
-		curNode = t.context.CurNode
+		curNode = t.context.CurNodes.peek()
 
 		line = t.nextLine()
 		if line.isEOF() {
@@ -55,7 +55,7 @@ func (t *Tree) parseBlock(line items) (ret Node) {
 	} else if t.isBlockquote(line) {
 		ret = t.parseBlockquote(line)
 	} else if isList, _ := t.isList(line); isList {
-		if NodeList == t.context.CurNode.Type() {
+		if NodeList == t.context.CurNodes.peek().Type() {
 			ret = t.parseListItem(line)
 		} else {
 			ret = t.parseList(line)

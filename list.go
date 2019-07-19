@@ -39,14 +39,18 @@ func (n *List) Close() {
 
 	tight := true
 	for child := n.FirstChild(); nil != child; child = child.Next() {
-		if !child.(*ListItem).Tight {
+		if NodeListItem == child.Type() && !child.(*ListItem).Tight {
 			tight = false
 			break
 		}
 	}
 	n.Tight = tight
+
 	for child := n.FirstChild(); nil != child; child = child.Next() {
-		child.(*ListItem).Tight = tight
+		if NodeListItem == child.Type() {
+			child.(*ListItem).Tight = tight
+		}
+
 		child.Close()
 	}
 
@@ -79,7 +83,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 	}
 	ret.AppendChild(ret, node)
 	t.context.IndentSpaces = indentSpaces
-	t.context.CurNode = ret
+	t.context.CurNodes.push(ret)
 
 	return
 }

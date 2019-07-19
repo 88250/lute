@@ -120,7 +120,7 @@ func (t *Tree) isSetextHeading(line items) (level int) {
 		}
 	}
 
-	parentType := t.context.CurNode.Type()
+	parentType := t.context.CurNodes.peek().Type()
 	if NodeBlockquote == parentType {
 		return
 	}
