@@ -44,10 +44,12 @@ func (t *Tree) parseParagraph(line items) {
 		startIndentSpaces := line.spaceCountLeft()
 
 		tokens := t.indentOffset(line, t.context.IndentSpaces)
-		if t.interruptParagraph(startIndentSpaces, tokens) {
+		if isInterrup, tokens := t.interruptParagraph(startIndentSpaces, tokens);isInterrup {
 			t.backupLine(line)
 
 			break
+		} else {
+			line = tokens
 		}
 	}
 	p.tokens = p.tokens.trimRight()
@@ -56,44 +58,50 @@ func (t *Tree) parseParagraph(line items) {
 	return
 }
 
-func (t *Tree) interruptParagraph(startIndentSpaces int, line items) bool {
+func (t *Tree) interruptParagraph(startIndentSpaces int, line items) (ret bool, tokens items) {
+	tokens = line
 	if t.isIndentCode(line) {
-		return false
+		return
 	}
 
 	if t.isThematicBreak(line) {
-		return true
+		ret = true
+		return
 	}
 
 	level := 0
 	if t.isATXHeading(line, &level) {
-		return true
+		ret = true
+		return
 	}
 
 	if isList, marker := t.isList(line); isList {
 		if NodeListItem == t.context.CurrentContainer().Type() {
 			if 2 < t.context.IndentSpaces && 3 < startIndentSpaces && t.context.IndentSpaces > startIndentSpaces {
-				return false
+				return
 			}
 
-			return true
+			ret = true
+			return
 		}
 
 		markerLen := len(marker)
 		if line[markerLen:].isBlankLine() {
-			return false
+			return
 		}
 
 		_, marker, delim, _, _ := t.parseListItemMarker(line, nil)
 		if " " != delim && "1" != marker[:markerLen-1] {
-			return false
+			return
 		}
 
-		return true
+		ret = true
+		return
 	}
 
 	if t.isFencedCode(line) {
-		return true
+		ret = true
+		return
 	}
 
 	pos := line.index(itemGreater)
@@ -101,20 +109,32 @@ func (t *Tree) interruptParagraph(startIndentSpaces int, line items) bool {
 		maybeTag := line[:pos+1]
 		htmlType := -1
 		if t.isHTML(maybeTag, &htmlType) && 7 != htmlType {
-			return true
+			ret = true
+			return
 		}
 	}
 
-	//if 0 < t.context.BlockquoteLevel {
-	//	tokens := t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
-	//	if tokens.isBlankLine() {
-	//		return true
-	//	}
-	//}
+	container := t.context.CurrentContainer()
+	if container.Is(NodeBlockquote) {
+		blockquote := container.(*Blockquote)
+		level := t.blockquoteMarkerCount(line)
+		if 0 == level {
+			return
+		}
 
-	if t.isBlockquote(line) {
-		return true
+		if blockquote.level != level {
+			ret = true
+			return
+		} else {
+			tokens = t.decBlockquoteMarker(line)
+			return
+		}
+	} else {
+		if t.isBlockquote(line) {
+			ret = true
+			return
+		}
 	}
 
-	return false
+	return
 }

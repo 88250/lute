@@ -40,7 +40,7 @@ func (t *Tree) parseFencedCode(line items) {
 
 	var codeValue string
 	for {
-		line = t.trimBlockquoteMarker(line)
+		line = t.decBlockquoteMarker(line)
 		line = t.indentOffset(line, t.context.IndentSpaces+indentSpaces)
 
 		codeValue += line.rawText()

@@ -17,10 +17,10 @@ package lute
 
 import "strings"
 
-func (t *Tree) parseHTML(line items, typ int) (ret Node) {
+func (t *Tree) parseHTML(line items, typ int) {
 	baseNode := &BaseNode{typ: NodeHTML}
 	html := &HTML{baseNode, ""}
-	ret = html
+	t.context.AppendChild(html)
 	openTagName := line.split(itemGreater)[0][1].val
 	for {
 		matchEnd := false
@@ -57,7 +57,7 @@ func (t *Tree) parseHTML(line items, typ int) (ret Node) {
 			break
 		}
 
-		line = t.trimBlockquoteMarker(line)
+		line = t.decBlockquoteMarker(line)
 
 		if isList, _ := t.isList(line); isList {
 			html.Value = strings.TrimRight(html.Value, "\n")

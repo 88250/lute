@@ -17,11 +17,14 @@ package lute
 
 type Blockquote struct {
 	*BaseNode
+
+	level int
 }
 
 func (t *Tree) parseBlockquote(line items) {
 	_, line = line.trimLeft()
-	blockquote := &Blockquote{&BaseNode{typ: NodeBlockquote}}
+	level := t.blockquoteMarkerCount(line)
+	blockquote := &Blockquote{&BaseNode{typ: NodeBlockquote}, level}
 	t.context.AppendChild(blockquote)
 	t.context.PushContainer(blockquote)
 	line = line[1:]
@@ -39,6 +42,8 @@ func (t *Tree) parseBlockquote(line items) {
 			t.backupLine(line)
 			break
 		}
+
+		line = t.decBlockquoteMarker(line)
 	}
 
 	t.context.PopContainer()
@@ -57,43 +62,19 @@ func (t *Tree) isBlockquote(line items) bool {
 	return true
 }
 
-func (t *Tree) trimBlockquoteMarker(line items) (ret items) {
+func (t *Tree) decBlockquoteMarker(line items) (ret items) {
 	if NodeBlockquote != t.context.CurrentContainer().Type() {
 		return line
 	}
 
-	count := 1
 	i := 0
 	for _, ret = line[1:].trimLeft(); 0 < len(ret) && (itemGreater == ret[0].typ || ret[0].isSpaceOrTab()); ret = ret[1:] {
-		if i++; count < i {
+		if i++; 1 < i {
 			break
 		}
 	}
 
 	return
-}
-
-func (t *Tree) isParagraphContinuation(line items) bool {
-	lastc := t.context.CurrentContainer().LastChild()
-	if nil == lastc {
-		return false
-	}
-
-	if NodeParagraph != lastc.Type() {
-		return false
-	}
-
-	line = t.trimBlockquoteMarker(line)
-	startIndentSpaces := line.spaceCountLeft()
-	if t.interruptParagraph(startIndentSpaces, line) {
-		return false
-	}
-
-	if line.isBlankLine() {
-		return false
-	}
-
-	return true
 }
 
 func (t *Tree) blockquoteMarkerCount(line items) (ret int) {
@@ -120,7 +101,7 @@ func (t *Tree) skipBlankBlockquote() (line items) {
 			return line
 		}
 
-		remains := t.trimBlockquoteMarker(line)
+		remains := t.decBlockquoteMarker(line)
 		if remains.isBlankLine() {
 			continue
 		}
