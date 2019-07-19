@@ -45,11 +45,7 @@ func (t *Tree) parseBlock(line items) {
 	} else if t.isBlockquote(line) {
 		t.parseBlockquote(line)
 	} else if isList, _ := t.isList(line); isList {
-		if NodeList == t.context.CurrentContainer().Type() {
-			t.parseListItem(line)
-		} else {
-			t.parseList(line)
-		}
+		t.parseList(line)
 	} else if t.isHTML(line, &htmlType) {
 		t.parseHTML(line, htmlType)
 	} else if t.parseLinkRefDef(line) {

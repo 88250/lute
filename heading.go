@@ -21,21 +21,22 @@ type Heading struct {
 	Level int
 }
 
-func (t *Tree) parseSetextHeading(p *Paragraph, level int) (ret Node) {
+func (t *Tree) parseSetextHeading(p *Paragraph, level int)  {
 	baseNode := &BaseNode{typ: NodeHeading}
-	ret = &Heading{baseNode, level}
+	heading := &Heading{baseNode, level}
+	t.context.AppendChild(heading)
 
 	p.tokens = p.tokens.trimRight()
 	text := &Text{BaseNode: &BaseNode{typ: NodeText, tokens: p.tokens}}
-	ret.AppendChild(ret, text)
+	heading.AppendChild(heading, text)
 
 	return
 }
 
-func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
+func (t *Tree) parseATXHeading(line items, level int) {
 	baseNode := &BaseNode{typ: NodeHeading}
 	heading := &Heading{baseNode, level}
-	ret = heading
+	t.context.AppendChild(heading)
 
 	_, tokens := line.trimLeft()
 	_, tokens = tokens[level:].trimLeft()
@@ -73,8 +74,8 @@ func (t *Tree) parseATXHeading(line items, level int) (ret Node) {
 }
 
 func (t *Tree) isATXHeading(line items, level *int) bool {
-	len := len(line)
-	if 2 > len { // at least # and newline
+	length := len(line)
+	if 2 > length { // at least # and newline
 		return false
 	}
 

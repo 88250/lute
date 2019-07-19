@@ -80,7 +80,13 @@ func (t *Tree) parseList(line items) {
 	t.context.AppendChild(list)
 	t.context.PushContainer(list)
 
-	t.parseListItem(line)
+	for {
+		t.parseListItem(line)
+		line = t.nextLine()
+		if isList, _:=t.isList(line);!isList {
+			break
+		}
+	}
 
 	t.context.IndentSpaces = indentSpaces
 	t.context.PopContainer()

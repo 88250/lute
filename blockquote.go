@@ -19,9 +19,10 @@ type Blockquote struct {
 	*BaseNode
 }
 
-func (t *Tree) parseBlockquote(line items)  {
+func (t *Tree) parseBlockquote(line items) {
 	_, line = line.trimLeft()
 	blockquote := &Blockquote{&BaseNode{typ: NodeBlockquote}}
+	t.context.AppendChild(blockquote)
 	t.context.PushContainer(blockquote)
 	line = line[1:]
 	if line[0].isSpace() {
@@ -33,10 +34,10 @@ func (t *Tree) parseBlockquote(line items)  {
 	for {
 		t.parseBlock(line)
 
-		_, line = line.trimLeft()
-		line = t.trimBlockquoteMarker(line)
-
-		break
+		line = t.nextLine()
+		if !t.isBlockquote(line) {
+			break
+		}
 	}
 
 	t.context.PopContainer()
