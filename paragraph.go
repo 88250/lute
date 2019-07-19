@@ -44,7 +44,7 @@ func (t *Tree) parseParagraph(line items) {
 		startIndentSpaces := line.spaceCountLeft()
 
 		tokens := t.indentOffset(line, t.context.IndentSpaces)
-		if isInterrup, tokens := t.interruptParagraph(startIndentSpaces, tokens);isInterrup {
+		if isInterrup, tokens := t.interruptParagraph(startIndentSpaces, tokens); isInterrup {
 			t.backupLine(line)
 
 			break
@@ -76,7 +76,7 @@ func (t *Tree) interruptParagraph(startIndentSpaces int, line items) (ret bool, 
 	}
 
 	if isList, marker := t.isList(line); isList {
-		if NodeListItem == t.context.CurrentContainer().Type() {
+		if t.context.CurrentContainer().Is(NodeListItem) {
 			if 2 < t.context.IndentSpaces && 3 < startIndentSpaces && t.context.IndentSpaces > startIndentSpaces {
 				return
 			}

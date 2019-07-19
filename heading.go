@@ -121,11 +121,11 @@ func (t *Tree) isSetextHeading(line items) (level int) {
 		}
 	}
 
-	parentType := t.context.CurrentContainer().Type()
-	if NodeBlockquote == parentType {
+	container:= t.context.CurrentContainer()
+	if container.Is(NodeBlockquote){
 		return
 	}
-	if NodeListItem == parentType {
+	if container.Is(NodeListItem) {
 		if t.context.IndentSpaces > spaces {
 			return
 		}
