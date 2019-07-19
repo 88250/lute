@@ -36,6 +36,7 @@ func (t *Tree) parseBlockquote(line items) {
 
 		line = t.nextLine()
 		if !t.isBlockquote(line) {
+			t.backupLine(line)
 			break
 		}
 	}

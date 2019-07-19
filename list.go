@@ -83,7 +83,14 @@ func (t *Tree) parseList(line items) {
 	for {
 		t.parseListItem(line)
 		line = t.nextLine()
-		if isList, _:=t.isList(line);!isList {
+
+		if t.isThematicBreak(line) {
+			t.backupLine(line)
+			break
+		}
+
+		if isList, _ := t.isList(line); !isList {
+			t.backupLine(line)
 			break
 		}
 	}

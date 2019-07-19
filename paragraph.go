@@ -24,7 +24,6 @@ type Paragraph struct {
 func (t *Tree) parseParagraph(line items) {
 	baseNode := &BaseNode{typ: NodeParagraph}
 	p := &Paragraph{baseNode, "<p>", "</p>"}
-	t.context.AppendChild(p)
 
 	for {
 		_, line = line.trimLeft()
@@ -52,6 +51,7 @@ func (t *Tree) parseParagraph(line items) {
 		}
 	}
 	p.tokens = p.tokens.trimRight()
+	t.context.AppendChild(p)
 
 	return
 }

@@ -17,7 +17,7 @@ package lute
 
 import "strings"
 
-func (t *Tree) parseFencedCode(line items) (ret Node) {
+func (t *Tree) parseFencedCode(line items)  {
 	indentSpaces, line := line.trimLeftSpace()
 	marker := line[0]
 	n := line.accept(marker.typ)
@@ -28,13 +28,14 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 	}
 	baseNode := &BaseNode{typ: NodeCode}
 	code := &Code{baseNode, "", infoStr}
+	t.context.AppendChild(code)
 
 	line = t.nextLine()
 	if line.isEOF() {
-		return code
+		return
 	}
 	if t.isFencedCodeClose(line, marker, n) {
-		return code
+		return
 	}
 
 	var codeValue string
@@ -62,9 +63,6 @@ func (t *Tree) parseFencedCode(line items) (ret Node) {
 	}
 
 	code.Value = codeValue
-	ret = code
-
-	return
 }
 
 func (t *Tree) isFencedCodeClose(line items, openMarker *item, num int) bool {
