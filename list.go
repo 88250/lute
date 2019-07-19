@@ -76,6 +76,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 	if remains.isBlankLine() {
 		t.context.IndentSpaces = startIndentSpaces + w + 1
 	}
+	t.context.CurNodes.push(ret)
 
 	node := t.parseListItem(line)
 	if nil == node {
@@ -83,7 +84,6 @@ func (t *Tree) parseList(line items) (ret Node) {
 	}
 	ret.AppendChild(ret, node)
 	t.context.IndentSpaces = indentSpaces
-	t.context.CurNodes.push(ret)
 
 	return
 }

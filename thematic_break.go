@@ -22,7 +22,6 @@ type ThematicBreak struct {
 func (t *Tree) parseThematicBreak(line items) (ret Node) {
 	baseNode := &BaseNode{typ: NodeThematicBreak, tokens: line}
 	ret = &ThematicBreak{baseNode}
-	t.context.CurNodes.push(ret)
 
 	return
 }

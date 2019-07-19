@@ -53,7 +53,7 @@ func (curNodes *CurNodes) pop() (ret Node) {
 	}
 
 	ret = curNodes.nodes[length-1]
-	curNodes.nodes = curNodes.nodes[:1]
+	curNodes.nodes = curNodes.nodes[:length-1]
 
 	return
 }

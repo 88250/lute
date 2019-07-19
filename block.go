@@ -17,17 +17,12 @@ package lute
 
 func (t *Tree) parseBlocks() {
 	curNode := t.context.CurNodes.peek()
-	for line := t.nextLine(); ; {
+	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
 		n := t.parseBlock(line)
 		if nil != n {
 			curNode.AppendChild(curNode, n)
 		}
 		curNode = t.context.CurNodes.peek()
-
-		line = t.nextLine()
-		if line.isEOF() {
-			break
-		}
 	}
 
 	for child := t.Root.FirstChild(); nil != child; child = child.Next() {
