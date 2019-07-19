@@ -34,7 +34,12 @@ func newListItem(t *Tree) (ret Node) {
 	return
 }
 
-func (t *Tree) parseListItem(line items) (ret Node, endWithBlankLine bool) {
+func (t *Tree) parseListItem(line items) (ret Node) {
+	if line.isBlankLine() {
+		ret = &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true}
+		return
+	}
+
 	ret = newListItem(t)
 	indentSpaces := t.context.IndentSpaces
 
@@ -67,19 +72,7 @@ func (t *Tree) parseListItem(line items) (ret Node, endWithBlankLine bool) {
 			continue
 		}
 
-		t.backupLine(line)
-		if 1 == len(blankLineIndices) && blankLineIndices[0] == i {
-			endWithBlankLine = true
-			t.backupLine(blankLines[0])
-		}
-
 		break
-	}
-
-	if 1 < len(blankLineIndices) {
-		ret.(*ListItem).Tight = false
-	} else if 1 == len(blankLineIndices) {
-		ret.(*ListItem).Tight = endWithBlankLine
 	}
 
 	return

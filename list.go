@@ -24,21 +24,25 @@ type List struct {
 
 	Bullet bool
 	Start  int
+	Delim  string
 	Tight  bool
 
-	Marker   string
-	WNSpaces int
+	Marker            string
+	startIndentSpaces int
+	indentSpaces      int
 }
 
-func newList(marker string, bullet bool, start int, wnSpaces int, t *Tree) (ret Node) {
+func newList(marker string, bullet bool, start int, delim string, startIndentSpaces, indentSpaces int, t *Tree) (ret Node) {
 	baseNode := &BaseNode{typ: NodeList}
 	ret = &List{
 		baseNode,
 		bullet,
 		start,
+		delim,
 		false,
 		marker,
-		wnSpaces,
+		startIndentSpaces,
+		indentSpaces,
 	}
 	t.context.CurNode = ret
 
@@ -80,8 +84,6 @@ func (t *Tree) parseListMarker(line items) (remains items, marker, delim string,
 	} else if 1 > n {
 		n = 1
 	}
-	wnSpaces := w + n
-	t.context.IndentSpaces += startIndentSpaces + wnSpaces
 	if line[0].isTab() {
 		line = t.indentOffset(line, 2)
 	} else {
@@ -97,94 +99,94 @@ func (t *Tree) parseList(line items) (ret Node) {
 	indentSpaces := t.context.IndentSpaces
 
 	line, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
-	ret = newList(marker, bullet, start, w+n, t)
+	ret = newList(marker, bullet, start, delim, startIndentSpaces, startIndentSpaces+w+n, t)
+	t.context.IndentSpaces += startIndentSpaces + w + n
 
 	if line.isBlankLine() {
 		t.context.IndentSpaces = startIndentSpaces + w + 1
-
-		line = t.nextLine()
-		if line.isBlankLine() {
-			ret.AppendChild(ret, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
-			ret.(*List).Tight = true
-
-			return
-		}
 	}
 
-	for {
-		node, endWithBlankLine := t.parseListItem(line)
-		if nil == node {
-			break
-		}
-		ret.AppendChild(ret, node)
-		t.context.IndentSpaces = indentSpaces
+	var node Node
+	var blankLineIndices []int
+	i := 0
 
-		line = t.nextLine()
-		if line.isEOF() {
-			break
-		}
+	node = t.parseListItem(line)
+	if nil == node {
+		return
+	}
+	ret.AppendChild(ret, node)
+	t.context.IndentSpaces = indentSpaces
 
-		if t.isThematicBreak(line) {
-			t.backupLine(line)
-			break
-		}
-
-		if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
-			t.backupLine(line)
-			break
-		}
-
-		start++
-
-		if isList, _ := t.isList(line); !isList {
-			t.backupLine(line)
-			node.(*ListItem).Tight = endWithBlankLine
-			break
-		}
-
-		nextLine, nextMarker, nextDelim, startIndentSpaces, indentSpaces := t.parseListItemMarker(line, ret)
-		if bullet {
-			if marker != nextMarker {
-				t.backupLine(line)
-				break
-			}
-		} else {
-			if delim != nextDelim || strconv.Itoa(start) != nextMarker[:1] {
-				t.backupLine(line)
-				break
-			}
-		}
-
-		if nextLine.isBlankLine() && t.context.IndentSpaces > line.spaceCountLeft() {
-			t.backupLine(line)
-			break
-		}
-
-		if startIndentSpaces < t.context.IndentSpaces && t.context.IndentSpaces >= indentSpaces {
-			t.backupLine(line)
-			break
-		}
-
-		if 3 < startIndentSpaces {
-			t.backupLine(line)
-			break
-		}
-
-		t.context.IndentSpaces = indentSpaces
-		line = t.indentOffset(nextLine, t.context.IndentSpaces)
+	blankLines := t.skipBlankLines()
+	if 0 < len(blankLines) {
+		blankLineIndices = append(blankLineIndices, i)
 	}
 
-	tight := true
-	for child := ret.FirstChild(); nil != child; child = child.Next() {
-		if !child.(*ListItem).Tight {
-			tight = false
-			break
-		}
-	}
-	ret.(*List).Tight = tight
-	for child := ret.FirstChild(); nil != child; child = child.Next() {
-		child.(*ListItem).Tight = tight
-	}
+	//line = t.nextLine()
+	//if line.isEOF() {
+	//	break
+	//}
+	//
+	//if t.isThematicBreak(line) {
+	//	t.backupLine(line)
+	//	break
+	//}
+	//
+	//if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
+	//	t.backupLine(line)
+	//	break
+	//}
+	//
+	//start++
+	//
+	//if isList, _ := t.isList(line); !isList {
+	//	t.backupLine(line)
+	//	node.(*ListItem).Tight = endWithBlankLine
+	//	break
+	//}
+	//
+	//nextLine, nextMarker, nextDelim, startIndentSpaces, indentSpaces := t.parseListItemMarker(line, ret)
+	//if bullet {
+	//	if marker != nextMarker {
+	//		t.backupLine(line)
+	//		break
+	//	}
+	//} else {
+	//	if delim != nextDelim || strconv.Itoa(start) != nextMarker[:1] {
+	//		t.backupLine(line)
+	//		break
+	//	}
+	//}
+	//
+	//if nextLine.isBlankLine() && t.context.IndentSpaces > line.spaceCountLeft() {
+	//	t.backupLine(line)
+	//	break
+	//}
+	//
+	//if startIndentSpaces < t.context.IndentSpaces && t.context.IndentSpaces >= indentSpaces {
+	//	t.backupLine(line)
+	//	break
+	//}
+	//
+	//if 3 < startIndentSpaces {
+	//	t.backupLine(line)
+	//	break
+	//}
+
+	t.context.IndentSpaces = indentSpaces
+	line = t.indentOffset(line, t.context.IndentSpaces)
+
+	//tight := true
+	//for child := ret.FirstChild(); nil != child; child = child.Next() {
+	//	if !child.(*ListItem).Tight {
+	//		tight = false
+	//		break
+	//	}
+	//}
+	//ret.(*List).Tight = tight
+	//for child := ret.FirstChild(); nil != child; child = child.Next() {
+	//	child.(*ListItem).Tight = tight
+	//}
 
 	return
 }
