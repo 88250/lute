@@ -62,7 +62,8 @@ func (t *Tree) isFencedCodeClose(line items, openMarker *item, num int) bool {
 
 	container := t.context.CurrentContainer()
 	if container.Is(NodeBlockquote) {
-		if !t.isBlockquote(line) {
+		if 1 > t.blockquoteMarkerCount(line) {
+			t.backupLine(line)
 			return true
 		}
 	} else if container.Is(NodeListItem) {

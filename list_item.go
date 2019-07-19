@@ -77,9 +77,9 @@ func (t *Tree) parseListItem(line items) {
 			break
 		}
 
-		//if 0 < t.blockquoteMarkerCount(line) && 0 < t.context.BlockquoteLevel {
-		//	line = t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
-		//}
+		if 0 < t.blockquoteMarkerCount(line) && t.context.CurrentContainer().Is(NodeBlockquote) {
+			line = t.decBlockquoteMarker(line)
+		}
 
 		if t.context.IndentSpaces <= line.spaceCountLeft() {
 			line = t.indentOffset(line, t.context.IndentSpaces)
@@ -87,7 +87,6 @@ func (t *Tree) parseListItem(line items) {
 		}
 
 		t.backupLine(line)
-
 		break
 	}
 

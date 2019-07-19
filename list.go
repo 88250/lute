@@ -83,6 +83,7 @@ func (t *Tree) parseList(line items) {
 	for {
 		t.parseListItem(line)
 		line = t.nextLine()
+		line = t.indentOffset(line, t.context.IndentSpaces)
 
 		if t.isThematicBreak(line) {
 			t.backupLine(line)
@@ -93,6 +94,23 @@ func (t *Tree) parseList(line items) {
 			t.backupLine(line)
 			break
 		}
+
+		if t.context.CurrentContainer().Parent().Is(NodeBlockquote) {
+			if 1 > t.blockquoteMarkerCount(line) {
+				t.backupLine(line)
+				break
+			} else {
+				line = t.decBlockquoteMarker(line)
+			}
+		}
+
+		if t.context.IndentSpaces-2 <= line.spaceCountLeft() {
+			line = t.indentOffset(line, t.context.IndentSpaces)
+			continue
+		}
+
+		t.backupLine(line)
+		break
 	}
 
 	t.context.IndentSpaces = indentSpaces

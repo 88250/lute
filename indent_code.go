@@ -55,10 +55,10 @@ func (t *Tree) parseIndentCode(line items) (ret Node) {
 		}
 		chunks = append(chunks, chunk)
 
-		//if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
-		//	t.backupLine(line)
-		//	break
-		//}
+		if t.context.CurrentContainer().Is(NodeBlockquote) && 1 > t.blockquoteMarkerCount(line) {
+			t.backupLine(line)
+			break
+		}
 
 		line = tokens
 	}
