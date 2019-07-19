@@ -22,7 +22,7 @@ func (t *Tree) parseBlocks() {
 		if nil != n {
 			curNode.AppendChild(curNode, n)
 		}
-		t.context.CurNode = curNode
+		curNode = t.context.CurNode
 
 		line = t.nextLine()
 		if line.isEOF() {

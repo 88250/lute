@@ -22,14 +22,23 @@ type ListItem struct {
 	Tight   bool
 }
 
-func newListItem(t *Tree) (ret Node) {
+func (n *ListItem) Close() {
+	if n.close {
+		return
+	}
+
+	for child := n.FirstChild(); nil != child; child = child.Next() {
+		child.Close()
+	}
+}
+
+func (t *Tree) newListItem(marker string, bullet bool, start int, delim string, startIndentSpaces, indentSpaces int) (ret Node) {
 	baseNode := &BaseNode{typ: NodeListItem, tokens: items{}}
 	ret = &ListItem{
 		baseNode,
 		false,
 		true,
 	}
-	t.context.CurNode = ret
 
 	return
 }
@@ -40,8 +49,10 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		return
 	}
 
-	ret = newListItem(t)
 	indentSpaces := t.context.IndentSpaces
+
+	line, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
+	ret = t.newListItem(marker, bullet, start, delim, startIndentSpaces, startIndentSpaces+w+n)
 
 	var blankLineIndices []int
 	i := 0
@@ -72,8 +83,18 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 			continue
 		}
 
+		t.backupLine(line)
+
 		break
 	}
+
+	if 1 < len(blankLineIndices) {
+		ret.(*ListItem).Tight = false
+	} else if 1 == len(blankLineIndices) {
+		ret.(*ListItem).Tight = 1 == len(blankLineIndices) && blankLineIndices[0] == i
+	}
+
+	t.context.CurNode = ret
 
 	return
 }

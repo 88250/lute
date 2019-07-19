@@ -92,7 +92,7 @@ func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
 	inTightList := false
 	if NodeListItem == node.Parent().Type() {
-		inTightList = node.Parent().Parent().(*List).Tight
+		inTightList = node.Parent().(*ListItem).Tight
 	}
 	if entering {
 		if !inTightList {

@@ -47,23 +47,38 @@ func (n *List) Close() {
 	n.Tight = tight
 	for child := n.FirstChild(); nil != child; child = child.Next() {
 		child.(*ListItem).Tight = tight
+		child.Close()
 	}
 
 	n.close = true
 }
 
-func newList(marker string, bullet bool, start int, delim string, startIndentSpaces, indentSpaces int, t *Tree) (ret Node) {
-	baseNode := &BaseNode{typ: NodeList}
+func (t *Tree) parseList(line items) (ret Node) {
+	indentSpaces := t.context.IndentSpaces
+
+	remains, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
 	ret = &List{
-		baseNode,
+		&BaseNode{typ: NodeList},
 		bullet,
 		start,
 		delim,
 		false,
 		marker,
 		startIndentSpaces,
-		indentSpaces,
+		startIndentSpaces + w + n,
 	}
+	t.context.IndentSpaces += startIndentSpaces + w + n
+
+	if remains.isBlankLine() {
+		t.context.IndentSpaces = startIndentSpaces + w + 1
+	}
+
+	node := t.parseListItem(line)
+	if nil == node {
+		return
+	}
+	ret.AppendChild(ret, node)
+	t.context.IndentSpaces = indentSpaces
 	t.context.CurNode = ret
 
 	return
@@ -111,27 +126,6 @@ func (t *Tree) parseListMarker(line items) (remains items, marker, delim string,
 	}
 
 	remains = line
-
-	return
-}
-
-func (t *Tree) parseList(line items) (ret Node) {
-	indentSpaces := t.context.IndentSpaces
-
-	line, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
-	ret = newList(marker, bullet, start, delim, startIndentSpaces, startIndentSpaces+w+n, t)
-	t.context.IndentSpaces += startIndentSpaces + w + n
-
-	if line.isBlankLine() {
-		t.context.IndentSpaces = startIndentSpaces + w + 1
-	}
-
-	node := t.parseListItem(line)
-	if nil == node {
-		return
-	}
-	ret.AppendChild(ret, node)
-	t.context.IndentSpaces = indentSpaces
 
 	return
 }
