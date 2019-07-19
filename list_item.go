@@ -94,7 +94,7 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		ret.(*ListItem).Tight = 1 == len(blankLineIndices) && blankLineIndices[0] == i
 	}
 
-	t.context.CurNodes.push(ret)
+	t.context.BlockContainers.push(ret)
 
 	return
 }
