@@ -17,6 +17,7 @@ package lute
 
 type Node interface {
 	Type() NodeType
+	Is(NodeType) bool
 	Unlink()
 	Parent() Node
 	SetParent(Node)
@@ -51,6 +52,10 @@ type BaseNode struct {
 
 func (n *BaseNode) Type() NodeType {
 	return n.typ
+}
+
+func (n *BaseNode) Is(nodeType NodeType) bool {
+	return nodeType == n.typ
 }
 
 func (n *BaseNode) Close() {
