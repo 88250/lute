@@ -35,6 +35,14 @@ func (t *Tree) parseParagraph(line items) {
 			break
 		}
 
+		if t.context.CurrentContainer().Is(NodeBlockquote) && 0 < t.blockquoteMarkerCount(line) {
+			tokens := t.decBlockquoteMarker(line)
+			if tokens.isBlankLine() {
+				t.backupLine(line)
+				break
+			}
+		}
+
 		if level := t.isSetextHeading(line); 0 < level {
 			t.parseSetextHeading(p, level)
 
