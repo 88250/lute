@@ -120,7 +120,7 @@ func (t *Tree) isSetextHeading(line items) (level int) {
 		}
 	}
 
-	parentType := t.context.BlockContainers.peek().Type()
+	parentType := t.context.CurrentContainer().Type()
 	if NodeBlockquote == parentType {
 		return
 	}
@@ -129,7 +129,6 @@ func (t *Tree) isSetextHeading(line items) (level int) {
 			return
 		}
 	}
-
 
 	if itemEqual == marker.typ {
 		level = 1

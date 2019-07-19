@@ -24,8 +24,7 @@ type Paragraph struct {
 func (t *Tree) parseParagraph(line items) {
 	baseNode := &BaseNode{typ: NodeParagraph}
 	p := &Paragraph{baseNode, "<p>", "</p>"}
-	curContainer := t.context.BlockContainers.peek()
-	curContainer.AppendChild(curContainer, p)
+	t.context.AppendChild(p)
 
 	for {
 		_, line = line.trimLeft()
@@ -72,7 +71,7 @@ func (t *Tree) interruptParagraph(startIndentSpaces int, line items) bool {
 	}
 
 	if isList, marker := t.isList(line); isList {
-		if NodeListItem == t.context.BlockContainers.peek().Type() {
+		if NodeListItem == t.context.CurrentContainer().Type() {
 			if 2 < t.context.IndentSpaces && 3 < startIndentSpaces && t.context.IndentSpaces > startIndentSpaces {
 				return false
 			}

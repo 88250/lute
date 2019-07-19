@@ -85,6 +85,23 @@ type Context struct {
 	previousDelimiter *delimiter
 }
 
+func (context *Context) AppendChild(node Node) {
+	container := context.BlockContainers.peek()
+	container.AppendChild(container, node)
+}
+
+func (context *Context) PushContainer(blockContainerNode Node) {
+	context.BlockContainers.push(blockContainerNode)
+}
+
+func (context *Context) PopContainer() Node {
+	return context.BlockContainers.pop()
+}
+
+func (context *Context) CurrentContainer() Node {
+	return context.BlockContainers.peek()
+}
+
 // Tree is the representation of the markdown ast.
 type Tree struct {
 	Root      *Root
@@ -212,7 +229,7 @@ func (t *Tree) parse() (err error) {
 	t.lex = lex(t.name, t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
 	t.context.BlockContainers = &BlockContainer{}
-	t.context.BlockContainers.push(t.Root)
+	t.context.PushContainer(t.Root)
 	t.context.LinkRefDef = map[string]*Link{}
 	t.parseBlocks()
 	t.parseInlines()

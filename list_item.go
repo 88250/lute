@@ -58,9 +58,8 @@ func (t *Tree) parseListItem(line items) {
 		startIndentSpaces,
 		startIndentSpaces + w + n,
 	}
-	curContainer := t.context.BlockContainers.peek()
-	curContainer.AppendChild(curContainer, li)
-	t.context.BlockContainers.push(li)
+	t.context.AppendChild(li)
+	t.context.PushContainer(li)
 
 	var blankLineIndices []int
 	i := 0
@@ -99,7 +98,7 @@ func (t *Tree) parseListItem(line items) {
 	}
 
 	t.context.IndentSpaces = indentSpaces
-	t.context.BlockContainers.pop()
+	t.context.PopContainer()
 
 	return
 }

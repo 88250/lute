@@ -18,6 +18,7 @@ package lute
 func (t *Tree) parseIndentCode(line items) (ret Node) {
 	baseNode := &BaseNode{typ: NodeCode}
 	code := &Code{baseNode, "", ""}
+	t.context.AppendChild(code)
 
 	var chunks []items
 	for {

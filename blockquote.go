@@ -22,7 +22,7 @@ type Blockquote struct {
 func (t *Tree) parseBlockquote(line items)  {
 	_, line = line.trimLeft()
 	blockquote := &Blockquote{&BaseNode{typ: NodeBlockquote}}
-	t.context.BlockContainers.push(blockquote)
+	t.context.PushContainer(blockquote)
 	line = line[1:]
 	if line[0].isSpace() {
 		line = line[1:]
@@ -39,7 +39,7 @@ func (t *Tree) parseBlockquote(line items)  {
 		break
 	}
 
-	t.context.BlockContainers.pop()
+	t.context.PopContainer()
 }
 
 func (t *Tree) isBlockquote(line items) bool {
@@ -56,7 +56,7 @@ func (t *Tree) isBlockquote(line items) bool {
 }
 
 func (t *Tree) trimBlockquoteMarker(line items) (ret items) {
-	if NodeBlockquote != t.context.BlockContainers.peek().Type() {
+	if NodeBlockquote != t.context.CurrentContainer().Type() {
 		return line
 	}
 
@@ -72,7 +72,7 @@ func (t *Tree) trimBlockquoteMarker(line items) (ret items) {
 }
 
 func (t *Tree) isParagraphContinuation(line items) bool {
-	lastc := t.context.BlockContainers.peek().LastChild()
+	lastc := t.context.CurrentContainer().LastChild()
 	if nil == lastc {
 		return false
 	}

@@ -77,14 +77,13 @@ func (t *Tree) parseList(line items) {
 		t.context.IndentSpaces = startIndentSpaces + w + 1
 	}
 
-	curContainer := t.context.BlockContainers.peek()
-	curContainer.AppendChild(curContainer, list)
-	t.context.BlockContainers.push(list)
+	t.context.AppendChild(list)
+	t.context.PushContainer(list)
 
 	t.parseListItem(line)
 
 	t.context.IndentSpaces = indentSpaces
-	t.context.BlockContainers.pop()
+	t.context.PopContainer()
 
 	return
 }
