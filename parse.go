@@ -96,7 +96,7 @@ func (t *Tree) nonWhitespace(line items) (spaces, tabs int, tokens items, firstN
 	return
 }
 
-func (t *Tree) skipBlankLines() (count int) {
+func (t *Tree) skipBlankLines() (blankLines []items) {
 	for {
 		line := t.nextLine()
 		if line.isEOF() {
@@ -107,7 +107,8 @@ func (t *Tree) skipBlankLines() (count int) {
 			t.backupLine(line)
 			return
 		}
-		count++
+
+		blankLines = append(blankLines, line)
 	}
 }
 

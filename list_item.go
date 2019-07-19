@@ -34,10 +34,13 @@ func newListItem(t *Tree) (ret Node) {
 	return
 }
 
-func (t *Tree) parseListItem(line items) (ret Node, withBlankLine bool) {
+func (t *Tree) parseListItem(line items) (ret Node, endWithBlankLine bool) {
 	ret = newListItem(t)
 	indentSpaces := t.context.IndentSpaces
-	for {
+
+	var blankLineIndices []int
+	i := 0
+	for ; ; i++ {
 		n := t.parseBlock(line)
 		if nil == n {
 			break
@@ -46,8 +49,8 @@ func (t *Tree) parseListItem(line items) (ret Node, withBlankLine bool) {
 		t.context.IndentSpaces = indentSpaces
 
 		blankLines := t.skipBlankLines()
-		if 1 <= blankLines && !withBlankLine {
-			withBlankLine = true
+		if 0 < len(blankLines) {
+			blankLineIndices = append(blankLineIndices, i)
 		}
 
 		line = t.nextLine()
@@ -65,11 +68,18 @@ func (t *Tree) parseListItem(line items) (ret Node, withBlankLine bool) {
 		}
 
 		t.backupLine(line)
+		if 1 == len(blankLineIndices) && blankLineIndices[0] == i {
+			endWithBlankLine = true
+			t.backupLine(blankLines[0])
+		}
+
 		break
 	}
 
-	if 1 < len(ret.Children()) && withBlankLine {
+	if 1 < len(blankLineIndices) {
 		ret.(*ListItem).Tight = false
+	} else if 1 == len(blankLineIndices) {
+		ret.(*ListItem).Tight = endWithBlankLine
 	}
 
 	return

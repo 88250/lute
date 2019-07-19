@@ -112,7 +112,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 	}
 
 	for {
-		node, withBlankLine := t.parseListItem(line)
+		node, endWithBlankLine := t.parseListItem(line)
 		if nil == node {
 			break
 		}
@@ -138,7 +138,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 
 		if isList, _ := t.isList(line); !isList {
 			t.backupLine(line)
-			node.(*ListItem).Tight = withBlankLine
+			node.(*ListItem).Tight = endWithBlankLine
 			break
 		}
 
@@ -155,16 +155,12 @@ func (t *Tree) parseList(line items) (ret Node) {
 			}
 		}
 
-		if nextLine.isBlankLine() && withBlankLine && t.context.IndentSpaces > line.spaceCountLeft() {
+		if nextLine.isBlankLine() && t.context.IndentSpaces > line.spaceCountLeft() {
 			t.backupLine(line)
 			break
 		}
 
-		if 2 <= start && withBlankLine {
-			node.(*ListItem).Tight = false
-		}
-
-		if withBlankLine && startIndentSpaces < t.context.IndentSpaces && t.context.IndentSpaces >= indentSpaces {
+		if startIndentSpaces < t.context.IndentSpaces && t.context.IndentSpaces >= indentSpaces {
 			t.backupLine(line)
 			break
 		}
