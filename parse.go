@@ -160,7 +160,11 @@ func (t *Tree) nextLine() (line items) {
 }
 
 func (t *Tree) backupLine(line items) {
-	t.context.CurLines = append(t.context.CurLines, line)
+	if 0 < len(t.context.CurLines) {
+		t.context.CurLines = append([]items{line}, t.context.CurLines...)
+	} else {
+		t.context.CurLines = append(t.context.CurLines, line)
+	}
 }
 
 // Parsing.
