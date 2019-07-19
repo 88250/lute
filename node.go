@@ -34,6 +34,7 @@ type Node interface {
 	RawText() string
 	SetRawText(string)
 	Tokens() items
+	Close()
 }
 
 type BaseNode struct {
@@ -45,10 +46,18 @@ type BaseNode struct {
 	lastChild  Node
 	rawText    string
 	tokens     items
+	close      bool
 }
 
 func (n *BaseNode) Type() NodeType {
 	return n.typ
+}
+
+func (n *BaseNode) Close() {
+	if n.close {
+		return
+	}
+	n.close = true
 }
 
 func (n *BaseNode) Unlink() {

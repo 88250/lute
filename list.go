@@ -32,6 +32,26 @@ type List struct {
 	indentSpaces      int
 }
 
+func (n *List) Close() {
+	if n.close {
+		return
+	}
+
+	tight := true
+	for child := n.FirstChild(); nil != child; child = child.Next() {
+		if !child.(*ListItem).Tight {
+			tight = false
+			break
+		}
+	}
+	n.Tight = tight
+	for child := n.FirstChild(); nil != child; child = child.Next() {
+		child.(*ListItem).Tight = tight
+	}
+
+	n.close = true
+}
+
 func newList(marker string, bullet bool, start int, delim string, startIndentSpaces, indentSpaces int, t *Tree) (ret Node) {
 	baseNode := &BaseNode{typ: NodeList}
 	ret = &List{
@@ -106,87 +126,12 @@ func (t *Tree) parseList(line items) (ret Node) {
 		t.context.IndentSpaces = startIndentSpaces + w + 1
 	}
 
-	var node Node
-	var blankLineIndices []int
-	i := 0
-
-	node = t.parseListItem(line)
+	node := t.parseListItem(line)
 	if nil == node {
 		return
 	}
 	ret.AppendChild(ret, node)
 	t.context.IndentSpaces = indentSpaces
-
-	blankLines := t.skipBlankLines()
-	if 0 < len(blankLines) {
-		blankLineIndices = append(blankLineIndices, i)
-	}
-
-	//line = t.nextLine()
-	//if line.isEOF() {
-	//	break
-	//}
-	//
-	//if t.isThematicBreak(line) {
-	//	t.backupLine(line)
-	//	break
-	//}
-	//
-	//if t.blockquoteMarkerCount(line) < t.context.BlockquoteLevel {
-	//	t.backupLine(line)
-	//	break
-	//}
-	//
-	//start++
-	//
-	//if isList, _ := t.isList(line); !isList {
-	//	t.backupLine(line)
-	//	node.(*ListItem).Tight = endWithBlankLine
-	//	break
-	//}
-	//
-	//nextLine, nextMarker, nextDelim, startIndentSpaces, indentSpaces := t.parseListItemMarker(line, ret)
-	//if bullet {
-	//	if marker != nextMarker {
-	//		t.backupLine(line)
-	//		break
-	//	}
-	//} else {
-	//	if delim != nextDelim || strconv.Itoa(start) != nextMarker[:1] {
-	//		t.backupLine(line)
-	//		break
-	//	}
-	//}
-	//
-	//if nextLine.isBlankLine() && t.context.IndentSpaces > line.spaceCountLeft() {
-	//	t.backupLine(line)
-	//	break
-	//}
-	//
-	//if startIndentSpaces < t.context.IndentSpaces && t.context.IndentSpaces >= indentSpaces {
-	//	t.backupLine(line)
-	//	break
-	//}
-	//
-	//if 3 < startIndentSpaces {
-	//	t.backupLine(line)
-	//	break
-	//}
-
-	t.context.IndentSpaces = indentSpaces
-	line = t.indentOffset(line, t.context.IndentSpaces)
-
-	//tight := true
-	//for child := ret.FirstChild(); nil != child; child = child.Next() {
-	//	if !child.(*ListItem).Tight {
-	//		tight = false
-	//		break
-	//	}
-	//}
-	//ret.(*List).Tight = tight
-	//for child := ret.FirstChild(); nil != child; child = child.Next() {
-	//	child.(*ListItem).Tight = tight
-	//}
 
 	return
 }

@@ -29,6 +29,10 @@ func (t *Tree) parseBlocks() {
 			break
 		}
 	}
+
+	for child := t.Root.FirstChild(); nil != child; child = child.Next() {
+		child.Close()
+	}
 }
 
 func (t *Tree) parseBlock(line items) (ret Node) {
