@@ -36,12 +36,14 @@ func newListItem(t *Tree) (ret Node) {
 
 func (t *Tree) parseListItem(line items) (ret Node, withBlankLine bool) {
 	ret = newListItem(t)
+	indentSpaces := t.context.IndentSpaces
 	for {
 		n := t.parseBlock(line)
 		if nil == n {
 			break
 		}
 		ret.AppendChild(ret, n)
+		t.context.IndentSpaces = indentSpaces
 
 		blankLines := t.skipBlankLines()
 		if 1 <= blankLines && !withBlankLine {
@@ -57,14 +59,13 @@ func (t *Tree) parseListItem(line items) (ret Node, withBlankLine bool) {
 			line = t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
 		}
 
-		spaces, tabs, _, _ := t.nonWhitespace(line)
-		totalSpaces := spaces + tabs*4
-		if totalSpaces < t.context.IndentSpaces {
-			t.backupLine(line)
-			break
+		if t.context.IndentSpaces <= line.spaceCountLeft() {
+			line = t.indentOffset(line, t.context.IndentSpaces)
+			continue
 		}
 
-		line = t.indentOffset(line, t.context.IndentSpaces)
+		t.backupLine(line)
+		break
 	}
 
 	if 1 < len(ret.Children()) && withBlankLine {

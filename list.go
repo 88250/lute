@@ -94,6 +94,8 @@ func (t *Tree) parseListMarker(line items) (remains items, marker, delim string,
 }
 
 func (t *Tree) parseList(line items) (ret Node) {
+	indentSpaces := t.context.IndentSpaces
+
 	line, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
 	ret = newList(marker, bullet, start, w+n, t)
 
@@ -115,6 +117,7 @@ func (t *Tree) parseList(line items) (ret Node) {
 			break
 		}
 		ret.AppendChild(ret, node)
+		t.context.IndentSpaces = indentSpaces
 
 		line = t.nextLine()
 		if line.isEOF() {
@@ -133,8 +136,9 @@ func (t *Tree) parseList(line items) (ret Node) {
 
 		start++
 
-		if isList, _ := t.isList(line);!isList {
+		if isList, _ := t.isList(line); !isList {
 			t.backupLine(line)
+			node.(*ListItem).Tight = withBlankLine
 			break
 		}
 
@@ -160,13 +164,18 @@ func (t *Tree) parseList(line items) (ret Node) {
 			node.(*ListItem).Tight = false
 		}
 
-		if withBlankLine && startIndentSpaces < t.context.IndentSpaces && (3 < startIndentSpaces || t.context.IndentSpaces > indentSpaces){
+		if withBlankLine && startIndentSpaces < t.context.IndentSpaces && t.context.IndentSpaces >= indentSpaces {
+			t.backupLine(line)
+			break
+		}
+
+		if 3 < startIndentSpaces {
 			t.backupLine(line)
 			break
 		}
 
 		t.context.IndentSpaces = indentSpaces
-		line = nextLine
+		line = t.indentOffset(nextLine, t.context.IndentSpaces)
 	}
 
 	tight := true
