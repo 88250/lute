@@ -23,8 +23,8 @@ type Blockquote struct {
 
 func (t *Tree) parseBlockquote(line items) {
 	_, line = line.trimLeft()
-	level := t.blockquoteMarkerCount(line)
-	blockquote := &Blockquote{&BaseNode{typ: NodeBlockquote}, level}
+	t.context.BlockquoteLevel++
+	blockquote := &Blockquote{&BaseNode{typ: NodeBlockquote}, t.context.BlockquoteLevel}
 	t.context.AppendChild(blockquote)
 	t.context.PushContainer(blockquote)
 	line = line[1:]
@@ -47,6 +47,7 @@ func (t *Tree) parseBlockquote(line items) {
 	}
 
 	t.context.PopContainer()
+	t.context.BlockquoteLevel--
 }
 
 func (t *Tree) isBlockquote(line items) bool {

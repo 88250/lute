@@ -130,7 +130,7 @@ func (t *Tree) interruptParagraph(startIndentSpaces int, line items) (ret bool, 
 			return
 		}
 
-		if blockquote.level != level {
+		if blockquote.level < level {
 			ret = true
 			return
 		} else {

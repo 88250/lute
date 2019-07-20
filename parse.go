@@ -75,6 +75,7 @@ type Context struct {
 	// Blocks parsing
 
 	BlockContainers *BlockContainer
+	BlockquoteLevel int
 	IndentSpaces    int
 
 	// Inlines parsing
