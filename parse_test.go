@@ -52,7 +52,7 @@ var parseTests = []parseTest{
 	//{"spec235", "123456789. ok\n", "<ol start=\"123456789\">\n<li>ok</li>\n</ol>\n"},
 	//{"spec234", "- Foo\n\n      bar\n\n\n      baz\n", "<ul>\n<li>\n<p>Foo</p>\n<pre><code>bar\n\n\nbaz\n</code></pre>\n</li>\n</ul>\n"},
 	//{"spec233", "1.  foo\n\n    ```\n    bar\n    ```\n\n    baz\n\n    > bam\n", "<ol>\n<li>\n<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>\n<blockquote>\n<p>bam</p>\n</blockquote>\n</li>\n</ol>\n"},
-	//{"spec229", "   > > 1.  one\n>>\n>>     two\n", "<blockquote>\n<blockquote>\n<ol>\n<li>\n<p>one</p>\n<p>two</p>\n</li>\n</ol>\n</blockquote>\n</blockquote>\n"},
+	{"spec229", "   > > 1.  one\n>>\n>>     two\n", "<blockquote>\n<blockquote>\n<ol>\n<li>\n<p>one</p>\n<p>two</p>\n</li>\n</ol>\n</blockquote>\n</blockquote>\n"},
 	{"spec227", " -    one\n\n     two\n", "<ul>\n<li>one</li>\n</ul>\n<pre><code> two\n</code></pre>\n"},
 	{"spec224", "1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.\n", "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>\n"},
 	{"spec222", ">     code\n\n>    not code\n", "<blockquote>\n<pre><code>code\n</code></pre>\n</blockquote>\n<blockquote>\n<p>not code</p>\n</blockquote>\n"},

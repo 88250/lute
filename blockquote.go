@@ -17,16 +17,19 @@ package lute
 
 type Blockquote struct {
 	*BaseNode
-
-	level int
 }
 
-func (t *Tree) parseBlockquote(line items) {
-	_, line = line.trimLeft()
-	t.context.BlockquoteLevel++
-	blockquote := &Blockquote{&BaseNode{typ: NodeBlockquote}, t.context.BlockquoteLevel}
-	t.context.AppendChild(blockquote)
-	t.context.PushContainer(blockquote)
+func (t *Tree) parseBlockquote(line items) (ret Node) {
+	if 2 > len(line) {
+		return
+	}
+
+	_, marker := line.firstNonSpace()
+	if itemGreater != marker.typ {
+		return
+	}
+
+	ret = &Blockquote{&BaseNode{typ: NodeBlockquote}}
 	line = line[1:]
 	if line[0].isSpace() {
 		line = line[1:]
@@ -34,79 +37,8 @@ func (t *Tree) parseBlockquote(line items) {
 		line = t.indentOffset(line, 2)
 	}
 
-	for {
-		t.parseBlock(line)
-
-		line = t.nextLine()
-		if !t.isBlockquote(line) {
-			t.backupLine(line)
-			break
-		}
-
-		line = t.decBlockquoteMarker(line)
-	}
-
-	t.context.PopContainer()
-	t.context.BlockquoteLevel--
-}
-
-func (t *Tree) isBlockquote(line items) bool {
-	if 2 > len(line) { // at least > and newline
-		return false
-	}
-
-	_, marker := line.firstNonSpace()
-	if itemGreater != marker.typ {
-		return false
-	}
-
-	return true
-}
-
-func (t *Tree) decBlockquoteMarker(line items) (ret items) {
-	if NodeBlockquote != t.context.CurrentContainer().Type() {
-		return line
-	}
-
-	i := 0
-	for _, ret = line[1:].trimLeft(); 0 < len(ret) && (itemGreater == ret[0].typ || ret[0].isSpaceOrTab()); ret = ret[1:] {
-		if i++; 1 < i {
-			break
-		}
-	}
+	child := t.parseBlock(line)
+	ret.AppendChild(ret, child)
 
 	return
-}
-
-func (t *Tree) blockquoteMarkerCount(line items) (ret int) {
-	_, line = line.trimLeft()
-	for _, token := range line {
-		if itemGreater == token.typ {
-			ret++
-		} else if itemSpace != token.typ && itemTab != token.typ {
-			break
-		}
-	}
-
-	return
-}
-
-func (t *Tree) skipBlankBlockquote() (line items) {
-	for {
-		line = t.nextLine()
-		if line.isEOF() {
-			return
-		}
-
-		if !t.isBlockquote(line) {
-			return line
-		}
-
-		remains := t.decBlockquoteMarker(line)
-		if remains.isBlankLine() {
-			continue
-		}
-
-		return remains
-	}
 }

@@ -390,7 +390,7 @@ func (tokens items) removeSpacesTabs() (ret items) {
 	return
 }
 
-func (tokens items) spaceCountLeft() (count int) {
+func (tokens items) leftSpaces() (count int) {
 	for _, token := range tokens {
 		if itemSpace == token.typ {
 			count++

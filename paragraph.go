@@ -21,47 +21,9 @@ type Paragraph struct {
 	OpenTag, CloseTag string
 }
 
-func (t *Tree) parseParagraph(line items) {
-	baseNode := &BaseNode{typ: NodeParagraph}
-	p := &Paragraph{baseNode, "<p>", "</p>"}
-
-	for {
-		_, line = line.trimLeft()
-		p.tokens = append(p.tokens, line...)
-
-		line = t.nextLine()
-		if line.isBlankLine() {
-			t.backupLine(line)
-			break
-		}
-
-		if t.context.CurrentContainer().Is(NodeBlockquote) && 0 < t.blockquoteMarkerCount(line) {
-			tokens := t.decBlockquoteMarker(line)
-			if tokens.isBlankLine() {
-				t.backupLine(line)
-				break
-			}
-		}
-
-		if level := t.isSetextHeading(line); 0 < level {
-			t.parseSetextHeading(p, level)
-
-			return
-		}
-
-		startIndentSpaces := line.spaceCountLeft()
-
-		tokens := t.indentOffset(line, t.context.IndentSpaces)
-		if isInterrup, tokens := t.interruptParagraph(startIndentSpaces, tokens); isInterrup {
-			t.backupLine(line)
-
-			break
-		} else {
-			line = tokens
-		}
-	}
-	p.tokens = p.tokens.trimRight()
-	t.context.AppendChild(p)
+func (t *Tree) parseParagraph(line items) (ret Node) {
+	p := &Paragraph{&BaseNode{typ: NodeParagraph, tokens: line}, "<p>", "</p>"}
+	ret = p
 
 	return
 }

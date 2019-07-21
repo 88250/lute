@@ -24,8 +24,8 @@ type ListItem struct {
 	Tight  bool
 
 	Marker            string
-	startIndentSpaces int
-	indentSpaces      int
+	StartIndentSpaces int
+	IndentSpaces      int
 }
 
 func (n *ListItem) Close() {
@@ -45,9 +45,7 @@ func (t *Tree) parseListItem(line items) {
 		return
 	}
 
-	indentSpaces := t.context.IndentSpaces
-
-	line, marker, delim, bullet, start, startIndentSpaces, w, n := t.parseListMarker(line)
+	line, marker, delim, startIndentSpaces, w, n := t.parseListItemMarker(line)
 	li = &ListItem{
 		&BaseNode{typ: NodeListItem, tokens: items{}},
 		bullet,
@@ -58,77 +56,15 @@ func (t *Tree) parseListItem(line items) {
 		startIndentSpaces,
 		startIndentSpaces + w + n,
 	}
-	t.context.AppendChild(li)
-	t.context.PushContainer(li)
 
-	var blankLineIndices []int
-	i := 0
-	for ; ; i++ {
-		t.parseBlock(line)
-
-		t.context.IndentSpaces = indentSpaces
-		blankLines := t.skipBlankLines()
-		if 0 < len(blankLines) {
-			blankLineIndices = append(blankLineIndices, i)
-		}
-
-		line = t.nextLine()
-		if line.isEOF() {
-			break
-		}
-
-		if 0 < t.blockquoteMarkerCount(line) && t.context.CurrentContainer().Is(NodeBlockquote) {
-			line = t.decBlockquoteMarker(line)
-		}
-
-		if t.context.IndentSpaces <= line.spaceCountLeft() {
-			line = t.indentOffset(line, t.context.IndentSpaces)
-			continue
-		}
-
-		t.backupLine(line)
-		break
-	}
-
-	if 1 < len(blankLineIndices) {
-		li.(*ListItem).Tight = false
-	} else if 1 == len(blankLineIndices) {
-		li.(*ListItem).Tight = 1 == len(blankLineIndices) && blankLineIndices[0] == i
-	}
-
-	t.context.IndentSpaces = indentSpaces
-	t.context.PopContainer()
+	child := t.parseBlock(line)
+	li.AppendChild(li, child)
 
 	return
 }
 
-func (t *Tree) parseListItemMarker(line items, list Node) (remains items, marker, delim string, startIndentSpaces, indentSpaces int) {
-	remains, marker, delim, startIndentSpaces, indentSpaces = t.parseListItemMarker0(line)
-
-	if remains.isBlankLine() {
-		remains = t.nextLine()
-		if remains.isBlankLine() {
-			list.AppendChild(list, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: false})
-			t.skipBlankLines()
-			remains = t.nextLine()
-			remains, marker, delim, startIndentSpaces, indentSpaces = t.parseListItemMarker0(remains)
-
-			return
-		}
-
-		if isList, marker := t.isList(remains); isList {
-			list.AppendChild(list, &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true})
-			remains = remains[len(marker):]
-		}
-
-		remains = t.indentOffset(remains, t.context.IndentSpaces)
-	}
-
-	return
-}
-
-func (t *Tree) parseListItemMarker0(line items) (remains items, marker, delim string, startIndentSpaces, indentSpaces int) {
-	spaces, tabs, tokens, firstNonWhitespace := t.nonWhitespace(line)
+func (t *Tree) parseListItemMarker(line items) (remains items, marker, delim string, startIndentSpaces, indentSpaces int) {
+	spaces, tabs, firstNonWhitespace := t.nonSpaceTab(line)
 	var markers items
 	markers = append(markers, firstNonWhitespace)
 	line = line[len(tokens):]

@@ -35,7 +35,10 @@ type Node interface {
 	RawText() string
 	SetRawText(string)
 	Tokens() items
+	IsOpen() bool
+	IsClosed() bool
 	Close()
+	LeftSpaces() int
 }
 
 type BaseNode struct {
@@ -48,6 +51,7 @@ type BaseNode struct {
 	rawText    string
 	tokens     items
 	close      bool
+	leftSpaces int
 }
 
 func (n *BaseNode) Type() NodeType {
@@ -56,6 +60,18 @@ func (n *BaseNode) Type() NodeType {
 
 func (n *BaseNode) Is(nodeType NodeType) bool {
 	return nodeType == n.typ
+}
+
+func (n *BaseNode) IsOpen() bool {
+	return !n.close
+}
+
+func (n *BaseNode) IsClosed() bool {
+	return n.close
+}
+
+func (n *BaseNode) LeftSpaces() int {
+	return n.leftSpaces
 }
 
 func (n *BaseNode) Close() {

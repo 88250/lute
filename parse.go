@@ -72,12 +72,6 @@ type Context struct {
 	LinkRefDef map[string]*Link
 	CurLines   []items
 
-	// Blocks parsing
-
-	BlockContainers *BlockContainer
-	BlockquoteLevel int
-	IndentSpaces    int
-
 	// Inlines parsing
 
 	Pos               int
@@ -86,22 +80,6 @@ type Context struct {
 	previousDelimiter *delimiter
 }
 
-func (context *Context) AppendChild(node Node) {
-	container := context.BlockContainers.peek()
-	container.AppendChild(container, node)
-}
-
-func (context *Context) PushContainer(blockContainerNode Node) {
-	context.BlockContainers.push(blockContainerNode)
-}
-
-func (context *Context) PopContainer() Node {
-	return context.BlockContainers.pop()
-}
-
-func (context *Context) CurrentContainer() Node {
-	return context.BlockContainers.peek()
-}
 
 // Tree is the representation of the markdown ast.
 type Tree struct {
@@ -123,18 +101,16 @@ func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 	return
 }
 
-func (t *Tree) nonWhitespace(line items) (spaces, tabs int, tokens items, firstNonWhitespace *item) {
+func (t *Tree) nonSpaceTab(line items) (spaces, tabs int, firstNonSpaceTab *item) {
 	for i := 0; i < len(line); i++ {
 		token := line[i]
-		tokens = append(tokens, token)
 		switch token.typ {
 		case itemTab:
 			tabs++
 		case itemSpace:
 			spaces++
-		case itemNewline:
 		default:
-			firstNonWhitespace = token
+			firstNonSpaceTab = token
 			return
 		}
 	}
@@ -229,8 +205,6 @@ func (t *Tree) parse() (err error) {
 
 	t.lex = lex(t.name, t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
-	t.context.BlockContainers = &BlockContainer{}
-	t.context.PushContainer(t.Root)
 	t.context.LinkRefDef = map[string]*Link{}
 	t.parseBlocks()
 	t.parseInlines()
