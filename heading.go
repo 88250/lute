@@ -24,7 +24,6 @@ type Heading struct {
 func (t *Tree) parseSetextHeading(p *Paragraph, level int)  {
 	baseNode := &BaseNode{typ: NodeHeading}
 	heading := &Heading{baseNode, level}
-	t.context.AppendChild(heading)
 
 	p.tokens = p.tokens.trimRight()
 	text := &Text{BaseNode: &BaseNode{typ: NodeText, tokens: p.tokens}}
@@ -36,7 +35,6 @@ func (t *Tree) parseSetextHeading(p *Paragraph, level int)  {
 func (t *Tree) parseATXHeading(line items, level int) {
 	baseNode := &BaseNode{typ: NodeHeading}
 	heading := &Heading{baseNode, level}
-	t.context.AppendChild(heading)
 
 	_, tokens := line.trimLeft()
 	_, tokens = tokens[level:].trimLeft()
@@ -117,16 +115,6 @@ func (t *Tree) isSetextHeading(line items) (level int) {
 	for i := 1; i < length; i++ {
 		token := line[i]
 		if marker.typ != token.typ {
-			return
-		}
-	}
-
-	container:= t.context.CurrentContainer()
-	if container.Is(NodeBlockquote){
-		return
-	}
-	if container.Is(NodeListItem) {
-		if t.context.IndentSpaces > spaces {
 			return
 		}
 	}

@@ -17,22 +17,28 @@ package lute
 
 func (t *Tree) parseBlocks() {
 	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
-		spaces, tabs, firstNonSpaceTab := t.nonSpaceTab(line)
+		t.processLine(line)
+	}
+}
 
-		
+func (t *Tree) processLine(line items) {
+	spaces, tabs, remains := t.nonSpaceTab(line)
+	indentSpaces := spaces + tabs*4
+	node := t.parseBlock(remains)
 
-		var lastOpenNode Node
-		for lastOpenNode = t.Root.FirstChild(); nil != lastOpenNode && lastOpenNode.IsOpen(); lastOpenNode = lastOpenNode.Next() {
+	_ = indentSpaces
 
-		}
-
+	var lastOpenNode Node
+	for lastOpenNode = t.Root.FirstChild(); nil != lastOpenNode && lastOpenNode.IsOpen(); lastOpenNode = lastOpenNode.Next() {
 		switch lastOpenNode.Type() {
 		case NodeListItem:
 		case NodeBlockquote:
+		case NodeRoot:
+			lastOpenNode.AppendChild(lastOpenNode, node)
+		default:
 		}
-
-		t.parseBlock(line)
 	}
+
 }
 
 func (t *Tree) parseBlock(tokens items) (node Node) {

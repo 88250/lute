@@ -18,7 +18,6 @@ package lute
 import "strings"
 
 func (t *Tree) parseFencedCode(line items) {
-	indentSpaces, line := line.trimLeftSpace()
 	marker := line[0]
 	n := line.accept(marker.typ)
 	line = line[n:]
@@ -28,7 +27,6 @@ func (t *Tree) parseFencedCode(line items) {
 	}
 	baseNode := &BaseNode{typ: NodeCode}
 	code := &Code{baseNode, "", infoStr}
-	t.context.AppendChild(code)
 
 	line = t.nextLine()
 	if line.isEOF() {
@@ -40,9 +38,6 @@ func (t *Tree) parseFencedCode(line items) {
 
 	var codeValue string
 	for {
-		line = t.decBlockquoteMarker(line)
-		line = t.indentOffset(line, t.context.IndentSpaces+indentSpaces)
-
 		codeValue += line.rawText()
 		code.tokens = append(code.tokens, line...)
 
@@ -58,23 +53,6 @@ func (t *Tree) parseFencedCode(line items) {
 func (t *Tree) isFencedCodeClose(line items, openMarker *item, num int) bool {
 	if line.isEOF() {
 		return true
-	}
-
-	container := t.context.CurrentContainer()
-	if container.Is(NodeBlockquote) {
-		if 1 > t.blockquoteMarkerCount(line) {
-			t.backupLine(line)
-			return true
-		}
-	} else if container.Is(NodeListItem) {
-		if isList, _ := t.isList(line); !isList {
-			return true
-		}
-	}
-
-	spaces, line := line.trimLeftSpace()
-	if t.context.IndentSpaces+3 < spaces {
-		return false
 	}
 
 	closeMarker := line[0]
@@ -93,10 +71,6 @@ func (t *Tree) isFencedCodeClose(line items, openMarker *item, num int) bool {
 
 func (t *Tree) isFencedCode(line items) bool {
 	if 3 > len(line) {
-		return false
-	}
-	spaces, line := line.trimLeftSpace()
-	if t.context.IndentSpaces+3 < spaces {
 		return false
 	}
 

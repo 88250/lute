@@ -15,6 +15,8 @@
 
 package lute
 
+import "strconv"
+
 type ListItem struct {
 	*BaseNode
 
@@ -38,56 +40,58 @@ func (n *ListItem) Close() {
 	}
 }
 
-func (t *Tree) parseListItem(line items) {
-	var li Node
-	if line.isBlankLine() {
-		li = &ListItem{BaseNode: &BaseNode{typ: NodeListItem}, Tight: true}
+func (t *Tree) parseListItem(line items) (ret Node) {
+	spaces, tabs, remains := t.nonSpaceTab(line)
+	startIndentSpaces := spaces + tabs*4
+	token := remains[0]
+	start := 0
+	var marker, delim string
+	var bullet bool
+	if itemAsterisk == token.typ {
+		if !line[1].isWhitespace() {
+			return
+		}
+		marker = "*"
+		delim = " "
+		bullet = true
+		remains = remains[2:]
+	} else if itemHyphen == token.typ {
+		if !line[1].isWhitespace() {
+			return
+		}
+		marker = "-"
+		delim = " "
+		bullet = true
+		remains = remains[2:]
+	} else if itemPlus == token.typ {
+		if !line[1].isWhitespace() {
+			return
+		}
+		marker = "+"
+		delim = " "
+		bullet = true
+		remains = remains[2:]
+	} else if token.isNumInt() && 9 >= len(token.val) {
+		if !line[2].isWhitespace() {
+			return
+		}
+		start, _ = strconv.Atoi(token.val)
+		if itemDot == line[1].typ {
+			delim = "."
+			marker = token.val + delim
+			remains = remains[2:]
+		} else if itemCloseParen == line[1].typ {
+			delim = ")"
+			marker = token.val + delim
+			remains = remains[2:]
+		} else {
+			return
+		}
+	} else {
 		return
 	}
 
-	line, marker, delim, startIndentSpaces, w, n := t.parseListItemMarker(line)
-	li = &ListItem{
-		&BaseNode{typ: NodeListItem, tokens: items{}},
-		bullet,
-		start,
-		delim,
-		true,
-		marker,
-		startIndentSpaces,
-		startIndentSpaces + w + n,
-	}
-
-	child := t.parseBlock(line)
-	li.AppendChild(li, child)
-
-	return
-}
-
-func (t *Tree) parseListItemMarker(line items) (remains items, marker, delim string, startIndentSpaces, indentSpaces int) {
-	spaces, tabs, firstNonWhitespace := t.nonSpaceTab(line)
-	var markers items
-	markers = append(markers, firstNonWhitespace)
-	line = line[len(tokens):]
-	if firstNonWhitespace.isNumInt() {
-		markers = append(markers, line[0])
-		line = line[1:]
-	}
-	switch markers[len(markers)-1].typ {
-	case itemAsterisk:
-		delim = " "
-	case itemHyphen:
-		delim = " "
-	case itemPlus:
-		delim = " "
-	case itemCloseParen:
-		delim = " "
-	case itemDot:
-		delim = "."
-	}
-	startIndentSpaces = spaces + tabs*4
-	marker = markers.rawText()
-	spaces, tabs, _, firstNonWhitespace = t.nonWhitespace(line)
-
+	spaces, tabs, remains = t.nonSpaceTab(remains)
 	w := len(marker)
 	n := spaces + tabs*4
 	if 4 < n {
@@ -96,14 +100,25 @@ func (t *Tree) parseListItemMarker(line items) (remains items, marker, delim str
 		n = 1
 	}
 	wnSpaces := w + n
-	indentSpaces = startIndentSpaces + wnSpaces
+	indentSpaces := startIndentSpaces + wnSpaces
 	if line[0].isTab() {
-		line = t.indentOffset(line, 2)
+		remains = t.indentOffset(remains, 2)
 	} else {
-		line = line[1:]
+		remains = remains[1:]
 	}
 
-	remains = line
+	li := &ListItem{
+		&BaseNode{typ: NodeListItem, tokens: items{}},
+		bullet,
+		start,
+		delim,
+		true,
+		marker,
+		startIndentSpaces,
+		indentSpaces,
+	}
+
+	ret = li
 
 	return
 }

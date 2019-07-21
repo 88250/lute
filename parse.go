@@ -80,7 +80,6 @@ type Context struct {
 	previousDelimiter *delimiter
 }
 
-
 // Tree is the representation of the markdown ast.
 type Tree struct {
 	Root      *Root
@@ -101,8 +100,9 @@ func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 	return
 }
 
-func (t *Tree) nonSpaceTab(line items) (spaces, tabs int, firstNonSpaceTab *item) {
-	for i := 0; i < len(line); i++ {
+func (t *Tree) nonSpaceTab(line items) (spaces, tabs int, remains items) {
+	i := 0
+	for ; i < len(line); i++ {
 		token := line[i]
 		switch token.typ {
 		case itemTab:
@@ -110,10 +110,11 @@ func (t *Tree) nonSpaceTab(line items) (spaces, tabs int, firstNonSpaceTab *item
 		case itemSpace:
 			spaces++
 		default:
-			firstNonSpaceTab = token
-			return
+			break
 		}
 	}
+
+	remains = line[i:]
 
 	return
 }

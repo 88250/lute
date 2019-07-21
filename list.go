@@ -15,8 +15,6 @@
 
 package lute
 
-import "strconv"
-
 type ListType int
 
 type List struct {
@@ -58,66 +56,22 @@ func (n *List) Close() {
 }
 
 func (t *Tree) parseList(line items) (ret Node) {
-	if 2 > len(line) { // at least marker and newline
+	n := t.parseListItem(line)
+	if nil == n {
 		return
 	}
 
-	token := line[0]
-	start := 0
-	var marker, delim string
-	var bullet bool
-	if itemAsterisk == token.typ {
-		if !line[1].isWhitespace() {
-			return
-		}
-		marker = "*"
-		delim = " "
-		bullet = true
-	} else if itemHyphen == token.typ {
-		if !line[1].isWhitespace() {
-			return
-		}
-		marker = "-"
-		delim = " "
-		bullet = true
-	} else if itemPlus == token.typ {
-		if !line[1].isWhitespace() {
-			return
-		}
-		marker = "+"
-		delim = " "
-		bullet = true
-	} else if token.isNumInt() && 9 >= len(token.val) {
-		if !line[2].isWhitespace() {
-			return
-		}
-		start, _ = strconv.Atoi(token.val)
-		if itemDot == line[1].typ {
-			delim = "."
-			marker = token.val + delim
-		} else if itemCloseParen == line[1].typ {
-			delim = ")"
-			marker = token.val + delim
-		} else {
-			return
-		}
-	}
-
-	w := len(marker)
-	tokens := line[len(marker)+1:]
-	n := tokens.leftSpaces()
+	li := n.(*ListItem)
 	ret = &List{
 		&BaseNode{typ: NodeList},
-		bullet,
-		start,
-		delim,
-		false,
-		marker,
-		0,
-		w + n,
+		li.Bullet,
+		li.Start,
+		li.Delim,
+		li.Tight,
+		li.Marker,
+		li.StartIndentSpaces,
+		li.IndentSpaces,
 	}
-
-	t.parseListItem(line)
 
 	return
 }

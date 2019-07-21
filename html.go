@@ -20,7 +20,6 @@ import "strings"
 func (t *Tree) parseHTML(line items, typ int) {
 	baseNode := &BaseNode{typ: NodeHTML}
 	html := &HTML{baseNode, ""}
-	t.context.AppendChild(html)
 	openTagName := line.split(itemGreater)[0][1].val
 	for {
 		matchEnd := false
@@ -54,14 +53,6 @@ func (t *Tree) parseHTML(line items, typ int) {
 
 		line = t.nextLine()
 		if line.isEOF() {
-			break
-		}
-
-		line = t.decBlockquoteMarker(line)
-
-		if isList, _ := t.isList(line); isList {
-			html.Value = strings.TrimRight(html.Value, "\n")
-			t.backupLine(line)
 			break
 		}
 
