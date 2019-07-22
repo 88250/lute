@@ -16,69 +16,18 @@
 package lute
 
 func (t *Tree) parseIndentCode(line items) (ret Node) {
+	spaces, tabs, remains := t.nonSpaceTab(line)
+	if 4 > spaces && 1 > tabs {
+		return
+	}
+
 	baseNode := &BaseNode{typ: NodeCode}
 	code := &Code{baseNode, "", ""}
-
-	var chunks []items
-	for {
-		var spaces, tabs int
-		for i := 0; i < 4; i++ {
-			token := line[i]
-			if itemSpace == token.typ {
-				spaces++
-			} else if itemTab == token.typ {
-				tabs++
-			}
-			if 3 < spaces || 0 < tabs {
-				line = line[i+1:]
-				break
-			}
-		}
-
-		chunk := items{}
-		chunk = append(chunk, line...)
-		newlines, nonNewline := t.nonNewline()
-		line = nonNewline
-
-		if 0 < len(newlines) {
-			chunk = append(chunk, newlines...)
-		}
-		chunks = append(chunks, chunk)
-	}
-
-	if 1 > len(chunks) {
-		return nil
-	}
-
-	for _, chunk := range chunks {
-		code.Value += chunk.rawText()
-	}
+	code.Value += remains.rawText()
 
 	ret = code
 
 	return
-}
-
-func (t *Tree) isIndentCode(line items) bool {
-	if line.isBlankLine() {
-		return false
-	}
-
-	var spaces int
-	for _, token := range line {
-		if itemSpace == token.typ {
-			spaces++
-			continue
-		}
-		if itemTab == token.typ {
-			spaces += 4
-			continue
-		}
-
-		break
-	}
-
-	return 3 < spaces
 }
 
 func (t *Tree) nonNewline() (newlines items, line items) {

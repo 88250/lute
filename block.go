@@ -22,17 +22,16 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) processLine(line items) {
-	spaces, tabs, remains := t.nonSpaceTab(line)
-	indentSpaces := spaces + tabs*4
-	node := t.parseBlock(remains)
 
-	_ = indentSpaces
+	node := t.parseBlock(line)
 
 	var lastOpenNode Node
-	for lastOpenNode = t.Root.FirstChild(); nil != lastOpenNode && lastOpenNode.IsOpen(); lastOpenNode = lastOpenNode.Next() {
+	for lastOpenNode = t.Root; nil != lastOpenNode && lastOpenNode.IsOpen(); lastOpenNode = lastOpenNode.Next() {
 		switch lastOpenNode.Type() {
 		case NodeListItem:
 		case NodeBlockquote:
+		case NodeParagraph:
+
 		case NodeRoot:
 			lastOpenNode.AppendChild(lastOpenNode, node)
 		default:
@@ -46,7 +45,10 @@ func (t *Tree) parseBlock(tokens items) (node Node) {
 		return
 	}
 
-	node = t.parseParagraph(tokens)
+	node = t.parseIndentCode(tokens)
+	if nil == node {
+		node = t.parseParagraph(tokens)
+	}
 
 	return
 }

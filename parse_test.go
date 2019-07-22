@@ -164,8 +164,8 @@ var parseTests = []parseTest{
 	//{"simple6", "l**ut**e", "<p>l<strong>ut</strong>e</p>\n"},
 	//{"simple5", "l*ut*e", "<p>l<em>ut</em>e</p>\n"},
 	//{"simple4", "    lute\n", "<pre><code>lute\n</code></pre>\n"},
-	//{"simple3", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
-	//{"simple2", "l`ut`e", "<p>l<code>ut</code>e</p>\n"},
+	{"simple3", "\tlute\n", "<pre><code>lute\n</code></pre>\n"},
+	{"simple2", "l`ut`e", "<p>l<code>ut</code>e</p>\n"},
 	{"simple1", "lute", "<p>lute</p>\n"},
 	{"simple0", "", ""},
 }
