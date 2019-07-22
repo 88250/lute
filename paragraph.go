@@ -22,6 +22,7 @@ type Paragraph struct {
 }
 
 func (t *Tree) parseParagraph(tokens items) (ret Node) {
+	tokens = tokens.trim()
 	p := &Paragraph{&BaseNode{typ: NodeParagraph, tokens: tokens}, "<p>", "</p>"}
 	ret = p
 

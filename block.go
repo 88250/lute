@@ -23,24 +23,47 @@ func (t *Tree) parseBlocks() {
 
 func (t *Tree) processLine(line items) {
 	node := t.parseBlock(line)
+	if nil == node {
+		return
+	}
 
-	var lastOpenNode Node
-	for lastOpenNode = t.Root; nil != lastOpenNode && lastOpenNode.IsOpen(); lastOpenNode = lastOpenNode.Next() {
-		switch lastOpenNode.Type() {
-		case NodeListItem:
-		case NodeBlockquote:
-		case NodeParagraph:
+	var lastOpenContainer Node
+	var lastOpenBlock Node
+	for lastOpenContainer = t.Root; nil != lastOpenContainer && lastOpenContainer.IsOpen(); lastOpenContainer = lastOpenContainer.Next() {
+		lastOpenBlock = lastOpenContainer.FirstChild()
+		if nil == lastOpenBlock {
+			t.appendBlock(lastOpenContainer, node)
+			return
+		}
 
-		case NodeRoot:
-			lastOpenNode.AppendChild(lastOpenNode, node)
-		default:
+		for ; nil != lastOpenBlock && lastOpenBlock.IsOpen(); lastOpenBlock = lastOpenBlock.Next() {
+			t.appendBlock(lastOpenBlock, node)
+			return
 		}
 	}
 
 }
 
+func (t *Tree) appendBlock(lastOpenBlock, node Node) {
+	switch lastOpenBlock.Type() {
+	case NodeListItem:
+	case NodeBlockquote:
+	case NodeParagraph:
+		lastOpenBlock.Close()
+		prev := lastOpenBlock.Previous()
+		if nil == prev {
+			lastOpenBlock = lastOpenBlock.Parent()
+		}
+		lastOpenBlock.AppendChild(lastOpenBlock, node)
+		return
+	case NodeRoot:
+		lastOpenBlock.AppendChild(lastOpenBlock, node)
+		return
+	}
+}
+
 func (t *Tree) parseBlock(tokens items) (node Node) {
-	if tokens.isEOF() {
+	if tokens.isEOF() || tokens.isBlankLine() {
 		return
 	}
 
