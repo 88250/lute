@@ -40,15 +40,15 @@ func (n *ListItem) Close() {
 	}
 }
 
-func (t *Tree) parseListItem(line items) (ret Node) {
-	spaces, tabs, remains := t.nonSpaceTab(line)
+func (t *Tree) parseListItem(tokens items) (ret Node) {
+	spaces, tabs, remains := t.nonSpaceTab(tokens)
 	startIndentSpaces := spaces + tabs*4
 	token := remains[0]
 	start := 0
 	var marker, delim string
 	var bullet bool
 	if itemAsterisk == token.typ {
-		if !line[1].isWhitespace() {
+		if !remains[1].isWhitespace() {
 			return
 		}
 		marker = "*"
@@ -56,7 +56,7 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		bullet = true
 		remains = remains[2:]
 	} else if itemHyphen == token.typ {
-		if !line[1].isWhitespace() {
+		if !remains[1].isWhitespace() {
 			return
 		}
 		marker = "-"
@@ -64,7 +64,7 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		bullet = true
 		remains = remains[2:]
 	} else if itemPlus == token.typ {
-		if !line[1].isWhitespace() {
+		if !tokens[1].isWhitespace() {
 			return
 		}
 		marker = "+"
@@ -72,15 +72,15 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		bullet = true
 		remains = remains[2:]
 	} else if token.isNumInt() && 9 >= len(token.val) {
-		if !line[2].isWhitespace() {
+		if !remains[2].isWhitespace() {
 			return
 		}
 		start, _ = strconv.Atoi(token.val)
-		if itemDot == line[1].typ {
+		if itemDot == remains[1].typ {
 			delim = "."
 			marker = token.val + delim
 			remains = remains[2:]
-		} else if itemCloseParen == line[1].typ {
+		} else if itemCloseParen == remains[1].typ {
 			delim = ")"
 			marker = token.val + delim
 			remains = remains[2:]
@@ -101,11 +101,6 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 	}
 	wnSpaces := w + n
 	indentSpaces := startIndentSpaces + wnSpaces
-	if line[0].isTab() {
-		remains = t.indentOffset(remains, 2)
-	} else {
-		remains = remains[1:]
-	}
 
 	li := &ListItem{
 		&BaseNode{typ: NodeListItem, tokens: items{}},
@@ -117,8 +112,10 @@ func (t *Tree) parseListItem(line items) (ret Node) {
 		startIndentSpaces,
 		indentSpaces,
 	}
-
 	ret = li
+
+	child := t.parseBlock(remains)
+	li.AppendChild(li, child)
 
 	return
 }

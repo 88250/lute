@@ -22,7 +22,6 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) processLine(line items) {
-
 	node := t.parseBlock(line)
 
 	var lastOpenNode Node
@@ -46,6 +45,15 @@ func (t *Tree) parseBlock(tokens items) (node Node) {
 	}
 
 	node = t.parseIndentCode(tokens)
+	if nil == node {
+		node = t.parseATXHeading(tokens)
+	}
+	if nil == node {
+		node = t.parseList(tokens)
+	}
+	if nil == node {
+		node = t.parseBlockquote(tokens)
+	}
 	if nil == node {
 		node = t.parseParagraph(tokens)
 	}

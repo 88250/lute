@@ -100,11 +100,11 @@ func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 	return
 }
 
-func (t *Tree) nonSpaceTab(line items) (spaces, tabs int, remains items) {
+func (t *Tree) nonSpaceTab(tokens items) (spaces, tabs int, remains items) {
 	i := 0
 Loop:
-	for ; i < len(line); i++ {
-		token := line[i]
+	for ; i < len(tokens); i++ {
+		token := tokens[i]
 		switch token.typ {
 		case itemTab:
 			tabs++
@@ -115,7 +115,7 @@ Loop:
 		}
 	}
 
-	remains = line[i:]
+	remains = tokens[i:]
 
 	return
 }

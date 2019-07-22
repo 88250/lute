@@ -21,8 +21,8 @@ type Paragraph struct {
 	OpenTag, CloseTag string
 }
 
-func (t *Tree) parseParagraph(line items) (ret Node) {
-	p := &Paragraph{&BaseNode{typ: NodeParagraph, tokens: line}, "<p>", "</p>"}
+func (t *Tree) parseParagraph(tokens items) (ret Node) {
+	p := &Paragraph{&BaseNode{typ: NodeParagraph, tokens: tokens}, "<p>", "</p>"}
 	ret = p
 
 	return

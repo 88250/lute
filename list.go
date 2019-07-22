@@ -55,14 +55,14 @@ func (n *List) Close() {
 	n.close = true
 }
 
-func (t *Tree) parseList(line items) (ret Node) {
-	n := t.parseListItem(line)
+func (t *Tree) parseList(tokens items) (ret Node) {
+	n := t.parseListItem(tokens)
 	if nil == n {
 		return
 	}
 
 	li := n.(*ListItem)
-	ret = &List{
+	list := &List{
 		&BaseNode{typ: NodeList},
 		li.Bullet,
 		li.Start,
@@ -72,6 +72,8 @@ func (t *Tree) parseList(line items) (ret Node) {
 		li.StartIndentSpaces,
 		li.IndentSpaces,
 	}
+	ret = list
+	list.AppendChild(list, li)
 
 	return
 }

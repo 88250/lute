@@ -15,8 +15,8 @@
 
 package lute
 
-func (t *Tree) parseIndentCode(line items) (ret Node) {
-	spaces, tabs, remains := t.nonSpaceTab(line)
+func (t *Tree) parseIndentCode(tokens items) (ret Node) {
+	spaces, tabs, remains := t.nonSpaceTab(tokens)
 	if 4 > spaces && 1 > tabs {
 		return
 	}

@@ -19,25 +19,25 @@ type Blockquote struct {
 	*BaseNode
 }
 
-func (t *Tree) parseBlockquote(line items) (ret Node) {
-	if 2 > len(line) {
+func (t *Tree) parseBlockquote(tokens items) (ret Node) {
+	if 2 > len(tokens) {
 		return
 	}
 
-	_, marker := line.firstNonSpace()
+	_, marker := tokens.firstNonSpace()
 	if itemGreater != marker.typ {
 		return
 	}
 
 	ret = &Blockquote{&BaseNode{typ: NodeBlockquote}}
-	line = line[1:]
-	if line[0].isSpace() {
-		line = line[1:]
-	} else if line[0].isTab() {
-		line = t.indentOffset(line, 2)
+	tokens = tokens[1:]
+	if tokens[0].isSpace() {
+		tokens = tokens[1:]
+	} else if tokens[0].isTab() {
+		tokens = t.indentOffset(tokens, 2)
 	}
 
-	child := t.parseBlock(line)
+	child := t.parseBlock(tokens)
 	ret.AppendChild(ret, child)
 
 	return

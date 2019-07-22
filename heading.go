@@ -21,7 +21,7 @@ type Heading struct {
 	Level int
 }
 
-func (t *Tree) parseSetextHeading(p *Paragraph, level int)  {
+func (t *Tree) parseSetextHeading(p *Paragraph, level int) {
 	baseNode := &BaseNode{typ: NodeHeading}
 	heading := &Heading{baseNode, level}
 
@@ -32,11 +32,30 @@ func (t *Tree) parseSetextHeading(p *Paragraph, level int)  {
 	return
 }
 
-func (t *Tree) parseATXHeading(line items, level int) {
+func (t *Tree) parseATXHeading(tokens items) (ret Node) {
+	if 2 > len(tokens) {
+		return
+	}
+
+	index, marker := tokens.firstNonSpace()
+	if itemCrosshatch != marker.typ {
+		return
+	}
+
+	tokens = tokens[index:]
+	level := tokens.accept(itemCrosshatch)
+	if 6 < level {
+		return
+	}
+
+	if !tokens[level].isWhitespace() {
+		return
+	}
+
 	baseNode := &BaseNode{typ: NodeHeading}
 	heading := &Heading{baseNode, level}
 
-	_, tokens := line.trimLeft()
+	_, tokens = tokens.trimLeft()
 	_, tokens = tokens[level:].trimLeft()
 	for _, token := range tokens {
 		if itemEOF == token.typ || itemNewline == token.typ {
@@ -68,31 +87,9 @@ func (t *Tree) parseATXHeading(line items, level int) {
 		heading.tokens = heading.tokens.trimRight()
 	}
 
+	ret = heading
+
 	return
-}
-
-func (t *Tree) isATXHeading(line items, level *int) bool {
-	length := len(line)
-	if 2 > length { // at least # and newline
-		return false
-	}
-
-	index, marker := line.firstNonSpace()
-	if itemCrosshatch != marker.typ {
-		return false
-	}
-
-	line = line[index:]
-	*level = line.accept(itemCrosshatch)
-	if 6 < *level {
-		return false
-	}
-
-	if !line[*level].isWhitespace() {
-		return false
-	}
-
-	return true
 }
 
 func (t *Tree) isSetextHeading(line items) (level int) {
