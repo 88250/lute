@@ -34,7 +34,9 @@ type Node interface {
 	InsertAfter(this Node, sibling Node)
 	RawText() string
 	SetRawText(string)
+	AppendRawText(string)
 	Tokens() items
+	AddTokens(items)
 	IsOpen() bool
 	IsClosed() bool
 	Close()
@@ -153,8 +155,16 @@ func (n *BaseNode) SetRawText(rawText string) {
 	n.rawText = rawText
 }
 
+func (n *BaseNode) AppendRawText(rawText string) {
+	n.rawText += rawText
+}
+
 func (n *BaseNode) Tokens() items {
 	return n.tokens
+}
+
+func (n *BaseNode) AddTokens(tokens items) {
+	n.tokens = append(n.tokens, tokens...)
 }
 
 func (n *BaseNode) InsertAfter(this Node, sibling Node) {
@@ -202,6 +212,7 @@ type NodeType int
 
 const (
 	NodeRoot NodeType = iota
+	NodeBlankLine
 	NodeParagraph
 	NodeHeading
 	NodeThematicBreak

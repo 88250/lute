@@ -23,9 +23,6 @@ func (t *Tree) parseBlocks() {
 
 func (t *Tree) processLine(line items) {
 	node := t.parseBlock(line)
-	if nil == node {
-		return
-	}
 
 	var lastOpenContainer Node
 	var lastOpenBlock Node
@@ -49,12 +46,20 @@ func (t *Tree) appendBlock(lastOpenBlock, node Node) {
 	case NodeListItem:
 	case NodeBlockquote:
 	case NodeParagraph:
-		lastOpenBlock.Close()
-		prev := lastOpenBlock.Previous()
-		if nil == prev {
-			lastOpenBlock = lastOpenBlock.Parent()
+		switch node.Type() {
+		case NodeParagraph:
+			lastOpenBlock.AddTokens(items{tNewLine})
+			lastOpenBlock.AddTokens(node.Tokens())
+		default:
+			lastOpenBlock.Close()
+			prev := lastOpenBlock.Previous()
+			if nil == prev {
+				lastOpenBlock = lastOpenBlock.Parent()
+			}
+
+			lastOpenBlock.AppendChild(lastOpenBlock, node)
 		}
-		lastOpenBlock.AppendChild(lastOpenBlock, node)
+
 		return
 	case NodeRoot:
 		lastOpenBlock.AppendChild(lastOpenBlock, node)
@@ -63,11 +68,10 @@ func (t *Tree) appendBlock(lastOpenBlock, node Node) {
 }
 
 func (t *Tree) parseBlock(tokens items) (node Node) {
-	if tokens.isEOF() || tokens.isBlankLine() {
-		return
+	node = t.parseBlankLine(tokens)
+	if nil == node {
+		node = t.parseIndentCode(tokens)
 	}
-
-	node = t.parseIndentCode(tokens)
 	if nil == node {
 		node = t.parseATXHeading(tokens)
 	}
