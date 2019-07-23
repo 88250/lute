@@ -23,37 +23,41 @@ func (t *Tree) parseBlocks() {
 
 func (t *Tree) processLine(line items) {
 	t.context.Line = line
-	t.walkOpenBlock(t.Root)
-}
 
-func (t *Tree) walkOpenBlock(openBlock Node) WalkStatus {
-	if nil != openBlock.FirstChild() && openBlock.FirstChild().IsOpen() {
-		for openBlock = openBlock.FirstChild(); nil != openBlock && openBlock.IsOpen(); openBlock = openBlock.Next() {
-			if WalkStop == t.walkOpenBlock(openBlock) {
-				return WalkStop
-			}
+	allMatched := true
+	var openBlock Node
+	openBlock = t.Root
+	for lastChild := openBlock.LastChild(); nil != lastChild && lastChild.IsOpen(); openBlock = openBlock.LastChild() {
+		openBlock = lastChild
+
+		switch openBlock.Continuation(t.context.Line) {
+		case 0: // we've matched, keep going
+			break
+		case 1: // we've failed to match a block
+			allMatched = false
+			break
+		case 2: // we've hit end of line for fenced code close and can return
+			return
+		}
+
+		if !allMatched {
+			openBlock = openBlock.Parent() // back up to last matching block
+			break
 		}
 	}
 
-	if nil == openBlock || openBlock.IsClosed() {
-		return WalkContinue
-	}
-
 	t.appendBlock(openBlock)
-
-	return WalkStop
 }
 
 func (t *Tree) appendBlock(openBlock Node) {
 	blockLeftSpaces := openBlock.LeftSpaces()
-	t.context.Line = t.indentOffset(t.context.Line, blockLeftSpaces)
+	lineNodeLeftSpaces := t.context.Line.leftSpaces()
 
 	switch openBlock.Type() {
 	case NodeListItem:
 	case NodeBlockquote:
 	case NodeParagraph:
 		lineNode := t.parseBlock(t.context.Line)
-		lineNode.SetLeftSpaces(lineNode.LeftSpaces())
 		switch lineNode.Type() {
 		case NodeParagraph:
 			openBlock.AddTokens(items{tNewLine})
@@ -61,7 +65,10 @@ func (t *Tree) appendBlock(openBlock Node) {
 		case NodeBlankLine:
 			openBlock.Close()
 		case NodeList:
-			lineNode = lineNode.FirstChild()
+			if lineNodeLeftSpaces < blockLeftSpaces {
+				lineNode = lineNode.FirstChild()
+			}
+
 			fallthrough
 		default:
 			openBlock.Close()

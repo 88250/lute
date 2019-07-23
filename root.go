@@ -15,24 +15,6 @@
 
 package lute
 
-type Paragraph struct {
+type Root struct {
 	*BaseNode
-
-	OpenTag, CloseTag string
-}
-
-func (t *Tree) Continuation(tokens items) int {
-	if tokens.isBlankLine() {
-		return 1
-	}
-
-	return 0
-}
-
-func (t *Tree) parseParagraph(tokens items) (ret Node) {
-	tokens = tokens.trim()
-	p := &Paragraph{&BaseNode{typ: NodeParagraph, tokens: tokens}, "<p>", "</p>"}
-	ret = p
-
-	return
 }

@@ -42,6 +42,7 @@ type Node interface {
 	Close()
 	LeftSpaces() int
 	SetLeftSpaces(int)
+	Continuation(items) int
 }
 
 type BaseNode struct {
@@ -73,6 +74,13 @@ func (n *BaseNode) IsClosed() bool {
 	return n.close
 }
 
+func (n *BaseNode) Close() {
+	if n.close {
+		return
+	}
+	n.close = true
+}
+
 func (n *BaseNode) LeftSpaces() int {
 	return n.leftSpaces
 }
@@ -81,11 +89,8 @@ func (n *BaseNode) SetLeftSpaces(leftSpaces int) {
 	n.leftSpaces = leftSpaces
 }
 
-func (n *BaseNode) Close() {
-	if n.close {
-		return
-	}
-	n.close = true
+func (n *BaseNode) Continuation(tokens items) int {
+	return 0
 }
 
 func (n *BaseNode) Unlink() {
@@ -242,10 +247,6 @@ const (
 )
 
 // Nodes.
-
-type Root struct {
-	*BaseNode
-}
 
 type Table struct {
 	*BaseNode
