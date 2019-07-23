@@ -73,6 +73,7 @@ func (t *Tree) parseList(tokens items) (ret Node) {
 		li.IndentSpaces,
 	}
 	ret = list
+	ret.SetLeftSpaces(list.StartIndentSpaces)
 	list.AppendChild(list, li)
 
 	return

@@ -45,13 +45,15 @@ func (t *Tree) walkOpenBlock(openBlock Node) WalkStatus {
 }
 
 func (t *Tree) appendBlock(openBlock Node) {
-	// indent offset
+	blockLeftSpaces := openBlock.LeftSpaces()
+	t.context.Line = t.indentOffset(t.context.Line, blockLeftSpaces)
 
 	switch openBlock.Type() {
 	case NodeListItem:
 	case NodeBlockquote:
 	case NodeParagraph:
 		lineNode := t.parseBlock(t.context.Line)
+		lineNode.SetLeftSpaces(lineNode.LeftSpaces())
 		switch lineNode.Type() {
 		case NodeParagraph:
 			openBlock.AddTokens(items{tNewLine})
@@ -65,8 +67,8 @@ func (t *Tree) appendBlock(openBlock Node) {
 			openBlock.Close()
 			prev := openBlock.Previous()
 			if nil == prev {
-				openBlock = openBlock.Parent()
-				openBlock.AppendChild(openBlock, lineNode)
+				parent := openBlock.Parent()
+				parent.AppendChild(parent, lineNode)
 			} else {
 				parent := prev.Parent()
 				parent.AppendChild(parent, lineNode)

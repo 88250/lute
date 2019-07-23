@@ -115,6 +115,7 @@ func (t *Tree) parseListItem(tokens items) (ret Node) {
 	ret = li
 
 	child := t.parseBlock(remains)
+	child.SetLeftSpaces(indentSpaces)
 	li.AppendChild(li, child)
 
 	return

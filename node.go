@@ -41,6 +41,7 @@ type Node interface {
 	IsClosed() bool
 	Close()
 	LeftSpaces() int
+	SetLeftSpaces(int)
 }
 
 type BaseNode struct {
@@ -74,6 +75,10 @@ func (n *BaseNode) IsClosed() bool {
 
 func (n *BaseNode) LeftSpaces() int {
 	return n.leftSpaces
+}
+
+func (n *BaseNode) SetLeftSpaces(leftSpaces int) {
+	n.leftSpaces = leftSpaces
 }
 
 func (n *BaseNode) Close() {
