@@ -22,49 +22,59 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) processLine(line items) {
-	t.context.lineNode = t.parseBlock(line)
+	t.context.Line = line
 	t.walkOpenBlock(t.Root)
 }
 
-func (t *Tree) walkOpenBlock(openBlock Node) {
+func (t *Tree) walkOpenBlock(openBlock Node) WalkStatus {
 	if nil != openBlock.FirstChild() && openBlock.FirstChild().IsOpen() {
 		for openBlock = openBlock.FirstChild(); nil != openBlock && openBlock.IsOpen(); openBlock = openBlock.Next() {
-			t.walkOpenBlock(openBlock)
+			if WalkStop == t.walkOpenBlock(openBlock) {
+				return WalkStop
+			}
 		}
 	}
 
 	if nil == openBlock || openBlock.IsClosed() {
-		return
+		return WalkContinue
 	}
 
 	t.appendBlock(openBlock)
+
+	return WalkStop
 }
 
 func (t *Tree) appendBlock(openBlock Node) {
+	// indent offset
+
 	switch openBlock.Type() {
 	case NodeListItem:
 	case NodeBlockquote:
 	case NodeParagraph:
-		switch t.context.lineNode.Type() {
+		lineNode := t.parseBlock(t.context.Line)
+		switch lineNode.Type() {
 		case NodeParagraph:
 			openBlock.AddTokens(items{tNewLine})
-			openBlock.AddTokens(t.context.lineNode.Tokens())
+			openBlock.AddTokens(lineNode.Tokens())
 		case NodeBlankLine:
 			openBlock.Close()
+		case NodeList:
+			lineNode = lineNode.FirstChild()
+			fallthrough
 		default:
 			openBlock.Close()
 			prev := openBlock.Previous()
 			if nil == prev {
 				openBlock = openBlock.Parent()
+				openBlock.AppendChild(openBlock, lineNode)
+			} else {
+				parent := prev.Parent()
+				parent.AppendChild(parent, lineNode)
 			}
-
-			openBlock.AppendChild(openBlock, t.context.lineNode)
 		}
-
-		return
 	case NodeRoot:
-		openBlock.AppendChild(openBlock, t.context.lineNode)
-		return
+		lineNode := t.parseBlock(t.context.Line)
+		openBlock.AppendChild(openBlock, lineNode)
 	}
 }
 

@@ -37,6 +37,8 @@ TBD
 
 ## 文档
 
+TBD
+
 * [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
 * CommonMark 规范要点解读
 * Lute 使用指南
@@ -53,7 +55,8 @@ Lute 使用 [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-
 ## 鸣谢
 
 * [commonmark.js](https://github.com/commonmark/commonmark.js)：CommonMark 规范的官方 JavaScript 参考实现
-* [mdast](https://github.com/syntax-tree/mdast)：Markdown 语法树规范
+* [mdast](https://github.com/syntax-tree/mdast)：Markdown 抽象语法树结构
+* [goldmark](https://github.com/yuin/goldmark)：另一款 golang 开发的 Markdown 解析器
 
 ---
 

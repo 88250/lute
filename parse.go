@@ -74,7 +74,7 @@ type Context struct {
 
 	// Blocks parsing
 
-	lineNode Node
+	Line items
 
 	// Inlines parsing
 
