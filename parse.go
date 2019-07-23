@@ -72,6 +72,10 @@ type Context struct {
 	LinkRefDef map[string]*Link
 	CurLines   []items
 
+	// Blocks parsing
+
+	lineNode Node
+
 	// Inlines parsing
 
 	Pos               int

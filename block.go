@@ -22,47 +22,48 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) processLine(line items) {
-	node := t.parseBlock(line)
+	t.context.lineNode = t.parseBlock(line)
+	t.walkOpenBlock(t.Root)
+}
 
-	var lastOpenContainer Node
-	var lastOpenBlock Node
-	for lastOpenContainer = t.Root; nil != lastOpenContainer && lastOpenContainer.IsOpen(); lastOpenContainer = lastOpenContainer.Next() {
-		lastOpenBlock = lastOpenContainer.FirstChild()
-		if nil == lastOpenBlock {
-			t.appendBlock(lastOpenContainer, node)
-			return
-		}
-
-		for ; nil != lastOpenBlock && lastOpenBlock.IsOpen(); lastOpenBlock = lastOpenBlock.Next() {
-			t.appendBlock(lastOpenBlock, node)
-			return
+func (t *Tree) walkOpenBlock(openBlock Node) {
+	if nil != openBlock.FirstChild() && openBlock.FirstChild().IsOpen() {
+		for openBlock = openBlock.FirstChild(); nil != openBlock && openBlock.IsOpen(); openBlock = openBlock.Next() {
+			t.walkOpenBlock(openBlock)
 		}
 	}
 
+	if nil == openBlock || openBlock.IsClosed() {
+		return
+	}
+
+	t.appendBlock(openBlock)
 }
 
-func (t *Tree) appendBlock(lastOpenBlock, node Node) {
-	switch lastOpenBlock.Type() {
+func (t *Tree) appendBlock(openBlock Node) {
+	switch openBlock.Type() {
 	case NodeListItem:
 	case NodeBlockquote:
 	case NodeParagraph:
-		switch node.Type() {
+		switch t.context.lineNode.Type() {
 		case NodeParagraph:
-			lastOpenBlock.AddTokens(items{tNewLine})
-			lastOpenBlock.AddTokens(node.Tokens())
+			openBlock.AddTokens(items{tNewLine})
+			openBlock.AddTokens(t.context.lineNode.Tokens())
+		case NodeBlankLine:
+			openBlock.Close()
 		default:
-			lastOpenBlock.Close()
-			prev := lastOpenBlock.Previous()
+			openBlock.Close()
+			prev := openBlock.Previous()
 			if nil == prev {
-				lastOpenBlock = lastOpenBlock.Parent()
+				openBlock = openBlock.Parent()
 			}
 
-			lastOpenBlock.AppendChild(lastOpenBlock, node)
+			openBlock.AppendChild(openBlock, t.context.lineNode)
 		}
 
 		return
 	case NodeRoot:
-		lastOpenBlock.AppendChild(lastOpenBlock, node)
+		openBlock.AppendChild(openBlock, t.context.lineNode)
 		return
 	}
 }
