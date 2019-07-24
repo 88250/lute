@@ -20,6 +20,7 @@ import "strings"
 type HTML struct {
 	*BaseNode
 	Value string
+	Typ   int
 }
 
 func (html *HTML) AcceptLines() bool {
@@ -31,8 +32,7 @@ func (html *HTML) CanContain(nodeType NodeType) bool {
 }
 
 func (t *Tree) parseHTML(line items, typ int) {
-	baseNode := &BaseNode{typ: NodeHTML}
-	html := &HTML{baseNode, ""}
+	html := &HTML{BaseNode: &BaseNode{typ: NodeHTML}}
 	openTagName := line.split(itemGreater)[0][1].val
 	for {
 		matchEnd := false

@@ -45,18 +45,21 @@ type Node interface {
 	Continuation(items) int
 	AcceptLines() bool
 	CanContain(NodeType) bool
+	LastLineBlank() bool
+	SetLastLineBlank(lastLineBlank bool)
 }
 
 type BaseNode struct {
-	typ        NodeType
-	parent     Node
-	next       Node
-	previous   Node
-	firstChild Node
-	lastChild  Node
-	rawText    string
-	tokens     items
-	close      bool
+	typ           NodeType
+	parent        Node
+	next          Node
+	previous      Node
+	firstChild    Node
+	lastChild     Node
+	rawText       string
+	tokens        items
+	close         bool
+	lastLineBlank bool
 }
 
 func (n *BaseNode) Type() NodeType {
@@ -92,6 +95,14 @@ func (n *BaseNode) AcceptLines() bool {
 
 func (n *BaseNode) CanContain(nodeType NodeType) bool {
 	return NodeListItem != nodeType
+}
+
+func (n *BaseNode) LastLineBlank() bool {
+	return n.lastLineBlank
+}
+
+func (n *BaseNode) SetLastLineBlank(lastLineBlank bool) {
+	n.lastLineBlank = lastLineBlank
 }
 
 func (n *BaseNode) Unlink() {
@@ -236,6 +247,7 @@ const (
 	NodeHTML
 	NodeInlineHTML
 	NodeCode
+	NodeFencedCode
 	NodeText
 	NodeEmphasis
 	NodeStrong

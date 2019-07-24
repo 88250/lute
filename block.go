@@ -15,11 +15,16 @@
 
 package lute
 
+import "strings"
+
 func (t *Tree) parseBlocks() {
 	t.context.linkRefDef = map[string]*Link{}
 
 	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
 		t.processLine(line)
+	}
+	for nil != t.context.tip {
+		t.finalize(t.context.tip)
 	}
 }
 
@@ -87,6 +92,57 @@ func (t *Tree) processLine(line items) {
 		}
 	}
 
+	// What remains at the offset is a text line.  Add the text to the
+	// appropriate container.
+
+	// First check for a lazy paragraph continuation:
+	if !t.context.allClosed && !t.context.blank && t.context.tip.Type() == NodeParagraph {
+		// lazy paragraph continuation
+		t.addLine()
+	} else { // not a lazy continuation
+
+		// finalize any blocks not matched
+		t.closeUnmatchedBlocks()
+		if t.context.blank && nil != container.LastChild() {
+			container.LastChild().SetLastLineBlank(true)
+		}
+
+		typ := container.Type()
+
+		// Block quote lines are never blank as they start with >
+		// and we don't count blanks in fenced code for purposes of tight/loose
+		// lists or breaking out of lists.  We also don't set _lastLineBlank
+		// on an empty list item, or if we just closed a fenced block.
+		var lastLineBlank = t.context.blank && !(typ == NodeBlockquote ||
+			(typ == NodeCode && container.Type() == NodeFencedCode) ||
+			(typ == NodeListItem && nil != container.FirstChild() /*&&container.sourcepos[0][0] == = this.lineNumber*/))
+
+		// propagate lastLineBlank up through parents:
+		var cont = container
+		for nil != cont {
+			cont.SetLastLineBlank(lastLineBlank)
+			cont = cont.Parent()
+		}
+
+		if container.AcceptLines() {
+			t.addLine()
+			// if HtmlBlock, check for end condition
+			if typ == NodeHTML {
+				html := container.(*HTML)
+				if html.Typ >= 1 && html.Typ <= 5 {
+					//if reHtmlBlockClose[container._htmlBlockType].test(this.currentLine.slice(this.offset))
+					{
+						t.finalize(container)
+					}
+				}
+			}
+		} else if t.context.offset < len(t.context.currentLine) && !t.context.blank {
+			// create paragraph container for line
+			t.addChild(NodeParagraph)
+			t.advanceNextNonspace()
+			t.addLine()
+		}
+	}
 }
 
 func (t *Tree) advanceOffset(count int, columns bool) {
@@ -231,4 +287,16 @@ func peek(ln items, pos int) *item {
 	}
 
 	return nil
+}
+
+// Add a line to the block at the tip.  We assume the tip
+// can accept lines -- that check should be done before calling this.
+func (t *Tree) addLine() {
+	if t.context.partiallyConsumedTab {
+		t.context.offset += 1 // skip over tab
+		// add space characters:
+		var charsToTab = 4 - (t.context.column % 4)
+		t.context.tip.AppendRawText(strings.Repeat(" ", charsToTab))
+	}
+	t.context.tip.AppendRawText(t.context.currentLine[t.context.offset:].rawText() + "\n")
 }
