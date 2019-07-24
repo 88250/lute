@@ -23,9 +23,7 @@ type ListItem struct {
 	Delim  string
 	Tight  bool
 
-	Marker            string
-	StartIndentSpaces int
-	IndentSpaces      int
+	markerOffset, padding int
 }
 
 func (listItem *ListItem) Continue(context *Context) int {
@@ -36,9 +34,9 @@ func (listItem *ListItem) Continue(context *Context) int {
 		} else {
 			context.advanceNextNonspace()
 		}
-	} else if context.indent >= listItem._listData.markerOffset+listItem._listData.padding {
-		context.advanceOffset(listItem._listData.markerOffset+
-			listItem._listData.padding, true)
+	} else if context.indent >= listItem.markerOffset+listItem.padding {
+		context.advanceOffset(listItem.markerOffset+
+			listItem.padding, true)
 	} else {
 		return 1
 	}

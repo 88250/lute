@@ -16,7 +16,6 @@
 package lute
 
 import (
-	"go/parser"
 	"regexp"
 )
 
@@ -195,85 +194,85 @@ func (context *Context) addChild(typ NodeType) {
 	context.tip.AppendChild(context.tip, newBlock)
 	context.tip = newBlock
 }
-
-// Parse a list marker and return data on the marker (type,
-// start, delimiter, bullet character, padding) or null.
-func (context *Context) parseListMarker(container Node) {
-	rest := context.currentLine[context.nextNonspace:]
-	var match
-	var nextc
-	var spacesStartCol
-	var spacesStartOffset
-	var data =
-	{
-		type: null,
-		tight: true, // lists are tight by default
-		bulletChar: null,
-		start: null,
-		delimiter: null,
-		padding: null,
-		markerOffset: context.indent
-	}
-	if context.indent >= 4 {
-		return null
-	}
-	if match = rest.match(reBulletListMarker))) {
-	data.type = 'bullet';
-	data.bulletChar = match[0][0];
-
-	} else if match = rest.match(reOrderedListMarker)) &&
-	container.
-	type != = 'p
-	aragraph
-	'  ||
-		match[1] == = '1')) {
-	data.type = 'ordered';
-	data.start = parseInt(match[1]);
-	data.delimiter = match[2];
-	} else {
-	return null;
-	}
-	// make sure we have spaces after
-	nextc = peek(context.currentLine, context.nextNonspace+match[0].length)
-	if !(nextc == -1 || nextc == C_TAB || nextc == C_SPACE)) {
-	return null;
-	}
-
-	// if it interrupts paragraph, make sure first line isn't blank
-	if container.
-	type == = 'p
-	aragraph
-	'  && !parser.currentLine.slice(parser.nextNonspace + match[0].length).match(reNonSpace)) {
-		return null
-	}
-
-	// we've got a match! advance offset and calculate padding
-	context.advanceNextNonspace()                // to start of marker
-	context.advanceOffset(match[0].length, true) // to end of marker
-	spacesStartCol = parser.column
-	spacesStartOffset = parser.offset
-	do{
-		context.advanceOffset(1, true)
-		nextc = peek(parser.currentLine, parser.offset)
-	}
-	while(parser.column-spacesStartCol < 5 &&
-		isSpaceOrTab(nextc))
-	var blank_item = peek(parser.currentLine, parser.offset) == = -1
-	var spaces_after_marker = parser.column - spacesStartCol
-	if spaces_after_marker >= 5 ||
-		spaces_after_marker < 1 ||
-		blank_item {
-		data.padding = match[0].length + 1
-		parser.column = spacesStartCol
-		parser.offset = spacesStartOffset
-		if isSpaceOrTab(peek(parser.currentLine, parser.offset)) {
-			context.advanceOffset(1, true)
-		}
-	} else {
-		data.padding = match[0].length + spaces_after_marker
-	}
-	return data
-}
+//
+//// Parse a list marker and return data on the marker (type,
+//// start, delimiter, bullet character, padding) or null.
+//func (context *Context) parseListMarker(container Node) {
+//	rest := context.currentLine[context.nextNonspace:]
+//	var match
+//	var nextc
+//	var spacesStartCol
+//	var spacesStartOffset
+//	var data =
+//	{
+//		type: null,
+//		tight: true, // lists are tight by default
+//		bulletChar: null,
+//		start: null,
+//		delimiter: null,
+//		padding: null,
+//		markerOffset: context.indent
+//	}
+//	if context.indent >= 4 {
+//		return null
+//	}
+//	if match = rest.match(reBulletListMarker))) {
+//	data.type = 'bullet';
+//	data.bulletChar = match[0][0];
+//
+//	} else if match = rest.match(reOrderedListMarker)) &&
+//	container.
+//	type != = 'p
+//	aragraph
+//	'  ||
+//		match[1] == = '1')) {
+//	data.type = 'ordered';
+//	data.start = parseInt(match[1]);
+//	data.delimiter = match[2];
+//	} else {
+//	return null;
+//	}
+//	// make sure we have spaces after
+//	nextc = peek(context.currentLine, context.nextNonspace+match[0].length)
+//	if !(nextc == -1 || nextc == C_TAB || nextc == C_SPACE)) {
+//	return null;
+//	}
+//
+//	// if it interrupts paragraph, make sure first line isn't blank
+//	if container.
+//	type == = 'p
+//	aragraph
+//	'  && !parser.currentLine.slice(parser.nextNonspace + match[0].length).match(reNonSpace)) {
+//		return null
+//	}
+//
+//	// we've got a match! advance offset and calculate padding
+//	context.advanceNextNonspace()                // to start of marker
+//	context.advanceOffset(match[0].length, true) // to end of marker
+//	spacesStartCol = parser.column
+//	spacesStartOffset = parser.offset
+//	do{
+//		context.advanceOffset(1, true)
+//		nextc = peek(parser.currentLine, parser.offset)
+//	}
+//	while(parser.column-spacesStartCol < 5 &&
+//		isSpaceOrTab(nextc))
+//	var blank_item = peek(parser.currentLine, parser.offset) == = -1
+//	var spaces_after_marker = parser.column - spacesStartCol
+//	if spaces_after_marker >= 5 ||
+//		spaces_after_marker < 1 ||
+//		blank_item {
+//		data.padding = match[0].length + 1
+//		parser.column = spacesStartCol
+//		parser.offset = spacesStartOffset
+//		if isSpaceOrTab(peek(parser.currentLine, parser.offset)) {
+//			context.advanceOffset(1, true)
+//		}
+//	} else {
+//		data.padding = match[0].length + spaces_after_marker
+//	}
+//	return data
+//}
 
 // Returns true if the two list items are of the same type,
 // with the same delimiter and bullet character.  This is used
