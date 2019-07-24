@@ -25,8 +25,22 @@ func (p *Paragraph) Continuation(tokens items) int {
 	if tokens.isBlankLine() {
 		return 1
 	}
-
 	return 0
+}
+
+func (p *Paragraph) Finalize() {
+	// TODO try parsing the beginning as link reference definitions:
+	//var pos int
+	//hasReferenceDefs := false
+	// for (peek(p.rawText, 0) == itemOpenBracket && (pos =
+	//context.inlineParser.parseReference(block._string_content,
+	//	parser.refmap))) {
+	//block._string_content = block._string_content.slice(pos);
+	//hasReferenceDefs = true;
+	//}
+	//if hasReferenceDefs && isBlank(block._string_content) {
+	//	block.unlink()
+	//}
 }
 
 func (p *Paragraph) AcceptLines() bool {

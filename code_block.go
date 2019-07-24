@@ -15,6 +15,8 @@
 
 package lute
 
+import "strings"
+
 type CodeBlock struct {
 	*BaseNode
 	Value   string
@@ -52,6 +54,21 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 		}
 	}
 	return 0
+}
+
+func (codeBlock*CodeBlock) Finalizes() {
+	if codeBlock.IsFenced {
+		// first line becomes info string
+		var content = codeBlock.rawText
+		var newlinePos = strings.Index(content, "\n")
+		var firstLine = content[:newlinePos]
+		var rest = content[newlinePos + 1:]
+		codeBlock.InfoStr = unescapeString(strings.TrimSpace(firstLine))
+		codeBlock.rawText = rest
+	} else { // indented
+		// TODO codeBlock.rawText= strings.ReplaceAll(codeBlock.rawText, .replace(/(\n *)+$/, '\n')
+	}
+	// TODO codeBlock._string_content = null // allow GC
 }
 
 func (codeBlock *CodeBlock) AcceptLines() bool {

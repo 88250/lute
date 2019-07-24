@@ -59,11 +59,11 @@ Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者致
 
 ### [commonmark.js](https://github.com/commonmark/commonmark.js)
 
-该项目是 CommonMark 规范官方参考实现的 JavaScript 版，Lute 参考了其解析器实现部分。
+该项目是 CommonMark 官方参考实现的 JavaScript 版，Lute 参考了其解析器实现部分。
 
 ### [mdast](https://github.com/syntax-tree/mdast)
 
-该项目介绍了一种 Markdown 抽象语法树结构的表现形式。在 Lute 的初始设计阶段参考了该项目，让我更直观地了解元素构成。Lute 最终设计是以 CommonMark 规范为主。
+该项目介绍了一种 Markdown 抽象语法树结构的表现形式。在 Lute 的初始设计阶段参考了该项目，最终设计以 CommonMark 为主。
 
 ### [goldmark](https://github.com/yuin/goldmark)
 

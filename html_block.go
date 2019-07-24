@@ -23,6 +23,18 @@ type HTML struct {
 	Typ   int
 }
 
+func (html *HTML) Continue(context *Context) int {
+	if context.blank && (html.Typ == 6 || html.Typ == 7) {
+		return 1
+	}
+	return 0
+}
+
+func (html*HTML) Finalize() {
+	// TODO html.rawText = html.rawText._string_content.replace(/(\n *)+$/, '');
+	// TODO block._string_content = null; // allow GC
+}
+
 func (html *HTML) AcceptLines() bool {
 	return true
 }
