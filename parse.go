@@ -199,7 +199,7 @@ func (context *Context) addChild(typ NodeType) {
 // Parse a list marker and return data on the marker (type,
 // start, delimiter, bullet character, padding) or null.
 func (context *Context) parseListMarker(container Node) {
-	var rest = context.currentLine.slice(context.nextNonspace)
+	rest := context.currentLine[context.nextNonspace:]
 	var match
 	var nextc
 	var spacesStartCol
@@ -235,7 +235,7 @@ func (context *Context) parseListMarker(container Node) {
 	}
 	// make sure we have spaces after
 	nextc = peek(context.currentLine, context.nextNonspace+match[0].length)
-	if !(nextc == = -1 || nextc == = C_TAB || nextc == = C_SPACE)) {
+	if !(nextc == -1 || nextc == C_TAB || nextc == C_SPACE)) {
 	return null;
 	}
 
@@ -248,12 +248,12 @@ func (context *Context) parseListMarker(container Node) {
 	}
 
 	// we've got a match! advance offset and calculate padding
-	parser.advanceNextNonspace()                // to start of marker
-	parser.advanceOffset(match[0].length, true) // to end of marker
+	context.advanceNextNonspace()                // to start of marker
+	context.advanceOffset(match[0].length, true) // to end of marker
 	spacesStartCol = parser.column
 	spacesStartOffset = parser.offset
 	do{
-		parser.advanceOffset(1, true)
+		context.advanceOffset(1, true)
 		nextc = peek(parser.currentLine, parser.offset)
 	}
 	while(parser.column-spacesStartCol < 5 &&
@@ -267,7 +267,7 @@ func (context *Context) parseListMarker(container Node) {
 		parser.column = spacesStartCol
 		parser.offset = spacesStartOffset
 		if isSpaceOrTab(peek(parser.currentLine, parser.offset)) {
-			parser.advanceOffset(1, true)
+			context.advanceOffset(1, true)
 		}
 	} else {
 		data.padding = match[0].length + spaces_after_marker

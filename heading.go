@@ -21,6 +21,10 @@ type Heading struct {
 	Level int
 }
 
+func (heading *Heading) Continue(context *Context) int {
+	return 1
+}
+
 func (heading *Heading) CanContain(nodeType NodeType) bool {
 	return false
 }

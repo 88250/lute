@@ -67,7 +67,7 @@ Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者致
 
 * [goldmark](https://github.com/yuin/goldmark)
 
-隔壁岛国开发者用 golang 实现的一款 Markdown 解析器。Lute 参考了其树遍历实现部分。
+另一款用 golang 写的 Markdown 解析器。Lute 参考了其树遍历实现部分。
 
 ---
 

@@ -19,6 +19,39 @@ type CodeBlock struct {
 	*BaseNode
 	Value   string
 	InfoStr string
+
+	IsFenced    bool
+	FenceChar   *item
+	FenceLength int
+	FenceOffset int
+}
+
+func (codeBlock *CodeBlock) Continue(context *Context) int {
+	var ln = context.currentLine
+	var indent = context.indent
+	if codeBlock.IsFenced {
+		if indent <= 3 && codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.FenceChar, codeBlock.FenceLength) {
+			// closing fence - we're at end of line, so we can return
+			context.finalize(codeBlock)
+			return 2
+		} else {
+			// skip optional spaces of fence offset
+			var i = codeBlock.FenceOffset
+			for i > 0 && (peek(ln, context.offset).isSpaceOrTab()) {
+				context.advanceOffset(1, true)
+				i--
+			}
+		}
+	} else { // indented
+		if indent >= 4 {
+			context.advanceOffset(4, true)
+		} else if context.blank {
+			context.advanceNextNonspace()
+		} else {
+			return 1
+		}
+	}
+	return 0
 }
 
 func (codeBlock *CodeBlock) AcceptLines() bool {
@@ -27,4 +60,42 @@ func (codeBlock *CodeBlock) AcceptLines() bool {
 
 func (codeBlock *CodeBlock) CanContain(nodeType NodeType) bool {
 	return false
+}
+
+func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker *item, num int) bool {
+	closeMarker := tokens[0]
+	if closeMarker.typ != openMarker.typ {
+		return false
+	}
+	if num > tokens.accept(closeMarker.typ) {
+		return false
+	}
+	if !tokens.trim().allAre(openMarker.typ) {
+		return false
+	}
+
+	return true
+}
+
+func (t *Tree) isFencedCode(line items) bool {
+	if 3 > len(line) {
+		return false
+	}
+
+	marker := line[0]
+	if itemBacktick != marker.typ && itemTilde != marker.typ {
+		return false
+	}
+
+	pos := line.accept(marker.typ)
+	if 3 > pos {
+		return false
+	}
+
+	infoStr := line[pos:]
+	if itemBacktick == marker.typ && infoStr.contain(itemBacktick) {
+		return false
+	}
+
+	return true
 }

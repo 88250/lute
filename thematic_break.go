@@ -19,6 +19,10 @@ type ThematicBreak struct {
 	*BaseNode
 }
 
+func (thematicBreak *ThematicBreak) Continue(context *Context) int {
+	return 1
+}
+
 func (thematicBreak *ThematicBreak) CanContain(node Node) bool {
 	return false
 }
