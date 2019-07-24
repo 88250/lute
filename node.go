@@ -43,6 +43,8 @@ type Node interface {
 	LeftSpaces() int
 	SetLeftSpaces(int)
 	Continuation(items) int
+	AcceptLines() bool
+	CanContain(Node) bool
 }
 
 type BaseNode struct {
@@ -91,6 +93,14 @@ func (n *BaseNode) SetLeftSpaces(leftSpaces int) {
 
 func (n *BaseNode) Continuation(tokens items) int {
 	return 0
+}
+
+func (n *BaseNode) AcceptLines() bool {
+	return false
+}
+
+func (n *BaseNode) CanContain(node Node) bool {
+	return NodeListItem != node.Type()
 }
 
 func (n *BaseNode) Unlink() {
@@ -263,20 +273,9 @@ type TableCell struct {
 	*Tree
 }
 
-type HTML struct {
-	*BaseNode
-	Value string
-}
-
 type InlineHTML struct {
 	*BaseNode
 	Value string
-}
-
-type Code struct {
-	*BaseNode
-	Value   string
-	InfoStr string
 }
 
 type Text struct {

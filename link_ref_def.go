@@ -73,8 +73,8 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	if 1 > len(remains) {
 		nextLine = t.nextLine()
 		if nextLine.isBlankLine() {
-			if _, ok := t.context.LinkRefDef[lowerCaseLabel]; !ok {
-				t.context.LinkRefDef[lowerCaseLabel] = link
+			if _, ok := t.context.linkRefDef[lowerCaseLabel]; !ok {
+				t.context.linkRefDef[lowerCaseLabel] = link
 			}
 			return true
 		}
@@ -88,8 +88,8 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	if !remains.isBlankLine() {
 		if nil != nextLine {
 			t.backupLine(nextLine)
-			if _, ok := t.context.LinkRefDef[lowerCaseLabel]; !ok {
-				t.context.LinkRefDef[lowerCaseLabel] = link
+			if _, ok := t.context.linkRefDef[lowerCaseLabel]; !ok {
+				t.context.linkRefDef[lowerCaseLabel] = link
 			}
 
 			return true
@@ -98,8 +98,8 @@ func (t *Tree) parseLinkRefDef(line items) bool {
 	}
 
 	link.Title = title
-	if _, ok := t.context.LinkRefDef[lowerCaseLabel]; !ok {
-		t.context.LinkRefDef[lowerCaseLabel] = link
+	if _, ok := t.context.linkRefDef[lowerCaseLabel]; !ok {
+		t.context.linkRefDef[lowerCaseLabel] = link
 	}
 
 	return true

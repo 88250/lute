@@ -15,6 +15,20 @@
 
 package lute
 
+type CodeBlock struct {
+	*BaseNode
+	Value   string
+	InfoStr string
+}
+
+func (codeBlock *CodeBlock) AcceptLines() bool {
+	return true
+}
+
+func (codeBlock *CodeBlock) CanContain(node Node) bool {
+	return false
+}
+
 func (t *Tree) parseIndentCode(tokens items) (ret Node) {
 	spaces, tabs, remains := t.nonSpaceTab(tokens)
 	if 4 > spaces && 1 > tabs {
@@ -22,7 +36,7 @@ func (t *Tree) parseIndentCode(tokens items) (ret Node) {
 	}
 
 	baseNode := &BaseNode{typ: NodeCode}
-	code := &Code{baseNode, "", ""}
+	code := &CodeBlock{baseNode, "", ""}
 	code.Value += remains.rawText()
 
 	ret = code

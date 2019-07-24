@@ -30,29 +30,33 @@ type List struct {
 	IndentSpaces      int
 }
 
-func (n *List) Close() {
-	if n.close {
+func (list *List) Close() {
+	if list.close {
 		return
 	}
 
-	tight := true
-	for child := n.FirstChild(); nil != child; child = child.Next() {
-		if NodeListItem == child.Type() && !child.(*ListItem).Tight {
-			tight = false
-			break
-		}
-	}
-	n.Tight = tight
+	//tight := true
+	//for child := list.FirstChild(); nil != child; child = child.Next() {
+	//	if NodeListItem == child.Type() && !child.(*ListItem).Tight {
+	//		tight = false
+	//		break
+	//	}
+	//}
+	//list.Tight = tight
+	//
+	//for child := list.FirstChild(); nil != child; child = child.Next() {
+	//	if NodeListItem == child.Type() {
+	//		child.(*ListItem).Tight = tight
+	//	}
+	//
+	//	child.Close()
+	//}
 
-	for child := n.FirstChild(); nil != child; child = child.Next() {
-		if NodeListItem == child.Type() {
-			child.(*ListItem).Tight = tight
-		}
+	list.close = true
+}
 
-		child.Close()
-	}
-
-	n.close = true
+func (list *List) CanContain(node Node) bool {
+	return NodeListItem == node.Type()
 }
 
 func (t *Tree) parseList(tokens items) (ret Node) {

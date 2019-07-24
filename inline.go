@@ -18,8 +18,8 @@ package lute
 import "strings"
 
 func (t *Tree) parseInlines() {
-	t.context.Delimiters = nil
-	t.context.Brackets = nil
+	t.context.delimiters = nil
+	t.context.brackets = nil
 	t.parseBlockInlines(t.Root.Children())
 }
 
@@ -43,9 +43,9 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			continue
 		}
 
-		t.context.Pos = 0
+		t.context.pos = 0
 		for {
-			token := tokens[t.context.Pos]
+			token := tokens[t.context.pos]
 			var n Node
 			switch token.typ {
 			case itemBackslash:
@@ -71,7 +71,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			}
 
 			len := len(tokens)
-			if 1 > len || t.context.Pos >= len || tokens[t.context.Pos].isEOF() {
+			if 1 > len || t.context.pos >= len || tokens[t.context.pos].isEOF() {
 				break
 			}
 		}
@@ -81,22 +81,22 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 }
 
 func (t *Tree) parseCloseBracket(block Node, tokens items) {
-	startPos := t.context.Pos
+	startPos := t.context.pos
 	matched := false
 	var dest, title, reflabel string
 
 	// get last [ or ![
-	opener := t.context.Brackets
+	opener := t.context.brackets
 
 	if nil == opener {
-		t.context.Pos++
+		t.context.pos++
 		return
 	}
 
 	if !opener.active {
 		// take opener off brackets stack
 		t.removeBracket()
-		t.context.Pos++
+		t.context.pos++
 		return
 	}
 
@@ -105,13 +105,13 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 
 	// Check to see if we have a link/image
 
-	savepos := t.context.Pos
+	savepos := t.context.pos
 
 	// Inline link?
-	if itemOpenParen == tokens[t.context.Pos].typ {
-		t.context.Pos++
+	if itemOpenParen == tokens[t.context.pos].typ {
+		t.context.pos++
 
-		tmp := tokens[t.context.Pos:]
+		tmp := tokens[t.context.pos:]
 		isLink, tmp := tmp.spnl()
 
 		if isLink {
@@ -124,7 +124,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 						if "" != title {
 							isLink, tmp = tmp.spnl()
 							if isLink && itemCloseParen == tmp[0].typ {
-								t.context.Pos++
+								t.context.pos++
 								matched = true
 							}
 						}
@@ -135,13 +135,13 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 	}
 
 	if !matched {
-		t.context.Pos = savepos
+		t.context.pos = savepos
 	}
 
 	if !matched {
 		// Next, see if there's a link label
-		var beforelabel = t.context.Pos
-		_, _, label := t.parseLinkLabel(tokens[t.context.Pos:])
+		var beforelabel = t.context.pos
+		_, _, label := t.parseLinkLabel(tokens[t.context.pos:])
 		var n = len(label)
 		if n > 2 {
 			reflabel = tokens[beforelabel:beforelabel+n].rawText()
@@ -152,12 +152,12 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 		}
 		if n == 0 {
 			// If shortcut reference link, rewind before spaces we skipped.
-			t.context.Pos = savepos
+			t.context.pos = savepos
 		}
 
 		if "" != reflabel {
 			// lookup rawlabel in refmap
-			var link = t.context.LinkRefDef[strings.ToLower(reflabel)]
+			var link = t.context.linkRefDef[strings.ToLower(reflabel)]
 			if nil != link {
 				dest = link.Destination
 				title = link.Title
@@ -192,7 +192,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 		// Now, for a link, we also deactivate earlier link openers.
 		// (no links in links)
 		if !isImage {
-			opener = t.context.Brackets
+			opener = t.context.brackets
 			for nil != opener {
 				if !opener.image {
 					opener.active = false // deactivate this opener
@@ -201,12 +201,12 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 			}
 		}
 
-		t.context.Pos++
+		t.context.pos++
 
 		return
 	} else { // no match
 		t.removeBracket() // remove this opener from stack
-		t.context.Pos = startPos
+		t.context.pos = startPos
 		block.AppendChild(block, &Text{&BaseNode{typ: NodeText}, "]"})
 
 		return
@@ -214,25 +214,25 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 }
 
 func (t *Tree) parseOpenBracket(tokens items) (ret Node) {
-	t.context.Pos++
+	t.context.pos++
 
 	ret = &Text{&BaseNode{typ: NodeText}, "["}
 
 	// Add entry to stack for this opener
-	t.addBracket(ret, t.context.Pos, false)
+	t.addBracket(ret, t.context.pos, false)
 
 	return
 }
 
 func (t *Tree) addBracket(node Node, index int, image bool) {
-	if nil != t.context.Brackets {
-		t.context.Brackets.bracketAfter = true
+	if nil != t.context.brackets {
+		t.context.brackets.bracketAfter = true
 	}
 
-	t.context.Brackets = &delimiter{
+	t.context.brackets = &delimiter{
 		node:              node,
-		previous:          t.context.Brackets,
-		previousDelimiter: t.context.Delimiters,
+		previous:          t.context.brackets,
+		previousDelimiter: t.context.delimiters,
 		index:             index,
 		image:             image,
 		active:            true,
@@ -240,20 +240,20 @@ func (t *Tree) addBracket(node Node, index int, image bool) {
 }
 
 func (t *Tree) removeBracket() {
-	t.context.Brackets = t.context.Brackets.previous
+	t.context.brackets = t.context.brackets.previous
 }
 
 func (t *Tree) parseBackslash(tokens items) (ret Node) {
-	if len(tokens)-1 > t.context.Pos {
-		t.context.Pos++
+	if len(tokens)-1 > t.context.pos {
+		t.context.pos++
 	}
-	token := tokens[t.context.Pos]
+	token := tokens[t.context.pos]
 	if token.isNewline() {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
-		t.context.Pos++
+		t.context.pos++
 	} else if token.isASCIIPunct() {
 		ret = &Text{&BaseNode{typ: NodeText}, token.val}
-		t.context.Pos++
+		t.context.pos++
 	} else {
 		ret = &Text{&BaseNode{typ: NodeText}, "\\"}
 	}
@@ -271,13 +271,13 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 }
 
 func (t *Tree) parseInlineCode(tokens items) (ret Node) {
-	startPos := t.context.Pos
+	startPos := t.context.pos
 	marker := tokens[startPos]
 	n := tokens[startPos:].accept(marker.typ)
 	endPos := t.matchEnd(tokens[startPos+n:], marker, n)
 	if 1 > endPos {
 		marker.typ = itemStr
-		t.context.Pos++
+		t.context.pos++
 
 		baseNode := &BaseNode{typ: NodeText, rawText: marker.val}
 		ret = &Text{baseNode, marker.val}
@@ -303,14 +303,14 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 
 	baseNode := &BaseNode{typ: NodeInlineCode, tokens: textTokens}
 	ret = &InlineCode{baseNode, textTokens.rawText()}
-	t.context.Pos = endPos + n
+	t.context.pos = endPos + n
 
 	return
 }
 
 func (t *Tree) parseText(tokens items) (ret Node) {
-	token := tokens[t.context.Pos]
-	t.context.Pos++
+	token := tokens[t.context.pos]
+	t.context.pos++
 
 	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
 	ret = &Text{baseNode, token.val}
@@ -319,13 +319,13 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 }
 
 func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
-	tag := tokens[t.context.Pos:]
+	tag := tokens[t.context.pos:]
 	tag = tag[:tag.index(itemGreater)+1]
 	if 1 > len(tag) {
-		token := tokens[t.context.Pos]
+		token := tokens[t.context.pos]
 		baseNode := &BaseNode{typ: NodeText, rawText: token.val}
 		ret = &Text{baseNode, token.val}
-		t.context.Pos++
+		t.context.pos++
 
 		return
 	}
@@ -334,7 +334,7 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	for _, token := range tag {
 		codeTokens = append(codeTokens, token)
 	}
-	t.context.Pos += len(codeTokens)
+	t.context.pos += len(codeTokens)
 
 	baseNode := &BaseNode{typ: NodeInlineHTML, tokens: codeTokens}
 	ret = &InlineHTML{baseNode, codeTokens.rawText()}
@@ -343,7 +343,7 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 }
 
 func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
-	t.context.Pos++
+	t.context.pos++
 	// check previous node for trailing spaces
 	var lastc = block.LastChild()
 	if nil != lastc && lastc.Type() == NodeText && lastc.RawText() == " " {

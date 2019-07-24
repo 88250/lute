@@ -22,15 +22,15 @@ func (t *Tree) parseBlocks() {
 }
 
 func (t *Tree) processLine(line items) {
-	t.context.Line = line
+	t.context.line = line
 
 	allMatched := true
-	var openBlock Node
-	openBlock = t.Root
-	for lastChild := openBlock.LastChild(); nil != lastChild && lastChild.IsOpen(); openBlock = openBlock.LastChild() {
-		openBlock = lastChild
+	var container Node
+	container = t.Root
+	for lastChild := container.LastChild(); nil != lastChild && lastChild.IsOpen(); container = container.LastChild() {
+		container = lastChild
 
-		switch openBlock.Continuation(t.context.Line) {
+		switch container.Continuation(t.context.line) {
 		case 0: // we've matched, keep going
 			break
 		case 1: // we've failed to match a block
@@ -41,50 +41,17 @@ func (t *Tree) processLine(line items) {
 		}
 
 		if !allMatched {
-			openBlock = openBlock.Parent() // back up to last matching block
+			container = container.Parent() // back up to last matching block
 			break
 		}
 	}
 
+	t.context.allClosed = container == t.context.oldtip
+	t.context.lastMatchedContainer = container
+
+
+
 	t.appendBlock(openBlock)
-}
-
-func (t *Tree) appendBlock(openBlock Node) {
-	blockLeftSpaces := openBlock.LeftSpaces()
-	lineNodeLeftSpaces := t.context.Line.leftSpaces()
-
-	switch openBlock.Type() {
-	case NodeListItem:
-	case NodeBlockquote:
-	case NodeParagraph:
-		lineNode := t.parseBlock(t.context.Line)
-		switch lineNode.Type() {
-		case NodeParagraph:
-			openBlock.AddTokens(items{tNewLine})
-			openBlock.AddTokens(lineNode.Tokens())
-		case NodeBlankLine:
-			openBlock.Close()
-		case NodeList:
-			if lineNodeLeftSpaces < blockLeftSpaces {
-				lineNode = lineNode.FirstChild()
-			}
-
-			fallthrough
-		default:
-			openBlock.Close()
-			prev := openBlock.Previous()
-			if nil == prev {
-				parent := openBlock.Parent()
-				parent.AppendChild(parent, lineNode)
-			} else {
-				parent := prev.Parent()
-				parent.AppendChild(parent, lineNode)
-			}
-		}
-	case NodeRoot:
-		lineNode := t.parseBlock(t.context.Line)
-		openBlock.AppendChild(openBlock, lineNode)
-	}
 }
 
 func (t *Tree) parseBlock(tokens items) (node Node) {
@@ -106,4 +73,40 @@ func (t *Tree) parseBlock(tokens items) (node Node) {
 	}
 
 	return
+}
+
+// Finalize and close any unmatched blocks.
+func (t *Tree) closeUnmatchedBlocks() {
+	if !t.context.allClosed {
+		// finalize any blocks not matched
+		for t.context.oldtip != t.context.lastMatchedContainer {
+			parent := t.context.oldtip.Parent()
+			t.finalize(t.context.oldtip)
+			t.context.oldtip = parent
+		}
+		t.context.allClosed = true
+	}
+}
+
+// Finalize a block.  Close it and do any necessary postprocessing,
+// e.g. creating string_content from strings, setting the 'tight'
+// or 'loose' status of a list, and parsing the beginnings
+// of paragraphs for reference definitions.  Reset the tip to the
+// parent of the closed block.
+func (t *Tree) finalize(block Node) {
+	var parent = block.Parent()
+	block.Close()
+	t.context.tip = parent
+}
+
+// Add block of type tag as a child of the tip.  If the tip can't
+// accept children, close and finalize it and try its parent,
+// and so on til we find a block that can accept children.
+func (t *Tree) addChild(newBlock Node) {
+	for !t.context.tip.CanContain(newBlock) {
+		t.finalize(t.context.tip)
+	}
+
+	t.context.tip.AppendChild(t.context.tip, newBlock)
+	t.context.tip = newBlock
 }

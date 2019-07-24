@@ -17,6 +17,19 @@ package lute
 
 import "strings"
 
+type HTML struct {
+	*BaseNode
+	Value string
+}
+
+func (html *HTML) AcceptLines() bool {
+	return true
+}
+
+func (html *HTML) CanContain(node Node) bool {
+	return false
+}
+
 func (t *Tree) parseHTML(line items, typ int) {
 	baseNode := &BaseNode{typ: NodeHTML}
 	html := &HTML{baseNode, ""}

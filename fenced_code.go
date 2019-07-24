@@ -26,7 +26,7 @@ func (t *Tree) parseFencedCode(line items) {
 		infoStr = strings.Split(infoStr, " ")[0]
 	}
 	baseNode := &BaseNode{typ: NodeCode}
-	code := &Code{baseNode, "", infoStr}
+	code := &CodeBlock{baseNode, "", infoStr}
 
 	line = t.nextLine()
 	if line.isEOF() {

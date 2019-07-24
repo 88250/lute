@@ -32,12 +32,12 @@ type delimiter struct {
 }
 
 func (t *Tree) scanDelims(tokens items) *delimiter {
-	startPos := t.context.Pos
+	startPos := t.context.pos
 	token := tokens[startPos]
 	delimitersCount := 0
-	for i := t.context.Pos; i < len(tokens) && token.val == tokens[i].val; i++ {
+	for i := t.context.pos; i < len(tokens) && token.val == tokens[i].val; i++ {
 		delimitersCount++
-		t.context.Pos++
+		t.context.pos++
 	}
 
 	tokenBefore, tokenAfter := tNewLine, tNewLine
@@ -45,7 +45,7 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 	if 0 < index {
 		tokenBefore = tokens[index]
 	}
-	index = t.context.Pos
+	index = t.context.pos
 	if len(tokens) > index {
 		tokenAfter = tokens[index]
 	}
@@ -74,27 +74,27 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 }
 
 func (t *Tree) handleDelim(block Node, tokens items) {
-	startPos := t.context.Pos
+	startPos := t.context.pos
 	delim := t.scanDelims(tokens)
 
-	subTokens, text := t.extractTokens(tokens, startPos, t.context.Pos)
+	subTokens, text := t.extractTokens(tokens, startPos, t.context.pos)
 	baseNode := &BaseNode{typ: NodeText, rawText: text, tokens: subTokens}
 	node := &Text{baseNode, text}
 	block.AppendChild(block, node)
 
 	// Add entry to stack for this opener
-	t.context.Delimiters = &delimiter{
+	t.context.delimiters = &delimiter{
 		typ:         delim.typ,
 		num:         delim.num,
 		originalNum: delim.num,
 		node:        node,
-		previous:    t.context.Delimiters,
+		previous:    t.context.delimiters,
 		next:        nil,
 		canOpen:     delim.canOpen,
 		canClose:    delim.canClose,
 	}
-	if t.context.Delimiters.previous != nil {
-		t.context.Delimiters.previous.next = t.context.Delimiters
+	if t.context.delimiters.previous != nil {
+		t.context.delimiters.previous.next = t.context.delimiters
 	}
 }
 
@@ -111,7 +111,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 	openers_bottom[itemAsterisk] = stackBottom
 
 	// find first closer above stack_bottom:
-	closer = t.context.Delimiters
+	closer = t.context.delimiters
 	for closer != nil && closer.previous != stackBottom {
 		closer = closer.previous
 	}
@@ -214,8 +214,8 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 	}
 
 	// remove all delimiters
-	for t.context.Delimiters != nil && t.context.Delimiters != stackBottom {
-		t.removeDelimiter(t.context.Delimiters)
+	for t.context.delimiters != nil && t.context.delimiters != stackBottom {
+		t.removeDelimiter(t.context.delimiters)
 	}
 }
 
@@ -225,7 +225,7 @@ func (t *Tree) removeDelimiter(delim *delimiter) (ret *delimiter) {
 	}
 	if delim.next == nil {
 		// top of stack
-		t.context.Delimiters = delim.previous
+		t.context.delimiters = delim.previous
 	} else {
 		delim.next.previous = delim.previous
 	}

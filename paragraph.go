@@ -21,12 +21,20 @@ type Paragraph struct {
 	OpenTag, CloseTag string
 }
 
-func (t *Tree) Continuation(tokens items) int {
+func (p *Paragraph) Continuation(tokens items) int {
 	if tokens.isBlankLine() {
 		return 1
 	}
 
 	return 0
+}
+
+func (p *Paragraph) AcceptLines() bool {
+	return true
+}
+
+func (p *Paragraph) CanContain(node Node) bool {
+	return false
 }
 
 func (t *Tree) parseParagraph(tokens items) (ret Node) {

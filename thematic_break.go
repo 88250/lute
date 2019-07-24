@@ -19,6 +19,10 @@ type ThematicBreak struct {
 	*BaseNode
 }
 
+func (thematicBreak *ThematicBreak) CanContain(node Node) bool {
+	return false
+}
+
 func (t *Tree) parseThematicBreak(line items) (ret Node) {
 	baseNode := &BaseNode{typ: NodeThematicBreak, tokens: line}
 	thematicBreak := &ThematicBreak{baseNode}

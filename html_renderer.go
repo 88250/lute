@@ -132,7 +132,7 @@ func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderCode(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.Newline()
-		n := node.(*Code)
+		n := node.(*CodeBlock)
 		if "" != n.InfoStr {
 			r.WriteString("<pre><code class=\"language-" + n.InfoStr + "\">" + n.Value)
 		} else {

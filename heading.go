@@ -21,6 +21,10 @@ type Heading struct {
 	Level int
 }
 
+func (heading *Heading) CanContain(node Node) bool {
+	return false
+}
+
 func (t *Tree) parseSetextHeading(p *Paragraph, level int) {
 	baseNode := &BaseNode{typ: NodeHeading}
 	heading := &Heading{baseNode, level}

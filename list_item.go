@@ -35,9 +35,9 @@ func (n *ListItem) Close() {
 		return
 	}
 
-	for child := n.FirstChild(); nil != child; child = child.Next() {
-		child.Close()
-	}
+	//for child := n.FirstChild(); nil != child; child = child.Next() {
+	//	child.Close()
+	//}
 }
 
 func (t *Tree) parseListItem(tokens items) (ret Node) {

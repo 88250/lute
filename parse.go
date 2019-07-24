@@ -69,18 +69,22 @@ func (bc *BlockContainer) peek() Node {
 
 // Context use to store common data in parsing.
 type Context struct {
-	LinkRefDef map[string]*Link
-	CurLines   []items
+	linkRefDef map[string]*Link
+	curLines   []items
 
 	// Blocks parsing
 
-	Line items
+	line      items
+	lastMatchedContainer Node
+	allClosed bool
+	tip Node
+	oldtip Node
 
 	// Inlines parsing
 
-	Pos               int
-	Delimiters        *delimiter
-	Brackets          *delimiter
+	pos               int
+	delimiters        *delimiter
+	brackets          *delimiter
 	previousDelimiter *delimiter
 }
 
@@ -171,10 +175,10 @@ func (t *Tree) indentOffset(tokens items, indentSpaces int) (ret items) {
 }
 
 func (t *Tree) nextLine() (line items) {
-	length := len(t.context.CurLines)
+	length := len(t.context.curLines)
 	if 0 < length {
-		line = t.context.CurLines[0]
-		t.context.CurLines = t.context.CurLines[1:]
+		line = t.context.curLines[0]
+		t.context.curLines = t.context.curLines[1:]
 
 		return
 	}
@@ -189,10 +193,10 @@ func (t *Tree) nextLine() (line items) {
 }
 
 func (t *Tree) backupLine(line items) {
-	if 0 < len(t.context.CurLines) {
-		t.context.CurLines = append([]items{line}, t.context.CurLines...)
+	if 0 < len(t.context.curLines) {
+		t.context.curLines = append([]items{line}, t.context.curLines...)
 	} else {
-		t.context.CurLines = append(t.context.CurLines, line)
+		t.context.curLines = append(t.context.curLines, line)
 	}
 }
 
@@ -211,7 +215,7 @@ func (t *Tree) parse() (err error) {
 
 	t.lex = lex(t.name, t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
-	t.context.LinkRefDef = map[string]*Link{}
+	t.context.linkRefDef = map[string]*Link{}
 	t.parseBlocks()
 	t.parseInlines()
 	t.lex = nil
