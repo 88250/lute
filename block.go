@@ -18,6 +18,8 @@ package lute
 import "strings"
 
 func (t *Tree) parseBlocks() {
+	t.context.tip = t.Root
+	t.context.oldtip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
 
 	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
@@ -192,7 +194,8 @@ func (t *Tree) addLine() {
 		var charsToTab = 4 - (t.context.column % 4)
 		t.context.tip.AppendRawText(strings.Repeat(" ", charsToTab))
 	}
-	t.context.tip.AppendRawText(t.context.currentLine[t.context.offset:].rawText() + "\n")
+	t.context.tip.AddTokens(t.context.currentLine[t.context.offset:])
+	//TODO t.context.tip.AppendRawText(t.context.currentLine[t.context.offset:].rawText() + "\n")
 }
 
 // Returns true if block ends with a blank line, descending if needed
