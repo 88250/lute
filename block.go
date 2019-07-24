@@ -24,7 +24,7 @@ func (t *Tree) parseBlocks() {
 		t.processLine(line)
 	}
 	for nil != t.context.tip {
-		t.finalize(t.context.tip)
+		t.context.finalize(t.context.tip)
 	}
 }
 
@@ -37,7 +37,7 @@ func (t *Tree) processLine(line items) {
 	for lastChild := container.LastChild(); nil != lastChild && lastChild.IsOpen(); container = container.LastChild() {
 		container = lastChild
 
-		switch container.Continuation(t.context.currentLine) {
+		switch container.Continue(t.context) {
 		case 0: // we've matched, keep going
 			break
 		case 1: // we've failed to match a block
@@ -62,7 +62,7 @@ func (t *Tree) processLine(line items) {
 	// Unless last matched container is a code block, try new container starts,
 	// adding children to the last matched container:
 	for !matchedLeaf {
-		t.findNextNonspace()
+		t.context.findNextNonspace()
 
 		// this is a little performance optimization:
 		//if !t.context.indented &&
@@ -87,7 +87,7 @@ func (t *Tree) processLine(line items) {
 		}
 
 		if i == startsLen { // nothing matched
-			t.advanceNextNonspace()
+			t.context.advanceNextNonspace()
 			break
 		}
 	}
@@ -102,7 +102,7 @@ func (t *Tree) processLine(line items) {
 	} else { // not a lazy continuation
 
 		// finalize any blocks not matched
-		t.closeUnmatchedBlocks()
+		t.context.closeUnmatchedBlocks()
 		if t.context.blank && nil != container.LastChild() {
 			container.LastChild().SetLastLineBlank(true)
 		}
@@ -132,123 +132,17 @@ func (t *Tree) processLine(line items) {
 				if html.Typ >= 1 && html.Typ <= 5 {
 					//if reHtmlBlockClose[container._htmlBlockType].test(this.currentLine.slice(this.offset))
 					{
-						t.finalize(container)
+						t.context.finalize(container)
 					}
 				}
 			}
 		} else if t.context.offset < len(t.context.currentLine) && !t.context.blank {
 			// create paragraph container for line
-			t.addChild(NodeParagraph)
-			t.advanceNextNonspace()
+			t.context.addChild(NodeParagraph)
+			t.context.advanceNextNonspace()
 			t.addLine()
 		}
 	}
-}
-
-func (t *Tree) advanceOffset(count int, columns bool) {
-	var currentLine = t.context.currentLine
-	var charsToTab, charsToAdvance int
-	var c *item
-	for c = currentLine[t.context.offset]; count > 0 && nil != c; {
-		if c.isTab() {
-			charsToTab = 4 - (t.context.column % 4)
-			if columns {
-				t.context.partiallyConsumedTab = charsToTab > count
-				if charsToTab > count {
-					charsToAdvance = count
-				} else {
-					charsToAdvance = charsToTab
-				}
-				t.context.column += charsToAdvance
-				if !t.context.partiallyConsumedTab {
-					t.context.offset += 1
-				}
-				count -= charsToAdvance
-			} else {
-				t.context.partiallyConsumedTab = false
-				t.context.column += charsToTab
-				t.context.offset += 1
-				count -= 1
-			}
-		} else {
-			t.context.partiallyConsumedTab = false
-			t.context.offset += 1
-			t.context.column += 1 // assume ascii; block starts are ascii
-			count -= 1
-		}
-	}
-}
-
-func (t *Tree) advanceNextNonspace() {
-	t.context.offset = t.context.nextNonspace
-	t.context.column = t.context.nextNonspaceColumn
-	t.context.partiallyConsumedTab = false
-}
-
-func (t *Tree) findNextNonspace() {
-	currentLine := t.context.currentLine
-	i := t.context.offset
-	cols := t.context.column
-
-	var c *item
-	for _, c = range currentLine {
-		if "" == c.val {
-			break
-		}
-
-		if c.isSpace() {
-			i++
-			cols++
-		} else if c.isTab() {
-			i++
-			cols += 4 - (cols % 4)
-		} else {
-			break
-		}
-	}
-	t.context.blank = c.val == "\n" || c.val == "\r" || "" == c.val
-	t.context.nextNonspace = i
-	t.context.nextNonspaceColumn = cols
-	t.context.indent = t.context.nextNonspaceColumn - t.context.column
-	t.context.indented = t.context.indent >= 4
-}
-
-// Finalize and close any unmatched blocks.
-func (t *Tree) closeUnmatchedBlocks() {
-	if !t.context.allClosed {
-		// finalize any blocks not matched
-		for t.context.oldtip != t.context.lastMatchedContainer {
-			parent := t.context.oldtip.Parent()
-			t.finalize(t.context.oldtip)
-			t.context.oldtip = parent
-		}
-		t.context.allClosed = true
-	}
-}
-
-// Finalize a block.  Close it and do any necessary postprocessing,
-// e.g. creating string_content from strings, setting the 'tight'
-// or 'loose' status of a list, and parsing the beginnings
-// of paragraphs for reference definitions.  Reset the tip to the
-// parent of the closed block.
-func (t *Tree) finalize(block Node) {
-	var parent = block.Parent()
-	block.Close()
-	block.Finalize()
-	t.context.tip = parent
-}
-
-// Add block of type tag as a child of the tip.  If the tip can't
-// accept children, close and finalize it and try its parent,
-// and so on til we find a block that can accept children.
-func (t *Tree) addChild(typ NodeType) {
-	for !t.context.tip.CanContain(typ) {
-		t.finalize(t.context.tip)
-	}
-
-	newBlock := &BaseNode{typ: typ}
-	t.context.tip.AppendChild(t.context.tip, newBlock)
-	t.context.tip = newBlock
 }
 
 type startFunc func(t *Tree, container Node) int
@@ -263,16 +157,16 @@ var blockStarts = []startFunc{
 		if !t.context.indented {
 			token := peek(t.context.currentLine, t.context.nextNonspace)
 			if nil != token && itemGreater == token.typ {
-				t.advanceNextNonspace()
-				t.advanceOffset(1, false)
+				t.context.advanceNextNonspace()
+				t.context.advanceOffset(1, false)
 				// optional following space
 				token = peek(t.context.currentLine, t.context.offset)
 				if token.isSpaceOrTab() {
-					t.advanceOffset(1, true)
+					t.context.advanceOffset(1, true)
 				}
 
-				t.closeUnmatchedBlocks()
-				t.addChild(NodeBlockquote)
+				t.context.closeUnmatchedBlocks()
+				t.context.addChild(NodeBlockquote)
 				return 1
 			}
 		}
@@ -299,4 +193,26 @@ func (t *Tree) addLine() {
 		t.context.tip.AppendRawText(strings.Repeat(" ", charsToTab))
 	}
 	t.context.tip.AppendRawText(t.context.currentLine[t.context.offset:].rawText() + "\n")
+}
+
+// Returns true if block ends with a blank line, descending if needed
+// into lists and sublists.
+func endsWithBlankLine(block Node) bool {
+	for nil != block {
+		if block.LastLineBlank() {
+			return true
+		}
+
+		var t = block.Type()
+		if !block.LastLineChecked() &&
+			(t == NodeList || t == NodeListItem) {
+			block.SetLastLineBlank(true)
+			block = block.LastChild()
+		} else {
+			block.SetLastLineChecked(true)
+			break
+		}
+	}
+
+	return false
 }

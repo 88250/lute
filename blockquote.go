@@ -18,3 +18,17 @@ package lute
 type Blockquote struct {
 	*BaseNode
 }
+
+func (blockquote *Blockquote) Continue(context *Context) int {
+	var ln = context.currentLine
+	if !context.indented && peek(ln, context.nextNonspace).typ == itemGreater {
+		context.advanceNextNonspace()
+		context.advanceOffset(1, false)
+		if (peek(ln, context.offset)).isSpaceOrTab() {
+			context.advanceOffset(1, true)
+		}
+	} else {
+		return 1
+	}
+	return 0
+}

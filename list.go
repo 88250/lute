@@ -33,3 +33,28 @@ type List struct {
 func (list *List) CanContain(nodeType NodeType) bool {
 	return NodeListItem == nodeType
 }
+
+func (list *List) Finalize() {
+	var item = list.firstChild
+
+	for nil != item {
+		// check for non-final list item ending with blank line:
+		if endsWithBlankLine(item) && nil != item.Next() {
+			list.Tight = false
+			break
+		}
+
+		// recurse into children of list item, to see if there are
+		// spaces between any of them:
+		var subitem = item.FirstChild()
+		for nil != subitem {
+			if endsWithBlankLine(subitem) &&
+				(nil != item.Next() || nil != subitem.Next()) {
+				list.Tight = false
+				break
+			}
+			subitem = subitem.Next()
+		}
+		item = item.Next()
+	}
+}

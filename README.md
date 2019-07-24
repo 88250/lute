@@ -40,8 +40,9 @@ TBD
 TBD
 
 * [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
-* CommonMark 规范要点解读
 * Lute 使用指南
+* CommonMark 规范要点解读
+* Lute 实现后记
 
 ## 社区
 
@@ -54,9 +55,19 @@ Lute 使用 [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-
 
 ## 鸣谢
 
-* [commonmark.js](https://github.com/commonmark/commonmark.js)：CommonMark 规范的官方 JavaScript 参考实现
-* [mdast](https://github.com/syntax-tree/mdast)：Markdown 抽象语法树结构
-* [goldmark](https://github.com/yuin/goldmark)：另一款 golang 开发的 Markdown 解析器
+Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者致以最崇高的敬意！
+
+### [commonmark.js](https://github.com/commonmark/commonmark.js)
+
+该项目是 CommonMark 规范官方参考实现的 JavaScript 版，Lute 参考了其解析器实现部分。
+
+* [mdast](https://github.com/syntax-tree/mdast)
+
+该项目介绍了一种 Markdown 抽象语法树结构的表现形式。在 Lute 的初始设计阶段参考了该项目，让我更直观地了解元素构成。Lute 最终设计是以 CommonMark 规范为主。
+
+* [goldmark](https://github.com/yuin/goldmark)
+
+隔壁岛国开发者用 golang 实现的一款 Markdown 解析器。Lute 参考了其树遍历实现部分。
 
 ---
 

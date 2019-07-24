@@ -42,24 +42,27 @@ type Node interface {
 	IsClosed() bool
 	Close()
 	Finalize()
-	Continuation(items) int
+	Continue(*Context) int
 	AcceptLines() bool
 	CanContain(NodeType) bool
 	LastLineBlank() bool
 	SetLastLineBlank(lastLineBlank bool)
+	LastLineChecked() bool
+	SetLastLineChecked(bool)
 }
 
 type BaseNode struct {
-	typ           NodeType
-	parent        Node
-	next          Node
-	previous      Node
-	firstChild    Node
-	lastChild     Node
-	rawText       string
-	tokens        items
-	close         bool
-	lastLineBlank bool
+	typ             NodeType
+	parent          Node
+	next            Node
+	previous        Node
+	firstChild      Node
+	lastChild       Node
+	rawText         string
+	tokens          items
+	close           bool
+	lastLineBlank   bool
+	lastLineChecked bool
 }
 
 func (n *BaseNode) Type() NodeType {
@@ -85,7 +88,7 @@ func (n *BaseNode) Close() {
 func (n *BaseNode) Finalize() {
 }
 
-func (n *BaseNode) Continuation(tokens items) int {
+func (n *BaseNode) Continue(context *Context) int {
 	return 0
 }
 
@@ -103,6 +106,14 @@ func (n *BaseNode) LastLineBlank() bool {
 
 func (n *BaseNode) SetLastLineBlank(lastLineBlank bool) {
 	n.lastLineBlank = lastLineBlank
+}
+
+func (n *BaseNode) LastLineChecked() bool {
+	return n.lastLineChecked
+}
+
+func (n *BaseNode) SetLastLineChecked(lastLineChecked bool) {
+	n.lastLineChecked = lastLineChecked
 }
 
 func (n *BaseNode) Unlink() {

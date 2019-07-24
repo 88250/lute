@@ -27,3 +27,20 @@ type ListItem struct {
 	StartIndentSpaces int
 	IndentSpaces      int
 }
+
+func (listItem *ListItem) Continue(context *Context) int {
+	if context.blank {
+		if nil == listItem.firstChild {
+			// Blank line after empty list item
+			return 1
+		} else {
+			context.advanceNextNonspace()
+		}
+	} else if context.indent >= listItem._listData.markerOffset+listItem._listData.padding {
+		context.advanceOffset(listItem._listData.markerOffset+
+			listItem._listData.padding, true)
+	} else {
+		return 1
+	}
+	return 0
+}
