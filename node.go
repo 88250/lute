@@ -37,14 +37,14 @@ type Node interface {
 	AppendRawText(string)
 	Tokens() items
 	AddTokens(items)
+
 	IsOpen() bool
 	IsClosed() bool
 	Close()
-	LeftSpaces() int
-	SetLeftSpaces(int)
+	Finalize()
 	Continuation(items) int
 	AcceptLines() bool
-	CanContain(Node) bool
+	CanContain(NodeType) bool
 }
 
 type BaseNode struct {
@@ -57,7 +57,6 @@ type BaseNode struct {
 	rawText    string
 	tokens     items
 	close      bool
-	leftSpaces int
 }
 
 func (n *BaseNode) Type() NodeType {
@@ -77,18 +76,10 @@ func (n *BaseNode) IsClosed() bool {
 }
 
 func (n *BaseNode) Close() {
-	if n.close {
-		return
-	}
 	n.close = true
 }
 
-func (n *BaseNode) LeftSpaces() int {
-	return n.leftSpaces
-}
-
-func (n *BaseNode) SetLeftSpaces(leftSpaces int) {
-	n.leftSpaces = leftSpaces
+func (n *BaseNode) Finalize() {
 }
 
 func (n *BaseNode) Continuation(tokens items) int {
@@ -99,8 +90,8 @@ func (n *BaseNode) AcceptLines() bool {
 	return false
 }
 
-func (n *BaseNode) CanContain(node Node) bool {
-	return NodeListItem != node.Type()
+func (n *BaseNode) CanContain(nodeType NodeType) bool {
+	return NodeListItem != nodeType
 }
 
 func (n *BaseNode) Unlink() {

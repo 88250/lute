@@ -18,27 +18,3 @@ package lute
 type Blockquote struct {
 	*BaseNode
 }
-
-func (t *Tree) parseBlockquote(tokens items) (ret Node) {
-	if 2 > len(tokens) {
-		return
-	}
-
-	_, marker := tokens.firstNonSpace()
-	if itemGreater != marker.typ {
-		return
-	}
-
-	ret = &Blockquote{&BaseNode{typ: NodeBlockquote}}
-	tokens = tokens[1:]
-	if tokens[0].isSpace() {
-		tokens = tokens[1:]
-	} else if tokens[0].isTab() {
-		tokens = t.indentOffset(tokens, 2)
-	}
-
-	child := t.parseBlock(tokens)
-	ret.AppendChild(ret, child)
-
-	return
-}

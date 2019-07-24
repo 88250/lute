@@ -74,11 +74,12 @@ type Context struct {
 
 	// Blocks parsing
 
-	line      items
-	lastMatchedContainer Node
-	allClosed bool
-	tip Node
-	oldtip Node
+	tip                                                      Node
+	oldtip                                                   Node
+	currentLine                                              items
+	offset, column, nextNonspace, nextNonspaceColumn, indent int
+	indented, blank, partiallyConsumedTab, allClosed         bool
+	lastMatchedContainer                                     Node
 
 	// Inlines parsing
 
@@ -215,7 +216,6 @@ func (t *Tree) parse() (err error) {
 
 	t.lex = lex(t.name, t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
-	t.context.linkRefDef = map[string]*Link{}
 	t.parseBlocks()
 	t.parseInlines()
 	t.lex = nil
