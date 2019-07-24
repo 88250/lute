@@ -25,35 +25,6 @@ func (codeBlock *CodeBlock) AcceptLines() bool {
 	return true
 }
 
-func (codeBlock *CodeBlock) CanContain(node Node) bool {
+func (codeBlock *CodeBlock) CanContain(nodeType NodeType) bool {
 	return false
-}
-
-func (t *Tree) parseIndentCode(tokens items) (ret Node) {
-	spaces, tabs, remains := t.nonSpaceTab(tokens)
-	if 4 > spaces && 1 > tabs {
-		return
-	}
-
-	baseNode := &BaseNode{typ: NodeCode}
-	code := &CodeBlock{baseNode, "", ""}
-	code.Value += remains.rawText()
-
-	ret = code
-
-	return
-}
-
-func (t *Tree) nonNewline() (newlines items, line items) {
-	for line = t.nextLine(); line.isBlankLine() && !line.isEOF(); line = t.nextLine() {
-		if 5 > len(line) {
-			_, line = line.trimLeftSpace()
-		} else {
-			line = t.indentOffset(line, 4)
-		}
-
-		newlines = append(newlines, line...)
-	}
-
-	return
 }

@@ -22,39 +22,3 @@ type ThematicBreak struct {
 func (thematicBreak *ThematicBreak) CanContain(node Node) bool {
 	return false
 }
-
-func (t *Tree) parseThematicBreak(line items) (ret Node) {
-	baseNode := &BaseNode{typ: NodeThematicBreak, tokens: line}
-	thematicBreak := &ThematicBreak{baseNode}
-
-	ret = thematicBreak
-
-	return
-}
-
-func (t *Tree) isThematicBreak(line items) bool {
-	if 3 > len(line) {
-		return false
-	}
-
-	tokens := line.removeSpacesTabs()
-	tokens = tokens[:len(tokens)-1] // remove tailing newline
-	length := len(tokens)
-	if 3 > length {
-		return false
-	}
-
-	marker := tokens[0]
-	if itemHyphen != marker.typ && itemUnderscore != marker.typ && itemAsterisk != marker.typ {
-		return false
-	}
-
-	for i := 1; i < length; i++ {
-		token := tokens[i]
-		if marker.typ != token.typ {
-			return false
-		}
-	}
-
-	return true
-}

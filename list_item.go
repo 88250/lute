@@ -15,8 +15,6 @@
 
 package lute
 
-import "strconv"
-
 type ListItem struct {
 	*BaseNode
 
@@ -28,95 +26,4 @@ type ListItem struct {
 	Marker            string
 	StartIndentSpaces int
 	IndentSpaces      int
-}
-
-func (n *ListItem) Close() {
-	if n.close {
-		return
-	}
-
-	//for child := n.FirstChild(); nil != child; child = child.Next() {
-	//	child.Close()
-	//}
-}
-
-func (t *Tree) parseListItem(tokens items) (ret Node) {
-	spaces, tabs, remains := t.nonSpaceTab(tokens)
-	startIndentSpaces := spaces + tabs*4
-	token := remains[0]
-	start := 0
-	var marker, delim string
-	var bullet bool
-	if itemAsterisk == token.typ {
-		if !remains[1].isWhitespace() {
-			return
-		}
-		marker = "*"
-		delim = " "
-		bullet = true
-		remains = remains[2:]
-	} else if itemHyphen == token.typ {
-		if !remains[1].isWhitespace() {
-			return
-		}
-		marker = "-"
-		delim = " "
-		bullet = true
-		remains = remains[2:]
-	} else if itemPlus == token.typ {
-		if !tokens[1].isWhitespace() {
-			return
-		}
-		marker = "+"
-		delim = " "
-		bullet = true
-		remains = remains[2:]
-	} else if token.isNumInt() && 9 >= len(token.val) {
-		if !remains[2].isWhitespace() {
-			return
-		}
-		start, _ = strconv.Atoi(token.val)
-		if itemDot == remains[1].typ {
-			delim = "."
-			marker = token.val + delim
-			remains = remains[2:]
-		} else if itemCloseParen == remains[1].typ {
-			delim = ")"
-			marker = token.val + delim
-			remains = remains[2:]
-		} else {
-			return
-		}
-	} else {
-		return
-	}
-
-	spaces, tabs, remains = t.nonSpaceTab(remains)
-	w := len(marker)
-	n := spaces + tabs*4
-	if 4 < n {
-		n = 1
-	} else if 1 > n {
-		n = 1
-	}
-	wnSpaces := w + n
-	indentSpaces := startIndentSpaces + wnSpaces
-
-	li := &ListItem{
-		&BaseNode{typ: NodeListItem, tokens: items{}},
-		bullet,
-		start,
-		delim,
-		true,
-		marker,
-		startIndentSpaces,
-		indentSpaces,
-	}
-	ret = li
-
-	child := t.parseToLeafBlock(remains)
-	child.SetLeftSpaces(indentSpaces)
-	li.AppendChild(li, child)
-
-	return
 }

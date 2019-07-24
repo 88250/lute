@@ -21,6 +21,6 @@ type Heading struct {
 	Level int
 }
 
-func (heading *Heading) CanContain(node Node) bool {
+func (heading *Heading) CanContain(nodeType NodeType) bool {
 	return false
 }

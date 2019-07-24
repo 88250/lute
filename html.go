@@ -26,7 +26,7 @@ func (html *HTML) AcceptLines() bool {
 	return true
 }
 
-func (html *HTML) CanContain(node Node) bool {
+func (html *HTML) CanContain(nodeType NodeType) bool {
 	return false
 }
 
