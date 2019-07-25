@@ -92,7 +92,7 @@ func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
 	inTightList := false
 	if NodeListItem == node.Parent().Type() {
-		inTightList = node.Parent().(*ListItem).Tight
+		inTightList = node.Parent().(*ListItem).tight
 	}
 	if entering {
 		if !inTightList {
@@ -191,14 +191,14 @@ func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*List)
 	tag := "ul"
-	if !n.Bullet {
+	if "" == n.bulletChar {
 		tag = "ol"
 	}
 	if entering {
 		r.Newline()
 		r.WriteString("<" + tag)
-		if !n.Bullet && 1 != n.Start {
-			r.WriteString(fmt.Sprintf(" start=\"%d\">", n.Start))
+		if "" == n.bulletChar && 1 != n.start {
+			r.WriteString(fmt.Sprintf(" start=\"%d\">", n.start))
 		} else {
 			r.WriteString(">")
 		}
@@ -215,7 +215,7 @@ func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) 
 	if entering {
 		r.WriteString("<li>")
 		li := node.(*ListItem)
-		if !li.Tight && 0 < len(li.Children()) {
+		if !li.tight && 0 < len(li.Children()) {
 			r.Newline()
 		}
 	} else {

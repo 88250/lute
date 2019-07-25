@@ -61,8 +61,7 @@ func (t *Tree) processLine(line items) {
 	t.context.lastMatchedContainer = container
 
 	matchedLeaf := container.Type() != NodeParagraph && container.AcceptLines()
-	var starts = blockStarts
-	var startsLen = len(starts)
+	var startsLen = len(blockStarts)
 	// Unless last matched container is a code block, try new container starts,
 	// adding children to the last matched container:
 	for !matchedLeaf {
@@ -77,7 +76,7 @@ func (t *Tree) processLine(line items) {
 
 		var i = 0
 		for i < startsLen {
-			var res = starts[i](t, container)
+			var res = blockStarts[i](t, container)
 			if res == 1 {
 				container = t.context.tip
 				break
@@ -221,6 +220,36 @@ var blockStarts = []startFunc{
 	//	return 0;
 	//	}
 	//},
+
+	// list item
+	func(t *Tree, container Node) int {
+		if !t.context.indented || container.Type() == NodeList {
+			data := t.parseListMarker(container)
+			if nil == data {
+				return 0
+			}
+
+			t.context.closeUnmatchedBlocks()
+
+			listsMatch := false
+			if container.Type() == NodeList {
+				listsMatch = t.context.listsMatch(container.(*List).ListData, data)
+			}
+
+			// add the list if needed
+			if t.context.tip.Type() != NodeList || !listsMatch {
+				list := &List{&BaseNode{typ: NodeList}, data}
+				t.context.addChild(list)
+			}
+
+			// add the list item
+			li := &ListItem{&BaseNode{typ: NodeListItem}, data}
+			t.context.addChild(li)
+
+			return 1
+		}
+		return 0
+	},
 
 	// indented code block
 	func(t *Tree, container Node) int {

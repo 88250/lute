@@ -17,13 +17,7 @@ package lute
 
 type ListItem struct {
 	*BaseNode
-
-	Bullet bool
-	Start  int
-	Delim  string
-	Tight  bool
-
-	markerOffset, padding int
+	*ListData
 }
 
 func (listItem *ListItem) Continue(context *Context) int {
