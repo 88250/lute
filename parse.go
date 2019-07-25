@@ -185,15 +185,15 @@ func (context *Context) finalize(block Node) {
 // Add block of type tag as a child of the tip.  If the tip can't
 // accept children, close and finalize it and try its parent,
 // and so on til we find a block that can accept children.
-func (context *Context) addChild(typ NodeType) {
-	for !context.tip.CanContain(typ) {
+func (context *Context) addChild(child Node) {
+	for !context.tip.CanContain(child.Type()) {
 		context.finalize(context.tip)
 	}
 
-	newBlock := &BaseNode{typ: typ}
-	context.tip.AppendChild(context.tip, newBlock)
-	context.tip = newBlock
+	context.tip.AppendChild(context.tip, child)
+	context.tip = child
 }
+
 //
 //// Parse a list marker and return data on the marker (type,
 //// start, delimiter, bullet character, padding) or null.

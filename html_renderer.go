@@ -26,7 +26,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeInlineCode] = ret.renderInlineCode
-	ret.rendererFuncs[NodeCode] = ret.renderCode
+	ret.rendererFuncs[NodeCodeBlock] = ret.renderCode
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote

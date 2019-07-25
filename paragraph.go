@@ -46,7 +46,3 @@ func (p *Paragraph) Finalize() {
 func (p *Paragraph) AcceptLines() bool {
 	return true
 }
-
-func (p *Paragraph) CanContain(node Node) bool {
-	return false
-}

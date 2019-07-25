@@ -257,8 +257,7 @@ const (
 	NodeTableCell
 	NodeHTML
 	NodeInlineHTML
-	NodeCode
-	NodeFencedCode
+	NodeCodeBlock
 	NodeText
 	NodeEmphasis
 	NodeStrong

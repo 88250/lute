@@ -27,7 +27,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 	for _, block := range blocks {
 		cType := block.Type()
 		switch cType {
-		case NodeCode, NodeThematicBreak, NodeHTML:
+		case NodeCodeBlock, NodeThematicBreak, NodeHTML:
 			continue
 		}
 

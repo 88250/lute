@@ -15,7 +15,9 @@
 
 package lute
 
-import "strings"
+import (
+	"strings"
+)
 
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
@@ -110,14 +112,20 @@ func (t *Tree) processLine(line items) {
 		}
 
 		typ := container.Type()
+		isFenced := false
+		if NodeCodeBlock == typ {
+			isFenced = container.(*CodeBlock).IsFenced
+		}
 
 		// Block quote lines are never blank as they start with >
 		// and we don't count blanks in fenced code for purposes of tight/loose
 		// lists or breaking out of lists.  We also don't set _lastLineBlank
 		// on an empty list item, or if we just closed a fenced block.
-		var lastLineBlank = t.context.blank && !(typ == NodeBlockquote ||
-			(typ == NodeCode && container.Type() == NodeFencedCode) ||
-			(typ == NodeListItem && nil != container.FirstChild() /*&&container.sourcepos[0][0] == = this.lineNumber*/))
+		var lastLineBlank = t.context.blank &&
+			!(typ == NodeBlockquote ||
+				(typ == NodeCodeBlock && isFenced) ||
+				(typ == NodeListItem &&
+					nil != container.FirstChild() /*&&container.sourcepos[0][0] == = this.lineNumber*/))
 
 		// propagate lastLineBlank up through parents:
 		var cont = container
@@ -140,7 +148,7 @@ func (t *Tree) processLine(line items) {
 			}
 		} else if t.context.offset < len(t.context.currentLine) && !t.context.blank {
 			// create paragraph container for line
-			t.context.addChild(NodeParagraph)
+			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph}})
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}
@@ -168,12 +176,45 @@ var blockStarts = []startFunc{
 				}
 
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(NodeBlockquote)
+				t.context.addChild(&Blockquote{BaseNode: &BaseNode{typ: NodeBlockquote}})
 				return 1
 			}
 		}
 
 		return 0
+	},
+
+
+	// fenced code block
+	//func(t *Tree, container Node) int {
+	//	var match;
+	//	if (!t.context.indented &&
+	//		(match = t.context.currentLine.slice(parser.nextNonspace).match(reCodeFence))) {
+	//	var fenceLength = match[0].length;
+	//	parser.closeUnmatchedBlocks();
+	//	var container = parser.addChild('code_block', parser.nextNonspace);
+	//	container._isFenced = true;
+	//	container._fenceLength = fenceLength;
+	//	container._fenceChar = match[0][0];
+	//	container._fenceOffset = parser.indent;
+	//	parser.advanceNextNonspace();
+	//	parser.advanceOffset(fenceLength, false);
+	//	return 2;
+	//	} else {
+	//	return 0;
+	//	}
+	//},
+
+	// indented code block
+	func(t *Tree, container Node) int {
+		if t.context.indented && t.context.tip.Type() != NodeParagraph && !t.context.blank {
+			t.context.advanceOffset(4, true)
+			t.context.closeUnmatchedBlocks()
+			t.context.addChild(&CodeBlock{BaseNode: &BaseNode{typ: NodeCodeBlock}})
+			return 2
+		} else {
+			return 0
+		}
 	},
 }
 
@@ -207,8 +248,7 @@ func endsWithBlankLine(block Node) bool {
 		}
 
 		var t = block.Type()
-		if !block.LastLineChecked() &&
-			(t == NodeList || t == NodeListItem) {
+		if !block.LastLineChecked() && (t == NodeList || t == NodeListItem) {
 			block.SetLastLineBlank(true)
 			block = block.LastChild()
 		} else {
