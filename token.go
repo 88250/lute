@@ -510,3 +510,11 @@ func (tokens items) spnl() (ret bool, remains items) {
 
 	return
 }
+
+func (tokens items) peek(pos int) *item {
+	if pos < len(tokens) {
+		return tokens[pos]
+	}
+
+	return nil
+}

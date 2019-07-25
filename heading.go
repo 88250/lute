@@ -17,7 +17,6 @@ package lute
 
 type Heading struct {
 	*BaseNode
-
 	Level int
 }
 
@@ -27,4 +26,58 @@ func (heading *Heading) Continue(context *Context) int {
 
 func (heading *Heading) CanContain(nodeType NodeType) bool {
 	return false
+}
+
+func (t *Tree) parseATXHeading() (ret *Heading) {
+	tokens := t.context.currentLine[t.context.nextNonspace:]
+	marker := tokens[0]
+	if itemCrosshatch != marker.typ {
+		return
+	}
+
+	level := tokens.accept(itemCrosshatch)
+	if 6 < level {
+		return
+	}
+
+	if !tokens[level].isWhitespace() {
+		return
+	}
+
+	heading := &Heading{&BaseNode{typ: NodeHeading}, level}
+	_, tokens = tokens.trimLeft()
+	_, tokens = tokens[level:].trimLeft()
+	for _, token := range tokens {
+		if itemEOF == token.typ || itemNewline == token.typ {
+			break
+		}
+
+		heading.tokens = append(heading.tokens, token)
+	}
+
+	heading.tokens = heading.tokens.trimRight()
+	closingCrosshatchIndex := len(heading.tokens) - 1
+	for ; 0 <= closingCrosshatchIndex; closingCrosshatchIndex-- {
+		if itemCrosshatch == heading.tokens[closingCrosshatchIndex].typ {
+			continue
+		}
+
+		if itemSpace == heading.tokens[closingCrosshatchIndex].typ {
+			break
+		} else {
+			closingCrosshatchIndex = len(heading.tokens)
+			break
+		}
+	}
+
+	if 0 >= closingCrosshatchIndex {
+		heading.tokens = nil
+	} else if 0 < closingCrosshatchIndex {
+		heading.tokens = heading.tokens[:closingCrosshatchIndex]
+		heading.tokens = heading.tokens.trimRight()
+	}
+
+	ret = heading
+
+	return
 }

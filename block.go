@@ -165,12 +165,12 @@ var blockStarts = []startFunc{
 	// block quote
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
-			token := peek(t.context.currentLine, t.context.nextNonspace)
+			token := t.context.currentLine.peek(t.context.nextNonspace)
 			if nil != token && itemGreater == token.typ {
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
 				// optional following space
-				token = peek(t.context.currentLine, t.context.offset)
+				token = t.context.currentLine.peek(t.context.offset)
 				if token.isSpaceOrTab() {
 					t.context.advanceOffset(1, true)
 				}
@@ -184,6 +184,23 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
+	// ATX heading
+	func(t *Tree, container Node) int {
+		if !t.context.indented {
+			if heading := t.parseATXHeading(); nil != heading {
+				t.context.advanceNextNonspace()
+				t.context.advanceOffset(len(heading.tokens), false)
+				t.context.closeUnmatchedBlocks()
+
+				t.context.addChild(heading)
+				t.context.advanceOffset(len(t.context.currentLine)-t.context.offset, false)
+				return 2
+			}
+		}
+
+		return 0
+
+	},
 
 	// fenced code block
 	//func(t *Tree, container Node) int {
@@ -216,14 +233,6 @@ var blockStarts = []startFunc{
 			return 0
 		}
 	},
-}
-
-func peek(ln items, pos int) *item {
-	if pos < len(ln) {
-		return ln[pos]
-	}
-
-	return nil
 }
 
 // Add a line to the block at the tip.  We assume the tip
