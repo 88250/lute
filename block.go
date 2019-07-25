@@ -20,8 +20,8 @@ import (
 )
 
 func (t *Tree) parseBlocks() {
+	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
-
 	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
 		t.incorporateLine(line)
 	}
@@ -34,8 +34,7 @@ func (t *Tree) parseBlocks() {
 // We parse markdown text by calling this on each line of input,
 // then finalizing the document.
 func (t *Tree) incorporateLine(line items) {
-	t.context.tip = t.Root
-	t.context.oldtip = t.Root
+	t.context.oldtip = t.context.tip
 	t.context.offset = 0
 	t.context.column = 0
 	t.context.blank = false
