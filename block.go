@@ -75,12 +75,20 @@ func (t *Tree) incorporateLine(line items) {
 	for !matchedLeaf {
 		t.context.findNextNonspace()
 
-		// TODO this is a little performance optimization:
-		//if !t.context.indented &&
-		//	!reMaybeSpecial.test(ln.slice(t.context.nextNonspace)) {
-		//	t.context.advanceNextNonspace()
-		//	break
-		//}
+		// 如果不由潜在的节点标记开头 ^[#`~*+_=<>0-9-]，则说明不用继续迭代生成子节点
+		// 这里仅做简单判断的话可以略微提升一些性能
+		maybeMarker := t.context.currentLine[t.context.nextNonspace].typ
+		maybeMarkerVal := t.context.currentLine[t.context.nextNonspace].val
+		if itemCrosshatch != maybeMarker && // ATX Heading
+			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block
+			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // Bullet List
+			itemUnderscore != maybeMarker && itemEqual != maybeMarker && // Setext Heading
+			itemLess != maybeMarker && // HTML
+			itemGreater != maybeMarker && // Blockquote
+			!("0" <= maybeMarkerVal && "9" >= maybeMarkerVal) { // Ordered List
+			t.context.advanceNextNonspace()
+			break
+		}
 
 		var i = 0
 		for i < startsLen {
@@ -135,7 +143,7 @@ func (t *Tree) incorporateLine(line items) {
 					nil != container.FirstChild() /*&&container.sourcepos[0][0] == = this.lineNumber*/))
 
 		// propagate lastLineBlank up through parents:
-		for cont := container; nil != cont; cont = cont.Parent(){
+		for cont := container; nil != cont; cont = cont.Parent() {
 			cont.SetLastLineBlank(lastLineBlank)
 		}
 
