@@ -26,8 +26,7 @@ func (t *Tree) parseInlines() {
 func (t *Tree) parseBlockInlines(blocks []Node) {
 	for _, block := range blocks {
 		cType := block.Type()
-		switch cType {
-		case NodeCodeBlock, NodeThematicBreak, NodeHTML:
+		if NodeParagraph != cType && NodeHeading != cType {
 			continue
 		}
 
@@ -38,7 +37,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			continue
 		}
 
-		tokens := block.Tokens()
+		tokens := block.Tokens().trim()
 		if nil == tokens {
 			continue
 		}
