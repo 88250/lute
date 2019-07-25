@@ -25,20 +25,23 @@ func (t *Tree) parseBlocks() {
 	t.context.linkRefDef = map[string]*Link{}
 
 	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
-		t.processLine(line)
+		t.incorporateLine(line)
 	}
 	for nil != t.context.tip {
 		t.context.finalize(t.context.tip)
 	}
 }
 
-func (t *Tree) processLine(line items) {
+// Analyze a line of text and update the document appropriately.
+// We parse markdown text by calling this on each line of input,
+// then finalizing the document.
+func (t *Tree) incorporateLine(line items) {
 	t.context.currentLine = line
 
 	allMatched := true
 	var container Node
 	container = t.Root
-	for lastChild := container.LastChild(); nil != lastChild && lastChild.IsOpen(); container = container.LastChild() {
+	for lastChild := container.LastChild(); nil != lastChild && lastChild.IsOpen(); lastChild = lastChild.LastChild() {
 		container = lastChild
 
 		switch container.Continue(t.context) {
@@ -67,7 +70,7 @@ func (t *Tree) processLine(line items) {
 	for !matchedLeaf {
 		t.context.findNextNonspace()
 
-		// this is a little performance optimization:
+		// TODO this is a little performance optimization:
 		//if !t.context.indented &&
 		//	!reMaybeSpecial.test(ln.slice(t.context.nextNonspace)) {
 		//	t.context.advanceNextNonspace()

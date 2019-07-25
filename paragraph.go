@@ -21,8 +21,8 @@ type Paragraph struct {
 	OpenTag, CloseTag string
 }
 
-func (p *Paragraph) Continuation(tokens items) int {
-	if tokens.isBlankLine() {
+func (p *Paragraph) Continue(context *Context) int {
+	if context.currentLine.isBlankLine() {
 		return 1
 	}
 	return 0
