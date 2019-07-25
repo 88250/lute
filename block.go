@@ -233,10 +233,10 @@ func (t *Tree) addLine() {
 		t.context.offset += 1 // skip over tab
 		// add space characters:
 		var charsToTab = 4 - (t.context.column % 4)
-		t.context.tip.AppendRawText(strings.Repeat(" ", charsToTab))
+		t.context.tip.AppendValue(strings.Repeat(" ", charsToTab))
 	}
 	t.context.tip.AddTokens(t.context.currentLine[t.context.offset:])
-	//TODO t.context.tip.AppendRawText(t.context.currentLine[t.context.offset:].rawText() + "\n")
+	t.context.tip.AppendValue(t.context.currentLine[t.context.offset:].rawText())
 }
 
 // Returns true if block ends with a blank line, descending if needed

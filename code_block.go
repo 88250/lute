@@ -19,7 +19,6 @@ import "strings"
 
 type CodeBlock struct {
 	*BaseNode
-	Value   string
 	InfoStr string
 
 	IsFenced    bool

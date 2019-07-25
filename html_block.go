@@ -19,7 +19,6 @@ import "strings"
 
 type HTML struct {
 	*BaseNode
-	Value string
 	Typ   int
 }
 
@@ -69,7 +68,7 @@ func (t *Tree) parseHTML(line items, typ int) {
 				}
 			}
 
-			html.Value += token.val
+			html.AppendValue(token.val)
 		}
 
 		if matchEnd && 6 != typ {
@@ -94,7 +93,7 @@ func (t *Tree) parseHTML(line items, typ int) {
 		}
 	}
 
-	html.Value = strings.TrimRight(html.Value, "\n")
+	html.value = strings.TrimRight(html.value, "\n")
 
 	return
 }

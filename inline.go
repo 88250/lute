@@ -207,7 +207,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 	} else { // no match
 		t.removeBracket() // remove this opener from stack
 		t.context.pos = startPos
-		block.AppendChild(block, &Text{&BaseNode{typ: NodeText}, "]"})
+		block.AppendChild(block, &Text{&BaseNode{typ: NodeText, value: "]"}})
 
 		return
 	}
@@ -216,7 +216,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 func (t *Tree) parseOpenBracket(tokens items) (ret Node) {
 	t.context.pos++
 
-	ret = &Text{&BaseNode{typ: NodeText}, "["}
+	ret = &Text{&BaseNode{typ: NodeText, value: "["}}
 
 	// Add entry to stack for this opener
 	t.addBracket(ret, t.context.pos, false)
@@ -252,10 +252,10 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 		t.context.pos++
 	} else if token.isASCIIPunct() {
-		ret = &Text{&BaseNode{typ: NodeText}, token.val}
+		ret = &Text{&BaseNode{typ: NodeText, value: token.val}}
 		t.context.pos++
 	} else {
-		ret = &Text{&BaseNode{typ: NodeText}, "\\"}
+		ret = &Text{&BaseNode{typ: NodeText, value: "\\"}}
 	}
 
 	return
@@ -278,10 +278,7 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 	if 1 > endPos {
 		marker.typ = itemStr
 		t.context.pos++
-
-		baseNode := &BaseNode{typ: NodeText, rawText: marker.val}
-		ret = &Text{baseNode, marker.val}
-
+		ret = &Text{&BaseNode{typ: NodeText, rawText: marker.val, value: marker.val}}
 		return
 	}
 	endPos = startPos + endPos + n
@@ -311,9 +308,7 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 func (t *Tree) parseText(tokens items) (ret Node) {
 	token := tokens[t.context.pos]
 	t.context.pos++
-
-	baseNode := &BaseNode{typ: NodeText, rawText: token.val}
-	ret = &Text{baseNode, token.val}
+	ret = &Text{&BaseNode{typ: NodeText, rawText: token.val, value: token.val}}
 
 	return
 }
@@ -323,8 +318,7 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	tag = tag[:tag.index(itemGreater)+1]
 	if 1 > len(tag) {
 		token := tokens[t.context.pos]
-		baseNode := &BaseNode{typ: NodeText, rawText: token.val}
-		ret = &Text{baseNode, token.val}
+		ret = &Text{&BaseNode{typ: NodeText, rawText: token.val, value: token.val}}
 		t.context.pos++
 
 		return

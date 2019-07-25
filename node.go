@@ -35,6 +35,7 @@ type Node interface {
 	RawText() string
 	SetRawText(string)
 	AppendRawText(string)
+	AppendValue(string)
 	Tokens() items
 	AddTokens(items)
 
@@ -59,6 +60,7 @@ type BaseNode struct {
 	firstChild      Node
 	lastChild       Node
 	rawText         string
+	value           string
 	tokens          items
 	close           bool
 	lastLineBlank   bool
@@ -192,6 +194,10 @@ func (n *BaseNode) AppendRawText(rawText string) {
 	n.rawText += rawText
 }
 
+func (n *BaseNode) AppendValue(value string) {
+	n.value += value
+}
+
 func (n *BaseNode) Tokens() items {
 	return n.tokens
 }
@@ -293,7 +299,6 @@ type InlineHTML struct {
 
 type Text struct {
 	*BaseNode
-	Value string
 }
 
 type Emphasis struct {

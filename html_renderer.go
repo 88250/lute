@@ -26,7 +26,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeInlineCode] = ret.renderInlineCode
-	ret.rendererFuncs[NodeCodeBlock] = ret.renderCode
+	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
@@ -68,7 +68,7 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 
 	r.Newline()
 	n := node.(*HTML)
-	r.WriteString(n.Value)
+	r.WriteString(n.value)
 	r.Newline()
 
 	return WalkContinue, nil
@@ -114,7 +114,7 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 	}
 
 	n := node.(*Text)
-	r.WriteString(escapeHTML(n.Value))
+	r.WriteString(escapeHTML(n.value))
 
 	return WalkContinue, nil
 }
@@ -129,14 +129,14 @@ func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderCode(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.Newline()
 		n := node.(*CodeBlock)
 		if "" != n.InfoStr {
-			r.WriteString("<pre><code class=\"language-" + n.InfoStr + "\">" + n.Value)
+			r.WriteString("<pre><code class=\"language-" + n.InfoStr + "\">" + n.value)
 		} else {
-			r.WriteString("<pre><code>" + escapeHTML(n.Value))
+			r.WriteString("<pre><code>" + escapeHTML(n.value))
 		}
 		return WalkSkipChildren, nil
 	}
