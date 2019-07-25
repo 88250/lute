@@ -19,7 +19,11 @@ import "strings"
 
 type HTML struct {
 	*BaseNode
-	Typ   int
+	Typ int
+}
+
+func (html *HTML) CanContain(nodeType NodeType) bool {
+	return false
 }
 
 func (html *HTML) Continue(context *Context) int {
@@ -29,17 +33,13 @@ func (html *HTML) Continue(context *Context) int {
 	return 0
 }
 
-func (html*HTML) Finalize() {
+func (html *HTML) Finalize() {
 	// TODO html.rawText = html.rawText._string_content.replace(/(\n *)+$/, '');
 	// TODO block._string_content = null; // allow GC
 }
 
 func (html *HTML) AcceptLines() bool {
 	return true
-}
-
-func (html *HTML) CanContain(nodeType NodeType) bool {
-	return false
 }
 
 func (t *Tree) parseHTML(line items, typ int) {

@@ -21,8 +21,12 @@ type Paragraph struct {
 	OpenTag, CloseTag string
 }
 
+func (p *Paragraph) CanContain(nodeType NodeType) bool {
+	return false
+}
+
 func (p *Paragraph) Continue(context *Context) int {
-	if context.currentLine.isBlankLine() {
+	if context.blank {
 		return 1
 	}
 	return 0

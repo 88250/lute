@@ -20,8 +20,6 @@ import (
 )
 
 func (t *Tree) parseBlocks() {
-	t.context.tip = t.Root
-	t.context.oldtip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
 
 	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
@@ -36,13 +34,21 @@ func (t *Tree) parseBlocks() {
 // We parse markdown text by calling this on each line of input,
 // then finalizing the document.
 func (t *Tree) incorporateLine(line items) {
+	t.context.tip = t.Root
+	t.context.oldtip = t.Root
+	t.context.offset = 0
+	t.context.column = 0
+	t.context.blank = false
+	t.context.partiallyConsumedTab = false
 	t.context.currentLine = line
 
 	allMatched := true
 	var container Node
 	container = t.Root
-	for lastChild := container.LastChild(); nil != lastChild && lastChild.IsOpen(); lastChild = lastChild.LastChild() {
+	lastChild := container.LastChild()
+	for ; nil != lastChild && lastChild.IsOpen(); lastChild = container.LastChild() {
 		container = lastChild
+		t.context.findNextNonspace()
 
 		switch container.Continue(t.context) {
 		case 0: // we've matched, keep going
@@ -150,7 +156,8 @@ func (t *Tree) incorporateLine(line items) {
 			}
 		} else if t.context.offset < len(t.context.currentLine) && !t.context.blank {
 			// create paragraph container for line
-			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph}})
+			container = &Paragraph{BaseNode: &BaseNode{typ: NodeParagraph}}
+			t.context.addChild(container)
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}
