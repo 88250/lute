@@ -90,19 +90,18 @@ func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
 }
 
 func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
-	inTightList := false
-	if NodeListItem == node.Parent().Type() {
-		inTightList = node.Parent().(*ListItem).tight
+if grandparent := node.Parent().Parent(); nil != grandparent && NodeList == grandparent.Type() {
+	if grandparent.(*List).tight {
+		return WalkContinue, nil
 	}
+}
+
 	if entering {
-		if !inTightList {
-			r.WriteString("<p>")
-		}
+		r.Newline()
+		r.WriteString("<p>")
 	} else {
-		if !inTightList {
-			r.WriteString("</p>")
-			r.Newline()
-		}
+		r.WriteString("</p>")
+		r.Newline()
 	}
 
 	return WalkContinue, nil

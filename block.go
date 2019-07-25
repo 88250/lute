@@ -135,10 +135,8 @@ func (t *Tree) incorporateLine(line items) {
 					nil != container.FirstChild() /*&&container.sourcepos[0][0] == = this.lineNumber*/))
 
 		// propagate lastLineBlank up through parents:
-		var cont = container
-		for nil != cont {
+		for cont := container; nil != cont; cont = cont.Parent(){
 			cont.SetLastLineBlank(lastLineBlank)
-			cont = cont.Parent()
 		}
 
 		if container.AcceptLines() {
@@ -155,8 +153,7 @@ func (t *Tree) incorporateLine(line items) {
 			}
 		} else if t.context.offset < len(t.context.currentLine) && !t.context.blank {
 			// create paragraph container for line
-			container = &Paragraph{BaseNode: &BaseNode{typ: NodeParagraph}}
-			t.context.addChild(container)
+			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph}})
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}

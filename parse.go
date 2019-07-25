@@ -136,10 +136,6 @@ func (context *Context) findNextNonspace() {
 
 	var c *item
 	for _, c = range currentLine {
-		if "" == c.val {
-			break
-		}
-
 		if c.isSpace() {
 			i++
 			cols++
