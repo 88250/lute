@@ -15,7 +15,9 @@
 
 package lute
 
-import "strings"
+import (
+	"strings"
+)
 
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
@@ -152,7 +154,7 @@ func (t *Tree) incorporateLine(line items) {
 			// if HtmlBlock, check for end condition
 			if typ == NodeHTML {
 				html := container.(*HTML)
-				if html.Typ >= 1 && html.Typ <= 5 {
+				if html.hType >= 1 && html.hType <= 5 {
 					//if reHtmlBlockClose[container._htmlBlockType].test(this.currentLine.slice(this.offset))
 					{
 						t.context.finalize(container)
@@ -228,12 +230,30 @@ var blockStarts = []startFunc{
 		}
 		return 0
 	},
+
+	// HTML block
+	func(t *Tree, container Node) int {
+		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace).typ == itemLess {
+			tokens := t.context.currentLine[t.context.nextNonspace:]
+			if htmlType := t.isHTML(tokens); -1 != htmlType {
+				html := t.parseHTML(tokens, htmlType)
+				t.context.closeUnmatchedBlocks()
+				// We don't adjust parser.offset;
+				// spaces are part of the HTML block:
+				t.context.addChild(html)
+				return 2
+			}
+		}
+
+		return 0
+	},
+
 	// Setext heading
 	func(t *Tree, container Node) int {
 		if !t.context.indented && container.Type() == NodeParagraph {
 			if heading := t.parseSetextHeading(); nil != heading {
 				t.context.closeUnmatchedBlocks()
-				// resolve reference link definitiosn
+				// TODO: resolve reference link definitiosn
 				//var pos
 				//while(peek(container._string_content, 0) == = C_OPEN_BRACKET &&
 				//	(pos =
@@ -253,7 +273,6 @@ var blockStarts = []startFunc{
 					return 2
 				}
 			}
-
 		}
 
 		return 0
