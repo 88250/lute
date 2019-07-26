@@ -298,13 +298,11 @@ var blockStarts = []startFunc{
 
 			// add the list if needed
 			if t.context.tip.Type() != NodeList || !listsMatch {
-				list := &List{&BaseNode{typ: NodeList}, data}
-				t.context.addChild(list)
+				t.context.addChild(&List{&BaseNode{typ: NodeList}, data})
 			}
 
 			// add the list item
-			li := &ListItem{&BaseNode{typ: NodeListItem}, data}
-			t.context.addChild(li)
+			t.context.addChild(&ListItem{&BaseNode{typ: NodeListItem}, data})
 
 			return 1
 		}

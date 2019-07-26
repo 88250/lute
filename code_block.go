@@ -55,18 +55,19 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 	return 0
 }
 
-func (codeBlock *CodeBlock) Finalizes() {
+func (codeBlock *CodeBlock) Finalize() {
 	if codeBlock.IsFenced {
 		// first line becomes info string
-		var content = codeBlock.rawText
+		var content = codeBlock.value
 		var newlinePos = strings.Index(content, "\n")
 		var firstLine = content[:newlinePos]
 		var rest = content[newlinePos+1:]
 		codeBlock.InfoStr = unescapeString(strings.TrimSpace(firstLine))
-		codeBlock.rawText = rest
+		codeBlock.value = rest
 	} else { // indented
-		// TODO codeBlock.rawText= strings.ReplaceAll(codeBlock.rawText, .replace(/(\n *)+$/, '\n')
+		codeBlock.value = strings.TrimRight(codeBlock.value, "\n ") + "\n"
 	}
+	codeBlock.tokens = nil
 }
 
 func (codeBlock *CodeBlock) AcceptLines() bool {

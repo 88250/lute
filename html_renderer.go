@@ -146,7 +146,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 
 func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<em>" + node.(*Emphasis).rawText)
+		r.WriteString("<em>" + node.(*Emphasis).value)
 	} else {
 		r.WriteString("</em>")
 	}
@@ -155,7 +155,7 @@ func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) 
 
 func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<strong>" + node.(*Strong).rawText)
+		r.WriteString("<strong>" + node.(*Strong).value)
 	} else {
 		r.WriteString("</strong>")
 	}
