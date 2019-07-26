@@ -91,7 +91,7 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 			continue
 		}
 
-		if itemEqual != token.typ && itemPlus!= token.typ {
+		if itemEqual != token.typ && itemHyphen != token.typ {
 			return nil
 		}
 
@@ -110,7 +110,7 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 	}
 
 	ret = &Heading{&BaseNode{typ: NodeHeading}, 1}
-	if itemEqual == marker.typ {
+	if itemHyphen == marker.typ {
 		ret.Level = 2
 	}
 

@@ -251,8 +251,10 @@ var blockStarts = []startFunc{
 				//container._string_content =
 				//container._string_content.slice(pos);
 				//}
-				if "" != container.Value() {
-					heading.value = container.Value()
+
+				if value := container.Value(); "" != value {
+					heading.value = value
+					heading.tokens = container.Tokens()
 					container.InsertAfter(container, heading)
 					container.Unlink()
 					t.context.tip = heading
