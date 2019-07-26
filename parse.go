@@ -130,12 +130,12 @@ func (context *Context) advanceNextNonspace() {
 }
 
 func (context *Context) findNextNonspace() {
-	currentLine := context.currentLine
 	i := context.offset
 	cols := context.column
 
 	var c *item
-	for _, c = range currentLine {
+	for {
+		c = context.currentLine[i]
 		if c.isSpace() {
 			i++
 			cols++
