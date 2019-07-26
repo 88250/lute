@@ -42,83 +42,28 @@ func (html *HTML) AcceptLines() bool {
 	return true
 }
 
-func (t *Tree) parseHTML(tokens items, typ int) (ret *HTML) {
-	ret = &HTML{BaseNode: &BaseNode{typ: NodeHTML}}
-	openTagName := tokens.split(itemGreater)[0][1].val
-	for {
-		matchEnd := false
-		for i, token := range tokens {
-			if 1 == typ {
-				if !matchEnd && itemLess == token.typ && i < len(tokens)-3 && itemSlash == tokens[i+1].typ {
-					if openTagName == tokens[i+2].val && itemGreater == tokens[i+3].typ {
-						matchEnd = true
-					}
-				}
-			} else if 2 == typ {
-				if !matchEnd && itemHyphen == token.typ && i < len(tokens)-2 && itemHyphen == tokens[i+1].typ && itemGreater == tokens[i+2].typ {
-					matchEnd = true
-				}
-			} else if 3 == typ {
-				if !matchEnd && itemQuestion == token.typ && i < len(tokens)-1 && itemGreater == tokens[i+1].typ {
-					matchEnd = true
-				}
-			} else if 5 == typ {
-				if !matchEnd && itemCloseBracket == token.typ && i < len(tokens)-2 && itemCloseBracket == tokens[i+1].typ && itemGreater == tokens[i+2].typ {
-					matchEnd = true
-				}
-			}
-
-			ret.AppendValue(token.val)
-		}
-
-		if matchEnd && 6 != typ {
-			break
-		}
-
-		tokens = t.nextLine()
-		if tokens.isEOF() {
-			break
-		}
-
-		if 1 == typ || 2 == typ || 4 == typ || 3 == typ || 5 == typ {
-			continue
-		}
-
-		if 6 == typ || 7 == typ {
-			if tokens.isBlankLine() {
-				break
-			}
-		} else {
-			break
-		}
-	}
-
-	ret.value = strings.TrimRight(ret.value, "\n")
-
-	return
-}
-
 var HTMLBlockTags = []string{"address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"}
 
-func (t *Tree) isHTML(tokens items) (htmlType int) {
+func (t *Tree) parseHTML(tokens items) (ret *HTML) {
+
 	_, tokens = tokens.trimLeft()
 	length := len(tokens)
 	if 3 > length { // at least <? and a newline
-		return -1
+		return nil
 	}
 
 	if itemLess != tokens[0].typ {
-		return -1
+		return nil
 	}
 
 	if t.equalAnyIgnoreCase(tokens[1].val, "script", "pre", "style") {
 		l := tokens[2:]
 		if 1 > len(l) {
-			return -1
+			return nil
 		}
 
 		if l[0].isWhitespace() || itemGreater == l[0].typ || l[0].isEOF() {
-			return 1
+			return &HTML{&BaseNode{typ: NodeHTML}, 1}
 		}
 	}
 
@@ -131,43 +76,43 @@ func (t *Tree) isHTML(tokens items) (htmlType int) {
 	if rule6 {
 		i++
 		if tokens[i].isWhitespace() || itemGreater == tokens[i].typ {
-			return 6
+			return &HTML{&BaseNode{typ: NodeHTML}, 6}
 		}
 		if i < length && itemSlash == tokens[i].typ && itemGreater == tokens[i+1].typ {
-			return 6
+			return &HTML{&BaseNode{typ: NodeHTML}, 6}
 		}
 	}
 
 	tag := tokens.trim()
 	isOpenTag, _ := tag.isOpenTag()
 	if isOpenTag {
-		return 7
+		return &HTML{&BaseNode{typ: NodeHTML}, 7}
 	}
 	isCloseTag := tag.isCloseTag()
 	if isCloseTag {
-		return 7
+		return &HTML{&BaseNode{typ: NodeHTML}, 7}
 	}
 
 	rawText := tokens.rawText()
 	if 0 == strings.Index(rawText, "<!--") {
-		return 2
+		return &HTML{&BaseNode{typ: NodeHTML}, 2}
 	}
 
 	if 0 == strings.Index(rawText, "<?") {
-		return 3
+		return &HTML{&BaseNode{typ: NodeHTML}, 3}
 	}
 
 	if 2 < len(rawText) && 0 == strings.Index(rawText, "<!") {
 		following := rawText[2:]
 		if 'A' <= following[0] && 'Z' >= following[0] {
-			return 4
+			return &HTML{&BaseNode{typ: NodeHTML}, 4}
 		}
 		if 0 == strings.Index(following, "[CDATA[") {
-			return 5
+			return &HTML{&BaseNode{typ: NodeHTML}, 5}
 		}
 	}
 
-	return -1
+	return nil
 }
 
 func (t *Tree) startWithAnyIgnoreCase(s1 string, strs ...string) (pos int) {

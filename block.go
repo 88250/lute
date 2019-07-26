@@ -235,8 +235,7 @@ var blockStarts = []startFunc{
 	func(t *Tree, container Node) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace).typ == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
-			if htmlType := t.isHTML(tokens); -1 != htmlType {
-				html := t.parseHTML(tokens, htmlType)
+			if html := t.parseHTML(tokens); nil != html {
 				t.context.closeUnmatchedBlocks()
 				// We don't adjust parser.offset;
 				// spaces are part of the HTML block:
