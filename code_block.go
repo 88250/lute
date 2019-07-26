@@ -111,5 +111,18 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 }
 
 func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker string, num int) bool {
+	closeMarker := tokens[0]
+	if closeMarker.val != openMarker{
+		return false
+	}
+	if num > tokens.accept(closeMarker.typ) {
+		return false
+	}
+	for _, token := range tokens.trim() {
+		if token.val != openMarker {
+			return false
+		}
+	}
+
 	return true
 }
