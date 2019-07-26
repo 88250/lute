@@ -79,7 +79,8 @@ func (t *Tree) incorporateLine(line items) {
 		// 这里仅做简单判断的话可以略微提升一些性能
 		maybeMarker := t.context.currentLine[t.context.nextNonspace].typ
 		maybeMarkerVal := t.context.currentLine[t.context.nextNonspace].val
-		if itemCrosshatch != maybeMarker && // ATX Heading
+		if !t.context.indented &&
+			itemCrosshatch != maybeMarker && // ATX Heading
 			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block
 			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // Bullet List
 			itemUnderscore != maybeMarker && itemEqual != maybeMarker && // Setext Heading

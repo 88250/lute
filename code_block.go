@@ -67,7 +67,6 @@ func (codeBlock *CodeBlock) Finalizes() {
 	} else { // indented
 		// TODO codeBlock.rawText= strings.ReplaceAll(codeBlock.rawText, .replace(/(\n *)+$/, '\n')
 	}
-	// TODO codeBlock._string_content = null // allow GC
 }
 
 func (codeBlock *CodeBlock) AcceptLines() bool {
