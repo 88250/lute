@@ -27,7 +27,7 @@ func (thematicBreak *ThematicBreak) CanContain(nodeType NodeType) bool {
 	return false
 }
 
-func (t *Tree) isThematicBreak() bool {
+func (t *Tree) parseThematicBreak() (ret *ThematicBreak) {
 	markers := 0
 	var marker *item
 	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
@@ -37,12 +37,12 @@ func (t *Tree) isThematicBreak() bool {
 		}
 
 		if itemHyphen != token.typ && itemUnderscore != token.typ && itemAsterisk != token.typ {
-			return false
+			return nil
 		}
 
 		if nil != marker {
 			if marker.typ != token.typ {
-				return false
+				return nil
 			}
 		} else {
 			marker = token
@@ -51,8 +51,8 @@ func (t *Tree) isThematicBreak() bool {
 	}
 
 	if 3 > markers {
-		return false
+		return nil
 	}
 
-	return true
+	return  &ThematicBreak{&BaseNode{typ: NodeThematicBreak}}
 }

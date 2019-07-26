@@ -271,7 +271,7 @@ var blockStarts = []startFunc{
 	// Thematic break
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
-			if thematicBreak := t.parseSetextHeading(); nil != thematicBreak {
+			if thematicBreak := t.parseThematicBreak(); nil != thematicBreak {
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(thematicBreak)
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
@@ -311,7 +311,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// indented code block
+	// Indented code block
 	func(t *Tree, container Node) int {
 		if t.context.indented && t.context.tip.Type() != NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)
