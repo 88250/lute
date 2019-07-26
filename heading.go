@@ -81,3 +81,38 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 
 	return
 }
+
+func (t *Tree) parseSetextHeading() (ret *Heading) {
+	markers := 0
+	var marker *item
+	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
+		token := t.context.currentLine[i]
+		if itemSpace == token.typ || itemTab == token.typ {
+			continue
+		}
+
+		if itemEqual != token.typ && itemPlus!= token.typ {
+			return nil
+		}
+
+		if nil != marker {
+			if marker.typ != token.typ {
+				return nil
+			}
+		} else {
+			marker = token
+		}
+		markers++
+	}
+
+	if nil == marker {
+		return nil
+	}
+
+	ret = &Heading{&BaseNode{typ: NodeHeading}, 1}
+	if itemEqual == marker.typ {
+		ret.Level = 2
+	}
+
+	return
+}

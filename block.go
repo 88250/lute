@@ -237,16 +237,46 @@ var blockStarts = []startFunc{
 	//	}
 	//},
 
+	// Setext heading
+	func(t *Tree, container Node) int {
+		if !t.context.indented && container.Type() == NodeParagraph {
+			if heading := t.parseSetextHeading(); nil != heading {
+				t.context.closeUnmatchedBlocks()
+				// resolve reference link definitiosn
+				//var pos
+				//while(peek(container._string_content, 0) == = C_OPEN_BRACKET &&
+				//	(pos =
+				//parser.inlineParser.parseReference(
+				//	container._string_content, parser.refmap))){
+				//container._string_content =
+				//container._string_content.slice(pos);
+				//}
+				if "" != container.Value() {
+					heading.value = container.Value()
+					container.InsertAfter(container, heading)
+					container.Unlink()
+					t.context.tip = heading
+					t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
+					return 2
+				}
+			}
+
+		}
+
+		return 0
+	},
+
 	// Thematic break
 	func(t *Tree, container Node) int {
-		if !t.context.indented && t.isThematicBreak() {
-			t.context.closeUnmatchedBlocks()
-			t.context.addChild(&ThematicBreak{&BaseNode{typ: NodeThematicBreak}})
-			t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
-			return 2
-		} else {
-			return 0
+		if !t.context.indented {
+			if thematicBreak := t.parseSetextHeading(); nil != thematicBreak {
+				t.context.closeUnmatchedBlocks()
+				t.context.addChild(thematicBreak)
+				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
+				return 2
+			}
 		}
+		return 0
 	},
 
 	// List item

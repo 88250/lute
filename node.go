@@ -35,6 +35,7 @@ type Node interface {
 	RawText() string
 	SetRawText(string)
 	AppendRawText(string)
+	Value() string
 	AppendValue(string)
 	Tokens() items
 	AddTokens(items)
@@ -194,6 +195,10 @@ func (n *BaseNode) AppendRawText(rawText string) {
 	n.rawText += rawText
 }
 
+func (n *BaseNode) Value() string {
+	return n.value
+}
+
 func (n *BaseNode) AppendValue(value string) {
 	n.value += value
 }
@@ -294,7 +299,6 @@ type TableCell struct {
 
 type InlineHTML struct {
 	*BaseNode
-	Value string
 }
 
 type Text struct {
@@ -315,7 +319,6 @@ type Delete struct {
 
 type InlineCode struct {
 	*BaseNode
-	Value string
 }
 
 type HardBreak struct {

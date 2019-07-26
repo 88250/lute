@@ -298,8 +298,8 @@ func (t *Tree) parseInlineCode(tokens items) (ret Node) {
 		textTokens = textTokens[:len(textTokens)-1]
 	}
 
-	baseNode := &BaseNode{typ: NodeInlineCode, tokens: textTokens}
-	ret = &InlineCode{baseNode, textTokens.rawText()}
+	baseNode := &BaseNode{typ: NodeInlineCode, tokens: textTokens, value: textTokens.rawText()}
+	ret = &InlineCode{baseNode}
 	t.context.pos = endPos + n
 
 	return
@@ -330,8 +330,8 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	}
 	t.context.pos += len(codeTokens)
 
-	baseNode := &BaseNode{typ: NodeInlineHTML, tokens: codeTokens}
-	ret = &InlineHTML{baseNode, codeTokens.rawText()}
+	baseNode := &BaseNode{typ: NodeInlineHTML, tokens: codeTokens, value: codeTokens.rawText()}
+	ret = &InlineHTML{baseNode}
 
 	return
 }

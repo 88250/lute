@@ -80,7 +80,7 @@ func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error
 	}
 
 	n := node.(*InlineHTML)
-	r.WriteString(n.Value)
+	r.WriteString(n.value)
 
 	return WalkContinue, nil
 }
@@ -120,7 +120,7 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 
 func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<code>" + escapeHTML(n.(*InlineCode).Value))
+		r.WriteString("<code>" + escapeHTML(n.(*InlineCode).value))
 
 		return WalkSkipChildren, nil
 	}
