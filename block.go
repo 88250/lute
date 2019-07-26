@@ -15,9 +15,7 @@
 
 package lute
 
-import (
-	"strings"
-)
+import "strings"
 
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
@@ -131,7 +129,7 @@ func (t *Tree) incorporateLine(line items) {
 		typ := container.Type()
 		isFenced := false
 		if NodeCodeBlock == typ {
-			isFenced = container.(*CodeBlock).IsFenced
+			isFenced = container.(*CodeBlock).isFenced
 		}
 
 		// Block quote lines are never blank as they start with >
@@ -218,25 +216,18 @@ var blockStarts = []startFunc{
 	},
 
 	// Fenced code block
-	//func(t *Tree, container Node) int {
-	//	var match;
-	//	if (!t.context.indented &&
-	//		(match = t.context.currentLine.slice(parser.nextNonspace).match(reCodeFence))) {
-	//	var fenceLength = match[0].length;
-	//	parser.closeUnmatchedBlocks();
-	//	var container = parser.addChild('code_block', parser.nextNonspace);
-	//	container._isFenced = true;
-	//	container._fenceLength = fenceLength;
-	//	container._fenceChar = match[0][0];
-	//	container._fenceOffset = parser.indent;
-	//	parser.advanceNextNonspace();
-	//	parser.advanceOffset(fenceLength, false);
-	//	return 2;
-	//	} else {
-	//	return 0;
-	//	}
-	//},
-
+	func(t *Tree, container Node) int {
+		if !t.context.indented {
+			if codeBlock := t.parseFencedCode(); nil != codeBlock {
+				t.context.closeUnmatchedBlocks()
+				t.context.addChild(codeBlock)
+				t.context.advanceNextNonspace()
+				t.context.advanceOffset(codeBlock.fenceLength, false)
+				return 2
+			}
+		}
+		return 0
+	},
 	// Setext heading
 	func(t *Tree, container Node) int {
 		if !t.context.indented && container.Type() == NodeParagraph {
