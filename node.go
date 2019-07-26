@@ -219,7 +219,7 @@ func (n *BaseNode) InsertAfter(this Node, sibling Node) {
 	}
 	sibling.SetPrevious(this)
 	n.next = sibling
-	sibling.SetParent(this)
+	sibling.SetParent(this.Parent())
 	if nil == sibling.Next() {
 		sibling.Parent().SetLastChild(sibling)
 	}
