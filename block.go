@@ -155,10 +155,10 @@ func (t *Tree) incorporateLine(line items) {
 			if typ == NodeHTML {
 				html := container.(*HTML)
 				if html.hType >= 1 && html.hType <= 5 {
-					//if reHtmlBlockClose[container._htmlBlockType].test(this.currentLine.slice(this.offset))
-					{
-						t.context.finalize(container)
-					}
+					// TODO if reHtmlBlockClose[container._htmlBlockType].test(this.currentLine.slice(this.offset))
+					//{
+					//	t.context.finalize(container)
+					//}
 				}
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
