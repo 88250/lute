@@ -77,6 +77,7 @@ type Context struct {
 	tip                                                      Node
 	oldtip                                                   Node
 	currentLine                                              items
+	currentLineLen                                           int
 	offset, column, nextNonspace, nextNonspaceColumn, indent int
 	indented, blank, partiallyConsumedTab, allClosed         bool
 	lastMatchedContainer                                     Node
@@ -93,7 +94,8 @@ func (context *Context) advanceOffset(count int, columns bool) {
 	var currentLine = context.currentLine
 	var charsToTab, charsToAdvance int
 	var c *item
-	for c = currentLine[context.offset]; count > 0 && nil != c; {
+	for ; count > 0; {
+		c = currentLine[context.offset]
 		if c.isTab() {
 			charsToTab = 4 - (context.column % 4)
 			if columns {

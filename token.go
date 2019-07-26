@@ -380,16 +380,6 @@ func (tokens items) isBlankLine() bool {
 	return true
 }
 
-func (tokens items) removeSpacesTabs() (ret items) {
-	for _, token := range tokens {
-		if itemSpace != token.typ && itemTab != token.typ {
-			ret = append(ret, token)
-		}
-	}
-
-	return
-}
-
 func (tokens items) leftSpaces() (count int) {
 	for _, token := range tokens {
 		if itemSpace == token.typ {

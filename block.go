@@ -40,6 +40,7 @@ func (t *Tree) incorporateLine(line items) {
 	t.context.blank = false
 	t.context.partiallyConsumedTab = false
 	t.context.currentLine = line
+	t.context.currentLineLen = len(t.context.currentLine)
 
 	allMatched := true
 	var container Node
@@ -160,7 +161,7 @@ func (t *Tree) incorporateLine(line items) {
 					}
 				}
 			}
-		} else if t.context.offset < len(t.context.currentLine) && !t.context.blank {
+		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
 			// create paragraph container for line
 			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph}})
 			t.context.advanceNextNonspace()
@@ -176,7 +177,7 @@ type startFunc func(t *Tree, container Node) int
 // 1 = matched container, keep going
 // 2 = matched leaf, no more block starts
 var blockStarts = []startFunc{
-	// block quote
+	// Blockquote
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
@@ -207,7 +208,7 @@ var blockStarts = []startFunc{
 				t.context.closeUnmatchedBlocks()
 
 				t.context.addChild(heading)
-				t.context.advanceOffset(len(t.context.currentLine)-t.context.offset, false)
+				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
 			}
 		}
@@ -216,7 +217,7 @@ var blockStarts = []startFunc{
 
 	},
 
-	// fenced code block
+	// Fenced code block
 	//func(t *Tree, container Node) int {
 	//	var match;
 	//	if (!t.context.indented &&
@@ -236,7 +237,19 @@ var blockStarts = []startFunc{
 	//	}
 	//},
 
-	// list item
+	// Thematic break
+	func(t *Tree, container Node) int {
+		if !t.context.indented && t.isThematicBreak() {
+			t.context.closeUnmatchedBlocks()
+			t.context.addChild(&ThematicBreak{&BaseNode{typ: NodeThematicBreak}})
+			t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
+			return 2
+		} else {
+			return 0
+		}
+	},
+
+	// List item
 	func(t *Tree, container Node) int {
 		if !t.context.indented || container.Type() == NodeList {
 			data := t.parseListMarker(container)

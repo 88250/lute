@@ -23,6 +23,36 @@ func (thematicBreak *ThematicBreak) Continue(context *Context) int {
 	return 1
 }
 
-func (thematicBreak *ThematicBreak) CanContain(node Node) bool {
+func (thematicBreak *ThematicBreak) CanContain(nodeType NodeType) bool {
 	return false
+}
+
+func (t *Tree) isThematicBreak() bool {
+	markers := 0
+	var marker *item
+	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
+		token := t.context.currentLine[i]
+		if itemSpace == token.typ || itemTab == token.typ {
+			continue
+		}
+
+		if itemHyphen != token.typ && itemUnderscore != token.typ && itemAsterisk != token.typ {
+			return false
+		}
+
+		if nil != marker {
+			if marker.typ != token.typ {
+				return false
+			}
+		} else {
+			marker = token
+		}
+		markers++
+	}
+
+	if 3 > markers {
+		return false
+	}
+
+	return true
 }
