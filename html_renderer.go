@@ -17,6 +17,7 @@ package lute
 
 import (
 	"fmt"
+	"strings"
 )
 
 func NewHTMLRenderer() (ret *Renderer) {
@@ -90,11 +91,11 @@ func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
 }
 
 func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
-if grandparent := node.Parent().Parent(); nil != grandparent && NodeList == grandparent.Type() {
-	if grandparent.(*List).tight {
-		return WalkContinue, nil
+	if grandparent := node.Parent().Parent(); nil != grandparent && NodeList == grandparent.Type() {
+		if grandparent.(*List).tight {
+			return WalkContinue, nil
+		}
 	}
-}
 
 	if entering {
 		r.Newline()
@@ -133,7 +134,8 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 		r.Newline()
 		n := node.(*CodeBlock)
 		if "" != n.info {
-			r.WriteString("<pre><code class=\"language-" + n.info + "\">" + n.value)
+			infoWords := strings.Fields(n.info)
+			r.WriteString("<pre><code class=\"language-" + infoWords[0] + "\">" + n.value)
 		} else {
 			r.WriteString("<pre><code>" + escapeHTML(n.value))
 		}
