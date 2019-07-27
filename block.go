@@ -251,15 +251,11 @@ var blockStarts = []startFunc{
 		if !t.context.indented && container.Type() == NodeParagraph {
 			if heading := t.parseSetextHeading(); nil != heading {
 				t.context.closeUnmatchedBlocks()
-				// TODO: resolve reference link definitiosn
-				//var pos
-				//while(peek(container._string_content, 0) == = C_OPEN_BRACKET &&
-				//	(pos =
-				//parser.inlineParser.parseReference(
-				//	container._string_content, parser.refmap))){
-				//container._string_content =
-				//container._string_content.slice(pos);
-				//}
+				// resolve reference link definition
+				for tokens := container.Tokens(); itemOpenBracket == tokens.peek(0).typ; tokens = container.Tokens() {
+					tokens = t.context.parseLinkRefDef(tokens)
+					container.SetTokens(tokens)
+				}
 
 				if value := container.Value(); "" != value {
 					heading.value = strings.TrimSpace(value)

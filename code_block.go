@@ -54,7 +54,7 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 	return 0
 }
 
-func (codeBlock *CodeBlock) Finalize() {
+func (codeBlock *CodeBlock) Finalize(context *Context) {
 	if codeBlock.isFenced {
 		// first line becomes info string
 		content := codeBlock.value

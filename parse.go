@@ -176,7 +176,7 @@ func (context *Context) closeUnmatchedBlocks() {
 func (context *Context) finalize(block Node) {
 	var parent = block.Parent()
 	block.Close()
-	block.Finalize()
+	block.Finalize(context)
 	context.tip = parent
 }
 

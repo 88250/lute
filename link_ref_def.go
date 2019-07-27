@@ -19,103 +19,69 @@ import (
 	"strings"
 )
 
-func (t *Tree) parseLinkRefDef(line items) bool {
+func (context *Context) parseLinkRefDef(line items) items {
 	_, line = line.trimLeft()
 	if 1 > len(line) {
-		return false
+		return nil
 	}
 
-	linkLabel, remains, label := t.parseLinkLabel(line)
+	linkLabel, remains, label := context.parseLinkLabel(line)
 	if nil == linkLabel {
-		return false
+		return nil
 	}
 
 	if itemColon != remains[0].typ {
-		return false
+		return nil
 	}
 
 	remains = remains[1:]
 	whitespaces, remains := remains.trimLeft()
 	newlines, _, _ := whitespaces.statWhitespace()
 	if 1 < newlines {
-		return false
-	}
-	if 1 > len(remains) {
-		remains = t.nextLine()
-		if remains.isBlankLine() {
-			t.backupLine(remains)
-			return false
-		}
-
-		_, remains = remains.trimLeft()
+		return nil
 	}
 
 	tokens := remains
-	linkDest, remains, destination := t.parseLinkDest(tokens)
+	linkDest, remains, destination := context.parseLinkDest(tokens)
 	if nil == linkDest {
-		return false
+		return nil
 	}
 
 	link := &Link{&BaseNode{typ: NodeLink}, destination, ""}
 
 	whitespaces, remains = remains.trimLeft()
 	if nil == whitespaces {
-		return false
+		return nil
 	}
 	newlines, _, _ = whitespaces.statWhitespace()
 	if 1 < newlines {
-		return false
+		return nil
 	}
 
 	lowerCaseLabel := strings.ToLower(label)
 
-	var nextLine items
-	if 1 > len(remains) {
-		nextLine = t.nextLine()
-		if nextLine.isBlankLine() {
-			if _, ok := t.context.linkRefDef[lowerCaseLabel]; !ok {
-				t.context.linkRefDef[lowerCaseLabel] = link
-			}
-			return true
-		}
-
-		_, nextLine = nextLine.trimLeft()
-		remains = nextLine
-	}
-
 	tokens = remains
-	_, remains, title := t.parseLinkTitle(tokens)
-	if !remains.isBlankLine() {
-		if nil != nextLine {
-			t.backupLine(nextLine)
-			if _, ok := t.context.linkRefDef[lowerCaseLabel]; !ok {
-				t.context.linkRefDef[lowerCaseLabel] = link
-			}
-
-			return true
-		}
-		return false
-	}
+	_, remains, title := context.parseLinkTitle(tokens)
 
 	link.Title = title
-	if _, ok := t.context.linkRefDef[lowerCaseLabel]; !ok {
-		t.context.linkRefDef[lowerCaseLabel] = link
+	if _, ok := context.linkRefDef[lowerCaseLabel]; !ok {
+		context.linkRefDef[lowerCaseLabel] = link
 	}
 
-	return true
+	return remains
 }
 
-func (t *Tree) parseLinkText(tokens items) (ret, remains items, text string) {
+func (context *Context) parseLinkText(tokens items) (ret, remains items, text string) {
 
 	return
 }
 
-func (t *Tree) parseLinkTitle(tokens items) (ret, remains items, title string) {
-	ret, remains, title = t.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
+func (context *Context) parseLinkTitle(tokens items) (ret, remains items, title string) {
+	ret, remains, title = context.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
 	if nil == ret {
-		ret, remains, title = t.parseLinkTitleMatch(itemSinglequote, itemSinglequote, tokens)
+		ret, remains, title = context.parseLinkTitleMatch(itemSinglequote, itemSinglequote, tokens)
 		if nil == ret {
-			ret, remains, title = t.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
+			ret, remains, title = context.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
 		}
 	}
 	if "" != title {
@@ -125,7 +91,7 @@ func (t *Tree) parseLinkTitle(tokens items) (ret, remains items, title string) {
 	return
 }
 
-func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, remains items, title string) {
+func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, remains items, title string) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -149,15 +115,6 @@ func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, 
 			title = title[:len(title)-1]
 			break
 		}
-		if token.isNewline() {
-			line = t.nextLine()
-			if line.isBlankLine() {
-				t.backupLine(line)
-				break
-			}
-			i = 0
-			continue
-		}
 		i++
 	}
 
@@ -173,10 +130,10 @@ func (t *Tree) parseLinkTitleMatch(opener, closer itemType, tokens items) (ret, 
 	return
 }
 
-func (t *Tree) parseLinkDest(tokens items) (ret, remains items, destination string) {
-	ret, remains, destination = t.parseLinkDest1(tokens)
+func (context *Context) parseLinkDest(tokens items) (ret, remains items, destination string) {
+	ret, remains, destination = context.parseLinkDest1(tokens)
 	if nil == ret {
-		ret, remains, destination = t.parseLinkDest2(tokens)
+		ret, remains, destination = context.parseLinkDest2(tokens)
 	}
 	if nil != ret {
 		destination = encodeDestination(destination)
@@ -185,7 +142,7 @@ func (t *Tree) parseLinkDest(tokens items) (ret, remains items, destination stri
 	return
 }
 
-func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, destination string) {
+func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destination string) {
 	remains = tokens
 	var leftParens, rightParens int
 	i := 0
@@ -224,7 +181,7 @@ func (t *Tree) parseLinkDest2(tokens items) (ret, remains items, destination str
 	return
 }
 
-func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, destination string) {
+func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destination string) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -268,7 +225,7 @@ func (t *Tree) parseLinkDest1(tokens items) (ret, remains items, destination str
 	return
 }
 
-func (t *Tree) parseLinkLabel(tokens items) (ret, remains items, label string) {
+func (context *Context) parseLinkLabel(tokens items) (ret, remains items, label string) {
 	length := len(tokens)
 	if 2 > length {
 		return
@@ -290,15 +247,6 @@ func (t *Tree) parseLinkLabel(tokens items) (ret, remains items, label string) {
 			label = label[0 : len(label)-1]
 			remains = line[i+1:]
 			break
-		}
-		if token.isNewline() {
-			line = t.nextLine()
-			if line.isBlankLine() {
-				t.backupLine(line)
-				break
-			}
-			i = 0
-			continue
 		}
 		i++
 	}

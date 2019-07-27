@@ -38,12 +38,13 @@ type Node interface {
 	Value() string
 	AppendValue(string)
 	Tokens() items
+	SetTokens(items)
 	AddTokens(items)
 
 	IsOpen() bool
 	IsClosed() bool
 	Close()
-	Finalize()
+	Finalize(*Context)
 	Continue(*Context) int
 	AcceptLines() bool
 	CanContain(NodeType) bool
@@ -88,7 +89,7 @@ func (n *BaseNode) Close() {
 	n.close = true
 }
 
-func (n *BaseNode) Finalize() {
+func (n *BaseNode) Finalize(context *Context) {
 }
 
 func (n *BaseNode) Continue(context *Context) int {
@@ -207,6 +208,9 @@ func (n *BaseNode) Tokens() items {
 	return n.tokens
 }
 
+func (n *BaseNode) SetTokens(tokens items) {
+	n.tokens = tokens
+}
 func (n *BaseNode) AddTokens(tokens items) {
 	n.tokens = append(n.tokens, tokens...)
 }

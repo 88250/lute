@@ -114,12 +114,12 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 		isLink, tmp := tmp.spnl()
 
 		if isLink {
-			_, tmp, dest := t.parseLinkDest(tmp)
+			_, tmp, dest := t.context.parseLinkDest(tmp)
 			if "" != dest {
 				isLink, tmp = tmp.spnl()
 				if isLink {
 					if tmp[0].isWhitespace() { // make sure there's a space before the title
-						_, tmp, title := t.parseLinkTitle(tmp)
+						_, tmp, title := t.context.parseLinkTitle(tmp)
 						if "" != title {
 							isLink, tmp = tmp.spnl()
 							if isLink && itemCloseParen == tmp[0].typ {
@@ -140,7 +140,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 	if !matched {
 		// Next, see if there's a link label
 		var beforelabel = t.context.pos
-		_, _, label := t.parseLinkLabel(tokens[t.context.pos:])
+		_, _, label := t.context.parseLinkLabel(tokens[t.context.pos:])
 		var n = len(label)
 		if n > 2 {
 			reflabel = tokens[beforelabel:beforelabel+n].rawText()

@@ -34,21 +34,21 @@ func (p *Paragraph) Continue(context *Context) int {
 	return 0
 }
 
-func (p *Paragraph) Finalize() {
-	// TODO try parsing the beginning as link reference definitions:
-	//var pos int
-	//hasReferenceDefs := false
-	// for (peek(p.rawText, 0) == itemOpenBracket && (pos =
-	//context.inlineParser.parseReference(block._string_content,
-	//	parser.refmap))) {
-	//block._string_content = block._string_content.slice(pos);
-	//hasReferenceDefs = true;
-	//}
-	//if hasReferenceDefs && isBlank(block._string_content) {
-	//	block.unlink()
-	//}
+func (p *Paragraph) Finalize(context *Context) {
 	p.value = strings.TrimSpace(p.value)
 	p.tokens = p.tokens.trim()
+
+	// try parsing the beginning as link reference definitions:
+	hasReferenceDefs := false
+	for tokens := p.tokens; itemOpenBracket == tokens.peek(0).typ; tokens = p.tokens {
+		tokens = context.parseLinkRefDef(tokens)
+		p.tokens = tokens
+		hasReferenceDefs = true
+	}
+
+	if hasReferenceDefs && p.tokens.isBlankLine() {
+		p.Unlink()
+	}
 }
 
 func (p *Paragraph) AcceptLines() bool {

@@ -45,7 +45,7 @@ func (list *List) CanContain(nodeType NodeType) bool {
 	return NodeListItem == nodeType
 }
 
-func (list *List) Finalize() {
+func (list *List) Finalize(context *Context) {
 	var item = list.firstChild
 
 	for nil != item {

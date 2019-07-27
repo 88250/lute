@@ -33,7 +33,7 @@ func (html *HTML) Continue(context *Context) int {
 	return 0
 }
 
-func (html *HTML) Finalize() {
+func (html *HTML) Finalize(context *Context) {
 	html.value = strings.TrimRight(html.value, "\n ")
 }
 
