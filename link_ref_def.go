@@ -51,24 +51,35 @@ func (context *Context) parseLinkRefDef(line items) items {
 	if nil == whitespaces && 0 < len(remains) {
 		return nil
 	}
-	newlines, _, _ = whitespaces.statWhitespace()
+	newlines, spaces1, tabs1 := whitespaces.statWhitespace()
 	if 1 < newlines {
 		return nil
 	}
 
-	tokens = remains
+	_, tokens = remains.trimLeft()
 	validTitle, remains, title := context.parseLinkTitle(tokens)
-	if !validTitle {
+	if !validTitle && 1 > newlines {
+		return nil
+	}
+	if !remains.isBlankLine() && 0 < spaces1+tabs1{
 		return nil
 	}
 
-	link := &Link{&BaseNode{typ: NodeLink}, destination, ""}
+	titleLine := tokens
+	whitespaces, tokens = remains.trimLeft()
+	_, spaces2, tabs2 := whitespaces.statWhitespace()
+	if !tokens.isBlankLine() && 0 < spaces2 + tabs2 {
+		title = ""
+		remains = titleLine
+	}
 
+	link := &Link{&BaseNode{typ: NodeLink}, destination, ""}
 	lowerCaseLabel := strings.ToLower(label)
 	link.Title = title
 	if _, ok := context.linkRefDef[lowerCaseLabel]; !ok {
 		context.linkRefDef[lowerCaseLabel] = link
 	}
+
 
 	return remains
 }
@@ -89,7 +100,7 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, remains i
 	validTitle, remains, title = context.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
 	if !validTitle {
 		validTitle, remains, title = context.parseLinkTitleMatch(itemSinglequote, itemSinglequote, tokens)
-		if !validTitle{
+		if !validTitle {
 			validTitle, remains, title = context.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
 		}
 	}
@@ -114,7 +125,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens item
 	line := tokens
 	closed := false
 	i := 1
-	for i < len(line){
+	for i < len(line) {
 		token := line[i]
 		title += token.val
 		if closer == token.typ && !tokens.isBackslashEscape(i) {
