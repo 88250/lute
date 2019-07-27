@@ -30,7 +30,7 @@ func (context *Context) parseLinkRefDef(line items) items {
 		return nil
 	}
 
-	if itemColon != remains[0].typ {
+	if 1 > len(remains) || itemColon != remains[0].typ {
 		return nil
 	}
 
