@@ -43,8 +43,41 @@ func (html *HTML) AcceptLines() bool {
 
 var HTMLBlockTags = []string{"address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"}
 
-func (t *Tree) parseHTML(tokens items) (ret *HTML) {
+func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
+	length := len(tokens)
+	switch htmlType {
+	case 1:
+		for i := 0; i < length-3; i++ {
+			if itemLess == tokens[i].typ && itemSlash == tokens[i+1].typ && t.equalAnyIgnoreCase(tokens[i+2].val, "script", "pre", "style") && itemGreater == tokens[i+3].typ {
+				return true
+			}
+		}
+	case 2:
+		for i := 0; i < length-3; i++ {
+			if itemHyphen == tokens[i].typ && itemHyphen == tokens[i+1].typ && itemGreater == tokens[i+2].typ {
+				return true
+			}
+		}
+	case 3:
+		for i := 0; i < length-2; i++ {
+			if itemQuestion == tokens[i].typ && itemGreater == tokens[i+1].typ {
+				return true
+			}
+		}
+	case 4:
+		return tokens.contain(itemGreater)
+	case 5:
+		for i := 0; i < length-2; i++ {
+			if itemCloseBracket == tokens[i].typ && itemCloseBracket == tokens[i+1].typ {
+				return true
+			}
+		}
+	}
 
+	return false
+}
+
+func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 	_, tokens = tokens.trimLeft()
 	length := len(tokens)
 	if 3 > length { // at least <? and a newline
@@ -88,7 +121,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 		return &HTML{&BaseNode{typ: NodeHTML}, 7}
 	}
 	isCloseTag := tag.isCloseTag()
-	if isCloseTag {
+	if isCloseTag && t.context.tip.Type() != NodeParagraph {
 		return &HTML{&BaseNode{typ: NodeHTML}, 7}
 	}
 

@@ -34,7 +34,6 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 		cs := block.Children()
 		if 0 < len(cs) {
 			t.parseBlockInlines(cs)
-
 			continue
 		}
 
