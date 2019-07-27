@@ -84,6 +84,11 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 
 func (t *Tree) parseSetextHeading() (ret *Heading) {
 	start := t.context.nextNonspace
+	marker := t.context.currentLine[start]
+	if itemEqual != marker.typ && itemHyphen != marker.typ {
+		return nil
+	}
+
 	end := t.context.currentLineLen - 2
 	for ; 0 <= end; end-- {
 		if !t.context.currentLine[end].isSpaceOrTab() {
@@ -92,7 +97,6 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 	}
 
 	markers := 0
-	marker := t.context.currentLine[start]
 	for ; start < end; start++ {
 		token := t.context.currentLine[start]
 		if itemEqual != token.typ && itemHyphen != token.typ {
