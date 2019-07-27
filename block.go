@@ -263,8 +263,8 @@ var blockStarts = []startFunc{
 				//}
 
 				if value := container.Value(); "" != value {
-					heading.value = value
-					heading.tokens = container.Tokens()
+					heading.value = strings.TrimSpace(value)
+					heading.tokens = container.Tokens().trim()
 					container.InsertAfter(container, heading)
 					container.Unlink()
 					t.context.tip = heading

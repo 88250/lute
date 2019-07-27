@@ -34,18 +34,7 @@ func (html *HTML) Continue(context *Context) int {
 }
 
 func (html *HTML) Finalize() {
-	i := len(html.value) - 1
-	for ; 0 <= i && ('\n' == html.value[i] || ' ' == html.value[i]); i-- {
-	}
-	i++
-	rest := html.value[i:]
-	for 0 <= strings.Index(rest, "\n ") {
-		rest = strings.ReplaceAll(rest, "\n ", "\n")
-	}
-	for 0 <= strings.Index(rest, "\n\n") {
-		rest = strings.ReplaceAll(rest, "\n\n", "\n")
-	}
-	html.value = html.value[:i] + rest
+	html.value = strings.TrimRight(html.value, "\n ")
 }
 
 func (html *HTML) AcceptLines() bool {

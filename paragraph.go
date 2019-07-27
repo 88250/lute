@@ -15,6 +15,8 @@
 
 package lute
 
+import "strings"
+
 type Paragraph struct {
 	*BaseNode
 
@@ -45,6 +47,8 @@ func (p *Paragraph) Finalize() {
 	//if hasReferenceDefs && isBlank(block._string_content) {
 	//	block.unlink()
 	//}
+	p.value = strings.TrimSpace(p.value)
+	p.tokens = p.tokens.trim()
 }
 
 func (p *Paragraph) AcceptLines() bool {

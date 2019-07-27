@@ -68,8 +68,7 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 	}
 
 	r.Newline()
-	n := node.(*HTML)
-	r.WriteString(n.value)
+	r.WriteString(node.Value())
 	r.Newline()
 
 	return WalkContinue, nil
@@ -80,8 +79,7 @@ func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error
 		return WalkContinue, nil
 	}
 
-	n := node.(*InlineHTML)
-	r.WriteString(n.value)
+	r.WriteString(node.Value())
 
 	return WalkContinue, nil
 }
@@ -113,15 +111,14 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 		return WalkContinue, nil
 	}
 
-	n := node.(*Text)
-	r.WriteString(escapeHTML(n.value))
+	r.WriteString(escapeHTML(node.Value()))
 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderInlineCode(n Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderInlineCode(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<code>" + escapeHTML(n.(*InlineCode).value))
+		r.WriteString("<code>" + escapeHTML(node.Value()))
 
 		return WalkSkipChildren, nil
 	}
@@ -148,7 +145,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 
 func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<em>" + node.(*Emphasis).value)
+		r.WriteString("<em>" + node.Value())
 	} else {
 		r.WriteString("</em>")
 	}
@@ -157,7 +154,7 @@ func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) 
 
 func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<strong>" + node.(*Strong).value)
+		r.WriteString("<strong>" + node.Value())
 	} else {
 		r.WriteString("</strong>")
 	}
