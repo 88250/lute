@@ -252,9 +252,11 @@ var blockStarts = []startFunc{
 			if heading := t.parseSetextHeading(); nil != heading {
 				t.context.closeUnmatchedBlocks()
 				// resolve reference link definition
-				for tokens := container.Tokens(); itemOpenBracket == tokens.peek(0).typ; tokens = container.Tokens() {
-					tokens = t.context.parseLinkRefDef(tokens)
-					container.SetTokens(tokens)
+				for tokens := container.Tokens(); 0 < len(tokens) && itemOpenBracket == tokens[0].typ; tokens = container.Tokens() {
+					if tokens = t.context.parseLinkRefDef(tokens); nil != tokens {
+						container.SetTokens(tokens)
+						container.SetValue(tokens.rawText())
+					}
 				}
 
 				if value := container.Value(); "" != value {

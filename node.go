@@ -36,6 +36,7 @@ type Node interface {
 	SetRawText(string)
 	AppendRawText(string)
 	Value() string
+	SetValue(string)
 	AppendValue(string)
 	Tokens() items
 	SetTokens(items)
@@ -198,6 +199,10 @@ func (n *BaseNode) AppendRawText(rawText string) {
 
 func (n *BaseNode) Value() string {
 	return n.value
+}
+
+func (n*BaseNode) SetValue(value string) {
+	n.value = value
 }
 
 func (n *BaseNode) AppendValue(value string) {
