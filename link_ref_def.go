@@ -82,6 +82,9 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, remains i
 	if 1 > len(tokens) {
 		return true, tokens, ""
 	}
+	if itemOpenBracket == tokens[0].typ {
+		return true, tokens, ""
+	}
 
 	validTitle, remains, title = context.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
 	if !validTitle {
@@ -154,7 +157,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 		token := tokens[i]
 		ret = append(ret, token)
 		destination += token.val
-		if itemSpace == token.typ || token.isControl() {
+		if token.isWhitespace() || token.isControl() {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
 			break
