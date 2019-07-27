@@ -87,7 +87,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	if itemPlus == marker.typ || itemHyphen == marker.typ || itemAsterisk == marker.typ {
 		data.typ = ListTypeBullet
 		data.bulletChar = marker.val
-	} else if marker.isNumInt() && 9 >= len(marker.val) && container.Type() != NodeParagraph {
+	} else if marker.isNumInt() && 9 >= len(marker.val) && (container.Type() != NodeParagraph || "1" == marker.val) {
 		data.typ = ListTypeOrdered
 		data.start, _ = strconv.Atoi(marker.val)
 		markerLength = 2
