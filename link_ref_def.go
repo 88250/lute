@@ -48,6 +48,9 @@ func (context *Context) parseLinkRefDef(line items) items {
 	}
 
 	whitespaces, remains = remains.trimLeft()
+	if nil == whitespaces && 0 < len(remains) {
+		return nil
+	}
 	newlines, _, _ = whitespaces.statWhitespace()
 	if 1 < newlines {
 		return nil
