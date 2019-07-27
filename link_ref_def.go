@@ -61,16 +61,18 @@ func (context *Context) parseLinkRefDef(line items) items {
 	if !validTitle && 1 > newlines {
 		return nil
 	}
-	if !remains.isBlankLine() && 0 < spaces1+tabs1{
+	if 0 < spaces1+tabs1 && !remains.isBlankLine() && itemNewline != remains[0].typ {
 		return nil
 	}
 
 	titleLine := tokens
 	whitespaces, tokens = remains.trimLeft()
 	_, spaces2, tabs2 := whitespaces.statWhitespace()
-	if !tokens.isBlankLine() && 0 < spaces2 + tabs2 {
+	if !tokens.isBlankLine() && 0 < spaces2+tabs2 {
 		title = ""
 		remains = titleLine
+	} else {
+		remains = tokens
 	}
 
 	link := &Link{&BaseNode{typ: NodeLink}, destination, ""}
@@ -79,7 +81,6 @@ func (context *Context) parseLinkRefDef(line items) items {
 	if _, ok := context.linkRefDef[lowerCaseLabel]; !ok {
 		context.linkRefDef[lowerCaseLabel] = link
 	}
-
 
 	return remains
 }
