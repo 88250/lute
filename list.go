@@ -153,7 +153,7 @@ func endsWithBlankLine(block Node) bool {
 		}
 		t := block.Type()
 		if !block.LastLineChecked() && (t == NodeList || t == NodeListItem) {
-			block.SetLastLineBlank(true)
+			block.SetLastLineChecked(true)
 			block = block.LastChild()
 		} else {
 			block.SetLastLineChecked(true)
