@@ -46,8 +46,7 @@ func (list *List) CanContain(nodeType NodeType) bool {
 }
 
 func (list *List) Finalize(context *Context) {
-	var item = list.firstChild
-
+	item := list.firstChild
 	for nil != item {
 		// check for non-final list item ending with blank line:
 		if endsWithBlankLine(item) && nil != item.Next() {
@@ -127,7 +126,8 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 		}
 	}
 
-	var blank_item = nil == t.context.currentLine.peek(t.context.offset)
+	token := t.context.currentLine.peek(t.context.offset)
+	var blank_item = nil == token || itemNewline == token.typ
 	var spaces_after_marker = t.context.column - spacesStartCol
 	if spaces_after_marker >= 5 || spaces_after_marker < 1 || blank_item {
 		data.padding = len(marker.val) + 1
@@ -143,4 +143,23 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 		data.padding++ // 加上分隔符 . 或者 ) 为 1 的长度
 	}
 	return data
+}
+
+// Returns true if block ends with a blank line, descending if needed into lists and sublists.
+func endsWithBlankLine(block Node) bool {
+	for nil != block {
+		if block.LastLineBlank() {
+			return true
+		}
+		t := block.Type()
+		if !block.LastLineChecked() && (t == NodeList || t == NodeListItem) {
+			block.SetLastLineBlank(true)
+			block = block.LastChild()
+		} else {
+			block.SetLastLineChecked(true)
+			break
+		}
+	}
+
+	return false
 }

@@ -212,10 +212,6 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.WriteString("<li>")
-		li := node.(*ListItem)
-		if !li.tight && 0 < len(li.Children()) {
-			r.Newline()
-		}
 	} else {
 		r.WriteString("</li>")
 		r.Newline()

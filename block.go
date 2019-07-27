@@ -141,8 +141,7 @@ func (t *Tree) incorporateLine(line items) {
 		var lastLineBlank = t.context.blank &&
 			!(typ == NodeBlockquote ||
 				(typ == NodeCodeBlock && isFenced) ||
-				(typ == NodeListItem &&
-					nil != container.FirstChild() /*&&container.sourcepos[0][0] == = this.lineNumber*/))
+				(typ == NodeListItem && nil == container.FirstChild()))
 
 		// propagate lastLineBlank up through parents:
 		for cont := container; nil != cont; cont = cont.Parent() {
@@ -338,25 +337,4 @@ func (t *Tree) addLine() {
 	}
 	t.context.tip.AddTokens(t.context.currentLine[t.context.offset:])
 	t.context.tip.AppendValue(t.context.currentLine[t.context.offset:].rawText())
-}
-
-// Returns true if block ends with a blank line, descending if needed
-// into lists and sublists.
-func endsWithBlankLine(block Node) bool {
-	for nil != block {
-		if block.LastLineBlank() {
-			return true
-		}
-
-		var t = block.Type()
-		if !block.LastLineChecked() && (t == NodeList || t == NodeListItem) {
-			block.SetLastLineBlank(true)
-			block = block.LastChild()
-		} else {
-			block.SetLastLineChecked(true)
-			break
-		}
-	}
-
-	return false
 }
