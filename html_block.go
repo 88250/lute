@@ -117,7 +117,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 
 	tag := tokens.trim()
 	isOpenTag, _ := tag.isOpenTag()
-	if isOpenTag {
+	if isOpenTag && t.context.tip.Type() != NodeParagraph {
 		return &HTML{&BaseNode{typ: NodeHTML}, 7}
 	}
 	isCloseTag := tag.isCloseTag()
