@@ -47,18 +47,11 @@ func (context *Context) parseLinkRefDef(line items) items {
 		return nil
 	}
 
-	link := &Link{&BaseNode{typ: NodeLink}, destination, ""}
-
 	whitespaces, remains = remains.trimLeft()
-	if nil == whitespaces {
-		return nil
-	}
 	newlines, _, _ = whitespaces.statWhitespace()
 	if 1 < newlines {
 		return nil
 	}
-
-	lowerCaseLabel := strings.ToLower(label)
 
 	tokens = remains
 	validTitle, remains, title := context.parseLinkTitle(tokens)
@@ -66,6 +59,9 @@ func (context *Context) parseLinkRefDef(line items) items {
 		return nil
 	}
 
+	link := &Link{&BaseNode{typ: NodeLink}, destination, ""}
+
+	lowerCaseLabel := strings.ToLower(label)
 	link.Title = title
 	if _, ok := context.linkRefDef[lowerCaseLabel]; !ok {
 		context.linkRefDef[lowerCaseLabel] = link
@@ -80,6 +76,10 @@ func (context *Context) parseLinkText(tokens items) (ret, remains items, text st
 }
 
 func (context *Context) parseLinkTitle(tokens items) (validTitle bool, remains items, title string) {
+	if 1 > len(tokens) {
+		return true, tokens, ""
+	}
+
 	validTitle, remains, title = context.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
 	if !validTitle {
 		validTitle, remains, title = context.parseLinkTitleMatch(itemSinglequote, itemSinglequote, tokens)
@@ -169,11 +169,6 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 		ret = nil
 		destination = ""
 		return
-	}
-
-	if length <= i {
-		i = length - 1
-		destination = destination[:len(destination)-1]
 	}
 
 	remains = tokens[i:]
