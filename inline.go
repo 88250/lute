@@ -109,27 +109,19 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) Node {
 	// Inline link?
 	if t.context.pos < len(tokens) && itemOpenParen == tokens[t.context.pos].typ {
 		t.context.pos++
-		tmp := tokens[t.context.pos:]
-		isLink, tmp := tmp.spnl()
-		if isLink {
-			_, tmp, dest := t.context.parseLinkDest(tmp)
-			if "" != dest {
-				isLink, tmp = tmp.spnl()
-				if isLink {
-					if tmp[0].isWhitespace() { // make sure there's a space before the title
-						validTitle, tmp, _ := t.context.parseLinkTitle(tmp)
-						if validTitle {
-							isLink, tmp = tmp.spnl()
-							if isLink && itemCloseParen == tmp[0].typ {
-								t.context.pos++
-								matched = true
-							}
+		if isLink, tmp := tokens[t.context.pos:].spnl(); isLink {
+			if _, tmp, dest := t.context.parseLinkDest(tmp); "" != dest {
+				if isLink, tmp = tmp.spnl(); isLink && tmp[0].isWhitespace() { // make sure there's a space before the title
+					if validTitle, tmp, _ := t.context.parseLinkTitle(tmp); validTitle {
+						isLink, tmp = tmp.spnl()
+						if isLink && itemCloseParen == tmp[0].typ {
+							t.context.pos++
+							matched = true
 						}
 					}
 				}
 			}
 		}
-
 		if !matched {
 			t.context.pos = savepos
 		}
