@@ -82,9 +82,36 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 	}
 }
 
-func (t *Tree) parseAutolink(tokens items) Node {
+func (t *Tree) parseAutolink(tokens items) (ret Node) {
+	schemed := false
+	scheme := ""
+	dest := ""
+	var token *item
+	i := t.context.pos + 1
+	for ; i < len(tokens) && itemGreater != tokens[i].typ; i++ {
+		token = tokens[i]
+		dest += token.val
+		if !schemed {
+			if itemColon != token.typ {
+				scheme += token.val
+			} else {
+				schemed = true
+			}
+		}
+	}
+	if !schemed {
+		return nil
+	}
 
-	return nil
+	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), ""}
+	if itemGreater != tokens[i].typ {
+		return nil
+	}
+
+	t.context.pos += 1 + i
+	ret.AppendChild(ret, &Text{&BaseNode{typ: NodeText, value: dest}})
+
+	return
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,

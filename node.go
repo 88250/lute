@@ -346,6 +346,6 @@ type Link struct {
 
 type Image struct {
 	*BaseNode
-	URL   string
-	Title string
+	Destination string
+	Title       string
 }

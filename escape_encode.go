@@ -64,7 +64,6 @@ func isBackslashEscape(runes []rune, pos int) bool {
 }
 
 func encodeDestination(destination string) (ret string) {
-	destination = unescapeString(destination)
 	destination = decodeDestination(destination)
 	u, e := url.Parse(destination)
 	if nil != e {
@@ -86,8 +85,9 @@ func decodeDestination(destination string) (ret string) {
 	return
 }
 
-func compatibleJSEncodeURIComponent(str string) string {
+func compatibleJSEncodeURIComponent(str string) (ret string) {
 	str = strings.ReplaceAll(str, "+", "%20")
+	str = strings.ReplaceAll(str, "\\", "%5C")
 	str = strings.ReplaceAll(str, "%21", "!")
 	str = strings.ReplaceAll(str, "%27", "'")
 	str = strings.ReplaceAll(str, "%28", "(")

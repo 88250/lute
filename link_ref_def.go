@@ -154,7 +154,7 @@ func (context *Context) parseLinkDest(tokens items) (ret, remains items, destina
 		ret, remains, destination = context.parseLinkDest2(tokens)
 	}
 	if nil != ret {
-		destination = encodeDestination(destination)
+		destination = encodeDestination(unescapeString(destination))
 	}
 
 	return
