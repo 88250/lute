@@ -2,11 +2,11 @@
 
 > 千呼万唤始出来，犹抱琵琶半遮面。转轴拨弦三两声，未成曲调先有情。
 
-## 简介
+## 💡 简介
 
 [Lute](https://github.com/b3log/lute) 是一款结构化的 Markdown 引擎，完整实现了最新的 [CommonMark 规范](https://commonmark.org)，对中文语境支持更好，并具备语法检查、格式化等功能。
 
-## 背景
+## 📽️ 背景
 
 <details>
 <summary>太长不看。</summary>
@@ -23,7 +23,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎。所谓的“结构�
 关于如何实现一个 Markdown 处理器，网上众说纷纭。有的人说 Markdown 适合用正则解析，因为文法规则太简单；也有的人说 Markdown 可以用编译原理来处理，正则太难维护。我赞同后者，因为正则确实太难维护而且运行效率较低。
 </details>
 
-## 特性
+## ✨  特性
 
 * 完整实现最新版 CommonMark 规范
 * 更好地支持中文语境
@@ -31,11 +31,11 @@ Lute 的目标是构建一个结构化的 Markdown 引擎。所谓的“结构�
 * 可扩展语法树节点类型以实现自定义输出
 * 内置缓存以提升性能
 
-## 性能对比
+## ⚡ 性能
 
 TBD
 
-## 文档
+## 📜 文档
 
 TBD
 
@@ -44,16 +44,16 @@ TBD
 * CommonMark 规范要点解读
 * Lute 实现后记
 
-## 社区
+## 🏘️ 社区
 
 * [讨论区](https://hacpai.com/tag/lute)
 * [报告问题](https://github.com/b3log/lute/issues/new/choose)
 
-## 授权
+## 📄 授权
 
 Lute 使用 [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-2.0) 开源协议。
 
-## 鸣谢
+## 🙏 鸣谢
 
 Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者致以最崇高的敬意！
 
@@ -63,7 +63,7 @@ Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者致
 
 ---
 
-## 开源项目推荐
+## 👍 开源项目推荐
 
 * 如果你需要集成一个浏览器端的 Markdown 编辑器，可以考虑使用 [Vditor](https://github.com/b3log/vditor)
 * 如果你需要搭建一个个人博客系统，可以考虑使用 [Solo](https://github.com/b3log/solo)
