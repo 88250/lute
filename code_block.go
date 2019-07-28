@@ -115,6 +115,8 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 	} else {
 		info = infoTokens.trim().rawText()
 	}
+
+	info = unescapeString(info)
 	ret = &CodeBlock{&BaseNode{typ: NodeCodeBlock},
 		true, fenceChar, fenceLength, t.context.indent, info}
 

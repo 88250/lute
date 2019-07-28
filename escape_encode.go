@@ -18,7 +18,6 @@ package lute
 import (
 	"net/url"
 	"strings"
-	"unicode"
 )
 
 var htmlEscaper = strings.NewReplacer(
@@ -47,7 +46,7 @@ func unescapeString(str string) string {
 }
 
 func isBackslashEscape(runes []rune, pos int) bool {
-	if !unicode.IsPunct(runes[pos]) {
+	if !isASCIIPunct(runes[pos]) {
 		return false
 	}
 
@@ -61,6 +60,10 @@ func isBackslashEscape(runes []rune, pos int) bool {
 	}
 
 	return 0 != backslashes%2
+}
+
+func isASCIIPunct(c rune) bool {
+	return (0x21 <= c && 0x2F >= c) || (0x3A <= c && 0x40 >= c) || (0x5B <= c && 0x60 >= c) || (0x7B <= c && 0x7E >= c)
 }
 
 func encodeDestination(destination string) (ret string) {

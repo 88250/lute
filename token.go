@@ -74,7 +74,7 @@ func (i *item) isControl() bool {
 }
 
 func (i *item) isPunct() bool {
-	return unicode.IsPunct(rune(i.val[0]))
+	return i.isASCIIPunct() || unicode.IsPunct(rune(i.val[0]))
 }
 
 func (i *item) isASCIIPunct() bool {

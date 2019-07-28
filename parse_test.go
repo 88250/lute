@@ -29,6 +29,7 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
+	{"spec310", "``` foo\\+bar\nfoo\n```\n", "<pre><code class=\"language-foo+bar\">foo\n</code></pre>\n"},
 	{"spec308", "[foo](/bar\\* \"ti\\*tle\")\n", "<p><a href=\"/bar*\" title=\"ti*tle\">foo</a></p>\n"},
 	{"spec306", "<http://example.com?find=\\*>\n", "<p><a href=\"http://example.com?find=%5C*\">http://example.com?find=\\*</a></p>\n"},
 
