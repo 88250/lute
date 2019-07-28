@@ -480,11 +480,11 @@ func (tokens items) statWhitespace() (newlines, spaces, tabs int) {
 	return
 }
 
-func (tokens items) spnl() (ret bool, remains items) {
-	whitespaces, remains := tokens.trimLeft()
-	newlines, _, _ := whitespaces.statWhitespace()
+func (tokens items) spnl() (ret bool, passed, remains items) {
+	passed, remains = tokens.trimLeft()
+	newlines, _, _ := passed.statWhitespace()
 	if 1 < newlines {
-		return false, tokens
+		return false, nil, tokens
 	}
 	ret = true
 

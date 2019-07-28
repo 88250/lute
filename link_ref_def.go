@@ -57,7 +57,7 @@ func (context *Context) parseLinkRefDef(line items) items {
 	}
 
 	_, tokens = remains.trimLeft()
-	validTitle, remains, title := context.parseLinkTitle(tokens)
+	validTitle, _, remains, title := context.parseLinkTitle(tokens)
 	if !validTitle && 1 > newlines {
 		return nil
 	}
@@ -90,19 +90,19 @@ func (context *Context) parseLinkText(tokens items) (ret, remains items, text st
 	return
 }
 
-func (context *Context) parseLinkTitle(tokens items) (validTitle bool, remains items, title string) {
+func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, remains items, title string) {
 	if 1 > len(tokens) {
-		return true, tokens, ""
+		return true, nil, tokens, ""
 	}
 	if itemOpenBracket == tokens[0].typ {
-		return true, tokens, ""
+		return true, nil, tokens, ""
 	}
 
-	validTitle, remains, title = context.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
+	validTitle, passed, remains, title = context.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
 	if !validTitle {
-		validTitle, remains, title = context.parseLinkTitleMatch(itemSinglequote, itemSinglequote, tokens)
+		validTitle, passed, remains, title = context.parseLinkTitleMatch(itemSinglequote, itemSinglequote, tokens)
 		if !validTitle {
-			validTitle, remains, title = context.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
+			validTitle, passed, remains, title = context.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
 		}
 	}
 	if "" != title {
@@ -112,7 +112,7 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, remains i
 	return
 }
 
-func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens items) (validTitle bool, remains items, title string) {
+func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens items) (validTitle bool, passed, remains items, title string) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -129,6 +129,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens item
 	for i < len(line) {
 		token := line[i]
 		title += token.val
+		passed = append(passed, token)
 		if closer == token.typ && !tokens.isBackslashEscape(i) {
 			closed = true
 			title = title[:len(title)-1]
@@ -139,6 +140,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens item
 
 	if !closed {
 		title = ""
+		passed = nil
 		return
 	}
 

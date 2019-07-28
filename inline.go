@@ -136,22 +136,34 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) Node {
 	// If we got here, open is a potential opener
 	isImage := opener.image
 
+	var dest, title string
 	// Check to see if we have a link/image
 
 	startPos := t.context.pos
 	savepos := t.context.pos
 	matched := false
 	// Inline link?
-	if t.context.pos < len(tokens) && itemOpenParen == tokens[t.context.pos].typ {
+	if t.context.pos+1 < len(tokens) && itemOpenParen == tokens[t.context.pos+1].typ {
 		t.context.pos++
-		if isLink, tmp := tokens[t.context.pos:].spnl(); isLink {
-			if _, tmp, dest := t.context.parseLinkDest(tmp); "" != dest {
-				if isLink, tmp = tmp.spnl(); isLink && tmp[0].isWhitespace() { // make sure there's a space before the title
-					if validTitle, tmp, _ := t.context.parseLinkTitle(tmp); validTitle {
-						isLink, tmp = tmp.spnl()
-						if isLink && itemCloseParen == tmp[0].typ {
-							t.context.pos++
-							matched = true
+		isLink := false
+		var passed, remains items
+		if isLink, passed, remains = tokens[t.context.pos:].spnl(); isLink {
+			t.context.pos += len(passed)
+			if passed, remains, dest = t.context.parseLinkDest(remains[1:]); "" != dest {
+				t.context.pos += len(passed)
+				if remains[0].isWhitespace() { // make sure there's a space before the title
+					t.context.pos++
+					if isLink, passed, remains = remains.spnl(); isLink {
+						t.context.pos += len(passed)
+						validTitle := false
+						if validTitle, passed, remains, title = t.context.parseLinkTitle(remains); validTitle {
+							t.context.pos += len(passed)
+							isLink, passed, remains = remains.spnl()
+							t.context.pos += len(passed)
+							if isLink && itemCloseParen == remains[0].typ {
+								t.context.pos++
+								matched = true
+							}
 						}
 					}
 				}
@@ -162,7 +174,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) Node {
 		}
 	}
 
-	var dest, title, reflabel string
+	var reflabel string
 	if !matched {
 		// Next, see if there's a link label
 		var beforelabel = t.context.pos
