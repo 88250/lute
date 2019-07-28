@@ -19,8 +19,6 @@ import "strings"
 
 type Paragraph struct {
 	*BaseNode
-
-	OpenTag, CloseTag string
 }
 
 func (p *Paragraph) CanContain(nodeType NodeType) bool {

@@ -60,7 +60,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			case itemOpenBracket:
 				n = t.parseOpenBracket(tokens)
 			case itemCloseBracket:
-				t.parseCloseBracket(block, tokens)
+				n = t.parseCloseBracket(block, tokens)
 			default:
 				n = t.parseText(tokens)
 			}
@@ -79,24 +79,23 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 	}
 }
 
-func (t *Tree) parseCloseBracket(block Node, tokens items) {
-	startPos := t.context.pos
-	matched := false
-	var dest, title, reflabel string
-
+// Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
+// to block's children. If there is a matching delimiter, remove it from the delimiter stack.
+func (t *Tree) parseCloseBracket(block Node, tokens items) Node {
 	// get last [ or ![
 	opener := t.context.brackets
-
 	if nil == opener {
 		t.context.pos++
-		return
+		// no matched opener, just return a literal
+		return &Text{&BaseNode{typ: NodeText, value: "]"}}
 	}
 
 	if !opener.active {
+		t.context.pos++
+		// no matched opener, just return a literal
 		// take opener off brackets stack
 		t.removeBracket()
-		t.context.pos++
-		return
+		return &Text{&BaseNode{typ: NodeText, value: "]"}}
 	}
 
 	// If we got here, open is a potential opener
@@ -104,23 +103,22 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 
 	// Check to see if we have a link/image
 
+	startPos := t.context.pos
 	savepos := t.context.pos
-
+	matched := false
 	// Inline link?
-	if itemOpenParen == tokens[t.context.pos].typ {
+	if t.context.pos < len(tokens) && itemOpenParen == tokens[t.context.pos].typ {
 		t.context.pos++
-
 		tmp := tokens[t.context.pos:]
 		isLink, tmp := tmp.spnl()
-
 		if isLink {
 			_, tmp, dest := t.context.parseLinkDest(tmp)
 			if "" != dest {
 				isLink, tmp = tmp.spnl()
 				if isLink {
 					if tmp[0].isWhitespace() { // make sure there's a space before the title
-						_, tmp, title := t.context.parseLinkTitle(tmp)
-						if "" != title {
+						validTitle, tmp, _ := t.context.parseLinkTitle(tmp)
+						if validTitle {
 							isLink, tmp = tmp.spnl()
 							if isLink && itemCloseParen == tmp[0].typ {
 								t.context.pos++
@@ -131,12 +129,13 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 				}
 			}
 		}
+
+		if !matched {
+			t.context.pos = savepos
+		}
 	}
 
-	if !matched {
-		t.context.pos = savepos
-	}
-
+	var dest, title, reflabel string
 	if !matched {
 		// Next, see if there's a link label
 		var beforelabel = t.context.pos
@@ -201,22 +200,18 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) {
 		}
 
 		t.context.pos++
-
-		return
+		return nil
 	} else { // no match
 		t.removeBracket() // remove this opener from stack
 		t.context.pos = startPos
-		block.AppendChild(block, &Text{&BaseNode{typ: NodeText, value: "]"}})
-
-		return
+		t.context.pos++
+		return &Text{&BaseNode{typ: NodeText, value: "]"}}
 	}
 }
 
 func (t *Tree) parseOpenBracket(tokens items) (ret Node) {
 	t.context.pos++
-
 	ret = &Text{&BaseNode{typ: NodeText, value: "["}}
-
 	// Add entry to stack for this opener
 	t.addBracket(ret, t.context.pos, false)
 
