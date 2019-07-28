@@ -56,7 +56,10 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			case itemNewline:
 				n = t.parseNewline(block, tokens)
 			case itemLess:
-				n = t.parseInlineHTML(tokens)
+				n = t.parseAutolink(tokens)
+				if nil == n {
+					n = t.parseInlineHTML(tokens)
+				}
 			case itemOpenBracket:
 				n = t.parseOpenBracket(tokens)
 			case itemCloseBracket:
@@ -77,6 +80,11 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 
 		t.processEmphasis(nil)
 	}
+}
+
+func (t *Tree) parseAutolink(tokens items) Node {
+
+	return nil
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,

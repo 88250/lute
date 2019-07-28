@@ -57,17 +57,9 @@ Lute 使用 [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-
 
 Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者致以最崇高的敬意！
 
-### [commonmark.js](https://github.com/commonmark/commonmark.js)
-
-该项目是 CommonMark 官方参考实现的 JavaScript 版，Lute 参考了其解析器实现部分。
-
-### [mdast](https://github.com/syntax-tree/mdast)
-
-该项目介绍了一种 Markdown 抽象语法树结构的表现形式。在 Lute 的初始设计阶段参考了该项目，最终设计以 CommonMark 为主。
-
-### [goldmark](https://github.com/yuin/goldmark)
-
-另一款用 golang 写的 Markdown 解析器。Lute 参考了其树遍历实现部分。
+* [commonmark.js](https://github.com/commonmark/commonmark.js)：该项目是 CommonMark 官方参考实现的 JavaScript 版，Lute 参考了其解析器实现部分
+* [mdast](https://github.com/syntax-tree/mdast)：该项目介绍了一种 Markdown 抽象语法树结构的表现形式，Lute 的 AST 在初始设计阶段参考了该项目
+* [goldmark](https://github.com/yuin/goldmark)：另一款用 golang 写的 Markdown 解析器，Lute 参考了其树遍历实现部分
 
 ---
 
