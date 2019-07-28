@@ -49,7 +49,7 @@ func (list *List) Finalize(context *Context) {
 	item := list.firstChild
 	for nil != item {
 		// check for non-final list item ending with blank line:
-		if endsWithBlankLine(item) && nil != item.Next() {
+		if list.endsWithBlankLine(item) && nil != item.Next() {
 			list.tight = false
 			break
 		}
@@ -58,7 +58,7 @@ func (list *List) Finalize(context *Context) {
 		// spaces between any of them:
 		var subitem = item.FirstChild()
 		for nil != subitem {
-			if endsWithBlankLine(subitem) &&
+			if list.endsWithBlankLine(subitem) &&
 				(nil != item.Next() || nil != subitem.Next()) {
 				list.tight = false
 				break
@@ -146,7 +146,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 }
 
 // Returns true if block ends with a blank line, descending if needed into lists and sublists.
-func endsWithBlankLine(block Node) bool {
+func (list *List) endsWithBlankLine(block Node) bool {
 	for nil != block {
 		if block.LastLineBlank() {
 			return true

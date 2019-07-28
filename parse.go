@@ -20,6 +20,7 @@ import (
 )
 
 func Parse(name, text string) (*Tree, error) {
+	// TODO: 移到 lex 阶段
 	text = sanitize(text)
 
 	t := &Tree{name: name, text: text, context: &Context{}}
