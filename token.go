@@ -136,6 +136,7 @@ var itemName = map[itemType]string{
 	itemDot:             ".",
 	itemColon:           ":",
 	itemQuestion:        "?",
+	itemAmpersand:       "&",
 }
 
 func (i itemType) String() string {
@@ -175,6 +176,7 @@ const (
 	itemDot                             // .
 	itemColon                           // :
 	itemQuestion                        // ?
+	itemAmpersand                       // &
 	itemControl
 )
 
@@ -201,6 +203,7 @@ var (
 	tEqual           = makeItem(itemEqual, "=")
 	tDoublequote     = makeItem(itemDoublequote, "\"")
 	tDot             = makeItem(itemDot, ".")
+	tAmpersand       = makeItem(itemAmpersand, "&")
 )
 
 func makeItem(typ itemType, text string) *item {
