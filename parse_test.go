@@ -31,7 +31,7 @@ var parseTests = []parseTest{
 
 	{"spec314", "&nbsp &x; &#; &#x;\n&#987654321;\n&#abcdef0;\n&ThisIsNotDefined; &hi?;\n", "<p>&amp;nbsp &amp;x; &amp;#; &amp;#x;\n&amp;#987654321;\n&amp;#abcdef0;\n&amp;ThisIsNotDefined; &amp;hi?;</p>\n"},
 	{"spec312", "&#35; &#1234; &#992; &#0;\n", "<p># Ӓ Ϡ �</p>\n"},
-	//{"spec311", "&nbsp; &amp; &copy; &AElig; &Dcaron;\n&frac34; &HilbertSpace; &DifferentialD;\n&ClockwiseContourIntegral; &ngE;\n", "<p>  &amp; © Æ Ď\n¾ ℋ ⅆ\n∲ ≧̸</p>\n"},
+	{"spec311", "&nbsp; &amp; &copy; &AElig; &Dcaron;\n&frac34; &HilbertSpace; &DifferentialD;\n&ClockwiseContourIntegral; &ngE;\n", "<p>  &amp; © Æ Ď\n¾ ℋ ⅆ\n∲ ≧̸</p>\n"},
 	{"spec310", "``` foo\\+bar\nfoo\n```\n", "<pre><code class=\"language-foo+bar\">foo\n</code></pre>\n"},
 	{"spec308", "[foo](/bar\\* \"ti\\*tle\")\n", "<p><a href=\"/bar*\" title=\"ti*tle\">foo</a></p>\n"},
 	{"spec306", "<http://example.com?find=\\*>\n", "<p><a href=\"http://example.com?find=%5C*\">http://example.com?find=\\*</a></p>\n"},

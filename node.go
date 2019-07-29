@@ -338,12 +338,6 @@ type SoftBreak struct {
 	*BaseNode
 }
 
-type Link struct {
-	*BaseNode
-	Destination string
-	Title       string
-}
-
 type Image struct {
 	*BaseNode
 	Destination string

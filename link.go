@@ -15,4 +15,8 @@
 
 package lute
 
-
+type Link struct {
+	*BaseNode
+	Destination string
+	Title       string
+}

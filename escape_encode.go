@@ -16,6 +16,7 @@
 package lute
 
 import (
+	"html"
 	"net/url"
 	"strings"
 )
@@ -32,6 +33,7 @@ func escapeHTML(html string) string {
 }
 
 func unescapeString(str string) string {
+	str = html.UnescapeString(str)
 	runes := []rune(str)
 
 	var retRunes []rune

@@ -86,7 +86,7 @@ func (context *Context) parseLinkRefDef(line items) items {
 }
 
 func (context *Context) parseLinkText(tokens items) (ret, remains items, text string) {
-
+    // TODO parseLinkText
 	return
 }
 

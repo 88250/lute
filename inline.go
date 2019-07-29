@@ -124,7 +124,7 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	}
 
 	if numeric {
-		entityNameLen := len(entityName);
+		entityNameLen := len(entityName)
 		if 10 < entityNameLen || 4 > entityNameLen {
 			t.context.pos++
 			return &Text{&BaseNode{typ: NodeText, value: "&"}}
