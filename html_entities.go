@@ -1,10 +1,10 @@
 package lute
 
 var htmlEntities = map[string]string{
-	"&#0":   "U+FFFD", // 为了安全
-	"&amp;": "&",
-	"&AMP;": "&",
+	"&#0": "U+FFFD", // 为了安全
 
+	"&amp;":                             "&",
+	"&AMP;":                             "&",
 	"&backcong;":                        "≌",
 	"&#10568;":                          "⥈",
 	"&NotSucceedsEqual;":                "⪰̸",
