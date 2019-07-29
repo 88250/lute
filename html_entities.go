@@ -1,6 +1,10 @@
 package lute
 
 var htmlEntities = map[string]string{
+	"&#0":   "U+FFFD", // 为了安全
+	"&amp;": "&",
+	"&AMP;": "&",
+
 	"&backcong;":                        "≌",
 	"&#10568;":                          "⥈",
 	"&NotSucceedsEqual;":                "⪰̸",
@@ -1262,7 +1266,6 @@ var htmlEntities = map[string]string{
 	"&#8781;&#8402;":                    "≍⃒",
 	"&#1115;":                           "ћ",
 	"&Equilibrium;":                     "⇌",
-	"&AMP;":                             "&",
 	"&#8808;&#65024;":                   "≨︀",
 	"&#8462;":                           "ℎ",
 	"&heartsuit;":                       "♥",
@@ -2271,7 +2274,6 @@ var htmlEntities = map[string]string{
 	"&#8804;":                           "≤",
 	"&#8940;":                           "⋬",
 	"&boxHu;":                           "╧",
-	"&amp;":                             "&",
 	"&simdot;":                          "⩪",
 	"&#10216;":                          "⟨",
 	"&#10575;":                          "⥏",

@@ -15,7 +15,10 @@
 
 package lute
 
-import "strings"
+import (
+	"html"
+	"strings"
+)
 
 func (t *Tree) parseInlines() {
 	t.context.delimiters = nil
@@ -85,27 +88,64 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 }
 
 func (t *Tree) parseEntity(tokens items) (ret Node) {
+	length := len(tokens)
+	if 2 > length {
+		t.context.pos++
+		return &Text{&BaseNode{typ: NodeText, value: "&"}}
+		return
+	}
+
 	start := t.context.pos
+	numeric := itemCrosshatch == tokens[start+1].typ
 	i := t.context.pos
 	var token *item
-	for ; i < len(tokens); i++ {
+	var endWithSemicolon bool
+	for ; i < length; i++ {
 		token = tokens[i]
 		if token.isWhitespace() {
 			break
 		}
 		if itemSemicolon == token.typ {
 			i++
+			endWithSemicolon = true
 			break
 		}
 	}
 
 	entityName := tokens[start:i].rawText()
-	if entityValue, ok := htmlEntities[entityName]; ok {
-		t.context.pos += i-start
+	if entityValue, ok := htmlEntities[entityName]; ok { // 通过查表优化
+		t.context.pos += i - start
 		return &Text{&BaseNode{typ: NodeText, value: entityValue}}
 	}
 
-	return &Text{&BaseNode{typ: NodeText, value: "&amp;"}}
+	if !endWithSemicolon {
+		t.context.pos++
+		return &Text{&BaseNode{typ: NodeText, value: "&"}}
+	}
+
+	if numeric {
+		entityNameLen := len(entityName);
+		if 10 < entityNameLen || 4 > entityNameLen {
+			t.context.pos++
+			return &Text{&BaseNode{typ: NodeText, value: "&"}}
+		}
+
+		hex := 'x' == entityName[2] || 'X' == entityName[2]
+		if hex {
+			if 5 > entityNameLen {
+				t.context.pos++
+				return &Text{&BaseNode{typ: NodeText, value: "&"}}
+			}
+		}
+	}
+
+	v := html.UnescapeString(entityName)
+	if v == entityName {
+		t.context.pos++
+		return &Text{&BaseNode{typ: NodeText, value: "&"}}
+	}
+	t.context.pos += i - start
+	return &Text{&BaseNode{typ: NodeText, value: v}}
 }
 
 func (t *Tree) parseAutolink(tokens items) (ret Node) {
