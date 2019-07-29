@@ -137,6 +137,7 @@ var itemName = map[itemType]string{
 	itemColon:           ":",
 	itemQuestion:        "?",
 	itemAmpersand:       "&",
+	itemSemicolon:       ";",
 }
 
 func (i itemType) String() string {
@@ -177,6 +178,7 @@ const (
 	itemColon                           // :
 	itemQuestion                        // ?
 	itemAmpersand                       // &
+	itemSemicolon                       // ;
 	itemControl
 )
 

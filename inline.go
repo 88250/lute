@@ -63,7 +63,9 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			case itemOpenBracket:
 				n = t.parseOpenBracket(tokens)
 			case itemCloseBracket:
-				n = t.parseCloseBracket(block, tokens)
+				n = t.parseCloseBracket(tokens)
+			case itemAmpersand:
+				n = t.parseEntity(tokens)
 			default:
 				n = t.parseText(tokens)
 			}
@@ -80,6 +82,30 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 
 		t.processEmphasis(nil)
 	}
+}
+
+func (t *Tree) parseEntity(tokens items) (ret Node) {
+	start := t.context.pos
+	i := t.context.pos
+	var token *item
+	for ; i < len(tokens); i++ {
+		token = tokens[i]
+		if token.isWhitespace() {
+			break
+		}
+		if itemSemicolon == token.typ {
+			i++
+			break
+		}
+	}
+
+	entityName := tokens[start:i].rawText()
+	if entityValue, ok := htmlEntities[entityName]; ok {
+		t.context.pos += i-start
+		return &Text{&BaseNode{typ: NodeText, value: entityValue}}
+	}
+
+	return &Text{&BaseNode{typ: NodeText, value: "&amp;"}}
 }
 
 func (t *Tree) parseAutolink(tokens items) (ret Node) {
@@ -116,7 +142,7 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
 // to block's children. If there is a matching delimiter, remove it from the delimiter stack.
-func (t *Tree) parseCloseBracket(block Node, tokens items) Node {
+func (t *Tree) parseCloseBracket(tokens items) Node {
 	// get last [ or ![
 	opener := t.context.brackets
 	if nil == opener {
@@ -220,7 +246,6 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) Node {
 			tmp = next
 		}
 
-		block.AppendChild(block, node)
 		t.processEmphasis(opener.previousDelimiter)
 		t.removeBracket()
 		opener.node.Unlink()
@@ -239,7 +264,7 @@ func (t *Tree) parseCloseBracket(block Node, tokens items) Node {
 		}
 
 		t.context.pos++
-		return nil
+		return node
 	} else { // no match
 		t.removeBracket() // remove this opener from stack
 		t.context.pos = startPos

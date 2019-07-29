@@ -158,6 +158,8 @@ func (s *scanner) run() {
 			s.newItem(itemQuestion)
 		case '&' == r:
 			s.newItem(itemAmpersand)
+		case ';' == r:
+			s.newItem(itemSemicolon)
 		case unicode.IsSymbol(r), unicode.IsPunct(r):
 			s.newItem(itemStr)
 		case unicode.IsControl(r):
