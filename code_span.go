@@ -22,7 +22,6 @@ type CodeSpan struct {
 func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	startPos := t.context.pos
 	length := len(tokens)
-
 	n := 0
 	for ; startPos+n < length; n++ {
 		if itemBacktick != tokens[startPos+n].typ {
@@ -30,16 +29,17 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 		}
 	}
 
+	backticks := tokens[startPos:startPos+n].rawText()
 	if length <= startPos+n {
-		t.context.pos++
-		ret = &Text{&BaseNode{typ: NodeText, rawText: "`", value: "`"}}
+		t.context.pos+=n
+		ret = &Text{&BaseNode{typ: NodeText, rawText: backticks, value: backticks}}
 		return
 	}
 
 	endPos := t.matchCodeSpanEnd(tokens[startPos+n:], n)
 	if 1 > endPos {
-		t.context.pos++
-		ret = &Text{&BaseNode{typ: NodeText, rawText: "`", value: "`"}}
+		t.context.pos+=n
+		ret = &Text{&BaseNode{typ: NodeText, rawText: backticks, value: backticks}}
 		return
 	}
 	endPos = startPos + endPos + n
