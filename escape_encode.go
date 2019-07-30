@@ -70,13 +70,13 @@ func isASCIIPunct(c rune) bool {
 
 func encodeDestination(destination string) (ret string) {
 	destination = decodeDestination(destination)
-	u, e := url.Parse(destination)
-	if nil != e {
-		return destination
-	}
-
-	ret = u.String()
-	ret = compatibleJSEncodeURIComponent(ret)
+	ret = url.PathEscape(destination)
+	// TODO: 此处需要重写
+	ret = strings.ReplaceAll(ret, "%2F", "/")
+	ret = strings.ReplaceAll(ret, "%3F", "?")
+	ret = strings.ReplaceAll(ret, "%28", "(")
+	ret = strings.ReplaceAll(ret, "%29", ")")
+	ret = strings.ReplaceAll(ret, "%2A", "*")
 
 	return
 }
@@ -88,16 +88,4 @@ func decodeDestination(destination string) (ret string) {
 	}
 
 	return
-}
-
-func compatibleJSEncodeURIComponent(str string) (ret string) {
-	str = strings.ReplaceAll(str, "+", "%20")
-	str = strings.ReplaceAll(str, "\\", "%5C")
-	str = strings.ReplaceAll(str, "%21", "!")
-	str = strings.ReplaceAll(str, "%27", "'")
-	str = strings.ReplaceAll(str, "%28", "(")
-	str = strings.ReplaceAll(str, "%29", ")")
-	str = strings.ReplaceAll(str, "%2A", "*")
-
-	return str
 }
