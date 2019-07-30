@@ -153,11 +153,10 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 			opener.num -= use_delims
 			closer.num -= use_delims
 
-			text := opener_inl.RawText()[0 : len(opener_inl.RawText())-use_delims]
-			opener_inl.SetRawText(text)
-
-			text = closer_inl.RawText()[0 : len(closer_inl.RawText())-use_delims]
-			closer_inl.SetRawText(text)
+			text := opener_inl.Value()[0 : len(opener_inl.Value())-use_delims]
+			opener_inl.SetValue(text)
+			text = closer_inl.Value()[0 : len(closer_inl.Value())-use_delims]
+			closer_inl.SetValue(text)
 
 			// build contents for new emph element
 			var emph Node
