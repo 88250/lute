@@ -21,13 +21,25 @@ type CodeSpan struct {
 
 func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	startPos := t.context.pos
-	marker := tokens[startPos]
-	n := tokens[startPos:].accept(marker.typ)
-	endPos := t.matchEnd(tokens[startPos+n:], marker, n)
-	if 1 > endPos {
-		marker.typ = itemStr
+	length := len(tokens)
+
+	n := 0
+	for ; startPos+n < length; n++ {
+		if itemBacktick != tokens[startPos+n].typ {
+			break
+		}
+	}
+
+	if length <= startPos+n {
 		t.context.pos++
-		ret = &Text{&BaseNode{typ: NodeText, rawText: marker.val, value: marker.val}}
+		ret = &Text{&BaseNode{typ: NodeText, rawText: "`", value: "`"}}
+		return
+	}
+
+	endPos := t.matchCodeSpanEnd(tokens[startPos+n:], n)
+	if 1 > endPos {
+		t.context.pos++
+		ret = &Text{&BaseNode{typ: NodeText, rawText: "`", value: "`"}}
 		return
 	}
 	endPos = startPos + endPos + n
@@ -54,10 +66,10 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	return
 }
 
-func (t *Tree) matchEnd(tokens items, openMarker *item, num int) (pos int) {
+func (t *Tree) matchCodeSpanEnd(tokens items, num int) (pos int) {
 	length := len(tokens)
 	for ; pos < length; {
-		len := tokens[pos:].accept(openMarker.typ)
+		len := tokens[pos:].accept(itemBacktick)
 		if num == len {
 			next := pos + len
 			if length-1 > next && itemBacktick == tokens[next].typ {
