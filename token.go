@@ -40,7 +40,21 @@ func (i *item) String() string {
 }
 
 func (i *item) isWhitespace() bool {
-	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ // TODO(D): line tabulation (U+000B), form feed (U+000C), or carriage return (U+000D)
+	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ || "\u000A" == i.val || "\u000C" == i.val || "\u000D" == i.val
+}
+
+func (i *item) isUnicodeWhitespace() bool {
+	length := len(i.val)
+	if 1 != length && 2 != length {
+		return false
+	}
+
+	r := rune(i.val[0])
+	if 2 == length {
+		r = rune(i.val[1])
+	}
+
+	return unicode.Is(unicode.Zs, r) || itemTab == i.typ || "\u000D" == i.val || itemNewline == i.typ || "\u000C" == i.val
 }
 
 func (i *item) isSpaceOrTab() bool {
@@ -74,12 +88,15 @@ func (i *item) isControl() bool {
 }
 
 func (i *item) isPunct() bool {
-	return i.isASCIIPunct() || unicode.IsPunct(rune(i.val[0]))
+	return i.isASCIIPunct() || (1 == len(i.val) && unicode.IsPunct(rune(i.val[0])))
 }
 
 func (i *item) isASCIIPunct() bool {
-	c := i.val[0]
+	if 1 != len(i.val) {
+		return false
+	}
 
+	c := i.val[0]
 	return (0x21 <= c && 0x2F >= c) || (0x3A <= c && 0x40 >= c) || (0x5B <= c && 0x60 >= c) || (0x7B <= c && 0x7E >= c)
 }
 
