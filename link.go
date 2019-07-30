@@ -32,37 +32,70 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		return
 	}
 
-	var openParens int
-	i := 0
-	for ; i < length; i++ {
-		token := tokens[i]
-		passed = append(passed, token)
-		destination += token.val
-		if token.isWhitespace() || token.isControl() {
-			destination = destination[:len(destination)-1]
-			passed = passed[:len(passed)-1]
-			break
-		}
-		if itemOpenParen == token.typ && !tokens.isBackslashEscape(i) {
-			openParens++
-		}
-		if itemCloseParen == token.typ && !tokens.isBackslashEscape(i) {
-			openParens--
-			if 1 > openParens {
+	isPointyBrackets := itemLess == tokens[1].typ
+	if isPointyBrackets {
+		matchEnd := false
+		passed = append(passed, tokens[0], tokens[1])
+		i := 2
+		for ; i < length; i++ {
+			token := tokens[i]
+			if token.isNewline() {
+				passed = nil
+				destination = ""
+				return
+			}
+
+			passed = append(passed, token)
+			destination += token.val
+			if itemGreater == token.typ && !tokens.isBackslashEscape(i) {
 				destination = destination[:len(destination)-1]
+				matchEnd = true
 				break
 			}
 		}
-	}
 
-	remains = tokens[i:]
-	if length > i && (itemCloseParen != tokens[i].typ && itemSpace != tokens[i].typ) {
-		passed = nil
-		destination = ""
-		return
-	}
+		if !matchEnd || (length > i && itemCloseParen != tokens[i+1].typ) {
+			passed = nil
+			destination = ""
+			return
+		}
 
-	destination = destination[1:]
+		passed = append(passed, tokens[i+1])
+
+		remains = tokens[i+2:]
+	} else {
+		var openParens int
+		i := 0
+		for ; i < length; i++ {
+			token := tokens[i]
+			passed = append(passed, token)
+			destination += token.val
+			if token.isWhitespace() || token.isControl() {
+				destination = destination[:len(destination)-1]
+				passed = passed[:len(passed)-1]
+				break
+			}
+			if itemOpenParen == token.typ && !tokens.isBackslashEscape(i) {
+				openParens++
+			}
+			if itemCloseParen == token.typ && !tokens.isBackslashEscape(i) {
+				openParens--
+				if 1 > openParens {
+					destination = destination[:len(destination)-1]
+					break
+				}
+			}
+		}
+
+		remains = tokens[i:]
+		if length > i && (itemCloseParen != tokens[i].typ && itemSpace != tokens[i].typ) {
+			passed = nil
+			destination = ""
+			return
+		}
+
+		destination = destination[1:]
+	}
 
 	if nil != passed {
 		destination = encodeDestination(unescapeString(destination))
