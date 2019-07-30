@@ -42,7 +42,7 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 
 	tokenBefore, tokenAfter := tNewLine, tNewLine
 	index := startPos - 1
-	if 0 < index {
+	if 0 <= index {
 		tokenBefore = tokens[index]
 	}
 	index = t.context.pos
