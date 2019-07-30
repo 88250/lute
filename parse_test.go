@@ -29,6 +29,8 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
+	{"spec333", "` b `\n", "<p><code> b </code></p>\n"},
+	{"spec330", "` `` `\n", "<p><code>``</code></p>\n"},
 	{"spec314", "&nbsp &x; &#; &#x;\n&#987654321;\n&#abcdef0;\n&ThisIsNotDefined; &hi?;\n", "<p>&amp;nbsp &amp;x; &amp;#; &amp;#x;\n&amp;#987654321;\n&amp;#abcdef0;\n&amp;ThisIsNotDefined; &amp;hi?;</p>\n"},
 	{"spec312", "&#35; &#1234; &#992; &#0;\n", "<p># Ӓ Ϡ �</p>\n"},
 	{"spec311", "&nbsp; &amp; &copy; &AElig; &Dcaron;\n&frac34; &HilbertSpace; &DifferentialD;\n&ClockwiseContourIntegral; &ngE;\n", "<p>  &amp; © Æ Ď\n¾ ℋ ⅆ\n∲ ≧̸</p>\n"},

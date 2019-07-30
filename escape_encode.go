@@ -33,7 +33,7 @@ func escapeHTML(html string) string {
 }
 
 func unescapeString(str string) string {
-	str = html.UnescapeString(str)
+	str = html.UnescapeString(str) // FIXME: 此处应该用内部的实体转义方式
 	runes := []rune(str)
 
 	var retRunes []rune

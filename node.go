@@ -282,7 +282,7 @@ const (
 	NodeEmphasis
 	NodeStrong
 	NodeDelete
-	NodeInlineCode
+	NodeCodeSpan
 	NodeHardBreak
 	NodeSoftBreak
 	NodeLink
@@ -323,10 +323,6 @@ type Strong struct {
 }
 
 type Delete struct {
-	*BaseNode
-}
-
-type InlineCode struct {
 	*BaseNode
 }
 

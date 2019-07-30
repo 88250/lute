@@ -160,7 +160,7 @@ func (s *scanner) run() {
 			s.newItem(itemAmpersand)
 		case ';' == r:
 			s.newItem(itemSemicolon)
-		case unicode.IsSymbol(r), unicode.IsPunct(r):
+		case unicode.IsSymbol(r), unicode.IsPunct(r), unicode.IsSpace(r):
 			s.newItem(itemStr)
 		case unicode.IsControl(r):
 			s.newItem(itemControl)
@@ -171,12 +171,10 @@ func (s *scanner) run() {
 			for {
 				switch {
 				case unicode.IsLetter(r), unicode.IsNumber(r):
-					// absorb
 					r = s.next()
 				default:
 					s.backup()
 					s.newItem(itemStr)
-
 					break str
 				}
 			}

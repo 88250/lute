@@ -53,7 +53,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			case itemBackslash:
 				n = t.parseBackslash(tokens)
 			case itemBacktick:
-				n = t.parseInlineCode(tokens)
+				n = t.parseCodeSpan(tokens)
 			case itemAsterisk, itemUnderscore:
 				t.handleDelim(block, tokens)
 			case itemNewline:
@@ -368,41 +368,6 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 	return
 }
 
-func (t *Tree) parseInlineCode(tokens items) (ret Node) {
-	startPos := t.context.pos
-	marker := tokens[startPos]
-	n := tokens[startPos:].accept(marker.typ)
-	endPos := t.matchEnd(tokens[startPos+n:], marker, n)
-	if 1 > endPos {
-		marker.typ = itemStr
-		t.context.pos++
-		ret = &Text{&BaseNode{typ: NodeText, rawText: marker.val, value: marker.val}}
-		return
-	}
-	endPos = startPos + endPos + n
-
-	var textTokens = items{}
-	for i := startPos + n; i < len(tokens) && i < endPos; i++ {
-		token := tokens[i]
-		if token.isNewline() {
-			textTokens = append(textTokens, tSpace)
-		} else {
-			textTokens = append(textTokens, token)
-		}
-	}
-
-	if 2 < len(textTokens) && textTokens[0].isSpace() && textTokens[len(textTokens)-1].isSpace() && !textTokens.isBlankLine() {
-		textTokens = textTokens[1:]
-		textTokens = textTokens[:len(textTokens)-1]
-	}
-
-	baseNode := &BaseNode{typ: NodeInlineCode, tokens: textTokens, value: textTokens.rawText()}
-	ret = &InlineCode{baseNode}
-	t.context.pos = endPos + n
-
-	return
-}
-
 func (t *Tree) parseText(tokens items) (ret Node) {
 	token := tokens[t.context.pos]
 	t.context.pos++
@@ -456,15 +421,4 @@ func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 	}
 
 	return
-}
-
-func (t *Tree) matchEnd(tokens items, openMarker *item, num int) (pos int) {
-	for ; pos < len(tokens); pos++ {
-		len := tokens[pos:].accept(openMarker.typ)
-		if num <= len {
-			return pos
-		}
-	}
-
-	return -1
 }

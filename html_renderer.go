@@ -26,7 +26,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeRoot] = ret.renderRoot
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
-	ret.rendererFuncs[NodeInlineCode] = ret.renderInlineCode
+	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
@@ -116,7 +116,7 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderInlineCode(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderCodeSpan(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.WriteString("<code>" + escapeHTML(node.Value()))
 

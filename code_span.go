@@ -1,0 +1,77 @@
+// Lute - A structured markdown engine.
+// Copyright (C) 2019-present, b3log.org
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package lute
+
+type CodeSpan struct {
+	*BaseNode
+}
+
+func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
+	startPos := t.context.pos
+	marker := tokens[startPos]
+	n := tokens[startPos:].accept(marker.typ)
+	endPos := t.matchEnd(tokens[startPos+n:], marker, n)
+	if 1 > endPos {
+		marker.typ = itemStr
+		t.context.pos++
+		ret = &Text{&BaseNode{typ: NodeText, rawText: marker.val, value: marker.val}}
+		return
+	}
+	endPos = startPos + endPos + n
+
+	var textTokens = items{}
+	for i := startPos + n; i < len(tokens) && i < endPos; i++ {
+		token := tokens[i]
+		if token.isNewline() {
+			textTokens = append(textTokens, tSpace)
+		} else {
+			textTokens = append(textTokens, token)
+		}
+	}
+
+	if 2 < len(textTokens) && textTokens[0].isSpace() && textTokens[len(textTokens)-1].isSpace() && !textTokens.isBlankLine() {
+		textTokens = textTokens[1:]
+		textTokens = textTokens[:len(textTokens)-1]
+	}
+
+	baseNode := &BaseNode{typ: NodeCodeSpan, tokens: textTokens, value: textTokens.rawText()}
+	ret = &CodeSpan{baseNode}
+	t.context.pos = endPos + n
+
+	return
+}
+
+func (t *Tree) matchEnd(tokens items, openMarker *item, num int) (pos int) {
+	length := len(tokens)
+	for ; pos < length; {
+		len := tokens[pos:].accept(openMarker.typ)
+		if num == len {
+			next := pos + len
+			if length-1 > next && itemBacktick == tokens[next].typ {
+				continue
+			}
+
+			return pos
+		}
+		if 0 < len {
+			pos += len
+		} else {
+			pos++
+		}
+	}
+
+	return -1
+}
