@@ -215,9 +215,9 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		var passed, remains items
 		if isLink, passed, remains = tokens[t.context.pos:].spnl(); isLink {
 			t.context.pos += len(passed)
-			if passed, remains, dest = t.context.parseLinkDest(remains[1:]); "" != dest {
+			if passed, remains, dest = t.context.parseLinkDest(remains); "" != dest {
 				t.context.pos += len(passed)
-				if remains[0].isWhitespace() { // make sure there's a space before the title
+				if remains[0].isWhitespace() { // 跟空格的话后续尝试按 title 解析
 					t.context.pos++
 					if isLink, passed, remains = remains.spnl(); isLink {
 						t.context.pos += len(passed)
@@ -232,6 +232,9 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 							}
 						}
 					}
+				} else { // 没有 title
+					t.context.pos--
+					matched = true
 				}
 			}
 		}

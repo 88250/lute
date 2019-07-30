@@ -86,7 +86,7 @@ func (context *Context) parseLinkRefDef(line items) items {
 }
 
 func (context *Context) parseLinkText(tokens items) (ret, remains items, text string) {
-    // TODO parseLinkText
+	// TODO parseLinkText
 	return
 }
 
@@ -151,9 +151,9 @@ func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens item
 }
 
 func (context *Context) parseLinkDest(tokens items) (ret, remains items, destination string) {
-	ret, remains, destination = context.parseLinkDest1(tokens)
+	ret, remains, destination = context.parseLinkDest1(tokens) // <autolink>
 	if nil == ret {
-		ret, remains, destination = context.parseLinkDest2(tokens)
+		ret, remains, destination = context.parseLinkDest2(tokens) // [label](/url)
 	}
 	if nil != ret {
 		destination = encodeDestination(unescapeString(destination))
@@ -164,9 +164,14 @@ func (context *Context) parseLinkDest(tokens items) (ret, remains items, destina
 
 func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destination string) {
 	remains = tokens
-	var leftParens, rightParens int
-	i := 0
 	length := len(tokens)
+	if 1 > length {
+		return
+	}
+
+	startWithParen := false
+	var openParens int
+	i := 0
 	for ; i < length; i++ {
 		token := tokens[i]
 		ret = append(ret, token)
@@ -178,20 +183,32 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 		}
 
 		if itemOpenParen == token.typ && !tokens.isBackslashEscape(i) {
-			leftParens++
+			openParens++
 		}
 		if itemCloseParen == token.typ && !tokens.isBackslashEscape(i) {
-			rightParens++
+			openParens--
+			if 1 > openParens {
+				break
+			}
 		}
 	}
 
-	if leftParens != rightParens {
-		ret = nil
-		destination = ""
-		return
+	if itemOpenParen == tokens[0].typ {
+		destination = destination[1:]
+		startWithParen = true
 	}
 
 	remains = tokens[i:]
+	if length > i {
+		if itemCloseParen == tokens[i].typ && startWithParen {
+			destination = destination[:len(destination)-1]
+			remains = remains[1:]
+		} else if !tokens[i].isWhitespace() {
+			ret = nil
+			destination = ""
+			return
+		}
+	}
 
 	return
 }
