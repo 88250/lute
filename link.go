@@ -20,3 +20,53 @@ type Link struct {
 	Destination string
 	Title       string
 }
+
+func (context *Context) parseInlineLinkDest(tokens items) (ret, remains items, destination string) {
+	remains = tokens
+	length := len(tokens)
+	if 3 > length {
+		return
+	}
+
+	if itemOpenParen != tokens[0].typ {
+		return
+	}
+
+	var openParens int
+	i := 0
+	for ; i < length; i++ {
+		token := tokens[i]
+		ret = append(ret, token)
+		destination += token.val
+		if token.isWhitespace() || token.isControl() {
+			destination = destination[:len(destination)-1]
+			ret = ret[:len(ret)-1]
+			break
+		}
+		if itemOpenParen == token.typ && !tokens.isBackslashEscape(i) {
+			openParens++
+		}
+		if itemCloseParen == token.typ && !tokens.isBackslashEscape(i) {
+			openParens--
+			if 1 > openParens {
+				destination = destination[:len(destination)-1]
+				break
+			}
+		}
+	}
+
+	remains = tokens[i:]
+	if length > i && (itemCloseParen != tokens[i].typ && itemSpace != tokens[i].typ) {
+		ret = nil
+		destination = ""
+		return
+	}
+
+	destination = destination[1:]
+
+	if nil != ret {
+		destination = encodeDestination(unescapeString(destination))
+	}
+
+	return
+}

@@ -215,9 +215,9 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		var passed, remains items
 		if isLink, passed, remains = tokens[t.context.pos:].spnl(); isLink {
 			t.context.pos += len(passed)
-			if passed, remains, dest = t.context.parseLinkDest(remains); "" != dest {
+			if passed, remains, dest = t.context.parseInlineLinkDest(remains); "" != dest {
 				t.context.pos += len(passed)
-				if remains[0].isWhitespace() { // 跟空格的话后续尝试按 title 解析
+				if 0 < len(remains) && remains[0].isWhitespace() { // 跟空格的话后续尝试按 title 解析
 					t.context.pos++
 					if isLink, passed, remains = remains.spnl(); isLink {
 						t.context.pos += len(passed)

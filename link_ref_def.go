@@ -85,11 +85,6 @@ func (context *Context) parseLinkRefDef(line items) items {
 	return remains
 }
 
-func (context *Context) parseLinkText(tokens items) (ret, remains items, text string) {
-	// TODO parseLinkText
-	return
-}
-
 func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, remains items, title string) {
 	if 1 > len(tokens) {
 		return true, nil, tokens, ""
@@ -169,7 +164,6 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 		return
 	}
 
-	startWithParen := false
 	var openParens int
 	i := 0
 	for ; i < length; i++ {
@@ -188,26 +182,17 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 		if itemCloseParen == token.typ && !tokens.isBackslashEscape(i) {
 			openParens--
 			if 1 > openParens {
+				i++
 				break
 			}
 		}
 	}
 
-	if itemOpenParen == tokens[0].typ {
-		destination = destination[1:]
-		startWithParen = true
-	}
-
 	remains = tokens[i:]
-	if length > i {
-		if itemCloseParen == tokens[i].typ && startWithParen {
-			destination = destination[:len(destination)-1]
-			remains = remains[1:]
-		} else if !tokens[i].isWhitespace() {
-			ret = nil
-			destination = ""
-			return
-		}
+	if length > i && !tokens[i].isWhitespace() {
+		ret = nil
+		destination = ""
+		return
 	}
 
 	return
