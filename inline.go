@@ -226,10 +226,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 							t.context.pos += len(passed)
 							isLink, passed, remains = remains.spnl()
 							t.context.pos += len(passed)
-							if isLink && itemCloseParen == remains[0].typ {
-								t.context.pos++
-								matched = true
-							}
+							matched = isLink && itemCloseParen == remains[0].typ
 						}
 					}
 				} else { // 没有 title
