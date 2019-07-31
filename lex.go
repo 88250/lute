@@ -106,12 +106,7 @@ func (s *scanner) run() {
 		case '~' == r:
 			s.newItem(itemTilde)
 		case '!' == r:
-			if '[' == s.next() {
-				s.newItem(itemBangOpenBracket)
-			} else {
-				s.backup()
-				s.newItem(itemStr)
-			}
+			s.newItem(itemBang)
 		case '#' == r:
 			s.newItem(itemCrosshatch)
 		case '*' == r:

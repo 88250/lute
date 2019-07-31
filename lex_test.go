@@ -35,7 +35,7 @@ var lexTests = []lexTest{
 
 	{"simple15", "$%@#&", items{makeItem(itemStr, "$"), makeItem(itemStr, "%"), makeItem(itemStr, "@"), tCrosshatch, tAmpersand, tEOF}},
 	{"simple14", "<a href=\"\">lute</a>", items{tLess, makeItem(itemStr, "a"), tSpace, makeItem(itemStr, "href"), tEqual, tDoublequote, tDoublequote, tGreater, makeItem(itemStr, "lute"), tLess, tSlash, makeItem(itemStr, "a"), tGreater, tEOF}},
-	{"simple13", "![lute]()", items{tBangOpenBracket, makeItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
+	{"simple13", "![lute]()", items{tBangOpenBracket, tOpenBracket, makeItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
 	{"simple12", "[lute]()", items{tOpenBracket, makeItem(itemStr, "lute"), tCloseBracket, tOpenParen, tCloseParan, tEOF}},
 	{"simple11", "`lu\nte`", items{tBacktick, makeItem(itemStr, "lu"), tNewLine, makeItem(itemStr, "te"), tBacktick, tEOF}},
 	{"simple10", "# lute", items{makeItem(itemCrosshatch, "#"), tSpace, makeItem(itemStr, "lute"), tEOF}},
