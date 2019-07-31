@@ -99,10 +99,6 @@ func (t *Tree) parseTagAttr(tokens items) (remains, attr items) {
 
 	var valSpec items
 	tokens, valSpec = t.parseAttrValSpec(tokens)
-	if 1 > len(valSpec) {
-		return
-	}
-
 	remains = tokens
 	attr = append(attr, whitespaces...)
 	attr = append(attr, attrName...)
