@@ -29,13 +29,14 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
-	//{"spec520", "[foo <bar attr=\"](baz)\">\n", "<p>[foo <bar attr=\"](baz)\"></p>\n"},
-	//{"spec516", "![[[foo](uri1)](uri2)](uri3)\n", "<p><img src=\"uri3\" alt=\"[foo](uri2)\" /></p>\n"},
-	//{"spec513", "[![moon](moon.jpg)](/uri)\n", "<p><a href=\"/uri\"><img src=\"moon.jpg\" alt=\"moon\" /></a></p>\n"},
-	//{"spec506", "[link](   /uri\n  \"title\"  )\n", "<p><a href=\"/uri\" title=\"title\">link</a></p>\n"},
-	//{"spec501", "[link](/url \"title\")\n[link](/url 'title')\n[link](/url (title))\n", "<p><a href=\"/url\" title=\"title\">link</a>\n<a href=\"/url\" title=\"title\">link</a>\n<a href=\"/url\" title=\"title\">link</a></p>\n"},
-	//{"spec491", "[a](<b)c\n[a](<b)c>\n[a](<b>c)\n", "<p>[a](&lt;b)c\n[a](&lt;b)c&gt;\n[a](<b>c)</p>\n"},
-	//{"spec490", "[link](<foo\\>)\n", "<p>[link](&lt;foo&gt;)</p>\n"},
+	{"spec523", "[foo][bar]\n\n[bar]: /url \"title\"\n", "<p><a href=\"/url\" title=\"title\">foo</a></p>\n"},
+	{"spec520", "[foo <bar attr=\"](baz)\">\n", "<p>[foo <bar attr=\"](baz)\"></p>\n"},
+	{"spec516", "![[[foo](uri1)](uri2)](uri3)\n", "<p><img src=\"uri3\" alt=\"[foo](uri2)\" /></p>\n"},
+	{"spec513", "[![moon](moon.jpg)](/uri)\n", "<p><a href=\"/uri\"><img src=\"moon.jpg\" alt=\"moon\" /></a></p>\n"},
+	{"spec506", "[link](   /uri\n  \"title\"  )\n", "<p><a href=\"/uri\" title=\"title\">link</a></p>\n"},
+	{"spec501", "[link](/url \"title\")\n[link](/url 'title')\n[link](/url (title))\n", "<p><a href=\"/url\" title=\"title\">link</a>\n<a href=\"/url\" title=\"title\">link</a>\n<a href=\"/url\" title=\"title\">link</a></p>\n"},
+	{"spec491", "[a](<b)c\n[a](<b)c>\n[a](<b>c)\n", "<p>[a](&lt;b)c\n[a](&lt;b)c&gt;\n[a](<b>c)</p>\n"},
+	{"spec490", "[link](<foo\\>)\n", "<p>[link](&lt;foo&gt;)</p>\n"},
 	{"spec488", "[link](<foo\nbar>)\n", "<p>[link](<foo\nbar>)</p>\n"},
 	{"spec484", "[link](<>)\n", "<p><a href=\"\">link</a></p>\n"},
 	{"spec483", "[link]()\n", "<p><a href=\"\">link</a></p>\n"},
