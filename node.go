@@ -201,7 +201,7 @@ func (n *BaseNode) Value() string {
 	return n.value
 }
 
-func (n*BaseNode) SetValue(value string) {
+func (n *BaseNode) SetValue(value string) {
 	n.value = value
 }
 
@@ -332,10 +332,4 @@ type HardBreak struct {
 
 type SoftBreak struct {
 	*BaseNode
-}
-
-type Image struct {
-	*BaseNode
-	Destination string
-	Title       string
 }

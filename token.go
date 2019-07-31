@@ -129,32 +129,32 @@ type itemType int
 
 // Make the types pretty print.
 var itemName = map[itemType]string{
-	itemEOF:             "EOF",
-	itemStr:             "str",
-	itemBacktick:        "`",
-	itemTilde:           "~",
-	itemBangOpenBracket: "![",
-	itemCrosshatch:      "#",
-	itemAsterisk:        "*",
-	itemOpenParen:       "(",
-	itemCloseParen:      ")",
-	itemHyphen:          "-",
-	itemUnderscore:      "_",
-	itemPlus:            "+",
-	itemTab:             "tab",
-	itemOpenBracket:     "[",
-	itemCloseBracket:    "]",
-	itemDoublequote:     "\"",
-	itemSinglequote:     "'",
-	itemLess:            "<",
-	itemGreater:         ">",
-	itemSpace:           "space",
-	itemNewline:         "newline",
-	itemDot:             ".",
-	itemColon:           ":",
-	itemQuestion:        "?",
-	itemAmpersand:       "&",
-	itemSemicolon:       ";",
+	itemEOF:          "EOF",
+	itemStr:          "str",
+	itemBacktick:     "`",
+	itemTilde:        "~",
+	itemBang:         "!",
+	itemCrosshatch:   "#",
+	itemAsterisk:     "*",
+	itemOpenParen:    "(",
+	itemCloseParen:   ")",
+	itemHyphen:       "-",
+	itemUnderscore:   "_",
+	itemPlus:         "+",
+	itemTab:          "tab",
+	itemOpenBracket:  "[",
+	itemCloseBracket: "]",
+	itemDoublequote:  "\"",
+	itemSinglequote:  "'",
+	itemLess:         "<",
+	itemGreater:      ">",
+	itemSpace:        "space",
+	itemNewline:      "newline",
+	itemDot:          ".",
+	itemColon:        ":",
+	itemQuestion:     "?",
+	itemAmpersand:    "&",
+	itemSemicolon:    ";",
 }
 
 func (i itemType) String() string {
@@ -167,35 +167,35 @@ func (i itemType) String() string {
 }
 
 const (
-	itemEOF             itemType = iota // EOF
-	itemStr                             // plain text
-	itemBacktick                        // `
-	itemTilde                           // ~
-	itemBangOpenBracket                 // ![
-	itemCrosshatch                      // #
-	itemAsterisk                        // *
-	itemOpenParen                       // (
-	itemCloseParen                      // )
-	itemHyphen                          // -
-	itemUnderscore                      // _
-	itemPlus                            // +
-	itemEqual                           // =
-	itemTab                             // \t
-	itemOpenBracket                     // [
-	itemCloseBracket                    // ]
-	itemDoublequote                     // "
-	itemSinglequote                     // '
-	itemLess                            // <
-	itemGreater                         // >
-	itemSpace                           // space
-	itemNewline                         // \n
-	itemBackslash                       // \
-	itemSlash                           // /
-	itemDot                             // .
-	itemColon                           // :
-	itemQuestion                        // ?
-	itemAmpersand                       // &
-	itemSemicolon                       // ;
+	itemEOF          itemType = iota // EOF
+	itemStr                          // plain text
+	itemBacktick                     // `
+	itemTilde                        // ~
+	itemBang                         // !
+	itemCrosshatch                   // #
+	itemAsterisk                     // *
+	itemOpenParen                    // (
+	itemCloseParen                   // )
+	itemHyphen                       // -
+	itemUnderscore                   // _
+	itemPlus                         // +
+	itemEqual                        // =
+	itemTab                          // \t
+	itemOpenBracket                  // [
+	itemCloseBracket                 // ]
+	itemDoublequote                  // "
+	itemSinglequote                  // '
+	itemLess                         // <
+	itemGreater                      // >
+	itemSpace                        // space
+	itemNewline                      // \n
+	itemBackslash                    // \
+	itemSlash                        // /
+	itemDot                          // .
+	itemColon                        // :
+	itemQuestion                     // ?
+	itemAmpersand                    // &
+	itemSemicolon                    // ;
 	itemControl
 )
 
@@ -209,7 +209,7 @@ var (
 	tHypen           = makeItem(itemHyphen, "-")
 	tUnderscore      = makeItem(itemUnderscore, "_")
 	tPlus            = makeItem(itemPlus, "+")
-	tBangOpenBracket = makeItem(itemBangOpenBracket, "![")
+	tBangOpenBracket = makeItem(itemBang, "!")
 	tOpenBracket     = makeItem(itemOpenBracket, "[")
 	tCloseBracket    = makeItem(itemCloseBracket, "]")
 	tOpenParen       = makeItem(itemOpenParen, "(")
