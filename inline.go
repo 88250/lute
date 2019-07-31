@@ -69,6 +69,8 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 				n = t.parseCloseBracket(tokens)
 			case itemAmpersand:
 				n = t.parseEntity(tokens)
+			case itemBang:
+				n = t.parseBang(tokens)
 			default:
 				n = t.parseText(tokens)
 			}
