@@ -29,6 +29,7 @@ type Renderer struct {
 	writer        strings.Builder
 	lastOut       string
 	rendererFuncs map[NodeType]RendererFunc
+	disableTags   int
 }
 
 func (r *Renderer) Render(n Node) error {

@@ -49,35 +49,39 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Image)
 	var out string
 	if entering {
-		out = "<img src=\"" + escapeHTML(n.Destination) + "\" alt=\""
-		r.WriteString(out)
+		if 0 == r.disableTags {
+			out = "<img src=\"" + escapeHTML(n.Destination) + "\" alt=\""
+			r.WriteString(out)
+		}
+		r.disableTags++
 		return WalkContinue, nil
 	}
 
-	out = "\""
-	if "" != n.Title {
-		out = " title=\"" + escapeHTML(n.Title) + "\""
+	r.disableTags--
+	if 0 == r.disableTags {
+		out = "\""
+		if "" != n.Title {
+			out = " title=\"" + escapeHTML(n.Title) + "\""
+		}
+		out += " />"
+		r.WriteString(out)
 	}
-	out += " />"
-	r.WriteString(out)
-
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderLink(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*Link)
-		out := "<a href=\"" + escapeHTML(n.Destination) + "\""
+		attrs := [][]string{{"href", n.Destination}}
 		if "" != n.Title {
-			out += " title=\"" + escapeHTML(n.Title) + "\""
+			attrs = append(attrs, []string{"title", escapeHTML(n.Title)})
 		}
-		out += ">"
-		r.WriteString(out)
+		r.tag("a", attrs, false)
 
 		return WalkContinue, nil
 	}
 
-	r.WriteString("</a>")
+	r.tag("/a", nil, false)
 
 	return WalkContinue, nil
 }
@@ -117,9 +121,9 @@ func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error)
 
 	if entering {
 		r.Newline()
-		r.WriteString("<p>")
+		r.tag("p", nil, false)
 	} else {
-		r.WriteString("</p>")
+		r.tag("/p", nil, false)
 		r.Newline()
 	}
 
@@ -214,16 +218,16 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 	}
 	if entering {
 		r.Newline()
-		r.WriteString("<" + tag)
+		attrs := [][]string{{"start", fmt.Sprintf("%d", n.start)}}
 		if "" == n.bulletChar && 1 != n.start {
-			r.WriteString(fmt.Sprintf(" start=\"%d\">", n.start))
+			r.tag(tag, attrs, false)
 		} else {
-			r.WriteString(">")
+			r.tag(tag, nil, false)
 		}
 		r.Newline()
 	} else {
 		r.Newline()
-		r.WriteString("</" + tag + ">")
+		r.tag("/"+tag, nil, false)
 		r.Newline()
 	}
 	return WalkContinue, nil
@@ -231,9 +235,9 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 
 func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<li>")
+		r.tag("li", nil, false)
 	} else {
-		r.WriteString("</li>")
+		r.tag("/li", nil, false)
 		r.Newline()
 	}
 	return WalkContinue, nil
@@ -242,7 +246,7 @@ func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) 
 func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.Newline()
-		r.WriteString("<hr />")
+		r.tag("hr", nil, true)
 		r.Newline()
 	}
 
@@ -251,7 +255,7 @@ func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus, er
 
 func (r *Renderer) renderHardBreak(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<br />")
+		r.tag("br", nil, true)
 		r.Newline()
 	}
 
@@ -264,4 +268,21 @@ func (r *Renderer) renderSoftBreak(node Node, entering bool) (WalkStatus, error)
 	}
 
 	return WalkContinue, nil
+}
+
+func (r *Renderer) tag(name string, attrs [][]string, selfclosing bool) {
+	if r.disableTags > 0 {
+		return
+	}
+
+	r.WriteString("<" + name)
+	if 0 < len(attrs) {
+		for _, attr := range attrs {
+			r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
+		}
+	}
+	if selfclosing {
+		r.WriteString(" /")
+	}
+	r.WriteString(">")
 }
