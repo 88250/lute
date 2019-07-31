@@ -77,6 +77,7 @@ func encodeDestination(destination string) (ret string) {
 	ret = strings.ReplaceAll(ret, "%28", "(")
 	ret = strings.ReplaceAll(ret, "%29", ")")
 	ret = strings.ReplaceAll(ret, "%2A", "*")
+	ret = strings.ReplaceAll(ret, "%23", "#")
 
 	return
 }

@@ -380,20 +380,35 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 }
 
 func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
-	tag := tokens[t.context.pos:]
-	tag = tag[:tag.index(itemGreater)+1]
-	if 1 > len(tag) {
-		token := tokens[t.context.pos]
-		ret = &Text{&BaseNode{typ: NodeText, rawText: token.val, value: token.val}}
-		t.context.pos++
+	startPos := t.context.pos
 
+	codeTokens := items{tokens[startPos]}
+	var closed bool
+	var token *item
+	tag := tokens[startPos+1:]
+	for _, token = range tag {
+		codeTokens = append(codeTokens, token)
+		if itemGreater == token.typ {
+			closed = true
+			break
+		}
+		if token.isWhitespace() || itemEqual == token.typ || itemDoublequote == token.typ ||
+			itemSlash == token.typ || itemBacktick == token.typ || itemAsterisk == token.typ || itemUnderscore == token.typ {
+			continue
+		}
+
+		if !token.isASCIILetterNumHyphen() {
+			ret = &Text{&BaseNode{typ: NodeText, rawText: "<", value: "<"}}
+			t.context.pos = startPos + 1
+			return
+		}
+	}
+	if !closed {
+		ret = &Text{&BaseNode{typ: NodeText, rawText: "<", value: "<"}}
+		t.context.pos = startPos + 1
 		return
 	}
 
-	codeTokens := items{}
-	for _, token := range tag {
-		codeTokens = append(codeTokens, token)
-	}
 	t.context.pos += len(codeTokens)
 
 	baseNode := &BaseNode{typ: NodeInlineHTML, tokens: codeTokens, value: codeTokens.rawText()}
