@@ -306,10 +306,6 @@ type TableCell struct {
 	*Tree
 }
 
-type InlineHTML struct {
-	*BaseNode
-}
-
 type Text struct {
 	*BaseNode
 }
