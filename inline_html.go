@@ -25,8 +25,8 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 
 	var tags items
 	tags = append(tags, tokens[startPos])
-	if itemSlash == tokens[startPos + 1].typ { // a closing tag
-		tags = append(tags, tokens[startPos + 1])
+	if itemSlash == tokens[startPos+1].typ { // a closing tag
+		tags = append(tags, tokens[startPos+1])
 		remains, tagName := t.parseTagName(tokens[t.context.pos+2:])
 		if 1 > len(tagName) {
 			t.context.pos++
@@ -54,15 +54,24 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 		}
 	}
 
-	if itemGreater != tokens[0].typ {
+	length := len(tokens)
+	if 1 > length {
 		t.context.pos = startPos + 1
 		return
 	}
 
-	tags = append(tags, tokens[0])
-	t.context.pos += len(tags)
-	ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
+	if (itemGreater == tokens[0].typ) ||
+		(1 < length && itemSlash == tokens[0].typ && itemGreater == tokens[1].typ) {
+		tags = append(tags, tokens[0])
+		if itemSlash == tokens[0].typ {
+			tags = append(tags, tokens[1])
+		}
+		t.context.pos += len(tags)
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
+		return
+	}
 
+	t.context.pos = startPos + 1
 	return
 }
 
