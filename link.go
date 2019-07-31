@@ -15,6 +15,8 @@
 
 package lute
 
+import "strings"
+
 type Link struct {
 	*BaseNode
 	Destination string
@@ -66,11 +68,17 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 	} else {
 		var openParens int
 		i := 0
+		destStarted := false
 		for ; i < length; i++ {
 			token := tokens[i]
 			passed = append(passed, token)
 			destination += token.val
-			if token.isWhitespace() || token.isControl() {
+			if !destStarted && !token.isWhitespace() && 0 < i {
+				destStarted = true
+				destination = destination[1:]
+				destination = strings.TrimSpace(destination)
+			}
+			if destStarted && (token.isWhitespace() || token.isControl()) {
 				destination = destination[:len(destination)-1]
 				passed = passed[:len(passed)-1]
 				break
@@ -88,13 +96,11 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		}
 
 		remains = tokens[i:]
-		if length > i && (itemCloseParen != tokens[i].typ && itemSpace != tokens[i].typ) {
+		if length > i && (itemCloseParen != tokens[i].typ && itemSpace != tokens[i].typ && itemNewline != tokens[i].typ) {
 			passed = nil
 			destination = ""
 			return
 		}
-
-		destination = destination[1:]
 	}
 
 	if nil != passed {
