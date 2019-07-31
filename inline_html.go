@@ -20,32 +20,36 @@ type InlineHTML struct {
 }
 
 func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
-	ret = &Text{&BaseNode{typ: NodeText, rawText: "<", value: "<"}}
 	startPos := t.context.pos
+	ret = &Text{&BaseNode{typ: NodeText, rawText: "<", value: "<"}}
 
-	remains, tagName := t.parseTagName(tokens[startPos+1:])
-	if "" == tagName {
+	var tags items
+	tags = append(tags, tokens[startPos])
+	remains, tagName := t.parseTagName(tokens[t.context.pos+1:])
+	if 1 > len(tagName) {
+		t.context.pos++
 		return
 	}
 
-	var tags items
+	tags = append(tags, tagName...)
 	tokens = remains
 	var attr items
 	for {
 		remains, attr = t.parseTagAttr(tokens)
+		tokens = remains
+		tags = append(tags, attr...)
 		if 1 > len(attr) {
 			break
 		}
-		tokens = remains
-		tags = append(tags, attr...)
 	}
 
-	if 1 > len(tags) {
-		t.context.pos = startPos
-	} else {
-		t.context.pos += len(tags)
+	if itemGreater != tokens[0].typ {
+		t.context.pos = startPos + 1
+		return
 	}
-	
+
+	tags = append(tags, tokens[0])
+	t.context.pos += len(tags)
 	ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
 
 	return
@@ -102,7 +106,7 @@ func (t *Tree) parseAttrValSpec(tokens items) (remains, valSpec items) {
 		return
 	}
 	valSpec = append(valSpec, token)
-	tokens = tokens[i:]
+	tokens = tokens[i+1:]
 	for i, token = range tokens {
 		if !token.isWhitespace() {
 			break
@@ -111,31 +115,31 @@ func (t *Tree) parseAttrValSpec(tokens items) (remains, valSpec items) {
 	}
 	token = tokens[i]
 	valSpec = append(valSpec, token)
-	tokens = tokens[i:]
+	tokens = tokens[i+1:]
 	if itemDoublequote == token.typ { // A double-quoted attribute value consists of ", zero or more characters not including ", and a final ".
 		for i, token = range tokens {
+			valSpec = append(valSpec, token)
 			if itemDoublequote == token.typ {
 				break
 			}
-			valSpec = append(valSpec, token)
 		}
 	} else if itemSinglequote == token.typ { // A single-quoted attribute value consists of ', zero or more characters not including ', and a final '.
 		for i, token = range tokens {
+			valSpec = append(valSpec, token)
 			if itemSinglequote == token.typ {
 				break
 			}
-			valSpec = append(valSpec, token)
 		}
 	} else { // An unquoted attribute value is a nonempty string of characters not including whitespace, ", ', =, <, >, or `.
 		for i, token = range tokens {
+			valSpec = append(valSpec, token)
 			if token.isWhitespace() || itemDoublequote == token.typ || itemSinglequote == token.typ || itemEqual == token.typ || itemLess == token.typ || itemGreater == token.typ || itemBacktick == token.typ {
 				break
 			}
-			valSpec = append(valSpec, token)
 		}
 	}
 
-	remains = tokens[i:]
+	remains = tokens[i+1:]
 
 	return
 }
@@ -146,41 +150,36 @@ func (t *Tree) parseAttrName(tokens items) (remains, attrName items) {
 		return
 	}
 	attrName = append(attrName, tokens[0])
-	var retRemains items
-	retRemains = append(retRemains, tokens[0])
 	tokens = tokens[1:]
 	var i int
 	var token *item
 	for i, token = range tokens {
 		if !token.isASCIILetterNumHyphen() && itemUnderscore != token.typ && itemDot != token.typ && itemColon != token.typ {
-			attrName = nil
-			return
+			break
 		}
-		retRemains = append(retRemains, token)
 		attrName = append(attrName, token)
 	}
-	remains = retRemains
+	if 1 > len(attrName) {
+		return
+	}
+
+	remains = tokens[i:]
 
 	return
 }
 
-func (t *Tree) parseTagAttrSpec(tokens items) (remains items, spec string) {
-
-}
-
-func (t *Tree) parseTagName(tokens items) (remains items, tagName string) {
-	var name string
+func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
 	var i int
 	var token *item
 	for i, token = range tokens {
 		if !token.isASCIILetterNumHyphen() {
-			return
+			break
 		}
 
-		name += token.val
-		t.context.pos++
+		tagName = append(tagName, token)
 	}
 
-	tagName = name
 	remains = tokens[i:]
+
+	return
 }
