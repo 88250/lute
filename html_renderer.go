@@ -40,8 +40,28 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeHTML] = ret.renderHTML
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
+	ret.rendererFuncs[NodeImage] = ret.renderImage
 
 	return
+}
+
+func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
+	n := node.(*Image)
+	var out string
+	if entering {
+		out = "<img src=\"" + escapeHTML(n.Destination) + "\" alt=\""
+		r.WriteString(out)
+		return WalkContinue, nil
+	}
+
+	out = "\""
+	if "" != n.Title {
+		out = " title=\"" + escapeHTML(n.Title) + "\""
+	}
+	out += " />"
+	r.WriteString(out)
+
+	return WalkContinue, nil
 }
 
 func (r *Renderer) renderLink(node Node, entering bool) (WalkStatus, error) {
