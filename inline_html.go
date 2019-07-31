@@ -25,21 +25,32 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 
 	var tags items
 	tags = append(tags, tokens[startPos])
-	remains, tagName := t.parseTagName(tokens[t.context.pos+1:])
-	if 1 > len(tagName) {
-		t.context.pos++
-		return
-	}
-
-	tags = append(tags, tagName...)
-	tokens = remains
-	var attr items
-	for {
-		remains, attr = t.parseTagAttr(tokens)
+	if itemSlash == tokens[startPos + 1].typ { // a closing tag
+		tags = append(tags, tokens[startPos + 1])
+		remains, tagName := t.parseTagName(tokens[t.context.pos+2:])
+		if 1 > len(tagName) {
+			t.context.pos++
+			return
+		}
+		tags = append(tags, tagName...)
 		tokens = remains
-		tags = append(tags, attr...)
-		if 1 > len(attr) {
-			break
+	} else { // an open tag
+		remains, tagName := t.parseTagName(tokens[t.context.pos+1:])
+		if 1 > len(tagName) {
+			t.context.pos++
+			return
+		}
+
+		tags = append(tags, tagName...)
+		tokens = remains
+		var attr items
+		for {
+			remains, attr = t.parseTagAttr(tokens)
+			tokens = remains
+			tags = append(tags, attr...)
+			if 1 > len(attr) {
+				break
+			}
 		}
 	}
 
