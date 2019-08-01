@@ -250,7 +250,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		var n = len(passed)
 		if n > 1 {
 			reflabel = label
-			t.context.pos += n + 2
+			t.context.pos += n + 1
 		} else if !opener.bracketAfter {
 			// Empty or missing second label means to use the first label as the reference.
 			// The reference must not contain a bracket. If we know there's a bracket, we don't even bother checking it.
