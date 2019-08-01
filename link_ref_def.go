@@ -265,6 +265,11 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 			remains = line[i+1:]
 			break
 		}
+		if itemOpenBracket == token.typ && !tokens.isBackslashEscape(i) {
+			passed = nil
+			label = ""
+			return
+		}
 		i++
 	}
 
@@ -273,6 +278,10 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 	}
 
 	label = strings.TrimSpace(label)
+	label = strings.ReplaceAll(label, "\n", " ")
+	for 0 <= strings.Index(label, "  ") {
+		label = strings.ReplaceAll(label, "  ", " ")
+	}
 
 	return
 }
