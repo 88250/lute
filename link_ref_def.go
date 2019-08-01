@@ -19,13 +19,13 @@ import (
 	"strings"
 )
 
-func (context *Context) parseLinkRefDef(line items) items {
-	_, line = line.trimLeft()
-	if 1 > len(line) {
+func (context *Context) parseLinkRefDef(tokens items) items {
+	_, tokens = tokens.trimLeft()
+	if 1 > len(tokens) {
 		return nil
 	}
 
-	linkLabel, remains, label := context.parseLinkLabel(line)
+	linkLabel, remains, label := context.parseLinkLabel(tokens)
 	if nil == linkLabel {
 		return nil
 	}
@@ -41,7 +41,7 @@ func (context *Context) parseLinkRefDef(line items) items {
 		return nil
 	}
 
-	tokens := remains
+	tokens = remains
 	linkDest, remains, destination := context.parseLinkDest(tokens)
 	if nil == linkDest {
 		return nil
@@ -242,7 +242,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 	return
 }
 
-func (context *Context) parseLinkLabel(tokens items) (ret, remains items, label string) {
+func (context *Context) parseLinkLabel(tokens items) (passed, remains items, label string) {
 	length := len(tokens)
 	if 2 > length {
 		return
@@ -257,7 +257,7 @@ func (context *Context) parseLinkLabel(tokens items) (ret, remains items, label 
 	i := 1
 	for {
 		token := line[i]
-		ret = append(ret, token)
+		passed = append(passed, token)
 		label += token.val
 		if itemCloseBracket == token.typ && !tokens.isBackslashEscape(i) {
 			closed = true
@@ -269,7 +269,7 @@ func (context *Context) parseLinkLabel(tokens items) (ret, remains items, label 
 	}
 
 	if !closed || "" == strings.TrimSpace(label) || 999 < len(label) {
-		ret = nil
+		passed = nil
 	}
 
 	label = strings.TrimSpace(label)

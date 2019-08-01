@@ -245,11 +245,12 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 	var reflabel string
 	if !matched {
 		// Next, see if there's a link label
-		var beforelabel = t.context.pos
-		_, _, label := t.context.parseLinkLabel(tokens[t.context.pos:])
-		var n = len(label)
-		if n > 2 {
-			reflabel = tokens[beforelabel:beforelabel+n].rawText()
+		var beforelabel = t.context.pos + 1
+		passed, _, label := t.context.parseLinkLabel(tokens[beforelabel:])
+		var n = len(passed)
+		if n > 1 {
+			reflabel = label
+			t.context.pos += n + 2
 		} else if !opener.bracketAfter {
 			// Empty or missing second label means to use the first label as the reference.
 			// The reference must not contain a bracket. If we know there's a bracket, we don't even bother checking it.
