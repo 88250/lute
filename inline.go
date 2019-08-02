@@ -248,17 +248,16 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		var beforelabel = t.context.pos + 1
 		passed, _, label := t.context.parseLinkLabel(tokens[beforelabel:])
 		var n = len(passed)
-		if n > 1 {
+		if n > 0 { // label 解析出来的话说明满足格式 [text][label]
 			reflabel = label
 			t.context.pos += n + 1
 		} else if !opener.bracketAfter {
-			// Empty or missing second label means to use the first label as the reference.
-			// The reference must not contain a bracket. If we know there's a bracket, we don't even bother checking it.
-			_, reflabel = t.extractTokens(tokens, opener.index, startPos)
-		}
-		if n == 0 {
-			// If shortcut reference link, rewind before spaces we skipped.
-			t.context.pos = savepos
+			// [text][] 或者 [text][] 格式，将第一个 text 视为 label 进行解析
+			passed, reflabel = t.extractTokens(tokens, opener.index, startPos)
+			if len(passed) > 0 && len(tokens) > beforelabel && itemOpenBracket == tokens[beforelabel].typ {
+				// [text][] 格式，跳过 []
+				t.context.pos += 2
+			}
 		}
 
 		if "" != reflabel {
