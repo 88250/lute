@@ -30,7 +30,7 @@ func (t *Tree) parseBang(tokens items) (ret Node) {
 		// Add entry to stack for this opener
 		t.addBracket(ret, startPos+2, true)
 	} else {
-		ret = &Text{&BaseNode{typ: NodeText, value: "!["}}
+		ret = &Text{&BaseNode{typ: NodeText, value: "!"}}
 	}
 	return
 }
