@@ -43,9 +43,13 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 
 		tags = append(tags, tagName...)
 		tokens = remains
-		var attr items
 		for {
-			remains, attr = t.parseTagAttr(tokens)
+			validAttr, remains, attr := t.parseTagAttr(tokens)
+			if !validAttr {
+				t.context.pos++
+				return
+			}
+
 			tokens = remains
 			tags = append(tags, attr...)
 			if 1 > len(attr) {
@@ -77,7 +81,8 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	return
 }
 
-func (t *Tree) parseTagAttr(tokens items) (remains, attr items) {
+func (t *Tree) parseTagAttr(tokens items) (validAttr bool, remains, attr items) {
+	validAttr = true
 	remains = tokens
 	var whitespaces items
 	var i int
@@ -100,7 +105,12 @@ func (t *Tree) parseTagAttr(tokens items) (remains, attr items) {
 	}
 
 	var valSpec items
-	tokens, valSpec = t.parseAttrValSpec(tokens)
+	validValSpec, tokens, valSpec := t.parseAttrValSpec(tokens)
+	if !validValSpec {
+		validAttr = false
+		return
+	}
+
 	remains = tokens
 	attr = append(attr, whitespaces...)
 	attr = append(attr, attrName...)
@@ -109,7 +119,8 @@ func (t *Tree) parseTagAttr(tokens items) (remains, attr items) {
 	return
 }
 
-func (t *Tree) parseAttrValSpec(tokens items) (remains, valSpec items) {
+func (t *Tree) parseAttrValSpec(tokens items) (validValSpec bool, remains, valSpec items) {
+	validValSpec = true
 	remains = tokens
 	var i int
 	var token *item
@@ -135,10 +146,12 @@ func (t *Tree) parseAttrValSpec(tokens items) (remains, valSpec items) {
 	token = tokens[i]
 	valSpec = append(valSpec, token)
 	tokens = tokens[i+1:]
+	closed := false
 	if itemDoublequote == token.typ { // A double-quoted attribute value consists of ", zero or more characters not including ", and a final ".
 		for i, token = range tokens {
 			valSpec = append(valSpec, token)
 			if itemDoublequote == token.typ {
+				closed = true
 				break
 			}
 		}
@@ -146,16 +159,29 @@ func (t *Tree) parseAttrValSpec(tokens items) (remains, valSpec items) {
 		for i, token = range tokens {
 			valSpec = append(valSpec, token)
 			if itemSinglequote == token.typ {
+				closed = true
 				break
 			}
 		}
 	} else { // An unquoted attribute value is a nonempty string of characters not including whitespace, ", ', =, <, >, or `.
 		for i, token = range tokens {
 			valSpec = append(valSpec, token)
-			if token.isWhitespace() || itemDoublequote == token.typ || itemSinglequote == token.typ || itemEqual == token.typ || itemLess == token.typ || itemGreater == token.typ || itemBacktick == token.typ {
+			if token.isWhitespace() {
 				break
 			}
+			if itemDoublequote == token.typ || itemSinglequote == token.typ || itemEqual == token.typ || itemLess == token.typ || itemGreater == token.typ || itemBacktick == token.typ {
+				closed = false
+				break
+			}
+			closed = true
 		}
+
+	}
+
+	if !closed {
+		validValSpec = false
+		valSpec = nil
+		return
 	}
 
 	remains = tokens[i+1:]
