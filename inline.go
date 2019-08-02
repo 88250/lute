@@ -82,8 +82,8 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 				block.AppendChild(block, n)
 			}
 
-			len := len(tokens)
-			if 1 > len || t.context.pos >= len || tokens[t.context.pos].isEOF() {
+			length := len(tokens)
+			if 1 > length || t.context.pos >= length || tokens[t.context.pos].isEOF() {
 				break
 			}
 		}
@@ -151,99 +151,6 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	}
 	t.context.pos += i - start
 	return &Text{&BaseNode{typ: NodeText, value: v}}
-}
-
-func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
-	tokens = tokens[1:]
-	var dest string
-	var token *item
-	length := len(tokens)
-	passed := 0
-	i := 0
-	at := false
-	for ; i < length; i++ {
-		token = tokens[i]
-		dest += token.val
-		passed++
-		if "@" == token.val {
-			at = true
-			break
-		}
-
-		if !token.isASCIILetterNumHyphen() && !strings.Contains(".!#$%&'*+/=?^_`{|}~", token.val) {
-			return nil
-		}
-	}
-
-	if 1 > i || !at {
-		return nil
-	}
-
-	domainPart := tokens[i+1:]
-	length = len(domainPart)
-	i = 0
-	closed := false
-	for ; i < length; i++ {
-		token = domainPart[i]
-		passed++
-		if itemGreater == token.typ {
-			closed = true
-			break
-		}
-		dest += token.val
-		if !token.isASCIILetterNumHyphen() && itemDot != token.typ {
-			return nil
-		}
-		if 63 < i {
-			return nil
-		}
-	}
-
-	if 1 > i || !closed {
-		return nil
-	}
-
-	t.context.pos += passed + 1
-	ret = &Link{&BaseNode{typ: NodeLink}, "mailto:" + dest, ""}
-	ret.AppendChild(ret, &Text{&BaseNode{typ: NodeText, value: dest}})
-
-	return
-}
-
-func (t *Tree) parseAutolink(tokens items) (ret Node) {
-	schemed := false
-	scheme := ""
-	dest := ""
-	var token *item
-	i := t.context.pos + 1
-	for ; i < len(tokens) && itemGreater != tokens[i].typ; i++ {
-		token = tokens[i]
-		if itemSpace == token.typ {
-			return nil
-		}
-
-		dest += token.val
-		if !schemed {
-			if itemColon != token.typ {
-				scheme += token.val
-			} else {
-				schemed = true
-			}
-		}
-	}
-	if !schemed {
-		return nil
-	}
-
-	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), ""}
-	if itemGreater != tokens[i].typ {
-		return nil
-	}
-
-	t.context.pos += 1 + i
-	ret.AppendChild(ret, &Text{&BaseNode{typ: NodeText, value: dest}})
-
-	return
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
