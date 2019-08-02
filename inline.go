@@ -380,21 +380,22 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 
 func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 	t.context.pos++
+
+	spaces := 0
 	// check previous node for trailing spaces
-	var lastc = block.LastChild()
-	if nil != lastc && lastc.Type() == NodeText && lastc.RawText() == " " {
-		previous := lastc.Previous()
-		hardbreak := nil != previous && previous.RawText() == " "
-		if hardbreak {
-			ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
-			for nil != lastc && lastc.RawText() == " " {
-				tmp := lastc.Previous()
-				lastc.Unlink()
-				lastc = tmp
-			}
-		} else {
-			ret = &SoftBreak{&BaseNode{typ: NodeSoftBreak}}
+	for lastc := block.LastChild(); ; {
+		if NodeText != lastc.Type() || " " != lastc.Value() {
+			break
 		}
+
+		tmp := lastc.Previous()
+		lastc.Unlink()
+		lastc = tmp
+		spaces++
+	}
+
+	if 1 < spaces {
+		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 	} else {
 		ret = &SoftBreak{&BaseNode{typ: NodeSoftBreak}}
 	}
