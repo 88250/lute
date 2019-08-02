@@ -60,8 +60,10 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 		return
 	}
 
+	whitespaces, tokens := tokens.trimLeft()
 	if (itemGreater == tokens[0].typ) ||
 		(1 < length && itemSlash == tokens[0].typ && itemGreater == tokens[1].typ) {
+		tags = append(tags, whitespaces...)
 		tags = append(tags, tokens[0])
 		if itemSlash == tokens[0].typ {
 			tags = append(tags, tokens[1])
@@ -119,6 +121,7 @@ func (t *Tree) parseAttrValSpec(tokens items) (remains, valSpec items) {
 	}
 	token = tokens[i]
 	if itemEqual != token.typ {
+		valSpec = nil
 		return
 	}
 	valSpec = append(valSpec, token)
@@ -185,17 +188,21 @@ func (t *Tree) parseAttrName(tokens items) (remains, attrName items) {
 }
 
 func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
-	var i int
-	var token *item
-	for i, token = range tokens {
-		if !token.isASCIILetterNumHyphen() {
-			break
-		}
-
-		tagName = append(tagName, token)
+	c := tokens[0].val[0]
+	if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) {
+		return tokens, nil
 	}
 
-	remains = tokens[i:]
+	for i := 0; i < len(tokens[0].val); i++ {
+		c = tokens[0].val[i]
+		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) &&
+			!('0' <= c && '9' >= c) && '-' != c {
+			return tokens, nil
+		}
+	}
+
+	tagName = append(tagName, tokens[0])
+	remains = tokens[1:]
 
 	return
 }
