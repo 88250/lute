@@ -61,7 +61,7 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 	if 0 == r.disableTags {
 		out = "\""
 		if "" != n.Title {
-			out = " title=\"" + escapeHTML(n.Title) + "\""
+			out += " title=\"" + escapeHTML(n.Title) + "\""
 		}
 		out += " />"
 		r.WriteString(out)

@@ -29,6 +29,7 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
+	{"spec568", "![foo](/url \"title\")\n", "<p><img src=\"/url\" alt=\"foo\" title=\"title\" /></p>\n"},
 	{"spec552", "[foo] \n[]\n\n[foo]: /url \"title\"\n", "<p><a href=\"/url\" title=\"title\">foo</a>\n[]</p>\n"},
 	{"spec549", "[foo][]\n\n[foo]: /url \"title\"\n", "<p><a href=\"/url\" title=\"title\">foo</a></p>\n"},
 	{"spec537", "[Foo\n  bar]: /url\n\n[Baz][Foo bar]\n", "<p><a href=\"/url\">Baz</a></p>\n"},
