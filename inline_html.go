@@ -50,8 +50,14 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 				break
 			}
 		}
-	} else if validComment, remains, comment := t.parseComment(tokens[t.context.pos+1:]); validComment {
+	} else if validComment, remains, comment := t.parseHTMLComment(tokens[t.context.pos+1:]); validComment {
 		tags = append(tags, comment...)
+		tokens = remains
+		t.context.pos += len(tags)
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
+		return
+	} else if valid, remains, ins := t.parseProcessingInstruction(tokens[t.context.pos+1:]); valid {
+		tags = append(tags, ins...)
 		tokens = remains
 		t.context.pos += len(tags)
 		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
@@ -84,7 +90,36 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	return
 }
 
-func (t *Tree) parseComment(tokens items) (validComment bool, remains, comment items) {
+func (t *Tree) parseProcessingInstruction(tokens items) (valid bool, remains, content items) {
+	remains = tokens
+	if itemQuestion != tokens[0].typ {
+		return
+	}
+
+	content = append(content, tokens[0])
+	tokens = tokens[1:]
+	var token *item
+	var i int
+	length := len(tokens)
+	for ; i < length; i++ {
+		token = tokens[i]
+		content = append(content, token)
+		if i <= length-2 && itemQuestion == token.typ && itemGreater == tokens[i+1].typ {
+			break
+		}
+	}
+	tokens = tokens[i:]
+	if itemQuestion != tokens[0].typ || itemGreater != tokens[1].typ {
+		return
+	}
+	content = append(content, tokens[1])
+	valid = true
+	remains = tokens[2:]
+
+	return
+}
+
+func (t *Tree) parseHTMLComment(tokens items) (valid bool, remains, comment items) {
 	remains = tokens
 	if itemBang != tokens[0].typ || itemHyphen != tokens[1].typ || itemHyphen != tokens[2].typ {
 		return
@@ -104,10 +139,10 @@ func (t *Tree) parseComment(tokens items) (validComment bool, remains, comment i
 	for ; i < length; i++ {
 		token = tokens[i]
 		comment = append(comment, token)
-		if i < length-2 && itemHyphen == token.typ && itemHyphen == tokens[i+1].typ {
+		if i <= length-2 && itemHyphen == token.typ && itemHyphen == tokens[i+1].typ {
 			break
 		}
-		if i < length-3 && itemHyphen == token.typ && itemHyphen == tokens[i+1].typ && itemGreater == tokens[i+2].typ {
+		if i <= length-3 && itemHyphen == token.typ && itemHyphen == tokens[i+1].typ && itemGreater == tokens[i+2].typ {
 			break
 		}
 	}
@@ -116,7 +151,7 @@ func (t *Tree) parseComment(tokens items) (validComment bool, remains, comment i
 		return
 	}
 	comment = append(comment, tokens[1], tokens[2])
-	validComment = true
+	valid = true
 	remains = tokens[3:]
 
 	return

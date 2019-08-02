@@ -29,6 +29,7 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
+	{"spec624", "foo <?php echo $a; ?>\n", "<p>foo <?php echo $a; ?></p>\n"},
 	{"spec622", "foo <!-- not a comment -- two hyphens -->\n", "<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>\n"},
 	{"spec621", "foo <!-- this is a\ncomment - with hyphen -->\n", "<p>foo <!-- this is a\ncomment - with hyphen --></p>\n"},
 	{"spec616", "<a href=\"hi'> <a href=hi'>\n", "<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>\n"},
