@@ -169,9 +169,9 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 
 func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<em>" + node.Value())
+		r.tag("em", nil, false)
 	} else {
-		r.WriteString("</em>")
+		r.tag("/em", nil, false)
 	}
 	return WalkContinue, nil
 }
