@@ -34,13 +34,7 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 		}
 		tags = append(tags, tagName...)
 		tokens = remains
-	} else { // an open tag
-		remains, tagName := t.parseTagName(tokens[t.context.pos+1:])
-		if 1 > len(tagName) {
-			t.context.pos++
-			return
-		}
-
+	} else if remains, tagName := t.parseTagName(tokens[t.context.pos+1:]); 0 < len(tagName) {
 		tags = append(tags, tagName...)
 		tokens = remains
 		for {
@@ -56,6 +50,15 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 				break
 			}
 		}
+	} else if validComment, remains, comment := t.parseComment(tokens[t.context.pos+1:]); validComment {
+		tags = append(tags, comment...)
+		tokens = remains
+		t.context.pos += len(tags)
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
+		return
+	} else {
+		t.context.pos++
+		return
 	}
 
 	length := len(tokens)
@@ -78,6 +81,44 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	}
 
 	t.context.pos = startPos + 1
+	return
+}
+
+func (t *Tree) parseComment(tokens items) (validComment bool, remains, comment items) {
+	remains = tokens
+	if itemBang != tokens[0].typ || itemHyphen != tokens[1].typ || itemHyphen != tokens[2].typ {
+		return
+	}
+
+	comment = append(comment, tokens[0], tokens[1], tokens[2])
+	tokens = tokens[3:]
+	if itemGreater == tokens[0].typ {
+		return
+	}
+	if itemHyphen == tokens[0].typ && itemGreater == tokens[1].typ {
+		return
+	}
+	var token *item
+	var i int
+	length := len(tokens)
+	for ; i < length; i++ {
+		token = tokens[i]
+		comment = append(comment, token)
+		if i < length-2 && itemHyphen == token.typ && itemHyphen == tokens[i+1].typ {
+			break
+		}
+		if i < length-3 && itemHyphen == token.typ && itemHyphen == tokens[i+1].typ && itemGreater == tokens[i+2].typ {
+			break
+		}
+	}
+	tokens = tokens[i:]
+	if itemHyphen != tokens[0].typ || itemHyphen != tokens[1].typ || itemGreater != tokens[2].typ {
+		return
+	}
+	comment = append(comment, tokens[1], tokens[2])
+	validComment = true
+	remains = tokens[3:]
+
 	return
 }
 

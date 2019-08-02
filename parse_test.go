@@ -29,8 +29,10 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
-	//{"spec616", "<a href=\"hi'> <a href=hi'>\n", "<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>\n"},
-	//{"spec613", "Foo <responsive-image src=\"foo.jpg\" />\n", "<p>Foo <responsive-image src=\"foo.jpg\" /></p>\n"},
+	{"spec622", "foo <!-- not a comment -- two hyphens -->\n", "<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>\n"},
+	{"spec621", "foo <!-- this is a\ncomment - with hyphen -->\n", "<p>foo <!-- this is a\ncomment - with hyphen --></p>\n"},
+	{"spec616", "<a href=\"hi'> <a href=hi'>\n", "<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>\n"},
+	{"spec613", "Foo <responsive-image src=\"foo.jpg\" />\n", "<p>Foo <responsive-image src=\"foo.jpg\" /></p>\n"},
 	{"spec612", "<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />\n", "<p><a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 /></p>\n"},
 	{"spec611", "<a  /><b2\ndata=\"foo\" >\n", "<p><a  /><b2\ndata=\"foo\" ></p>\n"},
 	{"spec604", "< http://foo.bar >\n", "<p>&lt; http://foo.bar &gt;</p>\n"},
