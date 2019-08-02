@@ -174,7 +174,6 @@ func (t *Tree) equalIgnoreCase(s1, s2 string) bool {
 }
 
 func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
-	tokens = tokens.trim()
 	length := len(tokens)
 	if 3 > length {
 		return
@@ -248,7 +247,6 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 			return !value.containWhitespace() && !value.contain(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick), withAttr
 		}
 	}
-
 	return true, withAttr
 }
 
