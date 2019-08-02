@@ -192,7 +192,6 @@ func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
 	if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) {
 		return tokens, nil
 	}
-
 	for i := 0; i < len(tokens[0].val); i++ {
 		c = tokens[0].val[i]
 		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) &&
@@ -200,9 +199,20 @@ func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
 			return tokens, nil
 		}
 	}
-
 	tagName = append(tagName, tokens[0])
-	remains = tokens[1:]
+
+	var token *item
+	i := 1
+	length := len(tokens)
+	for ; i < length; i++ {
+		token = tokens[i]
+		if !token.isASCIILetterNumHyphen() {
+			break
+		}
+		tagName = append(tagName, token)
+	}
+
+	remains = tokens[i:]
 
 	return
 }

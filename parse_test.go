@@ -29,6 +29,7 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
+	{"spec613", "Foo <responsive-image src=\"foo.jpg\" />\n", "<p>Foo <responsive-image src=\"foo.jpg\" /></p>\n"},
 	{"spec612", "<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />\n", "<p><a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 /></p>\n"},
 	{"spec611", "<a  /><b2\ndata=\"foo\" >\n", "<p><a  /><b2\ndata=\"foo\" ></p>\n"},
 	{"spec604", "< http://foo.bar >\n", "<p>&lt; http://foo.bar &gt;</p>\n"},
