@@ -72,7 +72,7 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderLink(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*Link)
-		attrs := [][]string{{"href", n.Destination}}
+		attrs := [][]string{{"href", escapeHTML(n.Destination)}}
 		if "" != n.Title {
 			attrs = append(attrs, []string{"title", escapeHTML(n.Title)})
 		}

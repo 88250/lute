@@ -29,6 +29,9 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
+	{"spec594", "<a+b+c:d>\n", "<p><a href=\"a+b+c:d\">a+b+c:d</a></p>\n"},
+	{"spec592", "<irc://foo.bar:2233/baz>\n", "<p><a href=\"irc://foo.bar:2233/baz\">irc://foo.bar:2233/baz</a></p>\n"},
+	{"spec591", "<http://foo.bar.baz/test?q=hello&id=22&boolean>\n", "<p><a href=\"http://foo.bar.baz/test?q=hello&amp;id=22&amp;boolean\">http://foo.bar.baz/test?q=hello&amp;id=22&amp;boolean</a></p>\n"},
 	{"spec588", "!\\[foo]\n\n[foo]: /url \"title\"\n", "<p>![foo]</p>\n"},
 	{"spec569", "![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"\n", "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &amp; tracks\" /></p>\n"},
 	{"spec568", "![foo](/url \"title\")\n", "<p><img src=\"/url\" alt=\"foo\" title=\"title\" /></p>\n"},
@@ -47,7 +50,8 @@ var parseTests = []parseTest{
 	{"spec488", "[link](<foo\nbar>)\n", "<p>[link](<foo\nbar>)</p>\n"},
 	{"spec484", "[link](<>)\n", "<p><a href=\"\">link</a></p>\n"},
 	{"spec483", "[link]()\n", "<p><a href=\"\">link</a></p>\n"},
-	{"spec403", "foo******bar*********baz\n", "<p>foo<strong><strong><strong>bar</strong></strong></strong>***baz</p>\n"},
+	{"spec479", "**a<http://foo.bar/?q=**>\n", "<p>**a<a href=\"http://foo.bar/?q=**\">http://foo.bar/?q=**</a></p>\n"},
+	{"spec416", "foo******bar*********baz\n", "<p>foo<strong><strong><strong>bar</strong></strong></strong>***baz</p>\n"},
 	{"spec403", "*foo [bar](/url)*\n", "<p><em>foo <a href=\"/url\">bar</a></em></p>\n"},
 	{"spec353", "* a *\n", "<p>* a *</p>\n"},
 	{"spec352", "a*\"foo\"*\n", "<p>a*&quot;foo&quot;*</p>\n"},

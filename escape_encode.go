@@ -70,22 +70,94 @@ func isASCIIPunct(c rune) bool {
 
 func encodeDestination(destination string) (ret string) {
 	destination = decodeDestination(destination)
-	ret = url.PathEscape(destination)
-	// TODO: 此处需要重写
-	ret = strings.ReplaceAll(ret, "%2F", "/")
-	ret = strings.ReplaceAll(ret, "%3F", "?")
-	ret = strings.ReplaceAll(ret, "%28", "(")
-	ret = strings.ReplaceAll(ret, "%29", ")")
+
+	parts := strings.SplitN(destination, ":", 2)
+	var scheme string
+	remains := destination
+	if 1 < len(parts) {
+		scheme = parts[0]
+		remains = parts[1]
+	}
+
+	index := strings.Index(remains, "?")
+	var query string
+	path := remains
+	if 0 <= index {
+		query = remains[index+1:]
+		queries := strings.Split(query, "&")
+		query = ""
+		length := len(queries)
+		for i, q := range queries {
+			kv := strings.Split(q, "=")
+			if 1 < len(kv) {
+				query += url.QueryEscape(kv[0]) + "=" + url.QueryEscape(kv[1])
+			} else {
+				query += url.QueryEscape(kv[0])
+			}
+			if i < length-1 {
+				query += "&"
+			}
+		}
+
+		path = remains[:index]
+	}
+
+	parts = strings.Split(path, "/")
+	path = ""
+	length := len(parts)
+	for i, part := range parts {
+		unescaped := url.PathEscape(part)
+		path += unescaped
+		if i < length-1 {
+			path += "/"
+		}
+	}
+
+	if "" == scheme {
+		ret = path
+	} else {
+		ret = scheme + ":" + path
+	}
+	if "" != query {
+		ret += "?" + query
+	}
+
 	ret = strings.ReplaceAll(ret, "%2A", "*")
+	ret = strings.ReplaceAll(ret, "%29", ")")
+	ret = strings.ReplaceAll(ret, "%28", "(")
 	ret = strings.ReplaceAll(ret, "%23", "#")
+	ret = strings.ReplaceAll(ret, "%2C", ",")
 
 	return
 }
 
 func decodeDestination(destination string) (ret string) {
-	ret, e := url.QueryUnescape(destination)
-	if nil != e {
-		return destination
+	parts := strings.SplitN(destination, ":", 2)
+	var scheme string
+	remains := destination
+	if 1 < len(parts) {
+		scheme = parts[0]
+		remains = parts[1]
+	}
+
+	parts = strings.Split(remains, "/")
+	remains = ""
+	length := len(parts)
+	for i, part := range parts {
+		unescaped, err := url.QueryUnescape(part)
+		if nil != err {
+			unescaped = part
+		}
+		remains += unescaped
+		if i < length-1 {
+			remains += "/"
+		}
+	}
+
+	if "" == scheme {
+		ret = remains
+	} else {
+		ret = scheme + ":" + remains
 	}
 
 	return

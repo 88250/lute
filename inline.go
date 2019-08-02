@@ -158,6 +158,10 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 	i := t.context.pos + 1
 	for ; i < len(tokens) && itemGreater != tokens[i].typ; i++ {
 		token = tokens[i]
+		if itemSpace == token.typ {
+			return nil
+		}
+
 		dest += token.val
 		if !schemed {
 			if itemColon != token.typ {
