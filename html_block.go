@@ -186,7 +186,6 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 	if itemGreater != tokens[length-1].typ {
 		return
 	}
-
 	if itemSlash == tokens[length-2].typ {
 		tokens = tokens[1 : length-2]
 	} else {
@@ -195,6 +194,10 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 
 	length = len(tokens)
 	if 0 == length {
+		return
+	}
+
+	if tokens[0].isWhitespace() { // < 后面不能跟空白
 		return
 	}
 

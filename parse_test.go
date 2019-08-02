@@ -29,6 +29,8 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
+	{"spec604", "< http://foo.bar >\n", "<p>&lt; http://foo.bar &gt;</p>\n"},
+	{"spec600", "<foo@bar.example.com>\n", "<p><a href=\"mailto:foo@bar.example.com\">foo@bar.example.com</a></p>\n"},
 	{"spec594", "<a+b+c:d>\n", "<p><a href=\"a+b+c:d\">a+b+c:d</a></p>\n"},
 	{"spec592", "<irc://foo.bar:2233/baz>\n", "<p><a href=\"irc://foo.bar:2233/baz\">irc://foo.bar:2233/baz</a></p>\n"},
 	{"spec591", "<http://foo.bar.baz/test?q=hello&id=22&boolean>\n", "<p><a href=\"http://foo.bar.baz/test?q=hello&amp;id=22&amp;boolean\">http://foo.bar.baz/test?q=hello&amp;id=22&amp;boolean</a></p>\n"},
