@@ -25,7 +25,6 @@ type item struct {
 	typ  itemType // the type of this item
 	pos  int      // the starting position, in bytes, of this item in the input string
 	val  string   // the value of this item, aka lexeme
-	line int      // the line number at the start of this item
 }
 
 func (i *item) String() string {

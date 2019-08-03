@@ -205,72 +205,6 @@ func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 	return
 }
 
-func (t *Tree) nonSpaceTab(tokens items) (spaces, tabs int, remains items) {
-	i := 0
-Loop:
-	for ; i < len(tokens); i++ {
-		token := tokens[i]
-		switch token.typ {
-		case itemTab:
-			tabs++
-		case itemSpace:
-			spaces++
-		default:
-			break Loop
-		}
-	}
-
-	remains = tokens[i:]
-
-	return
-}
-
-func (t *Tree) skipBlankLines() (blankLines []items) {
-	for {
-		line := t.nextLine()
-		if line.isEOF() {
-			return
-		}
-
-		//tokens := t.removeStartBlockquoteMarker(line, t.context.BlockquoteLevel)
-		if !line.isBlankLine() {
-			t.backupLine(line)
-			return
-		}
-
-		blankLines = append(blankLines, line)
-	}
-}
-
-func (t *Tree) indentOffset(tokens items, indentSpaces int) (ret items) {
-	var nonWhitespaces items
-	compSpaces := 0
-	i := 0
-	for ; i < len(tokens); i++ {
-		typ := tokens[i].typ
-		if itemSpace == typ {
-			compSpaces++
-		} else if itemTab == typ {
-			compSpaces += 4
-		} else {
-			nonWhitespaces = append(nonWhitespaces, tokens[i:]...)
-			break
-		}
-	}
-
-	remains := compSpaces - indentSpaces
-	if 0 > remains {
-		return nonWhitespaces
-	}
-
-	for j := 0; j < remains; j++ {
-		ret = append(ret, &item{itemSpace, 0, " ", 0})
-	}
-	ret = append(ret, nonWhitespaces...)
-
-	return
-}
-
 func (t *Tree) nextLine() (line items) {
 	length := len(t.context.curLines)
 	if 0 < length {
@@ -286,14 +220,6 @@ func (t *Tree) nextLine() (line items) {
 		if token.isNewline() || token.isEOF() {
 			return
 		}
-	}
-}
-
-func (t *Tree) backupLine(line items) {
-	if 0 < len(t.context.curLines) {
-		t.context.curLines = append([]items{line}, t.context.curLines...)
-	} else {
-		t.context.curLines = append(t.context.curLines, line)
 	}
 }
 
