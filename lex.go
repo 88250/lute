@@ -165,7 +165,7 @@ func (s *scanner) run() {
 		str:
 			for {
 				switch {
-				case unicode.IsLetter(r), unicode.IsNumber(r):
+				case unicode.IsLetter(r), unicode.IsNumber(r), unicode.IsMark(r):
 					r = s.next()
 				default:
 					s.backup()
