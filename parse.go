@@ -15,28 +15,11 @@
 
 package lute
 
-import (
-	"regexp"
-)
-
 func Parse(name, text string) (*Tree, error) {
-	// TODO: 移到 lex 阶段
-	text = sanitize(text)
-
 	t := &Tree{Name: name, text: text, context: &Context{}}
 	err := t.parse()
 
 	return t, err
-}
-
-var newlinesRegexp = regexp.MustCompile("\r[\n\u0085]?|[\u2424\u2028\u0085]")
-var nullRegexp = regexp.MustCompile("\u0000")
-
-func sanitize(text string) (ret string) {
-	ret = newlinesRegexp.ReplaceAllString(text, "\n")
-	nullRegexp.ReplaceAllString(ret, "\uFFFD")
-
-	return
 }
 
 type BlockContainer struct {

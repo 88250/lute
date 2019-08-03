@@ -141,6 +141,17 @@ func (s *scanner) run() {
 			s.newItem(itemSpace)
 		case '\n' == r:
 			s.newItem(itemNewline)
+		case '\r' == r:
+			if r = s.next(); '\n' == r || '\u0085' == r {
+				s.newItem(itemNewline)
+			} else {
+				s.backup()
+				s.newItem(itemStr)
+			}
+		case '\u2424' == r, '\u2028' == r, '\u0085' == r:
+			s.newItem(itemNewline)
+		case '\u0000' == r:
+			s.newItem(itemNewline)
 		case '\\' == r:
 			s.newItem(itemBackslash)
 		case '/' == r:
@@ -179,7 +190,7 @@ func (s *scanner) run() {
 
 // next returns the next rune in the input.
 func (s *scanner) next() rune {
-	if int(s.pos) >= len(s.input) {
+	if s.pos >= len(s.input) {
 		s.width = 0
 
 		return end
