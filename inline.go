@@ -333,10 +333,12 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 }
 
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
+	b := strings.Builder{}
 	for i := startPos; i < endPos; i++ {
-		text += tokens[i].val
-		subTokens = append(subTokens, tokens[i])
+		b.WriteString(tokens[i].val)
 	}
+	text = b.String()
+	subTokens = tokens[startPos:endPos]
 
 	return
 }
