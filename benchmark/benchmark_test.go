@@ -13,26 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lute
+package benchmark
 
 import (
+	"github.com/b3log/lute"
 	"io/ioutil"
 	"testing"
 )
 
 func BenchmarkLute(b *testing.B) {
-	spec := "commonmark-0.29-spec"
+	spec := "../commonmark-0.29-spec"
 	bytes, err := ioutil.ReadFile(spec + ".md")
 	if nil != err {
 		b.Fatalf("read spec text failed: " + err.Error())
 	}
 
-	tree, err := Parse("spec text", string(bytes))
+	tree, err := lute.Parse("spec text", string(bytes))
 	if nil != err {
-		b.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
+		b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 	}
 
-	renderer := NewHTMLRenderer()
+	renderer := lute.NewHTMLRenderer()
 	html, err := tree.Render(renderer)
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)
@@ -41,15 +42,14 @@ func BenchmarkLute(b *testing.B) {
 	ioutil.WriteFile(spec+".html", []byte(html), 0644)
 
 	for i := 0; i < b.N; i++ {
-		tree, err := Parse("spec text", string(bytes))
+		tree, err := lute.Parse("spec text", string(bytes))
 		if nil != err {
-			b.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
+			b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 		}
 
-		renderer := NewHTMLRenderer()
+		renderer := lute.NewHTMLRenderer()
 		if _, err := tree.Render(renderer); nil != err {
-			b.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
+			b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 		}
-
 	}
 }
