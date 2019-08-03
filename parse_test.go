@@ -247,7 +247,7 @@ func TestParse(t *testing.T) {
 		}
 
 		if test.result != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.result, html, test.input)
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.Name, test.result, html, test.input)
 		}
 	}
 }

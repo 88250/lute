@@ -48,7 +48,7 @@ func TestSpec(t *testing.T) {
 		fmt.Println("Test [" + testName + "]")
 		tree, err := Parse(testName, test.Markdown)
 		if nil != err {
-			t.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
+			t.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 		}
 
 		renderer := NewHTMLRenderer()
@@ -58,7 +58,7 @@ func TestSpec(t *testing.T) {
 		}
 
 		if test.HTML != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.name, test.HTML, html, test.Markdown)
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.Name, test.HTML, html, test.Markdown)
 		}
 	}
 }
