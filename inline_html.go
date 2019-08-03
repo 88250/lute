@@ -68,6 +68,12 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 		t.context.pos += len(tags)
 		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
 		return
+	} else if valid, remains, cdata := t.parseCDATA(tokens[t.context.pos+1:]); valid {
+		tags = append(tags, cdata...)
+		tokens = remains
+		t.context.pos += len(tags)
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
+		return
 	} else {
 		t.context.pos++
 		return
@@ -93,6 +99,44 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	}
 
 	t.context.pos = startPos + 1
+	return
+}
+
+func (t *Tree) parseCDATA(tokens items) (valid bool, remains, content items) {
+	remains = tokens
+	if itemBang != tokens[0].typ {
+		return
+	}
+	if itemOpenBracket != tokens[1].typ {
+		return
+	}
+	if "CDATA" != tokens[2].val {
+		return
+	}
+	if itemOpenBracket != tokens[3].typ {
+		return
+	}
+
+	content = append(content, tokens[0], tokens[1], tokens[2], tokens[3])
+	tokens = tokens[4:]
+	var token *item
+	var i int
+	length := len(tokens)
+	for ; i < length; i++ {
+		token = tokens[i]
+		content = append(content, token)
+		if i <= length-3 && itemCloseBracket == token.typ && itemCloseBracket == tokens[i+1].typ && itemGreater == tokens[i+2].typ {
+			break
+		}
+	}
+	tokens = tokens[i:]
+	if itemCloseBracket != tokens[0].typ || itemCloseBracket != tokens[1].typ || itemGreater != tokens[2].typ {
+		return
+	}
+	content = append(content, tokens[1], tokens[2])
+	valid = true
+	remains = tokens[3:]
+
 	return
 }
 
