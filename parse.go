@@ -23,7 +23,7 @@ func Parse(name, text string) (*Tree, error) {
 	// TODO: 移到 lex 阶段
 	text = sanitize(text)
 
-	t := &Tree{name: name, text: text, context: &Context{}}
+	t := &Tree{Name: name, text: text, context: &Context{}}
 	err := t.parse()
 
 	return t, err
@@ -205,7 +205,7 @@ func (context *Context) listsMatch(list_data, item_data *ListData) bool {
 // Tree is the representation of the markdown ast.
 type Tree struct {
 	Root      *Root
-	name      string
+	Name      string
 	text      string
 	lex       *lexer
 	peekCount int
@@ -327,7 +327,7 @@ func (t *Tree) recover(err *error) {
 func (t *Tree) parse() (err error) {
 	defer t.recover(&err)
 
-	t.lex = lex(t.name, t.text)
+	t.lex = lex(t.Name, t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
 	t.parseBlocks()
 	t.parseInlines()
