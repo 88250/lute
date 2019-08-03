@@ -40,5 +40,16 @@ func BenchmarkLute(b *testing.B) {
 
 	ioutil.WriteFile(spec+".html", []byte(html), 0644)
 
-	b.Log(html)
+	for i := 0; i < b.N; i++ {
+		tree, err := Parse("spec text", string(bytes))
+		if nil != err {
+			b.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
+		}
+
+		renderer := NewHTMLRenderer()
+		if _, err := tree.Render(renderer); nil != err {
+			b.Fatalf("parse [%s] failed: %s", tree.name, err.Error())
+		}
+
+	}
 }
