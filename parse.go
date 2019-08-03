@@ -310,7 +310,7 @@ func (t *Tree) recover(err *error) {
 func (t *Tree) parse() (err error) {
 	defer t.recover(&err)
 
-	t.lex = lex(t.Name, t.text)
+	t.lex = lex(t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
 	t.parseBlocks()
 	t.parseInlines()

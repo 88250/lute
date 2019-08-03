@@ -56,7 +56,7 @@ func (l *lexer) nextItem() *item {
 }
 
 // lex creates a new lexer for the input string.
-func lex(name, input string) *lexer {
+func lex(input string) *lexer {
 	ret := &lexer{items: []items{}}
 	if "" == input {
 		ret.items = append(ret.items, items{})

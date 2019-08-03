@@ -53,7 +53,7 @@ var lexTests = []lexTest{
 
 func TestLex(t *testing.T) {
 	for _, test := range lexTests {
-		l := lex(test.name, test.input)
+		l := lex(test.input)
 		var items items
 		for _, line := range l.items {
 			for _, item := range line {
