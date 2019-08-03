@@ -62,6 +62,12 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 		t.context.pos += len(tags)
 		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
 		return
+	} else if valid, remains, decl := t.parseDeclaration(tokens[t.context.pos+1:]); valid {
+		tags = append(tags, decl...)
+		tokens = remains
+		t.context.pos += len(tags)
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.rawText()}}
+		return
 	} else {
 		t.context.pos++
 		return
@@ -87,6 +93,41 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	}
 
 	t.context.pos = startPos + 1
+	return
+}
+
+func (t *Tree) parseDeclaration(tokens items) (valid bool, remains, content items) {
+	remains = tokens
+	if itemBang != tokens[0].typ {
+		return
+	}
+
+	name := tokens[1].val
+	for _, c := range name {
+		if !('A' <= c && 'Z' >= c) {
+			return
+		}
+	}
+
+	content = append(content, tokens[0], tokens[1])
+	tokens = tokens[2:]
+	var token *item
+	var i int
+	length := len(tokens)
+	for ; i < length; i++ {
+		token = tokens[i]
+		content = append(content, token)
+		if itemGreater == token.typ {
+			break
+		}
+	}
+	tokens = tokens[i:]
+	if itemGreater != tokens[0].typ {
+		return
+	}
+	valid = true
+	remains = tokens[1:]
+
 	return
 }
 
