@@ -21,7 +21,8 @@ import (
 )
 
 func BenchmarkLute(b *testing.B) {
-	bytes, err := ioutil.ReadFile("commonmark-0.29-spec.md")
+	spec := "commonmark-0.29-spec"
+	bytes, err := ioutil.ReadFile(spec + ".md")
 	if nil != err {
 		b.Fatalf("read spec text failed: " + err.Error())
 	}
@@ -36,6 +37,8 @@ func BenchmarkLute(b *testing.B) {
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)
 	}
+
+	ioutil.WriteFile(spec+".html", []byte(html), 0644)
 
 	b.Log(html)
 }

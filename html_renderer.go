@@ -156,7 +156,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 		n := node.(*CodeBlock)
 		if "" != n.info {
 			infoWords := strings.Fields(n.info)
-			r.WriteString("<pre><code class=\"language-" + infoWords[0] + "\">" + n.value)
+			r.WriteString("<pre><code class=\"language-" + infoWords[0] + "\">" + escapeHTML(n.value))
 		} else {
 			r.WriteString("<pre><code>" + escapeHTML(n.value))
 		}
