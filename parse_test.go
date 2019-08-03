@@ -29,6 +29,8 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// commonmark spec inline-level cases
 
+	{"issue1", "(<http://daringfireball.net/projects/markdown/>)", "<p>(<a href=\"http://daringfireball.net/projects/markdown/\">http://daringfireball.net/projects/markdown/</a>)</p>\n"},
+
 	{"spec626", "foo <![CDATA[>&<]]>\n", "<p>foo <![CDATA[>&<]]></p>\n"},
 	{"spec625", "foo <!ELEMENT br EMPTY>\n", "<p>foo <!ELEMENT br EMPTY></p>\n"},
 	{"spec624", "foo <?php echo $a; ?>\n", "<p>foo <?php echo $a; ?></p>\n"},

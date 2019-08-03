@@ -110,7 +110,7 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 		return nil
 	}
 
-	t.context.pos += 1 + i
+	t.context.pos = 1 + i
 	ret.AppendChild(ret, &Text{&BaseNode{typ: NodeText, value: dest}})
 
 	return
