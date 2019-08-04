@@ -24,7 +24,7 @@ type Image struct {
 func (t *Tree) parseBang(tokens items) (ret Node) {
 	var startPos = t.context.pos
 	t.context.pos++
-	if itemOpenBracket == tokens[t.context.pos].typ {
+	if itemOpenBracket == tokens[t.context.pos] {
 		t.context.pos++
 		ret = &Text{&BaseNode{typ: NodeText, value: "!["}}
 		// Add entry to stack for this opener

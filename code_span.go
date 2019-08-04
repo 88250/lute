@@ -24,7 +24,7 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	length := len(tokens)
 	n := 0
 	for ; startPos+n < length; n++ {
-		if itemBacktick != tokens[startPos+n].typ {
+		if itemBacktick != tokens[startPos+n] {
 			break
 		}
 	}
@@ -47,14 +47,14 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	var textTokens = items{}
 	for i := startPos + n; i < len(tokens) && i < endPos; i++ {
 		token := tokens[i]
-		if itemNewline == token.typ {
-			textTokens = append(textTokens, tSpace)
+		if itemNewline == token {
+			textTokens = append(textTokens, itemSpace)
 		} else {
 			textTokens = append(textTokens, token)
 		}
 	}
 
-	if 2 < len(textTokens) && itemSpace == textTokens[0].typ && itemSpace == textTokens[len(textTokens)-1].typ && !textTokens.isBlankLine() {
+	if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !textTokens.isBlankLine() {
 		textTokens = textTokens[1:]
 		textTokens = textTokens[:len(textTokens)-1]
 	}
@@ -72,7 +72,7 @@ func (t *Tree) matchCodeSpanEnd(tokens items, num int) (pos int) {
 		len := tokens[pos:].accept(itemBacktick)
 		if num == len {
 			next := pos + len
-			if length-1 > next && itemBacktick == tokens[next].typ {
+			if length-1 > next && itemBacktick == tokens[next] {
 				continue
 			}
 

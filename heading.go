@@ -31,7 +31,7 @@ func (heading *Heading) CanContain(nodeType NodeType) bool {
 func (t *Tree) parseATXHeading() (ret *Heading) {
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	marker := tokens[0]
-	if itemCrosshatch != marker.typ {
+	if itemCrosshatch != marker {
 		return
 	}
 
@@ -48,7 +48,7 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 	_, tokens = tokens.trimLeft()
 	_, tokens = tokens[level:].trimLeft()
 	for _, token := range tokens {
-		if itemEOF == token.typ || itemNewline == token.typ {
+		if itemEOF == token || itemNewline == token {
 			break
 		}
 
@@ -58,11 +58,11 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 	heading.tokens = heading.tokens.trimRight()
 	closingCrosshatchIndex := len(heading.tokens) - 1
 	for ; 0 <= closingCrosshatchIndex; closingCrosshatchIndex-- {
-		if itemCrosshatch == heading.tokens[closingCrosshatchIndex].typ {
+		if itemCrosshatch == heading.tokens[closingCrosshatchIndex] {
 			continue
 		}
 
-		if itemSpace == heading.tokens[closingCrosshatchIndex].typ {
+		if itemSpace == heading.tokens[closingCrosshatchIndex] {
 			break
 		} else {
 			closingCrosshatchIndex = len(heading.tokens)
@@ -85,13 +85,13 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 func (t *Tree) parseSetextHeading() (ret *Heading) {
 	start := t.context.nextNonspace
 	marker := t.context.currentLine[start]
-	if itemEqual != marker.typ && itemHyphen != marker.typ {
+	if itemEqual != marker && itemHyphen != marker {
 		return nil
 	}
 
 	end := t.context.currentLineLen - 2
 	for ; 0 <= end; end-- {
-		if token := t.context.currentLine[end]; itemSpace != token.typ && itemTab != token.typ {
+		if token := t.context.currentLine[end]; itemSpace != token && itemTab != token {
 			break
 		}
 	}
@@ -99,12 +99,12 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 	markers := 0
 	for ; start < end; start++ {
 		token := t.context.currentLine[start]
-		if itemEqual != token.typ && itemHyphen != token.typ {
+		if itemEqual != token && itemHyphen != token {
 			return nil
 		}
 
-		if nil != marker {
-			if marker.typ != token.typ {
+		if itemEOF != marker {
+			if marker != token {
 				return nil
 			}
 		} else {
@@ -113,12 +113,12 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 		markers++
 	}
 
-	if nil == marker {
+	if itemEOF == marker {
 		return nil
 	}
 
 	ret = &Heading{&BaseNode{typ: NodeHeading}, 1}
-	if itemHyphen == marker.typ {
+	if itemHyphen == marker {
 		ret.Level = 2
 	}
 

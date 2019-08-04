@@ -74,8 +74,7 @@ func (t *Tree) incorporateLine(line items) {
 
 		// 如果不由潜在的节点标记开头 ^[#`~*+_=<>0-9-]，则说明不用继续迭代生成子节点
 		// 这里仅做简单判断的话可以略微提升一些性能
-		maybeMarker := t.context.currentLine[t.context.nextNonspace].typ
-		maybeMarkerVal := t.context.currentLine[t.context.nextNonspace].Value()
+		maybeMarker := t.context.currentLine[t.context.nextNonspace]
 		if !t.context.indented &&
 			itemCrosshatch != maybeMarker && // ATX Heading
 			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block
@@ -83,7 +82,7 @@ func (t *Tree) incorporateLine(line items) {
 			itemUnderscore != maybeMarker && itemEqual != maybeMarker && // Setext Heading
 			itemLess != maybeMarker && // HTML
 			itemGreater != maybeMarker && // Blockquote
-			!("0" <= maybeMarkerVal && "9" >= maybeMarkerVal) { // Ordered List
+			!maybeMarker.isDigit() { // Ordered List
 			t.context.advanceNextNonspace()
 			break
 		}
@@ -175,12 +174,12 @@ var blockStarts = []startFunc{
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
-			if nil != token && itemGreater == token.typ {
+			if itemEOF != token && itemGreater == token {
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
 				// optional following space
 				token = t.context.currentLine.peek(t.context.offset)
-				if itemSpace == token.typ || itemTab == token.typ {
+				if itemSpace == token || itemTab == token {
 					t.context.advanceOffset(1, true)
 				}
 
@@ -227,7 +226,7 @@ var blockStarts = []startFunc{
 
 	// HTML block
 	func(t *Tree, container Node) int {
-		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace).typ == itemLess {
+		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if html := t.parseHTML(tokens); nil != html {
 				t.context.closeUnmatchedBlocks()
@@ -247,7 +246,7 @@ var blockStarts = []startFunc{
 			if heading := t.parseSetextHeading(); nil != heading {
 				t.context.closeUnmatchedBlocks()
 				// resolve reference link definition
-				for tokens := container.Tokens(); 0 < len(tokens) && itemOpenBracket == tokens[0].typ; tokens = container.Tokens() {
+				for tokens := container.Tokens(); 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.Tokens() {
 					if tokens = t.context.parseLinkRefDef(tokens); nil != tokens {
 						container.SetTokens(tokens)
 						container.SetValue(tokens.rawText())
@@ -328,11 +327,11 @@ func (t *Tree) addLine() {
 		t.context.offset += 1 // skip over tab
 		// add space characters:
 		var charsToTab = 4 - (t.context.column % 4)
-		//t.context.tip.AppendValue(strings.Repeat(" ", charsToTab))
+		// TODO t.context.tip.AppendValue(strings.Repeat(" ", charsToTab))
 		for i := 0; i < charsToTab; i++ {
-			t.context.tip.AddTokens(items{tSpace})
+			t.context.tip.AddTokens(items{itemSpace})
 		}
 	}
 	t.context.tip.AddTokens(t.context.currentLine[t.context.offset:])
-	//t.context.tip.AppendValue(t.context.currentLine[t.context.offset:].rawText())
+	// TODO t.context.tip.AppendValue(t.context.currentLine[t.context.offset:].rawText())
 }

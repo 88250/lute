@@ -16,221 +16,111 @@
 package lute
 
 import (
-	"fmt"
 	"strings"
 	"unicode"
 )
 
-// item 描述了一个读取进来的 Token.
-type item struct {
-	typ           itemType // Token 类型
-	input         *string  // 指向整个输入文本
-	valueStartPos int      // 词素（lexeme）起始位置
-	valueEndPos   int      // 词素结束位置
+type item rune
+
+func (token item) isNewline() bool {
+	return itemNewline == token || '\u2424' == token || '\u2028' == token || '\u0085' == token || '\u0000' == token
 }
 
-func (i *item) Value() string {
-	val := *i.input
-	if "" == val {
-		return ""
-	}
-
-	return (val)[i.valueStartPos:i.valueEndPos]
+func (token item) isWhitespace() bool {
+	return itemSpace == token || itemTab == token || itemNewline == token || '\u000A' == token || '\u000C' == token || '\u000D' == token
 }
 
-func (i *item) String() string {
-	switch {
-	case i.typ == itemEOF:
-		return "EOF"
-	case len(i.Value()) > 10:
-		return fmt.Sprintf("%.10q...", i.Value())
-	}
-
-	return fmt.Sprintf("%q", i.Value())
+func (token item) isUnicodeWhitespace() bool {
+	return unicode.Is(unicode.Zs, rune(token)) || itemTab == token || '\u000D' == token || itemNewline == token || '\u000C' == token
 }
 
-func (i *item) isWhitespace() bool {
-	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ || "\u000A" == i.Value() || "\u000C" == i.Value() || "\u000D" == i.Value()
+func (token item) isDigit() bool {
+	return unicode.IsDigit(rune(token))
 }
 
-func (i *item) isUnicodeWhitespace() bool {
-	length := len(i.Value())
-	if 1 != length && 2 != length {
-		return false
-	}
-
-	r := rune(i.Value()[0])
-	if 2 == length {
-		r = rune(i.Value()[1])
-	}
-
-	return unicode.Is(unicode.Zs, r) || itemTab == i.typ || "\u000D" == i.Value() || itemNewline == i.typ || "\u000C" == i.Value()
+func (token item) isPunct() bool {
+	return token.isASCIIPunct() || unicode.IsPunct(rune(token))
 }
 
-func (i *item) isNumInt() bool {
-	for _, c := range i.Value() {
-		if '0' > c || '9' < c {
-			return false
-		}
-	}
-
-	return true
+func (token item) isASCIIPunct() bool {
+	return (0x21 <= token && 0x2F >= token) || (0x3A <= token && 0x40 >= token) || (0x5B <= token && 0x60 >= token) || (0x7B <= token && 0x7E >= token)
 }
 
-func (i *item) isPunct() bool {
-	return i.isASCIIPunct() || (1 == len(i.Value()) && unicode.IsPunct(rune(i.Value()[0])))
+func (token item) isLetter() bool {
+	return unicode.IsLetter(rune(token))
 }
 
-func (i *item) isASCIIPunct() bool {
-	if 1 != len(i.Value()) {
-		return false
-	}
-
-	c := i.Value()[0]
-	return (0x21 <= c && 0x2F >= c) || (0x3A <= c && 0x40 >= c) || (0x5B <= c && 0x60 >= c) || (0x7B <= c && 0x7E >= c)
+func (token item) isASCIILetter() bool {
+	return !('A' <= token && 'Z' >= token) && !('a' <= token && 'z' >= token)
 }
 
-func (i *item) isASCIILetter() bool {
-	for _, c := range i.Value() {
-		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) {
-			return false
-		}
-	}
-
-	return true
+func (token item) isASCIILetterNumHyphen() bool {
+	return !('A' <= token && 'Z' >= token) && !('a' <= token && 'z' >= token) && !('0' <= token && '9' >= token) && '-' != token
 }
 
-func (i *item) isASCIILetterNumHyphen() bool {
-	for _, c := range i.Value() {
-		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) && !('0' <= c && '9' >= c) && '-' != c {
-			return false
-		}
-	}
-
-	return true
+func (token item) isNumber() bool {
+	return unicode.IsNumber(rune(token))
 }
 
-// itemType identifies the type of lex items.
-type itemType int
-
-// Make the types pretty print.
-var itemName = map[itemType]string{
-	itemEOF:          "EOF",
-	itemStr:          "str",
-	itemBacktick:     "`",
-	itemTilde:        "~",
-	itemBang:         "!",
-	itemCrosshatch:   "#",
-	itemAsterisk:     "*",
-	itemOpenParen:    "(",
-	itemCloseParen:   ")",
-	itemHyphen:       "-",
-	itemUnderscore:   "_",
-	itemPlus:         "+",
-	itemTab:          "tab",
-	itemOpenBracket:  "[",
-	itemCloseBracket: "]",
-	itemDoublequote:  "\"",
-	itemSinglequote:  "'",
-	itemLess:         "<",
-	itemGreater:      ">",
-	itemSpace:        "space",
-	itemNewline:      "newline",
-	itemDot:          ".",
-	itemColon:        ":",
-	itemQuestion:     "?",
-	itemAmpersand:    "&",
-	itemSemicolon:    ";",
+func (token item) isMark() bool {
+	return unicode.IsMark(rune(token))
 }
 
-func (i itemType) String() string {
-	s := itemName[i]
-	if s == "" {
-		return fmt.Sprintf("item%d", int(i))
-	}
+func (token item) isControl() bool {
+	return unicode.IsControl(rune(token))
+}
 
-	return s
+func (token item) isSpace() bool {
+	return unicode.IsSpace(rune(token))
+}
+
+func (token item) isSymbol() bool {
+	return unicode.IsSymbol(rune(token))
 }
 
 const (
-	itemEOF          itemType = iota // EOF
-	itemStr                          // plain text
-	itemBacktick                     // `
-	itemTilde                        // ~
-	itemBang                         // !
-	itemCrosshatch                   // #
-	itemAsterisk                     // *
-	itemOpenParen                    // (
-	itemCloseParen                   // )
-	itemHyphen                       // -
-	itemUnderscore                   // _
-	itemPlus                         // +
-	itemEqual                        // =
-	itemTab                          // \t
-	itemOpenBracket                  // [
-	itemCloseBracket                 // ]
-	itemDoublequote                  // "
-	itemSinglequote                  // '
-	itemLess                         // <
-	itemGreater                      // >
-	itemSpace                        // space
-	itemNewline                      // \n
-	itemBackslash                    // \
-	itemSlash                        // /
-	itemDot                          // .
-	itemColon                        // :
-	itemQuestion                     // ?
-	itemAmpersand                    // &
-	itemSemicolon                    // ;
-	itemControl
+	itemEOF          = item(0)
+	itemBacktick     = item('`')
+	itemTilde        = item('~')
+	itemBang         = item('!')
+	itemCrosshatch   = item('#')
+	itemAsterisk     = item('*')
+	itemOpenParen    = item('(')
+	itemCloseParen   = item(')')
+	itemHyphen       = item('-')
+	itemUnderscore   = item('_')
+	itemPlus         = item('+')
+	itemEqual        = item('=')
+	itemTab          = item('\t')
+	itemOpenBracket  = item('[')
+	itemCloseBracket = item(']')
+	itemDoublequote  = item('"')
+	itemSinglequote  = item('\'')
+	itemLess         = item('<')
+	itemGreater      = item('>')
+	itemSpace        = item(' ')
+	itemNewline      = item('\n')
+	itemBackslash    = item('\\')
+	itemSlash        = item('/')
+	itemDot          = item('.')
+	itemColon        = item(':')
+	itemQuestion     = item('?')
+	itemAmpersand    = item('&')
+	itemSemicolon    = item(';')
 )
 
-var (
-	tEOF             = makeItem(itemEOF, "")
-	tSpace           = makeItem(itemSpace, " ")
-	tNewLine         = makeItem(itemNewline, "\n")
-	tTab             = makeItem(itemTab, "\t")
-	tBacktick        = makeItem(itemBacktick, "`")
-	tAsterisk        = makeItem(itemAsterisk, "*")
-	tHypen           = makeItem(itemHyphen, "-")
-	tUnderscore      = makeItem(itemUnderscore, "_")
-	tPlus            = makeItem(itemPlus, "+")
-	tBangOpenBracket = makeItem(itemBang, "!")
-	tOpenBracket     = makeItem(itemOpenBracket, "[")
-	tCloseBracket    = makeItem(itemCloseBracket, "]")
-	tOpenParen       = makeItem(itemOpenParen, "(")
-	tCloseParan      = makeItem(itemCloseParen, ")")
-	tBackslash       = makeItem(itemBackslash, "\\")
-	tSlash           = makeItem(itemSlash, "/")
-	tCrosshatch      = makeItem(itemCrosshatch, "#")
-	tLess            = makeItem(itemLess, "<")
-	tGreater         = makeItem(itemGreater, ">")
-	tEqual           = makeItem(itemEqual, "=")
-	tDoublequote     = makeItem(itemDoublequote, "\"")
-	tDot             = makeItem(itemDot, ".")
-	tAmpersand       = makeItem(itemAmpersand, "&")
-)
-
-func makeItem(typ itemType, text string) *item {
-	return &item{typ, &text, 0, 1}
-}
-
-const (
-	end = -1
-)
-
-type items []*item
+type items []item
 
 // replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
 func (tokens items) replaceNewlineSpace() items {
 	length := len(tokens)
-	var token *item
+	var token item
 	for i := length - 1; 0 <= i; i-- {
 		token = tokens[i]
-		if itemNewline != token.typ && itemSpace != token.typ {
+		if itemNewline != token && itemSpace != token {
 			break
 		}
-		if itemNewline == tokens[i-1].typ && (itemSpace == token.typ || itemNewline == token.typ) {
+		if itemNewline == tokens[i-1] && (itemSpace == token || itemNewline == token) {
 			tokens = tokens[:i]
 		}
 	}
@@ -240,7 +130,7 @@ func (tokens items) replaceNewlineSpace() items {
 func (tokens items) rawText() (ret string) {
 	b := &strings.Builder{}
 	for i := 0; i < len(tokens); i++ {
-		b.WriteString(tokens[i].Value())
+		b.WriteString(string(tokens[i]))
 	}
 	ret = b.String()
 
@@ -255,9 +145,9 @@ func (tokens items) trimLeftSpace() (spaces int, remains items) {
 
 	i := 0
 	for ; i < size; i++ {
-		if itemSpace == tokens[i].typ {
+		if itemSpace == tokens[i] {
 			spaces++
-		} else if itemTab == tokens[i].typ {
+		} else if itemTab == tokens[i] {
 			spaces += 4
 		} else {
 			break
@@ -302,7 +192,7 @@ func (tokens items) trimRight() items {
 
 	i := size - 1
 	for ; 0 <= i; i-- {
-		if !tokens[i].isWhitespace() && itemEOF != tokens[i].typ {
+		if !tokens[i].isWhitespace() && itemEOF != tokens[i] {
 			break
 		}
 	}
@@ -310,9 +200,9 @@ func (tokens items) trimRight() items {
 	return tokens[:i+1]
 }
 
-func (tokens items) firstNonSpace() (index int, token *item) {
+func (tokens items) firstNonSpace() (index int, token item) {
 	for index, token = range tokens {
-		if itemSpace != token.typ {
+		if itemSpace != token {
 			return
 		}
 	}
@@ -320,9 +210,9 @@ func (tokens items) firstNonSpace() (index int, token *item) {
 	return
 }
 
-func (tokens items) accept(itemType itemType) (pos int) {
+func (tokens items) accept(item item) (pos int) {
 	for ; pos < len(tokens); pos++ {
-		if itemType != tokens[pos].typ {
+		if item != tokens[pos] {
 			break
 		}
 	}
@@ -330,20 +220,10 @@ func (tokens items) accept(itemType itemType) (pos int) {
 	return
 }
 
-func (tokens items) index(itemType itemType) (pos int) {
-	for ; pos < len(tokens); pos++ {
-		if itemType == tokens[pos].typ {
-			return
-		}
-	}
-
-	return -1
-}
-
-func (tokens items) contain(itemTypes ...itemType) bool {
-	for _, token := range tokens {
-		for _, it := range itemTypes {
-			if token.typ == it {
+func (tokens items) contain(someTokens ...item) bool {
+	for _, t := range tokens {
+		for _, it := range someTokens {
+			if t == it {
 				return true
 			}
 		}
@@ -364,8 +244,7 @@ func (tokens items) containWhitespace() bool {
 
 func (tokens items) isBlankLine() bool {
 	for _, token := range tokens {
-		typ := token.typ
-		if itemSpace != typ && itemTab != typ && itemNewline != typ {
+		if itemSpace != token && itemTab != token && itemNewline != token {
 			return false
 		}
 	}
@@ -375,9 +254,9 @@ func (tokens items) isBlankLine() bool {
 
 func (tokens items) leftSpaces() (count int) {
 	for _, token := range tokens {
-		if itemSpace == token.typ {
+		if itemSpace == token {
 			count++
-		} else if itemTab == token.typ {
+		} else if itemTab == token {
 			count += 4
 		} else {
 			break
@@ -408,48 +287,38 @@ func (tokens items) splitWhitespace() (ret []items) {
 	return
 }
 
-func (tokens items) split(itemType itemType) (ret []items) {
+func (tokens items) split(token item) (ret []items) {
 	ret = []items{}
 	i := 0
 	ret = append(ret, items{})
-	for j, token := range tokens {
-		if itemType == token.typ {
+	for j, t := range tokens {
+		if token == t {
 			ret = append(ret, items{})
 			ret[i+1] = append(ret[i+1], tokens[j+1:]...)
 			return
 		} else {
-			ret[i] = append(ret[i], token)
+			ret[i] = append(ret[i], t)
 		}
 	}
 
 	return
 }
 
-func (tokens items) isASCIILetterNumHyphen() bool {
-	for _, token := range tokens {
-		if !token.isASCIILetterNumHyphen() {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (tokens items) startWith(itemType itemType) bool {
+func (tokens items) startWith(token item) bool {
 	if 1 > len(tokens) {
 		return false
 	}
 
-	return itemType == tokens[0].typ
+	return token == tokens[0]
 }
 
-func (tokens items) endWith(itemType itemType) bool {
+func (tokens items) endWith(token item) bool {
 	length := len(tokens)
 	if 1 > length {
 		return false
 	}
 
-	return itemType == tokens[length-1].typ
+	return token == tokens[length-1]
 }
 
 func (tokens items) isBackslashEscape(pos int) bool {
@@ -459,7 +328,7 @@ func (tokens items) isBackslashEscape(pos int) bool {
 
 	backslashes := 0
 	for i := pos - 1; 0 <= i; i-- {
-		if itemBackslash != tokens[i].typ {
+		if itemBackslash != tokens[i] {
 			break
 		}
 
@@ -471,11 +340,11 @@ func (tokens items) isBackslashEscape(pos int) bool {
 
 func (tokens items) statWhitespace() (newlines, spaces, tabs int) {
 	for _, token := range tokens {
-		if itemNewline == token.typ {
+		if itemNewline == token {
 			newlines++
-		} else if itemSpace == token.typ {
+		} else if itemSpace == token {
 			spaces++
-		} else if itemTab == token.typ {
+		} else if itemTab == token {
 			tabs++
 		}
 	}
@@ -494,10 +363,10 @@ func (tokens items) spnl() (ret bool, passed, remains items) {
 	return
 }
 
-func (tokens items) peek(pos int) *item {
+func (tokens items) peek(pos int) item {
 	if pos < len(tokens) {
 		return tokens[pos]
 	}
 
-	return nil
+	return itemEOF
 }

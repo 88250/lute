@@ -17,7 +17,7 @@ package lute
 
 type delimiter struct {
 	node           Node       // the text node point to
-	typ            itemType   // the type of delimiter ([, ![, *, _)
+	typ            item   // the type of delimiter ([, ![, *, _)
 	num            int        // the number of delimiters
 	originalNum    int        // the original number of delimiters
 	canOpen        bool       // whether the delimiter is a potential opener
@@ -35,12 +35,12 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 	startPos := t.context.pos
 	token := tokens[startPos]
 	delimitersCount := 0
-	for i := t.context.pos; i < len(tokens) && token.Value() == tokens[i].Value(); i++ {
+	for i := t.context.pos; i < len(tokens) && token == tokens[i]; i++ {
 		delimitersCount++
 		t.context.pos++
 	}
 
-	tokenBefore, tokenAfter := tNewLine, tNewLine
+	tokenBefore, tokenAfter := itemNewline, itemNewline
 	if 0 != startPos {
 		tokenBefore = tokens[startPos - 1]
 	}
@@ -49,18 +49,18 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 	}
 
 	var beforeIsPunct, beforeIsWhitespace, afterIsPunct, afterIsWhitespace, canOpen, canClose bool
-	if nil != tokenBefore {
+	if itemEOF != tokenBefore {
 		beforeIsWhitespace = tokenBefore.isUnicodeWhitespace()
 		beforeIsPunct = tokenBefore.isPunct()
 	}
-	if nil != tokenAfter {
+	if itemEOF != tokenAfter {
 		afterIsWhitespace = tokenAfter.isUnicodeWhitespace()
 		afterIsPunct = tokenAfter.isPunct()
 	}
 
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
-	if itemUnderscore == token.typ {
+	if itemUnderscore == token {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
 	} else {
@@ -68,7 +68,7 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 		canClose = isRightFlanking
 	}
 
-	return &delimiter{typ: token.typ, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
+	return &delimiter{typ: token, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
 }
 
 func (t *Tree) handleDelim(block Node, tokens items) {
@@ -101,7 +101,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 	var tempstack *delimiter
 	var use_delims int
 	var opener_found bool
-	var openers_bottom = map[itemType]*delimiter{}
+	var openers_bottom = map[item]*delimiter{}
 	var odd_match = false
 
 	openers_bottom[itemUnderscore] = stackBottom

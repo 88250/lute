@@ -49,7 +49,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 		for {
 			token := tokens[t.context.pos]
 			var n Node
-			switch token.typ {
+			switch token {
 			case itemBackslash:
 				n = t.parseBackslash(tokens)
 			case itemBacktick:
@@ -83,7 +83,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			}
 
 			length := len(tokens)
-			if 1 > length || t.context.pos >= length || itemEOF == tokens[t.context.pos].typ {
+			if 1 > length || t.context.pos >= length || itemEOF == tokens[t.context.pos] {
 				break
 			}
 		}
@@ -100,16 +100,16 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	}
 
 	start := t.context.pos
-	numeric := itemCrosshatch == tokens[start+1].typ
+	numeric := itemCrosshatch == tokens[start+1]
 	i := t.context.pos
-	var token *item
+	var token item
 	var endWithSemicolon bool
 	for ; i < length; i++ {
 		token = tokens[i]
 		if token.isWhitespace() {
 			break
 		}
-		if itemSemicolon == token.typ {
+		if itemSemicolon == token {
 			i++
 			endWithSemicolon = true
 			break
@@ -181,7 +181,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 	savepos := t.context.pos
 	matched := false
 	// Inline link?
-	if t.context.pos+1 < len(tokens) && itemOpenParen == tokens[t.context.pos+1].typ {
+	if t.context.pos+1 < len(tokens) && itemOpenParen == tokens[t.context.pos+1] {
 		t.context.pos++
 		isLink := false
 		var passed, remains items
@@ -198,7 +198,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 							t.context.pos += len(passed)
 							isLink, passed, remains = remains.spnl()
 							t.context.pos += len(passed)
-							matched = isLink && itemCloseParen == remains[0].typ
+							matched = isLink && itemCloseParen == remains[0]
 						}
 					}
 				} else { // 没有 title
@@ -224,7 +224,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		} else if !opener.bracketAfter {
 			// [text][] 或者 [text][] 格式，将第一个 text 视为 label 进行解析
 			passed, reflabel = t.extractTokens(tokens, opener.index, startPos)
-			if len(passed) > 0 && len(tokens) > beforelabel && itemOpenBracket == tokens[beforelabel].typ {
+			if len(passed) > 0 && len(tokens) > beforelabel && itemOpenBracket == tokens[beforelabel] {
 				// [text][] 格式，跳过 []
 				t.context.pos += 2
 			}
@@ -318,11 +318,11 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 		t.context.pos++
 	}
 	token := tokens[t.context.pos]
-	if itemNewline == token.typ {
+	if itemNewline == token {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 		t.context.pos++
 	} else if token.isASCIIPunct() {
-		ret = &Text{&BaseNode{typ: NodeText, value: token.Value()}}
+		ret = &Text{&BaseNode{typ: NodeText, value: string(token)}}
 		t.context.pos++
 	} else {
 		ret = &Text{&BaseNode{typ: NodeText, value: "\\"}}
@@ -334,7 +334,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
 	b := &strings.Builder{}
 	for i := startPos; i < endPos; i++ {
-		b.WriteString(tokens[i].Value())
+		b.WriteString(string(tokens[i]))
 	}
 	text = b.String()
 	subTokens = tokens[startPos:endPos]
@@ -345,7 +345,7 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 func (t *Tree) parseText(tokens items) (ret Node) {
 	token := tokens[t.context.pos]
 	t.context.pos++
-	ret = &Text{&BaseNode{typ: NodeText, value: token.Value()}}
+	ret = &Text{&BaseNode{typ: NodeText, value: string(token)}}
 
 	return
 }

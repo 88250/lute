@@ -18,7 +18,6 @@ package lute
 import (
 	"bufio"
 	"strings"
-	"unicode"
 	"unicode/utf8"
 )
 
@@ -29,12 +28,10 @@ type lexer struct {
 }
 
 type scanner struct {
-	input   string // the string being scanned
-	pos     int    // current position in the input
-	start   int    // start position of this item
-	width   int    // width of last rune read from input
-	lastPos int    // position of most recent item returned by nextItem
-	items   items  // scanned items
+	input string // the string being scanned
+	pos   int    // current position in the input
+	width int    // width of last rune read from input
+	items items  // scanned tokens
 }
 
 // lex creates a new lexer for the input string.
@@ -42,7 +39,7 @@ func lex(input string) *lexer {
 	ret := &lexer{items: make([]items, 0, 64)}
 	if "" == input {
 		ret.items = append(ret.items, items{})
-		ret.items[ret.line] = append(ret.items[ret.line], &item{typ: itemEOF})
+		ret.items[ret.line] = append(ret.items[ret.line], itemEOF)
 
 		return ret
 	}
@@ -52,7 +49,7 @@ func lex(input string) *lexer {
 	var itemScanners []*scanner
 	for lineScanner.Scan() {
 		line = lineScanner.Text() + "\n"
-		itemScanner := &scanner{input: line, items: make([]*item, 0, 16)}
+		itemScanner := &scanner{input: line, items: make([]item, 0, 16)}
 		itemScanners = append(itemScanners, itemScanner)
 		itemScanner.run()
 	}
@@ -69,105 +66,35 @@ func (s *scanner) run() {
 	for {
 		r := s.next()
 		switch {
-		case '`' == r:
-			s.newItem(itemBacktick)
-		case '~' == r:
-			s.newItem(itemTilde)
-		case '!' == r:
-			s.newItem(itemBang)
-		case '#' == r:
-			s.newItem(itemCrosshatch)
-		case '*' == r:
-			s.newItem(itemAsterisk)
-		case '(' == r:
-			s.newItem(itemOpenParen)
-		case ')' == r:
-			s.newItem(itemCloseParen)
-		case '-' == r:
-			s.newItem(itemHyphen)
-		case '_' == r:
-			s.newItem(itemUnderscore)
-		case '+' == r:
-			s.newItem(itemPlus)
-		case '=' == r:
-			s.newItem(itemEqual)
-		case '\t' == r:
-			s.newItem(itemTab)
-		case '[' == r:
-			s.newItem(itemOpenBracket)
-		case ']' == r:
-			s.newItem(itemCloseBracket)
-		case '"' == r:
-			s.newItem(itemDoublequote)
-		case '\'' == r:
-			s.newItem(itemSinglequote)
-		case '<' == r:
-			s.newItem(itemLess)
-		case '>' == r:
-			s.newItem(itemGreater)
-		case ' ' == r:
-			s.newItem(itemSpace)
-		case '\n' == r:
-			s.newItem(itemNewline)
 		case '\r' == r:
 			if r = s.next(); '\n' == r || '\u0085' == r {
 				s.newItem(itemNewline)
 			} else {
 				s.backup()
-				s.newItem(itemStr)
+				s.newItem(r)
 			}
-		case '\u2424' == r, '\u2028' == r, '\u0085' == r:
+		case r.isNewline():
 			s.newItem(itemNewline)
-		case '\u0000' == r:
-			s.newItem(itemNewline)
-		case '\\' == r:
-			s.newItem(itemBackslash)
-		case '/' == r:
-			s.newItem(itemSlash)
-		case '.' == r:
-			s.newItem(itemDot)
-		case ':' == r:
-			s.newItem(itemColon)
-		case '?' == r:
-			s.newItem(itemQuestion)
-		case '&' == r:
-			s.newItem(itemAmpersand)
-		case ';' == r:
-			s.newItem(itemSemicolon)
-		case unicode.IsSymbol(r), unicode.IsPunct(r), unicode.IsSpace(r):
-			s.newItem(itemStr)
-		case unicode.IsControl(r):
-			s.newItem(itemControl)
-		case end == r:
+		case itemEOF == r:
 			return
 		default:
-		str:
-			for {
-				switch {
-				case unicode.IsLetter(r), unicode.IsNumber(r), unicode.IsMark(r):
-					r = s.next()
-				default:
-					s.backup()
-					s.newItem(itemStr)
-					break str
-				}
-			}
+			s.newItem(r)
 		}
 	}
 }
 
 // next returns the next rune in the input.
-func (s *scanner) next() rune {
+func (s *scanner) next() item {
 	if s.pos >= len(s.input) {
 		s.width = 0
-		return end
+		return itemEOF
 	}
 
 	r, w := utf8.DecodeRuneInString(s.input[s.pos:])
 	s.width = w
 	s.pos += s.width
 
-	return r
+	return item(r)
 }
 
 // backup steps back one rune. Can only be called once per call of next.
@@ -176,7 +103,6 @@ func (s *scanner) backup() {
 }
 
 // newItem creates an item with the specified item type.
-func (s *scanner) newItem(t itemType) {
-	s.items = append(s.items, &item{t, &s.input, s.start, s.pos})
-	s.start = s.pos
+func (s *scanner) newItem(r item) {
+	s.items = append(s.items, r)
 }

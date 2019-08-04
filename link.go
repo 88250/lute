@@ -26,7 +26,7 @@ type Link struct {
 func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 	tokens = tokens[1:]
 	var dest string
-	var token *item
+	var token item
 	length := len(tokens)
 	passed := 0
 	i := 0
@@ -84,7 +84,7 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 	schemed := false
 	scheme := ""
 	dest := ""
-	var token *item
+	var token item
 	i := t.context.pos + 1
 	for ; i < len(tokens) && itemGreater != tokens[i].typ; i++ {
 		token = tokens[i]

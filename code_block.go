@@ -20,7 +20,7 @@ import "strings"
 type CodeBlock struct {
 	*BaseNode
 	isFenced    bool
-	fenceChar   string
+	fenceChar   item
 	fenceLength int
 	fenceOffset int
 	info        string
@@ -37,10 +37,10 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 		} else {
 			// skip optional spaces of fence offset
 			var i = codeBlock.fenceOffset
-			var token *item
+			var token item
 			for i > 0 {
 				token = ln.peek(context.offset)
-				if itemSpace != token.typ && itemTab != token.typ {
+				if itemSpace != token && itemTab != token {
 					break
 				}
 				context.advanceOffset(1, true)
@@ -64,10 +64,10 @@ func (codeBlock *CodeBlock) Finalize(context *Context) {
 		// first line becomes info string
 		content := codeBlock.tokens
 		var i int
-		var token *item
+		var token item
 		for ; ; i++ {
 			token = codeBlock.tokens[i]
-			if itemNewline == token.typ {
+			if itemNewline == token {
 				break
 			}
 		}
@@ -93,13 +93,13 @@ func (codeBlock *CodeBlock) CanContain(nodeType NodeType) bool {
 
 func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 	marker := t.context.currentLine[t.context.nextNonspace]
-	if itemBacktick != marker.typ && itemTilde != marker.typ {
+	if itemBacktick != marker && itemTilde != marker {
 		return nil
 	}
 
-	fenceChar := marker.Value()
+	fenceChar := marker
 	fenceLength := 0
-	for i := t.context.nextNonspace; fenceChar == t.context.currentLine[i].Value(); i++ {
+	for i := t.context.nextNonspace; fenceChar == t.context.currentLine[i]; i++ {
 		fenceLength++
 	}
 
@@ -109,7 +109,7 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 
 	var info string
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
-	if itemBacktick == marker.typ {
+	if itemBacktick == marker {
 		if !infoTokens.contain(itemBacktick) {
 			info = infoTokens.trim().rawText()
 		} else {
@@ -126,16 +126,16 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 	return
 }
 
-func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker string, num int) bool {
+func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker item, num int) bool {
 	closeMarker := tokens[0]
-	if closeMarker.Value() != openMarker {
+	if closeMarker != openMarker {
 		return false
 	}
-	if num > tokens.accept(closeMarker.typ) {
+	if num > tokens.accept(closeMarker) {
 		return false
 	}
 	for _, token := range tokens.trim() {
-		if token.Value() != openMarker {
+		if token != openMarker {
 			return false
 		}
 	}

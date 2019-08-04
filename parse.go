@@ -76,7 +76,7 @@ type Context struct {
 func (context *Context) advanceOffset(count int, columns bool) {
 	var currentLine = context.currentLine
 	var charsToTab, charsToAdvance int
-	var c *item
+	var c item
 	for ; count > 0; {
 		c = currentLine[context.offset]
 		if itemTab == c.typ {
@@ -118,7 +118,7 @@ func (context *Context) findNextNonspace() {
 	i := context.offset
 	cols := context.column
 
-	var c *item
+	var c item
 	for {
 		c = context.currentLine[i]
 		if itemSpace == c.typ {

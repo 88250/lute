@@ -30,7 +30,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		return nil
 	}
 
-	if 1 > len(remains) || itemColon != remains[0].typ {
+	if 1 > len(remains) || itemColon != remains[0] {
 		return nil
 	}
 
@@ -61,7 +61,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	if !validTitle && 1 > newlines {
 		return nil
 	}
-	if 0 < spaces1+tabs1 && !remains.isBlankLine() && itemNewline != remains[0].typ {
+	if 0 < spaces1+tabs1 && !remains.isBlankLine() && itemNewline != remains[0] {
 		return nil
 	}
 
@@ -89,7 +89,7 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, r
 	if 1 > len(tokens) {
 		return true, nil, tokens, ""
 	}
-	if itemOpenBracket == tokens[0].typ {
+	if itemOpenBracket == tokens[0] {
 		return true, nil, tokens, ""
 	}
 
@@ -107,14 +107,14 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, r
 	return
 }
 
-func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens items) (validTitle bool, passed, remains items, title string) {
+func (context *Context) parseLinkTitleMatch(opener, closer item, tokens items) (validTitle bool, passed, remains items, title string) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
 		return
 	}
 
-	if opener != tokens[0].typ {
+	if opener != tokens[0] {
 		return
 	}
 
@@ -123,9 +123,9 @@ func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens item
 	i := 1
 	for i < len(line) {
 		token := line[i]
-		title += token.Value()
+		title += string(token)
 		passed = append(passed, token)
-		if closer == token.typ && !tokens.isBackslashEscape(i) {
+		if closer == token && !tokens.isBackslashEscape(i) {
 			closed = true
 			title = title[:len(title)-1]
 			break
@@ -169,17 +169,17 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 	for ; i < length; i++ {
 		token := tokens[i]
 		ret = append(ret, token)
-		destination += token.Value()
-		if token.isWhitespace() || itemControl == token.typ {
+		destination += string(token)
+		if token.isWhitespace() || token.isControl() {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
 			break
 		}
 
-		if itemOpenParen == token.typ && !tokens.isBackslashEscape(i) {
+		if itemOpenParen == token && !tokens.isBackslashEscape(i) {
 			openParens++
 		}
-		if itemCloseParen == token.typ && !tokens.isBackslashEscape(i) {
+		if itemCloseParen == token && !tokens.isBackslashEscape(i) {
 			openParens--
 			if 1 > openParens {
 				i++
@@ -205,7 +205,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 		return
 	}
 
-	if itemLess != tokens[0].typ {
+	if itemLess != tokens[0] {
 		return
 	}
 
@@ -215,15 +215,15 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 		token := tokens[i]
 		ret = append(ret, token)
 		if 0 < i {
-			destination += token.Value()
-			if itemLess == token.typ && !tokens.isBackslashEscape(i) {
+			destination += string(token)
+			if itemLess == token && !tokens.isBackslashEscape(i) {
 				ret = nil
 				destination = ""
 				return
 			}
 		}
 
-		if itemGreater == token.typ && !tokens.isBackslashEscape(i) {
+		if itemGreater == token && !tokens.isBackslashEscape(i) {
 			closed = true
 			destination = destination[0 : len(destination)-1]
 			break
@@ -248,7 +248,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 		return
 	}
 
-	if itemOpenBracket != tokens[0].typ {
+	if itemOpenBracket != tokens[0] {
 		return
 	}
 
@@ -258,14 +258,14 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 	for {
 		token := line[i]
 		passed = append(passed, token)
-		label += token.Value()
-		if itemCloseBracket == token.typ && !tokens.isBackslashEscape(i) {
+		label += string(token)
+		if itemCloseBracket == token && !tokens.isBackslashEscape(i) {
 			closed = true
 			label = label[0 : len(label)-1]
 			remains = line[i+1:]
 			break
 		}
-		if itemOpenBracket == token.typ && !tokens.isBackslashEscape(i) {
+		if itemOpenBracket == token && !tokens.isBackslashEscape(i) {
 			passed = nil
 			label = ""
 			return

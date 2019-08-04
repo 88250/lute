@@ -21,10 +21,10 @@ type Blockquote struct {
 
 func (blockquote *Blockquote) Continue(context *Context) int {
 	var ln = context.currentLine
-	if !context.indented && ln.peek(context.nextNonspace).typ == itemGreater {
+	if !context.indented && ln.peek(context.nextNonspace) == itemGreater {
 		context.advanceNextNonspace()
 		context.advanceOffset(1, false)
-		if token := ln.peek(context.offset); itemSpace == token.typ || itemTab == token.typ {
+		if token := ln.peek(context.offset); itemSpace == token || itemTab == token {
 			context.advanceOffset(1, true)
 		}
 	} else {

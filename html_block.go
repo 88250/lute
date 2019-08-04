@@ -49,19 +49,19 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	switch htmlType {
 	case 1:
 		for i := 0; i < length-3; i++ {
-			if itemLess == tokens[i].typ && itemSlash == tokens[i+1].typ && t.equalAnyIgnoreCase(tokens[i+2].Value(), "script", "pre", "style") && itemGreater == tokens[i+3].typ {
+			if itemLess == tokens[i] && itemSlash == tokens[i+1] && t.equalAnyIgnoreCase(tokens[i+2], "script", "pre", "style") && itemGreater == tokens[i+3] {
 				return true
 			}
 		}
 	case 2:
 		for i := 0; i < length-3; i++ {
-			if itemHyphen == tokens[i].typ && itemHyphen == tokens[i+1].typ && itemGreater == tokens[i+2].typ {
+			if itemHyphen == tokens[i] && itemHyphen == tokens[i+1] && itemGreater == tokens[i+2] {
 				return true
 			}
 		}
 	case 3:
 		for i := 0; i < length-2; i++ {
-			if itemQuestion == tokens[i].typ && itemGreater == tokens[i+1].typ {
+			if itemQuestion == tokens[i] && itemGreater == tokens[i+1] {
 				return true
 			}
 		}
@@ -69,7 +69,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 		return tokens.contain(itemGreater)
 	case 5:
 		for i := 0; i < length-2; i++ {
-			if itemCloseBracket == tokens[i].typ && itemCloseBracket == tokens[i+1].typ {
+			if itemCloseBracket == tokens[i] && itemCloseBracket == tokens[i+1] {
 				return true
 			}
 		}
@@ -85,7 +85,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 		return nil
 	}
 
-	if itemLess != tokens[0].typ {
+	if itemLess != tokens[0] {
 		return nil
 	}
 
@@ -95,12 +95,12 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 			return nil
 		}
 
-		if l[0].isWhitespace() || itemGreater == l[0].typ || itemEOF == l[0].typ {
+		if l[0].isWhitespace() || itemGreater == l[0] || itemEOF == l[0] {
 			return &HTML{&BaseNode{typ: NodeHTML}, 1}
 		}
 	}
 
-	slash := itemSlash == tokens[1].typ
+	slash := itemSlash == tokens[1]
 	i := 1
 	if slash {
 		i = 2
@@ -108,10 +108,10 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 	rule6 := t.equalAnyIgnoreCase(tokens[i].Value(), HTMLBlockTags...)
 	if rule6 {
 		i++
-		if tokens[i].isWhitespace() || itemGreater == tokens[i].typ {
+		if tokens[i].isWhitespace() || itemGreater == tokens[i] {
 			return &HTML{&BaseNode{typ: NodeHTML}, 6}
 		}
-		if i < length && itemSlash == tokens[i].typ && itemGreater == tokens[i+1].typ {
+		if i < length && itemSlash == tokens[i] && itemGreater == tokens[i+1] {
 			return &HTML{&BaseNode{typ: NodeHTML}, 6}
 		}
 	}
@@ -180,13 +180,13 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 		return
 	}
 
-	if itemLess != tokens[0].typ {
+	if itemLess != tokens[0] {
 		return
 	}
-	if itemGreater != tokens[length-1].typ {
+	if itemGreater != tokens[length-1] {
 		return
 	}
-	if itemSlash == tokens[length-2].typ {
+	if itemSlash == tokens[length-2] {
 		tokens = tokens[1 : length-2]
 	} else {
 		tokens = tokens[1 : length-1]
@@ -220,14 +220,14 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 	for _, nameAndAttr := range nameAndAttrs {
 		nameAndValue := nameAndAttr.split(itemEqual)
 		name := nameAndValue[0]
-		if !name[0].isASCIILetter() && itemUnderscore != name[0].typ && itemColon != name[0].typ {
+		if !name[0].isASCIILetter() && itemUnderscore != name[0] && itemColon != name[0] {
 			return
 		}
 
 		if 1 < len(name) {
 			name = name[1:]
 			for _, n := range name {
-				if !n.isASCIILetter() && !n.isNumInt() && itemUnderscore != n.typ && itemDot != n.typ && itemColon != n.typ && itemHyphen != n.typ {
+				if !n.isASCIILetter() && !n.isDigit() && itemUnderscore != n && itemDot != n && itemColon != n && itemHyphen != n {
 					return
 				}
 			}
@@ -258,10 +258,10 @@ func (tokens items) isCloseTag() bool {
 		return false
 	}
 
-	if itemLess != tokens[0].typ || itemSlash != tokens[1].typ {
+	if itemLess != tokens[0] || itemSlash != tokens[1] {
 		return false
 	}
-	if itemGreater != tokens[length-1].typ {
+	if itemGreater != tokens[length-1] {
 		return false
 	}
 
