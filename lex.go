@@ -66,10 +66,10 @@ func (s *scanner) run() {
 	for {
 		r := s.next()
 		switch {
-		case r.isNewline():
-			s.newItem(itemNewline)
 		case itemEOF == r:
 			return
+		case r.isNewline():
+			s.newItem(itemNewline)
 		default:
 			s.newItem(r)
 		}
