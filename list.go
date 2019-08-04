@@ -109,7 +109,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	}
 
 	// if it interrupts paragraph, make sure first line isn't blank
-	if container.Type() == NodeParagraph && t.context.currentLine[t.context.nextNonspace+markerLength:].isBlankLine() {
+	if container.Type() == NodeParagraph && itemNewline == t.context.currentLine[t.context.nextNonspace+markerLength].typ {
 		return nil
 	}
 

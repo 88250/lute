@@ -332,7 +332,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 }
 
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
-	b := strings.Builder{}
+	b := &strings.Builder{}
 	for i := startPos; i < endPos; i++ {
 		b.WriteString(tokens[i].Value())
 	}

@@ -22,7 +22,7 @@ import (
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
-	for line := t.nextLine(); !line.isEOF(); line = t.nextLine() {
+	for line := t.nextLine(); nil != line; line = t.nextLine() {
 		t.incorporateLine(line)
 	}
 	for nil != t.context.tip {

@@ -54,7 +54,6 @@ func (bc *BlockContainer) peek() Node {
 // Context use to store common data in parsing.
 type Context struct {
 	linkRefDef map[string]*Link
-	curLines   []items
 
 	// Blocks parsing
 
@@ -206,21 +205,12 @@ func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 }
 
 func (t *Tree) nextLine() (line items) {
-	length := len(t.context.curLines)
-	if 0 < length {
-		line = t.context.curLines[0]
-		t.context.curLines = t.context.curLines[1:]
-
+	if t.lex.line < t.lex.length {
+		line = t.lex.items[t.lex.line]
+		t.lex.line++
 		return
 	}
-
-	for {
-		token := t.lex.nextItem()
-		line = append(line, token)
-		if token.isNewline() || token.isEOF() {
-			return
-		}
-	}
+	return
 }
 
 // Parsing.

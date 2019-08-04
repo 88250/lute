@@ -24,9 +24,9 @@ import (
 )
 
 type lexer struct {
-	items   []items
-	lastPos int
-	line    int
+	items  []items // 总行
+	length int     // 总行数
+	line   int     // 当前行号
 }
 
 type scanner struct {
@@ -36,24 +36,6 @@ type scanner struct {
 	width   int    // width of last rune read from input
 	lastPos int    // position of most recent item returned by nextItem
 	items   items  // scanned items
-}
-
-// nextItem returns the next item from the input.
-// Called by the parser, not in the lexing goroutine.
-func (l *lexer) nextItem() *item {
-	if len(l.items) <= l.line || len(l.items[l.line]) <= l.lastPos {
-		return &item{typ: itemEOF}
-	}
-
-	item := l.items[l.line][l.lastPos]
-	if itemNewline == item.typ {
-		l.line++
-		l.lastPos = 0
-	} else {
-		l.lastPos++
-	}
-
-	return item
 }
 
 // lex creates a new lexer for the input string.
@@ -72,10 +54,7 @@ func lex(input string) *lexer {
 	wg := &sync.WaitGroup{}
 	for lineScanner.Scan() {
 		line = lineScanner.Text() + "\n"
-		itemScanner := &scanner{
-			input: line,
-			items: items{},
-		}
+		itemScanner := &scanner{input: line, items: items{}}
 		itemScanners = append(itemScanners, itemScanner)
 		wg.Add(1)
 		go itemScanner.run(wg)
@@ -86,8 +65,7 @@ func lex(input string) *lexer {
 		ret.items = append(ret.items, itemScanner.items)
 	}
 
-	lastLine := len(ret.items) - 1
-	ret.items[lastLine] = append(ret.items[lastLine], &item{typ: itemEOF})
+	ret.length = len(ret.items)
 
 	return ret
 }

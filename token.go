@@ -17,6 +17,7 @@ package lute
 
 import (
 	"fmt"
+	"strings"
 	"unicode"
 )
 
@@ -29,7 +30,12 @@ type item struct {
 }
 
 func (i *item) Value() string {
-	return (*i.input)[i.valueStartPos:i.valueEndPos]
+	val := *i.input
+	if "" == val {
+		return ""
+	}
+
+	return (val)[i.valueStartPos:i.valueEndPos]
 }
 
 func (i *item) String() string {
@@ -243,14 +249,12 @@ func (tokens items) Tokens() items {
 	return tokens
 }
 
-func (tokens items) isEOF() bool {
-	return 1 == len(tokens) && (tokens)[0].isEOF()
-}
-
 func (tokens items) rawText() (ret string) {
+	b := &strings.Builder{}
 	for i := 0; i < len(tokens); i++ {
-		ret += tokens[i].Value()
+		b.WriteString(tokens[i].Value())
 	}
+	ret = b.String()
 
 	return
 }
@@ -309,8 +313,8 @@ func (tokens items) trimRight() items {
 	}
 
 	i := size - 1
-	for ; 0 <= size; i-- {
-		if !tokens[i].isWhitespace() {
+	for ; 0 <= i; i-- {
+		if !tokens[i].isWhitespace() && !tokens[i].isEOF() {
 			break
 		}
 	}
@@ -371,10 +375,6 @@ func (tokens items) containWhitespace() bool {
 }
 
 func (tokens items) isBlankLine() bool {
-	if tokens.isEOF() {
-		return true
-	}
-
 	for _, token := range tokens {
 		typ := token.typ
 		if itemSpace != typ && itemTab != typ && itemNewline != typ {
