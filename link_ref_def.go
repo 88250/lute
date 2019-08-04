@@ -123,7 +123,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer itemType, tokens item
 	i := 1
 	for i < len(line) {
 		token := line[i]
-		title += token.val
+		title += token.Value()
 		passed = append(passed, token)
 		if closer == token.typ && !tokens.isBackslashEscape(i) {
 			closed = true
@@ -169,7 +169,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 	for ; i < length; i++ {
 		token := tokens[i]
 		ret = append(ret, token)
-		destination += token.val
+		destination += token.Value()
 		if token.isWhitespace() || token.isControl() {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
@@ -215,7 +215,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 		token := tokens[i]
 		ret = append(ret, token)
 		if 0 < i {
-			destination += token.val
+			destination += token.Value()
 			if itemLess == token.typ && !tokens.isBackslashEscape(i) {
 				ret = nil
 				destination = ""
@@ -258,7 +258,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 	for {
 		token := line[i]
 		passed = append(passed, token)
-		label += token.val
+		label += token.Value()
 		if itemCloseBracket == token.typ && !tokens.isBackslashEscape(i) {
 			closed = true
 			label = label[0 : len(label)-1]

@@ -27,10 +27,10 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
-	// commonmark spec inline-level cases
 
 	{"issue1", "(<http://daringfireball.net/projects/markdown/>)", "<p>(<a href=\"http://daringfireball.net/projects/markdown/\">http://daringfireball.net/projects/markdown/</a>)</p>\n"},
 
+	// commonmark spec inline-level cases
 	{"spec626", "foo <![CDATA[>&<]]>\n", "<p>foo <![CDATA[>&<]]></p>\n"},
 	{"spec625", "foo <!ELEMENT br EMPTY>\n", "<p>foo <!ELEMENT br EMPTY></p>\n"},
 	{"spec624", "foo <?php echo $a; ?>\n", "<p>foo <?php echo $a; ?></p>\n"},
@@ -210,7 +210,7 @@ var parseTests = []parseTest{
 	{"spec4", "  - foo\n\n\tbar\n", "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>\n"},
 	{"spec3", "    a\ta\n    ὐ\ta\n", "<pre><code>a\ta\nὐ\ta\n</code></pre>\n"},
 	{"spec2", "  \tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
-	{"spce1", "\tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
+	{"spec1", "\tfoo\tbaz\t\tbim\n", "<pre><code>foo\tbaz\t\tbim\n</code></pre>\n"},
 
 	// some simple cases
 

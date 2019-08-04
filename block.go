@@ -79,7 +79,7 @@ func (t *Tree) incorporateLine(line items) {
 		// 如果不由潜在的节点标记开头 ^[#`~*+_=<>0-9-]，则说明不用继续迭代生成子节点
 		// 这里仅做简单判断的话可以略微提升一些性能
 		maybeMarker := t.context.currentLine[t.context.nextNonspace].typ
-		maybeMarkerVal := t.context.currentLine[t.context.nextNonspace].val
+		maybeMarkerVal := t.context.currentLine[t.context.nextNonspace].Value()
 		if !t.context.indented &&
 			itemCrosshatch != maybeMarker && // ATX Heading
 			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block

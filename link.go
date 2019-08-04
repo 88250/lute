@@ -33,14 +33,14 @@ func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 	at := false
 	for ; i < length; i++ {
 		token = tokens[i]
-		dest += token.val
+		dest += token.Value()
 		passed++
-		if "@" == token.val {
+		if "@" == token.Value() {
 			at = true
 			break
 		}
 
-		if !token.isASCIILetterNumHyphen() && !strings.Contains(".!#$%&'*+/=?^_`{|}~", token.val) {
+		if !token.isASCIILetterNumHyphen() && !strings.Contains(".!#$%&'*+/=?^_`{|}~", token.Value()) {
 			return nil
 		}
 	}
@@ -60,7 +60,7 @@ func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 			closed = true
 			break
 		}
-		dest += token.val
+		dest += token.Value()
 		if !token.isASCIILetterNumHyphen() && itemDot != token.typ {
 			return nil
 		}
@@ -92,10 +92,10 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 			return nil
 		}
 
-		dest += token.val
+		dest += token.Value()
 		if !schemed {
 			if itemColon != token.typ {
-				scheme += token.val
+				scheme += token.Value()
 			} else {
 				schemed = true
 			}
@@ -141,7 +141,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 			}
 
 			passed = append(passed, token)
-			destination += token.val
+			destination += token.Value()
 			if itemGreater == token.typ && !tokens.isBackslashEscape(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
@@ -165,7 +165,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		for ; i < length; i++ {
 			token := tokens[i]
 			passed = append(passed, token)
-			destination += token.val
+			destination += token.Value()
 			if !destStarted && !token.isWhitespace() && 0 < i {
 				destStarted = true
 				destination = destination[1:]

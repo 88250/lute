@@ -97,7 +97,6 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	if 2 > length {
 		t.context.pos++
 		return &Text{&BaseNode{typ: NodeText, value: "&"}}
-		return
 	}
 
 	start := t.context.pos
@@ -323,7 +322,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 		t.context.pos++
 	} else if token.isASCIIPunct() {
-		ret = &Text{&BaseNode{typ: NodeText, value: token.val}}
+		ret = &Text{&BaseNode{typ: NodeText, value: token.Value()}}
 		t.context.pos++
 	} else {
 		ret = &Text{&BaseNode{typ: NodeText, value: "\\"}}
@@ -335,7 +334,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
 	b := strings.Builder{}
 	for i := startPos; i < endPos; i++ {
-		b.WriteString(tokens[i].val)
+		b.WriteString(tokens[i].Value())
 	}
 	text = b.String()
 	subTokens = tokens[startPos:endPos]
@@ -346,7 +345,7 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 func (t *Tree) parseText(tokens items) (ret Node) {
 	token := tokens[t.context.pos]
 	t.context.pos++
-	ret = &Text{&BaseNode{typ: NodeText, rawText: token.val, value: token.val}}
+	ret = &Text{&BaseNode{typ: NodeText, rawText: token.Value(), value: token.Value()}}
 
 	return
 }

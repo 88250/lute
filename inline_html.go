@@ -110,7 +110,7 @@ func (t *Tree) parseCDATA(tokens items) (valid bool, remains, content items) {
 	if itemOpenBracket != tokens[1].typ {
 		return
 	}
-	if "CDATA" != tokens[2].val {
+	if "CDATA" != tokens[2].Value() {
 		return
 	}
 	if itemOpenBracket != tokens[3].typ {
@@ -146,7 +146,7 @@ func (t *Tree) parseDeclaration(tokens items) (valid bool, remains, content item
 		return
 	}
 
-	name := tokens[1].val
+	name := tokens[1].Value()
 	for _, c := range name {
 		if !('A' <= c && 'Z' >= c) {
 			return
@@ -375,12 +375,12 @@ func (t *Tree) parseAttrName(tokens items) (remains, attrName items) {
 }
 
 func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
-	c := tokens[0].val[0]
+	c := tokens[0].Value()[0]
 	if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) {
 		return tokens, nil
 	}
-	for i := 0; i < len(tokens[0].val); i++ {
-		c = tokens[0].val[i]
+	for i := 0; i < len(tokens[0].Value()); i++ {
+		c = tokens[0].Value()[i]
 		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) &&
 			!('0' <= c && '9' >= c) && '-' != c {
 			return tokens, nil

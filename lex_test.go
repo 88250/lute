@@ -75,10 +75,10 @@ func equal(i1, i2 items, checkPos bool) bool {
 		if i1[k].typ != i2[k].typ {
 			return false
 		}
-		if i1[k].val != i2[k].val {
+		if i1[k].Value() != i2[k].Value() {
 			return false
 		}
-		if checkPos && i1[k].pos != i2[k].pos {
+		if checkPos && (i1[k].valueStartPos != i2[k].valueStartPos || i1[k].valueEndPos != i2[k].valueEndPos) {
 			return false
 		}
 	}

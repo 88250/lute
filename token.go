@@ -20,40 +20,45 @@ import (
 	"unicode"
 )
 
-// item represents a token returned from the scanner.
+// item 描述了一个读取进来的 Token.
 type item struct {
-	typ  itemType // the type of this item
-	pos  int      // the starting position, in bytes, of this item in the input string
-	val  string   // the value of this item, aka lexeme
+	typ           itemType // Token 类型
+	input         *string  // 指向整个输入文本
+	valueStartPos int      // 词素（lexeme）起始位置
+	valueEndPos   int      // 词素结束位置
+}
+
+func (i *item) Value() string {
+	return (*i.input)[i.valueStartPos:i.valueEndPos]
 }
 
 func (i *item) String() string {
 	switch {
 	case i.typ == itemEOF:
 		return "EOF"
-	case len(string(i.val)) > 10:
-		return fmt.Sprintf("%.10q...", i.val)
+	case len(string(i.Value())) > 10:
+		return fmt.Sprintf("%.10q...", i.Value())
 	}
 
-	return fmt.Sprintf("%q", i.val)
+	return fmt.Sprintf("%q", i.Value())
 }
 
 func (i *item) isWhitespace() bool {
-	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ || "\u000A" == i.val || "\u000C" == i.val || "\u000D" == i.val
+	return itemSpace == i.typ || itemTab == i.typ || itemNewline == i.typ || "\u000A" == i.Value() || "\u000C" == i.Value() || "\u000D" == i.Value()
 }
 
 func (i *item) isUnicodeWhitespace() bool {
-	length := len(i.val)
+	length := len(i.Value())
 	if 1 != length && 2 != length {
 		return false
 	}
 
-	r := rune(i.val[0])
+	r := rune(i.Value()[0])
 	if 2 == length {
-		r = rune(i.val[1])
+		r = rune(i.Value()[1])
 	}
 
-	return unicode.Is(unicode.Zs, r) || itemTab == i.typ || "\u000D" == i.val || itemNewline == i.typ || "\u000C" == i.val
+	return unicode.Is(unicode.Zs, r) || itemTab == i.typ || "\u000D" == i.Value() || itemNewline == i.typ || "\u000C" == i.Value()
 }
 
 func (i *item) isSpaceOrTab() bool {
@@ -73,7 +78,7 @@ func (i *item) isNewline() bool {
 }
 
 func (i *item) isNumInt() bool {
-	for _, c := range i.val {
+	for _, c := range i.Value() {
 		if '0' > c || '9' < c {
 			return false
 		}
@@ -87,20 +92,20 @@ func (i *item) isControl() bool {
 }
 
 func (i *item) isPunct() bool {
-	return i.isASCIIPunct() || (1 == len(i.val) && unicode.IsPunct(rune(i.val[0])))
+	return i.isASCIIPunct() || (1 == len(i.Value()) && unicode.IsPunct(rune(i.Value()[0])))
 }
 
 func (i *item) isASCIIPunct() bool {
-	if 1 != len(i.val) {
+	if 1 != len(i.Value()) {
 		return false
 	}
 
-	c := i.val[0]
+	c := i.Value()[0]
 	return (0x21 <= c && 0x2F >= c) || (0x3A <= c && 0x40 >= c) || (0x5B <= c && 0x60 >= c) || (0x7B <= c && 0x7E >= c)
 }
 
 func (i *item) isASCIILetter() bool {
-	for _, c := range i.val {
+	for _, c := range i.Value() {
 		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) {
 			return false
 		}
@@ -110,7 +115,7 @@ func (i *item) isASCIILetter() bool {
 }
 
 func (i *item) isASCIILetterNumHyphen() bool {
-	for _, c := range i.val {
+	for _, c := range i.Value() {
 		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) && !('0' <= c && '9' >= c) && '-' != c {
 			return false
 		}
@@ -225,18 +230,7 @@ var (
 )
 
 func makeItem(typ itemType, text string) *item {
-	return &item{
-		typ: typ,
-		val: text,
-	}
-}
-
-func makeItems(typ itemType, text string, num int) (ret items) {
-	for i := 0; i < num; i++ {
-		ret = append(ret, makeItem(typ, text))
-	}
-
-	return
+	return &item{typ, &text, 0, 1}
 }
 
 const (
@@ -255,7 +249,7 @@ func (tokens items) isEOF() bool {
 
 func (tokens items) rawText() (ret string) {
 	for i := 0; i < len(tokens); i++ {
-		ret += tokens[i].val
+		ret += tokens[i].Value()
 	}
 
 	return

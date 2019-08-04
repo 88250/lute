@@ -94,9 +94,9 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 		return nil
 	}
 
-	fenceChar := marker.val
+	fenceChar := marker.Value()
 	fenceLength := 0
-	for i := t.context.nextNonspace; fenceChar == t.context.currentLine[i].val; i++ {
+	for i := t.context.nextNonspace; fenceChar == t.context.currentLine[i].Value(); i++ {
 		fenceLength++
 	}
 
@@ -125,14 +125,14 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 
 func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker string, num int) bool {
 	closeMarker := tokens[0]
-	if closeMarker.val != openMarker {
+	if closeMarker.Value() != openMarker {
 		return false
 	}
 	if num > tokens.accept(closeMarker.typ) {
 		return false
 	}
 	for _, token := range tokens.trim() {
-		if token.val != openMarker {
+		if token.Value() != openMarker {
 			return false
 		}
 	}

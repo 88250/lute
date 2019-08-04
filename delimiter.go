@@ -35,19 +35,17 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 	startPos := t.context.pos
 	token := tokens[startPos]
 	delimitersCount := 0
-	for i := t.context.pos; i < len(tokens) && token.val == tokens[i].val; i++ {
+	for i := t.context.pos; i < len(tokens) && token.Value() == tokens[i].Value(); i++ {
 		delimitersCount++
 		t.context.pos++
 	}
 
 	tokenBefore, tokenAfter := tNewLine, tNewLine
-	index := startPos - 1
-	if 0 <= index {
-		tokenBefore = tokens[index]
+	if 0 != startPos {
+		tokenBefore = tokens[startPos - 1]
 	}
-	index = t.context.pos
-	if len(tokens) > index {
-		tokenAfter = tokens[index]
+	if len(tokens) > t.context.pos {
+		tokenAfter = tokens[t.context.pos]
 	}
 
 	var beforeIsPunct, beforeIsWhitespace, afterIsPunct, afterIsWhitespace, canOpen, canClose bool

@@ -86,10 +86,10 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	markerLength := 1
 	if itemPlus == marker.typ || itemHyphen == marker.typ || itemAsterisk == marker.typ {
 		data.typ = ListTypeBullet
-		data.bulletChar = marker.val
-	} else if marker.isNumInt() && 9 >= len(marker.val) && (container.Type() != NodeParagraph || "1" == marker.val) {
+		data.bulletChar = marker.Value()
+	} else if marker.isNumInt() && 9 >= len(marker.Value()) && (container.Type() != NodeParagraph || "1" == marker.Value()) {
 		data.typ = ListTypeOrdered
-		data.start, _ = strconv.Atoi(marker.val)
+		data.start, _ = strconv.Atoi(marker.Value())
 		markerLength = 2
 		if itemDot == tokens[1].typ {
 			data.delimiter = "."
@@ -130,14 +130,14 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	var blank_item = nil == token || itemNewline == token.typ
 	var spaces_after_marker = t.context.column - spacesStartCol
 	if spaces_after_marker >= 5 || spaces_after_marker < 1 || blank_item {
-		data.padding = len(marker.val) + 1
+		data.padding = len(marker.Value()) + 1
 		t.context.column = spacesStartCol
 		t.context.offset = spacesStartOffset
 		if t.context.currentLine.peek(t.context.offset).isSpaceOrTab() {
 			t.context.advanceOffset(1, true)
 		}
 	} else {
-		data.padding = len(marker.val) + spaces_after_marker
+		data.padding = len(marker.Value()) + spaces_after_marker
 	}
 	if data.typ == ListTypeOrdered {
 		data.padding++ // 加上分隔符 . 或者 ) 为 1 的长度

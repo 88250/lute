@@ -132,7 +132,7 @@ func (context *Context) findNextNonspace() {
 			break
 		}
 	}
-	context.blank = c.val == "\n" || c.val == "\r" || "" == c.val
+	context.blank = c.Value() == "\n" || "" == c.Value()
 	context.nextNonspace = i
 	context.nextNonspaceColumn = cols
 	context.indent = context.nextNonspaceColumn - context.column

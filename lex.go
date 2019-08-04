@@ -206,6 +206,6 @@ func (s *scanner) backup() {
 
 // newItem creates an item with the specified item type.
 func (s *scanner) newItem(t itemType) {
-	s.items = append(s.items, &item{t, s.start, s.input[s.start:s.pos]})
+	s.items = append(s.items, &item{t, &s.input, s.start, s.pos})
 	s.start = s.pos
 }

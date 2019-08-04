@@ -48,7 +48,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	switch htmlType {
 	case 1:
 		for i := 0; i < length-3; i++ {
-			if itemLess == tokens[i].typ && itemSlash == tokens[i+1].typ && t.equalAnyIgnoreCase(tokens[i+2].val, "script", "pre", "style") && itemGreater == tokens[i+3].typ {
+			if itemLess == tokens[i].typ && itemSlash == tokens[i+1].typ && t.equalAnyIgnoreCase(tokens[i+2].Value(), "script", "pre", "style") && itemGreater == tokens[i+3].typ {
 				return true
 			}
 		}
@@ -88,7 +88,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 		return nil
 	}
 
-	if t.equalAnyIgnoreCase(tokens[1].val, "script", "pre", "style") {
+	if t.equalAnyIgnoreCase(tokens[1].Value(), "script", "pre", "style") {
 		l := tokens[2:]
 		if 1 > len(l) {
 			return nil
@@ -104,7 +104,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 	if slash {
 		i = 2
 	}
-	rule6 := t.equalAnyIgnoreCase(tokens[i].val, HTMLBlockTags...)
+	rule6 := t.equalAnyIgnoreCase(tokens[i].Value(), HTMLBlockTags...)
 	if rule6 {
 		i++
 		if tokens[i].isWhitespace() || itemGreater == tokens[i].typ {
