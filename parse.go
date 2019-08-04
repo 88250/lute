@@ -205,11 +205,12 @@ func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 }
 
 func (t *Tree) nextLine() (line items) {
-	if t.lex.line < t.lex.length {
-		line = t.lex.items[t.lex.line]
-		t.lex.line++
+	if t.lex.line >= t.lex.length {
 		return
 	}
+
+	line = t.lex.items[t.lex.line]
+	t.lex.line++
 	return
 }
 
