@@ -67,10 +67,6 @@ func (i *item) isUnicodeWhitespace() bool {
 	return unicode.Is(unicode.Zs, r) || itemTab == i.typ || "\u000D" == i.Value() || itemNewline == i.typ || "\u000C" == i.Value()
 }
 
-func (i *item) isSpaceOrTab() bool {
-	return itemSpace == i.typ || itemTab == i.typ
-}
-
 func (i *item) isNumInt() bool {
 	for _, c := range i.Value() {
 		if '0' > c || '9' < c {

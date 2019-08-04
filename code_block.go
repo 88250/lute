@@ -37,7 +37,12 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 		} else {
 			// skip optional spaces of fence offset
 			var i = codeBlock.fenceOffset
-			for i > 0 && ln.peek(context.offset).isSpaceOrTab() {
+			var token *item
+			for i > 0 {
+				token = ln.peek(context.offset)
+				if itemSpace != token.typ && itemTab != token.typ {
+					break
+				}
 				context.advanceOffset(1, true)
 				i--
 			}

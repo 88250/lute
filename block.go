@@ -180,7 +180,7 @@ var blockStarts = []startFunc{
 				t.context.advanceOffset(1, false)
 				// optional following space
 				token = t.context.currentLine.peek(t.context.offset)
-				if token.isSpaceOrTab() {
+				if itemSpace == token.typ || itemTab == token.typ {
 					t.context.advanceOffset(1, true)
 				}
 
@@ -254,7 +254,7 @@ var blockStarts = []startFunc{
 					}
 				}
 
-				if value := container.Tokens(); 0 < len(value){
+				if value := container.Tokens(); 0 < len(value) {
 					heading.tokens = value.trim()
 					container.InsertAfter(container, heading)
 					container.Unlink()

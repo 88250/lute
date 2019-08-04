@@ -104,7 +104,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 
 	// make sure we have spaces after
 	nextc := t.context.currentLine[t.context.nextNonspace+markerLength]
-	if itemNewline != nextc.typ && !nextc.isSpaceOrTab() {
+	if itemNewline != nextc.typ && (itemSpace != nextc.typ && itemTab != nextc.typ) {
 		return nil
 	}
 
@@ -121,7 +121,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	for {
 		t.context.advanceOffset(1, true)
 		nextc = t.context.currentLine.peek(t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || nil == nextc || !nextc.isSpaceOrTab() {
+		if t.context.column-spacesStartCol >= 5 || nil == nextc || (itemSpace != nextc.typ && itemTab != nextc.typ) {
 			break
 		}
 	}
@@ -133,7 +133,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 		data.padding = len(marker.Value()) + 1
 		t.context.column = spacesStartCol
 		t.context.offset = spacesStartOffset
-		if t.context.currentLine.peek(t.context.offset).isSpaceOrTab() {
+		if token = t.context.currentLine.peek(t.context.offset); itemSpace == token.typ || itemTab == token.typ {
 			t.context.advanceOffset(1, true)
 		}
 	} else {

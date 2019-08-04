@@ -24,7 +24,7 @@ func (blockquote *Blockquote) Continue(context *Context) int {
 	if !context.indented && ln.peek(context.nextNonspace).typ == itemGreater {
 		context.advanceNextNonspace()
 		context.advanceOffset(1, false)
-		if ln.peek(context.offset).isSpaceOrTab() {
+		if token := ln.peek(context.offset); itemSpace == token.typ || itemTab == token.typ {
 			context.advanceOffset(1, true)
 		}
 	} else {

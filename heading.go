@@ -91,7 +91,7 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 
 	end := t.context.currentLineLen - 2
 	for ; 0 <= end; end-- {
-		if !t.context.currentLine[end].isSpaceOrTab() {
+		if token := t.context.currentLine[end]; itemSpace != token.typ && itemTab != token.typ {
 			break
 		}
 	}
