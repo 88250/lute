@@ -33,14 +33,14 @@ func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 	at := false
 	for ; i < length; i++ {
 		token = tokens[i]
-		dest += token.Value()
+		dest += string(token)
 		passed++
-		if "@" == token.Value() {
+		if '@' == token {
 			at = true
 			break
 		}
 
-		if !token.isASCIILetterNumHyphen() && !strings.Contains(".!#$%&'*+/=?^_`{|}~", token.Value()) {
+		if !token.isASCIILetterNumHyphen() && !strings.Contains(".!#$%&'*+/=?^_`{|}~", string(token)) {
 			return nil
 		}
 	}
@@ -56,12 +56,12 @@ func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 	for ; i < length; i++ {
 		token = domainPart[i]
 		passed++
-		if itemGreater == token.typ {
+		if itemGreater == token {
 			closed = true
 			break
 		}
-		dest += token.Value()
-		if !token.isASCIILetterNumHyphen() && itemDot != token.typ {
+		dest += string(token)
+		if !token.isASCIILetterNumHyphen() && itemDot != token {
 			return nil
 		}
 		if 63 < i {
@@ -86,16 +86,16 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 	dest := ""
 	var token item
 	i := t.context.pos + 1
-	for ; i < len(tokens) && itemGreater != tokens[i].typ; i++ {
+	for ; i < len(tokens) && itemGreater != tokens[i]; i++ {
 		token = tokens[i]
-		if itemSpace == token.typ {
+		if itemSpace == token {
 			return nil
 		}
 
-		dest += token.Value()
+		dest += string(token)
 		if !schemed {
-			if itemColon != token.typ {
-				scheme += token.Value()
+			if itemColon != token {
+				scheme += string(token)
 			} else {
 				schemed = true
 			}
@@ -106,7 +106,7 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 	}
 
 	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), ""}
-	if itemGreater != tokens[i].typ {
+	if itemGreater != tokens[i] {
 		return nil
 	}
 
@@ -123,33 +123,33 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		return
 	}
 
-	if itemOpenParen != tokens[0].typ {
+	if itemOpenParen != tokens[0] {
 		return
 	}
 
-	isPointyBrackets := itemLess == tokens[1].typ
+	isPointyBrackets := itemLess == tokens[1]
 	if isPointyBrackets {
 		matchEnd := false
 		passed = append(passed, tokens[0], tokens[1])
 		i := 2
 		for ; i < length; i++ {
 			token := tokens[i]
-			if itemNewline == token.typ {
+			if itemNewline == token {
 				passed = nil
 				destination = ""
 				return
 			}
 
 			passed = append(passed, token)
-			destination += token.Value()
-			if itemGreater == token.typ && !tokens.isBackslashEscape(i) {
+			destination += string(token)
+			if itemGreater == token && !tokens.isBackslashEscape(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
 				break
 			}
 		}
 
-		if !matchEnd || (length > i && itemCloseParen != tokens[i+1].typ) {
+		if !matchEnd || (length > i && itemCloseParen != tokens[i+1]) {
 			passed = nil
 			destination = ""
 			return
@@ -165,21 +165,21 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		for ; i < length; i++ {
 			token := tokens[i]
 			passed = append(passed, token)
-			destination += token.Value()
+			destination += string(token)
 			if !destStarted && !token.isWhitespace() && 0 < i {
 				destStarted = true
 				destination = destination[1:]
 				destination = strings.TrimSpace(destination)
 			}
-			if destStarted && (token.isWhitespace() || itemControl == token.typ) {
+			if destStarted && (token.isWhitespace() || token.isControl()) {
 				destination = destination[:len(destination)-1]
 				passed = passed[:len(passed)-1]
 				break
 			}
-			if itemOpenParen == token.typ && !tokens.isBackslashEscape(i) {
+			if itemOpenParen == token && !tokens.isBackslashEscape(i) {
 				openParens++
 			}
-			if itemCloseParen == token.typ && !tokens.isBackslashEscape(i) {
+			if itemCloseParen == token && !tokens.isBackslashEscape(i) {
 				openParens--
 				if 1 > openParens {
 					destination = destination[:len(destination)-1]
@@ -189,7 +189,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		}
 
 		remains = tokens[i:]
-		if length > i && (itemCloseParen != tokens[i].typ && itemSpace != tokens[i].typ && itemNewline != tokens[i].typ) {
+		if length > i && (itemCloseParen != tokens[i] && itemSpace != tokens[i] && itemNewline != tokens[i]) {
 			passed = nil
 			destination = ""
 			return

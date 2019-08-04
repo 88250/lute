@@ -66,13 +66,6 @@ func (s *scanner) run() {
 	for {
 		r := s.next()
 		switch {
-		case '\r' == r:
-			if r = s.next(); '\n' == r || '\u0085' == r {
-				s.newItem(itemNewline)
-			} else {
-				s.backup()
-				s.newItem(r)
-			}
 		case r.isNewline():
 			s.newItem(itemNewline)
 		case itemEOF == r:

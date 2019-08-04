@@ -49,9 +49,9 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	switch htmlType {
 	case 1:
 		for i := 0; i < length-3; i++ {
-			if itemLess == tokens[i] && itemSlash == tokens[i+1] && t.equalAnyIgnoreCase(tokens[i+2], "script", "pre", "style") && itemGreater == tokens[i+3] {
+//			if itemLess == tokens[i] && itemSlash == tokens[i+1] && t.equalAnyIgnoreCase(tokens[i+2], "script", "pre", "style") && itemGreater == tokens[i+3] {
 				return true
-			}
+//			}
 		}
 	case 2:
 		for i := 0; i < length-3; i++ {
@@ -89,32 +89,32 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 		return nil
 	}
 
-	if t.equalAnyIgnoreCase(tokens[1].Value(), "script", "pre", "style") {
-		l := tokens[2:]
-		if 1 > len(l) {
-			return nil
-		}
-
-		if l[0].isWhitespace() || itemGreater == l[0] || itemEOF == l[0] {
-			return &HTML{&BaseNode{typ: NodeHTML}, 1}
-		}
-	}
+	//if t.equalAnyIgnoreCase(tokens[1].Value(), "script", "pre", "style") {
+	//	l := tokens[2:]
+	//	if 1 > len(l) {
+	//		return nil
+	//	}
+	//
+	//	if l[0].isWhitespace() || itemGreater == l[0] || itemEOF == l[0] {
+	//		return &HTML{&BaseNode{typ: NodeHTML}, 1}
+	//	}
+	//}
 
 	slash := itemSlash == tokens[1]
-	i := 1
+	//i := 1
 	if slash {
-		i = 2
+		//i = 2
 	}
-	rule6 := t.equalAnyIgnoreCase(tokens[i].Value(), HTMLBlockTags...)
-	if rule6 {
-		i++
-		if tokens[i].isWhitespace() || itemGreater == tokens[i] {
-			return &HTML{&BaseNode{typ: NodeHTML}, 6}
-		}
-		if i < length && itemSlash == tokens[i] && itemGreater == tokens[i+1] {
-			return &HTML{&BaseNode{typ: NodeHTML}, 6}
-		}
-	}
+	//rule6 := t.equalAnyIgnoreCase(tokens[i].Value(), HTMLBlockTags...)
+	//if rule6 {
+	//	i++
+	//	if tokens[i].isWhitespace() || itemGreater == tokens[i] {
+	//		return &HTML{&BaseNode{typ: NodeHTML}, 6}
+	//	}
+	//	if i < length && itemSlash == tokens[i] && itemGreater == tokens[i+1] {
+	//		return &HTML{&BaseNode{typ: NodeHTML}, 6}
+	//	}
+	//}
 
 	tag := tokens.trim()
 	isOpenTag, _ := tag.isOpenTag()

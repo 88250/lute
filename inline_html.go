@@ -110,9 +110,9 @@ func (t *Tree) parseCDATA(tokens items) (valid bool, remains, content items) {
 	if itemOpenBracket != tokens[1] {
 		return
 	}
-	if "CDATA" != tokens[2].Value() {
-		return
-	}
+	//if "CDATA" != tokens[2].Value() {
+	//	return
+	//}
 	if itemOpenBracket != tokens[3] {
 		return
 	}
@@ -146,12 +146,12 @@ func (t *Tree) parseDeclaration(tokens items) (valid bool, remains, content item
 		return
 	}
 
-	name := tokens[1].Value()
-	for _, c := range name {
-		if !('A' <= c && 'Z' >= c) {
-			return
-		}
-	}
+	//name := tokens[1].Value()
+	//for _, c := range name {
+	//	if !('A' <= c && 'Z' >= c) {
+	//		return
+	//	}
+	//}
 
 	content = append(content, tokens[0], tokens[1])
 	tokens = tokens[2:]
@@ -375,14 +375,13 @@ func (t *Tree) parseAttrName(tokens items) (remains, attrName items) {
 }
 
 func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
-	c := tokens[0].Value()[0]
-	if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) {
+	c := tokens[0]
+	if !c.isASCIILetter() {
 		return tokens, nil
 	}
-	for i := 0; i < len(tokens[0].Value()); i++ {
-		c = tokens[0].Value()[i]
-		if !('A' <= c && 'Z' >= c) && !('a' <= c && 'z' >= c) &&
-			!('0' <= c && '9' >= c) && '-' != c {
+	for i := 1; i < len(tokens); i++ {
+		c = tokens[i]
+		if !c.isASCIILetterNumHyphen() {
 			return tokens, nil
 		}
 	}

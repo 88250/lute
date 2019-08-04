@@ -32,16 +32,16 @@ func (t *Tree) parseThematicBreak() (ret *ThematicBreak) {
 	var marker item
 	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
 		token := t.context.currentLine[i]
-		if itemSpace == token.typ || itemTab == token.typ {
+		if itemSpace == token || itemTab == token {
 			continue
 		}
 
-		if itemHyphen != token.typ && itemUnderscore != token.typ && itemAsterisk != token.typ {
+		if itemHyphen != token && itemUnderscore != token && itemAsterisk != token {
 			return nil
 		}
 
-		if nil != marker {
-			if marker.typ != token.typ {
+		if itemEOF != marker {
+			if marker != token {
 				return nil
 			}
 		} else {
@@ -54,5 +54,5 @@ func (t *Tree) parseThematicBreak() (ret *ThematicBreak) {
 		return nil
 	}
 
-	return  &ThematicBreak{&BaseNode{typ: NodeThematicBreak}}
+	return &ThematicBreak{&BaseNode{typ: NodeThematicBreak}}
 }

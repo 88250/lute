@@ -38,7 +38,7 @@ func (p *Paragraph) Finalize(context *Context) {
 
 	// try parsing the beginning as link reference definitions:
 	hasReferenceDefs := false
-	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0].typ; tokens = p.tokens {
+	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = p.tokens {
 		if tokens = context.parseLinkRefDef(tokens); nil != tokens {
 			p.tokens = tokens
 			hasReferenceDefs = true
