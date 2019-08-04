@@ -62,14 +62,6 @@ func lex(input string) *lexer {
 	}
 	ret.length = len(ret.items)
 
-	//fmt.Println(count)
-	//var i int
-	//for _, line := range ret.items {
-	//	fmt.Println(line)
-	//	i += len(line)
-	//}
-	//fmt.Println(i)
-
 	return ret
 }
 
