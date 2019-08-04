@@ -57,26 +57,24 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 func (codeBlock *CodeBlock) Finalize(context *Context) {
 	if codeBlock.isFenced {
 		// first line becomes info string
-		content := codeBlock.value
-		newlinePos := strings.Index(content, "\n")
-		firstLine := content[:newlinePos]
-		rest := content[newlinePos+1:]
-		codeBlock.info = unescapeString(strings.TrimSpace(firstLine))
-		codeBlock.value = rest
+		content := codeBlock.tokens
+		var i int
+		var token *item
+		for ; ; i++ {
+			token = codeBlock.tokens[i]
+			if itemNewline == token.typ {
+				break
+			}
+		}
+		firstLine := content[:i]
+		rest := content[i+1:]
+
+		codeBlock.info = unescapeString(strings.TrimSpace(firstLine.rawText()))
+		codeBlock.tokens = rest
 	} else { // indented
-		i := len(codeBlock.value) - 1
-		for ; 0 <= i && ('\n' == codeBlock.value[i] || ' ' == codeBlock.value[i]); i-- {
-		}
-		i++
-		rest := codeBlock.value[i:]
-		for 0 <= strings.Index(rest, "\n ") {
-			rest = strings.ReplaceAll(rest, "\n ", "\n")
-		}
-		for 0 <= strings.Index(rest, "\n\n") {
-			rest = strings.ReplaceAll(rest, "\n\n", "\n")
-		}
-		codeBlock.value = codeBlock.value[:i] + rest
+		codeBlock.tokens = codeBlock.tokens.replaceNewlineSpace()
 	}
+	codeBlock.value = codeBlock.tokens.rawText()
 	codeBlock.tokens = nil
 }
 

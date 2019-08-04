@@ -40,7 +40,7 @@ type scanner struct {
 
 // lex creates a new lexer for the input string.
 func lex(input string) *lexer {
-	ret := &lexer{items: []items{}}
+	ret := &lexer{items: make([]items, 0, 64)}
 	if "" == input {
 		ret.items = append(ret.items, items{})
 		ret.items[ret.line] = append(ret.items[ret.line], &item{typ: itemEOF})
@@ -54,7 +54,7 @@ func lex(input string) *lexer {
 	wg := &sync.WaitGroup{}
 	for lineScanner.Scan() {
 		line = lineScanner.Text() + "\n"
-		itemScanner := &scanner{input: line, items: items{}}
+		itemScanner := &scanner{input: line, items: make([]*item, 0, 64)}
 		itemScanners = append(itemScanners, itemScanner)
 		wg.Add(1)
 		go itemScanner.run(wg)
@@ -64,7 +64,6 @@ func lex(input string) *lexer {
 	for _, itemScanner := range itemScanners {
 		ret.items = append(ret.items, itemScanner.items)
 	}
-
 	ret.length = len(ret.items)
 
 	return ret

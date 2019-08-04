@@ -42,7 +42,7 @@ func (i *item) String() string {
 	switch {
 	case i.typ == itemEOF:
 		return "EOF"
-	case len(string(i.Value())) > 10:
+	case len(i.Value()) > 10:
 		return fmt.Sprintf("%.10q...", i.Value())
 	}
 
@@ -245,7 +245,19 @@ const (
 
 type items []*item
 
-func (tokens items) Tokens() items {
+// replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
+func (tokens items) replaceNewlineSpace() (items) {
+	length := len(tokens)
+	var token *item
+	for i := length - 1; 0 <= i; i-- {
+		token = tokens[i]
+		if itemNewline != token.typ && itemSpace != token.typ {
+			break
+		}
+		if itemNewline == tokens[i-1].typ && (itemSpace == token.typ || itemNewline == token.typ) {
+			tokens = tokens[:i]
+		}
+	}
 	return tokens
 }
 

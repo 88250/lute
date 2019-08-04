@@ -35,6 +35,7 @@ func (html *HTML) Continue(context *Context) int {
 
 func (html *HTML) Finalize(context *Context) {
 	html.value = strings.TrimRight(html.value, "\n ")
+	html.tokens = nil
 }
 
 func (html *HTML) AcceptLines() bool {

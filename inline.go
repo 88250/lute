@@ -41,7 +41,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 		}
 
 		tokens := block.Tokens()
-		if nil == tokens || 1 > len(tokens) {
+		if nil == tokens {
 			continue
 		}
 
