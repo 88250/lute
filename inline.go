@@ -345,7 +345,7 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 func (t *Tree) parseText(tokens items) (ret Node) {
 	token := tokens[t.context.pos]
 	t.context.pos++
-	ret = &Text{&BaseNode{typ: NodeText, rawText: token.Value(), value: token.Value()}}
+	ret = &Text{&BaseNode{typ: NodeText, value: token.Value()}}
 
 	return
 }

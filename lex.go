@@ -18,7 +18,6 @@ package lute
 import (
 	"bufio"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"unicode"
 	"unicode/utf8"
@@ -51,16 +50,13 @@ func lex(input string) *lexer {
 
 	lineScanner := bufio.NewScanner(strings.NewReader(input))
 	var line string
-	itemScanners := make([]*scanner, 0, 32)
-	wg := &sync.WaitGroup{}
+	var itemScanners []*scanner
 	for lineScanner.Scan() {
 		line = lineScanner.Text() + "\n"
-		itemScanner := &scanner{input: line, items: make([]*item, 0, 32)}
+		itemScanner := &scanner{input: line, items: make([]*item, 0, 16)}
 		itemScanners = append(itemScanners, itemScanner)
-		wg.Add(1)
-		go itemScanner.run(wg)
+		itemScanner.run()
 	}
-	wg.Wait()
 
 	for _, itemScanner := range itemScanners {
 		ret.items = append(ret.items, itemScanner.items)
@@ -78,8 +74,7 @@ func lex(input string) *lexer {
 	return ret
 }
 
-func (s *scanner) run(wg *sync.WaitGroup) {
-	defer wg.Done()
+func (s *scanner) run() {
 	for {
 		r := s.next()
 		switch {
