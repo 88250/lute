@@ -170,7 +170,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 		token := tokens[i]
 		ret = append(ret, token)
 		destination += token.Value()
-		if token.isWhitespace() || token.isControl() {
+		if token.isWhitespace() || itemControl == token.typ {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
 			break

@@ -171,7 +171,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 				destination = destination[1:]
 				destination = strings.TrimSpace(destination)
 			}
-			if destStarted && (token.isWhitespace() || token.isControl()) {
+			if destStarted && (token.isWhitespace() || itemControl == token.typ) {
 				destination = destination[:len(destination)-1]
 				passed = passed[:len(passed)-1]
 				break

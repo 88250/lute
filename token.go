@@ -77,10 +77,6 @@ func (i *item) isNumInt() bool {
 	return true
 }
 
-func (i *item) isControl() bool {
-	return itemControl == i.typ
-}
-
 func (i *item) isPunct() bool {
 	return i.isASCIIPunct() || (1 == len(i.Value()) && unicode.IsPunct(rune(i.Value()[0])))
 }
