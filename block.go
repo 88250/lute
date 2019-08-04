@@ -15,10 +15,6 @@
 
 package lute
 
-import (
-	"strings"
-)
-
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
@@ -258,9 +254,8 @@ var blockStarts = []startFunc{
 					}
 				}
 
-				if value := container.Value(); "" != value {
-					heading.value = strings.TrimSpace(value)
-					heading.tokens = container.Tokens().trim()
+				if value := container.Tokens(); 0 < len(value){
+					heading.tokens = value.trim()
 					container.InsertAfter(container, heading)
 					container.Unlink()
 					t.context.tip = heading
@@ -333,11 +328,11 @@ func (t *Tree) addLine() {
 		t.context.offset += 1 // skip over tab
 		// add space characters:
 		var charsToTab = 4 - (t.context.column % 4)
-		t.context.tip.AppendValue(strings.Repeat(" ", charsToTab))
+		//t.context.tip.AppendValue(strings.Repeat(" ", charsToTab))
 		for i := 0; i < charsToTab; i++ {
 			t.context.tip.AddTokens(items{tSpace})
 		}
 	}
 	t.context.tip.AddTokens(t.context.currentLine[t.context.offset:])
-	t.context.tip.AppendValue(t.context.currentLine[t.context.offset:].rawText())
+	//t.context.tip.AppendValue(t.context.currentLine[t.context.offset:].rawText())
 }

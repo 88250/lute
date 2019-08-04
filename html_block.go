@@ -34,7 +34,7 @@ func (html *HTML) Continue(context *Context) int {
 }
 
 func (html *HTML) Finalize(context *Context) {
-	html.value = strings.TrimRight(html.value, "\n ")
+	html.value = html.tokens.replaceNewlineSpace().trimRight().rawText()
 	html.tokens = nil
 }
 
