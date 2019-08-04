@@ -47,7 +47,7 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	var textTokens = items{}
 	for i := startPos + n; i < len(tokens) && i < endPos; i++ {
 		token := tokens[i]
-		if token.isNewline() {
+		if itemNewline == token.typ {
 			textTokens = append(textTokens, tSpace)
 		} else {
 			textTokens = append(textTokens, token)

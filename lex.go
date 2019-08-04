@@ -50,11 +50,11 @@ func lex(input string) *lexer {
 
 	lineScanner := bufio.NewScanner(strings.NewReader(input))
 	var line string
-	var itemScanners []*scanner
+	itemScanners := make([]*scanner, 0, 32)
 	wg := &sync.WaitGroup{}
 	for lineScanner.Scan() {
 		line = lineScanner.Text() + "\n"
-		itemScanner := &scanner{input: line, items: make([]*item, 0, 64)}
+		itemScanner := &scanner{input: line, items: make([]*item, 0, 32)}
 		itemScanners = append(itemScanners, itemScanner)
 		wg.Add(1)
 		go itemScanner.run(wg)

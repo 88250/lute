@@ -134,7 +134,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		i := 2
 		for ; i < length; i++ {
 			token := tokens[i]
-			if token.isNewline() {
+			if itemNewline == token.typ {
 				passed = nil
 				destination = ""
 				return

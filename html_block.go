@@ -95,7 +95,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 			return nil
 		}
 
-		if l[0].isWhitespace() || itemGreater == l[0].typ || l[0].isEOF() {
+		if l[0].isWhitespace() || itemGreater == l[0].typ || itemEOF == l[0].typ {
 			return &HTML{&BaseNode{typ: NodeHTML}, 1}
 		}
 	}

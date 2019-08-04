@@ -83,7 +83,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			}
 
 			length := len(tokens)
-			if 1 > length || t.context.pos >= length || tokens[t.context.pos].isEOF() {
+			if 1 > length || t.context.pos >= length || itemEOF == tokens[t.context.pos].typ {
 				break
 			}
 		}
@@ -318,7 +318,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 		t.context.pos++
 	}
 	token := tokens[t.context.pos]
-	if token.isNewline() {
+	if itemNewline == token.typ {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 		t.context.pos++
 	} else if token.isASCIIPunct() {

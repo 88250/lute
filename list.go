@@ -104,7 +104,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 
 	// make sure we have spaces after
 	nextc := t.context.currentLine[t.context.nextNonspace+markerLength]
-	if !nextc.isNewline() && !nextc.isSpaceOrTab() {
+	if itemNewline != nextc.typ && !nextc.isSpaceOrTab() {
 		return nil
 	}
 

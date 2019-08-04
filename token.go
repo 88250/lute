@@ -79,10 +79,6 @@ func (i *item) isTab() bool {
 	return itemTab == i.typ
 }
 
-func (i *item) isNewline() bool {
-	return itemNewline == i.typ
-}
-
 func (i *item) isNumInt() bool {
 	for _, c := range i.Value() {
 		if '0' > c || '9' < c {
@@ -128,10 +124,6 @@ func (i *item) isASCIILetterNumHyphen() bool {
 	}
 
 	return true
-}
-
-func (i *item) isEOF() bool {
-	return itemEOF == i.typ
 }
 
 // itemType identifies the type of lex items.
@@ -326,7 +318,7 @@ func (tokens items) trimRight() items {
 
 	i := size - 1
 	for ; 0 <= i; i-- {
-		if !tokens[i].isWhitespace() && !tokens[i].isEOF() {
+		if !tokens[i].isWhitespace() && itemEOF != tokens[i].typ {
 			break
 		}
 	}
