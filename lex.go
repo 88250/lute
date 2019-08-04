@@ -18,7 +18,6 @@ package lute
 import (
 	"bufio"
 	"strings"
-	"sync/atomic"
 	"unicode"
 	"unicode/utf8"
 )
@@ -186,13 +185,6 @@ func (s *scanner) backup() {
 
 // newItem creates an item with the specified item type.
 func (s *scanner) newItem(t itemType) {
-	s.items = append(s.items, s.newItem0(t))
+	s.items = append(s.items, &item{t, &s.input, s.start, s.pos})
 	s.start = s.pos
-}
-
-var count int32
-
-func (s *scanner) newItem0(t itemType) *item {
-	atomic.AddInt32(&count, 1)
-	return &item{t, &s.input, s.start, s.pos}
 }
