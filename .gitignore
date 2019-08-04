@@ -6,6 +6,7 @@
 *.out
 .idea
 cpu_profile
+profile*.png
 
 # https://github.com/b3log/header
 header
