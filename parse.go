@@ -79,7 +79,7 @@ func (context *Context) advanceOffset(count int, columns bool) {
 	var c *item
 	for ; count > 0; {
 		c = currentLine[context.offset]
-		if c.isTab() {
+		if itemTab == c.typ {
 			charsToTab = 4 - (context.column % 4)
 			if columns {
 				context.partiallyConsumedTab = charsToTab > count
@@ -121,10 +121,10 @@ func (context *Context) findNextNonspace() {
 	var c *item
 	for {
 		c = context.currentLine[i]
-		if c.isSpace() {
+		if itemSpace == c.typ {
 			i++
 			cols++
-		} else if c.isTab() {
+		} else if itemTab == c.typ {
 			i++
 			cols += 4 - (cols % 4)
 		} else {

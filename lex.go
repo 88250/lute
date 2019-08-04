@@ -19,6 +19,7 @@ import (
 	"bufio"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"unicode"
 	"unicode/utf8"
 )
@@ -65,6 +66,14 @@ func lex(input string) *lexer {
 		ret.items = append(ret.items, itemScanner.items)
 	}
 	ret.length = len(ret.items)
+
+	//fmt.Println(count)
+	//var i int
+	//for _, line := range ret.items {
+	//	fmt.Println(line)
+	//	i += len(line)
+	//}
+	//fmt.Println(i)
 
 	return ret
 }
@@ -165,7 +174,6 @@ func (s *scanner) run(wg *sync.WaitGroup) {
 func (s *scanner) next() rune {
 	if s.pos >= len(s.input) {
 		s.width = 0
-
 		return end
 	}
 
@@ -183,6 +191,13 @@ func (s *scanner) backup() {
 
 // newItem creates an item with the specified item type.
 func (s *scanner) newItem(t itemType) {
-	s.items = append(s.items, &item{t, &s.input, s.start, s.pos})
+	s.items = append(s.items, s.newItem0(t))
 	s.start = s.pos
+}
+
+var count int32
+
+func (s *scanner) newItem0(t itemType) *item {
+	atomic.AddInt32(&count, 1)
+	return &item{t, &s.input, s.start, s.pos}
 }

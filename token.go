@@ -68,15 +68,7 @@ func (i *item) isUnicodeWhitespace() bool {
 }
 
 func (i *item) isSpaceOrTab() bool {
-	return i.isSpace() || i.isTab()
-}
-
-func (i *item) isSpace() bool {
-	return itemSpace == i.typ
-}
-
-func (i *item) isTab() bool {
-	return itemTab == i.typ
+	return itemSpace == i.typ || itemTab == i.typ
 }
 
 func (i *item) isNumInt() bool {
@@ -238,7 +230,7 @@ const (
 type items []*item
 
 // replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
-func (tokens items) replaceNewlineSpace() (items) {
+func (tokens items) replaceNewlineSpace() items {
 	length := len(tokens)
 	var token *item
 	for i := length - 1; 0 <= i; i-- {
@@ -271,9 +263,9 @@ func (tokens items) trimLeftSpace() (spaces int, remains items) {
 
 	i := 0
 	for ; i < size; i++ {
-		if tokens[i].isSpace() {
+		if itemSpace == tokens[i].typ {
 			spaces++
-		} else if tokens[i].isTab() {
+		} else if itemTab == tokens[i].typ {
 			spaces += 4
 		} else {
 			break
