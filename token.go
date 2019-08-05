@@ -274,11 +274,15 @@ func (tokens items) accept(token item) (pos int) {
 }
 
 func (tokens items) acceptTokenss(someTokenss []items) (pos int) {
-	length := len(someTokenss)
+	length := len(tokens)
+	length2 := len(someTokenss)
 	for i := 0; i < length; i++ {
-		someTokens := someTokenss[i]
-		if pos = tokens.acceptTokens(someTokens); 0 <= pos {
-			return
+		remains := tokens[i:]
+		for j := 0; j < length2; j++ {
+			someTokens := someTokenss[j]
+			if pos = remains.acceptTokens(someTokens); 0 <= pos {
+				return
+			}
 		}
 	}
 
@@ -326,20 +330,6 @@ func (tokens items) isBlankLine() bool {
 	}
 
 	return true
-}
-
-func (tokens items) leftSpaces() (count int) {
-	for _, token := range tokens {
-		if itemSpace == token {
-			count++
-		} else if itemTab == token {
-			count += 4
-		} else {
-			break
-		}
-	}
-
-	return
 }
 
 func (tokens items) splitWhitespace() (ret []items) {
