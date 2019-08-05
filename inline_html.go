@@ -38,8 +38,8 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 		tags = append(tags, tagName...)
 		tokens = remains
 		for {
-			validAttr, remains, attr := t.parseTagAttr(tokens)
-			if !validAttr {
+			valid, remains, attr := t.parseTagAttr(tokens)
+			if !valid {
 				t.context.pos++
 				return
 			}
@@ -50,7 +50,7 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 				break
 			}
 		}
-	} else if validComment, remains, comment := t.parseHTMLComment(tokens[t.context.pos+1:]); validComment {
+	} else if valid, remains, comment := t.parseHTMLComment(tokens[t.context.pos+1:]); valid {
 		tags = append(tags, comment...)
 		tokens = remains
 		t.context.pos += len(tags)
@@ -243,8 +243,8 @@ func (t *Tree) parseHTMLComment(tokens items) (valid bool, remains, comment item
 	return
 }
 
-func (t *Tree) parseTagAttr(tokens items) (validAttr bool, remains, attr items) {
-	validAttr = true
+func (t *Tree) parseTagAttr(tokens items) (valid bool, remains, attr items) {
+	valid = true
 	remains = tokens
 	var whitespaces items
 	var i int
@@ -267,9 +267,8 @@ func (t *Tree) parseTagAttr(tokens items) (validAttr bool, remains, attr items) 
 	}
 
 	var valSpec items
-	validValSpec, tokens, valSpec := t.parseAttrValSpec(tokens)
-	if !validValSpec {
-		validAttr = false
+	valid, tokens, valSpec = t.parseAttrValSpec(tokens)
+	if !valid {
 		return
 	}
 
@@ -281,8 +280,8 @@ func (t *Tree) parseTagAttr(tokens items) (validAttr bool, remains, attr items) 
 	return
 }
 
-func (t *Tree) parseAttrValSpec(tokens items) (validValSpec bool, remains, valSpec items) {
-	validValSpec = true
+func (t *Tree) parseAttrValSpec(tokens items) (valid bool, remains, valSpec items) {
+	valid = true
 	remains = tokens
 	var i int
 	var token item
@@ -341,7 +340,7 @@ func (t *Tree) parseAttrValSpec(tokens items) (validValSpec bool, remains, valSp
 	}
 
 	if !closed {
-		validValSpec = false
+		valid = false
 		valSpec = nil
 		return
 	}
@@ -389,11 +388,6 @@ func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
 		}
 		tagName = append(tagName, token)
 	}
-	token = tokens[i]
-	if itemGreater != token {
-		return
-	}
-
 	remains = tokens[i:]
 
 	return
