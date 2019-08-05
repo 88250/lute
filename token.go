@@ -107,6 +107,44 @@ const (
 	itemQuestion     = item('?')
 	itemAmpersand    = item('&')
 	itemSemicolon    = item(';')
+
+	item_a = item('a')
+	item_b = item('b')
+	item_c = item('c')
+	item_d = item('d')
+	item_e = item('e')
+	item_f = item('f')
+	item_g = item('g')
+	item_h = item('h')
+	item_i = item('i')
+	item_j = item('j')
+	item_k = item('k')
+	item_l = item('l')
+	item_m = item('m')
+	item_n = item('n')
+	item_o = item('o')
+	item_p = item('p')
+	item_q = item('q')
+	item_r = item('r')
+	item_s = item('s')
+	item_t = item('t')
+	item_u = item('u')
+	item_v = item('v')
+	item_w = item('w')
+	item_x = item('x')
+	item_y = item('y')
+	item_z = item('z')
+
+	item_0 = item('0')
+	item_1 = item('1')
+	item_2 = item('2')
+	item_3 = item('3')
+	item_4 = item('4')
+	item_5 = item('5')
+	item_6 = item('6')
+	item_7 = item('7')
+	item_8 = item('8')
+	item_9 = item('9')
 )
 
 type items []item
@@ -244,7 +282,7 @@ func (tokens items) acceptTokenss(someTokenss []items) (pos int) {
 		}
 	}
 
-	return
+	return -1
 }
 
 func (tokens items) acceptTokens(someTokens items) (pos int) {
