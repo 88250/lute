@@ -88,7 +88,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 		data.typ = ListTypeBullet
 		data.bulletChar = marker
 	} else if marker, delim := t.parseOrderedListMarker(tokens); nil != marker {
-		if container.Type() != NodeParagraph || '1' == marker[0] {
+		if container.Type() != NodeParagraph || "1" == marker.rawText() {
 			data.typ = ListTypeOrdered
 			data.start, _ = strconv.Atoi(marker.rawText())
 			markerLength = len(marker) + 1
