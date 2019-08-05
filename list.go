@@ -91,7 +91,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 		if container.Type() != NodeParagraph || '1' == marker[0] {
 			data.typ = ListTypeOrdered
 			data.start, _ = strconv.Atoi(marker.rawText())
-			markerLength = 2
+			markerLength = len(marker) + 1
 			data.delimiter = delim
 		} else {
 			return nil
