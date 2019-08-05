@@ -15,7 +15,12 @@
 
 package lute
 
-// Root 描述了根节点。
-type Root struct {
+// Emphasis 描述了强调节点结构。
+type Emphasis struct {
+	*BaseNode
+}
+
+// Strong 描述了加粗节点结构。
+type Strong struct {
 	*BaseNode
 }

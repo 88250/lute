@@ -328,8 +328,8 @@ func (t *Tree) addLine() {
 		// add space characters:
 		var charsToTab = 4 - (t.context.column % 4)
 		for i := 0; i < charsToTab; i++ {
-			t.context.tip.AddTokens(items{itemSpace})
+			t.context.tip.AppendTokens(items{itemSpace})
 		}
 	}
-	t.context.tip.AddTokens(t.context.currentLine[t.context.offset:])
+	t.context.tip.AppendTokens(t.context.currentLine[t.context.offset:])
 }

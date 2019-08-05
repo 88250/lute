@@ -15,7 +15,12 @@
 
 package lute
 
-// Root 描述了根节点。
-type Root struct {
+// HardBreak 描述了硬换行节点结构。
+type HardBreak struct {
+	*BaseNode
+}
+
+// SoftBreak 描述了软换行节点结构。
+type SoftBreak struct {
 	*BaseNode
 }

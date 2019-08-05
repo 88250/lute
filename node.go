@@ -15,68 +15,134 @@
 
 package lute
 
-// Node 描述了节点结构。
+// Node 描述了节点操作。
 type Node interface {
+	// Type 返回节点类型。
 	Type() NodeType
-	Is(NodeType) bool
-	Unlink()
-	Parent() Node
-	SetParent(Node)
-	Next() Node
-	SetNext(Node)
-	Previous() Node
-	SetPrevious(Node)
-	FirstChild() Node
-	SetFirstChild(Node)
-	LastChild() Node
-	SetLastChild(Node)
-	Children() []Node
-	AppendChild(this, child Node)
-	InsertAfter(this Node, sibling Node)
-	RawText() string
-	SetRawText(string)
-	AppendRawText(string)
-	Value() string
-	SetValue(string)
-	AppendValue(string)
-	Tokens() items
-	SetTokens(items)
-	AddTokens(items)
 
+	// Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
+	Unlink()
+
+	// Parent 返回父节点。
+	Parent() Node
+
+	// SetParent 设置父节点。
+	SetParent(Node)
+
+	// Next 返回后一个兄弟节点。
+	Next() Node
+
+	// SetNext 设置后一个兄弟节点。
+	SetNext(Node)
+
+	// Previous 返回前一个兄弟节点。
+	Previous() Node
+
+	// SetPrevious 设置前一个兄弟节点。
+	SetPrevious(Node)
+
+	// FirstChild 返回第一个子节点。
+	FirstChild() Node
+
+	// SetFirstChild 设置第一个子节点。
+	SetFirstChild(Node)
+
+	// 返回最后一个子节点。
+	LastChild() Node
+
+	// 设置最后一个子节点。
+	SetLastChild(Node)
+
+	// Children 返回子节点列表。
+	Children() []Node
+
+	// AppendChild 添加一个子节点。
+	AppendChild(this, child Node)
+
+	// InsertAfter 添加一个兄弟节点。
+	InsertAfter(this Node, sibling Node)
+
+	// RawText 返回原始内容。
+	RawText() string
+
+	// SetRawText 设置原始内容。
+	SetRawText(string)
+
+	// AppendRawText 添加原始内容。
+	AppendRawText(string)
+
+	// Value 返回节点值。节点值即根据原始内容处理后的值。
+	Value() string
+
+	// SetValue 设置节点值。
+	SetValue(string)
+
+	// AppendValue 添加节点值。
+	AppendValue(string)
+
+	// Tokens 返回所有 tokens。
+	Tokens() items
+
+	// SetTokens 设置 tokens。
+	SetTokens(items)
+
+	// AppendTokens 添加 tokens。
+	AppendTokens(items)
+
+	// IsOpen 返回节点是否是打开的。
 	IsOpen() bool
+
+	// IsClosed 返回节点是否是关闭的。
 	IsClosed() bool
+
+	// Close 关闭节点。
 	Close()
+
+	// Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
 	Finalize(*Context)
+
+	// Continue 用于判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。
+	// 如果可以继续处理返回 0，如果不能接续处理返回 1，如果返回 2（仅在围栏代码块闭合时）则说明可以继续下一行处理了。
 	Continue(*Context) int
+
+	// AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 	AcceptLines() bool
+
+	// CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（一种块级容器）只能包含列表项节点，
+	// 块引用节点（另一种块级容器）可以包含任意节点；段落节点（一种叶子块节点）不能包含任何其他块级节点。
 	CanContain(NodeType) bool
+
+	// LastLineBlank 判断节点最后一行是否是空行。
 	LastLineBlank() bool
+
+	// SetLastLineBlank 设置节点最后一行是否是空行。
 	SetLastLineBlank(lastLineBlank bool)
+
+	// LastLineChecked 返回最后一行是否检查过。在判断列表是紧凑或松散模式时作为标识用。
 	LastLineChecked() bool
+
+	// SetLastLineChecked 设置最后一行是否检查过。
 	SetLastLineChecked(bool)
 }
 
+// BaseNode 描述了节点基础结构。
 type BaseNode struct {
-	typ             NodeType
-	parent          Node
-	next            Node
-	previous        Node
-	firstChild      Node
-	lastChild       Node
-	rawText         string
-	value           string
-	tokens          items
-	close           bool
-	lastLineBlank   bool
-	lastLineChecked bool
+	typ             NodeType // 节点类型
+	parent          Node     // 父节点
+	previous        Node     // 前一个兄弟节点
+	next            Node     // 后一个兄弟节点
+	firstChild      Node     // 第一个子节点
+	lastChild       Node     // 最后一个子节点
+	rawText         string   // 原始内容
+	value           string   // 原始内容处理后的值
+	tokens          items    // 词法分析结果 tokens
+	close           bool     // 标识是否关闭
+	lastLineBlank   bool     // 标识最后一行是否是空行
+	lastLineChecked bool     // 标识最后一行是否检查过
 }
 
 func (n *BaseNode) Type() NodeType {
 	return n.typ
-}
-
-func (n *BaseNode) Is(nodeType NodeType) bool {
-	return nodeType == n.typ
 }
 
 func (n *BaseNode) IsOpen() bool {
@@ -217,7 +283,7 @@ func (n *BaseNode) Tokens() items {
 func (n *BaseNode) SetTokens(tokens items) {
 	n.tokens = tokens
 }
-func (n *BaseNode) AddTokens(tokens items) {
+func (n *BaseNode) AppendTokens(tokens items) {
 	n.tokens = append(n.tokens, tokens...)
 }
 
@@ -286,44 +352,3 @@ const (
 	NodeLink                          // 链接节点
 	NodeImage                         // 图片节点
 )
-
-// Nodes.
-
-type Table struct {
-	*BaseNode
-	Align string
-}
-
-type TableRow struct {
-	*BaseNode
-}
-
-type TableCell struct {
-	*BaseNode
-	int
-	*Tree
-}
-
-type Text struct {
-	*BaseNode
-}
-
-type Emphasis struct {
-	*BaseNode
-}
-
-type Strong struct {
-	*BaseNode
-}
-
-type Delete struct {
-	*BaseNode
-}
-
-type HardBreak struct {
-	*BaseNode
-}
-
-type SoftBreak struct {
-	*BaseNode
-}

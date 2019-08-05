@@ -15,7 +15,7 @@
 
 package lute
 
-// Root 描述了根节点。
-type Root struct {
+// Text 描述了文本节点结构。
+type Text struct {
 	*BaseNode
 }
