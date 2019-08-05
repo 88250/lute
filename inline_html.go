@@ -147,17 +147,19 @@ func (t *Tree) parseDeclaration(tokens items) (valid bool, remains, content item
 		return
 	}
 
-	//name := tokens[1].Value()
-	//for _, c := range name {
-	//	if !('A' <= c && 'Z' >= c) {
-	//		return
-	//	}
-	//}
+	var token item
+	var i int
+	for _, token = range tokens[1:] {
+		if token.isWhitespace() {
+			break
+		}
+		if !('A' <= token && 'Z' >= token) {
+			return
+		}
+	}
 
 	content = append(content, tokens[0], tokens[1])
 	tokens = tokens[2:]
-	var token item
-	var i int
 	length := len(tokens)
 	for ; i < length; i++ {
 		token = tokens[i]
