@@ -15,7 +15,9 @@
 
 package lute
 
-import "strings"
+import (
+	"strings"
+)
 
 type HTML struct {
 	*BaseNode
@@ -42,17 +44,29 @@ func (html *HTML) AcceptLines() bool {
 	return true
 }
 
-var HTMLBlockTags = []string{"address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"}
+var HTMLBlockTags1, HTMLBlockTags6 []items
+
+func init() {
+	var tags = []string{"script", "pre", "style"}
+	for _, str := range tags {
+		HTMLBlockTags1 = append(HTMLBlockTags1, tokenize(str))
+	}
+	tags = []string{"address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"}
+	for _, str := range tags {
+		HTMLBlockTags6 = append(HTMLBlockTags6, tokenize(str))
+	}
+}
 
 func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	length := len(tokens)
 	switch htmlType {
 	case 1:
-		for i := 0; i < length-3; i++ {
-//			if itemLess == tokens[i] && itemSlash == tokens[i+1] && t.equalAnyIgnoreCase(tokens[i+2], "script", "pre", "style") && itemGreater == tokens[i+3] {
+		if pos := tokens.acceptTokenss(HTMLBlockTags1); 0 <= pos {
+			if itemLess == tokens[pos-1] && itemSlash == tokens[pos+1] && itemGreater == tokens[pos+3] {
 				return true
-//			}
+			}
 		}
+		return false
 	case 2:
 		for i := 0; i < length-3; i++ {
 			if itemHyphen == tokens[i] && itemHyphen == tokens[i+1] && itemGreater == tokens[i+2] {
@@ -89,16 +103,11 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 		return nil
 	}
 
-	//if t.equalAnyIgnoreCase(tokens[1].Value(), "script", "pre", "style") {
-	//	l := tokens[2:]
-	//	if 1 > len(l) {
-	//		return nil
-	//	}
-	//
-	//	if l[0].isWhitespace() || itemGreater == l[0] || itemEOF == l[0] {
-	//		return &HTML{&BaseNode{typ: NodeHTML}, 1}
-	//	}
-	//}
+	if pos := tokens[1:].acceptTokenss(HTMLBlockTags1); 0 <= pos {
+		if tokens[pos+1].isWhitespace() || itemGreater == tokens[pos+1] {
+			return  &HTML{&BaseNode{typ: NodeHTML}, 1}
+		}
+	}
 
 	slash := itemSlash == tokens[1]
 	//i := 1
@@ -162,7 +171,7 @@ func (t *Tree) startWithAnyIgnoreCase(s1 string, strs ...string) (pos int) {
 
 func (t *Tree) equalAnyIgnoreCase(s1 string, strs ...string) bool {
 	for _, s := range strs {
-		if t.equalIgnoreCase(s1, s) {
+		if strings.EqualFold(s1, s) {
 			return true
 		}
 	}
@@ -170,8 +179,12 @@ func (t *Tree) equalAnyIgnoreCase(s1 string, strs ...string) bool {
 	return false
 }
 
-func (t *Tree) equalIgnoreCase(s1, s2 string) bool {
-	return strings.ToLower(s1) == strings.ToLower(s2)
+func tokenize(str string) (ret items) {
+	for _, r := range str {
+		ret = append(ret, item(r))
+	}
+
+	return
 }
 
 func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {

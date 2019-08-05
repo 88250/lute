@@ -224,10 +224,34 @@ func (tokens items) firstNonSpace() (index int, token item) {
 	return
 }
 
-func (tokens items) accept(item item) (pos int) {
-	for ; pos < len(tokens); pos++ {
-		if item != tokens[pos] {
+func (tokens items) accept(token item) (pos int) {
+	length := len(tokens)
+	for ; pos < length; pos++ {
+		if token != tokens[pos] {
 			break
+		}
+	}
+
+	return
+}
+
+func (tokens items) acceptTokenss(someTokenss []items) (pos int) {
+	length := len(someTokenss)
+	for i := 0; i < length; i++ {
+		someTokens := someTokenss[i]
+		if pos = tokens.acceptTokens(someTokens); 0 <= pos {
+			return
+		}
+	}
+
+	return
+}
+
+func (tokens items) acceptTokens(someTokens items) (pos int) {
+	length := len(someTokens)
+	for ; pos < length; pos++ {
+		if someTokens[pos] != tokens[pos] {
+			return -1
 		}
 	}
 
