@@ -113,13 +113,13 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	for {
 		t.context.advanceOffset(1, true)
 		nextc = t.context.currentLine.peek(t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || itemEOF == nextc || (itemSpace != nextc && itemTab != nextc) {
+		if t.context.column-spacesStartCol >= 5 || itemEnd == nextc || (itemSpace != nextc && itemTab != nextc) {
 			break
 		}
 	}
 
 	token := t.context.currentLine.peek(t.context.offset)
-	var blank_item = itemEOF == token || itemNewline == token
+	var blank_item = itemEnd == token || itemNewline == token
 	var spaces_after_marker = t.context.column - spacesStartCol
 	if spaces_after_marker >= 5 || spaces_after_marker < 1 || blank_item {
 		data.padding = markerLength + 1
@@ -148,7 +148,7 @@ func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter ite
 	}
 
 	if 1 > len(marker) || (itemDot != delimiter && itemCloseParen != delimiter) {
-		return nil, itemEOF
+		return nil, itemEnd
 	}
 
 	return

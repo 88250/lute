@@ -21,8 +21,10 @@ import (
 	"unicode/utf8"
 )
 
-// 词法分析部分还有性能优化空间：可通过减少
+// TODO: 词法分析部分还有性能优化空间：不从原文本中解析出 rune 来，而是通过一些下标来标记并操作原文本 byte 数组。
+//       这样可以减少解析时间和内存分配，可以在很大程度上提升性能
 
+// lexer 描述了词法分析器结构。
 type lexer struct {
 	items  []items // 所有文本行
 	length int     // 总行数
@@ -40,22 +42,22 @@ func (lexer *lexer) nextLine() (line items) {
 	return
 }
 
-// lex creates a new lexer for the input string.
-func lex(input string) *lexer {
+// newLexer 创建一个词法分析器。
+func newLexer(input string) *lexer {
 	ret := &lexer{items: make([]items, 0, 64)}
 	if "" == input {
 		ret.items = append(ret.items, items{})
-		ret.items[ret.line] = append(ret.items[ret.line], itemEOF)
+		ret.items[ret.line] = append(ret.items[ret.line], itemEnd)
 
 		return ret
 	}
 
 	lineScanner := bufio.NewScanner(strings.NewReader(input))
 	var line string
-	var itemScanners []*scanner
+	var itemScanners []*lineLexer
 	for lineScanner.Scan() {
 		line = lineScanner.Text() + "\n"
-		itemScanner := &scanner{input: line, items: make([]item, 0, 16)}
+		itemScanner := &lineLexer{input: line, items: make([]item, 0, 16)}
 		itemScanners = append(itemScanners, itemScanner)
 		itemScanner.run()
 	}
@@ -68,30 +70,30 @@ func lex(input string) *lexer {
 	return ret
 }
 
-type scanner struct {
-	input string // the string being scanned
-	pos   int    // current position in the input
-	width int    // width of last rune read from input
-	items items  // scanned tokens
+// lineLexer 描述了文本行词法分析器。
+type lineLexer struct {
+	input string // 原文本行
+	pos   int    // 当前读取位置
+	width int    // 最新一个 token 的宽度（字节数）
+	items items  // 分析好的 tokens
 }
 
-func (s *scanner) run() {
+// run 执行词法分析。
+func (s *lineLexer) run() {
 	for {
-		r := s.next()
-		switch {
-		case itemEOF == r:
+		if r := s.next(); itemEnd == r {
 			return
-		default:
+		} else {
 			s.items = append(s.items, r)
 		}
 	}
 }
 
-// next returns the next token in the input.
-func (s *scanner) next() (ret item) {
+// next 从原文本中返回最新的一个 token，如果读取结束则返回 itemEnd。
+func (s *lineLexer) next() (ret item) {
 	if s.pos >= len(s.input) {
 		s.width = 0
-		return itemEOF
+		return itemEnd
 	}
 
 	var r rune

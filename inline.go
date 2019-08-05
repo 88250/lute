@@ -83,7 +83,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			}
 
 			length := len(tokens)
-			if 1 > length || t.context.pos >= length || itemEOF == tokens[t.context.pos] {
+			if 1 > length || t.context.pos >= length || itemEnd == tokens[t.context.pos] {
 				break
 			}
 		}

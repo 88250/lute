@@ -79,7 +79,7 @@ func (token item) isSymbol() bool {
 }
 
 const (
-	itemEOF          = item(0)
+	itemEnd          = item(0)
 	itemBacktick     = item('`')
 	itemTilde        = item('~')
 	itemBang         = item('!')
@@ -244,7 +244,7 @@ func (tokens items) trimRight() items {
 
 	i := size - 1
 	for ; 0 <= i; i-- {
-		if !tokens[i].isWhitespace() && itemEOF != tokens[i] {
+		if !tokens[i].isWhitespace() && itemEnd != tokens[i] {
 			break
 		}
 	}
@@ -434,5 +434,5 @@ func (tokens items) peek(pos int) item {
 		return tokens[pos]
 	}
 
-	return itemEOF
+	return itemEnd
 }

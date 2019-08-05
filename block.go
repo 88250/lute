@@ -174,7 +174,7 @@ var blockStarts = []startFunc{
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
-			if itemEOF != token && itemGreater == token {
+			if itemEnd != token && itemGreater == token {
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
 				// optional following space

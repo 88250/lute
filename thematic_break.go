@@ -40,7 +40,7 @@ func (t *Tree) parseThematicBreak() (ret *ThematicBreak) {
 			return nil
 		}
 
-		if itemEOF != marker {
+		if itemEnd != marker {
 			if marker != token {
 				return nil
 			}

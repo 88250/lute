@@ -48,7 +48,7 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 	_, tokens = tokens.trimLeft()
 	_, tokens = tokens[level:].trimLeft()
 	for _, token := range tokens {
-		if itemEOF == token || itemNewline == token {
+		if itemEnd == token || itemNewline == token {
 			break
 		}
 
@@ -103,7 +103,7 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 			return nil
 		}
 
-		if itemEOF != marker {
+		if itemEnd != marker {
 			if marker != token {
 				return nil
 			}
@@ -113,7 +113,7 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 		markers++
 	}
 
-	if itemEOF == marker {
+	if itemEnd == marker {
 		return nil
 	}
 

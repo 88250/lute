@@ -49,11 +49,11 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 	}
 
 	var beforeIsPunct, beforeIsWhitespace, afterIsPunct, afterIsWhitespace, canOpen, canClose bool
-	if itemEOF != tokenBefore {
+	if itemEnd != tokenBefore {
 		beforeIsWhitespace = tokenBefore.isUnicodeWhitespace()
 		beforeIsPunct = tokenBefore.isPunct()
 	}
-	if itemEOF != tokenAfter {
+	if itemEnd != tokenAfter {
 		afterIsWhitespace = tokenAfter.isUnicodeWhitespace()
 		afterIsPunct = tokenAfter.isPunct()
 	}

@@ -132,7 +132,7 @@ func (context *Context) findNextNonspace() {
 		}
 	}
 
-	context.blank = itemNewline == c || itemEOF == c
+	context.blank = itemNewline == c || itemEnd == c
 	context.nextNonspace = i
 	context.nextNonspaceColumn = cols
 	context.indent = context.nextNonspaceColumn - context.column
@@ -218,7 +218,7 @@ func (t *Tree) recover(err *error) {
 func (t *Tree) parse() (err error) {
 	defer t.recover(&err)
 
-	t.lex = lex(t.text)
+	t.lex = newLexer(t.text)
 	t.Root = &Root{&BaseNode{typ: NodeRoot}}
 	t.parseBlocks()
 	t.parseInlines()
