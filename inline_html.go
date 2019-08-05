@@ -15,6 +15,7 @@
 
 package lute
 
+// InlineHTML 描述了内联 HTML 节点结构。
 type InlineHTML struct {
 	*BaseNode
 }

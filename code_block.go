@@ -17,6 +17,7 @@ package lute
 
 import "strings"
 
+// CodeBlock 描述了代码块节点结构。
 type CodeBlock struct {
 	*BaseNode
 	isFenced    bool

@@ -15,6 +15,7 @@
 
 package lute
 
+// Heading 描述了标题节点结构。
 type Heading struct {
 	*BaseNode
 	Level int

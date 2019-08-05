@@ -13,18 +13,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Lute 是一款结构化的 Markdown 引擎，完整实现了最新的 GFM/CommonMark 规范，对中文语境支持更好。
 package lute
-
-type BlankLine struct {
-	*BaseNode
-}
-
-func (t *Tree) parseBlankLine(tokens items) (ret Node) {
-	if !tokens.isBlankLine() {
-		return
-	}
-
-	ret = &BlankLine{&BaseNode{typ: NodeBlankLine}}
-
-	return
-}

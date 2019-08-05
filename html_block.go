@@ -19,9 +19,10 @@ import (
 	"strings"
 )
 
+// HTMLBlock 描述了 HTML 块节点结构。
 type HTMLBlock struct {
 	*BaseNode
-	hType int
+	hType int // 规范中定义的 HTML 块类型（1-7）
 }
 
 func (html *HTMLBlock) CanContain(nodeType NodeType) bool {

@@ -15,6 +15,7 @@
 
 package lute
 
+// Blockquote 描述了块引用节点结构。
 type Blockquote struct {
 	*BaseNode
 }

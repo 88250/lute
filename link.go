@@ -17,6 +17,7 @@ package lute
 
 import "strings"
 
+// Link 描述了链接节点结构。
 type Link struct {
 	*BaseNode
 	Destination string

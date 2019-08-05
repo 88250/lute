@@ -20,8 +20,11 @@ import (
 	"strings"
 )
 
+// NewHTMLRenderer 创建一个 HTML 渲染器。
 func NewHTMLRenderer() (ret *Renderer) {
 	ret = &Renderer{rendererFuncs: map[NodeType]RendererFunc{}}
+
+	// 注册渲染器函数
 
 	ret.rendererFuncs[NodeRoot] = ret.renderRoot
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph

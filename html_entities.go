@@ -15,6 +15,7 @@
 
 package lute
 
+// htmlEntities 罗列了所有 HTML 实体，由 https://html.spec.whatwg.org/entities.json 整理生成。
 var htmlEntities = map[string]string{
 	"&#0": "U+FFFD", // 为了安全
 

@@ -15,6 +15,7 @@
 
 package lute
 
+// Image 描述了图片节点结构。
 type Image struct {
 	*BaseNode
 	Destination string

@@ -21,19 +21,20 @@ import (
 	"strings"
 )
 
+// RendererFunc 描述了渲染器函数签名。
 type RendererFunc func(n Node, entering bool) (WalkStatus, error)
 
-const Newline = "\n"
-
+// Renderer 描述了渲染器结构。
 type Renderer struct {
-	writer        strings.Builder
-	lastOut       string
-	rendererFuncs map[NodeType]RendererFunc
-	disableTags   int
+	writer        strings.Builder           // 输出缓冲
+	lastOut       string                    // 最新的输出内容
+	rendererFuncs map[NodeType]RendererFunc // 渲染器
+	disableTags   int                       // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况。比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 }
 
+// Render 渲染指定的节点 n。
 func (r *Renderer) Render(n Node) error {
-	r.lastOut = Newline
+	r.lastOut = "\n"
 	return Walk(n, func(n Node, entering bool) (WalkStatus, error) {
 		f := r.rendererFuncs[n.Type()]
 		if nil == f {
@@ -44,13 +45,15 @@ func (r *Renderer) Render(n Node) error {
 	})
 }
 
+// WriteString 输出指定的字符串 content。
 func (r *Renderer) WriteString(content string) {
 	r.writer.WriteString(content)
 	r.lastOut = content
 }
 
+// Newline 会在最新内容不是换行符 \n 时输出一个换行符。
 func (r *Renderer) Newline() {
-	if Newline != r.lastOut {
-		r.WriteString(Newline)
+	if "\n" != r.lastOut {
+		r.WriteString("\n")
 	}
 }

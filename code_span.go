@@ -15,6 +15,7 @@
 
 package lute
 
+// CodeSpan 描述了代码节点结构。
 type CodeSpan struct {
 	*BaseNode
 }
