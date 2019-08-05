@@ -110,15 +110,16 @@ func (t *Tree) parseCDATA(tokens items) (valid bool, remains, content items) {
 	if itemOpenBracket != tokens[1] {
 		return
 	}
-	//if "CDATA" != tokens[2].Value() {
-	//	return
-	//}
-	if itemOpenBracket != tokens[3] {
+
+	if 'C' != tokens[2] || 'D' != tokens[3] || 'A' != tokens[4] || 'T' != tokens[5] || 'A' != tokens[6] {
+		return
+	}
+	if itemOpenBracket != tokens[7] {
 		return
 	}
 
-	content = append(content, tokens[0], tokens[1], tokens[2], tokens[3])
-	tokens = tokens[4:]
+	content = append(content, tokens[:7]...)
+	tokens = tokens[7:]
 	var token item
 	var i int
 	length := len(tokens)
@@ -375,27 +376,22 @@ func (t *Tree) parseAttrName(tokens items) (remains, attrName items) {
 }
 
 func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
-	c := tokens[0]
-	if !c.isASCIILetter() {
+	i := 0
+	token := tokens[i]
+	if !token.isASCIILetter() {
 		return tokens, nil
 	}
-	for i := 1; i < len(tokens); i++ {
-		c = tokens[i]
-		if !c.isASCIILetterNumHyphen() {
-			return tokens, nil
-		}
-	}
-	tagName = append(tagName, tokens[0])
-
-	var token item
-	i := 1
-	length := len(tokens)
-	for ; i < length; i++ {
+	tagName = append(tagName, token)
+	for i = 1; i < len(tokens); i++ {
 		token = tokens[i]
 		if !token.isASCIILetterNumHyphen() {
 			break
 		}
 		tagName = append(tagName, token)
+	}
+	token = tokens[i]
+	if itemGreater != token {
+		return
 	}
 
 	remains = tokens[i:]

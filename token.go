@@ -51,11 +51,11 @@ func (token item) isLetter() bool {
 }
 
 func (token item) isASCIILetter() bool {
-	return !('A' <= token && 'Z' >= token) && !('a' <= token && 'z' >= token)
+	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token)
 }
 
 func (token item) isASCIILetterNumHyphen() bool {
-	return !('A' <= token && 'Z' >= token) && !('a' <= token && 'z' >= token) && !('0' <= token && '9' >= token) && '-' != token
+	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token) || ('0' <= token && '9' >= token) || '-' == token
 }
 
 func (token item) isNumber() bool {

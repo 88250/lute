@@ -102,15 +102,17 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 	if itemLess != tokens[0] {
 		return nil
 	}
+
 	i := 1
-	if itemSlash == tokens[1] {
-		i = 2
-	}
 	if pos := tokens[i:].acceptTokenss(HTMLBlockTags1); 0 <= pos {
 		pos += i
 		if tokens[pos].isWhitespace() || itemGreater == tokens[pos] {
 			return &HTML{&BaseNode{typ: NodeHTML}, 1}
 		}
+	}
+
+	if itemSlash == tokens[1] {
+		i = 2
 	}
 
 	if rule6Pos := tokens[i:].acceptTokenss(HTMLBlockTags6); 0 <= rule6Pos {
