@@ -128,18 +128,16 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	var blank_item = itemEOF == token || itemNewline == token
 	var spaces_after_marker = t.context.column - spacesStartCol
 	if spaces_after_marker >= 5 || spaces_after_marker < 1 || blank_item {
-		data.padding = len(marker) + 1
+		data.padding = markerLength + 1
 		t.context.column = spacesStartCol
 		t.context.offset = spacesStartOffset
 		if token = t.context.currentLine.peek(t.context.offset); itemSpace == token || itemTab == token {
 			t.context.advanceOffset(1, true)
 		}
 	} else {
-		data.padding = len(marker) + spaces_after_marker
+		data.padding = markerLength + spaces_after_marker
 	}
-	if data.typ == ListTypeOrdered {
-		data.padding++ // 加上分隔符 . 或者 ) 为 1 的长度
-	}
+
 	return data
 }
 
