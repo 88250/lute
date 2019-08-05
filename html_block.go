@@ -105,25 +105,23 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 
 	if pos := tokens[1:].acceptTokenss(HTMLBlockTags1); 0 <= pos {
 		if tokens[pos+1].isWhitespace() || itemGreater == tokens[pos+1] {
-			return  &HTML{&BaseNode{typ: NodeHTML}, 1}
+			return &HTML{&BaseNode{typ: NodeHTML}, 1}
 		}
 	}
 
 	slash := itemSlash == tokens[1]
-	//i := 1
+	i := 1
 	if slash {
-		//i = 2
+		i = 2
 	}
-	//rule6 := t.equalAnyIgnoreCase(tokens[i].Value(), HTMLBlockTags...)
-	//if rule6 {
-	//	i++
-	//	if tokens[i].isWhitespace() || itemGreater == tokens[i] {
-	//		return &HTML{&BaseNode{typ: NodeHTML}, 6}
-	//	}
-	//	if i < length && itemSlash == tokens[i] && itemGreater == tokens[i+1] {
-	//		return &HTML{&BaseNode{typ: NodeHTML}, 6}
-	//	}
-	//}
+	if rule6Pos := tokens[i:].acceptTokenss(HTMLBlockTags6); 0 <= rule6Pos {
+		if tokens[rule6Pos].isWhitespace() || itemGreater == tokens[rule6Pos] {
+			return &HTML{&BaseNode{typ: NodeHTML}, 6}
+		}
+		if i < length && itemSlash == tokens[rule6Pos] && itemGreater == tokens[rule6Pos+1] {
+			return &HTML{&BaseNode{typ: NodeHTML}, 6}
+		}
+	}
 
 	tag := tokens.trim()
 	isOpenTag, _ := tag.isOpenTag()
