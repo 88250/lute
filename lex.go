@@ -27,13 +27,6 @@ type lexer struct {
 	line   int     // 当前行号
 }
 
-type scanner struct {
-	input string // the string being scanned
-	pos   int    // current position in the input
-	width int    // width of last rune read from input
-	items items  // scanned tokens
-}
-
 // lex creates a new lexer for the input string.
 func lex(input string) *lexer {
 	ret := &lexer{items: make([]items, 0, 64)}
@@ -62,16 +55,21 @@ func lex(input string) *lexer {
 	return ret
 }
 
+type scanner struct {
+	input string // the string being scanned
+	pos   int    // current position in the input
+	width int    // width of last rune read from input
+	items items  // scanned tokens
+}
+
 func (s *scanner) run() {
 	for {
 		r := s.next()
 		switch {
 		case itemEOF == r:
 			return
-		case r.isNewline():
-			s.newItem(itemNewline)
 		default:
-			s.newItem(r)
+			s.items = append(s.items, r)
 		}
 	}
 }
@@ -88,14 +86,4 @@ func (s *scanner) next() item {
 	s.pos += s.width
 
 	return item(r)
-}
-
-// backup steps back one rune. Can only be called once per call of next.
-func (s *scanner) backup() {
-	s.pos -= s.width
-}
-
-// newItem creates an item with the specified item type.
-func (s *scanner) newItem(r item) {
-	s.items = append(s.items, r)
 }
