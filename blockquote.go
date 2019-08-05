@@ -27,8 +27,8 @@ func (blockquote *Blockquote) Continue(context *Context) int {
 		if token := ln.peek(context.offset); itemSpace == token || itemTab == token {
 			context.advanceOffset(1, true)
 		}
-	} else {
-		return 1
+
+		return 0
 	}
-	return 0
+	return 1
 }

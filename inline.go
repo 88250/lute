@@ -343,30 +343,39 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 }
 
 func (t *Tree) parseText(tokens items) (ret Node) {
-	token := tokens[t.context.pos]
-	t.context.pos++
-	ret = &Text{&BaseNode{typ: NodeText, value: string(token)}}
+	length := len(tokens)
+	var token item
+	b := &strings.Builder{}
+	for ; t.context.pos < length; t.context.pos++ {
+		token = tokens[t.context.pos]
+		if itemBackslash == token || itemBacktick == token || itemAsterisk == token || itemUnderscore == token ||
+			itemNewline == token || itemLess == token || itemOpenBracket == token || itemCloseBracket == token ||
+			itemAmpersand == token || itemBang == token {
+			break
+		}
+		b.WriteString(string(token))
+	}
+	ret = &Text{&BaseNode{typ: NodeText, value: b.String()}}
 
 	return
 }
 
 func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 	t.context.pos++
-
-	spaces := 0
 	// check previous node for trailing spaces
-	for lastc := block.LastChild(); ; {
-		if NodeText != lastc.Type() || " " != lastc.Value() {
-			break
+	lastc := block.LastChild()
+	hardbreak := false
+	if nil != lastc && NodeText == lastc.Type() {
+		value := lastc.Value()
+		if valueLen := len(value); ' ' == value[valueLen-1] {
+			lastc.SetValue(strings.TrimRight(value, " "))
+			if 1 < valueLen {
+				hardbreak = ' ' == value[len(value)-2]
+			}
 		}
-
-		tmp := lastc.Previous()
-		lastc.Unlink()
-		lastc = tmp
-		spaces++
 	}
 
-	if 1 < spaces {
+	if hardbreak {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 	} else {
 		ret = &SoftBreak{&BaseNode{typ: NodeSoftBreak}}
