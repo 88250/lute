@@ -45,21 +45,21 @@ func (html *HTMLBlock) AcceptLines() bool {
 	return true
 }
 
-var HTMLBlockTags1, HTMLBlockCloseTags1, HTMLBlockTags6 []items
+var htmlBlockTags1, htmlBlockCloseTags1, htmlBlockTags6 []items
 
 func init() {
 	var tags = []string{"<script", "<pre", "<style"}
 	for _, str := range tags {
-		HTMLBlockTags1 = append(HTMLBlockTags1, tokenize(str))
+		htmlBlockTags1 = append(htmlBlockTags1, tokenize(str))
 	}
 	tags = []string{"</script>", "</pre>", "</style>"}
 	for _, str := range tags {
-		HTMLBlockCloseTags1 = append(HTMLBlockCloseTags1, tokenize(str))
+		htmlBlockCloseTags1 = append(htmlBlockCloseTags1, tokenize(str))
 	}
 	tags = []string{"address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"}
 	for _, str := range tags {
-		HTMLBlockTags6 = append(HTMLBlockTags6, tokenize("<"+str))
-		HTMLBlockTags6 = append(HTMLBlockTags6, tokenize("</"+str))
+		htmlBlockTags6 = append(htmlBlockTags6, tokenize("<"+str))
+		htmlBlockTags6 = append(htmlBlockTags6, tokenize("</"+str))
 	}
 }
 
@@ -67,7 +67,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	length := len(tokens)
 	switch htmlType {
 	case 1:
-		if pos := tokens.acceptTokenss(HTMLBlockCloseTags1); 0 <= pos {
+		if pos := tokens.acceptTokenss(htmlBlockCloseTags1); 0 <= pos {
 			return true
 		}
 		return false
@@ -107,13 +107,13 @@ func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 		return nil
 	}
 
-	if pos := tokens.acceptTokenss(HTMLBlockTags1); 0 <= pos {
+	if pos := tokens.acceptTokenss(htmlBlockTags1); 0 <= pos {
 		if tokens[pos].isWhitespace() || itemGreater == tokens[pos] {
 			return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 1}
 		}
 	}
 
-	if pos := tokens.acceptTokenss(HTMLBlockTags6); 0 <= pos {
+	if pos := tokens.acceptTokenss(htmlBlockTags6); 0 <= pos {
 		if tokens[pos].isWhitespace() || itemGreater == tokens[pos] {
 			return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 6}
 		}
