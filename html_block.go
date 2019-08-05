@@ -19,28 +19,28 @@ import (
 	"strings"
 )
 
-type HTML struct {
+type HTMLBlock struct {
 	*BaseNode
 	hType int
 }
 
-func (html *HTML) CanContain(nodeType NodeType) bool {
+func (html *HTMLBlock) CanContain(nodeType NodeType) bool {
 	return false
 }
 
-func (html *HTML) Continue(context *Context) int {
+func (html *HTMLBlock) Continue(context *Context) int {
 	if context.blank && (html.hType == 6 || html.hType == 7) {
 		return 1
 	}
 	return 0
 }
 
-func (html *HTML) Finalize(context *Context) {
+func (html *HTMLBlock) Finalize(context *Context) {
 	html.value = html.tokens.replaceNewlineSpace().trimRight().rawText()
 	html.tokens = nil
 }
 
-func (html *HTML) AcceptLines() bool {
+func (html *HTMLBlock) AcceptLines() bool {
 	return true
 }
 
@@ -95,7 +95,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	return false
 }
 
-func (t *Tree) parseHTML(tokens items) (ret *HTML) {
+func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 	_, tokens = tokens.trimLeft()
 	length := len(tokens)
 	if 3 > length { // at least <? and a newline
@@ -108,45 +108,45 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 
 	if pos := tokens.acceptTokenss(HTMLBlockTags1); 0 <= pos {
 		if tokens[pos].isWhitespace() || itemGreater == tokens[pos] {
-			return &HTML{&BaseNode{typ: NodeHTML}, 1}
+			return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 1}
 		}
 	}
 
 	if pos := tokens.acceptTokenss(HTMLBlockTags6); 0 <= pos {
 		if tokens[pos].isWhitespace() || itemGreater == tokens[pos] {
-			return &HTML{&BaseNode{typ: NodeHTML}, 6}
+			return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 6}
 		}
 		if itemSlash == tokens[pos] && itemGreater == tokens[pos+1] {
-			return &HTML{&BaseNode{typ: NodeHTML}, 6}
+			return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 6}
 		}
 	}
 
 	tag := tokens.trim()
 	isOpenTag, _ := tag.isOpenTag()
 	if isOpenTag && t.context.tip.Type() != NodeParagraph {
-		return &HTML{&BaseNode{typ: NodeHTML}, 7}
+		return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 7}
 	}
 	isCloseTag := tag.isCloseTag()
 	if isCloseTag && t.context.tip.Type() != NodeParagraph {
-		return &HTML{&BaseNode{typ: NodeHTML}, 7}
+		return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 7}
 	}
 
 	rawText := tokens.rawText()
 	if 0 == strings.Index(rawText, "<!--") {
-		return &HTML{&BaseNode{typ: NodeHTML}, 2}
+		return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 2}
 	}
 
 	if 0 == strings.Index(rawText, "<?") {
-		return &HTML{&BaseNode{typ: NodeHTML}, 3}
+		return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 3}
 	}
 
 	if 2 < len(rawText) && 0 == strings.Index(rawText, "<!") {
 		following := rawText[2:]
 		if 'A' <= following[0] && 'Z' >= following[0] {
-			return &HTML{&BaseNode{typ: NodeHTML}, 4}
+			return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 4}
 		}
 		if 0 == strings.Index(following, "[CDATA[") {
-			return &HTML{&BaseNode{typ: NodeHTML}, 5}
+			return &HTMLBlock{&BaseNode{typ: NodeHTMLBlock}, 5}
 		}
 	}
 

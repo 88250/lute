@@ -18,7 +18,7 @@ package lute
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
-	for line := t.nextLine(); nil != line; line = t.nextLine() {
+	for line := t.lex.nextLine(); nil != line; line = t.lex.nextLine() {
 		t.incorporateLine(line)
 	}
 	for nil != t.context.tip {
@@ -80,7 +80,7 @@ func (t *Tree) incorporateLine(line items) {
 			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block
 			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // Bullet List
 			itemUnderscore != maybeMarker && itemEqual != maybeMarker && // Setext Heading
-			itemLess != maybeMarker && // HTML
+			itemLess != maybeMarker && // HTMLBlock
 			itemGreater != maybeMarker && // Blockquote
 			!maybeMarker.isDigit() { // Ordered List
 			t.context.advanceNextNonspace()
@@ -146,8 +146,8 @@ func (t *Tree) incorporateLine(line items) {
 		if container.AcceptLines() {
 			t.addLine()
 			// if HtmlBlock, check for end condition
-			if typ == NodeHTML {
-				html := container.(*HTML)
+			if typ == NodeHTMLBlock {
+				html := container.(*HTMLBlock)
 				if html.hType >= 1 && html.hType <= 5 {
 					if t.isHTMLBlockClose(t.context.currentLine[t.context.offset:], html.hType) {
 						t.context.finalize(container)
@@ -224,7 +224,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// HTML block
+	// HTML 块
 	func(t *Tree, container Node) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]

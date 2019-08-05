@@ -37,7 +37,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
 	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
 	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
-	ret.rendererFuncs[NodeHTML] = ret.renderHTML
+	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTML
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage

@@ -31,7 +31,7 @@ func main() {
 
 	cpuProfile, _ := os.Create("cpu_profile")
 	pprof.StartCPUProfile(cpuProfile)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 20; i++ {
 		tree, err := lute.Parse("spec text", string(bytes))
 		if nil != err {
 			panic(err)

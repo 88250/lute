@@ -205,16 +205,6 @@ func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 	return
 }
 
-func (t *Tree) nextLine() (line items) {
-	if t.lex.line >= t.lex.length {
-		return
-	}
-
-	line = t.lex.items[t.lex.line]
-	t.lex.line++
-	return
-}
-
 // Parsing.
 
 // recover is the handler that turns panics into returns from the top level of Parse.

@@ -21,10 +21,23 @@ import (
 	"unicode/utf8"
 )
 
+// 词法分析部分还有性能优化空间：可通过减少
+
 type lexer struct {
-	items  []items // 总行
+	items  []items // 所有文本行
 	length int     // 总行数
 	line   int     // 当前行号
+}
+
+// nextLine 返回下一行。
+func (lexer *lexer) nextLine() (line items) {
+	if lexer.line >= lexer.length {
+		return
+	}
+
+	line = lexer.items[lexer.line]
+	lexer.line++
+	return
 }
 
 // lex creates a new lexer for the input string.
@@ -74,16 +87,17 @@ func (s *scanner) run() {
 	}
 }
 
-// next returns the next rune in the input.
-func (s *scanner) next() item {
+// next returns the next token in the input.
+func (s *scanner) next() (ret item) {
 	if s.pos >= len(s.input) {
 		s.width = 0
 		return itemEOF
 	}
 
-	r, w := utf8.DecodeRuneInString(s.input[s.pos:])
-	s.width = w
+	var r rune
+	r, s.width = utf8.DecodeRuneInString(s.input[s.pos:])
 	s.pos += s.width
+	ret = item(r)
 
-	return item(r)
+	return ret
 }

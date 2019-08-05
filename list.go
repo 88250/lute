@@ -21,11 +21,6 @@ import (
 
 type ListType int
 
-const (
-	ListTypeBullet  = 0
-	ListTypeOrdered = 1
-)
-
 type ListData struct {
 	typ          ListType
 	tight        bool
@@ -77,7 +72,7 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	}
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	data := &ListData{
-		typ:          ListTypeBullet,
+		typ:          0,    // 无序列表
 		tight:        true, // lists are tight by default
 		markerOffset: t.context.indent,
 	}
@@ -85,11 +80,10 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	markerLength := 1
 	marker := items{tokens[0]}
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
-		data.typ = ListTypeBullet
 		data.bulletChar = marker
 	} else if marker, delim := t.parseOrderedListMarker(tokens); nil != marker {
 		if container.Type() != NodeParagraph || "1" == marker.rawText() {
-			data.typ = ListTypeOrdered
+			data.typ = 1 // 有序列表
 			data.start, _ = strconv.Atoi(marker.rawText())
 			markerLength = len(marker) + 1
 			data.delimiter = delim

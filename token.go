@@ -23,7 +23,7 @@ import (
 type item rune
 
 func (token item) isNewline() bool {
-	return itemNewline == token || '\r' == token || '\u2424' == token || '\u2028' == token || '\u0085' == token || '\u0000' == token
+	return itemNewline == token || '\r' == token /*|| '\u2424' == token || '\u2028' == token*/ || '\u0085' == token || '\u0000' == token
 }
 
 func (token item) isWhitespace() bool {

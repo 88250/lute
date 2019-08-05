@@ -15,24 +15,23 @@
 
 package lute
 
-// WalkStatus represents a current status of the Walk function.
+// WalkStatus 描述了遍历状态。
 type WalkStatus int
 
 const (
-	// WalkStop indicates no more walking needed.
+	// WalkStop 意味着不需要继续遍历。
 	WalkStop = iota
-	// WalkSkipChildren indicates that Walk wont walk on children of current node.
+	// WalkSkipChildren 意味着不要遍历子节点。
 	WalkSkipChildren
-	// WalkContinue indicates that Walk can continue to walk.
+	// WalkContinue 意味着继续遍历。
 	WalkContinue
 )
 
-// Walker is a function that will be called when Walk find a new node.
-// entering is set true before walks children, false after walked children.
-// If Walker returns error, Walk function immediately stop walking.
+// Walker 函数用于遍历指定节点，遍历子节点前设置 entering 为 true，离开子节点遍历后设置为 false。
+// 如果返回 error 则结束遍历。
 type Walker func(n Node, entering bool) (WalkStatus, error)
 
-// Walk walks a AST by the depth first search algorithm.
+// Walk 使用深度优先算法遍历指定的树节点。
 func Walk(n Node, walker Walker) error {
 	status, err := walker(n, true)
 	if err != nil || status == WalkStop {

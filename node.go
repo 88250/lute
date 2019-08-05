@@ -15,6 +15,7 @@
 
 package lute
 
+// Node 描述了节点结构。
 type Node interface {
 	Type() NodeType
 	Is(NodeType) bool
@@ -261,32 +262,29 @@ func (n *BaseNode) AppendChild(this, child Node) {
 	}
 }
 
+// NodeType 描述了节点类型。
 type NodeType int
 
 const (
-	NodeRoot NodeType = iota
-	NodeBlankLine
-	NodeParagraph
-	NodeHeading
-	NodeThematicBreak
-	NodeBlockquote
-	NodeList
-	NodeListItem
-	NodeTable
-	NodeTableRow
-	NodeTableCell
-	NodeHTML
-	NodeInlineHTML
-	NodeCodeBlock
-	NodeText
-	NodeEmphasis
-	NodeStrong
-	NodeDelete
-	NodeCodeSpan
-	NodeHardBreak
-	NodeSoftBreak
-	NodeLink
-	NodeImage
+	NodeRoot          NodeType = iota // 根节点类
+	NodeBlankLine                     // 空行节点
+	NodeParagraph                     // 段落节点
+	NodeHeading                       // 标题节点
+	NodeThematicBreak                 // 分隔线节点
+	NodeBlockquote                    // 块引用节点
+	NodeList                          // 列表节点
+	NodeListItem                      // 列表项节点
+	NodeHTMLBlock                     // HTML 块节点
+	NodeInlineHTML                    // 内联 HTML节点
+	NodeCodeBlock                     // 代码块节点
+	NodeText                          // 文本节点
+	NodeEmphasis                      // 强调节点
+	NodeStrong                        // 加粗节点
+	NodeCodeSpan                      // 代码节点
+	NodeHardBreak                     // 硬换行节点
+	NodeSoftBreak                     // 软换行节点
+	NodeLink                          // 链接节点
+	NodeImage                         // 图片节点
 )
 
 // Nodes.
