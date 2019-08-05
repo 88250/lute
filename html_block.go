@@ -102,21 +102,19 @@ func (t *Tree) parseHTML(tokens items) (ret *HTML) {
 	if itemLess != tokens[0] {
 		return nil
 	}
-
-	if pos := tokens[1:].acceptTokenss(HTMLBlockTags1); 0 <= pos {
-		pos++
+	i := 1
+	if itemSlash == tokens[1] {
+		i = 2
+	}
+	if pos := tokens[i:].acceptTokenss(HTMLBlockTags1); 0 <= pos {
+		pos += i
 		if tokens[pos].isWhitespace() || itemGreater == tokens[pos] {
 			return &HTML{&BaseNode{typ: NodeHTML}, 1}
 		}
 	}
 
-	slash := itemSlash == tokens[1]
-	i := 1
-	if slash {
-		i = 2
-	}
 	if rule6Pos := tokens[i:].acceptTokenss(HTMLBlockTags6); 0 <= rule6Pos {
-		rule6Pos++
+		rule6Pos += i
 		if tokens[rule6Pos].isWhitespace() || itemGreater == tokens[rule6Pos] {
 			return &HTML{&BaseNode{typ: NodeHTML}, 6}
 		}
@@ -167,16 +165,6 @@ func (t *Tree) startWithAnyIgnoreCase(s1 string, strs ...string) (pos int) {
 	}
 
 	return -1
-}
-
-func (t *Tree) equalAnyIgnoreCase(s1 string, strs ...string) bool {
-	for _, s := range strs {
-		if strings.EqualFold(s1, s) {
-			return true
-		}
-	}
-
-	return false
 }
 
 func tokenize(str string) (ret items) {
