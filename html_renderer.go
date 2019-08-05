@@ -213,13 +213,13 @@ func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*List)
 	tag := "ul"
-	if "" == n.bulletChar {
+	if nil == n.bulletChar {
 		tag = "ol"
 	}
 	if entering {
 		r.Newline()
 		attrs := [][]string{{"start", fmt.Sprintf("%d", n.start)}}
-		if "" == n.bulletChar && 1 != n.start {
+		if nil == n.bulletChar && 1 != n.start {
 			r.tag(tag, attrs, false)
 		} else {
 			r.tag(tag, nil, false)

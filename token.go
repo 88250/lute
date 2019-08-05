@@ -127,6 +127,20 @@ func (tokens items) replaceNewlineSpace() items {
 	return tokens
 }
 
+func (tokens items) equal(anotherTokens items) bool {
+	if len(tokens) != len(anotherTokens) {
+		return false
+	}
+
+	for i, token := range tokens {
+		if token != anotherTokens[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (tokens items) rawText() (ret string) {
 	b := &strings.Builder{}
 	for i := 0; i < len(tokens); i++ {

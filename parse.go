@@ -182,7 +182,7 @@ func (context *Context) addChild(child Node) {
 func (context *Context) listsMatch(list_data, item_data *ListData) bool {
 	return list_data.typ == item_data.typ &&
 		list_data.delimiter == item_data.delimiter &&
-		list_data.bulletChar == item_data.bulletChar
+		list_data.bulletChar.equal(item_data.bulletChar)
 }
 
 // Tree is the representation of the markdown ast.

@@ -29,9 +29,9 @@ const (
 type ListData struct {
 	typ          ListType
 	tight        bool
-	bulletChar   string
+	bulletChar   items
 	start        int
-	delimiter    string
+	delimiter    item
 	padding      int
 	markerOffset int
 }
@@ -69,24 +69,6 @@ func (list *List) Finalize(context *Context) {
 	}
 }
 
-func (t *Tree) parseOrderedListMarker(tokens items) (marker items) {
-	var i int
-	var token item
-	for ; ; i++ {
-		token = tokens[i]
-		marker = append(marker, token)
-		if !token.isDigit() || 8 < i {
-			break
-		}
-	}
-
-	if 1 > len(marker) || itemDot == token || itemCloseParen == token {
-		return nil
-	}
-
-	return
-}
-
 // Parse a list marker and return data on the marker (type,
 // start, delimiter, bullet character, padding) or null.
 func (t *Tree) parseListMarker(container Node) *ListData {
@@ -104,19 +86,13 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 	marker := items{tokens[0]}
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.typ = ListTypeBullet
-		data.bulletChar = string(marker[0])
-	} else if marker = t.parseOrderedListMarker(tokens); nil != marker {
+		data.bulletChar = marker
+	} else if marker, delim := t.parseOrderedListMarker(tokens); nil != marker {
 		if container.Type() != NodeParagraph || '1' == marker[0] {
 			data.typ = ListTypeOrdered
 			data.start, _ = strconv.Atoi(marker.rawText())
 			markerLength = 2
-			if itemDot == tokens[1] {
-				data.delimiter = "."
-			} else if itemCloseParen == tokens[1] {
-				data.delimiter = ")"
-			} else {
-				return nil
-			}
+			data.delimiter = delim
 		} else {
 			return nil
 		}
@@ -165,6 +141,25 @@ func (t *Tree) parseListMarker(container Node) *ListData {
 		data.padding++ // 加上分隔符 . 或者 ) 为 1 的长度
 	}
 	return data
+}
+
+func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter item) {
+	var i int
+	var token item
+	for ; ; i++ {
+		token = tokens[i]
+		if !token.isDigit() || 8 < i {
+			delimiter = token
+			break
+		}
+		marker = append(marker, token)
+	}
+
+	if 1 > len(marker) || (itemDot != delimiter && itemCloseParen != delimiter) {
+		return nil, itemEOF
+	}
+
+	return
 }
 
 // Returns true if block ends with a blank line, descending if needed into lists and sublists.
