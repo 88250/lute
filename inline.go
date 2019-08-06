@@ -360,14 +360,9 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 		}
 	}
 
-	ret = newText()
-	ret.SetValue(fromItems(tokens[start:t.context.pos]))
+	ret = &Text{typ: NodeText, value: fromItems(tokens[start:t.context.pos])}
 
 	return
-}
-
-func newText() Node {
-	return &Text{typ: NodeText}
 }
 
 func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
