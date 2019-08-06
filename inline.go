@@ -334,7 +334,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
 	b := &strings.Builder{}
 	for i := startPos; i < endPos; i++ {
-		b.WriteString(string(tokens[i]))
+		b.WriteRune(rune(tokens[i]))
 	}
 	text = b.String()
 	subTokens = tokens[startPos:endPos]
@@ -353,7 +353,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 			itemAmpersand == token || itemBang == token {
 			break
 		}
-		b.WriteString(string(token))
+		b.WriteRune(rune(token))
 	}
 	ret = &Text{&BaseNode{typ: NodeText, value: b.String()}}
 

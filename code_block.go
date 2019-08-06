@@ -121,7 +121,7 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 	}
 
 	info = unescapeString(info)
-	ret = &CodeBlock{&BaseNode{typ: NodeCodeBlock},
+	ret = &CodeBlock{&BaseNode{typ: NodeCodeBlock, tokens: make([]item, 0, 256)},
 		true, fenceChar, fenceLength, t.context.indent, info}
 
 	return

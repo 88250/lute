@@ -156,7 +156,7 @@ func (t *Tree) incorporateLine(line items) {
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
 			// create paragraph container for line
-			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph}})
+			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph, tokens: make([]item, 0, 128)}})
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}

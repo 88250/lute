@@ -210,8 +210,9 @@ func (tokens items) equal(anotherTokens items) bool {
 
 func (tokens items) rawText() (ret string) {
 	b := &strings.Builder{}
-	for i := 0; i < len(tokens); i++ {
-		b.WriteString(string(tokens[i]))
+	length := len(tokens)
+	for i := 0; i < length; i++ {
+		b.WriteRune(rune(tokens[i]))
 	}
 	ret = b.String()
 

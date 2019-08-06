@@ -76,8 +76,8 @@ func (t *Tree) handleDelim(block Node, tokens items) {
 	startPos := t.context.pos
 	delim := t.scanDelims(tokens)
 
-	subTokens, text := t.extractTokens(tokens, startPos, t.context.pos)
-	node := &Text{&BaseNode{typ: NodeText, rawText: text, value: text, tokens: subTokens}}
+	_, text := t.extractTokens(tokens, startPos, t.context.pos)
+	node := &Text{&BaseNode{typ: NodeText, value: text}}
 	block.AppendChild(block, node)
 
 	// Add entry to stack for this opener
