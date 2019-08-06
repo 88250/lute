@@ -24,7 +24,7 @@ import (
 type item byte
 
 func (token item) isNewline() bool {
-	return itemNewline == token || '\r' == token /*|| '\u2424' == token || '\u2028' == token*/ || '\u0085' == token || '\u0000' == token
+	return itemNewline == token || '\r' == token /* TODO || '\u2424' == token || '\u2028' == token*/ || '\u0085' == token || '\u0000' == token
 }
 
 func (token item) isWhitespace() bool {
@@ -32,7 +32,11 @@ func (token item) isWhitespace() bool {
 }
 
 func (token item) isUnicodeWhitespace() bool {
-	return unicode.Is(unicode.Zs, rune(token)) || itemTab == token || '\u000D' == token || itemNewline == token || '\u000C' == token
+	if unicode.Is(unicode.Zs, rune(token)) {
+		return true
+	}
+
+	return itemTab == token || '\u000D' == token || itemNewline == token || '\u000C' == token
 }
 
 func (token item) isDigit() bool {

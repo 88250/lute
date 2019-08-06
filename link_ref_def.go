@@ -119,18 +119,24 @@ func (context *Context) parseLinkTitleMatch(opener, closer item, tokens items) (
 	}
 
 	line := tokens
+	length = len(line)
 	closed := false
 	i := 1
-	for i < len(line) {
+	size := 0
+	var r rune
+	for ; i < length; i += size {
 		token := line[i]
-		title += string(token)
 		passed = append(passed, token)
+		r, size = decodeRune(line[i:])
+		for j := 1; j < size; j++ {
+			passed = append(passed, tokens[i+j])
+		}
+		title += string(r)
 		if closer == token && !tokens.isBackslashEscape(i) {
 			closed = true
 			title = title[:len(title)-1]
 			break
 		}
-		i++
 	}
 
 	if !closed {
@@ -166,10 +172,16 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 
 	var openParens int
 	i := 0
-	for ; i < length; i++ {
+	size := 0
+	var r rune
+	for ; i < length; {
 		token := tokens[i]
 		ret = append(ret, token)
-		destination += string(token)
+		r, size = decodeRune(tokens[i:])
+		for j := 1; j < size; j++ {
+			ret = append(ret, tokens[i+j])
+		}
+		destination += string(r)
 		if token.isWhitespace() || token.isControl() {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
@@ -186,6 +198,8 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 				break
 			}
 		}
+
+		i += size
 	}
 
 	remains = tokens[i:]
@@ -211,11 +225,18 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 
 	closed := false
 	i := 0
-	for ; i < length; i++ {
+	size := 0
+	var r rune
+	for ; i < length; i += size {
 		token := tokens[i]
 		ret = append(ret, token)
+		size = 1
 		if 0 < i {
-			destination += string(token)
+			r, size = decodeRune(tokens[i:])
+			for j := 1; j < size; j++ {
+				ret = append(ret, tokens[i+j])
+			}
+			destination += string(r)
 			if itemLess == token && !tokens.isBackslashEscape(i) {
 				ret = nil
 				destination = ""
@@ -258,7 +279,11 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 	for {
 		token := line[i]
 		passed = append(passed, token)
-		label += string(token)
+		r, size := decodeRune(line[i:])
+		for j := 1; j < size; j++ {
+			passed = append(passed, tokens[i+j])
+		}
+		label += string(r)
 		if itemCloseBracket == token && !tokens.isBackslashEscape(i) {
 			closed = true
 			label = label[0 : len(label)-1]
@@ -270,7 +295,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 			label = ""
 			return
 		}
-		i++
+		i += size
 	}
 
 	if !closed || "" == strings.TrimSpace(label) || 999 < len(label) {

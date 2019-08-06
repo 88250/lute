@@ -133,7 +133,9 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		matchEnd := false
 		passed = append(passed, tokens[0], tokens[1])
 		i := 2
-		for ; i < length; i++ {
+		size := 0
+		var r rune
+		for ; i < length; i += size {
 			token := tokens[i]
 			if itemNewline == token {
 				passed = nil
@@ -142,7 +144,13 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 			}
 
 			passed = append(passed, token)
-			destination += string(token)
+			r, size = decodeRune(tokens[i:])
+			if 1 < size {
+				for j := 1; j < size; j++ {
+					passed = append(passed, tokens[i+j])
+				}
+			}
+			destination += string(r)
 			if itemGreater == token && !tokens.isBackslashEscape(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
@@ -157,23 +165,29 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		}
 
 		passed = append(passed, tokens[i+1])
-
 		remains = tokens[i+2:]
 	} else {
 		var openParens int
 		i := 0
+		size := 0
+		var r rune
 		destStarted := false
-		for ; i < length; i++ {
+		for ; i < length; i += size {
 			token := tokens[i]
 			passed = append(passed, token)
-			destination += string(token)
+			r, size = decodeRune(tokens[i:])
+			destination += string(r)
+			for j := 1; j < size; j++ {
+				passed = append(passed, tokens[i+j])
+			}
+
 			if !destStarted && !token.isWhitespace() && 0 < i {
 				destStarted = true
-				destination = destination[1:]
+				destination = destination[size:]
 				destination = strings.TrimSpace(destination)
 			}
 			if destStarted && (token.isWhitespace() || token.isControl()) {
-				destination = destination[:len(destination)-1]
+				destination = destination[:len(destination)-size]
 				passed = passed[:len(passed)-1]
 				break
 			}

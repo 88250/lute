@@ -41,15 +41,17 @@ func (l *lexer) nextLine() (line items) {
 
 	var b item
 	i := l.offset
-	for ; i < l.length; i++ {
+	width := 0
+	for ; i < l.length; i += width {
 		b = l.input[i]
 		if '\n' == b {
 			i++
 			break
 		}
-		if 0x80 <= b {
-			width := runeCount(l.input[i:])
-			i += width
+		if RuneSelf <= b {
+			_, width = decodeRune(l.input[i:])
+		} else {
+			width = 1
 		}
 	}
 	line = l.input[l.offset:i]
@@ -72,42 +74,46 @@ func (l *lexer) load(str string) {
 	l.input = *(*items)(unsafe.Pointer(&h))
 }
 
-// 以下代码摘自标准库 utf8/utf8.go
+// 以下代码摘自标准库 utf8/go
 
-func runeCount(p items) int {
-	np := len(p)
-	var n int
-	for i := 0; i < np; {
-		n++
-		c := p[i]
-		if c < 0x80 {
-			// ASCII fast path
-			i++
-			continue
-		}
-		x := first[c]
-		if x == xx {
-			i++ // invalid.
-			continue
-		}
-		size := int(x & 7)
-		if i+size > np {
-			i++ // Short or invalid.
-			continue
-		}
-		accept := acceptRanges[x>>4]
-		if c := p[i+1]; c < accept.lo || accept.hi < c {
-			size = 1
-		} else if size == 2 {
-		} else if c := p[i+2]; c < locb || hicb < c {
-			size = 1
-		} else if size == 3 {
-		} else if c := p[i+3]; c < locb || hicb < c {
-			size = 1
-		}
-		i += size
+func decodeRune(p items) (r rune, size int) {
+	n := len(p)
+	if n < 1 {
+		return RuneError, 0
 	}
-	return n
+	p0 := p[0]
+	x := first[p0]
+	if x >= as {
+		// The following code simulates an additional check for x == xx and
+		// handling the ASCII and invalid cases accordingly. This mask-and-or
+		// approach prevents an additional branch.
+		mask := rune(x) << 31 >> 31 // Create 0x0000 or 0xFFFF.
+		return rune(p[0])&^mask | RuneError&mask, 1
+	}
+	sz := x & 7
+	accept := acceptRanges[x>>4]
+	if n < int(sz) {
+		return RuneError, 1
+	}
+	b1 := p[1]
+	if b1 < accept.lo || accept.hi < b1 {
+		return RuneError, 1
+	}
+	if sz == 2 {
+		return rune(p0&mask2)<<6 | rune(b1&maskx), 2
+	}
+	b2 := p[2]
+	if b2 < locb || hicb < b2 {
+		return RuneError, 1
+	}
+	if sz == 3 {
+		return rune(p0&mask3)<<12 | rune(b1&maskx)<<6 | rune(b2&maskx), 3
+	}
+	b3 := p[3]
+	if b3 < locb || hicb < b3 {
+		return RuneError, 1
+	}
+	return rune(p0&mask4)<<18 | rune(b1&maskx)<<12 | rune(b2&maskx)<<6 | rune(b3&maskx), 4
 }
 
 var acceptRanges = [...]acceptRange{
@@ -124,6 +130,14 @@ type acceptRange struct {
 }
 
 const (
+	RuneError = '\uFFFD'     // the "error" Rune or "Unicode replacement character"
+	RuneSelf  = 0x80         // characters below Runeself are represented as themselves in a single byte.
+	
+	maskx = 0x3F // 0011 1111
+	mask2 = 0x1F // 0001 1111
+	mask3 = 0x0F // 0000 1111
+	mask4 = 0x07 // 0000 0111
+
 	locb = 0x80 // 1000 0000
 	hicb = 0xBF // 1011 1111
 
