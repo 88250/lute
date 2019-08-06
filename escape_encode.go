@@ -42,9 +42,9 @@ func unescapeString(str string) string {
 	}
 
 	str = html.UnescapeString(str) // FIXME: 此处应该用内部的实体转义方式
-	runes := []rune(str)
+	runes := toItems(str)
 	length := len(runes)
-	retRunes := make([]rune, 0, length)
+	retRunes := make(items, 0, length)
 	for i := 0; i < length; i++ {
 		if isBackslashEscape(runes, i) {
 			retRunes = retRunes[:len(retRunes)-1]
@@ -52,17 +52,17 @@ func unescapeString(str string) string {
 		retRunes = append(retRunes, runes[i])
 	}
 
-	return string(retRunes)
+	return fromItems(retRunes)
 }
 
-func isBackslashEscape(runes []rune, pos int) bool {
-	if !isASCIIPunct(runes[pos]) {
+func isBackslashEscape(items items, pos int) bool {
+	if !isASCIIPunct(items[pos]) {
 		return false
 	}
 
 	backslashes := 0
 	for i := pos - 1; 0 <= i; i-- {
-		if '\\' != runes[i] {
+		if '\\' != items[i] {
 			break
 		}
 
@@ -72,8 +72,8 @@ func isBackslashEscape(runes []rune, pos int) bool {
 	return 0 != backslashes%2
 }
 
-func isASCIIPunct(c rune) bool {
-	return (0x21 <= c && 0x2F >= c) || (0x3A <= c && 0x40 >= c) || (0x5B <= c && 0x60 >= c) || (0x7B <= c && 0x7E >= c)
+func isASCIIPunct(token item) bool {
+	return (0x21 <= token && 0x2F >= token) || (0x3A <= token && 0x40 >= token) || (0x5B <= token && 0x60 >= token) || (0x7B <= token && 0x7E >= token)
 }
 
 func encodeDestination(destination string) (ret string) {

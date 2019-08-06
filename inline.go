@@ -332,7 +332,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 }
 
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
-	text = fromBytes(tokens[startPos:endPos])
+	text = fromItems(tokens[startPos:endPos])
 	subTokens = tokens[startPos:endPos]
 
 	return
@@ -355,7 +355,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 		}
 	}
 
-	value := fromBytes(tokens[start:t.context.pos])
+	value := fromItems(tokens[start:t.context.pos])
 	ret = &Text{&BaseNode{typ: NodeText, value: value}}
 
 	return

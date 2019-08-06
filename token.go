@@ -214,7 +214,7 @@ func (tokens items) equal(anotherTokens items) bool {
 }
 
 func (tokens items) string() string {
-	return fromBytes(tokens)
+	return fromItems(tokens)
 }
 
 func (tokens items) trimLeftSpace() (spaces int, remains items) {

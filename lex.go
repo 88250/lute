@@ -59,19 +59,19 @@ func (l *lexer) nextLine() (line items) {
 // lex 创建一个词法分析器。
 func lex(input string) (ret *lexer) {
 	ret = &lexer{}
-	ret.input = toBytes(input)
+	ret.input = toItems(input)
 	ret.length = len(ret.input)
 
 	return
 }
 
-// fromBytes 快速转换 items 为 string。
-func fromBytes(items items) string {
+// fromItems 快速转换 items 为 string。
+func fromItems(items items) string {
 	return *(*string)(unsafe.Pointer(&items))
 }
 
-// toBytes 快速转换 str 为 items。
-func toBytes(str string) items {
+// toItems 快速转换 str 为 items。
+func toItems(str string) items {
 	x := (*[2]uintptr)(unsafe.Pointer(&str))
 	h := [3]uintptr{x[0], x[1], x[1]}
 	return *(*items)(unsafe.Pointer(&h))
