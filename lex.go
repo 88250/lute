@@ -48,11 +48,11 @@ func (l *lexer) nextLine() (line items) {
 
 // lex 创建一个词法分析器并对 input 进行词法分析。
 func lex(input string) *lexer {
-	ret := &lexer{items: make([]items, 0, 64)}
+	ret := &lexer{items: make([]items, 0, 128)}
 
 	lineScanner := bufio.NewScanner(strings.NewReader(input))
 	for lineScanner.Scan() {
-		ret.items = append(ret.items, make([]item, 0, 16))
+		ret.items = append(ret.items, make([]item, 0, 128))
 		ret.line = lineScanner.Text() + "\n"
 		ret.lineLen = len(ret.line)
 		ret.run()
@@ -63,10 +63,11 @@ func lex(input string) *lexer {
 	ret.pos = 0
 	ret.lineLen = 0
 	ret.width = 0
+
 	return ret
 }
 
-// run 执行词法分析。
+// run 执行词法分析，每次 run 分析一行。
 func (l *lexer) run() {
 	for {
 		if r := l.next(); itemEnd == r {
