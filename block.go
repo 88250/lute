@@ -76,13 +76,13 @@ func (t *Tree) incorporateLine(line items) {
 		// 这里仅做简单判断的话可以略微提升一些性能
 		maybeMarker := t.context.currentLine[t.context.nextNonspace]
 		if !t.context.indented &&
-			itemCrosshatch != maybeMarker && // ATX Heading
-			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block
 			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // Bullet List
-			itemUnderscore != maybeMarker && itemEqual != maybeMarker && // Setext Heading
-			itemLess != maybeMarker && // HTMLBlock
+			!maybeMarker.isDigit() && // Ordered List
+			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block
+			itemCrosshatch != maybeMarker && // ATX Heading
 			itemGreater != maybeMarker && // Blockquote
-			!maybeMarker.isDigit() { // Ordered List
+			itemLess != maybeMarker && // HTMLBlock
+			itemUnderscore != maybeMarker && itemEqual != maybeMarker { // Setext Heading
 			t.context.advanceNextNonspace()
 			break
 		}
