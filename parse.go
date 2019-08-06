@@ -22,7 +22,7 @@ func Parse(name, text string) (t *Tree, err error) {
 	defer gulu.Panic.Recover(&err)
 
 	t = &Tree{Name: name, text: text, context: &Context{}}
-	t.lex = newLexer(t.text)
+	t.lex = lex(t.text)
 	t.Root = &Document{&BaseNode{typ: NodeRoot}}
 	t.parseBlocks()
 	t.parseInlines()
