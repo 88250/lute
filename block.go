@@ -76,13 +76,13 @@ func (t *Tree) incorporateLine(line items) {
 		// 这里仅做简单判断的话可以略微提升一些性能
 		maybeMarker := t.context.currentLine[t.context.nextNonspace]
 		if !t.context.indented &&
-			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // Bullet List
-			!isDigit(maybeMarker) && // Ordered List
-			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block
-			itemCrosshatch != maybeMarker && // ATX Heading
-			itemGreater != maybeMarker && // Blockquote
-			itemLess != maybeMarker && // HTMLBlock
-			itemUnderscore != maybeMarker && itemEqual != maybeMarker { // Setext Heading
+			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // 无序列表
+			!isDigit(maybeMarker) && // 有序列表
+			itemBacktick != maybeMarker && itemTilde != maybeMarker && // 代码块
+			itemCrosshatch != maybeMarker && // ATX 标题
+			itemGreater != maybeMarker && // 块引用
+			itemLess != maybeMarker && // HTML 块
+			itemUnderscore != maybeMarker && itemEqual != maybeMarker { // Setext 标题
 			t.context.advanceNextNonspace()
 			break
 		}
@@ -165,12 +165,12 @@ func (t *Tree) incorporateLine(line items) {
 
 type startFunc func(t *Tree, container Node) int
 
-// block start functions.  Return values:
-// 0 = no match
-// 1 = matched container, keep going
-// 2 = matched leaf, no more block starts
+// blockStarts 定义了一系列函数，每个函数用于判断某种块节点是否可以开始，返回值：
+// 0：不匹配
+// 1：匹配到块容器，需要继续迭代下降
+// 2：匹配到叶子块
 var blockStarts = []startFunc{
-	// Blockquote
+	// 块引用
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
@@ -192,7 +192,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// ATX heading
+	// ATX 标题
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if heading := t.parseATXHeading(); nil != heading {
@@ -210,7 +210,7 @@ var blockStarts = []startFunc{
 
 	},
 
-	// Fenced code block
+	// 围栏代码块
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if codeBlock := t.parseFencedCode(); nil != codeBlock {
@@ -240,7 +240,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// Setext heading
+	// Setext 标题
 	func(t *Tree, container Node) int {
 		if !t.context.indented && container.Type() == NodeParagraph {
 			if heading := t.parseSetextHeading(); nil != heading {
@@ -267,7 +267,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// Thematic break
+	// 分隔线
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if thematicBreak := t.parseThematicBreak(); nil != thematicBreak {
@@ -280,7 +280,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// List item
+	// 列表项
 	func(t *Tree, container Node) int {
 		if !t.context.indented || container.Type() == NodeList {
 			data := t.parseListMarker(container)
@@ -308,7 +308,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// Indented code block
+	// 缩进代码块
 	func(t *Tree, container Node) int {
 		if t.context.indented && t.context.tip.Type() != NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)
