@@ -46,9 +46,9 @@ func BenchmarkLute(b *testing.B) {
 			b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 		}
 
-		//renderer := lute.NewHTMLRenderer()
-		//if _, err := tree.Render(renderer); nil != err {
-		//	b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
-		//}
+		renderer := lute.NewHTMLRenderer()
+		if _, err := tree.Render(renderer); nil != err {
+			b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
+		}
 	}
 }
