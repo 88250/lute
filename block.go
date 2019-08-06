@@ -16,7 +16,7 @@
 package lute
 
 func (t *Tree) parseBlocks() {
-	t.context.tip = t.root
+	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
 	for line := t.lex.nextLine(); nil != line; line = t.lex.nextLine() {
 		t.incorporateLine(line)
@@ -40,7 +40,7 @@ func (t *Tree) incorporateLine(line items) {
 
 	allMatched := true
 	var container Node
-	container = t.root
+	container = t.Root
 	lastChild := container.LastChild()
 	for ; nil != lastChild && lastChild.IsOpen(); lastChild = container.LastChild() {
 		container = lastChild
