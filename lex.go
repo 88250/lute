@@ -40,6 +40,10 @@ func (l *lexer) nextLine() (line items) {
 			i++
 			break
 		}
+		if '\u0000' == b { // 跳过不安全字符
+			i++
+			continue
+		}
 		if RuneSelf <= b { // 说明占用多个字节
 			_, l.width = decodeRune(l.input[i:])
 		} else {

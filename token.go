@@ -24,11 +24,11 @@ import (
 type item byte
 
 func (token item) isNewline() bool {
-	return itemNewline == token || '\r' == token /* TODO || '\u2424' == token || '\u2028' == token*/ || '\u0085' == token || '\u0000' == token
+	return itemNewline == token || '\u0085' == token
 }
 
 func (token item) isWhitespace() bool {
-	return itemSpace == token || itemTab == token || itemNewline == token || '\u000A' == token || '\u000C' == token || '\u000D' == token
+	return itemSpace == token || itemNewline == token /* '\u000A' */ || itemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
 }
 
 func (token item) isUnicodeWhitespace() bool {
@@ -215,10 +215,11 @@ func (tokens items) equal(anotherTokens items) bool {
 }
 
 func (tokens items) rawText() (ret string) {
-	b := &strings.Builder{}
 	length := len(tokens)
+	b := &strings.Builder{}
+	b.Grow(length)
 	for i := 0; i < length; i++ {
-		b.WriteByte(byte(tokens[i])) // TODO 一次写入
+		b.WriteByte(byte(tokens[i]))
 	}
 	ret = b.String()
 
