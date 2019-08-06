@@ -56,7 +56,7 @@ func unescapeString(str string) string {
 }
 
 func isBackslashEscape(items items, pos int) bool {
-	if !isASCIIPunct(items[pos]) {
+	if !items[pos].isASCIIPunct() {
 		return false
 	}
 
@@ -65,15 +65,10 @@ func isBackslashEscape(items items, pos int) bool {
 		if '\\' != items[i] {
 			break
 		}
-
 		backslashes++
 	}
 
 	return 0 != backslashes%2
-}
-
-func isASCIIPunct(token item) bool {
-	return (0x21 <= token && 0x2F >= token) || (0x3A <= token && 0x40 >= token) || (0x5B <= token && 0x60 >= token) || (0x7B <= token && 0x7E >= token)
 }
 
 func encodeDestination(destination string) (ret string) {
