@@ -23,9 +23,7 @@ type lexer struct {
 	length  int   // 输入的文本字符数组的长度
 	offset  int   // 当前读取位置
 	lineNum int   // 当前行号
-	lineLen int   // 当前行长度
-
-	width int // TODO 最新一个 token 的宽度（字节数）
+	width   int   // 最新一个 token 的宽度（字节数）
 }
 
 // nextLine 返回下一行。
@@ -36,21 +34,21 @@ func (l *lexer) nextLine() (line items) {
 
 	var b item
 	i := l.offset
-	width := 0
-	for ; i < l.length; i += width {
+	for ; i < l.length; i += l.width {
 		b = l.input[i]
 		if '\n' == b {
 			i++
 			break
 		}
-		if RuneSelf <= b {
-			_, width = decodeRune(l.input[i:])
+		if RuneSelf <= b { // 说明占用多个字节
+			_, l.width = decodeRune(l.input[i:])
 		} else {
-			width = 1
+			l.width = 1
 		}
 	}
 	line = l.input[l.offset:i]
 	l.offset = i
+	l.lineNum++
 	return
 }
 
