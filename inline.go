@@ -20,6 +20,7 @@ import (
 	"strings"
 )
 
+// parseInlines 解析行级元素。
 func (t *Tree) parseInlines() {
 	t.context.delimiters = nil
 	t.context.brackets = nil
@@ -36,9 +37,12 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 
 		cs := block.Children()
 		if 0 < len(cs) {
+			// 递归进入子节点
 			t.parseBlockInlines(cs)
 			continue
 		}
+
+		// 开始解析块节点下的 tokens，生成该块的子节点
 
 		tokens := block.Tokens()
 		if nil == tokens {
@@ -88,6 +92,7 @@ func (t *Tree) parseBlockInlines(blocks []Node) {
 			}
 		}
 
+		// 强调加粗节点处理
 		t.processEmphasis(nil)
 	}
 }

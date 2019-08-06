@@ -15,6 +15,7 @@
 
 package lute
 
+// parseBlocks 解析块级元素。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Link{}

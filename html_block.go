@@ -176,8 +176,14 @@ func (t *Tree) startWithAnyIgnoreCase(s1 string, strs ...string) (pos int) {
 	return -1
 }
 
+// tokenize 在 init 函数中调用，可以认为是静态分配，所以使用拷贝字符不会有性能问题。
+// 另外，这里也必须要拷贝，因为调用点的 str 是局部变量，地址上的值会被覆盖。
 func tokenize(str string) (ret items) {
-	return toItems(str)
+	for _, r := range str {
+		ret = append(ret, byte(r))
+	}
+
+	return
 }
 
 func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
