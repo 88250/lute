@@ -116,7 +116,7 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 		}
 	}
 
-	entityName := tokens[start:i].rawText()
+	entityName := tokens[start:i].string()
 	if entityValue, ok := htmlEntities[entityName]; ok { // 通过查表优化
 		t.context.pos += i - start
 		return &Text{&BaseNode{typ: NodeText, value: entityValue}}

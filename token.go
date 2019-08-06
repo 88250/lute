@@ -213,7 +213,7 @@ func (tokens items) equal(anotherTokens items) bool {
 	return true
 }
 
-func (tokens items) rawText() string {
+func (tokens items) string() string {
 	return fromBytes(tokens)
 }
 

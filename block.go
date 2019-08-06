@@ -249,7 +249,7 @@ var blockStarts = []startFunc{
 				for tokens := container.Tokens(); 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.Tokens() {
 					if tokens = t.context.parseLinkRefDef(tokens); nil != tokens {
 						container.SetTokens(tokens)
-						container.SetValue(tokens.rawText())
+						container.SetValue(tokens.string())
 					}
 				}
 

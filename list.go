@@ -81,9 +81,9 @@ func (t *Tree) parseListMarker(container Node) *listData {
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.bulletChar = marker
 	} else if marker, delim := t.parseOrderedListMarker(tokens); nil != marker {
-		if container.Type() != NodeParagraph || "1" == marker.rawText() {
+		if container.Type() != NodeParagraph || "1" == marker.string() {
 			data.typ = 1 // 有序列表
-			data.start, _ = strconv.Atoi(marker.rawText())
+			data.start, _ = strconv.Atoi(marker.string())
 			markerLength = len(marker) + 1
 			data.delimiter = delim
 		} else {

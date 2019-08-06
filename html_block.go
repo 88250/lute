@@ -37,7 +37,7 @@ func (html *HTMLBlock) Continue(context *Context) int {
 }
 
 func (html *HTMLBlock) Finalize(context *Context) {
-	html.value = html.tokens.replaceNewlineSpace().trimRight().rawText()
+	html.value = html.tokens.replaceNewlineSpace().trimRight().string()
 	html.tokens = nil
 }
 
@@ -138,7 +138,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 		return
 	}
 
-	rawText := tokens.rawText()
+	rawText := tokens.string()
 	if 0 == strings.Index(rawText, "<!--") {
 		ret.hType = 2
 		return

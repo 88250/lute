@@ -75,12 +75,12 @@ func (codeBlock *CodeBlock) Finalize(context *Context) {
 		firstLine := content[:i]
 		rest := content[i+1:]
 
-		codeBlock.info = unescapeString(strings.TrimSpace(firstLine.rawText()))
+		codeBlock.info = unescapeString(strings.TrimSpace(firstLine.string()))
 		codeBlock.tokens = rest
 	} else { // indented
 		codeBlock.tokens = codeBlock.tokens.replaceNewlineSpace()
 	}
-	codeBlock.value = codeBlock.tokens.rawText()
+	codeBlock.value = codeBlock.tokens.string()
 	codeBlock.tokens = nil
 }
 
@@ -112,12 +112,12 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
 	if itemBacktick == marker {
 		if !infoTokens.contain(itemBacktick) {
-			info = infoTokens.trim().rawText()
+			info = infoTokens.trim().string()
 		} else {
 			return nil // info 部分不能包含 `
 		}
 	} else {
-		info = infoTokens.trim().rawText()
+		info = infoTokens.trim().string()
 	}
 
 	info = unescapeString(info)
