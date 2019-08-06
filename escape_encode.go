@@ -29,15 +29,23 @@ var htmlEscaper = strings.NewReplacer(
 )
 
 func escapeHTML(html string) string {
+	if "" == html {
+		return html
+	}
+
 	return htmlEscaper.Replace(html)
 }
 
 func unescapeString(str string) string {
+	if "" == str {
+		return str
+	}
+
 	str = html.UnescapeString(str) // FIXME: 此处应该用内部的实体转义方式
 	runes := []rune(str)
-
-	var retRunes []rune
-	for i := 0; i < len(runes); i++ {
+	length := len(runes)
+	retRunes := make([]rune, 0, length)
+	for i := 0; i < length; i++ {
 		if isBackslashEscape(runes, i) {
 			retRunes = retRunes[:len(retRunes)-1]
 		}
@@ -69,6 +77,10 @@ func isASCIIPunct(c rune) bool {
 }
 
 func encodeDestination(destination string) (ret string) {
+	if "" == destination {
+		return destination
+	}
+
 	destination = decodeDestination(destination)
 
 	parts := strings.SplitN(destination, ":", 2)
@@ -132,6 +144,10 @@ func encodeDestination(destination string) (ret string) {
 }
 
 func decodeDestination(destination string) (ret string) {
+	if "" == destination {
+		return destination
+	}
+
 	parts := strings.SplitN(destination, ":", 2)
 	var scheme string
 	remains := destination
