@@ -15,9 +15,10 @@
 
 package lute
 
+// ListItem 描述了列表项节点结构。
 type ListItem struct {
 	*BaseNode
-	*ListData
+	*listData
 }
 
 func (listItem *ListItem) Continue(context *Context) int {
@@ -29,7 +30,7 @@ func (listItem *ListItem) Continue(context *Context) int {
 			context.advanceNextNonspace()
 		}
 	} else if context.indent >= listItem.markerOffset+listItem.padding {
-		context.advanceOffset(listItem.markerOffset+ listItem.padding, true)
+		context.advanceOffset(listItem.markerOffset+listItem.padding, true)
 	} else {
 		return 1
 	}

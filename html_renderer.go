@@ -22,7 +22,7 @@ import (
 
 // NewHTMLRenderer 创建一个 HTML 渲染器。
 func NewHTMLRenderer() (ret *Renderer) {
-	ret = &Renderer{rendererFuncs: map[NodeType]RendererFunc{}}
+	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}}
 
 	// 注册渲染器函数
 

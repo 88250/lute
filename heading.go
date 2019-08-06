@@ -25,7 +25,7 @@ func (heading *Heading) Continue(context *Context) int {
 	return 1
 }
 
-func (heading *Heading) CanContain(nodeType NodeType) bool {
+func (heading *Heading) CanContain(nodeType int) bool {
 	return false
 }
 

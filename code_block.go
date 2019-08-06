@@ -88,7 +88,7 @@ func (codeBlock *CodeBlock) AcceptLines() bool {
 	return true
 }
 
-func (codeBlock *CodeBlock) CanContain(nodeType NodeType) bool {
+func (codeBlock *CodeBlock) CanContain(nodeType int) bool {
 	return false
 }
 

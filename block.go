@@ -292,7 +292,7 @@ var blockStarts = []startFunc{
 
 			listsMatch := false
 			if container.Type() == NodeList {
-				listsMatch = t.context.listsMatch(container.(*List).ListData, data)
+				listsMatch = t.context.listsMatch(container.(*List).listData, data)
 			}
 
 			// add the list if needed

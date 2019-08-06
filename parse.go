@@ -179,7 +179,7 @@ func (context *Context) addChild(child Node) {
 // Returns true if the two list items are of the same type,
 // with the same delimiter and bullet character.  This is used
 // in agglomerating list items into lists.
-func (context *Context) listsMatch(list_data, item_data *ListData) bool {
+func (context *Context) listsMatch(list_data, item_data *listData) bool {
 	return list_data.typ == item_data.typ &&
 		list_data.delimiter == item_data.delimiter &&
 		list_data.bulletChar.equal(item_data.bulletChar)

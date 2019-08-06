@@ -19,24 +19,23 @@ import (
 	"strconv"
 )
 
-type ListType int
-
-type ListData struct {
-	typ          ListType
-	tight        bool
-	bulletChar   items
-	start        int
-	delimiter    item
-	padding      int
-	markerOffset int
-}
-
+// List 描述了列表节点结构。
 type List struct {
 	*BaseNode
-	*ListData
+	*listData
 }
 
-func (list *List) CanContain(nodeType NodeType) bool {
+type listData struct {
+	typ          int   // 0：无序列表，1：有序列表
+	tight        bool  // 是否是紧凑模式
+	bulletChar   items // 无序列表标识，* - 或者 +
+	start        int   // 有序列表开始序号
+	delimiter    item  // 有序列表分隔符，. 或者 )
+	padding      int   // 列表内部缩进空格数，即无序列表标识或分隔符和后续第一个非空字符之间的空格数，规范里的 N
+	markerOffset int   // 标识符（* - + 或者 1 2 3）缩进
+}
+
+func (list *List) CanContain(nodeType int) bool {
 	return NodeListItem == nodeType
 }
 
@@ -66,12 +65,12 @@ func (list *List) Finalize(context *Context) {
 
 // Parse a list marker and return data on the marker (type,
 // start, delimiter, bullet character, padding) or null.
-func (t *Tree) parseListMarker(container Node) *ListData {
+func (t *Tree) parseListMarker(container Node) *listData {
 	if t.context.indent >= 4 {
 		return nil
 	}
 	tokens := t.context.currentLine[t.context.nextNonspace:]
-	data := &ListData{
+	data := &listData{
 		typ:          0,    // 无序列表
 		tight:        true, // lists are tight by default
 		markerOffset: t.context.indent,

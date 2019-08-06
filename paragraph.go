@@ -21,7 +21,7 @@ type Paragraph struct {
 	*BaseNode
 }
 
-func (p *Paragraph) CanContain(nodeType NodeType) bool {
+func (p *Paragraph) CanContain(nodeType int) bool {
 	return false
 }
 

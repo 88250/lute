@@ -23,7 +23,7 @@ func (thematicBreak *ThematicBreak) Continue(context *Context) int {
 	return 1
 }
 
-func (thematicBreak *ThematicBreak) CanContain(nodeType NodeType) bool {
+func (thematicBreak *ThematicBreak) CanContain(nodeType int) bool {
 	return false
 }
 

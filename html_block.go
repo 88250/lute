@@ -25,7 +25,7 @@ type HTMLBlock struct {
 	hType int // 规范中定义的 HTML 块类型（1-7）
 }
 
-func (html *HTMLBlock) CanContain(nodeType NodeType) bool {
+func (html *HTMLBlock) CanContain(nodeType int) bool {
 	return false
 }
 

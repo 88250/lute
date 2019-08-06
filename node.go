@@ -18,7 +18,7 @@ package lute
 // Node 描述了节点操作。
 type Node interface {
 	// Type 返回节点类型。
-	Type() NodeType
+	Type() int
 
 	// Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
 	Unlink()
@@ -110,7 +110,7 @@ type Node interface {
 
 	// CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（一种块级容器）只能包含列表项节点，
 	// 块引用节点（另一种块级容器）可以包含任意节点；段落节点（一种叶子块节点）不能包含任何其他块级节点。
-	CanContain(NodeType) bool
+	CanContain(int) bool
 
 	// LastLineBlank 判断节点最后一行是否是空行。
 	LastLineBlank() bool
@@ -127,21 +127,21 @@ type Node interface {
 
 // BaseNode 描述了节点基础结构。
 type BaseNode struct {
-	typ             NodeType // 节点类型
-	parent          Node     // 父节点
-	previous        Node     // 前一个兄弟节点
-	next            Node     // 后一个兄弟节点
-	firstChild      Node     // 第一个子节点
-	lastChild       Node     // 最后一个子节点
-	rawText         string   // 原始内容
-	value           string   // 原始内容处理后的值
-	tokens          items    // 词法分析结果 tokens
-	close           bool     // 标识是否关闭
-	lastLineBlank   bool     // 标识最后一行是否是空行
-	lastLineChecked bool     // 标识最后一行是否检查过
+	typ             int    // 节点类型
+	parent          Node   // 父节点
+	previous        Node   // 前一个兄弟节点
+	next            Node   // 后一个兄弟节点
+	firstChild      Node   // 第一个子节点
+	lastChild       Node   // 最后一个子节点
+	rawText         string // 原始内容
+	value           string // 原始内容处理后的值
+	tokens          items  // 词法分析结果 tokens
+	close           bool   // 标识是否关闭
+	lastLineBlank   bool   // 标识最后一行是否是空行
+	lastLineChecked bool   // 标识最后一行是否检查过
 }
 
-func (n *BaseNode) Type() NodeType {
+func (n *BaseNode) Type() int {
 	return n.typ
 }
 
@@ -168,7 +168,7 @@ func (n *BaseNode) AcceptLines() bool {
 	return false
 }
 
-func (n *BaseNode) CanContain(nodeType NodeType) bool {
+func (n *BaseNode) CanContain(nodeType int) bool {
 	return NodeListItem != nodeType
 }
 
@@ -328,27 +328,23 @@ func (n *BaseNode) AppendChild(this, child Node) {
 	}
 }
 
-// NodeType 描述了节点类型。
-type NodeType int
-
 const (
-	NodeRoot          NodeType = iota // 根节点类
-	NodeBlankLine                     // 空行节点
-	NodeParagraph                     // 段落节点
-	NodeHeading                       // 标题节点
-	NodeThematicBreak                 // 分隔线节点
-	NodeBlockquote                    // 块引用节点
-	NodeList                          // 列表节点
-	NodeListItem                      // 列表项节点
-	NodeHTMLBlock                     // HTML 块节点
-	NodeInlineHTML                    // 内联 HTML节点
-	NodeCodeBlock                     // 代码块节点
-	NodeText                          // 文本节点
-	NodeEmphasis                      // 强调节点
-	NodeStrong                        // 加粗节点
-	NodeCodeSpan                      // 代码节点
-	NodeHardBreak                     // 硬换行节点
-	NodeSoftBreak                     // 软换行节点
-	NodeLink                          // 链接节点
-	NodeImage                         // 图片节点
+	NodeRoot          = iota // 根节点类
+	NodeParagraph            // 段落节点
+	NodeHeading              // 标题节点
+	NodeThematicBreak        // 分隔线节点
+	NodeBlockquote           // 块引用节点
+	NodeList                 // 列表节点
+	NodeListItem             // 列表项节点
+	NodeHTMLBlock            // HTML 块节点
+	NodeInlineHTML           // 内联 HTML节点
+	NodeCodeBlock            // 代码块节点
+	NodeText                 // 文本节点
+	NodeEmphasis             // 强调节点
+	NodeStrong               // 加粗节点
+	NodeCodeSpan             // 代码节点
+	NodeHardBreak            // 硬换行节点
+	NodeSoftBreak            // 软换行节点
+	NodeLink                 // 链接节点
+	NodeImage                // 图片节点
 )

@@ -26,10 +26,10 @@ type RendererFunc func(n Node, entering bool) (WalkStatus, error)
 
 // Renderer 描述了渲染器结构。
 type Renderer struct {
-	writer        strings.Builder           // 输出缓冲
-	lastOut       string                    // 最新的输出内容
-	rendererFuncs map[NodeType]RendererFunc // 渲染器
-	disableTags   int                       // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况。比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
+	writer        strings.Builder      // 输出缓冲
+	lastOut       string               // 最新的输出内容
+	rendererFuncs map[int]RendererFunc // 渲染器
+	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况。比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 }
 
 // Render 渲染指定的节点 n。
