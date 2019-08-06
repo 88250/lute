@@ -15,9 +15,10 @@
 
 package lute
 
+// delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _）相关信息。
 type delimiter struct {
 	node           Node       // the text node point to
-	typ            item   // the type of delimiter ([, ![, *, _)
+	typ            item       // the type of delimiter ([, ![, *, _)
 	num            int        // the number of delimiters
 	originalNum    int        // the original number of delimiters
 	canOpen        bool       // whether the delimiter is a potential opener
@@ -42,7 +43,7 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 
 	tokenBefore, tokenAfter := itemNewline, itemNewline
 	if 0 != startPos {
-		tokenBefore = tokens[startPos - 1]
+		tokenBefore = tokens[startPos-1]
 	}
 	if len(tokens) > t.context.pos {
 		tokenAfter = tokens[t.context.pos]

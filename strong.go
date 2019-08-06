@@ -15,7 +15,7 @@
 
 package lute
 
-// Emphasis 描述了强调节点结构。
-type Emphasis struct {
+// Strong 描述了加粗节点结构。
+type Strong struct {
 	*BaseNode
 }

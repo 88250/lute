@@ -15,6 +15,7 @@
 
 package lute
 
+// ThematicBreak 描述了分隔线节点结构。
 type ThematicBreak struct {
 	*BaseNode
 }
