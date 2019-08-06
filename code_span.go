@@ -45,8 +45,9 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	}
 	endPos = startPos + endPos + n
 
-	var textTokens = items{}
-	for i := startPos + n; i < len(tokens) && i < endPos; i++ {
+	length = len(tokens)
+	var textTokens = make(items, 0, length)
+	for i := startPos + n; i < length && i < endPos; i++ {
 		token := tokens[i]
 		if itemNewline == token {
 			textTokens = append(textTokens, itemSpace)
@@ -60,8 +61,7 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 		textTokens = textTokens[:len(textTokens)-1]
 	}
 
-	baseNode := &BaseNode{typ: NodeCodeSpan, tokens: textTokens, value: textTokens.string()}
-	ret = &CodeSpan{baseNode}
+	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, value: textTokens.string()}}
 	t.context.pos = endPos + n
 
 	return

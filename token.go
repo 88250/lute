@@ -267,7 +267,6 @@ func (tokens items) isBlankLine() bool {
 }
 
 func (tokens items) splitWhitespace() (ret []items) {
-	ret = []items{}
 	i := 0
 	ret = append(ret, items{})
 	lastIsWhitespace := false
@@ -288,7 +287,6 @@ func (tokens items) splitWhitespace() (ret []items) {
 }
 
 func (tokens items) split(token byte) (ret []items) {
-	ret = []items{}
 	i := 0
 	ret = append(ret, items{})
 	for j, t := range tokens {
