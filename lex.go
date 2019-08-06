@@ -15,12 +15,7 @@
 
 package lute
 
-import (
-	"unsafe"
-)
-
-// TODO: 词法分析部分还有性能优化空间：不从原文本中解析出 rune 来，而是通过一些下标来标记并操作原文本 byte 数组。
-//       这样做可以节省解析 rune 的时间并大大减少内存分配（rune 和 slice 增长），可以在很大程度上提升性能（30%?）。
+import "unsafe"
 
 // lexer 描述了词法分析器结构。
 type lexer struct {
@@ -62,16 +57,13 @@ func (l *lexer) nextLine() (line items) {
 // lex 创建一个词法分析器。
 func lex(input string) (ret *lexer) {
 	ret = &lexer{}
-	ret.load(input)
+	// 加载原文本，避免内存分配
+	x := (*[2]uintptr)(unsafe.Pointer(&input))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	ret.input = *(*items)(unsafe.Pointer(&h))
 	ret.length = len(ret.input)
 
 	return
-}
-
-func (l *lexer) load(str string) {
-	x := (*[2]uintptr)(unsafe.Pointer(&str))
-	h := [3]uintptr{x[0], x[1], x[1]}
-	l.input = *(*items)(unsafe.Pointer(&h))
 }
 
 // 以下代码摘自标准库 utf8/go
@@ -130,9 +122,9 @@ type acceptRange struct {
 }
 
 const (
-	RuneError = '\uFFFD'     // the "error" Rune or "Unicode replacement character"
-	RuneSelf  = 0x80         // characters below Runeself are represented as themselves in a single byte.
-	
+	RuneError = '\uFFFD' // the "error" Rune or "Unicode replacement character"
+	RuneSelf  = 0x80     // characters below Runeself are represented as themselves in a single byte.
+
 	maskx = 0x3F // 0011 1111
 	mask2 = 0x1F // 0001 1111
 	mask3 = 0x0F // 0000 1111
