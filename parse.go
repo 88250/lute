@@ -21,7 +21,7 @@ func Parse(name, text string) (t *Tree, err error) {
 
 	defer t.recover(&err)
 	t.lex = newLexer(t.text)
-	t.Root = &Root{&BaseNode{typ: NodeRoot}}
+	t.root = &Document{&BaseNode{typ: NodeRoot}}
 	t.parseBlocks()
 	t.parseInlines()
 	t.lex = nil
@@ -164,7 +164,7 @@ func (context *Context) listsMatch(list_data, item_data *listData) bool {
 
 // Tree is the representation of the markdown ast.
 type Tree struct {
-	Root      *Root
+	root      *Document
 	Name      string
 	text      string
 	lex       *lexer
@@ -174,7 +174,7 @@ type Tree struct {
 
 // Render 使用 renderer 进行语法树渲染，渲染结果以 output 返回。
 func (t *Tree) Render(renderer *Renderer) (output string, err error) {
-	err = renderer.Render(t.Root)
+	err = renderer.Render(t.root)
 	if nil != err {
 		return "", err
 	}

@@ -23,7 +23,7 @@ import (
 func (t *Tree) parseInlines() {
 	t.context.delimiters = nil
 	t.context.brackets = nil
-	t.parseBlockInlines(t.Root.Children())
+	t.parseBlockInlines(t.root.Children())
 }
 
 func (t *Tree) parseBlockInlines(blocks []Node) {
