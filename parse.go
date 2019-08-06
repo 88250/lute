@@ -15,13 +15,15 @@
 
 package lute
 
+import "github.com/b3log/gulu"
+
 // Parse 会将 text 指定的 Markdown 原始文本解析为一颗语法树。
 func Parse(name, text string) (t *Tree, err error) {
-	t = &Tree{Name: name, text: text, context: &Context{}}
+	defer gulu.Panic.Recover(&err)
 
-	defer t.recover(&err)
+	t = &Tree{Name: name, text: text, context: &Context{}}
 	t.lex = newLexer(t.text)
-	t.root = &Document{&BaseNode{typ: NodeRoot}}
+	t.Root = &Document{&BaseNode{typ: NodeRoot}}
 	t.parseBlocks()
 	t.parseInlines()
 	t.lex = nil
@@ -129,11 +131,7 @@ func (context *Context) closeUnmatchedBlocks() {
 	}
 }
 
-// Finalize a block.  Close it and do any necessary postprocessing,
-// e.g. creating string_content from strings, setting the 'tight'
-// or 'loose' status of a list, and parsing the beginnings
-// of paragraphs for reference definitions.  Reset the tip to the
-// parent of the closed block.
+// finalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
 func (context *Context) finalize(block Node) {
 	var parent = block.Parent()
 	block.Close()
@@ -141,12 +139,11 @@ func (context *Context) finalize(block Node) {
 	context.tip = parent
 }
 
-// Add block of type tag as a child of the tip.  If the tip can't
-// accept children, close and finalize it and try its parent,
-// and so on til we find a block that can accept children.
+// addChild 将 child 作为子节点添加到 context.tip 上。如果 tip 节点不能接受子节点（非块级容器不能添加子节点），则最终化该 tip
+// 节点并向父节点方向尝试，直到找到一个能接受 child 的节点为止。
 func (context *Context) addChild(child Node) {
 	for !context.tip.CanContain(child.Type()) {
-		context.finalize(context.tip)
+		context.finalize(context.tip) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
 	context.tip.AppendChild(context.tip, child)
@@ -162,31 +159,23 @@ func (context *Context) listsMatch(list_data, item_data *listData) bool {
 		list_data.bulletChar.equal(item_data.bulletChar)
 }
 
-// Tree is the representation of the markdown ast.
+// Tree 描述了 Markdown 抽象语法树结构。
 type Tree struct {
-	root      *Document
-	Name      string
-	text      string
-	lex       *lexer
-	peekCount int
-	context   *Context
+	Name string    // 名称，可以为空
+	Root *Document // 根节点
+
+	text    string   // 原始的 Markdown 文本
+	lex     *lexer   // 词法分析器
+	context *Context // 语法解析上下文
 }
 
 // Render 使用 renderer 进行语法树渲染，渲染结果以 output 返回。
 func (t *Tree) Render(renderer *Renderer) (output string, err error) {
-	err = renderer.Render(t.root)
+	err = renderer.Render(t.Root)
 	if nil != err {
 		return "", err
 	}
 	output = renderer.writer.String()
 
 	return
-}
-
-// recover is the handler that turns panics into returns from the top level of Parse.
-func (t *Tree) recover(err *error) {
-	e := recover()
-	if e != nil {
-		*err = e.(error)
-	}
 }
