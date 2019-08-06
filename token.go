@@ -20,7 +20,7 @@ import (
 	"unicode"
 )
 
-type item rune
+type item byte
 
 func (token item) isNewline() bool {
 	return itemNewline == token || '\r' == token /*|| '\u2424' == token || '\u2028' == token*/ || '\u0085' == token || '\u0000' == token

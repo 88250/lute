@@ -16,9 +16,7 @@
 package lute
 
 import (
-	"bufio"
-	"strings"
-	"unicode/utf8"
+	"unsafe"
 )
 
 // TODO: 词法分析部分还有性能优化空间：不从原文本中解析出 rune 来，而是通过一些下标来标记并操作原文本 byte 数组。
@@ -26,72 +24,47 @@ import (
 
 // lexer 描述了词法分析器结构。
 type lexer struct {
-	items   []items // 分析好的所有文本行
-	length  int     // 总行数
-	lineNum int     // 当前行号
-	line    string  // 当前行
-	lineLen int     // 当前行长度
-	pos     int     // 当前行读取位置
-	width   int     // 最新一个 token 的宽度（字节数）
+	input   items  // 输入的文本字符数组
+	length  int    // 输入的文本字符数组的长度
+	offset  int    // 当前读取位置
+	line    []byte // 当前行
+	lineNum int    // 当前行号
+	lineLen int    // 当前行长度
+
+	width int // TODO 最新一个 token 的宽度（字节数）
 }
 
 // nextLine 返回下一行。
 func (l *lexer) nextLine() (line items) {
-	if l.lineNum >= l.length {
+	if l.offset >= l.length {
 		return
 	}
 
-	line = l.items[l.lineNum]
-	l.lineNum++
+	var b item
+	i := l.offset
+	for ; i < l.length; i++ {
+		b = l.input[i]
+		if '\n' == b {
+			i++
+			break
+		}
+	}
+	line = l.input[l.offset:i]
+	l.offset = i
 	return
 }
 
-// lex 创建一个词法分析器并对 input 进行词法分析。
-func lex(input string) *lexer {
-	ret := &lexer{items: make([]items, 0, 256)}
+// lex 创建一个词法分析器。
+func lex(input string) (ret *lexer) {
+	ret = &lexer{}
+	ret.load(input)
+	ret.length = len(ret.input)
 
-	lineScanner := bufio.NewScanner(strings.NewReader(input))
-	for lineScanner.Scan() {
-		ret.items = append(ret.items, make([]item, 0, 128))
-		ret.line = lineScanner.Text() + "\n"
-		ret.lineLen = len(ret.line)
-		ret.run()
-	}
-	ret.length = len(ret.items)
-	ret.line = ""
-	ret.lineNum = 0
-	ret.pos = 0
-	ret.lineLen = 0
-	ret.width = 0
-
-	return ret
+	return
 }
 
-// run 执行词法分析，每次 run 分析一行。
-func (l *lexer) run() {
-	for {
-		if r := l.next(); itemEnd == r {
-			return
-		} else {
-			l.items[l.lineNum] = append(l.items[l.lineNum], r)
-		}
-	}
-}
-
-// next 从原文本中返回最新的一个 token，如果读取结束则返回 itemEnd。
-func (l *lexer) next() (ret item) {
-	if l.pos >= l.lineLen {
-		l.width = 0
-		l.lineNum++
-		l.pos = 0
-
-		return itemEnd
-	}
-
-	var r rune
-	r, l.width = utf8.DecodeRuneInString(l.line[l.pos:])
-	l.pos += l.width
-	ret = item(r)
-
-	return ret
+func (l *lexer) load(str string) {
+	x := (*[2]uintptr)(unsafe.Pointer(&str))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	l.input = *(*items)(unsafe.Pointer(&h))
 }
