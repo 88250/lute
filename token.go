@@ -20,6 +20,7 @@ import (
 	"unicode"
 )
 
+// item 定义了一个 token。因为 Markdown 中的标记符（marker）只可能是 ASCII 字符，所以这可以字节表示。
 type item byte
 
 func (token item) isNewline() bool {
@@ -176,6 +177,7 @@ const (
 	item_9 = item('9')
 )
 
+// items 定义了由 item 构成的数组类型。
 type items []item
 
 // replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
@@ -212,7 +214,7 @@ func (tokens items) rawText() (ret string) {
 	b := &strings.Builder{}
 	length := len(tokens)
 	for i := 0; i < length; i++ {
-		b.WriteRune(rune(tokens[i]))
+		b.WriteByte(byte(tokens[i])) // TODO 一次写入
 	}
 	ret = b.String()
 
