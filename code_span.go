@@ -15,6 +15,8 @@
 
 package lute
 
+import "strings"
+
 // CodeSpan 描述了代码节点结构。
 type CodeSpan struct {
 	*BaseNode
@@ -30,7 +32,7 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 		}
 	}
 
-	backticks := tokens[startPos:startPos+n].string()
+	backticks := tokens[startPos : startPos+n].string()
 	if length <= startPos+n {
 		t.context.pos += n
 		ret = &Text{&BaseNode{typ: NodeText, value: backticks}}
@@ -45,23 +47,14 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	}
 	endPos = startPos + endPos + n
 
-	length = len(tokens)
-	var textTokens = make(items, 0, length)
-	for i := startPos + n; i < length && i < endPos; i++ {
-		token := tokens[i]
-		if itemNewline == token {
-			textTokens = append(textTokens, itemSpace)
-		} else {
-			textTokens = append(textTokens, token)
-		}
+	value := tokens[startPos+n : endPos].string()
+	value = strings.ReplaceAll(value, "\n", " ")
+	if 2 < len(value) && itemSpace == value[0] && itemSpace == value[len(value)-1] && 0 < len(strings.TrimSpace(value)) {
+		value = value[1:]
+		value = value[:len(value)-1]
 	}
 
-	if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !textTokens.isBlankLine() {
-		textTokens = textTokens[1:]
-		textTokens = textTokens[:len(textTokens)-1]
-	}
-
-	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, value: textTokens.string()}}
+	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, value: value}}
 	t.context.pos = endPos + n
 
 	return
@@ -69,7 +62,7 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 
 func (t *Tree) matchCodeSpanEnd(tokens items, num int) (pos int) {
 	length := len(tokens)
-	for ; pos < length; {
+	for pos < length {
 		len := tokens[pos:].accept(itemBacktick)
 		if num == len {
 			next := pos + len
