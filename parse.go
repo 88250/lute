@@ -87,12 +87,14 @@ func (context *Context) advanceOffset(count int, columns bool) {
 	}
 }
 
+// advanceNextNonspace 用于预移动到下一个非空字符位置。
 func (context *Context) advanceNextNonspace() {
 	context.offset = context.nextNonspace
 	context.column = context.nextNonspaceColumn
 	context.partiallyConsumedTab = false
 }
 
+// findNextNonspace 用于查找下一个非空字符。
 func (context *Context) findNextNonspace() {
 	i := context.offset
 	cols := context.column
