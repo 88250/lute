@@ -15,47 +15,25 @@
 
 package lute
 
-func Parse(name, text string) (*Tree, error) {
-	t := &Tree{Name: name, text: text, context: &Context{}}
-	err := t.parse()
+// Parse 会将 text 指定的 Markdown 原始文本解析为一颗语法树。
+func Parse(name, text string) (t *Tree, err error) {
+	t = &Tree{Name: name, text: text, context: &Context{}}
 
-	return t, err
-}
-
-type BlockContainer struct {
-	nodes []Node
-}
-
-func (bc *BlockContainer) push(node Node) {
-	bc.nodes = append(bc.nodes, node)
-}
-
-func (bc *BlockContainer) pop() (ret Node) {
-	length := len(bc.nodes)
-	if 1 > length {
-		return nil
-	}
-
-	ret = bc.nodes[length-1]
-	bc.nodes = bc.nodes[:length-1]
+	defer t.recover(&err)
+	t.lex = newLexer(t.text)
+	t.Root = &Root{&BaseNode{typ: NodeRoot}}
+	t.parseBlocks()
+	t.parseInlines()
+	t.lex = nil
 
 	return
 }
 
-func (bc *BlockContainer) peek() Node {
-	length := len(bc.nodes)
-	if 1 > length {
-		return nil
-	}
-
-	return bc.nodes[length-1]
-}
-
-// Context use to store common data in parsing.
+// Context 用于维护解析过程中使用到的公共数据。
 type Context struct {
-	linkRefDef map[string]*Link
+	linkRefDef map[string]*Link // 链接引用定义集
 
-	// Blocks parsing
+	// 以下变量用于块级解析阶段
 
 	tip                                                      Node
 	oldtip                                                   Node
@@ -65,12 +43,11 @@ type Context struct {
 	indented, blank, partiallyConsumedTab, allClosed         bool
 	lastMatchedContainer                                     Node
 
-	// Inlines parsing
+	// 以下变量用于行级解析阶段
 
-	pos               int
-	delimiters        *delimiter
-	brackets          *delimiter
-	previousDelimiter *delimiter
+	pos        int        // 当前 Token 位置
+	delimiters *delimiter // 分隔符栈，用于强调解析
+	brackets   *delimiter // 括号栈，用于图片和链接解析
 }
 
 func (context *Context) advanceOffset(count int, columns bool) {
@@ -195,6 +172,7 @@ type Tree struct {
 	context   *Context
 }
 
+// Render 使用 renderer 进行语法树渲染，渲染结果以 output 返回。
 func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 	err = renderer.Render(t.Root)
 	if nil != err {
@@ -205,24 +183,10 @@ func (t *Tree) Render(renderer *Renderer) (output string, err error) {
 	return
 }
 
-// Parsing.
-
 // recover is the handler that turns panics into returns from the top level of Parse.
 func (t *Tree) recover(err *error) {
 	e := recover()
 	if e != nil {
 		*err = e.(error)
 	}
-}
-
-func (t *Tree) parse() (err error) {
-	defer t.recover(&err)
-
-	t.lex = newLexer(t.text)
-	t.Root = &Root{&BaseNode{typ: NodeRoot}}
-	t.parseBlocks()
-	t.parseInlines()
-	t.lex = nil
-
-	return nil
 }

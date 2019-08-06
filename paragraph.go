@@ -17,6 +17,7 @@ package lute
 
 import "strings"
 
+// Paragraph 描述了段落节点结构。
 type Paragraph struct {
 	*BaseNode
 }
