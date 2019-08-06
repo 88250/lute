@@ -1,7 +1,5 @@
-github.com/b3log/gulu v0.0.0-20190722133353-eba7b0fb577a h1:VLuNC5xCvcsAUZO7x/jhVfbX1KcARotkvBLMChqjcSc=
-github.com/b3log/gulu v0.0.0-20190722133353-eba7b0fb577a/go.mod h1:UmyB0pe8jv1K3dZy/4UE3uCpM8zYkB4nbiIgjemuQ7A=
-github.com/b3log/gulu v0.0.0-20190806034141-2b1d1b33ff3d h1:Ns7H97LVniGzx1DW2T0+eUtmuroZDo6nzjEj486w4+0=
-github.com/b3log/gulu v0.0.0-20190806034141-2b1d1b33ff3d/go.mod h1:UmyB0pe8jv1K3dZy/4UE3uCpM8zYkB4nbiIgjemuQ7A=
+github.com/b3log/gulu v0.0.0-20190806070629-089495959b39 h1:jvogFX9S8W2/7tY9HRdvi6/uYOqK7kDSjrTphcIMAK4=
+github.com/b3log/gulu v0.0.0-20190806070629-089495959b39/go.mod h1:UmyB0pe8jv1K3dZy/4UE3uCpM8zYkB4nbiIgjemuQ7A=
 golang.org/x/text v0.3.2 h1:tW2bmiBqwgJj/UpqtC8EpXEZVYOwU0yG4iWbprSVAcs=
 golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
