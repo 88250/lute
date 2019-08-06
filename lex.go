@@ -60,12 +60,22 @@ func (l *lexer) nextLine() (line items) {
 func lex(input string) (ret *lexer) {
 	ret = &lexer{}
 	// 加载原文本，避免内存分配
-	x := (*[2]uintptr)(unsafe.Pointer(&input))
-	h := [3]uintptr{x[0], x[1], x[1]}
-	ret.input = *(*items)(unsafe.Pointer(&h))
+	ret.input = toBytes(input)
 	ret.length = len(ret.input)
 
 	return
+}
+
+// fromBytes 快速转换 items 为 string。
+func fromBytes(items items) string {
+	return *(*string)(unsafe.Pointer(&items))
+}
+
+// toBytes 快速转换 str 为 items。
+func toBytes(str string) items {
+	x := (*[2]uintptr)(unsafe.Pointer(&str))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	return *(*items)(unsafe.Pointer(&h))
 }
 
 // 以下代码摘自标准库 utf8/go

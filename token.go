@@ -16,7 +16,6 @@
 package lute
 
 import (
-	"strings"
 	"unicode"
 )
 
@@ -214,16 +213,8 @@ func (tokens items) equal(anotherTokens items) bool {
 	return true
 }
 
-func (tokens items) rawText() (ret string) {
-	length := len(tokens)
-	b := &strings.Builder{}
-	b.Grow(length)
-	for i := 0; i < length; i++ {
-		b.WriteByte(byte(tokens[i]))
-	}
-	ret = b.String()
-
-	return
+func (tokens items) rawText() string {
+	return fromBytes(tokens)
 }
 
 func (tokens items) trimLeftSpace() (spaces int, remains items) {

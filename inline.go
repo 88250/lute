@@ -332,12 +332,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 }
 
 func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
-	b := &strings.Builder{}
-	b.Grow(endPos - startPos)
-	for i := startPos; i < endPos; i++ {
-		b.WriteByte(byte(tokens[i]))
-	}
-	text = b.String()
+	text = fromBytes(tokens[startPos:endPos])
 	subTokens = tokens[startPos:endPos]
 
 	return
@@ -346,18 +341,22 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 func (t *Tree) parseText(tokens items) (ret Node) {
 	length := len(tokens)
 	var token item
-	b := &strings.Builder{}
-	b.Grow(length)
+	start := t.context.pos
 	for ; t.context.pos < length; t.context.pos++ {
 		token = tokens[t.context.pos]
 		if itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
 			itemNewline == token || itemBackslash == token || itemBacktick == token ||
 			itemLess == token || itemCloseBracket == token || itemAmpersand == token {
+			// 遇到潜在的标记符时需要跳出 text，回到行级解析主循环
+			if start == t.context.pos {
+				start++
+			}
 			break
 		}
-		b.WriteByte(byte(token))
 	}
-	ret = &Text{&BaseNode{typ: NodeText, value: b.String()}}
+
+	value := fromBytes(tokens[start:t.context.pos])
+	ret = &Text{&BaseNode{typ: NodeText, value: value}}
 
 	return
 }
