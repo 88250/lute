@@ -21,7 +21,7 @@ import "strings"
 type CodeBlock struct {
 	*BaseNode
 	isFenced    bool
-	fenceChar   item
+	fenceChar   byte
 	fenceLength int
 	fenceOffset int
 	info        string
@@ -38,7 +38,7 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 		} else {
 			// skip optional spaces of fence offset
 			var i = codeBlock.fenceOffset
-			var token item
+			var token byte
 			for i > 0 {
 				token = ln.peek(context.offset)
 				if itemSpace != token && itemTab != token {
@@ -65,7 +65,7 @@ func (codeBlock *CodeBlock) Finalize(context *Context) {
 		// first line becomes info string
 		content := codeBlock.tokens
 		var i int
-		var token item
+		var token byte
 		for ; ; i++ {
 			token = codeBlock.tokens[i]
 			if itemNewline == token {
@@ -121,13 +121,13 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 	}
 
 	info = unescapeString(info)
-	ret = &CodeBlock{&BaseNode{typ: NodeCodeBlock, tokens: make([]item, 0, 256)},
+	ret = &CodeBlock{&BaseNode{typ: NodeCodeBlock, tokens: make([]byte, 0, 256)},
 		true, fenceChar, fenceLength, t.context.indent, info}
 
 	return
 }
 
-func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker item, num int) bool {
+func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
 	closeMarker := tokens[0]
 	if closeMarker != openMarker {
 		return false

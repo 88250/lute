@@ -107,16 +107,16 @@ func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 		return nil
 	}
 
-	ret = &HTMLBlock{&BaseNode{typ: NodeHTMLBlock, tokens: make([]item, 0, 256)}, 1}
+	ret = &HTMLBlock{&BaseNode{typ: NodeHTMLBlock, tokens: make([]byte, 0, 256)}, 1}
 
 	if pos := tokens.acceptTokenss(htmlBlockTags1); 0 <= pos {
-		if tokens[pos].isWhitespace() || itemGreater == tokens[pos] {
+		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {
 			return
 		}
 	}
 
 	if pos := tokens.acceptTokenss(htmlBlockTags6); 0 <= pos {
-		if tokens[pos].isWhitespace() || itemGreater == tokens[pos] {
+		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {
 			ret.hType = 6
 			return
 		}
@@ -177,11 +177,7 @@ func (t *Tree) startWithAnyIgnoreCase(s1 string, strs ...string) (pos int) {
 }
 
 func tokenize(str string) (ret items) {
-	for _, r := range str {
-		ret = append(ret, item(r))
-	}
-
-	return
+	return toItems(str)
 }
 
 func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
@@ -207,19 +203,19 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 		return
 	}
 
-	if tokens[0].isWhitespace() { // < 后面不能跟空白
+	if isWhitespace(tokens[0]) { // < 后面不能跟空白
 		return
 	}
 
 	nameAndAttrs := tokens.splitWhitespace()
 	name := nameAndAttrs[0]
-	if !name[0].isASCIILetter() {
+	if !isASCIILetter(name[0]) {
 		return
 	}
 	if 1 < len(name) {
 		name = name[1:]
 		for _, n := range name {
-			if !n.isASCIILetterNumHyphen() {
+			if !isASCIILetterNumHyphen(n) {
 				return
 			}
 		}
@@ -230,14 +226,14 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 	for _, nameAndAttr := range nameAndAttrs {
 		nameAndValue := nameAndAttr.split(itemEqual)
 		name := nameAndValue[0]
-		if !name[0].isASCIILetter() && itemUnderscore != name[0] && itemColon != name[0] {
+		if !isASCIILetter(name[0]) && itemUnderscore != name[0] && itemColon != name[0] {
 			return
 		}
 
 		if 1 < len(name) {
 			name = name[1:]
 			for _, n := range name {
-				if !n.isASCIILetter() && !n.isDigit() && itemUnderscore != n && itemDot != n && itemColon != n && itemHyphen != n {
+				if !isASCIILetter(n) && !isDigit(n) && itemUnderscore != n && itemDot != n && itemColon != n && itemHyphen != n {
 					return
 				}
 			}
@@ -282,13 +278,13 @@ func (tokens items) isCloseTag() bool {
 	}
 
 	name := tokens[0:]
-	if !name[0].isASCIILetter() {
+	if !isASCIILetter(name[0]) {
 		return false
 	}
 	if 1 < len(name) {
 		name = name[1:]
 		for _, n := range name {
-			if !n.isASCIILetterNumHyphen() {
+			if !isASCIILetterNumHyphen(n) {
 				return false
 			}
 		}

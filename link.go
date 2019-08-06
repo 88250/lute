@@ -27,7 +27,7 @@ type Link struct {
 func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 	tokens = tokens[1:]
 	var dest string
-	var token item
+	var token byte
 	length := len(tokens)
 	passed := 0
 	i := 0
@@ -41,7 +41,7 @@ func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 			break
 		}
 
-		if !token.isASCIILetterNumHyphen() && !strings.Contains(".!#$%&'*+/=?^_`{|}~", string(token)) {
+		if !isASCIILetterNumHyphen(token) && !strings.Contains(".!#$%&'*+/=?^_`{|}~", string(token)) {
 			return nil
 		}
 	}
@@ -62,7 +62,7 @@ func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 			break
 		}
 		dest += string(token)
-		if !token.isASCIILetterNumHyphen() && itemDot != token {
+		if !isASCIILetterNumHyphen(token) && itemDot != token {
 			return nil
 		}
 		if 63 < i {
@@ -85,7 +85,7 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 	schemed := false
 	scheme := ""
 	dest := ""
-	var token item
+	var token byte
 	i := t.context.pos + 1
 	for ; i < len(tokens) && itemGreater != tokens[i]; i++ {
 		token = tokens[i]
@@ -181,12 +181,12 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 				passed = append(passed, tokens[i+j])
 			}
 
-			if !destStarted && !token.isWhitespace() && 0 < i {
+			if !destStarted && !isWhitespace(token) && 0 < i {
 				destStarted = true
 				destination = destination[size:]
 				destination = strings.TrimSpace(destination)
 			}
-			if destStarted && (token.isWhitespace() || token.isControl()) {
+			if destStarted && (isWhitespace(token) || isControl(token)) {
 				destination = destination[:len(destination)-size]
 				passed = passed[:len(passed)-1]
 				break

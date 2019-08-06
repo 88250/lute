@@ -28,7 +28,7 @@ func BenchmarkLute(b *testing.B) {
 		b.Fatalf("read spec text failed: " + err.Error())
 	}
 
-	tree, err := lute.Parse("spec text", string(bytes))
+	tree, err := lute.Parse("spec text", bytes)
 	if nil != err {
 		b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 	}
@@ -42,14 +42,14 @@ func BenchmarkLute(b *testing.B) {
 	ioutil.WriteFile(spec+".html", []byte(html), 0644)
 
 	for i := 0; i < b.N; i++ {
-		tree, err := lute.Parse("spec text", string(bytes))
+		tree, err := lute.Parse("spec text", bytes)
 		if nil != err {
 			b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 		}
 
-		renderer := lute.NewHTMLRenderer()
-		if _, err := tree.Render(renderer); nil != err {
-			b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
-		}
+		//renderer := lute.NewHTMLRenderer()
+		//if _, err := tree.Render(renderer); nil != err {
+		//	b.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
+		//}
 	}
 }

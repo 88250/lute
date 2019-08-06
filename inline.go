@@ -102,11 +102,11 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	start := t.context.pos
 	numeric := itemCrosshatch == tokens[start+1]
 	i := t.context.pos
-	var token item
+	var token byte
 	var endWithSemicolon bool
 	for ; i < length; i++ {
 		token = tokens[i]
-		if token.isWhitespace() {
+		if isWhitespace(token) {
 			break
 		}
 		if itemSemicolon == token {
@@ -189,7 +189,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 			t.context.pos += len(passed)
 			if passed, remains, dest = t.context.parseInlineLinkDest(remains); nil != passed {
 				t.context.pos += len(passed)
-				if 0 < len(remains) && remains[0].isWhitespace() { // 跟空格的话后续尝试按 title 解析
+				if 0 < len(remains) && isWhitespace(remains[0]) { // 跟空格的话后续尝试按 title 解析
 					t.context.pos++
 					if isLink, passed, remains = remains.spnl(); isLink {
 						t.context.pos += len(passed)
@@ -321,7 +321,7 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 	if itemNewline == token {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 		t.context.pos++
-	} else if token.isASCIIPunct() {
+	} else if isASCIIPunct(token) {
 		ret = &Text{&BaseNode{typ: NodeText, value: string(token)}}
 		t.context.pos++
 	} else {
@@ -340,7 +340,7 @@ func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens item
 
 func (t *Tree) parseText(tokens items) (ret Node) {
 	length := len(tokens)
-	var token item
+	var token byte
 	start := t.context.pos
 	for ; t.context.pos < length; t.context.pos++ {
 		token = tokens[t.context.pos]

@@ -30,7 +30,7 @@ func (thematicBreak *ThematicBreak) CanContain(nodeType int) bool {
 
 func (t *Tree) parseThematicBreak() (ret *ThematicBreak) {
 	markers := 0
-	var marker item
+	var marker byte
 	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
 		token := t.context.currentLine[i]
 		if itemSpace == token || itemTab == token {

@@ -56,7 +56,7 @@ func unescapeString(str string) string {
 }
 
 func isBackslashEscape(items items, pos int) bool {
-	if !items[pos].isASCIIPunct() {
+	if !isASCIIPunct(items[pos]) {
 		return false
 	}
 

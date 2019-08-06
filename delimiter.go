@@ -18,7 +18,7 @@ package lute
 // delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _）相关信息。
 type delimiter struct {
 	node           Node       // the text node point to
-	typ            item       // the type of delimiter ([, ![, *, _)
+	typ            byte       // the type of delimiter ([, ![, *, _)
 	num            int        // the number of delimiters
 	originalNum    int        // the original number of delimiters
 	canOpen        bool       // whether the delimiter is a potential opener
@@ -51,12 +51,12 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 
 	var beforeIsPunct, beforeIsWhitespace, afterIsPunct, afterIsWhitespace, canOpen, canClose bool
 	if itemEnd != tokenBefore {
-		beforeIsWhitespace = tokenBefore.isUnicodeWhitespace()
-		beforeIsPunct = tokenBefore.isPunct()
+		beforeIsWhitespace = isUnicodeWhitespace(tokenBefore)
+		beforeIsPunct = isPunct(tokenBefore)
 	}
 	if itemEnd != tokenAfter {
-		afterIsWhitespace = tokenAfter.isUnicodeWhitespace()
-		afterIsPunct = tokenAfter.isPunct()
+		afterIsWhitespace = isUnicodeWhitespace(tokenAfter)
+		afterIsPunct = isPunct(tokenAfter)
 	}
 
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
@@ -102,7 +102,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 	var tempstack *delimiter
 	var use_delims int
 	var opener_found bool
-	var openers_bottom = map[item]*delimiter{}
+	var openers_bottom = map[byte]*delimiter{}
 	var odd_match = false
 
 	openers_bottom[itemUnderscore] = stackBottom

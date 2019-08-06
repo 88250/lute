@@ -77,7 +77,7 @@ func (t *Tree) incorporateLine(line items) {
 		maybeMarker := t.context.currentLine[t.context.nextNonspace]
 		if !t.context.indented &&
 			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // Bullet List
-			!maybeMarker.isDigit() && // Ordered List
+			!isDigit(maybeMarker) && // Ordered List
 			itemBacktick != maybeMarker && itemTilde != maybeMarker && // Code Block
 			itemCrosshatch != maybeMarker && // ATX Heading
 			itemGreater != maybeMarker && // Blockquote
@@ -156,7 +156,7 @@ func (t *Tree) incorporateLine(line items) {
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
 			// create paragraph container for line
-			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph, tokens: make([]item, 0, 128)}})
+			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph, tokens: make([]byte, 0, 128)}})
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}

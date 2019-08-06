@@ -32,7 +32,7 @@ func (l *lexer) nextLine() (line items) {
 		return
 	}
 
-	var b item
+	var b byte
 	i := l.offset
 	for ; i < l.length; i += l.width {
 		b = l.input[i]
@@ -57,9 +57,9 @@ func (l *lexer) nextLine() (line items) {
 }
 
 // lex 创建一个词法分析器。
-func lex(input string) (ret *lexer) {
+func lex(input []byte) (ret *lexer) {
 	ret = &lexer{}
-	ret.input = toItems(input)
+	ret.input = input
 	ret.length = len(ret.input)
 
 	return
@@ -128,8 +128,8 @@ var acceptRanges = [...]acceptRange{
 }
 
 type acceptRange struct {
-	lo item // lowest value for second byte.
-	hi item // highest value for second byte.
+	lo byte // lowest value for second byte.
+	hi byte // highest value for second byte.
 }
 
 const (

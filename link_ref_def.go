@@ -107,7 +107,7 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, r
 	return
 }
 
-func (context *Context) parseLinkTitleMatch(opener, closer item, tokens items) (validTitle bool, passed, remains items, title string) {
+func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (validTitle bool, passed, remains items, title string) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -182,7 +182,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 			ret = append(ret, tokens[i+j])
 		}
 		destination += string(r)
-		if token.isWhitespace() || token.isControl() {
+		if isWhitespace(token) || isControl(token) {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
 			break
@@ -203,7 +203,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 	}
 
 	remains = tokens[i:]
-	if length > i && !tokens[i].isWhitespace() {
+	if length > i && !isWhitespace(tokens[i]) {
 		ret = nil
 		destination = ""
 		return

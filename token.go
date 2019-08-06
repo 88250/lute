@@ -19,18 +19,11 @@ import (
 	"unicode"
 )
 
-// item 定义了一个 token。因为 Markdown 中的标记符（marker）只可能是 ASCII 字符，所以这可以字节表示。
-type item byte
-
-func (token item) isNewline() bool {
-	return itemNewline == token || '\u0085' == token
-}
-
-func (token item) isWhitespace() bool {
+func isWhitespace(token byte) bool {
 	return itemSpace == token || itemNewline /* '\u000A' */ == token || itemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
 }
 
-func (token item) isUnicodeWhitespace() bool {
+func isUnicodeWhitespace(token byte) bool {
 	if unicode.Is(unicode.Zs, rune(token)) {
 		return true
 	}
@@ -38,155 +31,135 @@ func (token item) isUnicodeWhitespace() bool {
 	return itemTab == token || '\u000D' == token || itemNewline == token || '\u000C' == token
 }
 
-func (token item) isDigit() bool {
+func isDigit(token byte) bool {
 	return unicode.IsDigit(rune(token))
 }
 
-func (token item) isPunct() bool {
-	return token.isASCIIPunct() || unicode.IsPunct(rune(token))
+func isPunct(token byte) bool {
+	return isASCIIPunct(token) || unicode.IsPunct(rune(token))
 }
 
-func (token item) isASCIIPunct() bool {
+func isASCIIPunct(token byte) bool {
 	return (0x21 <= token && 0x2F >= token) || (0x3A <= token && 0x40 >= token) || (0x5B <= token && 0x60 >= token) || (0x7B <= token && 0x7E >= token)
 }
 
-func (token item) isLetter() bool {
-	return unicode.IsLetter(rune(token))
-}
-
-func (token item) isASCIILetter() bool {
+func isASCIILetter(token byte) bool {
 	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token)
 }
 
-func (token item) isASCIILetterNumHyphen() bool {
+func isASCIILetterNumHyphen(token byte) bool {
 	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token) || ('0' <= token && '9' >= token) || '-' == token
 }
 
-func (token item) isNumber() bool {
-	return unicode.IsNumber(rune(token))
-}
-
-func (token item) isMark() bool {
-	return unicode.IsMark(rune(token))
-}
-
-func (token item) isControl() bool {
+func isControl(token byte) bool {
 	return unicode.IsControl(rune(token))
 }
 
-func (token item) isSpace() bool {
-	return unicode.IsSpace(rune(token))
-}
-
-func (token item) isSymbol() bool {
-	return unicode.IsSymbol(rune(token))
-}
-
 const (
-	itemEnd          = item(0)
-	itemBacktick     = item('`')
-	itemTilde        = item('~')
-	itemBang         = item('!')
-	itemCrosshatch   = item('#')
-	itemAsterisk     = item('*')
-	itemOpenParen    = item('(')
-	itemCloseParen   = item(')')
-	itemHyphen       = item('-')
-	itemUnderscore   = item('_')
-	itemPlus         = item('+')
-	itemEqual        = item('=')
-	itemTab          = item('\t')
-	itemOpenBracket  = item('[')
-	itemCloseBracket = item(']')
-	itemDoublequote  = item('"')
-	itemSinglequote  = item('\'')
-	itemLess         = item('<')
-	itemGreater      = item('>')
-	itemSpace        = item(' ')
-	itemNewline      = item('\n')
-	itemBackslash    = item('\\')
-	itemSlash        = item('/')
-	itemDot          = item('.')
-	itemColon        = item(':')
-	itemQuestion     = item('?')
-	itemAmpersand    = item('&')
-	itemSemicolon    = item(';')
+	itemEnd          = byte(0)
+	itemBacktick     = byte('`')
+	itemTilde        = byte('~')
+	itemBang         = byte('!')
+	itemCrosshatch   = byte('#')
+	itemAsterisk     = byte('*')
+	itemOpenParen    = byte('(')
+	itemCloseParen   = byte(')')
+	itemHyphen       = byte('-')
+	itemUnderscore   = byte('_')
+	itemPlus         = byte('+')
+	itemEqual        = byte('=')
+	itemTab          = byte('\t')
+	itemOpenBracket  = byte('[')
+	itemCloseBracket = byte(']')
+	itemDoublequote  = byte('"')
+	itemSinglequote  = byte('\'')
+	itemLess         = byte('<')
+	itemGreater      = byte('>')
+	itemSpace        = byte(' ')
+	itemNewline      = byte('\n')
+	itemBackslash    = byte('\\')
+	itemSlash        = byte('/')
+	itemDot          = byte('.')
+	itemColon        = byte(':')
+	itemQuestion     = byte('?')
+	itemAmpersand    = byte('&')
+	itemSemicolon    = byte(';')
 
 	// 以下定义主要是为了方便调试时查看
 
-	item_a = item('a')
-	item_b = item('b')
-	item_c = item('c')
-	item_d = item('d')
-	item_e = item('e')
-	item_f = item('f')
-	item_g = item('g')
-	item_h = item('h')
-	item_i = item('i')
-	item_j = item('j')
-	item_k = item('k')
-	item_l = item('l')
-	item_m = item('m')
-	item_n = item('n')
-	item_o = item('o')
-	item_p = item('p')
-	item_q = item('q')
-	item_r = item('r')
-	item_s = item('s')
-	item_t = item('t')
-	item_u = item('u')
-	item_v = item('v')
-	item_w = item('w')
-	item_x = item('x')
-	item_y = item('y')
-	item_z = item('z')
+	item_a = byte('a')
+	item_b = byte('b')
+	item_c = byte('c')
+	item_d = byte('d')
+	item_e = byte('e')
+	item_f = byte('f')
+	item_g = byte('g')
+	item_h = byte('h')
+	item_i = byte('i')
+	item_j = byte('j')
+	item_k = byte('k')
+	item_l = byte('l')
+	item_m = byte('m')
+	item_n = byte('n')
+	item_o = byte('o')
+	item_p = byte('p')
+	item_q = byte('q')
+	item_r = byte('r')
+	item_s = byte('s')
+	item_t = byte('t')
+	item_u = byte('u')
+	item_v = byte('v')
+	item_w = byte('w')
+	item_x = byte('x')
+	item_y = byte('y')
+	item_z = byte('z')
 
-	item_A = item('A')
-	item_B = item('B')
-	item_C = item('C')
-	item_D = item('D')
-	item_E = item('E')
-	item_F = item('F')
-	item_G = item('G')
-	item_H = item('H')
-	item_I = item('I')
-	item_J = item('J')
-	item_K = item('K')
-	item_L = item('L')
-	item_M = item('M')
-	item_N = item('N')
-	item_O = item('O')
-	item_P = item('P')
-	item_Q = item('Q')
-	item_R = item('R')
-	item_S = item('S')
-	item_T = item('T')
-	item_U = item('U')
-	item_V = item('V')
-	item_W = item('W')
-	item_X = item('X')
-	item_Y = item('Y')
-	item_Z = item('Z')
+	item_A = byte('A')
+	item_B = byte('B')
+	item_C = byte('C')
+	item_D = byte('D')
+	item_E = byte('E')
+	item_F = byte('F')
+	item_G = byte('G')
+	item_H = byte('H')
+	item_I = byte('I')
+	item_J = byte('J')
+	item_K = byte('K')
+	item_L = byte('L')
+	item_M = byte('M')
+	item_N = byte('N')
+	item_O = byte('O')
+	item_P = byte('P')
+	item_Q = byte('Q')
+	item_R = byte('R')
+	item_S = byte('S')
+	item_T = byte('T')
+	item_U = byte('U')
+	item_V = byte('V')
+	item_W = byte('W')
+	item_X = byte('X')
+	item_Y = byte('Y')
+	item_Z = byte('Z')
 
-	item_0 = item('0')
-	item_1 = item('1')
-	item_2 = item('2')
-	item_3 = item('3')
-	item_4 = item('4')
-	item_5 = item('5')
-	item_6 = item('6')
-	item_7 = item('7')
-	item_8 = item('8')
-	item_9 = item('9')
+	item_0 = byte('0')
+	item_1 = byte('1')
+	item_2 = byte('2')
+	item_3 = byte('3')
+	item_4 = byte('4')
+	item_5 = byte('5')
+	item_6 = byte('6')
+	item_7 = byte('7')
+	item_8 = byte('8')
+	item_9 = byte('9')
 )
 
-// items 定义了由 item 构成的数组类型。
-type items []item
+// items 定义了字节数组，每个字节是一个 token。
+type items []byte
 
 // replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
 func (tokens items) replaceNewlineSpace() items {
 	length := len(tokens)
-	var token item
+	var token byte
 	for i := length - 1; 0 <= i; i-- {
 		token = tokens[i]
 		if itemNewline != token && itemSpace != token {
@@ -254,7 +227,7 @@ func (tokens items) trimLeft() (whitespaces, remains items) {
 
 	i := 0
 	for ; i < size; i++ {
-		if !tokens[i].isWhitespace() {
+		if !isWhitespace(tokens[i]) {
 			break
 		} else {
 			whitespaces = append(whitespaces, tokens[i])
@@ -272,7 +245,7 @@ func (tokens items) trimRight() items {
 
 	i := size - 1
 	for ; 0 <= i; i-- {
-		if !tokens[i].isWhitespace() && itemEnd != tokens[i] {
+		if !isWhitespace(tokens[i]) && itemEnd != tokens[i] {
 			break
 		}
 	}
@@ -280,7 +253,7 @@ func (tokens items) trimRight() items {
 	return tokens[:i+1]
 }
 
-func (tokens items) firstNonSpace() (index int, token item) {
+func (tokens items) firstNonSpace() (index int, token byte) {
 	for index, token = range tokens {
 		if itemSpace != token {
 			return
@@ -290,7 +263,7 @@ func (tokens items) firstNonSpace() (index int, token item) {
 	return
 }
 
-func (tokens items) accept(token item) (pos int) {
+func (tokens items) accept(token byte) (pos int) {
 	length := len(tokens)
 	for ; pos < length; pos++ {
 		if token != tokens[pos] {
@@ -328,7 +301,7 @@ func (tokens items) acceptTokens(someTokens items) (pos int) {
 	return
 }
 
-func (tokens items) contain(someTokens ...item) bool {
+func (tokens items) contain(someTokens ...byte) bool {
 	for _, t := range tokens {
 		for _, it := range someTokens {
 			if t == it {
@@ -342,7 +315,7 @@ func (tokens items) contain(someTokens ...item) bool {
 
 func (tokens items) containWhitespace() bool {
 	for _, token := range tokens {
-		if token.isWhitespace() {
+		if isWhitespace(token) {
 			return true
 		}
 	}
@@ -366,7 +339,7 @@ func (tokens items) splitWhitespace() (ret []items) {
 	ret = append(ret, items{})
 	lastIsWhitespace := false
 	for _, token := range tokens {
-		if token.isWhitespace() {
+		if isWhitespace(token) {
 			if !lastIsWhitespace {
 				i++
 				ret = append(ret, items{})
@@ -381,7 +354,7 @@ func (tokens items) splitWhitespace() (ret []items) {
 	return
 }
 
-func (tokens items) split(token item) (ret []items) {
+func (tokens items) split(token byte) (ret []items) {
 	ret = []items{}
 	i := 0
 	ret = append(ret, items{})
@@ -398,7 +371,7 @@ func (tokens items) split(token item) (ret []items) {
 	return
 }
 
-func (tokens items) startWith(token item) bool {
+func (tokens items) startWith(token byte) bool {
 	if 1 > len(tokens) {
 		return false
 	}
@@ -406,7 +379,7 @@ func (tokens items) startWith(token item) bool {
 	return token == tokens[0]
 }
 
-func (tokens items) endWith(token item) bool {
+func (tokens items) endWith(token byte) bool {
 	length := len(tokens)
 	if 1 > length {
 		return false
@@ -416,7 +389,7 @@ func (tokens items) endWith(token item) bool {
 }
 
 func (tokens items) isBackslashEscape(pos int) bool {
-	if !tokens[pos].isASCIIPunct() {
+	if !isASCIIPunct(tokens[pos]) {
 		return false
 	}
 
@@ -457,7 +430,7 @@ func (tokens items) spnl() (ret bool, passed, remains items) {
 	return
 }
 
-func (tokens items) peek(pos int) item {
+func (tokens items) peek(pos int) byte {
 	if pos < len(tokens) {
 		return tokens[pos]
 	}

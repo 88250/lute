@@ -18,7 +18,7 @@ package lute
 import "github.com/b3log/gulu"
 
 // Parse 会将 text 指定的 Markdown 原始文本解析为一颗语法树。
-func Parse(name, text string) (t *Tree, err error) {
+func Parse(name string, text []byte) (t *Tree, err error) {
 	defer gulu.Panic.Recover(&err)
 
 	t = &Tree{Name: name, text: text, context: &Context{}}
@@ -55,7 +55,7 @@ type Context struct {
 func (context *Context) advanceOffset(count int, columns bool) {
 	var currentLine = context.currentLine
 	var charsToTab, charsToAdvance int
-	var c item
+	var c byte
 	for ; count > 0; {
 		c = currentLine[context.offset]
 		if itemTab == c {
@@ -99,13 +99,13 @@ func (context *Context) findNextNonspace() {
 	i := context.offset
 	cols := context.column
 
-	var c item
+	var token byte
 	for {
-		c = context.currentLine[i]
-		if itemSpace == c {
+		token = context.currentLine[i]
+		if itemSpace == token {
 			i++
 			cols++
-		} else if itemTab == c {
+		} else if itemTab == token {
 			i++
 			cols += 4 - (cols % 4)
 		} else {
@@ -113,7 +113,7 @@ func (context *Context) findNextNonspace() {
 		}
 	}
 
-	context.blank = itemNewline == c || itemEnd == c
+	context.blank = itemNewline == token || itemEnd == token
 	context.nextNonspace = i
 	context.nextNonspaceColumn = cols
 	context.indent = context.nextNonspaceColumn - context.column
@@ -166,7 +166,7 @@ type Tree struct {
 	Name string    // 名称，可以为空
 	Root *Document // 根节点
 
-	text    string   // 原始的 Markdown 文本
+	text    []byte   // 原始的 Markdown 文本
 	lex     *lexer   // 词法分析器
 	context *Context // 语法解析上下文
 }

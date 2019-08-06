@@ -30,7 +30,7 @@ type listData struct {
 	tight        bool  // 是否是紧凑模式
 	bulletChar   items // 无序列表标识，* - 或者 +
 	start        int   // 有序列表开始序号
-	delimiter    item  // 有序列表分隔符，. 或者 )
+	delimiter    byte  // 有序列表分隔符，. 或者 )
 	padding      int   // 列表内部缩进空格数，即无序列表标识或分隔符和后续第一个非空字符之间的空格数，规范里的 N
 	markerOffset int   // 标识符（* - + 或者 1 2 3）缩进
 }
@@ -134,12 +134,12 @@ func (t *Tree) parseListMarker(container Node) *listData {
 	return data
 }
 
-func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter item) {
+func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter byte) {
 	var i int
-	var token item
+	var token byte
 	for ; ; i++ {
 		token = tokens[i]
-		if !token.isDigit() || 8 < i {
+		if !isDigit(token) || 8 < i {
 			delimiter = token
 			break
 		}
