@@ -27,7 +27,7 @@ func (token item) isNewline() bool {
 }
 
 func (token item) isWhitespace() bool {
-	return itemSpace == token || itemNewline == token /* '\u000A' */ || itemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
+	return itemSpace == token || itemNewline /* '\u000A' */ == token || itemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
 }
 
 func (token item) isUnicodeWhitespace() bool {

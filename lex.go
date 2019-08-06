@@ -59,7 +59,6 @@ func (l *lexer) nextLine() (line items) {
 // lex 创建一个词法分析器。
 func lex(input string) (ret *lexer) {
 	ret = &lexer{}
-	// 加载原文本，避免内存分配
 	ret.input = toBytes(input)
 	ret.length = len(ret.input)
 
