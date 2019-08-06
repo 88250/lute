@@ -46,7 +46,7 @@ func TestSpec(t *testing.T) {
 	for _, test := range testcases {
 		testName := test.Section + " " + strconv.Itoa(test.Example)
 		fmt.Println("Test [" + testName + "]")
-		tree, err := Parse(testName, test.Markdown)
+		tree, err := ParseStr(testName, test.Markdown)
 		if nil != err {
 			t.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 		}

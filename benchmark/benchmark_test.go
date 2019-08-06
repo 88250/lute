@@ -38,7 +38,6 @@ func BenchmarkLute(b *testing.B) {
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)
 	}
-
 	ioutil.WriteFile(spec+".html", []byte(html), 0644)
 
 	for i := 0; i < b.N; i++ {

@@ -31,6 +31,11 @@ func Parse(name string, text []byte) (t *Tree, err error) {
 	return
 }
 
+// ParseStr 接受 string 类型的 text 后直接调用 Parse 进行解析。
+func ParseStr(name string, text string) (t *Tree, err error) {
+	return Parse(name, toItems(text))
+}
+
 // Context 用于维护解析过程中使用到的公共数据。
 type Context struct {
 	linkRefDef map[string]*Link // 链接引用定义集

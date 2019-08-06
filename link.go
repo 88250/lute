@@ -15,7 +15,10 @@
 
 package lute
 
-import "strings"
+import (
+	"strings"
+	"unicode/utf8"
+)
 
 // Link 描述了链接节点结构。
 type Link struct {
@@ -144,7 +147,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 			}
 
 			passed = append(passed, token)
-			r, size = decodeRune(tokens[i:])
+			r, size = utf8.DecodeRune(tokens[i:])
 			if 1 < size {
 				for j := 1; j < size; j++ {
 					passed = append(passed, tokens[i+j])
@@ -175,7 +178,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 		for ; i < length; i += size {
 			token := tokens[i]
 			passed = append(passed, token)
-			r, size = decodeRune(tokens[i:])
+			r, size = utf8.DecodeRune(tokens[i:])
 			destination += string(r)
 			for j := 1; j < size; j++ {
 				passed = append(passed, tokens[i+j])

@@ -17,6 +17,7 @@ package lute
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 func (context *Context) parseLinkRefDef(tokens items) items {
@@ -127,7 +128,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 	for ; i < length; i += size {
 		token := line[i]
 		passed = append(passed, token)
-		r, size = decodeRune(line[i:])
+		r, size = utf8.DecodeRune(line[i:])
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
@@ -177,7 +178,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 	for ; i < length; {
 		token := tokens[i]
 		ret = append(ret, token)
-		r, size = decodeRune(tokens[i:])
+		r, size = utf8.DecodeRune(tokens[i:])
 		for j := 1; j < size; j++ {
 			ret = append(ret, tokens[i+j])
 		}
@@ -232,7 +233,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 		ret = append(ret, token)
 		size = 1
 		if 0 < i {
-			r, size = decodeRune(tokens[i:])
+			r, size = utf8.DecodeRune(tokens[i:])
 			for j := 1; j < size; j++ {
 				ret = append(ret, tokens[i+j])
 			}
@@ -279,7 +280,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 	for {
 		token := line[i]
 		passed = append(passed, token)
-		r, size := decodeRune(line[i:])
+		r, size := utf8.DecodeRune(line[i:])
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}

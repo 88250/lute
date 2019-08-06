@@ -239,7 +239,7 @@ var parseTests = []parseTest{
 func TestParse(t *testing.T) {
 	for _, test := range parseTests {
 		fmt.Println("Test [" + test.name + "]")
-		tree, err := Parse(test.name, test.input)
+		tree, err := ParseStr(test.name, test.input)
 		if nil != err {
 			t.Fatalf("%q: unexpected error: %v", test.name, err)
 		}
