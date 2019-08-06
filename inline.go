@@ -348,9 +348,9 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 	b := &strings.Builder{}
 	for ; t.context.pos < length; t.context.pos++ {
 		token = tokens[t.context.pos]
-		if itemBackslash == token || itemBacktick == token || itemAsterisk == token || itemUnderscore == token ||
-			itemNewline == token || itemLess == token || itemOpenBracket == token || itemCloseBracket == token ||
-			itemAmpersand == token || itemBang == token {
+		if itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
+			itemNewline == token || itemBackslash == token || itemBacktick == token ||
+			itemLess == token || itemCloseBracket == token || itemAmpersand == token {
 			break
 		}
 		b.WriteRune(rune(token))
