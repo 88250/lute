@@ -63,17 +63,17 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 func (t *Tree) matchCodeSpanEnd(tokens items, num int) (pos int) {
 	length := len(tokens)
 	for pos < length {
-		len := tokens[pos:].accept(itemBacktick)
-		if num == len {
-			next := pos + len
+		l := tokens[pos:].accept(itemBacktick)
+		if num == l {
+			next := pos + l
 			if length-1 > next && itemBacktick == tokens[next] {
 				continue
 			}
 
 			return pos
 		}
-		if 0 < len {
-			pos += len
+		if 0 < l {
+			pos += l
 		} else {
 			pos++
 		}
