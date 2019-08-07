@@ -24,76 +24,65 @@ import (
 func (t *Tree) parseInlines() {
 	t.context.delimiters = nil
 	t.context.brackets = nil
-	t.parseBlockInlines(t.Root.Children())
+
+	Walk(t.Root, func(n Node, entering bool) (WalkStatus, error) {
+		typ := n.Type()
+		if !entering && (typ == NodeParagraph || typ == NodeHeading) {
+			for t.parseInline(n) {
+			}
+			t.processEmphasis(nil)
+		}
+		return WalkContinue, nil
+	})
 }
 
-func (t *Tree) parseBlockInlines(blocks []Node) {
-	for _, block := range blocks {
-		cType := block.Type()
-		switch cType {
-		case NodeCodeBlock, NodeThematicBreak, NodeHTMLBlock:
-			continue
-		}
+func (t *Tree) parseInline(block Node) bool {
+	tokens := block.Tokens()
+	if nil == tokens {
+		return false
+	}
 
-		cs := block.Children()
-		if 0 < len(cs) {
-			// 递归进入子节点
-			t.parseBlockInlines(cs)
-			continue
-		}
-
-		// 开始解析块节点下的 tokens，生成该块的子节点
-
-		tokens := block.Tokens()
-		if nil == tokens {
-			continue
-		}
-
-		t.context.pos = 0
-		for {
-			token := tokens[t.context.pos]
-			var n Node
-			switch token {
-			case itemBackslash:
-				n = t.parseBackslash(tokens)
-			case itemBacktick:
-				n = t.parseCodeSpan(tokens)
-			case itemAsterisk, itemUnderscore:
-				t.handleDelim(block, tokens)
-			case itemNewline:
-				n = t.parseNewline(block, tokens)
-			case itemLess:
-				n = t.parseAutolink(tokens)
+	t.context.pos = 0
+	for {
+		token := tokens[t.context.pos]
+		var n Node
+		switch token {
+		case itemBackslash:
+			n = t.parseBackslash(tokens)
+		case itemBacktick:
+			n = t.parseCodeSpan(tokens)
+		case itemAsterisk, itemUnderscore:
+			t.handleDelim(block, tokens)
+		case itemNewline:
+			n = t.parseNewline(block, tokens)
+		case itemLess:
+			n = t.parseAutolink(tokens)
+			if nil == n {
+				n = t.parseAutoEmailLink(tokens)
 				if nil == n {
-					n = t.parseAutoEmailLink(tokens)
-					if nil == n {
-						n = t.parseInlineHTML(tokens)
-					}
+					n = t.parseInlineHTML(tokens)
 				}
-			case itemOpenBracket:
-				n = t.parseOpenBracket(tokens)
-			case itemCloseBracket:
-				n = t.parseCloseBracket(tokens)
-			case itemAmpersand:
-				n = t.parseEntity(tokens)
-			case itemBang:
-				n = t.parseBang(tokens)
-			default:
-				n = t.parseText(tokens)
 			}
-
-			if nil != n {
-				block.AppendChild(block, n)
-			}
-
-			length := len(tokens)
-			if 1 > length || t.context.pos >= length || itemEnd == tokens[t.context.pos] {
-				break
-			}
+		case itemOpenBracket:
+			n = t.parseOpenBracket(tokens)
+		case itemCloseBracket:
+			n = t.parseCloseBracket(tokens)
+		case itemAmpersand:
+			n = t.parseEntity(tokens)
+		case itemBang:
+			n = t.parseBang(tokens)
+		default:
+			n = t.parseText(tokens)
 		}
 
-		// 强调加粗节点处理
-		t.processEmphasis(nil)
+		if nil != n {
+			block.AppendChild(block, n)
+		}
+
+		length := len(tokens)
+		if 1 > length || t.context.pos >= length || itemEnd == tokens[t.context.pos] {
+			return false
+		}
 	}
 }
 

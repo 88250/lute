@@ -49,9 +49,9 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 ### [Lute](https://github.com/b3log/lute)
 
 ```
-BenchmarkLute-2   	     300	   4637583 ns/op	 2937242 B/op	   23281 allocs/op
-BenchmarkLute-4   	     300	   4657646 ns/op	 2937484 B/op	   23281 allocs/op
-BenchmarkLute-8   	     300	   4737322 ns/op	 2938008 B/op	   23281 allocs/op
+BenchmarkLute-2   	     300	   4631033 ns/op	 2835750 B/op	   22449 allocs/op
+BenchmarkLute-4   	     300	   4637586 ns/op	 2836016 B/op	   22450 allocs/op
+BenchmarkLute-8   	     300	   4537957 ns/op	 2836525 B/op	   22449 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
