@@ -17,6 +17,7 @@ package lute
 
 // Text 描述了文本节点结构。
 type Text struct {
+	// *BaseNode
 	// 这里通过减少嵌套结构体的构造来优化性能。
 	// 整颗语法书上可能 95% 都是文本节点。此时如果文本节点嵌套了基础节点 BaseNode 的话（嵌套的目的是为了复用 BaseNode 的字段和接口实现），
 	// 构造文本节点就需要创建两次对象，将会重复调用 `runtime.newobject` 降低性能。
@@ -30,8 +31,7 @@ type Text struct {
 	firstChild      Node   // 第一个子节点
 	lastChild       Node   // 最后一个子节点
 	rawText         string // 原始内容
-	value           items  // 原始内容处理后的值
-	tokens          items  // 词法分析结果 tokens
+	tokens          items  // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
 	close           bool   // 标识是否关闭
 	lastLineBlank   bool   // 标识最后一行是否是空行
 	lastLineChecked bool   // 标识最后一行是否检查过
@@ -158,18 +158,6 @@ func (n *Text) SetRawText(rawText string) {
 
 func (n *Text) AppendRawText(rawText string) {
 	n.rawText += rawText
-}
-
-func (n *Text) Value() items {
-	return n.value
-}
-
-func (n *Text) SetValue(value items) {
-	n.value = value
-}
-
-func (n *Text) AppendValue(value items) {
-	n.value = append(n.value, value...)
 }
 
 func (n *Text) Tokens() items {

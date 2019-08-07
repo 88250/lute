@@ -96,7 +96,7 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 	}
 
 	r.Newline()
-	r.Write(node.Value())
+	r.Write(node.Tokens())
 	r.Newline()
 
 	return WalkContinue, nil
@@ -107,7 +107,7 @@ func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error
 		return WalkContinue, nil
 	}
 
-	r.Write(node.Value())
+	r.Write(node.Tokens())
 
 	return WalkContinue, nil
 }
@@ -139,7 +139,7 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 		return WalkContinue, nil
 	}
 
-	r.Write(escapeHTML(node.Value()))
+	r.Write(escapeHTML(node.Tokens()))
 
 	return WalkContinue, nil
 }
@@ -147,7 +147,7 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderCodeSpan(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.Write(toItems("<code>"))
-		r.Write(escapeHTML(node.Value()))
+		r.Write(escapeHTML(node.Tokens()))
 		return WalkSkipChildren, nil
 	}
 	r.Write(toItems("</code>"))
@@ -161,10 +161,10 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 		if "" != n.info {
 			infoWords := strings.Fields(n.info)
 			r.Write(toItems("<pre><code class=\"language-" + infoWords[0] + "\">"))
-			r.Write(escapeHTML(n.value))
+			r.Write(escapeHTML(n.tokens))
 		} else {
 			r.Write(toItems("<pre><code>"))
-			r.Write(escapeHTML(n.value))
+			r.Write(escapeHTML(n.tokens))
 		}
 		return WalkSkipChildren, nil
 	}
@@ -185,7 +185,7 @@ func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) 
 func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.Write(toItems("<strong>"))
-		r.Write(node.Value())
+		r.Write(node.Tokens())
 	} else {
 		r.Write(toItems("</strong>"))
 	}

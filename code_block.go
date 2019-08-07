@@ -80,8 +80,6 @@ func (codeBlock *CodeBlock) Finalize(context *Context) {
 	} else { // indented
 		codeBlock.tokens = codeBlock.tokens.replaceNewlineSpace()
 	}
-	codeBlock.value = codeBlock.tokens
-	codeBlock.tokens = nil
 }
 
 func (codeBlock *CodeBlock) AcceptLines() bool {

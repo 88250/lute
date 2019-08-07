@@ -101,7 +101,7 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	length := len(tokens)
 	if 2 > length {
 		t.context.pos++
-		return &Text{typ: NodeText, value: items("&")}
+		return &Text{typ: NodeText, tokens: toItems("&")}
 	}
 
 	start := t.context.pos
@@ -127,26 +127,26 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	entityName := tokens[start:i].string()
 	if entityValue, ok := htmlEntities[entityName]; ok { // 通过查表优化
 		t.context.pos += i - start
-		return &Text{typ: NodeText, value: toItems(entityValue)}
+		return &Text{typ: NodeText, tokens: toItems(entityValue)}
 	}
 
 	if !endWithSemicolon {
 		t.context.pos++
-		return &Text{typ: NodeText, value: items("&")}
+		return &Text{typ: NodeText, tokens: toItems("&")}
 	}
 
 	if numeric {
 		entityNameLen := len(entityName)
 		if 10 < entityNameLen || 4 > entityNameLen {
 			t.context.pos++
-			return &Text{typ: NodeText, value: items("&")}
+			return &Text{typ: NodeText, tokens: toItems("&")}
 		}
 
 		hex := 'x' == entityName[2] || 'X' == entityName[2]
 		if hex {
 			if 5 > entityNameLen {
 				t.context.pos++
-				return &Text{typ: NodeText, value: items("&")}
+				return &Text{typ: NodeText, tokens: toItems("&")}
 			}
 		}
 	}
@@ -154,10 +154,10 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	v := html.UnescapeString(entityName)
 	if v == entityName {
 		t.context.pos++
-		return &Text{typ: NodeText, value: items("&")}
+		return &Text{typ: NodeText, tokens: toItems("&")}
 	}
 	t.context.pos += i - start
-	return &Text{typ: NodeText, value: items(v)}
+	return &Text{typ: NodeText, tokens: toItems(v)}
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
@@ -168,7 +168,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 	if nil == opener {
 		t.context.pos++
 		// no matched opener, just return a literal
-		return &Text{typ: NodeText, value: items("]")}
+		return &Text{typ: NodeText, tokens: toItems("]")}
 	}
 
 	if !opener.active {
@@ -176,7 +176,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		// no matched opener, just return a literal
 		// take opener off brackets stack
 		t.removeBracket()
-		return &Text{typ: NodeText, value: items("]")}
+		return &Text{typ: NodeText, tokens: toItems("]")}
 	}
 
 	// If we got here, open is a potential opener
@@ -289,13 +289,13 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		t.removeBracket() // remove this opener from stack
 		t.context.pos = startPos
 		t.context.pos++
-		return &Text{typ: NodeText, value: items("]")}
+		return &Text{typ: NodeText, tokens: toItems("]")}
 	}
 }
 
 func (t *Tree) parseOpenBracket(tokens items) (ret Node) {
 	t.context.pos++
-	ret = &Text{typ: NodeText, value: items("[")}
+	ret = &Text{typ: NodeText, tokens: toItems("[")}
 	// Add entry to stack for this opener
 	t.addBracket(ret, t.context.pos, false)
 
@@ -330,10 +330,10 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 		t.context.pos++
 	} else if isASCIIPunct(token) {
-		ret = &Text{typ: NodeText, value: items{token}}
+		ret = &Text{typ: NodeText, tokens: items{token}}
 		t.context.pos++
 	} else {
-		ret = &Text{typ: NodeText, value: items("\\")}
+		ret = &Text{typ: NodeText, tokens: toItems("\\")}
 	}
 
 	return
@@ -363,7 +363,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 		}
 	}
 
-	ret = &Text{typ: NodeText, value: tokens[start:t.context.pos]}
+	ret = &Text{typ: NodeText, tokens: tokens[start:t.context.pos]}
 
 	return
 }
@@ -374,11 +374,11 @@ func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 	lastc := block.LastChild()
 	hardbreak := false
 	if nil != lastc && NodeText == lastc.Type() {
-		value := lastc.Value()
-		if valueLen := len(value); ' ' == value[valueLen-1] {
-			lastc.SetValue(value.trimRight())
+		tokens := lastc.Tokens()
+		if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
+			lastc.SetTokens(tokens.trimRight())
 			if 1 < valueLen {
-				hardbreak = ' ' == value[len(value)-2]
+				hardbreak = ' ' == tokens[len(tokens)-2]
 			}
 		}
 	}

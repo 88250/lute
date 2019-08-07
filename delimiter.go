@@ -77,7 +77,7 @@ func (t *Tree) handleDelim(block Node, tokens items) {
 	delim := t.scanDelims(tokens)
 
 	text, _ := t.extractTokens(tokens, startPos, t.context.pos)
-	node := &Text{typ: NodeText, value: text}
+	node := &Text{typ: NodeText, tokens: text}
 	block.AppendChild(block, node)
 
 	// Add entry to stack for this opener
@@ -152,10 +152,10 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 			opener.num -= use_delims
 			closer.num -= use_delims
 
-			text := opener_inl.Value()[0 : len(opener_inl.Value())-use_delims]
-			opener_inl.SetValue(text)
-			text = closer_inl.Value()[0 : len(closer_inl.Value())-use_delims]
-			closer_inl.SetValue(text)
+			text := opener_inl.Tokens()[0 : len(opener_inl.Tokens())-use_delims]
+			opener_inl.SetTokens(text)
+			text = closer_inl.Tokens()[0 : len(closer_inl.Tokens())-use_delims]
+			closer_inl.SetTokens(text)
 
 			// build contents for new emph element
 			var emph Node

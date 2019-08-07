@@ -32,7 +32,6 @@ func (p *Paragraph) Continue(context *Context) int {
 }
 
 func (p *Paragraph) Finalize(context *Context) {
-	p.value = p.value.trim()
 	p.tokens = p.tokens.trim()
 
 	// try parsing the beginning as link reference definitions:

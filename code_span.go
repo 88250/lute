@@ -35,18 +35,19 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	backticks := tokens[startPos : startPos+n]
 	if length <= startPos+n {
 		t.context.pos += n
-		ret = &Text{typ: NodeText, value: backticks}
+		ret = &Text{typ: NodeText, tokens: backticks}
 		return
 	}
 
 	endPos := t.matchCodeSpanEnd(tokens[startPos+n:], n)
 	if 1 > endPos {
 		t.context.pos += n
-		ret = &Text{typ: NodeText, value: backticks}
+		ret = &Text{typ: NodeText, tokens: backticks}
 		return
 	}
 	endPos = startPos + endPos + n
 
+	// TODO: 依然用 tokens，不要换 string
 	value := tokens[startPos+n : endPos].string()
 	value = strings.ReplaceAll(value, "\n", " ")
 	if 2 < len(value) && itemSpace == value[0] && itemSpace == value[len(value)-1] && 0 < len(strings.TrimSpace(value)) {
@@ -54,7 +55,7 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 		value = value[:len(value)-1]
 	}
 
-	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, value: toItems(value)}}
+	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, tokens: toItems(value)}}
 	t.context.pos = endPos + n
 
 	return
