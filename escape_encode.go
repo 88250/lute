@@ -43,16 +43,16 @@ func escapeHTML(html items) (ret items) {
 			if 0 == len(ret) { // 通过延迟初始化减少内存分配，下同
 				ret = make([]byte, len(html), len(html))
 				copy(ret, html)
+				tmp = ret
 			}
 
-			ret = append(ret, 0, 0, 0, 0)
-			copy(ret[i+4:], ret[i:])
-			ret[i] = '&'
-			ret[i+1] = 'a'
-			ret[i+2] = 'm'
-			ret[i+3] = 'p'
-			ret[i+4] = ';'
-			tmp = ret
+			tmp = append(tmp, 0, 0, 0, 0)
+			copy(tmp[i+4:], tmp[i:])
+			tmp[i] = '&'
+			tmp[i+1] = 'a'
+			tmp[i+2] = 'm'
+			tmp[i+3] = 'p'
+			tmp[i+4] = ';'
 			i += 5
 
 			continue
@@ -62,15 +62,15 @@ func escapeHTML(html items) (ret items) {
 			if 0 == len(ret) {
 				ret = make([]byte, len(html), len(html))
 				copy(ret, html)
+				tmp = ret
 			}
 
-			ret = append(ret, 0, 0, 0)
-			copy(ret[i+3:], ret[i:])
-			ret[i] = '&'
-			ret[i+1] = 'l'
-			ret[i+2] = 't'
-			ret[i+3] = ';'
-			tmp = ret
+			tmp = append(tmp, 0, 0, 0)
+			copy(tmp[i+3:], tmp[i:])
+			tmp[i] = '&'
+			tmp[i+1] = 'l'
+			tmp[i+2] = 't'
+			tmp[i+3] = ';'
 			i += 4
 			continue
 		}
@@ -79,15 +79,15 @@ func escapeHTML(html items) (ret items) {
 			if 0 == len(ret) {
 				ret = make([]byte, len(html), len(html))
 				copy(ret, html)
+				tmp = ret
 			}
 
-			ret = append(ret, 0, 0, 0)
-			copy(ret[i+3:], ret[i:])
-			ret[i] = '&'
-			ret[i+1] = 'g'
-			ret[i+2] = 't'
-			ret[i+3] = ';'
-			tmp = ret
+			tmp = append(tmp, 0, 0, 0)
+			copy(tmp[i+3:], tmp[i:])
+			tmp[i] = '&'
+			tmp[i+1] = 'g'
+			tmp[i+2] = 't'
+			tmp[i+3] = ';'
 			i += 4
 			continue
 		}
@@ -96,17 +96,17 @@ func escapeHTML(html items) (ret items) {
 			if 0 == len(ret) {
 				ret = make([]byte, len(html), len(html))
 				copy(ret, html)
+				tmp = ret
 			}
 
-			ret = append(ret, 0, 0, 0, 0, 0)
-			copy(ret[i+5:], ret[i:])
-			ret[i] = '&'
-			ret[i+1] = 'q'
-			ret[i+2] = 'u'
-			ret[i+3] = 'o'
-			ret[i+4] = 't'
-			ret[i+5] = ';'
-			tmp = ret
+			tmp = append(tmp, 0, 0, 0, 0, 0)
+			copy(tmp[i+5:], tmp[i:])
+			tmp[i] = '&'
+			tmp[i+1] = 'q'
+			tmp[i+2] = 'u'
+			tmp[i+3] = 'o'
+			tmp[i+4] = 't'
+			tmp[i+5] = ';'
 			i += 6
 			continue
 		}
@@ -118,7 +118,7 @@ func escapeHTML(html items) (ret items) {
 		return html
 	}
 
-	return
+	return tmp
 }
 
 func unescapeString(str string) string {
