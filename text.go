@@ -140,14 +140,6 @@ func (n *Text) SetLastChild(lastChild Node) {
 	n.lastChild = lastChild
 }
 
-func (n *Text) Children() (ret []Node) {
-	for child := n.firstChild; nil != child; child = child.Next() {
-		ret = append(ret, child)
-	}
-
-	return
-}
-
 func (n *Text) RawText() string {
 	return n.rawText
 }

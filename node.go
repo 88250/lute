@@ -53,9 +53,6 @@ type Node interface {
 	// 设置最后一个子节点。
 	SetLastChild(Node)
 
-	// Children 返回子节点列表。
-	Children() []Node
-
 	// AppendChild 添加一个子节点。
 	AppendChild(this, child Node)
 
@@ -232,14 +229,6 @@ func (n *BaseNode) LastChild() Node {
 
 func (n *BaseNode) SetLastChild(lastChild Node) {
 	n.lastChild = lastChild
-}
-
-func (n *BaseNode) Children() (ret []Node) {
-	for child := n.firstChild; nil != child; child = child.Next() {
-		ret = append(ret, child)
-	}
-
-	return
 }
 
 func (n *BaseNode) RawText() string {
