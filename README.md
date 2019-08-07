@@ -49,17 +49,17 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 ### [Lute](https://github.com/b3log/lute)
 
 ```
-BenchmarkLute-2   	     300	   4631033 ns/op	 2835750 B/op	   22449 allocs/op
-BenchmarkLute-4   	     300	   4637586 ns/op	 2836016 B/op	   22450 allocs/op
-BenchmarkLute-8   	     300	   4537957 ns/op	 2836525 B/op	   22449 allocs/op
+BenchmarkLute-2   	     300	   4458074 ns/op	 2767406 B/op	   22450 allocs/op
+BenchmarkLute-4   	     300	   4428252 ns/op	 2767664 B/op	   22450 allocs/op
+BenchmarkLute-8   	     300	   4591147 ns/op	 2768186 B/op	   22450 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
 
 ```
-BenchmarkGoldMark-2   	     300	   4724041 ns/op	 2110378 B/op	   13901 allocs/op
-BenchmarkGoldMark-4   	     300	   4817211 ns/op	 2113808 B/op	   13902 allocs/op
-BenchmarkGoldMark-8   	     300	   4860328 ns/op	 2114412 B/op	   13902 allocs/op
+BenchmarkGoldMark-2   	     300	   4757269 ns/op	 2110741 B/op	   13901 allocs/op
+BenchmarkGoldMark-4   	     300	   4790514 ns/op	 2113679 B/op	   13902 allocs/op
+BenchmarkGoldMark-8   	     300	   4860327 ns/op	 2114696 B/op	   13902 allocs/op
 ```
 
 ### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
