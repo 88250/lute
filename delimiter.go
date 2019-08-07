@@ -72,15 +72,16 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 	return &delimiter{typ: token, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
 }
 
+// handleDelim 将分隔符 * _ 和 ~ 入栈。
 func (t *Tree) handleDelim(block Node, tokens items) {
 	startPos := t.context.pos
 	delim := t.scanDelims(tokens)
 
-	text, _ := t.extractTokens(tokens, startPos, t.context.pos)
+	text := tokens[startPos: t.context.pos]
 	node := &Text{tokens: text}
 	block.AppendChild(block, node)
 
-	// Add entry to stack for this opener
+	// 将这个分隔符入栈
 	t.context.delimiters = &delimiter{
 		typ:         delim.typ,
 		num:         delim.num,

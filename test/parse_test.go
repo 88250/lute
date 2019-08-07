@@ -28,6 +28,11 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
+	// gfm spec inline-level cases
+
+	{"gmf491", "~~Hi~~ Hello, world!", "<p><del>Hi</del> Hello, world!</p>"},
+	{"gmf492", "This ~~has a\n\nnew paragraph~~.", "<p>This ~~has a</p>\n<p>new paragraph~~.</p>"},
+
 	// commonmark spec inline-level cases
 
 	{"spec626", "foo <![CDATA[>&<]]>\n", "<p>foo <![CDATA[>&<]]></p>\n"},
