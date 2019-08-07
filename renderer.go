@@ -46,10 +46,18 @@ func (r *Renderer) Render(n Node) error {
 	})
 }
 
-// Write 输出指定的字符串 content。
+// Write 输出指定的 tokens 数组 content。
 func (r *Renderer) Write(content items) {
 	if length := len(content); 0 < length {
 		r.writer.Write(content)
+		r.lastOut = content[length-1]
+	}
+}
+
+// WriteString 输出指定的字符串 content。
+func (r *Renderer) WriteString(content string) {
+	if length := len(content); 0 < length {
+		r.writer.WriteString(content)
 		r.lastOut = content[length-1]
 	}
 }
