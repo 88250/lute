@@ -55,7 +55,7 @@ func (t *Tree) parseInline(block Node) bool {
 			n = t.parseBackslash(tokens)
 		case itemBacktick:
 			n = t.parseCodeSpan(tokens)
-		case itemAsterisk, itemUnderscore:
+		case itemAsterisk, itemUnderscore, itemTilde:
 			t.handleDelim(block, tokens)
 		case itemNewline:
 			n = t.parseNewline(block, tokens)
@@ -224,7 +224,8 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 			t.context.pos += n + 1
 		} else if !opener.bracketAfter {
 			// [text][] 或者 [text][] 格式，将第一个 text 视为 label 进行解析
-			passed, reflabel = t.extractTokens(tokens, opener.index, startPos)
+			passed = tokens[ opener.index:startPos]
+			reflabel = fromItems(passed)
 			if len(passed) > 0 && len(tokens) > beforelabel && itemOpenBracket == tokens[beforelabel] {
 				// [text][] 格式，跳过 []
 				t.context.pos += 2
@@ -328,13 +329,6 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 	} else {
 		ret = &Text{tokens: toItems("\\")}
 	}
-
-	return
-}
-
-func (t *Tree) extractTokens(tokens items, startPos, endPos int) (subTokens items, text string) {
-	text = fromItems(tokens[startPos:endPos])
-	subTokens = tokens[startPos:endPos]
 
 	return
 }
