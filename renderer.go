@@ -35,6 +35,7 @@ type Renderer struct {
 // Render 渲染指定的节点 n。
 func (r *Renderer) Render(n Node) error {
 	r.lastOut = itemNewline
+	r.writer.Grow(4096)
 	return Walk(n, func(n Node, entering bool) (WalkStatus, error) {
 		f := r.rendererFuncs[n.Type()]
 		if nil == f {

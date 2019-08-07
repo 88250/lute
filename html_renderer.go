@@ -48,21 +48,13 @@ func NewHTMLRenderer() (ret *Renderer) {
 	return
 }
 
-const (
-
-)
-
 func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Image)
-	var out items
 	if entering {
 		if 0 == r.disableTags {
-			out = toItems("<img src=\"")
-			r.Write(out)
-			out = escapeHTML(toItems(n.Destination))
-			r.Write(out)
-			out = toItems("\" alt=\"")
-			r.Write(out)
+			r.Write(toItems("<img src=\""))
+			r.Write(escapeHTML(toItems(n.Destination)))
+			r.Write(toItems("\" alt=\""))
 		}
 		r.disableTags++
 		return WalkContinue, nil
@@ -70,14 +62,13 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 
 	r.disableTags--
 	if 0 == r.disableTags {
-		out = toItems("\"")
+		r.Write(toItems("\""))
 		if "" != n.Title {
-			out = append(out, toItems(" title=\"")...)
-			out = append(out, escapeHTML(toItems(n.Title))...)
-			out = append(out, toItems("\"")...)
+			r.Write(toItems(" title=\""))
+			r.Write(escapeHTML(toItems(n.Title)))
+			r.Write(toItems("\""))
 		}
-		out = append(out, toItems(" />")...)
-		r.Write(out)
+		r.Write(toItems(" />"))
 	}
 	return WalkContinue, nil
 }
@@ -291,7 +282,8 @@ func (r *Renderer) tag(name string, attrs [][]string, selfclosing bool) {
 		return
 	}
 
-	r.Write(toItems("<" + name))
+	r.Write(toItems("<"))
+	r.Write(toItems(name))
 	if 0 < len(attrs) {
 		for _, attr := range attrs {
 			r.Write(toItems(" " + attr[0] + "=\"" + attr[1] + "\""))
