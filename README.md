@@ -42,7 +42,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 
 ## ⚡ 性能
 
-在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt)，197K+，9700+ 行）跑基准测试的结果：
+在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试的结果：
 
 ```
 BenchmarkLute-2   	     300	   4637583 ns/op	 2937242 B/op	   23281 allocs/op
