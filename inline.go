@@ -373,12 +373,14 @@ func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {
 	// check previous node for trailing spaces
 	lastc := block.LastChild()
 	hardbreak := false
-	if nil != lastc && NodeText == lastc.Type() {
-		tokens := lastc.Tokens()
-		if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
-			lastc.SetTokens(tokens.trimRight())
-			if 1 < valueLen {
-				hardbreak = ' ' == tokens[len(tokens)-2]
+	if nil != lastc {
+		if text, ok := lastc.(*Text); ok {
+			tokens := text.tokens
+			if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
+				lastc.SetTokens(tokens.trimRight())
+				if 1 < valueLen {
+					hardbreak = itemSpace == tokens[len(tokens)-2]
+				}
 			}
 		}
 	}

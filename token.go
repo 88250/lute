@@ -171,14 +171,14 @@ func (tokens items) trimLeft() (whitespaces, remains items) {
 }
 
 func (tokens items) trimRight() items {
-	size := len(tokens)
-	if 1 > size {
+	length := len(tokens)
+	if 1 > length {
 		return tokens
 	}
 
-	i := size - 1
+	i := length - 1
 	for ; 0 <= i; i-- {
-		if !isWhitespace(tokens[i]) && itemEnd != tokens[i] {
+		if !isWhitespace(tokens[i]) {
 			break
 		}
 	}
