@@ -30,8 +30,12 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// gfm spec inline-level cases
 
-	{"gmf491", "~~Hi~~ Hello, world!", "<p><del>Hi</del> Hello, world!</p>"},
-	{"gmf492", "This ~~has a\n\nnew paragraph~~.", "<p>This ~~has a</p>\n<p>new paragraph~~.</p>"},
+	{"gmf491", "~~Hi~~ Hello, world!", "<p><del>Hi</del> Hello, world!</p>\n"},
+	{"gmf492", "This ~~has a\n\nnew paragraph~~.", "<p>This ~~has a</p>\n<p>new paragraph~~.</p>\n"},
+	{"strikethrough0", "**~~Hi~~** Hello, world!", "<p><strong><del>Hi</del></strong> Hello, world!</p>\n"},
+	{"strikethrough1", "~~**Hi**~~ Hello, world!", "<p><del><strong>Hi</strong></del> Hello, world!</p>\n"},
+	{"strikethrough2", "~~**Hi~~** Hello, world!", "<p><del>**Hi</del>** Hello, world!</p>\n"},
+	{"strikethrough3", "**~~**Hi~~ Hello, world!", "<p>**<del>**Hi</del> Hello, world!</p>\n"},
 
 	// commonmark spec inline-level cases
 

@@ -341,7 +341,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 		token = tokens[t.context.pos]
 		if itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
 			itemNewline == token || itemBackslash == token || itemBacktick == token ||
-			itemLess == token || itemCloseBracket == token || itemAmpersand == token {
+			itemLess == token || itemCloseBracket == token || itemAmpersand == token || itemTilde == token {
 			// 遇到潜在的标记符时需要跳出 text，回到行级解析主循环
 			if start == t.context.pos {
 				start++

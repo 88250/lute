@@ -77,7 +77,7 @@ func (t *Tree) handleDelim(block Node, tokens items) {
 	startPos := t.context.pos
 	delim := t.scanDelims(tokens)
 
-	text := tokens[startPos: t.context.pos]
+	text := tokens[startPos:t.context.pos]
 	node := &Text{tokens: text}
 	block.AppendChild(block, node)
 
@@ -108,6 +108,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 
 	openers_bottom[itemUnderscore] = stackBottom
 	openers_bottom[itemAsterisk] = stackBottom
+	openers_bottom[itemTilde] = stackBottom
 
 	// find first closer above stack_bottom:
 	closer = t.context.delimiters
@@ -158,23 +159,26 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 			text = closer_inl.Tokens()[0 : len(closer_inl.Tokens())-use_delims]
 			closer_inl.SetTokens(text)
 
-			// build contents for new emph element
-			var emph Node
+			var emphStrongDel Node
 			if 1 == use_delims {
-				emph = &Emphasis{&BaseNode{typ: NodeEmphasis}}
+				emphStrongDel = &Emphasis{&BaseNode{typ: NodeEmphasis}}
 			} else {
-				emph = &Strong{&BaseNode{typ: NodeStrong}}
+				if itemTilde != closercc {
+					emphStrongDel = &Strong{&BaseNode{typ: NodeStrong}}
+				} else {
+					emphStrongDel = &Strikethrough{&BaseNode{typ: NodeStrikethrough}}
+				}
 			}
 
 			tmp := opener_inl.Next()
 			for nil != tmp && tmp != closer_inl {
 				next := tmp.Next()
 				tmp.Unlink()
-				emph.AppendChild(emph, tmp)
+				emphStrongDel.AppendChild(emphStrongDel, tmp)
 				tmp = next
 			}
 
-			opener_inl.InsertAfter(opener_inl, emph)
+			opener_inl.InsertAfter(opener_inl, emphStrongDel)
 
 			// remove elts between opener and closer in delimiters stack
 			if opener.next != closer {
