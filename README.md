@@ -30,7 +30,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 最后，还有一个很重要的动机就是 B3log 开源社区需要一款自己的 Markdown 引擎：
 
 * 社区项目 [Solo](https://github.com/b3log/solo)、[Pipe](https://github.com/b3log/pipe)、[Sym](https://github.com/b3log/symphony) 需要效果统一的 Markdown 渲染，并且性能非常重要
-* 社区项目 [Vditor](https://github.com/b3log/vditor) 需要一款结构化的引擎作为支撑，才有可能构建出下一代的 Markdown 编辑器
+* 社区项目 [Vditor](https://github.com/b3log/vditor) 需要一款结构化的引擎作为支撑，实现下一代的 Markdown 编辑器，为未来而构建
 
 </details>
 
