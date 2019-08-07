@@ -42,7 +42,9 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 
 ## ⚡ 性能
 
-在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试的结果：
+在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试的结果如下：
+
+[Lute](https://github.com/b3log/lute)：
 
 ```
 BenchmarkLute-2   	     300	   4637583 ns/op	 2937242 B/op	   23281 allocs/op
@@ -50,7 +52,7 @@ BenchmarkLute-4   	     300	   4657646 ns/op	 2937484 B/op	   23281 allocs/op
 BenchmarkLute-8   	     300	   4737322 ns/op	 2938008 B/op	   23281 allocs/op
 ```
 
-[goldmark](https://github.com/yuin/goldmark) 的测试结果：
+[goldmark](https://github.com/yuin/goldmark)：
 
 ```
 BenchmarkGoldMark-2   	     300	   4724041 ns/op	 2110378 B/op	   13901 allocs/op
@@ -58,7 +60,7 @@ BenchmarkGoldMark-4   	     300	   4817211 ns/op	 2113808 B/op	   13902 allocs/o
 BenchmarkGoldMark-8   	     300	   4860328 ns/op	 2114412 B/op	   13902 allocs/op
 ```
 
-[golang-commonmark](https://gitlab.com/golang-commonmark/markdown) 的测试结果：
+[golang-commonmark](https://gitlab.com/golang-commonmark/markdown)：
 
 ```
 BenchmarkGolangCommonMark-2   	     300	   5099691 ns/op	 2973258 B/op	   18827 allocs/op
@@ -66,7 +68,7 @@ BenchmarkGolangCommonMark-4   	     300	   5083059 ns/op	 2973794 B/op	   18828 
 BenchmarkGolangCommonMark-8   	     300	   5103111 ns/op	 2974818 B/op	   18828 allocs/op
 ```
 
-[Blackfriday](https://github.com/russross/blackfriday) 的测试结果：
+[Blackfriday](https://github.com/russross/blackfriday)：
 
 ```
 BenchmarkBlackFriday-2   	     500	   3875623 ns/op	 3318457 B/op	   20052 allocs/op
