@@ -89,6 +89,17 @@ const (
 // items 定义了字节数组，每个字节是一个 token。
 type items []byte
 
+// replaceAll 会将 tokens 中的 old token 使用 new token 进行覆盖。
+func (tokens items) replaceAll(old, new byte) {
+	var i int
+	length := len(tokens)
+	for ; i < length; i++ {
+		if old == tokens[i] {
+			tokens[i] = new
+		}
+	}
+}
+
 // replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
 func (tokens items) replaceNewlineSpace() items {
 	length := len(tokens)

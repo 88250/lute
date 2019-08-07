@@ -15,8 +15,6 @@
 
 package lute
 
-import "strings"
-
 // CodeSpan 描述了代码节点结构。
 type CodeSpan struct {
 	*BaseNode
@@ -47,15 +45,16 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 	}
 	endPos = startPos + endPos + n
 
-	// TODO: 依然用 tokens，不要换 string
-	value := tokens[startPos+n : endPos].string()
-	value = strings.ReplaceAll(value, "\n", " ")
-	if 2 < len(value) && itemSpace == value[0] && itemSpace == value[len(value)-1] && 0 < len(strings.TrimSpace(value)) {
-		value = value[1:]
-		value = value[:len(value)-1]
+	textTokens := tokens[startPos+n : endPos]
+	length = len(textTokens)
+	textTokens.replaceAll(itemNewline, itemSpace)
+	if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !textTokens.isBlankLine() {
+		// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
+		textTokens = textTokens[1:]
+		textTokens = textTokens[:len(textTokens)-1]
 	}
 
-	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, tokens: toItems(value)}}
+	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, tokens: textTokens}}
 	t.context.pos = endPos + n
 
 	return
