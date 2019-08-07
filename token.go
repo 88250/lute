@@ -245,12 +245,22 @@ func (tokens items) acceptTokens(someTokens items) (pos int) {
 	return
 }
 
-func (tokens items) contain(someTokens ...byte) bool {
+func (tokens items) containOne(someTokens ...byte) bool {
 	for _, t := range tokens {
 		for _, it := range someTokens {
 			if t == it {
 				return true
 			}
+		}
+	}
+
+	return false
+}
+
+func (tokens items) contain(anotherToken byte) bool {
+	for _, t := range tokens {
+		if t == anotherToken {
+			return true
 		}
 	}
 

@@ -108,15 +108,10 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 
 	var info string
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
-	if itemBacktick == marker {
-		if !infoTokens.contain(itemBacktick) {
-			info = infoTokens.trim().string()
-		} else {
-			return nil // info 部分不能包含 `
-		}
-	} else {
-		info = infoTokens.trim().string()
+	if itemBacktick == marker && infoTokens.contain(itemBacktick) {
+		return nil // info 部分不能包含 `
 	}
+	info = infoTokens.trim().string()
 
 	info = unescapeString(info)
 	ret = &CodeBlock{&BaseNode{typ: NodeCodeBlock, tokens: make(items, 0, 256)},

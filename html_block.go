@@ -256,7 +256,7 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 				value = value[:len(value)-1]
 				return !value.contain(itemDoublequote), withAttr
 			}
-			return !value.containWhitespace() && !value.contain(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick), withAttr
+			return !value.containWhitespace() && !value.containOne(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick), withAttr
 		}
 	}
 	return true, withAttr
