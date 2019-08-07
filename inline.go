@@ -26,12 +26,16 @@ func (t *Tree) parseInlines() {
 	t.context.brackets = nil
 
 	Walk(t.Root, func(n Node, entering bool) (WalkStatus, error) {
-		typ := n.Type()
-		if !entering && (typ == NodeParagraph || typ == NodeHeading) {
+		if entering {
+			return WalkContinue, nil
+		}
+
+		if typ := n.Type(); NodeParagraph == typ || NodeHeading == typ {
 			for t.parseInline(n) {
 			}
 			t.processEmphasis(nil)
 		}
+
 		return WalkContinue, nil
 	})
 }
