@@ -90,7 +90,7 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	length := len(tokens)
 	if 2 > length {
 		t.context.pos++
-		return &Text{typ: NodeText, tokens: toItems("&")}
+		return &Text{tokens: toItems("&")}
 	}
 
 	start := t.context.pos
@@ -116,26 +116,26 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	entityName := tokens[start:i].string()
 	if entityValue, ok := htmlEntities[entityName]; ok { // 通过查表优化
 		t.context.pos += i - start
-		return &Text{typ: NodeText, tokens: toItems(entityValue)}
+		return &Text{tokens: toItems(entityValue)}
 	}
 
 	if !endWithSemicolon {
 		t.context.pos++
-		return &Text{typ: NodeText, tokens: toItems("&")}
+		return &Text{tokens: toItems("&")}
 	}
 
 	if numeric {
 		entityNameLen := len(entityName)
 		if 10 < entityNameLen || 4 > entityNameLen {
 			t.context.pos++
-			return &Text{typ: NodeText, tokens: toItems("&")}
+			return &Text{tokens: toItems("&")}
 		}
 
 		hex := 'x' == entityName[2] || 'X' == entityName[2]
 		if hex {
 			if 5 > entityNameLen {
 				t.context.pos++
-				return &Text{typ: NodeText, tokens: toItems("&")}
+				return &Text{tokens: toItems("&")}
 			}
 		}
 	}
@@ -143,10 +143,10 @@ func (t *Tree) parseEntity(tokens items) (ret Node) {
 	v := html.UnescapeString(entityName)
 	if v == entityName {
 		t.context.pos++
-		return &Text{typ: NodeText, tokens: toItems("&")}
+		return &Text{tokens: toItems("&")}
 	}
 	t.context.pos += i - start
-	return &Text{typ: NodeText, tokens: toItems(v)}
+	return &Text{tokens: toItems(v)}
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
@@ -157,7 +157,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 	if nil == opener {
 		t.context.pos++
 		// no matched opener, just return a literal
-		return &Text{typ: NodeText, tokens: toItems("]")}
+		return &Text{tokens: toItems("]")}
 	}
 
 	if !opener.active {
@@ -165,7 +165,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		// no matched opener, just return a literal
 		// take opener off brackets stack
 		t.removeBracket()
-		return &Text{typ: NodeText, tokens: toItems("]")}
+		return &Text{tokens: toItems("]")}
 	}
 
 	// If we got here, open is a potential opener
@@ -278,13 +278,13 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		t.removeBracket() // remove this opener from stack
 		t.context.pos = startPos
 		t.context.pos++
-		return &Text{typ: NodeText, tokens: toItems("]")}
+		return &Text{tokens: toItems("]")}
 	}
 }
 
 func (t *Tree) parseOpenBracket(tokens items) (ret Node) {
 	t.context.pos++
-	ret = &Text{typ: NodeText, tokens: toItems("[")}
+	ret = &Text{tokens: toItems("[")}
 	// Add entry to stack for this opener
 	t.addBracket(ret, t.context.pos, false)
 
@@ -319,10 +319,10 @@ func (t *Tree) parseBackslash(tokens items) (ret Node) {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
 		t.context.pos++
 	} else if isASCIIPunct(token) {
-		ret = &Text{typ: NodeText, tokens: items{token}}
+		ret = &Text{tokens: items{token}}
 		t.context.pos++
 	} else {
-		ret = &Text{typ: NodeText, tokens: toItems("\\")}
+		ret = &Text{tokens: toItems("\\")}
 	}
 
 	return
@@ -352,7 +352,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 		}
 	}
 
-	ret = &Text{typ: NodeText, tokens: tokens[start:t.context.pos]}
+	ret = &Text{tokens: tokens[start:t.context.pos]}
 
 	return
 }

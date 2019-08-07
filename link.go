@@ -79,7 +79,7 @@ func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 
 	t.context.pos += passed + 1
 	ret = &Link{&BaseNode{typ: NodeLink}, "mailto:" + dest, ""}
-	ret.AppendChild(ret, &Text{typ: NodeText, tokens: toItems(dest)})
+	ret.AppendChild(ret, &Text{tokens: toItems(dest)})
 
 	return
 }
@@ -115,7 +115,7 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 	}
 
 	t.context.pos = 1 + i
-	ret.AppendChild(ret, &Text{typ: NodeText, tokens: toItems(dest)})
+	ret.AppendChild(ret, &Text{tokens: toItems(dest)})
 
 	return
 }

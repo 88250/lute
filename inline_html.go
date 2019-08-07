@@ -22,7 +22,7 @@ type InlineHTML struct {
 
 func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	startPos := t.context.pos
-	ret = &Text{typ: NodeText, tokens: toItems("<")}
+	ret = &Text{tokens: toItems("<")}
 
 	var tags items
 	tags = append(tags, tokens[startPos])

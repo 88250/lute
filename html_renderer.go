@@ -117,9 +117,11 @@ func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
 }
 
 func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.Parent().Parent(); nil != grandparent && NodeList == grandparent.Type() {
-		if grandparent.(*List).tight {
-			return WalkContinue, nil
+	if grandparent := node.Parent().Parent(); nil != grandparent {
+		if list, ok := grandparent.(*List); ok {
+			if list.tight {
+				return WalkContinue, nil
+			}
 		}
 	}
 

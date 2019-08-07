@@ -24,7 +24,6 @@ type Text struct {
 	// 优化方案就是去掉嵌套的 BaseNode，将 BaseNode 的结构在 Text 中再做一次。
 	// 总的来说，不构造对象可以换来巨大的性能提升，但代价就是降低代码可读性，并且看上去会显得有些僵硬。
 
-	typ             int    // 节点类型
 	parent          Node   // 父节点
 	previous        Node   // 前一个兄弟节点
 	next            Node   // 后一个兄弟节点
@@ -38,7 +37,7 @@ type Text struct {
 }
 
 func (n *Text) Type() int {
-	return n.typ
+	return NodeText
 }
 
 func (n *Text) IsOpen() bool {

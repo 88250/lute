@@ -27,11 +27,11 @@ func (t *Tree) parseBang(tokens items) (ret Node) {
 	t.context.pos++
 	if itemOpenBracket == tokens[t.context.pos] {
 		t.context.pos++
-		ret = &Text{typ: NodeText, tokens: toItems("![")}
+		ret = &Text{tokens: toItems("![")}
 		// Add entry to stack for this opener
 		t.addBracket(ret, startPos+2, true)
 	} else {
-		ret = &Text{typ: NodeText, tokens: toItems("!")}
+		ret = &Text{tokens: toItems("!")}
 	}
 	return
 }
