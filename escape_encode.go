@@ -16,16 +16,18 @@
 package lute
 
 import (
+	"bytes"
 	"html"
 	"net/url"
 	"strings"
+	"unicode/utf8"
 )
 
 func escapeHTML(html items) (ret items) {
 	var i int
 	var token byte
 	tmp := html
-	for ; i < len(tmp); {
+	for i < len(tmp) {
 		token = tmp[i]
 		if itemAmpersand == token {
 			if 0 == len(ret) { // 通过延迟初始化减少内存分配，下同
@@ -144,71 +146,113 @@ func isBackslashEscape(items items, pos int) bool {
 	return 0 != backslashes%2
 }
 
-func encodeDestination(destination string) (ret string) {
-	if "" == destination {
-		return destination
-	}
+//
+//func encodeDestination(destination string) (ret string) {
+//	if "" == destination {
+//		return destination
+//	}
+//
+//	destination = decodeDestination(destination)
+//
+//	parts := strings.SplitN(destination, ":", 2)
+//	var scheme string
+//	remains := destination
+//	if 1 < len(parts) {
+//		scheme = parts[0]
+//		remains = parts[1]
+//	}
+//
+//	index := strings.Index(remains, "?")
+//	var query string
+//	path := remains
+//	if 0 <= index {
+//		query = remains[index+1:]
+//		queries := strings.Split(query, "&")
+//		query = ""
+//		length := len(queries)
+//		for i, q := range queries {
+//			kv := strings.Split(q, "=")
+//			if 1 < len(kv) {
+//				query += url.QueryEscape(kv[0]) + "=" + url.QueryEscape(kv[1])
+//			} else {
+//				query += url.QueryEscape(kv[0])
+//			}
+//			if i < length-1 {
+//				query += "&"
+//			}
+//		}
+//
+//		path = remains[:index]
+//	}
+//
+//	parts = strings.Split(path, "/")
+//	path = ""
+//	length := len(parts)
+//	for i, part := range parts {
+//		unescaped := url.PathEscape(part)
+//		path += unescaped
+//		if i < length-1 {
+//			path += "/"
+//		}
+//	}
+//
+//	if "" == scheme {
+//		ret = path
+//	} else {
+//		ret = scheme + ":" + path
+//	}
+//	if "" != query {
+//		ret += "?" + query
+//	}
+//
+//	ret = strings.ReplaceAll(ret, "%2A", "*")
+//	ret = strings.ReplaceAll(ret, "%29", ")")
+//	ret = strings.ReplaceAll(ret, "%28", "(")
+//	ret = strings.ReplaceAll(ret, "%23", "#")
+//	ret = strings.ReplaceAll(ret, "%2C", ",")
+//
+//	return
+//}
 
-	destination = decodeDestination(destination)
-
-	parts := strings.SplitN(destination, ":", 2)
-	var scheme string
-	remains := destination
-	if 1 < len(parts) {
-		scheme = parts[0]
-		remains = parts[1]
-	}
-
-	index := strings.Index(remains, "?")
-	var query string
-	path := remains
-	if 0 <= index {
-		query = remains[index+1:]
-		queries := strings.Split(query, "&")
-		query = ""
-		length := len(queries)
-		for i, q := range queries {
-			kv := strings.Split(q, "=")
-			if 1 < len(kv) {
-				query += url.QueryEscape(kv[0]) + "=" + url.QueryEscape(kv[1])
+// encodeDestination percent-encodes rawurl, avoiding double encoding.
+// It doesn't touch:
+// - alphanumeric characters ([0-9a-zA-Z]);
+// - percent-encoded characters (%[0-9a-fA-F]{2});
+// - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
+// Invalid UTF-8 sequences are replaced with U+FFFD.
+// https://gitlab.com/golang-commonmark/mdurl
+func encodeDestination(rawurl string) string {
+	const hexdigit = "0123456789ABCDEF"
+	var buf bytes.Buffer
+	i := 0
+	for i < len(rawurl) {
+		r, rlen := utf8.DecodeRuneInString(rawurl[i:])
+		if r >= 0x80 {
+			for j, n := i, i+rlen; j < n; j++ {
+				b := rawurl[j]
+				buf.WriteByte('%')
+				buf.WriteByte(hexdigit[(b>>4)&0xf])
+				buf.WriteByte(hexdigit[b&0xf])
+			}
+		} else if r == '%' {
+			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1]) && isHexDigit(rawurl[i+2]) {
+				buf.WriteByte('%')
+				buf.WriteByte(tokenToUpper(rawurl[i+1]))
+				buf.WriteByte(tokenToUpper(rawurl[i+2]))
+				i += 2
 			} else {
-				query += url.QueryEscape(kv[0])
+				buf.WriteString("%25")
 			}
-			if i < length-1 {
-				query += "&"
-			}
+		} else if strings.IndexByte("!#$&'()*+,-./0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~", byte(r)) == -1 {
+			buf.WriteByte('%')
+			buf.WriteByte(hexdigit[(r>>4)&0xf])
+			buf.WriteByte(hexdigit[r&0xf])
+		} else {
+			buf.WriteByte(byte(r))
 		}
-
-		path = remains[:index]
+		i += rlen
 	}
-
-	parts = strings.Split(path, "/")
-	path = ""
-	length := len(parts)
-	for i, part := range parts {
-		unescaped := url.PathEscape(part)
-		path += unescaped
-		if i < length-1 {
-			path += "/"
-		}
-	}
-
-	if "" == scheme {
-		ret = path
-	} else {
-		ret = scheme + ":" + path
-	}
-	if "" != query {
-		ret += "?" + query
-	}
-
-	ret = strings.ReplaceAll(ret, "%2A", "*")
-	ret = strings.ReplaceAll(ret, "%29", ")")
-	ret = strings.ReplaceAll(ret, "%28", "(")
-	ret = strings.ReplaceAll(ret, "%23", "#")
-	ret = strings.ReplaceAll(ret, "%2C", ",")
-
-	return
+	return buf.String()
 }
 
 func decodeDestination(destination string) (ret string) {

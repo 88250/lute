@@ -32,7 +32,18 @@ func isUnicodeWhitespace(token byte) bool {
 }
 
 func isDigit(token byte) bool {
-	return unicode.IsDigit(rune(token))
+	return '0' <= token && '9' >= token
+}
+
+func isHexDigit(token byte) bool {
+	return isDigit(token) || token >= 'a' && token <= 'f' || token >= 'A' && token <= 'F'
+}
+
+func tokenToUpper(token byte) byte {
+	if token >= 'a' && token <= 'z' {
+		return token - 'a' + 'A'
+	}
+	return token
 }
 
 func isPunct(token byte) bool {
