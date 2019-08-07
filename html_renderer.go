@@ -50,10 +50,14 @@ func NewHTMLRenderer() (ret *Renderer) {
 
 func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Image)
-	var out string
+	var out items
 	if entering {
 		if 0 == r.disableTags {
-			out = "<img src=\"" + escapeHTML(n.Destination) + "\" alt=\""
+			out = toItems("<img src=\"")
+			r.WriteString(out)
+			out = escapeHTML(toItems(n.Destination))
+			r.WriteString(out)
+			out = toItems("\" alt=\"")
 			r.WriteString(out)
 		}
 		r.disableTags++
@@ -62,11 +66,13 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 
 	r.disableTags--
 	if 0 == r.disableTags {
-		out = "\""
+		out = toItems("\"")
 		if "" != n.Title {
-			out += " title=\"" + escapeHTML(n.Title) + "\""
+			out = append(out, toItems(" title=\"")...)
+			out = append(out, escapeHTML(toItems(n.Title))...)
+			out = append(out, toItems("\"")...)
 		}
-		out += " />"
+		out = append(out, toItems(" />")...)
 		r.WriteString(out)
 	}
 	return WalkContinue, nil
@@ -75,9 +81,9 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderLink(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*Link)
-		attrs := [][]string{{"href", escapeHTML(n.Destination)}}
+		attrs := [][]string{{"href", fromItems(escapeHTML(toItems(n.Destination)))}}
 		if "" != n.Title {
-			attrs = append(attrs, []string{"title", escapeHTML(n.Title)})
+			attrs = append(attrs, []string{"title", fromItems(escapeHTML(toItems(n.Title)))})
 		}
 		r.tag("a", attrs, false)
 
@@ -145,11 +151,11 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 
 func (r *Renderer) renderCodeSpan(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<code>" + escapeHTML(node.Value()))
-
+		r.WriteString(toItems("<code>"))
+		r.WriteString(escapeHTML(node.Value()))
 		return WalkSkipChildren, nil
 	}
-	r.WriteString("</code>")
+	r.WriteString(toItems("</code>"))
 	return WalkContinue, nil
 }
 
@@ -159,13 +165,15 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 		n := node.(*CodeBlock)
 		if "" != n.info {
 			infoWords := strings.Fields(n.info)
-			r.WriteString("<pre><code class=\"language-" + infoWords[0] + "\">" + escapeHTML(n.value))
+			r.WriteString(toItems("<pre><code class=\"language-" + infoWords[0] + "\">"))
+			r.WriteString(escapeHTML(n.value))
 		} else {
-			r.WriteString("<pre><code>" + escapeHTML(n.value))
+			r.WriteString(toItems("<pre><code>"))
+			r.WriteString(escapeHTML(n.value))
 		}
 		return WalkSkipChildren, nil
 	}
-	r.WriteString("</code></pre>")
+	r.WriteString(toItems("</code></pre>"))
 	r.Newline()
 	return WalkContinue, nil
 }
@@ -181,9 +189,10 @@ func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) 
 
 func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<strong>" + node.Value())
+		r.WriteString(toItems("<strong>"))
+		r.WriteString(node.Value())
 	} else {
-		r.WriteString("</strong>")
+		r.WriteString(toItems("</strong>"))
 	}
 	return WalkContinue, nil
 }
@@ -191,11 +200,11 @@ func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.Newline()
-		r.WriteString("<blockquote>")
+		r.WriteString(toItems("<blockquote>"))
 		r.Newline()
 	} else {
 		r.Newline()
-		r.WriteString("</blockquote>")
+		r.WriteString(toItems("</blockquote>"))
 		r.Newline()
 	}
 	return WalkContinue, nil
@@ -205,9 +214,9 @@ func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Heading)
 	if entering {
 		r.Newline()
-		r.WriteString("<h" + " 123456"[n.Level:n.Level+1] + ">")
+		r.WriteString(toItems("<h" + " 123456"[n.Level:n.Level+1] + ">"))
 	} else {
-		r.WriteString("</h" + " 123456"[n.Level:n.Level+1] + ">")
+		r.WriteString(toItems("</h" + " 123456"[n.Level:n.Level+1] + ">"))
 		r.Newline()
 	}
 	return WalkContinue, nil
@@ -278,14 +287,14 @@ func (r *Renderer) tag(name string, attrs [][]string, selfclosing bool) {
 		return
 	}
 
-	r.WriteString("<" + name)
+	r.WriteString(toItems("<" + name))
 	if 0 < len(attrs) {
 		for _, attr := range attrs {
-			r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
+			r.WriteString(toItems(" " + attr[0] + "=\"" + attr[1] + "\""))
 		}
 	}
 	if selfclosing {
-		r.WriteString(" /")
+		r.WriteString(toItems(" /"))
 	}
-	r.WriteString(">")
+	r.WriteString(toItems(">"))
 }

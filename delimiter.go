@@ -76,7 +76,7 @@ func (t *Tree) handleDelim(block Node, tokens items) {
 	startPos := t.context.pos
 	delim := t.scanDelims(tokens)
 
-	_, text := t.extractTokens(tokens, startPos, t.context.pos)
+	text, _ := t.extractTokens(tokens, startPos, t.context.pos)
 	node := &Text{typ: NodeText, value: text}
 	block.AppendChild(block, node)
 

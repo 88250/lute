@@ -22,7 +22,7 @@ type InlineHTML struct {
 
 func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 	startPos := t.context.pos
-	ret = &Text{typ: NodeText, value: "<"}
+	ret = &Text{typ: NodeText, value: items("<")}
 
 	var tags items
 	tags = append(tags, tokens[startPos])
@@ -55,25 +55,25 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 		tags = append(tags, comment...)
 		tokens = remains
 		t.context.pos += len(tags)
-		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.string()}}
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags}}
 		return
 	} else if valid, remains, ins := t.parseProcessingInstruction(tokens[t.context.pos+1:]); valid {
 		tags = append(tags, ins...)
 		tokens = remains
 		t.context.pos += len(tags)
-		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.string()}}
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags}}
 		return
 	} else if valid, remains, decl := t.parseDeclaration(tokens[t.context.pos+1:]); valid {
 		tags = append(tags, decl...)
 		tokens = remains
 		t.context.pos += len(tags)
-		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.string()}}
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags}}
 		return
 	} else if valid, remains, cdata := t.parseCDATA(tokens[t.context.pos+1:]); valid {
 		tags = append(tags, cdata...)
 		tokens = remains
 		t.context.pos += len(tags)
-		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.string()}}
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags}}
 		return
 	} else {
 		t.context.pos++
@@ -95,7 +95,7 @@ func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
 			tags = append(tags, tokens[1])
 		}
 		t.context.pos += len(tags)
-		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags.string()}}
+		ret = &InlineHTML{&BaseNode{typ: NodeInlineHTML, tokens: tags, value: tags}}
 		return
 	}
 

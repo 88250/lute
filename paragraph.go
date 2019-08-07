@@ -15,8 +15,6 @@
 
 package lute
 
-import "strings"
-
 // Paragraph 描述了段落节点结构。
 type Paragraph struct {
 	*BaseNode
@@ -34,7 +32,7 @@ func (p *Paragraph) Continue(context *Context) int {
 }
 
 func (p *Paragraph) Finalize(context *Context) {
-	p.value = strings.TrimSpace(p.value)
+	p.value = p.value.trim()
 	p.tokens = p.tokens.trim()
 
 	// try parsing the beginning as link reference definitions:

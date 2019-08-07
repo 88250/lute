@@ -30,7 +30,7 @@ type Text struct {
 	firstChild      Node   // 第一个子节点
 	lastChild       Node   // 最后一个子节点
 	rawText         string // 原始内容
-	value           string // 原始内容处理后的值
+	value           items  // 原始内容处理后的值
 	tokens          items  // 词法分析结果 tokens
 	close           bool   // 标识是否关闭
 	lastLineBlank   bool   // 标识最后一行是否是空行
@@ -160,16 +160,16 @@ func (n *Text) AppendRawText(rawText string) {
 	n.rawText += rawText
 }
 
-func (n *Text) Value() string {
+func (n *Text) Value() items {
 	return n.value
 }
 
-func (n *Text) SetValue(value string) {
+func (n *Text) SetValue(value items) {
 	n.value = value
 }
 
-func (n *Text) AppendValue(value string) {
-	n.value += value
+func (n *Text) AppendValue(value items) {
+	n.value = append(n.value, value...)
 }
 
 func (n *Text) Tokens() items {

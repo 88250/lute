@@ -32,7 +32,7 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 		}
 	}
 
-	backticks := tokens[startPos : startPos+n].string()
+	backticks := tokens[startPos : startPos+n]
 	if length <= startPos+n {
 		t.context.pos += n
 		ret = &Text{typ: NodeText, value: backticks}
@@ -54,7 +54,7 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 		value = value[:len(value)-1]
 	}
 
-	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, value: value}}
+	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, value: toItems(value)}}
 	t.context.pos = endPos + n
 
 	return

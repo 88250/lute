@@ -16,6 +16,7 @@
 package lute
 
 import (
+	"bytes"
 	"html"
 	"net/url"
 	"strings"
@@ -28,12 +29,96 @@ var htmlEscaper = strings.NewReplacer(
 	`"`, "&quot;",
 )
 
-func escapeHTML(html string) string {
-	if "" == html {
+func escapeHTML(html items) (ret items) {
+	if bytes.Equal(toItems(""), html) {
 		return html
 	}
 
-	return htmlEscaper.Replace(html)
+	var i int
+	var token byte
+	tmp := html
+	for ; i < len(tmp); {
+		token = tmp[i]
+		if itemAmpersand == token {
+			if 0 == len(ret) { // 通过延迟初始化减少内存分配，下同
+				ret = make([]byte, len(html), len(html))
+				copy(ret, html)
+			}
+
+			ret = append(ret, 0, 0, 0, 0)
+			copy(ret[i+4:], ret[i:])
+			ret[i] = '&'
+			ret[i+1] = 'a'
+			ret[i+2] = 'm'
+			ret[i+3] = 'p'
+			ret[i+4] = ';'
+			tmp = ret
+			i += 5
+
+			continue
+		}
+
+		if itemLess == token {
+			if 0 == len(ret) {
+				ret = make([]byte, len(html), len(html))
+				copy(ret, html)
+			}
+
+			ret = append(ret, 0, 0, 0)
+			copy(ret[i+3:], ret[i:])
+			ret[i] = '&'
+			ret[i+1] = 'l'
+			ret[i+2] = 't'
+			ret[i+3] = ';'
+			tmp = ret
+			i += 4
+			continue
+		}
+
+		if itemGreater == token {
+			if 0 == len(ret) {
+				ret = make([]byte, len(html), len(html))
+				copy(ret, html)
+			}
+
+			ret = append(ret, 0, 0, 0)
+			copy(ret[i+3:], ret[i:])
+			ret[i] = '&'
+			ret[i+1] = 'g'
+			ret[i+2] = 't'
+			ret[i+3] = ';'
+			tmp = ret
+			i += 4
+			continue
+		}
+
+		if itemDoublequote == token {
+			if 0 == len(ret) {
+				ret = make([]byte, len(html), len(html))
+				copy(ret, html)
+			}
+
+			ret = append(ret, 0, 0, 0, 0, 0)
+			copy(ret[i+5:], ret[i:])
+			ret[i] = '&'
+			ret[i+1] = 'q'
+			ret[i+2] = 'u'
+			ret[i+3] = 'o'
+			ret[i+4] = 't'
+			ret[i+5] = ';'
+			tmp = ret
+			i += 6
+			continue
+		}
+
+		i++
+	}
+
+	if 0 == len(ret) {
+		return html
+	}
+
+	return
 }
 
 func unescapeString(str string) string {

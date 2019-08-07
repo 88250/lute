@@ -27,14 +27,14 @@ type RendererFunc func(n Node, entering bool) (WalkStatus, error)
 // Renderer 描述了渲染器结构。
 type Renderer struct {
 	writer        strings.Builder      // 输出缓冲
-	lastOut       string               // 最新的输出内容
+	lastOut       byte                 // 最新输出的一个字节
 	rendererFuncs map[int]RendererFunc // 渲染器
 	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况。比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 }
 
 // Render 渲染指定的节点 n。
 func (r *Renderer) Render(n Node) error {
-	r.lastOut = "\n"
+	r.lastOut = itemNewline
 	return Walk(n, func(n Node, entering bool) (WalkStatus, error) {
 		f := r.rendererFuncs[n.Type()]
 		if nil == f {
@@ -45,15 +45,23 @@ func (r *Renderer) Render(n Node) error {
 	})
 }
 
+func (r *Renderer) WriteByte(c byte) {
+	r.writer.WriteByte(c)
+	r.lastOut = c
+}
+
 // WriteString 输出指定的字符串 content。
-func (r *Renderer) WriteString(content string) {
-	r.writer.WriteString(content)
-	r.lastOut = content
+func (r *Renderer) WriteString(content items) {
+	length := len(content)
+	if 0 < length {
+		r.writer.Write(content)
+		r.lastOut = content[length-1]
+	}
 }
 
 // Newline 会在最新内容不是换行符 \n 时输出一个换行符。
 func (r *Renderer) Newline() {
-	if "\n" != r.lastOut {
-		r.WriteString("\n")
+	if r.lastOut != itemNewline {
+		r.WriteByte(itemNewline)
 	}
 }

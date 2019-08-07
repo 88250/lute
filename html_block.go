@@ -37,7 +37,7 @@ func (html *HTMLBlock) Continue(context *Context) int {
 }
 
 func (html *HTMLBlock) Finalize(context *Context) {
-	html.value = html.tokens.replaceNewlineSpace().trimRight().string()
+	html.value = html.tokens.replaceNewlineSpace().trimRight()
 	html.tokens = nil
 }
 

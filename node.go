@@ -72,13 +72,13 @@ type Node interface {
 	AppendRawText(string)
 
 	// Value 返回节点值。节点值即根据原始内容处理后的值。
-	Value() string
+	Value() items
 
 	// SetValue 设置节点值。
-	SetValue(string)
+	SetValue(items)
 
 	// AppendValue 添加节点值。
-	AppendValue(string)
+	AppendValue(items)
 
 	// Tokens 返回所有 tokens。
 	Tokens() items
@@ -134,7 +134,7 @@ type BaseNode struct {
 	firstChild      Node   // 第一个子节点
 	lastChild       Node   // 最后一个子节点
 	rawText         string // 原始内容
-	value           string // 原始内容处理后的值
+	value           items // 原始内容处理后的值
 	tokens          items  // 词法分析结果 tokens
 	close           bool   // 标识是否关闭
 	lastLineBlank   bool   // 标识最后一行是否是空行
@@ -264,16 +264,16 @@ func (n *BaseNode) AppendRawText(rawText string) {
 	n.rawText += rawText
 }
 
-func (n *BaseNode) Value() string {
+func (n *BaseNode) Value() items {
 	return n.value
 }
 
-func (n *BaseNode) SetValue(value string) {
+func (n *BaseNode) SetValue(value items) {
 	n.value = value
 }
 
-func (n *BaseNode) AppendValue(value string) {
-	n.value += value
+func (n *BaseNode) AppendValue(value items) {
+	n.value = append(n.value, value...)
 }
 
 func (n *BaseNode) Tokens() items {
