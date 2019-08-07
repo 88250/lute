@@ -42,21 +42,39 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 
 ## ⚡ 性能
 
-以下是对 [CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt)（~198K，9700 行）跑基准测试的结果：
+在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt)，197K+，9700+ 行）跑基准测试的结果：
 
 ```
-BenchmarkLute-2   	     300	   5128026 ns/op	 3246187 B/op	   23291 allocs/op
-BenchmarkLute-4   	     300	   5007540 ns/op	 3246579 B/op	   23292 allocs/op
-BenchmarkLute-8   	     300	   5030987 ns/op	 3247453 B/op	   23293 allocs/op
+BenchmarkLute-2   	     300	   4637583 ns/op	 2937242 B/op	   23281 allocs/op
+BenchmarkLute-4   	     300	   4657646 ns/op	 2937484 B/op	   23281 allocs/op
+BenchmarkLute-8   	     300	   4737322 ns/op	 2938008 B/op	   23281 allocs/op
 ```
 
-Lute 在性能方面还有很大优化空间，目标是做到至少和 [goldmark](https://github.com/yuin/goldmark) 一样快（不得不说，goldmark 真的很快）。
+[goldmark](https://github.com/yuin/goldmark) 的测试结果：
 
 ```
 BenchmarkGoldMark-2   	     300	   4724041 ns/op	 2110378 B/op	   13901 allocs/op
 BenchmarkGoldMark-4   	     300	   4817211 ns/op	 2113808 B/op	   13902 allocs/op
 BenchmarkGoldMark-8   	     300	   4860328 ns/op	 2114412 B/op	   13902 allocs/op
 ```
+
+[golang-commonmark](https://gitlab.com/golang-commonmark/markdown) 的测试结果：
+
+```
+BenchmarkGolangCommonMark-2   	     300	   5099691 ns/op	 2973258 B/op	   18827 allocs/op
+BenchmarkGolangCommonMark-4   	     300	   5083059 ns/op	 2973794 B/op	   18828 allocs/op
+BenchmarkGolangCommonMark-8   	     300	   5103111 ns/op	 2974818 B/op	   18828 allocs/op
+```
+
+[Blackfriday](https://github.com/russross/blackfriday) 的测试结果：
+
+```
+BenchmarkBlackFriday-2   	     500	   3875623 ns/op	 3318457 B/op	   20052 allocs/op
+BenchmarkBlackFriday-4   	     500	   3783871 ns/op	 3334775 B/op	   20056 allocs/op
+BenchmarkBlackFriday-8   	     500	   3917515 ns/op	 3341045 B/op	   20058 allocs/op
+```
+
+Blackfriday 没有实现 CommonMark 所以性能好一些。在实现 CommonMark 规范的前提下，Lute 的性能目前是最好的。
 
 ## 📜 文档
 
