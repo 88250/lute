@@ -46,7 +46,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 
 在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试的结果如下：
 
-### [Lute](https://github.com/b3log/lute)：
+### [Lute](https://github.com/b3log/lute)
 
 ```
 BenchmarkLute-2   	     300	   4637583 ns/op	 2937242 B/op	   23281 allocs/op
@@ -54,7 +54,7 @@ BenchmarkLute-4   	     300	   4657646 ns/op	 2937484 B/op	   23281 allocs/op
 BenchmarkLute-8   	     300	   4737322 ns/op	 2938008 B/op	   23281 allocs/op
 ```
 
-### [goldmark](https://github.com/yuin/goldmark)：
+### [goldmark](https://github.com/yuin/goldmark)
 
 ```
 BenchmarkGoldMark-2   	     300	   4724041 ns/op	 2110378 B/op	   13901 allocs/op
@@ -62,7 +62,7 @@ BenchmarkGoldMark-4   	     300	   4817211 ns/op	 2113808 B/op	   13902 allocs/o
 BenchmarkGoldMark-8   	     300	   4860328 ns/op	 2114412 B/op	   13902 allocs/op
 ```
 
-### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)：
+### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
 
 ```
 BenchmarkGolangCommonMark-2   	     300	   5099691 ns/op	 2973258 B/op	   18827 allocs/op
@@ -70,7 +70,7 @@ BenchmarkGolangCommonMark-4   	     300	   5083059 ns/op	 2973794 B/op	   18828 
 BenchmarkGolangCommonMark-8   	     300	   5103111 ns/op	 2974818 B/op	   18828 allocs/op
 ```
 
-### [Blackfriday](https://github.com/russross/blackfriday)：
+### [Blackfriday](https://github.com/russross/blackfriday)
 
 ```
 BenchmarkBlackFriday-2   	     500	   3875623 ns/op	 3318457 B/op	   20052 allocs/op
@@ -80,7 +80,7 @@ BenchmarkBlackFriday-8   	     500	   3917515 ns/op	 3341045 B/op	   20058 alloc
 
 Blackfriday 没有实现 CommonMark 所以性能好一些。在实现 CommonMark 规范的前提下，Lute 的性能目前是最好的。
 
-### [markdown-it](https://github.com/markdown-it/markdown-it)：
+### [markdown-it](https://github.com/markdown-it/markdown-it)
 
 markdown-it 是 JavaScript 写的，它同样实现了 CommonMark 规范。循环渲染 300 次，平均每次调用耗时 9285933ns（9.2ms），耗时大致是 golang 实现的两倍。
 
