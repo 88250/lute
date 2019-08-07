@@ -215,7 +215,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 
 	var reflabel string
 	if !matched {
-		// Next, see if there's a link label
+		// 尝试解析链接 label
 		var beforelabel = t.context.pos + 1
 		passed, _, label := t.context.parseLinkLabel(tokens[beforelabel:])
 		var n = len(passed)
@@ -233,7 +233,7 @@ func (t *Tree) parseCloseBracket(tokens items) Node {
 		}
 
 		if "" != reflabel {
-			// lookup rawlabel in refmap
+			// 查找链接引用
 			var link = t.context.linkRefDef[strings.ToLower(reflabel)]
 			if nil != link {
 				dest = link.Destination
