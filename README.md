@@ -80,6 +80,10 @@ BenchmarkBlackFriday-8   	     500	   3917515 ns/op	 3341045 B/op	   20058 alloc
 
 Blackfriday 没有实现 CommonMark 所以性能好一些。在实现 CommonMark 规范的前提下，Lute 的性能目前是最好的。
 
+[markdown-it](https://github.com/markdown-it/markdown-it)：
+
+markdown-it 是 JavaScript 写的，它同样实现了 CommonMark 规范。循环渲染 300 次，平均每次调用耗时 9285933ns（9.2ms），耗时大致是 golang 实现的两倍。
+
 ## 📜 文档
 
 TBD
