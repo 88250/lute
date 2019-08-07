@@ -29,7 +29,7 @@ func escapeHTML(html items) (ret items) {
 		token = tmp[i]
 		if itemAmpersand == token {
 			if 0 == len(ret) { // 通过延迟初始化减少内存分配，下同
-				ret = make([]byte, len(html), len(html))
+				ret = make(items, len(html), len(html))
 				copy(ret, html)
 				tmp = ret
 			}
@@ -48,7 +48,7 @@ func escapeHTML(html items) (ret items) {
 
 		if itemLess == token {
 			if 0 == len(ret) {
-				ret = make([]byte, len(html), len(html))
+				ret = make(items, len(html), len(html))
 				copy(ret, html)
 				tmp = ret
 			}
@@ -65,7 +65,7 @@ func escapeHTML(html items) (ret items) {
 
 		if itemGreater == token {
 			if 0 == len(ret) {
-				ret = make([]byte, len(html), len(html))
+				ret = make(items, len(html), len(html))
 				copy(ret, html)
 				tmp = ret
 			}
@@ -82,7 +82,7 @@ func escapeHTML(html items) (ret items) {
 
 		if itemDoublequote == token {
 			if 0 == len(ret) {
-				ret = make([]byte, len(html), len(html))
+				ret = make(items, len(html), len(html))
 				copy(ret, html)
 				tmp = ret
 			}

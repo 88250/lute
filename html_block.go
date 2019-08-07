@@ -106,7 +106,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 		return nil
 	}
 
-	ret = &HTMLBlock{&BaseNode{typ: NodeHTMLBlock, tokens: make([]byte, 0, 256)}, 1}
+	ret = &HTMLBlock{&BaseNode{typ: NodeHTMLBlock, tokens: make(items, 0, 256)}, 1}
 
 	if pos := tokens.acceptTokenss(htmlBlockTags1); 0 <= pos {
 		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {

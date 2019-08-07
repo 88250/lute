@@ -274,6 +274,8 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 		return
 	}
 
+	passed = make(items, 0, len(tokens))
+
 	line := tokens
 	closed := false
 	i := 1
