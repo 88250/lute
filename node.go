@@ -296,7 +296,9 @@ func (n *BaseNode) AppendChild(this, child Node) {
 }
 
 const (
-	NodeRoot          = iota // 根节点类
+	// CommonMark
+
+	NodeDocument      = iota // 根节点类
 	NodeParagraph            // 段落节点
 	NodeHeading              // 标题节点
 	NodeThematicBreak        // 分隔线节点
@@ -314,4 +316,8 @@ const (
 	NodeSoftBreak            // 软换行节点
 	NodeLink                 // 链接节点
 	NodeImage                // 图片节点
+
+	// GFM
+
+	NodeStrikethrough // 删除线节点
 )

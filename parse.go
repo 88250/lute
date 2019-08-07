@@ -23,7 +23,7 @@ func Parse(name string, text []byte) (t *Tree, err error) {
 
 	t = &Tree{Name: name, text: text, context: &Context{}}
 	t.lex = lex(t.text)
-	t.Root = &Document{&BaseNode{typ: NodeRoot}}
+	t.Root = &Document{&BaseNode{typ: NodeDocument}}
 	t.parseBlocks()
 	t.parseInlines()
 	t.lex = nil

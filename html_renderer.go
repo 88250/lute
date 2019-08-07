@@ -24,9 +24,9 @@ import (
 func NewHTMLRenderer() (ret *Renderer) {
 	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}}
 
-	// 注册渲染器函数
+	// 注册 CommonMark 渲染函数
 
-	ret.rendererFuncs[NodeRoot] = ret.renderRoot
+	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
@@ -45,7 +45,20 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
 
+	// 注册 GFM 渲染函数
+
+	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
+
 	return
+}
+
+func (r *Renderer) renderStrikethrough(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("del", nil, false)
+	} else {
+		r.tag("/del", nil, false)
+	}
+	return WalkContinue, nil
 }
 
 func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
@@ -112,7 +125,7 @@ func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderRoot(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderDocument(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
