@@ -164,14 +164,15 @@ func (t *Tree) incorporateLine(line items) {
 	}
 }
 
-type startFunc func(t *Tree, container Node) int
+// blockStartFunc 定义了用于判断块是否开始的函数签名。
+type blockStartFunc func(t *Tree, container Node) int
 
 // blockStarts 定义了一系列函数，每个函数用于判断某种块节点是否可以开始，返回值：
 // 0：不匹配
 // 1：匹配到块容器，需要继续迭代下降
 // 2：匹配到叶子块
-var blockStarts = []startFunc{
-	// 块引用
+var blockStarts = []blockStartFunc{
+	// 用于判断块引用（>）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
@@ -193,7 +194,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// ATX 标题
+	// 用于判断 ATX 标题（#）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if heading := t.parseATXHeading(); nil != heading {
@@ -211,7 +212,7 @@ var blockStarts = []startFunc{
 
 	},
 
-	// 围栏代码块
+	// 用于判断围栏代码块（```）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if codeBlock := t.parseFencedCode(); nil != codeBlock {
@@ -225,7 +226,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// HTML 块
+	// 用于判断 HTML 块（<）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
@@ -241,7 +242,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// Setext 标题
+	// 用于判断 Setext 标题（- =）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented && container.Type() == NodeParagraph {
 			if heading := t.parseSetextHeading(); nil != heading {
@@ -267,7 +268,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// 分隔线
+	// 用于判断分隔线（--- ***）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if thematicBreak := t.parseThematicBreak(); nil != thematicBreak {
@@ -280,7 +281,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// 列表项
+	// 用于判断列表项或者列表项（* - + 1.）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented || container.Type() == NodeList {
 			data := t.parseListMarker(container)
@@ -308,7 +309,7 @@ var blockStarts = []startFunc{
 		return 0
 	},
 
-	// 缩进代码块
+	// 用于判断缩进代码块（    code）是否开始
 	func(t *Tree, container Node) int {
 		if t.context.indented && t.context.tip.Type() != NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)
@@ -320,11 +321,11 @@ var blockStarts = []startFunc{
 	},
 }
 
-// Add a line to the block at the tip.  We assume the tip
-// can accept lines -- that check should be done before calling this.
+// addLine 用于在当前的末梢节点 context.tip 上添加迭代行剩余的所有 tokens。
+// 调用该方法前必须确认末梢 tip 能够接受新行。
 func (t *Tree) addLine() {
 	if t.context.partiallyConsumedTab {
-		t.context.offset += 1 // skip over tab
+		t.context.offset++ // skip over tab
 		// add space characters:
 		var charsToTab = 4 - (t.context.column % 4)
 		for i := 0; i < charsToTab; i++ {
