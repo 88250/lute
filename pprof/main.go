@@ -23,13 +23,13 @@ import (
 )
 
 func main() {
-	spec := "commonmark-0.29-spec"
+	spec := "test/commonmark-0.29-spec"
 	bytes, err := ioutil.ReadFile(spec + ".md")
 	if nil != err {
 		panic(err)
 	}
 
-	cpuProfile, _ := os.Create("cpu_profile")
+	cpuProfile, _ := os.Create("pprof/cpu_profile")
 	pprof.StartCPUProfile(cpuProfile)
 	for i := 0; i < 100; i++ {
 		tree, err := lute.Parse("spec text", bytes)

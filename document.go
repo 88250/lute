@@ -15,7 +15,7 @@
 
 package lute
 
-// Document 描述了根节点。
+// Document 描述了根节点结构。
 type Document struct {
 	*BaseNode
 }

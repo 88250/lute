@@ -13,11 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lute
+package test
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/b3log/lute"
 	"io/ioutil"
 	"strconv"
 	"testing"
@@ -46,12 +47,12 @@ func TestSpec(t *testing.T) {
 	for _, test := range testcases {
 		testName := test.Section + " " + strconv.Itoa(test.Example)
 		fmt.Println("Test [" + testName + "]")
-		tree, err := ParseStr(testName, test.Markdown)
+		tree, err := lute.ParseStr(testName, test.Markdown)
 		if nil != err {
 			t.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
 		}
 
-		renderer := NewHTMLRenderer()
+		renderer := lute.NewHTMLRenderer()
 		html, err := tree.Render(renderer)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)

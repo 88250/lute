@@ -13,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lute
+package test
 
 import (
 	"fmt"
+	"github.com/b3log/lute"
 	"testing"
 )
 
@@ -239,12 +240,12 @@ var parseTests = []parseTest{
 func TestParse(t *testing.T) {
 	for _, test := range parseTests {
 		fmt.Println("Test [" + test.name + "]")
-		tree, err := ParseStr(test.name, test.input)
+		tree, err := lute.ParseStr(test.name, test.input)
 		if nil != err {
 			t.Fatalf("%q: unexpected error: %v", test.name, err)
 		}
 
-		renderer := NewHTMLRenderer()
+		renderer := lute.NewHTMLRenderer()
 		html, err := tree.Render(renderer)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
