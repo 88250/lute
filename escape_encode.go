@@ -16,24 +16,12 @@
 package lute
 
 import (
-	"bytes"
 	"html"
 	"net/url"
 	"strings"
 )
 
-var htmlEscaper = strings.NewReplacer(
-	`&`, "&amp;",
-	`<`, "&lt;",
-	`>`, "&gt;",
-	`"`, "&quot;",
-)
-
 func escapeHTML(html items) (ret items) {
-	if bytes.Equal(toItems(""), html) {
-		return html
-	}
-
 	var i int
 	var token byte
 	tmp := html

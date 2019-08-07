@@ -45,15 +45,9 @@ func (r *Renderer) Render(n Node) error {
 	})
 }
 
-func (r *Renderer) WriteByte(c byte) {
-	r.writer.WriteByte(c)
-	r.lastOut = c
-}
-
-// WriteString 输出指定的字符串 content。
-func (r *Renderer) WriteString(content items) {
-	length := len(content)
-	if 0 < length {
+// Write 输出指定的字符串 content。
+func (r *Renderer) Write(content items) {
+	if length := len(content); 0 < length {
 		r.writer.Write(content)
 		r.lastOut = content[length-1]
 	}
@@ -61,7 +55,8 @@ func (r *Renderer) WriteString(content items) {
 
 // Newline 会在最新内容不是换行符 \n 时输出一个换行符。
 func (r *Renderer) Newline() {
-	if r.lastOut != itemNewline {
-		r.WriteByte(itemNewline)
+	if itemNewline != r.lastOut {
+		r.writer.WriteByte(itemNewline)
+		r.lastOut = itemNewline
 	}
 }
