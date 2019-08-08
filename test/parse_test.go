@@ -28,10 +28,15 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
+	// gfm spec block-level cases
+
+	{"gfm279", "- [ ] foo\n- [x] bar\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\"> foo</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\"> bar</li>\n</ul>\n"},
+	{"gfm280", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\"> foo\n<ul>\n<li><input disabled=\"\" type=\"checkbox\"> bar</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\"> baz</li>\n</ul>\n</li>\n<li><input disabled=\"\" type=\"checkbox\"> bim</li>\n</ul>\n"},
+
 	// gfm spec inline-level cases
 
-	{"gmf491", "~~Hi~~ Hello, world!", "<p><del>Hi</del> Hello, world!</p>\n"},
-	{"gmf492", "This ~~has a\n\nnew paragraph~~.", "<p>This ~~has a</p>\n<p>new paragraph~~.</p>\n"},
+	{"gfm491", "~~Hi~~ Hello, world!", "<p><del>Hi</del> Hello, world!</p>\n"},
+	{"gfm492", "This ~~has a\n\nnew paragraph~~.", "<p>This ~~has a</p>\n<p>new paragraph~~.</p>\n"},
 	{"strikethrough0", "**~~Hi~~** Hello, world!", "<p><strong><del>Hi</del></strong> Hello, world!</p>\n"},
 	{"strikethrough1", "~~**Hi**~~ Hello, world!", "<p><del><strong>Hi</strong></del> Hello, world!</p>\n"},
 	{"strikethrough2", "~~**Hi~~** Hello, world!", "<p><del>**Hi</del>** Hello, world!</p>\n"},
