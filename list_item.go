@@ -26,9 +26,9 @@ func (listItem *ListItem) Continue(context *Context) int {
 		if nil == listItem.firstChild {
 			// Blank line after empty list item
 			return 1
-		} else {
-			context.advanceNextNonspace()
 		}
+
+		context.advanceNextNonspace()
 	} else if context.indent >= listItem.markerOffset+listItem.padding {
 		context.advanceOffset(listItem.markerOffset+listItem.padding, true)
 	} else {
