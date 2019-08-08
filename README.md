@@ -4,13 +4,9 @@
 
 ## 💡 简介
 
-[Lute](https://github.com/b3log/lute) 是一款结构化的 Markdown 引擎，完整实现了最新的 [GFM](https://github.github.com/gfm/) / [CommonMark](https://commonmark.org)规范，对中文语境支持更好。
+[Lute](https://github.com/b3log/lute) 是一款结构化的 Markdown 引擎，完整实现了最新的 [GFM](https://github.github.com/gfm/) / [CommonMark](https://commonmark.org) 规范，对中文语境支持更好。
 
 ## 📽️ 背景
-
-<details>
-<summary>太长不看。</summary>
-<br>
 
 之前我一直在使用其他 Markdown 引擎，他们或多或少都有些“瑕疵”：
 
@@ -31,8 +27,6 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 
 * 社区项目 [Solo](https://github.com/b3log/solo)、[Pipe](https://github.com/b3log/pipe)、[Sym](https://github.com/b3log/symphony) 需要效果统一的 Markdown 渲染，并且性能非常重要
 * 社区项目 [Vditor](https://github.com/b3log/vditor) 需要一款结构化的引擎作为支撑，实现下一代的 Markdown 编辑器，为未来而构建
-
-</details>
 
 ## ✨  特性
 
