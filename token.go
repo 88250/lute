@@ -95,6 +95,7 @@ const (
 	itemQuestion     = byte('?')
 	itemAmpersand    = byte('&')
 	itemSemicolon    = byte(';')
+	itemPipe         = byte('|')
 )
 
 // items 定义了字节数组，每个字节是一个 token。

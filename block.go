@@ -185,7 +185,6 @@ var blockStarts = []blockStartFunc{
 				return 1
 			}
 		}
-
 		return 0
 	},
 
@@ -202,9 +201,7 @@ var blockStarts = []blockStartFunc{
 				return 2
 			}
 		}
-
 		return 0
-
 	},
 
 	// 用于判断围栏代码块（```）是否开始
@@ -233,7 +230,6 @@ var blockStarts = []blockStartFunc{
 				return 2
 			}
 		}
-
 		return 0
 	},
 
@@ -259,7 +255,6 @@ var blockStarts = []blockStartFunc{
 				}
 			}
 		}
-
 		return 0
 	},
 
@@ -297,7 +292,6 @@ var blockStarts = []blockStartFunc{
 
 			listItem := &ListItem{&BaseNode{typ: NodeListItem}, data}
 			t.context.addChild(listItem)
-
 			return 1
 		}
 		return 0
