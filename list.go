@@ -25,14 +25,16 @@ type List struct {
 	*listData
 }
 
+// listData 用于记录列表或列表项节点的附加信息。
 type listData struct {
-	typ          int   // 0：无序列表，1：有序列表
+	typ          int   // 0：无序列表，1：有序列表，3：任务列表
 	tight        bool  // 是否是紧凑模式
 	bulletChar   items // 无序列表标识，* - 或者 +
-	start        int   // 有序列表开始序号
+	start        int   // 有序列表起始序号
 	delimiter    byte  // 有序列表分隔符，. 或者 )
 	padding      int   // 列表内部缩进空格数，即无序列表标识或分隔符和后续第一个非空字符之间的空格数，规范里的 N
 	markerOffset int   // 标识符（* - + 或者 1 2 3）缩进
+	checked      bool  // 任务列表项是否勾选
 }
 
 func (list *List) CanContain(nodeType int) bool {
@@ -63,17 +65,17 @@ func (list *List) Finalize(context *Context) {
 	}
 }
 
-// Parse a list marker and return data on the marker (type,
-// start, delimiter, bullet character, padding) or null.
+// parseListMarker 用于解析列表标记。
 func (t *Tree) parseListMarker(container Node) *listData {
+	ln := t.context.currentLine // 弄短点
 	if t.context.indent >= 4 {
 		return nil
 	}
-	tokens := t.context.currentLine[t.context.nextNonspace:]
+	tokens := ln[t.context.nextNonspace:]
 	data := &listData{
-		typ:          0,    // 无序列表
-		tight:        true, // lists are tight by default
-		markerOffset: t.context.indent,
+		typ:          0,                // 默认无序列表
+		tight:        true,             // 默认紧凑模式
+		markerOffset: t.context.indent, // 设置前置缩进
 	}
 
 	markerLength := 1
@@ -93,42 +95,54 @@ func (t *Tree) parseListMarker(container Node) *listData {
 		return nil
 	}
 
-	// make sure we have spaces after
-	nextc := t.context.currentLine[t.context.nextNonspace+markerLength]
-	if itemNewline != nextc && (itemSpace != nextc && itemTab != nextc) {
+	var token byte
+
+	// 列表项标记后必须是空白字符
+	if token = ln[t.context.nextNonspace+markerLength]; !isWhitespace(token) {
 		return nil
 	}
 
-	// if it interrupts paragraph, make sure first line isn't blank
-	if container.Type() == NodeParagraph && itemNewline == t.context.currentLine[t.context.nextNonspace+markerLength] {
+	// 如果要打断段落，则列表项内容部分不能为空
+	if container.Type() == NodeParagraph && itemNewline == ln[t.context.nextNonspace+markerLength] {
 		return nil
 	}
 
-	// we've got a match! advance offset and calculate padding
-	t.context.advanceNextNonspace()             // to start of marker
-	t.context.advanceOffset(markerLength, true) // to end of marker
+	// 到这里说明满足列表规则，开始解析并计算内部缩进空格数
+	t.context.advanceNextNonspace()             // 把起始下标移动到标记起始位置
+	t.context.advanceOffset(markerLength, true) // 把结束下标移动到标记结束位置
 	spacesStartCol := t.context.column
 	spacesStartOffset := t.context.offset
 	for {
 		t.context.advanceOffset(1, true)
-		nextc = t.context.currentLine.peek(t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || itemEnd == nextc || (itemSpace != nextc && itemTab != nextc) {
+		token = ln.peek(t.context.offset)
+		if t.context.column-spacesStartCol >= 5 || itemEnd == token || (itemSpace != token && itemTab != token) {
 			break
 		}
 	}
 
-	token := t.context.currentLine.peek(t.context.offset)
-	var blank_item = itemEnd == token || itemNewline == token
+	token = ln.peek(t.context.offset)
+	var isBlankItem = itemEnd == token || itemNewline == token
 	var spaces_after_marker = t.context.column - spacesStartCol
-	if spaces_after_marker >= 5 || spaces_after_marker < 1 || blank_item {
+	if spaces_after_marker >= 5 || spaces_after_marker < 1 || isBlankItem {
 		data.padding = markerLength + 1
 		t.context.column = spacesStartCol
 		t.context.offset = spacesStartOffset
-		if token = t.context.currentLine.peek(t.context.offset); itemSpace == token || itemTab == token {
+		if token = ln.peek(t.context.offset); itemSpace == token || itemTab == token {
 			t.context.advanceOffset(1, true)
 		}
 	} else {
 		data.padding = markerLength + spaces_after_marker
+	}
+
+	if !isBlankItem {
+		// 判断是否是任务列表项
+		content := ln[t.context.offset:]
+		if 3 <= len(content) { // 至少需要 [ ] 或者 [x] 3 个字符
+			if itemOpenBracket == content[0] && ('x' == content[1] || 'X' == content[1] || itemSpace == content[1]) && itemCloseBracket == content[2] {
+				data.typ = 3
+				data.checked = 'x' == content[1] || 'X' == content[1]
+			}
+		}
 	}
 
 	return data

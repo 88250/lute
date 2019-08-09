@@ -37,6 +37,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
 	ret.rendererFuncs[NodeList] = ret.renderList
 	ret.rendererFuncs[NodeListItem] = ret.renderListItem
+	ret.rendererFuncs[NodeTaskListItem] = ret.renderTaskListItem
 	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
 	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
 	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
@@ -235,7 +236,7 @@ func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*List)
 	tag := "ul"
-	if nil == n.bulletChar {
+	if 1 == n.listData.typ {
 		tag = "ol"
 	}
 	if entering {
@@ -261,6 +262,19 @@ func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) 
 	} else {
 		r.tag("/li", nil, false)
 		r.Newline()
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderTaskListItem(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		n := node.(*TaskListItem)
+		var attrs [][]string
+		if n.checked {
+			attrs = append(attrs, []string{"checked", ""})
+		}
+		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
+		r.tag("input", attrs, true)
 	}
 	return WalkContinue, nil
 }

@@ -281,7 +281,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 用于判断列表项或者列表项（* - + 1.）是否开始
+	// 用于判断列表、列表项（* - + 1.）或者任务列表项是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented || container.Type() == NodeList {
 			data := t.parseListMarker(container)
@@ -296,13 +296,15 @@ var blockStarts = []blockStartFunc{
 				listsMatch = t.context.listsMatch(container.(*List).listData, data)
 			}
 
-			// add the list if needed
 			if t.context.tip.Type() != NodeList || !listsMatch {
 				t.context.addChild(&List{&BaseNode{typ: NodeList}, data})
 			}
 
-			// add the list item
-			t.context.addChild(&ListItem{&BaseNode{typ: NodeListItem}, data})
+			listItem := &ListItem{&BaseNode{typ: NodeListItem}, data}
+			t.context.addChild(listItem)
+			if 3 == listItem.listData.typ { // 如果是任务列表项
+				t.context.addChild(&TaskListItem{&BaseNode{typ: NodeTaskListItem}, listItem.listData.checked})
+			}
 
 			return 1
 		}

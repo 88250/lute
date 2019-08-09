@@ -305,6 +305,7 @@ const (
 	NodeBlockquote           // 块引用节点
 	NodeList                 // 列表节点
 	NodeListItem             // 列表项节点
+	NodeTaskListItem         // 任务列表项节点
 	NodeHTMLBlock            // HTML 块节点
 	NodeInlineHTML           // 内联 HTML节点
 	NodeCodeBlock            // 代码块节点
