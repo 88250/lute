@@ -44,6 +44,9 @@ func (p *Paragraph) Finalize(context *Context) {
 		}
 		break
 	}
+	if hasReferenceDefs && p.tokens.isBlankLine() {
+		p.Unlink()
+	}
 
 	// 尝试解析任务列表项
 	if listItem, ok := p.parent.(*ListItem); ok {
@@ -53,10 +56,6 @@ func (p *Paragraph) Finalize(context *Context) {
 			p.InsertBefore(p, taskListItemMarker)
 			p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 		}
-	}
-
-	if hasReferenceDefs && p.tokens.isBlankLine() {
-		p.Unlink()
 	}
 }
 
