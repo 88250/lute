@@ -298,25 +298,25 @@ func (n *BaseNode) AppendChild(this, child Node) {
 const (
 	// CommonMark
 
-	NodeDocument      = iota // 根节点类
-	NodeParagraph            // 段落节点
-	NodeHeading              // 标题节点
-	NodeThematicBreak        // 分隔线节点
-	NodeBlockquote           // 块引用节点
-	NodeList                 // 列表节点
-	NodeListItem             // 列表项节点
-	NodeTaskListItem         // 任务列表项节点
-	NodeHTMLBlock            // HTML 块节点
-	NodeInlineHTML           // 内联 HTML节点
-	NodeCodeBlock            // 代码块节点
-	NodeText                 // 文本节点
-	NodeEmphasis             // 强调节点
-	NodeStrong               // 加粗节点
-	NodeCodeSpan             // 代码节点
-	NodeHardBreak            // 硬换行节点
-	NodeSoftBreak            // 软换行节点
-	NodeLink                 // 链接节点
-	NodeImage                // 图片节点
+	NodeDocument           = iota // 根节点类
+	NodeParagraph                 // 段落节点
+	NodeHeading                   // 标题节点
+	NodeThematicBreak             // 分隔线节点
+	NodeBlockquote                // 块引用节点
+	NodeList                      // 列表节点
+	NodeListItem                  // 列表项节点
+	NodeTaskListItemMarker        // 任务列表项标记节点
+	NodeHTMLBlock                 // HTML 块节点
+	NodeInlineHTML                // 内联 HTML节点
+	NodeCodeBlock                 // 代码块节点
+	NodeText                      // 文本节点
+	NodeEmphasis                  // 强调节点
+	NodeStrong                    // 加粗节点
+	NodeCodeSpan                  // 代码节点
+	NodeHardBreak                 // 硬换行节点
+	NodeSoftBreak                 // 软换行节点
+	NodeLink                      // 链接节点
+	NodeImage                     // 图片节点
 
 	// GFM
 

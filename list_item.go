@@ -37,8 +37,8 @@ func (listItem *ListItem) Continue(context *Context) int {
 	return 0
 }
 
-// TaskListItem 描述了任务列表项 [ ] 或者 [x]。
-type TaskListItem struct {
+// TaskListItemMarker 描述了任务列表项 [ ]、[x] 或者 [X]。
+type TaskListItemMarker struct {
 	*BaseNode
 	checked bool
 }

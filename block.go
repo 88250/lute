@@ -303,7 +303,7 @@ var blockStarts = []blockStartFunc{
 			listItem := &ListItem{&BaseNode{typ: NodeListItem}, data}
 			t.context.addChild(listItem)
 			if 3 == listItem.listData.typ { // 如果是任务列表项
-				t.context.addChild(&TaskListItem{&BaseNode{typ: NodeTaskListItem}, listItem.listData.checked})
+				t.context.addChild(&TaskListItemMarker{&BaseNode{typ: NodeTaskListItemMarker}, listItem.listData.checked})
 			}
 
 			return 1

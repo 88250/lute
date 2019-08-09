@@ -37,7 +37,7 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
 	ret.rendererFuncs[NodeList] = ret.renderList
 	ret.rendererFuncs[NodeListItem] = ret.renderListItem
-	ret.rendererFuncs[NodeTaskListItem] = ret.renderTaskListItem
+	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
 	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
 	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
 	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
@@ -139,7 +139,7 @@ func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error)
 			}
 		}
 
-		if listItem, ok := grandparent.(*ListItem); ok { // List.ListItem.TaskListItem.Paragraph
+		if listItem, ok := grandparent.(*ListItem); ok { // List.ListItem.TaskListItemMarker.Paragraph
 			if listItem.tight {
 				return WalkContinue, nil
 			}
@@ -273,9 +273,9 @@ func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTaskListItem(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTaskListItemMarker(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		n := node.(*TaskListItem)
+		n := node.(*TaskListItemMarker)
 		var attrs [][]string
 		if n.checked {
 			attrs = append(attrs, []string{"checked", ""})
