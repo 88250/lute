@@ -30,6 +30,14 @@ type parseTest struct {
 var parseTests = []parseTest{
 	// gfm spec block-level cases
 
+	{"gfm198", "| foo | bar |\n| --- | --- |\n| baz | bim |", "<table>\n<thead>\n<tr>\n<th>foo</th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>baz</td>\n<td>bim</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"gfm199", "| abc | defghi |\n:-: | -----------:\nbar | baz", "<table>\n<thead>\n<tr>\n<th align=\"center\">abc</th>\n<th align=\"right\">defghi</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"center\">bar</td>\n<td align=\"right\">baz</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"gfm200", "| f\\|oo  |\n| ------ |\n| b `\\|` az |\n| b **\\|** im |\n", "<table>\n<thead>\n<tr>\n<th>f|oo</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>b <code>|</code> az</td>\n</tr>\n<tr>\n<td>b <strong>|</strong> im</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"gfm201", "| abc | def |\n| --- | --- |\n| bar | baz |\n> bar\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>bar</td>\n<td>baz</td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p>bar</p>\n</blockquote>\n"},
+	{"gfm202", "| abc | def |\n| --- | --- |\n| bar | baz |\nbar\n\nbar\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>bar</td>\n<td>baz</td>\n</tr>\n<tr>\n<td>bar</td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<p>bar</p>\n"},
+	{"gfm203", "| abc | def |\n| --- |\n| bar |\n", "<p>| abc | def |\n| --- |\n| bar |</p>\n"},
+	{"gfm204", "| abc | def |\n| --- | --- |\n| bar |\n| bar | baz | boo |\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>bar</td>\n<td></td>\n</tr>\n<tr>\n<td>bar</td>\n<td>baz</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"gfm205", "| abc | def |\n| --- | --- |\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
 	{"gfm279", "- [ ] foo\n- [x] bar\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> foo</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> bar</li>\n</ul>\n"},
 	{"gfm280", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo\n<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> bar</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> baz</li>\n</ul>\n</li>\n<li><input disabled=\"\" type=\"checkbox\" /> bim</li>\n</ul>\n"},
 
