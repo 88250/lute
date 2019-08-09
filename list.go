@@ -44,7 +44,6 @@ func (list *List) CanContain(nodeType int) bool {
 func (list *List) Finalize(context *Context) {
 	item := list.firstChild
 	for nil != item {
-		// check for non-final list item ending with blank line:
 		if list.endsWithBlankLine(item) && nil != item.Next() {
 			list.tight = false
 			break
@@ -65,7 +64,7 @@ func (list *List) Finalize(context *Context) {
 	}
 }
 
-// parseListMarker 用于解析列表标记。
+// parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记。
 func (t *Tree) parseListMarker(container Node) *listData {
 	ln := t.context.currentLine // 弄短点
 	if t.context.indent >= 4 {
@@ -167,7 +166,7 @@ func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter byt
 	return
 }
 
-// Returns true if block ends with a blank line, descending if needed into lists and sublists.
+// endsWithBlankLine 用于判断块节点 block 是否是空行结束。如果 block 是列表或者列表项则迭代下降进入判断。
 func (list *List) endsWithBlankLine(block Node) bool {
 	for nil != block {
 		if block.LastLineBlank() {

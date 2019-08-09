@@ -131,9 +131,16 @@ func (r *Renderer) renderDocument(node Node, entering bool) (WalkStatus, error) 
 }
 
 func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.Parent().Parent(); nil != grandparent {
-		if list, ok := grandparent.(*List); ok {
+	grandparent := node.Parent().Parent()
+	if nil != grandparent {
+		if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
 			if list.tight {
+				return WalkContinue, nil
+			}
+		}
+
+		if listItem, ok := grandparent.(*ListItem); ok { // List.ListItem.TaskListItem.Paragraph
+			if listItem.tight {
 				return WalkContinue, nil
 			}
 		}
