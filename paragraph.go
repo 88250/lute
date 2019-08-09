@@ -34,7 +34,7 @@ func (p *Paragraph) Continue(context *Context) int {
 func (p *Paragraph) Finalize(context *Context) {
 	p.tokens = p.tokens.trim()
 
-	// try parsing the beginning as link reference definitions:
+	// 尝试解析链接引用定义
 	hasReferenceDefs := false
 	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = p.tokens {
 		if tokens = context.parseLinkRefDef(tokens); nil != tokens {
@@ -43,6 +43,16 @@ func (p *Paragraph) Finalize(context *Context) {
 			continue
 		}
 		break
+	}
+
+	// 尝试解析任务列表项
+	if listItem, ok := p.parent.(*ListItem); ok {
+		if 3 == listItem.listData.typ {
+			// 如果是任务列表项则添加任务列表标记节点
+			taskListItemMarker := &TaskListItemMarker{&BaseNode{typ: NodeTaskListItemMarker}, listItem.listData.checked}
+			p.InsertBefore(p, taskListItemMarker)
+			p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+		}
 	}
 
 	if hasReferenceDefs && p.tokens.isBlankLine() {

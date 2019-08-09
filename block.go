@@ -156,7 +156,6 @@ func (t *Tree) incorporateLine(line items) {
 				}
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
-			// create paragraph container for line
 			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph, tokens: make(items, 0, 256)}})
 			t.context.advanceNextNonspace()
 			t.addLine()
@@ -247,7 +246,7 @@ var blockStarts = []blockStartFunc{
 		if !t.context.indented && container.Type() == NodeParagraph {
 			if heading := t.parseSetextHeading(); nil != heading {
 				t.context.closeUnmatchedBlocks()
-				// resolve reference link definition
+				// 解析链接引用定义
 				for tokens := container.Tokens(); 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.Tokens() {
 					if tokens = t.context.parseLinkRefDef(tokens); nil != tokens {
 						container.SetTokens(tokens)
@@ -302,9 +301,6 @@ var blockStarts = []blockStartFunc{
 
 			listItem := &ListItem{&BaseNode{typ: NodeListItem}, data}
 			t.context.addChild(listItem)
-			if 3 == listItem.listData.typ { // 如果是任务列表项
-				t.context.addChild(&TaskListItemMarker{&BaseNode{typ: NodeTaskListItemMarker}, listItem.listData.checked})
-			}
 
 			return 1
 		}

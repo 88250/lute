@@ -31,7 +31,7 @@ var parseTests = []parseTest{
 	// gfm spec block-level cases
 
 	{"gfm279", "- [ ] foo\n- [x] bar\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> foo</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> bar</li>\n</ul>\n"},
-	{"gfm280", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo\n<ul>\n<li><input disabled=\"\" type=\"checkbox\"> bar</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> baz</li>\n</ul>\n</li>\n<li><input disabled=\"\" type=\"checkbox\" /> bim</li>\n</ul>\n"},
+	{"gfm280", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo\n<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> bar</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> baz</li>\n</ul>\n</li>\n<li><input disabled=\"\" type=\"checkbox\" /> bim</li>\n</ul>\n"},
 
 	// gfm spec inline-level cases
 
@@ -108,6 +108,7 @@ var parseTests = []parseTest{
 	{"spec272", "1. foo\n2. bar\n3) baz\n", "<ol>\n<li>foo</li>\n<li>bar</li>\n</ol>\n<ol start=\"3\">\n<li>baz</li>\n</ol>\n"},
 	{"spec270", "- # Foo\n- Bar\n  ---\n  baz\n", "<ul>\n<li>\n<h1>Foo</h1>\n</li>\n<li>\n<h2>Bar</h2>\nbaz</li>\n</ul>\n"},
 	{"spec265", "- foo\n - bar\n  - baz\n   - boo\n", "<ul>\n<li>foo</li>\n<li>bar</li>\n<li>baz</li>\n<li>boo</li>\n</ul>\n"},
+	{"spec262", "> 1. > Blockquote\ncontinued here.\n", "<blockquote>\n<ol>\n<li>\n<blockquote>\n<p>Blockquote\ncontinued here.</p>\n</blockquote>\n</li>\n</ol>\n</blockquote>\n"},
 	{"spec255", "foo\n*\n\nfoo\n1.\n", "<p>foo\n*</p>\n<p>foo\n1.</p>\n"},
 	{"spec253", "1. foo\n2.\n3. bar\n", "<ol>\n<li>foo</li>\n<li></li>\n<li>bar</li>\n</ol>\n"},
 	{"spec251", "- foo\n-\n- bar\n", "<ul>\n<li>foo</li>\n<li></li>\n<li>bar</li>\n</ul>\n"},
