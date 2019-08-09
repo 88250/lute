@@ -68,8 +68,8 @@ func (t *Tree) incorporateLine(line items) {
 
 	matchedLeaf := container.Type() != NodeParagraph && container.AcceptLines()
 	var startsLen = len(blockStarts)
-	// Unless last matched container is a code block, try new container starts,
-	// adding children to the last matched container:
+
+	// 除非最后一个匹配到的是代码块，否则的话就起始一个新的块级元素
 	for !matchedLeaf {
 		t.context.findNextNonspace()
 
@@ -88,17 +88,18 @@ func (t *Tree) incorporateLine(line items) {
 			break
 		}
 
+		// 逐个尝试是否可以起始一个块级节点
 		var i = 0
 		for i < startsLen {
 			var res = blockStarts[i](t, container)
-			if res == 1 {
+			if res == 1 { // 匹配到容器块，继续迭代下降过程
 				container = t.context.tip
 				break
-			} else if res == 2 {
+			} else if res == 2 { // 匹配到叶子块，跳出迭代下降过程
 				container = t.context.tip
 				matchedLeaf = true
 				break
-			} else {
+			} else { // 没有匹配到，继续用下一个起始块模式进行匹配
 				i++
 			}
 		}
@@ -109,16 +110,13 @@ func (t *Tree) incorporateLine(line items) {
 		}
 	}
 
-	// What remains at the offset is a text line.  Add the text to the
-	// appropriate container.
+	// offset 后余下的内容算作是文本行，需要将其添加到相应的块节点上
 
-	// First check for a lazy paragraph continuation:
 	if !t.context.allClosed && !t.context.blank && t.context.tip.Type() == NodeParagraph {
-		// lazy paragraph continuation
+		// 该行是段落延续文本，直接添加到当前末梢段落上
 		t.addLine()
-	} else { // not a lazy continuation
-
-		// finalize any blocks not matched
+	} else {
+		// 最终化未匹配的块
 		t.context.closeUnmatchedBlocks()
 		if t.context.blank && nil != container.LastChild() {
 			container.LastChild().SetLastLineBlank(true)
@@ -130,24 +128,21 @@ func (t *Tree) incorporateLine(line items) {
 			isFenced = container.(*CodeBlock).isFenced
 		}
 
-		// Block quote lines are never blank as they start with >
-		// and we don't count blanks in fenced code for purposes of tight/loose
-		// lists or breaking out of lists.  We also don't set _lastLineBlank
-		// on an empty list item, or if we just closed a fenced block.
+		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
 		var lastLineBlank = t.context.blank &&
-			!(typ == NodeBlockquote ||
-				(typ == NodeCodeBlock && isFenced) ||
-				(typ == NodeListItem && nil == container.FirstChild()))
-
-		// propagate lastLineBlank up through parents:
+			!(typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
+				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
+				(typ == NodeListItem && nil == container.FirstChild())) // 内容为空的列表项也不计入空行判断
+		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 lastLineBlank
+		// lastLineBlank 目前仅在判断列表紧凑模式上使用
 		for cont := container; nil != cont; cont = cont.Parent() {
 			cont.SetLastLineBlank(lastLineBlank)
 		}
 
 		if container.AcceptLines() {
 			t.addLine()
-			// if HtmlBlock, check for end condition
 			if typ == NodeHTMLBlock {
+				// HTML 块（类型 1-5）需要检查是否满足闭合条件
 				html := container.(*HTMLBlock)
 				if html.hType >= 1 && html.hType <= 5 {
 					if t.isHTMLBlockClose(t.context.currentLine[t.context.offset:], html.hType) {
@@ -156,6 +151,7 @@ func (t *Tree) incorporateLine(line items) {
 				}
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
+			// 普通段落开始
 			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph, tokens: make(items, 0, 256)}})
 			t.context.advanceNextNonspace()
 			t.addLine()
