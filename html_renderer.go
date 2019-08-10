@@ -64,16 +64,16 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 	}
 	if entering {
 		cell := node.(*TableCell)
-		attrs := [][]string{}
-			switch cell.Aligns {
-			case 0:
-			case 1:
-				attrs = append(attrs, []string{"align", "left"})
-			case 2:
-				attrs = append(attrs, []string{"align", "center"})
-			case 3:
-				attrs = append(attrs, []string{"align", "right"})
-			}
+		var attrs [][]string
+		switch cell.Aligns {
+		case 0:
+		case 1:
+			attrs = append(attrs, []string{"align", "left"})
+		case 2:
+			attrs = append(attrs, []string{"align", "center"})
+		case 3:
+			attrs = append(attrs, []string{"align", "right"})
+		}
 		r.tag(tag, nil, false)
 	} else {
 		r.tag("/"+tag, nil, false)
