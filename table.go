@@ -35,19 +35,19 @@ type TableCell struct {
 	Aligns int
 }
 
-func (t *Tree) parseTable(lines []items) (ret Node) {
+func (context *Context) parseTable(lines []items) (ret Node) {
 	length := len(lines)
 	if 2 > length {
 		return
 	}
 
 	tableDelimRow := lines[1]
-	aligns := t.parseTableDelimRow(tableDelimRow)
+	aligns := context.parseTableDelimRow(tableDelimRow)
 	if nil == aligns {
 		return
 	}
 
-	tableHead := t.parseTableRow(lines[0].trim(), aligns, true)
+	tableHead := context.parseTableRow(lines[0].trim(), aligns, true)
 	if nil == tableHead {
 		return
 	}
@@ -56,7 +56,7 @@ func (t *Tree) parseTable(lines []items) (ret Node) {
 	table.Aligns = aligns
 	table.AppendChild(table, tableHead)
 	for i := 2; i < length; i++ {
-		tableRow := t.parseTableRow(lines[i].trim(), aligns, false)
+		tableRow := context.parseTableRow(lines[i].trim(), aligns, false)
 		table.AppendChild(table, tableRow)
 	}
 
@@ -64,7 +64,7 @@ func (t *Tree) parseTable(lines []items) (ret Node) {
 	return
 }
 
-func (t *Tree) parseTableRow(line items, aligns []int, isHead bool) (ret *TableRow) {
+func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *TableRow) {
 	ret = &TableRow{}
 	cols := bytes.Split(line, []byte{itemPipe})
 	if isBlank(cols[0]) {
@@ -83,7 +83,7 @@ func (t *Tree) parseTableRow(line items, aligns []int, isHead bool) (ret *TableR
 	return
 }
 
-func (t *Tree) parseTableDelimRow(line items) (aligns []int) {
+func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	length := len(line)
 	var token byte
 	var i int
@@ -109,7 +109,7 @@ func (t *Tree) parseTableDelimRow(line items) (aligns []int) {
 			return nil
 		}
 
-		align := t.tableDelimAlign(col)
+		align := context.tableDelimAlign(col)
 		if -1 == align {
 			return nil
 		}
@@ -118,7 +118,7 @@ func (t *Tree) parseTableDelimRow(line items) (aligns []int) {
 	return alignments
 }
 
-func (t *Tree) tableDelimAlign(col items) int {
+func (context *Context) tableDelimAlign(col items) int {
 	var left, right bool
 	length := len(col)
 	first := col[0]

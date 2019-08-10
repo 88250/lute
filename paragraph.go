@@ -60,7 +60,7 @@ func (p *Paragraph) Finalize(context *Context) {
 
 	// 尝试解析表
 	lines := p.tokens.lines()
-	table := context.tree.parseTable(lines)
+	table := context.parseTable(lines)
 	if nil != table {
 		p.InsertBefore(p, table)
 		p.Unlink()
