@@ -46,27 +46,32 @@ func tokenToUpper(token byte) byte {
 	return token
 }
 
+// isPunct 判断 token 是否是一个标点符号。
 func isPunct(token byte) bool {
 	return isASCIIPunct(token) || unicode.IsPunct(rune(token))
 }
 
+// isASCIIPunct 判断 token 是否是一个 ASCII 标点符号。
 func isASCIIPunct(token byte) bool {
 	return (0x21 <= token && 0x2F >= token) || (0x3A <= token && 0x40 >= token) || (0x5B <= token && 0x60 >= token) || (0x7B <= token && 0x7E >= token)
 }
 
+// isASCIILetter 判断 token 是否是一个 ASCII 字母。
 func isASCIILetter(token byte) bool {
 	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token)
 }
 
+// isASCIILetterNumHyphen 判断 token 是否是一个 ASCII 字母、数字或者横线 -。
 func isASCIILetterNumHyphen(token byte) bool {
 	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token) || ('0' <= token && '9' >= token) || '-' == token
 }
 
+// isControl 判断 token 是否是一个控制字符。
 func isControl(token byte) bool {
 	return unicode.IsControl(rune(token))
 }
 
-// isBlank 用于判断 tokens 是否都为空格。
+// isBlank 判断 tokens 是否都为空格。
 func isBlank(tokens []byte) bool {
 	for _, token := range tokens {
 		if itemSpace != token {
@@ -119,7 +124,7 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	var line items
 	for ; i < length; i++ {
 		token = tokens[i]
-		if separator != token || tokens.isBackslashEscape(i) {
+		if separator != token || tokens.isBackslashEscapePunct(i) {
 			line = append(line, token)
 			continue
 		}
@@ -387,7 +392,8 @@ func (tokens items) endWith(token byte) bool {
 	return token == tokens[length-1]
 }
 
-func (tokens items) isBackslashEscape(pos int) bool {
+// isBackslashEscapePunct 判断 tokens 中 pos 所指的值是否是由反斜杠 \ 转义的 ASCII 标点符号。
+func (tokens items) isBackslashEscapePunct(pos int) bool {
 	if !isASCIIPunct(tokens[pos]) {
 		return false
 	}

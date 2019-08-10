@@ -133,7 +133,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 			passed = append(passed, tokens[i+j])
 		}
 		title += string(r)
-		if closer == token && !tokens.isBackslashEscape(i) {
+		if closer == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			title = title[:len(title)-1]
 			break
@@ -189,10 +189,10 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 			break
 		}
 
-		if itemOpenParen == token && !tokens.isBackslashEscape(i) {
+		if itemOpenParen == token && !tokens.isBackslashEscapePunct(i) {
 			openParens++
 		}
-		if itemCloseParen == token && !tokens.isBackslashEscape(i) {
+		if itemCloseParen == token && !tokens.isBackslashEscapePunct(i) {
 			openParens--
 			if 1 > openParens {
 				i++
@@ -238,14 +238,14 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 				ret = append(ret, tokens[i+j])
 			}
 			destination += string(r)
-			if itemLess == token && !tokens.isBackslashEscape(i) {
+			if itemLess == token && !tokens.isBackslashEscapePunct(i) {
 				ret = nil
 				destination = ""
 				return
 			}
 		}
 
-		if itemGreater == token && !tokens.isBackslashEscape(i) {
+		if itemGreater == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			destination = destination[0 : len(destination)-1]
 			break
@@ -287,13 +287,13 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 			passed = append(passed, tokens[i+j])
 		}
 		label += string(r)
-		if itemCloseBracket == token && !tokens.isBackslashEscape(i) {
+		if itemCloseBracket == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			label = label[0 : len(label)-1]
 			remains = line[i+1:]
 			break
 		}
-		if itemOpenBracket == token && !tokens.isBackslashEscape(i) {
+		if itemOpenBracket == token && !tokens.isBackslashEscapePunct(i) {
 			passed = nil
 			label = ""
 			return

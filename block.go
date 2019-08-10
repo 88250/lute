@@ -167,7 +167,7 @@ type blockStartFunc func(t *Tree, container Node) int
 // 1：匹配到块容器，需要继续迭代下降
 // 2：匹配到叶子块
 var blockStarts = []blockStartFunc{
-	// 用于判断块引用（>）是否开始
+	// 判断块引用（>）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
@@ -188,7 +188,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 用于判断 ATX 标题（#）是否开始
+	// 判断 ATX 标题（#）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if heading := t.parseATXHeading(); nil != heading {
@@ -204,7 +204,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 用于判断围栏代码块（```）是否开始
+	// 判断围栏代码块（```）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if codeBlock := t.parseFencedCode(); nil != codeBlock {
@@ -218,7 +218,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 用于判断 HTML 块（<）是否开始
+	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
@@ -233,7 +233,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 用于判断 Setext 标题（- =）是否开始
+	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented && container.Type() == NodeParagraph {
 			if heading := t.parseSetextHeading(); nil != heading {
@@ -258,7 +258,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 用于判断分隔线（--- ***）是否开始
+	// 判断分隔线（--- ***）是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented {
 			if thematicBreak := t.parseThematicBreak(); nil != thematicBreak {
@@ -271,7 +271,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 用于判断列表、列表项（* - + 1.）或者任务列表项是否开始
+	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始
 	func(t *Tree, container Node) int {
 		if !t.context.indented || container.Type() == NodeList {
 			data := t.parseListMarker(container)
@@ -297,7 +297,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 用于判断缩进代码块（    code）是否开始
+	// 判断缩进代码块（    code）是否开始
 	func(t *Tree, container Node) int {
 		if t.context.indented && t.context.tip.Type() != NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)

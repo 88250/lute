@@ -166,7 +166,7 @@ func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter byt
 	return
 }
 
-// endsWithBlankLine 用于判断块节点 block 是否是空行结束。如果 block 是列表或者列表项则迭代下降进入判断。
+// endsWithBlankLine 判断块节点 block 是否是空行结束。如果 block 是列表或者列表项则迭代下降进入判断。
 func (list *List) endsWithBlankLine(block Node) bool {
 	for nil != block {
 		if block.LastLineBlank() {

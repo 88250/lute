@@ -154,7 +154,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 				}
 			}
 			destination += string(r)
-			if itemGreater == token && !tokens.isBackslashEscape(i) {
+			if itemGreater == token && !tokens.isBackslashEscapePunct(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
 				break
@@ -194,10 +194,10 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains items
 				passed = passed[:len(passed)-1]
 				break
 			}
-			if itemOpenParen == token && !tokens.isBackslashEscape(i) {
+			if itemOpenParen == token && !tokens.isBackslashEscapePunct(i) {
 				openParens++
 			}
-			if itemCloseParen == token && !tokens.isBackslashEscape(i) {
+			if itemCloseParen == token && !tokens.isBackslashEscapePunct(i) {
 				openParens--
 				if 1 > openParens {
 					destination = destination[:len(destination)-1]

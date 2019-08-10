@@ -121,7 +121,7 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 
 	var alignments []int
 	for _, col := range cols {
-		col = items(col).trim()
+		col = col.trim()
 		if 1 > length {
 			return nil
 		}

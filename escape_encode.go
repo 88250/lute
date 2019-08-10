@@ -120,7 +120,7 @@ func unescapeString(str string) string {
 	length := len(tokens)
 	retTokens := make(items, 0, length)
 	for i := 0; i < length; i++ {
-		if tokens.isBackslashEscape(i) {
+		if tokens.isBackslashEscapePunct(i) {
 			retTokens = retTokens[:len(retTokens)-1]
 		}
 		retTokens = append(retTokens, tokens[i])
