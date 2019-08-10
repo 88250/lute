@@ -15,8 +15,6 @@
 
 package lute
 
-import "bytes"
-
 // Table 描述了表节点结构。
 type Table struct {
 	*BaseNode
@@ -79,7 +77,7 @@ func (context *Context) newTableHead(headRow *TableRow) *TableHead {
 
 func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *TableRow) {
 	ret = &TableRow{&BaseNode{typ: NodeTableRow}, aligns}
-	cols := bytes.Split(line, []byte{itemPipe})
+	cols := line.splitWithoutBackslashEscape(itemPipe)
 	if isBlank(cols[0]) {
 		cols = cols[1:]
 	}
@@ -88,7 +86,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	}
 
 	for i, col := range cols {
-		col = items(col).trim()
+		col = col.trim()
 		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
 		cell.tokens = col
 		ret.AppendChild(ret, cell)
@@ -113,7 +111,7 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 		return nil
 	}
 
-	cols := bytes.Split(line, []byte{itemPipe})
+	cols := line.splitWithoutBackslashEscape(itemPipe)
 	if isBlank(cols[0]) {
 		cols = cols[1:]
 	}

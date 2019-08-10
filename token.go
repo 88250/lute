@@ -111,6 +111,40 @@ const (
 // items 定义了字节数组，每个字节是一个 token。
 type items []byte
 
+// splitWithoutBackslashEscape 使用 separator 作为分隔符将 tokens 切分为多个子串，被反斜杠 \ 转义的字符不会计入切分。
+func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
+	length := len(tokens)
+	var i int
+	var token byte
+	var line items
+	for ; i < length; i++ {
+		token = tokens[i]
+		if separator != token || tokens.isBackslashEscape(i) {
+			line = append(line, token)
+			continue
+		}
+
+		ret = append(ret, line)
+		line = items{}
+	}
+	return
+}
+
+// split 使用 separator 作为分隔符将 tokens 切分为两个子串（仅分隔一次）。
+func (tokens items) split(separator byte) (ret [2]items) {
+	var i int
+	var token byte
+	for i, token = range tokens {
+		if separator == token {
+			ret[1] = append(ret[1], tokens[i+1:]...)
+			return
+		} else {
+			ret[0] = append(ret[0], token)
+		}
+	}
+	return
+}
+
 // lines 会使用 \n 对 tokens 进行分隔转行。
 func (tokens items) lines() (ret []items) {
 	length := len(tokens)
@@ -169,7 +203,6 @@ func (tokens items) equal(anotherTokens items) bool {
 			return false
 		}
 	}
-
 	return true
 }
 
@@ -195,7 +228,6 @@ func (tokens items) trimLeftSpace() (spaces int, remains items) {
 	}
 
 	remains = tokens[i:]
-
 	return
 }
 
@@ -220,7 +252,6 @@ func (tokens items) trimLeft() (whitespaces, remains items) {
 			whitespaces = append(whitespaces, tokens[i])
 		}
 	}
-
 	return whitespaces, tokens[i:]
 }
 
@@ -236,7 +267,6 @@ func (tokens items) trimRight() items {
 			break
 		}
 	}
-
 	return tokens[:i+1]
 }
 
@@ -246,7 +276,6 @@ func (tokens items) firstNonSpace() (index int, token byte) {
 			return
 		}
 	}
-
 	return
 }
 
@@ -257,7 +286,6 @@ func (tokens items) accept(token byte) (pos int) {
 			break
 		}
 	}
-
 	return
 }
 
@@ -273,7 +301,6 @@ func (tokens items) acceptTokenss(someTokenss []items) (pos int) {
 			}
 		}
 	}
-
 	return -1
 }
 
@@ -284,7 +311,6 @@ func (tokens items) acceptTokens(someTokens items) (pos int) {
 			return -1
 		}
 	}
-
 	return
 }
 
@@ -296,7 +322,6 @@ func (tokens items) containOne(someTokens ...byte) bool {
 			}
 		}
 	}
-
 	return false
 }
 
@@ -306,7 +331,6 @@ func (tokens items) contain(anotherToken byte) bool {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -316,7 +340,6 @@ func (tokens items) containWhitespace() bool {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -326,7 +349,6 @@ func (tokens items) isBlankLine() bool {
 			return false
 		}
 	}
-
 	return true
 }
 
@@ -346,23 +368,6 @@ func (tokens items) splitWhitespace() (ret []items) {
 			lastIsWhitespace = false
 		}
 	}
-
-	return
-}
-
-func (tokens items) split(token byte) (ret []items) {
-	i := 0
-	ret = append(ret, items{})
-	for j, t := range tokens {
-		if token == t {
-			ret = append(ret, items{})
-			ret[i+1] = append(ret[i+1], tokens[j+1:]...)
-			return
-		} else {
-			ret[i] = append(ret[i], t)
-		}
-	}
-
 	return
 }
 
@@ -370,7 +375,6 @@ func (tokens items) startWith(token byte) bool {
 	if 1 > len(tokens) {
 		return false
 	}
-
 	return token == tokens[0]
 }
 
@@ -379,7 +383,6 @@ func (tokens items) endWith(token byte) bool {
 	if 1 > length {
 		return false
 	}
-
 	return token == tokens[length-1]
 }
 
@@ -396,7 +399,6 @@ func (tokens items) isBackslashEscape(pos int) bool {
 
 		backslashes++
 	}
-
 	return 0 != backslashes%2
 }
 
@@ -410,7 +412,6 @@ func (tokens items) statWhitespace() (newlines, spaces, tabs int) {
 			tabs++
 		}
 	}
-
 	return
 }
 
@@ -421,7 +422,6 @@ func (tokens items) spnl() (ret bool, passed, remains items) {
 		return false, nil, tokens
 	}
 	ret = true
-
 	return
 }
 
@@ -429,6 +429,5 @@ func (tokens items) peek(pos int) byte {
 	if pos < len(tokens) {
 		return tokens[pos]
 	}
-
 	return itemEnd
 }
