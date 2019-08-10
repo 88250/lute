@@ -58,10 +58,15 @@ func NewHTMLRenderer() (ret *Renderer) {
 }
 
 func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error) {
+	tag := "td"
+	if NodeTableHead == node.Parent().Type() {
+		tag = "th"
+	}
 	if entering {
-		r.tag("td", nil, false)
+		//cell := node.(*TableCell)
+		r.tag(tag, nil, false)
 	} else {
-		r.tag("/td", nil, false)
+		r.tag("/"+tag, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -83,10 +88,14 @@ func (r *Renderer) renderTableHead(node Node, entering bool) (WalkStatus, error)
 		r.tag("thead", nil, false)
 		r.Newline()
 		r.tag("tr", nil, false)
+		r.Newline()
 	} else {
 		r.tag("/tr", nil, false)
+		r.Newline()
 		r.tag("/thead", nil, false)
+		r.Newline()
 		r.tag("tbody", nil, false)
+		r.Newline()
 	}
 	return WalkContinue, nil
 }
@@ -94,8 +103,10 @@ func (r *Renderer) renderTableHead(node Node, entering bool) (WalkStatus, error)
 func (r *Renderer) renderTable(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("table", nil, false)
+		r.Newline()
 	} else {
 		r.tag("/table", nil, false)
+		r.Newline()
 	}
 	return WalkContinue, nil
 }

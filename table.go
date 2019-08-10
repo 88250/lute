@@ -23,6 +23,11 @@ type Table struct {
 	Aligns []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
 }
 
+// TableHead 描述了表头节点结构。
+type TableHead struct {
+	*BaseNode
+}
+
 // TableRow 描述了表行节点结构。
 type TableRow struct {
 	*BaseNode
@@ -46,14 +51,13 @@ func (context *Context) parseTable(lines []items) (ret Node) {
 		return
 	}
 
-	tableHead := context.parseTableRow(lines[0].trim(), aligns, true)
-	if nil == tableHead {
+	headRow := context.parseTableRow(lines[0].trim(), aligns, true)
+	if nil == headRow {
 		return
 	}
-
 	table := &Table{&BaseNode{typ: NodeTable}, aligns}
 	table.Aligns = aligns
-	table.AppendChild(table, tableHead)
+	table.AppendChild(table, context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
 		tableRow := context.parseTableRow(lines[i].trim(), aligns, false)
 		table.AppendChild(table, tableRow)
@@ -61,6 +65,16 @@ func (context *Context) parseTable(lines []items) (ret Node) {
 
 	ret = table
 	return
+}
+
+func (context *Context) newTableHead(headRow *TableRow) *TableHead {
+	ret := &TableHead{&BaseNode{typ: NodeTableHead}}
+	for c := headRow.FirstChild(); c != nil; {
+		next := c.Next()
+		ret.AppendChild(ret, c)
+		c = next
+	}
+	return ret
 }
 
 func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *TableRow) {
