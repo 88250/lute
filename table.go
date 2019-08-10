@@ -88,7 +88,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	for i, col := range cols {
 		col = col.trim()
 		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
-		col = col.removeFirst(itemBackslash)
+		col = col.removeFirst(itemBackslash) // 删掉一个反斜杠以便恢复语义
 		cell.tokens = col
 		ret.AppendChild(ret, cell)
 	}
