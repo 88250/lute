@@ -131,16 +131,17 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 }
 
 // split 使用 separator 作为分隔符将 tokens 切分为两个子串（仅分隔一次）。
-func (tokens items) split(separator byte) (ret [2]items) {
+func (tokens items) split(separator byte) (ret []items) {
+	ret = append(ret, items{})
 	var i int
 	var token byte
 	for i, token = range tokens {
 		if separator == token {
+			ret = append(ret, items{})
 			ret[1] = append(ret[1], tokens[i+1:]...)
 			return
-		} else {
-			ret[0] = append(ret[0], token)
 		}
+		ret[0] = append(ret[0], token)
 	}
 	return
 }
