@@ -322,6 +322,7 @@ const (
 	NodeTaskListItemMarker // 任务列表项标记节点
 	NodeStrikethrough      // 删除线节点
 	NodeTable              // 表节点
+	NodeTableHead          // 表头节点
 	NodeTableRow           // 表行节点
 	NodeTableCell          // 表格节点
 )

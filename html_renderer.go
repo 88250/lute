@@ -37,7 +37,6 @@ func NewHTMLRenderer() (ret *Renderer) {
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
 	ret.rendererFuncs[NodeList] = ret.renderList
 	ret.rendererFuncs[NodeListItem] = ret.renderListItem
-	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
 	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
 	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
 	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
@@ -49,8 +48,56 @@ func NewHTMLRenderer() (ret *Renderer) {
 	// 注册 GFM 渲染函数
 
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
+	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
+	ret.rendererFuncs[NodeTable] = ret.renderTable
+	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
+	ret.rendererFuncs[NodeTableRow] = ret.renderTableRow
+	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
 
 	return
+}
+
+func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("td", nil, false)
+	} else {
+		r.tag("/td", nil, false)
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderTableRow(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("tr", nil, false)
+	} else {
+		r.tag("/tr", nil, false)
+		if node == node.Parent().LastChild() {
+			r.tag("/tbody", nil, false)
+		}
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderTableHead(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("thead", nil, false)
+		r.Newline()
+		r.tag("tr", nil, false)
+	} else {
+		r.tag("/tr", nil, false)
+		r.tag("/thead", nil, false)
+		r.tag("tbody", nil, false)
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderTable(node Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("table", nil, false)
+	} else {
+		r.tag("/table", nil, false)
+	}
+	return WalkContinue, nil
 }
 
 func (r *Renderer) renderStrikethrough(node Node, entering bool) (WalkStatus, error) {
