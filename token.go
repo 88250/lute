@@ -111,6 +111,24 @@ const (
 // items 定义了字节数组，每个字节是一个 token。
 type items []byte
 
+// lines 会使用 \n 对 tokens 进行分隔转行。
+func (tokens items) lines() (ret []items) {
+	length := len(tokens)
+	var i int
+	var token byte
+	var line items
+	for ; i < length; i++ {
+		token = tokens[i]
+		if itemNewline != token {
+			line = append(line, token)
+		} else {
+			ret = append(ret, line)
+			line = items{}
+		}
+	}
+	return
+}
+
 // replaceAll 会将 tokens 中的 old token 使用 new token 进行覆盖。
 func (tokens items) replaceAll(old, new byte) {
 	var i int

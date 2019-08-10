@@ -22,6 +22,7 @@ func Parse(name string, text []byte) (t *Tree, err error) {
 	defer gulu.Panic.Recover(&err)
 
 	t = &Tree{Name: name, text: text, context: &Context{}}
+	t.context.tree = t
 	t.lex = lex(t.text)
 	t.Root = &Document{&BaseNode{typ: NodeDocument}}
 	t.parseBlocks()
@@ -38,6 +39,7 @@ func ParseStr(name string, text string) (t *Tree, err error) {
 
 // Context 用于维护解析过程中使用到的公共数据。
 type Context struct {
+	tree       *Tree
 	linkRefDef map[string]*Link // 链接引用定义集
 
 	// 以下变量用于块级解析阶段

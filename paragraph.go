@@ -57,6 +57,14 @@ func (p *Paragraph) Finalize(context *Context) {
 			p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 		}
 	}
+
+	// 尝试解析表
+	lines := p.tokens.lines()
+	table := context.tree.parseTable(lines)
+	if nil != table {
+		p.InsertBefore(p, table)
+		p.Unlink()
+	}
 }
 
 func (p *Paragraph) AcceptLines() bool {
