@@ -73,7 +73,7 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 		case 3:
 			attrs = append(attrs, []string{"align", "right"})
 		}
-		r.tag(tag, nil, false)
+		r.tag(tag, attrs, false)
 	} else {
 		r.tag("/"+tag, nil, false)
 		r.Newline()
