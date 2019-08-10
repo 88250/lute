@@ -84,11 +84,13 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 func (r *Renderer) renderTableRow(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("tr", nil, false)
+		r.Newline()
 	} else {
 		r.tag("/tr", nil, false)
 		if node == node.Parent().LastChild() {
 			r.tag("/tbody", nil, false)
 		}
+		r.Newline()
 	}
 	return WalkContinue, nil
 }
