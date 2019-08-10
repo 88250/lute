@@ -42,13 +42,13 @@ type Context struct {
 
 	// 以下变量用于块级解析阶段
 
-	tip                                                      Node
-	oldtip                                                   Node
-	currentLine                                              items
-	currentLineLen                                           int
-	offset, column, nextNonspace, nextNonspaceColumn, indent int
-	indented, blank, partiallyConsumedTab, allClosed         bool
-	lastMatchedContainer                                     Node
+	tip                                                      Node  // 末梢节点
+	oldtip                                                   Node  // 老的末梢节点
+	currentLine                                              items // 当前行
+	currentLineLen                                           int   // 当前行长
+	offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的下标、缩进空格数
+	indented, blank, partiallyConsumedTab, allClosed         bool  // 是否是缩进行、空行等标识
+	lastMatchedContainer                                     Node  // 最后一个匹配的块节点
 
 	// 以下变量用于行级解析阶段
 
@@ -86,7 +86,7 @@ func (context *Context) advanceOffset(count int, columns bool) {
 		} else {
 			context.partiallyConsumedTab = false
 			context.offset += 1
-			context.column += 1 // assume ascii; block starts are ascii
+			context.column += 1 // 假定是 ASCII，因为块开始标记都是 ASCII
 			count -= 1
 		}
 	}
@@ -125,7 +125,7 @@ func (context *Context) findNextNonspace() {
 	context.indented = context.indent >= 4
 }
 
-// Finalize and close any unmatched blocks.
+// closeUnmatchedBlocks 最终化所有未匹配的块节点。
 func (context *Context) closeUnmatchedBlocks() {
 	if !context.allClosed {
 		// finalize any blocks not matched
@@ -157,13 +157,11 @@ func (context *Context) addChild(child Node) {
 	context.tip = child
 }
 
-// Returns true if the two list items are of the same type,
-// with the same delimiter and bullet character.  This is used
-// in agglomerating list items into lists.
-func (context *Context) listsMatch(list_data, item_data *listData) bool {
-	return list_data.typ == item_data.typ &&
-		list_data.delimiter == item_data.delimiter &&
-		list_data.bulletChar.equal(item_data.bulletChar)
+// listsMatch 用户判断指定的 listData 和 itemData 是否可归属于同一个列表。
+func (context *Context) listsMatch(listData, itemData *listData) bool {
+	return listData.typ == itemData.typ &&
+		listData.delimiter == itemData.delimiter &&
+		listData.bulletChar.equal(itemData.bulletChar)
 }
 
 // Tree 描述了 Markdown 抽象语法树结构。
