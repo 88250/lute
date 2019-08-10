@@ -63,7 +63,17 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 		tag = "th"
 	}
 	if entering {
-		//cell := node.(*TableCell)
+		cell := node.(*TableCell)
+		attrs := [][]string{}
+			switch cell.Aligns {
+			case 0:
+			case 1:
+				attrs = append(attrs, []string{"align", "left"})
+			case 2:
+				attrs = append(attrs, []string{"align", "center"})
+			case 3:
+				attrs = append(attrs, []string{"align", "right"})
+			}
 		r.tag(tag, nil, false)
 	} else {
 		r.tag("/"+tag, nil, false)
