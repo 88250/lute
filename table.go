@@ -15,17 +15,135 @@
 
 package lute
 
+import "bytes"
+
 // Table 描述了表节点结构。
 type Table struct {
 	*BaseNode
-	Align int // 0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
+	Aligns []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
 }
 
 // TableRow 描述了表行节点结构。
 type TableRow struct {
 	*BaseNode
+	Aligns []int
 }
 
 // TableCell 描述了表格节点结构。
 type TableCell struct {
+	*BaseNode
+	Aligns int
+}
+
+func (t *Tree) parseTable(lines []items) (ret Node) {
+	length := len(lines)
+	if 2 > length {
+		return
+	}
+
+	tableDelimRow := lines[1]
+	aligns := t.parseTableDelimRow(tableDelimRow)
+	if nil == aligns {
+		return
+	}
+
+	tableHead := t.parseTableRow(lines[0].trim(), aligns, true)
+	if nil == tableHead {
+		return
+	}
+
+	table := &Table{}
+	table.Aligns = aligns
+	table.AppendChild(table, tableHead)
+	for i := 2; i < length; i++ {
+		tableRow := t.parseTableRow(lines[i].trim(), aligns, false)
+		table.AppendChild(table, tableRow)
+	}
+
+	ret = table
+	return
+}
+
+func (t *Tree) parseTableRow(line items, aligns []int, isHead bool) (ret *TableRow) {
+	ret = &TableRow{}
+	cols := bytes.Split(line, []byte{itemPipe})
+	if isBlank(cols[0]) {
+		cols = cols[1:]
+	}
+	if len(cols) > 0 && isBlank(cols[len(cols)-1]) {
+		cols = cols[:len(cols)-1]
+	}
+
+	for i, col := range cols {
+		col = items(col).trim()
+		cell := &TableCell{Aligns: aligns[i]}
+		cell.tokens = col
+		ret.AppendChild(ret, cell)
+	}
+	return
+}
+
+func (t *Tree) parseTableDelimRow(line items) (aligns []int) {
+	length := len(line)
+	var token byte
+	var i int
+	for ; i < length; i++ {
+		token = line[i]
+		if itemPipe != token && itemSpace != token && itemColon != token {
+			return nil
+		}
+	}
+
+	cols := bytes.Split(line, []byte{itemPipe})
+	if isBlank(cols[0]) {
+		cols = cols[1:]
+	}
+	if len(cols) > 0 && isBlank(cols[len(cols)-1]) {
+		cols = cols[:len(cols)-1]
+	}
+
+	var alignments []int
+	for _, col := range cols {
+		col = items(col).trim()
+		if 1 > length {
+			return nil
+		}
+
+		align := t.tableDelimAlign(col)
+		if -1 == align {
+			return nil
+		}
+		alignments = append(alignments, align)
+	}
+	return alignments
+}
+
+func (t *Tree) tableDelimAlign(col items) int {
+	var left, right bool
+	length := len(col)
+	first := col[0]
+	left = itemColon == first
+	last := col[length-1]
+	right = itemColon == last
+
+	i := 1
+	var token byte
+	for ; i < length-1; i++ {
+		token = col[i]
+		if itemHyphen != token {
+			return -1
+		}
+	}
+
+	if left && right {
+		return 2
+	}
+	if left {
+		return 1
+	}
+	if right {
+		return 3
+	}
+
+	return 0
 }
