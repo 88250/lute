@@ -66,6 +66,16 @@ func isControl(token byte) bool {
 	return unicode.IsControl(rune(token))
 }
 
+// isBlank 用于判断 tokens 是否都为空格。
+func isBlank(tokens []byte) bool {
+	for _, token := range tokens {
+		if itemSpace != token {
+			return false
+		}
+	}
+	return true
+}
+
 const (
 	itemEnd          = byte(0)
 	itemBacktick     = byte('`')
@@ -147,13 +157,13 @@ func (tokens items) string() string {
 }
 
 func (tokens items) trimLeftSpace() (spaces int, remains items) {
-	size := len(tokens)
-	if 1 > size {
+	length := len(tokens)
+	if 1 > length {
 		return 0, tokens
 	}
 
 	i := 0
-	for ; i < size; i++ {
+	for ; i < length; i++ {
 		if itemSpace == tokens[i] {
 			spaces++
 		} else if itemTab == tokens[i] {
@@ -176,13 +186,13 @@ func (tokens items) trim() (ret items) {
 }
 
 func (tokens items) trimLeft() (whitespaces, remains items) {
-	size := len(tokens)
-	if 1 > size {
+	length := len(tokens)
+	if 1 > length {
 		return nil, tokens
 	}
 
 	i := 0
-	for ; i < size; i++ {
+	for ; i < length; i++ {
 		if !isWhitespace(tokens[i]) {
 			break
 		} else {
