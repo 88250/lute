@@ -132,6 +132,9 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 		ret = append(ret, line)
 		line = items{}
 	}
+	if 0 < len(line) {
+		ret = append(ret, line)
+	}
 	return
 }
 
