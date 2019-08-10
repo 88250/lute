@@ -88,6 +88,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	for i, col := range cols {
 		col = col.trim()
 		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
+		col = col.removeFirst(itemBackslash)
 		cell.tokens = col
 		ret.AppendChild(ret, cell)
 	}
