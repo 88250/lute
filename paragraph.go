@@ -64,6 +64,8 @@ func (p *Paragraph) Finalize(context *Context) {
 	if nil != table {
 		p.InsertBefore(p, table)
 		p.Unlink()
+		context.tip = table
+		context.lastMatchedContainer = table
 	}
 }
 
