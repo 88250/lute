@@ -18,7 +18,6 @@ package lute
 import (
 	"bytes"
 	"html"
-	"net/url"
 	"strings"
 	"unicode/utf8"
 )
@@ -130,6 +129,47 @@ func unescapeString(str string) string {
 	return fromItems(retTokens)
 }
 
+// encodeDestination percent-encodes rawurl, avoiding double encoding.
+// It doesn't touch:
+// - alphanumeric characters ([0-9a-zA-Z]);
+// - percent-encoded characters (%[0-9a-fA-F]{2});
+// - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
+// Invalid UTF-8 sequences are replaced with U+FFFD.
+// 鸣谢 https://gitlab.com/golang-commonmark/mdurl
+func encodeDestination(rawurl string) string {
+	const hexdigit = "0123456789ABCDEF"
+	var buf bytes.Buffer
+	i := 0
+	for i < len(rawurl) {
+		r, rlen := utf8.DecodeRuneInString(rawurl[i:])
+		if r >= 0x80 {
+			for j, n := i, i+rlen; j < n; j++ {
+				b := rawurl[j]
+				buf.WriteByte('%')
+				buf.WriteByte(hexdigit[(b>>4)&0xf])
+				buf.WriteByte(hexdigit[b&0xf])
+			}
+		} else if r == '%' {
+			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1]) && isHexDigit(rawurl[i+2]) {
+				buf.WriteByte('%')
+				buf.WriteByte(tokenToUpper(rawurl[i+1]))
+				buf.WriteByte(tokenToUpper(rawurl[i+2]))
+				i += 2
+			} else {
+				buf.WriteString("%25")
+			}
+		} else if strings.IndexByte("!#$&'()*+,-./0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~", byte(r)) == -1 {
+			buf.WriteByte('%')
+			buf.WriteByte(hexdigit[(r>>4)&0xf])
+			buf.WriteByte(hexdigit[r&0xf])
+		} else {
+			buf.WriteByte(byte(r))
+		}
+		i += rlen
+	}
+	return buf.String()
+}
+
 //
 //func encodeDestination(destination string) (ret string) {
 //	if "" == destination {
@@ -198,79 +238,38 @@ func unescapeString(str string) string {
 //	return
 //}
 
-// encodeDestination percent-encodes rawurl, avoiding double encoding.
-// It doesn't touch:
-// - alphanumeric characters ([0-9a-zA-Z]);
-// - percent-encoded characters (%[0-9a-fA-F]{2});
-// - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
-// Invalid UTF-8 sequences are replaced with U+FFFD.
-// https://gitlab.com/golang-commonmark/mdurl
-func encodeDestination(rawurl string) string {
-	const hexdigit = "0123456789ABCDEF"
-	var buf bytes.Buffer
-	i := 0
-	for i < len(rawurl) {
-		r, rlen := utf8.DecodeRuneInString(rawurl[i:])
-		if r >= 0x80 {
-			for j, n := i, i+rlen; j < n; j++ {
-				b := rawurl[j]
-				buf.WriteByte('%')
-				buf.WriteByte(hexdigit[(b>>4)&0xf])
-				buf.WriteByte(hexdigit[b&0xf])
-			}
-		} else if r == '%' {
-			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1]) && isHexDigit(rawurl[i+2]) {
-				buf.WriteByte('%')
-				buf.WriteByte(tokenToUpper(rawurl[i+1]))
-				buf.WriteByte(tokenToUpper(rawurl[i+2]))
-				i += 2
-			} else {
-				buf.WriteString("%25")
-			}
-		} else if strings.IndexByte("!#$&'()*+,-./0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~", byte(r)) == -1 {
-			buf.WriteByte('%')
-			buf.WriteByte(hexdigit[(r>>4)&0xf])
-			buf.WriteByte(hexdigit[r&0xf])
-		} else {
-			buf.WriteByte(byte(r))
-		}
-		i += rlen
-	}
-	return buf.String()
-}
-
-func decodeDestination(destination string) (ret string) {
-	if "" == destination {
-		return destination
-	}
-
-	parts := strings.SplitN(destination, ":", 2)
-	var scheme string
-	remains := destination
-	if 1 < len(parts) {
-		scheme = parts[0]
-		remains = parts[1]
-	}
-
-	parts = strings.Split(remains, "/")
-	remains = ""
-	length := len(parts)
-	for i, part := range parts {
-		unescaped, err := url.QueryUnescape(part)
-		if nil != err {
-			unescaped = part
-		}
-		remains += unescaped
-		if i < length-1 {
-			remains += "/"
-		}
-	}
-
-	if "" == scheme {
-		ret = remains
-	} else {
-		ret = scheme + ":" + remains
-	}
-
-	return
-}
+//func decodeDestination(destination string) (ret string) {
+//	if "" == destination {
+//		return destination
+//	}
+//
+//	parts := strings.SplitN(destination, ":", 2)
+//	var scheme string
+//	remains := destination
+//	if 1 < len(parts) {
+//		scheme = parts[0]
+//		remains = parts[1]
+//	}
+//
+//	parts = strings.Split(remains, "/")
+//	remains = ""
+//	length := len(parts)
+//	for i, part := range parts {
+//		unescaped, err := url.QueryUnescape(part)
+//		if nil != err {
+//			unescaped = part
+//		}
+//		remains += unescaped
+//		if i < length-1 {
+//			remains += "/"
+//		}
+//	}
+//
+//	if "" == scheme {
+//		ret = remains
+//	} else {
+//		ret = scheme + ":" + remains
+//	}
+//
+//	return
+//}
