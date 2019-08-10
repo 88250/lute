@@ -41,8 +41,7 @@ func (context *Context) parseTable(lines []items) (ret Node) {
 		return
 	}
 
-	tableDelimRow := lines[1]
-	aligns := context.parseTableDelimRow(tableDelimRow)
+	aligns := context.parseTableDelimRow(lines[1].trim())
 	if nil == aligns {
 		return
 	}
@@ -52,7 +51,7 @@ func (context *Context) parseTable(lines []items) (ret Node) {
 		return
 	}
 
-	table := &Table{}
+	table := &Table{&BaseNode{typ: NodeTable}, aligns}
 	table.Aligns = aligns
 	table.AppendChild(table, tableHead)
 	for i := 2; i < length; i++ {
@@ -65,7 +64,7 @@ func (context *Context) parseTable(lines []items) (ret Node) {
 }
 
 func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *TableRow) {
-	ret = &TableRow{}
+	ret = &TableRow{&BaseNode{typ: NodeTableRow}, aligns}
 	cols := bytes.Split(line, []byte{itemPipe})
 	if isBlank(cols[0]) {
 		cols = cols[1:]
@@ -76,7 +75,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 
 	for i, col := range cols {
 		col = items(col).trim()
-		cell := &TableCell{Aligns: aligns[i]}
+		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
 		cell.tokens = col
 		ret.AppendChild(ret, cell)
 	}
@@ -89,7 +88,7 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	var i int
 	for ; i < length; i++ {
 		token = line[i]
-		if itemPipe != token && itemSpace != token && itemColon != token {
+		if itemPipe != token && itemHyphen != token && itemColon != token && itemSpace != token {
 			return nil
 		}
 	}

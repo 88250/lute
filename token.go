@@ -126,6 +126,9 @@ func (tokens items) lines() (ret []items) {
 			line = items{}
 		}
 	}
+	if 0 < len(line) {
+		ret = append(ret, line)
+	}
 	return
 }
 
