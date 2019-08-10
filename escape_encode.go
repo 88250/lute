@@ -117,33 +117,17 @@ func unescapeString(str string) string {
 	}
 
 	str = html.UnescapeString(str) // FIXME: 此处应该用内部的实体转义方式
-	runes := toItems(str)
-	length := len(runes)
-	retRunes := make(items, 0, length)
+	tokens := toItems(str)
+	length := len(tokens)
+	retTokens := make(items, 0, length)
 	for i := 0; i < length; i++ {
-		if isBackslashEscape(runes, i) {
-			retRunes = retRunes[:len(retRunes)-1]
+		if tokens.isBackslashEscape(i) {
+			retTokens = retTokens[:len(retTokens)-1]
 		}
-		retRunes = append(retRunes, runes[i])
+		retTokens = append(retTokens, tokens[i])
 	}
 
-	return fromItems(retRunes)
-}
-
-func isBackslashEscape(items items, pos int) bool {
-	if !isASCIIPunct(items[pos]) {
-		return false
-	}
-
-	backslashes := 0
-	for i := pos - 1; 0 <= i; i-- {
-		if '\\' != items[i] {
-			break
-		}
-		backslashes++
-	}
-
-	return 0 != backslashes%2
+	return fromItems(retTokens)
 }
 
 //

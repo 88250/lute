@@ -397,7 +397,6 @@ func (tokens items) isBackslashEscape(pos int) bool {
 		if itemBackslash != tokens[i] {
 			break
 		}
-
 		backslashes++
 	}
 	return 0 != backslashes%2
