@@ -30,7 +30,7 @@ func (t *Tree) parseInlines() {
 			return WalkContinue, nil
 		}
 
-		if typ := n.Type(); NodeParagraph == typ || NodeHeading == typ {
+		if typ := n.Type(); NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
 			for t.parseInline(n) {
 			}
 			t.processEmphasis(nil)

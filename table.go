@@ -40,7 +40,7 @@ type TableCell struct {
 	Aligns int
 }
 
-func (context *Context) parseTable(lines []items) (ret Node) {
+func (context *Context) parseTable(lines []items) (ret *Table) {
 	length := len(lines)
 	if 2 > length {
 		return
@@ -55,15 +55,15 @@ func (context *Context) parseTable(lines []items) (ret Node) {
 	if nil == headRow {
 		return
 	}
-	table := &Table{&BaseNode{typ: NodeTable}, aligns}
-	table.Aligns = aligns
-	table.AppendChild(table, context.newTableHead(headRow))
+
+	ret = &Table{&BaseNode{typ: NodeTable}, aligns}
+	ret.Aligns = aligns
+	ret.AppendChild(ret, context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
 		tableRow := context.parseTableRow(lines[i].trim(), aligns, false)
-		table.AppendChild(table, tableRow)
+		ret.AppendChild(ret, tableRow)
 	}
 
-	ret = table
 	return
 }
 

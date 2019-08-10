@@ -66,7 +66,6 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 		cell := node.(*TableCell)
 		var attrs [][]string
 		switch cell.Aligns {
-		case 0:
 		case 1:
 			attrs = append(attrs, []string{"align", "left"})
 		case 2:
@@ -77,6 +76,7 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 		r.tag(tag, nil, false)
 	} else {
 		r.tag("/"+tag, nil, false)
+		r.Newline()
 	}
 	return WalkContinue, nil
 }
@@ -87,6 +87,7 @@ func (r *Renderer) renderTableRow(node Node, entering bool) (WalkStatus, error) 
 		r.Newline()
 	} else {
 		r.tag("/tr", nil, false)
+		r.Newline()
 		if node == node.Parent().LastChild() {
 			r.tag("/tbody", nil, false)
 		}
