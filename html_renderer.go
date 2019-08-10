@@ -107,7 +107,9 @@ func (r *Renderer) renderTableHead(node Node, entering bool) (WalkStatus, error)
 		r.Newline()
 		r.tag("/thead", nil, false)
 		r.Newline()
-		r.tag("tbody", nil, false)
+		if nil != node.Next() {
+			r.tag("tbody", nil, false)
+		}
 		r.Newline()
 	}
 	return WalkContinue, nil

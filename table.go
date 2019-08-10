@@ -99,12 +99,18 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	length := len(line)
 	var token byte
-	var i int
+	var i, pipes int
 	for ; i < length; i++ {
 		token = line[i]
 		if itemPipe != token && itemHyphen != token && itemColon != token && itemSpace != token {
 			return nil
 		}
+		if itemPipe == token {
+			pipes++
+		}
+	}
+	if 1 > pipes {
+		return nil
 	}
 
 	cols := bytes.Split(line, []byte{itemPipe})
