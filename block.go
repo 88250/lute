@@ -118,6 +118,7 @@ func (t *Tree) incorporateLine(line items) {
 	} else {
 		// 最终化未匹配的块
 		t.context.closeUnmatchedBlocks()
+
 		if t.context.blank && nil != container.LastChild() {
 			container.LastChild().SetLastLineBlank(true)
 		}

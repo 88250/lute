@@ -32,6 +32,156 @@ type delimiter struct {
 	previousDelimiter *delimiter
 }
 
+// handleDelim 将分隔符 *_~ 入栈。
+func (t *Tree) handleDelim(block Node, tokens items) {
+	startPos := t.context.pos
+	delim := t.scanDelims(tokens)
+
+	text := tokens[startPos:t.context.pos]
+	node := &Text{tokens: text}
+	block.AppendChild(block, node)
+
+	// 将这个分隔符入栈
+	t.context.delimiters = &delimiter{
+		typ:         delim.typ,
+		num:         delim.num,
+		originalNum: delim.num,
+		node:        node,
+		previous:    t.context.delimiters,
+		next:        nil,
+		canOpen:     delim.canOpen,
+		canClose:    delim.canClose,
+	}
+	if t.context.delimiters.previous != nil {
+		t.context.delimiters.previous.next = t.context.delimiters
+	}
+}
+
+// processEmphasis 处理强调、加粗以及删除线。
+func (t *Tree) processEmphasis(stackBottom *delimiter) {
+	var opener, closer, oldCloser *delimiter
+	var openerInl, closerInl Node
+	var tempStack *delimiter
+	var useDelims int
+	var openerFound bool
+	var openersBottom = map[byte]*delimiter{}
+	var oddMatch = false
+
+	openersBottom[itemUnderscore] = stackBottom
+	openersBottom[itemAsterisk] = stackBottom
+	openersBottom[itemTilde] = stackBottom
+
+	// find first closer above stack_bottom:
+	closer = t.context.delimiters
+	for closer != nil && closer.previous != stackBottom {
+		closer = closer.previous
+	}
+
+	// move forward, looking for closers, and handling each
+	for nil != closer {
+		var closercc = closer.typ
+		if !closer.canClose {
+			closer = closer.next
+			continue
+		}
+
+		// found emphasis closer. now look back for first matching opener:
+		opener = closer.previous
+		openerFound = false
+		for nil != opener && opener != stackBottom && opener != openersBottom[closercc] {
+			oddMatch = (closer.canOpen || opener.canClose) && closer.originalNum%3 != 0 && (opener.originalNum+closer.originalNum)%3 == 0
+			if opener.typ == closer.typ && opener.canOpen && !oddMatch {
+				openerFound = true
+				break
+			}
+			opener = opener.previous
+		}
+		oldCloser = closer
+
+		if !openerFound {
+			closer = closer.next
+		} else {
+			// calculate actual number of delimiters used from closer
+			if closer.num >= 2 && opener.num >= 2 {
+				useDelims = 2
+			} else {
+				useDelims = 1
+			}
+
+			openerInl = opener.node
+			closerInl = closer.node
+
+			// remove used delimiters from stack elts and inlines
+			opener.num -= useDelims
+			closer.num -= useDelims
+
+			text := openerInl.Tokens()[0 : len(openerInl.Tokens())-useDelims]
+			openerInl.SetTokens(text)
+			text = closerInl.Tokens()[0 : len(closerInl.Tokens())-useDelims]
+			closerInl.SetTokens(text)
+
+			var emphStrongDel Node
+			if 1 == useDelims {
+				emphStrongDel = &Emphasis{&BaseNode{typ: NodeEmphasis}}
+			} else {
+				if itemTilde != closercc {
+					emphStrongDel = &Strong{&BaseNode{typ: NodeStrong}}
+				} else {
+					emphStrongDel = &Strikethrough{&BaseNode{typ: NodeStrikethrough}}
+				}
+			}
+
+			tmp := openerInl.Next()
+			for nil != tmp && tmp != closerInl {
+				next := tmp.Next()
+				tmp.Unlink()
+				emphStrongDel.AppendChild(emphStrongDel, tmp)
+				tmp = next
+			}
+
+			openerInl.InsertAfter(openerInl, emphStrongDel)
+
+			// remove elts between opener and closer in delimiters stack
+			if opener.next != closer {
+				opener.next = closer
+				closer.previous = opener
+			}
+
+			// if opener has 0 delims, remove it and the inline
+			if opener.num == 0 {
+				openerInl.Unlink()
+				t.removeDelimiter(opener)
+			}
+
+			if closer.num == 0 {
+				closerInl.Unlink()
+				tempStack = closer.next
+				t.removeDelimiter(closer)
+				closer = tempStack
+			}
+		}
+
+		if !openerFound && !oddMatch {
+			// Set lower bound for future searches for openers:
+			// We don't do this with oddMatch because a **
+			// that doesn't match an earlier * might turn into
+			// an opener, and the * might be matched by something
+			// else.
+			openersBottom[closercc] = oldCloser.previous
+			if !oldCloser.canOpen {
+				// We can remove a closer that can't be an opener,
+				// once we've seen there's no matching opener:
+				t.removeDelimiter(oldCloser)
+			}
+		}
+	}
+
+	// 移除所有分隔符
+	for t.context.delimiters != nil && t.context.delimiters != stackBottom {
+		t.removeDelimiter(t.context.delimiters)
+	}
+}
+
 func (t *Tree) scanDelims(tokens items) *delimiter {
 	startPos := t.context.pos
 	token := tokens[startPos]
@@ -72,165 +222,14 @@ func (t *Tree) scanDelims(tokens items) *delimiter {
 	return &delimiter{typ: token, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
 }
 
-// handleDelim 将分隔符 * _ 和 ~ 入栈。
-func (t *Tree) handleDelim(block Node, tokens items) {
-	startPos := t.context.pos
-	delim := t.scanDelims(tokens)
-
-	text := tokens[startPos:t.context.pos]
-	node := &Text{tokens: text}
-	block.AppendChild(block, node)
-
-	// 将这个分隔符入栈
-	t.context.delimiters = &delimiter{
-		typ:         delim.typ,
-		num:         delim.num,
-		originalNum: delim.num,
-		node:        node,
-		previous:    t.context.delimiters,
-		next:        nil,
-		canOpen:     delim.canOpen,
-		canClose:    delim.canClose,
-	}
-	if t.context.delimiters.previous != nil {
-		t.context.delimiters.previous.next = t.context.delimiters
-	}
-}
-
-func (t *Tree) processEmphasis(stackBottom *delimiter) {
-	var opener, closer, old_closer *delimiter
-	var opener_inl, closer_inl Node
-	var tempstack *delimiter
-	var use_delims int
-	var opener_found bool
-	var openers_bottom = map[byte]*delimiter{}
-	var odd_match = false
-
-	openers_bottom[itemUnderscore] = stackBottom
-	openers_bottom[itemAsterisk] = stackBottom
-	openers_bottom[itemTilde] = stackBottom
-
-	// find first closer above stack_bottom:
-	closer = t.context.delimiters
-	for closer != nil && closer.previous != stackBottom {
-		closer = closer.previous
-	}
-
-	// move forward, looking for closers, and handling each
-	for nil != closer {
-		var closercc = closer.typ
-		if !closer.canClose {
-			closer = closer.next
-			continue
-		}
-
-		// found emphasis closer. now look back for first matching opener:
-		opener = closer.previous
-		opener_found = false
-		for nil != opener && opener != stackBottom && opener != openers_bottom[closercc] {
-			odd_match = (closer.canOpen || opener.canClose) && closer.originalNum%3 != 0 && (opener.originalNum+closer.originalNum)%3 == 0
-			if opener.typ == closer.typ && opener.canOpen && !odd_match {
-				opener_found = true
-				break
-			}
-			opener = opener.previous
-		}
-		old_closer = closer
-
-		if !opener_found {
-			closer = closer.next
-		} else {
-			// calculate actual number of delimiters used from closer
-			if closer.num >= 2 && opener.num >= 2 {
-				use_delims = 2
-			} else {
-				use_delims = 1
-			}
-
-			opener_inl = opener.node
-			closer_inl = closer.node
-
-			// remove used delimiters from stack elts and inlines
-			opener.num -= use_delims
-			closer.num -= use_delims
-
-			text := opener_inl.Tokens()[0 : len(opener_inl.Tokens())-use_delims]
-			opener_inl.SetTokens(text)
-			text = closer_inl.Tokens()[0 : len(closer_inl.Tokens())-use_delims]
-			closer_inl.SetTokens(text)
-
-			var emphStrongDel Node
-			if 1 == use_delims {
-				emphStrongDel = &Emphasis{&BaseNode{typ: NodeEmphasis}}
-			} else {
-				if itemTilde != closercc {
-					emphStrongDel = &Strong{&BaseNode{typ: NodeStrong}}
-				} else {
-					emphStrongDel = &Strikethrough{&BaseNode{typ: NodeStrikethrough}}
-				}
-			}
-
-			tmp := opener_inl.Next()
-			for nil != tmp && tmp != closer_inl {
-				next := tmp.Next()
-				tmp.Unlink()
-				emphStrongDel.AppendChild(emphStrongDel, tmp)
-				tmp = next
-			}
-
-			opener_inl.InsertAfter(opener_inl, emphStrongDel)
-
-			// remove elts between opener and closer in delimiters stack
-			if opener.next != closer {
-				opener.next = closer
-				closer.previous = opener
-			}
-
-			// if opener has 0 delims, remove it and the inline
-			if opener.num == 0 {
-				opener_inl.Unlink()
-				t.removeDelimiter(opener)
-			}
-
-			if closer.num == 0 {
-				closer_inl.Unlink()
-				tempstack = closer.next
-				t.removeDelimiter(closer)
-				closer = tempstack
-			}
-		}
-
-		if !opener_found && !odd_match {
-			// Set lower bound for future searches for openers:
-			// We don't do this with odd_match because a **
-			// that doesn't match an earlier * might turn into
-			// an opener, and the * might be matched by something
-			// else.
-			openers_bottom[closercc] = old_closer.previous
-			if !old_closer.canOpen {
-				// We can remove a closer that can't be an opener,
-				// once we've seen there's no matching opener:
-				t.removeDelimiter(old_closer)
-			}
-		}
-	}
-
-	// remove all delimiters
-	for t.context.delimiters != nil && t.context.delimiters != stackBottom {
-		t.removeDelimiter(t.context.delimiters)
-	}
-}
-
 func (t *Tree) removeDelimiter(delim *delimiter) (ret *delimiter) {
 	if delim.previous != nil {
 		delim.previous.next = delim.next
 	}
 	if delim.next == nil {
-		// top of stack
-		t.context.delimiters = delim.previous
+		t.context.delimiters = delim.previous // 栈顶
 	} else {
 		delim.next.previous = delim.previous
 	}
-
 	return
 }
