@@ -85,11 +85,21 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 		cols = cols[:len(cols)-1]
 	}
 
-	for i, col := range cols {
-		col = col.trim()
+	var i int
+	var col items
+	length := len(cols)
+	for ; i < length; i++ {
+		col = cols[i].trim()
 		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
 		col = col.removeFirst(itemBackslash) // 删掉一个反斜杠来恢复语义
 		cell.tokens = col
+		ret.AppendChild(ret, cell)
+	}
+
+	// 可能需要补全剩余的列
+	length = len(aligns)
+	for ; i < length; i++ {
+		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
 		ret.AppendChild(ret, cell)
 	}
 	return
