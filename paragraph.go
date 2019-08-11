@@ -63,9 +63,10 @@ func (p *Paragraph) Finalize(context *Context) {
 	table := context.parseTable(lines)
 	if nil != table {
 		p.InsertBefore(p, table)
-		p.Unlink()
-		context.tip = table
-		context.lastMatchedContainer = table
+		// 移除该段落所有内容 tokens，但段落节点本身暂时保留在语法树上
+		// 在行级解析中，如果段落内容为空则从语法树上移除该段落节点
+		// 这样处理的目的是让块级解析保持简单，在关闭未匹配的节点时只用判断段落类型
+		p.tokens = nil
 	}
 }
 

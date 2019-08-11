@@ -31,8 +31,16 @@ func (t *Tree) parseInlines() {
 		}
 
 		if typ := n.Type(); NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
+			if NodeParagraph == typ && nil == n.Tokens() {
+				// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空（具体可参看 Paragraph.Finalize() 函数）
+				// 在这里从语法树上移除空段落节点
+				n.Unlink()
+				return WalkContinue, nil
+			}
+
 			for t.parseInline(n) {
 			}
+
 			t.processEmphasis(nil)
 		}
 
@@ -40,6 +48,7 @@ func (t *Tree) parseInlines() {
 	})
 }
 
+// parseInline 解析并生成块节点 block 的行级子节点。
 func (t *Tree) parseInline(block Node) bool {
 	tokens := block.Tokens()
 	if nil == tokens {
