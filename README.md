@@ -40,7 +40,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 ## ⚡ 性能
 
 在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试结果如下。  
-目前看来在实现 CommonMark 规范的前提下，Lute、goldmark 和 golang-commonmark 的性能差距不大。
+目前看来在实现 CommonMark 规范的前提下，Lute、goldmark 和 golang-commonmark 的性能差距不大，Blackfriday 没有实现 CommonMark 所以性能更好一些。
 
 ### [Lute](https://github.com/b3log/lute)
 
@@ -73,8 +73,6 @@ BenchmarkBlackFriday-2   	     500	   3875623 ns/op	 3318457 B/op	   20052 alloc
 BenchmarkBlackFriday-4   	     500	   3783871 ns/op	 3334775 B/op	   20056 allocs/op
 BenchmarkBlackFriday-8   	     500	   3917515 ns/op	 3341045 B/op	   20058 allocs/op
 ```
-
-Blackfriday 没有实现 CommonMark 所以性能好一些。
 
 ### [markdown-it](https://github.com/markdown-it/markdown-it)
 
