@@ -20,16 +20,18 @@ import (
 	"strings"
 )
 
-// parseInlines 解析行级元素。
+// parseInlines 解析并生成行级节点。
 func (t *Tree) parseInlines() {
 	t.context.delimiters = nil
 	t.context.brackets = nil
 
+	// 从根节点开始按深度优先遍历子块节点
 	Walk(t.Root, func(n Node, entering bool) (WalkStatus, error) {
-		if entering {
+		if entering { // 遍历进入块节点时不做任何处理
 			return WalkContinue, nil
 		}
 
+		// 遍历离开块节点时，只有如下几种类型的块节点需要生成行级子节点
 		if typ := n.Type(); NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
 			if NodeParagraph == typ && nil == n.Tokens() {
 				// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空（具体可参看 Paragraph.Finalize() 函数）
@@ -38,9 +40,11 @@ func (t *Tree) parseInlines() {
 				return WalkContinue, nil
 			}
 
+			// 逐个生成该块节点的行级子节点
 			for t.parseInline(n) {
 			}
 
+			// 处理该块节点中的强调、加粗和删除线
 			t.processEmphasis(nil)
 		}
 

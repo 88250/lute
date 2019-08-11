@@ -15,7 +15,7 @@
 
 package lute
 
-// parseBlocks 解析块级元素。
+// parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
@@ -69,7 +69,7 @@ func (t *Tree) incorporateLine(line items) {
 	matchedLeaf := container.Type() != NodeParagraph && container.AcceptLines()
 	var startsLen = len(blockStarts)
 
-	// 除非最后一个匹配到的是代码块，否则的话就起始一个新的块级元素
+	// 除非最后一个匹配到的是代码块，否则的话就起始一个新的块级节点
 	for !matchedLeaf {
 		t.context.findNextNonspace()
 

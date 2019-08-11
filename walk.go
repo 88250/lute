@@ -27,26 +27,33 @@ const (
 	WalkContinue
 )
 
-// Walker 函数用于遍历指定节点，遍历子节点前设置 entering 为 true，离开子节点遍历后设置为 false。
-// 如果返回 error 则结束遍历。
+// Walker 函数定义了遍历节点 n 时需要执行的操作，进入节点设置 entering 为 true，离开节点设置为 false。
+// 如果返回 WalkStop 或者 error 则结束遍历。
 type Walker func(n Node, entering bool) (WalkStatus, error)
 
-// Walk 使用深度优先算法遍历指定的树节点。
-func Walk(n Node, walker Walker) error {
-	status, err := walker(n, true)
+// Walk 使用深度优先算法遍历指定的树节点 n。
+func Walk(n Node, walker Walker) (err error) {
+	var status WalkStatus
+
+	// 进入节点
+	status, err = walker(n, true)
 	if err != nil || status == WalkStop {
 		return err
 	}
+
 	if status != WalkSkipChildren {
+		// 递归遍历子节点
 		for c := n.FirstChild(); c != nil; c = c.Next() {
 			if err := Walk(c, walker); err != nil {
 				return err
 			}
 		}
 	}
+
+	// 离开节点
 	status, err = walker(n, false)
 	if err != nil || status == WalkStop {
 		return err
 	}
-	return nil
+	return
 }
