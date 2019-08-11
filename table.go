@@ -59,9 +59,11 @@ func (context *Context) parseTable(lines []items) (ret *Table) {
 	ret.AppendChild(ret, context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
 		tableRow := context.parseTableRow(lines[i].trim(), aligns, false)
+		if nil == tableRow {
+			return
+		}
 		ret.AppendChild(ret, tableRow)
 	}
-
 	return
 }
 
@@ -85,10 +87,15 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 		cols = cols[:len(cols)-1]
 	}
 
+	colsLen := len(cols)
+	alignsLen := len(aligns)
+	if isHead && colsLen > alignsLen { // 分隔符行定义了表的列数，如果表头列数还大于这个列数，则说明不满足表格式
+		return nil
+	}
+
 	var i int
 	var col items
-	length := len(cols)
-	for ; i < length; i++ {
+	for ; i < colsLen && i < alignsLen; i++ {
 		col = cols[i].trim()
 		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
 		col = col.removeFirst(itemBackslash) // 删掉一个反斜杠来恢复语义
@@ -97,8 +104,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	}
 
 	// 可能需要补全剩余的列
-	length = len(aligns)
-	for ; i < length; i++ {
+	for ; i < alignsLen; i++ {
 		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
 		ret.AppendChild(ret, cell)
 	}

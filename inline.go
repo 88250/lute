@@ -36,7 +36,10 @@ func (t *Tree) parseInlines() {
 			if NodeParagraph == typ && nil == n.Tokens() {
 				// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空（具体可参看 Paragraph.Finalize() 函数）
 				// 在这里从语法树上移除空段落节点
+				next := n.Next()
 				n.Unlink()
+				// Unlink 会将后一个兄弟节点置空，此处是在在遍历过程中修改树结构，所以需要保持继续迭代后面的兄弟节点
+				n.SetNext(next)
 				return WalkContinue, nil
 			}
 
