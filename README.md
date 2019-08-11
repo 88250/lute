@@ -39,7 +39,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 
 ## ⚡ 性能
 
-在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试结果如下。
+在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试结果如下。  
 目前看来在实现 CommonMark 规范的前提下，Lute、goldmark 和 golang-commonmark 的性能差距不大。
 
 ### [Lute](https://github.com/b3log/lute)
