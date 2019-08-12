@@ -18,10 +18,10 @@ package lute
 import "github.com/b3log/gulu"
 
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
-func parse(name string, markdown []byte) (t *Tree, err error) {
+func parse(name string, markdown []byte, option options) (t *Tree, err error) {
 	defer gulu.Panic.Recover(&err)
 
-	t = &Tree{Name: name, text: markdown, context: &Context{}}
+	t = &Tree{Name: name, text: markdown, context: &Context{option: option}}
 	t.context.tree = t
 	t.lex = lex(t.text)
 	t.Root = &Document{&BaseNode{typ: NodeDocument}}
@@ -32,14 +32,11 @@ func parse(name string, markdown []byte) (t *Tree, err error) {
 	return
 }
 
-// ParseStr 接受 string 类型的 markdown 后直接调用 parse 进行解析。
-func ParseStr(name string, markdown string) (t *Tree, err error) {
-	return parse(name, toItems(markdown))
-}
-
 // Context 用于维护解析过程中使用到的公共数据。
 type Context struct {
-	tree       *Tree
+	tree   *Tree   // 关联的语法树
+	option options // 解析渲染选项
+
 	linkRefDef map[string]*Link // 链接引用定义集
 
 	// 以下变量用于块级解析阶段

@@ -127,7 +127,9 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 				if itemTilde != closercc {
 					emphStrongDel = &Strong{&BaseNode{typ: NodeStrong}}
 				} else {
-					emphStrongDel = &Strikethrough{&BaseNode{typ: NodeStrikethrough}}
+					if t.context.option.GFMStrikethrough {
+						emphStrongDel = &Strikethrough{&BaseNode{typ: NodeStrikethrough}}
+					}
 				}
 			}
 

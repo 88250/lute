@@ -48,25 +48,29 @@ func (p *Paragraph) Finalize(context *Context) {
 		p.Unlink()
 	}
 
-	// 尝试解析任务列表项
-	if listItem, ok := p.parent.(*ListItem); ok {
-		if 3 == listItem.listData.typ {
-			// 如果是任务列表项则添加任务列表标记节点
-			taskListItemMarker := &TaskListItemMarker{&BaseNode{typ: NodeTaskListItemMarker}, listItem.listData.checked}
-			p.InsertBefore(p, taskListItemMarker)
-			p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+	if context.option.GFMTaskListItem {
+		// 尝试解析任务列表项
+		if listItem, ok := p.parent.(*ListItem); ok {
+			if 3 == listItem.listData.typ {
+				// 如果是任务列表项则添加任务列表标记节点
+				taskListItemMarker := &TaskListItemMarker{&BaseNode{typ: NodeTaskListItemMarker}, listItem.listData.checked}
+				p.InsertBefore(p, taskListItemMarker)
+				p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+			}
 		}
 	}
 
-	// 尝试解析表
-	lines := p.tokens.lines()
-	table := context.parseTable(lines)
-	if nil != table {
-		p.InsertBefore(p, table)
-		// 移除该段落所有内容 tokens，但段落节点本身暂时保留在语法树上
-		// 在行级解析中，如果段落内容为空则从语法树上移除该段落节点
-		// 这样处理的目的是让块级解析保持简单，在关闭未匹配的节点时只用判断段落类型
-		p.tokens = nil
+	if context.option.GFMTable {
+		// 尝试解析表
+		lines := p.tokens.lines()
+		table := context.parseTable(lines)
+		if nil != table {
+			p.InsertBefore(p, table)
+			// 移除该段落所有内容 tokens，但段落节点本身暂时保留在语法树上
+			// 在行级解析中，如果段落内容为空则从语法树上移除该段落节点
+			// 这样处理的目的是让块级解析保持简单，在关闭未匹配的节点时只用判断段落类型
+			p.tokens = nil
+		}
 	}
 }
 

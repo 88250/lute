@@ -20,17 +20,10 @@ type Lute struct {
 	options
 }
 
-// New 创建一个新的 Lute 引擎。
+// New 创建一个新的 Lute 引擎，默认启用所有 GFM 支持。
 func New(opts ...option) (ret *Lute) {
-	ret = &Lute{
-		options: options{
-			GFMTable:             true,
-			GFMTaskListItem:      true,
-			GFMStrikethrough:     true,
-			GFMAutoLink:          true,
-			GFMDisallowedRawHTML: true,
-		},
-	}
+	ret = &Lute{}
+	GFM(true)(ret)
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -40,7 +33,7 @@ func New(opts ...option) (ret *Lute) {
 // Markdown 将 markdown 文本字符数组处理为相应的 html 字符数组。name 参数用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error) {
 	var tree *Tree
-	tree, err = parse(name, markdown)
+	tree, err = parse(name, markdown, lute.options)
 	if nil != err {
 		return
 	}
@@ -111,7 +104,7 @@ func GFMDisallowedRawHTML(b bool) option {
 	}
 }
 
-// options 描述了一些列解析选项，主要是 GFM 规范开关。
+// options 描述了一些列解析和渲染选项。
 type options struct {
 	GFMTable             bool // GFM 表
 	GFMTaskListItem      bool // GFM 任务列表项
@@ -120,5 +113,5 @@ type options struct {
 	GFMDisallowedRawHTML bool // GFM 不允许原始 HTML
 }
 
-// option 描述了解析选项设置函数签名。
+// option 描述了解析渲染选项设置函数签名。
 type option func(lute *Lute)
