@@ -22,9 +22,9 @@ import (
 )
 
 type parseTest struct {
-	name   string
-	input  string
-	result string
+	name     string
+	markdown string
+	html     string
 }
 
 var parseTests = []parseTest{
@@ -262,21 +262,17 @@ var parseTests = []parseTest{
 }
 
 func TestParse(t *testing.T) {
+	luteEngine := lute.New(lute.GFM(false))
+
 	for _, test := range parseTests {
 		fmt.Println("Test [" + test.name + "]")
-		tree, err := lute.ParseStr(test.name, test.input)
-		if nil != err {
-			t.Fatalf("%q: unexpected error: %v", test.name, err)
-		}
-
-		renderer := lute.NewHTMLRenderer()
-		html, err := tree.Render(renderer)
+		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
 
-		if test.result != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.Name, test.result, html, test.input)
+		if test.html != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
 		}
 	}
 }

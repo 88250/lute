@@ -17,11 +17,11 @@ package lute
 
 import "github.com/b3log/gulu"
 
-// Parse 会将 text 指定的 Markdown 原始文本解析为一颗语法树。
-func Parse(name string, text []byte) (t *Tree, err error) {
+// parse 会将 markdown 原始文本字符数组解析为一颗语法树。
+func parse(name string, markdown []byte) (t *Tree, err error) {
 	defer gulu.Panic.Recover(&err)
 
-	t = &Tree{Name: name, text: text, context: &Context{}}
+	t = &Tree{Name: name, text: markdown, context: &Context{}}
 	t.context.tree = t
 	t.lex = lex(t.text)
 	t.Root = &Document{&BaseNode{typ: NodeDocument}}
@@ -32,9 +32,9 @@ func Parse(name string, text []byte) (t *Tree, err error) {
 	return
 }
 
-// ParseStr 接受 string 类型的 text 后直接调用 Parse 进行解析。
-func ParseStr(name string, text string) (t *Tree, err error) {
-	return Parse(name, toItems(text))
+// ParseStr 接受 string 类型的 markdown 后直接调用 parse 进行解析。
+func ParseStr(name string, markdown string) (t *Tree, err error) {
+	return parse(name, toItems(markdown))
 }
 
 // Context 用于维护解析过程中使用到的公共数据。
@@ -175,13 +175,13 @@ type Tree struct {
 	context *Context // 语法解析上下文
 }
 
-// Render 使用 renderer 进行语法树渲染，渲染结果以 output 返回。
-func (t *Tree) Render(renderer *Renderer) (output string, err error) {
+// render 使用 renderer 进行语法树渲染，渲染结果以 output 返回。
+func (t *Tree) render(renderer *Renderer) (html []byte, err error) {
 	err = renderer.Render(t.Root)
 	if nil != err {
-		return "", err
+		return
 	}
-	output = renderer.writer.String()
+	html = renderer.writer.Bytes()
 
 	return
 }

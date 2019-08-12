@@ -20,8 +20,8 @@ import (
 	"strings"
 )
 
-// NewHTMLRenderer 创建一个 HTML 渲染器。
-func NewHTMLRenderer() (ret *Renderer) {
+// newHTMLRenderer 创建一个 HTML 渲染器。
+func newHTMLRenderer() (ret *Renderer) {
 	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}}
 
 	// 注册 CommonMark 渲染函数

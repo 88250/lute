@@ -32,7 +32,7 @@ type Renderer struct {
 	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况。比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 }
 
-// Render 渲染指定的节点 n。
+// render 渲染指定的节点 n。
 func (r *Renderer) Render(n Node) error {
 	r.lastOut = itemNewline
 	r.writer.Grow(4096)

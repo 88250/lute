@@ -44,22 +44,19 @@ func TestSpec(t *testing.T) {
 		t.Fatalf("read spec test caes failed: " + err.Error())
 	}
 
+	luteEngine := lute.New(lute.GFM(false))
+
 	for _, test := range testcases {
 		testName := test.Section + " " + strconv.Itoa(test.Example)
 		fmt.Println("Test [" + testName + "]")
-		tree, err := lute.ParseStr(testName, test.Markdown)
-		if nil != err {
-			t.Fatalf("parse [%s] failed: %s", tree.Name, err.Error())
-		}
 
-		renderer := lute.NewHTMLRenderer()
-		html, err := tree.Render(renderer)
+		html, err := luteEngine.MarkdownStr(testName, test.Markdown)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
 
 		if test.HTML != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", tree.Name, test.HTML, html, test.Markdown)
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", testName, test.HTML, html, test.Markdown)
 		}
 	}
 }

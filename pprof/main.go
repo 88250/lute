@@ -32,13 +32,13 @@ func main() {
 	cpuProfile, _ := os.Create("pprof/cpu_profile")
 	pprof.StartCPUProfile(cpuProfile)
 	for i := 0; i < 100; i++ {
-		tree, err := lute.Parse("spec text", bytes)
+		tree, err := lute.parse("spec text", bytes)
 		if nil != err {
 			panic(err)
 		}
 
-		renderer := lute.NewHTMLRenderer()
-		if _, err := tree.Render(renderer); nil != err {
+		renderer := lute.newHTMLRenderer()
+		if _, err := tree.render(renderer); nil != err {
 			panic(err)
 		}
 	}
