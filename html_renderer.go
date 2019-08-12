@@ -21,8 +21,8 @@ import (
 )
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
-func newHTMLRenderer() (ret *Renderer) {
-	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}}
+func newHTMLRenderer(option options) (ret *Renderer) {
+	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: option}
 
 	// 注册 CommonMark 渲染函数
 
@@ -183,7 +183,11 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 	}
 
 	r.Newline()
-	r.Write(node.Tokens())
+	tokens := node.Tokens()
+	if r.option.GFMDisallowedRawHTML {
+		tokens = r.tagfilter(tokens)
+	}
+	r.Write(tokens)
 	r.Newline()
 
 	return WalkContinue, nil
@@ -194,7 +198,11 @@ func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error
 		return WalkContinue, nil
 	}
 
-	r.Write(node.Tokens())
+	tokens := node.Tokens()
+	if r.option.GFMDisallowedRawHTML {
+		tokens = r.tagfilter(tokens)
+	}
+	r.Write(tokens)
 
 	return WalkContinue, nil
 }

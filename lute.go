@@ -38,7 +38,7 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 		return
 	}
 
-	renderer := newHTMLRenderer()
+	renderer := newHTMLRenderer(lute.options)
 	html, err = tree.render(renderer)
 	if nil != err {
 		return
