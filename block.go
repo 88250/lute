@@ -175,7 +175,7 @@ var blockStarts = []blockStartFunc{
 			if itemEnd != token && itemGreater == token {
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
-				// optional following space
+				// > 后面的空格是可选的
 				token = t.context.currentLine.peek(t.context.offset)
 				if itemSpace == token || itemTab == token {
 					t.context.advanceOffset(1, true)
@@ -196,7 +196,6 @@ var blockStarts = []blockStartFunc{
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(len(heading.tokens), false)
 				t.context.closeUnmatchedBlocks()
-
 				t.context.addChild(heading)
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
@@ -225,8 +224,6 @@ var blockStarts = []blockStartFunc{
 			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if html := t.parseHTML(tokens); nil != html {
 				t.context.closeUnmatchedBlocks()
-				// We don't adjust parser.offset;
-				// spaces are part of the HTML block:
 				t.context.addChild(html)
 				return 2
 			}
