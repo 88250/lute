@@ -65,7 +65,6 @@ func GFM(b bool) option {
 		lute.GFMTaskListItem = b
 		lute.GFMStrikethrough = b
 		lute.GFMAutoLink = b
-		lute.GFMDisallowedRawHTML = b
 	}
 }
 
@@ -97,20 +96,12 @@ func GFMAutoLink(b bool) option {
 	}
 }
 
-// GFMDisallowedRawHTML 设置是否打开“GFM 不允许原始 HTML”支持。
-func GFMDisallowedRawHTML(b bool) option {
-	return func(lute *Lute) {
-		lute.GFMDisallowedRawHTML = b
-	}
-}
-
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	GFMTable             bool // GFM 表
 	GFMTaskListItem      bool // GFM 任务列表项
 	GFMStrikethrough     bool // GFM 删除线
 	GFMAutoLink          bool // GFM 自动链接
-	GFMDisallowedRawHTML bool // GFM 不允许原始 HTML
 }
 
 // option 描述了解析渲染选项设置函数签名。

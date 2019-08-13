@@ -183,11 +183,7 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 	}
 
 	r.Newline()
-	tokens := node.Tokens()
-	if r.option.GFMDisallowedRawHTML {
-		tokens = r.tagfilter(tokens)
-	}
-	r.Write(tokens)
+	r.Write(node.Tokens())
 	r.Newline()
 
 	return WalkContinue, nil
@@ -198,11 +194,7 @@ func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error
 		return WalkContinue, nil
 	}
 
-	tokens := node.Tokens()
-	if r.option.GFMDisallowedRawHTML {
-		tokens = r.tagfilter(tokens)
-	}
-	r.Write(tokens)
+	r.Write(node.Tokens())
 
 	return WalkContinue, nil
 }

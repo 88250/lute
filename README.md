@@ -38,6 +38,11 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 * 支持输出纯文本（待实现）
 * 可扩展语法树节点（待实现）
 
+## 🔒 安全
+
+Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://github.github.com/gfm/#disallowed-raw-html-extension-)，因为该扩展还是存在一定漏洞（比如没有处理 `<input>`）。
+建议通过其他库（比如 [bluemonday](https://github.com/microcosm-cc/bluemonday)）来进行 HTML 安全过滤，这样也能更好地适配应用场景。
+
 ## ⚡ 性能
 
 在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试结果如下。  
