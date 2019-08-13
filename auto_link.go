@@ -56,15 +56,43 @@ func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
 		return &Text{tokens: url}
 	}
 
+	var openParens, closeParens int
 	// 最后一个字符如果是标点符号则剔掉
 	path := url[j:]
 	length = len(path)
 	if 0 < length {
+		var k int
+		// 统计圆括号个数
+		for k = 0; k < length; k++ {
+			token = path[k]
+			if itemOpenParen == token {
+				openParens++
+			} else if itemCloseParen == token {
+				closeParens++
+			}
+		}
+
 		lastToken := path[length-1]
-		if isASCIIPunct(lastToken) {
+		if itemCloseParen == lastToken {
+			// 以 ) 结尾的话需要计算圆括号匹配
+			unmatches := closeParens - openParens
+			if 0 < unmatches {
+				// 向前移动
+				for k = length - 1; 0 < unmatches; k-- {
+					token = path[k]
+					if itemCloseParen != token {
+						break
+					}
+					unmatches--
+					i--
+				}
+				path = path[:k+1]
+			}
+		} else if isASCIIPunct(lastToken) {
 			path = path[:length-1]
 			i--
 		}
+
 	} else {
 		length = len(domain)
 		lastToken := domain[length-1]
