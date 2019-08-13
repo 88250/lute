@@ -100,11 +100,13 @@ func (t *Tree) parseInline(block Node) bool {
 						n = t.parseGfmAutoLink(tokens, "http://")
 						if nil == n {
 							n = t.parseGfmAutoLink(tokens, "ftp://")
+							if nil == n {
+								n = t.parseText(tokens)
+							}
 						}
 					}
 				}
-			}
-			if nil == n {
+			} else {
 				n = t.parseText(tokens)
 			}
 		}
@@ -369,9 +371,7 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 	start := t.context.pos
 	for ; t.context.pos < length; t.context.pos++ {
 		token = tokens[t.context.pos]
-		if itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
-			itemNewline == token || itemBackslash == token || itemBacktick == token ||
-			itemLess == token || itemCloseBracket == token || itemAmpersand == token || itemTilde == token {
+		if t.isMarker(token) {
 			// 遇到潜在的标记符时需要跳出 text，回到行级解析主循环
 			if start == t.context.pos {
 				start++
@@ -381,8 +381,14 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 	}
 
 	ret = &Text{tokens: tokens[start:t.context.pos]}
-
 	return
+}
+
+// isMarker 判断 token 是否是潜在的 Markdown 标记。
+func (t *Tree) isMarker(token byte) bool {
+	return itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
+		itemNewline == token || itemBackslash == token || itemBacktick == token ||
+		itemLess == token || itemCloseBracket == token || itemAmpersand == token || itemTilde == token
 }
 
 func (t *Tree) parseNewline(block Node, tokens items) (ret Node) {

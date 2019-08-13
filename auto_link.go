@@ -26,13 +26,19 @@ func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 	if 0 > index {
 		return nil
 	}
+
+	var i int
 	if 0 < index {
-		t.context.pos += index
-		return &Text{tokens: tokens[:index]}
+		for ; i < index; i++ {
+			if t.isMarker(tokens[i]) {
+				break
+			}
+		}
+		t.context.pos += i
+		return &Text{tokens: tokens[:i]}
 	}
 
 	length := len(tokens)
-	var i int
 	var token byte
 	for ; i < length; i++ {
 		token = tokens[i]
@@ -60,6 +66,7 @@ func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 	if !www {
 		domain = domain[len(protocol):]
 	}
+
 	if !t.isValidDomain(domain) {
 		t.context.pos += i
 		return &Text{tokens: url}
@@ -150,7 +157,7 @@ func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 	var dest, domainPath items
 	if www {
 		dest = items("http://")
-		domainPath := append(domain, path...)
+		domainPath = append(domain, path...)
 		dest = append(dest, domainPath...)
 	} else {
 		dest = items(protocol)
@@ -165,6 +172,11 @@ func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 	return
 }
 
+var (
+	// validDomainSuffix 用于列出所有认为合法的域名后缀，不够的话往里加就行。
+	validDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
+)
+
 // isValidDomain 校验 GFM 规范自动链接规则中定义的合法域名。
 // https://github.github.com/gfm/#valid-domain
 func (t *Tree) isValidDomain(domain items) bool {
@@ -178,6 +190,10 @@ func (t *Tree) isValidDomain(domain items) bool {
 	for i := 0; i < length; i++ {
 		segment := segments[i]
 		segLen := len(segment)
+		if 1 > segLen {
+			continue
+		}
+
 		for j := 0; j < segLen; j++ {
 			token = segment[j]
 			if !isASCIILetterNumHyphen(token) {
@@ -188,6 +204,19 @@ func (t *Tree) isValidDomain(domain items) bool {
 				if itemUnderscore == token {
 					return false
 				}
+			}
+		}
+
+		if i == length-1 {
+			validSuffix := false
+			for j := 0; j < len(validDomainSuffix); j++ {
+				if bytes.EqualFold(segment, validDomainSuffix[j]) {
+					validSuffix = true
+					break
+				}
+			}
+			if !validSuffix {
+				return false
 			}
 		}
 	}
