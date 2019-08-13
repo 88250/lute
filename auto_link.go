@@ -20,9 +20,9 @@ import (
 	"strings"
 )
 
-func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
+func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 	tokens = tokens[t.context.pos:]
-	index := bytes.Index(tokens, []byte("www."))
+	index := bytes.Index(tokens, []byte(protocol))
 	if 0 > index {
 		return nil
 	}
@@ -36,14 +36,20 @@ func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
 	var token byte
 	for ; i < length; i++ {
 		token = tokens[i]
+		// 链接以空白或者 < 截断
 		if isWhitespace(token) || itemLess == token {
 			break
 		}
 	}
 
+	www := "www." == protocol
+
 	url := tokens[:i]
 	length = len(url)
 	var j int
+	if !www {
+		j = len(protocol)
+	}
 	for ; j < length; j++ {
 		token = url[j]
 		if itemSlash == token {
@@ -51,6 +57,9 @@ func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
 		}
 	}
 	domain := url[:j]
+	if !www {
+		domain = domain[len(protocol):]
+	}
 	if !t.isValidDomain(domain) {
 		t.context.pos += i
 		return &Text{tokens: url}
@@ -138,9 +147,18 @@ func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
 		}
 	}
 
-	dest := items("http://")
-	domainPath := append(domain, path...)
-	dest = append(dest, domainPath...)
+	var dest, domainPath items
+	if www {
+		dest = items("http://")
+		domainPath := append(domain, path...)
+		dest = append(dest, domainPath...)
+	} else {
+		dest = items(protocol)
+		domain = append(dest, domain...)
+		domainPath = append(domain, path...)
+		dest = domainPath
+	}
+
 	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(fromItems(dest)), ""}
 	ret.AppendChild(ret, &Text{tokens: domainPath})
 	t.context.pos += i

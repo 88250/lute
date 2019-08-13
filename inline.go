@@ -93,7 +93,16 @@ func (t *Tree) parseInline(block Node) bool {
 			n = t.parseBang(tokens)
 		default:
 			if t.context.option.GFMAutoLink {
-				n = t.parseGfmAutoLink(tokens)
+				n = t.parseGfmAutoLink(tokens, "www.")
+				if nil == n {
+					n = t.parseGfmAutoLink(tokens, "https://")
+					if nil == n {
+						n = t.parseGfmAutoLink(tokens, "http://")
+						if nil == n {
+							n = t.parseGfmAutoLink(tokens, "ftp://")
+						}
+					}
+				}
 			}
 			if nil == n {
 				n = t.parseText(tokens)
