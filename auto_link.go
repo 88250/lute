@@ -72,6 +72,7 @@ func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
 			}
 		}
 
+		trimmed := false
 		lastToken := path[length-1]
 		if itemCloseParen == lastToken {
 			// 以 ) 结尾的话需要计算圆括号匹配
@@ -87,12 +88,47 @@ func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
 					i--
 				}
 				path = path[:k+1]
+				trimmed = true
+			} else { // 右圆括号 ) 数目小于等于左圆括号 ( 数目
+				// 算作全匹配上了，不需要再处理结尾标点符号
+				trimmed = true
 			}
-		} else if isASCIIPunct(lastToken) {
+		} else if itemSemicolon == lastToken {
+			// 检查 HTML 实体
+			foundAmp := false
+			// 向前检查 & 是否存在
+			for k = length - 1; 0 <= k; k-- {
+				token = path[k]
+				if itemAmpersand == token {
+					foundAmp = true
+					break
+				}
+			}
+			if foundAmp { // 如果 & 存在
+				entity := path[k:length]
+				if 3 <= len(entity) {
+					// 检查截取的子串是否满足实体特征（&;中间需要是字母或数字）
+					isEntity := true
+					for j = 1; j < len(entity)-1; j++ {
+						if !isASCIILetterNum(entity[j]) {
+							isEntity = false
+							break
+						}
+					}
+					if isEntity {
+						path = path[:k]
+						trimmed = true
+						i -= length - k
+					}
+				}
+			}
+		}
+
+		// 如果之前的 ) 或者 ; 没有命中处理，则进行结尾的标点符号规则处理，即标点不计入链接，需要剔掉
+		if !trimmed && isASCIIPunct(lastToken) {
 			path = path[:length-1]
 			i--
 		}
-
 	} else {
 		length = len(domain)
 		lastToken := domain[length-1]

@@ -61,6 +61,11 @@ func isASCIILetter(token byte) bool {
 	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token)
 }
 
+// isASCIILetterNum 判断 token 是否是一个 ASCII 字母或数字。
+func isASCIILetterNum(token byte) bool {
+	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token) || ('0' <= token && '9' >= token)
+}
+
 // isASCIILetterNumHyphen 判断 token 是否是一个 ASCII 字母、数字或者横线 -。
 func isASCIILetterNumHyphen(token byte) bool {
 	return ('A' <= token && 'Z' >= token) || ('a' <= token && 'z' >= token) || ('0' <= token && '9' >= token) || '-' == token
