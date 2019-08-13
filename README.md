@@ -51,9 +51,9 @@ Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://git
 ### [Lute](https://github.com/b3log/lute)
 
 ```
-BenchmarkLute-2   	     300	   4458074 ns/op	 2767406 B/op	   22450 allocs/op
-BenchmarkLute-4   	     300	   4428252 ns/op	 2767664 B/op	   22450 allocs/op
-BenchmarkLute-8   	     300	   4591147 ns/op	 2768186 B/op	   22450 allocs/op
+BenchmarkLute-2   	     300	   4527863 ns/op	 2536692 B/op	   22455 allocs/op
+BenchmarkLute-4   	     300	   4597705 ns/op	 2536951 B/op	   22455 allocs/op
+BenchmarkLute-8   	     300	   4521239 ns/op	 2537460 B/op	   22455 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
