@@ -92,7 +92,12 @@ func (t *Tree) parseInline(block Node) bool {
 		case itemBang:
 			n = t.parseBang(tokens)
 		default:
-			n = t.parseText(tokens)
+			if t.context.option.GFMAutoLink {
+				n = t.parseGfmAutoLink(tokens)
+			}
+			if nil == n {
+				n = t.parseText(tokens)
+			}
 		}
 
 		if nil != n {

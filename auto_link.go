@@ -15,7 +15,92 @@
 
 package lute
 
-import "strings"
+import (
+	"bytes"
+	"strings"
+)
+
+func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
+	index := bytes.Index(tokens, []byte("www."))
+	if 0 > index {
+		return nil
+	}
+	if 0 < index {
+		t.context.pos += index
+		return &Text{tokens: tokens[:index]}
+	}
+
+	length := len(tokens)
+	var i int
+	var token byte
+	for ; i < length; i++ {
+		token = tokens[i]
+		if isWhitespace(token) || itemLess == token {
+			break
+		}
+	}
+
+	url := tokens[:i]
+	length = len(url)
+	var j int
+	for ; j < length; j++ {
+		token = url[j]
+		if itemSlash == token {
+			break
+		}
+	}
+	domain := url[:j]
+	if !t.isValidDomain(domain) {
+		t.context.pos += i
+		return &Text{tokens: url}
+	}
+
+	path := url[j:]
+	length = len(path)
+	if 0 < length {
+		lastToken := path[length-1]
+		if isASCIIPunct(lastToken) {
+			path = path[:length-1]
+		}
+	}
+
+	dest := items("http://")
+	domainPath := append(domain, path...)
+	dest = append(dest, domainPath...)
+	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(fromItems(dest)), ""}
+	ret.AppendChild(ret, &Text{tokens: domainPath})
+	t.context.pos += i
+	return
+}
+
+// isValidDomain 校验 GFM 规范自动链接规则中定义的合法域名。
+// https://github.github.com/gfm/#valid-domain
+func (t *Tree) isValidDomain(domain items) bool {
+	segments := bytes.Split(domain, []byte("."))
+	length := len(segments)
+	if 2 > length { // 域名至少被 . 分隔为两部分，小于两部分的话不合法
+		return false
+	}
+
+	var token byte
+	for i := 0; i < length; i++ {
+		segment := segments[i]
+		segLen := len(segment)
+		for j := 0; j < segLen; j++ {
+			token = segment[j]
+			if !isASCIILetterNumHyphen(token) {
+				return false
+			}
+			if 2 < i && (i == length-2 || i == length-1) {
+				// 最后两个部分不能包含 _
+				if itemUnderscore == token {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
 
 func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 	tokens = tokens[1:]
