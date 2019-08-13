@@ -20,7 +20,7 @@ import (
 )
 
 func isWhitespace(token byte) bool {
-	return itemSpace == token || itemNewline /* '\u000A' */ == token || itemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
+	return itemSpace == token || itemNewline == token || itemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
 }
 
 func isUnicodeWhitespace(token byte) bool {
