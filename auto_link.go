@@ -21,6 +21,7 @@ import (
 )
 
 func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
+	tokens = tokens[t.context.pos:]
 	index := bytes.Index(tokens, []byte("www."))
 	if 0 > index {
 		return nil
@@ -55,12 +56,21 @@ func (t *Tree) parseGfmAutoLink(tokens items) (ret Node) {
 		return &Text{tokens: url}
 	}
 
+	// 最后一个字符如果是标点符号则剔掉
 	path := url[j:]
 	length = len(path)
 	if 0 < length {
 		lastToken := path[length-1]
 		if isASCIIPunct(lastToken) {
 			path = path[:length-1]
+			i--
+		}
+	} else {
+		length = len(domain)
+		lastToken := domain[length-1]
+		if isASCIIPunct(lastToken) {
+			domain = domain[:length-1]
+			i--
 		}
 	}
 
