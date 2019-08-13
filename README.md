@@ -14,7 +14,7 @@
 * 对“怪异”文本处理非常耗时，甚至挂死
 
 Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMark 规范。所谓的“结构化”指的是从输入的 MD 文本构建抽象语法树，通过操作树来进行 HTML 输出、原文格式化等。
-支持 GFM/CM 规范则是为了保证 Markdown 渲染不存在二义性，让同一份 Markdown 文本可以在实现这两个规范的 Markdown 引擎处理后得到一样的结果，我觉得这一点非常重要。
+实现规范是为了保证 Markdown 渲染不存在二义性，让同一份 Markdown 文本可以在实现规范的 Markdown 引擎处理后得到一样的结果，这一点非常重要。
 
 实现规范的引擎并不多，我想试试看自己能不能写上一个，这也是 Lute 的动机之一。关于如何实现一个 Markdown 引擎，网上众说纷纭：
 
@@ -26,7 +26,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 最后，还有一个很重要的动机就是 B3log 开源社区需要一款自己的 Markdown 引擎：
 
 * 社区项目 [Solo](https://github.com/b3log/solo)、[Pipe](https://github.com/b3log/pipe)、[Sym](https://github.com/b3log/symphony) 需要效果统一的 Markdown 渲染，并且性能非常重要
-* 社区项目 [Vditor](https://github.com/b3log/vditor) 需要一款结构化的引擎作为支撑，实现下一代的 Markdown 编辑器，为未来而构建
+* 社区项目 [Vditor](https://github.com/b3log/vditor) 需要一款结构化的引擎作为支撑以实现下一代的 Markdown 编辑器
 
 ## ✨  特性
 
