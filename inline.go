@@ -49,6 +49,16 @@ func (t *Tree) parseInlines() {
 
 			// 处理该块节点中的强调、加粗和删除线
 			t.processEmphasis(nil)
+
+			if t.context.option.GFMAutoLink {
+				// 处理 GFM 自动邮件链接
+				for child := n.FirstChild(); nil != child; child = child.Next() {
+					if NodeText == n.Type() {
+						tokens := n.Tokens()
+						_ = tokens
+					}
+				}
+			}
 		}
 
 		return WalkContinue, nil
@@ -101,10 +111,7 @@ func (t *Tree) parseInline(block Node) bool {
 						if nil == n {
 							n = t.parseGfmAutoLink(tokens, "ftp://")
 							if nil == n {
-								n = t.parseGfmAutoEmailLink(tokens)
-								if nil == n {
-									n = t.parseText(tokens)
-								}
+								n = t.parseText(tokens)
 							}
 						}
 					}
