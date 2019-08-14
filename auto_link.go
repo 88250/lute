@@ -20,6 +20,72 @@ import (
 	"strings"
 )
 
+func (t *Tree) isValidEmailSegment1(token byte) bool {
+	return isASCIILetterNumHyphen(token) || itemDot == token || itemPlus == token
+}
+
+func (t *Tree) isValidEmailSegment2(token byte) bool {
+	return isASCIILetterNumHyphen(token) || itemDot == token
+}
+
+func (t *Tree) parseGfmAutoEmailLink(tokens items) (ret Node) {
+	tokens = tokens[t.context.pos:]
+	index := bytes.Index(tokens, []byte("@"))
+	if 0 > index {
+		return nil
+	}
+
+	var i int
+	var token byte
+	if 0 < index {
+		for ; i < index; i++ {
+			token = tokens[i]
+			if t.isMarker(token) || // 检查是否有潜在的标记，有的话处理标记优先
+				!t.isValidEmailSegment1(token) { // 非法字符算作普通文本
+				break
+			}
+		}
+		if i < index {
+			// 将标记出现之前或者非法部分构造为文本节点
+			if i == 0 {
+				// 第一个字符可能就是非法字符，需要跳过
+				i++
+			}
+			t.context.pos += i
+			return &Text{tokens: tokens[:i]}
+		}
+	}
+
+	i++ // 跳过 @ 检查后面的部分
+	length := len(tokens)
+	validSeg2 := true
+	for ; i < length; i++ {
+		token = tokens[i]
+		// 邮件链接以空白截断
+		if isWhitespace(token) {
+			break
+		}
+
+		if !t.isValidEmailSegment2(token) {
+			validSeg2 = false
+			break
+		}
+	}
+
+	dest := tokens[:i]
+
+	if !validSeg2 {
+		t.context.pos += i
+		return &Text{tokens: dest}
+	}
+
+	ret = &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(dest), ""}
+	ret.AppendChild(ret, &Text{tokens: dest})
+	t.context.pos += i
+
+	return
+}
+
 func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 	tokens = tokens[t.context.pos:]
 	index := bytes.Index(tokens, []byte(protocol))
@@ -29,11 +95,13 @@ func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 
 	var i int
 	if 0 < index {
+		// 检查是否有潜在的标记，有的话处理标记优先
 		for ; i < index; i++ {
 			if t.isMarker(tokens[i]) {
 				break
 			}
 		}
+		// 将标记出现之前的部分构造为文本节点
 		t.context.pos += i
 		return &Text{tokens: tokens[:i]}
 	}
@@ -174,6 +242,7 @@ func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 
 var (
 	// validDomainSuffix 用于列出所有认为合法的域名后缀，不够的话往里加就行。
+	// TODO: 考虑提供接口支持开发者添加
 	validDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
 )
 

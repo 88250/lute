@@ -101,7 +101,10 @@ func (t *Tree) parseInline(block Node) bool {
 						if nil == n {
 							n = t.parseGfmAutoLink(tokens, "ftp://")
 							if nil == n {
-								n = t.parseText(tokens)
+								n = t.parseGfmAutoEmailLink(tokens)
+								if nil == n {
+									n = t.parseText(tokens)
+								}
 							}
 						}
 					}
