@@ -71,9 +71,7 @@ func (t *Tree) parseInlines() {
 				// 处理 GFM 自动邮件链接
 				for child := n.FirstChild(); nil != child; child = child.Next() {
 					if NodeText == child.Type() {
-						tokens := child.Tokens()
-						t.parseGfmAutoEmailLink(tokens)
-						_ = tokens
+						t.parseGfmAutoEmailLink(child)
 					}
 				}
 			}

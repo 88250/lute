@@ -20,70 +20,66 @@ import (
 	"strings"
 )
 
+// parseGfmAutoEmailLink 解析 node 文本节点中的 tokens，如果有邮件地址则生成链接节点并挂在 node 下。
+func (t *Tree) parseGfmAutoEmailLink(node Node) {
+	tokens := node.Tokens()
+	node.SetTokens(items{}) // 把 tokens 置空，下面会重新添加
+	var parts []items
+	var part items
+	var i int
+	var token byte
+	length := len(tokens)
+
+	// 按空白分隔成多组
+	for ; i < length; i++ {
+		token = tokens[i]
+		part = append(part, token)
+		if isWhitespace(token) || i == length-1 {
+			parts = append(parts, part)
+		}
+	}
+
+loopPart:
+	for i := 0; i < len(parts); i++ {
+		part = parts[i]
+		index := bytes.Index(part, []byte("@"))
+		if 0 >= index {
+			node.AppendTokens(part)
+			continue
+		}
+
+		for ; i < index; i++ {
+			token = part[i]
+			if !t.isValidEmailSegment1(token) {
+				node.AppendTokens(part)
+				continue loopPart
+			}
+		}
+
+		i++ // 跳过 @ 检查后面的部分
+		length := len(part)
+		for ; i < length; i++ {
+			token = part[i]
+			if !t.isValidEmailSegment2(token) {
+				node.AppendTokens(part)
+				continue loopPart
+			}
+		}
+
+		link := &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(part), ""}
+		link.AppendChild(link, &Text{tokens: part})
+		node.AppendChild(node, link)
+	}
+
+	return
+}
+
 func (t *Tree) isValidEmailSegment1(token byte) bool {
-	return isASCIILetterNumHyphen(token) || itemDot == token || itemPlus == token
+	return isASCIILetterNumHyphen(token) || itemDot == token || itemPlus == token || itemUnderscore == token
 }
 
 func (t *Tree) isValidEmailSegment2(token byte) bool {
-	return isASCIILetterNumHyphen(token) || itemDot == token
-}
-
-func (t *Tree) parseGfmAutoEmailLink(tokens items) (ret Node) {
-	tokens = tokens[t.context.pos:]
-	index := bytes.Index(tokens, []byte("@"))
-	if 0 > index {
-		return nil
-	}
-
-	var i int
-	var token byte
-	if 0 < index {
-		for ; i < index; i++ {
-			token = tokens[i]
-			if t.isMarker(token) || // 检查是否有潜在的标记，有的话处理标记优先
-				!t.isValidEmailSegment1(token) { // 非法字符算作普通文本
-				break
-			}
-		}
-		if i < index {
-			// 将标记出现之前或者非法部分构造为文本节点
-			if i == 0 {
-				// 第一个字符可能就是非法字符，需要跳过
-				i++
-			}
-			t.context.pos += i
-			return &Text{tokens: tokens[:i]}
-		}
-	}
-
-	i++ // 跳过 @ 检查后面的部分
-	length := len(tokens)
-	validSeg2 := true
-	for ; i < length; i++ {
-		token = tokens[i]
-		// 邮件链接以空白截断
-		if isWhitespace(token) {
-			break
-		}
-
-		if !t.isValidEmailSegment2(token) {
-			validSeg2 = false
-			break
-		}
-	}
-
-	dest := tokens[:i]
-
-	if !validSeg2 {
-		t.context.pos += i
-		return &Text{tokens: dest}
-	}
-
-	ret = &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(dest), ""}
-	ret.AppendChild(ret, &Text{tokens: dest})
-	t.context.pos += i
-
-	return
+	return isASCIILetterNumHyphen(token) || itemDot == token || itemUnderscore == token
 }
 
 func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
