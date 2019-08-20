@@ -50,11 +50,29 @@ func (t *Tree) parseInlines() {
 			// 处理该块节点中的强调、加粗和删除线
 			t.processEmphasis(nil)
 
+			// 将连续的文本节点进行合并。
+			// 规范只是定义了从输入的 Markdown 文本到输出的 HTML 的解析渲染规则，并未定义中间语法树的规则。
+			// 也就是说语法树的节点结构没有标准，可以自己发挥。这里进行文本节点合并主要有两个目的：
+			// 1. 减少节点数量，提升后续处理性能
+			// 2. 方便后续功能方面的处理，比如 GFM 自动邮件链接解析
+			for child := n.FirstChild(); nil != child; {
+				next := child.Next()
+				if NodeText == child.Type() {
+					for nil != next && NodeText == next.Type() {
+						child.AppendTokens(next.Tokens())
+						next.Unlink()
+						next = child.Next()
+					}
+				}
+				child = next
+			}
+
 			if t.context.option.GFMAutoLink {
 				// 处理 GFM 自动邮件链接
 				for child := n.FirstChild(); nil != child; child = child.Next() {
-					if NodeText == n.Type() {
-						tokens := n.Tokens()
+					if NodeText == child.Type() {
+						tokens := child.Tokens()
+						t.parseGfmAutoEmailLink(tokens)
 						_ = tokens
 					}
 				}
