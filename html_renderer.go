@@ -250,7 +250,12 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 		if "" != n.info {
 			infoWords := strings.Fields(n.info)
 			r.WriteString("<pre><code class=\"language-" + infoWords[0] + "\">")
-			r.Write(escapeHTML(n.tokens))
+			if r.option.CodeSyntaxHighlight {
+				r.Write(escapeHTML(n.tokens))
+			} else {
+				r.Write(escapeHTML(n.tokens))
+			}
+
 		} else {
 			r.WriteString("<pre><code>")
 			r.Write(escapeHTML(n.tokens))

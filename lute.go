@@ -20,10 +20,12 @@ type Lute struct {
 	options
 }
 
-// New 创建一个新的 Lute 引擎，默认启用所有 GFM 支持。
+// New 创建一个新的 Lute 引擎，默认启用所有 GFM 支持、代码语法高亮。
 func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
 	GFM(true)(ret)
+	CodeSyntaxHighlight(true)(ret)
+
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -96,12 +98,21 @@ func GFMAutoLink(b bool) option {
 	}
 }
 
+// CodeSyntaxHighlight 设置是否对代码、代码块进行语法高亮。
+func CodeSyntaxHighlight(b bool) option {
+	return func(lute *Lute) {
+		lute.CodeSyntaxHighlight = b
+	}
+}
+
 // options 描述了一些列解析和渲染选项。
 type options struct {
-	GFMTable             bool // GFM 表
-	GFMTaskListItem      bool // GFM 任务列表项
-	GFMStrikethrough     bool // GFM 删除线
-	GFMAutoLink          bool // GFM 自动链接
+	GFMTable         bool // 是否处理 GFM 表
+	GFMTaskListItem  bool // 是否处理 GFM 任务列表项
+	GFMStrikethrough bool // 是否处理 GFM 删除线
+	GFMAutoLink      bool // 是否处理 GFM 自动链接
+
+	CodeSyntaxHighlight bool // 是否对代码、代码块进行语法高亮
 }
 
 // option 描述了解析渲染选项设置函数签名。
