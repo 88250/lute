@@ -27,7 +27,7 @@ func (t *Tree) parseGfmAutoEmailLink(node Node) {
 		return
 	}
 
-	var i, j, k int
+	var i, j, k, atIndex int
 	var token byte
 	length := len(tokens)
 
@@ -35,34 +35,43 @@ func (t *Tree) parseGfmAutoEmailLink(node Node) {
 loopPart:
 	for i < length {
 		group := items{}
+		atIndex = 0
 		j = i
+
+		// 积攒组直到遇到空白符
 		for ; j < length; j++ {
 			token = tokens[j]
 			if !isWhitespace(token) {
 				group = append(group, token)
+				if '@' == token {
+					// 记录 @ 符号在组中的绝对位置，后面会用到
+					atIndex = j - i
+				}
 				continue
 			}
 			break
 		}
 		if i == j {
+			// 说明积攒组时第一个字符就是空白符，那就把这个空白符作为一个文本节点插到前面
 			text := &Text{tokens: items{token}}
 			node.InsertBefore(node, text)
-			i++
+			i++ // 继续下一个字符
 			continue
 		}
 
+		// 移动主循环下标
 		i = j
-		index := bytes.Index(group, []byte("@"))
-		if 0 >= index {
+
+		if 0 >= atIndex {
 			text := &Text{tokens: group}
 			node.InsertBefore(node, text)
 			continue
 		}
 
-		// 这一组 group 中包含了 @，可尝试进行邮件地址解析
+		// 至此说明这一组中包含了 @，可尝试进行邮件地址解析
 
 		k = 0
-		for ; k < index; k++ {
+		for ; k < atIndex; k++ {
 			token = group[k]
 			if !t.isValidEmailSegment1(token) {
 				text := &Text{tokens: group}
@@ -89,6 +98,7 @@ loopPart:
 			link := &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(group), ""}
 			link.AppendChild(link, &Text{tokens: group})
 			node.InsertBefore(node, link)
+			// . 作为文本节点插入
 			text := &Text{tokens: items{itemDot}}
 			node.InsertBefore(node, text)
 		} else if itemHyphen == token || itemUnderscore == token {
@@ -104,7 +114,7 @@ loopPart:
 		}
 	}
 
-	// 处理完后该文本节点已经被拆分为多个节点，所以可以移除自身
+	// 处理完后传入的文本节点 node 已经被拆分为多个节点，所以可以移除自身
 	node.Unlink()
 
 	return
