@@ -20,56 +20,92 @@ import (
 	"strings"
 )
 
-// parseGfmAutoEmailLink 解析 node 文本节点中的 tokens，如果有邮件地址则生成链接节点并挂在 node 下。
+// parseGfmAutoEmailLink 解析 node 文本节点中的 tokens，如果有邮件地址则生成链接节点并插入到 node 之前或者之后。
 func (t *Tree) parseGfmAutoEmailLink(node Node) {
 	tokens := node.Tokens()
-	node.SetTokens(items{}) // 把 tokens 置空，下面会重新添加
-	var parts []items
-	var part items
-	var i int
+	if 0 >= bytes.Index(tokens, []byte("@")) {
+		return
+	}
+
+	var i, j, k int
 	var token byte
 	length := len(tokens)
 
-	// 按空白分隔成多组
-	for ; i < length; i++ {
-		token = tokens[i]
-		part = append(part, token)
-		if isWhitespace(token) || i == length-1 {
-			parts = append(parts, part)
-		}
-	}
-
+	// 按空白分隔成多组并进行处理
 loopPart:
-	for i := 0; i < len(parts); i++ {
-		part = parts[i]
-		index := bytes.Index(part, []byte("@"))
-		if 0 >= index {
-			node.AppendTokens(part)
+	for i < length {
+		group := items{}
+		j = i
+		for ; j < length; j++ {
+			token = tokens[j]
+			if !isWhitespace(token) {
+				group = append(group, token)
+				continue
+			}
+			break
+		}
+		if i == j {
+			text := &Text{tokens: items{token}}
+			node.InsertBefore(node, text)
+			i++
 			continue
 		}
 
-		for ; i < index; i++ {
-			token = part[i]
+		i = j
+		index := bytes.Index(group, []byte("@"))
+		if 0 >= index {
+			text := &Text{tokens: group}
+			node.InsertBefore(node, text)
+			continue
+		}
+
+		// 这一组 group 中包含了 @，可尝试进行邮件地址解析
+
+		k = 0
+		for ; k < index; k++ {
+			token = group[k]
 			if !t.isValidEmailSegment1(token) {
-				node.AppendTokens(part)
+				text := &Text{tokens: group}
+				node.InsertBefore(node, text)
 				continue loopPart
 			}
 		}
 
-		i++ // 跳过 @ 检查后面的部分
-		length := len(part)
-		for ; i < length; i++ {
-			token = part[i]
+		k++ // 跳过 @ 检查后面的部分
+		length := len(group)
+		for ; k < length; k++ {
+			token = group[k]
 			if !t.isValidEmailSegment2(token) {
-				node.AppendTokens(part)
+				text := &Text{tokens: group}
+				node.InsertBefore(node, text)
 				continue loopPart
 			}
 		}
 
-		link := &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(part), ""}
-		link.AppendChild(link, &Text{tokens: part})
-		node.AppendChild(node, link)
+		if itemDot == token {
+			// 如果以 . 结尾则剔除该 .
+			lastIndex := len(group) - 1
+			group = group[:lastIndex]
+			link := &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(group), ""}
+			link.AppendChild(link, &Text{tokens: group})
+			node.InsertBefore(node, link)
+			text := &Text{tokens: items{itemDot}}
+			node.InsertBefore(node, text)
+		} else if itemHyphen == token || itemUnderscore == token {
+			// 如果以 - 或者 _ 结尾则整个串都不能算作邮件链接
+			text := &Text{tokens: group}
+			node.InsertBefore(node, text)
+			continue loopPart
+		} else {
+			// 以字母或者数字结尾
+			link := &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(group), ""}
+			link.AppendChild(link, &Text{tokens: group})
+			node.InsertBefore(node, link)
+		}
 	}
+
+	// 处理完后该文本节点已经被拆分为多个节点，所以可以移除自身
+	node.Unlink()
 
 	return
 }
