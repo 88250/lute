@@ -44,7 +44,7 @@ func TestSpec(t *testing.T) {
 		t.Fatalf("read spec test caes failed: " + err.Error())
 	}
 
-	luteEngine := lute.New(lute.GFM(false))
+	luteEngine := lute.New(lute.GFM(false)) // 不开启 GFM
 
 	for _, test := range testcases {
 		testName := test.Section + " " + strconv.Itoa(test.Example)

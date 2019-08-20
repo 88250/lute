@@ -281,7 +281,7 @@ var parseTests = []parseTest{
 }
 
 func TestParse(t *testing.T) {
-	luteEngine := lute.New(lute.GFM(true))
+	luteEngine := lute.New()
 
 	for _, test := range parseTests {
 		fmt.Println("Test [" + test.name + "]")
