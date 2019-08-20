@@ -56,8 +56,11 @@ type Node interface {
 	// AppendChild 添加一个子节点。
 	AppendChild(this, child Node)
 
-	// InsertAfter 添加一个兄弟节点。
+	// InsertAfter 在当前节点后插入一个兄弟节点。
 	InsertAfter(this Node, sibling Node)
+
+	// InsertBefore 在当前节点前插入一个兄弟节点。
+	InsertBefore(this Node, sibling Node)
 
 	// RawText 返回原始内容。
 	RawText() string
@@ -262,7 +265,7 @@ func (n *BaseNode) InsertAfter(this Node, sibling Node) {
 	}
 	sibling.SetPrevious(this)
 	n.next = sibling
-	sibling.SetParent(this.Parent())
+	sibling.SetParent(n.parent)
 	if nil == sibling.Next() {
 		sibling.Parent().SetLastChild(sibling)
 	}

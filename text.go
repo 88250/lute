@@ -170,7 +170,7 @@ func (n *Text) InsertAfter(this Node, sibling Node) {
 	}
 	sibling.SetPrevious(this)
 	n.next = sibling
-	sibling.SetParent(this.Parent())
+	sibling.SetParent(n.parent)
 	if nil == sibling.Next() {
 		sibling.Parent().SetLastChild(sibling)
 	}
