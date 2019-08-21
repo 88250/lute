@@ -150,7 +150,7 @@ func (t *Tree) parseInline(block Node) bool {
 
 func (t *Tree) parseEntity(tokens items) (ret Node) {
 	length := len(tokens)
-	if 2 > length {
+	if 2 > length || length <= t.context.pos+1 {
 		t.context.pos++
 		return &Text{tokens: toItems("&")}
 	}
