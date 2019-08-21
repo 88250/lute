@@ -229,6 +229,10 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 	withAttr = true
 	nameAndAttrs = nameAndAttrs[1:]
 	for _, nameAndAttr := range nameAndAttrs {
+		if 1 > len(nameAndAttr) {
+			continue
+		}
+
 		nameAndValue := nameAndAttr.split(itemEqual)
 		name := nameAndValue[0]
 		if !isASCIILetter(name[0]) && itemUnderscore != name[0] && itemColon != name[0] {
