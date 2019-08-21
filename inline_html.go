@@ -198,6 +198,10 @@ func (t *Tree) parseProcessingInstruction(tokens items) (valid bool, remains, co
 		}
 	}
 	tokens = tokens[i:]
+	if 1 > len(tokens) {
+		return
+	}
+
 	if itemQuestion != tokens[0] || itemGreater != tokens[1] {
 		return
 	}
