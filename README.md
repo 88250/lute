@@ -38,10 +38,11 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 * 支持输出纯文本（待实现）
 * 可扩展语法树节点（待实现）
 
-## 🔒 安全
+## 🗃 案例
 
-Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://github.github.com/gfm/#disallowed-raw-html-extension-)，因为该扩展还是存在一定漏洞（比如没有处理 `<input>`）。
-建议通过其他库（比如 [bluemonday](https://github.com/microcosm-cc/bluemonday)）来进行 HTML 安全过滤，这样也能更好地适配应用场景。
+* [黑客派](https://hacpai.com)
+* [Solo](https://solo.b3log.org)
+* [Pipe](https://github.com/b3log/pipe)
 
 ## ⚡ 性能
 
@@ -83,6 +84,15 @@ BenchmarkBlackFriday-8   	     500	   3917515 ns/op	 3341045 B/op	   20058 alloc
 ### [markdown-it](https://github.com/markdown-it/markdown-it)
 
 markdown-it 是 JavaScript 写的，它同样实现了 CommonMark 规范。循环渲染 300 次，平均每次调用耗时 9285933ns（9.2ms），耗时大致是 golang 实现的两倍。
+
+## 💪 健壮性
+
+Lute 承载了 B3log 开源社区所有的 Markdown 处理，每天处理数十万请求，运行表现稳定。
+
+## 🔒 安全
+
+Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://github.github.com/gfm/#disallowed-raw-html-extension-)，因为该扩展还是存在一定漏洞（比如没有处理 `<input>`）。
+建议通过其他库（比如 [bluemonday](https://github.com/microcosm-cc/bluemonday)）来进行 HTML 安全过滤，这样也能更好地适配应用场景。
 
 ## 📜 文档
 
