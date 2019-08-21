@@ -29,7 +29,8 @@ func BenchmarkLute(b *testing.B) {
 	}
 
 	luteEngine := lute.New(lute.GFM(false), // 不开启 GFM 支持
-		lute.CodeSyntaxHighlight(false)) // 不开启代码语法高亮
+		lute.CodeSyntaxHighlight(false),    // 不开启语法高亮
+	)
 	html, err := luteEngine.Markdown("spec text", bytes)
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)

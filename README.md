@@ -32,7 +32,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 
 * 完整实现最新版 GFM/CM 规范
 * 非常快
-* 代码块语法高亮（待实现）
+* 代码块语法高亮
 * 更好地支持中文语境（待实现）
 * 支持 Markdown 格式化（待实现）
 * 支持输出纯文本（待实现）
@@ -112,6 +112,7 @@ Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者们
 * [mdast](https://github.com/syntax-tree/mdast)：该项目介绍了一种 Markdown 抽象语法树结构的表现形式，Lute 的 AST 在初始设计阶段参考了该项目
 * [goldmark](https://github.com/yuin/goldmark)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其树遍历实现部分
 * [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其 URL 编码算法
+* [Chroma](https://github.com/alecthomas/chroma)：用 golang 写的语法高亮引擎 
 
 ---
 
