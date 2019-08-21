@@ -16,10 +16,11 @@
 package main
 
 import (
-	"github.com/b3log/lute"
 	"io/ioutil"
 	"os"
 	"runtime/pprof"
+
+	"github.com/b3log/lute"
 )
 
 func main() {
@@ -29,16 +30,15 @@ func main() {
 		panic(err)
 	}
 
+	luteEngine := lute.New(lute.GFM(false), // 不开启 GFM 支持
+		lute.CodeSyntaxHighlight(false),    // 不开启语法高亮
+	)
+
 	cpuProfile, _ := os.Create("pprof/cpu_profile")
 	pprof.StartCPUProfile(cpuProfile)
 	for i := 0; i < 100; i++ {
-		tree, err := lute.parse("spec text", bytes)
+		_, err := luteEngine.Markdown("pprof "+spec, bytes)
 		if nil != err {
-			panic(err)
-		}
-
-		renderer := lute.newHTMLRenderer()
-		if _, err := tree.render(renderer); nil != err {
 			panic(err)
 		}
 	}
