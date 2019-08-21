@@ -84,7 +84,8 @@ func (t *Tree) parseInlines() {
 // parseInline 解析并生成块节点 block 的行级子节点。
 func (t *Tree) parseInline(block Node) bool {
 	tokens := block.Tokens()
-	if nil == tokens {
+	length := len(tokens)
+	if 1 > length {
 		return false
 	}
 
@@ -141,7 +142,6 @@ func (t *Tree) parseInline(block Node) bool {
 			block.AppendChild(block, n)
 		}
 
-		length := len(tokens)
 		if 1 > length || t.context.pos >= length || itemEnd == tokens[t.context.pos] {
 			return false
 		}

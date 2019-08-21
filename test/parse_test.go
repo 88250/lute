@@ -17,8 +17,10 @@ package test
 
 import (
 	"fmt"
-	"github.com/b3log/lute"
+	"io/ioutil"
 	"testing"
+
+	"github.com/b3log/lute"
 )
 
 type parseTest struct {
@@ -256,4 +258,18 @@ func TestParse(t *testing.T) {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
 		}
 	}
+}
+
+func TestCase1(t *testing.T) {
+	bytes, err := ioutil.ReadFile("case1.md")
+	if nil != err {
+		t.Fatalf("read case failed: %s", err)
+	}
+
+	luteEngine := lute.New()
+	html, err := luteEngine.Markdown("test/case1.md", bytes)
+	if nil != err {
+		t.Fatalf("markdown failed: %s", err)
+	}
+	t.Log(html)
 }
