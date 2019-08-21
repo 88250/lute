@@ -16,8 +16,14 @@
 package lute
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
+
+	"github.com/alecthomas/chroma"
+	chromahtml "github.com/alecthomas/chroma/formatters/html"
+	chromalexers "github.com/alecthomas/chroma/lexers"
+	"github.com/alecthomas/chroma/styles"
 )
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
@@ -247,18 +253,38 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 	if entering {
 		r.Newline()
 		n := node.(*CodeBlock)
+		tokens := escapeHTML(n.tokens)
+
 		if "" != n.info {
 			infoWords := strings.Fields(n.info)
-			r.WriteString("<pre><code class=\"language-" + infoWords[0] + "\">")
+			language := infoWords[0]
+			r.WriteString("<pre><code class=\"language-" + language + "\">")
+			rendered := false
 			if r.option.CodeSyntaxHighlight {
-				r.Write(escapeHTML(n.tokens))
-			} else {
-				r.Write(escapeHTML(n.tokens))
+				var lexer chroma.Lexer
+				if "" != language {
+					lexer = chromalexers.Get(language)
+				}
+				if nil != lexer {
+					codeBlock := fromItems(tokens)
+					iterator, err := lexer.Tokenise(nil, codeBlock)
+					if nil == err {
+						formatter := chromahtml.New()
+						var b bytes.Buffer
+						if err = formatter.Format(&b, styles.Fallback, iterator); nil == err {
+							r.Write(b.Bytes())
+							rendered = true
+						}
+					}
+				}
 			}
 
+			if !rendered {
+				r.Write(tokens)
+			}
 		} else {
 			r.WriteString("<pre><code>")
-			r.Write(escapeHTML(n.tokens))
+			r.Write(tokens)
 		}
 		return WalkSkipChildren, nil
 	}
