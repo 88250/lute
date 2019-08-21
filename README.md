@@ -123,6 +123,7 @@ Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者们
 * [goldmark](https://github.com/yuin/goldmark)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其树遍历实现部分
 * [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其 URL 编码算法
 * [Chroma](https://github.com/alecthomas/chroma)：用 golang 写的语法高亮引擎 
+* [fasthttp](https://github.com/valyala/fasthttp)：用 golang 写的高性能 HTTP 实现
 
 ---
 
