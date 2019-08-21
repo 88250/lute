@@ -261,20 +261,23 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 			r.WriteString("<pre><code class=\"language-" + language + "\">")
 			rendered := false
 			if r.option.CodeSyntaxHighlight {
+				codeBlock := fromItems(tokens)
 				var lexer chroma.Lexer
 				if "" != language {
 					lexer = chromalexers.Get(language)
+				} else {
+					lexer = chromalexers.Analyse(codeBlock)
 				}
-				if nil != lexer {
-					codeBlock := fromItems(tokens)
-					iterator, err := lexer.Tokenise(nil, codeBlock)
-					if nil == err {
-						formatter := chromahtml.New()
-						var b bytes.Buffer
-						if err = formatter.Format(&b, styles.Fallback, iterator); nil == err {
-							r.Write(b.Bytes())
-							rendered = true
-						}
+				if nil == lexer {
+					lexer = chromalexers.Fallback
+				}
+				iterator, err := lexer.Tokenise(nil, codeBlock)
+				if nil == err {
+					formatter := chromahtml.New()
+					var b bytes.Buffer
+					if err = formatter.Format(&b, styles.Fallback, iterator); nil == err {
+						r.Write(b.Bytes())
+						rendered = true
 					}
 				}
 			}
