@@ -271,5 +271,5 @@ func TestCase1(t *testing.T) {
 	if nil != err {
 		t.Fatalf("markdown failed: %s", err)
 	}
-	t.Log(html)
+	t.Log(string(html))
 }
