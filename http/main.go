@@ -56,8 +56,10 @@ func main() {
 	gulu.Log.SetLevel("debug")
 	logger = gulu.Log.NewLogger(os.Stdout)
 
-	err := fasthttp.ListenAndServe("127.0.0.1:8250", handle)
+	addr := "127.0.0.1:8250"
+	logger.Infof("booting Lute HTTP Server on [%s]", addr)
+	err := fasthttp.ListenAndServe(addr, handle)
 	if nil != err {
-		logger.Fatalf("Lute HTTP server 启动失败，原因：%s", err.Error())
+		logger.Fatalf("booting Lute HTTP server failed: %s", err.Error())
 	}
 }
