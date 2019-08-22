@@ -126,12 +126,12 @@ func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 	}
 
 	tag := tokens.trim()
-	isOpenTag, _ := tag.isOpenTag()
+	isOpenTag := t.isOpenTag(tag)
 	if isOpenTag && t.context.tip.Type() != NodeParagraph {
 		ret.hType = 7
 		return
 	}
-	isCloseTag := tag.isCloseTag()
+	isCloseTag := t.isCloseTag(tag)
 	if isCloseTag && t.context.tip.Type() != NodeParagraph {
 		ret.hType = 7
 		return
@@ -185,7 +185,7 @@ func tokenize(str string) (ret items) {
 	return
 }
 
-func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
+func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 	length := len(tokens)
 	if 3 > length {
 		return
@@ -226,14 +226,13 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 		}
 	}
 
-	withAttr = true
-	nameAndAttrs = nameAndAttrs[1:]
-	for _, nameAndAttr := range nameAndAttrs {
-		if 1 > len(nameAndAttr) {
+	attrs := nameAndAttrs[1:]
+	for _, attr := range attrs {
+		if 1 > len(attr) {
 			continue
 		}
 
-		nameAndValue := nameAndAttr.split(itemEqual)
+		nameAndValue := attr.split(itemEqual)
 		name := nameAndValue[0]
 		if !isASCIILetter(name[0]) && itemUnderscore != name[0] && itemColon != name[0] {
 			return
@@ -253,20 +252,20 @@ func (tokens items) isOpenTag() (isOpenTag, withAttr bool) {
 			if value.startWith(itemSinglequote) && value.endWith(itemSinglequote) {
 				value = value[1:]
 				value = value[:len(value)-1]
-				return !value.contain(itemSinglequote), withAttr
+				return !value.contain(itemSinglequote)
 			}
 			if value.startWith(itemDoublequote) && value.endWith(itemDoublequote) {
 				value = value[1:]
 				value = value[:len(value)-1]
-				return !value.contain(itemDoublequote), withAttr
+				return !value.contain(itemDoublequote)
 			}
-			return !value.containWhitespace() && !value.containOne(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick), withAttr
+			return !value.containWhitespace() && !value.containOne(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick)
 		}
 	}
-	return true, withAttr
+	return true
 }
 
-func (tokens items) isCloseTag() bool {
+func (t *Tree) isCloseTag(tokens items) bool {
 	tokens = tokens.trim()
 	length := len(tokens)
 	if 4 > length {
