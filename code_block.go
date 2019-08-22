@@ -62,11 +62,15 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 
 func (codeBlock *CodeBlock) Finalize(context *Context) {
 	if codeBlock.isFenced {
-		// first line becomes info string
 		content := codeBlock.tokens
+		length := len(content)
+		if 1 > length {
+			return
+		}
+
 		var i int
 		var token byte
-		for ; ; i++ {
+		for ; i < length; i++ {
 			token = codeBlock.tokens[i]
 			if itemNewline == token {
 				break
@@ -98,7 +102,7 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 
 	fenceChar := marker
 	fenceLength := 0
-	for i := t.context.nextNonspace; fenceChar == t.context.currentLine[i]; i++ {
+	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar == t.context.currentLine[i]; i++ {
 		fenceLength++
 	}
 
