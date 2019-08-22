@@ -41,7 +41,7 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 		return
 	}
 
-	if !isWhitespace(tokens[level]) {
+	if level < len(tokens) && !isWhitespace(tokens[level]) {
 		return
 	}
 
