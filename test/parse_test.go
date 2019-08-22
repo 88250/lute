@@ -223,6 +223,7 @@ var parseTests = []parseTest{
 
 	// some simple cases
 
+	{"simple16", "lu\u0000te", "<p>lu\uFFFDte</p>\n"},
 	{"simple15", "[lute]: /url 'not a title", "<p>[lute]: /url 'not a title</p>\n"},
 	{"simple14", "\\[not a lute](/url)", "<p>[not a lute](/url)</p>\n"},
 	{"simple13", "- lu\n  - te", "<ul>\n<li>lu\n<ul>\n<li>te</li>\n</ul>\n</li>\n</ul>\n"},
