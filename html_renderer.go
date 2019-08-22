@@ -253,8 +253,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 	if entering {
 		r.Newline()
 		n := node.(*CodeBlock)
-		tokens := escapeHTML(n.tokens)
-
+		tokens := n.tokens
 		if "" != n.info {
 			infoWords := strings.Fields(n.info)
 			language := infoWords[0]
@@ -273,7 +272,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 				}
 				iterator, err := lexer.Tokenise(nil, codeBlock)
 				if nil == err {
-					formatter := chromahtml.New()
+					formatter := chromahtml.New(chromahtml.PreventSurroundingPre())
 					var b bytes.Buffer
 					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
 						r.Write(b.Bytes())
@@ -283,6 +282,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 			}
 
 			if !rendered {
+				tokens = escapeHTML(tokens)
 				r.Write(tokens)
 			}
 		} else {
@@ -298,7 +298,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 
 				iterator, err := lexer.Tokenise(nil, codeBlock)
 				if nil == err {
-					formatter := chromahtml.New()
+					formatter := chromahtml.New(chromahtml.PreventSurroundingPre())
 					var b bytes.Buffer
 					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
 						r.Write(b.Bytes())
@@ -307,10 +307,12 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 				}
 
 				if !rendered {
+					tokens = escapeHTML(tokens)
 					r.Write(tokens)
 				}
 			} else {
 				r.WriteString("<pre><code>")
+				tokens = escapeHTML(tokens)
 				r.Write(tokens)
 			}
 		}
