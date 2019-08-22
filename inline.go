@@ -399,9 +399,6 @@ func (t *Tree) parseText(tokens items) (ret Node) {
 		token = tokens[t.context.pos]
 		if t.isMarker(token) {
 			// 遇到潜在的标记符时需要跳出 text，回到行级解析主循环
-			if start == t.context.pos {
-				start++
-			}
 			break
 		}
 	}
