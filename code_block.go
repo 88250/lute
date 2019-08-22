@@ -48,7 +48,7 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 				i--
 			}
 		}
-	} else { // indented
+	} else { // 缩进代码块
 		if indent >= 4 {
 			context.advanceOffset(4, true)
 		} else if context.blank {
@@ -81,7 +81,7 @@ func (codeBlock *CodeBlock) Finalize(context *Context) {
 
 		codeBlock.info = unescapeString(strings.TrimSpace(firstLine.string()))
 		codeBlock.tokens = rest
-	} else { // indented
+	} else { // 缩进代码块
 		codeBlock.tokens = codeBlock.tokens.replaceNewlineSpace()
 	}
 }
