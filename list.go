@@ -148,9 +148,10 @@ func (t *Tree) parseListMarker(container Node) *listData {
 }
 
 func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter byte) {
+	length := len(tokens)
 	var i int
 	var token byte
-	for ; ; i++ {
+	for ; i < length; i++ {
 		token = tokens[i]
 		if !isDigit(token) || 8 < i {
 			delimiter = token
