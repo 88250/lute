@@ -286,8 +286,33 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 				r.Write(tokens)
 			}
 		} else {
-			r.WriteString("<pre><code>")
-			r.Write(tokens)
+			if r.option.CodeSyntaxHighlight {
+				codeBlock := fromItems(tokens)
+				var lexer = chromalexers.Analyse(codeBlock)
+				if nil == lexer {
+					lexer = chromalexers.Fallback
+				}
+				language := lexer.Config().Name
+				r.WriteString("<pre><code class=\"language-" + language + "\">")
+				rendered := false
+
+				iterator, err := lexer.Tokenise(nil, codeBlock)
+				if nil == err {
+					formatter := chromahtml.New()
+					var b bytes.Buffer
+					if err = formatter.Format(&b, styles.Fallback, iterator); nil == err {
+						r.Write(b.Bytes())
+						rendered = true
+					}
+				}
+
+				if !rendered {
+					r.Write(tokens)
+				}
+			} else {
+				r.WriteString("<pre><code>")
+				r.Write(tokens)
+			}
 		}
 		return WalkSkipChildren, nil
 	}
