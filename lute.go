@@ -20,7 +20,7 @@ type Lute struct {
 	options
 }
 
-// New 创建一个新的 Lute 引擎，默认启用所有 GFM 支持、代码块语法高亮。
+// New 创建一个新的 Lute 引擎，默认启用 GFM 支持、代码块语法高亮。
 func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
 	GFM(true)(ret)
@@ -37,6 +37,7 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 	var tree *Tree
 	tree, err = parse(name, markdown, lute.options)
 	if nil != err {
+		// fmt.Println(string(markdown))
 		return
 	}
 
@@ -107,11 +108,10 @@ func CodeSyntaxHighlight(b bool) option {
 
 // options 描述了一些列解析和渲染选项。
 type options struct {
-	GFMTable         bool // 是否处理 GFM 表
-	GFMTaskListItem  bool // 是否处理 GFM 任务列表项
-	GFMStrikethrough bool // 是否处理 GFM 删除线
-	GFMAutoLink      bool // 是否处理 GFM 自动链接
-
+	GFMTable            bool // 是否处理 GFM 表
+	GFMTaskListItem     bool // 是否处理 GFM 任务列表项
+	GFMStrikethrough    bool // 是否处理 GFM 删除线
+	GFMAutoLink         bool // 是否处理 GFM 自动链接
 	CodeSyntaxHighlight bool // 是否对代码块进行语法高亮
 }
 
