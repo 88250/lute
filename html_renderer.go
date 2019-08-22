@@ -275,7 +275,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 				if nil == err {
 					formatter := chromahtml.New()
 					var b bytes.Buffer
-					if err = formatter.Format(&b, styles.Fallback, iterator); nil == err {
+					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
 						r.Write(b.Bytes())
 						rendered = true
 					}
@@ -300,7 +300,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 				if nil == err {
 					formatter := chromahtml.New()
 					var b bytes.Buffer
-					if err = formatter.Format(&b, styles.Fallback, iterator); nil == err {
+					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
 						r.Write(b.Bytes())
 						rendered = true
 					}
