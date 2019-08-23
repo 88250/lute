@@ -333,8 +333,13 @@ func (t *Tree) parseAttrValSpec(tokens items) (valid bool, remains, valSpec item
 		}
 	} else { // An unquoted attribute value is a nonempty string of characters not including whitespace, ", ', =, <, >, or `.
 		for i, token = range tokens {
+			if itemGreater == token {
+				i-- // 大于字符 > 不计入 valSpec
+				break
+			}
 			valSpec = append(valSpec, token)
 			if isWhitespace(token) {
+				// 属性使用空白分隔
 				break
 			}
 			if itemDoublequote == token || itemSinglequote == token || itemEqual == token || itemLess == token || itemGreater == token || itemBacktick == token {
@@ -343,7 +348,6 @@ func (t *Tree) parseAttrValSpec(tokens items) (valid bool, remains, valSpec item
 			}
 			closed = true
 		}
-
 	}
 
 	if !closed {
