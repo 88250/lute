@@ -32,6 +32,8 @@ type delimiter struct {
 	previousDelimiter *delimiter
 }
 
+// 嵌套强调和链接的解析算法的中文解读可参考这里 TODO
+
 // handleDelim 将分隔符 *_~ 入栈。
 func (t *Tree) handleDelim(block Node, tokens items) {
 	startPos := t.context.pos
