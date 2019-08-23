@@ -124,10 +124,7 @@ func (t *Tree) incorporateLine(line items) {
 		}
 
 		typ := container.Type()
-		isFenced := false
-		if NodeCodeBlock == typ {
-			isFenced = container.(*CodeBlock).isFenced
-		}
+		isFenced := NodeCodeBlock == typ && container.(*CodeBlock).isFenced
 
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
 		var lastLineBlank = t.context.blank &&

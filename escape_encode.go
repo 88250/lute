@@ -43,7 +43,6 @@ func escapeHTML(html items) (ret items) {
 			tmp[i+3] = 'p'
 			tmp[i+4] = ';'
 			i += 5
-
 			continue
 		}
 
