@@ -157,11 +157,6 @@ func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
 			break
 		}
 
-		// 标点符号断开
-		if itemUnderscore != token && itemHyphen != token && itemDot != token && itemColon != token && itemSlash != token && isPunct(token) {
-			break
-		}
-
 		// 非标点符号非数字字母断开
 		if !isPunct(token) && !isASCIILetterNum(token) {
 			break
