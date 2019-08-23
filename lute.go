@@ -20,12 +20,15 @@ type Lute struct {
 	options
 }
 
-// New 创建一个新的 Lute 引擎，默认启用 GFM 支持、代码块语法高亮。
+// New 创建一个新的 Lute 引擎，默认启用：
+//  * GFM 支持
+//  * 代码块语法高亮
+//  * 软换行转硬换行
 func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
 	GFM(true)(ret)
 	CodeSyntaxHighlight(true)(ret)
-
+	SoftBreak2HardBreak(true)(ret)
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -106,12 +109,19 @@ func CodeSyntaxHighlight(b bool) option {
 	}
 }
 
+func SoftBreak2HardBreak(b bool) option {
+	return func(lute *Lute) {
+		lute.SoftBreak2HardBreak = b
+	}
+}
+
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	GFMTable            bool // 是否处理 GFM 表
 	GFMTaskListItem     bool // 是否处理 GFM 任务列表项
 	GFMStrikethrough    bool // 是否处理 GFM 删除线
 	GFMAutoLink         bool // 是否处理 GFM 自动链接
+	SoftBreak2HardBreak bool // 是否将软换行（\n）渲染为硬换行（<br />）
 	CodeSyntaxHighlight bool // 是否对代码块进行语法高亮
 }
 

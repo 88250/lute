@@ -46,6 +46,7 @@ func TestSpec(t *testing.T) {
 
 	luteEngine := lute.New(lute.GFM(false), // 不开启 GFM
 		lute.CodeSyntaxHighlight(false),    // 不开启语法高亮
+		lute.SoftBreak2HardBreak(false),    // 软换行不转硬换行
 	)
 
 	for _, test := range testcases {

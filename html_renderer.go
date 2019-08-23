@@ -437,7 +437,12 @@ func (r *Renderer) renderHardBreak(node Node, entering bool) (WalkStatus, error)
 
 func (r *Renderer) renderSoftBreak(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.Newline()
+		if r.option.SoftBreak2HardBreak {
+			r.tag("br", nil, true)
+			r.Newline()
+		} else {
+			r.Newline()
+		}
 	}
 
 	return WalkContinue, nil

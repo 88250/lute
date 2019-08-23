@@ -246,6 +246,7 @@ func TestParse(t *testing.T) {
 	luteEngine := lute.New(
 		lute.GFM(false),
 		lute.CodeSyntaxHighlight(false),
+		lute.SoftBreak2HardBreak(false),
 	)
 
 	for _, test := range parseTests {
