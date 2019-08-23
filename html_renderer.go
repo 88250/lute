@@ -272,11 +272,14 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 				}
 				iterator, err := lexer.Tokenise(nil, codeBlock)
 				if nil == err {
-					formatter := chromahtml.New(chromahtml.PreventSurroundingPre())
+					formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
 					var b bytes.Buffer
 					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
 						r.Write(b.Bytes())
 						rendered = true
+						// 生成 CSS 临时调试用：
+						//formatter.WriteCSS(os.Stdout, styles.GitHub)
+						//os.Stdout.WriteString("\n")
 					}
 				}
 			}
@@ -298,7 +301,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 
 				iterator, err := lexer.Tokenise(nil, codeBlock)
 				if nil == err {
-					formatter := chromahtml.New(chromahtml.PreventSurroundingPre())
+					formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
 					var b bytes.Buffer
 					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
 						r.Write(b.Bytes())
