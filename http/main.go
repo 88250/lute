@@ -24,7 +24,7 @@ import (
 )
 
 // handleMarkdown2HTML 处理 Markdown 转 HTML。
-// POST 请求 Body 传入 Markdown 原文；响应 Body 即处理好的 HTML。
+// POST 请求 Body 传入 Markdown 原文；响应 Body 是处理好的 HTML。
 func handleMarkdown2HTML(ctx *fasthttp.RequestCtx) {
 	body := ctx.PostBody()
 
@@ -48,15 +48,12 @@ func handle(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// 日志记录器。
-var logger *gulu.Logger
-
 // Lute 的 HTTP Server 入口点。
 func main() {
 	gulu.Log.SetLevel("debug")
-	logger = gulu.Log.NewLogger(os.Stdout)
+	logger := gulu.Log.NewLogger(os.Stdout)
 
-	addr := "127.0.0.1:8250"
+	addr := "127.0.0.1:8249"
 	logger.Infof("booting Lute HTTP Server on [%s]", addr)
 	err := fasthttp.ListenAndServe(addr, handle)
 	if nil != err {
