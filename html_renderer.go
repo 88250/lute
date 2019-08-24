@@ -29,24 +29,24 @@ func newHTMLRenderer(option options) (ret *Renderer) {
 
 	// 注册 CommonMark 渲染函数
 
-	ret.rendererFuncs[NodeDocument] = ret.renderDocument
-	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
-	ret.rendererFuncs[NodeText] = ret.renderText
-	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
-	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
-	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
-	ret.rendererFuncs[NodeStrong] = ret.renderStrong
-	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
-	ret.rendererFuncs[NodeHeading] = ret.renderHeading
-	ret.rendererFuncs[NodeList] = ret.renderList
-	ret.rendererFuncs[NodeListItem] = ret.renderListItem
-	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
-	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
-	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
-	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTML
-	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
-	ret.rendererFuncs[NodeLink] = ret.renderLink
-	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeDocument] = ret.renderDocumentHTML
+	ret.rendererFuncs[NodeParagraph] = ret.renderParagraphHTML
+	ret.rendererFuncs[NodeText] = ret.renderTextHTML
+	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpanHTML
+	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlockHTMl
+	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasisHTML
+	ret.rendererFuncs[NodeStrong] = ret.renderStrongHTML
+	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquoteHTML
+	ret.rendererFuncs[NodeHeading] = ret.renderHeadingHTML
+	ret.rendererFuncs[NodeList] = ret.renderListHTML
+	ret.rendererFuncs[NodeListItem] = ret.renderListItemHTML
+	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreakHTML
+	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreakHTML
+	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreakHTML
+	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTMLHTML
+	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTMLHTML
+	ret.rendererFuncs[NodeLink] = ret.renderLinkHTML
+	ret.rendererFuncs[NodeImage] = ret.renderImageHTML
 
 	// 注册 GFM 渲染函数
 
@@ -138,7 +138,7 @@ func (r *Renderer) renderStrikethrough(node Node, entering bool) (WalkStatus, er
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderImageHTML(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Image)
 	if entering {
 		if 0 == r.disableTags {
@@ -163,7 +163,7 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderLink(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderLinkHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*Link)
 		attrs := [][]string{{"href", fromItems(escapeHTML(toItems(n.Destination)))}}
@@ -180,7 +180,7 @@ func (r *Renderer) renderLink(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderHTMLHTML(node Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		return WalkContinue, nil
 	}
@@ -192,7 +192,7 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderInlineHTMLHTML(node Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		return WalkContinue, nil
 	}
@@ -202,11 +202,11 @@ func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderDocument(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderDocumentHTML(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderParagraphHTML(node Node, entering bool) (WalkStatus, error) {
 	if grandparent := node.Parent().Parent(); nil != grandparent {
 		if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
 			if list.tight {
@@ -226,7 +226,7 @@ func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error)
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTextHTML(node Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		return WalkContinue, nil
 	}
@@ -236,7 +236,7 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeSpan(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderCodeSpanHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("<code>")
 		r.write(escapeHTML(node.Tokens()))
@@ -246,7 +246,7 @@ func (r *Renderer) renderCodeSpan(node Node, entering bool) (WalkStatus, error) 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderCodeBlockHTMl(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		n := node.(*CodeBlock)
@@ -323,7 +323,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderEmphasisHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("em", nil, false)
 	} else {
@@ -332,7 +332,7 @@ func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderStrongHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("<strong>")
 		r.write(node.Tokens())
@@ -342,7 +342,7 @@ func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderBlockquoteHTML(n Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("<blockquote>")
@@ -355,7 +355,7 @@ func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderHeadingHTML(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Heading)
 	if entering {
 		r.newline()
@@ -367,7 +367,7 @@ func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderListHTML(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*List)
 	tag := "ul"
 	if 1 == n.listData.typ {
@@ -390,7 +390,7 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderListItemHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("li", nil, false)
 	} else {
@@ -413,7 +413,7 @@ func (r *Renderer) renderTaskListItemMarker(node Node, entering bool) (WalkStatu
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderThematicBreakHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.tag("hr", nil, true)
@@ -423,7 +423,7 @@ func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus, er
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHardBreak(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderHardBreakHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("br", nil, true)
 		r.newline()
@@ -432,7 +432,7 @@ func (r *Renderer) renderHardBreak(node Node, entering bool) (WalkStatus, error)
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderSoftBreak(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderSoftBreakHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if r.option.SoftBreak2HardBreak {
 			r.tag("br", nil, true)
