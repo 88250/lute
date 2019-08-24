@@ -4,16 +4,17 @@
 
 ## 💡 简介
 
-[Lute](https://github.com/b3log/lute) 是一款结构化的 Markdown 引擎，完整实现了最新的 [GFM](https://github.github.com/gfm/) / [CommonMark](https://commonmark.org) 规范，对中文语境支持更好。
+[Lute](https://github.com/b3log/lute) 是一款结构化的 Markdown 引擎，完整实现了最新的 [GFM](https://github.github.com/gfm/)/[CommonMark](https://commonmark.org) 规范，对中文语境支持更好。
 
 ## 📽️ 背景
 
-之前我一直在使用其他 Markdown 引擎，他们或多或少都有些“瑕疵”：
+之前我一直在使用其他 Markdown 引擎，它们或多或少都有些“瑕疵”：
 
 * 对标准规范的支持不一致
 * 对“怪异”文本处理非常耗时，甚至挂死
+* 对中文支持不够好
 
-Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMark 规范。所谓的“结构化”指的是从输入的 MD 文本构建抽象语法树，通过操作树来进行 HTML 输出、原文格式化等。
+Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范并对中文提供更好的支持。所谓的“结构化”指的是从输入的 MD 文本构建抽象语法树，通过操作树来进行 HTML 输出、原文格式化等。
 实现规范是为了保证 Markdown 渲染不存在二义性，让同一份 Markdown 文本可以在实现规范的 Markdown 引擎处理后得到一样的结果，这一点非常重要。
 
 实现规范的引擎并不多，我想试试看自己能不能写上一个，这也是 Lute 的动机之一。关于如何实现一个 Markdown 引擎，网上众说纷纭：
@@ -21,7 +22,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 * 有的人说 Markdown 适合用正则解析，因为文法规则太简单
 * 也有的人说 Markdown 可以用编译原理来处理，正则太难维护
 
-我赞同后者，因为正则确实太难维护而且运行效率较低。最重要的原因是符合 GFM/CM 规范的 Markdown 引擎的核心解析算法不大可能用正则写出来，因为规范定义的规则实在是太复杂了。
+我赞同后者，因为正则确实太难维护而且运行效率较低。最重要的原因是符合 GFM/CM 规范的 Markdown 引擎的核心解析算法不可能用正则写出来，因为规范定义的规则实在是太复杂了。
 
 最后，还有一个很重要的动机就是 B3log 开源社区需要一款自己的 Markdown 引擎：
 
@@ -30,7 +31,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 
 ## ✨  特性
 
-* 完整实现最新版 GFM/CM 规范
+* 实现最新版 GFM/CM 规范
 * 非常快
 * 代码块语法高亮
 * 更好地支持中文语境
@@ -100,12 +101,9 @@ Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://git
 
 ## 📜 文档
 
-TBD
-
 * [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
 * Lute 使用指南
 * CommonMark 规范要点解读
-* Lute 实现后记
 
 目前大部分文档都是中文的，欢迎外文好的同学帮忙进行国际化。
 
