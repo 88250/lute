@@ -45,9 +45,6 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 
 	renderer := newHTMLRenderer(lute.options)
 	html, err = tree.render(renderer)
-	if nil != err {
-		return
-	}
 	return
 }
 
@@ -60,6 +57,32 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 	}
 
 	html = fromItems(htmlBytes)
+	return
+}
+
+// Format 将 markdown 文本字符数组进行格式化。
+func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err error) {
+	var tree *Tree
+	tree, err = parse(name, markdown, lute.options)
+	if nil != err {
+		// fmt.Println(string(markdown))
+		return
+	}
+
+	renderer := newFormatRenderer(lute.options)
+	formatted, err = tree.render(renderer)
+	return
+}
+
+// FormatStr 接受 string 类型的 markdown 后直接调用 Format 进行处理。
+func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error) {
+	var formattedBytes []byte
+	formattedBytes, err = lute.Format(name, toItems(markdown))
+	if nil != err {
+		return
+	}
+
+	formatted = fromItems(formattedBytes)
 	return
 }
 
