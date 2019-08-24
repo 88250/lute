@@ -24,11 +24,13 @@ type Lute struct {
 //  * GFM 支持
 //  * 代码块语法高亮
 //  * 软换行转硬换行
+//  * 中西文间插入空格
 func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
 	GFM(true)(ret)
-	CodeSyntaxHighlight(true)(ret)
 	SoftBreak2HardBreak(true)(ret)
+	CodeSyntaxHighlight(true)(ret)
+	AutoSpace(true)(ret)
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -62,6 +64,12 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 
 	html = fromItems(htmlBytes)
 	return
+}
+
+// AutoSpace 会把 text 中的中西文之间加上空格。
+// https://github.com/sparanoid/chinese-copywriting-guidelines
+func (lute *Lute) Space(text string) (ret string) {
+	return space(text)
 }
 
 // GFM 设置是否打开所有 GFM 支持。

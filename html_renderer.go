@@ -234,7 +234,11 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 		return WalkContinue, nil
 	}
 
-	r.write(escapeHTML(node.Tokens()))
+	text := fromItems(escapeHTML(node.Tokens()))
+	if r.option.AutoSpace {
+		text = space(text)
+	}
+	r.writeString(text)
 
 	return WalkContinue, nil
 }

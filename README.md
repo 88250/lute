@@ -126,8 +126,10 @@ Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者们
 * [mdast](https://github.com/syntax-tree/mdast)：该项目介绍了一种 Markdown 抽象语法树结构的表现形式，Lute 的 AST 在初始设计阶段参考了该项目
 * [goldmark](https://github.com/yuin/goldmark)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其树遍历实现部分
 * [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其 URL 编码算法
-* [Chroma](https://github.com/alecthomas/chroma)：用 golang 写的语法高亮引擎 
+* [Chroma](https://github.com/alecthomas/chroma)：用 golang 写的语法高亮引擎
 * [fasthttp](https://github.com/valyala/fasthttp)：用 golang 写的高性能 HTTP 实现
+* [中文文案排版指北](https://github.com/sparanoid/chinese-copywriting-guidelines)：统一中文文案、排版的相关用法，降低团队成员之间的沟通成本，增强网站气质
+* [autocorrect](https://github.com/studygolang/autocorrect)：自动给中英文之间加入空格
 
 ---
 
