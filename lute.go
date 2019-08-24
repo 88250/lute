@@ -35,7 +35,7 @@ func New(opts ...option) (ret *Lute) {
 	return ret
 }
 
-// Markdown 将 markdown 文本字符数组处理为相应的 html 字符数组。name 参数用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
+// Markdown 将 markdown 文本字符数组处理为相应的 html 字符数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error) {
 	var tree *Tree
 	tree, err = parse(name, markdown, lute.options)
