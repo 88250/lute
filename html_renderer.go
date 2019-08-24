@@ -176,7 +176,6 @@ func (r *Renderer) renderLinkHTML(node Node, entering bool) (WalkStatus, error) 
 	}
 
 	r.tag("/a", nil, false)
-
 	return WalkContinue, nil
 }
 
@@ -188,7 +187,6 @@ func (r *Renderer) renderHTMLHTML(node Node, entering bool) (WalkStatus, error) 
 	r.newline()
 	r.write(node.Tokens())
 	r.newline()
-
 	return WalkContinue, nil
 }
 
@@ -198,7 +196,6 @@ func (r *Renderer) renderInlineHTMLHTML(node Node, entering bool) (WalkStatus, e
 	}
 
 	r.write(node.Tokens())
-
 	return WalkContinue, nil
 }
 
@@ -222,7 +219,6 @@ func (r *Renderer) renderParagraphHTML(node Node, entering bool) (WalkStatus, er
 		r.tag("/p", nil, false)
 		r.newline()
 	}
-
 	return WalkContinue, nil
 }
 
@@ -232,7 +228,6 @@ func (r *Renderer) renderTextHTML(node Node, entering bool) (WalkStatus, error) 
 	}
 
 	r.write(escapeHTML(node.Tokens()))
-
 	return WalkContinue, nil
 }
 
@@ -419,7 +414,6 @@ func (r *Renderer) renderThematicBreakHTML(node Node, entering bool) (WalkStatus
 		r.tag("hr", nil, true)
 		r.newline()
 	}
-
 	return WalkContinue, nil
 }
 
@@ -428,7 +422,6 @@ func (r *Renderer) renderHardBreakHTML(node Node, entering bool) (WalkStatus, er
 		r.tag("br", nil, true)
 		r.newline()
 	}
-
 	return WalkContinue, nil
 }
 
@@ -441,7 +434,6 @@ func (r *Renderer) renderSoftBreakHTML(node Node, entering bool) (WalkStatus, er
 			r.newline()
 		}
 	}
-
 	return WalkContinue, nil
 }
 
