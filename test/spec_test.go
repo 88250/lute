@@ -44,9 +44,10 @@ func TestSpec(t *testing.T) {
 		t.Fatalf("read spec test caes failed: " + err.Error())
 	}
 
-	luteEngine := lute.New(lute.GFM(false), // 不开启 GFM
-		lute.CodeSyntaxHighlight(false),    // 不开启语法高亮
-		lute.SoftBreak2HardBreak(false),    // 软换行不转硬换行
+	luteEngine := lute.New(lute.GFM(false),
+		lute.SoftBreak2HardBreak(false),
+		lute.CodeSyntaxHighlight(false),
+		lute.AutoSpace(false),
 	)
 
 	for _, test := range testcases {

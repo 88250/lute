@@ -65,9 +65,9 @@ var gfmSpecTests = []parseTest{
 }
 
 func TestGFMSpec(t *testing.T) {
-	luteEngine := lute.New(
-		// 默认已经开启 GFM 支持
+	luteEngine := lute.New( // 默认已经开启 GFM 支持
 		lute.SoftBreak2HardBreak(false),
+		lute.AutoSpace(false),
 	)
 
 	for _, test := range gfmSpecTests {
