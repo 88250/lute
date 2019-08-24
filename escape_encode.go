@@ -134,8 +134,9 @@ func unescapeString(str string) string {
 // - percent-encoded characters (%[0-9a-fA-F]{2});
 // - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
 // Invalid UTF-8 sequences are replaced with U+FFFD.
-// 鸣谢 https://gitlab.com/golang-commonmark/mdurl
 func encodeDestination(rawurl string) string {
+	// 鸣谢 https://gitlab.com/golang-commonmark/mdurl
+
 	const hexdigit = "0123456789ABCDEF"
 	var buf bytes.Buffer
 	i := 0
