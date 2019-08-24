@@ -13,7 +13,6 @@
 package lute
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -305,33 +304,25 @@ func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, 
 }
 
 func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, error) {
-	n := node.(*List)
-	tag := "ul"
-	if 1 == n.listData.typ {
-		tag = "ol"
-	}
 	if entering {
 		r.newline()
-		attrs := [][]string{{"start", fmt.Sprintf("%d", n.start)}}
-		if nil == n.bulletChar && 1 != n.start {
-			r.tag(tag, attrs, false)
-		} else {
-			r.tag(tag, nil, false)
-		}
-		r.newline()
 	} else {
-		r.newline()
-		r.tag("/"+tag, nil, false)
 		r.newline()
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus, error) {
+	n := node.(*ListItem)
 	if entering {
-		r.tag("li", nil, false)
+		r.writeString(strings.Repeat(" ", n.margin))
+		r.write(n.marker)
+		if 1 == n.listData.typ {
+			r.write(n.bulletChar)
+			r.writeByte(n.delimiter)
+		}
+		r.writeByte(' ')
 	} else {
-		r.tag("/li", nil, false)
 		r.newline()
 	}
 	return WalkContinue, nil

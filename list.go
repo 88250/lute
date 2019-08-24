@@ -29,9 +29,11 @@ type listData struct {
 	bulletChar   items // 无序列表标识，* - 或者 +
 	start        int   // 有序列表起始序号
 	delimiter    byte  // 有序列表分隔符，. 或者 )
-	padding      int   // 列表内部缩进空格数，即无序列表标识或分隔符和后续第一个非空字符之间的空格数，规范里的 N
-	markerOffset int   // 标识符（* - + 或者 1 2 3）缩进
+	padding      int   // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
+	markerOffset int   // 标识符（* - + 或者 1 2 3）相对缩进空格数
 	checked      bool  // 任务列表项是否勾选
+	margin       int   // 列表绝对缩进空格数
+	marker       items // 列表标识符
 }
 
 func (list *List) CanContain(nodeType int) bool {
@@ -63,22 +65,24 @@ func (list *List) Finalize(context *Context) {
 
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记。
 func (t *Tree) parseListMarker(container Node) *listData {
-	ln := t.context.currentLine // 弄短点
 	if t.context.indent >= 4 {
 		return nil
 	}
+
+	ln := t.context.currentLine // 弄短点
 	tokens := ln[t.context.nextNonspace:]
 	data := &listData{
 		typ:          0,                // 默认无序列表
 		tight:        true,             // 默认紧凑模式
-		markerOffset: t.context.indent, // 设置前置缩进
+		markerOffset: t.context.indent, // 设置前置相对缩进
 	}
 
 	markerLength := 1
 	marker := items{tokens[0]}
+	var delim byte
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.bulletChar = marker
-	} else if marker, delim := t.parseOrderedListMarker(tokens); nil != marker {
+	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
 		if container.Type() != NodeParagraph || "1" == marker.string() {
 			data.typ = 1 // 有序列表
 			data.start, _ = strconv.Atoi(marker.string())
@@ -90,6 +94,8 @@ func (t *Tree) parseListMarker(container Node) *listData {
 	} else {
 		return nil
 	}
+
+	data.marker = marker
 
 	var token byte
 

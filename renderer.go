@@ -45,6 +45,12 @@ func (r *Renderer) render(root Node) error {
 	})
 }
 
+// writeByte 输出一个字节 c。
+func (r *Renderer) writeByte(c byte) {
+	r.writer.WriteByte(c)
+	r.lastOut = c
+}
+
 // write 输出指定的 tokens 数组 content。
 func (r *Renderer) write(content items) {
 	if length := len(content); 0 < length {
