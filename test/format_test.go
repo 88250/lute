@@ -25,6 +25,10 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
+	{"12", "[B3log 开源](https://b3log.org \"B3log 开源\")\n", "[B3log 开源](https://b3log.org \"B3log 开源\")\n"},
+	{"11", "硬换行  \n第二行\n", "硬换行\\\n第二行\n"},
+	{"10", "硬换行\\\n第二行\n", "硬换行\\\n第二行\n"},
+	{"9", "分隔线\n\n---\n", "分隔线\n\n---\n"},
 	{"8", "```go\nvar lute\n```\n", "```go\nvar lute\n```\n"},
 	{"7", "`代码`\n", "`代码`\n"},
 	{"6", ">块引用\n", ">块引用\n"},

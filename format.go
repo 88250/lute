@@ -159,16 +159,15 @@ func (r *Renderer) renderImageMarkdown(node Node, entering bool) (WalkStatus, er
 func (r *Renderer) renderLinkMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*Link)
-		attrs := [][]string{{"href", fromItems(escapeHTML(toItems(n.Destination)))}}
+		r.writeString("[")
+		r.write(n.firstChild.Tokens()) // FIXME 未解决链接嵌套，另外还需要考虑链接引用定义
+		r.writeString("](" + n.Destination + "")
 		if "" != n.Title {
-			attrs = append(attrs, []string{"title", fromItems(escapeHTML(toItems(n.Title)))})
+			r.writeString(" \"" + n.Title + "\"")
 		}
-		r.tag("a", attrs, false)
-
+		r.writeString(")")
 		return WalkContinue, nil
 	}
-
-	r.tag("/a", nil, false)
 
 	return WalkContinue, nil
 }
@@ -181,7 +180,6 @@ func (r *Renderer) renderHTMLMarkdown(node Node, entering bool) (WalkStatus, err
 	r.newline()
 	r.write(node.Tokens())
 	r.newline()
-
 	return WalkContinue, nil
 }
 
@@ -191,7 +189,6 @@ func (r *Renderer) renderInlineHTMLMarkdown(node Node, entering bool) (WalkStatu
 	}
 
 	r.write(node.Tokens())
-
 	return WalkContinue, nil
 }
 
@@ -211,7 +208,6 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 	if !entering {
 		r.newline()
 	}
-
 	return WalkContinue, nil
 }
 
@@ -220,8 +216,9 @@ func (r *Renderer) renderTextMarkdown(node Node, entering bool) (WalkStatus, err
 		return WalkContinue, nil
 	}
 
-	r.write(escapeHTML(node.Tokens()))
-
+	if NodeLink != node.Parent().Type() {
+		r.write(escapeHTML(node.Tokens()))
+	}
 	return WalkContinue, nil
 }
 
@@ -231,6 +228,7 @@ func (r *Renderer) renderCodeSpanMarkdown(node Node, entering bool) (WalkStatus,
 		r.write(node.Tokens())
 		return WalkSkipChildren, nil
 	}
+
 	r.writeByte('`')
 	return WalkContinue, nil
 }
@@ -244,6 +242,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 		r.newline()
 		return WalkSkipChildren, nil
 	}
+
 	r.writeString("```")
 	r.newline()
 	return WalkContinue, nil
@@ -328,20 +327,16 @@ func (r *Renderer) renderTaskListItemMarkerMarkdown(node Node, entering bool) (W
 
 func (r *Renderer) renderThematicBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.newline()
-		r.tag("hr", nil, true)
-		r.newline()
+		r.writeString("\n---\n")
 	}
-
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderHardBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("br", nil, true)
+		r.writeString("\\")
 		r.newline()
 	}
-
 	return WalkContinue, nil
 }
 
@@ -354,6 +349,5 @@ func (r *Renderer) renderSoftBreakMarkdown(node Node, entering bool) (WalkStatus
 			r.newline()
 		}
 	}
-
 	return WalkContinue, nil
 }
