@@ -27,9 +27,7 @@ func (t *Tree) parseBlocks() {
 	}
 }
 
-// Analyze a line of text and update the document appropriately.
-// We parse markdown text by calling this on each line of input,
-// then finalizing the document.
+// incorporateLine 处理文本行 line 并把生成的块级节点挂到树上。
 func (t *Tree) incorporateLine(line items) {
 	t.context.oldtip = t.context.tip
 	t.context.offset = 0
