@@ -23,7 +23,7 @@ import (
 
 var spaceTests = []parseTest{
 
-	{"space1", "Lute解析200K的Markdown文本只需要5ms。\n", "<p>Lute 解析 200K 的 Markdown 文本只需要 5ms。</p>\n"},
+	{"space1", "Lute解析200K的Markdown文本在我的电脑上只需要5ms。\n", "<p>Lute 解析 200K 的 Markdown 文本在我的电脑上只需要 5ms。</p>\n"},
 	{"space0", "Lute是一款结构化的Markdown引擎，完整实现了最新的GFM / CommonMark规范，对中文语境支持更好。\n", "<p>Lute 是一款结构化的 Markdown 引擎，完整实现了最新的 GFM / CommonMark 规范，对中文语境支持更好。</p>\n"},
 }
 
@@ -40,6 +40,6 @@ func TestAutoSpace(t *testing.T) {
 		if test.html != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
 		}
-		t.Log(html)
+		t.Logf(html)
 	}
 }
