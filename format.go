@@ -208,9 +208,7 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 		}
 	}
 
-	if entering {
-		r.newline()
-	} else {
+	if !entering {
 		r.newline()
 	}
 
@@ -229,11 +227,11 @@ func (r *Renderer) renderTextMarkdown(node Node, entering bool) (WalkStatus, err
 
 func (r *Renderer) renderCodeSpanMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<code>")
-		r.write(escapeHTML(node.Tokens()))
+		r.writeByte('`')
+		r.write(node.Tokens())
 		return WalkSkipChildren, nil
 	}
-	r.writeString("</code>")
+	r.writeByte('`')
 	return WalkContinue, nil
 }
 
@@ -241,40 +239,30 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 	if entering {
 		r.newline()
 		n := node.(*CodeBlock)
-		tokens := n.tokens
-		if "" != n.info {
-			infoWords := strings.Fields(n.info)
-			language := infoWords[0]
-			r.writeString("<pre><code class=\"language-" + language + "\">")
-			tokens = escapeHTML(tokens)
-			r.write(tokens)
-		} else {
-			r.writeString("<pre><code>")
-			tokens = escapeHTML(tokens)
-			r.write(tokens)
-		}
+		r.writeString("```" + n.info + "\n")
+		r.write(n.tokens)
+		r.newline()
 		return WalkSkipChildren, nil
 	}
-	r.writeString("</code></pre>")
+	r.writeString("```")
 	r.newline()
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderEmphasisMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("em", nil, false)
+		r.writeByte('*')
 	} else {
-		r.tag("/em", nil, false)
+		r.writeByte('*')
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderStrongMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<strong>")
-		r.write(node.Tokens())
+		r.writeString("**")
 	} else {
-		r.writeString("</strong>")
+		r.writeString("**")
 	}
 	return WalkContinue, nil
 }
@@ -282,11 +270,8 @@ func (r *Renderer) renderStrongMarkdown(node Node, entering bool) (WalkStatus, e
 func (r *Renderer) renderBlockquoteMarkdown(n Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.writeString("<blockquote>")
-		r.newline()
+		r.writeString(">")
 	} else {
-		r.newline()
-		r.writeString("</blockquote>")
 		r.newline()
 	}
 	return WalkContinue, nil
