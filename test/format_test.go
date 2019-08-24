@@ -25,6 +25,9 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
+	{"15", "| abc | def |\n| --- | --- |\n", "| abc | def |\n| --- | --- |\n"},
+	{"14", "~~B3log~~\n", "~~B3log~~\n"},
+	{"13", "![B3log 开源](https://b3log.org \"B3log 开源\")\n", "![B3log 开源](https://b3log.org \"B3log 开源\")\n"},
 	{"12", "[B3log 开源](https://b3log.org \"B3log 开源\")\n", "[B3log 开源](https://b3log.org \"B3log 开源\")\n"},
 	{"11", "硬换行  \n第二行\n", "硬换行\\\n第二行\n"},
 	{"10", "硬换行\\\n第二行\n", "硬换行\\\n第二行\n"},

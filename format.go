@@ -93,40 +93,18 @@ func (r *Renderer) renderTableRowMarkdown(node Node, entering bool) (WalkStatus,
 }
 
 func (r *Renderer) renderTableHeadMarkdown(node Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("thead", nil, false)
-		r.newline()
-		r.tag("tr", nil, false)
-		r.newline()
-	} else {
-		r.tag("/tr", nil, false)
-		r.newline()
-		r.tag("/thead", nil, false)
-		r.newline()
-		if nil != node.Next() {
-			r.tag("tbody", nil, false)
-		}
-		r.newline()
-	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderTableMarkdown(node Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("table", nil, false)
-		r.newline()
-	} else {
-		r.tag("/table", nil, false)
-		r.newline()
-	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderStrikethroughMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("del", nil, false)
+		r.writeString("~~")
 	} else {
-		r.tag("/del", nil, false)
+		r.writeString("~~")
 	}
 	return WalkContinue, nil
 }
@@ -134,24 +112,13 @@ func (r *Renderer) renderStrikethroughMarkdown(node Node, entering bool) (WalkSt
 func (r *Renderer) renderImageMarkdown(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Image)
 	if entering {
-		if 0 == r.disableTags {
-			r.writeString("<img src=\"")
-			r.write(escapeHTML(toItems(n.Destination)))
-			r.writeString("\" alt=\"")
-		}
-		r.disableTags++
-		return WalkContinue, nil
-	}
-
-	r.disableTags--
-	if 0 == r.disableTags {
-		r.writeString("\"")
+		r.writeString("![")
+		r.write(n.firstChild.Tokens())
+		r.writeString("](" + n.Destination + "")
 		if "" != n.Title {
-			r.writeString(" title=\"")
-			r.write(escapeHTML(toItems(n.Title)))
-			r.writeString("\"")
+			r.writeString(" \"" + n.Title + "\"")
 		}
-		r.writeString(" />")
+		r.writeString(")")
 	}
 	return WalkContinue, nil
 }
@@ -166,7 +133,6 @@ func (r *Renderer) renderLinkMarkdown(node Node, entering bool) (WalkStatus, err
 			r.writeString(" \"" + n.Title + "\"")
 		}
 		r.writeString(")")
-		return WalkContinue, nil
 	}
 
 	return WalkContinue, nil
@@ -216,7 +182,7 @@ func (r *Renderer) renderTextMarkdown(node Node, entering bool) (WalkStatus, err
 		return WalkContinue, nil
 	}
 
-	if NodeLink != node.Parent().Type() {
+	if typ := node.Parent().Type(); NodeLink != typ && NodeImage != typ {
 		r.write(escapeHTML(node.Tokens()))
 	}
 	return WalkContinue, nil
