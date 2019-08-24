@@ -29,16 +29,16 @@ type Renderer struct {
 	writer        bytes.Buffer         // 输出缓冲
 	lastOut       byte                 // 最新输出的一个字节
 	rendererFuncs map[int]RendererFunc // 渲染器
-	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况。比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
+	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 	option        options              // 解析渲染选项
 }
 
-// render 渲染指定的节点 n。
-func (r *Renderer) render(n Node) error {
+// render 从指定的根节点 root 开始遍历并渲染。
+func (r *Renderer) render(root Node) error {
 	r.lastOut = itemNewline
 	r.writer.Grow(4096)
 
-	return Walk(n, func(n Node, entering bool) (WalkStatus, error) {
+	return Walk(root, func(n Node, entering bool) (WalkStatus, error) {
 		f := r.rendererFuncs[n.Type()]
 		if nil == f {
 			return WalkStop, errors.New(fmt.Sprintf("not found render function for node [type=%d, text=%s]", n.Type(), n.RawText()))
