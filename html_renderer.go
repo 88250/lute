@@ -50,17 +50,17 @@ func newHTMLRenderer(option options) (ret *Renderer) {
 
 	// 注册 GFM 渲染函数
 
-	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
-	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
-	ret.rendererFuncs[NodeTable] = ret.renderTable
-	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
-	ret.rendererFuncs[NodeTableRow] = ret.renderTableRow
-	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
+	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethroughHTML
+	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarkerHTML
+	ret.rendererFuncs[NodeTable] = ret.renderTableHTML
+	ret.rendererFuncs[NodeTableHead] = ret.renderTableHeadHTML
+	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowHTML
+	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellHTML
 
 	return
 }
 
-func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTableCellHTML(node Node, entering bool) (WalkStatus, error) {
 	tag := "td"
 	if NodeTableHead == node.Parent().Type() {
 		tag = "th"
@@ -84,7 +84,7 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableRow(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTableRowHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("tr", nil, false)
 		r.newline()
@@ -99,7 +99,7 @@ func (r *Renderer) renderTableRow(node Node, entering bool) (WalkStatus, error) 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableHead(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTableHeadHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("thead", nil, false)
 		r.newline()
@@ -118,7 +118,7 @@ func (r *Renderer) renderTableHead(node Node, entering bool) (WalkStatus, error)
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTable(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTableHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("table", nil, false)
 		r.newline()
@@ -129,7 +129,7 @@ func (r *Renderer) renderTable(node Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderStrikethrough(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderStrikethroughHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("del", nil, false)
 	} else {
@@ -400,7 +400,7 @@ func (r *Renderer) renderListItemHTML(node Node, entering bool) (WalkStatus, err
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTaskListItemMarker(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTaskListItemMarkerHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*TaskListItemMarker)
 		var attrs [][]string
