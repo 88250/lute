@@ -91,7 +91,7 @@ markdown-it 是 JavaScript 写的，它同样实现了 CommonMark 规范。循�
 
 ## 💪 健壮性
 
-Lute 承载了 B3log 开源社区所有的 Markdown 处理，每天处理数十万请求，运行表现稳定。
+Lute 承载了[黑客派](https://hacpai.com)上的所有 Markdown 处理，每天处理数十万请求，运行表现稳定。
 
 ## 🔒 安全
 
