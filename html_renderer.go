@@ -82,7 +82,7 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 		r.tag(tag, attrs, false)
 	} else {
 		r.tag("/"+tag, nil, false)
-		r.Newline()
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -90,14 +90,14 @@ func (r *Renderer) renderTableCell(node Node, entering bool) (WalkStatus, error)
 func (r *Renderer) renderTableRow(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("tr", nil, false)
-		r.Newline()
+		r.newline()
 	} else {
 		r.tag("/tr", nil, false)
-		r.Newline()
+		r.newline()
 		if node == node.Parent().LastChild() {
 			r.tag("/tbody", nil, false)
 		}
-		r.Newline()
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -105,18 +105,18 @@ func (r *Renderer) renderTableRow(node Node, entering bool) (WalkStatus, error) 
 func (r *Renderer) renderTableHead(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("thead", nil, false)
-		r.Newline()
+		r.newline()
 		r.tag("tr", nil, false)
-		r.Newline()
+		r.newline()
 	} else {
 		r.tag("/tr", nil, false)
-		r.Newline()
+		r.newline()
 		r.tag("/thead", nil, false)
-		r.Newline()
+		r.newline()
 		if nil != node.Next() {
 			r.tag("tbody", nil, false)
 		}
-		r.Newline()
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -124,10 +124,10 @@ func (r *Renderer) renderTableHead(node Node, entering bool) (WalkStatus, error)
 func (r *Renderer) renderTable(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("table", nil, false)
-		r.Newline()
+		r.newline()
 	} else {
 		r.tag("/table", nil, false)
-		r.Newline()
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -145,9 +145,9 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Image)
 	if entering {
 		if 0 == r.disableTags {
-			r.WriteString("<img src=\"")
-			r.Write(escapeHTML(toItems(n.Destination)))
-			r.WriteString("\" alt=\"")
+			r.writeString("<img src=\"")
+			r.write(escapeHTML(toItems(n.Destination)))
+			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
 		return WalkContinue, nil
@@ -155,13 +155,13 @@ func (r *Renderer) renderImage(node Node, entering bool) (WalkStatus, error) {
 
 	r.disableTags--
 	if 0 == r.disableTags {
-		r.WriteString("\"")
+		r.writeString("\"")
 		if "" != n.Title {
-			r.WriteString(" title=\"")
-			r.Write(escapeHTML(toItems(n.Title)))
-			r.WriteString("\"")
+			r.writeString(" title=\"")
+			r.write(escapeHTML(toItems(n.Title)))
+			r.writeString("\"")
 		}
-		r.WriteString(" />")
+		r.writeString(" />")
 	}
 	return WalkContinue, nil
 }
@@ -188,9 +188,9 @@ func (r *Renderer) renderHTML(node Node, entering bool) (WalkStatus, error) {
 		return WalkContinue, nil
 	}
 
-	r.Newline()
-	r.Write(node.Tokens())
-	r.Newline()
+	r.newline()
+	r.write(node.Tokens())
+	r.newline()
 
 	return WalkContinue, nil
 }
@@ -200,7 +200,7 @@ func (r *Renderer) renderInlineHTML(node Node, entering bool) (WalkStatus, error
 		return WalkContinue, nil
 	}
 
-	r.Write(node.Tokens())
+	r.write(node.Tokens())
 
 	return WalkContinue, nil
 }
@@ -219,11 +219,11 @@ func (r *Renderer) renderParagraph(node Node, entering bool) (WalkStatus, error)
 	}
 
 	if entering {
-		r.Newline()
+		r.newline()
 		r.tag("p", nil, false)
 	} else {
 		r.tag("/p", nil, false)
-		r.Newline()
+		r.newline()
 	}
 
 	return WalkContinue, nil
@@ -234,30 +234,30 @@ func (r *Renderer) renderText(node Node, entering bool) (WalkStatus, error) {
 		return WalkContinue, nil
 	}
 
-	r.Write(escapeHTML(node.Tokens()))
+	r.write(escapeHTML(node.Tokens()))
 
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderCodeSpan(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<code>")
-		r.Write(escapeHTML(node.Tokens()))
+		r.writeString("<code>")
+		r.write(escapeHTML(node.Tokens()))
 		return WalkSkipChildren, nil
 	}
-	r.WriteString("</code>")
+	r.writeString("</code>")
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.Newline()
+		r.newline()
 		n := node.(*CodeBlock)
 		tokens := n.tokens
 		if "" != n.info {
 			infoWords := strings.Fields(n.info)
 			language := infoWords[0]
-			r.WriteString("<pre><code class=\"language-" + language + "\">")
+			r.writeString("<pre><code class=\"language-" + language + "\">")
 			rendered := false
 			if r.option.CodeSyntaxHighlight {
 				codeBlock := fromItems(tokens)
@@ -275,7 +275,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 					formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
 					var b bytes.Buffer
 					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
-						r.Write(b.Bytes())
+						r.write(b.Bytes())
 						rendered = true
 						// 生成 CSS 临时调试用：
 						//formatter.WriteCSS(os.Stdout, styles.GitHub)
@@ -286,7 +286,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 
 			if !rendered {
 				tokens = escapeHTML(tokens)
-				r.Write(tokens)
+				r.write(tokens)
 			}
 		} else {
 			if r.option.CodeSyntaxHighlight {
@@ -296,7 +296,7 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 					lexer = chromalexers.Fallback
 				}
 				language := lexer.Config().Name
-				r.WriteString("<pre><code class=\"language-" + language + "\">")
+				r.writeString("<pre><code class=\"language-" + language + "\">")
 				rendered := false
 
 				iterator, err := lexer.Tokenise(nil, codeBlock)
@@ -304,25 +304,25 @@ func (r *Renderer) renderCodeBlock(node Node, entering bool) (WalkStatus, error)
 					formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
 					var b bytes.Buffer
 					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
-						r.Write(b.Bytes())
+						r.write(b.Bytes())
 						rendered = true
 					}
 				}
 
 				if !rendered {
 					tokens = escapeHTML(tokens)
-					r.Write(tokens)
+					r.write(tokens)
 				}
 			} else {
-				r.WriteString("<pre><code>")
+				r.writeString("<pre><code>")
 				tokens = escapeHTML(tokens)
-				r.Write(tokens)
+				r.write(tokens)
 			}
 		}
 		return WalkSkipChildren, nil
 	}
-	r.WriteString("</code></pre>")
-	r.Newline()
+	r.writeString("</code></pre>")
+	r.newline()
 	return WalkContinue, nil
 }
 
@@ -337,23 +337,23 @@ func (r *Renderer) renderEmphasis(node Node, entering bool) (WalkStatus, error) 
 
 func (r *Renderer) renderStrong(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.WriteString("<strong>")
-		r.Write(node.Tokens())
+		r.writeString("<strong>")
+		r.write(node.Tokens())
 	} else {
-		r.WriteString("</strong>")
+		r.writeString("</strong>")
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.Newline()
-		r.WriteString("<blockquote>")
-		r.Newline()
+		r.newline()
+		r.writeString("<blockquote>")
+		r.newline()
 	} else {
-		r.Newline()
-		r.WriteString("</blockquote>")
-		r.Newline()
+		r.newline()
+		r.writeString("</blockquote>")
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -361,11 +361,11 @@ func (r *Renderer) renderBlockquote(n Node, entering bool) (WalkStatus, error) {
 func (r *Renderer) renderHeading(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Heading)
 	if entering {
-		r.Newline()
-		r.WriteString("<h" + " 123456"[n.Level:n.Level+1] + ">")
+		r.newline()
+		r.writeString("<h" + " 123456"[n.Level:n.Level+1] + ">")
 	} else {
-		r.WriteString("</h" + " 123456"[n.Level:n.Level+1] + ">")
-		r.Newline()
+		r.writeString("</h" + " 123456"[n.Level:n.Level+1] + ">")
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -377,18 +377,18 @@ func (r *Renderer) renderList(node Node, entering bool) (WalkStatus, error) {
 		tag = "ol"
 	}
 	if entering {
-		r.Newline()
+		r.newline()
 		attrs := [][]string{{"start", fmt.Sprintf("%d", n.start)}}
 		if nil == n.bulletChar && 1 != n.start {
 			r.tag(tag, attrs, false)
 		} else {
 			r.tag(tag, nil, false)
 		}
-		r.Newline()
+		r.newline()
 	} else {
-		r.Newline()
+		r.newline()
 		r.tag("/"+tag, nil, false)
-		r.Newline()
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -398,7 +398,7 @@ func (r *Renderer) renderListItem(node Node, entering bool) (WalkStatus, error) 
 		r.tag("li", nil, false)
 	} else {
 		r.tag("/li", nil, false)
-		r.Newline()
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -418,9 +418,9 @@ func (r *Renderer) renderTaskListItemMarker(node Node, entering bool) (WalkStatu
 
 func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.Newline()
+		r.newline()
 		r.tag("hr", nil, true)
-		r.Newline()
+		r.newline()
 	}
 
 	return WalkContinue, nil
@@ -429,7 +429,7 @@ func (r *Renderer) renderThematicBreak(node Node, entering bool) (WalkStatus, er
 func (r *Renderer) renderHardBreak(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("br", nil, true)
-		r.Newline()
+		r.newline()
 	}
 
 	return WalkContinue, nil
@@ -439,9 +439,9 @@ func (r *Renderer) renderSoftBreak(node Node, entering bool) (WalkStatus, error)
 	if entering {
 		if r.option.SoftBreak2HardBreak {
 			r.tag("br", nil, true)
-			r.Newline()
+			r.newline()
 		} else {
-			r.Newline()
+			r.newline()
 		}
 	}
 
@@ -453,15 +453,15 @@ func (r *Renderer) tag(name string, attrs [][]string, selfclosing bool) {
 		return
 	}
 
-	r.WriteString("<")
-	r.Write(toItems(name))
+	r.writeString("<")
+	r.write(toItems(name))
 	if 0 < len(attrs) {
 		for _, attr := range attrs {
-			r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
+			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
 		}
 	}
 	if selfclosing {
-		r.WriteString(" /")
+		r.writeString(" /")
 	}
-	r.WriteString(">")
+	r.writeString(">")
 }

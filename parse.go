@@ -172,13 +172,13 @@ type Tree struct {
 	context *Context // 语法解析上下文
 }
 
-// render 使用 renderer 进行语法树渲染，渲染结果以 output 返回。
-func (t *Tree) render(renderer *Renderer) (html []byte, err error) {
-	err = renderer.Render(t.Root)
+// render 使用 renderer 对语法树 t 进行渲染，渲染结果以 output 返回。
+func (t *Tree) render(renderer *Renderer) (output []byte, err error) {
+	err = renderer.render(t.Root)
 	if nil != err {
 		return
 	}
-	html = renderer.writer.Bytes()
+	output = renderer.writer.Bytes()
 
 	return
 }

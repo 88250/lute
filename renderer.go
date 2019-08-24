@@ -34,7 +34,7 @@ type Renderer struct {
 }
 
 // render 渲染指定的节点 n。
-func (r *Renderer) Render(n Node) error {
+func (r *Renderer) render(n Node) error {
 	r.lastOut = itemNewline
 	r.writer.Grow(4096)
 
@@ -48,24 +48,24 @@ func (r *Renderer) Render(n Node) error {
 	})
 }
 
-// Write 输出指定的 tokens 数组 content。
-func (r *Renderer) Write(content items) {
+// write 输出指定的 tokens 数组 content。
+func (r *Renderer) write(content items) {
 	if length := len(content); 0 < length {
 		r.writer.Write(content)
 		r.lastOut = content[length-1]
 	}
 }
 
-// WriteString 输出指定的字符串 content。
-func (r *Renderer) WriteString(content string) {
+// writeString 输出指定的字符串 content。
+func (r *Renderer) writeString(content string) {
 	if length := len(content); 0 < length {
 		r.writer.WriteString(content)
 		r.lastOut = content[length-1]
 	}
 }
 
-// Newline 会在最新内容不是换行符 \n 时输出一个换行符。
-func (r *Renderer) Newline() {
+// newline 会在最新内容不是换行符 \n 时输出一个换行符。
+func (r *Renderer) newline() {
 	if itemNewline != r.lastOut {
 		r.writer.WriteByte(itemNewline)
 		r.lastOut = itemNewline
