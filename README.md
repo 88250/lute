@@ -114,7 +114,7 @@ Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://git
 
 ## 📄 授权
 
-Lute 使用 [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-2.0) 开源协议。
+Lute 使用 [木兰宽松许可证, 第1版](http://license.coscl.org.cn/MulanPSL) 开源协议。
 
 ## 🙏 鸣谢
 
