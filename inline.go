@@ -63,6 +63,13 @@ func (t *Tree) parseInlines() {
 						next.Unlink()
 						next = child.Next()
 					}
+
+					if t.context.option.AutoSpace {
+						// 中文排版优化：中西文间插入一个空格
+						text := fromItems(child.Tokens())
+						text = space(text)
+						child.SetTokens(toItems(text))
+					}
 				}
 				child = next
 			}
