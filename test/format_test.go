@@ -25,7 +25,7 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
-	{"0", "# 标题\n\n一个空行就够了。", "# 标题\n一个空行就够了。"},
+	{"0", "# 标题\n\n段落用一个空行分隔就够了。\n\n\n这是第二段。", "# 标题\n段落用一个空行分隔就够了。\n这是第二段。\n"},
 }
 
 func TestFormat(t *testing.T) {

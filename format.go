@@ -211,9 +211,7 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 
 	if entering {
 		r.newline()
-		r.tag("p", nil, false)
 	} else {
-		r.tag("/p", nil, false)
 		r.newline()
 	}
 
@@ -299,9 +297,8 @@ func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, 
 	n := node.(*Heading)
 	if entering {
 		r.newline()
-		r.writeString("<h" + " 123456"[n.Level:n.Level+1] + ">")
+		r.writeString(strings.Repeat("#", n.Level) + " ") // 统一使用 ATX 标题，不使用 Setext 标题
 	} else {
-		r.writeString("</h" + " 123456"[n.Level:n.Level+1] + ">")
 		r.newline()
 	}
 	return WalkContinue, nil
