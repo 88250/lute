@@ -33,7 +33,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 * 完整实现最新版 GFM/CM 规范
 * 非常快
 * 代码块语法高亮
-* 更好地支持中文语境（比如链接识别）
+* 更好地支持中文语境
 * 支持 Markdown 格式化（待实现）
 * 可扩展语法树节点（待实现）
 
@@ -42,6 +42,11 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CommonMar
 * [黑客派](https://hacpai.com)
 * [Solo](https://solo.b3log.org)
 * [Pipe](https://github.com/b3log/pipe)
+
+## 🇨🇳 中文语境优化
+
+* 自动链接识别加强
+* 在中西文间自动插入空格
 
 ## ⚡ 性能
 

@@ -102,6 +102,13 @@ func GFMAutoLink(b bool) option {
 	}
 }
 
+// SoftBreak2HardBreak 设置是否将软换行（\n）渲染为硬换行（<br />）。
+func SoftBreak2HardBreak(b bool) option {
+	return func(lute *Lute) {
+		lute.SoftBreak2HardBreak = b
+	}
+}
+
 // CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
 func CodeSyntaxHighlight(b bool) option {
 	return func(lute *Lute) {
@@ -109,20 +116,23 @@ func CodeSyntaxHighlight(b bool) option {
 	}
 }
 
-func SoftBreak2HardBreak(b bool) option {
+// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
+// https://github.com/sparanoid/chinese-copywriting-guidelines
+func AutoSpace(b bool) option {
 	return func(lute *Lute) {
-		lute.SoftBreak2HardBreak = b
+		lute.AutoSpace = b
 	}
 }
 
 // options 描述了一些列解析和渲染选项。
 type options struct {
-	GFMTable            bool // 是否处理 GFM 表
-	GFMTaskListItem     bool // 是否处理 GFM 任务列表项
-	GFMStrikethrough    bool // 是否处理 GFM 删除线
-	GFMAutoLink         bool // 是否处理 GFM 自动链接
-	SoftBreak2HardBreak bool // 是否将软换行（\n）渲染为硬换行（<br />）
-	CodeSyntaxHighlight bool // 是否对代码块进行语法高亮
+	GFMTable            bool
+	GFMTaskListItem     bool
+	GFMStrikethrough    bool
+	GFMAutoLink         bool
+	SoftBreak2HardBreak bool
+	CodeSyntaxHighlight bool
+	AutoSpace           bool
 }
 
 // option 描述了解析渲染选项设置函数签名。
