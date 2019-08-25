@@ -20,6 +20,8 @@ import (
 
 var spaceTests = []parseTest{
 
+	{"space2", "是符号但不是$标^点|符号的要自动插入空格\n", "<p>是符号但不是 $ 标 ^ 点 | 符号的要自动插入空格</p>\n"},
+	{"space2", "(括[号{问号?等!标.点,符-号*要_排%%除掉\n", "<p>(括[号{问号?等!标.点,符-号*要_排%%除掉</p>\n"},
 	{"space1", "Lute解析200K的Markdown文本在我的电脑上只需要5ms。\n", "<p>Lute 解析 200K 的 Markdown 文本在我的电脑上只需要 5ms。</p>\n"},
 	{"space0", "Lute是一款结构化的Markdown引擎，完整实现了最新的GFM / CommonMark规范，对中文语境支持更好。\n", "<p>Lute 是一款结构化的 Markdown 引擎，完整实现了最新的 GFM / CommonMark 规范，对中文语境支持更好。</p>\n"},
 }
