@@ -29,8 +29,8 @@ type formatTest struct {
 var formatTests = []formatTest{
 	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 lute 空格\n\n"},
 	{"17", "* [ ] 项一\n* [X] 项二\n", "* [ ] 项一\n* [X] 项二\n\n"},
-	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "|abc|defghi|\n|:---:|---:|\n|bar|baz|\n"},
-	{"15", "| abc | def |\n| --- | --- |\n", "|abc|def|\n|---|---|\n"},
+	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "|abc|defghi|\n|:---:|---:|\n|bar|baz|\n\n"},
+	{"15", "| abc | def |\n| --- | --- |\n", "|abc|def|\n|---|---|\n\n"},
 	{"14", "~~B3log~~\n", "~~B3log~~\n\n"},
 	{"13", "![B3log 开源](https://b3log.org \"B3log 开源\")\n", "![B3log 开源](https://b3log.org \"B3log 开源\")\n\n"},
 	{"12", "[B3log 开源](https://b3log.org \"B3log 开源\")\n", "[B3log 开源](https://b3log.org \"B3log 开源\")\n\n"},
@@ -43,8 +43,8 @@ var formatTests = []formatTest{
 	{"5", "**加粗**格式化\n", "**加粗**格式化\n\n"},
 	{"4", "_强调_ 格式化\n", "*强调* 格式化\n\n"},
 	{"3", "*强调*格式化\n", "*强调*格式化\n\n"},
-	{"2", "1.  列表项\n   * 子列表项\n", "1. 列表项\n   * 子列表项\n\n"},
-	{"1", "*  列表项\n   * 子列表项\n", "* 列表项\n  * 子列表项\n\n"},
+	{"2", "1.  列表项\n    * 子列表项\n", "1. 列表项\n   * 子列表项\n\n"},
+	{"1", "*  列表项\n", "* 列表项\n\n"},
 	{"0", "# 标题\n\n段落用一个空行分隔就够了。\n\n\n这是第二段。", "# 标题\n\n段落用一个空行分隔就够了。\n\n这是第二段。\n\n"},
 }
 

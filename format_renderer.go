@@ -94,6 +94,9 @@ func (r *Renderer) renderTableHeadMarkdown(node Node, entering bool) (WalkStatus
 }
 
 func (r *Renderer) renderTableMarkdown(node Node, entering bool) (WalkStatus, error) {
+	if !entering {
+		r.writeByte('\n')
+	}
 	return WalkContinue, nil
 }
 
@@ -163,6 +166,7 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 	listPadding := 0
 	inList := false
 	inTightList := false
+	lastListItemLastPara := false
 	if parent := node.Parent(); nil != parent {
 		if listItem, ok := parent.(*ListItem); ok { // ListItem.Paragraph
 			inList = true
@@ -171,15 +175,21 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 			// 设置紧凑标识的具体实现可参考函数 List#Finalize
 			inTightList = listItem.Parent().(*List).tight
 
-			firstItem := parent.FirstChild()
+			firstPara := listItem.firstChild
 			if 3 != listItem.listData.typ { // 普通列表
-				if firstItem != node {
+				if firstPara != node {
 					listPadding = listItem.padding
 				}
 			} else { // 任务列表
-				if firstItem.Next() != node { // 任务列表要跳过 TaskListItemMarker 即 [X]
+				if firstPara.Next() != node { // 任务列表要跳过 TaskListItemMarker 即 [X]
 					listPadding = listItem.padding
 				}
+			}
+
+			nextItem := listItem.next
+			if nil == nextItem {
+				nextPara := node.Next()
+				lastListItemLastPara = nil == nextPara
 			}
 		}
 	}
@@ -191,7 +201,7 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 		if !inList {
 			r.writeByte('\n')
 		} else {
-			if !inTightList {
+			if !inTightList || lastListItemLastPara {
 				r.writeByte('\n')
 			}
 		}
@@ -313,7 +323,7 @@ func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, err
 	} else {
 		n := node.(*List)
 		if n.tight {
-			r.writeByte('\n')
+			r.newline()
 		}
 		r.listLevel--
 	}
