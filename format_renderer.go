@@ -165,7 +165,8 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 	if grandparent := node.Parent().Parent(); nil != grandparent {
 		if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
 			inTightList = list.tight
-			if node.Parent().FirstChild() != node {
+			first := node.Parent().FirstChild()
+			if first != node /* 普通列表 */ && first.Next() != node /* 任务列表 */ {
 				listPadding = list.padding
 			}
 		}
