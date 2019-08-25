@@ -15,6 +15,16 @@ Setext 说实话我不喜欢 Setext 标题
 以上块级内容都挤在一坨了，插入合理的空行也很有必要。
 这就是为什么我们需要Markdown Format功能（注意此处中西文间插入了空格）。
 
+试下贴段代码：
+```go
+package main
+
+import "fmt"
+
+func main() {
+  fmt.Println("Hello, 世界")
+}
+```
 接下来让我们试试稍微复杂点的场景，比如列表项包含多个段落的情况：
 1. 列表项中的第一段
 
