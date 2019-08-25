@@ -215,6 +215,9 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 	}
 
 	n := node.(*CodeBlock)
+	if !n.isFenced {
+		n.fenceLength = 3
+	}
 	if entering {
 		r.newline()
 		if 0 < listPadding {
@@ -243,7 +246,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 	if 0 < listPadding {
 		r.writeString(strings.Repeat(" ", listPadding))
 	}
-	strings.Repeat("`", n.fenceLength)
+	r.writeString(strings.Repeat("`", n.fenceLength))
 	r.writeString("\n\n")
 	return WalkContinue, nil
 }
