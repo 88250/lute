@@ -348,14 +348,19 @@ func (r *Renderer) renderTaskListItemMarkerMarkdown(node Node, entering bool) (W
 
 func (r *Renderer) renderThematicBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("\n---\n")
+		r.newline()
+		r.writeString("---\n\n")
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderHardBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("\n\n")
+		if !r.option.SoftBreak2HardBreak {
+			r.writeString("\\\n")
+		} else {
+			r.writeString("\n")
+		}
 	}
 	return WalkContinue, nil
 }
