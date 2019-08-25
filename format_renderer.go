@@ -169,7 +169,8 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 	}
 
 	if !entering {
-		r.writeString("\n\n")
+		r.newline()
+		r.writeString("\n")
 	}
 	return WalkContinue, nil
 }
@@ -242,18 +243,17 @@ func (r *Renderer) renderBlockquoteMarkdown(n Node, entering bool) (WalkStatus, 
 func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Heading)
 	if entering {
-		r.newline()
 		r.writeString(strings.Repeat("#", n.Level) + " ") // 统一使用 ATX 标题，不使用 Setext 标题
 	} else {
-		r.writeString("\n\n")
+		r.newline()
+		r.writeString("\n")
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, error) {
-	if entering {
+	if !entering {
 		r.newline()
-	} else {
 		r.writeString("\n")
 	}
 	return WalkContinue, nil
