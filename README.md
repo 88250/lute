@@ -55,6 +55,8 @@ Markdown 原文：
 
 ```markdown
 # ATX 标题也有可能需要格式化的 ##
+一个简短的段落。
+
 Setext 说实话我不喜欢 Setext 标题
 ----
 0. 有序列表可以从 0 开始
@@ -74,7 +76,9 @@ Setext 说实话我不喜欢 Setext 标题
 
 ```markdown
 # ATX 标题也有可能需要格式化的
-        
+
+一个简短的段落。
+
 ## Setext 说实话我不喜欢 Setext 标题
 
 0. 有序列表可以从 0 开始

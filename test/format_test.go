@@ -13,6 +13,7 @@
 package test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -74,5 +75,5 @@ func TestFormatCase1(t *testing.T) {
 	if nil != err {
 		t.Fatalf("markdown format failed: %s", err)
 	}
-	t.Log(string(html))
+	fmt.Print(string(html))
 }
