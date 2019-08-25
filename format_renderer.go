@@ -162,6 +162,7 @@ func (r *Renderer) renderDocumentMarkdown(node Node, entering bool) (WalkStatus,
 func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if grandparent := node.Parent().Parent(); nil != grandparent {
 		if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
+			r.writeString(strings.Repeat(" ", list.padding))
 			if list.tight {
 				return WalkContinue, nil
 			}
