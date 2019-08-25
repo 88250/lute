@@ -232,7 +232,7 @@ func (r *Renderer) renderStrongMarkdown(node Node, entering bool) (WalkStatus, e
 func (r *Renderer) renderBlockquoteMarkdown(n Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.writeString(">")
+		r.writeString("> ") // 带个空格更好一些
 	} else {
 		r.newline()
 	}
