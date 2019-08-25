@@ -292,8 +292,10 @@ func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, 
 
 func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if !entering {
-		r.newline()
-		r.writeString("\n")
+		n := node.(*List)
+		if n.tight {
+			r.writeByte('\n')
+		}
 	}
 	return WalkContinue, nil
 }
@@ -301,6 +303,7 @@ func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, err
 func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*ListItem)
 	if entering {
+		r.newline()
 		r.writeString(strings.Repeat(" ", n.margin))
 		if 1 == n.listData.typ {
 			r.writeString(strconv.Itoa(n.num) + ".")
@@ -308,8 +311,6 @@ func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus,
 			r.write(n.marker)
 		}
 		r.writeByte(' ')
-	} else {
-		r.newline()
 	}
 	return WalkContinue, nil
 }
