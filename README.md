@@ -174,6 +174,9 @@ func main() {
 2. 整个有序列表是“松散”的：列表项内容要用 `<p>` 标签
 ````````
 
+这两段 Markdown 文本在语义上完全一致，格式化后的文本更清晰易读。在需要公共编辑的场景下，统一的排版风格能让大家更容易协作。
+（感谢并致敬 gofmt）
+
 ## ⚡ 性能
 
 在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试结果如下。  
