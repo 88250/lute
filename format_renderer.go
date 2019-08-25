@@ -214,13 +214,14 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 		}
 	}
 
+	n := node.(*CodeBlock)
 	if entering {
 		r.newline()
-		n := node.(*CodeBlock)
 		if 0 < listPadding {
 			r.writeString(strings.Repeat(" ", listPadding))
 		}
-		r.writeString("```" + n.info + "\n")
+		r.writeString(strings.Repeat("`", n.fenceLength))
+		r.writeString(n.info + "\n")
 		if 0 < listPadding {
 			lines := n.tokens.split(itemNewline)
 			length := len(lines)
@@ -242,7 +243,8 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 	if 0 < listPadding {
 		r.writeString(strings.Repeat(" ", listPadding))
 	}
-	r.writeString("```\n\n")
+	strings.Repeat("`", n.fenceLength)
+	r.writeString("\n\n")
 	return WalkContinue, nil
 }
 
