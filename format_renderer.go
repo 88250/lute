@@ -223,10 +223,13 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 		r.writeString("```" + n.info + "\n")
 		if 0 < listPadding {
 			lines := n.tokens.split(itemNewline)
-			for _, line := range lines {
+			length := len(lines)
+			for i, line := range lines {
 				r.writeString(strings.Repeat(" ", listPadding))
 				r.write(line)
-				r.writeByte('\n')
+				if i < length-1 {
+					r.writeByte('\n')
+				}
 			}
 		} else {
 			r.write(n.tokens)
