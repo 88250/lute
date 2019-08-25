@@ -160,16 +160,16 @@ func (r *Renderer) renderDocumentMarkdown(node Node, entering bool) (WalkStatus,
 }
 
 func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.Parent().Parent(); nil != grandparent {
-		if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
-			r.writeString(strings.Repeat(" ", list.padding))
-			if list.tight {
-				return WalkContinue, nil
+	if entering {
+		if grandparent := node.Parent().Parent(); nil != grandparent {
+			if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
+				if node.Parent().FirstChild() != node {
+					// 第一个列表项文本不用考虑缩进，后续段落就需要考虑缩进了
+					r.writeString(strings.Repeat(" ", list.padding))
+				}
 			}
 		}
-	}
-
-	if !entering {
+	} else {
 		r.newline()
 		r.writeString("\n")
 	}
@@ -182,7 +182,7 @@ func (r *Renderer) renderTextMarkdown(node Node, entering bool) (WalkStatus, err
 	}
 
 	if typ := node.Parent().Type(); NodeLink != typ && NodeImage != typ {
-		r.write(escapeHTML(node.Tokens()))
+		r.write(node.Tokens())
 	}
 	return WalkContinue, nil
 }
