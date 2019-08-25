@@ -100,7 +100,6 @@ func (t *Tree) incorporateLine(line items) {
 
 			if typ := container.Type(); NodeList != typ && NodeListItem != typ {
 				t.context.listMargin = 0
-				t.context.orderedListNum = -1
 			}
 		}
 
@@ -283,18 +282,23 @@ var blockStarts = []blockStartFunc{
 				if 1 == data.typ {
 					// 有序列表需要再加一个分隔符字符长度
 					t.context.listMargin++
-					t.context.orderedListNum = data.start
 				}
 				t.context.addChild(&List{&BaseNode{typ: NodeList}, data})
 			}
 
 			listItem := &ListItem{&BaseNode{typ: NodeListItem}, data}
-			if 1 == data.typ {
-				data.num = t.context.orderedListNum
-				t.context.orderedListNum++
-			}
 
 			t.context.addChild(listItem)
+
+			if 1 == listItem.listData.typ {
+				// 修正有序列表项序号
+				if prev, ok := listItem.previous.(*ListItem); ok {
+					listItem.num = prev.num + 1
+				} else {
+					listItem.num = data.start
+				}
+			}
+
 			return 1
 		}
 		return 0
