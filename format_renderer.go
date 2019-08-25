@@ -169,7 +169,7 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 	}
 
 	if !entering {
-		r.newline()
+		r.writeString("\n\n")
 	}
 	return WalkContinue, nil
 }
@@ -252,7 +252,7 @@ func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, 
 
 func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("\n")
+		r.newline()
 	} else {
 		r.writeString("\n")
 	}
