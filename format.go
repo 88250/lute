@@ -53,6 +53,8 @@ func newFormatRenderer(option options) (ret *Renderer) {
 	return
 }
 
+// TODO: 表的格式化应该按最宽的单元格对齐内容
+
 func (r *Renderer) renderTableCellMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte('|')
@@ -121,7 +123,7 @@ func (r *Renderer) renderLinkMarkdown(node Node, entering bool) (WalkStatus, err
 	if entering {
 		n := node.(*Link)
 		r.writeString("[")
-		r.write(n.firstChild.Tokens()) // FIXME 未解决链接嵌套，另外还需要考虑链接引用定义
+		r.write(n.firstChild.Tokens()) // FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
 		r.writeString("](" + n.Destination + "")
 		if "" != n.Title {
 			r.writeString(" \"" + n.Title + "\"")
