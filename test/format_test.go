@@ -13,6 +13,7 @@
 package test
 
 import (
+	"io/ioutil"
 	"testing"
 
 	"github.com/b3log/lute"
@@ -43,7 +44,7 @@ var formatTests = []formatTest{
 	{"3", "*强调*格式化\n", "*强调*格式化\n"},
 	{"2", "1.  列表项\n   * 子列表项\n", "1. 列表项\n   * 子列表项\n"},
 	{"1", "*  列表项\n   * 子列表项\n", "* 列表项\n  * 子列表项\n"},
-	{"0", "# 标题\n\n段落用一个空行分隔就够了。\n\n\n这是第二段。", "# 标题\n段落用一个空行分隔就够了。\n这是第二段。\n"},
+	{"0", "# 标题\n\n段落用一个空行分隔就够了。\n\n\n这是第二段。", "# 标题\n\n段落用一个空行分隔就够了。\n这是第二段。\n"},
 }
 
 func TestFormat(t *testing.T) {
@@ -60,4 +61,18 @@ func TestFormat(t *testing.T) {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.formatted, formatted, test.original)
 		}
 	}
+}
+
+func TestFormatCase1(t *testing.T) {
+	bytes, err := ioutil.ReadFile("fmt-case1.md")
+	if nil != err {
+		t.Fatalf("read case failed: %s", err)
+	}
+
+	luteEngine := lute.New()
+	html, err := luteEngine.Format("fmt-case1.md", bytes)
+	if nil != err {
+		t.Fatalf("markdown format failed: %s", err)
+	}
+	t.Log(string(html))
 }

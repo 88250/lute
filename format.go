@@ -244,7 +244,7 @@ func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, 
 		r.newline()
 		r.writeString(strings.Repeat("#", n.Level) + " ") // 统一使用 ATX 标题，不使用 Setext 标题
 	} else {
-		r.newline()
+		r.writeString("\n\n")
 	}
 	return WalkContinue, nil
 }
@@ -253,7 +253,7 @@ func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, err
 	if entering {
 		r.newline()
 	} else {
-		r.newline()
+		r.writeString("\n")
 	}
 	return WalkContinue, nil
 }
@@ -297,20 +297,14 @@ func (r *Renderer) renderThematicBreakMarkdown(node Node, entering bool) (WalkSt
 
 func (r *Renderer) renderHardBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("\\")
-		r.newline()
+		r.writeString("\n\n")
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderSoftBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if r.option.SoftBreak2HardBreak {
-			r.tag("br", nil, true)
-			r.newline()
-		} else {
-			r.newline()
-		}
+		r.newline()
 	}
 	return WalkContinue, nil
 }
