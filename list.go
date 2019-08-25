@@ -32,7 +32,6 @@ type listData struct {
 	padding      int   // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
 	markerOffset int   // 标识符（* - + 或者 1 2 3）相对缩进空格数
 	checked      bool  // 任务列表项是否勾选
-	margin       int   // 列表绝对缩进空格数
 	marker       items // 列表标识符
 	num          int   // 有序列表项修正过的序号
 }

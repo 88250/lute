@@ -97,10 +97,6 @@ func (t *Tree) incorporateLine(line items) {
 			} else { // 没有匹配到，继续用下一个起始块模式进行匹配
 				i++
 			}
-
-			if typ := container.Type(); NodeList != typ && NodeListItem != typ {
-				t.context.listMargin = 0
-			}
 		}
 
 		if i == startsLen { // nothing matched
@@ -277,17 +273,9 @@ var blockStarts = []blockStartFunc{
 
 			listsMatch := container.Type() == NodeList && t.context.listsMatch(container.(*List).listData, data)
 			if t.context.tip.Type() != NodeList || !listsMatch {
-				data.margin = t.context.listMargin
-				t.context.listMargin += len(data.marker) + 1
-				if 1 == data.typ {
-					// 有序列表需要再加一个分隔符字符长度
-					t.context.listMargin++
-				}
 				t.context.addChild(&List{&BaseNode{typ: NodeList}, data})
 			}
-
 			listItem := &ListItem{&BaseNode{typ: NodeListItem}, data}
-
 			t.context.addChild(listItem)
 
 			if 1 == listItem.listData.typ {

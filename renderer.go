@@ -28,6 +28,8 @@ type Renderer struct {
 	rendererFuncs map[int]RendererFunc // 渲染器
 	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 	option        options              // 解析渲染选项
+
+	listLevel int // 列表级别，用于记录嵌套列表深度
 }
 
 // render 从指定的根节点 root 开始遍历并渲染。

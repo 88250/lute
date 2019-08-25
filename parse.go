@@ -45,7 +45,6 @@ type Context struct {
 	offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的下标、缩进空格数
 	indented, blank, partiallyConsumedTab, allClosed         bool  // 是否是缩进行、空行等标识
 	lastMatchedContainer                                     Node  // 最后一个匹配的块节点
-	listMargin                                               int   // 列表缩进空格数
 
 	// 以下变量用于行级解析阶段
 

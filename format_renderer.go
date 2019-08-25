@@ -308,11 +308,14 @@ func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, 
 }
 
 func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, error) {
-	if !entering {
+	if entering {
+		r.listLevel++
+	} else {
 		n := node.(*List)
 		if n.tight {
 			r.writeByte('\n')
 		}
+		r.listLevel--
 	}
 	return WalkContinue, nil
 }
@@ -321,7 +324,13 @@ func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus,
 	n := node.(*ListItem)
 	if entering {
 		r.newline()
-		r.writeString(strings.Repeat(" ", n.margin))
+		if 1 < r.listLevel {
+			parent := n.Parent().Parent().(*ListItem)
+			r.writeString(strings.Repeat(" ", len(parent.marker)+1))
+			if 1 == parent.listData.typ {
+				r.writeByte(' ') // 有序列表需要加上分隔符 . 或者 ) 的一个字符长度
+			}
+		}
 		if 1 == n.listData.typ {
 			r.writeString(strconv.Itoa(n.num) + ".")
 		} else {
