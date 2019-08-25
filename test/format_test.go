@@ -25,6 +25,8 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
+	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 lute 空格\n"},
+	{"17", "* [ ] 项一\n* [X] 项二\n", "* [ ] 项一\n* [X] 项二\n"},
 	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "|abc|defghi|\n|:---:|---:|\n|bar|baz|\n"},
 	{"15", "| abc | def |\n| --- | --- |\n", "|abc|def|\n|---|---|\n"},
 	{"14", "~~B3log~~\n", "~~B3log~~\n"},

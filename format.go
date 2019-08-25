@@ -277,12 +277,13 @@ func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus,
 func (r *Renderer) renderTaskListItemMarkerMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*TaskListItemMarker)
-		var attrs [][]string
+		r.writeString("[")
 		if n.checked {
-			attrs = append(attrs, []string{"checked", ""})
+			r.writeByte('X')
+		} else {
+			r.writeByte(' ')
 		}
-		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
-		r.tag("input", attrs, true)
+		r.writeString("]")
 	}
 	return WalkContinue, nil
 }
