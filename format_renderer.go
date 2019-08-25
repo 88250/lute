@@ -161,13 +161,25 @@ func (r *Renderer) renderDocumentMarkdown(node Node, entering bool) (WalkStatus,
 
 func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus, error) {
 	listPadding := 0
+	inList := false
 	inTightList := false
-	if grandparent := node.Parent().Parent(); nil != grandparent {
-		if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
-			inTightList = list.tight
-			first := node.Parent().FirstChild()
-			if first != node /* 普通列表 */ && first.Next() != node /* 任务列表 */ {
-				listPadding = list.padding
+	if parent := node.Parent(); nil != parent {
+		if listItem, ok := parent.(*ListItem); ok { // ListItem.Paragraph
+			inList = true
+
+			// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
+			// 设置紧凑标识的具体实现可参考函数 List#Finalize
+			inTightList = listItem.Parent().(*List).tight
+
+			firstItem := parent.FirstChild()
+			if 3 != listItem.listData.typ { // 普通列表
+				if firstItem != node {
+					listPadding = listItem.padding
+				}
+			} else { // 任务列表
+				if firstItem.Next() != node { // 任务列表要跳过 TaskListItemMarker 即 [X]
+					listPadding = listItem.padding
+				}
 			}
 		}
 	}
@@ -176,8 +188,12 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 		r.writeString(strings.Repeat(" ", listPadding))
 	} else {
 		r.newline()
-		if !inTightList {
-			r.writeString("\n")
+		if !inList {
+			r.writeByte('\n')
+		} else {
+			if !inTightList {
+				r.writeByte('\n')
+			}
 		}
 	}
 	return WalkContinue, nil

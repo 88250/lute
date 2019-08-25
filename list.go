@@ -43,14 +43,14 @@ func (list *List) CanContain(nodeType int) bool {
 
 func (list *List) Finalize(context *Context) {
 	item := list.firstChild
+
+	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
 	for nil != item {
 		if list.endsWithBlankLine(item) && nil != item.Next() {
 			list.tight = false
 			break
 		}
 
-		// recurse into children of list item, to see if there are
-		// spaces between any of them:
 		var subitem = item.FirstChild()
 		for nil != subitem {
 			if list.endsWithBlankLine(subitem) &&
