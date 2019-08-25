@@ -160,18 +160,24 @@ func (r *Renderer) renderDocumentMarkdown(node Node, entering bool) (WalkStatus,
 }
 
 func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus, error) {
-	if entering {
-		if grandparent := node.Parent().Parent(); nil != grandparent {
-			if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
-				if node.Parent().FirstChild() != node {
-					// 第一个列表项文本不用考虑缩进，后续段落就需要考虑缩进了
-					r.writeString(strings.Repeat(" ", list.padding))
-				}
+	listPadding := 0
+	inTightList := false
+	if grandparent := node.Parent().Parent(); nil != grandparent {
+		if list, ok := grandparent.(*List); ok { // List.ListItem.Paragraph
+			inTightList = list.tight
+			if node.Parent().FirstChild() != node {
+				listPadding = list.padding
 			}
 		}
+	}
+
+	if entering {
+		r.writeString(strings.Repeat(" ", listPadding))
 	} else {
 		r.newline()
-		r.writeString("\n")
+		if !inTightList {
+			r.writeString("\n")
+		}
 	}
 	return WalkContinue, nil
 }
