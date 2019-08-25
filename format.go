@@ -54,45 +54,39 @@ func newFormatRenderer(option options) (ret *Renderer) {
 }
 
 func (r *Renderer) renderTableCellMarkdown(node Node, entering bool) (WalkStatus, error) {
-	tag := "td"
-	if NodeTableHead == node.Parent().Type() {
-		tag = "th"
-	}
 	if entering {
-		cell := node.(*TableCell)
-		var attrs [][]string
-		switch cell.Aligns {
-		case 1:
-			attrs = append(attrs, []string{"align", "left"})
-		case 2:
-			attrs = append(attrs, []string{"align", "center"})
-		case 3:
-			attrs = append(attrs, []string{"align", "right"})
-		}
-		r.tag(tag, attrs, false)
-	} else {
-		r.tag("/"+tag, nil, false)
-		r.newline()
+		r.writeByte('|')
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderTableRowMarkdown(node Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("tr", nil, false)
-		r.newline()
-	} else {
-		r.tag("/tr", nil, false)
-		r.newline()
-		if node == node.Parent().LastChild() {
-			r.tag("/tbody", nil, false)
-		}
-		r.newline()
+	if !entering {
+		r.writeString("|\n")
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderTableHeadMarkdown(node Node, entering bool) (WalkStatus, error) {
+	if !entering {
+		r.writeString("|\n")
+		n := node.(*TableHead)
+		table := n.Parent().(*Table)
+		for i := 0; i < len(table.Aligns); i++ {
+			align := table.Aligns[i]
+			switch align {
+			case 0:
+				r.writeString("|---")
+			case 1:
+				r.writeString("|:---")
+			case 2:
+				r.writeString("|:---:")
+			case 3:
+				r.writeString("|---:")
+			}
+		}
+		r.writeString("|\n")
+	}
 	return WalkContinue, nil
 }
 
