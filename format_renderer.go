@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -251,7 +252,7 @@ func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, 
 
 func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.newline()
+		r.writeString("\n")
 	} else {
 		r.writeString("\n")
 	}
@@ -262,10 +263,10 @@ func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus,
 	n := node.(*ListItem)
 	if entering {
 		r.writeString(strings.Repeat(" ", n.margin))
-		r.write(n.marker)
 		if 1 == n.listData.typ {
-			r.write(n.bulletChar)
-			r.writeByte(n.delimiter)
+			r.writeString(strconv.Itoa(n.num) + ".")
+		} else {
+			r.write(n.marker)
 		}
 		r.writeByte(' ')
 	} else {

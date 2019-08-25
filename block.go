@@ -89,12 +89,6 @@ func (t *Tree) incorporateLine(line items) {
 			var res = blockStarts[i](t, container)
 			if res == 1 { // 匹配到容器块，继续迭代下降过程
 				container = t.context.tip
-
-				if typ := container.Type(); NodeList != typ && NodeListItem != typ {
-					// 重置列表缩空格计数
-					t.context.listMargin = 0
-				}
-
 				break
 			} else if res == 2 { // 匹配到叶子块，跳出迭代下降过程
 				container = t.context.tip
@@ -102,6 +96,11 @@ func (t *Tree) incorporateLine(line items) {
 				break
 			} else { // 没有匹配到，继续用下一个起始块模式进行匹配
 				i++
+			}
+
+			if typ := container.Type(); NodeList != typ && NodeListItem != typ {
+				t.context.listMargin = 0
+				t.context.orderedListNum = -1
 			}
 		}
 
@@ -284,11 +283,17 @@ var blockStarts = []blockStartFunc{
 				if 1 == data.typ {
 					// 有序列表需要再加一个分隔符字符长度
 					t.context.listMargin++
+					t.context.orderedListNum = data.start
 				}
 				t.context.addChild(&List{&BaseNode{typ: NodeList}, data})
 			}
 
 			listItem := &ListItem{&BaseNode{typ: NodeListItem}, data}
+			if 1 == data.typ {
+				data.num = t.context.orderedListNum
+				t.context.orderedListNum++
+			}
+
 			t.context.addChild(listItem)
 			return 1
 		}

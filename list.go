@@ -34,6 +34,7 @@ type listData struct {
 	checked      bool  // 任务列表项是否勾选
 	margin       int   // 列表绝对缩进空格数
 	marker       items // 列表标识符
+	num          int   // 有序列表项修正过的序号
 }
 
 func (list *List) CanContain(nodeType int) bool {
@@ -75,6 +76,7 @@ func (t *Tree) parseListMarker(container Node) *listData {
 		typ:          0,                // 默认无序列表
 		tight:        true,             // 默认紧凑模式
 		markerOffset: t.context.indent, // 设置前置相对缩进
+		num:          -1,               // 假设有序列表起始为 -1，后面会进行计算赋值
 	}
 
 	markerLength := 1
