@@ -80,7 +80,7 @@ func TestFormatCase1(t *testing.T) {
 	html := string(htmlBytes)
 	fmt.Print(html)
 
-	bytes, err = ioutil.ReadFile("fmt-case1-formatted.md")
+	bytes, err = ioutil.ReadFile("format-case1-formatted.md")
 	if nil != err {
 		t.Fatalf("read case cailed: %s", err)
 	}
