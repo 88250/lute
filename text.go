@@ -57,6 +57,13 @@ func (t *Tree) mergeText(node Node) {
 				child.SetTokens(toItems(text))
 			}
 
+			if t.context.option.FixTermTypo {
+				// 术语修正
+				text := fromItems(child.Tokens())
+				text = fixTermTypo(text)
+				child.SetTokens(toItems(text))
+			}
+
 			if t.context.option.GFMAutoLink {
 				// 处理 GFM 自动邮件链接
 				t.parseGfmAutoEmailLink(child)

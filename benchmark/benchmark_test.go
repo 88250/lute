@@ -29,6 +29,7 @@ func BenchmarkLute(b *testing.B) {
 		lute.CodeSyntaxHighlight(false),
 		lute.SoftBreak2HardBreak(false),
 		lute.AutoSpace(false),
+		lute.FixTermTypo(false),
 	)
 	html, err := luteEngine.Markdown("spec text", bytes)
 	if nil != err {

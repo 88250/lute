@@ -28,6 +28,7 @@ func New(opts ...option) (ret *Lute) {
 	SoftBreak2HardBreak(true)(ret)
 	CodeSyntaxHighlight(true)(ret)
 	AutoSpace(true)(ret)
+	FixTermTypo(true)(ret)
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -92,6 +93,11 @@ func (lute *Lute) Space(text string) (ret string) {
 	return space(text)
 }
 
+// TermTypo 会把 text 中不正确的术语进行修正。
+func (lute *Lute) TermTypo(text string) (ret string) {
+	return fixTermTypo(text)
+}
+
 // GFM 设置是否打开所有 GFM 支持。
 func GFM(b bool) option {
 	return func(lute *Lute) {
@@ -152,6 +158,14 @@ func AutoSpace(b bool) option {
 	}
 }
 
+// FixTermTypo 设置是否对普通文本中出现的术语进行修正。
+// https://github.com/sparanoid/chinese-copywriting-guidelines
+func FixTermTypo(b bool) option {
+	return func(lute *Lute) {
+		lute.FixTermTypo = b
+	}
+}
+
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	GFMTable            bool
@@ -161,6 +175,7 @@ type options struct {
 	SoftBreak2HardBreak bool
 	CodeSyntaxHighlight bool
 	AutoSpace           bool
+	FixTermTypo         bool
 }
 
 // option 描述了解析渲染选项设置函数签名。
