@@ -52,33 +52,7 @@ func (t *Tree) parseInlines() {
 			// 也就是说语法树的节点结构没有标准，可以自行发挥。这里进行文本节点合并主要有两个目的：
 			// 1. 减少节点数量，提升后续处理性能
 			// 2. 方便后续功能方面的处理，比如 GFM 自动邮件链接解析
-			for child := n.FirstChild(); nil != child; {
-				next := child.Next()
-				if NodeText == child.Type() {
-					for nil != next && NodeText == next.Type() {
-						child.AppendTokens(next.Tokens())
-						next.Unlink()
-						next = child.Next()
-					}
-
-					if t.context.option.AutoSpace {
-						// 中文排版优化：中西文间插入一个空格
-						text := fromItems(child.Tokens())
-						text = space(text)
-						child.SetTokens(toItems(text))
-					}
-				}
-				child = next
-			}
-
-			if t.context.option.GFMAutoLink {
-				// 处理 GFM 自动邮件链接
-				for child := n.FirstChild(); nil != child; child = child.Next() {
-					if NodeText == child.Type() {
-						t.parseGfmAutoEmailLink(child)
-					}
-				}
-			}
+			t.mergeText(n)
 		}
 
 		return WalkContinue, nil

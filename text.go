@@ -33,6 +33,42 @@ type Text struct {
 	lastLineChecked bool   // 标识最后一行是否检查过
 }
 
+// mergeText 合并 node 中所有（包括子节点）连续的文本节点。
+// 合并后顺便进行中文排版优化以及 GFM 自动邮件链接识别。
+func (t *Tree) mergeText(node Node) {
+	if nil == node {
+		return
+	}
+
+	for child := node.FirstChild(); nil != child; {
+		next := child.Next()
+		if NodeText == child.Type() {
+			// 逐个合并后续兄弟节点
+			for nil != next && NodeText == next.Type() {
+				child.AppendTokens(next.Tokens())
+				next.Unlink()
+				next = child.Next()
+			}
+
+			if t.context.option.AutoSpace {
+				// 中文排版优化：中西文间插入一个空格
+				text := fromItems(child.Tokens())
+				text = space(text)
+				child.SetTokens(toItems(text))
+			}
+
+			if t.context.option.GFMAutoLink {
+				// 处理 GFM 自动邮件链接
+				t.parseGfmAutoEmailLink(child)
+			}
+		} else {
+			// 递归处理子节点
+			t.mergeText(child)
+		}
+		child = next
+	}
+}
+
 func (n *Text) Type() int {
 	return NodeText
 }

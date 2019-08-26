@@ -27,6 +27,7 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
+	{"19", "我们**需要Markdown Format**\n", "我们**需要 Markdown Format**\n\n"},
 	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 lute 空格\n\n"},
 	{"17", "* [ ] 项一\n* [X] 项二\n", "* [ ] 项一\n* [X] 项二\n\n"},
 	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "|abc|defghi|\n|:---:|---:|\n|bar|baz|\n\n"},
