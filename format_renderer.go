@@ -172,7 +172,7 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 			inList = true
 
 			// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
-			// 设置紧凑标识的具体实现可参考函数 List#Finalize
+			// 设置紧凑标识的具体实现可参考函数 List.Finalize()
 			inTightList = listItem.Parent().(*List).tight
 
 			firstPara := listItem.firstChild
