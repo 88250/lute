@@ -20,7 +20,7 @@ import (
 
 var termTypoTests = []parseTest{
 
-	{"0", "在github上做开源项目是一件很开心的事情，请不要把Github拼写成`github`哦\n", "<p>在 GitHub 上做开源项目是一件很开心的事情，请不要把 GitHub 拼写成<code>github</code>哦</p>\n"},
+	{"0", "在github上做开源项目是一件很开心的事情，请不要把Github拼写成`github`哦！\n", "<p>在 GitHub 上做开源项目是一件很开心的事情，请不要把 GitHub 拼写成<code>github</code>哦！</p>\n"},
 }
 
 func TestTermTypo(t *testing.T) {
@@ -36,6 +36,7 @@ func TestTermTypo(t *testing.T) {
 		if test.html != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
 		}
-		t.Logf(html)
+		fmt.Println(html)
+		fmt.Println(luteEngine.FormatStr(test.name, test.markdown))
 	}
 }

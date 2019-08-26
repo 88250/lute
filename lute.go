@@ -87,17 +87,6 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 	return
 }
 
-// AutoSpace 会把 text 中的中西文之间加上空格。
-// https://github.com/sparanoid/chinese-copywriting-guidelines
-func (lute *Lute) Space(text string) (ret string) {
-	return space(text)
-}
-
-// TermTypo 会把 text 中不正确的术语进行修正。
-func (lute *Lute) TermTypo(text string) (ret string) {
-	return fixTermTypo(text)
-}
-
 // GFM 设置是否打开所有 GFM 支持。
 func GFM(b bool) option {
 	return func(lute *Lute) {

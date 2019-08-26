@@ -21,14 +21,15 @@ func fixTermTypo(str string) string {
 	// 鸣谢 https://github.com/studygolang/autocorrect
 
 	for from, to := range terms {
-		re := regexp.MustCompile("(?i)" + from)
-		str = re.ReplaceAllString(str, to)
+		re := regexp.MustCompile("(?i)" + from + " ")
+		str = re.ReplaceAllString(str, to+" ")
 	}
 	return str
 }
 
 // terms 定义了术语字典，用于术语拼写修正。
 var terms = map[string]string{
+	"ipfs":          "IPFS",
 	"saas":          "SaaS",
 	"paas":          "PaaS",
 	"iaas":          "IaaS",
@@ -67,7 +68,7 @@ var terms = map[string]string{
 	"jsp":           "JSP",
 	"asp.net":       "ASP.NET",
 	".net":          ".NET",
-	"rest":          "REST",
+	"restful":       "RESTFul",
 	"orm":           "ORM",
 	"oauth":         "OAuth",
 	"markdown":      "Markdown",
@@ -76,7 +77,7 @@ var terms = map[string]string{
 	"gist":          "Gist",
 	"heroku":        "Heroku",
 	"stackoverflow": "Stack Overflow",
-	"stackexchange": "StackExchange",
+	"stackexchange": "Stack Exchange",
 	"twitter":       "Twitter",
 	"youtube":       "YouTube",
 	"dynamodb":      "DynamoDB",

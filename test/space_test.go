@@ -39,6 +39,7 @@ func TestAutoSpace(t *testing.T) {
 		if test.html != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
 		}
-		t.Logf(html)
+		fmt.Println(html)
+		fmt.Println(luteEngine.FormatStr(test.name, test.markdown))
 	}
 }
