@@ -31,7 +31,7 @@ func (t *Tree) parseInlines() {
 		// 遍历离开块节点时，只有如下几种类型的块节点需要生成行级子节点
 		if typ := n.Type(); NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
 			if NodeParagraph == typ && nil == n.Tokens() {
-				// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空（具体可参看 Paragraph.Finalize() 函数）
+				// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
 				// 在这里从语法树上移除空段落节点
 				next := n.Next()
 				n.Unlink()
@@ -40,9 +40,8 @@ func (t *Tree) parseInlines() {
 				return WalkContinue, nil
 			}
 
-			// 逐个生成该块节点的行级子节点
-			for t.parseInline(n) {
-			}
+			// 生成该块节点的行级子节点
+			t.parseInline(n)
 
 			// 处理该块节点中的强调、加粗和删除线
 			t.processEmphasis(nil)
@@ -60,11 +59,11 @@ func (t *Tree) parseInlines() {
 }
 
 // parseInline 解析并生成块节点 block 的行级子节点。
-func (t *Tree) parseInline(block Node) bool {
+func (t *Tree) parseInline(block Node) {
 	tokens := block.Tokens()
 	length := len(tokens)
 	if 1 > length {
-		return false
+		return
 	}
 
 	t.context.pos = 0
@@ -121,7 +120,7 @@ func (t *Tree) parseInline(block Node) bool {
 		}
 
 		if 1 > length || t.context.pos >= length || itemEnd == tokens[t.context.pos] {
-			return false
+			return
 		}
 	}
 }
