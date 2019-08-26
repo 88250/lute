@@ -214,9 +214,9 @@ func main() {
 ### [Lute](https://github.com/b3log/lute)
 
 ```
-BenchmarkLute-2   	     300	   5392343 ns/op	 3111557 B/op	   24482 allocs/op
-BenchmarkLute-4   	     300	   4487989 ns/op	 3112817 B/op	   24497 allocs/op
-BenchmarkLute-8   	     300	   4285201 ns/op	 3114240 B/op	   24511 allocs/op
+BenchmarkLute-2   	     300	   5458731 ns/op	 3077975 B/op	   22417 allocs/op
+BenchmarkLute-4   	     300	   4468039 ns/op	 3079380 B/op	   22434 allocs/op
+BenchmarkLute-8   	     300	   4268684 ns/op	 3080512 B/op	   22444 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
