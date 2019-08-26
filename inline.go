@@ -15,105 +15,124 @@ package lute
 import (
 	"html"
 	"strings"
+	"sync"
 )
 
 // parseInlines 解析并生成行级节点。
 func (t *Tree) parseInlines() {
-	t.context.delimiters = nil
-	t.context.brackets = nil
-
-	// 从根节点开始按深度优先遍历子块节点
-	Walk(t.Root, func(n Node, entering bool) (WalkStatus, error) {
-		if entering { // 遍历进入块节点时不做任何处理
-			return WalkContinue, nil
-		}
-
-		// 遍历离开块节点时，只有如下几种类型的块节点需要生成行级子节点
-		if typ := n.Type(); NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
-			if NodeParagraph == typ && nil == n.Tokens() {
-				// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
-				// 在这里从语法树上移除空段落节点
-				next := n.Next()
-				n.Unlink()
-				// Unlink 会将后一个兄弟节点置空，此处是在在遍历过程中修改树结构，所以需要保持继续迭代后面的兄弟节点
-				n.SetNext(next)
-				return WalkContinue, nil
-			}
-
-			// 生成该块节点的行级子节点
-			t.parseInline(n)
-
-			// 处理该块节点中的强调、加粗和删除线
-			t.processEmphasis(nil)
-
-			// 将连续的文本节点进行合并。
-			// 规范只是定义了从输入的 Markdown 文本到输出的 HTML 的解析渲染规则，并未定义中间语法树的规则。
-			// 也就是说语法树的节点结构没有标准，可以自行发挥。这里进行文本节点合并主要有两个目的：
-			// 1. 减少节点数量，提升后续处理性能
-			// 2. 方便后续功能方面的处理，比如 GFM 自动邮件链接解析
-			t.mergeText(n)
-		}
-
-		return WalkContinue, nil
-	})
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	t.walkParseInline(t.Root, wg)
+	wg.Wait()
 }
 
-// parseInline 解析并生成块节点 block 的行级子节点。
-func (t *Tree) parseInline(block Node) {
-	tokens := block.Tokens()
-	length := len(tokens)
-	if 1 > length {
+// walkParseInline 解析生成节点 node 的行级子节点。
+func (t *Tree) walkParseInline(node Node, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	if nil == node {
 		return
 	}
 
-	t.context.tokens = tokens
-	t.context.tokensLen = length
-	t.context.pos = 0
+	// 只有如下几种类型的块节点需要生成行级子节点
+	if typ := node.Type(); NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
+		tokens := node.Tokens()
+		if NodeParagraph == typ && nil == tokens {
+			// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
+			// 在这里从语法树上移除空段落节点
+			next := node.Next()
+			node.Unlink()
+			// Unlink 会将后一个兄弟节点置空，此处是在在遍历过程中修改树结构，所以需要保持继续迭代后面的兄弟节点
+			node.SetNext(next)
+			return
+		}
+
+		length := len(tokens)
+		if 1 > length {
+			return
+		}
+
+		ctx := &InlineContext{
+			tokens:    tokens,
+			tokensLen: length,
+		}
+
+		// 生成该块节点的行级子节点
+		t.parseInline(node, ctx)
+
+		// 处理该块节点中的强调、加粗和删除线
+		t.processEmphasis(nil, ctx)
+
+		// 将连续的文本节点进行合并。
+		// 规范只是定义了从输入的 Markdown 文本到输出的 HTML 的解析渲染规则，并未定义中间语法树的规则。
+		// 也就是说语法树的节点结构没有标准，可以自行发挥。这里进行文本节点合并主要有两个目的：
+		// 1. 减少节点数量，提升后续处理性能
+		// 2. 方便后续功能方面的处理，比如 GFM 自动邮件链接解析
+		t.mergeText(node)
+		return
+	}
+
+	// 深度优先遍历处理子节点
+	var children []Node
+	for child := node.FirstChild(); nil != child; child = child.Next() {
+		children = append(children, child)
+	}
+	cwg := &sync.WaitGroup{}
+	for _, child := range children {
+		cwg.Add(1)
+		go t.walkParseInline(child, cwg)
+	}
+	cwg.Wait()
+
+}
+
+// parseInline 解析并生成块节点 block 的行级子节点。
+func (t *Tree) parseInline(block Node, ctx *InlineContext) {
 	for {
-		token := tokens[t.context.pos]
+		token := ctx.tokens[ctx.pos]
 		var n Node
 		switch token {
 		case itemBackslash:
-			n = t.parseBackslash()
+			n = t.parseBackslash(ctx)
 		case itemBacktick:
-			n = t.parseCodeSpan()
+			n = t.parseCodeSpan(ctx)
 		case itemAsterisk, itemUnderscore, itemTilde:
-			t.handleDelim(block)
+			t.handleDelim(block, ctx)
 		case itemNewline:
-			n = t.parseNewline(block)
+			n = t.parseNewline(block, ctx)
 		case itemLess:
-			n = t.parseAutolink()
+			n = t.parseAutolink(ctx)
 			if nil == n {
-				n = t.parseAutoEmailLink()
+				n = t.parseAutoEmailLink(ctx)
 				if nil == n {
-					n = t.parseInlineHTML()
+					n = t.parseInlineHTML(ctx)
 				}
 			}
 		case itemOpenBracket:
-			n = t.parseOpenBracket()
+			n = t.parseOpenBracket(ctx)
 		case itemCloseBracket:
-			n = t.parseCloseBracket()
+			n = t.parseCloseBracket(ctx)
 		case itemAmpersand:
-			n = t.parseEntity()
+			n = t.parseEntity(ctx)
 		case itemBang:
-			n = t.parseBang()
+			n = t.parseBang(ctx)
 		default:
 			if t.context.option.GFMAutoLink {
-				n = t.parseGfmAutoLink("https://")
+				n = t.parseGfmAutoLink("https://", ctx)
 				if nil == n {
-					n = t.parseGfmAutoLink("http://")
+					n = t.parseGfmAutoLink("http://", ctx)
 					if nil == n {
-						n = t.parseGfmAutoLink("ftp://")
+						n = t.parseGfmAutoLink("ftp://", ctx)
 						if nil == n {
-							n = t.parseGfmAutoLink("www.")
+							n = t.parseGfmAutoLink("www.", ctx)
 							if nil == n {
-								n = t.parseText()
+								n = t.parseText(ctx)
 							}
 						}
 					}
 				}
 			} else {
-				n = t.parseText()
+				n = t.parseText(ctx)
 			}
 		}
 
@@ -121,28 +140,28 @@ func (t *Tree) parseInline(block Node) {
 			block.AppendChild(block, n)
 		}
 
-		if 1 > length || t.context.pos >= length || itemEnd == tokens[t.context.pos] {
+		if 1 > ctx.tokensLen || ctx.pos >= ctx.tokensLen || itemEnd == ctx.tokens[ctx.pos] {
 			return
 		}
 	}
 }
 
-func (t *Tree) parseEntity() (ret Node) {
-	if 2 > t.context.tokensLen || t.context.tokensLen <= t.context.pos+1 {
-		t.context.pos++
+func (t *Tree) parseEntity(ctx *InlineContext) (ret Node) {
+	if 2 > ctx.tokensLen || ctx.tokensLen <= ctx.pos+1 {
+		ctx.pos++
 		return &Text{tokens: toItems("&")}
 	}
 
-	start := t.context.pos
+	start := ctx.pos
 	numeric := false
-	if 3 < t.context.tokensLen {
-		numeric = itemCrosshatch == t.context.tokens[start+1]
+	if 3 < ctx.tokensLen {
+		numeric = itemCrosshatch == ctx.tokens[start+1]
 	}
-	i := t.context.pos
+	i := ctx.pos
 	var token byte
 	var endWithSemicolon bool
-	for ; i < t.context.tokensLen; i++ {
-		token = t.context.tokens[i]
+	for ; i < ctx.tokensLen; i++ {
+		token = ctx.tokens[i]
 		if isWhitespace(token) {
 			break
 		}
@@ -153,28 +172,28 @@ func (t *Tree) parseEntity() (ret Node) {
 		}
 	}
 
-	entityName := t.context.tokens[start:i].string()
+	entityName := ctx.tokens[start:i].string()
 	if entityValue, ok := htmlEntities[entityName]; ok { // 通过查表优化
-		t.context.pos += i - start
+		ctx.pos += i - start
 		return &Text{tokens: toItems(entityValue)}
 	}
 
 	if !endWithSemicolon {
-		t.context.pos++
+		ctx.pos++
 		return &Text{tokens: toItems("&")}
 	}
 
 	if numeric {
 		entityNameLen := len(entityName)
 		if 10 < entityNameLen || 4 > entityNameLen {
-			t.context.pos++
+			ctx.pos++
 			return &Text{tokens: toItems("&")}
 		}
 
 		hex := 'x' == entityName[2] || 'X' == entityName[2]
 		if hex {
 			if 5 > entityNameLen {
-				t.context.pos++
+				ctx.pos++
 				return &Text{tokens: toItems("&")}
 			}
 		}
@@ -182,29 +201,29 @@ func (t *Tree) parseEntity() (ret Node) {
 
 	v := html.UnescapeString(entityName)
 	if v == entityName {
-		t.context.pos++
+		ctx.pos++
 		return &Text{tokens: toItems("&")}
 	}
-	t.context.pos += i - start
+	ctx.pos += i - start
 	return &Text{tokens: toItems(v)}
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
 // to block's children. If there is a matching delimiter, remove it from the delimiter stack.
-func (t *Tree) parseCloseBracket() Node {
+func (t *Tree) parseCloseBracket(ctx *InlineContext) Node {
 	// get last [ or ![
-	opener := t.context.brackets
+	opener := ctx.brackets
 	if nil == opener {
-		t.context.pos++
+		ctx.pos++
 		// no matched opener, just return a literal
 		return &Text{tokens: toItems("]")}
 	}
 
 	if !opener.active {
-		t.context.pos++
+		ctx.pos++
 		// no matched opener, just return a literal
 		// take opener off brackets stack
-		t.removeBracket()
+		t.removeBracket(ctx)
 		return &Text{tokens: toItems("]")}
 	}
 
@@ -214,57 +233,57 @@ func (t *Tree) parseCloseBracket() Node {
 	var dest, title string
 	// Check to see if we have a link/image
 
-	startPos := t.context.pos
-	savepos := t.context.pos
+	startPos := ctx.pos
+	savepos := ctx.pos
 	matched := false
 	// Inline link?
-	if t.context.pos+1 < t.context.tokensLen && itemOpenParen == t.context.tokens[t.context.pos+1] {
-		t.context.pos++
+	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == ctx.tokens[ctx.pos+1] {
+		ctx.pos++
 		isLink := false
 		var passed, remains items
-		if isLink, passed, remains = t.context.tokens[t.context.pos:].spnl(); isLink {
-			t.context.pos += len(passed)
+		if isLink, passed, remains = ctx.tokens[ctx.pos:].spnl(); isLink {
+			ctx.pos += len(passed)
 			if passed, remains, dest = t.context.parseInlineLink(remains); nil != passed {
-				t.context.pos += len(passed)
+				ctx.pos += len(passed)
 				if 0 < len(remains) && isWhitespace(remains[0]) { // 跟空格的话后续尝试按 title 解析
-					t.context.pos++
+					ctx.pos++
 					if isLink, passed, remains = remains.spnl(); isLink {
-						t.context.pos += len(passed)
+						ctx.pos += len(passed)
 						validTitle := false
 						if validTitle, passed, remains, title = t.context.parseLinkTitle(remains); validTitle {
-							t.context.pos += len(passed)
+							ctx.pos += len(passed)
 							isLink, passed, remains = remains.spnl()
-							t.context.pos += len(passed)
+							ctx.pos += len(passed)
 							matched = isLink && itemCloseParen == remains[0]
 						}
 					}
 				} else { // 没有 title
-					t.context.pos--
+					ctx.pos--
 					matched = true
 				}
 			}
 		}
 		if !matched {
-			t.context.pos = savepos
+			ctx.pos = savepos
 		}
 	}
 
 	var reflabel string
 	if !matched {
 		// 尝试解析链接 label
-		var beforelabel = t.context.pos + 1
-		passed, _, label := t.context.parseLinkLabel(t.context.tokens[beforelabel:])
+		var beforelabel = ctx.pos + 1
+		passed, _, label := t.context.parseLinkLabel(ctx.tokens[beforelabel:])
 		var n = len(passed)
 		if n > 0 { // label 解析出来的话说明满足格式 [text][label]
 			reflabel = label
-			t.context.pos += n + 1
+			ctx.pos += n + 1
 		} else if !opener.bracketAfter {
 			// [text][] 或者 [text][] 格式，将第一个 text 视为 label 进行解析
-			passed = t.context.tokens[ opener.index:startPos]
+			passed = ctx.tokens[ opener.index:startPos]
 			reflabel = fromItems(passed)
-			if len(passed) > 0 && t.context.tokensLen > beforelabel && itemOpenBracket == t.context.tokens[beforelabel] {
+			if len(passed) > 0 && ctx.tokensLen > beforelabel && itemOpenBracket == ctx.tokens[beforelabel] {
 				// [text][] 格式，跳过 []
-				t.context.pos += 2
+				ctx.pos += 2
 			}
 		}
 
@@ -296,15 +315,15 @@ func (t *Tree) parseCloseBracket() Node {
 			tmp = next
 		}
 
-		t.processEmphasis(opener.previousDelimiter)
-		t.removeBracket()
+		t.processEmphasis(opener.previousDelimiter, ctx)
+		t.removeBracket(ctx)
 		opener.node.Unlink()
 
 		// We remove this bracket and processEmphasis will remove later delimiters.
 		// Now, for a link, we also deactivate earlier link openers.
 		// (no links in links)
 		if !isImage {
-			opener = t.context.brackets
+			opener = ctx.brackets
 			for nil != opener {
 				if !opener.image {
 					opener.active = false // deactivate this opener
@@ -313,54 +332,54 @@ func (t *Tree) parseCloseBracket() Node {
 			}
 		}
 
-		t.context.pos++
+		ctx.pos++
 		return node
 	} else { // no match
-		t.removeBracket() // remove this opener from stack
-		t.context.pos = startPos
-		t.context.pos++
+		t.removeBracket(ctx) // remove this opener from stack
+		ctx.pos = startPos
+		ctx.pos++
 		return &Text{tokens: toItems("]")}
 	}
 }
 
-func (t *Tree) parseOpenBracket() (ret Node) {
-	t.context.pos++
+func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret Node) {
+	ctx.pos++
 	ret = &Text{tokens: toItems("[")}
 	// 将 [ 入栈
-	t.addBracket(ret, t.context.pos, false)
+	t.addBracket(ret, ctx.pos, false, ctx)
 	return
 }
 
-func (t *Tree) addBracket(node Node, index int, image bool) {
-	if nil != t.context.brackets {
-		t.context.brackets.bracketAfter = true
+func (t *Tree) addBracket(node Node, index int, image bool, ctx *InlineContext) {
+	if nil != ctx.brackets {
+		ctx.brackets.bracketAfter = true
 	}
 
-	t.context.brackets = &delimiter{
+	ctx.brackets = &delimiter{
 		node:              node,
-		previous:          t.context.brackets,
-		previousDelimiter: t.context.delimiters,
+		previous:          ctx.brackets,
+		previousDelimiter: ctx.delimiters,
 		index:             index,
 		image:             image,
 		active:            true,
 	}
 }
 
-func (t *Tree) removeBracket() {
-	t.context.brackets = t.context.brackets.previous
+func (t *Tree) removeBracket(ctx *InlineContext) {
+	ctx.brackets = ctx.brackets.previous
 }
 
-func (t *Tree) parseBackslash() (ret Node) {
-	if t.context.tokensLen-1 > t.context.pos {
-		t.context.pos++
+func (t *Tree) parseBackslash(ctx *InlineContext) (ret Node) {
+	if ctx.tokensLen-1 > ctx.pos {
+		ctx.pos++
 	}
-	token := t.context.tokens[t.context.pos]
+	token := ctx.tokens[ctx.pos]
 	if itemNewline == token {
 		ret = &HardBreak{&BaseNode{typ: NodeHardBreak}}
-		t.context.pos++
+		ctx.pos++
 	} else if isASCIIPunct(token) {
 		ret = &Text{tokens: items{token}}
-		t.context.pos++
+		ctx.pos++
 	} else {
 		ret = &Text{tokens: toItems("\\")}
 	}
@@ -368,18 +387,18 @@ func (t *Tree) parseBackslash() (ret Node) {
 	return
 }
 
-func (t *Tree) parseText() (ret Node) {
+func (t *Tree) parseText(ctx *InlineContext) (ret Node) {
 	var token byte
-	start := t.context.pos
-	for ; t.context.pos < t.context.tokensLen; t.context.pos++ {
-		token = t.context.tokens[t.context.pos]
+	start := ctx.pos
+	for ; ctx.pos < ctx.tokensLen; ctx.pos++ {
+		token = ctx.tokens[ctx.pos]
 		if t.isMarker(token) {
 			// 遇到潜在的标记符时需要跳出 text，回到行级解析主循环
 			break
 		}
 	}
 
-	ret = &Text{tokens: t.context.tokens[start:t.context.pos]}
+	ret = &Text{tokens: ctx.tokens[start:ctx.pos]}
 	return
 }
 
@@ -390,8 +409,8 @@ func (t *Tree) isMarker(token byte) bool {
 		itemLess == token || itemCloseBracket == token || itemAmpersand == token || itemTilde == token
 }
 
-func (t *Tree) parseNewline(block Node) (ret Node) {
-	t.context.pos++
+func (t *Tree) parseNewline(block Node, ctx *InlineContext) (ret Node) {
+	ctx.pos++
 
 	hardbreak := false
 	// 检查前一个节点的结尾空格，如果大于等于两个则说明是硬换行

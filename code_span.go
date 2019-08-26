@@ -17,31 +17,31 @@ type CodeSpan struct {
 	*BaseNode
 }
 
-func (t *Tree) parseCodeSpan() (ret Node) {
-	startPos := t.context.pos
+func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret Node) {
+	startPos := ctx.pos
 	n := 0
-	for ; startPos+n < t.context.tokensLen; n++ {
-		if itemBacktick != t.context.tokens[startPos+n] {
+	for ; startPos+n < ctx.tokensLen; n++ {
+		if itemBacktick != ctx.tokens[startPos+n] {
 			break
 		}
 	}
 
-	backticks := t.context.tokens[startPos : startPos+n]
-	if t.context.tokensLen <= startPos+n {
-		t.context.pos += n
+	backticks := ctx.tokens[startPos : startPos+n]
+	if ctx.tokensLen <= startPos+n {
+		ctx.pos += n
 		ret = &Text{tokens: backticks}
 		return
 	}
 
-	endPos := t.matchCodeSpanEnd(t.context.tokens[startPos+n:], n)
+	endPos := t.matchCodeSpanEnd(ctx.tokens[startPos+n:], n)
 	if 1 > endPos {
-		t.context.pos += n
+		ctx.pos += n
 		ret = &Text{tokens: backticks}
 		return
 	}
 	endPos = startPos + endPos + n
 
-	textTokens := t.context.tokens[startPos+n : endPos]
+	textTokens := ctx.tokens[startPos+n : endPos]
 	textTokens.replaceAll(itemNewline, itemSpace)
 	if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !textTokens.isBlankLine() {
 		// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
@@ -50,7 +50,7 @@ func (t *Tree) parseCodeSpan() (ret Node) {
 	}
 
 	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, tokens: textTokens}}
-	t.context.pos = endPos + n
+	ctx.pos = endPos + n
 	return
 }
 

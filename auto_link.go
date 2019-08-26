@@ -125,8 +125,8 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 	return isASCIILetterNumHyphen(token) || itemDot == token || itemUnderscore == token
 }
 
-func (t *Tree) parseGfmAutoLink(protocol string) (ret Node) {
-	tokens := t.context.tokens[t.context.pos:]
+func (t *Tree) parseGfmAutoLink(protocol string, ctx *InlineContext) (ret Node) {
+	tokens := ctx.tokens[ctx.pos:]
 	index := bytes.Index(tokens, []byte(protocol))
 	if 0 > index {
 		return nil
@@ -141,7 +141,7 @@ func (t *Tree) parseGfmAutoLink(protocol string) (ret Node) {
 			}
 		}
 		// 将标记出现之前的部分构造为文本节点
-		t.context.pos += i
+		ctx.pos += i
 		return &Text{tokens: tokens[:i]}
 	}
 
@@ -180,7 +180,7 @@ func (t *Tree) parseGfmAutoLink(protocol string) (ret Node) {
 	}
 
 	if !t.isValidDomain(domain) {
-		t.context.pos += i
+		ctx.pos += i
 		return &Text{tokens: url}
 	}
 
@@ -280,7 +280,7 @@ func (t *Tree) parseGfmAutoLink(protocol string) (ret Node) {
 
 	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(fromItems(dest)), ""}
 	ret.AppendChild(ret, &Text{tokens: domainPath})
-	t.context.pos += i
+	ctx.pos += i
 	return
 }
 
@@ -336,8 +336,8 @@ func (t *Tree) isValidDomain(domain items) bool {
 	return true
 }
 
-func (t *Tree) parseAutoEmailLink() (ret Node) {
-	tokens := t.context.tokens[1:]
+func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret Node) {
+	tokens := ctx.tokens[1:]
 	var dest string
 	var token byte
 	length := len(tokens)
@@ -386,21 +386,21 @@ func (t *Tree) parseAutoEmailLink() (ret Node) {
 		return nil
 	}
 
-	t.context.pos += passed + 1
+	ctx.pos += passed + 1
 	ret = &Link{&BaseNode{typ: NodeLink}, "mailto:" + dest, ""}
 	ret.AppendChild(ret, &Text{tokens: toItems(dest)})
 
 	return
 }
 
-func (t *Tree) parseAutolink() (ret Node) {
+func (t *Tree) parseAutolink(ctx *InlineContext) (ret Node) {
 	schemed := false
 	scheme := ""
 	dest := ""
 	var token byte
-	i := t.context.pos + 1
-	for ; i < t.context.tokensLen && itemGreater != t.context.tokens[i]; i++ {
-		token = t.context.tokens[i]
+	i := ctx.pos + 1
+	for ; i < ctx.tokensLen && itemGreater != ctx.tokens[i]; i++ {
+		token = ctx.tokens[i]
 		if itemSpace == token {
 			return nil
 		}
@@ -419,11 +419,11 @@ func (t *Tree) parseAutolink() (ret Node) {
 	}
 
 	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), ""}
-	if itemGreater != t.context.tokens[i] {
+	if itemGreater != ctx.tokens[i] {
 		return nil
 	}
 
-	t.context.pos = 1 + i
+	ctx.pos = 1 + i
 	ret.AppendChild(ret, &Text{tokens: toItems(dest)})
 
 	return

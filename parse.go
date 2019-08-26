@@ -45,9 +45,10 @@ type Context struct {
 	offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的下标、缩进空格数
 	indented, blank, partiallyConsumedTab, allClosed         bool  // 是否是缩进行、空行等标识
 	lastMatchedContainer                                     Node  // 最后一个匹配的块节点
+}
 
-	// 以下变量用于行级解析阶段
-
+// InlineContext 描述了行级解析上下文。
+type InlineContext struct {
 	tokens     items      // 当前解析的 tokens
 	tokensLen  int        // 当前解析的 tokens 长度
 	pos        int        // 当前解析到的 token 位置
@@ -166,9 +167,10 @@ type Tree struct {
 	Name string    // 名称，可以为空
 	Root *Document // 根节点
 
-	text    []byte   // 原始的 Markdown 文本
-	lex     *lexer   // 词法分析器
-	context *Context // 语法解析上下文
+	text          []byte         // 原始的 Markdown 文本
+	lex           *lexer         // 词法分析器
+	context       *Context       // 语法解析上下文
+	inlineContext *InlineContext // 行级解析上下文
 }
 
 // render 使用 renderer 对语法树 t 进行渲染，渲染结果以 output 返回。

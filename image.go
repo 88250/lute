@@ -20,14 +20,14 @@ type Image struct {
 }
 
 // parseBang 解析 !，可能是图片标记开始 ![ 也可能是普通文本 !。
-func (t *Tree) parseBang() (ret Node) {
-	var startPos = t.context.pos
-	t.context.pos++
-	if t.context.pos < t.context.tokensLen && itemOpenBracket == t.context.tokens[t.context.pos] {
-		t.context.pos++
+func (t *Tree) parseBang(ctx *InlineContext) (ret Node) {
+	var startPos = ctx.pos
+	ctx.pos++
+	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos] {
+		ctx.pos++
 		ret = &Text{tokens: toItems("![")}
 		// 将图片开始标记入栈
-		t.addBracket(ret, startPos+2, true)
+		t.addBracket(ret, startPos+2, true, ctx)
 		return
 	}
 

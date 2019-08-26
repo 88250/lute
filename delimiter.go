@@ -32,32 +32,32 @@ type delimiter struct {
 // 嵌套强调和链接的解析算法的中文解读可参考这里 TODO: 文档地址
 
 // handleDelim 将分隔符 *_~ 入栈。
-func (t *Tree) handleDelim(block Node) {
-	startPos := t.context.pos
-	delim := t.scanDelims()
+func (t *Tree) handleDelim(block Node, ctx *InlineContext) {
+	startPos := ctx.pos
+	delim := t.scanDelims(ctx)
 
-	text := t.context.tokens[startPos:t.context.pos]
+	text := ctx.tokens[startPos:ctx.pos]
 	node := &Text{tokens: text}
 	block.AppendChild(block, node)
 
 	// 将这个分隔符入栈
-	t.context.delimiters = &delimiter{
+	ctx.delimiters = &delimiter{
 		typ:         delim.typ,
 		num:         delim.num,
 		originalNum: delim.num,
 		node:        node,
-		previous:    t.context.delimiters,
+		previous:    ctx.delimiters,
 		next:        nil,
 		canOpen:     delim.canOpen,
 		canClose:    delim.canClose,
 	}
-	if t.context.delimiters.previous != nil {
-		t.context.delimiters.previous.next = t.context.delimiters
+	if ctx.delimiters.previous != nil {
+		ctx.delimiters.previous.next = ctx.delimiters
 	}
 }
 
 // processEmphasis 处理强调、加粗以及删除线。
-func (t *Tree) processEmphasis(stackBottom *delimiter) {
+func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	var opener, closer, oldCloser *delimiter
 	var openerInl, closerInl Node
 	var tempStack *delimiter
@@ -71,7 +71,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 	openersBottom[itemTilde] = stackBottom
 
 	// find first closer above stack_bottom:
-	closer = t.context.delimiters
+	closer = ctx.delimiters
 	for closer != nil && closer.previous != stackBottom {
 		closer = closer.previous
 	}
@@ -151,13 +151,13 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 			// if opener has 0 delims, remove it and the inline
 			if opener.num == 0 {
 				openerInl.Unlink()
-				t.removeDelimiter(opener)
+				t.removeDelimiter(opener, ctx)
 			}
 
 			if closer.num == 0 {
 				closerInl.Unlink()
 				tempStack = closer.next
-				t.removeDelimiter(closer)
+				t.removeDelimiter(closer, ctx)
 				closer = tempStack
 			}
 		}
@@ -172,32 +172,32 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 			if !oldCloser.canOpen {
 				// We can remove a closer that can't be an opener,
 				// once we've seen there's no matching opener:
-				t.removeDelimiter(oldCloser)
+				t.removeDelimiter(oldCloser, ctx)
 			}
 		}
 	}
 
 	// 移除所有分隔符
-	for t.context.delimiters != nil && t.context.delimiters != stackBottom {
-		t.removeDelimiter(t.context.delimiters)
+	for ctx.delimiters != nil && ctx.delimiters != stackBottom {
+		t.removeDelimiter(ctx.delimiters, ctx)
 	}
 }
 
-func (t *Tree) scanDelims() *delimiter {
-	startPos := t.context.pos
-	token := t.context.tokens[startPos]
+func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
+	startPos := ctx.pos
+	token := ctx.tokens[startPos]
 	delimitersCount := 0
-	for i := t.context.pos; i < t.context.tokensLen && token == t.context.tokens[i]; i++ {
+	for i := ctx.pos; i < ctx.tokensLen && token == ctx.tokens[i]; i++ {
 		delimitersCount++
-		t.context.pos++
+		ctx.pos++
 	}
 
 	tokenBefore, tokenAfter := itemNewline, itemNewline
 	if 0 != startPos {
-		tokenBefore = t.context.tokens[startPos-1]
+		tokenBefore = ctx.tokens[startPos-1]
 	}
-	if t.context.tokensLen > t.context.pos {
-		tokenAfter = t.context.tokens[t.context.pos]
+	if ctx.tokensLen > ctx.pos {
+		tokenAfter = ctx.tokens[ctx.pos]
 	}
 
 	var beforeIsPunct, beforeIsWhitespace, afterIsPunct, afterIsWhitespace, canOpen, canClose bool
@@ -223,12 +223,12 @@ func (t *Tree) scanDelims() *delimiter {
 	return &delimiter{typ: token, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
 }
 
-func (t *Tree) removeDelimiter(delim *delimiter) (ret *delimiter) {
+func (t *Tree) removeDelimiter(delim *delimiter, ctx *InlineContext) (ret *delimiter) {
 	if delim.previous != nil {
 		delim.previous.next = delim.next
 	}
 	if delim.next == nil {
-		t.context.delimiters = delim.previous // 栈顶
+		ctx.delimiters = delim.previous // 栈顶
 	} else {
 		delim.next.previous = delim.previous
 	}
