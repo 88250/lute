@@ -15,7 +15,6 @@ package lute
 import (
 	"bytes"
 	"strconv"
-	"strings"
 )
 
 // newFormatRenderer 创建一个格式化渲染器。
@@ -139,7 +138,7 @@ func (r *Renderer) renderLinkMarkdown(node Node, entering bool) (WalkStatus, err
 			r.write(n.Title)
 			r.writeByte('"')
 		}
-		r.writeString(")")
+		r.writeByte(')')
 	}
 
 	return WalkContinue, nil
@@ -202,7 +201,7 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 	}
 
 	if entering {
-		r.writeString(strings.Repeat(" ", listPadding))
+		r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
 	} else {
 		r.newline()
 		if !inList {
@@ -255,16 +254,16 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 
 		r.newline()
 		if 0 < listPadding {
-			r.writeString(strings.Repeat(" ", listPadding))
+			r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
 		}
-		r.writeString(strings.Repeat("`", n.fenceLength))
+		r.write(bytes.Repeat([]byte{itemBacktick}, n.fenceLength))
 		r.write(n.info)
 		r.writeByte('\n')
 		if 0 < listPadding {
 			lines := bytes.Split(n.tokens, []byte{itemNewline})
 			length := len(lines)
 			for i, line := range lines {
-				r.writeString(strings.Repeat(" ", listPadding))
+				r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
 				r.write(line)
 				if i < length-1 {
 					r.writeByte('\n')
@@ -276,7 +275,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 		return WalkSkipChildren, nil
 	}
 
-	r.writeString(strings.Repeat("`", n.fenceLength))
+	r.write(bytes.Repeat([]byte{itemBacktick}, n.fenceLength))
 	r.writeString("\n\n")
 	return WalkContinue, nil
 }
@@ -312,10 +311,11 @@ func (r *Renderer) renderBlockquoteMarkdown(n Node, entering bool) (WalkStatus, 
 func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, error) {
 	n := node.(*Heading)
 	if entering {
-		r.writeString(strings.Repeat("#", n.Level) + " ") // 统一使用 ATX 标题，不使用 Setext 标题
+		r.write(bytes.Repeat([]byte{itemCrosshatch}, n.Level)) // 统一使用 ATX 标题，不使用 Setext 标题
+		r.writeByte(itemSpace)
 	} else {
 		r.newline()
-		r.writeString("\n")
+		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
 }
@@ -339,7 +339,7 @@ func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus,
 		r.newline()
 		if 1 < r.listLevel {
 			parent := n.Parent().Parent().(*ListItem)
-			r.writeString(strings.Repeat(" ", len(parent.marker)+1))
+			r.write(bytes.Repeat([]byte{itemSpace}, len(parent.marker)+1))
 			if 1 == parent.listData.typ {
 				r.writeByte(' ') // 有序列表需要加上分隔符 . 或者 ) 的一个字符长度
 			}
