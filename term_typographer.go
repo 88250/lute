@@ -29,6 +29,11 @@ func fixTermTypo(str string) string {
 
 // terms 定义了术语字典，用于术语拼写修正。
 var terms = map[string]string{
+	"saas":          "SaaS",
+	"paas":          "PaaS",
+	"iaas":          "IaaS",
+	"ioc":           "IoC",
+	"freemarker":    "FreeMarker",
 	"ruby":          "Ruby",
 	"mri":           "MRI",
 	"rails":         "Rails",
@@ -58,6 +63,8 @@ var terms = map[string]string{
 	"ajax":          "AJAX",
 	"messagepack":   "MessagePack",
 	"javascript":    "JavaScript",
+	"java":          "Java",
+	"jsp":           "JSP",
 	"asp.net":       "ASP.NET",
 	".net":          ".NET",
 	"rest":          "REST",
@@ -122,4 +129,8 @@ var terms = map[string]string{
 	"vpn":           "VPN",
 	"arm":           "ARM",
 	"cpu":           "CPU",
+	"spring":        "Spring",
+	"springboot":    "SpringBoot",
+	"springcloud":   "SpringCloud",
+	"qq":            "QQ",
 }
