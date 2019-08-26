@@ -17,7 +17,8 @@ type InlineHTML struct {
 	*BaseNode
 }
 
-func (t *Tree) parseInlineHTML(tokens items) (ret Node) {
+func (t *Tree) parseInlineHTML() (ret Node) {
+	tokens := t.context.tokens
 	startPos := t.context.pos
 	ret = &Text{tokens: toItems("<")}
 

@@ -17,33 +17,31 @@ type CodeSpan struct {
 	*BaseNode
 }
 
-func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
+func (t *Tree) parseCodeSpan() (ret Node) {
 	startPos := t.context.pos
-	length := len(tokens)
 	n := 0
-	for ; startPos+n < length; n++ {
-		if itemBacktick != tokens[startPos+n] {
+	for ; startPos+n < t.context.tokensLen; n++ {
+		if itemBacktick != t.context.tokens[startPos+n] {
 			break
 		}
 	}
 
-	backticks := tokens[startPos : startPos+n]
-	if length <= startPos+n {
+	backticks := t.context.tokens[startPos : startPos+n]
+	if t.context.tokensLen <= startPos+n {
 		t.context.pos += n
 		ret = &Text{tokens: backticks}
 		return
 	}
 
-	endPos := t.matchCodeSpanEnd(tokens[startPos+n:], n)
+	endPos := t.matchCodeSpanEnd(t.context.tokens[startPos+n:], n)
 	if 1 > endPos {
 		t.context.pos += n
-		ret = &Text{ tokens: backticks}
+		ret = &Text{tokens: backticks}
 		return
 	}
 	endPos = startPos + endPos + n
 
-	textTokens := tokens[startPos+n : endPos]
-	length = len(textTokens)
+	textTokens := t.context.tokens[startPos+n : endPos]
 	textTokens.replaceAll(itemNewline, itemSpace)
 	if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !textTokens.isBlankLine() {
 		// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
@@ -53,7 +51,6 @@ func (t *Tree) parseCodeSpan(tokens items) (ret Node) {
 
 	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, tokens: textTokens}}
 	t.context.pos = endPos + n
-
 	return
 }
 
@@ -66,7 +63,6 @@ func (t *Tree) matchCodeSpanEnd(tokens items, num int) (pos int) {
 			if length-1 > next && itemBacktick == tokens[next] {
 				continue
 			}
-
 			return pos
 		}
 		if 0 < l {
@@ -75,6 +71,5 @@ func (t *Tree) matchCodeSpanEnd(tokens items, num int) (pos int) {
 			pos++
 		}
 	}
-
 	return -1
 }

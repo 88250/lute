@@ -125,8 +125,8 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 	return isASCIILetterNumHyphen(token) || itemDot == token || itemUnderscore == token
 }
 
-func (t *Tree) parseGfmAutoLink(tokens items, protocol string) (ret Node) {
-	tokens = tokens[t.context.pos:]
+func (t *Tree) parseGfmAutoLink(protocol string) (ret Node) {
+	tokens := t.context.tokens[t.context.pos:]
 	index := bytes.Index(tokens, []byte(protocol))
 	if 0 > index {
 		return nil
@@ -336,8 +336,8 @@ func (t *Tree) isValidDomain(domain items) bool {
 	return true
 }
 
-func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
-	tokens = tokens[1:]
+func (t *Tree) parseAutoEmailLink() (ret Node) {
+	tokens := t.context.tokens[1:]
 	var dest string
 	var token byte
 	length := len(tokens)
@@ -393,14 +393,14 @@ func (t *Tree) parseAutoEmailLink(tokens items) (ret Node) {
 	return
 }
 
-func (t *Tree) parseAutolink(tokens items) (ret Node) {
+func (t *Tree) parseAutolink() (ret Node) {
 	schemed := false
 	scheme := ""
 	dest := ""
 	var token byte
 	i := t.context.pos + 1
-	for ; i < len(tokens) && itemGreater != tokens[i]; i++ {
-		token = tokens[i]
+	for ; i < t.context.tokensLen && itemGreater != t.context.tokens[i]; i++ {
+		token = t.context.tokens[i]
 		if itemSpace == token {
 			return nil
 		}
@@ -419,7 +419,7 @@ func (t *Tree) parseAutolink(tokens items) (ret Node) {
 	}
 
 	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), ""}
-	if itemGreater != tokens[i] {
+	if itemGreater != t.context.tokens[i] {
 		return nil
 	}
 

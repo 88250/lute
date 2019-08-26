@@ -32,11 +32,11 @@ type delimiter struct {
 // 嵌套强调和链接的解析算法的中文解读可参考这里 TODO: 文档地址
 
 // handleDelim 将分隔符 *_~ 入栈。
-func (t *Tree) handleDelim(block Node, tokens items) {
+func (t *Tree) handleDelim(block Node) {
 	startPos := t.context.pos
-	delim := t.scanDelims(tokens)
+	delim := t.scanDelims()
 
-	text := tokens[startPos:t.context.pos]
+	text := t.context.tokens[startPos:t.context.pos]
 	node := &Text{tokens: text}
 	block.AppendChild(block, node)
 
@@ -183,21 +183,21 @@ func (t *Tree) processEmphasis(stackBottom *delimiter) {
 	}
 }
 
-func (t *Tree) scanDelims(tokens items) *delimiter {
+func (t *Tree) scanDelims() *delimiter {
 	startPos := t.context.pos
-	token := tokens[startPos]
+	token := t.context.tokens[startPos]
 	delimitersCount := 0
-	for i := t.context.pos; i < len(tokens) && token == tokens[i]; i++ {
+	for i := t.context.pos; i < t.context.tokensLen && token == t.context.tokens[i]; i++ {
 		delimitersCount++
 		t.context.pos++
 	}
 
 	tokenBefore, tokenAfter := itemNewline, itemNewline
 	if 0 != startPos {
-		tokenBefore = tokens[startPos-1]
+		tokenBefore = t.context.tokens[startPos-1]
 	}
-	if len(tokens) > t.context.pos {
-		tokenAfter = tokens[t.context.pos]
+	if t.context.tokensLen > t.context.pos {
+		tokenAfter = t.context.tokens[t.context.pos]
 	}
 
 	var beforeIsPunct, beforeIsWhitespace, afterIsPunct, afterIsWhitespace, canOpen, canClose bool

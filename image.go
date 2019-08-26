@@ -20,10 +20,10 @@ type Image struct {
 }
 
 // parseBang 解析 !，可能是图片标记开始 ![ 也可能是普通文本 !。
-func (t *Tree) parseBang(tokens items) (ret Node) {
+func (t *Tree) parseBang() (ret Node) {
 	var startPos = t.context.pos
 	t.context.pos++
-	if t.context.pos < len(tokens) && itemOpenBracket == tokens[t.context.pos] {
+	if t.context.pos < t.context.tokensLen && itemOpenBracket == t.context.tokens[t.context.pos] {
 		t.context.pos++
 		ret = &Text{tokens: toItems("![")}
 		// 将图片开始标记入栈
