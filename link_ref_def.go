@@ -67,13 +67,12 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	whitespaces, tokens = remains.trimLeft()
 	_, spaces2, tabs2 := whitespaces.statWhitespace()
 	if !tokens.isBlankLine() && 0 < spaces2+tabs2 {
-		title = ""
 		remains = titleLine
 	} else {
 		remains = tokens
 	}
 
-	link := &Link{&BaseNode{typ: NodeLink}, destination, ""}
+	link := &Link{&BaseNode{typ: NodeLink}, destination, nil}
 	lowerCaseLabel := strings.ToLower(label)
 	link.Title = title
 	if _, ok := context.linkRefDef[lowerCaseLabel]; !ok {
@@ -83,12 +82,12 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	return remains
 }
 
-func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, remains items, title string) {
+func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, remains, title items) {
 	if 1 > len(tokens) {
-		return true, nil, tokens, ""
+		return true, nil, tokens, nil
 	}
 	if itemOpenBracket == tokens[0] {
-		return true, nil, tokens, ""
+		return true, nil, tokens, nil
 	}
 
 	validTitle, passed, remains, title = context.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
@@ -98,14 +97,14 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, r
 			validTitle, passed, remains, title = context.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
 		}
 	}
-	if "" != title {
+	if nil != title {
 		title = unescapeString(title)
 	}
 
 	return
 }
 
-func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (validTitle bool, passed, remains items, title string) {
+func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (validTitle bool, passed, remains, title items) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -129,7 +128,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		title += string(r)
+		title = append(title, items(string(r))...)
 		if closer == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			title = title[:len(title)-1]
@@ -138,18 +137,16 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 	}
 
 	if !closed {
-		title = ""
 		passed = nil
 		return
 	}
 
 	validTitle = true
 	remains = tokens[i+1:]
-
 	return
 }
 
-func (context *Context) parseLinkDest(tokens items) (ret, remains items, destination string) {
+func (context *Context) parseLinkDest(tokens items) (ret, remains, destination items) {
 	ret, remains, destination = context.parseLinkDest1(tokens) // <autolink>
 	if nil == ret {
 		ret, remains, destination = context.parseLinkDest2(tokens) // [label](/url)
@@ -161,7 +158,7 @@ func (context *Context) parseLinkDest(tokens items) (ret, remains items, destina
 	return
 }
 
-func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destination string) {
+func (context *Context) parseLinkDest2(tokens items) (ret, remains, destination items) {
 	remains = tokens
 	length := len(tokens)
 	if 1 > length {
@@ -179,7 +176,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 		for j := 1; j < size; j++ {
 			ret = append(ret, tokens[i+j])
 		}
-		destination += string(r)
+		destination = append(destination, items(string(r))...)
 		if isWhitespace(token) || isControl(token) {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
@@ -203,14 +200,13 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains items, destin
 	remains = tokens[i:]
 	if length > i && !isWhitespace(tokens[i]) {
 		ret = nil
-		destination = ""
 		return
 	}
 
 	return
 }
 
-func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destination string) {
+func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination items) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -234,10 +230,9 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 			for j := 1; j < size; j++ {
 				ret = append(ret, tokens[i+j])
 			}
-			destination += string(r)
+			destination = append(destination, items(string(r))...)
 			if itemLess == token && !tokens.isBackslashEscapePunct(i) {
 				ret = nil
-				destination = ""
 				return
 			}
 		}
@@ -251,8 +246,6 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains items, destin
 
 	if !closed {
 		ret = nil
-		destination = ""
-
 		return
 	}
 

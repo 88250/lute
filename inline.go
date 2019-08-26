@@ -227,7 +227,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) Node {
 	// If we got here, open is a potential opener
 	isImage := opener.image
 
-	var dest, title string
+	var dest, title items
 	// Check to see if we have a link/image
 
 	startPos := ctx.pos

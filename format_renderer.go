@@ -114,11 +114,14 @@ func (r *Renderer) renderImageMarkdown(node Node, entering bool) (WalkStatus, er
 	if entering {
 		r.writeString("![")
 		r.write(n.firstChild.Tokens())
-		r.writeString("](" + n.Destination + "")
-		if "" != n.Title {
-			r.writeString(" \"" + n.Title + "\"")
+		r.writeString("](")
+		r.write(n.Destination)
+		if nil != n.Title {
+			r.writeString(" \"")
+			r.write(n.Title)
+			r.writeByte('"')
 		}
-		r.writeString(")")
+		r.writeByte(')')
 	}
 	return WalkContinue, nil
 }
@@ -128,9 +131,12 @@ func (r *Renderer) renderLinkMarkdown(node Node, entering bool) (WalkStatus, err
 		n := node.(*Link)
 		r.writeString("[")
 		r.write(n.firstChild.Tokens()) // FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
-		r.writeString("](" + n.Destination + "")
-		if "" != n.Title {
-			r.writeString(" \"" + n.Title + "\"")
+		r.writeString("](")
+		r.write(n.Destination)
+		if nil != n.Title {
+			r.writeString(" \"")
+			r.write(n.Title)
+			r.writeByte('"')
 		}
 		r.writeString(")")
 	}
@@ -251,7 +257,8 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 			r.writeString(strings.Repeat(" ", listPadding))
 		}
 		r.writeString(strings.Repeat("`", n.fenceLength))
-		r.writeString(n.info + "\n")
+		r.write(n.info)
+		r.writeByte('\n')
 		if 0 < listPadding {
 			lines := n.tokens.split(itemNewline)
 			length := len(lines)

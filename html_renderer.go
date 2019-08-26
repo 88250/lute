@@ -15,8 +15,6 @@ package lute
 import (
 	"bytes"
 	"fmt"
-	"strings"
-
 	"github.com/alecthomas/chroma"
 	chromahtml "github.com/alecthomas/chroma/formatters/html"
 	chromalexers "github.com/alecthomas/chroma/lexers"
@@ -143,7 +141,7 @@ func (r *Renderer) renderImageHTML(node Node, entering bool) (WalkStatus, error)
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			r.write(escapeHTML(toItems(n.Destination)))
+			r.write(escapeHTML(n.Destination))
 			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
@@ -153,9 +151,9 @@ func (r *Renderer) renderImageHTML(node Node, entering bool) (WalkStatus, error)
 	r.disableTags--
 	if 0 == r.disableTags {
 		r.writeString("\"")
-		if "" != n.Title {
+		if nil != n.Title {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(toItems(n.Title)))
+			r.write(escapeHTML(n.Title))
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -166,9 +164,9 @@ func (r *Renderer) renderImageHTML(node Node, entering bool) (WalkStatus, error)
 func (r *Renderer) renderLinkHTML(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*Link)
-		attrs := [][]string{{"href", fromItems(escapeHTML(toItems(n.Destination)))}}
-		if "" != n.Title {
-			attrs = append(attrs, []string{"title", fromItems(escapeHTML(toItems(n.Title)))})
+		attrs := [][]string{{"href", fromItems(escapeHTML(n.Destination))}}
+		if nil != n.Title {
+			attrs = append(attrs, []string{"title", fromItems(escapeHTML(n.Title))})
 		}
 		r.tag("a", attrs, false)
 
@@ -246,16 +244,18 @@ func (r *Renderer) renderCodeBlockHTMl(node Node, entering bool) (WalkStatus, er
 		r.newline()
 		n := node.(*CodeBlock)
 		tokens := n.tokens
-		if "" != n.info {
-			infoWords := strings.Fields(n.info)
+		if nil != n.info {
+			infoWords := bytes.Fields(n.info)
 			language := infoWords[0]
-			r.writeString("<pre><code class=\"language-" + language + "\">")
+			r.writeString("<pre><code class=\"language-")
+			r.write(language)
+			r.writeString("\">")
 			rendered := false
 			if r.option.CodeSyntaxHighlight {
 				codeBlock := fromItems(tokens)
 				var lexer chroma.Lexer
-				if "" != language {
-					lexer = chromalexers.Get(language)
+				if nil != language {
+					lexer = chromalexers.Get(string(language))
 				} else {
 					lexer = chromalexers.Analyse(codeBlock)
 				}

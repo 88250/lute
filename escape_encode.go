@@ -106,23 +106,22 @@ func escapeHTML(html items) (ret items) {
 	return tmp
 }
 
-func unescapeString(str string) string {
-	if "" == str {
-		return str
+func unescapeString(tokens items) (ret items) {
+	if nil == tokens {
+		return
 	}
 
-	str = html.UnescapeString(str) // FIXME: 此处应该用内部的实体转义方式
-	tokens := toItems(str)
+	strStr := html.UnescapeString(string(tokens)) // FIXME: 此处应该用内部的实体转义方式
+	tokens = toItems(strStr)
 	length := len(tokens)
-	retTokens := make(items, 0, length)
+	ret = make(items, 0, length)
 	for i := 0; i < length; i++ {
 		if tokens.isBackslashEscapePunct(i) {
-			retTokens = retTokens[:len(retTokens)-1]
+			ret = ret[:len(ret)-1]
 		}
-		retTokens = append(retTokens, tokens[i])
+		ret = append(ret, tokens[i])
 	}
-
-	return fromItems(retTokens)
+	return
 }
 
 // encodeDestination percent-encodes rawurl, avoiding double encoding.
@@ -131,14 +130,14 @@ func unescapeString(str string) string {
 // - percent-encoded characters (%[0-9a-fA-F]{2});
 // - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
 // Invalid UTF-8 sequences are replaced with U+FFFD.
-func encodeDestination(rawurl string) string {
+func encodeDestination(rawurl items) items {
 	// 鸣谢 https://gitlab.com/golang-commonmark/mdurl
 
 	const hexdigit = "0123456789ABCDEF"
 	var buf bytes.Buffer
 	i := 0
 	for i < len(rawurl) {
-		r, rlen := utf8.DecodeRuneInString(rawurl[i:])
+		r, rlen := utf8.DecodeRune(rawurl[i:])
 		if r >= 0x80 {
 			for j, n := i, i+rlen; j < n; j++ {
 				b := rawurl[j]
@@ -164,7 +163,7 @@ func encodeDestination(rawurl string) string {
 		}
 		i += rlen
 	}
-	return buf.String()
+	return buf.Bytes()
 }
 
 //

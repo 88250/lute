@@ -13,18 +13,17 @@
 package lute
 
 import (
-	"strings"
 	"unicode/utf8"
 )
 
 // Link 描述了链接节点结构。
 type Link struct {
 	*BaseNode
-	Destination string
-	Title       string
+	Destination items
+	Title       items
 }
 
-func (context *Context) parseInlineLink(tokens items) (passed, remains items, destination string) {
+func (context *Context) parseInlineLink(tokens items) (passed, remains, destination items) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
@@ -46,7 +45,6 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains items, de
 			token := tokens[i]
 			if itemNewline == token {
 				passed = nil
-				destination = ""
 				return
 			}
 
@@ -57,7 +55,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains items, de
 					passed = append(passed, tokens[i+j])
 				}
 			}
-			destination += string(r)
+			destination = append(destination, items(string(r))...)
 			if itemGreater == token && !tokens.isBackslashEscapePunct(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
@@ -67,7 +65,6 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains items, de
 
 		if !matchEnd || (length > i && itemCloseParen != tokens[i+1]) {
 			passed = nil
-			destination = ""
 			return
 		}
 
@@ -83,7 +80,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains items, de
 			token := tokens[i]
 			passed = append(passed, token)
 			r, size = utf8.DecodeRune(tokens[i:])
-			destination += string(r)
+			destination = append(destination, []byte(string(r))...)
 			for j := 1; j < size; j++ {
 				passed = append(passed, tokens[i+j])
 			}
@@ -91,7 +88,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains items, de
 			if !destStarted && !isWhitespace(token) && 0 < i {
 				destStarted = true
 				destination = destination[size:]
-				destination = strings.TrimSpace(destination)
+				destination = destination.trim()
 			}
 			if destStarted && (isWhitespace(token) || isControl(token)) {
 				destination = destination[:len(destination)-size]
@@ -113,7 +110,6 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains items, de
 		remains = tokens[i:]
 		if length > i && (itemCloseParen != tokens[i] && itemSpace != tokens[i] && itemNewline != tokens[i]) {
 			passed = nil
-			destination = ""
 			return
 		}
 	}

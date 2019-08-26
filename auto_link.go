@@ -92,7 +92,7 @@ loopPart:
 			// 如果以 . 结尾则剔除该 .
 			lastIndex := len(group) - 1
 			group = group[:lastIndex]
-			link := &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(group), ""}
+			link := &Link{&BaseNode{typ: NodeLink}, append(items("mailto:"), group...), nil}
 			link.AppendChild(link, &Text{tokens: group})
 			node.InsertBefore(node, link)
 			// . 作为文本节点插入
@@ -105,7 +105,7 @@ loopPart:
 			continue loopPart
 		} else {
 			// 以字母或者数字结尾
-			link := &Link{&BaseNode{typ: NodeLink}, "mailto:" + fromItems(group), ""}
+			link := &Link{&BaseNode{typ: NodeLink}, append(items("mailto:"), group...), nil}
 			link.AppendChild(link, &Text{tokens: group})
 			node.InsertBefore(node, link)
 		}
@@ -278,7 +278,7 @@ func (t *Tree) parseGfmAutoLink(protocol string, ctx *InlineContext) (ret Node) 
 		dest = domainPath
 	}
 
-	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(fromItems(dest)), ""}
+	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), nil}
 	ret.AppendChild(ret, &Text{tokens: domainPath})
 	ctx.pos += i
 	return
@@ -387,7 +387,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret Node) {
 	}
 
 	ctx.pos += passed + 1
-	ret = &Link{&BaseNode{typ: NodeLink}, "mailto:" + dest, ""}
+	ret = &Link{&BaseNode{typ: NodeLink}, append(items("mailto:"), dest...), nil}
 	ret.AppendChild(ret, &Text{tokens: toItems(dest)})
 
 	return
@@ -396,7 +396,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret Node) {
 func (t *Tree) parseAutolink(ctx *InlineContext) (ret Node) {
 	schemed := false
 	scheme := ""
-	dest := ""
+	var dest items
 	var token byte
 	i := ctx.pos + 1
 	for ; i < ctx.tokensLen && itemGreater != ctx.tokens[i]; i++ {
@@ -405,7 +405,7 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret Node) {
 			return nil
 		}
 
-		dest += string(token)
+		dest = append(dest, token)
 		if !schemed {
 			if itemColon != token {
 				scheme += string(token)
@@ -418,13 +418,13 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret Node) {
 		return nil
 	}
 
-	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), ""}
+	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), nil}
 	if itemGreater != ctx.tokens[i] {
 		return nil
 	}
 
 	ctx.pos = 1 + i
-	ret.AppendChild(ret, &Text{tokens: toItems(dest)})
+	ret.AppendChild(ret, &Text{tokens: dest})
 
 	return
 }

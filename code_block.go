@@ -12,7 +12,9 @@
 
 package lute
 
-import "strings"
+import (
+	"bytes"
+)
 
 // CodeBlock 描述了代码块节点结构。
 type CodeBlock struct {
@@ -21,7 +23,7 @@ type CodeBlock struct {
 	fenceChar   byte
 	fenceLength int
 	fenceOffset int
-	info        string
+	info        items
 }
 
 func (codeBlock *CodeBlock) Continue(context *Context) int {
@@ -76,7 +78,7 @@ func (codeBlock *CodeBlock) Finalize(context *Context) {
 		firstLine := content[:i]
 		rest := content[i+1:]
 
-		codeBlock.info = unescapeString(strings.TrimSpace(firstLine.string()))
+		codeBlock.info = unescapeString(bytes.TrimSpace(firstLine))
 		codeBlock.tokens = rest
 	} else { // 缩进代码块
 		codeBlock.tokens = codeBlock.tokens.replaceNewlineSpace()
@@ -107,13 +109,12 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 		return nil
 	}
 
-	var info string
+	var info items
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
 	if itemBacktick == marker && infoTokens.contain(itemBacktick) {
 		return nil // info 部分不能包含 `
 	}
-	info = infoTokens.trim().string()
-
+	info = bytes.TrimSpace(infoTokens)
 	info = unescapeString(info)
 	ret = &CodeBlock{&BaseNode{typ: NodeCodeBlock, tokens: make(items, 0, 256)},
 		true, fenceChar, fenceLength, t.context.indent, info}
