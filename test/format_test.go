@@ -65,7 +65,7 @@ func TestFormat(t *testing.T) {
 }
 
 func TestFormatCase1(t *testing.T) {
-	caseName := "fmt-case1.md"
+	caseName := "format-case1.md"
 
 	bytes, err := ioutil.ReadFile(caseName)
 	if nil != err {
