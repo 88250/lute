@@ -275,6 +275,7 @@ Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://git
 * [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
 * Lute 使用指南
 * CommonMark 规范要点解读
+* Lute 实现后记
 
 目前大部分文档都是中文的，欢迎外文好的同学帮忙进行国际化。
 
