@@ -357,13 +357,13 @@ func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus,
 func (r *Renderer) renderTaskListItemMarkerMarkdown(node Node, entering bool) (WalkStatus, error) {
 	if entering {
 		n := node.(*TaskListItemMarker)
-		r.writeString("[")
+		r.writeByte('[')
 		if n.checked {
 			r.writeByte('X')
 		} else {
 			r.writeByte(' ')
 		}
-		r.writeString("]")
+		r.writeByte(']')
 	}
 	return WalkContinue, nil
 }

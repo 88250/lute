@@ -111,7 +111,7 @@ func unescapeString(tokens items) (ret items) {
 		return
 	}
 
-	strStr := html.UnescapeString(string(tokens)) // FIXME: 此处应该用内部的实体转义方式
+	strStr := html.UnescapeString(fromItems(tokens)) // FIXME: 此处应该用内部的实体转义方式
 	tokens = toItems(strStr)
 	length := len(tokens)
 	ret = make(items, 0, length)
