@@ -202,12 +202,12 @@ func main() {
 这两段 Markdown 文本在语义上完全一致，格式化后的文本更清晰易读。在需要公共编辑的场景下，统一的排版风格能让大家更容易协作。
 （感谢并致敬 gofmt）
 
-## 术语修正
+## ✍️术语修正
 
 Markdown 原文：
 
 ```markdown
-在github上做开源项目是一件很开心的事情，请不要把Github拼写成`github`哦\n
+在github上做开源项目是一件很开心的事情，请不要把Github拼写成`github`哦！
 ```
 
 修正后：
