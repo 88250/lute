@@ -111,7 +111,7 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 
 	var info items
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
-	if itemBacktick == marker && infoTokens.contain(itemBacktick) {
+	if itemBacktick == marker && bytes.Contains(infoTokens, []byte{itemBacktick}) {
 		return nil // info 部分不能包含 `
 	}
 	info = bytes.TrimSpace(infoTokens)

@@ -239,20 +239,20 @@ func (r *Renderer) renderCodeSpanMarkdown(node Node, entering bool) (WalkStatus,
 }
 
 func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus, error) {
-	listPadding := 0
-	if grandparent := node.Parent().Parent(); nil != grandparent {
-		if list, ok := grandparent.(*List); ok { // List.ListItem.CodeBlock
-			if node.Parent().FirstChild() != node {
-				listPadding = list.padding
-			}
-		}
-	}
-
 	n := node.(*CodeBlock)
 	if !n.isFenced {
 		n.fenceLength = 3
 	}
 	if entering {
+		listPadding := 0
+		if grandparent := node.Parent().Parent(); nil != grandparent {
+			if list, ok := grandparent.(*List); ok { // List.ListItem.CodeBlock
+				if node.Parent().FirstChild() != node {
+					listPadding = list.padding
+				}
+			}
+		}
+
 		r.newline()
 		if 0 < listPadding {
 			r.writeString(strings.Repeat(" ", listPadding))
@@ -273,14 +273,9 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 		} else {
 			r.write(n.tokens)
 		}
-
-		r.newline()
 		return WalkSkipChildren, nil
 	}
 
-	if 0 < listPadding {
-		r.writeString(strings.Repeat(" ", listPadding))
-	}
 	r.writeString(strings.Repeat("`", n.fenceLength))
 	r.writeString("\n\n")
 	return WalkContinue, nil

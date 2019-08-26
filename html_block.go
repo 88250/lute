@@ -43,6 +43,9 @@ func (html *HTMLBlock) AcceptLines() bool {
 }
 
 var htmlBlockTags1, htmlBlockCloseTags1, htmlBlockTags6 []items
+var htmlBlockEqual = []byte{itemEqual}
+var htmlBlockSinglequote = []byte{itemSinglequote}
+var htmlBlockDoublequote = []byte{itemDoublequote}
 
 func init() {
 	var tags = []string{"<script", "<pre", "<style"}
@@ -81,7 +84,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 			}
 		}
 	case 4:
-		return tokens.contain(itemGreater)
+		return bytes.Contains(tokens, []byte{itemGreater})
 	case 5:
 		for i := 0; i < length-2; i++ {
 			if itemCloseBracket == tokens[i] && itemCloseBracket == tokens[i+1] {
@@ -230,7 +233,7 @@ func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 			continue
 		}
 
-		nameAndValue := bytes.Split(attr, []byte{itemEqual})
+		nameAndValue := bytes.Split(attr, htmlBlockEqual)
 		name := nameAndValue[0]
 		if !isASCIILetter(name[0]) && itemUnderscore != name[0] && itemColon != name[0] {
 			return
@@ -247,18 +250,17 @@ func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 
 		if 1 < len(nameAndValue) {
 			value := nameAndValue[1]
-			if bytes.HasPrefix(value, []byte{itemSinglequote}) && bytes.HasSuffix(value, []byte{itemSinglequote}) {
+			if bytes.HasPrefix(value, htmlBlockSinglequote) && bytes.HasSuffix(value, htmlBlockSinglequote) {
 				value = value[1:]
 				value = value[:len(value)-1]
-				return !bytes.Contains(value, []byte{itemSinglequote})
+				return !bytes.Contains(value, htmlBlockSinglequote)
 			}
-			if bytes.HasPrefix(value, []byte{itemDoublequote}) && bytes.HasSuffix(value, []byte{itemDoublequote}) {
+			if bytes.HasPrefix(value, htmlBlockDoublequote) && bytes.HasSuffix(value, htmlBlockDoublequote) {
 				value = value[1:]
 				value = value[:len(value)-1]
-				return !bytes.Contains(value, []byte{itemDoublequote})
+				return !bytes.Contains(value, htmlBlockDoublequote)
 			}
-			v := items(value)
-			return !v.containWhitespace() && !v.containOne(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick)
+			return !bytes.ContainsAny(value, " \t\n") && !bytes.ContainsAny(value, "\"'=<>`")
 		}
 	}
 	return true

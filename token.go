@@ -253,35 +253,6 @@ func (tokens items) acceptTokens(someTokens items) (pos int) {
 	return
 }
 
-func (tokens items) containOne(someTokens ...byte) bool {
-	for _, t := range tokens {
-		for _, it := range someTokens {
-			if t == it {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func (tokens items) contain(anotherToken byte) bool {
-	for _, t := range tokens {
-		if t == anotherToken {
-			return true
-		}
-	}
-	return false
-}
-
-func (tokens items) containWhitespace() bool {
-	for _, token := range tokens {
-		if isWhitespace(token) {
-			return true
-		}
-	}
-	return false
-}
-
 func (tokens items) isBlankLine() bool {
 	for _, token := range tokens {
 		if itemSpace != token && itemTab != token && itemNewline != token {
