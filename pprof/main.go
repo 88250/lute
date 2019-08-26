@@ -27,8 +27,9 @@ func main() {
 		panic(err)
 	}
 
-	luteEngine := lute.New(lute.GFM(false), // 不开启 GFM 支持
-		lute.CodeSyntaxHighlight(false),    // 不开启语法高亮
+	luteEngine := lute.New(lute.GFM(false),
+		lute.CodeSyntaxHighlight(false),
+		lute.AutoSpace(false),
 	)
 
 	cpuProfile, _ := os.Create("pprof/cpu_profile")
