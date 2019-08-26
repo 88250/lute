@@ -141,22 +141,6 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	return
 }
 
-// split 使用 separator 作为分隔符将 tokens 切分为两个子串（仅分隔一次）。
-func (tokens items) split(separator byte) (ret []items) {
-	ret = append(ret, items{})
-	var i int
-	var token byte
-	for i, token = range tokens {
-		if separator == token {
-			ret = append(ret, items{})
-			ret[1] = append(ret[1], tokens[i+1:]...)
-			return
-		}
-		ret[0] = append(ret[0], token)
-	}
-	return
-}
-
 // lines 会使用 \n 对 tokens 进行分隔转行。
 func (tokens items) lines() (ret []items) {
 	length := len(tokens)
@@ -217,44 +201,6 @@ func (tokens items) replaceNewlineSpace() items {
 	return tokens
 }
 
-func (tokens items) equal(anotherTokens items) bool {
-	if len(tokens) != len(anotherTokens) {
-		return false
-	}
-
-	for i, token := range tokens {
-		if token != anotherTokens[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func (tokens items) string() string {
-	return fromItems(tokens)
-}
-
-func (tokens items) trimLeftSpace() (spaces int, remains items) {
-	length := len(tokens)
-	if 1 > length {
-		return 0, tokens
-	}
-
-	i := 0
-	for ; i < length; i++ {
-		if itemSpace == tokens[i] {
-			spaces++
-		} else if itemTab == tokens[i] {
-			spaces += 4
-		} else {
-			break
-		}
-	}
-
-	remains = tokens[i:]
-	return
-}
-
 func (tokens items) trimLeft() (whitespaces, remains items) {
 	length := len(tokens)
 	if 1 > length {
@@ -270,30 +216,6 @@ func (tokens items) trimLeft() (whitespaces, remains items) {
 		}
 	}
 	return whitespaces, tokens[i:]
-}
-
-func (tokens items) trimRight() items {
-	length := len(tokens)
-	if 1 > length {
-		return tokens
-	}
-
-	i := length - 1
-	for ; 0 <= i; i-- {
-		if !isWhitespace(tokens[i]) {
-			break
-		}
-	}
-	return tokens[:i+1]
-}
-
-func (tokens items) firstNonSpace() (index int, token byte) {
-	for index, token = range tokens {
-		if itemSpace != token {
-			return
-		}
-	}
-	return
 }
 
 func (tokens items) accept(token byte) (pos int) {

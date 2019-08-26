@@ -12,7 +12,10 @@
 
 package lute
 
-import "github.com/b3log/gulu"
+import (
+	"bytes"
+	"github.com/b3log/gulu"
+)
 
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
 func parse(name string, markdown []byte, option options) (t *Tree, err error) {
@@ -159,7 +162,7 @@ func (context *Context) addChild(child Node) {
 func (context *Context) listsMatch(listData, itemData *listData) bool {
 	return listData.typ == itemData.typ &&
 		listData.delimiter == itemData.delimiter &&
-		listData.bulletChar.equal(itemData.bulletChar)
+		bytes.Equal(listData.bulletChar, itemData.bulletChar)
 }
 
 // Tree 描述了 Markdown 抽象语法树结构。

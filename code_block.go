@@ -130,11 +130,11 @@ func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker byte, num
 	if num > tokens.accept(closeMarker) {
 		return false
 	}
-	for _, token := range tokens.trim() {
+	tokens = bytes.TrimSpace(tokens)
+	for _, token := range tokens {
 		if token != openMarker {
 			return false
 		}
 	}
-
 	return true
 }

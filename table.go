@@ -12,6 +12,8 @@
 
 package lute
 
+import "bytes"
+
 // Table 描述了表节点结构。
 type Table struct {
 	*BaseNode
@@ -41,12 +43,12 @@ func (context *Context) parseTable(lines []items) (ret *Table) {
 		return
 	}
 
-	aligns := context.parseTableDelimRow(lines[1].trim())
+	aligns := context.parseTableDelimRow(bytes.TrimSpace(lines[1]))
 	if nil == aligns {
 		return
 	}
 
-	headRow := context.parseTableRow(lines[0].trim(), aligns, true)
+	headRow := context.parseTableRow(bytes.TrimSpace(lines[0]), aligns, true)
 	if nil == headRow {
 		return
 	}
@@ -55,7 +57,7 @@ func (context *Context) parseTable(lines []items) (ret *Table) {
 	ret.Aligns = aligns
 	ret.AppendChild(ret, context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
-		tableRow := context.parseTableRow(lines[i].trim(), aligns, false)
+		tableRow := context.parseTableRow(bytes.TrimSpace(lines[i]), aligns, false)
 		if nil == tableRow {
 			return
 		}
@@ -93,7 +95,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	var i int
 	var col items
 	for ; i < colsLen && i < alignsLen; i++ {
-		col = cols[i].trim()
+		col = bytes.TrimSpace(cols[i])
 		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
 		col = col.removeFirst(itemBackslash) // 删掉一个反斜杠来恢复语义
 		cell.tokens = col
@@ -135,7 +137,7 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 
 	var alignments []int
 	for _, col := range cols {
-		col = col.trim()
+		col = bytes.TrimSpace(col)
 		if 1 > length {
 			return nil
 		}

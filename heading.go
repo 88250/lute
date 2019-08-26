@@ -12,6 +12,8 @@
 
 package lute
 
+import "bytes"
+
 // Heading 描述了标题节点结构。
 type Heading struct {
 	*BaseNode
@@ -43,8 +45,8 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 	}
 
 	heading := &Heading{&BaseNode{typ: NodeHeading}, level}
-	_, tokens = tokens.trimLeft()
-	_, tokens = tokens[level:].trimLeft()
+	tokens = bytes.TrimLeft(tokens, " \t\n")
+	tokens = bytes.TrimLeft(tokens[level:], " \t\n")
 	for _, token := range tokens {
 		if itemEnd == token || itemNewline == token {
 			break
@@ -53,7 +55,7 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 		heading.tokens = append(heading.tokens, token)
 	}
 
-	heading.tokens = heading.tokens.trimRight()
+	heading.tokens = bytes.TrimRight(heading.tokens, " \t\n")
 	closingCrosshatchIndex := len(heading.tokens) - 1
 	for ; 0 <= closingCrosshatchIndex; closingCrosshatchIndex-- {
 		if itemCrosshatch == heading.tokens[closingCrosshatchIndex] {
@@ -72,7 +74,7 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 		heading.tokens = nil
 	} else if 0 < closingCrosshatchIndex {
 		heading.tokens = heading.tokens[:closingCrosshatchIndex]
-		heading.tokens = heading.tokens.trimRight()
+		heading.tokens = bytes.TrimRight(heading.tokens, " \t\n")
 	}
 
 	ret = heading

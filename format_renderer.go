@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
 )
@@ -260,7 +261,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 		r.write(n.info)
 		r.writeByte('\n')
 		if 0 < listPadding {
-			lines := n.tokens.split(itemNewline)
+			lines := bytes.Split(n.tokens, []byte{itemNewline})
 			length := len(lines)
 			for i, line := range lines {
 				r.writeString(strings.Repeat(" ", listPadding))

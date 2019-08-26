@@ -12,6 +12,8 @@
 
 package lute
 
+import "bytes"
+
 // Paragraph 描述了段落节点结构。
 type Paragraph struct {
 	*BaseNode
@@ -29,7 +31,7 @@ func (p *Paragraph) Continue(context *Context) int {
 }
 
 func (p *Paragraph) Finalize(context *Context) {
-	p.tokens = p.tokens.trim()
+	p.tokens = bytes.TrimSpace(p.tokens)
 
 	// 尝试解析链接引用定义
 	hasReferenceDefs := false

@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"unicode/utf8"
 )
 
@@ -88,7 +89,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 			if !destStarted && !isWhitespace(token) && 0 < i {
 				destStarted = true
 				destination = destination[size:]
-				destination = destination.trim()
+				destination = bytes.TrimSpace(destination)
 			}
 			if destStarted && (isWhitespace(token) || isControl(token)) {
 				destination = destination[:len(destination)-size]

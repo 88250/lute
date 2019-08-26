@@ -12,6 +12,8 @@
 
 package lute
 
+import "bytes"
+
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
@@ -236,7 +238,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				if value := container.Tokens(); 0 < len(value) {
-					heading.tokens = value.trim()
+					heading.tokens = bytes.TrimSpace(value)
 					container.InsertAfter(container, heading)
 					container.Unlink()
 					t.context.tip = heading

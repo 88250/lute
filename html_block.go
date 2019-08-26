@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"strings"
 )
 
@@ -34,7 +35,7 @@ func (html *HTMLBlock) Continue(context *Context) int {
 }
 
 func (html *HTMLBlock) Finalize(context *Context) {
-	html.tokens = html.tokens.replaceNewlineSpace().trimRight()
+	html.tokens = bytes.TrimRight(html.tokens.replaceNewlineSpace(), " \t\n")
 }
 
 func (html *HTMLBlock) AcceptLines() bool {
@@ -93,7 +94,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 }
 
 func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
-	_, tokens = tokens.trimLeft()
+	tokens = bytes.TrimLeft(tokens, " \t\n")
 	length := len(tokens)
 	if 3 > length { // at least <? and a newline
 		return nil
@@ -122,7 +123,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 		}
 	}
 
-	tag := tokens.trim()
+	tag := bytes.TrimSpace(tokens)
 	isOpenTag := t.isOpenTag(tag)
 	if isOpenTag && t.context.tip.Type() != NodeParagraph {
 		ret.hType = 7
@@ -134,7 +135,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 		return
 	}
 
-	rawText := tokens.string()
+	rawText := fromItems(tokens)
 	if 0 == strings.Index(rawText, "<!--") {
 		ret.hType = 2
 		return
@@ -229,7 +230,7 @@ func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 			continue
 		}
 
-		nameAndValue := attr.split(itemEqual)
+		nameAndValue := bytes.Split(attr, []byte{itemEqual})
 		name := nameAndValue[0]
 		if !isASCIILetter(name[0]) && itemUnderscore != name[0] && itemColon != name[0] {
 			return
@@ -246,24 +247,25 @@ func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 
 		if 1 < len(nameAndValue) {
 			value := nameAndValue[1]
-			if value.startWith(itemSinglequote) && value.endWith(itemSinglequote) {
+			if bytes.HasPrefix(value, []byte{itemSinglequote}) && bytes.HasSuffix(value, []byte{itemSinglequote}) {
 				value = value[1:]
 				value = value[:len(value)-1]
-				return !value.contain(itemSinglequote)
+				return !bytes.Contains(value, []byte{itemSinglequote})
 			}
-			if value.startWith(itemDoublequote) && value.endWith(itemDoublequote) {
+			if bytes.HasPrefix(value, []byte{itemDoublequote}) && bytes.HasSuffix(value, []byte{itemDoublequote}) {
 				value = value[1:]
 				value = value[:len(value)-1]
-				return !value.contain(itemDoublequote)
+				return !bytes.Contains(value, []byte{itemDoublequote})
 			}
-			return !value.containWhitespace() && !value.containOne(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick)
+			v := items(value)
+			return !v.containWhitespace() && !v.containOne(itemSinglequote, itemDoublequote, itemEqual, itemLess, itemGreater, itemBacktick)
 		}
 	}
 	return true
 }
 
 func (t *Tree) isCloseTag(tokens items) bool {
-	tokens = tokens.trim()
+	tokens = bytes.TrimSpace(tokens)
 	length := len(tokens)
 	if 4 > length {
 		return false

@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"html"
 	"strings"
 	"sync"
@@ -169,7 +170,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret Node) {
 		}
 	}
 
-	entityName := ctx.tokens[start:i].string()
+	entityName := fromItems(ctx.tokens[start:i])
 	if entityValue, ok := htmlEntities[entityName]; ok { // 通过查表优化
 		ctx.pos += i - start
 		return &Text{tokens: toItems(entityValue)}
@@ -415,7 +416,7 @@ func (t *Tree) parseNewline(block Node, ctx *InlineContext) (ret Node) {
 		if text, ok := lastc.(*Text); ok {
 			tokens := text.tokens
 			if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
-				lastc.SetTokens(tokens.trimRight())
+				lastc.SetTokens(bytes.TrimRight(tokens, " \t\n"))
 				if 1 < valueLen {
 					hardbreak = itemSpace == tokens[len(tokens)-2]
 				}
