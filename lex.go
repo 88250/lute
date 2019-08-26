@@ -47,8 +47,6 @@ func (l *lexer) nextLine() (line items) {
 				if itemNewline == nb {
 					l.input = append(l.input[:i], l.input[i+1:]...) // 移除 \r，依靠下一个的 \n 切行
 					l.length--                                      // 重新计算总长
-				} else {
-					l.input[i] = itemNewline // 将 \r 替换为 \n
 				}
 			}
 			i++
