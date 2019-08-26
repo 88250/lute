@@ -140,7 +140,6 @@ func (r *Renderer) renderLinkMarkdown(node Node, entering bool) (WalkStatus, err
 		}
 		r.writeByte(')')
 	}
-
 	return WalkContinue, nil
 }
 
