@@ -207,28 +207,32 @@ func main() {
 在相同机器上，用相同的测试数据（[CommonMark 规范文档](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K）跑基准测试结果如下。  
 目前看来在实现 CommonMark 规范的前提下，Lute、goldmark 和 golang-commonmark 的性能差距不大，Blackfriday 没有实现 CommonMark 所以性能更好一些。
 
+注：
+1. 跑测试时已经将各个库的支持调整到仅支持 CommonMark 上，即关闭 GFM、Typographer 等扩展支持 
+2. Lute 在多核平台上有一定的性能优势，因为 Lute 的行级解析是并行处理的
+
 ### [Lute](https://github.com/b3log/lute)
 
 ```
-BenchmarkLute-2   	     300	   5199424 ns/op	 2951987 B/op	   22567 allocs/op
-BenchmarkLute-4   	     300	   4963289 ns/op	 2952282 B/op	   22567 allocs/op
-BenchmarkLute-8   	     300	   5039851 ns/op	 2952783 B/op	   22568 allocs/op
+BenchmarkLute-2   	     300	   5392343 ns/op	 3111557 B/op	   24482 allocs/op
+BenchmarkLute-4   	     300	   4487989 ns/op	 3112817 B/op	   24497 allocs/op
+BenchmarkLute-8   	     300	   4285201 ns/op	 3114240 B/op	   24511 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
 
 ```
-BenchmarkGoldMark-2   	     300	   4757269 ns/op	 2110741 B/op	   13901 allocs/op
-BenchmarkGoldMark-4   	     300	   4790514 ns/op	 2113679 B/op	   13902 allocs/op
-BenchmarkGoldMark-8   	     300	   4860327 ns/op	 2114696 B/op	   13902 allocs/op
+BenchmarkGoldMark-2   	     300	   5126286 ns/op	 2104060 B/op	   13855 allocs/op
+BenchmarkGoldMark-4   	     300	   5053149 ns/op	 2106974 B/op	   13856 allocs/op
+BenchmarkGoldMark-8   	     300	   5006604 ns/op	 2107715 B/op	   13856 allocs/op
 ```
 
 ### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
 
 ```
-BenchmarkGolangCommonMark-2   	     300	   5099691 ns/op	 2973258 B/op	   18827 allocs/op
-BenchmarkGolangCommonMark-4   	     300	   5083059 ns/op	 2973794 B/op	   18828 allocs/op
-BenchmarkGolangCommonMark-8   	     300	   5103111 ns/op	 2974818 B/op	   18828 allocs/op
+BenchmarkGolangCommonMark-2   	     300	   4640915 ns/op	 3143402 B/op	   18410 allocs/op
+BenchmarkGolangCommonMark-4   	     300	   4707406 ns/op	 3170133 B/op	   18414 allocs/op
+BenchmarkGolangCommonMark-8   	     300	   4817218 ns/op	 3179642 B/op	   18415 allocs/op
 ```
 
 ### [Blackfriday](https://github.com/russross/blackfriday)

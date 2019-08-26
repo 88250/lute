@@ -20,16 +20,14 @@ import (
 
 // parseInlines 解析并生成行级节点。
 func (t *Tree) parseInlines() {
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	t.walkParseInline(t.Root, wg)
-	wg.Wait()
+	t.walkParseInline(t.Root, nil)
 }
 
 // walkParseInline 解析生成节点 node 的行级子节点。
 func (t *Tree) walkParseInline(node Node, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+	if nil != wg {
+		defer wg.Done()
+	}
 	if nil == node {
 		return
 	}
@@ -72,7 +70,7 @@ func (t *Tree) walkParseInline(node Node, wg *sync.WaitGroup) {
 		return
 	}
 
-	// 深度优先遍历处理子节点
+	// 遍历处理子节点，通过并行处理提升性能
 	var children []Node
 	for child := node.FirstChild(); nil != child; child = child.Next() {
 		children = append(children, child)
@@ -83,7 +81,6 @@ func (t *Tree) walkParseInline(node Node, wg *sync.WaitGroup) {
 		go t.walkParseInline(child, cwg)
 	}
 	cwg.Wait()
-
 }
 
 // parseInline 解析并生成块节点 block 的行级子节点。
