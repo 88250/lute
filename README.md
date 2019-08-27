@@ -277,10 +277,38 @@ Lute 承载了[黑客派](https://hacpai.com)上的所有 Markdown 处理，每�
 Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://github.github.com/gfm/#disallowed-raw-html-extension-)，因为该扩展还是存在一定漏洞（比如没有处理 `<input>`）。
 建议通过其他库（比如 [bluemonday](https://github.com/microcosm-cc/bluemonday)）来进行 HTML 安全过滤，这样也能更好地适配应用场景。
 
+## 使用
+
+引入 Lute 库：
+```shell
+go get -u github.com/b3log/lute
+```
+
+最小化可工作示例：
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/b3log/lute"
+)
+
+func main() {
+	luteEngine := lute.New() // 默认已经启用 GFM 支持以及中文优化
+	html, err := luteEngine.MarkdownStr("demo", "**Lute**")
+	if nil != err {
+		panic(err)
+	}
+	fmt.Println(html)
+	// <p><strong>Lute</strong></p>
+}
+```
+
 ## 📜 文档
 
 * [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
-* Lute 使用指南
 * CommonMark 规范要点解读
 * Lute 实现后记
 
