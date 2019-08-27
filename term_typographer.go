@@ -28,6 +28,7 @@ func fixTermTypo(str string) string {
 }
 
 // terms 定义了术语字典，用于术语拼写修正。
+// TODO: 考虑提供接口支持开发者添加
 var terms = map[string]string{
 	"ipfs":          "IPFS",
 	"saas":          "SaaS",
