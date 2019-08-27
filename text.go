@@ -51,33 +51,18 @@ func (t *Tree) mergeText(node Node) {
 			}
 
 			if t.context.option.AutoSpace {
-				// 中文排版优化：中西文间插入一个空格
 				text := fromItems(child.Tokens())
 				text = space(text)
 				child.SetTokens(toItems(text))
 			}
 
 			if t.context.option.FixTermTypo {
-				// 术语修正
 				text := fromItems(child.Tokens())
 				text = fixTermTypo(text)
 				child.SetTokens(toItems(text))
 			}
-
-			if NodeLink != child.Parent().Type() {
-				if t.context.option.GFMAutoLink {
-					// 处理 GFM 自动邮件链接
-					t.parseGfmAutoEmailLink(child)
-				}
-
-				if t.context.option.GFMAutoLink {
-					// 处理 GFM 自动链接
-					t.parseGfmAutoLink(child)
-				}
-			}
 		} else {
-			// 递归处理子节点
-			t.mergeText(child)
+			t.mergeText(child) // 递归处理子节点
 		}
 		child = next
 	}

@@ -17,8 +17,33 @@ import (
 	"strings"
 )
 
-// parseGfmAutoEmailLink 解析 node 文本节点中的 tokens，如果有邮件地址则生成链接节点并插入到 node 之前或者之后。
-func (t *Tree) parseGfmAutoEmailLink(node Node) {
+func (t *Tree) parseGFMAutoEmailLink(node Node) {
+	for child := node.FirstChild(); nil != child; {
+		next := child.Next()
+		if NodeText == child.Type() &&
+			NodeLink != child.Parent().Type() /* 不处理链接 label */ {
+			t.parseGFMAutoEmailLink0(child)
+		} else {
+			t.parseGFMAutoEmailLink(child) // 递归处理子节点
+		}
+		child = next
+	}
+}
+
+func (t *Tree) parseGFMAutoLink(node Node) {
+	for child := node.FirstChild(); nil != child; {
+		next := child.Next()
+		if NodeText == child.Type() &&
+			NodeLink != child.Parent().Type() /* 不处理链接 label */ {
+			t.parseGFMAutoLink0(child)
+		} else {
+			t.parseGFMAutoLink(child) // 递归处理子节点
+		}
+		child = next
+	}
+}
+
+func (t *Tree) parseGFMAutoEmailLink0(node Node) {
 	tokens := node.Tokens()
 	if 0 >= bytes.Index(tokens, []byte("@")) {
 		return
@@ -78,8 +103,7 @@ loopPart:
 		}
 
 		k++ // 跳过 @ 检查后面的部分
-		length := len(group)
-		for ; k < length; k++ {
+		for ; k < len(group); k++ {
 			token = group[k]
 			if !t.isValidEmailSegment2(token) {
 				text := &Text{tokens: group}
@@ -124,13 +148,14 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 	return isASCIILetterNumHyphen(token) || itemDot == token || itemUnderscore == token
 }
 
-func (t *Tree) parseGfmAutoLink(node Node) {
+func (t *Tree) parseGFMAutoLink0(node Node) {
 	tokens := node.Tokens()
 
 	var i, j, k int
 	length := len(tokens)
 	var token byte
 	var consumed items
+	www := false
 	for i < length {
 		token = tokens[i]
 		var protocol items
@@ -139,6 +164,7 @@ func (t *Tree) parseGfmAutoLink(node Node) {
 		tmp := tokens[i:]
 		if bytes.HasPrefix(tmp, []byte("www.")) {
 			protocol = items("http://")
+			www = true
 		} else if bytes.HasPrefix(tmp, []byte("http://")) {
 			protocol = items("http://")
 			i += 7
@@ -157,6 +183,7 @@ func (t *Tree) parseGfmAutoLink(node Node) {
 		if 0 < len(consumed) {
 			text := &Text{tokens: consumed}
 			node.InsertBefore(node, text)
+			consumed = items{}
 		}
 
 		var url items
@@ -185,7 +212,7 @@ func (t *Tree) parseGfmAutoLink(node Node) {
 		i = j
 
 		k = 0
-		for ; k < j; k++ {
+		for ; k < len(url); k++ {
 			token = url[k]
 			if itemSlash == token {
 				break
@@ -201,7 +228,7 @@ func (t *Tree) parseGfmAutoLink(node Node) {
 		var openParens, closeParens int
 		// 最后一个字符如果是标点符号则剔掉
 		path := url[k:]
-		length = len(path)
+		length := len(path)
 		if 0 < length {
 			var l int
 			// 统计圆括号个数
@@ -283,7 +310,11 @@ func (t *Tree) parseGfmAutoLink(node Node) {
 		dest := protocol
 		dest = append(dest, domain...)
 		dest = append(dest, path...)
-		addr := domain
+		var addr items
+		if !www {
+			addr = append(addr, protocol...)
+		}
+		addr = append(addr, domain...)
 		addr = append(addr, path...)
 
 		link := &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), nil}
