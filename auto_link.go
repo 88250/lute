@@ -31,7 +31,7 @@ func (t *Tree) parseGfmAutoEmailLink(node Node) {
 	// 按空白分隔成多组并进行处理
 loopPart:
 	for i < length {
-		group := items{}
+		var group items
 		atIndex = 0
 		j = i
 
@@ -52,7 +52,7 @@ loopPart:
 			// 说明积攒组时第一个字符就是空白符，那就把这个空白符作为一个文本节点插到前面
 			text := &Text{tokens: items{token}}
 			node.InsertBefore(node, text)
-			i++ // 继续下一个字符
+			i++
 			continue
 		}
 
@@ -113,7 +113,6 @@ loopPart:
 
 	// 处理完后传入的文本节点 node 已经被拆分为多个节点，所以可以移除自身
 	node.Unlink()
-
 	return
 }
 
@@ -125,167 +124,185 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 	return isASCIILetterNumHyphen(token) || itemDot == token || itemUnderscore == token
 }
 
-func (t *Tree) parseGfmAutoLink(protocol string, ctx *InlineContext) (ret Node) {
-	tokens := ctx.tokens[ctx.pos:]
-	index := bytes.Index(tokens, []byte(protocol))
-	if 0 > index {
-		return nil
-	}
+func (t *Tree) parseGfmAutoLink(node Node) {
+	tokens := node.Tokens()
 
-	var i int
-	if 0 < index {
-		// 检查是否有潜在的标记，有的话处理标记优先
-		for ; i < index; i++ {
-			if t.isMarker(tokens[i]) {
+	var i, j, k int
+	length := len(tokens)
+	var token byte
+	var consumed items
+	for i < length {
+		token = tokens[i]
+		var protocol items
+
+		// 检查前缀
+		tmp := tokens[i:]
+		if bytes.HasPrefix(tmp, []byte("www.")) {
+			protocol = items("http://")
+		} else if bytes.HasPrefix(tmp, []byte("http://")) {
+			protocol = items("http://")
+			i += 7
+		} else if bytes.HasPrefix(tmp, []byte("https://")) {
+			protocol = items("https://")
+			i += 8
+		} else if bytes.HasPrefix(tmp, []byte("ftp://")) {
+			protocol = items("ftp://")
+			i += 6
+		} else {
+			consumed = append(consumed, token)
+			i++
+			continue
+		}
+
+		if 0 < len(consumed) {
+			text := &Text{tokens: consumed}
+			node.InsertBefore(node, text)
+		}
+
+		var url items
+		j = i
+		for ; j < length; j++ {
+			token = tokens[j]
+			// 链接以空白或者 < 断开
+			if isWhitespace(token) || itemLess == token {
+				break
+			}
+			// 非标点符号非数字字母断开
+			if !isPunct(token) && !isASCIILetterNum(token) {
+				break
+			}
+			url = append(url, token)
+		}
+		if i == j { // 第一个字符就断开了
+			url = append(url, token)
+			text := &Text{tokens: url}
+			node.InsertBefore(node, text)
+			i++
+			continue
+		}
+
+		// 移动主循环下标
+		i = j
+
+		k = 0
+		for ; k < j; k++ {
+			token = url[k]
+			if itemSlash == token {
 				break
 			}
 		}
-		// 将标记出现之前的部分构造为文本节点
-		ctx.pos += i
-		return &Text{tokens: tokens[:i]}
-	}
-
-	length := len(tokens)
-	var token byte
-	for ; i < length; i++ {
-		token = tokens[i]
-		// 链接以空白或者 < 截断
-		if isWhitespace(token) || itemLess == token {
-			break
+		domain := url[:k]
+		if !t.isValidDomain(domain) {
+			text := &Text{tokens: url}
+			node.InsertBefore(node, text)
+			continue
 		}
 
-		// 非标点符号非数字字母断开
-		if !isPunct(token) && !isASCIILetterNum(token) {
-			break
-		}
-	}
-
-	www := "www." == protocol
-
-	url := tokens[:i]
-	length = len(url)
-	var j int
-	if !www {
-		j = len(protocol)
-	}
-	for ; j < length; j++ {
-		token = url[j]
-		if itemSlash == token {
-			break
-		}
-	}
-	domain := url[:j]
-	if !www {
-		domain = domain[len(protocol):]
-	}
-
-	if !t.isValidDomain(domain) {
-		ctx.pos += i
-		return &Text{tokens: url}
-	}
-
-	var openParens, closeParens int
-	// 最后一个字符如果是标点符号则剔掉
-	path := url[j:]
-	length = len(path)
-	if 0 < length {
-		var k int
-		// 统计圆括号个数
-		for k = 0; k < length; k++ {
-			token = path[k]
-			if itemOpenParen == token {
-				openParens++
-			} else if itemCloseParen == token {
-				closeParens++
-			}
-		}
-
-		trimmed := false
-		lastToken := path[length-1]
-		if itemCloseParen == lastToken {
-			// 以 ) 结尾的话需要计算圆括号匹配
-			unmatches := closeParens - openParens
-			if 0 < unmatches {
-				// 向前移动
-				for k = length - 1; 0 < unmatches; k-- {
-					token = path[k]
-					if itemCloseParen != token {
-						break
-					}
-					unmatches--
-					i--
-				}
-				path = path[:k+1]
-				trimmed = true
-			} else { // 右圆括号 ) 数目小于等于左圆括号 ( 数目
-				// 算作全匹配上了，不需要再处理结尾标点符号
-				trimmed = true
-			}
-		} else if itemSemicolon == lastToken {
-			// 检查 HTML 实体
-			foundAmp := false
-			// 向前检查 & 是否存在
-			for k = length - 1; 0 <= k; k-- {
-				token = path[k]
-				if itemAmpersand == token {
-					foundAmp = true
-					break
+		var openParens, closeParens int
+		// 最后一个字符如果是标点符号则剔掉
+		path := url[k:]
+		length = len(path)
+		if 0 < length {
+			var l int
+			// 统计圆括号个数
+			for l = 0; l < length; l++ {
+				token = path[l]
+				if itemOpenParen == token {
+					openParens++
+				} else if itemCloseParen == token {
+					closeParens++
 				}
 			}
-			if foundAmp { // 如果 & 存在
-				entity := path[k:length]
-				if 3 <= len(entity) {
-					// 检查截取的子串是否满足实体特征（&;中间需要是字母或数字）
-					isEntity := true
-					for j = 1; j < len(entity)-1; j++ {
-						if !isASCIILetterNum(entity[j]) {
-							isEntity = false
+
+			trimmed := false
+			lastToken := path[length-1]
+			if itemCloseParen == lastToken {
+				// 以 ) 结尾的话需要计算圆括号匹配
+				unmatches := closeParens - openParens
+				if 0 < unmatches {
+					// 向前移动
+					for l = length - 1; 0 < unmatches; l-- {
+						token = path[l]
+						if itemCloseParen != token {
 							break
 						}
+						unmatches--
+						i--
 					}
-					if isEntity {
-						path = path[:k]
-						trimmed = true
-						i -= length - k
+					path = path[:l+1]
+					trimmed = true
+				} else { // 右圆括号 ) 数目小于等于左圆括号 ( 数目
+					// 算作全匹配上了，不需要再处理结尾标点符号
+					trimmed = true
+				}
+			} else if itemSemicolon == lastToken {
+				// 检查 HTML 实体
+				foundAmp := false
+				// 向前检查 & 是否存在
+				for l = length - 1; 0 <= l; l-- {
+					token = path[l]
+					if itemAmpersand == token {
+						foundAmp = true
+						break
+					}
+				}
+				if foundAmp { // 如果 & 存在
+					entity := path[l:length]
+					if 3 <= len(entity) {
+						// 检查截取的子串是否满足实体特征（&;中间需要是字母或数字）
+						isEntity := true
+						for j = 1; j < len(entity)-1; j++ {
+							if !isASCIILetterNum(entity[j]) {
+								isEntity = false
+								break
+							}
+						}
+						if isEntity {
+							path = path[:l]
+							trimmed = true
+							i -= length - l
+						}
 					}
 				}
 			}
+
+			// 如果之前的 ) 或者 ; 没有命中处理，则进行结尾的标点符号规则处理，即标点不计入链接，需要剔掉
+			if !trimmed && isASCIIPunct(lastToken) {
+				path = path[:length-1]
+				i--
+			}
+		} else {
+			length = len(domain)
+			lastToken := domain[length-1]
+			if isASCIIPunct(lastToken) {
+				domain = domain[:length-1]
+				i--
+			}
 		}
 
-		// 如果之前的 ) 或者 ; 没有命中处理，则进行结尾的标点符号规则处理，即标点不计入链接，需要剔掉
-		if !trimmed && isASCIIPunct(lastToken) {
-			path = path[:length-1]
-			i--
-		}
-	} else {
-		length = len(domain)
-		lastToken := domain[length-1]
-		if isASCIIPunct(lastToken) {
-			domain = domain[:length-1]
-			i--
-		}
+		dest := protocol
+		dest = append(dest, domain...)
+		dest = append(dest, path...)
+		addr := domain
+		addr = append(addr, path...)
+
+		link := &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), nil}
+		link.AppendChild(link, &Text{tokens: addr})
+		node.InsertBefore(node, link)
 	}
 
-	var dest, domainPath items
-	if www {
-		dest = items("http://")
-		domainPath = append(domain, path...)
-		dest = append(dest, domainPath...)
-	} else {
-		dest = items(protocol)
-		domain = append(dest, domain...)
-		domainPath = append(domain, path...)
-		dest = domainPath
+	if 0 < len(consumed) {
+		text := &Text{tokens: consumed}
+		node.InsertBefore(node, text)
 	}
 
-	ret = &Link{&BaseNode{typ: NodeLink}, encodeDestination(dest), nil}
-	ret.AppendChild(ret, &Text{tokens: domainPath})
-	ctx.pos += i
+	// 处理完后传入的文本节点 node 已经被拆分为多个节点，所以可以移除自身
+	node.Unlink()
 	return
 }
 
 var (
-	// validDomainSuffix 用于列出所有认为合法的域名后缀，不够的话往里加就行。
+	// validDomainSuffix 用于列出所有认为合法的域名后缀。
 	// TODO: 考虑提供接口支持开发者添加
 	validDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
 )

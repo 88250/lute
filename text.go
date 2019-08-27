@@ -64,9 +64,16 @@ func (t *Tree) mergeText(node Node) {
 				child.SetTokens(toItems(text))
 			}
 
-			if t.context.option.GFMAutoLink {
-				// 处理 GFM 自动邮件链接
-				t.parseGfmAutoEmailLink(child)
+			if NodeLink != child.Parent().Type() {
+				if t.context.option.GFMAutoLink {
+					// 处理 GFM 自动邮件链接
+					t.parseGfmAutoEmailLink(child)
+				}
+
+				if t.context.option.GFMAutoLink {
+					// 处理 GFM 自动链接
+					t.parseGfmAutoLink(child)
+				}
 			}
 		} else {
 			// 递归处理子节点

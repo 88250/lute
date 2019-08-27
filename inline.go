@@ -66,7 +66,7 @@ func (t *Tree) walkParseInline(node Node, wg *sync.WaitGroup) {
 		// 规范只是定义了从输入的 Markdown 文本到输出的 HTML 的解析渲染规则，并未定义中间语法树的规则。
 		// 也就是说语法树的节点结构没有标准，可以自行发挥。这里进行文本节点合并主要有两个目的：
 		// 1. 减少节点数量，提升后续处理性能
-		// 2. 方便后续功能方面的处理，比如 GFM 自动邮件链接解析
+		// 2. 方便后续功能方面的处理，比如 GFM 自动链接解析
 		t.mergeText(node)
 		return
 	}
@@ -115,23 +115,7 @@ func (t *Tree) parseInline(block Node, ctx *InlineContext) {
 		case itemBang:
 			n = t.parseBang(ctx)
 		default:
-			if t.context.option.GFMAutoLink {
-				n = t.parseGfmAutoLink("https://", ctx)
-				if nil == n {
-					n = t.parseGfmAutoLink("http://", ctx)
-					if nil == n {
-						n = t.parseGfmAutoLink("ftp://", ctx)
-						if nil == n {
-							n = t.parseGfmAutoLink("www.", ctx)
-							if nil == n {
-								n = t.parseText(ctx)
-							}
-						}
-					}
-				}
-			} else {
-				n = t.parseText(ctx)
-			}
+			n = t.parseText(ctx)
 		}
 
 		if nil != n {
