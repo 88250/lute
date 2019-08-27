@@ -32,7 +32,7 @@ func handleMarkdown2HTML(ctx *fasthttp.RequestCtx) {
 	if nil != err {
 		ctx.SetStatusCode(fasthttp.StatusInternalServerError)
 		ctx.WriteString(err.Error())
-		logger.Errorf(err.Error())
+		logger.Errorf("markdown text [%s]\n", body)
 		return
 	}
 	ctx.SetBody(html)
