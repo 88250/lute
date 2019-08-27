@@ -17,6 +17,8 @@ import (
 	"html"
 	"strings"
 	"sync"
+
+	"github.com/b3log/gulu"
 )
 
 // parseInlines 解析并生成行级节点。
@@ -26,6 +28,8 @@ func (t *Tree) parseInlines() {
 
 // walkParseInline 解析生成节点 node 的行级子节点。
 func (t *Tree) walkParseInline(node Node, wg *sync.WaitGroup) {
+	defer gulu.Panic.Recover(nil)
+
 	if nil != wg {
 		defer wg.Done()
 	}
@@ -267,7 +271,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) Node {
 			ctx.pos += n + 1
 		} else if !opener.bracketAfter {
 			// [text][] 或者 [text][] 格式，将第一个 text 视为 label 进行解析
-			passed = ctx.tokens[ opener.index:startPos]
+			passed = ctx.tokens[opener.index:startPos]
 			reflabel = fromItems(passed)
 			if len(passed) > 0 && ctx.tokensLen > beforelabel && itemOpenBracket == ctx.tokens[beforelabel] {
 				// [text][] 格式，跳过 []
