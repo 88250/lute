@@ -14,16 +14,32 @@ package lute
 
 import (
 	"regexp"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 // fixTermTypo 修正 str 中出现的术语拼写问题。
 func fixTermTypo(str string) string {
 	// 鸣谢 https://github.com/studygolang/autocorrect
 
-	for from, to := range terms {
-		re := regexp.MustCompile(" (?i) " + from) // FIXME: 前后标点情况处理
-		str = re.ReplaceAllString(str, " " + to + " ")
+	strs := strings.FieldsFunc(str, func(r rune) bool {
+		return unicode.IsSpace(r) || unicode.IsPunct(r)
+	})
+	for _, s := range strs {
+		if s[0] >= utf8.RuneSelf {
+			// 术语仅由 ASCII 字符组成
+			continue
+		}
+
+		for from, to := range terms {
+			if strings.EqualFold(s, from) {
+				re := regexp.MustCompile("(?i)" + from) // TODO: 不要用正则
+				str = re.ReplaceAllString(str, to)
+			}
+		}
 	}
+
 	return str
 }
 
