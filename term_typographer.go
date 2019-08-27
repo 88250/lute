@@ -21,8 +21,8 @@ func fixTermTypo(str string) string {
 	// 鸣谢 https://github.com/studygolang/autocorrect
 
 	for from, to := range terms {
-		re := regexp.MustCompile("(?i)" + from + " ")
-		str = re.ReplaceAllString(str, to+" ")
+		re := regexp.MustCompile("(?i)" + from)
+		str = re.ReplaceAllString(str, to)
 	}
 	return str
 }
@@ -55,7 +55,7 @@ var terms = map[string]string{
 	"html":          "HTML",
 	"json":          "JSON",
 	"jsonp":         "JSONP",
-	"xml":           "xml",
+	"xml":           "XML",
 	"yaml":          "YAML",
 	"yml":           "YAML",
 	"ini":           "INI",
