@@ -20,6 +20,8 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var logger = gulu.Log.NewLogger(os.Stdout)
+
 // handleMarkdown2HTML 处理 Markdown 转 HTML。
 // POST 请求 Body 传入 Markdown 原文；响应 Body 是处理好的 HTML。
 func handleMarkdown2HTML(ctx *fasthttp.RequestCtx) {
@@ -30,6 +32,7 @@ func handleMarkdown2HTML(ctx *fasthttp.RequestCtx) {
 	if nil != err {
 		ctx.SetStatusCode(fasthttp.StatusInternalServerError)
 		ctx.WriteString(err.Error())
+		logger.Errorf(err.Error())
 		return
 	}
 	ctx.SetBody(html)
@@ -48,7 +51,6 @@ func handle(ctx *fasthttp.RequestCtx) {
 // Lute 的 HTTP Server 入口点。
 func main() {
 	gulu.Log.SetLevel("debug")
-	logger := gulu.Log.NewLogger(os.Stdout)
 
 	addr := "127.0.0.1:8249"
 	logger.Infof("booting Lute HTTP Server on [%s]", addr)
