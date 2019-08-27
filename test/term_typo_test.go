@@ -20,7 +20,7 @@ import (
 
 var termTypoTests = []parseTest{
 
-	{"1", "特别是简历中千万不要出现这样的情况：熟练使用JAVA、Javascript语言，熟练GIT版本控制，对android、ios开发有一定了解，熟练使用Mysql、postgresql数据库。\n", "<p>特别是简历中千万不要出现这样的情况：熟练使用 Java、JavaScript 语言，熟练 Git 版本控制，对 Android、iOS 开发有一定了解，熟练使用 MySQL、PostgreSQL 数据库。</p>\n"},
+	{"1", "特别是简历中千万不要出现这样的情况：熟练使用JAVA、Javascript、GIT，对android、ios开发有一定了解，熟练使用Mysql、postgresql数据库。\n", "<p>特别是简历中千万不要出现这样的情况：熟练使用 Java、JavaScript、Git，对 Android、iOS 开发有一定了解，熟练使用 MySQL、PostgreSQL 数据库。</p>\n"},
 	{"0", "在github上做开源项目是一件很开心的事情，请不要把Github拼写成`github`哦！\n", "<p>在 GitHub 上做开源项目是一件很开心的事情，请不要把 GitHub 拼写成<code>github</code>哦！</p>\n"},
 }
 
