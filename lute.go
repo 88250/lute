@@ -22,6 +22,7 @@ type Lute struct {
 //  * 代码块语法高亮
 //  * 软换行转硬换行
 //  * 中西文间插入空格
+//  * 修正术语拼写
 func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
 	GFM(true)(ret)
