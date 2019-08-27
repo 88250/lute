@@ -231,14 +231,14 @@ Markdown 原文：
 
 注：
 1. 跑测试时已经将各个库的支持调整到仅支持 CommonMark 上，即关闭 GFM、Typographer 等扩展支持 
-2. Lute 在多核平台上有一定的性能优势，因为 Lute 的行级解析是并行处理的
+2. Lute 在多核平台上有一定的性能优势，因为 Lute 对行级解析算法做了并行优化
 
 ### [Lute](https://github.com/b3log/lute)
 
 ```
-BenchmarkLute-2   	     300	   5315783 ns/op	 3077144 B/op	   22404 allocs/op
-BenchmarkLute-4   	     300	   4464825 ns/op	 3078329 B/op	   22417 allocs/op
-BenchmarkLute-8   	     300	   4255322 ns/op	 3079699 B/op	   22431 allocs/op
+BenchmarkLute-2   	     300	   5299158 ns/op	 3077207 B/op	   22404 allocs/op
+BenchmarkLute-4   	     300	   4478118 ns/op	 3078091 B/op	   22414 allocs/op
+BenchmarkLute-8   	     300	   4258608 ns/op	 3079739 B/op	   22431 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
