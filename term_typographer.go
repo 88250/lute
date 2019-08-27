@@ -21,8 +21,8 @@ func fixTermTypo(str string) string {
 	// 鸣谢 https://github.com/studygolang/autocorrect
 
 	for from, to := range terms {
-		re := regexp.MustCompile("(?i)" + from)
-		str = re.ReplaceAllString(str, to)
+		re := regexp.MustCompile(" (?i) " + from) // FIXME: 前后标点情况处理
+		str = re.ReplaceAllString(str, " " + to + " ")
 	}
 	return str
 }
