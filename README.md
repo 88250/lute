@@ -277,7 +277,7 @@ Lute 承载了[黑客派](https://hacpai.com)上的所有 Markdown 处理，每�
 Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://github.github.com/gfm/#disallowed-raw-html-extension-)，因为该扩展还是存在一定漏洞（比如没有处理 `<input>`）。
 建议通过其他库（比如 [bluemonday](https://github.com/microcosm-cc/bluemonday)）来进行 HTML 安全过滤，这样也能更好地适配应用场景。
 
-## 使用
+## 🛠️ 使用
 
 引入 Lute 库：
 ```shell
