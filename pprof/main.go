@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	spec := "test/commonmark-0.29-spec"
+	spec := "test/commonmark-spec"
 	bytes, err := ioutil.ReadFile(spec + ".md")
 	if nil != err {
 		panic(err)

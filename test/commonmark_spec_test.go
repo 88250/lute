@@ -31,7 +31,7 @@ type testcase struct {
 }
 
 func TestSpec(t *testing.T) {
-	bytes, err := ioutil.ReadFile("commonmark-0.29-spec.json")
+	bytes, err := ioutil.ReadFile("commonmark-spec.json")
 	if nil != err {
 		t.Fatalf("read spec test cases failed: " + err.Error())
 	}

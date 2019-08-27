@@ -19,7 +19,7 @@ import (
 )
 
 func BenchmarkLute(b *testing.B) {
-	spec := "../test/commonmark-0.29-spec"
+	spec := "../test/commonmark-spec"
 	bytes, err := ioutil.ReadFile(spec + ".md")
 	if nil != err {
 		b.Fatalf("read spec text failed: " + err.Error())
