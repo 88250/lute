@@ -21,6 +21,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"11", "1>tag<\n", "<p>&lt;http:</p>\n"},
 	{"10", "<http:\n", "<p>&lt;http:</p>\n"},
 	{"9", "<\n", "<p>&lt;</p>\n"},
 	{"8", "~~~ \n", "<pre><code class=\"language-fallback\"></code></pre>\n"},
