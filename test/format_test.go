@@ -35,7 +35,7 @@ var formatTests = []formatTest{
 	{"14", "~~B3log~~\n", "~~B3log~~\n\n"},
 	{"13", "![B3log 开源](https://b3log.org \"B3log 开源\")\n", "![B3log 开源](https://b3log.org \"B3log 开源\")\n\n"},
 	{"12", "[B3log 开源](https://b3log.org \"B3log 开源\")\n", "[B3log 开源](https://b3log.org \"B3log 开源\")\n\n"},
-	{"11", "硬换行  \n第二行\n", "硬换行\n第二行\n\n"},   // 因为启用了软转硬
+	{"11", "硬换行  \n第二行\n", "硬换行\n第二行\n\n"}, // 因为启用了软转硬
 	{"10", "硬换行\\\n第二行\n", "硬换行\n第二行\n\n"}, // 因为启用了软转硬
 	{"9", "分隔线\n\n---\n", "分隔线\n\n---\n\n"},
 	{"8", "```go\nvar lute\n```\n", "```go\nvar lute\n```\n\n"},
@@ -53,7 +53,7 @@ func TestFormat(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range formatTests {
-		t.Log("Test [" + test.name + "]")
+		fmt.Println("Test [" + test.name + "]")
 		formatted, err := luteEngine.FormatStr(test.name, test.original)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
