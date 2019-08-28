@@ -21,6 +21,8 @@ import (
 
 var debugTests = []parseTest{
 
+	{"13", "**莠**\n", "<p><strong>莠</strong></p>\n"},
+	{"12", "**章**\n", "<p><strong>章</strong></p>\n"},
 	{"11", "1>tag<\n", "<p>1&gt;tag&lt;</p>\n"},
 	{"10", "<http:\n", "<p>&lt;http:</p>\n"},
 	{"9", "<\n", "<p>&lt;</p>\n"},
