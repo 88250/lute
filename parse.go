@@ -14,6 +14,7 @@ package lute
 
 import (
 	"bytes"
+
 	"github.com/b3log/gulu"
 )
 
@@ -63,7 +64,7 @@ func (context *Context) advanceOffset(count int, columns bool) {
 	var currentLine = context.currentLine
 	var charsToTab, charsToAdvance int
 	var c byte
-	for ; count > 0; {
+	for 0 < count {
 		c = currentLine[context.offset]
 		if itemTab == c {
 			charsToTab = 4 - (context.column % 4)

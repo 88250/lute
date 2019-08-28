@@ -77,7 +77,6 @@ func (t *Tree) walkParseInline(node Node, wg *sync.WaitGroup) {
 			t.parseGFMAutoEmailLink(node)
 			t.parseGFMAutoLink(node)
 		}
-
 		return
 	}
 
