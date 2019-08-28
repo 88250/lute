@@ -236,9 +236,9 @@ Markdown 原文：
 ### [Lute](https://github.com/b3log/lute)
 
 ```
-BenchmarkLute-2   	     300	   5299158 ns/op	 3077207 B/op	   22404 allocs/op
-BenchmarkLute-4   	     300	   4478118 ns/op	 3078091 B/op	   22414 allocs/op
-BenchmarkLute-8   	     300	   4258608 ns/op	 3079739 B/op	   22431 allocs/op
+BenchmarkLute-2   	     300	   5325652 ns/op	 3077539 B/op	   22410 allocs/op
+BenchmarkLute-4   	     300	   4504691 ns/op	 3079495 B/op	   22435 allocs/op
+BenchmarkLute-8   	     300	   4195547 ns/op	 3081590 B/op	   22458 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
