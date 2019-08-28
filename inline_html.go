@@ -21,7 +21,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret Node) {
 	tokens := ctx.tokens
 	startPos := ctx.pos
 	ret = &Text{tokens: toItems("<")}
-	if 3 > ctx.tokensLen {
+	if 3 > ctx.tokensLen || ctx.tokensLen <= startPos+1 {
 		ctx.pos++
 		return
 	}
