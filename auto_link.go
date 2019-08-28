@@ -162,16 +162,17 @@ func (t *Tree) parseGFMAutoLink0(node Node) {
 
 		// 检查前缀
 		tmp := tokens[i:]
-		if bytes.HasPrefix(tmp, []byte("www.")) {
+		tmpLen := len(tmp)
+		if 8 <= tmpLen /* www.x.xx */ && 'w' == tmp[0] && 'w' == tmp[1] && 'w' == tmp[2] && '.' == tmp[3] {
 			protocol = items("http://")
 			www = true
-		} else if bytes.HasPrefix(tmp, []byte("http://")) {
+		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == tmp[0] && 't' == tmp[1] && 't' == tmp[2] && 'p' == tmp[3] && ':' == tmp[4] && '/' == tmp[5] && '/' == tmp[6] {
 			protocol = items("http://")
 			i += 7
-		} else if bytes.HasPrefix(tmp, []byte("https://")) {
+		} else if 12 <= tmpLen /* https://x.xx */ && 'h' == tmp[0] && 't' == tmp[1] && 't' == tmp[2] && 'p' == tmp[3] && 's' == tmp[4] && ':' == tmp[5] && '/' == tmp[6] && '/' == tmp[7] {
 			protocol = items("https://")
 			i += 8
-		} else if bytes.HasPrefix(tmp, []byte("ftp://")) {
+		} else if 10 <= tmpLen /* ftp://x.xx */ && 'f' == tmp[0] && 't' == tmp[1] && 'p' == tmp[2] && ':' == tmp[3] && '/' == tmp[4] && '/' == tmp[5] {
 			protocol = items("ftp://")
 			i += 6
 		} else {
