@@ -225,7 +225,7 @@ func (r *Renderer) renderTextHTML(node Node, entering bool) (WalkStatus, error) 
 		return WalkContinue, nil
 	}
 
-	r.write(escapeHTML(node.Tokens()))
+	r.write(escapeHTML(node.(*Text).tokens))
 	return WalkContinue, nil
 }
 
