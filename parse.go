@@ -111,7 +111,7 @@ func (context *Context) findNextNonspace() {
 	var token byte
 	for {
 		if i >= context.currentLineLen {
-			fmt.Println(context.currentLineLen, i)
+			fmt.Println(context.currentLine, i)
 		}
 		token = context.currentLine[i]
 		if itemSpace == token {
