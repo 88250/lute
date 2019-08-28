@@ -154,7 +154,7 @@ func (t *Tree) parseGFMAutoLink0(node Node) {
 	var i, j, k int
 	length := len(tokens)
 	var token byte
-	var consumed items
+	var consumed = make(items, 0, 256)
 	www := false
 	for i < length {
 		token = tokens[i]
@@ -184,7 +184,7 @@ func (t *Tree) parseGFMAutoLink0(node Node) {
 		if 0 < len(consumed) {
 			text := &Text{tokens: consumed}
 			node.InsertBefore(node, text)
-			consumed = items{}
+			consumed = make(items, 0, 256)
 		}
 
 		var url items
