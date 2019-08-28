@@ -70,7 +70,7 @@ func (codeBlock *CodeBlock) Finalize(context *Context) {
 		var i int
 		var token byte
 		for ; i < length; i++ {
-			token = codeBlock.tokens[i]
+			token = content[i]
 			if itemNewline == token {
 				break
 			}
