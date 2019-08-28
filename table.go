@@ -138,7 +138,7 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	var alignments []int
 	for _, col := range cols {
 		col = bytes.TrimSpace(col)
-		if 1 > length {
+		if 1 > length || nil == col {
 			return nil
 		}
 
