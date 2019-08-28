@@ -77,15 +77,22 @@ func (l *lexer) nextLine() (line items) {
 	return
 }
 
-// lex 创建一个词法分析器。
-func lex(input items) (ret *lexer) {
+// newLexer 创建一个词法分析器。
+func newLexer(input items) (ret *lexer) {
 	ret = &lexer{}
 	// 动态构造一次，因为后续有可能会对字节数组进行赋值
 	// 不构造的话会报错 fatal error: fault
 	builder := strings.Builder{}
+
 	builder.Write(input)
 	ret.input = items(builder.String())
 	ret.length = len(ret.input)
+
+	if 0 < ret.length && itemNewline != ret.input[ret.length-1] {
+		// 以 \n 结尾预处理
+		ret.input = append(ret.input, itemNewline)
+		ret.length++
+	}
 
 	return
 }

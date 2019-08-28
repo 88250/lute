@@ -18,7 +18,7 @@ import "bytes"
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Link{}
-	for line := t.lex.nextLine(); nil != line; line = t.lex.nextLine() {
+	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		t.incorporateLine(line)
 	}
 	for nil != t.context.tip {

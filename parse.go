@@ -14,27 +14,25 @@ package lute
 
 import (
 	"bytes"
-	"fmt"
-
 	"github.com/b3log/gulu"
 )
 
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
-func parse(name string, markdown []byte, option options) (t *Tree, err error) {
+func parse(name string, markdown []byte, option options) (tree *Tree, err error) {
 	defer gulu.Panic.Recover(&err)
 
-	t = &Tree{Name: name, text: markdown, context: &Context{option: option}}
-	t.context.tree = t
-	t.lex = lex(t.text)
-	t.Root = &Document{&BaseNode{typ: NodeDocument}}
-	t.parseBlocks()
-	t.parseInlines()
-	t.lex = nil
+	tree = &Tree{Name: name, context: &Context{option: option}}
+	tree.context.tree = tree
+	tree.lexer = newLexer(markdown)
+	tree.Root = &Document{&BaseNode{typ: NodeDocument}}
+	tree.parseBlocks()
+	tree.parseInlines()
+	tree.lexer = nil
 
 	return
 }
 
-// Context 用于维护解析过程中使用到的公共数据。
+// Context 用于维护块级元素解析过程中使用到的公共数据。
 type Context struct {
 	tree   *Tree   // 关联的语法树
 	option options // 解析渲染选项
@@ -52,7 +50,7 @@ type Context struct {
 	lastMatchedContainer                                     Node  // 最后一个匹配的块节点
 }
 
-// InlineContext 描述了行级解析上下文。
+// InlineContext 描述了行级元素解析上下文。
 type InlineContext struct {
 	tokens     items      // 当前解析的 tokens
 	tokensLen  int        // 当前解析的 tokens 长度
@@ -110,9 +108,6 @@ func (context *Context) findNextNonspace() {
 
 	var token byte
 	for {
-		if i >= context.currentLineLen {
-			fmt.Println(context.currentLine, i)
-		}
 		token = context.currentLine[i]
 		if itemSpace == token {
 			i++
@@ -172,12 +167,10 @@ func (context *Context) listsMatch(listData, itemData *listData) bool {
 
 // Tree 描述了 Markdown 抽象语法树结构。
 type Tree struct {
-	Name string    // 名称，可以为空
-	Root *Document // 根节点
-
-	text          []byte         // 原始的 Markdown 文本
-	lex           *lexer         // 词法分析器
-	context       *Context       // 语法解析上下文
+	Name          string         // 名称，可以为空
+	Root          *Document      // 根节点
+	lexer         *lexer         // 词法分析器
+	context       *Context       // 块级解析上下文
 	inlineContext *InlineContext // 行级解析上下文
 }
 

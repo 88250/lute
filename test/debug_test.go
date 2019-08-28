@@ -21,6 +21,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"17", "- - ", "<ul>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n</ul>\n"}, // 原文不以 \n 结尾的话需要自动补上
 	{"16", "~~*~~Hi*\n", "<p>~~<em>~~Hi</em></p>\n"}, // 强调优先级高于删除线
 	{"15", "a*\"foo\"*\n", "<p>a*&quot;foo&quot;*</p>\n"},
 	{"14", "5*6*78\n", "<p>5<em>6</em>78</p>\n"},
