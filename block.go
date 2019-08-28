@@ -232,8 +232,10 @@ var blockStarts = []blockStartFunc{
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
 				for tokens := container.Tokens(); 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.Tokens() {
-					if tokens = t.context.parseLinkRefDef(tokens); nil != tokens {
-						container.SetTokens(tokens)
+					if remains := t.context.parseLinkRefDef(tokens); nil != remains {
+						container.SetTokens(remains)
+					} else {
+						break
 					}
 				}
 
