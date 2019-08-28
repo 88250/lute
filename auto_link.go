@@ -15,7 +15,6 @@ package lute
 import (
 	"bytes"
 	"strings"
-	"unicode"
 )
 
 func (t *Tree) parseGFMAutoEmailLink(node Node) {
@@ -192,12 +191,7 @@ func (t *Tree) parseGFMAutoLink0(node Node) {
 		j = i
 		for ; j < length; j++ {
 			token = tokens[j]
-			// 链接以空白或者 < 断开
-			if isWhitespace(token) || itemLess == token {
-				break
-			}
-			// 非标点符号非数字字母断开
-			if !unicode.IsPunct(rune(token)) && !isASCIILetterNum(token) {
+			if (isWhitespace(token) || itemLess == token) || (!isASCIIPunct(token) && !isASCIILetterNum(token)) {
 				break
 			}
 			url = append(url, token)
