@@ -21,6 +21,8 @@ import (
 
 var debugTests = []parseTest{
 
+	{"9", "<\n", "<p>&lt;</p>\n"},
+	{"8", "~~~ \n", "<pre><code class=\"language-fallback\"></code></pre>\n"},
 	{"7", "|||\n|||\n", "<p>|||<br />\n|||</p>\n"},
 	{"6", "[https://github.com/b3log/lute](https://github.com/b3log/lute)\n", "<p><a href=\"https://github.com/b3log/lute\">https://github.com/b3log/lute</a></p>\n"},
 	{"5", "[1\n--\n", "<h2>[1</h2>\n"},

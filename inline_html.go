@@ -21,6 +21,10 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret Node) {
 	tokens := ctx.tokens
 	startPos := ctx.pos
 	ret = &Text{tokens: toItems("<")}
+	if 3 > ctx.tokensLen {
+		ctx.pos++
+		return
+	}
 
 	var tags items
 	tags = append(tags, tokens[startPos])
@@ -86,7 +90,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret Node) {
 
 	whitespaces, tokens := tokens.trimLeft()
 	if (itemGreater == tokens[0]) ||
-		(1 < length && itemSlash == tokens[0] && itemGreater == tokens[1]) {
+		(1 < ctx.tokensLen && itemSlash == tokens[0] && itemGreater == tokens[1]) {
 		tags = append(tags, whitespaces...)
 		tags = append(tags, tokens[0])
 		if itemSlash == tokens[0] {
