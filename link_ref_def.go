@@ -266,13 +266,12 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 
 	passed = make(items, 0, len(tokens))
 
-	line := tokens
 	closed := false
 	i := 1
-	for {
-		token := line[i]
+	for i < length {
+		token := tokens[i]
 		passed = append(passed, token)
-		r, size := utf8.DecodeRune(line[i:])
+		r, size := utf8.DecodeRune(tokens[i:])
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
@@ -280,7 +279,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 		if itemCloseBracket == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			label = label[0 : len(label)-1]
-			remains = line[i+1:]
+			remains = tokens[i+1:]
 			break
 		}
 		if itemOpenBracket == token && !tokens.isBackslashEscapePunct(i) {
