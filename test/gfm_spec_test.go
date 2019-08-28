@@ -39,7 +39,7 @@ var gfmSpecTests = []parseTest{
 	{"strikethrough0", "**~~Hi~~** Hello, world!\n", "<p><strong><del>Hi</del></strong> Hello, world!</p>\n"},
 	{"strikethrough1", "~~**Hi**~~ Hello, world!\n", "<p><del><strong>Hi</strong></del> Hello, world!</p>\n"},
 	{"strikethrough2", "~~**Hi~~** Hello, world!\n", "<p><del>**Hi</del>** Hello, world!</p>\n"},
-	{"strikethrough3", "**~~**Hi~~ Hello, world!\n", "<p>**<del>**Hi</del> Hello, world!</p>\n"},
+	{"strikethrough3", "**~~**Hi~~ Hello, world!\n", "<p><strong>~~</strong>Hi~~ Hello, world!</p>\n"},
 	{"gfm621", "www.commonmark.org\n", "<p><a href=\"http://www.commonmark.org\">www.commonmark.org</a></p>\n"},
 	{"gfm622", "Visit www.commonmark.org/help for more information.\n", "<p>Visit <a href=\"http://www.commonmark.org/help\">www.commonmark.org/help</a> for more information.</p>\n"},
 	{"gfm623", "Visit www.commonmark.org.\n\nVisit www.commonmark.org/a.b.\n", "<p>Visit <a href=\"http://www.commonmark.org\">www.commonmark.org</a>.</p>\n<p>Visit <a href=\"http://www.commonmark.org/a.b\">www.commonmark.org/a.b</a>.</p>\n"},

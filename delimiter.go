@@ -124,15 +124,15 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			text = closerInl.Tokens()[0 : len(closerInl.Tokens())-useDelims]
 			closerInl.SetTokens(text)
 
-			var emphStrongDel Node
+			var emStrongDel Node
 			if 1 == useDelims {
-				emphStrongDel = &Emphasis{&BaseNode{typ: NodeEmphasis}}
+				emStrongDel = &Emphasis{&BaseNode{typ: NodeEmphasis}}
 			} else {
 				if itemTilde != closercc {
-					emphStrongDel = &Strong{&BaseNode{typ: NodeStrong}}
+					emStrongDel = &Strong{&BaseNode{typ: NodeStrong}}
 				} else {
 					if t.context.option.GFMStrikethrough {
-						emphStrongDel = &Strikethrough{&BaseNode{typ: NodeStrikethrough}}
+						emStrongDel = &Strikethrough{&BaseNode{typ: NodeStrikethrough}}
 					}
 				}
 			}
@@ -141,11 +141,11 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			for nil != tmp && tmp != closerInl {
 				next := tmp.Next()
 				tmp.Unlink()
-				emphStrongDel.AppendChild(emphStrongDel, tmp)
+				emStrongDel.AppendChild(emStrongDel, tmp)
 				tmp = next
 			}
 
-			openerInl.InsertAfter(openerInl, emphStrongDel)
+			openerInl.InsertAfter(openerInl, emStrongDel)
 
 			// remove elts between opener and closer in delimiters stack
 			if opener.next != closer {
