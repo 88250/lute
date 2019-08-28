@@ -20,12 +20,8 @@ func isWhitespace(token byte) bool {
 	return itemSpace == token || itemNewline == token || itemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
 }
 
-func isUnicodeWhitespace(token byte) bool {
-	if unicode.Is(unicode.Zs, rune(token)) {
-		return true
-	}
-
-	return itemTab == token || '\u000D' == token || itemNewline == token || '\u000C' == token
+func isUnicodeWhitespace(r rune) bool {
+	return unicode.IsSpace(r) || unicode.Is(unicode.Zs, r)
 }
 
 func isDigit(token byte) bool {
@@ -41,11 +37,6 @@ func tokenToUpper(token byte) byte {
 		return token - 'a' + 'A'
 	}
 	return token
-}
-
-// isPunct 判断 token 是否是一个标点符号。
-func isPunct(token byte) bool {
-	return isASCIIPunct(token) || unicode.IsPunct(rune(token))
 }
 
 // isASCIIPunct 判断 token 是否是一个 ASCII 标点符号。

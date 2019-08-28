@@ -12,6 +12,11 @@
 
 package lute
 
+import (
+	"unicode"
+	"unicode/utf8"
+)
+
 // delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _）相关信息。
 type delimiter struct {
 	node           Node       // the text node point to
@@ -192,26 +197,31 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		ctx.pos++
 	}
 
-	tokenBefore, tokenAfter := itemNewline, itemNewline
-	if 0 != startPos {
-		tokenBefore = ctx.tokens[startPos-1]
+	tokenBefore, tokenAfter := rune(itemNewline), rune(itemNewline)
+	if 0 < startPos {
+		t := ctx.tokens[startPos-1]
+		if t >= utf8.RuneSelf {
+			tokenBefore, _ = utf8.DecodeLastRune(ctx.tokens[:startPos-1])
+		} else {
+			tokenBefore = rune(t)
+		}
 	}
 	if ctx.tokensLen > ctx.pos {
-		tokenAfter = ctx.tokens[ctx.pos]
+		t := ctx.tokens[ctx.pos]
+		if t >= utf8.RuneSelf {
+			tokenAfter, _ = utf8.DecodeRune(ctx.tokens[ctx.pos:])
+		} else {
+			tokenAfter = rune(t)
+		}
 	}
 
-	var beforeIsPunct, beforeIsWhitespace, afterIsPunct, afterIsWhitespace, canOpen, canClose bool
-	if itemEnd != tokenBefore {
-		beforeIsWhitespace = isUnicodeWhitespace(tokenBefore)
-		beforeIsPunct = isPunct(tokenBefore)
-	}
-	if itemEnd != tokenAfter {
-		afterIsWhitespace = isUnicodeWhitespace(tokenAfter)
-		afterIsPunct = isPunct(tokenAfter)
-	}
-
+	beforeIsWhitespace := isUnicodeWhitespace(tokenBefore)
+	beforeIsPunct := unicode.IsPunct(tokenBefore)
+	afterIsWhitespace := isUnicodeWhitespace(tokenAfter)
+	afterIsPunct := unicode.IsPunct(tokenAfter)
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
+	var canOpen, canClose bool
 	if itemUnderscore == token {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
