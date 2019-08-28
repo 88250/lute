@@ -18,7 +18,26 @@ import (
 )
 
 // space 会把 text 中的中西文之间加上空格。
-func space(text string) (ret string) {
+func (t *Tree) space(node Node) {
+	if nil == node {
+		return
+	}
+
+	for child := node.FirstChild(); nil != child; {
+		next := child.Next()
+		if NodeText == child.Type() &&
+			NodeLink != child.Parent().Type() /* 不处理链接 label */ {
+			text := fromItems(child.Tokens())
+			text = space0(text)
+			child.SetTokens(toItems(text))
+		} else {
+			t.space(child) // 递归处理子节点
+		}
+		child = next
+	}
+}
+
+func space0(text string) (ret string) {
 	// 鸣谢 https://github.com/studygolang/autocorrect
 
 	for _, r := range text {

@@ -49,18 +49,6 @@ func (t *Tree) mergeText(node Node) {
 				next.Unlink()
 				next = child.Next()
 			}
-
-			if t.context.option.AutoSpace {
-				text := fromItems(child.Tokens())
-				text = space(text)
-				child.SetTokens(toItems(text))
-			}
-
-			if t.context.option.FixTermTypo {
-				text := fromItems(child.Tokens())
-				text = fixTermTypo(text)
-				child.SetTokens(toItems(text))
-			}
 		} else {
 			t.mergeText(child) // 递归处理子节点
 		}

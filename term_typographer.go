@@ -20,7 +20,26 @@ import (
 )
 
 // fixTermTypo 修正 str 中出现的术语拼写问题。
-func fixTermTypo(str string) string {
+func (t *Tree) fixTermTypo(node Node) {
+	if nil == node {
+		return
+	}
+
+	for child := node.FirstChild(); nil != child; {
+		next := child.Next()
+		if NodeText == child.Type() &&
+			NodeLink != child.Parent().Type() /* 不处理链接 label */ {
+			text := fromItems(child.Tokens())
+			text = fixTermTypo0(text)
+			child.SetTokens(toItems(text))
+		} else {
+			t.fixTermTypo(child) // 递归处理子节点
+		}
+		child = next
+	}
+}
+
+func fixTermTypo0(str string) string {
 	// 鸣谢 https://github.com/studygolang/autocorrect
 
 	strs := strings.FieldsFunc(str, func(r rune) bool {
