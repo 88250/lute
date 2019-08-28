@@ -463,7 +463,7 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret Node) {
 			}
 		}
 	}
-	if !schemed || 3 > len(scheme) {
+	if !schemed || 3 > len(scheme) || i == ctx.tokensLen {
 		return nil
 	}
 
