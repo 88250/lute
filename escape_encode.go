@@ -34,11 +34,7 @@ func escapeHTML(html items) (ret items) {
 
 			tmp = append(tmp, 0, 0, 0, 0)
 			copy(tmp[i+4:], tmp[i:])
-			tmp[i] = '&'
-			tmp[i+1] = 'a'
-			tmp[i+2] = 'm'
-			tmp[i+3] = 'p'
-			tmp[i+4] = ';'
+			tmp[i], tmp[i+1], tmp[i+2], tmp[i+3], tmp[i+4] = '&', 'a', 'm', 'p', ';'
 			i += 5
 			continue
 		}
@@ -52,10 +48,7 @@ func escapeHTML(html items) (ret items) {
 
 			tmp = append(tmp, 0, 0, 0)
 			copy(tmp[i+3:], tmp[i:])
-			tmp[i] = '&'
-			tmp[i+1] = 'l'
-			tmp[i+2] = 't'
-			tmp[i+3] = ';'
+			tmp[i], tmp[i+1], tmp[i+2], tmp[i+3] = '&', 'l', 't', ';'
 			i += 4
 			continue
 		}
@@ -69,10 +62,7 @@ func escapeHTML(html items) (ret items) {
 
 			tmp = append(tmp, 0, 0, 0)
 			copy(tmp[i+3:], tmp[i:])
-			tmp[i] = '&'
-			tmp[i+1] = 'g'
-			tmp[i+2] = 't'
-			tmp[i+3] = ';'
+			tmp[i], tmp[i+1], tmp[i+2], tmp[i+3] = '&', 'g', 't', ';'
 			i += 4
 			continue
 		}
@@ -86,12 +76,7 @@ func escapeHTML(html items) (ret items) {
 
 			tmp = append(tmp, 0, 0, 0, 0, 0)
 			copy(tmp[i+5:], tmp[i:])
-			tmp[i] = '&'
-			tmp[i+1] = 'q'
-			tmp[i+2] = 'u'
-			tmp[i+3] = 'o'
-			tmp[i+4] = 't'
-			tmp[i+5] = ';'
+			tmp[i], tmp[i+1], tmp[i+2], tmp[i+3], tmp[i+4], tmp[i+5] = '&', 'q', 'u', 'o', 't', ';'
 			i += 6
 			continue
 		}
