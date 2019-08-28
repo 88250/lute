@@ -132,27 +132,6 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	return
 }
 
-// lines 会使用 \n 对 tokens 进行分隔转行。
-func (tokens items) lines() (ret []items) {
-	length := len(tokens)
-	var i int
-	var token byte
-	var line items
-	for ; i < length; i++ {
-		token = tokens[i]
-		if itemNewline != token {
-			line = append(line, token)
-		} else {
-			ret = append(ret, line)
-			line = items{}
-		}
-	}
-	if 0 < len(line) {
-		ret = append(ret, line)
-	}
-	return
-}
-
 // removeFirst 会将 tokens 中和 token 相等的字符删掉（只删出现相等情况的第一个字符），返回处理后的新串。
 func (tokens items) removeFirst(token byte) items {
 	length := len(tokens)

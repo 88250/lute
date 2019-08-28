@@ -153,6 +153,10 @@ func (t *Tree) parseGFMAutoLink0(node Node) {
 
 	var i, j, k int
 	length := len(tokens)
+	if 8 > length { // 太短的情况肯定不可能有链接
+		return
+	}
+
 	var token byte
 	var consumed = make(items, 0, 256)
 	www := false

@@ -37,7 +37,7 @@ type TableCell struct {
 	Aligns int
 }
 
-func (context *Context) parseTable(lines []items) (ret *Table) {
+func (context *Context) parseTable(lines [][]byte) (ret *Table) {
 	length := len(lines)
 	if 2 > length {
 		return

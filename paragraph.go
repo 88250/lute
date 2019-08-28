@@ -61,7 +61,7 @@ func (p *Paragraph) Finalize(context *Context) {
 
 	if context.option.GFMTable {
 		// 尝试解析表
-		lines := p.tokens.lines()
+		lines := bytes.Split(p.tokens, []byte{itemNewline})
 		table := context.parseTable(lines)
 		if nil != table {
 			p.InsertBefore(p, table)
