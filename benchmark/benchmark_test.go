@@ -25,7 +25,7 @@ func BenchmarkLute(b *testing.B) {
 		b.Fatalf("read spec text failed: " + err.Error())
 	}
 
-	luteEngine := lute.New(lute.GFM(false),
+	luteEngine := lute.New(lute.GFM(true),
 		lute.CodeSyntaxHighlight(false),
 		lute.SoftBreak2HardBreak(false),
 		lute.AutoSpace(false),

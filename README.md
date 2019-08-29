@@ -230,10 +230,12 @@ Markdown 原文：
 目前看来在实现 CommonMark 规范的前提下，Lute、goldmark 和 golang-commonmark 的性能差距不大，Blackfriday 没有实现 CommonMark 所以性能更好一些。
 
 注：
-1. 跑测试时已经将各个库的支持调整到仅支持 CommonMark 上，即关闭 GFM、Typographer 等扩展支持 
-2. Lute 在多核平台上有一定的性能优势，因为 Lute 对行级解析算法做了并行优化
+1. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
+2. Lute 在多核平台上有一定的性能优势，因为 Lute 对解析算法做了并行优化
 
 ### [Lute](https://github.com/b3log/lute)
+
+CommonMark：
 
 ```
 BenchmarkLute-2   	     300	   5458708 ns/op	 3082353 B/op	   21578 allocs/op
@@ -241,7 +243,17 @@ BenchmarkLute-4   	     300	   4531184 ns/op	 3085091 B/op	   21615 allocs/op
 BenchmarkLute-8   	     300	   4258646 ns/op	 3086946 B/op	   21637 allocs/op
 ```
 
+GFM：
+
+```
+BenchmarkLute-2   	     200	   6467835 ns/op	 3986809 B/op	   26799 allocs/op
+BenchmarkLute-4   	     300	   5089711 ns/op	 3982293 B/op	   26791 allocs/op
+BenchmarkLute-8   	     300	   4780539 ns/op	 3981082 B/op	   26765 allocs/op
+```
+
 ### [goldmark](https://github.com/yuin/goldmark)
+
+CommonMark：
 
 ```
 BenchmarkGoldMark-2   	     300	   5179479 ns/op	 2104184 B/op	   13855 allocs/op
@@ -249,12 +261,30 @@ BenchmarkGoldMark-4   	     300	   5063031 ns/op	 2106850 B/op	   13856 allocs/o
 BenchmarkGoldMark-8   	     300	   5043283 ns/op	 2108124 B/op	   13856 allocs/op
 ```
 
+GFM：
+
+```
+BenchmarkGoldMark-2   	     200	   6527535 ns/op	 2338653 B/op	   15456 allocs/op
+BenchmarkGoldMark-4   	     200	   6577517 ns/op	 2338953 B/op	   15457 allocs/op
+BenchmarkGoldMark-8   	     200	   6612464 ns/op	 2340704 B/op	   15457 allocs/op
+```
+
 ### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
+
+CommonMark：
 
 ```
 BenchmarkGolangCommonMark-2   	     300	   4837064 ns/op	 3143122 B/op	   18410 allocs/op
 BenchmarkGolangCommonMark-4   	     300	   4777222 ns/op	 3172136 B/op	   18415 allocs/op
 BenchmarkGolangCommonMark-8   	     300	   4734003 ns/op	 3181031 B/op	   18416 allocs/op
+```
+
+GFM：
+
+```
+BenchmarkGolangCommonMark-2   	     300	   5069772 ns/op	 3144573 B/op	   18428 allocs/op
+BenchmarkGolangCommonMark-4   	     300	   5162821 ns/op	 3176381 B/op	   18433 allocs/op
+BenchmarkGolangCommonMark-8   	     300	   5242642 ns/op	 3181380 B/op	   18434 allocs/op
 ```
 
 ### [Blackfriday](https://github.com/russross/blackfriday)
