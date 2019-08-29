@@ -229,7 +229,7 @@ func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 
 	attrs := nameAndAttrs[1:]
 	for _, attr := range attrs {
-		if 1 > len(attr) {
+		if 1 >= len(attr) {
 			continue
 		}
 
