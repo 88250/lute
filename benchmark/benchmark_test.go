@@ -13,9 +13,15 @@
 package benchmark
 
 import (
-	"github.com/b3log/lute"
+	"bytes"
 	"io/ioutil"
 	"testing"
+
+	"github.com/b3log/lute"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/renderer/html"
+	"gitlab.com/golang-commonmark/markdown"
 )
 
 func BenchmarkLute(b *testing.B) {
@@ -41,5 +47,44 @@ func BenchmarkLute(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		luteEngine.Markdown("spec text", bytes)
+	}
+}
+
+func BenchmarkGolangCommonMark(b *testing.B) {
+	spec := "../test/commonmark-spec"
+	bytes, err := ioutil.ReadFile(spec + ".md")
+	if nil != err {
+		b.Fatalf("read spec text failed: " + err.Error())
+	}
+
+	md := markdown.New(markdown.XHTMLOutput(true),
+		markdown.Tables(true),
+		markdown.Linkify(true),
+		markdown.Typographer(false))
+	for i := 0; i < b.N; i++ {
+		md.RenderToString(bytes)
+	}
+}
+
+func BenchmarkGoldMark(b *testing.B) {
+	spec := "../test/commonmark-spec"
+	markdown, err := ioutil.ReadFile(spec + ".md")
+	if nil != err {
+		b.Fatalf("read spec text failed: " + err.Error())
+	}
+
+	goldmarkEngine := goldmark.New(
+		goldmark.WithRendererOptions(html.WithXHTML()),
+		goldmark.WithExtensions(
+			extension.Table, extension.Strikethrough, extension.TaskList, extension.Linkify,
+		),
+	)
+
+	var out bytes.Buffer
+	for i := 0; i < b.N; i++ {
+		out.Reset()
+		if err := goldmarkEngine.Convert(markdown, &out); err != nil {
+			panic(err)
+		}
 	}
 }

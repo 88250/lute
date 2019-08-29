@@ -232,6 +232,7 @@ Markdown 原文：
 注：
 1. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
 2. Lute 在多核平台上有一定的性能优势，因为 Lute 对解析算法做了并行优化
+3. 基准测试参数 `-test.cpu 2,4,8 -test.benchmem`
 
 ### [Lute](https://github.com/b3log/lute)
 
