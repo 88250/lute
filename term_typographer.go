@@ -65,6 +65,7 @@ func fixTermTypo0(str string) string {
 // terms 定义了术语字典，用于术语拼写修正。
 // TODO: 考虑提供接口支持开发者添加
 var terms = map[string]string{
+	"mariadb":       "MariaDB",
 	"ipfs":          "IPFS",
 	"saas":          "SaaS",
 	"paas":          "PaaS",
@@ -131,6 +132,7 @@ var terms = map[string]string{
 	"osx":           "OS X",
 	"ubuntu":        "Ubuntu",
 	"centos":        "CentOS",
+	"centos7":       "CentOS7",
 	"redhat":        "RedHat",
 	"gitlab":        "GitLab",
 	"jquery":        "jQuery",
