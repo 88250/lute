@@ -13,9 +13,10 @@
 package test
 
 import (
-"fmt"
-"github.com/b3log/lute"
-"testing"
+	"fmt"
+	"testing"
+
+	"github.com/b3log/lute"
 )
 
 var termTypoTests = []parseTest{

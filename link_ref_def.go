@@ -169,7 +169,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains, destination 
 	i := 0
 	size := 0
 	var r rune
-	for ; i < length; {
+	for i < length {
 		token := tokens[i]
 		ret = append(ret, token)
 		r, size = utf8.DecodeRune(tokens[i:])
