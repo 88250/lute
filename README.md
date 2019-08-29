@@ -7,7 +7,12 @@ Logo 正在制作中
 -->
 <br><br>
 一款结构化的 Markdown 引擎，为未来而构建<br><br>
-<em>千呼万唤始出来，犹抱琵琶半遮面。转轴拨弦三两声，未成曲调先有情</em>
+<em>
+千呼万唤始出来<br>
+犹抱琵琶半遮面<br>
+转轴拨弦三两声<br>
+未成曲调先有情
+</em>
 <br><br>
 <a title="Build Status" target="_blank" href="https://travis-ci.org/b3log/lute"><img src="https://img.shields.io/travis/b3log/lute.svg?style=flat-square"></a>
 <a title="Go Report Card" target="_blank" href="https://goreportcard.com/report/github.com/b3log/lute"><img src="https://goreportcard.com/badge/github.com/b3log/lute?style=flat-square"></a>
