@@ -38,11 +38,29 @@ func handleMarkdown2HTML(ctx *fasthttp.RequestCtx) {
 	ctx.SetBody(html)
 }
 
+// handleMarkdownFormat 处理 Markdown 格式化。
+// POST 请求 Body 传入 Markdown 原文；响应 Body 是格式化好的 Markdown 文本。
+func handleMarkdownFormat(ctx *fasthttp.RequestCtx) {
+	body := ctx.PostBody()
+
+	engine := lute.New()
+	formatted, err := engine.Format("", body)
+	if nil != err {
+		ctx.SetStatusCode(fasthttp.StatusInternalServerError)
+		ctx.WriteString(err.Error())
+		logger.Errorf("markdown text [%s]\n", body)
+		return
+	}
+	ctx.SetBody(formatted)
+}
+
 // handle 处理请求分发。
 func handle(ctx *fasthttp.RequestCtx) {
 	switch string(ctx.Path()) {
 	case "/", "":
 		handleMarkdown2HTML(ctx)
+	case "/format":
+		handleMarkdownFormat(ctx)
 	default:
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 	}
