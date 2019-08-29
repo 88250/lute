@@ -363,7 +363,7 @@ func main() {
 
 * [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
 * [CommonMark 规范要点解读](https://hacpai.com/article/1566893557720)
-* Lute 实现后记
+* [Lute 实现后记](https://hacpai.com/article/1567062979327)
 
 ## 🏘️ 社区
 
