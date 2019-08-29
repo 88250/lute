@@ -21,6 +21,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"19", "https://hacpai.com/ https://hacpai.com", "<p><a href=\"https://hacpai.com/\">https://hacpai.com/</a> <a href=\"https://hacpai.com\">https://hacpai.com</a></p>\n"}, // 链接结尾 / 处理
 	{"18", "`<a href=\"`\">`\n", "<p><code>&lt;a href=&quot;</code>&quot;&gt;`</p>\n"},
 	{"17", "- - ", "<ul>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n</ul>\n"}, // 原文不以 \n 结尾的话需要自动补上
 	{"16", "~~*~~Hi*\n", "<p>~~<em>~~Hi</em></p>\n"}, // 强调优先级高于删除线
