@@ -20,75 +20,50 @@ import (
 )
 
 func escapeHTML(html items) (ret items) {
-	var i int
-	var token byte
-	tmp := html
-	for i < len(tmp) {
-		token = tmp[i]
-		if itemAmpersand == token {
-			if 0 == len(ret) { // 通过延迟初始化减少内存分配，下同
-				ret = make(items, len(html), len(html))
-				copy(ret, html)
-				tmp = ret
+	length := len(html)
+	var start, i int
+	inited := false
+	ret = html
+	for ; i < length; i++ {
+		switch html[i] {
+		case itemAmpersand:
+			if !inited { // 通过延迟初始化减少内存分配，下同
+				ret = make(items, 0, length+128)
+				inited = true
 			}
-
-			tmp = append(tmp, 0, 0, 0, 0)
-			copy(tmp[i+4:], tmp[i:])
-			tmp[i], tmp[i+1], tmp[i+2], tmp[i+3], tmp[i+4] = '&', 'a', 'm', 'p', ';'
-			i += 5
-			continue
-		}
-
-		if itemLess == token {
-			if 0 == len(ret) {
-				ret = make(items, len(html), len(html))
-				copy(ret, html)
-				tmp = ret
+			ret = append(ret, html[start:i]...)
+			ret = append(ret, items("&amp;")...)
+			start = i + 1
+		case itemLess:
+			if !inited {
+				ret = make(items, 0, length+128)
+				inited = true
 			}
-
-			tmp = append(tmp, 0, 0, 0)
-			copy(tmp[i+3:], tmp[i:])
-			tmp[i], tmp[i+1], tmp[i+2], tmp[i+3] = '&', 'l', 't', ';'
-			i += 4
-			continue
-		}
-
-		if itemGreater == token {
-			if 0 == len(ret) {
-				ret = make(items, len(html), len(html))
-				copy(ret, html)
-				tmp = ret
+			ret = append(ret, html[start:i]...)
+			ret = append(ret, items("&lt;")...)
+			start = i + 1
+		case itemGreater:
+			if !inited {
+				ret = make(items, 0, length+128)
+				inited = true
 			}
-
-			tmp = append(tmp, 0, 0, 0)
-			copy(tmp[i+3:], tmp[i:])
-			tmp[i], tmp[i+1], tmp[i+2], tmp[i+3] = '&', 'g', 't', ';'
-			i += 4
-			continue
-		}
-
-		if itemDoublequote == token {
-			if 0 == len(ret) {
-				ret = make(items, len(html), len(html))
-				copy(ret, html)
-				tmp = ret
+			ret = append(ret, html[start:i]...)
+			ret = append(ret, items("&gt;")...)
+			start = i + 1
+		case itemDoublequote:
+			if !inited {
+				ret = make(items, 0, length+128)
+				inited = true
 			}
-
-			tmp = append(tmp, 0, 0, 0, 0, 0)
-			copy(tmp[i+5:], tmp[i:])
-			tmp[i], tmp[i+1], tmp[i+2], tmp[i+3], tmp[i+4], tmp[i+5] = '&', 'q', 'u', 'o', 't', ';'
-			i += 6
-			continue
+			ret = append(ret, html[start:i]...)
+			ret = append(ret, items("&quot;")...)
+			start = i + 1
 		}
-
-		i++
 	}
-
-	if 0 == len(ret) {
-		return html
+	if inited {
+		ret = append(ret, html[start:]...)
 	}
-
-	return tmp
+	return
 }
 
 func unescapeString(tokens items) (ret items) {
