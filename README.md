@@ -40,9 +40,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 
 ## 🗃 案例
 
-* [黑客派](https://hacpai.com)
-* [Solo](https://solo.b3log.org)
-* [Pipe](https://github.com/b3log/pipe)
+* [黑客派](https://hacpai.com)，可以到[这里](https://hacpai.com/guide/markdown)进行在线测试
 
 ## 🇨🇳 中文语境优化
 
