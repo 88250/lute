@@ -300,7 +300,6 @@ func (t *Tree) parseAttrValSpec(tokens items) (valid bool, remains, valSpec item
 		}
 		valSpec = append(valSpec, token)
 	}
-	token = tokens[i]
 	if itemEqual != token {
 		valSpec = nil
 		return
