@@ -1,6 +1,30 @@
 # Lute
 
-> 千呼万唤始出来，犹抱琵琶半遮面。转轴拨弦三两声，未成曲调先有情。
+<p align = "center">
+<!--
+Logo 正在制作中
+<img alt="Lute" src="">
+-->
+<br><br>
+一款结构化的 Markdown 引擎，为未来而构建
+<em>千呼万唤始出来，犹抱琵琶半遮面。转轴拨弦三两声，未成曲调先有情</em>
+<br><br>
+<a title="Build Status" target="_blank" href="https://travis-ci.org/b3log/lute"><img src="https://img.shields.io/travis/b3log/lute.svg?style=flat-square"></a>
+<a title="Go Report Card" target="_blank" href="https://goreportcard.com/report/github.com/b3log/lute"><img src="https://goreportcard.com/badge/github.com/b3log/lute?style=flat-square"></a>
+<a title="Coverage Status" target="_blank" href="https://coveralls.io/repos/github/b3log/lute/badge.svg?branch=master"><img src="https://img.shields.io/coveralls/github/b3log/lute.svg?style=flat-square&color=CC9933"></a>
+<a title="Code Size" target="_blank" href="https://github.com/b3log/lute"><img src="https://img.shields.io/github/languages/code-size/b3log/lute.svg?style=flat-square"></a>
+<a title="MulanPSL" target="_blank" href="https://github.com/b3log/lute/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MulanPSL-orange.svg?style=flat-square"></a>
+<br>
+<a title="GitHub Commits" target="_blank" href="https://github.com/b3log/lute/commits/master"><img src="https://img.shields.io/github/commit-activity/m/b3log/lute.svg?style=flat-square"></a>
+<a title="Last Commit" target="_blank" href="https://github.com/b3log/lute/commits/master"><img src="https://img.shields.io/github/last-commit/b3log/lute.svg?style=flat-square&color=FF9900"></a>
+<a title="GitHub Pull Requests" target="_blank" href="https://github.com/b3log/lute/pulls"><img src="https://img.shields.io/github/issues-pr-closed/b3log/lute.svg?style=flat-square&color=FF9966"></a>
+<a title="Hits" target="_blank" href="https://github.com/b3log/hits"><img src="https://hits.b3log.org/b3log/lute.svg"></a>
+<br><br>
+<a title="GitHub Watchers" target="_blank" href="https://github.com/b3log/lute/watchers"><img src="https://img.shields.io/github/watchers/b3log/lute.svg?label=Watchers&style=social"></a>&nbsp;&nbsp;
+<a title="GitHub Stars" target="_blank" href="https://github.com/b3log/lute/stargazers"><img src="https://img.shields.io/github/stars/b3log/lute.svg?label=Stars&style=social"></a>&nbsp;&nbsp;
+<a title="GitHub Forks" target="_blank" href="https://github.com/b3log/lute/network/members"><img src="https://img.shields.io/github/forks/b3log/lute.svg?label=Forks&style=social"></a>&nbsp;&nbsp;
+<a title="Author GitHub Followers" target="_blank" href="https://github.com/88250"><img src="https://img.shields.io/github/followers/88250.svg?label=Followers&style=social"></a>
+</p>
 
 ## 💡 简介
 
@@ -26,7 +50,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 
 最后，还有一个很重要的动机就是 B3log 开源社区需要一款自己的 Markdown 引擎：
 
-* [Solo](https://github.com/b3log/solo)、[Pipe](https://github.com/b3log/pipe)、[Sym](https://github.com/b3log/symphony) 需要效果统一的 Markdown 渲染，并且性能非常重要
+* [Solo](https://github.com/b3log/solo)、[Pipe](https://github.com/b3log/lute)、[Sym](https://github.com/b3log/symphony) 需要效果统一的 Markdown 渲染，并且性能非常重要
 * [Vditor](https://github.com/b3log/vditor) 需要一款结构化的引擎作为支撑以实现下一代的 Markdown 编辑器
 
 ## ✨  特性
