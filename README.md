@@ -26,17 +26,16 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 
 最后，还有一个很重要的动机就是 B3log 开源社区需要一款自己的 Markdown 引擎：
 
-* 社区项目 [Solo](https://github.com/b3log/solo)、[Pipe](https://github.com/b3log/pipe)、[Sym](https://github.com/b3log/symphony) 需要效果统一的 Markdown 渲染，并且性能非常重要
-* 社区项目 [Vditor](https://github.com/b3log/vditor) 需要一款结构化的引擎作为支撑以实现下一代的 Markdown 编辑器
+* [Solo](https://github.com/b3log/solo)、[Pipe](https://github.com/b3log/pipe)、[Sym](https://github.com/b3log/symphony) 需要效果统一的 Markdown 渲染，并且性能非常重要
+* [Vditor](https://github.com/b3log/vditor) 需要一款结构化的引擎作为支撑以实现下一代的 Markdown 编辑器
 
 ## ✨  特性
 
 * 实现最新版 GFM/CM 规范
-* 非常快
+* 零正则，非常快
 * 代码块语法高亮
 * 更好地支持中文语境
 * 支持 Markdown 格式化
-* 可扩展语法树节点（待实现）
 
 ## 🗃 案例
 
@@ -226,7 +225,7 @@ Markdown 原文：
 
 1. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
 2. Lute 在多核平台上有一定的性能优势，因为 Lute 对解析算法做了并行优化
-3. 基准测试数据 [《CommonMark 规范文档》](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
+3. 基准测试数据[《CommonMark 规范文档》](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt)~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
 4. Blackfriday 没有实现 CommonMark 所以性能看上去更好一些
 
 ### [Lute](https://github.com/b3log/lute)
