@@ -150,7 +150,6 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 
 func (t *Tree) parseGFMAutoLink0(node Node) {
 	tokens := node.Tokens()
-
 	var i, j, k int
 	length := len(tokens)
 	if 8 > length { // 太短的情况肯定不可能有链接
@@ -159,13 +158,14 @@ func (t *Tree) parseGFMAutoLink0(node Node) {
 
 	var token byte
 	var consumed = make(items, 0, 256)
+	var tmp = make(items, 0, 256)
 	www := false
 	for i < length {
 		token = tokens[i]
 		var protocol items
 
 		// 检查前缀
-		tmp := tokens[i:]
+		tmp = tokens[i:]
 		tmpLen := len(tmp)
 		if 8 <= tmpLen /* www.x.xx */ && 'w' == tmp[0] && 'w' == tmp[1] && 'w' == tmp[2] && '.' == tmp[3] {
 			protocol = items("http://")
