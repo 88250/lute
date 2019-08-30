@@ -235,6 +235,9 @@ func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 
 		nameAndValue := bytes.Split(attr, htmlBlockEqual)
 		name := nameAndValue[0]
+		if 1 > len(name) { // 等号前面空格的情况
+			continue
+		}
 		if !isASCIILetter(name[0]) && itemUnderscore != name[0] && itemColon != name[0] {
 			return
 		}
