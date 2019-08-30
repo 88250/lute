@@ -365,9 +365,8 @@ func main() {
  
 可通过 Web Assembly 使用 Lute，请参考 wasm 目录下的示例，示例运行需要启动一个 HTTP Server。
 
-1. 安装 goexec：`go get -u github.com/shurcooL/goexec`
-2. 启动 HTTP 服务：`goexec "http.ListenAndServe(`:8080`, gzipped.FileServer(http.Dir(`.`)))"`
-3. 浏览器访问 `http://localhost:8080/wasm_exec.html`
+1. 安装 goexec：`go get -u github.com/shurcooL/goexec` 然后启动 HTTP 服务：``goexec "http.ListenAndServe(`:8080`, gzipped.FileServer(http.Dir(`.`)))"``（当然，也可以用其他 HTTP Server）
+2. 浏览器访问 `http://localhost:8080/wasm_exec.html`
 
 目前通过 `brotli -o lute.wasm.br lute.wasm` 进行压缩后大小在 1.6MB，如果去掉后端高亮（对 Chroma 库的依赖）的话可以将至 700KB。
 
