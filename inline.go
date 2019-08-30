@@ -17,8 +17,6 @@ import (
 	"html"
 	"strings"
 	"sync"
-
-	"github.com/b3log/gulu"
 )
 
 // parseInlines 解析并生成行级节点。
@@ -28,7 +26,7 @@ func (t *Tree) parseInlines() {
 
 // walkParseInline 解析生成节点 node 的行级子节点。
 func (t *Tree) walkParseInline(node Node, wg *sync.WaitGroup) {
-	defer gulu.Panic.Recover(nil)
+	defer recoverPanic(nil)
 
 	if nil != wg {
 		defer wg.Done()
