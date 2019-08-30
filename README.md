@@ -278,17 +278,17 @@ BenchmarkLute-8   	     300	   4667613 ns/op	 3895977 B/op	   26560 allocs/op
 CommonMark：
 
 ```
-BenchmarkGoldMark-2   	     300	   5179479 ns/op	 2104184 B/op	   13855 allocs/op
-BenchmarkGoldMark-4   	     300	   5063031 ns/op	 2106850 B/op	   13856 allocs/op
-BenchmarkGoldMark-8   	     300	   5043283 ns/op	 2108124 B/op	   13856 allocs/op
+BenchmarkGoldMark-2   	     300	   4374970 ns/op	 2088874 B/op	   13850 allocs/op
+BenchmarkGoldMark-4   	     300	   4325104 ns/op	 2088057 B/op	   13850 allocs/op
+BenchmarkGoldMark-8   	     300	   4285322 ns/op	 2088570 B/op	   13850 allocs/op
 ```
 
 GFM：
 
 ```
-BenchmarkGoldMark-2   	     200	   6527535 ns/op	 2338653 B/op	   15456 allocs/op
-BenchmarkGoldMark-4   	     200	   6577517 ns/op	 2338953 B/op	   15457 allocs/op
-BenchmarkGoldMark-8   	     200	   6612464 ns/op	 2340704 B/op	   15457 allocs/op
+BenchmarkGoldMark-2   	     200	   5894097 ns/op	 2310470 B/op	   15368 allocs/op
+BenchmarkGoldMark-4   	     300	   5858532 ns/op	 2315752 B/op	   15368 allocs/op
+BenchmarkGoldMark-8   	     200	   5978943 ns/op	 2319698 B/op	   15369 allocs/op
 ```
 
 ### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
