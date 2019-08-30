@@ -29,7 +29,9 @@ func markdown(this js.Value, args []js.Value) interface{} {
 	return html
 }
 
-// 可通过如下方式启动一个 HTTP Server 然后即可访问查看最终效果
+// 运行 build 脚本后可生成 lute.wasm，可通过 brotli -o lute.wasm.br lute.wasm 进行压缩
+//
+// 通过如下方式启动一个 HTTP Server 然后即可访问查看最终效果
 // 1. 安装 goexec：go get -u github.com/shurcooL/goexec
 // 2. 启动 HTTP 服务：goexec "http.ListenAndServe(`:8080`, gzipped.FileServer(http.Dir(`.`)))"
 
