@@ -282,6 +282,7 @@ func (r *Renderer) renderCodeBlockHTMl(node Node, entering bool) (WalkStatus, er
 			}
 		} else {
 			if r.option.CodeSyntaxHighlight {
+				rendered := false
 				codeBlock := fromItems(tokens)
 				var lexer = chromalexers.Analyse(codeBlock)
 				if nil == lexer {
@@ -289,7 +290,6 @@ func (r *Renderer) renderCodeBlockHTMl(node Node, entering bool) (WalkStatus, er
 				}
 				language := lexer.Config().Name
 				r.writeString("<pre><code class=\"language-" + language + "\">")
-				rendered := false
 
 				iterator, err := lexer.Tokenise(nil, codeBlock)
 				if nil == err {
