@@ -102,7 +102,7 @@ func (r *Renderer) renderTableHeadHTML(node *BaseNode, entering bool) (WalkStatu
 		r.newline()
 		r.tag("/thead", nil, false)
 		r.newline()
-		if nil != node.Next() {
+		if nil != node.next {
 			r.tag("tbody", nil, false)
 		}
 		r.newline()

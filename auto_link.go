@@ -32,7 +32,7 @@ func (t *Tree) parseGFMAutoEmailLink(node *BaseNode) {
 
 func (t *Tree) parseGFMAutoLink(node *BaseNode) {
 	for child := node.firstChild; nil != child; {
-		next := child.Next()
+		next := child.next
 		if NodeText == child.typ && nil != child.parent &&
 			NodeLink != child.parent.typ /* 不处理链接 label */ {
 			t.parseGFMAutoLink0(child)

@@ -184,14 +184,14 @@ func (r *Renderer) renderParagraphMarkdown(node *BaseNode, entering bool) (WalkS
 					listPadding = listItem.padding
 				}
 			} else { // 任务列表
-				if firstPara.Next() != node { // 任务列表要跳过 TaskListItemMarker 即 [X]
+				if firstPara.next != node { // 任务列表要跳过 TaskListItemMarker 即 [X]
 					listPadding = listItem.padding
 				}
 			}
 
 			nextItem := listItem.next
 			if nil == nextItem {
-				nextPara := node.Next()
+				nextPara := node.next
 				lastListItemLastPara = nil == nextPara
 			}
 		}

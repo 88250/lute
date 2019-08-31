@@ -126,7 +126,7 @@ func (n *BaseNode) CanContain(nodeType int) bool {
 // Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
 func (n *BaseNode) Unlink() {
 	if nil != n.previous {
-		n.previous.SetNext(n.next)
+		n.previous.next = n.next
 	} else if nil != n.parent {
 		n.parent.firstChild = n.next
 	}
@@ -138,16 +138,6 @@ func (n *BaseNode) Unlink() {
 	n.parent = nil
 	n.next = nil
 	n.previous = nil
-}
-
-// Next 返回后一个兄弟节点。
-func (n *BaseNode) Next() *BaseNode {
-	return n.next
-}
-
-// SetNext 设置后一个兄弟节点。
-func (n *BaseNode) SetNext(next *BaseNode) {
-	n.next = next
 }
 
 // Previous 返回前一个兄弟节点。
@@ -203,14 +193,14 @@ func (n *BaseNode) AppendTokens(tokens items) {
 // InsertAfter 在当前节点后插入一个兄弟节点。
 func (n *BaseNode) InsertAfter(this *BaseNode, sibling *BaseNode) {
 	sibling.Unlink()
-	sibling.SetNext(n.next)
-	if nil != sibling.Next() {
-		sibling.Next().SetPrevious(sibling)
+	sibling.next = n.next
+	if nil != sibling.next {
+		sibling.next.previous = sibling
 	}
 	sibling.SetPrevious(this)
 	n.next = sibling
 	sibling.parent = n.parent
-	if nil == sibling.Next() {
+	if nil == sibling.next {
 		sibling.parent.lastChild = sibling
 	}
 }
@@ -220,9 +210,9 @@ func (n *BaseNode) InsertBefore(this *BaseNode, sibling *BaseNode) {
 	sibling.Unlink()
 	sibling.SetPrevious(n.previous)
 	if nil != sibling.Previous() {
-		sibling.Previous().SetNext(sibling)
+		sibling.previous.next = sibling
 	}
-	sibling.SetNext(this)
+	sibling.next = this
 	n.previous = sibling
 	sibling.parent = n.parent
 	if nil == sibling.Previous() {
@@ -235,7 +225,7 @@ func (n *BaseNode) AppendChild(this, child *BaseNode) {
 	child.Unlink()
 	child.parent = this
 	if nil != n.lastChild {
-		n.lastChild.SetNext(child)
+		n.lastChild.next = child
 		child.SetPrevious(n.lastChild)
 		n.lastChild = child
 	} else {

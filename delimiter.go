@@ -137,9 +137,9 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				}
 			}
 
-			tmp := openerInl.Next()
+			tmp := openerInl.next
 			for nil != tmp && tmp != closerInl {
-				next := tmp.Next()
+				next := tmp.next
 				tmp.Unlink()
 				emStrongDel.AppendChild(emStrongDel, tmp)
 				tmp = next

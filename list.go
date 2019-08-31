@@ -35,7 +35,7 @@ func (list *BaseNode) ListFinalize(context *Context) {
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
 	for nil != item {
-		if list.endsWithBlankLine(item) && nil != item.Next() {
+		if list.endsWithBlankLine(item) && nil != item.next {
 			list.tight = false
 			break
 		}
@@ -43,13 +43,13 @@ func (list *BaseNode) ListFinalize(context *Context) {
 		var subitem = item.firstChild
 		for nil != subitem {
 			if list.endsWithBlankLine(subitem) &&
-				(nil != item.Next() || nil != subitem.Next()) {
+				(nil != item.next || nil != subitem.next) {
 				list.tight = false
 				break
 			}
-			subitem = subitem.Next()
+			subitem = subitem.next
 		}
-		item = item.Next()
+		item = item.next
 	}
 }
 

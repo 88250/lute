@@ -26,7 +26,7 @@ func (t *Tree) mergeText(node *BaseNode) {
 			for nil != next && NodeText == next.Type() {
 				child.AppendTokens(next.Tokens())
 				next.Unlink()
-				next = child.Next()
+				next = child.next
 			}
 		} else {
 			t.mergeText(child) // 递归处理子节点
