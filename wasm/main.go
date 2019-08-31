@@ -26,7 +26,15 @@ func markdown(this js.Value, args []js.Value) interface{} {
 	fmt.Printf("markdown text [%s]", markdownText)
 	luteEngine := lute.New()
 	html, _ := luteEngine.MarkdownStr("", markdownText)
+	_ = luteEngine
 	return html
+}
+
+// 导出 TinyGo 函数。
+//go:export md
+func md(markdownText string) string {
+	fmt.Println("TinyGo！")
+	return "TinyGo！"
 }
 
 func main() {
