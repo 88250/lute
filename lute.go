@@ -41,7 +41,6 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 	var tree *Tree
 	tree, err = parse(name, markdown, lute.options)
 	if nil != err {
-		// fmt.Println(string(markdown))
 		return
 	}
 
@@ -67,7 +66,6 @@ func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err er
 	var tree *Tree
 	tree, err = parse(name, markdown, lute.options)
 	if nil != err {
-		// fmt.Println(string(markdown))
 		return
 	}
 
