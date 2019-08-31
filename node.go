@@ -28,15 +28,15 @@ type BaseNode struct {
 
 	// 代码块
 
-	isFenced    bool
-	fenceChar   byte
-	fenceLength int
-	fenceOffset int
-	info        items
+	isFencedCodeBlock    bool
+	codeBlockFenceChar   byte
+	codeBlockFenceLength int
+	codeBlockFenceOffset int
+	codeBlockInfo        items
 
 	// HTML 块
 
-	hType int // 规范中定义的 HTML 块类型（1-7）
+	htmlBlockType int // 规范中定义的 HTML 块类型（1-7）
 
 	// 列表、列表项
 
@@ -49,36 +49,21 @@ type BaseNode struct {
 
 	// 任务列表项 [ ]、[x] 或者 [X]
 
-	checked bool // 是否勾选
+	taskListItemChecked bool // 是否勾选
 
 	// 表
 
-	Aligns []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
-	Align  int   // 表的单元格对齐方式
+	TableAligns    []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
+	TableCellAlign int   // 表的单元格对齐方式
 
 	// 标题
 
-	Level int // 1~6
+	HeadingLevel int // 1~6
 }
 
 // Type 返回节点类型。
 func (n *BaseNode) Type() int {
 	return n.typ
-}
-
-// IsOpen 返回节点是否是打开的。
-func (n *BaseNode) IsOpen() bool {
-	return !n.close
-}
-
-// IsClosed 返回节点是否是关闭的。
-func (n *BaseNode) IsClosed() bool {
-	return n.close
-}
-
-// Close 关闭节点。
-func (n *BaseNode) Close() {
-	n.close = true
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
@@ -138,51 +123,21 @@ func (n *BaseNode) CanContain(nodeType int) bool {
 	return NodeListItem != nodeType
 }
 
-// LastLineBlank 判断节点最后一行是否是空行。
-func (n *BaseNode) LastLineBlank() bool {
-	return n.lastLineBlank
-}
-
-// SetLastLineBlank 设置节点最后一行是否是空行。
-func (n *BaseNode) SetLastLineBlank(lastLineBlank bool) {
-	n.lastLineBlank = lastLineBlank
-}
-
-// LastLineChecked 返回最后一行是否检查过。在判断列表是紧凑或松散模式时作为标识用。
-func (n *BaseNode) LastLineChecked() bool {
-	return n.lastLineChecked
-}
-
-// SetLastLineChecked 设置最后一行是否检查过。
-func (n *BaseNode) SetLastLineChecked(lastLineChecked bool) {
-	n.lastLineChecked = lastLineChecked
-}
-
 // Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
 func (n *BaseNode) Unlink() {
 	if nil != n.previous {
 		n.previous.SetNext(n.next)
 	} else if nil != n.parent {
-		n.parent.SetFirstChild(n.next)
+		n.parent.firstChild = n.next
 	}
 	if nil != n.next {
-		n.next.SetPrevious(n.previous)
+		n.next.previous = n.previous
 	} else if nil != n.parent {
-		n.parent.SetLastChild(n.previous)
+		n.parent.lastChild = n.previous
 	}
 	n.parent = nil
 	n.next = nil
 	n.previous = nil
-}
-
-// Parent 返回父节点。
-func (n *BaseNode) Parent() *BaseNode {
-	return n.parent
-}
-
-// SetParent 设置父节点。
-func (n *BaseNode) SetParent(parent *BaseNode) {
-	n.parent = parent
 }
 
 // Next 返回后一个兄弟节点。
@@ -203,16 +158,6 @@ func (n *BaseNode) Previous() *BaseNode {
 // SetPrevious 设置前一个兄弟节点。
 func (n *BaseNode) SetPrevious(previous *BaseNode) {
 	n.previous = previous
-}
-
-// FirstChild 返回第一个子节点。
-func (n *BaseNode) FirstChild() *BaseNode {
-	return n.firstChild
-}
-
-// SetFirstChild 设置第一个子节点。
-func (n *BaseNode) SetFirstChild(firstChild *BaseNode) {
-	n.firstChild = firstChild
 }
 
 // 返回最后一个子节点。
@@ -264,9 +209,9 @@ func (n *BaseNode) InsertAfter(this *BaseNode, sibling *BaseNode) {
 	}
 	sibling.SetPrevious(this)
 	n.next = sibling
-	sibling.SetParent(n.parent)
+	sibling.parent = n.parent
 	if nil == sibling.Next() {
-		sibling.Parent().SetLastChild(sibling)
+		sibling.parent.lastChild = sibling
 	}
 }
 
@@ -279,16 +224,16 @@ func (n *BaseNode) InsertBefore(this *BaseNode, sibling *BaseNode) {
 	}
 	sibling.SetNext(this)
 	n.previous = sibling
-	sibling.SetParent(n.parent)
+	sibling.parent = n.parent
 	if nil == sibling.Previous() {
-		sibling.Parent().SetFirstChild(sibling)
+		sibling.parent.firstChild = sibling
 	}
 }
 
 // AppendChild 添加一个子节点。
 func (n *BaseNode) AppendChild(this, child *BaseNode) {
 	child.Unlink()
-	child.SetParent(this)
+	child.parent = this
 	if nil != n.lastChild {
 		n.lastChild.SetNext(child)
 		child.SetPrevious(n.lastChild)

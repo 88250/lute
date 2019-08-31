@@ -40,7 +40,7 @@ func Walk(n *BaseNode, walker Walker) (err error) {
 
 	if status != WalkSkipChildren {
 		// 递归遍历子节点
-		for c := n.FirstChild(); c != nil; c = c.Next() {
+		for c := n.firstChild; c != nil; c = c.next {
 			if err := Walk(c, walker); err != nil {
 				return err
 			}

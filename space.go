@@ -23,8 +23,8 @@ func (t *Tree) space(node *BaseNode) {
 		return
 	}
 
-	for child := node.FirstChild(); nil != child; {
-		next := child.Next()
+	for child := node.firstChild; nil != child; {
+		next := child.next
 		if NodeText == child.typ && nil != child.parent &&
 			NodeLink != child.parent.typ /* 不处理链接 label */ {
 			text := fromItems(child.Tokens())

@@ -130,7 +130,7 @@ func (context *Context) findNextNonspace() {
 func (context *Context) closeUnmatchedBlocks() {
 	if !context.allClosed {
 		for context.oldtip != context.lastMatchedContainer {
-			parent := context.oldtip.Parent()
+			parent := context.oldtip.parent
 			context.finalize(context.oldtip)
 			context.oldtip = parent
 		}
@@ -140,8 +140,8 @@ func (context *Context) closeUnmatchedBlocks() {
 
 // finalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
 func (context *Context) finalize(block *BaseNode) {
-	var parent = block.Parent()
-	block.Close()
+	var parent = block.parent
+	block.close = true
 	block.Finalize(context)
 	context.tip = parent
 }

@@ -55,12 +55,12 @@ func newHTMLRenderer(option options) (ret *Renderer) {
 
 func (r *Renderer) renderTableCellHTML(node *BaseNode, entering bool) (WalkStatus, error) {
 	tag := "td"
-	if NodeTableHead == node.Parent().Type() {
+	if NodeTableHead == node.parent.typ {
 		tag = "th"
 	}
 	if entering {
 		var attrs [][]string
-		switch node.Align {
+		switch node.TableCellAlign {
 		case 1:
 			attrs = append(attrs, []string{"align", "left"})
 		case 2:
@@ -83,7 +83,7 @@ func (r *Renderer) renderTableRowHTML(node *BaseNode, entering bool) (WalkStatus
 	} else {
 		r.tag("/tr", nil, false)
 		r.newline()
-		if node == node.Parent().LastChild() {
+		if node == node.parent.lastChild {
 			r.tag("/tbody", nil, false)
 		}
 		r.newline()
@@ -194,7 +194,7 @@ func (r *Renderer) renderDocumentHTML(node *BaseNode, entering bool) (WalkStatus
 }
 
 func (r *Renderer) renderParagraphHTML(node *BaseNode, entering bool) (WalkStatus, error) {
-	if grandparent := node.Parent().Parent(); nil != grandparent {
+	if grandparent := node.parent.parent; nil != grandparent {
 		if NodeList == grandparent.typ { // List.ListItem.Paragraph
 			if grandparent.tight {
 				return WalkContinue, nil
@@ -266,9 +266,9 @@ func (r *Renderer) renderBlockquoteHTML(n *BaseNode, entering bool) (WalkStatus,
 func (r *Renderer) renderHeadingHTML(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.writeString("<h" + " 123456"[node.Level:node.Level+1] + ">")
+		r.writeString("<h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + ">")
 	} else {
-		r.writeString("</h" + " 123456"[node.Level:node.Level+1] + ">")
+		r.writeString("</h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + ">")
 		r.newline()
 	}
 	return WalkContinue, nil
@@ -309,7 +309,7 @@ func (r *Renderer) renderListItemHTML(node *BaseNode, entering bool) (WalkStatus
 func (r *Renderer) renderTaskListItemMarkerHTML(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		var attrs [][]string
-		if node.checked {
+		if node.taskListItemChecked {
 			attrs = append(attrs, []string{"checked", ""})
 		}
 		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})

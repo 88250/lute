@@ -18,7 +18,7 @@ import (
 )
 
 func (html *BaseNode) HTMLBlockContinue(context *Context) int {
-	if context.blank && (html.hType == 6 || html.hType == 7) {
+	if context.blank && (html.htmlBlockType == 6 || html.htmlBlockType == 7) {
 		return 1
 	}
 	return 0
@@ -93,7 +93,7 @@ func (t *Tree) parseHTML(tokens items) (ret *BaseNode) {
 		return nil
 	}
 
-	ret = &BaseNode{typ: NodeHTMLBlock, tokens: make(items, 0, 256), hType: 1}
+	ret = &BaseNode{typ: NodeHTMLBlock, tokens: make(items, 0, 256), htmlBlockType: 1}
 
 	if pos := tokens.acceptTokenss(htmlBlockTags1); 0 <= pos {
 		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {
@@ -103,11 +103,11 @@ func (t *Tree) parseHTML(tokens items) (ret *BaseNode) {
 
 	if pos := tokens.acceptTokenss(htmlBlockTags6); 0 <= pos {
 		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {
-			ret.hType = 6
+			ret.htmlBlockType = 6
 			return
 		}
 		if itemSlash == tokens[pos] && itemGreater == tokens[pos+1] {
-			ret.hType = 6
+			ret.htmlBlockType = 6
 			return
 		}
 	}
@@ -115,34 +115,34 @@ func (t *Tree) parseHTML(tokens items) (ret *BaseNode) {
 	tag := bytes.TrimSpace(tokens)
 	isOpenTag := t.isOpenTag(tag)
 	if isOpenTag && t.context.tip.Type() != NodeParagraph {
-		ret.hType = 7
+		ret.htmlBlockType = 7
 		return
 	}
 	isCloseTag := t.isCloseTag(tag)
 	if isCloseTag && t.context.tip.Type() != NodeParagraph {
-		ret.hType = 7
+		ret.htmlBlockType = 7
 		return
 	}
 
 	rawText := fromItems(tokens)
 	if 0 == strings.Index(rawText, "<!--") {
-		ret.hType = 2
+		ret.htmlBlockType = 2
 		return
 	}
 
 	if 0 == strings.Index(rawText, "<?") {
-		ret.hType = 3
+		ret.htmlBlockType = 3
 		return
 	}
 
 	if 2 < len(rawText) && 0 == strings.Index(rawText, "<!") {
 		following := rawText[2:]
 		if 'A' <= following[0] && 'Z' >= following[0] {
-			ret.hType = 4
+			ret.htmlBlockType = 4
 			return
 		}
 		if 0 == strings.Index(following, "[CDATA[") {
-			ret.hType = 5
+			ret.htmlBlockType = 5
 			return
 		}
 	}

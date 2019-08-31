@@ -23,8 +23,8 @@ func (r *Renderer) renderCodeBlockHTML(node *BaseNode, entering bool) (WalkStatu
 	if entering {
 		r.newline()
 		tokens := node.tokens
-		if nil != node.info {
-			infoWords := bytes.Fields(node.info)
+		if nil != node.codeBlockInfo {
+			infoWords := bytes.Fields(node.codeBlockInfo)
 			language := infoWords[0]
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)

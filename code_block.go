@@ -19,14 +19,14 @@ import (
 func (codeBlock *BaseNode) CodeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
-	if codeBlock.isFenced {
-		if indent <= 3 && codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.fenceChar, codeBlock.fenceLength) {
+	if codeBlock.isFencedCodeBlock {
+		if indent <= 3 && codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.codeBlockFenceChar, codeBlock.codeBlockFenceLength) {
 			// closing fence - we're at end of line, so we can return
 			context.finalize(codeBlock)
 			return 2
 		} else {
 			// skip optional spaces of fence offset
-			var i = codeBlock.fenceOffset
+			var i = codeBlock.codeBlockFenceOffset
 			var token byte
 			for i > 0 {
 				token = ln.peek(context.offset)
@@ -50,7 +50,7 @@ func (codeBlock *BaseNode) CodeBlockContinue(context *Context) int {
 }
 
 func (codeBlock *BaseNode) CodeBlockFinalize(context *Context) {
-	if codeBlock.isFenced {
+	if codeBlock.isFencedCodeBlock {
 		content := codeBlock.tokens
 		length := len(content)
 		if 1 > length {
@@ -68,7 +68,7 @@ func (codeBlock *BaseNode) CodeBlockFinalize(context *Context) {
 		firstLine := content[:i]
 		rest := content[i+1:]
 
-		codeBlock.info = unescapeString(bytes.TrimSpace(firstLine))
+		codeBlock.codeBlockInfo = unescapeString(bytes.TrimSpace(firstLine))
 		codeBlock.tokens = rest
 	} else { // 缩进代码块
 		codeBlock.tokens = codeBlock.tokens.replaceNewlineSpace()
@@ -99,7 +99,7 @@ func (t *Tree) parseFencedCode() (ret *BaseNode) {
 	info = bytes.TrimSpace(infoTokens)
 	info = unescapeString(info)
 	ret = &BaseNode{typ: NodeCodeBlock, tokens: make(items, 0, 256),
-		isFenced: true, fenceChar: fenceChar, fenceLength: fenceLength, fenceOffset: t.context.indent, info: info}
+		isFencedCodeBlock: true, codeBlockFenceChar: fenceChar, codeBlockFenceLength: fenceLength, codeBlockFenceOffset: t.context.indent, codeBlockInfo: info}
 
 	return
 }

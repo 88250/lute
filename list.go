@@ -40,7 +40,7 @@ func (list *BaseNode) ListFinalize(context *Context) {
 			break
 		}
 
-		var subitem = item.FirstChild()
+		var subitem = item.firstChild
 		for nil != subitem {
 			if list.endsWithBlankLine(subitem) &&
 				(nil != item.Next() || nil != subitem.Next()) {
@@ -164,15 +164,15 @@ func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter byt
 // endsWithBlankLine 判断块节点 block 是否是空行结束。如果 block 是列表或者列表项则迭代下降进入判断。
 func (list *BaseNode) endsWithBlankLine(block *BaseNode) bool {
 	for nil != block {
-		if block.LastLineBlank() {
+		if block.lastLineBlank {
 			return true
 		}
-		t := block.Type()
-		if !block.LastLineChecked() && (t == NodeList || t == NodeListItem) {
-			block.SetLastLineChecked(true)
-			block = block.LastChild()
+		t := block.typ
+		if !block.lastLineChecked && (t == NodeList || t == NodeListItem) {
+			block.lastLineChecked = true
+			block = block.lastChild
 		} else {
-			block.SetLastLineChecked(true)
+			block.lastLineChecked = true
 			break
 		}
 	}

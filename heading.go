@@ -30,7 +30,7 @@ func (t *Tree) parseATXHeading() (ret *BaseNode) {
 		return
 	}
 
-	heading := &BaseNode{typ: NodeHeading, Level: level}
+	heading := &BaseNode{typ: NodeHeading, HeadingLevel: level}
 	tokens = bytes.TrimLeft(tokens, " \t\n")
 	tokens = bytes.TrimLeft(tokens[level:], " \t\n")
 	for _, token := range tokens {
@@ -103,9 +103,9 @@ func (t *Tree) parseSetextHeading() (ret *BaseNode) {
 		return nil
 	}
 
-	ret = &BaseNode{typ: NodeHeading, Level: 1}
+	ret = &BaseNode{typ: NodeHeading, HeadingLevel: 1}
 	if itemHyphen == marker {
-		ret.Level = 2
+		ret.HeadingLevel = 2
 	}
 
 	return

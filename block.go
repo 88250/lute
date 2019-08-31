@@ -40,7 +40,7 @@ func (t *Tree) incorporateLine(line items) {
 	var container *BaseNode
 	container = t.Root
 	lastChild := container.LastChild()
-	for ; nil != lastChild && lastChild.IsOpen(); lastChild = container.LastChild() {
+	for ; nil != lastChild && !lastChild.close; lastChild = container.LastChild() {
 		container = lastChild
 		t.context.findNextNonspace()
 
@@ -55,7 +55,7 @@ func (t *Tree) incorporateLine(line items) {
 		}
 
 		if !allMatched {
-			container = container.Parent() // back up to last matching block
+			container = container.parent // back up to last matching block
 			break
 		}
 	}
@@ -117,21 +117,21 @@ func (t *Tree) incorporateLine(line items) {
 		t.context.closeUnmatchedBlocks()
 
 		if t.context.blank && nil != container.LastChild() {
-			container.LastChild().SetLastLineBlank(true)
+			container.lastChild.lastLineBlank = true
 		}
 
 		typ := container.Type()
-		isFenced := NodeCodeBlock == typ && container.isFenced
+		isFenced := NodeCodeBlock == typ && container.isFencedCodeBlock
 
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
 		var lastLineBlank = t.context.blank &&
 			!(typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
-				(typ == NodeListItem && nil == container.FirstChild())) // 内容为空的列表项也不计入空行判断
+				(typ == NodeListItem && nil == container.firstChild)) // 内容为空的列表项也不计入空行判断
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 lastLineBlank
 		// lastLineBlank 目前仅在判断列表紧凑模式上使用
-		for cont := container; nil != cont; cont = cont.Parent() {
-			cont.SetLastLineBlank(lastLineBlank)
+		for cont := container; nil != cont; cont = cont.parent {
+			cont.lastLineBlank = lastLineBlank
 		}
 
 		if container.AcceptLines() {
@@ -139,8 +139,8 @@ func (t *Tree) incorporateLine(line items) {
 			if typ == NodeHTMLBlock {
 				// HTML 块（类型 1-5）需要检查是否满足闭合条件
 				html := container
-				if html.hType >= 1 && html.hType <= 5 {
-					if t.isHTMLBlockClose(t.context.currentLine[t.context.offset:], html.hType) {
+				if html.htmlBlockType >= 1 && html.htmlBlockType <= 5 {
+					if t.isHTMLBlockClose(t.context.currentLine[t.context.offset:], html.htmlBlockType) {
 						t.context.finalize(container)
 					}
 				}
@@ -205,7 +205,7 @@ var blockStarts = []blockStartFunc{
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(codeBlock)
 				t.context.advanceNextNonspace()
-				t.context.advanceOffset(codeBlock.fenceLength, false)
+				t.context.advanceOffset(codeBlock.codeBlockFenceLength, false)
 				return 2
 			}
 		}

@@ -30,8 +30,8 @@ func (context *Context) parseTable(lines [][]byte) (ret *BaseNode) {
 		return
 	}
 
-	ret = &BaseNode{typ: NodeTable, Aligns: aligns}
-	ret.Aligns = aligns
+	ret = &BaseNode{typ: NodeTable, TableAligns: aligns}
+	ret.TableAligns = aligns
 	ret.AppendChild(ret, context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
 		tableRow := context.parseTableRow(bytes.TrimSpace(lines[i]), aligns, false)
@@ -45,8 +45,8 @@ func (context *Context) parseTable(lines [][]byte) (ret *BaseNode) {
 
 func (context *Context) newTableHead(headRow *BaseNode) *BaseNode {
 	ret := &BaseNode{typ: NodeTableHead}
-	for c := headRow.FirstChild(); c != nil; {
-		next := c.Next()
+	for c := headRow.firstChild; c != nil; {
+		next := c.next
 		ret.AppendChild(ret, c)
 		c = next
 	}
@@ -54,7 +54,7 @@ func (context *Context) newTableHead(headRow *BaseNode) *BaseNode {
 }
 
 func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *BaseNode) {
-	ret = &BaseNode{typ: NodeTableRow, Aligns: aligns}
+	ret = &BaseNode{typ: NodeTableRow, TableAligns: aligns}
 	cols := line.splitWithoutBackslashEscape(itemPipe)
 	if isBlank(cols[0]) {
 		cols = cols[1:]
@@ -73,7 +73,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	var col items
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = bytes.TrimSpace(cols[i])
-		cell := &BaseNode{typ: NodeTableCell, Align: aligns[i]}
+		cell := &BaseNode{typ: NodeTableCell, TableCellAlign: aligns[i]}
 		col = col.removeFirst(itemBackslash) // 删掉一个反斜杠来恢复语义
 		cell.tokens = col
 		ret.AppendChild(ret, cell)
@@ -81,7 +81,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 
 	// 可能需要补全剩余的列
 	for ; i < alignsLen; i++ {
-		cell := &BaseNode{typ: NodeTableCell, Align: aligns[i]}
+		cell := &BaseNode{typ: NodeTableCell, TableCellAlign: aligns[i]}
 		ret.AppendChild(ret, cell)
 	}
 	return

@@ -19,9 +19,9 @@ func (t *Tree) mergeText(node *BaseNode) {
 		return
 	}
 
-	for child := node.FirstChild(); nil != child; {
-		next := child.Next()
-		if NodeText == child.Type() {
+	for child := node.firstChild; nil != child; {
+		next := child.next
+		if NodeText == child.typ {
 			// 逐个合并后续兄弟节点
 			for nil != next && NodeText == next.Type() {
 				child.AppendTokens(next.Tokens())

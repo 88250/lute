@@ -74,8 +74,8 @@ func (r *Renderer) renderTableHeadMarkdown(node *BaseNode, entering bool) (WalkS
 	if !entering {
 		r.writeString("|\n")
 		table := node.parent
-		for i := 0; i < len(table.Aligns); i++ {
-			align := table.Aligns[i]
+		for i := 0; i < len(table.TableAligns); i++ {
+			align := table.TableAligns[i]
 			switch align {
 			case 0:
 				r.writeString("|---")
@@ -169,7 +169,7 @@ func (r *Renderer) renderParagraphMarkdown(node *BaseNode, entering bool) (WalkS
 	inList := false
 	inTightList := false
 	lastListItemLastPara := false
-	if parent := node.Parent(); nil != parent {
+	if parent := node.parent; nil != parent {
 		if NodeListItem == parent.typ { // ListItem.Paragraph
 			listItem := parent
 			inList = true
@@ -217,7 +217,7 @@ func (r *Renderer) renderTextMarkdown(node *BaseNode, entering bool) (WalkStatus
 		return WalkContinue, nil
 	}
 
-	if typ := node.Parent().Type(); NodeLink != typ && NodeImage != typ {
+	if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
 		r.write(node.Tokens())
 	}
 	return WalkContinue, nil
@@ -235,14 +235,14 @@ func (r *Renderer) renderCodeSpanMarkdown(node *BaseNode, entering bool) (WalkSt
 }
 
 func (r *Renderer) renderCodeBlockMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
-	if !node.isFenced {
-		node.fenceLength = 3
+	if !node.isFencedCodeBlock {
+		node.codeBlockFenceLength = 3
 	}
 	if entering {
 		listPadding := 0
 		if grandparent := node.parent.parent; nil != grandparent {
 			if NodeList == grandparent.typ { // List.ListItem.CodeBlock
-				if node.Parent().FirstChild() != node {
+				if node.parent.firstChild != node {
 					listPadding = grandparent.padding
 				}
 			}
@@ -252,8 +252,8 @@ func (r *Renderer) renderCodeBlockMarkdown(node *BaseNode, entering bool) (WalkS
 		if 0 < listPadding {
 			r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
 		}
-		r.write(bytes.Repeat([]byte{itemBacktick}, node.fenceLength))
-		r.write(node.info)
+		r.write(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLength))
+		r.write(node.codeBlockInfo)
 		r.writeByte('\n')
 		if 0 < listPadding {
 			lines := bytes.Split(node.tokens, []byte{itemNewline})
@@ -271,7 +271,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node *BaseNode, entering bool) (WalkS
 		return WalkSkipChildren, nil
 	}
 
-	r.write(bytes.Repeat([]byte{itemBacktick}, node.fenceLength))
+	r.write(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLength))
 	r.writeString("\n\n")
 	return WalkContinue, nil
 }
@@ -306,7 +306,7 @@ func (r *Renderer) renderBlockquoteMarkdown(n *BaseNode, entering bool) (WalkSta
 
 func (r *Renderer) renderHeadingMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(bytes.Repeat([]byte{itemCrosshatch}, node.Level)) // 统一使用 ATX 标题，不使用 Setext 标题
+		r.write(bytes.Repeat([]byte{itemCrosshatch}, node.HeadingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
 	} else {
 		r.newline()
@@ -350,7 +350,7 @@ func (r *Renderer) renderListItemMarkdown(node *BaseNode, entering bool) (WalkSt
 func (r *Renderer) renderTaskListItemMarkerMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte('[')
-		if node.checked {
+		if node.taskListItemChecked {
 			r.writeByte('X')
 		} else {
 			r.writeByte(' ')
