@@ -25,8 +25,8 @@ func (t *Tree) space(node *BaseNode) {
 
 	for child := node.FirstChild(); nil != child; {
 		next := child.Next()
-		if NodeText == child.Type() &&
-			NodeLink != child.Parent().Type() /* 不处理链接 label */ {
+		if NodeText == child.typ && nil != child.parent &&
+			NodeLink != child.parent.typ /* 不处理链接 label */ {
 			text := fromItems(child.Tokens())
 			text = space0(text)
 			child.SetTokens(toItems(text))
