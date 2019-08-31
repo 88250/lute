@@ -260,17 +260,17 @@ Markdown 原文：
 CommonMark：
 
 ```
-BenchmarkLute-2   	     300	   5132936 ns/op	 2994687 B/op	   21333 allocs/op
-BenchmarkLute-4   	     300	   4351804 ns/op	 2995676 B/op	   21345 allocs/op
-BenchmarkLute-8   	     300	   4168959 ns/op	 2996725 B/op	   21355 allocs/op
+BenchmarkLute-2   	     300	   4577753 ns/op	 3858948 B/op	   17704 allocs/op
+BenchmarkLute-4   	     500	   3835787 ns/op	 3855799 B/op	   17712 allocs/op
+BenchmarkLute-8   	     500	   3712092 ns/op	 3858597 B/op	   17746 allocs/op
 ```
 
 GFM：
 
 ```
-BenchmarkLute-2   	     200	   6398041 ns/op	 3898898 B/op	   26556 allocs/op
-BenchmarkLute-4   	     300	   5046502 ns/op	 3894238 B/op	   26540 allocs/op
-BenchmarkLute-8   	     300	   4667613 ns/op	 3895977 B/op	   26560 allocs/op
+BenchmarkLute-2   	     300	   5797823 ns/op	 5038749 B/op	   22891 allocs/op
+BenchmarkLute-4   	     300	   4627621 ns/op	 5043427 B/op	   22958 allocs/op
+BenchmarkLute-8   	     300	   4388374 ns/op	 5051098 B/op	   23067 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
