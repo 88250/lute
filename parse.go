@@ -149,7 +149,7 @@ func (context *Context) finalize(block *BaseNode) {
 // addChild 将 child 作为子节点添加到 context.tip 上。如果 tip 节点不能接受子节点（非块级容器不能添加子节点），则最终化该 tip
 // 节点并向父节点方向尝试，直到找到一个能接受 child 的节点为止。
 func (context *Context) addChild(child *BaseNode) {
-	for !context.tip.CanContain(child.Type()) {
+	for !context.tip.CanContain(child.typ) {
 		context.finalize(context.tip) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 

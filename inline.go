@@ -39,7 +39,7 @@ func (t *Tree) walkParseInline(node *BaseNode, wg *sync.WaitGroup) {
 	}
 
 	// 只有如下几种类型的块节点需要生成行级子节点
-	if typ := node.Type(); NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
+	if typ := node.typ; NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
 		tokens := node.Tokens()
 		if NodeParagraph == typ && nil == tokens {
 			// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()

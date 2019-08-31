@@ -38,9 +38,9 @@ func (r *Renderer) render(root *BaseNode) error {
 	r.writer.Grow(4096)
 
 	return Walk(root, func(n *BaseNode, entering bool) (WalkStatus, error) {
-		f := r.rendererFuncs[n.Type()]
+		f := r.rendererFuncs[n.typ]
 		if nil == f {
-			return WalkStop, errors.New(fmt.Sprintf("not found render function for node [type=%d, text=%s]", n.Type(), n.RawText()))
+			return WalkStop, errors.New(fmt.Sprintf("not found render function for node [type=%d, text=%s]", n.typ, n.RawText()))
 		}
 
 		return f(n, entering)

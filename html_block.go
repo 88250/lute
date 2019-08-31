@@ -114,12 +114,12 @@ func (t *Tree) parseHTML(tokens items) (ret *BaseNode) {
 
 	tag := bytes.TrimSpace(tokens)
 	isOpenTag := t.isOpenTag(tag)
-	if isOpenTag && t.context.tip.Type() != NodeParagraph {
+	if isOpenTag && t.context.tip.typ != NodeParagraph {
 		ret.htmlBlockType = 7
 		return
 	}
 	isCloseTag := t.isCloseTag(tag)
-	if isCloseTag && t.context.tip.Type() != NodeParagraph {
+	if isCloseTag && t.context.tip.typ != NodeParagraph {
 		ret.htmlBlockType = 7
 		return
 	}
