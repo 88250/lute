@@ -12,8 +12,12 @@
 
 package lute
 
-// BaseNode 描述了节点基础结构。
+// BaseNode 描述了节点结构。
 type BaseNode struct {
+	// 不用接口实现的方式写主要是为了性能，牺牲扩展性
+
+	// 节点结构
+
 	typ             int       // 节点类型
 	parent          *BaseNode // 父节点
 	previous        *BaseNode // 前一个兄弟节点
@@ -44,8 +48,8 @@ type BaseNode struct {
 
 	// 链接、图片
 
-	Destination items // 链接地址
-	Title       items // 链接标题
+	destination items // 链接地址
+	title       items // 链接标题
 
 	// 任务列表项 [ ]、[x] 或者 [X]
 
@@ -53,17 +57,12 @@ type BaseNode struct {
 
 	// 表
 
-	TableAligns    []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
-	TableCellAlign int   // 表的单元格对齐方式
+	tableAligns    []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
+	tableCellAlign int   // 表的单元格对齐方式
 
 	// 标题
 
-	HeadingLevel int // 1~6
-}
-
-// Type 返回节点类型。
-func (n *BaseNode) Type() int {
-	return n.typ
+	headingLevel int // 1~6
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
@@ -104,7 +103,7 @@ func (n *BaseNode) Continue(context *Context) int {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *BaseNode) AcceptLines() bool {
 	switch n.typ {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable:
 		return true
 	}
 	return false
