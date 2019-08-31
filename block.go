@@ -212,19 +212,6 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断 HTML 块（<）是否开始
-	func(t *Tree, container *BaseNode) int {
-		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
-			tokens := t.context.currentLine[t.context.nextNonspace:]
-			if html := t.parseHTML(tokens); nil != html {
-				t.context.closeUnmatchedBlocks()
-				t.context.addChild(html)
-				return 2
-			}
-		}
-		return 0
-	},
-
 	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented && container.Type() == NodeParagraph {
@@ -247,6 +234,19 @@ var blockStarts = []blockStartFunc{
 					t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 					return 2
 				}
+			}
+		}
+		return 0
+	},
+
+	// 判断 HTML 块（<）是否开始
+	func(t *Tree, container *BaseNode) int {
+		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
+			tokens := t.context.currentLine[t.context.nextNonspace:]
+			if html := t.parseHTML(tokens); nil != html {
+				t.context.closeUnmatchedBlocks()
+				t.context.addChild(html)
+				return 2
 			}
 		}
 		return 0
