@@ -17,10 +17,8 @@ package lute
 import (
 	"bytes"
 	"html"
-	"sync"
-
-	//"html"
 	"strings"
+	"sync"
 )
 
 // parseInlines 解析并生成行级节点。

@@ -14,7 +14,6 @@ package lute
 
 import (
 	"bytes"
-	"html"
 	"strings"
 	"unicode/utf8"
 )
@@ -62,23 +61,6 @@ func escapeHTML(html items) (ret items) {
 	}
 	if inited {
 		ret = append(ret, html[start:]...)
-	}
-	return
-}
-
-func unescapeString(tokens items) (ret items) {
-	if nil == tokens {
-		return
-	}
-
-	tokens = toItems(html.UnescapeString(fromItems(tokens))) // FIXME: 此处应该用内部的实体转义方式
-	length := len(tokens)
-	ret = make(items, 0, length)
-	for i := 0; i < length; i++ {
-		if tokens.isBackslashEscapePunct(i) {
-			ret = ret[:len(ret)-1]
-		}
-		ret = append(ret, tokens[i])
 	}
 	return
 }

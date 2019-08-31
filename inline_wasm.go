@@ -16,7 +16,6 @@ package lute
 
 import (
 	"bytes"
-	"html"
 	"strings"
 )
 
@@ -187,7 +186,9 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *BaseNode) {
 		}
 	}
 
-	v := html.UnescapeString(entityName)
+	// FIXME: 尝试 TinyGo，暂时注释掉
+	//v := html.UnescapeString(entityName)
+	v := ""
 	if v == entityName {
 		ctx.pos++
 		return &BaseNode{typ: NodeText, tokens: toItems("&")}
