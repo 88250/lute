@@ -17,13 +17,6 @@ import (
 	"unicode/utf8"
 )
 
-// Link 描述了链接节点结构。
-type Link struct {
-	*BaseNode
-	Destination items
-	Title       items
-}
-
 func (context *Context) parseInlineLink(tokens items) (passed, remains, destination items) {
 	remains = tokens
 	length := len(tokens)

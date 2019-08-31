@@ -72,7 +72,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		remains = tokens
 	}
 
-	link := &Link{&BaseNode{typ: NodeLink}, destination, nil}
+	link := &BaseNode{typ: NodeLink, Destination: destination}
 	lowerCaseLabel := strings.ToLower(label)
 	link.Title = title
 	if _, ok := context.linkRefDef[lowerCaseLabel]; !ok {

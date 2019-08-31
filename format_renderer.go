@@ -56,25 +56,24 @@ func newFormatRenderer(option options) (ret *Renderer) {
 
 // TODO: 表的格式化应该按最宽的单元格对齐内容
 
-func (r *Renderer) renderTableCellMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTableCellMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte('|')
 	}
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableRowMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTableRowMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.writeString("|\n")
 	}
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableHeadMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTableHeadMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.writeString("|\n")
-		n := node.(*TableHead)
-		table := n.Parent().(*Table)
+		table := node.parent
 		for i := 0; i < len(table.Aligns); i++ {
 			align := table.Aligns[i]
 			switch align {
@@ -93,14 +92,14 @@ func (r *Renderer) renderTableHeadMarkdown(node Node, entering bool) (WalkStatus
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTableMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.writeByte('\n')
 	}
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderStrikethroughMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderStrikethroughMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("~~")
 	} else {
@@ -109,16 +108,15 @@ func (r *Renderer) renderStrikethroughMarkdown(node Node, entering bool) (WalkSt
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderImageMarkdown(node Node, entering bool) (WalkStatus, error) {
-	n := node.(*Image)
+func (r *Renderer) renderImageMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("![")
-		r.write(n.firstChild.Tokens())
+		r.write(node.firstChild.Tokens())
 		r.writeString("](")
-		r.write(n.Destination)
-		if nil != n.Title {
+		r.write(node.Destination)
+		if nil != node.Title {
 			r.writeString(" \"")
-			r.write(n.Title)
+			r.write(node.Title)
 			r.writeByte('"')
 		}
 		r.writeByte(')')
@@ -126,16 +124,15 @@ func (r *Renderer) renderImageMarkdown(node Node, entering bool) (WalkStatus, er
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderLinkMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderLinkMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		n := node.(*Link)
 		r.writeString("[")
-		r.write(n.firstChild.Tokens()) // FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
+		r.write(node.firstChild.Tokens()) // FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
 		r.writeString("](")
-		r.write(n.Destination)
-		if nil != n.Title {
+		r.write(node.Destination)
+		if nil != node.Title {
 			r.writeString(" \"")
-			r.write(n.Title)
+			r.write(node.Title)
 			r.writeByte('"')
 		}
 		r.writeByte(')')
@@ -143,7 +140,7 @@ func (r *Renderer) renderLinkMarkdown(node Node, entering bool) (WalkStatus, err
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHTMLMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderHTMLMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if !entering {
 		return WalkContinue, nil
 	}
@@ -154,7 +151,7 @@ func (r *Renderer) renderHTMLMarkdown(node Node, entering bool) (WalkStatus, err
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderInlineHTMLMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderInlineHTMLMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if !entering {
 		return WalkContinue, nil
 	}
@@ -163,22 +160,23 @@ func (r *Renderer) renderInlineHTMLMarkdown(node Node, entering bool) (WalkStatu
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderDocumentMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderDocumentMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderParagraphMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	listPadding := 0
 	inList := false
 	inTightList := false
 	lastListItemLastPara := false
 	if parent := node.Parent(); nil != parent {
-		if listItem, ok := parent.(*ListItem); ok { // ListItem.Paragraph
+		if NodeListItem == parent.typ { // ListItem.Paragraph
+			listItem := parent
 			inList = true
 
 			// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
 			// 设置紧凑标识的具体实现可参考函数 List.Finalize()
-			inTightList = listItem.Parent().(*List).tight
+			inTightList = listItem.parent.tight
 
 			firstPara := listItem.firstChild
 			if 3 != listItem.listData.typ { // 普通列表
@@ -214,7 +212,7 @@ func (r *Renderer) renderParagraphMarkdown(node Node, entering bool) (WalkStatus
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTextMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTextMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if !entering {
 		return WalkContinue, nil
 	}
@@ -225,7 +223,7 @@ func (r *Renderer) renderTextMarkdown(node Node, entering bool) (WalkStatus, err
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeSpanMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderCodeSpanMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte('`')
 		r.write(node.Tokens())
@@ -236,17 +234,16 @@ func (r *Renderer) renderCodeSpanMarkdown(node Node, entering bool) (WalkStatus,
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus, error) {
-	n := node.(*CodeBlock)
-	if !n.isFenced {
-		n.fenceLength = 3
+func (r *Renderer) renderCodeBlockMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
+	if !node.isFenced {
+		node.fenceLength = 3
 	}
 	if entering {
 		listPadding := 0
-		if grandparent := node.Parent().Parent(); nil != grandparent {
-			if list, ok := grandparent.(*List); ok { // List.ListItem.CodeBlock
+		if grandparent := node.parent.parent; nil != grandparent {
+			if NodeList == grandparent.typ { // List.ListItem.CodeBlock
 				if node.Parent().FirstChild() != node {
-					listPadding = list.padding
+					listPadding = grandparent.padding
 				}
 			}
 		}
@@ -255,11 +252,11 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 		if 0 < listPadding {
 			r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
 		}
-		r.write(bytes.Repeat([]byte{itemBacktick}, n.fenceLength))
-		r.write(n.info)
+		r.write(bytes.Repeat([]byte{itemBacktick}, node.fenceLength))
+		r.write(node.info)
 		r.writeByte('\n')
 		if 0 < listPadding {
-			lines := bytes.Split(n.tokens, []byte{itemNewline})
+			lines := bytes.Split(node.tokens, []byte{itemNewline})
 			length := len(lines)
 			for i, line := range lines {
 				r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
@@ -269,17 +266,17 @@ func (r *Renderer) renderCodeBlockMarkdown(node Node, entering bool) (WalkStatus
 				}
 			}
 		} else {
-			r.write(n.tokens)
+			r.write(node.tokens)
 		}
 		return WalkSkipChildren, nil
 	}
 
-	r.write(bytes.Repeat([]byte{itemBacktick}, n.fenceLength))
+	r.write(bytes.Repeat([]byte{itemBacktick}, node.fenceLength))
 	r.writeString("\n\n")
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderEmphasisMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderEmphasisMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte('*')
 	} else {
@@ -288,7 +285,7 @@ func (r *Renderer) renderEmphasisMarkdown(node Node, entering bool) (WalkStatus,
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderStrongMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderStrongMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("**")
 	} else {
@@ -297,7 +294,7 @@ func (r *Renderer) renderStrongMarkdown(node Node, entering bool) (WalkStatus, e
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderBlockquoteMarkdown(n Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderBlockquoteMarkdown(n *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("> ") // 带个空格更好一些
@@ -307,10 +304,9 @@ func (r *Renderer) renderBlockquoteMarkdown(n Node, entering bool) (WalkStatus, 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, error) {
-	n := node.(*Heading)
+func (r *Renderer) renderHeadingMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(bytes.Repeat([]byte{itemCrosshatch}, n.Level)) // 统一使用 ATX 标题，不使用 Setext 标题
+		r.write(bytes.Repeat([]byte{itemCrosshatch}, node.Level)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
 	} else {
 		r.newline()
@@ -319,12 +315,11 @@ func (r *Renderer) renderHeadingMarkdown(node Node, entering bool) (WalkStatus, 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderListMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.listLevel++
 	} else {
-		n := node.(*List)
-		if n.tight {
+		if node.tight {
 			r.newline()
 		}
 		r.listLevel--
@@ -332,32 +327,30 @@ func (r *Renderer) renderListMarkdown(node Node, entering bool) (WalkStatus, err
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderListItemMarkdown(node Node, entering bool) (WalkStatus, error) {
-	n := node.(*ListItem)
+func (r *Renderer) renderListItemMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		if 1 < r.listLevel {
-			parent := n.Parent().Parent().(*ListItem)
+			parent := node.parent.parent
 			r.write(bytes.Repeat([]byte{itemSpace}, len(parent.marker)+1))
 			if 1 == parent.listData.typ {
 				r.writeByte(' ') // 有序列表需要加上分隔符 . 或者 ) 的一个字符长度
 			}
 		}
-		if 1 == n.listData.typ {
-			r.writeString(strconv.Itoa(n.num) + ".")
+		if 1 == node.listData.typ {
+			r.writeString(strconv.Itoa(node.num) + ".")
 		} else {
-			r.write(n.marker)
+			r.write(node.marker)
 		}
 		r.writeByte(' ')
 	}
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTaskListItemMarkerMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderTaskListItemMarkerMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		n := node.(*TaskListItemMarker)
 		r.writeByte('[')
-		if n.checked {
+		if node.checked {
 			r.writeByte('X')
 		} else {
 			r.writeByte(' ')
@@ -367,7 +360,7 @@ func (r *Renderer) renderTaskListItemMarkerMarkdown(node Node, entering bool) (W
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderThematicBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderThematicBreakMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("---\n\n")
@@ -375,7 +368,7 @@ func (r *Renderer) renderThematicBreakMarkdown(node Node, entering bool) (WalkSt
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHardBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderHardBreakMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		if !r.option.SoftBreak2HardBreak {
 			r.writeString("\\\n")
@@ -386,7 +379,7 @@ func (r *Renderer) renderHardBreakMarkdown(node Node, entering bool) (WalkStatus
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderSoftBreakMarkdown(node Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderSoftBreakMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 	}

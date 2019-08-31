@@ -19,7 +19,7 @@ import (
 
 // delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _）相关信息。
 type delimiter struct {
-	node           Node       // the text node point to
+	node           *BaseNode  // the text node point to
 	typ            byte       // the type of delimiter ([, ![, *, _)
 	num            int        // the number of delimiters
 	originalNum    int        // the original number of delimiters
@@ -37,12 +37,12 @@ type delimiter struct {
 // 嵌套强调和链接的解析算法的中文解读可参考这里 https://hacpai.com/article/1566893557720
 
 // handleDelim 将分隔符 *_~ 入栈。
-func (t *Tree) handleDelim(block Node, ctx *InlineContext) {
+func (t *Tree) handleDelim(block *BaseNode, ctx *InlineContext) {
 	startPos := ctx.pos
 	delim := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
-	node := &Text{tokens: text}
+	node := &BaseNode{typ: NodeText, tokens: text}
 	block.AppendChild(block, node)
 
 	// 将这个分隔符入栈
@@ -64,7 +64,7 @@ func (t *Tree) handleDelim(block Node, ctx *InlineContext) {
 // processEmphasis 处理强调、加粗以及删除线。
 func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	var opener, closer, oldCloser *delimiter
-	var openerInl, closerInl Node
+	var openerInl, closerInl *BaseNode
 	var tempStack *delimiter
 	var useDelims int
 	var openerFound bool
@@ -124,15 +124,15 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			text = closerInl.Tokens()[0 : len(closerInl.Tokens())-useDelims]
 			closerInl.SetTokens(text)
 
-			var emStrongDel Node
+			var emStrongDel *BaseNode
 			if 1 == useDelims {
-				emStrongDel = &Emphasis{&BaseNode{typ: NodeEmphasis}}
+				emStrongDel = &BaseNode{typ: NodeEmphasis}
 			} else {
 				if itemTilde != closercc {
-					emStrongDel = &Strong{&BaseNode{typ: NodeStrong}}
+					emStrongDel = &BaseNode{typ: NodeStrong}
 				} else {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel = &Strikethrough{&BaseNode{typ: NodeStrikethrough}}
+						emStrongDel = &BaseNode{typ: NodeStrikethrough}
 					}
 				}
 			}

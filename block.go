@@ -17,7 +17,7 @@ import "bytes"
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
-	t.context.linkRefDef = map[string]*Link{}
+	t.context.linkRefDef = map[string]*BaseNode{}
 	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		t.incorporateLine(line)
 	}
@@ -37,7 +37,7 @@ func (t *Tree) incorporateLine(line items) {
 	t.context.currentLineLen = len(t.context.currentLine)
 
 	allMatched := true
-	var container Node
+	var container *BaseNode
 	container = t.Root
 	lastChild := container.LastChild()
 	for ; nil != lastChild && lastChild.IsOpen(); lastChild = container.LastChild() {
@@ -121,7 +121,7 @@ func (t *Tree) incorporateLine(line items) {
 		}
 
 		typ := container.Type()
-		isFenced := NodeCodeBlock == typ && container.(*CodeBlock).isFenced
+		isFenced := NodeCodeBlock == typ && container.isFenced
 
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
 		var lastLineBlank = t.context.blank &&
@@ -138,7 +138,7 @@ func (t *Tree) incorporateLine(line items) {
 			t.addLine()
 			if typ == NodeHTMLBlock {
 				// HTML 块（类型 1-5）需要检查是否满足闭合条件
-				html := container.(*HTMLBlock)
+				html := container
 				if html.hType >= 1 && html.hType <= 5 {
 					if t.isHTMLBlockClose(t.context.currentLine[t.context.offset:], html.hType) {
 						t.context.finalize(container)
@@ -147,7 +147,7 @@ func (t *Tree) incorporateLine(line items) {
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
 			// 普通段落开始
-			t.context.addChild(&Paragraph{BaseNode: &BaseNode{typ: NodeParagraph, tokens: make(items, 0, 256)}})
+			t.context.addChild(&BaseNode{typ: NodeParagraph, tokens: make(items, 0, 256)})
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}
@@ -155,7 +155,7 @@ func (t *Tree) incorporateLine(line items) {
 }
 
 // blockStartFunc 定义了用于判断块是否开始的函数签名。
-type blockStartFunc func(t *Tree, container Node) int
+type blockStartFunc func(t *Tree, container *BaseNode) int
 
 // blockStarts 定义了一系列函数，每个函数用于判断某种块节点是否可以开始，返回值：
 // 0：不匹配
@@ -163,7 +163,7 @@ type blockStartFunc func(t *Tree, container Node) int
 // 2：匹配到叶子块
 var blockStarts = []blockStartFunc{
 	// 判断块引用（>）是否开始
-	func(t *Tree, container Node) int {
+	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
 			if itemEnd != token && itemGreater == token {
@@ -176,7 +176,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(&Blockquote{BaseNode: &BaseNode{typ: NodeBlockquote}})
+				t.context.addChild(&BaseNode{typ: NodeBlockquote})
 				return 1
 			}
 		}
@@ -184,7 +184,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 ATX 标题（#）是否开始
-	func(t *Tree, container Node) int {
+	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented {
 			if heading := t.parseATXHeading(); nil != heading {
 				t.context.advanceNextNonspace()
@@ -199,7 +199,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断围栏代码块（```）是否开始
-	func(t *Tree, container Node) int {
+	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented {
 			if codeBlock := t.parseFencedCode(); nil != codeBlock {
 				t.context.closeUnmatchedBlocks()
@@ -213,7 +213,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 HTML 块（<）是否开始
-	func(t *Tree, container Node) int {
+	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if html := t.parseHTML(tokens); nil != html {
@@ -226,7 +226,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 Setext 标题（- =）是否开始
-	func(t *Tree, container Node) int {
+	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented && container.Type() == NodeParagraph {
 			if heading := t.parseSetextHeading(); nil != heading {
 				t.context.closeUnmatchedBlocks()
@@ -253,7 +253,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断分隔线（--- ***）是否开始
-	func(t *Tree, container Node) int {
+	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented {
 			if thematicBreak := t.parseThematicBreak(); nil != thematicBreak {
 				t.context.closeUnmatchedBlocks()
@@ -266,7 +266,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始
-	func(t *Tree, container Node) int {
+	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented || container.Type() == NodeList {
 			data := t.parseListMarker(container)
 			if nil == data {
@@ -275,16 +275,17 @@ var blockStarts = []blockStartFunc{
 
 			t.context.closeUnmatchedBlocks()
 
-			listsMatch := container.Type() == NodeList && t.context.listsMatch(container.(*List).listData, data)
+			listsMatch := container.Type() == NodeList && t.context.listsMatch(container.listData, data)
 			if t.context.tip.Type() != NodeList || !listsMatch {
-				t.context.addChild(&List{&BaseNode{typ: NodeList}, data})
+				t.context.addChild(&BaseNode{typ: NodeList, listData: data})
 			}
-			listItem := &ListItem{&BaseNode{typ: NodeListItem}, data}
+			listItem := &BaseNode{typ: NodeListItem, listData: data}
 			t.context.addChild(listItem)
 
 			if 1 == listItem.listData.typ {
 				// 修正有序列表项序号
-				if prev, ok := listItem.previous.(*ListItem); ok {
+				prev := listItem.previous
+				if nil != prev {
 					listItem.num = prev.num + 1
 				} else {
 					listItem.num = data.start
@@ -297,11 +298,11 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断缩进代码块（    code）是否开始
-	func(t *Tree, container Node) int {
+	func(t *Tree, container *BaseNode) int {
 		if t.context.indented && t.context.tip.Type() != NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)
 			t.context.closeUnmatchedBlocks()
-			t.context.addChild(&CodeBlock{BaseNode: &BaseNode{typ: NodeCodeBlock}})
+			t.context.addChild(&BaseNode{typ: NodeCodeBlock})
 			return 2
 		}
 		return 0

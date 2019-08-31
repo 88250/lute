@@ -16,12 +16,6 @@ import (
 	"strconv"
 )
 
-// List 描述了列表节点结构。
-type List struct {
-	*BaseNode
-	*listData
-}
-
 // listData 用于记录列表或列表项节点的附加信息。
 type listData struct {
 	typ          int   // 0：无序列表，1：有序列表，3：任务列表
@@ -36,11 +30,7 @@ type listData struct {
 	num          int   // 有序列表项修正过的序号
 }
 
-func (list *List) CanContain(nodeType int) bool {
-	return NodeListItem == nodeType
-}
-
-func (list *List) Finalize(context *Context) {
+func (list *BaseNode) ListFinalize(context *Context) {
 	item := list.firstChild
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
@@ -64,7 +54,7 @@ func (list *List) Finalize(context *Context) {
 }
 
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记。
-func (t *Tree) parseListMarker(container Node) *listData {
+func (t *Tree) parseListMarker(container *BaseNode) *listData {
 	if t.context.indent >= 4 {
 		return nil
 	}
@@ -172,7 +162,7 @@ func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter byt
 }
 
 // endsWithBlankLine 判断块节点 block 是否是空行结束。如果 block 是列表或者列表项则迭代下降进入判断。
-func (list *List) endsWithBlankLine(block Node) bool {
+func (list *BaseNode) endsWithBlankLine(block *BaseNode) bool {
 	for nil != block {
 		if block.LastLineBlank() {
 			return true

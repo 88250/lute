@@ -12,20 +12,7 @@
 
 package lute
 
-// ThematicBreak 描述了分隔线节点结构。
-type ThematicBreak struct {
-	*BaseNode
-}
-
-func (thematicBreak *ThematicBreak) Continue(context *Context) int {
-	return 1
-}
-
-func (thematicBreak *ThematicBreak) CanContain(nodeType int) bool {
-	return false
-}
-
-func (t *Tree) parseThematicBreak() (ret *ThematicBreak) {
+func (t *Tree) parseThematicBreak() (ret *BaseNode) {
 	markers := 0
 	var marker byte
 	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
@@ -52,5 +39,5 @@ func (t *Tree) parseThematicBreak() (ret *ThematicBreak) {
 		return nil
 	}
 
-	return &ThematicBreak{&BaseNode{typ: NodeThematicBreak}}
+	return &BaseNode{typ: NodeThematicBreak}
 }

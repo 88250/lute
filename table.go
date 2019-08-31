@@ -14,30 +14,7 @@ package lute
 
 import "bytes"
 
-// Table 描述了表节点结构。
-type Table struct {
-	*BaseNode
-	Aligns []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
-}
-
-// TableHead 描述了表头节点结构。
-type TableHead struct {
-	*BaseNode
-}
-
-// TableRow 描述了表行节点结构。
-type TableRow struct {
-	*BaseNode
-	Aligns []int
-}
-
-// TableCell 描述了表格节点结构。
-type TableCell struct {
-	*BaseNode
-	Aligns int
-}
-
-func (context *Context) parseTable(lines [][]byte) (ret *Table) {
+func (context *Context) parseTable(lines [][]byte) (ret *BaseNode) {
 	length := len(lines)
 	if 2 > length {
 		return
@@ -53,7 +30,7 @@ func (context *Context) parseTable(lines [][]byte) (ret *Table) {
 		return
 	}
 
-	ret = &Table{&BaseNode{typ: NodeTable}, aligns}
+	ret = &BaseNode{typ: NodeTable, Aligns: aligns}
 	ret.Aligns = aligns
 	ret.AppendChild(ret, context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
@@ -66,8 +43,8 @@ func (context *Context) parseTable(lines [][]byte) (ret *Table) {
 	return
 }
 
-func (context *Context) newTableHead(headRow *TableRow) *TableHead {
-	ret := &TableHead{&BaseNode{typ: NodeTableHead}}
+func (context *Context) newTableHead(headRow *BaseNode) *BaseNode {
+	ret := &BaseNode{typ: NodeTableHead}
 	for c := headRow.FirstChild(); c != nil; {
 		next := c.Next()
 		ret.AppendChild(ret, c)
@@ -76,8 +53,8 @@ func (context *Context) newTableHead(headRow *TableRow) *TableHead {
 	return ret
 }
 
-func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *TableRow) {
-	ret = &TableRow{&BaseNode{typ: NodeTableRow}, aligns}
+func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *BaseNode) {
+	ret = &BaseNode{typ: NodeTableRow, Aligns: aligns}
 	cols := line.splitWithoutBackslashEscape(itemPipe)
 	if isBlank(cols[0]) {
 		cols = cols[1:]
@@ -96,7 +73,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	var col items
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = bytes.TrimSpace(cols[i])
-		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
+		cell := &BaseNode{typ: NodeTableCell, Align: aligns[i]}
 		col = col.removeFirst(itemBackslash) // 删掉一个反斜杠来恢复语义
 		cell.tokens = col
 		ret.AppendChild(ret, cell)
@@ -104,7 +81,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 
 	// 可能需要补全剩余的列
 	for ; i < alignsLen; i++ {
-		cell := &TableCell{&BaseNode{typ: NodeTableCell}, aligns[i]}
+		cell := &BaseNode{typ: NodeTableCell, Align: aligns[i]}
 		ret.AppendChild(ret, cell)
 	}
 	return

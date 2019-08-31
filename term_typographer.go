@@ -20,15 +20,15 @@ import (
 )
 
 // fixTermTypo 修正 str 中出现的术语拼写问题。
-func (t *Tree) fixTermTypo(node Node) {
+func (t *Tree) fixTermTypo(node *BaseNode) {
 	if nil == node {
 		return
 	}
 
 	for child := node.FirstChild(); nil != child; {
 		next := child.Next()
-		if NodeText == child.Type() &&
-			NodeLink != child.Parent().Type() /* 不处理链接 label */ {
+		if NodeText == child.typ &&
+			NodeLink != child.parent.typ /* 不处理链接 label */ {
 			text := fromItems(child.Tokens())
 			text = fixTermTypo0(text)
 			child.SetTokens(toItems(text))

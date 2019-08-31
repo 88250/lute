@@ -16,17 +16,7 @@ import (
 	"bytes"
 )
 
-// CodeBlock 描述了代码块节点结构。
-type CodeBlock struct {
-	*BaseNode
-	isFenced    bool
-	fenceChar   byte
-	fenceLength int
-	fenceOffset int
-	info        items
-}
-
-func (codeBlock *CodeBlock) Continue(context *Context) int {
+func (codeBlock *BaseNode) CodeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 	if codeBlock.isFenced {
@@ -59,7 +49,7 @@ func (codeBlock *CodeBlock) Continue(context *Context) int {
 	return 0
 }
 
-func (codeBlock *CodeBlock) Finalize(context *Context) {
+func (codeBlock *BaseNode) CodeBlockFinalize(context *Context) {
 	if codeBlock.isFenced {
 		content := codeBlock.tokens
 		length := len(content)
@@ -85,15 +75,7 @@ func (codeBlock *CodeBlock) Finalize(context *Context) {
 	}
 }
 
-func (codeBlock *CodeBlock) AcceptLines() bool {
-	return true
-}
-
-func (codeBlock *CodeBlock) CanContain(nodeType int) bool {
-	return false
-}
-
-func (t *Tree) parseFencedCode() (ret *CodeBlock) {
+func (t *Tree) parseFencedCode() (ret *BaseNode) {
 	marker := t.context.currentLine[t.context.nextNonspace]
 	if itemBacktick != marker && itemTilde != marker {
 		return nil
@@ -116,13 +98,13 @@ func (t *Tree) parseFencedCode() (ret *CodeBlock) {
 	}
 	info = bytes.TrimSpace(infoTokens)
 	info = unescapeString(info)
-	ret = &CodeBlock{&BaseNode{typ: NodeCodeBlock, tokens: make(items, 0, 256)},
-		true, fenceChar, fenceLength, t.context.indent, info}
+	ret = &BaseNode{typ: NodeCodeBlock, tokens: make(items, 0, 256),
+		isFenced: true, fenceChar: fenceChar, fenceLength: fenceLength, fenceOffset: t.context.indent, info: info}
 
 	return
 }
 
-func (codeBlock *CodeBlock) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
+func (codeBlock *BaseNode) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
 	closeMarker := tokens[0]
 	if closeMarker != openMarker {
 		return false

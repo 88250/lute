@@ -12,12 +12,7 @@
 
 package lute
 
-// CodeSpan 描述了代码节点结构。
-type CodeSpan struct {
-	*BaseNode
-}
-
-func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret Node) {
+func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *BaseNode) {
 	startPos := ctx.pos
 	n := 0
 	for ; startPos+n < ctx.tokensLen; n++ {
@@ -29,14 +24,14 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret Node) {
 	backticks := ctx.tokens[startPos : startPos+n]
 	if ctx.tokensLen <= startPos+n {
 		ctx.pos += n
-		ret = &Text{tokens: backticks}
+		ret = &BaseNode{typ: NodeText, tokens: backticks}
 		return
 	}
 
 	endPos := t.matchCodeSpanEnd(ctx.tokens[startPos+n:], n)
 	if 1 > endPos {
 		ctx.pos += n
-		ret = &Text{tokens: backticks}
+		ret = &BaseNode{typ: NodeText, tokens: backticks}
 		return
 	}
 	endPos = startPos + endPos + n
@@ -49,7 +44,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret Node) {
 		textTokens = textTokens[:len(textTokens)-1]
 	}
 
-	ret = &CodeSpan{&BaseNode{typ: NodeCodeSpan, tokens: textTokens}}
+	ret = &BaseNode{typ: NodeCodeSpan, tokens: textTokens}
 	ctx.pos = endPos + n
 	return
 }

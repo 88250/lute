@@ -12,13 +12,7 @@
 
 package lute
 
-// ListItem 描述了列表项节点结构。
-type ListItem struct {
-	*BaseNode
-	*listData
-}
-
-func (listItem *ListItem) Continue(context *Context) int {
+func (listItem *BaseNode) ListItemContinue(context *Context) int {
 	if context.blank {
 		if nil == listItem.firstChild {
 			// Blank line after empty list item
@@ -32,10 +26,4 @@ func (listItem *ListItem) Continue(context *Context) int {
 		return 1
 	}
 	return 0
-}
-
-// TaskListItemMarker 描述了任务列表项 [ ]、[x] 或者 [X]。
-type TaskListItemMarker struct {
-	*BaseNode
-	checked bool
 }

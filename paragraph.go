@@ -14,23 +14,14 @@ package lute
 
 import "bytes"
 
-// Paragraph 描述了段落节点结构。
-type Paragraph struct {
-	*BaseNode
-}
-
-func (p *Paragraph) CanContain(nodeType int) bool {
-	return false
-}
-
-func (p *Paragraph) Continue(context *Context) int {
+func (p *BaseNode) ParagraphContinue(context *Context) int {
 	if context.blank {
 		return 1
 	}
 	return 0
 }
 
-func (p *Paragraph) Finalize(context *Context) {
+func (p *BaseNode) ParagraphFinalize(context *Context) {
 	p.tokens = bytes.TrimSpace(p.tokens)
 
 	// 尝试解析链接引用定义
@@ -49,10 +40,11 @@ func (p *Paragraph) Finalize(context *Context) {
 
 	if context.option.GFMTaskListItem {
 		// 尝试解析任务列表项
-		if listItem, ok := p.parent.(*ListItem); ok {
+		listItem := p.parent
+		if nil != listItem && NodeListItem == listItem.typ {
 			if 3 == listItem.listData.typ {
 				// 如果是任务列表项则添加任务列表标记节点
-				taskListItemMarker := &TaskListItemMarker{&BaseNode{typ: NodeTaskListItemMarker}, listItem.listData.checked}
+				taskListItemMarker := &BaseNode{typ: NodeTaskListItemMarker, checked: listItem.listData.checked}
 				p.InsertBefore(p, taskListItemMarker)
 				p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 			}
@@ -71,8 +63,4 @@ func (p *Paragraph) Finalize(context *Context) {
 			p.tokens = nil
 		}
 	}
-}
-
-func (p *Paragraph) AcceptLines() bool {
-	return true
 }

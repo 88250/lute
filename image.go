@@ -12,25 +12,18 @@
 
 package lute
 
-// Image 描述了图片节点结构。
-type Image struct {
-	*BaseNode
-	Destination items // 图片链接地址
-	Title       items // 图片标题
-}
-
 // parseBang 解析 !，可能是图片标记开始 ![ 也可能是普通文本 !。
-func (t *Tree) parseBang(ctx *InlineContext) (ret Node) {
+func (t *Tree) parseBang(ctx *InlineContext) (ret *BaseNode) {
 	var startPos = ctx.pos
 	ctx.pos++
 	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos] {
 		ctx.pos++
-		ret = &Text{tokens: toItems("![")}
+		ret = &BaseNode{typ: NodeText, tokens: toItems("![")}
 		// 将图片开始标记入栈
 		t.addBracket(ret, startPos+2, true, ctx)
 		return
 	}
 
-	ret = &Text{tokens: toItems("!")}
+	ret = &BaseNode{typ: NodeText, tokens: toItems("!")}
 	return
 }

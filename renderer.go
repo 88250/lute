@@ -19,7 +19,7 @@ import (
 )
 
 // RendererFunc 描述了渲染器函数签名。
-type RendererFunc func(n Node, entering bool) (WalkStatus, error)
+type RendererFunc func(n *BaseNode, entering bool) (WalkStatus, error)
 
 // Renderer 描述了渲染器结构。
 type Renderer struct {
@@ -33,11 +33,11 @@ type Renderer struct {
 }
 
 // render 从指定的根节点 root 开始遍历并渲染。
-func (r *Renderer) render(root Node) error {
+func (r *Renderer) render(root *BaseNode) error {
 	r.lastOut = itemNewline
 	r.writer.Grow(4096)
 
-	return Walk(root, func(n Node, entering bool) (WalkStatus, error) {
+	return Walk(root, func(n *BaseNode, entering bool) (WalkStatus, error) {
 		f := r.rendererFuncs[n.Type()]
 		if nil == f {
 			return WalkStop, errors.New(fmt.Sprintf("not found render function for node [type=%d, text=%s]", n.Type(), n.RawText()))

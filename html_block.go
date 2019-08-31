@@ -17,29 +17,15 @@ import (
 	"strings"
 )
 
-// HTMLBlock 描述了 HTML 块节点结构。
-type HTMLBlock struct {
-	*BaseNode
-	hType int // 规范中定义的 HTML 块类型（1-7）
-}
-
-func (html *HTMLBlock) CanContain(nodeType int) bool {
-	return false
-}
-
-func (html *HTMLBlock) Continue(context *Context) int {
+func (html *BaseNode) HTMLBlockContinue(context *Context) int {
 	if context.blank && (html.hType == 6 || html.hType == 7) {
 		return 1
 	}
 	return 0
 }
 
-func (html *HTMLBlock) Finalize(context *Context) {
+func (html *BaseNode) HTMLBlockFinalize(context *Context) {
 	html.tokens = bytes.TrimRight(html.tokens.replaceNewlineSpace(), " \t\n")
-}
-
-func (html *HTMLBlock) AcceptLines() bool {
-	return true
 }
 
 var htmlBlockTags1, htmlBlockCloseTags1, htmlBlockTags6 []items
@@ -96,7 +82,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	return false
 }
 
-func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
+func (t *Tree) parseHTML(tokens items) (ret *BaseNode) {
 	tokens = bytes.TrimLeft(tokens, " \t\n")
 	length := len(tokens)
 	if 3 > length { // at least <? and a newline
@@ -107,7 +93,7 @@ func (t *Tree) parseHTML(tokens items) (ret *HTMLBlock) {
 		return nil
 	}
 
-	ret = &HTMLBlock{&BaseNode{typ: NodeHTMLBlock, tokens: make(items, 0, 256)}, 1}
+	ret = &BaseNode{typ: NodeHTMLBlock, tokens: make(items, 0, 256), hType: 1}
 
 	if pos := tokens.acceptTokenss(htmlBlockTags1); 0 <= pos {
 		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {

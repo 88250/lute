@@ -12,12 +12,7 @@
 
 package lute
 
-// Blockquote 描述了块引用节点结构。
-type Blockquote struct {
-	*BaseNode
-}
-
-func (blockquote *Blockquote) Continue(context *Context) int {
+func (blockquote *BaseNode) BlockquoteContinue(context *Context) int {
 	var ln = context.currentLine
 	if !context.indented && ln.peek(context.nextNonspace) == itemGreater {
 		context.advanceNextNonspace()

@@ -14,21 +14,7 @@ package lute
 
 import "bytes"
 
-// Heading 描述了标题节点结构。
-type Heading struct {
-	*BaseNode
-	Level int // 1~6
-}
-
-func (heading *Heading) Continue(context *Context) int {
-	return 1
-}
-
-func (heading *Heading) CanContain(nodeType int) bool {
-	return false
-}
-
-func (t *Tree) parseATXHeading() (ret *Heading) {
+func (t *Tree) parseATXHeading() (ret *BaseNode) {
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	marker := tokens[0]
 	if itemCrosshatch != marker {
@@ -44,7 +30,7 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 		return
 	}
 
-	heading := &Heading{&BaseNode{typ: NodeHeading}, level}
+	heading := &BaseNode{typ: NodeHeading, Level: level}
 	tokens = bytes.TrimLeft(tokens, " \t\n")
 	tokens = bytes.TrimLeft(tokens[level:], " \t\n")
 	for _, token := range tokens {
@@ -82,7 +68,7 @@ func (t *Tree) parseATXHeading() (ret *Heading) {
 	return
 }
 
-func (t *Tree) parseSetextHeading() (ret *Heading) {
+func (t *Tree) parseSetextHeading() (ret *BaseNode) {
 	start := t.context.nextNonspace
 	marker := t.context.currentLine[start]
 	if itemEqual != marker && itemHyphen != marker {
@@ -117,7 +103,7 @@ func (t *Tree) parseSetextHeading() (ret *Heading) {
 		return nil
 	}
 
-	ret = &Heading{&BaseNode{typ: NodeHeading}, 1}
+	ret = &BaseNode{typ: NodeHeading, Level: 1}
 	if itemHyphen == marker {
 		ret.Level = 2
 	}
