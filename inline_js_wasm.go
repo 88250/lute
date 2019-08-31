@@ -10,28 +10,25 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
+// +build js
+// +build wasm
+
 package lute
 
 import (
 	"bytes"
 	"html"
-	"sync"
-
-	//"html"
 	"strings"
 )
 
 // parseInlines 解析并生成行级节点。
 func (t *Tree) parseInlines() {
-	t.walkParseInline(t.Root, nil)
+	t.walkParseInline(t.Root)
 }
 
 // walkParseInline 解析生成节点 node 的行级子节点。
-func (t *Tree) walkParseInline(node *BaseNode, wg *sync.WaitGroup) {
+func (t *Tree) walkParseInline(node *BaseNode) {
 	defer recoverPanic(nil)
-	if nil != wg {
-		defer wg.Done()
-	}
 	if nil == node {
 		return
 	}
@@ -88,12 +85,10 @@ func (t *Tree) walkParseInline(node *BaseNode, wg *sync.WaitGroup) {
 	}
 
 	// 遍历处理子节点，通过并行处理提升性能
-	cwg := &sync.WaitGroup{}
 	for child := node.FirstChild(); nil != child; child = child.Next() {
-		cwg.Add(1)
-		go t.walkParseInline(child, cwg)
+		t.walkParseInline(child)
 	}
-	cwg.Wait()
+
 }
 
 // parseInline 解析并生成块节点 block 的行级子节点。

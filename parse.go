@@ -18,7 +18,7 @@ import (
 
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
 func parse(name string, markdown []byte, option options) (tree *Tree, err error) {
-	//defer recoverPanic(&err)
+	defer recoverPanic(&err)
 
 	tree = &Tree{Name: name, context: &Context{option: option}}
 	tree.context.tree = tree
