@@ -12,4 +12,4 @@
 
 #!/bin/sh
 
-tinygo build -o lute.tinygo.wasm -target wasm
+tinygo build -tags wasm -o lute.tinygo.wasm -target wasm
