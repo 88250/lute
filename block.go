@@ -39,8 +39,8 @@ func (t *Tree) incorporateLine(line items) {
 	allMatched := true
 	var container *BaseNode
 	container = t.Root
-	lastChild := container.LastChild()
-	for ; nil != lastChild && !lastChild.close; lastChild = container.LastChild() {
+	lastChild := container.lastChild
+	for ; nil != lastChild && !lastChild.close; lastChild = container.lastChild {
 		container = lastChild
 		t.context.findNextNonspace()
 
@@ -116,7 +116,7 @@ func (t *Tree) incorporateLine(line items) {
 		// 最终化未匹配的块
 		t.context.closeUnmatchedBlocks()
 
-		if t.context.blank && nil != container.LastChild() {
+		if t.context.blank && nil != container.lastChild {
 			container.lastChild.lastLineBlank = true
 		}
 

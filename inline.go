@@ -47,7 +47,7 @@ func (t *Tree) walkParseInline(node *BaseNode, wg *sync.WaitGroup) {
 			next := node.next
 			node.Unlink()
 			// Unlink 会将后一个兄弟节点置空，此处是在在遍历过程中修改树结构，所以需要保持继续迭代后面的兄弟节点
-			node.next=(next)
+			node.next = (next)
 			return
 		}
 
@@ -410,7 +410,7 @@ func (t *Tree) parseNewline(block *BaseNode, ctx *InlineContext) (ret *BaseNode)
 
 	hardbreak := false
 	// 检查前一个节点的结尾空格，如果大于等于两个则说明是硬换行
-	if lastc := block.LastChild(); nil != lastc {
+	if lastc := block.lastChild; nil != lastc {
 		if NodeText == lastc.typ {
 			tokens := lastc.tokens
 			if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {

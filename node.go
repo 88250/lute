@@ -140,26 +140,6 @@ func (n *BaseNode) Unlink() {
 	n.previous = nil
 }
 
-// Previous 返回前一个兄弟节点。
-func (n *BaseNode) Previous() *BaseNode {
-	return n.previous
-}
-
-// SetPrevious 设置前一个兄弟节点。
-func (n *BaseNode) SetPrevious(previous *BaseNode) {
-	n.previous = previous
-}
-
-// 返回最后一个子节点。
-func (n *BaseNode) LastChild() *BaseNode {
-	return n.lastChild
-}
-
-// 设置最后一个子节点。
-func (n *BaseNode) SetLastChild(lastChild *BaseNode) {
-	n.lastChild = lastChild
-}
-
 // RawText 返回原始内容。
 func (n *BaseNode) RawText() string {
 	return n.rawText
@@ -197,7 +177,7 @@ func (n *BaseNode) InsertAfter(this *BaseNode, sibling *BaseNode) {
 	if nil != sibling.next {
 		sibling.next.previous = sibling
 	}
-	sibling.SetPrevious(this)
+	sibling.previous = this
 	n.next = sibling
 	sibling.parent = n.parent
 	if nil == sibling.next {
@@ -208,14 +188,14 @@ func (n *BaseNode) InsertAfter(this *BaseNode, sibling *BaseNode) {
 // InsertBefore 在当前节点前插入一个兄弟节点。
 func (n *BaseNode) InsertBefore(this *BaseNode, sibling *BaseNode) {
 	sibling.Unlink()
-	sibling.SetPrevious(n.previous)
-	if nil != sibling.Previous() {
+	sibling.previous = n.previous
+	if nil != sibling.previous {
 		sibling.previous.next = sibling
 	}
 	sibling.next = this
 	n.previous = sibling
 	sibling.parent = n.parent
-	if nil == sibling.Previous() {
+	if nil == sibling.previous {
 		sibling.parent.firstChild = sibling
 	}
 }
@@ -226,7 +206,7 @@ func (n *BaseNode) AppendChild(this, child *BaseNode) {
 	child.parent = this
 	if nil != n.lastChild {
 		n.lastChild.next = child
-		child.SetPrevious(n.lastChild)
+		child.previous = n.lastChild
 		n.lastChild = child
 	} else {
 		n.firstChild = child
