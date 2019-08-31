@@ -69,22 +69,17 @@ func (t *Tree) parseATXHeading() (ret *BaseNode) {
 }
 
 func (t *Tree) parseSetextHeading() (ret *BaseNode) {
-	start := t.context.nextNonspace
-	marker := t.context.currentLine[start]
+	ln := bytes.TrimSpace(t.context.currentLine)
+	start := 0
+	marker := ln[start]
 	if itemEqual != marker && itemHyphen != marker {
 		return nil
 	}
 
-	end := t.context.currentLineLen - 2
-	for ; 0 <= end; end-- {
-		if token := t.context.currentLine[end]; itemSpace != token && itemTab != token {
-			break
-		}
-	}
-
 	markers := 0
-	for ; start < end; start++ {
-		token := t.context.currentLine[start]
+	length := len(ln)
+	for ; start < length; start++ {
+		token := ln[start]
 		if itemEqual != token && itemHyphen != token {
 			return nil
 		}
