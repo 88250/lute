@@ -20,7 +20,6 @@ func (blockquote *BaseNode) BlockquoteContinue(context *Context) int {
 		if token := ln.peek(context.offset); itemSpace == token || itemTab == token {
 			context.advanceOffset(1, true)
 		}
-
 		return 0
 	}
 	return 1

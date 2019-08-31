@@ -45,17 +45,17 @@ func (t *Tree) incorporateLine(line items) {
 		t.context.findNextNonspace()
 
 		switch container.Continue(t.context) {
-		case 0: // we've matched, keep going
+		case 0: // 说明匹配可继续处理
 			break
-		case 1: // we've failed to match a block
+		case 1: // 匹配失败，不能继续处理
 			allMatched = false
 			break
-		case 2: // we've hit end of line for fenced code close and can return
+		case 2: // 匹配围栏代码块闭合，处理下一行
 			return
 		}
 
 		if !allMatched {
-			container = container.parent // back up to last matching block
+			container = container.parent // 回到上一个匹配的块
 			break
 		}
 	}

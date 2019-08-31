@@ -14,8 +14,7 @@ package lute
 
 func (listItem *BaseNode) ListItemContinue(context *Context) int {
 	if context.blank {
-		if nil == listItem.firstChild {
-			// Blank line after empty list item
+		if nil == listItem.firstChild { // 列表项后面是空的
 			return 1
 		}
 
