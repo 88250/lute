@@ -60,7 +60,7 @@ func (r *Renderer) renderTableCellHTML(node *BaseNode, entering bool) (WalkStatu
 	}
 	if entering {
 		var attrs [][]string
-		switch node.TableCellAlign {
+		switch node.tableCellAlign {
 		case 1:
 			attrs = append(attrs, []string{"align", "left"})
 		case 2:
@@ -134,7 +134,7 @@ func (r *Renderer) renderImageHTML(node *BaseNode, entering bool) (WalkStatus, e
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			r.write(escapeHTML(node.Destination))
+			r.write(escapeHTML(node.destination))
 			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
@@ -144,9 +144,9 @@ func (r *Renderer) renderImageHTML(node *BaseNode, entering bool) (WalkStatus, e
 	r.disableTags--
 	if 0 == r.disableTags {
 		r.writeString("\"")
-		if nil != node.Title {
+		if nil != node.title {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(node.Title))
+			r.write(escapeHTML(node.title))
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -156,9 +156,9 @@ func (r *Renderer) renderImageHTML(node *BaseNode, entering bool) (WalkStatus, e
 
 func (r *Renderer) renderLinkHTML(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		attrs := [][]string{{"href", fromItems(escapeHTML(node.Destination))}}
-		if nil != node.Title {
-			attrs = append(attrs, []string{"title", fromItems(escapeHTML(node.Title))})
+		attrs := [][]string{{"href", fromItems(escapeHTML(node.destination))}}
+		if nil != node.title {
+			attrs = append(attrs, []string{"title", fromItems(escapeHTML(node.title))})
 		}
 		r.tag("a", attrs, false)
 
@@ -266,9 +266,9 @@ func (r *Renderer) renderBlockquoteHTML(n *BaseNode, entering bool) (WalkStatus,
 func (r *Renderer) renderHeadingHTML(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.writeString("<h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + ">")
+		r.writeString("<h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 	} else {
-		r.writeString("</h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + ">")
+		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 		r.newline()
 	}
 	return WalkContinue, nil

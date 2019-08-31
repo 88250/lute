@@ -74,8 +74,8 @@ func (r *Renderer) renderTableHeadMarkdown(node *BaseNode, entering bool) (WalkS
 	if !entering {
 		r.writeString("|\n")
 		table := node.parent
-		for i := 0; i < len(table.TableAligns); i++ {
-			align := table.TableAligns[i]
+		for i := 0; i < len(table.tableAligns); i++ {
+			align := table.tableAligns[i]
 			switch align {
 			case 0:
 				r.writeString("|---")
@@ -113,10 +113,10 @@ func (r *Renderer) renderImageMarkdown(node *BaseNode, entering bool) (WalkStatu
 		r.writeString("![")
 		r.write(node.firstChild.Tokens())
 		r.writeString("](")
-		r.write(node.Destination)
-		if nil != node.Title {
+		r.write(node.destination)
+		if nil != node.title {
 			r.writeString(" \"")
-			r.write(node.Title)
+			r.write(node.title)
 			r.writeByte('"')
 		}
 		r.writeByte(')')
@@ -129,10 +129,10 @@ func (r *Renderer) renderLinkMarkdown(node *BaseNode, entering bool) (WalkStatus
 		r.writeString("[")
 		r.write(node.firstChild.Tokens()) // FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
 		r.writeString("](")
-		r.write(node.Destination)
-		if nil != node.Title {
+		r.write(node.destination)
+		if nil != node.title {
 			r.writeString(" \"")
-			r.write(node.Title)
+			r.write(node.title)
 			r.writeByte('"')
 		}
 		r.writeByte(')')
@@ -306,7 +306,7 @@ func (r *Renderer) renderBlockquoteMarkdown(n *BaseNode, entering bool) (WalkSta
 
 func (r *Renderer) renderHeadingMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(bytes.Repeat([]byte{itemCrosshatch}, node.HeadingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
+		r.write(bytes.Repeat([]byte{itemCrosshatch}, node.headingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
 	} else {
 		r.newline()

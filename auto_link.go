@@ -116,7 +116,7 @@ loopPart:
 			// 如果以 . 结尾则剔除该 .
 			lastIndex := len(group) - 1
 			group = group[:lastIndex]
-			link := &BaseNode{typ: NodeLink, Destination: append(items("mailto:"), group...)}
+			link := &BaseNode{typ: NodeLink, destination: append(items("mailto:"), group...)}
 			text := &BaseNode{typ: NodeText, tokens: group}
 			link.AppendChild(link, text)
 			node.InsertBefore(node, link)
@@ -130,7 +130,7 @@ loopPart:
 			continue loopPart
 		} else {
 			// 以字母或者数字结尾
-			link := &BaseNode{typ: NodeLink, Destination: append(items("mailto:"), group...)}
+			link := &BaseNode{typ: NodeLink, destination: append(items("mailto:"), group...)}
 			text := &BaseNode{typ: NodeText, tokens: group}
 			link.AppendChild(link, text)
 			node.InsertBefore(node, link)
@@ -319,7 +319,7 @@ func (t *Tree) parseGFMAutoLink0(node *BaseNode) {
 		addr = append(addr, domain...)
 		addr = append(addr, path...)
 
-		link := &BaseNode{typ: NodeLink, Destination: encodeDestination(dest)}
+		link := &BaseNode{typ: NodeLink, destination: encodeDestination(dest)}
 		text := &BaseNode{typ: NodeText, tokens: addr}
 		link.AppendChild(link, text)
 		node.InsertBefore(node, link)
@@ -438,7 +438,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *BaseNode) {
 	}
 
 	ctx.pos += passed + 1
-	link := &BaseNode{typ: NodeLink, Destination: append(items("mailto:"), dest...)}
+	link := &BaseNode{typ: NodeLink, destination: append(items("mailto:"), dest...)}
 	text := &BaseNode{typ: NodeText, tokens: toItems(dest)}
 	link.AppendChild(ret, text)
 	return link
@@ -469,7 +469,7 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *BaseNode) {
 		return nil
 	}
 
-	link := &BaseNode{typ: NodeLink, Destination: encodeDestination(dest)}
+	link := &BaseNode{typ: NodeLink, destination: encodeDestination(dest)}
 	if itemGreater != ctx.tokens[i] {
 		return nil
 	}

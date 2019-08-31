@@ -287,8 +287,8 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *BaseNode {
 			// 查找链接引用
 			var link = t.context.linkRefDef[strings.ToLower(reflabel)]
 			if nil != link {
-				dest = link.Destination
-				title = link.Title
+				dest = link.destination
+				title = link.title
 				matched = true
 			}
 		}
@@ -297,9 +297,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *BaseNode {
 	if matched {
 		var node *BaseNode
 		if isImage {
-			node = &BaseNode{typ: NodeImage, Destination: dest, Title: title}
+			node = &BaseNode{typ: NodeImage, destination: dest, title: title}
 		} else {
-			node = &BaseNode{typ: NodeLink, Destination: dest, Title: title}
+			node = &BaseNode{typ: NodeLink, destination: dest, title: title}
 		}
 
 		var tmp, next *BaseNode
