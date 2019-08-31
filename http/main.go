@@ -72,7 +72,11 @@ func main() {
 
 	addr := "127.0.0.1:8249"
 	logger.Infof("booting Lute HTTP Server on [%s]", addr)
-	err := fasthttp.ListenAndServe(addr, handle)
+	server := &fasthttp.Server{
+		Handler:            handle,
+		MaxRequestBodySize: 1024 * 1024 * 2, // 2MB
+	}
+	err := server.ListenAndServe(addr)
 	if nil != err {
 		logger.Fatalf("booting Lute HTTP server failed: %s", err.Error())
 	}
