@@ -20,6 +20,8 @@ import (
 )
 
 var debugTests = []parseTest{
+	// https://github.com/b3log/lute/issues/9
+	//{"22", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
 	// https://github.com/b3log/lute/issues/3
 	{"21", "0\n-:\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n"},
 	// HTMl 块解析，等号前面空格情况
