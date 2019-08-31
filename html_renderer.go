@@ -13,12 +13,7 @@
 package lute
 
 import (
-	"bytes"
 	"fmt"
-	//"github.com/alecthomas/chroma"
-	//chromahtml "github.com/alecthomas/chroma/formatters/html"
-	//chromalexers "github.com/alecthomas/chroma/lexers"
-	//"github.com/alecthomas/chroma/styles"
 )
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
@@ -233,85 +228,6 @@ func (r *Renderer) renderCodeSpanHTML(node *BaseNode, entering bool) (WalkStatus
 		return WalkSkipChildren, nil
 	}
 	r.writeString("</code>")
-	return WalkContinue, nil
-}
-
-func (r *Renderer) renderCodeBlockHTML(node *BaseNode, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-		tokens := node.tokens
-		if nil != node.info {
-			infoWords := bytes.Fields(node.info)
-			language := infoWords[0]
-			r.writeString("<pre><code class=\"language-")
-			r.write(language)
-			r.writeString("\">")
-			rendered := false
-			//if r.option.CodeSyntaxHighlight {
-			//	codeBlock := fromItems(tokens)
-			//	var lexer chroma.Lexer
-			//	if nil != language {
-			//		lexer = chromalexers.Get(string(language))
-			//	} else {
-			//		lexer = chromalexers.Analyse(codeBlock)
-			//	}
-			//	if nil == lexer {
-			//		lexer = chromalexers.Fallback
-			//	}
-			//	iterator, err := lexer.Tokenise(nil, codeBlock)
-			//	if nil == err {
-			//		formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
-			//		var b bytes.Buffer
-			//		if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
-			//			r.write(b.Bytes())
-			//			rendered = true
-			//			// 生成 CSS 临时调试用：
-			//			//formatter.WriteCSS(os.Stdout, styles.GitHub)
-			//			//os.Stdout.WriteString("\n")
-			//		}
-			//	}
-			//}
-
-			if !rendered {
-				tokens = escapeHTML(tokens)
-				r.write(tokens)
-			}
-		} else {
-			rendered := false
-			if r.option.CodeSyntaxHighlight {
-				language := "fallback"
-				//codeBlock := fromItems(tokens)
-				//var lexer = chromalexers.Analyse(codeBlock)
-				//if nil == lexer {
-				//	lexer = chromalexers.Fallback
-				//}
-				//language = lexer.Config().Name
-				r.writeString("<pre><code class=\"language-" + language + "\">")
-				//
-				//iterator, err := lexer.Tokenise(nil, codeBlock)
-				//if nil == err {
-				//	formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
-				//	var b bytes.Buffer
-				//	if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
-				//		r.write(b.Bytes())
-				//		rendered = true
-				//	}
-				//}
-
-				if !rendered {
-					tokens = escapeHTML(tokens)
-					r.write(tokens)
-				}
-			} else {
-				r.writeString("<pre><code>")
-				tokens = escapeHTML(tokens)
-				r.write(tokens)
-			}
-		}
-		return WalkSkipChildren, nil
-	}
-	r.writeString("</code></pre>")
-	r.newline()
 	return WalkContinue, nil
 }
 
