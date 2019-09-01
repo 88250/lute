@@ -31,8 +31,7 @@ func handleMarkdown2HTML(ctx *fasthttp.RequestCtx) {
 	html, err := engine.Markdown("", body)
 	if nil != err {
 		ctx.SetStatusCode(fasthttp.StatusInternalServerError)
-		ctx.WriteString(err.Error())
-		logger.Errorf("markdown text [%s]\n", body)
+		logger.Errorf("markdown text [%s] failed: %s\n", body, err.Error())
 		return
 	}
 	ctx.SetBody(html)
@@ -47,8 +46,7 @@ func handleMarkdownFormat(ctx *fasthttp.RequestCtx) {
 	formatted, err := engine.Format("", body)
 	if nil != err {
 		ctx.SetStatusCode(fasthttp.StatusInternalServerError)
-		ctx.WriteString(err.Error())
-		logger.Errorf("markdown text [%s]\n", body)
+		logger.Errorf("format markdown text [%s] failed: %s\n", body, err.Error())
 		return
 	}
 	ctx.SetBody(formatted)
