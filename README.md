@@ -334,7 +334,7 @@ func main() {
 
 ### JavaScript
  
-可通过 Web Assembly 使用 Lute，请参考 wasm 目录下的示例，示例运行需要先编译出 lute.wasm 然后启动一个 HTTP Server。
+可通过 Wasm（Web Assembly）使用 Lute，请参考 wasm 目录下的示例，示例运行需要先编译出 lute.wasm 然后启动一个 HTTP Server。
 
 1. 运行平台对应的 build 脚本编译出 lute.wasm
 1. 安装 goexec `go get -u github.com/shurcooL/goexec` 并启动 HTTP 服务 ``goexec "http.ListenAndServe(`:8080`, gzipped.FileServer(http.Dir(`.`)))"``
