@@ -27,7 +27,9 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
-	{"21", "&amp;\n", "&amp;\n\n"},
+	{"22", "&&amp;\n", "&amp;&amp;\n\n"}, // 原先是 & 的格式化以后转义为 HTML 实体 &amp;
+	{"22", "\u2003emsp\n", "\u2003emsp\n\n"},
+	{"21", "&amp;123&emsp;456\n", "&amp;123\u2003456\n\n"},
 	{"20", "~删除线~\n", "~删除线~\n\n"},
 	{"19", "我们**需要Markdown Format**\n", "我们**需要 Markdown Format**\n\n"},
 	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 lute 空格\n\n"},

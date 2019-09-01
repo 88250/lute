@@ -22,7 +22,7 @@ func (p *Node) ParagraphContinue(context *Context) int {
 }
 
 func (p *Node) ParagraphFinalize(context *Context) {
-	p.tokens = bytes.TrimSpace(p.tokens)
+	p.tokens = bytes.Trim(p.tokens, " \t\n")
 
 	// 尝试解析链接引用定义
 	hasReferenceDefs := false

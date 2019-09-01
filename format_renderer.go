@@ -218,7 +218,7 @@ func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, er
 	}
 
 	if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
-		r.write(node.tokens)
+		r.write(escapeHTML(node.tokens))
 	}
 	return WalkContinue, nil
 }
