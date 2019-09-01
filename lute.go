@@ -150,6 +150,7 @@ func AutoSpace(b bool) option {
 
 // FixTermTypo 设置是否对普通文本中出现的术语进行修正。
 // https://github.com/sparanoid/chinese-copywriting-guidelines
+// 注意：开启术语修正的话会默认在中西文之间插入空格。
 func FixTermTypo(b bool) option {
 	return func(lute *Lute) {
 		lute.FixTermTypo = b

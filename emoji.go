@@ -67,7 +67,7 @@ func emoji0(node *Node) {
 				node.tokens = append(node.tokens, emoji...)
 			}
 		} else {
-			node.tokens = append(node.tokens, tokens[i:pos+1]...)
+			node.tokens = append(node.tokens, tokens[i:pos]...)
 		}
 
 		pos++
