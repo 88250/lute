@@ -251,9 +251,9 @@ Markdown 原文：
 ## ⚡ 性能
 
 1. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
-2. 均已开启 GFM，因为 GFM 支持基本是必备的，仅测试 CommonMark 意义不大 
-3. Lute 在多核平台上性能优势比较明显，因为 Lute 对解析算法做了并行优化
-4. Blackfriday 没有实现 CommonMark 所以性能看上去更好一些
+2. 均已开启 GFM 支持，因为 GFM 在实际使用场景下是必备的，仅测试 CommonMark 支持意义不大 
+3. Lute 在多核平台上性能优势比较明显，因为 Lute 使用了并行解析算法
+4. Blackfriday 没有实现 GFM 所以性能看上去更好一些
 5. 基准测试数据 [*CommonMark Spec*](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
 
 ### [Lute](https://github.com/b3log/lute)
