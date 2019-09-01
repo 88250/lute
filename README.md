@@ -251,21 +251,12 @@ Markdown 原文：
 ## ⚡ 性能
 
 1. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
-2. Lute 在多核平台上性能优势比较明显，因为 Lute 对解析算法做了并行优化
-3. Blackfriday 没有实现 CommonMark 所以性能看上去更好一些
-4. 基准测试数据 [*CommonMark Spec*](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
+2. 均已开启 GFM，因为 GFM 支持基本是必备的，仅测试 CommonMark 意义不大 
+3. Lute 在多核平台上性能优势比较明显，因为 Lute 对解析算法做了并行优化
+4. Blackfriday 没有实现 CommonMark 所以性能看上去更好一些
+5. 基准测试数据 [*CommonMark Spec*](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
 
 ### [Lute](https://github.com/b3log/lute)
-
-CommonMark：
-
-```
-BenchmarkLute-2   	     300	   4963400 ns/op	 4149065 B/op	   19248 allocs/op
-BenchmarkLute-4   	     300	   4035870 ns/op	 4150900 B/op	   19272 allocs/op
-BenchmarkLute-8   	     500	   3734010 ns/op	 4145230 B/op	   19241 allocs/op
-```
-
-GFM：
 
 ```
 BenchmarkLute-2   	     200	   5979087 ns/op	 5408158 B/op	   24467 allocs/op
@@ -275,16 +266,6 @@ BenchmarkLute-8   	     300	   4301945 ns/op	 5400340 B/op	   24436 allocs/op
 
 ### [goldmark](https://github.com/yuin/goldmark)
 
-CommonMark：
-
-```
-BenchmarkGoldMark-2   	     300	   4374970 ns/op	 2088874 B/op	   13850 allocs/op
-BenchmarkGoldMark-4   	     300	   4325104 ns/op	 2088057 B/op	   13850 allocs/op
-BenchmarkGoldMark-8   	     300	   4285322 ns/op	 2088570 B/op	   13850 allocs/op
-```
-
-GFM：
-
 ```
 BenchmarkGoldMark-2   	     300	   5807783 ns/op	 2310746 B/op	   15367 allocs/op
 BenchmarkGoldMark-4   	     300	   5678037 ns/op	 2316867 B/op	   15369 allocs/op
@@ -292,16 +273,6 @@ BenchmarkGoldMark-8   	     300	   5734657 ns/op	 2318907 B/op	   15369 allocs/o
 ```
 
 ### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
-
-CommonMark：
-
-```
-BenchmarkGolangCommonMark-2   	     300	   4837064 ns/op	 3143122 B/op	   18410 allocs/op
-BenchmarkGolangCommonMark-4   	     300	   4777222 ns/op	 3172136 B/op	   18415 allocs/op
-BenchmarkGolangCommonMark-8   	     300	   4734003 ns/op	 3181031 B/op	   18416 allocs/op
-```
-
-GFM：
 
 ```
 BenchmarkGolangCommonMark-2   	     300	   5069772 ns/op	 3144573 B/op	   18428 allocs/op
