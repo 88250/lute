@@ -14,7 +14,8 @@ package lute
 
 import "bytes"
 
-func (context *Context) parseTable(lines [][]byte) (ret *BaseNode) {
+func (context *Context) parseTable(paragraph *BaseNode) (ret *BaseNode) {
+	lines := bytes.Split(paragraph.tokens, []byte{itemNewline})
 	length := len(lines)
 	if 2 > length {
 		return
@@ -89,6 +90,10 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 
 func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	length := len(line)
+	if 1 > length {
+		return nil
+	}
+
 	var token byte
 	var i int
 	for ; i < length; i++ {

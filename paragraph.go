@@ -53,8 +53,7 @@ func (p *BaseNode) ParagraphFinalize(context *Context) {
 
 	if context.option.GFMTable {
 		// 尝试解析表
-		lines := bytes.Split(p.tokens, []byte{itemNewline})
-		table := context.parseTable(lines)
+		table := context.parseTable(p)
 		if nil != table {
 			p.InsertBefore(p, table)
 			// 移除该段落所有内容 tokens，但段落节点本身暂时保留在语法树上

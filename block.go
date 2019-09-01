@@ -12,7 +12,9 @@
 
 package lute
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
@@ -215,6 +217,20 @@ var blockStarts = []blockStartFunc{
 	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented && container.typ == NodeParagraph {
+			if t.context.option.GFMTable {
+				// 尝试解析表，因为可能出现如下情况：
+				//   0
+				//   -:
+				//   -
+				// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
+				table := t.context.parseTable(container)
+				if nil != table {
+					container.InsertBefore(container, table)
+					container.Unlink()
+					return 2
+				}
+			}
+
 			if heading := t.parseSetextHeading(); nil != heading {
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
