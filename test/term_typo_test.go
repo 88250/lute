@@ -13,7 +13,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/b3log/lute"
@@ -30,7 +29,6 @@ func TestTermTypo(t *testing.T) {
 	luteEngine := lute.New() // 默认已经开启了术语修正
 
 	for _, test := range termTypoTests {
-		fmt.Println("Test [" + test.name + "]")
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
@@ -39,7 +37,5 @@ func TestTermTypo(t *testing.T) {
 		if test.html != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
 		}
-		fmt.Println(html)
-		fmt.Println(luteEngine.FormatStr(test.name, test.markdown))
 	}
 }

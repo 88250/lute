@@ -14,7 +14,6 @@ package test
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/b3log/lute"
 	"io/ioutil"
 	"strconv"
@@ -51,8 +50,6 @@ func TestSpec(t *testing.T) {
 
 	for _, test := range testcases {
 		testName := test.Section + " " + strconv.Itoa(test.Example)
-		fmt.Println("Test [" + testName + "]")
-
 		html, err := luteEngine.MarkdownStr(testName, test.Markdown)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)

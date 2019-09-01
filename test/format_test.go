@@ -13,7 +13,6 @@
 package test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -57,7 +56,6 @@ func TestFormat(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range formatTests {
-		fmt.Println("Test [" + test.name + "]")
 		formatted, err := luteEngine.FormatStr(test.name, test.original)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
@@ -83,7 +81,6 @@ func TestFormatCase1(t *testing.T) {
 		t.Fatalf("markdown format failed: %s", err)
 	}
 	html := string(htmlBytes)
-	fmt.Print(html)
 
 	bytes, err = ioutil.ReadFile("format-case1-formatted.md")
 	if nil != err {

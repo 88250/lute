@@ -13,7 +13,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/b3log/lute"
@@ -62,9 +61,7 @@ var debugTests = []parseTest{
 
 func TestDebug(t *testing.T) {
 	luteEngine := lute.New()
-
 	for _, test := range debugTests {
-		fmt.Println("Test [" + test.name + "]")
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)

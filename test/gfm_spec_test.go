@@ -13,7 +13,6 @@
 package test
 
 import (
-	"fmt"
 	"github.com/b3log/lute"
 	"testing"
 )
@@ -68,7 +67,6 @@ func TestGFMSpec(t *testing.T) {
 	)
 
 	for _, test := range gfmSpecTests {
-		fmt.Println("Test [" + test.name + "]")
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)

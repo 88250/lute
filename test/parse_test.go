@@ -13,7 +13,6 @@
 package test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -248,7 +247,6 @@ func TestParse(t *testing.T) {
 	)
 
 	for _, test := range parseTests {
-		fmt.Println("Test [" + test.name + "]")
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
