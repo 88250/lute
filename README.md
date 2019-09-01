@@ -268,9 +268,9 @@ BenchmarkLute-8   	     500	   3642667 ns/op	 3855231 B/op	   17697 allocs/op
 GFM：
 
 ```
-BenchmarkLute-2   	     300	   5795003 ns/op	 5042017 B/op	   22923 allocs/op
-BenchmarkLute-4   	     300	   4499025 ns/op	 5044243 B/op	   22953 allocs/op
-BenchmarkLute-8   	     300	   4209115 ns/op	 5047745 B/op	   22999 allocs/op
+BenchmarkLute-2   	     300	   5757930 ns/op	 5037961 B/op	   22880 allocs/op
+BenchmarkLute-4   	     300	   4571207 ns/op	 5040427 B/op	   22913 allocs/op
+BenchmarkLute-8   	     300	   4192233 ns/op	 5042149 B/op	   22932 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
