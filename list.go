@@ -30,7 +30,7 @@ type listData struct {
 	num          int   // 有序列表项修正过的序号
 }
 
-func (list *BaseNode) ListFinalize(context *Context) {
+func (list *Node) ListFinalize(context *Context) {
 	item := list.firstChild
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
@@ -54,7 +54,7 @@ func (list *BaseNode) ListFinalize(context *Context) {
 }
 
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记。
-func (t *Tree) parseListMarker(container *BaseNode) *listData {
+func (t *Tree) parseListMarker(container *Node) *listData {
 	if t.context.indent >= 4 {
 		return nil
 	}
@@ -162,7 +162,7 @@ func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter byt
 }
 
 // endsWithBlankLine 判断块节点 block 是否是空行结束。如果 block 是列表或者列表项则迭代下降进入判断。
-func (list *BaseNode) endsWithBlankLine(block *BaseNode) bool {
+func (list *Node) endsWithBlankLine(block *Node) bool {
 	for nil != block {
 		if block.lastLineBlank {
 			return true

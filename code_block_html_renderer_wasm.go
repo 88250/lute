@@ -19,7 +19,7 @@ import (
 )
 
 // renderCodeBlockHTML 进行代码块 HTML 渲染，不实现语法高亮。
-func (r *Renderer) renderCodeBlockHTML(node *BaseNode, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		tokens := node.tokens

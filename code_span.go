@@ -12,7 +12,7 @@
 
 package lute
 
-func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *BaseNode) {
+func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	startPos := ctx.pos
 	n := 0
 	for ; startPos+n < ctx.tokensLen; n++ {
@@ -24,14 +24,14 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *BaseNode) {
 	backticks := ctx.tokens[startPos : startPos+n]
 	if ctx.tokensLen <= startPos+n {
 		ctx.pos += n
-		ret = &BaseNode{typ: NodeText, tokens: backticks}
+		ret = &Node{typ: NodeText, tokens: backticks}
 		return
 	}
 
 	endPos := t.matchCodeSpanEnd(ctx.tokens[startPos+n:], n)
 	if 1 > endPos {
 		ctx.pos += n
-		ret = &BaseNode{typ: NodeText, tokens: backticks}
+		ret = &Node{typ: NodeText, tokens: backticks}
 		return
 	}
 	endPos = startPos + endPos + n
@@ -44,7 +44,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *BaseNode) {
 		textTokens = textTokens[:len(textTokens)-1]
 	}
 
-	ret = &BaseNode{typ: NodeCodeSpan, tokens: textTokens}
+	ret = &Node{typ: NodeCodeSpan, tokens: textTokens}
 	ctx.pos = endPos + n
 	return
 }

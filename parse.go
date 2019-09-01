@@ -23,7 +23,7 @@ func parse(name string, markdown []byte, option options) (tree *Tree, err error)
 	tree = &Tree{Name: name, context: &Context{option: option}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &BaseNode{typ: NodeDocument}
+	tree.Root = &Node{typ: NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
@@ -36,17 +36,17 @@ type Context struct {
 	tree   *Tree   // 关联的语法树
 	option options // 解析渲染选项
 
-	linkRefDef map[string]*BaseNode // 链接引用定义集
+	linkRefDef map[string]*Node // 链接引用定义集
 
 	// 以下变量用于块级解析阶段
 
-	tip                                                      *BaseNode // 末梢节点
-	oldtip                                                   *BaseNode // 老的末梢节点
-	currentLine                                              items     // 当前行
-	currentLineLen                                           int       // 当前行长
-	offset, column, nextNonspace, nextNonspaceColumn, indent int       // 解析时用到的下标、缩进空格数
-	indented, blank, partiallyConsumedTab, allClosed         bool      // 是否是缩进行、空行等标识
-	lastMatchedContainer                                     *BaseNode // 最后一个匹配的块节点
+	tip                                                      *Node // 末梢节点
+	oldtip                                                   *Node // 老的末梢节点
+	currentLine                                              items // 当前行
+	currentLineLen                                           int   // 当前行长
+	offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的下标、缩进空格数
+	indented, blank, partiallyConsumedTab, allClosed         bool  // 是否是缩进行、空行等标识
+	lastMatchedContainer                                     *Node // 最后一个匹配的块节点
 }
 
 // InlineContext 描述了行级元素解析上下文。
@@ -139,7 +139,7 @@ func (context *Context) closeUnmatchedBlocks() {
 }
 
 // finalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
-func (context *Context) finalize(block *BaseNode) {
+func (context *Context) finalize(block *Node) {
 	var parent = block.parent
 	block.close = true
 	block.Finalize(context)
@@ -148,7 +148,7 @@ func (context *Context) finalize(block *BaseNode) {
 
 // addChild 将 child 作为子节点添加到 context.tip 上。如果 tip 节点不能接受子节点（非块级容器不能添加子节点），则最终化该 tip
 // 节点并向父节点方向尝试，直到找到一个能接受 child 的节点为止。
-func (context *Context) addChild(child *BaseNode) {
+func (context *Context) addChild(child *Node) {
 	for !context.tip.CanContain(child.typ) {
 		context.finalize(context.tip) // 注意调用 finalize 会向父节点方向进行迭代
 	}
@@ -167,7 +167,7 @@ func (context *Context) listsMatch(listData, itemData *listData) bool {
 // Tree 描述了 Markdown 抽象语法树结构。
 type Tree struct {
 	Name          string         // 名称，可以为空
-	Root          *BaseNode      // 根节点
+	Root          *Node          // 根节点
 	lexer         *lexer         // 词法分析器
 	context       *Context       // 块级解析上下文
 	inlineContext *InlineContext // 行级解析上下文

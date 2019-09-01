@@ -14,7 +14,7 @@ package lute
 
 import "bytes"
 
-func (context *Context) parseTable(paragraph *BaseNode) (ret *BaseNode) {
+func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 	lines := bytes.Split(paragraph.tokens, []byte{itemNewline})
 	length := len(lines)
 	if 2 > length {
@@ -31,7 +31,7 @@ func (context *Context) parseTable(paragraph *BaseNode) (ret *BaseNode) {
 		return
 	}
 
-	ret = &BaseNode{typ: NodeTable, tableAligns: aligns}
+	ret = &Node{typ: NodeTable, tableAligns: aligns}
 	ret.tableAligns = aligns
 	ret.AppendChild(ret, context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
@@ -44,8 +44,8 @@ func (context *Context) parseTable(paragraph *BaseNode) (ret *BaseNode) {
 	return
 }
 
-func (context *Context) newTableHead(headRow *BaseNode) *BaseNode {
-	ret := &BaseNode{typ: NodeTableHead}
+func (context *Context) newTableHead(headRow *Node) *Node {
+	ret := &Node{typ: NodeTableHead}
 	for c := headRow.firstChild; c != nil; {
 		next := c.next
 		ret.AppendChild(ret, c)
@@ -54,8 +54,8 @@ func (context *Context) newTableHead(headRow *BaseNode) *BaseNode {
 	return ret
 }
 
-func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *BaseNode) {
-	ret = &BaseNode{typ: NodeTableRow, tableAligns: aligns}
+func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *Node) {
+	ret = &Node{typ: NodeTableRow, tableAligns: aligns}
 	cols := line.splitWithoutBackslashEscape(itemPipe)
 	if 1 > len(cols) {
 		return nil
@@ -77,7 +77,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	var col items
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = bytes.TrimSpace(cols[i])
-		cell := &BaseNode{typ: NodeTableCell, tableCellAlign: aligns[i]}
+		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i]}
 		col = col.removeFirst(itemBackslash) // 删掉一个反斜杠来恢复语义
 		cell.tokens = col
 		ret.AppendChild(ret, cell)
@@ -85,7 +85,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 
 	// 可能需要补全剩余的列
 	for ; i < alignsLen; i++ {
-		cell := &BaseNode{typ: NodeTableCell, tableCellAlign: aligns[i]}
+		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i]}
 		ret.AppendChild(ret, cell)
 	}
 	return

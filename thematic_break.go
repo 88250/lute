@@ -12,7 +12,7 @@
 
 package lute
 
-func (t *Tree) parseThematicBreak() (ret *BaseNode) {
+func (t *Tree) parseThematicBreak() (ret *Node) {
 	markers := 0
 	var marker byte
 	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
@@ -39,5 +39,5 @@ func (t *Tree) parseThematicBreak() (ret *BaseNode) {
 		return nil
 	}
 
-	return &BaseNode{typ: NodeThematicBreak}
+	return &Node{typ: NodeThematicBreak}
 }

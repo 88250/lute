@@ -17,14 +17,14 @@ import (
 	"strings"
 )
 
-func (html *BaseNode) HTMLBlockContinue(context *Context) int {
+func (html *Node) HTMLBlockContinue(context *Context) int {
 	if context.blank && (html.htmlBlockType == 6 || html.htmlBlockType == 7) {
 		return 1
 	}
 	return 0
 }
 
-func (html *BaseNode) HTMLBlockFinalize(context *Context) {
+func (html *Node) HTMLBlockFinalize(context *Context) {
 	html.tokens = bytes.TrimRight(html.tokens.replaceNewlineSpace(), " \t\n")
 }
 
@@ -82,7 +82,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	return false
 }
 
-func (t *Tree) parseHTML(tokens items) (ret *BaseNode) {
+func (t *Tree) parseHTML(tokens items) (ret *Node) {
 	tokens = bytes.TrimLeft(tokens, " \t\n")
 	length := len(tokens)
 	if 3 > length { // at least <? and a newline
@@ -93,7 +93,7 @@ func (t *Tree) parseHTML(tokens items) (ret *BaseNode) {
 		return nil
 	}
 
-	ret = &BaseNode{typ: NodeHTMLBlock, tokens: make(items, 0, 256), htmlBlockType: 1}
+	ret = &Node{typ: NodeHTMLBlock, tokens: make(items, 0, 256), htmlBlockType: 1}
 
 	if pos := tokens.acceptTokenss(htmlBlockTags1); 0 <= pos {
 		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {

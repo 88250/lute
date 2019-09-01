@@ -19,7 +19,7 @@ import (
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
-	t.context.linkRefDef = map[string]*BaseNode{}
+	t.context.linkRefDef = map[string]*Node{}
 	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		t.incorporateLine(line)
 	}
@@ -39,7 +39,7 @@ func (t *Tree) incorporateLine(line items) {
 	t.context.currentLineLen = len(t.context.currentLine)
 
 	allMatched := true
-	var container *BaseNode
+	var container *Node
 	container = t.Root
 	lastChild := container.lastChild
 	for ; nil != lastChild && !lastChild.close; lastChild = container.lastChild {
@@ -149,7 +149,7 @@ func (t *Tree) incorporateLine(line items) {
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
 			// 普通段落开始
-			t.context.addChild(&BaseNode{typ: NodeParagraph, tokens: make(items, 0, 256)})
+			t.context.addChild(&Node{typ: NodeParagraph, tokens: make(items, 0, 256)})
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}
@@ -157,7 +157,7 @@ func (t *Tree) incorporateLine(line items) {
 }
 
 // blockStartFunc 定义了用于判断块是否开始的函数签名。
-type blockStartFunc func(t *Tree, container *BaseNode) int
+type blockStartFunc func(t *Tree, container *Node) int
 
 // blockStarts 定义了一系列函数，每个函数用于判断某种块节点是否可以开始，返回值：
 // 0：不匹配
@@ -165,7 +165,7 @@ type blockStartFunc func(t *Tree, container *BaseNode) int
 // 2：匹配到叶子块
 var blockStarts = []blockStartFunc{
 	// 判断块引用（>）是否开始
-	func(t *Tree, container *BaseNode) int {
+	func(t *Tree, container *Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
 			if itemEnd != token && itemGreater == token {
@@ -178,7 +178,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(&BaseNode{typ: NodeBlockquote})
+				t.context.addChild(&Node{typ: NodeBlockquote})
 				return 1
 			}
 		}
@@ -186,7 +186,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 ATX 标题（#）是否开始
-	func(t *Tree, container *BaseNode) int {
+	func(t *Tree, container *Node) int {
 		if !t.context.indented {
 			if heading := t.parseATXHeading(); nil != heading {
 				t.context.advanceNextNonspace()
@@ -201,7 +201,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断围栏代码块（```）是否开始
-	func(t *Tree, container *BaseNode) int {
+	func(t *Tree, container *Node) int {
 		if !t.context.indented {
 			if codeBlock := t.parseFencedCode(); nil != codeBlock {
 				t.context.closeUnmatchedBlocks()
@@ -215,7 +215,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 Setext 标题（- =）是否开始
-	func(t *Tree, container *BaseNode) int {
+	func(t *Tree, container *Node) int {
 		if !t.context.indented && container.typ == NodeParagraph {
 			if heading := t.parseSetextHeading(); nil != heading {
 				if t.context.option.GFMTable {
@@ -266,7 +266,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 HTML 块（<）是否开始
-	func(t *Tree, container *BaseNode) int {
+	func(t *Tree, container *Node) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if html := t.parseHTML(tokens); nil != html {
@@ -279,7 +279,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断分隔线（--- ***）是否开始
-	func(t *Tree, container *BaseNode) int {
+	func(t *Tree, container *Node) int {
 		if !t.context.indented {
 			if thematicBreak := t.parseThematicBreak(); nil != thematicBreak {
 				t.context.closeUnmatchedBlocks()
@@ -292,7 +292,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始
-	func(t *Tree, container *BaseNode) int {
+	func(t *Tree, container *Node) int {
 		if !t.context.indented || container.typ == NodeList {
 			data := t.parseListMarker(container)
 			if nil == data {
@@ -303,9 +303,9 @@ var blockStarts = []blockStartFunc{
 
 			listsMatch := container.typ == NodeList && t.context.listsMatch(container.listData, data)
 			if t.context.tip.typ != NodeList || !listsMatch {
-				t.context.addChild(&BaseNode{typ: NodeList, listData: data})
+				t.context.addChild(&Node{typ: NodeList, listData: data})
 			}
-			listItem := &BaseNode{typ: NodeListItem, listData: data}
+			listItem := &Node{typ: NodeListItem, listData: data}
 			t.context.addChild(listItem)
 
 			if 1 == listItem.listData.typ {
@@ -324,11 +324,11 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断缩进代码块（    code）是否开始
-	func(t *Tree, container *BaseNode) int {
+	func(t *Tree, container *Node) int {
 		if t.context.indented && t.context.tip.typ != NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)
 			t.context.closeUnmatchedBlocks()
-			t.context.addChild(&BaseNode{typ: NodeCodeBlock})
+			t.context.addChild(&Node{typ: NodeCodeBlock})
 			return 2
 		}
 		return 0

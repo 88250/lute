@@ -20,7 +20,7 @@ import (
 )
 
 // fixTermTypo 修正 str 中出现的术语拼写问题。
-func (t *Tree) fixTermTypo(node *BaseNode) {
+func (t *Tree) fixTermTypo(node *Node) {
 	if nil == node {
 		return
 	}

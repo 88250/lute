@@ -14,14 +14,14 @@ package lute
 
 import "bytes"
 
-func (p *BaseNode) ParagraphContinue(context *Context) int {
+func (p *Node) ParagraphContinue(context *Context) int {
 	if context.blank {
 		return 1
 	}
 	return 0
 }
 
-func (p *BaseNode) ParagraphFinalize(context *Context) {
+func (p *Node) ParagraphFinalize(context *Context) {
 	p.tokens = bytes.TrimSpace(p.tokens)
 
 	// 尝试解析链接引用定义
@@ -44,7 +44,7 @@ func (p *BaseNode) ParagraphFinalize(context *Context) {
 		if nil != listItem && NodeListItem == listItem.typ {
 			if 3 == listItem.listData.typ {
 				// 如果是任务列表项则添加任务列表标记节点
-				taskListItemMarker := &BaseNode{typ: NodeTaskListItemMarker, taskListItemChecked: listItem.listData.checked}
+				taskListItemMarker := &Node{typ: NodeTaskListItemMarker, taskListItemChecked: listItem.listData.checked}
 				p.InsertBefore(p, taskListItemMarker)
 				p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 			}

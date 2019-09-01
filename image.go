@@ -13,17 +13,17 @@
 package lute
 
 // parseBang 解析 !，可能是图片标记开始 ![ 也可能是普通文本 !。
-func (t *Tree) parseBang(ctx *InlineContext) (ret *BaseNode) {
+func (t *Tree) parseBang(ctx *InlineContext) (ret *Node) {
 	var startPos = ctx.pos
 	ctx.pos++
 	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos] {
 		ctx.pos++
-		ret = &BaseNode{typ: NodeText, tokens: toItems("![")}
+		ret = &Node{typ: NodeText, tokens: toItems("![")}
 		// 将图片开始标记入栈
 		t.addBracket(ret, startPos+2, true, ctx)
 		return
 	}
 
-	ret = &BaseNode{typ: NodeText, tokens: toItems("!")}
+	ret = &Node{typ: NodeText, tokens: toItems("!")}
 	return
 }

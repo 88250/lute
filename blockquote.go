@@ -12,7 +12,7 @@
 
 package lute
 
-func (blockquote *BaseNode) BlockquoteContinue(context *Context) int {
+func (blockquote *Node) BlockquoteContinue(context *Context) int {
 	var ln = context.currentLine
 	if !context.indented && ln.peek(context.nextNonspace) == itemGreater {
 		context.advanceNextNonspace()

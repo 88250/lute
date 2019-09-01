@@ -16,7 +16,7 @@ import (
 	"bytes"
 )
 
-func (codeBlock *BaseNode) CodeBlockContinue(context *Context) int {
+func (codeBlock *Node) CodeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 	if codeBlock.isFencedCodeBlock {
@@ -49,7 +49,7 @@ func (codeBlock *BaseNode) CodeBlockContinue(context *Context) int {
 	return 0
 }
 
-func (codeBlock *BaseNode) CodeBlockFinalize(context *Context) {
+func (codeBlock *Node) CodeBlockFinalize(context *Context) {
 	if codeBlock.isFencedCodeBlock {
 		content := codeBlock.tokens
 		length := len(content)
@@ -75,7 +75,7 @@ func (codeBlock *BaseNode) CodeBlockFinalize(context *Context) {
 	}
 }
 
-func (t *Tree) parseFencedCode() (ret *BaseNode) {
+func (t *Tree) parseFencedCode() (ret *Node) {
 	marker := t.context.currentLine[t.context.nextNonspace]
 	if itemBacktick != marker && itemTilde != marker {
 		return nil
@@ -98,13 +98,13 @@ func (t *Tree) parseFencedCode() (ret *BaseNode) {
 	}
 	info = bytes.TrimSpace(infoTokens)
 	info = unescapeString(info)
-	ret = &BaseNode{typ: NodeCodeBlock, tokens: make(items, 0, 256),
+	ret = &Node{typ: NodeCodeBlock, tokens: make(items, 0, 256),
 		isFencedCodeBlock: true, codeBlockFenceChar: fenceChar, codeBlockFenceLength: fenceLength, codeBlockFenceOffset: t.context.indent, codeBlockInfo: info}
 
 	return
 }
 
-func (codeBlock *BaseNode) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
+func (codeBlock *Node) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
 	closeMarker := tokens[0]
 	if closeMarker != openMarker {
 		return false

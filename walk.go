@@ -26,10 +26,10 @@ const (
 
 // Walker 函数定义了遍历节点 n 时需要执行的操作，进入节点设置 entering 为 true，离开节点设置为 false。
 // 如果返回 WalkStop 或者 error 则结束遍历。
-type Walker func(n *BaseNode, entering bool) (WalkStatus, error)
+type Walker func(n *Node, entering bool) (WalkStatus, error)
 
 // Walk 使用深度优先算法遍历指定的树节点 n。
-func Walk(n *BaseNode, walker Walker) (err error) {
+func Walk(n *Node, walker Walker) (err error) {
 	var status WalkStatus
 
 	// 进入节点

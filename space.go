@@ -18,7 +18,7 @@ import (
 )
 
 // space 会把 text 中的中西文之间加上空格。
-func (t *Tree) space(node *BaseNode) {
+func (t *Tree) space(node *Node) {
 	if nil == node {
 		return
 	}

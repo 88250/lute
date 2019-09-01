@@ -14,7 +14,7 @@ package lute
 
 import "bytes"
 
-func (t *Tree) parseATXHeading() (ret *BaseNode) {
+func (t *Tree) parseATXHeading() (ret *Node) {
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	marker := tokens[0]
 	if itemCrosshatch != marker {
@@ -30,7 +30,7 @@ func (t *Tree) parseATXHeading() (ret *BaseNode) {
 		return
 	}
 
-	heading := &BaseNode{typ: NodeHeading, headingLevel: level}
+	heading := &Node{typ: NodeHeading, headingLevel: level}
 	tokens = bytes.TrimLeft(tokens, " \t\n")
 	tokens = bytes.TrimLeft(tokens[level:], " \t\n")
 	for _, token := range tokens {
@@ -68,7 +68,7 @@ func (t *Tree) parseATXHeading() (ret *BaseNode) {
 	return
 }
 
-func (t *Tree) parseSetextHeading() (ret *BaseNode) {
+func (t *Tree) parseSetextHeading() (ret *Node) {
 	ln := bytes.TrimSpace(t.context.currentLine)
 	start := 0
 	marker := ln[start]
@@ -98,7 +98,7 @@ func (t *Tree) parseSetextHeading() (ret *BaseNode) {
 		return nil
 	}
 
-	ret = &BaseNode{typ: NodeHeading, headingLevel: 1}
+	ret = &Node{typ: NodeHeading, headingLevel: 1}
 	if itemHyphen == marker {
 		ret.headingLevel = 2
 	}
