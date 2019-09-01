@@ -52,13 +52,16 @@ func (p *BaseNode) ParagraphFinalize(context *Context) {
 	}
 
 	if context.option.GFMTable {
-		// 尝试解析表
 		table := context.parseTable(p)
 		if nil != table {
-			p.InsertBefore(p, table)
-			// 移除该段落所有内容 tokens，但段落节点本身暂时保留在语法树上
-			// 在行级解析中，如果段落内容为空则从语法树上移除该段落节点
-			// 这样处理的目的是让块级解析保持简单，在关闭未匹配的节点时只用判断段落类型
+			// 将该段落节点转成表节点
+			p.typ = NodeTable
+			p.tableAligns = table.tableAligns
+			for tr := table.firstChild; nil != tr; {
+				nextTr := tr.next
+				p.AppendChild(p, tr)
+				tr = nextTr
+			}
 			p.tokens = nil
 		}
 	}

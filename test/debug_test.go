@@ -20,19 +20,28 @@ import (
 )
 
 var debugTests = []parseTest{
-	// https://github.com/b3log/lute/issues/9
-	//{"22", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
-	// https://github.com/b3log/lute/issues/3
+	// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
+	{"23", "0\n-:\n1\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"right\">1</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
+	{"23", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
+
+	// GFM Table rendered as h2 https://github.com/b3log/lute/issues/3
 	{"21", "0\n-:\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n"},
+
 	// HTMl 块解析，等号前面空格情况
 	{"20", "<a href =\"https://github.com\">GitHub</a>\n", "<a href =\"https://github.com\">GitHub</a>\n"},
+
 	// 链接结尾 / 处理
 	{"19", "https://hacpai.com/ https://hacpai.com", "<p><a href=\"https://hacpai.com/\">https://hacpai.com/</a> <a href=\"https://hacpai.com\">https://hacpai.com</a></p>\n"},
+
+	// 转义
 	{"18", "`<a href=\"`\">`\n", "<p><code>&lt;a href=&quot;</code>&quot;&gt;`</p>\n"},
+
 	// 原文不以 \n 结尾的话需要自动补上
 	{"17", "- - ", "<ul>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n</ul>\n"},
+
 	// 强调优先级高于删除线
 	{"16", "~~*~~Hi*\n", "<p>~~<em>~~Hi</em></p>\n"},
+
 	{"15", "a*\"foo\"*\n", "<p>a*&quot;foo&quot;*</p>\n"},
 	{"14", "5*6*78\n", "<p>5<em>6</em>78</p>\n"},
 	{"13", "**莠**\n", "<p><strong>莠</strong></p>\n"},

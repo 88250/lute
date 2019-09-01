@@ -57,6 +57,9 @@ func (context *Context) newTableHead(headRow *BaseNode) *BaseNode {
 func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *BaseNode) {
 	ret = &BaseNode{typ: NodeTableRow, tableAligns: aligns}
 	cols := line.splitWithoutBackslashEscape(itemPipe)
+	if 1 > len(cols) {
+		return nil
+	}
 	if isBlank(cols[0]) {
 		cols = cols[1:]
 	}

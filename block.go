@@ -217,21 +217,31 @@ var blockStarts = []blockStartFunc{
 	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container *BaseNode) int {
 		if !t.context.indented && container.typ == NodeParagraph {
-			if t.context.option.GFMTable {
-				// 尝试解析表，因为可能出现如下情况：
-				//   0
-				//   -:
-				//   -
-				// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
-				table := t.context.parseTable(container)
-				if nil != table {
-					container.InsertBefore(container, table)
-					container.Unlink()
-					return 2
-				}
-			}
-
 			if heading := t.parseSetextHeading(); nil != heading {
+				if t.context.option.GFMTable {
+					// 尝试解析表，因为可能出现如下情况：
+					//
+					//   0
+					//   -:
+					//   -
+					//
+					// 前两行可以解析出一个只有一个单元格的表。
+					// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
+					table := t.context.parseTable(container)
+					if nil != table {
+						// 将该段落节点转成表节点
+						container.typ = NodeTable
+						container.tableAligns = table.tableAligns
+						for tr := table.firstChild; nil != tr; {
+							nextTr := tr.next
+							container.AppendChild(container, tr)
+							tr = nextTr
+						}
+						container.tokens = nil
+						return 0
+					}
+				}
+
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
 				for tokens := container.Tokens(); 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.Tokens() {
