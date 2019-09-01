@@ -33,7 +33,7 @@ func (t *Tree) walkParseInline(node *Node) {
 
 	// 只有如下几种类型的块节点需要生成行级子节点
 	if typ := node.typ; NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
-		tokens := node.Tokens()
+		tokens := node.tokens
 		if NodeParagraph == typ && nil == tokens {
 			// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
 			// 在这里从语法树上移除空段落节点
@@ -79,6 +79,11 @@ func (t *Tree) walkParseInline(node *Node) {
 		if t.context.option.FixTermTypo {
 			t.fixTermTypo(node)
 		}
+
+		if t.context.option.Emoji {
+			t.emoji(node)
+		}
+
 		return
 	}
 
@@ -407,7 +412,7 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 		if NodeText == lastc.typ {
 			tokens := lastc.tokens
 			if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
-				lastc.SetTokens(bytes.TrimRight(tokens, " \t\n"))
+				lastc.tokens = bytes.TrimRight(tokens, " \t\n")
 				if 1 < valueLen {
 					hardbreak = itemSpace == tokens[len(tokens)-2]
 				}
