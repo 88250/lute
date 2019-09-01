@@ -19,7 +19,13 @@ import (
 
 var emojiTests = []parseTest{
 
-	{"1", ":b3log:\n", "<p>${imgStaticPath}/b3log.png</p>\n"},
+	{"7", ":heart不是表情\n", "<p>:heart不是表情</p>\n"},
+	{"6", ":heart:开头表情\n", "<p>❤️开头表情</p>\n"},
+	{"5", "结尾表情:heart:\n", "<p>结尾表情❤️</p>\n"},
+	{"4", "没有表情\n", "<p>没有表情</p>\n"},
+	{"3", "0 :b3log: 1 :heart: 2\n", "<p>0 <img alt=\"b3log\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/b3log.png\" title=\"b3log\" /> 1 ❤️ 2</p>\n"},
+	{"2", ":smile: :heart:\n", "<p>😄 ❤️</p>\n"},
+	{"1", ":b3log:\n", "<p><img alt=\"b3log\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/b3log.png\" title=\"b3log\" /></p>\n"},
 	{"0", "爱心:heart:一个\n", "<p>爱心❤️一个</p>\n"},
 }
 
