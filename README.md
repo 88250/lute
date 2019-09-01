@@ -370,9 +370,11 @@ func main() {
    （这一步可以用其他 HTTP Server 代替）
 2. 浏览器访问 `http://localhost:8080/wasm_exec.html`
 
-目前通过 `brotli -o lute.wasm.br lute.wasm` 进行压缩后大小 ~1.6MB，如果去掉后端高亮（对 Chroma 库的依赖）的话可以将至 ~630KB。
+一些细节：
 
-[TinyGo](https://github.com/tinygo-org/tinygo) 编译暂时没成功。
+1. 没有内置语法高亮特性
+2. lute.wasm 大小 ~4MB，通过 `brotli -o lute.wasm.br lute.wasm` 压缩后大小 ~650KB
+3. [TinyGo](https://github.com/tinygo-org/tinygo) 编译还在探索中
 
 ## 📜 文档
 
