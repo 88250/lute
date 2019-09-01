@@ -175,7 +175,7 @@ func (r *Renderer) renderHTMLHTML(node *Node, entering bool) (WalkStatus, error)
 	}
 
 	r.newline()
-	r.write(node.Tokens())
+	r.write(node.tokens)
 	r.newline()
 	return WalkContinue, nil
 }
@@ -185,7 +185,7 @@ func (r *Renderer) renderInlineHTMLHTML(node *Node, entering bool) (WalkStatus, 
 		return WalkContinue, nil
 	}
 
-	r.write(node.Tokens())
+	r.write(node.tokens)
 	return WalkContinue, nil
 }
 
@@ -224,7 +224,7 @@ func (r *Renderer) renderTextHTML(node *Node, entering bool) (WalkStatus, error)
 func (r *Renderer) renderCodeSpanHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("<code>")
-		r.write(escapeHTML(node.Tokens()))
+		r.write(escapeHTML(node.tokens))
 		return WalkSkipChildren, nil
 	}
 	r.writeString("</code>")
@@ -243,7 +243,7 @@ func (r *Renderer) renderEmphasisHTML(node *Node, entering bool) (WalkStatus, er
 func (r *Renderer) renderStrongHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("<strong>")
-		r.write(node.Tokens())
+		r.write(node.tokens)
 	} else {
 		r.writeString("</strong>")
 	}

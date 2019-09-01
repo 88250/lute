@@ -44,7 +44,7 @@ func (t *Tree) parseGFMAutoLink(node *Node) {
 }
 
 func (t *Tree) parseGFMAutoEmailLink0(node *Node) {
-	tokens := node.Tokens()
+	tokens := node.tokens
 	if 0 >= bytes.Index(tokens, []byte("@")) {
 		return
 	}
@@ -151,7 +151,7 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 }
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
-	tokens := node.Tokens()
+	tokens := node.tokens
 	var i, j, k int
 	length := len(tokens)
 	if 8 > length { // 太短的情况肯定不可能有链接

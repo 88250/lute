@@ -29,9 +29,9 @@ func (t *Tree) fixTermTypo(node *Node) {
 		next := child.next
 		if NodeText == child.typ && nil != child.parent &&
 			NodeLink != child.parent.typ /* 不处理链接 label */ {
-			text := fromItems(child.Tokens())
+			text := fromItems(child.tokens)
 			text = fixTermTypo0(text)
-			child.SetTokens(toItems(text))
+			child.tokens = toItems(text)
 		} else {
 			t.fixTermTypo(child) // 递归处理子节点
 		}

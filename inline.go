@@ -38,14 +38,14 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 
 	// 只有如下几种类型的块节点需要生成行级子节点
 	if typ := node.typ; NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
-		tokens := node.Tokens()
+		tokens := node.tokens
 		if NodeParagraph == typ && nil == tokens {
 			// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
 			// 在这里从语法树上移除空段落节点
 			next := node.next
 			node.Unlink()
 			// Unlink 会将后一个兄弟节点置空，此处是在在遍历过程中修改树结构，所以需要保持继续迭代后面的兄弟节点
-			node.next = (next)
+			node.next = next
 			return
 		}
 
@@ -412,7 +412,7 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 		if NodeText == lastc.typ {
 			tokens := lastc.tokens
 			if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
-				lastc.SetTokens(bytes.TrimRight(tokens, " \t\n"))
+				lastc.tokens = bytes.TrimRight(tokens, " \t\n")
 				if 1 < valueLen {
 					hardbreak = itemSpace == tokens[len(tokens)-2]
 				}

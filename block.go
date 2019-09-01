@@ -244,15 +244,15 @@ var blockStarts = []blockStartFunc{
 
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
-				for tokens := container.Tokens(); 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.Tokens() {
+				for tokens := container.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.tokens {
 					if remains := t.context.parseLinkRefDef(tokens); nil != remains {
-						container.SetTokens(remains)
+						container.tokens = remains
 					} else {
 						break
 					}
 				}
 
-				if value := container.Tokens(); 0 < len(value) {
+				if value := container.tokens; 0 < len(value) {
 					heading.tokens = bytes.TrimSpace(value)
 					container.InsertAfter(container, heading)
 					container.Unlink()

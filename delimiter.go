@@ -119,10 +119,10 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			opener.num -= useDelims
 			closer.num -= useDelims
 
-			text := openerInl.Tokens()[0 : len(openerInl.Tokens())-useDelims]
-			openerInl.SetTokens(text)
-			text = closerInl.Tokens()[0 : len(closerInl.Tokens())-useDelims]
-			closerInl.SetTokens(text)
+			text := openerInl.tokens[0 : len(openerInl.tokens)-useDelims]
+			openerInl.tokens = text
+			text = closerInl.tokens[0 : len(closerInl.tokens)-useDelims]
+			closerInl.tokens = text
 
 			var emStrongDel *Node
 			if 1 == useDelims {

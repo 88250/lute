@@ -161,16 +161,6 @@ func (n *Node) AppendRawText(rawText string) {
 	n.rawText += rawText
 }
 
-// Tokens 返回所有 tokens。
-func (n *Node) Tokens() items {
-	return n.tokens
-}
-
-// SetTokens 设置 tokens。
-func (n *Node) SetTokens(tokens items) {
-	n.tokens = tokens
-}
-
 // AppendTokens 添加 tokens。
 func (n *Node) AppendTokens(tokens items) {
 	n.tokens = append(n.tokens, tokens...)

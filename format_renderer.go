@@ -111,7 +111,7 @@ func (r *Renderer) renderStrikethroughMarkdown(node *Node, entering bool) (WalkS
 func (r *Renderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("![")
-		r.write(node.firstChild.Tokens())
+		r.write(node.firstChild.tokens)
 		r.writeString("](")
 		r.write(node.destination)
 		if nil != node.title {
@@ -127,7 +127,7 @@ func (r *Renderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, e
 func (r *Renderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("[")
-		r.write(node.firstChild.Tokens()) // FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
+		r.write(node.firstChild.tokens) // FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
 		r.writeString("](")
 		r.write(node.destination)
 		if nil != node.title {
@@ -146,7 +146,7 @@ func (r *Renderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStatus, er
 	}
 
 	r.newline()
-	r.write(node.Tokens())
+	r.write(node.tokens)
 	r.newline()
 	return WalkContinue, nil
 }
@@ -156,7 +156,7 @@ func (r *Renderer) renderInlineHTMLMarkdown(node *Node, entering bool) (WalkStat
 		return WalkContinue, nil
 	}
 
-	r.write(node.Tokens())
+	r.write(node.tokens)
 	return WalkContinue, nil
 }
 
@@ -218,7 +218,7 @@ func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, er
 	}
 
 	if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
-		r.write(node.Tokens())
+		r.write(node.tokens)
 	}
 	return WalkContinue, nil
 }
@@ -226,7 +226,7 @@ func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, er
 func (r *Renderer) renderCodeSpanMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte('`')
-		r.write(node.Tokens())
+		r.write(node.tokens)
 		return WalkSkipChildren, nil
 	}
 

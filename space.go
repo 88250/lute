@@ -27,9 +27,9 @@ func (t *Tree) space(node *Node) {
 		next := child.next
 		if NodeText == child.typ && nil != child.parent &&
 			NodeLink != child.parent.typ /* 不处理链接 label */ {
-			text := fromItems(child.Tokens())
+			text := fromItems(child.tokens)
 			text = space0(text)
-			child.SetTokens(toItems(text))
+			child.tokens = toItems(text)
 		} else {
 			t.space(child) // 递归处理子节点
 		}
