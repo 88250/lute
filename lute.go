@@ -23,6 +23,7 @@ type Lute struct {
 //  * 软换行转硬换行
 //  * 中西文间插入空格
 //  * 修正术语拼写
+//  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
 	GFM(true)(ret)
@@ -30,6 +31,7 @@ func New(opts ...option) (ret *Lute) {
 	CodeSyntaxHighlight(true)(ret)
 	AutoSpace(true)(ret)
 	FixTermTypo(true)(ret)
+	Emoji(true)(ret)
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -154,6 +156,13 @@ func FixTermTypo(b bool) option {
 	}
 }
 
+// Emoji 设置是否对 Emoji 别名替换为原生 Unicode 字符。
+func Emoji(b bool) option {
+	return func(lute *Lute) {
+		lute.Emoji = b
+	}
+}
+
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	GFMTable            bool
@@ -164,6 +173,7 @@ type options struct {
 	CodeSyntaxHighlight bool
 	AutoSpace           bool
 	FixTermTypo         bool
+	Emoji               bool
 }
 
 // option 描述了解析渲染选项设置函数签名。

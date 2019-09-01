@@ -10,38 +10,30 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-package main
+package test
 
 import (
-	"io/ioutil"
-	"os"
-	"runtime/pprof"
-
 	"github.com/b3log/lute"
+	"testing"
 )
 
-func main() {
-	spec := "test/commonmark-spec"
-	bytes, err := ioutil.ReadFile(spec + ".md")
-	if nil != err {
-		panic(err)
-	}
+var emojiTests = []parseTest{
 
-	luteEngine := lute.New(lute.GFM(true),
-		lute.CodeSyntaxHighlight(false),
-		lute.SoftBreak2HardBreak(false),
-		lute.AutoSpace(false),
-		lute.FixTermTypo(false),
-		lute.Emoji(false),
-	)
+	{"1", ":b3log:\n", "<p>${imgStaticPath}/b3log.png</p>\n"},
+	{"0", "爱心:heart:一个\n", "<p>爱心❤️一个</p>\n"},
+}
 
-	cpuProfile, _ := os.Create("pprof/cpu_profile")
-	pprof.StartCPUProfile(cpuProfile)
-	for i := 0; i < 100; i++ {
-		_, err := luteEngine.Markdown("pprof "+spec, bytes)
+func TestEmoji(t *testing.T) {
+	luteEngine := lute.New() // 默认已经开启 Emoji 处理
+
+	for _, test := range emojiTests {
+		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
 		if nil != err {
-			panic(err)
+			t.Fatalf("unexpected: %s", err)
+		}
+
+		if test.html != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
 		}
 	}
-	pprof.StopCPUProfile()
 }

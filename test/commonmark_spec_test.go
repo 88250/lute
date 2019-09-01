@@ -46,6 +46,7 @@ func TestSpec(t *testing.T) {
 		lute.CodeSyntaxHighlight(false),
 		lute.AutoSpace(false),
 		lute.FixTermTypo(false),
+		lute.Emoji(false),
 	)
 
 	for _, test := range testcases {

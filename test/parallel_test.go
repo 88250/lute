@@ -36,7 +36,7 @@ func TestParallel(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			luteEngine := lute.New()
+			luteEngine := lute.New(lute.Emoji(false))
 			_, err := luteEngine.Markdown("", data0)
 			if nil != err {
 				t.Fatalf(err.Error())
@@ -46,7 +46,7 @@ func TestParallel(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			luteEngine := lute.New()
+			luteEngine := lute.New(lute.Emoji(false))
 			_, err := luteEngine.Markdown("", data1)
 			if nil != err {
 				t.Fatalf(err.Error())

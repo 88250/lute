@@ -36,6 +36,7 @@ func BenchmarkLute(b *testing.B) {
 		lute.SoftBreak2HardBreak(false),
 		lute.AutoSpace(false),
 		lute.FixTermTypo(false),
+		lute.Emoji(false),
 	)
 	html, err := luteEngine.Markdown("spec text", bytes)
 	if nil != err {
