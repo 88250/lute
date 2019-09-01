@@ -191,9 +191,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	// FIXME: 尝试 TinyGo，暂时注释掉
-	//v := html.UnescapeString(entityName)
-	v := ""
+	v := stdlibHTMLUnescapeString(entityName)
 	if v == entityName {
 		ctx.pos++
 		return &Node{typ: NodeText, tokens: toItems("&")}
