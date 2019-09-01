@@ -52,7 +52,7 @@ func emoji0(node *Node) {
 		if emoji, ok := emojis[fromItems(maybeEmoji)]; ok {
 			if strings.Contains(emoji, "${imgStaticPath}") { // 有的 Emoji 是图片链接，需要单独处理
 				alias := fromItems(maybeEmoji)
-				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/" + alias
+				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + EmojiSite + alias
 				suffix := ".png"
 				if "huaji" == alias {
 					suffix = ".gif"

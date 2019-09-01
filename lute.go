@@ -17,6 +17,9 @@ type Lute struct {
 	options
 }
 
+// EmojiSite 为图片 Emoji URL 的路径前缀。
+var EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/"
+
 // New 创建一个新的 Lute 引擎，默认启用：
 //  * GFM 支持
 //  * 代码块语法高亮
