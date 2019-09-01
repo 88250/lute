@@ -286,9 +286,9 @@ BenchmarkGoldMark-8   	     300	   4285322 ns/op	 2088570 B/op	   13850 allocs/o
 GFM：
 
 ```
-BenchmarkGoldMark-2   	     200	   5894097 ns/op	 2310470 B/op	   15368 allocs/op
-BenchmarkGoldMark-4   	     300	   5858532 ns/op	 2315752 B/op	   15368 allocs/op
-BenchmarkGoldMark-8   	     200	   5978943 ns/op	 2319698 B/op	   15369 allocs/op
+BenchmarkGoldMark-2   	     300	   5807783 ns/op	 2310746 B/op	   15367 allocs/op
+BenchmarkGoldMark-4   	     300	   5678037 ns/op	 2316867 B/op	   15369 allocs/op
+BenchmarkGoldMark-8   	     300	   5734657 ns/op	 2318907 B/op	   15369 allocs/op
 ```
 
 ### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
