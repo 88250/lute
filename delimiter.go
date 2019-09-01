@@ -126,7 +126,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 
 			var emStrongDel *BaseNode
 			if 1 == useDelims {
-				if itemAsterisk == closercc {
+				if itemAsterisk == closercc || itemUnderscore == closercc {
 					emStrongDel = &BaseNode{typ: NodeEmphasis}
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
