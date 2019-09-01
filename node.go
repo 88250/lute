@@ -63,6 +63,11 @@ type BaseNode struct {
 	// 标题
 
 	headingLevel int // 1~6
+
+	// 强调、加粗和删除线
+
+	strongEmDelMarker    byte
+	strongEmDelMarkenLen int
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。

@@ -126,19 +126,21 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 
 			var emStrongDel *BaseNode
 			if 1 == useDelims {
-				if itemAsterisk == closercc || itemUnderscore == closercc {
-					emStrongDel = &BaseNode{typ: NodeEmphasis}
+				if itemAsterisk == closercc {
+					emStrongDel = &BaseNode{typ: NodeEmphasis, strongEmDelMarker: itemAsterisk, strongEmDelMarkenLen: 1}
+				} else if itemUnderscore == closercc {
+					emStrongDel = &BaseNode{typ: NodeEmphasis, strongEmDelMarker: itemUnderscore, strongEmDelMarkenLen: 1}
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel = &BaseNode{typ: NodeStrikethrough}
+						emStrongDel = &BaseNode{typ: NodeStrikethrough, strongEmDelMarker: itemTilde, strongEmDelMarkenLen: 1}
 					}
 				}
 			} else {
 				if itemTilde != closercc {
-					emStrongDel = &BaseNode{typ: NodeStrong}
+					emStrongDel = &BaseNode{typ: NodeStrong, strongEmDelMarker: closercc, strongEmDelMarkenLen: 2}
 				} else {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel = &BaseNode{typ: NodeStrikethrough}
+						emStrongDel = &BaseNode{typ: NodeStrikethrough, strongEmDelMarker: closercc, strongEmDelMarkenLen: 2}
 					}
 				}
 			}

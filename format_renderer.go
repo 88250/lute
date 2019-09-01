@@ -101,9 +101,9 @@ func (r *Renderer) renderTableMarkdown(node *BaseNode, entering bool) (WalkStatu
 
 func (r *Renderer) renderStrikethroughMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("~~")
+		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
-		r.writeString("~~")
+		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	}
 	return WalkContinue, nil
 }
@@ -278,18 +278,18 @@ func (r *Renderer) renderCodeBlockMarkdown(node *BaseNode, entering bool) (WalkS
 
 func (r *Renderer) renderEmphasisMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeByte('*')
+		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
-		r.writeByte('*')
+		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderStrongMarkdown(node *BaseNode, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("**")
+		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
-		r.writeString("**")
+		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	}
 	return WalkContinue, nil
 }
