@@ -42,13 +42,28 @@ func emoji0(node *Node) {
 
 		node.tokens = append(node.tokens, tokens[pos:i]...)
 
+		matchCloseColon := false
 		for pos = i + 1; pos < length; pos++ {
 			token = tokens[pos]
+			if isWhitespace(token) {
+				break
+			}
 			if itemColon == token {
+				matchCloseColon = true
 				break
 			}
 		}
+		if !matchCloseColon {
+			node.tokens = append(node.tokens, tokens[i:pos]...)
+			continue
+		}
+
 		maybeEmoji = tokens[i+1 : pos]
+		if 1 > len(maybeEmoji) {
+			node.tokens = append(node.tokens, tokens[pos])
+			continue
+		}
+
 		if emoji, ok := emojis[fromItems(maybeEmoji)]; ok {
 			if strings.Contains(emoji, "${imgStaticPath}") { // 有的 Emoji 是图片链接，需要单独处理
 				alias := fromItems(maybeEmoji)

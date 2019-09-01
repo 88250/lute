@@ -19,6 +19,10 @@ import (
 
 var emojiTests = []parseTest{
 
+	{"11", "::\n", "<p>::</p>\n"},
+	{"10", "smile: :heart :smile:\n", "<p>smile: :heart 😄</p>\n"},
+	{"9", ":smile: :heart :smile:\n", "<p>😄 :heart 😄</p>\n"},
+	{"8", ":heart\n", "<p>:heart</p>\n"},
 	{"7", ":heart 不是表情\n", "<p>:heart 不是表情</p>\n"},
 	{"6", ":heart:开头表情\n", "<p>❤️开头表情</p>\n"},
 	{"5", "结尾表情:heart:\n", "<p>结尾表情❤️</p>\n"},
