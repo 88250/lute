@@ -19,7 +19,7 @@ import (
 	"unicode/utf8"
 )
 
-// fixTermTypo 修正 str 中出现的术语拼写问题。
+// fixTermTypo 修正 node 下文本节点中出现的术语拼写问题。
 func (t *Tree) fixTermTypo(node *Node) {
 	if nil == node {
 		return

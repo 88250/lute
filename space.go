@@ -17,7 +17,7 @@ import (
 	"unicode/utf8"
 )
 
-// space 会把 text 中的中西文之间加上空格。
+// space 会把 node 下文本节点中的中西文之间加上空格。
 func (t *Tree) space(node *Node) {
 	if nil == node {
 		return
