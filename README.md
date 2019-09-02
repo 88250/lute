@@ -255,7 +255,7 @@ Markdown 原文：
 
 ## ⚡ 性能
 
-1. 主要对比了 4 款 Go 实现的 Markdown 引擎：（[Lute](https://github.com/b3log/lute)、[golang-commonmark](https://gitlab.com/golang-commonmark/markdown)、[goldmark](https://github.com/yuin/goldmark) 和 [Blackfriday](https://github.com/russross/blackfriday)）
+1. 主要对比了 4 款 Go 实现的 Markdown 引擎：[Lute](https://github.com/b3log/lute)、[golang-commonmark](https://gitlab.com/golang-commonmark/markdown)、[goldmark](https://github.com/yuin/goldmark) 和 [Blackfriday](https://github.com/russross/blackfriday)
 2. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
 3. 均已开启 GFM 支持，因为 GFM 在实际使用场景下是必备的，仅测试 CommonMark 支持意义不大 
 4. Lute 在多核平台上性能优势比较明显，因为 Lute 使用了并行解析算法
@@ -277,7 +277,7 @@ BenchmarkBlackFriday-4               500           3670115 ns/op         3264290
 BenchmarkBlackFriday-8               500           3664262 ns/op         3267226 B/op      19863 allocs/op
 ```
 
-另外，JavaScript 写的 [markdown-it](https://github.com/markdown-it/markdown-it) 循环渲染 300 次，平均每次调用耗时 ~10ms，耗时大致是 golang 实现的两倍。
+另外，JavaScript 写的 [markdown-it](https://github.com/markdown-it/markdown-it) 循环渲染 300 次，平均每次调用耗时 ~10ms，耗时大致是 golang 实现的两倍，测试代码[见此](https://github.com/b3log/markdown-http/blob/master/benchmark/test.js)。
 
 ## 💪 健壮性
 
