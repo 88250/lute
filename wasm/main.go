@@ -15,7 +15,6 @@
 package main
 
 import (
-	"fmt"
 	"syscall/js"
 
 	"github.com/b3log/lute"
@@ -23,7 +22,6 @@ import (
 
 func markdown(this js.Value, args []js.Value) interface{} {
 	markdownText := args[0].String()
-	fmt.Printf("markdown text [%s]", markdownText)
 	luteEngine := lute.New()
 	html, _ := luteEngine.MarkdownStr("", markdownText)
 	_ = luteEngine
@@ -33,8 +31,7 @@ func markdown(this js.Value, args []js.Value) interface{} {
 // 导出 TinyGo 函数。
 //go:export md
 func md(markdownText string) string {
-	fmt.Println("TinyGo！")
-	return "TinyGo！"
+	return "Lute"
 }
 
 func main() {
