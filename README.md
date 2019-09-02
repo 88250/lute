@@ -327,7 +327,7 @@ import (
 )
 
 func main() {
-	luteEngine := lute.New() // 默认已经启用 GFM 支持以及中文优化
+	luteEngine := lute.New() // 默认已经启用 GFM 支持以及中文语境优化
 	html, err := luteEngine.MarkdownStr("demo", "**Lute** - A structured markdown engine.")
 	if nil != err {
 		panic(err)
