@@ -80,7 +80,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 
 <details>
 <summary>可点此展开查看示例。</summary>
-
+<br>
 Markdown 原文：
 
 ````````markdown
