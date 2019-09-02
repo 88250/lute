@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/b3log/lute"
-	"github.com/russross/blackfriday"
+	"github.com/russross/blackfriday/v2"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
