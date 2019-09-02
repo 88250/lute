@@ -79,7 +79,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 格式化功能可将“不整洁”的 Markdown 文本格式化为统一风格，在需要公共编辑的场景下，统一的排版风格能让大家更容易协作。
 
 <details>
-<summary>可点此展开查看示例。</summary>
+<summary>点此展开格式化示例。</summary>
 <br>
 Markdown 原文：
 
