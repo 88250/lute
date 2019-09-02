@@ -1,5 +1,5 @@
 chroma-styles/*.css linguist-vendored
-test/commonmark-spec.html
-test/commonmark-spec.json
-test/commonmark-spec.md
-wasm/wasm_exec.js
+test/commonmark-spec.html linguist-vendored
+test/commonmark-spec.json linguist-vendored
+test/commonmark-spec.md linguist-vendored
+wasm/wasm_exec.js linguist-vendored
