@@ -2,3 +2,4 @@ chroma-styles/*.css linguist-vendored
 test/commonmark-spec.html
 test/commonmark-spec.json
 test/commonmark-spec.md
+wasm/wasm_exec.js
