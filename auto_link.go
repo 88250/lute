@@ -42,7 +42,7 @@ func (t *Tree) parseGFMAutoLink(node *Node) {
 	}
 }
 
-var mailto = toItems("mailto:")
+var mailto = items("mailto:")
 
 func (t *Tree) parseGFMAutoEmailLink0(node *Node) {
 	tokens := node.tokens
@@ -152,9 +152,9 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 }
 
 var (
-	httpProto  = toItems("http://")
-	httpsProto = toItems("https://")
-	ftpProto   = toItems("ftp://")
+	httpProto  = items("http://")
+	httpsProto = items("https://")
+	ftpProto   = items("ftp://")
 )
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
@@ -388,7 +388,7 @@ func (t *Tree) isValidDomain(domain items) bool {
 	return true
 }
 
-var markers = toItems(".!#$%&'*+/=?^_`{|}~")
+var markers = items(".!#$%&'*+/=?^_`{|}~")
 
 func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens[1:]

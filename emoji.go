@@ -22,7 +22,7 @@ func (t *Tree) emoji(node *Node) {
 	}
 }
 
-var emojiSitePlaceholder = toItems("${imgStaticPath}")
+var emojiSitePlaceholder = items("${imgStaticPath}")
 
 func emoji0(node *Node) {
 	tokens := node.tokens

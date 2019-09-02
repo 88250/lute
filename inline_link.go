@@ -28,13 +28,17 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		return
 	}
 
+	passed = make(items, 0, 256)
+	destination = make(items, 0, 256)
+
 	isPointyBrackets := itemLess == tokens[1]
 	if isPointyBrackets {
 		matchEnd := false
 		passed = append(passed, tokens[0], tokens[1])
 		i := 2
-		size := 0
+		size := 1
 		var r rune
+		var runes items
 		for ; i < length; i += size {
 			token := tokens[i]
 			if itemNewline == token {
@@ -43,13 +47,14 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 			}
 
 			passed = append(passed, token)
-			r, size = utf8.DecodeRune(tokens[i:])
-			if 1 < size {
-				for j := 1; j < size; j++ {
-					passed = append(passed, tokens[i+j])
-				}
+			dest := items{token}
+			if token >= utf8.RuneSelf {
+				r, size = utf8.DecodeRune(tokens[i:])
+				runes = items(string(r))
+				passed = append(passed, runes...)
+				dest = append(dest, runes...)
 			}
-			destination = append(destination, toItems(string(r))...)
+			destination = append(destination, dest...)
 			if itemGreater == token && !tokens.isBackslashEscapePunct(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true

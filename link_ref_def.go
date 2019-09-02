@@ -294,9 +294,9 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 	}
 
 	label = bytes.TrimSpace(label)
-	label = bytes.ReplaceAll(label, toItems("\n"), toItems(" "))
-	for 0 <= bytes.Index(label, toItems("  ")) {
-		label = bytes.ReplaceAll(label, toItems("  "), toItems(" "))
+	label = bytes.ReplaceAll(label, items("\n"), items(" "))
+	for 0 <= bytes.Index(label, items("  ")) {
+		label = bytes.ReplaceAll(label, items("  "), items(" "))
 	}
 	return
 }
