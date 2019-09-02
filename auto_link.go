@@ -14,7 +14,6 @@ package lute
 
 import (
 	"bytes"
-	"strings"
 )
 
 func (t *Tree) parseGFMAutoEmailLink(node *Node) {
@@ -381,6 +380,8 @@ func (t *Tree) isValidDomain(domain items) bool {
 	return true
 }
 
+var markers = toItems(".!#$%&'*+/=?^_`{|}~")
+
 func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens[1:]
 	var dest string
@@ -398,7 +399,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 			break
 		}
 
-		if !isASCIILetterNumHyphen(token) && !strings.Contains(".!#$%&'*+/=?^_`{|}~", string(token)) {
+		if !isASCIILetterNumHyphen(token) && !bytes.Contains(markers, items{token}) {
 			return nil
 		}
 	}

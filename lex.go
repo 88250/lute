@@ -13,7 +13,7 @@
 package lute
 
 import (
-	"strings"
+	"bytes"
 	"unicode/utf8"
 	"unsafe"
 )
@@ -82,10 +82,9 @@ func newLexer(input items) (ret *lexer) {
 	ret = &lexer{}
 	// 动态构造一次，因为后续有可能会对字节数组进行赋值
 	// 不构造的话会报错 fatal error: fault
-	builder := strings.Builder{}
-
+	builder := bytes.Buffer{}
 	builder.Write(input)
-	ret.input = items(builder.String())
+	ret.input = builder.Bytes()
 	ret.length = len(ret.input)
 
 	if 0 < ret.length && itemNewline != ret.input[ret.length-1] {
