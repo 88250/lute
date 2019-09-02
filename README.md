@@ -349,7 +349,7 @@ func main() {
 一些细节：
 
 1. 没有内置语法高亮特性
-2. lute.wasm 大小 ~4MB，通过 `brotli -o lute.wasm.br lute.wasm` 压缩后大小 ~650KB
+2. lute.wasm 原始大小 ~3.5MB，通过 `brotli -o lute.wasm.br lute.wasm` 压缩后大小 ~600KB
 3. [TinyGo](https://github.com/tinygo-org/tinygo) 编译还在探索中
 
 ## 📜 文档
