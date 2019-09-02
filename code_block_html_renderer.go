@@ -16,11 +16,15 @@ package lute
 
 import (
 	"bytes"
+
 	"github.com/alecthomas/chroma"
 	chromahtml "github.com/alecthomas/chroma/formatters/html"
 	chromalexers "github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
 )
+
+// languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
+var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 
 // renderCodeBlockHTML 进行代码块 HTML 渲染，实现语法高亮。
 func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -34,7 +38,7 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 			r.write(language)
 			r.writeString("\">")
 			rendered := false
-			if r.option.CodeSyntaxHighlight {
+			if r.option.CodeSyntaxHighlight && !noHighlight(fromItems(language)) {
 				codeBlock := fromItems(tokens)
 				var lexer chroma.Lexer
 				if nil != language {
@@ -100,4 +104,13 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 	r.writeString("</code></pre>")
 	r.newline()
 	return WalkContinue, nil
+}
+
+func noHighlight(language string) bool {
+	for _, langNoHighlight := range languagesNoHighlight {
+		if language == langNoHighlight {
+			return true
+		}
+	}
+	return false
 }
