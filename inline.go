@@ -183,7 +183,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		}
 	}
 
-	var reflabel string
+	var reflabel items
 	if !matched {
 		// 尝试解析链接 label
 		var beforelabel = ctx.pos + 1
@@ -195,16 +195,16 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		} else if !opener.bracketAfter {
 			// [text][] 或者 [text][] 格式，将第一个 text 视为 label 进行解析
 			passed = ctx.tokens[opener.index:startPos]
-			reflabel = fromItems(passed)
+			reflabel = passed
 			if len(passed) > 0 && ctx.tokensLen > beforelabel && itemOpenBracket == ctx.tokens[beforelabel] {
 				// [text][] 格式，跳过 []
 				ctx.pos += 2
 			}
 		}
 
-		if "" != reflabel {
+		if nil != reflabel {
 			// 查找链接引用
-			var link = t.context.linkRefDef[strings.ToLower(reflabel)]
+			var link = t.context.linkRefDef[strings.ToLower(fromItems(reflabel))]
 			if nil != link {
 				dest = link.destination
 				title = link.title

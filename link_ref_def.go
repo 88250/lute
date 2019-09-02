@@ -13,7 +13,7 @@
 package lute
 
 import (
-	"strings"
+	"bytes"
 	"unicode/utf8"
 )
 
@@ -73,10 +73,10 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	}
 
 	link := &Node{typ: NodeLink, destination: destination}
-	lowerCaseLabel := strings.ToLower(label)
+	lowerCaseLabel := bytes.ToLower(label)
 	link.title = title
-	if _, ok := context.linkRefDef[lowerCaseLabel]; !ok {
-		context.linkRefDef[lowerCaseLabel] = link
+	if _, ok := context.linkRefDef[fromItems(lowerCaseLabel)]; !ok {
+		context.linkRefDef[fromItems(lowerCaseLabel)] = link
 	}
 
 	return remains
@@ -254,7 +254,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination 
 	return
 }
 
-func (context *Context) parseLinkLabel(tokens items) (passed, remains items, label string) {
+func (context *Context) parseLinkLabel(tokens items) (passed, remains, label items) {
 	length := len(tokens)
 	if 2 > length {
 		return
@@ -275,7 +275,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		label += string(r)
+		label = append(label, items(string(r))...)
 		if itemCloseBracket == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			label = label[0 : len(label)-1]
@@ -284,20 +284,19 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains items, lab
 		}
 		if itemOpenBracket == token && !tokens.isBackslashEscapePunct(i) {
 			passed = nil
-			label = ""
 			return
 		}
 		i += size
 	}
 
-	if !closed || "" == strings.TrimSpace(label) || 999 < len(label) {
+	if !closed || nil == bytes.TrimSpace(label) || 999 < len(label) {
 		passed = nil
 	}
 
-	label = strings.TrimSpace(label)
-	label = strings.ReplaceAll(label, "\n", " ")
-	for 0 <= strings.Index(label, "  ") {
-		label = strings.ReplaceAll(label, "  ", " ")
+	label = bytes.TrimSpace(label)
+	label = bytes.ReplaceAll(label, items("\n"), items(" "))
+	for 0 <= bytes.Index(label, items("  ")) {
+		label = bytes.ReplaceAll(label, items("  "), items(" "))
 	}
 
 	return
