@@ -17,8 +17,17 @@ type Lute struct {
 	options
 }
 
-// EmojiSite 为图片 Emoji URL 的路径前缀。
-var EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/"
+var (
+	// EmojiSite 为图片 Emoji URL 的路径前缀。
+	EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/"
+
+	// TaskListItemClass 作为 GFM 任务列表项类名。
+	// GFM 任务列表 li 加 class="vditor-task"，https://github.com/b3log/lute/issues/10
+	TaskListItemClass = "vditor-task"
+
+	// validDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
+	validDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
+)
 
 // New 创建一个新的 Lute 引擎，默认启用：
 //  * GFM 支持

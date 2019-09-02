@@ -298,7 +298,11 @@ func (r *Renderer) renderListHTML(node *Node, entering bool) (WalkStatus, error)
 
 func (r *Renderer) renderListItemHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("li", nil, false)
+		if 3 == node.listData.typ && "" != TaskListItemClass {
+			r.tag("li", [][]string{{"class", TaskListItemClass}}, false)
+		} else {
+			r.tag("li", nil, false)
+		}
 	} else {
 		r.tag("/li", nil, false)
 		r.newline()

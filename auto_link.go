@@ -160,7 +160,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 
 	var token byte
 	var consumed = make(items, 0, 256)
-	var tmp = make(items, 0, 256)
+	var tmp = make(items, 0, 16)
 	www := false
 	for i < length {
 		token = tokens[i]
@@ -334,12 +334,6 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	node.Unlink()
 	return
 }
-
-var (
-	// validDomainSuffix 用于列出所有认为合法的域名后缀。
-	// TODO: 考虑提供接口支持开发者添加
-	validDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
-)
 
 // isValidDomain 校验 GFM 规范自动链接规则中定义的合法域名。
 // https://github.github.com/gfm/#valid-domain

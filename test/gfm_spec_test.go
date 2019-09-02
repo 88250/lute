@@ -66,6 +66,8 @@ func TestGFMSpec(t *testing.T) {
 		lute.AutoSpace(false),
 	)
 
+	lute.TaskListItemClass = "" // 关闭类名渲染
+
 	for _, test := range gfmSpecTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
 		if nil != err {

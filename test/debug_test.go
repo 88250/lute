@@ -19,9 +19,13 @@ import (
 )
 
 var debugTests = []parseTest{
+
+	// GFM 任务列表 li 加 class="vditor-task" https://github.com/b3log/lute/issues/10
+	{"24", "- [x]\n", "<ul>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /></li>\n</ul>\n"},
+
 	// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
 	{"23", "0\n-:\n1\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"right\">1</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
-	{"23", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
+	{"22", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
 
 	// GFM Table rendered as h2 https://github.com/b3log/lute/issues/3
 	{"21", "0\n-:\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n"},
