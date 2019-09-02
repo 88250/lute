@@ -18,6 +18,13 @@ import (
 	"unicode/utf8"
 )
 
+var (
+	amp  = toItems("&amp;")
+	lt   = toItems("&lt;")
+	gt   = toItems("&gt;")
+	quot = toItems("&quot;")
+)
+
 func escapeHTML(html items) (ret items) {
 	length := len(html)
 	var start, i int
@@ -31,7 +38,7 @@ func escapeHTML(html items) (ret items) {
 				inited = true
 			}
 			ret = append(ret, html[start:i]...)
-			ret = append(ret, items("&amp;")...)
+			ret = append(ret, amp...)
 			start = i + 1
 		case itemLess:
 			if !inited {
@@ -39,7 +46,7 @@ func escapeHTML(html items) (ret items) {
 				inited = true
 			}
 			ret = append(ret, html[start:i]...)
-			ret = append(ret, items("&lt;")...)
+			ret = append(ret, lt...)
 			start = i + 1
 		case itemGreater:
 			if !inited {
@@ -47,7 +54,7 @@ func escapeHTML(html items) (ret items) {
 				inited = true
 			}
 			ret = append(ret, html[start:i]...)
-			ret = append(ret, items("&gt;")...)
+			ret = append(ret, gt...)
 			start = i + 1
 		case itemDoublequote:
 			if !inited {
@@ -55,7 +62,7 @@ func escapeHTML(html items) (ret items) {
 				inited = true
 			}
 			ret = append(ret, html[start:i]...)
-			ret = append(ret, items("&quot;")...)
+			ret = append(ret, quot...)
 			start = i + 1
 		}
 	}

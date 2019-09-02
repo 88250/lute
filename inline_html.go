@@ -12,10 +12,12 @@
 
 package lute
 
+var less = toItems("<")
+
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens
 	startPos := ctx.pos
-	ret = &Node{typ: NodeText, tokens: toItems("<")}
+	ret = &Node{typ: NodeText, tokens: less}
 	if 3 > ctx.tokensLen || ctx.tokensLen <= startPos+1 {
 		ctx.pos++
 		return

@@ -49,7 +49,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 					passed = append(passed, tokens[i+j])
 				}
 			}
-			destination = append(destination, items(string(r))...)
+			destination = append(destination, toItems(string(r))...)
 			if itemGreater == token && !tokens.isBackslashEscapePunct(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true

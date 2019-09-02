@@ -42,9 +42,11 @@ func (t *Tree) parseGFMAutoLink(node *Node) {
 	}
 }
 
+var mailto = toItems("mailto:")
+
 func (t *Tree) parseGFMAutoEmailLink0(node *Node) {
 	tokens := node.tokens
-	if 0 >= bytes.Index(tokens, []byte("@")) {
+	if 0 >= bytes.IndexByte(tokens, byte('@')) {
 		return
 	}
 
@@ -115,7 +117,7 @@ loopPart:
 			// 如果以 . 结尾则剔除该 .
 			lastIndex := len(group) - 1
 			group = group[:lastIndex]
-			link := &Node{typ: NodeLink, destination: append(items("mailto:"), group...)}
+			link := &Node{typ: NodeLink, destination: append(mailto, group...)}
 			text := &Node{typ: NodeText, tokens: group}
 			link.AppendChild(link, text)
 			node.InsertBefore(node, link)
@@ -129,7 +131,7 @@ loopPart:
 			continue loopPart
 		} else {
 			// 以字母或者数字结尾
-			link := &Node{typ: NodeLink, destination: append(items("mailto:"), group...)}
+			link := &Node{typ: NodeLink, destination: append(mailto, group...)}
 			text := &Node{typ: NodeText, tokens: group}
 			link.AppendChild(link, text)
 			node.InsertBefore(node, link)
@@ -148,6 +150,12 @@ func (t *Tree) isValidEmailSegment1(token byte) bool {
 func (t *Tree) isValidEmailSegment2(token byte) bool {
 	return isASCIILetterNumHyphen(token) || itemDot == token || itemUnderscore == token
 }
+
+var (
+	httpProto  = toItems("http://")
+	httpsProto = toItems("https://")
+	ftpProto   = toItems("ftp://")
+)
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
 	tokens := node.tokens
@@ -169,16 +177,16 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		tmp = tokens[i:]
 		tmpLen := len(tmp)
 		if 8 <= tmpLen /* www.x.xx */ && 'w' == tmp[0] && 'w' == tmp[1] && 'w' == tmp[2] && '.' == tmp[3] {
-			protocol = items("http://")
+			protocol = httpProto
 			www = true
 		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == tmp[0] && 't' == tmp[1] && 't' == tmp[2] && 'p' == tmp[3] && ':' == tmp[4] && '/' == tmp[5] && '/' == tmp[6] {
-			protocol = items("http://")
+			protocol = httpProto
 			i += 7
 		} else if 12 <= tmpLen /* https://x.xx */ && 'h' == tmp[0] && 't' == tmp[1] && 't' == tmp[2] && 'p' == tmp[3] && 's' == tmp[4] && ':' == tmp[5] && '/' == tmp[6] && '/' == tmp[7] {
-			protocol = items("https://")
+			protocol = httpsProto
 			i += 8
 		} else if 10 <= tmpLen /* ftp://x.xx */ && 'f' == tmp[0] && 't' == tmp[1] && 'p' == tmp[2] && ':' == tmp[3] && '/' == tmp[4] && '/' == tmp[5] {
-			protocol = items("ftp://")
+			protocol = ftpProto
 			i += 6
 		} else {
 			consumed = append(consumed, token)

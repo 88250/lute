@@ -128,7 +128,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		title = append(title, items(string(r))...)
+		title = append(title, toItems(string(r))...)
 		if closer == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			title = title[:len(title)-1]
@@ -176,7 +176,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains, destination 
 		for j := 1; j < size; j++ {
 			ret = append(ret, tokens[i+j])
 		}
-		destination = append(destination, items(string(r))...)
+		destination = append(destination, toItems(string(r))...)
 		if isWhitespace(token) || isControl(token) {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
@@ -230,7 +230,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination 
 			for j := 1; j < size; j++ {
 				ret = append(ret, tokens[i+j])
 			}
-			destination = append(destination, items(string(r))...)
+			destination = append(destination, toItems(string(r))...)
 			if itemLess == token && !tokens.isBackslashEscapePunct(i) {
 				ret = nil
 				return
@@ -275,7 +275,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		label = append(label, items(string(r))...)
+		label = append(label, toItems(string(r))...)
 		if itemCloseBracket == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			label = label[0 : len(label)-1]
@@ -294,10 +294,9 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 	}
 
 	label = bytes.TrimSpace(label)
-	label = bytes.ReplaceAll(label, items("\n"), items(" "))
-	for 0 <= bytes.Index(label, items("  ")) {
-		label = bytes.ReplaceAll(label, items("  "), items(" "))
+	label = bytes.ReplaceAll(label, toItems("\n"), toItems(" "))
+	for 0 <= bytes.Index(label, toItems("  ")) {
+		label = bytes.ReplaceAll(label, toItems("  "), toItems(" "))
 	}
-
 	return
 }

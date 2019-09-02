@@ -78,7 +78,7 @@ func emoji0(node *Node) {
 					suffix = ".gif"
 				}
 				repl += suffix + "\" title=\"" + alias + "\" />"
-				img := &Node{typ: NodeInlineHTML, tokens: items(repl)}
+				img := &Node{typ: NodeInlineHTML, tokens: toItems(repl)}
 				node.InsertAfter(node, img)
 				text := &Node{typ: NodeText, tokens: items{}} // 生成一个新文本节点
 				img.InsertAfter(node, text)
