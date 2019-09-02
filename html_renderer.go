@@ -357,7 +357,7 @@ func (r *Renderer) tag(name string, attrs [][]string, selfclosing bool) {
 	}
 
 	r.writeString("<")
-	r.write(toItems(name))
+	r.writeString(name)
 	if 0 < len(attrs) {
 		for _, attr := range attrs {
 			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")

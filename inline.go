@@ -90,9 +90,9 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	}
 
 	entityName := fromItems(ctx.tokens[start:i])
-	if entityValue, ok := htmlEntities[entityName]; ok { // 通过查表优化
+	if entityValue, ok := htmlEntities[entityName]; ok {
 		ctx.pos += i - start
-		return &Node{typ: NodeText, tokens: toItems(entityValue)}
+		return &Node{typ: NodeText, tokens: items(entityValue)}
 	}
 
 	if !endWithSemicolon {
@@ -122,7 +122,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 		return &Node{typ: NodeText, tokens: and}
 	}
 	ctx.pos += i - start
-	return &Node{typ: NodeText, tokens: toItems(v)}
+	return &Node{typ: NodeText, tokens: items(v)}
 }
 
 var closeBracket = items("]")

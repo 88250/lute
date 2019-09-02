@@ -441,8 +441,8 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	}
 
 	ctx.pos += passed + 1
-	link := &Node{typ: NodeLink, destination: append(items("mailto:"), dest...)}
-	text := &Node{typ: NodeText, tokens: toItems(dest)}
+	link := &Node{typ: NodeLink, destination: append(mailto, dest...)}
+	text := &Node{typ: NodeText, tokens: items(dest)}
 	link.AppendChild(ret, text)
 	return link
 }
