@@ -42,7 +42,7 @@ func (t *Tree) parseGFMAutoLink(node *Node) {
 	}
 }
 
-var mailto = items("mailto:")
+var mailto = toItems("mailto:")
 
 func (t *Tree) parseGFMAutoEmailLink0(node *Node) {
 	tokens := node.tokens
@@ -152,9 +152,9 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 }
 
 var (
-	httpProto  = items("http://")
-	httpsProto = items("https://")
-	ftpProto   = items("ftp://")
+	httpProto  = toItems("http://")
+	httpsProto = toItems("https://")
+	ftpProto   = toItems("ftp://")
 )
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
@@ -388,7 +388,7 @@ func (t *Tree) isValidDomain(domain items) bool {
 	return true
 }
 
-var markers = items(".!#$%&'*+/=?^_`{|}~")
+var markers = toItems(".!#$%&'*+/=?^_`{|}~")
 
 func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens[1:]
@@ -442,7 +442,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 
 	ctx.pos += passed + 1
 	link := &Node{typ: NodeLink, destination: append(mailto, dest...)}
-	text := &Node{typ: NodeText, tokens: items(dest)}
+	text := &Node{typ: NodeText, tokens: toItems(dest)}
 	link.AppendChild(ret, text)
 	return link
 }

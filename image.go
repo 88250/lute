@@ -12,8 +12,8 @@
 
 package lute
 
-var bang = items("!")
-var bangOpenBracket = items("![")
+var bang = toItems("!")
+var bangOpenBracket = toItems("![")
 
 // parseBang 解析 !，可能是图片标记开始 ![ 也可能是普通文本 !。
 func (t *Tree) parseBang(ctx *InlineContext) (ret *Node) {

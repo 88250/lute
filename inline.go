@@ -61,7 +61,7 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 	}
 }
 
-var and = items("&")
+var and = toItems("&")
 
 func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	if 2 > ctx.tokensLen || ctx.tokensLen <= ctx.pos+1 {
@@ -92,7 +92,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	entityName := fromItems(ctx.tokens[start:i])
 	if entityValue, ok := htmlEntities[entityName]; ok {
 		ctx.pos += i - start
-		return &Node{typ: NodeText, tokens: items(entityValue)}
+		return &Node{typ: NodeText, tokens: toItems(entityValue)}
 	}
 
 	if !endWithSemicolon {
@@ -122,10 +122,10 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 		return &Node{typ: NodeText, tokens: and}
 	}
 	ctx.pos += i - start
-	return &Node{typ: NodeText, tokens: items(v)}
+	return &Node{typ: NodeText, tokens: toItems(v)}
 }
 
-var closeBracket = items("]")
+var closeBracket = toItems("]")
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
 // to block's children. If there is a matching delimiter, remove it from the delimiter stack.
@@ -261,7 +261,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	}
 }
 
-var openBracket = items("[")
+var openBracket = toItems("[")
 
 func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
 	ctx.pos++
@@ -290,7 +290,7 @@ func (t *Tree) removeBracket(ctx *InlineContext) {
 	ctx.brackets = ctx.brackets.previous
 }
 
-var backslash = items("\\")
+var backslash = toItems("\\")
 
 func (t *Tree) parseBackslash(ctx *InlineContext) (ret *Node) {
 	if ctx.tokensLen-1 > ctx.pos {

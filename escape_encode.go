@@ -19,10 +19,10 @@ import (
 )
 
 var (
-	amp  = items("&amp;")
-	lt   = items("&lt;")
-	gt   = items("&gt;")
-	quot = items("&quot;")
+	amp  = toItems("&amp;")
+	lt   = toItems("&lt;")
+	gt   = toItems("&gt;")
+	quot = toItems("&quot;")
 )
 
 func escapeHTML(html items) (ret items) {

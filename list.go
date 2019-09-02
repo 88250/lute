@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"strconv"
 )
 
@@ -53,6 +54,8 @@ func (list *Node) ListFinalize(context *Context) {
 	}
 }
 
+var items1 = toItems("1")
+
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记。
 func (t *Tree) parseListMarker(container *Node) *listData {
 	if t.context.indent >= 4 {
@@ -74,7 +77,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.bulletChar = marker
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
-		if container.typ != NodeParagraph || "1" == fromItems(marker) {
+		if container.typ != NodeParagraph || bytes.Equal(items1, marker) {
 			data.typ = 1 // 有序列表
 			data.start, _ = strconv.Atoi(fromItems(marker))
 			markerLength = len(marker) + 1

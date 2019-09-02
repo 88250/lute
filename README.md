@@ -264,25 +264,25 @@ Markdown 原文：
 ### [Lute](https://github.com/b3log/lute)
 
 ```
-BenchmarkLute-2   	     200	   5969017 ns/op	 5408288 B/op	   24469 allocs/op
-BenchmarkLute-4   	     300	   4571107 ns/op	 5400415 B/op	   24446 allocs/op
-BenchmarkLute-8   	     300	   4281872 ns/op	 5400303 B/op	   24436 allocs/op
+BenchmarkLute-2   	     200	   5914148 ns/op	 5031806 B/op	   23604 allocs/op
+BenchmarkLute-4   	     300	   4601032 ns/op	 5026602 B/op	   23617 allocs/op
+BenchmarkLute-8   	     300	   4255277 ns/op	 5027874 B/op	   23631 allocs/op
 ```
 
 ### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
 
 ```
-BenchmarkGolangCommonMark-2   	     300	   5106332 ns/op	 2921345 B/op	   18424 allocs/op
-BenchmarkGolangCommonMark-4   	     300	   4807240 ns/op	 2933112 B/op	   18426 allocs/op
-BenchmarkGolangCommonMark-8   	     300	   4767249 ns/op	 2931755 B/op	   18426 allocs/op
+BenchmarkGolangCommonMark-2   	     300	   4963366 ns/op	 2921462 B/op	   18424 allocs/op
+BenchmarkGolangCommonMark-4   	     300	   4926923 ns/op	 2931386 B/op	   18425 allocs/op
+BenchmarkGolangCommonMark-8   	     300	   4900359 ns/op	 2930250 B/op	   18425 allocs/op
 ```
 
 ### [goldmark](https://github.com/yuin/goldmark)
 
 ```
-BenchmarkGoldMark-2   	     300	   5811230 ns/op	 2310383 B/op	   15368 allocs/op
-BenchmarkGoldMark-4   	     300	   5671477 ns/op	 2316620 B/op	   15369 allocs/op
-BenchmarkGoldMark-8   	     300	   5698186 ns/op	 2317564 B/op	   15369 allocs/op
+BenchmarkGoldMark-2   	     300	   5757913 ns/op	 2312857 B/op	   15368 allocs/op
+BenchmarkGoldMark-4   	     300	   5631706 ns/op	 2316498 B/op	   15369 allocs/op
+BenchmarkGoldMark-8   	     300	   5661525 ns/op	 2317366 B/op	   15369 allocs/op
 ```
 
 ### [Blackfriday](https://github.com/russross/blackfriday)

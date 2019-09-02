@@ -50,7 +50,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 			dest := items{token}
 			if token >= utf8.RuneSelf {
 				r, size = utf8.DecodeRune(tokens[i:])
-				runes = items(string(r))
+				runes = toItems(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}

@@ -22,7 +22,7 @@ func (t *Tree) emoji(node *Node) {
 	}
 }
 
-var emojiSitePlaceholder = items("${imgStaticPath}")
+var emojiSitePlaceholder = toItems("${imgStaticPath}")
 
 func emoji0(node *Node) {
 	tokens := node.tokens
@@ -70,7 +70,7 @@ func emoji0(node *Node) {
 		}
 
 		if emoji, ok := emojis[fromItems(maybeEmoji)]; ok {
-			if bytes.Contains(toItems(emoji), emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
+			if bytes.Contains(items(emoji), emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
 				alias := fromItems(maybeEmoji)
 				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + EmojiSite + alias
 				suffix := ".png"
