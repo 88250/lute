@@ -38,6 +38,9 @@ func md(markdownText string) string {
 }
 
 func main() {
-	js.Global().Set("markdown", js.FuncOf(markdown))
+	js.Global().Set("lute", make(map[string]interface{}))
+	lute := js.Global().Get("lute")
+	lute.Set("markdown", js.FuncOf(markdown))
+
 	select {}
 }

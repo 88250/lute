@@ -27,20 +27,15 @@ license that can be found in the LICENSE file.
 		}
 
 		const go = new Go();
-		let mod, inst;
 		WebAssembly.instantiateStreaming(fetch("lute.wasm"), go.importObject).then((result) => {
-			mod = result.module;
-			inst = result.instance;
-			go.run(inst);
-			document.getElementById('output').innerHTML = markdown(document.getElementById('input').value);
+			go.run(result.instance);
+			document.getElementById('output').innerHTML = lute.markdown(document.getElementById('input').value);
 		}).catch((err) => {
 			console.error(err);
 		});
 
 		function onMarkdown(it) {
-			let input = it.value;
-			let output = markdown(input);
-			document.getElementById('output').innerHTML = output;
+			document.getElementById('output').innerHTML = lute.markdown(it.value);
 		}
 	</script>
 
