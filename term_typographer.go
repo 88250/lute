@@ -13,7 +13,7 @@
 package lute
 
 import (
-	"strings"
+	"bytes"
 	"unicode/utf8"
 )
 
@@ -27,9 +27,7 @@ func (t *Tree) fixTermTypo(node *Node) {
 		next := child.next
 		if NodeText == child.typ && nil != child.parent &&
 			NodeLink != child.parent.typ /* 不处理链接 label */ {
-			text := fromItems(child.tokens)
-			text = fixTermTypo0(text)
-			child.tokens = toItems(text)
+			child.tokens = fixTermTypo0(child.tokens)
 		} else {
 			t.fixTermTypo(child) // 递归处理子节点
 		}
@@ -37,12 +35,11 @@ func (t *Tree) fixTermTypo(node *Node) {
 	}
 }
 
-func fixTermTypo0(str string) string {
-	tokens := toItems(str)
+func fixTermTypo0(tokens items) items {
 	length := len(tokens)
 	var token byte
 	var i, j, k, l int
-	var originalTerm string
+	var originalTerm items
 	for ; i < length; i++ {
 		token = tokens[i]
 		if isNotTerm(token) {
@@ -54,8 +51,8 @@ func fixTermTypo0(str string) string {
 				break
 			}
 		}
-		originalTerm = strings.ToLower(str[i:j])
-		if to, ok := terms[originalTerm]; ok {
+		originalTerm = bytes.ToLower(tokens[i:j])
+		if to, ok := terms[fromItems(originalTerm)]; ok {
 			l = 0
 			for k = i; k < j; k++ {
 				tokens[k] = to[l]
@@ -64,7 +61,7 @@ func fixTermTypo0(str string) string {
 		}
 	}
 
-	return fromItems(tokens)
+	return tokens
 }
 
 func isNotTerm(token byte) bool {
