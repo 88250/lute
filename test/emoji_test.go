@@ -13,12 +13,14 @@
 package test
 
 import (
-	"github.com/b3log/lute"
 	"testing"
+
+	"github.com/b3log/lute"
 )
 
 var emojiTests = []parseTest{
 
+	{"12", ":smile::smile:\n", "<p>😄😄</p>\n"},
 	{"11", "::\n", "<p>::</p>\n"},
 	{"10", "smile: :heart :smile:\n", "<p>smile: :heart 😄</p>\n"},
 	{"9", ":smile: :heart :smile:\n", "<p>😄 :heart 😄</p>\n"},

@@ -29,7 +29,7 @@ func emoji0(node *Node) {
 	var token byte
 	var maybeEmoji items
 	var pos int
-	for i := 0; i < length; i++ {
+	for i := 0; i < length; {
 		token = tokens[i]
 		if i == length-1 {
 			node.tokens = append(node.tokens, tokens[pos:]...)
@@ -37,6 +37,7 @@ func emoji0(node *Node) {
 		}
 
 		if itemColon != token {
+			i++
 			continue
 		}
 
@@ -55,12 +56,14 @@ func emoji0(node *Node) {
 		}
 		if !matchCloseColon {
 			node.tokens = append(node.tokens, tokens[i:pos]...)
+			i++
 			continue
 		}
 
 		maybeEmoji = tokens[i+1 : pos]
 		if 1 > len(maybeEmoji) {
 			node.tokens = append(node.tokens, tokens[pos])
+			i++
 			continue
 		}
 
