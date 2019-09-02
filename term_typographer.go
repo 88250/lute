@@ -13,9 +13,7 @@
 package lute
 
 import (
-	"regexp"
 	"strings"
-	"unicode"
 	"unicode/utf8"
 )
 
@@ -40,29 +38,46 @@ func (t *Tree) fixTermTypo(node *Node) {
 }
 
 func fixTermTypo0(str string) string {
-	// 鸣谢 https://github.com/studygolang/autocorrect
-
-	strs := strings.FieldsFunc(str, func(r rune) bool {
-		return unicode.IsSpace(r) || unicode.IsPunct(r)
-	})
-	for _, s := range strs {
-		if s[0] >= utf8.RuneSelf {
-			// 术语仅由 ASCII 字符组成
+	tokens := toItems(str)
+	length := len(tokens)
+	var token byte
+	var i, j, k, l int
+	var originalTerm string
+	for ; i < length; i++ {
+		token = tokens[i]
+		if isNotTerm(token) {
 			continue
 		}
-
-		for from, to := range terms {
-			if strings.EqualFold(s, from) {
-				re := regexp.MustCompile("(?i)" + from) // TODO: 不要用正则
-				str = re.ReplaceAllString(str, to)
+		for j = i; j < length; j++ {
+			token = tokens[j]
+			if isNotTerm(token) {
+				break
+			}
+		}
+		originalTerm = strings.ToLower(str[i:j])
+		if to, ok := terms[originalTerm]; ok {
+			l = 0
+			for k = i; k < j; k++ {
+				tokens[k] = to[l]
+				l++
 			}
 		}
 	}
 
-	return str
+	return fromItems(tokens)
 }
 
-// terms 定义了术语字典，用于术语拼写修正。
+func isNotTerm(token byte) bool {
+	return token >= utf8.RuneSelf || isWhitespace(token) || isASCIIPunct(token)
+}
+
+func replaceAtIndex(str string, r rune, i int) string {
+	out := []rune(str)
+	out[i] = r
+	return string(out)
+}
+
+// terms 定义了术语字典，用于术语拼写修正。Key 必须是全小写的。
 // TODO: 考虑提供接口支持开发者添加
 var terms = map[string]string{
 	"jdbc":          "JDBC",
