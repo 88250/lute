@@ -255,47 +255,29 @@ Markdown 原文：
 
 ## ⚡ 性能
 
-1. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
-2. 均已开启 GFM 支持，因为 GFM 在实际使用场景下是必备的，仅测试 CommonMark 支持意义不大 
-3. Lute 在多核平台上性能优势比较明显，因为 Lute 使用了并行解析算法
-4. Blackfriday 没有实现 GFM 所以性能看上去更好一些
-5. 基准测试数据 [*CommonMark Spec*](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
+1. 主要对比了 4 款 Go 实现的 Markdown 引擎：（[Lute](https://github.com/b3log/lute)、[golang-commonmark](https://gitlab.com/golang-commonmark/markdown)、[goldmark](https://github.com/yuin/goldmark) 和 [Blackfriday](https://github.com/russross/blackfriday)）
+2. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
+3. 均已开启 GFM 支持，因为 GFM 在实际使用场景下是必备的，仅测试 CommonMark 支持意义不大 
+4. Lute 在多核平台上性能优势比较明显，因为 Lute 使用了并行解析算法
+5. Blackfriday 没有实现 GFM 所以性能看上去更好一些
+6. 基准测试数据 [*CommonMark Spec*](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
 
-### [Lute](https://github.com/b3log/lute)
-
-```
-BenchmarkLute-2   	     200	   5914148 ns/op	 5031806 B/op	   23604 allocs/op
-BenchmarkLute-4   	     300	   4601032 ns/op	 5026602 B/op	   23617 allocs/op
-BenchmarkLute-8   	     300	   4255277 ns/op	 5027874 B/op	   23631 allocs/op
-```
-
-### [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)
-
-```
-BenchmarkGolangCommonMark-2   	     300	   4963366 ns/op	 2921462 B/op	   18424 allocs/op
-BenchmarkGolangCommonMark-4   	     300	   4926923 ns/op	 2931386 B/op	   18425 allocs/op
-BenchmarkGolangCommonMark-8   	     300	   4900359 ns/op	 2930250 B/op	   18425 allocs/op
-```
-
-### [goldmark](https://github.com/yuin/goldmark)
-
-```
-BenchmarkGoldMark-2   	     300	   5757913 ns/op	 2312857 B/op	   15368 allocs/op
-BenchmarkGoldMark-4   	     300	   5631706 ns/op	 2316498 B/op	   15369 allocs/op
-BenchmarkGoldMark-8   	     300	   5661525 ns/op	 2317366 B/op	   15369 allocs/op
+```text
+BenchmarkLute-2                      300           5917395 ns/op         5023138 B/op      23569 allocs/op
+BenchmarkLute-4                      300           4587833 ns/op         5025101 B/op      23595 allocs/op
+BenchmarkLute-8                      300           4355122 ns/op         5028157 B/op      23633 allocs/op
+BenchmarkGolangCommonMark-2          300           5016577 ns/op         2915443 B/op      18422 allocs/op
+BenchmarkGolangCommonMark-4          300           4823761 ns/op         2921106 B/op      18423 allocs/op
+BenchmarkGolangCommonMark-8          300           4780646 ns/op         2920370 B/op      18424 allocs/op
+BenchmarkGoldMark-2                  200           6053823 ns/op         2309085 B/op      15367 allocs/op
+BenchmarkGoldMark-4                  300           5953969 ns/op         2312643 B/op      15367 allocs/op
+BenchmarkGoldMark-8                  200           5904369 ns/op         2314507 B/op      15368 allocs/op
+BenchmarkBlackFriday-2               500           3927493 ns/op         3257718 B/op      19861 allocs/op
+BenchmarkBlackFriday-4               500           3670115 ns/op         3264290 B/op      19862 allocs/op
+BenchmarkBlackFriday-8               500           3664262 ns/op         3267226 B/op      19863 allocs/op
 ```
 
-### [Blackfriday](https://github.com/russross/blackfriday)
-
-```
-BenchmarkBlackFriday-2   	     500	   3875623 ns/op	 3318457 B/op	   20052 allocs/op
-BenchmarkBlackFriday-4   	     500	   3783871 ns/op	 3334775 B/op	   20056 allocs/op
-BenchmarkBlackFriday-8   	     500	   3917515 ns/op	 3341045 B/op	   20058 allocs/op
-```
-
-### [markdown-it](https://github.com/markdown-it/markdown-it)
-
-markdown-it 是 JavaScript 写的，循环渲染 300 次，平均每次调用耗时 ~10ms，耗时大致是 golang 实现的两倍。
+另外，JavaScript 写的 [markdown-it](https://github.com/markdown-it/markdown-it) 循环渲染 300 次，平均每次调用耗时 ~10ms，耗时大致是 golang 实现的两倍。
 
 ## 💪 健壮性
 

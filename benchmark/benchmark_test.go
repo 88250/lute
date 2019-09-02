@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/b3log/lute"
+	"github.com/russross/blackfriday"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
@@ -87,5 +88,16 @@ func BenchmarkGoldMark(b *testing.B) {
 		if err := goldmarkEngine.Convert(markdown, &out); err != nil {
 			panic(err)
 		}
+	}
+}
+
+func BenchmarkBlackFriday(b *testing.B) {
+	spec := "../test/commonmark-spec"
+	markdown, err := ioutil.ReadFile(spec + ".md")
+	if nil != err {
+		b.Fatalf("read spec text failed: " + err.Error())
+	}
+	for i := 0; i < b.N; i++ {
+		blackfriday.Run(markdown)
 	}
 }
