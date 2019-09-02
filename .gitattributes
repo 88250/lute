@@ -1,5 +1,5 @@
 chroma-styles/*.css linguist-vendored
-test/commonmark-spec.html linguist-vendored
-test/commonmark-spec.json linguist-vendored
-test/commonmark-spec.md linguist-vendored
-wasm/wasm_exec.js linguist-vendored
+test/commonmark-spec.html linguist-detectable=false
+test/commonmark-spec.json linguist-detectable=false
+test/commonmark-spec.md linguist-detectable=false
+wasm/wasm_exec.js linguist-detectable=false
