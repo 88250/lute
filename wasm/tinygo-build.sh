@@ -12,4 +12,5 @@
 
 #!/bin/sh
 
+go list -f {{.Deps}} -tags wasm
 tinygo build -tags wasm -o lute.tinygo.wasm -target wasm
