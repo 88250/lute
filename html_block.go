@@ -16,7 +16,7 @@ import (
 	"bytes"
 )
 
-func (html *Node) HTMLBlockContinue(context *Context) int {
+func (html *Node) htmlBlockContinue(context *Context) int {
 	if context.blank && (html.htmlBlockType == 6 || html.htmlBlockType == 7) {
 		return 1
 	}

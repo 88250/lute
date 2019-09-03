@@ -91,15 +91,15 @@ func (n *Node) Finalize(context *Context) {
 func (n *Node) Continue(context *Context) int {
 	switch n.typ {
 	case NodeCodeBlock:
-		return n.CodeBlockContinue(context)
+		return n.codeBlockContinue(context)
 	case NodeHTMLBlock:
-		return n.HTMLBlockContinue(context)
+		return n.htmlBlockContinue(context)
 	case NodeParagraph:
-		return n.ParagraphContinue(context)
+		return n.paragraphContinue(context)
 	case NodeListItem:
-		return n.ListItemContinue(context)
+		return n.listItemContinue(context)
 	case NodeBlockquote:
-		return n.BlockquoteContinue(context)
+		return n.blockquoteContinue(context)
 	case NodeHeading, NodeThematicBreak:
 		return 1
 	}

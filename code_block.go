@@ -16,7 +16,7 @@ import (
 	"bytes"
 )
 
-func (codeBlock *Node) CodeBlockContinue(context *Context) int {
+func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 	if codeBlock.isFencedCodeBlock {

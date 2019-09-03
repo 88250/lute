@@ -14,7 +14,7 @@ package lute
 
 import "bytes"
 
-func (p *Node) ParagraphContinue(context *Context) int {
+func (p *Node) paragraphContinue(context *Context) int {
 	if context.blank {
 		return 1
 	}
