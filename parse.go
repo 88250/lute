@@ -175,6 +175,8 @@ type Tree struct {
 
 // render 使用 renderer 对语法树 t 进行渲染，渲染结果以 output 返回。
 func (t *Tree) render(renderer *Renderer) (output []byte, err error) {
+	defer recoverPanic(&err)
+
 	err = renderer.render(t.Root)
 	if nil != err {
 		return

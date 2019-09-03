@@ -127,7 +127,10 @@ func (r *Renderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, e
 func (r *Renderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("[")
-		r.write(node.firstChild.tokens) // FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
+		if nil != node.firstChild {
+			// FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
+			r.write(node.firstChild.tokens)
+		}
 		r.writeString("](")
 		r.write(node.destination)
 		if nil != node.title {
