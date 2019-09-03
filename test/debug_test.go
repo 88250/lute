@@ -20,6 +20,10 @@ import (
 
 var debugTests = []parseTest{
 
+	{"27", "[]( https://b3log.org )", "<p><a href=\"https://b3log.org\"></a></p>\n"},
+	{"26", "[](https://b3log.org)", "<p><a href=\"https://b3log.org\"></a></p>\n"},
+	{"25", "[]( https://b3log.org", "<p>[]( <a href=\"https://b3log.org\">https://b3log.org</a></p>\n"},
+
 	// GFM 任务列表 li 加 class="vditor-task" https://github.com/b3log/lute/issues/10
 	{"24", "- [x]\n", "<ul>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /></li>\n</ul>\n"},
 

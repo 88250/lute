@@ -155,32 +155,50 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	startPos := ctx.pos
 	savepos := ctx.pos
 	matched := false
-	// Inline link?
+	// 尝试解析内联链接 [text](url "tile")
 	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == ctx.tokens[ctx.pos+1] {
 		ctx.pos++
 		isLink := false
 		var passed, remains items
-		if isLink, passed, remains = ctx.tokens[ctx.pos:].spnl(); isLink {
-			ctx.pos += len(passed)
-			if passed, remains, dest = t.context.parseInlineLink(remains); nil != passed {
-				ctx.pos += len(passed)
-				if 0 < len(remains) && isWhitespace(remains[0]) { // 跟空格的话后续尝试按 title 解析
-					ctx.pos++
-					if isLink, passed, remains = remains.spnl(); isLink {
-						ctx.pos += len(passed)
-						validTitle := false
-						if validTitle, passed, remains, title = t.context.parseLinkTitle(remains); validTitle {
-							ctx.pos += len(passed)
-							isLink, passed, remains = remains.spnl()
-							ctx.pos += len(passed)
-							matched = isLink && itemCloseParen == remains[0]
-						}
-					}
-				} else { // 没有 title
-					ctx.pos--
-					matched = true
-				}
+
+		for { // 这里使用 for 是为了简化逻辑，不是为了循环
+			if isLink, passed, remains = ctx.tokens[ctx.pos:].spnl(); !isLink {
+				break
 			}
+			ctx.pos += len(passed)
+			if passed, remains, dest = t.context.parseInlineLink(remains); nil == passed {
+				break
+			}
+			ctx.pos += len(passed)
+			matched = itemCloseParen == passed[len(passed)-1]
+			if matched {
+				ctx.pos--
+				break
+			}
+			if 1 > len(remains) || !isWhitespace(remains[0]) {
+				ctx.pos--
+				break
+			}
+			// 跟空格的话后续尝试 title 解析
+			ctx.pos++
+			if isLink, passed, remains = remains.spnl(); !isLink {
+				break
+			}
+			ctx.pos += len(passed)
+			matched = itemCloseParen == remains[0]
+			if matched {
+				ctx.pos--
+				break
+			}
+			validTitle := false
+			if validTitle, passed, remains, title = t.context.parseLinkTitle(remains); !validTitle {
+				break
+			}
+			ctx.pos += len(passed)
+			isLink, passed, remains = remains.spnl()
+			ctx.pos += len(passed)
+			matched = isLink && itemCloseParen == remains[0]
+			break
 		}
 		if !matched {
 			ctx.pos = savepos
