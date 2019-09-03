@@ -14,7 +14,6 @@ package lute
 
 import (
 	"unicode/utf8"
-	"unsafe"
 )
 
 // lexer 描述了词法分析器结构。
@@ -91,14 +90,4 @@ func newLexer(input items) (ret *lexer) {
 	return
 }
 
-// fromItems 快速转换 items 为 string。
-func fromItems(items items) string {
-	return *(*string)(unsafe.Pointer(&items))
-}
 
-// toItems 快速转换 str 为 items。
-func toItems(str string) items {
-	x := (*[2]uintptr)(unsafe.Pointer(&str))
-	h := [3]uintptr{x[0], x[1], x[1]}
-	return *(*items)(unsafe.Pointer(&h))
-}
