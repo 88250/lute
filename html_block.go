@@ -23,7 +23,7 @@ func (html *Node) htmlBlockContinue(context *Context) int {
 	return 0
 }
 
-func (html *Node) HTMLBlockFinalize(context *Context) {
+func (html *Node) htmlBlockFinalize(context *Context) {
 	html.tokens = bytes.TrimRight(html.tokens.replaceNewlineSpace(), " \t\n")
 }
 

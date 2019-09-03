@@ -76,13 +76,13 @@ type Node struct {
 func (n *Node) Finalize(context *Context) {
 	switch n.typ {
 	case NodeCodeBlock:
-		n.CodeBlockFinalize(context)
+		n.codeBlockFinalize(context)
 	case NodeHTMLBlock:
-		n.HTMLBlockFinalize(context)
+		n.htmlBlockFinalize(context)
 	case NodeParagraph:
-		n.ParagraphFinalize(context)
+		n.paragraphFinalize(context)
 	case NodeList:
-		n.ListFinalize(context)
+		n.listFinalize(context)
 	}
 }
 

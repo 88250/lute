@@ -21,7 +21,7 @@ func (p *Node) paragraphContinue(context *Context) int {
 	return 0
 }
 
-func (p *Node) ParagraphFinalize(context *Context) {
+func (p *Node) paragraphFinalize(context *Context) {
 	p.tokens = bytes.Trim(p.tokens, " \t\n")
 
 	// 尝试解析链接引用定义

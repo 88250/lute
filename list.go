@@ -31,7 +31,7 @@ type listData struct {
 	num          int   // 有序列表项修正过的序号
 }
 
-func (list *Node) ListFinalize(context *Context) {
+func (list *Node) listFinalize(context *Context) {
 	item := list.firstChild
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的

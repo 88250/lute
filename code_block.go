@@ -49,7 +49,7 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	return 0
 }
 
-func (codeBlock *Node) CodeBlockFinalize(context *Context) {
+func (codeBlock *Node) codeBlockFinalize(context *Context) {
 	if codeBlock.isFencedCodeBlock {
 		content := codeBlock.tokens
 		length := len(content)
