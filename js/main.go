@@ -27,6 +27,15 @@ func markdown(markdownText string) string {
 	return html
 }
 
+func format(markdownText string) string {
+	luteEngine := lute.New()
+	formatted, err := luteEngine.FormatStr("", markdownText)
+	if nil != err {
+		fmt.Println(err)
+	}
+	return formatted
+}
+
 func getEmojis(imgStaticPath string) map[string]string {
 	return lute.New().GetEmojis(imgStaticPath)
 }
@@ -36,4 +45,5 @@ func main() {
 	lute := js.Global.Get("lute")
 	lute.Set("markdown", markdown)
 	lute.Set("getEmojis", getEmojis)
+	lute.Set("format", format)
 }
