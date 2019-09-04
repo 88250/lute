@@ -10,7 +10,7 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build wasm
+// +build js
 
 package lute
 
@@ -82,7 +82,7 @@ func (t *Tree) walkParseInline(node *Node) {
 		return
 	}
 
-	// 遍历处理子节点，wasm 版不并行处理
+	// 遍历处理子节点，js 版不并行处理
 	for child := node.firstChild; nil != child; child = child.next {
 		t.walkParseInline(child)
 	}

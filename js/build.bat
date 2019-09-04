@@ -10,6 +10,5 @@
 : PURPOSE.
 : See the Mulan PSL v1 for more details.
 
-SET GOOS=js
-SET GOARCH=wasm
-go build -v -o lute.wasm
+SET GOOS=linux
+gopherjs build . --tags js -o lute.min.js -m

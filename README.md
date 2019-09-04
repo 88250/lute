@@ -322,19 +322,12 @@ func main() {
 
 ### JavaScript
  
-可通过 Wasm（Web Assembly）使用 Lute，请参考 wasm 目录下的示例，示例运行需要先编译出 lute.wasm 然后启动一个 HTTP Server。
-
-1. 运行平台对应的 build 脚本编译出 lute.wasm
-1. 安装 goexec `go get -u github.com/shurcooL/goexec` 并启动 HTTP 服务 ``goexec "http.ListenAndServe(`:8080`, gzipped.FileServer(http.Dir(`.`)))"``
-   （这一步可以用其他 HTTP Server 代替）
-2. 浏览器访问 `http://localhost:8080/wasm_exec.html`
+可通过 [GopherJS](https://github.com/gopherjs/gopherjs) 将 Lute 编译为 lute.js 使用，具体可参考 js 目录下的示例。
 
 一些细节：
 
-1. 没有内置语法高亮特性
-2. lute.wasm 原始大小 ~3.5MB，通过 `brotli -o lute.wasm.br lute.wasm` 压缩后大小 ~600KB
-3. [TinyGo](https://github.com/tinygo-org/tinygo) 编译还在探索中
-
+1. lute.js 没有内置语法高亮特性
+2. lute.js 原始大小 ~2MB，通过 `brotli -o lute.min.js.br lute.js` 压缩后大小 ~250KB
 ## 📜 文档
 
 * [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)

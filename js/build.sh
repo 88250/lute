@@ -12,4 +12,4 @@
 
 #!/bin/sh
 
-GOOS=js GOARCH=wasm go build -v -o lute.wasm
+gopherjs build . --tags js -o lute.min.js -m

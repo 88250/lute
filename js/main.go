@@ -10,22 +10,25 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build wasm
+package main
 
-package lute
+import (
+	"fmt"
+	"github.com/b3log/lute"
+	"github.com/gopherjs/gopherjs/js"
+)
 
-// []byte~string 之间的快速转换优化会导致 TinyGo 报错，所以暂时不做
-
-// fromItems 快速转换 items 为 string。
-func fromItems(items items) string {
-	//return *(*string)(unsafe.Pointer(&items))
-	return string(items)
+func markdown(markdownText string) string {
+	luteEngine := lute.New()
+	html, err := luteEngine.MarkdownStr("", markdownText)
+	if nil != err {
+		fmt.Println(err)
+	}
+	return html
 }
 
-// toItems 快速转换 str 为 items。
-func toItems(str string) items {
-	//x := (*[2]uintptr)(unsafe.Pointer(&str))
-	//h := [3]uintptr{x[0], x[1], x[1]}
-	//return *(*items)(unsafe.Pointer(&h))
-	return items(str)
+func main() {
+	js.Global.Set("lute", make(map[string]interface{}))
+	lute := js.Global.Get("lute")
+	lute.Set("markdown", markdown)
 }

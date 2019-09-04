@@ -2,4 +2,4 @@ chroma-styles/*.css linguist-generated=true
 test/commonmark-spec.html linguist-detectable=false
 test/commonmark-spec.json linguist-detectable=false
 test/commonmark-spec.md linguist-detectable=false
-wasm/wasm_exec.js linguist-detectable=false
+js/lute.min.js linguist-detectable=false
