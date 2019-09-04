@@ -10,8 +10,6 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build !js
-
 package lute
 
 import "sync"

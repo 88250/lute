@@ -32,7 +32,7 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 		r.newline()
 		tokens := node.tokens
 		if nil != node.codeBlockInfo {
-			infoWords := bytes.Fields(node.codeBlockInfo)
+			infoWords := bytes.Split(node.codeBlockInfo, []byte(" "))
 			language := infoWords[0]
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)
