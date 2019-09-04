@@ -15,7 +15,7 @@ package lute
 import (
 	"bytes"
 	"errors"
-	"fmt"
+	"strconv"
 )
 
 // RendererFunc 描述了渲染器函数签名。
@@ -40,7 +40,7 @@ func (r *Renderer) render(root *Node) error {
 	return Walk(root, func(n *Node, entering bool) (WalkStatus, error) {
 		f := r.rendererFuncs[n.typ]
 		if nil == f {
-			return WalkStop, errors.New(fmt.Sprintf("not found render function for node [type=%d, text=%s]", n.typ, n.RawText()))
+			return WalkStop, errors.New("not found render function for node [type=" + strconv.Itoa(n.typ) + ", tokens=" + string(n.tokens) + "]")
 		}
 
 		return f(n, entering)

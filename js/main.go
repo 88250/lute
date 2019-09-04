@@ -13,7 +13,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/b3log/lute"
 	"github.com/gopherjs/gopherjs/js"
 )
@@ -22,7 +21,7 @@ func markdown(markdownText string) string {
 	luteEngine := lute.New()
 	html, err := luteEngine.MarkdownStr("", markdownText)
 	if nil != err {
-		fmt.Println(err)
+		return err.Error()
 	}
 	return html
 }
@@ -31,7 +30,7 @@ func format(markdownText string) string {
 	luteEngine := lute.New()
 	formatted, err := luteEngine.FormatStr("", markdownText)
 	if nil != err {
-		fmt.Println(err)
+		return err.Error()
 	}
 	return formatted
 }

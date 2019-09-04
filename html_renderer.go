@@ -13,7 +13,7 @@
 package lute
 
 import (
-	"fmt"
+	"strconv"
 )
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
@@ -281,7 +281,7 @@ func (r *Renderer) renderListHTML(node *Node, entering bool) (WalkStatus, error)
 	}
 	if entering {
 		r.newline()
-		attrs := [][]string{{"start", fmt.Sprintf("%d", node.start)}}
+		attrs := [][]string{{"start", strconv.Itoa(node.start)}}
 		if nil == node.bulletChar && 1 != node.start {
 			r.tag(tag, attrs, false)
 		} else {
