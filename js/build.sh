@@ -12,4 +12,5 @@
 
 #!/bin/sh
 
+go list -tags js  -f {{.Deps}}
 gopherjs build . --tags js -o lute.min.js -m
