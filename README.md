@@ -327,7 +327,7 @@ func main() {
 一些细节：
 
 1. lute.js 没有内置语法高亮特性
-2. lute.js 原始大小 ~2MB，通过 `brotli -o lute.min.js.br lute.js` 压缩后大小 ~250KB
+2. lute.js 编译压缩后大小为 ~1.2MB，通过 `brotli -o lute.min.js.br lute.min.js` 压缩后大小 ~150KB
 ## 📜 文档
 
 * [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
