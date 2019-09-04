@@ -20,6 +20,9 @@ import (
 
 var emojiTests = []parseTest{
 
+	{"13", "1 :+1::1::+1:1\n", "<p>1 👍:1:👍1</p>\n"},
+	{"13", "1 :1: 1\n", "<p>1 :1: 1</p>\n"},
+	{"13", ":1:\n", "<p>:1:</p>\n"}, // 冒号解析错误 https://github.com/b3log/lute/issues/12
 	{"12", ":smile::smile:\n", "<p>😄😄</p>\n"},
 	{"11", "::\n", "<p>::</p>\n"},
 	{"10", "smile: :heart :smile:\n", "<p>smile: :heart 😄</p>\n"},
