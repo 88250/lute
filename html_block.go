@@ -27,26 +27,17 @@ func (html *Node) htmlBlockFinalize(context *Context) {
 	html.tokens = bytes.TrimRight(html.tokens.replaceNewlineSpace(), " \t\n")
 }
 
-var htmlBlockTags1, htmlBlockCloseTags1, htmlBlockTags6 []items
-var htmlBlockEqual = []byte{itemEqual}
-var htmlBlockSinglequote = []byte{itemSinglequote}
-var htmlBlockDoublequote = []byte{itemDoublequote}
-
-func init() {
-	var tags = []string{"<script", "<pre", "<style"}
-	for _, str := range tags {
-		htmlBlockTags1 = append(htmlBlockTags1, tokenize(str))
+var (
+	htmlBlockTags1      = []items{items("<script"), items("<pre"), items("<style")}
+	htmlBlockCloseTags1 = []items{items("</script>"), items("</pre>"), items("</style>")}
+	htmlBlockTags6      = []items{
+		items("<address"), items("<article"), items("<aside"), items("<base"), items("<basefont"), items("<blockquote"), items("<body"), items("<caption"), items("<center"), items("<col"), items("<colgroup"), items("<dd"), items("<details"), items("<dialog"), items("<dir"), items("<div"), items("<dl"), items("<dt"), items("<fieldset"), items("<figcaption"), items("<figure"), items("<footer"), items("<form"), items("<frame"), items("<frameset"), items("<h1"), items("<h2"), items("<h3"), items("<h4"), items("<h5"), items("<h6"), items("<head"), items("<header"), items("<hr"), items("<html"), items("<iframe"), items("<legend"), items("<li"), items("<link"), items("<main"), items("<menu"), items("<menuitem"), items("<nav"), items("<noframes"), items("<ol"), items("<optgroup"), items("<option"), items("<p"), items("<param"), items("<section"), items("<source"), items("<summary"), items("<table"), items("<tbody"), items("<td"), items("<tfoot"), items("<th"), items("<thead"), items("<title"), items("<tr"), items("<track"), items("<ul"),
+		items("</address"), items("</article"), items("</aside"), items("</base"), items("</basefont"), items("</blockquote"), items("</body"), items("</caption"), items("</center"), items("</col"), items("</colgroup"), items("</dd"), items("</details"), items("</dialog"), items("</dir"), items("</div"), items("</dl"), items("</dt"), items("</fieldset"), items("</figcaption"), items("</figure"), items("</footer"), items("</form"), items("</frame"), items("</frameset"), items("</h1"), items("</h2"), items("</h3"), items("</h4"), items("</h5"), items("</h6"), items("</head"), items("</header"), items("</hr"), items("</html"), items("</iframe"), items("</legend"), items("</li"), items("</link"), items("</main"), items("</menu"), items("</menuitem"), items("</nav"), items("</noframes"), items("</ol"), items("</optgroup"), items("</option"), items("</p"), items("</param"), items("</section"), items("</source"), items("</summary"), items("</table"), items("</tbody"), items("</td"), items("</tfoot"), items("</th"), items("</thead"), items("</title"), items("</tr"), items("</track"), items("</ul"),
 	}
-	tags = []string{"</script>", "</pre>", "</style>"}
-	for _, str := range tags {
-		htmlBlockCloseTags1 = append(htmlBlockCloseTags1, tokenize(str))
-	}
-	tags = []string{"address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"}
-	for _, str := range tags {
-		htmlBlockTags6 = append(htmlBlockTags6, tokenize("<"+str))
-		htmlBlockTags6 = append(htmlBlockTags6, tokenize("</"+str))
-	}
-}
+	htmlBlockEqual       = items{itemEqual}
+	htmlBlockSinglequote = items{itemSinglequote}
+	htmlBlockDoublequote = items{itemDoublequote}
+)
 
 func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	length := len(tokens)
