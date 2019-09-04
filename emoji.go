@@ -2,6 +2,7 @@ package lute
 
 import (
 	"bytes"
+	"strings"
 )
 
 // emoji 将 node 下文本节点中的 Emoji 别名替换为原生 Unicode 字符。
@@ -23,6 +24,18 @@ func (t *Tree) emoji(node *Node) {
 }
 
 var emojiSitePlaceholder = toItems("${imgStaticPath}")
+
+func getEmojis(imgStaticPath string) (ret map[string]string) {
+	ret = make(map[string]string, len(emojis))
+	placeholder := fromItems(emojiSitePlaceholder)
+	for k, v := range emojis {
+		if strings.Contains(v, placeholder) {
+			v = strings.ReplaceAll(v, placeholder, imgStaticPath)
+		}
+		ret[k] = v
+	}
+	return
+}
 
 func emoji0(node *Node) {
 	tokens := node.tokens
