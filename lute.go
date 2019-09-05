@@ -29,7 +29,7 @@ var (
 	validAutoLinkDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
 
 	// invalidAutoLinkDomain 指定了 GFM 自动链接解析时跳过的域名。
-	invalidAutoLinkDomain = [][]byte{[]byte("v.qq.com"), []byte("youtube.com"), []byte("youku.com"), []byte("coub.com"), []byte("dailymotion.com")}
+	invalidAutoLinkDomain [][]byte
 )
 
 // New 创建一个新的 Lute 引擎，默认启用：
