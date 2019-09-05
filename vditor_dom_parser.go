@@ -13,8 +13,9 @@
 package lute
 
 // Vditor DOM Parser
-// 解析 Vditor DOM 生成 Markdown 原文 https://github.com/b3log/lute/issues/15
 
-
-
-
+// parseVditorDOM 解析 Vditor DOM 生成 Markdown 文本。
+func parseVditorDOM(html string) *Tree {
+	// TODO: Vditor DOM Parser
+	return nil
+}
