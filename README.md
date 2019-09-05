@@ -320,6 +320,8 @@ func main() {
 }
 ```
 
+另外，代码块语法高亮样式文件在 chroma-styles 目录下，前端引入即可。
+
 ### JavaScript
  
 可通过 [GopherJS](https://github.com/gopherjs/gopherjs) 将 Lute 编译为 lute.js 使用，具体可参考 js 目录下的示例。
