@@ -46,7 +46,7 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 
 func (context *Context) newTableHead(headRow *Node) *Node {
 	ret := &Node{typ: NodeTableHead}
-	for c := headRow.firstChild; c != nil; {
+	for c := headRow.firstChild; nil != c; {
 		next := c.next
 		ret.AppendChild(ret, c)
 		c = next

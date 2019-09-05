@@ -57,7 +57,7 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 			canOpen:     delim.canOpen,
 			canClose:    delim.canClose,
 		}
-		if ctx.delimiters.previous != nil {
+		if nil != ctx.delimiters.previous {
 			ctx.delimiters.previous.next = ctx.delimiters
 		}
 	}
@@ -79,7 +79,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 
 	// find first closer above stack_bottom:
 	closer = ctx.delimiters
-	for closer != nil && closer.previous != stackBottom {
+	for nil != closer && closer.previous != stackBottom {
 		closer = closer.previous
 	}
 
@@ -189,7 +189,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	}
 
 	// 移除所有分隔符
-	for ctx.delimiters != nil && ctx.delimiters != stackBottom {
+	for nil != ctx.delimiters && ctx.delimiters != stackBottom {
 		t.removeDelimiter(ctx.delimiters, ctx)
 	}
 }
@@ -240,10 +240,10 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 }
 
 func (t *Tree) removeDelimiter(delim *delimiter, ctx *InlineContext) (ret *delimiter) {
-	if delim.previous != nil {
+	if nil != delim.previous {
 		delim.previous.next = delim.next
 	}
-	if delim.next == nil {
+	if nil == delim.next {
 		ctx.delimiters = delim.previous // 栈顶
 	} else {
 		delim.next.previous = delim.previous

@@ -55,7 +55,7 @@ func stack() []byte {
 		fmt.Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
 		if file != lastFile {
 			data, err := ioutil.ReadFile(file)
-			if err != nil {
+			if nil != err {
 				continue
 			}
 			lines = bytes.Split(data, []byte{'\n'})
@@ -78,7 +78,7 @@ func source(lines [][]byte, n int) []byte {
 // function returns, if possible, the name of the function containing the PC.
 func function(pc uintptr) []byte {
 	fn := runtime.FuncForPC(pc)
-	if fn == nil {
+	if nil == fn {
 		return dunno
 	}
 	name := []byte(fn.Name())

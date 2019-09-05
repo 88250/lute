@@ -34,14 +34,14 @@ func Walk(n *Node, walker Walker) (err error) {
 
 	// 进入节点
 	status, err = walker(n, true)
-	if err != nil || status == WalkStop {
+	if nil != err || status == WalkStop {
 		return err
 	}
 
 	if status != WalkSkipChildren {
 		// 递归遍历子节点
-		for c := n.firstChild; c != nil; c = c.next {
-			if err := Walk(c, walker); err != nil {
+		for c := n.firstChild; nil != c; c = c.next {
+			if err := Walk(c, walker); nil != err {
 				return err
 			}
 		}
@@ -49,7 +49,7 @@ func Walk(n *Node, walker Walker) (err error) {
 
 	// 离开节点
 	status, err = walker(n, false)
-	if err != nil || status == WalkStop {
+	if nil != err || status == WalkStop {
 		return err
 	}
 	return

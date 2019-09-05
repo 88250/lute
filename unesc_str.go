@@ -167,7 +167,7 @@ func parseEntity(s string) (string, int) {
 				}
 			case b == ';':
 				c, err := strconv.ParseInt(s[i-n:i], 16, 32)
-				if err != nil {
+				if nil != err {
 					return BadEntity, i + 1
 				}
 				if !isValidEntityCode(c) {

@@ -85,7 +85,7 @@ func BenchmarkGoldMark(b *testing.B) {
 	var out bytes.Buffer
 	for i := 0; i < b.N; i++ {
 		out.Reset()
-		if err := goldmarkEngine.Convert(markdown, &out); err != nil {
+		if err := goldmarkEngine.Convert(markdown, &out); nil != err {
 			panic(err)
 		}
 	}
