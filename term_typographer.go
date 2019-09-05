@@ -39,6 +39,7 @@ func fixTermTypo0(tokens items) items {
 	length := len(tokens)
 	var token byte
 	var i, j, k, l int
+	var afterIsDot bool
 	var originalTerm items
 	for ; i < length; i++ {
 		token = tokens[i]
@@ -47,10 +48,20 @@ func fixTermTypo0(tokens items) items {
 		}
 		for j = i; j < length; j++ {
 			token = tokens[j]
+			if itemDot == token {
+				afterIsDot = true
+				break;
+			}
 			if isNotTerm(token) {
 				break
 			}
 		}
+		if afterIsDot {
+			// 术语后面如果是 . 则不进行修正，因为可能是链接
+			// 比如 github.com 虽然不能识别为自动链接，但是也不能进行修正
+			continue
+		}
+
 		originalTerm = bytes.ToLower(tokens[i:j])
 		if to, ok := terms[fromItems(originalTerm)]; ok {
 			l = 0
