@@ -42,7 +42,7 @@ func TestSpec(t *testing.T) {
 
 	luteEngine := lute.New(lute.GFM(false),
 		lute.SoftBreak2HardBreak(false),
-		lute.CodeSyntaxHighlight(false),
+		lute.CodeSyntaxHighlight(false, false, "github"),
 		lute.AutoSpace(false),
 		lute.FixTermTypo(false),
 		lute.Emoji(false),

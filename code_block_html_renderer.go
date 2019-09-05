@@ -51,14 +51,16 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 				}
 				iterator, err := lexer.Tokenise(nil, codeBlock)
 				if nil == err {
-					formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
+					var formatter *chromahtml.Formatter
+					if !r.option.CodeSyntaxHighlightInlineStyle {
+						formatter = chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
+					} else {
+						formatter = chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.ClassPrefix("highlight-"))
+					}
 					var b bytes.Buffer
-					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
+					if err = formatter.Format(&b, styles.Get(r.option.CodeSyntaxHighlightStyleName), iterator); nil == err {
 						r.write(b.Bytes())
 						rendered = true
-						// 生成 CSS 临时调试用：
-						//formatter.WriteCSS(os.Stdout, styles.GitHub)
-						//os.Stdout.WriteString("\n")
 					}
 				}
 			}
@@ -81,9 +83,14 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 
 				iterator, err := lexer.Tokenise(nil, codeBlock)
 				if nil == err {
-					formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
+					var formatter *chromahtml.Formatter
+					if !r.option.CodeSyntaxHighlightInlineStyle {
+						formatter = chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.WithClasses(), chromahtml.ClassPrefix("highlight-"))
+					} else {
+						formatter = chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.ClassPrefix("highlight-"))
+					}
 					var b bytes.Buffer
-					if err = formatter.Format(&b, styles.GitHub, iterator); nil == err {
+					if err = formatter.Format(&b, styles.Get(r.option.CodeSyntaxHighlightStyleName), iterator); nil == err {
 						r.write(b.Bytes())
 						rendered = true
 					}

@@ -320,7 +320,10 @@ func main() {
 }
 ```
 
-另外，代码块语法高亮样式文件在 chroma-styles 目录下，前端引入即可。
+关于代码块语法高亮样式：
+
+* 可在前端引入 chroma-styles 目录下的样式文件
+* 也可以在 `lute.New()` 时通过 `lute.CodeSyntaxHighlight()` 参数来指定是否使用内联样式、样式名
 
 ### JavaScript
  

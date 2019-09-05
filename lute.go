@@ -40,7 +40,7 @@ func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
 	GFM(true)(ret)
 	SoftBreak2HardBreak(true)(ret)
-	CodeSyntaxHighlight(true)(ret)
+	CodeSyntaxHighlight(true, false, "github")(ret)
 	AutoSpace(true)(ret)
 	FixTermTypo(true)(ret)
 	Emoji(true)(ret)
@@ -151,9 +151,12 @@ func SoftBreak2HardBreak(b bool) option {
 }
 
 // CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
-func CodeSyntaxHighlight(b bool) option {
+// inlineStyle 设置是否为内联样式，默认不内联，name 指定高亮样式名。
+func CodeSyntaxHighlight(b bool, inlineStyle bool, name string) option {
 	return func(lute *Lute) {
 		lute.CodeSyntaxHighlight = b
+		lute.CodeSyntaxHighlightInlineStyle = inlineStyle
+		lute.CodeSyntaxHighlightStyleName = name
 	}
 }
 
@@ -183,15 +186,17 @@ func Emoji(b bool) option {
 
 // options 描述了一些列解析和渲染选项。
 type options struct {
-	GFMTable            bool
-	GFMTaskListItem     bool
-	GFMStrikethrough    bool
-	GFMAutoLink         bool
-	SoftBreak2HardBreak bool
-	CodeSyntaxHighlight bool
-	AutoSpace           bool
-	FixTermTypo         bool
-	Emoji               bool
+	GFMTable                       bool
+	GFMTaskListItem                bool
+	GFMStrikethrough               bool
+	GFMAutoLink                    bool
+	SoftBreak2HardBreak            bool
+	CodeSyntaxHighlight            bool
+	CodeSyntaxHighlightInlineStyle bool
+	CodeSyntaxHighlightStyleName   string
+	AutoSpace                      bool
+	FixTermTypo                    bool
+	Emoji                          bool
 }
 
 // option 描述了解析渲染选项设置函数签名。
