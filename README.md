@@ -291,6 +291,12 @@ Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://git
 
 ## 🛠️ 使用
 
+有三种方式使用 Lute：
+        
+1. 后端：如果你的代码是 Go 语言，引入 lute 包后就可以直接用了
+2. 后端：可以将 Lute 启动为一个 HTTP 服务进程供其他进程调用，具体参考 http/main.go
+3. 前端：引入 js 目录下的 lute.min.js 即可使用。理论上也支持 Node.js，但没有实际测试过 
+
 ### Go
 
 引入 Lute 库：
@@ -327,7 +333,7 @@ func main() {
 
 ### JavaScript
  
-可通过 [GopherJS](https://github.com/gopherjs/gopherjs) 将 Lute 编译为 lute.js 使用，具体可参考 js 目录下的示例。
+通过 [GopherJS](https://github.com/gopherjs/gopherjs) 将 Lute 编译为 lute.js 使用，具体可参考 js 目录下的示例。
 
 一些细节：
 
