@@ -108,6 +108,21 @@ func (lute *Lute) GetEmojis(imgStaticPath string) map[string]string {
 	return getEmojis(imgStaticPath)
 }
 
+// RenderVditorDOM 用于渲染 Vditor DOM。
+func (lute *Lute) RenderVditorDOM(nodeDataId int, markdownText string) (html string, err error) {
+	var tree *Tree
+	tree, err = parse("", items(markdownText), lute.options)
+	if nil != err {
+		return
+	}
+
+	renderer := newVditorRenderer(lute.options)
+	var output items
+	output, err = tree.render(renderer)
+	html = string(output)
+	return
+}
+
 // GFM 设置是否打开所有 GFM 支持。
 func GFM(b bool) option {
 	return func(lute *Lute) {

@@ -224,9 +224,9 @@ func (r *Renderer) renderParagraphVditor(node *Node, entering bool) (WalkStatus,
 
 	if entering {
 		r.newline()
-		r.tag("p", nil, false)
+		r.vditorTag("p", node.typ, nil, false)
 	} else {
-		r.tag("/p", nil, false)
+		r.vditorTag("/p", node.typ, nil, false)
 		r.newline()
 	}
 	return WalkContinue, nil
@@ -393,4 +393,28 @@ func (r *Renderer) renderSoftBreakVditor(node *Node, entering bool) (WalkStatus,
 		}
 	}
 	return WalkContinue, nil
+}
+
+func (r *Renderer) vditorTag(name string, typ int, attrs [][]string, selfclosing bool) {
+	if r.disableTags > 0 {
+		return
+	}
+
+	r.writeString("<")
+	r.writeString(name)
+
+	isClosing := itemSlash == name[0]
+	if !isClosing {
+		if nil == attrs {
+			attrs = [][]string{}
+		}
+		attrs = append(attrs, []string{"data-id", "0"}, []string{"data-type", strconv.Itoa(typ)})
+		for _, attr := range attrs {
+			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
+		}
+	}
+	if selfclosing {
+		r.writeString(" /")
+	}
+	r.writeString(">")
 }
