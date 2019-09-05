@@ -35,7 +35,7 @@ func Walk(n *Node, walker Walker) (err error) {
 	// 进入节点
 	status, err = walker(n, true)
 	if nil != err || status == WalkStop {
-		return err
+		return
 	}
 
 	if status != WalkSkipChildren {
@@ -49,8 +49,5 @@ func Walk(n *Node, walker Walker) (err error) {
 
 	// 离开节点
 	status, err = walker(n, false)
-	if nil != err || status == WalkStop {
-		return err
-	}
 	return
 }
