@@ -50,6 +50,8 @@ func newHTMLRenderer(option options) (ret *Renderer) {
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowHTML
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellHTML
 
+	// Emoji 渲染函数
+
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeHTML
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgHTML
 
@@ -265,7 +267,7 @@ func (r *Renderer) renderStrongHTML(node *Node, entering bool) (WalkStatus, erro
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderBlockquoteHTML(n *Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderBlockquoteHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("<blockquote>")

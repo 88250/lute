@@ -51,6 +51,8 @@ func newFormatRenderer(option options) (ret *Renderer) {
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowMarkdown
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellMarkdown
 
+	// Emoji 渲染函数
+
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeMarkdown
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgMarkdown
 
@@ -118,9 +120,9 @@ func (r *Renderer) renderTableMarkdown(node *Node, entering bool) (WalkStatus, e
 
 func (r *Renderer) renderStrikethroughMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
+		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
-		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
+		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	}
 	return WalkContinue, nil
 }
@@ -218,7 +220,7 @@ func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatu
 	}
 
 	if entering {
-		r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
+		r.write(bytes.Repeat(items{itemSpace}, listPadding))
 	} else {
 		r.newline()
 		if !inList {
@@ -270,16 +272,16 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 
 		r.newline()
 		if 0 < listPadding {
-			r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
+			r.write(bytes.Repeat(items{itemSpace}, listPadding))
 		}
-		r.write(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLength))
+		r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLength))
 		r.write(node.codeBlockInfo)
 		r.writeByte('\n')
 		if 0 < listPadding {
-			lines := bytes.Split(node.tokens, []byte{itemNewline})
+			lines := bytes.Split(node.tokens, items{itemNewline})
 			length := len(lines)
 			for i, line := range lines {
-				r.write(bytes.Repeat([]byte{itemSpace}, listPadding))
+				r.write(bytes.Repeat(items{itemSpace}, listPadding))
 				r.write(line)
 				if i < length-1 {
 					r.writeByte('\n')
@@ -291,30 +293,30 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 		return WalkSkipChildren, nil
 	}
 
-	r.write(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLength))
+	r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLength))
 	r.writeString("\n\n")
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderEmphasisMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
+		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
-		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
+		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderStrongMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
+		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
-		r.write(bytes.Repeat([]byte{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
+		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	}
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderBlockquoteMarkdown(n *Node, entering bool) (WalkStatus, error) {
+func (r *Renderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("> ") // 带个空格更好一些
@@ -326,7 +328,7 @@ func (r *Renderer) renderBlockquoteMarkdown(n *Node, entering bool) (WalkStatus,
 
 func (r *Renderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(bytes.Repeat([]byte{itemCrosshatch}, node.headingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
+		r.write(bytes.Repeat(items{itemCrosshatch}, node.headingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
 	} else {
 		r.newline()
@@ -352,7 +354,7 @@ func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus
 		r.newline()
 		if 1 < r.listLevel {
 			parent := node.parent.parent
-			r.write(bytes.Repeat([]byte{itemSpace}, len(parent.marker)+1))
+			r.write(bytes.Repeat(items{itemSpace}, len(parent.marker)+1))
 			if 1 == parent.listData.typ {
 				r.writeByte(' ') // 有序列表需要加上分隔符 . 或者 ) 的一个字符长度
 			}
