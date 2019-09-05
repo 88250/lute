@@ -46,18 +46,20 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 	block.AppendChild(block, node)
 
 	// 将这个分隔符入栈
-	ctx.delimiters = &delimiter{
-		typ:         delim.typ,
-		num:         delim.num,
-		originalNum: delim.num,
-		node:        node,
-		previous:    ctx.delimiters,
-		next:        nil,
-		canOpen:     delim.canOpen,
-		canClose:    delim.canClose,
-	}
-	if ctx.delimiters.previous != nil {
-		ctx.delimiters.previous.next = ctx.delimiters
+	if delim.canOpen || delim.canClose {
+		ctx.delimiters = &delimiter{
+			typ:         delim.typ,
+			num:         delim.num,
+			originalNum: delim.num,
+			node:        node,
+			previous:    ctx.delimiters,
+			next:        nil,
+			canOpen:     delim.canOpen,
+			canClose:    delim.canClose,
+		}
+		if ctx.delimiters.previous != nil {
+			ctx.delimiters.previous.next = ctx.delimiters
+		}
 	}
 }
 
@@ -177,10 +179,6 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 
 		if !openerFound && !oddMatch {
 			// Set lower bound for future searches for openers:
-			// We don't do this with oddMatch because a **
-			// that doesn't match an earlier * might turn into
-			// an opener, and the * might be matched by something
-			// else.
 			openersBottom[closercc] = oldCloser.previous
 			if !oldCloser.canOpen {
 				// We can remove a closer that can't be an opener,
