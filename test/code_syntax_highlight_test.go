@@ -57,3 +57,43 @@ func TestCodeSyntaxHighlightInline(t *testing.T) {
 		}
 	}
 }
+
+var codeSyntaxHighlightStyleTests = []parseTest{
+
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java\"><span style=\"color:#458;font-weight:bold\">int</span> <span style=\"color:#900;font-weight:bold\">i</span>;\n</code></pre>\n"},
+}
+
+func TestCodeSyntaxHighlightStyle(t *testing.T) {
+	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, true, "github"))
+
+	for _, test := range codeSyntaxHighlightStyleTests {
+		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		if nil != err {
+			t.Fatalf("unexpected: %s", err)
+		}
+
+		if test.html != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		}
+	}
+}
+
+var codeSyntaxHighlightOffTests = []parseTest{
+
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java\">int i;\n</code></pre>\n"},
+}
+
+func TestCodeSyntaxHighlightOff(t *testing.T) {
+	luteEngine := lute.New(lute.CodeSyntaxHighlight(false, false, "dracula"))
+
+	for _, test := range codeSyntaxHighlightOffTests {
+		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		if nil != err {
+			t.Fatalf("unexpected: %s", err)
+		}
+
+		if test.html != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		}
+	}
+}
