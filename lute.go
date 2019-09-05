@@ -25,8 +25,11 @@ var (
 	// GFM 任务列表 li 加 class="vditor-task"，https://github.com/b3log/lute/issues/10
 	TaskListItemClass = "vditor-task"
 
-	// validDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
-	validDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
+	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
+	validAutoLinkDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
+
+	// invalidAutoLinkDomain 指定了 GFM 自动链接解析时跳过的域名。
+	invalidAutoLinkDomain = [][]byte{[]byte("v.qq.com"), []byte("youtube.com"), []byte("youku.com"), []byte("coub.com"), []byte("dailymotion.com")}
 )
 
 // New 创建一个新的 Lute 引擎，默认启用：

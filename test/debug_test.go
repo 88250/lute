@@ -20,6 +20,9 @@ import (
 
 var debugTests = []parseTest{
 
+	// 出现在 invalidAutoLinkDomain 中的不要解析自动链接
+	{"28", "https://v.qq.com/x/cover/zf2z0xpqcculhcz/y0016tj0qvh.html", "<p>https://v.qq.com/x/cover/zf2z0xpqcculhcz/y0016tj0qvh.html</p>\n"},
+
 	{"27", "[]( https://b3log.org )", "<p><a href=\"https://b3log.org\"></a></p>\n"},
 	{"26", "[](https://b3log.org)", "<p><a href=\"https://b3log.org\"></a></p>\n"},
 	{"25", "[]( https://b3log.org", "<p>[]( <a href=\"https://b3log.org\">https://b3log.org</a></p>\n"},

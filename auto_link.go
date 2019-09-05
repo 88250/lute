@@ -229,7 +229,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		}
 		domain := url[:k]
 		if !t.isValidDomain(domain) {
-			text := &Node{typ: NodeText, tokens: url}
+			text := &Node{typ: NodeText, tokens: append(protocol, url...)}
 			node.InsertBefore(node, text)
 			continue
 		}
@@ -351,6 +351,12 @@ func (t *Tree) isValidDomain(domain items) bool {
 		return false
 	}
 
+	for i := 0; i < len(invalidAutoLinkDomain); i++ {
+		if bytes.EqualFold(domain, invalidAutoLinkDomain[i]) {
+			return false
+		}
+	}
+
 	var token byte
 	for i := 0; i < length; i++ {
 		segment := segments[i]
@@ -374,8 +380,8 @@ func (t *Tree) isValidDomain(domain items) bool {
 
 		if i == length-1 {
 			validSuffix := false
-			for j := 0; j < len(validDomainSuffix); j++ {
-				if bytes.EqualFold(segment, validDomainSuffix[j]) {
+			for j := 0; j < len(validAutoLinkDomainSuffix); j++ {
+				if bytes.EqualFold(segment, validAutoLinkDomainSuffix[j]) {
 					validSuffix = true
 					break
 				}
