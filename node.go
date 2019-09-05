@@ -70,6 +70,10 @@ type Node struct {
 
 	strongEmDelMarker    byte
 	strongEmDelMarkenLen int
+
+	// Emoji
+
+	emojiImgAlias items
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
@@ -223,7 +227,7 @@ const (
 	NodeHTMLBlock            // HTML 块节点
 	NodeInlineHTML           // 内联 HTML节点
 	NodeCodeBlock            // 代码块节点
-	NodeText                 // 文本节点
+	NodeText                 // 文本节点 10
 	NodeEmphasis             // 强调节点
 	NodeStrong               // 加粗节点
 	NodeCodeSpan             // 代码节点
@@ -236,8 +240,13 @@ const (
 
 	NodeTaskListItemMarker // 任务列表项标记节点
 	NodeStrikethrough      // 删除线节点
-	NodeTable              // 表节点
+	NodeTable              // 表节点 20
 	NodeTableHead          // 表头节点
 	NodeTableRow           // 表行节点
 	NodeTableCell          // 表格节点
+
+	// Emoji
+
+	NodeEmojiUnicode // Emoji Unicode 字符节点
+	NodeEmojiImg     // Emoji 图片节点
 )

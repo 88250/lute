@@ -51,7 +51,24 @@ func newFormatRenderer(option options) (ret *Renderer) {
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowMarkdown
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellMarkdown
 
+	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeMarkdown
+	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgMarkdown
+
 	return
+}
+
+func (r *Renderer) renderEmojiImgMarkdown(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.write(node.emojiImgAlias)
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderEmojiUnicodeMarkdown(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.write(node.tokens)
+	}
+	return WalkContinue, nil
 }
 
 // TODO: 表的格式化应该按最宽的单元格对齐内容

@@ -39,7 +39,7 @@ func getEmojis(imgStaticPath string) (ret map[string]string) {
 
 func emoji0(node *Node) {
 	tokens := node.tokens
-	node.tokens = items{}
+	node.tokens = items{} // 先清空，后面逐个添加或者添加 tokens 或者 Emoji 兄弟节点
 	length := len(tokens)
 	var token byte
 	var maybeEmoji items
@@ -83,6 +83,7 @@ func emoji0(node *Node) {
 		}
 
 		if emoji, ok := emojis[fromItems(maybeEmoji)]; ok {
+			emojiNode := &Node{typ: NodeEmojiUnicode}
 			if bytes.Contains(items(emoji), emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
 				alias := fromItems(maybeEmoji)
 				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + EmojiSite + alias
@@ -91,14 +92,19 @@ func emoji0(node *Node) {
 					suffix = ".gif"
 				}
 				repl += suffix + "\" title=\"" + alias + "\" />"
-				img := &Node{typ: NodeInlineHTML, tokens: toItems(repl)}
-				node.InsertAfter(node, img)
-				text := &Node{typ: NodeText, tokens: items{}} // 生成一个新文本节点
-				img.InsertAfter(node, text)
-				node = text
+
+				emojiNode.typ = NodeEmojiImg
+				emojiNode.tokens = toItems(repl)
+				emojiNode.emojiImgAlias = tokens[i : pos+1]
 			} else {
-				node.tokens = append(node.tokens, emoji...)
+				emojiNode.tokens = toItems(emoji)
 			}
+
+			node.InsertAfter(node, emojiNode)
+			// 在 EmojiImg 节点后插入一个内容为空的文本节点，留作下次迭代
+			text := &Node{typ: NodeText, tokens: items{}}
+			emojiNode.InsertAfter(emojiNode, text)
+			node = text
 		} else {
 			node.tokens = append(node.tokens, tokens[i:pos+1]...)
 		}

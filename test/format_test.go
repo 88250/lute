@@ -26,7 +26,13 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
-	{"23", "&&amp;\n", "&amp;&amp;\n\n"}, // 原先是 & 的格式化以后转义为 HTML 实体 &amp;
+
+	// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
+	{"24", ":heart: :hacpai:\n", "❤️ :hacpai:\n\n"},
+
+	// 原先是 & 的格式化以后转义为 HTML 实体 &amp;
+	{"23", "&&amp;\n", "&amp;&amp;\n\n"},
+
 	{"22", "\u2003emsp\n", "\u2003emsp\n\n"},
 	{"21", "&amp;123&emsp;456\n", "&amp;123\u2003456\n\n"},
 	{"20", "~删除线~\n", "~删除线~\n\n"},

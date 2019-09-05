@@ -50,7 +50,24 @@ func newHTMLRenderer(option options) (ret *Renderer) {
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowHTML
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellHTML
 
+	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeHTML
+	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgHTML
+
 	return
+}
+
+func (r *Renderer) renderEmojiImgHTML(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.write(node.tokens)
+	}
+	return WalkContinue, nil
+}
+
+func (r *Renderer) renderEmojiUnicodeHTML(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.write(node.tokens)
+	}
+	return WalkContinue, nil
 }
 
 func (r *Renderer) renderTableCellHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -181,11 +198,9 @@ func (r *Renderer) renderHTMLHTML(node *Node, entering bool) (WalkStatus, error)
 }
 
 func (r *Renderer) renderInlineHTMLHTML(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
+	if entering {
+		r.write(node.tokens)
 	}
-
-	r.write(node.tokens)
 	return WalkContinue, nil
 }
 
