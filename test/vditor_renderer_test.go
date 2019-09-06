@@ -20,6 +20,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
+	{"1", "## Lute\n", "<h2 data-id=\"0\" data-type=\"2\">Lute</h2>\n"},
 	{"0", "Lute\n", "<p data-id=\"0\" data-type=\"1\">Lute</p>\n"},
 }
 

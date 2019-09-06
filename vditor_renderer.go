@@ -310,7 +310,7 @@ func (r *Renderer) renderBlockquoteVditor(node *Node, entering bool) (WalkStatus
 func (r *Renderer) renderHeadingVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.writeString("<h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
+		r.vditorTag("h" + " 123456"[node.headingLevel:node.headingLevel+1], node.typ, nil, false)
 	} else {
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 		r.newline()
