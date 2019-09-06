@@ -27,6 +27,8 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	{"25", "`` `Lute` ``\n", "`` `Lute` ``\n\n"},
+
 	// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
 	{"24", ":heart: :hacpai:\n", "❤️ :hacpai:\n\n"},
 

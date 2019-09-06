@@ -241,18 +241,26 @@ func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, er
 
 func (r *Renderer) renderCodeSpanMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeByte('`')
+		r.writeByte(itemBacktick)
+		if 1 < node.codeMarkerLen {
+			r.writeByte(itemBacktick)
+			r.writeByte(itemSpace)
+		}
 		r.write(node.tokens)
 		return WalkSkipChildren, nil
 	}
 
-	r.writeByte('`')
+	if 1 < node.codeMarkerLen {
+		r.writeByte(itemSpace)
+		r.writeByte(itemBacktick)
+	}
+	r.writeByte(itemBacktick)
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !node.isFencedCodeBlock {
-		node.codeBlockFenceLength = 3
+		node.codeBlockFenceLen = 3
 	}
 	if entering {
 		listPadding := 0
@@ -268,7 +276,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 		if 0 < listPadding {
 			r.write(bytes.Repeat(items{itemSpace}, listPadding))
 		}
-		r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLength))
+		r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
 		r.write(node.codeBlockInfo)
 		r.writeByte('\n')
 		if 0 < listPadding {
@@ -287,7 +295,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 		return WalkSkipChildren, nil
 	}
 
-	r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLength))
+	r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
 	r.writeString("\n\n")
 	return WalkContinue, nil
 }

@@ -32,11 +32,15 @@ type Node struct {
 	lastLineBlank   bool   // 标识最后一行是否是空行
 	lastLineChecked bool   // 标识最后一行是否检查过
 
+	// 代码
+
+	codeMarkerLen int // ` 个数，1 或 2
+
 	// 代码块
 
 	isFencedCodeBlock    bool
 	codeBlockFenceChar   byte
-	codeBlockFenceLength int
+	codeBlockFenceLen    int
 	codeBlockFenceOffset int
 	codeBlockInfo        items
 
