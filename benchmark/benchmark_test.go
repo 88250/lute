@@ -33,7 +33,7 @@ func BenchmarkLute(b *testing.B) {
 	}
 
 	luteEngine := lute.New(lute.GFM(true),
-		lute.CodeSyntaxHighlight(false, false, "github"),
+		lute.CodeSyntaxHighlight(false, false, false, "github"),
 		lute.SoftBreak2HardBreak(false),
 		lute.AutoSpace(false),
 		lute.FixTermTypo(false),
