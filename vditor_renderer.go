@@ -237,7 +237,7 @@ func (r *Renderer) renderTextVditor(node *Node, entering bool) (WalkStatus, erro
 		r.vditorTag("span", node.typ, nil, false)
 		r.write(escapeHTML(node.tokens))
 	} else {
-		r.writeString("</span>")
+		r.vditorTag("/span", node.typ, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -335,7 +335,7 @@ func (r *Renderer) renderListVditor(node *Node, entering bool) (WalkStatus, erro
 		r.newline()
 	} else {
 		r.newline()
-		r.tag("/"+tag, nil, false)
+		r.vditorTag("/"+tag, node.typ, nil, false)
 		r.newline()
 	}
 	return WalkContinue, nil
@@ -344,12 +344,12 @@ func (r *Renderer) renderListVditor(node *Node, entering bool) (WalkStatus, erro
 func (r *Renderer) renderListItemVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 3 == node.listData.typ && "" != TaskListItemClass {
-			r.tag("li", [][]string{{"class", TaskListItemClass}}, false)
+			r.vditorTag("li", node.typ, [][]string{{"class", TaskListItemClass}}, false)
 		} else {
-			r.tag("li", nil, false)
+			r.vditorTag("li", node.typ, nil, false)
 		}
 	} else {
-		r.tag("/li", nil, false)
+		r.vditorTag("/li", node.typ, nil, false)
 		r.newline()
 	}
 	return WalkContinue, nil
