@@ -233,11 +233,12 @@ func (r *Renderer) renderParagraphVditor(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *Renderer) renderTextVditor(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
+	if entering {
+		r.vditorTag("span", node.typ, nil, false)
+		r.write(escapeHTML(node.tokens))
+	} else {
+		r.writeString("</span>")
 	}
-
-	r.write(escapeHTML(node.tokens))
 	return WalkContinue, nil
 }
 
@@ -297,7 +298,7 @@ func (r *Renderer) renderStrongVditor(node *Node, entering bool) (WalkStatus, er
 func (r *Renderer) renderBlockquoteVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.writeString("<blockquote>")
+		r.vditorTag("blockquote", node.typ, nil, false)
 		r.newline()
 	} else {
 		r.newline()
@@ -310,7 +311,7 @@ func (r *Renderer) renderBlockquoteVditor(node *Node, entering bool) (WalkStatus
 func (r *Renderer) renderHeadingVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.vditorTag("h" + " 123456"[node.headingLevel:node.headingLevel+1], node.typ, nil, false)
+		r.vditorTag("h"+" 123456"[node.headingLevel:node.headingLevel+1], node.typ, nil, false)
 	} else {
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 		r.newline()
@@ -369,7 +370,7 @@ func (r *Renderer) renderTaskListItemMarkerVditor(node *Node, entering bool) (Wa
 func (r *Renderer) renderThematicBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.tag("hr", nil, true)
+		r.vditorTag("hr", node.typ, nil, true)
 		r.newline()
 	}
 	return WalkContinue, nil

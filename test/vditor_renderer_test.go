@@ -20,8 +20,10 @@ import (
 
 var vditorRendererTests = []parseTest{
 
-	{"1", "## Lute\n", "<h2 data-id=\"0\" data-type=\"2\">Lute</h2>\n"},
-	{"0", "Lute\n", "<p data-id=\"0\" data-type=\"1\">Lute</p>\n"},
+	{"3", "> Lute\n", "<blockquote data-id=\"0\" data-type=\"4\">\n<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lute</span></p>\n</blockquote>\n"},
+	{"2", "---\n", "<hr data-id=\"0\" data-type=\"3\" />\n"},
+	{"1", "## Lute\n", "<h2 data-id=\"0\" data-type=\"2\"><span data-id=\"0\" data-type=\"10\">Lute</span></h2>\n"},
+	{"0", "Lute\n", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lute</span></p>\n"},
 }
 
 func TestVditorRenderer(t *testing.T) {
