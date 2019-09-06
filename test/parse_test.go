@@ -241,7 +241,7 @@ var parseTests = []parseTest{
 func TestParse(t *testing.T) {
 	luteEngine := lute.New(
 		lute.GFM(false),
-		lute.CodeSyntaxHighlight(false, false, "github"),
+		lute.CodeSyntaxHighlight(false, false, false, "github"),
 		lute.SoftBreak2HardBreak(false),
 		lute.AutoSpace(false),
 		lute.Emoji(false),

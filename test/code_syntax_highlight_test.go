@@ -18,6 +18,26 @@ import (
 	"github.com/b3log/lute"
 )
 
+var codeSyntaxHighlightLineNumTests = []parseTest{
+
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java\"><span class=\"highlight-ln\">1</span><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
+}
+
+func TestCodeSyntaxHighlightLineNum(t *testing.T) {
+	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, false, true, "dracula"))
+
+	for _, test := range codeSyntaxHighlightLineNumTests {
+		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		if nil != err {
+			t.Fatalf("unexpected: %s", err)
+		}
+
+		if test.html != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		}
+	}
+}
+
 var codeSyntaxHighlightTests = []parseTest{
 
 	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
@@ -44,7 +64,7 @@ var codeSyntaxHighlightInlineTests = []parseTest{
 }
 
 func TestCodeSyntaxHighlightInline(t *testing.T) {
-	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, true, "dracula"))
+	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, true, false, "dracula"))
 
 	for _, test := range codeSyntaxHighlightInlineTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
@@ -64,7 +84,7 @@ var codeSyntaxHighlightStyleTests = []parseTest{
 }
 
 func TestCodeSyntaxHighlightStyle(t *testing.T) {
-	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, true, "github"))
+	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, true, false, "github"))
 
 	for _, test := range codeSyntaxHighlightStyleTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
@@ -84,7 +104,7 @@ var codeSyntaxHighlightOffTests = []parseTest{
 }
 
 func TestCodeSyntaxHighlightOff(t *testing.T) {
-	luteEngine := lute.New(lute.CodeSyntaxHighlight(false, false, "dracula"))
+	luteEngine := lute.New(lute.CodeSyntaxHighlight(false, false, false, "dracula"))
 
 	for _, test := range codeSyntaxHighlightOffTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)

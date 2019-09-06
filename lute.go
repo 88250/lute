@@ -43,7 +43,7 @@ func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
 	GFM(true)(ret)
 	SoftBreak2HardBreak(true)(ret)
-	CodeSyntaxHighlight(true, false, "github")(ret)
+	CodeSyntaxHighlight(true, false, false, "github")(ret)
 	AutoSpace(true)(ret)
 	FixTermTypo(true)(ret)
 	Emoji(true)(ret)
@@ -169,11 +169,14 @@ func SoftBreak2HardBreak(b bool) option {
 }
 
 // CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
-// inlineStyle 设置是否为内联样式，默认不内联，name 指定高亮样式名。
-func CodeSyntaxHighlight(b bool, inlineStyle bool, name string) option {
+//   inlineStyle 设置是否为内联样式，默认不内联
+//   lineNum 设置是否显示行号，默认不显示
+//   name 指定高亮样式名，默认为 "github"
+func CodeSyntaxHighlight(b, inlineStyle, lineNum bool, name string) option {
 	return func(lute *Lute) {
 		lute.CodeSyntaxHighlight = b
 		lute.CodeSyntaxHighlightInlineStyle = inlineStyle
+		lute.CodeSyntaxHighlightLineNum = lineNum
 		lute.CodeSyntaxHighlightStyleName = name
 	}
 }
@@ -211,6 +214,7 @@ type options struct {
 	SoftBreak2HardBreak            bool
 	CodeSyntaxHighlight            bool
 	CodeSyntaxHighlightInlineStyle bool
+	CodeSyntaxHighlightLineNum     bool
 	CodeSyntaxHighlightStyleName   string
 	AutoSpace                      bool
 	FixTermTypo                    bool

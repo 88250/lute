@@ -14,10 +14,11 @@ package test
 
 import (
 	"encoding/json"
-	"github.com/b3log/lute"
 	"io/ioutil"
 	"strconv"
 	"testing"
+
+	"github.com/b3log/lute"
 )
 
 type testcase struct {
@@ -42,7 +43,7 @@ func TestSpec(t *testing.T) {
 
 	luteEngine := lute.New(lute.GFM(false),
 		lute.SoftBreak2HardBreak(false),
-		lute.CodeSyntaxHighlight(false, false, "github"),
+		lute.CodeSyntaxHighlight(false, false, false, "github"),
 		lute.AutoSpace(false),
 		lute.FixTermTypo(false),
 		lute.Emoji(false),
