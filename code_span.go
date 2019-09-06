@@ -44,7 +44,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 		textTokens = textTokens[:len(textTokens)-1]
 	}
 
-	ret = &Node{typ: NodeCodeSpan, tokens: textTokens}
+	ret = &Node{typ: NodeCodeSpan, tokens: textTokens, codeMarkerLen: n}
 	ctx.pos = endPos + n
 	return
 }

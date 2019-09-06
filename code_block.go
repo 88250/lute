@@ -20,7 +20,7 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 	if codeBlock.isFencedCodeBlock {
-		if indent <= 3 && codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.codeBlockFenceChar, codeBlock.codeBlockFenceLength) {
+		if indent <= 3 && codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.codeBlockFenceChar, codeBlock.codeBlockFenceLen) {
 			// closing fence - we're at end of line, so we can return
 			context.finalize(codeBlock)
 			return 2
@@ -101,7 +101,7 @@ func (t *Tree) parseFencedCode() (ret *Node) {
 	info = bytes.TrimSpace(infoTokens)
 	info = unescapeString(info)
 	ret = &Node{typ: NodeCodeBlock, tokens: make(items, 0, 256),
-		isFencedCodeBlock: true, codeBlockFenceChar: fenceChar, codeBlockFenceLength: fenceLength, codeBlockFenceOffset: t.context.indent, codeBlockInfo: info}
+		isFencedCodeBlock: true, codeBlockFenceChar: fenceChar, codeBlockFenceLen: fenceLength, codeBlockFenceOffset: t.context.indent, codeBlockInfo: info}
 
 	return
 }
