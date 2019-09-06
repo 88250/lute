@@ -342,7 +342,7 @@ func (r *Renderer) renderThematicBreakHTML(node *Node, entering bool) (WalkStatu
 		r.tag("hr", nil, true)
 		r.newline()
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
 
 func (r *Renderer) renderHardBreakHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -350,7 +350,7 @@ func (r *Renderer) renderHardBreakHTML(node *Node, entering bool) (WalkStatus, e
 		r.tag("br", nil, true)
 		r.newline()
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
 
 func (r *Renderer) renderSoftBreakHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -362,7 +362,7 @@ func (r *Renderer) renderSoftBreakHTML(node *Node, entering bool) (WalkStatus, e
 			r.newline()
 		}
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
 
 func (r *Renderer) tag(name string, attrs [][]string, selfclosing bool) {

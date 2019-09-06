@@ -389,7 +389,7 @@ func (r *Renderer) renderThematicBreakMarkdown(node *Node, entering bool) (WalkS
 		r.newline()
 		r.writeString("---\n\n")
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
 
 func (r *Renderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
@@ -400,12 +400,12 @@ func (r *Renderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatu
 			r.writeString("\n")
 		}
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
 
 func (r *Renderer) renderSoftBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
