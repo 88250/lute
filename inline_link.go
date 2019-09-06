@@ -38,8 +38,9 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		i := 2
 		size := 1
 		var r rune
-		var runes items
+		var dest, runes items
 		for ; i < length; i += size {
+			size = 1
 			token := tokens[i]
 			if itemNewline == token {
 				passed = nil
@@ -47,8 +48,10 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 			}
 
 			passed = append(passed, token)
-			dest := items{token}
-			if token >= utf8.RuneSelf {
+			if token < utf8.RuneSelf {
+				dest = items{token}
+			} else {
+				dest = items{}
 				r, size = utf8.DecodeRune(tokens[i:])
 				runes = toItems(string(r))
 				passed = append(passed, runes...)
@@ -72,18 +75,24 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 	} else {
 		var openParens int
 		i := 0
-		size := 0
+		size := 1
 		var r rune
+		var dest, runes items
 		destStarted := false
 		for ; i < length; i += size {
+			size = 1
 			token := tokens[i]
 			passed = append(passed, token)
-			r, size = utf8.DecodeRune(tokens[i:])
-			destination = append(destination, []byte(string(r))...)
-			for j := 1; j < size; j++ {
-				passed = append(passed, tokens[i+j])
+			if token < utf8.RuneSelf {
+				dest = items{token}
+			} else {
+				dest = items{}
+				r, size = utf8.DecodeRune(tokens[i:])
+				runes = toItems(string(r))
+				passed = append(passed, runes...)
+				dest = append(dest, runes...)
 			}
-
+			destination = append(destination, dest...)
 			if !destStarted && !isWhitespace(token) && 0 < i {
 				destStarted = true
 				destination = destination[size:]
