@@ -75,6 +75,8 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 	}
 }
 
+var codeBlockBacktick = items{itemBacktick}
+
 func (t *Tree) parseFencedCode() (ret *Node) {
 	marker := t.context.currentLine[t.context.nextNonspace]
 	if itemBacktick != marker && itemTilde != marker {
@@ -93,7 +95,7 @@ func (t *Tree) parseFencedCode() (ret *Node) {
 
 	var info items
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
-	if itemBacktick == marker && bytes.Contains(infoTokens, []byte{itemBacktick}) {
+	if itemBacktick == marker && bytes.Contains(infoTokens, codeBlockBacktick) {
 		return nil // info 部分不能包含 `
 	}
 	info = bytes.TrimSpace(infoTokens)

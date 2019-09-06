@@ -37,6 +37,7 @@ var (
 	htmlBlockEqual       = items{itemEqual}
 	htmlBlockSinglequote = items{itemSinglequote}
 	htmlBlockDoublequote = items{itemDoublequote}
+	htmlBlockGreater     = items{itemGreater}
 )
 
 func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
@@ -60,7 +61,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 			}
 		}
 	case 4:
-		return bytes.Contains(tokens, []byte{itemGreater})
+		return bytes.Contains(tokens, htmlBlockGreater)
 	case 5:
 		for i := 0; i < length-2; i++ {
 			if itemCloseBracket == tokens[i] && itemCloseBracket == tokens[i+1] {
