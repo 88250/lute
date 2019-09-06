@@ -207,7 +207,7 @@ var blockStarts = []blockStartFunc{
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(codeBlock)
 				t.context.advanceNextNonspace()
-				t.context.advanceOffset(codeBlock.codeBlockFenceLength, false)
+				t.context.advanceOffset(codeBlock.codeBlockFenceLen, false)
 				return 2
 			}
 		}
