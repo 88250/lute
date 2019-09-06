@@ -276,9 +276,18 @@ func (r *Renderer) renderCodeBlockVditor(node *Node, entering bool) (WalkStatus,
 
 func (r *Renderer) renderEmphasisVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("em", nil, false)
+		r.vditorTag("span", -1, nil, false)
+		attrs := [][]string{{"class", "open"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.writeByte(node.strongEmDelMarker)
+		r.vditorTag("/span", -1, nil, false)
+		r.vditorTag("em", node.typ, nil, false)
 	} else {
 		r.tag("/em", nil, false)
+		attrs := [][]string{{"class", "close"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.writeByte(node.strongEmDelMarker)
+		r.vditorTag("/span", -1, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -407,7 +416,9 @@ func (r *Renderer) vditorTag(name string, typ int, attrs [][]string, selfclosing
 		if nil == attrs {
 			attrs = [][]string{}
 		}
-		attrs = append(attrs, []string{"data-id", "0"}, []string{"data-type", strconv.Itoa(typ)})
+		if -1 != typ {
+			attrs = append(attrs, []string{"data-id", "0"}, []string{"data-type", strconv.Itoa(typ)})
+		}
 		for _, attr := range attrs {
 			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
 		}

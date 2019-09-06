@@ -227,7 +227,7 @@ const (
 	NodeHTMLBlock            // HTML 块节点
 	NodeInlineHTML           // 内联 HTML节点
 	NodeCodeBlock            // 代码块节点
-	NodeText                 // 文本节点 10
+	NodeText                 // 文本节点
 	NodeEmphasis             // 强调节点
 	NodeStrong               // 加粗节点
 	NodeCodeSpan             // 代码节点
@@ -240,7 +240,7 @@ const (
 
 	NodeTaskListItemMarker // 任务列表项标记节点
 	NodeStrikethrough      // 删除线节点
-	NodeTable              // 表节点 20
+	NodeTable              // 表节点
 	NodeTableHead          // 表头节点
 	NodeTableRow           // 表行节点
 	NodeTableCell          // 表格节点
