@@ -47,8 +47,8 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 				return
 			}
 
-			passed = append(passed, token)
 			if token < utf8.RuneSelf {
+				passed = append(passed, token)
 				dest = items{token}
 			} else {
 				dest = items{}
@@ -82,8 +82,8 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		for ; i < length; i += size {
 			size = 1
 			token := tokens[i]
-			passed = append(passed, token)
 			if token < utf8.RuneSelf {
+				passed = append(passed, token)
 				dest = items{token}
 			} else {
 				dest = items{}
