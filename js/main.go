@@ -44,7 +44,7 @@ func markdown(markdownText string, options map[string]interface{}) string {
 	luteEngine := lute.New(
 		lute.GFM(gfm),
 		lute.SoftBreak2HardBreak(softBreak2HardBreak),
-		lute.CodeSyntaxHighlight(false, false, "github"),
+		lute.CodeSyntaxHighlight(false, false, false, "github"),
 		lute.AutoSpace(autoSpace),
 		lute.FixTermTypo(fixTermTypo),
 		lute.Emoji(emoji),
