@@ -163,22 +163,18 @@ func (r *Renderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, er
 }
 
 func (r *Renderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
+	if entering {
+		r.newline()
+		r.write(node.tokens)
+		r.newline()
 	}
-
-	r.newline()
-	r.write(node.tokens)
-	r.newline()
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderInlineHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
+	if entering {
+		r.write(node.tokens)
 	}
-
-	r.write(node.tokens)
 	return WalkContinue, nil
 }
 
@@ -235,12 +231,10 @@ func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatu
 }
 
 func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
-	}
-
-	if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
-		r.write(escapeHTML(node.tokens))
+	if entering {
+		if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
+			r.write(escapeHTML(node.tokens))
+		}
 	}
 	return WalkContinue, nil
 }

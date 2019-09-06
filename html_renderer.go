@@ -189,13 +189,12 @@ func (r *Renderer) renderLinkHTML(node *Node, entering bool) (WalkStatus, error)
 }
 
 func (r *Renderer) renderHTMLHTML(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
-	}
+	if entering {
+		r.newline()
+		r.write(node.tokens)
+		r.newline()
 
-	r.newline()
-	r.write(node.tokens)
-	r.newline()
+	}
 	return WalkContinue, nil
 }
 
@@ -230,11 +229,9 @@ func (r *Renderer) renderParagraphHTML(node *Node, entering bool) (WalkStatus, e
 }
 
 func (r *Renderer) renderTextHTML(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
+	if entering {
+		r.write(escapeHTML(node.tokens))
 	}
-
-	r.write(escapeHTML(node.tokens))
 	return WalkContinue, nil
 }
 
