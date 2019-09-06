@@ -294,10 +294,18 @@ func (r *Renderer) renderEmphasisVditor(node *Node, entering bool) (WalkStatus, 
 
 func (r *Renderer) renderStrongVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<strong>")
-		r.write(node.tokens)
+		r.vditorTag("span", -1, nil, false)
+		attrs := [][]string{{"class", "open"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
+		r.vditorTag("/span", -1, nil, false)
+		r.vditorTag("strong", node.typ, nil, false)
 	} else {
-		r.writeString("</strong>")
+		r.tag("/strong", nil, false)
+		attrs := [][]string{{"class", "close"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
+		r.vditorTag("/span", -1, nil, false)
 	}
 	return WalkContinue, nil
 }
