@@ -20,6 +20,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
+	{"7", "`Lute`\n", "<p data-id=\"0\" data-type=\"1\"><span><span class=\"open\">`</span><code data-id=\"0\" data-type=\"13\">Lute</code><span class=\"close\">`</span></p>\n"},
 	{"6", "**Lute**\n", "<p data-id=\"0\" data-type=\"1\"><span><span class=\"open\">**</span><strong data-id=\"0\" data-type=\"12\"><span data-id=\"0\" data-type=\"10\">Lute</span></strong><span class=\"close\">**</span></p>\n"},
 	{"5", "*Lute*\n", "<p data-id=\"0\" data-type=\"1\"><span><span class=\"open\">*</span><em data-id=\"0\" data-type=\"11\"><span data-id=\"0\" data-type=\"10\">Lute</span></em><span class=\"close\">*</span></p>\n"},
 	{"4", "* Lute\n", "<ul data-id=\"0\" data-type=\"5\">\n<li data-id=\"0\" data-type=\"6\"><span data-id=\"0\" data-type=\"10\">Lute</span></li>\n</ul>\n"},

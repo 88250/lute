@@ -242,11 +242,21 @@ func (r *Renderer) renderTextVditor(node *Node, entering bool) (WalkStatus, erro
 
 func (r *Renderer) renderCodeSpanVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<code>")
+		r.vditorTag("span", -1, nil, false)
+		attrs := [][]string{{"class", "open"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.write(items{itemBacktick})
+		r.vditorTag("/span", -1, nil, false)
+		r.vditorTag("code", node.typ, nil, false)
 		r.write(escapeHTML(node.tokens))
-		return WalkSkipChildren, nil
+	} else {
+		r.tag("/code", nil, false)
+		attrs := [][]string{{"class", "close"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.write(items{itemBacktick})
+		r.vditorTag("/span", -1, nil, false)
 	}
-	r.writeString("</code>")
+
 	return WalkContinue, nil
 }
 
