@@ -20,6 +20,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
+	{"11", "[Lute](https://github.com/b3log/lute)", "<p data-id=\"0\" data-type=\"1\"><span><span class=\"open\">[</span><a href=\"https://github.com/b3log/lute\"><span data-id=\"0\" data-type=\"10\">Lute</span></a><span class=\"close\">]</span><span class=\"open\">(</span><span>https://github.com/b3log/lute</span><span class=\"close\">)</span></span></p>\n"},
 	{"10", "Lu\nte\n", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lu</span><span data-id=\"0\" data-type=\"15\" /></span>\n<span data-id=\"0\" data-type=\"10\">te</span></p>\n"},
 	{"9", "Lu  \nte\n", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lu</span><span data-id=\"0\" data-type=\"14\"></span>\n<span data-id=\"0\" data-type=\"10\">te</span></p>\n"},
 	{"8", "Lu\\\nte\n", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lu</span><span data-id=\"0\" data-type=\"14\"></span>\n<span data-id=\"0\" data-type=\"10\">te</span></p>\n"},

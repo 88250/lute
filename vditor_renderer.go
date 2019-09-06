@@ -178,16 +178,38 @@ func (r *Renderer) renderImageVditor(node *Node, entering bool) (WalkStatus, err
 
 func (r *Renderer) renderLinkVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		attrs := [][]string{{"href", fromItems(escapeHTML(node.destination))}}
+		r.vditorTag("span", -1, nil, false)
+		attrs := [][]string{{"class", "open"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.writeByte(itemOpenBracket)
+		r.vditorTag("/span", -1, nil, false)
+
+		attrs = [][]string{{"href", fromItems(escapeHTML(node.destination))}}
 		if nil != node.title {
 			attrs = append(attrs, []string{"title", fromItems(escapeHTML(node.title))})
 		}
 		r.tag("a", attrs, false)
-
-		return WalkContinue, nil
+	} else {
+		r.tag("/a", nil, false)
+		attrs := [][]string{{"class", "close"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.writeByte(itemCloseBracket)
+		r.vditorTag("/span", -1, nil, false)
+		attrs = [][]string{{"class", "open"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.writeByte(itemOpenParen)
+		r.vditorTag("/span", -1, nil, false)
+		r.vditorTag("span", -1, nil, false)
+		r.write(node.destination)
+		r.vditorTag("/span", -1, nil, false)
+		// TODO: title
+		attrs = [][]string{{"class", "close"}}
+		r.vditorTag("span", -1, attrs, false)
+		r.writeByte(itemCloseParen)
+		r.vditorTag("/span", -1, nil, false)
+		r.vditorTag("/span", -1, nil, false)
 	}
 
-	r.tag("/a", nil, false)
 	return WalkContinue, nil
 }
 
@@ -245,7 +267,10 @@ func (r *Renderer) renderCodeSpanVditor(node *Node, entering bool) (WalkStatus, 
 		r.vditorTag("span", -1, nil, false)
 		attrs := [][]string{{"class", "open"}}
 		r.vditorTag("span", -1, attrs, false)
-		r.write(items{itemBacktick})
+		r.writeByte(itemBacktick)
+		if 1 < node.codeMarkerLen {
+			r.writeByte(itemBacktick)
+		}
 		r.vditorTag("/span", -1, nil, false)
 		r.vditorTag("code", node.typ, nil, false)
 		r.write(escapeHTML(node.tokens))
@@ -253,7 +278,10 @@ func (r *Renderer) renderCodeSpanVditor(node *Node, entering bool) (WalkStatus, 
 		r.tag("/code", nil, false)
 		attrs := [][]string{{"class", "close"}}
 		r.vditorTag("span", -1, attrs, false)
-		r.write(items{itemBacktick})
+		r.writeByte(itemBacktick)
+		if 1 < node.codeMarkerLen {
+			r.writeByte(itemBacktick)
+		}
 		r.vditorTag("/span", -1, nil, false)
 	}
 
