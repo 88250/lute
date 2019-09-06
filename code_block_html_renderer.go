@@ -33,71 +33,23 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 		tokens := node.tokens
 		if nil != node.codeBlockInfo {
 			infoWords := bytes.Split(node.codeBlockInfo, []byte(" "))
-			language := infoWords[0]
-			r.writeString("<pre><code class=\"language-")
-			r.write(language)
-			r.writeString("\">")
+			language := string(infoWords[0])
 			rendered := false
-			if r.option.CodeSyntaxHighlight && !noHighlight(fromItems(language)) {
-				codeBlock := fromItems(tokens)
-				var lexer chroma.Lexer
-				if nil != language {
-					lexer = chromalexers.Get(string(language))
-				} else {
-					lexer = chromalexers.Analyse(codeBlock)
-				}
-				if nil == lexer {
-					lexer = chromalexers.Fallback
-				}
-				iterator, err := lexer.Tokenise(nil, codeBlock)
-				if nil == err {
-					formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.ClassPrefix("highlight-"))
-					if !r.option.CodeSyntaxHighlightInlineStyle {
-						chromahtml.WithClasses()(formatter)
-					}
-					if r.option.CodeSyntaxHighlightLineNum {
-						chromahtml.WithLineNumbers()(formatter)
-					}
-					var b bytes.Buffer
-					if err = formatter.Format(&b, styles.Get(r.option.CodeSyntaxHighlightStyleName), iterator); nil == err {
-						r.write(b.Bytes())
-						rendered = true
-					}
-				}
+			if r.option.CodeSyntaxHighlight && !noHighlight(language) {
+				rendered = highlightChroma(tokens, language, r)
 			}
 
 			if !rendered {
+				r.writeString("<pre><code class=\"language-")
+				r.writeString(language)
+				r.writeString("\">")
 				tokens = escapeHTML(tokens)
 				r.write(tokens)
 			}
 		} else {
 			rendered := false
 			if r.option.CodeSyntaxHighlight {
-				language := "fallback"
-				codeBlock := fromItems(tokens)
-				var lexer = chromalexers.Analyse(codeBlock)
-				if nil == lexer {
-					lexer = chromalexers.Fallback
-				}
-				language = lexer.Config().Name
-				r.writeString("<pre><code class=\"language-" + language + "\">")
-
-				iterator, err := lexer.Tokenise(nil, codeBlock)
-				if nil == err {
-					formatter := chromahtml.New(chromahtml.PreventSurroundingPre(), chromahtml.ClassPrefix("highlight-"))
-					if !r.option.CodeSyntaxHighlightInlineStyle {
-						chromahtml.WithClasses()(formatter)
-					}
-					if r.option.CodeSyntaxHighlightLineNum {
-						chromahtml.WithLineNumbers()(formatter)
-					}
-					var b bytes.Buffer
-					if err = formatter.Format(&b, styles.Get(r.option.CodeSyntaxHighlightStyleName), iterator); nil == err {
-						r.write(b.Bytes())
-						rendered = true
-					}
-				}
-
+				rendered = highlightChroma(tokens, "", r)
 				if !rendered {
 					tokens = escapeHTML(tokens)
 					r.write(tokens)
@@ -113,6 +65,51 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 	r.writeString("</code></pre>")
 	r.newline()
 	return WalkContinue, nil
+}
+
+func highlightChroma(tokens items, language string, r *Renderer) (rendered bool) {
+	codeBlock := fromItems(tokens)
+	var lexer chroma.Lexer
+	if "" != language {
+		lexer = chromalexers.Get(language)
+	} else {
+		lexer = chromalexers.Analyse(codeBlock)
+	}
+	if nil == lexer {
+		lexer = chromalexers.Fallback
+		language = lexer.Config().Name
+	}
+	lexer = chroma.Coalesce(lexer)
+	iterator, err := lexer.Tokenise(nil, codeBlock)
+	if nil == err {
+		chromahtmlOpts := []chromahtml.Option{
+			chromahtml.PreventSurroundingPre(),
+			chromahtml.ClassPrefix("highlight-"),
+		}
+		if !r.option.CodeSyntaxHighlightInlineStyle {
+			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithClasses())
+		}
+		if r.option.CodeSyntaxHighlightLineNum {
+			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithLineNumbers())
+		}
+		formatter := chromahtml.New(chromahtmlOpts...)
+		style := styles.Get(r.option.CodeSyntaxHighlightStyleName)
+		var b bytes.Buffer
+		if err = formatter.Format(&b, style, iterator); nil == err {
+			if !r.option.CodeSyntaxHighlightInlineStyle {
+				r.writeString("<pre class=\"highlight-chroma")
+			} else {
+				r.writeString("<pre style=\"" + chromahtml.StyleEntryToCSS(style.Get(chroma.Background)))
+			}
+			r.writeString("\">")
+			r.writeString("<code class=\"language-")
+			r.writeString(language)
+			r.writeString("\">")
+			r.write(b.Bytes())
+			rendered = true
+		}
+	}
+	return
 }
 
 func noHighlight(language string) bool {

@@ -20,7 +20,7 @@ import (
 
 var codeSyntaxHighlightLineNumTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java\"><span class=\"highlight-ln\">1</span><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre class=\"highlight-chroma\"><code class=\"language-java\"><span class=\"highlight-ln\">1</span><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightLineNum(t *testing.T) {
@@ -40,7 +40,7 @@ func TestCodeSyntaxHighlightLineNum(t *testing.T) {
 
 var codeSyntaxHighlightTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre class=\"highlight-chroma\"><code class=\"language-java\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlight(t *testing.T) {
@@ -60,7 +60,7 @@ func TestCodeSyntaxHighlight(t *testing.T) {
 
 var codeSyntaxHighlightInlineTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java\"><span style=\"color:#8be9fd\">int</span> <span style=\"color:#50fa7b\">i</span>;\n</code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre style=\"color: #f8f8f2; background-color: #282a36\"><code class=\"language-java\"><span style=\"color:#8be9fd\">int</span> <span style=\"color:#50fa7b\">i</span>;\n</code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightInline(t *testing.T) {
@@ -80,11 +80,11 @@ func TestCodeSyntaxHighlightInline(t *testing.T) {
 
 var codeSyntaxHighlightStyleTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java\"><span style=\"color:#458;font-weight:bold\">int</span> <span style=\"color:#900;font-weight:bold\">i</span>;\n</code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre class=\"highlight-chroma\"><code class=\"language-java\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightStyle(t *testing.T) {
-	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, true, false, "github"))
+	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, false, false, "monokai"))
 
 	for _, test := range codeSyntaxHighlightStyleTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
