@@ -192,13 +192,11 @@ func (r *Renderer) renderLinkVditor(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *Renderer) renderHTMLVditor(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		return WalkContinue, nil
+	if entering {
+		r.newline()
+		r.write(node.tokens)
+		r.newline()
 	}
-
-	r.newline()
-	r.write(node.tokens)
-	r.newline()
 	return WalkContinue, nil
 }
 
