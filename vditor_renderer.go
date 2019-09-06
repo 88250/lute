@@ -328,9 +328,9 @@ func (r *Renderer) renderListVditor(node *Node, entering bool) (WalkStatus, erro
 		r.newline()
 		attrs := [][]string{{"start", strconv.Itoa(node.start)}}
 		if nil == node.bulletChar && 1 != node.start {
-			r.tag(tag, attrs, false)
+			r.vditorTag(tag, node.typ, attrs, false)
 		} else {
-			r.tag(tag, nil, false)
+			r.vditorTag(tag, node.typ, nil, false)
 		}
 		r.newline()
 	} else {
