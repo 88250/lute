@@ -398,27 +398,25 @@ func (r *Renderer) renderThematicBreakVditor(node *Node, entering bool) (WalkSta
 		r.vditorTag("hr", node.typ, nil, true)
 		r.newline()
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
 
 func (r *Renderer) renderHardBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("br", nil, true)
+		r.vditorTag("span", node.typ, nil, false)
+		r.vditorTag("/span", node.typ, nil, false)
 		r.newline()
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
 
 func (r *Renderer) renderSoftBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if r.option.SoftBreak2HardBreak {
-			r.tag("br", nil, true)
-			r.newline()
-		} else {
-			r.newline()
-		}
+		r.vditorTag("span", node.typ, nil, true)
+		r.vditorTag("/span", node.typ, nil, false)
+		r.newline()
 	}
-	return WalkContinue, nil
+	return WalkSkipChildren, nil
 }
 
 func (r *Renderer) vditorTag(name string, typ int, attrs [][]string, selfclosing bool) {
