@@ -26,10 +26,13 @@ var (
 	TaskListItemClass = "vditor-task"
 
 	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
-	validAutoLinkDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"), []byte("cn"), []byte("io")}
+	validAutoLinkDomainSuffix = []items{items("top"), items("com"), items("net"), items("org"), items("edu"), items("gov"),
+		items("cn"), items("io"), items("me"), items("biz"), items("co"), items("live"), items("pro"), items("xyz"),
+		items("win"), items("club"), items("tv"), items("wiki"), items("site"), items("tech"), items("space"), items("cc"),
+		items("name"), items("social"), items("band"), items("pub"), items("info")}
 
 	// invalidAutoLinkDomain 指定了 GFM 自动链接解析时跳过的域名。
-	invalidAutoLinkDomain [][]byte
+	invalidAutoLinkDomain []items
 )
 
 // New 创建一个新的 Lute 引擎，默认启用：

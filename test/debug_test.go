@@ -20,9 +20,12 @@ import (
 
 var debugTests = []parseTest{
 
+	{"31", "https://t.mex .mex 后缀不自动链接", "<p>https://t.mex .mex 后缀不自动链接</p>\n"},
+	{"30", "https://t.me .me 后缀自动链接", "<p><a href=\"https://t.me\">https://t.me</a> .me 后缀自动链接</p>\n"},
+
 	// 链接解析问题 https://github.com/b3log/lute/issues/20
-	{"28", "[新建.zip](/路)foo", "<p><a href=\"/%E8%B7%AF\">新建.zip</a>foo</p>\n"},
-	{"29", "[新建.zip](http://bar.com/文件.zip)[新建.zip](http://bar.com/文件.zip)", "<p><a href=\"http://bar.com/%E6%96%87%E4%BB%B6.zip\">新建.zip</a><a href=\"http://bar.com/%E6%96%87%E4%BB%B6.zip\">新建.zip</a></p>\n"},
+	{"29", "[新建.zip](/路)foo", "<p><a href=\"/%E8%B7%AF\">新建.zip</a>foo</p>\n"},
+	{"28", "[新建.zip](http://bar.com/文件.zip)[新建.zip](http://bar.com/文件.zip)", "<p><a href=\"http://bar.com/%E6%96%87%E4%BB%B6.zip\">新建.zip</a><a href=\"http://bar.com/%E6%96%87%E4%BB%B6.zip\">新建.zip</a></p>\n"},
 
 	{"27", "[]( https://b3log.org )", "<p><a href=\"https://b3log.org\"></a></p>\n"},
 	{"26", "[](https://b3log.org)", "<p><a href=\"https://b3log.org\"></a></p>\n"},
