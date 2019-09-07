@@ -20,6 +20,7 @@ import (
 
 var termTypoTests = []parseTest{
 
+	{"4", "cookie ie ieo\n", "<p>cookie IE ieo</p>\n"},
 	{"3", "github.com\n", "<p>github.com</p>\n"},
 	{"2", "https://github.com\n", "<p><a href=\"https://github.com\">https://github.com</a></p>\n"},
 	{"1", "特别是简历中千万不要出现这样的情况：熟练使用JAVA、Javascript、GIT，对android、ios开发有一定了解，熟练使用Mysql、postgresql数据库。\n", "<p>特别是简历中千万不要出现这样的情况：熟练使用 Java、JavaScript、Git，对 Android、iOS 开发有一定了解，熟练使用 MySQL、PostgreSQL 数据库。</p>\n"},

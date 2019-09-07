@@ -39,24 +39,28 @@ func fixTermTypo0(tokens items) items {
 	length := len(tokens)
 	var token byte
 	var i, j, k, l int
-	var afterIsDot bool
+	var before, after byte
 	var originalTerm items
 	for ; i < length; i++ {
 		token = tokens[i]
 		if isNotTerm(token) {
 			continue
 		}
-		for j = i; j < length; j++ {
-			token = tokens[j]
-			if itemDot == token {
-				afterIsDot = true
-				break;
+		if 1 < i {
+			before = tokens[i-1]
+			if !isNotTerm(before) {
+				// 前一个字节必须是非术语，否则无法分隔
+				continue
 			}
-			if isNotTerm(token) {
+		}
+
+		for j = i; j < length; j++ {
+			after = tokens[j]
+			if isNotTerm(after) || itemDot == after {
 				break
 			}
 		}
-		if afterIsDot {
+		if itemDot == after {
 			// 术语后面如果是 . 则不进行修正，因为可能是链接
 			// 比如 github.com 虽然不能识别为自动链接，但是也不能进行修正
 			continue
@@ -103,7 +107,6 @@ var terms = map[string]string{
 	"puppet":        "Puppet",
 	"vagrant":       "Vagrant",
 	"chef":          "Chef",
-	"nodejs":        "Node.js",
 	"npm":           "NPM",
 	"beego":         "Beego",
 	"gin":           "Gin",
@@ -127,8 +130,6 @@ var terms = map[string]string{
 	"javascript":    "JavaScript",
 	"java":          "Java",
 	"jsp":           "JSP",
-	"asp.net":       "ASP.NET",
-	".net":          ".NET",
 	"restful":       "RESTFul",
 	"orm":           "ORM",
 	"oauth":         "OAuth",
