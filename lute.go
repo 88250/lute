@@ -17,11 +17,6 @@ type Lute struct {
 	options
 }
 
-var (
-
-
-)
-
 // New 创建一个新的 Lute 引擎，默认启用：
 //  * GFM 支持
 //  * 代码块语法高亮
