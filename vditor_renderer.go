@@ -293,7 +293,7 @@ func (r *Renderer) renderCodeBlockVditor(node *Node, entering bool) (WalkStatus,
 		r.newline()
 		tokens := node.tokens
 		if 0 < len(node.codeBlockInfo) {
-			infoWords := bytes.Split(node.codeBlockInfo, []byte(" "))
+			infoWords := bytes.Split(node.codeBlockInfo, items(" "))
 			language := infoWords[0]
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)

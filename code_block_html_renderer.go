@@ -32,7 +32,7 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 		r.newline()
 		tokens := node.tokens
 		if nil != node.codeBlockInfo {
-			infoWords := bytes.Split(node.codeBlockInfo, []byte(" "))
+			infoWords := bytes.Split(node.codeBlockInfo, items(" "))
 			language := string(infoWords[0])
 			rendered := false
 			if r.option.CodeSyntaxHighlight && !noHighlight(language) {
