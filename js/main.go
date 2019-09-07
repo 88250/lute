@@ -46,7 +46,7 @@ func New(options map[string]interface{}) *js.Object {
 }
 
 func main() {
-	js.Global.Set("lute", make(map[string]interface{}))
-	l := js.Global.Get("lute")
-	l.Set("new", New)
+	js.Global.Set("Lute", make(map[string]interface{}))
+	l := js.Global.Get("Lute")
+	l.Set("New", New)
 }
