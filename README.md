@@ -264,18 +264,18 @@ Markdown 原文：
 6. 基准测试数据 [*CommonMark Spec*](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
 
 ```text
-BenchmarkLute-2                      200           5953911 ns/op         5031793 B/op      23607 allocs/op
-BenchmarkLute-4                      300           4594874 ns/op         5025256 B/op      23597 allocs/op
-BenchmarkLute-8                      300           4272013 ns/op         5025863 B/op      23599 allocs/op
-BenchmarkGolangCommonMark-2          300           4817006 ns/op         2914575 B/op      18422 allocs/op
-BenchmarkGolangCommonMark-4          300           4737246 ns/op         2920761 B/op      18424 allocs/op
-BenchmarkGolangCommonMark-8          300           4714165 ns/op         2921442 B/op      18423 allocs/op
-BenchmarkGoldMark-2                  200           5993989 ns/op         2310577 B/op      15367 allocs/op
-BenchmarkGoldMark-4                  300           5857768 ns/op         2312875 B/op      15367 allocs/op
-BenchmarkGoldMark-8                  300           5884382 ns/op         2312396 B/op      15367 allocs/op
-BenchmarkBlackFriday-2               300           3999293 ns/op         3295267 B/op      20046 allocs/op
-BenchmarkBlackFriday-4               500           3753950 ns/op         3303472 B/op      20048 allocs/op
-BenchmarkBlackFriday-8               500           3732016 ns/op         3302915 B/op      20048 allocs/op
+BenchmarkLute-2                      200           6078735 ns/op         5356144 B/op      24761 allocs/op
+BenchmarkLute-4                      300           4597634 ns/op         5349340 B/op      24755 allocs/op
+BenchmarkLute-8                      300           4351571 ns/op         5347613 B/op      24729 allocs/op
+BenchmarkGolangCommonMark-2          300           4913517 ns/op         2916179 B/op      18422 allocs/op
+BenchmarkGolangCommonMark-4          300           4820437 ns/op         2924956 B/op      18424 allocs/op
+BenchmarkGolangCommonMark-8          300           4830516 ns/op         2928402 B/op      18425 allocs/op
+BenchmarkGoldMark-2                  200           5978834 ns/op         2310616 B/op      15367 allocs/op
+BenchmarkGoldMark-4                  300           5827833 ns/op         2312460 B/op      15368 allocs/op
+BenchmarkGoldMark-8                  300           5857754 ns/op         2313601 B/op      15368 allocs/op
+BenchmarkBlackFriday-2               500           3969380 ns/op         3297519 B/op      20046 allocs/op
+BenchmarkBlackFriday-4               500           3747971 ns/op         3305187 B/op      20048 allocs/op
+BenchmarkBlackFriday-8               500           3779957 ns/op         3315026 B/op      20049 allocs/op
 ```
 
 另外，JavaScript 写的 [markdown-it](https://github.com/markdown-it/markdown-it) 循环渲染 300 次，平均每次调用耗时 ~10ms，耗时大致是 golang 实现的两倍，测试代码[见此](https://github.com/b3log/markdown-http/blob/master/benchmark/test.js)。
