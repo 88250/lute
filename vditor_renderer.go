@@ -396,8 +396,8 @@ func (r *Renderer) renderListVditor(node *Node, entering bool) (WalkStatus, erro
 
 func (r *Renderer) renderListItemVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if 3 == node.listData.typ && "" != TaskListItemClass {
-			r.vditorTag("li", node.typ, [][]string{{"class", TaskListItemClass}}, false)
+		if 3 == node.listData.typ && "" != taskListItemClass {
+			r.vditorTag("li", node.typ, [][]string{{"class", taskListItemClass}}, false)
 		} else {
 			r.vditorTag("li", node.typ, nil, false)
 		}

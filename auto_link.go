@@ -155,6 +155,12 @@ var (
 	httpProto  = toItems("http://")
 	httpsProto = toItems("https://")
 	ftpProto   = toItems("ftp://")
+
+	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
+	validAutoLinkDomainSuffix = []items{items("top"), items("com"), items("net"), items("org"), items("edu"), items("gov"),
+		items("cn"), items("io"), items("me"), items("biz"), items("co"), items("live"), items("pro"), items("xyz"),
+		items("win"), items("club"), items("tv"), items("wiki"), items("site"), items("tech"), items("space"), items("cc"),
+		items("name"), items("social"), items("band"), items("pub"), items("info")}
 )
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
@@ -341,6 +347,9 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	node.Unlink()
 	return
 }
+
+// invalidAutoLinkDomain 指定了 GFM 自动链接解析时跳过的域名。
+var invalidAutoLinkDomain []items
 
 // isValidDomain 校验 GFM 规范自动链接规则中定义的合法域名。
 // https://github.github.com/gfm/#valid-domain
