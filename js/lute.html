@@ -7,15 +7,29 @@
 <body>
 <script src="lute.min.js"></script>
 <script>
+    let luteEngine = lute.new();
+
     function onMarkdown(it) {
-        document.getElementById('output').innerHTML = lute.markdown(it.value);
+        let result = luteEngine.MarkdownStr("", it.value);
+        let error = result[1];
+        if (error) {
+            document.getElementById('output').innerHTML = error;
+        } else {
+            document.getElementById('output').innerHTML = result[0];
+        }
     }
 </script>
 
 <textarea id="input" rows="10" cols="150" oninput="onMarkdown(this)">**Lute** - A structured markdown engine.</textarea>
 <div id="output"></div>
 <script>
-    document.getElementById('output').innerHTML = lute.markdown(document.getElementById('input').value);
+    let result = luteEngine.MarkdownStr("", document.getElementById('input').value);
+    let error = result[1];
+    if (error) {
+        document.getElementById('output').innerHTML = error;
+    } else {
+        document.getElementById('output').innerHTML = result[0];
+    }
 </script>
 </body>
 </html>
