@@ -18,8 +18,8 @@ import (
 )
 
 // newFormatRenderer 创建一个格式化渲染器。
-func (lute *Lute) newFormatRenderer() (ret *Renderer) {
-	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options}
+func (lute *Lute) newFormatRenderer(treeRoot *Node) (ret *Renderer) {
+	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}
 
 	// 注册 CommonMark 渲染函数
 
@@ -113,7 +113,10 @@ func (r *Renderer) renderTableHeadMarkdown(node *Node, entering bool) (WalkStatu
 
 func (r *Renderer) renderTableMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
-		r.writeByte('\n')
+		r.newline()
+		if !isLastNode(r.treeRoot, node) {
+			r.writeByte(itemNewline)
+		}
 	}
 	return WalkContinue, nil
 }
@@ -179,18 +182,19 @@ func (r *Renderer) renderInlineHTMLMarkdown(node *Node, entering bool) (WalkStat
 }
 
 func (r *Renderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus, error) {
+	if !entering {
+		r.writeByte(itemNewline)
+	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	listPadding := 0
-	inList := false
 	inTightList := false
 	lastListItemLastPara := false
 	if parent := node.parent; nil != parent {
 		if NodeListItem == parent.typ { // ListItem.Paragraph
 			listItem := parent
-			inList = true
 
 			// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
 			// 设置紧凑标识的具体实现可参考函数 List.Finalize()
@@ -219,15 +223,30 @@ func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatu
 		r.write(bytes.Repeat(items{itemSpace}, listPadding))
 	} else {
 		r.newline()
-		if !inList {
-			r.writeByte('\n')
-		} else {
-			if !inTightList || lastListItemLastPara {
-				r.writeByte('\n')
-			}
+		isLastNode := isLastNode(r.treeRoot, node)
+		if !isLastNode && (!inTightList || (lastListItemLastPara && 2 > r.listLevel)) {
+			r.writeByte(itemNewline)
 		}
 	}
 	return WalkContinue, nil
+}
+
+func isLastNode(treeRoot, node *Node) bool {
+	if treeRoot == node {
+		return true
+	}
+
+	if NodeDocument == node.parent.typ {
+		return treeRoot.lastChild == node
+	}
+
+	var n *Node
+	for n = node.parent; ; n = n.parent {
+		if NodeDocument == n.parent.typ {
+			break
+		}
+	}
+	return treeRoot.lastChild == n
 }
 
 func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, error) {
@@ -278,7 +297,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 		}
 		r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
 		r.write(node.codeBlockInfo)
-		r.writeByte('\n')
+		r.writeByte(itemNewline)
 		if 0 < listPadding {
 			lines := bytes.Split(node.tokens, items{itemNewline})
 			length := len(lines)
@@ -286,7 +305,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 				r.write(bytes.Repeat(items{itemSpace}, listPadding))
 				r.write(line)
 				if i < length-1 {
-					r.writeByte('\n')
+					r.writeByte(itemNewline)
 				}
 			}
 		} else {
@@ -296,7 +315,10 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 	}
 
 	r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
-	r.writeString("\n\n")
+	r.newline()
+	if !isLastNode(r.treeRoot, node) {
+		r.writeByte(itemNewline)
+	}
 	return WalkContinue, nil
 }
 
@@ -341,11 +363,10 @@ func (r *Renderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus,
 
 func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		r.newline()
 		r.listLevel++
 	} else {
-		if node.tight {
-			r.newline()
-		}
+		r.newline()
 		r.listLevel--
 	}
 	return WalkContinue, nil
@@ -387,7 +408,8 @@ func (r *Renderer) renderTaskListItemMarkerMarkdown(node *Node, entering bool) (
 func (r *Renderer) renderThematicBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.writeString("---\n\n")
+		r.writeString("---")
+		r.newline()
 	}
 	return WalkSkipChildren, nil
 }
@@ -397,7 +419,7 @@ func (r *Renderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatu
 		if !r.option.SoftBreak2HardBreak {
 			r.writeString("\\\n")
 		} else {
-			r.writeString("\n")
+			r.writeByte(itemNewline)
 		}
 	}
 	return WalkSkipChildren, nil

@@ -26,6 +26,9 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
+	// 子列表格式化后缩进不对 https://github.com/b3log/lute/issues/22
+	{"27", "* first\n   * sub first\n* second\n  *  sub second\n", "* first\n  * sub first\n* second\n  * sub second\n\n"},
+	{"26", "* first\n  * sub first\n* second\n  * sub second\n", "* first\n  * sub first\n* second\n  * sub second\n\n"},
 
 	{"25", "`` `Lute` ``\n", "`` `Lute` ``\n\n"},
 

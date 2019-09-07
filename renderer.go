@@ -28,16 +28,19 @@ type Renderer struct {
 	rendererFuncs map[int]RendererFunc // 渲染器
 	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 	option        *options             // 解析渲染选项
+	treeRoot      *Node                // 待渲染的树的根节点
 
 	listLevel int // 列表级别，用于记录嵌套列表深度
 }
 
 // render 从指定的根节点 root 开始遍历并渲染。
-func (r *Renderer) render(root *Node) error {
+func (r *Renderer) render()  (output []byte, err error) {
+	defer recoverPanic(&err)
+
 	r.lastOut = itemNewline
 	r.writer.Grow(4096)
 
-	return Walk(root, func(n *Node, entering bool) (WalkStatus, error) {
+	err = Walk(r.treeRoot, func(n *Node, entering bool) (WalkStatus, error) {
 		f := r.rendererFuncs[n.typ]
 		if nil == f {
 			return WalkStop, errors.New("not found render function for node [type=" + strconv.Itoa(n.typ) + ", tokens=" + string(n.tokens) + "]")
@@ -45,6 +48,12 @@ func (r *Renderer) render(root *Node) error {
 
 		return f(n, entering)
 	})
+	if nil != err {
+		return
+	}
+
+	output = r.writer.Bytes()
+	return
 }
 
 // writeByte 输出一个字节 c。

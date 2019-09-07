@@ -20,8 +20,8 @@ import (
 )
 
 // newVditorRenderer 创建一个 Vditor DOM 渲染器。
-func newVditorRenderer(option *options) (ret *Renderer) {
-	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: option}
+func (lute *Lute) newVditorRenderer(treeRoot *Node) (ret *Renderer) {
+	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}
 
 	// 注册 CommonMark 渲染函数
 

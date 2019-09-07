@@ -60,8 +60,8 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 		return
 	}
 
-	renderer := lute.newHTMLRenderer()
-	html, err = tree.render(renderer)
+	renderer := lute.newHTMLRenderer(tree.Root)
+	html, err = renderer.render()
 	return
 }
 
@@ -85,8 +85,8 @@ func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err er
 		return
 	}
 
-	renderer := lute.newFormatRenderer()
-	formatted, err = tree.render(renderer)
+	renderer := lute.newFormatRenderer(tree.Root)
+	formatted, err = renderer.render()
 	return
 }
 
@@ -130,9 +130,9 @@ func (lute *Lute) RenderVditorDOM(nodeDataId int, markdownText string) (html str
 		return
 	}
 
-	renderer := newVditorRenderer(lute.options)
+	renderer := lute.newVditorRenderer(tree.Root)
 	var output items
-	output, err = tree.render(renderer)
+	output, err = renderer.render()
 	html = string(output)
 	return
 }
