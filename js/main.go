@@ -49,6 +49,7 @@ func markdown(markdownText string, options map[string]interface{}) string {
 		lute.FixTermTypo(fixTermTypo),
 		lute.Emoji(emoji),
 	)
+
 	html, err := luteEngine.MarkdownStr("", markdownText)
 	if nil != err {
 		return err.Error()
@@ -65,19 +66,36 @@ func format(markdownText string) string {
 	return formatted
 }
 
-func getEmojis(imgStaticPath string) map[string]string {
-	return lute.GetEmojis(imgStaticPath)
-}
-
-func putEmoji(alias, value string) {
-	lute.PutEmoji(alias, value)
+func New(options map[string]interface{}) *js.Object {
+	luteEngine := lute.New()
+	if 0 < len(options) {
+		if v, ok := options["gfm"]; ok {
+			lute.GFM(v.(bool))(luteEngine)
+		}
+		if v, ok := options["softBreak2HardBreak"]; ok {
+			luteEngine.SoftBreak2HardBreak = v.(bool)
+		}
+		if v, ok := options["autoSpace"]; ok {
+			luteEngine.AutoSpace = v.(bool)
+		}
+		if v, ok := options["fixTermTypo"]; ok {
+			luteEngine.FixTermTypo = v.(bool)
+		}
+		if v, ok := options["emoji"]; ok {
+			luteEngine.Emoji = v.(bool)
+		}
+		if v, ok := options["emojis"]; ok {
+			luteEngine.PutEmojis(v.(map[string]string))
+		}
+		if v, ok := options["emojiSite"]; ok {
+			luteEngine.EmojiSite = v.(string)
+		}
+	}
+	return js.MakeWrapper(luteEngine)
 }
 
 func main() {
 	js.Global.Set("lute", make(map[string]interface{}))
-	lute := js.Global.Get("lute")
-	lute.Set("markdown", markdown)
-	lute.Set("format", format)
-	lute.Set("getEmojis", getEmojis)
-	lute.Set("putEmoji", putEmoji)
+	l := js.Global.Get("lute")
+	l.Set("new", New)
 }

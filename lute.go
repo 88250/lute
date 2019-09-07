@@ -32,12 +32,20 @@ var TaskListItemClass = "vditor-task"
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 func New(opts ...option) (ret *Lute) {
 	ret = &Lute{}
-	GFM(true)(ret)
-	SoftBreak2HardBreak(true)(ret)
-	CodeSyntaxHighlight(true, false, false, "github")(ret)
-	AutoSpace(true)(ret)
-	FixTermTypo(true)(ret)
-	Emoji(true)(ret)
+	ret.GFMTable = true
+	ret.GFMTaskListItem = true
+	ret.GFMStrikethrough = true
+	ret.GFMAutoLink = true
+	ret.SoftBreak2HardBreak = true
+	ret.CodeSyntaxHighlight = true
+	ret.CodeSyntaxHighlightInlineStyle = false
+	ret.CodeSyntaxHighlightLineNum = false
+	ret.CodeSyntaxHighlightStyleName = "github"
+	ret.AutoSpace = true
+	ret.FixTermTypo = true
+	ret.Emoji = true
+	ret.Emojis = newEmojis()
+	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/"
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -95,10 +103,10 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 }
 
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的映射列表。由于有的 Emoji 是图片形式，可传入 imgStaticPath 指定图片路径前缀。
-func GetEmojis(imgStaticPath string) (ret map[string]string) {
-	ret = make(map[string]string, len(emojis))
+func (lute *Lute) GetEmojis(imgStaticPath string) (ret map[string]string) {
+	ret = make(map[string]string, len(lute.Emojis))
 	placeholder := fromItems(emojiSitePlaceholder)
-	for k, v := range emojis {
+	for k, v := range lute.Emojis {
 		if strings.Contains(v, placeholder) {
 			v = strings.ReplaceAll(v, placeholder, imgStaticPath)
 		}
@@ -107,9 +115,11 @@ func GetEmojis(imgStaticPath string) (ret map[string]string) {
 	return
 }
 
-// PutEmoji 用于添加或者覆盖 Emoji 别名和对应 Unicode 字符的映射。
-func PutEmoji(alias, value string) {
-	emojis[alias] = value
+// PutEmojis 将指定的 emojiMap 合并覆盖到已有的 Emoji 映射。
+func (lute *Lute) PutEmojis(emojiMap map[string]string) {
+	for k, v := range emojiMap {
+		lute.Emojis[k] = v
+	}
 }
 
 // RenderVditorDOM 用于渲染 Vditor DOM。
@@ -209,6 +219,19 @@ func Emoji(b bool) option {
 	}
 }
 
+func Emojis(emojis map[string]string) option {
+	return func(lute *Lute) {
+		lute.PutEmojis(emojis)
+	}
+}
+
+// EmojiSite 设置图片 Emoji URL 的路径前缀。
+func EmojiSite(emojiSite string) option {
+	return func(lute *Lute) {
+		lute.EmojiSite = emojiSite
+	}
+}
+
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	GFMTable                       bool
@@ -223,6 +246,8 @@ type options struct {
 	AutoSpace                      bool
 	FixTermTypo                    bool
 	Emoji                          bool
+	Emojis                         map[string]string
+	EmojiSite                      string
 }
 
 // option 描述了解析渲染选项设置函数签名。

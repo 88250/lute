@@ -10,7 +10,7 @@ func (t *Tree) emoji(node *Node) {
 		next := child.next
 		if NodeText == child.typ && nil != child.parent &&
 			NodeLink != child.parent.typ /* 不处理链接 label */ {
-			emoji0(child)
+			t.emoji0(child)
 		} else {
 			t.emoji(child) // 递归处理子节点
 		}
@@ -20,10 +20,7 @@ func (t *Tree) emoji(node *Node) {
 
 var emojiSitePlaceholder = toItems("${imgStaticPath}")
 
-// emojiSite 为图片 Emoji URL 的路径前缀。
-var emojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/"
-
-func emoji0(node *Node) {
+func (t *Tree) emoji0(node *Node) {
 	tokens := node.tokens
 	node.tokens = items{} // 先清空，后面逐个添加或者添加 tokens 或者 Emoji 兄弟节点
 	length := len(tokens)
@@ -68,11 +65,11 @@ func emoji0(node *Node) {
 			continue
 		}
 
-		if emoji, ok := emojis[fromItems(maybeEmoji)]; ok {
+		if emoji, ok := t.context.option.Emojis[fromItems(maybeEmoji)]; ok {
 			emojiNode := &Node{typ: NodeEmojiUnicode}
 			if bytes.Contains(items(emoji), emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
 				alias := fromItems(maybeEmoji)
-				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + emojiSite + alias
+				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + t.context.option.EmojiSite + alias
 				suffix := ".png"
 				if "huaji" == alias {
 					suffix = ".gif"
