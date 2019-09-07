@@ -11,12 +11,8 @@
 
     function onMarkdown(it) {
         let result = luteEngine.MarkdownStr("", it.value);
-        let error = result[1];
-        if (error) {
-            document.getElementById('output').innerHTML = error;
-        } else {
-            document.getElementById('output').innerHTML = result[0];
-        }
+        let output = result[1] ? result[1] : result[0];
+        document.getElementById('output').innerHTML = output;
     }
 </script>
 
@@ -24,12 +20,8 @@
 <div id="output"></div>
 <script>
     let result = luteEngine.MarkdownStr("", document.getElementById('input').value);
-    let error = result[1];
-    if (error) {
-        document.getElementById('output').innerHTML = error;
-    } else {
-        document.getElementById('output').innerHTML = result[0];
-    }
+    let output = result[1] ? result[1] : result[0];
+    document.getElementById('output').innerHTML = output;
 </script>
 </body>
 </html>
