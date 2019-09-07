@@ -12,10 +12,16 @@
 
 package lute
 
+import "strings"
+
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
 	options
 }
+
+// taskListItemClass 作为 GFM 任务列表项类名。
+// GFM 任务列表 li 加 class="vditor-task"，https://github.com/b3log/lute/issues/10
+var TaskListItemClass = "vditor-task"
 
 // New 创建一个新的 Lute 引擎，默认启用：
 //  * GFM 支持
@@ -89,8 +95,21 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 }
 
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的映射列表。由于有的 Emoji 是图片形式，可传入 imgStaticPath 指定图片路径前缀。
-func (lute *Lute) GetEmojis(imgStaticPath string) map[string]string {
-	return getEmojis(imgStaticPath)
+func GetEmojis(imgStaticPath string) (ret map[string]string) {
+	ret = make(map[string]string, len(emojis))
+	placeholder := fromItems(emojiSitePlaceholder)
+	for k, v := range emojis {
+		if strings.Contains(v, placeholder) {
+			v = strings.ReplaceAll(v, placeholder, imgStaticPath)
+		}
+		ret[k] = v
+	}
+	return
+}
+
+// PutEmoji 用于添加或者覆盖 Emoji 别名和对应 Unicode 字符的映射。
+func PutEmoji(alias, value string) {
+	emojis[alias] = value
 }
 
 // RenderVditorDOM 用于渲染 Vditor DOM。

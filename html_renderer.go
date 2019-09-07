@@ -310,14 +310,10 @@ func (r *Renderer) renderListHTML(node *Node, entering bool) (WalkStatus, error)
 	return WalkContinue, nil
 }
 
-// taskListItemClass 作为 GFM 任务列表项类名。
-// GFM 任务列表 li 加 class="vditor-task"，https://github.com/b3log/lute/issues/10
-var taskListItemClass = "vditor-task"
-
 func (r *Renderer) renderListItemHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if 3 == node.listData.typ && "" != taskListItemClass {
-			r.tag("li", [][]string{{"class", taskListItemClass}}, false)
+		if 3 == node.listData.typ && "" != TaskListItemClass {
+			r.tag("li", [][]string{{"class", TaskListItemClass}}, false)
 		} else {
 			r.tag("li", nil, false)
 		}

@@ -66,13 +66,18 @@ func format(markdownText string) string {
 }
 
 func getEmojis(imgStaticPath string) map[string]string {
-	return lute.New().GetEmojis(imgStaticPath)
+	return lute.GetEmojis(imgStaticPath)
+}
+
+func putEmoji(alias, value string) {
+	lute.PutEmoji(alias, value)
 }
 
 func main() {
 	js.Global.Set("lute", make(map[string]interface{}))
 	lute := js.Global.Get("lute")
 	lute.Set("markdown", markdown)
-	lute.Set("getEmojis", getEmojis)
 	lute.Set("format", format)
+	lute.Set("getEmojis", getEmojis)
+	lute.Set("putEmoji", putEmoji)
 }
