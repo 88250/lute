@@ -18,8 +18,8 @@ import (
 )
 
 // newFormatRenderer 创建一个格式化渲染器。
-func newFormatRenderer(option options) (ret *Renderer) {
-	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: option}
+func (lute *Lute) newFormatRenderer() (ret *Renderer) {
+	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options}
 
 	// 注册 CommonMark 渲染函数
 

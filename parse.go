@@ -17,10 +17,10 @@ import (
 )
 
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
-func parse(name string, markdown []byte, option options) (tree *Tree, err error) {
+func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	defer recoverPanic(&err)
 
-	tree = &Tree{Name: name, context: &Context{option: option}}
+	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
 	tree.Root = &Node{typ: NodeDocument}
@@ -33,8 +33,8 @@ func parse(name string, markdown []byte, option options) (tree *Tree, err error)
 
 // Context 用于维护块级元素解析过程中使用到的公共数据。
 type Context struct {
-	tree   *Tree   // 关联的语法树
-	option options // 解析渲染选项
+	tree   *Tree    // 关联的语法树
+	option *options // 解析渲染选项
 
 	linkRefDef map[string]*Node // 链接引用定义集
 

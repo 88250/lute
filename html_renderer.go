@@ -17,8 +17,8 @@ import (
 )
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
-func newHTMLRenderer(option options) (ret *Renderer) {
-	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: option}
+func (lute *Lute) newHTMLRenderer() (ret *Renderer) {
+	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options}
 
 	// 注册 CommonMark 渲染函数
 

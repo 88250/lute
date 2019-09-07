@@ -16,7 +16,7 @@ import "strings"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
-	options
+	*options
 }
 
 // taskListItemClass 作为 GFM 任务列表项类名。
@@ -31,7 +31,7 @@ var TaskListItemClass = "vditor-task"
 //  * 修正术语拼写
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 func New(opts ...option) (ret *Lute) {
-	ret = &Lute{}
+	ret = &Lute{options: &options{}}
 	ret.GFMTable = true
 	ret.GFMTaskListItem = true
 	ret.GFMStrikethrough = true
@@ -55,12 +55,12 @@ func New(opts ...option) (ret *Lute) {
 // Markdown 将 markdown 文本字符数组处理为相应的 html 字符数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error) {
 	var tree *Tree
-	tree, err = parse(name, markdown, lute.options)
+	tree, err = lute.parse(name, markdown)
 	if nil != err {
 		return
 	}
 
-	renderer := newHTMLRenderer(lute.options)
+	renderer := lute.newHTMLRenderer()
 	html, err = tree.render(renderer)
 	return
 }
@@ -80,12 +80,12 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 // Format 将 markdown 文本字符数组进行格式化。
 func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err error) {
 	var tree *Tree
-	tree, err = parse(name, markdown, lute.options)
+	tree, err = lute.parse(name, markdown)
 	if nil != err {
 		return
 	}
 
-	renderer := newFormatRenderer(lute.options)
+	renderer := lute.newFormatRenderer()
 	formatted, err = tree.render(renderer)
 	return
 }
@@ -125,7 +125,7 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 // RenderVditorDOM 用于渲染 Vditor DOM。
 func (lute *Lute) RenderVditorDOM(nodeDataId int, markdownText string) (html string, err error) {
 	var tree *Tree
-	tree, err = parse("", items(markdownText), lute.options)
+	tree, err = lute.parse("", items(markdownText))
 	if nil != err {
 		return
 	}

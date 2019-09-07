@@ -20,7 +20,7 @@ import (
 )
 
 // newVditorRenderer 创建一个 Vditor DOM 渲染器。
-func newVditorRenderer(option options) (ret *Renderer) {
+func newVditorRenderer(option *options) (ret *Renderer) {
 	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: option}
 
 	// 注册 CommonMark 渲染函数
