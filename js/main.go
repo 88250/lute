@@ -17,55 +17,6 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-func markdown(markdownText string, options map[string]interface{}) string {
-	gfm := true
-	softBreak2HardBreak := true
-	autoSpace := true
-	fixTermTypo := true
-	emoji := true
-	if 0 < len(options) {
-		if v, ok := options["gfm"]; ok {
-			gfm = v.(bool)
-		}
-		if v, ok := options["softBreak2HardBreak"]; ok {
-			softBreak2HardBreak = v.(bool)
-		}
-		if v, ok := options["autoSpace"]; ok {
-			autoSpace = v.(bool)
-		}
-		if v, ok := options["fixTermTypo"]; ok {
-			fixTermTypo = v.(bool)
-		}
-		if v, ok := options["emoji"]; ok {
-			emoji = v.(bool)
-		}
-	}
-
-	luteEngine := lute.New(
-		lute.GFM(gfm),
-		lute.SoftBreak2HardBreak(softBreak2HardBreak),
-		lute.CodeSyntaxHighlight(false, false, false, "github"),
-		lute.AutoSpace(autoSpace),
-		lute.FixTermTypo(fixTermTypo),
-		lute.Emoji(emoji),
-	)
-
-	html, err := luteEngine.MarkdownStr("", markdownText)
-	if nil != err {
-		return err.Error()
-	}
-	return html
-}
-
-func format(markdownText string) string {
-	luteEngine := lute.New()
-	formatted, err := luteEngine.FormatStr("", markdownText)
-	if nil != err {
-		return err.Error()
-	}
-	return formatted
-}
-
 func New(options map[string]interface{}) *js.Object {
 	luteEngine := lute.New()
 	if 0 < len(options) {
