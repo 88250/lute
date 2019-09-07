@@ -19,10 +19,6 @@ import (
 
 // space 会把 node 下文本节点中的中西文之间加上空格。
 func (t *Tree) space(node *Node) {
-	if nil == node {
-		return
-	}
-
 	for child := node.firstChild; nil != child; {
 		next := child.next
 		if NodeText == child.typ && nil != child.parent &&
