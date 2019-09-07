@@ -6,10 +6,6 @@ import (
 
 // emoji 将 node 下文本节点中的 Emoji 别名替换为原生 Unicode 字符。
 func (t *Tree) emoji(node *Node) {
-	if nil == node {
-		return
-	}
-
 	for child := node.firstChild; nil != child; {
 		next := child.next
 		if NodeText == child.typ && nil != child.parent &&

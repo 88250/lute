@@ -19,10 +19,6 @@ import (
 
 // fixTermTypo 修正 node 下文本节点中出现的术语拼写问题。
 func (t *Tree) fixTermTypo(node *Node) {
-	if nil == node {
-		return
-	}
-
 	for child := node.firstChild; nil != child; {
 		next := child.next
 		if NodeText == child.typ && nil != child.parent &&
