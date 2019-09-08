@@ -333,7 +333,7 @@ func main() {
 
 ### JavaScript
  
-通过 [GopherJS](https://github.com/gopherjs/gopherjs) 将 Lute 编译为 lute.js 使用，具体可参考 [Vditor 中的示例](https://github.com/b3log/vditor/tree/master/demo)。
+通过 [GopherJS](https://github.com/gopherjs/gopherjs) 将 Lute 编译为 lute.js 使用。简单示例可参考 js 目录下的 demo，结合前端编辑器的完整用法请参考 [Vditor 中的示例](https://github.com/b3log/vditor/tree/master/demo)。
 
 ![Vditor](https://user-images.githubusercontent.com/970828/64320104-624fac00-cff0-11e9-8727-0ad51a6f71c0.png)
 
