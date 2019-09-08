@@ -79,21 +79,21 @@ func TestFormat(t *testing.T) {
 }
 
 func TestFormatCase1(t *testing.T) {
-	caseName := "format-case1.md"
+	caseName := "format-case1"
 
-	bytes, err := ioutil.ReadFile(caseName)
+	bytes, err := ioutil.ReadFile(caseName + ".md")
 	if nil != err {
 		t.Fatalf("read case failed: %s", err)
 	}
 
 	luteEngine := lute.New()
-	htmlBytes, err := luteEngine.Format(caseName, bytes)
+	htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
 	if nil != err {
 		t.Fatalf("markdown format failed: %s", err)
 	}
 	html := string(htmlBytes)
 
-	bytes, err = ioutil.ReadFile("format-case1-formatted.md")
+	bytes, err = ioutil.ReadFile(caseName + "-formatted.md")
 	if nil != err {
 		t.Fatalf("read case cailed: %s", err)
 	}
@@ -104,21 +104,46 @@ func TestFormatCase1(t *testing.T) {
 }
 
 func TestFormatCase2(t *testing.T) {
-	caseName := "format-case2.md"
+	caseName := "format-case2"
 
-	bytes, err := ioutil.ReadFile(caseName)
+	bytes, err := ioutil.ReadFile(caseName + ".md")
 	if nil != err {
 		t.Fatalf("read case failed: %s", err)
 	}
 
 	luteEngine := lute.New()
-	htmlBytes, err := luteEngine.Format(caseName, bytes)
+	htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
 	if nil != err {
 		t.Fatalf("markdown format failed: %s", err)
 	}
 	html := string(htmlBytes)
 
-	bytes, err = ioutil.ReadFile("format-case2-formatted.md")
+	bytes, err = ioutil.ReadFile(caseName + "-formatted.md")
+	if nil != err {
+		t.Fatalf("read case cailed: %s", err)
+	}
+	expected := string(bytes)
+	if expected != html {
+		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
+	}
+}
+
+func TestFormatCase3(t *testing.T) {
+	caseName := "format-case3"
+
+	bytes, err := ioutil.ReadFile(caseName + ".md")
+	if nil != err {
+		t.Fatalf("read case failed: %s", err)
+	}
+
+	luteEngine := lute.New()
+	htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
+	if nil != err {
+		t.Fatalf("markdown format failed: %s", err)
+	}
+	html := string(htmlBytes)
+
+	bytes, err = ioutil.ReadFile(caseName + "-formatted.md")
 	if nil != err {
 		t.Fatalf("read case cailed: %s", err)
 	}
