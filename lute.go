@@ -175,3 +175,65 @@ type options struct {
 
 // option 描述了解析渲染选项设置函数签名。
 type option func(lute *Lute)
+
+// 以下 Setters 主要是给 JavaScript 端导出方法用。
+
+func (lute *Lute) SetGFMTable(b bool) {
+	lute.GFMTable = b
+}
+
+func (lute *Lute) SetGFMTaskListItem(b bool) {
+	lute.GFMTaskListItem = b
+}
+
+func (lute *Lute) SetGFMTaskListItemClass(class string) {
+	lute.GFMTaskListItemClass = class
+}
+
+func (lute *Lute) SetGFMStrikethrough(b bool) {
+	lute.GFMStrikethrough = b
+}
+
+func (lute *Lute) SetGFMAutoLink(b bool) {
+	lute.GFMAutoLink = b
+}
+
+func (lute *Lute) SetSoftBreak2HardBreak(b bool) {
+	lute.SoftBreak2HardBreak = b
+}
+
+func (lute *Lute) SetCodeSyntaxHighlight(b bool) {
+	lute.CodeSyntaxHighlight = b
+}
+
+func (lute *Lute) SetCodeSyntaxHighlightInlineStyle(b bool) {
+	lute.CodeSyntaxHighlightInlineStyle = b
+}
+
+func (lute *Lute) SetCodeSyntaxHighlightLineNum(b bool) {
+	lute.CodeSyntaxHighlightLineNum = b
+}
+
+func (lute *Lute) SetCodeSyntaxHighlightStyleName(name string) {
+	lute.CodeSyntaxHighlightStyleName = name
+}
+
+func (lute *Lute) SetAutoSpace(b bool) {
+	lute.AutoSpace = b
+}
+
+func (lute *Lute) SetFixTermTypo(b bool) {
+	lute.FixTermTypo = b
+}
+
+func (lute *Lute) SetEmoji(b bool) {
+	lute.Emoji = b
+}
+
+func (lute *Lute) SetEmojis(emojis map[string]string) {
+	lute.Emojis = emojis
+}
+
+func (lute *Lute) SetEmojiSite(emojiSite string) {
+	lute.EmojiSite = emojiSite
+}

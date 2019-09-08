@@ -8,19 +8,16 @@
 <script src="lute.min.js"></script>
 <script>
     let luteEngine = Lute.New();
-    luteEngine.Emojis = false;
 
     function onMarkdown(it) {
-        console.log(luteEngine.Emojis);
         let result = luteEngine.MarkdownStr("", it.value);
         let output = result[1] ? result[1] : result[0];
-
-
         document.getElementById('output').innerHTML = output;
     }
 </script>
 
-<textarea id="input" rows="10" cols="150" oninput="onMarkdown(this)">**Lute** - A structured markdown engine. :+1:</textarea>
+<textarea id="input" rows="10" cols="150"
+          oninput="onMarkdown(this)">**Lute** - A structured markdown engine.</textarea>
 <div id="output"></div>
 <script>
     let result = luteEngine.MarkdownStr("", document.getElementById('input').value);
