@@ -92,7 +92,7 @@ func TestFormatCases(t *testing.T) {
 		}
 	}
 
-	for i := 1; i <= formatCases; i++ {
+	for i := 0; i < formatCases; i++ {
 		caseName := "format-case" + strconv.Itoa(i)
 		bytes, err := ioutil.ReadFile(caseName + ".md")
 		if nil != err {
