@@ -114,7 +114,7 @@ func (r *Renderer) renderTableHeadMarkdown(node *Node, entering bool) (WalkStatu
 func (r *Renderer) renderTableMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.newline()
-		if !isLastNode(r.treeRoot, node) {
+		if !r.isLastNode(r.treeRoot, node) {
 			r.writeByte(itemNewline)
 		}
 	}
@@ -223,30 +223,12 @@ func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatu
 		r.write(bytes.Repeat(items{itemSpace}, listPadding))
 	} else {
 		r.newline()
-		isLastNode := isLastNode(r.treeRoot, node)
-		if !isLastNode && (!inTightList || (lastListItemLastPara && 2 > r.listLevel)) {
+		isLastNode := r.isLastNode(r.treeRoot, node)
+		if !isLastNode && (!inTightList || (lastListItemLastPara)) {
 			r.writeByte(itemNewline)
 		}
 	}
 	return WalkContinue, nil
-}
-
-func isLastNode(treeRoot, node *Node) bool {
-	if treeRoot == node {
-		return true
-	}
-
-	if NodeDocument == node.parent.typ {
-		return treeRoot.lastChild == node
-	}
-
-	var n *Node
-	for n = node.parent; ; n = n.parent {
-		if NodeDocument == n.parent.typ {
-			break
-		}
-	}
-	return treeRoot.lastChild == n
 }
 
 func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, error) {
@@ -316,7 +298,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 
 	r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
 	r.newline()
-	if !isLastNode(r.treeRoot, node) {
+	if !r.isLastNode(r.treeRoot, node) {
 		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
@@ -364,10 +346,26 @@ func (r *Renderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus,
 func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.listLevel++
+		r.listDepth++
+		if 1 < r.listDepth {
+			lastList := r.listStack[len(r.listStack)-1] // 栈顶是上一个列表节点
+			r.listIndent += len(lastList.marker) + 1
+			if 1 == lastList.listData.typ {
+				r.listIndent++
+			}
+		}
+		r.listStack = append(r.listStack, node) // 入栈
 	} else {
 		r.newline()
-		r.listLevel--
+		r.listStack = r.listStack[:len(r.listStack)-1] // 出栈
+		if 0 < len(r.listStack) {
+			lastList := r.listStack[len(r.listStack)-1]
+			r.listIndent -= + len(lastList.marker) + 1
+			if 1 == lastList.listData.typ {
+				r.listIndent--
+			}
+		}
+		r.listDepth--
 	}
 	return WalkContinue, nil
 }
@@ -375,12 +373,8 @@ func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, er
 func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		if 1 < r.listLevel {
-			parent := node.parent.parent
-			r.write(bytes.Repeat(items{itemSpace}, (r.listLevel-1)*2))
-			if 1 == parent.listData.typ {
-				r.writeByte(itemSpace) // 有序列表需要加上分隔符 . 或者 ) 的一个字符长度
-			}
+		if 1 < r.listDepth {
+			r.write(bytes.Repeat(items{itemSpace}, r.listIndent))
 		}
 		if 1 == node.listData.typ {
 			r.writeString(strconv.Itoa(node.num) + ".")
@@ -430,4 +424,22 @@ func (r *Renderer) renderSoftBreakMarkdown(node *Node, entering bool) (WalkStatu
 		r.newline()
 	}
 	return WalkSkipChildren, nil
+}
+
+func (r *Renderer) isLastNode(treeRoot, node *Node) bool {
+	if treeRoot == node {
+		return true
+	}
+
+	if NodeDocument == node.parent.typ {
+		return treeRoot.lastChild == node
+	}
+
+	var n *Node
+	for n = node.parent; ; n = n.parent {
+		if NodeDocument == n.parent.typ {
+			break
+		}
+	}
+	return treeRoot.lastChild == n
 }

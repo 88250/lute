@@ -30,11 +30,15 @@ type Renderer struct {
 	option        *options             // 解析渲染选项
 	treeRoot      *Node                // 待渲染的树的根节点
 
-	listLevel int // 列表级别，用于记录嵌套列表深度
+	// 以下字段用于维护列表嵌套场景需要的元数据，目前仅用于格式化渲染器
+
+	listDepth  int     // 列表嵌套深度
+	listIndent int     // 列表项缩进空格数
+	listStack  []*Node // 列表栈
 }
 
 // render 从指定的根节点 root 开始遍历并渲染。
-func (r *Renderer) render()  (output []byte, err error) {
+func (r *Renderer) render() (output []byte, err error) {
 	defer recoverPanic(&err)
 
 	r.lastOut = itemNewline
