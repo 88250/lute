@@ -17,7 +17,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-func New(options map[string]interface{}) *js.Object {
+func New() *js.Object {
 	return js.MakeWrapper(lute.New())
 }
 
