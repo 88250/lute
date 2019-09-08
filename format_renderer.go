@@ -77,7 +77,7 @@ func (r *Renderer) renderEmojiUnicodeMarkdown(node *Node, entering bool) (WalkSt
 
 func (r *Renderer) renderTableCellMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeByte('|')
+		r.writeByte(itemPipe)
 	}
 	return WalkContinue, nil
 }
@@ -139,9 +139,9 @@ func (r *Renderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, e
 		if nil != node.title {
 			r.writeString(" \"")
 			r.write(node.title)
-			r.writeByte('"')
+			r.writeByte(itemDoublequote)
 		}
-		r.writeByte(')')
+		r.writeByte(itemCloseParen)
 	}
 	return WalkContinue, nil
 }
@@ -158,9 +158,9 @@ func (r *Renderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, er
 		if nil != node.title {
 			r.writeString(" \"")
 			r.write(node.title)
-			r.writeByte('"')
+			r.writeByte(itemDoublequote)
 		}
-		r.writeByte(')')
+		r.writeByte(itemCloseParen)
 	}
 	return WalkContinue, nil
 }
@@ -377,9 +377,9 @@ func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus
 		r.newline()
 		if 1 < r.listLevel {
 			parent := node.parent.parent
-			r.write(bytes.Repeat(items{itemSpace}, len(parent.marker)+1))
+			r.write(bytes.Repeat(items{itemSpace}, (r.listLevel-1)*2))
 			if 1 == parent.listData.typ {
-				r.writeByte(' ') // 有序列表需要加上分隔符 . 或者 ) 的一个字符长度
+				r.writeByte(itemSpace) // 有序列表需要加上分隔符 . 或者 ) 的一个字符长度
 			}
 		}
 		if 1 == node.listData.typ {
@@ -387,20 +387,20 @@ func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus
 		} else {
 			r.write(node.marker)
 		}
-		r.writeByte(' ')
+		r.writeByte(itemSpace)
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderTaskListItemMarkerMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeByte('[')
+		r.writeByte(itemOpenBracket)
 		if node.taskListItemChecked {
 			r.writeByte('X')
 		} else {
-			r.writeByte(' ')
+			r.writeByte(itemSpace)
 		}
-		r.writeByte(']')
+		r.writeByte(itemCloseBracket)
 	}
 	return WalkContinue, nil
 }

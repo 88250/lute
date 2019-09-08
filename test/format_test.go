@@ -102,3 +102,28 @@ func TestFormatCase1(t *testing.T) {
 		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
 	}
 }
+
+func TestFormatCase2(t *testing.T) {
+	caseName := "format-case2.md"
+
+	bytes, err := ioutil.ReadFile(caseName)
+	if nil != err {
+		t.Fatalf("read case failed: %s", err)
+	}
+
+	luteEngine := lute.New()
+	htmlBytes, err := luteEngine.Format(caseName, bytes)
+	if nil != err {
+		t.Fatalf("markdown format failed: %s", err)
+	}
+	html := string(htmlBytes)
+
+	bytes, err = ioutil.ReadFile("format-case2-formatted.md")
+	if nil != err {
+		t.Fatalf("read case cailed: %s", err)
+	}
+	expected := string(bytes)
+	if expected != html {
+		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
+	}
+}
