@@ -88,6 +88,9 @@ func replaceAtIndex(str string, r rune, i int) string {
 // terms 定义了术语字典，用于术语拼写修正。Key 必须是全小写的。
 // TODO: 考虑提供接口支持开发者添加
 var terms = map[string]string{
+	"jetty":         "Jetty",
+	"tomcat":        "Tomcat",
+	"docker":        "Docker",
 	"jdbc":          "JDBC",
 	"mariadb":       "MariaDB",
 	"ipfs":          "IPFS",
