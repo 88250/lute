@@ -14,7 +14,6 @@ package test
 
 import (
 	"io/ioutil"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -85,15 +84,13 @@ func TestFormatCases(t *testing.T) {
 	if nil != err {
 		t.Fatalf("read test dir failed: %s", err)
 	}
-	formatCases := 0
-	for _, file := range files {
-		if strings.HasPrefix(file.Name(), "format-case") && !strings.Contains(file.Name(), "formatted") {
-			formatCases++
-		}
-	}
 
-	for i := 0; i < formatCases; i++ {
-		caseName := "format-case" + strconv.Itoa(i)
+	for _, file := range files {
+		if !strings.HasPrefix(file.Name(), "format-case") || strings.Contains(file.Name(), "formatted") {
+			continue
+		}
+
+		caseName := file.Name()[:len(file.Name())-3]
 		bytes, err := ioutil.ReadFile(caseName + ".md")
 		if nil != err {
 			t.Fatalf("read case failed: %s", err)
@@ -115,4 +112,5 @@ func TestFormatCases(t *testing.T) {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
 		}
 	}
+
 }
