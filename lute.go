@@ -44,7 +44,7 @@ func New(opts ...option) (ret *Lute) {
 	ret.FixTermTypo = true
 	ret.Emoji = true
 	ret.Emojis = newEmojis()
-	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/"
+	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
 	for _, opt := range opts {
 		opt(ret)
 	}

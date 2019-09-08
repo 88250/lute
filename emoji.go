@@ -18,7 +18,7 @@ func (t *Tree) emoji(node *Node) {
 	}
 }
 
-var emojiSitePlaceholder = toItems("${imgStaticPath}")
+var emojiSitePlaceholder = toItems("${emojiSite}")
 
 func (t *Tree) emoji0(node *Node) {
 	tokens := node.tokens
@@ -69,7 +69,7 @@ func (t *Tree) emoji0(node *Node) {
 			emojiNode := &Node{typ: NodeEmojiUnicode}
 			if bytes.Contains(items(emoji), emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
 				alias := fromItems(maybeEmoji)
-				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + t.context.option.EmojiSite + alias
+				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + t.context.option.EmojiSite + "/" + alias
 				suffix := ".png"
 				if "huaji" == alias {
 					suffix = ".gif"
