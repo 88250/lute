@@ -21,10 +21,6 @@ type Lute struct {
 	*options
 }
 
-// taskListItemClass 作为 GFM 任务列表项类名。
-// GFM 任务列表 li 加 class="vditor-task"，https://github.com/b3log/lute/issues/10
-var TaskListItemClass = "vditor-task"
-
 // New 创建一个新的 Lute 引擎，默认启用：
 //  * GFM 支持
 //  * 代码块语法高亮
@@ -36,6 +32,7 @@ func New(opts ...option) (ret *Lute) {
 	ret = &Lute{options: &options{}}
 	ret.GFMTable = true
 	ret.GFMTaskListItem = true
+	ret.GFMTaskListItemClass = "vditor-task"
 	ret.GFMStrikethrough = true
 	ret.GFMAutoLink = true
 	ret.SoftBreak2HardBreak = true
@@ -145,6 +142,8 @@ type options struct {
 	GFMTable bool
 	// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。
 	GFMTaskListItem bool
+	// GFMTaskListItemClass 作为 GFM 任务列表项类名，默认为 "vditor-task"。
+	GFMTaskListItemClass string
 	// GFMStrikethrough 设置是否打开“GFM 删除线”支持。
 	GFMStrikethrough bool
 	// GFMAutoLink 设置是否打开“GFM 自动链接”支持。

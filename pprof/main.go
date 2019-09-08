@@ -27,13 +27,16 @@ func main() {
 		panic(err)
 	}
 
-	luteEngine := lute.New(lute.GFM(true),
-		lute.CodeSyntaxHighlight(false, false, false, "github"),
-		lute.SoftBreak2HardBreak(false),
-		lute.AutoSpace(false),
-		lute.FixTermTypo(false),
-		lute.Emoji(false),
-	)
+	luteEngine := lute.New()
+	luteEngine.GFMTaskListItem = true
+	luteEngine.GFMTable = true
+	luteEngine.GFMAutoLink = true
+	luteEngine.GFMStrikethrough = true
+	luteEngine.SoftBreak2HardBreak = false
+	luteEngine.CodeSyntaxHighlight = false
+	luteEngine.AutoSpace = false
+	luteEngine.FixTermTypo = false
+	luteEngine.Emoji = false
 
 	cpuProfile, _ := os.Create("pprof/cpu_profile")
 	pprof.StartCPUProfile(cpuProfile)

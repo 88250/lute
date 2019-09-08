@@ -312,8 +312,8 @@ func (r *Renderer) renderListHTML(node *Node, entering bool) (WalkStatus, error)
 
 func (r *Renderer) renderListItemHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if 3 == node.listData.typ && "" != TaskListItemClass {
-			r.tag("li", [][]string{{"class", TaskListItemClass}}, false)
+		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
+			r.tag("li", [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
 		} else {
 			r.tag("li", nil, false)
 		}

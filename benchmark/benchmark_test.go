@@ -32,13 +32,16 @@ func BenchmarkLute(b *testing.B) {
 		b.Fatalf("read spec text failed: " + err.Error())
 	}
 
-	luteEngine := lute.New(lute.GFM(true),
-		lute.CodeSyntaxHighlight(false, false, false, "github"),
-		lute.SoftBreak2HardBreak(false),
-		lute.AutoSpace(false),
-		lute.FixTermTypo(false),
-		lute.Emoji(false),
-	)
+	luteEngine := lute.New()
+	luteEngine.GFMTaskListItem = true
+	luteEngine.GFMTable = true
+	luteEngine.GFMAutoLink = true
+	luteEngine.GFMStrikethrough = true
+	luteEngine.SoftBreak2HardBreak = false
+	luteEngine.CodeSyntaxHighlight = false
+	luteEngine.AutoSpace = false
+	luteEngine.FixTermTypo = false
+	luteEngine.Emoji = false
 	html, err := luteEngine.Markdown("spec text", bytes)
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)

@@ -64,8 +64,7 @@ func TestGFMSpec(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SoftBreak2HardBreak = false
 	luteEngine.AutoSpace = false
-
-	lute.TaskListItemClass = "" // 关闭类名渲染
+	luteEngine.GFMTaskListItemClass = "" // 关闭类名渲染
 
 	for _, test := range gfmSpecTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
