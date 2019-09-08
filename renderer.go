@@ -30,11 +30,12 @@ type Renderer struct {
 	option        *options             // 解析渲染选项
 	treeRoot      *Node                // 待渲染的树的根节点
 
-	// 以下字段用于维护列表嵌套场景需要的元数据，目前仅用于格式化渲染器
+	// 以下字段用于格式化渲染器
 
-	listDepth  int     // 列表嵌套深度
-	listIndent int     // 列表项缩进空格数
-	listStack  []*Node // 列表栈
+	listDepth       int     // 列表嵌套深度
+	listIndent      int     // 列表项缩进空格数
+	listStack       []*Node // 列表栈
+	blockquoteDepth int     // 块引用嵌套深度
 }
 
 // render 从指定的根节点 root 开始遍历并渲染。

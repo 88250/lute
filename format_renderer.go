@@ -324,10 +324,12 @@ func (r *Renderer) renderStrongMarkdown(node *Node, entering bool) (WalkStatus, 
 
 func (r *Renderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		r.blockquoteDepth++
 		r.newline()
 		r.writeString("> ") // 带个空格更好一些
 	} else {
 		r.newline()
+		r.blockquoteDepth--
 	}
 	return WalkContinue, nil
 }
@@ -345,7 +347,6 @@ func (r *Renderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus,
 
 func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.newline()
 		r.listDepth++
 		if 1 < r.listDepth {
 			lastList := r.listStack[len(r.listStack)-1] // 栈顶是上一个列表节点
@@ -355,6 +356,7 @@ func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, er
 			}
 		}
 		r.listStack = append(r.listStack, node) // 入栈
+		r.newline()
 	} else {
 		r.newline()
 		r.listStack = r.listStack[:len(r.listStack)-1] // 出栈
