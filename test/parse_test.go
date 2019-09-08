@@ -239,13 +239,16 @@ var parseTests = []parseTest{
 }
 
 func TestParse(t *testing.T) {
-	luteEngine := lute.New(
-		lute.GFM(false),
-		lute.CodeSyntaxHighlight(false, false, false, "github"),
-		lute.SoftBreak2HardBreak(false),
-		lute.AutoSpace(false),
-		lute.Emoji(false),
-	)
+	luteEngine := lute.New()
+	luteEngine.GFMTaskListItem = false
+	luteEngine.GFMTable = false
+	luteEngine.GFMAutoLink = false
+	luteEngine.GFMStrikethrough = false
+	luteEngine.SoftBreak2HardBreak = false
+	luteEngine.CodeSyntaxHighlight = false
+	luteEngine.AutoSpace = false
+	luteEngine.FixTermTypo = false
+	luteEngine.Emoji = false
 
 	for _, test := range parseTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)

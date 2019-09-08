@@ -12,7 +12,9 @@
 
 package lute
 
-import "strings"
+import (
+	"strings"
+)
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
@@ -137,117 +139,39 @@ func (lute *Lute) RenderVditorDOM(nodeDataId int, markdownText string) (html str
 	return
 }
 
-// GFM 设置是否打开所有 GFM 支持。
-func GFM(b bool) option {
-	return func(lute *Lute) {
-		lute.GFMTable = b
-		lute.GFMTaskListItem = b
-		lute.GFMStrikethrough = b
-		lute.GFMAutoLink = b
-	}
-}
-
-// GFMTable 设置是否打开“GFM 表”支持。
-func GFMTable(b bool) option {
-	return func(lute *Lute) {
-		lute.GFMTable = b
-	}
-}
-
-// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。
-func GFMTaskListItem(b bool) option {
-	return func(lute *Lute) {
-		lute.GFMTaskListItem = b
-	}
-}
-
-// GFMStrikethrough 设置是否打开“GFM 删除线”支持。
-func GFMStrikethrough(b bool) option {
-	return func(lute *Lute) {
-		lute.GFMStrikethrough = b
-	}
-}
-
-// GFMAutoLink 设置是否打开“GFM 自动链接”支持。
-func GFMAutoLink(b bool) option {
-	return func(lute *Lute) {
-		lute.GFMAutoLink = b
-	}
-}
-
-// SoftBreak2HardBreak 设置是否将软换行（\n）渲染为硬换行（<br />）。
-func SoftBreak2HardBreak(b bool) option {
-	return func(lute *Lute) {
-		lute.SoftBreak2HardBreak = b
-	}
-}
-
-// CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
-//   inlineStyle 设置是否为内联样式，默认不内联
-//   lineNum 设置是否显示行号，默认不显示
-//   name 指定高亮样式名，默认为 "github"
-func CodeSyntaxHighlight(b, inlineStyle, lineNum bool, name string) option {
-	return func(lute *Lute) {
-		lute.CodeSyntaxHighlight = b
-		lute.CodeSyntaxHighlightInlineStyle = inlineStyle
-		lute.CodeSyntaxHighlightLineNum = lineNum
-		lute.CodeSyntaxHighlightStyleName = name
-	}
-}
-
-// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
-// https://github.com/sparanoid/chinese-copywriting-guidelines
-func AutoSpace(b bool) option {
-	return func(lute *Lute) {
-		lute.AutoSpace = b
-	}
-}
-
-// FixTermTypo 设置是否对普通文本中出现的术语进行修正。
-// https://github.com/sparanoid/chinese-copywriting-guidelines
-// 注意：开启术语修正的话会默认在中西文之间插入空格。
-func FixTermTypo(b bool) option {
-	return func(lute *Lute) {
-		lute.FixTermTypo = b
-	}
-}
-
-// Emoji 设置是否对 Emoji 别名替换为原生 Unicode 字符。
-func Emoji(b bool) option {
-	return func(lute *Lute) {
-		lute.Emoji = b
-	}
-}
-
-func Emojis(emojis map[string]string) option {
-	return func(lute *Lute) {
-		lute.PutEmojis(emojis)
-	}
-}
-
-// EmojiSite 设置图片 Emoji URL 的路径前缀。
-func EmojiSite(emojiSite string) option {
-	return func(lute *Lute) {
-		lute.EmojiSite = emojiSite
-	}
-}
-
 // options 描述了一些列解析和渲染选项。
 type options struct {
-	GFMTable                       bool
-	GFMTaskListItem                bool
-	GFMStrikethrough               bool
-	GFMAutoLink                    bool
-	SoftBreak2HardBreak            bool
-	CodeSyntaxHighlight            bool
+	// GFMTable 设置是否打开“GFM 表”支持。
+	GFMTable bool
+	// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。
+	GFMTaskListItem bool
+	// GFMStrikethrough 设置是否打开“GFM 删除线”支持。
+	GFMStrikethrough bool
+	// GFMAutoLink 设置是否打开“GFM 自动链接”支持。
+	GFMAutoLink bool
+	// SoftBreak2HardBreak 设置是否将软换行（\n）渲染为硬换行（<br />）。
+	SoftBreak2HardBreak bool
+	// CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
+	CodeSyntaxHighlight bool
+	// CodeSyntaxHighlightInlineStyle 设置语法高亮是否为内联样式，默认不内联。
 	CodeSyntaxHighlightInlineStyle bool
-	CodeSyntaxHighlightLineNum     bool
-	CodeSyntaxHighlightStyleName   string
-	AutoSpace                      bool
-	FixTermTypo                    bool
-	Emoji                          bool
-	Emojis                         map[string]string
-	EmojiSite                      string
+	// CodeSyntaxHightLineNum 设置语法高亮是否显示行号，默认不显示。
+	CodeSyntaxHighlightLineNum bool
+	// CodeSyntaxHighlightStyleName 指定语法高亮样式名，默认为 "github"。
+	CodeSyntaxHighlightStyleName string
+	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
+	// https://github.com/sparanoid/chinese-copywriting-guidelines
+	AutoSpace bool
+	// FixTermTypo 设置是否对普通文本中出现的术语进行修正。
+	// https://github.com/sparanoid/chinese-copywriting-guidelines
+	// 注意：开启术语修正的话会默认在中西文之间插入空格。
+	FixTermTypo bool
+	// Emoji 设置是否对 Emoji 别名替换为原生 Unicode 字符。
+	Emoji bool
+	// Emojis 将传入的 emojis 合并覆盖到已有的 Emoji 映射。
+	Emojis map[string]string
+	// EmojiSite 设置图片 Emoji URL 的路径前缀。
+	EmojiSite string
 }
 
 // option 描述了解析渲染选项设置函数签名。

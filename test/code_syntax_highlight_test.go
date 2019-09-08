@@ -24,7 +24,8 @@ var codeSyntaxHighlightLineNumTests = []parseTest{
 }
 
 func TestCodeSyntaxHighlightLineNum(t *testing.T) {
-	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, false, true, "dracula"))
+	luteEngine := lute.New()
+	luteEngine.CodeSyntaxHighlightLineNum = true
 
 	for _, test := range codeSyntaxHighlightLineNumTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
@@ -64,7 +65,9 @@ var codeSyntaxHighlightInlineTests = []parseTest{
 }
 
 func TestCodeSyntaxHighlightInline(t *testing.T) {
-	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, true, false, "dracula"))
+	luteEngine := lute.New()
+	luteEngine.CodeSyntaxHighlightInlineStyle = true
+	luteEngine.CodeSyntaxHighlightStyleName = "dracula"
 
 	for _, test := range codeSyntaxHighlightInlineTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
@@ -84,7 +87,8 @@ var codeSyntaxHighlightStyleTests = []parseTest{
 }
 
 func TestCodeSyntaxHighlightStyle(t *testing.T) {
-	luteEngine := lute.New(lute.CodeSyntaxHighlight(true, false, false, "monokai"))
+	luteEngine := lute.New()
+	luteEngine.CodeSyntaxHighlightStyleName = "monokai"
 
 	for _, test := range codeSyntaxHighlightStyleTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
@@ -104,7 +108,8 @@ var codeSyntaxHighlightOffTests = []parseTest{
 }
 
 func TestCodeSyntaxHighlightOff(t *testing.T) {
-	luteEngine := lute.New(lute.CodeSyntaxHighlight(false, false, false, "dracula"))
+	luteEngine := lute.New()
+	luteEngine.CodeSyntaxHighlight = false
 
 	for _, test := range codeSyntaxHighlightOffTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.markdown)

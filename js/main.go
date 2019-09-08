@@ -21,7 +21,11 @@ func New(options map[string]interface{}) *js.Object {
 	luteEngine := lute.New()
 	if 0 < len(options) {
 		if v, ok := options["gfm"]; ok {
-			lute.GFM(v.(bool))(luteEngine)
+			gfm := v.(bool)
+			luteEngine.GFMStrikethrough = gfm
+			luteEngine.GFMAutoLink = gfm
+			luteEngine.GFMTable = gfm
+			luteEngine.GFMTaskListItem = gfm
 		}
 		if v, ok := options["softBreak2HardBreak"]; ok {
 			luteEngine.SoftBreak2HardBreak = v.(bool)
