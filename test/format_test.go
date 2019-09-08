@@ -14,6 +14,8 @@ package test
 
 import (
 	"io/ioutil"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/b3log/lute"
@@ -78,77 +80,39 @@ func TestFormat(t *testing.T) {
 	}
 }
 
-func TestFormatCase1(t *testing.T) {
-	caseName := "format-case1"
-
-	bytes, err := ioutil.ReadFile(caseName + ".md")
+func TestFormatCases(t *testing.T) {
+	files, err := ioutil.ReadDir(".")
 	if nil != err {
-		t.Fatalf("read case failed: %s", err)
+		t.Fatalf("read test dir failed: %s", err)
+	}
+	formatCases := 0
+	for _, file := range files {
+		if strings.HasPrefix(file.Name(), "format-case") && !strings.Contains(file.Name(), "formatted") {
+			formatCases++
+		}
 	}
 
-	luteEngine := lute.New()
-	htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
-	if nil != err {
-		t.Fatalf("markdown format failed: %s", err)
-	}
-	html := string(htmlBytes)
+	for i := 1; i <= formatCases; i++ {
+		caseName := "format-case" + strconv.Itoa(i)
+		bytes, err := ioutil.ReadFile(caseName + ".md")
+		if nil != err {
+			t.Fatalf("read case failed: %s", err)
+		}
 
-	bytes, err = ioutil.ReadFile(caseName + "-formatted.md")
-	if nil != err {
-		t.Fatalf("read case cailed: %s", err)
-	}
-	expected := string(bytes)
-	if expected != html {
-		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
-	}
-}
+		luteEngine := lute.New()
+		htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
+		if nil != err {
+			t.Fatalf("markdown format failed: %s", err)
+		}
+		html := string(htmlBytes)
 
-func TestFormatCase2(t *testing.T) {
-	caseName := "format-case2"
-
-	bytes, err := ioutil.ReadFile(caseName + ".md")
-	if nil != err {
-		t.Fatalf("read case failed: %s", err)
-	}
-
-	luteEngine := lute.New()
-	htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
-	if nil != err {
-		t.Fatalf("markdown format failed: %s", err)
-	}
-	html := string(htmlBytes)
-
-	bytes, err = ioutil.ReadFile(caseName + "-formatted.md")
-	if nil != err {
-		t.Fatalf("read case cailed: %s", err)
-	}
-	expected := string(bytes)
-	if expected != html {
-		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
-	}
-}
-
-func TestFormatCase3(t *testing.T) {
-	caseName := "format-case3"
-
-	bytes, err := ioutil.ReadFile(caseName + ".md")
-	if nil != err {
-		t.Fatalf("read case failed: %s", err)
-	}
-
-	luteEngine := lute.New()
-	htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
-	if nil != err {
-		t.Fatalf("markdown format failed: %s", err)
-	}
-	html := string(htmlBytes)
-
-	bytes, err = ioutil.ReadFile(caseName + "-formatted.md")
-	if nil != err {
-		t.Fatalf("read case cailed: %s", err)
-	}
-	expected := string(bytes)
-	if expected != html {
-		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
+		bytes, err = ioutil.ReadFile(caseName + "-formatted.md")
+		if nil != err {
+			t.Fatalf("read case cailed: %s", err)
+		}
+		expected := string(bytes)
+		if expected != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
+		}
 	}
 }
