@@ -49,8 +49,8 @@ func fixTermTypo0(tokens items) items {
 				continue
 			}
 		}
-		if itemDot == before {
-			// 术语后面如果是 . 则不进行修正，因为可能是链接
+		if isASCIIPunct(before) {
+			// 比如术语前面如果是 . 则不进行修正，因为可能是链接
 			// 比如 test.html 虽然不能识别为自动链接，但是也不能进行修正
 			continue
 		}
@@ -61,8 +61,8 @@ func fixTermTypo0(tokens items) items {
 				break
 			}
 		}
-		if itemDot == after {
-			// 术语后面如果是 . 则不进行修正，因为可能是链接
+		if isASCIIPunct(after) {
+			// 比如术语后面如果是 . 则不进行修正，因为可能是链接
 			// 比如 github.com 虽然不能识别为自动链接，但是也不能进行修正
 			continue
 		}
