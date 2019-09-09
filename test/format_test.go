@@ -85,7 +85,6 @@ func TestFormatCases(t *testing.T) {
 		t.Fatalf("read test dir failed: %s", err)
 	}
 
-	// TODO: 暂时跳过一些失败的用例
 	skips := ""
 
 	for _, file := range files {

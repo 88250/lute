@@ -13,10 +13,54 @@
 package test
 
 import (
+	"io/ioutil"
+	"strings"
 	"testing"
 
 	"github.com/b3log/lute"
 )
+
+func TestCodeSyntaxHighlightIssue17(t *testing.T) {
+	// 语法高亮支持内联样式 https://github.com/b3log/lute/issues/17
+
+	caseName := "code-syntax-highlight-issue17"
+	data, err := ioutil.ReadFile(caseName + ".md")
+	if nil != err {
+		t.Fatalf("read case failed: %s", err)
+	}
+
+	luteEngine := lute.New()
+	luteEngine.SetCodeSyntaxHighlightInlineStyle(true)
+	luteEngine.SetCodeSyntaxHighlightLineNum(true)
+	style := "monokai"
+	luteEngine.SetCodeSyntaxHighlightStyleName(style)
+	htmlBytes, err := luteEngine.Markdown(caseName, data)
+	if nil != err {
+		t.Fatalf("markdown failed: %s", err)
+	}
+	html := string(htmlBytes)
+	expected := `<pre style="color: #f8f8f2; background-color: #272822"><code class="language-go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello, 世界&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span>}
+</code></pre>
+`
+	if expected != html {
+		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
+	}
+
+	data, err = ioutil.ReadFile(caseName + ".tpl")
+	if nil != err {
+		t.Fatalf("read template failed: %s", err)
+	}
+	template := string(data)
+	template = strings.ReplaceAll(template, "${style}", style)
+	template = strings.ReplaceAll(template, "${code}", html)
+	ioutil.WriteFile(caseName+".html", []byte(template), 0644)
+}
 
 var codeSyntaxHighlightLineNumTests = []parseTest{
 
