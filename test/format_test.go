@@ -34,7 +34,7 @@ var formatTests = []formatTest{
 	{"25", "`` `Lute` ``\n", "`` `Lute` ``\n\n"},
 
 	// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
-	{"24", ":heart: :hacpai:\n", "❤️ :hacpai:\n\n"},
+	{"24", ":heart: :hacpai:\n", ":heart: :hacpai:\n\n"},
 
 	// 原先是 & 的格式化以后转义为 HTML 实体 &amp;
 	{"23", "&&amp;\n", "&amp;&amp;\n\n"},
@@ -118,5 +118,4 @@ func TestFormatCases(t *testing.T) {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
 		}
 	}
-
 }

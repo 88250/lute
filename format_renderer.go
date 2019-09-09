@@ -61,16 +61,16 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) (ret *Renderer) {
 
 func (r *Renderer) renderEmojiImgMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(node.emojiImgAlias)
+		r.write(node.emojiAlias)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderEmojiUnicodeMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(node.tokens)
+		r.write(node.emojiAlias)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 // TODO: 表的格式化应该按最宽的单元格对齐内容
@@ -187,7 +187,7 @@ func (r *Renderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
 	} else {
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		buf := bytes.TrimSpace(r.writer.Bytes())
+		buf := bytes.Trim(r.writer.Bytes(), " \t\n")
 		r.writer.Reset()
 		r.write(buf)
 		r.writeString("\n\n")

@@ -80,15 +80,16 @@ func (t *Tree) emoji0(node *Node) {
 
 				emojiNode.typ = NodeEmojiImg
 				emojiNode.tokens = toItems(repl)
-				emojiNode.emojiImgAlias = tokens[i : pos+1]
+				emojiNode.emojiAlias = tokens[i : pos+1]
 			} else if bytes.Contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
 				alias := fromItems(maybeEmoji)
 				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + emoji + "\" title=\"" + alias + "\" />"
 				emojiNode.typ = NodeEmojiImg
 				emojiNode.tokens = toItems(repl)
-				emojiNode.emojiImgAlias = tokens[i : pos+1]
+				emojiNode.emojiAlias = tokens[i : pos+1]
 			} else {
 				emojiNode.tokens = emojiTokens
+				emojiNode.emojiAlias = tokens[i:pos+1]
 			}
 
 			node.InsertAfter(node, emojiNode)

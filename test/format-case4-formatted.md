@@ -126,7 +126,7 @@ public class HelloWorld {
 
 #### 任务列表
 
-- [x] 发布 Sym
+- [X] 发布 Sym
 - [X] 发布 Solo
 - [ ] 预约牙医
 
@@ -134,11 +134,11 @@ public class HelloWorld {
 
 如果需要展示数据什么的，可以选择使用表格。
 
-| header 1 | header 3 |
-| -------- | -------- |
-| cell 1   | cell 2   |
-| cell 3   | cell 4   |
-| cell 5   | cell 6   |
+|header 1|header 3|
+|---|---|
+|cell 1|cell 2|
+|cell 3|cell 4|
+|cell 5|cell 6|
 
 ### 隐藏细节
 
@@ -146,7 +146,6 @@ public class HelloWorld {
 <summary>这里是摘要部分。</summary>
 这里是细节部分。
 </details>
-
 ### 段落
 
 空行可以将内容进行分段，便于阅读。（这是第一段）
@@ -251,4 +250,5 @@ K: Em
 
 ## 快捷键
 
-我们的编辑器支持很多快捷键，具体请参考 [键盘快捷键](https://hacpai.com/article/1474030007391)（或者按 "`?` ":smirk_cat:）
+我们的编辑器支持很多快捷键，具体请参考 [键盘快捷键](https://hacpai.com/article/1474030007391)（或者按 &quot;`?` &quot;:smirk_cat:）
+
