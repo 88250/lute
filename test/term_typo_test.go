@@ -20,6 +20,7 @@ import (
 
 var termTypoTests = []parseTest{
 
+	{"5", "test.html\n", "<p>test.html</p>\n"},
 	{"4", "cookie ie ieo\n", "<p>cookie IE ieo</p>\n"},
 	{"3", "github.com\n", "<p>github.com</p>\n"},
 	{"2", "https://github.com\n", "<p><a href=\"https://github.com\">https://github.com</a></p>\n"},
