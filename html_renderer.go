@@ -232,7 +232,7 @@ func (r *Renderer) renderTextHTML(node *Node, entering bool) (WalkStatus, error)
 	if entering {
 		r.write(escapeHTML(node.tokens))
 	}
-	return WalkContinue, nil
+	return WalkContinue, nil // TODO: return WalkStop, nil
 }
 
 func (r *Renderer) renderCodeSpanHTML(node *Node, entering bool) (WalkStatus, error) {

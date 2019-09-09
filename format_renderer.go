@@ -143,7 +143,7 @@ func (r *Renderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, e
 		}
 		r.writeByte(itemCloseParen)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, error) {
@@ -162,7 +162,7 @@ func (r *Renderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, er
 		}
 		r.writeByte(itemCloseParen)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
@@ -171,62 +171,35 @@ func (r *Renderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStatus, er
 		r.write(node.tokens)
 		r.newline()
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderInlineHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
-		r.writeByte(itemNewline)
+	if entering {
+		r.writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
+	} else {
+		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+		buf := writer.Bytes()
+		buf = append(buf, itemNewline)
+		r.writer.Reset()
+		r.writer.Write(buf)
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatus, error) {
-	listPadding := 0
-	inTightList := false
-	lastListItemLastPara := false
-	if parent := node.parent; nil != parent {
-		if NodeListItem == parent.typ { // ListItem.Paragraph
-			listItem := parent
-
-			// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
-			// 设置紧凑标识的具体实现可参考函数 List.Finalize()
-			inTightList = listItem.parent.tight
-
-			firstPara := listItem.firstChild
-			if 3 != listItem.listData.typ { // 普通列表
-				if firstPara != node {
-					listPadding = listItem.padding
-				}
-			} else { // 任务列表
-				if firstPara.next != node { // 任务列表要跳过 TaskListItemMarker 即 [X]
-					listPadding = listItem.padding
-				}
-			}
-
-			nextItem := listItem.next
-			if nil == nextItem {
-				nextPara := node.next
-				lastListItemLastPara = nil == nextPara
-			}
-		}
-	}
-
-	if entering {
-		r.write(bytes.Repeat(items{itemSpace}, listPadding))
-	} else {
+	if !entering {
 		r.newline()
-		isLastNode := r.isLastNode(r.treeRoot, node)
-		if !isLastNode && (!inTightList || (lastListItemLastPara)) {
-			r.writeByte(itemNewline)
-		}
+		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
 }
@@ -237,7 +210,7 @@ func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, er
 			r.write(escapeHTML(node.tokens))
 		}
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderCodeSpanMarkdown(node *Node, entering bool) (WalkStatus, error) {
@@ -324,12 +297,29 @@ func (r *Renderer) renderStrongMarkdown(node *Node, entering bool) (WalkStatus, 
 
 func (r *Renderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.blockquoteDepth++
-		r.newline()
-		r.writeString("> ") // 带个空格更好一些
+		r.writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
 	} else {
-		r.newline()
-		r.blockquoteDepth--
+		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+
+		blockquoteLines := bytes.Buffer{}
+		buf := writer.Bytes()
+		lines := bytes.Split(buf, items{itemNewline})
+		length := len(lines)
+		if 2 < length && isBlank(lines[length-1]) && isBlank(lines[length-2]) {
+			lines = lines[:length-1]
+		}
+		for _, line := range lines {
+			blockquoteLines.WriteString("> ")
+			blockquoteLines.Write(line)
+			blockquoteLines.WriteByte(itemNewline)
+		}
+		buf = blockquoteLines.Bytes()
+		writer.Reset()
+		writer.Write(buf)
+		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
+		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 	}
 	return WalkContinue, nil
 }
@@ -347,43 +337,55 @@ func (r *Renderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus,
 
 func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.listDepth++
-		if 1 < r.listDepth {
-			lastList := r.listStack[len(r.listStack)-1] // 栈顶是上一个列表节点
-			r.listIndent += len(lastList.marker) + 1
-			if 1 == lastList.listData.typ {
-				r.listIndent++
-			}
-		}
-		r.listStack = append(r.listStack, node) // 入栈
-		r.newline()
+		r.writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
 	} else {
-		r.newline()
-		r.listStack = r.listStack[:len(r.listStack)-1] // 出栈
-		if 0 < len(r.listStack) {
-			lastList := r.listStack[len(r.listStack)-1]
-			r.listIndent -= + len(lastList.marker) + 1
-			if 1 == lastList.listData.typ {
-				r.listIndent--
-			}
-		}
-		r.listDepth--
+		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
 	}
 	return WalkContinue, nil
 }
 
 func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.newline()
-		if 1 < r.listDepth {
-			r.write(bytes.Repeat(items{itemSpace}, r.listIndent))
-		}
+		r.writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
+	} else {
+		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+		indent := len(node.marker) + 1
 		if 1 == node.listData.typ {
-			r.writeString(strconv.Itoa(node.num) + ".")
-		} else {
-			r.write(node.marker)
+			indent++
 		}
-		r.writeByte(itemSpace)
+		indentSpaces := bytes.Repeat(items{itemSpace}, indent)
+		indentedLines := bytes.Buffer{}
+		buf := writer.Bytes()
+		lines := bytes.Split(buf, items{itemNewline})
+		for _, line := range lines {
+			if 1 > len(line) {
+				continue
+			}
+			indentedLines.Write(indentSpaces)
+			indentedLines.Write(line)
+			indentedLines.WriteByte(itemNewline)
+		}
+		buf = indentedLines.Bytes()
+		buf = buf[indent:]
+
+		listItemBuf := bytes.Buffer{}
+		if 1 == node.listData.typ {
+			listItemBuf.WriteString(strconv.Itoa(node.num) + ".")
+		} else {
+			listItemBuf.Write(node.marker)
+		}
+		listItemBuf.WriteByte(itemSpace)
+		buf = append(listItemBuf.Bytes(), buf...)
+
+		writer.Reset()
+		writer.Write(buf)
+		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
+		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 	}
 	return WalkContinue, nil
 }
@@ -407,7 +409,7 @@ func (r *Renderer) renderThematicBreakMarkdown(node *Node, entering bool) (WalkS
 		r.writeString("---")
 		r.newline()
 	}
-	return WalkSkipChildren, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
@@ -418,21 +420,23 @@ func (r *Renderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatu
 			r.writeByte(itemNewline)
 		}
 	}
-	return WalkSkipChildren, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderSoftBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 	}
-	return WalkSkipChildren, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) isLastNode(treeRoot, node *Node) bool {
 	if treeRoot == node {
 		return true
 	}
-
+	if nil != node.next {
+		return false
+	}
 	if NodeDocument == node.parent.typ {
 		return treeRoot.lastChild == node
 	}

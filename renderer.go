@@ -23,19 +23,14 @@ type RendererFunc func(n *Node, entering bool) (WalkStatus, error)
 
 // Renderer 描述了渲染器结构。
 type Renderer struct {
-	writer        bytes.Buffer         // 输出缓冲
+	writer        *bytes.Buffer        // 输出缓冲
 	lastOut       byte                 // 最新输出的一个字节
 	rendererFuncs map[int]RendererFunc // 渲染器
 	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 	option        *options             // 解析渲染选项
 	treeRoot      *Node                // 待渲染的树的根节点
 
-	// 以下字段用于格式化渲染器
-
-	listDepth       int     // 列表嵌套深度
-	listIndent      int     // 列表项缩进空格数
-	listStack       []*Node // 列表栈
-	blockquoteDepth int     // 块引用嵌套深度
+	nodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
 }
 
 // render 从指定的根节点 root 开始遍历并渲染。
@@ -43,6 +38,7 @@ func (r *Renderer) render() (output []byte, err error) {
 	defer recoverPanic(&err)
 
 	r.lastOut = itemNewline
+	r.writer = &bytes.Buffer{}
 	r.writer.Grow(4096)
 
 	err = Walk(r.treeRoot, func(n *Node, entering bool) (WalkStatus, error) {
