@@ -86,7 +86,7 @@ func TestFormatCases(t *testing.T) {
 	}
 
 	// TODO: 暂时跳过一些失败的用例
-	skips := "format-case0.md, format-case1.md, format-case2.md, format-case3.md"
+	skips := ""
 
 	for _, file := range files {
 		if !strings.HasPrefix(file.Name(), "format-case") || strings.Contains(file.Name(), "formatted") {

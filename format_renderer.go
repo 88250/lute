@@ -237,6 +237,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 		node.codeBlockFenceLen = 3
 	}
 	if entering {
+		// TODO: 重写
 		listPadding := 0
 		if grandparent := node.parent.parent; nil != grandparent {
 			if NodeList == grandparent.typ { // List.ListItem.CodeBlock
@@ -309,6 +310,12 @@ func (r *Renderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStat
 		length := len(lines)
 		if 2 < length && isBlank(lines[length-1]) && isBlank(lines[length-2]) {
 			lines = lines[:length-1]
+		}
+		if 1 == len(r.nodeWriterStack) { // 已经是根这一层
+			length = len(lines)
+			if 1 < length && isBlank(lines[length-1]) {
+				lines = lines[:length-1]
+			}
 		}
 		for _, line := range lines {
 			blockquoteLines.WriteString("> ")
