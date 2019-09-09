@@ -186,12 +186,11 @@ func (r *Renderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
 	} else {
-		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		buf := writer.Bytes()
-		buf = append(buf, itemNewline)
+		buf := bytes.TrimSpace(r.writer.Bytes())
 		r.writer.Reset()
-		r.writer.Write(buf)
+		r.write(buf)
+		r.writeString("\n\n")
 	}
 	return WalkContinue, nil
 }
@@ -199,7 +198,28 @@ func (r *Renderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus
 func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.newline()
-		r.writeByte(itemNewline)
+
+		inTightList := false
+		lastListItemLastPara := false
+		if parent := node.parent; nil != parent {
+			if NodeListItem == parent.typ { // ListItem.Paragraph
+				listItem := parent
+
+				// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
+				// 设置紧凑标识的具体实现可参考函数 List.Finalize()
+				inTightList = listItem.parent.tight
+
+				nextItem := listItem.next
+				if nil == nextItem {
+					nextPara := node.next
+					lastListItemLastPara = nil == nextPara
+				}
+			}
+		}
+
+		if !inTightList || (lastListItemLastPara) {
+			r.writeByte(itemNewline)
+		}
 	}
 	return WalkContinue, nil
 }
@@ -237,39 +257,12 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 		node.codeBlockFenceLen = 3
 	}
 	if entering {
-		// TODO: 重写
-		listPadding := 0
-		if grandparent := node.parent.parent; nil != grandparent {
-			if NodeList == grandparent.typ { // List.ListItem.CodeBlock
-				if node.parent.firstChild != node {
-					listPadding = grandparent.padding
-				}
-			}
-		}
-
-		r.newline()
-		if 0 < listPadding {
-			r.write(bytes.Repeat(items{itemSpace}, listPadding))
-		}
 		r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
 		r.write(node.codeBlockInfo)
 		r.writeByte(itemNewline)
-		if 0 < listPadding {
-			lines := bytes.Split(node.tokens, items{itemNewline})
-			length := len(lines)
-			for i, line := range lines {
-				r.write(bytes.Repeat(items{itemSpace}, listPadding))
-				r.write(line)
-				if i < length-1 {
-					r.writeByte(itemNewline)
-				}
-			}
-		} else {
-			r.write(node.tokens)
-		}
+		r.write(node.tokens)
 		return WalkSkipChildren, nil
 	}
-
 	r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
 	r.newline()
 	if !r.isLastNode(r.treeRoot, node) {
@@ -318,6 +311,11 @@ func (r *Renderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStat
 			}
 		}
 		for _, line := range lines {
+			if 0 == len(line) {
+				blockquoteLines.WriteString(">\n")
+				continue
+			}
+
 			blockquoteLines.WriteString("> ")
 			blockquoteLines.Write(line)
 			blockquoteLines.WriteByte(itemNewline)
@@ -327,6 +325,10 @@ func (r *Renderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStat
 		writer.Write(buf)
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
 		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		buf = bytes.TrimSpace(r.writer.Bytes())
+		r.writer.Reset()
+		r.write(buf)
+		r.writeString("\n\n")
 	}
 	return WalkContinue, nil
 }
@@ -350,6 +352,11 @@ func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, er
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
+		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		buf := bytes.TrimSpace(r.writer.Bytes())
+		r.writer.Reset()
+		r.write(buf)
+		r.writeString("\n\n")
 	}
 	return WalkContinue, nil
 }
@@ -370,7 +377,8 @@ func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus
 		buf := writer.Bytes()
 		lines := bytes.Split(buf, items{itemNewline})
 		for _, line := range lines {
-			if 1 > len(line) {
+			if 0 == len(line) {
+				indentedLines.WriteByte(itemNewline)
 				continue
 			}
 			indentedLines.Write(indentSpaces)
@@ -388,11 +396,15 @@ func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus
 		}
 		listItemBuf.WriteByte(itemSpace)
 		buf = append(listItemBuf.Bytes(), buf...)
-
 		writer.Reset()
 		writer.Write(buf)
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
 		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		buf = bytes.TrimSpace(r.writer.Bytes())
+		r.writer.Reset()
+		r.write(buf)
+		r.writeString("\n")
 	}
 	return WalkContinue, nil
 }
