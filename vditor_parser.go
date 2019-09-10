@@ -25,7 +25,7 @@ import (
 func (lute *Lute) parseVditorDOM(htmlStr string) (tree *Tree, err error) {
 	defer recoverPanic(&err)
 
-	// 将字符串解析为 HTMl 树
+	// 将字符串解析为 HTML 树
 
 	reader := strings.NewReader(htmlStr)
 	htmlRoot := &html.Node{Type: html.ElementNode}
@@ -39,28 +39,34 @@ func (lute *Lute) parseVditorDOM(htmlStr string) (tree *Tree, err error) {
 	tree = &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
 	for _, htmlNode := range htmlNodes {
 		tree.context.tip = tree.Root
-		lute.convertAST(htmlNode, tree)
+		lute.genASTByVditorDOM(htmlNode, tree)
 	}
 
 	return
 }
 
-// convertAST 对指定的 HTML 树节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
-func (lute *Lute) convertAST(n *html.Node, tree *Tree) {
-	node := &Node{}
+// genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
+func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
+	node := &Node{typ: -1, tokens: toItems(n.Data)}
 	switch n.DataAtom {
+	case 0:
+		node.typ = NodeText
 	case atom.Em:
 		node.typ = NodeEmphasis
 		node.strongEmDelMarker = itemAsterisk
 		node.strongEmDelMarkenLen = 1
-	case 0:
-		node.typ = NodeText
-		node.tokens = toItems(n.Data)
+	case atom.P:
+		node.typ = NodeParagraph
+	case atom.Span:
+
 	}
-	tree.context.vditorAddChild(node)
+
+	if 1 <= node.typ {
+		tree.context.vditorAddChild(node)
+	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.convertAST(c, tree)
+		lute.genASTByVditorDOM(c, tree)
 	}
 }
 

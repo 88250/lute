@@ -20,7 +20,8 @@ import (
 
 var vditorParserTests = []parseTest{
 
-	{"0", "<em>Lute</em>\n", "*Lute*\n\n"},
+	{"1", "<em>Lute</em>\n", "*Lute*\n\n"},
+	{"0", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lute</span></p>\n", "Lute\n\n"},
 }
 
 func TestVditorParser(t *testing.T) {
