@@ -62,14 +62,14 @@ func (r *Renderer) renderEmojiImgHTML(node *Node, entering bool) (WalkStatus, er
 	if entering {
 		r.write(node.tokens)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderEmojiUnicodeHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderTableCellHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -193,16 +193,15 @@ func (r *Renderer) renderHTMLHTML(node *Node, entering bool) (WalkStatus, error)
 		r.newline()
 		r.write(node.tokens)
 		r.newline()
-
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderInlineHTMLHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderDocumentHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -232,7 +231,7 @@ func (r *Renderer) renderTextHTML(node *Node, entering bool) (WalkStatus, error)
 	if entering {
 		r.write(escapeHTML(node.tokens))
 	}
-	return WalkContinue, nil // TODO: return WalkStop, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderCodeSpanHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -342,7 +341,7 @@ func (r *Renderer) renderThematicBreakHTML(node *Node, entering bool) (WalkStatu
 		r.tag("hr", nil, true)
 		r.newline()
 	}
-	return WalkSkipChildren, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderHardBreakHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -350,7 +349,7 @@ func (r *Renderer) renderHardBreakHTML(node *Node, entering bool) (WalkStatus, e
 		r.tag("br", nil, true)
 		r.newline()
 	}
-	return WalkSkipChildren, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) renderSoftBreakHTML(node *Node, entering bool) (WalkStatus, error) {
@@ -362,7 +361,7 @@ func (r *Renderer) renderSoftBreakHTML(node *Node, entering bool) (WalkStatus, e
 			r.newline()
 		}
 	}
-	return WalkSkipChildren, nil
+	return WalkStop, nil
 }
 
 func (r *Renderer) tag(name string, attrs [][]string, selfclosing bool) {
