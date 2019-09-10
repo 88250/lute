@@ -25,26 +25,60 @@ import (
 func (lute *Lute) parseVditorDOM(htmlStr string) (tree *Tree, err error) {
 	defer recoverPanic(&err)
 
+	// 将字符串解析为 HTMl 树
+
 	reader := strings.NewReader(htmlStr)
-	doc, err := html.Parse(reader)
+	htmlRoot := &html.Node{Type: html.ElementNode}
+	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
 	if nil != err {
 		return
 	}
 
-	// HTML Tree to Markdown AST
-	tree = &Tree{Name: "", Root: &Node{typ: NodeDocument}}
+	// 将 HTML 树转换为 Markdown 语法树
 
-	var walker func(*html.Node)
-	walker = func(n *html.Node) {
-		if html.ElementNode == n.Type && atom.Html == n.DataAtom {
-			// Do something with n...
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walker(c)
-		}
+	tree = &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
+	for _, htmlNode := range htmlNodes {
+		tree.context.tip = tree.Root
+		lute.convertAST(htmlNode, tree)
 	}
 
-	walker(doc)
-
 	return
+}
+
+// convertAST 对指定的 HTML 树节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
+func (lute *Lute) convertAST(n *html.Node, tree *Tree) {
+	node := &Node{}
+	switch n.DataAtom {
+	case atom.Em:
+		node.typ = NodeEmphasis
+		node.strongEmDelMarker = itemAsterisk
+		node.strongEmDelMarkenLen = 1
+	case 0:
+		node.typ = NodeText
+		node.tokens = toItems(n.Data)
+	}
+	tree.context.vditorAddChild(node)
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.convertAST(c, tree)
+	}
+}
+
+// vditorAddChild 将 child 作为子节点添加到 context.tip 上。如果 tip 节点不能接受子节点（非块级容器不能添加子节点），则最终化该 tip
+// 节点并向父节点方向尝试，直到找到一个能接受 child 的节点为止。
+func (context *Context) vditorAddChild(child *Node) {
+	for !context.tip.CanContain(child.typ) {
+		context.vditorFinalize(context.tip) // 注意调用 vditorFinalize 会向父节点方向进行迭代
+	}
+
+	context.tip.AppendChild(context.tip, child)
+	context.tip = child
+}
+
+// vditorFinalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
+func (context *Context) vditorFinalize(block *Node) {
+	var parent = block.parent
+	block.close = true
+	block.Finalize(context)
+	context.tip = parent
 }
