@@ -16,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/b3log/lute/html"
 )
 
 func unescapeString(tokens items) (ret items) {
@@ -124,7 +126,7 @@ func parseEntity(s string) (string, int) {
 					return "", 0
 				}
 			case b == ';':
-				if e, ok := htmlEntities[s[i-n:i]]; ok {
+				if e, ok := html.Entities[s[i-n:i]]; ok {
 					return e, i + 1
 				}
 				return "", 0

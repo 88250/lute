@@ -12,10 +12,33 @@
 
 package lute
 
+import (
+	"strings"
+
+	"github.com/b3log/lute/html"
+)
+
 // Vditor DOM Parser
 
 // parseVditorDOM 解析 Vditor DOM 生成 Markdown 文本。
-func parseVditorDOM(html string) *Tree {
-	// TODO: Vditor DOM Parser
-	return nil
+func (lute *Lute) parseVditorDOM(htmlStr string) (tree *Tree, err error) {
+	defer recoverPanic(&err)
+
+	reader := strings.NewReader(htmlStr)
+	doc, err := html.Parse(reader)
+	if nil != err {
+		return
+	}
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			// Do something with n...
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+
+	return
 }

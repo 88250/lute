@@ -4,7 +4,7 @@
   "Includes": [
     "*.go"
   ],
-  "Excludes": [],
+  "Excludes": ["html/**"],
   "UseDefaultExcludes": true,
   "Properties": {
     "Year": "2019-present",

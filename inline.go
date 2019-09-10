@@ -14,6 +14,7 @@ package lute
 
 import (
 	"bytes"
+	"github.com/b3log/lute/html"
 	"strings"
 )
 
@@ -90,7 +91,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	}
 
 	entityName := fromItems(ctx.tokens[start:i])
-	if entityValue, ok := htmlEntities[entityName]; ok {
+	if entityValue, ok := html.Entities[entityName]; ok {
 		ctx.pos += i - start
 		return &Node{typ: NodeText, tokens: toItems(entityValue)}
 	}

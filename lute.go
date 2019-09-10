@@ -136,6 +136,23 @@ func (lute *Lute) RenderVditorDOM(nodeDataId int, markdownText string) (html str
 	return
 }
 
+// VditorDOMMarkdown 用于将 Vditor DOM 转换为 Markdown 文本。
+func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
+	tree, err := lute.parseVditorDOM(html)
+	if nil != err {
+		return
+	}
+
+	var formatted []byte
+	renderer := lute.newFormatRenderer(tree.Root)
+	formatted, err = renderer.Render()
+	if nil != err {
+		return
+	}
+	markdown = fromItems(formatted)
+	return
+}
+
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	// GFMTable 设置是否打开“GFM 表”支持。

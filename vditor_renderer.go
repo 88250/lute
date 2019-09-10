@@ -289,7 +289,6 @@ func (r *VditorRenderer) renderCodeSpanVditor(node *Node, entering bool) (WalkSt
 		}
 		r.tag("/span", -1, nil, false)
 	}
-
 	return WalkContinue, nil
 }
 
