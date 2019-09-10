@@ -77,13 +77,13 @@ var debugTests = []parseTest{
 func TestDebug(t *testing.T) {
 	luteEngine := lute.New()
 	for _, test := range debugTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
 
-		if test.html != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
 	}
 }

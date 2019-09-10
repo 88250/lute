@@ -72,13 +72,13 @@ func TestCodeSyntaxHighlightLineNum(t *testing.T) {
 	luteEngine.CodeSyntaxHighlightLineNum = true
 
 	for _, test := range codeSyntaxHighlightLineNumTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
 
-		if test.html != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
 	}
 }
@@ -92,13 +92,13 @@ func TestCodeSyntaxHighlight(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range codeSyntaxHighlightTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
 
-		if test.html != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
 	}
 }
@@ -114,13 +114,13 @@ func TestCodeSyntaxHighlightInline(t *testing.T) {
 	luteEngine.CodeSyntaxHighlightStyleName = "dracula"
 
 	for _, test := range codeSyntaxHighlightInlineTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
 
-		if test.html != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
 	}
 }
@@ -135,13 +135,13 @@ func TestCodeSyntaxHighlightStyle(t *testing.T) {
 	luteEngine.CodeSyntaxHighlightStyleName = "monokai"
 
 	for _, test := range codeSyntaxHighlightStyleTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
 
-		if test.html != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
 	}
 }
@@ -156,13 +156,13 @@ func TestCodeSyntaxHighlightOff(t *testing.T) {
 	luteEngine.CodeSyntaxHighlight = false
 
 	for _, test := range codeSyntaxHighlightOffTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.markdown)
+		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
 
-		if test.html != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.html, html, test.markdown)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
 	}
 }
