@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/b3log/lute/html"
+	"github.com/b3log/lute/html/atom"
 )
 
 // Vditor DOM Parser
@@ -29,16 +30,21 @@ func (lute *Lute) parseVditorDOM(htmlStr string) (tree *Tree, err error) {
 	if nil != err {
 		return
 	}
-	var f func(*html.Node)
-	f = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "a" {
+
+	// HTML Tree to Markdown AST
+	tree = &Tree{Name: "", Root: &Node{typ: NodeDocument}}
+
+	var walker func(*html.Node)
+	walker = func(n *html.Node) {
+		if html.ElementNode == n.Type && atom.Html == n.DataAtom {
 			// Do something with n...
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			f(c)
+			walker(c)
 		}
 	}
-	f(doc)
+
+	walker(doc)
 
 	return
 }
