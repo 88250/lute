@@ -17,9 +17,15 @@ import (
 	"strconv"
 )
 
+// FormatRenderer 描述了格式化渲染器。
+type FormatRenderer struct {
+	*BaseRenderer
+	nodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
+}
+
 // newFormatRenderer 创建一个格式化渲染器。
-func (lute *Lute) newFormatRenderer(treeRoot *Node) (ret *Renderer) {
-	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}
+func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
+	ret := &FormatRenderer{BaseRenderer: &BaseRenderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
 
 	// 注册 CommonMark 渲染函数
 
@@ -56,17 +62,17 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) (ret *Renderer) {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeMarkdown
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgMarkdown
 
-	return
+	return ret
 }
 
-func (r *Renderer) renderEmojiImgMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmojiImgMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.emojiAlias)
 	}
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderEmojiUnicodeMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmojiUnicodeMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.emojiAlias)
 	}
@@ -75,21 +81,21 @@ func (r *Renderer) renderEmojiUnicodeMarkdown(node *Node, entering bool) (WalkSt
 
 // TODO: 表的格式化应该按最宽的单元格对齐内容
 
-func (r *Renderer) renderTableCellMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableCellMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte(itemPipe)
 	}
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableRowMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableRowMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.writeString("|\n")
 	}
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableHeadMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableHeadMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.writeString("|\n")
 		table := node.parent
@@ -111,7 +117,7 @@ func (r *Renderer) renderTableHeadMarkdown(node *Node, entering bool) (WalkStatu
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.newline()
 		if !r.isLastNode(r.treeRoot, node) {
@@ -121,7 +127,7 @@ func (r *Renderer) renderTableMarkdown(node *Node, entering bool) (WalkStatus, e
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderStrikethroughMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrikethroughMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
@@ -130,7 +136,7 @@ func (r *Renderer) renderStrikethroughMarkdown(node *Node, entering bool) (WalkS
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("![")
 		r.write(node.firstChild.tokens)
@@ -146,7 +152,7 @@ func (r *Renderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, e
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("[")
 		if nil != node.firstChild {
@@ -165,7 +171,7 @@ func (r *Renderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, er
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.write(node.tokens)
@@ -174,14 +180,14 @@ func (r *Renderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStatus, er
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderInlineHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderInlineHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -195,7 +201,7 @@ func (r *Renderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.newline()
 
@@ -224,7 +230,7 @@ func (r *Renderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatu
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
 			r.write(escapeHTML(node.tokens))
@@ -233,7 +239,7 @@ func (r *Renderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, er
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderCodeSpanMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeSpanMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte(itemBacktick)
 		if 1 < node.codeMarkerLen {
@@ -252,7 +258,7 @@ func (r *Renderer) renderCodeSpanMarkdown(node *Node, entering bool) (WalkStatus
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if !node.isFencedCodeBlock {
 		node.codeBlockFenceLen = 3
 	}
@@ -271,7 +277,7 @@ func (r *Renderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatu
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderEmphasisMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmphasisMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
@@ -280,7 +286,7 @@ func (r *Renderer) renderEmphasisMarkdown(node *Node, entering bool) (WalkStatus
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderStrongMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrongMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
@@ -289,7 +295,7 @@ func (r *Renderer) renderStrongMarkdown(node *Node, entering bool) (WalkStatus, 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -333,7 +339,7 @@ func (r *Renderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStat
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(bytes.Repeat(items{itemCrosshatch}, node.headingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
@@ -344,7 +350,7 @@ func (r *Renderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus,
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -361,7 +367,7 @@ func (r *Renderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, er
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -409,7 +415,7 @@ func (r *Renderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTaskListItemMarkerMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTaskListItemMarkerMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte(itemOpenBracket)
 		if node.taskListItemChecked {
@@ -422,7 +428,7 @@ func (r *Renderer) renderTaskListItemMarkerMarkdown(node *Node, entering bool) (
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderThematicBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderThematicBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("---")
@@ -431,7 +437,7 @@ func (r *Renderer) renderThematicBreakMarkdown(node *Node, entering bool) (WalkS
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if !r.option.SoftBreak2HardBreak {
 			r.writeString("\\\n")
@@ -442,14 +448,14 @@ func (r *Renderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatu
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderSoftBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderSoftBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 	}
 	return WalkStop, nil
 }
 
-func (r *Renderer) isLastNode(treeRoot, node *Node) bool {
+func (r *FormatRenderer) isLastNode(treeRoot, node *Node) bool {
 	if treeRoot == node {
 		return true
 	}

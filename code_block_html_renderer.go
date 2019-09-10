@@ -27,7 +27,7 @@ import (
 var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 
 // renderCodeBlockHTML 进行代码块 HTML 渲染，实现语法高亮。
-func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		tokens := node.tokens
@@ -67,7 +67,7 @@ func (r *Renderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, e
 	return WalkContinue, nil
 }
 
-func highlightChroma(tokens items, language string, r *Renderer) (rendered bool) {
+func highlightChroma(tokens items, language string, r *HTMLRenderer) (rendered bool) {
 	codeBlock := fromItems(tokens)
 	var lexer chroma.Lexer
 	if "" != language {

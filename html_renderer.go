@@ -16,9 +16,14 @@ import (
 	"strconv"
 )
 
+// HTMLRenderer 描述了 HTML 渲染器。
+type HTMLRenderer struct {
+	*BaseRenderer
+}
+
 // newHTMLRenderer 创建一个 HTML 渲染器。
-func (lute *Lute) newHTMLRenderer(treeRoot *Node) (ret *Renderer) {
-	ret = &Renderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}
+func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
+	ret := &HTMLRenderer{&BaseRenderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
 
 	// 注册 CommonMark 渲染函数
 
@@ -55,24 +60,24 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) (ret *Renderer) {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeHTML
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgHTML
 
-	return
+	return ret
 }
 
-func (r *Renderer) renderEmojiImgHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderEmojiImgHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderEmojiUnicodeHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderEmojiUnicodeHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderTableCellHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderTableCellHTML(node *Node, entering bool) (WalkStatus, error) {
 	tag := "td"
 	if NodeTableHead == node.parent.typ {
 		tag = "th"
@@ -95,7 +100,7 @@ func (r *Renderer) renderTableCellHTML(node *Node, entering bool) (WalkStatus, e
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableRowHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderTableRowHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("tr", nil, false)
 		r.newline()
@@ -110,7 +115,7 @@ func (r *Renderer) renderTableRowHTML(node *Node, entering bool) (WalkStatus, er
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableHeadHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderTableHeadHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("thead", nil, false)
 		r.newline()
@@ -129,7 +134,7 @@ func (r *Renderer) renderTableHeadHTML(node *Node, entering bool) (WalkStatus, e
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTableHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderTableHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("table", nil, false)
 		r.newline()
@@ -140,7 +145,7 @@ func (r *Renderer) renderTableHTML(node *Node, entering bool) (WalkStatus, error
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderStrikethroughHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderStrikethroughHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("del", nil, false)
 	} else {
@@ -149,7 +154,7 @@ func (r *Renderer) renderStrikethroughHTML(node *Node, entering bool) (WalkStatu
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderImageHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderImageHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
@@ -173,7 +178,7 @@ func (r *Renderer) renderImageHTML(node *Node, entering bool) (WalkStatus, error
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderLinkHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderLinkHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		attrs := [][]string{{"href", fromItems(escapeHTML(node.destination))}}
 		if nil != node.title {
@@ -188,7 +193,7 @@ func (r *Renderer) renderLinkHTML(node *Node, entering bool) (WalkStatus, error)
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHTMLHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderHTMLHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.write(node.tokens)
@@ -197,18 +202,18 @@ func (r *Renderer) renderHTMLHTML(node *Node, entering bool) (WalkStatus, error)
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderInlineHTMLHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderInlineHTMLHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderDocumentHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderDocumentHTML(node *Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderParagraphHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderParagraphHTML(node *Node, entering bool) (WalkStatus, error) {
 	if grandparent := node.parent.parent; nil != grandparent {
 		if NodeList == grandparent.typ { // List.ListItem.Paragraph
 			if grandparent.tight {
@@ -227,14 +232,14 @@ func (r *Renderer) renderParagraphHTML(node *Node, entering bool) (WalkStatus, e
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTextHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderTextHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(escapeHTML(node.tokens))
 	}
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderCodeSpanHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderCodeSpanHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("<code>")
 		r.write(escapeHTML(node.tokens))
@@ -244,7 +249,7 @@ func (r *Renderer) renderCodeSpanHTML(node *Node, entering bool) (WalkStatus, er
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderEmphasisHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderEmphasisHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("em", nil, false)
 	} else {
@@ -253,7 +258,7 @@ func (r *Renderer) renderEmphasisHTML(node *Node, entering bool) (WalkStatus, er
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderStrongHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderStrongHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("<strong>")
 		r.write(node.tokens)
@@ -263,7 +268,7 @@ func (r *Renderer) renderStrongHTML(node *Node, entering bool) (WalkStatus, erro
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderBlockquoteHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderBlockquoteHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("<blockquote>")
@@ -276,7 +281,7 @@ func (r *Renderer) renderBlockquoteHTML(node *Node, entering bool) (WalkStatus, 
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderHeadingHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderHeadingHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("<h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
@@ -287,7 +292,7 @@ func (r *Renderer) renderHeadingHTML(node *Node, entering bool) (WalkStatus, err
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderListHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderListHTML(node *Node, entering bool) (WalkStatus, error) {
 	tag := "ul"
 	if 1 == node.listData.typ {
 		tag = "ol"
@@ -309,7 +314,7 @@ func (r *Renderer) renderListHTML(node *Node, entering bool) (WalkStatus, error)
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderListItemHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderListItemHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
 			r.tag("li", [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
@@ -323,7 +328,7 @@ func (r *Renderer) renderListItemHTML(node *Node, entering bool) (WalkStatus, er
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderTaskListItemMarkerHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderTaskListItemMarkerHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		var attrs [][]string
 		if node.taskListItemChecked {
@@ -335,7 +340,7 @@ func (r *Renderer) renderTaskListItemMarkerHTML(node *Node, entering bool) (Walk
 	return WalkContinue, nil
 }
 
-func (r *Renderer) renderThematicBreakHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderThematicBreakHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.tag("hr", nil, true)
@@ -344,7 +349,7 @@ func (r *Renderer) renderThematicBreakHTML(node *Node, entering bool) (WalkStatu
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderHardBreakHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderHardBreakHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("br", nil, true)
 		r.newline()
@@ -352,7 +357,7 @@ func (r *Renderer) renderHardBreakHTML(node *Node, entering bool) (WalkStatus, e
 	return WalkStop, nil
 }
 
-func (r *Renderer) renderSoftBreakHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderSoftBreakHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if r.option.SoftBreak2HardBreak {
 			r.tag("br", nil, true)
@@ -364,7 +369,7 @@ func (r *Renderer) renderSoftBreakHTML(node *Node, entering bool) (WalkStatus, e
 	return WalkStop, nil
 }
 
-func (r *Renderer) tag(name string, attrs [][]string, selfclosing bool) {
+func (r *HTMLRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 	if r.disableTags > 0 {
 		return
 	}

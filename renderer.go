@@ -21,20 +21,24 @@ import (
 // RendererFunc 描述了渲染器函数签名。
 type RendererFunc func(n *Node, entering bool) (WalkStatus, error)
 
-// Renderer 描述了渲染器结构。
-type Renderer struct {
+// Renderer 描述了渲染器接口。
+type Renderer interface {
+	// Render 渲染输出。
+	Render() (output []byte, err error)
+}
+
+// BaseRenderer 描述了渲染器结构。
+type BaseRenderer struct {
 	writer        *bytes.Buffer        // 输出缓冲
 	lastOut       byte                 // 最新输出的一个字节
 	rendererFuncs map[int]RendererFunc // 渲染器
 	disableTags   int                  // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 	option        *options             // 解析渲染选项
 	treeRoot      *Node                // 待渲染的树的根节点
-
-	nodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
 }
 
-// render 从指定的根节点 root 开始遍历并渲染。
-func (r *Renderer) render() (output []byte, err error) {
+// Render 从指定的根节点 root 开始遍历并渲染。
+func (r *BaseRenderer) Render() (output []byte, err error) {
 	defer recoverPanic(&err)
 
 	r.lastOut = itemNewline
@@ -58,13 +62,13 @@ func (r *Renderer) render() (output []byte, err error) {
 }
 
 // writeByte 输出一个字节 c。
-func (r *Renderer) writeByte(c byte) {
+func (r *BaseRenderer) writeByte(c byte) {
 	r.writer.WriteByte(c)
 	r.lastOut = c
 }
 
 // write 输出指定的 tokens 数组 content。
-func (r *Renderer) write(content items) {
+func (r *BaseRenderer) write(content items) {
 	if length := len(content); 0 < length {
 		r.writer.Write(content)
 		r.lastOut = content[length-1]
@@ -72,7 +76,7 @@ func (r *Renderer) write(content items) {
 }
 
 // writeString 输出指定的字符串 content。
-func (r *Renderer) writeString(content string) {
+func (r *BaseRenderer) writeString(content string) {
 	if length := len(content); 0 < length {
 		r.writer.WriteString(content)
 		r.lastOut = content[length-1]
@@ -80,7 +84,7 @@ func (r *Renderer) writeString(content string) {
 }
 
 // newline 会在最新内容不是换行符 \n 时输出一个换行符。
-func (r *Renderer) newline() {
+func (r *BaseRenderer) newline() {
 	if itemNewline != r.lastOut {
 		r.writer.WriteByte(itemNewline)
 		r.lastOut = itemNewline
