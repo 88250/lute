@@ -20,6 +20,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
+	{"15", "**foo**\n\n<br />\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>foo</span></strong><span class=\"marker\">**</span></span></p><br />"},
 	{"14", "**foo**\n\nbar\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>foo</span></strong><span class=\"marker\">**</span></span></p><p><span>bar</span></p>"},
 	{"13", "**foo** _bar_\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>foo</span></strong><span class=\"marker\">**</span></span><span> </span><span class=\"node\"><span class=\"marker\">_</span><em><span>bar</span></em><span class=\"marker\">_</span></span></p>"},
 	{"12", "[Lute](https://github.com/b3log/lute)", "<p><span><span class=\"marker\">[</span><a href=\"https://github.com/b3log/lute\"><span>Lute</span></a><span class=\"marker\">]</span><span class=\"marker\">(</span><span>https://github.com/b3log/lute</span><span class=\"marker\">)</span></span></p>"},
