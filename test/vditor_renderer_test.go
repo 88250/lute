@@ -25,7 +25,7 @@ var vditorRendererTests = []parseTest{
 	{"9", "Lu  \nte\n", "<p><span>Lu</span><span></span>\n<span>te</span></p>\n"},
 	{"8", "Lu\\\nte\n", "<p><span>Lu</span><span></span>\n<span>te</span></p>\n"},
 	{"7", "`Lute`\n", "<p><span><span class=\"marker\">`</span><code>Lute</code><span class=\"marker\">`</span></p>\n"},
-	{"6", "**Lute**\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>Lute</span></strong><span class=\"marker\">**</span></p>\n"},
+	{"6", "**Lute**\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>Lute</span></strong><span class=\"marker\">**</span></span></p>\n"},
 	{"5", "*Lute*\n", "<p><span><span class=\"marker\">*</span><em><span>Lute</span></em><span class=\"marker\">*</span></p>\n"},
 	{"4", "* Lute\n", "<ul>\n<li><span>Lute</span></li>\n</ul>\n"},
 	{"3", "> Lute\n", "<blockquote>\n<p><span>Lute</span></p>\n</blockquote>\n"},
