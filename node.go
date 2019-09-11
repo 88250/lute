@@ -128,7 +128,7 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（另一种块级容器）可以包含任意节点；段落节点（一种叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType int) bool {
 	switch n.typ {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeHeading, NodeThematicBreak, NodeTable:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType

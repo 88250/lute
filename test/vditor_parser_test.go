@@ -20,6 +20,7 @@ import (
 
 var vditorParserTests = []parseTest{
 
+	{"3", "<h2><span>Lute</span></h2>\n", "## Lute\n\n"},
 	{"2", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>Lute</span></strong><span class=\"marker\">**</span></p>\n", "**Lute**\n\n"},
 	{"1", "<p><span><span class=\"marker\">*</span><em><span>Lute</span></em><span class=\"marker\">*</span></p>\n", "*Lute*\n\n"},
 	{"0", "<p><span>Lute</span></p>\n", "Lute\n\n"},
