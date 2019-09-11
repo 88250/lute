@@ -326,7 +326,7 @@ func main() {
 
 关于代码块语法高亮：
 
-* 需要在前端引入 chroma-styles 目录下的样式主题文件，默认使用的是 github.css
+* 默认使用外部样式表，主题为 github.css，可从 chroma-styles 目录下拷贝该样式文件到项目中引入
 * 可通过 `lutenEngine.SetCodeSyntaxHighlightXXX()` 来指定高亮相关参数，比如是否启用内联样式、行号以及主题
 
 ### JavaScript
