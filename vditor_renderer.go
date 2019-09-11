@@ -318,8 +318,9 @@ func (r *VditorRenderer) renderCodeBlockVditor(node *Node, entering bool) (WalkS
 
 func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", -1, nil, false)
-		attrs := [][]string{{"class", "marker"}}
+		attrs := [][]string{{"class", "node"}}
+		r.tag("span", -1, attrs, false)
+		attrs = [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(node.strongEmDelMarker)
 		r.tag("/span", -1, nil, false)
@@ -330,6 +331,7 @@ func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkSt
 		r.tag("span", -1, attrs, false)
 		r.writeByte(node.strongEmDelMarker)
 		r.tag("/span", -1, nil, false)
+		r.tag("/span", -1, attrs, false)
 	}
 	return WalkContinue, nil
 }
@@ -348,8 +350,8 @@ func (r *VditorRenderer) renderStrongVditor(node *Node, entering bool) (WalkStat
 		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
-		r.tag("/span", -1, attrs, false)
-		r.tag("/span", -1, attrs, false)
+		r.tag("/span", -1, nil, false)
+		r.tag("/span", -1, nil, false)
 	}
 	return WalkContinue, nil
 }

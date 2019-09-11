@@ -20,13 +20,15 @@ import (
 
 var vditorRendererTests = []parseTest{
 
-	{"11", "[Lute](https://github.com/b3log/lute)", "<p><span><span class=\"marker\">[</span><a href=\"https://github.com/b3log/lute\"><span>Lute</span></a><span class=\"marker\">]</span><span class=\"marker\">(</span><span>https://github.com/b3log/lute</span><span class=\"marker\">)</span></span></p>\n"},
-	{"10", "Lu\nte\n", "<p><span>Lu</span><span /></span>\n<span>te</span></p>\n"},
-	{"9", "Lu  \nte\n", "<p><span>Lu</span><span></span>\n<span>te</span></p>\n"},
-	{"8", "Lu\\\nte\n", "<p><span>Lu</span><span></span>\n<span>te</span></p>\n"},
-	{"7", "`Lute`\n", "<p><span><span class=\"marker\">`</span><code>Lute</code><span class=\"marker\">`</span></p>\n"},
-	{"6", "**Lute**\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>Lute</span></strong><span class=\"marker\">**</span></span></p>\n"},
-	{"5", "*Lute*\n", "<p><span><span class=\"marker\">*</span><em><span>Lute</span></em><span class=\"marker\">*</span></p>\n"},
+	{"13", "**foo** _bar_\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>foo</span></strong><span class=\"marker\">**</span></span><span> </span><span class=\"node\"><span class=\"marker\">_</span><em><span>bar</span></em><span class=\"marker\">_</span></span></p>\n"},
+	{"12", "[Lute](https://github.com/b3log/lute)", "<p><span><span class=\"marker\">[</span><a href=\"https://github.com/b3log/lute\"><span>Lute</span></a><span class=\"marker\">]</span><span class=\"marker\">(</span><span>https://github.com/b3log/lute</span><span class=\"marker\">)</span></span></p>\n"},
+	{"11", "Lu\nte\n", "<p><span>Lu</span><span /></span>\n<span>te</span></p>\n"},
+	{"10", "Lu  \nte\n", "<p><span>Lu</span><span></span>\n<span>te</span></p>\n"},
+	{"9", "Lu\\\nte\n", "<p><span>Lu</span><span></span>\n<span>te</span></p>\n"},
+	{"8", "`Lute`\n", "<p><span><span class=\"marker\">`</span><code>Lute</code><span class=\"marker\">`</span></p>\n"},
+	{"7", "**Lute**\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>Lute</span></strong><span class=\"marker\">**</span></span></p>\n"},
+	{"6", "*Lute*\n", "<p><span class=\"node\"><span class=\"marker\">*</span><em><span>Lute</span></em><span class=\"marker\">*</span></span></p>\n"},
+	{"5", "_Lute_\n", "<p><span class=\"node\"><span class=\"marker\">_</span><em><span>Lute</span></em><span class=\"marker\">_</span></span></p>\n"},
 	{"4", "* Lute\n", "<ul>\n<li><span>Lute</span></li>\n</ul>\n"},
 	{"3", "> Lute\n", "<blockquote>\n<p><span>Lute</span></p>\n</blockquote>\n"},
 	{"2", "---\n", "<hr />\n"},

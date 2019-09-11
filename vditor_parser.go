@@ -54,11 +54,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeText
 	case atom.Em:
 		node.typ = NodeEmphasis
-		node.strongEmDelMarker = itemAsterisk
+		node.strongEmDelMarker = n.PrevSibling.FirstChild.Data[0]
 		node.strongEmDelMarkenLen = 1
 	case atom.Strong:
 		node.typ = NodeStrong
-		node.strongEmDelMarker = itemAsterisk
+		node.strongEmDelMarker = n.PrevSibling.FirstChild.Data[0]
 		node.strongEmDelMarkenLen = 2
 	case atom.P:
 		node.typ = NodeParagraph
