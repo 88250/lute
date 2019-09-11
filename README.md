@@ -326,8 +326,8 @@ func main() {
 
 关于代码块语法高亮样式：
 
-* 可在前端引入 chroma-styles 目录下的样式文件
-* 也可以在 `lute.New()` 时通过 `lute.CodeSyntaxHighlight()` 参数来指定是否使用内联样式、样式名
+* 在前端引入 chroma-styles 目录下的样式文件
+* 可通过 `lutenEngine.SetCodeSyntaxHighlightXXX()` 来指定高亮相关参数，比如是否启用内联样式、行号以及主题
 
 ### JavaScript
  
