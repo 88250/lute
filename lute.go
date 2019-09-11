@@ -153,6 +153,16 @@ func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 	return
 }
 
+// SpinVditorDOM 用于将当前的 Vditor DOM 转换为 新的 Vditor DOM。
+func (lute *Lute) SpinVditorDOM(html string) (newHTML string, err error) {
+	markdown, err := lute.VditorDOMMarkdown(html)
+	if nil != err {
+		return
+	}
+	newHTML, err = lute.RenderVditorDOM(markdown)
+	return
+}
+
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	// GFMTable 设置是否打开“GFM 表”支持。
