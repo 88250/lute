@@ -47,6 +47,7 @@ func (lute *Lute) parseVditorDOM(htmlStr string) (tree *Tree, err error) {
 
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
+	skipChildren := false
 	node := &Node{typ: -1, tokens: toItems(n.Data)}
 	switch n.DataAtom {
 	case 0:
@@ -55,19 +56,39 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeEmphasis
 		node.strongEmDelMarker = itemAsterisk
 		node.strongEmDelMarkenLen = 1
+	case atom.Strong:
+		node.typ = NodeStrong
+		node.strongEmDelMarker = itemAsterisk
+		node.strongEmDelMarkenLen = 2
 	case atom.P:
 		node.typ = NodeParagraph
 	case atom.Span:
-
+		if nil != n.Attr {
+			class := lute.domAttrValue(n, "class")
+			skipChildren = !strings.Contains(class, "node")
+		}
 	}
 
 	if 1 <= node.typ {
 		tree.context.vditorAddChild(node)
 	}
-
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.genASTByVditorDOM(c, tree)
+	if !skipChildren {
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			lute.genASTByVditorDOM(c, tree)
+		}
 	}
+}
+
+func (lute *Lute) domAttrValue(n *html.Node, attrName string) (string) {
+	if 1 > len(n.Attr) {
+		return ""
+	}
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			return attr.Val
+		}
+	}
+	return ""
 }
 
 // vditorAddChild 将 child 作为子节点添加到 context.tip 上。如果 tip 节点不能接受子节点（非块级容器不能添加子节点），则最终化该 tip

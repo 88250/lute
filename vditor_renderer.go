@@ -184,7 +184,7 @@ func (r *VditorRenderer) renderImageVditor(node *Node, entering bool) (WalkStatu
 func (r *VditorRenderer) renderLinkVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("span", -1, nil, false)
-		attrs := [][]string{{"class", "open"}}
+		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(itemOpenBracket)
 		r.tag("/span", -1, nil, false)
@@ -196,11 +196,11 @@ func (r *VditorRenderer) renderLinkVditor(node *Node, entering bool) (WalkStatus
 		r.tag("a", -1, attrs, false)
 	} else {
 		r.tag("/a", node.typ, nil, false)
-		attrs := [][]string{{"class", "close"}}
+		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(itemCloseBracket)
 		r.tag("/span", -1, nil, false)
-		attrs = [][]string{{"class", "open"}}
+		attrs = [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(itemOpenParen)
 		r.tag("/span", -1, nil, false)
@@ -208,7 +208,7 @@ func (r *VditorRenderer) renderLinkVditor(node *Node, entering bool) (WalkStatus
 		r.write(node.destination)
 		r.tag("/span", -1, nil, false)
 		// TODO: title
-		attrs = [][]string{{"class", "close"}}
+		attrs = [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(itemCloseParen)
 		r.tag("/span", -1, nil, false)
@@ -270,7 +270,7 @@ func (r *VditorRenderer) renderTextVditor(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer) renderCodeSpanVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("span", -1, nil, false)
-		attrs := [][]string{{"class", "open"}}
+		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(itemBacktick)
 		if 1 < node.codeMarkerLen {
@@ -281,7 +281,7 @@ func (r *VditorRenderer) renderCodeSpanVditor(node *Node, entering bool) (WalkSt
 		r.write(escapeHTML(node.tokens))
 	} else {
 		r.tag("/code", node.typ, nil, false)
-		attrs := [][]string{{"class", "close"}}
+		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(itemBacktick)
 		if 1 < node.codeMarkerLen {
@@ -319,14 +319,14 @@ func (r *VditorRenderer) renderCodeBlockVditor(node *Node, entering bool) (WalkS
 func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("span", -1, nil, false)
-		attrs := [][]string{{"class", "open"}}
+		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(node.strongEmDelMarker)
 		r.tag("/span", -1, nil, false)
 		r.tag("em", node.typ, nil, false)
 	} else {
 		r.tag("/em", node.typ, nil, false)
-		attrs := [][]string{{"class", "close"}}
+		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(node.strongEmDelMarker)
 		r.tag("/span", -1, nil, false)
@@ -336,18 +336,20 @@ func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkSt
 
 func (r *VditorRenderer) renderStrongVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", -1, nil, false)
-		attrs := [][]string{{"class", "marker-open marker-strong"}}
+		attrs := [][]string{{"class", "node"}}
+		r.tag("span", -1, attrs, false)
+		attrs = [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
 		r.tag("/span", -1, nil, false)
 		r.tag("strong", node.typ, nil, false)
 	} else {
 		r.tag("/strong", node.typ, nil, false)
-		attrs := [][]string{{"class", "marker-close marker-strong"}}
+		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
-		r.tag("/span", -1, nil, false)
+		r.tag("/span", -1, attrs, false)
+		r.tag("/span", -1, attrs, false)
 	}
 	return WalkContinue, nil
 }
@@ -464,9 +466,9 @@ func (r *VditorRenderer) tag(name string, typ int, attrs [][]string, selfclosing
 		if nil == attrs {
 			attrs = [][]string{}
 		}
-		if -1 != typ {
-			attrs = append(attrs, []string{"data-id", "0"}, []string{"data-type", strconv.Itoa(typ)})
-		}
+		//if -1 != typ {
+		//	attrs = append(attrs, []string{"data-id", "0"}, []string{"data-type", strconv.Itoa(typ)})
+		//}
 		for _, attr := range attrs {
 			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
 		}

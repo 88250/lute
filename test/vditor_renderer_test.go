@@ -20,25 +20,25 @@ import (
 
 var vditorRendererTests = []parseTest{
 
-	{"11", "[Lute](https://github.com/b3log/lute)", "<p data-id=\"0\" data-type=\"1\"><span><span class=\"open\">[</span><a href=\"https://github.com/b3log/lute\"><span data-id=\"0\" data-type=\"10\">Lute</span></a><span class=\"close\">]</span><span class=\"open\">(</span><span>https://github.com/b3log/lute</span><span class=\"close\">)</span></span></p>\n"},
-	{"10", "Lu\nte\n", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lu</span><span data-id=\"0\" data-type=\"15\" /></span>\n<span data-id=\"0\" data-type=\"10\">te</span></p>\n"},
-	{"9", "Lu  \nte\n", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lu</span><span data-id=\"0\" data-type=\"14\"></span>\n<span data-id=\"0\" data-type=\"10\">te</span></p>\n"},
-	{"8", "Lu\\\nte\n", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lu</span><span data-id=\"0\" data-type=\"14\"></span>\n<span data-id=\"0\" data-type=\"10\">te</span></p>\n"},
-	{"7", "`Lute`\n", "<p data-id=\"0\" data-type=\"1\"><span><span class=\"open\">`</span><code data-id=\"0\" data-type=\"13\">Lute</code><span class=\"close\">`</span></p>\n"},
-	{"6", "**Lute**\n", "<p data-id=\"0\" data-type=\"1\"><span><span class=\"marker-open marker-strong\">**</span><strong data-id=\"0\" data-type=\"12\"><span data-id=\"0\" data-type=\"10\">Lute</span></strong><span class=\"marker-close marker-strong\">**</span></p>\n"},
-	{"5", "*Lute*\n", "<p data-id=\"0\" data-type=\"1\"><span><span class=\"open\">*</span><em data-id=\"0\" data-type=\"11\"><span data-id=\"0\" data-type=\"10\">Lute</span></em><span class=\"close\">*</span></p>\n"},
-	{"4", "* Lute\n", "<ul data-id=\"0\" data-type=\"5\">\n<li data-id=\"0\" data-type=\"6\"><span data-id=\"0\" data-type=\"10\">Lute</span></li>\n</ul>\n"},
-	{"3", "> Lute\n", "<blockquote data-id=\"0\" data-type=\"4\">\n<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lute</span></p>\n</blockquote>\n"},
-	{"2", "---\n", "<hr data-id=\"0\" data-type=\"3\" />\n"},
-	{"1", "## Lute\n", "<h2 data-id=\"0\" data-type=\"2\"><span data-id=\"0\" data-type=\"10\">Lute</span></h2>\n"},
-	{"0", "Lute\n", "<p data-id=\"0\" data-type=\"1\"><span data-id=\"0\" data-type=\"10\">Lute</span></p>\n"},
+	{"11", "[Lute](https://github.com/b3log/lute)", "<p><span><span class=\"marker\">[</span><a href=\"https://github.com/b3log/lute\"><span>Lute</span></a><span class=\"marker\">]</span><span class=\"marker\">(</span><span>https://github.com/b3log/lute</span><span class=\"marker\">)</span></span></p>\n"},
+	{"10", "Lu\nte\n", "<p><span>Lu</span><span /></span>\n<span>te</span></p>\n"},
+	{"9", "Lu  \nte\n", "<p><span>Lu</span><span></span>\n<span>te</span></p>\n"},
+	{"8", "Lu\\\nte\n", "<p><span>Lu</span><span></span>\n<span>te</span></p>\n"},
+	{"7", "`Lute`\n", "<p><span><span class=\"marker\">`</span><code>Lute</code><span class=\"marker\">`</span></p>\n"},
+	{"6", "**Lute**\n", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>Lute</span></strong><span class=\"marker\">**</span></p>\n"},
+	{"5", "*Lute*\n", "<p><span><span class=\"marker\">*</span><em><span>Lute</span></em><span class=\"marker\">*</span></p>\n"},
+	{"4", "* Lute\n", "<ul>\n<li><span>Lute</span></li>\n</ul>\n"},
+	{"3", "> Lute\n", "<blockquote>\n<p><span>Lute</span></p>\n</blockquote>\n"},
+	{"2", "---\n", "<hr />\n"},
+	{"1", "## Lute\n", "<h2><span>Lute</span></h2>\n"},
+	{"0", "Lute\n", "<p><span>Lute</span></p>\n"},
 }
 
 func TestVditorRenderer(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range vditorRendererTests {
-		html, err := luteEngine.RenderVditorDOM(1, test.from)
+		html, err := luteEngine.RenderVditorDOM(test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}

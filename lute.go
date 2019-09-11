@@ -122,7 +122,7 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 }
 
 // RenderVditorDOM 用于渲染 Vditor DOM。
-func (lute *Lute) RenderVditorDOM(nodeDataId int, markdownText string) (html string, err error) {
+func (lute *Lute) RenderVditorDOM(markdownText string) (html string, err error) {
 	var tree *Tree
 	tree, err = lute.parse("", items(markdownText))
 	if nil != err {
