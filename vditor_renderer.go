@@ -337,14 +337,14 @@ func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkSt
 func (r *VditorRenderer) renderStrongVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("span", -1, nil, false)
-		attrs := [][]string{{"class", "open"}}
+		attrs := [][]string{{"class", "marker-open marker-strong"}}
 		r.tag("span", -1, attrs, false)
 		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
 		r.tag("/span", -1, nil, false)
 		r.tag("strong", node.typ, nil, false)
 	} else {
 		r.tag("/strong", node.typ, nil, false)
-		attrs := [][]string{{"class", "close"}}
+		attrs := [][]string{{"class", "marker-close marker-strong"}}
 		r.tag("span", -1, attrs, false)
 		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
 		r.tag("/span", -1, nil, false)
