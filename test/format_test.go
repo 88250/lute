@@ -28,40 +28,40 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 	// 子列表格式化后缩进不对 https://github.com/b3log/lute/issues/22
-	{"27", "* first\n   * sub first\n* second\n  *  sub second\n", "* first\n  * sub first\n* second\n  * sub second\n\n"},
-	{"26", "* first\n  * sub first\n* second\n  * sub second\n", "* first\n  * sub first\n* second\n  * sub second\n\n"},
+	{"27", "* first\n   * sub first\n* second\n  *  sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
+	{"26", "* first\n  * sub first\n* second\n  * sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
 
-	{"25", "`` `Lute` ``\n", "`` `Lute` ``\n\n"},
+	{"25", "`` `Lute` ``\n", "`` `Lute` ``\n"},
 
 	// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
-	{"24", ":heart: :hacpai:\n", ":heart: :hacpai:\n\n"},
+	{"24", ":heart: :hacpai:\n", ":heart: :hacpai:\n"},
 
 	// 原先是 & 的格式化以后转义为 HTML 实体 &amp;
-	{"23", "&&amp;\n", "&amp;&amp;\n\n"},
+	{"23", "&&amp;\n", "&amp;&amp;\n"},
 
-	{"22", "\u2003emsp\n", "\u2003emsp\n\n"},
-	{"21", "&amp;123&emsp;456\n", "&amp;123\u2003456\n\n"},
-	{"20", "~删除线~\n", "~删除线~\n\n"},
-	{"19", "我们**需要Markdown Format**\n", "我们**需要 Markdown Format**\n\n"},
-	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 Lute 空格\n\n"},
-	{"17", "* [ ] 项一\n* [X] 项二\n", "* [ ] 项一\n* [X] 项二\n\n"},
-	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "|abc|defghi|\n|:---:|---:|\n|bar|baz|\n\n"},
-	{"15", "| abc | def |\n| --- | --- |\n", "|abc|def|\n|---|---|\n\n"},
-	{"14", "~~删除线~~\n", "~~删除线~~\n\n"},
-	{"13", "![B3log 开源](https://b3log.org \"B3log 开源\")\n", "![B3log 开源](https://b3log.org \"B3log 开源\")\n\n"},
-	{"12", "[B3log 开源](https://b3log.org \"B3log 开源\")\n", "[B3log 开源](https://b3log.org \"B3log 开源\")\n\n"},
-	{"11", "硬换行  \n第二行\n", "硬换行\n第二行\n\n"}, // 因为启用了软转硬
-	{"10", "硬换行\\\n第二行\n", "硬换行\n第二行\n\n"}, // 因为启用了软转硬
-	{"9", "分隔线\n\n---\n", "分隔线\n\n---\n\n"},
-	{"8", "```go\nvar lute\n```\n", "```go\nvar lute\n```\n\n"},
-	{"7", "`代码`\n", "`代码`\n\n"},
-	{"6", ">块引用\n", "> 块引用\n\n"},
-	{"5", "**加粗**格式化\n", "**加粗**格式化\n\n"},
-	{"4", "_强调_ 格式化\n", "_强调_ 格式化\n\n"},
-	{"3", "*强调*格式化\n", "*强调*格式化\n\n"},
-	{"2", "1.  列表项\n    * 子列表项\n", "1. 列表项\n   * 子列表项\n\n"},
-	{"1", "*  列表项\n", "* 列表项\n\n"},
-	{"0", "# 标题\n\n段落用一个空行分隔就够了。\n\n\n这是第二段。", "# 标题\n\n段落用一个空行分隔就够了。\n\n这是第二段。\n\n"},
+	{"22", "\u2003emsp\n", "\u2003emsp\n"},
+	{"21", "&amp;123&emsp;456\n", "&amp;123\u2003456\n"},
+	{"20", "~删除线~\n", "~删除线~\n"},
+	{"19", "我们**需要Markdown Format**\n", "我们**需要 Markdown Format**\n"},
+	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 Lute 空格\n"},
+	{"17", "* [ ] 项一\n* [X] 项二\n", "* [ ] 项一\n* [X] 项二\n"},
+	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "|abc|defghi|\n|:---:|---:|\n|bar|baz|\n"},
+	{"15", "| abc | def |\n| --- | --- |\n", "|abc|def|\n|---|---|\n"},
+	{"14", "~~删除线~~\n", "~~删除线~~\n"},
+	{"13", "![B3log 开源](https://b3log.org \"B3log 开源\")\n", "![B3log 开源](https://b3log.org \"B3log 开源\")\n"},
+	{"12", "[B3log 开源](https://b3log.org \"B3log 开源\")\n", "[B3log 开源](https://b3log.org \"B3log 开源\")\n"},
+	{"11", "硬换行  \n第二行\n", "硬换行\n第二行\n"}, // 因为启用了软转硬
+	{"10", "硬换行\\\n第二行\n", "硬换行\n第二行\n"}, // 因为启用了软转硬
+	{"9", "分隔线\n\n---\n", "分隔线\n\n---\n"},
+	{"8", "```go\nvar lute\n```\n", "```go\nvar lute\n```\n"},
+	{"7", "`代码`\n", "`代码`\n"},
+	{"6", ">块引用\n", "> 块引用\n"},
+	{"5", "**加粗**格式化\n", "**加粗**格式化\n"},
+	{"4", "_强调_ 格式化\n", "_强调_ 格式化\n"},
+	{"3", "*强调*格式化\n", "*强调*格式化\n"},
+	{"2", "1.  列表项\n    * 子列表项\n", "1. 列表项\n   * 子列表项\n"},
+	{"1", "*  列表项\n", "* 列表项\n"},
+	{"0", "# 标题\n\n段落用一个空行分隔就够了。\n\n\n这是第二段。", "# 标题\n\n段落用一个空行分隔就够了。\n\n这是第二段。\n"},
 }
 
 func TestFormat(t *testing.T) {

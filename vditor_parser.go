@@ -73,12 +73,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	if 1 <= node.typ {
-		tree.context.vditorAddChild(node)
+		tree.context.tip.AppendChild(tree.context.tip, node)
+		tree.context.tip = node
 	}
 	if !skipChildren {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			lute.genASTByVditorDOM(c, tree)
 		}
+	}
+	if 1 <= node.typ {
+		tree.context.tip = tree.context.tip.parent
 	}
 }
 
@@ -92,23 +96,4 @@ func (lute *Lute) domAttrValue(n *html.Node, attrName string) (string) {
 		}
 	}
 	return ""
-}
-
-// vditorAddChild 将 child 作为子节点添加到 context.tip 上。如果 tip 节点不能接受子节点（非块级容器不能添加子节点），则最终化该 tip
-// 节点并向父节点方向尝试，直到找到一个能接受 child 的节点为止。
-func (context *Context) vditorAddChild(child *Node) {
-	for !context.tip.CanContain(child.typ) {
-		context.vditorFinalize(context.tip) // 注意调用 vditorFinalize 会向父节点方向进行迭代
-	}
-
-	context.tip.AppendChild(context.tip, child)
-	context.tip = child
-}
-
-// vditorFinalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
-func (context *Context) vditorFinalize(block *Node) {
-	var parent = block.parent
-	block.close = true
-	block.Finalize(context)
-	context.tip = parent
 }

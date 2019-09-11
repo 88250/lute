@@ -196,7 +196,7 @@ func (r *FormatRenderer) renderDocumentMarkdown(node *Node, entering bool) (Walk
 		buf := bytes.Trim(r.writer.Bytes(), " \t\n")
 		r.writer.Reset()
 		r.write(buf)
-		r.writeString("\n\n")
+		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
 }
