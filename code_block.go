@@ -21,11 +21,10 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	var indent = context.indent
 	if codeBlock.isFencedCodeBlock {
 		if indent <= 3 && codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.codeBlockFenceChar, codeBlock.codeBlockFenceLen) {
-			// closing fence - we're at end of line, so we can return
 			context.finalize(codeBlock)
 			return 2
 		} else {
-			// skip optional spaces of fence offset
+			// 跳过围栏标记之前可能存在的空格
 			var i = codeBlock.codeBlockFenceOffset
 			var token byte
 			for i > 0 {
