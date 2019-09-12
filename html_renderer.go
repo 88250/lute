@@ -32,6 +32,7 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeText] = ret.renderTextHTML
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpanHTML
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlockHTML
+	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlockHTML
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasisHTML
 	ret.rendererFuncs[NodeStrong] = ret.renderStrongHTML
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquoteHTML
@@ -61,6 +62,18 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgHTML
 
 	return ret
+}
+
+func (r *HTMLRenderer) renderMathBlockHTML(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.newline()
+		tokens := node.tokens
+		tokens = escapeHTML(tokens)
+		r.write(tokens)
+		return WalkSkipChildren, nil
+	}
+	r.newline()
+	return WalkContinue, nil
 }
 
 func (r *HTMLRenderer) renderEmojiImgHTML(node *Node, entering bool) (WalkStatus, error) {

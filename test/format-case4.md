@@ -155,7 +155,21 @@ public class HelloWorld {
 
 ### 数学公式
 
-$$a^2 + b^2 = \color{red}c^2$$
+多行公式块：
+
+$$
+\frac{1}{
+  \Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{
+  \frac25 \pi}} = 1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}} {
+    1+\frac{e^{-6\pi}}
+    {1+\frac{e^{-8\pi}}{1+\cdots}}
+  }
+}
+$$
+
+行内公式：
+
+公式 $a^2 + b^2 = \color{red}c^2$ 是行内。
 
 ### 流程图
 

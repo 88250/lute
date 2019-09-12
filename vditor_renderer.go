@@ -35,6 +35,7 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeText] = ret.renderTextVditor
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpanVditor
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlockVditor
+	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlockVditor
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasisVditor
 	ret.rendererFuncs[NodeStrong] = ret.renderStrongVditor
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquoteVditor
@@ -277,6 +278,18 @@ func (r *VditorRenderer) renderCodeSpanVditor(node *Node, entering bool) (WalkSt
 	return WalkContinue, nil
 }
 
+func (r *VditorRenderer) renderMathBlockVditor(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.newline()
+		tokens := node.tokens
+		tokens = escapeHTML(tokens)
+		r.write(tokens)
+		return WalkSkipChildren, nil
+	}
+	r.newline()
+	return WalkContinue, nil
+}
+
 func (r *VditorRenderer) renderCodeBlockVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		tokens := node.tokens
@@ -463,7 +476,7 @@ func (r *VditorRenderer) tag(name string, typ int, attrs [][]string, selfclosing
 //   2：行级元素
 func (r *VditorRenderer) mtype(nodeType int) string {
 	switch nodeType {
-	case NodeThematicBreak, NodeHeading, NodeCodeBlock, NodeHTMLBlock, NodeParagraph:
+	case NodeThematicBreak, NodeHeading, NodeCodeBlock, NodeMathBlock, NodeHTMLBlock, NodeParagraph:
 		return "0"
 	case NodeBlockquote, NodeList, NodeListItem:
 		return "1"

@@ -105,6 +105,7 @@ const (
 	itemAmpersand      = byte('&')
 	itemSemicolon      = byte(';')
 	itemPipe           = byte('|')
+	itemDollar         = byte('$')
 )
 
 // items 定义了字节数组，每个字节是一个 token。

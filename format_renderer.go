@@ -34,6 +34,7 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeText] = ret.renderTextMarkdown
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpanMarkdown
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlockMarkdown
+	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlockMarkdown
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasisMarkdown
 	ret.rendererFuncs[NodeStrong] = ret.renderStrongMarkdown
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquoteMarkdown
@@ -255,6 +256,18 @@ func (r *FormatRenderer) renderCodeSpanMarkdown(node *Node, entering bool) (Walk
 		r.writeByte(itemBacktick)
 	}
 	r.writeByte(itemBacktick)
+	return WalkContinue, nil
+}
+
+func (r *FormatRenderer) renderMathBlockMarkdown(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.newline()
+		r.write(node.tokens)
+		return WalkSkipChildren, nil
+	}
+	if !r.isLastNode(r.treeRoot, node) {
+		r.writeString("\n\n")
+	}
 	return WalkContinue, nil
 }
 

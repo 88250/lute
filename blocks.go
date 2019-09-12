@@ -82,7 +82,8 @@ func (t *Tree) incorporateLine(line items) {
 			itemCrosshatch != maybeMarker && // ATX 标题
 			itemGreater != maybeMarker && // 块引用
 			itemLess != maybeMarker && // HTML 块
-			itemUnderscore != maybeMarker && itemEqual != maybeMarker { // Setext 标题
+			itemUnderscore != maybeMarker && itemEqual != maybeMarker && // Setext 标题
+			itemDollar != maybeMarker { // 数学公式
 			t.context.advanceNextNonspace()
 			break
 		}
@@ -129,6 +130,7 @@ func (t *Tree) incorporateLine(line items) {
 		var lastLineBlank = t.context.blank &&
 			!(typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
+				(typ == NodeMathBlock) || // 数学公式块不计入空行判断
 				(typ == NodeListItem && nil == container.firstChild)) // 内容为空的列表项也不计入空行判断
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 lastLineBlank
 		// lastLineBlank 目前仅在判断列表紧凑模式上使用
@@ -319,6 +321,20 @@ var blockStarts = []blockStartFunc{
 			}
 
 			return 1
+		}
+		return 0
+	},
+
+	// 判断数学公式块（$$）是否开始
+	func(t *Tree, container *Node) int {
+		if !t.context.indented {
+			if mathBlock := t.parseMathBlock(); nil != mathBlock {
+				t.context.closeUnmatchedBlocks()
+				t.context.addChild(mathBlock)
+				t.context.advanceNextNonspace()
+				t.context.advanceOffset(mathBlock.mathBlockDollarOffset, false)
+				return 2
+			}
 		}
 		return 0
 	},

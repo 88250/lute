@@ -78,6 +78,10 @@ type Node struct {
 	// Emoji
 
 	emojiAlias items
+
+	// 数学公式块
+
+	mathBlockDollarOffset int
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
@@ -89,6 +93,8 @@ func (n *Node) Finalize(context *Context) {
 		n.htmlBlockFinalize(context)
 	case NodeParagraph:
 		n.paragraphFinalize(context)
+	case NodeMathBlock:
+		n.mathBlockFinalize(context)
 	case NodeList:
 		n.listFinalize(context)
 	}
@@ -108,6 +114,8 @@ func (n *Node) Continue(context *Context) int {
 		return n.listItemContinue(context)
 	case NodeBlockquote:
 		return n.blockquoteContinue(context)
+	case NodeMathBlock:
+		return n.mathBlockContinue(context)
 	case NodeHeading, NodeThematicBreak:
 		return 1
 	}
@@ -118,7 +126,7 @@ func (n *Node) Continue(context *Context) int {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.typ {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock:
 		return true
 	}
 	return false
@@ -128,7 +136,7 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（另一种块级容器）可以包含任意节点；段落节点（一种叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType int) bool {
 	switch n.typ {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
@@ -253,4 +261,9 @@ const (
 
 	NodeEmojiUnicode // Emoji Unicode 字符节点
 	NodeEmojiImg     // Emoji 图片节点
+
+	// 数学公式
+
+	NodeMathBlock  // 数学公式块节点
+	NodeInlineMath // 内联数学公式节点
 )
