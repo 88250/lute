@@ -68,10 +68,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
 		node.headingLevel = int(node.tokens[1] - byte('0'))
+	case atom.Blockquote:
+		node.typ = NodeBlockquote
+	case atom.Hr:
+		node.typ = NodeThematicBreak
 	case atom.Span:
-		if nil != n.Attr {
-			class := lute.domAttrValue(n, "class")
-			skipChildren = !strings.Contains(class, "node")
+		class := lute.domAttrValue(n, "class")
+		skipChildren = !strings.Contains(class, "node")
+		if skipChildren {
+			ntype := lute.domAttrValue(n, "data-ntype")
+			skipChildren = "10" != ntype
 		}
 	}
 

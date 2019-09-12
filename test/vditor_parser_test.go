@@ -20,16 +20,22 @@ import (
 
 var vditorParserTests = []parseTest{
 
-	{"9", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>foo</span></strong><span class=\"marker\">**</span></span></p><br />", "**foo**\n\n<br />\n"},
-	{"8", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>foo</span></strong><span class=\"marker\">**</span></span></p><p><span><br></span></p>", "**foo**\n\n<br />\n"},
-	{"7", "<p><span><br></span></p>", "<br />\n"},
-	{"6", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>foo</span></strong><span class=\"marker\">**</span></span></p><p><span>bar</span></p>", "**foo**\n\nbar\n"},
-	{"5", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>foo</span></strong><span class=\"marker\">**</span></span><span> </span><span class=\"node\"><span class=\"marker\">_</span><em><span>bar</span></em><span class=\"marker\">_</span></span></p>\n", "**foo** _bar_\n"},
-	{"4", "<h2><span>Lute</span></h2>\n", "## Lute\n"},
-	{"3", "<p><span class=\"node\"><span class=\"marker\">**</span><strong><span>Lute</span></strong><span class=\"marker\">**</span></p>\n", "**Lute**\n"},
-	{"2", "<p><span><span class=\"marker\">*</span><em><span>Lute</span></em><span class=\"marker\">*</span></p>\n", "*Lute*\n"},
-	{"1", "<p><span class=\"node\"><span class=\"marker\">_</span><em><span>Lute</span></em><span class=\"marker\">_</span></span></p>\n", "_Lute_\n"},
-	{"0", "<p><span>Lute</span></p>\n", "Lute\n"},
+	{"15", "<span class=\"node\"><span class=\"marker\">&gt;</span><blockquote data-ntype=\"4\" data-mtype=\"1\"><p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></p></blockquote></span>", "> foo\n"},
+	{"14", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></strong><span class=\"marker\">**</span></span></p><p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">bar</span></p>", "**foo**\n\nbar\n"},
+	{"13", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></strong><span class=\"marker\">**</span></span><span data-ntype=\"10\" data-mtype=\"2\"> </span><span class=\"node\"><span class=\"marker\">_</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">bar</span></em><span class=\"marker\">_</span></span></p>", "**foo** _bar_\n"},
+	//{"12", "<p data-ntype=\"1\" data-mtype=\"0\"><span><span class=\"marker\">[</span><a href=\"https://github.com/b3log/lute\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></a><span class=\"marker\">]</span><span class=\"marker\">(</span><span>https://github.com/b3log/lute</span><span class=\"marker\">)</span></span></p>", "[Lute](https://github.com/b3log/lute)"},
+	//{"11", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lu</span><span data-ntype=\"15\" data-mtype=\"2\" /></span><span data-ntype=\"10\" data-mtype=\"2\">te</span></p>","Lu\nte\n" },
+	//{"10", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lu</span><span data-ntype=\"14\" data-mtype=\"2\"></span><span data-ntype=\"10\" data-mtype=\"2\">te</span></p>", "Lu  \nte\n"},
+	//{"9", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lu</span><span data-ntype=\"14\" data-mtype=\"2\"></span><span data-ntype=\"10\" data-mtype=\"2\">te</span></p>", "Lu\\\nte\n"},
+	//{"8", "`Lute`\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span><span class=\"marker\">`</span><code data-ntype=\"13\" data-mtype=\"2\">Lute</code><span class=\"marker\">`</span></p>"},
+	{"7", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></strong><span class=\"marker\">**</span></span></p>", "**Lute**\n"},
+	{"6", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></em><span class=\"marker\">*</span></span></p>", "*Lute*\n"},
+	{"5", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">_</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></em><span class=\"marker\">_</span></span></p>", "_Lute_\n"},
+	//{"4", "<ul data-ntype=\"5\" data-mtype=\"1\"><li data-ntype=\"6\" data-mtype=\"1\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></li></ul>", "* Lute\n"},
+	{"3", "<span class=\"node\"><span class=\"marker\">&gt;</span><blockquote data-ntype=\"4\" data-mtype=\"1\"><p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></p></blockquote></span>", "> Lute\n"},
+	{"2", "<hr data-ntype=\"3\" data-mtype=\"0\" />", "---\n"},
+	{"1", "<h2 data-ntype=\"2\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></h2>", "## Lute\n"},
+	{"0", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></p>", "Lute\n"},
 }
 
 func TestVditorParser(t *testing.T) {

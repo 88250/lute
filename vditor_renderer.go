@@ -341,9 +341,16 @@ func (r *VditorRenderer) renderStrongVditor(node *Node, entering bool) (WalkStat
 
 func (r *VditorRenderer) renderBlockquoteVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		attrs := [][]string{{"class", "node"}}
+		r.tag("span", -1, attrs, false)
+		attrs = [][]string{{"class", "marker"}}
+		r.tag("span", -1, attrs, false)
+		r.writeString("&gt;")
+		r.tag("/span", -1, nil, false)
 		r.tag("blockquote", node.typ, nil, false)
 	} else {
-		r.writeString("</blockquote>")
+		r.tag("/blockquote", node.typ, nil, false)
+		r.tag("/span", -1, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -436,9 +443,10 @@ func (r *VditorRenderer) tag(name string, typ int, attrs [][]string, selfclosing
 		if nil == attrs {
 			attrs = [][]string{}
 		}
-		//if -1 != typ {
-		//	attrs = append(attrs, []string{"data-id", "0"}, []string{"data-type", strconv.Itoa(typ)})
-		//}
+		if -1 != typ {
+			attrs = append(attrs, []string{"data-ntype", strconv.Itoa(typ)})
+			attrs = append(attrs, []string{"data-mtype", r.mtype(typ)})
+		}
 		for _, attr := range attrs {
 			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
 		}
@@ -447,4 +455,19 @@ func (r *VditorRenderer) tag(name string, typ int, attrs [][]string, selfclosing
 		r.writeString(" /")
 	}
 	r.writeString(">")
+}
+
+// mtype 返回节点类型 nodeType 对应的 Markdown 元素类型。
+//   0：叶子块元素
+//   1：容器块元素
+//   2：行级元素
+func (r *VditorRenderer) mtype(nodeType int) string {
+	switch nodeType {
+	case NodeThematicBreak, NodeHeading, NodeCodeBlock, NodeHTMLBlock, NodeParagraph:
+		return "0"
+	case NodeBlockquote, NodeList, NodeListItem:
+		return "1"
+	default:
+		return "2"
+	}
 }
