@@ -91,11 +91,17 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 
 	data.marker = marker
 
-	var token byte
-
-	// 列表项标记后必须是空白字符
-	if token = ln[t.context.nextNonspace+markerLength]; !isWhitespace(token) {
-		return nil
+	var token = ln[t.context.nextNonspace+markerLength]
+	if !t.context.option.ListItemSpace {
+		// 列表项标记后必须是空白字符
+		if !isWhitespace(token) {
+			return nil
+		}
+	} else {
+		// 列表项标记后必须是空格
+		if itemSpace != token {
+			return nil
+		}
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空
@@ -118,8 +124,8 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 
 	token = ln.peek(t.context.offset)
 	var isBlankItem = itemEnd == token || itemNewline == token
-	var spaces_after_marker = t.context.column - spacesStartCol
-	if spaces_after_marker >= 5 || spaces_after_marker < 1 || isBlankItem {
+	var spacesAfterMarker = t.context.column - spacesStartCol
+	if spacesAfterMarker >= 5 || spacesAfterMarker < 1 || isBlankItem {
 		data.padding = markerLength + 1
 		t.context.column = spacesStartCol
 		t.context.offset = spacesStartOffset
@@ -127,7 +133,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 			t.context.advanceOffset(1, true)
 		}
 	} else {
-		data.padding = markerLength + spaces_after_marker
+		data.padding = markerLength + spacesAfterMarker
 	}
 
 	if !isBlankItem {

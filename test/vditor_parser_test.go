@@ -20,6 +20,8 @@ import (
 
 var vditorParserTests = []parseTest{
 
+	{"17", "<span data-ntype=\"10\" data-mtype=\"2\">*</span>", "*\n"},
+	{"16", "<span data-ntype=\"10\" data-mtype=\"2\">*</span><span class=\"node\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></em><span class=\"marker\">*</span></span>", "**foo*\n"},
 	{"15", "<span class=\"node\"><span class=\"marker\">&gt;</span><blockquote data-ntype=\"4\" data-mtype=\"1\"><p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></p></blockquote></span>", "> foo\n"},
 	{"14", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></strong><span class=\"marker\">**</span></span></p><p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">bar</span></p>", "**foo**\n\nbar\n"},
 	{"13", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></strong><span class=\"marker\">**</span></span><span data-ntype=\"10\" data-mtype=\"2\"> </span><span class=\"node\"><span class=\"marker\">_</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">bar</span></em><span class=\"marker\">_</span></span></p>", "**foo** _bar_\n"},

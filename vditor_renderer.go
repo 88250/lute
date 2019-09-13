@@ -397,21 +397,22 @@ func (r *VditorRenderer) renderListVditor(node *Node, entering bool) (WalkStatus
 
 func (r *VditorRenderer) renderListItemVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-
+		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
+			r.tag("li", node.typ, [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
+		} else {
+			r.tag("li", node.typ, nil, false)
+		}
 		attrs := [][]string{{"class", "node"}}
 		r.tag("span", -1, attrs, false)
 		attrs = [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.write(node.listData.marker)
 		r.tag("/span", -1, nil, false)
-		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
-			r.tag("li", node.typ, [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
-		} else {
-			r.tag("li", node.typ, nil, false)
-		}
-	} else {
-		r.tag("/li", node.typ, nil, false)
 		r.tag("/span", -1, nil, false)
+		r.tag("p", NodeParagraph, nil, false)
+	} else {
+		r.tag("/p", NodeParagraph, nil, false)
+		r.tag("/li", node.typ, nil, false)
 	}
 	return WalkContinue, nil
 }

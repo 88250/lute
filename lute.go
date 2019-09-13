@@ -198,6 +198,8 @@ type options struct {
 	Emojis map[string]string
 	// EmojiSite 设置图片 Emoji URL 的路径前缀。
 	EmojiSite string
+	// ListItemSpace 设置列表项标记后是否需要跟空格才解析为列表项，默认为 false 即不需要跟空格也可以解析为列表项（CommonMark 中定义的空行情况）。
+	ListItemSpace bool
 }
 
 // option 描述了解析渲染选项设置函数签名。
@@ -263,4 +265,8 @@ func (lute *Lute) SetEmojis(emojis map[string]string) {
 
 func (lute *Lute) SetEmojiSite(emojiSite string) {
 	lute.EmojiSite = emojiSite
+}
+
+func (lute *Lute) SetListItemSpace(b bool) {
+	lute.ListItemSpace = b
 }

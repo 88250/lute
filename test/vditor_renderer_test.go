@@ -20,6 +20,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
+	{"17", "*", "<span data-ntype=\"10\" data-mtype=\"2\">*</span>"},
 	{"16", "**foo*\n", "<span data-ntype=\"10\" data-mtype=\"2\">*</span><span class=\"node\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></em><span class=\"marker\">*</span></span>"},
 	{"15", "**foo**\n\n<br />\n", "<span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></strong><span class=\"marker\">**</span></span><br />"},
 	{"14", "**foo**\n\nbar\n", "<span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></strong><span class=\"marker\">**</span></span><span data-ntype=\"10\" data-mtype=\"2\">bar</span>"},
@@ -32,7 +33,7 @@ var vditorRendererTests = []parseTest{
 	{"7", "**Lute**\n", "<span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></strong><span class=\"marker\">**</span></span>"},
 	{"6", "*Lute*\n", "<span class=\"node\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></em><span class=\"marker\">*</span></span>"},
 	{"5", "_Lute_\n", "<span class=\"node\"><span class=\"marker\">_</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></em><span class=\"marker\">_</span></span>"},
-	{"4", "* Lute\n", "<ul data-ntype=\"5\" data-mtype=\"1\"><span class=\"node\"><span class=\"marker\">*</span><li data-ntype=\"6\" data-mtype=\"1\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></li></span></ul>"},
+	{"4", "* Lute\n", "<ul data-ntype=\"5\" data-mtype=\"1\"><li data-ntype=\"6\" data-mtype=\"1\"><span class=\"node\"><span class=\"marker\">*</span></span><p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></p></li></ul>"},
 	{"3", "> Lute\n", "<span class=\"node\"><span class=\"marker\">&gt;</span><blockquote data-ntype=\"4\" data-mtype=\"1\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></blockquote></span>"},
 	{"2", "---\n", "<hr data-ntype=\"3\" data-mtype=\"0\" />"},
 	{"1", "## Lute\n", "<h2 data-ntype=\"2\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></h2>"},
@@ -41,6 +42,7 @@ var vditorRendererTests = []parseTest{
 
 func TestVditorRenderer(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.ListItemSpace = true
 
 	for _, test := range vditorRendererTests {
 		html, err := luteEngine.RenderVditorDOM(test.from)
