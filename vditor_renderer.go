@@ -406,7 +406,12 @@ func (r *VditorRenderer) renderListItemVditor(node *Node, entering bool) (WalkSt
 		r.tag("span", -1, attrs, false)
 		attrs = [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
-		r.write(node.listData.marker)
+
+		marker := node.listData.marker
+		if 0 != node.listData.delimiter {
+			marker = append(marker, node.listData.delimiter)
+		}
+		r.writeString(fromItems(marker) + " ")
 		r.tag("/span", -1, nil, false)
 		r.tag("/span", -1, nil, false)
 		r.tag("p", NodeParagraph, nil, false)

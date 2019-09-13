@@ -92,16 +92,9 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	data.marker = marker
 
 	var token = ln[t.context.nextNonspace+markerLength]
-	if !t.context.option.ListItemSpace {
-		// 列表项标记后必须是空白字符
-		if !isWhitespace(token) {
-			return nil
-		}
-	} else {
-		// 列表项标记后必须是空格
-		if itemSpace != token {
-			return nil
-		}
+	// 列表项标记后必须是空白字符
+	if !isWhitespace(token) {
+		return nil
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空

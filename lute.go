@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -163,6 +164,44 @@ func (lute *Lute) SpinVditorDOM(html string) (newHTML string, err error) {
 	return
 }
 
+// VditorNewline 用于在类型为 blockType 的块中进行换行生成新的 Vditor 节点。
+// param 用于传递生成某些块换行所需的参数，比如在列表项中换行需要传列表项标记和分隔符。
+func (lute *Lute) VditorNewline(blockType int, param map[string]interface{}) (html string, err error) {
+	renderer := lute.newVditorRenderer(nil).(*VditorRenderer)
+
+	switch blockType {
+	case NodeParagraph:
+		renderer.tag("p", NodeParagraph, nil, false)
+		renderer.tag("/p", NodeParagraph, nil, false)
+	case NodeListItem:
+		listType := 0
+		listType, err = strconv.Atoi(param["listType"].(string))
+		if nil != err {
+			return
+		}
+		num := 1
+		num, err = strconv.Atoi(param["listNum"].(string))
+		delim := param["listDelim"].(string)
+		marker := param["listMarker"].(string)
+		if 1 == listType { // 有序列表
+			marker = strconv.Itoa(num + 1)
+			marker += delim
+		}
+		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: toItems(marker), delimiter: delim[0]}}
+		_, err = renderer.renderListItemVditor(listItem, true)
+		if nil != err {
+			return
+		}
+		_, err = renderer.renderListItemVditor(listItem, false)
+		if nil != err {
+			return
+		}
+	}
+
+	html = renderer.writer.String()
+	return
+}
+
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	// GFMTable 设置是否打开“GFM 表”支持。
@@ -198,8 +237,6 @@ type options struct {
 	Emojis map[string]string
 	// EmojiSite 设置图片 Emoji URL 的路径前缀。
 	EmojiSite string
-	// ListItemSpace 设置列表项标记后是否需要跟空格才解析为列表项，默认为 false 即不需要跟空格也可以解析为列表项（CommonMark 中定义的空行情况）。
-	ListItemSpace bool
 }
 
 // option 描述了解析渲染选项设置函数签名。
@@ -265,8 +302,4 @@ func (lute *Lute) SetEmojis(emojis map[string]string) {
 
 func (lute *Lute) SetEmojiSite(emojiSite string) {
 	lute.EmojiSite = emojiSite
-}
-
-func (lute *Lute) SetListItemSpace(b bool) {
-	lute.ListItemSpace = b
 }
