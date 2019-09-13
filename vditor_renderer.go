@@ -227,19 +227,19 @@ func (r *VditorRenderer) renderDocumentVditor(node *Node, entering bool) (WalkSt
 }
 
 func (r *VditorRenderer) renderParagraphVditor(node *Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.parent.parent; nil != grandparent {
-		if NodeList == grandparent.typ { // List.ListItem.Paragraph
-			if grandparent.tight {
-				return WalkContinue, nil
-			}
-		}
-	}
-
-	if entering {
-		r.tag("p", node.typ, nil, false)
-	} else {
-		r.tag("/p", node.typ, nil, false)
-	}
+	//if grandparent := node.parent.parent; nil != grandparent {
+	//	if NodeList == grandparent.typ { // List.ListItem.Paragraph
+	//		if grandparent.tight {
+	//			return WalkContinue, nil
+	//		}
+	//	}
+	//}
+	//
+	//if entering {
+	//	r.tag("p", node.typ, nil, false)
+	//} else {
+	//	r.tag("/p", node.typ, nil, false)
+	//}
 	return WalkContinue, nil
 }
 
@@ -327,7 +327,7 @@ func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkSt
 		r.tag("span", -1, attrs, false)
 		r.writeByte(node.strongEmDelMarker)
 		r.tag("/span", -1, nil, false)
-		r.tag("/span", -1, attrs, false)
+		r.tag("/span", -1, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -397,6 +397,13 @@ func (r *VditorRenderer) renderListVditor(node *Node, entering bool) (WalkStatus
 
 func (r *VditorRenderer) renderListItemVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+
+		attrs := [][]string{{"class", "node"}}
+		r.tag("span", -1, attrs, false)
+		attrs = [][]string{{"class", "marker"}}
+		r.tag("span", -1, attrs, false)
+		r.write(node.listData.marker)
+		r.tag("/span", -1, nil, false)
 		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
 			r.tag("li", node.typ, [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
 		} else {
@@ -404,6 +411,7 @@ func (r *VditorRenderer) renderListItemVditor(node *Node, entering bool) (WalkSt
 		}
 	} else {
 		r.tag("/li", node.typ, nil, false)
+		r.tag("/span", -1, nil, false)
 	}
 	return WalkContinue, nil
 }
