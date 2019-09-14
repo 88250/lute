@@ -19,6 +19,8 @@ import (
 )
 
 var mathTests = []parseTest{
+	{"2", "| $a^2 + b^2 = \\color{red}c^2$ | bar |\n| --- | --- |\n| baz | bim |\n", "<table>\n<thead>\n<tr>\n<th>$a^2 + b^2 = \\color{red}c^2$</th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>baz</td>\n<td>bim</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"1", "$a^2 + b^2 = \\color{red}c^2$", "<p>$a^2 + b^2 = \\color{red}c^2$</p>\n"},
 	{"0", "$$a^2 + b^2 = \\color{red}c^2$$", "$$a^2 + b^2 = \\color{red}c^2$$\n"},
 }
 

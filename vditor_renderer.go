@@ -27,15 +27,13 @@ type VditorRenderer struct {
 // newVditorRenderer 创建一个 Vditor DOM 渲染器。
 func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
 	ret := &VditorRenderer{&BaseRenderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
-
-	// 注册 CommonMark 渲染函数
-
 	ret.rendererFuncs[NodeDocument] = ret.renderDocumentVditor
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraphVditor
 	ret.rendererFuncs[NodeText] = ret.renderTextVditor
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpanVditor
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlockVditor
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlockVditor
+	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMathHTML
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasisVditor
 	ret.rendererFuncs[NodeStrong] = ret.renderStrongVditor
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquoteVditor
@@ -49,23 +47,14 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTMLVditor
 	ret.rendererFuncs[NodeLink] = ret.renderLinkVditor
 	ret.rendererFuncs[NodeImage] = ret.renderImageVditor
-
-	// 注册 GFM 渲染函数
-
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethroughVditor
 	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarkerVditor
 	ret.rendererFuncs[NodeTable] = ret.renderTableVditor
 	ret.rendererFuncs[NodeTableHead] = ret.renderTableHeadVditor
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowVditor
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellVditor
-
-	// Emoji 渲染函数
-
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeVditor
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgVditor
-
-	// Vditor 渲染函数
-
 	ret.rendererFuncs[NodeVditorCaret] = ret.renderVditorCaretVditor
 
 	return ret
@@ -285,16 +274,24 @@ func (r *VditorRenderer) renderCodeSpanVditor(node *Node, entering bool) (WalkSt
 	return WalkContinue, nil
 }
 
+func (r *VditorRenderer) renderInlineMathHTML(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		tokens := node.tokens
+		tokens = escapeHTML(tokens)
+		r.write(tokens)
+	}
+	return WalkStop, nil
+}
+
 func (r *VditorRenderer) renderMathBlockVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		tokens := node.tokens
 		tokens = escapeHTML(tokens)
 		r.write(tokens)
-		return WalkSkipChildren, nil
+		r.newline()
 	}
-	r.newline()
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderCodeBlockVditor(node *Node, entering bool) (WalkStatus, error) {
