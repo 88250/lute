@@ -78,7 +78,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = bytes.TrimSpace(cols[i])
 		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i]}
-		col = col.removeFirst(itemBackslash) // 删掉一个反斜杠来恢复语义
+		col = bytes.ReplaceAll(col, items("\\|"), items("|"))
 		cell.tokens = col
 		ret.AppendChild(ret, cell)
 	}

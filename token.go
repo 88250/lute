@@ -134,18 +134,6 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	return
 }
 
-// removeFirst 会将 tokens 中和 token 相等的字符删掉（只删出现相等情况的第一个字符），返回处理后的新串。
-func (tokens items) removeFirst(token byte) items {
-	length := len(tokens)
-	var i int
-	for ; i < length; i++ {
-		if token == tokens[i] {
-			return append(tokens[:i], tokens[i+1:]...)
-		}
-	}
-	return tokens
-}
-
 // replaceAll 会将 tokens 中的所有 old 使用 new 替换。
 func (tokens items) replaceAll(old, new byte) {
 	length := len(tokens)
