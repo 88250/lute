@@ -64,21 +64,32 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeVditor
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgVditor
 
+	// Vditor 渲染函数
+
+	ret.rendererFuncs[NodeVditorCaret] = ret.renderVditorCaretVditor
+
 	return ret
+}
+
+func (r *VditorRenderer) renderVditorCaretVditor(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writeString("<span data-caret></span>")
+	}
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmojiImgVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmojiUnicodeVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderTableCellVditor(node *Node, entering bool) (WalkStatus, error) {
@@ -227,11 +238,14 @@ func (r *VditorRenderer) renderDocumentVditor(node *Node, entering bool) (WalkSt
 }
 
 func (r *VditorRenderer) renderParagraphVditor(node *Node, entering bool) (WalkStatus, error) {
-	if !entering {
+	if entering {
+		r.tag("p", node.typ, nil, false)
+	} else {
 		attrs := [][]string{{"class", "newline"}}
 		r.tag("span", -1, attrs, false)
 		r.writeString("\n\n")
 		r.tag("/span", -1, nil, false)
+		r.tag("/p", node.typ, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -436,22 +450,28 @@ func (r *VditorRenderer) renderThematicBreakVditor(node *Node, entering bool) (W
 
 func (r *VditorRenderer) renderHardBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		r.tag("span", node.typ, nil, false)
 		r.tag("br", -1, nil, false)
 		attrs := [][]string{{"class", "newline"}}
 		r.tag("span", node.typ, attrs, true)
+		r.writeByte(itemNewline)
+		r.tag("/span", node.typ, nil, false)
 		r.tag("/span", node.typ, nil, false)
 	}
-	return WalkSkipChildren, nil
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderSoftBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		r.tag("span", node.typ, nil, false)
 		r.tag("br", -1, nil, false)
 		attrs := [][]string{{"class", "newline"}}
 		r.tag("span", node.typ, attrs, true)
+		r.writeByte(itemNewline)
+		r.tag("/span", node.typ, nil, false)
 		r.tag("/span", node.typ, nil, false)
 	}
-	return WalkSkipChildren, nil
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) tag(name string, typ int, attrs [][]string, selfclosing bool) {

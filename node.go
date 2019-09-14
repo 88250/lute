@@ -266,4 +266,8 @@ const (
 
 	NodeMathBlock  // 数学公式块节点
 	NodeInlineMath // 内联数学公式节点
+
+	// Vditor
+
+	NodeVditorCaret // Vditor 插入字符
 )

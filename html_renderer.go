@@ -24,9 +24,6 @@ type HTMLRenderer struct {
 // newHTMLRenderer 创建一个 HTML 渲染器。
 func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret := &HTMLRenderer{&BaseRenderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
-
-	// 注册 CommonMark 渲染函数
-
 	ret.rendererFuncs[NodeDocument] = ret.renderDocumentHTML
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraphHTML
 	ret.rendererFuncs[NodeText] = ret.renderTextHTML
@@ -46,22 +43,23 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTMLHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLinkHTML
 	ret.rendererFuncs[NodeImage] = ret.renderImageHTML
-
-	// 注册 GFM 渲染函数
-
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethroughHTML
 	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarkerHTML
 	ret.rendererFuncs[NodeTable] = ret.renderTableHTML
 	ret.rendererFuncs[NodeTableHead] = ret.renderTableHeadHTML
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowHTML
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellHTML
-
-	// Emoji 渲染函数
-
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeHTML
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgHTML
-
+	ret.rendererFuncs[NodeVditorCaret] = ret.renderVditorCaretVditor
 	return ret
+}
+
+func (r *HTMLRenderer) renderVditorCaretVditor(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.write(node.tokens)
+	}
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderMathBlockHTML(node *Node, entering bool) (WalkStatus, error) {

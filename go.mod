@@ -14,6 +14,9 @@ require (
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/russross/blackfriday v2.0.0+incompatible // indirect
 	github.com/russross/blackfriday/v2 v2.0.1
+	github.com/shurcooL/go v0.0.0-20190704215121-7189cc372560 // indirect
+	github.com/shurcooL/go-goon v0.0.0-20170922171312-37c2f522c041 // indirect
+	github.com/shurcooL/goexec v0.0.0-20181215213458-76a6b9a99126 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/valyala/fasthttp v1.4.0

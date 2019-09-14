@@ -26,9 +26,6 @@ type FormatRenderer struct {
 // newFormatRenderer 创建一个格式化渲染器。
 func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret := &FormatRenderer{BaseRenderer: &BaseRenderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
-
-	// 注册 CommonMark 渲染函数
-
 	ret.rendererFuncs[NodeDocument] = ret.renderDocumentMarkdown
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraphMarkdown
 	ret.rendererFuncs[NodeText] = ret.renderTextMarkdown
@@ -48,22 +45,23 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTMLMarkdown
 	ret.rendererFuncs[NodeLink] = ret.renderLinkMarkdown
 	ret.rendererFuncs[NodeImage] = ret.renderImageMarkdown
-
-	// 注册 GFM 渲染函数
-
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethroughMarkdown
 	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarkerMarkdown
 	ret.rendererFuncs[NodeTable] = ret.renderTableMarkdown
 	ret.rendererFuncs[NodeTableHead] = ret.renderTableHeadMarkdown
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowMarkdown
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellMarkdown
-
-	// Emoji 渲染函数
-
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeMarkdown
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgMarkdown
-
+	ret.rendererFuncs[NodeVditorCaret] = ret.renderVditorCaretVditor
 	return ret
+}
+
+func (r *FormatRenderer) renderVditorCaretVditor(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.write(node.tokens)
+	}
+	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderEmojiImgMarkdown(node *Node, entering bool) (WalkStatus, error) {

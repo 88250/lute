@@ -72,7 +72,7 @@ func (t *Tree) incorporateLine(line items) {
 	for !matchedLeaf {
 		t.context.findNextNonspace()
 
-		// 如果不由潜在的节点标记开头 ^[#`~*+_=<>0-9-]，则说明不用继续迭代生成子节点
+		// 如果不由潜在的节点标记开头 ^[#`~*+_=<>0-9-]$，则说明不用继续迭代生成子节点
 		// 这里仅做简单判断的话可以略微提升一些性能
 		maybeMarker := t.context.currentLine[t.context.nextNonspace]
 		if !t.context.indented &&

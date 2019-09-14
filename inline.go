@@ -48,6 +48,8 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 			n = t.parseEntity(ctx)
 		case itemBang:
 			n = t.parseBang(ctx)
+		case itemBell:
+			n = t.parseVditorCaret(ctx)
 		default:
 			n = t.parseText(ctx)
 		}
@@ -348,7 +350,11 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 func (t *Tree) isMarker(token byte) bool {
 	return itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
 		itemNewline == token || itemBackslash == token || itemBacktick == token ||
-		itemLess == token || itemCloseBracket == token || itemAmpersand == token || itemTilde == token
+		itemLess == token || itemCloseBracket == token || itemAmpersand == token || itemTilde == token ||
+	// TODO: 内联数学公式处理 https://github.com/b3log/lute/issues/25
+	// itemDollar == token
+		itemBell == token
+
 }
 
 func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
