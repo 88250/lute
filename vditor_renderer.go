@@ -227,19 +227,12 @@ func (r *VditorRenderer) renderDocumentVditor(node *Node, entering bool) (WalkSt
 }
 
 func (r *VditorRenderer) renderParagraphVditor(node *Node, entering bool) (WalkStatus, error) {
-	//if grandparent := node.parent.parent; nil != grandparent {
-	//	if NodeList == grandparent.typ { // List.ListItem.Paragraph
-	//		if grandparent.tight {
-	//			return WalkContinue, nil
-	//		}
-	//	}
-	//}
-	//
-	//if entering {
-	//	r.tag("p", node.typ, nil, false)
-	//} else {
-	//	r.tag("/p", node.typ, nil, false)
-	//}
+	if !entering {
+		attrs := [][]string{{"class", "newline"}}
+		r.tag("span", -1, attrs, false)
+		r.writeString("\n\n")
+		r.tag("/span", -1, nil, false)
+	}
 	return WalkContinue, nil
 }
 
@@ -315,7 +308,7 @@ func (r *VditorRenderer) renderCodeBlockVditor(node *Node, entering bool) (WalkS
 func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		attrs := [][]string{{"class", "node"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", node.typ, attrs, false)
 		attrs = [][]string{{"class", "marker"}}
 		r.tag("span", -1, attrs, false)
 		r.writeByte(node.strongEmDelMarker)
@@ -443,7 +436,9 @@ func (r *VditorRenderer) renderThematicBreakVditor(node *Node, entering bool) (W
 
 func (r *VditorRenderer) renderHardBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node.typ, nil, false)
+		r.tag("br", -1, nil, false)
+		attrs := [][]string{{"class", "newline"}}
+		r.tag("span", node.typ, attrs, true)
 		r.tag("/span", node.typ, nil, false)
 	}
 	return WalkSkipChildren, nil
@@ -451,7 +446,9 @@ func (r *VditorRenderer) renderHardBreakVditor(node *Node, entering bool) (WalkS
 
 func (r *VditorRenderer) renderSoftBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node.typ, nil, true)
+		r.tag("br", -1, nil, false)
+		attrs := [][]string{{"class", "newline"}}
+		r.tag("span", node.typ, attrs, true)
 		r.tag("/span", node.typ, nil, false)
 	}
 	return WalkSkipChildren, nil

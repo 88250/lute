@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/b3log/lute/html"
@@ -73,6 +74,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Hr:
 		node.typ = NodeThematicBreak
 	case atom.Span:
+		mtype := lute.domAttrValue(n, "data-mtype")
+		if "2" == mtype { // 行级元素可以直接用其 text
+			node.typ = NodeText
+			node.tokens = toItems(lute.domText(n))
+			break
+		}
+
 		class := lute.domAttrValue(n, "class")
 		skipChildren = !strings.Contains(class, "node")
 		if skipChildren {
@@ -95,7 +103,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 }
 
-func (lute *Lute) domAttrValue(n *html.Node, attrName string) (string) {
+func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
 	if 1 > len(n.Attr) {
 		return ""
 	}
@@ -105,4 +113,22 @@ func (lute *Lute) domAttrValue(n *html.Node, attrName string) (string) {
 		}
 	}
 	return ""
+}
+
+func (lute *Lute) domText(n *html.Node) string {
+	buf := &bytes.Buffer{}
+	lute.domText0(n, buf)
+	return buf.String()
+}
+
+func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
+	if nil == n {
+		return
+	}
+	if 0 == n.DataAtom {
+		buffer.WriteString(n.Data)
+	}
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		lute.domText0(child, buffer)
+	}
 }
