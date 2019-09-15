@@ -23,7 +23,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &Node{typ: NodeDocument}
+	tree.Root = &Node{typ: NodeDocument, sourcepos: [][]int{{}, {}}}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
@@ -38,15 +38,13 @@ type Context struct {
 
 	linkRefDef map[string]*Node // 链接引用定义集
 
-	// 以下变量用于块级解析阶段
-
-	tip                                                      *Node // 末梢节点
-	oldtip                                                   *Node // 老的末梢节点
-	currentLine                                              items // 当前行
-	currentLineLen                                           int   // 当前行长
-	offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的下标、缩进空格数
-	indented, blank, partiallyConsumedTab, allClosed         bool  // 是否是缩进行、空行等标识
-	lastMatchedContainer                                     *Node // 最后一个匹配的块节点
+	tip                                                               *Node // 末梢节点
+	oldtip                                                            *Node // 老的末梢节点
+	currentLine                                                       items // 当前行
+	currentLineLen                                                    int   // 当前行长
+	lineNum, offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的行号、下标、缩进空格数等
+	indented, blank, partiallyConsumedTab, allClosed                  bool  // 是否是缩进行、空行等标识
+	lastMatchedContainer                                              *Node // 最后一个匹配的块节点
 }
 
 // InlineContext 描述了行级元素解析上下文。
@@ -131,7 +129,7 @@ func (context *Context) closeUnmatchedBlocks() {
 	if !context.allClosed {
 		for context.oldtip != context.lastMatchedContainer {
 			parent := context.oldtip.parent
-			context.finalize(context.oldtip)
+			context.finalize(context.oldtip, context.lineNum-1)
 			context.oldtip = parent
 		}
 		context.allClosed = true
@@ -139,22 +137,30 @@ func (context *Context) closeUnmatchedBlocks() {
 }
 
 // finalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
-func (context *Context) finalize(block *Node) {
+func (context *Context) finalize(block *Node, lineNum int) {
 	var parent = block.parent
 	block.close = true
+	if nil == block.sourcepos {
+		block.close = true
+	}
+
+	block.sourcepos[1] = []int{lineNum, context.currentLineLen}
 	block.Finalize(context)
 	context.tip = parent
 }
 
 // addChild 将 child 作为子节点添加到 context.tip 上。如果 tip 节点不能接受子节点（非块级容器不能添加子节点），则最终化该 tip
 // 节点并向父节点方向尝试，直到找到一个能接受 child 的节点为止。
-func (context *Context) addChild(child *Node) {
-	for !context.tip.CanContain(child.typ) {
-		context.finalize(context.tip) // 注意调用 finalize 会向父节点方向进行迭代
+func (context *Context) addChild(nodeType, offset int) (ret *Node) {
+	for !context.tip.CanContain(nodeType) {
+		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
-	context.tip.AppendChild(context.tip, child)
-	context.tip = child
+	columnNum := offset + 1 // offset 0 = column 1
+	ret = &Node{typ: nodeType, sourcepos: [][]int{{context.lineNum, columnNum}, {0, 0}}}
+	context.tip.AppendChild(context.tip, ret)
+	context.tip = ret
+	return ret
 }
 
 // listsMatch 用户判断指定的 listData 和 itemData 是否可归属于同一个列表。

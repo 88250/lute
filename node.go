@@ -16,21 +16,22 @@ package lute
 type Node struct {
 	// 不用接口实现的原因：
 	//   1. 转换节点类型非常方便，只需修改 typ 属性
-	//   2. 为了极致的性能，牺牲一点扩展性
+	//   2. 为了极致的性能而牺牲扩展性
 
 	// 节点基础结构
 
-	typ             int    // 节点类型
-	parent          *Node  // 父节点
-	previous        *Node  // 前一个兄弟节点
-	next            *Node  // 后一个兄弟节点
-	firstChild      *Node  // 第一个子节点
-	lastChild       *Node  // 最后一个子节点
-	rawText         string // 原始内容
-	tokens          items  // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
-	close           bool   // 标识是否关闭
-	lastLineBlank   bool   // 标识最后一行是否是空行
-	lastLineChecked bool   // 标识最后一行是否检查过
+	typ             int     // 节点类型
+	parent          *Node   // 父节点
+	previous        *Node   // 前一个兄弟节点
+	next            *Node   // 后一个兄弟节点
+	firstChild      *Node   // 第一个子节点
+	lastChild       *Node   // 最后一个子节点
+	rawText         string  // 原始内容
+	tokens          items   // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
+	close           bool    // 标识是否关闭
+	lastLineBlank   bool    // 标识最后一行是否是空行
+	lastLineChecked bool    // 标识最后一行是否检查过
+	sourcepos       [][]int // 源码位置
 
 	// 代码
 

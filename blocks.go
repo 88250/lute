@@ -20,11 +20,13 @@ import (
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Node{}
+	lines := 0
 	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		t.incorporateLine(line)
+		lines++
 	}
 	for nil != t.context.tip {
-		t.context.finalize(t.context.tip)
+		t.context.finalize(t.context.tip, lines)
 	}
 }
 
@@ -131,7 +133,8 @@ func (t *Tree) incorporateLine(line items) {
 			!(typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
 				(typ == NodeMathBlock) || // 数学公式块不计入空行判断
-				(typ == NodeListItem && nil == container.firstChild)) // 内容为空的列表项也不计入空行判断
+				(typ == NodeListItem && nil == container.firstChild) && // 内容为空的列表项也不计入空行判断
+					container.sourcepos[0][0] == t.context.lineNum)
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 lastLineBlank
 		// lastLineBlank 目前仅在判断列表紧凑模式上使用
 		for cont := container; nil != cont; cont = cont.parent {
@@ -145,13 +148,13 @@ func (t *Tree) incorporateLine(line items) {
 				html := container
 				if html.htmlBlockType >= 1 && html.htmlBlockType <= 5 {
 					if t.isHTMLBlockClose(t.context.currentLine[t.context.offset:], html.htmlBlockType) {
-						t.context.finalize(container)
+						t.context.finalize(container, t.context.lineNum)
 					}
 				}
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
 			// 普通段落开始
-			t.context.addChild(&Node{typ: NodeParagraph, tokens: make(items, 0, 256)})
+			t.context.addChild(NodeParagraph, t.context.offset)
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}
@@ -180,7 +183,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(&Node{typ: NodeBlockquote})
+				t.context.addChild(NodeBlockquote, t.context.nextNonspace)
 				return 1
 			}
 		}
@@ -190,11 +193,13 @@ var blockStarts = []blockStartFunc{
 	// 判断 ATX 标题（#）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			if heading := t.parseATXHeading(); nil != heading {
+			if content, level := t.parseATXHeading(); nil != content {
 				t.context.advanceNextNonspace()
-				t.context.advanceOffset(len(heading.tokens), false)
+				t.context.advanceOffset(len(content), false)
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(heading)
+				container := t.context.addChild(NodeHeading, t.context.nextNonspace)
+				container.headingLevel = level
+				container.tokens = content
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
 			}
@@ -205,11 +210,16 @@ var blockStarts = []blockStartFunc{
 	// 判断围栏代码块（```）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			if codeBlock := t.parseFencedCode(); nil != codeBlock {
+			if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockInfo := t.parseFencedCode(); ok {
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(codeBlock)
+				container := t.context.addChild(NodeCodeBlock, t.context.nextNonspace)
+				container.isFencedCodeBlock = true
+				container.codeBlockFenceLen = codeBlockFenceLen
+				container.codeBlockFenceChar = codeBlockFenceChar
+				container.codeBlockFenceOffset = codeBlockFenceOffset
+				container.codeBlockInfo = codeBlockInfo
 				t.context.advanceNextNonspace()
-				t.context.advanceOffset(codeBlock.codeBlockFenceLen, false)
+				t.context.advanceOffset(codeBlockFenceLen, false)
 				return 2
 			}
 		}
@@ -255,10 +265,11 @@ var blockStarts = []blockStartFunc{
 				}
 
 				if value := container.tokens; 0 < len(value) {
-					heading.tokens = bytes.TrimSpace(value)
-					container.InsertAfter(container, heading)
+					child := &Node{typ: NodeHeading, sourcepos: container.sourcepos, headingLevel: heading.headingLevel}
+					child.tokens = bytes.TrimSpace(value)
+					container.InsertAfter(container, child)
 					container.Unlink()
-					t.context.tip = heading
+					t.context.tip = child
 					t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 					return 2
 				}
@@ -273,7 +284,10 @@ var blockStarts = []blockStartFunc{
 			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if html := t.parseHTML(tokens); nil != html {
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(html)
+				// We don't adjust parser.offset;
+				// spaces are part of the HTML block:
+				block := t.context.addChild(NodeHTMLBlock, t.context.offset)
+				block.htmlBlockType = html.htmlBlockType
 				return 2
 			}
 		}
@@ -285,7 +299,7 @@ var blockStarts = []blockStartFunc{
 		if !t.context.indented {
 			if thematicBreak := t.parseThematicBreak(); nil != thematicBreak {
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(thematicBreak)
+				t.context.addChild(NodeThematicBreak, t.context.nextNonspace)
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
 			}
@@ -305,11 +319,11 @@ var blockStarts = []blockStartFunc{
 
 			listsMatch := container.typ == NodeList && t.context.listsMatch(container.listData, data)
 			if t.context.tip.typ != NodeList || !listsMatch {
-				t.context.addChild(&Node{typ: NodeList, listData: data})
+				list := t.context.addChild(NodeList, t.context.nextNonspace)
+				list.listData = data
 			}
-			listItem := &Node{typ: NodeListItem, listData: data}
-			t.context.addChild(listItem)
-
+			listItem := t.context.addChild(NodeListItem, t.context.nextNonspace)
+			listItem.listData = data
 			if 1 == listItem.listData.typ {
 				// 修正有序列表项序号
 				prev := listItem.previous
@@ -330,7 +344,8 @@ var blockStarts = []blockStartFunc{
 		if !t.context.indented {
 			if mathBlock := t.parseMathBlock(); nil != mathBlock {
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(mathBlock)
+				block := t.context.addChild(NodeMathBlock, t.context.nextNonspace)
+				block.mathBlockDollarOffset = mathBlock.mathBlockDollarOffset
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(mathBlock.mathBlockDollarOffset, false)
 				return 2
@@ -344,7 +359,7 @@ var blockStarts = []blockStartFunc{
 		if t.context.indented && t.context.tip.typ != NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)
 			t.context.closeUnmatchedBlocks()
-			t.context.addChild(&Node{typ: NodeCodeBlock})
+			t.context.addChild(NodeCodeBlock, t.context.offset)
 			return 2
 		}
 		return 0

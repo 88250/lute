@@ -21,7 +21,7 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	var indent = context.indent
 	if codeBlock.isFencedCodeBlock {
 		if indent <= 3 && codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.codeBlockFenceChar, codeBlock.codeBlockFenceLen) {
-			context.finalize(codeBlock)
+			context.finalize(codeBlock, context.lineNum)
 			return 2
 		} else {
 			// 跳过围栏标记之前可能存在的空格
@@ -76,10 +76,10 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 
 var codeBlockBacktick = items{itemBacktick}
 
-func (t *Tree) parseFencedCode() (ret *Node) {
+func (t *Tree) parseFencedCode() (ok bool, codeBlockFenceChar byte, codeBlockFenceLen int, codeBlockFenceOffset int, codeBlockInfo items) {
 	marker := t.context.currentLine[t.context.nextNonspace]
 	if itemBacktick != marker && itemTilde != marker {
-		return nil
+		return
 	}
 
 	fenceChar := marker
@@ -89,20 +89,18 @@ func (t *Tree) parseFencedCode() (ret *Node) {
 	}
 
 	if 3 > fenceLength {
-		return nil
+		return
 	}
 
 	var info items
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
 	if itemBacktick == marker && bytes.Contains(infoTokens, codeBlockBacktick) {
-		return nil // info 部分不能包含 `
+		// info 部分不能包含 `
+		return
 	}
 	info = bytes.TrimSpace(infoTokens)
 	info = unescapeString(info)
-	ret = &Node{typ: NodeCodeBlock, tokens: make(items, 0, 256),
-		isFencedCodeBlock: true, codeBlockFenceChar: fenceChar, codeBlockFenceLen: fenceLength, codeBlockFenceOffset: t.context.indent, codeBlockInfo: info}
-
-	return
+	return  true, fenceChar, fenceLength, t.context.indent, info
 }
 
 func (codeBlock *Node) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
