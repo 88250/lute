@@ -171,8 +171,8 @@ func (lute *Lute) VditorNewline(blockType int, param map[string]interface{}) (ht
 
 	switch blockType {
 	case NodeParagraph:
-		renderer.tag("p", NodeParagraph, nil, false)
-		renderer.tag("/p", NodeParagraph, nil, false)
+		renderer.tag("p", nil, nil, false)
+		renderer.tag("/p", nil, nil, false)
 	case NodeListItem:
 		listType := 0
 		listType, err = strconv.Atoi(param["listType"].(string))

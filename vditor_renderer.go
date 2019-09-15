@@ -87,20 +87,20 @@ func (r *VditorRenderer) renderTableCellVditor(node *Node, entering bool) (WalkS
 		case 3:
 			attrs = append(attrs, []string{"align", "right"})
 		}
-		r.tag(tag, node.typ, attrs, false)
+		r.tag(tag, node, attrs, false)
 	} else {
-		r.tag("/"+tag, node.typ, nil, false)
+		r.tag("/"+tag, node, nil, false)
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderTableRowVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("tr", node.typ, nil, false)
+		r.tag("tr", node, nil, false)
 	} else {
-		r.tag("/tr", node.typ, nil, false)
+		r.tag("/tr", node, nil, false)
 		if node == node.parent.lastChild {
-			r.tag("/tbody", node.typ, nil, false)
+			r.tag("/tbody", node, nil, false)
 		}
 	}
 	return WalkContinue, nil
@@ -108,13 +108,13 @@ func (r *VditorRenderer) renderTableRowVditor(node *Node, entering bool) (WalkSt
 
 func (r *VditorRenderer) renderTableHeadVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("thead", node.typ, nil, false)
-		r.tag("tr", node.typ, nil, false)
+		r.tag("thead", node, nil, false)
+		r.tag("tr", node, nil, false)
 	} else {
-		r.tag("/tr", node.typ, nil, false)
-		r.tag("/thead", node.typ, nil, false)
+		r.tag("/tr", node, nil, false)
+		r.tag("/thead", node, nil, false)
 		if nil != node.next {
-			r.tag("tbody", node.typ, nil, false)
+			r.tag("tbody", node, nil, false)
 		}
 	}
 	return WalkContinue, nil
@@ -122,18 +122,18 @@ func (r *VditorRenderer) renderTableHeadVditor(node *Node, entering bool) (WalkS
 
 func (r *VditorRenderer) renderTableVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("table", node.typ, nil, false)
+		r.tag("table", node, nil, false)
 	} else {
-		r.tag("/table", node.typ, nil, false)
+		r.tag("/table", node, nil, false)
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderStrikethroughVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("del", node.typ, nil, false)
+		r.tag("del", node, nil, false)
 	} else {
-		r.tag("/del", node.typ, nil, false)
+		r.tag("/del", node, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -164,36 +164,36 @@ func (r *VditorRenderer) renderImageVditor(node *Node, entering bool) (WalkStatu
 
 func (r *VditorRenderer) renderLinkVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", -1, nil, false)
+		r.tag("span", nil, nil, false)
 		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeByte(itemOpenBracket)
-		r.tag("/span", -1, nil, false)
+		r.tag("/span", nil, nil, false)
 
 		attrs = [][]string{{"href", fromItems(escapeHTML(node.destination))}}
 		if nil != node.title {
 			attrs = append(attrs, []string{"title", fromItems(escapeHTML(node.title))})
 		}
-		r.tag("a", -1, attrs, false)
+		r.tag("a", nil, attrs, false)
 	} else {
-		r.tag("/a", node.typ, nil, false)
+		r.tag("/a", node, nil, false)
 		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeByte(itemCloseBracket)
-		r.tag("/span", -1, nil, false)
+		r.tag("/span", nil, nil, false)
 		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeByte(itemOpenParen)
-		r.tag("/span", -1, nil, false)
-		r.tag("span", -1, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("span", nil, nil, false)
 		r.write(node.destination)
-		r.tag("/span", -1, nil, false)
+		r.tag("/span", nil, nil, false)
 		// TODO: title
 		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeByte(itemCloseParen)
-		r.tag("/span", -1, nil, false)
-		r.tag("/span", -1, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("/span", nil, nil, false)
 	}
 
 	return WalkContinue, nil
@@ -219,44 +219,44 @@ func (r *VditorRenderer) renderDocumentVditor(node *Node, entering bool) (WalkSt
 
 func (r *VditorRenderer) renderParagraphVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("p", node.typ, nil, false)
+		r.tag("p", node, nil, false)
 	} else {
-		r.writeString("<span><br><span class=\"newline\">\n</span><br><span class=\"newline\">\n</span></span>")
+		r.writeString("<span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>")
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderTextVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node.typ, nil, false)
+		r.tag("span", node, nil, false)
 		r.write(escapeHTML(node.tokens))
 	} else {
-		r.tag("/span", node.typ, nil, false)
+		r.tag("/span", node, nil, false)
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderCodeSpanVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", -1, nil, false)
+		r.tag("span", nil, nil, false)
 		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeByte(itemBacktick)
 		if 1 < node.codeMarkerLen {
 			r.writeByte(itemBacktick)
 		}
-		r.tag("/span", -1, nil, false)
-		r.tag("code", node.typ, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("code", node, nil, false)
 		r.write(escapeHTML(node.tokens))
 	} else {
-		r.tag("/code", node.typ, nil, false)
+		r.tag("/code", node, nil, false)
 		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeByte(itemBacktick)
 		if 1 < node.codeMarkerLen {
 			r.writeByte(itemBacktick)
 		}
-		r.tag("/span", -1, nil, false)
+		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -306,19 +306,19 @@ func (r *VditorRenderer) renderCodeBlockVditor(node *Node, entering bool) (WalkS
 func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		attrs := [][]string{{"class", "node"}}
-		r.tag("span", node.typ, attrs, false)
+		r.tag("span", node, attrs, false)
 		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeByte(node.strongEmDelMarker)
-		r.tag("/span", -1, nil, false)
-		r.tag("em", node.typ, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("em", node, nil, false)
 	} else {
-		r.tag("/em", node.typ, nil, false)
+		r.tag("/em", node, nil, false)
 		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeByte(node.strongEmDelMarker)
-		r.tag("/span", -1, nil, false)
-		r.tag("/span", -1, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -326,19 +326,19 @@ func (r *VditorRenderer) renderEmphasisVditor(node *Node, entering bool) (WalkSt
 func (r *VditorRenderer) renderStrongVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		attrs := [][]string{{"class", "node"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
-		r.tag("/span", -1, nil, false)
-		r.tag("strong", node.typ, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("strong", node, nil, false)
 	} else {
-		r.tag("/strong", node.typ, nil, false)
+		r.tag("/strong", node, nil, false)
 		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
-		r.tag("/span", -1, nil, false)
-		r.tag("/span", -1, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -346,22 +346,22 @@ func (r *VditorRenderer) renderStrongVditor(node *Node, entering bool) (WalkStat
 func (r *VditorRenderer) renderBlockquoteVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		attrs := [][]string{{"class", "node"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		r.writeString("&gt;")
-		r.tag("/span", -1, nil, false)
-		r.tag("blockquote", node.typ, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("blockquote", node, nil, false)
 	} else {
-		r.tag("/blockquote", node.typ, nil, false)
-		r.tag("/span", -1, nil, false)
+		r.tag("/blockquote", node, nil, false)
+		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderHeadingVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("h"+" 123456"[node.headingLevel:node.headingLevel+1], node.typ, nil, false)
+		r.tag("h"+" 123456"[node.headingLevel:node.headingLevel+1], node, nil, false)
 	} else {
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 	}
@@ -376,12 +376,12 @@ func (r *VditorRenderer) renderListVditor(node *Node, entering bool) (WalkStatus
 	if entering {
 		attrs := [][]string{{"start", strconv.Itoa(node.start)}}
 		if nil == node.bulletChar && 1 != node.start {
-			r.tag(tag, node.typ, attrs, false)
+			r.tag(tag, node, attrs, false)
 		} else {
-			r.tag(tag, node.typ, nil, false)
+			r.tag(tag, node, nil, false)
 		}
 	} else {
-		r.tag("/"+tag, node.typ, nil, false)
+		r.tag("/"+tag, node, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -389,26 +389,26 @@ func (r *VditorRenderer) renderListVditor(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer) renderListItemVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
-			r.tag("li", node.typ, [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
+			r.tag("li", node, [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
 		} else {
-			r.tag("li", node.typ, nil, false)
+			r.tag("li", node, nil, false)
 		}
 		attrs := [][]string{{"class", "node"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", -1, attrs, false)
+		r.tag("span", nil, attrs, false)
 
 		marker := node.listData.marker
 		if 0 != node.listData.delimiter {
 			marker = append(marker, node.listData.delimiter)
 		}
 		r.writeString(fromItems(marker) + " ")
-		r.tag("/span", -1, nil, false)
-		r.tag("/span", -1, nil, false)
-		r.tag("p", NodeParagraph, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("/span", nil, nil, false)
+		r.tag("p", nil, nil, false)
 	} else {
-		r.tag("/p", NodeParagraph, nil, false)
-		r.tag("/li", node.typ, nil, false)
+		r.tag("/p", nil, nil, false)
+		r.tag("/li", node, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -420,45 +420,45 @@ func (r *VditorRenderer) renderTaskListItemMarkerVditor(node *Node, entering boo
 			attrs = append(attrs, []string{"checked", ""})
 		}
 		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
-		r.tag("input", node.typ, attrs, true)
+		r.tag("input", node, attrs, true)
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderThematicBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("hr", node.typ, nil, true)
+		r.tag("hr", node, nil, true)
 	}
 	return WalkSkipChildren, nil
 }
 
 func (r *VditorRenderer) renderHardBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node.typ, nil, false)
-		r.tag("br", -1, nil, false)
+		r.tag("span", node, nil, false)
+		r.tag("br", nil, nil, false)
 		attrs := [][]string{{"class", "newline"}}
-		r.tag("span", node.typ, attrs, true)
+		r.tag("span", node, attrs, true)
 		r.writeByte(itemNewline)
-		r.tag("/span", node.typ, nil, false)
-		r.tag("/span", node.typ, nil, false)
+		r.tag("/span", node, nil, false)
+		r.tag("/span", node, nil, false)
 	}
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderSoftBreakVditor(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node.typ, nil, false)
-		r.tag("br", -1, nil, false)
+		r.tag("span", node, nil, false)
+		r.tag("br", nil, nil, false)
 		attrs := [][]string{{"class", "newline"}}
-		r.tag("span", node.typ, attrs, true)
+		r.tag("span", node, attrs, true)
 		r.writeByte(itemNewline)
-		r.tag("/span", node.typ, nil, false)
-		r.tag("/span", node.typ, nil, false)
+		r.tag("/span", node, nil, false)
+		r.tag("/span", node, nil, false)
 	}
 	return WalkStop, nil
 }
 
-func (r *VditorRenderer) tag(name string, typ int, attrs [][]string, selfclosing bool) {
+func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclosing bool) {
 	if r.disableTags > 0 {
 		return
 	}
@@ -471,9 +471,11 @@ func (r *VditorRenderer) tag(name string, typ int, attrs [][]string, selfclosing
 		if nil == attrs {
 			attrs = [][]string{}
 		}
-		if -1 != typ {
-			attrs = append(attrs, []string{"data-ntype", strconv.Itoa(typ)})
-			attrs = append(attrs, []string{"data-mtype", r.mtype(typ)})
+		if nil != node {
+			attrs = append(attrs, []string{"data-ntype", strconv.Itoa(node.typ)})
+			attrs = append(attrs, []string{"data-mtype", r.mtype(node.typ)})
+			attrs = append(attrs, []string{"data-pos-start", strconv.Itoa(node.srcPosStartLine) + ":" + strconv.Itoa(node.srcPosStartCol)})
+			attrs = append(attrs, []string{"data-pos-end", strconv.Itoa(node.srcPosEndLine) + ":" + strconv.Itoa(node.srcPosEndCol)})
 		}
 		for _, attr := range attrs {
 			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")

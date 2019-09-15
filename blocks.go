@@ -20,7 +20,7 @@ import (
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Node{}
-	lines := 1
+	lines := 0
 	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		t.incorporateLine(line)
 		lines++

@@ -23,7 +23,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &Node{typ: NodeDocument}
+	tree.Root = &Node{typ: NodeDocument, srcPosStartLine: 1, srcPosStartCol: 1}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
