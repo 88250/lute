@@ -20,18 +20,24 @@ type Node struct {
 
 	// 节点基础结构
 
-	typ             int     // 节点类型
-	parent          *Node   // 父节点
-	previous        *Node   // 前一个兄弟节点
-	next            *Node   // 后一个兄弟节点
-	firstChild      *Node   // 第一个子节点
-	lastChild       *Node   // 最后一个子节点
-	rawText         string  // 原始内容
-	tokens          items   // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
-	close           bool    // 标识是否关闭
-	lastLineBlank   bool    // 标识最后一行是否是空行
-	lastLineChecked bool    // 标识最后一行是否检查过
-	sourcepos       [][]int // 源码位置
+	typ             int    // 节点类型
+	parent          *Node  // 父节点
+	previous        *Node  // 前一个兄弟节点
+	next            *Node  // 后一个兄弟节点
+	firstChild      *Node  // 第一个子节点
+	lastChild       *Node  // 最后一个子节点
+	rawText         string // 原始内容
+	tokens          items  // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
+	close           bool   // 标识是否关闭
+	lastLineBlank   bool   // 标识最后一行是否是空行
+	lastLineChecked bool   // 标识最后一行是否检查过
+
+	// 源码位置
+
+	srcPosStartLine int // 源码位置开始行
+	srcPosStartCol  int // 源码位置开始列
+	srcPosEndLine   int // 源码位置结束行
+	srcPosEndCol    int // 源码位置结束列
 
 	// 代码
 

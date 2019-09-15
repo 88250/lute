@@ -134,7 +134,7 @@ func (t *Tree) incorporateLine(line items) {
 				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
 				(typ == NodeMathBlock) || // 数学公式块不计入空行判断
 				(typ == NodeListItem && nil == container.firstChild) && // 内容为空的列表项也不计入空行判断
-					container.sourcepos[0][0] == t.context.lineNum)
+					container.srcPosStartLine == t.context.lineNum)
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 lastLineBlank
 		// lastLineBlank 目前仅在判断列表紧凑模式上使用
 		for cont := container; nil != cont; cont = cont.parent {
@@ -265,7 +265,11 @@ var blockStarts = []blockStartFunc{
 				}
 
 				if value := container.tokens; 0 < len(value) {
-					child := &Node{typ: NodeHeading, sourcepos: container.sourcepos, headingLevel: level}
+					child := &Node{typ: NodeHeading, headingLevel: level,
+						srcPosStartLine: container.srcPosStartLine,
+						srcPosStartCol:  container.srcPosStartCol,
+						srcPosEndCol:    container.srcPosEndCol,
+						srcPosEndLine:   container.srcPosEndLine}
 					child.tokens = bytes.TrimSpace(value)
 					container.InsertAfter(container, child)
 					container.Unlink()
