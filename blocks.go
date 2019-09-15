@@ -268,8 +268,9 @@ var blockStarts = []blockStartFunc{
 					child := &Node{typ: NodeHeading, headingLevel: level,
 						srcPosStartLine: container.srcPosStartLine,
 						srcPosStartCol:  container.srcPosStartCol,
+						srcPosEndLine:   container.srcPosEndLine,
 						srcPosEndCol:    container.srcPosEndCol,
-						srcPosEndLine:   container.srcPosEndLine}
+					}
 					child.tokens = bytes.TrimSpace(value)
 					container.InsertAfter(container, child)
 					container.Unlink()

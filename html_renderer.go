@@ -52,15 +52,7 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellHTML
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeHTML
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgHTML
-	ret.rendererFuncs[NodeVditorCaret] = ret.renderVditorCaretVditor
 	return ret
-}
-
-func (r *HTMLRenderer) renderVditorCaretVditor(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
-	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderInlineMathHTML(node *Node, entering bool) (WalkStatus, error) {

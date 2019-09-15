@@ -55,16 +55,7 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellVditor
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeVditor
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgVditor
-	ret.rendererFuncs[NodeVditorCaret] = ret.renderVditorCaretVditor
-
 	return ret
-}
-
-func (r *VditorRenderer) renderVditorCaretVditor(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeString("<span data-caret></span>")
-	}
-	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmojiImgVditor(node *Node, entering bool) (WalkStatus, error) {
@@ -230,7 +221,7 @@ func (r *VditorRenderer) renderParagraphVditor(node *Node, entering bool) (WalkS
 	if entering {
 		r.tag("p", node.typ, nil, false)
 	} else {
-		r.writeString(`<span><br><span class="newline">\n</span><br><span class="newline">\n</span></span>`)
+		r.writeString("<span><br><span class=\"newline\">\n</span><br><span class=\"newline\">\n</span></span>")
 	}
 	return WalkContinue, nil
 }

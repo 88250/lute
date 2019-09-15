@@ -54,15 +54,7 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellMarkdown
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeMarkdown
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgMarkdown
-	ret.rendererFuncs[NodeVditorCaret] = ret.renderVditorCaretVditor
 	return ret
-}
-
-func (r *FormatRenderer) renderVditorCaretVditor(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
-	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderEmojiImgMarkdown(node *Node, entering bool) (WalkStatus, error) {

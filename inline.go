@@ -50,8 +50,6 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 			n = t.parseBang(ctx)
 		case itemDollar:
 			n = t.parseInlineMath(ctx)
-		case itemBell:
-			n = t.parseVditorCaret(ctx)
 		default:
 			n = t.parseText(ctx)
 		}
@@ -353,7 +351,7 @@ func (t *Tree) isMarker(token byte) bool {
 	return itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
 		itemNewline == token || itemBackslash == token || itemBacktick == token ||
 		itemLess == token || itemCloseBracket == token || itemAmpersand == token || itemTilde == token ||
-		itemDollar == token || itemBell == token
+		itemDollar == token
 }
 
 func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
