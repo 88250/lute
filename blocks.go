@@ -20,7 +20,7 @@ import (
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
 	t.context.linkRefDef = map[string]*Node{}
-	lines := 0
+	lines := 1
 	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		t.incorporateLine(line)
 		lines++
@@ -68,16 +68,16 @@ func (t *Tree) incorporateLine(line items) {
 	t.context.lastMatchedContainer = container
 
 	matchedLeaf := container.typ != NodeParagraph && container.AcceptLines()
-	var startsLen = len(blockStarts)
+	startsLen := len(blockStarts)
 
 	// 除非最后一个匹配到的是代码块，否则的话就起始一个新的块级节点
 	for !matchedLeaf {
 		t.context.findNextNonspace()
 
-		// 如果不由潜在的节点标记开头 ^[#`~*+_=<>0-9-]$，则说明不用继续迭代生成子节点
-		// 这里仅做简单判断的话可以略微提升一些性能
+		// 如果不由潜在的节点标记开头 ^[#`~*+_=<>0-9-$]，则说明不用继续迭代生成子节点
+		// 这里仅做简单判断的话可以提升一些性能
 		maybeMarker := t.context.currentLine[t.context.nextNonspace]
-		if !t.context.indented &&
+		if !t.context.indented && // 缩进代码块
 			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // 无序列表
 			!isDigit(maybeMarker) && // 有序列表
 			itemBacktick != maybeMarker && itemTilde != maybeMarker && // 代码块
