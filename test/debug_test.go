@@ -20,6 +20,8 @@ import (
 
 var debugTests = []parseTest{
 
+	{"33", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
+	{"32", "**foo*<br>", "<p>*<em>foo</em><br></p>\n"},
 	{"31", "https://t.mex .mex 后缀不自动链接", "<p>https://t.mex .mex 后缀不自动链接</p>\n"},
 	{"30", "https://t.me .me 后缀自动链接", "<p><a href=\"https://t.me\">https://t.me</a> .me 后缀自动链接</p>\n"},
 

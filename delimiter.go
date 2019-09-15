@@ -207,7 +207,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	if 0 < startPos {
 		t := ctx.tokens[startPos-1]
 		if t >= utf8.RuneSelf {
-			tokenBefore, _ = utf8.DecodeLastRune(ctx.tokens[:startPos-1])
+			tokenBefore, _ = utf8.DecodeLastRune(ctx.tokens[:startPos])
 		} else {
 			tokenBefore = rune(t)
 		}
@@ -221,10 +221,11 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		}
 	}
 
-	beforeIsWhitespace := isUnicodeWhitespace(tokenBefore)
-	beforeIsPunct := unicode.IsPunct(tokenBefore)
 	afterIsWhitespace := isUnicodeWhitespace(tokenAfter)
-	afterIsPunct := unicode.IsPunct(tokenAfter)
+	afterIsPunct := unicode.IsPunct(tokenAfter) || unicode.IsSymbol(tokenAfter)
+	beforeIsWhitespace := isUnicodeWhitespace(tokenBefore)
+	beforeIsPunct := unicode.IsPunct(tokenBefore) || unicode.IsSymbol(tokenBefore)
+
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
 	var canOpen, canClose bool
