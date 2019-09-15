@@ -67,12 +67,12 @@ func (t *Tree) parseATXHeading() (content items, level int) {
 	return
 }
 
-func (t *Tree) parseSetextHeading() (ret *Node) {
+func (t *Tree) parseSetextHeading() (level int) {
 	ln := bytes.TrimSpace(t.context.currentLine)
 	start := 0
 	marker := ln[start]
 	if itemEqual != marker && itemHyphen != marker {
-		return nil
+		return
 	}
 
 	markers := 0
@@ -80,12 +80,12 @@ func (t *Tree) parseSetextHeading() (ret *Node) {
 	for ; start < length; start++ {
 		token := ln[start]
 		if itemEqual != token && itemHyphen != token {
-			return nil
+			return
 		}
 
 		if itemEnd != marker {
 			if marker != token {
-				return nil
+				return
 			}
 		} else {
 			marker = token
@@ -94,13 +94,12 @@ func (t *Tree) parseSetextHeading() (ret *Node) {
 	}
 
 	if itemEnd == marker {
-		return nil
+		return
 	}
 
-	ret = &Node{typ: NodeHeading, headingLevel: 1}
+	level = 1
 	if itemHyphen == marker {
-		ret.headingLevel = 2
+		level = 2
 	}
-
 	return
 }

@@ -229,7 +229,7 @@ var blockStarts = []blockStartFunc{
 	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented && container.typ == NodeParagraph {
-			if heading := t.parseSetextHeading(); nil != heading {
+			if level := t.parseSetextHeading(); 0 != level {
 				if t.context.option.GFMTable {
 					// 尝试解析表，因为可能出现如下情况：
 					//
@@ -265,7 +265,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				if value := container.tokens; 0 < len(value) {
-					child := &Node{typ: NodeHeading, sourcepos: container.sourcepos, headingLevel: heading.headingLevel}
+					child := &Node{typ: NodeHeading, sourcepos: container.sourcepos, headingLevel: level}
 					child.tokens = bytes.TrimSpace(value)
 					container.InsertAfter(container, child)
 					container.Unlink()
@@ -282,12 +282,10 @@ var blockStarts = []blockStartFunc{
 	func(t *Tree, container *Node) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
-			if html := t.parseHTML(tokens); nil != html {
+			if htmlType := t.parseHTML(tokens); 0 != htmlType {
 				t.context.closeUnmatchedBlocks()
-				// We don't adjust parser.offset;
-				// spaces are part of the HTML block:
 				block := t.context.addChild(NodeHTMLBlock, t.context.offset)
-				block.htmlBlockType = html.htmlBlockType
+				block.htmlBlockType = htmlType
 				return 2
 			}
 		}
@@ -297,7 +295,7 @@ var blockStarts = []blockStartFunc{
 	// 判断分隔线（--- ***）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			if thematicBreak := t.parseThematicBreak(); nil != thematicBreak {
+			if ok := t.parseThematicBreak(); ok {
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(NodeThematicBreak, t.context.nextNonspace)
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
@@ -342,12 +340,12 @@ var blockStarts = []blockStartFunc{
 	// 判断数学公式块（$$）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			if mathBlock := t.parseMathBlock(); nil != mathBlock {
+			if ok, mathBlockDollarOffset := t.parseMathBlock(); ok {
 				t.context.closeUnmatchedBlocks()
 				block := t.context.addChild(NodeMathBlock, t.context.nextNonspace)
-				block.mathBlockDollarOffset = mathBlock.mathBlockDollarOffset
+				block.mathBlockDollarOffset = mathBlockDollarOffset
 				t.context.advanceNextNonspace()
-				t.context.advanceOffset(mathBlock.mathBlockDollarOffset, false)
+				t.context.advanceOffset(mathBlockDollarOffset, false)
 				return 2
 			}
 		}

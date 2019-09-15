@@ -230,11 +230,7 @@ func (r *VditorRenderer) renderParagraphVditor(node *Node, entering bool) (WalkS
 	if entering {
 		r.tag("p", node.typ, nil, false)
 	} else {
-		attrs := [][]string{{"class", "newline"}}
-		r.tag("span", -1, attrs, false)
-		r.writeString("\n\n")
-		r.tag("/span", -1, nil, false)
-		r.tag("/p", node.typ, nil, false)
+		r.writeString(`<span><br><span class="newline">\n</span><br><span class="newline">\n</span></span>`)
 	}
 	return WalkContinue, nil
 }

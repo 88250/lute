@@ -51,10 +51,10 @@ func (mathBlock *Node) mathBlockFinalize(context *Context) {
 
 var mathBlockDollar = items{itemDollar}
 
-func (t *Tree) parseMathBlock() (ret *Node) {
+func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 	marker := t.context.currentLine[t.context.nextNonspace]
 	if itemDollar != marker {
-		return nil
+		return
 	}
 
 	fenceChar := marker
@@ -64,12 +64,10 @@ func (t *Tree) parseMathBlock() (ret *Node) {
 	}
 
 	if 2 > fenceLength {
-		return nil
+		return
 	}
 
-	ret = &Node{typ: NodeMathBlock, tokens: make(items, 0, 256), mathBlockDollarOffset: t.context.indent}
-
-	return
+	return true, t.context.indent
 }
 
 func (mathBlock *Node) isMathBlockClose(tokens items) bool {
