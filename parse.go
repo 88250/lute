@@ -45,6 +45,7 @@ type Context struct {
 	lineNum, offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的行号、下标、缩进空格数等
 	indented, blank, partiallyConsumedTab, allClosed                  bool  // 是否是缩进行、空行等标识
 	lastMatchedContainer                                              *Node // 最后一个匹配的块节点
+	lastLineLen                                                       int   // 最后一行行长
 }
 
 // InlineContext 描述了行级元素解析上下文。
@@ -141,7 +142,7 @@ func (context *Context) finalize(block *Node, lineNum int) {
 	var parent = block.parent
 	block.close = true
 	block.srcPosEndLine = lineNum
-	block.srcPosEndCol = context.currentLineLen
+	block.srcPosEndCol = context.lastLineLen
 	block.Finalize(context)
 	context.tip = parent
 }

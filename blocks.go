@@ -37,6 +37,7 @@ func (t *Tree) incorporateLine(line items) {
 	t.context.column = 0
 	t.context.blank = false
 	t.context.partiallyConsumedTab = false
+	t.context.lineNum++
 	t.context.currentLine = line
 	t.context.currentLineLen = len(t.context.currentLine)
 
@@ -55,6 +56,7 @@ func (t *Tree) incorporateLine(line items) {
 			allMatched = false
 			break
 		case 2: // 匹配围栏代码块闭合，处理下一行
+			t.context.lastLineLen = t.context.currentLineLen
 			return
 		}
 
@@ -159,6 +161,7 @@ func (t *Tree) incorporateLine(line items) {
 			t.addLine()
 		}
 	}
+	t.context.lastLineLen = t.context.currentLineLen
 }
 
 // blockStartFunc 定义了用于判断块是否开始的函数签名。
