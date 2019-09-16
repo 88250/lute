@@ -19,6 +19,9 @@ import (
 )
 
 var mathTests = []parseTest{
+	{"8", "lu$a^2 + b^2 = \\color{red}c^2$1te", "<p>lu$a^2 + b^2 = \\color{red}c^2$1te</p>\n"},
+	{"7", "lu$1a^2 + b^2 = \\color{red}c^2$te", "<p>lu$1a^2 + b^2 = \\color{red}c^2$te</p>\n"},
+	{"6", "lu$a^2 + b^2 = \\color{red}c^2$te$a^2$m", "<p>lu<span class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</span>te<span class=\"vditor-math\">a^2</span>m</p>\n"},
 	{"5", "lu$a^2 + b^2 = \\color{red}c^2$te", "<p>lu<span class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</span>te</p>\n"},
 	{"4", "lu$$a^2 + b^2 = \\color{red}c^2$$te", "<p>lu\n<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</div>\nte</p>\n"},
 	{"3", "$$\na^2 + b^2 = \\color{red}c^2\n$$", "<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</div>\n"},

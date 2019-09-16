@@ -15,6 +15,11 @@ package lute
 var dollar = toItems("$")
 
 func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
+	if 2 > ctx.tokensLen {
+		ctx.pos++
+		return &Node{typ: NodeText, tokens: items{itemDollar}}
+	}
+
 	startPos := ctx.pos
 	blockStartPos := startPos
 	dollars := 0
@@ -34,10 +39,15 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 			}
 		}
 		if matchBlock {
-			ret = &Node{typ: NodeMathBlock, tokens: ctx.tokens[blockStartPos : blockEndPos]}
+			ret = &Node{typ: NodeMathBlock, tokens: ctx.tokens[blockStartPos:blockEndPos]}
 			ctx.pos = blockEndPos + 2
 			return
 		}
+	}
+
+	if isDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
+		ctx.pos += 2
+		return &Node{typ: NodeText, tokens: ctx.tokens[startPos : startPos+2]}
 	}
 
 	endPos := t.matchInlineMathEnd(ctx.tokens[startPos+1:])
@@ -58,7 +68,13 @@ func (t *Tree) matchInlineMathEnd(tokens items) (pos int) {
 	length := len(tokens)
 	for ; pos < length; pos++ {
 		if itemDollar == tokens[pos] {
-			return pos
+			if pos < length-1 {
+				if !isDigit(tokens[pos+1]) {
+					return pos
+				}
+			} else {
+				return pos
+			}
 		}
 	}
 	return -1
