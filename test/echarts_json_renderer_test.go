@@ -20,7 +20,7 @@ import (
 
 var echartsJSONRendererTests = []parseTest{
 
-	{"0", "# foo\n*bar*\n", "{\"name\": \"Document\",\"children\": [{\"name\": \"Heading\nh1\",\"children\": [{\"name\": \"Text\nfoo\"}]},{\"name\": \"Paragraph\np\",\"children\": [{\"name\": \"Emphasis\nem\",\"children\": [{\"name\": \"Text\nbar\"}]}]}]}"},
+	{"0", "# foo\n*bar*\n", "[{\"name\": \"Document\",\"children\": [{\"name\": \"Heading\\nh1\",\"children\": [{\"name\": \"Text\\nfoo\"}]},{\"name\": \"Paragraph\\np\",\"children\": [{\"name\": \"Emphasis\\nem\",\"children\": [{\"name\": \"Text\\nbar\"}]}]}]}]"},
 }
 
 func TestEChartsJSONRenderer(t *testing.T) {
