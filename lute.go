@@ -137,6 +137,21 @@ func (lute *Lute) RenderVditorDOM(markdownText string) (html string, err error) 
 	return
 }
 
+// RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
+func (lute *Lute) RenderEChartsJSON(markdownText string) (json string, err error) {
+	var tree *Tree
+	tree, err = lute.parse("", items(markdownText))
+	if nil != err {
+		return
+	}
+
+	renderer := lute.newEChartsJSONRenderer(tree.Root)
+	var output items
+	output, err = renderer.Render()
+	json = string(output)
+	return
+}
+
 // VditorDOMMarkdown 用于将 Vditor DOM 转换为 Markdown 文本。
 func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 	tree, err := lute.parseVditorDOM(html)
