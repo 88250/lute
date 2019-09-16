@@ -169,13 +169,13 @@ func (r *EChartsJSONRenderer) renderInlineHTMLEChartsJSON(node *Node, entering b
 }
 
 func (r *EChartsJSONRenderer) renderDocumentEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if (entering) {
+	if entering {
 		r.writeByte(itemOpenBracket)
 		r.openObj()
 		r.val("Document", node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 		r.writeByte(itemCloseBracket)
 	}
@@ -188,7 +188,7 @@ func (r *EChartsJSONRenderer) renderParagraphEChartsJSON(node *Node, entering bo
 		r.val("Paragraph\\np", node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -229,7 +229,7 @@ func (r *EChartsJSONRenderer) renderEmphasisEChartsJSON(node *Node, entering boo
 		r.val("Emphasis\\nem", node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -241,7 +241,7 @@ func (r *EChartsJSONRenderer) renderStrongEChartsJSON(node *Node, entering bool)
 		r.val("Strong\\nstrong", node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -253,7 +253,7 @@ func (r *EChartsJSONRenderer) renderBlockquoteEChartsJSON(node *Node, entering b
 		r.val("Blockquote\\nblockquote", node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -266,7 +266,7 @@ func (r *EChartsJSONRenderer) renderHeadingEChartsJSON(node *Node, entering bool
 		r.val("Heading\\n"+h, node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -282,7 +282,7 @@ func (r *EChartsJSONRenderer) renderListEChartsJSON(node *Node, entering bool) (
 		r.val("List\\n"+list, node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -294,7 +294,7 @@ func (r *EChartsJSONRenderer) renderListItemEChartsJSON(node *Node, entering boo
 		r.val("List Item\\nli "+fromItems(node.listData.marker), node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -310,7 +310,7 @@ func (r *EChartsJSONRenderer) renderTaskListItemMarkerEChartsJSON(node *Node, en
 		r.val("Task List Item Marker\\n["+check+"]", node)
 		r.openChildren(node)
 	} else {
-		r.closeChildren()
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -373,8 +373,10 @@ func (r *EChartsJSONRenderer) openChildren(node *Node) {
 	}
 }
 
-func (r *EChartsJSONRenderer) closeChildren() {
-	r.writeByte(']')
+func (r *EChartsJSONRenderer) closeChildren(node *Node) {
+	if nil != node && nil != node.firstChild {
+		r.writeByte(']')
+	}
 }
 
 func (r *EChartsJSONRenderer) comma() {
