@@ -16,6 +16,30 @@ var dollar = toItems("$")
 
 func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	startPos := ctx.pos
+	blockStartPos := startPos
+	dollars := 0
+	for ; blockStartPos < ctx.tokensLen && itemDollar == t.context.currentLine[blockStartPos]; blockStartPos++ {
+		dollars++
+	}
+	if 2 <= dollars {
+		// 块节点
+		matchBlock := false
+		blockEndPos := blockStartPos + dollars
+		var token byte
+		for ; blockEndPos < ctx.tokensLen; blockEndPos++ {
+			token = ctx.tokens[blockEndPos]
+			if itemDollar == token && blockEndPos < ctx.tokensLen-1 && itemDollar == ctx.tokens[blockEndPos+1] {
+				matchBlock = true
+				break
+			}
+		}
+		if matchBlock {
+			ret = &Node{typ: NodeMathBlock, tokens: ctx.tokens[blockStartPos : blockEndPos]}
+			ctx.pos = blockEndPos + 2
+			return
+		}
+	}
+
 	endPos := t.matchInlineMathEnd(ctx.tokens[startPos+1:])
 	if 1 > endPos {
 		ctx.pos++
@@ -24,8 +48,8 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	}
 
 	endPos = startPos + endPos + 2
-	textTokens := ctx.tokens[startPos+1 : endPos-1]
-	ret = &Node{typ: NodeInlineMath, tokens: textTokens}
+	content := ctx.tokens[startPos+1 : endPos-1]
+	ret = &Node{typ: NodeInlineMath, tokens: content}
 	ctx.pos = endPos
 	return
 }

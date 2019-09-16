@@ -70,9 +70,7 @@ func (r *HTMLRenderer) renderMathBlockHTML(node *Node, entering bool) (WalkStatu
 		r.newline()
 		attrs := [][]string{{"class", "vditor-math"}}
 		r.tag("div", attrs, false)
-		r.newline()
 		r.write(escapeHTML(node.tokens))
-		r.newline()
 		r.tag("/div", nil, false)
 		r.newline()
 	}
