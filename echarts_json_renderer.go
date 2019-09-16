@@ -136,6 +136,9 @@ func (r *EChartsJSONRenderer) renderImageEChartsJSON(node *Node, entering bool) 
 	if entering {
 		r.openObj()
 		r.val("Image\\nimg", node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
@@ -145,6 +148,9 @@ func (r *EChartsJSONRenderer) renderLinkEChartsJSON(node *Node, entering bool) (
 	if entering {
 		r.openObj()
 		r.val("Link\\na", node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return WalkContinue, nil
