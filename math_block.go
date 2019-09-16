@@ -39,12 +39,13 @@ func (mathBlock *Node) mathBlockContinue(context *Context) int {
 	return 0
 }
 
+var mathBlockMarker = items{itemDollar, itemDollar}
+
 func (mathBlock *Node) mathBlockFinalize(context *Context) {
-	tokens := bytes.TrimSpace(mathBlock.tokens)
-	closing := items{itemDollar, itemDollar}
-	if !bytes.HasSuffix(tokens, closing) {
-		tokens = append(tokens, itemNewline)
-		tokens = append(tokens, closing...)
+	tokens := mathBlock.tokens[2:] // 剔除开头的两个 $$
+	tokens = bytes.TrimSpace(tokens)
+	if bytes.HasSuffix(tokens, mathBlockMarker) {
+		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
 	}
 	mathBlock.tokens = tokens
 }

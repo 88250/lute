@@ -24,7 +24,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	}
 
 	endPos = startPos + endPos + 2
-	textTokens := ctx.tokens[startPos:endPos]
+	textTokens := ctx.tokens[startPos+1 : endPos-1]
 	ret = &Node{typ: NodeInlineMath, tokens: textTokens}
 	ctx.pos = endPos
 	return

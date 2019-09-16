@@ -57,9 +57,10 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 
 func (r *HTMLRenderer) renderInlineMathHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		tokens := node.tokens
-		tokens = escapeHTML(tokens)
-		r.write(tokens)
+		attrs := [][]string{{"class", "vditor-math"}}
+		r.tag("span", attrs, false)
+		r.write(escapeHTML(node.tokens))
+		r.tag("/span", nil, false)
 	}
 	return WalkStop, nil
 }
@@ -67,9 +68,12 @@ func (r *HTMLRenderer) renderInlineMathHTML(node *Node, entering bool) (WalkStat
 func (r *HTMLRenderer) renderMathBlockHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		tokens := node.tokens
-		tokens = escapeHTML(tokens)
-		r.write(tokens)
+		attrs := [][]string{{"class", "vditor-math"}}
+		r.tag("div", attrs, false)
+		r.newline()
+		r.write(escapeHTML(node.tokens))
+		r.newline()
+		r.tag("/div", nil, false)
 		r.newline()
 	}
 	return WalkStop, nil

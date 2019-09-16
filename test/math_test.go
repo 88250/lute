@@ -19,9 +19,10 @@ import (
 )
 
 var mathTests = []parseTest{
-	{"2", "| $a^2 + b^2 = \\color{red}c^2$ | bar |\n| --- | --- |\n| baz | bim |\n", "<table>\n<thead>\n<tr>\n<th>$a^2 + b^2 = \\color{red}c^2$</th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>baz</td>\n<td>bim</td>\n</tr>\n</tbody>\n</table>\n"},
-	{"1", "$a^2 + b^2 = \\color{red}c^2$", "<p>$a^2 + b^2 = \\color{red}c^2$</p>\n"},
-	{"0", "$$a^2 + b^2 = \\color{red}c^2$$", "$$a^2 + b^2 = \\color{red}c^2$$\n"},
+	{"3", "$$\na^2 + b^2 = \\color{red}c^2\n$$", "<div class=\"vditor-math\">\na^2 + b^2 = \\color{red}c^2\n</div>\n"},
+	{"2", "| $a^2 + b^2 = \\color{red}c^2$ | bar |\n| --- | --- |\n| baz | bim |\n", "<table>\n<thead>\n<tr>\n<th><span class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</span></th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>baz</td>\n<td>bim</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"1", "$a^2 + b^2 = \\color{red}c^2$", "<p><span class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</span></p>\n"},
+	{"0", "$$a^2 + b^2 = \\color{red}c^2$$", "<div class=\"vditor-math\">\na^2 + b^2 = \\color{red}c^2\n</div>\n"},
 }
 
 func TestMath(t *testing.T) {

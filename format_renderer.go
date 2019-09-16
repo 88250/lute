@@ -251,18 +251,25 @@ func (r *FormatRenderer) renderCodeSpanMarkdown(node *Node, entering bool) (Walk
 }
 
 func (r *FormatRenderer) renderInlineMathMarkdown(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemDollar)
 	r.write(node.tokens)
+	r.writeByte(itemDollar)
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderMathBlockMarkdown(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
+		r.write(mathBlockMarker)
+		r.newline()
 		r.write(node.tokens)
 		return WalkSkipChildren, nil
 	}
+	r.newline()
+	r.write(mathBlockMarker)
+	r.newline()
 	if !r.isLastNode(r.treeRoot, node) {
-		r.writeString("\n\n")
+		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
 }
