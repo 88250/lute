@@ -14,10 +14,13 @@ package main
 
 import (
 	"bytes"
-	chromahtml "github.com/alecthomas/chroma/formatters/html"
-	"github.com/alecthomas/chroma/styles"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
+
+	chromahtml "github.com/alecthomas/chroma/formatters/html"
+	"github.com/alecthomas/chroma/styles"
 )
 
 // 生成 Chroma 样式。
@@ -32,4 +35,6 @@ func main() {
 		ioutil.WriteFile(filepath.Join(dir, name)+".css", b.Bytes(), 0644)
 		b.Reset()
 	}
+
+	fmt.Println("[\"" + strings.Join(names, "\", \"") + "\"]")
 }
