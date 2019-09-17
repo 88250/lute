@@ -23,7 +23,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	startPos := ctx.pos
 	blockStartPos := startPos
 	dollars := 0
-	for ; blockStartPos < ctx.tokensLen && itemDollar == t.context.currentLine[blockStartPos]; blockStartPos++ {
+	for ; blockStartPos < ctx.tokensLen && itemDollar == ctx.tokens[blockStartPos]; blockStartPos++ {
 		dollars++
 	}
 	if 2 <= dollars {
