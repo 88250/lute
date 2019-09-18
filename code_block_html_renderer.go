@@ -97,13 +97,14 @@ func highlightChroma(tokens items, language string, r *HTMLRenderer) (rendered b
 		var b bytes.Buffer
 		if err = formatter.Format(&b, style, iterator); nil == err {
 			if !r.option.CodeSyntaxHighlightInlineStyle {
-				r.writeString("<pre class=\"highlight-chroma")
+				r.writeString("<pre>")
 			} else {
-				r.writeString("<pre style=\"" + chromahtml.StyleEntryToCSS(style.Get(chroma.Background)))
+				r.writeString("<pre style=\"" + chromahtml.StyleEntryToCSS(style.Get(chroma.Background)) + "\">")
 			}
-			r.writeString("\">")
-			r.writeString("<code class=\"language-")
-			r.writeString(language)
+			r.writeString("<code class=\"language-" + language)
+			if !r.option.CodeSyntaxHighlightInlineStyle {
+				r.writeString(" highlight-chroma")
+			}
 			r.writeString("\">")
 			r.write(b.Bytes())
 			rendered = true

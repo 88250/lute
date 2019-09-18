@@ -64,7 +64,7 @@ func TestCodeSyntaxHighlightIssue17(t *testing.T) {
 
 var codeSyntaxHighlightLineNumTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre class=\"highlight-chroma\"><code class=\"language-java\"><span class=\"highlight-ln\">1</span><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-ln\">1</span><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightLineNum(t *testing.T) {
@@ -85,7 +85,7 @@ func TestCodeSyntaxHighlightLineNum(t *testing.T) {
 
 var codeSyntaxHighlightTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre class=\"highlight-chroma\"><code class=\"language-java\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlight(t *testing.T) {
@@ -127,7 +127,7 @@ func TestCodeSyntaxHighlightInline(t *testing.T) {
 
 var codeSyntaxHighlightStyleTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre class=\"highlight-chroma\"><code class=\"language-java\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-nf\">i</span><span class=\"highlight-p\">;</span>\n</code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightStyle(t *testing.T) {
