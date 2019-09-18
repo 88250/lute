@@ -292,7 +292,7 @@ Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://git
 有三种方式使用 Lute：
         
 1. 后端：用 Go 语言的话引入 `github.com/b3log/lute` 包即可 
-2. 后端：将 Lute 启动为一个 HTTP 服务进程供其他进程调用，具体请参考 http/main.go
+2. 后端：将 Lute 启动为一个 HTTP 服务进程供其他进程调用，具体请参考[这里](https://github.com/b3log/lute-http)
 3. 前端：引入 js 目录下的 lute.min.js 即可，支持 Node.js 
 
 ### Go
@@ -364,7 +364,6 @@ Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者们
 * [goldmark](https://github.com/yuin/goldmark)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其树遍历实现部分
 * [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其 URL 编码以及 HTML 转义算法
 * [Chroma](https://github.com/alecthomas/chroma)：用 golang 写的语法高亮引擎
-* [fasthttp](https://github.com/valyala/fasthttp)：用 golang 写的高性能 HTTP 实现
 * [中文文案排版指北](https://github.com/sparanoid/chinese-copywriting-guidelines)：统一中文文案、排版的相关用法，降低团队成员之间的沟通成本，增强网站气质
 * [autocorrect](https://github.com/studygolang/autocorrect)：自动给中英文之间加入空格、术语拼写修正
 * [GopherJS](https://github.com/gopherjs/gopherjs)：将 Go 代码编译成 JavaScript 代码
