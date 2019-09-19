@@ -57,6 +57,7 @@ type InlineContext struct {
 	brackets   *delimiter // 括号栈，用于图片和链接解析
 }
 
+// advanceOffset 用于移动 count 个字符位置，columns 指定了遇到 tab 时是否需要空格进行补偿偏移。
 func (context *Context) advanceOffset(count int, columns bool) {
 	var currentLine = context.currentLine
 	var charsToTab, charsToAdvance int
@@ -67,27 +68,25 @@ func (context *Context) advanceOffset(count int, columns bool) {
 			charsToTab = 4 - (context.column % 4)
 			if columns {
 				context.partiallyConsumedTab = charsToTab > count
-				if charsToTab > count {
+				if context.partiallyConsumedTab {
 					charsToAdvance = count
 				} else {
 					charsToAdvance = charsToTab
+					context.offset++
 				}
 				context.column += charsToAdvance
-				if !context.partiallyConsumedTab {
-					context.offset += 1
-				}
 				count -= charsToAdvance
 			} else {
 				context.partiallyConsumedTab = false
 				context.column += charsToTab
-				context.offset += 1
-				count -= 1
+				context.offset++
+				count--
 			}
 		} else {
 			context.partiallyConsumedTab = false
-			context.offset += 1
-			context.column += 1 // 假定是 ASCII，因为块开始标记都是 ASCII
-			count -= 1
+			context.offset++
+			context.column++ // 假定是 ASCII，因为块开始标记都是 ASCII
+			count--
 		}
 	}
 }
