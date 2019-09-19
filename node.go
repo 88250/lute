@@ -34,10 +34,14 @@ type Node struct {
 
 	// 源码位置
 
-	srcPosStartLine int // 源码位置开始行
-	srcPosStartCol  int // 源码位置开始列
-	srcPosEndLine   int // 源码位置结束行
-	srcPosEndCol    int // 源码位置结束列
+	// 节点对应的源码位置，因为节点内容可能存在跨行并且中间是其他节点的情况，所以需要用数组，比如：
+	//   > *emphasized
+	//   > text*
+	// 第二行的 > 属于块引用节点，但是 text 属于强调节点，所以强调节点的源码位置应该对应：
+	//   [[1:4-1:13], [2:3-2:6]]
+	// 即第 1 个 range 是从第 1 行第 4 列开始到第 1 行第 13 列结束；
+	// 第 2 个 range 是从第 2 行第 3 列开始到第 2 行第 6 列结束。
+	ranges []*Range
 
 	// 代码
 
@@ -89,6 +93,14 @@ type Node struct {
 	// 数学公式块
 
 	mathBlockDollarOffset int
+}
+
+// Range 描述了源码位置起始和结束行列。
+type Range struct {
+	srcPosStartLine int // 源码位置开始行
+	srcPosStartCol  int // 源码位置开始列
+	srcPosEndLine   int // 源码位置结束行
+	srcPosEndCol    int // 源码位置结束列
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
@@ -236,24 +248,25 @@ func (n *Node) AppendChild(this, child *Node) {
 const (
 	// CommonMark
 
-	NodeDocument      = iota // 根节点类
-	NodeParagraph            // 段落节点
-	NodeHeading              // 标题节点
-	NodeThematicBreak        // 分隔线节点
-	NodeBlockquote           // 块引用节点
-	NodeList                 // 列表节点
-	NodeListItem             // 列表项节点
-	NodeHTMLBlock            // HTML 块节点
-	NodeInlineHTML           // 内联 HTML节点
-	NodeCodeBlock            // 代码块节点
-	NodeText                 // 文本节点
-	NodeEmphasis             // 强调节点
-	NodeStrong               // 加粗节点
-	NodeCodeSpan             // 代码节点
-	NodeHardBreak            // 硬换行节点
-	NodeSoftBreak            // 软换行节点
-	NodeLink                 // 链接节点
-	NodeImage                // 图片节点
+	NodeDocument         = iota // 根节点类
+	NodeParagraph               // 段落节点
+	NodeHeading                 // 标题节点
+	NodeThematicBreak           // 分隔线节点
+	NodeBlockquote              // 块引用节点
+	NodeBlockquoteMarker        // 块引用标记符 >
+	NodeList                    // 列表节点
+	NodeListItem                // 列表项节点
+	NodeHTMLBlock               // HTML 块节点
+	NodeInlineHTML              // 内联 HTML节点
+	NodeCodeBlock               // 代码块节点
+	NodeText                    // 文本节点
+	NodeEmphasis                // 强调节点
+	NodeStrong                  // 加粗节点
+	NodeCodeSpan                // 代码节点
+	NodeHardBreak               // 硬换行节点
+	NodeSoftBreak               // 软换行节点
+	NodeLink                    // 链接节点
+	NodeImage                   // 图片节点
 
 	// GFM
 
@@ -274,7 +287,4 @@ const (
 	NodeMathBlock  // 数学公式块节点
 	NodeInlineMath // 内联数学公式节点
 
-	// Vditor
-
-	NodeVditorCaret // Vditor 插入字符
 )
