@@ -1,5 +1,3 @@
-# Lute
-
 <p align = "center">
 <img alt="Lute" src="https://user-images.githubusercontent.com/873584/65254932-99b17300-db2f-11e9-815a-b0b63e812b89.png">
 <br><br>
