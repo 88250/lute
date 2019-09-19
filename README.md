@@ -282,7 +282,7 @@ BenchmarkBlackFriday-8               500           3736069 ns/op         3313467
 
 Lute 承载了[黑客派](https://hacpai.com)上的所有 Markdown 处理，每天处理数十万请求，运行表现稳定。
 
-## 🔒 安全
+## 🔒 安全性
 
 Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://github.github.com/gfm/#disallowed-raw-html-extension-)，因为该扩展还是存在一定漏洞（比如没有处理 `<input>`）。
 建议通过其他库（比如 [bluemonday](https://github.com/microcosm-cc/bluemonday)）来进行 HTML 安全过滤，这样也能更好地适配应用场景。
@@ -331,7 +331,7 @@ func main() {
 
 ### JavaScript
  
-通过 [GopherJS](https://github.com/gopherjs/gopherjs) 将 Lute 编译为 lute.js 使用。简单示例可参考 js 目录下的 demo，结合前端编辑器的完整用法请参考 [Vditor 中的示例](https://github.com/b3log/vditor/tree/master/demo)。
+简单示例可参考 js 目录下的 demo，结合前端编辑器的完整用法请参考 [Vditor 中的示例](https://github.com/b3log/vditor/tree/master/demo)。
 
 ![Vditor](https://user-images.githubusercontent.com/970828/64320104-624fac00-cff0-11e9-8727-0ad51a6f71c0.png)
 
