@@ -1,10 +1,7 @@
 # Lute
 
 <p align = "center">
-<!--
-Logo 正在制作中
-<img alt="Lute" src="">
--->
+<img alt="Lute" src="https://user-images.githubusercontent.com/873584/65254932-99b17300-db2f-11e9-815a-b0b63e812b89.png">
 <br><br>
 一款结构化的 Markdown 引擎，为未来而构建<br><br>
 <em>
