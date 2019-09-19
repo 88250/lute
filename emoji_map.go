@@ -778,6 +778,7 @@ var emojis = map[string]string{
 	"love_hotel":                           "🏩",
 	"love_letter":                          "💌",
 	"low_brightness":                       "🔅",
+	"lute":                                 `${emojiSite}/lute.png`,
 	"luxembourg":                           "🇱🇺",
 	"lying_face":                           "🤥",
 	"m":                                    "Ⓜ️",
