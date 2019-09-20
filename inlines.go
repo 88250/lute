@@ -50,6 +50,7 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 		ctx := &InlineContext{
 			tokens:    tokens,
 			tokensLen: length,
+			lineNum:   node.ranges[0].srcPosStartLine,
 		}
 
 		// 生成该块节点的行级子节点

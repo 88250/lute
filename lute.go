@@ -203,11 +203,11 @@ func (lute *Lute) VditorNewline(blockType int, param map[string]interface{}) (ht
 			marker += delim
 		}
 		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: toItems(marker), delimiter: delim[0]}}
-		_, err = renderer.renderListItemVditor(listItem, true)
+		_, err = renderer.renderListItem(listItem, true)
 		if nil != err {
 			return
 		}
-		_, err = renderer.renderListItemVditor(listItem, false)
+		_, err = renderer.renderListItem(listItem, false)
 		if nil != err {
 			return
 		}

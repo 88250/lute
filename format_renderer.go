@@ -26,45 +26,46 @@ type FormatRenderer struct {
 // newFormatRenderer 创建一个格式化渲染器。
 func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret := &FormatRenderer{BaseRenderer: &BaseRenderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
-	ret.rendererFuncs[NodeDocument] = ret.renderDocumentMarkdown
-	ret.rendererFuncs[NodeParagraph] = ret.renderParagraphMarkdown
-	ret.rendererFuncs[NodeText] = ret.renderTextMarkdown
-	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpanMarkdown
-	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlockMarkdown
-	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlockMarkdown
-	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMathMarkdown
-	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasisMarkdown
-	ret.rendererFuncs[NodeStrong] = ret.renderStrongMarkdown
-	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquoteMarkdown
-	ret.rendererFuncs[NodeHeading] = ret.renderHeadingMarkdown
-	ret.rendererFuncs[NodeList] = ret.renderListMarkdown
-	ret.rendererFuncs[NodeListItem] = ret.renderListItemMarkdown
-	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreakMarkdown
-	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreakMarkdown
-	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreakMarkdown
-	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTMLMarkdown
-	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTMLMarkdown
-	ret.rendererFuncs[NodeLink] = ret.renderLinkMarkdown
-	ret.rendererFuncs[NodeImage] = ret.renderImageMarkdown
-	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethroughMarkdown
-	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarkerMarkdown
-	ret.rendererFuncs[NodeTable] = ret.renderTableMarkdown
-	ret.rendererFuncs[NodeTableHead] = ret.renderTableHeadMarkdown
-	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowMarkdown
-	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellMarkdown
-	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeMarkdown
-	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgMarkdown
+	ret.rendererFuncs[NodeDocument] = ret.renderDocument
+	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
+	ret.rendererFuncs[NodeText] = ret.renderText
+	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
+	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
+	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
+	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
+	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
+	ret.rendererFuncs[NodeStrong] = ret.renderStrong
+	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
+	ret.rendererFuncs[NodeBlockquoteMarker] = ret.renderBlockquoteMarker
+	ret.rendererFuncs[NodeHeading] = ret.renderHeading
+	ret.rendererFuncs[NodeList] = ret.renderList
+	ret.rendererFuncs[NodeListItem] = ret.renderListItem
+	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
+	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
+	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
+	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTML
+	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
+	ret.rendererFuncs[NodeLink] = ret.renderLink
+	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
+	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
+	ret.rendererFuncs[NodeTable] = ret.renderTable
+	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
+	ret.rendererFuncs[NodeTableRow] = ret.renderTableRow
+	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
+	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
+	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	return ret
 }
 
-func (r *FormatRenderer) renderEmojiImgMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.emojiAlias)
 	}
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderEmojiUnicodeMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.emojiAlias)
 	}
@@ -73,21 +74,21 @@ func (r *FormatRenderer) renderEmojiUnicodeMarkdown(node *Node, entering bool) (
 
 // TODO: 表的格式化应该按最宽的单元格对齐内容
 
-func (r *FormatRenderer) renderTableCellMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte(itemPipe)
 	}
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderTableRowMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.writeString("|\n")
 	}
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderTableHeadMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.writeString("|\n")
 		table := node.parent
@@ -109,7 +110,7 @@ func (r *FormatRenderer) renderTableHeadMarkdown(node *Node, entering bool) (Wal
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderTableMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTable(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.newline()
 		if !r.isLastNode(r.treeRoot, node) {
@@ -119,7 +120,7 @@ func (r *FormatRenderer) renderTableMarkdown(node *Node, entering bool) (WalkSta
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderStrikethroughMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
@@ -128,7 +129,7 @@ func (r *FormatRenderer) renderStrikethroughMarkdown(node *Node, entering bool) 
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderImageMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("![")
 		r.write(node.firstChild.tokens)
@@ -144,7 +145,7 @@ func (r *FormatRenderer) renderImageMarkdown(node *Node, entering bool) (WalkSta
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderLinkMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("[")
 		if nil != node.firstChild {
@@ -163,7 +164,7 @@ func (r *FormatRenderer) renderLinkMarkdown(node *Node, entering bool) (WalkStat
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.write(node.tokens)
@@ -172,14 +173,14 @@ func (r *FormatRenderer) renderHTMLMarkdown(node *Node, entering bool) (WalkStat
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderInlineHTMLMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(node.tokens)
 	}
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderDocumentMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -193,7 +194,7 @@ func (r *FormatRenderer) renderDocumentMarkdown(node *Node, entering bool) (Walk
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderParagraphMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.newline()
 
@@ -222,7 +223,7 @@ func (r *FormatRenderer) renderParagraphMarkdown(node *Node, entering bool) (Wal
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderTextMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
 			r.write(escapeHTML(node.tokens))
@@ -231,7 +232,7 @@ func (r *FormatRenderer) renderTextMarkdown(node *Node, entering bool) (WalkStat
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderCodeSpanMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte(itemBacktick)
 		if 1 < node.codeMarkerLen {
@@ -250,14 +251,14 @@ func (r *FormatRenderer) renderCodeSpanMarkdown(node *Node, entering bool) (Walk
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderInlineMathMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
 	r.writeByte(itemDollar)
 	r.write(node.tokens)
 	r.writeByte(itemDollar)
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderMathBlockMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.write(mathBlockMarker)
@@ -274,7 +275,7 @@ func (r *FormatRenderer) renderMathBlockMarkdown(node *Node, entering bool) (Wal
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderCodeBlockMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if !node.isFencedCodeBlock {
 		node.codeBlockFenceLen = 3
 	}
@@ -293,7 +294,7 @@ func (r *FormatRenderer) renderCodeBlockMarkdown(node *Node, entering bool) (Wal
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderEmphasisMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
@@ -302,7 +303,7 @@ func (r *FormatRenderer) renderEmphasisMarkdown(node *Node, entering bool) (Walk
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderStrongMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
 	} else {
@@ -311,7 +312,7 @@ func (r *FormatRenderer) renderStrongMarkdown(node *Node, entering bool) (WalkSt
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderBlockquoteMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -355,7 +356,11 @@ func (r *FormatRenderer) renderBlockquoteMarkdown(node *Node, entering bool) (Wa
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderHeadingMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderBlockquoteMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.write(bytes.Repeat(items{itemCrosshatch}, node.headingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
@@ -366,7 +371,7 @@ func (r *FormatRenderer) renderHeadingMarkdown(node *Node, entering bool) (WalkS
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderListMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -383,7 +388,7 @@ func (r *FormatRenderer) renderListMarkdown(node *Node, entering bool) (WalkStat
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderListItemMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -431,7 +436,7 @@ func (r *FormatRenderer) renderListItemMarkdown(node *Node, entering bool) (Walk
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderTaskListItemMarkerMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte(itemOpenBracket)
 		if node.taskListItemChecked {
@@ -444,7 +449,7 @@ func (r *FormatRenderer) renderTaskListItemMarkerMarkdown(node *Node, entering b
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderThematicBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		r.writeString("---")
@@ -453,7 +458,7 @@ func (r *FormatRenderer) renderThematicBreakMarkdown(node *Node, entering bool) 
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderHardBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if !r.option.SoftBreak2HardBreak {
 			r.writeString("\\\n")
@@ -464,7 +469,7 @@ func (r *FormatRenderer) renderHardBreakMarkdown(node *Node, entering bool) (Wal
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderSoftBreakMarkdown(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 	}

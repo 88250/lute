@@ -27,7 +27,7 @@ import (
 var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 
 // renderCodeBlockHTML 进行代码块 HTML 渲染，实现语法高亮。
-func (r *HTMLRenderer) renderCodeBlockHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		tokens := node.tokens

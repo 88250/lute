@@ -53,6 +53,7 @@ type InlineContext struct {
 	tokens     items      // 当前解析的 tokens
 	tokensLen  int        // 当前解析的 tokens 长度
 	pos        int        // 当前解析到的 token 位置
+	lineNum    int        // 当前解析的起始行号
 	delimiters *delimiter // 分隔符栈，用于强调解析
 	brackets   *delimiter // 括号栈，用于图片和链接解析
 }
@@ -146,8 +147,15 @@ func (context *Context) finalize(block *Node, lineNum int) {
 	context.tip = parent
 }
 
-// addChild 将 child 作为子节点添加到 context.tip 上。如果 tip 节点不能接受子节点（非块级容器不能添加子节点），则最终化该 tip
-// 节点并向父节点方向尝试，直到找到一个能接受 child 的节点为止。
+// addChildMarker 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。
+func (context *Context) addChildMarker(nodeType int, rng *Range) (ret *Node) {
+	ret = &Node{typ: nodeType, ranges: []*Range{rng}, close: true}
+	context.tip.AppendChild(context.tip, ret)
+	return ret
+}
+
+// addChild 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
+// 节点并向父节点方向尝试，直到找到一个能接受该子节点的节点为止。添加完成后该子节点会被设置为新的末梢节点。
 func (context *Context) addChild(nodeType, offset int) (ret *Node) {
 	for !context.tip.CanContain(nodeType) {
 		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代

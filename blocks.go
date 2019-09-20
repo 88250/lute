@@ -177,16 +177,27 @@ var blockStarts = []blockStartFunc{
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
 			if itemGreater == token {
+				markerStartCol := t.context.nextNonspace + 1
+				markerEndCol := markerStartCol
+
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
 				// > 后面的空格是可选的
 				token = t.context.currentLine.peek(t.context.offset)
-				if itemSpace == token || itemTab == token {
+				withSpace := itemSpace == token || itemTab == token
+				if withSpace {
 					t.context.advanceOffset(1, true)
+					markerEndCol++
 				}
 
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(NodeBlockquote, t.context.nextNonspace)
+				t.context.addChildMarker(NodeBlockquoteMarker, &Range{
+					srcPosStartLine: t.context.lineNum,
+					srcPosStartCol:  markerStartCol,
+					srcPosEndLine:   t.context.lineNum,
+					srcPosEndCol:    markerEndCol,
+				})
 				return 1
 			}
 		}

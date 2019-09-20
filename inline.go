@@ -342,7 +342,13 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	ret = &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos]}
+	ret = &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos],
+		ranges: []*Range{
+			{
+				srcPosStartLine: ctx.lineNum, srcPosStartCol: start,
+				srcPosEndLine: ctx.lineNum, srcPosEndCol: ctx.pos,
+			},
+		}}
 	return
 }
 
