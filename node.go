@@ -231,7 +231,7 @@ func (n *Node) InsertBefore(sibling *Node) {
 	}
 }
 
-// AppendChild 添加一个子节点。
+// AppendChild 在 n 的子节点最后再添加一个子节点。
 func (n *Node) AppendChild(child *Node) {
 	child.Unlink()
 	child.parent = n
@@ -245,37 +245,63 @@ func (n *Node) AppendChild(child *Node) {
 	}
 }
 
+// PrependChild 在 n 的子节点最前添加一个子节点。
+func (n *Node) PrependChild(child *Node) {
+	child.Unlink()
+	child.parent = n
+	if nil != n.firstChild {
+		n.firstChild.previous = child
+		child.next = n.firstChild
+		n.firstChild = child
+	} else {
+		n.firstChild = child
+		n.lastChild = child
+	}
+}
+
 const (
 	// CommonMark
 
-	NodeDocument         = iota // 根节点类
-	NodeParagraph               // 段落节点
-	NodeHeading                 // 标题节点
-	NodeThematicBreak           // 分隔线节点
-	NodeBlockquote              // 块引用节点
-	NodeBlockquoteMarker        // 块引用标记符 >
-	NodeList                    // 列表节点
-	NodeListItem                // 列表项节点
-	NodeHTMLBlock               // HTML 块节点
-	NodeInlineHTML              // 内联 HTML节点
-	NodeCodeBlock               // 代码块节点
-	NodeText                    // 文本节点
-	NodeEmphasis                // 强调节点
-	NodeStrong                  // 加粗节点
-	NodeCodeSpan                // 代码节点
-	NodeHardBreak               // 硬换行节点
-	NodeSoftBreak               // 软换行节点
-	NodeLink                    // 链接节点
-	NodeImage                   // 图片节点
+	NodeDocument             = iota // 根节点类
+	NodeParagraph                   // 段落节点
+	NodeHeading                     // 标题节点
+	NodeThematicBreak               // 分隔线节点
+	NodeBlockquote                  // 块引用节点
+	NodeBlockquoteMarker            // 块引用标记符 >
+	NodeList                        // 列表节点
+	NodeListItem                    // 列表项节点
+	NodeHTMLBlock                   // HTML 块节点
+	NodeInlineHTML                  // 内联 HTML节点
+	NodeCodeBlock                   // 代码块节点
+	NodeText                        // 文本节点
+	NodeEmphasis                    // 强调节点
+	NodeEmA6kOpenMarker             // 开始强调标记符 *
+	NodeEmA6kCloseMarker            // 结束强调标记符 *
+	NodeEmU8eOpenMarker             // 开始强调标记符 _
+	NodeEmU8eCloseMarker            // 结束强调标记符 _
+	NodeStrong                      // 加粗节点
+	NodeStrongA6kOpenMarker         // 开始加粗节点标记符 **
+	NodeStrongA6kCloseMarker        // 结束加粗节点标记符 **
+	NodeStrongU8eOpenMarker         // 开始加粗节点标记符 __
+	NodeStrongU8eCloseMarker        // 结束加粗节点标记符 __
+	NodeCodeSpan                    // 代码节点
+	NodeHardBreak                   // 硬换行节点
+	NodeSoftBreak                   // 软换行节点
+	NodeLink                        // 链接节点
+	NodeImage                       // 图片节点
 
 	// GFM
 
-	NodeTaskListItemMarker // 任务列表项标记节点
-	NodeStrikethrough      // 删除线节点
-	NodeTable              // 表节点
-	NodeTableHead          // 表头节点
-	NodeTableRow           // 表行节点
-	NodeTableCell          // 表格节点
+	NodeTaskListItemMarker       // 任务列表项标记节点
+	NodeStrikethrough            // 删除线节点
+	NodeStrikethrough1OpenMarker  // 开始删除线节点标记符 ~
+	NodeStrikethrough1CloseMarker // 结束删除线节点标记符 ~
+	NodeStrikethrough2OpenMarker  // 开始删除线节点标记符 ~~
+	NodeStrikethrough2CloseMarker // 结束删除线节点标记符 ~~
+	NodeTable                    // 表节点
+	NodeTableHead                // 表头节点
+	NodeTableRow                 // 表行节点
+	NodeTableCell                // 表格节点
 
 	// Emoji
 

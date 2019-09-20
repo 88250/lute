@@ -32,7 +32,15 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
+	ret.rendererFuncs[NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
+	ret.rendererFuncs[NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
+	ret.rendererFuncs[NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
+	ret.rendererFuncs[NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
+	ret.rendererFuncs[NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
+	ret.rendererFuncs[NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
+	ret.rendererFuncs[NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
+	ret.rendererFuncs[NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
 	ret.rendererFuncs[NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
@@ -46,6 +54,10 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
+	ret.rendererFuncs[NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
+	ret.rendererFuncs[NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
+	ret.rendererFuncs[NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
+	ret.rendererFuncs[NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
 	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
 	ret.rendererFuncs[NodeTable] = ret.renderTable
 	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
@@ -161,12 +173,27 @@ func (r *HTMLRenderer) renderTable(node *Node, entering bool) (WalkStatus, error
 }
 
 func (r *HTMLRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("del", nil, false)
-	} else {
-		r.tag("/del", nil, false)
-	}
 	return WalkContinue, nil
+}
+
+func (r *HTMLRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("del", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/del", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("del", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/del", nil, false)
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
@@ -265,22 +292,51 @@ func (r *HTMLRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, er
 }
 
 func (r *HTMLRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("em", nil, false)
-	} else {
-		r.tag("/em", nil, false)
-	}
 	return WalkContinue, nil
 }
 
+func (r *HTMLRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("em", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/em", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("em", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/em", nil, false)
+	return WalkStop, nil
+}
+
 func (r *HTMLRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeString("<strong>")
-		r.write(node.tokens)
-	} else {
-		r.writeString("</strong>")
-	}
 	return WalkContinue, nil
+}
+
+func (r *HTMLRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("strong", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/strong", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("strong", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/strong", nil, false)
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
