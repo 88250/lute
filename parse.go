@@ -23,7 +23,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &Node{typ: NodeDocument, ranges: []*Range{{srcPosStartLine: 1, srcPosStartCol: 1}}}
+	tree.Root = &Node{typ: NodeDocument, ranges: []*Range{{startLine: 1, startCol: 1}}}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
@@ -141,8 +141,8 @@ func (context *Context) closeUnmatchedBlocks() {
 func (context *Context) finalize(block *Node, lineNum int) {
 	var parent = block.parent
 	block.close = true
-	block.ranges[0].srcPosEndLine = lineNum
-	block.ranges[0].srcPosEndCol = context.lastLineLen
+	block.ranges[0].endLine = lineNum
+	block.ranges[0].endCol = context.lastLineLen
 	block.Finalize(context)
 	context.tip = parent
 }
@@ -162,7 +162,7 @@ func (context *Context) addChild(nodeType, offset int) (ret *Node) {
 	}
 
 	columnNum := offset + 1 // offset 0 = column 1
-	ret = &Node{typ: nodeType, ranges: []*Range{{srcPosStartLine: context.lineNum, srcPosStartCol: columnNum}}}
+	ret = &Node{typ: nodeType, ranges: []*Range{{startLine: context.lineNum, startCol: columnNum}}}
 	context.tip.AppendChild(ret)
 	context.tip = ret
 	return ret

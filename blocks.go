@@ -136,7 +136,7 @@ func (t *Tree) incorporateLine(line items) {
 				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
 				(typ == NodeMathBlock) || // 数学公式块不计入空行判断
 				(typ == NodeListItem && nil == container.firstChild) && // 内容为空的列表项也不计入空行判断
-					container.ranges[0].srcPosStartLine == t.context.lineNum)
+					container.ranges[0].startLine == t.context.lineNum)
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 lastLineBlank
 		// lastLineBlank 目前仅在判断列表紧凑模式上使用
 		for cont := container; nil != cont; cont = cont.parent {
@@ -193,10 +193,10 @@ var blockStarts = []blockStartFunc{
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(NodeBlockquote, t.context.nextNonspace)
 				t.context.addChildMarker(NodeBlockquoteMarker, &Range{
-					srcPosStartLine: t.context.lineNum,
-					srcPosStartCol:  markerStartCol,
-					srcPosEndLine:   t.context.lineNum,
-					srcPosEndCol:    markerEndCol,
+					startLine: t.context.lineNum,
+					startCol:  markerStartCol,
+					endLine:   t.context.lineNum,
+					endCol:    markerEndCol,
 				})
 				return 1
 			}
@@ -281,10 +281,10 @@ var blockStarts = []blockStartFunc{
 				if value := container.tokens; 0 < len(value) {
 					child := &Node{typ: NodeHeading, headingLevel: level,
 						ranges: []*Range{{
-							srcPosStartLine: container.ranges[0].srcPosStartLine,
-							srcPosStartCol:  container.ranges[0].srcPosStartCol,
-							srcPosEndLine:   container.ranges[0].srcPosEndLine,
-							srcPosEndCol:    container.ranges[0].srcPosEndCol,
+							startLine: container.ranges[0].startLine,
+							startCol:  container.ranges[0].startCol,
+							endLine:   container.ranges[0].endLine,
+							endCol:    container.ranges[0].endCol,
 						}},
 					}
 					child.tokens = bytes.TrimSpace(value)

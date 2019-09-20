@@ -479,8 +479,8 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 		if nil != node {
 			attrs = append(attrs, []string{"data-ntype", strconv.Itoa(node.typ)})
 			attrs = append(attrs, []string{"data-mtype", r.mtype(node.typ)})
-			attrs = append(attrs, []string{"data-pos-start", strconv.Itoa(node.ranges[0].srcPosStartLine) + ":" + strconv.Itoa(node.ranges[0].srcPosStartCol)})
-			attrs = append(attrs, []string{"data-pos-end", strconv.Itoa(node.ranges[0].srcPosEndLine) + ":" + strconv.Itoa(node.ranges[0].srcPosEndCol)})
+			attrs = append(attrs, []string{"data-pos-start", strconv.Itoa(node.ranges[0].startLine) + ":" + strconv.Itoa(node.ranges[0].startCol)})
+			attrs = append(attrs, []string{"data-pos-end", strconv.Itoa(node.ranges[0].endLine) + ":" + strconv.Itoa(node.ranges[0].endCol)})
 		}
 		for _, attr := range attrs {
 			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
