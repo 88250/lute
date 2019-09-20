@@ -150,7 +150,7 @@ func (context *Context) finalize(block *Node, lineNum int) {
 // addChildMarker 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。
 func (context *Context) addChildMarker(nodeType int, rng *Range) (ret *Node) {
 	ret = &Node{typ: nodeType, ranges: []*Range{rng}, close: true}
-	context.tip.AppendChild(context.tip, ret)
+	context.tip.AppendChild(ret)
 	return ret
 }
 
@@ -163,7 +163,7 @@ func (context *Context) addChild(nodeType, offset int) (ret *Node) {
 
 	columnNum := offset + 1 // offset 0 = column 1
 	ret = &Node{typ: nodeType, ranges: []*Range{{srcPosStartLine: context.lineNum, srcPosStartCol: columnNum}}}
-	context.tip.AppendChild(context.tip, ret)
+	context.tip.AppendChild(ret)
 	context.tip = ret
 	return ret
 }

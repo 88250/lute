@@ -202,13 +202,13 @@ func (n *Node) AppendTokens(tokens items) {
 }
 
 // InsertAfter 在当前节点后插入一个兄弟节点。
-func (n *Node) InsertAfter(this *Node, sibling *Node) {
+func (n *Node) InsertAfter(sibling *Node) {
 	sibling.Unlink()
 	sibling.next = n.next
 	if nil != sibling.next {
 		sibling.next.previous = sibling
 	}
-	sibling.previous = this
+	sibling.previous = n
 	n.next = sibling
 	sibling.parent = n.parent
 	if nil == sibling.next {
@@ -217,13 +217,13 @@ func (n *Node) InsertAfter(this *Node, sibling *Node) {
 }
 
 // InsertBefore 在当前节点前插入一个兄弟节点。
-func (n *Node) InsertBefore(this *Node, sibling *Node) {
+func (n *Node) InsertBefore(sibling *Node) {
 	sibling.Unlink()
 	sibling.previous = n.previous
 	if nil != sibling.previous {
 		sibling.previous.next = sibling
 	}
-	sibling.next = this
+	sibling.next = n
 	n.previous = sibling
 	sibling.parent = n.parent
 	if nil == sibling.previous {
@@ -232,9 +232,9 @@ func (n *Node) InsertBefore(this *Node, sibling *Node) {
 }
 
 // AppendChild 添加一个子节点。
-func (n *Node) AppendChild(this, child *Node) {
+func (n *Node) AppendChild(child *Node) {
 	child.Unlink()
-	child.parent = this
+	child.parent = n
 	if nil != n.lastChild {
 		n.lastChild.next = child
 		child.previous = n.lastChild

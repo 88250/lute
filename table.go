@@ -33,13 +33,13 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 
 	ret = &Node{typ: NodeTable, tableAligns: aligns, ranges: []*Range{{}}}
 	ret.tableAligns = aligns
-	ret.AppendChild(ret, context.newTableHead(headRow))
+	ret.AppendChild(context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
 		tableRow := context.parseTableRow(bytes.TrimSpace(lines[i]), aligns, false)
 		if nil == tableRow {
 			return
 		}
-		ret.AppendChild(ret, tableRow)
+		ret.AppendChild(tableRow)
 	}
 	return
 }
@@ -48,7 +48,7 @@ func (context *Context) newTableHead(headRow *Node) *Node {
 	ret := &Node{typ: NodeTableHead, ranges: []*Range{{}}}
 	for c := headRow.firstChild; nil != c; {
 		next := c.next
-		ret.AppendChild(ret, c)
+		ret.AppendChild(c)
 		c = next
 	}
 	return ret
@@ -80,13 +80,13 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i], ranges: []*Range{{}}}
 		col = bytes.ReplaceAll(col, items("\\|"), items("|"))
 		cell.tokens = col
-		ret.AppendChild(ret, cell)
+		ret.AppendChild(cell)
 	}
 
 	// 可能需要补全剩余的列
 	for ; i < alignsLen; i++ {
 		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i], ranges: []*Range{{}}}
-		ret.AppendChild(ret, cell)
+		ret.AppendChild(cell)
 	}
 	return
 }

@@ -43,7 +43,7 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 
 	text := ctx.tokens[startPos:ctx.pos]
 	node := &Node{typ: NodeText, tokens: text}
-	block.AppendChild(block, node)
+	block.AppendChild(node)
 
 	// 将这个分隔符入栈
 	if delim.canOpen || delim.canClose {
@@ -151,11 +151,11 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			for nil != tmp && tmp != closerInl {
 				next := tmp.next
 				tmp.Unlink()
-				emStrongDel.AppendChild(emStrongDel, tmp)
+				emStrongDel.AppendChild(tmp)
 				tmp = next
 			}
 
-			openerInl.InsertAfter(openerInl, emStrongDel)
+			openerInl.InsertAfter(emStrongDel)
 
 			// remove elts between opener and closer in delimiters stack
 			if opener.next != closer {

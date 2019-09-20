@@ -260,7 +260,7 @@ var blockStarts = []blockStartFunc{
 						container.tableAligns = table.tableAligns
 						for tr := table.firstChild; nil != tr; {
 							nextTr := tr.next
-							container.AppendChild(container, tr)
+							container.AppendChild(tr)
 							tr = nextTr
 						}
 						container.tokens = nil
@@ -288,7 +288,7 @@ var blockStarts = []blockStartFunc{
 						}},
 					}
 					child.tokens = bytes.TrimSpace(value)
-					container.InsertAfter(container, child)
+					container.InsertAfter(child)
 					container.Unlink()
 					t.context.tip = child
 					t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)

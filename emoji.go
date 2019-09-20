@@ -101,13 +101,13 @@ func (t *Tree) emoji0(node *Node) {
 				emojiNode.emojiAlias = tokens[i : pos+1]
 			} else {
 				emojiNode.tokens = emojiTokens
-				emojiNode.emojiAlias = tokens[i:pos+1]
+				emojiNode.emojiAlias = tokens[i : pos+1]
 			}
 
-			node.InsertAfter(node, emojiNode)
+			node.InsertAfter(emojiNode)
 			// 在 EmojiImg 节点后插入一个内容为空的文本节点，留作下次迭代
 			text := &Node{typ: NodeText, tokens: items{}}
-			emojiNode.InsertAfter(emojiNode, text)
+			emojiNode.InsertAfter(text)
 			node = text
 		} else {
 			node.tokens = append(node.tokens, tokens[i:pos+1]...)

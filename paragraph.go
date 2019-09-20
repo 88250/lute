@@ -45,7 +45,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 			if 3 == listItem.listData.typ {
 				// 如果是任务列表项则添加任务列表标记节点
 				taskListItemMarker := &Node{typ: NodeTaskListItemMarker, taskListItemChecked: listItem.listData.checked}
-				p.InsertBefore(p, taskListItemMarker)
+				p.InsertBefore(taskListItemMarker)
 				p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 			}
 		}
@@ -59,7 +59,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 			p.tableAligns = table.tableAligns
 			for tr := table.firstChild; nil != tr; {
 				nextTr := tr.next
-				p.AppendChild(p, tr)
+				p.AppendChild(tr)
 				tr = nextTr
 			}
 			p.tokens = nil

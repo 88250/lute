@@ -55,7 +55,7 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 		}
 
 		if nil != n {
-			block.AppendChild(block, n)
+			block.AppendChild(n)
 		}
 	}
 }
@@ -247,7 +247,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		for nil != tmp {
 			next = tmp.next
 			tmp.Unlink()
-			node.AppendChild(node, tmp)
+			node.AppendChild(tmp)
 			tmp = next
 		}
 
