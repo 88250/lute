@@ -20,7 +20,7 @@ import (
 
 // parseInline 解析并生成块节点 block 的行级子节点。
 func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
-	for {
+	for ctx.pos < ctx.tokensLen {
 		token := ctx.tokens[ctx.pos]
 		var n *Node
 		switch token {
@@ -56,10 +56,6 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 
 		if nil != n {
 			block.AppendChild(block, n)
-		}
-
-		if 1 > ctx.tokensLen || ctx.pos >= ctx.tokensLen || itemEnd == ctx.tokens[ctx.pos] {
-			return
 		}
 	}
 }
