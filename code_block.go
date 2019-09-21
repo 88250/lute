@@ -24,7 +24,7 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 			context.finalize(codeBlock, context.lineNum)
 			return 2
 		} else {
-			// 跳过围栏标记之前可能存在的空格
+			// 跳过围栏标记符之前可能存在的空格
 			var i = codeBlock.codeBlockFenceOffset
 			var token byte
 			for i > 0 {

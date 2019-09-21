@@ -348,7 +348,7 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 	return
 }
 
-// isMarker 判断 token 是否是潜在的 Markdown 标记。
+// isMarker 判断 token 是否是潜在的 Markdown 标记符。
 func (t *Tree) isMarker(token byte) bool {
 	return itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
 		itemNewline == token || itemBackslash == token || itemBacktick == token ||

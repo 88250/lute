@@ -287,7 +287,7 @@ const (
 
 	// GFM
 
-	NodeTaskListItemMarker       // 任务列表项标记节点
+	NodeTaskListItemMarker       // 任务列表项标记符节点
 	NodeStrikethrough            // 删除线节点
 	NodeStrikethrough1OpenMarker  // 开始删除线节点标记符 ~
 	NodeStrikethrough1CloseMarker // 结束删除线节点标记符 ~

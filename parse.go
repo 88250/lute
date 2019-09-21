@@ -86,7 +86,7 @@ func (context *Context) advanceOffset(count int, columns bool) {
 		} else {
 			context.partiallyConsumedTab = false
 			context.offset++
-			context.column++ // 假定是 ASCII，因为块开始标记都是 ASCII
+			context.column++ // 假定是 ASCII，因为块开始标记符都是 ASCII
 			count--
 		}
 	}

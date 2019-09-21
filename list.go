@@ -56,7 +56,7 @@ func (list *Node) listFinalize(context *Context) {
 
 var items1 = toItems("1")
 
-// parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记。
+// parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记符。
 func (t *Tree) parseListMarker(container *Node) *listData {
 	if t.context.indent >= 4 {
 		return nil
@@ -92,7 +92,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	data.marker = marker
 
 	var token = ln[t.context.nextNonspace+markerLength]
-	// 列表项标记后必须是空白字符
+	// 列表项标记符后必须是空白字符
 	if !isWhitespace(token) {
 		return nil
 	}
@@ -103,8 +103,8 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	}
 
 	// 到这里说明满足列表规则，开始解析并计算内部缩进空格数
-	t.context.advanceNextNonspace()             // 把起始下标移动到标记起始位置
-	t.context.advanceOffset(markerLength, true) // 把结束下标移动到标记结束位置
+	t.context.advanceNextNonspace()             // 把起始下标移动到标记符起始位置
+	t.context.advanceOffset(markerLength, true) // 把结束下标移动到标记符结束位置
 	spacesStartCol := t.context.column
 	spacesStartOffset := t.context.offset
 	for {

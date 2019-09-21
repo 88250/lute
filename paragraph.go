@@ -43,7 +43,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 		listItem := p.parent
 		if nil != listItem && NodeListItem == listItem.typ {
 			if 3 == listItem.listData.typ {
-				// 如果是任务列表项则添加任务列表标记节点
+				// 如果是任务列表项则添加任务列表标记符节点
 				taskListItemMarker := &Node{typ: NodeTaskListItemMarker, taskListItemChecked: listItem.listData.checked}
 				p.InsertBefore(taskListItemMarker)
 				p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
