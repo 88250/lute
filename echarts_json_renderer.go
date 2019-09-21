@@ -23,7 +23,7 @@ type EChartsJSONRenderer struct {
 
 // newEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
 func (lute *Lute) newEChartsJSONRenderer(treeRoot *Node) Renderer {
-	ret := &EChartsJSONRenderer{&BaseRenderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
+	ret := &EChartsJSONRenderer{&BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocumentEChartsJSON
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraphEChartsJSON
 	ret.rendererFuncs[NodeText] = ret.renderTextEChartsJSON

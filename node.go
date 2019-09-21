@@ -12,6 +12,8 @@
 
 package lute
 
+import "strconv"
+
 // Node 描述了节点结构。
 type Node struct {
 	// 不用接口实现的原因：
@@ -20,17 +22,17 @@ type Node struct {
 
 	// 节点基础结构
 
-	typ             int    // 节点类型
-	parent          *Node  // 父节点
-	previous        *Node  // 前一个兄弟节点
-	next            *Node  // 后一个兄弟节点
-	firstChild      *Node  // 第一个子节点
-	lastChild       *Node  // 最后一个子节点
-	rawText         string // 原始内容
-	tokens          items  // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
-	close           bool   // 标识是否关闭
-	lastLineBlank   bool   // 标识最后一行是否是空行
-	lastLineChecked bool   // 标识最后一行是否检查过
+	typ             nodeType // 节点类型
+	parent          *Node    // 父节点
+	previous        *Node    // 前一个兄弟节点
+	next            *Node    // 后一个兄弟节点
+	firstChild      *Node    // 第一个子节点
+	lastChild       *Node    // 最后一个子节点
+	rawText         string   // 原始内容
+	tokens          items    // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
+	close           bool     // 标识是否关闭
+	lastLineBlank   bool     // 标识最后一行是否是空行
+	lastLineChecked bool     // 标识最后一行是否检查过
 
 	// 源码位置
 
@@ -148,7 +150,7 @@ func (n *Node) AcceptLines() bool {
 
 // CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（一种块级容器）只能包含列表项节点，
 // 块引用节点（另一种块级容器）可以包含任意节点；段落节点（一种叶子块节点）不能包含任何其他块级节点。
-func (n *Node) CanContain(nodeType int) bool {
+func (n *Node) CanContain(nodeType nodeType) bool {
 	switch n.typ {
 	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock:
 		return false
@@ -254,58 +256,64 @@ func (n *Node) PrependChild(child *Node) {
 	}
 }
 
+type nodeType int
+
+func (typ nodeType) String() string {
+	return strconv.Itoa(int(typ))
+}
+
 const (
 	// CommonMark
 
-	NodeDocument             = iota // 根节点类
-	NodeParagraph                   // 段落节点
-	NodeHeading                     // 标题节点
-	NodeThematicBreak               // 分隔线节点
-	NodeBlockquote                  // 块引用节点
-	NodeBlockquoteMarker            // 块引用标记符 >
-	NodeList                        // 列表节点
-	NodeListItem                    // 列表项节点
-	NodeHTMLBlock                   // HTML 块节点
-	NodeInlineHTML                  // 内联 HTML节点
-	NodeCodeBlock                   // 代码块节点
-	NodeText                        // 文本节点
-	NodeEmphasis                    // 强调节点
-	NodeEmA6kOpenMarker             // 开始强调标记符 *
-	NodeEmA6kCloseMarker            // 结束强调标记符 *
-	NodeEmU8eOpenMarker             // 开始强调标记符 _
-	NodeEmU8eCloseMarker            // 结束强调标记符 _
-	NodeStrong                      // 加粗节点
-	NodeStrongA6kOpenMarker         // 开始加粗节点标记符 **
-	NodeStrongA6kCloseMarker        // 结束加粗节点标记符 **
-	NodeStrongU8eOpenMarker         // 开始加粗节点标记符 __
-	NodeStrongU8eCloseMarker        // 结束加粗节点标记符 __
-	NodeCodeSpan                    // 代码节点
-	NodeHardBreak                   // 硬换行节点
-	NodeSoftBreak                   // 软换行节点
-	NodeLink                        // 链接节点
-	NodeImage                       // 图片节点
+	NodeDocument             nodeType = 0  // 根节点类 不用 iota 方便前后端联调
+	NodeParagraph            nodeType = 1  // 段落节点
+	NodeHeading              nodeType = 2  // 标题节点
+	NodeThematicBreak        nodeType = 3  // 分隔线节点
+	NodeBlockquote           nodeType = 4  // 块引用节点
+	NodeBlockquoteMarker     nodeType = 5  // 块引用标记符 >
+	NodeList                 nodeType = 6  // 列表节点
+	NodeListItem             nodeType = 7  // 列表项节点
+	NodeHTMLBlock            nodeType = 8  // HTML 块节点
+	NodeInlineHTML           nodeType = 9  // 内联 HTML节点
+	NodeCodeBlock            nodeType = 10 // 代码块节点
+	NodeText                 nodeType = 11 // 文本节点
+	NodeEmphasis             nodeType = 12 // 强调节点
+	NodeEmA6kOpenMarker      nodeType = 13 // 开始强调标记符 *
+	NodeEmA6kCloseMarker     nodeType = 14 // 结束强调标记符 *
+	NodeEmU8eOpenMarker      nodeType = 15 // 开始强调标记符 _
+	NodeEmU8eCloseMarker     nodeType = 16 // 结束强调标记符 _
+	NodeStrong               nodeType = 17 // 加粗节点
+	NodeStrongA6kOpenMarker  nodeType = 18 // 开始加粗节点标记符 **
+	NodeStrongA6kCloseMarker nodeType = 19 // 结束加粗节点标记符 **
+	NodeStrongU8eOpenMarker  nodeType = 20 // 开始加粗节点标记符 __
+	NodeStrongU8eCloseMarker nodeType = 21 // 结束加粗节点标记符 __
+	NodeCodeSpan             nodeType = 22 // 代码节点
+	NodeHardBreak            nodeType = 23 // 硬换行节点
+	NodeSoftBreak            nodeType = 24 // 软换行节点
+	NodeLink                 nodeType = 25 // 链接节点
+	NodeImage                nodeType = 26 // 图片节点
 
 	// GFM
 
-	NodeTaskListItemMarker       // 任务列表项标记符节点
-	NodeStrikethrough            // 删除线节点
-	NodeStrikethrough1OpenMarker  // 开始删除线节点标记符 ~
-	NodeStrikethrough1CloseMarker // 结束删除线节点标记符 ~
-	NodeStrikethrough2OpenMarker  // 开始删除线节点标记符 ~~
-	NodeStrikethrough2CloseMarker // 结束删除线节点标记符 ~~
-	NodeTable                    // 表节点
-	NodeTableHead                // 表头节点
-	NodeTableRow                 // 表行节点
-	NodeTableCell                // 表格节点
+	NodeTaskListItemMarker        nodeType = 27 // 任务列表项标记符节点
+	NodeStrikethrough             nodeType = 28 // 删除线节点
+	NodeStrikethrough1OpenMarker  nodeType = 29 // 开始删除线节点标记符 ~
+	NodeStrikethrough1CloseMarker nodeType = 30 // 结束删除线节点标记符 ~
+	NodeStrikethrough2OpenMarker  nodeType = 31 // 开始删除线节点标记符 ~~
+	NodeStrikethrough2CloseMarker nodeType = 32 // 结束删除线节点标记符 ~~
+	NodeTable                     nodeType = 33 // 表节点
+	NodeTableHead                 nodeType = 34 // 表头节点
+	NodeTableRow                  nodeType = 35 // 表行节点
+	NodeTableCell                 nodeType = 36 // 表格节点
 
 	// Emoji
 
-	NodeEmojiUnicode // Emoji Unicode 字符节点
-	NodeEmojiImg     // Emoji 图片节点
+	NodeEmojiUnicode nodeType = 37 // Emoji Unicode 字符节点
+	NodeEmojiImg     nodeType = 38 // Emoji 图片节点
 
 	// 数学公式
 
-	NodeMathBlock  // 数学公式块节点
-	NodeInlineMath // 内联数学公式节点
+	NodeMathBlock  nodeType = 39 // 数学公式块节点
+	NodeInlineMath nodeType = 40 // 内联数学公式节点
 
 )

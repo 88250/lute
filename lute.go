@@ -181,7 +181,7 @@ func (lute *Lute) SpinVditorDOM(html string) (newHTML string, err error) {
 
 // VditorNewline 用于在类型为 blockType 的块中进行换行生成新的 Vditor 节点。
 // param 用于传递生成某些块换行所需的参数，比如在列表项中换行需要传列表项标记符和分隔符。
-func (lute *Lute) VditorNewline(blockType int, param map[string]interface{}) (html string, err error) {
+func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}) (html string, err error) {
 	renderer := lute.newVditorRenderer(nil).(*VditorRenderer)
 
 	switch blockType {

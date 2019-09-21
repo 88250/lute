@@ -85,7 +85,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 	}
 
-	if 1 <= node.typ {
+	if -1 != node.typ {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 	}
@@ -94,7 +94,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			lute.genASTByVditorDOM(c, tree)
 		}
 	}
-	if 1 <= node.typ {
+	if -1 != node.typ {
 		tree.context.tip = tree.context.tip.parent
 	}
 }

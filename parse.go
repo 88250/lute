@@ -148,7 +148,7 @@ func (context *Context) finalize(block *Node, lineNum int) {
 }
 
 // addChildMarker 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。
-func (context *Context) addChildMarker(nodeType int, rng *Range) (ret *Node) {
+func (context *Context) addChildMarker(nodeType nodeType, rng *Range) (ret *Node) {
 	ret = &Node{typ: nodeType, ranges: []*Range{rng}, close: true}
 	context.tip.AppendChild(ret)
 	return ret
@@ -156,7 +156,7 @@ func (context *Context) addChildMarker(nodeType int, rng *Range) (ret *Node) {
 
 // addChild 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
 // 节点并向父节点方向尝试，直到找到一个能接受该子节点的节点为止。添加完成后该子节点会被设置为新的末梢节点。
-func (context *Context) addChild(nodeType, offset int) (ret *Node) {
+func (context *Context) addChild(nodeType nodeType, offset int) (ret *Node) {
 	for !context.tip.CanContain(nodeType) {
 		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}

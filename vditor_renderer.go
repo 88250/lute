@@ -26,7 +26,7 @@ type VditorRenderer struct {
 
 // newVditorRenderer 创建一个 Vditor DOM 渲染器。
 func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
-	ret := &VditorRenderer{&BaseRenderer{rendererFuncs: map[int]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
+	ret := &VditorRenderer{&BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
@@ -556,7 +556,7 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 			attrs = [][]string{}
 		}
 		if nil != node {
-			attrs = append(attrs, []string{"data-ntype", strconv.Itoa(node.typ)})
+			attrs = append(attrs, []string{"data-ntype", node.typ.String()})
 			attrs = append(attrs, []string{"data-mtype", r.mtype(node.typ)})
 			attrs = append(attrs, []string{"data-pos-start", strconv.Itoa(node.ranges[0].startLine) + ":" + strconv.Itoa(node.ranges[0].startCol)})
 			attrs = append(attrs, []string{"data-pos-end", strconv.Itoa(node.ranges[0].endLine) + ":" + strconv.Itoa(node.ranges[0].endCol)})
@@ -575,7 +575,7 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 //   0：叶子块元素
 //   1：容器块元素
 //   2：行级元素
-func (r *VditorRenderer) mtype(nodeType int) string {
+func (r *VditorRenderer) mtype(nodeType nodeType) string {
 	switch nodeType {
 	case NodeThematicBreak, NodeHeading, NodeCodeBlock, NodeMathBlock, NodeHTMLBlock, NodeParagraph:
 		return "0"
