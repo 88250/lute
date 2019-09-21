@@ -333,7 +333,7 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 	for ; ctx.pos < ctx.tokensLen; ctx.pos++ {
 		token = ctx.tokens[ctx.pos]
 		if t.isMarker(token) {
-			// 遇到潜在的标记符时需要跳出 text，回到行级解析主循环
+			// 遇到潜在的标记符时需要跳出该文本节点，回到行级解析主循环
 			break
 		}
 	}
@@ -341,8 +341,8 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 	ret = &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos],
 		ranges: []*Range{
 			{
-				startLine: ctx.lineNum, startCol: start,
-				endLine: ctx.lineNum, endCol: ctx.pos,
+				startLine: ctx.lineNum, startCol: ctx.columnNum + start,
+				endLine: ctx.lineNum, endCol: ctx.columnNum + ctx.pos,
 			},
 		}}
 	return

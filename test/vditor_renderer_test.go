@@ -20,7 +20,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
-	//{"20", "*foo*\n", "<p><em>foo</em></p>\n"},
+	{"20", "*foo*\n", "<p><em>foo</em></p>\n"},
 	//{"19", "> *foo\n> bar*\n", "<blockquote>\n<p><em>foo<br />\nbar</em></p>\n</blockquote>\n"},
 	//{"18", "**789*<span></span>", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">*</span><span class=\"node\" data-ntype=\"11\" data-mtype=\"2\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">789</span></em><span class=\"marker\">*</span></span><span></span><span class=\"newline\">\n\n</span></p>"},
 	//{"16", "**foo*\n", "<span data-ntype=\"10\" data-mtype=\"2\">*</span><span class=\"node\" data-ntype=\"11\" data-mtype=\"2\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></em><span class=\"marker\">*</span></span>"},
@@ -36,7 +36,7 @@ var vditorRendererTests = []parseTest{
 	//{"6", "*Lute*\n", "<span class=\"node\" data-ntype=\"11\" data-mtype=\"2\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></em><span class=\"marker\">*</span></span>"},
 	//{"5", "_Lute_\n", "<span class=\"node\" data-ntype=\"11\" data-mtype=\"2\"><span class=\"marker\">_</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></em><span class=\"marker\">_</span></span>"},
 	//{"4", "* Lute\n", "<ul data-ntype=\"5\" data-mtype=\"1\"><li data-ntype=\"6\" data-mtype=\"1\"><span class=\"node\"><span class=\"marker\">* </span></span><p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></p></li></ul>"},
-	{"3", "> Lute\n", "<span class=\"node\"><span class=\"marker\" data-ntype=\"5\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:2\">&gt;</span><blockquote data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:3\" data-pos-end=\"1:7\"><p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:3\" data-pos-end=\"1:7\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:0\" data-pos-end=\"1:4\">Lute</span><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span></blockquote></span>"},
+	{"3", "> Lute\n", "<blockquote><span class=\"node\"><span class=\"marker\" data-ntype=\"5\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:2\">&gt;</span></span><p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:3\" data-pos-end=\"1:7\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:3\" data-pos-end=\"1:7\">Lute</span><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span></blockquote>"},
 	//{"2", "---\n", "<hr data-ntype=\"3\" data-mtype=\"0\" />"},
 	//{"1", "## Lute\n", "<h2 data-ntype=\"2\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></h2>"},
 	//{"0", "Lute\n", "<span data-ntype=\"10\" data-mtype=\"2\">Lute</span>"},

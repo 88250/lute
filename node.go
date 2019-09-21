@@ -265,55 +265,55 @@ func (typ nodeType) String() string {
 const (
 	// CommonMark
 
-	NodeDocument             nodeType = 0  // 根节点类 不用 iota 方便前后端联调
-	NodeParagraph            nodeType = 1  // 段落节点
-	NodeHeading              nodeType = 2  // 标题节点
-	NodeThematicBreak        nodeType = 3  // 分隔线节点
-	NodeBlockquote           nodeType = 4  // 块引用节点
+	NodeDocument             nodeType = 0  // 根 不用 iota 方便前后端联调
+	NodeParagraph            nodeType = 1  // 段落
+	NodeHeading              nodeType = 2  // 标题
+	NodeThematicBreak        nodeType = 3  // 分隔线
+	NodeBlockquote           nodeType = 4  // 块引用
 	NodeBlockquoteMarker     nodeType = 5  // 块引用标记符 >
-	NodeList                 nodeType = 6  // 列表节点
-	NodeListItem             nodeType = 7  // 列表项节点
-	NodeHTMLBlock            nodeType = 8  // HTML 块节点
-	NodeInlineHTML           nodeType = 9  // 内联 HTML节点
-	NodeCodeBlock            nodeType = 10 // 代码块节点
-	NodeText                 nodeType = 11 // 文本节点
-	NodeEmphasis             nodeType = 12 // 强调节点
+	NodeList                 nodeType = 6  // 列表
+	NodeListItem             nodeType = 7  // 列表项
+	NodeHTMLBlock            nodeType = 8  // HTML 块
+	NodeInlineHTML           nodeType = 9  // 内联 HTML
+	NodeCodeBlock            nodeType = 10 // 代码块
+	NodeText                 nodeType = 11 // 文本
+	NodeEmphasis             nodeType = 12 // 强调
 	NodeEmA6kOpenMarker      nodeType = 13 // 开始强调标记符 *
 	NodeEmA6kCloseMarker     nodeType = 14 // 结束强调标记符 *
 	NodeEmU8eOpenMarker      nodeType = 15 // 开始强调标记符 _
 	NodeEmU8eCloseMarker     nodeType = 16 // 结束强调标记符 _
-	NodeStrong               nodeType = 17 // 加粗节点
+	NodeStrong               nodeType = 17 // 加粗
 	NodeStrongA6kOpenMarker  nodeType = 18 // 开始加粗节点标记符 **
 	NodeStrongA6kCloseMarker nodeType = 19 // 结束加粗节点标记符 **
 	NodeStrongU8eOpenMarker  nodeType = 20 // 开始加粗节点标记符 __
 	NodeStrongU8eCloseMarker nodeType = 21 // 结束加粗节点标记符 __
-	NodeCodeSpan             nodeType = 22 // 代码节点
-	NodeHardBreak            nodeType = 23 // 硬换行节点
-	NodeSoftBreak            nodeType = 24 // 软换行节点
-	NodeLink                 nodeType = 25 // 链接节点
-	NodeImage                nodeType = 26 // 图片节点
+	NodeCodeSpan             nodeType = 22 // 代码
+	NodeHardBreak            nodeType = 23 // 硬换行
+	NodeSoftBreak            nodeType = 24 // 软换行
+	NodeLink                 nodeType = 25 // 链接
+	NodeImage                nodeType = 26 // 图片
 
 	// GFM
 
-	NodeTaskListItemMarker        nodeType = 27 // 任务列表项标记符节点
-	NodeStrikethrough             nodeType = 28 // 删除线节点
+	NodeTaskListItemMarker        nodeType = 27 // 任务列表项标记符
+	NodeStrikethrough             nodeType = 28 // 删除线
 	NodeStrikethrough1OpenMarker  nodeType = 29 // 开始删除线节点标记符 ~
 	NodeStrikethrough1CloseMarker nodeType = 30 // 结束删除线节点标记符 ~
 	NodeStrikethrough2OpenMarker  nodeType = 31 // 开始删除线节点标记符 ~~
 	NodeStrikethrough2CloseMarker nodeType = 32 // 结束删除线节点标记符 ~~
-	NodeTable                     nodeType = 33 // 表节点
-	NodeTableHead                 nodeType = 34 // 表头节点
-	NodeTableRow                  nodeType = 35 // 表行节点
-	NodeTableCell                 nodeType = 36 // 表格节点
+	NodeTable                     nodeType = 33 // 表
+	NodeTableHead                 nodeType = 34 // 表头
+	NodeTableRow                  nodeType = 35 // 表行
+	NodeTableCell                 nodeType = 36 // 表格
 
 	// Emoji
 
-	NodeEmojiUnicode nodeType = 37 // Emoji Unicode 字符节点
-	NodeEmojiImg     nodeType = 38 // Emoji 图片节点
+	NodeEmojiUnicode nodeType = 37 // Emoji Unicode 字符
+	NodeEmojiImg     nodeType = 38 // Emoji 图片
 
 	// 数学公式
 
-	NodeMathBlock  nodeType = 39 // 数学公式块节点
-	NodeInlineMath nodeType = 40 // 内联数学公式节点
+	NodeMathBlock  nodeType = 39 // 数学公式块
+	NodeInlineMath nodeType = 40 // 内联数学公式
 
 )

@@ -51,6 +51,7 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 			tokens:    tokens,
 			tokensLen: length,
 			lineNum:   node.ranges[0].startLine,
+			columnNum: node.ranges[0].startCol,
 		}
 
 		// 生成该块节点的行级子节点
