@@ -12,7 +12,9 @@
 
 package lute
 
-import "strings"
+import (
+	"strings"
+)
 
 // EChartsJSONRenderer 描述了 JSON 渲染器。
 type EChartsJSONRenderer struct {
@@ -50,7 +52,13 @@ func (lute *Lute) newEChartsJSONRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellEChartsJSON
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeEChartsJSON
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgEChartsJSON
+
+	ret.defaultRendererFunc = ret.renderDefault
 	return ret
+}
+
+func (r *EChartsJSONRenderer) renderDefault(n *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
 }
 
 func (r *EChartsJSONRenderer) renderInlineMathEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
@@ -348,23 +356,35 @@ func (r *EChartsJSONRenderer) openObj() {
 
 func (r *EChartsJSONRenderer) closeObj(node *Node) {
 	r.writeByte('}')
-	if nil != node && nil != node.next {
+	if !r.ignore(node.next) {
 		r.comma()
 	}
 }
 
 func (r *EChartsJSONRenderer) openChildren(node *Node) {
-	if nil != node && nil != node.firstChild {
+	if nil != node.firstChild {
 		r.writeString(",\"children\":[")
 	}
 }
 
 func (r *EChartsJSONRenderer) closeChildren(node *Node) {
-	if nil != node && nil != node.firstChild {
+	if nil != node.firstChild {
 		r.writeByte(']')
 	}
 }
 
 func (r *EChartsJSONRenderer) comma() {
 	r.writeString(",")
+}
+
+func (r *EChartsJSONRenderer) ignore(node *Node) bool {
+	return nil == node ||
+	// 以下类型的节点不进行渲染，否则图画出来节点太多
+		NodeBlockquoteMarker == node.typ ||
+		NodeEmA6kOpenMarker == node.typ || NodeEmA6kCloseMarker == node.typ ||
+		NodeEmU8eOpenMarker == node.typ || NodeEmU8eCloseMarker == node.typ ||
+		NodeStrongA6kOpenMarker == node.typ || NodeStrongA6kCloseMarker == node.typ ||
+		NodeStrongU8eOpenMarker == node.typ || NodeStrongU8eCloseMarker == node.typ ||
+		NodeStrikethrough1OpenMarker == node.typ || NodeStrikethrough1CloseMarker == node.typ ||
+		NodeStrikethrough2OpenMarker == node.typ || NodeStrikethrough2CloseMarker == node.typ
 }

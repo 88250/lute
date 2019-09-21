@@ -34,7 +34,15 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
+	ret.rendererFuncs[NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
+	ret.rendererFuncs[NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
+	ret.rendererFuncs[NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
+	ret.rendererFuncs[NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
+	ret.rendererFuncs[NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
+	ret.rendererFuncs[NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
+	ret.rendererFuncs[NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
+	ret.rendererFuncs[NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
 	ret.rendererFuncs[NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
@@ -48,6 +56,10 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
+	ret.rendererFuncs[NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
+	ret.rendererFuncs[NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
+	ret.rendererFuncs[NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
+	ret.rendererFuncs[NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
 	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
 	ret.rendererFuncs[NodeTable] = ret.renderTable
 	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
@@ -121,12 +133,27 @@ func (r *FormatRenderer) renderTable(node *Node, entering bool) (WalkStatus, err
 }
 
 func (r *FormatRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
-	} else {
-		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
-	}
 	return WalkContinue, nil
+}
+
+func (r *FormatRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemTilde)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemTilde)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("~~")
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("~~")
+	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
@@ -295,21 +322,51 @@ func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *FormatRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
-	} else {
-		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
-	}
 	return WalkContinue, nil
 }
 
+func (r *FormatRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemAsterisk)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemAsterisk)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemUnderscore)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemUnderscore)
+	return WalkStop, nil
+}
+
 func (r *FormatRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
-	} else {
-		r.write(bytes.Repeat(items{node.strongEmDelMarker}, node.strongEmDelMarkenLen))
-	}
 	return WalkContinue, nil
+}
+
+func (r *FormatRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("**")
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("**")
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("__")
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("__")
+	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {

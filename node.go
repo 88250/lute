@@ -81,11 +81,6 @@ type Node struct {
 
 	headingLevel int // 1~6
 
-	// 强调、加粗和删除线
-
-	strongEmDelMarker    byte
-	strongEmDelMarkenLen int
-
 	// Emoji
 
 	emojiAlias items

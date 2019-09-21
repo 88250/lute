@@ -129,28 +129,28 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			var emStrongDel, openMarker, closeMarker *Node
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
-					emStrongDel = &Node{typ: NodeEmphasis, strongEmDelMarker: itemAsterisk, strongEmDelMarkenLen: 1}
+					emStrongDel = &Node{typ: NodeEmphasis, ranges: []*Range{{}}, close: true}
 					openMarker = &Node{typ: NodeEmA6kOpenMarker, ranges: []*Range{{}}, close: true}
 					closeMarker = &Node{typ: NodeEmA6kCloseMarker, ranges: []*Range{{}}, close: true}
 				} else if itemUnderscore == closercc {
-					emStrongDel = &Node{typ: NodeEmphasis, strongEmDelMarker: itemUnderscore, strongEmDelMarkenLen: 1}
+					emStrongDel = &Node{typ: NodeEmphasis, ranges: []*Range{{}}, close: true}
 					openMarker = &Node{typ: NodeEmU8eOpenMarker, ranges: []*Range{{}}, close: true}
 					closeMarker = &Node{typ: NodeEmU8eCloseMarker, ranges: []*Range{{}}, close: true}
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel = &Node{typ: NodeStrikethrough, strongEmDelMarker: itemTilde, strongEmDelMarkenLen: 1}
+						emStrongDel = &Node{typ: NodeStrikethrough, ranges: []*Range{{}}, close: true}
 						openMarker = &Node{typ: NodeStrikethrough1OpenMarker, ranges: []*Range{{}}, close: true}
 						closeMarker = &Node{typ: NodeStrikethrough1CloseMarker, ranges: []*Range{{}}, close: true}
 					}
 				}
 			} else {
 				if itemTilde != closercc {
-					emStrongDel = &Node{typ: NodeStrong, strongEmDelMarker: closercc, strongEmDelMarkenLen: 2}
+					emStrongDel = &Node{typ: NodeStrong, ranges: []*Range{{}}, close: true}
 					openMarker = &Node{typ: NodeStrongA6kOpenMarker, ranges: []*Range{{}}, close: true}
 					closeMarker = &Node{typ: NodeStrongA6kCloseMarker, ranges: []*Range{{}}, close: true}
 				} else {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel = &Node{typ: NodeStrikethrough, strongEmDelMarker: closercc, strongEmDelMarkenLen: 2}
+						emStrongDel = &Node{typ: NodeStrikethrough}
 						openMarker = &Node{typ: NodeStrikethrough2OpenMarker, ranges: []*Range{{}}, close: true}
 						closeMarker = &Node{typ: NodeStrikethrough2CloseMarker, ranges: []*Range{{}}, close: true}
 					}

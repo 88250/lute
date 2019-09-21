@@ -57,13 +57,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeInlineHTML
 		node.tokens = toItems("<br />")
 	case atom.Em:
-		node.typ = NodeEmphasis
-		node.strongEmDelMarker = n.PrevSibling.FirstChild.Data[0]
-		node.strongEmDelMarkenLen = 1
+		node.typ = NodeEmA6kOpenMarker
 	case atom.Strong:
 		node.typ = NodeStrong
-		node.strongEmDelMarker = n.PrevSibling.FirstChild.Data[0]
-		node.strongEmDelMarkenLen = 2
 	case atom.P:
 		node.typ = NodeParagraph
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:

@@ -20,7 +20,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
-	{"20", "*foo*\n", "<p><em>foo</em></p>\n"},
+	//{"20", "*foo*\n", "<p><em>foo</em></p>\n"},
 	//{"19", "> *foo\n> bar*\n", "<blockquote>\n<p><em>foo<br />\nbar</em></p>\n</blockquote>\n"},
 	//{"18", "**789*<span></span>", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">*</span><span class=\"node\" data-ntype=\"11\" data-mtype=\"2\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">789</span></em><span class=\"marker\">*</span></span><span></span><span class=\"newline\">\n\n</span></p>"},
 	//{"16", "**foo*\n", "<span data-ntype=\"10\" data-mtype=\"2\">*</span><span class=\"node\" data-ntype=\"11\" data-mtype=\"2\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></em><span class=\"marker\">*</span></span>"},

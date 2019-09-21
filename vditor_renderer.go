@@ -35,7 +35,15 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
+	ret.rendererFuncs[NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
+	ret.rendererFuncs[NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
+	ret.rendererFuncs[NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
+	ret.rendererFuncs[NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
 	ret.rendererFuncs[NodeStrong] = ret.renderStrong
+	ret.rendererFuncs[NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
+	ret.rendererFuncs[NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
+	ret.rendererFuncs[NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
+	ret.rendererFuncs[NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
 	ret.rendererFuncs[NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
@@ -49,6 +57,10 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
+	ret.rendererFuncs[NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
+	ret.rendererFuncs[NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
+	ret.rendererFuncs[NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
+	ret.rendererFuncs[NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
 	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
 	ret.rendererFuncs[NodeTable] = ret.renderTable
 	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
@@ -131,12 +143,27 @@ func (r *VditorRenderer) renderTable(node *Node, entering bool) (WalkStatus, err
 }
 
 func (r *VditorRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("del", node, nil, false)
-	} else {
-		r.tag("/del", node, nil, false)
-	}
 	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("del", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/del", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("del", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/del", node, nil, false)
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
@@ -308,40 +335,92 @@ func (r *VditorRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, 
 	if entering {
 		attrs := [][]string{{"class", "node"}}
 		r.tag("span", node, attrs, false)
-		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
-		r.writeByte(node.strongEmDelMarker)
-		r.tag("/span", nil, nil, false)
-		r.tag("em", node, nil, false)
 	} else {
-		r.tag("/em", node, nil, false)
-		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
-		r.writeByte(node.strongEmDelMarker)
-		r.tag("/span", nil, nil, false)
 		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", nil, attrs, false)
+	r.writeByte(itemAsterisk)
+	r.tag("/span", nil, nil, false)
+	r.tag("em", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", nil, attrs, false)
+	r.writeByte(itemAsterisk)
+	r.tag("/span", nil, nil, false)
+	r.tag("/em", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", nil, attrs, false)
+	r.writeByte(itemUnderscore)
+	r.tag("/span", nil, nil, false)
+	r.tag("em", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", nil, attrs, false)
+	r.writeByte(itemUnderscore)
+	r.tag("/span", nil, nil, false)
+	r.tag("/em", node, nil, false)
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		attrs := [][]string{{"class", "node"}}
 		r.tag("span", nil, attrs, false)
-		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
-		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
-		r.tag("/span", nil, nil, false)
-		r.tag("strong", node, nil, false)
 	} else {
-		r.tag("/strong", node, nil, false)
-		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
-		r.write(items{node.strongEmDelMarker, node.strongEmDelMarker})
-		r.tag("/span", nil, nil, false)
 		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", nil, attrs, false)
+	r.writeString("**")
+	r.tag("/span", nil, nil, false)
+	r.tag("strong", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", nil, attrs, false)
+	r.writeString("**")
+	r.tag("/span", nil, nil, false)
+	r.tag("/strong", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", nil, attrs, false)
+	r.writeString("__")
+	r.tag("/span", nil, nil, false)
+	r.tag("strong", node, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", nil, attrs, false)
+	r.writeString("__")
+	r.tag("/span", nil, nil, false)
+	r.tag("/strong", node, nil, false)
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
