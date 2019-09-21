@@ -161,7 +161,7 @@ func (t *Tree) incorporateLine(line items) {
 			t.addLine()
 		}
 	}
-	t.context.lastLineLen = t.context.currentLineLen
+	t.context.lastLineLen = t.context.currentLineLen - 1 // 减掉结尾的 \n
 }
 
 // blockStartFunc 定义了用于判断块是否开始的函数签名。

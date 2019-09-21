@@ -249,7 +249,7 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.tag("p", node, nil, false)
 	} else {
-		r.writeString("<span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>")
+		r.writeString("</p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>")
 	}
 	return WalkContinue, nil
 }
@@ -343,19 +343,19 @@ func (r *VditorRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, 
 
 func (r *VditorRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "marker"}}
-	r.tag("span", nil, attrs, false)
+	r.tag("span", node, attrs, false)
 	r.writeByte(itemAsterisk)
 	r.tag("/span", nil, nil, false)
-	r.tag("em", node, nil, false)
+	r.tag("em", node.parent, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/em", node, nil, false)
 	attrs := [][]string{{"class", "marker"}}
-	r.tag("span", nil, attrs, false)
+	r.tag("span", node, attrs, false)
 	r.writeByte(itemAsterisk)
 	r.tag("/span", nil, nil, false)
-	r.tag("/em", node, nil, false)
 	return WalkStop, nil
 }
 
@@ -425,7 +425,7 @@ func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (
 
 func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("blockquote", node.next, nil, false)
+		r.tag("blockquote", node, nil, false)
 	} else {
 		r.tag("/blockquote", node, nil, false)
 	}

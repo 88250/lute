@@ -42,7 +42,12 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 	delim := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
-	node := &Node{typ: NodeText, tokens: text}
+	node := &Node{typ: NodeText, tokens: text, ranges: []*Range{{
+		startLine: ctx.lineNum,
+		startCol:  ctx.pos,
+		endLine:   ctx.lineNum,
+		endCol:    ctx.pos + delim.num - 1,
+	}}}
 	block.AppendChild(node)
 
 	// 将这个分隔符入栈
@@ -126,33 +131,38 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			text = closerInl.tokens[0 : len(closerInl.tokens)-useDelims]
 			closerInl.tokens = text
 
-			var emStrongDel, openMarker, closeMarker *Node
+			emStrongDel := &Node{ranges: []*Range{{startLine: ctx.lineNum, startCol: ctx.columnNum}}, close: true}
+			openMarker := &Node{
+				ranges: []*Range{{startLine: ctx.lineNum, startCol: ctx.columnNum, endLine: ctx.lineNum, endCol: ctx.columnNum}},
+				close:  true,
+			}
+			closeMarker := &Node{ranges: []*Range{{}}, close: true}
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
-					emStrongDel = &Node{typ: NodeEmphasis, ranges: []*Range{{}}, close: true}
-					openMarker = &Node{typ: NodeEmA6kOpenMarker, ranges: []*Range{{}}, close: true}
-					closeMarker = &Node{typ: NodeEmA6kCloseMarker, ranges: []*Range{{}}, close: true}
+					emStrongDel.typ = NodeEmphasis
+					openMarker.typ = NodeEmA6kOpenMarker
+					closeMarker.typ = NodeEmA6kCloseMarker
 				} else if itemUnderscore == closercc {
-					emStrongDel = &Node{typ: NodeEmphasis, ranges: []*Range{{}}, close: true}
-					openMarker = &Node{typ: NodeEmU8eOpenMarker, ranges: []*Range{{}}, close: true}
-					closeMarker = &Node{typ: NodeEmU8eCloseMarker, ranges: []*Range{{}}, close: true}
+					emStrongDel.typ = NodeEmphasis
+					openMarker.typ = NodeEmU8eOpenMarker
+					closeMarker.typ = NodeEmU8eCloseMarker
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel = &Node{typ: NodeStrikethrough, ranges: []*Range{{}}, close: true}
-						openMarker = &Node{typ: NodeStrikethrough1OpenMarker, ranges: []*Range{{}}, close: true}
-						closeMarker = &Node{typ: NodeStrikethrough1CloseMarker, ranges: []*Range{{}}, close: true}
+						emStrongDel.typ = NodeStrikethrough
+						openMarker.typ = NodeStrikethrough1OpenMarker
+						closeMarker.typ = NodeStrikethrough1CloseMarker
 					}
 				}
 			} else {
 				if itemTilde != closercc {
-					emStrongDel = &Node{typ: NodeStrong, ranges: []*Range{{}}, close: true}
-					openMarker = &Node{typ: NodeStrongA6kOpenMarker, ranges: []*Range{{}}, close: true}
-					closeMarker = &Node{typ: NodeStrongA6kCloseMarker, ranges: []*Range{{}}, close: true}
+					emStrongDel.typ = NodeStrong
+					openMarker.typ = NodeStrongA6kOpenMarker
+					closeMarker.typ = NodeStrongA6kCloseMarker
 				} else {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel = &Node{typ: NodeStrikethrough}
-						openMarker = &Node{typ: NodeStrikethrough2OpenMarker, ranges: []*Range{{}}, close: true}
-						closeMarker = &Node{typ: NodeStrikethrough2CloseMarker, ranges: []*Range{{}}, close: true}
+						emStrongDel.typ = NodeStrikethrough
+						openMarker.typ = NodeStrikethrough2OpenMarker
+						closeMarker.typ = NodeStrikethrough2CloseMarker
 					}
 				}
 			}
@@ -164,8 +174,19 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				emStrongDel.AppendChild(tmp)
 				tmp = next
 			}
-			emStrongDel.PrependChild(openMarker)
-			emStrongDel.AppendChild(closeMarker)
+
+			closeMarker.ranges = []*Range{{
+				startLine: tmp.ranges[0].startLine,
+				startCol:  tmp.ranges[0].startCol,
+				endLine:   tmp.ranges[0].endLine,
+				endCol:    tmp.ranges[0].endCol,
+			}}
+
+			emStrongDel.PrependChild(openMarker) // 插入起始标记符
+			emStrongDel.AppendChild(closeMarker) // 插入结束标记符
+
+			emStrongDel.ranges[0].endLine = closeMarker.ranges[0].endLine
+			emStrongDel.ranges[0].endCol = closeMarker.ranges[0].endCol
 			openerInl.InsertAfter(emStrongDel)
 
 			// remove elts between opener and closer in delimiters stack

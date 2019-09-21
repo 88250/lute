@@ -342,7 +342,7 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 		ranges: []*Range{
 			{
 				startLine: ctx.lineNum, startCol: ctx.columnNum + start,
-				endLine: ctx.lineNum, endCol: ctx.columnNum + ctx.pos,
+				endLine: ctx.lineNum, endCol: ctx.columnNum + ctx.pos - 1,
 			},
 		}}
 	return
