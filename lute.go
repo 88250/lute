@@ -102,6 +102,11 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 	return
 }
 
+// Space 用于在 text 中的中西文之间插入空格。
+func (lute *Lute) Space(text string) string {
+	return space0(text)
+}
+
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的映射列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	ret = make(map[string]string, len(lute.Emojis))
