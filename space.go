@@ -34,8 +34,6 @@ func (t *Tree) space(node *Node) {
 }
 
 func space0(text string) (ret string) {
-	// 鸣谢 https://github.com/studygolang/autocorrect
-
 	for _, r := range text {
 		ret = addSpaceAtBoundary(ret, r)
 	}
@@ -43,23 +41,50 @@ func space0(text string) (ret string) {
 }
 
 func addSpaceAtBoundary(prefix string, nextChar rune) string {
-	if len(prefix) == 0 {
+	if 0 == len(prefix) {
 		return string(nextChar)
 	}
-
-	r, size := utf8.DecodeLastRuneInString(prefix)
-	if isLatin(size) != isLatin(utf8.RuneLen(nextChar)) &&
-		isAllowSpace(nextChar) && isAllowSpace(r) {
-		return prefix + " " + string(nextChar)
+	if unicode.IsSpace(nextChar) {
+		return prefix + string(nextChar)
 	}
 
+	currentChar, _ := utf8.DecodeLastRuneInString(prefix)
+	if isAllowSpace(currentChar, nextChar) {
+		return prefix + " " + string(nextChar)
+	}
 	return prefix + string(nextChar)
 }
 
-func isLatin(size int) bool {
-	return size == 1
-}
+func isAllowSpace(currentChar, nextChar rune) bool {
+	if unicode.IsSpace(currentChar) {
+		return false
+	}
 
-func isAllowSpace(r rune) bool {
-	return !unicode.IsSpace(r) && !unicode.IsPunct(r)
+	if utf8.RuneSelf <= currentChar { // 当前字符不是 ASCII 字符
+		if '℃' == currentChar {
+			// 摄氏度符号后必须跟空格
+			return true
+		}
+		if '%' == nextChar {
+			return true
+		}
+		if unicode.IsPunct(nextChar) {
+			// 后面的字符如果是标点符号的话不需要后跟空格
+			return false
+		}
+		return utf8.RuneSelf > nextChar && !unicode.IsPunct(currentChar)
+	} else { // 当前字符是 ASCII 字符
+		if unicode.IsDigit(currentChar) && '℃' == nextChar {
+			// 数字后更摄氏度符号不需要空格
+			return false
+		}
+		if '%' == currentChar {
+			return true
+		}
+		if unicode.IsPunct(currentChar) {
+			// 当前字符如果是 ASCII 标点符号的话不需要后跟空格
+			return false
+		}
+		return utf8.RuneSelf <= nextChar && !unicode.IsPunct(nextChar)
+	}
 }

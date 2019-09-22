@@ -360,7 +360,6 @@ Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者们
 * [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其 URL 编码以及 HTML 转义算法
 * [Chroma](https://github.com/alecthomas/chroma)：用 golang 写的语法高亮引擎
 * [中文文案排版指北](https://github.com/sparanoid/chinese-copywriting-guidelines)：统一中文文案、排版的相关用法，降低团队成员之间的沟通成本，增强网站气质
-* [autocorrect](https://github.com/studygolang/autocorrect)：自动给中英文之间加入空格、术语拼写修正
 * [GopherJS](https://github.com/gopherjs/gopherjs)：将 Go 代码编译成 JavaScript 代码
 
 ---
