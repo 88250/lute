@@ -133,7 +133,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 
 			emStrongDel := &Node{ranges: []*Range{{startLine: ctx.lineNum, startCol: ctx.columnNum}}, close: true}
 			openMarker := &Node{
-				ranges: []*Range{{startLine: ctx.lineNum, startCol: ctx.columnNum, endLine: ctx.lineNum, endCol: ctx.columnNum}},
+				ranges: []*Range{{startLine: ctx.lineNum, startCol: ctx.columnNum, endLine: ctx.lineNum, endCol: ctx.columnNum + 1}},
 				close:  true,
 			}
 			closeMarker := &Node{ranges: []*Range{{}}, close: true}
@@ -179,7 +179,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				startLine: tmp.ranges[0].startLine,
 				startCol:  tmp.ranges[0].startCol,
 				endLine:   tmp.ranges[0].endLine,
-				endCol:    tmp.ranges[0].endCol,
+				endCol:    tmp.ranges[0].endCol + 1,
 			}}
 
 			emStrongDel.PrependChild(openMarker) // 插入起始标记符

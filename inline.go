@@ -338,13 +338,13 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	ret = &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos],
-		ranges: []*Range{
-			{
-				startLine: ctx.lineNum, startCol: ctx.columnNum + start,
-				endLine: ctx.lineNum, endCol: ctx.columnNum + ctx.pos,
-			},
-		}}
+	ret = &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos]}
+	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, start)
+	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
+	ret.ranges = append(ret.ranges, []*Range{{
+		startLine: sBLn, startCol: ctx.columnNum + sBCol,
+		endLine: eBLn, endCol: ctx.columnNum + eBCol}}...)
+
 	return
 }
 
