@@ -46,7 +46,7 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 		startLine: ctx.lineNum,
 		startCol:  ctx.pos,
 		endLine:   ctx.lineNum,
-		endCol:    ctx.pos + delim.num - 1,
+		endCol:    startPos + delim.num,
 	}}}
 	block.AppendChild(node)
 

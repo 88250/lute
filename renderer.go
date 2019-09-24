@@ -54,7 +54,6 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 				return r.renderDefault(n, entering)
 			}
 		}
-
 		return f(n, entering)
 	})
 	if nil != err {

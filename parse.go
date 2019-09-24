@@ -143,7 +143,7 @@ func (context *Context) finalize(block *Node, lineNum int) {
 	var parent = block.parent
 	block.close = true
 	block.ranges[0].endLine = lineNum
-	block.ranges[0].endCol = context.lastLineLen
+	block.ranges[0].endCol = context.lastLineLen + 1
 	block.Finalize(context)
 	context.tip = parent
 }

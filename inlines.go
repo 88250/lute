@@ -88,10 +88,10 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 	}
 
 	// 遍历处理子节点，通过并行处理提升性能
-	cwg := &sync.WaitGroup{}
+	//cwg := &sync.WaitGroup{}
 	for child := node.firstChild; nil != child; child = child.next {
-		cwg.Add(1)
-		go t.walkParseInline(child, cwg)
+		//cwg.Add(1)
+		t.walkParseInline(child, nil)
 	}
-	cwg.Wait()
+	//cwg.Wait()
 }

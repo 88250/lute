@@ -20,8 +20,8 @@ import (
 
 var vditorRendererTests = []parseTest{
 
-	{"20", "*foo*\n", "<p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:1\" data-pos-end=\"1:5\"><span class=\"node\" data-ntype=\"12\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:5\"><span class=\"marker\" data-ntype=\"13\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:1\">*</span><em data-ntype=\"12\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:5\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:2\" data-pos-end=\"1:4\">foo</span></em><span class=\"marker\" data-ntype=\"14\" data-mtype=\"2\" data-pos-start=\"1:5\" data-pos-end=\"1:5\">*</span></span></p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>"},
-	//{"19", "> *foo\n> bar*\n", "<blockquote>\n<p><em>foo<br />\nbar</em></p>\n</blockquote>\n"},
+	//{"20", "> *foo\n> bar*\n", "<blockquote>\n<p><em>foo<br />\nbar</em></p>\n</blockquote>\n"},
+	//{"19", "*foo*\n", "<p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:1\" data-pos-end=\"1:5\"><span class=\"node\" data-ntype=\"12\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:5\"><span class=\"marker\" data-ntype=\"13\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:1\">*</span><em data-ntype=\"12\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:5\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:2\" data-pos-end=\"1:4\">foo</span></em><span class=\"marker\" data-ntype=\"14\" data-mtype=\"2\" data-pos-start=\"1:5\" data-pos-end=\"1:5\">*</span></span></p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>"},
 	//{"18", "**789*<span></span>", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">*</span><span class=\"node\" data-ntype=\"11\" data-mtype=\"2\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">789</span></em><span class=\"marker\">*</span></span><span></span><span class=\"newline\">\n\n</span></p>"},
 	//{"16", "**foo*\n", "<span data-ntype=\"10\" data-mtype=\"2\">*</span><span class=\"node\" data-ntype=\"11\" data-mtype=\"2\"><span class=\"marker\">*</span><em data-ntype=\"11\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></em><span class=\"marker\">*</span></span>"},
 	//{"15", "**foo**\n\n<br />\n", "<span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"12\" data-mtype=\"2\"><span data-ntype=\"10\" data-mtype=\"2\">foo</span></strong><span class=\"marker\">**</span></span><br />"},
@@ -39,7 +39,7 @@ var vditorRendererTests = []parseTest{
 	//{"3", "> Lute\n", "<blockquote><span class=\"node\"><span class=\"marker\" data-ntype=\"5\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:2\">&gt;</span></span><p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:3\" data-pos-end=\"1:7\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:3\" data-pos-end=\"1:7\">Lute</span><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span></blockquote>"},
 	//{"2", "---\n", "<hr data-ntype=\"3\" data-mtype=\"0\" />"},
 	//{"1", "## Lute\n", "<h2 data-ntype=\"2\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></h2>"},
-	{"0", "Lute\n", "<p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:1\" data-pos-end=\"1:4\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:4\">Lute</span></p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>"},
+	{"0", "Lute\n", "<p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:1\" data-pos-end=\"1:5\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:5\">Lute</span></p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>"},
 }
 
 func TestVditorRenderer(t *testing.T) {

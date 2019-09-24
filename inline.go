@@ -342,7 +342,7 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 		ranges: []*Range{
 			{
 				startLine: ctx.lineNum, startCol: ctx.columnNum + start,
-				endLine: ctx.lineNum, endCol: ctx.columnNum + ctx.pos - 1,
+				endLine: ctx.lineNum, endCol: ctx.columnNum + ctx.pos,
 			},
 		}}
 	return
@@ -378,5 +378,11 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 	} else {
 		ret = &Node{typ: NodeSoftBreak}
 	}
+	ret.ranges = []*Range{{
+		startLine: ctx.lineNum,
+		startCol:  ctx.pos,
+		endLine:   ctx.lineNum,
+		endCol:    ctx.pos,
+	}}
 	return
 }

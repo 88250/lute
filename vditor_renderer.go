@@ -524,7 +524,6 @@ func (r *VditorRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus,
 		r.tag("span", node, attrs, true)
 		r.writeByte(itemNewline)
 		r.tag("/span", node, nil, false)
-		r.tag("/span", node, nil, false)
 	}
 	return WalkStop, nil
 }
@@ -536,7 +535,6 @@ func (r *VditorRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus,
 		attrs := [][]string{{"class", "newline"}}
 		r.tag("span", node, attrs, true)
 		r.writeByte(itemNewline)
-		r.tag("/span", node, nil, false)
 		r.tag("/span", node, nil, false)
 	}
 	return WalkStop, nil
