@@ -95,7 +95,6 @@ func replaceAtIndex(str string, r rune, i int) string {
 var terms = map[string]string{
 	"jetty":         "Jetty",
 	"tomcat":        "Tomcat",
-	"docker":        "Docker",
 	"jdbc":          "JDBC",
 	"mariadb":       "MariaDB",
 	"ipfs":          "IPFS",
@@ -138,7 +137,6 @@ var terms = map[string]string{
 	"gorm":          "GORM",
 	"orm":           "ORM",
 	"oauth":         "OAuth",
-	"markdown":      "Markdown",
 	"facebook":      "Facebook",
 	"github":        "GitHub",
 	"gist":          "Gist",
