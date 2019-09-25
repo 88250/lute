@@ -25,7 +25,7 @@ type VditorRenderer struct {
 }
 
 // newVditorRenderer 创建一个 Vditor DOM 渲染器。
-func (lute *Lute) newVditorRenderer(treeRoot *Node) Renderer {
+func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret := &VditorRenderer{&BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
@@ -556,8 +556,11 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 		if nil != node {
 			attrs = append(attrs, []string{"data-ntype", node.typ.String()})
 			attrs = append(attrs, []string{"data-mtype", r.mtype(node.typ)})
-			attrs = append(attrs, []string{"data-pos-start", strconv.Itoa(node.ranges[0].startLine) + ":" + strconv.Itoa(node.ranges[0].startCol)})
-			attrs = append(attrs, []string{"data-pos-end", strconv.Itoa(node.ranges[0].endLine) + ":" + strconv.Itoa(node.ranges[0].endCol)})
+			//attrs = append(attrs, []string{"data-pos-start", strconv.Itoa(node.ranges[0].startLn) + ":" + strconv.Itoa(node.ranges[0].startCol)})
+			//attrs = append(attrs, []string{"data-pos-end", strconv.Itoa(node.ranges[0].endLn) + ":" + strconv.Itoa(node.ranges[0].endCol)})
+			if "" != node.caret {
+				attrs = append(attrs, []string{"data-caret", node.caret}, []string{"data-caretoffset", strconv.Itoa(node.caretOffset)})
+			}
 		}
 		for _, attr := range attrs {
 			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
@@ -582,4 +585,40 @@ func (r *VditorRenderer) mtype(nodeType nodeType) string {
 	default:
 		return "2"
 	}
+}
+
+// mapSelection 用于映射文本选段。
+// 根据 Markdown 原文中的 startLn:startCol、endLn:endCol 位置从根节点 root 上遍历查找该范围内的节点，找到对应节点后进行标记以支持后续渲染。
+func (r *VditorRenderer) mapSelection(root *Node, startLn, startCol, endLn, endCol int) {
+	var nodes []*Node
+	for c := root.firstChild; nil != c; c = c.next {
+		r.findSelection(root, startLn, startCol, endLn, endCol, &nodes)
+	}
+	for _, node := range nodes {
+		node.caret = "start"
+		node.caretOffset = node.ranges[0].startCol
+	}
+}
+
+func (r *VditorRenderer) findSelection(node *Node, startLn, startCol, endLn, endCol int, selected *[]*Node) {
+	for _, rng := range node.ranges {
+		if rng.startLn > startLn || rng.endLn < endLn {
+			return
+		}
+		if rng.startCol > startCol || rng.endCol < endCol {
+			return
+		}
+	}
+
+	if nil == node.firstChild {
+		// 说明找到了选段内的叶子结点
+		*selected = append(*selected, node)
+		return
+	}
+
+	// 在子节点中递归查找
+	for c := node.firstChild; nil != c; c = c.next {
+		r.findSelection(c, startLn, startCol, endLn, endCol, selected)
+	}
+	return
 }

@@ -135,10 +135,12 @@ func (lute *Lute) RenderVditorDOM(markdownText string, start, end int) (html str
 		return
 	}
 
-	// 光标位置映射
-
-
 	renderer := lute.newVditorRenderer(tree.Root)
+	// 光标位置映射
+	sLn, sCol := tree.unidim2BidimTxt(markdownText, start)
+	eLn, eCol := tree.unidim2BidimTxt(markdownText, end)
+	renderer.mapSelection(tree.Root, sLn, sCol, eLn,eCol)
+
 	var output items
 	output, err = renderer.Render()
 	html = string(output)
@@ -190,7 +192,7 @@ func (lute *Lute) SpinVditorDOM(html string) (newHTML string, err error) {
 // VditorNewline 用于在类型为 blockType 的块中进行换行生成新的 Vditor 节点。
 // param 用于传递生成某些块换行所需的参数，比如在列表项中换行需要传列表项标记符和分隔符。
 func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}) (html string, err error) {
-	renderer := lute.newVditorRenderer(nil).(*VditorRenderer)
+	renderer := lute.newVditorRenderer(nil)
 
 	switch blockType {
 	case NodeParagraph:

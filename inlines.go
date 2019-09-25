@@ -50,7 +50,7 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 		ctx := &InlineContext{
 			tokens:    tokens,
 			tokensLen: length,
-			lineNum:   node.ranges[0].startLine,
+			lineNum:   node.ranges[0].startLn,
 			columnNum: node.ranges[0].startCol,
 		}
 

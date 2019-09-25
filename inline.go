@@ -342,8 +342,8 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, start)
 	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
 	ret.ranges = append(ret.ranges, []*Range{{
-		startLine: sBLn, startCol: ctx.columnNum + sBCol,
-		endLine: eBLn, endCol: ctx.columnNum + eBCol}}...)
+		startLn: sBLn, startCol: ctx.columnNum + sBCol,
+		endLn: eBLn, endCol: ctx.columnNum + eBCol}}...)
 
 	return
 }
@@ -379,10 +379,10 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 		ret = &Node{typ: NodeSoftBreak}
 	}
 	ret.ranges = []*Range{{
-		startLine: ctx.lineNum,
-		startCol:  ctx.columnNum + ctx.pos - 1,
-		endLine:   ctx.lineNum,
-		endCol:    ctx.columnNum + ctx.pos,
+		startLn:  ctx.lineNum,
+		startCol: ctx.columnNum + ctx.pos - 1,
+		endLn:    ctx.lineNum,
+		endCol:   ctx.columnNum + ctx.pos,
 	}}
 	return
 }

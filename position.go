@@ -31,3 +31,20 @@ func (t *Tree) unidim2Bidim(tokens items, uCol int) (bLn, bCol int) {
 	bCol -= bLn - 1 // 减去 \n 个数
 	return
 }
+
+func (t *Tree) unidim2BidimTxt(markdownText string, offset int) (ln, col int) {
+	ln = 1
+	length := len(markdownText)
+	var token byte
+	for i := 0; i < length && i < offset; i++ {
+		token = markdownText[i]
+		if itemNewline == token {
+			ln++
+			col = 1
+			continue
+		}
+		col++
+	}
+	col -= ln - 1 // 减去 \n 个数
+	return
+}

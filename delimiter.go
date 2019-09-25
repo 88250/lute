@@ -45,10 +45,10 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, startPos)
 	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
 	node := &Node{typ: NodeText, tokens: text, ranges: []*Range{{
-		startLine: sBLn,
-		startCol:  ctx.columnNum + sBCol,
-		endLine:   eBLn,
-		endCol:    ctx.columnNum + eBCol,
+		startLn:  sBLn,
+		startCol: ctx.columnNum + sBCol,
+		endLn:    eBLn,
+		endCol:   ctx.columnNum + eBCol,
 	}}}
 	block.AppendChild(node)
 
@@ -133,7 +133,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			text = closerInl.tokens[0 : len(closerInl.tokens)-useDelims]
 			closerInl.tokens = text
 
-			emStrongDel := &Node{ranges: []*Range{{startLine: openerInl.ranges[0].startLine, startCol: openerInl.ranges[0].startCol + 1}}, close: true}
+			emStrongDel := &Node{ranges: []*Range{{startLn: openerInl.ranges[0].startLn, startCol: openerInl.ranges[0].startCol + 1}}, close: true}
 			openMarker := &Node{ranges: []*Range{openerInl.ranges[0]}, close: true}
 			closeMarker := &Node{close: true}
 			if 1 == useDelims {
@@ -179,7 +179,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			emStrongDel.PrependChild(openMarker) // 插入起始标记符
 			emStrongDel.AppendChild(closeMarker) // 插入结束标记符
 
-			emStrongDel.ranges[0].endLine = closeMarker.ranges[0].endLine
+			emStrongDel.ranges[0].endLn = closeMarker.ranges[0].endLn
 			emStrongDel.ranges[0].endCol = closeMarker.ranges[0].endCol - 1
 			openerInl.InsertAfter(emStrongDel)
 
