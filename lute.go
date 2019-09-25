@@ -127,13 +127,16 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 	}
 }
 
-// RenderVditorDOM 用于渲染 Vditor DOM。
-func (lute *Lute) RenderVditorDOM(markdownText string) (html string, err error) {
+// RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置。
+func (lute *Lute) RenderVditorDOM(markdownText string, start, end int) (html string, err error) {
 	var tree *Tree
 	tree, err = lute.parse("", items(markdownText))
 	if nil != err {
 		return
 	}
+
+	// 光标位置映射
+
 
 	renderer := lute.newVditorRenderer(tree.Root)
 	var output items
@@ -180,7 +183,7 @@ func (lute *Lute) SpinVditorDOM(html string) (newHTML string, err error) {
 	if nil != err {
 		return
 	}
-	newHTML, err = lute.RenderVditorDOM(markdown)
+	newHTML, err = lute.RenderVditorDOM(markdown, 0, 0)
 	return
 }
 

@@ -380,9 +380,9 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 	}
 	ret.ranges = []*Range{{
 		startLine: ctx.lineNum,
-		startCol:  ctx.pos,
+		startCol:  ctx.columnNum + ctx.pos - 1,
 		endLine:   ctx.lineNum,
-		endCol:    ctx.pos,
+		endCol:    ctx.columnNum + ctx.pos,
 	}}
 	return
 }

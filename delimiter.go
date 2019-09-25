@@ -42,11 +42,13 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 	delim := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
+	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, startPos)
+	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
 	node := &Node{typ: NodeText, tokens: text, ranges: []*Range{{
-		startLine: ctx.lineNum,
-		startCol:  ctx.pos,
-		endLine:   ctx.lineNum,
-		endCol:    startPos + delim.num,
+		startLine: sBLn,
+		startCol:  ctx.columnNum + sBCol,
+		endLine:   eBLn,
+		endCol:    ctx.columnNum + eBCol,
 	}}}
 	block.AppendChild(node)
 
@@ -131,12 +133,9 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			text = closerInl.tokens[0 : len(closerInl.tokens)-useDelims]
 			closerInl.tokens = text
 
-			emStrongDel := &Node{ranges: []*Range{{startLine: ctx.lineNum, startCol: ctx.columnNum}}, close: true}
-			openMarker := &Node{
-				ranges: []*Range{{startLine: ctx.lineNum, startCol: ctx.columnNum, endLine: ctx.lineNum, endCol: ctx.columnNum + 1}},
-				close:  true,
-			}
-			closeMarker := &Node{ranges: []*Range{{}}, close: true}
+			emStrongDel := &Node{ranges: []*Range{{startLine: openerInl.ranges[0].startLine, startCol: openerInl.ranges[0].startCol + 1}}, close: true}
+			openMarker := &Node{ranges: []*Range{openerInl.ranges[0]}, close: true}
+			closeMarker := &Node{close: true}
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
 					emStrongDel.typ = NodeEmphasis
@@ -175,18 +174,13 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				tmp = next
 			}
 
-			closeMarker.ranges = []*Range{{
-				startLine: tmp.ranges[0].startLine,
-				startCol:  tmp.ranges[0].startCol,
-				endLine:   tmp.ranges[0].endLine,
-				endCol:    tmp.ranges[0].endCol + 1,
-			}}
+			closeMarker.ranges = []*Range{tmp.ranges[0]}
 
 			emStrongDel.PrependChild(openMarker) // 插入起始标记符
 			emStrongDel.AppendChild(closeMarker) // 插入结束标记符
 
 			emStrongDel.ranges[0].endLine = closeMarker.ranges[0].endLine
-			emStrongDel.ranges[0].endCol = closeMarker.ranges[0].endCol
+			emStrongDel.ranges[0].endCol = closeMarker.ranges[0].endCol - 1
 			openerInl.InsertAfter(emStrongDel)
 
 			// remove elts between opener and closer in delimiters stack
