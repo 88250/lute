@@ -596,7 +596,7 @@ func (r *VditorRenderer) mapSelection(root *Node, startLn, startCol, endLn, endC
 	}
 	for _, node := range nodes {
 		node.caret = "start"
-		node.caretOffset = node.ranges[0].startCol
+		node.caretOffset = startCol - node.ranges[0].startCol
 	}
 }
 
