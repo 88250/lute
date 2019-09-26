@@ -42,14 +42,7 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 	delim := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
-	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, startPos)
-	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
-	node := &Node{typ: NodeText, tokens: text, ranges: []*Range{{
-		startLn:  sBLn,
-		startCol: ctx.columnNum + sBCol,
-		endLn:    eBLn,
-		endCol:   ctx.columnNum + eBCol,
-	}}}
+	node := &Node{typ: NodeText, tokens: text}
 	block.AppendChild(node)
 
 	// 将这个分隔符入栈
@@ -133,9 +126,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			text = closerInl.tokens[0 : len(closerInl.tokens)-useDelims]
 			closerInl.tokens = text
 
-			emStrongDel := &Node{ranges: []*Range{{startLn: openerInl.ranges[0].startLn, startCol: openerInl.ranges[0].startCol + 1}}, close: true}
-			openMarker := &Node{ranges: []*Range{openerInl.ranges[0]}, close: true}
-			closeMarker := &Node{close: true}
+			openMarker, emStrongDel, closeMarker := &Node{close: true}, &Node{close: true}, &Node{close: true}
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
 					emStrongDel.typ = NodeEmphasis
@@ -174,13 +165,8 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				tmp = next
 			}
 
-			closeMarker.ranges = []*Range{tmp.ranges[0]}
-
 			emStrongDel.PrependChild(openMarker) // 插入起始标记符
 			emStrongDel.AppendChild(closeMarker) // 插入结束标记符
-
-			emStrongDel.ranges[0].endLn = closeMarker.ranges[0].endLn
-			emStrongDel.ranges[0].endCol = closeMarker.ranges[0].endCol - 1
 			openerInl.InsertAfter(emStrongDel)
 
 			// remove elts between opener and closer in delimiters stack

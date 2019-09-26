@@ -610,7 +610,7 @@ func (r *VditorRenderer) mapSelection(root *Node, startLn, startCol, endLn, endC
 	}
 	for _, node := range nodes {
 		node.caret = "start"
-		node.caretOffset = startCol - node.ranges[0].startCol
+		node.caretOffset = 1024
 	}
 	if 0 < len(nodes) {
 		r.expand(nodes[0])
@@ -632,17 +632,18 @@ func (r *VditorRenderer) expand(node *Node) {
 }
 
 func (r *VditorRenderer) findSelection(node *Node, startLn, startCol, endLn, endCol int, selected *[]*Node) {
-	for _, rng := range node.ranges {
-		if rng.startLn > startLn || rng.endLn < endLn {
-			return
-		}
-		if rng.startLn == startLn && (rng.startCol > startCol) {
-			return
-		}
-		if rng.endLn == endLn && (rng.endCol < endCol) {
-			return
-		}
-	}
+	// TODO: 选段查找
+	//for _, rng := range node.ranges {
+	//	if rng.startLn > startLn || rng.endLn < endLn {
+	//		return
+	//	}
+	//	if rng.startLn == startLn && (rng.startCol > startCol) {
+	//		return
+	//	}
+	//	if rng.endLn == endLn && (rng.endCol < endCol) {
+	//		return
+	//	}
+	//}
 
 	if nil == node.firstChild {
 		// 说明找到了选段内的叶子结点

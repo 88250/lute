@@ -23,7 +23,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &Node{typ: NodeDocument, ranges: []*Range{{startLn: 1, startCol: 1}}}
+	tree.Root = &Node{typ: NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
@@ -45,7 +45,6 @@ type Context struct {
 	lineNum, offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的行号、下标、缩进空格数等
 	indented, blank, partiallyConsumedTab, allClosed                  bool  // 是否是缩进行、空行等标识
 	lastMatchedContainer                                              *Node // 最后一个匹配的块节点
-	lastLineLen                                                       int   // 最后一行行长
 }
 
 // InlineContext 描述了行级元素解析上下文。
@@ -142,15 +141,13 @@ func (context *Context) closeUnmatchedBlocks() {
 func (context *Context) finalize(block *Node, lineNum int) {
 	var parent = block.parent
 	block.close = true
-	block.ranges[0].endLn = lineNum
-	block.ranges[0].endCol = context.lastLineLen + 1
 	block.Finalize(context)
 	context.tip = parent
 }
 
 // addChildMarker 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。
-func (context *Context) addChildMarker(nodeType nodeType, rng *Range) (ret *Node) {
-	ret = &Node{typ: nodeType, ranges: []*Range{rng}, close: true}
+func (context *Context) addChildMarker(nodeType nodeType) (ret *Node) {
+	ret = &Node{typ: nodeType, close: true}
 	context.tip.AppendChild(ret)
 	return ret
 }
@@ -162,8 +159,7 @@ func (context *Context) addChild(nodeType nodeType, offset int) (ret *Node) {
 		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
-	columnNum := offset + 1 // offset 0 = column 1
-	ret = &Node{typ: nodeType, ranges: []*Range{{startLn: context.lineNum, startCol: columnNum}}}
+	ret = &Node{typ: nodeType}
 	context.tip.AppendChild(ret)
 	context.tip = ret
 	return ret

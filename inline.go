@@ -133,7 +133,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	opener := ctx.brackets
 	if nil == opener {
 		ctx.pos++
-		return t.newNode(NodeText, closeBracket, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
+		return &Node{typ: NodeText, tokens: closeBracket}
 	}
 
 	if !opener.active {
@@ -273,23 +273,15 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		t.removeBracket(ctx) // remove this opener from stack
 		ctx.pos = startPos
 		ctx.pos++
-		return t.newNode(NodeText, closeBracket, ctx.lineNum, ctx.columnNum+startPos, ctx.lineNum, ctx.columnNum+ctx.pos)
+		return &Node{typ: NodeText, tokens: closeBracket}
 	}
 }
 
 var openBracket = toItems("[")
 
 func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
-	startPos := ctx.pos
 	ctx.pos++
-	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, startPos)
-	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
-	ret = &Node{typ: NodeText, tokens: openBracket, ranges: []*Range{{
-		startLn:  sBLn,
-		startCol: ctx.columnNum + sBCol,
-		endLn:    eBLn,
-		endCol:   ctx.columnNum + eBCol,
-	}}}
+	ret = &Node{typ: NodeText, tokens: openBracket}
 	// 将 [ 入栈
 	t.addBracket(ret, ctx.pos, false, ctx)
 	return
@@ -319,20 +311,20 @@ var backslash = toItems("\\")
 func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 	if ctx.pos == ctx.tokensLen-1 {
 		ctx.pos++
-		return t.newNode(NodeText, backslash, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
+		return &Node{typ: NodeText, tokens: backslash}
 	}
 
 	ctx.pos++
 	token := ctx.tokens[ctx.pos]
 	if itemNewline == token {
 		ctx.pos++
-		return t.newNode(NodeHardBreak, items{token}, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
+		return &Node{typ: NodeHardBreak, tokens: items{token}}
 	}
 	if isASCIIPunct(token) {
 		ctx.pos++
-		return t.newNode(NodeText, items{token}, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
+		return &Node{typ: NodeText, tokens: items{token}}
 	}
-	return t.newNode(NodeText, backslash, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
+	return &Node{typ: NodeText, tokens: backslash}
 }
 
 func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
@@ -347,12 +339,6 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 	}
 
 	ret = &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos]}
-	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, start)
-	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
-	ret.ranges = append(ret.ranges, []*Range{{
-		startLn: sBLn, startCol: ctx.columnNum + sBCol,
-		endLn: eBLn, endCol: ctx.columnNum + eBCol}}...)
-
 	return
 }
 
@@ -364,7 +350,7 @@ func (t *Tree) isMarker(token byte) bool {
 		itemDollar == token
 }
 
-func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
+func (t *Tree) parseNewline(block *Node, ctx *InlineContext) *Node {
 	ctx.pos++
 
 	hardbreak := false
@@ -382,15 +368,7 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 	}
 
 	if hardbreak {
-		ret = &Node{typ: NodeHardBreak}
-	} else {
-		ret = &Node{typ: NodeSoftBreak}
+		return &Node{typ: NodeHardBreak}
 	}
-	ret.ranges = []*Range{{
-		startLn:  ctx.lineNum,
-		startCol: ctx.columnNum + ctx.pos - 1,
-		endLn:    ctx.lineNum,
-		endCol:   ctx.columnNum + ctx.pos,
-	}}
-	return
+	return &Node{typ: NodeSoftBreak}
 }

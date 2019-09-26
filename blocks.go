@@ -56,7 +56,6 @@ func (t *Tree) incorporateLine(line items) {
 			allMatched = false
 			break
 		case 2: // 匹配围栏代码块闭合，处理下一行
-			t.context.lastLineLen = t.context.currentLineLen
 			return
 		}
 
@@ -135,8 +134,7 @@ func (t *Tree) incorporateLine(line items) {
 			!(typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
 				(typ == NodeMathBlock) || // 数学公式块不计入空行判断
-				(typ == NodeListItem && nil == container.firstChild) && // 内容为空的列表项也不计入空行判断
-					container.ranges[0].startLn == t.context.lineNum)
+				(typ == NodeListItem && nil == container.firstChild)) // 内容为空的列表项也不计入空行判断
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 lastLineBlank
 		// lastLineBlank 目前仅在判断列表紧凑模式上使用
 		for cont := container; nil != cont; cont = cont.parent {
@@ -161,7 +159,6 @@ func (t *Tree) incorporateLine(line items) {
 			t.addLine()
 		}
 	}
-	t.context.lastLineLen = t.context.currentLineLen - 1 // 减掉结尾的 \n
 }
 
 // blockStartFunc 定义了用于判断块是否开始的函数签名。
@@ -192,12 +189,7 @@ var blockStarts = []blockStartFunc{
 
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(NodeBlockquote, t.context.nextNonspace)
-				t.context.addChildMarker(NodeBlockquoteMarker, &Range{
-					startLn:  t.context.lineNum,
-					startCol: markerStartCol,
-					endLn:    t.context.lineNum,
-					endCol:   markerEndCol,
-				})
+				t.context.addChildMarker(NodeBlockquoteMarker)
 				return 1
 			}
 		}
@@ -279,14 +271,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				if value := container.tokens; 0 < len(value) {
-					child := &Node{typ: NodeHeading, headingLevel: level,
-						ranges: []*Range{{
-							startLn:  container.ranges[0].startLn,
-							startCol: container.ranges[0].startCol,
-							endLn:    container.ranges[0].endLn,
-							endCol:   container.ranges[0].endCol,
-						}},
-					}
+					child := &Node{typ: NodeHeading, headingLevel: level}
 					child.tokens = bytes.TrimSpace(value)
 					container.InsertAfter(child)
 					container.Unlink()

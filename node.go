@@ -43,7 +43,7 @@ type Node struct {
 	//   [[1:4-1:13], [2:3-2:6]]
 	// 即第 1 个 range 是从第 1 行第 4 列开始到第 1 行第 13 列结束；
 	// 第 2 个 range 是从第 2 行第 3 列开始到第 2 行第 6 列结束。
-	ranges []*Range
+	//ranges []*Range
 
 	// 代码
 
@@ -97,21 +97,13 @@ type Node struct {
 	caretOffset int
 }
 
-// newNode 根据指定的节点类型 typ 和 tokens 创建一个新节点。
-func (t *Tree) newNode(typ nodeType, tokens items, startLn, startCol, endLn, endCol int) *Node {
-	return &Node{
-		typ:    typ,
-		tokens: tokens,
-		ranges: []*Range{{startLn: startLn, startCol: startCol, endLn: endLn, endCol: endCol}}}
-}
-
-// Range 描述了源码位置起始和结束行列。
-type Range struct {
-	startLn  int // 开始行
-	startCol int // 开始列
-	endLn    int // 结束行
-	endCol   int // 结束列
-}
+//// Range 描述了源码位置起始和结束行列。
+//type Range struct {
+//	startLn  int // 开始行
+//	startCol int // 开始列
+//	endLn    int // 结束行
+//	endCol   int // 结束列
+//}
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
 func (n *Node) Finalize(context *Context) {

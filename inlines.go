@@ -47,12 +47,7 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 			return
 		}
 
-		ctx := &InlineContext{
-			tokens:    tokens,
-			tokensLen: length,
-			lineNum:   node.ranges[0].startLn,
-			columnNum: node.ranges[0].startCol,
-		}
+		ctx := &InlineContext{tokens: tokens, tokensLen: length}
 
 		// 生成该块节点的行级子节点
 		t.parseInline(node, ctx)
@@ -88,10 +83,10 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 	}
 
 	// 遍历处理子节点，通过并行处理提升性能
-	//cwg := &sync.WaitGroup{}
+	cwg := &sync.WaitGroup{}
 	for child := node.firstChild; nil != child; child = child.next {
-		//cwg.Add(1)
-		t.walkParseInline(child, nil)
+		cwg.Add(1)
+		go t.walkParseInline(child, cwg)
 	}
-	//cwg.Wait()
+	cwg.Wait()
 }
