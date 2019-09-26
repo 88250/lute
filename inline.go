@@ -318,7 +318,8 @@ var backslash = toItems("\\")
 
 func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 	if ctx.pos == ctx.tokensLen-1 {
-		return t.newNode(NodeText, backslash, ctx.lineNum, ctx.columnNum+ctx.pos, ctx.lineNum, ctx.columnNum+ctx.pos+1)
+		ctx.pos++
+		return t.newNode(NodeText, backslash, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
 	}
 
 	ctx.pos++
@@ -331,7 +332,7 @@ func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 		ctx.pos++
 		return t.newNode(NodeText, items{token}, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
 	}
-	return t.newNode(NodeText, backslash, ctx.lineNum, ctx.columnNum+ctx.pos, ctx.lineNum, ctx.columnNum+ctx.pos+1)
+	return t.newNode(NodeText, backslash, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
 }
 
 func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
