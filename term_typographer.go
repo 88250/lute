@@ -204,5 +204,7 @@ var terms = map[string]string{
 	"spring":        "Spring",
 	"springboot":    "SpringBoot",
 	"springcloud":   "SpringCloud",
+	"sprintmvc":     "SpringMVC",
+	"mybatis":       "MyBatis",
 	"qq":            "QQ",
 }
