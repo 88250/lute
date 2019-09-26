@@ -202,7 +202,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 
 		if 0 < len(consumed) {
 			text := &Node{typ: NodeText, tokens: consumed}
-			node.InsertBefore(text)
+			node.InsertAfter(text)
 			consumed = make(items, 0, 256)
 		}
 
@@ -218,7 +218,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		if i == j { // 第一个字符就断开了
 			url = append(url, token)
 			text := &Node{typ: NodeText, tokens: url}
-			node.InsertBefore(text)
+			node.InsertAfter(text)
 			i++
 			continue
 		}
@@ -236,7 +236,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		domain := url[:k]
 		if !t.isValidDomain(domain) {
 			text := &Node{typ: NodeText, tokens: append(protocol, url...)}
-			node.InsertBefore(text)
+			node.InsertAfter(text)
 			continue
 		}
 
@@ -335,12 +335,17 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		link := &Node{typ: NodeLink, destination: encodeDestination(dest)}
 		text := &Node{typ: NodeText, tokens: addr}
 		link.AppendChild(text)
-		node.InsertBefore(link)
+		node.InsertAfter(link)
 	}
 
 	if 0 < len(consumed) {
-		text := &Node{typ: NodeText, tokens: consumed}
-		node.InsertBefore(text)
+		text := &Node{typ: NodeText, tokens: consumed, ranges: []*Range{{
+			startLn:  node.previous.ranges[0].endLn,
+			startCol: node.previous.ranges[0].endCol,
+			endLn:    node.previous.ranges[0].endLn,
+			endCol:   node.previous.ranges[0].endCol + len(consumed),
+		}}}
+		node.InsertAfter(text)
 	}
 
 	// 处理完后传入的文本节点 node 已经被拆分为多个节点，所以可以移除自身

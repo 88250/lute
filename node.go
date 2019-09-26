@@ -92,8 +92,17 @@ type Node struct {
 	mathBlockDollarOffset int
 
 	// Vditor
+	expand      bool
 	caret       string
 	caretOffset int
+}
+
+// newNode 根据指定的节点类型 typ 和 tokens 创建一个新节点。
+func (t *Tree) newNode(typ nodeType, tokens items, startLn, startCol, endLn, endCol int) *Node {
+	return &Node{
+		typ:    typ,
+		tokens: tokens,
+		ranges: []*Range{{startLn: startLn, startCol: startCol, endLn: endLn, endCol: endCol}}}
 }
 
 // Range 描述了源码位置起始和结束行列。

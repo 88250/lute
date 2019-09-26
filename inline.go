@@ -133,8 +133,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	opener := ctx.brackets
 	if nil == opener {
 		ctx.pos++
-		// no matched opener, just return a literal
-		return &Node{typ: NodeText, tokens: closeBracket}
+		return t.newNode(NodeText, closeBracket, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
 	}
 
 	if !opener.active {
@@ -274,15 +273,23 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		t.removeBracket(ctx) // remove this opener from stack
 		ctx.pos = startPos
 		ctx.pos++
-		return &Node{typ: NodeText, tokens: closeBracket}
+		return t.newNode(NodeText, closeBracket, ctx.lineNum, ctx.columnNum+startPos, ctx.lineNum, ctx.columnNum+ctx.pos)
 	}
 }
 
 var openBracket = toItems("[")
 
 func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
+	startPos := ctx.pos
 	ctx.pos++
-	ret = &Node{typ: NodeText, tokens: openBracket}
+	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, startPos)
+	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
+	ret = &Node{typ: NodeText, tokens: openBracket, ranges: []*Range{{
+		startLn:  sBLn,
+		startCol: ctx.columnNum + sBCol,
+		endLn:    eBLn,
+		endCol:   ctx.columnNum + eBCol,
+	}}}
 	// 将 [ 入栈
 	t.addBracket(ret, ctx.pos, false, ctx)
 	return
@@ -309,22 +316,22 @@ func (t *Tree) removeBracket(ctx *InlineContext) {
 
 var backslash = toItems("\\")
 
-func (t *Tree) parseBackslash(ctx *InlineContext) (ret *Node) {
-	if ctx.tokensLen-1 > ctx.pos {
-		ctx.pos++
-	}
-	token := ctx.tokens[ctx.pos]
-	if itemNewline == token {
-		ret = &Node{typ: NodeHardBreak}
-		ctx.pos++
-	} else if isASCIIPunct(token) {
-		ret = &Node{typ: NodeText, tokens: items{token}}
-		ctx.pos++
-	} else {
-		ret = &Node{typ: NodeText, tokens: backslash}
+func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
+	if ctx.pos == ctx.tokensLen-1 {
+		return t.newNode(NodeText, backslash, ctx.lineNum, ctx.columnNum+ctx.pos, ctx.lineNum, ctx.columnNum+ctx.pos+1)
 	}
 
-	return
+	ctx.pos++
+	token := ctx.tokens[ctx.pos]
+	if itemNewline == token {
+		ctx.pos++
+		return t.newNode(NodeHardBreak, items{token}, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
+	}
+	if isASCIIPunct(token) {
+		ctx.pos++
+		return t.newNode(NodeText, items{token}, ctx.lineNum, ctx.columnNum+ctx.pos-1, ctx.lineNum, ctx.columnNum+ctx.pos)
+	}
+	return t.newNode(NodeText, backslash, ctx.lineNum, ctx.columnNum+ctx.pos, ctx.lineNum, ctx.columnNum+ctx.pos+1)
 }
 
 func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {

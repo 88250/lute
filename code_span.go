@@ -24,14 +24,28 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	backticks := ctx.tokens[startPos : startPos+n]
 	if ctx.tokensLen <= startPos+n {
 		ctx.pos += n
-		ret = &Node{typ: NodeText, tokens: backticks}
+		sBLn, sBCol := t.unidim2Bidim(ctx.tokens, startPos)
+		eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
+		ret = &Node{typ: NodeText, tokens: backticks, ranges: []*Range{{
+			startLn:  sBLn,
+			startCol: ctx.columnNum + sBCol,
+			endLn:    eBLn,
+			endCol:   ctx.columnNum + eBCol,
+		}}}
 		return
 	}
 
 	endPos := t.matchCodeSpanEnd(ctx.tokens[startPos+n:], n)
 	if 1 > endPos {
 		ctx.pos += n
-		ret = &Node{typ: NodeText, tokens: backticks}
+		sBLn, sBCol := t.unidim2Bidim(ctx.tokens, startPos)
+		eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
+		ret = &Node{typ: NodeText, tokens: backticks, ranges: []*Range{{
+			startLn:  sBLn,
+			startCol: ctx.columnNum + sBCol,
+			endLn:    eBLn,
+			endCol:   ctx.columnNum + eBCol,
+		}}}
 		return
 	}
 	endPos = startPos + endPos + n
@@ -44,7 +58,15 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 		textTokens = textTokens[:len(textTokens)-1]
 	}
 
-	ret = &Node{typ: NodeCodeSpan, tokens: textTokens, codeMarkerLen: n}
+	sBLn, sBCol := t.unidim2Bidim(ctx.tokens, startPos)
+	eBLn, eBCol := t.unidim2Bidim(ctx.tokens, ctx.pos)
+	ret = &Node{typ: NodeCodeSpan, tokens: textTokens, codeMarkerLen: n,
+		ranges: []*Range{{
+			startLn:  sBLn,
+			startCol: ctx.columnNum + sBCol,
+			endLn:    eBLn,
+			endCol:   ctx.columnNum + eBCol,
+		}}}
 	ctx.pos = endPos + n
 	return
 }

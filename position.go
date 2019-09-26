@@ -33,7 +33,11 @@ func (t *Tree) unidim2Bidim(tokens items, uCol int) (bLn, bCol int) {
 }
 
 func (t *Tree) unidim2BidimTxt(markdownText string, offset int) (ln, col int) {
-	ln = 1
+	ln, col = 1, 1
+	if 0 == offset {
+		return
+	}
+
 	length := len(markdownText)
 	var token byte
 	for i := 0; i < length && i < offset; i++ {

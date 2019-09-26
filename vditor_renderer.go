@@ -17,6 +17,7 @@ package lute
 import (
 	"bytes"
 	"strconv"
+	"strings"
 )
 
 // VditorRenderer 描述了 Vditor DOM 渲染器。
@@ -561,6 +562,9 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 			if "" != node.caret {
 				attrs = append(attrs, []string{"data-caret", node.caret}, []string{"data-caretoffset", strconv.Itoa(node.caretOffset)})
 			}
+			if node.expand {
+				r.appendClass(&attrs, "node--expand")
+			}
 		}
 		for _, attr := range attrs {
 			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
@@ -570,6 +574,16 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 		r.writeString(" /")
 	}
 	r.writeString(">")
+}
+
+func (r *VditorRenderer) appendClass(attrs *[][]string, class string) {
+	for _, attr := range *attrs {
+		if "class" == attr[0] && !strings.Contains(attr[1], class) {
+			attr[1] += " " + class
+			return
+		}
+	}
+	*attrs = append(*attrs, []string{"class", class})
 }
 
 // mtype 返回节点类型 nodeType 对应的 Markdown 元素类型。
@@ -598,6 +612,23 @@ func (r *VditorRenderer) mapSelection(root *Node, startLn, startCol, endLn, endC
 		node.caret = "start"
 		node.caretOffset = startCol - node.ranges[0].startCol
 	}
+	if 0 < len(nodes) {
+		r.expand(nodes[0])
+	}
+}
+
+// expand 用于在 node 上或者 node 的祖先节点上标记展开。
+func (r *VditorRenderer) expand(node *Node) {
+	for p := node; nil != p; p = p.parent {
+		if "0" == r.mtype(p.typ) {
+			return
+		}
+		switch p.typ {
+		case NodeEmphasis, NodeStrong, NodeBlockquoteMarker, NodeListItem:
+			p.expand = true
+			return
+		}
+	}
 }
 
 func (r *VditorRenderer) findSelection(node *Node, startLn, startCol, endLn, endCol int, selected *[]*Node) {
@@ -605,7 +636,10 @@ func (r *VditorRenderer) findSelection(node *Node, startLn, startCol, endLn, end
 		if rng.startLn > startLn || rng.endLn < endLn {
 			return
 		}
-		if rng.startCol > startCol || rng.endCol < endCol {
+		if rng.startLn == startLn && (rng.startCol > startCol) {
+			return
+		}
+		if rng.endLn == endLn && (rng.endCol < endCol) {
 			return
 		}
 	}
