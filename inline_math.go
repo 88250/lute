@@ -12,7 +12,7 @@
 
 package lute
 
-var dollar = toItems("$")
+var dollar = toBytes("$")
 
 func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	if 2 > ctx.tokensLen {

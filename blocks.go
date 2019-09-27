@@ -12,10 +12,6 @@
 
 package lute
 
-import (
-	"bytes"
-)
-
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
@@ -77,7 +73,7 @@ func (t *Tree) incorporateLine(line items) {
 
 		// 如果不由潜在的节点标记符开头 ^[#`~*+_=<>0-9-$]，则说明不用继续迭代生成子节点
 		// 这里仅做简单判断的话可以提升一些性能
-		maybeMarker := t.context.currentLine[t.context.nextNonspace]
+		maybeMarker := t.context.currentLine[t.context.nextNonspace].term
 		if !t.context.indented && // 缩进代码块
 			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // 无序列表
 			!isDigit(maybeMarker) && // 有序列表
@@ -147,7 +143,8 @@ func (t *Tree) incorporateLine(line items) {
 				// HTML 块（类型 1-5）需要检查是否满足闭合条件
 				html := container
 				if html.htmlBlockType >= 1 && html.htmlBlockType <= 5 {
-					if t.isHTMLBlockClose(t.context.currentLine[t.context.offset:], html.htmlBlockType) {
+					tokens := itemsToBytes(t.context.currentLine[t.context.offset:])
+					if t.isHTMLBlockClose(tokens, html.htmlBlockType) {
 						t.context.finalize(container, t.context.lineNum)
 					}
 				}
@@ -262,7 +259,7 @@ var blockStarts = []blockStartFunc{
 
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
-				for tokens := container.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.tokens {
+				for tokens := container.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0].term; tokens = container.tokens {
 					if remains := t.context.parseLinkRefDef(tokens); nil != remains {
 						container.tokens = remains
 					} else {
@@ -272,7 +269,7 @@ var blockStarts = []blockStartFunc{
 
 				if value := container.tokens; 0 < len(value) {
 					child := &Node{typ: NodeHeading, headingLevel: level}
-					child.tokens = bytes.TrimSpace(value)
+					//TODO: child.tokens = bytes.TrimSpace(value)
 					container.InsertAfter(child)
 					container.Unlink()
 					t.context.tip = child
@@ -287,7 +284,7 @@ var blockStarts = []blockStartFunc{
 	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
-			tokens := t.context.currentLine[t.context.nextNonspace:]
+			tokens := itemsToBytes(t.context.currentLine[t.context.nextNonspace:])
 			if htmlType := t.parseHTML(tokens); 0 != htmlType {
 				t.context.closeUnmatchedBlocks()
 				block := t.context.addChild(NodeHTMLBlock, t.context.offset)
@@ -378,7 +375,7 @@ func (t *Tree) addLine() {
 		// add space characters:
 		var charsToTab = 4 - (t.context.column % 4)
 		for i := 0; i < charsToTab; i++ {
-			t.context.tip.AppendTokens(items{itemSpace})
+			t.context.tip.AppendTokens(strToItems(" "))
 		}
 	}
 	t.context.tip.AppendTokens(t.context.currentLine[t.context.offset:])

@@ -16,14 +16,14 @@ package lute
 
 import "unsafe"
 
-// fromItems 快速转换 items 为 string。
-func fromItems(items items) string {
-	return *(*string)(unsafe.Pointer(&items))
+// fromBytes 快速转换 []byte 为 string。
+func fromBytes(bytes []byte) string {
+	return *(*string)(unsafe.Pointer(&bytes))
 }
 
-// toItems 快速转换 str 为 items。
-func toItems(str string) items {
+// toBytes 快速转换 string 为 []byte。
+func toBytes(str string) []byte {
 	x := (*[2]uintptr)(unsafe.Pointer(&str))
 	h := [3]uintptr{x[0], x[1], x[1]}
-	return *(*items)(unsafe.Pointer(&h))
+	return *(*[]byte)(unsafe.Pointer(&h))
 }

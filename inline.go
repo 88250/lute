@@ -60,7 +60,7 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 	}
 }
 
-var and = toItems("&")
+var and = toBytes("&")
 
 func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	if 2 > ctx.tokensLen || ctx.tokensLen <= ctx.pos+1 {
@@ -88,10 +88,10 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	entityName := fromItems(ctx.tokens[start:i])
+	entityName := fromBytes(ctx.tokens[start:i])
 	if entityValue, ok := html.Entities[entityName]; ok {
 		ctx.pos += i - start
-		return &Node{typ: NodeText, tokens: toItems(entityValue)}
+		return &Node{typ: NodeText, tokens: toBytes(entityValue)}
 	}
 
 	if !endWithSemicolon {
@@ -121,10 +121,10 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 		return &Node{typ: NodeText, tokens: and}
 	}
 	ctx.pos += i - start
-	return &Node{typ: NodeText, tokens: toItems(v)}
+	return &Node{typ: NodeText, tokens: toBytes(v)}
 }
 
-var closeBracket = toItems("]")
+var closeBracket = toBytes("]")
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
 // to block's children. If there is a matching delimiter, remove it from the delimiter stack.
@@ -224,7 +224,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 
 		if nil != reflabel {
 			// 查找链接引用
-			var link = t.context.linkRefDef[strings.ToLower(fromItems(reflabel))]
+			var link = t.context.linkRefDef[strings.ToLower(fromBytes(reflabel))]
 			if nil != link {
 				dest = link.destination
 				title = link.title
@@ -277,7 +277,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	}
 }
 
-var openBracket = toItems("[")
+var openBracket = toBytes("[")
 
 func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
 	ctx.pos++
@@ -306,7 +306,7 @@ func (t *Tree) removeBracket(ctx *InlineContext) {
 	ctx.brackets = ctx.brackets.previous
 }
 
-var backslash = toItems("\\")
+var backslash = toBytes("\\")
 
 func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 	if ctx.pos == ctx.tokensLen-1 {

@@ -32,8 +32,8 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 		r.newline()
 		tokens := node.tokens
 		if nil != node.codeBlockInfo {
-			infoWords := bytes.Split(node.codeBlockInfo, items(" "))
-			language := string(infoWords[0])
+			infoWords := split(node.codeBlockInfo, itemSpace)
+			language := itemsToStr(infoWords[0])
 			rendered := false
 			if r.option.CodeSyntaxHighlight && !noHighlight(language) {
 				rendered = highlightChroma(tokens, language, r)
@@ -68,7 +68,7 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 }
 
 func highlightChroma(tokens items, language string, r *HTMLRenderer) (rendered bool) {
-	codeBlock := fromItems(tokens)
+	codeBlock := itemsToStr(tokens)
 	var lexer chroma.Lexer
 	if "" != language {
 		lexer = chromalexers.Get(language)
@@ -106,7 +106,7 @@ func highlightChroma(tokens items, language string, r *HTMLRenderer) (rendered b
 				r.writeString(" highlight-chroma")
 			}
 			r.writeString("\">")
-			r.write(b.Bytes())
+			r.writeBytes(b.Bytes())
 			rendered = true
 		}
 	}

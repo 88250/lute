@@ -42,11 +42,12 @@ func (t *Tree) parseGFMAutoLink(node *Node) {
 	}
 }
 
-var mailto = toItems("mailto:")
+var mailto = strToItems("mailto:")
+var at = strToItems("@")
 
 func (t *Tree) parseGFMAutoEmailLink0(node *Node) {
 	tokens := node.tokens
-	if 0 >= bytes.IndexByte(tokens, byte('@')) {
+	if 0 >= index(tokens, at) {
 		return
 	}
 
@@ -63,9 +64,9 @@ loopPart:
 
 		// 积攒组直到遇到空白符
 		for ; j < length; j++ {
-			token = tokens[j]
+			token = tokens[j].term
 			if !isWhitespace(token) {
-				group = append(group, token)
+				group = append(group, &item{term: token})
 				if '@' == token {
 					// 记录 @ 符号在组中的绝对位置，后面会用到
 					atIndex = j - i
@@ -76,7 +77,7 @@ loopPart:
 		}
 		if i == j {
 			// 说明积攒组时第一个字符就是空白符，那就把这个空白符作为一个文本节点插到前面
-			text := &Node{typ: NodeText, tokens: items{token}}
+			text := &Node{typ: NodeText, tokens: items{{term: token}}}
 			node.InsertBefore(text)
 			i++
 			continue
@@ -95,7 +96,7 @@ loopPart:
 
 		k = 0
 		for ; k < atIndex; k++ {
-			token = group[k]
+			token = group[k].term
 			if !t.isValidEmailSegment1(token) {
 				text := &Node{typ: NodeText, tokens: group}
 				node.InsertBefore(text)
@@ -105,7 +106,7 @@ loopPart:
 
 		k++ // 跳过 @ 检查后面的部分
 		for ; k < len(group); k++ {
-			token = group[k]
+			token = group[k].term
 			if !t.isValidEmailSegment2(token) {
 				text := &Node{typ: NodeText, tokens: group}
 				node.InsertBefore(text)
@@ -122,7 +123,7 @@ loopPart:
 			link.AppendChild(text)
 			node.InsertBefore(link)
 			// . 作为文本节点插入
-			text = &Node{typ: NodeText, tokens: items{itemDot}}
+			text = &Node{typ: NodeText, tokens: items{{term: itemDot}}}
 			node.InsertBefore(text)
 		} else if itemHyphen == token || itemUnderscore == token {
 			// 如果以 - 或者 _ 结尾则整个串都不能算作邮件链接
@@ -152,15 +153,15 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 }
 
 var (
-	httpProto  = toItems("http://")
-	httpsProto = toItems("https://")
-	ftpProto   = toItems("ftp://")
+	httpProto  = strToItems("http://")
+	httpsProto = strToItems("https://")
+	ftpProto   = strToItems("ftp://")
 
 	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
-	validAutoLinkDomainSuffix = []items{items("top"), items("com"), items("net"), items("org"), items("edu"), items("gov"),
-		items("cn"), items("io"), items("me"), items("biz"), items("co"), items("live"), items("pro"), items("xyz"),
-		items("win"), items("club"), items("tv"), items("wiki"), items("site"), items("tech"), items("space"), items("cc"),
-		items("name"), items("social"), items("band"), items("pub"), items("info")}
+	validAutoLinkDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"),
+		[]byte("cn"), []byte("io"), []byte("me"), []byte("biz"), []byte("co"), []byte("live"), []byte("pro"), []byte("xyz"),
+		[]byte("win"), []byte("club"), []byte("tv"), []byte("wiki"), []byte("site"), []byte("tech"), []byte("space"), []byte("cc"),
+		[]byte("name"), []byte("social"), []byte("band"), []byte("pub"), []byte("info")}
 )
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
@@ -171,7 +172,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		return
 	}
 
-	var token byte
+	var token *item
 	var consumed = make(items, 0, 256)
 	var tmp = make(items, 0, 16)
 	www := false
@@ -182,16 +183,16 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		// 检查前缀
 		tmp = tokens[i:]
 		tmpLen := len(tmp)
-		if 8 <= tmpLen /* www.x.xx */ && 'w' == tmp[0] && 'w' == tmp[1] && 'w' == tmp[2] && '.' == tmp[3] {
+		if 8 <= tmpLen /* www.x.xx */ && 'w' == tmp[0].term && 'w' == tmp[1].term && 'w' == tmp[2].term && '.' == tmp[3].term {
 			protocol = httpProto
 			www = true
-		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == tmp[0] && 't' == tmp[1] && 't' == tmp[2] && 'p' == tmp[3] && ':' == tmp[4] && '/' == tmp[5] && '/' == tmp[6] {
+		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == tmp[0].term && 't' == tmp[1].term && 't' == tmp[2].term && 'p' == tmp[3].term && ':' == tmp[4].term && '/' == tmp[5].term && '/' == tmp[6].term {
 			protocol = httpProto
 			i += 7
-		} else if 12 <= tmpLen /* https://x.xx */ && 'h' == tmp[0] && 't' == tmp[1] && 't' == tmp[2] && 'p' == tmp[3] && 's' == tmp[4] && ':' == tmp[5] && '/' == tmp[6] && '/' == tmp[7] {
+		} else if 12 <= tmpLen /* https://x.xx */ && 'h' == tmp[0].term && 't' == tmp[1].term && 't' == tmp[2].term && 'p' == tmp[3].term && 's' == tmp[4].term && ':' == tmp[5].term && '/' == tmp[6].term && '/' == tmp[7].term {
 			protocol = httpsProto
 			i += 8
-		} else if 10 <= tmpLen /* ftp://x.xx */ && 'f' == tmp[0] && 't' == tmp[1] && 'p' == tmp[2] && ':' == tmp[3] && '/' == tmp[4] && '/' == tmp[5] {
+		} else if 10 <= tmpLen /* ftp://x.xx */ && 'f' == tmp[0].term && 't' == tmp[1].term && 'p' == tmp[2].term && ':' == tmp[3].term && '/' == tmp[4].term && '/' == tmp[5].term {
 			protocol = ftpProto
 			i += 6
 		} else {
@@ -210,7 +211,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		j = i
 		for ; j < length; j++ {
 			token = tokens[j]
-			if (isWhitespace(token) || itemLess == token) || (!isASCIIPunct(token) && !isASCIILetterNum(token)) {
+			if (isWhitespace(token.term) || itemLess == token.term) || (!isASCIIPunct(token.term) && !isASCIILetterNum(token.term)) {
 				break
 			}
 			url = append(url, token)
@@ -229,12 +230,13 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		k = 0
 		for ; k < len(url); k++ {
 			token = url[k]
-			if itemSlash == token {
+			if itemSlash == token.term {
 				break
 			}
 		}
 		domain := url[:k]
-		if !t.isValidDomain(domain) {
+		domainBytes := itemsToBytes(domain) // TODO 性能优化
+		if !t.isValidDomain(domainBytes) {
 			text := &Node{typ: NodeText, tokens: append(protocol, url...)}
 			node.InsertBefore(text)
 			continue
@@ -249,23 +251,23 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			// 统计圆括号个数
 			for l = 0; l < length; l++ {
 				token = path[l]
-				if itemOpenParen == token {
+				if itemOpenParen == token.term {
 					openParens++
-				} else if itemCloseParen == token {
+				} else if itemCloseParen == token.term {
 					closeParens++
 				}
 			}
 
 			trimmed := false
 			lastToken := path[length-1]
-			if itemCloseParen == lastToken {
+			if itemCloseParen == lastToken.term {
 				// 以 ) 结尾的话需要计算圆括号匹配
 				unmatches := closeParens - openParens
 				if 0 < unmatches {
 					// 向前移动
 					for l = length - 1; 0 < unmatches; l-- {
 						token = path[l]
-						if itemCloseParen != token {
+						if itemCloseParen != token.term {
 							break
 						}
 						unmatches--
@@ -277,13 +279,13 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 					// 算作全匹配上了，不需要再处理结尾标点符号
 					trimmed = true
 				}
-			} else if itemSemicolon == lastToken {
+			} else if itemSemicolon == lastToken.term {
 				// 检查 HTML 实体
 				foundAmp := false
 				// 向前检查 & 是否存在
 				for l = length - 1; 0 <= l; l-- {
 					token = path[l]
-					if itemAmpersand == token {
+					if itemAmpersand == token.term {
 						foundAmp = true
 						break
 					}
@@ -294,7 +296,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 						// 检查截取的子串是否满足实体特征（&;中间需要是字母或数字）
 						isEntity := true
 						for j = 1; j < len(entity)-1; j++ {
-							if !isASCIILetterNum(entity[j]) {
+							if !isASCIILetterNum(entity[j].term) {
 								isEntity = false
 								break
 							}
@@ -309,14 +311,14 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			}
 
 			// 如果之前的 ) 或者 ; 没有命中处理，则进行结尾的标点符号规则处理，即标点不计入链接，需要剔掉
-			if !trimmed && isASCIIPunct(lastToken) && itemSlash != lastToken {
+			if !trimmed && isASCIIPunct(lastToken.term) && itemSlash != lastToken.term {
 				path = path[:length-1]
 				i--
 			}
 		} else {
 			length = len(domain)
 			lastToken := domain[length-1]
-			if isASCIIPunct(lastToken) {
+			if isASCIIPunct(lastToken.term) {
 				domain = domain[:length-1]
 				i--
 			}
@@ -332,7 +334,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		addr = append(addr, domain...)
 		addr = append(addr, path...)
 
-		link := &Node{typ: NodeLink, destination: encodeDestination(dest)}
+		link := &Node{typ: NodeLink, destination: strToItems(encodeDestination(dest))}
 		text := &Node{typ: NodeText, tokens: addr}
 		link.AppendChild(text)
 		node.InsertBefore(link)
@@ -349,11 +351,11 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 }
 
 // invalidAutoLinkDomain 指定了 GFM 自动链接解析时跳过的域名。
-var invalidAutoLinkDomain []items
+var invalidAutoLinkDomain [][]byte
 
 // isValidDomain 校验 GFM 规范自动链接规则中定义的合法域名。
 // https://github.github.com/gfm/#valid-domain
-func (t *Tree) isValidDomain(domain items) bool {
+func (t *Tree) isValidDomain(domain []byte) bool {
 	segments := bytes.Split(domain, []byte("."))
 	length := len(segments)
 	if 2 > length { // 域名至少被 . 分隔为两部分，小于两部分的话不合法
@@ -403,26 +405,26 @@ func (t *Tree) isValidDomain(domain items) bool {
 	return true
 }
 
-var markers = toItems(".!#$%&'*+/=?^_`{|}~")
+var markers = toBytes(".!#$%&'*+/=?^_`{|}~")
 
 func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens[1:]
-	var dest string
+	var dest items
 	var token byte
 	length := len(tokens)
 	passed := 0
 	i := 0
 	at := false
 	for ; i < length; i++ {
-		token = tokens[i]
-		dest += string(token)
+		token = tokens[i].term
+		dest = append(dest, &item{term: token})
 		passed++
 		if '@' == token {
 			at = true
 			break
 		}
 
-		if !isASCIILetterNumHyphen(token) && !bytes.Contains(markers, items{token}) {
+		if !isASCIILetterNumHyphen(token) && !bytes.Contains(markers, []byte{token}) {
 			return nil
 		}
 	}
@@ -436,13 +438,13 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	i = 0
 	closed := false
 	for ; i < length; i++ {
-		token = domainPart[i]
+		token = domainPart[i].term
 		passed++
 		if itemGreater == token {
 			closed = true
 			break
 		}
-		dest += string(token)
+		dest = append(dest, &item{term: token})
 		if !isASCIILetterNumHyphen(token) && itemDot != token {
 			return nil
 		}
@@ -457,7 +459,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 
 	ctx.pos += passed + 1
 	link := &Node{typ: NodeLink, destination: append(mailto, dest...)}
-	text := &Node{typ: NodeText, tokens: toItems(dest)}
+	text := &Node{typ: NodeText, tokens: dest}
 	link.AppendChild(text)
 	return link
 }
@@ -468,13 +470,13 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 	var dest items
 	var token byte
 	i := ctx.pos + 1
-	for ; i < ctx.tokensLen && itemGreater != ctx.tokens[i]; i++ {
-		token = ctx.tokens[i]
+	for ; i < ctx.tokensLen && itemGreater != ctx.tokens[i].term; i++ {
+		token = ctx.tokens[i].term
 		if itemSpace == token {
 			return nil
 		}
 
-		dest = append(dest, token)
+		dest = append(dest, &item{term: token})
 		if !schemed {
 			if itemColon != token {
 				scheme += string(token)
@@ -487,8 +489,8 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 		return nil
 	}
 
-	link := &Node{typ: NodeLink, destination: encodeDestination(dest)}
-	if itemGreater != ctx.tokens[i] {
+	link := &Node{typ: NodeLink, destination: strToItems(encodeDestination(dest))}
+	if itemGreater != ctx.tokens[i].term {
 		return nil
 	}
 

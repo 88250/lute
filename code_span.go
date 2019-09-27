@@ -16,7 +16,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	startPos := ctx.pos
 	n := 0
 	for ; startPos+n < ctx.tokensLen; n++ {
-		if itemBacktick != ctx.tokens[startPos+n] {
+		if itemBacktick != ctx.tokens[startPos+n].term {
 			break
 		}
 	}
@@ -38,7 +38,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 
 	textTokens := ctx.tokens[startPos+n : endPos]
 	textTokens.replaceAll(itemNewline, itemSpace)
-	if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !textTokens.isBlankLine() {
+	if 2 < len(textTokens) && itemSpace == textTokens[0].term && itemSpace == textTokens[len(textTokens)-1].term && !textTokens.isBlankLine() {
 		// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
 		textTokens = textTokens[1:]
 		textTokens = textTokens[:len(textTokens)-1]
@@ -55,7 +55,7 @@ func (t *Tree) matchCodeSpanEnd(tokens items, num int) (pos int) {
 		l := tokens[pos:].accept(itemBacktick)
 		if num == l {
 			next := pos + l
-			if length-1 > next && itemBacktick == tokens[next] {
+			if length-1 > next && itemBacktick == tokens[next].term {
 				continue
 			}
 			return pos

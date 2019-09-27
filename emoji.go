@@ -12,10 +12,6 @@
 
 package lute
 
-import (
-	"bytes"
-)
-
 // emoji 将 node 下文本节点中的 Emoji 别名替换为原生 Unicode 字符。
 func (t *Tree) emoji(node *Node) {
 	for child := node.firstChild; nil != child; {
@@ -30,18 +26,18 @@ func (t *Tree) emoji(node *Node) {
 	}
 }
 
-var emojiSitePlaceholder = toItems("${emojiSite}")
-var emojiDot = toItems(".")
+var emojiSitePlaceholder = strToItems("${emojiSite}")
+var emojiDot = strToItems(".")
 
 func (t *Tree) emoji0(node *Node) {
 	tokens := node.tokens
 	node.tokens = items{} // 先清空，后面逐个添加或者添加 tokens 或者 Emoji 兄弟节点
 	length := len(tokens)
 	var token byte
-	var maybeEmoji items
+	var maybeEmoji []byte
 	var pos int
 	for i := 0; i < length; {
-		token = tokens[i]
+		token = tokens[i].term
 		if i == length-1 {
 			node.tokens = append(node.tokens, tokens[pos:]...)
 			break
@@ -56,7 +52,7 @@ func (t *Tree) emoji0(node *Node) {
 
 		matchCloseColon := false
 		for pos = i + 1; pos < length; pos++ {
-			token = tokens[pos]
+			token = tokens[pos].term
 			if isWhitespace(token) {
 				break
 			}
@@ -71,18 +67,18 @@ func (t *Tree) emoji0(node *Node) {
 			continue
 		}
 
-		maybeEmoji = tokens[i+1 : pos]
+		maybeEmoji = itemsToBytes(tokens[i+1 : pos])
 		if 1 > len(maybeEmoji) {
 			node.tokens = append(node.tokens, tokens[pos])
 			i++
 			continue
 		}
 
-		if emoji, ok := t.context.option.Emojis[fromItems(maybeEmoji)]; ok {
+		if emoji, ok := t.context.option.Emojis[fromBytes(maybeEmoji)]; ok {
 			emojiNode := &Node{typ: NodeEmojiUnicode}
-			emojiTokens := toItems(emoji)
-			if bytes.Contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
-				alias := fromItems(maybeEmoji)
+			emojiTokens := strToItems(emoji)
+			if contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
+				alias := fromBytes(maybeEmoji)
 				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + t.context.option.EmojiSite + "/" + alias
 				suffix := ".png"
 				if "huaji" == alias {
@@ -91,13 +87,13 @@ func (t *Tree) emoji0(node *Node) {
 				repl += suffix + "\" title=\"" + alias + "\" />"
 
 				emojiNode.typ = NodeEmojiImg
-				emojiNode.tokens = toItems(repl)
+				emojiNode.tokens = strToItems(repl)
 				emojiNode.emojiAlias = tokens[i : pos+1]
-			} else if bytes.Contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
-				alias := fromItems(maybeEmoji)
+			} else if contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
+				alias := fromBytes(maybeEmoji)
 				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + emoji + "\" title=\"" + alias + "\" />"
 				emojiNode.typ = NodeEmojiImg
-				emojiNode.tokens = toItems(repl)
+				emojiNode.tokens = strToItems(repl)
 				emojiNode.emojiAlias = tokens[i : pos+1]
 			} else {
 				emojiNode.tokens = emojiTokens

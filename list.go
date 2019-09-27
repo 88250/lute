@@ -54,7 +54,7 @@ func (list *Node) listFinalize(context *Context) {
 	}
 }
 
-var items1 = toItems("1")
+var items1 = toBytes("1")
 
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记符。
 func (t *Tree) parseListMarker(container *Node) *listData {
@@ -79,7 +79,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
 		if container.typ != NodeParagraph || bytes.Equal(items1, marker) {
 			data.typ = 1 // 有序列表
-			data.start, _ = strconv.Atoi(fromItems(marker))
+			data.start, _ = strconv.Atoi(fromBytes(marker))
 			markerLength = len(marker) + 1
 			data.delimiter = delim
 		} else {

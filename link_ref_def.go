@@ -75,8 +75,8 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	link := &Node{typ: NodeLink, destination: destination}
 	lowerCaseLabel := bytes.ToLower(label)
 	link.title = title
-	if _, ok := context.linkRefDef[fromItems(lowerCaseLabel)]; !ok {
-		context.linkRefDef[fromItems(lowerCaseLabel)] = link
+	if _, ok := context.linkRefDef[fromBytes(lowerCaseLabel)]; !ok {
+		context.linkRefDef[fromBytes(lowerCaseLabel)] = link
 	}
 
 	return remains
@@ -128,7 +128,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		title = append(title, toItems(string(r))...)
+		title = append(title, toBytes(string(r))...)
 		if closer == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			title = title[:len(title)-1]
@@ -179,7 +179,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains, destination 
 		for j := 1; j < size; j++ {
 			ret = append(ret, tokens[i+j])
 		}
-		destination = append(destination, toItems(string(r))...)
+		destination = append(destination, toBytes(string(r))...)
 		if isWhitespace(token) || isControl(token) {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
@@ -236,7 +236,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination 
 			for j := 1; j < size; j++ {
 				ret = append(ret, tokens[i+j])
 			}
-			destination = append(destination, toItems(string(r))...)
+			destination = append(destination, toBytes(string(r))...)
 			if itemLess == token && !tokens.isBackslashEscapePunct(i) {
 				ret = nil
 				return
@@ -281,7 +281,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		label = append(label, toItems(string(r))...)
+		label = append(label, toBytes(string(r))...)
 		if itemCloseBracket == token && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			label = label[0 : len(label)-1]
@@ -300,9 +300,9 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 	}
 
 	label = bytes.TrimSpace(label)
-	label = bytes.ReplaceAll(label, toItems("\n"), toItems(" "))
-	for 0 <= bytes.Index(label, toItems("  ")) {
-		label = bytes.ReplaceAll(label, toItems("  "), toItems(" "))
+	label = bytes.ReplaceAll(label, toBytes("\n"), toBytes(" "))
+	for 0 <= bytes.Index(label, toBytes("  ")) {
+		label = bytes.ReplaceAll(label, toBytes("  "), toBytes(" "))
 	}
 	return
 }

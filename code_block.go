@@ -12,10 +12,6 @@
 
 package lute
 
-import (
-	"bytes"
-)
-
 func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
@@ -57,28 +53,26 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 		}
 
 		var i int
-		var token byte
 		for ; i < length; i++ {
-			token = content[i]
-			if itemNewline == token {
+			if itemNewline == content[i].term {
 				break
 			}
 		}
 		firstLine := content[:i]
 		rest := content[i+1:]
 
-		codeBlock.codeBlockInfo = unescapeString(bytes.TrimSpace(firstLine))
+		codeBlock.codeBlockInfo = unescapeString(trimWhitespace(firstLine))
 		codeBlock.tokens = rest
 	} else { // 缩进代码块
-		codeBlock.tokens = codeBlock.tokens.replaceNewlineSpace()
+		codeBlock.tokens = replaceNewlineSpace(codeBlock.tokens)
 	}
 }
 
-var codeBlockBacktick = items{itemBacktick}
+var codeBlockBacktick = strToItems("`")
 
 func (t *Tree) parseFencedCode() (ok bool, codeBlockFenceChar byte, codeBlockFenceLen int, codeBlockFenceOffset int, codeBlockInfo items) {
 	marker := t.context.currentLine[t.context.nextNonspace]
-	if itemBacktick != marker && itemTilde != marker {
+	if itemBacktick != marker.term && itemTilde != marker.term {
 		return
 	}
 
@@ -94,26 +88,26 @@ func (t *Tree) parseFencedCode() (ok bool, codeBlockFenceChar byte, codeBlockFen
 
 	var info items
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
-	if itemBacktick == marker && bytes.Contains(infoTokens, codeBlockBacktick) {
+	if itemBacktick == marker.term && contains(infoTokens, codeBlockBacktick) {
 		// info 部分不能包含 `
 		return
 	}
-	info = bytes.TrimSpace(infoTokens)
+	info = trimWhitespace(infoTokens)
 	info = unescapeString(info)
-	return  true, fenceChar, fenceLength, t.context.indent, info
+	return true, fenceChar.term, fenceLength, t.context.indent, info
 }
 
 func (codeBlock *Node) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
 	closeMarker := tokens[0]
-	if closeMarker != openMarker {
+	if closeMarker.term != openMarker {
 		return false
 	}
-	if num > tokens.accept(closeMarker) {
+	if num > tokens.accept(closeMarker.term) {
 		return false
 	}
-	tokens = bytes.TrimSpace(tokens)
+	tokens = trimWhitespace(tokens)
 	for _, token := range tokens {
-		if token != openMarker {
+		if token.term != openMarker {
 			return false
 		}
 	}

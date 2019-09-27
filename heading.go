@@ -17,7 +17,7 @@ import "bytes"
 func (t *Tree) parseATXHeading() (content items, level int) {
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	marker := tokens[0]
-	if itemCrosshatch != marker {
+	if itemCrosshatch != marker.term {
 		return
 	}
 
@@ -26,13 +26,13 @@ func (t *Tree) parseATXHeading() (content items, level int) {
 		return
 	}
 
-	if level < len(tokens) && !isWhitespace(tokens[level]) {
+	if level < len(tokens) && !isWhitespace(tokens[level].term) {
 		return
 	}
 
 	content = make(items, 0, 256)
 
-	tokens = bytes.TrimLeft(tokens, " \t\n")
+	tokens = bytes.TrimLeft(itemsToBytes(tokens), " \t\n")
 	tokens = bytes.TrimLeft(tokens[level:], " \t\n")
 	for _, token := range tokens {
 		if itemEnd == token || itemNewline == token {

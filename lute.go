@@ -73,7 +73,7 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 		return
 	}
 
-	html = fromItems(htmlBytes)
+	html = fromBytes(htmlBytes)
 	return
 }
 
@@ -98,7 +98,7 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 		return
 	}
 
-	formatted = fromItems(formattedBytes)
+	formatted = fromBytes(formattedBytes)
 	return
 }
 
@@ -110,7 +110,7 @@ func (lute *Lute) Space(text string) string {
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的映射列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	ret = make(map[string]string, len(lute.Emojis))
-	placeholder := fromItems(emojiSitePlaceholder)
+	placeholder := fromBytes(emojiSitePlaceholder)
 	for k, v := range lute.Emojis {
 		if strings.Contains(v, placeholder) {
 			v = strings.ReplaceAll(v, placeholder, lute.EmojiSite)
@@ -175,7 +175,7 @@ func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 	if nil != err {
 		return
 	}
-	markdown = fromItems(formatted)
+	markdown = fromBytes(formatted)
 	return
 }
 
@@ -212,7 +212,7 @@ func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}
 			marker = strconv.Itoa(num + 1)
 			marker += delim
 		}
-		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: toItems(marker), delimiter: delim[0]}}
+		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: toBytes(marker), delimiter: delim[0]}}
 		_, err = renderer.renderListItem(listItem, true)
 		if nil != err {
 			return

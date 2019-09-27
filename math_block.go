@@ -12,10 +12,6 @@
 
 package lute
 
-import (
-	"bytes"
-)
-
 func (mathBlock *Node) mathBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
@@ -39,22 +35,22 @@ func (mathBlock *Node) mathBlockContinue(context *Context) int {
 	return 0
 }
 
-var mathBlockMarker = items{itemDollar, itemDollar}
+var mathBlockMarker = strToItems("$$")
 
 func (mathBlock *Node) mathBlockFinalize(context *Context) {
 	tokens := mathBlock.tokens[2:] // 剔除开头的两个 $$
-	tokens = bytes.TrimSpace(tokens)
-	if bytes.HasSuffix(tokens, mathBlockMarker) {
+	tokens = trimWhitespace(tokens)
+	if hasSuffix(tokens, mathBlockMarker) {
 		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
 	}
 	mathBlock.tokens = tokens
 }
 
-var mathBlockDollar = items{itemDollar}
+var mathBlockDollar = strToItems("$")
 
 func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 	marker := t.context.currentLine[t.context.nextNonspace]
-	if itemDollar != marker {
+	if itemDollar != marker.term {
 		return
 	}
 
@@ -73,15 +69,15 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 
 func (mathBlock *Node) isMathBlockClose(tokens items) bool {
 	closeMarker := tokens[0]
-	if closeMarker != itemDollar {
+	if closeMarker.term != itemDollar {
 		return false
 	}
-	if 2 > tokens.accept(closeMarker) {
+	if 2 > tokens.accept(closeMarker.term) {
 		return false
 	}
-	tokens = bytes.TrimSpace(tokens)
+	tokens = trimWhitespace(tokens)
 	for _, token := range tokens {
-		if token != itemDollar {
+		if token.term != itemDollar {
 			return false
 		}
 	}

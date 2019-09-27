@@ -215,7 +215,7 @@ func (r *FormatRenderer) renderDocument(node *Node, entering bool) (WalkStatus, 
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 		buf := bytes.Trim(r.writer.Bytes(), " \t\n")
 		r.writer.Reset()
-		r.write(buf)
+		r.writeBytes(buf)
 		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
@@ -307,13 +307,13 @@ func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 		node.codeBlockFenceLen = 3
 	}
 	if entering {
-		r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
+		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
 		r.write(node.codeBlockInfo)
 		r.writeByte(itemNewline)
 		r.write(node.tokens)
 		return WalkSkipChildren, nil
 	}
-	r.write(bytes.Repeat(items{itemBacktick}, node.codeBlockFenceLen))
+	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
 	r.newline()
 	if !r.isLastNode(r.treeRoot, node) {
 		r.writeByte(itemNewline)
@@ -379,7 +379,7 @@ func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus
 
 		blockquoteLines := bytes.Buffer{}
 		buf := writer.Bytes()
-		lines := bytes.Split(buf, items{itemNewline})
+		lines := bytes.Split(buf, []byte{itemNewline})
 		length := len(lines)
 		if 2 < length && isBlank(lines[length-1]) && isBlank(lines[length-2]) {
 			lines = lines[:length-1]
@@ -407,7 +407,7 @@ func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus
 		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = bytes.TrimSpace(r.writer.Bytes())
 		r.writer.Reset()
-		r.write(buf)
+		r.writeBytes(buf)
 		r.writeString("\n\n")
 	}
 	return WalkContinue, nil
@@ -419,7 +419,7 @@ func (r *FormatRenderer) renderBlockquoteMarker(node *Node, entering bool) (Walk
 
 func (r *FormatRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(bytes.Repeat(items{itemCrosshatch}, node.headingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
+		r.writeBytes(bytes.Repeat([]byte{itemCrosshatch}, node.headingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
 	} else {
 		r.newline()
@@ -439,7 +439,7 @@ func (r *FormatRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf := bytes.TrimSpace(r.writer.Bytes())
 		r.writer.Reset()
-		r.write(buf)
+		r.writeBytes(buf)
 		r.writeString("\n\n")
 	}
 	return WalkContinue, nil
@@ -456,10 +456,10 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		if 1 == node.listData.typ {
 			indent++
 		}
-		indentSpaces := bytes.Repeat(items{itemSpace}, indent)
+		indentSpaces := bytes.Repeat([]byte{itemSpace}, indent)
 		indentedLines := bytes.Buffer{}
 		buf := writer.Bytes()
-		lines := bytes.Split(buf, items{itemNewline})
+		lines := bytes.Split(buf, []byte{itemNewline})
 		for _, line := range lines {
 			if 0 == len(line) {
 				indentedLines.WriteByte(itemNewline)
@@ -476,7 +476,7 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		if 1 == node.listData.typ {
 			listItemBuf.WriteString(strconv.Itoa(node.num) + ".")
 		} else {
-			listItemBuf.Write(node.marker)
+			listItemBuf.Write(itemsToBytes(node.marker))
 		}
 		listItemBuf.WriteByte(itemSpace)
 		buf = append(listItemBuf.Bytes(), buf...)
@@ -487,7 +487,7 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = bytes.TrimSpace(r.writer.Bytes())
 		r.writer.Reset()
-		r.write(buf)
+		r.writeBytes(buf)
 		r.writeString("\n")
 	}
 	return WalkContinue, nil

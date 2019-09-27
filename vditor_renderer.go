@@ -199,9 +199,9 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 		r.writeByte(itemOpenBracket)
 		r.tag("/span", nil, nil, false)
 
-		attrs = [][]string{{"href", fromItems(escapeHTML(node.destination))}}
+		attrs = [][]string{{"href", fromBytes(escapeHTML(node.destination))}}
 		if nil != node.title {
-			attrs = append(attrs, []string{"title", fromItems(escapeHTML(node.title))})
+			attrs = append(attrs, []string{"title", fromBytes(escapeHTML(node.title))})
 		}
 		r.tag("a", nil, attrs, false)
 	} else {
@@ -487,7 +487,7 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		if 0 != node.listData.delimiter {
 			marker = append(marker, node.listData.delimiter)
 		}
-		r.writeString(fromItems(marker) + " ")
+		r.writeString(fromBytes(marker) + " ")
 		r.tag("/span", nil, nil, false)
 		r.tag("/span", nil, nil, false)
 		r.tag("p", nil, nil, false)

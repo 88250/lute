@@ -53,7 +53,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 			} else {
 				dest = items{}
 				r, size = utf8.DecodeRune(tokens[i:])
-				runes = toItems(string(r))
+				runes = toBytes(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}
@@ -88,7 +88,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 			} else {
 				dest = items{}
 				r, size = utf8.DecodeRune(tokens[i:])
-				runes = toItems(string(r))
+				runes = toBytes(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}

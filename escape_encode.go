@@ -19,10 +19,10 @@ import (
 )
 
 var (
-	amp  = toItems("&amp;")
-	lt   = toItems("&lt;")
-	gt   = toItems("&gt;")
-	quot = toItems("&quot;")
+	amp  = strToItems("&amp;")
+	lt   = strToItems("&lt;")
+	gt   = strToItems("&gt;")
+	quot = strToItems("&quot;")
 )
 
 func escapeHTML(html items) (ret items) {
@@ -31,7 +31,7 @@ func escapeHTML(html items) (ret items) {
 	inited := false
 	ret = html
 	for ; i < length; i++ {
-		switch html[i] {
+		switch html[i].term {
 		case itemAmpersand:
 			if !inited { // 通过延迟初始化减少内存分配，下同
 				ret = make(items, 0, length+128)
@@ -78,26 +78,26 @@ func escapeHTML(html items) (ret items) {
 // - percent-encoded characters (%[0-9a-fA-F]{2});
 // - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
 // Invalid UTF-8 sequences are replaced with U+FFFD.
-func encodeDestination(rawurl items) items {
+func encodeDestination(rawurl items) string {
 	// 鸣谢 https://gitlab.com/golang-commonmark/mdurl
 
 	const hexdigit = "0123456789ABCDEF"
 	var buf bytes.Buffer
 	i := 0
 	for i < len(rawurl) {
-		r, rlen := utf8.DecodeRune(rawurl[i:])
+		r, rlen := utf8.DecodeRune(itemsToBytes(rawurl[i:]))
 		if r >= 0x80 {
 			for j, n := i, i+rlen; j < n; j++ {
-				b := rawurl[j]
+				b := rawurl[j].term
 				buf.WriteByte('%')
 				buf.WriteByte(hexdigit[(b>>4)&0xf])
 				buf.WriteByte(hexdigit[b&0xf])
 			}
 		} else if r == '%' {
-			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1]) && isHexDigit(rawurl[i+2]) {
+			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1].term) && isHexDigit(rawurl[i+2].term) {
 				buf.WriteByte('%')
-				buf.WriteByte(tokenToUpper(rawurl[i+1]))
-				buf.WriteByte(tokenToUpper(rawurl[i+2]))
+				buf.WriteByte(tokenToUpper(rawurl[i+1].term))
+				buf.WriteByte(tokenToUpper(rawurl[i+2].term))
 				i += 2
 			} else {
 				buf.WriteString("%25")
@@ -111,5 +111,5 @@ func encodeDestination(rawurl items) items {
 		}
 		i += rlen
 	}
-	return buf.Bytes()
+	return buf.String()
 }

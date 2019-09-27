@@ -24,27 +24,27 @@ func (html *Node) htmlBlockContinue(context *Context) int {
 }
 
 func (html *Node) htmlBlockFinalize(context *Context) {
-	html.tokens = bytes.TrimRight(html.tokens.replaceNewlineSpace(), " \t\n")
+	// TODO: html.tokens = bytes.TrimRight(html.tokens.replaceNewlineSpace(), " \t\n")
 }
 
 var (
-	htmlBlockTags1      = []items{items("<script"), items("<pre"), items("<style")}
-	htmlBlockCloseTags1 = []items{items("</script>"), items("</pre>"), items("</style>")}
-	htmlBlockTags6      = []items{
-		items("<address"), items("<article"), items("<aside"), items("<base"), items("<basefont"), items("<blockquote"), items("<body"), items("<caption"), items("<center"), items("<col"), items("<colgroup"), items("<dd"), items("<details"), items("<dialog"), items("<dir"), items("<div"), items("<dl"), items("<dt"), items("<fieldset"), items("<figcaption"), items("<figure"), items("<footer"), items("<form"), items("<frame"), items("<frameset"), items("<h1"), items("<h2"), items("<h3"), items("<h4"), items("<h5"), items("<h6"), items("<head"), items("<header"), items("<hr"), items("<html"), items("<iframe"), items("<legend"), items("<li"), items("<link"), items("<main"), items("<menu"), items("<menuitem"), items("<nav"), items("<noframes"), items("<ol"), items("<optgroup"), items("<option"), items("<p"), items("<param"), items("<section"), items("<source"), items("<summary"), items("<table"), items("<tbody"), items("<td"), items("<tfoot"), items("<th"), items("<thead"), items("<title"), items("<tr"), items("<track"), items("<ul"),
-		items("</address"), items("</article"), items("</aside"), items("</base"), items("</basefont"), items("</blockquote"), items("</body"), items("</caption"), items("</center"), items("</col"), items("</colgroup"), items("</dd"), items("</details"), items("</dialog"), items("</dir"), items("</div"), items("</dl"), items("</dt"), items("</fieldset"), items("</figcaption"), items("</figure"), items("</footer"), items("</form"), items("</frame"), items("</frameset"), items("</h1"), items("</h2"), items("</h3"), items("</h4"), items("</h5"), items("</h6"), items("</head"), items("</header"), items("</hr"), items("</html"), items("</iframe"), items("</legend"), items("</li"), items("</link"), items("</main"), items("</menu"), items("</menuitem"), items("</nav"), items("</noframes"), items("</ol"), items("</optgroup"), items("</option"), items("</p"), items("</param"), items("</section"), items("</source"), items("</summary"), items("</table"), items("</tbody"), items("</td"), items("</tfoot"), items("</th"), items("</thead"), items("</title"), items("</tr"), items("</track"), items("</ul"),
+	htmlBlockTags1      = [][]byte{[]byte("<script"), []byte("<pre"), []byte("<style")}
+	htmlBlockCloseTags1 = [][]byte{[]byte("</script>"), []byte("</pre>"), []byte("</style>")}
+	htmlBlockTags6      = [][]byte{
+		[]byte("<address"), []byte("<article"), []byte("<aside"), []byte("<base"), []byte("<basefont"), []byte("<blockquote"), []byte("<body"), []byte("<caption"), []byte("<center"), []byte("<col"), []byte("<colgroup"), []byte("<dd"), []byte("<details"), []byte("<dialog"), []byte("<dir"), []byte("<div"), []byte("<dl"), []byte("<dt"), []byte("<fieldset"), []byte("<figcaption"), []byte("<figure"), []byte("<footer"), []byte("<form"), []byte("<frame"), []byte("<frameset"), []byte("<h1"), []byte("<h2"), []byte("<h3"), []byte("<h4"), []byte("<h5"), []byte("<h6"), []byte("<head"), []byte("<header"), []byte("<hr"), []byte("<html"), []byte("<iframe"), []byte("<legend"), []byte("<li"), []byte("<link"), []byte("<main"), []byte("<menu"), []byte("<menuitem"), []byte("<nav"), []byte("<noframes"), []byte("<ol"), []byte("<optgroup"), []byte("<option"), []byte("<p"), []byte("<param"), []byte("<section"), []byte("<source"), []byte("<summary"), []byte("<table"), []byte("<tbody"), []byte("<td"), []byte("<tfoot"), []byte("<th"), []byte("<thead"), []byte("<title"), []byte("<tr"), []byte("<track"), []byte("<ul"),
+		[]byte("</address"), []byte("</article"), []byte("</aside"), []byte("</base"), []byte("</basefont"), []byte("</blockquote"), []byte("</body"), []byte("</caption"), []byte("</center"), []byte("</col"), []byte("</colgroup"), []byte("</dd"), []byte("</details"), []byte("</dialog"), []byte("</dir"), []byte("</div"), []byte("</dl"), []byte("</dt"), []byte("</fieldset"), []byte("</figcaption"), []byte("</figure"), []byte("</footer"), []byte("</form"), []byte("</frame"), []byte("</frameset"), []byte("</h1"), []byte("</h2"), []byte("</h3"), []byte("</h4"), []byte("</h5"), []byte("</h6"), []byte("</head"), []byte("</header"), []byte("</hr"), []byte("</html"), []byte("</iframe"), []byte("</legend"), []byte("</li"), []byte("</link"), []byte("</main"), []byte("</menu"), []byte("</menuitem"), []byte("</nav"), []byte("</noframes"), []byte("</ol"), []byte("</optgroup"), []byte("</option"), []byte("</p"), []byte("</param"), []byte("</section"), []byte("</source"), []byte("</summary"), []byte("</table"), []byte("</tbody"), []byte("</td"), []byte("</tfoot"), []byte("</th"), []byte("</thead"), []byte("</title"), []byte("</tr"), []byte("</track"), []byte("</ul"),
 	}
-	htmlBlockEqual       = items{itemEqual}
-	htmlBlockSinglequote = items{itemSinglequote}
-	htmlBlockDoublequote = items{itemDoublequote}
-	htmlBlockGreater     = items{itemGreater}
+	htmlBlockEqual       = []byte{itemEqual}
+	htmlBlockSinglequote = []byte{itemSinglequote}
+	htmlBlockDoublequote = []byte{itemDoublequote}
+	htmlBlockGreater     = []byte{itemGreater}
 )
 
-func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
+func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
 	length := len(tokens)
 	switch htmlType {
 	case 1:
-		if pos := tokens.acceptTokenss(htmlBlockCloseTags1); 0 <= pos {
+		if pos := acceptTokenss(tokens, htmlBlockCloseTags1); 0 <= pos {
 			return true
 		}
 		return false
@@ -73,7 +73,7 @@ func (t *Tree) isHTMLBlockClose(tokens items, htmlType int) bool {
 	return false
 }
 
-func (t *Tree) parseHTML(tokens items) (typ int) {
+func (t *Tree) parseHTML(tokens []byte) (typ int) {
 	tokens = bytes.TrimLeft(tokens, " \t\n")
 	length := len(tokens)
 	if 3 > length { // at least <? and a newline
@@ -86,13 +86,13 @@ func (t *Tree) parseHTML(tokens items) (typ int) {
 
 	typ = 1
 
-	if pos := tokens.acceptTokenss(htmlBlockTags1); 0 <= pos {
+	if pos := acceptTokenss(tokens, htmlBlockTags1); 0 <= pos {
 		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {
 			return
 		}
 	}
 
-	if pos := tokens.acceptTokenss(htmlBlockTags6); 0 <= pos {
+	if pos := acceptTokenss(tokens, htmlBlockTags6); 0 <= pos {
 		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {
 			typ = 6
 			return
@@ -115,23 +115,23 @@ func (t *Tree) parseHTML(tokens items) (typ int) {
 		return
 	}
 
-	if 0 == bytes.Index(tokens, toItems("<!--")) {
+	if 0 == bytes.Index(tokens, toBytes("<!--")) {
 		typ = 2
 		return
 	}
 
-	if 0 == bytes.Index(tokens, toItems("<?")) {
+	if 0 == bytes.Index(tokens, toBytes("<?")) {
 		typ = 3
 		return
 	}
 
-	if 2 < len(tokens) && 0 == bytes.Index(tokens, toItems("<!")) {
+	if 2 < len(tokens) && 0 == bytes.Index(tokens, toBytes("<!")) {
 		following := tokens[2:]
 		if 'A' <= following[0] && 'Z' >= following[0] {
 			typ = 4
 			return
 		}
-		if 0 == bytes.Index(following, toItems("[CDATA[")) {
+		if 0 == bytes.Index(following, toBytes("[CDATA[")) {
 			typ = 5
 			return
 		}
@@ -139,17 +139,7 @@ func (t *Tree) parseHTML(tokens items) (typ int) {
 	return 0
 }
 
-// tokenize 在 init 函数中调用，可以认为是静态分配，所以使用拷贝字符不会有性能问题。
-// 另外，这里也必须要拷贝，因为调用点的 str 是局部变量，地址上的值会被覆盖。
-func tokenize(str string) (ret items) {
-	for _, r := range str {
-		ret = append(ret, byte(r))
-	}
-
-	return
-}
-
-func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
+func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 	length := len(tokens)
 	if 3 > length {
 		return
@@ -176,7 +166,7 @@ func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 		return
 	}
 
-	nameAndAttrs := tokens.splitWhitespace()
+	nameAndAttrs := splitWhitespace(tokens)
 	name := nameAndAttrs[0]
 	if !isASCIILetter(name[0]) {
 		return
@@ -232,7 +222,7 @@ func (t *Tree) isOpenTag(tokens items) (isOpenTag bool) {
 	return true
 }
 
-func (t *Tree) isCloseTag(tokens items) bool {
+func (t *Tree) isCloseTag(tokens []byte) bool {
 	tokens = bytes.TrimSpace(tokens)
 	length := len(tokens)
 	if 4 > length {

@@ -25,7 +25,7 @@ func unescapeString(tokens items) (ret items) {
 		return
 	}
 
-	tokens = toItems(htmlUnescapeString(fromItems(tokens)))
+	tokens = toBytes(htmlUnescapeString(fromBytes(tokens)))
 	length := len(tokens)
 	ret = make(items, 0, length)
 	for i := 0; i < length; i++ {

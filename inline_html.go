@@ -12,7 +12,7 @@
 
 package lute
 
-var less = toItems("<")
+var less = toBytes("<")
 
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens

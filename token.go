@@ -13,8 +13,16 @@
 package lute
 
 import (
+	"bytes"
 	"unicode"
 )
+
+// item 描述了词法分析的一个 token。
+type item struct {
+	term byte // 源码
+	ln   int  // 源码行号
+	col  int  // 源码列号
+}
 
 func isWhitespace(token byte) bool {
 	return itemSpace == token || itemNewline == token || itemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
@@ -109,17 +117,39 @@ const (
 )
 
 // items 定义了字节数组，每个字节是一个 token。
-type items []byte
+type items []*item
 
-// splitWithoutBackslashEscape 使用 separator 作为分隔符将 tokens 切分为多个子串，被反斜杠 \ 转义的字符不会计入切分。
-func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
+// strToItems 将 str 转为 items。
+func strToItems(str string) (ret items) {
+	length := len(str)
+	for i := 0; i < length; i++ {
+		ret = append(ret, &item{term: str[i]})
+	}
+	return
+}
+
+// itemsToStr 将 items 转为 string。
+func itemsToStr(items items) string {
+	return string(itemsToBytes(items))
+}
+
+// itemsToBytes 将 items 转为 []byte。
+func itemsToBytes(items items) (ret []byte) {
+	length := len(items)
+	for i := 0; i < length; i++ {
+		ret = append(ret, items[i].term)
+	}
+	return
+}
+
+func split(tokens items, separator byte) (ret []items) {
 	length := len(tokens)
 	var i int
-	var token byte
+	var token *item
 	var line items
 	for ; i < length; i++ {
 		token = tokens[i]
-		if separator != token || tokens.isBackslashEscapePunct(i) {
+		if separator != token.term {
 			line = append(line, token)
 			continue
 		}
@@ -133,31 +163,95 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	return
 }
 
+// splitWithoutBackslashEscape 使用 separator 作为分隔符将 tokens 切分为多个子串，被反斜杠 \ 转义的字符不会计入切分。
+func (tokens items) splitWithoutBackslashEscape(separator *item) (ret []items) {
+	length := len(tokens)
+	var i int
+	var token *item
+	var line items
+	for ; i < length; i++ {
+		token = tokens[i]
+		if separator.term != token.term || tokens.isBackslashEscapePunct(i) {
+			line = append(line, token)
+			continue
+		}
+
+		ret = append(ret, line)
+		line = items{}
+	}
+	if 0 < len(line) {
+		ret = append(ret, line)
+	}
+	return
+}
+
+func hasSuffix(tokens, suffix items) bool {
+	return len(tokens) >= len(suffix) && equal(tokens[len(tokens)-len(suffix):], suffix)
+}
+
+func equal(a, b items) bool {
+	length := len(a)
+	if length != len(b) {
+		return false
+	}
+	for i := 0; i < length; i++ {
+		if a[i].term != b[i].term {
+			return false
+		}
+	}
+	return true
+}
+
+func index(tokens, sep items) (pos int) {
+	a := itemsToBytes(tokens)
+	b := itemsToBytes(sep)
+	return bytes.Index(a, b)
+}
+
+func contains(tokens, sub items) bool {
+	return 0 <= index(tokens, sub)
+}
+
 // replaceAll 会将 tokens 中的所有 old 使用 new 替换。
 func (tokens items) replaceAll(old, new byte) {
 	length := len(tokens)
-	var i int
-	for ; i < length; i++ {
-		if old == tokens[i] {
-			tokens[i] = new
+	for i := 0; i < length; i++ {
+		if old == tokens[i].term {
+			tokens[i].term = new
 		}
 	}
 }
 
 // replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
-func (tokens items) replaceNewlineSpace() items {
+func replaceNewlineSpace(tokens items) items {
 	length := len(tokens)
 	var token byte
 	for i := length - 1; 0 <= i; i-- {
-		token = tokens[i]
+		token = tokens[i].term
 		if itemNewline != token && itemSpace != token {
 			break
 		}
-		if itemNewline == tokens[i-1] && (itemSpace == token || itemNewline == token) {
+		if itemNewline == tokens[i-1].term && (itemSpace == token || itemNewline == token) {
 			tokens = tokens[:i]
 		}
 	}
 	return tokens
+}
+
+func trimWhitespace(tokens items) items {
+	length := len(tokens)
+	start, end := 0, length-1
+	for ; start < length; start++ {
+		if !isWhitespace(tokens[start].term) {
+			break
+		}
+	}
+	for ; 0 <= end; end-- {
+		if !isWhitespace(tokens[end].term) {
+			break
+		}
+	}
+	return tokens[start : end+1]
 }
 
 func (tokens items) trimLeft() (whitespaces, remains items) {
@@ -168,7 +262,7 @@ func (tokens items) trimLeft() (whitespaces, remains items) {
 
 	i := 0
 	for ; i < length; i++ {
-		if !isWhitespace(tokens[i]) {
+		if !isWhitespace(tokens[i].term) {
 			break
 		} else {
 			whitespaces = append(whitespaces, tokens[i])
@@ -180,21 +274,21 @@ func (tokens items) trimLeft() (whitespaces, remains items) {
 func (tokens items) accept(token byte) (pos int) {
 	length := len(tokens)
 	for ; pos < length; pos++ {
-		if token != tokens[pos] {
+		if token != tokens[pos].term {
 			break
 		}
 	}
 	return
 }
 
-func (tokens items) acceptTokenss(someTokenss []items) (pos int) {
+func acceptTokenss(tokens []byte, someTokenss [][]byte) (pos int) {
 	length := len(tokens)
 	length2 := len(someTokenss)
 	for i := 0; i < length; i++ {
 		remains := tokens[i:]
 		for j := 0; j < length2; j++ {
 			someTokens := someTokenss[j]
-			if pos = remains.acceptTokens(someTokens); 0 <= pos {
+			if pos = acceptTokens(remains, someTokens); 0 <= pos {
 				return
 			}
 		}
@@ -202,10 +296,10 @@ func (tokens items) acceptTokenss(someTokenss []items) (pos int) {
 	return -1
 }
 
-func (tokens items) acceptTokens(someTokens items) (pos int) {
+func acceptTokens(remains, someTokens []byte) (pos int) {
 	length := len(someTokens)
 	for ; pos < length; pos++ {
-		if someTokens[pos] != tokens[pos] {
+		if someTokens[pos] != remains[pos] {
 			return -1
 		}
 	}
@@ -214,22 +308,22 @@ func (tokens items) acceptTokens(someTokens items) (pos int) {
 
 func (tokens items) isBlankLine() bool {
 	for _, token := range tokens {
-		if itemSpace != token && itemTab != token && itemNewline != token {
+		if itemSpace != token.term && itemTab != token.term && itemNewline != token.term {
 			return false
 		}
 	}
 	return true
 }
 
-func (tokens items) splitWhitespace() (ret []items) {
+func splitWhitespace(tokens []byte) (ret [][]byte) {
 	i := 0
-	ret = append(ret, items{})
+	ret = append(ret, []byte{})
 	lastIsWhitespace := false
 	for _, token := range tokens {
 		if isWhitespace(token) {
 			if !lastIsWhitespace {
 				i++
-				ret = append(ret, items{})
+				ret = append(ret, []byte{})
 			}
 			lastIsWhitespace = true
 		} else {
@@ -244,7 +338,7 @@ func (tokens items) startWith(token byte) bool {
 	if 1 > len(tokens) {
 		return false
 	}
-	return token == tokens[0]
+	return token == tokens[0].term
 }
 
 func (tokens items) endWith(token byte) bool {
@@ -252,18 +346,18 @@ func (tokens items) endWith(token byte) bool {
 	if 1 > length {
 		return false
 	}
-	return token == tokens[length-1]
+	return token == tokens[length-1].term
 }
 
 // isBackslashEscapePunct 判断 tokens 中 pos 所指的值是否是由反斜杠 \ 转义的 ASCII 标点符号。
 func (tokens items) isBackslashEscapePunct(pos int) bool {
-	if !isASCIIPunct(tokens[pos]) {
+	if !isASCIIPunct(tokens[pos].term) {
 		return false
 	}
 
 	backslashes := 0
 	for i := pos - 1; 0 <= i; i-- {
-		if itemBackslash != tokens[i] {
+		if itemBackslash != tokens[i].term {
 			break
 		}
 		backslashes++
@@ -273,11 +367,11 @@ func (tokens items) isBackslashEscapePunct(pos int) bool {
 
 func (tokens items) statWhitespace() (newlines, spaces, tabs int) {
 	for _, token := range tokens {
-		if itemNewline == token {
+		if itemNewline == token.term {
 			newlines++
-		} else if itemSpace == token {
+		} else if itemSpace == token.term {
 			spaces++
-		} else if itemTab == token {
+		} else if itemTab == token.term {
 			tabs++
 		}
 	}
@@ -296,7 +390,7 @@ func (tokens items) spnl() (ret bool, passed, remains items) {
 
 func (tokens items) peek(pos int) byte {
 	if pos < len(tokens) {
-		return tokens[pos]
+		return tokens[pos].term
 	}
 	return itemEnd
 }
