@@ -24,7 +24,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	}
 
 	n, remains, label := context.parseLinkLabel(tokens)
-	if 2 > n {
+	if 2 > n || 1 > len(label) {
 		return nil
 	}
 

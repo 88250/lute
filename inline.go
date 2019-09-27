@@ -128,15 +128,16 @@ var closeBracket = strToItems("]")
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
 // to block's children. If there is a matching delimiter, remove it from the delimiter stack.
 func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
+	ctx.pos++
+	startPos := ctx.pos
+
 	// get last [ or ![
 	opener := ctx.brackets
 	if nil == opener {
-		ctx.pos++
 		return &Node{typ: NodeText, tokens: closeBracket}
 	}
 
 	if !opener.active {
-		ctx.pos++
 		// no matched opener, just return a literal
 		// take opener off brackets stack
 		t.removeBracket(ctx)
@@ -146,10 +147,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	// If we got here, open is a potential opener
 	isImage := opener.image
 
-	var dest, title items
 	// Check to see if we have a link/image
 
-	startPos := ctx.pos
+	var dest, title items
 	savepos := ctx.pos
 	matched := false
 	// 尝试解析内联链接 [text](url "tile")
@@ -205,22 +205,17 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	var reflabel items
 	if !matched {
 		// 尝试解析链接 label
-		var beforelabel = ctx.pos + 1
+		var beforelabel = ctx.pos
 		n, _, label := t.context.parseLinkLabel(ctx.tokens[beforelabel:])
 		if 2 < n { // label 解析出来的话说明满足格式 [text][label]
 			reflabel = label
 			ctx.pos += n
 		} else if !opener.bracketAfter {
 			// [text][] 格式，将 text 视为 label 进行解析
-			passed := ctx.tokens[opener.index:startPos]
-			reflabel = passed
-			if len(passed) > 0 && ctx.tokensLen > beforelabel && itemOpenBracket == ctx.tokens[beforelabel].term {
-				// [text][] 格式，跳过 []
-				ctx.pos += 2
-			}
+			reflabel = ctx.tokens[opener.index:startPos]
 		}
 
-		if nil != reflabel {
+		if 0 == n {
 			// 查找链接引用
 			var link = t.context.linkRefDef[strings.ToLower(itemsToStr(reflabel))]
 			if nil != link {
@@ -265,12 +260,10 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			}
 		}
 
-		ctx.pos++
 		return node
 	} else { // no match
 		t.removeBracket(ctx) // remove this opener from stack
 		ctx.pos = startPos
-		ctx.pos++
 		return &Node{typ: NodeText, tokens: closeBracket}
 	}
 }
@@ -281,7 +274,7 @@ func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
 	ctx.pos++
 	ret = &Node{typ: NodeText, tokens: openBracket}
 	// 将 [ 入栈
-	t.addBracket(ret, ctx.pos, false, ctx)
+	t.addBracket(ret, ctx.pos-1, false, ctx)
 	return
 }
 
