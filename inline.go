@@ -206,14 +206,13 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	if !matched {
 		// 尝试解析链接 label
 		var beforelabel = ctx.pos + 1
-		passed, _, label := t.context.parseLinkLabel(ctx.tokens[beforelabel:])
-		var n = len(passed)
-		if n > 0 { // label 解析出来的话说明满足格式 [text][label]
+		n, _, label := t.context.parseLinkLabel(ctx.tokens[beforelabel:])
+		if 2 < n { // label 解析出来的话说明满足格式 [text][label]
 			reflabel = label
 			ctx.pos += n + 1
 		} else if !opener.bracketAfter {
-			// [text][] 或者 [text][] 格式，将第一个 text 视为 label 进行解析
-			passed = ctx.tokens[opener.index:startPos]
+			// [text][] 格式，将 text 视为 label 进行解析
+			passed := ctx.tokens[opener.index:startPos]
 			reflabel = passed
 			if len(passed) > 0 && ctx.tokensLen > beforelabel && itemOpenBracket == ctx.tokens[beforelabel].term {
 				// [text][] 格式，跳过 []

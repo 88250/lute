@@ -270,7 +270,7 @@ func trimRight(tokens items) (whitespaces, remains items) {
 		}
 		whitespaces = append(whitespaces, tokens[i])
 	}
-	return whitespaces, tokens[:i]
+	return whitespaces, tokens[:i+1]
 }
 
 func trimLeft(tokens items) (whitespaces, remains items) {

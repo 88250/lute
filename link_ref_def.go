@@ -23,8 +23,8 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		return nil
 	}
 
-	linkLabel, remains, label := context.parseLinkLabel(tokens)
-	if nil == linkLabel {
+	n, remains, label := context.parseLinkLabel(tokens)
+	if 2 > n {
 		return nil
 	}
 
@@ -259,7 +259,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination 
 	return
 }
 
-func (context *Context) parseLinkLabel(tokens items) (passed, remains, label items) {
+func (context *Context) parseLinkLabel(tokens items) (n int, remains, label items) {
 	length := len(tokens)
 	if 2 > length {
 		return
@@ -269,7 +269,8 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 		return
 	}
 
-	passed = make(items, 0, len(tokens))
+	passed := make(items, 0, len(tokens))
+	passed = append(passed, tokens[0])
 
 	closed := false
 	i := 1
@@ -296,6 +297,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 
 	if !closed || nil == trimWhitespace(label) || 999 < len(label) {
 		passed = nil
+		return
 	}
 
 	label = trimWhitespace(label)
@@ -303,5 +305,6 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 	for 0 <= index(label, strToItems("  ")) {
 		label = replaceAll(label, strToItems("  "), strToItems(" "))
 	}
+	n = len(passed)
 	return
 }
