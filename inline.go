@@ -153,13 +153,13 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	savepos := ctx.pos
 	matched := false
 	// 尝试解析内联链接 [text](url "tile")
-	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == ctx.tokens[ctx.pos+1].term {
+	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == ctx.tokens[ctx.pos].term {
 		ctx.pos++
 		isLink := false
 		var passed, remains items
 
 		for { // 这里使用 for 是为了简化逻辑，不是为了循环
-			if isLink, passed, remains = ctx.tokens[ctx.pos:].spnl(); !isLink {
+			if isLink, passed, remains = ctx.tokens[ctx.pos-1:].spnl(); !isLink {
 				break
 			}
 			ctx.pos += len(passed)
@@ -169,11 +169,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			ctx.pos += len(passed)
 			matched = itemCloseParen == passed[len(passed)-1].term
 			if matched {
-				ctx.pos--
 				break
 			}
 			if 1 > len(remains) || !isWhitespace(remains[0].term) {
-				ctx.pos--
 				break
 			}
 			// 跟空格的话后续尝试 title 解析
@@ -184,7 +182,6 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			ctx.pos += len(passed)
 			matched = itemCloseParen == remains[0].term
 			if matched {
-				ctx.pos--
 				break
 			}
 			validTitle := false
@@ -195,6 +192,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			isLink, passed, remains = remains.spnl()
 			ctx.pos += len(passed)
 			matched = isLink && itemCloseParen == remains[0].term
+			ctx.pos++
 			break
 		}
 		if !matched {
@@ -212,10 +210,13 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			ctx.pos += n
 		} else if !opener.bracketAfter {
 			// [text][] 格式，将 text 视为 label 进行解析
-			reflabel = ctx.tokens[opener.index:startPos]
+			reflabel = ctx.tokens[opener.index+1 : startPos-1]
+			ctx.pos += len(reflabel)
 		}
-
 		if 0 == n {
+			ctx.pos = startPos
+		}
+		if nil != reflabel {
 			// 查找链接引用
 			var link = t.context.linkRefDef[strings.ToLower(itemsToStr(reflabel))]
 			if nil != link {

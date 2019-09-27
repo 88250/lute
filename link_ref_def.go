@@ -28,7 +28,12 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		return nil
 	}
 
-	if 1 > len(remains) || itemColon != remains[0].term {
+	length := len(remains)
+	if 1 > length {
+		return nil
+	}
+
+	if ':' != remains[0].term {
 		return nil
 	}
 
