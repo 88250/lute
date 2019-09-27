@@ -164,7 +164,7 @@ func (context *Context) addChild(nodeType nodeType, offset int) (ret *Node) {
 // listsMatch 用户判断指定的 listData 和 itemData 是否可归属于同一个列表。
 func (context *Context) listsMatch(listData, itemData *listData) bool {
 	return listData.typ == itemData.typ &&
-		listData.delimiter == itemData.delimiter &&
+		((nil == listData.delimiter && nil == itemData.delimiter) || listData.delimiter.term == itemData.delimiter.term) &&
 		equal(listData.bulletChar, itemData.bulletChar)
 }
 

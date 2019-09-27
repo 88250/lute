@@ -109,13 +109,13 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	for {
 		t.context.advanceOffset(1, true)
 		token = ln.peek(t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || itemEnd == token.term || (itemSpace != token.term && itemTab != token.term) {
+		if t.context.column-spacesStartCol >= 5 || nil == token || (itemSpace != token.term && itemTab != token.term) {
 			break
 		}
 	}
 
 	token = ln.peek(t.context.offset)
-	var isBlankItem = itemEnd == token.term || itemNewline == token.term
+	var isBlankItem = nil == token || itemNewline == token.term
 	var spacesAfterMarker = t.context.column - spacesStartCol
 	if spacesAfterMarker >= 5 || spacesAfterMarker < 1 || isBlankItem {
 		data.padding = markerLength + 1

@@ -20,9 +20,9 @@ import (
 )
 
 type parseTest struct {
-	name     string
+	name string
 	from string
-	to     string
+	to   string
 }
 
 var parseTests = []parseTest{
@@ -253,7 +253,7 @@ func TestParse(t *testing.T) {
 	for _, test := range parseTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {
-			t.Fatalf("unexpected: %s", err)
+			t.Fatalf("test case [%s] unexpected: %s", test.name, err)
 		}
 
 		if test.to != html {

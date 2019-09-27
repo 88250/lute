@@ -243,11 +243,17 @@ func replaceNewlineSpace(tokens items) items {
 
 func trimWhitespace(tokens items) items {
 	length := len(tokens)
+	if 0 == length {
+		return tokens
+	}
 	start, end := 0, length-1
 	for ; start < length; start++ {
 		if !isWhitespace(tokens[start].term) {
 			break
 		}
+	}
+	if start == length {
+		start--
 	}
 	for ; 0 <= end; end-- {
 		if !isWhitespace(tokens[end].term) {

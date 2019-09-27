@@ -78,7 +78,7 @@ func (t *Tree) parseFencedCode() (ok bool, codeBlockFenceChar byte, codeBlockFen
 
 	fenceChar := marker
 	fenceLength := 0
-	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar == t.context.currentLine[i]; i++ {
+	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar.term == t.context.currentLine[i].term; i++ {
 		fenceLength++
 	}
 

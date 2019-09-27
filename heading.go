@@ -82,17 +82,13 @@ func (t *Tree) parseSetextHeading() (level int) {
 		}
 
 		if itemEnd != marker.term {
-			if marker != token {
+			if marker.term != token.term {
 				return
 			}
 		} else {
 			marker = token
 		}
 		markers++
-	}
-
-	if itemEnd == marker.term {
-		return
 	}
 
 	level = 1

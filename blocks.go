@@ -269,7 +269,7 @@ var blockStarts = []blockStartFunc{
 
 				if value := container.tokens; 0 < len(value) {
 					child := &Node{typ: NodeHeading, headingLevel: level}
-					//TODO: child.tokens = bytes.TrimSpace(value)
+					child.tokens = trimWhitespace(value)
 					container.InsertAfter(child)
 					container.Unlink()
 					t.context.tip = child

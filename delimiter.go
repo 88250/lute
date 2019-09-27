@@ -210,7 +210,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	startPos := ctx.pos
 	token := ctx.tokens[startPos]
 	delimitersCount := 0
-	for i := ctx.pos; i < ctx.tokensLen && token == ctx.tokens[i]; i++ {
+	for i := ctx.pos; i < ctx.tokensLen && token.term == ctx.tokens[i].term; i++ {
 		delimitersCount++
 		ctx.pos++
 	}

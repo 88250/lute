@@ -31,7 +31,7 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 	if entering {
 		r.newline()
 		tokens := node.tokens
-		if nil != node.codeBlockInfo {
+		if 0 < len(node.codeBlockInfo) {
 			infoWords := split(node.codeBlockInfo, itemSpace)
 			language := itemsToStr(infoWords[0])
 			rendered := false

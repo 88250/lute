@@ -209,7 +209,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		n, _, label := t.context.parseLinkLabel(ctx.tokens[beforelabel:])
 		if 2 < n { // label 解析出来的话说明满足格式 [text][label]
 			reflabel = label
-			ctx.pos += n + 1
+			ctx.pos += n
 		} else if !opener.bracketAfter {
 			// [text][] 格式，将 text 视为 label 进行解析
 			passed := ctx.tokens[opener.index:startPos]
