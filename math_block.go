@@ -24,7 +24,7 @@ func (mathBlock *Node) mathBlockContinue(context *Context) int {
 		var i = mathBlock.mathBlockDollarOffset
 		var token byte
 		for i > 0 {
-			token = ln.peek(context.offset)
+			token = ln.peek(context.offset).term
 			if itemSpace != token && itemTab != token {
 				break
 			}

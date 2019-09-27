@@ -68,7 +68,7 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 // MarkdownStr 接受 string 类型的 markdown 后直接调用 Markdown 进行处理。
 func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 	var htmlBytes []byte
-	htmlBytes, err = lute.Markdown(name, items(markdown))
+	htmlBytes, err = lute.Markdown(name, []byte(markdown))
 	if nil != err {
 		return
 	}
@@ -93,7 +93,7 @@ func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err er
 // FormatStr 接受 string 类型的 markdown 后直接调用 Format 进行处理。
 func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error) {
 	var formattedBytes []byte
-	formattedBytes, err = lute.Format(name, items(markdown))
+	formattedBytes, err = lute.Format(name, []byte(markdown))
 	if nil != err {
 		return
 	}
@@ -110,7 +110,7 @@ func (lute *Lute) Space(text string) string {
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的映射列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	ret = make(map[string]string, len(lute.Emojis))
-	placeholder := fromBytes(emojiSitePlaceholder)
+	placeholder := itemsToStr(emojiSitePlaceholder)
 	for k, v := range lute.Emojis {
 		if strings.Contains(v, placeholder) {
 			v = strings.ReplaceAll(v, placeholder, lute.EmojiSite)
@@ -130,7 +130,7 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 // RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
 func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset int) (html string, err error) {
 	var tree *Tree
-	tree, err = lute.parse("", items(markdownText))
+	tree, err = lute.parse("", []byte(markdownText))
 	if nil != err {
 		return
 	}
@@ -139,9 +139,9 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 	// 光标位置映射
 	sLn, sCol := tree.unidim2BidimTxt(markdownText, startOffset)
 	eLn, eCol := tree.unidim2BidimTxt(markdownText, endOffset)
-	renderer.mapSelection(tree.Root, sLn, sCol, eLn,eCol)
+	renderer.mapSelection(tree.Root, sLn, sCol, eLn, eCol)
 
-	var output items
+	var output []byte
 	output, err = renderer.Render()
 	html = string(output)
 	return
@@ -150,13 +150,13 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
 func (lute *Lute) RenderEChartsJSON(markdownText string) (json string, err error) {
 	var tree *Tree
-	tree, err = lute.parse("", items(markdownText))
+	tree, err = lute.parse("", []byte(markdownText))
 	if nil != err {
 		return
 	}
 
 	renderer := lute.newEChartsJSONRenderer(tree.Root)
-	var output items
+	var output []byte
 	output, err = renderer.Render()
 	json = string(output)
 	return
@@ -212,7 +212,7 @@ func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}
 			marker = strconv.Itoa(num + 1)
 			marker += delim
 		}
-		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: toBytes(marker), delimiter: delim[0]}}
+		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: strToItems(marker), delimiter: &item{term: delim[0]}}}
 		_, err = renderer.renderListItem(listItem, true)
 		if nil != err {
 			return

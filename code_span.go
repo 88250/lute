@@ -37,7 +37,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	endPos = startPos + endPos + n
 
 	textTokens := ctx.tokens[startPos+n : endPos]
-	textTokens.replaceAll(itemNewline, itemSpace)
+	textTokens = replaceAll(textTokens, strToItems("\n"), strToItems(" "))
 	if 2 < len(textTokens) && itemSpace == textTokens[0].term && itemSpace == textTokens[len(textTokens)-1].term && !textTokens.isBlankLine() {
 		// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
 		textTokens = textTokens[1:]

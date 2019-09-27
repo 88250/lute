@@ -18,11 +18,11 @@ import (
 
 // lexer 描述了词法分析器结构。
 type lexer struct {
-	input   items // 输入的文本字符数组
-	length  int   // 输入的文本字符数组的长度
-	offset  int   // 当前读取位置
-	lineNum int   // 当前行号
-	width   int   // 最新一个 token 的宽度（字节数）
+	input   []byte // 输入的文本字节数组
+	length  int    // 输入的文本字节数组的长度
+	offset  int    // 当前读取位置
+	lineNum int    // 当前行号
+	width   int    // 最新一个 token 的宽度（字节数）
 }
 
 // nextLine 返回下一行。
@@ -69,14 +69,14 @@ func (l *lexer) nextLine() (line items) {
 			l.width = 1
 		}
 	}
-	line = l.input[l.offset:i]
+	line = bytesToItems(l.input[l.offset:i])
 	l.offset = i
 	l.lineNum++
 	return
 }
 
 // newLexer 创建一个词法分析器。
-func newLexer(input items) (ret *lexer) {
+func newLexer(input []byte) (ret *lexer) {
 	ret = &lexer{}
 	ret.input = input
 	ret.length = len(input)
@@ -89,5 +89,3 @@ func newLexer(input items) (ret *lexer) {
 
 	return
 }
-
-

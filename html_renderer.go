@@ -222,9 +222,9 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 
 func (r *HTMLRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		attrs := [][]string{{"href", fromBytes(escapeHTML(node.destination))}}
+		attrs := [][]string{{"href", itemsToStr(escapeHTML(node.destination))}}
 		if nil != node.title {
-			attrs = append(attrs, []string{"title", fromBytes(escapeHTML(node.title))})
+			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(node.title))})
 		}
 		r.tag("a", attrs, false)
 

@@ -13,7 +13,6 @@
 package lute
 
 import (
-	"bytes"
 	"unicode/utf8"
 )
 
@@ -24,14 +23,14 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		return
 	}
 
-	if itemOpenParen != tokens[0] {
+	if itemOpenParen != tokens[0].term {
 		return
 	}
 
 	passed = make(items, 0, 256)
 	destination = make(items, 0, 256)
 
-	isPointyBrackets := itemLess == tokens[1]
+	isPointyBrackets := itemLess == tokens[1].term
 	if isPointyBrackets {
 		matchEnd := false
 		passed = append(passed, tokens[0], tokens[1])
@@ -42,30 +41,30 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		for ; i < length; i += size {
 			size = 1
 			token := tokens[i]
-			if itemNewline == token {
+			if itemNewline == token.term {
 				passed = nil
 				return
 			}
 
-			if token < utf8.RuneSelf {
+			if token.term < utf8.RuneSelf {
 				passed = append(passed, token)
 				dest = items{token}
 			} else {
 				dest = items{}
-				r, size = utf8.DecodeRune(tokens[i:])
-				runes = toBytes(string(r))
+				r, size = utf8.DecodeRune(itemsToBytes(tokens[i:]))
+				runes = strToItems(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}
 			destination = append(destination, dest...)
-			if itemGreater == token && !tokens.isBackslashEscapePunct(i) {
+			if itemGreater == token.term && !tokens.isBackslashEscapePunct(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
 				break
 			}
 		}
 
-		if !matchEnd || (length > i && itemCloseParen != tokens[i+1]) {
+		if !matchEnd || (length > i && itemCloseParen != tokens[i+1].term) {
 			passed = nil
 			return
 		}
@@ -82,31 +81,31 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		for ; i < length; i += size {
 			size = 1
 			token := tokens[i]
-			if token < utf8.RuneSelf {
+			if token.term < utf8.RuneSelf {
 				passed = append(passed, token)
 				dest = items{token}
 			} else {
 				dest = items{}
-				r, size = utf8.DecodeRune(tokens[i:])
-				runes = toBytes(string(r))
+				r, size = utf8.DecodeRune(itemsToBytes(tokens[i:]))
+				runes = strToItems(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}
 			destination = append(destination, dest...)
-			if !destStarted && !isWhitespace(token) && 0 < i {
+			if !destStarted && !isWhitespace(token.term) && 0 < i {
 				destStarted = true
 				destination = destination[size:]
-				destination = bytes.TrimSpace(destination)
+				destination = trimWhitespace(destination)
 			}
-			if destStarted && (isWhitespace(token) || isControl(token)) {
+			if destStarted && (isWhitespace(token.term) || isControl(token.term)) {
 				destination = destination[:len(destination)-size]
 				passed = passed[:len(passed)-1]
 				break
 			}
-			if itemOpenParen == token && !tokens.isBackslashEscapePunct(i) {
+			if itemOpenParen == token.term && !tokens.isBackslashEscapePunct(i) {
 				openParens++
 			}
-			if itemCloseParen == token && !tokens.isBackslashEscapePunct(i) {
+			if itemCloseParen == token.term && !tokens.isBackslashEscapePunct(i) {
 				openParens--
 				if 1 > openParens {
 					destination = destination[:len(destination)-1]
@@ -116,15 +115,14 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		}
 
 		remains = tokens[i:]
-		if length > i && (itemCloseParen != tokens[i] && itemSpace != tokens[i] && itemNewline != tokens[i]) {
+		if length > i && (itemCloseParen != tokens[i].term && itemSpace != tokens[i].term && itemNewline != tokens[i].term) {
 			passed = nil
 			return
 		}
 	}
 
 	if nil != passed {
-		destination = encodeDestination(unescapeString(destination))
+		destination = strToItems(encodeDestination(unescapeString(destination)))
 	}
-
 	return
 }

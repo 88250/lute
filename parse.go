@@ -12,10 +12,6 @@
 
 package lute
 
-import (
-	"bytes"
-)
-
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
 func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	defer recoverPanic(&err)
@@ -64,7 +60,7 @@ func (context *Context) advanceOffset(count int, columns bool) {
 	var charsToTab, charsToAdvance int
 	var c byte
 	for 0 < count {
-		c = currentLine[context.offset]
+		c = currentLine[context.offset].term
 		if itemTab == c {
 			charsToTab = 4 - (context.column % 4)
 			if columns {
@@ -106,7 +102,7 @@ func (context *Context) findNextNonspace() {
 
 	var token byte
 	for {
-		token = context.currentLine[i]
+		token = context.currentLine[i].term
 		if itemSpace == token {
 			i++
 			cols++
@@ -169,7 +165,7 @@ func (context *Context) addChild(nodeType nodeType, offset int) (ret *Node) {
 func (context *Context) listsMatch(listData, itemData *listData) bool {
 	return listData.typ == itemData.typ &&
 		listData.delimiter == itemData.delimiter &&
-		bytes.Equal(listData.bulletChar, itemData.bulletChar)
+		equal(listData.bulletChar, itemData.bulletChar)
 }
 
 // Tree 描述了 Markdown 抽象语法树结构。

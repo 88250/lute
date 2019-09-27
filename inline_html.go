@@ -12,7 +12,7 @@
 
 package lute
 
-var less = toBytes("<")
+var less = strToItems("<")
 
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens
@@ -25,7 +25,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 
 	var tags items
 	tags = append(tags, tokens[startPos])
-	if itemSlash == tokens[startPos+1] { // a closing tag
+	if itemSlash == tokens[startPos+1].term { // a closing tag
 		tags = append(tags, tokens[startPos+1])
 		remains, tagName := t.parseTagName(tokens[ctx.pos+2:])
 		if 1 > len(tagName) {
@@ -85,12 +85,12 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 		return
 	}
 
-	whitespaces, tokens := tokens.trimLeft()
-	if (itemGreater == tokens[0]) ||
-		(1 < ctx.tokensLen && itemSlash == tokens[0] && itemGreater == tokens[1]) {
+	whitespaces, tokens := trimLeft(tokens)
+	if (itemGreater == tokens[0].term) ||
+		(1 < ctx.tokensLen && itemSlash == tokens[0].term && itemGreater == tokens[1].term) {
 		tags = append(tags, whitespaces...)
 		tags = append(tags, tokens[0])
-		if itemSlash == tokens[0] {
+		if itemSlash == tokens[0].term {
 			tags = append(tags, tokens[1])
 		}
 		ctx.pos += len(tags)
@@ -104,34 +104,34 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 
 func (t *Tree) parseCDATA(tokens items) (valid bool, remains, content items) {
 	remains = tokens
-	if itemBang != tokens[0] {
+	if itemBang != tokens[0].term {
 		return
 	}
-	if itemOpenBracket != tokens[1] {
+	if itemOpenBracket != tokens[1].term {
 		return
 	}
 
-	if 'C' != tokens[2] || 'D' != tokens[3] || 'A' != tokens[4] || 'T' != tokens[5] || 'A' != tokens[6] {
+	if 'C' != tokens[2].term || 'D' != tokens[3].term || 'A' != tokens[4].term || 'T' != tokens[5].term || 'A' != tokens[6].term {
 		return
 	}
-	if itemOpenBracket != tokens[7] {
+	if itemOpenBracket != tokens[7].term {
 		return
 	}
 
 	content = append(content, tokens[:7]...)
 	tokens = tokens[7:]
-	var token byte
+	var token *item
 	var i int
 	length := len(tokens)
 	for ; i < length; i++ {
 		token = tokens[i]
 		content = append(content, token)
-		if i <= length-3 && itemCloseBracket == token && itemCloseBracket == tokens[i+1] && itemGreater == tokens[i+2] {
+		if i <= length-3 && itemCloseBracket == token.term && itemCloseBracket == tokens[i+1].term && itemGreater == tokens[i+2].term {
 			break
 		}
 	}
 	tokens = tokens[i:]
-	if itemCloseBracket != tokens[0] || itemCloseBracket != tokens[1] || itemGreater != tokens[2] {
+	if itemCloseBracket != tokens[0].term || itemCloseBracket != tokens[1].term || itemGreater != tokens[2].term {
 		return
 	}
 	content = append(content, tokens[1], tokens[2])
@@ -143,17 +143,17 @@ func (t *Tree) parseCDATA(tokens items) (valid bool, remains, content items) {
 
 func (t *Tree) parseDeclaration(tokens items) (valid bool, remains, content items) {
 	remains = tokens
-	if itemBang != tokens[0] {
+	if itemBang != tokens[0].term {
 		return
 	}
 
-	var token byte
+	var token *item
 	var i int
 	for _, token = range tokens[1:] {
-		if isWhitespace(token) {
+		if isWhitespace(token.term) {
 			break
 		}
-		if !('A' <= token && 'Z' >= token) {
+		if !('A' <= token.term && 'Z' >= token.term) {
 			return
 		}
 	}
@@ -164,12 +164,12 @@ func (t *Tree) parseDeclaration(tokens items) (valid bool, remains, content item
 	for ; i < length; i++ {
 		token = tokens[i]
 		content = append(content, token)
-		if itemGreater == token {
+		if itemGreater == token.term {
 			break
 		}
 	}
 	tokens = tokens[i:]
-	if itemGreater != tokens[0] {
+	if itemGreater != tokens[0].term {
 		return
 	}
 	valid = true
@@ -180,19 +180,19 @@ func (t *Tree) parseDeclaration(tokens items) (valid bool, remains, content item
 
 func (t *Tree) parseProcessingInstruction(tokens items) (valid bool, remains, content items) {
 	remains = tokens
-	if itemQuestion != tokens[0] {
+	if itemQuestion != tokens[0].term {
 		return
 	}
 
 	content = append(content, tokens[0])
 	tokens = tokens[1:]
-	var token byte
+	var token *item
 	var i int
 	length := len(tokens)
 	for ; i < length; i++ {
 		token = tokens[i]
 		content = append(content, token)
-		if i <= length-2 && itemQuestion == token && itemGreater == tokens[i+1] {
+		if i <= length-2 && itemQuestion == token.term && itemGreater == tokens[i+1].term {
 			break
 		}
 	}
@@ -201,7 +201,7 @@ func (t *Tree) parseProcessingInstruction(tokens items) (valid bool, remains, co
 		return
 	}
 
-	if itemQuestion != tokens[0] || itemGreater != tokens[1] {
+	if itemQuestion != tokens[0].term || itemGreater != tokens[1].term {
 		return
 	}
 	content = append(content, tokens[1])
@@ -213,33 +213,33 @@ func (t *Tree) parseProcessingInstruction(tokens items) (valid bool, remains, co
 
 func (t *Tree) parseHTMLComment(tokens items) (valid bool, remains, comment items) {
 	remains = tokens
-	if itemBang != tokens[0] || itemHyphen != tokens[1] || itemHyphen != tokens[2] {
+	if itemBang != tokens[0].term || itemHyphen != tokens[1].term || itemHyphen != tokens[2].term {
 		return
 	}
 
 	comment = append(comment, tokens[0], tokens[1], tokens[2])
 	tokens = tokens[3:]
-	if itemGreater == tokens[0] {
+	if itemGreater == tokens[0].term {
 		return
 	}
-	if itemHyphen == tokens[0] && itemGreater == tokens[1] {
+	if itemHyphen == tokens[0].term && itemGreater == tokens[1].term {
 		return
 	}
-	var token byte
+	var token *item
 	var i int
 	length := len(tokens)
 	for ; i < length; i++ {
 		token = tokens[i]
 		comment = append(comment, token)
-		if i <= length-2 && itemHyphen == token && itemHyphen == tokens[i+1] {
+		if i <= length-2 && itemHyphen == token.term && itemHyphen == tokens[i+1].term {
 			break
 		}
-		if i <= length-3 && itemHyphen == token && itemHyphen == tokens[i+1] && itemGreater == tokens[i+2] {
+		if i <= length-3 && itemHyphen == token.term && itemHyphen == tokens[i+1].term && itemGreater == tokens[i+2].term {
 			break
 		}
 	}
 	tokens = tokens[i:]
-	if itemHyphen != tokens[0] || itemHyphen != tokens[1] || itemGreater != tokens[2] {
+	if itemHyphen != tokens[0].term || itemHyphen != tokens[1].term || itemGreater != tokens[2].term {
 		return
 	}
 	comment = append(comment, tokens[1], tokens[2])
@@ -254,9 +254,9 @@ func (t *Tree) parseTagAttr(tokens items) (valid bool, remains, attr items) {
 	remains = tokens
 	var whitespaces items
 	var i int
-	var token byte
+	var token *item
 	for i, token = range tokens {
-		if !isWhitespace(token) {
+		if !isWhitespace(token.term) {
 			break
 		}
 		whitespaces = append(whitespaces, token)
@@ -290,21 +290,21 @@ func (t *Tree) parseAttrValSpec(tokens items) (valid bool, remains, valSpec item
 	valid = true
 	remains = tokens
 	var i int
-	var token byte
+	var token *item
 	for i, token = range tokens {
-		if !isWhitespace(token) {
+		if !isWhitespace(token.term) {
 			break
 		}
 		valSpec = append(valSpec, token)
 	}
-	if itemEqual != token {
+	if itemEqual != token.term {
 		valSpec = nil
 		return
 	}
 	valSpec = append(valSpec, token)
 	tokens = tokens[i+1:]
 	for i, token = range tokens {
-		if !isWhitespace(token) {
+		if !isWhitespace(token.term) {
 			break
 		}
 		valSpec = append(valSpec, token)
@@ -313,34 +313,34 @@ func (t *Tree) parseAttrValSpec(tokens items) (valid bool, remains, valSpec item
 	valSpec = append(valSpec, token)
 	tokens = tokens[i+1:]
 	closed := false
-	if itemDoublequote == token { // A double-quoted attribute value consists of ", zero or more characters not including ", and a final ".
+	if itemDoublequote == token.term { // A double-quoted attribute value consists of ", zero or more characters not including ", and a final ".
 		for i, token = range tokens {
 			valSpec = append(valSpec, token)
-			if itemDoublequote == token {
+			if itemDoublequote == token.term {
 				closed = true
 				break
 			}
 		}
-	} else if itemSinglequote == token { // A single-quoted attribute value consists of ', zero or more characters not including ', and a final '.
+	} else if itemSinglequote == token.term { // A single-quoted attribute value consists of ', zero or more characters not including ', and a final '.
 		for i, token = range tokens {
 			valSpec = append(valSpec, token)
-			if itemSinglequote == token {
+			if itemSinglequote == token.term {
 				closed = true
 				break
 			}
 		}
 	} else { // An unquoted attribute value is a nonempty string of characters not including whitespace, ", ', =, <, >, or `.
 		for i, token = range tokens {
-			if itemGreater == token {
+			if itemGreater == token.term {
 				i-- // 大于字符 > 不计入 valSpec
 				break
 			}
 			valSpec = append(valSpec, token)
-			if isWhitespace(token) {
+			if isWhitespace(token.term) {
 				// 属性使用空白分隔
 				break
 			}
-			if itemDoublequote == token || itemSinglequote == token || itemEqual == token || itemLess == token || itemGreater == token || itemBacktick == token {
+			if itemDoublequote == token.term || itemSinglequote == token.term || itemEqual == token.term || itemLess == token.term || itemGreater == token.term || itemBacktick == token.term {
 				closed = false
 				break
 			}
@@ -361,15 +361,15 @@ func (t *Tree) parseAttrValSpec(tokens items) (valid bool, remains, valSpec item
 
 func (t *Tree) parseAttrName(tokens items) (remains, attrName items) {
 	remains = tokens
-	if !isASCIILetter(tokens[0]) && itemUnderscore != tokens[0] && itemColon != tokens[0] {
+	if !isASCIILetter(tokens[0].term) && itemUnderscore != tokens[0].term && itemColon != tokens[0].term {
 		return
 	}
 	attrName = append(attrName, tokens[0])
 	tokens = tokens[1:]
 	var i int
-	var token byte
+	var token *item
 	for i, token = range tokens {
-		if !isASCIILetterNumHyphen(token) && itemUnderscore != token && itemDot != token && itemColon != token {
+		if !isASCIILetterNumHyphen(token.term) && itemUnderscore != token.term && itemDot != token.term && itemColon != token.term {
 			break
 		}
 		attrName = append(attrName, token)
@@ -386,13 +386,13 @@ func (t *Tree) parseAttrName(tokens items) (remains, attrName items) {
 func (t *Tree) parseTagName(tokens items) (remains, tagName items) {
 	i := 0
 	token := tokens[i]
-	if !isASCIILetter(token) {
+	if !isASCIILetter(token.term) {
 		return tokens, nil
 	}
 	tagName = append(tagName, token)
 	for i = 1; i < len(tokens); i++ {
 		token = tokens[i]
-		if !isASCIILetterNumHyphen(token) {
+		if !isASCIILetterNumHyphen(token.term) {
 			break
 		}
 		tagName = append(tagName, token)

@@ -13,7 +13,6 @@
 package lute
 
 import (
-	"bytes"
 	"github.com/b3log/lute/html"
 	"strings"
 )
@@ -23,7 +22,7 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 	for ctx.pos < ctx.tokensLen {
 		token := ctx.tokens[ctx.pos]
 		var n *Node
-		switch token {
+		switch token.term {
 		case itemBackslash:
 			n = t.parseBackslash(ctx)
 		case itemBacktick:
@@ -60,7 +59,7 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 	}
 }
 
-var and = toBytes("&")
+var and = strToItems("&")
 
 func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	if 2 > ctx.tokensLen || ctx.tokensLen <= ctx.pos+1 {
@@ -71,13 +70,13 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	start := ctx.pos
 	numeric := false
 	if 3 < ctx.tokensLen {
-		numeric = itemCrosshatch == ctx.tokens[start+1]
+		numeric = itemCrosshatch == ctx.tokens[start+1].term
 	}
 	i := ctx.pos
 	var token byte
 	var endWithSemicolon bool
 	for ; i < ctx.tokensLen; i++ {
-		token = ctx.tokens[i]
+		token = ctx.tokens[i].term
 		if isWhitespace(token) {
 			break
 		}
@@ -88,10 +87,10 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	entityName := fromBytes(ctx.tokens[start:i])
+	entityName := itemsToStr(ctx.tokens[start:i])
 	if entityValue, ok := html.Entities[entityName]; ok {
 		ctx.pos += i - start
-		return &Node{typ: NodeText, tokens: toBytes(entityValue)}
+		return &Node{typ: NodeText, tokens: strToItems(entityValue)}
 	}
 
 	if !endWithSemicolon {
@@ -121,10 +120,10 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 		return &Node{typ: NodeText, tokens: and}
 	}
 	ctx.pos += i - start
-	return &Node{typ: NodeText, tokens: toBytes(v)}
+	return &Node{typ: NodeText, tokens: strToItems(v)}
 }
 
-var closeBracket = toBytes("]")
+var closeBracket = strToItems("]")
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
 // to block's children. If there is a matching delimiter, remove it from the delimiter stack.
@@ -154,7 +153,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	savepos := ctx.pos
 	matched := false
 	// 尝试解析内联链接 [text](url "tile")
-	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == ctx.tokens[ctx.pos+1] {
+	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == ctx.tokens[ctx.pos+1].term {
 		ctx.pos++
 		isLink := false
 		var passed, remains items
@@ -168,12 +167,12 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				break
 			}
 			ctx.pos += len(passed)
-			matched = itemCloseParen == passed[len(passed)-1]
+			matched = itemCloseParen == passed[len(passed)-1].term
 			if matched {
 				ctx.pos--
 				break
 			}
-			if 1 > len(remains) || !isWhitespace(remains[0]) {
+			if 1 > len(remains) || !isWhitespace(remains[0].term) {
 				ctx.pos--
 				break
 			}
@@ -183,7 +182,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				break
 			}
 			ctx.pos += len(passed)
-			matched = itemCloseParen == remains[0]
+			matched = itemCloseParen == remains[0].term
 			if matched {
 				ctx.pos--
 				break
@@ -195,7 +194,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			ctx.pos += len(passed)
 			isLink, passed, remains = remains.spnl()
 			ctx.pos += len(passed)
-			matched = isLink && itemCloseParen == remains[0]
+			matched = isLink && itemCloseParen == remains[0].term
 			break
 		}
 		if !matched {
@@ -216,7 +215,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			// [text][] 或者 [text][] 格式，将第一个 text 视为 label 进行解析
 			passed = ctx.tokens[opener.index:startPos]
 			reflabel = passed
-			if len(passed) > 0 && ctx.tokensLen > beforelabel && itemOpenBracket == ctx.tokens[beforelabel] {
+			if len(passed) > 0 && ctx.tokensLen > beforelabel && itemOpenBracket == ctx.tokens[beforelabel].term {
 				// [text][] 格式，跳过 []
 				ctx.pos += 2
 			}
@@ -224,7 +223,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 
 		if nil != reflabel {
 			// 查找链接引用
-			var link = t.context.linkRefDef[strings.ToLower(fromBytes(reflabel))]
+			var link = t.context.linkRefDef[strings.ToLower(itemsToStr(reflabel))]
 			if nil != link {
 				dest = link.destination
 				title = link.title
@@ -277,7 +276,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	}
 }
 
-var openBracket = toBytes("[")
+var openBracket = strToItems("[")
 
 func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
 	ctx.pos++
@@ -306,7 +305,7 @@ func (t *Tree) removeBracket(ctx *InlineContext) {
 	ctx.brackets = ctx.brackets.previous
 }
 
-var backslash = toBytes("\\")
+var backslash = strToItems("\\")
 
 func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 	if ctx.pos == ctx.tokensLen-1 {
@@ -316,11 +315,11 @@ func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 
 	ctx.pos++
 	token := ctx.tokens[ctx.pos]
-	if itemNewline == token {
+	if itemNewline == token.term {
 		ctx.pos++
 		return &Node{typ: NodeHardBreak, tokens: items{token}}
 	}
-	if isASCIIPunct(token) {
+	if isASCIIPunct(token.term) {
 		ctx.pos++
 		return &Node{typ: NodeText, tokens: items{token}}
 	}
@@ -331,7 +330,7 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 	var token byte
 	start := ctx.pos
 	for ; ctx.pos < ctx.tokensLen; ctx.pos++ {
-		token = ctx.tokens[ctx.pos]
+		token = ctx.tokens[ctx.pos].term
 		if t.isMarker(token) {
 			// 遇到潜在的标记符时需要跳出该文本节点，回到行级解析主循环
 			break
@@ -358,10 +357,10 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) *Node {
 	if lastc := block.lastChild; nil != lastc {
 		if NodeText == lastc.typ {
 			tokens := lastc.tokens
-			if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
-				lastc.tokens = bytes.TrimRight(tokens, " \t\n")
+			if valueLen := len(tokens); itemSpace == tokens[valueLen-1].term {
+				_, lastc.tokens = trimRight(tokens)
 				if 1 < valueLen {
-					hardbreak = itemSpace == tokens[len(tokens)-2]
+					hardbreak = itemSpace == tokens[len(tokens)-2].term
 				}
 			}
 		}

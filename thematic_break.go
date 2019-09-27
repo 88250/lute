@@ -16,7 +16,7 @@ func (t *Tree) parseThematicBreak() (ok bool) {
 	markers := 0
 	var marker byte
 	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
-		token := t.context.currentLine[i]
+		token := t.context.currentLine[i].term
 		if itemSpace == token || itemTab == token {
 			continue
 		}

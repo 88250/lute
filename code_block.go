@@ -24,7 +24,7 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 			var i = codeBlock.codeBlockFenceOffset
 			var token byte
 			for i > 0 {
-				token = ln.peek(context.offset)
+				token = ln.peek(context.offset).term
 				if itemSpace != token && itemTab != token {
 					break
 				}

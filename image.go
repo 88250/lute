@@ -12,14 +12,14 @@
 
 package lute
 
-var bang = toBytes("!")
-var bangOpenBracket = toBytes("![")
+var bang = strToItems("!")
+var bangOpenBracket = strToItems("![")
 
 // parseBang 解析 !，可能是图片标记符开始 ![ 也可能是普通文本 !。
 func (t *Tree) parseBang(ctx *InlineContext) (ret *Node) {
 	var startPos = ctx.pos
 	ctx.pos++
-	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos] {
+	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos].term {
 		ctx.pos++
 		ret = &Node{typ: NodeText, tokens: bangOpenBracket}
 		// 将图片开始标记符入栈

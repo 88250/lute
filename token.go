@@ -142,6 +142,11 @@ func itemsToBytes(items items) (ret []byte) {
 	return
 }
 
+// bytesToItems 将 bytes 转为 items。
+func bytesToItems(bytes []byte) items {
+	return strToItems(fromBytes(bytes))
+}
+
 func split(tokens items, separator byte) (ret []items) {
 	length := len(tokens)
 	var i int
@@ -164,14 +169,14 @@ func split(tokens items, separator byte) (ret []items) {
 }
 
 // splitWithoutBackslashEscape 使用 separator 作为分隔符将 tokens 切分为多个子串，被反斜杠 \ 转义的字符不会计入切分。
-func (tokens items) splitWithoutBackslashEscape(separator *item) (ret []items) {
+func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	length := len(tokens)
 	var i int
 	var token *item
 	var line items
 	for ; i < length; i++ {
 		token = tokens[i]
-		if separator.term != token.term || tokens.isBackslashEscapePunct(i) {
+		if separator != token.term || tokens.isBackslashEscapePunct(i) {
 			line = append(line, token)
 			continue
 		}
@@ -213,13 +218,11 @@ func contains(tokens, sub items) bool {
 }
 
 // replaceAll 会将 tokens 中的所有 old 使用 new 替换。
-func (tokens items) replaceAll(old, new byte) {
-	length := len(tokens)
-	for i := 0; i < length; i++ {
-		if old == tokens[i].term {
-			tokens[i].term = new
-		}
-	}
+func replaceAll(tokens, old, new items) items {
+	t := itemsToBytes(tokens)
+	o := itemsToBytes(old)
+	n := itemsToBytes(new)
+	return bytesToItems(bytes.ReplaceAll(t, o, n))
 }
 
 // replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
@@ -254,7 +257,23 @@ func trimWhitespace(tokens items) items {
 	return tokens[start : end+1]
 }
 
-func (tokens items) trimLeft() (whitespaces, remains items) {
+func trimRight(tokens items) (whitespaces, remains items) {
+	length := len(tokens)
+	if 1 > length {
+		return nil, tokens
+	}
+
+	i := length - 1
+	for ; 0 <= i; i-- {
+		if !isWhitespace(tokens[i].term) {
+			break
+		}
+		whitespaces = append(whitespaces, tokens[i])
+	}
+	return whitespaces, tokens[:i]
+}
+
+func trimLeft(tokens items) (whitespaces, remains items) {
 	length := len(tokens)
 	if 1 > length {
 		return nil, tokens
@@ -264,9 +283,8 @@ func (tokens items) trimLeft() (whitespaces, remains items) {
 	for ; i < length; i++ {
 		if !isWhitespace(tokens[i].term) {
 			break
-		} else {
-			whitespaces = append(whitespaces, tokens[i])
 		}
+		whitespaces = append(whitespaces, tokens[i])
 	}
 	return whitespaces, tokens[i:]
 }
@@ -379,7 +397,7 @@ func (tokens items) statWhitespace() (newlines, spaces, tabs int) {
 }
 
 func (tokens items) spnl() (ret bool, passed, remains items) {
-	passed, remains = tokens.trimLeft()
+	passed, remains = trimLeft(tokens)
 	newlines, _, _ := passed.statWhitespace()
 	if 1 < newlines {
 		return false, nil, tokens
@@ -388,9 +406,9 @@ func (tokens items) spnl() (ret bool, passed, remains items) {
 	return
 }
 
-func (tokens items) peek(pos int) byte {
+func (tokens items) peek(pos int) *item {
 	if pos < len(tokens) {
-		return tokens[pos].term
+		return tokens[pos]
 	}
-	return itemEnd
+	return nil
 }

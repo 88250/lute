@@ -18,7 +18,7 @@ import (
 )
 
 func (context *Context) parseLinkRefDef(tokens items) items {
-	_, tokens = tokens.trimLeft()
+	_, tokens = trimLeft(tokens)
 	if 1 > len(tokens) {
 		return nil
 	}
@@ -28,12 +28,12 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		return nil
 	}
 
-	if 1 > len(remains) || itemColon != remains[0] {
+	if 1 > len(remains) || itemColon != remains[0].term {
 		return nil
 	}
 
 	remains = remains[1:]
-	whitespaces, remains := remains.trimLeft()
+	whitespaces, remains := trimLeft(remains)
 	newlines, _, _ := whitespaces.statWhitespace()
 	if 1 < newlines {
 		return nil
@@ -45,7 +45,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		return nil
 	}
 
-	whitespaces, remains = remains.trimLeft()
+	whitespaces, remains = trimLeft(remains)
 	if nil == whitespaces && 0 < len(remains) {
 		return nil
 	}
@@ -54,17 +54,17 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		return nil
 	}
 
-	_, tokens = remains.trimLeft()
+	_, tokens = trimLeft(remains)
 	validTitle, _, remains, title := context.parseLinkTitle(tokens)
 	if !validTitle && 1 > newlines {
 		return nil
 	}
-	if 0 < spaces1+tabs1 && !remains.isBlankLine() && itemNewline != remains[0] {
+	if 0 < spaces1+tabs1 && !remains.isBlankLine() && itemNewline != remains[0].term {
 		return nil
 	}
 
 	titleLine := tokens
-	whitespaces, tokens = remains.trimLeft()
+	whitespaces, tokens = trimLeft(remains)
 	_, spaces2, tabs2 := whitespaces.statWhitespace()
 	if !tokens.isBlankLine() && 0 < spaces2+tabs2 {
 		remains = titleLine
@@ -73,7 +73,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	}
 
 	link := &Node{typ: NodeLink, destination: destination}
-	lowerCaseLabel := bytes.ToLower(label)
+	lowerCaseLabel := bytes.ToLower(itemsToBytes(label))
 	link.title = title
 	if _, ok := context.linkRefDef[fromBytes(lowerCaseLabel)]; !ok {
 		context.linkRefDef[fromBytes(lowerCaseLabel)] = link
@@ -86,7 +86,7 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, r
 	if 1 > len(tokens) {
 		return true, nil, tokens, nil
 	}
-	if itemOpenBracket == tokens[0] {
+	if itemOpenBracket == tokens[0].term {
 		return true, nil, tokens, nil
 	}
 
@@ -111,7 +111,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 		return
 	}
 
-	if opener != tokens[0] {
+	if opener != tokens[0].term {
 		return
 	}
 
@@ -124,12 +124,12 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 	for ; i < length; i += size {
 		token := line[i]
 		passed = append(passed, token)
-		r, size = utf8.DecodeRune(line[i:])
+		r, size = utf8.DecodeRune(itemsToBytes(line[i:]))
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		title = append(title, toBytes(string(r))...)
-		if closer == token && !tokens.isBackslashEscapePunct(i) {
+		title = append(title, strToItems(string(r))...)
+		if closer == token.term && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			title = title[:len(title)-1]
 			break
@@ -152,9 +152,8 @@ func (context *Context) parseLinkDest(tokens items) (ret, remains, destination i
 		ret, remains, destination = context.parseLinkDest2(tokens) // [label](/url)
 	}
 	if nil != ret {
-		destination = encodeDestination(unescapeString(destination))
+		destination = strToItems(encodeDestination(unescapeString(destination)))
 	}
-
 	return
 }
 
@@ -175,21 +174,21 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains, destination 
 	for i < length {
 		token := tokens[i]
 		ret = append(ret, token)
-		r, size = utf8.DecodeRune(tokens[i:])
+		r, size = utf8.DecodeRune(itemsToBytes(tokens[i:]))
 		for j := 1; j < size; j++ {
 			ret = append(ret, tokens[i+j])
 		}
-		destination = append(destination, toBytes(string(r))...)
-		if isWhitespace(token) || isControl(token) {
+		destination = append(destination, strToItems(string(r))...)
+		if isWhitespace(token.term) || isControl(token.term) {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
 			break
 		}
 
-		if itemOpenParen == token && !tokens.isBackslashEscapePunct(i) {
+		if itemOpenParen == token.term && !tokens.isBackslashEscapePunct(i) {
 			openParens++
 		}
-		if itemCloseParen == token && !tokens.isBackslashEscapePunct(i) {
+		if itemCloseParen == token.term && !tokens.isBackslashEscapePunct(i) {
 			openParens--
 			if 1 > openParens {
 				i++
@@ -201,7 +200,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains, destination 
 	}
 
 	remains = tokens[i:]
-	if length > i && !isWhitespace(tokens[i]) {
+	if length > i && !isWhitespace(tokens[i].term) {
 		ret = nil
 		return
 	}
@@ -216,7 +215,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination 
 		return
 	}
 
-	if itemLess != tokens[0] {
+	if itemLess != tokens[0].term {
 		return
 	}
 
@@ -232,18 +231,18 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination 
 		ret = append(ret, token)
 		size = 1
 		if 0 < i {
-			r, size = utf8.DecodeRune(tokens[i:])
+			r, size = utf8.DecodeRune(itemsToBytes(tokens[i:]))
 			for j := 1; j < size; j++ {
 				ret = append(ret, tokens[i+j])
 			}
-			destination = append(destination, toBytes(string(r))...)
-			if itemLess == token && !tokens.isBackslashEscapePunct(i) {
+			destination = append(destination, strToItems(string(r))...)
+			if itemLess == token.term && !tokens.isBackslashEscapePunct(i) {
 				ret = nil
 				return
 			}
 		}
 
-		if itemGreater == token && !tokens.isBackslashEscapePunct(i) {
+		if itemGreater == token.term && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			destination = destination[0 : len(destination)-1]
 			break
@@ -266,7 +265,7 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 		return
 	}
 
-	if itemOpenBracket != tokens[0] {
+	if itemOpenBracket != tokens[0].term {
 		return
 	}
 
@@ -277,32 +276,32 @@ func (context *Context) parseLinkLabel(tokens items) (passed, remains, label ite
 	for i < length {
 		token := tokens[i]
 		passed = append(passed, token)
-		r, size := utf8.DecodeRune(tokens[i:])
+		r, size := utf8.DecodeRune(itemsToBytes(tokens[i:]))
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		label = append(label, toBytes(string(r))...)
-		if itemCloseBracket == token && !tokens.isBackslashEscapePunct(i) {
+		label = append(label, strToItems(string(r))...)
+		if itemCloseBracket == token.term && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			label = label[0 : len(label)-1]
 			remains = tokens[i+1:]
 			break
 		}
-		if itemOpenBracket == token && !tokens.isBackslashEscapePunct(i) {
+		if itemOpenBracket == token.term && !tokens.isBackslashEscapePunct(i) {
 			passed = nil
 			return
 		}
 		i += size
 	}
 
-	if !closed || nil == bytes.TrimSpace(label) || 999 < len(label) {
+	if !closed || nil == trimWhitespace(label) || 999 < len(label) {
 		passed = nil
 	}
 
-	label = bytes.TrimSpace(label)
-	label = bytes.ReplaceAll(label, toBytes("\n"), toBytes(" "))
-	for 0 <= bytes.Index(label, toBytes("  ")) {
-		label = bytes.ReplaceAll(label, toBytes("  "), toBytes(" "))
+	label = trimWhitespace(label)
+	label = replaceAll(label, strToItems("\n"), strToItems(" "))
+	for 0 <= index(label, strToItems("  ")) {
+		label = replaceAll(label, strToItems("  "), strToItems(" "))
 	}
 	return
 }

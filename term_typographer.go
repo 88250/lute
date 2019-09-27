@@ -36,14 +36,14 @@ func fixTermTypo0(tokens items) items {
 	var token byte
 	var i, j, k, l int
 	var before, after byte
-	var originalTerm items
+	var originalTerm []byte
 	for ; i < length; i++ {
-		token = tokens[i]
+		token = tokens[i].term
 		if isNotTerm(token) {
 			continue
 		}
 		if 1 <= i {
-			before = tokens[i-1]
+			before = tokens[i-1].term
 			if !isNotTerm(before) {
 				// 前一个字节必须是非术语，否则无法分隔
 				continue
@@ -56,7 +56,7 @@ func fixTermTypo0(tokens items) items {
 		}
 
 		for j = i; j < length; j++ {
-			after = tokens[j]
+			after = tokens[j].term
 			if isNotTerm(after) || itemDot == after {
 				break
 			}
@@ -67,11 +67,11 @@ func fixTermTypo0(tokens items) items {
 			continue
 		}
 
-		originalTerm = bytes.ToLower(tokens[i:j])
+		originalTerm = bytes.ToLower(itemsToBytes(tokens[i:j]))
 		if to, ok := terms[fromBytes(originalTerm)]; ok {
 			l = 0
 			for k = i; k < j; k++ {
-				tokens[k] = to[l]
+				tokens[k].term = to[l]
 				l++
 			}
 		}

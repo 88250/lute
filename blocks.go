@@ -170,7 +170,7 @@ var blockStarts = []blockStartFunc{
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
-			if itemGreater == token {
+			if itemGreater == token.term {
 				markerStartCol := t.context.nextNonspace + 1
 				markerEndCol := markerStartCol
 
@@ -178,7 +178,7 @@ var blockStarts = []blockStartFunc{
 				t.context.advanceOffset(1, false)
 				// > 后面的空格是可选的
 				token = t.context.currentLine.peek(t.context.offset)
-				withSpace := itemSpace == token || itemTab == token
+				withSpace := itemSpace == token.term || itemTab == token.term
 				if withSpace {
 					t.context.advanceOffset(1, true)
 					markerEndCol++
@@ -283,7 +283,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container *Node) int {
-		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace) == itemLess {
+		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace).term == itemLess {
 			tokens := itemsToBytes(t.context.currentLine[t.context.nextNonspace:])
 			if htmlType := t.parseHTML(tokens); 0 != htmlType {
 				t.context.closeUnmatchedBlocks()

@@ -15,7 +15,6 @@ package lute
 // Vditor DOM Renderer
 
 import (
-	"bytes"
 	"strconv"
 	"strings"
 )
@@ -199,9 +198,9 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 		r.writeByte(itemOpenBracket)
 		r.tag("/span", nil, nil, false)
 
-		attrs = [][]string{{"href", fromBytes(escapeHTML(node.destination))}}
+		attrs = [][]string{{"href", itemsToStr(escapeHTML(node.destination))}}
 		if nil != node.title {
-			attrs = append(attrs, []string{"title", fromBytes(escapeHTML(node.title))})
+			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(node.title))})
 		}
 		r.tag("a", nil, attrs, false)
 	} else {
@@ -314,7 +313,7 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 	if entering {
 		tokens := node.tokens
 		if 0 < len(node.codeBlockInfo) {
-			infoWords := bytes.Split(node.codeBlockInfo, items(" "))
+			infoWords := split(node.codeBlockInfo, itemSpace)
 			language := infoWords[0]
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)
@@ -484,10 +483,10 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		r.tag("span", nil, attrs, false)
 
 		marker := node.listData.marker
-		if 0 != node.listData.delimiter {
+		if nil != node.listData.delimiter {
 			marker = append(marker, node.listData.delimiter)
 		}
-		r.writeString(fromBytes(marker) + " ")
+		r.writeString(itemsToStr(marker) + " ")
 		r.tag("/span", nil, nil, false)
 		r.tag("/span", nil, nil, false)
 		r.tag("p", nil, nil, false)

@@ -12,21 +12,19 @@
 
 package lute
 
-import "bytes"
-
 func (context *Context) parseTable(paragraph *Node) (ret *Node) {
-	lines := bytes.Split(paragraph.tokens, []byte{itemNewline})
+	lines := split(paragraph.tokens, itemNewline)
 	length := len(lines)
 	if 2 > length {
 		return
 	}
 
-	aligns := context.parseTableDelimRow(bytes.TrimSpace(lines[1]))
+	aligns := context.parseTableDelimRow(trimWhitespace(lines[1]))
 	if nil == aligns {
 		return
 	}
 
-	headRow := context.parseTableRow(bytes.TrimSpace(lines[0]), aligns, true)
+	headRow := context.parseTableRow(trimWhitespace(lines[0]), aligns, true)
 	if nil == headRow {
 		return
 	}
@@ -35,7 +33,7 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 	ret.tableAligns = aligns
 	ret.AppendChild(context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
-		tableRow := context.parseTableRow(bytes.TrimSpace(lines[i]), aligns, false)
+		tableRow := context.parseTableRow(trimWhitespace(lines[i]), aligns, false)
 		if nil == tableRow {
 			return
 		}
@@ -60,10 +58,10 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	if 1 > len(cols) {
 		return nil
 	}
-	if isBlank(cols[0]) {
+	if isBlank(itemsToBytes(cols[0])) {
 		cols = cols[1:]
 	}
-	if len(cols) > 0 && isBlank(cols[len(cols)-1]) {
+	if len(cols) > 0 && isBlank(itemsToBytes(cols[len(cols)-1])) {
 		cols = cols[:len(cols)-1]
 	}
 
@@ -76,9 +74,9 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	var i int
 	var col items
 	for ; i < colsLen && i < alignsLen; i++ {
-		col = bytes.TrimSpace(cols[i])
+		col = trimWhitespace(cols[i])
 		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i]}
-		col = bytes.ReplaceAll(col, items("\\|"), items("|"))
+		col = replaceAll(col, strToItems("\\|"), strToItems("|"))
 		cell.tokens = col
 		ret.AppendChild(cell)
 	}
@@ -100,23 +98,23 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	var token byte
 	var i int
 	for ; i < length; i++ {
-		token = line[i]
+		token = line[i].term
 		if itemPipe != token && itemHyphen != token && itemColon != token && itemSpace != token {
 			return nil
 		}
 	}
 
 	cols := line.splitWithoutBackslashEscape(itemPipe)
-	if isBlank(cols[0]) {
+	if isBlank(itemsToBytes(cols[0])) {
 		cols = cols[1:]
 	}
-	if len(cols) > 0 && isBlank(cols[len(cols)-1]) {
+	if len(cols) > 0 && isBlank(itemsToBytes(cols[len(cols)-1])) {
 		cols = cols[:len(cols)-1]
 	}
 
 	var alignments []int
 	for _, col := range cols {
-		col = bytes.TrimSpace(col)
+		col = trimWhitespace(col)
 		if 1 > length || nil == col {
 			return nil
 		}
@@ -134,14 +132,14 @@ func (context *Context) tableDelimAlign(col items) int {
 	var left, right bool
 	length := len(col)
 	first := col[0]
-	left = itemColon == first
+	left = itemColon == first.term
 	last := col[length-1]
-	right = itemColon == last
+	right = itemColon == last.term
 
 	i := 1
 	var token byte
 	for ; i < length-1; i++ {
-		token = col[i]
+		token = col[i].term
 		if itemHyphen != token {
 			return -1
 		}

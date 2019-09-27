@@ -49,13 +49,13 @@ func (lute *Lute) parseVditorDOM(htmlStr string) (tree *Tree, err error) {
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	skipChildren := false
-	node := &Node{typ: -1, tokens: toBytes(n.Data)}
+	node := &Node{typ: -1, tokens: strToItems(n.Data)}
 	switch n.DataAtom {
 	case 0:
 		node.typ = NodeText
 	case atom.Br:
 		node.typ = NodeInlineHTML
-		node.tokens = toBytes("<br />")
+		node.tokens = strToItems("<br />")
 	case atom.Em:
 		node.typ = NodeEmA6kOpenMarker
 	case atom.Strong:
@@ -64,7 +64,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeParagraph
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
-		node.headingLevel = int(node.tokens[1] - byte('0'))
+		node.headingLevel = int(node.tokens[1].term - byte('0'))
 	case atom.Blockquote:
 		node.typ = NodeBlockquote
 	case atom.Hr:
@@ -73,7 +73,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		mtype := lute.domAttrValue(n, "data-mtype")
 		if "2" == mtype { // 行级元素可以直接用其 text
 			node.typ = NodeText
-			node.tokens = toBytes(lute.domText(n))
+			node.tokens = strToItems(lute.domText(n))
 			break
 		}
 

@@ -12,8 +12,6 @@
 
 package lute
 
-import "bytes"
-
 func (p *Node) paragraphContinue(context *Context) int {
 	if context.blank {
 		return 1
@@ -22,11 +20,11 @@ func (p *Node) paragraphContinue(context *Context) int {
 }
 
 func (p *Node) paragraphFinalize(context *Context) {
-	p.tokens = bytes.Trim(p.tokens, " \t\n")
+	p.tokens = trimWhitespace(p.tokens)
 
 	// 尝试解析链接引用定义
 	hasReferenceDefs := false
-	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = p.tokens {
+	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0].term; tokens = p.tokens {
 		if tokens = context.parseLinkRefDef(tokens); nil != tokens {
 			p.tokens = tokens
 			hasReferenceDefs = true
