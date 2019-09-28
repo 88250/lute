@@ -22,6 +22,41 @@ type item struct {
 // items 定义了字节数组，每个字节是一个 token。
 type items []*item
 
+// term 返回 item 的词素。
 func term(item *item) byte {
 	return item.term
+}
+
+// strToItems 将 str 转为 items。
+func strToItems(str string) (ret items) {
+	ret = make(items, 0, len(str))
+	length := len(str)
+	for i := 0; i < length; i++ {
+		ret = append(ret, &item{term: str[i]})
+	}
+	return
+}
+
+// itemsToStr 将 items 转为 string。
+func itemsToStr(items items) string {
+	return string(itemsToBytes(items))
+}
+
+// itemsToBytes 将 items 转为 []byte。
+func itemsToBytes(items items) (ret []byte) {
+	length := len(items)
+	for i := 0; i < length; i++ {
+		ret = append(ret, term(items[i]))
+	}
+	return
+}
+
+// bytesToItems 将 bytes 转为 items。
+func bytesToItems(bytes []byte) (ret items) {
+	ret = make(items, 0, len(bytes))
+	length := len(bytes)
+	for i := 0; i < length; i++ {
+		ret = append(ret, &item{term: bytes[i]})
+	}
+	return
 }

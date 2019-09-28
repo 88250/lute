@@ -66,7 +66,7 @@ loopPart:
 		for ; j < length; j++ {
 			token = term(tokens[j])
 			if !isWhitespace(token) {
-				group = append(group, &item{term: token})
+				group = append(group, tokens[j])
 				if '@' == token {
 					// 记录 @ 符号在组中的绝对位置，后面会用到
 					atIndex = j - i
@@ -77,7 +77,7 @@ loopPart:
 		}
 		if i == j {
 			// 说明积攒组时第一个字符就是空白符，那就把这个空白符作为一个文本节点插到前面
-			text := &Node{typ: NodeText, tokens: items{{term: token}}}
+			text := &Node{typ: NodeText, tokens: items{tokens[j]}}
 			node.InsertBefore(text)
 			i++
 			continue
@@ -105,7 +105,9 @@ loopPart:
 		}
 
 		k++ // 跳过 @ 检查后面的部分
+		var item *item
 		for ; k < len(group); k++ {
+			item = group[k]
 			token = term(group[k])
 			if !t.isValidEmailSegment2(token) {
 				text := &Node{typ: NodeText, tokens: group}
@@ -123,7 +125,7 @@ loopPart:
 			link.AppendChild(text)
 			node.InsertBefore(link)
 			// . 作为文本节点插入
-			text = &Node{typ: NodeText, tokens: items{{term: itemDot}}}
+			text = &Node{typ: NodeText, tokens: items{item}}
 			node.InsertBefore(text)
 		} else if itemHyphen == token || itemUnderscore == token {
 			// 如果以 - 或者 _ 结尾则整个串都不能算作邮件链接
@@ -417,7 +419,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	at := false
 	for ; i < length; i++ {
 		token = term(tokens[i])
-		dest = append(dest, &item{term: token})
+		dest = append(dest, tokens[i])
 		passed++
 		if '@' == token {
 			at = true
@@ -444,7 +446,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 			closed = true
 			break
 		}
-		dest = append(dest, &item{term: token})
+		dest = append(dest, domainPart[i])
 		if !isASCIILetterNumHyphen(token) && itemDot != token {
 			return nil
 		}
@@ -476,7 +478,7 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 			return nil
 		}
 
-		dest = append(dest, &item{term: token})
+		dest = append(dest, ctx.tokens[i])
 		if !schemed {
 			if itemColon != token {
 				scheme += string(token)

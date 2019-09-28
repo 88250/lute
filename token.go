@@ -108,40 +108,6 @@ const (
 	itemDollar         = byte('$')
 )
 
-// strToItems 将 str 转为 items。
-func strToItems(str string) (ret items) {
-	ret = make(items, 0, len(str))
-	length := len(str)
-	for i := 0; i < length; i++ {
-		ret = append(ret, &item{term: str[i]})
-	}
-	return
-}
-
-// itemsToStr 将 items 转为 string。
-func itemsToStr(items items) string {
-	return string(itemsToBytes(items))
-}
-
-// itemsToBytes 将 items 转为 []byte。
-func itemsToBytes(items items) (ret []byte) {
-	length := len(items)
-	for i := 0; i < length; i++ {
-		ret = append(ret, term(items[i]))
-	}
-	return
-}
-
-// bytesToItems 将 bytes 转为 items。
-func bytesToItems(bytes []byte) (ret items) {
-	ret = make(items, 0, len(bytes))
-	length := len(bytes)
-	for i := 0; i < length; i++ {
-		ret = append(ret, &item{term: bytes[i]})
-	}
-	return
-}
-
 func split(tokens items, separator byte) (ret []items) {
 	length := len(tokens)
 	var i int
