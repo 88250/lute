@@ -41,7 +41,7 @@ func TestMath(t *testing.T) {
 	for _, test := range mathTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {
-			t.Fatalf("unexpected: %s", err)
+			t.Fatalf("test case [%s] unexpected: %s", test.name, err)
 		}
 
 		if test.to != html {

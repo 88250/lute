@@ -121,6 +121,7 @@ type items []*item
 
 // strToItems 将 str 转为 items。
 func strToItems(str string) (ret items) {
+	ret = make(items, 0, len(str))
 	length := len(str)
 	for i := 0; i < length; i++ {
 		ret = append(ret, &item{term: str[i]})
@@ -143,8 +144,13 @@ func itemsToBytes(items items) (ret []byte) {
 }
 
 // bytesToItems 将 bytes 转为 items。
-func bytesToItems(bytes []byte) items {
-	return strToItems(fromBytes(bytes))
+func bytesToItems(bytes []byte) (ret items) {
+	ret = make(items, 0, len(bytes))
+	length := len(bytes)
+	for i := 0; i < length; i++ {
+		ret = append(ret, &item{term: bytes[i]})
+	}
+	return
 }
 
 func split(tokens items, separator byte) (ret []items) {
@@ -261,7 +267,7 @@ func trimWhitespace(tokens items) items {
 		}
 	}
 	if end < start {
-		end = start-1
+		end = start - 1
 	}
 	return tokens[start : end+1]
 }
