@@ -14,17 +14,13 @@
 
 package lute
 
-import (
-	"bytes"
-)
-
 // renderCodeBlockHTML 进行代码块 HTML 渲染，不实现语法高亮。
 func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		tokens := node.tokens
 		if 0 < len(node.codeBlockInfo) {
-			infoWords := bytes.Split(node.codeBlockInfo, []byte(" "))
+			infoWords := split(node.codeBlockInfo, itemSpace)
 			language := infoWords[0]
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)

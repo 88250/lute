@@ -16,12 +16,12 @@ package lute
 
 // []byte~string 之间的快速转换优化会导致生成 JavaScript 端代码问题，所以此处还是使用内存拷贝。
 
-// fromBytes 快速转换 items 为 string。
-func fromItems(items items) string {
-	return string(items)
+// fromBytes 快速转换 []byte 为 string。
+func fromBytes(bytes []byte) string {
+	return string(bytes)
 }
 
-// toBytes 快速转换 str 为 items。
-func toBytes(str string) items {
-	return items(str)
+// toBytes 快速转换 string 为 []byte。
+func toBytes(str string) []byte {
+	return []byte(str)
 }
