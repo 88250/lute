@@ -64,7 +64,7 @@ loopPart:
 
 		// 积攒组直到遇到空白符
 		for ; j < length; j++ {
-			token = tokens[j].term
+			token = term(tokens[j])
 			if !isWhitespace(token) {
 				group = append(group, &item{term: token})
 				if '@' == token {
@@ -96,7 +96,7 @@ loopPart:
 
 		k = 0
 		for ; k < atIndex; k++ {
-			token = group[k].term
+			token = term(group[k])
 			if !t.isValidEmailSegment1(token) {
 				text := &Node{typ: NodeText, tokens: group}
 				node.InsertBefore(text)
@@ -106,7 +106,7 @@ loopPart:
 
 		k++ // 跳过 @ 检查后面的部分
 		for ; k < len(group); k++ {
-			token = group[k].term
+			token = term(group[k])
 			if !t.isValidEmailSegment2(token) {
 				text := &Node{typ: NodeText, tokens: group}
 				node.InsertBefore(text)
@@ -183,10 +183,10 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		// 检查前缀
 		tmp = tokens[i:]
 		tmpLen := len(tmp)
-		if 8 <= tmpLen /* www.x.xx */ && 'w' == tmp[0].term && 'w' == tmp[1].term && 'w' == tmp[2].term && '.' == tmp[3].term {
+		if 8 <= tmpLen /* www.x.xx */ && 'w' == term(tmp[0]) && 'w' == term(tmp[1]) && 'w' == term(tmp[2]) && '.' == term(tmp[3]) {
 			protocol = httpProto
 			www = true
-		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == tmp[0].term && 't' == tmp[1].term && 't' == tmp[2].term && 'p' == tmp[3].term && ':' == tmp[4].term && '/' == tmp[5].term && '/' == tmp[6].term {
+		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == term(tmp[0]) && 't' == term(tmp[1]) && 't' == tmp[2].term && 'p' == tmp[3].term && ':' == tmp[4].term && '/' == tmp[5].term && '/' == tmp[6].term {
 			protocol = httpProto
 			i += 7
 		} else if 12 <= tmpLen /* https://x.xx */ && 'h' == tmp[0].term && 't' == tmp[1].term && 't' == tmp[2].term && 'p' == tmp[3].term && 's' == tmp[4].term && ':' == tmp[5].term && '/' == tmp[6].term && '/' == tmp[7].term {
@@ -416,7 +416,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	i := 0
 	at := false
 	for ; i < length; i++ {
-		token = tokens[i].term
+		token = term(tokens[i])
 		dest = append(dest, &item{term: token})
 		passed++
 		if '@' == token {
@@ -438,7 +438,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	i = 0
 	closed := false
 	for ; i < length; i++ {
-		token = domainPart[i].term
+		token = term(domainPart[i])
 		passed++
 		if itemGreater == token {
 			closed = true
@@ -470,8 +470,8 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 	var dest items
 	var token byte
 	i := ctx.pos + 1
-	for ; i < ctx.tokensLen && itemGreater != ctx.tokens[i].term; i++ {
-		token = ctx.tokens[i].term
+	for ; i < ctx.tokensLen && itemGreater != term(ctx.tokens[i]); i++ {
+		token = term(ctx.tokens[i])
 		if itemSpace == token {
 			return nil
 		}
@@ -490,7 +490,7 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 	}
 
 	link := &Node{typ: NodeLink, destination: strToItems(encodeDestination(dest))}
-	if itemGreater != ctx.tokens[i].term {
+	if itemGreater != term(ctx.tokens[i]) {
 		return nil
 	}
 

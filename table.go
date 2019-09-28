@@ -98,7 +98,7 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	var token byte
 	var i int
 	for ; i < length; i++ {
-		token = line[i].term
+		token = term(line[i])
 		if itemPipe != token && itemHyphen != token && itemColon != token && itemSpace != token {
 			return nil
 		}
@@ -136,14 +136,14 @@ func (context *Context) tableDelimAlign(col items) int {
 
 	var left, right bool
 	first := col[0]
-	left = itemColon == first.term
+	left = itemColon == term(first)
 	last := col[length-1]
-	right = itemColon == last.term
+	right = itemColon == term(last)
 
 	i := 1
 	var token byte
 	for ; i < length-1; i++ {
-		token = col[i].term
+		token = term(col[i])
 		if itemHyphen != token {
 			return -1
 		}

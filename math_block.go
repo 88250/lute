@@ -24,7 +24,7 @@ func (mathBlock *Node) mathBlockContinue(context *Context) int {
 		var i = mathBlock.mathBlockDollarOffset
 		var token byte
 		for i > 0 {
-			token = ln.peek(context.offset).term
+			token = term(ln.peek(context.offset))
 			if itemSpace != token && itemTab != token {
 				break
 			}
@@ -50,13 +50,13 @@ var mathBlockDollar = strToItems("$")
 
 func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 	marker := t.context.currentLine[t.context.nextNonspace]
-	if itemDollar != marker.term {
+	if itemDollar != term(marker) {
 		return
 	}
 
 	fenceChar := marker
 	fenceLength := 0
-	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar.term == t.context.currentLine[i].term; i++ {
+	for i := t.context.nextNonspace; i < t.context.currentLineLen && term(fenceChar) == term(t.context.currentLine[i]); i++ {
 		fenceLength++
 	}
 
@@ -69,15 +69,15 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 
 func (mathBlock *Node) isMathBlockClose(tokens items) bool {
 	closeMarker := tokens[0]
-	if closeMarker.term != itemDollar {
+	if term(closeMarker) != itemDollar {
 		return false
 	}
-	if 2 > tokens.accept(closeMarker.term) {
+	if 2 > tokens.accept(term(closeMarker)) {
 		return false
 	}
 	tokens = trimWhitespace(tokens)
 	for _, token := range tokens {
-		if token.term != itemDollar {
+		if term(token) != itemDollar {
 			return false
 		}
 	}

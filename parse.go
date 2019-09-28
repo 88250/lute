@@ -60,7 +60,7 @@ func (context *Context) advanceOffset(count int, columns bool) {
 	var charsToTab, charsToAdvance int
 	var c byte
 	for 0 < count {
-		c = currentLine[context.offset].term
+		c = term(currentLine[context.offset])
 		if itemTab == c {
 			charsToTab = 4 - (context.column % 4)
 			if columns {
@@ -102,7 +102,7 @@ func (context *Context) findNextNonspace() {
 
 	var token byte
 	for {
-		token = context.currentLine[i].term
+		token = term(context.currentLine[i])
 		if itemSpace == token {
 			i++
 			cols++
@@ -164,7 +164,7 @@ func (context *Context) addChild(nodeType nodeType, offset int) (ret *Node) {
 // listsMatch 用户判断指定的 listData 和 itemData 是否可归属于同一个列表。
 func (context *Context) listsMatch(listData, itemData *listData) bool {
 	return listData.typ == itemData.typ &&
-		((nil == listData.delimiter && nil == itemData.delimiter) || listData.delimiter.term == itemData.delimiter.term) &&
+		((nil == listData.delimiter && nil == itemData.delimiter) || term(listData.delimiter) == term(itemData.delimiter)) &&
 		equal(listData.bulletChar, itemData.bulletChar)
 }
 

@@ -31,7 +31,7 @@ func escapeHTML(html items) (ret items) {
 	inited := false
 	ret = html
 	for ; i < length; i++ {
-		switch html[i].term {
+		switch term(html[i]) {
 		case itemAmpersand:
 			if !inited { // 通过延迟初始化减少内存分配，下同
 				ret = make(items, 0, length+128)
@@ -88,16 +88,16 @@ func encodeDestination(rawurl items) string {
 		r, rlen := utf8.DecodeRune(itemsToBytes(rawurl[i:]))
 		if r >= 0x80 {
 			for j, n := i, i+rlen; j < n; j++ {
-				b := rawurl[j].term
+				b := term(rawurl[j])
 				buf.WriteByte('%')
 				buf.WriteByte(hexdigit[(b>>4)&0xf])
 				buf.WriteByte(hexdigit[b&0xf])
 			}
 		} else if r == '%' {
-			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1].term) && isHexDigit(rawurl[i+2].term) {
+			if i+2 < len(rawurl) && isHexDigit(term(rawurl[i+1])) && isHexDigit(term(rawurl[i+2])) {
 				buf.WriteByte('%')
-				buf.WriteByte(tokenToUpper(rawurl[i+1].term))
-				buf.WriteByte(tokenToUpper(rawurl[i+2].term))
+				buf.WriteByte(tokenToUpper(term(rawurl[i+1])))
+				buf.WriteByte(tokenToUpper(term(rawurl[i+2])))
 				i += 2
 			} else {
 				buf.WriteString("%25")

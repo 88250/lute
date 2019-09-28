@@ -64,7 +64,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeParagraph
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
-		node.headingLevel = int(node.tokens[1].term - byte('0'))
+		node.headingLevel = int(term(node.tokens[1]) - byte('0'))
 	case atom.Blockquote:
 		node.typ = NodeBlockquote
 	case atom.Hr:

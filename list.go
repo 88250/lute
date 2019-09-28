@@ -73,7 +73,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	markerLength := 1
 	marker := items{tokens[0]}
 	var delim *item
-	if itemPlus == marker[0].term || itemHyphen == marker[0].term || itemAsterisk == marker[0].term {
+	if itemPlus == term(marker[0]) || itemHyphen == term(marker[0]) || itemAsterisk == term(marker[0]) {
 		data.bulletChar = marker
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
 		if container.typ != NodeParagraph || equal(items1, marker) {
@@ -92,12 +92,12 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 
 	var token = ln[t.context.nextNonspace+markerLength]
 	// 列表项标记符后必须是空白字符
-	if !isWhitespace(token.term) {
+	if !isWhitespace(term(token)) {
 		return nil
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空
-	if container.typ == NodeParagraph && itemNewline == ln[t.context.nextNonspace+markerLength].term {
+	if container.typ == NodeParagraph && itemNewline == term(ln[t.context.nextNonspace+markerLength]) {
 		return nil
 	}
 
@@ -109,19 +109,19 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	for {
 		t.context.advanceOffset(1, true)
 		token = ln.peek(t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || nil == token || (itemSpace != token.term && itemTab != token.term) {
+		if t.context.column-spacesStartCol >= 5 || nil == token || (itemSpace != term(token) && itemTab != term(token)) {
 			break
 		}
 	}
 
 	token = ln.peek(t.context.offset)
-	var isBlankItem = nil == token || itemNewline == token.term
+	var isBlankItem = nil == token || itemNewline == term(token)
 	var spacesAfterMarker = t.context.column - spacesStartCol
 	if spacesAfterMarker >= 5 || spacesAfterMarker < 1 || isBlankItem {
 		data.padding = markerLength + 1
 		t.context.column = spacesStartCol
 		t.context.offset = spacesStartOffset
-		if token = ln.peek(t.context.offset); itemSpace == token.term || itemTab == token.term {
+		if token = ln.peek(t.context.offset); itemSpace == term(token) || itemTab == term(token) {
 			t.context.advanceOffset(1, true)
 		}
 	} else {
@@ -132,9 +132,9 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 		// 判断是否是任务列表项
 		content := ln[t.context.offset:]
 		if 3 <= len(content) { // 至少需要 [ ] 或者 [x] 3 个字符
-			if itemOpenBracket == content[0].term && ('x' == content[1].term || 'X' == content[1].term || itemSpace == content[1].term) && itemCloseBracket == content[2].term {
+			if itemOpenBracket == term(content[0]) && ('x' == term(content[1]) || 'X' == term(content[1]) || itemSpace == term(content[1])) && itemCloseBracket == term(content[2]) {
 				data.typ = 3
-				data.checked = 'x' == content[1].term || 'X' == content[1].term
+				data.checked = 'x' == term(content[1]) || 'X' == term(content[1])
 			}
 		}
 	}
@@ -148,14 +148,14 @@ func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter *it
 	var token *item
 	for ; i < length; i++ {
 		token = tokens[i]
-		if !isDigit(token.term) || 8 < i {
+		if !isDigit(term(token)) || 8 < i {
 			delimiter = token
 			break
 		}
 		marker = append(marker, token)
 	}
 
-	if 1 > len(marker) || (itemDot != delimiter.term && itemCloseParen != delimiter.term) {
+	if 1 > len(marker) || (itemDot != term(delimiter) && itemCloseParen != term(delimiter)) {
 		return nil, nil
 	}
 

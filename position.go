@@ -20,7 +20,7 @@ func (t *Tree) unidim2Bidim(tokens items, uCol int) (bLn, bCol int) {
 	length := len(tokens)
 	var token byte
 	for i := 0; i < length && i < uCol; i++ {
-		token = tokens[i].term
+		token = term(tokens[i])
 		if itemNewline == token {
 			bLn++
 			bCol = 1

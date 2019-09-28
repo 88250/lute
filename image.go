@@ -19,7 +19,7 @@ var bangOpenBracket = strToItems("![")
 func (t *Tree) parseBang(ctx *InlineContext) (ret *Node) {
 	var startPos = ctx.pos
 	ctx.pos++
-	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos].term {
+	if ctx.pos < ctx.tokensLen && itemOpenBracket == term(ctx.tokens[ctx.pos]) {
 		ctx.pos++
 		ret = &Node{typ: NodeText, tokens: bangOpenBracket}
 		// 将图片开始标记符入栈

@@ -24,7 +24,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 
 	// 尝试解析链接引用定义
 	hasReferenceDefs := false
-	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0].term; tokens = p.tokens {
+	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == term(tokens[0]); tokens = p.tokens {
 		if tokens = context.parseLinkRefDef(tokens); nil != tokens {
 			p.tokens = tokens
 			hasReferenceDefs = true

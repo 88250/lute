@@ -12,28 +12,16 @@
 
 package lute
 
-func (t *Tree) parseThematicBreak() (ok bool) {
-	markers := 0
-	var marker byte
-	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
-		token := term(t.context.currentLine[i])
-		if itemSpace == token || itemTab == token {
-			continue
-		}
+// item 描述了词法分析的一个 token。
+type item struct {
+	term byte // 源码字节
+	ln   int  // 源码行号
+	col  int  // 源码列号
+}
 
-		if itemHyphen != token && itemUnderscore != token && itemAsterisk != token {
-			return
-		}
+// items 定义了字节数组，每个字节是一个 token。
+type items []*item
 
-		if 0 != marker {
-			if marker != token {
-				return
-			}
-		} else {
-			marker = token
-		}
-		markers++
-	}
-
-	return 3 <= markers
+func term(item *item) byte {
+	return item.term
 }
