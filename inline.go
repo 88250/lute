@@ -210,7 +210,12 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			ctx.pos += n
 		} else if !opener.bracketAfter {
 			// [text][] 格式，将 text 视为 label 进行解析
-			reflabel = ctx.tokens[opener.index+1 : startPos-1]
+			start := opener.index
+			if itemOpenBracket == ctx.tokens[start].term {
+				// TODO: 链接引用定义 key 还是包括方括号好些 [xxx]
+				start++
+			}
+			reflabel = ctx.tokens[start : startPos-1]
 			ctx.pos += len(reflabel)
 		}
 		if 0 == n {

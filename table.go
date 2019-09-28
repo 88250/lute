@@ -129,8 +129,12 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 }
 
 func (context *Context) tableDelimAlign(col items) int {
-	var left, right bool
 	length := len(col)
+	if 1 > length {
+		return -1
+	}
+
+	var left, right bool
 	first := col[0]
 	left = itemColon == first.term
 	last := col[length-1]

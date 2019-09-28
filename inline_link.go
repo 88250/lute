@@ -105,6 +105,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 				openParens--
 				if 1 > openParens {
 					if itemOpenParen == destination[0].term {
+						// TODO: 需要重写边界判断
 						destination = destination[1:]
 					}
 					destination = destination[:len(destination)-1]

@@ -260,6 +260,9 @@ func trimWhitespace(tokens items) items {
 			break
 		}
 	}
+	if end < start {
+		end = start-1
+	}
 	return tokens[start : end+1]
 }
 
