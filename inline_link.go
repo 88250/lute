@@ -26,11 +26,11 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 	passed = make(items, 0, 256)
 	destination = make(items, 0, 256)
 
-	isPointyBrackets := itemLess == tokens[0].term
+	isPointyBrackets := itemLess == tokens[1].term
 	if isPointyBrackets {
 		matchEnd := false
 		passed = append(passed, tokens[0], tokens[1])
-		i := 1
+		i := 2
 		size := 1
 		var r rune
 		var dest, runes items
@@ -90,7 +90,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 			destination = append(destination, dest...)
 			if !destStarted && !isWhitespace(token.term) && 0 < i {
 				destStarted = true
-				// TODO: destination = destination[size:]
+				destination = destination[size:]
 				destination = trimWhitespace(destination)
 			}
 			if destStarted && (isWhitespace(token.term) || isControl(token.term)) {
@@ -104,7 +104,9 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 			if itemCloseParen == token.term && !tokens.isBackslashEscapePunct(i) {
 				openParens--
 				if 1 > openParens {
-					destination = destination[1:]
+					if itemOpenParen == destination[0].term {
+						destination = destination[1:]
+					}
 					destination = destination[:len(destination)-1]
 					break
 				}
