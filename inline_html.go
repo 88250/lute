@@ -120,7 +120,7 @@ func (t *Tree) parseCDATA(tokens items) (valid bool, remains, content items) {
 
 	content = append(content, tokens[:7]...)
 	tokens = tokens[7:]
-	var token *item
+	var token item
 	var i int
 	length := len(tokens)
 	for ; i < length; i++ {
@@ -147,7 +147,7 @@ func (t *Tree) parseDeclaration(tokens items) (valid bool, remains, content item
 		return
 	}
 
-	var token *item
+	var token item
 	var i int
 	for _, token = range tokens[1:] {
 		if isWhitespace(term(token)) {
@@ -186,7 +186,7 @@ func (t *Tree) parseProcessingInstruction(tokens items) (valid bool, remains, co
 
 	content = append(content, tokens[0])
 	tokens = tokens[1:]
-	var token *item
+	var token item
 	var i int
 	length := len(tokens)
 	for ; i < length; i++ {
@@ -225,7 +225,7 @@ func (t *Tree) parseHTMLComment(tokens items) (valid bool, remains, comment item
 	if itemHyphen == term(tokens[0]) && itemGreater == term(tokens[1]) {
 		return
 	}
-	var token *item
+	var token item
 	var i int
 	length := len(tokens)
 	for ; i < length; i++ {
@@ -254,7 +254,7 @@ func (t *Tree) parseTagAttr(tokens items) (valid bool, remains, attr items) {
 	remains = tokens
 	var whitespaces items
 	var i int
-	var token *item
+	var token item
 	for i, token = range tokens {
 		if !isWhitespace(term(token)) {
 			break
@@ -290,7 +290,7 @@ func (t *Tree) parseAttrValSpec(tokens items) (valid bool, remains, valSpec item
 	valid = true
 	remains = tokens
 	var i int
-	var token *item
+	var token item
 	for i, token = range tokens {
 		if !isWhitespace(term(token)) {
 			break
@@ -367,7 +367,7 @@ func (t *Tree) parseAttrName(tokens items) (remains, attrName items) {
 	attrName = append(attrName, tokens[0])
 	tokens = tokens[1:]
 	var i int
-	var token *item
+	var token item
 	for i, token = range tokens {
 		if !isASCIILetterNumHyphen(term(token)) && itemUnderscore != term(token) && itemDot != term(token) && itemColon != term(token) {
 			break

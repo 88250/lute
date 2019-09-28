@@ -10,46 +10,50 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build srcmap
+// +build !srcmap
 
 package lute
 
 // item 描述了词法分析的一个 token。
-type item byte
+type item struct {
+	term byte // 源码字节
+	ln   int  // 源码行号
+	col  int  // 源码列号
+}
 
 // items 定义了 token 数组。
 type items []item
 
 // nilItem 返回一个空值 token。
 func nilItem() item {
-	return item(0)
+	return item{term: 0}
 }
 
 // isNilItem 判断 item 是否为空值。
 func isNilItem(item item) bool {
-	return 0 == item
+	return 0 == item.term
 }
 
 // newItem 构造一个 token。
 func newItem(term byte, ln, col int) item {
-	return item(term)
+	return item{term: term, ln: ln, col: col}
 }
 
 // term 返回 item 的词素。
 func term(item item) byte {
-	return byte(item)
+	return item.term
 }
 
 func setTerm(tokens *items, i int, term byte) {
-	(*tokens)[i] = item(term)
+	(*tokens)[i].term = term
 }
 
 // strToItems 将 str 转为 items。
 func strToItems(str string) (ret items) {
+	ret = make(items, 0, len(str))
 	length := len(str)
-	ret = make(items, 0, 256)
 	for i := 0; i < length; i++ {
-		ret = append(ret, item(str[i]))
+		ret = append(ret, item{term: str[i]})
 	}
 	return
 }
@@ -62,19 +66,18 @@ func itemsToStr(items items) string {
 // itemsToBytes 将 items 转为 []byte。
 func itemsToBytes(items items) (ret []byte) {
 	length := len(items)
-	ret = make([]byte, 0, 256)
 	for i := 0; i < length; i++ {
-		ret = append(ret, byte(items[i]))
+		ret = append(ret, term(items[i]))
 	}
 	return
 }
 
 // bytesToItems 将 bytes 转为 items。
 func bytesToItems(bytes []byte) (ret items) {
+	ret = make(items, 0, len(bytes))
 	length := len(bytes)
-	ret = make(items, 0, 256)
 	for i := 0; i < length; i++ {
-		ret = append(ret, item(bytes[i]))
+		ret = append(ret, item{term: bytes[i]})
 	}
 	return
 }

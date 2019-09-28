@@ -105,7 +105,7 @@ loopPart:
 		}
 
 		k++ // 跳过 @ 检查后面的部分
-		var item *item
+		var item item
 		for ; k < len(group); k++ {
 			item = group[k]
 			token = term(group[k])
@@ -174,7 +174,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		return
 	}
 
-	var token *item
+	var token item
 	var consumed = make(items, 0, 256)
 	var tmp = make(items, 0, 16)
 	www := false

@@ -22,7 +22,7 @@ type listData struct {
 	tight        bool  // 是否是紧凑模式
 	bulletChar   items // 无序列表标识，* - 或者 +
 	start        int   // 有序列表起始序号
-	delimiter    *item // 有序列表分隔符，. 或者 )
+	delimiter    item  // 有序列表分隔符，. 或者 )
 	padding      int   // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
 	markerOffset int   // 标识符（* - + 或者 1 2 3）相对缩进空格数
 	checked      bool  // 任务列表项是否勾选
@@ -72,7 +72,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 
 	markerLength := 1
 	marker := items{tokens[0]}
-	var delim *item
+	var delim item
 	if itemPlus == term(marker[0]) || itemHyphen == term(marker[0]) || itemAsterisk == term(marker[0]) {
 		data.bulletChar = marker
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
@@ -109,13 +109,13 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	for {
 		t.context.advanceOffset(1, true)
 		token = ln.peek(t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || nil == token || (itemSpace != term(token) && itemTab != term(token)) {
+		if t.context.column-spacesStartCol >= 5 || isNilItem(token) || (itemSpace != term(token) && itemTab != term(token)) {
 			break
 		}
 	}
 
 	token = ln.peek(t.context.offset)
-	var isBlankItem = nil == token || itemNewline == term(token)
+	var isBlankItem = isNilItem(token) || itemNewline == term(token)
 	var spacesAfterMarker = t.context.column - spacesStartCol
 	if spacesAfterMarker >= 5 || spacesAfterMarker < 1 || isBlankItem {
 		data.padding = markerLength + 1
@@ -142,10 +142,10 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	return data
 }
 
-func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter *item) {
+func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter item) {
 	length := len(tokens)
 	var i int
-	var token *item
+	var token item
 	for ; i < length; i++ {
 		token = tokens[i]
 		if !isDigit(term(token)) || 8 < i {
@@ -156,7 +156,7 @@ func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter *it
 	}
 
 	if 1 > len(marker) || (itemDot != term(delimiter) && itemCloseParen != term(delimiter)) {
-		return nil, nil
+		return nil, nilItem()
 	}
 
 	return

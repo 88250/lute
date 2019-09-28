@@ -483,7 +483,7 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		r.tag("span", nil, attrs, false)
 
 		marker := node.listData.marker
-		if nil != node.listData.delimiter {
+		if !isNilItem(node.listData.delimiter) {
 			marker = append(marker, node.listData.delimiter)
 		}
 		r.writeString(itemsToStr(marker) + " ")

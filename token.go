@@ -111,7 +111,7 @@ const (
 func split(tokens items, separator byte) (ret []items) {
 	length := len(tokens)
 	var i int
-	var token *item
+	var token item
 	var line items
 	for ; i < length; i++ {
 		token = tokens[i]
@@ -133,7 +133,7 @@ func split(tokens items, separator byte) (ret []items) {
 func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	length := len(tokens)
 	var i int
-	var token *item
+	var token item
 	var line items
 	for ; i < length; i++ {
 		token = tokens[i]
@@ -376,9 +376,9 @@ func (tokens items) spnl() (ret bool, passed, remains items) {
 	return
 }
 
-func (tokens items) peek(pos int) *item {
+func (tokens items) peek(pos int) item {
 	if pos < len(tokens) {
 		return tokens[pos]
 	}
-	return nil
+	return nilItem()
 }
