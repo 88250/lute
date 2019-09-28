@@ -22,6 +22,10 @@ type item struct {
 // items 定义了字节数组，每个字节是一个 token。
 type items []*item
 
+func newItem(term byte, ln, col int) *item {
+	return &item{term: term, ln: ln, col: col}
+}
+
 // term 返回 item 的词素。
 func term(item *item) byte {
 	return item.term

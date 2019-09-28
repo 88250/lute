@@ -212,7 +212,7 @@ func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}
 			marker = strconv.Itoa(num + 1)
 			marker += delim
 		}
-		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: strToItems(marker), delimiter: &item{term: delim[0]}}}
+		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: strToItems(marker), delimiter: newItem(delim[0], 0, 0)}}
 		_, err = renderer.renderListItem(listItem, true)
 		if nil != err {
 			return
