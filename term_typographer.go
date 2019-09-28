@@ -71,6 +71,7 @@ func fixTermTypo0(tokens items) items {
 		if to, ok := terms[fromBytes(originalTerm)]; ok {
 			l = 0
 			for k = i; k < j; k++ {
+				//setTerm(&tokens, k, to[l])
 				tokens[k].term = to[l]
 				l++
 			}

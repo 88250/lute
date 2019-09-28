@@ -27,6 +27,10 @@ func term(item *item) byte {
 	return item.term
 }
 
+func setTerm(tokens *items, i int, term byte) {
+	(*tokens)[i].term = term
+}
+
 // strToItems 将 str 转为 items。
 func strToItems(str string) (ret items) {
 	ret = make(items, 0, len(str))

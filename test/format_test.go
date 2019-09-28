@@ -104,7 +104,7 @@ func TestFormatCases(t *testing.T) {
 		luteEngine := lute.New()
 		htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
 		if nil != err {
-			t.Fatalf("markdown format failed: %s", err)
+			t.Fatalf("test case [%s] markdown format failed: %s", caseName, err)
 		}
 		html := string(htmlBytes)
 
