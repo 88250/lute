@@ -114,7 +114,7 @@ func (context *Context) findNextNonspace() {
 		}
 	}
 
-	context.blank = itemNewline == token || itemEnd == token
+	context.blank = itemNewline == token
 	context.nextNonspace = i
 	context.nextNonspaceColumn = cols
 	context.indent = context.nextNonspaceColumn - context.column

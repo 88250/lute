@@ -83,7 +83,6 @@ func isBlank(tokens []byte) bool {
 }
 
 const (
-	itemEnd            = byte(0)
 	itemBacktick       = byte('`')
 	itemTilde          = byte('~')
 	itemBang           = byte('!')

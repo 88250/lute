@@ -18,25 +18,31 @@ import (
 
 // lexer 描述了词法分析器结构。
 type lexer struct {
-	input   []byte // 输入的文本字节数组
-	length  int    // 输入的文本字节数组的长度
-	offset  int    // 当前读取位置
-	lineNum int    // 当前行号
-	width   int    // 最新一个 token 的宽度（字节数）
+	input  []byte // 输入的文本字节数组
+	length int    // 输入的文本字节数组的长度
+	offset int    // 当前读取字节位置
+	ln     int    // 当前行号
+	col    int    // 当前列号
+	width  int    // 最新一个 token 的宽度（字节数）
 }
 
 // nextLine 返回下一行。
-func (l *lexer) nextLine() (line items) {
+func (l *lexer) nextLine() (ret items) {
 	if l.offset >= l.length {
 		return
 	}
+
+	l.ln++
+	l.col = 0
 
 	var b, nb byte
 	i := l.offset
 	for ; i < l.length; i += l.width {
 		b = l.input[i]
+		l.col++
 		if itemNewline == b {
 			i++
+			ret = append(ret, &item{term: b, ln: l.ln, col: l.col})
 			break
 		} else if itemCarriageReturn == b {
 			// 按照规范定义的 line ending (https://spec.commonmark.org/0.29/#line-ending) 处理 \r
@@ -65,13 +71,15 @@ func (l *lexer) nextLine() (line items) {
 
 		if utf8.RuneSelf <= b { // 说明占用多个字节
 			_, l.width = utf8.DecodeRune(l.input[i:])
+			for j := 0; j < l.width; j++ {
+				ret = append(ret, &item{term: l.input[i+j], ln: l.ln, col: l.col})
+			}
 		} else {
 			l.width = 1
+			ret = append(ret, &item{term: b, ln: l.ln, col: l.col})
 		}
 	}
-	line = bytesToItems(l.input[l.offset:i])
 	l.offset = i
-	l.lineNum++
 	return
 }
 

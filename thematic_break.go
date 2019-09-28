@@ -25,7 +25,7 @@ func (t *Tree) parseThematicBreak() (ok bool) {
 			return
 		}
 
-		if itemEnd != marker {
+		if 0 != marker {
 			if marker != token {
 				return
 			}
