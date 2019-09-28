@@ -186,13 +186,13 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		if 8 <= tmpLen /* www.x.xx */ && 'w' == term(tmp[0]) && 'w' == term(tmp[1]) && 'w' == term(tmp[2]) && '.' == term(tmp[3]) {
 			protocol = httpProto
 			www = true
-		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == term(tmp[0]) && 't' == term(tmp[1]) && 't' == tmp[2].term && 'p' == tmp[3].term && ':' == tmp[4].term && '/' == tmp[5].term && '/' == tmp[6].term {
+		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == term(tmp[0]) && 't' == term(tmp[1]) && 't' == term(tmp[2]) && 'p' == term(tmp[3]) && ':' == term(tmp[4]) && '/' == term(tmp[5]) && '/' == term(tmp[6]) {
 			protocol = httpProto
 			i += 7
-		} else if 12 <= tmpLen /* https://x.xx */ && 'h' == tmp[0].term && 't' == tmp[1].term && 't' == tmp[2].term && 'p' == tmp[3].term && 's' == tmp[4].term && ':' == tmp[5].term && '/' == tmp[6].term && '/' == tmp[7].term {
+		} else if 12 <= tmpLen /* https://x.xx */ && 'h' == term(tmp[0]) && 't' == term(tmp[1]) && 't' == term(tmp[2]) && 'p' == term(tmp[3]) && 's' == term(tmp[4]) && ':' == term(tmp[5]) && '/' == term(tmp[6]) && '/' == term(tmp[7]) {
 			protocol = httpsProto
 			i += 8
-		} else if 10 <= tmpLen /* ftp://x.xx */ && 'f' == tmp[0].term && 't' == tmp[1].term && 'p' == tmp[2].term && ':' == tmp[3].term && '/' == tmp[4].term && '/' == tmp[5].term {
+		} else if 10 <= tmpLen /* ftp://x.xx */ && 'f' == term(tmp[0]) && 't' == term(tmp[1]) && 'p' == term(tmp[2]) && ':' == term(tmp[3]) && '/' == term(tmp[4]) && '/' == term(tmp[5]) {
 			protocol = ftpProto
 			i += 6
 		} else {
@@ -211,7 +211,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		j = i
 		for ; j < length; j++ {
 			token = tokens[j]
-			if (isWhitespace(token.term) || itemLess == token.term) || (!isASCIIPunct(token.term) && !isASCIILetterNum(token.term)) {
+			if (isWhitespace(term(token)) || itemLess == term(token)) || (!isASCIIPunct(term(token)) && !isASCIILetterNum(term(token))) {
 				break
 			}
 			url = append(url, token)
@@ -230,7 +230,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		k = 0
 		for ; k < len(url); k++ {
 			token = url[k]
-			if itemSlash == token.term {
+			if itemSlash == term(token) {
 				break
 			}
 		}
@@ -251,23 +251,23 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			// 统计圆括号个数
 			for l = 0; l < length; l++ {
 				token = path[l]
-				if itemOpenParen == token.term {
+				if itemOpenParen == term(token) {
 					openParens++
-				} else if itemCloseParen == token.term {
+				} else if itemCloseParen == term(token) {
 					closeParens++
 				}
 			}
 
 			trimmed := false
 			lastToken := path[length-1]
-			if itemCloseParen == lastToken.term {
+			if itemCloseParen == term(lastToken) {
 				// 以 ) 结尾的话需要计算圆括号匹配
 				unmatches := closeParens - openParens
 				if 0 < unmatches {
 					// 向前移动
 					for l = length - 1; 0 < unmatches; l-- {
 						token = path[l]
-						if itemCloseParen != token.term {
+						if itemCloseParen != term(token) {
 							break
 						}
 						unmatches--
@@ -279,13 +279,13 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 					// 算作全匹配上了，不需要再处理结尾标点符号
 					trimmed = true
 				}
-			} else if itemSemicolon == lastToken.term {
+			} else if itemSemicolon == term(lastToken) {
 				// 检查 HTML 实体
 				foundAmp := false
 				// 向前检查 & 是否存在
 				for l = length - 1; 0 <= l; l-- {
 					token = path[l]
-					if itemAmpersand == token.term {
+					if itemAmpersand == term(token) {
 						foundAmp = true
 						break
 					}
@@ -296,7 +296,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 						// 检查截取的子串是否满足实体特征（&;中间需要是字母或数字）
 						isEntity := true
 						for j = 1; j < len(entity)-1; j++ {
-							if !isASCIILetterNum(entity[j].term) {
+							if !isASCIILetterNum(term(entity[j])) {
 								isEntity = false
 								break
 							}
@@ -311,14 +311,14 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			}
 
 			// 如果之前的 ) 或者 ; 没有命中处理，则进行结尾的标点符号规则处理，即标点不计入链接，需要剔掉
-			if !trimmed && isASCIIPunct(lastToken.term) && itemSlash != lastToken.term {
+			if !trimmed && isASCIIPunct(term(lastToken)) && itemSlash != term(lastToken) {
 				path = path[:length-1]
 				i--
 			}
 		} else {
 			length = len(domain)
 			lastToken := domain[length-1]
-			if isASCIIPunct(lastToken.term) {
+			if isASCIIPunct(term(lastToken)) {
 				domain = domain[:length-1]
 				i--
 			}

@@ -24,7 +24,7 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 			var i = codeBlock.codeBlockFenceOffset
 			var token byte
 			for i > 0 {
-				token = ln.peek(context.offset).term
+				token = term(ln.peek(context.offset))
 				if itemSpace != token && itemTab != token {
 					break
 				}
@@ -54,7 +54,7 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 
 		var i int
 		for ; i < length; i++ {
-			if itemNewline == content[i].term {
+			if itemNewline == term(content[i]) {
 				break
 			}
 		}
@@ -72,13 +72,13 @@ var codeBlockBacktick = strToItems("`")
 
 func (t *Tree) parseFencedCode() (ok bool, codeBlockFenceChar byte, codeBlockFenceLen int, codeBlockFenceOffset int, codeBlockInfo items) {
 	marker := t.context.currentLine[t.context.nextNonspace]
-	if itemBacktick != marker.term && itemTilde != marker.term {
+	if itemBacktick != term(marker) && itemTilde != term(marker) {
 		return
 	}
 
 	fenceChar := marker
 	fenceLength := 0
-	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar.term == t.context.currentLine[i].term; i++ {
+	for i := t.context.nextNonspace; i < t.context.currentLineLen && term(fenceChar) == term(t.context.currentLine[i]); i++ {
 		fenceLength++
 	}
 
@@ -88,26 +88,26 @@ func (t *Tree) parseFencedCode() (ok bool, codeBlockFenceChar byte, codeBlockFen
 
 	var info items
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
-	if itemBacktick == marker.term && contains(infoTokens, codeBlockBacktick) {
+	if itemBacktick == term(marker) && contains(infoTokens, codeBlockBacktick) {
 		// info 部分不能包含 `
 		return
 	}
 	info = trimWhitespace(infoTokens)
 	info = unescapeString(info)
-	return true, fenceChar.term, fenceLength, t.context.indent, info
+	return true, term(fenceChar), fenceLength, t.context.indent, info
 }
 
 func (codeBlock *Node) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
 	closeMarker := tokens[0]
-	if closeMarker.term != openMarker {
+	if term(closeMarker) != openMarker {
 		return false
 	}
-	if num > tokens.accept(closeMarker.term) {
+	if num > tokens.accept(term(closeMarker)) {
 		return false
 	}
 	tokens = trimWhitespace(tokens)
 	for _, token := range tokens {
-		if token.term != openMarker {
+		if term(token) != openMarker {
 			return false
 		}
 	}
