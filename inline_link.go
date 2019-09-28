@@ -26,7 +26,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 	passed = make(items, 0, 256)
 	destination = make(items, 0, 256)
 
-	isPointyBrackets := itemLess == tokens[1].term
+	isPointyBrackets := itemLess == term(tokens[1])
 	if isPointyBrackets {
 		matchEnd := false
 		passed = append(passed, tokens[0], tokens[1])
@@ -37,12 +37,12 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		for ; i < length; i += size {
 			size = 1
 			token := tokens[i]
-			if itemNewline == token.term {
+			if itemNewline == term(token) {
 				passed = nil
 				return
 			}
 
-			if token.term < utf8.RuneSelf {
+			if term(token) < utf8.RuneSelf {
 				passed = append(passed, token)
 				dest = items{token}
 			} else {
@@ -53,14 +53,14 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 				dest = append(dest, runes...)
 			}
 			destination = append(destination, dest...)
-			if itemGreater == token.term && !tokens.isBackslashEscapePunct(i) {
+			if itemGreater == term(token) && !tokens.isBackslashEscapePunct(i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
 				break
 			}
 		}
 
-		if !matchEnd || (length > i && itemCloseParen != tokens[i+1].term) {
+		if !matchEnd || (length > i && itemCloseParen != term(tokens[i+1])) {
 			passed = nil
 			return
 		}
@@ -77,7 +77,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		for ; i < length; i += size {
 			size = 1
 			token := tokens[i]
-			if token.term < utf8.RuneSelf {
+			if term(token) < utf8.RuneSelf {
 				passed = append(passed, token)
 				dest = items{token}
 			} else {
@@ -88,23 +88,23 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 				dest = append(dest, runes...)
 			}
 			destination = append(destination, dest...)
-			if !destStarted && !isWhitespace(token.term) && 0 < i {
+			if !destStarted && !isWhitespace(term(token)) && 0 < i {
 				destStarted = true
 				destination = destination[size:]
 				destination = trimWhitespace(destination)
 			}
-			if destStarted && (isWhitespace(token.term) || isControl(token.term)) {
+			if destStarted && (isWhitespace(term(token)) || isControl(term(token))) {
 				destination = destination[:len(destination)-size]
 				passed = passed[:len(passed)-1]
 				break
 			}
-			if itemOpenParen == token.term && !tokens.isBackslashEscapePunct(i) {
+			if itemOpenParen == term(token) && !tokens.isBackslashEscapePunct(i) {
 				openParens++
 			}
-			if itemCloseParen == token.term && !tokens.isBackslashEscapePunct(i) {
+			if itemCloseParen == term(token) && !tokens.isBackslashEscapePunct(i) {
 				openParens--
 				if 1 > openParens {
-					if itemOpenParen == destination[0].term {
+					if itemOpenParen == term(destination[0]) {
 						// TODO: 需要重写边界判断
 						destination = destination[1:]
 					}
@@ -115,7 +115,7 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 		}
 
 		remains = tokens[i:]
-		if length > i && (itemCloseParen != tokens[i].term && itemSpace != tokens[i].term && itemNewline != tokens[i].term) {
+		if length > i && (itemCloseParen != term(tokens[i]) && itemSpace != term(tokens[i]) && itemNewline != term(tokens[i])) {
 			passed = nil
 			return
 		}

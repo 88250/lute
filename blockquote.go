@@ -14,10 +14,10 @@ package lute
 
 func (blockquote *Node) blockquoteContinue(context *Context) int {
 	var ln = context.currentLine
-	if !context.indented && ln.peek(context.nextNonspace).term == itemGreater {
+	if !context.indented && term(ln.peek(context.nextNonspace)) == itemGreater {
 		context.advanceNextNonspace()
 		context.advanceOffset(1, false)
-		if token := ln.peek(context.offset); itemSpace == token.term || itemTab == token.term {
+		if token := ln.peek(context.offset); itemSpace == term(token) || itemTab == term(token) {
 			context.advanceOffset(1, true)
 		}
 		return 0

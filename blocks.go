@@ -73,7 +73,7 @@ func (t *Tree) incorporateLine(line items) {
 
 		// 如果不由潜在的节点标记符开头 ^[#`~*+_=<>0-9-$]，则说明不用继续迭代生成子节点
 		// 这里仅做简单判断的话可以提升一些性能
-		maybeMarker := t.context.currentLine[t.context.nextNonspace].term
+		maybeMarker := term(t.context.currentLine[t.context.nextNonspace])
 		if !t.context.indented && // 缩进代码块
 			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // 无序列表
 			!isDigit(maybeMarker) && // 有序列表
@@ -170,7 +170,7 @@ var blockStarts = []blockStartFunc{
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
 			token := t.context.currentLine.peek(t.context.nextNonspace)
-			if itemGreater == token.term {
+			if itemGreater == term(token) {
 				markerStartCol := t.context.nextNonspace + 1
 				markerEndCol := markerStartCol
 
@@ -178,7 +178,7 @@ var blockStarts = []blockStartFunc{
 				t.context.advanceOffset(1, false)
 				// > 后面的空格是可选的
 				token = t.context.currentLine.peek(t.context.offset)
-				withSpace := itemSpace == token.term || itemTab == token.term
+				withSpace := itemSpace == term(token) || itemTab == term(token)
 				if withSpace {
 					t.context.advanceOffset(1, true)
 					markerEndCol++
@@ -259,7 +259,7 @@ var blockStarts = []blockStartFunc{
 
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
-				for tokens := container.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0].term; tokens = container.tokens {
+				for tokens := container.tokens; 0 < len(tokens) && itemOpenBracket == term(tokens[0]); tokens = container.tokens {
 					if remains := t.context.parseLinkRefDef(tokens); nil != remains {
 						container.tokens = remains
 					} else {
@@ -283,7 +283,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container *Node) int {
-		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace).term == itemLess {
+		if !t.context.indented && term(t.context.currentLine.peek(t.context.nextNonspace)) == itemLess {
 			tokens := itemsToBytes(t.context.currentLine[t.context.nextNonspace:])
 			if htmlType := t.parseHTML(tokens); 0 != htmlType {
 				t.context.closeUnmatchedBlocks()
