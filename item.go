@@ -10,9 +10,13 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build !srcmap
+// +build !js
 
 package lute
+
+import (
+	"unsafe"
+)
 
 // item 描述了词法分析的一个 token。
 type item byte
@@ -46,35 +50,39 @@ func setTerm(tokens *items, i int, term byte) {
 
 // strToItems 将 str 转为 items。
 func strToItems(str string) (ret items) {
-	length := len(str)
-	ret = make(items, 0, 256)
-	for i := 0; i < length; i++ {
-		ret = append(ret, item(str[i]))
-	}
+	return bytesToItems(toBytes(str))
+	//length := len(str)
+	//ret = make(items, 0, 256)
+	//for i := 0; i < length; i++ {
+	//	ret = append(ret, item(str[i]))
+	//}
 	return
 }
 
 // itemsToStr 将 items 转为 string。
 func itemsToStr(items items) string {
-	return string(itemsToBytes(items))
+	return fromBytes(itemsToBytes(items))
+	//return string(itemsToBytes(items))
 }
 
 // itemsToBytes 将 items 转为 []byte。
 func itemsToBytes(items items) (ret []byte) {
-	length := len(items)
-	ret = make([]byte, 0, 256)
-	for i := 0; i < length; i++ {
-		ret = append(ret, byte(items[i]))
-	}
+	ret = *(*[]byte)(unsafe.Pointer(&items))
+	//length := len(items)
+	//ret = make([]byte, 0, 256)
+	//for i := 0; i < length; i++ {
+	//	ret = append(ret, byte(items[i]))
+	//}
 	return
 }
 
 // bytesToItems 将 bytes 转为 items。
 func bytesToItems(bytes []byte) (ret items) {
-	length := len(bytes)
-	ret = make(items, 0, 256)
-	for i := 0; i < length; i++ {
-		ret = append(ret, item(bytes[i]))
-	}
+	ret = *(*items)(unsafe.Pointer(&bytes))
+	//length := len(bytes)
+	//ret = make(items, 0, 256)
+	//for i := 0; i < length; i++ {
+	//	ret = append(ret, item(bytes[i]))
+	//}
 	return
 }
