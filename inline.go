@@ -13,8 +13,9 @@
 package lute
 
 import (
-	"github.com/b3log/lute/html"
 	"strings"
+
+	"github.com/b3log/lute/html"
 )
 
 // parseInline 解析并生成块节点 block 的行级子节点。
@@ -122,11 +123,10 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	return &Node{typ: NodeText, tokens: strToItems(v)}
 }
 
-var closeBracket = strToItems("]")
-
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
 // to block's children. If there is a matching delimiter, remove it from the delimiter stack.
 func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
+	closeBracket := items{ctx.tokens[ctx.pos]}
 	ctx.pos++
 	startPos := ctx.pos
 
@@ -273,9 +273,8 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	}
 }
 
-var openBracket = strToItems("[")
-
 func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
+	openBracket := items{ctx.tokens[ctx.pos]}
 	ctx.pos++
 	ret = &Node{typ: NodeText, tokens: openBracket}
 	// 将 [ 入栈
