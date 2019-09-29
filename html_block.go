@@ -24,7 +24,7 @@ func (html *Node) htmlBlockContinue(context *Context) int {
 }
 
 func (html *Node) htmlBlockFinalize(context *Context) {
-	// TODO: html.tokens = bytes.TrimRight(html.tokens.replaceNewlineSpace(), " \t\n")
+	_, html.tokens = trimRight(replaceNewlineSpace(html.tokens))
 }
 
 var (

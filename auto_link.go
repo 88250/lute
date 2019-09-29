@@ -237,7 +237,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			}
 		}
 		domain := url[:k]
-		domainBytes := itemsToBytes(domain) // TODO 性能优化
+		domainBytes := itemsToBytes(domain)
 		if !t.isValidDomain(domainBytes) {
 			text := &Node{typ: NodeText, tokens: append(protocol, url...)}
 			node.InsertBefore(text)
