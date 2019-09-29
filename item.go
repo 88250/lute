@@ -44,45 +44,29 @@ func term(item item) byte {
 	return byte(item)
 }
 
+// setTerm 用于设置 tokens 中第 i 个 token 的词素。
 func setTerm(tokens *items, i int, term byte) {
 	(*tokens)[i] = item(term)
 }
 
 // strToItems 将 str 转为 items。
-func strToItems(str string) (ret items) {
-	return bytesToItems(toBytes(str))
-	//length := len(str)
-	//ret = make(items, 0, 256)
-	//for i := 0; i < length; i++ {
-	//	ret = append(ret, item(str[i]))
-	//}
-	return
+func strToItems(str string) items {
+	x := (*[2]uintptr)(unsafe.Pointer(&str))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	return *(*items)(unsafe.Pointer(&h))
 }
 
 // itemsToStr 将 items 转为 string。
 func itemsToStr(items items) string {
-	return fromBytes(itemsToBytes(items))
-	//return string(itemsToBytes(items))
+	return *(*string)(unsafe.Pointer(&items))
 }
 
 // itemsToBytes 将 items 转为 []byte。
-func itemsToBytes(items items) (ret []byte) {
-	ret = *(*[]byte)(unsafe.Pointer(&items))
-	//length := len(items)
-	//ret = make([]byte, 0, 256)
-	//for i := 0; i < length; i++ {
-	//	ret = append(ret, byte(items[i]))
-	//}
-	return
+func itemsToBytes(items items) []byte {
+	return *(*[]byte)(unsafe.Pointer(&items))
 }
 
 // bytesToItems 将 bytes 转为 items。
-func bytesToItems(bytes []byte) (ret items) {
-	ret = *(*items)(unsafe.Pointer(&bytes))
-	//length := len(bytes)
-	//ret = make(items, 0, 256)
-	//for i := 0; i < length; i++ {
-	//	ret = append(ret, item(bytes[i]))
-	//}
-	return
+func bytesToItems(bytes []byte) items {
+	return *(*items)(unsafe.Pointer(&bytes))
 }

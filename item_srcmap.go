@@ -44,6 +44,7 @@ func term(item item) byte {
 	return item.term
 }
 
+// setTerm 用于设置 tokens 中第 i 个 token 的词素。
 func setTerm(tokens *items, i int, term byte) {
 	(*tokens)[i].term = term
 }
