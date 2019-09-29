@@ -60,6 +60,8 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 * Emoji 解析
 * 支持 Markdown 格式化
 * 支持源码位置映射
+* 仅依赖标准库
+* 支持 JavaScript 端使用
 
 ## 🗃 案例
 
