@@ -556,6 +556,7 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 		if nil != node {
 			attrs = append(attrs, []string{"data-ntype", node.typ.String()})
 			attrs = append(attrs, []string{"data-mtype", r.mtype(node.typ)})
+			// TODO: 源码位置
 			//attrs = append(attrs, []string{"data-pos-start", strconv.Itoa(node.ranges[0].startLn) + ":" + strconv.Itoa(node.ranges[0].startCol)})
 			//attrs = append(attrs, []string{"data-pos-end", strconv.Itoa(node.ranges[0].endLn) + ":" + strconv.Itoa(node.ranges[0].endCol)})
 			if "" != node.caret {

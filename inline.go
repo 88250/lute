@@ -59,9 +59,8 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 	}
 }
 
-var and = strToItems("&")
-
 func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
+	and := items{ctx.tokens[ctx.pos]}
 	if 2 > ctx.tokensLen || ctx.tokensLen <= ctx.pos+1 {
 		ctx.pos++
 		return &Node{typ: NodeText, tokens: and}

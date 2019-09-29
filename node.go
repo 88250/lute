@@ -34,7 +34,7 @@ type Node struct {
 	lastLineBlank   bool     // 标识最后一行是否是空行
 	lastLineChecked bool     // 标识最后一行是否检查过
 
-	// 源码位置
+	// TODO: 源码位置
 
 	// 节点对应的源码位置，因为节点内容可能存在跨行并且中间是其他节点的情况，所以需要用数组，比如：
 	//   > *emphasized
