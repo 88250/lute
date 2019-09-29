@@ -10,18 +10,28 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build js
+// +build javascript
 
 package lute
 
-// []byte~string 之间的快速转换优化会导致生成 JavaScript 端代码问题，所以此处还是使用内存拷贝。
+import (
+	"errors"
+)
 
-// bytesToStr 快速转换 []byte 为 string。
-func bytesToStr(bytes []byte) string {
-	return string(bytes)
-}
-
-// strToBytes 快速转换 string 为 []byte。
-func strToBytes(str string) []byte {
-	return []byte(str)
+// Recover recovers a panic.
+func recoverPanic(err *error) {
+	if e := recover(); nil != e {
+		errMsg := ""
+		switch x := e.(type) {
+		case error:
+			errMsg = x.Error()
+		case string:
+			errMsg = x
+		default:
+			errMsg = "unknown panic"
+		}
+		if nil != err {
+			*err = errors.New("PANIC RECOVERED: " + errMsg + "\n")
+		}
+	}
 }

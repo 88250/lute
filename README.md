@@ -327,14 +327,14 @@ func main() {
 
 ### JavaScript
  
-简单示例可参考 js 目录下的 demo，结合前端编辑器的完整用法请参考 [Vditor 中的示例](https://github.com/b3log/vditor/tree/master/demo)。
+简单示例可参考 javascript 目录下的 demo，结合前端编辑器的完整用法请参考 [Vditor 中的示例](https://github.com/b3log/vditor/tree/master/demo)。
 
 ![Vditor](https://user-images.githubusercontent.com/970828/64320104-624fac00-cff0-11e9-8727-0ad51a6f71c0.png)
 
 一些细节：
 
 1. lute.js 没有内置语法高亮特性
-2. lute.js 编译压缩后大小为 ~800KB，通过 `brotli -o lute.min.js.br lute.min.js` 压缩后大小 ~110KB，常规 GZip 压缩后大小 ~150KB
+2. lute.js 编译后大小为 ~800KB，通过 `brotli -o lute.min.js.br lute.min.js` 压缩后大小 ~110KB，常规 GZip 压缩后大小 ~150KB
 
 ## 📜 文档
 
