@@ -255,6 +255,9 @@ func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 		if r.option.AutoSpace {
 			r.space(node)
 		}
+		if r.option.FixTermTypo {
+			r.fixTermTypo(node)
+		}
 		if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
 			r.write(escapeHTML(node.tokens))
 		}

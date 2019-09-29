@@ -17,18 +17,9 @@ import (
 	"unicode/utf8"
 )
 
-// fixTermTypo 修正 node 下文本节点中出现的术语拼写问题。
-func (t *Tree) fixTermTypo(node *Node) {
-	for child := node.firstChild; nil != child; {
-		next := child.next
-		if NodeText == child.typ && nil != child.parent &&
-			NodeLink != child.parent.typ /* 不处理链接 label */ {
-			child.tokens = fixTermTypo0(child.tokens)
-		} else {
-			t.fixTermTypo(child) // 递归处理子节点
-		}
-		child = next
-	}
+// fixTermTypo 修正文本节点 textNode 中出现的术语拼写问题。
+func (r *BaseRenderer) fixTermTypo(textNode *Node) {
+	textNode.tokens = fixTermTypo0(textNode.tokens)
 }
 
 func fixTermTypo0(tokens items) items {
