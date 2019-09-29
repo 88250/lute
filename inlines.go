@@ -67,10 +67,6 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 			t.parseGFMAutoLink(node)
 		}
 
-		if t.context.option.AutoSpace {
-			t.space(node)
-		}
-
 		if t.context.option.FixTermTypo {
 			t.fixTermTypo(node)
 		}

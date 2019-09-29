@@ -17,20 +17,11 @@ import (
 	"unicode/utf8"
 )
 
-// space 会把 node 下文本节点中的中西文之间加上空格。
-func (t *Tree) space(node *Node) {
-	for child := node.firstChild; nil != child; {
-		next := child.next
-		if NodeText == child.typ && nil != child.parent &&
-			NodeLink != child.parent.typ /* 不处理链接 label */ {
-			text := itemsToStr(child.tokens)
-			text = space0(text)
-			child.tokens = strToItems(text)
-		} else {
-			t.space(child) // 递归处理子节点
-		}
-		child = next
-	}
+// space 会把文本节点 textNode 中的中西文之间加上空格。
+func (r *BaseRenderer) space(textNode *Node) {
+	text := itemsToStr(textNode.tokens)
+	text = space0(text)
+	textNode.tokens = strToItems(text)
 }
 
 func space0(text string) (ret string) {

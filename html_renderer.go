@@ -276,6 +276,9 @@ func (r *HTMLRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, e
 
 func (r *HTMLRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		if r.option.AutoSpace {
+			r.space(node)
+		}
 		r.write(escapeHTML(node.tokens))
 	}
 	return WalkStop, nil
