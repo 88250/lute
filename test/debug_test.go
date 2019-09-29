@@ -20,52 +20,51 @@ import (
 
 var debugTests = []parseTest{
 
-	{"33", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
-	{"32", "**foo*<br>", "<p>*<em>foo</em><br></p>\n"},
-	{"31", "https://t.mex .mex 后缀不自动链接", "<p>https://t.mex .mex 后缀不自动链接</p>\n"},
-	{"30", "https://t.me .me 后缀自动链接", "<p><a href=\"https://t.me\">https://t.me</a> .me 后缀自动链接</p>\n"},
+	{"32", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
+	{"31", "**foo*<br>", "<p>*<em>foo</em><br></p>\n"},
+	{"30", "https://t.mex .mex 后缀不自动链接", "<p>https://t.mex .mex 后缀不自动链接</p>\n"},
+	{"29", "https://t.me .me 后缀自动链接", "<p><a href=\"https://t.me\">https://t.me</a> .me 后缀自动链接</p>\n"},
 
 	// 链接解析问题 https://github.com/b3log/lute/issues/20
-	{"29", "[新建.zip](/路)foo", "<p><a href=\"/%E8%B7%AF\">新建.zip</a>foo</p>\n"},
-	{"28", "[新建.zip](http://bar.com/文件.zip)[新建.zip](http://bar.com/文件.zip)", "<p><a href=\"http://bar.com/%E6%96%87%E4%BB%B6.zip\">新建.zip</a><a href=\"http://bar.com/%E6%96%87%E4%BB%B6.zip\">新建.zip</a></p>\n"},
+	{"28", "[新建.zip](/路)foo", "<p><a href=\"/%E8%B7%AF\">新建.zip</a>foo</p>\n"},
+	{"27", "[新建.zip](http://bar.com/文件.zip)[新建.zip](http://bar.com/文件.zip)", "<p><a href=\"http://bar.com/%E6%96%87%E4%BB%B6.zip\">新建.zip</a><a href=\"http://bar.com/%E6%96%87%E4%BB%B6.zip\">新建.zip</a></p>\n"},
 
-	{"27", "[]( https://b3log.org )", "<p><a href=\"https://b3log.org\"></a></p>\n"},
-	{"26", "[](https://b3log.org)", "<p><a href=\"https://b3log.org\"></a></p>\n"},
-	{"25", "[]( https://b3log.org", "<p>[]( <a href=\"https://b3log.org\">https://b3log.org</a></p>\n"},
+	{"26", "[]( https://b3log.org )", "<p><a href=\"https://b3log.org\"></a></p>\n"},
+	{"25", "[](https://b3log.org)", "<p><a href=\"https://b3log.org\"></a></p>\n"},
+	{"24", "[]( https://b3log.org", "<p>[]( <a href=\"https://b3log.org\">https://b3log.org</a></p>\n"},
 
 	// GFM 任务列表 li 加 class="vditor-task" https://github.com/b3log/lute/issues/10
-	{"24", "- [x]\n", "<ul>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /></li>\n</ul>\n"},
+	{"23", "- [x]\n", "<ul>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /></li>\n</ul>\n"},
 
 	// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
-	{"23", "0\n-:\n1\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"right\">1</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
-	{"22", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
+	{"22", "0\n-:\n1\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"right\">1</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
+	{"21", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
 
 	// GFM Table rendered as h2 https://github.com/b3log/lute/issues/3
-	{"21", "0\n-:\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n"},
+	{"20", "0\n-:\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n"},
 
 	// HTMl 块解析，等号前面空格情况
-	{"20", "<a href =\"https://github.com\">GitHub</a>\n", "<a href =\"https://github.com\">GitHub</a>\n"},
+	{"19", "<a href =\"https://github.com\">GitHub</a>\n", "<a href =\"https://github.com\">GitHub</a>\n"},
 
 	// 链接结尾 / 处理
-	{"19", "https://hacpai.com/ https://hacpai.com", "<p><a href=\"https://hacpai.com/\">https://hacpai.com/</a> <a href=\"https://hacpai.com\">https://hacpai.com</a></p>\n"},
+	{"18", "https://hacpai.com/ https://hacpai.com", "<p><a href=\"https://hacpai.com/\">https://hacpai.com/</a> <a href=\"https://hacpai.com\">https://hacpai.com</a></p>\n"},
 
 	// 转义
-	{"18", "`<a href=\"`\">`\n", "<p><code>&lt;a href=&quot;</code>&quot;&gt;`</p>\n"},
+	{"17", "`<a href=\"`\">`\n", "<p><code>&lt;a href=&quot;</code>&quot;&gt;`</p>\n"},
 
 	// 原文不以 \n 结尾的话需要自动补上
-	{"17", "- - ", "<ul>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n</ul>\n"},
+	{"16", "- - ", "<ul>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n</ul>\n"},
 
 	// 强调优先级高于删除线
-	{"16", "~~*~~Hi*\n", "<p>~~<em>~~Hi</em></p>\n"},
+	{"15", "~~*~~Hi*\n", "<p>~~<em>~~Hi</em></p>\n"},
 
-	{"15", "a*\"foo\"*\n", "<p>a*&quot;foo&quot;*</p>\n"},
-	{"14", "5*6*78\n", "<p>5<em>6</em>78</p>\n"},
-	{"13", "**莠**\n", "<p><strong>莠</strong></p>\n"},
-	{"12", "**章**\n", "<p><strong>章</strong></p>\n"},
-	{"11", "1>tag<\n", "<p>1&gt;tag&lt;</p>\n"},
-	{"10", "<http:\n", "<p>&lt;http:</p>\n"},
-	{"9", "<\n", "<p>&lt;</p>\n"},
-	{"8", "~~~ \n", "<pre><code class=\"language-fallback highlight-chroma\"></code></pre>\n"},
+	{"14", "a*\"foo\"*\n", "<p>a*&quot;foo&quot;*</p>\n"},
+	{"13", "5*6*78\n", "<p>5<em>6</em>78</p>\n"},
+	{"12", "**莠**\n", "<p><strong>莠</strong></p>\n"},
+	{"11", "**章**\n", "<p><strong>章</strong></p>\n"},
+	{"10", "1>tag<\n", "<p>1&gt;tag&lt;</p>\n"},
+	{"9", "<http:\n", "<p>&lt;http:</p>\n"},
+	{"8", "<\n", "<p>&lt;</p>\n"},
 	{"7", "|||\n|||\n", "<p>|||<br />\n|||</p>\n"},
 	{"6", "[https://github.com/b3log/lute](https://github.com/b3log/lute)\n", "<p><a href=\"https://github.com/b3log/lute\">https://github.com/b3log/lute</a></p>\n"},
 	{"5", "[1\n--\n", "<h2>[1</h2>\n"},

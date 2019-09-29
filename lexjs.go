@@ -88,6 +88,16 @@ func bytesToItems(bytes []byte) (ret items) {
 	return
 }
 
+// bytesToStr 快速转换 []byte 为 string。
+func bytesToStr(bytes []byte) string {
+	return string(bytes)
+}
+
+// strToBytes 快速转换 string 为 []byte。
+func strToBytes(str string) []byte {
+	return []byte(str)
+}
+
 // nextLine 返回下一行。
 func (l *lexer) nextLine() (ret items) {
 	if l.offset >= l.length {
