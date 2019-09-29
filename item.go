@@ -35,7 +35,7 @@ func isNilItem(item item) bool {
 }
 
 // newItem 构造一个 token。
-func newItem(term byte, ln, col int) item {
+func newItem(term byte, ln, col, offset int) item {
 	return item(term)
 }
 

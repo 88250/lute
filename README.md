@@ -59,6 +59,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 * 更好地支持中文语境
 * Emoji 解析
 * 支持 Markdown 格式化
+* 支持源码位置映射
 
 ## 🗃 案例
 
@@ -252,7 +253,7 @@ Markdown 原文：
 1. 主要对比了 4 款 Go 实现的 Markdown 引擎：[Lute](https://github.com/b3log/lute)、[golang-commonmark](https://gitlab.com/golang-commonmark/markdown)、[goldmark](https://github.com/yuin/goldmark) 和 [Blackfriday](https://github.com/russross/blackfriday)
 2. 均已关闭 Typographer 相关配置，因为在排版优化上各库的功能差异较大，对比性能意义不大
 3. 均已开启 GFM 支持，因为 GFM 在实际使用场景下是必备的，仅测试 CommonMark 支持意义不大 
-4. Lute 在多核平台上性能优势比较明显，因为 Lute 使用了并行解析算法
+4. Lute 在多核平台上有较大性能提升，因为 Lute 使用了并行解析算法
 5. Blackfriday 没有实现 GFM 所以性能看上去更好一些
 6. 基准测试数据 [*CommonMark Spec*](https://github.com/commonmark/commonmark-spec-web/blob/gh-pages/0.29/spec.txt) ~197K，参数 `-test.cpu 2,4,8 -test.benchmem`
 

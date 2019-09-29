@@ -16,9 +16,10 @@ package lute
 
 // item 描述了词法分析的一个 token。
 type item struct {
-	term byte // 源码字节
-	ln   int  // 源码行号
-	col  int  // 源码列号
+	term   byte // 源码字节值
+	ln     int  // 源码行号，从 1 开始
+	col    int  // 源码列号，从 1 开始
+	offset int  // 源码偏移位置，从 0 开始
 }
 
 // items 定义了 token 数组。
@@ -35,8 +36,8 @@ func isNilItem(item item) bool {
 }
 
 // newItem 构造一个 token。
-func newItem(term byte, ln, col int) item {
-	return item{term: term, ln: ln, col: col}
+func newItem(term byte, ln, col, offset int) item {
+	return item{term: term, ln: ln, col: col, offset: offset}
 }
 
 // term 返回 item 的词素。

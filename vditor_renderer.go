@@ -602,11 +602,11 @@ func (r *VditorRenderer) mtype(nodeType nodeType) string {
 }
 
 // mapSelection 用于映射文本选段。
-// 根据 Markdown 原文中的 startLn:startCol、endLn:endCol 位置从根节点 root 上遍历查找该范围内的节点，找到对应节点后进行标记以支持后续渲染。
-func (r *VditorRenderer) mapSelection(root *Node, startLn, startCol, endLn, endCol int) {
+// 根据 Markdown 原文中的 startOffset 和 endOffset 位置从根节点 root 上遍历查找该范围内的节点，找到对应节点后进行标记以支持后续渲染。
+func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 	var nodes []*Node
 	for c := root.firstChild; nil != c; c = c.next {
-		r.findSelection(root, startLn, startCol, endLn, endCol, &nodes)
+		r.findSelection(root, startOffset, endOffset, &nodes)
 	}
 	for _, node := range nodes {
 		node.caret = "start"
@@ -631,8 +631,8 @@ func (r *VditorRenderer) expand(node *Node) {
 	}
 }
 
-func (r *VditorRenderer) findSelection(node *Node, startLn, startCol, endLn, endCol int, selected *[]*Node) {
-	// TODO: 选段查找
+// findSelection 在 node 上递归查找 startOffset 和 endOffset 选段，选中节点累计到 selected 中。
+func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, selected *[]*Node) {
 	//for _, rng := range node.ranges {
 	//	if rng.startLn > startLn || rng.endLn < endLn {
 	//		return
@@ -653,7 +653,7 @@ func (r *VditorRenderer) findSelection(node *Node, startLn, startCol, endLn, end
 
 	// 在子节点中递归查找
 	for c := node.firstChild; nil != c; c = c.next {
-		r.findSelection(c, startLn, startCol, endLn, endCol, selected)
+		r.findSelection(c, startOffset, endOffset, selected)
 	}
 	return
 }

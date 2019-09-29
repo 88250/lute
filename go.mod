@@ -20,7 +20,7 @@ require (
 	gitlab.com/golang-commonmark/mdurl v0.0.0-20180912090424-e5bce34c34f2 // indirect
 	gitlab.com/golang-commonmark/puny v0.0.0-20180912090636-2cd490539afe // indirect
 	gitlab.com/opennota/wd v0.0.0-20180912061657-c5d65f63c638 // indirect
-	golang.org/x/sys v0.0.0-20190921204832-2dccfee4fd3e // indirect
+	golang.org/x/sys v0.0.0-20190927073244-c990c680b611 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
