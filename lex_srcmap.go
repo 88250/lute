@@ -18,12 +18,12 @@ import (
 	"unicode/utf8"
 )
 
-
 // nextLine 返回下一行。
 func (l *lexer) nextLine() (ret items) {
 	if l.offset >= l.length {
 		return
 	}
+	ret = make(items, 0, 256)
 
 	l.ln++
 	l.col = 0
@@ -35,18 +35,18 @@ func (l *lexer) nextLine() (ret items) {
 		l.col++
 		if itemNewline == b {
 			i++
-			//ret = append(ret, newItem(b, l.ln, l.col))
+			ret = append(ret, newItem(b, l.ln, l.col))
 			break
 		} else if itemCarriageReturn == b {
 			// 按照规范定义的 line ending (https://spec.commonmark.org/0.29/#line-ending) 处理 \r
-			//ret = append(ret, newItem(b, l.ln, l.col))
+			ret = append(ret, newItem(b, l.ln, l.col))
 			if i < l.length-1 {
 				nb = l.input[i+1]
 				if itemNewline == nb {
 					l.input = append(l.input[:i], l.input[i+1:]...) // 移除 \r，依靠下一个的 \n 切行
 					l.length--                                      // 重新计算总长
-					//ret = ret[:len(ret)-1]
-					//ret = append(ret, newItem(nb, l.ln, l.col))
+					ret = ret[:len(ret)-1]
+					ret = append(ret, newItem(nb, l.ln, l.col))
 				}
 			}
 			i++
@@ -62,23 +62,22 @@ func (l *lexer) nextLine() (ret items) {
 			l.input[i+2] = '\xBD'
 			l.length += 2 // 重新计算总长
 			l.width = 3
-			//ret = append(ret, newItem(l.input[i], l.ln, l.col))
-			//ret = append(ret, newItem(l.input[i+1], l.ln, l.col))
-			//ret = append(ret, newItem(l.input[i+2], l.ln, l.col))
+			ret = append(ret, newItem(l.input[i], l.ln, l.col))
+			ret = append(ret, newItem(l.input[i+1], l.ln, l.col))
+			ret = append(ret, newItem(l.input[i+2], l.ln, l.col))
 			continue
 		}
 
 		if utf8.RuneSelf <= b { // 说明占用多个字节
 			_, l.width = utf8.DecodeRune(l.input[i:])
-			//for j := 0; j < l.width; j++ {
-			//	ret = append(ret, newItem(l.input[i+j], l.ln, l.col))
-			//}
+			for j := 0; j < l.width; j++ {
+				ret = append(ret, newItem(l.input[i+j], l.ln, l.col))
+			}
 		} else {
 			l.width = 1
-			//ret = append(ret, newItem(b, l.ln, l.col))
+			ret = append(ret, newItem(b, l.ln, l.col))
 		}
 	}
-	ret = bytesToItems(l.input[l.offset:i])
 	l.offset = i
 	return
 }
