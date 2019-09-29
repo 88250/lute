@@ -177,16 +177,6 @@ func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 	return
 }
 
-// SpinVditorDOM 用于将当前的 Vditor DOM 转换为 新的 Vditor DOM。
-func (lute *Lute) SpinVditorDOM(html string) (newHTML string, err error) {
-	markdown, err := lute.VditorDOMMarkdown(html)
-	if nil != err {
-		return
-	}
-	newHTML, err = lute.RenderVditorDOM(markdown, 0, 0)
-	return
-}
-
 // VditorNewline 用于在类型为 blockType 的块中进行换行生成新的 Vditor 节点。
 // param 用于传递生成某些块换行所需的参数，比如在列表项中换行需要传列表项标记符和分隔符。
 func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}) (html string, err error) {
