@@ -68,7 +68,7 @@ func fixTermTypo0(tokens items) items {
 		}
 
 		originalTerm = bytes.ToLower(itemsToBytes(tokens[i:j]))
-		if to, ok := terms[fromBytes(originalTerm)]; ok {
+		if to, ok := terms[bytesToStr(originalTerm)]; ok {
 			l = 0
 			for k = i; k < j; k++ {
 				setTerm(&tokens, k, to[l])

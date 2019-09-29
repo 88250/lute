@@ -73,7 +73,7 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 		return
 	}
 
-	html = fromBytes(htmlBytes)
+	html = bytesToStr(htmlBytes)
 	return
 }
 
@@ -98,7 +98,7 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 		return
 	}
 
-	formatted = fromBytes(formattedBytes)
+	formatted = bytesToStr(formattedBytes)
 	return
 }
 
@@ -173,7 +173,7 @@ func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 	if nil != err {
 		return
 	}
-	markdown = fromBytes(formatted)
+	markdown = bytesToStr(formatted)
 	return
 }
 

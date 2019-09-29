@@ -407,7 +407,7 @@ func (t *Tree) isValidDomain(domain []byte) bool {
 	return true
 }
 
-var markers = toBytes(".!#$%&'*+/=?^_`{|}~")
+var markers = strToBytes(".!#$%&'*+/=?^_`{|}~")
 
 func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens[1:]

@@ -115,23 +115,23 @@ func (t *Tree) parseHTML(tokens []byte) (typ int) {
 		return
 	}
 
-	if 0 == bytes.Index(tokens, toBytes("<!--")) {
+	if 0 == bytes.Index(tokens, strToBytes("<!--")) {
 		typ = 2
 		return
 	}
 
-	if 0 == bytes.Index(tokens, toBytes("<?")) {
+	if 0 == bytes.Index(tokens, strToBytes("<?")) {
 		typ = 3
 		return
 	}
 
-	if 2 < len(tokens) && 0 == bytes.Index(tokens, toBytes("<!")) {
+	if 2 < len(tokens) && 0 == bytes.Index(tokens, strToBytes("<!")) {
 		following := tokens[2:]
 		if 'A' <= following[0] && 'Z' >= following[0] {
 			typ = 4
 			return
 		}
-		if 0 == bytes.Index(following, toBytes("[CDATA[")) {
+		if 0 == bytes.Index(following, strToBytes("[CDATA[")) {
 			typ = 5
 			return
 		}
