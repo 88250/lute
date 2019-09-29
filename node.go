@@ -91,10 +91,10 @@ type Node struct {
 
 	mathBlockDollarOffset int
 
-	// Vditor
-	expand      bool
-	caret       string
-	caretOffset int
+	// Vditor 所见即所得支持
+	expand           bool   // 是否需要展开节点
+	caretStartOffset string // 光标插入起始偏移位置
+	caretEndOffset   string // 光标插入结束偏移位置
 }
 
 //// Range 描述了源码位置起始和结束行列。

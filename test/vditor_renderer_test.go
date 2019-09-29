@@ -10,6 +10,8 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
+// +build javascript
+
 package test
 
 import (
@@ -39,7 +41,7 @@ var vditorRendererTests = []parseTest{
 	//{"3", "> Lute\n", "<blockquote><span class=\"node\"><span class=\"marker\" data-ntype=\"5\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:2\">&gt;</span></span><p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:3\" data-pos-end=\"1:7\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:3\" data-pos-end=\"1:7\">Lute</span><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span></blockquote>"},
 	//{"2", "---\n", "<hr data-ntype=\"3\" data-mtype=\"0\" data-caret=\"start\" data-caretoffset=\"0\" />"},
 	//{"1", "## Lute\n", "<h2 data-ntype=\"2\" data-mtype=\"0\"><span data-ntype=\"11\" data-mtype=\"2\" data-caret=\"start\" data-caretoffset=\"0\">Lute</span></h2>"},
-	//{"0", "**1123****456** **789**\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"18\" data-mtype=\"2\" data-caret=\"start\" data-caretoffset=\"2\"><span data-ntype=\"11\" data-mtype=\"2\" data-caret=\"start\" data-caretoffset=\"0\">1123****456</span><span class=\"marker\">**</span></strong></span><span data-ntype=\"11\" data-mtype=\"2\"> </span><span class=\"node\"><span class=\"marker\">**</span><strong data-ntype=\"18\" data-mtype=\"2\"><span data-ntype=\"11\" data-mtype=\"2\">789</span><span class=\"marker\">**</span></strong></span></p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>"},
+	{"0", "*foo*\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node node--expand\" data-ntype=\"12\" data-mtype=\"2\"><span class=\"marker\" data-ntype=\"13\" data-mtype=\"2\">*</span><em data-ntype=\"12\" data-mtype=\"2\" class=\"node--expand\"><span data-ntype=\"11\" data-mtype=\"2\" data-cso=\"1\" data-ceo=\"1\">foo</span></em><span class=\"marker\" data-ntype=\"14\" data-mtype=\"2\">*</span></span></p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>"},
 }
 
 func TestVditorRenderer(t *testing.T) {

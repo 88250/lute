@@ -252,7 +252,7 @@ var blockStarts = []blockStartFunc{
 							container.AppendChild(tr)
 							tr = nextTr
 						}
-						container.tokens = nil
+						// TODO: 源码映射不要释放 container.tokens = nil
 						return 0
 					}
 				}

@@ -121,12 +121,16 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			opener.num -= useDelims
 			closer.num -= useDelims
 
+			openerTokens := openerInl.tokens[len(openerInl.tokens)-useDelims:]
 			text := openerInl.tokens[0 : len(openerInl.tokens)-useDelims]
 			openerInl.tokens = text
+			closerTokens := closerInl.tokens[len(closerInl.tokens)-useDelims:]
 			text = closerInl.tokens[0 : len(closerInl.tokens)-useDelims]
 			closerInl.tokens = text
 
-			openMarker, emStrongDel, closeMarker := &Node{close: true}, &Node{close: true}, &Node{close: true}
+			openMarker := &Node{tokens: openerTokens, close: true}
+			emStrongDel := &Node{close: true}
+			closeMarker := &Node{tokens: closerTokens, close: true}
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
 					emStrongDel.typ = NodeEmphasis

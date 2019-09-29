@@ -49,6 +49,11 @@ func term(item item) byte {
 	return item.term
 }
 
+// Offset 返回 item 的 offset。
+func (item item) Offset() int {
+	return item.offset
+}
+
 // setTerm 用于设置 tokens 中第 i 个 token 的词素。
 func setTerm(tokens *items, i int, term byte) {
 	(*tokens)[i].term = term
@@ -110,6 +115,7 @@ func (l *lexer) nextLine() (ret items) {
 
 	var b, nb byte
 	i := l.offset
+	offset :=0
 	for ; i < l.length; i += l.width {
 		b = l.input[i]
 		l.col++
@@ -151,12 +157,13 @@ func (l *lexer) nextLine() (ret items) {
 		if utf8.RuneSelf <= b { // 说明占用多个字节
 			_, l.width = utf8.DecodeRune(l.input[i:])
 			for j := 0; j < l.width; j++ {
-				ret = append(ret, newItem(l.input[i+j], l.ln, l.col, l.offset))
+				ret = append(ret, newItem(l.input[i+j], l.ln, l.col, l.offset+offset))
 			}
 		} else {
 			l.width = 1
-			ret = append(ret, newItem(b, l.ln, l.col, l.offset))
+			ret = append(ret, newItem(b, l.ln, l.col, l.offset+offset))
 		}
+		offset++
 	}
 	l.offset = i
 	return

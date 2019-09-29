@@ -556,11 +556,11 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 		if nil != node {
 			attrs = append(attrs, []string{"data-ntype", node.typ.String()})
 			attrs = append(attrs, []string{"data-mtype", r.mtype(node.typ)})
-			// TODO: 源码位置
-			//attrs = append(attrs, []string{"data-pos-start", strconv.Itoa(node.ranges[0].startLn) + ":" + strconv.Itoa(node.ranges[0].startCol)})
-			//attrs = append(attrs, []string{"data-pos-end", strconv.Itoa(node.ranges[0].endLn) + ":" + strconv.Itoa(node.ranges[0].endCol)})
-			if "" != node.caret {
-				attrs = append(attrs, []string{"data-caret", node.caret}, []string{"data-caretoffset", strconv.Itoa(node.caretOffset)})
+			if "" != node.caretStartOffset {
+				attrs = append(attrs, []string{"data-cso", node.caretStartOffset})
+			}
+			if "" != node.caretEndOffset {
+				attrs = append(attrs, []string{"data-ceo", node.caretEndOffset})
 			}
 			if node.expand {
 				r.appendClass(&attrs, "node--expand")
@@ -594,7 +594,7 @@ func (r *VditorRenderer) mtype(nodeType nodeType) string {
 	switch nodeType {
 	case NodeThematicBreak, NodeHeading, NodeCodeBlock, NodeMathBlock, NodeHTMLBlock, NodeParagraph:
 		return "0"
-	case NodeBlockquote, NodeList, NodeListItem:
+	case NodeDocument, NodeBlockquote, NodeList, NodeListItem:
 		return "1"
 	default:
 		return "2"
@@ -608,11 +608,12 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 	for c := root.firstChild; nil != c; c = c.next {
 		r.findSelection(root, startOffset, endOffset, &nodes)
 	}
-	for _, node := range nodes {
-		node.caret = "start"
-		node.caretOffset = 1024
-	}
 	if 0 < len(nodes) {
+		sn := nodes[0]
+		base := sn.tokens[0].Offset()
+		sn.caretStartOffset = strconv.Itoa(startOffset - base)
+		en := nodes[len(nodes)-1]
+		en.caretEndOffset = strconv.Itoa(endOffset - base)
 		r.expand(nodes[0])
 	}
 }
@@ -633,17 +634,14 @@ func (r *VditorRenderer) expand(node *Node) {
 
 // findSelection 在 node 上递归查找 startOffset 和 endOffset 选段，选中节点累计到 selected 中。
 func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, selected *[]*Node) {
-	//for _, rng := range node.ranges {
-	//	if rng.startLn > startLn || rng.endLn < endLn {
-	//		return
-	//	}
-	//	if rng.startLn == startLn && (rng.startCol > startCol) {
-	//		return
-	//	}
-	//	if rng.endLn == endLn && (rng.endCol < endCol) {
-	//		return
-	//	}
-	//}
+	if 0 < len(node.tokens) {
+		// 判断是否在选段内
+		st := node.tokens[0]
+		et := node.tokens[len(node.tokens)-1]
+		if st.Offset() > startOffset || et.Offset() < endOffset {
+			return
+		}
+	}
 
 	if nil == node.firstChild {
 		// 说明找到了选段内的叶子结点
