@@ -46,6 +46,7 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
 	ret.rendererFuncs[NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
+	ret.rendererFuncs[NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
 	ret.rendererFuncs[NodeList] = ret.renderList
 	ret.rendererFuncs[NodeListItem] = ret.renderListItem
 	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
@@ -432,6 +433,10 @@ func (r *FormatRenderer) renderHeading(node *Node, entering bool) (WalkStatus, e
 		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
+}
+
+func (r *FormatRenderer) renderHeadingC8hMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
