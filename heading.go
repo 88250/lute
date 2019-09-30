@@ -12,7 +12,7 @@
 
 package lute
 
-func (t *Tree) parseATXHeading() (content items, level int) {
+func (t *Tree) parseATXHeading() (ok bool, markers, content items, level int) {
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	marker := tokens[0]
 	if itemCrosshatch != term(marker) {
@@ -28,15 +28,15 @@ func (t *Tree) parseATXHeading() (content items, level int) {
 		return
 	}
 
-	content = make(items, 0, 256)
+	markers = t.context.currentLine[t.context.nextNonspace : t.context.nextNonspace+level]
 
+	content = make(items, 0, 256)
 	_, tokens = trimLeft(tokens)
 	_, tokens = trimLeft(tokens[level:])
 	for _, token := range tokens {
 		if itemNewline == term(token) {
 			break
 		}
-
 		content = append(content, token)
 	}
 
@@ -46,7 +46,6 @@ func (t *Tree) parseATXHeading() (content items, level int) {
 		if itemCrosshatch == term(content[closingCrosshatchIndex]) {
 			continue
 		}
-
 		if itemSpace == term(content[closingCrosshatchIndex]) {
 			break
 		} else {
@@ -61,6 +60,7 @@ func (t *Tree) parseATXHeading() (content items, level int) {
 		content = content[:closingCrosshatchIndex]
 		_, content = trimRight(content)
 	}
+	ok = true
 
 	return
 }

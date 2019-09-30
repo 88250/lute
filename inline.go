@@ -58,6 +58,7 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 			block.AppendChild(n)
 		}
 	}
+	block.tokens = nil
 }
 
 func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {

@@ -40,15 +40,15 @@ var vditorRendererTests = []parseTest{
 	//{"4", "* Lute\n", "<ul data-ntype=\"5\" data-mtype=\"1\"><li data-ntype=\"6\" data-mtype=\"1\"><span class=\"node\"><span class=\"marker\">* </span></span><p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"10\" data-mtype=\"2\">Lute</span></p></li></ul>"},
 	//{"3", "> Lute\n", "<blockquote><span class=\"node\"><span class=\"marker\" data-ntype=\"5\" data-mtype=\"2\" data-pos-start=\"1:1\" data-pos-end=\"1:2\">&gt;</span></span><p data-ntype=\"1\" data-mtype=\"0\" data-pos-start=\"1:3\" data-pos-end=\"1:7\"><span data-ntype=\"11\" data-mtype=\"2\" data-pos-start=\"1:3\" data-pos-end=\"1:7\">Lute</span><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span></blockquote>"},
 	//{"2", "---\n", "<hr data-ntype=\"3\" data-mtype=\"0\" data-caret=\"start\" data-caretoffset=\"0\" />"},
-	//{"1", "## Lute\n", "<h2 data-ntype=\"2\" data-mtype=\"0\"><span data-ntype=\"11\" data-mtype=\"2\" data-caret=\"start\" data-caretoffset=\"0\">Lute</span></h2>"},
-	{"0", "*foo*\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node node--expand\" data-ntype=\"12\" data-mtype=\"2\"><span class=\"marker\" data-ntype=\"13\" data-mtype=\"2\">*</span><em data-ntype=\"12\" data-mtype=\"2\" class=\"node--expand\"><span data-ntype=\"11\" data-mtype=\"2\" data-cso=\"1\" data-ceo=\"1\">foo</span></em><span class=\"marker\" data-ntype=\"14\" data-mtype=\"2\">*</span></span></p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>"},
+	{"1", "## foo\n", "<h2 data-ntype=\"2\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\" data-ntype=\"3\" data-mtype=\"2\" data-cso=\"1\" data-ceo=\"1\">##</span></span><span data-ntype=\"12\" data-mtype=\"2\">foo</span></h2>"},
+	{"0", "*foo*\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node node--expand\" data-ntype=\"13\" data-mtype=\"2\"><span class=\"marker\" data-ntype=\"14\" data-mtype=\"2\">*</span><em data-ntype=\"13\" data-mtype=\"2\" class=\"node--expand\"><span data-ntype=\"12\" data-mtype=\"2\" data-cso=\"0\" data-ceo=\"0\">foo</span></em><span class=\"marker\" data-ntype=\"15\" data-mtype=\"2\">*</span></span></p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>"},
 }
 
 func TestVditorRenderer(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range vditorRendererTests {
-		html, err := luteEngine.RenderVditorDOM(test.from, 2, 2)
+		html, err := luteEngine.RenderVditorDOM(test.from, 1, 1)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}

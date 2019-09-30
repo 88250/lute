@@ -273,52 +273,55 @@ const (
 	NodeDocument             nodeType = 0  // 根 不用 iota 方便前后端联调
 	NodeParagraph            nodeType = 1  // 段落
 	NodeHeading              nodeType = 2  // 标题
-	NodeThematicBreak        nodeType = 3  // 分隔线
-	NodeBlockquote           nodeType = 4  // 块引用
-	NodeBlockquoteMarker     nodeType = 5  // 块引用标记符 >
-	NodeList                 nodeType = 6  // 列表
-	NodeListItem             nodeType = 7  // 列表项
-	NodeHTMLBlock            nodeType = 8  // HTML 块
-	NodeInlineHTML           nodeType = 9  // 内联 HTML
-	NodeCodeBlock            nodeType = 10 // 代码块
-	NodeText                 nodeType = 11 // 文本
-	NodeEmphasis             nodeType = 12 // 强调
-	NodeEmA6kOpenMarker      nodeType = 13 // 开始强调标记符 *
-	NodeEmA6kCloseMarker     nodeType = 14 // 结束强调标记符 *
-	NodeEmU8eOpenMarker      nodeType = 15 // 开始强调标记符 _
-	NodeEmU8eCloseMarker     nodeType = 16 // 结束强调标记符 _
-	NodeStrong               nodeType = 17 // 加粗
-	NodeStrongA6kOpenMarker  nodeType = 18 // 开始加粗节点标记符 **
-	NodeStrongA6kCloseMarker nodeType = 19 // 结束加粗节点标记符 **
-	NodeStrongU8eOpenMarker  nodeType = 20 // 开始加粗节点标记符 __
-	NodeStrongU8eCloseMarker nodeType = 21 // 结束加粗节点标记符 __
-	NodeCodeSpan             nodeType = 22 // 代码
-	NodeHardBreak            nodeType = 23 // 硬换行
-	NodeSoftBreak            nodeType = 24 // 软换行
-	NodeLink                 nodeType = 25 // 链接
-	NodeImage                nodeType = 26 // 图片
+	NodeHeadingC8hMarker     nodeType = 3  // ATX 标题标记符 #
+	NodeThematicBreak        nodeType = 4  // 分隔线
+	NodeBlockquote           nodeType = 5  // 块引用
+	NodeBlockquoteMarker     nodeType = 6  // 块引用标记符 >
+	NodeList                 nodeType = 7  // 列表
+	NodeListItem             nodeType = 8  // 列表项
+	NodeHTMLBlock            nodeType = 9  // HTML 块
+	NodeInlineHTML           nodeType = 10 // 内联 HTML
+	NodeCodeBlock            nodeType = 11 // 代码块
+	NodeText                 nodeType = 12 // 文本
+	NodeEmphasis             nodeType = 13 // 强调
+	NodeEmA6kOpenMarker      nodeType = 14 // 开始强调标记符 *
+	NodeEmA6kCloseMarker     nodeType = 15 // 结束强调标记符 *
+	NodeEmU8eOpenMarker      nodeType = 16 // 开始强调标记符 _
+	NodeEmU8eCloseMarker     nodeType = 17 // 结束强调标记符 _
+	NodeStrong               nodeType = 18 // 加粗
+	NodeStrongA6kOpenMarker  nodeType = 19 // 开始加粗标记符 **
+	NodeStrongA6kCloseMarker nodeType = 20 // 结束加粗标记符 **
+	NodeStrongU8eOpenMarker  nodeType = 21 // 开始加粗标记符 __
+	NodeStrongU8eCloseMarker nodeType = 22 // 结束加粗标记符 __
+	NodeCodeSpan             nodeType = 23 // 代码
+	NodeCodeSpanOpenMarker   nodeType = 24 // 开始代码标记符 `
+	NodeCodeSpanCloseMarker  nodeType = 25 // 结束代码标记符 `
+	NodeHardBreak            nodeType = 26 // 硬换行
+	NodeSoftBreak            nodeType = 27 // 软换行
+	NodeLink                 nodeType = 28 // 链接
+	NodeImage                nodeType = 29 // 图片
 
 	// GFM
 
-	NodeTaskListItemMarker        nodeType = 27 // 任务列表项标记符
-	NodeStrikethrough             nodeType = 28 // 删除线
-	NodeStrikethrough1OpenMarker  nodeType = 29 // 开始删除线节点标记符 ~
-	NodeStrikethrough1CloseMarker nodeType = 30 // 结束删除线节点标记符 ~
-	NodeStrikethrough2OpenMarker  nodeType = 31 // 开始删除线节点标记符 ~~
-	NodeStrikethrough2CloseMarker nodeType = 32 // 结束删除线节点标记符 ~~
-	NodeTable                     nodeType = 33 // 表
-	NodeTableHead                 nodeType = 34 // 表头
-	NodeTableRow                  nodeType = 35 // 表行
-	NodeTableCell                 nodeType = 36 // 表格
+	NodeTaskListItemMarker        nodeType = 30 // 任务列表项标记符
+	NodeStrikethrough             nodeType = 31 // 删除线
+	NodeStrikethrough1OpenMarker  nodeType = 32 // 开始删除线标记符 ~
+	NodeStrikethrough1CloseMarker nodeType = 33 // 结束删除线标记符 ~
+	NodeStrikethrough2OpenMarker  nodeType = 34 // 开始删除线标记符 ~~
+	NodeStrikethrough2CloseMarker nodeType = 35 // 结束删除线标记符 ~~
+	NodeTable                     nodeType = 36 // 表
+	NodeTableHead                 nodeType = 37 // 表头
+	NodeTableRow                  nodeType = 38 // 表行
+	NodeTableCell                 nodeType = 39 // 表格
 
 	// Emoji
 
-	NodeEmojiUnicode nodeType = 37 // Emoji Unicode 字符
-	NodeEmojiImg     nodeType = 38 // Emoji 图片
+	NodeEmojiUnicode nodeType = 40 // Emoji Unicode 字符
+	NodeEmojiImg     nodeType = 41 // Emoji 图片
 
 	// 数学公式
 
-	NodeMathBlock  nodeType = 39 // 数学公式块
-	NodeInlineMath nodeType = 40 // 内联数学公式
+	NodeMathBlock  nodeType = 42 // 数学公式块
+	NodeInlineMath nodeType = 43 // 内联数学公式
 
 )

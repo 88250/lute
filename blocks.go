@@ -196,13 +196,15 @@ var blockStarts = []blockStartFunc{
 	// 判断 ATX 标题（#）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			if content, level := t.parseATXHeading(); nil != content {
+			if ok, markers, content, level := t.parseATXHeading(); ok {
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(len(content), false)
 				t.context.closeUnmatchedBlocks()
-				container := t.context.addChild(NodeHeading, t.context.nextNonspace)
-				container.headingLevel = level
-				container.tokens = content
+				heading := t.context.addChild(NodeHeading, t.context.nextNonspace)
+				heading.headingLevel = level
+				heading.tokens = content
+				crosshatchMarker := &Node{typ:NodeHeadingC8hMarker, tokens:markers}
+				heading.AppendChild(crosshatchMarker)
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
 			}
@@ -252,7 +254,7 @@ var blockStarts = []blockStartFunc{
 							container.AppendChild(tr)
 							tr = nextTr
 						}
-						// TODO: 源码映射不要释放 container.tokens = nil
+						container.tokens = nil
 						return 0
 					}
 				}

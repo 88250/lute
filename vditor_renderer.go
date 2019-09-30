@@ -47,6 +47,7 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
 	ret.rendererFuncs[NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.rendererFuncs[NodeHeading] = ret.renderHeading
+	ret.rendererFuncs[NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
 	ret.rendererFuncs[NodeList] = ret.renderList
 	ret.rendererFuncs[NodeListItem] = ret.renderListItem
 	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
@@ -450,6 +451,17 @@ func (r *VditorRenderer) renderHeading(node *Node, entering bool) (WalkStatus, e
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 	}
 	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderHeadingC8hMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "node"}}
+	r.tag("span", nil, attrs, false)
+	attrs = [][]string{{"class", "marker"}}
+	r.tag("span", node, attrs, false)
+	r.write(node.tokens)
+	r.tag("/span", node, nil, false)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {

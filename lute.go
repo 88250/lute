@@ -136,9 +136,7 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 	}
 
 	renderer := lute.newVditorRenderer(tree.Root)
-	// 光标位置映射
 	renderer.mapSelection(tree.Root, startOffset, endOffset)
-
 	var output []byte
 	output, err = renderer.Render()
 	html = string(output)
