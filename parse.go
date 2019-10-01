@@ -142,8 +142,8 @@ func (context *Context) finalize(block *Node, lineNum int) {
 }
 
 // addChildMarker 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。
-func (context *Context) addChildMarker(nodeType nodeType) (ret *Node) {
-	ret = &Node{typ: nodeType, close: true}
+func (context *Context) addChildMarker(nodeType nodeType, tokens items) (ret *Node) {
+	ret = &Node{typ: nodeType, tokens: tokens, close: true}
 	context.tip.AppendChild(ret)
 	return ret
 }

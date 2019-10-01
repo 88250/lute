@@ -169,24 +169,23 @@ var blockStarts = []blockStartFunc{
 	// 判断块引用（>）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			token := t.context.currentLine.peek(t.context.nextNonspace)
-			if itemGreater == term(token) {
+			marker := t.context.currentLine.peek(t.context.nextNonspace)
+			if itemGreater == term(marker) {
 				markerStartCol := t.context.nextNonspace + 1
 				markerEndCol := markerStartCol
 
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
 				// > 后面的空格是可选的
-				token = t.context.currentLine.peek(t.context.offset)
-				withSpace := itemSpace == term(token) || itemTab == term(token)
+				whitespace := t.context.currentLine.peek(t.context.offset)
+				withSpace := itemSpace == term(whitespace) || itemTab == term(whitespace)
 				if withSpace {
 					t.context.advanceOffset(1, true)
 					markerEndCol++
 				}
-
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(NodeBlockquote, t.context.nextNonspace)
-				t.context.addChildMarker(NodeBlockquoteMarker)
+				t.context.addChildMarker(NodeBlockquoteMarker, items{marker, whitespace})
 				return 1
 			}
 		}

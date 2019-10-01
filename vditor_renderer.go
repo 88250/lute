@@ -650,7 +650,7 @@ func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, s
 		// 判断是否在选段内
 		st := node.tokens[0]
 		et := node.tokens[len(node.tokens)-1]
-		if st.Offset() > startOffset || et.Offset() < endOffset {
+		if st.Offset()+1 > startOffset || et.Offset()+1 < endOffset {
 			return
 		}
 	}
