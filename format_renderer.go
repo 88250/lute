@@ -30,6 +30,8 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
+	ret.rendererFuncs[NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
+	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
@@ -282,6 +284,14 @@ func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 		r.writeByte(itemBacktick)
 	}
 	r.writeByte(itemBacktick)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	return WalkStop, nil
 }
 

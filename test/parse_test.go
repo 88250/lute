@@ -158,6 +158,7 @@ var parseTests = []parseTest{
 	{"spec118", "<table><tr><td>\n<pre>\n**Hello**,\n\n_world_.\n</pre>\n</td></tr></table>\n", "<table><tr><td>\n<pre>\n**Hello**,\n<p><em>world</em>.\n</pre></p>\n</td></tr></table>\n"},
 	{"spec117", "```\n``` aaa\n```\n", "<pre><code>``` aaa\n</code></pre>\n"},
 	{"spec116", "~~~ aa ``` ~~~\nfoo\n~~~\n", "<pre><code class=\"language-aa\">foo\n</code></pre>\n"},
+	{"spec115", "``` aa ```\nfoo\n", "<p><code>aa</code>\nfoo</p>\n"},
 	{"spec113", "~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~\n", "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>\n"},
 	{"spec112", "```ruby\ndef foo(x)\n  return 3\nend\n```\n", "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>\n"},
 	{"spec110", "foo\n```\nbar\n```\nbaz\n", "<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>\n"},

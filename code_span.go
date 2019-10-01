@@ -27,6 +27,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 		ret = &Node{typ: NodeText, tokens: backticks}
 		return
 	}
+	openMarker := &Node{typ: NodeCodeSpanOpenMarker, tokens: backticks}
 
 	endPos := t.matchCodeSpanEnd(ctx.tokens[startPos+n:], n)
 	if 1 > endPos {
@@ -35,16 +36,21 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 		return
 	}
 	endPos = startPos + endPos + n
+	closeMarker := &Node{typ: NodeCodeSpanCloseMarker, tokens: ctx.tokens[endPos : endPos+n]}
 
 	textTokens := ctx.tokens[startPos+n : endPos]
 	textTokens = replaceAll(textTokens, strToItems("\n"), strToItems(" "))
 	if 2 < len(textTokens) && itemSpace == term(textTokens[0]) && itemSpace == term(textTokens[len(textTokens)-1]) && !textTokens.isBlankLine() {
 		// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
+		openMarker.tokens = append(openMarker.tokens, textTokens[0])
+		closeMarker.tokens = ctx.tokens[endPos-1 : endPos+n]
 		textTokens = textTokens[1:]
 		textTokens = textTokens[:len(textTokens)-1]
 	}
 
 	ret = &Node{typ: NodeCodeSpan, tokens: textTokens, codeMarkerLen: n}
+	ret.PrependChild(openMarker)
+	ret.AppendChild(closeMarker)
 	ctx.pos = endPos + n
 	return
 }

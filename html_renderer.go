@@ -28,6 +28,8 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
+	ret.rendererFuncs[NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
+	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
@@ -296,6 +298,14 @@ func (r *HTMLRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, er
 	}
 	r.writeString("</code>")
 	return WalkContinue, nil
+}
+
+func (r *HTMLRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {

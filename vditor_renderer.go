@@ -31,6 +31,8 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
+	ret.rendererFuncs[NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
+	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
@@ -267,27 +269,29 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 
 func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", nil, nil, false)
-		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
-		r.writeByte(itemBacktick)
-		if 1 < node.codeMarkerLen {
-			r.writeByte(itemBacktick)
-		}
-		r.tag("/span", nil, nil, false)
-		r.tag("code", node, nil, false)
-		r.write(escapeHTML(node.tokens))
+		r.tag("span", node, [][]string{{"class", "node"}}, false)
 	} else {
-		r.tag("/code", node, nil, false)
-		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
-		r.writeByte(itemBacktick)
-		if 1 < node.codeMarkerLen {
-			r.writeByte(itemBacktick)
-		}
 		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", node, attrs, false)
+	r.write(node.tokens)
+	r.tag("/span", nil, nil, false)
+	r.tag("code", node.parent, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/code", node, nil, false)
+	attrs := [][]string{{"class", "marker"}}
+	r.tag("span", node, attrs, false)
+	r.write(node.tokens)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
