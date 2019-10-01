@@ -334,8 +334,7 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		attrs := [][]string{{"class", "node"}}
-		r.tag("span", node, attrs, false)
+		r.tag("span", node, [][]string{{"class", "node"}}, false)
 	} else {
 		r.tag("/span", nil, nil, false)
 	}
@@ -362,19 +361,19 @@ func (r *VditorRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) 
 
 func (r *VditorRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "marker"}}
-	r.tag("span", nil, attrs, false)
+	r.tag("span", node, attrs, false)
 	r.writeByte(itemUnderscore)
 	r.tag("/span", nil, nil, false)
-	r.tag("em", node, nil, false)
+	r.tag("em", node.parent, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/em", node, nil, false)
 	attrs := [][]string{{"class", "marker"}}
-	r.tag("span", nil, attrs, false)
+	r.tag("span", node, attrs, false)
 	r.writeByte(itemUnderscore)
 	r.tag("/span", nil, nil, false)
-	r.tag("/em", node, nil, false)
 	return WalkStop, nil
 }
 
@@ -574,7 +573,7 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 			if "" != node.caretEndOffset {
 				attrs = append(attrs, []string{"data-ceo", node.caretEndOffset})
 			}
-			if node.expand {
+			if node.expand && r.containClass(&attrs, "node") {
 				r.appendClass(&attrs, "node--expand")
 			}
 		}
@@ -596,6 +595,15 @@ func (r *VditorRenderer) appendClass(attrs *[][]string, class string) {
 		}
 	}
 	*attrs = append(*attrs, []string{"class", class})
+}
+
+func (r *VditorRenderer) containClass(attrs *[][]string, class string) bool {
+	for _, attr := range *attrs {
+		if "class" == attr[0] && strings.Contains(attr[1], class) {
+			return true
+		}
+	}
+	return false
 }
 
 // mtype 返回节点类型 nodeType 对应的 Markdown 元素类型。
