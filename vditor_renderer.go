@@ -389,37 +389,37 @@ func (r *VditorRenderer) renderStrong(node *Node, entering bool) (WalkStatus, er
 
 func (r *VditorRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "marker"}}
-	r.tag("span", nil, attrs, false)
+	r.tag("span", node, attrs, false)
 	r.writeString("**")
 	r.tag("/span", nil, nil, false)
-	r.tag("strong", node, nil, false)
+	r.tag("strong", node.parent, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/strong", node, nil, false)
 	attrs := [][]string{{"class", "marker"}}
-	r.tag("span", nil, attrs, false)
+	r.tag("span", node, attrs, false)
 	r.writeString("**")
 	r.tag("/span", nil, nil, false)
-	r.tag("/strong", node, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "marker"}}
-	r.tag("span", nil, attrs, false)
+	r.tag("span", node, attrs, false)
 	r.writeString("__")
 	r.tag("/span", nil, nil, false)
-	r.tag("strong", node, nil, false)
+	r.tag("strong", node.parent, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/strong", node, nil, false)
 	attrs := [][]string{{"class", "marker"}}
-	r.tag("span", nil, attrs, false)
+	r.tag("span", node, attrs, false)
 	r.writeString("__")
 	r.tag("/span", nil, nil, false)
-	r.tag("/strong", node, nil, false)
 	return WalkStop, nil
 }
 
