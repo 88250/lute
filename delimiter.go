@@ -148,15 +148,19 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 					}
 				}
 			} else {
-				if itemTilde != closercc {
+				if itemAsterisk == closercc {
 					emStrongDel.typ = NodeStrong
 					openMarker.typ = NodeStrongA6kOpenMarker
 					closeMarker.typ = NodeStrongA6kCloseMarker
-				} else {
+				} else if itemUnderscore == closercc {
+					emStrongDel.typ = NodeStrong
+					openMarker.typ = NodeStrongU8eOpenMarker
+					closeMarker.typ = NodeStrongU8eCloseMarker
+				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
 						emStrongDel.typ = NodeStrikethrough
-						openMarker.typ = NodeStrikethrough2OpenMarker
-						closeMarker.typ = NodeStrikethrough2CloseMarker
+						openMarker.typ = NodeStrikethrough1OpenMarker
+						closeMarker.typ = NodeStrikethrough1CloseMarker
 					}
 				}
 			}
