@@ -282,6 +282,7 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 	r.write(node.tokens)
 	r.tag("/span", nil, nil, false)
 	r.tag("code", node.parent, nil, false)
+	r.write(node.parent.tokens)
 	return WalkStop, nil
 }
 
@@ -649,7 +650,7 @@ func (r *VditorRenderer) expand(node *Node) {
 			return
 		}
 		switch p.typ {
-		case NodeEmphasis, NodeStrong, NodeBlockquoteMarker, NodeListItem:
+		case NodeEmphasis, NodeStrong, NodeBlockquoteMarker, NodeListItem, NodeCodeSpan:
 			p.expand = true
 			return
 		}

@@ -130,6 +130,7 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 // RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
 func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset int) (html string, err error) {
 	var tree *Tree
+	lute.VditorWYSIWYG = true
 	tree, err = lute.parse("", []byte(markdownText))
 	if nil != err {
 		return
@@ -248,6 +249,8 @@ type options struct {
 	Emojis map[string]string
 	// EmojiSite 设置图片 Emoji URL 的路径前缀。
 	EmojiSite string
+	// Vditor 所见即所得支持
+	VditorWYSIWYG bool
 }
 
 // option 描述了解析渲染选项设置函数签名。
@@ -313,4 +316,8 @@ func (lute *Lute) SetEmojis(emojis map[string]string) {
 
 func (lute *Lute) SetEmojiSite(emojiSite string) {
 	lute.EmojiSite = emojiSite
+}
+
+func (lute *Lute) SetVditorWYSIWYG(b bool) {
+	lute.VditorWYSIWYG = b
 }

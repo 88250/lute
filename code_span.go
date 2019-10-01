@@ -39,7 +39,9 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	closeMarker := &Node{typ: NodeCodeSpanCloseMarker, tokens: ctx.tokens[endPos : endPos+n]}
 
 	textTokens := ctx.tokens[startPos+n : endPos]
-	textTokens = replaceAll(textTokens, strToItems("\n"), strToItems(" "))
+	if !t.context.option.VditorWYSIWYG {
+		textTokens = replaceAll(textTokens, strToItems("\n"), strToItems(" "))
+	}
 	if 2 < len(textTokens) && itemSpace == term(textTokens[0]) && itemSpace == term(textTokens[len(textTokens)-1]) && !textTokens.isBlankLine() {
 		// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
 		openMarker.tokens = append(openMarker.tokens, textTokens[0])

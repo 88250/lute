@@ -76,7 +76,9 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = trimWhitespace(cols[i])
 		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i]}
-		col = replaceAll(col, strToItems("\\|"), strToItems("|"))
+		if !context.option.VditorWYSIWYG {
+			col = replaceAll(col, strToItems("\\|"), strToItems("|"))
+		}
 		cell.tokens = col
 		ret.AppendChild(cell)
 	}
