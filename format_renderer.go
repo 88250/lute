@@ -31,6 +31,7 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
 	ret.rendererFuncs[NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
+	ret.rendererFuncs[NodeCodeSpanContent] = ret.renderCodeSpanContent
 	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
@@ -269,29 +270,29 @@ func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeByte(itemBacktick)
-		if 1 < node.codeMarkerLen {
-			r.writeByte(itemBacktick)
-			r.writeByte(itemSpace)
-		}
-		r.write(node.tokens)
-		return WalkSkipChildren, nil
-	}
-
-	if 1 < node.codeMarkerLen {
-		r.writeByte(itemSpace)
-		r.writeByte(itemBacktick)
-	}
-	r.writeByte(itemBacktick)
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemBacktick)
+	if 1 < node.parent.codeMarkerLen {
+		r.writeByte(itemBacktick)
+		r.writeByte(itemSpace)
+	}
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	if 1 < node.parent.codeMarkerLen {
+		r.writeByte(itemSpace)
+		r.writeByte(itemBacktick)
+	}
+	r.writeByte(itemBacktick)
 	return WalkStop, nil
 }
 

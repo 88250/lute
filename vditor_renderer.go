@@ -32,6 +32,7 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
 	ret.rendererFuncs[NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
+	ret.rendererFuncs[NodeCodeSpanContent] = ret.renderCodeSpanContent
 	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
@@ -282,8 +283,17 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 	r.write(node.tokens)
 	r.tag("/span", nil, nil, false)
 	r.tag("code", node.parent, nil, false)
-	r.write(node.parent.tokens)
 	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("span", node, nil, false)
+		r.write(escapeHTML(node.tokens))
+	} else {
+		r.tag("/span", node, nil, false)
+	}
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
@@ -668,7 +678,7 @@ func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, s
 		}
 	}
 
-	if nil == node.firstChild {
+	if nil == node.firstChild || nil != node.tokens {
 		// 说明找到了选段内的叶子结点
 		*selected = append(*selected, node)
 		return

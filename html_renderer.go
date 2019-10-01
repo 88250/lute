@@ -29,6 +29,7 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeText] = ret.renderText
 	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
 	ret.rendererFuncs[NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
+	ret.rendererFuncs[NodeCodeSpanContent] = ret.renderCodeSpanContent
 	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
@@ -291,20 +292,21 @@ func (r *HTMLRenderer) renderText(node *Node, entering bool) (WalkStatus, error)
 }
 
 func (r *HTMLRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeString("<code>")
-		r.write(escapeHTML(node.tokens))
-		return WalkSkipChildren, nil
-	}
-	r.writeString("</code>")
 	return WalkContinue, nil
 }
 
 func (r *HTMLRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("<code>")
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("</code>")
 	return WalkStop, nil
 }
 
