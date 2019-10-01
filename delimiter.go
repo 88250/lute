@@ -159,8 +159,8 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
 						emStrongDel.typ = NodeStrikethrough
-						openMarker.typ = NodeStrikethrough1OpenMarker
-						closeMarker.typ = NodeStrikethrough1CloseMarker
+						openMarker.typ = NodeStrikethrough2OpenMarker
+						closeMarker.typ = NodeStrikethrough2CloseMarker
 					}
 				}
 			}
