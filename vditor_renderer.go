@@ -441,7 +441,6 @@ func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus
 	if entering {
 		attrs := [][]string{{"class", "node"}}
 		r.tag("span", nil, attrs, false)
-		r.tag("blockquote", node, nil, false)
 	} else {
 		r.tag("/blockquote", node, nil, false)
 		r.tag("/span", nil, nil, false)
@@ -454,6 +453,7 @@ func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) (Walk
 	r.tag("span", node, attrs, false)
 	r.write(escapeHTML(node.tokens))
 	r.tag("/span", node, nil, false)
+	r.tag("blockquote", node, nil, false)
 	return WalkStop, nil
 }
 
@@ -461,7 +461,6 @@ func (r *VditorRenderer) renderHeading(node *Node, entering bool) (WalkStatus, e
 	if entering {
 		attrs := [][]string{{"class", "node"}}
 		r.tag("span", nil, attrs, false)
-		r.tag("h"+" 123456"[node.headingLevel:node.headingLevel+1], node, nil, false)
 	} else {
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 		r.tag("/span", nil, nil, false)
@@ -474,6 +473,7 @@ func (r *VditorRenderer) renderHeadingC8hMarker(node *Node, entering bool) (Walk
 	r.tag("span", node, attrs, false)
 	r.write(node.tokens)
 	r.tag("/span", node, nil, false)
+	r.tag("h"+" 123456"[node.headingLevel:node.headingLevel+1], node, nil, false)
 	return WalkStop, nil
 }
 
