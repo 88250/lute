@@ -37,6 +37,14 @@ type BaseRenderer struct {
 	treeRoot            *Node                     // 待渲染的树的根节点
 }
 
+// newBaseRenderer 构造一个 BaseRenderer。
+func (lute *Lute) newBaseRenderer(treeRoot *Node) *BaseRenderer {
+	ret := &BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, treeRoot: treeRoot}
+	ret.writer = &bytes.Buffer{}
+	ret.writer.Grow(4096)
+	return ret
+}
+
 // Render 从指定的根节点 root 开始遍历并渲染。
 func (r *BaseRenderer) Render() (output []byte, err error) {
 	defer recoverPanic(&err)

@@ -171,9 +171,7 @@ var blockStarts = []blockStartFunc{
 		if !t.context.indented {
 			marker := t.context.currentLine.peek(t.context.nextNonspace)
 			if itemGreater == term(marker) {
-				markerStartCol := t.context.nextNonspace + 1
-				markerEndCol := markerStartCol
-
+				markers := items{marker}
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
 				// > 后面的空格是可选的
@@ -181,11 +179,11 @@ var blockStarts = []blockStartFunc{
 				withSpace := itemSpace == term(whitespace) || itemTab == term(whitespace)
 				if withSpace {
 					t.context.advanceOffset(1, true)
-					markerEndCol++
+					markers = append(markers, whitespace)
 				}
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(NodeBlockquote, t.context.nextNonspace)
-				t.context.addChildMarker(NodeBlockquoteMarker, items{marker, whitespace})
+				t.context.addChildMarker(NodeBlockquoteMarker, markers)
 				return 1
 			}
 		}

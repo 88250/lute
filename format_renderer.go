@@ -25,7 +25,7 @@ type FormatRenderer struct {
 
 // newFormatRenderer 创建一个格式化渲染器。
 func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
-	ret := &FormatRenderer{BaseRenderer: &BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
+	ret := &FormatRenderer{BaseRenderer: lute.newBaseRenderer(treeRoot)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText

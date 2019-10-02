@@ -26,7 +26,7 @@ type VditorRenderer struct {
 
 // newVditorRenderer 创建一个 Vditor DOM 渲染器。
 func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
-	ret := &VditorRenderer{&BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
+	ret := &VditorRenderer{lute.newBaseRenderer(treeRoot)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
@@ -394,8 +394,7 @@ func (r *VditorRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool
 
 func (r *VditorRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		attrs := [][]string{{"class", "node"}}
-		r.tag("span", nil, attrs, false)
+		r.tag("span", node, [][]string{{"class", "node"}}, false)
 	} else {
 		r.tag("/span", nil, nil, false)
 	}
@@ -452,7 +451,7 @@ func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) (Walk
 	r.tag("span", nil, attrs, false)
 	attrs = [][]string{{"class", "marker"}}
 	r.tag("span", node, attrs, false)
-	r.writeString("&gt;")
+	r.write(escapeHTML(node.tokens))
 	r.tag("/span", node, nil, false)
 	r.tag("/span", nil, nil, false)
 	return WalkStop, nil

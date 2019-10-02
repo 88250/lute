@@ -23,7 +23,7 @@ type EChartsJSONRenderer struct {
 
 // newEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
 func (lute *Lute) newEChartsJSONRenderer(treeRoot *Node) Renderer {
-	ret := &EChartsJSONRenderer{&BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
+	ret := &EChartsJSONRenderer{lute.newBaseRenderer(treeRoot)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocumentEChartsJSON
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraphEChartsJSON
 	ret.rendererFuncs[NodeText] = ret.renderTextEChartsJSON
@@ -379,7 +379,7 @@ func (r *EChartsJSONRenderer) comma() {
 
 func (r *EChartsJSONRenderer) ignore(node *Node) bool {
 	return nil == node ||
-	// 以下类型的节点不进行渲染，否则图画出来节点太多
+		// 以下类型的节点不进行渲染，否则图画出来节点太多
 		NodeBlockquoteMarker == node.typ ||
 		NodeEmA6kOpenMarker == node.typ || NodeEmA6kCloseMarker == node.typ ||
 		NodeEmU8eOpenMarker == node.typ || NodeEmU8eCloseMarker == node.typ ||

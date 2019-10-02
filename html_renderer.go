@@ -23,7 +23,7 @@ type HTMLRenderer struct {
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
 func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
-	ret := &HTMLRenderer{&BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, treeRoot: treeRoot}}
+	ret := &HTMLRenderer{lute.newBaseRenderer(treeRoot)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
