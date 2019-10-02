@@ -253,7 +253,7 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.tag("p", node, nil, false)
 	} else {
-		r.writeString("</p><span><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></span>")
+		r.writeString("<span class=\"newline\">\n</span><span class=\"newline\">\n</span></p>")
 	}
 	return WalkContinue, nil
 }
