@@ -28,7 +28,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content items, level int) {
 		return
 	}
 
-	markers = t.context.currentLine[t.context.nextNonspace : t.context.nextNonspace+level]
+	markers = t.context.currentLine[t.context.nextNonspace : t.context.nextNonspace+level+1]
 
 	content = make(items, 0, 256)
 	_, tokens = trimLeft(tokens)
