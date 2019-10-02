@@ -61,7 +61,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 		return nil
 	}
 
-	ln := t.context.currentLine // 弄短点
+	ln := t.context.currentLine
 	tokens := ln[t.context.nextNonspace:]
 	data := &listData{
 		typ:          0,                // 默认无序列表

@@ -21,9 +21,6 @@ func (t *Tree) mergeText(node *Node) {
 			// 逐个合并后续兄弟节点
 			for nil != next && NodeText == next.typ {
 				child.AppendTokens(next.tokens)
-				// TODO: 源码位置
-				//child.ranges[0].endLn = next.ranges[0].endLn
-				//child.ranges[0].endCol = next.ranges[0].endCol
 				next.Unlink()
 				next = child.next
 			}
