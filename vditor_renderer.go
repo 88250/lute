@@ -439,41 +439,41 @@ func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (
 
 func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		attrs := [][]string{{"class", "node"}}
+		r.tag("span", nil, attrs, false)
 		r.tag("blockquote", node, nil, false)
 	} else {
 		r.tag("/blockquote", node, nil, false)
+		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) (WalkStatus, error) {
-	attrs := [][]string{{"class", "node"}}
-	r.tag("span", nil, attrs, false)
-	attrs = [][]string{{"class", "marker"}}
+	attrs := [][]string{{"class", "marker"}}
 	r.tag("span", node, attrs, false)
 	r.write(escapeHTML(node.tokens))
 	r.tag("/span", node, nil, false)
-	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		attrs := [][]string{{"class", "node"}}
+		r.tag("span", nil, attrs, false)
 		r.tag("h"+" 123456"[node.headingLevel:node.headingLevel+1], node, nil, false)
 	} else {
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
+		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderHeadingC8hMarker(node *Node, entering bool) (WalkStatus, error) {
-	attrs := [][]string{{"class", "node"}}
-	r.tag("span", nil, attrs, false)
-	attrs = [][]string{{"class", "marker"}}
+	attrs := [][]string{{"class", "marker"}}
 	r.tag("span", node, attrs, false)
 	r.write(node.tokens)
 	r.tag("/span", node, nil, false)
-	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
