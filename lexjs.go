@@ -121,18 +121,18 @@ func (l *lexer) nextLine() (ret items) {
 		l.col++
 		if itemNewline == b {
 			i++
-			ret = append(ret, newItem(b, l.ln, l.col, l.offset))
+			ret = append(ret, newItem(b, l.ln, l.col, l.offset+offset))
 			break
 		} else if itemCarriageReturn == b {
 			// 按照规范定义的 line ending (https://spec.commonmark.org/0.29/#line-ending) 处理 \r
-			ret = append(ret, newItem(b, l.ln, l.col, l.offset))
+			ret = append(ret, newItem(b, l.ln, l.col, l.offset+offset))
 			if i < l.length-1 {
 				nb = l.input[i+1]
 				if itemNewline == nb {
 					l.input = append(l.input[:i], l.input[i+1:]...) // 移除 \r，依靠下一个的 \n 切行
 					l.length--                                      // 重新计算总长
 					ret = ret[:len(ret)-1]
-					ret = append(ret, newItem(nb, l.ln, l.col, l.offset))
+					ret = append(ret, newItem(nb, l.ln, l.col, l.offset+offset))
 				}
 			}
 			i++

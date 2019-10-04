@@ -440,7 +440,7 @@ func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (
 func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		attrs := [][]string{{"class", "node node--block"}}
-		r.tag("div", nil, attrs, false)
+		r.tag("div", node, attrs, false)
 	} else {
 		r.tag("/blockquote", node, nil, false)
 		r.tag("/div", nil, nil, false)
@@ -453,13 +453,12 @@ func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) (Walk
 	r.tag("span", node, attrs, false)
 	r.write(escapeHTML(node.tokens))
 	r.tag("/span", node, nil, false)
-	r.tag("blockquote", node, nil, false)
+	r.tag("blockquote", node.parent, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-	} else {
+	if !entering {
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 	}
 	return WalkContinue, nil
@@ -467,7 +466,7 @@ func (r *VditorRenderer) renderHeading(node *Node, entering bool) (WalkStatus, e
 
 func (r *VditorRenderer) renderHeadingC8hMarker(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "node"}}
-	r.tag("h"+" 123456"[node.parent.headingLevel:node.parent.headingLevel+1], node, attrs, false)
+	r.tag("h"+" 123456"[node.parent.headingLevel:node.parent.headingLevel+1], node.parent, attrs, false)
 	attrs = [][]string{{"class", "marker"}}
 	r.tag("span", node, attrs, false)
 	r.write(node.tokens)
@@ -657,7 +656,7 @@ func (r *VditorRenderer) expand(node *Node) {
 			return
 		}
 		switch p.typ {
-		case NodeEmphasis, NodeStrong, NodeBlockquoteMarker, NodeListItem, NodeCodeSpan:
+		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading:
 			p.expand = true
 			return
 		}
@@ -675,7 +674,7 @@ func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, s
 		}
 	}
 
-	if nil == node.firstChild || nil != node.tokens {
+	if nil == node.firstChild || 0 != len(node.tokens) {
 		// 说明找到了选段内的叶子结点
 		*selected = append(*selected, node)
 		return
