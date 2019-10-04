@@ -65,6 +65,7 @@ func TestGFMSpec(t *testing.T) {
 	luteEngine.SoftBreak2HardBreak = false
 	luteEngine.AutoSpace = false
 	luteEngine.GFMTaskListItemClass = "" // 关闭类名渲染
+	luteEngine.AddAutoLinkDomainSuffix("baz")
 
 	for _, test := range gfmSpecTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.from)

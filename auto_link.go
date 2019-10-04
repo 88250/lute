@@ -160,11 +160,16 @@ var (
 	ftpProto   = strToItems("ftp://")
 
 	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
-	validAutoLinkDomainSuffix = [][]byte{[]byte("top"), []byte("com"), []byte("net"), []byte("org"), []byte("edu"), []byte("gov"),
-		[]byte("cn"), []byte("io"), []byte("me"), []byte("biz"), []byte("co"), []byte("live"), []byte("pro"), []byte("xyz"),
-		[]byte("win"), []byte("club"), []byte("tv"), []byte("wiki"), []byte("site"), []byte("tech"), []byte("space"), []byte("cc"),
-		[]byte("name"), []byte("social"), []byte("band"), []byte("pub"), []byte("info")}
+	validAutoLinkDomainSuffix = []items{strToItems("top"), strToItems("com"), strToItems("net"), strToItems("org"), strToItems("edu"), strToItems("gov"),
+		strToItems("cn"), strToItems("io"), strToItems("me"), strToItems("biz"), strToItems("co"), strToItems("live"), strToItems("pro"), strToItems("xyz"),
+		strToItems("win"), strToItems("club"), strToItems("tv"), strToItems("wiki"), strToItems("site"), strToItems("tech"), strToItems("space"), strToItems("cc"),
+		strToItems("name"), strToItems("social"), strToItems("band"), strToItems("pub"), strToItems("info")}
 )
+
+// AddAutoLinkDomainSuffix 添加自动链接解析域名后缀 suffix。
+func (lute *Lute) AddAutoLinkDomainSuffix(suffix string) {
+	validAutoLinkDomainSuffix = append(validAutoLinkDomainSuffix, strToItems(suffix))
+}
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
 	tokens := node.tokens
@@ -200,6 +205,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		} else {
 			consumed = append(consumed, token)
 			if length-i < minLinkLen && 0 < length-i {
+				// 剩余字符不足，已经不可能形成链接了
 				consumed = append(consumed, tokens[i+1:]...)
 				node.InsertBefore(&Node{typ: NodeText, tokens: consumed})
 				node.Unlink()
@@ -243,8 +249,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			}
 		}
 		domain := url[:k]
-		domainBytes := itemsToBytes(domain)
-		if !t.isValidDomain(domainBytes) {
+		if !t.isValidDomain(domain) {
 			text := &Node{typ: NodeText, tokens: append(protocol, url...)}
 			node.InsertBefore(text)
 			continue
@@ -358,22 +363,13 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	return
 }
 
-// invalidAutoLinkDomain 指定了 GFM 自动链接解析时跳过的域名。
-var invalidAutoLinkDomain [][]byte
-
 // isValidDomain 校验 GFM 规范自动链接规则中定义的合法域名。
 // https://github.github.com/gfm/#valid-domain
-func (t *Tree) isValidDomain(domain []byte) bool {
-	segments := bytes.Split(domain, []byte("."))
+func (t *Tree) isValidDomain(domain items) bool {
+	segments := split(domain, '.')
 	length := len(segments)
 	if 2 > length { // 域名至少被 . 分隔为两部分，小于两部分的话不合法
 		return false
-	}
-
-	for i := 0; i < len(invalidAutoLinkDomain); i++ {
-		if bytes.EqualFold(domain, invalidAutoLinkDomain[i]) {
-			return false
-		}
 	}
 
 	var token byte
@@ -385,7 +381,7 @@ func (t *Tree) isValidDomain(domain []byte) bool {
 		}
 
 		for j := 0; j < segLen; j++ {
-			token = segment[j]
+			token = term(segment[j])
 			if !isASCIILetterNumHyphen(token) {
 				return false
 			}
@@ -400,7 +396,7 @@ func (t *Tree) isValidDomain(domain []byte) bool {
 		if i == length-1 {
 			validSuffix := false
 			for j := 0; j < len(validAutoLinkDomainSuffix); j++ {
-				if bytes.EqualFold(segment, validAutoLinkDomainSuffix[j]) {
+				if equal(segment, validAutoLinkDomainSuffix[j]) {
 					validSuffix = true
 					break
 				}
