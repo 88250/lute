@@ -170,7 +170,8 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	tokens := node.tokens
 	var i, j, k int
 	length := len(tokens)
-	if 8 > length { // 太短的情况肯定不可能有链接
+	minLinkLen := 10 // 太短的情况肯定不可能有链接，最短的情况是 www.xxx.xx
+	if minLinkLen > length {
 		return
 	}
 
@@ -181,24 +182,29 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	for i < length {
 		token = tokens[i]
 		var protocol items
-
 		// 检查前缀
 		tmp = tokens[i:]
 		tmpLen := len(tmp)
-		if 8 <= tmpLen /* www.x.xx */ && 'w' == term(tmp[0]) && 'w' == term(tmp[1]) && 'w' == term(tmp[2]) && '.' == term(tmp[3]) {
+		if 10 <= tmpLen /* www.xxx.xx */ && 'w' == term(tmp[0]) && 'w' == term(tmp[1]) && 'w' == term(tmp[2]) && '.' == term(tmp[3]) {
 			protocol = httpProto
 			www = true
-		} else if 11 <= tmpLen /* http://x.xx */ && 'h' == term(tmp[0]) && 't' == term(tmp[1]) && 't' == term(tmp[2]) && 'p' == term(tmp[3]) && ':' == term(tmp[4]) && '/' == term(tmp[5]) && '/' == term(tmp[6]) {
+		} else if 13 <= tmpLen /* http://xxx.xx */ && 'h' == term(tmp[0]) && 't' == term(tmp[1]) && 't' == term(tmp[2]) && 'p' == term(tmp[3]) && ':' == term(tmp[4]) && '/' == term(tmp[5]) && '/' == term(tmp[6]) {
 			protocol = httpProto
 			i += 7
-		} else if 12 <= tmpLen /* https://x.xx */ && 'h' == term(tmp[0]) && 't' == term(tmp[1]) && 't' == term(tmp[2]) && 'p' == term(tmp[3]) && 's' == term(tmp[4]) && ':' == term(tmp[5]) && '/' == term(tmp[6]) && '/' == term(tmp[7]) {
+		} else if 14 <= tmpLen /* https://xxx.xx */ && 'h' == term(tmp[0]) && 't' == term(tmp[1]) && 't' == term(tmp[2]) && 'p' == term(tmp[3]) && 's' == term(tmp[4]) && ':' == term(tmp[5]) && '/' == term(tmp[6]) && '/' == term(tmp[7]) {
 			protocol = httpsProto
 			i += 8
-		} else if 10 <= tmpLen /* ftp://x.xx */ && 'f' == term(tmp[0]) && 't' == term(tmp[1]) && 'p' == term(tmp[2]) && ':' == term(tmp[3]) && '/' == term(tmp[4]) && '/' == term(tmp[5]) {
+		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == term(tmp[0]) && 't' == term(tmp[1]) && 'p' == term(tmp[2]) && ':' == term(tmp[3]) && '/' == term(tmp[4]) && '/' == term(tmp[5]) {
 			protocol = ftpProto
 			i += 6
 		} else {
 			consumed = append(consumed, token)
+			if length-i < minLinkLen && 0 < length-i {
+				consumed = append(consumed, tokens[i+1:]...)
+				node.InsertBefore(&Node{typ: NodeText, tokens: consumed})
+				node.Unlink()
+				return
+			}
 			i++
 			continue
 		}
