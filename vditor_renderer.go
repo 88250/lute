@@ -247,7 +247,7 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 
 func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
 	if nil == node.firstChild {
-		r.writeString("<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"" + strconv.Itoa(int(NodeParagraph)) + " data-mtype=\"2\" data-cso=\"0\" data-ceo=\"0\">" +
+		r.writeString("<p data-ntype=\"" + NodeParagraph.String() + "\" data-mtype=\"0\"><span data-ntype=\"" + NodeParagraph.String() + " data-mtype=\"2\" data-cso=\"0\" data-ceo=\"0\">" +
 			"</span><span class=\"newline\">\n</span><span class=\"newline\">\n</span></p>")
 		return WalkStop, nil
 	}
