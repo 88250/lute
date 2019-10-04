@@ -652,9 +652,6 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 // expand 用于在 node 上或者 node 的祖先节点上标记展开。
 func (r *VditorRenderer) expand(node *Node) {
 	for p := node; nil != p; p = p.parent {
-		if "0" == r.mtype(p.typ) {
-			return
-		}
 		switch p.typ {
 		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading:
 			p.expand = true

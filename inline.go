@@ -346,7 +346,8 @@ func (t *Tree) isMarker(token byte) bool {
 		itemDollar == token
 }
 
-func (t *Tree) parseNewline(block *Node, ctx *InlineContext) *Node {
+func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
+	pos := ctx.pos
 	ctx.pos++
 
 	hardbreak := false
@@ -363,8 +364,9 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) *Node {
 		}
 	}
 
+	ret = &Node{typ: NodeSoftBreak, tokens: items{ctx.tokens[pos]}}
 	if hardbreak {
-		return &Node{typ: NodeHardBreak}
+		ret.typ = NodeHardBreak
 	}
-	return &Node{typ: NodeSoftBreak}
+	return
 }
