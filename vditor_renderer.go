@@ -246,6 +246,11 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 }
 
 func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
+	if nil == node.firstChild {
+		r.writeString("<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"" + strconv.Itoa(int(NodeParagraph)) + " data-mtype=\"2\" data-cso=\"0\" data-ceo=\"0\">" +
+			"</span><span class=\"newline\">\n</span><span class=\"newline\">\n</span></p>")
+		return WalkStop, nil
+	}
 	return WalkContinue, nil
 }
 
@@ -495,13 +500,11 @@ func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
-			r.tag("li", node, [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
+			r.tag("li", node, [][]string{{"class", "node node--block " + r.option.GFMTaskListItemClass}}, false)
 		} else {
-			r.tag("li", node, nil, false)
+			r.tag("li", node, [][]string{{"class", "node node--block "}}, false)
 		}
-		attrs := [][]string{{"class", "node"}}
-		r.tag("span", nil, attrs, false)
-		attrs = [][]string{{"class", "marker"}}
+		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", nil, attrs, false)
 
 		marker := node.listData.marker
@@ -510,10 +513,7 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		}
 		r.writeString(itemsToStr(marker) + " ")
 		r.tag("/span", nil, nil, false)
-		r.tag("/span", nil, nil, false)
-		r.tag("p", nil, nil, false)
 	} else {
-		r.tag("/p", nil, nil, false)
 		r.tag("/li", node, nil, false)
 	}
 	return WalkContinue, nil

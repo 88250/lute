@@ -70,7 +70,6 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 		if t.context.option.Emoji {
 			t.emoji(node)
 		}
-
 		return
 	}
 
