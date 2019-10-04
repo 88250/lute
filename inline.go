@@ -324,11 +324,9 @@ func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 }
 
 func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
-	var token byte
 	start := ctx.pos
 	for ; ctx.pos < ctx.tokensLen; ctx.pos++ {
-		token = term(ctx.tokens[ctx.pos])
-		if t.isMarker(token) {
+		if t.isMarker(term(ctx.tokens[ctx.pos])) {
 			// 遇到潜在的标记符时需要跳出该文本节点，回到行级解析主循环
 			break
 		}
@@ -340,10 +338,12 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 
 // isMarker 判断 token 是否是潜在的 Markdown 标记符。
 func (t *Tree) isMarker(token byte) bool {
-	return itemAsterisk == token || itemUnderscore == token || itemOpenBracket == token || itemBang == token ||
-		itemNewline == token || itemBackslash == token || itemBacktick == token ||
-		itemLess == token || itemCloseBracket == token || itemAmpersand == token || itemTilde == token ||
-		itemDollar == token
+	switch token {
+	case itemAsterisk, itemUnderscore, itemOpenBracket, itemNewline, itemBackslash, itemBacktick, itemLess,
+		itemCloseBracket, itemAmpersand, itemTilde, itemDollar:
+		return true
+	}
+	return false
 }
 
 func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
