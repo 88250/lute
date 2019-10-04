@@ -342,8 +342,9 @@ func (t *Tree) isMarker(token byte) bool {
 	case itemAsterisk, itemUnderscore, itemOpenBracket, itemNewline, itemBackslash, itemBacktick, itemLess,
 		itemCloseBracket, itemAmpersand, itemTilde, itemDollar:
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
