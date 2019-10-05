@@ -259,17 +259,15 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.tag("p", node, nil, false)
 	} else {
-		r.writeString("<span class=\"newline\">\n</span><span class=\"newline\">\n</span></p>")
+		r.writeString("<span class=\"newline\">\n\n</span></p>")
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node, nil, false)
 		r.write(escapeHTML(node.tokens))
 	} else {
-		r.tag("/span", node, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -294,10 +292,7 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 
 func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node, nil, false)
 		r.write(escapeHTML(node.tokens))
-	} else {
-		r.tag("/span", node, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -541,24 +536,14 @@ func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkSta
 
 func (r *VditorRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node, nil, false)
-		r.tag("br", nil, nil, false)
-		attrs := [][]string{{"class", "newline"}}
-		r.tag("span", node, attrs, true)
 		r.writeByte(itemNewline)
-		r.tag("/span", node, nil, false)
 	}
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node, nil, false)
-		r.tag("br", nil, nil, false)
-		attrs := [][]string{{"class", "newline"}}
-		r.tag("span", node, attrs, true)
 		r.writeByte(itemNewline)
-		r.tag("/span", node, nil, false)
 	}
 	return WalkStop, nil
 }
@@ -577,8 +562,10 @@ func (r *VditorRenderer) tag(name string, node *Node, attrs [][]string, selfclos
 			attrs = [][]string{}
 		}
 		if nil != node {
-			attrs = append(attrs, []string{"data-ntype", node.typ.String()})
-			attrs = append(attrs, []string{"data-mtype", r.mtype(node.typ)})
+			if !r.containClass(&attrs, "marker") {
+				attrs = append(attrs, []string{"data-ntype", node.typ.String()})
+				attrs = append(attrs, []string{"data-mtype", r.mtype(node.typ)})
+			}
 			if "" != node.caretStartOffset {
 				attrs = append(attrs, []string{"data-cso", node.caretStartOffset})
 			}
