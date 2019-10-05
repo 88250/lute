@@ -184,7 +184,7 @@ func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}
 	switch blockType {
 	case NodeParagraph:
 		renderer.writer.WriteString("<p data-ntype=\"" + NodeParagraph.String() + "\" data-mtype=\"" + renderer.mtype(NodeParagraph) + "\">" +
-			"<br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></p>")
+			"<br><span class=\"newline\">\n\n</span></p>")
 	case NodeListItem:
 		listType := 0
 		listType, err = strconv.Atoi(param["listType"].(string))

@@ -614,14 +614,28 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 	for c := root.firstChild; nil != c; c = c.next {
 		r.findSelection(c, startOffset, endOffset, &nodes)
 	}
+
+	var sn, en *Node
 	if 0 < len(nodes) {
-		sn := nodes[len(nodes)-1]
-		base := sn.tokens[0].Offset()
-		sn.caretStartOffset = strconv.Itoa(startOffset - base)
-		en := nodes[len(nodes)-1]
-		en.caretEndOffset = strconv.Itoa(endOffset - base)
-		r.expand(nodes[0])
+		sn = nodes[len(nodes)-1]
+		en = nodes[len(nodes)-1]
+	} else {
+		var lastChild *Node
+		for lastChild = root.lastChild; nil != lastChild && nil != lastChild.lastChild; lastChild = lastChild.lastChild {
+		}
+		if nil == lastChild {
+			lastChild = root
+		}
+		sn = lastChild
+		en = lastChild
 	}
+	base := 0
+	if 0 < len(sn.tokens) {
+		base = sn.tokens[0].Offset()
+	}
+	sn.caretStartOffset = strconv.Itoa(startOffset - base)
+	en.caretEndOffset = strconv.Itoa(endOffset - base)
+	r.expand(sn)
 }
 
 // expand 用于在 node 上或者 node 的祖先节点上标记展开。

@@ -21,6 +21,7 @@ import (
 )
 
 var vditorRendererTests = []parseTest{
+	{"14", "fo\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"2\" data-ceo=\"2\">fo</span><span class=\"newline\">\n\n</span></p>"},
 	{"13", "", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-ntype=\"1 data-mtype=\"2\" data-cso=\"0\" data-ceo=\"0\"></span><span class=\"newline\">\n</span><span class=\"newline\">\n</span></p>"},
 	{"12", "foo\nbar\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"2\" data-ceo=\"2\">foo</span>\n<span>bar</span><span class=\"newline\">\n\n</span></p>"},
 	{"11", "> # foo\n", "<blockquote class=\"node node--block\" data-ntype=\"5\" data-mtype=\"1\"><span class=\"marker\">&gt; </span><h1 class=\"node node--expand\" data-ntype=\"2\" data-mtype=\"0\"><span class=\"marker\" data-cso=\"0\" data-ceo=\"0\"># </span><span>foo</span></h1></blockquote>"},
