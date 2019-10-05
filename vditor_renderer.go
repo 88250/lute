@@ -147,26 +147,39 @@ func (r *VditorRenderer) renderTable(node *Node, entering bool) (WalkStatus, err
 }
 
 func (r *VditorRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("del", node, [][]string{{"class", "node"}}, false)
+	} else {
+		r.tag("/del", nil, nil, false)
+	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("del", node, nil, false)
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeString("~")
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("/del", node, nil, false)
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeString("~")
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("del", node, nil, false)
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeString("~~")
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("/del", node, nil, false)
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeString("~~")
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
