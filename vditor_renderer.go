@@ -439,22 +439,19 @@ func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (
 }
 
 func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		attrs := [][]string{{"class", "node node--block"}}
-		r.tag("div", node, attrs, false)
-	} else {
+	if !entering {
 		r.tag("/blockquote", node, nil, false)
-		r.tag("/div", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) (WalkStatus, error) {
-	attrs := [][]string{{"class", "marker"}}
+	attrs := [][]string{{"class", "node node--block"}}
+	r.tag("blockquote", node.parent, attrs, false)
+	attrs = [][]string{{"class", "marker"}}
 	r.tag("span", node, attrs, false)
 	r.write(escapeHTML(node.tokens))
 	r.tag("/span", node, nil, false)
-	r.tag("blockquote", node.parent, nil, false)
 	return WalkStop, nil
 }
 
