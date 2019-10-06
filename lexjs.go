@@ -115,7 +115,7 @@ func (l *lexer) nextLine() (ret items) {
 
 	var b, nb byte
 	i := l.offset
-	offset :=0
+	offset := 0
 	for ; i < l.length; i += l.width {
 		b = l.input[i]
 		l.col++
@@ -139,7 +139,6 @@ func (l *lexer) nextLine() (ret items) {
 			break
 		} else if '\u0000' == b {
 			// 将 \u0000 替换为 \uFFFD https://spec.commonmark.org/0.29/#insecure-characters
-
 			l.input = append(l.input, 0, 0)
 			copy(l.input[i+2:], l.input[i:])
 			// \uFFFD 的 UTF-8 编码为 \xEF\xBF\xBD 共三个字节
