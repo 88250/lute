@@ -616,6 +616,7 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 	}
 
 	var sn, en *Node
+	// TODO: 最后一个节点是最接近指定偏移位置的节点，这里暂时不考虑选段，仅考虑光标字符插入位置
 	if 0 < len(nodes) {
 		sn = nodes[len(nodes)-1]
 		en = nodes[len(nodes)-1]

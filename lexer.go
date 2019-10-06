@@ -27,12 +27,10 @@ func newLexer(input []byte) (ret *lexer) {
 	ret = &lexer{}
 	ret.input = input
 	ret.length = len(input)
-
 	if 0 < ret.length && itemNewline != ret.input[ret.length-1] {
 		// 以 \n 结尾预处理
 		ret.input = append(ret.input, itemNewline)
 		ret.length++
 	}
-
 	return
 }

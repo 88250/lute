@@ -149,15 +149,15 @@ func (l *lexer) nextLine() (ret items) {
 			l.length += 2 // 重新计算总长
 			l.width = 3
 			ret = append(ret, newItem(l.input[i], l.ln, l.col, l.offset))
-			ret = append(ret, newItem(l.input[i+1], l.ln, l.col, l.offset))
-			ret = append(ret, newItem(l.input[i+2], l.ln, l.col, l.offset))
+			ret = append(ret, newItem(l.input[i+1], l.ln, l.col, l.offset+1))
+			ret = append(ret, newItem(l.input[i+2], l.ln, l.col, l.offset+2))
 			continue
 		}
 
 		if utf8.RuneSelf <= b { // 说明占用多个字节
 			_, l.width = utf8.DecodeRune(l.input[i:])
 			for j := 0; j < l.width; j++ {
-				ret = append(ret, newItem(l.input[i+j], l.ln, l.col, l.offset+offset))
+				ret = append(ret, newItem(l.input[i+j], l.ln, l.col, l.offset+offset+j))
 			}
 		} else {
 			l.width = 1
