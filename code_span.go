@@ -40,7 +40,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 
 	textTokens := ctx.tokens[startPos+n : endPos]
 	if !t.context.option.VditorWYSIWYG {
-		textTokens = replaceAll(textTokens, strToItems("\n"), strToItems(" "))
+		textTokens = replaceAll(textTokens, itemNewline, itemSpace)
 		if 2 < len(textTokens) && itemSpace == textTokens[0].term() && itemSpace == textTokens[len(textTokens)-1].term() && !textTokens.isBlankLine() {
 			// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
 			openMarker.tokens = append(openMarker.tokens, textTokens[0])

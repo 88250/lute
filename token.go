@@ -179,11 +179,13 @@ func contains(tokens, sub items) bool {
 }
 
 // replaceAll 会将 tokens 中的所有 old 使用 new 替换。
-func replaceAll(tokens, old, new items) items {
-	t := itemsToBytes(tokens)
-	o := itemsToBytes(old)
-	n := itemsToBytes(new)
-	return bytesToItems(bytes.ReplaceAll(t, o, n))
+func replaceAll(tokens items, old, new byte) items {
+	for i, token := range tokens {
+		if token.term() == old {
+			setTerm(&tokens, i, new)
+		}
+	}
+	return tokens
 }
 
 // replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。

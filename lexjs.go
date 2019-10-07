@@ -20,10 +20,10 @@ import (
 
 // item 描述了词法分析的一个 token。
 type item struct {
-	term   byte // 源码字节值
-	ln     int  // 源码行号，从 1 开始
-	col    int  // 源码列号，从 1 开始
-	offset int  // 源码偏移位置，从 0 开始
+	termByte byte // 源码字节值
+	ln       int  // 源码行号，从 1 开始
+	col      int  // 源码列号，从 1 开始
+	offset   int  // 源码偏移位置，从 0 开始
 }
 
 // items 定义了 token 数组。
@@ -31,22 +31,22 @@ type items []item
 
 // nilItem 返回一个空值 token。
 func nilItem() item {
-	return item{term: 0}
+	return item{termByte: 0}
 }
 
 // isNilItem 判断 item 是否为空值。
 func isNilItem(item item) bool {
-	return 0 == item.term
+	return 0 == item.termByte
 }
 
 // newItem 构造一个 token。
 func newItem(term byte, ln, col, offset int) item {
-	return item{term: term, ln: ln, col: col, offset: offset}
+	return item{termByte: term, ln: ln, col: col, offset: offset}
 }
 
 // term 返回 item 的词素。
 func (item item) term() byte {
-	return item.term
+	return item.termByte
 }
 
 // Offset 返回 item 的 offset。
@@ -56,7 +56,7 @@ func (item item) Offset() int {
 
 // setTerm 用于设置 tokens 中第 i 个 token 的词素。
 func setTerm(tokens *items, i int, term byte) {
-	(*tokens)[i].term = term
+	(*tokens)[i].termByte = term
 }
 
 // strToItems 将 str 转为 items。
@@ -64,7 +64,7 @@ func strToItems(str string) (ret items) {
 	ret = make(items, 0, len(str))
 	length := len(str)
 	for i := 0; i < length; i++ {
-		ret = append(ret, item{term: str[i]})
+		ret = append(ret, item{termByte: str[i]})
 	}
 	return
 }
@@ -78,7 +78,7 @@ func itemsToStr(items items) string {
 func itemsToBytes(items items) (ret []byte) {
 	length := len(items)
 	for i := 0; i < length; i++ {
-		ret = append(ret, term(items[i]))
+		ret = append(ret, items[i].termByte)
 	}
 	return
 }
@@ -88,7 +88,7 @@ func bytesToItems(bytes []byte) (ret items) {
 	ret = make(items, 0, len(bytes))
 	length := len(bytes)
 	for i := 0; i < length; i++ {
-		ret = append(ret, item{term: bytes[i]})
+		ret = append(ret, item{termByte: bytes[i]})
 	}
 	return
 }

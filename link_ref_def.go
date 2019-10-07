@@ -307,9 +307,15 @@ func (context *Context) parseLinkLabel(tokens items) (n int, remains, label item
 
 	label = trimWhitespace(label)
 	if !context.option.VditorWYSIWYG {
-		label = replaceAll(label, strToItems("\n"), strToItems(" "))
-		for 0 <= index(label, strToItems("  ")) {
-			label = replaceAll(label, strToItems("  "), strToItems(" "))
+		label = replaceAll(label, itemNewline, itemSpace)
+		length := len(label)
+		var token item
+		for i := 0; i < length; i++ {
+			token = label[i]
+			if token.term() == itemSpace && i < length-1 && label[i+1].term() == itemSpace {
+				label = append(label[:i], label[i+1:]...)
+				length--
+			}
 		}
 	}
 	n = len(passed)
