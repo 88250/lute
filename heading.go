@@ -15,7 +15,7 @@ package lute
 func (t *Tree) parseATXHeading() (ok bool, markers, content items, level int) {
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	marker := tokens[0]
-	if itemCrosshatch != term(marker) {
+	if itemCrosshatch != marker.term() {
 		return
 	}
 
@@ -24,7 +24,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content items, level int) {
 		return
 	}
 
-	if level < len(tokens) && !isWhitespace(term(tokens[level])) {
+	if level < len(tokens) && !isWhitespace(tokens[level].term()) {
 		return
 	}
 
@@ -34,7 +34,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content items, level int) {
 	_, tokens = trimLeft(tokens)
 	_, tokens = trimLeft(tokens[level:])
 	for _, token := range tokens {
-		if itemNewline == term(token) {
+		if itemNewline == token.term() {
 			break
 		}
 		content = append(content, token)
@@ -43,10 +43,10 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content items, level int) {
 	_, content = trimRight(content)
 	closingCrosshatchIndex := len(content) - 1
 	for ; 0 <= closingCrosshatchIndex; closingCrosshatchIndex-- {
-		if itemCrosshatch == term(content[closingCrosshatchIndex]) {
+		if itemCrosshatch == content[closingCrosshatchIndex].term() {
 			continue
 		}
-		if itemSpace == term(content[closingCrosshatchIndex]) {
+		if itemSpace == content[closingCrosshatchIndex].term() {
 			break
 		} else {
 			closingCrosshatchIndex = len(content)
@@ -69,7 +69,7 @@ func (t *Tree) parseSetextHeading() (level int) {
 	ln := trimWhitespace(t.context.currentLine)
 	start := 0
 	marker := ln[start]
-	if itemEqual != term(marker) && itemHyphen != term(marker) {
+	if itemEqual != marker.term() && itemHyphen != marker.term() {
 		return
 	}
 
@@ -77,12 +77,12 @@ func (t *Tree) parseSetextHeading() (level int) {
 	length := len(ln)
 	for ; start < length; start++ {
 		token := ln[start]
-		if itemEqual != term(token) && itemHyphen != term(token) {
+		if itemEqual != token.term() && itemHyphen != token.term() {
 			return
 		}
 
-		if 0 != term(marker) {
-			if term(marker) != term(token) {
+		if 0 != marker.term() {
+			if marker.term() != token.term() {
 				return
 			}
 		} else {
@@ -92,7 +92,7 @@ func (t *Tree) parseSetextHeading() (level int) {
 	}
 
 	level = 1
-	if itemHyphen == term(marker) {
+	if itemHyphen == marker.term() {
 		level = 2
 	}
 	return

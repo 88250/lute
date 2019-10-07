@@ -33,7 +33,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		return nil
 	}
 
-	if ':' != term(remains[0]) {
+	if ':' != remains[0].term() {
 		return nil
 	}
 
@@ -64,7 +64,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	if !validTitle && 1 > newlines {
 		return nil
 	}
-	if 0 < spaces1+tabs1 && !remains.isBlankLine() && itemNewline != term(remains[0]) {
+	if 0 < spaces1+tabs1 && !remains.isBlankLine() && itemNewline != remains[0].term() {
 		return nil
 	}
 
@@ -91,7 +91,7 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, r
 	if 1 > len(tokens) {
 		return true, nil, tokens, nil
 	}
-	if itemOpenBracket == term(tokens[0]) {
+	if itemOpenBracket == tokens[0].term() {
 		return true, nil, tokens, nil
 	}
 
@@ -116,7 +116,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 		return
 	}
 
-	if opener != term(tokens[0]) {
+	if opener != tokens[0].term() {
 		return
 	}
 
@@ -134,7 +134,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens items) (
 			passed = append(passed, tokens[i+j])
 		}
 		title = append(title, strToItems(string(r))...)
-		if closer == term(token) && !tokens.isBackslashEscapePunct(i) {
+		if closer == token.term() && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			title = title[:len(title)-1]
 			break
@@ -184,16 +184,16 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains, destination 
 			ret = append(ret, tokens[i+j])
 		}
 		destination = append(destination, strToItems(string(r))...)
-		if isWhitespace(term(token)) || isControl(term(token)) {
+		if isWhitespace(token.term()) || isControl(token.term()) {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
 			break
 		}
 
-		if itemOpenParen == term(token) && !tokens.isBackslashEscapePunct(i) {
+		if itemOpenParen == token.term() && !tokens.isBackslashEscapePunct(i) {
 			openParens++
 		}
-		if itemCloseParen == term(token) && !tokens.isBackslashEscapePunct(i) {
+		if itemCloseParen == token.term() && !tokens.isBackslashEscapePunct(i) {
 			openParens--
 			if 1 > openParens {
 				i++
@@ -205,7 +205,7 @@ func (context *Context) parseLinkDest2(tokens items) (ret, remains, destination 
 	}
 
 	remains = tokens[i:]
-	if length > i && !isWhitespace(term(tokens[i])) {
+	if length > i && !isWhitespace(tokens[i].term()) {
 		ret = nil
 		return
 	}
@@ -220,7 +220,7 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination 
 		return
 	}
 
-	if itemLess != term(tokens[0]) {
+	if itemLess != tokens[0].term() {
 		return
 	}
 
@@ -241,13 +241,13 @@ func (context *Context) parseLinkDest1(tokens items) (ret, remains, destination 
 				ret = append(ret, tokens[i+j])
 			}
 			destination = append(destination, strToItems(string(r))...)
-			if itemLess == term(token) && !tokens.isBackslashEscapePunct(i) {
+			if itemLess == token.term() && !tokens.isBackslashEscapePunct(i) {
 				ret = nil
 				return
 			}
 		}
 
-		if itemGreater == term(token) && !tokens.isBackslashEscapePunct(i) {
+		if itemGreater == token.term() && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			destination = destination[0 : len(destination)-1]
 			break
@@ -270,7 +270,7 @@ func (context *Context) parseLinkLabel(tokens items) (n int, remains, label item
 		return
 	}
 
-	if itemOpenBracket != term(tokens[0]) {
+	if itemOpenBracket != tokens[0].term() {
 		return
 	}
 
@@ -287,13 +287,13 @@ func (context *Context) parseLinkLabel(tokens items) (n int, remains, label item
 			passed = append(passed, tokens[i+j])
 		}
 		label = append(label, strToItems(string(r))...)
-		if itemCloseBracket == term(token) && !tokens.isBackslashEscapePunct(i) {
+		if itemCloseBracket == token.term() && !tokens.isBackslashEscapePunct(i) {
 			closed = true
 			label = label[0 : len(label)-1]
 			remains = tokens[i+1:]
 			break
 		}
-		if itemOpenBracket == term(token) && !tokens.isBackslashEscapePunct(i) {
+		if itemOpenBracket == token.term() && !tokens.isBackslashEscapePunct(i) {
 			passed = nil
 			return
 		}

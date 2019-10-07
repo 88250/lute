@@ -115,7 +115,7 @@ func split(tokens items, separator byte) (ret []items) {
 	var line items
 	for ; i < length; i++ {
 		token = tokens[i]
-		if separator != term(token) {
+		if separator != token.term() {
 			line = append(line, token)
 			continue
 		}
@@ -137,7 +137,7 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	var line items
 	for ; i < length; i++ {
 		token = tokens[i]
-		if separator != term(token) || tokens.isBackslashEscapePunct(i) {
+		if separator != token.term() || tokens.isBackslashEscapePunct(i) {
 			line = append(line, token)
 			continue
 		}
@@ -161,7 +161,7 @@ func equal(a, b items) bool {
 		return false
 	}
 	for i := 0; i < length; i++ {
-		if term(a[i]) != term(b[i]) {
+		if a[i].term() != b[i].term() {
 			return false
 		}
 	}
@@ -191,11 +191,11 @@ func replaceNewlineSpace(tokens items) items {
 	length := len(tokens)
 	var token byte
 	for i := length - 1; 0 <= i; i-- {
-		token = term(tokens[i])
+		token = tokens[i].term()
 		if itemNewline != token && itemSpace != token {
 			break
 		}
-		if itemNewline == term(tokens[i-1]) && (itemSpace == token || itemNewline == token) {
+		if itemNewline == tokens[i-1].term() && (itemSpace == token || itemNewline == token) {
 			tokens = tokens[:i]
 		}
 	}
@@ -209,7 +209,7 @@ func trimWhitespace(tokens items) items {
 	}
 	start, end := 0, length-1
 	for ; start < length; start++ {
-		if !isWhitespace(term(tokens[start])) {
+		if !isWhitespace(tokens[start].term()) {
 			break
 		}
 	}
@@ -217,7 +217,7 @@ func trimWhitespace(tokens items) items {
 		start--
 	}
 	for ; 0 <= end; end-- {
-		if !isWhitespace(term(tokens[end])) {
+		if !isWhitespace(tokens[end].term()) {
 			break
 		}
 	}
@@ -235,7 +235,7 @@ func trimRight(tokens items) (whitespaces, remains items) {
 
 	i := length - 1
 	for ; 0 <= i; i-- {
-		if !isWhitespace(term(tokens[i])) {
+		if !isWhitespace(tokens[i].term()) {
 			break
 		}
 		whitespaces = append(whitespaces, tokens[i])
@@ -251,7 +251,7 @@ func trimLeft(tokens items) (whitespaces, remains items) {
 
 	i := 0
 	for ; i < length; i++ {
-		if !isWhitespace(term(tokens[i])) {
+		if !isWhitespace(tokens[i].term()) {
 			break
 		}
 		whitespaces = append(whitespaces, tokens[i])
@@ -262,7 +262,7 @@ func trimLeft(tokens items) (whitespaces, remains items) {
 func (tokens items) accept(token byte) (pos int) {
 	length := len(tokens)
 	for ; pos < length; pos++ {
-		if token != term(tokens[pos]) {
+		if token != tokens[pos].term() {
 			break
 		}
 	}
@@ -296,7 +296,7 @@ func acceptTokens(remains, someTokens []byte) (pos int) {
 
 func (tokens items) isBlankLine() bool {
 	for _, token := range tokens {
-		if itemSpace != term(token) && itemTab != term(token) && itemNewline != term(token) {
+		if itemSpace != token.term() && itemTab != token.term() && itemNewline != token.term() {
 			return false
 		}
 	}
@@ -326,7 +326,7 @@ func (tokens items) startWith(token byte) bool {
 	if 1 > len(tokens) {
 		return false
 	}
-	return token == term(tokens[0])
+	return token == tokens[0].term()
 }
 
 func (tokens items) endWith(token byte) bool {
@@ -334,18 +334,18 @@ func (tokens items) endWith(token byte) bool {
 	if 1 > length {
 		return false
 	}
-	return token == term(tokens[length-1])
+	return token == tokens[length-1].term()
 }
 
 // isBackslashEscapePunct 判断 tokens 中 pos 所指的值是否是由反斜杠 \ 转义的 ASCII 标点符号。
 func (tokens items) isBackslashEscapePunct(pos int) bool {
-	if !isASCIIPunct(term(tokens[pos])) {
+	if !isASCIIPunct(tokens[pos].term()) {
 		return false
 	}
 
 	backslashes := 0
 	for i := pos - 1; 0 <= i; i-- {
-		if itemBackslash != term(tokens[i]) {
+		if itemBackslash != tokens[i].term() {
 			break
 		}
 		backslashes++
@@ -355,11 +355,11 @@ func (tokens items) isBackslashEscapePunct(pos int) bool {
 
 func (tokens items) statWhitespace() (newlines, spaces, tabs int) {
 	for _, token := range tokens {
-		if itemNewline == term(token) {
+		if itemNewline == token.term() {
 			newlines++
-		} else if itemSpace == term(token) {
+		} else if itemSpace == token.term() {
 			spaces++
-		} else if itemTab == term(token) {
+		} else if itemTab == token.term() {
 			tabs++
 		}
 	}

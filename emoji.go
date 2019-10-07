@@ -37,7 +37,7 @@ func (t *Tree) emoji0(node *Node) {
 	var maybeEmoji []byte
 	var pos int
 	for i := 0; i < length; {
-		token = term(tokens[i])
+		token = tokens[i].term()
 		if i == length-1 {
 			node.tokens = append(node.tokens, tokens[pos:]...)
 			break
@@ -52,7 +52,7 @@ func (t *Tree) emoji0(node *Node) {
 
 		matchCloseColon := false
 		for pos = i + 1; pos < length; pos++ {
-			token = term(tokens[pos])
+			token = tokens[pos].term()
 			if isWhitespace(token) {
 				break
 			}

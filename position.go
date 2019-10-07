@@ -12,15 +12,13 @@
 
 package lute
 
-var newline = []byte{itemNewline}
-
 // unidim2Bidim 用于将一维 tokens 中的列 uCol 变换为对应二维中的行 bLn 和列 bCol。
 func (t *Tree) unidim2Bidim(tokens items, uCol int) (bLn, bCol int) {
 	bLn = 1
 	length := len(tokens)
 	var token byte
 	for i := 0; i < length && i < uCol; i++ {
-		token = term(tokens[i])
+		token = tokens[i].term()
 		if itemNewline == token {
 			bLn++
 			bCol = 1

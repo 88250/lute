@@ -29,12 +29,12 @@ func (r *BaseRenderer) fixTermTypo0(tokens items) items {
 	var before, after byte
 	var originalTerm []byte
 	for ; i < length; i++ {
-		token = term(tokens[i])
+		token = tokens[i].term()
 		if isNotTerm(token) {
 			continue
 		}
 		if 1 <= i {
-			before = term(tokens[i-1])
+			before = tokens[i-1].term()
 			if !isNotTerm(before) {
 				// 前一个字节必须是非术语，否则无法分隔
 				continue
@@ -47,7 +47,7 @@ func (r *BaseRenderer) fixTermTypo0(tokens items) items {
 		}
 
 		for j = i; j < length; j++ {
-			after = term(tokens[j])
+			after = tokens[j].term()
 			if isNotTerm(after) || itemDot == after {
 				break
 			}

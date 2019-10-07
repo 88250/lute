@@ -23,7 +23,7 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 	for ctx.pos < ctx.tokensLen {
 		token := ctx.tokens[ctx.pos]
 		var n *Node
-		switch term(token) {
+		switch token.term() {
 		case itemBackslash:
 			n = t.parseBackslash(ctx)
 		case itemBacktick:
@@ -71,13 +71,13 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	start := ctx.pos
 	numeric := false
 	if 3 < ctx.tokensLen {
-		numeric = itemCrosshatch == term(ctx.tokens[start+1])
+		numeric = itemCrosshatch == ctx.tokens[start+1].term()
 	}
 	i := ctx.pos
 	var token byte
 	var endWithSemicolon bool
 	for ; i < ctx.tokensLen; i++ {
-		token = term(ctx.tokens[i])
+		token = ctx.tokens[i].term()
 		if isWhitespace(token) {
 			break
 		}
@@ -153,7 +153,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	savepos := ctx.pos
 	matched := false
 	// 尝试解析内联链接 [text](url "tile")
-	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == term(ctx.tokens[ctx.pos]) {
+	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == ctx.tokens[ctx.pos].term() {
 		ctx.pos++
 		isLink := false
 		var passed, remains items
@@ -167,12 +167,12 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				break
 			}
 			ctx.pos += len(passed)
-			matched = itemCloseParen == term(passed[len(passed)-1])
+			matched = itemCloseParen == passed[len(passed)-1].term()
 			if matched {
 				ctx.pos--
 				break
 			}
-			if 1 > len(remains) || !isWhitespace(term(remains[0])) {
+			if 1 > len(remains) || !isWhitespace(remains[0].term()) {
 				break
 			}
 			// 跟空格的话后续尝试 title 解析
@@ -181,7 +181,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				break
 			}
 			ctx.pos += len(passed)
-			matched = itemCloseParen == term(remains[0])
+			matched = itemCloseParen == remains[0].term()
 			if matched {
 				break
 			}
@@ -192,7 +192,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			ctx.pos += len(passed)
 			isLink, passed, remains = remains.spnl()
 			ctx.pos += len(passed)
-			matched = isLink && itemCloseParen == term(remains[0])
+			matched = isLink && itemCloseParen == remains[0].term()
 			break
 		}
 		if !matched {
@@ -211,7 +211,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		} else if !opener.bracketAfter {
 			// [text][] 格式，将 text 视为 label 进行解析
 			start := opener.index
-			if itemOpenBracket == term(ctx.tokens[start]) {
+			if itemOpenBracket == ctx.tokens[start].term() {
 				// TODO: 链接引用定义 key 还是包括方括号好些 [xxx]
 				start++
 			}
@@ -312,11 +312,11 @@ func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 
 	ctx.pos++
 	token := ctx.tokens[ctx.pos]
-	if itemNewline == term(token) {
+	if itemNewline == token.term() {
 		ctx.pos++
 		return &Node{typ: NodeHardBreak, tokens: items{token}}
 	}
-	if isASCIIPunct(term(token)) {
+	if isASCIIPunct(token.term()) {
 		ctx.pos++
 		return &Node{typ: NodeText, tokens: items{token}}
 	}
@@ -326,7 +326,7 @@ func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 	start := ctx.pos
 	for ; ctx.pos < ctx.tokensLen; ctx.pos++ {
-		if t.isMarker(term(ctx.tokens[ctx.pos])) {
+		if t.isMarker(ctx.tokens[ctx.pos].term()) {
 			// 遇到潜在的标记符时需要跳出该文本节点，回到行级解析主循环
 			break
 		}
@@ -356,10 +356,10 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 	if lastc := block.lastChild; nil != lastc {
 		if NodeText == lastc.typ {
 			tokens := lastc.tokens
-			if valueLen := len(tokens); itemSpace == term(tokens[valueLen-1]) {
+			if valueLen := len(tokens); itemSpace == tokens[valueLen-1].term() {
 				_, lastc.tokens = trimRight(tokens)
 				if 1 < valueLen {
-					hardbreak = itemSpace == term(tokens[len(tokens)-2])
+					hardbreak = itemSpace == tokens[len(tokens)-2].term()
 				}
 			}
 		}

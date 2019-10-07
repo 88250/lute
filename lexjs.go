@@ -45,7 +45,7 @@ func newItem(term byte, ln, col, offset int) item {
 }
 
 // term 返回 item 的词素。
-func term(item item) byte {
+func (item item) term() byte {
 	return item.term
 }
 
