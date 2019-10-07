@@ -270,6 +270,14 @@ func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
+	if grandparent := node.parent.parent; nil != grandparent {
+		if NodeList == grandparent.typ { // List.ListItem.Paragraph
+			if grandparent.tight {
+				return WalkContinue, nil
+			}
+		}
+	}
+
 	if entering {
 		r.tag("p", node, nil, false)
 	} else {
