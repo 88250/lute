@@ -615,21 +615,14 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 		r.findSelection(c, startOffset, endOffset, &nodes)
 	}
 
-	var sn, en *Node
-	// TODO: 最后一个节点是最接近指定偏移位置的节点，这里暂时不考虑选段，仅考虑光标字符插入位置
-	if 0 < len(nodes) {
-		sn = nodes[len(nodes)-1]
-		en = nodes[len(nodes)-1]
-	} else {
-		var lastChild *Node
-		for lastChild = root.lastChild; nil != lastChild && nil != lastChild.lastChild; lastChild = lastChild.lastChild {
-		}
-		if nil == lastChild {
-			lastChild = root
-		}
-		sn = lastChild
-		en = lastChild
+	if 1 > len(nodes) {
+		// 当且仅当渲染空 Markdown 时
+		nodes = append(nodes, root)
 	}
+
+	// TODO: 仅实现了光标插入位置节点获取，选段映射待实现
+	en := r.nearest(nodes, endOffset)
+	sn := en
 	base := 0
 	if 0 < len(sn.tokens) {
 		base = sn.tokens[0].Offset()
@@ -656,7 +649,7 @@ func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, s
 		// 判断是否在选段内
 		st := node.tokens[0]
 		et := node.tokens[len(node.tokens)-1]
-		if st.Offset() > startOffset || et.Offset() < endOffset {
+		if st.Offset()-3 > startOffset || et.Offset()+3 < endOffset {
 			return
 		}
 	}
@@ -670,6 +663,46 @@ func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, s
 	// 在子节点中递归查找
 	for c := node.firstChild; nil != c; c = c.next {
 		r.findSelection(c, startOffset, endOffset, selected)
+	}
+	return
+}
+
+// nearest 在 selected 节点列表中查找离 offset 最近的节点。
+func (r *VditorRenderer) nearest(selected []*Node, offset int) (ret *Node) {
+	dist := 16
+	for i := 0; i < len(selected); i++ {
+		n := selected[i]
+		s, e := n.Range()
+		tmpSDis := s - offset
+		if 0 > tmpSDis {
+			tmpSDis = -tmpSDis
+		}
+		tmpEDis := e - offset
+		if 0 > tmpEDis {
+			tmpEDis = -tmpEDis
+		}
+		minDist := tmpSDis
+		if minDist > tmpEDis {
+			minDist = tmpEDis
+		}
+		if minDist < dist {
+			dist = minDist
+			ret = n
+		}
+	}
+	return
+}
+
+// byteOffset 返回字符偏移位置在 str 中考虑字符编码情况下的字节偏移位置。
+func (r *VditorRenderer) byteOffset(str string, runeStartOffset, runeEndOffset int) (startOffset, endOffset int) {
+	for i, _ := range str {
+		if i >= runeStartOffset {
+			startOffset = i
+		}
+		if i >= runeEndOffset {
+			endOffset = i
+			return
+		}
 	}
 	return
 }

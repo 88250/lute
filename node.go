@@ -34,17 +34,6 @@ type Node struct {
 	lastLineBlank   bool     // 标识最后一行是否是空行
 	lastLineChecked bool     // 标识最后一行是否检查过
 
-	// TODO: 源码位置
-
-	// 节点对应的源码位置，因为节点内容可能存在跨行并且中间是其他节点的情况，所以需要用数组，比如：
-	//   > *emphasized
-	//   > text*
-	// 第二行的 > 属于块引用节点，但是 text 属于强调节点，所以强调节点的源码位置应该对应：
-	//   [[1:4-1:13], [2:3-2:6]]
-	// 即第 1 个 range 是从第 1 行第 4 列开始到第 1 行第 13 列结束；
-	// 第 2 个 range 是从第 2 行第 3 列开始到第 2 行第 6 列结束。
-	//ranges []*Range
-
 	// 代码
 
 	codeMarkerLen int // ` 个数，1 或 2
@@ -97,13 +86,15 @@ type Node struct {
 	caretEndOffset   string // 光标插入结束偏移位置
 }
 
-//// Range 描述了源码位置起始和结束行列。
-//type Range struct {
-//	startLn  int // 开始行
-//	startCol int // 开始列
-//	endLn    int // 结束行
-//	endCol   int // 结束列
-//}
+// Range 返回节点源码起始偏移和结束偏移位置。
+func (n *Node) Range() (start, end int) {
+	if 1 > len(n.tokens) {
+		return 0, 0
+	}
+	s := n.tokens[0]
+	e := n.tokens[len(n.tokens)-1]
+	return s.Offset(), e.Offset()
+}
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
 func (n *Node) Finalize(context *Context) {

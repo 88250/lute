@@ -137,6 +137,7 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 	}
 
 	renderer := lute.newVditorRenderer(tree.Root)
+	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)
 	renderer.mapSelection(tree.Root, startOffset, endOffset)
 	var output []byte
 	output, err = renderer.Render()
