@@ -50,8 +50,6 @@ func (item item) Offset() int {
 	return 0
 }
 
-// TODO: 作为 item 的方法
-
 // setTerm 用于设置 tokens 中第 i 个 token 的词素。
 func setTerm(tokens *items, i int, term byte) {
 	(*tokens)[i] = item(term)
