@@ -19,10 +19,10 @@ import (
 
 // fixTermTypo 修正文本节点 textNode 中出现的术语拼写问题。
 func (r *BaseRenderer) fixTermTypo(textNode *Node) {
-	textNode.tokens = fixTermTypo0(textNode.tokens)
+	textNode.tokens = r.fixTermTypo0(textNode.tokens)
 }
 
-func fixTermTypo0(tokens items) items {
+func (r *BaseRenderer) fixTermTypo0(tokens items) items {
 	length := len(tokens)
 	var token byte
 	var i, j, k, l int
@@ -59,7 +59,7 @@ func fixTermTypo0(tokens items) items {
 		}
 
 		originalTerm = bytes.ToLower(itemsToBytes(tokens[i:j]))
-		if to, ok := terms[bytesToStr(originalTerm)]; ok {
+		if to, ok := r.option.Terms[bytesToStr(originalTerm)]; ok {
 			l = 0
 			for k = i; k < j; k++ {
 				setTerm(&tokens, k, to[l])
@@ -81,8 +81,15 @@ func replaceAtIndex(str string, r rune, i int) string {
 	return string(out)
 }
 
+func newTerms() (ret map[string]string) {
+	ret = make(map[string]string, len(terms))
+	for k, v := range terms {
+		ret[k] = v
+	}
+	return
+}
+
 // terms 定义了术语字典，用于术语拼写修正。Key 必须是全小写的。
-// TODO: 考虑提供接口支持开发者添加
 var terms = map[string]string{
 	"jetty":         "Jetty",
 	"tomcat":        "Tomcat",

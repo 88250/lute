@@ -45,6 +45,7 @@ func New(opts ...option) (ret *Lute) {
 	ret.FixTermTypo = true
 	ret.Emoji = true
 	ret.Emojis = newEmojis()
+	ret.Terms = newTerms()
 	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
 	for _, opt := range opts {
 		opt(ret)
@@ -107,7 +108,7 @@ func (lute *Lute) Space(text string) string {
 	return space0(text)
 }
 
-// GetEmojis 返回 Emoji 别名和对应 Unicode 字符的映射列表。
+// GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	ret = make(map[string]string, len(lute.Emojis))
 	placeholder := itemsToStr(emojiSitePlaceholder)
@@ -120,10 +121,22 @@ func (lute *Lute) GetEmojis() (ret map[string]string) {
 	return
 }
 
-// PutEmojis 将指定的 emojiMap 合并覆盖到已有的 Emoji 映射。
+// PutEmojis 将指定的 emojiMap 合并覆盖已有的 Emoji 字典。
 func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 	for k, v := range emojiMap {
 		lute.Emojis[k] = v
+	}
+}
+
+// GetTerms 返回术语字典。
+func (lute *Lute) GetTerms() map[string]string {
+	return lute.Terms
+}
+
+// PutTerms 将制定的 termMap 合并覆盖已有的术语字典。
+func (lute *Lute) PutTerms(termMap map[string]string) {
+	for k, v := range termMap {
+		lute.Terms[k] = v
 	}
 }
 
@@ -258,10 +271,12 @@ type options struct {
 	FixTermTypo bool
 	// Emoji 设置是否对 Emoji 别名替换为原生 Unicode 字符。
 	Emoji bool
-	// Emojis 将传入的 emojis 合并覆盖到已有的 Emoji 映射。
+	// Emojis 将传入的 emojis 合并覆盖到已有的 Emoji 字典。
 	Emojis map[string]string
 	// EmojiSite 设置图片 Emoji URL 的路径前缀。
 	EmojiSite string
+	// Terms 将传入的 terms 合并覆盖到已有的 Terms 字典。
+	Terms map[string]string
 	// Vditor 所见即所得支持
 	VditorWYSIWYG bool
 }
@@ -329,6 +344,10 @@ func (lute *Lute) SetEmojis(emojis map[string]string) {
 
 func (lute *Lute) SetEmojiSite(emojiSite string) {
 	lute.EmojiSite = emojiSite
+}
+
+func (lute *Lute) SetTerms(terms map[string]string) {
+	lute.Terms = terms
 }
 
 func (lute *Lute) SetVditorWYSIWYG(b bool) {
