@@ -131,6 +131,7 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset int) (html string, err error) {
 	var tree *Tree
 	lute.VditorWYSIWYG = true
+	markdownText = lute.endNewline(markdownText)
 	tree, err = lute.parse("", []byte(markdownText))
 	if nil != err {
 		return
@@ -216,6 +217,14 @@ func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}
 
 	html = renderer.writer.String()
 	return
+}
+
+// endNewline 用于在 markdownText 结尾加上一个 \n，仅在结尾没有 \n 时添加。
+func (lute *Lute) endNewline(markdownText string) string {
+	if length := len(markdownText); 0 < length && itemNewline != markdownText[length-1] {
+		markdownText += "\n"
+	}
+	return markdownText
 }
 
 // options 描述了一些列解析和渲染选项。

@@ -17,6 +17,7 @@ package lute
 import (
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // VditorRenderer 描述了 Vditor DOM 渲染器。
@@ -627,8 +628,12 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 	if 0 < len(sn.tokens) {
 		base = sn.tokens[0].Offset()
 	}
-	sn.caretStartOffset = strconv.Itoa(startOffset - base)
-	en.caretEndOffset = strconv.Itoa(endOffset - base)
+
+	startOffset = startOffset - base
+	endOffset = endOffset - base
+	startOffset, endOffset = r.runeOffset(itemsToBytes(sn.tokens), startOffset, endOffset)
+	sn.caretStartOffset = strconv.Itoa(startOffset)
+	en.caretEndOffset = strconv.Itoa(endOffset)
 	r.expand(sn)
 }
 
@@ -695,12 +700,32 @@ func (r *VditorRenderer) nearest(selected []*Node, offset int) (ret *Node) {
 
 // byteOffset 返回字符偏移位置在 str 中考虑字符编码情况下的字节偏移位置。
 func (r *VditorRenderer) byteOffset(str string, runeStartOffset, runeEndOffset int) (startOffset, endOffset int) {
+	runes := 0
 	for i, _ := range str {
-		if i >= runeStartOffset {
+		runes++
+		if runes > runeStartOffset {
 			startOffset = i
 		}
-		if i >= runeEndOffset {
+		if runes > runeEndOffset {
 			endOffset = i
+			return
+		}
+	}
+	return
+}
+
+// runeOffset 返回字节偏移位置在 bytes 中考虑字符编码情况下的字符偏移位置。
+func (r *VditorRenderer) runeOffset(bytes []byte, byteStartOffset, byteEndOffset int) (runeStartOffset, runeEndOffset int) {
+	length := len(bytes)
+	var i, size int
+	for ; i < length; i += size {
+		_, size = utf8.DecodeRune(bytes[i:])
+		if i < byteStartOffset {
+			runeStartOffset++
+		}
+		if i < byteEndOffset {
+			runeEndOffset++
+		} else {
 			return
 		}
 	}
