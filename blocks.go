@@ -143,7 +143,7 @@ func (t *Tree) incorporateLine(line items) {
 				// HTML 块（类型 1-5）需要检查是否满足闭合条件
 				html := container
 				if html.htmlBlockType >= 1 && html.htmlBlockType <= 5 {
-					tokens := itemsToBytes(t.context.currentLine[t.context.offset:])
+					tokens := t.context.currentLine[t.context.offset:]
 					if t.isHTMLBlockClose(tokens, html.htmlBlockType) {
 						t.context.finalize(container, t.context.lineNum)
 					}
@@ -283,7 +283,7 @@ var blockStarts = []blockStartFunc{
 	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace).term() == itemLess {
-			tokens := itemsToBytes(t.context.currentLine[t.context.nextNonspace:])
+			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if htmlType := t.parseHTML(tokens); 0 != htmlType {
 				t.context.closeUnmatchedBlocks()
 				block := t.context.addChild(NodeHTMLBlock, t.context.offset)

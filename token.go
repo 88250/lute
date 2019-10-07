@@ -13,7 +13,6 @@
 package lute
 
 import (
-	"bytes"
 	"unicode"
 )
 
@@ -151,6 +150,10 @@ func (tokens items) splitWithoutBackslashEscape(separator byte) (ret []items) {
 	return
 }
 
+func hasPrefix(s, prefix items) bool {
+	return len(s) >= len(prefix) && equal(s[0:len(prefix)], prefix)
+}
+
 func hasSuffix(tokens, suffix items) bool {
 	return len(tokens) >= len(suffix) && equal(tokens[len(tokens)-len(suffix):], suffix)
 }
@@ -169,13 +172,40 @@ func equal(a, b items) bool {
 }
 
 func index(tokens, sep items) (pos int) {
-	a := itemsToBytes(tokens)
-	b := itemsToBytes(sep)
-	return bytes.Index(a, b)
+	length := len(tokens)
+	sepLen := len(sep)
+	for i := 0; i < length; i++ {
+		if i+sepLen > length {
+			break
+		}
+		if equal(tokens[i:i+sepLen], sep) {
+			return i
+		}
+	}
+	return -1
+}
+
+func indexAny(tokens items, chars string) (pos int) {
+	length := len(tokens)
+	charsLen := len(chars)
+	var token byte
+	for i := 0; i < length; i++ {
+		token = tokens[i].term()
+		for j := 0; j < charsLen; j++ {
+			if token == chars[j] {
+				return i
+			}
+		}
+	}
+	return -1
 }
 
 func contains(tokens, sub items) bool {
 	return 0 <= index(tokens, sub)
+}
+
+func containsAny(tokens items, chars string) bool {
+	return 0 <= indexAny(tokens, chars)
 }
 
 // replaceAll 会将 tokens 中的所有 old 使用 new 替换。
@@ -271,7 +301,7 @@ func (tokens items) accept(token byte) (pos int) {
 	return
 }
 
-func acceptTokenss(tokens []byte, someTokenss [][]byte) (pos int) {
+func acceptTokenss(tokens items, someTokenss []items) (pos int) {
 	length := len(tokens)
 	length2 := len(someTokenss)
 	for i := 0; i < length; i++ {
@@ -286,7 +316,7 @@ func acceptTokenss(tokens []byte, someTokenss [][]byte) (pos int) {
 	return -1
 }
 
-func acceptTokens(remains, someTokens []byte) (pos int) {
+func acceptTokens(remains, someTokens items) (pos int) {
 	length := len(someTokens)
 	for ; pos < length; pos++ {
 		if someTokens[pos] != remains[pos] {
@@ -305,15 +335,15 @@ func (tokens items) isBlankLine() bool {
 	return true
 }
 
-func splitWhitespace(tokens []byte) (ret [][]byte) {
+func splitWhitespace(tokens items) (ret []items) {
 	i := 0
-	ret = append(ret, []byte{})
+	ret = append(ret, items{})
 	lastIsWhitespace := false
 	for _, token := range tokens {
-		if isWhitespace(token) {
+		if isWhitespace(token.term()) {
 			if !lastIsWhitespace {
 				i++
-				ret = append(ret, []byte{})
+				ret = append(ret, items{})
 			}
 			lastIsWhitespace = true
 		} else {
