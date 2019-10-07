@@ -192,26 +192,36 @@ func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 }
 
 // VditorNewline 用于在类型为 blockType 的块中进行换行生成新的 Vditor 节点。
-// param 用于传递生成某些块换行所需的参数，比如在列表项中换行需要传列表项标记符和分隔符。
+// param 用于传递生成某些块换行所需的参数，比如在列表项中换行需要传列表项标记符。
 func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}) (html string, err error) {
 	renderer := lute.newVditorRenderer(nil)
 
 	switch blockType {
 	case NodeListItem:
+		markerPart := param["marker"].(string)
 		listType := 0
-		listType, err = strconv.Atoi(param["listType"].(string))
-		if nil != err {
-			return
-		}
 		num := 1
-		num, err = strconv.Atoi(param["listNum"].(string))
-		delim := param["listDelim"].(string)
-		marker := param["listMarker"].(string)
-		if 1 == listType { // 有序列表
-			marker = strconv.Itoa(num + 1)
-			marker += delim
+		marker := "*"
+		delim := ""
+		listItem := &Node{typ: NodeListItem}
+		if isASCIILetterNum(markerPart[0]) {
+			listType = 1 // 有序列表
+			if strings.Contains(markerPart, ")") {
+				delim = ")"
+			} else {
+				delim = "."
+			}
+			markerParts := strings.SplitN(markerPart, delim, 2)
+			num, _ = strconv.Atoi(markerParts[0])
+			num++
+			marker = strconv.Itoa(num)
+		} else {
+			marker = markerPart
 		}
-		listItem := &Node{typ: NodeListItem, listData: &listData{typ: listType, marker: strToItems(marker), delimiter: newItem(delim[0], 0, 0, 0)}}
+		listItem.listData = &listData{typ: listType, marker: strToItems(marker)}
+		if 1 == listType {
+			listItem.delimiter = newItem(delim[0], 0, 0, 0)
+		}
 		_, err = renderer.renderListItem(listItem, true)
 		if nil != err {
 			return

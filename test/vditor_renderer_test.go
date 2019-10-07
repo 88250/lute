@@ -62,11 +62,11 @@ func TestVditorRenderer(t *testing.T) {
 func TestVditorNewline(t *testing.T) {
 	luteEngine := lute.New()
 
-	html, err := luteEngine.VditorNewline(1, nil)
+	html, err := luteEngine.VditorNewline(8, map[string]interface{}{"marker": "1. "})
 	if nil != err {
 		t.Fatalf("unexpected: %s", err)
 	}
-	expected := "<p data-ntype=\"1\" data-mtype=\"0\"><br><span class=\"newline\">\n</span><span class=\"newline\">\n</span></p>"
+	expected := "<li class=\"node node--block\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">2. </span></li>"
 	if expected != html {
 		t.Fatalf("vditor newline failed\nexpected\n\t%q\ngot\n\t%q", expected, html)
 	}
