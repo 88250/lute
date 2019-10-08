@@ -194,7 +194,7 @@ func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 // VditorNewline 用于在类型为 blockType 的块中进行换行生成新的 Vditor 节点。
 // param 用于传递生成某些块换行所需的参数，比如在列表项中换行需要传列表项标记符。
 func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}) (html string, err error) {
-	renderer := lute.newVditorRenderer(nil)
+	var renderer *VditorRenderer
 
 	switch blockType {
 	case NodeListItem:
@@ -216,26 +216,34 @@ func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}
 			num++
 			marker = strconv.Itoa(num)
 		} else {
-			marker = markerPart
+			marker = string(markerPart[0])
 		}
 		listItem.listData = &listData{typ: listType, marker: strToItems(marker)}
+		listItem.expand = true
 		if 1 == listType {
 			listItem.delimiter = newItem(delim[0], 0, 0, 0)
 		}
-		_, err = renderer.renderListItem(listItem, true)
-		if nil != err {
-			return
-		}
-		_, err = renderer.renderListItem(listItem, false)
-		if nil != err {
-			return
-		}
-	default:
-		renderer.writer.WriteString("<p data-ntype=\"" + NodeParagraph.String() + "\" data-mtype=\"" + renderer.mtype(NodeParagraph) + "\">" +
-			"<br><span class=\"newline\">\n\n</span></p>")
-	}
 
-	html = renderer.writer.String()
+		text := &Node{typ: NodeText, tokens: strToItems("")}
+		text.caretStartOffset = "0"
+		text.caretEndOffset = "0"
+		p := &Node{typ: NodeParagraph}
+		p.AppendChild(text)
+		listItem.AppendChild(p)
+		listItem.tight = true
+		renderer = lute.newVditorRenderer(listItem)
+		var output []byte
+		output, err = renderer.Render()
+		if nil != err {
+			return
+		}
+		html = string(output)
+	default:
+		renderer = lute.newVditorRenderer(nil)
+		renderer.writer.WriteString("<p data-ntype=\"" + NodeParagraph.String() + "\" data-mtype=\"" + renderer.mtype(NodeParagraph) + "\" data-cso=\"0\" data-ceo=\"0\">" +
+			"<br><span class=\"newline\">\n\n</span></p>")
+		html = renderer.writer.String()
+	}
 	return
 }
 

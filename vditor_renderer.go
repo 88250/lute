@@ -23,11 +23,12 @@ import (
 // VditorRenderer 描述了 Vditor DOM 渲染器。
 type VditorRenderer struct {
 	*BaseRenderer
+	lastOut string
 }
 
 // newVditorRenderer 创建一个 Vditor DOM 渲染器。
 func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
-	ret := &VditorRenderer{lute.newBaseRenderer(treeRoot)}
+	ret := &VditorRenderer{BaseRenderer: lute.newBaseRenderer(treeRoot)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
@@ -270,9 +271,9 @@ func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.parent.parent; nil != grandparent {
-		if NodeList == grandparent.typ { // List.ListItem.Paragraph
-			if grandparent.tight {
+	if parent := node.parent; nil != parent {
+		if NodeListItem == parent.typ { // ListItem.Paragraph
+			if parent.tight || parent.parent.tight {
 				return WalkContinue, nil
 			}
 		}
@@ -281,7 +282,8 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.tag("p", node, nil, false)
 	} else {
-		r.writeString("<span class=\"newline\">\n\n</span></p>")
+		r.tag("/p", nil, nil, false)
+		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -506,6 +508,7 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		r.writeString(itemsToStr(marker) + " ")
 		r.tag("/span", nil, nil, false)
 	} else {
+		r.newline()
 		r.tag("/li", node, nil, false)
 	}
 	return WalkContinue, nil
@@ -738,4 +741,13 @@ func (r *VditorRenderer) runeOffset(bytes []byte, byteStartOffset, byteEndOffset
 		}
 	}
 	return
+}
+
+var newlineSpan = "<span class=\"newline\">\n\n</span>"
+
+func (r *VditorRenderer) newline() {
+	if newlineSpan != r.lastOut {
+		r.writer.WriteString(newlineSpan)
+		r.lastOut = newlineSpan
+	}
 }
