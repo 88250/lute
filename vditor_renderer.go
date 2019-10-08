@@ -263,8 +263,8 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
 	if nil == node.firstChild {
 		r.writeString("<p data-ntype=\"" + NodeParagraph.String() + "\" data-mtype=\"" + r.mtype(NodeParagraph) + "\">" +
-			"<span data-ntype=\"" + NodeParagraph.String() + " data-mtype=\"2\" data-cso=\"0\" data-ceo=\"0\">" +
-			"</span><span class=\"newline\">\n</span><span class=\"newline\">\n</span></p>")
+			"<span data-ntype=\"" + NodeParagraph.String() + " data-mtype=\"2\" data-cso=\"0\" data-ceo=\"0\"></span>" +
+			"<span class=\"newline\">\n</span></p>")
 		return WalkStop, nil
 	}
 	return WalkContinue, nil
@@ -282,8 +282,8 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.tag("p", node, nil, false)
 	} else {
+		r.writeString("<span class=\"newline\">\n\n</span>")
 		r.tag("/p", nil, nil, false)
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -508,7 +508,9 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		r.writeString(itemsToStr(marker) + " ")
 		r.tag("/span", nil, nil, false)
 	} else {
-		r.newline()
+		if node.tight || node.parent.tight {
+			r.writeString("<span class=\"newline\">\n</span>")
+		}
 		r.tag("/li", node, nil, false)
 	}
 	return WalkContinue, nil
@@ -741,13 +743,4 @@ func (r *VditorRenderer) runeOffset(bytes []byte, byteStartOffset, byteEndOffset
 		}
 	}
 	return
-}
-
-var newlineSpan = "<span class=\"newline\">\n\n</span>"
-
-func (r *VditorRenderer) newline() {
-	if newlineSpan != r.lastOut {
-		r.writer.WriteString(newlineSpan)
-		r.lastOut = newlineSpan
-	}
 }
