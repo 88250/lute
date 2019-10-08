@@ -672,10 +672,9 @@ func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, s
 		}
 	}
 
-	if nil == node.firstChild || 0 != len(node.tokens) {
+	if nil == node.firstChild {
 		// 说明找到了选段内的叶子结点
 		*selected = append(*selected, node)
-		return
 	}
 
 	// 在子节点中递归查找

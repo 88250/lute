@@ -88,7 +88,7 @@ type Node struct {
 
 // Range 返回节点源码起始偏移和结束偏移位置。
 func (n *Node) Range() (start, end int) {
-	if NodeDocument == n.typ {
+	if 1 > len(n.tokens) {
 		return 0, 0
 	}
 	return n.tokens[0].Offset(), n.tokens[len(n.tokens)-1].Offset()
