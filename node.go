@@ -88,12 +88,10 @@ type Node struct {
 
 // Range 返回节点源码起始偏移和结束偏移位置。
 func (n *Node) Range() (start, end int) {
-	if 1 > len(n.tokens) {
+	if NodeDocument == n.typ {
 		return 0, 0
 	}
-	s := n.tokens[0]
-	e := n.tokens[len(n.tokens)-1]
-	return s.Offset(), e.Offset()
+	return n.tokens[0].Offset(), n.tokens[len(n.tokens)-1].Offset()
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
