@@ -10,11 +10,14 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
+// +build javascript
+
 package lute
 
 // Vditor DOM Renderer
 
 import (
+	"sort"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -661,27 +664,46 @@ func (r *VditorRenderer) expand(node *Node) {
 	}
 }
 
+func (tokens items) Len() int           { return len(tokens) }
+func (tokens items) Swap(i, j int)      { tokens[i], tokens[j] = tokens[j], tokens[i] }
+func (tokens items) Less(i, j int) bool { return tokens[i].Offset() < tokens[j].Offset() }
+
 // findSelection 在 node 上递归查找 startOffset 和 endOffset 选段，选中节点累计到 selected 中。
 func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, selected *[]*Node) {
-	if 0 < len(node.tokens) {
-		// 判断是否在选段内
-		st := node.tokens[0]
-		et := node.tokens[len(node.tokens)-1]
-		if st.Offset()-3 > startOffset || et.Offset()+3 < endOffset {
-			return
+	nodes := node.List()
+	length := len(nodes)
+	var n *Node
+	tokens := make(items, 0, len(nodes)*4)
+	for i := 0; i < length; i++ {
+		n = nodes[i]
+		for i, _ := range n.tokens {
+			n.tokens[i].node = n
+		}
+		tokens = append(tokens, n.tokens...)
+	}
+
+	sort.Sort(tokens)
+
+	var token item
+	var startToken, endToken *item
+	length = len(tokens)
+	for i := 0; i < length; i++ {
+		token = tokens[i]
+		if nil == startToken && startOffset <= token.Offset()+1 {
+			startToken = &token
+		}
+		if endOffset <= token.Offset()+1 {
+			endToken = &token
+			break
 		}
 	}
 
-	if nil == node.firstChild {
-		// 说明找到了选段内的叶子结点
-		*selected = append(*selected, node)
+	if nil != startToken {
+		*selected = append(*selected, startToken.node)
+		if startToken.node != endToken.node {
+			*selected = append(*selected, endToken.node)
+		}
 	}
-
-	// 在子节点中递归查找
-	for c := node.firstChild; nil != c; c = c.next {
-		r.findSelection(c, startOffset, endOffset, selected)
-	}
-	return
 }
 
 // nearest 在 selected 节点列表中查找离 offset 最近的节点。

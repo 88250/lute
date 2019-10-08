@@ -250,6 +250,18 @@ func (n *Node) PrependChild(child *Node) {
 	}
 }
 
+// List 将 n 及其所有子节点按深度优先遍历添加到结果列表 ret 中。
+func (n *Node) List() (ret []*Node) {
+	ret = make([]*Node, 0, 512)
+	Walk(n, func(n *Node, entering bool) (status WalkStatus, e error) {
+		if entering {
+			ret = append(ret, n)
+		}
+		return WalkContinue, nil
+	})
+	return
+}
+
 type nodeType int
 
 func (typ nodeType) String() string {

@@ -20,10 +20,11 @@ import (
 
 // item 描述了词法分析的一个 token。
 type item struct {
-	termByte byte // 源码字节值
-	ln       int  // 源码行号，从 1 开始
-	col      int  // 源码列号，从 1 开始
-	offset   int  // 源码偏移位置，从 0 开始
+	node     *Node // 所属节点
+	termByte byte  // 源码字节值
+	ln       int   // 源码行号，从 1 开始
+	col      int   // 源码列号，从 1 开始
+	offset   int   // 源码偏移位置，从 0 开始
 }
 
 // items 定义了 token 数组。
