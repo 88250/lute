@@ -163,7 +163,7 @@ func (l *lexer) nextLine() (ret items) {
 			l.width = 1
 			ret = append(ret, newItem(b, l.ln, l.col, l.offset+offset))
 		}
-		offset++
+		offset+=l.width
 	}
 	l.offset = i
 	return
