@@ -16,7 +16,7 @@ import (
 	"unicode/utf8"
 )
 
-func (context *Context) parseInlineLink(tokens items) (passed, remains, destination items) {
+func (context *Context) parseInlineLinkDest(tokens items) (passed, remains, destination items) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {

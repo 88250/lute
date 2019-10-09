@@ -49,7 +49,7 @@ func TestVditorRenderer(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range vditorRendererTests {
-		html, err := luteEngine.RenderVditorDOM(test.from, 2, 2)
+		html, err := luteEngine.RenderVditorDOM(test.from, 11, 11)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}

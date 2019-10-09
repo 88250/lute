@@ -163,7 +163,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				break
 			}
 			ctx.pos += len(passed)
-			if passed, remains, dest = t.context.parseInlineLink(remains); nil == passed {
+			if passed, remains, dest = t.context.parseInlineLinkDest(remains); nil == passed {
 				break
 			}
 			ctx.pos += len(passed)
@@ -288,9 +288,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 }
 
 func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
-	openBracket := items{ctx.tokens[ctx.pos]}
+	startPos := ctx.pos
 	ctx.pos++
-	ret = &Node{typ: NodeText, tokens: openBracket}
+	ret = &Node{typ: NodeText, tokens: ctx.tokens[startPos:ctx.pos]}
 	// 将 [ 入栈
 	t.addBracket(ret, ctx.pos-1, false, ctx)
 	return

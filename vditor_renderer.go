@@ -197,9 +197,11 @@ func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 }
 
 func (r *VditorRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
 	r.writeString(" \"")
 	r.write(node.tokens)
 	r.writeString("\"")
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
@@ -695,7 +697,7 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 func (r *VditorRenderer) expand(node *Node) {
 	for p := node; nil != p; p = p.parent {
 		switch p.typ {
-		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink, NodeLinkText, NodeLinkDest, NodeLinkTitle:
+		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink:
 			p.expand = true
 			return
 		}
