@@ -214,7 +214,7 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 
 func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", nil, nil, false)
+		r.tag("span", node, [][]string{{"class", "node"}}, false)
 		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", nil, attrs, false)
 		r.writeByte(itemOpenBracket)
@@ -226,7 +226,7 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 		}
 		r.tag("a", nil, attrs, false)
 	} else {
-		r.tag("/a", node, nil, false)
+		r.tag("/a", nil, nil, false)
 		attrs := [][]string{{"class", "marker"}}
 		r.tag("span", nil, attrs, false)
 		r.writeByte(itemCloseBracket)
@@ -234,13 +234,8 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 		attrs = [][]string{{"class", "marker"}}
 		r.tag("span", nil, attrs, false)
 		r.writeByte(itemOpenParen)
-		r.tag("/span", nil, nil, false)
-		r.tag("span", nil, nil, false)
 		r.write(node.destination)
-		r.tag("/span", nil, nil, false)
 		// TODO: title
-		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
 		r.writeByte(itemCloseParen)
 		r.tag("/span", nil, nil, false)
 		r.tag("/span", nil, nil, false)
@@ -657,7 +652,7 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 func (r *VditorRenderer) expand(node *Node) {
 	for p := node; nil != p; p = p.parent {
 		switch p.typ {
-		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading:
+		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink:
 			p.expand = true
 			return
 		}
