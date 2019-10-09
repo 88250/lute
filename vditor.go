@@ -93,3 +93,21 @@ func (lute *Lute) VditorNewline(blockType nodeType, param map[string]interface{}
 	}
 	return
 }
+
+// VditorDOMMarkdown 用于将 Vditor DOM 转换为 Markdown 文本。
+// TODO：改为解析标准 DOM
+func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
+	tree, err := lute.parseVditorDOM(html)
+	if nil != err {
+		return
+	}
+
+	var formatted []byte
+	renderer := lute.newFormatRenderer(tree.Root)
+	formatted, err = renderer.Render()
+	if nil != err {
+		return
+	}
+	markdown = bytesToStr(formatted)
+	return
+}

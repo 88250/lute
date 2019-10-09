@@ -154,23 +154,6 @@ func (lute *Lute) RenderEChartsJSON(markdownText string) (json string, err error
 	return
 }
 
-// VditorDOMMarkdown 用于将 Vditor DOM 转换为 Markdown 文本。
-func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
-	tree, err := lute.parseVditorDOM(html)
-	if nil != err {
-		return
-	}
-
-	var formatted []byte
-	renderer := lute.newFormatRenderer(tree.Root)
-	formatted, err = renderer.Render()
-	if nil != err {
-		return
-	}
-	markdown = bytesToStr(formatted)
-	return
-}
-
 // endNewline 用于在 markdownText 结尾加上一个 \n，仅在结尾没有 \n 时添加。
 func (lute *Lute) endNewline(markdownText string) string {
 	if length := len(markdownText); 0 < length && itemNewline != markdownText[length-1] {
