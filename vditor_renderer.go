@@ -65,6 +65,11 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeBang] = ret.renderBang
+	ret.rendererFuncs[NodeOpenBracket] = ret.renderOpenBracket
+	ret.rendererFuncs[NodeCloseBracket] = ret.renderCloseBracket
+	ret.rendererFuncs[NodeOpenParen] = ret.renderOpenParen
+	ret.rendererFuncs[NodeCloseParen] = ret.renderCloseParen
 	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
 	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
 	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
@@ -192,43 +197,56 @@ func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 }
 
 func (r *VditorRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		if nil != node.tokens {
-			r.writeString(" \"")
-			r.write(node.tokens)
-			r.writeString("\"")
-		}
-	} else {
-		r.writeByte(itemCloseParen)
-		r.tag("/span", nil, nil, false)
-	}
-	return WalkContinue, nil
+	r.writeString(" \"")
+	r.write(node.tokens)
+	r.writeString("\"")
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("span", node, [][]string{{"class", "marker"}}, false)
-		r.writeByte(itemOpenParen)
-		r.write(node.tokens)
-	}
-	return WalkContinue, nil
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.write(node.tokens)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
-		r.writeByte(itemOpenBracket)
-		r.tag("/span", nil, nil, false)
+	r.tag("span", node, nil, false)
+	r.write(escapeHTML(node.tokens))
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
+}
 
-		r.tag("span", node, nil, false)
-		r.write(escapeHTML(node.tokens))
-		r.tag("/span", nil, nil, false)
-	} else {
-		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
-		r.writeByte(itemCloseBracket)
-		r.tag("/span", nil, nil, false)
-	}
-	return WalkContinue, nil
+func (r *VditorRenderer) renderCloseParen(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeByte(itemCloseParen)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderOpenParen(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeByte(itemOpenParen)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderCloseBracket(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeByte(itemCloseBracket)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderOpenBracket(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeByte(itemOpenBracket)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderBang(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
