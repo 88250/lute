@@ -119,15 +119,10 @@ loopPart:
 			// 如果以 . 结尾则剔除该 .
 			lastIndex := len(group) - 1
 			group = group[:lastIndex]
-			link := &Node{typ: NodeLink}
-			text := &Node{typ: NodeLinkText, tokens: group}
-			link.AppendChild(text)
-			dest := &Node{typ: NodeLinkDest, tokens: append(mailto, group...)}
-			link.AppendChild(dest)
+			link := t.newLink(NodeLink, group, append(mailto, group...), nil)
 			node.InsertBefore(link)
 			// . 作为文本节点插入
-			text = &Node{typ: NodeText, tokens: items{item}}
-			node.InsertBefore(text)
+			node.InsertBefore(&Node{typ: NodeText, tokens: items{item}})
 		} else if itemHyphen == token || itemUnderscore == token {
 			// 如果以 - 或者 _ 结尾则整个串都不能算作邮件链接
 			text := &Node{typ: NodeText, tokens: group}
@@ -350,9 +345,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		addr = append(addr, domain...)
 		addr = append(addr, path...)
 
-		link := &Node{typ: NodeLink}
-		link.AppendChild(&Node{typ: NodeLinkText, tokens: addr})
-		link.AppendChild(&Node{typ: NodeLinkDest, tokens: encodeDestination(dest)})
+		link := t.newLink(NodeLink, addr, encodeDestination(dest), nil)
 		node.InsertBefore(link)
 	}
 
@@ -465,10 +458,24 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	}
 
 	ctx.pos += passed + 1
-	link := &Node{typ: NodeLink}
-	link.AppendChild(&Node{typ: NodeLinkText, tokens: dest})
-	link.AppendChild(&Node{typ: NodeLinkDest, tokens: append(mailto, dest...)})
-	return link
+	return t.newLink(NodeLink, dest, dest, nil)
+}
+
+func (t *Tree) newLink(typ nodeType, text, dest, title items) (ret *Node) {
+	ret = &Node{typ: typ}
+	if NodeImage == typ {
+		ret.AppendChild(&Node{typ: NodeBang})
+	}
+	ret.AppendChild(&Node{typ: NodeOpenBracket})
+	ret.AppendChild(&Node{typ: NodeLinkText, tokens: text})
+	ret.AppendChild(&Node{typ: NodeCloseBracket})
+	ret.AppendChild(&Node{typ: NodeOpenParen})
+	ret.AppendChild(&Node{typ: NodeLinkDest, tokens: dest})
+	if nil != title {
+		ret.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
+	}
+	ret.AppendChild(&Node{typ: NodeCloseParen})
+	return
 }
 
 func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
@@ -496,13 +503,9 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 		return nil
 	}
 
-	link := &Node{typ: NodeLink}
 	if itemGreater != ctx.tokens[i].term() {
 		return nil
 	}
-
 	ctx.pos = 1 + i
-	link.AppendChild(&Node{typ: NodeLinkText, tokens: dest})
-	link.AppendChild(&Node{typ: NodeLinkDest, tokens: encodeDestination(dest)})
-	return link
+	return t.newLink(NodeLink, dest, encodeDestination(dest), nil)
 }

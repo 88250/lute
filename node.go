@@ -300,37 +300,42 @@ const (
 	NodeStrongU8eOpenMarker  nodeType = 21 // 开始加粗标记符 __
 	NodeStrongU8eCloseMarker nodeType = 22 // 结束加粗标记符 __
 	NodeCodeSpan             nodeType = 23 // 代码
-	NodeCodeSpanOpenMarker   nodeType = 24 // 开始代码标记符 `
-	NodeCodeSpanContent      nodeType = 25 // 代码内容
-	NodeCodeSpanCloseMarker  nodeType = 26 // 结束代码标记符 `
-	NodeHardBreak            nodeType = 27 // 硬换行
-	NodeSoftBreak            nodeType = 28 // 软换行
-	NodeLink                 nodeType = 29 // 链接
-	NodeImage                nodeType = 30 // 图片
-	NodeLinkText             nodeType = 31 // 链接文本
-	NodeLinkDest             nodeType = 32 // 链接地址
-	NodeLinkTitle            nodeType = 33 // 链接标题
+	NodeCodeSpanOpenMarker  nodeType = 24  // 开始代码标记符 `
+	NodeCodeSpanContent     nodeType = 25  // 代码内容
+	NodeCodeSpanCloseMarker nodeType = 26  // 结束代码标记符 `
+	NodeHardBreak           nodeType = 27  // 硬换行
+	NodeSoftBreak           nodeType = 28  // 软换行
+	NodeLink                nodeType = 29  // 链接
+	NodeImage               nodeType = 30  // 图片
+	NodeBang                nodeType = 31  // !
+	NodeOpenBracket         nodeType = 32  // [
+	NodeCloseBracket        nodeType = 33  // ]
+	NodeOpenParen           nodeType = 34  // (
+	NodeCloseParen          nodeType = 35  // )
+	NodeLinkText            nodeType = 36  // 链接文本
+	NodeLinkDest            nodeType = 37  // 链接地址
+	NodeLinkTitle           nodeType = 38  // 链接标题
 
 	// GFM
 
-	NodeTaskListItemMarker        nodeType = 34 // 任务列表项标记符
-	NodeStrikethrough             nodeType = 35 // 删除线
-	NodeStrikethrough1OpenMarker  nodeType = 36 // 开始删除线标记符 ~
-	NodeStrikethrough1CloseMarker nodeType = 37 // 结束删除线标记符 ~
-	NodeStrikethrough2OpenMarker  nodeType = 38 // 开始删除线标记符 ~~
-	NodeStrikethrough2CloseMarker nodeType = 39 // 结束删除线标记符 ~~
-	NodeTable                     nodeType = 40 // 表
-	NodeTableHead                 nodeType = 41 // 表头
-	NodeTableRow                  nodeType = 42 // 表行
-	NodeTableCell                 nodeType = 43 // 表格
+	NodeTaskListItemMarker        nodeType = 100 // 任务列表项标记符
+	NodeStrikethrough             nodeType = 101 // 删除线
+	NodeStrikethrough1OpenMarker  nodeType = 102 // 开始删除线标记符 ~
+	NodeStrikethrough1CloseMarker nodeType = 103 // 结束删除线标记符 ~
+	NodeStrikethrough2OpenMarker  nodeType = 104 // 开始删除线标记符 ~~
+	NodeStrikethrough2CloseMarker nodeType = 105 // 结束删除线标记符 ~~
+	NodeTable                     nodeType = 106 // 表
+	NodeTableHead                 nodeType = 107 // 表头
+	NodeTableRow                  nodeType = 108 // 表行
+	NodeTableCell                 nodeType = 109 // 表格
 
 	// Emoji
 
-	NodeEmojiUnicode nodeType = 44 // Emoji Unicode 字符
-	NodeEmojiImg     nodeType = 45 // Emoji 图片
+	NodeEmojiUnicode nodeType = 200 // Emoji Unicode 字符
+	NodeEmojiImg     nodeType = 201 // Emoji 图片
 
 	// 数学公式
 
-	NodeMathBlock  nodeType = 46 // 数学公式块
-	NodeInlineMath nodeType = 47 // 内联数学公式
+	NodeMathBlock  nodeType = 300 // 数学公式块
+	NodeInlineMath nodeType = 301 // 内联数学公式
 )

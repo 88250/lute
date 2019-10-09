@@ -239,7 +239,10 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		node := &Node{typ: NodeLink}
 		if isImage {
 			node.typ = NodeImage
+			node.AppendChild(&Node{typ: NodeBang})
 		}
+		node.AppendChild(&Node{typ: NodeOpenBracket})
+
 		var tmp, next *Node
 		tmp = opener.node.next
 		for nil != tmp {
@@ -251,8 +254,13 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			node.AppendChild(tmp)
 			tmp = next
 		}
+		node.AppendChild(&Node{typ: NodeCloseBracket})
+		node.AppendChild(&Node{typ: NodeOpenParen})
 		node.AppendChild(&Node{typ: NodeLinkDest, tokens: dest})
-		node.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
+		if 0 < len(title) {
+			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
+		}
+		node.AppendChild(&Node{typ: NodeCloseParen})
 
 		t.processEmphasis(opener.previousDelimiter, ctx)
 		t.removeBracket(ctx)

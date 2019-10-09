@@ -65,6 +65,7 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
 	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
 	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
@@ -191,23 +192,43 @@ func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 }
 
 func (r *VditorRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("span", nil, [][]string{{"class", "marker"}}, false)
-	r.writeByte(itemCloseBracket)
-	r.tag("/span", nil, nil, false)
-	r.tag("span", nil, [][]string{{"class", "marker"}}, false)
-	r.writeByte(itemOpenParen)
-	dest := node.ChildByType(NodeLinkDest)
-	r.write(dest.tokens)
-	if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
-		r.write(title.tokens)
+	if entering {
+		if nil != node.tokens {
+			r.writeString(" \"")
+			r.write(node.tokens)
+			r.writeString("\"")
+		}
+	} else {
+		r.writeByte(itemCloseParen)
+		r.tag("/span", nil, nil, false)
 	}
-	r.writeByte(itemCloseParen)
-	r.tag("/span", nil, nil, false)
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+	if entering {
+		r.tag("span", node, [][]string{{"class", "marker"}}, false)
+		r.writeByte(itemOpenParen)
+		r.write(node.tokens)
+	}
+	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
+		r.writeByte(itemOpenBracket)
+		r.tag("/span", nil, nil, false)
+
+		r.tag("span", node, nil, false)
+		r.write(escapeHTML(node.tokens))
+		r.tag("/span", nil, nil, false)
+	} else {
+		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
+		r.writeByte(itemCloseBracket)
+		r.tag("/span", nil, nil, false)
+	}
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
@@ -242,11 +263,7 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(title.tokens))})
 		}
 		r.tag("a", node, attrs, false)
-		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
-		r.writeByte(itemOpenBracket)
-		r.tag("/span", nil, nil, false)
 	} else {
-
 		r.tag("/a", nil, nil, false)
 	}
 	return WalkContinue, nil

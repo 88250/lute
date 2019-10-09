@@ -77,10 +77,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 		remains = tokens
 	}
 
-	link := &Node{typ: NodeLink}
-	link.AppendChild(&Node{typ: NodeLinkText, tokens: label})
-	link.AppendChild(&Node{typ: NodeLinkDest, tokens: destination})
-	link.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
+	link := context.tree.newLink(NodeLink, label, destination, title)
 	lowerCaseLabel := bytes.ToLower(itemsToBytes(label))
 	if _, ok := context.linkRefDef[bytesToStr(lowerCaseLabel)]; !ok {
 		context.linkRefDef[bytesToStr(lowerCaseLabel)] = link
