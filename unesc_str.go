@@ -181,7 +181,6 @@ func parseEntity(s string) (string, int) {
 			}
 		}
 	}
-
 	return "", 0
 }
 

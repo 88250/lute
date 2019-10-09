@@ -171,7 +171,17 @@ func equal(a, b items) bool {
 	return true
 }
 
-func index(tokens, sep items) (pos int) {
+func indexByte(tokens items, b byte) (ret int) {
+	length := len(tokens)
+	for i := 0; i < length; i++ {
+		if b == tokens[i].term() {
+			return i
+		}
+	}
+	return -1
+}
+
+func index(tokens, sep items) int {
 	length := len(tokens)
 	sepLen := len(sep)
 	for i := 0; i < length; i++ {
