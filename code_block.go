@@ -61,7 +61,12 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 		firstLine := content[:i]
 		rest := content[i+1:]
 
-		codeBlock.codeBlockInfo = unescapeString(trimWhitespace(firstLine))
+		if !context.option.VditorWYSIWYG {
+			codeBlock.codeBlockInfo = unescapeString(trimWhitespace(firstLine))
+		} else {
+			codeBlock.codeBlockInfo = firstLine
+		}
+
 		codeBlock.tokens = rest
 	} else { // 缩进代码块
 		codeBlock.tokens = replaceNewlineSpace(codeBlock.tokens)

@@ -13,7 +13,6 @@
 package lute
 
 import (
-	"bytes"
 	"strings"
 	"unicode/utf8"
 )
@@ -78,38 +77,45 @@ func escapeHTML(html items) (ret items) {
 // - percent-encoded characters (%[0-9a-fA-F]{2});
 // - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
 // Invalid UTF-8 sequences are replaced with U+FFFD.
-func encodeDestination(rawurl items) string {
+func encodeDestination(rawurl items) (ret items) {
 	// 鸣谢 https://gitlab.com/golang-commonmark/mdurl
 
 	const hexdigit = "0123456789ABCDEF"
-	var buf bytes.Buffer
+	ret = make(items, 0, 256)
 	i := 0
+	var token item
 	for i < len(rawurl) {
 		r, rlen := utf8.DecodeRune(itemsToBytes(rawurl[i:]))
-		if r >= 0x80 {
+		if utf8.RuneSelf <= r {
 			for j, n := i, i+rlen; j < n; j++ {
 				b := rawurl[j].term()
-				buf.WriteByte('%')
-				buf.WriteByte(hexdigit[(b>>4)&0xf])
-				buf.WriteByte(hexdigit[b&0xf])
+				token = rawurl[j]
+				ret = append(ret, newItem('%', token.Col(), token.Col(), token.Offset()))
+				ret = append(ret, newItem(hexdigit[(b>>4)&0xf], token.Ln(), token.Col(), token.Offset()))
+				ret = append(ret, newItem(hexdigit[b&0xf], token.Ln(), token.Col(), token.Offset()))
 			}
 		} else if r == '%' {
+			token = rawurl[i]
 			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1].term()) && isHexDigit(rawurl[i+2].term()) {
-				buf.WriteByte('%')
-				buf.WriteByte(tokenToUpper(rawurl[i+1].term()))
-				buf.WriteByte(tokenToUpper(rawurl[i+2].term()))
+				ret = append(ret, newItem('%', token.Ln(), token.Col(), token.Offset()))
+				ret = append(ret, newItem(tokenToUpper(rawurl[i+1].term()), token.Ln(), token.Col(), token.Offset()))
+				ret = append(ret, newItem(tokenToUpper(rawurl[i+2].term()), token.Ln(), token.Col(), token.Offset()))
 				i += 2
 			} else {
-				buf.WriteString("%25")
+				ret = append(ret, newItem('%', token.Ln(), token.Col(), token.Offset()))
+				ret = append(ret, newItem('2', token.Ln(), token.Col(), token.Offset()))
+				ret = append(ret, newItem('5', token.Ln(), token.Col(), token.Offset()))
 			}
 		} else if strings.IndexByte("!#$&'()*+,-./0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~", byte(r)) == -1 {
-			buf.WriteByte('%')
-			buf.WriteByte(hexdigit[(r>>4)&0xf])
-			buf.WriteByte(hexdigit[r&0xf])
+			token = rawurl[i]
+			ret = append(ret, newItem('%', token.Ln(), token.Col(), token.Offset()))
+			ret = append(ret, newItem(hexdigit[(r>>4)&0xf], token.Ln(), token.Col(), token.Offset()))
+			ret = append(ret, newItem(hexdigit[r&0xf], token.Ln(), token.Col(), token.Offset()))
 		} else {
-			buf.WriteByte(byte(r))
+			token = rawurl[i]
+			ret = append(ret, newItem(token.term(), token.Ln(), token.Col(), token.Offset()))
 		}
 		i += rlen
 	}
-	return buf.String()
+	return
 }

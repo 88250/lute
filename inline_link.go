@@ -122,7 +122,9 @@ func (context *Context) parseInlineLink(tokens items) (passed, remains, destinat
 	}
 
 	if nil != passed {
-		destination = strToItems(encodeDestination(unescapeString(destination)))
+		if !context.option.VditorWYSIWYG {
+			destination = encodeDestination(unescapeString(destination))
+		}
 	}
 	return
 }

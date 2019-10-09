@@ -59,6 +59,7 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
 	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
 	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
@@ -172,17 +173,23 @@ func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *FormatRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.tokens)
+	if entering {
+		r.writeString("](")
+		r.write(node.tokens)
+	}
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.write(node.tokens)
+	}
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("![")
-		if nil != node.firstChild {
-			r.write(node.firstChild.tokens)
-		}
-		r.writeString("](")
 	} else {
 		r.writeString(")")
 	}
@@ -192,11 +199,6 @@ func (r *FormatRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 func (r *FormatRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("[")
-		if nil != node.firstChild {
-			// FIXME: 未解决链接嵌套，另外还需要考虑链接引用定义
-			r.write(node.firstChild.tokens)
-		}
-		r.writeString("](")
 	} else {
 		r.writeString(")")
 	}
@@ -270,9 +272,7 @@ func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 		if r.option.FixTermTypo {
 			r.fixTermTypo(node)
 		}
-		if typ := node.parent.typ; NodeLink != typ && NodeImage != typ {
-			r.write(escapeHTML(node.tokens))
-		}
+		r.write(escapeHTML(node.tokens))
 	}
 	return WalkStop, nil
 }

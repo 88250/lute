@@ -45,6 +45,16 @@ func (item item) term() byte {
 	return byte(item)
 }
 
+// Ln 返回 item 的 ln。
+func (item item) Ln() int {
+	return 0
+}
+
+// Col 返回 item 的 col。
+func (item item) Col() int {
+	return 0
+}
+
 // Offset 返回 item 的 offset。
 func (item item) Offset() int {
 	return 0

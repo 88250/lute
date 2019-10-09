@@ -78,7 +78,7 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	}
 
 	link := &Node{typ: NodeLink}
-	link.AppendChild(&Node{typ: NodeText, tokens: label})
+	link.AppendChild(&Node{typ: NodeLinkText, tokens: label})
 	link.AppendChild(&Node{typ: NodeLinkDest, tokens: destination})
 	link.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
 	lowerCaseLabel := bytes.ToLower(itemsToBytes(label))
@@ -105,7 +105,9 @@ func (context *Context) parseLinkTitle(tokens items) (validTitle bool, passed, r
 		}
 	}
 	if nil != title {
-		title = unescapeString(title)
+		if !context.option.VditorWYSIWYG {
+			title = unescapeString(title)
+		}
 	}
 
 	return
@@ -159,7 +161,9 @@ func (context *Context) parseLinkDest(tokens items) (ret, remains, destination i
 		ret, remains, destination = context.parseLinkDest2(tokens) // [label](/url)
 	}
 	if nil != ret {
-		destination = strToItems(encodeDestination(unescapeString(destination)))
+		if !context.option.VditorWYSIWYG {
+			destination = encodeDestination(unescapeString(destination))
+		}
 	}
 	return
 }

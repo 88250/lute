@@ -307,29 +307,30 @@ const (
 	NodeSoftBreak            nodeType = 28 // 软换行
 	NodeLink                 nodeType = 29 // 链接
 	NodeImage                nodeType = 30 // 图片
-	NodeLinkDest             nodeType = 31 // 链接地址
-	NodeLinkTitle            nodeType = 32 // 链接标题
+	NodeLinkText             nodeType = 31 // 链接文本
+	NodeLinkDest             nodeType = 32 // 链接地址
+	NodeLinkTitle            nodeType = 33 // 链接标题
 
 	// GFM
 
-	NodeTaskListItemMarker        nodeType = 33 // 任务列表项标记符
-	NodeStrikethrough             nodeType = 34 // 删除线
-	NodeStrikethrough1OpenMarker  nodeType = 35 // 开始删除线标记符 ~
-	NodeStrikethrough1CloseMarker nodeType = 36 // 结束删除线标记符 ~
-	NodeStrikethrough2OpenMarker  nodeType = 37 // 开始删除线标记符 ~~
-	NodeStrikethrough2CloseMarker nodeType = 38 // 结束删除线标记符 ~~
-	NodeTable                     nodeType = 39 // 表
-	NodeTableHead                 nodeType = 40 // 表头
-	NodeTableRow                  nodeType = 41 // 表行
-	NodeTableCell                 nodeType = 42 // 表格
+	NodeTaskListItemMarker        nodeType = 34 // 任务列表项标记符
+	NodeStrikethrough             nodeType = 35 // 删除线
+	NodeStrikethrough1OpenMarker  nodeType = 36 // 开始删除线标记符 ~
+	NodeStrikethrough1CloseMarker nodeType = 37 // 结束删除线标记符 ~
+	NodeStrikethrough2OpenMarker  nodeType = 38 // 开始删除线标记符 ~~
+	NodeStrikethrough2CloseMarker nodeType = 39 // 结束删除线标记符 ~~
+	NodeTable                     nodeType = 40 // 表
+	NodeTableHead                 nodeType = 41 // 表头
+	NodeTableRow                  nodeType = 42 // 表行
+	NodeTableCell                 nodeType = 43 // 表格
 
 	// Emoji
 
-	NodeEmojiUnicode nodeType = 43 // Emoji Unicode 字符
-	NodeEmojiImg     nodeType = 44 // Emoji 图片
+	NodeEmojiUnicode nodeType = 44 // Emoji Unicode 字符
+	NodeEmojiImg     nodeType = 45 // Emoji 图片
 
 	// 数学公式
 
-	NodeMathBlock  nodeType = 45 // 数学公式块
-	NodeInlineMath nodeType = 46 // 内联数学公式
+	NodeMathBlock  nodeType = 46 // 数学公式块
+	NodeInlineMath nodeType = 47 // 内联数学公式
 )

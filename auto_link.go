@@ -32,8 +32,7 @@ func (t *Tree) parseGFMAutoEmailLink(node *Node) {
 func (t *Tree) parseGFMAutoLink(node *Node) {
 	for child := node.firstChild; nil != child; {
 		next := child.next
-		if NodeText == child.typ && nil != child.parent &&
-			NodeLink != child.parent.typ /* 不处理链接 label */ {
+		if NodeText == child.typ {
 			t.parseGFMAutoLink0(child)
 		} else {
 			t.parseGFMAutoLink(child) // 递归处理子节点
@@ -121,7 +120,7 @@ loopPart:
 			lastIndex := len(group) - 1
 			group = group[:lastIndex]
 			link := &Node{typ: NodeLink}
-			text := &Node{typ: NodeText, tokens: group}
+			text := &Node{typ: NodeLinkText, tokens: group}
 			link.AppendChild(text)
 			dest := &Node{typ: NodeLinkDest, tokens: append(mailto, group...)}
 			link.AppendChild(dest)
@@ -137,7 +136,7 @@ loopPart:
 		} else {
 			// 以字母或者数字结尾
 			link := &Node{typ: NodeLink}
-			text := &Node{typ: NodeText, tokens: group}
+			text := &Node{typ: NodeLinkText, tokens: group}
 			link.AppendChild(text)
 			dest := &Node{typ: NodeLinkDest, tokens: append(mailto, group...)}
 			link.AppendChild(dest)
@@ -352,8 +351,8 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		addr = append(addr, path...)
 
 		link := &Node{typ: NodeLink}
-		link.AppendChild(&Node{typ: NodeText, tokens: addr})
-		link.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(encodeDestination(dest))})
+		link.AppendChild(&Node{typ: NodeLinkText, tokens: addr})
+		link.AppendChild(&Node{typ: NodeLinkDest, tokens: encodeDestination(dest)})
 		node.InsertBefore(link)
 	}
 
@@ -467,7 +466,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 
 	ctx.pos += passed + 1
 	link := &Node{typ: NodeLink}
-	link.AppendChild(&Node{typ: NodeText, tokens: dest})
+	link.AppendChild(&Node{typ: NodeLinkText, tokens: dest})
 	link.AppendChild(&Node{typ: NodeLinkDest, tokens: append(mailto, dest...)})
 	return link
 }
@@ -503,7 +502,7 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 	}
 
 	ctx.pos = 1 + i
-	link.AppendChild(&Node{typ: NodeText, tokens: dest})
-	link.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(encodeDestination(dest))})
+	link.AppendChild(&Node{typ: NodeLinkText, tokens: dest})
+	link.AppendChild(&Node{typ: NodeLinkDest, tokens: encodeDestination(dest)})
 	return link
 }

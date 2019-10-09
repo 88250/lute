@@ -245,6 +245,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		for nil != tmp {
 			next = tmp.next
 			tmp.Unlink()
+			if NodeText == tmp.typ {
+				tmp.typ = NodeLinkText
+			}
 			node.AppendChild(tmp)
 			tmp = next
 		}

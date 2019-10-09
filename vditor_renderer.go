@@ -191,6 +191,18 @@ func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 }
 
 func (r *VditorRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", nil, [][]string{{"class", "marker"}}, false)
+	r.writeByte(itemCloseBracket)
+	r.tag("/span", nil, nil, false)
+	r.tag("span", nil, [][]string{{"class", "marker"}}, false)
+	r.writeByte(itemOpenParen)
+	dest := node.ChildByType(NodeLinkDest)
+	r.write(dest.tokens)
+	if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
+		r.write(title.tokens)
+	}
+	r.writeByte(itemCloseParen)
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
@@ -234,18 +246,7 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 		r.writeByte(itemOpenBracket)
 		r.tag("/span", nil, nil, false)
 	} else {
-		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
-		r.writeByte(itemCloseBracket)
-		r.tag("/span", nil, nil, false)
-		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
-		r.writeByte(itemOpenParen)
-		dest := node.ChildByType(NodeLinkDest)
-		r.write(dest.tokens)
-		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
-			r.write(title.tokens)
-		}
-		r.writeByte(itemCloseParen)
-		r.tag("/span", nil, nil, false)
+
 		r.tag("/a", nil, nil, false)
 	}
 	return WalkContinue, nil
@@ -659,7 +660,7 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 func (r *VditorRenderer) expand(node *Node) {
 	for p := node; nil != p; p = p.parent {
 		switch p.typ {
-		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink:
+		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink, NodeLinkText, NodeLinkDest, NodeLinkTitle:
 			p.expand = true
 			return
 		}

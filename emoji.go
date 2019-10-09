@@ -16,8 +16,7 @@ package lute
 func (t *Tree) emoji(node *Node) {
 	for child := node.firstChild; nil != child; {
 		next := child.next
-		if NodeText == child.typ && nil != child.parent &&
-			NodeLink != child.parent.typ /* 不处理链接 label */ {
+		if NodeText == child.typ {
 			t.emoji0(child)
 		} else {
 			t.emoji(child) // 递归处理子节点
