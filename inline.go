@@ -225,21 +225,21 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			// 查找链接引用
 			var link = t.context.linkRefDef[strings.ToLower(itemsToStr(reflabel))]
 			if nil != link {
-				dest = link.destination
-				title = link.title
+				dest = link.firstChild.next.tokens
+				titleNode := link.firstChild.next.next
+				if nil != titleNode {
+					title = titleNode.tokens
+				}
 				matched = true
 			}
 		}
 	}
 
 	if matched {
-		var node *Node
+		node := &Node{typ: NodeLink}
 		if isImage {
-			node = &Node{typ: NodeImage, destination: dest, title: title}
-		} else {
-			node = &Node{typ: NodeLink, destination: dest, title: title}
+			node.typ = NodeImage
 		}
-
 		var tmp, next *Node
 		tmp = opener.node.next
 		for nil != tmp {
@@ -248,6 +248,8 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			node.AppendChild(tmp)
 			tmp = next
 		}
+		node.AppendChild(&Node{typ: NodeLinkDest, tokens: dest})
+		node.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
 
 		t.processEmphasis(opener.previousDelimiter, ctx)
 		t.removeBracket(ctx)

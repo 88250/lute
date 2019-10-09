@@ -54,11 +54,6 @@ type Node struct {
 
 	*listData
 
-	// 链接、图片
-
-	destination items // 链接地址
-	title       items // 链接标题
-
 	// 任务列表项 [ ]、[x] 或者 [X]
 
 	taskListItemChecked bool // 是否勾选
@@ -84,6 +79,16 @@ type Node struct {
 	expand           bool   // 是否需要展开节点
 	caretStartOffset string // 光标插入起始偏移位置
 	caretEndOffset   string // 光标插入结束偏移位置
+}
+
+// LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。
+func (n *Node) ChildByType(childType nodeType) *Node {
+	for c := n.firstChild; nil != c; c = c.next {
+		if c.typ == childType {
+			return c
+		}
+	}
+	return nil
 }
 
 // Range 返回节点源码起始偏移和结束偏移位置。
@@ -302,28 +307,29 @@ const (
 	NodeSoftBreak            nodeType = 28 // 软换行
 	NodeLink                 nodeType = 29 // 链接
 	NodeImage                nodeType = 30 // 图片
+	NodeLinkDest             nodeType = 31 // 链接地址
+	NodeLinkTitle            nodeType = 32 // 链接标题
 
 	// GFM
 
-	NodeTaskListItemMarker        nodeType = 31 // 任务列表项标记符
-	NodeStrikethrough             nodeType = 32 // 删除线
-	NodeStrikethrough1OpenMarker  nodeType = 33 // 开始删除线标记符 ~
-	NodeStrikethrough1CloseMarker nodeType = 34 // 结束删除线标记符 ~
-	NodeStrikethrough2OpenMarker  nodeType = 35 // 开始删除线标记符 ~~
-	NodeStrikethrough2CloseMarker nodeType = 36 // 结束删除线标记符 ~~
-	NodeTable                     nodeType = 37 // 表
-	NodeTableHead                 nodeType = 38 // 表头
-	NodeTableRow                  nodeType = 39 // 表行
-	NodeTableCell                 nodeType = 40 // 表格
+	NodeTaskListItemMarker        nodeType = 33 // 任务列表项标记符
+	NodeStrikethrough             nodeType = 34 // 删除线
+	NodeStrikethrough1OpenMarker  nodeType = 35 // 开始删除线标记符 ~
+	NodeStrikethrough1CloseMarker nodeType = 36 // 结束删除线标记符 ~
+	NodeStrikethrough2OpenMarker  nodeType = 37 // 开始删除线标记符 ~~
+	NodeStrikethrough2CloseMarker nodeType = 38 // 结束删除线标记符 ~~
+	NodeTable                     nodeType = 39 // 表
+	NodeTableHead                 nodeType = 40 // 表头
+	NodeTableRow                  nodeType = 41 // 表行
+	NodeTableCell                 nodeType = 42 // 表格
 
 	// Emoji
 
-	NodeEmojiUnicode nodeType = 41 // Emoji Unicode 字符
-	NodeEmojiImg     nodeType = 42 // Emoji 图片
+	NodeEmojiUnicode nodeType = 43 // Emoji Unicode 字符
+	NodeEmojiImg     nodeType = 44 // Emoji 图片
 
 	// 数学公式
 
-	NodeMathBlock  nodeType = 43 // 数学公式块
-	NodeInlineMath nodeType = 44 // 内联数学公式
-
+	NodeMathBlock  nodeType = 45 // 数学公式块
+	NodeInlineMath nodeType = 46 // 内联数学公式
 )

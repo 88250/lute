@@ -59,6 +59,8 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
+	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
 	ret.rendererFuncs[NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
 	ret.rendererFuncs[NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
@@ -160,20 +162,31 @@ func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 	return WalkStop, nil
 }
 
+func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
+	if nil != node.tokens {
+		r.writeString(" \"")
+		r.write(node.tokens)
+		r.writeString("\"")
+	}
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
+	return WalkStop, nil
+}
+
 func (r *FormatRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("![")
-		r.write(node.firstChild.tokens)
-		r.writeString("](")
-		r.write(node.destination)
-		if nil != node.title {
-			r.writeString(" \"")
-			r.write(node.title)
-			r.writeByte(itemDoublequote)
+		if nil != node.firstChild {
+			r.write(node.firstChild.tokens)
 		}
-		r.writeByte(itemCloseParen)
+		r.writeString("](")
+	} else {
+		r.writeString(")")
 	}
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 func (r *FormatRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
@@ -184,15 +197,10 @@ func (r *FormatRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 			r.write(node.firstChild.tokens)
 		}
 		r.writeString("](")
-		r.write(node.destination)
-		if nil != node.title {
-			r.writeString(" \"")
-			r.write(node.title)
-			r.writeByte(itemDoublequote)
-		}
-		r.writeByte(itemCloseParen)
+	} else {
+		r.writeString(")")
 	}
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 func (r *FormatRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {

@@ -57,6 +57,8 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
+	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
 	ret.rendererFuncs[NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
 	ret.rendererFuncs[NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
@@ -200,11 +202,19 @@ func (r *HTMLRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool
 	return WalkStop, nil
 }
 
+func (r *HTMLRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
 func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			r.write(escapeHTML(node.destination))
+			r.write(escapeHTML(node.ChildByType(NodeLinkDest).tokens))
 			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
@@ -214,9 +224,9 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 	r.disableTags--
 	if 0 == r.disableTags {
 		r.writeString("\"")
-		if nil != node.title {
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens  {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(node.title))
+			r.write(escapeHTML(title.tokens))
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -226,16 +236,15 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 
 func (r *HTMLRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		attrs := [][]string{{"href", itemsToStr(escapeHTML(node.destination))}}
-		if nil != node.title {
-			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(node.title))})
+		dest := node.ChildByType(NodeLinkDest)
+		attrs := [][]string{{"href", itemsToStr(escapeHTML(dest.tokens))}}
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
+			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(title.tokens))})
 		}
 		r.tag("a", attrs, false)
-
-		return WalkContinue, nil
+	} else {
+		r.tag("/a", nil, false)
 	}
-
-	r.tag("/a", nil, false)
 	return WalkContinue, nil
 }
 

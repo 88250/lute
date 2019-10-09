@@ -120,9 +120,11 @@ loopPart:
 			// 如果以 . 结尾则剔除该 .
 			lastIndex := len(group) - 1
 			group = group[:lastIndex]
-			link := &Node{typ: NodeLink, destination: append(mailto, group...)}
+			link := &Node{typ: NodeLink}
 			text := &Node{typ: NodeText, tokens: group}
 			link.AppendChild(text)
+			dest := &Node{typ: NodeLinkDest, tokens: append(mailto, group...)}
+			link.AppendChild(dest)
 			node.InsertBefore(link)
 			// . 作为文本节点插入
 			text = &Node{typ: NodeText, tokens: items{item}}
@@ -134,9 +136,11 @@ loopPart:
 			continue loopPart
 		} else {
 			// 以字母或者数字结尾
-			link := &Node{typ: NodeLink, destination: append(mailto, group...)}
+			link := &Node{typ: NodeLink}
 			text := &Node{typ: NodeText, tokens: group}
 			link.AppendChild(text)
+			dest := &Node{typ: NodeLinkDest, tokens: append(mailto, group...)}
+			link.AppendChild(dest)
 			node.InsertBefore(link)
 		}
 	}
@@ -347,9 +351,9 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		addr = append(addr, domain...)
 		addr = append(addr, path...)
 
-		link := &Node{typ: NodeLink, destination: strToItems(encodeDestination(dest))}
-		text := &Node{typ: NodeText, tokens: addr}
-		link.AppendChild(text)
+		link := &Node{typ: NodeLink}
+		link.AppendChild(&Node{typ: NodeText, tokens: addr})
+		link.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(encodeDestination(dest))})
 		node.InsertBefore(link)
 	}
 
@@ -462,9 +466,9 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	}
 
 	ctx.pos += passed + 1
-	link := &Node{typ: NodeLink, destination: append(mailto, dest...)}
-	text := &Node{typ: NodeText, tokens: dest}
-	link.AppendChild(text)
+	link := &Node{typ: NodeLink}
+	link.AppendChild(&Node{typ: NodeText, tokens: dest})
+	link.AppendChild(&Node{typ: NodeLinkDest, tokens: append(mailto, dest...)})
 	return link
 }
 
@@ -493,13 +497,13 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 		return nil
 	}
 
-	link := &Node{typ: NodeLink, destination: strToItems(encodeDestination(dest))}
+	link := &Node{typ: NodeLink}
 	if itemGreater != ctx.tokens[i].term() {
 		return nil
 	}
 
 	ctx.pos = 1 + i
-	text := &Node{typ: NodeText, tokens: dest}
-	link.AppendChild(text)
+	link.AppendChild(&Node{typ: NodeText, tokens: dest})
+	link.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(encodeDestination(dest))})
 	return link
 }
