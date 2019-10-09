@@ -65,6 +65,8 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
+	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
 	ret.rendererFuncs[NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
 	ret.rendererFuncs[NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
@@ -188,11 +190,19 @@ func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 	return WalkStop, nil
 }
 
+func (r *VditorRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
 func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			r.write(escapeHTML(node.destination))
+			r.write(escapeHTML(node.ChildByType(NodeLinkDest).tokens))
 			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
@@ -202,9 +212,9 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 	r.disableTags--
 	if 0 == r.disableTags {
 		r.writeString("\"")
-		if nil != node.title {
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(node.title))
+			r.write(escapeHTML(title.tokens))
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -214,33 +224,30 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 
 func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node, [][]string{{"class", "node"}}, false)
-		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
+		dest := node.ChildByType(NodeLinkDest)
+		attrs := [][]string{{"class", "node"}, {"href", itemsToStr(escapeHTML(dest.tokens))}}
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
+			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(title.tokens))})
+		}
+		r.tag("a", node, attrs, false)
+		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
 		r.writeByte(itemOpenBracket)
 		r.tag("/span", nil, nil, false)
-
-		attrs = [][]string{{"href", itemsToStr(escapeHTML(node.destination))}}
-		if nil != node.title {
-			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(node.title))})
-		}
-		r.tag("a", nil, attrs, false)
 	} else {
-		r.tag("/a", nil, nil, false)
-		attrs := [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
+		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
 		r.writeByte(itemCloseBracket)
 		r.tag("/span", nil, nil, false)
-		attrs = [][]string{{"class", "marker"}}
-		r.tag("span", nil, attrs, false)
+		r.tag("span", nil, [][]string{{"class", "marker"}}, false)
 		r.writeByte(itemOpenParen)
-		r.write(node.destination)
-		// TODO: title
+		dest := node.ChildByType(NodeLinkDest)
+		r.write(dest.tokens)
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
+			r.write(title.tokens)
+		}
 		r.writeByte(itemCloseParen)
 		r.tag("/span", nil, nil, false)
-		r.tag("/span", nil, nil, false)
+		r.tag("/a", nil, nil, false)
 	}
-
 	return WalkContinue, nil
 }
 
