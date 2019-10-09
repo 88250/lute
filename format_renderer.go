@@ -59,6 +59,11 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeBang] = ret.renderBang
+	ret.rendererFuncs[NodeOpenBracket] = ret.renderOpenBracket
+	ret.rendererFuncs[NodeCloseBracket] = ret.renderCloseBracket
+	ret.rendererFuncs[NodeOpenParen] = ret.renderOpenParen
+	ret.rendererFuncs[NodeCloseParen] = ret.renderCloseParen
 	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
 	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
 	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
@@ -164,7 +169,7 @@ func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 }
 
 func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
-	if nil != node.tokens {
+	if entering {
 		r.writeString(" \"")
 		r.write(node.tokens)
 		r.writeString("\"")
@@ -174,7 +179,6 @@ func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus,
 
 func (r *FormatRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("](")
 		r.write(node.tokens)
 	}
 	return WalkStop, nil
@@ -187,21 +191,36 @@ func (r *FormatRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, 
 	return WalkStop, nil
 }
 
+func (r *FormatRenderer) renderCloseParen(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemCloseParen)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderOpenParen(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemOpenParen)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderCloseBracket(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemCloseBracket)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderOpenBracket(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemOpenBracket)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderBang(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemBang)
+	return WalkStop, nil
+}
+
 func (r *FormatRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeString("![")
-	} else {
-		r.writeString(")")
-	}
 	return WalkContinue, nil
 }
 
 func (r *FormatRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeString("[")
-	} else {
-		r.writeString(")")
-	}
 	return WalkContinue, nil
 }
 

@@ -57,6 +57,11 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
 	ret.rendererFuncs[NodeLink] = ret.renderLink
 	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeBang] = ret.renderBang
+	ret.rendererFuncs[NodeOpenBracket] = ret.renderOpenBracket
+	ret.rendererFuncs[NodeCloseBracket] = ret.renderCloseBracket
+	ret.rendererFuncs[NodeOpenParen] = ret.renderOpenParen
+	ret.rendererFuncs[NodeCloseParen] = ret.renderCloseParen
 	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
 	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
 	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
@@ -204,15 +209,37 @@ func (r *HTMLRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool
 }
 
 func (r *HTMLRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 func (r *HTMLRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 func (r *HTMLRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.tokens))
+	if entering {
+		r.write(escapeHTML(node.tokens))
+	}
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderCloseParen(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderOpenParen(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderCloseBracket(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderOpenBracket(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderBang(node *Node, entering bool) (WalkStatus, error) {
 	return WalkStop, nil
 }
 
@@ -230,7 +257,7 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 	r.disableTags--
 	if 0 == r.disableTags {
 		r.writeString("\"")
-		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens  {
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			r.writeString(" title=\"")
 			r.write(escapeHTML(title.tokens))
 			r.writeString("\"")

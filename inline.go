@@ -225,8 +225,8 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			// 查找链接引用
 			var link = t.context.linkRefDef[strings.ToLower(itemsToStr(reflabel))]
 			if nil != link {
-				dest = link.firstChild.next.tokens
-				titleNode := link.firstChild.next.next
+				dest = link.ChildByType(NodeLinkDest).tokens
+				titleNode := link.ChildByType(NodeLinkTitle)
 				if nil != titleNode {
 					title = titleNode.tokens
 				}

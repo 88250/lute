@@ -82,7 +82,6 @@ func (context *Context) parseLinkRefDef(tokens items) items {
 	if _, ok := context.linkRefDef[bytesToStr(lowerCaseLabel)]; !ok {
 		context.linkRefDef[bytesToStr(lowerCaseLabel)] = link
 	}
-
 	return remains
 }
 

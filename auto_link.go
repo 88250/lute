@@ -458,7 +458,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	}
 
 	ctx.pos += passed + 1
-	return t.newLink(NodeLink, dest, dest, nil)
+	return t.newLink(NodeLink, dest, append(mailto, dest...), nil)
 }
 
 func (t *Tree) newLink(typ nodeType, text, dest, title items) (ret *Node) {
