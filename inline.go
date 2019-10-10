@@ -186,6 +186,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			space = passed
 			ctx.pos += len(passed)
 			matched = itemCloseParen == remains[0].term()
+			closeParen = remains[:]
 			if matched {
 				break
 			}
@@ -196,7 +197,8 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			ctx.pos += len(passed)
 			isLink, passed, remains = remains.spnl()
 			ctx.pos += len(passed)
-			matched = isLink && itemCloseParen == remains[0].term()
+			matched = isLink && 0 < len(remains) && itemCloseParen == remains[0].term()
+			closeParen = remains[0:]
 			break
 		}
 		if !matched {
