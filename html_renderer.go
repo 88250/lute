@@ -63,6 +63,7 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeOpenParen] = ret.renderOpenParen
 	ret.rendererFuncs[NodeCloseParen] = ret.renderCloseParen
 	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
+	ret.rendererFuncs[NodeLinkSpace] = ret.renderLinkSpace
 	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
 	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
@@ -209,11 +210,15 @@ func (r *HTMLRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool
 }
 
 func (r *HTMLRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderLinkSpace(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {

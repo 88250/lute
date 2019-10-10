@@ -149,7 +149,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 
 	// Check to see if we have a link/image
 
-	var openParen, closeParen, dest, title items
+	var openParen, dest, space, title, closeParen items
 	savepos := ctx.pos
 	matched := false
 	// 尝试解析内联链接 [text](url "tile")
@@ -177,11 +177,13 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			if 1 > len(remains) || !isWhitespace(remains[0].term()) {
 				break
 			}
-			// 跟空格的话后续尝试 title 解析
+
 			ctx.pos++
+			// 跟空格的话后续尝试 title 解析
 			if isLink, passed, remains = remains.spnl(); !isLink {
 				break
 			}
+			space = passed
 			ctx.pos += len(passed)
 			matched = itemCloseParen == remains[0].term()
 			if matched {
@@ -259,6 +261,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		node.AppendChild(&Node{typ: NodeCloseBracket, tokens: closeBracket})
 		node.AppendChild(&Node{typ: NodeOpenParen, tokens: openParen})
 		node.AppendChild(&Node{typ: NodeLinkDest, tokens: dest})
+		if nil != space {
+			node.AppendChild(&Node{typ: NodeLinkSpace, tokens: space})
+		}
 		if 0 < len(title) {
 			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
 		}

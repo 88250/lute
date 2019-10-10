@@ -72,6 +72,7 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeCloseParen] = ret.renderCloseParen
 	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
 	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
+	ret.rendererFuncs[NodeLinkSpace] = ret.renderLinkSpace
 	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
 	ret.rendererFuncs[NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
@@ -198,9 +199,16 @@ func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 
 func (r *VditorRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("span", node, [][]string{{"class", "marker"}}, false)
-	r.writeString(" \"")
+	r.writeString("\"")
 	r.write(node.tokens)
 	r.writeString("\"")
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderLinkSpace(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.write(node.tokens)
 	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }

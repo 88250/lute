@@ -65,6 +65,7 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeOpenParen] = ret.renderOpenParen
 	ret.rendererFuncs[NodeCloseParen] = ret.renderCloseParen
 	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
+	ret.rendererFuncs[NodeLinkSpace] = ret.renderLinkSpace
 	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
 	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
 	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
@@ -169,25 +170,24 @@ func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 }
 
 func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeString(" \"")
-		r.write(node.tokens)
-		r.writeString("\"")
-	}
+	r.writeString("\"")
+	r.write(node.tokens)
+	r.writeString("\"")
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
+	r.write(node.tokens)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderLinkSpace(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemSpace)
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -225,18 +225,14 @@ func (r *FormatRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *FormatRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-		r.write(node.tokens)
-		r.newline()
-	}
+	r.newline()
+	r.write(node.tokens)
+	r.newline()
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -284,15 +280,13 @@ func (r *FormatRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		if r.option.AutoSpace {
-			r.space(node)
-		}
-		if r.option.FixTermTypo {
-			r.fixTermTypo(node)
-		}
-		r.write(escapeHTML(node.tokens))
+	if r.option.AutoSpace {
+		r.space(node)
 	}
+	if r.option.FixTermTypo {
+		r.fixTermTypo(node)
+	}
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
