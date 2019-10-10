@@ -20,7 +20,8 @@ import (
 
 var debugTests = []parseTest{
 
-	{"32", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},
+	{"34", "[foo](/bar )1\n", "<p><a href=\"/bar\">foo</a>1</p>\n"},
+	{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},
 	{"32", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
 	{"31", "**foo*<br>", "<p>*<em>foo</em><br></p>\n"},
 	{"30", "https://t.mex .mex 后缀不自动链接", "<p>https://t.mex .mex 后缀不自动链接</p>\n"},

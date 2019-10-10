@@ -177,8 +177,6 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			if 1 > len(remains) || !isWhitespace(remains[0].term()) {
 				break
 			}
-
-			ctx.pos++
 			// 跟空格的话后续尝试 title 解析
 			if isLink, passed, remains = remains.spnl(); !isLink {
 				break
@@ -186,10 +184,11 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			space = passed
 			ctx.pos += len(passed)
 			matched = itemCloseParen == remains[0].term()
-			closeParen = remains[:]
+			closeParen = remains[0:1]
 			if matched {
 				break
 			}
+			ctx.pos++
 			validTitle := false
 			if validTitle, passed, remains, title = t.context.parseLinkTitle(remains); !validTitle {
 				break
