@@ -222,7 +222,7 @@ func (r *VditorRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, 
 
 func (r *VditorRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("span", node, nil, false)
-	r.write(escapeHTML(node.tokens))
+	r.write(node.tokens)
 	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
@@ -263,7 +263,7 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			r.write(escapeHTML(node.ChildByType(NodeLinkDest).tokens))
+			r.write(node.ChildByType(NodeLinkDest).tokens)
 			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
@@ -275,7 +275,7 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 		r.writeString("\"")
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(title.tokens))
+			r.write(title.tokens)
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -286,9 +286,9 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
-		attrs := [][]string{{"class", "node"}, {"href", itemsToStr(escapeHTML(dest.tokens))}}
+		attrs := [][]string{{"class", "node"}, {"href", itemsToStr(dest.tokens)}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
-			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(title.tokens))})
+			attrs = append(attrs, []string{"title", itemsToStr(title.tokens)})
 		}
 		r.tag("a", node, attrs, false)
 	} else {
@@ -342,7 +342,7 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("span", node, nil, false)
-		r.write(escapeHTML(node.tokens))
+		r.write((node.tokens))
 		r.tag("/span", nil, nil, false)
 	}
 	return WalkStop, nil
@@ -504,7 +504,7 @@ func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("blockquote", node.parent, [][]string{{"class", "node node--block"}}, false)
 	r.tag("span", node, [][]string{{"class", "marker"}}, false)
-	r.write(escapeHTML(node.tokens))
+	r.write(node.tokens)
 	r.tag("/span", node, nil, false)
 	return WalkStop, nil
 }
