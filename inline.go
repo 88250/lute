@@ -149,7 +149,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 
 	// Check to see if we have a link/image
 
-	var dest, title items
+	var openParen, closeParen, dest, title items
 	savepos := ctx.pos
 	matched := false
 	// 尝试解析内联链接 [text](url "tile")
@@ -167,6 +167,8 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				break
 			}
 			ctx.pos += len(passed)
+			openParen = passed[0:1]
+			closeParen = passed[len(passed)-1:]
 			matched = itemCloseParen == passed[len(passed)-1].term()
 			if matched {
 				ctx.pos--
@@ -241,7 +243,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			node.typ = NodeImage
 			node.AppendChild(&Node{typ: NodeBang})
 		}
-		node.AppendChild(&Node{typ: NodeOpenBracket})
+		node.AppendChild(&Node{typ: NodeOpenBracket, tokens: opener.node.tokens})
 
 		var tmp, next *Node
 		tmp = opener.node.next
@@ -254,13 +256,13 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			node.AppendChild(tmp)
 			tmp = next
 		}
-		node.AppendChild(&Node{typ: NodeCloseBracket})
-		node.AppendChild(&Node{typ: NodeOpenParen})
+		node.AppendChild(&Node{typ: NodeCloseBracket, tokens: closeBracket})
+		node.AppendChild(&Node{typ: NodeOpenParen, tokens: openParen})
 		node.AppendChild(&Node{typ: NodeLinkDest, tokens: dest})
 		if 0 < len(title) {
 			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
 		}
-		node.AppendChild(&Node{typ: NodeCloseParen})
+		node.AppendChild(&Node{typ: NodeCloseParen, tokens: closeParen})
 
 		t.processEmphasis(opener.previousDelimiter, ctx)
 		t.removeBracket(ctx)
