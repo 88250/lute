@@ -17,17 +17,17 @@ import (
 	"unicode/utf8"
 )
 
-// delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _）相关信息。
+// delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _, ~）相关信息。
 type delimiter struct {
-	node           *Node      // the text node point to
-	typ            byte       // the type of delimiter ([, ![, *, _)
-	num            int        // the number of delimiters
-	originalNum    int        // the original number of delimiters
-	canOpen        bool       // whether the delimiter is a potential opener
-	canClose       bool       // whether the delimiter is a potential closer
-	previous, next *delimiter // doubly linked list
+	node           *Node      // 分隔符对应的文本节点
+	typ            byte       // 分隔符字节 [*_~
+	num            int        // 分隔符字节数
+	originalNum    int        // 原始分隔符字节数
+	canOpen        bool       // 是否是开始分隔符
+	canClose       bool       // 是否是结束分隔符
+	previous, next *delimiter // 双向链表前后节点
 
-	active            bool // whether the delimiter is "active" (all are active to start)
+	active            bool
 	image             bool
 	bracketAfter      bool
 	index             int
