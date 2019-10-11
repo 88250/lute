@@ -63,6 +63,10 @@ type Node struct {
 	tableAligns    []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
 	tableCellAlign int   // 表的单元格对齐方式
 
+	// 链接
+
+	linkType int // 链接类型，0：内联链接 [foo](/bar)，1：链接引用 [label]，2：自动链接
+
 	// 标题
 
 	headingLevel int // 1~6
