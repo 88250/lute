@@ -241,7 +241,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	}
 
 	if matched {
-		node := &Node{typ: NodeLink}
+		node := &Node{typ: NodeLink, linkType: 0}
 		if isImage {
 			node.typ = NodeImage
 			node.AppendChild(&Node{typ: NodeBang})
