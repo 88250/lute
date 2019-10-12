@@ -22,6 +22,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
+	{"22", "https://hacpai.com\n", "<p data-ntype=\"1\" data-mtype=\"0\"><a class=\"node node--expand\" href=\"/bar\" data-ntype=\"29\" data-mtype=\"2\"><span class=\"marker\">[</span><span data-cso=\"1\" data-ceo=\"1\">foo</span><span class=\"marker\">]</span><span class=\"marker\">(</span><span class=\"marker\">/bar</span><span class=\"marker\"> </span><span class=\"marker\">)</span></a><span class=\"newline\">\n\n</span></p>"},
 	{"21", "[foo](/bar )1\n", "<p data-ntype=\"1\" data-mtype=\"0\"><a class=\"node node--expand\" href=\"/bar\" data-ntype=\"29\" data-mtype=\"2\"><span class=\"marker\">[</span><span data-cso=\"1\" data-ceo=\"1\">foo</span><span class=\"marker\">]</span><span class=\"marker\">(</span><span class=\"marker\">/bar</span><span class=\"marker\"> </span><span class=\"marker\">)</span></a><span class=\"newline\">\n\n</span></p>"},
 	{"20", "[foo](/bar)\n", "<p data-ntype=\"1\" data-mtype=\"0\"><a class=\"node node--expand\" href=\"/bar\" data-ntype=\"29\" data-mtype=\"2\"><span class=\"marker\">[</span><span data-cso=\"1\" data-ceo=\"1\">foo</span><span class=\"marker\">]</span><span class=\"marker\">(</span><span class=\"marker\">/bar</span><span class=\"marker\">)</span></a><span class=\"newline\">\n\n</span></p>"},
 	{"19", "* foo\n\n  bar", "<ul data-ntype=\"7\" data-mtype=\"1\"><li class=\"node node--block node--expand\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">* </span><p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">foo</span><span class=\"newline\">\n\n</span></p><p data-ntype=\"1\" data-mtype=\"0\"><span>bar</span><span class=\"newline\">\n\n</span></p></li></ul>"},
@@ -50,7 +51,7 @@ func TestVditorRenderer(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range vditorRendererTests {
-		html, err := luteEngine.RenderVditorDOM(test.from, 13, 13)
+		html, err := luteEngine.RenderVditorDOM(test.from, 18, 18)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}

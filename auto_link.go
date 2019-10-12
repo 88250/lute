@@ -119,7 +119,7 @@ loopPart:
 			// 如果以 . 结尾则剔除该 .
 			lastIndex := len(group) - 1
 			group = group[:lastIndex]
-			link := t.newLink(NodeLink, group, append(mailto, group...), nil)
+			link := t.newLink(NodeLink, group, append(mailto, group...), nil, 2)
 			node.InsertBefore(link)
 			// . 作为文本节点插入
 			node.InsertBefore(&Node{typ: NodeText, tokens: items{item}})
@@ -130,7 +130,7 @@ loopPart:
 			continue loopPart
 		} else {
 			// 以字母或者数字结尾
-			link := &Node{typ: NodeLink}
+			link := &Node{typ: NodeLink, linkType: 2}
 			text := &Node{typ: NodeLinkText, tokens: group}
 			link.AppendChild(text)
 			dest := &Node{typ: NodeLinkDest, tokens: append(mailto, group...)}
@@ -345,7 +345,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		addr = append(addr, domain...)
 		addr = append(addr, path...)
 
-		link := t.newLink(NodeLink, addr, encodeDestination(dest), nil)
+		link := t.newLink(NodeLink, addr, encodeDestination(dest), nil, 2)
 		node.InsertBefore(link)
 	}
 
@@ -458,11 +458,11 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *Node) {
 	}
 
 	ctx.pos += passed + 1
-	return t.newLink(NodeLink, dest, append(mailto, dest...), nil)
+	return t.newLink(NodeLink, dest, append(mailto, dest...), nil, 2)
 }
 
-func (t *Tree) newLink(typ nodeType, text, dest, title items) (ret *Node) {
-	ret = &Node{typ: typ}
+func (t *Tree) newLink(typ nodeType, text, dest, title items, linkType int) (ret *Node) {
+	ret = &Node{typ: typ, linkType: linkType}
 	if NodeImage == typ {
 		ret.AppendChild(&Node{typ: NodeBang})
 	}
@@ -507,5 +507,5 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *Node) {
 		return nil
 	}
 	ctx.pos = 1 + i
-	return t.newLink(NodeLink, dest, encodeDestination(dest), nil)
+	return t.newLink(NodeLink, dest, encodeDestination(dest), nil, 2)
 }

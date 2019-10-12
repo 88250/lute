@@ -284,8 +284,19 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 }
 
 func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
+	dest := node.ChildByType(NodeLinkDest)
+	if 2 == node.linkType || 1 == node.linkType {
+		// 自动链接和链接引用渲染为文本
+		dest.caretStartOffset = node.caretStartOffset
+		dest.caretEndOffset = node.caretEndOffset
+		dest.expand = node.expand
+		r.tag("span", dest, nil, false)
+		r.write(dest.tokens)
+		r.tag("/span", nil, nil, false)
+		return WalkStop, nil
+	}
+
 	if entering {
-		dest := node.ChildByType(NodeLinkDest)
 		attrs := [][]string{{"class", "node"}, {"href", itemsToStr(dest.tokens)}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			attrs = append(attrs, []string{"title", itemsToStr(title.tokens)})
@@ -340,11 +351,9 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("span", node, nil, false)
-		r.write((node.tokens))
-		r.tag("/span", nil, nil, false)
-	}
+	r.tag("span", node, nil, false)
+	r.write((node.tokens))
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
