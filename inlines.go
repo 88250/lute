@@ -62,7 +62,7 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 		// 2. 方便后续功能方面的处理，比如 GFM 自动链接解析
 		t.mergeText(node)
 
-		if t.context.option.GFMAutoLink {
+		if t.context.option.GFMAutoLink && !t.context.option.VditorWYSIWYG {
 			t.parseGFMAutoEmailLink(node)
 			t.parseGFMAutoLink(node)
 		}
