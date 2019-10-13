@@ -590,9 +590,15 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 
 func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("hr", node, nil, true)
+		r.tag("div", nil, nil, false)
+		r.tag("span", node, [][]string{{"class", "marker"}}, false)
+		r.write(node.tokens)
+		r.tag("/span", nil, nil, false)
+		r.tag("hr", nil, nil, true)
+	} else {
+		r.tag("/div", nil, nil, false)
 	}
-	return WalkSkipChildren, nil
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
