@@ -20,6 +20,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"35", "* [ ] foo [foo](/bar)\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo <a href=\"/bar\">foo</a></li>\n</ul>\n"},
 	{"34", "[foo](/bar )1\n", "<p><a href=\"/bar\">foo</a>1</p>\n"},
 	{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},
 	{"32", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
