@@ -63,10 +63,10 @@ func TestVditorRenderer(t *testing.T) {
 	}
 }
 
-func TestVditorNewline(t *testing.T) {
+func TestVditorOperation(t *testing.T) {
 	luteEngine := lute.New()
 
-	html, err := luteEngine.VditorNewline(8, map[string]interface{}{"marker": "* "})
+	html, err := luteEngine.VditorOperation("**foo**", 2, 2, "newline")
 	if nil != err {
 		t.Fatalf("unexpected: %s", err)
 	}
