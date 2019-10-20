@@ -22,6 +22,7 @@ import (
 
 var vditorRendererTests = []parseTest{
 
+	{"23", "-\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">-</span><span class=\"newline\">\n\n</span></p>"},
 	{"22", "https://hacpai.com\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"2\" data-ceo=\"2\">https://hacpai.com</span><span class=\"newline\">\n\n</span></p>"},
 	{"21", "[foo](/bar )1\n", "<p data-ntype=\"1\" data-mtype=\"0\"><a class=\"node node--expand\" href=\"/bar\" data-ntype=\"29\" data-mtype=\"2\"><span class=\"marker\">[</span><span data-cso=\"1\" data-ceo=\"1\">foo</span><span class=\"marker\">]</span><span class=\"marker\">(</span><span class=\"marker\">/bar</span><span class=\"marker\"> </span><span class=\"marker\">)</span></a><span>1</span><span class=\"newline\">\n\n</span></p>"},
 	{"20", "[foo](/bar)\n", "<p data-ntype=\"1\" data-mtype=\"0\"><a class=\"node node--expand\" href=\"/bar\" data-ntype=\"29\" data-mtype=\"2\"><span class=\"marker\">[</span><span data-cso=\"1\" data-ceo=\"1\">foo</span><span class=\"marker\">]</span><span class=\"marker\">(</span><span class=\"marker\">/bar</span><span class=\"marker\">)</span></a><span class=\"newline\">\n\n</span></p>"},
@@ -36,7 +37,7 @@ var vditorRendererTests = []parseTest{
 	{"11", "> # foo\n", "<blockquote class=\"node node--block node--expand\" data-ntype=\"5\" data-mtype=\"1\"><span class=\"marker\" data-cso=\"2\" data-ceo=\"2\">> </span><h1 class=\"node\" data-ntype=\"2\" data-mtype=\"0\"><span class=\"marker\"># </span><span>foo</span></h1></blockquote>"},
 	{"10", "> #\n", "<blockquote class=\"node node--block node--expand\" data-ntype=\"5\" data-mtype=\"1\"><span class=\"marker\" data-cso=\"2\" data-ceo=\"2\">> </span><h1 class=\"node\" data-ntype=\"2\" data-mtype=\"0\"><span class=\"marker\">#\n</span></h1></blockquote>"},
 	{"9", "> ## foo\n", "<blockquote class=\"node node--block node--expand\" data-ntype=\"5\" data-mtype=\"1\"><span class=\"marker\" data-cso=\"2\" data-ceo=\"2\">> </span><h2 class=\"node\" data-ntype=\"2\" data-mtype=\"0\"><span class=\"marker\">## </span><span>foo</span></h2></blockquote>"},
-	{"8", "-- ---\n", "<div><span class=\"marker\" data-cso=\"2\" data-ceo=\"2\">-- ---</span><hr /></div>"},
+	{"8", "-- ---\n", "<div class=\"node\"><span class=\"marker\" data-cso=\"2\" data-ceo=\"2\">-- ---</span><hr /></div>"},
 	{"7", "__foo__\n", "<p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node node--expand\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\" data-cso=\"2\" data-ceo=\"2\">__</span><span>foo</span><span class=\"marker\">__</span></strong><span class=\"newline\">\n\n</span></p>"},
 	{"6", "`foo`\n", "<p data-ntype=\"1\" data-mtype=\"0\"><code class=\"node node--expand\" data-ntype=\"23\" data-mtype=\"2\"><span class=\"marker\">`</span>foo<span class=\"marker\">`</span></code><span class=\"newline\">\n\n</span></p>"},
 	{"5", "**foo**\n", "<p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node node--expand\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\" data-cso=\"2\" data-ceo=\"2\">**</span><span>foo</span><span class=\"marker\">**</span></strong><span class=\"newline\">\n\n</span></p>"},

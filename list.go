@@ -96,6 +96,13 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 		return nil
 	}
 
+	if t.context.option.VditorWYSIWYG {
+		// Vditor 所见即所得模式下列表项内容部分不能为空
+		if itemNewline == token.term() {
+			return nil
+		}
+	}
+
 	// 如果要打断段落，则列表项内容部分不能为空
 	if container.typ == NodeParagraph && itemNewline == ln[t.context.nextNonspace+markerLength].term() {
 		return nil

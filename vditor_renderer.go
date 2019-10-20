@@ -590,7 +590,7 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 
 func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("div", nil, nil, false)
+		r.tag("div", nil, [][]string{{"class", "node"}}, false)
 		r.tag("span", node, [][]string{{"class", "marker"}}, false)
 		r.write(node.tokens)
 		r.tag("/span", nil, nil, false)
