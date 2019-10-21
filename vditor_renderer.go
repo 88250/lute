@@ -352,7 +352,7 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("span", node, nil, false)
-	r.write((node.tokens))
+	r.write(node.tokens)
 	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
@@ -739,7 +739,7 @@ func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, s
 	tokens := make(items, 0, len(nodes)*4)
 	for i := 0; i < length; i++ {
 		n = nodes[i]
-		for i, _ := range n.tokens {
+		for i := range n.tokens {
 			n.tokens[i].node = n
 		}
 		tokens = append(tokens, n.tokens...)
@@ -798,7 +798,7 @@ func (r *VditorRenderer) nearest(selected []*Node, offset int) (ret *Node) {
 // byteOffset 返回字符偏移位置在 str 中考虑字符编码情况下的字节偏移位置。
 func (r *VditorRenderer) byteOffset(str string, runeStartOffset, runeEndOffset int) (startOffset, endOffset int) {
 	runes := 0
-	for i, _ := range str {
+	for i := range str {
 		runes++
 		if runes > runeStartOffset {
 			startOffset = i

@@ -14,8 +14,6 @@
 
 package lute
 
-import "strconv"
-
 // RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
 func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset int) (html string, err error) {
 	var tree *Tree
@@ -61,20 +59,63 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	}
 
 	// TODO: 仅实现了光标插入位置节点获取，选段映射待实现
+
+	var newText items
 	en := renderer.nearest(nodes, endOffset)
-	sn := en
-	baseOffset := 0
-	if 0 < len(sn.tokens) {
-		baseOffset = sn.tokens[0].Offset()
+	switch en.typ {
+	case NodeStrongA6kOpenMarker, NodeStrongA6kCloseMarker, NodeStrongU8eOpenMarker, NodeStrongU8eCloseMarker:
+		en = en.parent
+	case NodeText:
+		newText = en.tokens[endOffset:]
+		en.tokens = en.tokens[:endOffset]
+		en = &Node{typ: NodeText, tokens: newText, parent: en.parent, next: en.next}
 	}
 
-	startOffset = startOffset - baseOffset
-	endOffset = endOffset - baseOffset
-	startOffset, endOffset = renderer.runeOffset(itemsToBytes(sn.tokens), startOffset, endOffset)
-	sn.caretStartOffset = strconv.Itoa(startOffset)
-	en.caretEndOffset = strconv.Itoa(endOffset)
-	renderer.expand(sn)
+	// 在父节点方向上获取节点路径
+	var pathNodes []*Node
+	var parent *Node
+	for parent = en.parent; ; parent = parent.parent {
+		pathNodes = append(pathNodes, parent)
+		if NodeDocument == parent.typ || NodeListItem == parent.typ || NodeBlockquote == parent.typ {
+			// 遇到块容器则停止
+			break
+		}
+	}
 
+	// 克隆新的节点路径
+	length := len(pathNodes)
+	top := pathNodes[length-1]
+	newPath := &Node{typ: top.typ}
+	if NodeListItem == top.typ {
+		newPath.listData = top.listData
+	}
+	for i := length - 2; 0 <= i; i-- {
+		n := pathNodes[i]
+		newNode := &Node{typ: n.typ}
+		newPath.AppendChild(newNode)
+		newPath = newNode
+	}
+
+	// 把选段及其后续节点挂到新路径下
+	en.caretStartOffset = "0"
+	en.caretEndOffset = "0"
+	en.expand = true
+	for next := en; nil != next; next = next.next {
+		newPath.AppendChild(next)
+	}
+
+	// 把新路径作为路径同级兄弟挂到树上
+	np := newPath
+	for ; nil != np.parent && NodeDocument != np.parent.typ; np = np.parent {
+	}
+	if NodeDocument == parent.typ {
+		parent.AppendChild(np)
+	} else {
+		parent.InsertAfter(np)
+	}
+	var output []byte
+	output, err = renderer.Render()
+	html = string(output)
 	//var renderer *VditorRenderer
 	//
 	//switch blockType {
