@@ -703,13 +703,13 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 	// TODO: 仅实现了光标插入位置节点获取，选段映射待实现
 	en := r.nearest(nodes, endOffset)
 	sn := en
-	base := 0
+	baseOffset := 0
 	if 0 < len(sn.tokens) {
-		base = sn.tokens[0].Offset()
+		baseOffset = sn.tokens[0].Offset()
 	}
 
-	startOffset = startOffset - base
-	endOffset = endOffset - base
+	startOffset = startOffset - baseOffset
+	endOffset = endOffset - baseOffset
 	startOffset, endOffset = r.runeOffset(itemsToBytes(sn.tokens), startOffset, endOffset)
 	sn.caretStartOffset = strconv.Itoa(startOffset)
 	en.caretEndOffset = strconv.Itoa(endOffset)

@@ -14,6 +14,8 @@
 
 package lute
 
+import "strconv"
+
 // RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
 func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset int) (html string, err error) {
 	var tree *Tree
@@ -37,8 +39,41 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 // 支持的 operation 如下：
 //   * newline 换行
 func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset int, operation string) (html string, err error) {
-	lute.
+	var tree *Tree
+	lute.VditorWYSIWYG = true
+	markdownText = lute.endNewline(markdownText)
+	tree, err = lute.parse("", []byte(markdownText))
+	if nil != err {
+		return
+	}
 
+	renderer := lute.newVditorRenderer(tree.Root)
+	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)
+
+	var nodes []*Node
+	for c := tree.Root.firstChild; nil != c; c = c.next {
+		renderer.findSelection(c, startOffset, endOffset, &nodes)
+	}
+
+	if 1 > len(nodes) {
+		// 当且仅当渲染空 Markdown 时
+		nodes = append(nodes, tree.Root)
+	}
+
+	// TODO: 仅实现了光标插入位置节点获取，选段映射待实现
+	en := renderer.nearest(nodes, endOffset)
+	sn := en
+	baseOffset := 0
+	if 0 < len(sn.tokens) {
+		baseOffset = sn.tokens[0].Offset()
+	}
+
+	startOffset = startOffset - baseOffset
+	endOffset = endOffset - baseOffset
+	startOffset, endOffset = renderer.runeOffset(itemsToBytes(sn.tokens), startOffset, endOffset)
+	sn.caretStartOffset = strconv.Itoa(startOffset)
+	en.caretEndOffset = strconv.Itoa(endOffset)
+	renderer.expand(sn)
 
 	//var renderer *VditorRenderer
 	//
