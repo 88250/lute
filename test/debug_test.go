@@ -20,6 +20,9 @@ import (
 
 var debugTests = []parseTest{
 
+	{"38", "www.我的网址/console\n", "<p>www.我的网址/console</p>\n"},
+	{"37", "http://我的网址/console\n", "<p>http://我的网址/console</p>\n"},
+	{"36", "http://mydomain/console\n", "<p>http://mydomain/console</p>\n"},
 	{"35", "* [ ] foo [foo](/bar)\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo <a href=\"/bar\">foo</a></li>\n</ul>\n"},
 	{"34", "[foo](/bar )1\n", "<p><a href=\"/bar\">foo</a>1</p>\n"},
 	{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},

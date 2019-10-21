@@ -14,6 +14,7 @@ package lute
 
 import (
 	"bytes"
+	"unicode/utf8"
 )
 
 func (t *Tree) parseGFMAutoEmailLink(node *Node) {
@@ -153,9 +154,7 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 }
 
 var (
-	httpProto  = strToItems("http://")
-	httpsProto = strToItems("https://")
-	ftpProto   = strToItems("ftp://")
+	httpProto = strToItems("http://")
 
 	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
 	validAutoLinkDomainSuffix = []items{strToItems("top"), strToItems("com"), strToItems("net"), strToItems("org"), strToItems("edu"), strToItems("gov"),
@@ -192,13 +191,13 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			protocol = httpProto
 			www = true
 		} else if 13 <= tmpLen /* http://xxx.xx */ && 'h' == tmp[0].term() && 't' == tmp[1].term() && 't' == tmp[2].term() && 'p' == tmp[3].term() && ':' == tmp[4].term() && '/' == tmp[5].term() && '/' == tmp[6].term() {
-			protocol = httpProto
+			protocol = tmp[0:7]
 			i += 7
 		} else if 14 <= tmpLen /* https://xxx.xx */ && 'h' == tmp[0].term() && 't' == tmp[1].term() && 't' == tmp[2].term() && 'p' == tmp[3].term() && 's' == tmp[4].term() && ':' == tmp[5].term() && '/' == tmp[6].term() && '/' == tmp[7].term() {
-			protocol = httpsProto
+			protocol = tmp[0:8]
 			i += 8
 		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == tmp[0].term() && 't' == tmp[1].term() && 'p' == tmp[2].term() && ':' == tmp[3].term() && '/' == tmp[4].term() && '/' == tmp[5].term() {
-			protocol = ftpProto
+			protocol = tmp[0:6]
 			i += 6
 		} else {
 			consumed = append(consumed, token)
@@ -229,10 +228,23 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			url = append(url, token)
 		}
 		if i == j { // 第一个字符就断开了
-			url = append(url, token)
+			if utf8.RuneSelf <= token.term() {
+				if !www {
+					url = append(url, protocol...)
+				}
+				for ; i < length; i++ {
+					token = tokens[i]
+					if utf8.RuneSelf > token.term() {
+						break
+					}
+					url = append(url, token)
+				}
+			} else {
+				url = append(url, token)
+				i++
+			}
 			text := &Node{typ: NodeText, tokens: url}
 			node.InsertBefore(text)
-			i++
 			continue
 		}
 
@@ -248,7 +260,13 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		}
 		domain := url[:k]
 		if !t.isValidDomain(domain) {
-			text := &Node{typ: NodeText, tokens: append(protocol, url...)}
+			var part items
+			if www {
+				part = url
+			} else {
+				part = append(protocol, url...)
+			}
+			text := &Node{typ: NodeText, tokens: part}
 			node.InsertBefore(text)
 			continue
 		}
