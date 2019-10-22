@@ -101,7 +101,7 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	newNode.caretStartOffset = "0"
 	newNode.caretEndOffset = "0"
 	newNode.expand = true
-	for next := en; nil != next; next = next.next {
+	for next := en.next; nil != next; next = next.next {
 		newPath.AppendChild(next)
 	}
 
@@ -115,6 +115,7 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		parent.InsertAfter(np)
 	}
 
+	// 格式化还原为 Markdown 原文
 	formatRenderer := lute.newFormatRenderer(tree.Root)
 	var output []byte
 	output, err = formatRenderer.Render()
@@ -122,59 +123,16 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		return
 	}
 
+	// 再次解析生成语法树
+	tree, err = lute.parse("", output)
+	if nil != err {
+		return
+	}
+
+	// 进行最终渲染
 	renderer = lute.newVditorRenderer(tree.Root)
 	output, err = renderer.Render()
 	html = string(output)
-	//var renderer *VditorRenderer
-	//
-	//switch blockType {
-	//case NodeListItem:
-	//	markerPart := param["marker"].(string)
-	//	listType := 0
-	//	num := 1
-	//	marker := "*"
-	//	delim := ""
-	//	listItem := &Node{typ: NodeListItem}
-	//	if isASCIILetterNum(markerPart[0]) {
-	//		listType = 1 // 有序列表
-	//		if strings.Contains(markerPart, ")") {
-	//			delim = ")"
-	//		} else {
-	//			delim = "."
-	//		}
-	//		markerParts := strings.SplitN(markerPart, delim, 2)
-	//		num, _ = strconv.Atoi(markerParts[0])
-	//		num++
-	//		marker = strconv.Itoa(num)
-	//	} else {
-	//		marker = string(markerPart[0])
-	//	}
-	//	listItem.listData = &listData{typ: listType, marker: strToItems(marker)}
-	//	listItem.expand = true
-	//	if 1 == listType {
-	//		listItem.delimiter = newItem(delim[0], 0, 0, 0)
-	//	}
-	//
-	//	text := &Node{typ: NodeText, tokens: strToItems("")}
-	//	text.caretStartOffset = "0"
-	//	text.caretEndOffset = "0"
-	//	p := &Node{typ: NodeParagraph}
-	//	p.AppendChild(text)
-	//	listItem.AppendChild(p)
-	//	listItem.tight = true
-	//	renderer = lute.newVditorRenderer(listItem)
-	//	var output []byte
-	//	output, err = renderer.Render()
-	//	if nil != err {
-	//		return
-	//	}
-	//	html = string(output)
-	//default:
-	//	renderer = lute.newVditorRenderer(nil)
-	//	renderer.writer.WriteString("<p data-ntype=\"" + NodeParagraph.String() + "\" data-mtype=\"" + renderer.mtype(NodeParagraph) + "\" data-cso=\"0\" data-ceo=\"0\">" +
-	//		"<br><span class=\"newline\">\n\n</span></p>")
-	//	html = renderer.writer.String()
-	//}
 	return
 }
 
