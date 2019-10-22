@@ -271,6 +271,17 @@ func (n *Node) List() (ret []*Node) {
 	return
 }
 
+// isMarker 判断 n  是否是标记节点。
+func (n *Node) isMarker() bool {
+	switch n.typ {
+	case NodeEmA6kOpenMarker, NodeEmA6kCloseMarker, NodeEmU8eOpenMarker, NodeEmU8eCloseMarker,
+		NodeStrongA6kOpenMarker, NodeStrongA6kCloseMarker, NodeStrongU8eOpenMarker, NodeStrongU8eCloseMarker:
+		// TODO: 判断节点是否是标记节点
+		return true
+	}
+	return false
+}
+
 type nodeType int
 
 func (typ nodeType) String() string {

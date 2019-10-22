@@ -66,53 +66,33 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		baseOffset = en.tokens[0].Offset()
 	}
 	endOffset = endOffset - baseOffset
-	// 构造兄弟节点准备拆分树
-	newNode := &Node{typ: en.typ, tokens: en.tokens[endOffset:]}
-	en.tokens = en.tokens[:endOffset]
-	en.InsertAfter(newNode)
 
-	var parent, next *Node
-	var subTree, pathNodes []*Node
-	// 查找后续节点和构建节点路径
-	for parent = newNode; ; parent = parent.parent {
-		for next = parent; nil != next; next = next.next {
-			subTree = append(subTree, next)
-		}
+	newTree := &Node{typ: en.typ, tokens: en.tokens[endOffset:]}
+	en.tokens = en.tokens[:endOffset]
+	en.InsertAfter(newTree)
+	var parent, child *Node
+	for parent = en.parent; ; parent = parent.parent {
 		if NodeDocument == parent.typ || NodeListItem == parent.typ || NodeBlockquote == parent.typ {
 			break
 		}
-		pathNodes = append(pathNodes, parent)
-	}
 
-	pathNodes = pathNodes[1:]
-	// 克隆新的节点路径
-	length := len(pathNodes)
-	top := pathNodes[length-1]
-	newPath := top
-	if NodeListItem == top.typ {
-		newPath.listData = top.listData
-	}
-	for i := length - 2; 0 <= i; i-- {
-		n := pathNodes[i]
-		newNode := &Node{typ: n.typ}
-		newPath.AppendChild(newNode)
-		newPath = newNode
-	}
-
-	// 把后续节点挂到新路径下
-	for _, n:=range subTree {
-		newPath.AppendChild(n)
-	}
-
-	newNode.caretStartOffset = "0"
-	newNode.caretEndOffset = "0"
-	newNode.expand = true
-
-	// 把新路径作为路径同级兄弟挂到树上
-	if NodeDocument == parent.typ {
-		parent.AppendChild(top)
-	} else {
-		parent.InsertAfter(top)
+		newParent := &Node{typ:parent.typ}
+		left := true
+		for child = parent.firstChild; nil != child; child = child.next {
+			if child == newTree {
+				newParent.AppendChild(newTree)
+				left = false
+				continue
+			}
+			if child.isMarker() {
+				newParent.AppendChild(&Node{typ:child.typ, tokens:child.tokens})
+				continue
+			}
+			if !left {
+				newParent.AppendChild(child)
+			}
+		}
+		parent.InsertAfter(newParent)
 	}
 
 	// 进行最终渲染
