@@ -61,31 +61,34 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	// TODO: 仅实现了光标插入位置节点获取，选段映射待实现
 
 	en := renderer.nearest(nodes, endOffset)
-
 	baseOffset := 0
 	if 0 < len(en.tokens) {
 		baseOffset = en.tokens[0].Offset()
 	}
 	endOffset = endOffset - baseOffset
-
+	// 构造兄弟节点准备拆分树
 	newNode := &Node{typ: en.typ, tokens: en.tokens[endOffset:]}
 	en.tokens = en.tokens[:endOffset]
+	en.InsertAfter(newNode)
 
-	// 在父节点方向上获取节点路径
-	var pathNodes []*Node
-	var parent *Node
-	for parent = en.parent; ; parent = parent.parent {
-		pathNodes = append(pathNodes, parent)
+	var parent, next *Node
+	var subTree, pathNodes []*Node
+	// 查找后续节点和构建节点路径
+	for parent = newNode; ; parent = parent.parent {
+		for next = parent; nil != next; next = next.next {
+			subTree = append(subTree, next)
+		}
 		if NodeDocument == parent.typ || NodeListItem == parent.typ || NodeBlockquote == parent.typ {
-			// 遇到块容器则停止
 			break
 		}
+		pathNodes = append(pathNodes, parent)
 	}
 
+	pathNodes = pathNodes[1:]
 	// 克隆新的节点路径
 	length := len(pathNodes)
 	top := pathNodes[length-1]
-	newPath := &Node{typ: top.typ}
+	newPath := top
 	if NodeListItem == top.typ {
 		newPath.listData = top.listData
 	}
@@ -96,40 +99,24 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		newPath = newNode
 	}
 
-	// 把选段及其后续节点挂到新路径下
-	newPath.AppendChild(newNode)
+	// 把后续节点挂到新路径下
+	for _, n:=range subTree {
+		newPath.AppendChild(n)
+	}
+
 	newNode.caretStartOffset = "0"
 	newNode.caretEndOffset = "0"
 	newNode.expand = true
-	for next := en.next; nil != next; next = next.next {
-		newPath.AppendChild(next)
-	}
 
 	// 把新路径作为路径同级兄弟挂到树上
-	np := newPath
-	for ; nil != np.parent && NodeDocument != np.parent.typ; np = np.parent {
-	}
 	if NodeDocument == parent.typ {
-		parent.AppendChild(np)
+		parent.AppendChild(top)
 	} else {
-		parent.InsertAfter(np)
-	}
-
-	// 格式化还原为 Markdown 原文
-	formatRenderer := lute.newFormatRenderer(tree.Root)
-	var output []byte
-	output, err = formatRenderer.Render()
-	if nil != err {
-		return
-	}
-
-	// 再次解析生成语法树
-	tree, err = lute.parse("", output)
-	if nil != err {
-		return
+		parent.InsertAfter(top)
 	}
 
 	// 进行最终渲染
+	var output []byte
 	renderer = lute.newVditorRenderer(tree.Root)
 	output, err = renderer.Render()
 	html = string(output)
