@@ -69,30 +69,31 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 
 	newTree := &Node{typ: en.typ, tokens: en.tokens[endOffset:]}
 	en.tokens = en.tokens[:endOffset]
-	en.InsertAfter(newTree)
-	var parent, child *Node
+	var parent, child, next *Node
 	for parent = en.parent; ; parent = parent.parent {
 		if NodeDocument == parent.typ || NodeListItem == parent.typ || NodeBlockquote == parent.typ {
 			break
 		}
 
-		newParent := &Node{typ:parent.typ}
+		newParent := &Node{typ: parent.typ}
 		left := true
-		for child = parent.firstChild; nil != child; child = child.next {
-			if child == newTree {
+		child = parent.firstChild
+		for {
+			next = child.next
+			if child == newTree || child == en {
 				newParent.AppendChild(newTree)
 				left = false
-				continue
-			}
-			if child.isMarker() {
-				newParent.AppendChild(&Node{typ:child.typ, tokens:child.tokens})
-				continue
-			}
-			if !left {
+			} else if child.isMarker() {
+				newParent.AppendChild(&Node{typ: child.typ, tokens: child.tokens})
+			} else if !left {
 				newParent.AppendChild(child)
+			}
+			if child = next; nil == child {
+				break
 			}
 		}
 		parent.InsertAfter(newParent)
+		newTree = newParent
 	}
 
 	// 进行最终渲染
