@@ -280,7 +280,7 @@ func (typ nodeType) String() string {
 const (
 	// CommonMark
 
-	NodeDocument             nodeType = 0  // 根 不用 iota 方便前后端联调
+	NodeDocument             nodeType = 0  // 根
 	NodeParagraph            nodeType = 1  // 段落
 	NodeHeading              nodeType = 2  // 标题
 	NodeHeadingC8hMarker     nodeType = 3  // ATX 标题标记符 #
