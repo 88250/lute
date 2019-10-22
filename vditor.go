@@ -60,16 +60,16 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 
 	// TODO: 仅实现了光标插入位置节点获取，选段映射待实现
 
-	var newText items
 	en := renderer.nearest(nodes, endOffset)
-	switch en.typ {
-	case NodeStrongA6kOpenMarker, NodeStrongA6kCloseMarker, NodeStrongU8eOpenMarker, NodeStrongU8eCloseMarker:
-		en = en.parent
-	case NodeText:
-		newText = en.tokens[endOffset:]
-		en.tokens = en.tokens[:endOffset]
-		en = &Node{typ: NodeText, tokens: newText, parent: en.parent, next: en.next}
+
+	baseOffset := 0
+	if 0 < len(en.tokens) {
+		baseOffset = en.tokens[0].Offset()
 	}
+	endOffset = endOffset - baseOffset
+
+	newNode := &Node{typ: en.typ, tokens: en.tokens[endOffset:]}
+	en.tokens = en.tokens[:endOffset]
 
 	// 在父节点方向上获取节点路径
 	var pathNodes []*Node
@@ -97,9 +97,10 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	}
 
 	// 把选段及其后续节点挂到新路径下
-	en.caretStartOffset = "0"
-	en.caretEndOffset = "0"
-	en.expand = true
+	newPath.AppendChild(newNode)
+	newNode.caretStartOffset = "0"
+	newNode.caretEndOffset = "0"
+	newNode.expand = true
 	for next := en; nil != next; next = next.next {
 		newPath.AppendChild(next)
 	}
@@ -113,7 +114,15 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	} else {
 		parent.InsertAfter(np)
 	}
+
+	formatRenderer := lute.newFormatRenderer(tree.Root)
 	var output []byte
+	output, err = formatRenderer.Render()
+	if nil != err {
+		return
+	}
+
+	renderer = lute.newVditorRenderer(tree.Root)
 	output, err = renderer.Render()
 	html = string(output)
 	//var renderer *VditorRenderer
