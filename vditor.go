@@ -96,13 +96,14 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		newTree = newParent
 	}
 
-	newTree.caretStartOffset = "0"
-	newTree.caretEndOffset = "0"
-	newTree.expand = true
-
 	// 进行最终渲染
 	var output []byte
 	renderer = lute.newVditorRenderer(tree.Root)
+	for child = newTree.firstChild; nil != child.firstChild; child = child.firstChild {
+	}
+	child.caretStartOffset = "0"
+	child.caretEndOffset = "0"
+	renderer.expand(child)
 	output, err = renderer.Render()
 	html = string(output)
 	return

@@ -70,14 +70,14 @@ func TestVditorRenderer(t *testing.T) {
 
 var vditorOperationTests = []*vditorTest{
 
-	{&parseTest{"0", "* foo **bar**\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">-</span><span class=\"newline\">\n\n</span></p>"}, 9, 9},
+	{&parseTest{"0", "**foobar**\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">-</span><span class=\"newline\">\n\n</span></p>"}, 5, 5},
 }
 
 func TestVditorOperation(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range vditorOperationTests {
-		html, err := luteEngine.RenderVditorDOM(test.from, test.startOffset, test.endOffset)
+		html, err := luteEngine.VditorOperation(test.from, test.startOffset, test.endOffset, "newline")
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}
