@@ -82,38 +82,30 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 }
 
 func (r *HTMLRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		attrs := [][]string{{"class", "vditor-math"}}
-		r.tag("span", attrs, false)
-		r.write(escapeHTML(node.tokens))
-		r.tag("/span", nil, false)
-	}
+	attrs := [][]string{{"class", "vditor-math"}}
+	r.tag("span", attrs, false)
+	r.write(escapeHTML(node.tokens))
+	r.tag("/span", nil, false)
 	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-		attrs := [][]string{{"class", "vditor-math"}}
-		r.tag("div", attrs, false)
-		r.write(escapeHTML(node.tokens))
-		r.tag("/div", nil, false)
-		r.newline()
-	}
+	r.newline()
+	attrs := [][]string{{"class", "vditor-math"}}
+	r.tag("div", attrs, false)
+	r.write(escapeHTML(node.tokens))
+	r.tag("/div", nil, false)
+	r.newline()
 	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -287,18 +279,14 @@ func (r *HTMLRenderer) renderLink(node *Node, entering bool) (WalkStatus, error)
 }
 
 func (r *HTMLRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-		r.write(node.tokens)
-		r.newline()
-	}
+	r.newline()
+	r.write(node.tokens)
+	r.newline()
 	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -326,15 +314,13 @@ func (r *HTMLRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, e
 }
 
 func (r *HTMLRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		if r.option.AutoSpace {
-			r.space(node)
-		}
-		if r.option.FixTermTypo {
-			r.fixTermTypo(node)
-		}
-		r.write(escapeHTML(node.tokens))
+	if r.option.AutoSpace {
+		r.space(node)
 	}
+	if r.option.FixTermTypo {
+		r.fixTermTypo(node)
+	}
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
@@ -486,11 +472,9 @@ func (r *HTMLRenderer) renderTaskListItemMarker(node *Node, entering bool) (Walk
 }
 
 func (r *HTMLRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-		r.tag("hr", nil, true)
-		r.newline()
-	}
+	r.newline()
+	r.tag("hr", nil, true)
+	r.newline()
 	return WalkStop, nil
 }
 
@@ -503,13 +487,11 @@ func (r *HTMLRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, e
 }
 
 func (r *HTMLRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		if r.option.SoftBreak2HardBreak {
-			r.tag("br", nil, true)
-			r.newline()
-		} else {
-			r.newline()
-		}
+	if r.option.SoftBreak2HardBreak {
+		r.tag("br", nil, true)
+		r.newline()
+	} else {
+		r.newline()
 	}
 	return WalkStop, nil
 }
