@@ -90,16 +90,15 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 }
 
 func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.tokens)
-	}
+	r.write(node.tokens)
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.write(node.emojiAlias)
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
@@ -397,13 +396,11 @@ func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus
 }
 
 func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-		tokens := node.tokens
-		tokens = escapeHTML(tokens)
-		r.write(tokens)
-		r.newline()
-	}
+	r.newline()
+	tokens := node.tokens
+	tokens = escapeHTML(tokens)
+	r.write(tokens)
+	r.newline()
 	return WalkStop, nil
 }
 
@@ -602,16 +599,12 @@ func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkSta
 }
 
 func (r *VditorRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeByte(itemNewline)
-	}
+	r.writeByte(itemNewline)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeByte(itemNewline)
-	}
+	r.writeByte(itemNewline)
 	return WalkStop, nil
 }
 
