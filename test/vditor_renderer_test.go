@@ -70,7 +70,8 @@ func TestVditorRenderer(t *testing.T) {
 
 var vditorOperationTests = []*vditorTest{
 
-	{&parseTest{"0", "**foobar**\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">-</span><span class=\"newline\">\n\n</span></p>"}, 5, 5},
+	{&parseTest{"1", "**foo**\n\n**bar**\n", "<p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\">**</span><span>foo</span><span class=\"marker\">**</span></strong><span class=\"newline\">\n\n</span></p><p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\">**</span><span>b</span><span class=\"marker\">**</span></strong><span class=\"newline\">\n\n</span></p><p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node node--expand\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\" data-cso=\"0\" data-ceo=\"0\">**</span><span>ar</span><span class=\"marker\">**</span></strong><span class=\"newline\">\n\n</span></p>"}, 12, 12},
+	{&parseTest{"0", "**foobar**\n", "<p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\">**</span><span>foo</span><span class=\"marker\">**</span></strong><span class=\"newline\">\n\n</span></p><p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node node--expand\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\" data-cso=\"0\" data-ceo=\"0\">**</span><span>bar</span><span class=\"marker\">**</span></strong><span class=\"newline\">\n\n</span></p>"}, 5, 5},
 }
 
 func TestVditorOperation(t *testing.T) {
