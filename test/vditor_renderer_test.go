@@ -66,7 +66,7 @@ func TestVditorRenderer(t *testing.T) {
 func TestVditorOperation(t *testing.T) {
 	luteEngine := lute.New()
 
-	html, err := luteEngine.VditorOperation("*12[45](6)7 _8a_ 9*1011", 14, 14, "newline")
+	html, err := luteEngine.VditorOperation("* foo **bar**\n", 9, 9, "newline")
 	if nil != err {
 		t.Fatalf("unexpected: %s", err)
 	}

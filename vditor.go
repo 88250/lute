@@ -71,11 +71,11 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	en.tokens = en.tokens[:endOffset]
 	var parent, child, next *Node
 	for parent = en.parent; ; parent = parent.parent {
-		if NodeDocument == parent.typ || NodeListItem == parent.typ || NodeBlockquote == parent.typ {
+		if NodeDocument == parent.typ || NodeList == parent.typ || NodeBlockquote == parent.typ {
 			break
 		}
 
-		newParent := &Node{typ: parent.typ}
+		newParent := &Node{typ: parent.typ, listData: parent.listData}
 		left := true
 		child = parent.firstChild
 		for {
@@ -95,6 +95,10 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		parent.InsertAfter(newParent)
 		newTree = newParent
 	}
+
+	newTree.caretStartOffset = "0"
+	newTree.caretEndOffset = "0"
+	newTree.expand = true
 
 	// 进行最终渲染
 	var output []byte
