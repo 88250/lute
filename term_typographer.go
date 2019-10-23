@@ -132,6 +132,7 @@ var terms = map[string]string{
 	"java":          "Java",
 	"jsp":           "JSP",
 	"restful":       "RESTFul",
+	"graphql":       "GraphQL",
 	"gorm":          "GORM",
 	"orm":           "ORM",
 	"oauth":         "OAuth",
