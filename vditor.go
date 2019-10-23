@@ -67,38 +67,40 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	}
 	endOffset = endOffset - baseOffset
 
-	newTree := &Node{typ: en.typ, tokens: en.tokens[endOffset:]}
-	en.tokens = en.tokens[:endOffset]
-	var parent, child, next *Node
-	for parent = en.parent; ; parent = parent.parent {
+	newTree := &Node{typ: en.typ, tokens: en.tokens[endOffset:]} // 生成新的节点树，内容是当前选中节点的后半部分
+	en.tokens = en.tokens[:endOffset]                            // 当前选中节点内容为前半部分
+	// 保持排版格式并实现换行
+	for parent := en.parent; ; parent = parent.parent { // 从当前选中节点开始向父节点方向迭代
 		if NodeDocument == parent.typ || NodeList == parent.typ || NodeBlockquote == parent.typ {
+			// 遇到这几种块容器说明迭代结束
 			break
 		}
 
-		newParent := &Node{typ: parent.typ, listData: parent.listData}
-		left := true
-		child = parent.firstChild
-		for {
-			next = child.next
-			if child == newTree || child == en {
-				newParent.AppendChild(newTree)
-				left = false
-			} else if child.isMarker() {
-				newParent.AppendChild(&Node{typ: child.typ, tokens: child.tokens})
-			} else if !left {
-				newParent.AppendChild(child)
+		newParent := &Node{typ: parent.typ, listData: parent.listData} // 生成新的父节点
+		left := true                                                   // 用于标记左边兄弟节点是否迭代结束
+		child := parent.firstChild
+		for { // 从左到右迭代子节点
+			next := child.next                   // AppendChild 会断开，所以这里需要临时保存
+			if child == newTree || child == en { // 如果遍历到当前节点
+				newParent.AppendChild(newTree) // 将当前节点挂到新的父节点上
+				left = false                   // 标记左边兄弟节点迭代结束
+			} else if child.isMarker() { // 如果遍历到的是排版标记节点
+				newParent.AppendChild(&Node{typ: child.typ, tokens: child.tokens}) // 生成新的标记节点以便保持排版格式
+			} else if !left { // 如果遍历到右边兄弟节点
+				newParent.AppendChild(child) // 将右边的兄弟节点断开并挂到新的父节点上
 			}
 			if child = next; nil == child {
 				break
 			}
 		}
-		parent.InsertAfter(newParent)
-		newTree = newParent
+		parent.InsertAfter(newParent) // 将新的父节作为当前迭代节点的右兄弟节点挂好
+		newTree = newParent           // 设置当前节点以便下一次迭代
 	}
 
 	// 进行最终渲染
 	var output []byte
 	renderer = lute.newVditorRenderer(tree.Root)
+	var child *Node
 	for child = newTree.firstChild; nil != child.firstChild; child = child.firstChild {
 	}
 	child.caretStartOffset = "0"
