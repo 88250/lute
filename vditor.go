@@ -111,6 +111,9 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	var child *Node
 	for child = newTree.firstChild; nil != child.firstChild; child = child.firstChild {
 	}
+	if 1 > len(child.tokens) {
+		child.tokens = items{newItem(itemNewline, 0, 0, 0)}
+	}
 	child.caretStartOffset = "0"
 	child.caretEndOffset = "0"
 	renderer.expand(child)

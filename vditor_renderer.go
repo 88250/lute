@@ -347,7 +347,7 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
 	if nil == node.firstChild {
 		r.writeString("<p data-ntype=\"" + NodeParagraph.String() + "\" data-mtype=\"" + r.mtype(NodeParagraph) + "\">" +
-			"<span data-ntype=\"" + NodeParagraph.String() + " data-mtype=\"2\" data-cso=\"0\" data-ceo=\"0\"></span>" +
+			"<span data-cso=\"0\" data-ceo=\"0\"></span>" +
 			"<span class=\"newline\">\n</span></p>")
 		return WalkStop, nil
 	}
