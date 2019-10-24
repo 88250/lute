@@ -67,6 +67,14 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	}
 	endOffset = endOffset - baseOffset
 
+	if NodeThematicBreak == en.typ { // 如果光标所处节点是分隔线节点的话
+		en.typ = NodeText // 将分隔线转为文本，后续会按文本节点进行换行处理
+		// 构造段落父节点
+		paragraph := &Node{typ: NodeParagraph}
+		en.parent.AppendChild(paragraph)
+		paragraph.AppendChild(en)
+	}
+
 	newTree := &Node{typ: en.typ, tokens: en.tokens[endOffset:]} // 生成新的节点树，内容是当前选中节点的后半部分
 	en.tokens = en.tokens[:endOffset]                            // 当前选中节点内容为前半部分
 	// 保持排版格式并实现换行
