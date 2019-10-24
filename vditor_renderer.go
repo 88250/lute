@@ -615,6 +615,7 @@ func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkSta
 		r.write(node.tokens)
 		r.tag("/span", nil, nil, false)
 		r.tag("hr", nil, nil, true)
+		r.writeString("<span class=\"newline\">\n\n</span>")
 	} else {
 		r.tag("/div", nil, nil, false)
 	}
