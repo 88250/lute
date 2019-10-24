@@ -80,21 +80,21 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
+	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
 	return ret
 }
 
-func (r *FormatRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.emojiAlias)
-	}
+func (r *FormatRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
+func (r *FormatRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
 func (r *FormatRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(node.emojiAlias)
-	}
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 // TODO: 表的格式化应该按最宽的单元格对齐内容

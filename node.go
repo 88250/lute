@@ -71,10 +71,6 @@ type Node struct {
 
 	headingLevel int // 1~6
 
-	// Emoji
-
-	emojiAlias items
-
 	// 数学公式块
 
 	mathBlockDollarOffset int
@@ -271,7 +267,7 @@ func (n *Node) List() (ret []*Node) {
 	return
 }
 
-// isMarker 判断 n  是否是标记节点。
+// isMarker 判断 n  是否是排版类（比如强调加粗）标记节点。
 func (n *Node) isMarker() bool {
 	switch n.typ {
 	case NodeEmA6kOpenMarker, NodeEmA6kCloseMarker, NodeEmU8eOpenMarker, NodeEmU8eCloseMarker,
@@ -348,8 +344,9 @@ const (
 
 	// Emoji
 
-	NodeEmojiUnicode nodeType = 200 // Emoji Unicode 字符
+	NodeEmojiUnicode nodeType = 200 // Emoji Unicode
 	NodeEmojiImg     nodeType = 201 // Emoji 图片
+	NodeEmojiAlias   nodeType = 202 // Emoji ASCII
 
 	// 数学公式
 

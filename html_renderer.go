@@ -78,7 +78,22 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
+	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
 	return ret
+}
+
+func (r *HTMLRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
@@ -96,16 +111,6 @@ func (r *HTMLRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, e
 	r.write(escapeHTML(node.tokens))
 	r.tag("/div", nil, false)
 	r.newline()
-	return WalkStop, nil
-}
-
-func (r *HTMLRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.tokens)
-	return WalkStop, nil
-}
-
-func (r *HTMLRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.tokens)
 	return WalkStop, nil
 }
 

@@ -87,22 +87,20 @@ func (t *Tree) emoji0(node *Node) {
 
 				emojiNode.typ = NodeEmojiImg
 				emojiNode.tokens = strToItems(repl)
-				emojiNode.emojiAlias = tokens[i : pos+1]
 			} else if contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
 				alias := bytesToStr(maybeEmoji)
 				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + emoji + "\" title=\"" + alias + "\" />"
 				emojiNode.typ = NodeEmojiImg
 				emojiNode.tokens = strToItems(repl)
-				emojiNode.emojiAlias = tokens[i : pos+1]
 			} else {
 				emojiNode.tokens = emojiTokens
-				emojiNode.emojiAlias = tokens[i : pos+1]
 			}
 
+			emojiNode.AppendChild(&Node{typ: NodeEmojiAlias, tokens: tokens[i : pos+1]})
 			node.InsertAfter(emojiNode)
 
 			if pos+1 < length {
-				// 在 EmojiImg 节点后插入一个内容为空的文本节点，留作下次迭代
+				// 在 Emoji 节点后插入一个内容为空的文本节点，留作下次迭代
 				text := &Node{typ: NodeText, tokens: items{}}
 				emojiNode.InsertAfter(text)
 				node = text
@@ -113,5 +111,9 @@ func (t *Tree) emoji0(node *Node) {
 
 		pos++
 		i = pos
+	}
+
+	if 1 > len(node.tokens) {
+		node.Unlink() // 丢弃空的文本节点
 	}
 }
