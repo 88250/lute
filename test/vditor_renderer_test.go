@@ -27,6 +27,7 @@ type vditorTest struct {
 
 var vditorRendererTests = []*vditorTest{
 
+	{&parseTest{"25", ":heart:\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">-</span><span class=\"newline\">\n\n</span></p>"}, 4, 4},
 	{&parseTest{"24", "foo:heart:bar\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">-</span><span class=\"newline\">\n\n</span></p>"}, 4, 4},
 	{&parseTest{"23", "-\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">-</span><span class=\"newline\">\n\n</span></p>"}, 2, 2},
 	{&parseTest{"22", "https://hacpai.com\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"2\" data-ceo=\"2\">https://hacpai.com</span><span class=\"newline\">\n\n</span></p>"}, 2, 2},

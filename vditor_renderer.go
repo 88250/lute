@@ -84,22 +84,45 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRow
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
+	ret.rendererFuncs[NodeEmoji] = ret.renderEmoji
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
+	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
 	return ret
 }
 
-func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
 	r.write(node.tokens)
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
+func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("span", node, [][]string{{"data-hidden", "true"}}, false)
+		r.write(node.tokens)
+		r.tag("/span", nil, nil, false)
+	}
+	return WalkContinue, nil
+}
+
 func (r *VditorRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.tokens)
-	r.tag("span", node, [][]string{{"class", "marker"}}, false)
-	r.write(node.emojiAlias)
-	r.tag("/span", nil, nil, false)
-	return WalkStop, nil
+	if entering {
+		r.tag("span", node, [][]string{{"data-hidden", "true"}}, false)
+		r.write(node.tokens)
+		r.tag("/span", nil, nil, false)
+	}
+	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("span", node, [][]string{{"class", "node"}}, false)
+	} else {
+		r.tag("/span", nil, nil, false)
+	}
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
@@ -587,7 +610,7 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 
 func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("div", nil, [][]string{{"class", "node"}}, false)
+		r.tag("div", nil, [][]string{{"class", "node node--block node--hr"}}, false)
 		r.tag("span", node, [][]string{{"class", "marker"}}, false)
 		r.write(node.tokens)
 		r.tag("/span", nil, nil, false)
@@ -713,7 +736,7 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 func (r *VditorRenderer) expand(node *Node) {
 	for p := node; nil != p; p = p.parent {
 		switch p.typ {
-		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink:
+		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink, NodeEmojiAlias:
 			p.expand = true
 			return
 		}
@@ -732,6 +755,9 @@ func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, s
 	tokens := make(items, 0, len(nodes)*4)
 	for i := 0; i < length; i++ {
 		n = nodes[i]
+		if NodeEmojiUnicode == n.typ || NodeEmojiImg == n.typ || 1 > len(n.tokens) {
+			continue
+		}
 		for i := range n.tokens {
 			n.tokens[i].node = n
 		}
