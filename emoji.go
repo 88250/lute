@@ -99,7 +99,7 @@ func (t *Tree) emoji0(node *Node) {
 			}
 
 			emojiUnicodeOrImg.AppendChild(&Node{typ: NodeEmojiAlias, tokens: tokens[i : pos+1]})
-			node.InsertAfter(emojiUnicodeOrImg)
+			node.InsertAfter(emojiNode)
 
 			if pos+1 < length {
 				// 在 Emoji 节点后插入一个内容为空的文本节点，留作下次迭代
