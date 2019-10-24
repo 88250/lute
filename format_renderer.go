@@ -78,6 +78,7 @@ func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
 	ret.rendererFuncs[NodeTableRow] = ret.renderTableRow
 	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
+	ret.rendererFuncs[NodeEmoji] = ret.renderEmoji
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
@@ -94,6 +95,10 @@ func (r *FormatRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *FormatRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
+func (r *FormatRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 

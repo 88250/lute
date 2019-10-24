@@ -344,9 +344,10 @@ const (
 
 	// Emoji
 
-	NodeEmojiUnicode nodeType = 200 // Emoji Unicode
-	NodeEmojiImg     nodeType = 201 // Emoji 图片
-	NodeEmojiAlias   nodeType = 202 // Emoji ASCII
+	NodeEmoji        nodeType = 200 // Emoji
+	NodeEmojiUnicode nodeType = 201 // Emoji Unicode
+	NodeEmojiImg     nodeType = 202 // Emoji 图片
+	NodeEmojiAlias   nodeType = 203 // Emoji ASCII
 
 	// 数学公式
 
