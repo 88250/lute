@@ -29,6 +29,7 @@ var emojiSitePlaceholder = strToItems("${emojiSite}")
 var emojiDot = strToItems(".")
 
 func (t *Tree) emoji0(node *Node) {
+	first := node
 	tokens := node.tokens
 	node.tokens = items{} // 先清空，后面逐个添加或者添加 tokens 或者 Emoji 兄弟节点
 	length := len(tokens)
@@ -74,7 +75,7 @@ func (t *Tree) emoji0(node *Node) {
 		}
 
 		if emoji, ok := t.context.option.Emojis[bytesToStr(maybeEmoji)]; ok {
-			emojiNode := &Node{typ:NodeEmoji}
+			emojiNode := &Node{typ: NodeEmoji}
 			emojiUnicodeOrImg := &Node{typ: NodeEmojiUnicode}
 			emojiNode.AppendChild(emojiUnicodeOrImg)
 			emojiTokens := strToItems(emoji)
@@ -104,7 +105,7 @@ func (t *Tree) emoji0(node *Node) {
 			if pos+1 < length {
 				// 在 Emoji 节点后插入一个内容为空的文本节点，留作下次迭代
 				text := &Node{typ: NodeText, tokens: items{}}
-				emojiUnicodeOrImg.InsertAfter(text)
+				emojiNode.InsertAfter(text)
 				node = text
 			}
 		} else {
@@ -115,7 +116,11 @@ func (t *Tree) emoji0(node *Node) {
 		i = pos
 	}
 
+	// 丢弃空的文本节点
+	if 1 > len(first.tokens) {
+		first.Unlink()
+	}
 	if 1 > len(node.tokens) {
-		node.Unlink() // 丢弃空的文本节点
+		node.Unlink()
 	}
 }
