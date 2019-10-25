@@ -273,7 +273,7 @@ func trim(tokens items) (leftWhitespaces, rightWhitespaces, remains items) {
 		end = start - 1
 	}
 	if 0 < end {
-		rightWhitespaces = tokens[end:length]
+		rightWhitespaces = tokens[end+1:length]
 	}
 	remains = tokens[start : end+1]
 	return
