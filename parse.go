@@ -175,4 +175,6 @@ type Tree struct {
 	lexer         *lexer         // 词法分析器
 	context       *Context       // 块级解析上下文
 	inlineContext *InlineContext // 行级解析上下文
+
+	tokens items // 所有 tokens
 }
