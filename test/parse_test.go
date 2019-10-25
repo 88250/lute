@@ -47,6 +47,7 @@ var parseTests = []parseTest{
 	{"spec568", "![foo](/url \"title\")\n", "<p><img src=\"/url\" alt=\"foo\" title=\"title\" /></p>\n"},
 	{"spec552", "[foo] \n[]\n\n[foo]: /url \"title\"\n", "<p><a href=\"/url\" title=\"title\">foo</a>\n[]</p>\n"},
 	{"spec549", "[foo][]\n\n[foo]: /url \"title\"\n", "<p><a href=\"/url\" title=\"title\">foo</a></p>\n"},
+	{"spec548", "[\n ]\n\n[\n ]: /uri\n", "<p>[\n]</p>\n<p>[\n]: /uri</p>\n"},
 	{"spec547", "[]\n\n[]: /uri\n", "<p>[]</p>\n<p>[]: /uri</p>\n"},
 	{"spec537", "[Foo\n  bar]: /url\n\n[Baz][Foo bar]\n", "<p><a href=\"/url\">Baz</a></p>\n"},
 	{"spec536", "[Толпой][Толпой] is a Russian word.\n\n[ТОЛПОЙ]: /url\n", "<p><a href=\"/url\">Толпой</a> is a Russian word.</p>\n"},

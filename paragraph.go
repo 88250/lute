@@ -20,7 +20,18 @@ func (p *Node) paragraphContinue(context *Context) int {
 }
 
 func (p *Node) paragraphFinalize(context *Context) {
-	p.tokens = trimWhitespace(p.tokens)
+	if context.option.VditorWYSIWYG {
+		leftWhitespaces, rightWhitespaces, remains := trim(p.tokens)
+		if 0 < len(leftWhitespaces) {
+			p.InsertBefore(&Node{typ: NodeVditorHidden, tokens: leftWhitespaces})
+		}
+		if 0 < len(rightWhitespaces) {
+			p.InsertAfter(&Node{typ: NodeVditorHidden, tokens: rightWhitespaces})
+		}
+		p.tokens = remains
+	} else {
+		p.tokens = trimWhitespace(p.tokens)
+	}
 
 	// 尝试解析链接引用定义
 	hasReferenceDefs := false

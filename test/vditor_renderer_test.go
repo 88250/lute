@@ -27,6 +27,7 @@ type vditorTest struct {
 
 var vditorRendererTests = []*vditorTest{
 
+	{&parseTest{"26", "foo\n\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">:</span><span data-hidden=\"❤️\"></span><span class=\"marker\">heart:</span></span><span data-cso=\"4\" data-ceo=\"4\"> foo</span><span class=\"newline\">\n\n</span></p>"}, 5, 5},
 	{&parseTest{"25", ":heart: foo\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">:</span><span data-hidden=\"❤️\"></span><span class=\"marker\">heart:</span></span><span data-cso=\"4\" data-ceo=\"4\"> foo</span><span class=\"newline\">\n\n</span></p>"}, 11, 11},
 	{&parseTest{"24", "foo:heart:bar\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span>foo</span><span class=\"node\"><span class=\"marker\">:</span><span data-hidden=\"❤️\"></span><span class=\"marker\" data-cso=\"1\" data-ceo=\"1\">heart:</span></span><span>bar</span><span class=\"newline\">\n\n</span></p>"}, 4, 4},
 	{&parseTest{"23", "-\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">-</span><span class=\"newline\">\n\n</span></p>"}, 2, 2},

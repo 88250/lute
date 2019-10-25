@@ -244,10 +244,15 @@ func replaceNewlineSpace(tokens items) items {
 	return tokens
 }
 
-func trimWhitespace(tokens items) items {
+func trimWhitespace(tokens items) (ret items) {
+	_, _, ret = trim(tokens)
+	return
+}
+
+func trim(tokens items) (leftWhitespaces, rightWhitespaces, remains items) {
 	length := len(tokens)
 	if 0 == length {
-		return tokens
+		return nil, nil, tokens
 	}
 	start, end := 0, length-1
 	for ; start < length; start++ {
@@ -255,6 +260,7 @@ func trimWhitespace(tokens items) items {
 			break
 		}
 	}
+	leftWhitespaces = tokens[0:start]
 	if start == length {
 		start--
 	}
@@ -266,7 +272,11 @@ func trimWhitespace(tokens items) items {
 	if end < start {
 		end = start - 1
 	}
-	return tokens[start : end+1]
+	if 0 < end {
+		rightWhitespaces = tokens[end:length]
+	}
+	remains = tokens[start : end+1]
+	return
 }
 
 func trimRight(tokens items) (whitespaces, remains items) {
