@@ -60,7 +60,7 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 		return
 	}
 
-	renderer := lute.newHTMLRenderer(tree.Root)
+	renderer := lute.newHTMLRenderer(tree)
 	html, err = renderer.Render()
 	return
 }
@@ -85,7 +85,7 @@ func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err er
 		return
 	}
 
-	renderer := lute.newFormatRenderer(tree.Root)
+	renderer := lute.newFormatRenderer(tree)
 	formatted, err = renderer.Render()
 	return
 }
@@ -147,7 +147,7 @@ func (lute *Lute) RenderEChartsJSON(markdownText string) (json string, err error
 		return
 	}
 
-	renderer := lute.newEChartsJSONRenderer(tree.Root)
+	renderer := lute.newEChartsJSONRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
 	json = string(output)

@@ -20,6 +20,9 @@ func (t *Tree) parseBlocks() {
 	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		t.incorporateLine(line)
 		lines++
+		if t.context.option.VditorWYSIWYG {
+			t.tokens = append(t.tokens, line...)
+		}
 	}
 	for nil != t.context.tip {
 		t.context.finalize(t.context.tip, lines)
