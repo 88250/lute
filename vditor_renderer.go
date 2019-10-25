@@ -364,7 +364,7 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.tag("p", node, nil, false)
 	} else {
-		//r.writeString("<span class=\"newline\">\n\n</span>")
+		r.writeString("<span class=\"newline\">\n\n</span>")
 		r.tag("/p", nil, nil, false)
 	}
 	return WalkContinue, nil
@@ -372,7 +372,13 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("span", node, nil, false)
-	r.write(node.tokens)
+	for _, token := range node.tokens {
+		if term := token.term(); itemNewline == term {
+			r.writeString("<br>")
+		} else {
+			r.writer.WriteByte(term)
+		}
+	}
 	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
