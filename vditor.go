@@ -24,7 +24,48 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 		return
 	}
 
-	renderer := lute.newVditorRenderer(tree.Root)
+	// 将 token 和节点进行反向关联
+	nodes := tree.Root.List()
+	length := len(nodes)
+	var n *Node
+	parsedTokens := make(items, 0, len(nodes)*4)
+	for i := 0; i < length; i++ {
+		n = nodes[i]
+		if NodeEmojiUnicode == n.typ || NodeEmojiImg == n.typ || 1 > len(n.tokens) {
+			// 跳过生成的、内容为空的节点
+			continue
+		}
+		// 关联节点
+		for i := range n.tokens {
+			n.tokens[i].node = n
+		}
+		parsedTokens = append(parsedTokens, n.tokens...)
+	}
+
+	// 标准的 Markdown AST 会丢弃一些字符（比如段落首尾空白），需要将这些字符作为隐藏节点（NodeVditorHidden）挂到树上
+	parsedLen := len(parsedTokens)
+	var i, j int
+	var lastChild *Node
+	for i < parsedLen {
+		parsedToken := parsedTokens[i]
+		lastChild = parsedToken.node
+		tree.tokens[j].node = lastChild
+		if tree.tokens[j].offset == parsedToken.offset {
+			i++
+			j++
+			continue
+		}
+		lastChild.tokens = append(lastChild.tokens, tree.tokens[j])
+		j++
+	}
+	if totalLen := len(tree.tokens); j < totalLen {
+		for ; j < totalLen; j++ {
+			tree.tokens[j].node = lastChild
+			lastChild.tokens = append(lastChild.tokens, tree.tokens[j])
+		}
+	}
+
+	renderer := lute.newVditorRenderer(tree)
 	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)
 	renderer.mapSelection(tree.Root, startOffset, endOffset)
 	var output []byte
@@ -45,7 +86,7 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		return
 	}
 
-	renderer := lute.newVditorRenderer(tree.Root)
+	renderer := lute.newVditorRenderer(tree)
 	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)
 
 	var nodes []*Node
@@ -107,7 +148,7 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 
 	// 进行最终渲染
 	var output []byte
-	renderer = lute.newVditorRenderer(tree.Root)
+	renderer = lute.newVditorRenderer(tree)
 	var child *Node
 	for child = newTree.firstChild; nil != child.firstChild; child = child.firstChild {
 	}
@@ -131,7 +172,7 @@ func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 	}
 
 	var formatted []byte
-	renderer := lute.newFormatRenderer(tree.Root)
+	renderer := lute.newFormatRenderer(tree)
 	formatted, err = renderer.Render()
 	if nil != err {
 		return

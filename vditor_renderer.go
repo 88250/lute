@@ -17,7 +17,6 @@ package lute
 // Vditor DOM Renderer
 
 import (
-	"sort"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -30,8 +29,8 @@ type VditorRenderer struct {
 }
 
 // newVditorRenderer 创建一个 Vditor DOM 渲染器。
-func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
-	ret := &VditorRenderer{BaseRenderer: lute.newBaseRenderer(treeRoot)}
+func (lute *Lute) newVditorRenderer(tree *Tree) *VditorRenderer {
+	ret := &VditorRenderer{BaseRenderer: lute.newBaseRenderer(tree)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
@@ -88,7 +87,13 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.rendererFuncs[NodeVditorHidden] = ret.renderVditorHidden
 	return ret
+}
+
+func (r *VditorRenderer) renderVditorHidden(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
@@ -749,26 +754,12 @@ func (tokens items) Less(i, j int) bool { return tokens[i].Offset() < tokens[j].
 
 // findSelection 在 node 上递归查找 startOffset 和 endOffset 选段，选中节点累计到 selected 中。
 func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, selected *[]*Node) {
-	nodes := node.List()
-	length := len(nodes)
-	var n *Node
-	tokens := make(items, 0, len(nodes)*4)
-	for i := 0; i < length; i++ {
-		n = nodes[i]
-		if NodeEmojiUnicode == n.typ || NodeEmojiImg == n.typ || 1 > len(n.tokens) {
-			continue
-		}
-		for i := range n.tokens {
-			n.tokens[i].node = n
-		}
-		tokens = append(tokens, n.tokens...)
-	}
-
-	sort.Sort(tokens)
-
+	tokens := r.tree.tokens
+	// TODO: 这个排序似乎是多余的
+	//sort.Sort(tokens)
 	var token item
 	var startToken, endToken *item
-	length = len(tokens)
+	length := len(tokens)
 	for i := 0; i < length; i++ {
 		token = tokens[i]
 		if nil == startToken && startOffset <= token.Offset()+1 {
@@ -816,8 +807,9 @@ func (r *VditorRenderer) nearest(selected []*Node, offset int) (ret *Node) {
 
 // byteOffset 返回字符偏移位置在 str 中考虑字符编码情况下的字节偏移位置。
 func (r *VditorRenderer) byteOffset(str string, runeStartOffset, runeEndOffset int) (startOffset, endOffset int) {
-	runes := 0
-	for i := range str {
+	startOffset, endOffset = -1, -1
+	runes, i := 0, 0
+	for i = range str {
 		runes++
 		if runes > runeStartOffset {
 			startOffset = i
@@ -826,6 +818,12 @@ func (r *VditorRenderer) byteOffset(str string, runeStartOffset, runeEndOffset i
 			endOffset = i
 			return
 		}
+	}
+	if -1 == startOffset {
+		startOffset = i + 1
+	}
+	if -1 == endOffset {
+		endOffset = i + 1
 	}
 	return
 }
