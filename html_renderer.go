@@ -80,12 +80,7 @@ func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
-	ret.rendererFuncs[NodeVditorHidden] = ret.renderVditorHidden
 	return ret
-}
-
-func (r *HTMLRenderer) renderVditorHidden(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
