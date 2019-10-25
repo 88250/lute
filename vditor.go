@@ -14,21 +14,12 @@
 
 package lute
 
-// RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
-func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset int) (html string, err error) {
-	var tree *Tree
-	lute.VditorWYSIWYG = true
-	markdownText = lute.endNewline(markdownText)
-	tree, err = lute.parse("", []byte(markdownText))
-	if nil != err {
-		return
-	}
-
-	// 将 token 和节点进行反向关联
+// attachNode 用于将 tree 上的所有 tokens 和节点进行反向关联。
+func (lute *Lute) attachNode(tree *Tree) (tokens items) {
 	nodes := tree.Root.List()
 	length := len(nodes)
 	var n *Node
-	parsedTokens := make(items, 0, len(nodes)*4)
+	tokens = make(items, 0, len(nodes)*4)
 	for i := 0; i < length; i++ {
 		n = nodes[i]
 		if NodeEmojiUnicode == n.typ || NodeEmojiImg == n.typ || 1 > len(n.tokens) {
@@ -39,10 +30,14 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 		for i := range n.tokens {
 			n.tokens[i].node = n
 		}
-		parsedTokens = append(parsedTokens, n.tokens...)
+		tokens = append(tokens, n.tokens...)
 	}
+	return
+}
 
-	// 标准的 Markdown AST 会丢弃一些字符（比如段落首尾空白），需要将这些字符作为隐藏节点（NodeVditorHidden）挂到树上
+// restoreTokens 使用树上完整的 tokens 补全解析好的节点。
+// 标准的 Markdown AST 会丢弃一些 tokens（比如段落首尾空白），需要将这些字节补全到相应节点后。
+func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
 	parsedLen := len(parsedTokens)
 	var i, j int
 	var lastChild *Node
@@ -64,6 +59,20 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 			lastChild.tokens = append(lastChild.tokens, tree.tokens[j])
 		}
 	}
+}
+
+// RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
+func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset int) (html string, err error) {
+	var tree *Tree
+	lute.VditorWYSIWYG = true
+	markdownText = lute.endNewline(markdownText)
+	tree, err = lute.parse("", []byte(markdownText))
+	if nil != err {
+		return
+	}
+
+	parsedTokens := lute.attachNode(tree)
+	lute.restoreTokens(parsedTokens, tree)
 
 	renderer := lute.newVditorRenderer(tree)
 	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)
@@ -85,6 +94,9 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	if nil != err {
 		return
 	}
+
+	parsedTokens := lute.attachNode(tree)
+	lute.restoreTokens(parsedTokens, tree)
 
 	renderer := lute.newVditorRenderer(tree)
 	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)

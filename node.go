@@ -353,7 +353,4 @@ const (
 
 	NodeMathBlock  nodeType = 300 // 数学公式块
 	NodeInlineMath nodeType = 301 // 内联数学公式
-
-	// Vditor
-	NodeVditorHidden nodeType = 400 // Vditor 隐藏节点
 )
