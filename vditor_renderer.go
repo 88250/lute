@@ -93,15 +93,14 @@ func (lute *Lute) newVditorRenderer(treeRoot *Node) *VditorRenderer {
 
 func (r *VditorRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("span", node, [][]string{{"class", "marker"}}, false)
-	r.write(node.tokens)
+	r.write(node.tokens[1:])
 	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node, [][]string{{"data-hidden", "true"}}, false)
-		r.write(node.tokens)
+		r.tag("span", node, [][]string{{"data-hidden", itemsToStr(node.tokens)}}, false)
 		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
@@ -109,8 +108,8 @@ func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, 
 
 func (r *VditorRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("span", node, [][]string{{"data-hidden", "true"}}, false)
-		r.write(node.tokens)
+		r.writeString("<span class=\"marker\">:</span>")
+		r.tag("span", node, [][]string{{"data-hidden", itemsToStr(node.tokens)}}, false)
 		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
