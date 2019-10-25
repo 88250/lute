@@ -24,8 +24,8 @@ type FormatRenderer struct {
 }
 
 // newFormatRenderer 创建一个格式化渲染器。
-func (lute *Lute) newFormatRenderer(treeRoot *Node) Renderer {
-	ret := &FormatRenderer{BaseRenderer: lute.newBaseRenderer(treeRoot)}
+func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
+	ret := &FormatRenderer{BaseRenderer: lute.newBaseRenderer(tree)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
@@ -143,7 +143,7 @@ func (r *FormatRenderer) renderTableHead(node *Node, entering bool) (WalkStatus,
 func (r *FormatRenderer) renderTable(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
 		r.newline()
-		if !r.isLastNode(r.treeRoot, node) {
+		if !r.isLastNode(r.tree.Root, node) {
 			r.writeByte(itemNewline)
 		}
 	}
@@ -340,7 +340,7 @@ func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus,
 	r.newline()
 	r.write(mathBlockMarker)
 	r.newline()
-	if !r.isLastNode(r.treeRoot, node) {
+	if !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
@@ -359,7 +359,7 @@ func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 	}
 	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
 	r.newline()
-	if !r.isLastNode(r.treeRoot, node) {
+	if !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil

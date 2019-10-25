@@ -22,8 +22,8 @@ type HTMLRenderer struct {
 }
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
-func (lute *Lute) newHTMLRenderer(treeRoot *Node) Renderer {
-	ret := &HTMLRenderer{lute.newBaseRenderer(treeRoot)}
+func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
+	ret := &HTMLRenderer{lute.newBaseRenderer(tree)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
