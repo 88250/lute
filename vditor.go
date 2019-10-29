@@ -38,40 +38,33 @@ func (lute *Lute) attachNode(tree *Tree) (tokens items) {
 // restoreTokens 使用树上完整的 tokens 补全解析好的节点。
 // 标准的 Markdown AST 会丢弃一些 tokens（比如段落首尾空白），需要将这些字节补全到相应节点后。
 func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
-	var node, lastc *Node
+	lastc := tree.Root.firstDeepestChild()
 	var i int
-	for ;i < len(parsedTokens);i++ {
+	for ; i < len(parsedTokens); i++ {
 		parsedToken := parsedTokens[i]
 		if tree.tokens[i].offset == parsedToken.offset {
-			node = parsedToken.node
-			tree.tokens[i].node = node
-			lastc = node
-			node = nil
+			lastc = parsedToken.node
 		} else {
-			node = lastc
-			tree.tokens[i].node = node
+			tree.tokens[i].node = lastc
 			parsedTokens = append(parsedTokens, newItem(0, 0, 0, 0))
 			copy(parsedTokens[i+1:], parsedTokens[i:])
 			parsedTokens[i] = tree.tokens[i]
-			lastc = node
 		}
 	}
 
+	// TODO: 没必要
 	if nil == lastc {
 		lastc = tree.Root
 	}
 
 	// 因为 parsed tokens 可能会比 all tokens 短，所需还需要处理末尾部分
 	length := len(tree.tokens)
-	if i < length {
-		for ; i < length; i++ {
-			tree.tokens[i].node = lastc
-			lastc.tokens = append(lastc.tokens, tree.tokens[i])
-			parsedTokens = append(parsedTokens, tree.tokens[i])
-		}
+	for ; i < length; i++ {
+		parsedTokens = append(parsedTokens, tree.tokens[i])
 	}
-	tree.tokens = parsedTokens
 
+	// TODO: 没必要
+	tree.tokens = parsedTokens
 
 }
 
