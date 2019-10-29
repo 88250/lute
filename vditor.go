@@ -38,35 +38,23 @@ func (lute *Lute) attachNode(tree *Tree) (tokens items) {
 // restoreTokens 使用树上完整的 tokens 补全解析好的节点。
 // 标准的 Markdown AST 会丢弃一些 tokens（比如段落首尾空白），需要将这些字节补全到相应节点后。
 func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
-	var i, j int
 	var node, lastc *Node
-	for i < len(parsedTokens) {
+	var i int
+	for ;i < len(parsedTokens);i++ {
 		parsedToken := parsedTokens[i]
-		if tree.tokens[j].offset == parsedToken.offset {
+		if tree.tokens[i].offset == parsedToken.offset {
 			node = parsedToken.node
-			tree.tokens[j].node = node
+			tree.tokens[i].node = node
 			lastc = node
 			node = nil
 		} else {
+			node = lastc
+			tree.tokens[i].node = node
 			parsedTokens = append(parsedTokens, newItem(0, 0, 0, 0))
 			copy(parsedTokens[i+1:], parsedTokens[i:])
-			if nil == node {
-				if 0 < i {
-					node = parsedTokens[i-1].node
-					node.tokens = append(node.tokens, tree.tokens[j])
-				} else {
-					node = parsedTokens[0].node
-					node.tokens = append(node.tokens, newItem(0, 0, 0, 0))
-					copy(node.tokens[1:], node.tokens[0:])
-					node.tokens[0] = tree.tokens[j]
-				}
-				lastc = node
-			}
-			tree.tokens[j].node = node
-			parsedTokens[i] = tree.tokens[j]
+			parsedTokens[i] = tree.tokens[i]
+			lastc = node
 		}
-		i++
-		j++
 	}
 
 	if nil == lastc {
@@ -75,14 +63,16 @@ func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
 
 	// 因为 parsed tokens 可能会比 all tokens 短，所需还需要处理末尾部分
 	length := len(tree.tokens)
-	if j < length {
-		for ; j < length; j++ {
-			tree.tokens[j].node = lastc
-			lastc.tokens = append(lastc.tokens, tree.tokens[j])
-			parsedTokens = append(parsedTokens, tree.tokens[j])
+	if i < length {
+		for ; i < length; i++ {
+			tree.tokens[i].node = lastc
+			lastc.tokens = append(lastc.tokens, tree.tokens[i])
+			parsedTokens = append(parsedTokens, tree.tokens[i])
 		}
 	}
 	tree.tokens = parsedTokens
+
+
 }
 
 // RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
