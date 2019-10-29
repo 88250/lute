@@ -49,14 +49,21 @@ func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
 			node = nil
 		} else {
 			parsedTokens = append(parsedTokens, newItem(0, 0, 0, 0))
-			copy(parsedTokens[j+1:], parsedTokens[j:])
+			copy(parsedTokens[i+1:], parsedTokens[i:])
 			if nil == node {
-				node = parsedTokens[i-1].node
+				if 0 < i {
+					node = parsedTokens[i-1].node
+					node.tokens = append(node.tokens, tree.tokens[j])
+				} else {
+					node = parsedTokens[0].node
+					node.tokens = append(node.tokens, newItem(0, 0, 0, 0))
+					copy(node.tokens[1:], node.tokens[0:])
+					node.tokens[0] = tree.tokens[j]
+				}
 				lastc = node
 			}
 			tree.tokens[j].node = node
 			parsedTokens[i] = tree.tokens[j]
-			node.tokens = append(node.tokens, tree.tokens[j])
 		}
 		i++
 		j++
@@ -69,7 +76,7 @@ func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
 		tree.tokens[j].node = lastc
 		lastc.tokens = append(lastc.tokens, tree.tokens[j])
 	}
-
+	tree.tokens = parsedTokens
 }
 
 // RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
