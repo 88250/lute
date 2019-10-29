@@ -83,12 +83,10 @@ type Node struct {
 
 // lastDeepestChild 返回 n 的最后最深一个子节点。
 func (n *Node) lastDeepestChild() (ret *Node) {
-	if ret = n; nil != n.lastChild {
-		ret = n.lastChild
-	} else {
-		return
+	if nil == n.lastChild {
+		return n
 	}
-	return ret.lastDeepestChild()
+	return n.lastChild.lastDeepestChild()
 }
 
 // LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。

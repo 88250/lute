@@ -373,10 +373,12 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("span", node, nil, false)
 	for _, token := range node.tokens {
-		if term := token.term(); itemNewline == term {
-			r.writeString("<br>")
-		} else {
+		if term := token.term(); itemNewline != term {
 			r.writer.WriteByte(term)
+		} else {
+			if node == r.tree.Root.lastDeepestChild() {
+				r.writeByte(itemNewline)
+			}
 		}
 	}
 	r.tag("/span", nil, nil, false)
