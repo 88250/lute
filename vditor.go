@@ -72,9 +72,15 @@ func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
 	if nil == lastc {
 		lastc = tree.Root
 	}
-	if j < len(tree.tokens) {
-		tree.tokens[j].node = lastc
-		lastc.tokens = append(lastc.tokens, tree.tokens[j])
+
+	// 因为 parsed tokens 可能会比 all tokens 短，所需还需要处理末尾部分
+	length := len(tree.tokens)
+	if j < length {
+		for ; j < length; j++ {
+			tree.tokens[j].node = lastc
+			lastc.tokens = append(lastc.tokens, tree.tokens[j])
+			parsedTokens = append(parsedTokens, tree.tokens[j])
+		}
 	}
 	tree.tokens = parsedTokens
 }
