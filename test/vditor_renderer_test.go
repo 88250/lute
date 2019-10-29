@@ -73,6 +73,7 @@ func TestVditorRenderer(t *testing.T) {
 
 var vditorOperationTests = []*vditorTest{
 
+	{&parseTest{"8", "\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\"></span><span class=\"newline\">\n</span></p>"}, 0, 0},
 	{&parseTest{"7", "* 1 * 2\n", "<ul data-ntype=\"7\" data-mtype=\"1\"><li class=\"node node--block\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">* </span><span>1 * 2</span><span class=\"newline\">\n</span></li><li class=\"node node--block node--expand\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">* </span><span data-cso=\"0\" data-ceo=\"0\">\n</span><span class=\"newline\">\n</span></li></ul>"}, 8, 8},
 	{&parseTest{"6", "foo\n\nbar\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span>foo</span><span class=\"newline\">\n\n</span></p><p data-ntype=\"1\" data-mtype=\"0\"><span>bar</span><span class=\"newline\">\n\n</span></p><p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">\n</span><span class=\"newline\">\n\n</span></p>"}, 8, 8},
 	{&parseTest{"5", "**foo**\n", "<p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\">**</span><span>foo</span><span class=\"marker\">**</span></strong><span class=\"newline\">\n\n</span></p><p data-ntype=\"1\" data-mtype=\"0\"><strong class=\"node node--expand\" data-ntype=\"18\" data-mtype=\"2\"><span class=\"marker\" data-cso=\"0\" data-ceo=\"0\">**</span><span class=\"marker\">**</span></strong><span class=\"newline\">\n\n</span></p>"}, 7, 7},

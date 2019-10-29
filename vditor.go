@@ -142,7 +142,7 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	newTree := &Node{typ: en.typ, tokens: en.tokens[endOffset:]} // 生成新的节点树，内容是当前选中节点的后半部分
 	en.tokens = en.tokens[:endOffset]                            // 当前选中节点内容为前半部分
 	// 保持排版格式并实现换行
-	for parent := en.parent; ; parent = parent.parent { // 从当前选中节点开始向父节点方向迭代
+	for parent := en.parent; nil != parent; parent = parent.parent { // 从当前选中节点开始向父节点方向迭代
 		if NodeDocument == parent.typ || NodeList == parent.typ || NodeBlockquote == parent.typ {
 			// 遇到这几种块容器说明迭代结束
 			break
@@ -172,18 +172,16 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	// 进行最终渲染
 	var output []byte
 	renderer = lute.newVditorRenderer(tree)
-	var child *Node
-	for child = newTree.firstChild; nil != child.firstChild; child = child.firstChild {
-	}
-	if 1 > len(child.tokens) {
+	firstc := newTree.firstDeepestChild()
+	if 1 > len(firstc.tokens) {
 		lastc := tree.Root.lastDeepestChild()
-		if lastc == child {
-			child.tokens = items{newItem(itemNewline, 0, 0, 0)}
+		if lastc == firstc {
+			firstc.tokens = items{newItem(itemNewline, 0, 0, 0)}
 		}
 	}
-	child.caretStartOffset = "0"
-	child.caretEndOffset = "0"
-	renderer.expand(child)
+	firstc.caretStartOffset = "0"
+	firstc.caretEndOffset = "0"
+	renderer.expand(firstc)
 	output, err = renderer.Render()
 	html = string(output)
 	return

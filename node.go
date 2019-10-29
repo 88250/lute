@@ -81,12 +81,20 @@ type Node struct {
 	caretEndOffset   string // 光标插入结束偏移位置
 }
 
-// lastDeepestChild 返回 n 的最后最深一个子节点。
+// lastDeepestChild 返回 n 的最后一个最深子节点。
 func (n *Node) lastDeepestChild() (ret *Node) {
 	if nil == n.lastChild {
 		return n
 	}
 	return n.lastChild.lastDeepestChild()
+}
+
+// firstDeepestChild 返回 n 的第一个最深的子节点。
+func (n *Node) firstDeepestChild() (ret *Node) {
+	if nil == n.firstChild {
+		return n
+	}
+	return n.firstChild.firstDeepestChild()
 }
 
 // LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。
