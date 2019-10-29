@@ -61,6 +61,10 @@ func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
 		i++
 		j++
 	}
+
+	if nil == lastc {
+		lastc = tree.Root
+	}
 	if j < len(tree.tokens) {
 		tree.tokens[j].node = lastc
 		lastc.tokens = append(lastc.tokens, tree.tokens[j])
