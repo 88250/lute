@@ -153,8 +153,6 @@ var terms = map[string]string{
 	"redis":         "Redis",
 	"elasticsearch": "Elasticsearch",
 	"solr":          "Solr",
-	"solo":          "Solo",
-	"sym":           "Sym",
 	"b3log":         "B3log",
 	"hacpai":        "HacPai",
 	"lute":          "Lute",
