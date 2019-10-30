@@ -17,17 +17,20 @@ package lute
 // attachNode 用于将 tree 上的所有 tokens 和节点进行反向关联。
 func (lute *Lute) attachNode(tree *Tree) {
 	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
-		if NodeEmojiUnicode == n.typ || NodeEmojiImg == n.typ || 1 > len(n.tokens) {
-			// 跳过生成的、内容为空的节点
-			return WalkStop, nil
+		if !entering {
+			return WalkContinue, nil
 		}
 
-		if entering {
-			// 关联节点
-			for i := range n.tokens {
-				n.tokens[i].node = n
-			}
+		if NodeEmojiUnicode == n.typ || NodeEmojiImg == n.typ || 1 > len(n.tokens) {
+			// 跳过生成的、内容为空的节点
+			return WalkContinue, nil
 		}
+
+		// 关联节点
+		for i := range n.tokens {
+			n.tokens[i].node = n
+		}
+		tree.passedTokens = append(tree.passedTokens, n.tokens...)
 		return WalkContinue, nil
 	})
 }
