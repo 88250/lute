@@ -88,11 +88,11 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	// TODO: 仅实现了光标插入位置节点获取，选段映射待实现
 
 	en := renderer.nearest(nodes, endOffset)
-	baseOffset := 0
-	if 0 < len(en.tokens) {
-		baseOffset = en.tokens[0].Offset()
-	}
+	baseOffset, _ := en.Range()
 	endOffset = endOffset - baseOffset
+	if enLen := len(en.tokens); enLen < endOffset {
+		endOffset = enLen
+	}
 
 	if NodeThematicBreak == en.typ { // 如果光标所处节点是分隔线节点的话
 		en.typ = NodeText // 将分隔线转为文本，后续会按文本节点进行换行处理

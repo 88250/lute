@@ -767,7 +767,7 @@ func (r *VditorRenderer) findSelection(startOffset, endOffset int, selected *[]*
 			endToken = &token
 			break
 		}
-
+		*selected = append(*selected, token.node)
 	}
 
 	if nil != startToken {
