@@ -178,3 +178,14 @@ type Tree struct {
 
 	tokens items // 所有 tokens
 }
+
+// findTokens 返回 start、end 间的 tokens。
+func (tree *Tree) findTokens(start, end int) (tokens items) {
+	// TODO: 通过二分查找改进性能
+	for _, token := range tree.tokens {
+		if start <= token.Offset() && end >= token.Offset() {
+			tokens = append(tokens, token)
+		}
+	}
+	return
+}
