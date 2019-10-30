@@ -15,57 +15,21 @@
 package lute
 
 // attachNode 用于将 tree 上的所有 tokens 和节点进行反向关联。
-func (lute *Lute) attachNode(tree *Tree) (tokens items) {
-	nodes := tree.Root.List()
-	length := len(nodes)
-	var n *Node
-	tokens = make(items, 0, len(nodes)*4)
-	for i := 0; i < length; i++ {
-		n = nodes[i]
+func (lute *Lute) attachNode(tree *Tree) {
+	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
 		if NodeEmojiUnicode == n.typ || NodeEmojiImg == n.typ || 1 > len(n.tokens) {
 			// 跳过生成的、内容为空的节点
-			continue
+			return WalkStop, nil
 		}
-		// 关联节点
-		for i := range n.tokens {
-			n.tokens[i].node = n
+
+		if entering {
+			// 关联节点
+			for i := range n.tokens {
+				n.tokens[i].node = n
+			}
 		}
-		tokens = append(tokens, n.tokens...)
-	}
-	return
-}
-
-// restoreTokens 使用树上完整的 tokens 补全解析好的节点。
-// 标准的 Markdown AST 会丢弃一些 tokens（比如段落首尾空白），需要将这些字节补全到相应节点后。
-func (lute *Lute) restoreTokens(parsedTokens items, tree *Tree) {
-	lastc := tree.Root.firstDeepestChild()
-	var i int
-	for ; i < len(parsedTokens); i++ {
-		parsedToken := parsedTokens[i]
-		if tree.tokens[i].offset == parsedToken.offset {
-			lastc = parsedToken.node
-		} else {
-			tree.tokens[i].node = lastc
-			parsedTokens = append(parsedTokens, newItem(0, 0, 0, 0))
-			copy(parsedTokens[i+1:], parsedTokens[i:])
-			parsedTokens[i] = tree.tokens[i]
-		}
-	}
-
-	// TODO: 没必要
-	if nil == lastc {
-		lastc = tree.Root
-	}
-
-	// 因为 parsed tokens 可能会比 all tokens 短，所需还需要处理末尾部分
-	length := len(tree.tokens)
-	for ; i < length; i++ {
-		parsedTokens = append(parsedTokens, tree.tokens[i])
-	}
-
-	// TODO: 没必要
-	tree.tokens = parsedTokens
-
+		return WalkContinue, nil
+	})
 }
 
 // RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
@@ -78,8 +42,7 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 		return
 	}
 
-	parsedTokens := lute.attachNode(tree)
-	lute.restoreTokens(parsedTokens, tree)
+	lute.attachNode(tree)
 
 	renderer := lute.newVditorRenderer(tree)
 	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)
@@ -102,16 +65,13 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		return
 	}
 
-	parsedTokens := lute.attachNode(tree)
-	lute.restoreTokens(parsedTokens, tree)
+	lute.attachNode(tree)
 
 	renderer := lute.newVditorRenderer(tree)
 	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)
 
 	var nodes []*Node
-	for c := tree.Root.firstChild; nil != c; c = c.next {
-		renderer.findSelection(c, startOffset, endOffset, &nodes)
-	}
+	renderer.findSelection(startOffset, endOffset, &nodes)
 
 	if 1 > len(nodes) {
 		// 当且仅当渲染空 Markdown 时
