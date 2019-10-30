@@ -711,12 +711,10 @@ func (r *VditorRenderer) mtype(nodeType nodeType) string {
 }
 
 // mapSelection 用于映射文本选段。
-// 根据 Markdown 原文中的 startOffset 和 endOffset 位置从根节点 root 上遍历查找该范围内的节点，找到对应节点后进行标记以支持后续渲染。
+// 根据 Markdown 原文中的 startOffset 和 endOffset 位置上遍历查找该范围内的节点，找到对应节点后进行标记以支持后续渲染。
 func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 	var nodes []*Node
-	for c := root.firstChild; nil != c; c = c.next {
-		r.findSelection(c, startOffset, endOffset, &nodes)
-	}
+	r.findSelection(startOffset, endOffset, &nodes)
 
 	if 1 > len(nodes) {
 		// 当且仅当渲染空 Markdown 时
@@ -754,11 +752,10 @@ func (tokens items) Len() int           { return len(tokens) }
 func (tokens items) Swap(i, j int)      { tokens[i], tokens[j] = tokens[j], tokens[i] }
 func (tokens items) Less(i, j int) bool { return tokens[i].Offset() < tokens[j].Offset() }
 
-// findSelection 在 node 上递归查找 startOffset 和 endOffset 选段，选中节点累计到 selected 中。
-func (r *VditorRenderer) findSelection(node *Node, startOffset, endOffset int, selected *[]*Node) {
+// findSelection 在语法树上查找 startOffset 和 endOffset 选段，选中节点累计到 selected 中。
+func (r *VditorRenderer) findSelection(startOffset, endOffset int, selected *[]*Node) {
 	tokens := r.tree.tokens
-	// TODO: 这个排序似乎是多余的
-	//sort.Sort(tokens)
+
 	var token item
 	var startToken, endToken *item
 	length := len(tokens)
