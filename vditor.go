@@ -37,9 +37,11 @@ func (lute *Lute) attachNode(tree *Tree) {
 
 // RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
 func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset int) (html string, err error) {
-	var tree *Tree
 	lute.VditorWYSIWYG = true
-	markdownText = lute.endNewline(markdownText)
+	lute.endNewline(&markdownText)
+	lute.fixOffset(&markdownText, &startOffset, &endOffset)
+
+	var tree *Tree
 	tree, err = lute.parse("", []byte(markdownText))
 	if nil != err {
 		return
@@ -50,6 +52,7 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 	renderer := lute.newVditorRenderer(tree)
 	startOffset, endOffset = renderer.byteOffset(markdownText, startOffset, endOffset)
 	renderer.mapSelection(tree.Root, startOffset, endOffset)
+
 	var output []byte
 	output, err = renderer.Render()
 	html = string(output)
@@ -60,9 +63,11 @@ func (lute *Lute) RenderVditorDOM(markdownText string, startOffset, endOffset in
 // 支持的 operation 如下：
 //   * newline 换行
 func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset int, operation string) (html string, err error) {
-	var tree *Tree
 	lute.VditorWYSIWYG = true
-	markdownText = lute.endNewline(markdownText)
+	lute.endNewline(&markdownText)
+	lute.fixOffset(&markdownText, &startOffset, &endOffset)
+
+	var tree *Tree
 	tree, err = lute.parse("", []byte(markdownText))
 	if nil != err {
 		return
@@ -75,7 +80,6 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 
 	var nodes []*Node
 	renderer.findSelection(startOffset, endOffset, &nodes)
-
 	if 1 > len(nodes) {
 		// 当且仅当渲染空 Markdown 时
 		nodes = append(nodes, tree.Root)
@@ -99,11 +103,20 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	}
 
 	newTree := &Node{typ: en.typ, tokens: en.tokens[endOffset:]} // 生成新的节点树，内容是当前选中节点的后半部分
-	en.tokens = en.tokens[:endOffset]                            // 当前选中节点内容为前半部分
+	if NodeListItem == en.typ {
+		newTree.listData = en.listData
+		newTree.tokens = en.tokens
+		// TODO: 处理有序列表序号递增
+	}
+	en.tokens = en.tokens[:endOffset] // 当前选中节点内容为前半部分
+
 	// 保持排版格式并实现换行
 	for parent := en.parent; nil != parent; parent = parent.parent { // 从当前选中节点开始向父节点方向迭代
 		if NodeDocument == parent.typ || NodeList == parent.typ || NodeBlockquote == parent.typ {
 			// 遇到这几种块容器说明迭代结束
+			if !newTree.close {
+				en.InsertAfter(newTree)
+			}
 			break
 		}
 
@@ -126,6 +139,7 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		}
 		parent.InsertAfter(newParent) // 将新的父节作为当前迭代节点的右兄弟节点挂好
 		newTree = newParent           // 设置当前节点以便下一次迭代
+		newTree.close = true
 	}
 
 	// 进行最终渲染
@@ -162,4 +176,14 @@ func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
 	}
 	markdown = bytesToStr(formatted)
 	return
+}
+
+func (lute *Lute) fixOffset(markdownText *string, startOffset, endOffset *int) {
+	length := len(*markdownText)
+	if length < *startOffset {
+		*startOffset = length
+	}
+	if length < *endOffset {
+		*endOffset = length
+	}
 }

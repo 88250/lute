@@ -155,15 +155,15 @@ func (lute *Lute) RenderEChartsJSON(markdownText string) (json string, err error
 }
 
 // endNewline 用于在 markdownText 结尾加上一个 \n，仅在结尾没有 \n 时添加。
-func (lute *Lute) endNewline(markdownText string) string {
-	length := len(markdownText)
+func (lute *Lute) endNewline(markdownText *string) {
+	length := len(*markdownText)
 	if 1 > length {
-		return "\n"
+		*markdownText = "\n"
+		return
 	}
-	if itemNewline != markdownText[length-1] {
-		markdownText += "\n"
+	if itemNewline != (*markdownText)[length-1] {
+		*markdownText += "\n"
 	}
-	return markdownText
 }
 
 // options 描述了一些列解析和渲染选项。
