@@ -754,8 +754,7 @@ func (tokens items) Less(i, j int) bool { return tokens[i].Offset() < tokens[j].
 
 // findSelection 在语法树上查找 startOffset 和 endOffset 选段，选中节点累计到 selected 中。
 func (r *VditorRenderer) findSelection(startOffset, endOffset int, selected *[]*Node) {
-
-
+	tokens := r.tree.passedTokens
 	var token item
 	var startToken, endToken *item
 	length := len(tokens)
