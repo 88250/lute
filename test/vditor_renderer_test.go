@@ -27,12 +27,13 @@ type vditorTest struct {
 
 var vditorRendererTests = []*vditorTest{
 
+	{&parseTest{"30", ":heart:", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">:</span><span data-hidden=\"❤️\"></span><span class=\"marker\" data-cso=\"6\" data-ceo=\"6\">heart:</span></span><span class=\"newline\">\n\n</span></p>"}, 7, 7},
 	{&parseTest{"29", "* 1\n\n  2", "<ul data-ntype=\"7\" data-mtype=\"1\"><li class=\"node node--block node--expand\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">* </span><p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\">1</span><span class=\"newline\">\n\n</span></p><p data-ntype=\"1\" data-mtype=\"0\"><span>2</span><span class=\"newline\">\n\n</span></p></li></ul>"}, 2, 2},
 	{&parseTest{"28", "  1", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"1\" data-ceo=\"1\">1</span><span class=\"newline\">\n\n</span></p>"}, 3, 3},
-	{&parseTest{"27", "1  ", "<p data-ntype=\"1\" data-mtype=\"0\"><span>1</span><span class=\"newline\">\n\n</span></p>"}, 3, 3},
+	{&parseTest{"27", "1  2", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"3\" data-ceo=\"3\">1  2</span><span class=\"newline\">\n\n</span></p>"}, 3, 3},
 	{&parseTest{"26", "\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\"></span><span class=\"newline\">\n</span></p>"}, 0, 0},
 	{&parseTest{"25", ":heart: foo\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">:</span><span data-hidden=\"❤️\"></span><span class=\"marker\">heart:</span></span><span data-cso=\"4\" data-ceo=\"4\"> foo</span><span class=\"newline\">\n\n</span></p>"}, 11, 11},
-	{&parseTest{"24", "foo:heart:bar\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span>foo</span><span class=\"node\"><span class=\"marker\">:</span><span data-hidden=\"❤️\"></span><span class=\"marker\" data-cso=\"1\" data-ceo=\"1\">heart:</span></span><span>bar</span><span class=\"newline\">\n\n</span></p>"}, 4, 4},
+	{&parseTest{"24", "foo:heart:bar\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span>foo</span><span class=\"node\"><span class=\"marker\">:</span><span data-hidden=\"❤️\"></span><span class=\"marker\" data-cso=\"0\" data-ceo=\"0\">heart:</span></span><span>bar</span><span class=\"newline\">\n\n</span></p>"}, 4, 4},
 	{&parseTest{"23", "-\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"1\" data-ceo=\"1\">-</span><span class=\"newline\">\n\n</span></p>"}, 1, 1},
 	{&parseTest{"22", "https://hacpai.com\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"2\" data-ceo=\"2\">https://hacpai.com</span><span class=\"newline\">\n\n</span></p>"}, 2, 2},
 	{&parseTest{"21", "[foo](/bar )1\n", "<p data-ntype=\"1\" data-mtype=\"0\"><a class=\"node node--expand\" href=\"/bar\" data-ntype=\"29\" data-mtype=\"2\"><span class=\"marker\">[</span><span data-cso=\"1\" data-ceo=\"1\">foo</span><span class=\"marker\">]</span><span class=\"marker\">(</span><span class=\"marker\">/bar</span><span class=\"marker\"> </span><span class=\"marker\">)</span></a><span>1</span><span class=\"newline\">\n\n</span></p>"}, 2, 2},

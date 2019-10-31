@@ -732,6 +732,11 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 	startOffset = startOffset - baseOffset
 	endOffset = endOffset - baseOffset
 	startOffset, endOffset = r.runeOffset(itemsToBytes(sn.tokens), startOffset, endOffset)
+	if NodeEmojiAlias == en.typ {
+		// :heart: 前面第一个 : 是放在 Unicode 前，所以偏移需要减一
+		endOffset--
+		startOffset--
+	}
 	sn.caretStartOffset = strconv.Itoa(startOffset)
 	en.caretEndOffset = strconv.Itoa(endOffset)
 	r.expand(sn)
