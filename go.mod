@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/alecthomas/chroma v0.6.8
+	github.com/alecthomas/colour v0.1.0 // indirect
 	github.com/alecthomas/repr v0.0.0-20181024024818-d37bc2a10ba1 // indirect
 	github.com/dlclark/regexp2 v1.2.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190915194858-d3ddacdb130f
@@ -13,10 +14,10 @@ require (
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
-	github.com/yuin/goldmark v1.1.0
+	github.com/yuin/goldmark v1.1.1
 	gitlab.com/golang-commonmark/html v0.0.0-20180917080848-cfaf75183c4a // indirect
 	gitlab.com/golang-commonmark/linkify v0.0.0-20191026162114-a0c2df6c8f82 // indirect
-	gitlab.com/golang-commonmark/markdown v0.0.0-20181102083822-772775880e1f
+	gitlab.com/golang-commonmark/markdown v0.0.0-20191101041056-07f57002fff3
 	gitlab.com/golang-commonmark/mdurl v0.0.0-20180912090424-e5bce34c34f2 // indirect
 	gitlab.com/golang-commonmark/puny v0.0.0-20180912090636-2cd490539afe // indirect
 	gitlab.com/opennota/wd v0.0.0-20180912061657-c5d65f63c638 // indirect
