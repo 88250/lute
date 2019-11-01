@@ -241,9 +241,15 @@ func (r *VditorRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("span", node, nil, false)
-	r.write(node.tokens)
-	r.tag("/span", nil, nil, false)
+	if NodeImage == node.parent.typ {
+		r.tag("span", node, [][]string{{"class", "marker"}}, false)
+		r.write(node.tokens)
+		r.tag("/span", nil, nil, false)
+	} else {
+		r.tag("span", node, nil, false)
+		r.write(node.tokens)
+		r.tag("/span", nil, nil, false)
+	}
 	return WalkStop, nil
 }
 
@@ -276,29 +282,30 @@ func (r *VditorRenderer) renderOpenBracket(node *Node, entering bool) (WalkStatu
 }
 
 func (r *VditorRenderer) renderBang(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.writeByte(itemBang)
+	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if 0 == r.disableTags {
-			r.writeString("<img src=\"")
-			r.write(node.ChildByType(NodeLinkDest).tokens)
+		r.tag("span", node, [][]string{{"class", "node"}}, false)
+	} else {
+		r.writeString("<img src=\"")
+		r.write(node.ChildByType(NodeLinkDest).tokens)
+		if text := node.ChildByType(NodeLinkText); nil != text && nil != text.tokens {
 			r.writeString("\" alt=\"")
+			r.write(text.tokens)
+			r.writeString("\"")
 		}
-		r.disableTags++
-		return WalkContinue, nil
-	}
-
-	r.disableTags--
-	if 0 == r.disableTags {
-		r.writeString("\"")
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			r.writeString(" title=\"")
 			r.write(title.tokens)
 			r.writeString("\"")
 		}
 		r.writeString(" />")
+		r.tag("/span", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
