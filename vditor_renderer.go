@@ -754,7 +754,8 @@ func (r *VditorRenderer) mapSelection(root *Node, startOffset, endOffset int) {
 func (r *VditorRenderer) expand(node *Node) {
 	for p := node; nil != p; p = p.parent {
 		switch p.typ {
-		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink, NodeEmojiAlias:
+		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink, NodeEmojiAlias,
+			NodeImage:
 			p.expand = true
 			return
 		}
