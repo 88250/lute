@@ -294,8 +294,9 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 	} else {
 		r.writeString("<img src=\"")
 		r.write(node.ChildByType(NodeLinkDest).tokens)
+		r.writeString("\"")
 		if text := node.ChildByType(NodeLinkText); nil != text && nil != text.tokens {
-			r.writeString("\" alt=\"")
+			r.writeString(" alt=\"")
 			r.write(text.tokens)
 			r.writeString("\"")
 		}

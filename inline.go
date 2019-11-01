@@ -244,7 +244,8 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		node := &Node{typ: NodeLink, linkType: 0}
 		if isImage {
 			node.typ = NodeImage
-			node.AppendChild(&Node{typ: NodeBang})
+			node.AppendChild(&Node{typ: NodeBang, tokens: opener.node.tokens[:1]})
+			opener.node.tokens = opener.node.tokens[1:]
 		}
 		node.AppendChild(&Node{typ: NodeOpenBracket, tokens: opener.node.tokens})
 
