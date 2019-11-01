@@ -81,6 +81,7 @@ func TestVditorRenderer(t *testing.T) {
 
 var vditorOperationTests = []*vditorTest{
 
+	{&parseTest{"11", "# foo\n", "<p data-ntype=\"1\" data-mtype=\"0\"><span class=\"node\"><span class=\"marker\">:</span><img alt=\"doge\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/doge.png\" title=\"doge\" /><span class=\"marker\" data-cso=\"1\" data-ceo=\"1\">doge:</span></span><span class=\"newline\">\n\n</span></p>"}, 5, 5},
 	{&parseTest{"10", "* 1", "<ul data-ntype=\"7\" data-mtype=\"1\"><li class=\"node node--block\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">* </span><span>1</span><span class=\"newline\">\n</span></li><li class=\"node node--block node--expand\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">* </span><span data-cso=\"0\" data-ceo=\"0\">\n</span><span class=\"newline\">\n</span></li></ul>"}, 3, 3},
 	{&parseTest{"9", "* 1\n* ", "<ul data-ntype=\"7\" data-mtype=\"1\"><li class=\"node node--block\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">* </span><span>1</span><span class=\"newline\">\n</span></li><li class=\"node node--block\" data-ntype=\"8\" data-mtype=\"1\"><span class=\"marker\">* </span><span class=\"newline\">\n</span></li><li class=\"node node--block node--expand\" data-ntype=\"8\" data-mtype=\"1\" data-cso=\"0\" data-ceo=\"0\"><span class=\"marker\">* </span><span class=\"newline\">\n</span></li></ul>"}, 6, 6},
 	{&parseTest{"8", "", "<p data-ntype=\"1\" data-mtype=\"0\"><span data-cso=\"0\" data-ceo=\"0\"></span><span class=\"newline\">\n</span></p>"}, 0, 0},
