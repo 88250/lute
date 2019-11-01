@@ -19,5 +19,4 @@ func TestChroma(t *testing.T) {
 	if nil != err {
 		t.Fatalf(err.Error())
 	}
-
 }
