@@ -612,6 +612,9 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 
 func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		r.tag("span", node, [][]string{{"class", "marker"}}, false)
+		r.write(node.tokens)
+		r.tag("/span", nil, nil, false)
 		var attrs [][]string
 		if node.taskListItemChecked {
 			attrs = append(attrs, []string{"checked", ""})
@@ -619,7 +622,7 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
 		r.tag("input", node, attrs, true)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
