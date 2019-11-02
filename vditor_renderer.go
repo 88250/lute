@@ -588,7 +588,7 @@ func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 
 func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
+		if 3 == node.listData.typ {
 			r.tag("li", node, [][]string{{"class", "node node--block " + r.option.GFMTaskListItemClass}}, false)
 		} else {
 			r.tag("li", node, [][]string{{"class", "node node--block"}}, false)
@@ -600,7 +600,10 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 			marker = append(marker, node.listData.delimiter)
 		}
 		r.writeString(itemsToStr(marker) + " ")
-		r.tag("/span", nil, nil, false)
+
+		if 3 != node.parent.listData.typ {
+			r.tag("/span", nil, nil, false)
+		}
 	} else {
 		if node.tight || node.parent.tight {
 			r.writeString("<span class=\"newline\">\n</span>")
@@ -611,17 +614,15 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("span", node, [][]string{{"class", "marker"}}, false)
-		r.write(node.tokens)
-		r.tag("/span", nil, nil, false)
-		var attrs [][]string
-		if node.taskListItemChecked {
-			attrs = append(attrs, []string{"checked", ""})
-		}
-		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
-		r.tag("input", node, attrs, true)
+	r.write(node.tokens)
+	var attrs [][]string
+	if node.taskListItemChecked {
+		attrs = append(attrs, []string{"checked", ""})
 	}
+	r.tag("/span", nil, nil, false)
+	attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
+	r.tag("input", node, attrs, true)
+
 	return WalkStop, nil
 }
 
