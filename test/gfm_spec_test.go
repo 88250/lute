@@ -30,6 +30,10 @@ var gfmSpecTests = []parseTest{
 	{"gfm205", "| abc | def |\n| --- | --- |\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
 	{"gfm279", "- [ ] foo\n- [x] bar\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> foo</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> bar</li>\n</ul>\n"},
 	{"gfm280", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo\n<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> bar</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> baz</li>\n</ul>\n</li>\n<li><input disabled=\"\" type=\"checkbox\" /> bim</li>\n</ul>\n"},
+	{"task3", "- [ ]foo\n", "<ul>\n<li>[ ]foo</li>\n</ul>\n"},
+	{"task2", "- [ ] foo\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
+	{"task1", "- [ ] \n", "<ul>\n<li>[ ]</li>\n</ul>\n"},
+	{"task0", "- [ ]\n", "<ul>\n<li>[ ]</li>\n</ul>\n"},
 
 	// gfm spec inline-level cases
 

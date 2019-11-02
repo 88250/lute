@@ -40,7 +40,7 @@ var debugTests = []parseTest{
 	{"24", "[]( https://b3log.org", "<p>[]( <a href=\"https://b3log.org\">https://b3log.org</a></p>\n"},
 
 	// GFM 任务列表 li 加 class="vditor-task" https://github.com/b3log/lute/issues/10
-	{"23", "- [x]\n", "<ul>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /></li>\n</ul>\n"},
+	{"23", "- [x] foo\n", "<ul>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
 
 	// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
 	{"22", "0\n-:\n1\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"right\">1</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
