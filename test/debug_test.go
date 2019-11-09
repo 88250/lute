@@ -20,6 +20,9 @@ import (
 
 var debugTests = []parseTest{
 
+	// 为标题添加锚点 https://github.com/b3log/lute/issues/35
+	{"39", "# 标题一\n\n## 子标题二\n", ""},
+
 	{"38", "www.我的网址/console\n", "<p>www.我的网址/console</p>\n"},
 	{"37", "http://我的网址/console\n", "<p>http://我的网址/console</p>\n"},
 	{"36", "http://mydomain/console\n", "<p>http://mydomain/console</p>\n"},
@@ -83,6 +86,7 @@ var debugTests = []parseTest{
 
 func TestDebug(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.HeadingAnchor = true
 	for _, test := range debugTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.from)
 		if nil != err {

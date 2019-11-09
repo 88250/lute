@@ -107,6 +107,17 @@ func (n *Node) ChildByType(childType nodeType) *Node {
 	return nil
 }
 
+// Text 返回 n 及其文本子节点的文本值。
+func (n *Node) Text() (ret string) {
+	Walk(n, func(n *Node, entering bool) (status WalkStatus, e error) {
+		if NodeText == n.typ && entering {
+			ret += itemsToStr(n.tokens)
+		}
+		return WalkContinue, nil
+	})
+	return
+}
+
 // Range 返回节点源码起始偏移和结束偏移位置。
 func (n *Node) Range() (start, end int) {
 	if 1 > len(n.tokens) {

@@ -201,6 +201,8 @@ type options struct {
 	Emojis map[string]string
 	// EmojiSite 设置图片 Emoji URL 的路径前缀。
 	EmojiSite string
+	// HeadingAnchor 设置是否对标题生成链接锚点
+	HeadingAnchor bool
 	// Terms 将传入的 terms 合并覆盖到已有的 Terms 字典。
 	Terms map[string]string
 	// Vditor 所见即所得支持
@@ -270,6 +272,10 @@ func (lute *Lute) SetEmojis(emojis map[string]string) {
 
 func (lute *Lute) SetEmojiSite(emojiSite string) {
 	lute.EmojiSite = emojiSite
+}
+
+func (lute *Lute) SetHeadingAnchor(b bool) {
+	lute.HeadingAnchor = b
 }
 
 func (lute *Lute) SetTerms(terms map[string]string) {
