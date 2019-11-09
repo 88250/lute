@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/alecthomas/chroma/quick"
@@ -22,7 +23,8 @@ func TestChroma(t *testing.T) {
 		t.Fatalf(err.Error())
 	}
 	if output := writer.String(); expected != output {
-		t.Fatalf("unexpected output:\n" + output)
+		fmt.Println("unexpected output:\n" + output)
+		t.Fail()
 	}
 }
 
@@ -103,12 +105,12 @@ var expected = `<html>
 body { background-color: #ffffff; }
 </style><body class="chroma">
 <pre class="chroma">
-	<span class="nd">@RequestProcessing</span><span class="p">(</span><span class="s">&#34;/&#34;</span><span class="p">)</span>
-	<span class="kd">public</span> <span class="nf">void</span> <span class="n">index</span><span class="p">(</span><span class="kd">final</span> <span class="nf">RequestContext</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
-		<span class="n">context</span><span class="p">.</span><span class="na">setRenderer</span><span class="p">(</span><span class="k">new</span> <span class="n">SimpleFMRenderer</span><span class="p">(</span><span class="s">&#34;index.ftl&#34;</span><span class="p">));</span>
-		<span class="kd">final</span> <span class="nf">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="nf">dataModel</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="na">getRenderer</span><span class="p">().</span><span class="na">getRenderDataModel</span><span class="p">();</span>
-		<span class="n">dataModel</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&#34;greeting&#34;</span><span class="p">,</span> <span class="s">&#34;Hello, Latke!&#34;</span><span class="p">);</span>
-	<span class="p">}</span></pre>
+	<span class="nd">@RequestProcessing</span><span class="o">(</span><span class="s">&#34;/&#34;</span><span class="o">)</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">index</span><span class="o">(</span><span class="kd">final</span> <span class="n">RequestContext</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">context</span><span class="o">.</span><span class="na">setRenderer</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleFMRenderer</span><span class="o">(</span><span class="s">&#34;index.ftl&#34;</span><span class="o">));</span>
+		<span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">dataModel</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getRenderer</span><span class="o">().</span><span class="na">getRenderDataModel</span><span class="o">();</span>
+		<span class="n">dataModel</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&#34;greeting&#34;</span><span class="o">,</span> <span class="s">&#34;Hello, Latke!&#34;</span><span class="o">);</span>
+	<span class="o">}</span></pre>
 </body>
 </html>
 `
