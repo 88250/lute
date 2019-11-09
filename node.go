@@ -110,7 +110,7 @@ func (n *Node) ChildByType(childType nodeType) *Node {
 // Text 返回 n 及其文本子节点的文本值。
 func (n *Node) Text() (ret string) {
 	Walk(n, func(n *Node, entering bool) (status WalkStatus, e error) {
-		if NodeText == n.typ && entering {
+		if (NodeText == n.typ || NodeLinkText == n.typ) && entering {
 			ret += itemsToStr(n.tokens)
 		}
 		return WalkContinue, nil
