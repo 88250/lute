@@ -135,7 +135,7 @@ func (l *lexer) nextLine() (ret items) {
 			ret = append(ret, newItem(b, l.ln, l.col, l.offset+offset))
 			break
 		} else if itemCarriageReturn == b {
-			// 按照规范定义的 line ending (https://spec.commonmark.org/0.29/#line-ending) 处理 \r
+			// 处理 \r
 			ret = append(ret, newItem(b, l.ln, l.col, l.offset+offset))
 			if i < l.length-1 {
 				nb = l.input[i+1]
@@ -149,7 +149,7 @@ func (l *lexer) nextLine() (ret items) {
 			i++
 			break
 		} else if '\u0000' == b {
-			// 将 \u0000 替换为 \uFFFD https://spec.commonmark.org/0.29/#insecure-characters
+			// 将 \u0000 替换为 \uFFFD
 			l.input = append(l.input, 0, 0)
 			copy(l.input[i+2:], l.input[i:])
 			// \uFFFD 的 UTF-8 编码为 \xEF\xBF\xBD 共三个字节
