@@ -18,6 +18,8 @@ import (
 )
 
 var spaceTests = []parseTest{
+
+	{"7", "人民币符号后￥100不加空格\n", "<p>人民币符号后 ￥100 不加空格</p>\n"},
 	{"6", "今日气温25℃晴\n", "<p>今日气温 25℃ 晴</p>\n"},
 
 	// 自动空格 % 问题 https://github.com/b3log/lute/issues/28

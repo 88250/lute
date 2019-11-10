@@ -51,31 +51,53 @@ func isAllowSpace(currentChar, nextChar rune) bool {
 		return false
 	}
 
-	if utf8.RuneSelf <= currentChar { // 当前字符不是 ASCII 字符
-		if '℃' == currentChar {
-			// 摄氏度符号后必须跟空格
+	currentIsASCII := utf8.RuneSelf > currentChar
+	nextIsASCII := utf8.RuneSelf > nextChar
+	currentIsLetter := unicode.IsLetter(currentChar)
+	nextIsLetter := unicode.IsLetter(nextChar)
+	if currentIsASCII == nextIsASCII && currentIsLetter && nextIsLetter {
+		return false
+	}
+
+	currentIsSymbol := unicode.IsSymbol(currentChar)
+	nextIsSymbol := unicode.IsSymbol(nextChar)
+	if (currentIsLetter && nextIsSymbol) || (currentIsSymbol && nextIsLetter) {
+		return true
+	}
+
+	currentIsPunct := unicode.IsPunct(currentChar)
+	nextIsPunct := unicode.IsPunct(nextChar)
+	if (currentIsLetter && nextIsPunct) || (currentIsPunct && nextIsLetter) {
+		if '%' == currentChar || '%' == nextChar {
 			return true
 		}
-		if '%' == nextChar {
+		return false
+	}
+
+	currentIsDigit := '0' <= currentChar && '9' >= currentChar
+	nextIsDigit := '0' <= nextChar && '9' >= nextChar
+
+	if currentIsASCII {
+		if currentIsDigit && nextIsSymbol {
+			return false
+		}
+		if currentIsPunct && nextIsLetter {
+			return false
+		}
+		if !nextIsASCII {
 			return true
 		}
-		if unicode.IsPunct(nextChar) {
-			// 后面的字符如果是标点符号的话不需要后跟空格
-			return false
-		}
-		return utf8.RuneSelf > nextChar && !unicode.IsPunct(currentChar)
-	} else { // 当前字符是 ASCII 字符
-		if unicode.IsDigit(currentChar) && '℃' == nextChar {
-			// 数字后更摄氏度符号不需要空格
-			return false
-		}
-		if '%' == currentChar {
+		return false
+	} else {
+		if nextIsSymbol {
 			return true
 		}
-		if unicode.IsPunct(currentChar) {
-			// 当前字符如果是 ASCII 标点符号的话不需要后跟空格
+		if currentIsSymbol && (nextIsDigit || nextIsPunct || !nextIsASCII) {
 			return false
 		}
-		return utf8.RuneSelf <= nextChar && !unicode.IsPunct(nextChar)
+		if currentIsLetter && nextIsPunct {
+			return false
+		}
+		return true
 	}
 }
