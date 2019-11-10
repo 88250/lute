@@ -10,6 +10,14 @@
 : PURPOSE.
 : See the Mulan PSL v1 for more details.
 
-go list --tags javascript  -f {{.Deps}}
 SET GOOS=linux
-gopherjs build . --tags javascript -o lute.min.js -m
+
+RD /S /Q %GOPATH%\pkg\linux_js
+
+: go list --tags "!sm"  -f {{.Deps}}
+gopherjs build . --tags "javascript !sm" -o lute.min.js
+RD /S /Q %GOPATH%\pkg\linux_js
+
+: go list --tags "sm"  -f {{.Deps}}
+gopherjs build . --tags "javascript sm" -o lute-sm.min.js
+RD /S /Q %GOPATH%\pkg\linux_js

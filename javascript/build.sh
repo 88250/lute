@@ -12,6 +12,14 @@
 
 #!/bin/sh
 
-go list --tags javascript  -f {{.Deps}}
-SET GOOS=linux
-gopherjs build . --tags javascript -o lute.min.js -m
+export GOOS=linux
+
+rm -rf $GOPATH/pkg/linux_js_min
+
+#go list --tags "!sm"  -f {{.Deps}}
+gopherjs build . --tags "!sm" -o lute.min.js -m
+
+rm -rf $GOPATH/pkg/linux_js_min
+
+#go list --tags "sm"  -f {{.Deps}}
+gopherjs build . --tags "sm" -o lute-sm.min.js -m
