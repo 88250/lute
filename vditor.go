@@ -10,8 +10,6 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build js
-
 package lute
 
 // attachNode 用于将 tree 上的所有 tokens 和节点进行反向关联。
