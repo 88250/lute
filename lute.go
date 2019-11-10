@@ -28,6 +28,7 @@ type Lute struct {
 //  * 中西文间插入空格
 //  * 修正术语拼写
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
+//  * 并行解析
 func New(opts ...option) (ret *Lute) {
 	ret = &Lute{options: &options{}}
 	ret.GFMTable = true
@@ -46,6 +47,7 @@ func New(opts ...option) (ret *Lute) {
 	ret.Emojis = newEmojis()
 	ret.Terms = newTerms()
 	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
+	ret.ParallelParsing = true
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -201,12 +203,14 @@ type options struct {
 	Emojis map[string]string
 	// EmojiSite 设置图片 Emoji URL 的路径前缀。
 	EmojiSite string
-	// HeadingAnchor 设置是否对标题生成链接锚点
+	// HeadingAnchor 设置是否对标题生成链接锚点。
 	HeadingAnchor bool
 	// Terms 将传入的 terms 合并覆盖到已有的 Terms 字典。
 	Terms map[string]string
 	// Vditor 所见即所得支持
 	VditorWYSIWYG bool
+	// ParallelParsing 设置是否启用并行解析。
+	ParallelParsing bool
 }
 
 // option 描述了解析渲染选项设置函数签名。
@@ -284,4 +288,8 @@ func (lute *Lute) SetTerms(terms map[string]string) {
 
 func (lute *Lute) SetVditorWYSIWYG(b bool) {
 	lute.VditorWYSIWYG = b
+}
+
+func (lute *Lute) SetParallelParsing(b bool) {
+	lute.ParallelParsing = b
 }
