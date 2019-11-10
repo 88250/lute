@@ -59,24 +59,20 @@ func isAllowSpace(currentChar, nextChar rune) bool {
 		return false
 	}
 
-	currentIsSymbol := unicode.IsSymbol(currentChar)
-	nextIsSymbol := unicode.IsSymbol(nextChar)
-	if (currentIsLetter && nextIsSymbol) || (currentIsSymbol && nextIsLetter) {
+	if (currentIsLetter && ('￥' == nextChar || '℃' == nextChar)) || (('￥' == currentChar || '℃' == currentChar) && nextIsLetter) {
 		return true
 	}
 
-	currentIsPunct := unicode.IsPunct(currentChar)
-	nextIsPunct := unicode.IsPunct(nextChar)
-	if (currentIsLetter && nextIsPunct) || (currentIsPunct && nextIsLetter) {
-		if '%' == currentChar || '%' == nextChar {
-			return true
-		}
-		return false
+	if ('%' == currentChar && nextIsLetter) || (currentIsLetter && '%' == nextChar) {
+		return true
 	}
 
 	currentIsDigit := '0' <= currentChar && '9' >= currentChar
 	nextIsDigit := '0' <= nextChar && '9' >= nextChar
 
+	nextIsSymbol := unicode.IsSymbol(nextChar)
+	currentIsPunct := unicode.IsPunct(currentChar)
+	nextIsPunct := unicode.IsPunct(nextChar)
 	if currentIsASCII {
 		if currentIsDigit && nextIsSymbol {
 			return false
@@ -84,14 +80,18 @@ func isAllowSpace(currentChar, nextChar rune) bool {
 		if currentIsPunct && nextIsLetter {
 			return false
 		}
-		if !nextIsASCII {
-			return true
+		if nextIsPunct || nextIsSymbol {
+			return false
 		}
-		return false
+		return !nextIsASCII
 	} else {
+		if currentIsPunct {
+			return false
+		}
 		if nextIsSymbol {
 			return true
 		}
+		currentIsSymbol := unicode.IsSymbol(currentChar)
 		if currentIsSymbol && (nextIsDigit || nextIsPunct || !nextIsASCII) {
 			return false
 		}
