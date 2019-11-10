@@ -13,8 +13,9 @@
 package test
 
 import (
-	"github.com/b3log/lute"
 	"testing"
+
+	"github.com/b3log/lute"
 )
 
 var spaceTests = []parseTest{
