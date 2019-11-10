@@ -10,7 +10,7 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build sm
+// +build js
 
 package lute
 
@@ -28,7 +28,7 @@ func (lute *Lute) attachNode(tree *Tree) {
 
 		// 关联节点
 		for i := range n.tokens {
-			n.tokens[i].node = n
+			n.tokens[i].SetNode(n)
 		}
 		tree.passedTokens = append(tree.passedTokens, n.tokens...)
 		return WalkContinue, nil

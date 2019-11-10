@@ -12,12 +12,5 @@
 
 SET GOOS=linux
 
-RD /S /Q %GOPATH%\pkg\linux_js
-
-: go list --tags "!sm"  -f {{.Deps}}
-gopherjs build . --tags "javascript !sm" -o lute.min.js
-RD /S /Q %GOPATH%\pkg\linux_js
-
-: go list --tags "sm"  -f {{.Deps}}
-gopherjs build . --tags "javascript sm" -o lute-sm.min.js
-RD /S /Q %GOPATH%\pkg\linux_js
+go list --tags "js"  -f {{.Deps}}
+gopherjs build -o lute.min.js -m

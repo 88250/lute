@@ -10,7 +10,7 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build sm
+// +build js
 
 package lute
 
@@ -43,6 +43,16 @@ func isNilItem(item item) bool {
 // newItem 构造一个 token。
 func newItem(term byte, ln, col, offset int) item {
 	return item{b: term, ln: ln, col: col, offset: offset}
+}
+
+// Node 返回 item 关联的节点。
+func (item item) Node() *Node {
+	return item.node
+}
+
+// SetNode 设置 item 关联的节点。
+func (item *item) SetNode(node *Node) {
+	item.node = node
 }
 
 // term 返回 item 的词素。

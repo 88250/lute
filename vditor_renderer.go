@@ -10,7 +10,7 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build sm
+// +build js
 
 package lute
 
@@ -785,13 +785,13 @@ func (r *VditorRenderer) findSelection(startOffset, endOffset int, selected *[]*
 			endToken = &token
 			break
 		}
-		*selected = append(*selected, token.node)
+		*selected = append(*selected, token.Node())
 	}
 
 	if nil != startToken {
-		*selected = append(*selected, startToken.node)
-		if startToken.node != endToken.node {
-			*selected = append(*selected, endToken.node)
+		*selected = append(*selected, startToken.Node())
+		if startToken.Node() != endToken.Node() {
+			*selected = append(*selected, endToken.Node())
 		}
 	}
 }
