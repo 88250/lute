@@ -20,6 +20,10 @@ import (
 
 var debugTests = []parseTest{
 
+	// 链接解析括号匹配问题 https://github.com/b3log/lute/issues/36
+	{"40", "[link](/u(ri\n)\n", "<p>[link](/u(ri<br />\n)</p>\n"},
+	{"39", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
+
 	{"38", "www.我的网址/console\n", "<p>www.我的网址/console</p>\n"},
 	{"37", "http://我的网址/console\n", "<p>http://我的网址/console</p>\n"},
 	{"36", "http://mydomain/console\n", "<p>http://mydomain/console</p>\n"},

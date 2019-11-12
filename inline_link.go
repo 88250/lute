@@ -96,6 +96,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains, dest
 			if destStarted && (isWhitespace(token.term()) || isControl(token.term())) {
 				destination = destination[:len(destination)-size]
 				passed = passed[:len(passed)-1]
+				openParens--
 				break
 			}
 			if itemOpenParen == token.term() && !tokens.isBackslashEscapePunct(i) {
@@ -116,6 +117,11 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains, dest
 
 		remains = tokens[i:]
 		if length > i && (itemCloseParen != tokens[i].term() && itemSpace != tokens[i].term() && itemNewline != tokens[i].term()) {
+			passed = nil
+			return
+		}
+
+		if 0 != openParens {
 			passed = nil
 			return
 		}

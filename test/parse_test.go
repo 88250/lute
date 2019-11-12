@@ -26,6 +26,11 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
+
+	// issue #177
+	{"#177", "[link](/u(ri\n)\n", "<p>[link](/u(ri\n)</p>\n"},
+	{"#177", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
+
 	// commonmark spec inline-level cases
 
 	{"spec626", "foo <![CDATA[>&<]]>\n", "<p>foo <![CDATA[>&<]]></p>\n"},
