@@ -81,18 +81,24 @@ func (t *Tree) emoji0(node *Node) {
 			emojiTokens := strToItems(emoji)
 			if contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
 				alias := bytesToStr(maybeEmoji)
-				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + t.context.option.EmojiSite + "/" + alias
 				suffix := ".png"
 				if "huaji" == alias {
 					suffix = ".gif"
 				}
-				repl += suffix + "\" title=\"" + alias + "\" />"
-
+				src := t.context.option.EmojiSite + "/" + alias + suffix
+				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + src
+				repl += "\" title=\"" + alias + "\" />"
+				if t.context.option.VditorWYSIWYG {
+					repl = src
+				}
 				emojiUnicodeOrImg.typ = NodeEmojiImg
 				emojiUnicodeOrImg.tokens = strToItems(repl)
 			} else if contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
 				alias := bytesToStr(maybeEmoji)
 				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + emoji + "\" title=\"" + alias + "\" />"
+				if t.context.option.VditorWYSIWYG {
+					repl = emoji
+				}
 				emojiUnicodeOrImg.typ = NodeEmojiImg
 				emojiUnicodeOrImg.tokens = strToItems(repl)
 			} else {

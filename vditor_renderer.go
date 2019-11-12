@@ -97,10 +97,11 @@ func (r *VditorRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus
 
 func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<span class=\"marker\">:</span>")
-		r.write(node.tokens)
+		attrs :=  [][]string{{"data-hidden", "    "}, {"sytle", "background-image:url(" + itemsToStr(node.tokens) + ")"}}
+		r.tag("span", node,attrs, false)
+		r.tag("/span", nil, nil, false)
 	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
