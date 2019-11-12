@@ -766,10 +766,6 @@ func (r *VditorRenderer) expand(node *Node) {
 	}
 }
 
-func (tokens items) Len() int           { return len(tokens) }
-func (tokens items) Swap(i, j int)      { tokens[i], tokens[j] = tokens[j], tokens[i] }
-func (tokens items) Less(i, j int) bool { return tokens[i].Offset() < tokens[j].Offset() }
-
 // findSelection 在语法树上查找 startOffset 和 endOffset 选段，选中节点累计到 selected 中。
 func (r *VditorRenderer) findSelection(startOffset, endOffset int, selected *[]*Node) {
 	tokens := r.tree.passedTokens
@@ -826,8 +822,13 @@ func (r *VditorRenderer) nearest(selected []*Node, offset int) (ret *Node) {
 func (r *VditorRenderer) byteOffset(str string, runeStartOffset, runeEndOffset int) (startOffset, endOffset int) {
 	startOffset, endOffset = -1, -1
 	runes, i := 0, 0
-	for i = range str {
+	var c rune
+	for i, c = range str {
 		runes++
+		if _, ok := unicodeAliasEmojiMap[string(c)]; ok {
+			// 浏览器中表情字符长度为 2
+			runes++
+		}
 		if runes > runeStartOffset {
 			startOffset = i
 		}
@@ -849,8 +850,14 @@ func (r *VditorRenderer) byteOffset(str string, runeStartOffset, runeEndOffset i
 func (r *VditorRenderer) runeOffset(bytes []byte, byteStartOffset, byteEndOffset int) (runeStartOffset, runeEndOffset int) {
 	length := len(bytes)
 	var i, size int
+	var c rune
 	for ; i < length; i += size {
-		_, size = utf8.DecodeRune(bytes[i:])
+		c, size = utf8.DecodeRune(bytes[i:])
+		if _, ok := unicodeAliasEmojiMap[string(c)]; ok {
+			// 浏览器中表情字符长度为 2
+			runeStartOffset++
+			runeEndOffset++
+		}
 		if i < byteStartOffset {
 			runeStartOffset++
 		}

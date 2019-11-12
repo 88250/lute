@@ -13,14 +13,18 @@
 package lute
 
 func newEmojis() (ret map[string]string) {
-	ret = make(map[string]string, len(emojis))
-	for k, v := range emojis {
+	ret = make(map[string]string, len(aliasUnicodeEmojiMap))
+	unicodeAliasEmojiMap = make(map[string]string, len(aliasUnicodeEmojiMap))
+	for k, v := range aliasUnicodeEmojiMap {
 		ret[k] = v
+		unicodeAliasEmojiMap[v] = k
 	}
 	return
 }
 
-var emojis = map[string]string{
+var unicodeAliasEmojiMap map[string]string
+
+var aliasUnicodeEmojiMap = map[string]string{
 	"+1":                                   "👍",
 	"-1":                                   "👎",
 	"100":                                  "💯",
