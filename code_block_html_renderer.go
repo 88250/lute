@@ -16,6 +16,8 @@ package lute
 
 import (
 	"bytes"
+	"go/format"
+	"strings"
 
 	"github.com/alecthomas/chroma"
 	chromahtml "github.com/alecthomas/chroma/formatters/html"
@@ -35,6 +37,13 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 			infoWords := split(node.codeBlockInfo, itemSpace)
 			language := itemsToStr(infoWords[0])
 			rendered := false
+			if isGo(language) {
+				// Go 代码块自动格式化 https://github.com/b3log/lute/issues/37
+				bytes := itemsToBytes(tokens)
+				if bytes, err := format.Source(bytes); nil == err {
+					tokens = bytesToItems(bytes)
+				}
+			}
 			if r.option.CodeSyntaxHighlight && !noHighlight(language) {
 				rendered = highlightChroma(tokens, language, r)
 			}
@@ -120,4 +129,8 @@ func noHighlight(language string) bool {
 		}
 	}
 	return false
+}
+
+func isGo(language string) bool {
+	return strings.EqualFold(language, "go") || strings.EqualFold(language, "golang")
 }
