@@ -98,7 +98,7 @@ func (r *VditorRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("<span class=\"marker\">:</span>")
-		attrs := [][]string{{"data-hidden", "    "}, {"style", "background-image:url(" + itemsToStr(node.tokens) + ")"}}
+		attrs := [][]string{{"data-hidden", "     "}, {"style", "background-image:url(" + itemsToStr(node.tokens) + ")"}}
 		r.tag("span", node, attrs, false)
 		r.tag("/span", nil, nil, false)
 	}
