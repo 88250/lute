@@ -44,7 +44,7 @@ func New(opts ...option) (ret *Lute) {
 	ret.AutoSpace = true
 	ret.FixTermTypo = true
 	ret.Emoji = true
-	ret.Emojis = newEmojis()
+	ret.AliasEmoji, ret.EmojiAlias = newEmojis()
 	ret.Terms = newTerms()
 	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
 	ret.ParallelParsing = true
@@ -111,9 +111,9 @@ func (lute *Lute) Space(text string) string {
 
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
-	ret = make(map[string]string, len(lute.Emojis))
+	ret = make(map[string]string, len(lute.AliasEmoji))
 	placeholder := itemsToStr(emojiSitePlaceholder)
-	for k, v := range lute.Emojis {
+	for k, v := range lute.AliasEmoji {
 		if strings.Contains(v, placeholder) {
 			v = strings.ReplaceAll(v, placeholder, lute.EmojiSite)
 		}
@@ -125,7 +125,8 @@ func (lute *Lute) GetEmojis() (ret map[string]string) {
 // PutEmojis 将指定的 emojiMap 合并覆盖已有的 Emoji 字典。
 func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 	for k, v := range emojiMap {
-		lute.Emojis[k] = v
+		lute.AliasEmoji[k] = v
+		lute.EmojiAlias[v] = k
 	}
 }
 
@@ -199,8 +200,10 @@ type options struct {
 	FixTermTypo bool
 	// Emoji 设置是否对 Emoji 别名替换为原生 Unicode 字符。
 	Emoji bool
-	// Emojis 将传入的 emojis 合并覆盖到已有的 Emoji 字典。
-	Emojis map[string]string
+	// AliasEmoji 存储 ASCII 别名到表情 Unicode 映射。
+	AliasEmoji map[string]string
+	// EmojiAlias 存储表情 Unicode 到 ASCII 别名映射。
+	EmojiAlias map[string]string
 	// EmojiSite 设置图片 Emoji URL 的路径前缀。
 	EmojiSite string
 	// HeadingAnchor 设置是否对标题生成链接锚点。
@@ -271,7 +274,7 @@ func (lute *Lute) SetEmoji(b bool) {
 }
 
 func (lute *Lute) SetEmojis(emojis map[string]string) {
-	lute.Emojis = emojis
+	lute.AliasEmoji = emojis
 }
 
 func (lute *Lute) SetEmojiSite(emojiSite string) {

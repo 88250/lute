@@ -74,7 +74,7 @@ func (t *Tree) emoji0(node *Node) {
 			continue
 		}
 
-		if emoji, ok := t.context.option.Emojis[bytesToStr(maybeEmoji)]; ok {
+		if emoji, ok := t.context.option.AliasEmoji[bytesToStr(maybeEmoji)]; ok {
 			emojiNode := &Node{typ: NodeEmoji}
 			emojiUnicodeOrImg := &Node{typ: NodeEmojiUnicode}
 			emojiNode.AppendChild(emojiUnicodeOrImg)
