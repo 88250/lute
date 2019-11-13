@@ -36,9 +36,9 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 	}
 	r.writeString("</code></pre>")
 	r.newline()
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+	return WalkStop, nil
 }

@@ -97,7 +97,7 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatu
 		return WalkSkipChildren, nil
 	}
 	r.writeString("</code></pre>")
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func highlightChroma(tokens items, language string, r *HTMLRenderer) (rendered bool) {

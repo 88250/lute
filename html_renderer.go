@@ -89,15 +89,15 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 }
 
 func (r *HTMLRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
