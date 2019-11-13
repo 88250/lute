@@ -91,7 +91,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 		return
 	}
 
-	openFence = t.context.currentLine[t.context.nextNonspace : fenceLen+1]
+	openFence = t.context.currentLine[t.context.nextNonspace : t.context.nextNonspace+fenceLen]
 
 	var info items
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLen:]
