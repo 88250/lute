@@ -79,6 +79,7 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 			node.AppendChild(info)
 			code := &Node{typ: NodeCodeBlockCode, tokens: node.tokens, codeBlockInfo: node.codeBlockInfo}
 			node.AppendChild(code)
+			node.tokens = nil
 		}
 	}
 

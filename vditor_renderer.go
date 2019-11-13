@@ -37,6 +37,10 @@ func (lute *Lute) newVditorRenderer(tree *Tree) *VditorRenderer {
 	ret.rendererFuncs[NodeCodeSpanContent] = ret.renderCodeSpanContent
 	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
+	ret.rendererFuncs[NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
+	ret.rendererFuncs[NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
+	ret.rendererFuncs[NodeCodeBlockCode] = ret.renderCodeBlockCode
+	ret.rendererFuncs[NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
@@ -441,25 +445,41 @@ func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus,
 	return WalkStop, nil
 }
 
+func (r *VditorRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.write(node.tokens)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.tag("code", node, nil, false)
+		tokens := escapeHTML(node.tokens)
+		r.write(tokens)
+	} else {
+		r.tag("/code", nil, nil, false)
+	}
+	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("span", node, [][]string{{"class", "marker"}}, false)
+	r.write(node.tokens)
+	r.tag("/span", nil, nil, false)
+	return WalkStop, nil
+}
+
 func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		tokens := node.tokens
-		if 0 < len(node.codeBlockInfo) {
-			infoWords := split(node.codeBlockInfo, itemSpace)
-			language := infoWords[0]
-			r.writeString("<pre><code class=\"language-")
-			r.write(language)
-			r.writeString("\">")
-			tokens = escapeHTML(tokens)
-			r.write(tokens)
-		} else {
-			r.writeString("<pre><code>")
-			tokens = escapeHTML(tokens)
-			r.write(tokens)
-		}
-		return WalkSkipChildren, nil
+		r.writeString("<pre class=\"node\">")
+	} else {
+		r.writeString("</pre>")
 	}
-	r.writeString("</code></pre>")
 	return WalkContinue, nil
 }
 
