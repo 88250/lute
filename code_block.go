@@ -75,31 +75,30 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 
 var codeBlockBacktick = strToItems("`")
 
-func (t *Tree) parseFencedCode() (ok bool, codeBlockFenceChar byte, codeBlockFenceLen int, codeBlockFenceOffset int, codeBlockInfo items) {
+func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOffset int, codeBlockInfo items) {
 	marker := t.context.currentLine[t.context.nextNonspace]
 	if itemBacktick != marker.term() && itemTilde != marker.term() {
 		return
 	}
 
-	fenceChar := marker
-	fenceLength := 0
-	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar.term() == t.context.currentLine[i].term(); i++ {
-		fenceLength++
+	fenceChar = marker.term()
+	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar == t.context.currentLine[i].term(); i++ {
+		fenceLen++
 	}
 
-	if 3 > fenceLength {
+	if 3 > fenceLen {
 		return
 	}
 
 	var info items
-	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLength:]
+	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLen:]
 	if itemBacktick == marker.term() && contains(infoTokens, codeBlockBacktick) {
 		// info 部分不能包含 `
 		return
 	}
 	info = trimWhitespace(infoTokens)
 	info = unescapeString(info)
-	return true, fenceChar.term(), fenceLength, t.context.indent, info
+	return true, fenceChar, fenceLen, t.context.indent, info
 }
 
 func (codeBlock *Node) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
