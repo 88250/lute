@@ -33,6 +33,10 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeCodeSpanContent] = ret.renderCodeSpanContent
 	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
+	ret.rendererFuncs[NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
+	ret.rendererFuncs[NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
+	ret.rendererFuncs[NodeCodeBlockCode] = ret.renderCodeBlockCode
+	ret.rendererFuncs[NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
@@ -82,6 +86,18 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
 	return ret
+}
+
+func (r *HTMLRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
+func (r *HTMLRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
+func (r *HTMLRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
 }
 
 func (r *HTMLRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {

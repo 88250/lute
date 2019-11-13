@@ -28,10 +28,35 @@ import (
 // languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
 var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 
-// renderCodeBlockHTML 进行代码块 HTML 渲染，实现语法高亮。
 func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
+	if !node.isFencedCodeBlock {
+		// 缩进代码块处理
+
 		r.newline()
+		rendered := false
+		tokens := node.tokens
+		if r.option.CodeSyntaxHighlight {
+			rendered = highlightChroma(tokens, "", r)
+			if !rendered {
+				tokens = escapeHTML(tokens)
+				r.write(tokens)
+			}
+		} else {
+			r.writeString("<pre><code>")
+			tokens = escapeHTML(tokens)
+			r.write(tokens)
+		}
+		r.writeString("</code></pre>")
+		r.newline()
+		return WalkStop, nil
+	}
+	r.newline()
+	return WalkContinue, nil
+}
+
+// renderCodeBlockCode 进行代码块 HTML 渲染，实现语法高亮。
+func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
 		tokens := node.tokens
 		if 0 < len(node.codeBlockInfo) {
 			infoWords := split(node.codeBlockInfo, itemSpace)
@@ -72,7 +97,6 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 		return WalkSkipChildren, nil
 	}
 	r.writeString("</code></pre>")
-	r.newline()
 	return WalkContinue, nil
 }
 

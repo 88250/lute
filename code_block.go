@@ -75,7 +75,7 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 
 var codeBlockBacktick = strToItems("`")
 
-func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOffset int, codeBlockInfo items) {
+func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOffset int, openFence, codeBlockInfo items) {
 	marker := t.context.currentLine[t.context.nextNonspace]
 	if itemBacktick != marker.term() && itemTilde != marker.term() {
 		return
@@ -90,6 +90,8 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 		return
 	}
 
+	openFence = t.context.currentLine[t.context.nextNonspace : fenceLen+1]
+
 	var info items
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLen:]
 	if itemBacktick == marker.term() && contains(infoTokens, codeBlockBacktick) {
@@ -98,7 +100,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 	}
 	info = trimWhitespace(infoTokens)
 	info = unescapeString(info)
-	return true, fenceChar, fenceLen, t.context.indent, info
+	return true, fenceChar, fenceLen, t.context.indent, openFence, info
 }
 
 func (codeBlock *Node) isFencedCodeClose(tokens items, openMarker byte, num int) bool {

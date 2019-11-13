@@ -215,13 +215,14 @@ var blockStarts = []blockStartFunc{
 	// 判断围栏代码块（```）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockInfo := t.parseFencedCode(); ok {
+			if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockOpenFence, codeBlockInfo := t.parseFencedCode(); ok {
 				t.context.closeUnmatchedBlocks()
 				container := t.context.addChild(NodeCodeBlock, t.context.nextNonspace)
 				container.isFencedCodeBlock = true
 				container.codeBlockFenceLen = codeBlockFenceLen
 				container.codeBlockFenceChar = codeBlockFenceChar
 				container.codeBlockFenceOffset = codeBlockFenceOffset
+				container.codeBlockOpenFence = codeBlockOpenFence
 				container.codeBlockInfo = codeBlockInfo
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(codeBlockFenceLen, false)

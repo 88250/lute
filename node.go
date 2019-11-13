@@ -44,6 +44,7 @@ type Node struct {
 	codeBlockFenceChar   byte
 	codeBlockFenceLen    int
 	codeBlockFenceOffset int
+	codeBlockOpenFence   items
 	codeBlockInfo        items
 
 	// HTML 块
@@ -315,46 +316,50 @@ func (typ nodeType) String() string {
 const (
 	// CommonMark
 
-	NodeDocument             nodeType = 0  // 根
-	NodeParagraph            nodeType = 1  // 段落
-	NodeHeading              nodeType = 2  // 标题
-	NodeHeadingC8hMarker     nodeType = 3  // ATX 标题标记符 #
-	NodeThematicBreak        nodeType = 4  // 分隔线
-	NodeBlockquote           nodeType = 5  // 块引用
-	NodeBlockquoteMarker     nodeType = 6  // 块引用标记符 >
-	NodeList                 nodeType = 7  // 列表
-	NodeListItem             nodeType = 8  // 列表项
-	NodeHTMLBlock            nodeType = 9  // HTML 块
-	NodeInlineHTML           nodeType = 10 // 内联 HTML
-	NodeCodeBlock            nodeType = 11 // 代码块
-	NodeText                 nodeType = 12 // 文本
-	NodeEmphasis             nodeType = 13 // 强调
-	NodeEmA6kOpenMarker      nodeType = 14 // 开始强调标记符 *
-	NodeEmA6kCloseMarker     nodeType = 15 // 结束强调标记符 *
-	NodeEmU8eOpenMarker      nodeType = 16 // 开始强调标记符 _
-	NodeEmU8eCloseMarker     nodeType = 17 // 结束强调标记符 _
-	NodeStrong               nodeType = 18 // 加粗
-	NodeStrongA6kOpenMarker  nodeType = 19 // 开始加粗标记符 **
-	NodeStrongA6kCloseMarker nodeType = 20 // 结束加粗标记符 **
-	NodeStrongU8eOpenMarker  nodeType = 21 // 开始加粗标记符 __
-	NodeStrongU8eCloseMarker nodeType = 22 // 结束加粗标记符 __
-	NodeCodeSpan             nodeType = 23 // 代码
-	NodeCodeSpanOpenMarker   nodeType = 24 // 开始代码标记符 `
-	NodeCodeSpanContent      nodeType = 25 // 代码内容
-	NodeCodeSpanCloseMarker  nodeType = 26 // 结束代码标记符 `
-	NodeHardBreak            nodeType = 27 // 硬换行
-	NodeSoftBreak            nodeType = 28 // 软换行
-	NodeLink                 nodeType = 29 // 链接
-	NodeImage                nodeType = 30 // 图片
-	NodeBang                 nodeType = 31 // !
-	NodeOpenBracket          nodeType = 32 // [
-	NodeCloseBracket         nodeType = 33 // ]
-	NodeOpenParen            nodeType = 34 // (
-	NodeCloseParen           nodeType = 35 // )
-	NodeLinkText             nodeType = 36 // 链接文本
-	NodeLinkDest             nodeType = 37 // 链接地址
-	NodeLinkTitle            nodeType = 38 // 链接标题
-	NodeLinkSpace            nodeType = 39 // 链接地址和链接标题之间的空格
+	NodeDocument                  nodeType = 0  // 根
+	NodeParagraph                 nodeType = 1  // 段落
+	NodeHeading                   nodeType = 2  // 标题
+	NodeHeadingC8hMarker          nodeType = 3  // ATX 标题标记符 #
+	NodeThematicBreak             nodeType = 4  // 分隔线
+	NodeBlockquote                nodeType = 5  // 块引用
+	NodeBlockquoteMarker          nodeType = 6  // 块引用标记符 >
+	NodeList                      nodeType = 7  // 列表
+	NodeListItem                  nodeType = 8  // 列表项
+	NodeHTMLBlock                 nodeType = 9  // HTML 块
+	NodeInlineHTML                nodeType = 10 // 内联 HTML
+	NodeCodeBlock                 nodeType = 11 // 代码块
+	NodeCodeBlockFenceOpenMarker  nodeType = 12 // 开始围栏代码块标记符 ```
+	NodeCodeBlockFenceCloseMarker nodeType = 13 // 结束围栏代码块标记符 ```
+	NodeCodeBlockFenceInfoMarker  nodeType = 14 // 围栏代码块信息标记符 info string
+	NodeCodeBlockCode             nodeType = 15 // 围栏代码块代码
+	NodeText                      nodeType = 16 // 文本
+	NodeEmphasis                  nodeType = 17 // 强调
+	NodeEmA6kOpenMarker           nodeType = 18 // 开始强调标记符 *
+	NodeEmA6kCloseMarker          nodeType = 19 // 结束强调标记符 *
+	NodeEmU8eOpenMarker           nodeType = 20 // 开始强调标记符 _
+	NodeEmU8eCloseMarker          nodeType = 21 // 结束强调标记符 _
+	NodeStrong                    nodeType = 22 // 加粗
+	NodeStrongA6kOpenMarker       nodeType = 23 // 开始加粗标记符 **
+	NodeStrongA6kCloseMarker      nodeType = 24 // 结束加粗标记符 **
+	NodeStrongU8eOpenMarker       nodeType = 25 // 开始加粗标记符 __
+	NodeStrongU8eCloseMarker      nodeType = 26 // 结束加粗标记符 __
+	NodeCodeSpan                  nodeType = 27 // 代码
+	NodeCodeSpanOpenMarker        nodeType = 28 // 开始代码标记符 `
+	NodeCodeSpanContent           nodeType = 29 // 代码内容
+	NodeCodeSpanCloseMarker       nodeType = 30 // 结束代码标记符 `
+	NodeHardBreak                 nodeType = 31 // 硬换行
+	NodeSoftBreak                 nodeType = 32 // 软换行
+	NodeLink                      nodeType = 33 // 链接
+	NodeImage                     nodeType = 34 // 图片
+	NodeBang                      nodeType = 35 // !
+	NodeOpenBracket               nodeType = 36 // [
+	NodeCloseBracket              nodeType = 37 // ]
+	NodeOpenParen                 nodeType = 38 // (
+	NodeCloseParen                nodeType = 39 // )
+	NodeLinkText                  nodeType = 40 // 链接文本
+	NodeLinkDest                  nodeType = 41 // 链接地址
+	NodeLinkTitle                 nodeType = 42 // 链接标题
+	NodeLinkSpace                 nodeType = 43 // 链接地址和链接标题之间的空格
 
 	// GFM
 

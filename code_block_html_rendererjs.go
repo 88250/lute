@@ -14,7 +14,7 @@
 
 package lute
 
-// renderCodeBlockHTML 进行代码块 HTML 渲染，不实现语法高亮。
+// renderCodeBlock 进行代码块 HTML 渲染，不实现语法高亮。
 func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
@@ -37,4 +37,8 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 	r.writeString("</code></pre>")
 	r.newline()
 	return WalkContinue, nil
+}
+
+func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
+
 }
