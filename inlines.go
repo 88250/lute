@@ -73,13 +73,15 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 		return
 	} else if NodeCodeBlock == typ {
 		if node.isFencedCodeBlock { // 如果是围栏代码块需要细化其子节点
-			openMarker := &Node{typ: NodeCodeBlockFenceOpenMarker, tokens: node.codeBlockOpenFence}
+			openMarker := &Node{typ: NodeCodeBlockFenceOpenMarker, tokens: node.codeBlockOpenFence, codeBlockFenceLen: node.codeBlockFenceLen}
 			node.PrependChild(openMarker)
 			info := &Node{typ: NodeCodeBlockFenceInfoMarker, tokens: node.codeBlockInfo}
 			node.AppendChild(info)
 			code := &Node{typ: NodeCodeBlockCode, tokens: node.tokens, codeBlockInfo: node.codeBlockInfo}
 			node.AppendChild(code)
 			node.tokens = nil
+			closeMarker := &Node{typ: NodeCodeBlockFenceCloseMarker, tokens: node.codeBlockCloseFence, codeBlockFenceLen: node.codeBlockFenceLen}
+			node.AppendChild(closeMarker)
 		}
 	}
 

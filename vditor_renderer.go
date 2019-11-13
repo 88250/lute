@@ -452,10 +452,6 @@ func (r *VditorRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (
 	return WalkStop, nil
 }
 
-func (r *VditorRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
-}
-
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("code", node, nil, false)
@@ -464,6 +460,10 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 	} else {
 		r.tag("/code", nil, nil, false)
 	}
+	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
 	return WalkContinue, nil
 }
 

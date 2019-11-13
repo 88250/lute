@@ -34,6 +34,10 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeCodeSpanContent] = ret.renderCodeSpanContent
 	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
 	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
+	ret.rendererFuncs[NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
+	ret.rendererFuncs[NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
+	ret.rendererFuncs[NodeCodeBlockCode] = ret.renderCodeBlockCode
+	ret.rendererFuncs[NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
@@ -346,21 +350,42 @@ func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus,
 	return WalkContinue, nil
 }
 
-func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
-	if !node.isFencedCodeBlock {
-		node.codeBlockFenceLen = 3
-	}
-	if entering {
-		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
-		r.write(node.codeBlockInfo)
-		r.writeByte(itemNewline)
-		r.write(node.tokens)
-		return WalkSkipChildren, nil
-	}
+func (r *FormatRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
+	}
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
+	r.writeByte(itemNewline)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
+	if !node.isFencedCodeBlock {
+		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
+		r.writeByte(itemNewline)
+		r.write(node.tokens)
+		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
+		r.newline()
+		if !r.isLastNode(r.tree.Root, node) {
+			r.writeByte(itemNewline)
+		}
+		return WalkStop, nil
 	}
 	return WalkContinue, nil
 }

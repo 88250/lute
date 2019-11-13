@@ -16,7 +16,8 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 	if codeBlock.isFencedCodeBlock {
-		if indent <= 3 && codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.codeBlockFenceChar, codeBlock.codeBlockFenceLen) {
+		if ok, closeFence := codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.codeBlockFenceChar, codeBlock.codeBlockFenceLen); indent <= 3 && ok {
+			codeBlock.codeBlockCloseFence = closeFence
 			context.finalize(codeBlock, context.lineNum)
 			return 2
 		} else {
@@ -103,19 +104,20 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 	return true, fenceChar, fenceLen, t.context.indent, openFence, info
 }
 
-func (codeBlock *Node) isFencedCodeClose(tokens items, openMarker byte, num int) bool {
+func (codeBlock *Node) isFencedCodeClose(tokens items, openMarker byte, num int) (ok bool, closeFence items) {
 	closeMarker := tokens[0]
 	if closeMarker.term() != openMarker {
-		return false
+		return false, nil
 	}
 	if num > tokens.accept(closeMarker.term()) {
-		return false
+		return false, nil
 	}
 	tokens = trimWhitespace(tokens)
 	for _, token := range tokens {
 		if token.term() != openMarker {
-			return false
+			return false, nil
 		}
 	}
-	return true
+	closeFence = tokens
+	return true, closeFence
 }

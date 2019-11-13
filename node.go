@@ -46,6 +46,7 @@ type Node struct {
 	codeBlockFenceOffset int
 	codeBlockOpenFence   items
 	codeBlockInfo        items
+	codeBlockCloseFence  items
 
 	// HTML 块
 
