@@ -448,11 +448,7 @@ func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus,
 func (r *VditorRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("span", node, [][]string{{"class", "marker"}}, false)
 	tokens := node.tokens
-	if 1 > len(tokens) {
-		tokens = strToItems("```")
-	}
 	r.write(tokens)
-	r.newline()
 	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }
