@@ -446,17 +446,23 @@ func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *VditorRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("<span class=\"newline\">\n</span>")
 	r.tag("span", node, [][]string{{"class", "marker"}}, false)
 	tokens := node.tokens
 	r.write(tokens)
 	r.tag("/span", nil, nil, false)
+	if 0 < len(tokens) {
+		r.writeString("<span class=\"newline\">\n</span>")
+	}
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		r.writeString("<span class=\"newline\">\n</span>")
 		r.tag("code", node, nil, false)
 		tokens := escapeHTML(node.tokens)
+		_, tokens = trimRight(tokens)
 		if 1 > len(tokens) {
 			tokens = strToItems("<br />")
 		}
@@ -469,7 +475,6 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 func (r *VditorRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("span", node, [][]string{{"class", "marker"}}, false)
 	r.write(node.tokens)
-	r.newline()
 	r.tag("/span", nil, nil, false)
 	return WalkStop, nil
 }

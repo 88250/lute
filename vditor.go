@@ -97,6 +97,7 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 
 	if NodeCodeBlockFenceCloseMarker == en.typ {
 		newTree = &Node{typ: NodeParagraph}
+		newTree.AppendChild(&Node{typ:NodeText})
 		en.parent.parent.AppendChild(newTree)
 		needContinueSameSubTree = false
 	}
