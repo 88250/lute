@@ -483,9 +483,9 @@ func (r *VditorRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) (W
 
 func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<pre class=\"node\">")
+		r.tag("pre", node, [][]string{{"class", "node"}} ,false )
 	} else {
-		r.writeString("</pre>")
+		r.tag("/pre", nil, nil, false)
 	}
 	return WalkContinue, nil
 }
@@ -786,7 +786,7 @@ func (r *VditorRenderer) expand(node *Node) {
 	for p := node; nil != p; p = p.parent {
 		switch p.typ {
 		case NodeEmphasis, NodeStrong, NodeBlockquote, NodeListItem, NodeCodeSpan, NodeHeading, NodeLink, NodeEmojiAlias,
-			NodeImage:
+			NodeImage, NodeCodeBlock:
 			p.expand = true
 			return
 		}

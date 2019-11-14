@@ -92,52 +92,63 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 		endOffset = enLen
 	}
 
-	if NodeThematicBreak == en.typ { // 如果光标所处节点是分隔线节点的话
-		en.typ = NodeText // 将分隔线转为文本，后续会按文本节点进行换行处理
-		// 构造段落父节点
-		paragraph := &Node{typ: NodeParagraph}
-		en.parent.AppendChild(paragraph)
-		paragraph.AppendChild(en)
+	newTree := &Node{}
+	needContinueSameSubTree := true // 是否需要生成和最后一个节点相同结构的子树
+
+	if NodeCodeBlockFenceCloseMarker == en.typ {
+		newTree = &Node{typ: NodeParagraph}
+		en.parent.parent.AppendChild(newTree)
+		needContinueSameSubTree = false
 	}
 
-	newTree := &Node{typ: en.typ, tokens: en.tokens[endOffset:]} // 生成新的节点树，内容是当前选中节点的后半部分
-	if NodeListItem == en.typ {
-		newTree.listData = en.listData
-		newTree.tokens = en.tokens
-		// TODO: 处理有序列表序号递增
-	}
-	en.tokens = en.tokens[:endOffset] // 当前选中节点内容为前半部分
-
-	// 保持排版格式并实现换行
-	for parent := en.parent; nil != parent; parent = parent.parent { // 从当前选中节点开始向父节点方向迭代
-		if NodeDocument == parent.typ || NodeList == parent.typ || NodeBlockquote == parent.typ {
-			// 遇到这几种块容器说明迭代结束
-			if !newTree.close {
-				en.InsertAfter(newTree)
-			}
-			break
+	if needContinueSameSubTree {
+		if NodeThematicBreak == en.typ { // 如果光标所处节点是分隔线节点的话
+			en.typ = NodeText // 将分隔线转为文本，后续会按文本节点进行换行处理
+			// 构造段落父节点
+			paragraph := &Node{typ: NodeParagraph}
+			en.parent.AppendChild(paragraph)
+			paragraph.AppendChild(en)
 		}
 
-		newParent := &Node{typ: parent.typ, listData: parent.listData} // 生成新的父节点
-		left := true                                                   // 用于标记左边兄弟节点是否迭代结束
-		child := parent.firstChild
-		for { // 从左到右迭代子节点
-			next := child.next                   // AppendChild 会断开，所以这里需要临时保存
-			if child == newTree || child == en { // 如果遍历到当前节点
-				newParent.AppendChild(newTree) // 将当前节点挂到新的父节点上
-				left = false                   // 标记左边兄弟节点迭代结束
-			} else if child.isMarker() { // 如果遍历到的是排版标记节点
-				newParent.AppendChild(&Node{typ: child.typ, tokens: child.tokens}) // 生成新的标记节点以便保持排版格式
-			} else if !left { // 如果遍历到右边兄弟节点
-				newParent.AppendChild(child) // 将右边的兄弟节点断开并挂到新的父节点上
-			}
-			if child = next; nil == child {
+		newTree = &Node{typ: en.typ, tokens: en.tokens[endOffset:]} // 生成新的节点树，内容是当前选中节点的后半部分
+		if NodeListItem == en.typ {
+			newTree.listData = en.listData
+			newTree.tokens = en.tokens
+			// TODO: 处理有序列表序号递增
+		}
+		en.tokens = en.tokens[:endOffset] // 当前选中节点内容为前半部分
+
+		// 保持排版格式并实现换行
+		for parent := en.parent; nil != parent; parent = parent.parent { // 从当前选中节点开始向父节点方向迭代
+			if NodeDocument == parent.typ || NodeList == parent.typ || NodeBlockquote == parent.typ {
+				// 遇到这几种块容器说明迭代结束
+				if !newTree.close {
+					en.InsertAfter(newTree)
+				}
 				break
 			}
+
+			newParent := &Node{typ: parent.typ, listData: parent.listData} // 生成新的父节点
+			left := true                                                   // 用于标记左边兄弟节点是否迭代结束
+			child := parent.firstChild
+			for { // 从左到右迭代子节点
+				next := child.next                   // AppendChild 会断开，所以这里需要临时保存
+				if child == newTree || child == en { // 如果遍历到当前节点
+					newParent.AppendChild(newTree) // 将当前节点挂到新的父节点上
+					left = false                   // 标记左边兄弟节点迭代结束
+				} else if child.isMarker() { // 如果遍历到的是排版标记节点
+					newParent.AppendChild(&Node{typ: child.typ, tokens: child.tokens}) // 生成新的标记节点以便保持排版格式
+				} else if !left { // 如果遍历到右边兄弟节点
+					newParent.AppendChild(child) // 将右边的兄弟节点断开并挂到新的父节点上
+				}
+				if child = next; nil == child {
+					break
+				}
+			}
+			parent.InsertAfter(newParent) // 将新的父节作为当前迭代节点的右兄弟节点挂好
+			newTree = newParent           // 设置当前节点以便下一次迭代
+			newTree.close = true
 		}
-		parent.InsertAfter(newParent) // 将新的父节作为当前迭代节点的右兄弟节点挂好
-		newTree = newParent           // 设置当前节点以便下一次迭代
-		newTree.close = true
 	}
 
 	// 进行最终渲染
