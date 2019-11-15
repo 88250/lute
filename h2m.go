@@ -67,7 +67,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
 	case atom.Em:
 		node.typ = NodeEmphasis
-		node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToItems("_")})
+		marker := lute.domAttrValue(n, "data-marker")
+		if "_" == marker {
+			node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToItems(marker)})
+		} else {
+			node.AppendChild(&Node{typ: NodeEmA6kOpenMarker, tokens: strToItems(marker)})
+		}
 	case atom.Strong:
 		node.typ = NodeStrong
 		marker := lute.domAttrValue(n, "data-marker")
@@ -124,7 +129,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 
 			switch n.DataAtom {
 			case atom.Em:
-				node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems("_")})
+				marker := lute.domAttrValue(n, "data-marker")
+				if "_" == marker {
+					node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems(marker)})
+				} else {
+					node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: strToItems(marker)})
+				}
 			case atom.Strong:
 				marker := lute.domAttrValue(n, "data-marker")
 				if "__" == marker {

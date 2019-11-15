@@ -127,12 +127,10 @@ func (r *VditorRenderer2) renderInlineMath(node *Node, entering bool) (WalkStatu
 }
 
 func (r *VditorRenderer2) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
-	r.newline()
 	attrs := [][]string{{"class", "vditor-math"}}
 	r.tag("div", attrs, false)
 	r.write(escapeHTML(node.tokens))
 	r.tag("/div", nil, false)
-	r.newline()
 	return WalkStop, nil
 }
 
@@ -154,7 +152,6 @@ func (r *VditorRenderer2) renderTableCell(node *Node, entering bool) (WalkStatus
 		r.tag(tag, attrs, false)
 	} else {
 		r.tag("/"+tag, nil, false)
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -162,14 +159,11 @@ func (r *VditorRenderer2) renderTableCell(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer2) renderTableRow(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("tr", nil, false)
-		r.newline()
 	} else {
 		r.tag("/tr", nil, false)
-		r.newline()
 		if node == node.parent.lastChild {
 			r.tag("/tbody", nil, false)
 		}
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -177,18 +171,13 @@ func (r *VditorRenderer2) renderTableRow(node *Node, entering bool) (WalkStatus,
 func (r *VditorRenderer2) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("thead", nil, false)
-		r.newline()
 		r.tag("tr", nil, false)
-		r.newline()
 	} else {
 		r.tag("/tr", nil, false)
-		r.newline()
 		r.tag("/thead", nil, false)
-		r.newline()
 		if nil != node.next {
 			r.tag("tbody", nil, false)
 		}
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -196,10 +185,8 @@ func (r *VditorRenderer2) renderTableHead(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer2) renderTable(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("table", nil, false)
-		r.newline()
 	} else {
 		r.tag("/table", nil, false)
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -306,9 +293,7 @@ func (r *VditorRenderer2) renderLink(node *Node, entering bool) (WalkStatus, err
 }
 
 func (r *VditorRenderer2) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	r.newline()
 	r.write(node.tokens)
-	r.newline()
 	return WalkStop, nil
 }
 
@@ -331,11 +316,9 @@ func (r *VditorRenderer2) renderParagraph(node *Node, entering bool) (WalkStatus
 	}
 
 	if entering {
-		r.newline()
 		r.tag("p", nil, false)
 	} else {
 		r.tag("/p", nil, false)
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -375,7 +358,7 @@ func (r *VditorRenderer2) renderEmphasis(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *VditorRenderer2) renderEmAsteriskOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("em", [][]string{{"data-marker", "__"}}, false)
+	r.tag("em", [][]string{{"data-marker", "*"}}, false)
 	return WalkStop, nil
 }
 
@@ -420,13 +403,9 @@ func (r *VditorRenderer2) renderStrongU8eCloseMarker(node *Node, entering bool) 
 
 func (r *VditorRenderer2) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.newline()
 		r.writeString("<blockquote>")
-		r.newline()
 	} else {
-		r.newline()
 		r.writeString("</blockquote>")
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -437,7 +416,6 @@ func (r *VditorRenderer2) renderBlockquoteMarker(node *Node, entering bool) (Wal
 
 func (r *VditorRenderer2) renderHeading(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.newline()
 		r.writeString("<h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 		if r.option.HeadingAnchor {
 			anchor := node.Text()
@@ -448,7 +426,6 @@ func (r *VditorRenderer2) renderHeading(node *Node, entering bool) (WalkStatus, 
 		}
 	} else {
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -463,18 +440,14 @@ func (r *VditorRenderer2) renderList(node *Node, entering bool) (WalkStatus, err
 		tag = "ol"
 	}
 	if entering {
-		r.newline()
 		attrs := [][]string{{"start", strconv.Itoa(node.start)}}
 		if nil == node.bulletChar && 1 != node.start {
 			r.tag(tag, attrs, false)
 		} else {
 			r.tag(tag, nil, false)
 		}
-		r.newline()
 	} else {
-		r.newline()
 		r.tag("/"+tag, nil, false)
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -488,7 +461,6 @@ func (r *VditorRenderer2) renderListItem(node *Node, entering bool) (WalkStatus,
 		}
 	} else {
 		r.tag("/li", nil, false)
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -506,16 +478,13 @@ func (r *VditorRenderer2) renderTaskListItemMarker(node *Node, entering bool) (W
 }
 
 func (r *VditorRenderer2) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
-	r.newline()
 	r.tag("hr", nil, true)
-	r.newline()
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer2) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.tag("br", nil, true)
-		r.newline()
 	}
 	return WalkStop, nil
 }
@@ -523,7 +492,6 @@ func (r *VditorRenderer2) renderHardBreak(node *Node, entering bool) (WalkStatus
 func (r *VditorRenderer2) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
 	if r.option.SoftBreak2HardBreak {
 		r.tag("br", nil, true)
-		r.newline()
 	} else {
 		r.newline()
 	}
@@ -552,16 +520,13 @@ func (r *VditorRenderer2) renderCodeBlock(node *Node, entering bool) (WalkStatus
 	if !node.isFencedCodeBlock {
 		// 缩进代码块处理
 
-		r.newline()
 		tokens := node.tokens
 		r.writeString("<pre><code>")
 		tokens = escapeHTML(tokens)
 		r.write(tokens)
 		r.writeString("</code></pre>")
-		r.newline()
 		return WalkStop, nil
 	}
-	r.newline()
 	return WalkContinue, nil
 }
 
