@@ -70,7 +70,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToItems("_")})
 	case atom.Strong:
 		node.typ = NodeStrong
-		node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToItems("**")})
+		marker := lute.domAttrValue(n, "data-marker")
+		if "__" == marker {
+			node.AppendChild(&Node{typ: NodeStrongU8eOpenMarker, tokens: strToItems(marker)})
+		} else {
+			node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToItems(marker)})
+		}
 	case atom.Code:
 		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
 			node.typ = NodeCodeSpan
@@ -83,30 +88,30 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeOpenBracket})
 	case atom.Img:
 		node.typ = NodeImage
-		node.AppendChild(&Node{typ:NodeBang})
-		node.AppendChild(&Node{typ:NodeOpenBracket})
+		node.AppendChild(&Node{typ: NodeBang})
+		node.AppendChild(&Node{typ: NodeOpenBracket})
 		imgAlt := lute.domAttrValue(n, "alt")
 		if "" != imgAlt {
-			node.AppendChild(&Node{typ:NodeLinkText, tokens:strToItems(imgAlt)})
+			node.AppendChild(&Node{typ: NodeLinkText, tokens: strToItems(imgAlt)})
 		}
 		node.AppendChild(&Node{typ: NodeCloseBracket})
 		node.AppendChild(&Node{typ: NodeOpenParen})
 		node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "src"))})
 		node.AppendChild(&Node{typ: NodeCloseParen})
-	case atom.Span:
-		mtype := lute.domAttrValue(n, "data-mtype")
-		if "2" == mtype { // 行级元素可以直接用其 text
-			node.typ = NodeText
-			node.tokens = strToItems(lute.domText(n))
-			break
-		}
-
-		class := lute.domAttrValue(n, "class")
-		skipChildren = !strings.Contains(class, "node")
-		if skipChildren {
-			ntype := lute.domAttrValue(n, "data-ntype")
-			skipChildren = "10" != ntype
-		}
+		//case atom.Span:
+		//	mtype := lute.domAttrValue(n, "data-mtype")
+		//	if "2" == mtype { // 行级元素可以直接用其 text
+		//		node.typ = NodeText
+		//		node.tokens = strToItems(lute.domText(n))
+		//		break
+		//	}
+		//
+		//	class := lute.domAttrValue(n, "class")
+		//	skipChildren = !strings.Contains(class, "node")
+		//	if skipChildren {
+		//		ntype := lute.domAttrValue(n, "data-ntype")
+		//		skipChildren = "10" != ntype
+		//	}
 	}
 
 	if -1 != node.typ {
@@ -121,7 +126,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			case atom.Em:
 				node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems("_")})
 			case atom.Strong:
-				node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToItems("**")})
+				marker := lute.domAttrValue(n, "data-marker")
+				if "__" == marker {
+					node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: strToItems(marker)})
+				} else {
+					node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToItems(marker)})
+				}
 			case atom.Pre:
 				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToItems("```"), codeBlockFenceLen: 3})
 			case atom.Code:
@@ -134,8 +144,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 				node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "href"))})
 				linkTitle := lute.domAttrValue(n, "title")
 				if "" != linkTitle {
-					node.AppendChild(&Node{typ:NodeLinkSpace})
-					node.AppendChild(&Node{typ:NodeLinkTitle, tokens:strToItems(linkTitle)})
+					node.AppendChild(&Node{typ: NodeLinkSpace})
+					node.AppendChild(&Node{typ: NodeLinkTitle, tokens: strToItems(linkTitle)})
 				}
 				node.AppendChild(&Node{typ: NodeCloseParen})
 			}
