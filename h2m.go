@@ -30,7 +30,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
 		node.headingLevel = int(node.tokens[1].term() - byte('0'))
-		node.AppendChild(&Node{typ:NodeHeadingC8hMarker, tokens: strToItems(strings.Repeat("#", node.headingLevel))})
+		node.AppendChild(&Node{typ: NodeHeadingC8hMarker, tokens: strToItems(strings.Repeat("#", node.headingLevel))})
+	case atom.Blockquote:
+		node.typ = NodeBlockquote
+		node.AppendChild(&Node{typ: NodeBlockquoteMarker, tokens: strToItems(">")})
+	case atom.Hr:
+		node.typ = NodeThematicBreak
 	case atom.Br:
 		node.typ = NodeInlineHTML
 		node.tokens = strToItems("<br />")
@@ -42,10 +47,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToItems("**")})
 	case atom.P:
 		node.typ = NodeParagraph
-	case atom.Blockquote:
-		node.typ = NodeBlockquote
-	case atom.Hr:
-		node.typ = NodeThematicBreak
 	case atom.Span:
 		mtype := lute.domAttrValue(n, "data-mtype")
 		if "2" == mtype { // 行级元素可以直接用其 text

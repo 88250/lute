@@ -19,6 +19,7 @@ import (
 )
 
 var h2mTests = []parseTest{
+	{"4", "<blockquote>foo</blockquote>", "> foo\n"},
 	{"3", "<h2>foo</h2>", "## foo\n"},
 	{"2", "<p><strong><em>foo</em></strong></p>", "**_foo_**\n"},
 	{"1", "<p><strong>foo</strong></p>", "**foo**\n"},
