@@ -20,6 +20,7 @@ import (
 
 var h2mTests = []parseTest{
 
+	{"13", "<h2>foo</h2>\n<p>para<em>em</em></p>", "## foo\n\npara_em_\n"},
 	{"12", "<a href=\"/bar\" title=\"baz\">foo</a>", "[foo](/bar \"baz\")\n"},
 	{"11", "<img src=\"/bar\" alt=\"foo\" />", "![foo](/bar)\n"},
 	{"10", "<img src=\"/bar\" />", "![](/bar)\n"},

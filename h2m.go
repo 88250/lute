@@ -40,7 +40,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 				node.typ = NodeText
 			}
 		} else {
-			node.typ = NodeText
+			if "\n" != n.Data {
+				node.typ = NodeText
+			}
 		}
 	case atom.P:
 		node.typ = NodeParagraph
