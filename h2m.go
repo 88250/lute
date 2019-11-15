@@ -27,10 +27,16 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	switch n.DataAtom {
 	case 0:
 		if atom.Code == n.Parent.DataAtom {
-			node.typ = NodeCodeBlockCode
+			if nil == n.Parent.Parent {
+				node.typ = NodeCodeSpanContent
+			} else {
+				node.typ = NodeCodeBlockCode
+			}
 		} else {
 			node.typ = NodeText
 		}
+	case atom.P:
+		node.typ = NodeParagraph
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
 		node.headingLevel = int(node.tokens[1].term() - byte('0'))
@@ -48,19 +54,22 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	case atom.Pre:
 		node.typ = NodeCodeBlock
 		node.isFencedCodeBlock = true
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToItems("```"), codeBlockFenceLen:3})
-		node.AppendChild(&Node{typ:NodeCodeBlockFenceInfoMarker})
-	case atom.Br:
-		node.typ = NodeInlineHTML
-		node.tokens = strToItems("<br />")
+		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToItems("```"), codeBlockFenceLen: 3})
+		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
 	case atom.Em:
 		node.typ = NodeEmphasis
 		node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToItems("_")})
 	case atom.Strong:
 		node.typ = NodeStrong
 		node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToItems("**")})
-	case atom.P:
-		node.typ = NodeParagraph
+	case atom.Code:
+		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
+			node.typ = NodeCodeSpan
+			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: strToItems("`")})
+		}
+	case atom.Br:
+		node.typ = NodeInlineHTML
+		node.tokens = strToItems("<br />")
 	case atom.Span:
 		mtype := lute.domAttrValue(n, "data-mtype")
 		if "2" == mtype { // 行级元素可以直接用其 text
@@ -91,7 +100,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			case atom.Strong:
 				node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToItems("**")})
 			case atom.Pre:
-				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToItems("```"), codeBlockFenceLen:3})
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToItems("```"), codeBlockFenceLen: 3})
+			case atom.Code:
+				if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
+					node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: strToItems("`")})
+				}
 			}
 		}
 	}
