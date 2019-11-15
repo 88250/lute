@@ -79,6 +79,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	case atom.A:
 		node.typ = NodeLink
 		node.AppendChild(&Node{typ: NodeOpenBracket})
+	case atom.Img:
+		node.typ = NodeImage
+		node.AppendChild(&Node{typ:NodeBang})
+		node.AppendChild(&Node{typ:NodeOpenBracket})
+		imgAlt := lute.domAttrValue(n, "alt")
+		if "" != imgAlt {
+			node.AppendChild(&Node{typ:NodeLinkText, tokens:strToItems(imgAlt)})
+		}
+		node.AppendChild(&Node{typ: NodeCloseBracket})
+		node.AppendChild(&Node{typ: NodeOpenParen})
+		node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "src"))})
+		node.AppendChild(&Node{typ: NodeCloseParen})
 	case atom.Span:
 		mtype := lute.domAttrValue(n, "data-mtype")
 		if "2" == mtype { // 行级元素可以直接用其 text
