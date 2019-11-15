@@ -26,11 +26,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	node := &Node{typ: -1, tokens: strToItems(n.Data)}
 	switch n.DataAtom {
 	case 0:
-		if atom.Code == n.Parent.DataAtom {
-			if nil == n.Parent.Parent {
-				node.typ = NodeCodeSpanContent
-			} else {
-				node.typ = NodeCodeBlockCode
+		if nil != n.Parent {
+			switch n.Parent.DataAtom {
+			case atom.Code:
+				if nil == n.Parent.Parent {
+					node.typ = NodeCodeSpanContent
+				} else {
+					node.typ = NodeCodeBlockCode
+				}
+			case atom.A:
+				node.typ = NodeLinkText
+			default:
+				node.typ = NodeText
 			}
 		} else {
 			node.typ = NodeText
@@ -68,8 +75,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: strToItems("`")})
 		}
 	case atom.Br:
-		node.typ = NodeInlineHTML
-		node.tokens = strToItems("<br />")
+		node.typ = NodeHardBreak
+	case atom.A:
+		node.typ = NodeLink
+		node.AppendChild(&Node{typ: NodeOpenBracket})
 	case atom.Span:
 		mtype := lute.domAttrValue(n, "data-mtype")
 		if "2" == mtype { // 行级元素可以直接用其 text
@@ -105,6 +114,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 				if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
 					node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: strToItems("`")})
 				}
+			case atom.A:
+				node.AppendChild(&Node{typ: NodeCloseBracket})
+				node.AppendChild(&Node{typ: NodeOpenParen})
+				node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "href"))})
+				node.AppendChild(&Node{typ: NodeCloseParen})
 			}
 		}
 	}
