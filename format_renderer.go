@@ -351,6 +351,7 @@ func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *FormatRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.newline()
 	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {

@@ -26,16 +26,30 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	node := &Node{typ: -1, tokens: strToItems(n.Data)}
 	switch n.DataAtom {
 	case 0:
-		node.typ = NodeText
+		if atom.Code == n.Parent.DataAtom {
+			node.typ = NodeCodeBlockCode
+		} else {
+			node.typ = NodeText
+		}
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
 		node.headingLevel = int(node.tokens[1].term() - byte('0'))
 		node.AppendChild(&Node{typ: NodeHeadingC8hMarker, tokens: strToItems(strings.Repeat("#", node.headingLevel))})
+	case atom.Hr:
+		node.typ = NodeThematicBreak
 	case atom.Blockquote:
 		node.typ = NodeBlockquote
 		node.AppendChild(&Node{typ: NodeBlockquoteMarker, tokens: strToItems(">")})
-	case atom.Hr:
-		node.typ = NodeThematicBreak
+	case atom.List:
+		node.typ = NodeList
+	case atom.Li:
+		node.typ = NodeListItem
+		node.listData = &listData{marker: strToItems("*")}
+	case atom.Pre:
+		node.typ = NodeCodeBlock
+		node.isFencedCodeBlock = true
+		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToItems("```"), codeBlockFenceLen:3})
+		node.AppendChild(&Node{typ:NodeCodeBlockFenceInfoMarker})
 	case atom.Br:
 		node.typ = NodeInlineHTML
 		node.tokens = strToItems("<br />")
@@ -76,6 +90,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 				node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems("_")})
 			case atom.Strong:
 				node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToItems("**")})
+			case atom.Pre:
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToItems("```"), codeBlockFenceLen:3})
 			}
 		}
 	}
