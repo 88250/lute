@@ -27,18 +27,21 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	switch n.DataAtom {
 	case 0:
 		node.typ = NodeText
+	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		node.typ = NodeHeading
+		node.headingLevel = int(node.tokens[1].term() - byte('0'))
+		node.AppendChild(&Node{typ:NodeHeadingC8hMarker, tokens: strToItems(strings.Repeat("#", node.headingLevel))})
 	case atom.Br:
 		node.typ = NodeInlineHTML
 		node.tokens = strToItems("<br />")
 	case atom.Em:
-		node.typ = NodeEmA6kOpenMarker
+		node.typ = NodeEmphasis
+		node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToItems("_")})
 	case atom.Strong:
 		node.typ = NodeStrong
+		node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToItems("**")})
 	case atom.P:
 		node.typ = NodeParagraph
-	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
-		node.typ = NodeHeading
-		node.headingLevel = int(node.tokens[1].term() - byte('0'))
 	case atom.Blockquote:
 		node.typ = NodeBlockquote
 	case atom.Hr:
@@ -66,6 +69,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	if !skipChildren {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			lute.genASTByDOM(c, tree)
+
+			switch n.DataAtom {
+			case atom.Em:
+				node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems("_")})
+			case atom.Strong:
+				node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToItems("**")})
+			}
 		}
 	}
 	if -1 != node.typ {
