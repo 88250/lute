@@ -27,8 +27,8 @@ type vditor2Test struct {
 
 var vditorRenderer2Tests = []*vditorTest{
 
-	{&parseTest{"1", "<p><strong data-marker=\"**\">foo</strong></p>", "<p><strong data-marker=\"**\">foo</strong></p>\n"}, 2, 2},
-	{&parseTest{"0", "<p>foo</p>", "<p>foo</p>\n"}, 2, 2},
+	{&parseTest{"1", "<p><strong data-marker=\"**\">foo</strong></p>", "<p><strong data-marker=\"**\">foo</strong></p>"}, 2, 2},
+	{&parseTest{"0", "<p>foo</p>", "<p>foo</p>"}, 2, 2},
 }
 
 func TestVditorRenderer2(t *testing.T) {

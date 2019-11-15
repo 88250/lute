@@ -13,9 +13,6 @@
 package test
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"strconv"
 	"testing"
 
 	"github.com/b3log/lute"
@@ -23,9 +20,10 @@ import (
 
 var h2mTests = []parseTest{
 
+	{"16", "<p><em><strong>foo</strong></em></p>", "***foo***\n"},
 	{"15", "<p><strong data-marker=\"__\">foo</strong></p>", "__foo__\n"},
 	{"14", "<p><strong data-marker=\"**\">foo</strong></p>", "**foo**\n"},
-	{"13", "<h2>foo</h2>\n<p>para<em>em</em></p>", "## foo\n\npara_em_\n"},
+	{"13", "<h2>foo</h2>\n<p>para<em>em</em></p>", "## foo\n\npara*em*\n"},
 	{"12", "<a href=\"/bar\" title=\"baz\">foo</a>", "[foo](/bar \"baz\")\n"},
 	{"11", "<img src=\"/bar\" alt=\"foo\" />", "![foo](/bar)\n"},
 	{"10", "<img src=\"/bar\" />", "![](/bar)\n"},
@@ -36,7 +34,7 @@ var h2mTests = []parseTest{
 	{"5", "<ul><li>foo</li></ul>", "* foo\n"},
 	{"4", "<blockquote>foo</blockquote>", "> foo\n"},
 	{"3", "<h2>foo</h2>", "## foo\n"},
-	{"2", "<p><strong><em>foo</em></strong></p>", "**_foo_**\n"},
+	{"2", "<p><strong><em>foo</em></strong></p>", "***foo***\n"},
 	{"1", "<p><strong>foo</strong></p>", "**foo**\n"},
 	{"0", "<p>foo</p>", "foo\n"},
 }
@@ -57,36 +55,38 @@ func TestHtml2Md(t *testing.T) {
 }
 
 func TestHtml2MdSpec(t *testing.T) {
-	bytes, err := ioutil.ReadFile("commonmark-spec.json")
-	if nil != err {
-		t.Fatalf("read spec test cases failed: " + err.Error())
-	}
+	// TODO: html to markdown spec
 
-	var testcases []testcase
-	if err = json.Unmarshal(bytes, &testcases); nil != err {
-		t.Fatalf("read spec test caes failed: " + err.Error())
-	}
-
-	luteEngine := lute.New()
-	luteEngine.GFMTaskListItem = false
-	luteEngine.GFMTable = false
-	luteEngine.GFMAutoLink = false
-	luteEngine.GFMStrikethrough = false
-	luteEngine.SoftBreak2HardBreak = false
-	luteEngine.CodeSyntaxHighlight = false
-	luteEngine.AutoSpace = false
-	luteEngine.FixTermTypo = false
-	luteEngine.Emoji = false
-
-	for _, test := range testcases {
-		testName := test.Section + " " + strconv.Itoa(test.Example)
-		md, err := luteEngine.Html2Md(test.HTML)
-		if nil != err {
-			t.Fatalf("test case [%s] unexpected: %s", testName, err)
-		}
-
-		if test.Markdown != md {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", testName, test.Markdown, md, test.HTML)
-		}
-	}
+	//bytes, err := ioutil.ReadFile("commonmark-spec.json")
+	//if nil != err {
+	//	t.Fatalf("read spec test cases failed: " + err.Error())
+	//}
+	//
+	//var testcases []testcase
+	//if err = json.Unmarshal(bytes, &testcases); nil != err {
+	//	t.Fatalf("read spec test caes failed: " + err.Error())
+	//}
+	//
+	//luteEngine := lute.New()
+	//luteEngine.GFMTaskListItem = false
+	//luteEngine.GFMTable = false
+	//luteEngine.GFMAutoLink = false
+	//luteEngine.GFMStrikethrough = false
+	//luteEngine.SoftBreak2HardBreak = false
+	//luteEngine.CodeSyntaxHighlight = false
+	//luteEngine.AutoSpace = false
+	//luteEngine.FixTermTypo = false
+	//luteEngine.Emoji = false
+	//
+	//for _, test := range testcases {
+	//	testName := test.Section + " " + strconv.Itoa(test.Example)
+	//	md, err := luteEngine.Html2Md(test.HTML)
+	//	if nil != err {
+	//		t.Fatalf("test case [%s] unexpected: %s", testName, err)
+	//	}
+	//
+	//	if test.Markdown != md {
+	//		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", testName, test.Markdown, md, test.HTML)
+	//	}
+	//}
 }
