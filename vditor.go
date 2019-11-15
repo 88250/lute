@@ -97,7 +97,7 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 
 	if NodeCodeBlockFenceCloseMarker == en.typ {
 		newTree = &Node{typ: NodeParagraph}
-		newTree.AppendChild(&Node{typ:NodeText})
+		newTree.AppendChild(&Node{typ: NodeText})
 		en.parent.parent.AppendChild(newTree)
 		needContinueSameSubTree = false
 	}
@@ -167,24 +167,6 @@ func (lute *Lute) VditorOperation(markdownText string, startOffset, endOffset in
 	renderer.expand(firstc)
 	output, err = renderer.Render()
 	html = string(output)
-	return
-}
-
-// VditorDOMMarkdown 用于将 Vditor DOM 转换为 Markdown 文本。
-// TODO：改为解析标准 DOM
-func (lute *Lute) VditorDOMMarkdown(html string) (markdown string, err error) {
-	tree, err := lute.parseVditorDOM(html)
-	if nil != err {
-		return
-	}
-
-	var formatted []byte
-	renderer := lute.newFormatRenderer(tree)
-	formatted, err = renderer.Render()
-	if nil != err {
-		return
-	}
-	markdown = bytesToStr(formatted)
 	return
 }
 

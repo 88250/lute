@@ -20,34 +20,8 @@ import (
 	"github.com/b3log/lute/html/atom"
 )
 
-// Vditor DOM Parser
-
-// parseVditorDOM 解析 Vditor DOM 生成 Markdown 文本。
-func (lute *Lute) parseVditorDOM(htmlStr string) (tree *Tree, err error) {
-	defer recoverPanic(&err)
-
-	// 将字符串解析为 HTML 树
-
-	reader := strings.NewReader(htmlStr)
-	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
-	if nil != err {
-		return
-	}
-
-	// 将 HTML 树转换为 Markdown 语法树
-
-	tree = &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
-	for _, htmlNode := range htmlNodes {
-		tree.context.tip = tree.Root
-		lute.genASTByVditorDOM(htmlNode, tree)
-	}
-
-	return
-}
-
-// genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
-func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
+// genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
+func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	skipChildren := false
 	node := &Node{typ: -1, tokens: strToItems(n.Data)}
 	switch n.DataAtom {
@@ -91,7 +65,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 	if !skipChildren {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			lute.genASTByVditorDOM(c, tree)
+			lute.genASTByDOM(c, tree)
 		}
 	}
 	if -1 != node.typ {
