@@ -12,7 +12,7 @@
 
 package lute
 
-// RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
+// RenderVditorDOM 用于渲染 Vditor DOM。
 func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	lute.VditorWYSIWYG = true
 	lute.endNewline(&htmlStr)
@@ -29,7 +29,7 @@ func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 		return
 	}
 
-	renderer := lute.newVditorRenderer2(tree)
+	renderer := lute.newVditorRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
 	html = string(output)
