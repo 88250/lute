@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-// VditorRenderer 描述了 HTML 渲染器。
+// VditorRenderer 描述了 Vditor DOM 渲染器。
 type VditorRenderer struct {
 	*BaseRenderer
 }
@@ -538,7 +538,6 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 		} else {
 			r.writeString("<pre><code>")
 		}
-		tokens = tokens
 		r.write(tokens)
 		return WalkSkipChildren, nil
 	}
