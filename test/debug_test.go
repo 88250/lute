@@ -20,6 +20,8 @@ import (
 
 var debugTests = []parseTest{
 
+	{"41", "|abc|def|\n|---|---|\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
+
 	// 链接解析括号匹配问题 https://github.com/b3log/lute/issues/36
 	{"40", "[link](/u(ri\n)\n", "<p>[link](/u(ri<br />\n)</p>\n"},
 	{"39", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},

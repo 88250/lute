@@ -22,6 +22,7 @@ import (
 
 var vditorRendererTests = []*parseTest{
 
+	{"13", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>"},
 	{"12", "<p><del data-marker=\"~~\">Hi</del> Hello, world!</p>", "<p><del data-marker=\"~~\">Hi</del> Hello, world!</p>"},
 	{"11", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>"},
 	{"10", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},
