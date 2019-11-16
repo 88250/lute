@@ -22,7 +22,6 @@ import (
 
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
-	skipChildren := false
 	node := &Node{typ: -1, tokens: strToItems(n.Data)}
 	switch n.DataAtom {
 	case 0:
@@ -115,44 +114,44 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 	}
-	if !skipChildren {
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			lute.genASTByDOM(c, tree)
 
-			switch n.DataAtom {
-			case atom.Em:
-				marker := lute.domAttrValue(n, "data-marker")
-				if "_" == marker {
-					node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems(marker)})
-				} else {
-					node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: strToItems(marker)})
-				}
-			case atom.Strong:
-				marker := lute.domAttrValue(n, "data-marker")
-				if "__" == marker {
-					node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: strToItems(marker)})
-				} else {
-					node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToItems(marker)})
-				}
-			case atom.Pre:
-				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToItems("```"), codeBlockFenceLen: 3})
-			case atom.Code:
-				if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
-					node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: strToItems("`")})
-				}
-			case atom.A:
-				node.AppendChild(&Node{typ: NodeCloseBracket})
-				node.AppendChild(&Node{typ: NodeOpenParen})
-				node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "href"))})
-				linkTitle := lute.domAttrValue(n, "title")
-				if "" != linkTitle {
-					node.AppendChild(&Node{typ: NodeLinkSpace})
-					node.AppendChild(&Node{typ: NodeLinkTitle, tokens: strToItems(linkTitle)})
-				}
-				node.AppendChild(&Node{typ: NodeCloseParen})
-			}
-		}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.genASTByDOM(c, tree)
 	}
+
+	switch n.DataAtom {
+	case atom.Em:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "_" == marker {
+			node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems(marker)})
+		} else {
+			node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: strToItems(marker)})
+		}
+	case atom.Strong:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "__" == marker {
+			node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: strToItems(marker)})
+		} else {
+			node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToItems(marker)})
+		}
+	case atom.Pre:
+		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToItems("```"), codeBlockFenceLen: 3})
+	case atom.Code:
+		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
+			node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: strToItems("`")})
+		}
+	case atom.A:
+		node.AppendChild(&Node{typ: NodeCloseBracket})
+		node.AppendChild(&Node{typ: NodeOpenParen})
+		node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "href"))})
+		linkTitle := lute.domAttrValue(n, "title")
+		if "" != linkTitle {
+			node.AppendChild(&Node{typ: NodeLinkSpace})
+			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: strToItems(linkTitle)})
+		}
+		node.AppendChild(&Node{typ: NodeCloseParen})
+	}
+
 	if -1 != node.typ {
 		tree.context.tip = tree.context.tip.parent
 	}
