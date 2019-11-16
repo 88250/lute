@@ -20,13 +20,10 @@ import (
 	"github.com/b3log/lute"
 )
 
-type vditor2Test struct {
-	*parseTest
-	startOffset, endOffset int
-}
+var vditorRendererTests = []*parseTest{
 
-var vditorRenderer2Tests = []*parseTest{
-
+	{"12", "<p><del data-marker=\"~~\">Hi</del> Hello, world!</p>", "<p><del data-marker=\"~~\">Hi</del> Hello, world!</p>"},
+	{"11", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>"},
 	{"10", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},
 	{"9", "<ul><li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},
 	{"8", "> <wbr>", "<blockquote><wbr></blockquote>"},
@@ -40,10 +37,10 @@ var vditorRenderer2Tests = []*parseTest{
 	{"0", "<p>foo</p>", "<p>foo</p>"},
 }
 
-func TestVditorRenderer2(t *testing.T) {
+func TestVditorRenderer(t *testing.T) {
 	luteEngine := lute.New()
 
-	for _, test := range vditorRenderer2Tests {
+	for _, test := range vditorRendererTests {
 		html, err := luteEngine.RenderVditorDOM(test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)

@@ -196,7 +196,7 @@ func (r *VditorRenderer) renderStrikethrough(node *Node, entering bool) (WalkSta
 }
 
 func (r *VditorRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("del", nil, false)
+	r.tag("del", [][]string{{"data-marker", "~"}}, false)
 	return WalkStop, nil
 }
 
@@ -206,7 +206,7 @@ func (r *VditorRenderer) renderStrikethrough1CloseMarker(node *Node, entering bo
 }
 
 func (r *VditorRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("del", nil, false)
+	r.tag("del", [][]string{{"data-marker", "~~"}}, false)
 	return WalkStop, nil
 }
 
