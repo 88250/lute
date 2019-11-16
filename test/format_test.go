@@ -27,14 +27,15 @@ type formatTest struct {
 }
 
 var formatTests = []formatTest{
+
 	// 子列表格式化后缩进不对 https://github.com/b3log/lute/issues/22
-	//{"27", "* first\n   * sub first\n* second\n  *  sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
-	//{"26", "* first\n  * sub first\n* second\n  * sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
-	//
-	//{"25", "`` `Lute` ``\n", "`` `Lute` ``\n"},
-	//
-	//// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
-	//{"24", ":heart: :hacpai:\n", ":heart: :hacpai:\n"},
+	{"27", "* first\n   * sub first\n* second\n  *  sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
+	{"26", "* first\n  * sub first\n* second\n  * sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
+
+	{"25", "`` `Lute` ``\n", "`` `Lute` ``\n"},
+
+	// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
+	{"24", ":heart: :hacpai:\n", ":heart: :hacpai:\n"},
 
 	// 原先是 HTML 实体 &amp; 格式化后反转义
 	{"23", "&&amp;\n", "&&\n"},
