@@ -117,6 +117,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.tokens = strToItems("[ ]")
 		}
+	case atom.Del:
+		node.typ = NodeStrikethrough
+		marker := lute.domAttrValue(n, "data-marker")
+		if "~" == marker {
+			node.AppendChild(&Node{typ: NodeStrikethrough1OpenMarker, tokens: strToItems(marker)})
+		} else {
+			node.AppendChild(&Node{typ: NodeStrikethrough2OpenMarker, tokens: strToItems(marker)})
+		}
 	case atom.Div:
 		node.typ = NodeParagraph
 	}
@@ -161,6 +169,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: strToItems(linkTitle)})
 		}
 		node.AppendChild(&Node{typ: NodeCloseParen})
+	case atom.Del:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "~" == marker {
+			node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: strToItems(marker)})
+		} else {
+			node.AppendChild(&Node{typ: NodeStrikethrough2CloseMarker, tokens: strToItems(marker)})
+		}
 	}
 
 	if -1 != node.typ {
