@@ -60,7 +60,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	case atom.Blockquote:
 		node.typ = NodeBlockquote
 		node.AppendChild(&Node{typ: NodeBlockquoteMarker, tokens: strToItems(">")})
-	case atom.List:
+	case atom.List, atom.Ul:
 		node.typ = NodeList
 	case atom.Li:
 		node.typ = NodeListItem
@@ -92,7 +92,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: strToItems("`")})
 		}
 	case atom.Br:
-		node.typ = NodeHardBreak
+		node.typ = NodeInlineHTML
+		node.tokens = strToItems("<br />")
 	case atom.A:
 		node.typ = NodeLink
 		node.AppendChild(&Node{typ: NodeOpenBracket})
@@ -108,6 +109,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeOpenParen})
 		node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "src"))})
 		node.AppendChild(&Node{typ: NodeCloseParen})
+	case atom.Div:
+		node.typ = NodeParagraph
 	}
 
 	if -1 != node.typ {

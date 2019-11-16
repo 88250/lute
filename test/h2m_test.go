@@ -20,6 +20,8 @@ import (
 
 var h2mTests = []parseTest{
 
+	{"20", "<p>foo</p><p><wbr><br></p>", "foo\n\n<wbr><br />\n"},
+	{"19", "<ul><li>foo</li></ul><div><wbr><br></div>", "* foo\n\n<wbr><br />\n"},
 	{"18", "<p><em data-marker=\"*\">foo<wbr></em></p>", "*foo<wbr>*\n"},
 	{"17", "foo<span>&nbsp;</span>bar", "foo bar\n"},
 	{"16", "<p><em><strong>foo</strong></em></p>", "***foo***\n"},
@@ -30,7 +32,7 @@ var h2mTests = []parseTest{
 	{"11", "<img src=\"/bar\" alt=\"foo\" />", "![foo](/bar)\n"},
 	{"10", "<img src=\"/bar\" />", "![](/bar)\n"},
 	{"9", "<a href=\"/bar\">foo</a>", "[foo](/bar)\n"},
-	{"8", "foo<br />bar", "foo\nbar\n"},
+	{"8", "foo<br />bar", "foo<br />bar\n"},
 	{"7", "<code>foo</code>", "`foo`\n"},
 	{"6", "<pre><code>foo</code></pre>", "```\nfoo\n```\n"},
 	{"5", "<ul><li>foo</li></ul>", "* foo\n"},
