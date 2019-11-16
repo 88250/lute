@@ -20,6 +20,7 @@ import (
 
 var h2mTests = []parseTest{
 
+	{"22", "><wbr>", "><wbr>\n"},
 	{"21", "<p>> foo<wbr></p>", "> foo<wbr>\n"},
 	{"20", "<p>foo</p><p><wbr><br></p>", "foo\n\n<wbr><br />\n"},
 	{"19", "<ul><li>foo</li></ul><div><wbr><br></div>", "* foo\n\n<wbr><br />\n"},

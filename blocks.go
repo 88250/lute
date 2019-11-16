@@ -183,6 +183,11 @@ var blockStarts = []blockStartFunc{
 				if withSpace {
 					t.context.advanceOffset(1, true)
 					markers = append(markers, whitespace)
+				} else {
+					if t.context.option.VditorWYSIWYG {
+						// Vditor 所见即所得模式下块引用标记符 > 后面必须跟空格
+						return 0
+					}
 				}
 				t.context.closeUnmatchedBlocks()
 				t.context.addChild(NodeBlockquote, t.context.nextNonspace)

@@ -27,6 +27,8 @@ type vditor2Test struct {
 
 var vditorRenderer2Tests = []*vditorTest{
 
+	{&parseTest{"8", "> <wbr>", "<blockquote><wbr></blockquote>"}, 2, 2},
+	{&parseTest{"7", "><wbr>", "<p>&gt;<wbr></p>"}, 2, 2},
 	{&parseTest{"6", "<p>> foo<wbr></p>", "<blockquote><p>foo<wbr></p></blockquote>"}, 2, 2},
 	{&parseTest{"5", "<p>foo</p><p><wbr><br></p>", "<p>foo</p><p><wbr><br /></p>"}, 2, 2},
 	{&parseTest{"4", "<ul><li>foo</li></ul><div><wbr><br></div>", "<ul><li>foo</li></ul><p><wbr><br /></p>"}, 2, 2},
