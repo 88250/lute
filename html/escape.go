@@ -135,7 +135,7 @@ func unescapeEntity(b []byte, dst, src int, attribute bool) (dst1, src1 int) {
 		break
 	}
 
-	entityName := string(s[1:i])
+	entityName := string(s[1 : i-1])
 	if entityName == "" {
 		// No-op.
 	} else if attribute && entityName[len(entityName)-1] != ';' && len(s) > i && s[i] == '=' {

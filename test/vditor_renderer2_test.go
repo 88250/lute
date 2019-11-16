@@ -27,6 +27,8 @@ type vditor2Test struct {
 
 var vditorRenderer2Tests = []*vditorTest{
 
+	{&parseTest{"3", "<p><em data-marker=\"*\">foo<wbr></em></p>", "<p><em data-marker=\"*\">foo<wbr></em></p>"}, 2, 2},
+	{&parseTest{"2", "<p>foo<wbr></p>", "<p>foo<wbr></p>"}, 2, 2},
 	{&parseTest{"1", "<p><strong data-marker=\"**\">foo</strong></p>", "<p><strong data-marker=\"**\">foo</strong></p>"}, 2, 2},
 	{&parseTest{"0", "<p>foo</p>", "<p>foo</p>"}, 2, 2},
 }

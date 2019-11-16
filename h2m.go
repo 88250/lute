@@ -38,12 +38,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 				node.typ = NodeLinkText
 			default:
 				node.typ = NodeText
+				if html.Entities["nbsp"] == n.Data {
+					node.tokens = strToItems(" ")
+				}
 			}
 		} else {
 			if "\n" != n.Data {
 				node.typ = NodeText
 			}
 		}
+	case atom.Wbr:
+		node.typ = NodeInlineHTML
+		node.tokens = strToItems("<wbr>")
 	case atom.P:
 		node.typ = NodeParagraph
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
@@ -103,20 +109,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeOpenParen})
 		node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "src"))})
 		node.AppendChild(&Node{typ: NodeCloseParen})
-		//case atom.Span:
-		//	mtype := lute.domAttrValue(n, "data-mtype")
-		//	if "2" == mtype { // 行级元素可以直接用其 text
-		//		node.typ = NodeText
-		//		node.tokens = strToItems(lute.domText(n))
-		//		break
-		//	}
-		//
-		//	class := lute.domAttrValue(n, "class")
-		//	skipChildren = !strings.Contains(class, "node")
-		//	if skipChildren {
-		//		ntype := lute.domAttrValue(n, "data-ntype")
-		//		skipChildren = "10" != ntype
-		//	}
 	}
 
 	if -1 != node.typ {
