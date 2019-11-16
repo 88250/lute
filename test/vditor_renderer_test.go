@@ -25,26 +25,26 @@ type vditor2Test struct {
 	startOffset, endOffset int
 }
 
-var vditorRenderer2Tests = []*vditorTest{
+var vditorRenderer2Tests = []*parseTest{
 
-	{&parseTest{"10", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"}, 2, 2},
-	{&parseTest{"9", "<ul><li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"}, 2, 2},
-	{&parseTest{"8", "> <wbr>", "<blockquote><wbr></blockquote>"}, 2, 2},
-	{&parseTest{"7", "><wbr>", "<p>><wbr></p>"}, 2, 2},
-	{&parseTest{"6", "<p>> foo<wbr></p>", "<blockquote><p>foo<wbr></p></blockquote>"}, 2, 2},
-	{&parseTest{"5", "<p>foo</p><p><wbr><br></p>", "<p>foo</p><p><wbr><br /></p>"}, 2, 2},
-	{&parseTest{"4", "<ul><li>foo</li></ul><div><wbr><br></div>", "<ul><li>foo</li></ul><p><wbr><br /></p>"}, 2, 2},
-	{&parseTest{"3", "<p><em data-marker=\"*\">foo<wbr></em></p>", "<p><em data-marker=\"*\">foo<wbr></em></p>"}, 2, 2},
-	{&parseTest{"2", "<p>foo<wbr></p>", "<p>foo<wbr></p>"}, 2, 2},
-	{&parseTest{"1", "<p><strong data-marker=\"**\">foo</strong></p>", "<p><strong data-marker=\"**\">foo</strong></p>"}, 2, 2},
-	{&parseTest{"0", "<p>foo</p>", "<p>foo</p>"}, 2, 2},
+	{"10", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},
+	{"9", "<ul><li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},
+	{"8", "> <wbr>", "<blockquote><wbr></blockquote>"},
+	{"7", "><wbr>", "<p>><wbr></p>"},
+	{"6", "<p>> foo<wbr></p>", "<blockquote><p>foo<wbr></p></blockquote>"},
+	{"5", "<p>foo</p><p><wbr><br></p>", "<p>foo</p><p><wbr><br /></p>"},
+	{"4", "<ul><li>foo</li></ul><div><wbr><br></div>", "<ul><li>foo</li></ul><p><wbr><br /></p>"},
+	{"3", "<p><em data-marker=\"*\">foo<wbr></em></p>", "<p><em data-marker=\"*\">foo<wbr></em></p>"},
+	{"2", "<p>foo<wbr></p>", "<p>foo<wbr></p>"},
+	{"1", "<p><strong data-marker=\"**\">foo</strong></p>", "<p><strong data-marker=\"**\">foo</strong></p>"},
+	{"0", "<p>foo</p>", "<p>foo</p>"},
 }
 
 func TestVditorRenderer2(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range vditorRenderer2Tests {
-		html, err := luteEngine.RenderVditorDOM2(test.from, test.startOffset, test.endOffset)
+		html, err := luteEngine.RenderVditorDOM(test.from)
 		if nil != err {
 			t.Fatalf("unexpected: %s", err)
 		}

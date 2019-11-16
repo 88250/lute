@@ -12,8 +12,8 @@
 
 package lute
 
-// RenderVditorDOM2 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
-func (lute *Lute) RenderVditorDOM2(htmlStr string, startOffset, endOffset int) (html string, err error) {
+// RenderVditorDOM 用于渲染 Vditor DOM，start 和 end 是光标位置，从 0 开始。
+func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	lute.VditorWYSIWYG = true
 	lute.endNewline(&htmlStr)
 
