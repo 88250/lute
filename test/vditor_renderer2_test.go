@@ -27,6 +27,8 @@ type vditor2Test struct {
 
 var vditorRenderer2Tests = []*vditorTest{
 
+	{&parseTest{"10", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"}, 2, 2},
+	{&parseTest{"9", "<ul><li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul><li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"}, 2, 2},
 	{&parseTest{"8", "> <wbr>", "<blockquote><wbr></blockquote>"}, 2, 2},
 	{&parseTest{"7", "><wbr>", "<p>><wbr></p>"}, 2, 2},
 	{&parseTest{"6", "<p>> foo<wbr></p>", "<blockquote><p>foo<wbr></p></blockquote>"}, 2, 2},

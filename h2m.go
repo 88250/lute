@@ -109,6 +109,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeOpenParen})
 		node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "src"))})
 		node.AppendChild(&Node{typ: NodeCloseParen})
+	case atom.Input:
+		node.typ = NodeTaskListItemMarker
+		if lute.hasAttr(n, "checked") {
+			node.taskListItemChecked = true
+			node.tokens = strToItems("[X]")
+		} else {
+			node.tokens = strToItems("[ ]")
+		}
 	case atom.Div:
 		node.typ = NodeParagraph
 	}
@@ -160,10 +168,16 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	}
 }
 
-func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
-	if 1 > len(n.Attr) {
-		return ""
+func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			return true
+		}
 	}
+	return false
+}
+
+func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
 	for _, attr := range n.Attr {
 		if attr.Key == attrName {
 			return attr.Val
