@@ -35,7 +35,7 @@ func addSpaceAtBoundary(prefix string, nextChar rune) string {
 	if 0 == len(prefix) {
 		return string(nextChar)
 	}
-	if unicode.IsSpace(nextChar) {
+	if unicode.IsSpace(nextChar) || !unicode.IsPrint(nextChar) {
 		return prefix + string(nextChar)
 	}
 
@@ -47,7 +47,7 @@ func addSpaceAtBoundary(prefix string, nextChar rune) string {
 }
 
 func isAllowSpace(currentChar, nextChar rune) bool {
-	if unicode.IsSpace(currentChar) {
+	if unicode.IsSpace(currentChar) || !unicode.IsPrint(currentChar) {
 		return false
 	}
 
