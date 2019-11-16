@@ -138,7 +138,7 @@ func (r *HTMLRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, e
 
 func (r *HTMLRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
 	tag := "td"
-	if NodeTableHead == node.parent.typ {
+	if NodeTableHead == node.parent.parent.typ {
 		tag = "th"
 	}
 	if entering {
@@ -166,10 +166,6 @@ func (r *HTMLRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, er
 	} else {
 		r.tag("/tr", nil, false)
 		r.newline()
-		if node == node.parent.lastChild {
-			r.tag("/tbody", nil, false)
-		}
-		r.newline()
 	}
 	return WalkContinue, nil
 }
@@ -178,11 +174,7 @@ func (r *HTMLRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, e
 	if entering {
 		r.tag("thead", nil, false)
 		r.newline()
-		r.tag("tr", nil, false)
-		r.newline()
 	} else {
-		r.tag("/tr", nil, false)
-		r.newline()
 		r.tag("/thead", nil, false)
 		r.newline()
 		if nil != node.next {
@@ -198,6 +190,10 @@ func (r *HTMLRenderer) renderTable(node *Node, entering bool) (WalkStatus, error
 		r.tag("table", nil, false)
 		r.newline()
 	} else {
+		if nil != node.firstChild.next {
+			r.tag("/tbody", nil, false)
+		}
+		r.newline()
 		r.tag("/table", nil, false)
 		r.newline()
 	}
