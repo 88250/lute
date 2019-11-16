@@ -28,19 +28,19 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 	// 子列表格式化后缩进不对 https://github.com/b3log/lute/issues/22
-	{"27", "* first\n   * sub first\n* second\n  *  sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
-	{"26", "* first\n  * sub first\n* second\n  * sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
+	//{"27", "* first\n   * sub first\n* second\n  *  sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
+	//{"26", "* first\n  * sub first\n* second\n  * sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
+	//
+	//{"25", "`` `Lute` ``\n", "`` `Lute` ``\n"},
+	//
+	//// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
+	//{"24", ":heart: :hacpai:\n", ":heart: :hacpai:\n"},
 
-	{"25", "`` `Lute` ``\n", "`` `Lute` ``\n"},
+	// 原先是 HTML 实体 &amp; 格式化后反转义
+	{"23", "&&amp;\n", "&&\n"},
+	{"22", "&amp;123&emsp;456\n", "&123\u2003456\n"},
 
-	// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
-	{"24", ":heart: :hacpai:\n", ":heart: :hacpai:\n"},
-
-	// 原先是 & 的格式化以后转义为 HTML 实体 &amp;
-	{"23", "&&amp;\n", "&amp;&amp;\n"},
-
-	{"22", "\u2003emsp\n", "\u2003emsp\n"},
-	{"21", "&amp;123&emsp;456\n", "&amp;123\u2003456\n"},
+	{"21", "\u2003emsp\n", "\u2003emsp\n"},
 	{"20", "~删除线~\n", "~删除线~\n"},
 	{"19", "我们**需要Markdown Format**\n", "我们**需要 Markdown Format**\n"},
 	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 Lute 空格\n"},

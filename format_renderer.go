@@ -295,7 +295,7 @@ func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 	if r.option.FixTermTypo {
 		r.fixTermTypo(node)
 	}
-	r.write(escapeHTML(node.tokens))
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
