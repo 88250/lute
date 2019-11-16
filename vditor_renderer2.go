@@ -121,7 +121,7 @@ func (r *VditorRenderer2) renderEmoji(node *Node, entering bool) (WalkStatus, er
 func (r *VditorRenderer2) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "vditor-math"}}
 	r.tag("span", attrs, false)
-	r.write(escapeHTML(node.tokens))
+	r.write(node.tokens)
 	r.tag("/span", nil, false)
 	return WalkStop, nil
 }
@@ -129,7 +129,7 @@ func (r *VditorRenderer2) renderInlineMath(node *Node, entering bool) (WalkStatu
 func (r *VditorRenderer2) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "vditor-math"}}
 	r.tag("div", attrs, false)
-	r.write(escapeHTML(node.tokens))
+	r.write(node.tokens)
 	r.tag("/div", nil, false)
 	return WalkStop, nil
 }
@@ -229,7 +229,7 @@ func (r *VditorRenderer2) renderLinkSpace(node *Node, entering bool) (WalkStatus
 
 func (r *VditorRenderer2) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.write(escapeHTML(node.tokens))
+		r.write(node.tokens)
 	}
 	return WalkStop, nil
 }
@@ -258,7 +258,7 @@ func (r *VditorRenderer2) renderImage(node *Node, entering bool) (WalkStatus, er
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			r.write(escapeHTML(node.ChildByType(NodeLinkDest).tokens))
+			r.write(node.ChildByType(NodeLinkDest).tokens)
 			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
@@ -270,7 +270,7 @@ func (r *VditorRenderer2) renderImage(node *Node, entering bool) (WalkStatus, er
 		r.writeString("\"")
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(title.tokens))
+			r.write(title.tokens)
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -281,9 +281,9 @@ func (r *VditorRenderer2) renderImage(node *Node, entering bool) (WalkStatus, er
 func (r *VditorRenderer2) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
-		attrs := [][]string{{"href", itemsToStr(escapeHTML(dest.tokens))}}
+		attrs := [][]string{{"href", itemsToStr(dest.tokens)}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
-			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(title.tokens))})
+			attrs = append(attrs, []string{"title", itemsToStr(title.tokens)})
 		}
 		r.tag("a", attrs, false)
 	} else {
@@ -330,7 +330,7 @@ func (r *VditorRenderer2) renderText(node *Node, entering bool) (WalkStatus, err
 	if r.option.FixTermTypo {
 		r.fixTermTypo(node)
 	}
-	r.write(escapeHTML(node.tokens))
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -344,7 +344,7 @@ func (r *VditorRenderer2) renderCodeSpanOpenMarker(node *Node, entering bool) (W
 }
 
 func (r *VditorRenderer2) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.tokens))
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -520,10 +520,8 @@ func (r *VditorRenderer2) renderCodeBlock(node *Node, entering bool) (WalkStatus
 	if !node.isFencedCodeBlock {
 		// 缩进代码块处理
 
-		tokens := node.tokens
 		r.writeString("<pre><code>")
-		tokens = escapeHTML(tokens)
-		r.write(tokens)
+		r.write(node.tokens)
 		r.writeString("</code></pre>")
 		return WalkStop, nil
 	}
@@ -540,7 +538,7 @@ func (r *VditorRenderer2) renderCodeBlockCode(node *Node, entering bool) (WalkSt
 		} else {
 			r.writeString("<pre><code>")
 		}
-		tokens = escapeHTML(tokens)
+		tokens = tokens
 		r.write(tokens)
 		return WalkSkipChildren, nil
 	}
