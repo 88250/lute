@@ -124,7 +124,6 @@ func (r *FormatRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, 
 
 func (r *FormatRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
-		r.writeString("|\n")
 		table := node.parent
 		for i := 0; i < len(table.tableAligns); i++ {
 			align := table.tableAligns[i]
