@@ -20,6 +20,7 @@ import (
 
 var h2mTests = []parseTest{
 
+	{"27", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>\n", "|abc|def|\n|---|---|\n"},
 	{"26", "<p><del data-marker=\"~~\">Hi</del> Hello, world!</p>", "~~Hi~~ Hello, world!\n"},
 	{"25", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "~Hi~ Hello, world!\n"},
 	{"24", "<ul><li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "* [X] foo<wbr>\n"},

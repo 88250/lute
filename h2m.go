@@ -125,6 +125,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.AppendChild(&Node{typ: NodeStrikethrough2OpenMarker, tokens: strToItems(marker)})
 		}
+	case atom.Table:
+		node.typ = NodeTable
+		var tableAligns []int
+		for c := n.FirstChild.FirstChild.FirstChild; nil != c; c = c.NextSibling {
+			tableAligns = append(tableAligns, 0)
+		}
+		node.tableAligns = tableAligns
+	case atom.Thead:
+		node.typ = NodeTableHead
+	case atom.Tr:
+		node.typ = NodeTableRow
+	case atom.Th, atom.Td:
+		node.typ = NodeTableCell
 	case atom.Div:
 		node.typ = NodeParagraph
 	}
