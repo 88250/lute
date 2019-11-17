@@ -98,17 +98,25 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeLink
 		node.AppendChild(&Node{typ: NodeOpenBracket})
 	case atom.Img:
-		node.typ = NodeImage
-		node.AppendChild(&Node{typ: NodeBang})
-		node.AppendChild(&Node{typ: NodeOpenBracket})
+		imgClass := lute.domAttrValue(n, "class")
 		imgAlt := lute.domAttrValue(n, "alt")
-		if "" != imgAlt {
-			node.AppendChild(&Node{typ: NodeLinkText, tokens: strToItems(imgAlt)})
+		if "emoji" == imgClass {
+			node.typ = NodeEmoji
+			emojiImg := &Node{typ: NodeEmojiImg, tokens: tree.emojiImgTokens(imgAlt, lute.domAttrValue(n, "src"))}
+			emojiImg.AppendChild(&Node{typ: NodeEmojiAlias, tokens: strToItems(":" + imgAlt + ":")})
+			node.AppendChild(emojiImg)
+		} else {
+			node.typ = NodeImage
+			node.AppendChild(&Node{typ: NodeBang})
+			node.AppendChild(&Node{typ: NodeOpenBracket})
+			if "" != imgAlt {
+				node.AppendChild(&Node{typ: NodeLinkText, tokens: strToItems(imgAlt)})
+			}
+			node.AppendChild(&Node{typ: NodeCloseBracket})
+			node.AppendChild(&Node{typ: NodeOpenParen})
+			node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "src"))})
+			node.AppendChild(&Node{typ: NodeCloseParen})
 		}
-		node.AppendChild(&Node{typ: NodeCloseBracket})
-		node.AppendChild(&Node{typ: NodeOpenParen})
-		node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "src"))})
-		node.AppendChild(&Node{typ: NodeCloseParen})
 	case atom.Input:
 		node.typ = NodeTaskListItemMarker
 		if lute.hasAttr(n, "checked") {

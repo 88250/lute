@@ -86,21 +86,12 @@ func (t *Tree) emoji0(node *Node) {
 					suffix = ".gif"
 				}
 				src := t.context.option.EmojiSite + "/" + alias + suffix
-				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + src
-				repl += "\" title=\"" + alias + "\" />"
-				if t.context.option.VditorWYSIWYG {
-					repl = src
-				}
 				emojiUnicodeOrImg.typ = NodeEmojiImg
-				emojiUnicodeOrImg.tokens = strToItems(repl)
+				emojiUnicodeOrImg.tokens = t.emojiImgTokens(alias, src)
 			} else if contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
 				alias := bytesToStr(maybeEmoji)
-				repl := "<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + emoji + "\" title=\"" + alias + "\" />"
-				if t.context.option.VditorWYSIWYG {
-					repl = emoji
-				}
 				emojiUnicodeOrImg.typ = NodeEmojiImg
-				emojiUnicodeOrImg.tokens = strToItems(repl)
+				emojiUnicodeOrImg.tokens = t.emojiImgTokens(alias, emoji)
 			} else {
 				emojiUnicodeOrImg.tokens = emojiTokens
 			}
@@ -129,4 +120,8 @@ func (t *Tree) emoji0(node *Node) {
 	if 1 > len(node.tokens) {
 		node.Unlink()
 	}
+}
+
+func (t *Tree) emojiImgTokens(alias, src string) items {
+	return strToItems("<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + src + "\" title=\"" + alias + "\" />")
 }
