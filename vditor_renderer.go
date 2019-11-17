@@ -469,7 +469,7 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 		if node.taskListItemChecked {
 			attrs = append(attrs, []string{"checked", ""})
 		}
-		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
+		attrs = append(attrs, []string{"type", "checkbox"})
 		r.tag("input", attrs, true)
 	}
 	return WalkContinue, nil
