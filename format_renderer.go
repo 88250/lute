@@ -543,7 +543,9 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 			indentedLines.WriteByte(itemNewline)
 		}
 		buf = indentedLines.Bytes()
-		buf = buf[indent:]
+		if indent < len(buf) {
+			buf = buf[indent:]
+		}
 
 		listItemBuf := bytes.Buffer{}
 		if 1 == node.listData.typ {
@@ -556,7 +558,6 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		writer.Reset()
 		writer.Write(buf)
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
-		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = bytes.TrimSpace(r.writer.Bytes())
 		r.writer.Reset()

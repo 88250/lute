@@ -20,6 +20,9 @@ import (
 
 var h2mTests = []parseTest{
 
+	{"31", "<ul><li>foo<ul><li>bar</li></ul></li></ul>", "* foo\n  * bar\n"},
+	{"30", "<ul><li>foo</li><li><ul><li><wbr><br /></li></ul></li></ul>", "* foo\n* * <wbr><br />\n"},
+	{"29", "<p><s>del</s></p>", "~~del~~\n"},
 	{"29", "<p>[]()</p>", "[]()\n"},
 	{"28", ":octocat:", ":octocat:\n"},
 	{"27", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>\n", "|abc|def|\n|---|---|\n"},

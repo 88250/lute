@@ -22,6 +22,7 @@ import (
 
 var vditorRendererTests = []*parseTest{
 
+	{"22", "<ul><li>foo</li><li><ul><li><wbr><br /></li></ul></li></ul>", "<ul><li>foo</li><li><ul><li><wbr><br /></li></ul></li></ul>"},
 	{"21", "<p>[foo](/bar \"baz\")</p>", "<p><a href=\"/bar\" title=\"baz\">foo</a></p>"},
 	{"20", "<p>[foo](/bar)</p>", "<p><a href=\"/bar\">foo</a></p>"},
 	{"19", "<p>[foo]()</p>", "<p>[foo]()</p>"},

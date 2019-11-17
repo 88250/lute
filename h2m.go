@@ -125,7 +125,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.tokens = strToItems("[ ]")
 		}
-	case atom.Del:
+	case atom.Del, atom.S:
 		node.typ = NodeStrikethrough
 		marker := lute.domAttrValue(n, "data-marker")
 		if "~" == marker {
@@ -190,7 +190,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: strToItems(linkTitle)})
 		}
 		node.AppendChild(&Node{typ: NodeCloseParen})
-	case atom.Del:
+	case atom.Del, atom.S:
 		marker := lute.domAttrValue(n, "data-marker")
 		if "~" == marker {
 			node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: strToItems(marker)})
