@@ -166,6 +166,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			if passed, remains, dest = t.context.parseInlineLinkDest(remains); nil == passed {
 				break
 			}
+			if t.context.option.VditorWYSIWYG && (1 > len(dest) || nil == opener.node.next) {
+				break
+			}
 			ctx.pos += len(passed)
 			openParen = passed[0:1]
 			closeParen = passed[len(passed)-1:]

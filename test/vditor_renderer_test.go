@@ -22,6 +22,12 @@ import (
 
 var vditorRendererTests = []*parseTest{
 
+	{"21", "<p>[foo](/bar \"baz\")</p>", "<p><a href=\"/bar\" title=\"baz\">foo</a></p>"},
+	{"20", "<p>[foo](/bar)</p>", "<p><a href=\"/bar\">foo</a></p>"},
+	{"19", "<p>[foo]()</p>", "<p>[foo]()</p>"},
+	{"18", "<p>[](/bar)</p>", "<p>[](/bar)</p>"},
+	{"17", "<p>[]()</p>", "<p>[]()</p>"},
+	{"16", "<p>[](</p>", "<p>[](</p>"},
 	{"15", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
 	{"14", ":octocat:", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
 	{"13", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>"},
