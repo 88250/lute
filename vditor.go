@@ -105,7 +105,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Wbr:
 		node.typ = NodeText
 		node.tokens = strToItems("<wbr>")
@@ -120,14 +120,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
 		node.headingLevel = int(node.tokens[1].term() - byte('0'))
 		node.AppendChild(&Node{typ: NodeHeadingC8hMarker, tokens: strToItems(strings.Repeat("#", node.headingLevel))})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Hr:
 		node.typ = NodeThematicBreak
 		tree.context.tip.AppendChild(node)
@@ -136,7 +136,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeBlockquoteMarker, tokens: strToItems(">")})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Ol, atom.Ul:
 		node.typ = NodeList
 		node.listData = &listData{}
@@ -149,7 +149,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Li:
 		node.typ = NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
@@ -166,15 +166,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 		}
 		node.listData = &listData{marker: strToItems(marker)}
-		if lute.onlyText(n) {
+		if lute.firstChildIsText(n) {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			node = &Node{typ: NodeParagraph}
-			node.close = true // 跳过中间节点
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Pre:
 		node.typ = NodeCodeBlock
 		node.isFencedCodeBlock = true
@@ -182,7 +181,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Em, atom.I:
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
@@ -193,7 +192,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Strong, atom.B:
 		node.typ = NodeStrong
 		marker := lute.domAttrValue(n, "data-marker")
@@ -204,27 +203,27 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Code:
 		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
 			node.typ = NodeCodeSpan
 			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: strToItems("`")})
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
-			defer tree.context.parentTip()
+			defer tree.context.parentTip(n)
 		}
 	case atom.Br:
 		node.typ = NodeInlineHTML
 		node.tokens = strToItems("<br />")
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.A:
 		node.typ = NodeLink
 		node.AppendChild(&Node{typ: NodeOpenBracket})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Img:
 		imgClass := lute.domAttrValue(n, "class")
 		imgAlt := lute.domAttrValue(n, "alt")
@@ -247,7 +246,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Input:
 		node.typ = NodeTaskListItemMarker
 		if lute.hasAttr(n, "checked") {
@@ -258,7 +257,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 		if nil != node.parent.parent {
 			node.parent.parent.listData.typ = 3
 		}
@@ -272,7 +271,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Table:
 		node.typ = NodeTable
 		var tableAligns []int
@@ -282,22 +281,22 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.tableAligns = tableAligns
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Thead:
 		node.typ = NodeTableHead
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Tr:
 		node.typ = NodeTableRow
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	case atom.Th, atom.Td:
 		node.typ = NodeTableCell
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
-		defer tree.context.parentTip()
+		defer tree.context.parentTip(n)
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -345,26 +344,29 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 }
 
-func (context *Context) parentTip() {
+func (context *Context) parentTip(n *html.Node) {
 	for tip := context.tip.parent; nil != tip; tip = tip.parent {
-		if tip.close {
-			continue
+		if NodeParagraph == tip.typ {
+			if nil != n.NextSibling {
+				nextType := n.NextSibling.DataAtom
+				if atom.Ul == nextType ||
+					atom.Ol == nextType  {
+					continue
+				}
+			}
 		}
 		context.tip = tip
 		break
 	}
 }
 
-// onlyText 用于判断 n 的子节点是否仅包含文本节点（第一个节点如果是插入符则跳过）。
-func (lute *Lute) onlyText(n *html.Node) bool {
+// firstChildIsText 用于判断 n 的第一个子节点是否是文本节点。
+func (lute *Lute) firstChildIsText(n *html.Node) bool {
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
 		if "\u2038" == c.Data {
-			continue
+			continue // 不考虑插入符
 		}
-		if 0 != c.DataAtom {
-			return false
-		}
-		return true
+		return 0 == c.DataAtom || atom.Em == c.DataAtom
 	}
 	return true
 }
