@@ -50,11 +50,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip()
 	case atom.Wbr:
-		node.typ = NodeInlineHTML
+		node.typ = NodeText
 		node.tokens = strToItems("<wbr>")
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip()
+		lastc := tree.context.tip.lastDeepestChild()
+		if NodeParagraph == lastc.typ {
+			lastc.AppendChild(node)
+		} else {
+			lastc.AppendTokens(node.tokens)
+		}
+		return
 	case atom.P, atom.Div:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
@@ -108,7 +112,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip()
-	case atom.Em:
+	case atom.Em, atom.I:
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
 		if "_" == marker {
@@ -119,7 +123,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip()
-	case atom.Strong:
+	case atom.Strong, atom.B:
 		node.typ = NodeStrong
 		marker := lute.domAttrValue(n, "data-marker")
 		if "__" == marker {

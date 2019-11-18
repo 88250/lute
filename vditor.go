@@ -12,6 +12,8 @@
 
 package lute
 
+import "strings"
+
 // RenderVditorDOM 用于渲染 Vditor DOM。
 func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	lute.VditorWYSIWYG = true
@@ -23,6 +25,8 @@ func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 		return
 	}
 
+	md = strings.ReplaceAll(md, "<wbr>", "\u2038")
+
 	var tree *Tree
 	tree, err = lute.parse("", []byte(md))
 	if nil != err {
@@ -33,5 +37,6 @@ func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	var output []byte
 	output, err = renderer.Render()
 	html = string(output)
+	html = strings.ReplaceAll(html, "\u2038", "<wbr>")
 	return
 }
