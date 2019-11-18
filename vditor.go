@@ -347,12 +347,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 func (context *Context) parentTip(n *html.Node) {
 	for tip := context.tip.parent; nil != tip; tip = tip.parent {
 		if NodeParagraph == tip.typ {
-			if nil != n.NextSibling {
-				nextType := n.NextSibling.DataAtom
-				if atom.Ul == nextType ||
-					atom.Ol == nextType  {
-					continue
-				}
+			if nil == n.NextSibling {
+				continue
+			}
+			nextType := n.NextSibling.DataAtom
+			if atom.Ul == nextType ||
+				atom.Ol == nextType {
+				continue
 			}
 		}
 		context.tip = tip
@@ -368,7 +369,7 @@ func (lute *Lute) firstChildIsText(n *html.Node) bool {
 		}
 		return 0 == c.DataAtom || atom.Em == c.DataAtom
 	}
-	return true
+	return false
 }
 
 func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {

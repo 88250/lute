@@ -23,12 +23,13 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
-	//{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n  * *‸<br />*\n"},
-	//{"35", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "* ‸<br />\n"},
-	//{"34", "<p>中<wbr>文</p>", "中‸文\n"},
-	//{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo‸</li></ul>", "1. foo‸\n"},
-	//{"32", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "* foo‸\n"},
-	//{"31", "<ul><li data-marker=\"*\">foo<ul><li data-marker=\"*\">bar</li></ul></li></ul>", "* foo\n  * bar\n"},
+	{"37", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li><li data-marker=\"*\"></li><li data-marker=\"*\"><br></li></ul>", "* foo‸\n*\n* <br />\n"},
+	{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n* *‸<br />*\n"},
+	{"35", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "* ‸<br />\n"},
+	{"34", "<p>中<wbr>文</p>", "中‸文\n"},
+	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo‸</li></ul>", "1. foo‸\n"},
+	{"32", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "* foo‸\n"},
+	{"31", "<ul><li data-marker=\"*\">foo<ul><li data-marker=\"*\">bar</li></ul></li></ul>", "* foo\n  * bar\n"},
 	{"30", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><br /></li></ul></li></ul>", "* foo\n* * <br />\n"},
 	{"29", "<p><s>del</s></p>", "~~del~~\n"},
 	{"29", "<p>[]()</p>", "[]()\n"},
