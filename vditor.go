@@ -25,7 +25,7 @@ func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	lute.endNewline(&htmlStr)
 
 	var md string
-	md, err = lute.Html2Md(htmlStr)
+	md, err = lute.VditorDOM2Md(htmlStr)
 	if nil != err {
 		return
 	}
