@@ -108,6 +108,8 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 
 // Html2Md 将 htmlStr 转换为 markdown 文本。
 func (lute *Lute) Html2Md(htmlStr string) (md string, err error) {
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "\u2038")
+
 	// 将字符串解析为 HTML 树
 
 	reader := strings.NewReader(htmlStr)

@@ -23,7 +23,7 @@ import (
 var vditorRendererTests = []*parseTest{
 
 	{"23", "<ol><li data-marker=\"1.\">foo</li></ol>", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ol>"},
-	{"22", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><wbr><br /></li></ul></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /></li></ul></li></ul>"},
+	{"22", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><wbr><br /></li></ul></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /><br /></li></ul></li></ul>"},
 	{"21", "<p>[foo](/bar \"baz\")</p>", "<p><a href=\"/bar\" title=\"baz\">foo</a></p>"},
 	{"20", "<p>[foo](/bar)</p>", "<p><a href=\"/bar\">foo</a></p>"},
 	{"19", "<p>[foo]()</p>", "<p>[foo]()</p>"},

@@ -25,8 +25,6 @@ func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 		return
 	}
 
-	md = strings.ReplaceAll(md, "<wbr>", "\u2038")
-
 	var tree *Tree
 	tree, err = lute.parse("", []byte(md))
 	if nil != err {
