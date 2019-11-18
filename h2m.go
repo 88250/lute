@@ -80,9 +80,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip()
-	case atom.List, atom.Ul:
+	case atom.Ol, atom.Ul:
 		node.typ = NodeList
 		node.listData = &listData{}
+		if atom.Ol == n.DataAtom {
+			node.listData.typ = 1
+		}
 		tight := lute.domAttrValue(n, "data-tight")
 		if "true" == tight || "" == tight {
 			node.tight = true
@@ -92,7 +95,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		defer tree.context.parentTip()
 	case atom.Li:
 		node.typ = NodeListItem
-		node.listData = &listData{marker: strToItems("*")}
+		marker := lute.domAttrValue(n, "data-marker")
+		node.listData = &listData{marker: strToItems(marker)}
 		if nil != n.FirstChild {
 			if cType := n.FirstChild.DataAtom; atom.Blockquote != cType && atom.Ul != cType && atom.Input != cType {
 				tree.context.tip.AppendChild(node)
@@ -188,6 +192,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip()
+		if nil != node.parent.parent {
+			node.parent.parent.listData.typ = 3
+		}
 	case atom.Del, atom.S:
 		node.typ = NodeStrikethrough
 		marker := lute.domAttrValue(n, "data-marker")

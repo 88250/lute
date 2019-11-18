@@ -454,11 +454,17 @@ func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 
 func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
-			r.tag("li", [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
-		} else {
-			r.tag("li", nil, false)
+		var attrs [][]string
+		switch node.listData.typ {
+		case 0:
+			attrs = append(attrs, []string{"data-marker", itemsToStr(node.marker)})
+		case 1:
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + "."})
+		case 3:
+			attrs = append(attrs, []string{"data-marker", itemsToStr(node.marker)})
+			attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
 		}
+		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
 	}
