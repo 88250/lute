@@ -39,7 +39,7 @@ var h2mTests = []parseTest{
 	{"16", "<p><em><strong>foo</strong></em></p>", "***foo***\n"},
 	{"15", "<p><strong data-marker=\"__\">foo</strong></p>", "__foo__\n"},
 	{"14", "<p><strong data-marker=\"**\">foo</strong></p>", "**foo**\n"},
-	{"13", "<h2>foo</h2>\n<p>para<em>em</em></p>", "## foo\n\npara*em*\n"},
+	{"13", "<h2>foo</h2><p>para<em>em</em></p>", "## foo\n\npara*em*\n"},
 	{"12", "<a href=\"/bar\" title=\"baz\">foo</a>", "[foo](/bar \"baz\")\n"},
 	{"11", "<img src=\"/bar\" alt=\"foo\" />", "![foo](/bar)\n"},
 	{"10", "<img src=\"/bar\" />", "![](/bar)\n"},

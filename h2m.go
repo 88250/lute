@@ -22,7 +22,7 @@ import (
 
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
-	node := &Node{typ: -1, tokens: strToItems(n.Data)}
+	node := &Node{typ: NodeText, tokens: strToItems(n.Data)}
 	switch n.DataAtom {
 	case 0:
 		if nil != n.Parent {
@@ -47,10 +47,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			}
 		}
 		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Wbr:
 		node.typ = NodeInlineHTML
 		node.tokens = strToItems("<wbr>")
 		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.P, atom.Div:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
@@ -85,11 +89,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	case atom.Li:
 		node.typ = NodeListItem
 		node.listData = &listData{marker: strToItems("*")}
-		if nil != n.FirstChild && atom.Blockquote != n.FirstChild.DataAtom && atom.Ul != n.FirstChild.DataAtom {
-			tree.context.tip.AppendChild(node)
-			tree.context.tip = node
-			node = &Node{typ: NodeParagraph}
-			defer tree.context.parentTip()
+		if nil != n.FirstChild {
+			if cType := n.FirstChild.DataAtom; atom.Blockquote != cType && atom.Ul != cType && atom.Input != cType {
+				tree.context.tip.AppendChild(node)
+				tree.context.tip = node
+				node = &Node{typ: NodeParagraph}
+				node.close = true // 跳过中间节点
+			}
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -100,6 +106,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToItems("```"), codeBlockFenceLen: 3})
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
 		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Em:
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
@@ -126,12 +134,16 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
 			node.typ = NodeCodeSpan
 			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: strToItems("`")})
+			tree.context.tip.AppendChild(node)
+			tree.context.tip = node
+			defer tree.context.parentTip()
 		}
-		tree.context.tip.AppendChild(node)
 	case atom.Br:
 		node.typ = NodeInlineHTML
 		node.tokens = strToItems("<br />")
 		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.A:
 		node.typ = NodeLink
 		node.AppendChild(&Node{typ: NodeOpenBracket})
@@ -170,6 +182,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.tokens = strToItems("[ ]")
 		}
 		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Del, atom.S:
 		node.typ = NodeStrikethrough
 		marker := lute.domAttrValue(n, "data-marker")
@@ -254,7 +268,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 }
 
 func (context *Context) parentTip() {
-	context.tip = context.tip.parent
+	for tip := context.tip.parent; nil != tip; tip = tip.parent {
+		if tip.close {
+			continue
+		}
+		context.tip = tip
+		break
+	}
 }
 
 func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {
