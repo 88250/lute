@@ -20,6 +20,63 @@ import (
 	"github.com/b3log/lute"
 )
 
+
+var vditorDOM2MdTests = []parseTest{
+
+	{"34", "<p>中<wbr>文</p>", "中‸文\n"},
+	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo‸</li></ul>", "1. foo‸\n"},
+	{"32", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "* foo‸\n"},
+	{"31", "<ul><li data-marker=\"*\">foo<ul><li data-marker=\"*\">bar</li></ul></li></ul>", "* foo\n  * bar\n"},
+	{"30", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><br /></li></ul></li></ul>", "* foo\n* * <br />\n"},
+	{"29", "<p><s>del</s></p>", "~~del~~\n"},
+	{"29", "<p>[]()</p>", "[]()\n"},
+	{"28", ":octocat:", ":octocat:\n"},
+	{"27", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>\n", "|abc|def|\n|---|---|\n"},
+	{"26", "<p><del data-marker=\"~~\">Hi</del> Hello, world!</p>", "~~Hi~~ Hello, world!\n"},
+	{"25", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "~Hi~ Hello, world!\n"},
+	{"24", "<ul><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "* [X] foo‸\n"},
+	{"23", "<ul><li data-marker=\"*\" class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "* [ ] foo‸\n"},
+	{"22", "><wbr>", ">‸\n"},
+	{"21", "<p>> foo<wbr></p>", "> foo‸\n"},
+	{"20", "<p>foo</p><p><wbr><br></p>", "foo\n\n‸<br />\n"},
+	{"19", "<ul><li data-marker=\"*\">foo</li></ul><div><wbr><br></div>", "* foo\n\n‸<br />\n"},
+	{"18", "<p><em data-marker=\"*\">foo<wbr></em></p>", "*foo‸*\n"},
+	{"17", "foo<span>&nbsp;</span>bar", "foo bar\n"},
+	{"16", "<p><em><strong>foo</strong></em></p>", "***foo***\n"},
+	{"15", "<p><strong data-marker=\"__\">foo</strong></p>", "__foo__\n"},
+	{"14", "<p><strong data-marker=\"**\">foo</strong></p>", "**foo**\n"},
+	{"13", "<h2>foo</h2><p>para<em>em</em></p>", "## foo\n\npara*em*\n"},
+	{"12", "<a href=\"/bar\" title=\"baz\">foo</a>", "[foo](/bar \"baz\")\n"},
+	{"11", "<img src=\"/bar\" alt=\"foo\" />", "![foo](/bar)\n"},
+	{"10", "<img src=\"/bar\" />", "![](/bar)\n"},
+	{"9", "<a href=\"/bar\">foo</a>", "[foo](/bar)\n"},
+	{"8", "foo<br />bar", "foo<br />bar\n"},
+	{"7", "<code>foo</code>", "`foo`\n"},
+	{"6", "<pre><code>foo</code></pre>", "```\nfoo\n```\n"},
+	{"5", "<ul><li data-marker=\"*\">foo</li></ul>", "* foo\n"},
+	{"4", "<blockquote>foo</blockquote>", "> foo\n"},
+	{"3", "<h2>foo</h2>", "## foo\n"},
+	{"2", "<p><strong><em>foo</em></strong></p>", "***foo***\n"},
+	{"1", "<p><strong>foo</strong></p>", "**foo**\n"},
+	{"0", "<p>foo</p>", "foo\n"},
+}
+
+func TestVditorDOM2Md(t *testing.T) {
+	luteEngine := lute.New()
+
+	for _, test := range vditorDOM2MdTests {
+		md, err := luteEngine.VditorDOM2Md(test.from)
+		if nil != err {
+			t.Fatalf("test case [%s] unexpected: %s", test.name, err)
+		}
+
+		if test.to != md {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
+		}
+	}
+}
+
+
 var vditorRendererTests = []*parseTest{
 
 	{"23", "<ol><li data-marker=\"1.\">foo</li></ol>", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ol>"},

@@ -124,7 +124,7 @@ func (lute *Lute) Html2Md(htmlStr string) (md string, err error) {
 	tree := &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
 	tree.context.tip = tree.Root
 	for _, htmlNode := range htmlNodes {
-		lute.genASTByDOM(htmlNode, tree)
+		lute.genASTByVditorDOM(htmlNode, tree)
 	}
 
 	// 将 AST 进行 Markdown 格式化渲染
