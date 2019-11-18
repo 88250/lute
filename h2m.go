@@ -46,30 +46,60 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 				node.typ = NodeText
 			}
 		}
+		tree.context.tip.AppendChild(node)
 	case atom.Wbr:
 		node.typ = NodeInlineHTML
 		node.tokens = strToItems("<wbr>")
-	case atom.P:
+		tree.context.tip.AppendChild(node)
+	case atom.P, atom.Div:
 		node.typ = NodeParagraph
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
 		node.headingLevel = int(node.tokens[1].term() - byte('0'))
 		node.AppendChild(&Node{typ: NodeHeadingC8hMarker, tokens: strToItems(strings.Repeat("#", node.headingLevel))})
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Hr:
 		node.typ = NodeThematicBreak
+		tree.context.tip.AppendChild(node)
 	case atom.Blockquote:
 		node.typ = NodeBlockquote
 		node.AppendChild(&Node{typ: NodeBlockquoteMarker, tokens: strToItems(">")})
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.List, atom.Ul:
 		node.typ = NodeList
+		node.listData = &listData{}
+		tight := lute.domAttrValue(n, "data-tight")
+		if "true" == tight || "" == tight {
+			node.tight = true
+		}
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Li:
 		node.typ = NodeListItem
 		node.listData = &listData{marker: strToItems("*")}
+		if nil != n.FirstChild && atom.Blockquote != n.FirstChild.DataAtom && atom.Ul != n.FirstChild.DataAtom {
+			tree.context.tip.AppendChild(node)
+			tree.context.tip = node
+			node = &Node{typ: NodeParagraph}
+			defer tree.context.parentTip()
+		}
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Pre:
 		node.typ = NodeCodeBlock
 		node.isFencedCodeBlock = true
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToItems("```"), codeBlockFenceLen: 3})
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
+		tree.context.tip.AppendChild(node)
 	case atom.Em:
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
@@ -78,6 +108,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.AppendChild(&Node{typ: NodeEmA6kOpenMarker, tokens: strToItems(marker)})
 		}
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Strong:
 		node.typ = NodeStrong
 		marker := lute.domAttrValue(n, "data-marker")
@@ -86,17 +119,25 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToItems(marker)})
 		}
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Code:
 		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
 			node.typ = NodeCodeSpan
 			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: strToItems("`")})
 		}
+		tree.context.tip.AppendChild(node)
 	case atom.Br:
 		node.typ = NodeInlineHTML
 		node.tokens = strToItems("<br />")
+		tree.context.tip.AppendChild(node)
 	case atom.A:
 		node.typ = NodeLink
 		node.AppendChild(&Node{typ: NodeOpenBracket})
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Img:
 		imgClass := lute.domAttrValue(n, "class")
 		imgAlt := lute.domAttrValue(n, "alt")
@@ -117,6 +158,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToItems(lute.domAttrValue(n, "src"))})
 			node.AppendChild(&Node{typ: NodeCloseParen})
 		}
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Input:
 		node.typ = NodeTaskListItemMarker
 		if lute.hasAttr(n, "checked") {
@@ -125,6 +169,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.tokens = strToItems("[ ]")
 		}
+		tree.context.tip.AppendChild(node)
 	case atom.Del, atom.S:
 		node.typ = NodeStrikethrough
 		marker := lute.domAttrValue(n, "data-marker")
@@ -133,6 +178,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.AppendChild(&Node{typ: NodeStrikethrough2OpenMarker, tokens: strToItems(marker)})
 		}
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	case atom.Table:
 		node.typ = NodeTable
 		var tableAligns []int
@@ -140,19 +188,24 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			tableAligns = append(tableAligns, 0)
 		}
 		node.tableAligns = tableAligns
-	case atom.Thead:
-		node.typ = NodeTableHead
-	case atom.Tr:
-		node.typ = NodeTableRow
-	case atom.Th, atom.Td:
-		node.typ = NodeTableCell
-	case atom.Div:
-		node.typ = NodeParagraph
-	}
-
-	if -1 != node.typ {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
+		defer tree.context.parentTip()
+	case atom.Thead:
+		node.typ = NodeTableHead
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
+	case atom.Tr:
+		node.typ = NodeTableRow
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
+	case atom.Th, atom.Td:
+		node.typ = NodeTableCell
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip()
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -198,10 +251,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeStrikethrough2CloseMarker, tokens: strToItems(marker)})
 		}
 	}
+}
 
-	if -1 != node.typ {
-		tree.context.tip = tree.context.tip.parent
-	}
+func (context *Context) parentTip() {
+	context.tip = context.tip.parent
 }
 
 func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {

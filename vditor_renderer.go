@@ -438,12 +438,14 @@ func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 		tag = "ol"
 	}
 	if entering {
-		attrs := [][]string{{"start", strconv.Itoa(node.start)}}
-		if nil == node.bulletChar && 1 != node.start {
-			r.tag(tag, attrs, false)
-		} else {
-			r.tag(tag, nil, false)
+		var attrs [][]string
+		if node.tight {
+			attrs = append(attrs, []string{"data-tight", "true"})
 		}
+		if nil == node.bulletChar && 1 != node.start {
+			attrs = append(attrs, []string{"start", strconv.Itoa(node.start)})
+		}
+		r.tag(tag, attrs, false)
 	} else {
 		r.tag("/"+tag, nil, false)
 	}

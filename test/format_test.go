@@ -86,7 +86,7 @@ func TestFormatCases(t *testing.T) {
 		t.Fatalf("read test dir failed: %s", err)
 	}
 
-	skips := ""
+	skips := "" // 用于跳过测试文件，例如 format-case0.md
 
 	for _, file := range files {
 		if !strings.HasPrefix(file.Name(), "format-case") || strings.Contains(file.Name(), "formatted") {

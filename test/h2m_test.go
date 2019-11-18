@@ -21,7 +21,7 @@ import (
 var h2mTests = []parseTest{
 
 	{"31", "<ul><li>foo<ul><li>bar</li></ul></li></ul>", "* foo\n  * bar\n"},
-	{"30", "<ul><li>foo</li><li><ul><li><wbr><br /></li></ul></li></ul>", "* foo\n* * <wbr><br />\n"},
+	{"30", "<ul><li>foo</li><li><ul><li><br /></li></ul></li></ul>", "* foo\n* * <br />\n"},
 	{"29", "<p><s>del</s></p>", "~~del~~\n"},
 	{"29", "<p>[]()</p>", "[]()\n"},
 	{"28", ":octocat:", ":octocat:\n"},
