@@ -23,6 +23,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"35", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "* ‸<br />\n"},
 	{"34", "<p>中<wbr>文</p>", "中‸文\n"},
 	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo‸</li></ul>", "1. foo‸\n"},
 	{"32", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "* foo‸\n"},
@@ -79,8 +80,9 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var vditorRendererTests = []*parseTest{
 
+	{"24", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /></li></ul>"},
 	{"23", "<ol><li data-marker=\"1.\">foo</li></ol>", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ol>"},
-	{"22", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><wbr><br /></li></ul></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /><br /></li></ul></li></ul>"},
+	{"22", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><wbr><br /></li></ul></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /></li></ul></li></ul>"},
 	{"21", "<p>[foo](/bar \"baz\")</p>", "<p><a href=\"/bar\" title=\"baz\">foo</a></p>"},
 	{"20", "<p>[foo](/bar)</p>", "<p><a href=\"/bar\">foo</a></p>"},
 	{"19", "<p>[foo]()</p>", "<p>[foo]()</p>"},

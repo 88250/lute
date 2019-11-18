@@ -108,7 +108,7 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 
 // Html2Md 将 htmlStr 转换为 markdown 文本。
 func (lute *Lute) Html2Md(htmlStr string) (md string, err error) {
-	// 将字符串解析为 HTML 树
+	// 将字符串解析为 DOM 树
 
 	reader := strings.NewReader(htmlStr)
 	htmlRoot := &html.Node{Type: html.ElementNode}
@@ -188,18 +188,6 @@ func (lute *Lute) RenderEChartsJSON(markdownText string) (json string, err error
 	output, err = renderer.Render()
 	json = string(output)
 	return
-}
-
-// endNewline 用于在 markdownText 结尾加上一个 \n，仅在结尾没有 \n 时添加。
-func (lute *Lute) endNewline(markdownText *string) {
-	length := len(*markdownText)
-	if 1 > length {
-		*markdownText = "\n"
-		return
-	}
-	if itemNewline != (*markdownText)[length-1] {
-		*markdownText += "\n"
-	}
 }
 
 // options 描述了一些列解析和渲染选项。

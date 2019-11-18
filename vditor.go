@@ -22,7 +22,6 @@ import (
 // RenderVditorDOM 用于渲染 Vditor DOM。
 func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	lute.VditorWYSIWYG = true
-	lute.endNewline(&htmlStr)
 
 	var md string
 	md, err = lute.VditorDOM2Md(htmlStr)
@@ -39,16 +38,17 @@ func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	renderer := lute.newVditorRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
-	html = string(output)
-	html = strings.ReplaceAll(html, "\u2038", "<wbr>")
+	// 替换插入符
+	html = strings.ReplaceAll(string(output), "\u2038", "<wbr>")
 	return
 }
 
 // VditorDOM2Md 将 Vditor DOM 转换为 Markdown 文本。
 func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
+	// 替换插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "\u2038")
 
-	// 将字符串解析为 HTML 树
+	// 将字符串解析为 DOM 树
 
 	reader := strings.NewReader(htmlStr)
 	htmlRoot := &html.Node{Type: html.ElementNode}
@@ -166,13 +166,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 		}
 		node.listData = &listData{marker: strToItems(marker)}
-		if nil != n.FirstChild {
-			if cType := n.FirstChild.DataAtom; atom.Blockquote != cType && atom.Ul != cType && atom.Input != cType {
-				tree.context.tip.AppendChild(node)
-				tree.context.tip = node
-				node = &Node{typ: NodeParagraph}
-				node.close = true // 跳过中间节点
-			}
+		if lute.onlyText(n) {
+			tree.context.tip.AppendChild(node)
+			tree.context.tip = node
+			node = &Node{typ: NodeParagraph}
+			node.close = true // 跳过中间节点
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -355,6 +353,20 @@ func (context *Context) parentTip() {
 		context.tip = tip
 		break
 	}
+}
+
+// onlyText 用于判断 n 的子节点是否仅包含文本节点（第一个节点如果是插入符则跳过）。
+func (lute *Lute) onlyText(n *html.Node) bool {
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		if "\u2038" == c.Data {
+			continue
+		}
+		if 0 != c.DataAtom {
+			return false
+		}
+		return true
+	}
+	return true
 }
 
 func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {
