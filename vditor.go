@@ -153,6 +153,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Li:
 		node.typ = NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			if atom.Ol == n.Parent.DataAtom {
+				start := lute.domAttrValue(n.Parent, "start")
+				if "" == start {
+					marker = "1."
+				} else {
+					marker = start + "."
+				}
+			} else {
+				marker = "*"
+			}
+		}
 		node.listData = &listData{marker: strToItems(marker)}
 		if nil != n.FirstChild {
 			if cType := n.FirstChild.DataAtom; atom.Blockquote != cType && atom.Ul != cType && atom.Input != cType {

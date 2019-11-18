@@ -489,18 +489,12 @@ func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkSta
 }
 
 func (r *VditorRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.tag("br", nil, true)
-	}
+	r.tag("br", nil, true)
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
-	if r.option.SoftBreak2HardBreak {
-		r.tag("br", nil, true)
-	} else {
-		r.newline()
-	}
+	r.tag("br", nil, true)
 	return WalkStop, nil
 }
 
