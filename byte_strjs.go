@@ -10,10 +10,16 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build js
+// +build javascript
 
 package lute
 
-// Recover recovers a panic.
-func recoverPanic(err *error) {
+// strToBytes 快速转换 string 为 []byte。
+func strToBytes(str string) (ret []byte) {
+	return []byte(str)
+}
+
+// bytesToStr 快速转换 []byte 为 string。
+func bytesToStr(items []byte) string {
+	return string(items)
 }

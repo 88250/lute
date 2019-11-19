@@ -10,7 +10,7 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build js
+// +build javascript
 
 package test
 
@@ -23,6 +23,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"42", "<div class=\"vditor-panel vditor-panel--none\" contenteditable=\"false\" style=\"display: block; top: 5px; left: 567px;\"><input class=\"vditor-input\" placeholder=\"row\" style=\"width: 42px; text-align: center;\"> x <input class=\"vditor-input\" placeholder=\"column\" style=\"width: 42px; text-align: center;\"></div>", "<div class=\"vditor-panel vditor-panel--none\" contenteditable=\"false\" style=\"display: block; top: 5px; left: 567px;\"><input class=\"vditor-input\" placeholder=\"row\" style=\"width: 42px; text-align: center;\"/> x <input class=\"vditor-input\" placeholder=\"column\" style=\"width: 42px; text-align: center;\"/></div>\n"},
 	{"41", "<pre><code class=\"language-go\"><wbr></code></pre>", "```go\n‸\n```\n"},
 	{"40", "<p>f<span data-marker=\"*\">o</span>ob<wbr></p>", "f*o*ob‸\n"},
 	{"39", "<p><b>foo<wbr></b></p>", "**foo‸**\n"},
