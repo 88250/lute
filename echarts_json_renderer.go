@@ -190,7 +190,7 @@ func (r *EChartsJSONRenderer) renderParagraphEChartsJSON(node *Node, entering bo
 
 func (r *EChartsJSONRenderer) renderTextEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		text := bytesToStr(itemsToBytes(node.tokens))
+		text := bytesToStr(node.tokens)
 		var i int
 		summary := ""
 		for _, r := range text {
@@ -283,7 +283,7 @@ func (r *EChartsJSONRenderer) renderListEChartsJSON(node *Node, entering bool) (
 func (r *EChartsJSONRenderer) renderListItemEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
-		r.val("List Item\nli "+bytesToStr(itemsToBytes(node.listData.marker)), node)
+		r.val("List Item\nli "+bytesToStr(node.listData.marker), node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)

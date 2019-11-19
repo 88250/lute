@@ -22,19 +22,19 @@ func (r *BaseRenderer) fixTermTypo(textNode *Node) {
 	textNode.tokens = r.fixTermTypo0(textNode.tokens)
 }
 
-func (r *BaseRenderer) fixTermTypo0(tokens items) items {
+func (r *BaseRenderer) fixTermTypo0(tokens []byte) []byte {
 	length := len(tokens)
 	var token byte
 	var i, j, k, l int
 	var before, after byte
 	var originalTerm []byte
 	for ; i < length; i++ {
-		token = tokens[i].term()
+		token = tokens[i]
 		if isNotTerm(token) {
 			continue
 		}
 		if 1 <= i {
-			before = tokens[i-1].term()
+			before = tokens[i-1]
 			if !isNotTerm(before) {
 				// 前一个字节必须是非术语，否则无法分隔
 				continue
@@ -47,7 +47,7 @@ func (r *BaseRenderer) fixTermTypo0(tokens items) items {
 		}
 
 		for j = i; j < length; j++ {
-			after = tokens[j].term()
+			after = tokens[j]
 			if isNotTerm(after) || itemDot == after {
 				break
 			}
@@ -58,11 +58,11 @@ func (r *BaseRenderer) fixTermTypo0(tokens items) items {
 			continue
 		}
 
-		originalTerm = bytes.ToLower(itemsToBytes(tokens[i:j]))
+		originalTerm = bytes.ToLower(tokens[i:j])
 		if to, ok := r.option.Terms[bytesToStr(originalTerm)]; ok {
 			l = 0
 			for k = i; k < j; k++ {
-				setTerm(&tokens, k, to[l])
+				tokens[k] = to[l]
 				l++
 			}
 		}

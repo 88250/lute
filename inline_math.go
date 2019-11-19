@@ -12,7 +12,7 @@
 
 package lute
 
-var dollar = strToItems("$")
+var dollar = strToBytes("$")
 
 func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	if 2 > ctx.tokensLen {
@@ -23,7 +23,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	startPos := ctx.pos
 	blockStartPos := startPos
 	dollars := 0
-	for ; blockStartPos < ctx.tokensLen && itemDollar == ctx.tokens[blockStartPos].term(); blockStartPos++ {
+	for ; blockStartPos < ctx.tokensLen && itemDollar == ctx.tokens[blockStartPos]; blockStartPos++ {
 		dollars++
 	}
 	if 2 <= dollars {
@@ -32,8 +32,8 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 		blockEndPos := blockStartPos + dollars
 		var token byte
 		for ; blockEndPos < ctx.tokensLen; blockEndPos++ {
-			token = ctx.tokens[blockEndPos].term()
-			if itemDollar == token && blockEndPos < ctx.tokensLen-1 && itemDollar == ctx.tokens[blockEndPos+1].term() {
+			token = ctx.tokens[blockEndPos]
+			if itemDollar == token && blockEndPos < ctx.tokensLen-1 && itemDollar == ctx.tokens[blockEndPos+1] {
 				matchBlock = true
 				break
 			}
@@ -45,7 +45,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	if isDigit(ctx.tokens[startPos+1].term()) { // $ 后面不能紧跟数字
+	if isDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
 		ctx.pos += 2
 		return &Node{typ: NodeText, tokens: ctx.tokens[startPos : startPos+2]}
 	}
@@ -64,12 +64,12 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	return
 }
 
-func (t *Tree) matchInlineMathEnd(tokens items) (pos int) {
+func (t *Tree) matchInlineMathEnd(tokens []byte) (pos int) {
 	length := len(tokens)
 	for ; pos < length; pos++ {
-		if itemDollar == tokens[pos].term() {
+		if itemDollar == tokens[pos] {
 			if pos < length-1 {
-				if !isDigit(tokens[pos+1].term()) {
+				if !isDigit(tokens[pos+1]) {
 					return pos
 				}
 			} else {

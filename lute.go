@@ -145,7 +145,7 @@ func (lute *Lute) Space(text string) string {
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	ret = make(map[string]string, len(lute.AliasEmoji))
-	placeholder := itemsToStr(emojiSitePlaceholder)
+	placeholder := bytesToStr(emojiSitePlaceholder)
 	for k, v := range lute.AliasEmoji {
 		if strings.Contains(v, placeholder) {
 			v = strings.ReplaceAll(v, placeholder, lute.EmojiSite)

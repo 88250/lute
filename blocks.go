@@ -27,7 +27,7 @@ func (t *Tree) parseBlocks() {
 }
 
 // incorporateLine 处理文本行 line 并把生成的块级节点挂到树上。
-func (t *Tree) incorporateLine(line items) {
+func (t *Tree) incorporateLine(line []byte) {
 	t.context.oldtip = t.context.tip
 	t.context.offset = 0
 	t.context.column = 0
@@ -73,7 +73,7 @@ func (t *Tree) incorporateLine(line items) {
 
 		// 如果不由潜在的节点标记符开头 ^[#`~*+_=<>0-9-$]，则说明不用继续迭代生成子节点
 		// 这里仅做简单判断的话可以提升一些性能
-		maybeMarker := t.context.currentLine[t.context.nextNonspace].term()
+		maybeMarker := t.context.currentLine[t.context.nextNonspace]
 		if !t.context.indented && // 缩进代码块
 			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // 无序列表
 			!isDigit(maybeMarker) && // 有序列表
@@ -169,14 +169,14 @@ var blockStarts = []blockStartFunc{
 	// 判断块引用（>）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			marker := t.context.currentLine.peek(t.context.nextNonspace)
-			if itemGreater == marker.term() {
-				markers := items{marker}
+			marker := peek(t.context.currentLine, t.context.nextNonspace)
+			if itemGreater == marker {
+				markers := []byte{marker}
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
 				// > 后面的空格是可选的
-				whitespace := t.context.currentLine.peek(t.context.offset)
-				withSpace := itemSpace == whitespace.term() || itemTab == whitespace.term()
+				whitespace := peek(t.context.currentLine, t.context.offset)
+				withSpace := itemSpace == whitespace || itemTab == whitespace
 				if withSpace {
 					t.context.advanceOffset(1, true)
 					markers = append(markers, whitespace)
@@ -264,7 +264,7 @@ var blockStarts = []blockStartFunc{
 
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
-				for tokens := container.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0].term(); tokens = container.tokens {
+				for tokens := container.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.tokens {
 					if remains := t.context.parseLinkRefDef(tokens); nil != remains {
 						container.tokens = remains
 					} else {
@@ -288,7 +288,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container *Node) int {
-		if !t.context.indented && t.context.currentLine.peek(t.context.nextNonspace).term() == itemLess {
+		if !t.context.indented && peek(t.context.currentLine, t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if htmlType := t.parseHTML(tokens); 0 != htmlType {
 				t.context.closeUnmatchedBlocks()
@@ -382,7 +382,7 @@ func (t *Tree) addLine() {
 		// add space characters:
 		var charsToTab = 4 - (t.context.column % 4)
 		for i := 0; i < charsToTab; i++ {
-			t.context.tip.AppendTokens(strToItems(" "))
+			t.context.tip.AppendTokens(strToBytes(" "))
 		}
 	}
 	t.context.tip.AppendTokens(t.context.currentLine[t.context.offset:])

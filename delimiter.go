@@ -218,7 +218,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	startPos := ctx.pos
 	token := ctx.tokens[startPos]
 	delimitersCount := 0
-	for i := ctx.pos; i < ctx.tokensLen && token.term() == ctx.tokens[i].term(); i++ {
+	for i := ctx.pos; i < ctx.tokensLen && token == ctx.tokens[i]; i++ {
 		delimitersCount++
 		ctx.pos++
 	}
@@ -226,18 +226,18 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	tokenBefore, tokenAfter := rune(itemNewline), rune(itemNewline)
 	if 0 < startPos {
 		t := ctx.tokens[startPos-1]
-		if t.term() >= utf8.RuneSelf {
-			tokenBefore, _ = utf8.DecodeLastRune(itemsToBytes(ctx.tokens[:startPos]))
+		if t >= utf8.RuneSelf {
+			tokenBefore, _ = utf8.DecodeLastRune(ctx.tokens[:startPos])
 		} else {
-			tokenBefore = rune(t.term())
+			tokenBefore = rune(t)
 		}
 	}
 	if ctx.tokensLen > ctx.pos {
 		t := ctx.tokens[ctx.pos]
-		if t.term() >= utf8.RuneSelf {
-			tokenAfter, _ = utf8.DecodeRune(itemsToBytes(ctx.tokens[ctx.pos:]))
+		if t >= utf8.RuneSelf {
+			tokenAfter, _ = utf8.DecodeRune(ctx.tokens[ctx.pos:])
 		} else {
-			tokenAfter = rune(t.term())
+			tokenAfter = rune(t)
 		}
 	}
 
@@ -249,7 +249,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
 	var canOpen, canClose bool
-	if itemUnderscore == token.term() {
+	if itemUnderscore == token {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
 	} else {
@@ -257,7 +257,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		canClose = isRightFlanking
 	}
 
-	return &delimiter{typ: token.term(), num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
+	return &delimiter{typ: token, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
 }
 
 func (t *Tree) removeDelimiter(delim *delimiter, ctx *InlineContext) (ret *delimiter) {

@@ -20,16 +20,16 @@ import (
 	"github.com/b3log/lute/html"
 )
 
-func unescapeString(tokens items) (ret items) {
+func unescapeString(tokens []byte) (ret []byte) {
 	if nil == tokens {
 		return
 	}
 
-	tokens = strToItems(htmlUnescapeString(itemsToStr(tokens)))
+	tokens = strToBytes(htmlUnescapeString(bytesToStr(tokens)))
 	length := len(tokens)
-	ret = make(items, 0, length)
+	ret = make([]byte, 0, length)
 	for i := 0; i < length; i++ {
-		if tokens.isBackslashEscapePunct(i) {
+		if isBackslashEscapePunct(tokens, i) {
 			ret = ret[:len(ret)-1]
 		}
 		ret = append(ret, tokens[i])

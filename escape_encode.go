@@ -18,22 +18,22 @@ import (
 )
 
 var (
-	amp  = strToItems("&amp;")
-	lt   = strToItems("&lt;")
-	gt   = strToItems("&gt;")
-	quot = strToItems("&quot;")
+	amp  = strToBytes("&amp;")
+	lt   = strToBytes("&lt;")
+	gt   = strToBytes("&gt;")
+	quot = strToBytes("&quot;")
 )
 
-func escapeHTML(html items) (ret items) {
+func escapeHTML(html []byte) (ret []byte) {
 	length := len(html)
 	var start, i int
 	inited := false
 	ret = html
 	for ; i < length; i++ {
-		switch html[i].term() {
+		switch html[i] {
 		case itemAmpersand:
 			if !inited { // 通过延迟初始化减少内存分配，下同
-				ret = make(items, 0, length+128)
+				ret = make([]byte, 0, length+128)
 				inited = true
 			}
 			ret = append(ret, html[start:i]...)
@@ -41,7 +41,7 @@ func escapeHTML(html items) (ret items) {
 			start = i + 1
 		case itemLess:
 			if !inited {
-				ret = make(items, 0, length+128)
+				ret = make([]byte, 0, length+128)
 				inited = true
 			}
 			ret = append(ret, html[start:i]...)
@@ -49,7 +49,7 @@ func escapeHTML(html items) (ret items) {
 			start = i + 1
 		case itemGreater:
 			if !inited {
-				ret = make(items, 0, length+128)
+				ret = make([]byte, 0, length+128)
 				inited = true
 			}
 			ret = append(ret, html[start:i]...)
@@ -57,7 +57,7 @@ func escapeHTML(html items) (ret items) {
 			start = i + 1
 		case itemDoublequote:
 			if !inited {
-				ret = make(items, 0, length+128)
+				ret = make([]byte, 0, length+128)
 				inited = true
 			}
 			ret = append(ret, html[start:i]...)
@@ -77,43 +77,43 @@ func escapeHTML(html items) (ret items) {
 // - percent-encoded characters (%[0-9a-fA-F]{2});
 // - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
 // Invalid UTF-8 sequences are replaced with U+FFFD.
-func encodeDestination(rawurl items) (ret items) {
+func encodeDestination(rawurl []byte) (ret []byte) {
 	// 鸣谢 https://gitlab.com/golang-commonmark/mdurl
 
 	const hexdigit = "0123456789ABCDEF"
-	ret = make(items, 0, 256)
+	ret = make([]byte, 0, 256)
 	i := 0
-	var token item
+	var token byte
 	for i < len(rawurl) {
-		r, rlen := utf8.DecodeRune(itemsToBytes(rawurl[i:]))
+		r, rlen := utf8.DecodeRune(rawurl[i:])
 		if utf8.RuneSelf <= r {
 			for j, n := i, i+rlen; j < n; j++ {
-				b := rawurl[j].term()
+				b := rawurl[j]
 				token = rawurl[j]
-				ret = append(ret, newItem('%', token.Col(), token.Col(), token.Offset()))
-				ret = append(ret, newItem(hexdigit[(b>>4)&0xf], token.Ln(), token.Col(), token.Offset()))
-				ret = append(ret, newItem(hexdigit[b&0xf], token.Ln(), token.Col(), token.Offset()))
+				ret = append(ret, '%')
+				ret = append(ret, hexdigit[(b>>4)&0xf])
+				ret = append(ret, hexdigit[b&0xf])
 			}
 		} else if r == '%' {
 			token = rawurl[i]
-			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1].term()) && isHexDigit(rawurl[i+2].term()) {
-				ret = append(ret, newItem('%', token.Ln(), token.Col(), token.Offset()))
-				ret = append(ret, newItem(tokenToUpper(rawurl[i+1].term()), token.Ln(), token.Col(), token.Offset()))
-				ret = append(ret, newItem(tokenToUpper(rawurl[i+2].term()), token.Ln(), token.Col(), token.Offset()))
+			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1]) && isHexDigit(rawurl[i+2]) {
+				ret = append(ret, '%')
+				ret = append(ret, tokenToUpper(rawurl[i+1]))
+				ret = append(ret, tokenToUpper(rawurl[i+2]))
 				i += 2
 			} else {
-				ret = append(ret, newItem('%', token.Ln(), token.Col(), token.Offset()))
-				ret = append(ret, newItem('2', token.Ln(), token.Col(), token.Offset()))
-				ret = append(ret, newItem('5', token.Ln(), token.Col(), token.Offset()))
+				ret = append(ret, '%')
+				ret = append(ret, '2')
+				ret = append(ret, '5')
 			}
 		} else if strings.IndexByte("!#$&'()*+,-./0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~", byte(r)) == -1 {
 			token = rawurl[i]
-			ret = append(ret, newItem('%', token.Ln(), token.Col(), token.Offset()))
-			ret = append(ret, newItem(hexdigit[(r>>4)&0xf], token.Ln(), token.Col(), token.Offset()))
-			ret = append(ret, newItem(hexdigit[r&0xf], token.Ln(), token.Col(), token.Offset()))
+			ret = append(ret, '%')
+			ret = append(ret, hexdigit[(r>>4)&0xf])
+			ret = append(ret, hexdigit[r&0xf])
 		} else {
 			token = rawurl[i]
-			ret = append(ret, newItem(token.term(), token.Ln(), token.Col(), token.Offset()))
+			ret = append(ret, token)
 		}
 		i += rlen
 	}

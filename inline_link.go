@@ -16,51 +16,51 @@ import (
 	"unicode/utf8"
 )
 
-func (context *Context) parseInlineLinkDest(tokens items) (passed, remains, destination items) {
+func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, destination []byte) {
 	remains = tokens
 	length := len(tokens)
 	if 2 > length {
 		return
 	}
 
-	passed = make(items, 0, 256)
-	destination = make(items, 0, 256)
+	passed = make([]byte, 0, 256)
+	destination = make([]byte, 0, 256)
 
-	isPointyBrackets := itemLess == tokens[1].term()
+	isPointyBrackets := itemLess == tokens[1]
 	if isPointyBrackets {
 		matchEnd := false
 		passed = append(passed, tokens[0], tokens[1])
 		i := 2
 		size := 1
 		var r rune
-		var dest, runes items
+		var dest, runes []byte
 		for ; i < length; i += size {
 			size = 1
 			token := tokens[i]
-			if itemNewline == token.term() {
+			if itemNewline == token {
 				passed = nil
 				return
 			}
 
-			if token.term() < utf8.RuneSelf {
+			if token < utf8.RuneSelf {
 				passed = append(passed, token)
-				dest = items{token}
+				dest = []byte{token}
 			} else {
-				dest = items{}
-				r, size = utf8.DecodeRune(itemsToBytes(tokens[i:]))
-				runes = strToItems(string(r))
+				dest = []byte{}
+				r, size = utf8.DecodeRune(tokens[i:])
+				runes = strToBytes(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}
 			destination = append(destination, dest...)
-			if itemGreater == token.term() && !tokens.isBackslashEscapePunct(i) {
+			if itemGreater == token && !isBackslashEscapePunct(tokens, i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
 				break
 			}
 		}
 
-		if !matchEnd || (length > i && itemCloseParen != tokens[i+1].term()) {
+		if !matchEnd || (length > i && itemCloseParen != tokens[i+1]) {
 			passed = nil
 			return
 		}
@@ -72,40 +72,40 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains, dest
 		i := 0
 		size := 1
 		var r rune
-		var dest, runes items
+		var dest, runes []byte
 		destStarted := false
 		for ; i < length; i += size {
 			size = 1
 			token := tokens[i]
-			if token.term() < utf8.RuneSelf {
+			if token < utf8.RuneSelf {
 				passed = append(passed, token)
-				dest = items{token}
+				dest = []byte{token}
 			} else {
-				dest = items{}
-				r, size = utf8.DecodeRune(itemsToBytes(tokens[i:]))
-				runes = strToItems(string(r))
+				dest = []byte{}
+				r, size = utf8.DecodeRune(tokens[i:])
+				runes = strToBytes(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}
 			destination = append(destination, dest...)
-			if !destStarted && !isWhitespace(token.term()) && 0 < i {
+			if !destStarted && !isWhitespace(token) && 0 < i {
 				destStarted = true
 				destination = destination[size:]
 				destination = trimWhitespace(destination)
 			}
-			if destStarted && (isWhitespace(token.term()) || isControl(token.term())) {
+			if destStarted && (isWhitespace(token) || isControl(token)) {
 				destination = destination[:len(destination)-size]
 				passed = passed[:len(passed)-1]
 				openParens--
 				break
 			}
-			if itemOpenParen == token.term() && !tokens.isBackslashEscapePunct(i) {
+			if itemOpenParen == token && !isBackslashEscapePunct(tokens, i) {
 				openParens++
 			}
-			if itemCloseParen == token.term() && !tokens.isBackslashEscapePunct(i) {
+			if itemCloseParen == token && !isBackslashEscapePunct(tokens, i) {
 				openParens--
 				if 1 > openParens {
-					if itemOpenParen == destination[0].term() {
+					if itemOpenParen == destination[0] {
 						// TODO: 需要重写边界判断
 						destination = destination[1:]
 					}
@@ -116,7 +116,7 @@ func (context *Context) parseInlineLinkDest(tokens items) (passed, remains, dest
 		}
 
 		remains = tokens[i:]
-		if length > i && (itemCloseParen != tokens[i].term() && itemSpace != tokens[i].term() && itemNewline != tokens[i].term()) {
+		if length > i && (itemCloseParen != tokens[i] && itemSpace != tokens[i] && itemNewline != tokens[i]) {
 			passed = nil
 			return
 		}

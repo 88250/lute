@@ -551,7 +551,7 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		if 1 == node.listData.typ {
 			listItemBuf.WriteString(strconv.Itoa(node.num) + ".")
 		} else {
-			listItemBuf.Write(itemsToBytes(node.marker))
+			listItemBuf.Write(node.marker)
 		}
 		listItemBuf.WriteByte(itemSpace)
 		buf = append(listItemBuf.Bytes(), buf...)

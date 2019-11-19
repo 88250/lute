@@ -16,7 +16,7 @@ package lute
 func (t *Tree) parseBang(ctx *InlineContext) (ret *Node) {
 	var startPos = ctx.pos
 	ctx.pos++
-	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos].term() {
+	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos] {
 		ctx.pos++
 		ret = &Node{typ: NodeText, tokens: ctx.tokens[startPos : ctx.pos]}
 		// 将图片开始标记符入栈

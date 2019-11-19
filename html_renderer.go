@@ -290,9 +290,9 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 func (r *HTMLRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
-		attrs := [][]string{{"href", itemsToStr(escapeHTML(dest.tokens))}}
+		attrs := [][]string{{"href", bytesToStr(escapeHTML(dest.tokens))}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
-			attrs = append(attrs, []string{"title", itemsToStr(escapeHTML(title.tokens))})
+			attrs = append(attrs, []string{"title", bytesToStr(escapeHTML(title.tokens))})
 		}
 		r.tag("a", attrs, false)
 	} else {

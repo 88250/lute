@@ -12,12 +12,12 @@
 
 package lute
 
-func (t *Tree) parseThematicBreak() (ok bool, markers items) {
+func (t *Tree) parseThematicBreak() (ok bool, markers []byte) {
 	markerCnt := 0
 	var marker byte
 	for i := t.context.nextNonspace; i < t.context.currentLineLen-1; i++ {
 		token := t.context.currentLine[i]
-		term := token.term()
+		term := token
 		markers = append(markers, t.context.currentLine[i])
 		if itemSpace == term || itemTab == term {
 			continue

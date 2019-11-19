@@ -24,7 +24,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 
 	// 尝试解析链接引用定义
 	hasReferenceDefs := false
-	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0].term(); tokens = p.tokens {
+	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = p.tokens {
 		if tokens = context.parseLinkRefDef(tokens); nil != tokens {
 			p.tokens = tokens
 			hasReferenceDefs = true
@@ -32,7 +32,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 		}
 		break
 	}
-	if hasReferenceDefs && p.tokens.isBlankLine() {
+	if hasReferenceDefs && isBlankLine(p.tokens) {
 		p.Unlink()
 	}
 
@@ -40,7 +40,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 		// 尝试解析任务列表项
 		listItem := p.parent
 		if nil != listItem && NodeListItem == listItem.typ {
-			if 3 == listItem.listData.typ && 3 < len(p.tokens) && isWhitespace(p.tokens[3].term()){
+			if 3 == listItem.listData.typ && 3 < len(p.tokens) && isWhitespace(p.tokens[3]) {
 				// 如果是任务列表项则添加任务列表标记符节点
 				taskListItemMarker := &Node{typ: NodeTaskListItemMarker, tokens: p.tokens[:3], taskListItemChecked: listItem.listData.checked}
 				p.InsertBefore(taskListItemMarker)

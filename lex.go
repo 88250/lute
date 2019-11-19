@@ -10,91 +10,12 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build !javascript
-
 package lute
 
 import (
 	"unicode/utf8"
 	"unsafe"
 )
-
-// item 描述了词法分析的一个 token。
-type item byte
-
-// items 定义了 token 数组。
-type items []item
-
-// nilItem 返回一个空值 token。
-func nilItem() item {
-	return item(0)
-}
-
-// isNilItem 判断 item 是否为空值。
-func isNilItem(item item) bool {
-	return 0 == item
-}
-
-// newItem 构造一个 token。
-func newItem(term byte, ln, col, offset int) item {
-	return item(term)
-}
-
-// Node 返回 item 关联的节点。
-func (item item) Node() *Node {
-	return nil
-}
-
-// SetNode 设置 item 关联的节点。
-func (item *item) SetNode(node *Node) {
-}
-
-// term 返回 item 的词素。
-func (item item) term() byte {
-	return byte(item)
-}
-
-// Ln 返回 item 的 ln。
-func (item item) Ln() int {
-	return 0
-}
-
-// Col 返回 item 的 col。
-func (item item) Col() int {
-	return 0
-}
-
-// Offset 返回 item 的 offset。
-func (item item) Offset() int {
-	return 0
-}
-
-// setTerm 用于设置 tokens 中第 i 个 token 的词素。
-func setTerm(tokens *items, i int, term byte) {
-	(*tokens)[i] = item(term)
-}
-
-// strToItems 将 str 转为 items。
-func strToItems(str string) items {
-	x := (*[2]uintptr)(unsafe.Pointer(&str))
-	h := [3]uintptr{x[0], x[1], x[1]}
-	return *(*items)(unsafe.Pointer(&h))
-}
-
-// itemsToStr 将 items 转为 string。
-func itemsToStr(items items) string {
-	return *(*string)(unsafe.Pointer(&items))
-}
-
-// itemsToBytes 将 items 转为 []byte。
-func itemsToBytes(items items) []byte {
-	return *(*[]byte)(unsafe.Pointer(&items))
-}
-
-// bytesToItems 将 bytes 转为 items。
-func bytesToItems(bytes []byte) items {
-	return *(*items)(unsafe.Pointer(&bytes))
-}
 
 // bytesToStr 快速转换 []byte 为 string。
 func bytesToStr(bytes []byte) string {
@@ -109,7 +30,7 @@ func strToBytes(str string) []byte {
 }
 
 // nextLine 返回下一行。
-func (l *lexer) nextLine() (ret items) {
+func (l *lexer) nextLine() (ret []byte) {
 	if l.offset >= l.length {
 		return
 	}
@@ -155,7 +76,7 @@ func (l *lexer) nextLine() (ret items) {
 			l.width = 1
 		}
 	}
-	ret = bytesToItems(l.input[l.offset:i])
+	ret = l.input[l.offset:i]
 	l.offset = i
 	return
 }

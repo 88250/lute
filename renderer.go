@@ -73,7 +73,7 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 }
 
 func (r *BaseRenderer) renderDefault(n *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, errors.New("not found render function for node [type=" + n.typ.String() + ", tokens=" + itemsToStr(n.tokens) + "]")
+	return WalkStop, errors.New("not found render function for node [type=" + n.typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
 }
 
 // writeByte 输出一个字节 c。
@@ -91,11 +91,10 @@ func (r *BaseRenderer) writeBytes(bytes []byte) {
 }
 
 // write 输出指定的 tokens 数组 content。
-func (r *BaseRenderer) write(content items) {
-	bytes := itemsToBytes(content)
-	if length := len(bytes); 0 < length {
-		r.writer.Write(bytes)
-		r.lastOut = bytes[length-1]
+func (r *BaseRenderer) write(content []byte) {
+	if length := len(content); 0 < length {
+		r.writer.Write(content)
+		r.lastOut = content[length-1]
 	}
 }
 

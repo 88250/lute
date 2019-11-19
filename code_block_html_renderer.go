@@ -60,13 +60,13 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatu
 		tokens := node.tokens
 		if 0 < len(node.previous.codeBlockInfo) {
 			infoWords := split(node.previous.codeBlockInfo, itemSpace)
-			language := itemsToStr(infoWords[0])
+			language := bytesToStr(infoWords[0])
 			rendered := false
 			if isGo(language) {
 				// Go 代码块自动格式化 https://github.com/b3log/lute/issues/37
-				bytes := itemsToBytes(tokens)
+				bytes := tokens
 				if bytes, err := format.Source(bytes); nil == err {
-					tokens = bytesToItems(bytes)
+					tokens = bytes
 				}
 			}
 			if r.option.CodeSyntaxHighlight && !noHighlight(language) {
@@ -100,8 +100,8 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatu
 	return WalkStop, nil
 }
 
-func highlightChroma(tokens items, language string, r *HTMLRenderer) (rendered bool) {
-	codeBlock := itemsToStr(tokens)
+func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered bool) {
+	codeBlock := bytesToStr(tokens)
 	var lexer chroma.Lexer
 	if "" != language {
 		lexer = chromalexers.Get(language)

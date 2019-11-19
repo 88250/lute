@@ -54,16 +54,16 @@ func (context *Context) newTableHead(headRow *Node) *Node {
 	return ret
 }
 
-func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (ret *Node) {
+func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *Node) {
 	ret = &Node{typ: NodeTableRow, tableAligns: aligns}
-	cols := line.splitWithoutBackslashEscape(itemPipe)
+	cols := splitWithoutBackslashEscape(line, itemPipe)
 	if 1 > len(cols) {
 		return nil
 	}
-	if isBlank(itemsToBytes(cols[0])) {
+	if isBlank(cols[0]) {
 		cols = cols[1:]
 	}
-	if len(cols) > 0 && isBlank(itemsToBytes(cols[len(cols)-1])) {
+	if len(cols) > 0 && isBlank(cols[len(cols)-1]) {
 		cols = cols[:len(cols)-1]
 	}
 
@@ -74,16 +74,16 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	}
 
 	var i int
-	var col items
+	var col []byte
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = trimWhitespace(cols[i])
 		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i]}
 		if !context.option.VditorWYSIWYG {
 			length := len(col)
-			var token item
+			var token byte
 			for i := 0; i < length; i++ {
 				token = col[i]
-				if token.term() == itemBackslash && i < length-1 && col[i+1].term() == itemPipe {
+				if token == itemBackslash && i < length-1 && col[i+1] == itemPipe {
 					col = append(col[:i], col[i+1:]...)
 					length--
 				}
@@ -102,7 +102,7 @@ func (context *Context) parseTableRow(line items, aligns []int, isHead bool) (re
 	return
 }
 
-func (context *Context) parseTableDelimRow(line items) (aligns []int) {
+func (context *Context) parseTableDelimRow(line []byte) (aligns []int) {
 	length := len(line)
 	if 1 > length {
 		return nil
@@ -111,17 +111,17 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	var token byte
 	var i int
 	for ; i < length; i++ {
-		token = line[i].term()
+		token = line[i]
 		if itemPipe != token && itemHyphen != token && itemColon != token && itemSpace != token {
 			return nil
 		}
 	}
 
-	cols := line.splitWithoutBackslashEscape(itemPipe)
-	if isBlank(itemsToBytes(cols[0])) {
+	cols := splitWithoutBackslashEscape(line, itemPipe)
+	if isBlank(cols[0]) {
 		cols = cols[1:]
 	}
-	if len(cols) > 0 && isBlank(itemsToBytes(cols[len(cols)-1])) {
+	if len(cols) > 0 && isBlank(cols[len(cols)-1]) {
 		cols = cols[:len(cols)-1]
 	}
 
@@ -141,7 +141,7 @@ func (context *Context) parseTableDelimRow(line items) (aligns []int) {
 	return alignments
 }
 
-func (context *Context) tableDelimAlign(col items) int {
+func (context *Context) tableDelimAlign(col []byte) int {
 	length := len(col)
 	if 1 > length {
 		return -1
@@ -149,14 +149,14 @@ func (context *Context) tableDelimAlign(col items) int {
 
 	var left, right bool
 	first := col[0]
-	left = itemColon == first.term()
+	left = itemColon == first
 	last := col[length-1]
-	right = itemColon == last.term()
+	right = itemColon == last
 
 	i := 1
 	var token byte
 	for ; i < length-1; i++ {
-		token = col[i].term()
+		token = col[i]
 		if itemHyphen != token {
 			return -1
 		}

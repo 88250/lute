@@ -279,9 +279,9 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
-		attrs := [][]string{{"href", itemsToStr(dest.tokens)}}
+		attrs := [][]string{{"href", bytesToStr(dest.tokens)}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
-			attrs = append(attrs, []string{"title", itemsToStr(title.tokens)})
+			attrs = append(attrs, []string{"title", bytesToStr(title.tokens)})
 		}
 		r.tag("a", attrs, false)
 	} else {
@@ -457,11 +457,11 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		var attrs [][]string
 		switch node.listData.typ {
 		case 0:
-			attrs = append(attrs, []string{"data-marker", itemsToStr(node.marker)})
+			attrs = append(attrs, []string{"data-marker", bytesToStr(node.marker)})
 		case 1:
 			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + "."})
 		case 3:
-			attrs = append(attrs, []string{"data-marker", itemsToStr(node.marker)})
+			attrs = append(attrs, []string{"data-marker", bytesToStr(node.marker)})
 			attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
 		}
 		r.tag("li", attrs, false)
@@ -533,13 +533,13 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 		tokens := node.tokens
 		if 0 < len(node.codeBlockInfo) {
 			infoWords := split(node.codeBlockInfo, itemSpace)
-			language := itemsToStr(infoWords[0])
+			language := bytesToStr(infoWords[0])
 			r.writeString("<pre><code class=\"language-" + language + "\">")
 		} else {
 			r.writeString("<pre><code>")
 		}
-		if "\n" + caret + "<br />\n" == itemsToStr(tokens) {
-			tokens = strToItems(caret + "\n")
+		if "\n"+caret+"<br />\n" == bytesToStr(tokens) {
+			tokens = strToBytes(caret + "\n")
 		}
 		r.write(tokens)
 		return WalkSkipChildren, nil

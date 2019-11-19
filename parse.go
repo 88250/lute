@@ -34,18 +34,18 @@ type Context struct {
 
 	linkRefDef map[string]*Node // 链接引用定义集
 
-	tip                                                               *Node // 末梢节点
-	oldtip                                                            *Node // 老的末梢节点
-	currentLine                                                       items // 当前行
-	currentLineLen                                                    int   // 当前行长
-	lineNum, offset, column, nextNonspace, nextNonspaceColumn, indent int   // 解析时用到的行号、下标、缩进空格数等
-	indented, blank, partiallyConsumedTab, allClosed                  bool  // 是否是缩进行、空行等标识
-	lastMatchedContainer                                              *Node // 最后一个匹配的块节点
+	tip                                                               *Node  // 末梢节点
+	oldtip                                                            *Node  // 老的末梢节点
+	currentLine                                                       []byte // 当前行
+	currentLineLen                                                    int    // 当前行长
+	lineNum, offset, column, nextNonspace, nextNonspaceColumn, indent int    // 解析时用到的行号、下标、缩进空格数等
+	indented, blank, partiallyConsumedTab, allClosed                  bool   // 是否是缩进行、空行等标识
+	lastMatchedContainer                                              *Node  // 最后一个匹配的块节点
 }
 
 // InlineContext 描述了行级元素解析上下文。
 type InlineContext struct {
-	tokens     items      // 当前解析的 tokens
+	tokens     []byte     // 当前解析的 tokens
 	tokensLen  int        // 当前解析的 tokens 长度
 	pos        int        // 当前解析到的 token 位置
 	lineNum    int        // 当前解析的起始行号
@@ -60,7 +60,7 @@ func (context *Context) advanceOffset(count int, columns bool) {
 	var charsToTab, charsToAdvance int
 	var c byte
 	for 0 < count {
-		c = currentLine[context.offset].term()
+		c = currentLine[context.offset]
 		if itemTab == c {
 			charsToTab = 4 - (context.column % 4)
 			if columns {
@@ -102,7 +102,7 @@ func (context *Context) findNextNonspace() {
 
 	var token byte
 	for {
-		token = context.currentLine[i].term()
+		token = context.currentLine[i]
 		if itemSpace == token {
 			i++
 			cols++
@@ -142,7 +142,7 @@ func (context *Context) finalize(block *Node, lineNum int) {
 }
 
 // addChildMarker 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。
-func (context *Context) addChildMarker(nodeType nodeType, tokens items) (ret *Node) {
+func (context *Context) addChildMarker(nodeType nodeType, tokens []byte) (ret *Node) {
 	ret = &Node{typ: nodeType, tokens: tokens, close: true}
 	context.tip.AppendChild(ret)
 	return ret
@@ -164,7 +164,7 @@ func (context *Context) addChild(nodeType nodeType, offset int) (ret *Node) {
 // listsMatch 用户判断指定的 listData 和 itemData 是否可归属于同一个列表。
 func (context *Context) listsMatch(listData, itemData *listData) bool {
 	return listData.typ == itemData.typ &&
-		((isNilItem(listData.delimiter) && isNilItem(itemData.delimiter)) || listData.delimiter.term() == itemData.delimiter.term()) &&
+		((0 == listData.delimiter && 0 == itemData.delimiter) || listData.delimiter == itemData.delimiter) &&
 		equal(listData.bulletChar, itemData.bulletChar)
 }
 

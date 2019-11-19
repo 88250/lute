@@ -29,7 +29,7 @@ type Node struct {
 	firstChild      *Node    // 第一个子节点
 	lastChild       *Node    // 最后一个子节点
 	rawText         string   // 原始内容
-	tokens          items    // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
+	tokens          []byte   // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
 	close           bool     // 标识是否关闭
 	lastLineBlank   bool     // 标识最后一行是否是空行
 	lastLineChecked bool     // 标识最后一行是否检查过
@@ -44,9 +44,9 @@ type Node struct {
 	codeBlockFenceChar   byte
 	codeBlockFenceLen    int
 	codeBlockFenceOffset int
-	codeBlockOpenFence   items
-	codeBlockInfo        items
-	codeBlockCloseFence  items
+	codeBlockOpenFence   []byte
+	codeBlockInfo        []byte
+	codeBlockCloseFence  []byte
 
 	// HTML 块
 
@@ -113,19 +113,11 @@ func (n *Node) ChildByType(childType nodeType) *Node {
 func (n *Node) Text() (ret string) {
 	Walk(n, func(n *Node, entering bool) (status WalkStatus, e error) {
 		if (NodeText == n.typ || NodeLinkText == n.typ) && entering {
-			ret += itemsToStr(n.tokens)
+			ret += bytesToStr(n.tokens)
 		}
 		return WalkContinue, nil
 	})
 	return
-}
-
-// Range 返回节点源码起始偏移和结束偏移位置。
-func (n *Node) Range() (start, end int) {
-	if 1 > len(n.tokens) {
-		return 0, 0
-	}
-	return n.tokens[0].Offset(), n.tokens[len(n.tokens)-1].Offset()
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
@@ -222,7 +214,7 @@ func (n *Node) AppendRawText(rawText string) {
 }
 
 // AppendTokens 添加 tokens。
-func (n *Node) AppendTokens(tokens items) {
+func (n *Node) AppendTokens(tokens []byte) {
 	n.tokens = append(n.tokens, tokens...)
 }
 

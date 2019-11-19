@@ -25,19 +25,19 @@ func (t *Tree) emoji(node *Node) {
 	}
 }
 
-var emojiSitePlaceholder = strToItems("${emojiSite}")
-var emojiDot = strToItems(".")
+var emojiSitePlaceholder = strToBytes("${emojiSite}")
+var emojiDot = strToBytes(".")
 
 func (t *Tree) emoji0(node *Node) {
 	first := node
 	tokens := node.tokens
-	node.tokens = items{} // 先清空，后面逐个添加或者添加 tokens 或者 Emoji 兄弟节点
+	node.tokens = []byte{} // 先清空，后面逐个添加或者添加 tokens 或者 Emoji 兄弟节点
 	length := len(tokens)
 	var token byte
 	var maybeEmoji []byte
 	var pos int
 	for i := 0; i < length; {
-		token = tokens[i].term()
+		token = tokens[i]
 		if i == length-1 {
 			node.tokens = append(node.tokens, tokens[pos:]...)
 			break
@@ -52,7 +52,7 @@ func (t *Tree) emoji0(node *Node) {
 
 		matchCloseColon := false
 		for pos = i + 1; pos < length; pos++ {
-			token = tokens[pos].term()
+			token = tokens[pos]
 			if isWhitespace(token) {
 				break
 			}
@@ -67,7 +67,7 @@ func (t *Tree) emoji0(node *Node) {
 			continue
 		}
 
-		maybeEmoji = itemsToBytes(tokens[i+1 : pos])
+		maybeEmoji = tokens[i+1 : pos]
 		if 1 > len(maybeEmoji) {
 			node.tokens = append(node.tokens, tokens[pos])
 			i++
@@ -78,7 +78,7 @@ func (t *Tree) emoji0(node *Node) {
 			emojiNode := &Node{typ: NodeEmoji}
 			emojiUnicodeOrImg := &Node{typ: NodeEmojiUnicode}
 			emojiNode.AppendChild(emojiUnicodeOrImg)
-			emojiTokens := strToItems(emoji)
+			emojiTokens := strToBytes(emoji)
 			if contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
 				alias := bytesToStr(maybeEmoji)
 				suffix := ".png"
@@ -101,7 +101,7 @@ func (t *Tree) emoji0(node *Node) {
 
 			if pos+1 < length {
 				// 在 Emoji 节点后插入一个内容为空的文本节点，留作下次迭代
-				text := &Node{typ: NodeText, tokens: items{}}
+				text := &Node{typ: NodeText, tokens: []byte{}}
 				emojiNode.InsertAfter(text)
 				node = text
 			}
@@ -122,6 +122,6 @@ func (t *Tree) emoji0(node *Node) {
 	}
 }
 
-func (t *Tree) emojiImgTokens(alias, src string) items {
-	return strToItems("<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + src + "\" title=\"" + alias + "\" />")
+func (t *Tree) emojiImgTokens(alias, src string) []byte {
+	return strToBytes("<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + src + "\" title=\"" + alias + "\" />")
 }

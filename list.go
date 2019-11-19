@@ -18,16 +18,16 @@ import (
 
 // listData 用于记录列表或列表项节点的附加信息。
 type listData struct {
-	typ          int   // 0：无序列表，1：有序列表，3：任务列表
-	tight        bool  // 是否是紧凑模式
-	bulletChar   items // 无序列表标识，* - 或者 +
-	start        int   // 有序列表起始序号
-	delimiter    item  // 有序列表分隔符，. 或者 )
-	padding      int   // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
-	markerOffset int   // 标识符（* - + 或者 1 2 3）相对缩进空格数
-	checked      bool  // 任务列表项是否勾选
-	marker       items // 列表标识符
-	num          int   // 有序列表项修正过的序号
+	typ          int    // 0：无序列表，1：有序列表，3：任务列表
+	tight        bool   // 是否是紧凑模式
+	bulletChar   []byte // 无序列表标识，* - 或者 +
+	start        int    // 有序列表起始序号
+	delimiter    byte   // 有序列表分隔符，. 或者 )
+	padding      int    // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
+	markerOffset int    // 标识符（* - + 或者 1 2 3）相对缩进空格数
+	checked      bool   // 任务列表项是否勾选
+	marker       []byte // 列表标识符
+	num          int    // 有序列表项修正过的序号
 }
 
 func (list *Node) listFinalize(context *Context) {
@@ -53,7 +53,7 @@ func (list *Node) listFinalize(context *Context) {
 	}
 }
 
-var items1 = strToItems("1")
+var items1 = strToBytes("1")
 
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记符。
 func (t *Tree) parseListMarker(container *Node) *listData {
@@ -71,14 +71,14 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	}
 
 	markerLength := 1
-	marker := items{tokens[0]}
-	var delim item
-	if itemPlus == marker[0].term() || itemHyphen == marker[0].term() || itemAsterisk == marker[0].term() {
+	marker := []byte{tokens[0]}
+	var delim byte
+	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.bulletChar = marker
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
 		if container.typ != NodeParagraph || equal(items1, marker) {
 			data.typ = 1 // 有序列表
-			data.start, _ = strconv.Atoi(itemsToStr(marker))
+			data.start, _ = strconv.Atoi(bytesToStr(marker))
 			markerLength = len(marker) + 1
 			data.delimiter = delim
 		} else {
@@ -92,19 +92,19 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 
 	var token = ln[t.context.nextNonspace+markerLength]
 	// 列表项标记符后必须是空白字符
-	if !isWhitespace(token.term()) {
+	if !isWhitespace(token) {
 		return nil
 	}
 
 	if t.context.option.VditorWYSIWYG {
 		// Vditor 所见即所得模式下列表项内容部分不能为空
-		if itemNewline == token.term() {
+		if itemNewline == token {
 			return nil
 		}
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空
-	if container.typ == NodeParagraph && itemNewline == ln[t.context.nextNonspace+markerLength].term() {
+	if container.typ == NodeParagraph && itemNewline == ln[t.context.nextNonspace+markerLength] {
 		return nil
 	}
 
@@ -115,20 +115,20 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	spacesStartOffset := t.context.offset
 	for {
 		t.context.advanceOffset(1, true)
-		token = ln.peek(t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || isNilItem(token) || (itemSpace != token.term() && itemTab != token.term()) {
+		token = peek(ln, t.context.offset)
+		if t.context.column-spacesStartCol >= 5 || 0 == (token) || (itemSpace != token && itemTab != token) {
 			break
 		}
 	}
 
-	token = ln.peek(t.context.offset)
-	var isBlankItem = isNilItem(token) || itemNewline == token.term()
+	token = peek(ln, t.context.offset)
+	var isBlankItem = 0 == token || itemNewline == token
 	var spacesAfterMarker = t.context.column - spacesStartCol
 	if spacesAfterMarker >= 5 || spacesAfterMarker < 1 || isBlankItem {
 		data.padding = markerLength + 1
 		t.context.column = spacesStartCol
 		t.context.offset = spacesStartOffset
-		if token = ln.peek(t.context.offset); itemSpace == token.term() || itemTab == token.term() {
+		if token = peek(ln, t.context.offset); itemSpace == token || itemTab == token {
 			t.context.advanceOffset(1, true)
 		}
 	} else {
@@ -139,9 +139,9 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 		// 判断是否是任务列表项
 		content := ln[t.context.offset:]
 		if 3 <= len(content) { // 至少需要 [ ] 或者 [x] 3 个字符
-			if itemOpenBracket == content[0].term() && ('x' == content[1].term() || 'X' == content[1].term() || itemSpace == content[1].term()) && itemCloseBracket == content[2].term() {
+			if itemOpenBracket == content[0] && ('x' == content[1] || 'X' == content[1] || itemSpace == content[1]) && itemCloseBracket == content[2] {
 				data.typ = 3
-				data.checked = 'x' == content[1].term() || 'X' == content[1].term()
+				data.checked = 'x' == content[1] || 'X' == content[1]
 			}
 		}
 	}
@@ -149,21 +149,21 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	return data
 }
 
-func (t *Tree) parseOrderedListMarker(tokens items) (marker items, delimiter item) {
+func (t *Tree) parseOrderedListMarker(tokens []byte) (marker []byte, delimiter byte) {
 	length := len(tokens)
 	var i int
-	var token item
+	var token byte
 	for ; i < length; i++ {
 		token = tokens[i]
-		if !isDigit(token.term()) || 8 < i {
+		if !isDigit(token) || 8 < i {
 			delimiter = token
 			break
 		}
 		marker = append(marker, token)
 	}
 
-	if 1 > len(marker) || (itemDot != delimiter.term() && itemCloseParen != delimiter.term()) {
-		return nil, nilItem()
+	if 1 > len(marker) || (itemDot != delimiter && itemCloseParen != delimiter) {
+		return nil, 0
 	}
 
 	return

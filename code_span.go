@@ -16,7 +16,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	startPos := ctx.pos
 	n := 0
 	for ; startPos+n < ctx.tokensLen; n++ {
-		if itemBacktick != ctx.tokens[startPos+n].term() {
+		if itemBacktick != ctx.tokens[startPos+n] {
 			break
 		}
 	}
@@ -41,7 +41,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	textTokens := ctx.tokens[startPos+n : endPos]
 	if !t.context.option.VditorWYSIWYG {
 		textTokens = replaceAll(textTokens, itemNewline, itemSpace)
-		if 2 < len(textTokens) && itemSpace == textTokens[0].term() && itemSpace == textTokens[len(textTokens)-1].term() && !textTokens.isBlankLine() {
+		if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !isBlankLine(textTokens) {
 			// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
 			openMarker.tokens = append(openMarker.tokens, textTokens[0])
 			closeMarker.tokens = ctx.tokens[endPos-1 : endPos+n]
@@ -58,13 +58,13 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	return
 }
 
-func (t *Tree) matchCodeSpanEnd(tokens items, num int) (pos int) {
+func (t *Tree) matchCodeSpanEnd(tokens []byte, num int) (pos int) {
 	length := len(tokens)
 	for pos < length {
-		l := tokens[pos:].accept(itemBacktick)
+		l := accept(tokens[pos:], itemBacktick)
 		if num == l {
 			next := pos + l
-			if length-1 > next && itemBacktick == tokens[next].term() {
+			if length-1 > next && itemBacktick == tokens[next] {
 				continue
 			}
 			return pos
