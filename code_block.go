@@ -99,6 +99,9 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 		// info 部分不能包含 `
 		return
 	}
+	if t.context.option.VditorWYSIWYG && contains(infoTokens, strToItems(caret)) {
+		return
+	}
 	info = trimWhitespace(infoTokens)
 	info = unescapeString(info)
 	return true, fenceChar, fenceLen, t.context.indent, openFence, info

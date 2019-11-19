@@ -538,6 +538,9 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 		} else {
 			r.writeString("<pre><code>")
 		}
+		if "\n" + caret + "<br />\n" == itemsToStr(tokens) {
+			tokens = strToItems(caret + "\n")
+		}
 		r.write(tokens)
 		return WalkSkipChildren, nil
 	}

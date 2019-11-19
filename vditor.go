@@ -19,6 +19,9 @@ import (
 	"strings"
 )
 
+// 插入符 \u2038
+const caret = "‸"
+
 // RenderVditorDOM 用于渲染 Vditor DOM。
 func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	lute.VditorWYSIWYG = true
@@ -39,14 +42,14 @@ func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
 	var output []byte
 	output, err = renderer.Render()
 	// 替换插入符
-	html = strings.ReplaceAll(string(output), "\u2038", "<wbr>")
+	html = strings.ReplaceAll(string(output), caret, "<wbr>")
 	return
 }
 
 // VditorDOM2Md 将 Vditor DOM 转换为 Markdown 文本。
 func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
 	// 替换插入符
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "\u2038")
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
 
 	// 将字符串解析为 DOM 树
 
@@ -364,7 +367,7 @@ func (context *Context) parentTip(n *html.Node) {
 // firstChildIsText 用于判断 n 的第一个子节点是否是文本节点。
 func (lute *Lute) firstChildIsText(n *html.Node) bool {
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		if "\u2038" == c.Data {
+		if caret == c.Data {
 			continue // 不考虑插入符
 		}
 		return 0 == c.DataAtom || atom.Em == c.DataAtom
