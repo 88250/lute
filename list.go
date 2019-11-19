@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"strconv"
 )
 
@@ -76,7 +77,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.bulletChar = marker
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
-		if container.typ != NodeParagraph || equal(items1, marker) {
+		if container.typ != NodeParagraph || bytes.Equal(items1, marker) {
 			data.typ = 1 // 有序列表
 			data.start, _ = strconv.Atoi(bytesToStr(marker))
 			markerLength = len(marker) + 1

@@ -12,6 +12,8 @@
 
 package lute
 
+import "bytes"
+
 func (html *Node) htmlBlockContinue(context *Context) int {
 	if context.blank && (html.htmlBlockType == 6 || html.htmlBlockType == 7) {
 		return 1
@@ -56,7 +58,7 @@ func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
 			}
 		}
 	case 4:
-		return contains(tokens, htmlBlockGreater)
+		return bytes.Contains(tokens, htmlBlockGreater)
 	case 5:
 		for i := 0; i < length-2; i++ {
 			if itemCloseBracket == tokens[i] && itemCloseBracket == tokens[i+1] {
@@ -110,23 +112,23 @@ func (t *Tree) parseHTML(tokens []byte) (typ int) {
 		return
 	}
 
-	if 0 == index(tokens, strToBytes("<!--")) {
+	if 0 == bytes.Index(tokens, strToBytes("<!--")) {
 		typ = 2
 		return
 	}
 
-	if 0 == index(tokens, strToBytes("<?")) {
+	if 0 == bytes.Index(tokens, strToBytes("<?")) {
 		typ = 3
 		return
 	}
 
-	if 2 < len(tokens) && 0 == index(tokens, strToBytes("<!")) {
+	if 2 < len(tokens) && 0 == bytes.Index(tokens, strToBytes("<!")) {
 		following := tokens[2:]
 		if 'A' <= following[0] && 'Z' >= following[0] {
 			typ = 4
 			return
 		}
-		if 0 == index(following, strToBytes("[CDATA[")) {
+		if 0 == bytes.Index(following, strToBytes("[CDATA[")) {
 			typ = 5
 			return
 		}
@@ -201,17 +203,17 @@ func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 
 		if 1 < len(nameAndValue) {
 			value := nameAndValue[1]
-			if hasPrefix(value, htmlBlockSinglequote) && hasSuffix(value, htmlBlockSinglequote) {
+			if bytes.HasPrefix(value, htmlBlockSinglequote) && bytes.HasSuffix(value, htmlBlockSinglequote) {
 				value = value[1:]
 				value = value[:len(value)-1]
-				return !contains(value, htmlBlockSinglequote)
+				return !bytes.Contains(value, htmlBlockSinglequote)
 			}
-			if hasPrefix(value, htmlBlockDoublequote) && hasSuffix(value, htmlBlockDoublequote) {
+			if bytes.HasPrefix(value, htmlBlockDoublequote) && bytes.HasSuffix(value, htmlBlockDoublequote) {
 				value = value[1:]
 				value = value[:len(value)-1]
-				return !contains(value, htmlBlockDoublequote)
+				return !bytes.Contains(value, htmlBlockDoublequote)
 			}
-			return !containsAny(value, " \t\n") && !containsAny(value, "\"'=<>`")
+			return !bytes.ContainsAny(value, " \t\n") && !bytes.ContainsAny(value, "\"'=<>`")
 		}
 	}
 	return true

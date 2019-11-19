@@ -43,11 +43,10 @@ func (t *Tree) parseGFMAutoLink(node *Node) {
 }
 
 var mailto = strToBytes("mailto:")
-var at = strToBytes("@")
 
 func (t *Tree) parseGFMAutoEmailLink0(node *Node) {
 	tokens := node.tokens
-	if 0 >= index(tokens, at) {
+	if 0 >= bytes.IndexByte(tokens, '@') {
 		return
 	}
 
@@ -410,7 +409,7 @@ func (t *Tree) isValidDomain(domain []byte) bool {
 		if i == length-1 {
 			validSuffix := false
 			for j := 0; j < len(validAutoLinkDomainSuffix); j++ {
-				if equal(segment, validAutoLinkDomainSuffix[j]) {
+				if bytes.Equal(segment, validAutoLinkDomainSuffix[j]) {
 					validSuffix = true
 					break
 				}

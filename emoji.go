@@ -12,6 +12,8 @@
 
 package lute
 
+import "bytes"
+
 // emoji 将 node 下文本节点中的 Emoji 别名替换为原生 Unicode 字符。
 func (t *Tree) emoji(node *Node) {
 	for child := node.firstChild; nil != child; {
@@ -79,7 +81,7 @@ func (t *Tree) emoji0(node *Node) {
 			emojiUnicodeOrImg := &Node{typ: NodeEmojiUnicode}
 			emojiNode.AppendChild(emojiUnicodeOrImg)
 			emojiTokens := strToBytes(emoji)
-			if contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
+			if bytes.Contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
 				alias := bytesToStr(maybeEmoji)
 				suffix := ".png"
 				if "huaji" == alias {
@@ -88,7 +90,7 @@ func (t *Tree) emoji0(node *Node) {
 				src := t.context.option.EmojiSite + "/" + alias + suffix
 				emojiUnicodeOrImg.typ = NodeEmojiImg
 				emojiUnicodeOrImg.tokens = t.emojiImgTokens(alias, src)
-			} else if contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
+			} else if bytes.Contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
 				alias := bytesToStr(maybeEmoji)
 				emojiUnicodeOrImg.typ = NodeEmojiImg
 				emojiUnicodeOrImg.tokens = t.emojiImgTokens(alias, emoji)

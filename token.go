@@ -150,64 +150,6 @@ func splitWithoutBackslashEscape(tokens []byte, separator byte) (ret [][]byte) {
 	return
 }
 
-func hasPrefix(s, prefix []byte) bool {
-	return len(s) >= len(prefix) && equal(s[0:len(prefix)], prefix)
-}
-
-func hasSuffix(tokens, suffix []byte) bool {
-	return len(tokens) >= len(suffix) && equal(tokens[len(tokens)-len(suffix):], suffix)
-}
-
-func equal(a, b []byte) bool {
-	length := len(a)
-	if length != len(b) {
-		return false
-	}
-	for i := 0; i < length; i++ {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func index(tokens, sep []byte) int {
-	length := len(tokens)
-	sepLen := len(sep)
-	for i := 0; i < length; i++ {
-		if i+sepLen > length {
-			break
-		}
-		if equal(tokens[i:i+sepLen], sep) {
-			return i
-		}
-	}
-	return -1
-}
-
-func indexAny(tokens []byte, chars string) (pos int) {
-	length := len(tokens)
-	charsLen := len(chars)
-	var token byte
-	for i := 0; i < length; i++ {
-		token = tokens[i]
-		for j := 0; j < charsLen; j++ {
-			if token == chars[j] {
-				return i
-			}
-		}
-	}
-	return -1
-}
-
-func contains(tokens, sub []byte) bool {
-	return 0 <= index(tokens, sub)
-}
-
-func containsAny(tokens []byte, chars string) bool {
-	return 0 <= indexAny(tokens, chars)
-}
-
 // replaceAll 会将 tokens 中的所有 old 使用 new 替换。
 func replaceAll(tokens []byte, old, new byte) []byte {
 	for i, token := range tokens {
@@ -362,21 +304,6 @@ func splitWhitespace(tokens []byte) (ret [][]byte) {
 		}
 	}
 	return
-}
-
-func startWith(tokens []byte, token byte) bool {
-	if 1 > len(tokens) {
-		return false
-	}
-	return token == tokens[0]
-}
-
-func endWith(tokens []byte, token byte) bool {
-	length := len(tokens)
-	if 1 > length {
-		return false
-	}
-	return token == tokens[length-1]
 }
 
 // isBackslashEscapePunct 判断 tokens 中 pos 所指的值是否是由反斜杠 \ 转义的 ASCII 标点符号。

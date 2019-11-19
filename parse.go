@@ -12,6 +12,8 @@
 
 package lute
 
+import "bytes"
+
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
 func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	defer recoverPanic(&err)
@@ -165,7 +167,7 @@ func (context *Context) addChild(nodeType nodeType, offset int) (ret *Node) {
 func (context *Context) listsMatch(listData, itemData *listData) bool {
 	return listData.typ == itemData.typ &&
 		((0 == listData.delimiter && 0 == itemData.delimiter) || listData.delimiter == itemData.delimiter) &&
-		equal(listData.bulletChar, itemData.bulletChar)
+		bytes.Equal(listData.bulletChar, itemData.bulletChar)
 }
 
 // Tree 描述了 Markdown 抽象语法树结构。

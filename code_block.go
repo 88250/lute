@@ -12,6 +12,8 @@
 
 package lute
 
+import "bytes"
+
 func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
@@ -95,11 +97,11 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 
 	var info []byte
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLen:]
-	if itemBacktick == marker && contains(infoTokens, codeBlockBacktick) {
+	if itemBacktick == marker && bytes.Contains(infoTokens, codeBlockBacktick) {
 		// info 部分不能包含 `
 		return
 	}
-	if t.context.option.VditorWYSIWYG && contains(infoTokens, strToBytes(caret)) {
+	if t.context.option.VditorWYSIWYG && bytes.Contains(infoTokens, strToBytes(caret)) {
 		return
 	}
 	info = trimWhitespace(infoTokens)
