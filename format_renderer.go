@@ -365,7 +365,7 @@ func (r *FormatRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 }
 
 func (r *FormatRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.tokens)
+	r.write(node.codeBlockInfo)
 	r.writeByte(itemNewline)
 	return WalkStop, nil
 }

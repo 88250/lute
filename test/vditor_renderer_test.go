@@ -23,6 +23,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"41", "<pre><code class=\"language-go\"><wbr></code></pre>", "```go\n‸\n```\n"},
 	{"40", "<p>f<span data-marker=\"*\">o</span>ob<wbr></p>", "f*o*ob‸\n"},
 	{"39", "<p><b>foo<wbr></b></p>", "**foo‸**\n"},
 	{"38", "<p>```java</p><p><wbr><br></p>", "```java\n\n‸<br />\n"},
