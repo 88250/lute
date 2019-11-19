@@ -14,20 +14,7 @@ package lute
 
 import (
 	"unicode/utf8"
-	"unsafe"
 )
-
-// bytesToStr 快速转换 []byte 为 string。
-func bytesToStr(bytes []byte) string {
-	return *(*string)(unsafe.Pointer(&bytes))
-}
-
-// strToBytes 快速转换 string 为 []byte。
-func strToBytes(str string) []byte {
-	x := (*[2]uintptr)(unsafe.Pointer(&str))
-	h := [3]uintptr{x[0], x[1], x[1]}
-	return *(*[]byte)(unsafe.Pointer(&h))
-}
 
 // nextLine 返回下一行。
 func (l *lexer) nextLine() (ret []byte) {
