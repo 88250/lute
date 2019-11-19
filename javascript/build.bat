@@ -13,4 +13,4 @@
 SET GOOS=linux
 
 go list -tags js  -f {{.Deps}}
-gopherjs build -o lute.min.js
+gopherjs build -o lute.min.js -m
