@@ -10,7 +10,7 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build javascript
+// +build js
 
 package test
 
