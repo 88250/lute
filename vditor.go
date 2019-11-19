@@ -188,6 +188,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Em, atom.I:
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "_"
+		}
 		if "_" == marker {
 			node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToItems(marker)})
 		} else {
@@ -199,6 +202,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Strong, atom.B:
 		node.typ = NodeStrong
 		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "**"
+		}
 		if "__" == marker {
 			node.AppendChild(&Node{typ: NodeStrongU8eOpenMarker, tokens: strToItems(marker)})
 		} else {
@@ -307,15 +313,21 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	switch n.DataAtom {
-	case atom.Em:
+	case atom.Em, atom.I:
 		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "_"
+		}
 		if "_" == marker {
 			node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems(marker)})
 		} else {
 			node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: strToItems(marker)})
 		}
-	case atom.Strong:
+	case atom.Strong, atom.B:
 		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "**"
+		}
 		if "__" == marker {
 			node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: strToItems(marker)})
 		} else {
