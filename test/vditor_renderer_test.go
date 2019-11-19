@@ -23,6 +23,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"40", "<p>f<span data-marker=\"*\">o</span>ob<wbr></p>", "f*o*ob‸\n"},
 	{"39", "<p><b>foo<wbr></b></p>", "**foo‸**\n"},
 	{"38", "<p>```java</p><p><wbr><br></p>", "```java\n\n‸<br />\n"},
 	{"37", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li><li data-marker=\"*\"></li><li data-marker=\"*\"><br></li></ul>", "* foo‸\n*\n* <br />\n"},
@@ -46,7 +47,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"20", "<p>foo</p><p><wbr><br></p>", "foo\n\n‸<br />\n"},
 	{"19", "<ul><li data-marker=\"*\">foo</li></ul><div><wbr><br></div>", "* foo\n\n‸<br />\n"},
 	{"18", "<p><em data-marker=\"*\">foo<wbr></em></p>", "*foo‸*\n"},
-	{"17", "foo<span>&nbsp;</span>bar", "foo bar\n"},
+	{"17", "foo bar", "foo bar\n"},
 	{"16", "<p><em><strong>foo</strong></em></p>", "_**foo**_\n"},
 	{"15", "<p><strong data-marker=\"__\">foo</strong></p>", "__foo__\n"},
 	{"14", "<p><strong data-marker=\"**\">foo</strong></p>", "**foo**\n"},

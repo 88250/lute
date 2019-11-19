@@ -97,9 +97,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				node.typ = NodeLinkText
 			default:
 				node.typ = NodeText
-				if html.Entities["nbsp"] == n.Data {
-					node.tokens = strToItems(" ")
-				}
+				//if html.Entities["nbsp"] == n.Data {
+				//	node.tokens = strToItems(" ")
+				//}
 			}
 		} else {
 			if "\n" != n.Data {
@@ -306,6 +306,32 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
+	case atom.Span:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "" != marker {
+			switch marker {
+			case "*", "_":
+				node.typ = NodeEmphasis
+				if "_" == marker {
+					node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToItems(marker)})
+				} else {
+					node.AppendChild(&Node{typ: NodeEmA6kOpenMarker, tokens: strToItems(marker)})
+				}
+			case "**", "__":
+				if "__" == marker {
+					node.AppendChild(&Node{typ: NodeStrongU8eOpenMarker, tokens: strToItems(marker)})
+				} else {
+					node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToItems(marker)})
+				}
+
+			}
+		} else {
+			node.tokens = strToItems("")
+		}
+
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip(n)
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -355,6 +381,25 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: strToItems(marker)})
 		} else {
 			node.AppendChild(&Node{typ: NodeStrikethrough2CloseMarker, tokens: strToItems(marker)})
+		}
+	case atom.Span:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "" != marker {
+			switch marker {
+			case "*", "_":
+				node.typ = NodeEmphasis
+				if "_" == marker {
+					node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToItems(marker)})
+				} else {
+					node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: strToItems(marker)})
+				}
+			case "**", "__":
+				if "__" == marker {
+					node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: strToItems(marker)})
+				} else {
+					node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToItems(marker)})
+				}
+			}
 		}
 	}
 }
