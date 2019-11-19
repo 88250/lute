@@ -58,8 +58,8 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		tokens := node.tokens
-		if 0 < len(node.codeBlockInfo) {
-			infoWords := split(node.codeBlockInfo, itemSpace)
+		if 0 < len(node.previous.codeBlockInfo) {
+			infoWords := split(node.previous.codeBlockInfo, itemSpace)
 			language := itemsToStr(infoWords[0])
 			rendered := false
 			if isGo(language) {
