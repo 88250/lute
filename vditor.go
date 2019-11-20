@@ -298,6 +298,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
+	case atom.Tbody:
 	case atom.Tr:
 		node.typ = NodeTableRow
 		tree.context.tip.AppendChild(node)
