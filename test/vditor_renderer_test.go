@@ -23,7 +23,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
-	{"42", "<div class=\"vditor-panel vditor-panel--none\" contenteditable=\"false\" style=\"display: block; top: 5px; left: 567px;\"><input class=\"vditor-input\" placeholder=\"row\" style=\"width: 42px; text-align: center;\"> x <input class=\"vditor-input\" placeholder=\"column\" style=\"width: 42px; text-align: center;\"></div>", "<div class=\"vditor-panel vditor-panel--none\" contenteditable=\"false\" style=\"display: block; top: 5px; left: 567px;\"><input class=\"vditor-input\" placeholder=\"row\" style=\"width: 42px; text-align: center;\"/> x <input class=\"vditor-input\" placeholder=\"column\" style=\"width: 42px; text-align: center;\"/></div>\n"},
+	{"42", "<div class=\"vditor-panel vditor-panel--none\" contenteditable=\"false\" style=\"display: block; top: 5px; left: 567px;\"><input class=\"vditor-input\" placeholder=\"row\" style=\"width: 42px; text-align: center;\"> x <input class=\"vditor-input\" placeholder=\"column\" style=\"width: 42px; text-align: center;\"></div>", "\n"},
 	{"41", "<pre><code class=\"language-go\"><wbr></code></pre>", "```go\n‸\n```\n"},
 	{"40", "<p>f<span data-marker=\"*\">o</span>ob<wbr></p>", "f*o*ob‸\n"},
 	{"39", "<p><b>foo<wbr></b></p>", "**foo‸**\n"},
@@ -87,7 +87,7 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var vditorRendererTests = []*parseTest{
 
-	{"25", "<p>```java</p><p><wbr><br></p>", "<pre><code class=\"language-java\"><wbr>\n</code></pre>"},
+	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<pre><code class=\"language-java\"><wbr>\n</code></pre>\n"},
 	{"24", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /></li></ul>"},
 	{"23", "<ol><li data-marker=\"1.\">foo</li></ol>", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ol>"},
 	{"22", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><wbr><br /></li></ul></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /></li></ul></li></ul>"},
@@ -99,12 +99,12 @@ var vditorRendererTests = []*parseTest{
 	{"16", "<p>[](</p>", "<p>[](</p>"},
 	{"15", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
 	{"14", ":octocat:", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
-	{"13", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>"},
+	{"13", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>\n"},
 	{"12", "<p><s data-marker=\"~~\">Hi</s> Hello, world!</p>", "<p><s data-marker=\"~~\">Hi</s> Hello, world!</p>"},
 	{"11", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "<p><s data-marker=\"~\">Hi</s> Hello, world!</p>"},
 	{"10", "<ul><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},
 	{"9", "<ul><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> foo<wbr></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> foo<wbr></li></ul>"},
-	{"8", "> <wbr>", "<blockquote><p><wbr></p></blockquote>"},
+	{"8", "> <wbr>", "<p>> <wbr></p>"},
 	{"7", "><wbr>", "<p>><wbr></p>"},
 	{"6", "<p>> foo<wbr></p>", "<blockquote><p>foo<wbr></p></blockquote>"},
 	{"5", "<p>foo</p><p><wbr><br></p>", "<p>foo</p><p><wbr><br /></p>"},

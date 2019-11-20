@@ -118,13 +118,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Div:
 		class := lute.domAttrValue(n, "class")
 		if strings.Contains(class, "vditor-panel") {
-			buf := &bytes.Buffer{}
-			html.Render(buf, n)
-			node.typ = NodeHTMLBlock
-			node.tokens = strToBytes(buf.String())
-			tree.context.tip.AppendChild(node)
-			tree.context.tip = node
-			defer tree.context.parentTip(n)
 			return
 		}
 		fallthrough

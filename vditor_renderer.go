@@ -185,6 +185,7 @@ func (r *VditorRenderer) renderTable(node *Node, entering bool) (WalkStatus, err
 			r.tag("/tbody", nil, false)
 		}
 		r.tag("/table", nil, false)
+		r.tailBlank(node)
 	}
 	return WalkContinue, nil
 }
@@ -494,7 +495,7 @@ func (r *VditorRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *VditorRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("br", nil, true)
+	r.writeByte(itemNewline)
 	return WalkStop, nil
 }
 
@@ -519,20 +520,29 @@ func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if !node.isFencedCodeBlock {
 		// 缩进代码块处理
-
 		r.writeString("<pre><code>")
 		r.write(node.tokens)
 		r.writeString("</code></pre>")
+		r.tailBlank(node)
 		return WalkStop, nil
 	}
+	if !entering {
+		r.tailBlank(node)
+	}
 	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) tailBlank(node *Node) {
+	if node == r.tree.Root.lastChild {
+		r.writeString("\n")
+	}
 }
 
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		tokens := node.tokens
-		if 0 < len(node.codeBlockInfo) {
-			infoWords := split(node.codeBlockInfo, itemSpace)
+		if 0 < len(node.previous.codeBlockInfo) {
+			infoWords := split(node.previous.codeBlockInfo, itemSpace)
 			language := bytesToStr(infoWords[0])
 			r.writeString("<pre><code class=\"language-" + language + "\">")
 		} else {

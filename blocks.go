@@ -12,6 +12,8 @@
 
 package lute
 
+import "strings"
+
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
@@ -180,9 +182,12 @@ var blockStarts = []blockStartFunc{
 				if withSpace {
 					t.context.advanceOffset(1, true)
 					markers = append(markers, whitespace)
-				} else {
-					if t.context.option.VditorWYSIWYG {
-						// Vditor 所见即所得模式下块引用标记符 > 后面必须跟空格
+				}
+				if t.context.option.VditorWYSIWYG {
+					// Vditor 所见即所得模式下块引用标记符 > 后面不能为空
+					ln := bytesToStr(t.context.currentLine[t.context.offset:])
+					ln = strings.ReplaceAll(ln, caret, "")
+					if ln = strings.TrimSpace(ln); "" == ln {
 						return 0
 					}
 				}
