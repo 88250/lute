@@ -318,6 +318,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
+	case atom.Details:
+		node.typ = NodeHTMLBlock
+		buf := &bytes.Buffer{}
+		//n.Attr = nil
+		html.Render(buf, n)
+		tokens := buf.Bytes()
+		//tokens = bytes.ReplaceAll(tokens, []byte("</summary>\n"), []byte("</summary>"))
+		//tokens = bytes.ReplaceAll(tokens, []byte("\n</details>"), []byte("</details>"))
+		node.tokens = tokens
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip(n)
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
