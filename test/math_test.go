@@ -19,6 +19,7 @@ import (
 )
 
 var mathTests = []parseTest{
+
 	{"13", "$$a^2 + b^2 = \\color{red}c^2$$\n## 12\n", "<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2$$\n## 12</div>\n"},
 	{"12", "$$\n", "<div class=\"vditor-math\"></div>\n"},
 	{"11", "$\n", "<p>$</p>\n"},
@@ -47,5 +48,35 @@ func TestMath(t *testing.T) {
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
+	}
+}
+
+var inlineMathDigitTests = []parseTest{
+
+	{"not allow digit after $", "$1$", "<p>$1$</p>\n"},
+	{"allow digit after $", "$1$", "<p><span class=\"vditor-math\">1</span></p>\n"},
+}
+
+func TestInlineMathDigit(t *testing.T) {
+	luteEngine := lute.New()
+
+	notAllowDigit := inlineMathDigitTests[0]
+	html, err := luteEngine.MarkdownStr(notAllowDigit.name, notAllowDigit.from)
+	if nil != err {
+		t.Fatalf("test case [%s] unexpected: %s", notAllowDigit.name, err)
+	}
+	if notAllowDigit.to != html {
+		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", notAllowDigit.name, notAllowDigit.to, html, notAllowDigit.from)
+	}
+
+	luteEngine.InlineMathAllowDigitAfterOpenMarker = true
+
+	allowDigit := inlineMathDigitTests[1]
+	html, err = luteEngine.MarkdownStr(allowDigit.name, allowDigit.from)
+	if nil != err {
+		t.Fatalf("test case [%s] unexpected: %s", allowDigit.name, err)
+	}
+	if allowDigit.to != html {
+		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", allowDigit.name, allowDigit.to, html, allowDigit.from)
 	}
 }

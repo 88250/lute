@@ -235,6 +235,8 @@ type options struct {
 	VditorWYSIWYG bool
 	// ParallelParsing 设置是否启用并行解析。
 	ParallelParsing bool
+	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
+	InlineMathAllowDigitAfterOpenMarker bool
 }
 
 // option 描述了解析渲染选项设置函数签名。
@@ -316,4 +318,8 @@ func (lute *Lute) SetVditorWYSIWYG(b bool) {
 
 func (lute *Lute) SetParallelParsing(b bool) {
 	lute.ParallelParsing = b
+}
+
+func (lute *Lute) SetInlineMathAllowDigitAfterOpenMarker(b bool) {
+	lute.InlineMathAllowDigitAfterOpenMarker = b
 }
