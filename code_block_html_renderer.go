@@ -31,7 +31,6 @@ var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if !node.isFencedCodeBlock {
 		// 缩进代码块处理
-
 		r.newline()
 		rendered := false
 		tokens := node.tokens

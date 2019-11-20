@@ -16,11 +16,25 @@ package lute
 
 // renderCodeBlock 进行代码块 HTML 渲染，不实现语法高亮。
 func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
+	if !node.isFencedCodeBlock {
+		// 缩进代码块处理
+		r.newline()
+		r.writeString("<pre><code>")
+		r.write(escapeHTML(node.tokens))
+		r.writeString("</code></pre>")
+		r.newline()
+		return WalkStop, nil
+	}
+	r.newline()
+	return WalkContinue, nil
+}
+
+func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
 		tokens := node.tokens
-		if 0 < len(node.codeBlockInfo) {
-			infoWords := split(node.codeBlockInfo, itemSpace)
+		if 0 < len(node.previous.codeBlockInfo) {
+			infoWords := split(node.previous.codeBlockInfo, itemSpace)
 			language := infoWords[0]
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)
@@ -36,9 +50,5 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 	}
 	r.writeString("</code></pre>")
 	r.newline()
-	return WalkStop, nil
-}
-
-func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	return WalkStop, nil
 }
