@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"44", "<p>f<i>o</i>o<wbr></p>", "* foo<br />\n  * b‸\n"},
 	{"43", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<br></li><ul><li data-marker=\"*\">b<wbr></li></ul></ul>", "* foo<br />\n  * b‸\n"},
 	{"42", "<div class=\"vditor-panel vditor-panel--none\" contenteditable=\"false\" style=\"display: block; top: 5px; left: 567px;\"><input class=\"vditor-input\" placeholder=\"row\" style=\"width: 42px; text-align: center;\"> x <input class=\"vditor-input\" placeholder=\"column\" style=\"width: 42px; text-align: center;\"></div>", "\n"},
 	{"41", "<pre><code class=\"language-go\"><wbr></code></pre>", "```go\n‸\n```\n"},

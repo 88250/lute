@@ -207,7 +207,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
-			marker = "_"
+			marker = "*"
 		}
 		if "_" == marker {
 			node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToBytes(marker)})
@@ -369,7 +369,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Em, atom.I:
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
-			marker = "_"
+			marker = "*"
 		}
 		if "_" == marker {
 			node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToBytes(marker)})
