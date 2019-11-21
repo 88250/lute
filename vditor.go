@@ -288,7 +288,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if nil != node.parent.parent {
 			node.parent.parent.listData.typ = 3
 		}
-	case atom.Del, atom.S:
+	case atom.Del, atom.S, atom.Strike:
 		node.typ = NodeStrikethrough
 		marker := lute.domAttrValue(n, "data-marker")
 		if "~" == marker {
@@ -402,7 +402,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: strToBytes(linkTitle)})
 		}
 		node.AppendChild(&Node{typ: NodeCloseParen})
-	case atom.Del, atom.S:
+	case atom.Del, atom.S, atom.Strike:
 		marker := lute.domAttrValue(n, "data-marker")
 		if "~" == marker {
 			node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: strToBytes(marker)})
