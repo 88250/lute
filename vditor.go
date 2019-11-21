@@ -68,6 +68,22 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
 		lute.genASTByVditorDOM(htmlNode, tree)
 	}
 
+	// 调整树结构
+
+	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
+		if entering && NodeList == n.typ {
+			// ul.ul => ul.li.ul
+			if nil != n.parent && NodeList == n.parent.typ {
+				previousLi := n.previous
+				if nil != previousLi {
+					n.Unlink()
+					previousLi.AppendChild(n)
+				}
+			}
+		}
+		return WalkContinue, nil
+	})
+
 	// 将 AST 进行 Markdown 格式化渲染
 
 	var formatted []byte
