@@ -22,7 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
-	{"44", "<p>f<i>o</i>o<wbr></p>", "* foo<br />\n  * b‸\n"},
+	{"44", "<p>f<i>o</i>o<wbr></p>", "f*o*o‸\n"},
 	{"43", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<br></li><ul><li data-marker=\"*\">b<wbr></li></ul></ul>", "* foo<br />\n  * b‸\n"},
 	{"42", "<div class=\"vditor-panel vditor-panel--none\" contenteditable=\"false\" style=\"display: block; top: 5px; left: 567px;\"><input class=\"vditor-input\" placeholder=\"row\" style=\"width: 42px; text-align: center;\"> x <input class=\"vditor-input\" placeholder=\"column\" style=\"width: 42px; text-align: center;\"></div>", "\n"},
 	{"41", "<pre><code class=\"language-go\"><wbr></code></pre>", "```go\n‸\n```\n"},
@@ -51,10 +51,10 @@ var vditorDOM2MdTests = []parseTest{
 	{"19", "<ul><li data-marker=\"*\">foo</li></ul><div><wbr><br></div>", "* foo\n\n‸<br />\n"},
 	{"18", "<p><em data-marker=\"*\">foo<wbr></em></p>", "*foo‸*\n"},
 	{"17", "foo bar", "foo bar\n"},
-	{"16", "<p><em><strong>foo</strong></em></p>", "_**foo**_\n"},
+	{"16", "<p><em><strong>foo</strong></em></p>", "***foo***\n"},
 	{"15", "<p><strong data-marker=\"__\">foo</strong></p>", "__foo__\n"},
 	{"14", "<p><strong data-marker=\"**\">foo</strong></p>", "**foo**\n"},
-	{"13", "<h2>foo</h2><p>para<em>em</em></p>", "## foo\n\npara_em_\n"},
+	{"13", "<h2>foo</h2><p>para<em>em</em></p>", "## foo\n\npara*em*\n"},
 	{"12", "<a href=\"/bar\" title=\"baz\">foo</a>", "[foo](/bar \"baz\")\n"},
 	{"11", "<img src=\"/bar\" alt=\"foo\" />", "![foo](/bar)\n"},
 	{"10", "<img src=\"/bar\" />", "![](/bar)\n"},
@@ -65,7 +65,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"5", "<ul><li data-marker=\"*\">foo</li></ul>", "* foo\n"},
 	{"4", "<blockquote>foo</blockquote>", "> foo\n"},
 	{"3", "<h2>foo</h2>", "## foo\n"},
-	{"2", "<p><strong><em>foo</em></strong></p>", "**_foo_**\n"},
+	{"2", "<p><strong><em>foo</em></strong></p>", "***foo***\n"},
 	{"1", "<p><strong>foo</strong></p>", "**foo**\n"},
 	{"0", "<p>foo</p>", "foo\n"},
 }
