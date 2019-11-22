@@ -19,61 +19,8 @@ import (
 	"strings"
 )
 
-// 插入符 \u2038
-const caret = "‸"
-
-// RenderVditorDOM 用于渲染 Vditor DOM。
-func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
-	lute.VditorWYSIWYG = true
-
-	var md string
-	md, err = lute.VditorDOM2Md(htmlStr)
-	if nil != err {
-		return
-	}
-
-	var tree *Tree
-	tree, err = lute.parse("", []byte(md))
-	if nil != err {
-		return
-	}
-
-	renderer := lute.newVditorRenderer(tree)
-	var output []byte
-	output, err = renderer.Render()
-	// 替换插入符
-	html = strings.ReplaceAll(string(output), caret, "<wbr>")
-	return
-}
-
-// HTML2VditorDOM 将 HTML 转换为 Vditor DOM。
-func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string, err error) {
-	lute.VditorWYSIWYG = true
-
-	var md string
-	md, err = lute.HTML2Md(htmlStr)
-	if nil != err {
-		return
-	}
-
-	var tree *Tree
-	tree, err = lute.parse("", []byte(md))
-	if nil != err {
-		return
-	}
-
-	renderer := lute.newVditorRenderer(tree)
-	var output []byte
-	output, err = renderer.Render()
-	html = string(output)
-	return
-}
-
-// VditorDOM2Md 将 Vditor DOM 转换为 Markdown 文本。
-func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
-	// 替换插入符
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
-
+// HTML2Md 将 HTML 转换为 Markdown 文本。
+func (lute *Lute) HTML2Md(htmlStr string) (md string, err error) {
 	// 将字符串解析为 DOM 树
 
 	reader := strings.NewReader(htmlStr)
@@ -88,7 +35,7 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
 	tree := &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
 	tree.context.tip = tree.Root
 	for _, htmlNode := range htmlNodes {
-		lute.genASTByVditorDOM(htmlNode, tree)
+		lute.genASTByDOM(htmlNode, tree)
 	}
 
 	// 调整树结构
@@ -119,8 +66,8 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
 	return
 }
 
-// genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
-func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
+// genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
+func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	node := &Node{typ: NodeText, tokens: strToBytes(n.Data)}
 	switch n.DataAtom {
 	case 0:
@@ -144,16 +91,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-	case atom.Wbr:
-		node.typ = NodeText
-		node.tokens = strToBytes("<wbr>")
-		lastc := tree.context.tip.lastDeepestChild()
-		if NodeParagraph == lastc.typ {
-			lastc.AppendChild(node)
-		} else {
-			lastc.AppendTokens(node.tokens)
-		}
-		return
 	case atom.Div:
 		class := lute.domAttrValue(n, "class")
 		if strings.Contains(class, "vditor-panel") {
@@ -187,26 +124,19 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if atom.Ol == n.DataAtom {
 			node.listData.typ = 1
 		}
-		tight := lute.domAttrValue(n, "data-tight")
-		if "true" == tight || "" == tight {
-			node.tight = true
-		}
+		node.tight = true
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Li:
 		node.typ = NodeListItem
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			if atom.Ol == n.Parent.DataAtom {
-				start := lute.domAttrValue(n.Parent, "start")
-				if "" == start {
-					marker = "1."
-				} else {
-					marker = start + "."
-				}
+		marker := "*"
+		if atom.Ol == n.Parent.DataAtom {
+			start := lute.domAttrValue(n.Parent, "start")
+			if "" == start {
+				marker = "1."
 			} else {
-				marker = "*"
+				marker = start + "."
 			}
 		}
 		node.listData = &listData{marker: strToBytes(marker)}
@@ -228,29 +158,15 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		defer tree.context.parentTip(n)
 	case atom.Em, atom.I:
 		node.typ = NodeEmphasis
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "*"
-		}
-		if "_" == marker {
-			node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToBytes(marker)})
-		} else {
-			node.AppendChild(&Node{typ: NodeEmA6kOpenMarker, tokens: strToBytes(marker)})
-		}
+		marker := "*"
+		node.AppendChild(&Node{typ: NodeEmA6kOpenMarker, tokens: strToBytes(marker)})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Strong, atom.B:
 		node.typ = NodeStrong
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "**"
-		}
-		if "__" == marker {
-			node.AppendChild(&Node{typ: NodeStrongU8eOpenMarker, tokens: strToBytes(marker)})
-		} else {
-			node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToBytes(marker)})
-		}
+		marker := "**"
+		node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToBytes(marker)})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -313,12 +229,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 	case atom.Del, atom.S, atom.Strike:
 		node.typ = NodeStrikethrough
-		marker := lute.domAttrValue(n, "data-marker")
-		if "~" == marker {
-			node.AppendChild(&Node{typ: NodeStrikethrough1OpenMarker, tokens: strToBytes(marker)})
-		} else {
-			node.AppendChild(&Node{typ: NodeStrikethrough2OpenMarker, tokens: strToBytes(marker)})
-		}
+		marker := "~"
+		node.AppendChild(&Node{typ: NodeStrikethrough1OpenMarker, tokens: strToBytes(marker)})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -349,12 +261,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Span:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" != marker {
-			node.tokens = strToBytes(lute.domText(n))
-		} else {
-			node.tokens = strToBytes("")
-		}
+		node.tokens = strToBytes(lute.domText(n))
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -385,30 +292,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.genASTByVditorDOM(c, tree)
+		lute.genASTByDOM(c, tree)
 	}
 
 	switch n.DataAtom {
 	case atom.Em, atom.I:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "*"
-		}
-		if "_" == marker {
-			node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToBytes(marker)})
-		} else {
-			node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: strToBytes(marker)})
-		}
+		marker := "*"
+		node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: strToBytes(marker)})
 	case atom.Strong, atom.B:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "**"
-		}
-		if "__" == marker {
-			node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: strToBytes(marker)})
-		} else {
-			node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToBytes(marker)})
-		}
+		marker := "**"
+		node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToBytes(marker)})
 	case atom.Pre:
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
 	case atom.Code:
@@ -426,75 +319,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		node.AppendChild(&Node{typ: NodeCloseParen})
 	case atom.Del, atom.S, atom.Strike:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "~" == marker {
-			node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: strToBytes(marker)})
-		} else {
-			node.AppendChild(&Node{typ: NodeStrikethrough2CloseMarker, tokens: strToBytes(marker)})
-		}
-	}
-}
-
-func (context *Context) parentTip(n *html.Node) {
-	for tip := context.tip.parent; nil != tip; tip = tip.parent {
-		if NodeParagraph == tip.typ {
-			if nil == n.NextSibling {
-				continue
-			}
-			nextType := n.NextSibling.DataAtom
-			if atom.Ul == nextType ||
-				atom.Ol == nextType {
-				continue
-			}
-		}
-		context.tip = tip
-		break
-	}
-}
-
-// firstChildIsText 用于判断 n 的第一个子节点是否是文本节点。
-func (lute *Lute) firstChildIsText(n *html.Node) bool {
-	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		if caret == c.Data {
-			continue // 不考虑插入符
-		}
-		return 0 == c.DataAtom || atom.Em == c.DataAtom
-	}
-	return false
-}
-
-func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {
-	for _, attr := range n.Attr {
-		if attr.Key == attrName {
-			return true
-		}
-	}
-	return false
-}
-
-func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
-	for _, attr := range n.Attr {
-		if attr.Key == attrName {
-			return attr.Val
-		}
-	}
-	return ""
-}
-
-func (lute *Lute) domText(n *html.Node) string {
-	buf := &bytes.Buffer{}
-	lute.domText0(n, buf)
-	return buf.String()
-}
-
-func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
-	if nil == n {
-		return
-	}
-	if 0 == n.DataAtom {
-		buffer.WriteString(n.Data)
-	}
-	for child := n.FirstChild; nil != child; child = child.NextSibling {
-		lute.domText0(child, buffer)
+		marker := "~"
+		node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: strToBytes(marker)})
 	}
 }

@@ -14,8 +14,6 @@ package lute
 
 import (
 	"strings"
-
-	"github.com/b3log/lute/html"
 )
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
@@ -103,37 +101,6 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 	}
 
 	formatted = bytesToStr(formattedBytes)
-	return
-}
-
-// Html2Md 将 htmlStr 转换为 markdown 文本。
-func (lute *Lute) Html2Md(htmlStr string) (md string, err error) {
-	// 将字符串解析为 DOM 树
-
-	reader := strings.NewReader(htmlStr)
-	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
-	if nil != err {
-		return
-	}
-
-	// 将 HTML 树转换为 Markdown AST
-
-	tree := &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
-	tree.context.tip = tree.Root
-	for _, htmlNode := range htmlNodes {
-		lute.genASTByVditorDOM(htmlNode, tree)
-	}
-
-	// 将 AST 进行 Markdown 格式化渲染
-
-	var formatted []byte
-	renderer := lute.newFormatRenderer(tree)
-	formatted, err = renderer.Render()
-	if nil != err {
-		return
-	}
-	md = bytesToStr(formatted)
 	return
 }
 
