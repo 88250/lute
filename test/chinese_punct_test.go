@@ -20,6 +20,7 @@ import (
 
 var chinesePunctTests = []parseTest{
 
+	{"3", "感叹号!问号?\n", "<p>感叹号！问号？</p>\n"},
 	{"2", "中文,。冒号:bar.英文句号在前\n", "<p>中文，。冒号：bar.英文句号在前</p>\n"},
 	{"1", "foo,bar.\n", "<p>foo,bar.</p>\n"},
 	{"0", "中文,逗号句号.\n", "<p>中文，逗号句号。</p>\n"},

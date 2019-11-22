@@ -38,8 +38,10 @@ func commaPeriod(prefix string, nextChar rune) string {
 	nextCharIsEnglishComma := ',' == nextChar
 	nextCharIsEnglishPeriod := '.' == nextChar
 	nextCharIsEnglishColon := ':' == nextChar
+	nextCharIsEnglishBang := '!' == nextChar
+	nextCharIsEnglishQuestion := '?' == nextChar
 
-	if !nextCharIsEnglishComma && !nextCharIsEnglishPeriod && !nextCharIsEnglishColon {
+	if !nextCharIsEnglishComma && !nextCharIsEnglishPeriod && !nextCharIsEnglishColon && !nextCharIsEnglishBang && !nextCharIsEnglishQuestion {
 		return prefix + string(nextChar)
 	}
 
@@ -52,7 +54,12 @@ func commaPeriod(prefix string, nextChar rune) string {
 		return prefix + "，"
 	} else if nextCharIsEnglishPeriod {
 		return prefix + "。"
-	} else {
+	} else if nextCharIsEnglishColon {
 		return prefix + "："
+	} else if nextCharIsEnglishBang {
+		return prefix + "！"
+	} else if nextCharIsEnglishQuestion {
+		return prefix + "？"
 	}
+	return prefix + string(nextChar)
 }
