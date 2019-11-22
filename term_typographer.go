@@ -75,12 +75,6 @@ func isNotTerm(token byte) bool {
 	return token >= utf8.RuneSelf || isWhitespace(token) || isASCIIPunct(token)
 }
 
-func replaceAtIndex(str string, r rune, i int) string {
-	out := []rune(str)
-	out[i] = r
-	return string(out)
-}
-
 func newTerms() (ret map[string]string) {
 	ret = make(map[string]string, len(terms))
 	for k, v := range terms {
