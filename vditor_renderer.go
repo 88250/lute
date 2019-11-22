@@ -329,6 +329,9 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 	if r.option.FixTermTypo {
 		r.fixTermTypo(node)
 	}
+	if r.option.ChinesePunct {
+		r.chinesePunct(node)
+	}
 	r.write(node.tokens)
 	return WalkStop, nil
 }

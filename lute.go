@@ -27,6 +27,7 @@ type Lute struct {
 //  * 软换行转硬换行
 //  * 中西文间插入空格
 //  * 修正术语拼写
+//  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 //  * 并行解析
 func New(opts ...option) (ret *Lute) {
@@ -43,6 +44,7 @@ func New(opts ...option) (ret *Lute) {
 	ret.CodeSyntaxHighlightStyleName = "github"
 	ret.AutoSpace = true
 	ret.FixTermTypo = true
+	ret.ChinesePunct = true
 	ret.Emoji = true
 	ret.AliasEmoji, ret.EmojiAlias = newEmojis()
 	ret.Terms = newTerms()
@@ -186,6 +188,8 @@ type options struct {
 	// https://github.com/sparanoid/chinese-copywriting-guidelines
 	// 注意：开启术语修正的话会默认在中西文之间插入空格。
 	FixTermTypo bool
+	// ChinesePunct 设置是否对普通文本中出现中文后跟英文逗号句号等标点替换为中文对应标点。
+	ChinesePunct bool
 	// Emoji 设置是否对 Emoji 别名替换为原生 Unicode 字符。
 	Emoji bool
 	// AliasEmoji 存储 ASCII 别名到表情 Unicode 映射。
@@ -257,6 +261,10 @@ func (lute *Lute) SetAutoSpace(b bool) {
 
 func (lute *Lute) SetFixTermTypo(b bool) {
 	lute.FixTermTypo = b
+}
+
+func (lute *Lute) SetPunct(b bool) {
+	lute.ChinesePunct = b
 }
 
 func (lute *Lute) SetEmoji(b bool) {

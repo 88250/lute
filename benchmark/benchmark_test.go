@@ -41,6 +41,7 @@ func BenchmarkLute(b *testing.B) {
 	luteEngine.CodeSyntaxHighlight = false
 	luteEngine.AutoSpace = false
 	luteEngine.FixTermTypo = false
+	luteEngine.ChinesePunct = false
 	luteEngine.Emoji = false
 	html, err := luteEngine.Markdown("spec text", bytes)
 	if nil != err {

@@ -40,13 +40,13 @@ func addSpaceAtBoundary(prefix string, nextChar rune) string {
 	}
 
 	currentChar, _ := utf8.DecodeLastRuneInString(prefix)
-	if isAllowSpace(currentChar, nextChar) {
+	if allowSpace(currentChar, nextChar) {
 		return prefix + " " + string(nextChar)
 	}
 	return prefix + string(nextChar)
 }
 
-func isAllowSpace(currentChar, nextChar rune) bool {
+func allowSpace(currentChar, nextChar rune) bool {
 	if unicode.IsSpace(currentChar) || !unicode.IsPrint(currentChar) {
 		return false
 	}

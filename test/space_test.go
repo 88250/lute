@@ -38,6 +38,7 @@ var spaceTests = []parseTest{
 
 func TestAutoSpace(t *testing.T) {
 	luteEngine := lute.New() // 默认已经开启自动空格优化
+	luteEngine.ChinesePunct = false
 
 	for _, test := range spaceTests {
 		html, err := luteEngine.MarkdownStr(test.name, test.from)

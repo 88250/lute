@@ -343,6 +343,9 @@ func (r *HTMLRenderer) renderText(node *Node, entering bool) (WalkStatus, error)
 	if r.option.FixTermTypo {
 		r.fixTermTypo(node)
 	}
+	if r.option.ChinesePunct {
+		r.chinesePunct(node)
+	}
 	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }

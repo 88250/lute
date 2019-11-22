@@ -257,6 +257,7 @@ func TestParse(t *testing.T) {
 	luteEngine.CodeSyntaxHighlight = false
 	luteEngine.AutoSpace = false
 	luteEngine.FixTermTypo = false
+	luteEngine.ChinesePunct = false
 	luteEngine.Emoji = false
 
 	for _, test := range parseTests {

@@ -68,7 +68,7 @@ var a = 1
 
 #### 语法高亮支持
 
-如果在 ``` 后面跟随语言名称，可以有语法高亮的效果哦，比如:
+如果在 ``` 后面跟随语言名称，可以有语法高亮的效果哦，比如：
 
 ##### 演示 Go 代码高亮
 
@@ -94,7 +94,7 @@ public class HelloWorld {
 }
 ```
 
-> Tip: 语言名称支持下面这些: `ruby`, `python`, `js`, `html`, `erb`, `css`, `coffee`, `bash`, `json`, `yml`, `xml` ...
+> Tip: 语言名称支持下面这些：`ruby`, `python`, `js`, `html`, `erb`, `css`, `coffee`, `bash`, `json`, `yml`, `xml` ...
 
 ### 有序、无序、任务列表
 
