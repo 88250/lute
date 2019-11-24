@@ -27,7 +27,7 @@ import (
 func main() {
 	dir := "chroma-styles"
 	prefix := "highlight-"
-	formatter := chromahtml.New(chromahtml.WithClasses(), chromahtml.ClassPrefix(prefix))
+	formatter := chromahtml.New(chromahtml.WithClasses(true), chromahtml.ClassPrefix(prefix))
 	var b bytes.Buffer
 	names := styles.Names()
 	for _, name := range names {
