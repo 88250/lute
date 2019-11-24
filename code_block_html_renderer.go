@@ -115,14 +115,14 @@ func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered 
 	iterator, err := lexer.Tokenise(nil, codeBlock)
 	if nil == err {
 		chromahtmlOpts := []chromahtml.Option{
-			chromahtml.PreventSurroundingPre(),
+			chromahtml.PreventSurroundingPre(true),
 			chromahtml.ClassPrefix("highlight-"),
 		}
 		if !r.option.CodeSyntaxHighlightInlineStyle {
-			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithClasses())
+			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithClasses(true))
 		}
 		if r.option.CodeSyntaxHighlightLineNum {
-			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithLineNumbers())
+			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithLineNumbers(true))
 		}
 		formatter := chromahtml.New(chromahtmlOpts...)
 		style := styles.Get(r.option.CodeSyntaxHighlightStyleName)
