@@ -159,7 +159,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if strings.Contains(class, "vditor-panel") {
 			return
 		}
-		fallthrough
 	case atom.P:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
@@ -376,7 +375,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeHTMLBlock
 		buf := &bytes.Buffer{}
 		html.Render(buf, n)
-		tokens := buf.Bytes()
+		tokens := []byte("<div class=\"vditor-block\" data-type=\"pre\">\n")
+		tokens = append(tokens, buf.Bytes()...)
+		tokens = append(tokens, []byte("\n</div>\n")...)
 		node.tokens = tokens
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node

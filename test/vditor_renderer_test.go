@@ -87,6 +87,8 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var vditorRendererTests = []*parseTest{
 
+	{"27", "<p>foo<audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio>bar</p>", "\n<audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio>\n"},
+	{"27", "<p><wbr></p>", "<p>\n<wbr></p>"},
 	{"26", "<p>![alt](src \"title\")</p>", "<p><img src=\"src\" alt=\"alt\" title=\"title\" /></p>"},
 	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<pre><code class=\"language-java\"><wbr>\n</code></pre>\n"},
 	{"24", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /></li></ul>"},
@@ -100,7 +102,7 @@ var vditorRendererTests = []*parseTest{
 	{"16", "<p>[](</p>", "<p>[](</p>"},
 	{"15", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
 	{"14", ":octocat:", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
-	{"13", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>\n"},
+	{"13", "<div class=\"vditor-block\"><table><thead><tr><th>abc</th><th>def</th></tr></thead></table></div>", "<table><thead><tr><th>abc</th><th>def</th></tr></thead></table>\n"},
 	{"12", "<p><s data-marker=\"~~\">Hi</s> Hello, world!</p>", "<p><s data-marker=\"~~\">Hi</s> Hello, world!</p>"},
 	{"11", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "<p><s data-marker=\"~\">Hi</s> Hello, world!</p>"},
 	{"10", "<ul><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},

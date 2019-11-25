@@ -185,7 +185,6 @@ func (r *VditorRenderer) renderTable(node *Node, entering bool) (WalkStatus, err
 			r.tag("/tbody", nil, false)
 		}
 		r.tag("/table", nil, false)
-		r.tailBlank(node)
 	}
 	return WalkContinue, nil
 }
@@ -292,7 +291,9 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
+	r.newline()
 	r.write(node.tokens)
+	r.newline()
 	return WalkStop, nil
 }
 
@@ -316,6 +317,9 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 
 	if entering {
 		r.tag("p", nil, false)
+		if nil != node.firstChild && NodeText == node.firstChild.typ && caret == bytesToStr(node.firstChild.tokens) {
+			r.writeByte(itemNewline)
+		}
 	} else {
 		r.tag("/p", nil, false)
 	}
@@ -526,19 +530,14 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 		r.writeString("<pre><code>")
 		r.write(node.tokens)
 		r.writeString("</code></pre>")
-		r.tailBlank(node)
 		return WalkStop, nil
 	}
-	if !entering {
-		r.tailBlank(node)
+	if entering {
+		r.writeString("<div class=\"vditor-block\">")
+	} else {
+		r.writeString("</div>")
 	}
 	return WalkContinue, nil
-}
-
-func (r *VditorRenderer) tailBlank(node *Node) {
-	if node == r.tree.Root.lastChild {
-		r.writeString("\n")
-	}
 }
 
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {

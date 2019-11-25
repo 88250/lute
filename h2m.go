@@ -96,7 +96,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		if strings.Contains(class, "vditor-panel") {
 			return
 		}
-		fallthrough
 	case atom.P:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
