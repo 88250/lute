@@ -166,7 +166,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			if passed, remains, dest = t.context.parseInlineLinkDest(remains); nil == passed {
 				break
 			}
-			if t.context.option.VditorWYSIWYG && (1 > len(dest) || nil == opener.node.next) {
+			if t.context.option.VditorWYSIWYG && (1 > len(dest) || (nil == opener.node.next && !isImage)) {
 				break
 			}
 			ctx.pos += len(passed)

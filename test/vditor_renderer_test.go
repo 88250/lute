@@ -87,6 +87,7 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var vditorRendererTests = []*parseTest{
 
+	{"26", "<p>![alt](src \"title\")</p>", "<p><img src=\"src\" alt=\"alt\" title=\"title\" /></p>"},
 	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<pre><code class=\"language-java\"><wbr>\n</code></pre>\n"},
 	{"24", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /></li></ul>"},
 	{"23", "<ol><li data-marker=\"1.\">foo</li></ol>", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ol>"},
