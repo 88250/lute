@@ -121,6 +121,11 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
 
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
+	class := lute.domAttrValue(n, "class")
+	if strings.Contains(class, "vditor-panel") || strings.Contains(class, "vditor-wysiwyg__preview"){
+		return
+	}
+
 	node := &Node{typ: NodeText, tokens: strToBytes(n.Data)}
 	switch n.DataAtom {
 	case 0:
@@ -131,7 +136,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 					node.typ = NodeCodeSpanContent
 				} else {
 					node.typ = NodeCodeBlockCode
-					class := lute.domAttrValue(n.Parent, "class")
 					if strings.Contains(class, "language-") {
 						language := class[len("language-"):]
 						tree.context.tip.lastChild.codeBlockInfo = strToBytes(language)
@@ -154,11 +158,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			lastc.AppendTokens(node.tokens)
 		}
 		return
-	case atom.Div:
-		class := lute.domAttrValue(n, "class")
-		if strings.Contains(class, "vditor-panel") {
-			return
-		}
 	case atom.P:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
@@ -274,7 +273,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Img:
-		imgClass := lute.domAttrValue(n, "class")
+		imgClass := class
 		imgAlt := lute.domAttrValue(n, "alt")
 		if "emoji" == imgClass {
 			node.typ = NodeEmoji
@@ -375,9 +374,15 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeHTMLBlock
 		buf := &bytes.Buffer{}
 		html.Render(buf, n)
-		tokens := []byte("<div class=\"vditor-block\" data-type=\"pre\">\n")
-		tokens = append(tokens, buf.Bytes()...)
-		tokens = append(tokens, []byte("\n</div>\n")...)
+		bufTokens := buf.Bytes()
+		var tokens []byte
+		if !bytes.HasPrefix(bufTokens, []byte("<div class=")) {
+			tokens = []byte("<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\">")
+			tokens = append(tokens, bufTokens...)
+			tokens = append(tokens, []byte("</textarea></div>\n")...)
+		} else {
+			tokens = bufTokens
+		}
 		node.tokens = tokens
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node

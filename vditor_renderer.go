@@ -533,7 +533,7 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 		return WalkStop, nil
 	}
 	if entering {
-		r.writeString("<div class=\"vditor-block\">")
+		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"pre\">")
 	} else {
 		r.writeString("</div>")
 	}
