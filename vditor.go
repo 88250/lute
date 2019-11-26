@@ -73,7 +73,7 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 	lute.VditorWYSIWYG = true
 
-	markdown, err := lute.HTML2Md(htmlStr)
+	markdown, err := lute.HTML2Markdown(htmlStr)
 	if nil != err {
 		html = err.Error()
 		return
@@ -173,12 +173,41 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
+// RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
+func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
+	tree, err := lute.parse("", []byte(markdown))
+	if nil != err {
+		json = err.Error()
+		return
+	}
+
+	renderer := lute.newEChartsJSONRenderer(tree)
+	var output []byte
+	output, err = renderer.Render()
+	if nil != err {
+		json = err.Error()
+		return
+	}
+	json = string(output)
+	return
+}
+
+// HTML2Md 用于将 HTML 转换为 markdown。
+func (lute *Lute) HTML2Md(html string) (markdown string) {
+	markdown, err := lute.HTML2Markdown(html)
+	if nil != err {
+		markdown = err.Error()
+		return
+	}
+	return
+}
+
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	class := lute.domAttrValue(n, "class")
 	if strings.Contains(class, "vditor-") && !strings.Contains(class, "vditor-task") {
 		// Vditor 块结构用段落节点分隔
-		p := &Node{typ:NodeParagraph}
+		p := &Node{typ: NodeParagraph}
 		tree.context.tip.AppendChild(p)
 		tree.context.tip = p
 		defer tree.context.parentTip(n)

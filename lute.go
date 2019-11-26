@@ -144,21 +144,6 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 	}
 }
 
-// RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
-func (lute *Lute) RenderEChartsJSON(markdownText string) (json string, err error) {
-	var tree *Tree
-	tree, err = lute.parse("", []byte(markdownText))
-	if nil != err {
-		return
-	}
-
-	renderer := lute.newEChartsJSONRenderer(tree)
-	var output []byte
-	output, err = renderer.Render()
-	json = string(output)
-	return
-}
-
 // options 描述了一些列解析和渲染选项。
 type options struct {
 	// GFMTable 设置是否打开“GFM 表”支持。
