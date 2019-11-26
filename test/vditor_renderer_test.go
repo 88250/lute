@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"44", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code class=\"language-java\">foo<wbr>\n</code></pre></div>", "f*o*o\n"},
 	{"43", "<p>f<i>o</i>o<wbr></p>", "f*o*o\n"},
 	{"42", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<br></li><ul><li data-marker=\"*\">b<wbr></li></ul></ul>", "* foo<br />\n  * b\n"},
 	{"41", "<pre><code class=\"language-go\"><wbr></code></pre>", "```go\n```\n"},
@@ -80,7 +81,7 @@ func TestVditorDOM2Md(t *testing.T) {
 	}
 }
 
-var vditorRendererTests = []*parseTest{
+var spinVditorDOMTests = []*parseTest{
 
 	{"29", "<p><wbr><br></p>", "<p><wbr><br /></p>"},
 	{"28", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>"},
@@ -117,7 +118,7 @@ var vditorRendererTests = []*parseTest{
 func TestSpinVditorDOM(t *testing.T) {
 	luteEngine := lute.New()
 
-	for _, test := range vditorRendererTests {
+	for _, test := range spinVditorDOMTests {
 		html := luteEngine.SpinVditorDOM(test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
