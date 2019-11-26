@@ -190,6 +190,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 					node.typ = NodeCodeSpanContent
 				} else {
 					node.typ = NodeCodeBlockCode
+					class := lute.domAttrValue(n.Parent, "class")
 					if strings.Contains(class, "language-") {
 						language := class[len("language-"):]
 						tree.context.tip.lastChild.codeBlockInfo = []byte(language)
@@ -303,6 +304,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			defer tree.context.parentTip(n)
+		} else {
+			if nil == node.firstChild {
+				node.typ = NodeCodeBlockCode
+				if strings.Contains(class, "language-") {
+					language := class[len("language-"):]
+					tree.context.tip.lastChild.codeBlockInfo = []byte(language)
+				}
+			}
 		}
 	case atom.Br:
 		node.typ = NodeInlineHTML
