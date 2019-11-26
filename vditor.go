@@ -14,17 +14,39 @@ package lute
 
 import (
 	"bytes"
+	"strings"
+
 	"github.com/b3log/lute/html"
 	"github.com/b3log/lute/html/atom"
-	"strings"
 )
 
 // 插入符 \u2038
 const caret = "‸"
 
-// RenderVditorDOM 用于渲染 Vditor DOM。
-func (lute *Lute) RenderVditorDOM(htmlStr string) (html string, err error) {
+// Md2Html 将 markdown 转换为标准 HTML，用于源码模式预览。
+func (lute *Lute) Md2HTML(markdown string) (html string) {
+	html, err := lute.MarkdownStr("", markdown)
+	if nil != err {
+		html = err.Error()
+	}
+	return
+}
+
+// FormatMd 将 markdown 进行格式化输出 formatted，用于源码模式格式化。
+func (lute *Lute) FormatMd(markdown string) (formatted string) {
+	formatted, err := lute.FormatStr("", markdown)
+	if nil != err {
+		formatted = err.Error()
+	}
+	return
+}
+
+// SpinVditorDOM 用于 Vditor DOM 自旋。
+func (lute *Lute) SpinVditorDOM(htmlStr string) (html string, err error) {
 	lute.VditorWYSIWYG = true
+
+	// 替换插入符
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
 
 	var md string
 	md, err = lute.VditorDOM2Md(htmlStr)
@@ -69,7 +91,7 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string, err error) {
 	return
 }
 
-// Md2VditorDOM 将 Markdown 转换为 Vditor DOM。
+// Md2VditorDOM 将 markdown 转换为 Vditor DOM，用于从源码模式切换至所见即所得模式。
 func (lute *Lute) Md2VditorDOM(markdown string) (html string, err error) {
 	var tree *Tree
 	tree, err = lute.parse("", []byte(markdown))
@@ -84,10 +106,10 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string, err error) {
 	return
 }
 
-// VditorDOM2Md 将 Vditor DOM 转换为 Markdown。
-func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
-	// 替换插入符
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
+// VditorDOM2Md 将 Vditor DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
+func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string, err error) {
+	// 删掉插入符
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
 
 	// 将字符串解析为 DOM 树
 
@@ -130,18 +152,18 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
 	if nil != err {
 		return
 	}
-	md = bytesToStr(formatted)
+	markdown = string(formatted)
 	return
 }
 
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	class := lute.domAttrValue(n, "class")
-	if strings.Contains(class, "vditor-panel") || strings.Contains(class, "vditor-wysiwyg__preview"){
+	if strings.Contains(class, "vditor-panel") || strings.Contains(class, "vditor-wysiwyg__preview") {
 		return
 	}
 
-	node := &Node{typ: NodeText, tokens: strToBytes(n.Data)}
+	node := &Node{typ: NodeText, tokens: []byte(n.Data)}
 	switch n.DataAtom {
 	case 0:
 		if nil != n.Parent {
@@ -153,7 +175,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 					node.typ = NodeCodeBlockCode
 					if strings.Contains(class, "language-") {
 						language := class[len("language-"):]
-						tree.context.tip.lastChild.codeBlockInfo = strToBytes(language)
+						tree.context.tip.lastChild.codeBlockInfo = []byte(language)
 					}
 				}
 			case atom.A:
@@ -163,16 +185,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-	case atom.Wbr:
-		node.typ = NodeText
-		node.tokens = strToBytes("<wbr>")
-		lastc := tree.context.tip.lastDeepestChild()
-		if NodeParagraph == lastc.typ {
-			lastc.AppendChild(node)
-		} else {
-			lastc.AppendTokens(node.tokens)
-		}
-		return
 	case atom.P:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
@@ -181,7 +193,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		node.typ = NodeHeading
 		node.headingLevel = int(node.tokens[1] - byte('0'))
-		node.AppendChild(&Node{typ: NodeHeadingC8hMarker, tokens: strToBytes(strings.Repeat("#", node.headingLevel))})
+		node.AppendChild(&Node{typ: NodeHeadingC8hMarker, tokens: []byte(strings.Repeat("#", node.headingLevel))})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -190,7 +202,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 	case atom.Blockquote:
 		node.typ = NodeBlockquote
-		node.AppendChild(&Node{typ: NodeBlockquoteMarker, tokens: strToBytes(">")})
+		node.AppendChild(&Node{typ: NodeBlockquoteMarker, tokens: []byte(">")})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -222,7 +234,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				marker = "*"
 			}
 		}
-		node.listData = &listData{marker: strToBytes(marker)}
+		node.listData = &listData{marker: []byte(marker)}
 		if lute.firstChildIsText(n) {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
@@ -234,7 +246,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Pre:
 		node.typ = NodeCodeBlock
 		node.isFencedCodeBlock = true
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
+		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -246,9 +258,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			marker = "*"
 		}
 		if "_" == marker {
-			node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeEmU8eOpenMarker, tokens: []byte(marker)})
 		} else {
-			node.AppendChild(&Node{typ: NodeEmA6kOpenMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeEmA6kOpenMarker, tokens: []byte(marker)})
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -260,9 +272,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			marker = "**"
 		}
 		if "__" == marker {
-			node.AppendChild(&Node{typ: NodeStrongU8eOpenMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeStrongU8eOpenMarker, tokens: []byte(marker)})
 		} else {
-			node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: []byte(marker)})
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -270,14 +282,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Code:
 		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
 			node.typ = NodeCodeSpan
-			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: strToBytes("`")})
+			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			defer tree.context.parentTip(n)
 		}
 	case atom.Br:
 		node.typ = NodeInlineHTML
-		node.tokens = strToBytes("<br />")
+		node.tokens = []byte("<br />")
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -293,18 +305,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if "emoji" == imgClass {
 			node.typ = NodeEmoji
 			emojiImg := &Node{typ: NodeEmojiImg, tokens: tree.emojiImgTokens(imgAlt, lute.domAttrValue(n, "src"))}
-			emojiImg.AppendChild(&Node{typ: NodeEmojiAlias, tokens: strToBytes(":" + imgAlt + ":")})
+			emojiImg.AppendChild(&Node{typ: NodeEmojiAlias, tokens: []byte(":" + imgAlt + ":")})
 			node.AppendChild(emojiImg)
 		} else {
 			node.typ = NodeImage
 			node.AppendChild(&Node{typ: NodeBang})
 			node.AppendChild(&Node{typ: NodeOpenBracket})
 			if "" != imgAlt {
-				node.AppendChild(&Node{typ: NodeLinkText, tokens: strToBytes(imgAlt)})
+				node.AppendChild(&Node{typ: NodeLinkText, tokens: []byte(imgAlt)})
 			}
 			node.AppendChild(&Node{typ: NodeCloseBracket})
 			node.AppendChild(&Node{typ: NodeOpenParen})
-			node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToBytes(lute.domAttrValue(n, "src"))})
+			node.AppendChild(&Node{typ: NodeLinkDest, tokens: []byte(lute.domAttrValue(n, "src"))})
 			node.AppendChild(&Node{typ: NodeCloseParen})
 		}
 		tree.context.tip.AppendChild(node)
@@ -314,9 +326,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeTaskListItemMarker
 		if lute.hasAttr(n, "checked") {
 			node.taskListItemChecked = true
-			node.tokens = strToBytes("[X]")
+			node.tokens = []byte("[X]")
 		} else {
-			node.tokens = strToBytes("[ ]")
+			node.tokens = []byte("[ ]")
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -328,9 +340,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeStrikethrough
 		marker := lute.domAttrValue(n, "data-marker")
 		if "~" == marker {
-			node.AppendChild(&Node{typ: NodeStrikethrough1OpenMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeStrikethrough1OpenMarker, tokens: []byte(marker)})
 		} else {
-			node.AppendChild(&Node{typ: NodeStrikethrough2OpenMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeStrikethrough2OpenMarker, tokens: []byte(marker)})
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -364,27 +376,27 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Span:
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" != marker {
-			node.tokens = strToBytes(lute.domText(n))
+			node.tokens = []byte(lute.domText(n))
 		} else {
-			node.tokens = strToBytes("")
+			node.tokens = []byte("")
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-	case atom.Details:
-		node.typ = NodeHTMLBlock
-		buf := &bytes.Buffer{}
-		//n.Attr = nil
-		html.Render(buf, n)
-		tokens := buf.Bytes()
-		//tokens = bytes.ReplaceAll(tokens, []byte("</summary>\n"), []byte("</summary>"))
-		//tokens = bytes.ReplaceAll(tokens, []byte("\n</details>"), []byte("</details>"))
-		tokens = append(tokens, []byte("<p></p>")...)
-		node.tokens = tokens
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
-		return
+	//case atom.Details:
+	//	node.typ = NodeHTMLBlock
+	//	buf := &bytes.Buffer{}
+	//	//n.Attr = nil
+	//	html.Render(buf, n)
+	//	tokens := buf.Bytes()
+	//	//tokens = bytes.ReplaceAll(tokens, []byte("</summary>\n"), []byte("</summary>"))
+	//	//tokens = bytes.ReplaceAll(tokens, []byte("\n</details>"), []byte("</details>"))
+	//	tokens = append(tokens, []byte("<p></p>")...)
+	//	node.tokens = tokens
+	//	tree.context.tip.AppendChild(node)
+	//	tree.context.tip = node
+	//	defer tree.context.parentTip(n)
+	//	return
 	default:
 		node.typ = NodeHTMLBlock
 		buf := &bytes.Buffer{}
@@ -416,9 +428,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			marker = "*"
 		}
 		if "_" == marker {
-			node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: []byte(marker)})
 		} else {
-			node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: []byte(marker)})
 		}
 	case atom.Strong, atom.B:
 		marker := lute.domAttrValue(n, "data-marker")
@@ -426,32 +438,32 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			marker = "**"
 		}
 		if "__" == marker {
-			node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: []byte(marker)})
 		} else {
-			node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: []byte(marker)})
 		}
 	case atom.Pre:
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
+		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
 	case atom.Code:
 		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
-			node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: strToBytes("`")})
+			node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: []byte("`")})
 		}
 	case atom.A:
 		node.AppendChild(&Node{typ: NodeCloseBracket})
 		node.AppendChild(&Node{typ: NodeOpenParen})
-		node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToBytes(lute.domAttrValue(n, "href"))})
+		node.AppendChild(&Node{typ: NodeLinkDest, tokens: []byte(lute.domAttrValue(n, "href"))})
 		linkTitle := lute.domAttrValue(n, "title")
 		if "" != linkTitle {
 			node.AppendChild(&Node{typ: NodeLinkSpace})
-			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: strToBytes(linkTitle)})
+			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: []byte(linkTitle)})
 		}
 		node.AppendChild(&Node{typ: NodeCloseParen})
 	case atom.Del, atom.S, atom.Strike:
 		marker := lute.domAttrValue(n, "data-marker")
 		if "~" == marker {
-			node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: []byte(marker)})
 		} else {
-			node.AppendChild(&Node{typ: NodeStrikethrough2CloseMarker, tokens: strToBytes(marker)})
+			node.AppendChild(&Node{typ: NodeStrikethrough2CloseMarker, tokens: []byte(marker)})
 		}
 	}
 }
