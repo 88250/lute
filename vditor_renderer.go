@@ -291,9 +291,9 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	r.newline()
+	r.writeString("\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\">")
 	r.write(node.tokens)
-	r.newline()
+	r.writeString("</textarea></div>\n")
 	return WalkStop, nil
 }
 

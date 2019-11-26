@@ -176,7 +176,15 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	class := lute.domAttrValue(n, "class")
-	if strings.Contains(class, "vditor-panel") || strings.Contains(class, "vditor-wysiwyg__preview") {
+	if strings.Contains(class, "vditor-") && !strings.Contains(class, "vditor-task") {
+		// Vditor 块结构用段落节点分隔
+		p := &Node{typ:NodeParagraph}
+		tree.context.tip.AppendChild(p)
+		tree.context.tip = p
+		defer tree.context.parentTip(n)
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			lute.genASTByVditorDOM(c, tree)
+		}
 		return
 	}
 
@@ -427,16 +435,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeHTMLBlock
 		buf := &bytes.Buffer{}
 		html.Render(buf, n)
-		bufTokens := buf.Bytes()
-		var tokens []byte
-		if !bytes.HasPrefix(bufTokens, []byte("<div class=")) {
-			tokens = []byte("<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\">")
-			tokens = append(tokens, bufTokens...)
-			tokens = append(tokens, []byte("</textarea></div>\n")...)
-		} else {
-			tokens = bufTokens
-		}
-		node.tokens = tokens
+		node.tokens = buf.Bytes()
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
