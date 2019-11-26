@@ -19,8 +19,8 @@ import (
 	"strings"
 )
 
-// HTML2Md 将 HTML 转换为 Markdown 文本。
-func (lute *Lute) HTML2Md(htmlStr string) (md string, err error) {
+// HTML2Md 将 HTML 转换为 Markdown。
+func (lute *Lute) HTML2Md(htmlStr string) (markdown string, err error) {
 	// 将字符串解析为 DOM 树
 
 	reader := strings.NewReader(htmlStr)
@@ -62,7 +62,7 @@ func (lute *Lute) HTML2Md(htmlStr string) (md string, err error) {
 	if nil != err {
 		return
 	}
-	md = bytesToStr(formatted)
+	markdown = bytesToStr(formatted)
 	return
 }
 

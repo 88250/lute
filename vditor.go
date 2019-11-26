@@ -41,73 +41,81 @@ func (lute *Lute) FormatMd(markdown string) (formatted string) {
 	return
 }
 
-// SpinVditorDOM 用于 Vditor DOM 自旋。
-func (lute *Lute) SpinVditorDOM(htmlStr string) (html string, err error) {
+// SpinVditorDOM 自旋 Vditor DOM，用于所见即所得模式下的编辑。
+func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 	lute.VditorWYSIWYG = true
 
 	// 替换插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
 
-	var md string
-	md, err = lute.VditorDOM2Md(htmlStr)
-	if nil != err {
-		return
-	}
+	markdown := lute.VditorDOM2Md(htmlStr)
 
-	var tree *Tree
-	tree, err = lute.parse("", []byte(md))
+	tree, err := lute.parse("", []byte(markdown))
 	if nil != err {
+		html = err.Error()
 		return
 	}
 
 	renderer := lute.newVditorRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
+	if nil != err {
+		html = err.Error()
+		return
+	}
+
 	// 替换插入符
 	html = strings.ReplaceAll(string(output), caret, "<wbr>")
 	return
 }
 
-// HTML2VditorDOM 将 HTML 转换为 Vditor DOM。
-func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string, err error) {
+// HTML2VditorDOM 将 HTML 转换为 Vditor DOM，用于所见即所得模式下粘贴。
+func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 	lute.VditorWYSIWYG = true
 
-	var md string
-	md, err = lute.HTML2Md(htmlStr)
+	markdown, err := lute.HTML2Md(htmlStr)
 	if nil != err {
+		html = err.Error()
 		return
 	}
 
 	var tree *Tree
-	tree, err = lute.parse("", []byte(md))
+	tree, err = lute.parse("", []byte(markdown))
 	if nil != err {
+		html = err.Error()
 		return
 	}
 
 	renderer := lute.newVditorRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
+	if nil != err {
+		html = err.Error()
+	}
 	html = string(output)
 	return
 }
 
 // Md2VditorDOM 将 markdown 转换为 Vditor DOM，用于从源码模式切换至所见即所得模式。
-func (lute *Lute) Md2VditorDOM(markdown string) (html string, err error) {
-	var tree *Tree
-	tree, err = lute.parse("", []byte(markdown))
+func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
+	tree, err := lute.parse("", []byte(markdown))
 	if nil != err {
+		html = err.Error()
 		return
 	}
 
 	renderer := lute.newVditorRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
+	if nil != err {
+		html = err.Error()
+	}
 	html = string(output)
 	return
 }
 
 // VditorDOM2Md 将 Vditor DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
-func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string, err error) {
+func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 	// 删掉插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
 
@@ -117,6 +125,7 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string, err error) {
 	htmlRoot := &html.Node{Type: html.ElementNode}
 	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
 	if nil != err {
+		markdown = err.Error()
 		return
 	}
 
@@ -150,6 +159,7 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string, err error) {
 	renderer := lute.newFormatRenderer(tree)
 	formatted, err = renderer.Render()
 	if nil != err {
+		markdown = err.Error()
 		return
 	}
 	markdown = string(formatted)
