@@ -17,7 +17,7 @@ import (
 	"unicode/utf8"
 )
 
-// chinesePunct 会把文本节点 textNode 中的中文间的英文逗号句号换成中文的逗号句号。
+// chinesePunct 会把文本节点 textNode 中的中文间的英文标点换成对应的中文标点。
 func (r *BaseRenderer) chinesePunct(textNode *Node) {
 	text := bytesToStr(textNode.tokens)
 	text = chinesePunct0(text)
@@ -25,16 +25,24 @@ func (r *BaseRenderer) chinesePunct(textNode *Node) {
 }
 
 func chinesePunct0(text string) (ret string) {
-	for _, r := range text {
-		ret = commaPeriod(ret, r)
+	runes := []rune(text)
+	length := len(runes)
+	for i, r := range runes {
+		if '.' == r && i+1 < length && isFileExt(i+1, length, &runes) {
+			// 中文.合法扩展名 的形式不进行转换
+			ret += string(r)
+			continue
+		}
+		ret = chinesePunct00(ret, r)
 	}
 	return
 }
 
-func commaPeriod(prefix string, nextChar rune) string {
+func chinesePunct00(prefix string, nextChar rune) string {
 	if 0 == len(prefix) {
 		return string(nextChar)
 	}
+
 	nextCharIsEnglishComma := ',' == nextChar
 	nextCharIsEnglishPeriod := '.' == nextChar
 	nextCharIsEnglishColon := ':' == nextChar

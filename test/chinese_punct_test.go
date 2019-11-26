@@ -20,6 +20,10 @@ import (
 
 var chinesePunctTests = []parseTest{
 
+	// 标点转换需要排除文件后缀 https://github.com/b3log/lute/issues/41
+	{"5", "主页.1html 主页.html1\n", "<p>主页。1html 主页.html1</p>\n"},
+	{"4", "程序.exe 程序.exee 程序.no\n", "<p>程序.exe 程序.exee 程序。no</p>\n"},
+
 	{"3", "感叹号!问号?\n", "<p>感叹号！问号？</p>\n"},
 	{"2", "中文,。冒号:bar.英文句号在前\n", "<p>中文，。冒号：bar.英文句号在前</p>\n"},
 	{"1", "foo,bar.\n", "<p>foo,bar.</p>\n"},
