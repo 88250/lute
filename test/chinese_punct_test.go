@@ -21,6 +21,7 @@ import (
 var chinesePunctTests = []parseTest{
 
 	// 标点转换需要排除文件后缀 https://github.com/b3log/lute/issues/41
+	{"6", "名字@数字.exe\n", "<p>名字@数字.exe</p>\n"},
 	{"5", "主页.1html 主页.html1\n", "<p>主页。1html 主页.html1</p>\n"},
 	{"4", "程序.exe 程序.exee 程序.no\n", "<p>程序.exe 程序.exee 程序。no</p>\n"},
 
