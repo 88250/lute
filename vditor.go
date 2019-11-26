@@ -174,7 +174,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string, removeVditorBlock bool) (markdown
 	tree := &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
 	tree.context.tip = tree.Root
 	for _, htmlNode := range htmlNodes {
-		lute.genASTByVditorDOM(htmlNode, tree, removeVditorBlock)
+		lute.genASTByVditorDOM(htmlNode, tree)
 	}
 
 	// 调整树结构
@@ -207,7 +207,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string, removeVditorBlock bool) (markdown
 }
 
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
-func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree, removeVditorBlock bool) {
+func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	dataRender := lute.domAttrValue(n, "data-render")
 	if "false" == dataRender {
 		return
@@ -215,10 +215,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree, removeVditorBlock 
 
 	dataType := lute.domAttrValue(n, "data-type")
 	if "pre" == dataType || "html" == dataType {
-		//if removeVditorBlock {
-			lute.genASTByVditorDOM(n.FirstChild, tree, removeVditorBlock)
-			return
-		//}
+		// 如果是 HTML 块或者代码块则直接进入子节点处理，忽略当前 div 节点
+		lute.genASTByVditorDOM(n.FirstChild, tree)
+		return
 	}
 
 	class := lute.domAttrValue(n, "class")
@@ -477,7 +476,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree, removeVditorBlock 
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.genASTByVditorDOM(c, tree, removeVditorBlock)
+		lute.genASTByVditorDOM(c, tree)
 	}
 
 	switch n.DataAtom {
