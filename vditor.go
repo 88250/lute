@@ -96,6 +96,13 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 	return
 }
 
+// VditorDOM2HTML 将 Vditor DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
+func (lute *Lute) VditorDOM2HTML(vhtml string) (html string) {
+	markdown := lute.VditorDOM2Md(vhtml)
+	html = lute.Md2HTML(markdown)
+	return
+}
+
 // Md2VditorDOM 将 markdown 转换为 Vditor DOM，用于从源码模式切换至所见即所得模式。
 func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 	tree, err := lute.parse("", []byte(markdown))
