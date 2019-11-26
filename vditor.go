@@ -69,7 +69,22 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string, err error) {
 	return
 }
 
-// VditorDOM2Md 将 Vditor DOM 转换为 Markdown 文本。
+// Md2VditorDOM 将 Markdown 转换为 Vditor DOM。
+func (lute *Lute) Md2VditorDOM(markdown string) (html string, err error) {
+	var tree *Tree
+	tree, err = lute.parse("", []byte(markdown))
+	if nil != err {
+		return
+	}
+
+	renderer := lute.newVditorRenderer(tree)
+	var output []byte
+	output, err = renderer.Render()
+	html = string(output)
+	return
+}
+
+// VditorDOM2Md 将 Vditor DOM 转换为 Markdown。
 func (lute *Lute) VditorDOM2Md(htmlStr string) (md string, err error) {
 	// 替换插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
