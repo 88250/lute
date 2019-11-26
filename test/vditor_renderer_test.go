@@ -82,8 +82,9 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var vditorRendererTests = []*parseTest{
 
-	{"27", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>"},
-	{"27", "<p><wbr></p>", "<p>\n<wbr></p>"},
+	{"29", "<p><wbr><br></p>", "<p><wbr><br /></p>"},
+	{"28", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>"},
+	{"27", "<p><wbr></p>", "<p><wbr></p>"},
 	{"26", "<p>![alt](src \"title\")</p>", "<p><img src=\"src\" alt=\"alt\" title=\"title\" /></p>"},
 	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code class=\"language-java\"><wbr>\n</code></pre></div>"},
 	{"24", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br /></li></ul>"},
@@ -105,7 +106,7 @@ var vditorRendererTests = []*parseTest{
 	{"8", "> <wbr>", "<p>> <wbr></p>"},
 	{"7", "><wbr>", "<p>><wbr></p>"},
 	{"6", "<p>> foo<wbr></p>", "<blockquote><p>foo<wbr></p></blockquote>"},
-	{"5", "<p>foo</p><p><wbr><br></p>", "<p>foo</p><p>\n<wbr><br /></p>"},
+	{"5", "<p>foo</p><p><wbr><br></p>", "<p>foo</p><p><wbr><br /></p>"},
 	{"4", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>"},
 	{"3", "<p><em data-marker=\"*\">foo<wbr></em></p>", "<p><em data-marker=\"*\">foo<wbr></em></p>"},
 	{"2", "<p>foo<wbr></p>", "<p>foo<wbr></p>"},
@@ -113,7 +114,7 @@ var vditorRendererTests = []*parseTest{
 	{"0", "<p>foo</p>", "<p>foo</p>"},
 }
 
-func TestVditorRenderer(t *testing.T) {
+func TestSpinVditorDOM(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range vditorRendererTests {
