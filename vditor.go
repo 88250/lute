@@ -48,7 +48,7 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 	// 替换插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
 
-	markdown := lute.VditorDOM2Md(htmlStr)
+	markdown := lute.vditorDOM2Md(htmlStr, false)
 
 	tree, err := lute.parse("", []byte(markdown))
 	if nil != err {
@@ -98,7 +98,7 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 
 // VditorDOM2HTML 将 Vditor DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
 func (lute *Lute) VditorDOM2HTML(vhtml string) (html string) {
-	markdown := lute.VditorDOM2Md(vhtml)
+	markdown := lute.vditorDOM2Md(vhtml, true)
 	html = lute.Md2HTML(markdown)
 	return
 }
@@ -123,54 +123,7 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 
 // VditorDOM2Md 将 Vditor DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
 func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
-	// 删掉插入符
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
-
-	// 将字符串解析为 DOM 树
-
-	reader := strings.NewReader(htmlStr)
-	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
-	if nil != err {
-		markdown = err.Error()
-		return
-	}
-
-	// 将 HTML 树转换为 Markdown AST
-
-	tree := &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
-	tree.context.tip = tree.Root
-	for _, htmlNode := range htmlNodes {
-		lute.genASTByVditorDOM(htmlNode, tree)
-	}
-
-	// 调整树结构
-
-	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
-		if entering && NodeList == n.typ {
-			// ul.ul => ul.li.ul
-			if nil != n.parent && NodeList == n.parent.typ {
-				previousLi := n.previous
-				if nil != previousLi {
-					n.Unlink()
-					previousLi.AppendChild(n)
-				}
-			}
-		}
-		return WalkContinue, nil
-	})
-
-	// 将 AST 进行 Markdown 格式化渲染
-
-	var formatted []byte
-	renderer := lute.newFormatRenderer(tree)
-	formatted, err = renderer.Render()
-	if nil != err {
-		markdown = err.Error()
-		return
-	}
-	markdown = string(formatted)
-	return
+	return lute.vditorDOM2Md(htmlStr, true)
 }
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
@@ -202,17 +155,74 @@ func (lute *Lute) HTML2Md(html string) (markdown string) {
 	return
 }
 
+func (lute *Lute) vditorDOM2Md(htmlStr string, removeVditorBlock bool) (markdown string) {
+	// 删掉插入符
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
+
+	// 将字符串解析为 DOM 树
+
+	reader := strings.NewReader(htmlStr)
+	htmlRoot := &html.Node{Type: html.ElementNode}
+	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
+	if nil != err {
+		markdown = err.Error()
+		return
+	}
+
+	// 将 HTML 树转换为 Markdown AST
+
+	tree := &Tree{Name: "", Root: &Node{typ: NodeDocument}, context: &Context{option: lute.options}}
+	tree.context.tip = tree.Root
+	for _, htmlNode := range htmlNodes {
+		lute.genASTByVditorDOM(htmlNode, tree, removeVditorBlock)
+	}
+
+	// 调整树结构
+
+	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
+		if entering && NodeList == n.typ {
+			// ul.ul => ul.li.ul
+			if nil != n.parent && NodeList == n.parent.typ {
+				previousLi := n.previous
+				if nil != previousLi {
+					n.Unlink()
+					previousLi.AppendChild(n)
+				}
+			}
+		}
+		return WalkContinue, nil
+	})
+
+	// 将 AST 进行 Markdown 格式化渲染
+
+	var formatted []byte
+	renderer := lute.newFormatRenderer(tree)
+	formatted, err = renderer.Render()
+	if nil != err {
+		markdown = err.Error()
+		return
+	}
+	markdown = string(formatted)
+	return
+}
+
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
-func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
+func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree, removeVditorBlock bool) {
 	class := lute.domAttrValue(n, "class")
 	if strings.Contains(class, "vditor-") && !strings.Contains(class, "vditor-task") {
-		// Vditor 块结构用段落节点分隔
-		p := &Node{typ: NodeParagraph}
-		tree.context.tip.AppendChild(p)
-		tree.context.tip = p
-		defer tree.context.parentTip(n)
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			lute.genASTByVditorDOM(c, tree)
+		if strings.Contains(class, "vditor-panel") {
+			return
+		}
+
+		if !removeVditorBlock {
+			// Vditor 块结构用段落节点分隔
+			p := &Node{typ: NodeParagraph}
+			tree.context.tip.AppendChild(p)
+			tree.context.tip = p
+			defer tree.context.parentTip(n)
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				lute.genASTByVditorDOM(c, tree, removeVditorBlock)
+			}
 		}
 		return
 	}
@@ -472,7 +482,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.genASTByVditorDOM(c, tree)
+		lute.genASTByVditorDOM(c, tree, removeVditorBlock)
 	}
 
 	switch n.DataAtom {
