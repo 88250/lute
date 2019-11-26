@@ -23,7 +23,7 @@ import (
 // 插入符 \u2038
 const caret = "‸"
 
-// Md2Html 将 markdown 转换为标准 HTML，用于源码模式预览。
+// Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
 func (lute *Lute) Md2HTML(markdown string) (html string) {
 	html, err := lute.MarkdownStr("", markdown)
 	if nil != err {
