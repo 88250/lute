@@ -237,17 +237,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case 0:
 		if nil != n.Parent {
 			switch n.Parent.DataAtom {
-			case atom.Code:
-				if nil == n.Parent.Parent {
-					node.typ = NodeCodeSpanContent
-				} else {
-					node.typ = NodeCodeBlockCode
-					class := lute.domAttrValue(n.Parent, "class")
-					if strings.Contains(class, "language-") {
-						language := class[len("language-"):]
-						tree.context.tip.lastChild.codeBlockInfo = []byte(language)
-					}
-				}
 			case atom.A:
 				node.typ = NodeLinkText
 			}
@@ -318,9 +307,28 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.isFencedCodeBlock = true
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
+		buf := &bytes.Buffer{}
+		firstc := n.FirstChild
+		if nil != firstc {
+			if atom.Code == firstc.DataAtom {
+				class := lute.domAttrValue(firstc, "class")
+				if strings.Contains(class, "language-") {
+					language := class[len("language-"):]
+					node.lastChild.codeBlockInfo = []byte(language)
+				}
+				firstc = firstc.FirstChild
+			}
+
+			for c := firstc; nil != c; c = c.NextSibling {
+				buf.WriteString(lute.domText(c))
+			}
+		}
+
+		content := &Node{typ: NodeCodeBlockCode, tokens: buf.Bytes()}
+		node.AppendChild(content)
+		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
 		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		return
 	case atom.Em, atom.I:
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
@@ -350,21 +358,19 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
-		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
-			node.typ = NodeCodeSpan
-			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
-			tree.context.tip.AppendChild(node)
-			tree.context.tip = node
-			defer tree.context.parentTip(n)
-		} else {
-			if nil == node.firstChild {
-				node.typ = NodeCodeBlockCode
-				if strings.Contains(class, "language-") {
-					language := class[len("language-"):]
-					tree.context.tip.lastChild.codeBlockInfo = []byte(language)
-				}
-			}
+		buf := &bytes.Buffer{}
+		for c := n.FirstChild; nil != c; c = c.NextSibling {
+			html.Render(buf, c)
 		}
+		content := &Node{typ: NodeCodeSpanContent, tokens: buf.Bytes()}
+		node.typ = NodeCodeSpan
+		node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
+		node.AppendChild(content)
+		node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: []byte("`")})
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip(n)
+		return
 	case atom.Br:
 		node.typ = NodeHardBreak
 		node.tokens = []byte("\n")
@@ -452,29 +458,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Span:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" != marker {
-			node.tokens = []byte(lute.domText(n))
-		} else {
-			node.tokens = []byte("")
-		}
+		node.tokens = []byte(lute.domText(n))
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-	//case atom.Details:
-	//	node.typ = NodeHTMLBlock
-	//	buf := &bytes.Buffer{}
-	//	//n.Attr = nil
-	//	html.Render(buf, n)
-	//	tokens := buf.Bytes()
-	//	//tokens = bytes.ReplaceAll(tokens, []byte("</summary>\n"), []byte("</summary>"))
-	//	//tokens = bytes.ReplaceAll(tokens, []byte("\n</details>"), []byte("</details>"))
-	//	tokens = append(tokens, []byte("<p></p>")...)
-	//	node.tokens = tokens
-	//	tree.context.tip.AppendChild(node)
-	//	tree.context.tip = node
-	//	defer tree.context.parentTip(n)
-	//	return
 	default:
 		node.typ = NodeHTMLBlock
 		buf := &bytes.Buffer{}
@@ -510,12 +497,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: []byte(marker)})
 		} else {
 			node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: []byte(marker)})
-		}
-	case atom.Pre:
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
-	case atom.Code:
-		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
-			node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: []byte("`")})
 		}
 	case atom.A:
 		node.AppendChild(&Node{typ: NodeCloseBracket})
@@ -593,9 +574,13 @@ func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
 	if nil == n {
 		return
 	}
-	if 0 == n.DataAtom {
+	switch n.DataAtom {
+	case 0:
 		buffer.WriteString(n.Data)
+	case atom.Br:
+		buffer.WriteString("\n")
 	}
+
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
 		lute.domText0(child, buffer)
 	}

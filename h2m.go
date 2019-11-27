@@ -41,13 +41,24 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 	// 调整树结构
 
 	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
-		if entering && NodeList == n.typ {
-			// ul.ul => ul.li.ul
-			if nil != n.parent && NodeList == n.parent.typ {
-				previousLi := n.previous
-				if nil != previousLi {
-					n.Unlink()
-					previousLi.AppendChild(n)
+		if entering {
+			if NodeList == n.typ {
+				// ul.ul => ul.li.ul
+				if nil != n.parent && NodeList == n.parent.typ {
+					previousLi := n.previous
+					if nil != previousLi {
+						n.Unlink()
+						previousLi.AppendChild(n)
+					}
+				}
+			} else if NodeListItem == n.typ {
+				if nil != n.parent && NodeList != n.parent.typ {
+					// doc.li => doc.ul.li
+					previousList := n.previous
+					if nil != previousList {
+						n.Unlink()
+						previousList.AppendChild(n)
+					}
 				}
 			}
 		}
@@ -68,6 +79,10 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
+	if html.CommentNode == n.Type || atom.Meta == n.DataAtom {
+		return
+	}
+
 	node := &Node{typ: NodeText, tokens: strToBytes(n.Data)}
 	switch n.DataAtom {
 	case 0:
@@ -152,9 +167,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.isFencedCodeBlock = true
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
+		buf := &bytes.Buffer{}
+		for c := n.FirstChild; nil != c; c = c.NextSibling {
+			html.Render(buf, c)
+		}
+		code := &Node{typ: NodeCodeBlockCode, tokens: buf.Bytes()}
+		node.AppendChild(code)
+		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
 		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		return
 	case atom.Em, atom.I:
 		node.typ = NodeEmphasis
 		marker := "*"
@@ -178,8 +199,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			defer tree.context.parentTip(n)
 		}
 	case atom.Br:
-		node.typ = NodeInlineHTML
-		node.tokens = strToBytes("<br />")
+		node.typ = NodeHardBreak
+		node.tokens = strToBytes("\n")
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -259,25 +280,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-	case atom.Span:
-		node.tokens = strToBytes(lute.domText(n))
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
-	case atom.Details:
-		node.typ = NodeHTMLBlock
-		buf := &bytes.Buffer{}
-		//n.Attr = nil
-		html.Render(buf, n)
-		tokens := buf.Bytes()
-		//tokens = bytes.ReplaceAll(tokens, []byte("</summary>\n"), []byte("</summary>"))
-		//tokens = bytes.ReplaceAll(tokens, []byte("\n</details>"), []byte("</details>"))
-		tokens = append(tokens, []byte("<p></p>")...)
-		node.tokens = tokens
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
-		return
 	default:
 		node.typ = NodeHTMLBlock
 		buf := &bytes.Buffer{}
