@@ -267,15 +267,18 @@ func (r *FormatRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 		if parent := node.parent; nil != parent {
 			if NodeListItem == parent.typ { // ListItem.Paragraph
 				listItem := parent
+				if nil != listItem.parent && nil != listItem.parent.listData {
+					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
+					// 设置紧凑标识的具体实现可参考函数 List.Finalize()
+					inTightList = listItem.parent.tight
 
-				// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
-				// 设置紧凑标识的具体实现可参考函数 List.Finalize()
-				inTightList = listItem.parent.tight
-
-				nextItem := listItem.next
-				if nil == nextItem {
-					nextPara := node.next
-					lastListItemLastPara = nil == nextPara
+					nextItem := listItem.next
+					if nil == nextItem {
+						nextPara := node.next
+						lastListItemLastPara = nil == nextPara
+					}
+				} else {
+					inTightList = true
 				}
 			}
 		}

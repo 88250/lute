@@ -48,7 +48,7 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 	// 替换插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
 
-	markdown := lute.vditorDOM2Md(htmlStr, false)
+	markdown := lute.vditorDOM2Md(htmlStr)
 
 	tree, err := lute.parse("", []byte(markdown))
 	if nil != err {
@@ -98,7 +98,7 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 
 // VditorDOM2HTML 将 Vditor DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
 func (lute *Lute) VditorDOM2HTML(vhtml string) (html string) {
-	markdown := lute.vditorDOM2Md(vhtml, true)
+	markdown := lute.vditorDOM2Md(vhtml)
 	html = lute.Md2HTML(markdown)
 	return
 }
@@ -123,7 +123,7 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 
 // VditorDOM2Md 将 Vditor DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
 func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
-	return lute.vditorDOM2Md(htmlStr, true)
+	return lute.vditorDOM2Md(htmlStr)
 }
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
@@ -155,7 +155,7 @@ func (lute *Lute) HTML2Md(html string) (markdown string) {
 	return
 }
 
-func (lute *Lute) vditorDOM2Md(htmlStr string, removeVditorBlock bool) (markdown string) {
+func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	// 删掉插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
 
@@ -180,13 +180,24 @@ func (lute *Lute) vditorDOM2Md(htmlStr string, removeVditorBlock bool) (markdown
 	// 调整树结构
 
 	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
-		if entering && NodeList == n.typ {
-			// ul.ul => ul.li.ul
-			if nil != n.parent && NodeList == n.parent.typ {
-				previousLi := n.previous
-				if nil != previousLi {
-					n.Unlink()
-					previousLi.AppendChild(n)
+		if entering {
+			if NodeList == n.typ {
+				// ul.ul => ul.li.ul
+				if nil != n.parent && NodeList == n.parent.typ {
+					previousLi := n.previous
+					if nil != previousLi {
+						n.Unlink()
+						previousLi.AppendChild(n)
+					}
+				}
+			} else if NodeListItem == n.typ {
+				if nil != n.parent && NodeList != n.parent.typ {
+					// doc.li => doc.ul.li
+					previousList := n.previous
+					if nil != previousList {
+						n.Unlink()
+						previousList.AppendChild(n)
+					}
 				}
 			}
 		}
