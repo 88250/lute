@@ -355,8 +355,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 		}
 	case atom.Br:
-		node.typ = NodeInlineHTML
-		node.tokens = []byte("<br />")
+		node.typ = NodeHardBreak
+		node.tokens = []byte("\n")
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
