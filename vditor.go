@@ -192,7 +192,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 				}
 			} else if NodeListItem == n.typ {
 				if nil != n.parent && NodeList != n.parent.typ {
-					// doc.li => doc.ul.li
+					// .li => .ul.li
 					previousList := n.previous
 					if nil != previousList {
 						n.Unlink()
@@ -225,7 +225,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	dataType := lute.domAttrValue(n, "data-type")
-	if "pre" == dataType || "html" == dataType {
+	if "pre" == dataType || "html" == dataType || "math-block" == dataType || "math-inline" == dataType {
 		// 如果是 HTML 块或者代码块则直接进入子节点处理，忽略当前 div 节点
 		lute.genASTByVditorDOM(n.FirstChild, tree)
 		return
