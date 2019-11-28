@@ -84,13 +84,14 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"34", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">ab<wbr></span></p>", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">ab<wbr></span></p>"},
+	{"35", "<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><textarea class=\"vditor-reset\" data-type=\"math-block\">a</textarea></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><textarea class=\"vditor-reset\" data-type=\"math-block\">a</textarea></div>"},
+	{"34", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">ab<wbr></span></p>", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><textarea class=\"vditor-reset\" data-type=\"math-inline\">ab<wbr></textarea></span></p>"},
 	{"33", "<p><code>foo</code><wbr></p>", "<p> <code>foo</code> <wbr></p>"},
 	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code>\n</code></pre></div>"},
 	{"31", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code><span style=\"color:#000080;font-weight:bold;\">package1<wbr></span>\n</code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code>package1<wbr>\n</code></pre></div>"},
 	{"30", "<p>1. Node.js</p><p>2. Go<wbr></p>", "<ol><li data-marker=\"1.\"><p>Node.js</p></li><li data-marker=\"2.\"><p>Go<wbr></p></li></ol>"},
 	{"29", "<p><wbr><br></p>", "<p><wbr>\n</p>"},
-	{"28", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>", "<p>foo</p><p><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></p><p>bar</p>"},
+	{"28", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><textarea class=\"vditor-reset\" data-type=\"html-block\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>", "<p>foo</p><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><textarea class=\"vditor-reset\" data-type=\"html-block\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div><p>bar</p>"},
 	{"27", "<p><wbr></p>", "<p><wbr>\n</p>"},
 	{"26", "<p>![alt](src \"title\")</p>", "<p><img src=\"src\" alt=\"alt\" title=\"title\" /></p>"},
 	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code class=\"language-java\"><wbr>\n</code></pre></div>"},
@@ -105,7 +106,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"16", "<p>[](</p>", "<p>[](</p>"},
 	{"15", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
 	{"14", ":octocat:", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
-	{"13", "<div class=\"vditor-block\"><table><thead><tr><th>abc</th><th>def</th></tr></thead></table></div>", "\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><div class=\"vditor-block\"><table><thead><tr><th>abc</th><th>def</th></tr></thead></table></div></textarea></div>\n"},
+	{"13", "<div class=\"vditor-block\"><table><thead><tr><th>abc</th><th>def</th></tr></thead></table></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><textarea class=\"vditor-reset\" data-type=\"html-block\"><div class=\"vditor-block\"><table><thead><tr><th>abc</th><th>def</th></tr></thead></table></div></textarea></div>"},
 	{"12", "<p><s data-marker=\"~~\">Hi</s> Hello, world!</p>", "<p><s data-marker=\"~~\">Hi</s> Hello, world!</p>"},
 	{"11", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "<p><s data-marker=\"~\">Hi</s> Hello, world!</p>"},
 	{"10", "<ul><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},

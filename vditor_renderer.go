@@ -125,17 +125,17 @@ func (r *VditorRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, err
 }
 
 func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("</span>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.tokens))
+	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><textarea class=\"vditor-reset\" data-type=\"math-inline\">")
+	r.write(node.tokens)
+	r.writeString("</textarea></span>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
 	return WalkStop, nil
 }
 
@@ -144,17 +144,17 @@ func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus
 }
 
 func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("</div>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.tokens))
+	r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><textarea class=\"vditor-reset\" data-type=\"math-block\">")
+	r.write(node.tokens)
+	r.writeString("</textarea></div>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
 	return WalkStop, nil
 }
 
@@ -319,14 +319,16 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\">")
+	r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><textarea class=\"vditor-reset\" data-type=\"html-block\">")
 	r.write(node.tokens)
-	r.writeString("</textarea></div>\n")
+	r.writeString("</textarea></div>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"<textarea class=\"vditor-reset\" data-type=\"html-inline\">")
 	r.write(node.tokens)
+	r.writeString("</textarea></span>")
 	return WalkStop, nil
 }
 

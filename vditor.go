@@ -225,8 +225,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	dataType := lute.domAttrValue(n, "data-type")
-	if "pre" == dataType || "html" == dataType {
-		// 如果是 HTML 块或者代码块则直接进入子节点处理，忽略当前 div 节点
+	if "pre" == dataType {
+		lute.genASTByVditorDOM(n.FirstChild, tree)
+		return
+	}
+
+	if atom.Div == n.DataAtom && ("html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType) {
 		lute.genASTByVditorDOM(n.FirstChild, tree)
 		return
 	}
@@ -460,14 +464,31 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: []byte(lute.domText(n))})
 			node.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
 			tree.context.tip.AppendChild(node)
-		} else if "math-block" == dataType {
-			node.typ = NodeMathBlock
-			node.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
-			node.AppendChild(&Node{typ: NodeMathBlockContent, tokens: []byte(lute.domText(n))})
-			node.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
-			tree.context.tip.AppendChild(node)
 		} else {
 			node.tokens = []byte(lute.domText(n))
+			tree.context.tip.AppendChild(node)
+		}
+		return
+	case atom.Textarea:
+		if "math-block" == dataType {
+			node.typ = NodeMathBlock
+			node.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
+			node.AppendChild(&Node{typ: NodeMathBlockContent, tokens: []byte(n.FirstChild.Data)})
+			node.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
+			tree.context.tip.AppendChild(node)
+		} else if "math-inline" == dataType {
+			node.typ = NodeInlineMath
+			node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
+			node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: []byte(n.FirstChild.Data)})
+			node.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
+			tree.context.tip.AppendChild(node)
+		} else if "html-block" == dataType {
+			node.typ = NodeHTMLBlock
+			node.tokens = []byte(n.FirstChild.Data)
+			tree.context.tip.AppendChild(node)
+		} else if "html-inline" == dataType {
+			node.typ = NodeInlineHTML
+			node.tokens = []byte(n.FirstChild.Data)
 			tree.context.tip.AppendChild(node)
 		}
 		return
@@ -477,8 +498,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		html.Render(buf, n)
 		node.tokens = buf.Bytes()
 		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
 		return
 	}
 
@@ -571,6 +590,28 @@ func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
 		}
 	}
 	return ""
+}
+
+func (lute *Lute) domHTML(n *html.Node) string {
+	buf := &bytes.Buffer{}
+	lute.domHTML0(n, buf)
+	return buf.String()
+}
+
+func (lute *Lute) domHTML0(n *html.Node, buffer *bytes.Buffer) {
+	if nil == n {
+		return
+	}
+	switch n.DataAtom {
+	case 0:
+		buffer.WriteString(n.Data)
+	case atom.Br:
+		buffer.WriteString("\n")
+	}
+
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		lute.domHTML0(child, buffer)
+	}
 }
 
 func (lute *Lute) domText(n *html.Node) string {
