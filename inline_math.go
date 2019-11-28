@@ -39,7 +39,10 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 			}
 		}
 		if matchBlock {
-			ret = &Node{typ: NodeMathBlock, tokens: ctx.tokens[blockStartPos:blockEndPos]}
+			ret = &Node{typ: NodeMathBlock}
+			ret.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
+			ret.AppendChild(&Node{typ: NodeMathBlockContent, tokens: ctx.tokens[blockStartPos:blockEndPos]})
+			ret.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
 			ctx.pos = blockEndPos + 2
 			return
 		}
@@ -58,13 +61,11 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	}
 
 	endPos = startPos + endPos + 2
-	openMarker := &Node{typ: NodeInlineMathOpenMarker, tokens: dollar}
-	content := &Node{typ: NodeInlineMathContent, tokens: ctx.tokens[startPos+1 : endPos-1]}
-	closeMarker := &Node{typ: NodeInlineMathCloseMarker, tokens: dollar}
+
 	ret = &Node{typ: NodeInlineMath}
-	ret.AppendChild(openMarker)
-	ret.AppendChild(content)
-	ret.AppendChild(closeMarker)
+	ret.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
+	ret.AppendChild(&Node{typ: NodeInlineMathContent, tokens: ctx.tokens[startPos+1 : endPos-1]})
+	ret.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
 
 	ctx.pos = endPos
 	return

@@ -37,6 +37,7 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
 	ret.rendererFuncs[NodeCodeBlockCode] = ret.renderCodeBlockCode
 	ret.rendererFuncs[NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
+	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
 	ret.rendererFuncs[NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
 	ret.rendererFuncs[NodeMathBlockContent] = ret.renderMathBlockContent
 	ret.rendererFuncs[NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
@@ -145,7 +146,6 @@ func (r *HTMLRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, 
 
 func (r *HTMLRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("/div", nil, false)
-	r.newline()
 	return WalkStop, nil
 }
 
@@ -157,7 +157,6 @@ func (r *HTMLRenderer) renderMathBlockContent(node *Node, entering bool) (WalkSt
 func (r *HTMLRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "vditor-math"}}
 	r.tag("div", attrs, false)
-	r.newline()
 	return WalkStop, nil
 }
 

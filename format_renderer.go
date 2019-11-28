@@ -353,10 +353,7 @@ func (r *FormatRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (
 }
 
 func (r *FormatRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
-	r.writeByte(itemDollar)
-	r.write(node.tokens)
-	r.writeByte(itemDollar)
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 func (r *FormatRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
