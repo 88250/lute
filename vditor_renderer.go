@@ -119,18 +119,16 @@ func (r *VditorRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, err
 }
 
 func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
-	attrs := [][]string{{"class", "vditor-math"}}
-	r.tag("span", attrs, false)
+	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
 	r.write(node.tokens)
-	r.tag("/span", nil, false)
+	r.writeString("</span>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
-	attrs := [][]string{{"class", "vditor-math"}}
-	r.tag("div", attrs, false)
+	r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
 	r.write(node.tokens)
-	r.tag("/div", nil, false)
+	r.writeString("</div>")
 	return WalkStop, nil
 }
 
