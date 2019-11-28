@@ -550,6 +550,9 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 			r.writeString("<pre><code>")
 		}
 		tokens := node.tokens
+		if 1 > len(tokens) {
+			tokens = append(tokens, itemNewline)
+		}
 		r.write(tokens)
 		return WalkSkipChildren, nil
 	}

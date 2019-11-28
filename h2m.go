@@ -154,11 +154,23 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
 		buf := &bytes.Buffer{}
-		for c := n.FirstChild; nil != c; c = c.NextSibling {
-			html.Render(buf, c)
+		firstc := n.FirstChild
+		if nil != firstc {
+			if atom.Code == firstc.DataAtom {
+				class := lute.domAttrValue(firstc, "class")
+				if strings.Contains(class, "language-") {
+					language := class[len("language-"):]
+					node.lastChild.codeBlockInfo = []byte(language)
+				}
+				firstc = firstc.FirstChild
+			}
+
+			for c := firstc; nil != c; c = c.NextSibling {
+				buf.WriteString(lute.domText(c))
+			}
 		}
-		code := &Node{typ: NodeCodeBlockCode, tokens: buf.Bytes()}
-		node.AppendChild(code)
+		content := &Node{typ: NodeCodeBlockCode, tokens: buf.Bytes()}
+		node.AppendChild(content)
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
 		tree.context.tip.AppendChild(node)
 		return

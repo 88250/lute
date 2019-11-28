@@ -13,10 +13,11 @@
 package test
 
 import (
-	"github.com/b3log/lute/html"
-	"github.com/b3log/lute/html/atom"
 	"strings"
 	"testing"
+
+	"github.com/b3log/lute/html"
+	"github.com/b3log/lute/html/atom"
 )
 
 func TestHTMLParse(t *testing.T) {

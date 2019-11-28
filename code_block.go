@@ -61,16 +61,7 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 				break
 			}
 		}
-		firstLine := content[:i]
-		rest := content[i+1:]
-
-		if !context.option.VditorWYSIWYG {
-			codeBlock.codeBlockInfo = unescapeString(trimWhitespace(firstLine))
-		} else {
-			codeBlock.codeBlockInfo = firstLine
-		}
-
-		codeBlock.tokens = rest
+		codeBlock.tokens = content[i+1:]
 	} else { // 缩进代码块
 		codeBlock.tokens = replaceNewlineSpace(codeBlock.tokens)
 	}
@@ -102,7 +93,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 		return
 	}
 	if t.context.option.VditorWYSIWYG && bytes.Contains(infoTokens, strToBytes(caret)) {
-		return
+		infoTokens = bytes.ReplaceAll(infoTokens, strToBytes(caret), []byte(""))
 	}
 	info = trimWhitespace(infoTokens)
 	info = unescapeString(info)

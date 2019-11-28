@@ -320,7 +320,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				buf.WriteString(lute.domText(c))
 			}
 		}
-
 		content := &Node{typ: NodeCodeBlockCode, tokens: buf.Bytes()}
 		node.AppendChild(content)
 		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
