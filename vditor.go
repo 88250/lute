@@ -308,7 +308,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Pre:
-
 		if atom.Code == n.FirstChild.DataAtom {
 			switch dataType {
 			case "math-block":
@@ -317,18 +316,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				node.AppendChild(&Node{typ: NodeMathBlockContent, tokens: []byte(n.FirstChild.Data)})
 				node.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
 				tree.context.tip.AppendChild(node)
-			case "math-inline":
-				node.typ = NodeInlineMath
-				node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
-				node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: []byte(n.FirstChild.Data)})
-				node.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
-				tree.context.tip.AppendChild(node)
 			case "html-block":
 				node.typ = NodeHTMLBlock
-				node.tokens = []byte(n.FirstChild.Data)
-				tree.context.tip.AppendChild(node)
-			case "html-inline":
-				node.typ = NodeInlineHTML
 				node.tokens = []byte(n.FirstChild.Data)
 				tree.context.tip.AppendChild(node)
 			default:
@@ -377,18 +366,24 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
-		buf := &bytes.Buffer{}
-		for c := n.FirstChild; nil != c; c = c.NextSibling {
-			html.Render(buf, c)
+		if "math-inline" == dataType {
+			node.typ = NodeInlineMath
+			node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
+			node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: []byte(n.FirstChild.Data)})
+			node.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
+			tree.context.tip.AppendChild(node)
+		} else if "html-inline" == dataType {
+			node.typ = NodeInlineHTML
+			node.tokens = []byte(n.FirstChild.Data)
+			tree.context.tip.AppendChild(node)
+		} else {
+			content := &Node{typ: NodeCodeSpanContent, tokens: []byte(n.FirstChild.Data)}
+			node.typ = NodeCodeSpan
+			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
+			node.AppendChild(content)
+			node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: []byte("`")})
+			tree.context.tip.AppendChild(node)
 		}
-		content := &Node{typ: NodeCodeSpanContent, tokens: buf.Bytes()}
-		node.typ = NodeCodeSpan
-		node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
-		node.AppendChild(content)
-		node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: []byte("`")})
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
 		return
 	case atom.Br:
 		node.typ = NodeHardBreak

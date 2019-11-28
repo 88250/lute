@@ -130,12 +130,11 @@ func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) 
 
 func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
-		r.writeString("<pre><code data-type=\"math-inline\">")
+		r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
+		r.writeString("<code data-type=\"math-inline\">")
 		r.write(node.tokens)
 	} else {
-		r.writeString("</code></pre>")
-		r.writeString("</div>")
+		r.writeString("</code></span>")
 	}
 	return WalkContinue, nil
 }
@@ -154,12 +153,11 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (
 
 func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
-		r.writeString("<pre><code data-type=\"math-block\">")
+		r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
+		r.writeString("<code data-type=\"math-block\">")
 		r.write(node.tokens)
 	} else {
-		r.writeString("</code></pre>")
-		r.writeString("</div>")
+		r.writeString("</code></span>")
 	}
 	return WalkContinue, nil
 }
