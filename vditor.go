@@ -235,11 +235,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	node := &Node{typ: NodeText, tokens: []byte(n.Data)}
 	switch n.DataAtom {
 	case 0:
-		if nil != n.Parent {
-			switch n.Parent.DataAtom {
-			case atom.A:
-				node.typ = NodeLinkText
-			}
+		if nil != n.Parent && atom.A == n.Parent.DataAtom {
+			node.typ = NodeLinkText
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node

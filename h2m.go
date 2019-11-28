@@ -83,34 +83,20 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		return
 	}
 
+	dataRender := lute.domAttrValue(n, "data-render")
+	if "false" == dataRender {
+		return
+	}
+
 	node := &Node{typ: NodeText, tokens: strToBytes(n.Data)}
 	switch n.DataAtom {
 	case 0:
-		if nil != n.Parent {
-			switch n.Parent.DataAtom {
-			case atom.Code:
-				if nil == n.Parent.Parent {
-					node.typ = NodeCodeSpanContent
-				} else {
-					node.typ = NodeCodeBlockCode
-					class := lute.domAttrValue(n.Parent, "class")
-					if strings.Contains(class, "language-") {
-						language := class[len("language-"):]
-						tree.context.tip.lastChild.codeBlockInfo = strToBytes(language)
-					}
-				}
-			case atom.A:
-				node.typ = NodeLinkText
-			}
+		if nil != n.Parent && atom.A == n.Parent.DataAtom {
+			node.typ = NodeLinkText
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-	case atom.Div:
-		class := lute.domAttrValue(n, "class")
-		if strings.Contains(class, "vditor-panel") {
-			return
-		}
 	case atom.P:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
@@ -191,13 +177,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
-		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
-			node.typ = NodeCodeSpan
-			node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: strToBytes("`")})
-			tree.context.tip.AppendChild(node)
-			tree.context.tip = node
-			defer tree.context.parentTip(n)
+		buf := &bytes.Buffer{}
+		for c := n.FirstChild; nil != c; c = c.NextSibling {
+			html.Render(buf, c)
 		}
+		content := &Node{typ: NodeCodeSpanContent, tokens: buf.Bytes()}
+		node.typ = NodeCodeSpan
+		node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
+		node.AppendChild(content)
+		node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: []byte("`")})
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip(n)
+		return
 	case atom.Br:
 		node.typ = NodeHardBreak
 		node.tokens = strToBytes("\n")
@@ -303,12 +295,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	case atom.Strong, atom.B:
 		marker := "**"
 		node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: strToBytes(marker)})
-	case atom.Pre:
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
-	case atom.Code:
-		if nil == n.Parent || atom.Pre != n.Parent.DataAtom {
-			node.AppendChild(&Node{typ: NodeCodeSpanCloseMarker, tokens: strToBytes("`")})
-		}
 	case atom.A:
 		node.AppendChild(&Node{typ: NodeCloseBracket})
 		node.AppendChild(&Node{typ: NodeOpenParen})
