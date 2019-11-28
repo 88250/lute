@@ -38,7 +38,13 @@ func (lute *Lute) newVditorRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeCodeBlockCode] = ret.renderCodeBlockCode
 	ret.rendererFuncs[NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
+	ret.rendererFuncs[NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
+	ret.rendererFuncs[NodeMathBlockContent] = ret.renderMathBlockContent
+	ret.rendererFuncs[NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
+	ret.rendererFuncs[NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
+	ret.rendererFuncs[NodeInlineMathContent] = ret.renderInlineMathContent
+	ret.rendererFuncs[NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 	ret.rendererFuncs[NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
 	ret.rendererFuncs[NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
@@ -118,18 +124,42 @@ func (r *VditorRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, err
 	return WalkContinue, nil
 }
 
-func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
-	r.write(node.tokens)
+func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.writeString("</span>")
 	return WalkStop, nil
 }
 
-func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
-	r.write(node.tokens)
+func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(escapeHTML(node.tokens))
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.writeString("</div>")
 	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(escapeHTML(node.tokens))
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {

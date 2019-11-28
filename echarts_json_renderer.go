@@ -386,5 +386,7 @@ func (r *EChartsJSONRenderer) ignore(node *Node) bool {
 		NodeStrongA6kOpenMarker == node.typ || NodeStrongA6kCloseMarker == node.typ ||
 		NodeStrongU8eOpenMarker == node.typ || NodeStrongU8eCloseMarker == node.typ ||
 		NodeStrikethrough1OpenMarker == node.typ || NodeStrikethrough1CloseMarker == node.typ ||
-		NodeStrikethrough2OpenMarker == node.typ || NodeStrikethrough2CloseMarker == node.typ
+		NodeStrikethrough2OpenMarker == node.typ || NodeStrikethrough2CloseMarker == node.typ ||
+		NodeMathBlockOpenMarker == node.typ || NodeMathBlockContent == node.typ || NodeMathBlockCloseMarker == node.typ ||
+		NodeInlineMathOpenMarker == node.typ || NodeInlineMathContent == node.typ || NodeInlineMathCloseMarker == node.typ
 }

@@ -37,8 +37,13 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
 	ret.rendererFuncs[NodeCodeBlockCode] = ret.renderCodeBlockCode
 	ret.rendererFuncs[NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
-	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
+	ret.rendererFuncs[NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
+	ret.rendererFuncs[NodeMathBlockContent] = ret.renderMathBlockContent
+	ret.rendererFuncs[NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
+	ret.rendererFuncs[NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
+	ret.rendererFuncs[NodeInlineMathContent] = ret.renderInlineMathContent
+	ret.rendererFuncs[NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 	ret.rendererFuncs[NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
 	ret.rendererFuncs[NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
@@ -118,22 +123,47 @@ func (r *HTMLRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, error
 	return WalkContinue, nil
 }
 
-func (r *HTMLRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/span", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(escapeHTML(node.tokens))
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	attrs := [][]string{{"class", "vditor-math"}}
 	r.tag("span", attrs, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
+func (r *HTMLRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.tag("/div", nil, false)
+	r.newline()
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
 	r.write(escapeHTML(node.tokens))
-	r.tag("/span", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	attrs := [][]string{{"class", "vditor-math"}}
+	r.tag("div", attrs, false)
+	r.newline()
 	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
 	r.newline()
-	attrs := [][]string{{"class", "vditor-math"}}
-	r.tag("div", attrs, false)
-	r.write(escapeHTML(node.tokens))
-	r.tag("/div", nil, false)
-	r.newline()
-	return WalkStop, nil
+	return WalkContinue, nil
 }
 
 func (r *HTMLRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {

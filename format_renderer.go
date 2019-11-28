@@ -39,7 +39,13 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeCodeBlockCode] = ret.renderCodeBlockCode
 	ret.rendererFuncs[NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
 	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
+	ret.rendererFuncs[NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
+	ret.rendererFuncs[NodeMathBlockContent] = ret.renderMathBlockContent
+	ret.rendererFuncs[NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
 	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
+	ret.rendererFuncs[NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
+	ret.rendererFuncs[NodeInlineMathContent] = ret.renderInlineMathContent
+	ret.rendererFuncs[NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
 	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
 	ret.rendererFuncs[NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
 	ret.rendererFuncs[NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
@@ -331,6 +337,21 @@ func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (W
 	return WalkStop, nil
 }
 
+func (r *FormatRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemDollar)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeByte(itemDollar)
+	return WalkStop, nil
+}
+
 func (r *FormatRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
 	r.writeByte(itemDollar)
 	r.write(node.tokens)
@@ -338,18 +359,27 @@ func (r *FormatRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus
 	return WalkStop, nil
 }
 
-func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-		r.write(mathBlockMarker)
-		r.newline()
-		r.write(node.tokens)
-		return WalkSkipChildren, nil
-	}
-	r.newline()
+func (r *FormatRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.write(mathBlockMarker)
+	r.writeByte(itemNewline)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(node.tokens)
+	r.writeByte(itemNewline)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.write(mathBlockMarker)
+	r.writeByte(itemNewline)
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
 	r.newline()
-	if !r.isLastNode(r.tree.Root, node) {
+	if !entering && !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
 	return WalkContinue, nil
