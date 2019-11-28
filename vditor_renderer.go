@@ -317,10 +317,10 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 
 	if entering {
 		r.tag("p", nil, false)
+	} else {
 		if nil != node.firstChild && NodeText == node.firstChild.typ && caret == bytesToStr(node.firstChild.tokens) {
 			r.writeByte(itemNewline)
 		}
-	} else {
 		r.tag("/p", nil, false)
 	}
 	return WalkContinue, nil
@@ -345,6 +345,9 @@ func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	if !strings.HasSuffix(node.parent.PreviousNodeText(), " ") {
+		r.writeByte(itemSpace)
+	}
 	r.writeString("<code>")
 	return WalkStop, nil
 }
@@ -356,6 +359,9 @@ func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.writeString("</code>")
+	if !strings.HasPrefix(node.parent.NextNodeText(), " ") {
+		r.writeByte(itemSpace)
+	}
 	return WalkStop, nil
 }
 

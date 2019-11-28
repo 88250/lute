@@ -84,12 +84,13 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code></code></pre></div>"},
+	{"33", "<p><code>foo</code><wbr></p>", "<p> <code>foo</code> <wbr></p>"},
+	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code>\n</code></pre></div>"},
 	{"31", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code><span style=\"color:#000080;font-weight:bold;\">package1<wbr></span>\n</code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code>package1<wbr>\n</code></pre></div>"},
 	{"30", "<p>1. Node.js</p><p>2. Go<wbr></p>", "<ol><li data-marker=\"1.\"><p>Node.js</p></li><li data-marker=\"2.\"><p>Go<wbr></p></li></ol>"},
-	{"29", "<p><wbr><br></p>", "<p>\n<wbr></p>"},
+	{"29", "<p><wbr><br></p>", "<p><wbr>\n</p>"},
 	{"28", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html\"><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>", "<p>foo</p><p><textarea class=\"vditor-reset\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></p><p>bar</p>"},
-	{"27", "<p><wbr></p>", "<p>\n<wbr></p>"},
+	{"27", "<p><wbr></p>", "<p><wbr>\n</p>"},
 	{"26", "<p>![alt](src \"title\")</p>", "<p><img src=\"src\" alt=\"alt\" title=\"title\" /></p>"},
 	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code class=\"language-java\"><wbr>\n</code></pre></div>"},
 	{"24", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr></li></ul>"},
@@ -111,7 +112,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"8", "> <wbr>", "<p>> <wbr></p>"},
 	{"7", "><wbr>", "<p>><wbr></p>"},
 	{"6", "<p>> foo<wbr></p>", "<blockquote><p>foo<wbr></p></blockquote>"},
-	{"5", "<p>foo</p><p><wbr><br></p>", "<p>foo</p><p>\n<wbr></p>"},
+	{"5", "<p>foo</p><p><wbr><br></p>", "<p>foo</p><p><wbr>\n</p>"},
 	{"4", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>"},
 	{"3", "<p><em data-marker=\"*\">foo<wbr></em></p>", "<p><em data-marker=\"*\">foo<wbr></em></p>"},
 	{"2", "<p>foo<wbr></p>", "<p>foo<wbr></p>"},
