@@ -308,30 +308,45 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Pre:
-		node.typ = NodeCodeBlock
-		node.isFencedCodeBlock = true
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
-		buf := &bytes.Buffer{}
-		firstc := n.FirstChild
-		if nil != firstc {
-			if atom.Code == firstc.DataAtom {
-				class := lute.domAttrValue(firstc, "class")
+
+		if atom.Code == n.FirstChild.DataAtom {
+			switch dataType {
+			case "math-block":
+				node.typ = NodeMathBlock
+				node.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
+				node.AppendChild(&Node{typ: NodeMathBlockContent, tokens: []byte(n.FirstChild.Data)})
+				node.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
+				tree.context.tip.AppendChild(node)
+			case "math-inline":
+				node.typ = NodeInlineMath
+				node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
+				node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: []byte(n.FirstChild.Data)})
+				node.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
+				tree.context.tip.AppendChild(node)
+			case "html-block":
+				node.typ = NodeHTMLBlock
+				node.tokens = []byte(n.FirstChild.Data)
+				tree.context.tip.AppendChild(node)
+			case "html-inline":
+				node.typ = NodeInlineHTML
+				node.tokens = []byte(n.FirstChild.Data)
+				tree.context.tip.AppendChild(node)
+			default:
+				node.typ = NodeCodeBlock
+				node.isFencedCodeBlock = true
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
+				class := lute.domAttrValue(n.FirstChild, "class")
 				if strings.Contains(class, "language-") {
 					language := class[len("language-"):]
 					node.lastChild.codeBlockInfo = []byte(language)
 				}
-				firstc = firstc.FirstChild
-			}
-
-			for c := firstc; nil != c; c = c.NextSibling {
-				buf.WriteString(lute.domText(c))
+				content := &Node{typ: NodeCodeBlockCode, tokens: []byte(n.FirstChild.FirstChild.Data)}
+				node.AppendChild(content)
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
+				tree.context.tip.AppendChild(node)
 			}
 		}
-		content := &Node{typ: NodeCodeBlockCode, tokens: buf.Bytes()}
-		node.AppendChild(content)
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
-		tree.context.tip.AppendChild(node)
 		return
 	case atom.Em, atom.I:
 		node.typ = NodeEmphasis
@@ -462,39 +477,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Span:
-		if "math-inline" == dataType {
-			node.typ = NodeInlineMath
-			node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
-			node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: []byte(lute.domText(n))})
-			node.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
-			tree.context.tip.AppendChild(node)
-		} else {
-			node.tokens = []byte(lute.domText(n))
-			tree.context.tip.AppendChild(node)
-		}
-		return
-	case atom.Textarea:
-		if "math-block" == dataType {
-			node.typ = NodeMathBlock
-			node.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
-			node.AppendChild(&Node{typ: NodeMathBlockContent, tokens: []byte(n.FirstChild.Data)})
-			node.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
-			tree.context.tip.AppendChild(node)
-		} else if "math-inline" == dataType {
-			node.typ = NodeInlineMath
-			node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
-			node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: []byte(n.FirstChild.Data)})
-			node.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
-			tree.context.tip.AppendChild(node)
-		} else if "html-block" == dataType {
-			node.typ = NodeHTMLBlock
-			node.tokens = []byte(n.FirstChild.Data)
-			tree.context.tip.AppendChild(node)
-		} else if "html-inline" == dataType {
-			node.typ = NodeInlineHTML
-			node.tokens = []byte(n.FirstChild.Data)
-			tree.context.tip.AppendChild(node)
-		}
+		node.tokens = []byte(lute.domText(n))
+		tree.context.tip.AppendChild(node)
 		return
 	default:
 		node.typ = NodeHTMLBlock

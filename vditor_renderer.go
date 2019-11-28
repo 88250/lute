@@ -129,10 +129,15 @@ func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) 
 }
 
 func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><textarea class=\"vditor-reset\" data-type=\"math-inline\">")
-	r.write(node.tokens)
-	r.writeString("</textarea></span>")
-	return WalkStop, nil
+	if entering {
+		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
+		r.writeString("<pre><code data-type=\"math-inline\">")
+		r.write(node.tokens)
+	} else {
+		r.writeString("</code></pre>")
+		r.writeString("</div>")
+	}
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
@@ -148,10 +153,15 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (
 }
 
 func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><textarea class=\"vditor-reset\" data-type=\"math-block\">")
-	r.write(node.tokens)
-	r.writeString("</textarea></div>")
-	return WalkStop, nil
+	if entering {
+		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
+		r.writeString("<pre><code data-type=\"math-block\">")
+		r.write(node.tokens)
+	} else {
+		r.writeString("</code></pre>")
+		r.writeString("</div>")
+	}
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
@@ -319,17 +329,27 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><textarea class=\"vditor-reset\" data-type=\"html-block\">")
-	r.write(node.tokens)
-	r.writeString("</textarea></div>")
-	return WalkStop, nil
+	if entering {
+		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\">")
+		r.writeString("<pre><code data-type=\"html-block\">")
+		r.write(node.tokens)
+	} else {
+		r.writeString("</code></pre>")
+		r.writeString("</div>")
+	}
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"<textarea class=\"vditor-reset\" data-type=\"html-inline\">")
-	r.write(node.tokens)
-	r.writeString("</textarea></span>")
-	return WalkStop, nil
+	if entering {
+		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
+		r.writeString("<pre><code data-type=\"html-inline\">")
+		r.write(node.tokens)
+	} else {
+		r.writeString("</code></pre>")
+		r.writeString("</div>")
+	}
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
@@ -562,7 +582,7 @@ func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 
 func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if !node.isFencedCodeBlock {
-		// 缩进代码块处理
+		// TODO: 移除缩进代码块处理
 		r.writeString("<pre><code>")
 		r.write(node.tokens)
 		r.writeString("</code></pre>")
