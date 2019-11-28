@@ -45,10 +45,14 @@ func (mathBlock *Node) mathBlockFinalize(context *Context) {
 	if bytes.HasSuffix(tokens, mathBlockMarker) {
 		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
 	}
-	mathBlock.tokens = tokens
+	content := &Node{typ: NodeMathBlockContent, tokens: tokens}
+	openMarker := &Node{typ: NodeMathBlockOpenMarker, tokens: mathBlockMarker}
+	closeMarker := &Node{typ: NodeMathBlockCloseMarker, tokens: mathBlockMarker}
+	mathBlock.tokens = nil
+	mathBlock.AppendChild(openMarker)
+	mathBlock.AppendChild(content)
+	mathBlock.AppendChild(closeMarker)
 }
-
-var mathBlockDollar = strToBytes("$")
 
 func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 	marker := t.context.currentLine[t.context.nextNonspace]
