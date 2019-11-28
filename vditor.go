@@ -226,12 +226,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 	dataType := lute.domAttrValue(n, "data-type")
 	if "pre" == dataType {
-		lute.genASTByVditorDOM(n.FirstChild, tree)
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			lute.genASTByVditorDOM(c, tree)
+		}
 		return
 	}
 
 	if atom.Div == n.DataAtom && ("html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType) {
-		lute.genASTByVditorDOM(n.FirstChild, tree)
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			lute.genASTByVditorDOM(c, tree)
+		}
 		return
 	}
 
