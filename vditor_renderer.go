@@ -542,7 +542,6 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		tokens := node.tokens
 		if 0 < len(node.previous.codeBlockInfo) {
 			infoWords := split(node.previous.codeBlockInfo, itemSpace)
 			language := bytesToStr(infoWords[0])
@@ -550,9 +549,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 		} else {
 			r.writeString("<pre><code>")
 		}
-		if "\n"+caret+"<br />\n" == bytesToStr(tokens) {
-			tokens = strToBytes(caret + "\n")
-		}
+		tokens := node.tokens
 		r.write(tokens)
 		return WalkSkipChildren, nil
 	}
