@@ -130,11 +130,17 @@ func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) 
 
 func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		if !strings.HasSuffix(node.parent.PreviousNodeText(), " ") {
+			r.writeByte(itemSpace)
+		}
 		r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
 		r.writeString("<code data-type=\"math-inline\">")
 		r.write(node.tokens)
 	} else {
 		r.writeString("</code></span>")
+		if !strings.HasPrefix(node.parent.NextNodeText(), " ") {
+			r.writeByte(itemSpace)
+		}
 	}
 	return WalkContinue, nil
 }
@@ -153,11 +159,11 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (
 
 func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
-		r.writeString("<code data-type=\"math-block\">")
+		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
+		r.writeString("<per><code data-type=\"math-block\">")
 		r.write(node.tokens)
 	} else {
-		r.writeString("</code></span>")
+		r.writeString("</code></pre></div>")
 	}
 	return WalkContinue, nil
 }
@@ -340,12 +346,17 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
-		r.writeString("<pre><code data-type=\"html-inline\">")
+		if !strings.HasSuffix(node.PreviousNodeText(), " ") {
+			r.writeByte(itemSpace)
+		}
+		r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
+		r.writeString("<code data-type=\"html-inline\">")
 		r.write(node.tokens)
 	} else {
-		r.writeString("</code></pre>")
-		r.writeString("</div>")
+		r.writeString("</code></span>")
+		if !strings.HasPrefix(node.NextNodeText(), " ") {
+			r.writeByte(itemSpace)
+		}
 	}
 	return WalkContinue, nil
 }

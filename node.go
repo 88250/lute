@@ -391,11 +391,11 @@ const (
 	// 数学公式
 
 	NodeMathBlock             nodeType = 300 // 数学公式块
-	NodeMathBlockOpenMarker            = 301 // 开始数学公式块标记符 $$
-	NodeMathBlockContent               = 302 // 数学公式块内容
-	NodeMathBlockCloseMarker           = 303 // 结束数学公式块标记符 $$
+	NodeMathBlockOpenMarker   nodeType = 301 // 开始数学公式块标记符 $$
+	NodeMathBlockContent      nodeType = 302 // 数学公式块内容
+	NodeMathBlockCloseMarker  nodeType = 303 // 结束数学公式块标记符 $$
 	NodeInlineMath            nodeType = 304 // 内联数学公式
-	NodeInlineMathOpenMarker           = 305 // 开始内联数学公式标记符 $
-	NodeInlineMathContent              = 306 // 内联数学公式内容
-	NodeInlineMathCloseMarker          = 307 // 结束内联数学公式标记符 $
+	NodeInlineMathOpenMarker  nodeType = 305 // 开始内联数学公式标记符 $
+	NodeInlineMathContent     nodeType = 306 // 内联数学公式内容
+	NodeInlineMathCloseMarker nodeType = 307 // 结束内联数学公式标记符 $
 )
