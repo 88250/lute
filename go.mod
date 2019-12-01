@@ -1,4 +1,4 @@
-module github.com/b3log/lute
+module github.com/88250/lute
 
 go 1.12
 

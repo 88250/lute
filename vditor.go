@@ -16,8 +16,8 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/b3log/lute/html"
-	"github.com/b3log/lute/html/atom"
+	"github.com/88250/lute/html"
+	"github.com/88250/lute/html/atom"
 )
 
 // 插入符 \u2038

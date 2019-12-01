@@ -18,7 +18,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/b3log/lute"
+	"github.com/88250/lute"
 )
 
 type testcase struct {

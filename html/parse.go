@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	a "github.com/b3log/lute/html/atom"
+	a "github.com/88250/lute/html/atom"
 )
 
 // A parser implements the HTML5 parsing algorithm:

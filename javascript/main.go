@@ -13,7 +13,7 @@
 package main
 
 import (
-	"github.com/b3log/lute"
+	"github.com/88250/lute"
 	"github.com/gopherjs/gopherjs/js"
 )
 

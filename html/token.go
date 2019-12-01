@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/b3log/lute/html/atom"
+	"github.com/88250/lute/html/atom"
 )
 
 // A TokenType is the type of a Token.

@@ -17,7 +17,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/b3log/lute/html"
+	"github.com/88250/lute/html"
 )
 
 func unescapeString(tokens []byte) (ret []byte) {

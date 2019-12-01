@@ -17,7 +17,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/b3log/lute"
+	"github.com/88250/lute"
 )
 
 func TestCodeSyntaxHighlightIssue17(t *testing.T) {

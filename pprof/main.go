@@ -17,7 +17,7 @@ import (
 	"os"
 	"runtime/pprof"
 
-	"github.com/b3log/lute"
+	"github.com/88250/lute"
 )
 
 func main() {

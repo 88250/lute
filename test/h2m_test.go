@@ -17,7 +17,7 @@ package test
 import (
 	"testing"
 
-	"github.com/b3log/lute"
+	"github.com/88250/lute"
 )
 
 var html2MdTests = []parseTest{

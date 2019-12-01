@@ -15,7 +15,7 @@ package lute
 import (
 	"strings"
 
-	"github.com/b3log/lute/html"
+	"github.com/88250/lute/html"
 )
 
 // parseInline 解析并生成块节点 block 的行级子节点。
