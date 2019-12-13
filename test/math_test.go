@@ -20,6 +20,9 @@ import (
 
 var mathTests = []parseTest{
 
+	// 解析问题 10$ https://github.com/88250/lute/issues/1
+	{"解析问题 10$", "10$\n", "<p>10$</p>\n"},
+
 	{"13", "$$a^2 + b^2 = \\color{red}c^2$$\n## 12\n", "<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2$$\n## 12</div>\n"},
 	{"12", "$$\n", "<div class=\"vditor-math\"></div>\n"},
 	{"11", "$\n", "<p>$</p>\n"},

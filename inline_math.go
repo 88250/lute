@@ -48,7 +48,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	if !t.context.option.InlineMathAllowDigitAfterOpenMarker && isDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
+	if !t.context.option.InlineMathAllowDigitAfterOpenMarker && ctx.tokensLen > startPos+1 && isDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
 		ctx.pos += 3
 		return &Node{typ: NodeText, tokens: ctx.tokens[startPos : startPos+3]}
 	}
