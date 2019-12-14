@@ -224,7 +224,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				start++
 			}
 			reflabel = ctx.tokens[start : startPos-1]
-			ctx.pos += len(reflabel)
+			ctx.pos += 2
 		}
 		if 0 == n {
 			ctx.pos = startPos

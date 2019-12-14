@@ -20,6 +20,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"42", "[label][] 是 label\n\n[label]: https://b3log.org\n", "<p><a href=\"https://b3log.org\">label</a> 是 label</p>\n"},
 	{"41", "|abc|def|\n|---|---|\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
 
 	// 链接解析括号匹配问题 https://github.com/b3log/lute/issues/36

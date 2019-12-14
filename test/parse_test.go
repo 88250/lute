@@ -27,7 +27,9 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 
-	// issue #177
+	// issue 链接引用定义问题 #3
+	{"#3", "[foo][]bar\n\n[foo]: /url \"title\"\n", "<p><a href=\"/url\" title=\"title\">foo</a>bar</p>\n"},
+
 	{"#177", "[link](/u(ri\n)\n", "<p>[link](/u(ri\n)</p>\n"},
 	{"#177", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
 
