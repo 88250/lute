@@ -20,6 +20,10 @@ import (
 
 var chinesePunctTests = []parseTest{
 
+	// 连续英文句号出现在中文后不优化 https://github.com/88250/lute/issues/2
+	{"8", "英文句号.。\n", "<p>英文句号。。</p>\n"},
+	{"7", "英文句号..\n", "<p>英文句号..</p>\n"},
+
 	// 标点转换需要排除文件后缀 https://github.com/b3log/lute/issues/41
 	{"6", "名字@数字.exe\n", "<p>名字@数字.exe</p>\n"},
 	{"5", "主页.1html 主页.html1\n", "<p>主页。1html 主页.html1</p>\n"},

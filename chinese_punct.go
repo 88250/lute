@@ -28,10 +28,16 @@ func chinesePunct0(text string) (ret string) {
 	runes := []rune(text)
 	length := len(runes)
 	for i, r := range runes {
-		if '.' == r && i+1 < length && isFileExt(i+1, length, &runes) {
-			// 中文.合法扩展名 的形式不进行转换
-			ret += string(r)
-			continue
+		if '.' == r && i+1 < length {
+			if  '.' == runes[i+1] {
+				// 连续英文句号出现在中文后不优化
+				ret += string(r)
+				continue
+			} else if isFileExt(i+1, length, &runes) {
+				// 中文.合法扩展名 的形式不进行转换
+				ret += string(r)
+				continue
+			}
 		}
 		ret = chinesePunct00(ret, r)
 	}
