@@ -13,7 +13,6 @@
 package lute
 
 import (
-	"bytes"
 	"strconv"
 	"strings"
 )
@@ -238,6 +237,9 @@ func (r *VditorRenderer) renderStrikethrough(node *Node, entering bool) (WalkSta
 
 func (r *VditorRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("s", [][]string{{"data-marker", "~"}}, false)
+	if caret == string(node.next.tokens) {
+		node.next.tokens = append([]byte("\n"), node.next.tokens...)
+	}
 	return WalkStop, nil
 }
 
@@ -248,6 +250,9 @@ func (r *VditorRenderer) renderStrikethrough1CloseMarker(node *Node, entering bo
 
 func (r *VditorRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("s", [][]string{{"data-marker", "~~"}}, false)
+	if caret == string(node.next.tokens) {
+		node.next.tokens = append([]byte("\n"), node.next.tokens...)
+	}
 	return WalkStop, nil
 }
 
@@ -387,10 +392,6 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
-	if 6 < len(node.tokens) && bytes.Contains(node.tokens, []byte(zeroWidthSpace+caret)) {
-		node.tokens = bytes.ReplaceAll(node.tokens, []byte(zeroWidthSpace), []byte(""))
-	}
-
 	if r.option.AutoSpace {
 		r.space(node)
 	}
@@ -435,6 +436,9 @@ func (r *VditorRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, 
 
 func (r *VditorRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("em", [][]string{{"data-marker", "*"}}, false)
+	if caret == string(node.next.tokens) {
+		node.next.tokens = append([]byte("\n"), node.next.tokens...)
+	}
 	return WalkStop, nil
 }
 
@@ -445,6 +449,9 @@ func (r *VditorRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) 
 
 func (r *VditorRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("em", [][]string{{"data-marker", "_"}}, false)
+	if caret == string(node.next.tokens) {
+		node.next.tokens = append([]byte("\n"), node.next.tokens...)
+	}
 	return WalkStop, nil
 }
 
@@ -459,6 +466,9 @@ func (r *VditorRenderer) renderStrong(node *Node, entering bool) (WalkStatus, er
 
 func (r *VditorRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("strong", [][]string{{"data-marker", "**"}}, false)
+	if caret == string(node.next.tokens) {
+		node.next.tokens = append([]byte("\n"), node.next.tokens...)
+	}
 	return WalkStop, nil
 }
 
@@ -469,6 +479,9 @@ func (r *VditorRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) (
 
 func (r *VditorRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("strong", [][]string{{"data-marker", "__"}}, false)
+	if caret == string(node.next.tokens) {
+		node.next.tokens = append([]byte("\n"), node.next.tokens...)
+	}
 	return WalkStop, nil
 }
 

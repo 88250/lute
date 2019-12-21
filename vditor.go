@@ -23,9 +23,6 @@ import (
 // 插入符 \u2038
 const caret = "‸"
 
-// 零宽空格 \u200B
-const zeroWidthSpace = "\u200B"
-
 // Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
 func (lute *Lute) Md2HTML(markdown string) (html string) {
 	html, err := lute.MarkdownStr("", markdown)
@@ -355,7 +352,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&Node{typ: NodeText, tokens: []byte(zeroWidthSpace + caret)})
+			node.AppendChild(&Node{typ: NodeText, tokens: []byte(caret)})
 			if "_" == marker {
 				node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: []byte(marker)})
 			} else {
@@ -381,7 +378,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&Node{typ: NodeText, tokens: []byte(zeroWidthSpace + caret)})
+			node.AppendChild(&Node{typ: NodeText, tokens: []byte(caret)})
 			if "_" == marker {
 				node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: []byte(marker)})
 			} else {
@@ -461,7 +458,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&Node{typ: NodeText, tokens: []byte(zeroWidthSpace + caret)})
+			node.AppendChild(&Node{typ: NodeText, tokens: []byte(caret)})
 			if "~" == marker {
 				node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: []byte(marker)})
 			} else {
