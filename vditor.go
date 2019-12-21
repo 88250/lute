@@ -330,7 +330,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 					language := class[len("language-"):]
 					node.lastChild.codeBlockInfo = []byte(language)
 				}
-				content := &Node{typ: NodeCodeBlockCode, tokens: []byte(n.FirstChild.FirstChild.Data)}
+
+				var codeTokens []byte
+				for code := n.FirstChild; nil != code; code = code.NextSibling {
+					codeTokens = append(codeTokens, []byte(lute.domHTML(code.FirstChild))...)
+				}
+				content := &Node{typ: NodeCodeBlockCode, tokens: codeTokens}
 				node.AppendChild(content)
 				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
 				tree.context.tip.AppendChild(node)

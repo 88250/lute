@@ -22,9 +22,11 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"49", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code>foo\n</code><code><br></code><code>bar<wbr></code></pre></div>", "```\nfoo\n\nbar\n```\n"},
+	{"48", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code>foo\n</code><code>b<wbr></code></pre></div>", "```\nfoo\nb\n```\n"},
 	{"47", "<p><em data-marker=\"*\"><br></em></p><p><em data-marker=\"*\"><wbr>foo</em></p>", "*foo*\n"},
 	{"46", "<p><em data-marker=\"*\">foo<wbr></em></p><p><em data-marker=\"*\"></em></p>", "*foo*\n"},
-	{"45", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "*foo*\n\n*\n*\n"},
+	{"45", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "*foo*\n"},
 	{"44", "<ol><li data-marker=\"1.\"><p>Node.js</p></li><li data-marker=\"2.\"><p>Go<wbr></p></li></ol>", "1. Node.js\n2. Go\n"},
 	{"43", "<p>f<i>o</i>o<wbr></p>", "f*o*o\n"},
 	{"42", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<br></li><ul><li data-marker=\"*\">b<wbr></li></ul></ul>", "* foo\n  * b\n"},
@@ -33,7 +35,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"39", "<p><b>foo<wbr></b></p>", "**foo**\n"},
 	{"38", "<p>```java</p><p><wbr><br></p>", "```java\n"},
 	{"37", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li><li data-marker=\"*\"></li><li data-marker=\"*\"><br></li></ul>", "* foo\n*\n*\n"},
-	{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n* *\n  *\n"},
+	{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n*\n"},
 	{"35", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "*\n"},
 	{"34", "<p>中<wbr>文</p>", "中文\n"},
 	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ul>", "1. foo\n"},
