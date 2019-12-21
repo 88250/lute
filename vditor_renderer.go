@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
 )
@@ -625,6 +626,11 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
+		if bytes.Contains(node.previous.codeBlockInfo, []byte(caret)) {
+			node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
+			node.tokens = append(node.tokens, []byte("\n" + caret)...)
+		}
+
 		if 0 < len(node.previous.codeBlockInfo) {
 			infoWords := split(node.previous.codeBlockInfo, itemSpace)
 			language := bytesToStr(infoWords[0])
@@ -632,11 +638,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 		} else {
 			r.writeString("<pre><code>")
 		}
-		tokens := node.tokens
-		if 1 > len(tokens) {
-			tokens = append(tokens, itemNewline)
-		}
-		r.write(tokens)
+		r.write(node.tokens)
 		return WalkSkipChildren, nil
 	}
 	r.writeString("</code></pre>")
