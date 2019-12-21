@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"45", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "*foo*\n\n<em data-marker=\"*\"><br/></em>\n"},
 	{"44", "<ol><li data-marker=\"1.\"><p>Node.js</p></li><li data-marker=\"2.\"><p>Go<wbr></p></li></ol>", "1. Node.js\n2. Go\n"},
 	{"43", "<p>f<i>o</i>o<wbr></p>", "f*o*o\n"},
 	{"42", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<br></li><ul><li data-marker=\"*\">b<wbr></li></ul></ul>", "* foo\n  * b\n"},
@@ -30,7 +31,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"39", "<p><b>foo<wbr></b></p>", "**foo**\n"},
 	{"38", "<p>```java</p><p><wbr><br></p>", "```java\n"},
 	{"37", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li><li data-marker=\"*\"></li><li data-marker=\"*\"><br></li></ul>", "* foo\n*\n*\n"},
-	{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n* *\n  *\n"},
+	{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n* <em data-marker=\"*\"><br/></em>\n"},
 	{"35", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "*\n"},
 	{"34", "<p>中<wbr>文</p>", "中文\n"},
 	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ul>", "1. foo\n"},
@@ -83,6 +84,9 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"37", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\">\u200b<wbr>bar</em></p>", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr>bar</em></p>"},
+	{"36", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\">\u200b<wbr></em></p>", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\">\u200b<wbr></em></p>"},
+	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\">\u200b<wbr></em></p>"},
 	{"34", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span></p>", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span> </p>"},
 	{"33", "<p><code>foo</code><wbr></p>", "<p> <code>foo</code> <wbr></p>"},
 	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code>\n</code></pre></div>"},

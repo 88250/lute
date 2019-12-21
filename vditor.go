@@ -23,6 +23,9 @@ import (
 // 插入符 \u2038
 const caret = "‸"
 
+// 零宽空格 \u200B
+const zeroWidthSpace = "\u200B"
+
 // Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
 func (lute *Lute) Md2HTML(markdown string) (html string) {
 	html, err := lute.MarkdownStr("", markdown)
@@ -349,6 +352,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeEmA6kOpenMarker, tokens: []byte(marker)})
 		}
 		tree.context.tip.AppendChild(node)
+
+		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&Node{typ: NodeText, tokens: []byte(zeroWidthSpace + caret)})
+			if "_" == marker {
+				node.AppendChild(&Node{typ: NodeEmU8eCloseMarker, tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&Node{typ: NodeEmA6kCloseMarker, tokens: []byte(marker)})
+			}
+			return
+		}
+
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Strong, atom.B:
@@ -363,6 +378,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeStrongA6kOpenMarker, tokens: []byte(marker)})
 		}
 		tree.context.tip.AppendChild(node)
+
+		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&Node{typ: NodeText, tokens: []byte(zeroWidthSpace + caret)})
+			if "_" == marker {
+				node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: []byte(marker)})
+			}
+			return
+		}
+
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
@@ -431,6 +458,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeStrikethrough2OpenMarker, tokens: []byte(marker)})
 		}
 		tree.context.tip.AppendChild(node)
+
+		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&Node{typ: NodeText, tokens: []byte(zeroWidthSpace + caret)})
+			if "~" == marker {
+				node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&Node{typ: NodeStrikethrough2CloseMarker, tokens: []byte(marker)})
+			}
+			return
+		}
+
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Table:

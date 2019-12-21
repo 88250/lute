@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
 )
@@ -386,6 +387,10 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
+	if 6 < len(node.tokens) && bytes.Contains(node.tokens, []byte(zeroWidthSpace+caret)) {
+		node.tokens = bytes.ReplaceAll(node.tokens, []byte(zeroWidthSpace), []byte(""))
+	}
+
 	if r.option.AutoSpace {
 		r.space(node)
 	}
