@@ -338,7 +338,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		return
 	case atom.Em, atom.I:
-		if nil == n.FirstChild {
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
 
@@ -368,7 +368,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Strong, atom.B:
-		if nil == n.FirstChild {
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
 
@@ -455,7 +455,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.parent.parent.listData.typ = 3
 		}
 	case atom.Del, atom.S, atom.Strike:
-		if nil == n.FirstChild {
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
 
