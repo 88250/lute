@@ -338,6 +338,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		return
 	case atom.Em, atom.I:
+		if nil == n.FirstChild {
+			return
+		}
+
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
@@ -364,6 +368,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Strong, atom.B:
+		if nil == n.FirstChild {
+			return
+		}
+
 		node.typ = NodeStrong
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
@@ -447,6 +455,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.parent.parent.listData.typ = 3
 		}
 	case atom.Del, atom.S, atom.Strike:
+		if nil == n.FirstChild {
+			return
+		}
+
 		node.typ = NodeStrikethrough
 		marker := lute.domAttrValue(n, "data-marker")
 		if "~" == marker {
