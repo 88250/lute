@@ -333,7 +333,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 				var codeTokens []byte
 				for code := n.FirstChild; nil != code; code = code.NextSibling {
-					codeTokens = append(codeTokens, []byte(lute.domHTML(code.FirstChild))...)
+					codeTokens = append(codeTokens, []byte(lute.domCode(code.FirstChild))...)
 				}
 				content := &Node{typ: NodeCodeBlockCode, tokens: codeTokens}
 				node.AppendChild(content)
@@ -530,9 +530,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		return
 	default:
 		node.typ = NodeHTMLBlock
-		buf := &bytes.Buffer{}
-		html.Render(buf, n)
-		node.tokens = buf.Bytes()
+		node.tokens = lute.domHTML(n)
 		tree.context.tip.AppendChild(node)
 		return
 	}
@@ -628,13 +626,13 @@ func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
 	return ""
 }
 
-func (lute *Lute) domHTML(n *html.Node) string {
+func (lute *Lute) domCode(n *html.Node) string {
 	buf := &bytes.Buffer{}
-	lute.domHTML0(n, buf)
+	lute.domCode0(n, buf)
 	return buf.String()
 }
 
-func (lute *Lute) domHTML0(n *html.Node, buffer *bytes.Buffer) {
+func (lute *Lute) domCode0(n *html.Node, buffer *bytes.Buffer) {
 	if nil == n {
 		return
 	}
@@ -643,10 +641,13 @@ func (lute *Lute) domHTML0(n *html.Node, buffer *bytes.Buffer) {
 		buffer.WriteString(n.Data)
 	case atom.Br:
 		buffer.WriteString("\n")
+	default:
+		buffer.Write(lute.domHTML(n))
+		return
 	}
 
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
-		lute.domHTML0(child, buffer)
+		lute.domCode0(child, buffer)
 	}
 }
 
@@ -670,4 +671,10 @@ func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
 		lute.domText0(child, buffer)
 	}
+}
+
+func (lute *Lute) domHTML(n *html.Node) []byte {
+	buf := &bytes.Buffer{}
+	html.Render(buf, n)
+	return buf.Bytes()
 }

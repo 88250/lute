@@ -286,9 +286,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		defer tree.context.parentTip(n)
 	default:
 		node.typ = NodeHTMLBlock
-		buf := &bytes.Buffer{}
-		html.Render(buf, n)
-		tokens := buf.Bytes()
+		tokens := lute.domHTML(n)
 		node.tokens = tokens
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
