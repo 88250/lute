@@ -22,11 +22,10 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
-	{"45", "<ol><li data-marker=\"1.\"><p>Node.js</p></li><li data-marker=\"2.\"><p>Go<wbr></p></li></ol>", "1. Node.js\n2. Go\n"},
-	{"44", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code class=\"language-java\">foo<wbr>\n</code></pre></div>", "```java\nfoo\n```\n"},
+	{"44", "<ol><li data-marker=\"1.\"><p>Node.js</p></li><li data-marker=\"2.\"><p>Go<wbr></p></li></ol>", "1. Node.js\n2. Go\n"},
 	{"43", "<p>f<i>o</i>o<wbr></p>", "f*o*o\n"},
 	{"42", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<br></li><ul><li data-marker=\"*\">b<wbr></li></ul></ul>", "* foo\n  * b\n"},
-	{"41", "<pre><code class=\"language-go\"><wbr></code></pre>", "```go\n```\n"},
+	{"41", "<pre><code class=\"language-go\">var<wbr></code></pre>", "```go\nvar\n```\n"},
 	{"40", "<p>f<span data-marker=\"*\">o</span>ob<wbr></p>", "foob\n"},
 	{"39", "<p><b>foo<wbr></b></p>", "**foo**\n"},
 	{"38", "<p>```java</p><p><wbr><br></p>", "```java\n"},
@@ -84,8 +83,6 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
-	//{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><wbr><textarea class=\"vditor-reset\" data-type=\"html-block\">&lt;div&gt;123&lt;/div&gt;</textarea></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><textarea class=\"vditor-reset\" data-type=\"math-block\">a</textarea></div>"},
-	//{"35", "<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><textarea class=\"vditor-reset\" data-type=\"math-block\">a</textarea></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><textarea class=\"vditor-reset\" data-type=\"math-block\">a</textarea></div>"},
 	{"34", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span></p>", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span> </p>"},
 	{"33", "<p><code>foo</code><wbr></p>", "<p> <code>foo</code> <wbr></p>"},
 	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code>\n</code></pre></div>"},
