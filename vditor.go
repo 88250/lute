@@ -225,14 +225,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	dataType := lute.domAttrValue(n, "data-type")
-	if "code-block" == dataType {
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			lute.genASTByVditorDOM(c, tree)
-		}
-		return
-	}
 
-	if atom.Div == n.DataAtom && ("html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType) {
+	if atom.Div == n.DataAtom && ("code-block" == dataType || "html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType) {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			lute.genASTByVditorDOM(c, tree)
 		}
@@ -309,16 +303,22 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		defer tree.context.parentTip(n)
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
-			switch dataType {
+			divDataType := lute.domAttrValue(n.Parent, "data-type")
+			var codeTokens []byte
+			for code := n.FirstChild; nil != code; code = code.NextSibling {
+				codeTokens = append(codeTokens, []byte(lute.domCode(code.FirstChild))...)
+			}
+
+			switch divDataType {
 			case "math-block":
 				node.typ = NodeMathBlock
 				node.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
-				node.AppendChild(&Node{typ: NodeMathBlockContent, tokens: []byte(n.FirstChild.Data)})
+				node.AppendChild(&Node{typ: NodeMathBlockContent, tokens: codeTokens})
 				node.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
 				tree.context.tip.AppendChild(node)
 			case "html-block":
 				node.typ = NodeHTMLBlock
-				node.tokens = []byte(n.FirstChild.Data)
+				node.tokens = codeTokens
 				tree.context.tip.AppendChild(node)
 			default:
 				node.typ = NodeCodeBlock
@@ -331,10 +331,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 					node.lastChild.codeBlockInfo = []byte(language)
 				}
 
-				var codeTokens []byte
-				for code := n.FirstChild; nil != code; code = code.NextSibling {
-					codeTokens = append(codeTokens, []byte(lute.domCode(code.FirstChild))...)
-				}
 				content := &Node{typ: NodeCodeBlockCode, tokens: codeTokens}
 				node.AppendChild(content)
 				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
@@ -618,6 +614,10 @@ func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {
 }
 
 func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
+	if nil == n {
+		return ""
+	}
+
 	for _, attr := range n.Attr {
 		if attr.Key == attrName {
 			return attr.Val

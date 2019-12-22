@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"51", "<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><pre><code data-type=\"math-block\">a^2 + b^2 = \\color{red}c^2<wbr></code></pre></div>", "$$\na^2 + b^2 = \\color{red}c^2\n$$\n"},
 	{"50", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code><a href=\"hacpai.com\">hacpai.com</a><wbr></code></pre></div>", "```\n<a href=\"hacpai.com\">hacpai.com</a>\n```\n"},
 	{"49", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code>foo\n</code><code><br></code><code>bar<wbr></code></pre></div>", "```\nfoo\n\nbar\n```\n"},
 	{"48", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code>foo\n</code><code>b<wbr></code></pre></div>", "```\nfoo\nb\n```\n"},
