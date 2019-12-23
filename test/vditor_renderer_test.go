@@ -22,6 +22,10 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"52", "<blockquote><p>foo\n</p><blockquote><p>bar<wbr>\n</p></blockquote></blockquote>", "> foo\n>\n> > bar\n> >\n"},
+	{"51", "<blockquote><blockquote><p><wbr>\n</p></blockquote></blockquote>", "\n"},
+	{"50", "<blockquote><p><wbr>\n</p></blockquote>", "\n"},
+	{"49", "<blockquote><p>f<wbr>\n</p></blockquote>", "> f\n"},
 	{"48", "<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\"><pre><code data-code=\"foo\"></code></pre></div>", "$$\nfoo\n$$\n"},
 	{"47", "<p><em data-marker=\"*\"><br></em></p><p><em data-marker=\"*\"><wbr>foo</em></p>", "*foo*\n"},
 	{"46", "<p><em data-marker=\"*\">foo<wbr></em></p><p><em data-marker=\"*\"></em></p>", "*foo*\n"},
@@ -87,6 +91,7 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"37", "<blockquote><p><wbr>\n</p></blockquote>", ""},
 	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\"></code></pre></div>"},
 	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p><em data-marker=\"*\">foo</em>\n</p><p><em data-marker=\"*\">\n<wbr></em>\n</p>"},
 	{"34", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span></p>", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span> \n</p>"},

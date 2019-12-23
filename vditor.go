@@ -261,6 +261,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeThematicBreak
 		tree.context.tip.AppendChild(node)
 	case atom.Blockquote:
+		content := strings.TrimSpace(lute.domText(n))
+		if "" == content || "&gt;" == content || caret == content {
+			return
+		}
+
 		node.typ = NodeBlockquote
 		node.AppendChild(&Node{typ: NodeBlockquoteMarker, tokens: []byte(">")})
 		tree.context.tip.AppendChild(node)
@@ -577,13 +582,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 func (context *Context) parentTip(n *html.Node) {
 	for tip := context.tip.parent; nil != tip; tip = tip.parent {
-		if NodeParagraph == tip.typ {
+		if NodeParagraph == tip.typ && NodeBlockquote != tip.parent.typ {
 			if nil == n.NextSibling {
 				continue
 			}
 			nextType := n.NextSibling.DataAtom
-			if atom.Ul == nextType ||
-				atom.Ol == nextType {
+			if atom.Ul == nextType || atom.Ol == nextType {
 				continue
 			}
 		}
