@@ -87,11 +87,11 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\n\" class=\"language-go\"></code></pre></div>"},
+	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\"></code></pre></div>"},
 	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\">\n<wbr></em></p>"},
 	{"34", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span></p>", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span> </p>"},
 	{"33", "<p><code>foo</code><wbr></p>", "<p> <code data-code=\"foo\"></code> <wbr></p>"},
-	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"\"></code></pre></div>"},
+	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"\"><wbr></code></pre></div>"},
 	{"31", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code><span style=\"color:#000080;font-weight:bold;\">package1<wbr></span>\n</code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-type=\"html-block\"><div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code><span style=\"color:#000080;font-weight:bold;\">package1<wbr></span>\n</code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div></code></pre></div>"},
 	{"30", "<p>1. Node.js</p><p>2. Go<wbr></p>", "<ol><li data-marker=\"1.\"><p>Node.js</p></li><li data-marker=\"2.\"><p>Go<wbr></p></li></ol>"},
 	{"29", "<p><wbr><br></p>", "<p><wbr>\n</p>"},

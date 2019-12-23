@@ -163,7 +163,7 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (
 
 func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
+		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte("<wbr>"))
 
 		var attrs [][]string
 		if r.EscapeCode {
@@ -633,25 +633,26 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
-		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
+	node.tokens = bytes.TrimSpace(node.tokens)
+	caretInCode := bytes.Contains(node.previous.codeBlockInfo, []byte(caret))
+	node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
 
-		var attrs [][]string
-		if r.EscapeCode {
-			attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
-		} else {
-			attrs = append(attrs, []string{"data-code", string(node.tokens)})
-		}
+	var attrs [][]string
+	if r.EscapeCode {
+		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
+	} else {
+		attrs = append(attrs, []string{"data-code", string(node.tokens)})
+	}
 
-		if 0 < len(node.previous.codeBlockInfo) {
-			infoWords := split(node.previous.codeBlockInfo, itemSpace)
-			language := string(infoWords[0])
-			attrs = append(attrs, []string{"class", "language-" + language})
-		}
-		r.writeString("<pre>")
-		r.tag("code", attrs, false)
-		return WalkSkipChildren, nil
+	if 0 < len(node.previous.codeBlockInfo) {
+		infoWords := split(node.previous.codeBlockInfo, itemSpace)
+		language := string(infoWords[0])
+		attrs = append(attrs, []string{"class", "language-" + language})
+	}
+	r.writeString("<pre>")
+	r.tag("code", attrs, false)
+	if caretInCode {
+		r.writeString("<wbr>")
 	}
 	r.writeString("</code></pre>")
 	return WalkStop, nil
