@@ -532,6 +532,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			tree.context.tip.AppendChild(node)
 		}
 		return
+	case atom.Font:
+		return
 	default:
 		node.typ = NodeHTMLBlock
 		node.tokens = lute.domHTML(n)
