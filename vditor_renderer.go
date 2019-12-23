@@ -429,17 +429,16 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 	if !strings.HasSuffix(node.parent.PreviousNodeText(), " ") {
 		r.writeByte(itemSpace)
 	}
-	r.writeString("<code>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.tokens)
+	r.tag("code", [][]string{{"data-code", PathEscape(string(node.tokens))}}, false)
+	r.writeString("</code>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("</code>")
 	if !strings.HasPrefix(node.parent.NextNodeText(), " ") {
 		r.writeByte(itemSpace)
 	}
