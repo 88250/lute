@@ -609,13 +609,6 @@ func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 }
 
 func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
-	if !node.isFencedCodeBlock {
-		// TODO: 移除缩进代码块处理
-		r.writeString("<pre><code>")
-		r.write(node.tokens)
-		r.writeString("</code></pre>")
-		return WalkStop, nil
-	}
 	if entering {
 		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\">")
 	} else {
@@ -626,19 +619,17 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if bytes.Contains(node.previous.codeBlockInfo, []byte(caret)) {
-			node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
-			node.tokens = append(node.tokens, []byte("\n" + caret)...)
-		}
+		node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
+		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
 
+		attrs := [][]string{{"data-code", string(node.tokens)}}
 		if 0 < len(node.previous.codeBlockInfo) {
 			infoWords := split(node.previous.codeBlockInfo, itemSpace)
 			language := bytesToStr(infoWords[0])
-			r.writeString("<pre><code class=\"language-" + language + "\">")
-		} else {
-			r.writeString("<pre><code>")
+			attrs = append(attrs, []string{"class", "language-" + language})
 		}
-		r.write(node.tokens)
+		r.tag("pre", attrs, false)
+		r.writeString("<code>")
 		return WalkSkipChildren, nil
 	}
 	r.writeString("</code></pre>")
