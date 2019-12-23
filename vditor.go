@@ -306,7 +306,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
-			codeTokens := []byte(lute.domAttrValue(n, "data-code"))
+			codeTokens := []byte(lute.domAttrValue(n.FirstChild, "data-code"))
 
 			switch divDataType {
 			case "math-block":

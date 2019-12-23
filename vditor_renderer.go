@@ -637,8 +637,8 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 			language := string(infoWords[0])
 			attrs = append(attrs, []string{"class", "language-" + language})
 		}
-		r.tag("pre", attrs, false)
-		r.writeString("<code>")
+		r.writeString("<pre>")
+		r.tag("code", attrs, false)
 		return WalkSkipChildren, nil
 	}
 	r.writeString("</code></pre>")
