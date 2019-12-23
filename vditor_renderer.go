@@ -163,13 +163,20 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (
 
 func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
-		r.writeString("<pre><code data-type=\"math-block\">")
-		r.write(node.tokens)
-	} else {
-		r.writeString("</code></pre></div>")
+		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
+
+		var attrs [][]string
+		if r.EscapeCode {
+			attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
+		} else {
+			attrs = append(attrs, []string{"data-code", string(node.tokens)})
+		}
+		r.writeString("<pre>")
+		r.tag("code", attrs, false)
+		return WalkSkipChildren, nil
 	}
-	return WalkContinue, nil
+	r.writeString("</code></pre>")
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
@@ -177,6 +184,11 @@ func (r *VditorRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (W
 }
 
 func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
+	} else {
+		r.writeString("</div>")
+	}
 	return WalkContinue, nil
 }
 
