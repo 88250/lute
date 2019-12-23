@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"53", "<blockquote><p><br></p><p><wbr>foo\n</p></blockquote>", "> foo\n"}, // 在块引用第一个字符前换行
 	{"52", "<blockquote><p>foo\n</p><blockquote><p>bar<wbr>\n</p></blockquote></blockquote>", "> foo\n>\n> > bar\n> >\n"},
 	{"51", "<blockquote><blockquote><p><wbr>\n</p></blockquote></blockquote>", "\n"},
 	{"50", "<blockquote><p><wbr>\n</p></blockquote>", "\n"},
