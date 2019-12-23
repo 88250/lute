@@ -14,7 +14,6 @@ package lute
 
 import (
 	"bytes"
-	"net/url"
 	"strconv"
 	"strings"
 )
@@ -332,9 +331,9 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
-		attrs := [][]string{{"href", bytesToStr(dest.tokens)}}
+		attrs := [][]string{{"href", string(dest.tokens)}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
-			attrs = append(attrs, []string{"title", bytesToStr(title.tokens)})
+			attrs = append(attrs, []string{"title", string(title.tokens)})
 		}
 		r.tag("a", attrs, false)
 	} else {
@@ -388,7 +387,7 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.tag("p", nil, false)
 	} else {
-		if nil != node.firstChild && NodeText == node.firstChild.typ && caret == bytesToStr(node.firstChild.tokens) {
+		if nil != node.firstChild && NodeText == node.firstChild.typ && caret == string(node.firstChild.tokens) {
 			r.writeByte(itemNewline)
 		}
 		r.tag("/p", nil, false)
@@ -553,11 +552,11 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		var attrs [][]string
 		switch node.listData.typ {
 		case 0:
-			attrs = append(attrs, []string{"data-marker", bytesToStr(node.marker)})
+			attrs = append(attrs, []string{"data-marker", string(node.marker)})
 		case 1:
 			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + "."})
 		case 3:
-			attrs = append(attrs, []string{"data-marker", bytesToStr(node.marker)})
+			attrs = append(attrs, []string{"data-marker", string(node.marker)})
 			attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
 		}
 		r.tag("li", attrs, false)
@@ -628,14 +627,14 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 
 		var attrs [][]string
 		if r.EscapeCode {
-			attrs = append(attrs, []string{"data-code", url.PathEscape(string(node.tokens))})
+			attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
 		} else {
 			attrs = append(attrs, []string{"data-code", string(node.tokens)})
 		}
 
 		if 0 < len(node.previous.codeBlockInfo) {
 			infoWords := split(node.previous.codeBlockInfo, itemSpace)
-			language := bytesToStr(infoWords[0])
+			language := string(infoWords[0])
 			attrs = append(attrs, []string{"class", "language-" + language})
 		}
 		r.tag("pre", attrs, false)
