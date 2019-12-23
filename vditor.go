@@ -87,6 +87,7 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 	}
 
 	renderer := lute.newVditorRenderer(tree)
+	renderer.EscapeCode = true
 	var output []byte
 	output, err = renderer.Render()
 	if nil != err {
@@ -112,6 +113,7 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 	}
 
 	renderer := lute.newVditorRenderer(tree)
+	renderer.EscapeCode = true
 	var output []byte
 	output, err = renderer.Render()
 	if nil != err {

@@ -14,6 +14,7 @@ package lute
 
 import (
 	"bytes"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -21,11 +22,14 @@ import (
 // VditorRenderer 描述了 Vditor DOM 渲染器。
 type VditorRenderer struct {
 	*BaseRenderer
+
+	// EscapeCode 标识是否对代码、代码块进行编码
+	EscapeCode bool
 }
 
 // newVditorRenderer 创建一个 HTML 渲染器。
-func (lute *Lute) newVditorRenderer(tree *Tree) Renderer {
-	ret := &VditorRenderer{lute.newBaseRenderer(tree)}
+func (lute *Lute) newVditorRenderer(tree *Tree) *VditorRenderer {
+	ret := &VditorRenderer{BaseRenderer: lute.newBaseRenderer(tree)}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
@@ -622,7 +626,13 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 		node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
 
-		attrs := [][]string{{"data-code", string(node.tokens)}}
+		var attrs [][]string
+		if r.EscapeCode {
+			attrs = append(attrs, []string{"data-code", url.PathEscape(string(node.tokens))})
+		} else {
+			attrs = append(attrs, []string{"data-code", string(node.tokens)})
+		}
+
 		if 0 < len(node.previous.codeBlockInfo) {
 			infoWords := split(node.previous.codeBlockInfo, itemSpace)
 			language := bytesToStr(infoWords[0])
