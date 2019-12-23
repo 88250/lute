@@ -399,9 +399,7 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.tag("p", nil, false)
 	} else {
-		if nil != node.firstChild && NodeText == node.firstChild.typ && caret == string(node.firstChild.tokens) {
-			r.writeByte(itemNewline)
-		}
+		r.writeByte(itemNewline)
 		r.tag("/p", nil, false)
 	}
 	return WalkContinue, nil
