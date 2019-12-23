@@ -433,6 +433,7 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 }
 
 func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
+	node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
 	r.tag("code", [][]string{{"data-code", PathEscape(string(node.tokens))}}, false)
 	r.writeString("</code>")
 	return WalkStop, nil
