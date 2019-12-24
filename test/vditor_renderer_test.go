@@ -94,6 +94,7 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"39", "<p>*foo<wbr>*bar\n</p>", "<p><em data-marker=\"*\">foo<wbr></em>bar\n</p>"},
 	{"38", "<p>[foo](h<wbr>)\n</p>", "<p><a href=\"h\">foo<wbr></a>\n</p>"},
 	{"37", "<blockquote><p><wbr>\n</p></blockquote>", ""},
 	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\"></code></pre></div>"},

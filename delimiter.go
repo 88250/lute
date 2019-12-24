@@ -245,6 +245,14 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	afterIsPunct := unicode.IsPunct(tokenAfter) || unicode.IsSymbol(tokenAfter)
 	beforeIsWhitespace := isUnicodeWhitespace(tokenBefore)
 	beforeIsPunct := unicode.IsPunct(tokenBefore) || unicode.IsSymbol(tokenBefore)
+	if t.context.option.VditorWYSIWYG {
+		if caret == string(tokenAfter) {
+			afterIsPunct = false
+		}
+		if caret == string(tokenBefore) {
+			beforeIsPunct = false
+		}
+	}
 
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
