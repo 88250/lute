@@ -289,6 +289,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Li:
+		content := strings.TrimSpace(lute.domText(n))
+		if "" == content { // vditorDOM2MdTests case 55
+			return
+		}
+
 		node.typ = NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
