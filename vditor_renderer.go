@@ -425,9 +425,10 @@ func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	if !strings.HasSuffix(node.parent.PreviousNodeText(), " ") {
-		r.writeByte(itemSpace)
-	}
+	//previousText := node.parent.PreviousNodeText()
+	//if "" != previousText && !strings.HasSuffix(previousText, " ") {
+	//	r.writeByte(itemSpace)
+	//}
 	return WalkStop, nil
 }
 
@@ -444,9 +445,10 @@ func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 }
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	if !strings.HasPrefix(node.parent.NextNodeText(), " ") {
-		r.writeByte(itemSpace)
-	}
+	//nextText := node.parent.NextNodeText()
+	//if "" != nextText && !strings.HasPrefix(nextText, " ") {
+	//	r.writeByte(itemSpace)
+	//}
 	return WalkStop, nil
 }
 

@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"54", "<p>f<code data-code=\"o\"></code><wbr>o\n</p>", "f`o`o\n"},
 	{"53", "<blockquote><p><br></p><p><wbr>foo\n</p></blockquote>", "> foo\n"}, // 在块引用第一个字符前换行
 	{"52", "<blockquote><p>foo\n</p><blockquote><p>bar<wbr>\n</p></blockquote></blockquote>", "> foo\n>\n> > bar\n> >\n"},
 	{"51", "<blockquote><blockquote><p><wbr>\n</p></blockquote></blockquote>", "\n"},
@@ -69,7 +70,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"10", "<img src=\"/bar\" />", "![](/bar)\n"},
 	{"9", "<a href=\"/bar\">foo</a>", "[foo](/bar)\n"},
 	{"8", "foo<br />bar", "foo\nbar\n"},
-	{"7", "<code>foo</code>", "`foo`\n"},
+	{"7", "<p><code data-code=\"foo\"></code><wbr>\n</p>", "`foo`\n"},
 	{"6", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\">foo<br></code></pre></div>", "```\nfoo\n```\n"},
 	{"5", "<ul><li data-marker=\"*\">foo</li></ul>", "* foo\n"},
 	{"4", "<blockquote>foo</blockquote>", "> foo\n"},
@@ -97,7 +98,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\"></code></pre></div>"},
 	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p><em data-marker=\"*\">foo</em>\n</p><p><em data-marker=\"*\">\n<wbr></em>\n</p>"},
 	{"34", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span></p>", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span> \n</p>"},
-	{"33", "<p><code>foo</code><wbr></p>", "<p> <code data-code=\"foo\"></code> <wbr>\n</p>"},
+	{"33", "<p><code data-code=\"foo\"></code><wbr>\n</p>", "<p><code data-code=\"foo\"></code><wbr>\n</p>"},
 	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"\"><wbr></code></pre></div>"},
 	{"31", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code><span style=\"color:#000080;font-weight:bold;\">package1<wbr></span>\n</code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-type=\"html-block\"><div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code><span style=\"color:#000080;font-weight:bold;\">package1<wbr></span>\n</code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div></code></pre></div>"},
 	{"30", "<p>1. Node.js</p><p>2. Go<wbr></p>", "<ol><li data-marker=\"1.\"><p>Node.js\n</p></li><li data-marker=\"2.\"><p>Go<wbr>\n</p></li></ol>"},

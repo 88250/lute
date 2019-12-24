@@ -407,7 +407,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
-		content := &Node{typ: NodeCodeSpanContent, tokens: []byte(n.FirstChild.Data)}
+		codeTokens := []byte(lute.domAttrValue(n, "data-code"))
+		content := &Node{typ: NodeCodeSpanContent, tokens: codeTokens}
 		node.typ = NodeCodeSpan
 		node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
 		node.AppendChild(content)
