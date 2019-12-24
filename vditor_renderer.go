@@ -343,6 +343,7 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
+		dest.tokens = bytes.ReplaceAll(dest.tokens, []byte(caret), []byte(""))
 		attrs := [][]string{{"href", string(dest.tokens)}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			attrs = append(attrs, []string{"title", string(title.tokens)})
