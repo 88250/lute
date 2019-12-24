@@ -456,6 +456,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Input:
+		if nil == n.Parent || atom.Li != n.Parent.DataAtom {
+			return
+		}
 		node.typ = NodeTaskListItemMarker
 		if lute.hasAttr(n, "checked") {
 			node.taskListItemChecked = true
