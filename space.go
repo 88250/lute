@@ -70,9 +70,9 @@ func allowSpace(currentChar, nextChar rune) bool {
 	currentIsDigit := '0' <= currentChar && '9' >= currentChar
 	nextIsDigit := '0' <= nextChar && '9' >= nextChar
 
-	nextIsSymbol := unicode.IsSymbol(nextChar)
-	currentIsPunct := unicode.IsPunct(currentChar)
-	nextIsPunct := unicode.IsPunct(nextChar)
+	nextIsSymbol := unicode.IsSymbol(nextChar) && '~' != nextChar
+	currentIsPunct := unicode.IsPunct(currentChar) || '~' == currentChar
+	nextIsPunct := unicode.IsPunct(nextChar) || '~' == nextChar
 	if currentIsASCII {
 		if currentIsDigit && nextIsSymbol {
 			return false
@@ -91,7 +91,7 @@ func allowSpace(currentChar, nextChar rune) bool {
 		if nextIsSymbol {
 			return true
 		}
-		currentIsSymbol := unicode.IsSymbol(currentChar)
+		currentIsSymbol := unicode.IsSymbol(currentChar) && '~' != currentChar
 		if currentIsSymbol && (nextIsDigit || nextIsPunct || !nextIsASCII) {
 			return false
 		}
