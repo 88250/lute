@@ -242,6 +242,9 @@ func (r *FormatRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 	r.newline()
 	r.write(node.tokens)
 	r.newline()
+	if !r.isLastNode(r.tree.Root, node) {
+		r.writeByte(itemNewline)
+	}
 	return WalkStop, nil
 }
 

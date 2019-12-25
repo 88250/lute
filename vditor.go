@@ -330,8 +330,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				node.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
 				tree.context.tip.AppendChild(node)
 			case "html-block":
+				htmlCode, e := PathUnescape(string(codeTokens))
+				if nil != e {
+					return
+				}
 				node.typ = NodeHTMLBlock
-				node.tokens = codeTokens
+				node.tokens = []byte(htmlCode)
 				tree.context.tip.AppendChild(node)
 			default:
 				node.typ = NodeCodeBlock

@@ -361,13 +361,16 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\">")
-		r.writeString("<pre><code data-type=\"html-block\">")
-		r.write(node.tokens)
-	} else {
-		r.writeString("</code></pre>")
-		r.writeString("</div>")
+		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte("<wbr>"))
+
+		var attrs [][]string
+		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
+		r.writeString("<pre>")
+		r.tag("code", attrs, false)
+		return WalkSkipChildren, nil
 	}
-	return WalkContinue, nil
+	r.writeString("</code></pre></div>")
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {

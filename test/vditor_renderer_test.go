@@ -22,8 +22,9 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"57", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E%0A\">&lt;details&gt;&lt;summary&gt;这里是摘要部分。&lt;/summary&gt;这里是细节部分。&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "### 隐藏细节\n\n<details>\n<summary>这里是摘要部分。</summary>\n这里是细节部分。\n</details>\n\n1\n"},
 	{"56", "<p>~删除线~</p>", "~删除线~\n"},
-	{"55", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><br></li><li data-marker=\"*\"><wbr>bar</li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><wbr>bar</li></ul>"}, // 在 bar 前面换行剔除空的列表项节点
+	{"55", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><br></li><li data-marker=\"*\"><wbr>bar</li></ul>", "* foo\n* bar\n"}, // 在 bar 前面换行剔除空的列表项节点
 	{"54", "<p>f<code data-code=\"o\"></code><wbr>o\n</p>", "f`o`o\n"},
 	{"53", "<blockquote><p><br></p><p><wbr>foo\n</p></blockquote>", "> foo\n"}, // 在块引用第一个字符前换行
 	{"52", "<blockquote><p>foo\n</p><blockquote><p>bar<wbr>\n</p></blockquote></blockquote>", "> foo\n>\n> > bar\n> >\n"},
@@ -41,14 +42,14 @@ var vditorDOM2MdTests = []parseTest{
 	{"40", "<p>f<span data-marker=\"*\">o</span>ob<wbr></p>", "foob\n"},
 	{"39", "<p><b>foo<wbr></b></p>", "**foo**\n"},
 	{"38", "<p>```java</p><p><wbr><br></p>", "```java\n"},
-	{"37", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li><li data-marker=\"*\"></li><li data-marker=\"*\"><br></li></ul>", "* foo\n*\n*\n"},
-	{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n*\n"},
-	{"35", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "*\n"},
+	{"37", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li><li data-marker=\"*\"></li><li data-marker=\"*\"><br></li></ul>", "* foo\n"},
+	{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n"},
+	{"35", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "\n"},
 	{"34", "<p>中<wbr>文</p>", "中文\n"},
 	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ul>", "1. foo\n"},
 	{"32", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "* foo\n"},
 	{"31", "<ul><li data-marker=\"*\">foo<ul><li data-marker=\"*\">bar</li></ul></li></ul>", "* foo\n  * bar\n"},
-	{"30", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><br /></li></ul></li></ul>", "* foo\n* *\n"},
+	{"30", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><br /></li></ul></li></ul>", "* foo\n"},
 	{"29", "<p><s>del</s></p>", "~~del~~\n"},
 	{"29", "<p>[]()</p>", "[]()\n"},
 	{"28", ":octocat:", ":octocat:\n"},
@@ -95,6 +96,7 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"40", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E%0A\">&lt;details&gt;&lt;summary&gt;这里是摘要部分。&lt;/summary&gt;这里是细节部分。&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E\"></code></pre></div><p>1<wbr>\n</p>"},
 	{"39", "<p>*foo<wbr>*bar\n</p>", "<p><em data-marker=\"*\">foo<wbr></em>bar\n</p>"},
 	{"38", "<p>[foo](h<wbr>)\n</p>", "<p><a href=\"h\">foo<wbr></a>\n</p>"},
 	{"37", "<blockquote><p><wbr>\n</p></blockquote>", ""},
@@ -103,10 +105,10 @@ var spinVditorDOMTests = []*parseTest{
 	{"34", "<p><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span></p>", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">a1a</code></span> \n</p>"},
 	{"33", "<p><code data-code=\"foo\"></code><wbr>\n</p>", "<p><code data-code=\"foo\"></code><wbr>\n</p>"},
 	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"\"><wbr></code></pre></div>"},
-	{"31", "<div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code><span style=\"color:#000080;font-weight:bold;\">package1<wbr></span>\n</code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-type=\"html-block\"><div class=\"vditor-wysiwyg__block\" data-type=\"pre\"><pre><code><span style=\"color:#000080;font-weight:bold;\">package1<wbr></span>\n</code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div></code></pre></div>"},
+
 	{"30", "<p>1. Node.js</p><p>2. Go<wbr></p>", "<ol><li data-marker=\"1.\"><p>Node.js\n</p></li><li data-marker=\"2.\"><p>Go<wbr>\n</p></li></ol>"},
 	{"29", "<p><wbr><br></p>", "<p><wbr>\n</p>"},
-	{"28", "<p>foo</p>\n<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><textarea class=\"vditor-reset\" data-type=\"html-block\"><audio controls=\"controls\" src=\"http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3\"></audio></textarea></div>\n<p>bar</p>", "<p>foo\n</p><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-type=\"html-block\"><textarea class=\"vditor-reset\" data-type=\"html-block\">&lt;audio controls=&#34;controls&#34; src=&#34;http://localhost:8080/upload/file/2019/11/1440573175609-96444c00.mp3&#34;&gt;&lt;/audio&gt;</textarea></code></pre></div><p>bar\n</p>"},
+
 	{"27", "<p><wbr></p>", "<p><wbr>\n</p>"},
 	{"26", "<p>![alt](src \"title\")</p>", "<p><img src=\"src\" alt=\"alt\" title=\"title\" />\n</p>"},
 	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"\" class=\"language-java\"></code></pre></div>"},
@@ -121,7 +123,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"16", "<p>[](</p>", "<p>[](\n</p>"},
 	{"15", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" />\n</p>"},
 	{"14", ":octocat:", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" />\n</p>"},
-	{"13", "<div class=\"vditor-block\"><table><thead><tr><th>abc</th><th>def</th></tr></thead></table></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-type=\"html-block\"><div class=\"vditor-block\"><table><thead><tr><th>abc</th><th>def</th></tr></thead></table></div></code></pre></div>"},
+
 	{"12", "<p><s data-marker=\"~~\">Hi</s> Hello, world!</p>", "<p><s data-marker=\"~~\">Hi</s> Hello, world!\n</p>"},
 	{"11", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "<p><s data-marker=\"~\">Hi</s> Hello, world!\n</p>"},
 	{"10", "<ul><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul data-tight=\"true\"><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},
