@@ -130,7 +130,7 @@ func (r *VditorRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, err
 
 func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	nextText := node.parent.NextNodeText()
-	if "" != nextText && !strings.HasPrefix(nextText, " ") {
+	if "" == nextText || !strings.HasPrefix(nextText, " ") {
 		r.writeByte(itemSpace)
 	}
 	return WalkStop, nil
@@ -151,7 +151,7 @@ func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (Wal
 
 func (r *VditorRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	previousText := node.parent.PreviousNodeText()
-	if "" != previousText && !strings.HasSuffix(previousText, " ") {
+	if "" == previousText || !strings.HasSuffix(previousText, " ") {
 		r.writeByte(itemSpace)
 	}
 	return WalkStop, nil
@@ -378,20 +378,24 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		if !strings.HasSuffix(node.PreviousNodeText(), " ") {
-			r.writeByte(itemSpace)
-		}
-		r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
-		r.writeString("<code data-type=\"html-inline\">")
-		r.write(node.tokens)
-	} else {
-		r.writeString("</code></span>")
-		if !strings.HasPrefix(node.NextNodeText(), " ") {
-			r.writeByte(itemSpace)
-		}
+	previousText := node.parent.PreviousNodeText()
+	if "" == previousText || !strings.HasSuffix(previousText, " ") {
+		r.writeByte(itemSpace)
 	}
-	return WalkContinue, nil
+	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
+	node.tokens = bytes.TrimSpace(node.tokens)
+	caretInCode := bytes.Contains(node.tokens, []byte(caret))
+	node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
+	r.tag("code", [][]string{{"data-type", "math-inline"}, {"data-code", PathEscape(string(node.tokens))}}, false)
+	if caretInCode {
+		r.writeString("<wbr>")
+	}
+	r.writeString("</code></span>")
+	nextText := node.parent.NextNodeText()
+	if "" == nextText || !strings.HasPrefix(nextText, " ") {
+		r.writeByte(itemSpace)
+	}
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
@@ -436,7 +440,7 @@ func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 
 func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	previousText := node.parent.PreviousNodeText()
-	if "" != previousText && !strings.HasSuffix(previousText, " ") {
+	if "" == previousText || !strings.HasSuffix(previousText, " ") {
 		r.writeByte(itemSpace)
 	}
 	return WalkStop, nil
@@ -456,7 +460,7 @@ func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	nextText := node.parent.NextNodeText()
-	if "" != nextText && !strings.HasPrefix(nextText, " ") {
+	if "" == nextText || !strings.HasPrefix(nextText, " ") {
 		r.writeByte(itemSpace)
 	}
 	return WalkStop, nil

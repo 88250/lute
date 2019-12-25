@@ -530,15 +530,17 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Span:
+		codeTokens := []byte(lute.domAttrValue(n.FirstChild, "data-code"))
+
 		if "math-inline" == dataType {
 			node.typ = NodeInlineMath
 			node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
-			node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: []byte(n.FirstChild.FirstChild.Data)})
+			node.AppendChild(&Node{typ: NodeInlineMathContent, tokens: codeTokens})
 			node.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
 			tree.context.tip.AppendChild(node)
 		} else if "html-inline" == dataType {
 			node.typ = NodeInlineHTML
-			node.tokens = []byte(n.FirstChild.FirstChild.Data)
+			node.tokens = codeTokens
 			tree.context.tip.AppendChild(node)
 		} else {
 			node.tokens = []byte(lute.domText(n))
