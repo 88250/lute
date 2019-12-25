@@ -255,6 +255,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		if "" == strings.TrimSpace(lute.domText(n)) {
+			return
+		}
 		node.typ = NodeHeading
 		node.headingLevel = int(node.tokens[1] - byte('0'))
 		node.AppendChild(&Node{typ: NodeHeadingC8hMarker, tokens: []byte(strings.Repeat("#", node.headingLevel))})
