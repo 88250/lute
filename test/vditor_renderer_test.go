@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"58", "<p><em data-marker=\"*\">foo </em>bar<wbr>\n</p>", "*foo*bar\n"},
 	{"57", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E%0A\">&lt;details&gt;&lt;summary&gt;这里是摘要部分。&lt;/summary&gt;这里是细节部分。&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "### 隐藏细节\n\n<details>\n<summary>这里是摘要部分。</summary>\n这里是细节部分。\n</details>\n\n1\n"},
 	{"56", "<p>~删除线~</p>", "~删除线~\n"},
 	{"55", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><br></li><li data-marker=\"*\"><wbr>bar</li></ul>", "* foo\n* bar\n"}, // 在 bar 前面换行剔除空的列表项节点
@@ -96,13 +97,13 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
-	//{"40", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E%0A\">&lt;details&gt;&lt;summary&gt;这里是摘要部分。&lt;/summary&gt;这里是细节部分。&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E\"></code></pre></div><p>1<wbr>\n</p>"},
-	//{"39", "<p>*foo<wbr>*bar\n</p>", "<p><em data-marker=\"*\">foo<wbr></em>bar\n</p>"},
-	//{"38", "<p>[foo](h<wbr>)\n</p>", "<p><a href=\"h\">foo<wbr></a>\n</p>"},
-	//{"37", "<blockquote><p><wbr>\n</p></blockquote>", ""},
-	//{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\"></code></pre></div>"},
-	//{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p><em data-marker=\"*\">foo</em>\n</p><p><em data-marker=\"*\">\n<wbr></em>\n</p>"},
-	//{"34", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" data-code=\"a1a\"></code></span> \n</p>", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" data-code=\"a1a\"></code></span> \n</p>"},
+	{"40", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E%0A\">&lt;details&gt;&lt;summary&gt;这里是摘要部分。&lt;/summary&gt;这里是细节部分。&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E\"></code></pre></div><p>1<wbr>\n</p>"},
+	{"39", "<p>*foo<wbr>*bar\n</p>", "<p><em data-marker=\"*\">foo<wbr></em>bar\n</p>"},
+	{"38", "<p>[foo](h<wbr>)\n</p>", "<p><a href=\"h\">foo<wbr></a>\n</p>"},
+	{"37", "<blockquote><p><wbr>\n</p></blockquote>", ""},
+	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"foo\" class=\"language-go\"></code></pre></div>"},
+	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p><em data-marker=\"*\">foo</em>\n</p><p><em data-marker=\"*\">\n<wbr></em>\n</p>"},
+	{"34", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" data-code=\"a1a\"></code></span> \n</p>", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" data-code=\"a1a\"></code></span> \n</p>"},
 	{"33", "<p><code data-code=\"foo\"></code><wbr>\n</p>", "<p> <code data-code=\"foo\"></code> <wbr>\n</p>"},
 	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\"><pre><code data-code=\"\"><wbr></code></pre></div>"},
 

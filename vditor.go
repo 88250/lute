@@ -386,6 +386,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
+		// 删掉前后空格，否则输入空格后会形成 *foo * 导致自旋失败
+		n.FirstChild.Data = strings.TrimSpace(n.FirstChild.Data)
+
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Strong, atom.B:
@@ -415,6 +418,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 			return
 		}
+
+		n.FirstChild.Data = strings.TrimSpace(n.FirstChild.Data)
 
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -503,6 +508,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 			return
 		}
+
+		n.FirstChild.Data = strings.TrimSpace(n.FirstChild.Data)
 
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
