@@ -141,7 +141,13 @@ func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (Wal
 	node.tokens = bytes.TrimSpace(node.tokens)
 	caretInCode := bytes.Contains(node.tokens, []byte(caret))
 	node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
-	r.tag("code", [][]string{{"data-type", "math-inline"}, {"data-code", PathEscape(string(node.tokens))}}, false)
+	attrs := [][]string{{"data-type", "math-inline"}}
+	if r.EscapeCode {
+		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
+	} else {
+		attrs = append(attrs, []string{"data-code", string(node.tokens)})
+	}
+	r.tag("code", attrs, false)
 	if caretInCode {
 		r.writeString("<wbr>")
 	}
@@ -168,7 +174,6 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (
 func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte("<wbr>"))
-
 		var attrs [][]string
 		if r.EscapeCode {
 			attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
@@ -366,7 +371,6 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 	if entering {
 		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\">")
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte("<wbr>"))
-
 		var attrs [][]string
 		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
 		r.writeString("<pre>")
@@ -450,7 +454,13 @@ func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 	node.tokens = bytes.TrimSpace(node.tokens)
 	caretInCode := bytes.Contains(node.tokens, []byte(caret))
 	node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
-	r.tag("code", [][]string{{"data-code", PathEscape(string(node.tokens))}}, false)
+	var attrs [][]string
+	if r.EscapeCode {
+		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
+	} else {
+		attrs = append(attrs, []string{"data-code", string(node.tokens)})
+	}
+	r.tag("code", attrs, false)
 	if caretInCode {
 		r.writeString("<wbr>")
 	}
