@@ -24,34 +24,36 @@ type EChartsJSONRenderer struct {
 // newEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
 func (lute *Lute) newEChartsJSONRenderer(tree *Tree) Renderer {
 	ret := &EChartsJSONRenderer{lute.newBaseRenderer(tree)}
-	ret.rendererFuncs[NodeDocument] = ret.renderDocumentEChartsJSON
-	ret.rendererFuncs[NodeParagraph] = ret.renderParagraphEChartsJSON
-	ret.rendererFuncs[NodeText] = ret.renderTextEChartsJSON
-	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpanEChartsJSON
-	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlockEChartsJSON
-	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlockEChartsJSON
-	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMathEChartsJSON
-	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasisEChartsJSON
-	ret.rendererFuncs[NodeStrong] = ret.renderStrongEChartsJSON
-	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquoteEChartsJSON
-	ret.rendererFuncs[NodeHeading] = ret.renderHeadingEChartsJSON
-	ret.rendererFuncs[NodeList] = ret.renderListEChartsJSON
-	ret.rendererFuncs[NodeListItem] = ret.renderListItemEChartsJSON
-	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreakEChartsJSON
-	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreakEChartsJSON
-	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreakEChartsJSON
-	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTMLEChartsJSON
-	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTMLEChartsJSON
-	ret.rendererFuncs[NodeLink] = ret.renderLinkEChartsJSON
-	ret.rendererFuncs[NodeImage] = ret.renderImageEChartsJSON
-	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethroughEChartsJSON
-	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarkerEChartsJSON
-	ret.rendererFuncs[NodeTable] = ret.renderTableEChartsJSON
-	ret.rendererFuncs[NodeTableHead] = ret.renderTableHeadEChartsJSON
-	ret.rendererFuncs[NodeTableRow] = ret.renderTableRowEChartsJSON
-	ret.rendererFuncs[NodeTableCell] = ret.renderTableCellEChartsJSON
-	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicodeEChartsJSON
-	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImgEChartsJSON
+	ret.rendererFuncs[NodeDocument] = ret.renderDocument
+	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
+	ret.rendererFuncs[NodeText] = ret.renderText
+	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
+	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
+	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
+	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
+	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
+	ret.rendererFuncs[NodeStrong] = ret.renderStrong
+	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
+	ret.rendererFuncs[NodeHeading] = ret.renderHeading
+	ret.rendererFuncs[NodeList] = ret.renderList
+	ret.rendererFuncs[NodeListItem] = ret.renderListItem
+	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
+	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
+	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
+	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTML
+	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
+	ret.rendererFuncs[NodeLink] = ret.renderLink
+	ret.rendererFuncs[NodeImage] = ret.renderImage
+	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
+	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
+	ret.rendererFuncs[NodeTable] = ret.renderTable
+	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
+	ret.rendererFuncs[NodeTableRow] = ret.renderTableRow
+	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
+	ret.rendererFuncs[NodeEmoji] = ret.renderEmoji
+	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
+	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
+	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
 
 	ret.defaultRendererFunc = ret.renderDefault
 	return ret
@@ -61,70 +63,64 @@ func (r *EChartsJSONRenderer) renderDefault(n *Node, entering bool) (WalkStatus,
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderInlineMathEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.leaf("Inline Math\nspan", node)
 	}
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderMathBlockEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.leaf("Math Block\ndiv", node)
 	}
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderEmojiImgEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("Emoji Img\n", node)
-	}
+func (r *EChartsJSONRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("Emoji Img\n", node)
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderEmojiUnicodeEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("Emoji Unicode\n", node)
-	}
+func (r *EChartsJSONRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("Emoji Unicode\n", node)
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderTableCellEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("Table Cell\ntd", node)
-	}
+func (r *EChartsJSONRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderTableRowEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("Table Row\ntr", node)
-	}
+func (r *EChartsJSONRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
+}
+
+func (r *EChartsJSONRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("Table Cell\ntd", node)
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderTableHeadEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("Table Head\nthead", node)
-	}
+func (r *EChartsJSONRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("Table Row\ntr", node)
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderTableEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("Table\ntable", node)
-	}
+func (r *EChartsJSONRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("Table Head\nthead", node)
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderStrikethroughEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("Strikethrough\ndel", node)
-	}
+func (r *EChartsJSONRenderer) renderTable(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("Table\ntable", node)
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderImageEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("Strikethrough\ndel", node)
+	return WalkStop, nil
+}
+
+func (r *EChartsJSONRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		r.val("Image\nimg", node)
@@ -136,7 +132,7 @@ func (r *EChartsJSONRenderer) renderImageEChartsJSON(node *Node, entering bool) 
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderLinkEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		r.val("Link\na", node)
@@ -148,21 +144,17 @@ func (r *EChartsJSONRenderer) renderLinkEChartsJSON(node *Node, entering bool) (
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderHTMLEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("HTML Block\n", node)
-	}
+func (r *EChartsJSONRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("HTML Block\n", node)
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderInlineHTMLEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.leaf("Inline HTML\n", node)
-	}
+func (r *EChartsJSONRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
+	r.leaf("Inline HTML\n", node)
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderDocumentEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte(itemOpenBracket)
 		r.openObj()
@@ -176,7 +168,7 @@ func (r *EChartsJSONRenderer) renderDocumentEChartsJSON(node *Node, entering boo
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderParagraphEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		r.val("Paragraph\np", node)
@@ -188,7 +180,7 @@ func (r *EChartsJSONRenderer) renderParagraphEChartsJSON(node *Node, entering bo
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderTextEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		text := bytesToStr(node.tokens)
 		var i int
@@ -208,14 +200,14 @@ func (r *EChartsJSONRenderer) renderTextEChartsJSON(node *Node, entering bool) (
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderCodeSpanEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.leaf("Code Span\ncode", node)
 	}
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderEmphasisEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		r.val("Emphasis\nem", node)
@@ -227,7 +219,7 @@ func (r *EChartsJSONRenderer) renderEmphasisEChartsJSON(node *Node, entering boo
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderStrongEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		r.val("Strong\nstrong", node)
@@ -239,7 +231,7 @@ func (r *EChartsJSONRenderer) renderStrongEChartsJSON(node *Node, entering bool)
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderBlockquoteEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		r.val("Blockquote\nblockquote", node)
@@ -251,7 +243,7 @@ func (r *EChartsJSONRenderer) renderBlockquoteEChartsJSON(node *Node, entering b
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderHeadingEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		h := "h" + " 123456"[node.headingLevel:node.headingLevel+1]
@@ -264,7 +256,7 @@ func (r *EChartsJSONRenderer) renderHeadingEChartsJSON(node *Node, entering bool
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderListEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		list := "ul"
@@ -280,7 +272,7 @@ func (r *EChartsJSONRenderer) renderListEChartsJSON(node *Node, entering bool) (
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderListItemEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		r.val("List Item\nli "+bytesToStr(node.listData.marker), node)
@@ -292,7 +284,7 @@ func (r *EChartsJSONRenderer) renderListItemEChartsJSON(node *Node, entering boo
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderTaskListItemMarkerEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.openObj()
 		check := " "
@@ -308,28 +300,28 @@ func (r *EChartsJSONRenderer) renderTaskListItemMarkerEChartsJSON(node *Node, en
 	return WalkContinue, nil
 }
 
-func (r *EChartsJSONRenderer) renderThematicBreakEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.leaf("Thematic Break\nhr", node)
 	}
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderHardBreakEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.leaf("Hard Break\nbr", node)
 	}
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderSoftBreakEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.leaf("Soft Break\n", node)
 	}
 	return WalkStop, nil
 }
 
-func (r *EChartsJSONRenderer) renderCodeBlockEChartsJSON(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.leaf("Code Block\npre.code", node)
 	}
