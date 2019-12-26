@@ -14,9 +14,10 @@ package lute
 
 import (
 	"bytes"
+	"strings"
+
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
-	"strings"
 )
 
 // HTML2Markdown 将 HTML 转换为 Markdown。
@@ -94,6 +95,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.typ = NodeLinkText
 		}
+		node.tokens = bytes.ReplaceAll(node.tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
+
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -149,30 +152,33 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Pre:
-		node.typ = NodeCodeBlock
-		node.isFencedCodeBlock = true
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
-		buf := &bytes.Buffer{}
 		firstc := n.FirstChild
 		if nil != firstc {
 			if atom.Code == firstc.DataAtom {
+				node.typ = NodeCodeBlock
+				node.isFencedCodeBlock = true
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
+				buf := &bytes.Buffer{}
 				class := lute.domAttrValue(firstc, "class")
 				if strings.Contains(class, "language-") {
 					language := class[len("language-"):]
 					node.lastChild.codeBlockInfo = []byte(language)
 				}
 				firstc = firstc.FirstChild
-			}
-
-			for c := firstc; nil != c; c = c.NextSibling {
-				buf.WriteString(lute.domText(c))
+				for c := firstc; nil != c; c = c.NextSibling {
+					buf.WriteString(lute.domText(c))
+				}
+				content := &Node{typ: NodeCodeBlockCode, tokens: buf.Bytes()}
+				node.AppendChild(content)
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
+				tree.context.tip.AppendChild(node)
+			} else {
+				node.typ = NodeHTMLBlock
+				node.tokens = lute.domHTML(n)
+				tree.context.tip.AppendChild(node)
 			}
 		}
-		content := &Node{typ: NodeCodeBlockCode, tokens: buf.Bytes()}
-		node.AppendChild(content)
-		node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: strToBytes("```"), codeBlockFenceLen: 3})
-		tree.context.tip.AppendChild(node)
 		return
 	case atom.Em, atom.I:
 		node.typ = NodeEmphasis
@@ -241,9 +247,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeTaskListItemMarker
 		if lute.hasAttr(n, "checked") {
 			node.taskListItemChecked = true
-			node.tokens = strToBytes("[X]")
-		} else {
-			node.tokens = strToBytes("[ ]")
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -281,6 +284,23 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		defer tree.context.parentTip(n)
 	case atom.Th, atom.Td:
 		node.typ = NodeTableCell
+		tree.context.tip.AppendChild(node)
+		tree.context.tip = node
+		defer tree.context.parentTip(n)
+	case atom.Span:
+		if nil == n.FirstChild {
+			return
+		}
+
+		node.typ = NodeText
+		if 0 == n.FirstChild.DataAtom {
+			tokens := strToBytes(n.FirstChild.Data)
+			tokens = bytes.ReplaceAll(tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
+			node.tokens = []byte(tokens)
+			tree.context.tip.AppendChild(node)
+			return
+		}
+		node.tokens = []byte{' '}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
