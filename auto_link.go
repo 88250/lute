@@ -339,7 +339,8 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			}
 
 			// 如果之前的 ) 或者 ; 没有命中处理，则进行结尾的标点符号规则处理，即标点不计入链接，需要剔掉
-			if !trimmed && isASCIIPunct(lastToken) && itemSlash != lastToken {
+			if !trimmed && isASCIIPunct(lastToken) && itemSlash != lastToken &&
+				'}' != lastToken && '{' != lastToken /* 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4 */ {
 				path = path[:length-1]
 				i--
 			}

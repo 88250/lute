@@ -20,6 +20,9 @@ import (
 
 var debugTests = []parseTest{
 
+	// 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4
+	{"43", "https://foo.com/bar}", "<p><a href=\"https://foo.com/bar%7D\">https://foo.com/bar}</a></p>\n"},
+
 	{"42", "[label][] 是 label\n\n[label]: https://b3log.org\n", "<p><a href=\"https://b3log.org\">label</a> 是 label</p>\n"},
 	{"41", "|abc|def|\n|---|---|\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
 
