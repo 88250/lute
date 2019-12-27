@@ -96,10 +96,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.typ = NodeLinkText
 		}
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
-
 		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
 	case atom.P:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
@@ -143,7 +140,16 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			}
 		}
 		node.listData = &listData{marker: strToBytes(marker)}
-		if lute.firstChildIsText(n) {
+		if NodeListItem == tree.context.tip.typ {
+			tree.context.tip = tree.context.tip.parent
+		}
+
+		if nil == n.FirstChild || (atom.Br == n.FirstChild.DataAtom && nil == n.FirstChild.NextSibling && nil != n.NextSibling) {
+			// 列表中间不能出现空项
+			return
+		}
+
+		if atom.P != n.FirstChild.DataAtom {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			node = &Node{typ: NodeParagraph}
@@ -249,8 +255,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.taskListItemChecked = true
 		}
 		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
 		if nil != node.parent.parent {
 			node.parent.parent.listData.typ = 3
 		}

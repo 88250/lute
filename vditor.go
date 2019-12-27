@@ -243,8 +243,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.typ = NodeLinkText
 		}
 		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
 	case atom.P:
 		if nil != n.Parent && atom.Blockquote == n.Parent.DataAtom && "" == strings.TrimSpace(lute.domText(n)) { // vditorDOM2MdTests case 53
 			return
@@ -288,15 +286,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if "true" == tight || "" == tight {
 			node.tight = true
 		}
+		if NodeParagraph == tree.context.tip.typ {
+			// 子列表需要返回到上一层 li
+			tree.context.tip = tree.context.tip.parent
+		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Li:
-		content := strings.TrimSpace(lute.domText(n))
-		if "" == content { // vditorDOM2MdTests case 55
-			return
-		}
-
 		node.typ = NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
@@ -312,7 +309,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 		}
 		node.listData = &listData{marker: []byte(marker)}
-		if lute.firstChildIsText(n) {
+		if NodeListItem == tree.context.tip.typ {
+			tree.context.tip = tree.context.tip.parent
+		}
+
+		if nil == n.FirstChild || (atom.Br == n.FirstChild.DataAtom && nil == n.FirstChild.NextSibling && nil != n.NextSibling) {
+			// 列表中间不能出现空项
+			return
+		}
+
+		if atom.P != n.FirstChild.DataAtom {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			node = &Node{typ: NodeParagraph}
@@ -468,7 +474,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Input:
-		if nil == n.Parent || (atom.Li != n.Parent.DataAtom && atom.P != n.Parent.DataAtom) {
+		if nil == n.Parent || nil == n.Parent.Parent || (atom.P != n.Parent.DataAtom && atom.Li != n.Parent.DataAtom) {
+			// 仅允许 input 出现在任务列表中
 			return
 		}
 		node.typ = NodeTaskListItemMarker
@@ -476,8 +483,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.taskListItemChecked = true
 		}
 		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
 		if nil != node.parent.parent && nil != node.parent.parent.listData { // ul.li.input
 			node.parent.parent.listData.typ = 3
 		}
@@ -612,30 +617,20 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 }
 
 func (context *Context) parentTip(n *html.Node) {
-	for tip := context.tip.parent; nil != tip; tip = tip.parent {
-		if NodeParagraph == tip.typ && NodeBlockquote != tip.parent.typ {
-			if nil == n.NextSibling {
-				continue
-			}
-			nextType := n.NextSibling.DataAtom
-			if atom.Ul == nextType || atom.Ol == nextType {
-				continue
-			}
-		}
-		context.tip = tip
-		break
-	}
-}
-
-// firstChildIsText 用于判断 n 的第一个子节点是否是文本节点。
-func (lute *Lute) firstChildIsText(n *html.Node) bool {
-	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		if caret == c.Data {
-			continue // 不考虑插入符
-		}
-		return 0 == c.DataAtom || atom.Em == c.DataAtom
-	}
-	return false
+	//for tip := context.tip.parent; nil != tip; tip = tip.parent {
+	//	if NodeParagraph == tip.typ && NodeBlockquote != tip.parent.typ {
+	//		if nil == n.NextSibling {
+	//			continue
+	//		}
+	//		nextType := n.NextSibling.DataAtom
+	//		if atom.Ul == nextType || atom.Ol == nextType {
+	//			continue
+	//		}
+	//	}
+	//	context.tip = tip
+	//	break
+	//}
+	context.tip = context.tip.parent
 }
 
 func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {
