@@ -22,8 +22,9 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
-	{"62", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><wbr><br></li></ul>", "* foo\n*\n"},
-	{"61", "<ul><li data-marker=\"*\"><p>a\n</p></li><li data-marker=\"*\"><p>b\n</p></li><li data-marker=\"*\"><p>c\n</p></li></ul><p>1<wbr>\n</p>", "* a\n* b\n* c\n\n1\n"},
+	{"63", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li></ul><p>b<wbr>\n</p>", "* foo\n\nb\n"},
+	{"62", "<ul><li data-marker=\"*\"><p>foo\n</p></li></ul><p>b<wbr>\n</p>", "* foo\n\nb\n"},
+	{"61", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><wbr><br></li></ul>", "* foo\n*\n"},
 	{"60", "<ul><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\"> foo\n</p></li><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\"> b<wbr>\n</p></li></ul>", "- [ ] foo\n- [ ] b\n"},
 	{"59", "<ul><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\" /> foo\n</p></li><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\" /> b<wbr>\n</p></li></ul>", "- [ ] foo\n- [ ] b\n"},
 	{"58", "<p><em data-marker=\"*\">foo </em>bar<wbr>\n</p>", "*foo*bar\n"},
@@ -101,7 +102,7 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"45", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li></ul><p>- [ ] b<wbr>\n</p>", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\" /> foo</li><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\" /> b<wbr></li></ul>"},
+	{"45", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li></ul><p>- [ ] b<wbr>\n</p>", "<ul><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\" /> foo\n</p></li><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\" /> b<wbr>\n</p></li></ul>"},
 	{"44", "<p>* [ ]<wbr>\n</p>", "<p>* [ ]<wbr>\n</p>"},
 	{"43", "<p>* [ <wbr>\n</p>", "<p>* [ <wbr>\n</p>"},
 	{"42", "<p>* [<wbr>\n</p>", "<p>* [<wbr>\n</p>"},

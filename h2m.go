@@ -153,6 +153,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			node = &Node{typ: NodeParagraph}
+			defer tree.context.parentTip(n)
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
