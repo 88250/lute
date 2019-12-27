@@ -468,7 +468,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Input:
-		if nil == n.Parent || atom.Li != n.Parent.DataAtom {
+		if nil == n.Parent || (atom.Li != n.Parent.DataAtom && atom.P != n.Parent.DataAtom) {
 			return
 		}
 		node.typ = NodeTaskListItemMarker
@@ -478,8 +478,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-		if nil != node.parent.parent {
+		if nil != node.parent.parent && nil != node.parent.parent.listData { // ul.li.input
 			node.parent.parent.listData.typ = 3
+		}
+		if nil != node.parent.parent.parent && nil != node.parent.parent.parent.listData { // ul.li.p.input
+			node.parent.parent.parent.listData.typ = 3
 		}
 	case atom.Del, atom.S, atom.Strike:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {

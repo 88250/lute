@@ -97,15 +97,8 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 		return nil
 	}
 
-	if t.context.option.VditorWYSIWYG {
-		// Vditor 所见即所得模式下列表项内容部分不能为空
-		if itemNewline == token {
-			return nil
-		}
-	}
-
 	// 如果要打断段落，则列表项内容部分不能为空
-	if container.typ == NodeParagraph && itemNewline == ln[t.context.nextNonspace+markerLength] {
+	if container.typ == NodeParagraph && itemNewline == token {
 		return nil
 	}
 
@@ -134,6 +127,19 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 		}
 	} else {
 		data.padding = markerLength + spacesAfterMarker
+	}
+
+	if t.context.option.VditorWYSIWYG {
+		if isBlankItem {
+			return nil
+		}
+
+		content := string(ln[t.context.offset:])
+		if "["+caret+"\n" == content || "[ "+caret+"\n" == content || "[ ]"+caret+"\n" == content ||
+			"[x"+caret+"\n" == content || "[x]"+caret+"\n" == content ||
+			"[X"+caret+"\n" == content || "[X]"+caret+"\n" == content {
+			return nil
+		}
 	}
 
 	if !isBlankItem {

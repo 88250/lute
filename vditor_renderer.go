@@ -410,6 +410,14 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	if grandparent := node.parent.parent; nil != grandparent {
 		if NodeList == grandparent.typ { // List.ListItem.Paragraph
 			if grandparent.tight {
+				if 3 == grandparent.listData.typ && entering {
+					var attrs [][]string
+					if taskListItemMarker := node.parent.firstChild.next; taskListItemMarker.taskListItemChecked {
+						attrs = append(attrs, []string{"checked", ""})
+					}
+					attrs = append(attrs, []string{"type", "checkbox"})
+					r.tag("input", attrs, true)
+				}
 				return WalkContinue, nil
 			}
 		}
@@ -417,6 +425,16 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 
 	if entering {
 		r.tag("p", nil, false)
+		if grandparent := node.parent.parent; nil != grandparent {
+			if NodeList == grandparent.typ && 3 == grandparent.listData.typ {
+				var attrs [][]string
+				if taskListItemMarker := node.parent.firstChild.next; taskListItemMarker.taskListItemChecked {
+					attrs = append(attrs, []string{"checked", ""})
+				}
+				attrs = append(attrs, []string{"type", "checkbox"})
+				r.tag("input", attrs, true)
+			}
+		}
 	} else {
 		r.writeByte(itemNewline)
 		r.tag("/p", nil, false)
@@ -434,6 +452,9 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 	if r.option.ChinesePunct {
 		r.chinesePunct(node)
 	}
+
+	node.tokens = bytes.TrimRight(node.tokens, "\n")
+
 	r.write(node.tokens)
 	return WalkStop, nil
 }
@@ -609,15 +630,7 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		var attrs [][]string
-		if node.taskListItemChecked {
-			attrs = append(attrs, []string{"checked", ""})
-		}
-		attrs = append(attrs, []string{"type", "checkbox"})
-		r.tag("input", attrs, true)
-	}
-	return WalkContinue, nil
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
