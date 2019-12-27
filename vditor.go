@@ -322,11 +322,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			node = &Node{typ: NodeParagraph}
-			defer tree.context.parentTip(n)
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
+		if next := n.NextSibling; nil == next || (atom.Ul != next.DataAtom && atom.Ol != next.DataAtom && atom.Li != next.DataAtom && atom.Blockquote != next.DataAtom) {
+			// 块级容器打断
+			defer tree.context.parentTip(n)
+		}
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
@@ -618,20 +621,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 }
 
 func (context *Context) parentTip(n *html.Node) {
-	//for tip := context.tip.parent; nil != tip; tip = tip.parent {
-	//	if NodeParagraph == tip.typ && NodeBlockquote != tip.parent.typ {
-	//		if nil == n.NextSibling {
-	//			continue
-	//		}
-	//		nextType := n.NextSibling.DataAtom
-	//		if atom.Ul == nextType || atom.Ol == nextType {
-	//			continue
-	//		}
-	//	}
-	//	context.tip = tip
-	//	break
-	//}
-	context.tip = context.tip.parent
+	if tip := context.tip.parent; nil != tip {
+		context.tip = context.tip.parent
+	}
 }
 
 func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {

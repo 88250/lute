@@ -125,6 +125,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.listData.typ = 1
 		}
 		node.tight = true
+		if NodeParagraph == tree.context.tip.typ {
+			// 子列表需要返回到上一层 li
+			tree.context.tip = tree.context.tip.parent
+		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -153,11 +157,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			node = &Node{typ: NodeParagraph}
-			defer tree.context.parentTip(n)
 		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
+		if next := n.NextSibling; nil == next || (atom.Ul != next.DataAtom && atom.Ol != next.DataAtom && atom.Li != next.DataAtom && atom.Blockquote != next.DataAtom) {
+			// 块级容器打断
+			defer tree.context.parentTip(n)
+		}
 	case atom.Pre:
 		firstc := n.FirstChild
 		if nil != firstc {

@@ -20,6 +20,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"7", `<ul><li>Java<ul><li>Spring</li></ul></li></ul>`, "* Java\n  * Spring\n"},
 	{"6", `<!--StartFragment--><p>这是一篇讲解如何正确使用<span>&nbsp;</span><strong>Markdown</strong><span>&nbsp;</span>的排版示例，学会这个很有必要，能让你的文章有更佳清晰的排版。</p><!--EndFragment-->`, "这是一篇讲解如何正确使用 **Markdown** 的排版示例，学会这个很有必要，能让你的文章有更佳清晰的排版。\n"},
 	{"5", `<!--StartFragment--><ul><li><input checked="" disabled="" type="checkbox"><span>&nbsp;</span>发布 Solo</li></ul><!--EndFragment-->`, "* [X] 发布 Solo\n"},
 	{"4", "<span>&nbsp;</span>发布 Solo", "发布 Solo\n"},
