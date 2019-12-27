@@ -347,12 +347,8 @@ func (r *HTMLRenderer) renderDocument(node *Node, entering bool) (WalkStatus, er
 }
 
 func (r *HTMLRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.parent.parent; nil != grandparent {
-		if NodeList == grandparent.typ { // List.ListItem.Paragraph
-			if grandparent.tight {
-				return WalkContinue, nil
-			}
-		}
+	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.typ && grandparent.tight { // List.ListItem.Paragraph
+		return WalkContinue, nil
 	}
 
 	if entering {

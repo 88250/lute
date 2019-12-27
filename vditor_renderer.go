@@ -407,34 +407,12 @@ func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.parent.parent; nil != grandparent {
-		if NodeList == grandparent.typ { // List.ListItem.Paragraph
-			if grandparent.tight {
-				if 3 == grandparent.listData.typ && entering {
-					var attrs [][]string
-					if taskListItemMarker := node.parent.firstChild.next; taskListItemMarker.taskListItemChecked {
-						attrs = append(attrs, []string{"checked", ""})
-					}
-					attrs = append(attrs, []string{"type", "checkbox"})
-					r.tag("input", attrs, true)
-				}
-				return WalkContinue, nil
-			}
-		}
+	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.typ && grandparent.tight { // List.ListItem.Paragraph
+		return WalkContinue, nil
 	}
 
 	if entering {
 		r.tag("p", nil, false)
-		if grandparent := node.parent.parent; nil != grandparent {
-			if NodeList == grandparent.typ && 3 == grandparent.listData.typ {
-				var attrs [][]string
-				if taskListItemMarker := node.parent.firstChild.next; taskListItemMarker.taskListItemChecked {
-					attrs = append(attrs, []string{"checked", ""})
-				}
-				attrs = append(attrs, []string{"type", "checkbox"})
-				r.tag("input", attrs, true)
-			}
-		}
 	} else {
 		r.writeByte(itemNewline)
 		r.tag("/p", nil, false)
@@ -630,6 +608,12 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
+	var attrs [][]string
+	if taskListItemMarker := node.parent.firstChild.next; taskListItemMarker.taskListItemChecked {
+		attrs = append(attrs, []string{"checked", ""})
+	}
+	attrs = append(attrs, []string{"type", "checkbox"})
+	r.tag("input", attrs, true)
 	return WalkStop, nil
 }
 

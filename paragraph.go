@@ -38,12 +38,11 @@ func (p *Node) paragraphFinalize(context *Context) {
 
 	if context.option.GFMTaskListItem {
 		// 尝试解析任务列表项
-		listItem := p.parent
-		if nil != listItem && NodeListItem == listItem.typ {
+		if listItem := p.parent; nil != listItem && NodeListItem == listItem.typ {
 			if 3 == listItem.listData.typ && 3 < len(p.tokens) && isWhitespace(p.tokens[3]) {
 				// 如果是任务列表项则添加任务列表标记符节点
 				taskListItemMarker := &Node{typ: NodeTaskListItemMarker, tokens: p.tokens[:3], taskListItemChecked: listItem.listData.checked}
-				p.InsertBefore(taskListItemMarker)
+				p.PrependChild(taskListItemMarker)
 				p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 			}
 		}
