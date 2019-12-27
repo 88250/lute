@@ -604,42 +604,34 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *FormatRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeByte(itemOpenBracket)
-		if node.taskListItemChecked {
-			r.writeByte('X')
-		} else {
-			r.writeByte(itemSpace)
-		}
-		r.writeByte(itemCloseBracket)
+	r.writeByte(itemOpenBracket)
+	if node.taskListItemChecked {
+		r.writeByte('X')
+	} else {
+		r.writeByte(itemSpace)
 	}
-	return WalkContinue, nil
+	r.writeByte(itemCloseBracket)
+	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-		r.writeString("---")
-		r.newline()
-	}
+	r.newline()
+	r.writeString("---")
+	r.newline()
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		if !r.option.SoftBreak2HardBreak {
-			r.writeString("\\\n")
-		} else {
-			r.writeByte(itemNewline)
-		}
+	if !r.option.SoftBreak2HardBreak {
+		r.writeString("\\\n")
+	} else {
+		r.writeByte(itemNewline)
 	}
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.newline()
-	}
+	r.newline()
 	return WalkStop, nil
 }
 
