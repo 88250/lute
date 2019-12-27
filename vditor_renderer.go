@@ -609,7 +609,7 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 
 func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
 	var attrs [][]string
-	if taskListItemMarker := node.parent.firstChild.next; taskListItemMarker.taskListItemChecked {
+	if node.taskListItemChecked {
 		attrs = append(attrs, []string{"checked", ""})
 	}
 	attrs = append(attrs, []string{"type", "checkbox"})

@@ -22,7 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
-	//{"64", `<ul data-tight="true"><li data-marker="*">a<ul data-tight="true"><li data-marker="*">a1</li></ul></li><li data-marker="*">b</li><li data-marker="*">c<wbr></li></ul>`, "* a\n  * a1\n* b\n* c\n"},
+	{"64", `<ul data-tight="true"><li data-marker="*">a<ul data-tight="true"><li data-marker="*">a1</li></ul></li><li data-marker="*">b</li><li data-marker="*">c<wbr></li></ul>`, "* a\n  * a1\n* b\n* c\n"},
 	{"63", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li></ul><p>b<wbr>\n</p>", "* foo\n\nb\n"},
 	{"62", "<ul><li data-marker=\"*\"><p>foo\n</p></li></ul><p>b<wbr>\n</p>", "* foo\n\nb\n"},
 	{"61", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><wbr><br></li></ul>", "* foo\n*\n"},
@@ -103,6 +103,7 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"46", "<p>- [x] f<wbr>\n</p>", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> f<wbr></li></ul>"},
 	{"45", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li></ul><p>- [ ] b<wbr>\n</p>", "<ul><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\" /> foo\n</p></li><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\" /> b<wbr>\n</p></li></ul>"},
 	{"44", "<p>* [ ]<wbr>\n</p>", "<p>* [ ]<wbr>\n</p>"},
 	{"43", "<p>* [ <wbr>\n</p>", "<p>* [ <wbr>\n</p>"},
