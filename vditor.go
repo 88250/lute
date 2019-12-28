@@ -525,8 +525,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.Table:
 		node.typ = NodeTable
 		var tableAligns []int
-		for c := n.FirstChild.FirstChild.FirstChild; nil != c; c = c.NextSibling {
-			tableAligns = append(tableAligns, 0)
+		for th := n.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
+			align := lute.domAttrValue(th, "align")
+			switch align {
+			case "left":
+				tableAligns = append(tableAligns, 1)
+			case "center":
+				tableAligns = append(tableAligns, 2)
+			case "right":
+				tableAligns = append(tableAligns, 3)
+			default:
+				tableAligns = append(tableAligns, 0)
+			}
 		}
 		node.tableAligns = tableAligns
 		tree.context.tip.AppendChild(node)
