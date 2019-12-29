@@ -104,11 +104,11 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"46", "<p>- [x] f<wbr>\n</p>", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> f<wbr></li></ul>"},
-	{"45", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li></ul><p>- [ ] b<wbr>\n</p>", "<ul><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\" /> foo\n</p></li><li data-marker=\"-\" class=\"vditor-task\"><p><input type=\"checkbox\" /> b<wbr>\n</p></li></ul>"},
-	{"44", "<p>* [ ]<wbr>\n</p>", "<p>* [ ]<wbr>\n</p>"},
-	{"43", "<p>* [ <wbr>\n</p>", "<p>* [ <wbr>\n</p>"},
-	{"42", "<p>* [<wbr>\n</p>", "<p>* [<wbr>\n</p>"},
+	{"46", "<p>- [x] f<wbr>\n</p>", "<ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\" data-block=\"0\"><input checked=\"\" type=\"checkbox\" /> f<wbr></li></ul>"},
+	{"45", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li></ul><p>- [ ] b<wbr>\n</p>", "<ul data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\" data-block=\"0\"><p data-block=\"0\"><input type=\"checkbox\" /> foo\n</p></li><li data-marker=\"-\" class=\"vditor-task\" data-block=\"0\"><p data-block=\"0\"><input type=\"checkbox\" /> b<wbr>\n</p></li></ul>"},
+	{"44", "<p>* [ ]<wbr>\n</p>", "<p data-block=\"0\">* [ ]<wbr>\n</p>"},
+	{"43", "<p>* [ <wbr>\n</p>", "<p data-block=\"0\">* [ <wbr>\n</p>"},
+	{"42", "<p>* [<wbr>\n</p>", "<p data-block=\"0\">* [<wbr>\n</p>"},
 	{"40", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E%0A\">&lt;details&gt;&lt;summary&gt;这里是摘要部分。&lt;/summary&gt;这里是细节部分。&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E\"></code></pre></div><p>1<wbr>\n</p>"},
 	{"39", "<p>*foo<wbr>*bar\n</p>", "<p><em data-marker=\"*\">foo<wbr></em>bar\n</p>"},
 	{"38", "<p>[foo](h<wbr>)\n</p>", "<p><a href=\"h\">foo<wbr></a>\n</p>"},

@@ -194,7 +194,7 @@ func (r *VditorRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (W
 
 func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"math-block\">")
+		r.writeString(`<div class="vditor-wysiwyg__block" data-type="math-block" data-block="0">`)
 	} else {
 		r.writeString("</div>")
 	}
@@ -246,7 +246,7 @@ func (r *VditorRenderer) renderTableHead(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderTable(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.tag("table", nil, false)
+		r.tag("table", [][]string{{"data-block", "0"}}, false)
 	} else {
 		if nil != node.firstChild.next {
 			r.tag("/tbody", nil, false)
@@ -369,7 +369,7 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\">")
+		r.writeString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte("<wbr>"))
 		var attrs [][]string
 		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
@@ -412,7 +412,7 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 	}
 
 	if entering {
-		r.tag("p", nil, false)
+		r.tag("p", [][]string{{"data-block", "0"}}, false)
 	} else {
 		r.writeByte(itemNewline)
 		r.tag("/p", nil, false)
@@ -537,7 +537,7 @@ func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (
 
 func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<blockquote>")
+		r.writeString(`<blockquote data-block="0">`)
 	} else {
 		r.writeString("</blockquote>")
 	}
@@ -550,7 +550,7 @@ func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) (Walk
 
 func (r *VditorRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
+		r.writeString("<h" + " 123456"[node.headingLevel:node.headingLevel+1] + " data-block=\"0\">")
 		if r.option.HeadingAnchor {
 			anchor := node.Text()
 			anchor = strings.ReplaceAll(anchor, " ", "-")
@@ -581,6 +581,7 @@ func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 		if nil == node.bulletChar && 1 != node.start {
 			attrs = append(attrs, []string{"start", strconv.Itoa(node.start)})
 		}
+		attrs = append(attrs, []string{"data-block", "0"})
 		r.tag(tag, attrs, false)
 	} else {
 		r.tag("/"+tag, nil, false)
@@ -600,6 +601,7 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 			attrs = append(attrs, []string{"data-marker", string(node.marker)})
 			attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
 		}
+		attrs = append(attrs, []string{"data-block", "0"})
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
@@ -618,7 +620,7 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 }
 
 func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("hr", nil, true)
+	r.tag("hr", [][]string{{"data-block", "0"}}, true)
 	return WalkStop, nil
 }
 
@@ -652,7 +654,7 @@ func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 
 func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\">")
+		r.writeString(`<div class="vditor-wysiwyg__block" data-type="code-block" data-block="0">`)
 	} else {
 		r.writeString("</div>")
 	}
