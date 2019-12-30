@@ -657,7 +657,8 @@ func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 
 func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString(`<div class="vditor-wysiwyg__block" data-type="code-block" data-block="0">`)
+		marker := string(node.firstChild.tokens)
+		r.writeString(`<div class="vditor-wysiwyg__block" data-type="code-block" data-block="0" data-marker="` + marker + `">`)
 	} else {
 		r.writeString("</div>")
 	}

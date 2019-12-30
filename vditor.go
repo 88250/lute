@@ -332,6 +332,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
+			marker := lute.domAttrValue(n.Parent, "data-marker")
+			if "" == marker {
+				marker = "```"
+			}
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
 			codeTokens := []byte(lute.domAttrValue(n.FirstChild, "data-code"))
 
@@ -353,7 +357,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			default:
 				node.typ = NodeCodeBlock
 				node.isFencedCodeBlock = true
-				node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceOpenMarker, tokens: []byte(marker), codeBlockFenceLen: len(marker)})
 				node.AppendChild(&Node{typ: NodeCodeBlockFenceInfoMarker})
 				class := lute.domAttrValue(n.FirstChild, "class")
 				if strings.Contains(class, "language-") {
@@ -363,7 +367,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 				content := &Node{typ: NodeCodeBlockCode, tokens: codeTokens}
 				node.AppendChild(content)
-				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte("```"), codeBlockFenceLen: 3})
+				node.AppendChild(&Node{typ: NodeCodeBlockFenceCloseMarker, tokens: []byte(marker), codeBlockFenceLen: len(marker)})
 				tree.context.tip.AppendChild(node)
 			}
 		}
