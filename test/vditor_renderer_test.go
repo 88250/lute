@@ -116,7 +116,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"37", "<blockquote><p><wbr>\n</p></blockquote>", ""},
 	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-marker=\"```\"><pre><code data-code=\"foo\" class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code data-code=\"foo\" class=\"language-go\"></code></pre></div>"},
 	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p data-block=\"0\"><em data-marker=\"*\">foo</em>\n</p><p data-block=\"0\"><em data-marker=\"*\">\n<wbr></em>\n</p>"},
-	{"34", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" data-code=\"a1a\"></code></span> \n</p>", "<p data-block=\"0\"> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" data-code=\"a1a\"></code></span> \n</p>"},
+	{"34", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" data-code=\"a1a\"></code></span> \n</p>", "<p data-block=\"0\"> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" data-code=\"a1a\">a1a</code></span> \n</p>"},
 	{"33", "<p><code data-code=\"foo\"></code><wbr>\n</p>", "<p data-block=\"0\"> <code data-code=\"foo\">foo</code> <wbr>\n</p>"},
 	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code data-code=\"\"><wbr>\n</code></pre></div>"},
 

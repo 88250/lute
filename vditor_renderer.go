@@ -148,6 +148,8 @@ func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (Wal
 		attrs = append(attrs, []string{"data-code", string(node.tokens)})
 	}
 	r.tag("code", attrs, false)
+	code, _ := PathUnescape(string(node.tokens))
+	r.writeString(code)
 	if caretInCode {
 		r.writeString("<wbr>")
 	}
