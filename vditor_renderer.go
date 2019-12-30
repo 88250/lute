@@ -460,6 +460,8 @@ func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 		attrs = append(attrs, []string{"data-code", string(node.tokens)})
 	}
 	r.tag("code", attrs, false)
+	code, _ := PathUnescape(string(node.tokens))
+	r.writeString(code)
 	if caretInCode {
 		r.writeString("<wbr>")
 	}
@@ -663,6 +665,7 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	node.tokens = bytes.TrimSpace(node.tokens)
+	codeIsEmpty := 1 > len(node.tokens)
 	caretInCode := bytes.Contains(node.previous.codeBlockInfo, []byte(caret))
 	node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
 
@@ -682,6 +685,9 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 	r.tag("code", attrs, false)
 	if caretInCode {
 		r.writeString("<wbr>")
+	}
+	if codeIsEmpty {
+		r.writeByte(itemNewline)
 	}
 	r.writeString("</code></pre>")
 	return WalkStop, nil
