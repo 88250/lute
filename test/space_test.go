@@ -20,6 +20,9 @@ import (
 
 var spaceTests = []parseTest{
 
+	{"13", "**[链接foo文本](/bar)**\n", "<p><strong><a href=\"/bar\">链接 foo 文本</a></strong></p>\n"},
+	{"12", "[链接foo文本](/bar)\n", "<p><a href=\"/bar\">链接 foo 文本</a></p>\n"},
+	{"11", "[链接foo文本](/bar)\n", "<p><a href=\"/bar\">链接 foo 文本</a></p>\n"},
 	{"10", "插入\u2038符\n", "<p>插入\u2038符</p>\n"},
 	{"9", "非\u200c打印&zwnj;字符\n", "<p>非\u200c打印\u200c字符</p>\n"},
 	{"8", "逗号，1后面\n", "<p>逗号，1 后面</p>\n"},

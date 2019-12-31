@@ -266,9 +266,10 @@ func (r *HTMLRenderer) renderLinkSpace(node *Node, entering bool) (WalkStatus, e
 }
 
 func (r *HTMLRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.write(escapeHTML(node.tokens))
+	if r.option.AutoSpace {
+		r.space(node)
 	}
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
