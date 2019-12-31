@@ -90,7 +90,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 			destination = append(destination, dest...)
 			if !destStarted && !isWhitespace(token) && 0 < i {
 				destStarted = true
-				destination = destination[size:]
+				destination = destination[1:]
 				destination = trimWhitespace(destination)
 			}
 			if destStarted && (isWhitespace(token) || isControl(token)) {
