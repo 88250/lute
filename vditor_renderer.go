@@ -448,7 +448,12 @@ func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	previousText := node.parent.PreviousNodeText()
+	codeSpan := node.parent
+	if codeSpanParent := codeSpan.parent; nil != codeSpanParent && NodeLink == codeSpanParent.typ {
+		return WalkStop, nil
+	}
+
+	previousText := codeSpan.PreviousNodeText()
 	if "" == previousText || !strings.HasSuffix(previousText, " ") {
 		r.writeByte(itemSpace)
 	}
@@ -474,7 +479,12 @@ func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 }
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	nextText := node.parent.NextNodeText()
+	codeSpan := node.parent
+	if codeSpanParent := codeSpan.parent; nil != codeSpanParent && NodeLink == codeSpanParent.typ {
+		return WalkStop, nil
+	}
+
+	nextText := codeSpan.NextNodeText()
 	if "" == nextText || !strings.HasPrefix(nextText, " ") {
 		r.writeByte(itemSpace)
 	}
