@@ -97,7 +97,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		}
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 		tree.context.tip.AppendChild(node)
-	case atom.P:
+	case atom.P, atom.Div:
 		node.typ = NodeParagraph
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
