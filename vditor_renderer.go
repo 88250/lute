@@ -148,8 +148,6 @@ func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (Wal
 		attrs = append(attrs, []string{"data-code", string(node.tokens)})
 	}
 	r.tag("code", attrs, false)
-	code, _ := PathUnescape(string(node.tokens))
-	r.writeString(code)
 	if caretInCode {
 		r.writeString("<wbr>")
 	}
@@ -174,17 +172,23 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (
 }
 
 func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte("<wbr>"))
-		var attrs [][]string
-		if r.EscapeCode {
-			attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
-		} else {
-			attrs = append(attrs, []string{"data-code", string(node.tokens)})
-		}
-		r.writeString("<pre>")
-		r.tag("code", attrs, false)
-		return WalkSkipChildren, nil
+	node.tokens = bytes.TrimSpace(node.tokens)
+	codeIsEmpty := 1 > len(node.tokens)
+	caretInCode := bytes.Contains(node.tokens, []byte(caret))
+	node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
+	var attrs [][]string
+	if r.EscapeCode {
+		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
+	} else {
+		attrs = append(attrs, []string{"data-code", string(node.tokens)})
+	}
+	r.writeString("<pre>")
+	r.tag("code", attrs, false)
+	if caretInCode {
+		r.writeString("<wbr>")
+	}
+	if codeIsEmpty {
+		r.writeByte(itemNewline)
 	}
 	r.writeString("</code></pre>")
 	return WalkStop, nil
@@ -372,7 +376,7 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
-		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte("<wbr>"))
+		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
 		var attrs [][]string
 		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
 		r.writeString("<pre>")
@@ -462,8 +466,6 @@ func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 		attrs = append(attrs, []string{"data-code", string(node.tokens)})
 	}
 	r.tag("code", attrs, false)
-	code, _ := PathUnescape(string(node.tokens))
-	r.writeString(code)
 	if caretInCode {
 		r.writeString("<wbr>")
 	}
