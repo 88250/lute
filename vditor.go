@@ -99,6 +99,8 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 
 // VditorDOM2HTML 将 Vditor DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
 func (lute *Lute) VditorDOM2HTML(vhtml string) (html string) {
+	lute.VditorWYSIWYG = true
+
 	markdown := lute.vditorDOM2Md(vhtml)
 	html = lute.Md2HTML(markdown)
 	return
@@ -106,6 +108,8 @@ func (lute *Lute) VditorDOM2HTML(vhtml string) (html string) {
 
 // Md2VditorDOM 将 markdown 转换为 Vditor DOM，用于从源码模式切换至所见即所得模式。
 func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
+	lute.VditorWYSIWYG = true
+
 	tree, err := lute.parse("", []byte(markdown))
 	if nil != err {
 		html = err.Error()
@@ -125,6 +129,8 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 
 // VditorDOM2Md 将 Vditor DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
 func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
+	lute.VditorWYSIWYG = true
+
 	return lute.vditorDOM2Md(htmlStr)
 }
 
@@ -201,6 +207,10 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 						previousList.AppendChild(n)
 					}
 				}
+			} else if NodeInlineHTML == n.typ || NodeCodeSpan == n.typ || NodeInlineMath == n.typ ||
+				NodeHTMLBlock == n.typ || NodeCodeBlockCode == n.typ || NodeMathBlockContent == n.typ {
+				code, _ := PathUnescape(string(n.tokens))
+				n.tokens = []byte(code)
 			}
 		}
 		return WalkContinue, nil
@@ -347,12 +357,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				node.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
 				tree.context.tip.AppendChild(node)
 			case "html-block":
-				htmlCode, e := PathUnescape(string(codeTokens))
-				if nil != e {
-					return
-				}
 				node.typ = NodeHTMLBlock
-				node.tokens = []byte(htmlCode)
+				node.tokens = codeTokens
 				tree.context.tip.AppendChild(node)
 			default:
 				node.typ = NodeCodeBlock
@@ -447,8 +453,20 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		return
 	case atom.Br:
+		if nil != n.Parent {
+			if atom.Td == n.Parent.DataAtom {
+				if (nil == n.PrevSibling || caret == n.PrevSibling.Data) && (nil == n.NextSibling || caret == n.NextSibling.Data) {
+					return
+				}
+
+				node.typ = NodeInlineHTML
+				node.tokens = []byte("<br />")
+				tree.context.tip.AppendChild(node)
+				return
+			}
+		}
+
 		node.typ = NodeHardBreak
-		node.tokens = []byte("\n")
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -558,6 +576,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Th, atom.Td:
+		content := strings.TrimSpace(lute.domText(n))
+		if "" == content {
+			return
+		} else if caret == content {
+			node.typ = NodeText
+			node.tokens = []byte(caret)
+			tree.context.tip.AppendChild(node)
+			return
+		}
+
 		node.typ = NodeTableCell
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -576,7 +604,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.tokens = codeTokens
 			tree.context.tip.AppendChild(node)
 		} else {
-			node.tokens = []byte(lute.domText(n))
+			node.tokens = codeTokens
 			tree.context.tip.AppendChild(node)
 		}
 		return

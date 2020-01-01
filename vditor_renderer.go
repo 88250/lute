@@ -391,10 +391,10 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	previousText := node.parent.PreviousNodeText()
-	if "" == previousText || !strings.HasSuffix(previousText, " ") {
-		r.writeByte(itemSpace)
-	}
+	//previousText := node.parent.PreviousNodeText()
+	//if "" == previousText || !strings.HasSuffix(previousText, " ") {
+	//	r.writeByte(itemSpace)
+	//}
 	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
 	node.tokens = bytes.TrimSpace(node.tokens)
 	caretInCode := bytes.Contains(node.tokens, []byte(caret))
@@ -404,10 +404,10 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 		r.writeString("<wbr>")
 	}
 	r.writeString("</code></span>")
-	nextText := node.parent.NextNodeText()
-	if "" == nextText || !strings.HasPrefix(nextText, " ") {
-		r.writeByte(itemSpace)
-	}
+	//nextText := node.parent.NextNodeText()
+	//if "" == nextText || !strings.HasPrefix(nextText, " ") {
+	//	r.writeByte(itemSpace)
+	//}
 	return WalkStop, nil
 }
 

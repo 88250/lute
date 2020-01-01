@@ -22,6 +22,9 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"68", "<p data-block=\"0\">11<wbr><span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\" data-code=\"%3Cbr%3E\" style=\"display:none\">&lt;br&gt;</code><span class=\"vditor-wysiwyg__preview\" data-render=\"false\"><br></span></span>2</p>", "11<br>2\n"},
+	{"67", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>1<br>2<wbr></td></tr></tbody></table>", "|col1|\n|---|\n|1<br />2|\n"},
+	{"66", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr><br></td></tr></tbody></table>", "|col1|\n|---|\n||\n"},
 	{"65", `<table><thead><tr><th align="center">col1</th></tr></thead><tbody><tr><td align="center">12</td></tr><tr><td align="center">34<wbr></td></tr></tbody></table>`, "|col1|\n|:---:|\n|12|\n|34|\n"},
 	{"64", `<ul data-tight="true"><li data-marker="*">a<ul data-tight="true"><li data-marker="*">a1</li></ul></li><li data-marker="*">b</li><li data-marker="*">c<wbr></li></ul>`, "* a\n  * a1\n* b\n* c\n"},
 	{"63", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li></ul><p>b<wbr>\n</p>", "* foo\n\nb\n"},
@@ -104,6 +107,8 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"54", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr>\n</td></tr></tbody></table>", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr></td></tr></tbody></table>"},
+	{"53", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr><br></td></tr></tbody></table>", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr></td></tr></tbody></table>"},
 	{"52", "<p data-block=\"0\">---<wbr>\n</p>", "<hr data-block=\"0\" />"},
 	{"51", "<p data-block=\"0\">### <wbr>\n</p>", "<p data-block=\"0\">### <wbr>\n</p>"},
 	{"50", "<details open=\"\">\n<summary>foo</summary><ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></details>", "<details open=\"\">\n<summary>foo</summary><ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></details>"},
