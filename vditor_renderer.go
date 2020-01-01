@@ -399,7 +399,7 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 	node.tokens = bytes.TrimSpace(node.tokens)
 	caretInCode := bytes.Contains(node.tokens, []byte(caret))
 	node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
-	r.tag("code", [][]string{{"data-type", "math-inline"}, {"data-code", PathEscape(string(node.tokens))}}, false)
+	r.tag("code", [][]string{{"data-type", "html-inline"}, {"data-code", PathEscape(string(node.tokens))}}, false)
 	if caretInCode {
 		r.writeString("<wbr>")
 	}
