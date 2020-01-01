@@ -326,6 +326,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
+	case atom.Font:
+		return
+	case atom.Details:
+		node.typ = NodeHTMLBlock
+		node.tokens = lute.domHTML(n)
+		node.tokens = bytes.SplitAfter(node.tokens, []byte("</summary>"))[0]
+		tree.context.tip.AppendChild(node)
+	case atom.Summary:
+		return
 	default:
 		node.typ = NodeHTMLBlock
 		tokens := lute.domHTML(n)
@@ -360,5 +369,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 	case atom.Del, atom.S, atom.Strike:
 		marker := "~"
 		node.AppendChild(&Node{typ: NodeStrikethrough1CloseMarker, tokens: strToBytes(marker)})
+	case atom.Details:
+		tree.context.tip.AppendChild(&Node{typ: NodeHTMLBlock, tokens: []byte("</details>")})
 	}
 }

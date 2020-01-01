@@ -374,7 +374,7 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	if bytes.HasPrefix(node.tokens, []byte("<details>")) || bytes.HasPrefix(node.tokens, []byte("</details>")) {
+	if bytes.HasPrefix(node.tokens, []byte("<details")) || bytes.HasPrefix(node.tokens, []byte("</details>")) {
 		r.write(node.tokens)
 		return WalkStop, nil
 	}
