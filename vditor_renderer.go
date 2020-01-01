@@ -374,15 +374,18 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	if entering {
-		r.writeString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
-		node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
-		var attrs [][]string
-		attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
-		r.writeString("<pre>")
-		r.tag("code", attrs, false)
-		return WalkSkipChildren, nil
+	if bytes.HasPrefix(node.tokens, []byte("<details>")) || bytes.HasPrefix(node.tokens, []byte("</details>")) {
+		r.write(node.tokens)
+		return WalkStop, nil
 	}
+
+	r.writeString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
+	node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
+	var attrs [][]string
+	attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
+	r.writeString("<pre>")
+	r.tag("code", attrs, false)
+	return WalkSkipChildren, nil
 	r.writeString("</code></pre></div>")
 	return WalkStop, nil
 }
