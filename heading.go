@@ -60,8 +60,12 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 		content = content[:closingCrosshatchIndex]
 		_, content = trimRight(content)
 	}
-	ok = true
 
+	if t.context.option.VditorWYSIWYG && caret == string(content) {
+		return
+	}
+
+	ok = true
 	return
 }
 
