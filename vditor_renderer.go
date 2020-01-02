@@ -396,7 +396,8 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 	//	r.writeByte(itemSpace)
 	//}
 
-	if bytes.HasPrefix(node.tokens, []byte("<kbd")) || bytes.HasPrefix(node.tokens, []byte("</kbd>")) {
+	if bytes.HasPrefix(node.tokens, []byte("<kbd")) || bytes.HasPrefix(node.tokens, []byte("</kbd>")) ||
+		bytes.HasPrefix(node.tokens, []byte("<br")) {
 		r.write(node.tokens)
 		return WalkStop, nil
 	}
