@@ -395,6 +395,12 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 	//if "" == previousText || !strings.HasSuffix(previousText, " ") {
 	//	r.writeByte(itemSpace)
 	//}
+
+	if bytes.HasPrefix(node.tokens, []byte("<kbd")) || bytes.HasPrefix(node.tokens, []byte("</kbd>")) {
+		r.write(node.tokens)
+		return WalkStop, nil
+	}
+
 	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
 	node.tokens = bytes.TrimSpace(node.tokens)
 	caretInCode := bytes.Contains(node.tokens, []byte(caret))
