@@ -607,6 +607,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.tokens = lute.domHTML(n)
 		node.tokens = bytes.SplitAfter(node.tokens, []byte("</summary>"))[0]
 		tree.context.tip.AppendChild(node)
+	case atom.Kbd:
+		node.typ = NodeInlineHTML
+		node.tokens = lute.domHTML(n)
+		tree.context.tip.AppendChild(node)
+		return
 	case atom.Summary:
 		return
 	default:
