@@ -107,6 +107,7 @@ var terms = map[string]string{
 	"php":           "PHP",
 	"ssh":           "SSH",
 	"web":           "Web",
+	"websocket":     "WebSocket",
 	"api":           "API",
 	"css":           "CSS",
 	"html":          "HTML",
