@@ -23,7 +23,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 
 	var tags []byte
 	tags = append(tags, tokens[startPos])
-	if itemSlash == tokens[startPos+1] { // a closing tag
+	if itemSlash == tokens[startPos+1] && 1 < ctx.tokensLen-(startPos+1) { // a closing tag
 		tags = append(tags, tokens[startPos+1])
 		remains, tagName := t.parseTagName(tokens[ctx.pos+2:])
 		if 1 > len(tagName) {

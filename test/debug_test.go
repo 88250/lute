@@ -20,6 +20,8 @@ import (
 
 var debugTests = []parseTest{
 
+	{"44", "f</\n", "<p>f&lt;/</p>\n"},
+
 	// 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4
 	{"43", "https://foo.com/bar}", "<p><a href=\"https://foo.com/bar%7D\">https://foo.com/bar}</a></p>\n"},
 
