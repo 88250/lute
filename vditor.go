@@ -576,16 +576,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Th, atom.Td:
-		content := strings.TrimSpace(lute.domText(n))
-		if "" == content {
-			return
-		} else if caret == content {
-			node.typ = NodeText
-			node.tokens = []byte(caret)
-			tree.context.tip.AppendChild(node)
-			return
-		}
-
 		node.typ = NodeTableCell
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
@@ -603,9 +593,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.typ = NodeInlineHTML
 			node.tokens = codeTokens
 			tree.context.tip.AppendChild(node)
-		} else {
+		} else if "code-inline" == dataType {
 			node.tokens = codeTokens
 			tree.context.tip.AppendChild(node)
+		} else {
+			break
 		}
 		return
 	case atom.Font:
