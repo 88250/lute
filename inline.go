@@ -343,7 +343,11 @@ func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 	}
 	if isASCIIPunct(token) {
 		ctx.pos++
-		return &Node{typ: NodeText, tokens: []byte{token}}
+		tokens := []byte{token}
+		if t.context.option.VditorWYSIWYG {
+			tokens = append([]byte("\\"), tokens...)
+		}
+		return &Node{typ: NodeText, tokens: tokens}
 	}
 	return &Node{typ: NodeText, tokens: backslash}
 }

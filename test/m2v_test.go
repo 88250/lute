@@ -20,6 +20,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
+	{"1", `foo\<aa>bar`, "<p data-block=\"0\">foo\\&lt;aa&gt;bar\n</p>"},
 	{"0", `<details>
 <summary>foo</summary>
 

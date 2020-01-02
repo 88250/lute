@@ -448,8 +448,7 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 	}
 
 	node.tokens = bytes.TrimRight(node.tokens, "\n")
-
-	r.write(node.tokens)
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
