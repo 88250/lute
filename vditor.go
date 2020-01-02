@@ -25,6 +25,7 @@ const caret = "‸"
 
 // Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
 func (lute *Lute) Md2HTML(markdown string) (html string) {
+	lute.VditorWYSIWYG = false
 	html, err := lute.MarkdownStr("", markdown)
 	if nil != err {
 		html = err.Error()
