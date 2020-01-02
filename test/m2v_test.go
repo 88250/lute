@@ -20,6 +20,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
+	{"2", "<p align=\"center\">\nfoo\n</p>\n\nbar", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code data-code=\"%3Cp%20align=%22center%22%3E%0Afoo%0A%3C%2Fp%3E\"></code></pre></div><p data-block=\"0\">bar\n</p>"},
 	{"1", `foo\<aa>bar`, "<p data-block=\"0\">foo\\&lt;aa&gt;bar\n</p>"},
 	{"0", `<details>
 <summary>foo</summary>

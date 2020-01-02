@@ -385,7 +385,6 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 	attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
 	r.writeString("<pre>")
 	r.tag("code", attrs, false)
-	return WalkSkipChildren, nil
 	r.writeString("</code></pre></div>")
 	return WalkStop, nil
 }
