@@ -209,11 +209,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
-		buf := &bytes.Buffer{}
-		for c := n.FirstChild; nil != c; c = c.NextSibling {
-			html.Render(buf, c)
-		}
-		content := &Node{typ: NodeCodeSpanContent, tokens: buf.Bytes()}
+		code := lute.domHTML(n.FirstChild)
+		unescaped := html.UnescapeString(string(code))
+		code = []byte(unescaped)
+		content := &Node{typ: NodeCodeSpanContent, tokens: code}
 		node.typ = NodeCodeSpan
 		node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
 		node.AppendChild(content)
