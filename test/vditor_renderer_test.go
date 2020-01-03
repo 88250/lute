@@ -36,7 +36,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"58", "<p><em data-marker=\"*\">foo </em>bar<wbr>\n</p>", "*foo*bar\n"},
 	{"57", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code data-code=\"%3Cdetails%3E%0A%3Csummary%3E%E8%BF%99%E9%87%8C%E6%98%AF%E6%91%98%E8%A6%81%E9%83%A8%E5%88%86%E3%80%82%3C%2Fsummary%3E%0A%E8%BF%99%E9%87%8C%E6%98%AF%E7%BB%86%E8%8A%82%E9%83%A8%E5%88%86%E3%80%82%0A%3C%2Fdetails%3E%0A\">&lt;details&gt;&lt;summary&gt;这里是摘要部分。&lt;/summary&gt;这里是细节部分。&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "### 隐藏细节\n\n<details>\n<summary>这里是摘要部分。</summary>\n这里是细节部分。\n</details>\n\n1\n"},
 	{"56", "<p>~删除线~</p>", "~删除线~\n"},
-	{"55", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><br></li><li data-marker=\"*\"><wbr>bar</li></ul>", "* foo\n* bar\n"}, // 在 bar 前面换行剔除空的列表项节点
+	{"55", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><br></li><li data-marker=\"*\"><wbr>bar</li></ul>", "* foo\n*\n* bar\n"},
 	{"54", "<p>f<code data-code=\"o\"></code><wbr>o\n</p>", "f`o`o\n"},
 	{"53", "<blockquote><p><br></p><p><wbr>foo\n</p></blockquote>", "> foo\n"}, // 在块引用第一个字符前换行
 	{"52", "<blockquote><p>foo\n</p><blockquote><p>bar<wbr>\n</p></blockquote></blockquote>", "> foo\n>\n> > bar\n> >\n"},
@@ -54,7 +54,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"40", "<p>f<span data-marker=\"*\">o</span>ob<wbr></p>", "foob\n"},
 	{"39", "<p><b>foo<wbr></b></p>", "**foo**\n"},
 	{"38", "<p>```java</p><p><wbr><br></p>", "```java\n"},
-	{"37", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li><li data-marker=\"*\"></li><li data-marker=\"*\"><br></li></ul>", "* foo\n*\n"}, // 剔除中间的空项
+	{"37", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li><li data-marker=\"*\"></li><li data-marker=\"*\"><br></li></ul>", "* foo\n*\n*\n"},
 	{"36", "<ul data-tight=\"true\"><li data-marker=\"*\">1<em data-marker=\"*\">2</em></li><li data-marker=\"*\"><em data-marker=\"*\"><wbr><br></em></li></ul>", "* 1*2*\n*\n"},
 	{"35", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "*\n"},
 	{"34", "<p>中<wbr>文</p>", "中文\n"},

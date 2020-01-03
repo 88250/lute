@@ -130,10 +130,6 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	}
 
 	if t.context.option.VditorWYSIWYG {
-		if isBlankItem {
-			return nil
-		}
-
 		content := string(ln[t.context.offset:])
 		if "["+caret+"\n" == content || "[ "+caret+"\n" == content || "[ ]"+caret+"\n" == content ||
 			"[x"+caret+"\n" == content || "[x]"+caret+"\n" == content ||

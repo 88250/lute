@@ -324,12 +324,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			tree.context.tip = tree.context.tip.parent
 		}
 
-		if nil == n.FirstChild || (atom.Br == n.FirstChild.DataAtom && nil == n.FirstChild.NextSibling && nil != n.NextSibling) {
-			// 列表中间不能出现空项
-			return
-		}
-
-		if atom.P != n.FirstChild.DataAtom {
+		if nil == n.FirstChild || atom.P != n.FirstChild.DataAtom {
 			tree.context.tip.AppendChild(node)
 			tree.context.tip = node
 			node = &Node{typ: NodeParagraph}
