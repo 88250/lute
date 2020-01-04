@@ -435,18 +435,7 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 
 func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
 	node.tokens = bytes.TrimSpace(node.tokens)
-	//caretInCode := bytes.Contains(node.tokens, []byte(caret))
-	//node.tokens = bytes.ReplaceAll(node.tokens, []byte(caret), []byte(""))
-	var attrs [][]string
-	//if r.EscapeCode {
-	//	attrs = append(attrs, []string{"data-code", PathEscape(string(node.tokens))})
-	//} else {
-	//	attrs = append(attrs, []string{"data-code", string(node.tokens)})
-	//}
-	r.tag("code", attrs, false)
-	//if caretInCode {
-	//	r.writeString("<wbr>")
-	//}
+	r.tag("code", nil, false)
 	r.write(escapeHTML(node.tokens))
 	r.writeString("</code>")
 	return WalkStop, nil
