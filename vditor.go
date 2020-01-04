@@ -343,8 +343,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				marker = "```"
 			}
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
-			codeTokens := []byte(lute.domAttrValue(n.FirstChild, "data-code"))
-
+			//codeTokens := []byte(lute.domAttrValue(n.FirstChild, "data-code"))
+			codeTokens := unescapeHTML([]byte(n.FirstChild.FirstChild.Data))
 			switch divDataType {
 			case "math-block":
 				node.typ = NodeMathBlock
@@ -440,7 +440,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
-		codeTokens := []byte(lute.domAttrValue(n, "data-code"))
+		//codeTokens := []byte(lute.domAttrValue(n, "data-code"))
+		codeTokens := unescapeHTML([]byte(n.FirstChild.Data))
 		content := &Node{typ: NodeCodeSpanContent, tokens: codeTokens}
 		node.typ = NodeCodeSpan
 		node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})

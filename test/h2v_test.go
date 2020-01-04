@@ -20,7 +20,7 @@ import (
 
 var html2VditorDOMTests = []parseTest{
 
-	{"0", `<code class="language-text">&gt;</code>`, "<p data-block=\"0\"> <code data-code=\"%3E\"></code> \n</p>"},
+	{"0", `<code class="language-text">&gt;</code>`, "<p data-block=\"0\"> <code>&gt;</code> \n</p>"},
 }
 
 func TestHTML2VditorDOM(t *testing.T) {

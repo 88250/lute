@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"github.com/88250/lute/html"
 	"strings"
 	"unicode/utf8"
 )
@@ -23,6 +24,10 @@ var (
 	gt   = strToBytes("&gt;")
 	quot = strToBytes("&quot;")
 )
+
+func unescapeHTML(h []byte) (ret []byte) {
+	return strToBytes(html.UnescapeString(bytesToStr(h)))
+}
 
 func escapeHTML(html []byte) (ret []byte) {
 	length := len(html)
