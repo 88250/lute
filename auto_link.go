@@ -170,6 +170,7 @@ func (lute *Lute) AddAutoLinkDomainSuffix(suffix string) {
 func (t *Tree) parseGFMAutoLink0(node *Node) {
 	tokens := node.tokens
 	var i, j, k int
+	var textStart, textEnd int
 	length := len(tokens)
 	minLinkLen := 10 // 太短的情况肯定不可能有链接，最短的情况是 www.xxx.xx
 	if minLinkLen > length {
@@ -177,7 +178,6 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	}
 
 	var token byte
-	var consumed = make([]byte, 0, 256)
 	var tmp = make([]byte, 0, 16)
 	www := false
 	for i < length {
@@ -199,11 +199,14 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			protocol = tmp[0:6]
 			i += 6
 		} else {
-			consumed = append(consumed, token)
+			textEnd++
 			if length-i < minLinkLen && 0 < length-i {
 				// 剩余字符不足，已经不可能形成链接了
-				consumed = append(consumed, tokens[i+1:]...)
-				node.InsertBefore(&Node{typ: NodeText, tokens: consumed})
+				if textStart < textEnd {
+					node.InsertBefore(&Node{typ: NodeText, tokens: tokens[textStart:]})
+				} else {
+					node.InsertBefore(&Node{typ: NodeText, tokens: tokens[textEnd:]})
+				}
 				node.Unlink()
 				return
 			}
@@ -211,10 +214,11 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			continue
 		}
 
-		if 0 < len(consumed) {
-			text := &Node{typ: NodeText, tokens: consumed}
+		//if 0 < len(consumed) {
+		if textStart < textEnd {
+			text := &Node{typ: NodeText, tokens: tokens[textStart:textEnd]}
 			node.InsertBefore(text)
-			consumed = make([]byte, 0, 256)
+			textStart = textEnd
 		}
 
 		var url []byte
@@ -244,6 +248,9 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			}
 			text := &Node{typ: NodeText, tokens: url}
 			node.InsertBefore(text)
+
+			textStart = i
+			textEnd = i
 			continue
 		}
 
@@ -267,6 +274,9 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			}
 			text := &Node{typ: NodeText, tokens: part}
 			node.InsertBefore(text)
+
+			textStart = i
+			textEnd = i
 			continue
 		}
 
@@ -353,8 +363,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			}
 		}
 
-		dest := protocol
-		dest = append(dest, domain...)
+		dest := append(protocol, domain...)
 		dest = append(dest, path...)
 		var addr []byte
 		if !www {
@@ -365,10 +374,14 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 
 		link := t.newLink(NodeLink, addr, encodeDestination(dest), nil, 2)
 		node.InsertBefore(link)
+
+		textStart = i
+		textEnd = i
 	}
 
-	if 0 < len(consumed) {
-		text := &Node{typ: NodeText, tokens: consumed}
+	//if 0 < len(consumed) {
+	if textStart < textEnd {
+		text := &Node{typ: NodeText, tokens: tokens[textStart:textEnd]}
 		node.InsertBefore(text)
 	}
 
