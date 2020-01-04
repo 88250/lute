@@ -88,7 +88,6 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 	}
 
 	renderer := lute.newVditorRenderer(tree)
-	renderer.EscapeCode = true
 	var output []byte
 	output, err = renderer.Render()
 	if nil != err {
@@ -118,7 +117,6 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 	}
 
 	renderer := lute.newVditorRenderer(tree)
-	renderer.EscapeCode = true
 	var output []byte
 	output, err = renderer.Render()
 	if nil != err {
@@ -343,7 +341,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				marker = "```"
 			}
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
-			//codeTokens := []byte(lute.domAttrValue(n.FirstChild, "data-code"))
 			codeTokens := unescapeHTML([]byte(n.FirstChild.FirstChild.Data))
 			switch divDataType {
 			case "math-block":
@@ -440,7 +437,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
-		//codeTokens := []byte(lute.domAttrValue(n, "data-code"))
 		codeTokens := unescapeHTML([]byte(n.FirstChild.Data))
 		content := &Node{typ: NodeCodeSpanContent, tokens: codeTokens}
 		node.typ = NodeCodeSpan
@@ -578,8 +574,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Span:
-		codeTokens := []byte(lute.domAttrValue(n.FirstChild, "data-code"))
-
+		if nil == n.FirstChild {
+			return
+		}
+		if code := n.FirstChild.FirstChild; nil == code || atom.Code != code.DataAtom {
+			break
+		}
+		codeTokens := unescapeHTML([]byte(n.FirstChild.FirstChild.Data))
 		if "math-inline" == dataType {
 			node.typ = NodeInlineMath
 			node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
@@ -593,8 +594,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		} else if "code-inline" == dataType {
 			node.tokens = codeTokens
 			tree.context.tip.AppendChild(node)
-		} else {
-			break
 		}
 		return
 	case atom.Font:
