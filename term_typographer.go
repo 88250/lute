@@ -185,7 +185,6 @@ var terms = map[string]string{
 	"macbook":       "MacBook",
 	"vps":           "VPS",
 	"vpn":           "VPN",
-	"arm":           "ARM",
 	"cpu":           "CPU",
 	"spring":        "Spring",
 	"springboot":    "SpringBoot",
@@ -194,4 +193,5 @@ var terms = map[string]string{
 	"mybatis":       "MyBatis",
 	"qq":            "QQ",
 	"sql":           "SQL",
+	"markdown":      "Markdown",
 }
