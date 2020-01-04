@@ -178,25 +178,24 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	}
 
 	var token byte
-	var tmp = make([]byte, 0, 16)
 	www := false
 	for i < length {
 		token = tokens[i]
 		var protocol []byte
 		// 检查前缀
-		tmp = tokens[i:]
-		tmpLen := len(tmp)
-		if 10 <= tmpLen /* www.xxx.xx */ && 'w' == tmp[0] && 'w' == tmp[1] && 'w' == tmp[2] && '.' == tmp[3] {
+		//tmp = tokens[i:]
+		tmpLen := length - i
+		if 10 <= tmpLen /* www.xxx.xx */ && 'w' == tokens[i] && 'w' == tokens[i+1] && 'w' == tokens[i+2] && '.' == tokens[i+3] {
 			protocol = httpProto
 			www = true
-		} else if 13 <= tmpLen /* http://xxx.xx */ && 'h' == tmp[0] && 't' == tmp[1] && 't' == tmp[2] && 'p' == tmp[3] && ':' == tmp[4] && '/' == tmp[5] && '/' == tmp[6] {
-			protocol = tmp[0:7]
+		} else if 13 <= tmpLen /* http://xxx.xx */ && 'h' == tokens[i] && 't' == tokens[i+1] && 't' == tokens[i+2] && 'p' == tokens[i+3] && ':' == tokens[i+4] && '/' == tokens[i+5] && '/' == tokens[i+6] {
+			protocol = tokens[i:i+7]
 			i += 7
-		} else if 14 <= tmpLen /* https://xxx.xx */ && 'h' == tmp[0] && 't' == tmp[1] && 't' == tmp[2] && 'p' == tmp[3] && 's' == tmp[4] && ':' == tmp[5] && '/' == tmp[6] && '/' == tmp[7] {
-			protocol = tmp[0:8]
+		} else if 14 <= tmpLen /* https://xxx.xx */ && 'h' == tokens[i] && 't' == tokens[i+1] && 't' == tokens[i+2] && 'p' == tokens[i+3] && 's' == tokens[i+4] && ':' == tokens[i+5] && '/' == tokens[i+6] && '/' == tokens[i+7] {
+			protocol = tokens[i:i+8]
 			i += 8
-		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == tmp[0] && 't' == tmp[1] && 'p' == tmp[2] && ':' == tmp[3] && '/' == tmp[4] && '/' == tmp[5] {
-			protocol = tmp[0:6]
+		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == tokens[i] && 't' == tokens[i+1] && 'p' == tokens[i+2] && ':' == tokens[i+3] && '/' == tokens[i+4] && '/' == tokens[i+5] {
+			protocol = tokens[i:i+6]
 			i += 6
 		} else {
 			textEnd++
@@ -214,7 +213,6 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			continue
 		}
 
-		//if 0 < len(consumed) {
 		if textStart < textEnd {
 			text := &Node{typ: NodeText, tokens: tokens[textStart:textEnd]}
 			node.InsertBefore(text)
@@ -379,7 +377,6 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		textEnd = i
 	}
 
-	//if 0 < len(consumed) {
 	if textStart < textEnd {
 		text := &Node{typ: NodeText, tokens: tokens[textStart:textEnd]}
 		node.InsertBefore(text)
