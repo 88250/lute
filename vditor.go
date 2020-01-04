@@ -341,7 +341,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				marker = "```"
 			}
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
-			codeTokens := unescapeHTML([]byte(n.FirstChild.FirstChild.Data))
+			codeTokens := []byte(n.FirstChild.FirstChild.Data)
 			switch divDataType {
 			case "math-block":
 				node.typ = NodeMathBlock
@@ -437,7 +437,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
-		codeTokens := unescapeHTML([]byte(n.FirstChild.Data))
+		codeTokens := []byte(n.FirstChild.Data)
 		content := &Node{typ: NodeCodeSpanContent, tokens: codeTokens}
 		node.typ = NodeCodeSpan
 		node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})
@@ -574,13 +574,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Span:
-		if nil == n.FirstChild {
-			return
-		}
-		if code := n.FirstChild.FirstChild; nil == code || atom.Code != code.DataAtom {
+		if nil == n.FirstChild || atom.Code != n.FirstChild.DataAtom {
 			break
 		}
-		codeTokens := unescapeHTML([]byte(n.FirstChild.FirstChild.Data))
+		codeTokens := []byte(n.FirstChild.FirstChild.Data)
 		if "math-inline" == dataType {
 			node.typ = NodeInlineMath
 			node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
