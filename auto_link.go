@@ -216,8 +216,8 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		}
 
 		if textStart < textEnd {
-			text := &Node{typ: NodeText, tokens: tokens[textStart:textEnd]}
-			node.InsertBefore(text)
+			node.InsertBefore(&Node{typ: NodeText, tokens: tokens[textStart:textEnd]})
+			needUnlink = true
 			textStart = textEnd
 		}
 
@@ -264,6 +264,8 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		}
 		domain := url[:k]
 		if !t.isValidDomain(domain) {
+			node.InsertBefore(&Node{typ: NodeText, tokens: tokens[textStart:i]})
+			needUnlink = true
 			textStart = i
 			textEnd = i
 			continue
