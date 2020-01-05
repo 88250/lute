@@ -20,6 +20,13 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"7", "www.我的网址/console\n", "<p>www.我的网址/console</p>\n"},
+	{"6", "http://我的网址/console\n", "<p>http://我的网址/console</p>\n"},
+	{"5", "http://mydomain/console\n", "<p>http://mydomain/console</p>\n"},
+	{"4", "http://foo.com/bar\n", "<p><a href=\"http://foo.com/bar\">http://foo.com/bar</a></p>\n"},
+	{"3", "http://mydomain/console\n", "<p>http://mydomain/console</p>\n"},
+	{"2", "www.非链接\n", "<p>www.非链接</p>\n"},
+	{"1", "foo bar baz\n", "<p>foo bar baz</p>\n"},
 	{"0", "foo http://bar.com baz\nfoo http://bar.com baz\n", "<p>foo <a href=\"http://bar.com\">http://bar.com</a> baz<br />\nfoo <a href=\"http://bar.com\">http://bar.com</a> baz</p>\n"},
 }
 

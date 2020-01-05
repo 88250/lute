@@ -20,21 +20,18 @@ import (
 
 var debugTests = []parseTest{
 
-	{"44", "f</\n", "<p>f&lt;/</p>\n"},
+	{"41", "f</\n", "<p>f&lt;/</p>\n"},
 
 	// 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4
-	{"43", "https://foo.com/bar}", "<p><a href=\"https://foo.com/bar%7D\">https://foo.com/bar}</a></p>\n"},
+	{"40", "https://foo.com/bar}", "<p><a href=\"https://foo.com/bar%7D\">https://foo.com/bar}</a></p>\n"},
 
-	{"42", "[label][] 是 label\n\n[label]: https://b3log.org\n", "<p><a href=\"https://b3log.org\">label</a> 是 label</p>\n"},
-	{"41", "|abc|def|\n|---|---|\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
+	{"39", "[label][] 是 label\n\n[label]: https://b3log.org\n", "<p><a href=\"https://b3log.org\">label</a> 是 label</p>\n"},
+	{"38", "|abc|def|\n|---|---|\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
 
 	// 链接解析括号匹配问题 https://github.com/b3log/lute/issues/36
-	{"40", "[link](/u(ri\n)\n", "<p>[link](/u(ri<br />\n)</p>\n"},
-	{"39", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
+	{"37", "[link](/u(ri\n)\n", "<p>[link](/u(ri<br />\n)</p>\n"},
+	{"36", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
 
-	{"38", "www.我的网址/console\n", "<p>www.我的网址/console</p>\n"},
-	{"37", "http://我的网址/console\n", "<p>http://我的网址/console</p>\n"},
-	{"36", "http://mydomain/console\n", "<p>http://mydomain/console</p>\n"},
 	{"35", "* [ ] foo [foo](/bar)\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo <a href=\"/bar\">foo</a></li>\n</ul>\n"},
 	{"34", "[foo](/bar )1\n", "<p><a href=\"/bar\">foo</a>1</p>\n"},
 	{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},

@@ -169,16 +169,17 @@ func (lute *Lute) AddAutoLinkDomainSuffix(suffix string) {
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
 	tokens := node.tokens
-	var i, j, k int
-	var textStart, textEnd int
 	length := len(tokens)
 	minLinkLen := 10 // 太短的情况肯定不可能有链接，最短的情况是 www.xxx.xx
 	if minLinkLen > length {
 		return
 	}
 
+	var i, j, k int
+	var textStart, textEnd int
 	var token byte
 	www := false
+	needUnlink := false
 	for i < length {
 		token = tokens[i]
 		var protocol []byte
@@ -189,24 +190,25 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			protocol = httpProto
 			www = true
 		} else if 13 <= tmpLen /* http://xxx.xx */ && 'h' == tokens[i] && 't' == tokens[i+1] && 't' == tokens[i+2] && 'p' == tokens[i+3] && ':' == tokens[i+4] && '/' == tokens[i+5] && '/' == tokens[i+6] {
-			protocol = tokens[i:i+7]
+			protocol = tokens[i : i+7]
 			i += 7
 		} else if 14 <= tmpLen /* https://xxx.xx */ && 'h' == tokens[i] && 't' == tokens[i+1] && 't' == tokens[i+2] && 'p' == tokens[i+3] && 's' == tokens[i+4] && ':' == tokens[i+5] && '/' == tokens[i+6] && '/' == tokens[i+7] {
-			protocol = tokens[i:i+8]
+			protocol = tokens[i : i+8]
 			i += 8
 		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == tokens[i] && 't' == tokens[i+1] && 'p' == tokens[i+2] && ':' == tokens[i+3] && '/' == tokens[i+4] && '/' == tokens[i+5] {
-			protocol = tokens[i:i+6]
+			protocol = tokens[i : i+6]
 			i += 6
 		} else {
 			textEnd++
-			if length-i < minLinkLen && 0 < length-i {
-				// 剩余字符不足，已经不可能形成链接了
-				if textStart < textEnd {
-					node.InsertBefore(&Node{typ: NodeText, tokens: tokens[textStart:]})
-				} else {
-					node.InsertBefore(&Node{typ: NodeText, tokens: tokens[textEnd:]})
+			if length-i < minLinkLen { // 剩余字符不足，已经不可能形成链接了
+				if needUnlink {
+					if textStart < textEnd {
+						node.InsertBefore(&Node{typ: NodeText, tokens: tokens[textStart:]})
+					} else {
+						node.InsertBefore(&Node{typ: NodeText, tokens: tokens[textEnd:]})
+					}
+					node.Unlink()
 				}
-				node.Unlink()
 				return
 			}
 			i++
@@ -244,8 +246,6 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 				url = append(url, token)
 				i++
 			}
-			text := &Node{typ: NodeText, tokens: url}
-			node.InsertBefore(text)
 
 			textStart = i
 			textEnd = i
@@ -264,15 +264,6 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		}
 		domain := url[:k]
 		if !t.isValidDomain(domain) {
-			var part []byte
-			if www {
-				part = url
-			} else {
-				part = append(protocol, url...)
-			}
-			text := &Node{typ: NodeText, tokens: part}
-			node.InsertBefore(text)
-
 			textStart = i
 			textEnd = i
 			continue
@@ -372,6 +363,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 
 		link := t.newLink(NodeLink, addr, encodeDestination(dest), nil, 2)
 		node.InsertBefore(link)
+		needUnlink = true
 
 		textStart = i
 		textEnd = i
@@ -380,10 +372,11 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	if textStart < textEnd {
 		text := &Node{typ: NodeText, tokens: tokens[textStart:textEnd]}
 		node.InsertBefore(text)
+		needUnlink = true
 	}
-
-	// 处理完后传入的文本节点 node 已经被拆分为多个节点，所以可以移除自身
-	node.Unlink()
+	if needUnlink {
+		node.Unlink()
+	}
 	return
 }
 
