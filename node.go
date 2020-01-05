@@ -76,11 +76,6 @@ type Node struct {
 	// 数学公式块
 
 	mathBlockDollarOffset int
-
-	// Vditor 所见即所得支持
-	expand           bool   // 是否需要展开节点
-	caretStartOffset string // 光标插入起始偏移位置
-	caretEndOffset   string // 光标插入结束偏移位置
 }
 
 // lastDeepestChild 返回 n 的最后一个最深子节点。
@@ -398,4 +393,9 @@ const (
 	NodeInlineMathOpenMarker  nodeType = 305 // 开始内联数学公式标记符 $
 	NodeInlineMathContent     nodeType = 306 // 内联数学公式内容
 	NodeInlineMathCloseMarker nodeType = 307 // 结束内联数学公式标记符 $
+
+	// Vditor 所见即所得
+
+	NodeBackslash        nodeType = 400 // 转义反斜杠标记符 \
+	NodeBackslashContent nodeType = 401 // 转义反斜杠后的内容
 )

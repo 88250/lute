@@ -237,7 +237,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 	dataType := lute.domAttrValue(n, "data-type")
 
-	if atom.Div == n.DataAtom && ("code-block" == dataType || "html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType) {
+	if atom.Div == n.DataAtom && ("code-block" == dataType || "html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType ||
+		"backslash" == dataType) {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			lute.genASTByVditorDOM(c, tree)
 		}

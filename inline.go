@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/88250/lute/html"
@@ -25,7 +26,7 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 		var n *Node
 		switch token {
 		case itemBackslash:
-			n = t.parseBackslash(ctx)
+			n = t.parseBackslash(block, ctx)
 		case itemBacktick:
 			n = t.parseCodeSpan(ctx)
 		case itemAsterisk, itemUnderscore, itemTilde:
@@ -166,8 +167,16 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			if passed, remains, dest = t.context.parseInlineLinkDest(remains); nil == passed {
 				break
 			}
-			if t.context.option.VditorWYSIWYG && (1 > len(dest) || (nil == opener.node.next && !isImage)) {
-				break
+			if t.context.option.VditorWYSIWYG {
+				if bytes.Contains(dest, []byte(caret)) {
+					break
+				}
+				if nil == opener.node.next || bytes.Contains(opener.node.next.tokens, []byte(caret)) {
+					break
+				}
+				if 1 > len(dest) {
+					break
+				}
 			}
 			ctx.pos += len(passed)
 			openParen = passed[0:1]
@@ -329,7 +338,7 @@ func (t *Tree) removeBracket(ctx *InlineContext) {
 
 var backslash = strToBytes("\\")
 
-func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
+func (t *Tree) parseBackslash(block *Node, ctx *InlineContext) *Node {
 	if ctx.pos == ctx.tokensLen-1 {
 		ctx.pos++
 		return &Node{typ: NodeText, tokens: backslash}
@@ -343,11 +352,14 @@ func (t *Tree) parseBackslash(ctx *InlineContext) *Node {
 	}
 	if isASCIIPunct(token) {
 		ctx.pos++
-		tokens := []byte{token}
 		if t.context.option.VditorWYSIWYG {
-			tokens = append([]byte("\\"), tokens...)
+			n := &Node{typ: NodeBackslash}
+			block.AppendChild(n)
+			n.AppendChild(&Node{typ: NodeBackslashContent, tokens: []byte{token}})
+			return nil
+		} else {
+			return &Node{typ: NodeText, tokens: []byte{token}}
 		}
-		return &Node{typ: NodeText, tokens: tokens}
 	}
 	return &Node{typ: NodeText, tokens: backslash}
 }

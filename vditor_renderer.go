@@ -92,7 +92,26 @@ func (lute *Lute) newVditorRenderer(tree *Tree) *VditorRenderer {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
+	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
 	return ret
+}
+
+func (r *VditorRenderer) renderBackslashContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(escapeHTML(node.tokens))
+	return WalkStop, nil
+}
+
+func (r *VditorRenderer) renderBackslash(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writeString("<span data-type=\"backslash\">")
+		r.writeString("<span>")
+		r.writeByte(itemBackslash)
+		r.writeString("</span>")
+	} else {
+		r.writeString("</span>")
+	}
+	return WalkContinue, nil
 }
 
 func (r *VditorRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {

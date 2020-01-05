@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"70", "<p data-block=\"0\">/\\_\\_foo__.\n</p>", "/\\_\\_foo__.\n"},
 	{"69", "<p data-block=\"0\">foo<kbd>code</kbd>bar</p>", "foo<kbd>code</kbd>bar\n"},
 	{"68", "<p data-block=\"0\">1<wbr><span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\" style=\"display:none\">&lt;br&gt;</code><span class=\"vditor-wysiwyg__preview\" data-render=\"false\"><br></span></span>2</p>", "1<br>2\n"},
 	{"67", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>1<br>2<wbr></td></tr></tbody></table>", "|col1|\n|---|\n|1<br />2|\n"},
@@ -108,6 +109,9 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"57", "<p data-block=\"0\">/<span data-type=\"backslash\"><span>\\</span>_</span><span data-type=\"backslash\"><span>\\</span>_</span>foo__.\n</p>", "<p data-block=\"0\">/<span data-type=\"backslash\"><span>\\</span>_</span><span data-type=\"backslash\"><span>\\</span>_</span>foo__.\n</p>"},
+	{"56", "<p data-block=\"0\">[foo](bar<wbr>)\n</p>", "<p data-block=\"0\">[foo](bar<wbr>)\n</p>"},
+	{"55", "<p data-block=\"0\">[foo<wbr>](bar)\n</p>", "<p data-block=\"0\">[foo<wbr>](bar)\n</p>"},
 	{"54", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr>\n</td></tr></tbody></table>", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr></td></tr><tr><td></td></tr></tbody></table>"},
 	{"53", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr><br></td></tr></tbody></table>", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr></td></tr></tbody></table>"},
 	{"52", "<p data-block=\"0\">---<wbr>\n</p>", "<hr data-block=\"0\" />"},
@@ -115,7 +119,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"50", "<details open=\"\">\n<summary>foo</summary><ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></details>", "<details open=\"\">\n<summary>foo</summary><ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></details>"},
 	{"49", "<details>\n<summary>foo</summary><ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></details>", "<details>\n<summary>foo</summary><ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></details>"},
 	{"49", "<p data-block=\"0\"><a href=\"/bar\"><code>foo</code></a><wbr>\n</p>", "<p data-block=\"0\"><a href=\"/bar\"><code>foo</code></a><wbr>\n</p>"},
-	{"48", "<p data-block=\"0\"><a href=\"中文\">link<wbr></a>\n</p>", "<p data-block=\"0\"><a href=\"中文\">link<wbr></a>\n</p>"},
+	{"48", "<p data-block=\"0\"><a href=\"中文\">link</a><wbr>\n</p>", "<p data-block=\"0\"><a href=\"中文\">link</a><wbr>\n</p>"},
 	{"47", "<p data-block=\"0\">`1<wbr>`\n</p>", "<p data-block=\"0\"> <code>1<wbr></code> \n</p>"},
 	{"46", "<p>- [x] f<wbr>\n</p>", "<ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> f<wbr></li></ul>"},
 	{"45", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li></ul><p>- [ ] b<wbr>\n</p>", "<ul data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\"><p data-block=\"0\"><input type=\"checkbox\" /> foo\n</p></li><li data-marker=\"-\" class=\"vditor-task\"><p data-block=\"0\"><input type=\"checkbox\" /> b<wbr>\n</p></li></ul>"},
@@ -124,7 +128,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"42", "<p>* [<wbr>\n</p>", "<p data-block=\"0\">* [<wbr>\n</p>"},
 	{"40", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code>&lt;details&gt;\n&lt;summary&gt;\n这里是摘要部分。\n&lt;/summary&gt;\n这里是细节部分。\n&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "<h3 data-block=\"0\">隐藏细节</h3><details>\n<summary>\n这里是摘要部分。\n</summary>\n这里是细节部分。\n</details><p data-block=\"0\">1<wbr>\n</p>"},
 	{"39", "<p>*foo<wbr>*bar\n</p>", "<p data-block=\"0\"><em data-marker=\"*\">foo<wbr></em>bar\n</p>"},
-	{"38", "<p>[foo](h<wbr>)\n</p>", "<p data-block=\"0\"><a href=\"h\">foo<wbr></a>\n</p>"},
+	{"38", "<p>[foo](b<wbr>)\n</p>", "<p data-block=\"0\">[foo](b<wbr>)\n</p>"},
 	{"37", "<blockquote><p><wbr>\n</p></blockquote>", ""},
 	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-marker=\"```\"><pre><code class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code class=\"language-go\">foo</code></pre></div>"},
 	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p data-block=\"0\"><em data-marker=\"*\">foo</em>\n</p><p data-block=\"0\"><em data-marker=\"*\">\n<wbr></em>\n</p>"},
