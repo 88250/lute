@@ -188,25 +188,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 
 	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
 		if entering {
-			if NodeList == n.typ {
-				// ul.ul => ul.li.ul
-				if nil != n.parent && NodeList == n.parent.typ {
-					previousLi := n.previous
-					if nil != previousLi {
-						n.Unlink()
-						previousLi.AppendChild(n)
-					}
-				}
-			} else if NodeListItem == n.typ {
-				if nil != n.parent && NodeList != n.parent.typ {
-					// .li => .ul.li
-					previousList := n.previous
-					if nil != previousList {
-						n.Unlink()
-						previousList.AppendChild(n)
-					}
-				}
-			} else if NodeInlineHTML == n.typ || NodeCodeSpan == n.typ || NodeInlineMath == n.typ ||
+			if NodeInlineHTML == n.typ || NodeCodeSpan == n.typ || NodeInlineMath == n.typ ||
 				NodeHTMLBlock == n.typ || NodeCodeBlockCode == n.typ || NodeMathBlockContent == n.typ {
 				code, _ := PathUnescape(string(n.tokens))
 				n.tokens = []byte(code)

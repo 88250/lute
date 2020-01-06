@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	// TODO: 松散列表问题
 	//{"71", `<ul data-tight="true" data-block="0"><li data-marker="*">123<ul data-tight="true" data-block="0"><li data-marker="*">456<ul data-tight="true" data-block="0"><li data-marker="*">789</li></ul></li></ul></li><li data-marker="*">1</li><li data-marker="*"><wbr><br></li></ul>`, "* 123\n  * 456\n    * 789\n* 1\n*\n"},
 	{"70", "<p data-block=\"0\">/\\_\\_foo__.\n</p>", "/\\_\\_foo__.\n"},
 	{"69", "<p data-block=\"0\">foo<kbd>code</kbd>bar</p>", "foo<kbd>code</kbd>bar\n"},
@@ -110,6 +111,7 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"58", "<p data-block=\"0\">![](/bar)<wbr>\n</p>", "<p data-block=\"0\"><img src=\"/bar\" alt=\"\" /><wbr>\n</p>"},
 	{"57", "<p data-block=\"0\">/<span data-type=\"backslash\"><span>\\</span>_</span><span data-type=\"backslash\"><span>\\</span>_</span>foo__.\n</p>", "<p data-block=\"0\">/<span data-type=\"backslash\"><span>\\</span>_</span><span data-type=\"backslash\"><span>\\</span>_</span>foo__.\n</p>"},
 	{"56", "<p data-block=\"0\">[foo](bar<wbr>)\n</p>", "<p data-block=\"0\">[foo](bar<wbr>)\n</p>"},
 	{"55", "<p data-block=\"0\">[foo<wbr>](bar)\n</p>", "<p data-block=\"0\">[foo<wbr>](bar)\n</p>"},

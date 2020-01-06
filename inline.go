@@ -171,7 +171,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				if bytes.Contains(dest, []byte(caret)) {
 					break
 				}
-				if nil == opener.node.next || bytes.Contains(opener.node.next.tokens, []byte(caret)) {
+				if !isImage && (nil == opener.node.next || bytes.Contains(opener.node.next.tokens, []byte(caret))) {
 					break
 				}
 				if 1 > len(dest) {
