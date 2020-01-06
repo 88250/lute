@@ -130,7 +130,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"39", "<p>*foo<wbr>*bar\n</p>", "<p data-block=\"0\"><em data-marker=\"*\">foo<wbr></em>bar\n</p>"},
 	{"38", "<p>[foo](b<wbr>)\n</p>", "<p data-block=\"0\">[foo](b<wbr>)\n</p>"},
 	{"37", "<blockquote><p><wbr>\n</p></blockquote>", ""},
-	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-marker=\"```\"><pre><code class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code class=\"language-go\">foo</code></pre></div>"},
+	{"36", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-marker=\"```\"><pre><code class=\"language-go\">foo</code></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code class=\"language-go\">foo\n</code></pre></div>"},
 	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p data-block=\"0\"><em data-marker=\"*\">foo</em>\n</p><p data-block=\"0\"><em data-marker=\"*\">\n<wbr></em>\n</p>"},
 	{"34", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">foo</code></span> \n</p>", "<p data-block=\"0\"> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">foo</code></span> \n</p>"},
 	{"33", "<p><code>foo</code><wbr>\n</p>", "<p data-block=\"0\"> <code>foo</code> <wbr>\n</p>"},
@@ -141,7 +141,7 @@ var spinVditorDOMTests = []*parseTest{
 
 	{"27", "<p><wbr></p>", "<p data-block=\"0\"><wbr>\n</p>"},
 	{"26", "<p>![alt](src \"title\")</p>", "<p data-block=\"0\"><img src=\"src\" alt=\"alt\" title=\"title\" />\n</p>"},
-	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code class=\"language-java\">\n<wbr></code></pre></div>"},
+	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code class=\"language-java\"><wbr>\n</code></pre></div>"},
 	{"24", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "<ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\"><wbr></li></ul>"},
 	{"23", "<ol><li data-marker=\"1.\">foo</li></ol>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\">foo</li></ol>"},
 	{"22", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\">bar</li></ul></li></ul>", "<ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></li></ul>"},
