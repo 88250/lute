@@ -317,6 +317,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			} else {
 				marker = "*"
 			}
+		} else {
+			if "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
+				// 子有序列表必须从 1 开始
+				marker = "1."
+			}
 		}
 		node.listData = &listData{marker: []byte(marker)}
 		if NodeListItem == tree.context.tip.typ {
