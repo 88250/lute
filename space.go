@@ -63,7 +63,7 @@ func allowSpace(currentChar, nextChar rune) bool {
 		return true
 	}
 
-	if ('%' == currentChar && nextIsLetter) || (currentIsLetter && '%' == nextChar) {
+	if ('%' == currentChar && nextIsLetter && !nextIsASCII) || (!currentIsASCII && currentIsLetter && '%' == nextChar) {
 		return true
 	}
 

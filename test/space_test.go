@@ -20,6 +20,8 @@ import (
 
 var spaceTests = []parseTest{
 
+	{"14", "foo%bar", "<p>foo%bar</p>\n"},
+
 	{"13", "**[链接foo文本](/bar)**\n", "<p><strong><a href=\"/bar\">链接 foo 文本</a></strong></p>\n"},
 	{"12", "[链接foo文本](/bar)\n", "<p><a href=\"/bar\">链接 foo 文本</a></p>\n"},
 	{"11", "[链接foo文本](/bar)\n", "<p><a href=\"/bar\">链接 foo 文本</a></p>\n"},
