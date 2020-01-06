@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	//{"71", `<ul data-tight="true" data-block="0"><li data-marker="*">123<ul data-tight="true" data-block="0"><li data-marker="*">456<ul data-tight="true" data-block="0"><li data-marker="*">789</li></ul></li></ul></li><li data-marker="*">1</li><li data-marker="*"><wbr><br></li></ul>`, "* 123\n  * 456\n    * 789\n* 1\n*\n"},
 	{"70", "<p data-block=\"0\">/\\_\\_foo__.\n</p>", "/\\_\\_foo__.\n"},
 	{"69", "<p data-block=\"0\">foo<kbd>code</kbd>bar</p>", "foo<kbd>code</kbd>bar\n"},
 	{"68", "<p data-block=\"0\">1<wbr><span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\" style=\"display:none\">&lt;br&gt;</code><span class=\"vditor-wysiwyg__preview\" data-render=\"false\"><br></span></span>2</p>", "1<br>2\n"},
@@ -61,8 +62,8 @@ var vditorDOM2MdTests = []parseTest{
 	{"34", "<p>中<wbr>文</p>", "中文\n"},
 	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ul>", "1. foo\n"},
 	{"32", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "* foo\n"},
-	{"31", "<ul><li data-marker=\"*\">foo<ul><li data-marker=\"*\">bar</li></ul></li></ul>", "* foo\n  * bar\n"},
-	{"30", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><br /></li></ul></li></ul>", "* foo\n* *\n"},
+	{"31", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<ul><li data-marker=\"*\">bar</li></ul></li></ul>", "* foo\n  * bar\n"},
+	{"30", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><br /></li></ul></li></ul>", "* foo\n* *\n"},
 	{"29", "<p><s>del</s></p>", "~~del~~\n"},
 	{"29", "<p>[]()</p>", "[]()\n"},
 	{"28", ":octocat:", ":octocat:\n"},
