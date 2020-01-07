@@ -318,8 +318,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			if "" == marker {
 				marker = "```"
 			}
+
+			var codeTokens []byte
+			if nil != n.FirstChild.FirstChild {
+				codeTokens = []byte(n.FirstChild.FirstChild.Data)
+			}
+
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
-			codeTokens := []byte(n.FirstChild.FirstChild.Data)
 			switch divDataType {
 			case "math-block":
 				node.typ = NodeMathBlock
