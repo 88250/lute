@@ -387,17 +387,26 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	if bytes.HasPrefix(node.tokens, []byte("<kbd")) || bytes.HasPrefix(node.tokens, []byte("</kbd>")) ||
-		bytes.HasPrefix(node.tokens, []byte("<br")) {
-		r.write(node.tokens)
-		return WalkStop, nil
-	}
+	// TODO: HTMl 标准标签处理
+	//if bytes.HasPrefix(node.tokens, []byte("<kbd")) || bytes.HasPrefix(node.tokens, []byte("</kbd>")) ||
+	//	bytes.HasPrefix(node.tokens, []byte("<br")) {
+	//	r.write(node.tokens)
+	//	return WalkStop, nil
+	//}
 
+	previousText := node.PreviousNodeText()
+	if "" == previousText || !strings.HasSuffix(previousText, " ") {
+		r.writeByte(itemSpace)
+	}
 	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
 	node.tokens = bytes.TrimSpace(node.tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	r.write(escapeHTML(node.tokens))
 	r.writeString("</code></span>")
+	nextText := node.NextNodeText()
+	if "" == nextText || !strings.HasPrefix(nextText, " ") {
+		r.writeByte(itemSpace)
+	}
 	return WalkStop, nil
 }
 
