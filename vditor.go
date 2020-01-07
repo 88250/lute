@@ -188,10 +188,17 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 
 	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
 		if entering {
-			if NodeInlineHTML == n.typ || NodeCodeSpan == n.typ || NodeInlineMath == n.typ ||
-				NodeHTMLBlock == n.typ || NodeCodeBlockCode == n.typ || NodeMathBlockContent == n.typ {
+			switch n.typ {
+			case NodeInlineHTML, NodeCodeSpan, NodeInlineMath, NodeHTMLBlock, NodeCodeBlockCode, NodeMathBlockContent:
 				code, _ := PathUnescape(string(n.tokens))
 				n.tokens = []byte(code)
+			case NodeList:
+				// 浏览器生成的子列表是 ul.ul 形式，需要将其调整为 ul.li.ul
+				if nil != n.parent && NodeList == n.parent.typ {
+					if previousLi := n.previous; nil != previousLi {
+						previousLi.AppendChild(n)
+					}
+				}
 			}
 		}
 		return WalkContinue, nil
@@ -278,10 +285,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if "true" == tight {
 			node.tight = true
 		}
-		if NodeParagraph == tree.context.tip.typ {
-			// 子列表需要返回到上一层 li
-			tree.context.tip = tree.context.tip.parent
-		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -306,22 +309,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 		}
 		node.listData = &listData{marker: []byte(marker)}
-		if NodeListItem == tree.context.tip.typ {
-			tree.context.tip = tree.context.tip.parent
-		}
-
-		if nil == n.FirstChild || atom.P != n.FirstChild.DataAtom {
-			tree.context.tip.AppendChild(node)
-			tree.context.tip = node
-			node = &Node{typ: NodeParagraph}
-		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-		if next := n.NextSibling; nil == next || (atom.Ul != next.DataAtom && atom.Ol != next.DataAtom && atom.Li != next.DataAtom && atom.Blockquote != next.DataAtom) {
-			// 块级容器打断
-			defer tree.context.parentTip(n)
-		}
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
 			marker := lute.domAttrValue(n.Parent, "data-marker")

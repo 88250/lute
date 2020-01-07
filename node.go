@@ -297,7 +297,7 @@ func (n *Node) List() (ret []*Node) {
 	return
 }
 
-// isMarker 判断 n  是否是排版类（比如强调加粗）标记节点。
+// isMarker 判断 n 是否是排版类（比如强调加粗）标记节点。
 func (n *Node) isMarker() bool {
 	switch n.typ {
 	case NodeEmA6kOpenMarker, NodeEmA6kCloseMarker, NodeEmU8eOpenMarker, NodeEmU8eCloseMarker,
@@ -307,6 +307,11 @@ func (n *Node) isMarker() bool {
 		return true
 	}
 	return false
+}
+
+// isContainerBlock 判断 n 是否是容器块节点。
+func (n *Node) isContainerBlock() bool {
+	return NodeBlockquote == n.typ || NodeList == n.typ || NodeListItem == n.typ
 }
 
 type nodeType int
