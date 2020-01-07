@@ -598,8 +598,6 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 			attrs = append(attrs, []string{"data-marker", string(node.marker)})
 			attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
 		}
-		// TODO: 未解决列表项局部渲染
-		//attrs = append(attrs, []string{"data-block", "0"})
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
