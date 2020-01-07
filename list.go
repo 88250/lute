@@ -131,9 +131,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 
 	if t.context.option.VditorWYSIWYG {
 		content := string(ln[t.context.offset:])
-		if "["+caret+"\n" == content || "[ "+caret+"\n" == content || "[ ]"+caret+"\n" == content ||
-			"[x"+caret+"\n" == content || "[x]"+caret+"\n" == content ||
-			"[X"+caret+"\n" == content || "[X]"+caret+"\n" == content {
+		if "[ ]"+caret+"\n" == content || "[x]"+caret+"\n" == content || "[X]"+caret+"\n" == content {
 			return nil
 		}
 	}
