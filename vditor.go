@@ -300,7 +300,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 					marker = start + "."
 				}
 			} else {
-				marker = "*"
+				marker = lute.domAttrValue(n.Parent, "data-marker")
 			}
 		} else {
 			if "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {

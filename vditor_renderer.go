@@ -584,8 +584,12 @@ func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 		if node.tight {
 			attrs = append(attrs, []string{"data-tight", "true"})
 		}
-		if nil == node.bulletChar && 1 != node.start {
-			attrs = append(attrs, []string{"start", strconv.Itoa(node.start)})
+		if nil == node.bulletChar {
+			if 1 != node.start {
+				attrs = append(attrs, []string{"start", strconv.Itoa(node.start)})
+			}
+		} else {
+			attrs = append(attrs, []string{"data-marker", string(node.bulletChar)})
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
 		r.tag(tag, attrs, false)
