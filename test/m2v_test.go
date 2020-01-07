@@ -27,7 +27,7 @@ var md2VditorTests = []parseTest{
 
 * bar
 
-</details>`, "<details>\n<summary>foo</summary><ul data-tight=\"true\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></details>"},
+</details>`, "<details>\n<summary>foo</summary><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></details>"},
 }
 
 func TestMd2Vditor(t *testing.T) {
