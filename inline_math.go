@@ -15,7 +15,7 @@ package lute
 var dollar = strToBytes("$")
 
 func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
-	if 2 > ctx.tokensLen {
+	if 3 > ctx.tokensLen {
 		ctx.pos++
 		return &Node{typ: NodeText, tokens: dollar}
 	}
@@ -62,9 +62,15 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 
 	endPos = startPos + endPos + 2
 
+	tokens := ctx.tokens[startPos+1 : endPos-1]
+	if 1 > len(trimWhitespace(tokens)) {
+		ctx.pos++
+		return &Node{typ: NodeText, tokens: dollar}
+	}
+
 	ret = &Node{typ: NodeInlineMath}
 	ret.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
-	ret.AppendChild(&Node{typ: NodeInlineMathContent, tokens: ctx.tokens[startPos+1 : endPos-1]})
+	ret.AppendChild(&Node{typ: NodeInlineMathContent, tokens: tokens})
 	ret.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
 
 	ctx.pos = endPos

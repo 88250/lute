@@ -20,6 +20,8 @@ import (
 
 var mathTests = []parseTest{
 
+	{"14", "$ $\n", "<p>$ $</p>\n"},
+
 	// 解析问题 10$ https://github.com/88250/lute/issues/1
 	{"解析问题 10$", "10$\n", "<p>10$</p>\n"},
 
