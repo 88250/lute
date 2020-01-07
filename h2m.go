@@ -52,15 +52,6 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 						previousLi.AppendChild(n)
 					}
 				}
-			} else if NodeListItem == n.typ {
-				if nil != n.parent && NodeList != n.parent.typ {
-					// doc.li => doc.ul.li
-					previousList := n.previous
-					if nil != previousList {
-						n.Unlink()
-						previousList.AppendChild(n)
-					}
-				}
 			}
 		}
 		return WalkContinue, nil
@@ -125,46 +116,33 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.listData.typ = 1
 		}
 		node.tight = true
-		if NodeParagraph == tree.context.tip.typ {
-			// 子列表需要返回到上一层 li
-			tree.context.tip = tree.context.tip.parent
-		}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Li:
 		node.typ = NodeListItem
-		marker := "*"
-		if atom.Ol == n.Parent.DataAtom {
-			start := lute.domAttrValue(n.Parent, "start")
-			if "" == start {
-				marker = "1."
+		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			if atom.Ol == n.Parent.DataAtom {
+				start := lute.domAttrValue(n.Parent, "start")
+				if "" == start {
+					marker = "1."
+				} else {
+					marker = start + "."
+				}
 			} else {
-				marker = start + "."
+				marker = "*"
+			}
+		} else {
+			if "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
+				// 子有序列表必须从 1 开始
+				marker = "1."
 			}
 		}
-		node.listData = &listData{marker: strToBytes(marker)}
-		if NodeListItem == tree.context.tip.typ {
-			tree.context.tip = tree.context.tip.parent
-		}
-
-		if nil == n.FirstChild || (atom.Br == n.FirstChild.DataAtom && nil == n.FirstChild.NextSibling && nil != n.NextSibling) {
-			// 列表中间不能出现空项
-			return
-		}
-
-		if atom.P != n.FirstChild.DataAtom {
-			tree.context.tip.AppendChild(node)
-			tree.context.tip = node
-			node = &Node{typ: NodeParagraph}
-		}
+		node.listData = &listData{marker: []byte(marker)}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
-		if next := n.NextSibling; nil == next || (atom.Ul != next.DataAtom && atom.Ol != next.DataAtom && atom.Li != next.DataAtom && atom.Blockquote != next.DataAtom) {
-			// 块级容器打断
-			defer tree.context.parentTip(n)
-		}
 	case atom.Pre:
 		firstc := n.FirstChild
 		if nil != firstc {
