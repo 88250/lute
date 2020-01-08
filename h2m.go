@@ -290,19 +290,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		if nil == n.FirstChild {
 			return
 		}
-
-		node.typ = NodeText
-		if 0 == n.FirstChild.DataAtom {
-			tokens := strToBytes(n.FirstChild.Data)
-			tokens = bytes.ReplaceAll(tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
-			node.tokens = []byte(tokens)
-			tree.context.tip.AppendChild(node)
-			return
-		}
-		node.tokens = []byte{' '}
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
 	case atom.Font:
 		return
 	case atom.Details:
