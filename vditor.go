@@ -407,7 +407,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
 			node.AppendChild(&Node{typ: NodeText, tokens: []byte(caret)})
-			if "_" == marker {
+			if "__" == marker {
 				node.AppendChild(&Node{typ: NodeStrongU8eCloseMarker, tokens: []byte(marker)})
 			} else {
 				node.AppendChild(&Node{typ: NodeStrongA6kCloseMarker, tokens: []byte(marker)})

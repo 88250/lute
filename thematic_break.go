@@ -44,5 +44,9 @@ func (t *Tree) parseThematicBreak() (ok bool, markers []byte) {
 		markerCnt++
 	}
 
+	if t.context.option.VditorWYSIWYG && 3 < markerCnt {
+		return false, nil
+	}
+
 	return 3 <= markerCnt, markers
 }
