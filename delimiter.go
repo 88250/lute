@@ -246,9 +246,6 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	beforeIsWhitespace := isUnicodeWhitespace(tokenBefore)
 	beforeIsPunct := unicode.IsPunct(tokenBefore) || unicode.IsSymbol(tokenBefore)
 	if t.context.option.VditorWYSIWYG {
-		if caret == string(tokenAfter) {
-			afterIsPunct = false
-		}
 		if caret == string(tokenBefore) {
 			beforeIsPunct = false
 		}
