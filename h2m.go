@@ -234,6 +234,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&Node{typ: NodeCloseBracket})
 			node.AppendChild(&Node{typ: NodeOpenParen})
 			node.AppendChild(&Node{typ: NodeLinkDest, tokens: strToBytes(lute.domAttrValue(n, "src"))})
+			linkTitle := lute.domAttrValue(n, "title")
+			if "" != linkTitle {
+				node.AppendChild(&Node{typ: NodeLinkSpace})
+				node.AppendChild(&Node{typ: NodeLinkTitle, tokens: []byte(linkTitle)})
+			}
 			node.AppendChild(&Node{typ: NodeCloseParen})
 		}
 		tree.context.tip.AppendChild(node)
