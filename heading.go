@@ -12,6 +12,10 @@
 
 package lute
 
+import (
+	"bytes"
+)
+
 func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	marker := tokens[0]
@@ -77,6 +81,10 @@ func (t *Tree) parseSetextHeading() (level int) {
 	marker := ln[start]
 	if itemEqual != marker && itemHyphen != marker {
 		return
+	}
+
+	if t.context.option.VditorWYSIWYG {
+		ln = bytes.ReplaceAll(ln, []byte(caret), []byte(""))
 	}
 
 	markers := 0
