@@ -420,6 +420,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
+		if nil == n.FirstChild {
+			return
+		}
 		codeTokens := []byte(n.FirstChild.Data)
 		content := &Node{typ: NodeCodeSpanContent, tokens: codeTokens}
 		node.typ = NodeCodeSpan

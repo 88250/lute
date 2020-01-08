@@ -372,11 +372,6 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
-	if bytes.HasPrefix(node.tokens, []byte("<details")) || bytes.HasPrefix(node.tokens, []byte("</details>")) {
-		r.write(node.tokens)
-		return WalkStop, nil
-	}
-
 	r.writeString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
 	node.tokens = bytes.TrimSpace(node.tokens)
 	r.writeString("<pre>")
@@ -387,13 +382,6 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	// TODO: HTMl 标准标签处理
-	//if bytes.HasPrefix(node.tokens, []byte("<kbd")) || bytes.HasPrefix(node.tokens, []byte("</kbd>")) ||
-	//	bytes.HasPrefix(node.tokens, []byte("<br")) {
-	//	r.write(node.tokens)
-	//	return WalkStop, nil
-	//}
-
 	previousText := node.PreviousNodeText()
 	if "" == previousText || !strings.HasSuffix(previousText, " ") {
 		r.writeByte(itemSpace)

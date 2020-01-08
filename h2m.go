@@ -40,6 +40,7 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 	}
 
 	// 调整树结构
+	// TODO: 列表项依赖入参带有 p 节点，需要在此调整为自动插入 p 节点
 
 	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
 		if entering {
@@ -187,6 +188,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Code:
+		if nil == n.FirstChild {
+			return
+		}
+
 		code := lute.domHTML(n.FirstChild)
 		unescaped := html.UnescapeString(string(code))
 		code = []byte(unescaped)
