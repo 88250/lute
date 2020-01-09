@@ -22,7 +22,8 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"67", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><p>[ ]<wbr></p></li></ul>`, "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> <wbr></li></ul>"},
+	{"68", `<p data-block="0">|foo|bar|<wbr></p>`, "<table data-block=\"0\"><thead><tr><th>foo</th><th>bar</th><th><wbr></th></tr></thead><tbody><tr><td></td><td></td><td></td></tr></tbody></table>"},
+	{"67", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><p>[ ]<wbr></p></li></ul>`, "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\">[ ]<wbr></li></ul>"},
 	{"66", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><p><input type=\"checkbox\" checked=\"checked\"><wbr> foo</p></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /><wbr> foo</li></ul>"},
 	{"65", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p>foo<em data-marker=\"*\">bar</em></p></li><li data-marker=\"*\"><p><em data-marker=\"*\"><wbr><br></em></p></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo<em data-marker=\"*\">bar</em></li><li data-marker=\"*\"><wbr></li></ul>"},
 	{"64", "<p data-block=\"0\">[foo<wbr>](/bar)", "<p data-block=\"0\">[foo<wbr>](/bar)\n</p>"},
