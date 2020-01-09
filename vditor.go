@@ -190,8 +190,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 		if entering {
 			switch n.typ {
 			case NodeInlineHTML, NodeCodeSpan, NodeInlineMath, NodeHTMLBlock, NodeCodeBlockCode, NodeMathBlockContent:
-				code, _ := PathUnescape(string(n.tokens))
-				n.tokens = []byte(code)
+				n.tokens = unescapeHTML(n.tokens)
 			case NodeList:
 				// 浏览器生成的子列表是 ul.ul 形式，需要将其调整为 ul.li.ul
 				if nil != n.parent && NodeList == n.parent.typ {
