@@ -22,6 +22,8 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"67", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><p>[ ]<wbr></p></li></ul>`, "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> <wbr></li></ul>"},
+	{"66", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><p><input type=\"checkbox\" checked=\"checked\"><wbr> foo</p></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /><wbr> foo</li></ul>"},
 	{"65", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p>foo<em data-marker=\"*\">bar</em></p></li><li data-marker=\"*\"><p><em data-marker=\"*\"><wbr><br></em></p></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo<em data-marker=\"*\">bar</em></li><li data-marker=\"*\"><wbr></li></ul>"},
 	{"64", "<p data-block=\"0\">[foo<wbr>](/bar)", "<p data-block=\"0\">[foo<wbr>](/bar)\n</p>"},
 	{"63", "<p data-block=\"0\">![foo<wbr>](/bar)", "<p data-block=\"0\">![foo<wbr>](/bar)\n</p>"},
@@ -44,7 +46,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"47", "<p data-block=\"0\">`1<wbr>`\n</p>", "<p data-block=\"0\"> <code>1<wbr></code> \n</p>"},
 	{"46", "<p>- [x] f<wbr>\n</p>", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> f<wbr></li></ul>"},
 	{"45", "<ul data-tight=\"true\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li></ul><p>- [ ] b<wbr>\n</p>", "<ul data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\"><p data-block=\"0\"><input type=\"checkbox\" /> foo\n</p></li><li data-marker=\"-\" class=\"vditor-task\"><p data-block=\"0\"><input type=\"checkbox\" /> b<wbr>\n</p></li></ul>"},
-	{"44", "<p>* [ ]<wbr>\n</p>", "<p data-block=\"0\">* [ ]<wbr>\n</p>"},
+	{"44", "<p data-block=\"0\">* [ ]<wbr>\n</p>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> <wbr></li></ul>"},
 	{"43", "<p>* [ <wbr>\n</p>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">[ <wbr></li></ul>"},
 	{"42", "<p>* [<wbr>\n</p>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">[<wbr></li></ul>"},
 	{"40", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code>&lt;details&gt;\n&lt;summary&gt;\n这里是摘要部分。\n&lt;/summary&gt;\n这里是细节部分。\n&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "<h3 data-block=\"0\">隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;details&gt;\n&lt;summary&gt;\n这里是摘要部分。\n&lt;/summary&gt;\n这里是细节部分。\n&lt;/details&gt;</code></pre></div><p data-block=\"0\">1<wbr>\n</p>"},

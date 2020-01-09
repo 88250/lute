@@ -39,7 +39,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 	if context.option.GFMTaskListItem {
 		// 尝试解析任务列表项
 		if listItem := p.parent; nil != listItem && NodeListItem == listItem.typ {
-			if 3 == listItem.listData.typ && 3 < len(p.tokens) && isWhitespace(p.tokens[3]) {
+			if 3 == listItem.listData.typ && 3 < len(p.tokens) && (isWhitespace(p.tokens[3]) || caret[0] == p.tokens[3]) {
 				// 如果是任务列表项则添加任务列表标记符节点
 				taskListItemMarker := &Node{typ: NodeTaskListItemMarker, tokens: p.tokens[:3], taskListItemChecked: listItem.listData.checked}
 				p.PrependChild(taskListItemMarker)

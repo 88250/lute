@@ -595,6 +595,9 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 	}
 	attrs = append(attrs, []string{"type", "checkbox"})
 	r.tag("input", attrs, true)
+	if caret == string(node.next.tokens) {
+		r.writeByte(itemSpace)
+	}
 	return WalkStop, nil
 }
 

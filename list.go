@@ -129,13 +129,6 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 		data.padding = markerLength + spacesAfterMarker
 	}
 
-	if t.context.option.VditorWYSIWYG {
-		content := string(ln[t.context.offset:])
-		if "[ ]"+caret+"\n" == content || "[x]"+caret+"\n" == content || "[X]"+caret+"\n" == content {
-			return nil
-		}
-	}
-
 	if !isBlankItem {
 		// 判断是否是任务列表项
 		content := ln[t.context.offset:]
@@ -146,7 +139,6 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 			}
 		}
 	}
-
 	return data
 }
 
