@@ -360,6 +360,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
+		if caret == strings.TrimSpace(lute.domText(n.FirstChild)) {
+			node.tokens = []byte(caret)
+			tree.context.tip.AppendChild(node)
+			return
+		}
 
 		node.typ = NodeEmphasis
 		marker := lute.domAttrValue(n, "data-marker")
@@ -391,6 +396,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		defer tree.context.parentTip(n)
 	case atom.Strong, atom.B:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
+			return
+		}
+		if caret == strings.TrimSpace(lute.domText(n.FirstChild)) {
+			node.tokens = []byte(caret)
+			tree.context.tip.AppendChild(node)
 			return
 		}
 
@@ -503,6 +513,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 	case atom.Del, atom.S, atom.Strike:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
+			return
+		}
+		if caret == strings.TrimSpace(lute.domText(n.FirstChild)) {
+			node.tokens = []byte(caret)
+			tree.context.tip.AppendChild(node)
 			return
 		}
 
