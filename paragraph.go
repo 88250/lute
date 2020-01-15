@@ -46,7 +46,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 				if !context.option.VditorWYSIWYG {
 					isTaskListItem = 3 < len(p.tokens) && isWhitespace(p.tokens[3])
 				} else {
-					isTaskListItem = 3 < len(p.tokens) && (isWhitespace(p.tokens[3]) || bytes.HasPrefix(p.tokens[3:], []byte(caret+" ")))
+					isTaskListItem = 3 <= len(p.tokens)
 				}
 
 				if isTaskListItem {
@@ -54,6 +54,15 @@ func (p *Node) paragraphFinalize(context *Context) {
 					taskListItemMarker := &Node{typ: NodeTaskListItemMarker, tokens: p.tokens[:3], taskListItemChecked: listItem.listData.checked}
 					p.PrependChild(taskListItemMarker)
 					p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+					if context.option.VditorWYSIWYG {
+						if 1 > len(p.tokens) {
+							p.tokens = []byte(" ")
+						} else {
+							if !bytes.HasPrefix(p.tokens, []byte(" ")) {
+								p.tokens = append([]byte(" "), p.tokens...)
+							}
+						}
+					}
 				}
 			}
 		}
