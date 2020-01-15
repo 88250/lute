@@ -184,7 +184,7 @@ func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (Walk
 	r.writeString("<pre>")
 	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
 	if codeIsEmpty {
-		r.writeString("\n<wbr>")
+		r.writeString("<wbr>\n")
 	} else {
 		r.write(escapeHTML(node.tokens))
 	}
@@ -659,7 +659,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 	r.tag("code", attrs, false)
 
 	if codeIsEmpty {
-		r.writeString("\n<wbr>")
+		r.writeString("<wbr>\n")
 	} else {
 		r.write(escapeHTML(node.tokens))
 		r.newline()

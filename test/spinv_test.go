@@ -58,7 +58,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"35", "<p><em data-marker=\"*\">foo</em></p><p><em data-marker=\"*\"><wbr><br></em></p>", "<p data-block=\"0\"><em data-marker=\"*\">foo</em>\n</p><p data-block=\"0\"><wbr>\n</p>"},
 	{"34", "<p> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">foo</code></span> \n</p>", "<p data-block=\"0\"> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">foo</code></span> \n</p>"},
 	{"33", "<p><code>foo</code><wbr>\n</p>", "<p data-block=\"0\"> <code>foo</code> <wbr>\n</p>"},
-	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code>\n<wbr></code></pre></div>"},
+	{"32", "<p>```<wbr></p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code><wbr>\n</code></pre></div>"},
 
 	{"30", "<p>1. Node.js</p><p>2. Go<wbr></p>", "<ol data-block=\"0\"><li data-marker=\"1.\"><p data-block=\"0\">Node.js\n</p></li><li data-marker=\"2.\"><p data-block=\"0\">Go<wbr>\n</p></li></ol>"},
 	{"29", "<p><wbr><br></p>", "<p data-block=\"0\"><wbr>\n</p>"},
