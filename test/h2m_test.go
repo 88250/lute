@@ -20,6 +20,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"11", "<li>foo</li><li>bar</li>", "* foo\n* bar\n"},
 	{"10", `<p data-block="0">foo'%'bar</p>`, "foo'%'bar\n"},
 	{"9", `<code class="language-text">&gt;</code>`, "`>`\n"},
 	{"8", `<div><a href="/bar">foo</a></div>`, "[foo](/bar)\n"},

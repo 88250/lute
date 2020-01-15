@@ -124,7 +124,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		node.typ = NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
-			if atom.Ol == n.Parent.DataAtom {
+			if nil != n.Parent && atom.Ol == n.Parent.DataAtom {
 				start := lute.domAttrValue(n.Parent, "start")
 				if "" == start {
 					marker = "1."
@@ -135,7 +135,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 				marker = "*"
 			}
 		} else {
-			if "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
+			if nil != n.Parent && "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
 				// 子有序列表必须从 1 开始
 				marker = "1."
 			}

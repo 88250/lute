@@ -305,7 +305,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				}
 			}
 		} else {
-			if "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
+			if nil != n.Parent && "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
 				// 子有序列表必须从 1 开始
 				marker = "1."
 			}

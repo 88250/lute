@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"75", "<li data-marker=\"*\"><p>foo</p></li><li data-marker=\"*\"><p>bar</p></li>", "* foo\n* bar\n"},
 	{"74", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre style=\"display: none;\"><code>foo'%'bar</code></pre></div>", "```\nfoo'%'bar\n```\n"},
 	{"73", `<p data-block="0"><img src="/bar" alt="alt text" title="title">`, "![alt text](/bar \"title\")\n"},
 	{"72", `<div class="vditor-wysiwyg__block" data-type="code-block"><pre data-block="0"><code></code></pre></div>`, "```\n```\n"},
