@@ -445,7 +445,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		return
 	case atom.Br:
 		if nil != n.Parent {
-			if atom.Td == n.Parent.DataAtom {
+			if atom.Td == n.Parent.DataAtom || atom.Th == n.Parent.DataAtom {
 				if (nil == n.PrevSibling || caret == n.PrevSibling.Data) && (nil == n.NextSibling || caret == n.NextSibling.Data) {
 					return
 				}

@@ -23,24 +23,6 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 		if 2 > length {
 			return
 		}
-
-		// TODO: 表格优化 https://github.com/Vanessa219/vditor/issues/66
-		//if firstLn := bytes.TrimSpace(lines[0]); 1 == length && itemPipe == firstLn[0] && 5 < len(firstLn) && bytes.HasSuffix(firstLn, []byte("|"+caret)) {
-		//	cols := splitWithoutBackslashEscape(lines[0], itemPipe)
-		//	if 3 > len(cols) {
-		//		return
-		//	}
-		//	var line []byte
-		//	for i := 1; i < len(cols); i++ {
-		//		line = append(line, []byte("| --- ")...)
-		//	}
-		//	line = append(line, itemPipe)
-		//	lines = append(lines, line)
-		//	lines = append(lines, bytes.Repeat([]byte{itemPipe}, len(cols)))
-		//	length += 2
-		//} else {
-		//	return
-		//}
 	}
 
 	aligns := context.parseTableDelimRow(trimWhitespace(lines[1]))
