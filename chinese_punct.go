@@ -28,9 +28,9 @@ func chinesePunct0(text string) (ret string) {
 	runes := []rune(text)
 	length := len(runes)
 	for i, r := range runes {
-		if '.' == r && i+1 < length {
-			if  '.' == runes[i+1] {
-				// 连续英文句号出现在中文后不优化
+		if ('.' == r || '!' == r || '?' == r) && i+1 < length {
+			if '.' == runes[i+1] || '!' == runes[i+1] || '?' == runes[i+1] {
+				// 连续英文标点符号出现在中文后不优化
 				ret += string(r)
 				continue
 			} else if isFileExt(i+1, length, &runes) {
