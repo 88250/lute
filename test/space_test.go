@@ -21,6 +21,7 @@ import (
 var spaceTests = []parseTest{
 
 	// ing 前不需要空格，如 打码ing https://github.com/88250/lute/issues/9
+	{"17", "打码ing开源", "<p>打码ing 开源</p>\n"},
 	{"16", "打码in", "<p>打码 in</p>\n"},
 	{"15", "打码ing", "<p>打码ing</p>\n"},
 
