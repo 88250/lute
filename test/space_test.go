@@ -20,8 +20,11 @@ import (
 
 var spaceTests = []parseTest{
 
-	{"14", "foo%bar", "<p>foo%bar</p>\n"},
+	// ing 前不需要空格，如 打码ing https://github.com/88250/lute/issues/9
+	{"16", "打码in", "<p>打码 in</p>\n"},
+	{"15", "打码ing", "<p>打码ing</p>\n"},
 
+	{"14", "foo%bar", "<p>foo%bar</p>\n"},
 	{"13", "**[链接foo文本](/bar)**\n", "<p><strong><a href=\"/bar\">链接 foo 文本</a></strong></p>\n"},
 	{"12", "[链接foo文本](/bar)\n", "<p><a href=\"/bar\">链接 foo 文本</a></p>\n"},
 	{"11", "[链接foo文本](/bar)\n", "<p><a href=\"/bar\">链接 foo 文本</a></p>\n"},
