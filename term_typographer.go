@@ -194,4 +194,8 @@ var terms = map[string]string{
 	"qq":            "QQ",
 	"sql":           "SQL",
 	"markdown":      "Markdown",
+	"jdk":           "JDK",
+	"openjdk":       "OpenJDK",
+	"cors":          "CORS",
+	"protobuf":      "Protobuf",
 }
