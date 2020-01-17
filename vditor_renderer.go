@@ -325,8 +325,13 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			r.write(node.ChildByType(NodeLinkDest).tokens)
+			dest := node.ChildByType(NodeLinkDest)
+			dest.tokens = bytes.ReplaceAll(dest.tokens, []byte(caret), []byte(""))
+			r.write(dest.tokens)
 			r.writeString("\" alt=\"")
+			if alt := node.ChildByType(NodeLinkText); nil != alt && bytes.Contains(alt.tokens, []byte(caret)) {
+				alt.tokens = bytes.ReplaceAll(alt.tokens, []byte(caret), []byte(""))
+			}
 		}
 		r.disableTags++
 		return WalkContinue, nil
@@ -337,6 +342,7 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 		r.writeString("\"")
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			r.writeString(" title=\"")
+			title.tokens = bytes.ReplaceAll(title.tokens, []byte(caret), []byte(""))
 			r.write(title.tokens)
 			r.writeString("\"")
 		}
@@ -352,10 +358,11 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 		if caretInDest {
 			text := node.ChildByType(NodeLinkText)
 			text.tokens = append(text.tokens, []byte(caret)...)
+			dest.tokens = bytes.ReplaceAll(dest.tokens, []byte(caret), []byte(""))
 		}
-		dest.tokens = bytes.ReplaceAll(dest.tokens, []byte(caret), []byte(""))
 		attrs := [][]string{{"href", string(dest.tokens)}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
+			title.tokens = bytes.ReplaceAll(title.tokens, []byte(caret), []byte(""))
 			attrs = append(attrs, []string{"title", string(title.tokens)})
 		}
 		r.tag("a", attrs, false)
