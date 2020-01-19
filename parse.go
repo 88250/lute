@@ -34,7 +34,8 @@ type Context struct {
 	tree   *Tree    // 关联的语法树
 	option *options // 解析渲染选项
 
-	linkRefDef map[string]*Node // 链接引用定义集
+	linkRefDefs   map[string]*Node // 链接引用定义集
+	footnotesDefs []*Node          // 脚注定义集
 
 	tip                                                               *Node  // 末梢节点
 	oldtip                                                            *Node  // 老的末梢节点

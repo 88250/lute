@@ -25,6 +25,7 @@ type Lute struct {
 //  * GFM 支持
 //  * 代码块语法高亮
 //  * 软换行转硬换行
+//  * 脚注
 //  * 中西文间插入空格
 //  * 修正术语拼写
 //  * 替换中文标点
@@ -42,6 +43,7 @@ func New(opts ...option) (ret *Lute) {
 	ret.CodeSyntaxHighlightInlineStyle = false
 	ret.CodeSyntaxHighlightLineNum = false
 	ret.CodeSyntaxHighlightStyleName = "github"
+	ret.Footnotes = true
 	ret.AutoSpace = true
 	ret.FixTermTypo = true
 	ret.ChinesePunct = true
@@ -66,6 +68,11 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 
 	renderer := lute.newHTMLRenderer(tree)
 	html, err = renderer.Render()
+
+	if lute.options.Footnotes && 0 < len(tree.context.footnotesDefs) {
+		html = renderer.(*HTMLRenderer).renderFootnotesDefs(lute, tree.context)
+	}
+
 	return
 }
 
@@ -166,6 +173,8 @@ type options struct {
 	CodeSyntaxHighlightLineNum bool
 	// CodeSyntaxHighlightStyleName 指定语法高亮样式名，默认为 "github"。
 	CodeSyntaxHighlightStyleName string
+	// Footnotes 设置是否打开“脚注”支持。
+	Footnotes bool
 	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
 	// https://github.com/sparanoid/chinese-copywriting-guidelines
 	AutoSpace bool
@@ -238,6 +247,10 @@ func (lute *Lute) SetCodeSyntaxHighlightLineNum(b bool) {
 
 func (lute *Lute) SetCodeSyntaxHighlightStyleName(name string) {
 	lute.CodeSyntaxHighlightStyleName = name
+}
+
+func (lute *Lute) SetFootnotes(b bool) {
+	lute.Footnotes = b
 }
 
 func (lute *Lute) SetAutoSpace(b bool) {

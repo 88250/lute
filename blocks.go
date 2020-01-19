@@ -12,12 +12,16 @@
 
 package lute
 
-import "strings"
+import (
+	"bytes"
+	"strings"
+)
 
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
-	t.context.linkRefDef = map[string]*Node{}
+	t.context.linkRefDefs = map[string]*Node{}
+	t.context.footnotesDefs = []*Node{}
 	lines := 0
 	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		if t.context.option.VditorWYSIWYG {
@@ -92,7 +96,8 @@ func (t *Tree) incorporateLine(line []byte) {
 			itemGreater != maybeMarker && // 块引用
 			itemLess != maybeMarker && // HTML 块
 			itemUnderscore != maybeMarker && itemEqual != maybeMarker && // Setext 标题
-			itemDollar != maybeMarker { // 数学公式
+			itemDollar != maybeMarker && // 数学公式
+			itemOpenBracket != maybeMarker { // 脚注
 			t.context.advanceNextNonspace()
 			break
 		}
@@ -176,6 +181,56 @@ type blockStartFunc func(t *Tree, container *Node) int
 // 1：匹配到块容器，需要继续迭代下降
 // 2：匹配到叶子块
 var blockStarts = []blockStartFunc{
+
+	// 判断脚注定义（[^label]）是否开始
+	func(t *Tree, container *Node) int {
+		if !t.context.option.Footnotes {
+			return 0
+		}
+
+		if !t.context.indented {
+			marker := peek(t.context.currentLine, t.context.nextNonspace)
+			if itemOpenBracket != marker {
+				return 0
+			}
+			caret := peek(t.context.currentLine, t.context.nextNonspace+1)
+			if itemCaret != caret {
+				return 0
+			}
+
+			var label = []byte{itemCaret}
+			var token byte
+			var i int
+			for i = t.context.nextNonspace + 2; i < t.context.currentLineLen; i++ {
+				token = t.context.currentLine[i]
+				if itemSpace == token || itemNewline == token || itemTab == token {
+					return 0
+				}
+				if itemCloseBracket == token {
+					break
+				}
+				label = append(label, token)
+			}
+			if i >= t.context.currentLineLen {
+				return 0
+			}
+			if itemColon != t.context.currentLine[i+1] {
+				return 0
+			}
+
+			t.context.closeUnmatchedBlocks()
+			t.context.advanceOffset(4, true)
+			footnotesDef := t.context.addChild(NodeFootnotesDef, t.context.nextNonspace)
+			footnotesDef.tokens = label
+			lowerCaseLabel := bytes.ToLower(label)
+			if _, def := t.context.findFootnotesDef(lowerCaseLabel); nil == def {
+				t.context.footnotesDefs = append(t.context.footnotesDefs, footnotesDef)
+			}
+			return 1
+		}
+		return 0
+	},
+
 	// 判断块引用（>）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {

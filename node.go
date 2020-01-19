@@ -76,6 +76,12 @@ type Node struct {
 	// 数学公式块
 
 	mathBlockDollarOffset int
+
+	// 脚注
+
+	footnotesRefId int     // 脚注 id
+
+	footnotesRefs  []*Node // 脚注引用
 }
 
 // lastDeepestChild 返回 n 的最后一个最深子节点。
@@ -161,6 +167,8 @@ func (n *Node) Continue(context *Context) int {
 		return n.blockquoteContinue(context)
 	case NodeMathBlock:
 		return n.mathBlockContinue(context)
+	case NodeFootnotesDef:
+		return n.footnotesContinue(context)
 	case NodeHeading, NodeThematicBreak:
 		return 1
 	}
@@ -177,8 +185,8 @@ func (n *Node) AcceptLines() bool {
 	return false
 }
 
-// CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（一种块级容器）只能包含列表项节点，
-// 块引用节点（另一种块级容器）可以包含任意节点；段落节点（一种叶子块节点）不能包含任何其他块级节点。
+// CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（块级容器）只能包含列表项节点，
+// 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType nodeType) bool {
 	switch n.typ {
 	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock:
@@ -403,4 +411,9 @@ const (
 
 	NodeBackslash        nodeType = 400 // 转义反斜杠标记符 \
 	NodeBackslashContent nodeType = 401 // 转义反斜杠后的内容
+
+	// 脚注
+
+	NodeFootnotesDef nodeType = 500 // 脚注定义 [^label]:
+	NodeFootnotesRef nodeType = 501 // 脚注引用 [^label]
 )

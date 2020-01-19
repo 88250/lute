@@ -105,6 +105,7 @@ const (
 	itemSemicolon      = byte(';')
 	itemPipe           = byte('|')
 	itemDollar         = byte('$')
+	itemCaret          = byte('^')
 )
 
 func split(tokens []byte, separator byte) (ret [][]byte) {

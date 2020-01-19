@@ -236,9 +236,22 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 			ctx.pos = startPos
 		}
 		if nil != reflabel {
+			if t.context.option.Footnotes {
+				// 查找脚注
+				if _, footnotesDef := t.context.findFootnotesDef(reflabel); nil != footnotesDef {
+					t.removeBracket(ctx)
+					opener.node.next.Unlink() // ^label
+					opener.node.Unlink()      // [
+
+					refId := len(footnotesDef.footnotesRefs) + 1
+					ref := &Node{typ: NodeFootnotesRef, tokens: bytes.ToLower(reflabel), footnotesRefId: refId}
+					footnotesDef.footnotesRefs = append(footnotesDef.footnotesRefs, ref)
+					return ref
+				}
+			}
+
 			// 查找链接引用
-			var link = t.context.linkRefDef[strings.ToLower(bytesToStr(reflabel))]
-			if nil != link {
+			if link := t.context.linkRefDefs[strings.ToLower(bytesToStr(reflabel))]; nil != link {
 				dest = link.ChildByType(NodeLinkDest).tokens
 				titleNode := link.ChildByType(NodeLinkTitle)
 				if nil != titleNode {

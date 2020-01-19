@@ -20,11 +20,12 @@ import (
 // HTMLRenderer 描述了 HTML 渲染器。
 type HTMLRenderer struct {
 	*BaseRenderer
+	needRenderFootnotesDef bool
 }
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
 func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
-	ret := &HTMLRenderer{lute.newBaseRenderer(tree)}
+	ret := &HTMLRenderer{lute.newBaseRenderer(tree), false}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
@@ -91,7 +92,49 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.rendererFuncs[NodeFootnotesDef] = ret.renderFootnotesDef
+	ret.rendererFuncs[NodeFootnotesRef] = ret.renderFootnotesRef
 	return ret
+}
+
+func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte {
+	r.writeString("<div class=\"footnotes-defs-div\">\n")
+	r.writeString("<ol class=\"footnotes-defs-ol\">")
+	for i, def := range context.footnotesDefs {
+		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
+		tree := &Tree{Name: "", context: &Context{option: lute.options}}
+		tree.context.tree = tree
+		tree.Root = &Node{typ: NodeDocument}
+		tree.Root.AppendChild(def)
+		defRenderer := lute.newHTMLRenderer(tree)
+		defRenderer.(*HTMLRenderer).needRenderFootnotesDef = true
+		defContent, err := defRenderer.Render()
+		if nil != err {
+			break
+		}
+		r.write(defContent)
+		r.writeString("</li>\n")
+	}
+	r.writeString("</ol>\n</div>")
+	return r.writer.Bytes()
+}
+
+func (r *HTMLRenderer) renderFootnotesRef(node *Node, entering bool) (WalkStatus, error) {
+	idx, _ := r.tree.context.findFootnotesDef(node.tokens)
+	idxStr := strconv.Itoa(idx)
+	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + strconv.Itoa(node.footnotesRefId)}}, false)
+	r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
+	r.writeString(idxStr)
+	r.tag("/a", nil, false)
+	r.tag("/sup", nil, false)
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderFootnotesDef(node *Node, entering bool) (WalkStatus, error) {
+	if !r.needRenderFootnotesDef {
+		return WalkStop, nil
+	}
+	return WalkContinue, nil
 }
 
 func (r *HTMLRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
