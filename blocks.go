@@ -217,6 +217,7 @@ var blockStarts = []blockStartFunc{
 			if itemColon != t.context.currentLine[i+1] {
 				return 0
 			}
+			t.context.advanceOffset(1, false)
 
 			t.context.closeUnmatchedBlocks()
 			t.context.advanceOffset(4, true)
