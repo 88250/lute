@@ -15,11 +15,15 @@ package lute
 import "bytes"
 
 func (footnotesDef *Node) footnotesContinue(context *Context) int {
-	if 4 <= context.indent {
-		context.advanceOffset(4, true)
-	} else {
+	if context.blank {
+		return 0
+	}
+
+	if 4 > context.indent {
 		return 1
 	}
+
+	context.advanceOffset(4, true)
 	return 0
 }
 

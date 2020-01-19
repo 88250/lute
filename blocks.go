@@ -142,7 +142,8 @@ func (t *Tree) incorporateLine(line []byte) {
 
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
 		var lastLineBlank = t.context.blank &&
-			!(typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
+			!(typ == NodeFootnotesDef ||
+				typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
 				(typ == NodeMathBlock) || // 数学公式块不计入空行判断
 				(typ == NodeListItem && nil == container.firstChild)) // 内容为空的列表项也不计入空行判断
@@ -220,7 +221,7 @@ var blockStarts = []blockStartFunc{
 			t.context.advanceOffset(1, false)
 
 			t.context.closeUnmatchedBlocks()
-			t.context.advanceOffset(4, true)
+			t.context.advanceOffset(len(label) + 2, true)
 			footnotesDef := t.context.addChild(NodeFootnotesDef, t.context.nextNonspace)
 			footnotesDef.tokens = label
 			lowerCaseLabel := bytes.ToLower(label)

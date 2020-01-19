@@ -20,6 +20,7 @@ import (
 
 var fnTests = []parseTest{
 
+	{"1", "foo[^label]\n[^label]:bar\n    * baz", "<p>foo<sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\">\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar</p>\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ol>\n</div>"},
 	{"0", "foo[^1]\n[^1]:bar\n    * baz", "<p>foo<sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\">\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar</p>\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ol>\n</div>"},
 }
 

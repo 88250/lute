@@ -193,6 +193,8 @@ func (n *Node) CanContain(nodeType nodeType) bool {
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
+	case NodeFootnotesDef:
+		return NodeFootnotesDef != nodeType // 脚注不能包含脚注
 	}
 
 	return NodeListItem != nodeType
@@ -315,11 +317,6 @@ func (n *Node) isMarker() bool {
 		return true
 	}
 	return false
-}
-
-// isContainerBlock 判断 n 是否是容器块节点。
-func (n *Node) isContainerBlock() bool {
-	return NodeBlockquote == n.typ || NodeList == n.typ || NodeListItem == n.typ
 }
 
 type nodeType int
