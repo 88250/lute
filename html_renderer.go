@@ -98,7 +98,8 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 }
 
 func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte {
-	r.writeString("<div class=\"footnotes-defs-div\">\n")
+	r.writeString("<div class=\"footnotes-defs-div\">")
+	r.writeString("<hr class=\"footnotes-defs-hr\" />\n")
 	r.writeString("<ol class=\"footnotes-defs-ol\">")
 	for i, def := range context.footnotesDefs {
 		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
@@ -107,22 +108,30 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 		tree.Root = &Node{typ: NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := lute.newHTMLRenderer(tree)
+		lc := tree.Root.lastDeepestChild()
+		for i = len(def.footnotesRefs) - 1; 0 <= i; i-- {
+			ref := def.footnotesRefs[i]
+			gotoRef := " <a href=\"#footnotes-ref-" + ref.footnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
+			link := &Node{typ: NodeInlineHTML, tokens: strToBytes(gotoRef)}
+			lc.InsertAfter(link)
+		}
 		defRenderer.(*HTMLRenderer).needRenderFootnotesDef = true
 		defContent, err := defRenderer.Render()
 		if nil != err {
 			break
 		}
 		r.write(defContent)
+
 		r.writeString("</li>\n")
 	}
-	r.writeString("</ol>\n</div>")
+	r.writeString("</ol></div>")
 	return r.writer.Bytes()
 }
 
 func (r *HTMLRenderer) renderFootnotesRef(node *Node, entering bool) (WalkStatus, error) {
 	idx, _ := r.tree.context.findFootnotesDef(node.tokens)
 	idxStr := strconv.Itoa(idx)
-	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + strconv.Itoa(node.footnotesRefId)}}, false)
+	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.footnotesRefId}}, false)
 	r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
 	r.writeString(idxStr)
 	r.tag("/a", nil, false)
@@ -510,6 +519,7 @@ func (r *HTMLRenderer) renderHeading(node *Node, entering bool) (WalkStatus, err
 		if r.option.HeadingAnchor {
 			anchor := node.Text()
 			anchor = strings.ReplaceAll(anchor, " ", "-")
+			anchor = strings.ReplaceAll(anchor, ".", "")
 			r.tag("a", [][]string{{"id", "vditorAnchor-" + anchor}, {"class", "vditor-anchor"}, {"href", "#" + anchor}}, false)
 			r.writeString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
 			r.tag("/a", nil, false)

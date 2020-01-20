@@ -79,7 +79,7 @@ type Node struct {
 
 	// 脚注
 
-	footnotesRefId int     // 脚注 id
+	footnotesRefId string     // 脚注 id
 
 	footnotesRefs  []*Node // 脚注引用
 }

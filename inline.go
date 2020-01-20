@@ -14,6 +14,7 @@ package lute
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 
 	"github.com/88250/lute/html"
@@ -238,12 +239,16 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 		if nil != reflabel {
 			if t.context.option.Footnotes {
 				// 查找脚注
-				if _, footnotesDef := t.context.findFootnotesDef(reflabel); nil != footnotesDef {
+				if idx, footnotesDef := t.context.findFootnotesDef(reflabel); nil != footnotesDef {
 					t.removeBracket(ctx)
 					opener.node.next.Unlink() // ^label
 					opener.node.Unlink()      // [
 
-					refId := len(footnotesDef.footnotesRefs) + 1
+					refId := strconv.Itoa(idx)
+					refsLen := len(footnotesDef.footnotesRefs)
+					if 0 < refsLen {
+						refId += ":" + strconv.Itoa(refsLen+1)
+					}
 					ref := &Node{typ: NodeFootnotesRef, tokens: bytes.ToLower(reflabel), footnotesRefId: refId}
 					footnotesDef.footnotesRefs = append(footnotesDef.footnotesRefs, ref)
 					return ref
