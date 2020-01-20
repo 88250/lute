@@ -202,4 +202,5 @@ var terms = map[string]string{
 	"google":        "Google",
 	"ibm":           "IBM",
 	"oracle":        "Oracle",
+	"typora":        "Typora",
 }
