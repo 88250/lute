@@ -112,11 +112,26 @@ func (r *FormatRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, err
 	return WalkContinue, nil
 }
 
-// TODO: 表的格式化应该按最宽的单元格对齐内容
-
 func (r *FormatRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
+	padding := node.tableCellContentMaxWidth - node.tableCellContentWidth
 	if entering {
 		r.writeByte(itemPipe)
+		r.writeByte(itemSpace)
+		switch node.tableCellAlign {
+		case 2:
+			r.write(bytes.Repeat([]byte{itemSpace}, padding/2))
+		case 3:
+			r.write(bytes.Repeat([]byte{itemSpace}, padding))
+		}
+	} else {
+		switch node.tableCellAlign {
+		case 2:
+			r.write(bytes.Repeat([]byte{itemSpace}, padding/2))
+		case 3:
+		default:
+			r.write(bytes.Repeat([]byte{itemSpace}, padding))
+		}
+		r.writeByte(itemSpace)
 	}
 	return WalkContinue, nil
 }
@@ -130,18 +145,34 @@ func (r *FormatRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, 
 
 func (r *FormatRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
-		table := node.parent
-		for i := 0; i < len(table.tableAligns); i++ {
-			align := table.tableAligns[i]
+		headRow := node.firstChild
+		for th := headRow.firstChild; nil != th; th = th.next {
+			align := th.tableCellAlign
 			switch align {
 			case 0:
-				r.writeString("|---")
+				r.writeString("| -")
+				if padding := th.tableCellContentMaxWidth - 1; 0 < padding {
+					r.write(bytes.Repeat([]byte{itemHyphen}, padding))
+				}
+				r.writeByte(itemSpace)
 			case 1:
-				r.writeString("|:---")
+				r.writeString("| :-")
+				if padding := th.tableCellContentMaxWidth - 2; 0 < padding {
+					r.write(bytes.Repeat([]byte{itemHyphen}, padding))
+				}
+				r.writeByte(itemSpace)
 			case 2:
-				r.writeString("|:---:")
+				r.writeString("| :-")
+				if padding := th.tableCellContentMaxWidth - 3; 0 < padding {
+					r.write(bytes.Repeat([]byte{itemHyphen}, padding))
+				}
+				r.writeString(": ")
 			case 3:
-				r.writeString("|---:")
+				r.writeString("| -")
+				if padding := th.tableCellContentMaxWidth - 2; 0 < padding {
+					r.write(bytes.Repeat([]byte{itemHyphen}, padding))
+				}
+				r.writeString(": ")
 			}
 		}
 		r.writeString("|\n")

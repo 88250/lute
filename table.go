@@ -54,12 +54,12 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 	var maxWidth int
 	for col := 0; col < len(cells[0]); col++ {
 		for row := 0; row < len(cells); row++ {
-			if maxWidth < cells[row][col].tableCellWidth {
-				maxWidth = cells[row][col].tableCellWidth
+			if maxWidth < cells[row][col].tableCellContentWidth {
+				maxWidth = cells[row][col].tableCellContentWidth
 			}
 		}
 		for row := 0; row < len(cells); row++ {
-			cells[row][col].tableCellWidth = maxWidth
+			cells[row][col].tableCellContentMaxWidth = maxWidth
 		}
 		maxWidth = 0
 	}
@@ -102,7 +102,7 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = trimWhitespace(cols[i])
 		width := len(col)
-		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i], tableCellWidth: width}
+		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i], tableCellContentWidth: width}
 		if !context.option.VditorWYSIWYG {
 			var token byte
 			for i := 0; i < width; i++ {

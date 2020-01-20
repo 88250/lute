@@ -28,6 +28,8 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	{"28", "|f|\n|:-:|\nfoo|\n", "|  f  |\n| :-: |\n| foo |\n"},
+
 	// 子列表格式化后缩进不对 https://github.com/b3log/lute/issues/22
 	{"27", "* first\n   * sub first\n* second\n  *  sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
 	{"26", "* first\n  * sub first\n* second\n  * sub second\n", "* first\n  * sub first\n* second\n  * sub second\n"},
@@ -46,8 +48,8 @@ var formatTests = []formatTest{
 	{"19", "我们**需要Markdown Format**\n", "我们**需要 Markdown Format**\n"},
 	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 Lute 空格\n"},
 	{"17", "* [ ] 项一\n* [X] 项二\n", "* [ ] 项一\n* [X] 项二\n"},
-	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "|abc|defghi|\n|:---:|---:|\n|bar|baz|\n"},
-	{"15", "| abc | def |\n| --- | --- |\n", "|abc|def|\n|---|---|\n"},
+	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "| abc | defghi |\n| :-: | -----: |\n| bar |    baz |\n"},
+	{"15", "| abc | def |\n| --- | --- |\n", "| abc | def |\n| --- | --- |\n"},
 	{"14", "~~删除线~~\n", "~~删除线~~\n"},
 	{"13", "![B3log 开源](https://b3log.org \"B3log 开源\")\n", "![B3log 开源](https://b3log.org \"B3log 开源\")\n"},
 	{"12", "[B3log 开源](https://b3log.org \"B3log 开源\")\n", "[B3log 开源](https://b3log.org \"B3log 开源\")\n"},

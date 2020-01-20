@@ -55,9 +55,9 @@ func main() {
 
 最后，我们试下对 GFM 的格式化支持：
 
-|表格列a|表格列b|       表格列c   |
+|col1|col2  |       col3   |
 :---           |:---------------:|--:
-第1列开头不要竖线      |   第2列   |第3列结尾不要竖线
-                                 ||这个表格看得我眼都花了|
+col1 without left pipe      |   this is col2   | col3 without right pipe
+                                 ||need align cell|
 
 **以上就是为什么我们需要Markdown Format，而且是带中西文自动空格的格式化。**
