@@ -56,7 +56,7 @@ func main() {
 最后，我们试下对 GFM 的格式化支持：
 
 |col1|col2  |       col3   |
-:---           |:---------------:|--:
+---           |---------------|--
 col1 without left pipe      |   this is col2   | col3 without right pipe
                                  ||need align cell|
 
