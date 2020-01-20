@@ -64,6 +64,7 @@ type Node struct {
 
 	tableAligns    []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
 	tableCellAlign int   // 表的单元格对齐方式
+	tableCellWidth int   // 表的单元格宽度（字符数）
 
 	// 链接
 
@@ -79,9 +80,9 @@ type Node struct {
 
 	// 脚注
 
-	footnotesRefId string     // 脚注 id
+	footnotesRefId string // 脚注 id
 
-	footnotesRefs  []*Node // 脚注引用
+	footnotesRefs []*Node // 脚注引用
 }
 
 // lastDeepestChild 返回 n 的最后一个最深子节点。

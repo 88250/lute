@@ -15,14 +15,8 @@ package lute
 func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 	lines := split(paragraph.tokens, itemNewline)
 	length := len(lines)
-	if !context.option.VditorWYSIWYG {
-		if 2 > length {
-			return
-		}
-	} else {
-		if 2 > length {
-			return
-		}
+	if 2 > length {
+		return
 	}
 
 	aligns := context.parseTableDelimRow(trimWhitespace(lines[1]))
@@ -35,6 +29,12 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 		return
 	}
 
+	var cells [][]*Node
+	cells = append(cells, []*Node{})
+	for n := headRow.firstChild; nil != n; n = n.next {
+		cells[0] = append(cells[0], n)
+	}
+
 	ret = &Node{typ: NodeTable, tableAligns: aligns}
 	ret.tableAligns = aligns
 	ret.AppendChild(context.newTableHead(headRow))
@@ -44,6 +44,24 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 			return
 		}
 		ret.AppendChild(tableRow)
+
+		cells = append(cells, []*Node{})
+		for n := tableRow.firstChild; nil != n; n = n.next {
+			cells[i-1] = append(cells[i-1], n)
+		}
+	}
+
+	var maxWidth int
+	for col := 0; col < len(cells[0]); col++ {
+		for row := 0; row < len(cells); row++ {
+			if maxWidth < cells[row][col].tableCellWidth {
+				maxWidth = cells[row][col].tableCellWidth
+			}
+		}
+		for row := 0; row < len(cells); row++ {
+			cells[row][col].tableCellWidth = maxWidth
+		}
+		maxWidth = 0
 	}
 	return
 }
@@ -83,18 +101,17 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	var col []byte
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = trimWhitespace(cols[i])
-		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i]}
+		width := len(col)
+		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i], tableCellWidth: width}
 		if !context.option.VditorWYSIWYG {
-			length := len(col)
 			var token byte
-			for i := 0; i < length; i++ {
+			for i := 0; i < width; i++ {
 				token = col[i]
-				if token == itemBackslash && i < length-1 && col[i+1] == itemPipe {
+				if token == itemBackslash && i < width-1 && col[i+1] == itemPipe {
 					col = append(col[:i], col[i+1:]...)
-					length--
+					width--
 				}
 			}
-
 		}
 		cell.tokens = col
 		ret.AppendChild(cell)
