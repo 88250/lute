@@ -169,10 +169,10 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				break
 			}
 			if t.context.option.VditorWYSIWYG {
-				if 1 > len(dest) || bytes.Contains(dest, []byte(caret)) {
+				if !isImage && nil == opener.node.next {
 					break
 				}
-				if !isImage && nil == opener.node.next {
+				if 1 > len(dest) && nil != opener.node.next && nil != opener.node.next.tokens && bytes.Contains(opener.node.next.tokens, []byte(caret)) {
 					break
 				}
 			}

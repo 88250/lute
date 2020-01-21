@@ -20,6 +20,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
+	{"6", "[]()", "<p data-block=\"0\">[]()\n</p>"},
 	{"5", "* [ ]", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> \n</li></ul>"},
 	{"4", "*", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">\n</li></ul>"},
 	{"3", "foo'%'bar", "<p data-block=\"0\">foo'%'bar\n</p>"},
