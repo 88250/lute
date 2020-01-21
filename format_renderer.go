@@ -92,7 +92,21 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
+	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
 	return ret
+}
+
+func (r *FormatRenderer) renderBackslashContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(escapeHTML(node.tokens))
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderBackslash(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writeByte(itemBackslash)
+	}
+	return WalkContinue, nil
 }
 
 func (r *FormatRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
