@@ -130,7 +130,8 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 	lute.VditorWYSIWYG = true
 
-	return lute.vditorDOM2Md(htmlStr)
+	md := lute.vditorDOM2Md(htmlStr)
+	return lute.FormatMd(md)
 }
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
