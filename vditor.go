@@ -70,7 +70,7 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 
 	// 替换插入符
 	html = strings.ReplaceAll(string(output), caret, "<wbr>")
-	return strings.ReplaceAll(html, zwsp, "")
+	return html
 }
 
 // HTML2VditorDOM 将 HTML 转换为 Vditor DOM，用于所见即所得模式下粘贴。
