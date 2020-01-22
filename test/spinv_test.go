@@ -62,7 +62,7 @@ var spinVditorDOMTests = []*parseTest{
 
 	{"30", "<p>1. Node.js</p><p>2. Go<wbr></p>", "<ol data-block=\"0\"><li data-marker=\"1.\"><p data-block=\"0\">Node.js\n</p></li><li data-marker=\"2.\"><p data-block=\"0\">Go<wbr>\n</p></li></ol>"},
 	{"29", "<p><wbr><br></p>", "<p data-block=\"0\"><wbr>\n</p>"},
-
+	{"28", "<p data-block=\"0\">❤️<wbr>\n</p>", "<p data-block=\"0\">❤️<wbr>\n</p>"},
 	{"27", "<p><wbr></p>", "<p data-block=\"0\"><wbr>\n</p>"},
 	{"26", "<p>![alt](src \"title\")</p>", "<p data-block=\"0\"><img src=\"src\" alt=\"alt\" title=\"title\" />\n</p>"},
 	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code class=\"language-java\"><wbr>\n</code></pre></div>"},

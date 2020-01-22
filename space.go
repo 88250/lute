@@ -84,6 +84,12 @@ func allowSpace(currentChar, nextChar rune) bool {
 	nextIsSymbol := unicode.IsSymbol(nextChar) && '~' != nextChar
 	currentIsPunct := unicode.IsPunct(currentChar) || '~' == currentChar
 	nextIsPunct := unicode.IsPunct(nextChar) || '~' == nextChar
+
+	if !currentIsPunct && !currentIsASCII && !unicode.Is(unicode.Han, currentChar) {
+		// Emoji 后不应该有空格
+		return false
+	}
+
 	if currentIsASCII {
 		if currentIsDigit && nextIsSymbol {
 			return false
