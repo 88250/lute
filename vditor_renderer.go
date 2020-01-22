@@ -429,8 +429,8 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 	}
 
 	node.tokens = bytes.TrimRight(node.tokens, "\n")
-	if nil != node.parent && nil != node.parent.parent && NodeListItem != node.parent.parent.typ {
-		// li 有的场景需要零宽空格撑起
+	// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
+	if !bytes.EqualFold(node.tokens, []byte(zwsp)) {
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
 	}
 	r.write(escapeHTML(node.tokens))
