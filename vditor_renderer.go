@@ -591,9 +591,6 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		}
 		r.tag("li", attrs, false)
 	} else {
-		if lchild := node.lastChild; nil != lchild && NodeList != lchild.typ && NodeBlockquote != lchild.typ && "" != lchild.Text() {
-			r.newline()
-		}
 		r.tag("/li", nil, false)
 	}
 	return WalkContinue, nil

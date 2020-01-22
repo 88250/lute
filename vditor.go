@@ -23,6 +23,9 @@ import (
 // 插入符 \u2038
 const caret = "‸"
 
+// 零宽空格
+const zwsp = "\u200b"
+
 // Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
 func (lute *Lute) Md2HTML(markdown string) (html string) {
 	lute.VditorWYSIWYG = false
@@ -131,7 +134,8 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 	lute.VditorWYSIWYG = true
 
 	md := lute.vditorDOM2Md(htmlStr)
-	return lute.FormatMd(md)
+	md = lute.FormatMd(md)
+	return strings.ReplaceAll(md, zwsp, "")
 }
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
@@ -289,6 +293,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Li:
+		if nil != n.FirstChild && nil == n.FirstChild.NextSibling && (atom.Ul == n.FirstChild.DataAtom || atom.Ol == n.FirstChild.DataAtom) {
+			break
+		}
+
 		node.typ = NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
@@ -455,6 +463,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				node.tokens = []byte("<br />")
 				tree.context.tip.AppendChild(node)
 				return
+			}
+			if atom.P == n.Parent.DataAtom {
+				if nil != n.Parent.NextSibling && (atom.Ul == n.Parent.NextSibling.DataAtom || atom.Ol == n.Parent.NextSibling.DataAtom || atom.Blockquote == n.Parent.NextSibling.DataAtom) {
+					tree.context.tip.AppendChild(&Node{typ: NodeText, tokens: []byte(zwsp)})
+					return
+				}
+				if nil != n.Parent.Parent && nil != n.Parent.Parent.NextSibling && atom.Li == n.Parent.Parent.NextSibling.DataAtom {
+					tree.context.tip.AppendChild(&Node{typ: NodeText, tokens: []byte(zwsp)})
+					return
+				}
 			}
 		}
 

@@ -22,6 +22,8 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"78", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p>a​​​​</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p><br></p></li><li data-marker=\"*\"><p><wbr>b</p></li></ul></li></ul>", "* a\n  * \n  * b\n"},
+	{"77", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p>a</p></li><li data-marker=\"*\"><p><wbr><br></p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p>b\n</p></li></ul></li></ul>", "* a\n* \n  * b\n"},
 	{"76", "<table data-block=\"0\"><thead><tr><th>col1<wbr></th></tr></thead></table>", "| col1 |\n| ---- |\n"},
 	{"75", "<li data-marker=\"*\"><p>foo</p></li><li data-marker=\"*\"><p>bar</p></li>", "* foo\n* bar\n"},
 	{"74", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre style=\"display: none;\"><code>foo'%'bar</code></pre></div>", "```\nfoo'%'bar\n```\n"},
@@ -68,7 +70,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ul>", "1. foo\n"},
 	{"32", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "* foo\n"},
 	{"31", "<ul data-tight=\"true\"><li data-marker=\"*\"><p>foo</p><ul data-tight=\"true\"><li data-marker=\"*\"><p>bar</p></li></ul></li></ul>", "* foo\n  * bar\n"},
-	{"30", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\"><br /></li></ul></li></ul>", "* foo\n* *\n"},
+	{"30", "<ul data-tight=\"true\"><li data-marker=\"*\"><p>foo</p></li><li data-marker=\"*\"><ul><li data-marker=\"*\"><p><br /></p></li></ul></li></ul>", "* foo\n  *\n"},
 	{"29", "<p><s>del</s></p>", "~~del~~\n"},
 	{"29", "<p>[]()</p>", "[]()\n"},
 	{"28", ":octocat:", ":octocat:\n"},
