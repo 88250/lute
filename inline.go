@@ -172,9 +172,6 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				if !isImage && nil == opener.node.next {
 					break
 				}
-				if 1 > len(dest) && nil != opener.node.next && nil != opener.node.next.tokens && bytes.Contains(opener.node.next.tokens, []byte(caret)) {
-					break
-				}
 			}
 			ctx.pos += len(passed)
 			openParen = passed[0:1]
