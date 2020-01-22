@@ -430,7 +430,7 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 
 	node.tokens = bytes.TrimRight(node.tokens, "\n")
 	// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
-	if !bytes.EqualFold(node.tokens, []byte(zwsp)) {
+	if !bytes.EqualFold(node.tokens, []byte(caret+zwsp)) {
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
 	}
 	r.write(escapeHTML(node.tokens))
