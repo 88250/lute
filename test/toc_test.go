@@ -20,7 +20,7 @@ import (
 
 var tocTests = []parseTest{
 
-	{"0", "[toc]\n\n# 1\n\n## 1.1\n\n# 2\n", ""},
+	{"0", "[toc]\n\n# 1\n\n## 1.1\n\n# 2\n", "<ul></ul>\n<h1>1</h1>\n<h2>1.1</h2>\n<h1>2</h1>\n"},
 }
 
 func TestToC(t *testing.T) {
