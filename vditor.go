@@ -444,7 +444,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if nil == n.FirstChild {
 			return
 		}
-		codeTokens := []byte(n.FirstChild.Data)
+		contentStr := strings.ReplaceAll(n.FirstChild.Data, zwsp, "")
+		if caret == contentStr {
+			node.tokens = []byte(caret)
+			tree.context.tip.AppendChild(node)
+			return
+		}
+		codeTokens := []byte(contentStr)
 		content := &Node{typ: NodeCodeSpanContent, tokens: codeTokens}
 		node.typ = NodeCodeSpan
 		node.AppendChild(&Node{typ: NodeCodeSpanOpenMarker, tokens: []byte("`")})

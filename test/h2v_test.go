@@ -20,9 +20,9 @@ import (
 
 var html2VditorDOMTests = []parseTest{
 
-	{"2", `<!--StartFragment--><span>Use<span>&nbsp;</span></span><code class="language-text">new Date()</code><span><span>&nbsp;</span>and</span><!--EndFragment-->`, "<p data-block=\"0\">Use <code>new Date()</code> and\n</p>"},
+	{"2", `<!--StartFragment--><span>Use<span>&nbsp;</span></span><code class="language-text">new Date()</code><span><span>&nbsp;</span>and</span><!--EndFragment-->`, "<p data-block=\"0\">Use <code>\u200bnew Date()</code>\u200b and\n</p>"},
 	{"1", `<pre><code class="language-text">&gt;</code></pre>`, "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code class=\"language-text\">&gt;\n</code></pre></div>"},
-	{"0", `<code class="language-text">&gt;</code>`, "<p data-block=\"0\"> <code>&gt;</code> \n</p>"},
+	{"0", `<code class="language-text">&gt;</code>`, "<p data-block=\"0\"><code>\u200b></code>\u200b\n</p>"},
 }
 
 func TestHTML2VditorDOM(t *testing.T) {
