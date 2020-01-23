@@ -44,6 +44,7 @@ func New(opts ...option) (ret *Lute) {
 	ret.CodeSyntaxHighlightLineNum = false
 	ret.CodeSyntaxHighlightStyleName = "github"
 	ret.Footnotes = true
+	ret.ToC = false
 	ret.AutoSpace = true
 	ret.FixTermTypo = true
 	ret.ChinesePunct = true
@@ -175,6 +176,8 @@ type options struct {
 	CodeSyntaxHighlightStyleName string
 	// Footnotes 设置是否打开“脚注”支持。
 	Footnotes bool
+	// ToC 设置是否打开“目录”支持。
+	ToC bool
 	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
 	// https://github.com/sparanoid/chinese-copywriting-guidelines
 	AutoSpace bool
@@ -251,6 +254,10 @@ func (lute *Lute) SetCodeSyntaxHighlightStyleName(name string) {
 
 func (lute *Lute) SetFootnotes(b bool) {
 	lute.Footnotes = b
+}
+
+func (lute *Lute) SetToC(b bool) {
+	lute.ToC = b
 }
 
 func (lute *Lute) SetAutoSpace(b bool) {
