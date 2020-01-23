@@ -383,6 +383,11 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
+	if bytes.Equal(node.tokens, []byte("<br />")) && node.parentIs(NodeTableCell) {
+		r.write(node.tokens)
+		return WalkStop, nil
+	}
+
 	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
 	node.tokens = bytes.TrimSpace(node.tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)

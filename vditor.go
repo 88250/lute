@@ -460,7 +460,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		return
 	case atom.Br:
 		if nil != n.Parent {
-			if atom.Td == n.Parent.DataAtom || atom.Th == n.Parent.DataAtom {
+			if lute.parentIs(n, atom.Td, atom.Th) {
 				if (nil == n.PrevSibling || caret == n.PrevSibling.Data) && (nil == n.NextSibling || caret == n.NextSibling.Data) {
 					return
 				}
@@ -743,6 +743,17 @@ func (lute *Lute) domCode0(n *html.Node, buffer *bytes.Buffer) {
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
 		lute.domCode0(child, buffer)
 	}
+}
+
+func (lute *Lute) parentIs(n *html.Node, parentTypes ...atom.Atom) bool {
+	for p := n.Parent; nil != p; p = p.Parent {
+		for _, pt := range parentTypes {
+			if pt == p.DataAtom {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (lute *Lute) domText(n *html.Node) string {
