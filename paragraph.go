@@ -69,8 +69,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 	}
 
 	if context.option.GFMTable {
-		table := context.parseTable(p)
-		if nil != table {
+		if table := context.parseTable(p); nil != table {
 			// 将该段落节点转成表节点
 			p.typ = NodeTable
 			p.tableAligns = table.tableAligns
@@ -80,6 +79,16 @@ func (p *Node) paragraphFinalize(context *Context) {
 				tr = nextTr
 			}
 			p.tokens = nil
+			return
+		}
+	}
+
+	if context.option.ToC {
+		if toc := context.parseToC(p); nil != toc {
+			// 将该段落节点转换成目录节点
+			p.typ = NodeToC
+			p.tokens = nil
+			return
 		}
 	}
 }

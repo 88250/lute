@@ -94,7 +94,39 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
 	ret.rendererFuncs[NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.rendererFuncs[NodeFootnotesRef] = ret.renderFootnotesRef
+	ret.rendererFuncs[NodeToC] = ret.renderToC
 	return ret
+}
+
+func (r *HTMLRenderer) renderToC(node *Node, entering bool) (WalkStatus, error) {
+	headings := r.headings()
+	length := len(headings)
+	if 1 > length {
+		return WalkStop, nil
+	}
+	r.writeString("<ul>")
+	r.writeString("</ul>")
+
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) headings() (ret []*Node) {
+	for n := r.tree.Root.firstChild; nil != n; n = n.next {
+		r.headings0(n, &ret)
+	}
+	return
+}
+
+func (r *HTMLRenderer) headings0(n *Node, headings *[]*Node) {
+	if NodeHeading == n.typ {
+		*headings = append(*headings, n)
+		return
+	}
+	if NodeList == n.typ || NodeListItem == n.typ || NodeBlockquote == n.typ {
+		for c := n.firstChild; nil != c; c = c.next {
+			r.headings0(c, headings)
+		}
+	}
 }
 
 func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte {

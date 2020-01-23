@@ -415,4 +415,8 @@ const (
 
 	NodeFootnotesDef nodeType = 500 // 脚注定义 [^label]:
 	NodeFootnotesRef nodeType = 501 // 脚注引用 [^label]
+
+	// 目录
+
+	NodeToC nodeType = 600 // 目录 [toc]
 )
