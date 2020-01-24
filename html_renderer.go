@@ -108,8 +108,10 @@ func (r *HTMLRenderer) renderToC(node *Node, entering bool) (WalkStatus, error) 
 	r.writeString("<div class=\"toc-div\">")
 	for i, heading := range headings {
 		level := strconv.Itoa(heading.headingLevel)
+		spaces := (heading.headingLevel - 1) * 2
+		r.writeString(strings.Repeat("&emsp;", spaces))
 		r.writeString("<span class=\"toc-h" + level + "\">")
-		r.writeString("<a class=\"toc-a\" href=\"#toc_h" + level + "_" + strconv.Itoa(i) + "\">" + heading.Text() + "</a></span>")
+		r.writeString("<a class=\"toc-a\" href=\"#toc_h" + level + "_" + strconv.Itoa(i) + "\">" + heading.Text() + "</a></span><br>")
 	}
 	r.writeString("</div>\n\n")
 
