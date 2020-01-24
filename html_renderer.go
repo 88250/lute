@@ -104,8 +104,13 @@ func (r *HTMLRenderer) renderToC(node *Node, entering bool) (WalkStatus, error) 
 	if 1 > length {
 		return WalkStop, nil
 	}
-	r.writeString("<ul>")
-	r.writeString("</ul>")
+	r.writeString("<div class=\"toc-div\">")
+	for i, heading := range headings {
+		level := strconv.Itoa(heading.headingLevel)
+		r.writeString("<span class=\"toc-h" + level + "\">")
+		r.writeString("<a class=\"toc-a\" href=\"#toc-h" + level + "-" + strconv.Itoa(i) + "\" /></span>")
+	}
+	r.writeString("</div>\n\n")
 
 	return WalkStop, nil
 }
