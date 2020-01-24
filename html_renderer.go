@@ -108,11 +108,29 @@ func (r *HTMLRenderer) renderToC(node *Node, entering bool) (WalkStatus, error) 
 	for i, heading := range headings {
 		level := strconv.Itoa(heading.headingLevel)
 		r.writeString("<span class=\"toc-h" + level + "\">")
-		r.writeString("<a class=\"toc-a\" href=\"#toc-h" + level + "-" + strconv.Itoa(i) + "\" /></span>")
+		r.writeString("<a class=\"toc-a\" href=\"#toc-h" + level + "-" + strconv.Itoa(i) + "\">" + heading.text() + "</a></span>")
 	}
 	r.writeString("</div>\n\n")
 
 	return WalkStop, nil
+}
+
+func (n *Node) text() (ret string) {
+	for c := n.firstChild; nil != c; c = c.next {
+		text0(c, &ret)
+	}
+	return
+}
+
+func text0(n *Node, ret *string) {
+	if NodeText == n.typ || NodeLinkText == n.typ {
+		*ret += bytesToStr(n.tokens)
+		return
+	}
+
+	for c := n.firstChild; nil != c; c = c.next {
+		text0(c, ret)
+	}
 }
 
 func (r *HTMLRenderer) headings() (ret []*Node) {
