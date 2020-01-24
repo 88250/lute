@@ -21,11 +21,12 @@ import (
 type HTMLRenderer struct {
 	*BaseRenderer
 	needRenderFootnotesDef bool
+	headingCnt             int
 }
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
 func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
-	ret := &HTMLRenderer{lute.newBaseRenderer(tree), false}
+	ret := &HTMLRenderer{lute.newBaseRenderer(tree), false, 0}
 	ret.rendererFuncs[NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[NodeText] = ret.renderText
@@ -108,29 +109,11 @@ func (r *HTMLRenderer) renderToC(node *Node, entering bool) (WalkStatus, error) 
 	for i, heading := range headings {
 		level := strconv.Itoa(heading.headingLevel)
 		r.writeString("<span class=\"toc-h" + level + "\">")
-		r.writeString("<a class=\"toc-a\" href=\"#toc-h" + level + "-" + strconv.Itoa(i) + "\">" + heading.text() + "</a></span>")
+		r.writeString("<a class=\"toc-a\" href=\"#toc_h" + level + "_" + strconv.Itoa(i) + "\">" + heading.Text() + "</a></span>")
 	}
 	r.writeString("</div>\n\n")
 
 	return WalkStop, nil
-}
-
-func (n *Node) text() (ret string) {
-	for c := n.firstChild; nil != c; c = c.next {
-		text0(c, &ret)
-	}
-	return
-}
-
-func text0(n *Node, ret *string) {
-	if NodeText == n.typ || NodeLinkText == n.typ {
-		*ret += bytesToStr(n.tokens)
-		return
-	}
-
-	for c := n.firstChild; nil != c; c = c.next {
-		text0(c, ret)
-	}
 }
 
 func (r *HTMLRenderer) headings() (ret []*Node) {
@@ -570,7 +553,13 @@ func (r *HTMLRenderer) renderBlockquoteMarker(node *Node, entering bool) (WalkSt
 func (r *HTMLRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		r.writeString("<h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
+		level := " 123456"[node.headingLevel : node.headingLevel+1]
+		r.writeString("<h" + level)
+		if r.option.ToC {
+			r.writeString(" id=\"toc_h" + level + "_" + strconv.Itoa(r.headingCnt) + "\"")
+			r.headingCnt++
+		}
+		r.writeString(">")
 		if r.option.HeadingAnchor {
 			anchor := node.Text()
 			anchor = strings.ReplaceAll(anchor, " ", "-")
