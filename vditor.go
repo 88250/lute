@@ -239,10 +239,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	class := lute.domAttrValue(n, "class")
-	node := &Node{typ: NodeText, tokens: []byte(n.Data)}
+	content := strings.ReplaceAll(n.Data, zwsp, "")
+	node := &Node{typ: NodeText, tokens: []byte(content)}
 	switch n.DataAtom {
 	case 0:
-		content := strings.ReplaceAll(n.Data, zwsp, "")
 		if "" == content {
 			return
 		}
@@ -793,5 +793,5 @@ func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
 func (lute *Lute) domHTML(n *html.Node) []byte {
 	buf := &bytes.Buffer{}
 	html.Render(buf, n)
-	return buf.Bytes()
+	return bytes.ReplaceAll(buf.Bytes(), []byte(zwsp), []byte(""))
 }

@@ -437,6 +437,9 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
+	if entering && nil == node.previous {
+		r.writeString(zwsp)
+	}
 	return WalkContinue, nil
 }
 
