@@ -242,6 +242,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	node := &Node{typ: NodeText, tokens: []byte(n.Data)}
 	switch n.DataAtom {
 	case 0:
+		content := strings.ReplaceAll(n.Data, zwsp, "")
+		if "" == content {
+			return
+		}
+
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.typ = NodeLinkText
 		}
@@ -607,10 +612,17 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Span:
-		if nil == n.FirstChild || atom.Code != n.FirstChild.DataAtom {
+		if nil == n.FirstChild {
 			break
 		}
-		codeTokens := []byte(n.FirstChild.FirstChild.Data)
+		var codeTokens []byte
+		if zwsp == n.FirstChild.Data {
+			codeTokens = []byte(n.FirstChild.NextSibling.FirstChild.Data)
+		} else if atom.Code == n.FirstChild.DataAtom {
+			codeTokens = []byte(n.FirstChild.FirstChild.Data)
+		} else {
+			break
+		}
 		if "math-inline" == dataType {
 			node.typ = NodeInlineMath
 			node.AppendChild(&Node{typ: NodeInlineMathOpenMarker})

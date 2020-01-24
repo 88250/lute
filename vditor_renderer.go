@@ -388,12 +388,11 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 		return WalkStop, nil
 	}
 
-	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
+	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">" + zwsp)
 	node.tokens = bytes.TrimSpace(node.tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
 	tokens = escapeHTML(node.tokens)
-	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
 	r.writeString("</code></span>" + zwsp)
 	return WalkStop, nil
