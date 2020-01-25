@@ -145,31 +145,30 @@ func (r *VditorRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, err
 }
 
 func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	nextText := node.parent.NextNodeText()
-	if "" == nextText || !strings.HasPrefix(nextText, " ") {
-		r.writeByte(itemSpace)
-	}
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
 	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
-	node.tokens = bytes.TrimSpace(node.tokens)
 	r.tag("code", [][]string{{"data-type", "math-inline"}}, false)
-	r.write(escapeHTML(node.tokens))
+	tokens := bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
+	tokens = escapeHTML(tokens)
+	tokens = append([]byte(zwsp), tokens...)
+	r.write(tokens)
 	r.writeString("</code></span>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	previousText := node.parent.PreviousNodeText()
-	if "" == previousText || !strings.HasSuffix(previousText, " ") {
-		r.writeByte(itemSpace)
-	}
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
+	previousNodeText := node.PreviousNodeText()
+	previousNodeText = strings.ReplaceAll(previousNodeText, caret, "")
+	if "" == previousNodeText {
+		r.writeString(zwsp)
+	}
 	return WalkContinue, nil
 }
 
@@ -437,8 +436,12 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
-	if entering && nil == node.previous {
-		r.writeString(zwsp)
+	if entering {
+		previousNodeText := node.PreviousNodeText()
+		previousNodeText = strings.ReplaceAll(previousNodeText, caret, "")
+		if "" == previousNodeText {
+			r.writeString(zwsp)
+		}
 	}
 	return WalkContinue, nil
 }
@@ -450,7 +453,7 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
 	r.tag("code", nil, false)
 	tokens := bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
-	tokens = escapeHTML(node.tokens)
+	tokens = escapeHTML(tokens)
 	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
 	r.writeString("</code>")
