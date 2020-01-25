@@ -160,15 +160,17 @@ func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (Wal
 }
 
 func (r *VditorRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		previousNodeText := node.PreviousNodeText()
+		previousNodeText = strings.ReplaceAll(previousNodeText, caret, "")
+		if "" == previousNodeText {
+			r.writeString(zwsp)
+		}
+	}
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
-	previousNodeText := node.PreviousNodeText()
-	previousNodeText = strings.ReplaceAll(previousNodeText, caret, "")
-	if "" == previousNodeText {
-		r.writeString(zwsp)
-	}
 	return WalkContinue, nil
 }
 
