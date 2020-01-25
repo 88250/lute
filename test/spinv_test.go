@@ -22,6 +22,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"71", "<p data-block=\"0\">foo<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bbar</code></span> \n</p>", "<p data-block=\"0\">foo<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bbar</code></span>\n</p>"},
 	{"70", "<p data-block=\"0\"> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bfoo</code></span> \n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bfoo</code></span>\n</p>"},
 	{"69", "<p data-block=\"0\"><a href=\"/bar\"><code>foo</code></a><wbr>\n</p>", "<p data-block=\"0\"><a href=\"/bar\">\u200b<code>\u200bfoo</code></a><wbr>\n</p>"},
 	{"68", `<p data-block="0">|foo|bar|<wbr></p>`, "<p data-block=\"0\">|foo|bar|<wbr>\n</p>"},
