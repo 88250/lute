@@ -389,6 +389,14 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 		return WalkStop, nil
 	}
 
+	if entering {
+		previousNodeText := node.PreviousNodeText()
+		previousNodeText = strings.ReplaceAll(previousNodeText, caret, "")
+		if "" == previousNodeText {
+			r.writeString(zwsp)
+		}
+	}
+
 	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">" + zwsp)
 	node.tokens = bytes.TrimSpace(node.tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)

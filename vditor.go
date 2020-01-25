@@ -455,6 +455,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			tree.context.tip.AppendChild(node)
 			return
 		}
+		if "" == contentStr {
+			return
+		}
 		codeTokens := []byte(contentStr)
 		content := &Node{typ: NodeCodeSpanContent, tokens: codeTokens}
 		node.typ = NodeCodeSpan
@@ -620,6 +623,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			codeTokens = []byte(n.FirstChild.NextSibling.FirstChild.Data)
 		} else if atom.Code == n.FirstChild.DataAtom {
 			codeTokens = []byte(n.FirstChild.FirstChild.Data)
+			if zwsp == string(codeTokens) {
+				break
+			}
 		} else {
 			break
 		}
