@@ -22,6 +22,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"72", "<p data-block=\"0\">foo\n-<wbr></p>", "<h2 data-block=\"0\">foo<wbr></h2>"},
 	{"71", "<p data-block=\"0\">foo<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bbar</code></span> \n</p>", "<p data-block=\"0\">foo<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bbar</code></span>\u200b\n</p>"},
 	{"70", "<p data-block=\"0\"> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bfoo</code></span> \n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bfoo</code></span>\u200b\n</p>"},
 	{"69", "<p data-block=\"0\"><a href=\"/bar\"><code>foo</code></a><wbr>\n</p>", "<p data-block=\"0\"><a href=\"/bar\">\u200b<code>\u200bfoo</code></a><wbr>\n</p>"},
@@ -33,7 +34,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"63", "<p data-block=\"0\">![foo<wbr>](/bar)", "<p data-block=\"0\"><img src=\"/bar\" alt=\"foo\" />\n</p>"},
 	{"62", "<p data-block=\"0\"><strong data-marker=\"__\"><wbr><br></strong></p>", "<p data-block=\"0\"><wbr>\n</p>"},
 	{"61", "<p data-block=\"0\">_foo_<wbr></p>", "<p data-block=\"0\"><em data-marker=\"_\">foo</em><wbr>\n</p>"},
-	{"60", "<p data-block=\"0\">foo\n=<wbr></p>", "<h1 data-block=\"0\">foo</h1>"},
+	{"60", "<p data-block=\"0\">foo\n=<wbr></p>", "<h1 data-block=\"0\">foo<wbr></h1>"},
 	{"59", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\"><p>foo</p><ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\"><p>bar<wbr><p></li></ul></li></ul>", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\">foo<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\">bar<wbr></li></ul></li></ul>"},
 	{"58", "<p data-block=\"0\">![](/bar)<wbr>\n</p>", "<p data-block=\"0\"><img src=\"/bar\" alt=\"\" /><wbr>\n</p>"},
 	{"57", "<p data-block=\"0\">/<span data-type=\"backslash\"><span>\\</span>_</span><span data-type=\"backslash\"><span>\\</span>_</span>foo__.\n</p>", "<p data-block=\"0\">/<span data-type=\"backslash\"><span>\\</span>_</span><span data-type=\"backslash\"><span>\\</span>_</span>foo__.\n</p>"},

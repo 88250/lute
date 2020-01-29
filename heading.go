@@ -83,8 +83,12 @@ func (t *Tree) parseSetextHeading() (level int) {
 		return
 	}
 
+	var caretInLn bool
 	if t.context.option.VditorWYSIWYG {
-		ln = bytes.ReplaceAll(ln, []byte(caret), []byte(""))
+		if bytes.Contains(ln, []byte(caret)) {
+			caretInLn = true
+			ln = bytes.ReplaceAll(ln, []byte(caret), []byte(""))
+		}
 	}
 
 	markers := 0
@@ -109,5 +113,11 @@ func (t *Tree) parseSetextHeading() (level int) {
 	if itemHyphen == marker {
 		level = 2
 	}
+
+	if t.context.option.VditorWYSIWYG && caretInLn {
+		t.context.oldtip.tokens = trimWhitespace(t.context.oldtip.tokens)
+		t.context.oldtip.AppendTokens([]byte(caret))
+	}
+
 	return
 }
