@@ -14,6 +14,7 @@ package lute
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 
 	"github.com/88250/lute/html"
@@ -307,11 +308,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		var bullet byte
 		if "" == marker {
 			if atom.Ol == n.Parent.DataAtom {
-				start := lute.domAttrValue(n.Parent, "start")
-				if "" == start {
+				if startAttr := lute.domAttrValue(n.Parent, "start"); "" == startAttr {
 					marker = "1."
 				} else {
-					marker = start + "."
+					marker = startAttr + "."
 				}
 			} else {
 				marker = lute.domAttrValue(n.Parent, "data-marker")
@@ -333,6 +333,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 		}
 		node.listData = &listData{marker: []byte(marker), bulletChar: bullet}
+		if 0 == bullet {
+			node.listData.num, _ = strconv.Atoi(string(marker[0]))
+		}
+
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
