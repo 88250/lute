@@ -303,6 +303,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			break
 		}
 
+		if p := n.FirstChild;nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
+			tree.context.tip.tight = false
+		}
+
 		node.typ = NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
 		var bullet byte
