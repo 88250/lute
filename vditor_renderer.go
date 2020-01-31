@@ -564,7 +564,7 @@ func (r *VditorRenderer) renderHeadingC8hMarker(node *Node, entering bool) (Walk
 
 func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
 	tag := "ul"
-	if 1 == node.listData.typ {
+	if 1 == node.listData.typ || (3 == node.listData.typ && 0 == len(node.listData.bulletChar)) {
 		tag = "ol"
 	}
 	if entering {

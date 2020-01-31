@@ -28,6 +28,7 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	{"29", "1. [X] foo\n", "1. [X] foo\n"},
 	{"28", "|f|\n|:-:|\nfoo|\n", "|  f  |\n| :-: |\n| foo |\n"},
 
 	// 子列表格式化后缩进不对 https://github.com/b3log/lute/issues/22

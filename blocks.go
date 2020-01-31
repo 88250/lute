@@ -402,7 +402,7 @@ var blockStarts = []blockStartFunc{
 			listItem := t.context.addChild(NodeListItem, t.context.nextNonspace)
 			listItem.listData = data
 			listItem.tokens = data.marker
-			if 1 == listItem.listData.typ {
+			if 1 == listItem.listData.typ || (3 == listItem.listData.typ && 0 == len(listItem.listData.bulletChar)) {
 				// 修正有序列表项序号
 				prev := listItem.previous
 				if nil != prev {
