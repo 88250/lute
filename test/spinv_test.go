@@ -22,7 +22,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"73", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\"><p>[x] foo<wbr></p></li></ol>", "fb\n"},
+	{"73", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\"><p>[x] foo<wbr></p></li></ol>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ol>"},
 	{"72", "<p data-block=\"0\">foo\n-<wbr></p>", "<h2 data-block=\"0\">foo<wbr></h2>"},
 	{"71", "<p data-block=\"0\">foo<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bbar</code></span> \n</p>", "<p data-block=\"0\">foo<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bbar</code></span>\u200b\n</p>"},
 	{"70", "<p data-block=\"0\"> <span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bfoo</code></span> \n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bfoo</code></span>\u200b\n</p>"},

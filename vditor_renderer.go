@@ -564,7 +564,7 @@ func (r *VditorRenderer) renderHeadingC8hMarker(node *Node, entering bool) (Walk
 
 func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
 	tag := "ul"
-	if 1 == node.listData.typ || (3 == node.listData.typ && 0 == len(node.listData.bulletChar)) {
+	if 1 == node.listData.typ || (3 == node.listData.typ && 0 == node.listData.bulletChar) {
 		tag = "ol"
 	}
 	if entering {
@@ -572,7 +572,7 @@ func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 		if node.tight {
 			attrs = append(attrs, []string{"data-tight", "true"})
 		}
-		if nil == node.bulletChar {
+		if 0 == node.bulletChar {
 			if 1 != node.start {
 				attrs = append(attrs, []string{"start", strconv.Itoa(node.start)})
 			}
@@ -596,8 +596,14 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		case 1:
 			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + "."})
 		case 3:
-			attrs = append(attrs, []string{"data-marker", string(node.marker)})
-			attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
+			if 0 == node.listData.bulletChar {
+				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + "."})
+			} else {
+				attrs = append(attrs, []string{"data-marker", string(node.marker)})
+			}
+			if nil != node.firstChild && nil != node.firstChild.firstChild && NodeTaskListItemMarker == node.firstChild.firstChild.typ {
+				attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
+			}
 		}
 		r.tag("li", attrs, false)
 	} else {

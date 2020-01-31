@@ -21,7 +21,7 @@ import (
 type listData struct {
 	typ          int    // 0：无序列表，1：有序列表，3：任务列表
 	tight        bool   // 是否是紧凑模式
-	bulletChar   []byte // 无序列表标识，* - 或者 +
+	bulletChar   byte // 无序列表标识，* - 或者 +
 	start        int    // 有序列表起始序号
 	delimiter    byte   // 有序列表分隔符，. 或者 )
 	padding      int    // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
@@ -75,7 +75,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	marker := []byte{tokens[0]}
 	var delim byte
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
-		data.bulletChar = marker
+		data.bulletChar = marker[0]
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
 		if container.typ != NodeParagraph || bytes.Equal(items1, marker) {
 			data.typ = 1 // 有序列表

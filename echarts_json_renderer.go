@@ -260,7 +260,7 @@ func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) (WalkStatus,
 	if entering {
 		r.openObj()
 		list := "ul"
-		if 1 == node.listData.typ|| (3 == node.listData.typ && 0 == len(node.listData.bulletChar)) {
+		if 1 == node.listData.typ|| (3 == node.listData.typ && 0 == node.listData.bulletChar) {
 			list = "ol"
 		}
 		r.val("List\n"+list, node)

@@ -607,7 +607,7 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 		indent := len(node.marker) + 1
-		if 1 == node.listData.typ || (3 == node.listData.typ && 0 == len(node.listData.bulletChar)) {
+		if 1 == node.listData.typ || (3 == node.listData.typ && 0 == node.listData.bulletChar) {
 			indent++
 		}
 		indentSpaces := bytes.Repeat([]byte{itemSpace}, indent)
@@ -629,7 +629,7 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		}
 
 		listItemBuf := bytes.Buffer{}
-		if 1 == node.listData.typ || (3 == node.listData.typ && 0 == len(node.listData.bulletChar)) {
+		if 1 == node.listData.typ || (3 == node.listData.typ && 0 == node.listData.bulletChar) {
 			listItemBuf.WriteString(strconv.Itoa(node.num) + ".")
 		} else {
 			listItemBuf.Write(node.marker)

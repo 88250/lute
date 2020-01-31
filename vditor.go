@@ -304,6 +304,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 		node.typ = NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
+		var bullet byte
 		if "" == marker {
 			if atom.Ol == n.Parent.DataAtom {
 				start := lute.domAttrValue(n.Parent, "start")
@@ -317,14 +318,21 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				if "" == marker {
 					marker = "*"
 				}
+				bullet = marker[0]
 			}
 		} else {
-			if nil != n.Parent && "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
-				// 子有序列表必须从 1 开始
-				marker = "1."
+			if nil != n.Parent {
+				if atom.Ol == n.Parent.DataAtom {
+					if "1." != marker && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
+						// 子有序列表必须从 1 开始
+						marker = "1."
+					}
+				} else {
+					bullet = marker[0]
+				}
 			}
 		}
-		node.listData = &listData{marker: []byte(marker)}
+		node.listData = &listData{marker: []byte(marker), bulletChar: bullet}
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)

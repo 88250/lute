@@ -583,13 +583,13 @@ func (r *HTMLRenderer) renderHeadingC8hMarker(node *Node, entering bool) (WalkSt
 
 func (r *HTMLRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
 	tag := "ul"
-	if 1 == node.listData.typ || (3 == node.listData.typ && 0 == len(node.listData.bulletChar)) {
+	if 1 == node.listData.typ || (3 == node.listData.typ && 0 == node.listData.bulletChar) {
 		tag = "ol"
 	}
 	if entering {
 		r.newline()
 		attrs := [][]string{{"start", strconv.Itoa(node.start)}}
-		if nil == node.bulletChar && 1 != node.start {
+		if 0 == node.bulletChar && 1 != node.start {
 			r.tag(tag, attrs, false)
 		} else {
 			r.tag(tag, nil, false)
