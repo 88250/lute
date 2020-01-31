@@ -605,7 +605,8 @@ func (r *HTMLRenderer) renderList(node *Node, entering bool) (WalkStatus, error)
 
 func (r *HTMLRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass {
+		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass &&
+			nil != node.firstChild && nil != node.firstChild.firstChild && NodeTaskListItemMarker == node.firstChild.firstChild.typ {
 			r.tag("li", [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
 		} else {
 			r.tag("li", nil, false)

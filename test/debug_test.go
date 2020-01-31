@@ -20,6 +20,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"42", "* [x]\n* [x] foo\n", "<ul>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
 	{"41", "f</\n", "<p>f&lt;/</p>\n"},
 
 	// 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4
