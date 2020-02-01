@@ -21,10 +21,10 @@ import (
 	"github.com/88250/lute/html/atom"
 )
 
-// 插入符 \u2038
+// caret 插入符 \u2038。
 const caret = "‸"
 
-// 零宽空格
+// zwsp 零宽空格。
 const zwsp = "\u200b"
 
 // Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
@@ -303,7 +303,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			break
 		}
 
-		if p := n.FirstChild;nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
+		if p := n.FirstChild; nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
 			tree.context.tip.tight = false
 		}
 
