@@ -389,7 +389,9 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			r.write(escapeHTML(node.ChildByType(NodeLinkDest).tokens))
+			destTokens := node.ChildByType(NodeLinkDest).tokens
+			destTokens = r.tree.context.relativePath(destTokens)
+			r.write(escapeHTML(destTokens))
 			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
@@ -412,7 +414,9 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 func (r *HTMLRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
-		attrs := [][]string{{"href", bytesToStr(escapeHTML(dest.tokens))}}
+		destTokens := dest.tokens
+		destTokens = r.tree.context.relativePath(destTokens)
+		attrs := [][]string{{"href", bytesToStr(escapeHTML(destTokens))}}
 		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			attrs = append(attrs, []string{"title", bytesToStr(escapeHTML(title.tokens))})
 		}

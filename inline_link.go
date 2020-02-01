@@ -13,6 +13,7 @@
 package lute
 
 import (
+	"bytes"
 	"unicode/utf8"
 )
 
@@ -133,4 +134,28 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 		}
 	}
 	return
+}
+
+func (context *Context) relativePath(dest []byte) []byte {
+	if "" == context.option.LinkBase {
+		return dest
+	}
+
+	if !context.isRelativePath(dest) {
+		return dest
+	}
+
+	return append(strToBytes(context.option.LinkBase), dest...)
+}
+
+func (context *Context) isRelativePath(dest []byte) bool {
+	if 1 > len(dest) {
+		return true
+	}
+
+	if '/' == dest[0] {
+		return false
+	}
+
+	return !bytes.Contains(dest, []byte("://"))
 }
