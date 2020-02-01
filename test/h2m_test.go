@@ -20,6 +20,13 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"18", "<del>foo</del>", "~foo~\n"},
+	{"17", "<img src=\"bar.png\" alt=\"foo\">", "![foo](bar.png)\n"},
+	{"16", "foo<br>bar", "foo\nbar\n"},
+	{"15", "<em>foo</em>", "*foo*\n"},
+	{"14", "<hr>", "---\n"},
+	{"13", "<blockquote>foo</blockquote>", "> foo\n"},
+	{"12", "<h1>foo</h1>", "# foo\n"},
 	{"11", "<li>foo</li><li>bar</li>", "* foo\n* bar\n"},
 	{"10", `<p data-block="0">foo'%'bar</p>`, "foo'%'bar\n"},
 	{"9", `<code class="language-text">&gt;</code>`, "`>`\n"},
