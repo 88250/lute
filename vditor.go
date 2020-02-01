@@ -533,7 +533,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 			node.AppendChild(&Node{typ: NodeCloseBracket})
 			node.AppendChild(&Node{typ: NodeOpenParen})
-			node.AppendChild(&Node{typ: NodeLinkDest, tokens: []byte(lute.domAttrValue(n, "src"))})
+			src := lute.domAttrValue(n, "src")
+			if "" != lute.LinkBase {
+				src = strings.ReplaceAll(src, lute.LinkBase, "")
+			}
+			node.AppendChild(&Node{typ: NodeLinkDest, tokens: []byte(src)})
 			linkTitle := lute.domAttrValue(n, "title")
 			if "" != linkTitle {
 				node.AppendChild(&Node{typ: NodeLinkSpace})
@@ -709,7 +713,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	case atom.A:
 		node.AppendChild(&Node{typ: NodeCloseBracket})
 		node.AppendChild(&Node{typ: NodeOpenParen})
-		node.AppendChild(&Node{typ: NodeLinkDest, tokens: []byte(lute.domAttrValue(n, "href"))})
+		href := lute.domAttrValue(n, "href")
+		if "" != lute.LinkBase {
+			href = strings.ReplaceAll(href, lute.LinkBase, "")
+		}
+		node.AppendChild(&Node{typ: NodeLinkDest, tokens: []byte(href)})
 		linkTitle := lute.domAttrValue(n, "title")
 		if "" != linkTitle {
 			node.AppendChild(&Node{typ: NodeLinkSpace})
