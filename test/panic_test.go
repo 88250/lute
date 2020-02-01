@@ -13,9 +13,10 @@
 package test
 
 import (
-	"github.com/88250/lute"
 	"sync"
 	"testing"
+
+	"github.com/88250/lute"
 )
 
 func TestRecover(t *testing.T) {
