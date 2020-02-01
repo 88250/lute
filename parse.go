@@ -14,7 +14,7 @@ package lute
 
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
 func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
-	defer recoverPanic(&err)
+	defer RecoverPanic(&err)
 
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree

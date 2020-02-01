@@ -20,7 +20,7 @@ import (
 )
 
 // Recover recovers a panic.
-func recoverPanic(err *error) {
+func RecoverPanic(err *error) {
 	if e := recover(); nil != e {
 		stack := debug.Stack()
 		errMsg := ""

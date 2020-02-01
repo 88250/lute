@@ -21,7 +21,7 @@ func (t *Tree) parseInlines() {
 
 // walkParseInline 解析生成节点 node 的行级子节点。
 func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
-	defer recoverPanic(nil)
+	defer RecoverPanic(nil)
 	if nil != wg {
 		defer wg.Done()
 	}

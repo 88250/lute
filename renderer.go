@@ -47,7 +47,7 @@ func (lute *Lute) newBaseRenderer(tree *Tree) *BaseRenderer {
 
 // Render 从指定的根节点 root 开始遍历并渲染。
 func (r *BaseRenderer) Render() (output []byte, err error) {
-	defer recoverPanic(&err)
+	defer RecoverPanic(&err)
 
 	r.lastOut = itemNewline
 	r.writer = &bytes.Buffer{}

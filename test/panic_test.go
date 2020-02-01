@@ -10,10 +10,24 @@
 // PURPOSE.
 // See the Mulan PSL v1 for more details.
 
-// +build javascript
+package test
 
-package lute
+import (
+	"github.com/88250/lute"
+	"sync"
+	"testing"
+)
 
-// Recover recovers a panic.
-func RecoverPanic(err *error) {
+func TestRecover(t *testing.T) {
+	var err error
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		defer lute.RecoverPanic(&err)
+		panic("test panic")
+	}()
+	wg.Wait()
+	t.Log(err)
 }
