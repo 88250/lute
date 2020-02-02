@@ -327,11 +327,17 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		} else {
 			if nil != n.Parent {
 				if atom.Ol == n.Parent.DataAtom {
-					if "1." != marker && nil != n.Parent && (atom.Ol == n.Parent.DataAtom || atom.Ul == n.Parent.DataAtom) {
+					if "*" == marker || "-" == marker || "+" == marker {
+						marker = "1."
+					}
+					if "1." != marker && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
 						// 子有序列表必须从 1 开始
 						marker = "1."
 					}
 				} else {
+					if "*" != marker && "-" != marker && "+" != marker {
+						marker = "*"
+					}
 					bullet = marker[0]
 				}
 			}

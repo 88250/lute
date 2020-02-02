@@ -22,6 +22,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"76", "<ul><li data-marker=\"1.\"><p>12<wbr></p></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">12<wbr></li></ul>"},
 	{"75", "<ol><li data-marker=\"*\"><p>foo<wbr></p></li></ol>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\">foo<wbr></li></ol>"},
 	{"74", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\" class=\"vditor-task\"><p><input checked=\"\" type=\"checkbox\"> 1<wbr></p></li></ol>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> 1<wbr></li></ol>"},
 	{"73", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\"><p>[x] foo<wbr></p></li></ol>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ol>"},
