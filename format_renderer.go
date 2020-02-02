@@ -98,7 +98,7 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 }
 
 func (r *FormatRenderer) renderBackslashContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.tokens))
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 

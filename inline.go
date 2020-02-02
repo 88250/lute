@@ -364,14 +364,10 @@ func (t *Tree) parseBackslash(block *Node, ctx *InlineContext) *Node {
 	}
 	if isASCIIPunct(token) {
 		ctx.pos++
-		if t.context.option.VditorWYSIWYG {
-			n := &Node{typ: NodeBackslash}
-			block.AppendChild(n)
-			n.AppendChild(&Node{typ: NodeBackslashContent, tokens: []byte{token}})
-			return nil
-		} else {
-			return &Node{typ: NodeText, tokens: []byte{token}}
-		}
+		n := &Node{typ: NodeBackslash}
+		block.AppendChild(n)
+		n.AppendChild(&Node{typ: NodeBackslashContent, tokens: []byte{token}})
+		return nil
 	}
 	return &Node{typ: NodeText, tokens: backslash}
 }

@@ -96,7 +96,18 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.rendererFuncs[NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.rendererFuncs[NodeToC] = ret.renderToC
+	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
+	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
 	return ret
+}
+
+func (r *HTMLRenderer) renderBackslashContent(node *Node, entering bool) (WalkStatus, error) {
+	r.write(escapeHTML(node.tokens))
+	return WalkStop, nil
+}
+
+func (r *HTMLRenderer) renderBackslash(node *Node, entering bool) (WalkStatus, error) {
+	return WalkContinue, nil
 }
 
 func (r *HTMLRenderer) renderToC(node *Node, entering bool) (WalkStatus, error) {
