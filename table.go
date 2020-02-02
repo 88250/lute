@@ -103,16 +103,6 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 		col = trimWhitespace(cols[i])
 		width := len(col)
 		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i], tableCellContentWidth: width}
-		if !context.option.VditorWYSIWYG {
-			var token byte
-			for i := 0; i < width; i++ {
-				token = col[i]
-				if token == itemBackslash && i < width-1 && col[i+1] == itemPipe {
-					col = append(col[:i], col[i+1:]...)
-					width--
-				}
-			}
-		}
 		cell.tokens = col
 		ret.AppendChild(cell)
 	}

@@ -29,6 +29,8 @@ type formatTest struct {
 var formatTests = []formatTest{
 
 	// 格式化后丢失反斜杠 https://github.com/88250/lute/issues/16
+	{"32", "|foo|\n|-|\n|`\\|bar`|\n", "| foo     |\n| ------- |\n| `\\|bar` |\n"},
+	{"31", "|foo|\n|-|\n|\\|bar|\n", "| foo   |\n| ----- |\n| \\|bar |\n"},
 	{"30", "\\<foo>\n", "\\<foo>\n"},
 
 	{"29", "1. [X] foo\n", "1. [X] foo\n"},
