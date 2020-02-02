@@ -65,6 +65,10 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 
 // processEmphasis 处理强调、加粗以及删除线。
 func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
+	if nil == ctx.delimiters {
+		return
+	}
+
 	var opener, closer, oldCloser *delimiter
 	var openerInl, closerInl *Node
 	var tempStack *delimiter

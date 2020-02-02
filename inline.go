@@ -376,7 +376,7 @@ func (t *Tree) parseBackslash(block *Node, ctx *InlineContext) *Node {
 	return &Node{typ: NodeText, tokens: backslash}
 }
 
-func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
+func (t *Tree) parseText(ctx *InlineContext) *Node {
 	start := ctx.pos
 	for ; ctx.pos < ctx.tokensLen; ctx.pos++ {
 		if t.isMarker(ctx.tokens[ctx.pos]) {
@@ -384,9 +384,7 @@ func (t *Tree) parseText(ctx *InlineContext) (ret *Node) {
 			break
 		}
 	}
-
-	ret = &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos]}
-	return
+	return &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos]}
 }
 
 // isMarker 判断 token 是否是潜在的 Markdown 标记符。
