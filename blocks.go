@@ -221,7 +221,7 @@ var blockStarts = []blockStartFunc{
 			t.context.advanceOffset(1, false)
 
 			t.context.closeUnmatchedBlocks()
-			t.context.advanceOffset(len(label) + 2, true)
+			t.context.advanceOffset(len(label)+2, true)
 			footnotesDef := t.context.addChild(NodeFootnotesDef, t.context.nextNonspace)
 			footnotesDef.tokens = label
 			lowerCaseLabel := bytes.ToLower(label)

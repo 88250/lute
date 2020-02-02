@@ -321,7 +321,7 @@ func (n *Node) isMarker() bool {
 	return false
 }
 
-func (n *Node) parentIs(nodeType nodeType, nodeTypes... nodeType) bool {
+func (n *Node) parentIs(nodeType nodeType, nodeTypes ...nodeType) bool {
 	types := append(nodeTypes, nodeType)
 	for p := n.parent; nil != p; p = p.parent {
 		for _, pt := range types {
