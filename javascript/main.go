@@ -22,7 +22,10 @@ func New() *js.Object {
 }
 
 func main() {
-	js.Global.Set("Lute", make(map[string]interface{}))
+	Lute := map[string]interface{}{
+		"version": lute.Version,
+	}
+	js.Global.Set("Lute", Lute)
 	l := js.Global.Get("Lute")
 	l.Set("New", New)
 }
