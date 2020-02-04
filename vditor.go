@@ -645,7 +645,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			break
 		}
 		var codeTokens []byte
-		if zwsp == n.FirstChild.Data {
+		if zwsp == n.FirstChild.Data && "" == lute.domAttrValue(n, "style") {
 			codeTokens = []byte(n.FirstChild.NextSibling.FirstChild.Data)
 		} else if atom.Code == n.FirstChild.DataAtom {
 			codeTokens = []byte(n.FirstChild.FirstChild.Data)
