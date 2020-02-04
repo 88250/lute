@@ -540,13 +540,19 @@ func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus
 				lines = lines[:length-1]
 			}
 		}
+
+		length = len(lines)
 		for _, line := range lines {
 			if 0 == len(line) {
 				blockquoteLines.WriteString(">\n")
 				continue
 			}
 
-			blockquoteLines.WriteString("> ")
+			if itemGreater == line[0] {
+				blockquoteLines.WriteString(">")
+			} else {
+				blockquoteLines.WriteString("> ")
+			}
 			blockquoteLines.Write(line)
 			blockquoteLines.WriteByte(itemNewline)
 		}
@@ -660,9 +666,7 @@ func (r *FormatRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 }
 
 func (r *FormatRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
-	r.newline()
-	r.writeString("---")
-	r.newline()
+	r.writeString("---\n\n")
 	return WalkStop, nil
 }
 
