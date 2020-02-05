@@ -28,6 +28,11 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	{"36", "`foo`、`bar`\n", "`foo`、`bar`\n"},
+	{"35", "foo`bar`\n", "foo `bar`\n"},
+	{"34", "`bar`\n", "`bar`\n"},
+	{"33", "foo`bar`baz\n", "foo `bar` baz\n"},
+
 	// 格式化后丢失反斜杠 https://github.com/88250/lute/issues/16
 	{"32", "|foo|\n|-|\n|`\\|bar`|\n", "| foo     |\n| ------- |\n| `\\|bar` |\n"},
 	{"31", "|foo|\n|-|\n|\\|bar|\n", "| foo   |\n| ----- |\n| \\|bar |\n"},
@@ -94,7 +99,8 @@ func TestFormatCases(t *testing.T) {
 		t.Fatalf("read test dir failed: %s", err)
 	}
 
-	skips := "format-case0.md,format-case1.md,format-case2.md,format-case3.md,format-case4.md,format-case5.md" // 用于跳过测试文件，例如 format-case0.md
+	//skips := "format-case0.md,format-case1.md,format-case2.md,format-case3.md,format-case4.md,format-case5.md" // 用于跳过测试文件，例如 format-case0.md
+	skips := ""
 
 	for _, file := range files {
 		if !strings.HasPrefix(file.Name(), "format-case") || strings.Contains(file.Name(), "formatted") {

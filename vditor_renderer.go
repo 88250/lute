@@ -16,6 +16,8 @@ import (
 	"bytes"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 // VditorRenderer 描述了 Vditor DOM 渲染器。
@@ -455,6 +457,11 @@ func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 		previousNodeText = strings.ReplaceAll(previousNodeText, caret, "")
 		if "" == previousNodeText {
 			r.writeString(zwsp)
+		} else {
+			lastc, _ := utf8.DecodeLastRuneInString(previousNodeText)
+			if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
+				r.writeByte(itemSpace)
+			}
 		}
 	}
 	return WalkContinue, nil

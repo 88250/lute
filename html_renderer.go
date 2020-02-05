@@ -15,6 +15,8 @@ package lute
 import (
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 // HTMLRenderer 描述了 HTML 渲染器。
@@ -484,6 +486,25 @@ func (r *HTMLRenderer) renderText(node *Node, entering bool) (WalkStatus, error)
 }
 
 func (r *HTMLRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		if r.option.AutoSpace {
+			if text := node.PreviousNodeText(); "" != text {
+				lastc, _ := utf8.DecodeLastRuneInString(text)
+				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
+					r.writeByte(itemSpace)
+				}
+			}
+		}
+	} else {
+		if r.option.AutoSpace {
+			if text := node.NextNodeText(); "" != text {
+				firstc, _ := utf8.DecodeRuneInString(text)
+				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
+					r.writeByte(itemSpace)
+				}
+			}
+		}
+	}
 	return WalkContinue, nil
 }
 
