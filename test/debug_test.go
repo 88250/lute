@@ -20,6 +20,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"44", "~~foo~\n", "<p>~~foo~</p>\n"},
 	{"43", "1. [x]\n2. [x] foo\n", "<ol>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ol>\n"},
 	{"42", "* [x]\n* [x] foo\n", "<ul>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
 	{"41", "f</\n", "<p>f&lt;/</p>\n"},
