@@ -494,6 +494,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				if (nil == n.PrevSibling || caret == n.PrevSibling.Data) && (nil == n.NextSibling || caret == n.NextSibling.Data) {
 					return
 				}
+				if nil == n.NextSibling {
+					return // 删掉表格中结尾的 br
+				}
 
 				node.typ = NodeInlineHTML
 				node.tokens = []byte("<br />")
