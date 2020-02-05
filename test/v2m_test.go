@@ -40,7 +40,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"68", "<p data-block=\"0\">1<wbr><span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\" style=\"display:none\">&lt;br&gt;</code><span class=\"vditor-wysiwyg__preview\" data-render=\"false\"><br></span></span>2</p>", "1<br>2\n"},
 	{"67", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>1<br>2<wbr></td></tr></tbody></table>", "| col1     |\n| -------- |\n| 1<br />2 |\n"},
 	{"66", "<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td><wbr><br></td></tr></tbody></table>", "| col1 |\n| ---- |\n|      |\n"},
-	{"65", `<table><thead><tr><th align="center">col1</th></tr></thead><tbody><tr><td align="center">12</td></tr><tr><td align="center">34<wbr></td></tr></tbody></table>`, "| col1 |\n| ---- |\n| 12   |\n| 34   |\n"},
+	{"65", `<table><thead><tr><th align="center">col1</th></tr></thead><tbody><tr><td align="center">12</td></tr><tr><td align="center">34<wbr></td></tr></tbody></table>`, "| col1 |\n| :--: |\n|  12  |\n|  34  |\n"},
 	{"64", `<ul data-tight="true"><li data-marker="*"><p>a</p><ul data-tight="true"><li data-marker="*"><p>a1</p></li></ul></li><li data-marker="*"><p>b<wbr></p></li></ul>`, "* a\n  * a1\n* b\n"},
 	{"63", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li></ul><p>b<wbr>\n</p>", "* foo\n\nb\n"},
 	{"62", "<ul><li data-marker=\"*\"><p>foo\n</p></li></ul><p>b<wbr>\n</p>", "* foo\n\nb\n"},

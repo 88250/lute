@@ -293,6 +293,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *Tree) {
 		defer tree.context.parentTip(n)
 	case atom.Th, atom.Td:
 		node.typ = NodeTableCell
+		align := lute.domAttrValue(n, "align")
+		var tableAlign int
+		switch align {
+		case "left":
+			tableAlign = 1
+		case "center":
+			tableAlign = 2
+		case "right":
+			tableAlign = 3
+		default:
+			tableAlign = 0
+		}
+		node.tableCellAlign = tableAlign
 		tree.context.tip.AppendChild(node)
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
