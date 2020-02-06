@@ -463,6 +463,7 @@ func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 				r.writeByte(itemSpace)
 			}
 		}
+		r.tag("code", [][]string{{"marker", strings.Repeat("`", node.codeMarkerLen)}}, false)
 	}
 	return WalkContinue, nil
 }
@@ -472,16 +473,15 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 }
 
 func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
-	r.tag("code", nil, false)
 	tokens := bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
 	tokens = escapeHTML(tokens)
 	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
-	r.writeString("</code>")
 	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("</code>")
 	codeSpan := node.parent
 	if codeSpanParent := codeSpan.parent; nil != codeSpanParent && NodeLink == codeSpanParent.typ {
 		return WalkStop, nil

@@ -387,7 +387,11 @@ func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 	r.writeByte(itemBacktick)
 	if 1 < node.parent.codeMarkerLen {
 		r.writeByte(itemBacktick)
-		r.writeByte(itemSpace)
+		text := bytesToStr(node.next.tokens)
+		firstc, _ := utf8.DecodeRuneInString(text)
+		if '`' == firstc {
+			r.writeByte(itemSpace)
+		}
 	}
 	return WalkStop, nil
 }
@@ -399,7 +403,11 @@ func (r *FormatRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 
 func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	if 1 < node.parent.codeMarkerLen {
-		r.writeByte(itemSpace)
+		text := bytesToStr(node.previous.tokens)
+		lastc, _ := utf8.DecodeLastRuneInString(text)
+		if '`' == lastc {
+			r.writeByte(itemSpace)
+		}
 		r.writeByte(itemBacktick)
 	}
 	r.writeByte(itemBacktick)

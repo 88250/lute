@@ -28,6 +28,7 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	{"37", "``foo``、`bar`\n", "``foo``、`bar`\n"},
 	{"36", "`foo`、`bar`\n", "`foo`、`bar`\n"},
 	{"35", "foo`bar`\n", "foo `bar`\n"},
 	{"34", "`bar`\n", "`bar`\n"},
