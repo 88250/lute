@@ -121,9 +121,9 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			openerInl = opener.node
 			closerInl = closer.node
 
-			 if t.context.option.GFMStrikethrough && itemTilde == closercc && opener.num != closer.num {
-			 	break
-			 }
+			if t.context.option.GFMStrikethrough && itemTilde == closercc && opener.num != closer.num {
+				break
+			}
 
 			// remove used delimiters from stack elts and inlines
 			opener.num -= useDelims
