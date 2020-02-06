@@ -85,6 +85,7 @@ func newTerms() (ret map[string]string) {
 
 // terms 定义了术语字典，用于术语拼写修正。Key 必须是全小写的。
 var terms = map[string]string{
+	"flutter":       "Flutter",
 	"netty":         "Netty",
 	"jetty":         "Jetty",
 	"tomcat":        "Tomcat",
