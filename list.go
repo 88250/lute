@@ -21,7 +21,7 @@ import (
 type listData struct {
 	typ          int    // 0：无序列表，1：有序列表，3：任务列表
 	tight        bool   // 是否是紧凑模式
-	bulletChar   byte // 无序列表标识，* - 或者 +
+	bulletChar   byte   // 无序列表标识，* - 或者 +
 	start        int    // 有序列表起始序号
 	delimiter    byte   // 有序列表分隔符，. 或者 )
 	padding      int    // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
