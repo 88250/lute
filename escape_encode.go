@@ -13,9 +13,10 @@
 package lute
 
 import (
-	"github.com/88250/lute/html"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/88250/lute/html"
 )
 
 var (
