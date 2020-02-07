@@ -334,6 +334,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 						// 子有序列表必须从 1 开始
 						marker = "1."
 					}
+					if "1." != marker && atom.Ol == n.Parent.DataAtom && n.Parent.FirstChild == n {
+						marker = "1."
+					}
 				} else {
 					if "*" != marker && "-" != marker && "+" != marker {
 						marker = "*"
