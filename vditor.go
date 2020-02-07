@@ -393,7 +393,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		}
 		return
 	case atom.Em, atom.I:
-		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom || zwsp == n.FirstChild.Data {
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n.FirstChild))
@@ -435,7 +435,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
 	case atom.Strong, atom.B:
-		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom || zwsp == n.FirstChild.Data {
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n.FirstChild))
@@ -587,7 +587,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.parent.parent.parent.listData.typ = 3
 		}
 	case atom.Del, atom.S, atom.Strike:
-		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom || zwsp == n.FirstChild.Data {
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n.FirstChild))
@@ -839,7 +839,9 @@ func (lute *Lute) parentIs(n *html.Node, parentTypes ...atom.Atom) bool {
 
 func (lute *Lute) domText(n *html.Node) string {
 	buf := &bytes.Buffer{}
-	lute.domText0(n, buf)
+	for next := n; nil != next; next = next.NextSibling {
+		lute.domText0(n, buf)
+	}
 	return buf.String()
 }
 
