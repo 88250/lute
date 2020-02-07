@@ -22,6 +22,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"80", "<s><em>\u200b</em></s>", ""},
 	{"79", "<p data-block=\"0\"><b>&#8203;</b></p>", ""},
 	{"78", "<p data-block=\"0\">``foo``<wbr></p>", "<p data-block=\"0\">\u200b<code marker=\"``\">\u200bfoo</code>\u200b<wbr>\n</p>"},
 	{"77", `<p data-block="0">1<wbr><span style="background-color: var(--textarea-focus-background-color); color: var(--textarea-text-color);">​</span><span class="vditor-wysiwyg__block" data-type="math-inline" style="background-color: var(--textarea-focus-background-color); color: var(--textarea-text-color);"><code data-type="math-inline">foo</code><span class="vditor-wysiwyg__preview" data-render="false"><span class="vditor-math" data-math="foo"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.05724em;">f</span><span class="mord mathdefault" style="margin-right:0.05724em;">o</span><span class="mord mathdefault" style="margin-right:0.05724em;">o</span></span></span></span></span></span></span><span style="background-color: var(--textarea-focus-background-color); color: var(--textarea-text-color);">​</span></p>`, "<p data-block=\"0\">1<wbr><span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\">\u200bfoo</code></span>\u200b\n</p>"},

@@ -396,7 +396,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom || zwsp == n.FirstChild.Data {
 			return
 		}
-		if caret == strings.TrimSpace(lute.domText(n.FirstChild)) {
+		text := strings.TrimSpace(lute.domText(n.FirstChild))
+		if zwsp == text {
+			return
+		}
+		if caret == text {
 			node.tokens = []byte(caret)
 			tree.context.tip.AppendChild(node)
 			return
@@ -434,7 +438,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom || zwsp == n.FirstChild.Data {
 			return
 		}
-		if caret == strings.TrimSpace(lute.domText(n.FirstChild)) {
+		text := strings.TrimSpace(lute.domText(n.FirstChild))
+		if zwsp == text {
+			return
+		}
+		if caret == text {
 			node.tokens = []byte(caret)
 			tree.context.tip.AppendChild(node)
 			return
@@ -582,7 +590,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom || zwsp == n.FirstChild.Data {
 			return
 		}
-		if caret == strings.TrimSpace(lute.domText(n.FirstChild)) {
+		text := strings.TrimSpace(lute.domText(n.FirstChild))
+		if zwsp == text {
+			return
+		}
+		if caret == text {
 			node.tokens = []byte(caret)
 			tree.context.tip.AppendChild(node)
 			return
