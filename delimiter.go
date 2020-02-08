@@ -251,8 +251,14 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 
 	afterIsWhitespace := isUnicodeWhitespace(tokenAfter)
 	afterIsPunct := unicode.IsPunct(tokenAfter) || unicode.IsSymbol(tokenAfter)
+	if (itemAsterisk == token && '~' == tokenAfter) || (itemTilde == token && '*' == tokenAfter) {
+		afterIsPunct = false
+	}
 	beforeIsWhitespace := isUnicodeWhitespace(tokenBefore)
 	beforeIsPunct := unicode.IsPunct(tokenBefore) || unicode.IsSymbol(tokenBefore)
+	if (itemAsterisk == token && '~' == tokenBefore) || (itemTilde == token && '*' == tokenBefore) {
+		beforeIsPunct = false
+	}
 	if t.context.option.VditorWYSIWYG {
 		if caret == string(tokenBefore) {
 			beforeIsPunct = false

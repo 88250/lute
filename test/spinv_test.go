@@ -22,6 +22,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"86", "<p data-block=\"0\"><strong><s>foo</s></strong>bar<wbr></p>", "<p data-block=\"0\"><strong data-marker=\"**\"><s data-marker=\"~~\">foo</s></strong>bar<wbr>\n</p>"},
 	{"85", "<p data-block=\"0\"><span data-marker=\"**\"><b>foo </b><span>b<wbr></span></span>", "<p data-block=\"0\"><strong data-marker=\"**\">foo</strong> b<wbr>\n</p>"},
 	{"84", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1)\"><p>f<wbr></p></li></ol>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1)\">f<wbr></li></ol>"},
 	{"83", "<p data-block=\"0\">1) f<wbr></p>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1)\">f<wbr></li></ol>"},
