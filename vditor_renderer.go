@@ -604,10 +604,10 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		case 0:
 			attrs = append(attrs, []string{"data-marker", string(node.marker)})
 		case 1:
-			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + "."})
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + string(node.listData.delimiter)})
 		case 3:
 			if 0 == node.listData.bulletChar {
-				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + "."})
+				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.num) + string(node.listData.delimiter)})
 			} else {
 				attrs = append(attrs, []string{"data-marker", string(node.marker)})
 			}

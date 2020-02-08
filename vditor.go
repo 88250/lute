@@ -330,11 +330,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 					if "*" == marker || "-" == marker || "+" == marker {
 						marker = "1."
 					}
-					if "1." != marker && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
+					if "1." != marker && "1)" != marker && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
 						// 子有序列表必须从 1 开始
 						marker = "1."
 					}
-					if "1." != marker && atom.Ol == n.Parent.DataAtom && n.Parent.FirstChild == n {
+					if "1." != marker && "1)" != marker && atom.Ol == n.Parent.DataAtom && n.Parent.FirstChild == n {
 						marker = "1."
 					}
 				} else {
