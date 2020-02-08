@@ -94,6 +94,8 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.rendererFuncs[NodeFootnotesDef] = ret.renderFootnotesDef
+	ret.rendererFuncs[NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
 	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
 	return ret
@@ -107,6 +109,18 @@ func (r *FormatRenderer) renderBackslashContent(node *Node, entering bool) (Walk
 func (r *FormatRenderer) renderBackslash(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.writeByte(itemBackslash)
+	}
+	return WalkContinue, nil
+}
+
+func (r *FormatRenderer) renderFootnotesRef(node *Node, entering bool) (WalkStatus, error) {
+	r.writeString("[" + bytesToStr(node.tokens) + "]")
+	return WalkStop, nil
+}
+
+func (r *FormatRenderer) renderFootnotesDef(node *Node, entering bool) (WalkStatus, error) {
+	if entering {
+		r.writeString("[" + bytesToStr(node.tokens) + "]: ")
 	}
 	return WalkContinue, nil
 }

@@ -28,6 +28,9 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	{"40", "foo[^bar]\nfoo[^baz]\nfoo[^bar]: bar\n[^baz]: baz\n", "foo[^bar]\nfoo[^baz]\nfoo[^bar]: bar\n\n[^baz]: baz\n"},
+	{"39", "foo[^bar]\n[^bar]: bar\n", "foo[^bar]\n\n[^bar]: bar\n"},
+	{"38", "[^bar]: bar\n", "[^bar]: bar\n"},
 	{"37", "``foo``、`bar`\n", "``foo``、`bar`\n"},
 	{"36", "`foo`、`bar`\n", "`foo`、`bar`\n"},
 	{"35", "foo`bar`\n", "foo `bar`\n"},
