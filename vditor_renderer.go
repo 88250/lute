@@ -23,6 +23,7 @@ import (
 // VditorRenderer 描述了 Vditor DOM 渲染器。
 type VditorRenderer struct {
 	*BaseRenderer
+	needRenderFootnotesDef bool
 }
 
 // newVditorRenderer 创建一个 HTML 渲染器。
@@ -94,6 +95,8 @@ func (lute *Lute) newVditorRenderer(tree *Tree) *VditorRenderer {
 	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
 	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.rendererFuncs[NodeFootnotesDef] = ret.renderFootnotesDef
+	ret.rendererFuncs[NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
 	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
 	return ret
@@ -114,6 +117,55 @@ func (r *VditorRenderer) renderBackslash(node *Node, entering bool) (WalkStatus,
 		r.writeString("</span>")
 	}
 	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderFootnotesDef(node *Node, entering bool) (WalkStatus, error) {
+	if !r.needRenderFootnotesDef {
+		return WalkStop, nil
+	}
+	return WalkContinue, nil
+}
+
+func (r *VditorRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte {
+	r.writeString("<div class=\"footnotes-defs-div\">")
+	r.writeString("<hr class=\"footnotes-defs-hr\" />\n")
+	r.writeString("<ol class=\"footnotes-defs-ol\">")
+	for i, def := range context.footnotesDefs {
+		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
+		tree := &Tree{Name: "", context: &Context{option: lute.options}}
+		tree.context.tree = tree
+		tree.Root = &Node{typ: NodeDocument}
+		tree.Root.AppendChild(def)
+		defRenderer := lute.newVditorRenderer(tree)
+		lc := tree.Root.lastDeepestChild()
+		for i = len(def.footnotesRefs) - 1; 0 <= i; i-- {
+			ref := def.footnotesRefs[i]
+			gotoRef := " <a href=\"#footnotes-ref-" + ref.footnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
+			link := &Node{typ: NodeInlineHTML, tokens: strToBytes(gotoRef)}
+			lc.InsertAfter(link)
+		}
+		defRenderer.needRenderFootnotesDef = true
+		defContent, err := defRenderer.Render()
+		if nil != err {
+			break
+		}
+		r.write(defContent)
+
+		r.writeString("</li>\n")
+	}
+	r.writeString("</ol></div>")
+	return r.writer.Bytes()
+}
+
+func (r *VditorRenderer) renderFootnotesRef(node *Node, entering bool) (WalkStatus, error) {
+	idx, _ := r.tree.context.findFootnotesDef(node.tokens)
+	idxStr := strconv.Itoa(idx)
+	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.footnotesRefId}}, false)
+	r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
+	r.writeString(idxStr)
+	r.tag("/a", nil, false)
+	r.tag("/sup", nil, false)
+	return WalkStop, nil
 }
 
 func (r *VditorRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
