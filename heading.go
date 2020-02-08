@@ -91,7 +91,6 @@ func (t *Tree) parseSetextHeading() (level int) {
 		}
 	}
 
-	markers := 0
 	length := len(ln)
 	for ; start < length; start++ {
 		token := ln[start]
@@ -106,7 +105,6 @@ func (t *Tree) parseSetextHeading() (level int) {
 		} else {
 			marker = token
 		}
-		markers++
 	}
 
 	level = 1
