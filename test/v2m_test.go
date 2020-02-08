@@ -22,6 +22,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"86", "<strong><em></em>foo</strong>", "**foo**\n"},
 	{"85", "<p data-block=\"0\">foo<strong>\u200b</strong></p><span>\u200b</span>", "foo\n"},
 	{"84", `<table data-block="0"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>foo<wbr><br></td></tr></tbody></table>`, "| col1 |\n| ---- |\n| foo  |\n"},
 	{"83", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p>foo</p><p data-block=\"0\">b<wbr></p></li></ul>", "* foo\n\n  b\n"},
