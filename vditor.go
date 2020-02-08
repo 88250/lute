@@ -432,8 +432,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
-		// 删掉前后空格，否则输入空格后会形成 *foo * 导致自旋失败
-		n.FirstChild.Data = strings.TrimSpace(n.FirstChild.Data)
+		// 结尾空格后会形成 *foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符后 *foo*
+		if strings.HasSuffix(n.FirstChild.Data, " ") {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
 
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -474,7 +477,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
-		n.FirstChild.Data = strings.TrimSpace(n.FirstChild.Data)
+		if strings.HasSuffix(n.FirstChild.Data, " ") {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
 
 		tree.context.tip = node
 		defer tree.context.parentTip(n)
@@ -623,7 +629,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
-		n.FirstChild.Data = strings.TrimSpace(n.FirstChild.Data)
+		if strings.HasSuffix(n.FirstChild.Data, " ") {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
 
 		tree.context.tip = node
 		defer tree.context.parentTip(n)

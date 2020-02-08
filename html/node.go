@@ -46,6 +46,38 @@ type Node struct {
 	Attr      []Attribute
 }
 
+// Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
+func (n *Node) Unlink() {
+	if nil != n.PrevSibling {
+		n.PrevSibling.NextSibling = n.NextSibling
+	} else if nil != n.Parent {
+		n.Parent.FirstChild = n.NextSibling
+	}
+	if nil != n.NextSibling {
+		n.NextSibling.PrevSibling = n.PrevSibling
+	} else if nil != n.Parent {
+		n.Parent.LastChild = n.PrevSibling
+	}
+	n.Parent = nil
+	n.NextSibling = nil
+	n.PrevSibling = nil
+}
+
+// InsertAfter 在当前节点后插入一个兄弟节点。
+func (n *Node) InsertAfter(sibling *Node) {
+	sibling.Unlink()
+	sibling.NextSibling = n.NextSibling
+	if nil != sibling.NextSibling {
+		sibling.NextSibling.PrevSibling = sibling
+	}
+	sibling.PrevSibling = n
+	n.NextSibling = sibling
+	sibling.Parent = n.Parent
+	if nil == sibling.NextSibling {
+		sibling.Parent.LastChild = sibling
+	}
+}
+
 // InsertBefore inserts newChild as a child of n, immediately before oldChild
 // in the sequence of n's children. oldChild may be nil, in which case newChild
 // is appended to the end of n's children.
