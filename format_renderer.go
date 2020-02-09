@@ -679,7 +679,7 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 
 		listItemBuf := bytes.Buffer{}
 		if 1 == node.listData.typ || (3 == node.listData.typ && 0 == node.listData.bulletChar) {
-			listItemBuf.WriteString(strconv.Itoa(node.num) + ".")
+			listItemBuf.WriteString(strconv.Itoa(node.num) + string(node.listData.delimiter))
 		} else {
 			listItemBuf.Write(node.marker)
 		}
