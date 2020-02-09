@@ -348,6 +348,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.listData = &listData{marker: []byte(marker), bulletChar: bullet}
 		if 0 == bullet {
 			node.listData.num, _ = strconv.Atoi(string(marker[0]))
+			node.listData.delimiter = marker[len(marker)-1]
 		}
 
 		tree.context.tip.AppendChild(node)
@@ -432,7 +433,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
-		// 结尾空格后会形成 *foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符后 *foo*
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, zwsp, "")
+
+		// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
+		if strings.HasPrefix(n.FirstChild.Data, " ") {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&Node{typ: NodeText, tokens: []byte(" ")})
+		}
 		if strings.HasSuffix(n.FirstChild.Data, " ") {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
@@ -477,6 +484,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, zwsp, "")
+		if strings.HasPrefix(n.FirstChild.Data, " ") {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&Node{typ: NodeText, tokens: []byte(" ")})
+		}
 		if strings.HasSuffix(n.FirstChild.Data, " ") {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
@@ -518,6 +530,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, zwsp, "")
+
+		if strings.HasPrefix(n.FirstChild.Data, " ") {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&Node{typ: NodeText, tokens: []byte(" ")})
+		}
 		if strings.HasSuffix(n.FirstChild.Data, " ") {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})

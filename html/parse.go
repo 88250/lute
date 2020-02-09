@@ -280,7 +280,7 @@ func (p *parser) fosterParent(n *Node) {
 		return
 	}
 
-	parent.InsertBefore(n, table)
+	parent.InsertChildBefore(n, table)
 }
 
 // addText adds text to the preceding node if it is a text node, or else it

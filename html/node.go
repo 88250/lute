@@ -63,6 +63,21 @@ func (n *Node) Unlink() {
 	n.PrevSibling = nil
 }
 
+// InsertBefore 在当前节点前插入一个兄弟节点。
+func (n *Node) InsertBefore(sibling *Node) {
+	sibling.Unlink()
+	sibling.PrevSibling = n.PrevSibling
+	if nil != sibling.PrevSibling {
+		sibling.PrevSibling.NextSibling = sibling
+	}
+	sibling.NextSibling = n
+	n.PrevSibling = sibling
+	sibling.Parent = n.Parent
+	if nil == sibling.PrevSibling {
+		sibling.Parent.FirstChild = sibling
+	}
+}
+
 // InsertAfter 在当前节点后插入一个兄弟节点。
 func (n *Node) InsertAfter(sibling *Node) {
 	sibling.Unlink()
@@ -78,14 +93,14 @@ func (n *Node) InsertAfter(sibling *Node) {
 	}
 }
 
-// InsertBefore inserts newChild as a child of n, immediately before oldChild
+// InsertChildBefore inserts newChild as a child of n, immediately before oldChild
 // in the sequence of n's children. oldChild may be nil, in which case newChild
 // is appended to the end of n's children.
 //
 // It will panic if newChild already has a parent or siblings.
-func (n *Node) InsertBefore(newChild, oldChild *Node) {
+func (n *Node) InsertChildBefore(newChild, oldChild *Node) {
 	if newChild.Parent != nil || newChild.PrevSibling != nil || newChild.NextSibling != nil {
-		panic("html: InsertBefore called for an attached child Node")
+		panic("html: InsertChildBefore called for an attached child Node")
 	}
 	var prev, next *Node
 	if oldChild != nil {
