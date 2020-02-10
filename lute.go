@@ -274,7 +274,7 @@ func (lute *Lute) SetFixTermTypo(b bool) {
 	lute.FixTermTypo = b
 }
 
-func (lute *Lute) SetPunct(b bool) {
+func (lute *Lute) SetChinesePunct(b bool) {
 	lute.ChinesePunct = b
 }
 
