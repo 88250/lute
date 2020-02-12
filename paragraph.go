@@ -40,7 +40,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 
 	if context.option.GFMTaskListItem {
 		// 尝试解析任务列表项
-		if listItem := p.parent; nil != listItem && NodeListItem == listItem.typ {
+		if listItem := p.parent; nil != listItem && NodeListItem == listItem.typ && listItem.firstChild == p {
 			if 3 == listItem.listData.typ {
 				isTaskListItem := false
 				if !context.option.VditorWYSIWYG {

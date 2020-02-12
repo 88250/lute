@@ -22,6 +22,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"87", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> foo</p><ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> bar</p></li></ul><p data-block="0">b<wbr></p></li></ul>`, "<ul data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><p data-block=\"0\"><input type=\"checkbox\" /> foo\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> bar</li></ul><p data-block=\"0\">b<wbr>\n</p></li></ul>"},
 	{"86", "<p data-block=\"0\"><strong><s>foo</s></strong>bar<wbr></p>", "<p data-block=\"0\"><strong data-marker=\"**\"><s data-marker=\"~~\">foo</s></strong>bar<wbr>\n</p>"},
 	{"85", "<p data-block=\"0\"><span data-marker=\"**\"><b>foo </b><span>b<wbr></span></span>", "<p data-block=\"0\"><strong data-marker=\"**\">foo</strong> b<wbr>\n</p>"},
 	{"84", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1)\"><p>f<wbr></p></li></ol>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1)\">f<wbr></li></ol>"},
