@@ -30,7 +30,7 @@ func space0(text string) (ret string) {
 	var r rune
 	for i := 0; i < length; {
 		r = runes[i]
-		if i < length-3 && 'i' == runes[i+1] && 'n' == runes[i+2] && 'g' == runes[i+3] {
+		if i < length-3 && 'i' == runes[i+1] && 'n' == runes[i+2] && 'g' == runes[i+3] && unicode.Is(unicode.Han, runes[i]) {
 			// ing 前不需要空格，如 打码ing https://github.com/88250/lute/issues/9
 			ret += string(r) + "ing"
 			i += 4

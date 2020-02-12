@@ -20,6 +20,7 @@ import (
 
 var spaceTests = []parseTest{
 
+	{"19", "测试ping空格", "<p>测试 ping 空格</p>\n"},
 	{"18", "foo❤️bar", "<p>foo❤️bar</p>\n"},
 
 	// ing 前不需要空格，如 打码ing https://github.com/88250/lute/issues/9
