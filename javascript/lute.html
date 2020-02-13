@@ -8,7 +8,7 @@
 <script src="lute.min.js"></script>
 <script>
     // 支持覆写渲染器 https://github.com/88250/lute/issues/5
-    let formatRenderer = {
+    let HTML2MdRenderer = {
         renderImage: function (node, entering) {
             console.log('重写 Image 节点', node, entering)
             return Lute.WalkContinue;
@@ -20,7 +20,7 @@
     };
     let luteEngine = Lute.New({
         "renderers": {
-            "format": formatRenderer,
+            "HTML2Md": HTML2MdRenderer,
         }
     });
 

@@ -42,7 +42,7 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 	delim := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
-	node := &Node{Typ: NodeText, tokens: text}
+	node := &Node{Typ: NodeText, Tokens: text}
 	block.AppendChild(node)
 
 	// 将这个分隔符入栈
@@ -129,16 +129,16 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			opener.num -= useDelims
 			closer.num -= useDelims
 
-			openerTokens := openerInl.tokens[len(openerInl.tokens)-useDelims:]
-			text := openerInl.tokens[0 : len(openerInl.tokens)-useDelims]
-			openerInl.tokens = text
-			closerTokens := closerInl.tokens[len(closerInl.tokens)-useDelims:]
-			text = closerInl.tokens[0 : len(closerInl.tokens)-useDelims]
-			closerInl.tokens = text
+			openerTokens := openerInl.Tokens[len(openerInl.Tokens)-useDelims:]
+			text := openerInl.Tokens[0 : len(openerInl.Tokens)-useDelims]
+			openerInl.Tokens = text
+			closerTokens := closerInl.Tokens[len(closerInl.Tokens)-useDelims:]
+			text = closerInl.Tokens[0 : len(closerInl.Tokens)-useDelims]
+			closerInl.Tokens = text
 
-			openMarker := &Node{tokens: openerTokens, close: true}
+			openMarker := &Node{Tokens: openerTokens, close: true}
 			emStrongDel := &Node{close: true}
-			closeMarker := &Node{tokens: closerTokens, close: true}
+			closeMarker := &Node{Tokens: closerTokens, close: true}
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
 					emStrongDel.Typ = NodeEmphasis
@@ -173,9 +173,9 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				}
 			}
 
-			tmp := openerInl.next
+			tmp := openerInl.Next
 			for nil != tmp && tmp != closerInl {
-				next := tmp.next
+				next := tmp.Next
 				tmp.Unlink()
 				emStrongDel.AppendChild(tmp)
 				tmp = next

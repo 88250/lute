@@ -182,7 +182,7 @@ func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) (WalkSt
 
 func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		text := bytesToStr(node.tokens)
+		text := bytesToStr(node.Tokens)
 		var i int
 		summary := ""
 		for _, r := range text {
@@ -348,19 +348,19 @@ func (r *EChartsJSONRenderer) openObj() {
 
 func (r *EChartsJSONRenderer) closeObj(node *Node) {
 	r.writeByte('}')
-	if !r.ignore(node.next) {
+	if !r.ignore(node.Next) {
 		r.comma()
 	}
 }
 
 func (r *EChartsJSONRenderer) openChildren(node *Node) {
-	if nil != node.firstChild {
+	if nil != node.FirstChild {
 		r.writeString(",\"children\":[")
 	}
 }
 
 func (r *EChartsJSONRenderer) closeChildren(node *Node) {
-	if nil != node.firstChild {
+	if nil != node.FirstChild {
 		r.writeByte(']')
 	}
 }

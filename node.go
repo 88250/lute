@@ -20,17 +20,19 @@ type Node struct {
 
 	// 节点基础结构
 
-	Typ             NodeType // 节点类型
-	parent          *Node    // 父节点
-	previous        *Node    // 前一个兄弟节点
-	next            *Node    // 后一个兄弟节点
-	firstChild      *Node    // 第一个子节点
-	lastChild       *Node    // 最后一个子节点
-	rawText         string   // 原始内容
-	tokens          []byte   // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
-	close           bool     // 标识是否关闭
-	lastLineBlank   bool     // 标识最后一行是否是空行
-	lastLineChecked bool     // 标识最后一行是否检查过
+	Typ        NodeType // 节点类型
+	Parent     *Node    // 父节点
+	Previous   *Node    // 前一个兄弟节点
+	Next       *Node    // 后一个兄弟节点
+	FirstChild *Node    // 第一个子节点
+	LastChild  *Node    // 最后一个子节点
+	Tokens     []byte   // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
+
+	// 解析过程标识
+
+	close           bool // 标识是否关闭
+	lastLineBlank   bool // 标识最后一行是否是空行
+	lastLineChecked bool // 标识最后一行是否检查过
 
 	// 代码
 
@@ -86,23 +88,23 @@ type Node struct {
 
 // lastDeepestChild 返回 n 的最后一个最深子节点。
 func (n *Node) lastDeepestChild() (ret *Node) {
-	if nil == n.lastChild {
+	if nil == n.LastChild {
 		return n
 	}
-	return n.lastChild.lastDeepestChild()
+	return n.LastChild.lastDeepestChild()
 }
 
 // firstDeepestChild 返回 n 的第一个最深的子节点。
 func (n *Node) firstDeepestChild() (ret *Node) {
-	if nil == n.firstChild {
+	if nil == n.FirstChild {
 		return n
 	}
-	return n.firstChild.firstDeepestChild()
+	return n.FirstChild.firstDeepestChild()
 }
 
 // LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。
 func (n *Node) ChildByType(childType NodeType) *Node {
-	for c := n.firstChild; nil != c; c = c.next {
+	for c := n.FirstChild; nil != c; c = c.Next {
 		if c.Typ == childType {
 			return c
 		}
@@ -114,7 +116,7 @@ func (n *Node) ChildByType(childType NodeType) *Node {
 func (n *Node) Text() (ret string) {
 	Walk(n, func(n *Node, entering bool) (status WalkStatus, e error) {
 		if (NodeText == n.Typ || NodeLinkText == n.Typ) && entering {
-			ret += bytesToStr(n.tokens)
+			ret += bytesToStr(n.Tokens)
 		}
 		return WalkContinue, nil
 	})
@@ -122,17 +124,17 @@ func (n *Node) Text() (ret string) {
 }
 
 func (n *Node) NextNodeText() string {
-	if nil == n.next {
+	if nil == n.Next {
 		return ""
 	}
-	return n.next.Text()
+	return n.Next.Text()
 }
 
 func (n *Node) PreviousNodeText() string {
-	if nil == n.previous {
+	if nil == n.Previous {
 		return ""
 	}
-	return n.previous.Text()
+	return n.Previous.Text()
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
@@ -202,96 +204,81 @@ func (n *Node) CanContain(nodeType NodeType) bool {
 
 // Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
 func (n *Node) Unlink() {
-	if nil != n.previous {
-		n.previous.next = n.next
-	} else if nil != n.parent {
-		n.parent.firstChild = n.next
+	if nil != n.Previous {
+		n.Previous.Next = n.Next
+	} else if nil != n.Parent {
+		n.Parent.FirstChild = n.Next
 	}
-	if nil != n.next {
-		n.next.previous = n.previous
-	} else if nil != n.parent {
-		n.parent.lastChild = n.previous
+	if nil != n.Next {
+		n.Next.Previous = n.Previous
+	} else if nil != n.Parent {
+		n.Parent.LastChild = n.Previous
 	}
-	n.parent = nil
-	n.next = nil
-	n.previous = nil
-}
-
-// RawText 返回原始内容。
-func (n *Node) RawText() string {
-	return n.rawText
-}
-
-// SetRawText 设置原始内容。
-func (n *Node) SetRawText(rawText string) {
-	n.rawText = rawText
-}
-
-// AppendRawText 添加原始内容。
-func (n *Node) AppendRawText(rawText string) {
-	n.rawText += rawText
+	n.Parent = nil
+	n.Next = nil
+	n.Previous = nil
 }
 
 // AppendTokens 添加 tokens。
 func (n *Node) AppendTokens(tokens []byte) {
-	n.tokens = append(n.tokens, tokens...)
+	n.Tokens = append(n.Tokens, tokens...)
 }
 
 // InsertAfter 在当前节点后插入一个兄弟节点。
 func (n *Node) InsertAfter(sibling *Node) {
 	sibling.Unlink()
-	sibling.next = n.next
-	if nil != sibling.next {
-		sibling.next.previous = sibling
+	sibling.Next = n.Next
+	if nil != sibling.Next {
+		sibling.Next.Previous = sibling
 	}
-	sibling.previous = n
-	n.next = sibling
-	sibling.parent = n.parent
-	if nil == sibling.next {
-		sibling.parent.lastChild = sibling
+	sibling.Previous = n
+	n.Next = sibling
+	sibling.Parent = n.Parent
+	if nil == sibling.Next {
+		sibling.Parent.LastChild = sibling
 	}
 }
 
 // InsertBefore 在当前节点前插入一个兄弟节点。
 func (n *Node) InsertBefore(sibling *Node) {
 	sibling.Unlink()
-	sibling.previous = n.previous
-	if nil != sibling.previous {
-		sibling.previous.next = sibling
+	sibling.Previous = n.Previous
+	if nil != sibling.Previous {
+		sibling.Previous.Next = sibling
 	}
-	sibling.next = n
-	n.previous = sibling
-	sibling.parent = n.parent
-	if nil == sibling.previous {
-		sibling.parent.firstChild = sibling
+	sibling.Next = n
+	n.Previous = sibling
+	sibling.Parent = n.Parent
+	if nil == sibling.Previous {
+		sibling.Parent.FirstChild = sibling
 	}
 }
 
 // AppendChild 在 n 的子节点最后再添加一个子节点。
 func (n *Node) AppendChild(child *Node) {
 	child.Unlink()
-	child.parent = n
-	if nil != n.lastChild {
-		n.lastChild.next = child
-		child.previous = n.lastChild
-		n.lastChild = child
+	child.Parent = n
+	if nil != n.LastChild {
+		n.LastChild.Next = child
+		child.Previous = n.LastChild
+		n.LastChild = child
 	} else {
-		n.firstChild = child
-		n.lastChild = child
+		n.FirstChild = child
+		n.LastChild = child
 	}
 }
 
 // PrependChild 在 n 的子节点最前添加一个子节点。
 func (n *Node) PrependChild(child *Node) {
 	child.Unlink()
-	child.parent = n
-	if nil != n.firstChild {
-		n.firstChild.previous = child
-		child.next = n.firstChild
-		n.firstChild = child
+	child.Parent = n
+	if nil != n.FirstChild {
+		n.FirstChild.Previous = child
+		child.Next = n.FirstChild
+		n.FirstChild = child
 	} else {
-		n.firstChild = child
-		n.lastChild = child
+		n.FirstChild = child
+		n.LastChild = child
 	}
 }
 
@@ -321,7 +308,7 @@ func (n *Node) isMarker() bool {
 
 func (n *Node) parentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 	types := append(nodeTypes, nodeType)
-	for p := n.parent; nil != p; p = p.parent {
+	for p := n.Parent; nil != p; p = p.Parent {
 		for _, pt := range types {
 			if pt == p.Typ {
 				return true

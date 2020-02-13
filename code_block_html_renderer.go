@@ -33,7 +33,7 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 		// 缩进代码块处理
 		r.newline()
 		rendered := false
-		tokens := node.firstChild.tokens
+		tokens := node.FirstChild.Tokens
 		if r.option.CodeSyntaxHighlight {
 			rendered = highlightChroma(tokens, "", r)
 			if !rendered {
@@ -56,9 +56,9 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 // renderCodeBlockCode 进行代码块 HTML 渲染，实现语法高亮。
 func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		tokens := node.tokens
-		if 0 < len(node.previous.codeBlockInfo) {
-			infoWords := split(node.previous.codeBlockInfo, itemSpace)
+		tokens := node.Tokens
+		if 0 < len(node.Previous.codeBlockInfo) {
+			infoWords := split(node.Previous.codeBlockInfo, itemSpace)
 			language := bytesToStr(infoWords[0])
 			rendered := false
 			if isGo(language) {

@@ -113,7 +113,7 @@ func (t *Tree) parseSetextHeading() (level int) {
 	}
 
 	if t.context.option.VditorWYSIWYG && caretInLn {
-		t.context.oldtip.tokens = trimWhitespace(t.context.oldtip.tokens)
+		t.context.oldtip.Tokens = trimWhitespace(t.context.oldtip.Tokens)
 		t.context.oldtip.AppendTokens([]byte(caret))
 	}
 

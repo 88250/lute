@@ -22,7 +22,7 @@ func (html *Node) htmlBlockContinue(context *Context) int {
 }
 
 func (html *Node) htmlBlockFinalize(context *Context) {
-	_, html.tokens = trimRight(replaceNewlineSpace(html.tokens))
+	_, html.Tokens = trimRight(replaceNewlineSpace(html.Tokens))
 }
 
 var (

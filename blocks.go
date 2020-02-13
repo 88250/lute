@@ -54,8 +54,8 @@ func (t *Tree) incorporateLine(line []byte) {
 	allMatched := true
 	var container *Node
 	container = t.Root
-	lastChild := container.lastChild
-	for ; nil != lastChild && !lastChild.close; lastChild = container.lastChild {
+	lastChild := container.LastChild
+	for ; nil != lastChild && !lastChild.close; lastChild = container.LastChild {
 		container = lastChild
 		t.context.findNextNonspace()
 
@@ -70,7 +70,7 @@ func (t *Tree) incorporateLine(line []byte) {
 		}
 
 		if !allMatched {
-			container = container.parent // 回到上一个匹配的块
+			container = container.Parent // 回到上一个匹配的块
 			break
 		}
 	}
@@ -133,8 +133,8 @@ func (t *Tree) incorporateLine(line []byte) {
 		// 最终化未匹配的块
 		t.context.closeUnmatchedBlocks()
 
-		if t.context.blank && nil != container.lastChild {
-			container.lastChild.lastLineBlank = true
+		if t.context.blank && nil != container.LastChild {
+			container.LastChild.lastLineBlank = true
 		}
 
 		typ := container.Typ
@@ -146,10 +146,10 @@ func (t *Tree) incorporateLine(line []byte) {
 				typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
 				(typ == NodeMathBlock) || // 数学公式块不计入空行判断
-				(typ == NodeListItem && nil == container.firstChild)) // 内容为空的列表项也不计入空行判断
+				(typ == NodeListItem && nil == container.FirstChild)) // 内容为空的列表项也不计入空行判断
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 lastLineBlank
 		// lastLineBlank 目前仅在判断列表紧凑模式上使用
-		for cont := container; nil != cont; cont = cont.parent {
+		for cont := container; nil != cont; cont = cont.Parent {
 			cont.lastLineBlank = lastLineBlank
 		}
 
@@ -223,7 +223,7 @@ var blockStarts = []blockStartFunc{
 			t.context.closeUnmatchedBlocks()
 			t.context.advanceOffset(len(label)+2, true)
 			footnotesDef := t.context.addChild(NodeFootnotesDef, t.context.nextNonspace)
-			footnotesDef.tokens = label
+			footnotesDef.Tokens = label
 			lowerCaseLabel := bytes.ToLower(label)
 			if _, def := t.context.findFootnotesDef(lowerCaseLabel); nil == def {
 				t.context.footnotesDefs = append(t.context.footnotesDefs, footnotesDef)
@@ -274,8 +274,8 @@ var blockStarts = []blockStartFunc{
 				t.context.closeUnmatchedBlocks()
 				heading := t.context.addChild(NodeHeading, t.context.nextNonspace)
 				heading.headingLevel = level
-				heading.tokens = content
-				crosshatchMarker := &Node{Typ: NodeHeadingC8hMarker, tokens: markers}
+				heading.Tokens = content
+				crosshatchMarker := &Node{Typ: NodeHeadingC8hMarker, Tokens: markers}
 				heading.AppendChild(crosshatchMarker)
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
@@ -322,29 +322,29 @@ var blockStarts = []blockStartFunc{
 						// 将该段落节点转成表节点
 						container.Typ = NodeTable
 						container.tableAligns = table.tableAligns
-						for tr := table.firstChild; nil != tr; {
-							nextTr := tr.next
+						for tr := table.FirstChild; nil != tr; {
+							nextTr := tr.Next
 							container.AppendChild(tr)
 							tr = nextTr
 						}
-						container.tokens = nil
+						container.Tokens = nil
 						return 0
 					}
 				}
 
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
-				for tokens := container.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.tokens {
+				for tokens := container.Tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.Tokens {
 					if remains := t.context.parseLinkRefDef(tokens); nil != remains {
-						container.tokens = remains
+						container.Tokens = remains
 					} else {
 						break
 					}
 				}
 
-				if value := container.tokens; 0 < len(value) {
+				if value := container.Tokens; 0 < len(value) {
 					child := &Node{Typ: NodeHeading, headingLevel: level}
-					child.tokens = trimWhitespace(value)
+					child.Tokens = trimWhitespace(value)
 					container.InsertAfter(child)
 					container.Unlink()
 					t.context.tip = child
@@ -376,7 +376,7 @@ var blockStarts = []blockStartFunc{
 			if ok, markers := t.parseThematicBreak(); ok {
 				t.context.closeUnmatchedBlocks()
 				thematicBreak := t.context.addChild(NodeThematicBreak, t.context.nextNonspace)
-				thematicBreak.tokens = markers
+				thematicBreak.Tokens = markers
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
 			}
@@ -401,10 +401,10 @@ var blockStarts = []blockStartFunc{
 			}
 			listItem := t.context.addChild(NodeListItem, t.context.nextNonspace)
 			listItem.listData = data
-			listItem.tokens = data.marker
+			listItem.Tokens = data.marker
 			if 1 == listItem.listData.typ || (3 == listItem.listData.typ && 0 == listItem.listData.bulletChar) {
 				// 修正有序列表项序号
-				prev := listItem.previous
+				prev := listItem.Previous
 				if nil != prev {
 					listItem.num = prev.num + 1
 				} else {

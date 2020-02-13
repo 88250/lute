@@ -77,7 +77,7 @@ func (r *BaseRenderer) RendererFuncs(nodeType NodeType) RendererFunc {
 }
 
 func (r *BaseRenderer) renderDefault(n *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, errors.New("not found render function for node [type=" + n.Typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
+	return WalkStop, errors.New("not found render function for node [type=" + n.Typ.String() + ", tokens=" + bytesToStr(n.Tokens) + "]")
 }
 
 // writeByte 输出一个字节 c。

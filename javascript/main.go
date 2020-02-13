@@ -33,12 +33,10 @@ func registerRenderers(engine *lute.Lute, options map[string]map[string]*js.Obje
 		}
 
 		var rendererFuncs map[lute.NodeType]lute.RendererFunc
-		if "format" == rendererType {
-			rendererFuncs = engine.FormatRendererFuncs
-		} else if "vditor" == rendererType {
-			rendererFuncs = engine.VditorRendererFuncs
-		} else if "html" == rendererType {
-			rendererFuncs = engine.HTMLRendererFuncs
+		if "HTML2Md" == rendererType {
+			rendererFuncs = engine.HTML2MdRendererFuncs
+		} else if "HTML2VditorDOM" == rendererType {
+			rendererFuncs = engine.HTML2VditorDOMRendererFuncs
 		} else {
 			continue
 		}

@@ -24,27 +24,27 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	backticks := ctx.tokens[startPos : startPos+n]
 	if ctx.tokensLen <= startPos+n {
 		ctx.pos += n
-		ret = &Node{Typ: NodeText, tokens: backticks}
+		ret = &Node{Typ: NodeText, Tokens: backticks}
 		return
 	}
-	openMarker := &Node{Typ: NodeCodeSpanOpenMarker, tokens: backticks}
+	openMarker := &Node{Typ: NodeCodeSpanOpenMarker, Tokens: backticks}
 
 	endPos := t.matchCodeSpanEnd(ctx.tokens[startPos+n:], n)
 	if 1 > endPos {
 		ctx.pos += n
-		ret = &Node{Typ: NodeText, tokens: backticks}
+		ret = &Node{Typ: NodeText, Tokens: backticks}
 		return
 	}
 	endPos = startPos + endPos + n
-	closeMarker := &Node{Typ: NodeCodeSpanCloseMarker, tokens: ctx.tokens[endPos : endPos+n]}
+	closeMarker := &Node{Typ: NodeCodeSpanCloseMarker, Tokens: ctx.tokens[endPos : endPos+n]}
 
 	textTokens := ctx.tokens[startPos+n : endPos]
 	if !t.context.option.VditorWYSIWYG {
 		textTokens = replaceAll(textTokens, itemNewline, itemSpace)
 		if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !isBlankLine(textTokens) {
 			// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
-			openMarker.tokens = append(openMarker.tokens, textTokens[0])
-			closeMarker.tokens = ctx.tokens[endPos-1 : endPos+n]
+			openMarker.Tokens = append(openMarker.Tokens, textTokens[0])
+			closeMarker.Tokens = ctx.tokens[endPos-1 : endPos+n]
 			textTokens = textTokens[1:]
 			textTokens = textTokens[:len(textTokens)-1]
 		}
@@ -52,7 +52,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 
 	ret = &Node{Typ: NodeCodeSpan, codeMarkerLen: n}
 	ret.AppendChild(openMarker)
-	ret.AppendChild(&Node{Typ: NodeCodeSpanContent, tokens: textTokens})
+	ret.AppendChild(&Node{Typ: NodeCodeSpanContent, Tokens: textTokens})
 	ret.AppendChild(closeMarker)
 	ctx.pos = endPos + n
 	return

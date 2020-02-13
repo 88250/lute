@@ -22,44 +22,44 @@ func (p *Node) paragraphContinue(context *Context) int {
 }
 
 func (p *Node) paragraphFinalize(context *Context) {
-	p.tokens = trimWhitespace(p.tokens)
+	p.Tokens = trimWhitespace(p.Tokens)
 
 	// 尝试解析链接引用定义
 	hasReferenceDefs := false
-	for tokens := p.tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = p.tokens {
+	for tokens := p.Tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = p.Tokens {
 		if tokens = context.parseLinkRefDef(tokens); nil != tokens {
-			p.tokens = tokens
+			p.Tokens = tokens
 			hasReferenceDefs = true
 			continue
 		}
 		break
 	}
-	if hasReferenceDefs && isBlankLine(p.tokens) {
+	if hasReferenceDefs && isBlankLine(p.Tokens) {
 		p.Unlink()
 	}
 
 	if context.option.GFMTaskListItem {
 		// 尝试解析任务列表项
-		if listItem := p.parent; nil != listItem && NodeListItem == listItem.Typ && listItem.firstChild == p {
+		if listItem := p.Parent; nil != listItem && NodeListItem == listItem.Typ && listItem.FirstChild == p {
 			if 3 == listItem.listData.typ {
 				isTaskListItem := false
 				if !context.option.VditorWYSIWYG {
-					isTaskListItem = 3 < len(p.tokens) && isWhitespace(p.tokens[3])
+					isTaskListItem = 3 < len(p.Tokens) && isWhitespace(p.Tokens[3])
 				} else {
-					isTaskListItem = 3 <= len(p.tokens)
+					isTaskListItem = 3 <= len(p.Tokens)
 				}
 
 				if isTaskListItem {
 					// 如果是任务列表项则添加任务列表标记符节点
-					taskListItemMarker := &Node{Typ: NodeTaskListItemMarker, tokens: p.tokens[:3], taskListItemChecked: listItem.listData.checked}
+					taskListItemMarker := &Node{Typ: NodeTaskListItemMarker, Tokens: p.Tokens[:3], taskListItemChecked: listItem.listData.checked}
 					p.PrependChild(taskListItemMarker)
-					p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+					p.Tokens = p.Tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 					if context.option.VditorWYSIWYG {
-						if 1 > len(p.tokens) {
-							p.tokens = []byte(" ")
+						if 1 > len(p.Tokens) {
+							p.Tokens = []byte(" ")
 						} else {
-							if !bytes.HasPrefix(p.tokens, []byte(" ")) {
-								p.tokens = append([]byte(" "), p.tokens...)
+							if !bytes.HasPrefix(p.Tokens, []byte(" ")) {
+								p.Tokens = append([]byte(" "), p.Tokens...)
 							}
 						}
 					}
@@ -73,12 +73,12 @@ func (p *Node) paragraphFinalize(context *Context) {
 			// 将该段落节点转成表节点
 			p.Typ = NodeTable
 			p.tableAligns = table.tableAligns
-			for tr := table.firstChild; nil != tr; {
-				nextTr := tr.next
+			for tr := table.FirstChild; nil != tr; {
+				nextTr := tr.Next
 				p.AppendChild(tr)
 				tr = nextTr
 			}
-			p.tokens = nil
+			p.Tokens = nil
 			return
 		}
 	}
@@ -87,7 +87,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 		if toc := context.parseToC(p); nil != toc {
 			// 将该段落节点转换成目录节点
 			p.Typ = NodeToC
-			p.tokens = nil
+			p.Tokens = nil
 			return
 		}
 	}

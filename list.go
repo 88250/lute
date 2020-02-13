@@ -32,25 +32,25 @@ type listData struct {
 }
 
 func (list *Node) listFinalize(context *Context) {
-	item := list.firstChild
+	item := list.FirstChild
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
 	for nil != item {
-		if list.endsWithBlankLine(item) && nil != item.next {
+		if list.endsWithBlankLine(item) && nil != item.Next {
 			list.tight = false
 			break
 		}
 
-		var subitem = item.firstChild
+		var subitem = item.FirstChild
 		for nil != subitem {
 			if list.endsWithBlankLine(subitem) &&
-				(nil != item.next || nil != subitem.next) {
+				(nil != item.Next || nil != subitem.Next) {
 				list.tight = false
 				break
 			}
-			subitem = subitem.next
+			subitem = subitem.Next
 		}
-		item = item.next
+		item = item.Next
 	}
 }
 
@@ -171,7 +171,7 @@ func (list *Node) endsWithBlankLine(block *Node) bool {
 		t := block.Typ
 		if !block.lastLineChecked && (t == NodeList || t == NodeListItem) {
 			block.lastLineChecked = true
-			block = block.lastChild
+			block = block.LastChild
 		} else {
 			block.lastLineChecked = true
 			break

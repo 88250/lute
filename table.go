@@ -13,7 +13,7 @@
 package lute
 
 func (context *Context) parseTable(paragraph *Node) (ret *Node) {
-	lines := split(paragraph.tokens, itemNewline)
+	lines := split(paragraph.Tokens, itemNewline)
 	length := len(lines)
 	if 2 > length {
 		return
@@ -31,7 +31,7 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 
 	var cells [][]*Node
 	cells = append(cells, []*Node{})
-	for n := headRow.firstChild; nil != n; n = n.next {
+	for n := headRow.FirstChild; nil != n; n = n.Next {
 		cells[0] = append(cells[0], n)
 	}
 
@@ -46,7 +46,7 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 		ret.AppendChild(tableRow)
 
 		cells = append(cells, []*Node{})
-		for n := tableRow.firstChild; nil != n; n = n.next {
+		for n := tableRow.FirstChild; nil != n; n = n.Next {
 			cells[i-1] = append(cells[i-1], n)
 		}
 	}
@@ -70,8 +70,8 @@ func (context *Context) newTableHead(headRow *Node) *Node {
 	ret := &Node{Typ: NodeTableHead}
 	tr := &Node{Typ: NodeTableRow}
 	ret.AppendChild(tr)
-	for c := headRow.firstChild; nil != c; {
-		next := c.next
+	for c := headRow.FirstChild; nil != c; {
+		next := c.Next
 		tr.AppendChild(c)
 		c = next
 	}
@@ -103,7 +103,7 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 		col = trimWhitespace(cols[i])
 		width := len(col)
 		cell := &Node{Typ: NodeTableCell, tableCellAlign: aligns[i], tableCellContentWidth: width}
-		cell.tokens = col
+		cell.Tokens = col
 		ret.AppendChild(cell)
 	}
 

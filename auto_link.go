@@ -18,10 +18,10 @@ import (
 )
 
 func (t *Tree) parseGFMAutoEmailLink(node *Node) {
-	for child := node.firstChild; nil != child; {
-		next := child.next
-		if NodeText == child.Typ && nil != child.parent &&
-			NodeLink != child.parent.Typ /* 不处理链接 label */ {
+	for child := node.FirstChild; nil != child; {
+		next := child.Next
+		if NodeText == child.Typ && nil != child.Parent &&
+			NodeLink != child.Parent.Typ /* 不处理链接 label */ {
 			t.parseGFMAutoEmailLink0(child)
 		} else {
 			t.parseGFMAutoEmailLink(child) // 递归处理子节点
@@ -31,8 +31,8 @@ func (t *Tree) parseGFMAutoEmailLink(node *Node) {
 }
 
 func (t *Tree) parseGFMAutoLink(node *Node) {
-	for child := node.firstChild; nil != child; {
-		next := child.next
+	for child := node.FirstChild; nil != child; {
+		next := child.Next
 		if NodeText == child.Typ {
 			t.parseGFMAutoLink0(child)
 		} else {
@@ -45,7 +45,7 @@ func (t *Tree) parseGFMAutoLink(node *Node) {
 var mailto = strToBytes("mailto:")
 
 func (t *Tree) parseGFMAutoEmailLink0(node *Node) {
-	tokens := node.tokens
+	tokens := node.Tokens
 	if 0 >= bytes.IndexByte(tokens, '@') {
 		return
 	}
@@ -76,7 +76,7 @@ loopPart:
 		}
 		if i == j {
 			// 说明积攒组时第一个字符就是空白符，那就把这个空白符作为一个文本节点插到前面
-			text := &Node{Typ: NodeText, tokens: []byte{tokens[j]}}
+			text := &Node{Typ: NodeText, Tokens: []byte{tokens[j]}}
 			node.InsertBefore(text)
 			i++
 			continue
@@ -86,7 +86,7 @@ loopPart:
 		i = j
 
 		if 0 >= atIndex {
-			text := &Node{Typ: NodeText, tokens: group}
+			text := &Node{Typ: NodeText, Tokens: group}
 			node.InsertBefore(text)
 			continue
 		}
@@ -97,7 +97,7 @@ loopPart:
 		for ; k < atIndex; k++ {
 			token = group[k]
 			if !t.isValidEmailSegment1(token) {
-				text := &Node{Typ: NodeText, tokens: group}
+				text := &Node{Typ: NodeText, Tokens: group}
 				node.InsertBefore(text)
 				continue loopPart
 			}
@@ -109,7 +109,7 @@ loopPart:
 			item = group[k]
 			token = group[k]
 			if !t.isValidEmailSegment2(token) {
-				text := &Node{Typ: NodeText, tokens: group}
+				text := &Node{Typ: NodeText, Tokens: group}
 				node.InsertBefore(text)
 				continue loopPart
 			}
@@ -122,18 +122,18 @@ loopPart:
 			link := t.newLink(NodeLink, group, append(mailto, group...), nil, 2)
 			node.InsertBefore(link)
 			// . 作为文本节点插入
-			node.InsertBefore(&Node{Typ: NodeText, tokens: []byte{item}})
+			node.InsertBefore(&Node{Typ: NodeText, Tokens: []byte{item}})
 		} else if itemHyphen == token || itemUnderscore == token {
 			// 如果以 - 或者 _ 结尾则整个串都不能算作邮件链接
-			text := &Node{Typ: NodeText, tokens: group}
+			text := &Node{Typ: NodeText, Tokens: group}
 			node.InsertBefore(text)
 			continue loopPart
 		} else {
 			// 以字母或者数字结尾
 			link := &Node{Typ: NodeLink, linkType: 2}
-			text := &Node{Typ: NodeLinkText, tokens: group}
+			text := &Node{Typ: NodeLinkText, Tokens: group}
 			link.AppendChild(text)
-			dest := &Node{Typ: NodeLinkDest, tokens: append(mailto, group...)}
+			dest := &Node{Typ: NodeLinkDest, Tokens: append(mailto, group...)}
 			link.AppendChild(dest)
 			node.InsertBefore(link)
 		}
@@ -168,7 +168,7 @@ func (lute *Lute) AddAutoLinkDomainSuffix(suffix string) {
 }
 
 func (t *Tree) parseGFMAutoLink0(node *Node) {
-	tokens := node.tokens
+	tokens := node.Tokens
 	length := len(tokens)
 	minLinkLen := 10 // 太短的情况肯定不可能有链接，最短的情况是 www.xxx.xx
 	if minLinkLen > length {
@@ -203,9 +203,9 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 			if length-i < minLinkLen { // 剩余字符不足，已经不可能形成链接了
 				if needUnlink {
 					if textStart < textEnd {
-						node.InsertBefore(&Node{Typ: NodeText, tokens: tokens[textStart:]})
+						node.InsertBefore(&Node{Typ: NodeText, Tokens: tokens[textStart:]})
 					} else {
-						node.InsertBefore(&Node{Typ: NodeText, tokens: tokens[textEnd:]})
+						node.InsertBefore(&Node{Typ: NodeText, Tokens: tokens[textEnd:]})
 					}
 					node.Unlink()
 				}
@@ -216,7 +216,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		}
 
 		if textStart < textEnd {
-			node.InsertBefore(&Node{Typ: NodeText, tokens: tokens[textStart:textEnd]})
+			node.InsertBefore(&Node{Typ: NodeText, Tokens: tokens[textStart:textEnd]})
 			needUnlink = true
 			textStart = textEnd
 		}
@@ -264,7 +264,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 		}
 		domain := url[:k]
 		if !t.isValidDomain(domain) {
-			node.InsertBefore(&Node{Typ: NodeText, tokens: tokens[textStart:i]})
+			node.InsertBefore(&Node{Typ: NodeText, Tokens: tokens[textStart:i]})
 			needUnlink = true
 			textStart = i
 			textEnd = i
@@ -372,7 +372,7 @@ func (t *Tree) parseGFMAutoLink0(node *Node) {
 	}
 
 	if textStart < textEnd {
-		text := &Node{Typ: NodeText, tokens: tokens[textStart:textEnd]}
+		text := &Node{Typ: NodeText, Tokens: tokens[textStart:textEnd]}
 		node.InsertBefore(text)
 		needUnlink = true
 	}
@@ -490,12 +490,12 @@ func (t *Tree) newLink(typ NodeType, text, dest, title []byte, linkType int) (re
 		ret.AppendChild(&Node{Typ: NodeBang})
 	}
 	ret.AppendChild(&Node{Typ: NodeOpenBracket})
-	ret.AppendChild(&Node{Typ: NodeLinkText, tokens: text})
+	ret.AppendChild(&Node{Typ: NodeLinkText, Tokens: text})
 	ret.AppendChild(&Node{Typ: NodeCloseBracket})
 	ret.AppendChild(&Node{Typ: NodeOpenParen})
-	ret.AppendChild(&Node{Typ: NodeLinkDest, tokens: dest})
+	ret.AppendChild(&Node{Typ: NodeLinkDest, Tokens: dest})
 	if nil != title {
-		ret.AppendChild(&Node{Typ: NodeLinkTitle, tokens: title})
+		ret.AppendChild(&Node{Typ: NodeLinkTitle, Tokens: title})
 	}
 	ret.AppendChild(&Node{Typ: NodeCloseParen})
 	return

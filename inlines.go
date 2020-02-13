@@ -31,14 +31,14 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 
 	// 只有如下几种类型的块节点需要生成行级子节点
 	if typ := node.Typ; NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
-		tokens := node.tokens
+		tokens := node.Tokens
 		if NodeParagraph == typ && nil == tokens {
 			// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
 			// 在这里从语法树上移除空段落节点
-			next := node.next
+			next := node.Next
 			node.Unlink()
 			// Unlink 会将后一个兄弟节点置空，此处是在在遍历过程中修改树结构，所以需要保持继续迭代后面的兄弟节点
-			node.next = next
+			node.Next = next
 			return
 		}
 
@@ -74,20 +74,20 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 	} else if NodeCodeBlock == typ {
 		if node.isFencedCodeBlock {
 			// 细化围栏代码块子节点
-			openMarker := &Node{Typ: NodeCodeBlockFenceOpenMarker, tokens: node.codeBlockOpenFence, codeBlockFenceLen: node.codeBlockFenceLen}
+			openMarker := &Node{Typ: NodeCodeBlockFenceOpenMarker, Tokens: node.codeBlockOpenFence, codeBlockFenceLen: node.codeBlockFenceLen}
 			node.PrependChild(openMarker)
 			info := &Node{Typ: NodeCodeBlockFenceInfoMarker, codeBlockInfo: node.codeBlockInfo}
 			node.AppendChild(info)
-			code := &Node{Typ: NodeCodeBlockCode, tokens: node.tokens}
+			code := &Node{Typ: NodeCodeBlockCode, Tokens: node.Tokens}
 			node.AppendChild(code)
-			closeMarker := &Node{Typ: NodeCodeBlockFenceCloseMarker, tokens: node.codeBlockCloseFence, codeBlockFenceLen: node.codeBlockFenceLen}
+			closeMarker := &Node{Typ: NodeCodeBlockFenceCloseMarker, Tokens: node.codeBlockCloseFence, codeBlockFenceLen: node.codeBlockFenceLen}
 			node.AppendChild(closeMarker)
 		} else {
 			// 细化缩进代码块子节点
-			code := &Node{Typ: NodeCodeBlockCode, tokens: node.tokens}
+			code := &Node{Typ: NodeCodeBlockCode, Tokens: node.Tokens}
 			node.AppendChild(code)
 		}
-		node.tokens = nil
+		node.Tokens = nil
 	}
 
 	// 遍历处理子节点
@@ -95,13 +95,13 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 	if t.context.option.ParallelParsing {
 		// 通过并行处理提升性能
 		cwg := &sync.WaitGroup{}
-		for child := node.firstChild; nil != child; child = child.next {
+		for child := node.FirstChild; nil != child; child = child.Next {
 			cwg.Add(1)
 			go t.walkParseInline(child, cwg)
 		}
 		cwg.Wait()
 	} else {
-		for child := node.firstChild; nil != child; child = child.next {
+		for child := node.FirstChild; nil != child; child = child.Next {
 			t.walkParseInline(child, nil)
 		}
 	}
