@@ -9,12 +9,12 @@
 <script>
     // 支持覆写渲染器 https://github.com/88250/lute/issues/5
     let formatRenderer = {
-        renderImage: function (n, entering) {
-            console.log('重写 Image 节点', n, entering)
+        renderImage: function (node, entering) {
+            console.log('重写 Image 节点', node, entering)
             return Lute.WalkContinue;
         },
-        renderBang: function (n, entering) {
-            console.log('重写 Bang 节点', n, entering)
+        renderBang: function (node, entering) {
+            console.log('重写 Bang 节点', node, entering)
             return Lute.WalkStop;
         },
     };
