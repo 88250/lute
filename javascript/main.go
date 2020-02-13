@@ -37,6 +37,8 @@ func registerRenderers(engine *lute.Lute, options map[string]map[string]*js.Obje
 			rendererFuncs = engine.FormatRendererFuncs
 		} else if "vditor" == rendererType {
 			rendererFuncs = engine.VditorRendererFuncs
+		} else if "html" == rendererType {
+			rendererFuncs = engine.HTMLRendererFuncs
 		} else {
 			continue
 		}

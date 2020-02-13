@@ -24,6 +24,7 @@ type Lute struct {
 
 	FormatRendererFuncs map[NodeType]RendererFunc // 用户自定义的格式化渲染器函数
 	VditorRendererFuncs map[NodeType]RendererFunc // 用户自定义的 Vditor 渲染器函数
+	HTMLRendererFuncs   map[NodeType]RendererFunc // 用户自定义的 HTML 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：

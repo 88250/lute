@@ -100,6 +100,10 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeToC] = ret.renderToC
 	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
 	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
+
+	for nodeType, render := range lute.HTMLRendererFuncs {
+		ret.rendererFuncs[nodeType] = render
+	}
 	return ret
 }
 
