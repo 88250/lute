@@ -22,8 +22,8 @@ const Version = "1.1.2"
 type Lute struct {
 	*options // 解析和渲染选项配置
 
-	HTML2MdRendererFuncs        map[NodeType]RendererFunc // 用户自定义的 HTML2Md 渲染器函数
-	HTML2VditorDOMRendererFuncs map[NodeType]RendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
+	HTML2MdRendererFuncs        map[NodeType]ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
+	HTML2VditorDOMRendererFuncs map[NodeType]ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：
@@ -62,8 +62,8 @@ func New(opts ...option) (ret *Lute) {
 	for _, opt := range opts {
 		opt(ret)
 	}
-	ret.HTML2MdRendererFuncs = map[NodeType]RendererFunc{}
-	ret.HTML2VditorDOMRendererFuncs = map[NodeType]RendererFunc{}
+	ret.HTML2MdRendererFuncs = map[NodeType]ExtRendererFunc{}
+	ret.HTML2VditorDOMRendererFuncs = map[NodeType]ExtRendererFunc{}
 	return ret
 }
 

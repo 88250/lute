@@ -93,7 +93,7 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 
 	renderer := lute.newVditorRenderer(tree)
 	for nodeType, render := range lute.HTML2VditorDOMRendererFuncs {
-		renderer.rendererFuncs[nodeType] = render
+		renderer.extRendererFuncs[nodeType] = render
 	}
 	var output []byte
 	output, err = renderer.Render()

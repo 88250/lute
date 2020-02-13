@@ -20,6 +20,9 @@ import (
 // RendererFunc 描述了渲染器函数签名。
 type RendererFunc func(n *Node, entering bool) (WalkStatus, error)
 
+// ExtRendererFunc 描述了用户自定义的渲染器函数签名。
+type ExtRendererFunc func(n *Node, entering bool) (string, WalkStatus)
+
 // Renderer 描述了渲染器接口。
 type Renderer interface {
 	// Render 渲染输出。
@@ -28,18 +31,19 @@ type Renderer interface {
 
 // BaseRenderer 描述了渲染器结构。
 type BaseRenderer struct {
-	writer              *bytes.Buffer             // 输出缓冲
-	lastOut             byte                      // 最新输出的一个字节
-	rendererFuncs       map[NodeType]RendererFunc // 渲染器
-	defaultRendererFunc RendererFunc              // 默认渲染器，在 rendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
-	disableTags         int                       // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
-	option              *options                  // 解析渲染选项
-	tree                *Tree                     // 待渲染的树
+	writer              *bytes.Buffer                // 输出缓冲
+	lastOut             byte                         // 最新输出的一个字节
+	rendererFuncs       map[NodeType]RendererFunc    // 渲染器
+	defaultRendererFunc RendererFunc                 // 默认渲染器，在 rendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
+	extRendererFuncs    map[NodeType]ExtRendererFunc // 用户自定义的渲染器
+	disableTags         int                          // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
+	option              *options                     // 解析渲染选项
+	tree                *Tree                        // 待渲染的树
 }
 
 // newBaseRenderer 构造一个 BaseRenderer。
 func (lute *Lute) newBaseRenderer(tree *Tree) *BaseRenderer {
-	ret := &BaseRenderer{rendererFuncs: map[NodeType]RendererFunc{}, option: lute.options, tree: tree}
+	ret := &BaseRenderer{rendererFuncs: map[NodeType]RendererFunc{}, extRendererFuncs: map[NodeType]ExtRendererFunc{}, option: lute.options, tree: tree}
 	ret.writer = &bytes.Buffer{}
 	ret.writer.Grow(4096)
 	return ret
@@ -54,15 +58,25 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 	r.writer.Grow(4096)
 
 	err = Walk(r.tree.Root, func(n *Node, entering bool) (WalkStatus, error) {
-		f := r.rendererFuncs[n.Typ]
-		if nil == f {
-			if nil != r.defaultRendererFunc {
-				return r.defaultRendererFunc(n, entering)
-			} else {
-				return r.renderDefault(n, entering)
+		extRender := r.extRendererFuncs[n.Typ]
+		if nil != extRender {
+			output, status := extRender(n, entering)
+			r.writeString(output)
+			return status, nil
+		}
+
+		render := r.rendererFuncs[n.Typ]
+		if nil == render {
+			render = r.rendererFuncs[n.Typ]
+			if nil == render {
+				if nil != r.defaultRendererFunc {
+					return r.defaultRendererFunc(n, entering)
+				} else {
+					return r.renderDefault(n, entering)
+				}
 			}
 		}
-		return f(n, entering)
+		return render(n, entering)
 	})
 	if nil != err {
 		return

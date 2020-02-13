@@ -32,7 +32,7 @@ func registerRenderers(engine *lute.Lute, options map[string]map[string]*js.Obje
 			continue
 		}
 
-		var rendererFuncs map[lute.NodeType]lute.RendererFunc
+		var rendererFuncs map[lute.NodeType]lute.ExtRendererFunc
 		if "HTML2Md" == rendererType {
 			rendererFuncs = engine.HTML2MdRendererFuncs
 		} else if "HTML2VditorDOM" == rendererType {
@@ -44,11 +44,11 @@ func registerRenderers(engine *lute.Lute, options map[string]map[string]*js.Obje
 		renderFuncs := extRenderer.Interface().(map[string]interface{})
 		for funcName, _ := range renderFuncs {
 			nodeType := "Node" + funcName[len("render"):]
-			rendererFuncs[lute.Str2NodeType(nodeType)] = func(n *lute.Node, entering bool) (status lute.WalkStatus, err error) {
-				nodeType := n.Typ.String()
+			rendererFuncs[lute.Str2NodeType(nodeType)] = func(node *lute.Node, entering bool) (string, lute.WalkStatus) {
+				nodeType := node.Typ.String()
 				funcName = "render" + nodeType[len("Node"):]
-				walkStatus := extRenderer.Call(funcName, js.MakeWrapper(n), entering).Int()
-				return lute.WalkStatus(walkStatus), nil
+				ret := extRenderer.Call(funcName, js.MakeWrapper(node), entering).Interface().([]interface{})
+				return ret[0].(string), lute.WalkStatus(ret[1].(float64))
 			}
 		}
 	}
