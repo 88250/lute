@@ -17,15 +17,37 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-func New() *js.Object {
-	return js.MakeWrapper(lute.New())
+func New(formatRenderer, vditorRenderer *js.Object) *js.Object {
+	engine := lute.New()
+	registerRenderer(engine, formatRenderer)
+	registerRenderer(engine, vditorRenderer)
+	return js.MakeWrapper(engine)
+}
+
+func registerRenderer(engine *lute.Lute, renderer *js.Object) {
+	switch renderer.Interface().(type) {
+	case map[string]interface{}:
+		break
+	default:
+		return
+	}
+
+	renderFuncs := renderer.Interface().(map[string]interface{})
+	for funcName, _ := range renderFuncs {
+		nodeType := "Node" + funcName[len("render"):]
+		engine.FormatRendererFuncs[lute.Str2NodeType(nodeType)] = func(n *lute.Node, entering bool) (status lute.WalkStatus, err error) {
+			walkStatus := renderer.Call(funcName, js.MakeWrapper(n), entering).Int()
+			return lute.WalkStatus(walkStatus), nil
+		}
+	}
 }
 
 func main() {
-	Lute := map[string]interface{}{
-		"version": lute.Version,
-	}
-	js.Global.Set("Lute", Lute)
-	l := js.Global.Get("Lute")
-	l.Set("New", New)
+	js.Global.Set("Lute", map[string]interface{}{
+		"Version":          lute.Version,
+		"New":              New,
+		"WalkStop":         lute.WalkStop,
+		"WalkSkipChildren": lute.WalkSkipChildren,
+		"WalkContinue":     lute.WalkContinue,
+	})
 }

@@ -12,8 +12,6 @@
 
 package lute
 
-import "strconv"
-
 // Node 描述了节点结构。
 type Node struct {
 	// 不用接口实现的原因：
@@ -333,10 +331,16 @@ func (n *Node) parentIs(nodeType nodeType, nodeTypes ...nodeType) bool {
 	return false
 }
 
+//go:generate stringer -type=nodeType
 type nodeType int
 
-func (typ nodeType) String() string {
-	return strconv.Itoa(int(typ))
+func Str2NodeType(nodeTypeStr string) nodeType {
+	for t := NodeDocument; t < 1024; t++ {
+		if nodeTypeStr == t.String() {
+			return t
+		}
+	}
+	return -1
 }
 
 const (

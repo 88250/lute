@@ -12,5 +12,6 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
+	golang.org/x/tools v0.0.0-20200213050514-49b8ac185c84 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

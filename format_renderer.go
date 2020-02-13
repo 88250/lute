@@ -14,6 +14,7 @@ package lute
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"unicode"
 	"unicode/utf8"
@@ -98,6 +99,12 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 	ret.rendererFuncs[NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
 	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
+
+	for nodeType, render := range lute.FormatRendererFuncs {
+		ret.rendererFuncs[nodeType] = render
+		fmt.Println("overrided render [" + nodeType.String() + "]")
+	}
+
 	return ret
 }
 

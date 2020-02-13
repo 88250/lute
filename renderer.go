@@ -72,6 +72,10 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 	return
 }
 
+func (r *BaseRenderer) RendererFuncs(nodeType nodeType) RendererFunc {
+	return r.rendererFuncs[nodeType]
+}
+
 func (r *BaseRenderer) renderDefault(n *Node, entering bool) (WalkStatus, error) {
 	return WalkStop, errors.New("not found render function for node [type=" + n.typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
 }

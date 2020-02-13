@@ -7,12 +7,28 @@
 <body>
 <script src="lute.min.js"></script>
 <script>
-    let luteEngine = Lute.New();
+    // 扩展格式化功能的渲染器 https://github.com/88250/lute/issues/5
+    let formatRenderer = {
+        renderImage: function (n, entering) {
+            console.log('扩展 Image 节点', n, entering)
+            return Lute.WalkContinue;
+        },
+        renderBang: function (n, entering) {
+            console.log('扩展 Bang 节点', n, entering)
+            return Lute.WalkStop;
+        },
+    };
+    let luteEngine = Lute.New(formatRenderer);
+
+    // 没有扩展需求的话直接构造即可
+    // let luteEngine = Lute.New();
 
     function onMarkdown(it) {
         let result = luteEngine.MarkdownStr("", it.value);
         let output = result[1] ? result[1] : result[0];
         document.getElementById('output').innerHTML = output;
+
+        console.log(luteEngine.HTML2Md(output));
     }
 </script>
 

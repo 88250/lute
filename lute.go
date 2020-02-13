@@ -20,7 +20,10 @@ const Version = "1.1.2"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
-	*options
+	*options // 解析和渲染选项配置
+
+	FormatRendererFuncs map[nodeType]RendererFunc // 格式化渲染器函数
+	VditorRendererFuncs map[nodeType]RendererFunc // Vditor 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：
@@ -59,6 +62,8 @@ func New(opts ...option) (ret *Lute) {
 	for _, opt := range opts {
 		opt(ret)
 	}
+	ret.FormatRendererFuncs = map[nodeType]RendererFunc{}
+	ret.VditorRendererFuncs = map[nodeType]RendererFunc{}
 	return ret
 }
 
