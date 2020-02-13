@@ -335,7 +335,7 @@ func (n *Node) parentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 type NodeType int
 
 func Str2NodeType(nodeTypeStr string) NodeType {
-	for t := NodeDocument; t < 1024; t++ {
+	for t := NodeDocument; t < NodeTypeMaxVal; t++ {
 		if nodeTypeStr == t.String() {
 			return t
 		}
@@ -435,4 +435,6 @@ const (
 	// 目录
 
 	NodeToC NodeType = 600 // 目录 [toc]
+
+	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

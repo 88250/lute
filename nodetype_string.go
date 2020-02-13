@@ -82,45 +82,45 @@ func _() {
 }
 
 const (
-	_nodeType_name_0 = "NodeDocumentNodeParagraphNodeHeadingNodeHeadingC8hMarkerNodeThematicBreakNodeBlockquoteNodeBlockquoteMarkerNodeListNodeListItemNodeHTMLBlockNodeInlineHTMLNodeCodeBlockNodeCodeBlockFenceOpenMarkerNodeCodeBlockFenceCloseMarkerNodeCodeBlockFenceInfoMarkerNodeCodeBlockCodeNodeTextNodeEmphasisNodeEmA6kOpenMarkerNodeEmA6kCloseMarkerNodeEmU8eOpenMarkerNodeEmU8eCloseMarkerNodeStrongNodeStrongA6kOpenMarkerNodeStrongA6kCloseMarkerNodeStrongU8eOpenMarkerNodeStrongU8eCloseMarkerNodeCodeSpanNodeCodeSpanOpenMarkerNodeCodeSpanContentNodeCodeSpanCloseMarkerNodeHardBreakNodeSoftBreakNodeLinkNodeImageNodeBangNodeOpenBracketNodeCloseBracketNodeOpenParenNodeCloseParenNodeLinkTextNodeLinkDestNodeLinkTitleNodeLinkSpace"
-	_nodeType_name_1 = "NodeTaskListItemMarkerNodeStrikethroughNodeStrikethrough1OpenMarkerNodeStrikethrough1CloseMarkerNodeStrikethrough2OpenMarkerNodeStrikethrough2CloseMarkerNodeTableNodeTableHeadNodeTableRowNodeTableCell"
-	_nodeType_name_2 = "NodeEmojiNodeEmojiUnicodeNodeEmojiImgNodeEmojiAlias"
-	_nodeType_name_3 = "NodeMathBlockNodeMathBlockOpenMarkerNodeMathBlockContentNodeMathBlockCloseMarkerNodeInlineMathNodeInlineMathOpenMarkerNodeInlineMathContentNodeInlineMathCloseMarker"
-	_nodeType_name_4 = "NodeBackslashNodeBackslashContent"
-	_nodeType_name_5 = "NodeFootnotesDefNodeFootnotesRef"
-	_nodeType_name_6 = "NodeToC"
+	_NodeType_name_0 = "NodeDocumentNodeParagraphNodeHeadingNodeHeadingC8hMarkerNodeThematicBreakNodeBlockquoteNodeBlockquoteMarkerNodeListNodeListItemNodeHTMLBlockNodeInlineHTMLNodeCodeBlockNodeCodeBlockFenceOpenMarkerNodeCodeBlockFenceCloseMarkerNodeCodeBlockFenceInfoMarkerNodeCodeBlockCodeNodeTextNodeEmphasisNodeEmA6kOpenMarkerNodeEmA6kCloseMarkerNodeEmU8eOpenMarkerNodeEmU8eCloseMarkerNodeStrongNodeStrongA6kOpenMarkerNodeStrongA6kCloseMarkerNodeStrongU8eOpenMarkerNodeStrongU8eCloseMarkerNodeCodeSpanNodeCodeSpanOpenMarkerNodeCodeSpanContentNodeCodeSpanCloseMarkerNodeHardBreakNodeSoftBreakNodeLinkNodeImageNodeBangNodeOpenBracketNodeCloseBracketNodeOpenParenNodeCloseParenNodeLinkTextNodeLinkDestNodeLinkTitleNodeLinkSpace"
+	_NodeType_name_1 = "NodeTaskListItemMarkerNodeStrikethroughNodeStrikethrough1OpenMarkerNodeStrikethrough1CloseMarkerNodeStrikethrough2OpenMarkerNodeStrikethrough2CloseMarkerNodeTableNodeTableHeadNodeTableRowNodeTableCell"
+	_NodeType_name_2 = "NodeEmojiNodeEmojiUnicodeNodeEmojiImgNodeEmojiAlias"
+	_NodeType_name_3 = "NodeMathBlockNodeMathBlockOpenMarkerNodeMathBlockContentNodeMathBlockCloseMarkerNodeInlineMathNodeInlineMathOpenMarkerNodeInlineMathContentNodeInlineMathCloseMarker"
+	_NodeType_name_4 = "NodeBackslashNodeBackslashContent"
+	_NodeType_name_5 = "NodeFootnotesDefNodeFootnotesRef"
+	_NodeType_name_6 = "NodeToC"
 )
 
 var (
-	_nodeType_index_0 = [...]uint16{0, 12, 25, 36, 56, 73, 87, 107, 115, 127, 140, 154, 167, 195, 224, 252, 269, 277, 289, 308, 328, 347, 367, 377, 400, 424, 447, 471, 483, 505, 524, 547, 560, 573, 581, 590, 598, 613, 629, 642, 656, 668, 680, 693, 706}
-	_nodeType_index_1 = [...]uint8{0, 22, 39, 67, 96, 124, 153, 162, 175, 187, 200}
-	_nodeType_index_2 = [...]uint8{0, 9, 25, 37, 51}
-	_nodeType_index_3 = [...]uint8{0, 13, 36, 56, 80, 94, 118, 139, 164}
-	_nodeType_index_4 = [...]uint8{0, 13, 33}
-	_nodeType_index_5 = [...]uint8{0, 16, 32}
+	_NodeType_index_0 = [...]uint16{0, 12, 25, 36, 56, 73, 87, 107, 115, 127, 140, 154, 167, 195, 224, 252, 269, 277, 289, 308, 328, 347, 367, 377, 400, 424, 447, 471, 483, 505, 524, 547, 560, 573, 581, 590, 598, 613, 629, 642, 656, 668, 680, 693, 706}
+	_NodeType_index_1 = [...]uint8{0, 22, 39, 67, 96, 124, 153, 162, 175, 187, 200}
+	_NodeType_index_2 = [...]uint8{0, 9, 25, 37, 51}
+	_NodeType_index_3 = [...]uint8{0, 13, 36, 56, 80, 94, 118, 139, 164}
+	_NodeType_index_4 = [...]uint8{0, 13, 33}
+	_NodeType_index_5 = [...]uint8{0, 16, 32}
 )
 
 func (i NodeType) String() string {
 	switch {
 	case 0 <= i && i <= 43:
-		return _nodeType_name_0[_nodeType_index_0[i]:_nodeType_index_0[i+1]]
+		return _NodeType_name_0[_NodeType_index_0[i]:_NodeType_index_0[i+1]]
 	case 100 <= i && i <= 109:
 		i -= 100
-		return _nodeType_name_1[_nodeType_index_1[i]:_nodeType_index_1[i+1]]
+		return _NodeType_name_1[_NodeType_index_1[i]:_NodeType_index_1[i+1]]
 	case 200 <= i && i <= 203:
 		i -= 200
-		return _nodeType_name_2[_nodeType_index_2[i]:_nodeType_index_2[i+1]]
+		return _NodeType_name_2[_NodeType_index_2[i]:_NodeType_index_2[i+1]]
 	case 300 <= i && i <= 307:
 		i -= 300
-		return _nodeType_name_3[_nodeType_index_3[i]:_nodeType_index_3[i+1]]
+		return _NodeType_name_3[_NodeType_index_3[i]:_NodeType_index_3[i+1]]
 	case 400 <= i && i <= 401:
 		i -= 400
-		return _nodeType_name_4[_nodeType_index_4[i]:_nodeType_index_4[i+1]]
+		return _NodeType_name_4[_NodeType_index_4[i]:_NodeType_index_4[i+1]]
 	case 500 <= i && i <= 501:
 		i -= 500
-		return _nodeType_name_5[_nodeType_index_5[i]:_nodeType_index_5[i+1]]
+		return _NodeType_name_5[_NodeType_index_5[i]:_NodeType_index_5[i+1]]
 	case i == 600:
-		return _nodeType_name_6
+		return _NodeType_name_6
 	default:
 		return "NodeType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
