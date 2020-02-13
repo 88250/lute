@@ -98,6 +98,10 @@ func (lute *Lute) newVditorRenderer(tree *Tree) *VditorRenderer {
 	ret.rendererFuncs[NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
 	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
+
+	for nodeType, render := range lute.VditorRendererFuncs {
+		ret.rendererFuncs[nodeType] = render
+	}
 	return ret
 }
 

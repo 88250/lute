@@ -14,7 +14,6 @@ package lute
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
 	"unicode"
 	"unicode/utf8"
@@ -102,9 +101,7 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 
 	for nodeType, render := range lute.FormatRendererFuncs {
 		ret.rendererFuncs[nodeType] = render
-		fmt.Println("overrided render [" + nodeType.String() + "]")
 	}
-
 	return ret
 }
 

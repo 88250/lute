@@ -10,11 +10,11 @@
     // 扩展格式化功能的渲染器 https://github.com/88250/lute/issues/5
     let formatRenderer = {
         renderImage: function (n, entering) {
-            console.log('扩展 Image 节点', n, entering)
+            console.log('重写 Image 节点', n, entering)
             return Lute.WalkContinue;
         },
         renderBang: function (n, entering) {
-            console.log('扩展 Bang 节点', n, entering)
+            console.log('重写 Bang 节点', n, entering)
             return Lute.WalkStop;
         },
     };
