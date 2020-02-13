@@ -182,7 +182,7 @@ func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) (WalkSt
 
 func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		text := bytesToStr(node.Tokens)
+		text := bytesToStr(node.tokens)
 		var i int
 		summary := ""
 		for _, r := range text {
@@ -348,19 +348,19 @@ func (r *EChartsJSONRenderer) openObj() {
 
 func (r *EChartsJSONRenderer) closeObj(node *Node) {
 	r.writeByte('}')
-	if !r.ignore(node.Next) {
+	if !r.ignore(node.next) {
 		r.comma()
 	}
 }
 
 func (r *EChartsJSONRenderer) openChildren(node *Node) {
-	if nil != node.FirstChild {
+	if nil != node.firstChild {
 		r.writeString(",\"children\":[")
 	}
 }
 
 func (r *EChartsJSONRenderer) closeChildren(node *Node) {
-	if nil != node.FirstChild {
+	if nil != node.firstChild {
 		r.writeByte(']')
 	}
 }
@@ -372,13 +372,13 @@ func (r *EChartsJSONRenderer) comma() {
 func (r *EChartsJSONRenderer) ignore(node *Node) bool {
 	return nil == node ||
 		// 以下类型的节点不进行渲染，否则图画出来节点太多
-		NodeBlockquoteMarker == node.Typ ||
-		NodeEmA6kOpenMarker == node.Typ || NodeEmA6kCloseMarker == node.Typ ||
-		NodeEmU8eOpenMarker == node.Typ || NodeEmU8eCloseMarker == node.Typ ||
-		NodeStrongA6kOpenMarker == node.Typ || NodeStrongA6kCloseMarker == node.Typ ||
-		NodeStrongU8eOpenMarker == node.Typ || NodeStrongU8eCloseMarker == node.Typ ||
-		NodeStrikethrough1OpenMarker == node.Typ || NodeStrikethrough1CloseMarker == node.Typ ||
-		NodeStrikethrough2OpenMarker == node.Typ || NodeStrikethrough2CloseMarker == node.Typ ||
-		NodeMathBlockOpenMarker == node.Typ || NodeMathBlockContent == node.Typ || NodeMathBlockCloseMarker == node.Typ ||
-		NodeInlineMathOpenMarker == node.Typ || NodeInlineMathContent == node.Typ || NodeInlineMathCloseMarker == node.Typ
+		NodeBlockquoteMarker == node.typ ||
+		NodeEmA6kOpenMarker == node.typ || NodeEmA6kCloseMarker == node.typ ||
+		NodeEmU8eOpenMarker == node.typ || NodeEmU8eCloseMarker == node.typ ||
+		NodeStrongA6kOpenMarker == node.typ || NodeStrongA6kCloseMarker == node.typ ||
+		NodeStrongU8eOpenMarker == node.typ || NodeStrongU8eCloseMarker == node.typ ||
+		NodeStrikethrough1OpenMarker == node.typ || NodeStrikethrough1CloseMarker == node.typ ||
+		NodeStrikethrough2OpenMarker == node.typ || NodeStrikethrough2CloseMarker == node.typ ||
+		NodeMathBlockOpenMarker == node.typ || NodeMathBlockContent == node.typ || NodeMathBlockCloseMarker == node.typ ||
+		NodeInlineMathOpenMarker == node.typ || NodeInlineMathContent == node.typ || NodeInlineMathCloseMarker == node.typ
 }

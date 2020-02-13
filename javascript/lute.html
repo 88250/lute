@@ -10,7 +10,7 @@
     // 支持覆写渲染器 https://github.com/88250/lute/issues/5
     let HTML2MdRenderer = {
         renderLinkDest: function (node, entering) {
-            console.log('重写 LinkDest 节点', node.TokensStr(), entering);
+            console.log('重写 LinkDest 节点', node.__internal_object__.typ, node.TokensStr(), entering);
             return [node.TokensStr(), Lute.WalkStop]
         },
         renderBang: function (node, entering) {

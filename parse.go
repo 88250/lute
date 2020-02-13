@@ -19,7 +19,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &Node{Typ: NodeDocument}
+	tree.Root = &Node{typ: NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
@@ -126,7 +126,7 @@ func (context *Context) findNextNonspace() {
 func (context *Context) closeUnmatchedBlocks() {
 	if !context.allClosed {
 		for context.oldtip != context.lastMatchedContainer {
-			parent := context.oldtip.Parent
+			parent := context.oldtip.parent
 			context.finalize(context.oldtip, context.lineNum-1)
 			context.oldtip = parent
 		}
@@ -136,7 +136,7 @@ func (context *Context) closeUnmatchedBlocks() {
 
 // finalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
 func (context *Context) finalize(block *Node, lineNum int) {
-	var parent = block.Parent
+	var parent = block.parent
 	block.close = true
 	block.Finalize(context)
 	context.tip = parent
@@ -144,7 +144,7 @@ func (context *Context) finalize(block *Node, lineNum int) {
 
 // addChildMarker 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.tip 上。
 func (context *Context) addChildMarker(nodeType NodeType, tokens []byte) (ret *Node) {
-	ret = &Node{Typ: nodeType, Tokens: tokens, close: true}
+	ret = &Node{typ: nodeType, tokens: tokens, close: true}
 	context.tip.AppendChild(ret)
 	return ret
 }
@@ -156,7 +156,7 @@ func (context *Context) addChild(nodeType NodeType, offset int) (ret *Node) {
 		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
-	ret = &Node{Typ: nodeType}
+	ret = &Node{typ: nodeType}
 	context.tip.AppendChild(ret)
 	context.tip = ret
 	return ret

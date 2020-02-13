@@ -15,7 +15,7 @@ package lute
 import "bytes"
 
 func (context *Context) parseToC(paragraph *Node) *Node {
-	lines := split(paragraph.Tokens, itemNewline)
+	lines := split(paragraph.tokens, itemNewline)
 	if 1 != len(lines) {
 		return nil
 	}
@@ -25,5 +25,5 @@ func (context *Context) parseToC(paragraph *Node) *Node {
 		return nil
 	}
 
-	return &Node{Typ: NodeToC}
+	return &Node{typ: NodeToC}
 }

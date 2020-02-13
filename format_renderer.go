@@ -102,7 +102,7 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 }
 
 func (r *FormatRenderer) renderBackslashContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -114,19 +114,19 @@ func (r *FormatRenderer) renderBackslash(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *FormatRenderer) renderFootnotesRef(node *Node, entering bool) (WalkStatus, error) {
-	r.writeString("[" + bytesToStr(node.Tokens) + "]")
+	r.writeString("[" + bytesToStr(node.tokens) + "]")
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderFootnotesDef(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
-		r.writeString("[" + bytesToStr(node.Tokens) + "]: ")
+		r.writeString("[" + bytesToStr(node.tokens) + "]: ")
 	}
 	return WalkContinue, nil
 }
 
 func (r *FormatRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -175,8 +175,8 @@ func (r *FormatRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, 
 
 func (r *FormatRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
 	if !entering {
-		headRow := node.FirstChild
-		for th := headRow.FirstChild; nil != th; th = th.Next {
+		headRow := node.firstChild
+		for th := headRow.firstChild; nil != th; th = th.next {
 			align := th.tableCellAlign
 			switch align {
 			case 0:
@@ -246,13 +246,13 @@ func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *Node, entering bo
 
 func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
 	r.writeString("\"")
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	r.writeString("\"")
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -262,7 +262,7 @@ func (r *FormatRenderer) renderLinkSpace(node *Node, entering bool) (WalkStatus,
 }
 
 func (r *FormatRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -301,7 +301,7 @@ func (r *FormatRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 
 func (r *FormatRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
 	r.newline()
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
@@ -310,7 +310,7 @@ func (r *FormatRenderer) renderHTML(node *Node, entering bool) (WalkStatus, erro
 }
 
 func (r *FormatRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -334,17 +334,17 @@ func (r *FormatRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 
 		inTightList := false
 		lastListItemLastPara := false
-		if parent := node.Parent; nil != parent {
-			if NodeListItem == parent.Typ { // ListItem.Paragraph
+		if parent := node.parent; nil != parent {
+			if NodeListItem == parent.typ { // ListItem.Paragraph
 				listItem := parent
-				if nil != listItem.Parent && nil != listItem.Parent.listData {
+				if nil != listItem.parent && nil != listItem.parent.listData {
 					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
 					// 设置紧凑标识的具体实现可参考函数 List.Finalize()
-					inTightList = listItem.Parent.tight
+					inTightList = listItem.parent.tight
 
-					nextItem := listItem.Next
+					nextItem := listItem.next
 					if nil == nextItem {
-						nextPara := node.Next
+						nextPara := node.next
 						lastListItemLastPara = nil == nextPara
 					}
 				} else {
@@ -370,7 +370,7 @@ func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 	if r.option.ChinesePunct {
 		r.chinesePunct(node)
 	}
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -399,9 +399,9 @@ func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 
 func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.writeByte(itemBacktick)
-	if 1 < node.Parent.codeMarkerLen {
+	if 1 < node.parent.codeMarkerLen {
 		r.writeByte(itemBacktick)
-		text := bytesToStr(node.Next.Tokens)
+		text := bytesToStr(node.next.tokens)
 		firstc, _ := utf8.DecodeRuneInString(text)
 		if '`' == firstc {
 			r.writeByte(itemSpace)
@@ -411,13 +411,13 @@ func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 }
 
 func (r *FormatRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
 func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	if 1 < node.Parent.codeMarkerLen {
-		text := bytesToStr(node.Previous.Tokens)
+	if 1 < node.parent.codeMarkerLen {
+		text := bytesToStr(node.previous.tokens)
 		lastc, _ := utf8.DecodeLastRuneInString(text)
 		if '`' == lastc {
 			r.writeByte(itemSpace)
@@ -434,7 +434,7 @@ func (r *FormatRenderer) renderInlineMathCloseMarker(node *Node, entering bool) 
 }
 
 func (r *FormatRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -454,7 +454,7 @@ func (r *FormatRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (
 }
 
 func (r *FormatRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	r.writeByte(itemNewline)
 	return WalkStop, nil
 }
@@ -484,7 +484,7 @@ func (r *FormatRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (
 }
 
 func (r *FormatRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -503,7 +503,7 @@ func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 	if !node.isFencedCodeBlock {
 		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
 		r.writeByte(itemNewline)
-		r.write(node.FirstChild.Tokens)
+		r.write(node.firstChild.tokens)
 		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
 		r.newline()
 		if !r.isLastNode(r.tree.Root, node) {
@@ -731,18 +731,18 @@ func (r *FormatRenderer) isLastNode(treeRoot, node *Node) bool {
 	if treeRoot == node {
 		return true
 	}
-	if nil != node.Next {
+	if nil != node.next {
 		return false
 	}
-	if NodeDocument == node.Parent.Typ {
-		return treeRoot.LastChild == node
+	if NodeDocument == node.parent.typ {
+		return treeRoot.lastChild == node
 	}
 
 	var n *Node
-	for n = node.Parent; ; n = n.Parent {
-		if NodeDocument == n.Parent.Typ {
+	for n = node.parent; ; n = n.parent {
+		if NodeDocument == n.parent.typ {
 			break
 		}
 	}
-	return treeRoot.LastChild == n
+	return treeRoot.lastChild == n
 }

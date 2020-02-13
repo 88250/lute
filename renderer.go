@@ -58,16 +58,16 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 	r.writer.Grow(4096)
 
 	err = Walk(r.tree.Root, func(n *Node, entering bool) (WalkStatus, error) {
-		extRender := r.extRendererFuncs[n.Typ]
+		extRender := r.extRendererFuncs[n.typ]
 		if nil != extRender {
 			output, status := extRender(n, entering)
 			r.writeString(output)
 			return status, nil
 		}
 
-		render := r.rendererFuncs[n.Typ]
+		render := r.rendererFuncs[n.typ]
 		if nil == render {
-			render = r.rendererFuncs[n.Typ]
+			render = r.rendererFuncs[n.typ]
 			if nil == render {
 				if nil != r.defaultRendererFunc {
 					return r.defaultRendererFunc(n, entering)
@@ -91,7 +91,7 @@ func (r *BaseRenderer) RendererFuncs(nodeType NodeType) RendererFunc {
 }
 
 func (r *BaseRenderer) renderDefault(n *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, errors.New("not found render function for node [type=" + n.Typ.String() + ", tokens=" + bytesToStr(n.Tokens) + "]")
+	return WalkStop, errors.New("not found render function for node [type=" + n.typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
 }
 
 // writeByte 输出一个字节 c。

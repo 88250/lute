@@ -60,14 +60,14 @@ func (t *Tree) parseInline(block *Node, ctx *InlineContext) {
 			block.AppendChild(n)
 		}
 	}
-	block.Tokens = nil
+	block.tokens = nil
 }
 
 func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	and := []byte{ctx.tokens[ctx.pos]}
 	if 2 > ctx.tokensLen || ctx.tokensLen <= ctx.pos+1 {
 		ctx.pos++
-		return &Node{Typ: NodeText, Tokens: and}
+		return &Node{typ: NodeText, tokens: and}
 	}
 
 	start := ctx.pos
@@ -93,26 +93,26 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	entityName := bytesToStr(ctx.tokens[start:i])
 	if entityValue, ok := html.Entities[entityName]; ok {
 		ctx.pos += i - start
-		return &Node{Typ: NodeText, Tokens: strToBytes(entityValue)}
+		return &Node{typ: NodeText, tokens: strToBytes(entityValue)}
 	}
 
 	if !endWithSemicolon {
 		ctx.pos++
-		return &Node{Typ: NodeText, Tokens: and}
+		return &Node{typ: NodeText, tokens: and}
 	}
 
 	if numeric {
 		entityNameLen := len(entityName)
 		if 10 < entityNameLen || 4 > entityNameLen {
 			ctx.pos++
-			return &Node{Typ: NodeText, Tokens: and}
+			return &Node{typ: NodeText, tokens: and}
 		}
 
 		hex := 'x' == entityName[2] || 'X' == entityName[2]
 		if hex {
 			if 5 > entityNameLen {
 				ctx.pos++
-				return &Node{Typ: NodeText, Tokens: and}
+				return &Node{typ: NodeText, tokens: and}
 			}
 		}
 	}
@@ -120,10 +120,10 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *Node) {
 	v := htmlUnescapeString(entityName)
 	if v == entityName {
 		ctx.pos++
-		return &Node{Typ: NodeText, Tokens: and}
+		return &Node{typ: NodeText, tokens: and}
 	}
 	ctx.pos += i - start
-	return &Node{Typ: NodeText, Tokens: strToBytes(v)}
+	return &Node{typ: NodeText, tokens: strToBytes(v)}
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,
@@ -136,14 +136,14 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	// get last [ or ![
 	opener := ctx.brackets
 	if nil == opener {
-		return &Node{Typ: NodeText, Tokens: closeBracket}
+		return &Node{typ: NodeText, tokens: closeBracket}
 	}
 
 	if !opener.active {
 		// no matched opener, just return a literal
 		// take opener off brackets stack
 		t.removeBracket(ctx)
-		return &Node{Typ: NodeText, Tokens: closeBracket}
+		return &Node{typ: NodeText, tokens: closeBracket}
 	}
 
 	// If we got here, open is a potential opener
@@ -169,7 +169,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				break
 			}
 			if t.context.option.VditorWYSIWYG {
-				if !isImage && nil == opener.node.Next {
+				if !isImage && nil == opener.node.next {
 					break
 				}
 			}
@@ -238,7 +238,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 				// 查找脚注
 				if idx, footnotesDef := t.context.findFootnotesDef(reflabel); nil != footnotesDef {
 					t.removeBracket(ctx)
-					opener.node.Next.Unlink() // ^label
+					opener.node.next.Unlink() // ^label
 					opener.node.Unlink()      // [
 
 					refId := strconv.Itoa(idx)
@@ -246,7 +246,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 					if 0 < refsLen {
 						refId += ":" + strconv.Itoa(refsLen+1)
 					}
-					ref := &Node{Typ: NodeFootnotesRef, Tokens: bytes.ToLower(reflabel), footnotesRefId: refId}
+					ref := &Node{typ: NodeFootnotesRef, tokens: bytes.ToLower(reflabel), footnotesRefId: refId}
 					footnotesDef.footnotesRefs = append(footnotesDef.footnotesRefs, ref)
 					return ref
 				}
@@ -254,10 +254,10 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 
 			// 查找链接引用
 			if link := t.context.linkRefDefs[strings.ToLower(bytesToStr(reflabel))]; nil != link {
-				dest = link.ChildByType(NodeLinkDest).Tokens
+				dest = link.ChildByType(NodeLinkDest).tokens
 				titleNode := link.ChildByType(NodeLinkTitle)
 				if nil != titleNode {
-					title = titleNode.Tokens
+					title = titleNode.tokens
 				}
 				matched = true
 			}
@@ -265,35 +265,35 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	}
 
 	if matched {
-		node := &Node{Typ: NodeLink, linkType: 0}
+		node := &Node{typ: NodeLink, linkType: 0}
 		if isImage {
-			node.Typ = NodeImage
-			node.AppendChild(&Node{Typ: NodeBang, Tokens: opener.node.Tokens[:1]})
-			opener.node.Tokens = opener.node.Tokens[1:]
+			node.typ = NodeImage
+			node.AppendChild(&Node{typ: NodeBang, tokens: opener.node.tokens[:1]})
+			opener.node.tokens = opener.node.tokens[1:]
 		}
-		node.AppendChild(&Node{Typ: NodeOpenBracket, Tokens: opener.node.Tokens})
+		node.AppendChild(&Node{typ: NodeOpenBracket, tokens: opener.node.tokens})
 
 		var tmp, next *Node
-		tmp = opener.node.Next
+		tmp = opener.node.next
 		for nil != tmp {
-			next = tmp.Next
+			next = tmp.next
 			tmp.Unlink()
-			if NodeText == tmp.Typ {
-				tmp.Typ = NodeLinkText
+			if NodeText == tmp.typ {
+				tmp.typ = NodeLinkText
 			}
 			node.AppendChild(tmp)
 			tmp = next
 		}
-		node.AppendChild(&Node{Typ: NodeCloseBracket, Tokens: closeBracket})
-		node.AppendChild(&Node{Typ: NodeOpenParen, Tokens: openParen})
-		node.AppendChild(&Node{Typ: NodeLinkDest, Tokens: dest})
+		node.AppendChild(&Node{typ: NodeCloseBracket, tokens: closeBracket})
+		node.AppendChild(&Node{typ: NodeOpenParen, tokens: openParen})
+		node.AppendChild(&Node{typ: NodeLinkDest, tokens: dest})
 		if nil != space {
-			node.AppendChild(&Node{Typ: NodeLinkSpace, Tokens: space})
+			node.AppendChild(&Node{typ: NodeLinkSpace, tokens: space})
 		}
 		if 0 < len(title) {
-			node.AppendChild(&Node{Typ: NodeLinkTitle, Tokens: title})
+			node.AppendChild(&Node{typ: NodeLinkTitle, tokens: title})
 		}
-		node.AppendChild(&Node{Typ: NodeCloseParen, Tokens: closeParen})
+		node.AppendChild(&Node{typ: NodeCloseParen, tokens: closeParen})
 
 		t.processEmphasis(opener.previousDelimiter, ctx)
 		t.removeBracket(ctx)
@@ -316,14 +316,14 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *Node {
 	} else { // no match
 		t.removeBracket(ctx) // remove this opener from stack
 		ctx.pos = startPos
-		return &Node{Typ: NodeText, Tokens: closeBracket}
+		return &Node{typ: NodeText, tokens: closeBracket}
 	}
 }
 
 func (t *Tree) parseOpenBracket(ctx *InlineContext) (ret *Node) {
 	startPos := ctx.pos
 	ctx.pos++
-	ret = &Node{Typ: NodeText, Tokens: ctx.tokens[startPos:ctx.pos]}
+	ret = &Node{typ: NodeText, tokens: ctx.tokens[startPos:ctx.pos]}
 	// 将 [ 入栈
 	t.addBracket(ret, ctx.pos-1, false, ctx)
 	return
@@ -353,23 +353,23 @@ var backslash = strToBytes("\\")
 func (t *Tree) parseBackslash(block *Node, ctx *InlineContext) *Node {
 	if ctx.pos == ctx.tokensLen-1 {
 		ctx.pos++
-		return &Node{Typ: NodeText, Tokens: backslash}
+		return &Node{typ: NodeText, tokens: backslash}
 	}
 
 	ctx.pos++
 	token := ctx.tokens[ctx.pos]
 	if itemNewline == token {
 		ctx.pos++
-		return &Node{Typ: NodeHardBreak, Tokens: []byte{token}}
+		return &Node{typ: NodeHardBreak, tokens: []byte{token}}
 	}
 	if isASCIIPunct(token) {
 		ctx.pos++
-		n := &Node{Typ: NodeBackslash}
+		n := &Node{typ: NodeBackslash}
 		block.AppendChild(n)
-		n.AppendChild(&Node{Typ: NodeBackslashContent, Tokens: []byte{token}})
+		n.AppendChild(&Node{typ: NodeBackslashContent, tokens: []byte{token}})
 		return nil
 	}
-	return &Node{Typ: NodeText, Tokens: backslash}
+	return &Node{typ: NodeText, tokens: backslash}
 }
 
 func (t *Tree) parseText(ctx *InlineContext) *Node {
@@ -380,7 +380,7 @@ func (t *Tree) parseText(ctx *InlineContext) *Node {
 			break
 		}
 	}
-	return &Node{Typ: NodeText, Tokens: ctx.tokens[start:ctx.pos]}
+	return &Node{typ: NodeText, tokens: ctx.tokens[start:ctx.pos]}
 }
 
 // isMarker 判断 token 是否是潜在的 Markdown 标记符。
@@ -400,11 +400,11 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 
 	hardbreak := false
 	// 检查前一个节点的结尾空格，如果大于等于两个则说明是硬换行
-	if lastc := block.LastChild; nil != lastc {
-		if NodeText == lastc.Typ {
-			tokens := lastc.Tokens
+	if lastc := block.lastChild; nil != lastc {
+		if NodeText == lastc.typ {
+			tokens := lastc.tokens
 			if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
-				_, lastc.Tokens = trimRight(tokens)
+				_, lastc.tokens = trimRight(tokens)
 				if 1 < valueLen {
 					hardbreak = itemSpace == tokens[len(tokens)-2]
 				}
@@ -412,9 +412,9 @@ func (t *Tree) parseNewline(block *Node, ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	ret = &Node{Typ: NodeSoftBreak, Tokens: []byte{ctx.tokens[pos]}}
+	ret = &Node{typ: NodeSoftBreak, tokens: []byte{ctx.tokens[pos]}}
 	if hardbreak {
-		ret.Typ = NodeHardBreak
+		ret.typ = NodeHardBreak
 	}
 	return
 }

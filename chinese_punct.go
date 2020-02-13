@@ -19,9 +19,9 @@ import (
 
 // chinesePunct 会把文本节点 textNode 中的中文间的英文标点换成对应的中文标点。
 func (r *BaseRenderer) chinesePunct(textNode *Node) {
-	text := bytesToStr(textNode.Tokens)
+	text := bytesToStr(textNode.tokens)
 	text = chinesePunct0(text)
-	textNode.Tokens = strToBytes(text)
+	textNode.tokens = strToBytes(text)
 }
 
 func chinesePunct0(text string) (ret string) {

@@ -32,25 +32,25 @@ type listData struct {
 }
 
 func (list *Node) listFinalize(context *Context) {
-	item := list.FirstChild
+	item := list.firstChild
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
 	for nil != item {
-		if list.endsWithBlankLine(item) && nil != item.Next {
+		if list.endsWithBlankLine(item) && nil != item.next {
 			list.tight = false
 			break
 		}
 
-		var subitem = item.FirstChild
+		var subitem = item.firstChild
 		for nil != subitem {
 			if list.endsWithBlankLine(subitem) &&
-				(nil != item.Next || nil != subitem.Next) {
+				(nil != item.next || nil != subitem.next) {
 				list.tight = false
 				break
 			}
-			subitem = subitem.Next
+			subitem = subitem.next
 		}
-		item = item.Next
+		item = item.next
 	}
 }
 
@@ -77,7 +77,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.bulletChar = marker[0]
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
-		if container.Typ != NodeParagraph || bytes.Equal(items1, marker) {
+		if container.typ != NodeParagraph || bytes.Equal(items1, marker) {
 			data.typ = 1 // 有序列表
 			data.start, _ = strconv.Atoi(bytesToStr(marker))
 			markerLength = len(marker) + 1
@@ -98,7 +98,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空
-	if container.Typ == NodeParagraph && itemNewline == token {
+	if container.typ == NodeParagraph && itemNewline == token {
 		return nil
 	}
 
@@ -168,10 +168,10 @@ func (list *Node) endsWithBlankLine(block *Node) bool {
 		if block.lastLineBlank {
 			return true
 		}
-		t := block.Typ
+		t := block.typ
 		if !block.lastLineChecked && (t == NodeList || t == NodeListItem) {
 			block.lastLineChecked = true
-			block = block.LastChild
+			block = block.lastChild
 		} else {
 			block.lastLineChecked = true
 			break

@@ -20,7 +20,7 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 		// 缩进代码块处理
 		r.newline()
 		r.writeString("<pre><code>")
-		r.write(escapeHTML(node.FirstChild.Tokens))
+		r.write(escapeHTML(node.firstChild.tokens))
 		r.writeString("</code></pre>")
 		r.newline()
 		return WalkStop, nil
@@ -32,9 +32,9 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		r.newline()
-		tokens := node.Tokens
-		if 0 < len(node.Previous.codeBlockInfo) {
-			infoWords := split(node.Previous.codeBlockInfo, itemSpace)
+		tokens := node.tokens
+		if 0 < len(node.previous.codeBlockInfo) {
+			infoWords := split(node.previous.codeBlockInfo, itemSpace)
 			language := infoWords[0]
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)

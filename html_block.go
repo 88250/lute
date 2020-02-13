@@ -22,7 +22,7 @@ func (html *Node) htmlBlockContinue(context *Context) int {
 }
 
 func (html *Node) htmlBlockFinalize(context *Context) {
-	_, html.Tokens = trimRight(replaceNewlineSpace(html.Tokens))
+	_, html.tokens = trimRight(replaceNewlineSpace(html.tokens))
 }
 
 var (
@@ -102,12 +102,12 @@ func (t *Tree) parseHTML(tokens []byte) (typ int) {
 
 	tag := trimWhitespace(tokens)
 	isOpenTag := t.isOpenTag(tag)
-	if isOpenTag && t.context.tip.Typ != NodeParagraph {
+	if isOpenTag && t.context.tip.typ != NodeParagraph {
 		typ = 7
 		return
 	}
 	isCloseTag := t.isCloseTag(tag)
-	if isCloseTag && t.context.tip.Typ != NodeParagraph {
+	if isCloseTag && t.context.tip.typ != NodeParagraph {
 		typ = 7
 		return
 	}

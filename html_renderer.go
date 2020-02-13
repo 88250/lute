@@ -104,7 +104,7 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 }
 
 func (r *HTMLRenderer) renderBackslashContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.Tokens))
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
@@ -132,19 +132,19 @@ func (r *HTMLRenderer) renderToC(node *Node, entering bool) (WalkStatus, error) 
 }
 
 func (r *HTMLRenderer) headings() (ret []*Node) {
-	for n := r.tree.Root.FirstChild; nil != n; n = n.Next {
+	for n := r.tree.Root.firstChild; nil != n; n = n.next {
 		r.headings0(n, &ret)
 	}
 	return
 }
 
 func (r *HTMLRenderer) headings0(n *Node, headings *[]*Node) {
-	if NodeHeading == n.Typ {
+	if NodeHeading == n.typ {
 		*headings = append(*headings, n)
 		return
 	}
-	if NodeList == n.Typ || NodeListItem == n.Typ || NodeBlockquote == n.Typ {
-		for c := n.FirstChild; nil != c; c = c.Next {
+	if NodeList == n.typ || NodeListItem == n.typ || NodeBlockquote == n.typ {
+		for c := n.firstChild; nil != c; c = c.next {
 			r.headings0(c, headings)
 		}
 	}
@@ -158,14 +158,14 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
 		tree := &Tree{Name: "", context: &Context{option: lute.options}}
 		tree.context.tree = tree
-		tree.Root = &Node{Typ: NodeDocument}
+		tree.Root = &Node{typ: NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := lute.newHTMLRenderer(tree)
 		lc := tree.Root.lastDeepestChild()
 		for i = len(def.footnotesRefs) - 1; 0 <= i; i-- {
 			ref := def.footnotesRefs[i]
 			gotoRef := " <a href=\"#footnotes-ref-" + ref.footnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
-			link := &Node{Typ: NodeInlineHTML, Tokens: strToBytes(gotoRef)}
+			link := &Node{typ: NodeInlineHTML, tokens: strToBytes(gotoRef)}
 			lc.InsertAfter(link)
 		}
 		defRenderer.(*HTMLRenderer).needRenderFootnotesDef = true
@@ -182,7 +182,7 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 }
 
 func (r *HTMLRenderer) renderFootnotesRef(node *Node, entering bool) (WalkStatus, error) {
-	idx, _ := r.tree.context.findFootnotesDef(node.Tokens)
+	idx, _ := r.tree.context.findFootnotesDef(node.tokens)
 	idxStr := strconv.Itoa(idx)
 	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.footnotesRefId}}, false)
 	r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
@@ -216,12 +216,12 @@ func (r *HTMLRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *HTMLRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -235,7 +235,7 @@ func (r *HTMLRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (W
 }
 
 func (r *HTMLRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.Tokens))
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
@@ -255,7 +255,7 @@ func (r *HTMLRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (Wa
 }
 
 func (r *HTMLRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.Tokens))
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
@@ -272,7 +272,7 @@ func (r *HTMLRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, e
 
 func (r *HTMLRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
 	tag := "td"
-	if NodeTableHead == node.Parent.Parent.Typ {
+	if NodeTableHead == node.parent.parent.typ {
 		tag = "th"
 	}
 	if entering {
@@ -311,7 +311,7 @@ func (r *HTMLRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, e
 	} else {
 		r.tag("/thead", nil, false)
 		r.newline()
-		if nil != node.Next {
+		if nil != node.next {
 			r.tag("tbody", nil, false)
 		}
 		r.newline()
@@ -324,7 +324,7 @@ func (r *HTMLRenderer) renderTable(node *Node, entering bool) (WalkStatus, error
 		r.tag("table", nil, false)
 		r.newline()
 	} else {
-		if nil != node.FirstChild.Next {
+		if nil != node.firstChild.next {
 			r.tag("/tbody", nil, false)
 		}
 		r.newline()
@@ -374,7 +374,7 @@ func (r *HTMLRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, er
 	if r.option.AutoSpace {
 		r.space(node)
 	}
-	r.write(escapeHTML(node.Tokens))
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
@@ -402,7 +402,7 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			destTokens := node.ChildByType(NodeLinkDest).Tokens
+			destTokens := node.ChildByType(NodeLinkDest).tokens
 			destTokens = r.tree.context.relativePath(destTokens)
 			r.write(escapeHTML(destTokens))
 			r.writeString("\" alt=\"")
@@ -414,9 +414,9 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 	r.disableTags--
 	if 0 == r.disableTags {
 		r.writeString("\"")
-		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.Tokens {
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(title.Tokens))
+			r.write(escapeHTML(title.tokens))
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -427,11 +427,11 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) (WalkStatus, error
 func (r *HTMLRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
-		destTokens := dest.Tokens
+		destTokens := dest.tokens
 		destTokens = r.tree.context.relativePath(destTokens)
 		attrs := [][]string{{"href", bytesToStr(escapeHTML(destTokens))}}
-		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.Tokens {
-			attrs = append(attrs, []string{"title", bytesToStr(escapeHTML(title.Tokens))})
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
+			attrs = append(attrs, []string{"title", bytesToStr(escapeHTML(title.tokens))})
 		}
 		r.tag("a", attrs, false)
 	} else {
@@ -442,13 +442,13 @@ func (r *HTMLRenderer) renderLink(node *Node, entering bool) (WalkStatus, error)
 
 func (r *HTMLRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
 	r.newline()
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	r.newline()
 	return WalkStop, nil
 }
 
 func (r *HTMLRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
-	r.write(node.Tokens)
+	r.write(node.tokens)
 	return WalkStop, nil
 }
 
@@ -457,7 +457,7 @@ func (r *HTMLRenderer) renderDocument(node *Node, entering bool) (WalkStatus, er
 }
 
 func (r *HTMLRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.Parent.Parent; nil != grandparent && NodeList == grandparent.Typ && grandparent.tight { // List.ListItem.Paragraph
+	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.typ && grandparent.tight { // List.ListItem.Paragraph
 		return WalkContinue, nil
 	}
 
@@ -481,7 +481,7 @@ func (r *HTMLRenderer) renderText(node *Node, entering bool) (WalkStatus, error)
 	if r.option.ChinesePunct {
 		r.chinesePunct(node)
 	}
-	r.write(escapeHTML(node.Tokens))
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
@@ -514,7 +514,7 @@ func (r *HTMLRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Walk
 }
 
 func (r *HTMLRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
-	r.write(escapeHTML(node.Tokens))
+	r.write(escapeHTML(node.tokens))
 	return WalkStop, nil
 }
 
@@ -642,7 +642,7 @@ func (r *HTMLRenderer) renderList(node *Node, entering bool) (WalkStatus, error)
 func (r *HTMLRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass &&
-			nil != node.FirstChild && nil != node.FirstChild.FirstChild && NodeTaskListItemMarker == node.FirstChild.FirstChild.Typ {
+			nil != node.firstChild && nil != node.firstChild.firstChild && NodeTaskListItemMarker == node.firstChild.firstChild.typ {
 			r.tag("li", [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
 		} else {
 			r.tag("li", nil, false)

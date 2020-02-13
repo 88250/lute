@@ -13,7 +13,7 @@
 package lute
 
 func (context *Context) parseTable(paragraph *Node) (ret *Node) {
-	lines := split(paragraph.Tokens, itemNewline)
+	lines := split(paragraph.tokens, itemNewline)
 	length := len(lines)
 	if 2 > length {
 		return
@@ -31,11 +31,11 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 
 	var cells [][]*Node
 	cells = append(cells, []*Node{})
-	for n := headRow.FirstChild; nil != n; n = n.Next {
+	for n := headRow.firstChild; nil != n; n = n.next {
 		cells[0] = append(cells[0], n)
 	}
 
-	ret = &Node{Typ: NodeTable, tableAligns: aligns}
+	ret = &Node{typ: NodeTable, tableAligns: aligns}
 	ret.tableAligns = aligns
 	ret.AppendChild(context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
@@ -46,7 +46,7 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 		ret.AppendChild(tableRow)
 
 		cells = append(cells, []*Node{})
-		for n := tableRow.FirstChild; nil != n; n = n.Next {
+		for n := tableRow.firstChild; nil != n; n = n.next {
 			cells[i-1] = append(cells[i-1], n)
 		}
 	}
@@ -67,11 +67,11 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 }
 
 func (context *Context) newTableHead(headRow *Node) *Node {
-	ret := &Node{Typ: NodeTableHead}
-	tr := &Node{Typ: NodeTableRow}
+	ret := &Node{typ: NodeTableHead}
+	tr := &Node{typ: NodeTableRow}
 	ret.AppendChild(tr)
-	for c := headRow.FirstChild; nil != c; {
-		next := c.Next
+	for c := headRow.firstChild; nil != c; {
+		next := c.next
 		tr.AppendChild(c)
 		c = next
 	}
@@ -79,7 +79,7 @@ func (context *Context) newTableHead(headRow *Node) *Node {
 }
 
 func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *Node) {
-	ret = &Node{Typ: NodeTableRow, tableAligns: aligns}
+	ret = &Node{typ: NodeTableRow, tableAligns: aligns}
 	cols := splitWithoutBackslashEscape(line, itemPipe)
 	if 1 > len(cols) {
 		return nil
@@ -102,14 +102,14 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = trimWhitespace(cols[i])
 		width := len(col)
-		cell := &Node{Typ: NodeTableCell, tableCellAlign: aligns[i], tableCellContentWidth: width}
-		cell.Tokens = col
+		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i], tableCellContentWidth: width}
+		cell.tokens = col
 		ret.AppendChild(cell)
 	}
 
 	// 可能需要补全剩余的列
 	for ; i < alignsLen; i++ {
-		cell := &Node{Typ: NodeTableCell, tableCellAlign: aligns[i]}
+		cell := &Node{typ: NodeTableCell, tableCellAlign: aligns[i]}
 		ret.AppendChild(cell)
 	}
 	return

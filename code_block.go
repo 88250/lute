@@ -49,7 +49,7 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 
 func (codeBlock *Node) codeBlockFinalize(context *Context) {
 	if codeBlock.isFencedCodeBlock {
-		content := codeBlock.Tokens
+		content := codeBlock.tokens
 		length := len(content)
 		if 1 > length {
 			return
@@ -61,9 +61,9 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 				break
 			}
 		}
-		codeBlock.Tokens = content[i+1:]
+		codeBlock.tokens = content[i+1:]
 	} else { // 缩进代码块
-		codeBlock.Tokens = replaceNewlineSpace(codeBlock.Tokens)
+		codeBlock.tokens = replaceNewlineSpace(codeBlock.tokens)
 	}
 }
 
