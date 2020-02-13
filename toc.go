@@ -25,5 +25,5 @@ func (context *Context) parseToC(paragraph *Node) *Node {
 		return nil
 	}
 
-	return &Node{typ: NodeToC}
+	return &Node{Typ: NodeToC}
 }

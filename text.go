@@ -17,9 +17,9 @@ package lute
 func (t *Tree) mergeText(node *Node) {
 	for child := node.firstChild; nil != child; {
 		next := child.next
-		if NodeText == child.typ {
+		if NodeText == child.Typ {
 			// 逐个合并后续兄弟节点
-			for nil != next && NodeText == next.typ {
+			for nil != next && NodeText == next.Typ {
 				child.AppendTokens(next.tokens)
 				next.Unlink()
 				next = child.next

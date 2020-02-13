@@ -15,12 +15,12 @@ package lute
 // Node 描述了节点结构。
 type Node struct {
 	// 不用接口实现的原因：
-	//   1. 转换节点类型非常方便，只需修改 typ 属性
+	//   1. 转换节点类型非常方便，只需修改 Typ 属性
 	//   2. 为了极致的性能而牺牲扩展性
 
 	// 节点基础结构
 
-	typ             nodeType // 节点类型
+	Typ             NodeType // 节点类型
 	parent          *Node    // 父节点
 	previous        *Node    // 前一个兄弟节点
 	next            *Node    // 后一个兄弟节点
@@ -101,9 +101,9 @@ func (n *Node) firstDeepestChild() (ret *Node) {
 }
 
 // LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。
-func (n *Node) ChildByType(childType nodeType) *Node {
+func (n *Node) ChildByType(childType NodeType) *Node {
 	for c := n.firstChild; nil != c; c = c.next {
-		if c.typ == childType {
+		if c.Typ == childType {
 			return c
 		}
 	}
@@ -113,7 +113,7 @@ func (n *Node) ChildByType(childType nodeType) *Node {
 // Text 返回 n 及其文本子节点的文本值。
 func (n *Node) Text() (ret string) {
 	Walk(n, func(n *Node, entering bool) (status WalkStatus, e error) {
-		if (NodeText == n.typ || NodeLinkText == n.typ) && entering {
+		if (NodeText == n.Typ || NodeLinkText == n.Typ) && entering {
 			ret += bytesToStr(n.tokens)
 		}
 		return WalkContinue, nil
@@ -137,7 +137,7 @@ func (n *Node) PreviousNodeText() string {
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
 func (n *Node) Finalize(context *Context) {
-	switch n.typ {
+	switch n.Typ {
 	case NodeCodeBlock:
 		n.codeBlockFinalize(context)
 	case NodeHTMLBlock:
@@ -154,7 +154,7 @@ func (n *Node) Finalize(context *Context) {
 // Continue 判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。
 // 如果可以继续处理返回 0，如果不能接续处理返回 1，如果返回 2（仅在围栏代码块闭合时）则说明可以继续下一行处理了。
 func (n *Node) Continue(context *Context) int {
-	switch n.typ {
+	switch n.Typ {
 	case NodeCodeBlock:
 		return n.codeBlockContinue(context)
 	case NodeHTMLBlock:
@@ -178,7 +178,7 @@ func (n *Node) Continue(context *Context) int {
 
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
-	switch n.typ {
+	switch n.Typ {
 	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock:
 		return true
 	}
@@ -187,8 +187,8 @@ func (n *Node) AcceptLines() bool {
 
 // CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（块级容器）只能包含列表项节点，
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
-func (n *Node) CanContain(nodeType nodeType) bool {
-	switch n.typ {
+func (n *Node) CanContain(nodeType NodeType) bool {
+	switch n.Typ {
 	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock:
 		return false
 	case NodeList:
@@ -309,7 +309,7 @@ func (n *Node) List() (ret []*Node) {
 
 // isMarker 判断 n 是否是排版类（比如强调加粗）标记节点。
 func (n *Node) isMarker() bool {
-	switch n.typ {
+	switch n.Typ {
 	case NodeEmA6kOpenMarker, NodeEmA6kCloseMarker, NodeEmU8eOpenMarker, NodeEmU8eCloseMarker,
 		NodeStrongA6kOpenMarker, NodeStrongA6kCloseMarker, NodeStrongU8eOpenMarker, NodeStrongU8eCloseMarker,
 		NodeStrikethrough1OpenMarker, NodeStrikethrough1CloseMarker, NodeStrikethrough2OpenMarker, NodeStrikethrough2CloseMarker:
@@ -319,11 +319,11 @@ func (n *Node) isMarker() bool {
 	return false
 }
 
-func (n *Node) parentIs(nodeType nodeType, nodeTypes ...nodeType) bool {
+func (n *Node) parentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 	types := append(nodeTypes, nodeType)
 	for p := n.parent; nil != p; p = p.parent {
 		for _, pt := range types {
-			if pt == p.typ {
+			if pt == p.Typ {
 				return true
 			}
 		}
@@ -331,10 +331,10 @@ func (n *Node) parentIs(nodeType nodeType, nodeTypes ...nodeType) bool {
 	return false
 }
 
-//go:generate stringer -type=nodeType
-type nodeType int
+//go:generate stringer -type=NodeType
+type NodeType int
 
-func Str2NodeType(nodeTypeStr string) nodeType {
+func Str2NodeType(nodeTypeStr string) NodeType {
 	for t := NodeDocument; t < 1024; t++ {
 		if nodeTypeStr == t.String() {
 			return t
@@ -346,93 +346,93 @@ func Str2NodeType(nodeTypeStr string) nodeType {
 const (
 	// CommonMark
 
-	NodeDocument                  nodeType = 0  // 根
-	NodeParagraph                 nodeType = 1  // 段落
-	NodeHeading                   nodeType = 2  // 标题
-	NodeHeadingC8hMarker          nodeType = 3  // ATX 标题标记符 #
-	NodeThematicBreak             nodeType = 4  // 分隔线
-	NodeBlockquote                nodeType = 5  // 块引用
-	NodeBlockquoteMarker          nodeType = 6  // 块引用标记符 >
-	NodeList                      nodeType = 7  // 列表
-	NodeListItem                  nodeType = 8  // 列表项
-	NodeHTMLBlock                 nodeType = 9  // HTML 块
-	NodeInlineHTML                nodeType = 10 // 内联 HTML
-	NodeCodeBlock                 nodeType = 11 // 代码块
-	NodeCodeBlockFenceOpenMarker  nodeType = 12 // 开始围栏代码块标记符 ```
-	NodeCodeBlockFenceCloseMarker nodeType = 13 // 结束围栏代码块标记符 ```
-	NodeCodeBlockFenceInfoMarker  nodeType = 14 // 围栏代码块信息标记符 info string
-	NodeCodeBlockCode             nodeType = 15 // 围栏代码块代码
-	NodeText                      nodeType = 16 // 文本
-	NodeEmphasis                  nodeType = 17 // 强调
-	NodeEmA6kOpenMarker           nodeType = 18 // 开始强调标记符 *
-	NodeEmA6kCloseMarker          nodeType = 19 // 结束强调标记符 *
-	NodeEmU8eOpenMarker           nodeType = 20 // 开始强调标记符 _
-	NodeEmU8eCloseMarker          nodeType = 21 // 结束强调标记符 _
-	NodeStrong                    nodeType = 22 // 加粗
-	NodeStrongA6kOpenMarker       nodeType = 23 // 开始加粗标记符 **
-	NodeStrongA6kCloseMarker      nodeType = 24 // 结束加粗标记符 **
-	NodeStrongU8eOpenMarker       nodeType = 25 // 开始加粗标记符 __
-	NodeStrongU8eCloseMarker      nodeType = 26 // 结束加粗标记符 __
-	NodeCodeSpan                  nodeType = 27 // 代码
-	NodeCodeSpanOpenMarker        nodeType = 28 // 开始代码标记符 `
-	NodeCodeSpanContent           nodeType = 29 // 代码内容
-	NodeCodeSpanCloseMarker       nodeType = 30 // 结束代码标记符 `
-	NodeHardBreak                 nodeType = 31 // 硬换行
-	NodeSoftBreak                 nodeType = 32 // 软换行
-	NodeLink                      nodeType = 33 // 链接
-	NodeImage                     nodeType = 34 // 图片
-	NodeBang                      nodeType = 35 // !
-	NodeOpenBracket               nodeType = 36 // [
-	NodeCloseBracket              nodeType = 37 // ]
-	NodeOpenParen                 nodeType = 38 // (
-	NodeCloseParen                nodeType = 39 // )
-	NodeLinkText                  nodeType = 40 // 链接文本
-	NodeLinkDest                  nodeType = 41 // 链接地址
-	NodeLinkTitle                 nodeType = 42 // 链接标题
-	NodeLinkSpace                 nodeType = 43 // 链接地址和链接标题之间的空格
+	NodeDocument                  NodeType = 0  // 根
+	NodeParagraph                 NodeType = 1  // 段落
+	NodeHeading                   NodeType = 2  // 标题
+	NodeHeadingC8hMarker          NodeType = 3  // ATX 标题标记符 #
+	NodeThematicBreak             NodeType = 4  // 分隔线
+	NodeBlockquote                NodeType = 5  // 块引用
+	NodeBlockquoteMarker          NodeType = 6  // 块引用标记符 >
+	NodeList                      NodeType = 7  // 列表
+	NodeListItem                  NodeType = 8  // 列表项
+	NodeHTMLBlock                 NodeType = 9  // HTML 块
+	NodeInlineHTML                NodeType = 10 // 内联 HTML
+	NodeCodeBlock                 NodeType = 11 // 代码块
+	NodeCodeBlockFenceOpenMarker  NodeType = 12 // 开始围栏代码块标记符 ```
+	NodeCodeBlockFenceCloseMarker NodeType = 13 // 结束围栏代码块标记符 ```
+	NodeCodeBlockFenceInfoMarker  NodeType = 14 // 围栏代码块信息标记符 info string
+	NodeCodeBlockCode             NodeType = 15 // 围栏代码块代码
+	NodeText                      NodeType = 16 // 文本
+	NodeEmphasis                  NodeType = 17 // 强调
+	NodeEmA6kOpenMarker           NodeType = 18 // 开始强调标记符 *
+	NodeEmA6kCloseMarker          NodeType = 19 // 结束强调标记符 *
+	NodeEmU8eOpenMarker           NodeType = 20 // 开始强调标记符 _
+	NodeEmU8eCloseMarker          NodeType = 21 // 结束强调标记符 _
+	NodeStrong                    NodeType = 22 // 加粗
+	NodeStrongA6kOpenMarker       NodeType = 23 // 开始加粗标记符 **
+	NodeStrongA6kCloseMarker      NodeType = 24 // 结束加粗标记符 **
+	NodeStrongU8eOpenMarker       NodeType = 25 // 开始加粗标记符 __
+	NodeStrongU8eCloseMarker      NodeType = 26 // 结束加粗标记符 __
+	NodeCodeSpan                  NodeType = 27 // 代码
+	NodeCodeSpanOpenMarker        NodeType = 28 // 开始代码标记符 `
+	NodeCodeSpanContent           NodeType = 29 // 代码内容
+	NodeCodeSpanCloseMarker       NodeType = 30 // 结束代码标记符 `
+	NodeHardBreak                 NodeType = 31 // 硬换行
+	NodeSoftBreak                 NodeType = 32 // 软换行
+	NodeLink                      NodeType = 33 // 链接
+	NodeImage                     NodeType = 34 // 图片
+	NodeBang                      NodeType = 35 // !
+	NodeOpenBracket               NodeType = 36 // [
+	NodeCloseBracket              NodeType = 37 // ]
+	NodeOpenParen                 NodeType = 38 // (
+	NodeCloseParen                NodeType = 39 // )
+	NodeLinkText                  NodeType = 40 // 链接文本
+	NodeLinkDest                  NodeType = 41 // 链接地址
+	NodeLinkTitle                 NodeType = 42 // 链接标题
+	NodeLinkSpace                 NodeType = 43 // 链接地址和链接标题之间的空格
 
 	// GFM
 
-	NodeTaskListItemMarker        nodeType = 100 // 任务列表项标记符
-	NodeStrikethrough             nodeType = 101 // 删除线
-	NodeStrikethrough1OpenMarker  nodeType = 102 // 开始删除线标记符 ~
-	NodeStrikethrough1CloseMarker nodeType = 103 // 结束删除线标记符 ~
-	NodeStrikethrough2OpenMarker  nodeType = 104 // 开始删除线标记符 ~~
-	NodeStrikethrough2CloseMarker nodeType = 105 // 结束删除线标记符 ~~
-	NodeTable                     nodeType = 106 // 表
-	NodeTableHead                 nodeType = 107 // 表头
-	NodeTableRow                  nodeType = 108 // 表行
-	NodeTableCell                 nodeType = 109 // 表格
+	NodeTaskListItemMarker        NodeType = 100 // 任务列表项标记符
+	NodeStrikethrough             NodeType = 101 // 删除线
+	NodeStrikethrough1OpenMarker  NodeType = 102 // 开始删除线标记符 ~
+	NodeStrikethrough1CloseMarker NodeType = 103 // 结束删除线标记符 ~
+	NodeStrikethrough2OpenMarker  NodeType = 104 // 开始删除线标记符 ~~
+	NodeStrikethrough2CloseMarker NodeType = 105 // 结束删除线标记符 ~~
+	NodeTable                     NodeType = 106 // 表
+	NodeTableHead                 NodeType = 107 // 表头
+	NodeTableRow                  NodeType = 108 // 表行
+	NodeTableCell                 NodeType = 109 // 表格
 
 	// Emoji
 
-	NodeEmoji        nodeType = 200 // Emoji
-	NodeEmojiUnicode nodeType = 201 // Emoji Unicode
-	NodeEmojiImg     nodeType = 202 // Emoji 图片
-	NodeEmojiAlias   nodeType = 203 // Emoji ASCII
+	NodeEmoji        NodeType = 200 // Emoji
+	NodeEmojiUnicode NodeType = 201 // Emoji Unicode
+	NodeEmojiImg     NodeType = 202 // Emoji 图片
+	NodeEmojiAlias   NodeType = 203 // Emoji ASCII
 
 	// 数学公式
 
-	NodeMathBlock             nodeType = 300 // 数学公式块
-	NodeMathBlockOpenMarker   nodeType = 301 // 开始数学公式块标记符 $$
-	NodeMathBlockContent      nodeType = 302 // 数学公式块内容
-	NodeMathBlockCloseMarker  nodeType = 303 // 结束数学公式块标记符 $$
-	NodeInlineMath            nodeType = 304 // 内联数学公式
-	NodeInlineMathOpenMarker  nodeType = 305 // 开始内联数学公式标记符 $
-	NodeInlineMathContent     nodeType = 306 // 内联数学公式内容
-	NodeInlineMathCloseMarker nodeType = 307 // 结束内联数学公式标记符 $
+	NodeMathBlock             NodeType = 300 // 数学公式块
+	NodeMathBlockOpenMarker   NodeType = 301 // 开始数学公式块标记符 $$
+	NodeMathBlockContent      NodeType = 302 // 数学公式块内容
+	NodeMathBlockCloseMarker  NodeType = 303 // 结束数学公式块标记符 $$
+	NodeInlineMath            NodeType = 304 // 内联数学公式
+	NodeInlineMathOpenMarker  NodeType = 305 // 开始内联数学公式标记符 $
+	NodeInlineMathContent     NodeType = 306 // 内联数学公式内容
+	NodeInlineMathCloseMarker NodeType = 307 // 结束内联数学公式标记符 $
 
 	// Vditor 所见即所得
 
-	NodeBackslash        nodeType = 400 // 转义反斜杠标记符 \
-	NodeBackslashContent nodeType = 401 // 转义反斜杠后的内容
+	NodeBackslash        NodeType = 400 // 转义反斜杠标记符 \
+	NodeBackslashContent NodeType = 401 // 转义反斜杠后的内容
 
 	// 脚注
 
-	NodeFootnotesDef nodeType = 500 // 脚注定义 [^label]:
-	NodeFootnotesRef nodeType = 501 // 脚注引用 [^label]
+	NodeFootnotesDef NodeType = 500 // 脚注定义 [^label]:
+	NodeFootnotesRef NodeType = 501 // 脚注引用 [^label]
 
 	// 目录
 
-	NodeToC nodeType = 600 // 目录 [toc]
+	NodeToC NodeType = 600 // 目录 [toc]
 )

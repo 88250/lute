@@ -78,7 +78,7 @@ func (t *Tree) incorporateLine(line []byte) {
 	t.context.allClosed = container == t.context.oldtip
 	t.context.lastMatchedContainer = container
 
-	matchedLeaf := container.typ != NodeParagraph && container.AcceptLines()
+	matchedLeaf := container.Typ != NodeParagraph && container.AcceptLines()
 	startsLen := len(blockStarts)
 
 	// 除非最后一个匹配到的是代码块，否则的话就起始一个新的块级节点
@@ -126,7 +126,7 @@ func (t *Tree) incorporateLine(line []byte) {
 
 	// offset 后余下的内容算作是文本行，需要将其添加到相应的块节点上
 
-	if !t.context.allClosed && !t.context.blank && t.context.tip.typ == NodeParagraph {
+	if !t.context.allClosed && !t.context.blank && t.context.tip.Typ == NodeParagraph {
 		// 该行是段落延续文本，直接添加到当前末梢段落上
 		t.addLine()
 	} else {
@@ -137,7 +137,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			container.lastChild.lastLineBlank = true
 		}
 
-		typ := container.typ
+		typ := container.Typ
 		isFenced := NodeCodeBlock == typ && container.isFencedCodeBlock
 
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
@@ -275,7 +275,7 @@ var blockStarts = []blockStartFunc{
 				heading := t.context.addChild(NodeHeading, t.context.nextNonspace)
 				heading.headingLevel = level
 				heading.tokens = content
-				crosshatchMarker := &Node{typ: NodeHeadingC8hMarker, tokens: markers}
+				crosshatchMarker := &Node{Typ: NodeHeadingC8hMarker, tokens: markers}
 				heading.AppendChild(crosshatchMarker)
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
@@ -306,7 +306,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container *Node) int {
-		if !t.context.indented && container.typ == NodeParagraph {
+		if !t.context.indented && container.Typ == NodeParagraph {
 			if level := t.parseSetextHeading(); 0 != level {
 				if t.context.option.GFMTable {
 					// 尝试解析表，因为可能出现如下情况：
@@ -320,7 +320,7 @@ var blockStarts = []blockStartFunc{
 					table := t.context.parseTable(container)
 					if nil != table {
 						// 将该段落节点转成表节点
-						container.typ = NodeTable
+						container.Typ = NodeTable
 						container.tableAligns = table.tableAligns
 						for tr := table.firstChild; nil != tr; {
 							nextTr := tr.next
@@ -343,7 +343,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				if value := container.tokens; 0 < len(value) {
-					child := &Node{typ: NodeHeading, headingLevel: level}
+					child := &Node{Typ: NodeHeading, headingLevel: level}
 					child.tokens = trimWhitespace(value)
 					container.InsertAfter(child)
 					container.Unlink()
@@ -386,7 +386,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始
 	func(t *Tree, container *Node) int {
-		if !t.context.indented || container.typ == NodeList {
+		if !t.context.indented || container.Typ == NodeList {
 			data := t.parseListMarker(container)
 			if nil == data {
 				return 0
@@ -394,8 +394,8 @@ var blockStarts = []blockStartFunc{
 
 			t.context.closeUnmatchedBlocks()
 
-			listsMatch := container.typ == NodeList && t.context.listsMatch(container.listData, data)
-			if t.context.tip.typ != NodeList || !listsMatch {
+			listsMatch := container.Typ == NodeList && t.context.listsMatch(container.listData, data)
+			if t.context.tip.Typ != NodeList || !listsMatch {
 				list := t.context.addChild(NodeList, t.context.nextNonspace)
 				list.listData = data
 			}
@@ -434,7 +434,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断缩进代码块（    code）是否开始
 	func(t *Tree, container *Node) int {
-		if t.context.indented && t.context.tip.typ != NodeParagraph && !t.context.blank {
+		if t.context.indented && t.context.tip.Typ != NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)
 			t.context.closeUnmatchedBlocks()
 			t.context.addChild(NodeCodeBlock, t.context.offset)

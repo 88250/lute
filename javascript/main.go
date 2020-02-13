@@ -19,24 +19,35 @@ import (
 
 func New(formatRenderer, vditorRenderer *js.Object) *js.Object {
 	engine := lute.New()
-	registerRenderer(engine, formatRenderer)
-	registerRenderer(engine, vditorRenderer)
+	registerRenderer(engine, formatRenderer, "format")
+	registerRenderer(engine, vditorRenderer, "vditor")
 	return js.MakeWrapper(engine)
 }
 
-func registerRenderer(engine *lute.Lute, renderer *js.Object) {
-	switch renderer.Interface().(type) {
+func registerRenderer(engine *lute.Lute, extRenderer *js.Object, rendererType string) {
+	switch extRenderer.Interface().(type) {
 	case map[string]interface{}:
 		break
 	default:
 		return
 	}
 
-	renderFuncs := renderer.Interface().(map[string]interface{})
+	var rendererFuncs map[lute.NodeType]lute.RendererFunc
+	if "format" == rendererType {
+		rendererFuncs = engine.FormatRendererFuncs
+	} else if "vditor" == rendererType {
+		rendererFuncs = engine.VditorRendererFuncs
+	} else {
+		return
+	}
+
+	renderFuncs := extRenderer.Interface().(map[string]interface{})
 	for funcName, _ := range renderFuncs {
 		nodeType := "Node" + funcName[len("render"):]
-		engine.FormatRendererFuncs[lute.Str2NodeType(nodeType)] = func(n *lute.Node, entering bool) (status lute.WalkStatus, err error) {
-			walkStatus := renderer.Call(funcName, js.MakeWrapper(n), entering).Int()
+		rendererFuncs[lute.Str2NodeType(nodeType)] = func(n *lute.Node, entering bool) (status lute.WalkStatus, err error) {
+			nodeType := n.Typ.String()
+			funcName = "render" + nodeType[len("Node"):]
+			walkStatus := extRenderer.Call(funcName, js.MakeWrapper(n), entering).Int()
 			return lute.WalkStatus(walkStatus), nil
 		}
 	}

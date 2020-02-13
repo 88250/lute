@@ -19,7 +19,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &Node{typ: NodeDocument}
+	tree.Root = &Node{Typ: NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
@@ -142,21 +142,21 @@ func (context *Context) finalize(block *Node, lineNum int) {
 	context.tip = parent
 }
 
-// addChildMarker 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。
-func (context *Context) addChildMarker(nodeType nodeType, tokens []byte) (ret *Node) {
-	ret = &Node{typ: nodeType, tokens: tokens, close: true}
+// addChildMarker 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.tip 上。
+func (context *Context) addChildMarker(nodeType NodeType, tokens []byte) (ret *Node) {
+	ret = &Node{Typ: nodeType, tokens: tokens, close: true}
 	context.tip.AppendChild(ret)
 	return ret
 }
 
-// addChild 将构造一个 nodeType 节点并作为子节点添加到末梢节点 context.tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
+// addChild 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
 // 节点并向父节点方向尝试，直到找到一个能接受该子节点的节点为止。添加完成后该子节点会被设置为新的末梢节点。
-func (context *Context) addChild(nodeType nodeType, offset int) (ret *Node) {
+func (context *Context) addChild(nodeType NodeType, offset int) (ret *Node) {
 	for !context.tip.CanContain(nodeType) {
 		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
-	ret = &Node{typ: nodeType}
+	ret = &Node{Typ: nodeType}
 	context.tip.AppendChild(ret)
 	context.tip = ret
 	return ret

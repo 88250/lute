@@ -40,7 +40,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 
 	if context.option.GFMTaskListItem {
 		// 尝试解析任务列表项
-		if listItem := p.parent; nil != listItem && NodeListItem == listItem.typ && listItem.firstChild == p {
+		if listItem := p.parent; nil != listItem && NodeListItem == listItem.Typ && listItem.firstChild == p {
 			if 3 == listItem.listData.typ {
 				isTaskListItem := false
 				if !context.option.VditorWYSIWYG {
@@ -51,7 +51,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 
 				if isTaskListItem {
 					// 如果是任务列表项则添加任务列表标记符节点
-					taskListItemMarker := &Node{typ: NodeTaskListItemMarker, tokens: p.tokens[:3], taskListItemChecked: listItem.listData.checked}
+					taskListItemMarker := &Node{Typ: NodeTaskListItemMarker, tokens: p.tokens[:3], taskListItemChecked: listItem.listData.checked}
 					p.PrependChild(taskListItemMarker)
 					p.tokens = p.tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 					if context.option.VditorWYSIWYG {
@@ -71,7 +71,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 	if context.option.GFMTable {
 		if table := context.parseTable(p); nil != table {
 			// 将该段落节点转成表节点
-			p.typ = NodeTable
+			p.Typ = NodeTable
 			p.tableAligns = table.tableAligns
 			for tr := table.firstChild; nil != tr; {
 				nextTr := tr.next
@@ -86,7 +86,7 @@ func (p *Node) paragraphFinalize(context *Context) {
 	if context.option.ToC {
 		if toc := context.parseToC(p); nil != toc {
 			// 将该段落节点转换成目录节点
-			p.typ = NodeToC
+			p.Typ = NodeToC
 			p.tokens = nil
 			return
 		}

@@ -42,7 +42,7 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 	delim := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
-	node := &Node{typ: NodeText, tokens: text}
+	node := &Node{Typ: NodeText, tokens: text}
 	block.AppendChild(node)
 
 	// 将这个分隔符入栈
@@ -141,34 +141,34 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			closeMarker := &Node{tokens: closerTokens, close: true}
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
-					emStrongDel.typ = NodeEmphasis
-					openMarker.typ = NodeEmA6kOpenMarker
-					closeMarker.typ = NodeEmA6kCloseMarker
+					emStrongDel.Typ = NodeEmphasis
+					openMarker.Typ = NodeEmA6kOpenMarker
+					closeMarker.Typ = NodeEmA6kCloseMarker
 				} else if itemUnderscore == closercc {
-					emStrongDel.typ = NodeEmphasis
-					openMarker.typ = NodeEmU8eOpenMarker
-					closeMarker.typ = NodeEmU8eCloseMarker
+					emStrongDel.Typ = NodeEmphasis
+					openMarker.Typ = NodeEmU8eOpenMarker
+					closeMarker.Typ = NodeEmU8eCloseMarker
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel.typ = NodeStrikethrough
-						openMarker.typ = NodeStrikethrough1OpenMarker
-						closeMarker.typ = NodeStrikethrough1CloseMarker
+						emStrongDel.Typ = NodeStrikethrough
+						openMarker.Typ = NodeStrikethrough1OpenMarker
+						closeMarker.Typ = NodeStrikethrough1CloseMarker
 					}
 				}
 			} else {
 				if itemAsterisk == closercc {
-					emStrongDel.typ = NodeStrong
-					openMarker.typ = NodeStrongA6kOpenMarker
-					closeMarker.typ = NodeStrongA6kCloseMarker
+					emStrongDel.Typ = NodeStrong
+					openMarker.Typ = NodeStrongA6kOpenMarker
+					closeMarker.Typ = NodeStrongA6kCloseMarker
 				} else if itemUnderscore == closercc {
-					emStrongDel.typ = NodeStrong
-					openMarker.typ = NodeStrongU8eOpenMarker
-					closeMarker.typ = NodeStrongU8eCloseMarker
+					emStrongDel.Typ = NodeStrong
+					openMarker.Typ = NodeStrongU8eOpenMarker
+					closeMarker.Typ = NodeStrongU8eCloseMarker
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel.typ = NodeStrikethrough
-						openMarker.typ = NodeStrikethrough2OpenMarker
-						closeMarker.typ = NodeStrikethrough2CloseMarker
+						emStrongDel.Typ = NodeStrikethrough
+						openMarker.Typ = NodeStrikethrough2OpenMarker
+						closeMarker.Typ = NodeStrikethrough2CloseMarker
 					}
 				}
 			}

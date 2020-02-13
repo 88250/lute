@@ -24,19 +24,19 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	backticks := ctx.tokens[startPos : startPos+n]
 	if ctx.tokensLen <= startPos+n {
 		ctx.pos += n
-		ret = &Node{typ: NodeText, tokens: backticks}
+		ret = &Node{Typ: NodeText, tokens: backticks}
 		return
 	}
-	openMarker := &Node{typ: NodeCodeSpanOpenMarker, tokens: backticks}
+	openMarker := &Node{Typ: NodeCodeSpanOpenMarker, tokens: backticks}
 
 	endPos := t.matchCodeSpanEnd(ctx.tokens[startPos+n:], n)
 	if 1 > endPos {
 		ctx.pos += n
-		ret = &Node{typ: NodeText, tokens: backticks}
+		ret = &Node{Typ: NodeText, tokens: backticks}
 		return
 	}
 	endPos = startPos + endPos + n
-	closeMarker := &Node{typ: NodeCodeSpanCloseMarker, tokens: ctx.tokens[endPos : endPos+n]}
+	closeMarker := &Node{Typ: NodeCodeSpanCloseMarker, tokens: ctx.tokens[endPos : endPos+n]}
 
 	textTokens := ctx.tokens[startPos+n : endPos]
 	if !t.context.option.VditorWYSIWYG {
@@ -50,9 +50,9 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	ret = &Node{typ: NodeCodeSpan, codeMarkerLen: n}
+	ret = &Node{Typ: NodeCodeSpan, codeMarkerLen: n}
 	ret.AppendChild(openMarker)
-	ret.AppendChild(&Node{typ: NodeCodeSpanContent, tokens: textTokens})
+	ret.AppendChild(&Node{Typ: NodeCodeSpanContent, tokens: textTokens})
 	ret.AppendChild(closeMarker)
 	ctx.pos = endPos + n
 	return

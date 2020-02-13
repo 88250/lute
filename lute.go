@@ -22,8 +22,8 @@ const Version = "1.1.2"
 type Lute struct {
 	*options // 解析和渲染选项配置
 
-	FormatRendererFuncs map[nodeType]RendererFunc // 用户自定义的格式化渲染器函数
-	VditorRendererFuncs map[nodeType]RendererFunc // 用户自定义的 Vditor 渲染器函数
+	FormatRendererFuncs map[NodeType]RendererFunc // 用户自定义的格式化渲染器函数
+	VditorRendererFuncs map[NodeType]RendererFunc // 用户自定义的 Vditor 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：
@@ -62,8 +62,8 @@ func New(opts ...option) (ret *Lute) {
 	for _, opt := range opts {
 		opt(ret)
 	}
-	ret.FormatRendererFuncs = map[nodeType]RendererFunc{}
-	ret.VditorRendererFuncs = map[nodeType]RendererFunc{}
+	ret.FormatRendererFuncs = map[NodeType]RendererFunc{}
+	ret.VditorRendererFuncs = map[NodeType]RendererFunc{}
 	return ret
 }
 

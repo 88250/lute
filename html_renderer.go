@@ -139,11 +139,11 @@ func (r *HTMLRenderer) headings() (ret []*Node) {
 }
 
 func (r *HTMLRenderer) headings0(n *Node, headings *[]*Node) {
-	if NodeHeading == n.typ {
+	if NodeHeading == n.Typ {
 		*headings = append(*headings, n)
 		return
 	}
-	if NodeList == n.typ || NodeListItem == n.typ || NodeBlockquote == n.typ {
+	if NodeList == n.Typ || NodeListItem == n.Typ || NodeBlockquote == n.Typ {
 		for c := n.firstChild; nil != c; c = c.next {
 			r.headings0(c, headings)
 		}
@@ -158,14 +158,14 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
 		tree := &Tree{Name: "", context: &Context{option: lute.options}}
 		tree.context.tree = tree
-		tree.Root = &Node{typ: NodeDocument}
+		tree.Root = &Node{Typ: NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := lute.newHTMLRenderer(tree)
 		lc := tree.Root.lastDeepestChild()
 		for i = len(def.footnotesRefs) - 1; 0 <= i; i-- {
 			ref := def.footnotesRefs[i]
 			gotoRef := " <a href=\"#footnotes-ref-" + ref.footnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
-			link := &Node{typ: NodeInlineHTML, tokens: strToBytes(gotoRef)}
+			link := &Node{Typ: NodeInlineHTML, tokens: strToBytes(gotoRef)}
 			lc.InsertAfter(link)
 		}
 		defRenderer.(*HTMLRenderer).needRenderFootnotesDef = true
@@ -272,7 +272,7 @@ func (r *HTMLRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, e
 
 func (r *HTMLRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
 	tag := "td"
-	if NodeTableHead == node.parent.parent.typ {
+	if NodeTableHead == node.parent.parent.Typ {
 		tag = "th"
 	}
 	if entering {
@@ -457,7 +457,7 @@ func (r *HTMLRenderer) renderDocument(node *Node, entering bool) (WalkStatus, er
 }
 
 func (r *HTMLRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.typ && grandparent.tight { // List.ListItem.Paragraph
+	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.Typ && grandparent.tight { // List.ListItem.Paragraph
 		return WalkContinue, nil
 	}
 
@@ -642,7 +642,7 @@ func (r *HTMLRenderer) renderList(node *Node, entering bool) (WalkStatus, error)
 func (r *HTMLRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
 	if entering {
 		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass &&
-			nil != node.firstChild && nil != node.firstChild.firstChild && NodeTaskListItemMarker == node.firstChild.firstChild.typ {
+			nil != node.firstChild && nil != node.firstChild.firstChild && NodeTaskListItemMarker == node.firstChild.firstChild.Typ {
 			r.tag("li", [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
 		} else {
 			r.tag("li", nil, false)

@@ -18,7 +18,7 @@ import "bytes"
 func (t *Tree) emoji(node *Node) {
 	for child := node.firstChild; nil != child; {
 		next := child.next
-		if NodeText == child.typ {
+		if NodeText == child.Typ {
 			t.emoji0(child)
 		} else {
 			t.emoji(child) // 递归处理子节点
@@ -77,8 +77,8 @@ func (t *Tree) emoji0(node *Node) {
 		}
 
 		if emoji, ok := t.context.option.AliasEmoji[bytesToStr(maybeEmoji)]; ok {
-			emojiNode := &Node{typ: NodeEmoji}
-			emojiUnicodeOrImg := &Node{typ: NodeEmojiUnicode}
+			emojiNode := &Node{Typ: NodeEmoji}
+			emojiUnicodeOrImg := &Node{Typ: NodeEmojiUnicode}
 			emojiNode.AppendChild(emojiUnicodeOrImg)
 			emojiTokens := strToBytes(emoji)
 			if bytes.Contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
@@ -88,22 +88,22 @@ func (t *Tree) emoji0(node *Node) {
 					suffix = ".gif"
 				}
 				src := t.context.option.EmojiSite + "/" + alias + suffix
-				emojiUnicodeOrImg.typ = NodeEmojiImg
+				emojiUnicodeOrImg.Typ = NodeEmojiImg
 				emojiUnicodeOrImg.tokens = t.emojiImgTokens(alias, src)
 			} else if bytes.Contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
 				alias := bytesToStr(maybeEmoji)
-				emojiUnicodeOrImg.typ = NodeEmojiImg
+				emojiUnicodeOrImg.Typ = NodeEmojiImg
 				emojiUnicodeOrImg.tokens = t.emojiImgTokens(alias, emoji)
 			} else {
 				emojiUnicodeOrImg.tokens = emojiTokens
 			}
 
-			emojiUnicodeOrImg.AppendChild(&Node{typ: NodeEmojiAlias, tokens: tokens[i : pos+1]})
+			emojiUnicodeOrImg.AppendChild(&Node{Typ: NodeEmojiAlias, tokens: tokens[i : pos+1]})
 			node.InsertAfter(emojiNode)
 
 			if pos+1 < length {
 				// 在 Emoji 节点后插入一个内容为空的文本节点，留作下次迭代
-				text := &Node{typ: NodeText, tokens: []byte{}}
+				text := &Node{Typ: NodeText, tokens: []byte{}}
 				emojiNode.InsertAfter(text)
 				node = text
 			}

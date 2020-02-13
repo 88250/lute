@@ -77,7 +77,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.bulletChar = marker[0]
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
-		if container.typ != NodeParagraph || bytes.Equal(items1, marker) {
+		if container.Typ != NodeParagraph || bytes.Equal(items1, marker) {
 			data.typ = 1 // 有序列表
 			data.start, _ = strconv.Atoi(bytesToStr(marker))
 			markerLength = len(marker) + 1
@@ -98,7 +98,7 @@ func (t *Tree) parseListMarker(container *Node) *listData {
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空
-	if container.typ == NodeParagraph && itemNewline == token {
+	if container.Typ == NodeParagraph && itemNewline == token {
 		return nil
 	}
 
@@ -168,7 +168,7 @@ func (list *Node) endsWithBlankLine(block *Node) bool {
 		if block.lastLineBlank {
 			return true
 		}
-		t := block.typ
+		t := block.Typ
 		if !block.lastLineChecked && (t == NodeList || t == NodeListItem) {
 			block.lastLineChecked = true
 			block = block.lastChild

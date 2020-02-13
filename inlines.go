@@ -30,7 +30,7 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 	}
 
 	// 只有如下几种类型的块节点需要生成行级子节点
-	if typ := node.typ; NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
+	if typ := node.Typ; NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
 		tokens := node.tokens
 		if NodeParagraph == typ && nil == tokens {
 			// 解析 GFM 表节点后段落内容 tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
@@ -73,14 +73,14 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 		return
 	} else if NodeCodeBlock == typ {
 		if node.isFencedCodeBlock { // 如果是围栏代码块需要细化其子节点
-			openMarker := &Node{typ: NodeCodeBlockFenceOpenMarker, tokens: node.codeBlockOpenFence, codeBlockFenceLen: node.codeBlockFenceLen}
+			openMarker := &Node{Typ: NodeCodeBlockFenceOpenMarker, tokens: node.codeBlockOpenFence, codeBlockFenceLen: node.codeBlockFenceLen}
 			node.PrependChild(openMarker)
-			info := &Node{typ: NodeCodeBlockFenceInfoMarker, codeBlockInfo: node.codeBlockInfo}
+			info := &Node{Typ: NodeCodeBlockFenceInfoMarker, codeBlockInfo: node.codeBlockInfo}
 			node.AppendChild(info)
-			code := &Node{typ: NodeCodeBlockCode, tokens: node.tokens}
+			code := &Node{Typ: NodeCodeBlockCode, tokens: node.tokens}
 			node.AppendChild(code)
 			node.tokens = nil
-			closeMarker := &Node{typ: NodeCodeBlockFenceCloseMarker, tokens: node.codeBlockCloseFence, codeBlockFenceLen: node.codeBlockFenceLen}
+			closeMarker := &Node{Typ: NodeCodeBlockFenceCloseMarker, tokens: node.codeBlockCloseFence, codeBlockFenceLen: node.codeBlockFenceLen}
 			node.AppendChild(closeMarker)
 		}
 	}

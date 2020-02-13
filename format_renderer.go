@@ -339,7 +339,7 @@ func (r *FormatRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 		inTightList := false
 		lastListItemLastPara := false
 		if parent := node.parent; nil != parent {
-			if NodeListItem == parent.typ { // ListItem.Paragraph
+			if NodeListItem == parent.Typ { // ListItem.Paragraph
 				listItem := parent
 				if nil != listItem.parent && nil != listItem.parent.listData {
 					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.tight
@@ -738,13 +738,13 @@ func (r *FormatRenderer) isLastNode(treeRoot, node *Node) bool {
 	if nil != node.next {
 		return false
 	}
-	if NodeDocument == node.parent.typ {
+	if NodeDocument == node.parent.Typ {
 		return treeRoot.lastChild == node
 	}
 
 	var n *Node
 	for n = node.parent; ; n = n.parent {
-		if NodeDocument == n.parent.typ {
+		if NodeDocument == n.parent.Typ {
 			break
 		}
 	}

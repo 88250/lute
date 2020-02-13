@@ -228,7 +228,7 @@ func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus,
 
 func (r *VditorRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
 	tag := "td"
-	if NodeTableHead == node.parent.parent.typ {
+	if NodeTableHead == node.parent.parent.Typ {
 		tag = "th"
 	}
 	if entering {
@@ -436,7 +436,7 @@ func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, 
 }
 
 func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
-	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.typ && grandparent.tight { // List.ListItem.Paragraph
+	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.Typ && grandparent.tight { // List.ListItem.Paragraph
 		return WalkContinue, nil
 	}
 
@@ -501,7 +501,7 @@ func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkS
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
 	r.writeString("</code>")
 	codeSpan := node.parent
-	if codeSpanParent := codeSpan.parent; nil != codeSpanParent && NodeLink == codeSpanParent.typ {
+	if codeSpanParent := codeSpan.parent; nil != codeSpanParent && NodeLink == codeSpanParent.Typ {
 		return WalkStop, nil
 	}
 	r.writeString(zwsp)
@@ -629,7 +629,7 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 			} else {
 				attrs = append(attrs, []string{"data-marker", string(node.marker)})
 			}
-			if nil != node.firstChild && nil != node.firstChild.firstChild && NodeTaskListItemMarker == node.firstChild.firstChild.typ {
+			if nil != node.firstChild && nil != node.firstChild.firstChild && NodeTaskListItemMarker == node.firstChild.firstChild.Typ {
 				attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
 			}
 		}

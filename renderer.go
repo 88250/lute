@@ -30,7 +30,7 @@ type Renderer interface {
 type BaseRenderer struct {
 	writer              *bytes.Buffer             // 输出缓冲
 	lastOut             byte                      // 最新输出的一个字节
-	rendererFuncs       map[nodeType]RendererFunc // 渲染器
+	rendererFuncs       map[NodeType]RendererFunc // 渲染器
 	defaultRendererFunc RendererFunc              // 默认渲染器，在 rendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
 	disableTags         int                       // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 	option              *options                  // 解析渲染选项
@@ -39,7 +39,7 @@ type BaseRenderer struct {
 
 // newBaseRenderer 构造一个 BaseRenderer。
 func (lute *Lute) newBaseRenderer(tree *Tree) *BaseRenderer {
-	ret := &BaseRenderer{rendererFuncs: map[nodeType]RendererFunc{}, option: lute.options, tree: tree}
+	ret := &BaseRenderer{rendererFuncs: map[NodeType]RendererFunc{}, option: lute.options, tree: tree}
 	ret.writer = &bytes.Buffer{}
 	ret.writer.Grow(4096)
 	return ret
@@ -54,7 +54,7 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 	r.writer.Grow(4096)
 
 	err = Walk(r.tree.Root, func(n *Node, entering bool) (WalkStatus, error) {
-		f := r.rendererFuncs[n.typ]
+		f := r.rendererFuncs[n.Typ]
 		if nil == f {
 			if nil != r.defaultRendererFunc {
 				return r.defaultRendererFunc(n, entering)
@@ -72,12 +72,12 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 	return
 }
 
-func (r *BaseRenderer) RendererFuncs(nodeType nodeType) RendererFunc {
+func (r *BaseRenderer) RendererFuncs(nodeType NodeType) RendererFunc {
 	return r.rendererFuncs[nodeType]
 }
 
 func (r *BaseRenderer) renderDefault(n *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, errors.New("not found render function for node [type=" + n.typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
+	return WalkStop, errors.New("not found render function for node [type=" + n.Typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
 }
 
 // writeByte 输出一个字节 c。

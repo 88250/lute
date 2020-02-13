@@ -46,9 +46,9 @@ func (mathBlock *Node) mathBlockFinalize(context *Context) {
 		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
 	}
 	mathBlock.tokens = nil
-	mathBlock.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
-	mathBlock.AppendChild(&Node{typ: NodeMathBlockContent, tokens: tokens})
-	mathBlock.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
+	mathBlock.AppendChild(&Node{Typ: NodeMathBlockOpenMarker})
+	mathBlock.AppendChild(&Node{Typ: NodeMathBlockContent, tokens: tokens})
+	mathBlock.AppendChild(&Node{Typ: NodeMathBlockCloseMarker})
 }
 
 func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
