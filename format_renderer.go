@@ -507,7 +507,7 @@ func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 	if !node.isFencedCodeBlock {
 		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
 		r.writeByte(itemNewline)
-		r.write(node.tokens)
+		r.write(node.firstChild.tokens)
 		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
 		r.newline()
 		if !r.isLastNode(r.tree.Root, node) {

@@ -699,10 +699,12 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
 	codeLen := len(node.tokens)
 	codeIsEmpty := 1 > codeLen || (len(caret) == codeLen && caret == string(node.tokens))
-	node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
-
+	isFenced := node.parent.isFencedCodeBlock
+	if isFenced {
+		node.previous.codeBlockInfo = bytes.ReplaceAll(node.previous.codeBlockInfo, []byte(caret), []byte(""))
+	}
 	var attrs [][]string
-	if 0 < len(node.previous.codeBlockInfo) {
+	if isFenced && 0 < len(node.previous.codeBlockInfo) {
 		infoWords := split(node.previous.codeBlockInfo, itemSpace)
 		language := string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})

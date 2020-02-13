@@ -33,7 +33,7 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 		// 缩进代码块处理
 		r.newline()
 		rendered := false
-		tokens := node.tokens
+		tokens := node.firstChild.tokens
 		if r.option.CodeSyntaxHighlight {
 			rendered = highlightChroma(tokens, "", r)
 			if !rendered {
