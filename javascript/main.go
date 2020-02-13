@@ -17,10 +17,10 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-func New(formatRenderer, vditorRenderer *js.Object) *js.Object {
+func New(options map[string]*js.Object) *js.Object {
 	engine := lute.New()
-	registerRenderer(engine, formatRenderer, "format")
-	registerRenderer(engine, vditorRenderer, "vditor")
+	registerRenderer(engine, options["formatRenderer"], "format")
+	registerRenderer(engine, options["vditorRenderer"], "vditor")
 	return js.MakeWrapper(engine)
 }
 
