@@ -18,7 +18,11 @@
             return Lute.WalkStop;
         },
     };
-    let luteEngine = Lute.New({"formatRenderer": formatRenderer});
+    let luteEngine = Lute.New({
+        "renderers": {
+            "format": formatRenderer,
+        }
+    });
 
     // 没有扩展需求的话直接构造即可
     // let luteEngine = Lute.New();

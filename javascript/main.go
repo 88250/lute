@@ -17,38 +17,39 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-func New(options map[string]*js.Object) *js.Object {
+func New(options map[string]map[string]*js.Object) *js.Object {
 	engine := lute.New()
-	registerRenderer(engine, options["formatRenderer"], "format")
-	registerRenderer(engine, options["vditorRenderer"], "vditor")
+	registerRenderers(engine, options)
 	return js.MakeWrapper(engine)
 }
 
-func registerRenderer(engine *lute.Lute, extRenderer *js.Object, rendererType string) {
-	switch extRenderer.Interface().(type) {
-	case map[string]interface{}:
-		break
-	default:
-		return
-	}
+func registerRenderers(engine *lute.Lute, options map[string]map[string]*js.Object) {
+	for rendererType, extRenderer := range options["renderers"] {
+		switch extRenderer.Interface().(type) {
+		case map[string]interface{}:
+			break
+		default:
+			continue
+		}
 
-	var rendererFuncs map[lute.NodeType]lute.RendererFunc
-	if "format" == rendererType {
-		rendererFuncs = engine.FormatRendererFuncs
-	} else if "vditor" == rendererType {
-		rendererFuncs = engine.VditorRendererFuncs
-	} else {
-		return
-	}
+		var rendererFuncs map[lute.NodeType]lute.RendererFunc
+		if "format" == rendererType {
+			rendererFuncs = engine.FormatRendererFuncs
+		} else if "vditor" == rendererType {
+			rendererFuncs = engine.VditorRendererFuncs
+		} else {
+			continue
+		}
 
-	renderFuncs := extRenderer.Interface().(map[string]interface{})
-	for funcName, _ := range renderFuncs {
-		nodeType := "Node" + funcName[len("render"):]
-		rendererFuncs[lute.Str2NodeType(nodeType)] = func(n *lute.Node, entering bool) (status lute.WalkStatus, err error) {
-			nodeType := n.Typ.String()
-			funcName = "render" + nodeType[len("Node"):]
-			walkStatus := extRenderer.Call(funcName, js.MakeWrapper(n), entering).Int()
-			return lute.WalkStatus(walkStatus), nil
+		renderFuncs := extRenderer.Interface().(map[string]interface{})
+		for funcName, _ := range renderFuncs {
+			nodeType := "Node" + funcName[len("render"):]
+			rendererFuncs[lute.Str2NodeType(nodeType)] = func(n *lute.Node, entering bool) (status lute.WalkStatus, err error) {
+				nodeType := n.Typ.String()
+				funcName = "render" + nodeType[len("Node"):]
+				walkStatus := extRenderer.Call(funcName, js.MakeWrapper(n), entering).Int()
+				return lute.WalkStatus(walkStatus), nil
+			}
 		}
 	}
 }
