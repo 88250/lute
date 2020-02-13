@@ -9,12 +9,12 @@
 <script>
     // 支持覆写渲染器 https://github.com/88250/lute/issues/5
     let HTML2MdRenderer = {
-        renderImage: function (node, entering) {
-            console.log('重写 Image 节点', node, entering)
+        renderLinkDest: function (node, entering) {
+            console.log('重写 LinkDest 节点', node.TokensStr(), entering)
             return Lute.WalkContinue;
         },
         renderBang: function (node, entering) {
-            console.log('重写 Bang 节点', node, entering)
+            console.log('重写 Bang 节点', node.TokensStr(), entering)
             return Lute.WalkStop;
         },
     };

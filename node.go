@@ -102,6 +102,10 @@ func (n *Node) firstDeepestChild() (ret *Node) {
 	return n.FirstChild.firstDeepestChild()
 }
 
+func (n *Node) TokensStr() string {
+	return bytesToStr(n.Tokens)
+}
+
 // LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。
 func (n *Node) ChildByType(childType NodeType) *Node {
 	for c := n.FirstChild; nil != c; c = c.Next {
