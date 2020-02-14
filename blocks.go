@@ -371,10 +371,10 @@ var blockStarts = []blockStartFunc{
 	// 判断分隔线（--- ***）是否开始
 	func(t *Tree, container *Node) int {
 		if !t.context.indented {
-			if ok, markers := t.parseThematicBreak(); ok {
+			if ok, caretTokens := t.parseThematicBreak(); ok {
 				t.context.closeUnmatchedBlocks()
 				thematicBreak := t.context.addChild(NodeThematicBreak, t.context.nextNonspace)
-				thematicBreak.tokens = markers
+				thematicBreak.tokens = caretTokens
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
 			}

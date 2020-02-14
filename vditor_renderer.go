@@ -646,6 +646,12 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) Wal
 
 func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) WalkStatus {
 	r.tag("hr", [][]string{{"data-block", "0"}}, true)
+	if nil != node.tokens {
+		r.tag("p", [][]string{{"data-block", "0"}}, false)
+		r.writeBytes(node.tokens)
+		r.writeByte(itemNewline)
+		r.tag("/p", nil, false)
+	}
 	return WalkStop
 }
 

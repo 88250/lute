@@ -12,18 +12,21 @@ package lute
 
 import "bytes"
 
-func (t *Tree) parseThematicBreak() (ok bool, markers []byte) {
+func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	markerCnt := 0
 	var marker byte
 	ln := t.context.currentLine
+	var caretInLn bool
 	if t.context.option.VditorWYSIWYG {
-		ln = bytes.ReplaceAll(ln, []byte(caret), []byte(""))
+		if bytes.Contains(ln, []byte(caret)) {
+			caretInLn = true
+			ln = bytes.ReplaceAll(ln, []byte(caret), []byte(""))
+		}
 	}
 
 	length := len(ln)
 	for i := t.context.nextNonspace; i < length-1; i++ {
 		token := ln[i]
-		markers = append(markers, token)
 		if itemSpace == token || itemTab == token {
 			continue
 		}
@@ -42,5 +45,9 @@ func (t *Tree) parseThematicBreak() (ok bool, markers []byte) {
 		markerCnt++
 	}
 
-	return 3 <= markerCnt, markers
+	if t.context.option.VditorWYSIWYG && caretInLn {
+		caretTokens = []byte(caret)
+	}
+
+	return 3 <= markerCnt, caretTokens
 }
