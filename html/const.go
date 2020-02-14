@@ -1,8 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-package html
+// license that can be found in the LICENSE file.package html
 
 // Section 12.2.4.2 of the HTML5 specification says "The following elements
 // have varying levels of special parsing rules".

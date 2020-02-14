@@ -8,9 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 // PURPOSE.
-// See the Mulan PSL v1 for more details.
-
-package html
+// See the Mulan PSL v1 for more details.package html
 
 // Entities 罗列了所有 HTML 实体，由 https://html.spec.whatwg.org/entities.json 整理生成。
 var Entities = map[string]string{
