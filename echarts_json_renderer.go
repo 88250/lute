@@ -59,68 +59,68 @@ func (lute *Lute) newEChartsJSONRenderer(tree *Tree) Renderer {
 	return ret
 }
 
-func (r *EChartsJSONRenderer) renderDefault(n *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *EChartsJSONRenderer) renderDefault(n *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderInlineMath(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.leaf("Inline Math\nspan", node)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderMathBlock(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.leaf("Math Block\ndiv", node)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderEmojiImg(node *Node, entering bool) WalkStatus {
 	r.leaf("Emoji Img\n", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderEmojiUnicode(node *Node, entering bool) WalkStatus {
 	r.leaf("Emoji Unicode\n", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *EChartsJSONRenderer) renderEmojiAlias(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *EChartsJSONRenderer) renderEmoji(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderTableCell(node *Node, entering bool) WalkStatus {
 	r.leaf("Table Cell\ntd", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderTableRow(node *Node, entering bool) WalkStatus {
 	r.leaf("Table Row\ntr", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderTableHead(node *Node, entering bool) WalkStatus {
 	r.leaf("Table Head\nthead", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderTable(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderTable(node *Node, entering bool) WalkStatus {
 	r.leaf("Table\ntable", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderStrikethrough(node *Node, entering bool) WalkStatus {
 	r.leaf("Strikethrough\ndel", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderImage(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Image\nimg", node)
@@ -129,10 +129,10 @@ func (r *EChartsJSONRenderer) renderImage(node *Node, entering bool) (WalkStatus
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderLink(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Link\na", node)
@@ -141,20 +141,20 @@ func (r *EChartsJSONRenderer) renderLink(node *Node, entering bool) (WalkStatus,
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderHTML(node *Node, entering bool) WalkStatus {
 	r.leaf("HTML Block\n", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderInlineHTML(node *Node, entering bool) WalkStatus {
 	r.leaf("Inline HTML\n", node)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderDocument(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeByte(itemOpenBracket)
 		r.openObj()
@@ -165,10 +165,10 @@ func (r *EChartsJSONRenderer) renderDocument(node *Node, entering bool) (WalkSta
 		r.closeObj(node)
 		r.writeByte(itemCloseBracket)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Paragraph\np", node)
@@ -177,10 +177,10 @@ func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) (WalkSt
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) WalkStatus {
 	if entering {
 		text := bytesToStr(node.tokens)
 		var i int
@@ -197,17 +197,17 @@ func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) (WalkStatus,
 		r.val("Text\n"+summary, node)
 		r.closeObj(node)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderCodeSpan(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.leaf("Code Span\ncode", node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderEmphasis(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Emphasis\nem", node)
@@ -216,10 +216,10 @@ func (r *EChartsJSONRenderer) renderEmphasis(node *Node, entering bool) (WalkSta
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderStrong(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Strong\nstrong", node)
@@ -228,10 +228,10 @@ func (r *EChartsJSONRenderer) renderStrong(node *Node, entering bool) (WalkStatu
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderBlockquote(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Blockquote\nblockquote", node)
@@ -240,10 +240,10 @@ func (r *EChartsJSONRenderer) renderBlockquote(node *Node, entering bool) (WalkS
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderHeading(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		h := "h" + " 123456"[node.headingLevel:node.headingLevel+1]
@@ -253,10 +253,10 @@ func (r *EChartsJSONRenderer) renderHeading(node *Node, entering bool) (WalkStat
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		list := "ul"
@@ -269,10 +269,10 @@ func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) (WalkStatus,
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderListItem(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("List Item\nli "+bytesToStr(node.listData.marker), node)
@@ -281,10 +281,10 @@ func (r *EChartsJSONRenderer) renderListItem(node *Node, entering bool) (WalkSta
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		check := " "
@@ -297,35 +297,35 @@ func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *Node, entering bool
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderThematicBreak(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.leaf("Thematic Break\nhr", node)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderHardBreak(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.leaf("Hard Break\nbr", node)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderSoftBreak(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.leaf("Soft Break\n", node)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
+func (r *EChartsJSONRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.leaf("Code Block\npre.code", node)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
 func (r *EChartsJSONRenderer) leaf(val string, node *Node) {

@@ -101,48 +101,48 @@ func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 	return ret
 }
 
-func (r *FormatRenderer) renderBackslashContent(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderBackslashContent(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderBackslash(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderBackslash(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeByte(itemBackslash)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderFootnotesRef(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderFootnotesRef(node *Node, entering bool) WalkStatus {
 	r.writeString("[" + bytesToStr(node.tokens) + "]")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderFootnotesDef(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderFootnotesDef(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeString("[" + bytesToStr(node.tokens) + "]: ")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmojiAlias(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderEmojiImg(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderEmojiUnicode(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderEmoji(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableCell(node *Node, entering bool) WalkStatus {
 	padding := node.tableCellContentMaxWidth - node.tableCellContentWidth
 	if entering {
 		r.writeByte(itemPipe)
@@ -163,17 +163,17 @@ func (r *FormatRenderer) renderTableCell(node *Node, entering bool) (WalkStatus,
 		}
 		r.writeByte(itemSpace)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableRow(node *Node, entering bool) WalkStatus {
 	if !entering {
 		r.writeString("|\n")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTableHead(node *Node, entering bool) WalkStatus {
 	if !entering {
 		headRow := node.firstChild
 		for th := headRow.firstChild; nil != th; th = th.next {
@@ -207,114 +207,114 @@ func (r *FormatRenderer) renderTableHead(node *Node, entering bool) (WalkStatus,
 		}
 		r.writeString("|\n")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderTable(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTable(node *Node, entering bool) WalkStatus {
 	if !entering {
 		r.newline()
 		if !r.isLastNode(r.tree.Root, node) {
 			r.writeByte(itemNewline)
 		}
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderStrikethrough(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemTilde)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemTilde)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeString("~~")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) WalkStatus {
 	r.writeString("~~")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) WalkStatus {
 	r.writeString("\"")
 	r.write(node.tokens)
 	r.writeString("\"")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderLinkDest(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderLinkSpace(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderLinkSpace(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemSpace)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderLinkText(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCloseParen(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCloseParen(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemCloseParen)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderOpenParen(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderOpenParen(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemOpenParen)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCloseBracket(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCloseBracket(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemCloseBracket)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderOpenBracket(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderOpenBracket(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemOpenBracket)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderBang(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderBang(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemBang)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderImage(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderLink(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderHTML(node *Node, entering bool) WalkStatus {
 	r.newline()
 	r.write(node.tokens)
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderInlineHTML(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderDocument(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -325,10 +325,10 @@ func (r *FormatRenderer) renderDocument(node *Node, entering bool) (WalkStatus, 
 		r.writeBytes(buf)
 		r.writeByte(itemNewline)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderParagraph(node *Node, entering bool) WalkStatus {
 	if !entering {
 		r.newline()
 
@@ -357,10 +357,10 @@ func (r *FormatRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 			r.writeByte(itemNewline)
 		}
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderText(node *Node, entering bool) WalkStatus {
 	if r.option.AutoSpace {
 		r.space(node)
 	}
@@ -371,10 +371,10 @@ func (r *FormatRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 		r.chinesePunct(node)
 	}
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) WalkStatus {
 	if entering {
 		if r.option.AutoSpace {
 			if text := node.PreviousNodeText(); "" != text {
@@ -394,10 +394,10 @@ func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 			}
 		}
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemBacktick)
 	if 1 < node.parent.codeMarkerLen {
 		r.writeByte(itemBacktick)
@@ -407,15 +407,15 @@ func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (Wa
 			r.writeByte(itemSpace)
 		}
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeSpanContent(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) WalkStatus {
 	if 1 < node.parent.codeMarkerLen {
 		text := bytesToStr(node.previous.tokens)
 		lastc, _ := utf8.DecodeLastRuneInString(text)
@@ -425,81 +425,81 @@ func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (W
 		r.writeByte(itemBacktick)
 	}
 	r.writeByte(itemBacktick)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderInlineMathCloseMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemDollar)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderInlineMathContent(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderInlineMathOpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemDollar)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderInlineMath(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderMathBlockCloseMarker(node *Node, entering bool) WalkStatus {
 	r.write(mathBlockMarker)
 	r.writeByte(itemNewline)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderMathBlockContent(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
 	r.writeByte(itemNewline)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderMathBlockOpenMarker(node *Node, entering bool) WalkStatus {
 	r.write(mathBlockMarker)
 	r.writeByte(itemNewline)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) WalkStatus {
 	r.newline()
 	if !entering && !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) WalkStatus {
 	r.newline()
 	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeBlockCode(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) WalkStatus {
 	r.write(node.codeBlockInfo)
 	r.writeByte(itemNewline)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.codeBlockFenceLen))
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
 	if !node.isFencedCodeBlock {
 		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
 		r.writeByte(itemNewline)
@@ -509,60 +509,60 @@ func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 		if !r.isLastNode(r.tree.Root, node) {
 			r.writeByte(itemNewline)
 		}
-		return WalkStop, nil
+		return WalkStop
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderEmphasis(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemAsterisk)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemAsterisk)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemUnderscore)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemUnderscore)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *FormatRenderer) renderStrong(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeString("**")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) WalkStatus {
 	r.writeString("**")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) WalkStatus {
 	r.writeString("__")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) WalkStatus {
 	r.writeString("__")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -609,14 +609,14 @@ func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus
 		r.writeBytes(buf)
 		r.writeString("\n\n")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderBlockquoteMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *FormatRenderer) renderBlockquoteMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderHeading(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeBytes(bytes.Repeat([]byte{itemCrosshatch}, node.headingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
@@ -624,14 +624,14 @@ func (r *FormatRenderer) renderHeading(node *Node, entering bool) (WalkStatus, e
 		r.newline()
 		r.writeByte(itemNewline)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderHeadingC8hMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *FormatRenderer) renderHeadingC8hMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderList(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -645,10 +645,10 @@ func (r *FormatRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 		r.writeBytes(buf)
 		r.writeString("\n\n")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderListItem(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -694,10 +694,10 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 		r.writeBytes(buf)
 		r.writeString("\n")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *FormatRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderTaskListItemMarker(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemOpenBracket)
 	if node.taskListItemChecked {
 		r.writeByte('X')
@@ -705,26 +705,26 @@ func (r *FormatRenderer) renderTaskListItemMarker(node *Node, entering bool) (Wa
 		r.writeByte(itemSpace)
 	}
 	r.writeByte(itemCloseBracket)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderThematicBreak(node *Node, entering bool) WalkStatus {
 	r.writeString("---\n\n")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderHardBreak(node *Node, entering bool) WalkStatus {
 	if !r.option.SoftBreak2HardBreak {
 		r.writeString("\\\n")
 	} else {
 		r.writeByte(itemNewline)
 	}
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *FormatRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *FormatRenderer) renderSoftBreak(node *Node, entering bool) WalkStatus {
 	r.newline()
-	return WalkStop, nil
+	return WalkStop
 }
 
 func (r *FormatRenderer) isLastNode(treeRoot, node *Node) bool {

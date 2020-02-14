@@ -42,7 +42,7 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 	// 调整树结构
 	// TODO: 列表项依赖入参带有 p 节点，需要在此调整为自动插入 p 节点
 
-	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
+	Walk(tree.Root, func(n *Node, entering bool) WalkStatus {
 		if entering {
 			if NodeList == n.typ {
 				// ul.ul => ul.li.ul
@@ -55,7 +55,7 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 				}
 			}
 		}
-		return WalkContinue, nil
+		return WalkContinue
 	})
 
 	// 将 AST 进行 Markdown 格式化渲染

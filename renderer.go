@@ -14,11 +14,10 @@ package lute
 
 import (
 	"bytes"
-	"errors"
 )
 
 // RendererFunc 描述了渲染器函数签名。
-type RendererFunc func(n *Node, entering bool) (WalkStatus, error)
+type RendererFunc func(n *Node, entering bool) WalkStatus
 
 // ExtRendererFunc 描述了用户自定义的渲染器函数签名。
 type ExtRendererFunc func(n *Node, entering bool) (string, WalkStatus)
@@ -57,12 +56,12 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 	r.writer = &bytes.Buffer{}
 	r.writer.Grow(4096)
 
-	err = Walk(r.tree.Root, func(n *Node, entering bool) (WalkStatus, error) {
+	Walk(r.tree.Root, func(n *Node, entering bool) WalkStatus {
 		extRender := r.extRendererFuncs[n.typ]
 		if nil != extRender {
 			output, status := extRender(n, entering)
 			r.writeString(output)
-			return status, nil
+			return status
 		}
 
 		render := r.rendererFuncs[n.typ]
@@ -90,8 +89,9 @@ func (r *BaseRenderer) RendererFuncs(nodeType NodeType) RendererFunc {
 	return r.rendererFuncs[nodeType]
 }
 
-func (r *BaseRenderer) renderDefault(n *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, errors.New("not found render function for node [type=" + n.typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
+func (r *BaseRenderer) renderDefault(n *Node, entering bool) WalkStatus {
+	r.writeString("not found render function for node [type=" + n.typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
+	return WalkContinue
 }
 
 // writeByte 输出一个字节 c。

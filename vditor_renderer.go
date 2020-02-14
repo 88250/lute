@@ -101,12 +101,12 @@ func (lute *Lute) newVditorRenderer(tree *Tree) *VditorRenderer {
 	return ret
 }
 
-func (r *VditorRenderer) renderBackslashContent(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderBackslashContent(node *Node, entering bool) WalkStatus {
 	r.write(escapeHTML(node.tokens))
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderBackslash(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderBackslash(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeString("<span data-type=\"backslash\">")
 		r.writeString("<span>")
@@ -115,56 +115,56 @@ func (r *VditorRenderer) renderBackslash(node *Node, entering bool) (WalkStatus,
 	} else {
 		r.writeString("</span>")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderFootnotesDef(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderFootnotesDef(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeString("[" + bytesToStr(node.tokens) + "]: ")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderFootnotesRef(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderFootnotesRef(node *Node, entering bool) WalkStatus {
 	r.writeString("[" + bytesToStr(node.tokens) + "]")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderEmojiAlias(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderEmojiAlias(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderEmojiImg(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderEmojiUnicode(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderEmojiUnicode(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderEmoji(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *VditorRenderer) renderEmoji(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderInlineMathCloseMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) WalkStatus {
 	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
 	r.tag("code", [][]string{{"data-type", "math-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
@@ -172,14 +172,14 @@ func (r *VditorRenderer) renderInlineMathContent(node *Node, entering bool) (Wal
 	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
 	r.writeString("</code></span>" + zwsp)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderInlineMathOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderInlineMathOpenMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) WalkStatus {
 	if entering {
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, caret, "")
@@ -187,14 +187,14 @@ func (r *VditorRenderer) renderInlineMath(node *Node, entering bool) (WalkStatus
 			r.writeString(zwsp)
 		}
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderMathBlockCloseMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) WalkStatus {
 	node.tokens = bytes.TrimSpace(node.tokens)
 	codeLen := len(node.tokens)
 	codeIsEmpty := 1 > codeLen || (len(caret) == codeLen && caret == string(node.tokens))
@@ -206,23 +206,23 @@ func (r *VditorRenderer) renderMathBlockContent(node *Node, entering bool) (Walk
 		r.write(escapeHTML(node.tokens))
 	}
 	r.writeString("</code></pre>")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderMathBlockOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderMathBlockOpenMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderMathBlock(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeString(`<div class="vditor-wysiwyg__block" data-type="math-block" data-block="0">`)
 	} else {
 		r.writeString("</div>")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderTableCell(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderTableCell(node *Node, entering bool) WalkStatus {
 	tag := "td"
 	if NodeTableHead == node.parent.parent.typ {
 		tag = "th"
@@ -241,19 +241,19 @@ func (r *VditorRenderer) renderTableCell(node *Node, entering bool) (WalkStatus,
 	} else {
 		r.tag("/"+tag, nil, false)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderTableRow(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderTableRow(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.tag("tr", nil, false)
 	} else {
 		r.tag("/tr", nil, false)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderTableHead(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderTableHead(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.tag("thead", nil, false)
 	} else {
@@ -262,10 +262,10 @@ func (r *VditorRenderer) renderTableHead(node *Node, entering bool) (WalkStatus,
 			r.tag("tbody", nil, false)
 		}
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderTable(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderTable(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.tag("table", [][]string{{"data-block", "0"}}, false)
 	} else {
@@ -274,71 +274,71 @@ func (r *VditorRenderer) renderTable(node *Node, entering bool) (WalkStatus, err
 		}
 		r.tag("/table", nil, false)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderStrikethrough(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *VditorRenderer) renderStrikethrough(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) WalkStatus {
 	r.tag("s", [][]string{{"data-marker", "~"}}, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) WalkStatus {
 	r.tag("/s", nil, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) WalkStatus {
 	r.tag("s", [][]string{{"data-marker", "~~"}}, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) WalkStatus {
 	r.tag("/s", nil, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderLinkTitle(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderLinkTitle(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderLinkDest(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderLinkDest(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderLinkSpace(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderLinkSpace(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderLinkText(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderLinkText(node *Node, entering bool) WalkStatus {
 	r.write(node.tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderCloseParen(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderCloseParen(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderOpenParen(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderOpenParen(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderCloseBracket(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderCloseBracket(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderOpenBracket(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderOpenBracket(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderBang(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderBang(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderImage(node *Node, entering bool) WalkStatus {
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
@@ -352,7 +352,7 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 			}
 		}
 		r.disableTags++
-		return WalkContinue, nil
+		return WalkContinue
 	}
 
 	r.disableTags--
@@ -366,10 +366,10 @@ func (r *VditorRenderer) renderImage(node *Node, entering bool) (WalkStatus, err
 		}
 		r.writeString(" />")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderLink(node *Node, entering bool) WalkStatus {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
 		destTokens := dest.tokens
@@ -389,23 +389,23 @@ func (r *VditorRenderer) renderLink(node *Node, entering bool) (WalkStatus, erro
 	} else {
 		r.tag("/a", nil, false)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderHTML(node *Node, entering bool) WalkStatus {
 	r.writeString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
 	node.tokens = bytes.TrimSpace(node.tokens)
 	r.writeString("<pre>")
 	r.tag("code", nil, false)
 	r.write(escapeHTML(node.tokens))
 	r.writeString("</code></pre></div>")
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) WalkStatus {
 	if bytes.Equal(node.tokens, []byte("<br />")) && node.parentIs(NodeTableCell) {
 		r.write(node.tokens)
-		return WalkStop, nil
+		return WalkStop
 	}
 
 	if entering {
@@ -424,16 +424,16 @@ func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) (WalkStatus
 	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
 	r.writeString("</code></span>" + zwsp)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderDocument(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *VditorRenderer) renderDocument(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderParagraph(node *Node, entering bool) WalkStatus {
 	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.typ && grandparent.tight { // List.ListItem.Paragraph
-		return WalkContinue, nil
+		return WalkContinue
 	}
 
 	if entering {
@@ -442,10 +442,10 @@ func (r *VditorRenderer) renderParagraph(node *Node, entering bool) (WalkStatus,
 		r.writeByte(itemNewline)
 		r.tag("/p", nil, false)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderText(node *Node, entering bool) WalkStatus {
 	if r.option.AutoSpace {
 		r.space(node)
 	}
@@ -462,10 +462,10 @@ func (r *VditorRenderer) renderText(node *Node, entering bool) (WalkStatus, erro
 		node.tokens = bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
 	}
 	r.write(escapeHTML(node.tokens))
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) WalkStatus {
 	if entering {
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, caret, "")
@@ -479,93 +479,93 @@ func (r *VditorRenderer) renderCodeSpan(node *Node, entering bool) (WalkStatus, 
 		}
 		r.tag("code", [][]string{{"marker", strings.Repeat("`", node.codeMarkerLen)}}, false)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderCodeSpanContent(node *Node, entering bool) WalkStatus {
 	tokens := bytes.ReplaceAll(node.tokens, []byte(zwsp), []byte(""))
 	tokens = escapeHTML(tokens)
 	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) WalkStatus {
 	r.writeString("</code>")
 	codeSpan := node.parent
 	if codeSpanParent := codeSpan.parent; nil != codeSpanParent && NodeLink == codeSpanParent.typ {
-		return WalkStop, nil
+		return WalkStop
 	}
 	r.writeString(zwsp)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderEmphasis(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *VditorRenderer) renderEmphasis(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) WalkStatus {
 	r.tag("em", [][]string{{"data-marker", "*"}}, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) WalkStatus {
 	r.tag("/em", nil, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) WalkStatus {
 	r.tag("em", [][]string{{"data-marker", "_"}}, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) WalkStatus {
 	r.tag("/em", nil, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderStrong(node *Node, entering bool) (WalkStatus, error) {
-	return WalkContinue, nil
+func (r *VditorRenderer) renderStrong(node *Node, entering bool) WalkStatus {
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) WalkStatus {
 	r.tag("strong", [][]string{{"data-marker", "**"}}, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) WalkStatus {
 	r.tag("/strong", nil, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) WalkStatus {
 	r.tag("strong", [][]string{{"data-marker", "__"}}, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) WalkStatus {
 	r.tag("/strong", nil, false)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderBlockquote(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeString(`<blockquote data-block="0">`)
 	} else {
 		r.writeString("</blockquote>")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderBlockquoteMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderHeading(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderHeading(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.writeString("<h" + " 123456"[node.headingLevel:node.headingLevel+1] + " data-block=\"0\">")
 		if r.option.HeadingAnchor {
@@ -579,14 +579,14 @@ func (r *VditorRenderer) renderHeading(node *Node, entering bool) (WalkStatus, e
 	} else {
 		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderHeadingC8hMarker(node *Node, entering bool) (WalkStatus, error) {
-	return WalkStop, nil
+func (r *VditorRenderer) renderHeadingC8hMarker(node *Node, entering bool) WalkStatus {
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderList(node *Node, entering bool) WalkStatus {
 	tag := "ul"
 	if 1 == node.listData.typ || (3 == node.listData.typ && 0 == node.listData.bulletChar) {
 		tag = "ol"
@@ -608,10 +608,10 @@ func (r *VditorRenderer) renderList(node *Node, entering bool) (WalkStatus, erro
 	} else {
 		r.tag("/"+tag, nil, false)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderListItem(node *Node, entering bool) WalkStatus {
 	if entering {
 		var attrs [][]string
 		switch node.listData.typ {
@@ -633,32 +633,32 @@ func (r *VditorRenderer) renderListItem(node *Node, entering bool) (WalkStatus, 
 	} else {
 		r.tag("/li", nil, false)
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderTaskListItemMarker(node *Node, entering bool) WalkStatus {
 	var attrs [][]string
 	if node.taskListItemChecked {
 		attrs = append(attrs, []string{"checked", ""})
 	}
 	attrs = append(attrs, []string{"type", "checkbox"})
 	r.tag("input", attrs, true)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderThematicBreak(node *Node, entering bool) WalkStatus {
 	r.tag("hr", [][]string{{"data-block", "0"}}, true)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderHardBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderHardBreak(node *Node, entering bool) WalkStatus {
 	r.tag("br", nil, true)
-	return WalkStop, nil
+	return WalkStop
 }
 
-func (r *VditorRenderer) renderSoftBreak(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderSoftBreak(node *Node, entering bool) WalkStatus {
 	r.writeByte(itemNewline)
-	return WalkStop, nil
+	return WalkStop
 }
 
 func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
@@ -679,7 +679,7 @@ func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 	r.writeString(">")
 }
 
-func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
 	if entering {
 		marker := "```"
 		if nil != node.firstChild {
@@ -689,10 +689,10 @@ func (r *VditorRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus,
 	} else {
 		r.writeString("</div>")
 	}
-	return WalkContinue, nil
+	return WalkContinue
 }
 
-func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
+func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) WalkStatus {
 	codeLen := len(node.tokens)
 	codeIsEmpty := 1 > codeLen || (len(caret) == codeLen && caret == string(node.tokens))
 	isFenced := node.parent.isFencedCodeBlock
@@ -715,5 +715,5 @@ func (r *VditorRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkSta
 		r.newline()
 	}
 	r.writeString("</code></pre>")
-	return WalkStop, nil
+	return WalkStop
 }

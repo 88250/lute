@@ -28,7 +28,7 @@ import (
 // languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
 var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 
-func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
 	if !node.isFencedCodeBlock {
 		// 缩进代码块处理
 		r.newline()
@@ -47,14 +47,14 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) (WalkStatus, e
 		}
 		r.writeString("</code></pre>")
 		r.newline()
-		return WalkStop, nil
+		return WalkStop
 	}
 	r.newline()
-	return WalkContinue, nil
+	return WalkContinue
 }
 
 // renderCodeBlockCode 进行代码块 HTML 渲染，实现语法高亮。
-func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatus, error) {
+func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) WalkStatus {
 	if entering {
 		tokens := node.tokens
 		if 0 < len(node.previous.codeBlockInfo) {
@@ -93,10 +93,10 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) (WalkStatu
 				r.write(tokens)
 			}
 		}
-		return WalkSkipChildren, nil
+		return WalkSkipChildren
 	}
 	r.writeString("</code></pre>")
-	return WalkStop, nil
+	return WalkStop
 }
 
 func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered bool) {

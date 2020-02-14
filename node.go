@@ -149,11 +149,11 @@ func (n *Node) ChildByType(childType NodeType) *Node {
 
 // Text 返回 n 及其文本子节点的文本值。
 func (n *Node) Text() (ret string) {
-	Walk(n, func(n *Node, entering bool) (status WalkStatus, e error) {
+	Walk(n, func(n *Node, entering bool) WalkStatus {
 		if (NodeText == n.typ || NodeLinkText == n.typ) && entering {
 			ret += bytesToStr(n.tokens)
 		}
-		return WalkContinue, nil
+		return WalkContinue
 	})
 	return
 }
@@ -320,11 +320,11 @@ func (n *Node) PrependChild(child *Node) {
 // List 将 n 及其所有子节点按深度优先遍历添加到结果列表 ret 中。
 func (n *Node) List() (ret []*Node) {
 	ret = make([]*Node, 0, 512)
-	Walk(n, func(n *Node, entering bool) (status WalkStatus, e error) {
+	Walk(n, func(n *Node, entering bool) WalkStatus {
 		if entering {
 			ret = append(ret, n)
 		}
-		return WalkContinue, nil
+		return WalkContinue
 	})
 	return
 }

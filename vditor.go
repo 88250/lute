@@ -195,7 +195,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 
 	// 调整树结构
 
-	Walk(tree.Root, func(n *Node, entering bool) (status WalkStatus, e error) {
+	Walk(tree.Root, func(n *Node, entering bool) WalkStatus {
 		if entering {
 			switch n.typ {
 			case NodeInlineHTML, NodeCodeSpan, NodeInlineMath, NodeHTMLBlock, NodeCodeBlockCode, NodeMathBlockContent:
@@ -209,7 +209,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 				}
 			}
 		}
-		return WalkContinue, nil
+		return WalkContinue
 	})
 
 	// 将 AST 进行 Markdown 格式化渲染
