@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-const Version = "1.1.2"
+const Version = "1.1.3"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
