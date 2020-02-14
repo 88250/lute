@@ -1,6 +1,16 @@
 // Lute - 一款对中文语境优化的 Markdown 引擎，支持 Go 和 JavaScript
 // Copyright (c) 2019-present, b3log.org
 //
+// Lute is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//         http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
+// Lute - 一款对中文语境优化的 Markdown 引擎，支持 Go 和 JavaScript
+// Copyright (c) 2019-present, b3log.org
+//
 // Lute is licensed under the Mulan PSL v1.
 // You can use this software according to the terms and conditions of the Mulan PSL v1.
 // You may obtain a copy of Mulan PSL v1 at:
@@ -22,6 +32,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"88", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><p>test</p></li></ul><ul data-tight="true" data-marker="-" data-block="0"><li data-marker="-"><p>--<wbr></p></li></ul>`, "<ul data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><p data-block=\"0\"><input type=\"checkbox\" /> foo\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> bar</li></ul><p data-block=\"0\">b<wbr>\n</p></li></ul>"},
 	{"87", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> foo</p><ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> bar</p></li></ul><p data-block="0">b<wbr></p></li></ul>`, "<ul data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><p data-block=\"0\"><input type=\"checkbox\" /> foo\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> bar</li></ul><p data-block=\"0\">b<wbr>\n</p></li></ul>"},
 	{"86", "<p data-block=\"0\"><strong><s>foo</s></strong>bar<wbr></p>", "<p data-block=\"0\"><strong data-marker=\"**\"><s data-marker=\"~~\">foo</s></strong>bar<wbr>\n</p>"},
 	{"85", "<p data-block=\"0\"><span data-marker=\"**\"><b>foo </b><span>b<wbr></span></span>", "<p data-block=\"0\"><strong data-marker=\"**\">foo</strong> b<wbr>\n</p>"},
