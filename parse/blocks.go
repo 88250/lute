@@ -452,10 +452,8 @@ func (t *Tree) addLine() {
 	if t.Context.partiallyConsumedTab {
 		t.Context.offset++ // skip over tab
 		// add space characters:
-		var charsToTab = 4 - (t.Context.column % 4)
-		for i := 0; i < charsToTab; i++ {
-			t.Context.Tip.AppendTokens(util.StrToBytes(" "))
-		}
+		charsToTab := 4 - (t.Context.column % 4)
+		t.Context.Tip.AppendTokens(bytes.Repeat(util.StrToBytes(" "), charsToTab))
 	}
 	t.Context.Tip.AppendTokens(t.Context.currentLine[t.Context.offset:])
 }
