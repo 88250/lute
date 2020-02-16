@@ -48,22 +48,27 @@ const (
 	ItemCaret          = byte('^')
 )
 
+// IsWhitespace 判断 token 是否是空白。
 func IsWhitespace(token byte) bool {
 	return ItemSpace == token || ItemNewline == token || ItemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
 }
 
+// IsUnicodeWhitespace 判断 token 是否是 Unicode 空白。
 func IsUnicodeWhitespace(r rune) bool {
 	return unicode.IsSpace(r) || unicode.Is(unicode.Zs, r)
 }
 
+// IsDigit 判断 token 是否为数字 0-9。
 func IsDigit(token byte) bool {
 	return '0' <= token && '9' >= token
 }
 
+// IsHexDigit 判断 token 是否是十六进制数字。
 func IsHexDigit(token byte) bool {
 	return IsDigit(token) || token >= 'a' && token <= 'f' || token >= 'A' && token <= 'F'
 }
 
+// TokenToUpper 将 token 转为大写。
 func TokenToUpper(token byte) byte {
 	if token >= 'a' && token <= 'z' {
 		return token - 'a' + 'A'
