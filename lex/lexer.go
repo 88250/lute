@@ -62,9 +62,7 @@ func (l *Lexer) NextLine() (ret []byte) {
 			l.input = append(l.input, 0, 0)
 			copy(l.input[i+2:], l.input[i:])
 			// \uFFFD 的 UTF-8 编码为 \xEF\xBF\xBD 共三个字节
-			l.input[i] = '\xEF'
-			l.input[i+1] = '\xBF'
-			l.input[i+2] = '\xBD'
+			l.input[i], l.input[i+1], l.input[i+2] = '\xEF', '\xBF', '\xBD'
 			l.length += 2 // 重新计算总长
 			l.width = 3
 			continue
