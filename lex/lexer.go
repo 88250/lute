@@ -15,8 +15,6 @@ type Lexer struct {
 	input  []byte // 输入的文本字节数组
 	length int    // 输入的文本字节数组的长度
 	offset int    // 当前读取字节位置
-	ln     int    // 当前行号
-	col    int    // 当前列号
 	width  int    // 最新一个 token 的宽度（字节数）
 }
 

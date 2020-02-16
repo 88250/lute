@@ -20,14 +20,10 @@ func (l *Lexer) NextLine() (ret []byte) {
 		return
 	}
 
-	l.ln++
-	l.col = 0
-
 	var b, nb byte
 	i := l.offset
 	for ; i < l.length; i += l.width {
 		b = l.input[i]
-		l.col++
 		if ItemNewline == b {
 			i++
 			break
