@@ -11,6 +11,7 @@
 package lute
 
 import (
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
@@ -28,7 +29,7 @@ func unescapeString(tokens []byte) (ret []byte) {
 	length := len(tokens)
 	ret = make([]byte, 0, length)
 	for i := 0; i < length; i++ {
-		if isBackslashEscapePunct(tokens, i) {
+		if lex.IsBackslashEscapePunct(tokens, i) {
 			ret = ret[:len(ret)-1]
 		}
 		ret = append(ret, tokens[i])
@@ -39,7 +40,7 @@ func unescapeString(tokens []byte) (ret []byte) {
 func htmlUnescapeString(s string) string {
 	// 鸣谢 https://gitlab.com/golang-commonmark
 
-	i := strings.IndexByte(s, itemAmpersand)
+	i := strings.IndexByte(s, lex.ItemAmpersand)
 	if i < 0 {
 		return s
 	}
@@ -99,7 +100,7 @@ func parseEntity(s string) (string, int) {
 			switch {
 			case b == '#':
 				st = 1
-			case isASCIILetter(b):
+			case lex.IsASCIILetter(b):
 				n = 1
 				st = 2
 			default:
@@ -110,7 +111,7 @@ func parseEntity(s string) (string, int) {
 			switch {
 			case b == 'x' || b == 'X':
 				st = 3
-			case isDigit(b):
+			case lex.IsDigit(b):
 				n = 1
 				st = 4
 			default:
@@ -119,7 +120,7 @@ func parseEntity(s string) (string, int) {
 
 		case 2: // &q
 			switch {
-			case isASCIILetterNum(b):
+			case lex.IsASCIILetterNum(b):
 				n++
 				if n > 31 {
 					return "", 0
@@ -135,7 +136,7 @@ func parseEntity(s string) (string, int) {
 
 		case 3: // &#x
 			switch {
-			case isHexDigit(b):
+			case lex.IsHexDigit(b):
 				n = 1
 				st = 5
 			default:
@@ -144,7 +145,7 @@ func parseEntity(s string) (string, int) {
 
 		case 4: // &#0
 			switch {
-			case isDigit(b):
+			case lex.IsDigit(b):
 				n++
 				if n > 8 {
 					return "", 0
@@ -161,7 +162,7 @@ func parseEntity(s string) (string, int) {
 
 		case 5: // &#x0
 			switch {
-			case isHexDigit(b):
+			case lex.IsHexDigit(b):
 				n++
 				if n > 8 {
 					return "", 0

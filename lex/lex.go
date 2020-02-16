@@ -8,14 +8,14 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package lex
 
 import (
 	"unicode/utf8"
 )
 
-// nextLine 返回下一行。
-func (l *lexer) nextLine() (ret []byte) {
+// NextLine 返回下一行。
+func (l *Lexer) NextLine() (ret []byte) {
 	if l.offset >= l.length {
 		return
 	}
@@ -28,14 +28,14 @@ func (l *lexer) nextLine() (ret []byte) {
 	for ; i < l.length; i += l.width {
 		b = l.input[i]
 		l.col++
-		if itemNewline == b {
+		if ItemNewline == b {
 			i++
 			break
-		} else if itemCarriageReturn == b {
+		} else if ItemCarriageReturn == b {
 			// 处理 \r
 			if i < l.length-1 {
 				nb = l.input[i+1]
-				if itemNewline == nb {
+				if ItemNewline == nb {
 					l.input = append(l.input[:i], l.input[i+1:]...) // 移除 \r，依靠下一个的 \n 切行
 					l.length--                                      // 重新计算总长
 				}

@@ -10,7 +10,10 @@
 
 package lute
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/88250/lute/lex"
+)
 
 func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	markerCnt := 0
@@ -27,11 +30,11 @@ func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	length := len(ln)
 	for i := t.context.nextNonspace; i < length-1; i++ {
 		token := ln[i]
-		if itemSpace == token || itemTab == token {
+		if lex.ItemSpace == token || lex.ItemTab == token {
 			continue
 		}
 
-		if itemHyphen != token && itemUnderscore != token && itemAsterisk != token {
+		if lex.ItemHyphen != token && lex.ItemUnderscore != token && lex.ItemAsterisk != token {
 			return
 		}
 

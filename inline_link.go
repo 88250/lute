@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"unicode/utf8"
 )
@@ -26,7 +27,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 	passed = make([]byte, 0, 256)
 	destination = make([]byte, 0, 256)
 
-	isPointyBrackets := itemLess == tokens[1]
+	isPointyBrackets := lex.ItemLess == tokens[1]
 	if isPointyBrackets {
 		matchEnd := false
 		passed = append(passed, tokens[0], tokens[1])
@@ -37,7 +38,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 		for ; i < length; i += size {
 			size = 1
 			token := tokens[i]
-			if itemNewline == token {
+			if lex.ItemNewline == token {
 				passed = nil
 				return
 			}
@@ -53,14 +54,14 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 				dest = append(dest, runes...)
 			}
 			destination = append(destination, dest...)
-			if itemGreater == token && !isBackslashEscapePunct(tokens, i) {
+			if lex.ItemGreater == token && !lex.IsBackslashEscapePunct(tokens, i) {
 				destination = destination[:len(destination)-1]
 				matchEnd = true
 				break
 			}
 		}
 
-		if !matchEnd || (length > i && itemCloseParen != tokens[i+1]) {
+		if !matchEnd || (length > i && lex.ItemCloseParen != tokens[i+1]) {
 			passed = nil
 			return
 		}
@@ -88,24 +89,24 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 				dest = append(dest, runes...)
 			}
 			destination = append(destination, dest...)
-			if !destStarted && !isWhitespace(token) && 0 < i {
+			if !destStarted && !lex.IsWhitespace(token) && 0 < i {
 				destStarted = true
 				destination = destination[1:]
-				destination = trimWhitespace(destination)
+				destination = lex.TrimWhitespace(destination)
 			}
-			if destStarted && (isWhitespace(token) || isControl(token)) {
+			if destStarted && (lex.IsWhitespace(token) || lex.IsControl(token)) {
 				destination = destination[:len(destination)-size]
 				passed = passed[:len(passed)-1]
 				openParens--
 				break
 			}
-			if itemOpenParen == token && !isBackslashEscapePunct(tokens, i) {
+			if lex.ItemOpenParen == token && !lex.IsBackslashEscapePunct(tokens, i) {
 				openParens++
 			}
-			if itemCloseParen == token && !isBackslashEscapePunct(tokens, i) {
+			if lex.ItemCloseParen == token && !lex.IsBackslashEscapePunct(tokens, i) {
 				openParens--
 				if 1 > openParens {
-					if itemOpenParen == destination[0] {
+					if lex.ItemOpenParen == destination[0] {
 						// TODO: 需要重写边界判断
 						destination = destination[1:]
 					}
@@ -116,7 +117,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 		}
 
 		remains = tokens[i:]
-		if length > i && (itemCloseParen != tokens[i] && itemSpace != tokens[i] && itemNewline != tokens[i]) {
+		if length > i && (lex.ItemCloseParen != tokens[i] && lex.ItemSpace != tokens[i] && lex.ItemNewline != tokens[i]) {
 			passed = nil
 			return
 		}

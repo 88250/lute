@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
@@ -26,15 +27,15 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 		token := ctx.tokens[ctx.pos]
 		var n *ast.Node
 		switch token {
-		case itemBackslash:
+		case lex.ItemBackslash:
 			n = t.parseBackslash(block, ctx)
-		case itemBacktick:
+		case lex.ItemBacktick:
 			n = t.parseCodeSpan(ctx)
-		case itemAsterisk, itemUnderscore, itemTilde:
+		case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemTilde:
 			t.handleDelim(block, ctx)
-		case itemNewline:
+		case lex.ItemNewline:
 			n = t.parseNewline(block, ctx)
-		case itemLess:
+		case lex.ItemLess:
 			n = t.parseAutolink(ctx)
 			if nil == n {
 				n = t.parseAutoEmailLink(ctx)
@@ -42,15 +43,15 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 					n = t.parseInlineHTML(ctx)
 				}
 			}
-		case itemOpenBracket:
+		case lex.ItemOpenBracket:
 			n = t.parseOpenBracket(ctx)
-		case itemCloseBracket:
+		case lex.ItemCloseBracket:
 			n = t.parseCloseBracket(ctx)
-		case itemAmpersand:
+		case lex.ItemAmpersand:
 			n = t.parseEntity(ctx)
-		case itemBang:
+		case lex.ItemBang:
 			n = t.parseBang(ctx)
-		case itemDollar:
+		case lex.ItemDollar:
 			n = t.parseInlineMath(ctx)
 		default:
 			n = t.parseText(ctx)
@@ -73,17 +74,17 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *ast.Node) {
 	start := ctx.pos
 	numeric := false
 	if 3 < ctx.tokensLen {
-		numeric = itemCrosshatch == ctx.tokens[start+1]
+		numeric = lex.ItemCrosshatch == ctx.tokens[start+1]
 	}
 	i := ctx.pos
 	var token byte
 	var endWithSemicolon bool
 	for ; i < ctx.tokensLen; i++ {
 		token = ctx.tokens[i]
-		if isWhitespace(token) {
+		if lex.IsWhitespace(token) {
 			break
 		}
-		if itemSemicolon == token {
+		if lex.ItemSemicolon == token {
 			i++
 			endWithSemicolon = true
 			break
@@ -155,13 +156,13 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 	savepos := ctx.pos
 	matched := false
 	// 尝试解析内联链接 [text](url "tile")
-	if ctx.pos+1 < ctx.tokensLen && itemOpenParen == ctx.tokens[ctx.pos] {
+	if ctx.pos+1 < ctx.tokensLen && lex.ItemOpenParen == ctx.tokens[ctx.pos] {
 		ctx.pos++
 		isLink := false
 		var passed, remains []byte
 
 		for { // 这里使用 for 是为了简化逻辑，不是为了循环
-			if isLink, passed, remains = spnl(ctx.tokens[ctx.pos-1:]); !isLink {
+			if isLink, passed, remains = lex.Spnl(ctx.tokens[ctx.pos-1:]); !isLink {
 				break
 			}
 			ctx.pos += len(passed)
@@ -176,21 +177,21 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			ctx.pos += len(passed)
 			openParen = passed[0:1]
 			closeParen = passed[len(passed)-1:]
-			matched = itemCloseParen == passed[len(passed)-1]
+			matched = lex.ItemCloseParen == passed[len(passed)-1]
 			if matched {
 				ctx.pos--
 				break
 			}
-			if 1 > len(remains) || !isWhitespace(remains[0]) {
+			if 1 > len(remains) || !lex.IsWhitespace(remains[0]) {
 				break
 			}
 			// 跟空格的话后续尝试 title 解析
-			if isLink, passed, remains = spnl(remains); !isLink {
+			if isLink, passed, remains = lex.Spnl(remains); !isLink {
 				break
 			}
 			space = passed
 			ctx.pos += len(passed)
-			matched = itemCloseParen == remains[0]
+			matched = lex.ItemCloseParen == remains[0]
 			closeParen = remains[0:1]
 			if matched {
 				break
@@ -201,9 +202,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 				break
 			}
 			ctx.pos += len(passed)
-			isLink, passed, remains = spnl(remains)
+			isLink, passed, remains = lex.Spnl(remains)
 			ctx.pos += len(passed)
-			matched = isLink && 0 < len(remains) && itemCloseParen == remains[0]
+			matched = isLink && 0 < len(remains) && lex.ItemCloseParen == remains[0]
 			closeParen = remains[0:]
 			break
 		}
@@ -223,7 +224,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 		} else if !opener.bracketAfter {
 			// [text][] 格式，将 text 视为 label 进行解析
 			start := opener.index
-			if itemOpenBracket == ctx.tokens[start] {
+			if lex.ItemOpenBracket == ctx.tokens[start] {
 				// TODO: 链接引用定义 key 还是包括方括号好些 [xxx]
 				start++
 			}
@@ -358,11 +359,11 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 
 	ctx.pos++
 	token := ctx.tokens[ctx.pos]
-	if itemNewline == token {
+	if lex.ItemNewline == token {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeHardBreak, Tokens: []byte{token}}
 	}
-	if isASCIIPunct(token) {
+	if lex.IsASCIIPunct(token) {
 		ctx.pos++
 		n := &ast.Node{Type: ast.NodeBackslash}
 		block.AppendChild(n)
@@ -386,8 +387,8 @@ func (t *Tree) parseText(ctx *InlineContext) *ast.Node {
 // IsMarker 判断 token 是否是潜在的 Markdown 标记符。
 func (t *Tree) isMarker(token byte) bool {
 	switch token {
-	case itemAsterisk, itemUnderscore, itemOpenBracket, itemBang, itemNewline, itemBackslash, itemBacktick, itemLess,
-		itemCloseBracket, itemAmpersand, itemTilde, itemDollar:
+	case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemOpenBracket, lex.ItemBang, lex.ItemNewline, lex.ItemBackslash, lex.ItemBacktick, lex.ItemLess,
+		lex.ItemCloseBracket, lex.ItemAmpersand, lex.ItemTilde, lex.ItemDollar:
 		return true
 	default:
 		return false
@@ -403,10 +404,10 @@ func (t *Tree) parseNewline(block *ast.Node, ctx *InlineContext) (ret *ast.Node)
 	if lastc := block.LastChild; nil != lastc {
 		if ast.NodeText == lastc.Type {
 			tokens := lastc.Tokens
-			if valueLen := len(tokens); itemSpace == tokens[valueLen-1] {
-				_, lastc.Tokens = trimRight(tokens)
+			if valueLen := len(tokens); lex.ItemSpace == tokens[valueLen-1] {
+				_, lastc.Tokens = lex.TrimRight(tokens)
 				if 1 < valueLen {
-					hardbreak = itemSpace == tokens[len(tokens)-2]
+					hardbreak = lex.ItemSpace == tokens[len(tokens)-2]
 				}
 			}
 		}

@@ -12,6 +12,7 @@ package lute
 
 import (
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"unicode"
 	"unicode/utf8"
 )
@@ -76,9 +77,9 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	var openersBottom = map[byte]*delimiter{}
 	var oddMatch = false
 
-	openersBottom[itemUnderscore] = stackBottom
-	openersBottom[itemAsterisk] = stackBottom
-	openersBottom[itemTilde] = stackBottom
+	openersBottom[lex.ItemUnderscore] = stackBottom
+	openersBottom[lex.ItemAsterisk] = stackBottom
+	openersBottom[lex.ItemTilde] = stackBottom
 
 	// find first closer above stack_bottom:
 	closer = ctx.delimiters
@@ -120,7 +121,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			openerInl = opener.node
 			closerInl = closer.node
 
-			if t.context.option.GFMStrikethrough && itemTilde == closercc && opener.num != closer.num {
+			if t.context.option.GFMStrikethrough && lex.ItemTilde == closercc && opener.num != closer.num {
 				break
 			}
 
@@ -139,15 +140,15 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			emStrongDel := &ast.Node{Close: true}
 			closeMarker := &ast.Node{Tokens: closerTokens, Close: true}
 			if 1 == useDelims {
-				if itemAsterisk == closercc {
+				if lex.ItemAsterisk == closercc {
 					emStrongDel.Type = ast.NodeEmphasis
 					openMarker.Type = ast.NodeEmA6kOpenMarker
 					closeMarker.Type = ast.NodeEmA6kCloseMarker
-				} else if itemUnderscore == closercc {
+				} else if lex.ItemUnderscore == closercc {
 					emStrongDel.Type = ast.NodeEmphasis
 					openMarker.Type = ast.NodeEmU8eOpenMarker
 					closeMarker.Type = ast.NodeEmU8eCloseMarker
-				} else if itemTilde == closercc {
+				} else if lex.ItemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
 						emStrongDel.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough1OpenMarker
@@ -155,15 +156,15 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 					}
 				}
 			} else {
-				if itemAsterisk == closercc {
+				if lex.ItemAsterisk == closercc {
 					emStrongDel.Type = ast.NodeStrong
 					openMarker.Type = ast.NodeStrongA6kOpenMarker
 					closeMarker.Type = ast.NodeStrongA6kCloseMarker
-				} else if itemUnderscore == closercc {
+				} else if lex.ItemUnderscore == closercc {
 					emStrongDel.Type = ast.NodeStrong
 					openMarker.Type = ast.NodeStrongU8eOpenMarker
 					closeMarker.Type = ast.NodeStrongU8eCloseMarker
-				} else if itemTilde == closercc {
+				} else if lex.ItemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
 						emStrongDel.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough2OpenMarker
@@ -230,7 +231,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		ctx.pos++
 	}
 
-	tokenBefore, tokenAfter := rune(itemNewline), rune(itemNewline)
+	tokenBefore, tokenAfter := rune(lex.ItemNewline), rune(lex.ItemNewline)
 	if 0 < startPos {
 		t := ctx.tokens[startPos-1]
 		if t >= utf8.RuneSelf {
@@ -248,14 +249,14 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		}
 	}
 
-	afterIsWhitespace := isUnicodeWhitespace(tokenAfter)
+	afterIsWhitespace := lex.IsUnicodeWhitespace(tokenAfter)
 	afterIsPunct := unicode.IsPunct(tokenAfter) || unicode.IsSymbol(tokenAfter)
-	if (itemAsterisk == token && '~' == tokenAfter) || (itemTilde == token && '*' == tokenAfter) {
+	if (lex.ItemAsterisk == token && '~' == tokenAfter) || (lex.ItemTilde == token && '*' == tokenAfter) {
 		afterIsPunct = false
 	}
-	beforeIsWhitespace := isUnicodeWhitespace(tokenBefore)
+	beforeIsWhitespace := lex.IsUnicodeWhitespace(tokenBefore)
 	beforeIsPunct := unicode.IsPunct(tokenBefore) || unicode.IsSymbol(tokenBefore)
-	if (itemAsterisk == token && '~' == tokenBefore) || (itemTilde == token && '*' == tokenBefore) {
+	if (lex.ItemAsterisk == token && '~' == tokenBefore) || (lex.ItemTilde == token && '*' == tokenBefore) {
 		beforeIsPunct = false
 	}
 	if t.context.option.VditorWYSIWYG {
@@ -267,7 +268,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
 	var canOpen, canClose bool
-	if itemUnderscore == token {
+	if lex.ItemUnderscore == token {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
 	} else {

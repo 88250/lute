@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"unicode/utf8"
 )
@@ -64,7 +65,7 @@ loopPart:
 		// 积攒组直到遇到空白符
 		for ; j < length; j++ {
 			token = tokens[j]
-			if !isWhitespace(token) {
+			if !lex.IsWhitespace(token) {
 				group = append(group, tokens[j])
 				if '@' == token {
 					// 记录 @ 符号在组中的绝对位置，后面会用到
@@ -115,7 +116,7 @@ loopPart:
 			}
 		}
 
-		if itemDot == token {
+		if lex.ItemDot == token {
 			// 如果以 . 结尾则剔除该 .
 			lastIndex := len(group) - 1
 			group = group[:lastIndex]
@@ -123,7 +124,7 @@ loopPart:
 			node.InsertBefore(link)
 			// . 作为文本节点插入
 			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte{item}})
-		} else if itemHyphen == token || itemUnderscore == token {
+		} else if lex.ItemHyphen == token || lex.ItemUnderscore == token {
 			// 如果以 - 或者 _ 结尾则整个串都不能算作邮件链接
 			text := &ast.Node{Type: ast.NodeText, Tokens: group}
 			node.InsertBefore(text)
@@ -145,11 +146,11 @@ loopPart:
 }
 
 func (t *Tree) isValidEmailSegment1(token byte) bool {
-	return isASCIILetterNumHyphen(token) || itemDot == token || itemPlus == token || itemUnderscore == token
+	return lex.IsASCIILetterNumHyphen(token) || lex.ItemDot == token || lex.ItemPlus == token || lex.ItemUnderscore == token
 }
 
 func (t *Tree) isValidEmailSegment2(token byte) bool {
-	return isASCIILetterNumHyphen(token) || itemDot == token || itemUnderscore == token
+	return lex.IsASCIILetterNumHyphen(token) || lex.ItemDot == token || lex.ItemUnderscore == token
 }
 
 var (
@@ -224,7 +225,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		j = i
 		for ; j < length; j++ {
 			token = tokens[j]
-			if (isWhitespace(token) || itemLess == token) || (!isASCIIPunct(token) && !isASCIILetterNum(token)) {
+			if (lex.IsWhitespace(token) || lex.ItemLess == token) || (!lex.IsASCIIPunct(token) && !lex.IsASCIILetterNum(token)) {
 				break
 			}
 			url = append(url, token)
@@ -257,7 +258,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		k = 0
 		for ; k < len(url); k++ {
 			token = url[k]
-			if itemSlash == token {
+			if lex.ItemSlash == token {
 				break
 			}
 		}
@@ -279,23 +280,23 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			// 统计圆括号个数
 			for l = 0; l < length; l++ {
 				token = path[l]
-				if itemOpenParen == token {
+				if lex.ItemOpenParen == token {
 					openParens++
-				} else if itemCloseParen == token {
+				} else if lex.ItemCloseParen == token {
 					closeParens++
 				}
 			}
 
 			trimmed := false
 			lastToken := path[length-1]
-			if itemCloseParen == lastToken {
+			if lex.ItemCloseParen == lastToken {
 				// 以 ) 结尾的话需要计算圆括号匹配
 				unmatches := closeParens - openParens
 				if 0 < unmatches {
 					// 向前移动
 					for l = length - 1; 0 < unmatches; l-- {
 						token = path[l]
-						if itemCloseParen != token {
+						if lex.ItemCloseParen != token {
 							break
 						}
 						unmatches--
@@ -307,13 +308,13 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 					// 算作全匹配上了，不需要再处理结尾标点符号
 					trimmed = true
 				}
-			} else if itemSemicolon == lastToken {
+			} else if lex.ItemSemicolon == lastToken {
 				// 检查 HTML 实体
 				foundAmp := false
 				// 向前检查 & 是否存在
 				for l = length - 1; 0 <= l; l-- {
 					token = path[l]
-					if itemAmpersand == token {
+					if lex.ItemAmpersand == token {
 						foundAmp = true
 						break
 					}
@@ -324,7 +325,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 						// 检查截取的子串是否满足实体特征（&;中间需要是字母或数字）
 						isEntity := true
 						for j = 1; j < len(entity)-1; j++ {
-							if !isASCIILetterNum(entity[j]) {
+							if !lex.IsASCIILetterNum(entity[j]) {
 								isEntity = false
 								break
 							}
@@ -339,7 +340,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			}
 
 			// 如果之前的 ) 或者 ; 没有命中处理，则进行结尾的标点符号规则处理，即标点不计入链接，需要剔掉
-			if !trimmed && isASCIIPunct(lastToken) && itemSlash != lastToken &&
+			if !trimmed && lex.IsASCIIPunct(lastToken) && lex.ItemSlash != lastToken &&
 				'}' != lastToken && '{' != lastToken /* 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4 */ {
 				path = path[:length-1]
 				i--
@@ -347,7 +348,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		} else {
 			length = len(domain)
 			lastToken := domain[length-1]
-			if isASCIIPunct(lastToken) {
+			if lex.IsASCIIPunct(lastToken) {
 				domain = domain[:length-1]
 				i--
 			}
@@ -384,7 +385,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 // isValidDomain 校验 GFM 规范自动链接规则中定义的合法域名。
 // https://github.github.com/gfm/#valid-domain
 func (t *Tree) isValidDomain(domain []byte) bool {
-	segments := split(domain, '.')
+	segments := lex.Split(domain, '.')
 	length := len(segments)
 	if 2 > length { // 域名至少被 . 分隔为两部分，小于两部分的话不合法
 		return false
@@ -400,12 +401,12 @@ func (t *Tree) isValidDomain(domain []byte) bool {
 
 		for j := 0; j < segLen; j++ {
 			token = segment[j]
-			if !isASCIILetterNumHyphen(token) {
+			if !lex.IsASCIILetterNumHyphen(token) {
 				return false
 			}
 			if 2 < i && (i == length-2 || i == length-1) {
 				// 最后两个部分不能包含 _
-				if itemUnderscore == token {
+				if lex.ItemUnderscore == token {
 					return false
 				}
 			}
@@ -446,7 +447,7 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *ast.Node) {
 			break
 		}
 
-		if !isASCIILetterNumHyphen(token) && !bytes.Contains(markers, []byte{token}) {
+		if !lex.IsASCIILetterNumHyphen(token) && !bytes.Contains(markers, []byte{token}) {
 			return nil
 		}
 	}
@@ -462,12 +463,12 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *ast.Node) {
 	for ; i < length; i++ {
 		token = domainPart[i]
 		passed++
-		if itemGreater == token {
+		if lex.ItemGreater == token {
 			closed = true
 			break
 		}
 		dest = append(dest, domainPart[i])
-		if !isASCIILetterNumHyphen(token) && itemDot != token {
+		if !lex.IsASCIILetterNumHyphen(token) && lex.ItemDot != token {
 			return nil
 		}
 		if 63 < i {
@@ -506,15 +507,15 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *ast.Node) {
 	var dest []byte
 	var token byte
 	i := ctx.pos + 1
-	for ; i < ctx.tokensLen && itemGreater != ctx.tokens[i]; i++ {
+	for ; i < ctx.tokensLen && lex.ItemGreater != ctx.tokens[i]; i++ {
 		token = ctx.tokens[i]
-		if itemSpace == token {
+		if lex.ItemSpace == token {
 			return nil
 		}
 
 		dest = append(dest, ctx.tokens[i])
 		if !schemed {
-			if itemColon != token {
+			if lex.ItemColon != token {
 				scheme += string(token)
 			} else {
 				schemed = true
@@ -525,7 +526,7 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *ast.Node) {
 		return nil
 	}
 
-	if itemGreater != ctx.tokens[i] {
+	if lex.ItemGreater != ctx.tokens[i] {
 		return nil
 	}
 	ctx.pos = 1 + i

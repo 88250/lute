@@ -10,14 +10,17 @@
 
 package lute
 
-import "github.com/88250/lute/ast"
+import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+)
 
 func BlockquoteContinue(blockquote *ast.Node, context *Context) int {
 	var ln = context.currentLine
-	if !context.indented && peek(ln, context.nextNonspace) == itemGreater {
+	if !context.indented && lex.Peek(ln, context.nextNonspace) == lex.ItemGreater {
 		context.advanceNextNonspace()
 		context.advanceOffset(1, false)
-		if token := peek(ln, context.offset); itemSpace == token || itemTab == token {
+		if token := lex.Peek(ln, context.offset); lex.ItemSpace == token || lex.ItemTab == token {
 			context.advanceOffset(1, true)
 		}
 		return 0

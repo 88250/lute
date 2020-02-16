@@ -12,6 +12,7 @@ package lute
 
 import (
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
@@ -26,7 +27,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 	startPos := ctx.pos
 	blockStartPos := startPos
 	dollars := 0
-	for ; blockStartPos < ctx.tokensLen && itemDollar == ctx.tokens[blockStartPos]; blockStartPos++ {
+	for ; blockStartPos < ctx.tokensLen && lex.ItemDollar == ctx.tokens[blockStartPos]; blockStartPos++ {
 		dollars++
 	}
 	if 2 <= dollars {
@@ -36,7 +37,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 		var token byte
 		for ; blockEndPos < ctx.tokensLen; blockEndPos++ {
 			token = ctx.tokens[blockEndPos]
-			if itemDollar == token && blockEndPos < ctx.tokensLen-1 && itemDollar == ctx.tokens[blockEndPos+1] {
+			if lex.ItemDollar == token && blockEndPos < ctx.tokensLen-1 && lex.ItemDollar == ctx.tokens[blockEndPos+1] {
 				matchBlock = true
 				break
 			}
@@ -51,7 +52,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 		}
 	}
 
-	if !t.context.option.InlineMathAllowDigitAfterOpenMarker && ctx.tokensLen > startPos+1 && isDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
+	if !t.context.option.InlineMathAllowDigitAfterOpenMarker && ctx.tokensLen > startPos+1 && lex.IsDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
 		ctx.pos += 3
 		return &ast.Node{Type: ast.NodeText, Tokens: ctx.tokens[startPos : startPos+3]}
 	}
@@ -66,7 +67,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 	endPos = startPos + endPos + 2
 
 	tokens := ctx.tokens[startPos+1 : endPos-1]
-	if 1 > len(trimWhitespace(tokens)) {
+	if 1 > len(lex.TrimWhitespace(tokens)) {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: dollar}
 	}
@@ -83,9 +84,9 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 func (t *Tree) matchInlineMathEnd(tokens []byte) (pos int) {
 	length := len(tokens)
 	for ; pos < length; pos++ {
-		if itemDollar == tokens[pos] {
+		if lex.ItemDollar == tokens[pos] {
 			if pos < length-1 {
-				if !isDigit(tokens[pos+1]) {
+				if !lex.IsDigit(tokens[pos+1]) {
 					return pos
 				}
 			} else {

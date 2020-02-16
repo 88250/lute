@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
@@ -47,7 +48,7 @@ func (t *Tree) emoji0(node *ast.Node) {
 			break
 		}
 
-		if itemColon != token {
+		if lex.ItemColon != token {
 			i++
 			continue
 		}
@@ -57,10 +58,10 @@ func (t *Tree) emoji0(node *ast.Node) {
 		matchCloseColon := false
 		for pos = i + 1; pos < length; pos++ {
 			token = tokens[pos]
-			if isWhitespace(token) {
+			if lex.IsWhitespace(token) {
 				break
 			}
-			if itemColon == token {
+			if lex.ItemColon == token {
 				matchCloseColon = true
 				break
 			}

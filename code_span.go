@@ -10,13 +10,16 @@
 
 package lute
 
-import "github.com/88250/lute/ast"
+import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+)
 
 func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
 	startPos := ctx.pos
 	n := 0
 	for ; startPos+n < ctx.tokensLen; n++ {
-		if itemBacktick != ctx.tokens[startPos+n] {
+		if lex.ItemBacktick != ctx.tokens[startPos+n] {
 			break
 		}
 	}
@@ -40,8 +43,8 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
 
 	textTokens := ctx.tokens[startPos+n : endPos]
 	if !t.context.option.VditorWYSIWYG {
-		textTokens = replaceAll(textTokens, itemNewline, itemSpace)
-		if 2 < len(textTokens) && itemSpace == textTokens[0] && itemSpace == textTokens[len(textTokens)-1] && !isBlankLine(textTokens) {
+		textTokens = lex.ReplaceAll(textTokens, lex.ItemNewline, lex.ItemSpace)
+		if 2 < len(textTokens) && lex.ItemSpace == textTokens[0] && lex.ItemSpace == textTokens[len(textTokens)-1] && !lex.IsBlankLine(textTokens) {
 			// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
 			openMarker.Tokens = append(openMarker.Tokens, textTokens[0])
 			closeMarker.Tokens = ctx.tokens[endPos-1 : endPos+n]
@@ -61,10 +64,10 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
 func (t *Tree) matchCodeSpanEnd(tokens []byte, num int) (pos int) {
 	length := len(tokens)
 	for pos < length {
-		l := accept(tokens[pos:], itemBacktick)
+		l := lex.Accept(tokens[pos:], lex.ItemBacktick)
 		if num == l {
 			next := pos + l
-			if length-1 > next && itemBacktick == tokens[next] {
+			if length-1 > next && lex.ItemBacktick == tokens[next] {
 				continue
 			}
 			return pos

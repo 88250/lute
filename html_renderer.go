@@ -12,6 +12,7 @@ package lute
 
 import (
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
@@ -491,7 +492,7 @@ func (r *HTMLRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkSta
 			if text := node.PreviousNodeText(); "" != text {
 				lastc, _ := utf8.DecodeLastRuneInString(text)
 				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
-					r.writeByte(itemSpace)
+					r.writeByte(lex.ItemSpace)
 				}
 			}
 		}
@@ -500,7 +501,7 @@ func (r *HTMLRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkSta
 			if text := node.NextNodeText(); "" != text {
 				firstc, _ := utf8.DecodeRuneInString(text)
 				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
-					r.writeByte(itemSpace)
+					r.writeByte(lex.ItemSpace)
 				}
 			}
 		}

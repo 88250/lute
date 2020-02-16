@@ -15,6 +15,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"go/format"
 	"strings"
@@ -58,7 +59,7 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 	if entering {
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
-			infoWords := split(node.Previous.CodeBlockInfo, itemSpace)
+			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 			language := util.BytesToStr(infoWords[0])
 			rendered := false
 			if isGo(language) {

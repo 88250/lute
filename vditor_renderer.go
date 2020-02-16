@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
@@ -110,7 +111,7 @@ func (r *VditorRenderer) renderBackslash(node *ast.Node, entering bool) ast.Walk
 	if entering {
 		r.writeString("<span data-type=\"backslash\">")
 		r.writeString("<span>")
-		r.writeByte(itemBackslash)
+		r.writeByte(lex.ItemBackslash)
 		r.writeString("</span>")
 	} else {
 		r.writeString("</span>")
@@ -439,7 +440,7 @@ func (r *VditorRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 	if entering {
 		r.tag("p", [][]string{{"data-block", "0"}}, false)
 	} else {
-		r.writeByte(itemNewline)
+		r.writeByte(lex.ItemNewline)
 		r.tag("/p", nil, false)
 	}
 	return ast.WalkContinue
@@ -474,7 +475,7 @@ func (r *VditorRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 		} else {
 			lastc, _ := utf8.DecodeLastRuneInString(previousNodeText)
 			if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
-				r.writeByte(itemSpace)
+				r.writeByte(lex.ItemSpace)
 			}
 		}
 		r.tag("code", [][]string{{"marker", strings.Repeat("`", node.CodeMarkerLen)}}, false)
@@ -651,7 +652,7 @@ func (r *VditorRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.
 	if nil != node.Tokens {
 		r.tag("p", [][]string{{"data-block", "0"}}, false)
 		r.writeBytes(node.Tokens)
-		r.writeByte(itemNewline)
+		r.writeByte(lex.ItemNewline)
 		r.tag("/p", nil, false)
 	}
 	return ast.WalkStop
@@ -663,7 +664,7 @@ func (r *VditorRenderer) renderHardBreak(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *VditorRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemNewline)
+	r.writeByte(lex.ItemNewline)
 	return ast.WalkStop
 }
 
@@ -707,7 +708,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	}
 	var attrs [][]string
 	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
-		infoWords := split(node.Previous.CodeBlockInfo, itemSpace)
+		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language := string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})
 	}

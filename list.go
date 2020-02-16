@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strconv"
 )
@@ -60,7 +61,7 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 	markerLength := 1
 	marker := []byte{tokens[0]}
 	var delim byte
-	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
+	if lex.ItemPlus == marker[0] || lex.ItemHyphen == marker[0] || lex.ItemAsterisk == marker[0] {
 		data.BulletChar = marker[0]
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
 		if container.Type != ast.NodeParagraph || bytes.Equal(items1, marker) {
@@ -79,12 +80,12 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 
 	var token = ln[t.context.nextNonspace+markerLength]
 	// 列表项标记符后必须是空白字符
-	if !isWhitespace(token) {
+	if !lex.IsWhitespace(token) {
 		return nil
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空
-	if container.Type == ast.NodeParagraph && itemNewline == token {
+	if container.Type == ast.NodeParagraph && lex.ItemNewline == token {
 		return nil
 	}
 
@@ -95,20 +96,20 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 	spacesStartOffset := t.context.offset
 	for {
 		t.context.advanceOffset(1, true)
-		token = peek(ln, t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || 0 == (token) || (itemSpace != token && itemTab != token) {
+		token = lex.Peek(ln, t.context.offset)
+		if t.context.column-spacesStartCol >= 5 || 0 == (token) || (lex.ItemSpace != token && lex.ItemTab != token) {
 			break
 		}
 	}
 
-	token = peek(ln, t.context.offset)
-	var isBlankItem = 0 == token || itemNewline == token
+	token = lex.Peek(ln, t.context.offset)
+	var isBlankItem = 0 == token || lex.ItemNewline == token
 	var spacesAfterMarker = t.context.column - spacesStartCol
 	if spacesAfterMarker >= 5 || spacesAfterMarker < 1 || isBlankItem {
 		data.Padding = markerLength + 1
 		t.context.column = spacesStartCol
 		t.context.offset = spacesStartOffset
-		if token = peek(ln, t.context.offset); itemSpace == token || itemTab == token {
+		if token = lex.Peek(ln, t.context.offset); lex.ItemSpace == token || lex.ItemTab == token {
 			t.context.advanceOffset(1, true)
 		}
 	} else {
@@ -119,7 +120,7 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 		// 判断是否是任务列表项
 		content := ln[t.context.offset:]
 		if 3 <= len(content) { // 至少需要 [ ] 或者 [x] 3 个字符
-			if itemOpenBracket == content[0] && ('x' == content[1] || 'X' == content[1] || itemSpace == content[1]) && itemCloseBracket == content[2] {
+			if lex.ItemOpenBracket == content[0] && ('x' == content[1] || 'X' == content[1] || lex.ItemSpace == content[1]) && lex.ItemCloseBracket == content[2] {
 				data.Typ = 3
 				data.Checked = 'x' == content[1] || 'X' == content[1]
 			}
@@ -134,14 +135,14 @@ func (t *Tree) parseOrderedListMarker(tokens []byte) (marker []byte, delimiter b
 	var token byte
 	for ; i < length; i++ {
 		token = tokens[i]
-		if !isDigit(token) || 8 < i {
+		if !lex.IsDigit(token) || 8 < i {
 			delimiter = token
 			break
 		}
 		marker = append(marker, token)
 	}
 
-	if 1 > len(marker) || (itemDot != delimiter && itemCloseParen != delimiter) {
+	if 1 > len(marker) || (lex.ItemDot != delimiter && lex.ItemCloseParen != delimiter) {
 		return nil, 0
 	}
 

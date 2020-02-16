@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 )
 
 func ParagraphContinue(p *ast.Node, context *Context) int {
@@ -23,11 +24,11 @@ func ParagraphContinue(p *ast.Node, context *Context) int {
 }
 
 func paragraphFinalize(p *ast.Node, context *Context) {
-	p.Tokens = trimWhitespace(p.Tokens)
+	p.Tokens = lex.TrimWhitespace(p.Tokens)
 
 	// 尝试解析链接引用定义
 	hasReferenceDefs := false
-	for tokens := p.Tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = p.Tokens {
+	for tokens := p.Tokens; 0 < len(tokens) && lex.ItemOpenBracket == tokens[0]; tokens = p.Tokens {
 		if tokens = context.parseLinkRefDef(tokens); nil != tokens {
 			p.Tokens = tokens
 			hasReferenceDefs = true
@@ -35,7 +36,7 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 		}
 		break
 	}
-	if hasReferenceDefs && isBlankLine(p.Tokens) {
+	if hasReferenceDefs && lex.IsBlankLine(p.Tokens) {
 		p.Unlink()
 	}
 
@@ -45,7 +46,7 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 			if 3 == listItem.ListData.Typ {
 				isTaskListItem := false
 				if !context.option.VditorWYSIWYG {
-					isTaskListItem = 3 < len(p.Tokens) && isWhitespace(p.Tokens[3])
+					isTaskListItem = 3 < len(p.Tokens) && lex.IsWhitespace(p.Tokens[3])
 				} else {
 					isTaskListItem = 3 <= len(p.Tokens)
 				}

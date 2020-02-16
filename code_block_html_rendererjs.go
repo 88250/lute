@@ -12,7 +12,10 @@
 
 package lute
 
-import "github.com/88250/lute/ast"
+import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+)
 
 // renderCodeBlock 进行代码块 HTML 渲染，不实现语法高亮。
 func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
@@ -34,7 +37,7 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		r.newline()
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
-			infoWords := split(node.Previous.CodeBlockInfo, itemSpace)
+			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 			language := infoWords[0]
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)

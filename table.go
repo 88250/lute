@@ -10,21 +10,24 @@
 
 package lute
 
-import "github.com/88250/lute/ast"
+import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+)
 
 func (context *Context) parseTable(paragraph *ast.Node) (ret *ast.Node) {
-	lines := split(paragraph.Tokens, itemNewline)
+	lines := lex.Split(paragraph.Tokens, lex.ItemNewline)
 	length := len(lines)
 	if 2 > length {
 		return
 	}
 
-	aligns := context.parseTableDelimRow(trimWhitespace(lines[1]))
+	aligns := context.parseTableDelimRow(lex.TrimWhitespace(lines[1]))
 	if nil == aligns {
 		return
 	}
 
-	headRow := context.parseTableRow(trimWhitespace(lines[0]), aligns, true)
+	headRow := context.parseTableRow(lex.TrimWhitespace(lines[0]), aligns, true)
 	if nil == headRow {
 		return
 	}
@@ -39,7 +42,7 @@ func (context *Context) parseTable(paragraph *ast.Node) (ret *ast.Node) {
 	ret.TableAligns = aligns
 	ret.AppendChild(context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
-		tableRow := context.parseTableRow(trimWhitespace(lines[i]), aligns, false)
+		tableRow := context.parseTableRow(lex.TrimWhitespace(lines[i]), aligns, false)
 		if nil == tableRow {
 			return
 		}
@@ -80,14 +83,14 @@ func (context *Context) newTableHead(headRow *ast.Node) *ast.Node {
 
 func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *ast.Node) {
 	ret = &ast.Node{Type: ast.NodeTableRow, TableAligns: aligns}
-	cols := splitWithoutBackslashEscape(line, itemPipe)
+	cols := lex.SplitWithoutBackslashEscape(line, lex.ItemPipe)
 	if 1 > len(cols) {
 		return nil
 	}
-	if isBlank(cols[0]) {
+	if lex.IsBlank(cols[0]) {
 		cols = cols[1:]
 	}
-	if len(cols) > 0 && isBlank(cols[len(cols)-1]) {
+	if len(cols) > 0 && lex.IsBlank(cols[len(cols)-1]) {
 		cols = cols[:len(cols)-1]
 	}
 
@@ -100,7 +103,7 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	var i int
 	var col []byte
 	for ; i < colsLen && i < alignsLen; i++ {
-		col = trimWhitespace(cols[i])
+		col = lex.TrimWhitespace(cols[i])
 		width := len(col)
 		cell := &ast.Node{Type: ast.NodeTableCell, TableCellAlign: aligns[i], TableCellContentWidth: width}
 		cell.Tokens = col
@@ -125,22 +128,22 @@ func (context *Context) parseTableDelimRow(line []byte) (aligns []int) {
 	var i int
 	for ; i < length; i++ {
 		token = line[i]
-		if itemPipe != token && itemHyphen != token && itemColon != token && itemSpace != token {
+		if lex.ItemPipe != token && lex.ItemHyphen != token && lex.ItemColon != token && lex.ItemSpace != token {
 			return nil
 		}
 	}
 
-	cols := splitWithoutBackslashEscape(line, itemPipe)
-	if isBlank(cols[0]) {
+	cols := lex.SplitWithoutBackslashEscape(line, lex.ItemPipe)
+	if lex.IsBlank(cols[0]) {
 		cols = cols[1:]
 	}
-	if len(cols) > 0 && isBlank(cols[len(cols)-1]) {
+	if len(cols) > 0 && lex.IsBlank(cols[len(cols)-1]) {
 		cols = cols[:len(cols)-1]
 	}
 
 	var alignments []int
 	for _, col := range cols {
-		col = trimWhitespace(col)
+		col = lex.TrimWhitespace(col)
 		if 1 > length || nil == col {
 			return nil
 		}
@@ -162,15 +165,15 @@ func (context *Context) tableDelimAlign(col []byte) int {
 
 	var left, right bool
 	first := col[0]
-	left = itemColon == first
+	left = lex.ItemColon == first
 	last := col[length-1]
-	right = itemColon == last
+	right = lex.ItemColon == last
 
 	i := 1
 	var token byte
 	for ; i < length-1; i++ {
 		token = col[i]
-		if itemHyphen != token {
+		if lex.ItemHyphen != token {
 			return -1
 		}
 	}

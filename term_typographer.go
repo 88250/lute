@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"unicode/utf8"
 )
@@ -40,7 +41,7 @@ func (r *BaseRenderer) fixTermTypo0(tokens []byte) []byte {
 				continue
 			}
 		}
-		if isASCIIPunct(before) {
+		if lex.IsASCIIPunct(before) {
 			// 比如术语前面如果是 . 则不进行修正，因为可能是链接
 			// 比如 test.html 虽然不能识别为自动链接，但是也不能进行修正
 			continue
@@ -48,11 +49,11 @@ func (r *BaseRenderer) fixTermTypo0(tokens []byte) []byte {
 
 		for j = i; j < length; j++ {
 			after = tokens[j]
-			if isNotTerm(after) || itemDot == after {
+			if isNotTerm(after) || lex.ItemDot == after {
 				break
 			}
 		}
-		if isASCIIPunct(after) {
+		if lex.IsASCIIPunct(after) {
 			// 比如术语后面如果是 . 则不进行修正，因为可能是链接
 			// 比如 github.com 虽然不能识别为自动链接，但是也不能进行修正
 			continue
@@ -72,7 +73,7 @@ func (r *BaseRenderer) fixTermTypo0(tokens []byte) []byte {
 }
 
 func isNotTerm(token byte) bool {
-	return token >= utf8.RuneSelf || isWhitespace(token) || isASCIIPunct(token)
+	return token >= utf8.RuneSelf || lex.IsWhitespace(token) || lex.IsASCIIPunct(token)
 }
 
 func newTerms() (ret map[string]string) {

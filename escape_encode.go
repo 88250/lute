@@ -11,6 +11,7 @@
 package lute
 
 import (
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strings"
 	"unicode/utf8"
@@ -36,7 +37,7 @@ func escapeHTML(html []byte) (ret []byte) {
 	ret = html
 	for ; i < length; i++ {
 		switch html[i] {
-		case itemAmpersand:
+		case lex.ItemAmpersand:
 			if !inited { // 通过延迟初始化减少内存分配，下同
 				ret = make([]byte, 0, length+128)
 				inited = true
@@ -44,7 +45,7 @@ func escapeHTML(html []byte) (ret []byte) {
 			ret = append(ret, html[start:i]...)
 			ret = append(ret, amp...)
 			start = i + 1
-		case itemLess:
+		case lex.ItemLess:
 			if !inited {
 				ret = make([]byte, 0, length+128)
 				inited = true
@@ -52,7 +53,7 @@ func escapeHTML(html []byte) (ret []byte) {
 			ret = append(ret, html[start:i]...)
 			ret = append(ret, lt...)
 			start = i + 1
-		case itemGreater:
+		case lex.ItemGreater:
 			if !inited {
 				ret = make([]byte, 0, length+128)
 				inited = true
@@ -60,7 +61,7 @@ func escapeHTML(html []byte) (ret []byte) {
 			ret = append(ret, html[start:i]...)
 			ret = append(ret, gt...)
 			start = i + 1
-		case itemDoublequote:
+		case lex.ItemDoublequote:
 			if !inited {
 				ret = make([]byte, 0, length+128)
 				inited = true
@@ -101,10 +102,10 @@ func encodeDestination(rawurl []byte) (ret []byte) {
 			}
 		} else if r == '%' {
 			token = rawurl[i]
-			if i+2 < len(rawurl) && isHexDigit(rawurl[i+1]) && isHexDigit(rawurl[i+2]) {
+			if i+2 < len(rawurl) && lex.IsHexDigit(rawurl[i+1]) && lex.IsHexDigit(rawurl[i+2]) {
 				ret = append(ret, '%')
-				ret = append(ret, tokenToUpper(rawurl[i+1]))
-				ret = append(ret, tokenToUpper(rawurl[i+2]))
+				ret = append(ret, lex.TokenToUpper(rawurl[i+1]))
+				ret = append(ret, lex.TokenToUpper(rawurl[i+2]))
 				i += 2
 			} else {
 				ret = append(ret, '%')

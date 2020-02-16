@@ -10,7 +10,10 @@
 
 package lute
 
-import "github.com/88250/lute/ast"
+import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+)
 
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	tokens := ctx.tokens
@@ -23,7 +26,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 
 	var tags []byte
 	tags = append(tags, tokens[startPos])
-	if itemSlash == tokens[startPos+1] && 1 < ctx.tokensLen-(startPos+1) { // a closing tag
+	if lex.ItemSlash == tokens[startPos+1] && 1 < ctx.tokensLen-(startPos+1) { // a closing tag
 		tags = append(tags, tokens[startPos+1])
 		remains, tagName := t.parseTagName(tokens[ctx.pos+2:])
 		if 1 > len(tagName) {
@@ -83,12 +86,12 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		return
 	}
 
-	whitespaces, tokens := trimLeft(tokens)
-	if (itemGreater == tokens[0]) ||
-		(1 < ctx.tokensLen && itemSlash == tokens[0] && itemGreater == tokens[1]) {
+	whitespaces, tokens := lex.TrimLeft(tokens)
+	if (lex.ItemGreater == tokens[0]) ||
+		(1 < ctx.tokensLen && lex.ItemSlash == tokens[0] && lex.ItemGreater == tokens[1]) {
 		tags = append(tags, whitespaces...)
 		tags = append(tags, tokens[0])
-		if itemSlash == tokens[0] {
+		if lex.ItemSlash == tokens[0] {
 			tags = append(tags, tokens[1])
 		}
 		ctx.pos += len(tags)
@@ -102,17 +105,17 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 
 func (t *Tree) parseCDATA(tokens []byte) (valid bool, remains, content []byte) {
 	remains = tokens
-	if itemBang != tokens[0] {
+	if lex.ItemBang != tokens[0] {
 		return
 	}
-	if itemOpenBracket != tokens[1] {
+	if lex.ItemOpenBracket != tokens[1] {
 		return
 	}
 
 	if 'C' != tokens[2] || 'D' != tokens[3] || 'A' != tokens[4] || 'T' != tokens[5] || 'A' != tokens[6] {
 		return
 	}
-	if itemOpenBracket != tokens[7] {
+	if lex.ItemOpenBracket != tokens[7] {
 		return
 	}
 
@@ -124,12 +127,12 @@ func (t *Tree) parseCDATA(tokens []byte) (valid bool, remains, content []byte) {
 	for ; i < length; i++ {
 		token = tokens[i]
 		content = append(content, token)
-		if i <= length-3 && itemCloseBracket == token && itemCloseBracket == tokens[i+1] && itemGreater == tokens[i+2] {
+		if i <= length-3 && lex.ItemCloseBracket == token && lex.ItemCloseBracket == tokens[i+1] && lex.ItemGreater == tokens[i+2] {
 			break
 		}
 	}
 	tokens = tokens[i:]
-	if itemCloseBracket != tokens[0] || itemCloseBracket != tokens[1] || itemGreater != tokens[2] {
+	if lex.ItemCloseBracket != tokens[0] || lex.ItemCloseBracket != tokens[1] || lex.ItemGreater != tokens[2] {
 		return
 	}
 	content = append(content, tokens[1], tokens[2])
@@ -141,14 +144,14 @@ func (t *Tree) parseCDATA(tokens []byte) (valid bool, remains, content []byte) {
 
 func (t *Tree) parseDeclaration(tokens []byte) (valid bool, remains, content []byte) {
 	remains = tokens
-	if itemBang != tokens[0] {
+	if lex.ItemBang != tokens[0] {
 		return
 	}
 
 	var token byte
 	var i int
 	for _, token = range tokens[1:] {
-		if isWhitespace(token) {
+		if lex.IsWhitespace(token) {
 			break
 		}
 		if !('A' <= token && 'Z' >= token) {
@@ -162,12 +165,12 @@ func (t *Tree) parseDeclaration(tokens []byte) (valid bool, remains, content []b
 	for ; i < length; i++ {
 		token = tokens[i]
 		content = append(content, token)
-		if itemGreater == token {
+		if lex.ItemGreater == token {
 			break
 		}
 	}
 	tokens = tokens[i:]
-	if itemGreater != tokens[0] {
+	if lex.ItemGreater != tokens[0] {
 		return
 	}
 	valid = true
@@ -178,7 +181,7 @@ func (t *Tree) parseDeclaration(tokens []byte) (valid bool, remains, content []b
 
 func (t *Tree) parseProcessingInstruction(tokens []byte) (valid bool, remains, content []byte) {
 	remains = tokens
-	if itemQuestion != tokens[0] {
+	if lex.ItemQuestion != tokens[0] {
 		return
 	}
 
@@ -190,7 +193,7 @@ func (t *Tree) parseProcessingInstruction(tokens []byte) (valid bool, remains, c
 	for ; i < length; i++ {
 		token = tokens[i]
 		content = append(content, token)
-		if i <= length-2 && itemQuestion == token && itemGreater == tokens[i+1] {
+		if i <= length-2 && lex.ItemQuestion == token && lex.ItemGreater == tokens[i+1] {
 			break
 		}
 	}
@@ -199,7 +202,7 @@ func (t *Tree) parseProcessingInstruction(tokens []byte) (valid bool, remains, c
 		return
 	}
 
-	if itemQuestion != tokens[0] || itemGreater != tokens[1] {
+	if lex.ItemQuestion != tokens[0] || lex.ItemGreater != tokens[1] {
 		return
 	}
 	content = append(content, tokens[1])
@@ -211,16 +214,16 @@ func (t *Tree) parseProcessingInstruction(tokens []byte) (valid bool, remains, c
 
 func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []byte) {
 	remains = tokens
-	if itemBang != tokens[0] || itemHyphen != tokens[1] || itemHyphen != tokens[2] {
+	if lex.ItemBang != tokens[0] || lex.ItemHyphen != tokens[1] || lex.ItemHyphen != tokens[2] {
 		return
 	}
 
 	comment = append(comment, tokens[0], tokens[1], tokens[2])
 	tokens = tokens[3:]
-	if itemGreater == tokens[0] {
+	if lex.ItemGreater == tokens[0] {
 		return
 	}
-	if itemHyphen == tokens[0] && itemGreater == tokens[1] {
+	if lex.ItemHyphen == tokens[0] && lex.ItemGreater == tokens[1] {
 		return
 	}
 	var token byte
@@ -229,15 +232,15 @@ func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []b
 	for ; i < length; i++ {
 		token = tokens[i]
 		comment = append(comment, token)
-		if i <= length-2 && itemHyphen == token && itemHyphen == tokens[i+1] {
+		if i <= length-2 && lex.ItemHyphen == token && lex.ItemHyphen == tokens[i+1] {
 			break
 		}
-		if i <= length-3 && itemHyphen == token && itemHyphen == tokens[i+1] && itemGreater == tokens[i+2] {
+		if i <= length-3 && lex.ItemHyphen == token && lex.ItemHyphen == tokens[i+1] && lex.ItemGreater == tokens[i+2] {
 			break
 		}
 	}
 	tokens = tokens[i:]
-	if itemHyphen != tokens[0] || itemHyphen != tokens[1] || itemGreater != tokens[2] {
+	if lex.ItemHyphen != tokens[0] || lex.ItemHyphen != tokens[1] || lex.ItemGreater != tokens[2] {
 		return
 	}
 	comment = append(comment, tokens[1], tokens[2])
@@ -254,7 +257,7 @@ func (t *Tree) parseTagAttr(tokens []byte) (valid bool, remains, attr []byte) {
 	var i int
 	var token byte
 	for i, token = range tokens {
-		if !isWhitespace(token) {
+		if !lex.IsWhitespace(token) {
 			break
 		}
 		whitespaces = append(whitespaces, token)
@@ -290,19 +293,19 @@ func (t *Tree) parseAttrValSpec(tokens []byte) (valid bool, remains, valSpec []b
 	var i int
 	var token byte
 	for i, token = range tokens {
-		if !isWhitespace(token) {
+		if !lex.IsWhitespace(token) {
 			break
 		}
 		valSpec = append(valSpec, token)
 	}
-	if itemEqual != token {
+	if lex.ItemEqual != token {
 		valSpec = nil
 		return
 	}
 	valSpec = append(valSpec, token)
 	tokens = tokens[i+1:]
 	for i, token = range tokens {
-		if !isWhitespace(token) {
+		if !lex.IsWhitespace(token) {
 			break
 		}
 		valSpec = append(valSpec, token)
@@ -311,34 +314,34 @@ func (t *Tree) parseAttrValSpec(tokens []byte) (valid bool, remains, valSpec []b
 	valSpec = append(valSpec, token)
 	tokens = tokens[i+1:]
 	closed := false
-	if itemDoublequote == token { // A double-quoted attribute value consists of ", zero or more characters not including ", and a final ".
+	if lex.ItemDoublequote == token { // A double-quoted attribute value consists of ", zero or more characters not including ", and a final ".
 		for i, token = range tokens {
 			valSpec = append(valSpec, token)
-			if itemDoublequote == token {
+			if lex.ItemDoublequote == token {
 				closed = true
 				break
 			}
 		}
-	} else if itemSinglequote == token { // A single-quoted attribute value consists of ', zero or more characters not including ', and a final '.
+	} else if lex.ItemSinglequote == token { // A single-quoted attribute value consists of ', zero or more characters not including ', and a final '.
 		for i, token = range tokens {
 			valSpec = append(valSpec, token)
-			if itemSinglequote == token {
+			if lex.ItemSinglequote == token {
 				closed = true
 				break
 			}
 		}
 	} else { // An unquoted attribute value is a nonempty string of characters not including whitespace, ", ', =, <, >, or `.
 		for i, token = range tokens {
-			if itemGreater == token {
+			if lex.ItemGreater == token {
 				i-- // 大于字符 > 不计入 valSpec
 				break
 			}
 			valSpec = append(valSpec, token)
-			if isWhitespace(token) {
+			if lex.IsWhitespace(token) {
 				// 属性使用空白分隔
 				break
 			}
-			if itemDoublequote == token || itemSinglequote == token || itemEqual == token || itemLess == token || itemGreater == token || itemBacktick == token {
+			if lex.ItemDoublequote == token || lex.ItemSinglequote == token || lex.ItemEqual == token || lex.ItemLess == token || lex.ItemGreater == token || lex.ItemBacktick == token {
 				closed = false
 				break
 			}
@@ -359,7 +362,7 @@ func (t *Tree) parseAttrValSpec(tokens []byte) (valid bool, remains, valSpec []b
 
 func (t *Tree) parseAttrName(tokens []byte) (remains, attrName []byte) {
 	remains = tokens
-	if !isASCIILetter(tokens[0]) && itemUnderscore != tokens[0] && itemColon != tokens[0] {
+	if !lex.IsASCIILetter(tokens[0]) && lex.ItemUnderscore != tokens[0] && lex.ItemColon != tokens[0] {
 		return
 	}
 	attrName = append(attrName, tokens[0])
@@ -367,7 +370,7 @@ func (t *Tree) parseAttrName(tokens []byte) (remains, attrName []byte) {
 	var i int
 	var token byte
 	for i, token = range tokens {
-		if !isASCIILetterNumHyphen(token) && itemUnderscore != token && itemDot != token && itemColon != token {
+		if !lex.IsASCIILetterNumHyphen(token) && lex.ItemUnderscore != token && lex.ItemDot != token && lex.ItemColon != token {
 			break
 		}
 		attrName = append(attrName, token)
@@ -384,13 +387,13 @@ func (t *Tree) parseAttrName(tokens []byte) (remains, attrName []byte) {
 func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
 	i := 0
 	token := tokens[i]
-	if !isASCIILetter(token) {
+	if !lex.IsASCIILetter(token) {
 		return tokens, nil
 	}
 	tagName = append(tagName, token)
 	for i = 1; i < len(tokens); i++ {
 		token = tokens[i]
-		if !isASCIILetterNumHyphen(token) {
+		if !lex.IsASCIILetterNumHyphen(token) {
 			break
 		}
 		tagName = append(tagName, token)

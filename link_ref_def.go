@@ -13,12 +13,13 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"unicode/utf8"
 )
 
 func (context *Context) parseLinkRefDef(tokens []byte) []byte {
-	_, tokens = trimLeft(tokens)
+	_, tokens = lex.TrimLeft(tokens)
 	if 1 > len(tokens) {
 		return nil
 	}
@@ -38,8 +39,8 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 	}
 
 	remains = remains[1:]
-	whitespaces, remains := trimLeft(remains)
-	newlines, _, _ := statWhitespace(whitespaces)
+	whitespaces, remains := lex.TrimLeft(remains)
+	newlines, _, _ := lex.StatWhitespace(whitespaces)
 	if 1 < newlines {
 		return nil
 	}
@@ -50,28 +51,28 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 		return nil
 	}
 
-	whitespaces, remains = trimLeft(remains)
+	whitespaces, remains = lex.TrimLeft(remains)
 	if nil == whitespaces && 0 < len(remains) {
 		return nil
 	}
-	newlines, spaces1, tabs1 := statWhitespace(whitespaces)
+	newlines, spaces1, tabs1 := lex.StatWhitespace(whitespaces)
 	if 1 < newlines {
 		return nil
 	}
 
-	_, tokens = trimLeft(remains)
+	_, tokens = lex.TrimLeft(remains)
 	validTitle, _, remains, title := context.parseLinkTitle(tokens)
 	if !validTitle && 1 > newlines {
 		return nil
 	}
-	if 0 < spaces1+tabs1 && !isBlankLine(remains) && itemNewline != remains[0] {
+	if 0 < spaces1+tabs1 && !lex.IsBlankLine(remains) && lex.ItemNewline != remains[0] {
 		return nil
 	}
 
 	titleLine := tokens
-	whitespaces, tokens = trimLeft(remains)
-	_, spaces2, tabs2 := statWhitespace(whitespaces)
-	if !isBlankLine(tokens) && 0 < spaces2+tabs2 {
+	whitespaces, tokens = lex.TrimLeft(remains)
+	_, spaces2, tabs2 := lex.StatWhitespace(whitespaces)
+	if !lex.IsBlankLine(tokens) && 0 < spaces2+tabs2 {
 		remains = titleLine
 	} else {
 		remains = tokens
@@ -89,15 +90,15 @@ func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, 
 	if 1 > len(tokens) {
 		return true, nil, tokens, nil
 	}
-	if itemOpenBracket == tokens[0] {
+	if lex.ItemOpenBracket == tokens[0] {
 		return true, nil, tokens, nil
 	}
 
-	validTitle, passed, remains, title = context.parseLinkTitleMatch(itemDoublequote, itemDoublequote, tokens)
+	validTitle, passed, remains, title = context.parseLinkTitleMatch(lex.ItemDoublequote, lex.ItemDoublequote, tokens)
 	if !validTitle {
-		validTitle, passed, remains, title = context.parseLinkTitleMatch(itemSinglequote, itemSinglequote, tokens)
+		validTitle, passed, remains, title = context.parseLinkTitleMatch(lex.ItemSinglequote, lex.ItemSinglequote, tokens)
 		if !validTitle {
-			validTitle, passed, remains, title = context.parseLinkTitleMatch(itemOpenParen, itemCloseParen, tokens)
+			validTitle, passed, remains, title = context.parseLinkTitleMatch(lex.ItemOpenParen, lex.ItemCloseParen, tokens)
 		}
 	}
 	if nil != title {
@@ -134,7 +135,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens []byte) 
 			passed = append(passed, tokens[i+j])
 		}
 		title = append(title, util.StrToBytes(string(r))...)
-		if closer == token && !isBackslashEscapePunct(tokens, i) {
+		if closer == token && !lex.IsBackslashEscapePunct(tokens, i) {
 			closed = true
 			title = title[:len(title)-1]
 			break
@@ -186,16 +187,16 @@ func (context *Context) parseLinkDest2(tokens []byte) (ret, remains, destination
 			ret = append(ret, tokens[i+j])
 		}
 		destination = append(destination, util.StrToBytes(string(r))...)
-		if isWhitespace(token) || isControl(token) {
+		if lex.IsWhitespace(token) || lex.IsControl(token) {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
 			break
 		}
 
-		if itemOpenParen == token && !isBackslashEscapePunct(tokens, i) {
+		if lex.ItemOpenParen == token && !lex.IsBackslashEscapePunct(tokens, i) {
 			openParens++
 		}
-		if itemCloseParen == token && !isBackslashEscapePunct(tokens, i) {
+		if lex.ItemCloseParen == token && !lex.IsBackslashEscapePunct(tokens, i) {
 			openParens--
 			if 1 > openParens {
 				i++
@@ -207,7 +208,7 @@ func (context *Context) parseLinkDest2(tokens []byte) (ret, remains, destination
 	}
 
 	remains = tokens[i:]
-	if length > i && !isWhitespace(tokens[i]) {
+	if length > i && !lex.IsWhitespace(tokens[i]) {
 		ret = nil
 		return
 	}
@@ -222,7 +223,7 @@ func (context *Context) parseLinkDest1(tokens []byte) (ret, remains, destination
 		return
 	}
 
-	if itemLess != tokens[0] {
+	if lex.ItemLess != tokens[0] {
 		return
 	}
 
@@ -243,13 +244,13 @@ func (context *Context) parseLinkDest1(tokens []byte) (ret, remains, destination
 				ret = append(ret, tokens[i+j])
 			}
 			destination = append(destination, util.StrToBytes(string(r))...)
-			if itemLess == token && !isBackslashEscapePunct(tokens, i) {
+			if lex.ItemLess == token && !lex.IsBackslashEscapePunct(tokens, i) {
 				ret = nil
 				return
 			}
 		}
 
-		if itemGreater == token && !isBackslashEscapePunct(tokens, i) {
+		if lex.ItemGreater == token && !lex.IsBackslashEscapePunct(tokens, i) {
 			closed = true
 			destination = destination[0 : len(destination)-1]
 			break
@@ -272,7 +273,7 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 		return
 	}
 
-	if itemOpenBracket != tokens[0] {
+	if lex.ItemOpenBracket != tokens[0] {
 		return
 	}
 
@@ -289,32 +290,32 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 			passed = append(passed, tokens[i+j])
 		}
 		label = append(label, util.StrToBytes(string(r))...)
-		if itemCloseBracket == token && !isBackslashEscapePunct(tokens, i) {
+		if lex.ItemCloseBracket == token && !lex.IsBackslashEscapePunct(tokens, i) {
 			closed = true
 			label = label[0 : len(label)-1]
 			remains = tokens[i+1:]
 			break
 		}
-		if itemOpenBracket == token && !isBackslashEscapePunct(tokens, i) {
+		if lex.ItemOpenBracket == token && !lex.IsBackslashEscapePunct(tokens, i) {
 			passed = nil
 			return
 		}
 		i += size
 	}
 
-	if !closed || nil == trimWhitespace(label) || 999 < len(label) {
+	if !closed || nil == lex.TrimWhitespace(label) || 999 < len(label) {
 		passed = nil
 		return
 	}
 
-	label = trimWhitespace(label)
+	label = lex.TrimWhitespace(label)
 	if !context.option.VditorWYSIWYG {
-		label = replaceAll(label, itemNewline, itemSpace)
+		label = lex.ReplaceAll(label, lex.ItemNewline, lex.ItemSpace)
 		length := len(label)
 		var token byte
 		for i := 0; i < length; i++ {
 			token = label[i]
-			if token == itemSpace && i < length-1 && label[i+1] == itemSpace {
+			if token == lex.ItemSpace && i < length-1 && label[i+1] == lex.ItemSpace {
 				label = append(label[:i], label[i+1:]...)
 				length--
 			}

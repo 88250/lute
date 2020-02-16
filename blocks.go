@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strings"
 )
@@ -23,10 +24,10 @@ func (t *Tree) parseBlocks() {
 	t.context.linkRefDefs = map[string]*ast.Node{}
 	t.context.footnotesDefs = []*ast.Node{}
 	lines := 0
-	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
+	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {
 		if t.context.option.VditorWYSIWYG {
 			ln := []rune(string(line))
-			if 4 < len(ln) && isDigit(byte(ln[0])) && ('、' == ln[1] || '）' == ln[1]) {
+			if 4 < len(ln) && lex.IsDigit(byte(ln[0])) && ('、' == ln[1] || '）' == ln[1]) {
 				// 列表标记符自动优化 https://github.com/Vanessa219/vditor/issues/68
 				line = []byte(string(ln[0]) + ". " + string(ln[2:]))
 			}
@@ -89,15 +90,15 @@ func (t *Tree) incorporateLine(line []byte) {
 		// 这里仅做简单判断的话可以提升一些性能
 		maybeMarker := t.context.currentLine[t.context.nextNonspace]
 		if !t.context.indented && // 缩进代码块
-			itemHyphen != maybeMarker && itemAsterisk != maybeMarker && itemPlus != maybeMarker && // 无序列表
-			!isDigit(maybeMarker) && // 有序列表
-			itemBacktick != maybeMarker && itemTilde != maybeMarker && // 代码块
-			itemCrosshatch != maybeMarker && // ATX 标题
-			itemGreater != maybeMarker && // 块引用
-			itemLess != maybeMarker && // HTML 块
-			itemUnderscore != maybeMarker && itemEqual != maybeMarker && // Setext 标题
-			itemDollar != maybeMarker && // 数学公式
-			itemOpenBracket != maybeMarker { // 脚注
+			lex.ItemHyphen != maybeMarker && lex.ItemAsterisk != maybeMarker && lex.ItemPlus != maybeMarker && // 无序列表
+			!lex.IsDigit(maybeMarker) && // 有序列表
+			lex.ItemBacktick != maybeMarker && lex.ItemTilde != maybeMarker && // 代码块
+			lex.ItemCrosshatch != maybeMarker && // ATX 标题
+			lex.ItemGreater != maybeMarker && // 块引用
+			lex.ItemLess != maybeMarker && // HTML 块
+			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
+			lex.ItemDollar != maybeMarker && // 数学公式
+			lex.ItemOpenBracket != maybeMarker { // 脚注
 			t.context.advanceNextNonspace()
 			break
 		}
@@ -190,24 +191,24 @@ var blockStarts = []blockStartFunc{
 		}
 
 		if !t.context.indented {
-			marker := peek(t.context.currentLine, t.context.nextNonspace)
-			if itemOpenBracket != marker {
+			marker := lex.Peek(t.context.currentLine, t.context.nextNonspace)
+			if lex.ItemOpenBracket != marker {
 				return 0
 			}
-			caret := peek(t.context.currentLine, t.context.nextNonspace+1)
-			if itemCaret != caret {
+			caret := lex.Peek(t.context.currentLine, t.context.nextNonspace+1)
+			if lex.ItemCaret != caret {
 				return 0
 			}
 
-			var label = []byte{itemCaret}
+			var label = []byte{lex.ItemCaret}
 			var token byte
 			var i int
 			for i = t.context.nextNonspace + 2; i < t.context.currentLineLen; i++ {
 				token = t.context.currentLine[i]
-				if itemSpace == token || itemNewline == token || itemTab == token {
+				if lex.ItemSpace == token || lex.ItemNewline == token || lex.ItemTab == token {
 					return 0
 				}
-				if itemCloseBracket == token {
+				if lex.ItemCloseBracket == token {
 					break
 				}
 				label = append(label, token)
@@ -215,7 +216,7 @@ var blockStarts = []blockStartFunc{
 			if i >= t.context.currentLineLen {
 				return 0
 			}
-			if itemColon != t.context.currentLine[i+1] {
+			if lex.ItemColon != t.context.currentLine[i+1] {
 				return 0
 			}
 			t.context.advanceOffset(1, false)
@@ -236,14 +237,14 @@ var blockStarts = []blockStartFunc{
 	// 判断块引用（>）是否开始
 	func(t *Tree, container *ast.Node) int {
 		if !t.context.indented {
-			marker := peek(t.context.currentLine, t.context.nextNonspace)
-			if itemGreater == marker {
+			marker := lex.Peek(t.context.currentLine, t.context.nextNonspace)
+			if lex.ItemGreater == marker {
 				markers := []byte{marker}
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(1, false)
 				// > 后面的空格是可选的
-				whitespace := peek(t.context.currentLine, t.context.offset)
-				withSpace := itemSpace == whitespace || itemTab == whitespace
+				whitespace := lex.Peek(t.context.currentLine, t.context.offset)
+				withSpace := lex.ItemSpace == whitespace || lex.ItemTab == whitespace
 				if withSpace {
 					t.context.advanceOffset(1, true)
 					markers = append(markers, whitespace)
@@ -334,7 +335,7 @@ var blockStarts = []blockStartFunc{
 
 				t.context.closeUnmatchedBlocks()
 				// 解析链接引用定义
-				for tokens := container.Tokens; 0 < len(tokens) && itemOpenBracket == tokens[0]; tokens = container.Tokens {
+				for tokens := container.Tokens; 0 < len(tokens) && lex.ItemOpenBracket == tokens[0]; tokens = container.Tokens {
 					if remains := t.context.parseLinkRefDef(tokens); nil != remains {
 						container.Tokens = remains
 					} else {
@@ -344,7 +345,7 @@ var blockStarts = []blockStartFunc{
 
 				if value := container.Tokens; 0 < len(value) {
 					child := &ast.Node{Type: ast.NodeHeading, HeadingLevel: level}
-					child.Tokens = trimWhitespace(value)
+					child.Tokens = lex.TrimWhitespace(value)
 					container.InsertAfter(child)
 					container.Unlink()
 					t.context.tip = child
@@ -358,7 +359,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented && peek(t.context.currentLine, t.context.nextNonspace) == itemLess {
+		if !t.context.indented && lex.Peek(t.context.currentLine, t.context.nextNonspace) == lex.ItemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if htmlType := t.parseHTML(tokens); 0 != htmlType {
 				t.context.closeUnmatchedBlocks()

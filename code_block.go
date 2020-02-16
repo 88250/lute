@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
@@ -29,8 +30,8 @@ func CodeBlockContinue(codeBlock *ast.Node, context *Context) int {
 			var i = codeBlock.CodeBlockFenceOffset
 			var token byte
 			for i > 0 {
-				token = peek(ln, context.offset)
-				if itemSpace != token && itemTab != token {
+				token = lex.Peek(ln, context.offset)
+				if lex.ItemSpace != token && lex.ItemTab != token {
 					break
 				}
 				context.advanceOffset(1, true)
@@ -59,13 +60,13 @@ func codeBlockFinalize(codeBlock *ast.Node) {
 
 		var i int
 		for ; i < length; i++ {
-			if itemNewline == content[i] {
+			if lex.ItemNewline == content[i] {
 				break
 			}
 		}
 		codeBlock.Tokens = content[i+1:]
 	} else { // 缩进代码块
-		codeBlock.Tokens = replaceNewlineSpace(codeBlock.Tokens)
+		codeBlock.Tokens = lex.ReplaceNewlineSpace(codeBlock.Tokens)
 	}
 }
 
@@ -73,7 +74,7 @@ var codeBlockBacktick = util.StrToBytes("`")
 
 func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOffset int, openFence, codeBlockInfo []byte) {
 	marker := t.context.currentLine[t.context.nextNonspace]
-	if itemBacktick != marker && itemTilde != marker {
+	if lex.ItemBacktick != marker && lex.ItemTilde != marker {
 		return
 	}
 
@@ -90,11 +91,11 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 
 	var info []byte
 	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLen:]
-	if itemBacktick == marker && bytes.Contains(infoTokens, codeBlockBacktick) {
+	if lex.ItemBacktick == marker && bytes.Contains(infoTokens, codeBlockBacktick) {
 		// info 部分不能包含 `
 		return
 	}
-	info = trimWhitespace(infoTokens)
+	info = lex.TrimWhitespace(infoTokens)
 	info = unescapeString(info)
 	return true, fenceChar, fenceLen, t.context.indent, openFence, info
 }
@@ -104,10 +105,10 @@ func isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeF
 	if closeMarker != openMarker {
 		return false, nil
 	}
-	if num > accept(tokens, closeMarker) {
+	if num > lex.Accept(tokens, closeMarker) {
 		return false, nil
 	}
-	tokens = trimWhitespace(tokens)
+	tokens = lex.TrimWhitespace(tokens)
 	for _, token := range tokens {
 		if token != openMarker {
 			return false, nil

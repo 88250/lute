@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strconv"
 	"unicode"
@@ -108,7 +109,7 @@ func (r *FormatRenderer) renderBackslashContent(node *ast.Node, entering bool) a
 
 func (r *FormatRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeByte(itemBackslash)
+		r.writeByte(lex.ItemBackslash)
 	}
 	return ast.WalkContinue
 }
@@ -145,23 +146,23 @@ func (r *FormatRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStat
 func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
 	padding := node.TableCellContentMaxWidth - node.TableCellContentWidth
 	if entering {
-		r.writeByte(itemPipe)
-		r.writeByte(itemSpace)
+		r.writeByte(lex.ItemPipe)
+		r.writeByte(lex.ItemSpace)
 		switch node.TableCellAlign {
 		case 2:
-			r.write(bytes.Repeat([]byte{itemSpace}, padding/2))
+			r.write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
 		case 3:
-			r.write(bytes.Repeat([]byte{itemSpace}, padding))
+			r.write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
 		}
 	} else {
 		switch node.TableCellAlign {
 		case 2:
-			r.write(bytes.Repeat([]byte{itemSpace}, padding/2))
+			r.write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
 		case 3:
 		default:
-			r.write(bytes.Repeat([]byte{itemSpace}, padding))
+			r.write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
 		}
-		r.writeByte(itemSpace)
+		r.writeByte(lex.ItemSpace)
 	}
 	return ast.WalkContinue
 }
@@ -182,25 +183,25 @@ func (r *FormatRenderer) renderTableHead(node *ast.Node, entering bool) ast.Walk
 			case 0:
 				r.writeString("| -")
 				if padding := th.TableCellContentMaxWidth - 1; 0 < padding {
-					r.write(bytes.Repeat([]byte{itemHyphen}, padding))
+					r.write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
 				}
-				r.writeByte(itemSpace)
+				r.writeByte(lex.ItemSpace)
 			case 1:
 				r.writeString("| :-")
 				if padding := th.TableCellContentMaxWidth - 2; 0 < padding {
-					r.write(bytes.Repeat([]byte{itemHyphen}, padding))
+					r.write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
 				}
-				r.writeByte(itemSpace)
+				r.writeByte(lex.ItemSpace)
 			case 2:
 				r.writeString("| :-")
 				if padding := th.TableCellContentMaxWidth - 3; 0 < padding {
-					r.write(bytes.Repeat([]byte{itemHyphen}, padding))
+					r.write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
 				}
 				r.writeString(": ")
 			case 3:
 				r.writeString("| -")
 				if padding := th.TableCellContentMaxWidth - 2; 0 < padding {
-					r.write(bytes.Repeat([]byte{itemHyphen}, padding))
+					r.write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
 				}
 				r.writeString(": ")
 			}
@@ -214,7 +215,7 @@ func (r *FormatRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStat
 	if !entering {
 		r.newline()
 		if !r.isLastNode(r.tree.Root, node) {
-			r.writeByte(itemNewline)
+			r.writeByte(lex.ItemNewline)
 		}
 	}
 	return ast.WalkContinue
@@ -225,12 +226,12 @@ func (r *FormatRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.
 }
 
 func (r *FormatRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemTilde)
+	r.writeByte(lex.ItemTilde)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemTilde)
+	r.writeByte(lex.ItemTilde)
 	return ast.WalkStop
 }
 
@@ -257,7 +258,7 @@ func (r *FormatRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *FormatRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemSpace)
+	r.writeByte(lex.ItemSpace)
 	return ast.WalkStop
 }
 
@@ -267,27 +268,27 @@ func (r *FormatRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *FormatRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemCloseParen)
+	r.writeByte(lex.ItemCloseParen)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemOpenParen)
+	r.writeByte(lex.ItemOpenParen)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemCloseBracket)
+	r.writeByte(lex.ItemCloseBracket)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemOpenBracket)
+	r.writeByte(lex.ItemOpenBracket)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemBang)
+	r.writeByte(lex.ItemBang)
 	return ast.WalkStop
 }
 
@@ -304,7 +305,7 @@ func (r *FormatRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 	r.write(node.Tokens)
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {
-		r.writeByte(itemNewline)
+		r.writeByte(lex.ItemNewline)
 	}
 	return ast.WalkStop
 }
@@ -323,7 +324,7 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 		buf := bytes.Trim(r.writer.Bytes(), " \t\n")
 		r.writer.Reset()
 		r.writeBytes(buf)
-		r.writeByte(itemNewline)
+		r.writeByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
 }
@@ -354,7 +355,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 		}
 
 		if !inTightList || (lastListItemLastPara) {
-			r.writeByte(itemNewline)
+			r.writeByte(lex.ItemNewline)
 		}
 	}
 	return ast.WalkContinue
@@ -380,7 +381,7 @@ func (r *FormatRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 			if text := node.PreviousNodeText(); "" != text {
 				lastc, _ := utf8.DecodeLastRuneInString(text)
 				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
-					r.writeByte(itemSpace)
+					r.writeByte(lex.ItemSpace)
 				}
 			}
 		}
@@ -389,7 +390,7 @@ func (r *FormatRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 			if text := node.NextNodeText(); "" != text {
 				firstc, _ := utf8.DecodeRuneInString(text)
 				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
-					r.writeByte(itemSpace)
+					r.writeByte(lex.ItemSpace)
 				}
 			}
 		}
@@ -398,13 +399,13 @@ func (r *FormatRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *FormatRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemBacktick)
+	r.writeByte(lex.ItemBacktick)
 	if 1 < node.Parent.CodeMarkerLen {
-		r.writeByte(itemBacktick)
+		r.writeByte(lex.ItemBacktick)
 		text := util.BytesToStr(node.Next.Tokens)
 		firstc, _ := utf8.DecodeRuneInString(text)
 		if '`' == firstc {
-			r.writeByte(itemSpace)
+			r.writeByte(lex.ItemSpace)
 		}
 	}
 	return ast.WalkStop
@@ -420,16 +421,16 @@ func (r *FormatRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool
 		text := util.BytesToStr(node.Previous.Tokens)
 		lastc, _ := utf8.DecodeLastRuneInString(text)
 		if '`' == lastc {
-			r.writeByte(itemSpace)
+			r.writeByte(lex.ItemSpace)
 		}
-		r.writeByte(itemBacktick)
+		r.writeByte(lex.ItemBacktick)
 	}
-	r.writeByte(itemBacktick)
+	r.writeByte(lex.ItemBacktick)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemDollar)
+	r.writeByte(lex.ItemDollar)
 	return ast.WalkStop
 }
 
@@ -439,7 +440,7 @@ func (r *FormatRenderer) renderInlineMathContent(node *ast.Node, entering bool) 
 }
 
 func (r *FormatRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemDollar)
+	r.writeByte(lex.ItemDollar)
 	return ast.WalkStop
 }
 
@@ -449,36 +450,36 @@ func (r *FormatRenderer) renderInlineMath(node *ast.Node, entering bool) ast.Wal
 
 func (r *FormatRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(mathBlockMarker)
-	r.writeByte(itemNewline)
+	r.writeByte(lex.ItemNewline)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	r.writeByte(itemNewline)
+	r.writeByte(lex.ItemNewline)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(mathBlockMarker)
-	r.writeByte(itemNewline)
+	r.writeByte(lex.ItemNewline)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.newline()
 	if !entering && !r.isLastNode(r.tree.Root, node) {
-		r.writeByte(itemNewline)
+		r.writeByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.newline()
-	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.CodeBlockFenceLen))
+	r.writeBytes(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {
-		r.writeByte(itemNewline)
+		r.writeByte(lex.ItemNewline)
 	}
 	return ast.WalkStop
 }
@@ -490,24 +491,24 @@ func (r *FormatRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 
 func (r *FormatRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.CodeBlockInfo)
-	r.writeByte(itemNewline)
+	r.writeByte(lex.ItemNewline)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.CodeBlockFenceLen))
+	r.writeBytes(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !node.IsFencedCodeBlock {
-		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
-		r.writeByte(itemNewline)
+		r.writeBytes(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
+		r.writeByte(lex.ItemNewline)
 		r.write(node.FirstChild.Tokens)
-		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
+		r.writeBytes(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
 		r.newline()
 		if !r.isLastNode(r.tree.Root, node) {
-			r.writeByte(itemNewline)
+			r.writeByte(lex.ItemNewline)
 		}
 		return ast.WalkStop
 	}
@@ -519,22 +520,22 @@ func (r *FormatRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *FormatRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemAsterisk)
+	r.writeByte(lex.ItemAsterisk)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemAsterisk)
+	r.writeByte(lex.ItemAsterisk)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemUnderscore)
+	r.writeByte(lex.ItemUnderscore)
 	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemUnderscore)
+	r.writeByte(lex.ItemUnderscore)
 	return ast.WalkStop
 }
 
@@ -572,14 +573,14 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 
 		blockquoteLines := bytes.Buffer{}
 		buf := writer.Bytes()
-		lines := bytes.Split(buf, []byte{itemNewline})
+		lines := bytes.Split(buf, []byte{lex.ItemNewline})
 		length := len(lines)
-		if 2 < length && isBlank(lines[length-1]) && isBlank(lines[length-2]) {
+		if 2 < length && lex.IsBlank(lines[length-1]) && lex.IsBlank(lines[length-2]) {
 			lines = lines[:length-1]
 		}
 		if 1 == len(r.nodeWriterStack) { // 已经是根这一层
 			length = len(lines)
-			if 1 < length && isBlank(lines[length-1]) {
+			if 1 < length && lex.IsBlank(lines[length-1]) {
 				lines = lines[:length-1]
 			}
 		}
@@ -591,13 +592,13 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 				continue
 			}
 
-			if itemGreater == line[0] {
+			if lex.ItemGreater == line[0] {
 				blockquoteLines.WriteString(">")
 			} else {
 				blockquoteLines.WriteString("> ")
 			}
 			blockquoteLines.Write(line)
-			blockquoteLines.WriteByte(itemNewline)
+			blockquoteLines.WriteByte(lex.ItemNewline)
 		}
 		buf = blockquoteLines.Bytes()
 		writer.Reset()
@@ -618,11 +619,11 @@ func (r *FormatRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) a
 
 func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeBytes(bytes.Repeat([]byte{itemCrosshatch}, node.HeadingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
-		r.writeByte(itemSpace)
+		r.writeBytes(bytes.Repeat([]byte{lex.ItemCrosshatch}, node.HeadingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
+		r.writeByte(lex.ItemSpace)
 	} else {
 		r.newline()
-		r.writeByte(itemNewline)
+		r.writeByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
 }
@@ -659,18 +660,18 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			indent++
 		}
-		indentSpaces := bytes.Repeat([]byte{itemSpace}, indent)
+		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
 		indentedLines := bytes.Buffer{}
 		buf := writer.Bytes()
-		lines := bytes.Split(buf, []byte{itemNewline})
+		lines := bytes.Split(buf, []byte{lex.ItemNewline})
 		for _, line := range lines {
 			if 0 == len(line) {
-				indentedLines.WriteByte(itemNewline)
+				indentedLines.WriteByte(lex.ItemNewline)
 				continue
 			}
 			indentedLines.Write(indentSpaces)
 			indentedLines.Write(line)
-			indentedLines.WriteByte(itemNewline)
+			indentedLines.WriteByte(lex.ItemNewline)
 		}
 		buf = indentedLines.Bytes()
 		if indent < len(buf) {
@@ -683,7 +684,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		} else {
 			listItemBuf.Write(node.Marker)
 		}
-		listItemBuf.WriteByte(itemSpace)
+		listItemBuf.WriteByte(lex.ItemSpace)
 		buf = append(listItemBuf.Bytes(), buf...)
 		writer.Reset()
 		writer.Write(buf)
@@ -698,13 +699,13 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *FormatRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(itemOpenBracket)
+	r.writeByte(lex.ItemOpenBracket)
 	if node.TaskListItemChecked {
 		r.writeByte('X')
 	} else {
-		r.writeByte(itemSpace)
+		r.writeByte(lex.ItemSpace)
 	}
-	r.writeByte(itemCloseBracket)
+	r.writeByte(lex.ItemCloseBracket)
 	return ast.WalkStop
 }
 
@@ -717,7 +718,7 @@ func (r *FormatRenderer) renderHardBreak(node *ast.Node, entering bool) ast.Walk
 	if !r.option.SoftBreak2HardBreak {
 		r.writeString("\\\n")
 	} else {
-		r.writeByte(itemNewline)
+		r.writeByte(lex.ItemNewline)
 	}
 	return ast.WalkStop
 }

@@ -12,43 +12,44 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/lex"
 )
 
 func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	tokens := t.context.currentLine[t.context.nextNonspace:]
 	marker := tokens[0]
-	if itemCrosshatch != marker {
+	if lex.ItemCrosshatch != marker {
 		return
 	}
 
-	level = accept(tokens, itemCrosshatch)
+	level = lex.Accept(tokens, lex.ItemCrosshatch)
 	if 6 < level {
 		return
 	}
 
-	if level < len(tokens) && !isWhitespace(tokens[level]) {
+	if level < len(tokens) && !lex.IsWhitespace(tokens[level]) {
 		return
 	}
 
 	markers = t.context.currentLine[t.context.nextNonspace : t.context.nextNonspace+level+1]
 
 	content = make([]byte, 0, 256)
-	_, tokens = trimLeft(tokens)
-	_, tokens = trimLeft(tokens[level:])
+	_, tokens = lex.TrimLeft(tokens)
+	_, tokens = lex.TrimLeft(tokens[level:])
 	for _, token := range tokens {
-		if itemNewline == token {
+		if lex.ItemNewline == token {
 			break
 		}
 		content = append(content, token)
 	}
 
-	_, content = trimRight(content)
+	_, content = lex.TrimRight(content)
 	closingCrosshatchIndex := len(content) - 1
 	for ; 0 <= closingCrosshatchIndex; closingCrosshatchIndex-- {
-		if itemCrosshatch == content[closingCrosshatchIndex] {
+		if lex.ItemCrosshatch == content[closingCrosshatchIndex] {
 			continue
 		}
-		if itemSpace == content[closingCrosshatchIndex] {
+		if lex.ItemSpace == content[closingCrosshatchIndex] {
 			break
 		} else {
 			closingCrosshatchIndex = len(content)
@@ -60,7 +61,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 		content = make([]byte, 0, 0)
 	} else if 0 < closingCrosshatchIndex {
 		content = content[:closingCrosshatchIndex]
-		_, content = trimRight(content)
+		_, content = lex.TrimRight(content)
 	}
 
 	if t.context.option.VditorWYSIWYG {
@@ -74,10 +75,10 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 }
 
 func (t *Tree) parseSetextHeading() (level int) {
-	ln := trimWhitespace(t.context.currentLine)
+	ln := lex.TrimWhitespace(t.context.currentLine)
 	start := 0
 	marker := ln[start]
-	if itemEqual != marker && itemHyphen != marker {
+	if lex.ItemEqual != marker && lex.ItemHyphen != marker {
 		return
 	}
 
@@ -92,7 +93,7 @@ func (t *Tree) parseSetextHeading() (level int) {
 	length := len(ln)
 	for ; start < length; start++ {
 		token := ln[start]
-		if itemEqual != token && itemHyphen != token {
+		if lex.ItemEqual != token && lex.ItemHyphen != token {
 			return
 		}
 
@@ -106,12 +107,12 @@ func (t *Tree) parseSetextHeading() (level int) {
 	}
 
 	level = 1
-	if itemHyphen == marker {
+	if lex.ItemHyphen == marker {
 		level = 2
 	}
 
 	if t.context.option.VditorWYSIWYG && caretInLn {
-		t.context.oldtip.Tokens = trimWhitespace(t.context.oldtip.Tokens)
+		t.context.oldtip.Tokens = lex.TrimWhitespace(t.context.oldtip.Tokens)
 		t.context.oldtip.AppendTokens([]byte(caret))
 	}
 

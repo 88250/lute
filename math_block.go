@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
@@ -28,8 +29,8 @@ func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 		var i = mathBlock.MathBlockDollarOffset
 		var token byte
 		for i > 0 {
-			token = peek(ln, context.offset)
-			if itemSpace != token && itemTab != token {
+			token = lex.Peek(ln, context.offset)
+			if lex.ItemSpace != token && lex.ItemTab != token {
 				break
 			}
 			context.advanceOffset(1, true)
@@ -43,7 +44,7 @@ var mathBlockMarker = util.StrToBytes("$$")
 
 func mathBlockFinalize(mathBlock *ast.Node) {
 	tokens := mathBlock.Tokens[2:] // 剔除开头的两个 $$
-	tokens = trimWhitespace(tokens)
+	tokens = lex.TrimWhitespace(tokens)
 	if bytes.HasSuffix(tokens, mathBlockMarker) {
 		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
 	}
@@ -55,7 +56,7 @@ func mathBlockFinalize(mathBlock *ast.Node) {
 
 func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 	marker := t.context.currentLine[t.context.nextNonspace]
-	if itemDollar != marker {
+	if lex.ItemDollar != marker {
 		return
 	}
 
@@ -74,15 +75,15 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 
 func isMathBlockClose(tokens []byte) bool {
 	closeMarker := tokens[0]
-	if closeMarker != itemDollar {
+	if closeMarker != lex.ItemDollar {
 		return false
 	}
-	if 2 > accept(tokens, closeMarker) {
+	if 2 > lex.Accept(tokens, closeMarker) {
 		return false
 	}
-	tokens = trimWhitespace(tokens)
+	tokens = lex.TrimWhitespace(tokens)
 	for _, token := range tokens {
-		if token != itemDollar {
+		if token != lex.ItemDollar {
 			return false
 		}
 	}

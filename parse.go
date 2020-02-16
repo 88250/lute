@@ -10,7 +10,10 @@
 
 package lute
 
-import "github.com/88250/lute/ast"
+import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+)
 
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
 func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
@@ -18,7 +21,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
-	tree.lexer = newLexer(markdown)
+	tree.lexer = lex.NewLexer(markdown)
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
@@ -62,7 +65,7 @@ func (context *Context) advanceOffset(count int, columns bool) {
 	var c byte
 	for 0 < count {
 		c = currentLine[context.offset]
-		if itemTab == c {
+		if lex.ItemTab == c {
 			charsToTab = 4 - (context.column % 4)
 			if columns {
 				context.partiallyConsumedTab = charsToTab > count
@@ -104,10 +107,10 @@ func (context *Context) findNextNonspace() {
 	var token byte
 	for {
 		token = context.currentLine[i]
-		if itemSpace == token {
+		if lex.ItemSpace == token {
 			i++
 			cols++
-		} else if itemTab == token {
+		} else if lex.ItemTab == token {
 			i++
 			cols += 4 - (cols % 4)
 		} else {
@@ -115,7 +118,7 @@ func (context *Context) findNextNonspace() {
 		}
 	}
 
-	context.blank = itemNewline == token
+	context.blank = lex.ItemNewline == token
 	context.nextNonspace = i
 	context.nextNonspaceColumn = cols
 	context.indent = context.nextNonspaceColumn - context.column
@@ -187,7 +190,7 @@ func (context *Context) listsMatch(listData, itemData *ast.ListData) bool {
 type Tree struct {
 	Name          string         // 名称，可以为空
 	Root          *ast.Node      // 根节点
-	lexer         *lexer         // 词法分析器
+	lexer         *lex.Lexer     // 词法分析器
 	context       *Context       // 块级解析上下文
 	inlineContext *InlineContext // 行级解析上下文
 }

@@ -12,6 +12,7 @@ package lute
 
 import (
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"strings"
 )
@@ -156,14 +157,14 @@ func (r *EChartsJSONRenderer) renderInlineHTML(node *ast.Node, entering bool) as
 
 func (r *EChartsJSONRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeByte(itemOpenBracket)
+		r.writeByte(lex.ItemOpenBracket)
 		r.openObj()
 		r.val("Document", node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
 		r.closeObj(node)
-		r.writeByte(itemCloseBracket)
+		r.writeByte(lex.ItemCloseBracket)
 	}
 	return ast.WalkContinue
 }

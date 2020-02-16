@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
@@ -24,7 +25,7 @@ func HtmlBlockContinue(html *ast.Node, context *Context) int {
 }
 
 func htmlBlockFinalize(html *ast.Node) {
-	_, html.Tokens = trimRight(replaceNewlineSpace(html.Tokens))
+	_, html.Tokens = lex.TrimRight(lex.ReplaceNewlineSpace(html.Tokens))
 }
 
 var (
@@ -43,19 +44,19 @@ func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
 	length := len(tokens)
 	switch htmlType {
 	case 1:
-		if pos := acceptTokenss(tokens, htmlBlockCloseTags1); 0 <= pos {
+		if pos := lex.AcceptTokenss(tokens, htmlBlockCloseTags1); 0 <= pos {
 			return true
 		}
 		return false
 	case 2:
 		for i := 0; i < length-3; i++ {
-			if itemHyphen == tokens[i] && itemHyphen == tokens[i+1] && itemGreater == tokens[i+2] {
+			if lex.ItemHyphen == tokens[i] && lex.ItemHyphen == tokens[i+1] && lex.ItemGreater == tokens[i+2] {
 				return true
 			}
 		}
 	case 3:
 		for i := 0; i < length-2; i++ {
-			if itemQuestion == tokens[i] && itemGreater == tokens[i+1] {
+			if lex.ItemQuestion == tokens[i] && lex.ItemGreater == tokens[i+1] {
 				return true
 			}
 		}
@@ -63,7 +64,7 @@ func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
 		return bytes.Contains(tokens, htmlBlockGreater)
 	case 5:
 		for i := 0; i < length-2; i++ {
-			if itemCloseBracket == tokens[i] && itemCloseBracket == tokens[i+1] {
+			if lex.ItemCloseBracket == tokens[i] && lex.ItemCloseBracket == tokens[i+1] {
 				return true
 			}
 		}
@@ -73,36 +74,36 @@ func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
 }
 
 func (t *Tree) parseHTML(tokens []byte) (typ int) {
-	_, tokens = trimLeft(tokens)
+	_, tokens = lex.TrimLeft(tokens)
 	length := len(tokens)
 	if 3 > length { // at least <? and a newline
 		return
 	}
 
-	if itemLess != tokens[0] {
+	if lex.ItemLess != tokens[0] {
 		return
 	}
 
 	typ = 1
 
-	if pos := acceptTokenss(tokens, htmlBlockTags1); 0 <= pos {
-		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {
+	if pos := lex.AcceptTokenss(tokens, htmlBlockTags1); 0 <= pos {
+		if lex.IsWhitespace(tokens[pos]) || lex.ItemGreater == tokens[pos] {
 			return
 		}
 	}
 
-	if pos := acceptTokenss(tokens, htmlBlockTags6); 0 <= pos {
-		if isWhitespace(tokens[pos]) || itemGreater == tokens[pos] {
+	if pos := lex.AcceptTokenss(tokens, htmlBlockTags6); 0 <= pos {
+		if lex.IsWhitespace(tokens[pos]) || lex.ItemGreater == tokens[pos] {
 			typ = 6
 			return
 		}
-		if itemSlash == tokens[pos] && itemGreater == tokens[pos+1] {
+		if lex.ItemSlash == tokens[pos] && lex.ItemGreater == tokens[pos+1] {
 			typ = 6
 			return
 		}
 	}
 
-	tag := trimWhitespace(tokens)
+	tag := lex.TrimWhitespace(tokens)
 	isOpenTag := t.isOpenTag(tag)
 	if isOpenTag && t.context.tip.Type != ast.NodeParagraph {
 		typ = 7
@@ -144,13 +145,13 @@ func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 		return
 	}
 
-	if itemLess != tokens[0] {
+	if lex.ItemLess != tokens[0] {
 		return
 	}
-	if itemGreater != tokens[length-1] {
+	if lex.ItemGreater != tokens[length-1] {
 		return
 	}
-	if itemSlash == tokens[length-2] {
+	if lex.ItemSlash == tokens[length-2] {
 		tokens = tokens[1 : length-2]
 	} else {
 		tokens = tokens[1 : length-1]
@@ -161,19 +162,19 @@ func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 		return
 	}
 
-	if isWhitespace(tokens[0]) { // < 后面不能跟空白
+	if lex.IsWhitespace(tokens[0]) { // < 后面不能跟空白
 		return
 	}
 
-	nameAndAttrs := splitWhitespace(tokens)
+	nameAndAttrs := lex.SplitWhitespace(tokens)
 	name := nameAndAttrs[0]
-	if !isASCIILetter(name[0]) {
+	if !lex.IsASCIILetter(name[0]) {
 		return
 	}
 	if 1 < len(name) {
 		name = name[1:]
 		for _, n := range name {
-			if !isASCIILetterNumHyphen(n) {
+			if !lex.IsASCIILetterNumHyphen(n) {
 				return
 			}
 		}
@@ -185,19 +186,19 @@ func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 			continue
 		}
 
-		nameAndValue := split(attr, itemEqual)
+		nameAndValue := lex.Split(attr, lex.ItemEqual)
 		name := nameAndValue[0]
 		if 1 > len(name) { // 等号前面空格的情况
 			continue
 		}
-		if !isASCIILetter(name[0]) && itemUnderscore != name[0] && itemColon != name[0] {
+		if !lex.IsASCIILetter(name[0]) && lex.ItemUnderscore != name[0] && lex.ItemColon != name[0] {
 			return
 		}
 
 		if 1 < len(name) {
 			name = name[1:]
 			for _, n := range name {
-				if !isASCIILetter(n) && !isDigit(n) && itemUnderscore != n && itemDot != n && itemColon != n && itemHyphen != n {
+				if !lex.IsASCIILetter(n) && !lex.IsDigit(n) && lex.ItemUnderscore != n && lex.ItemDot != n && lex.ItemColon != n && lex.ItemHyphen != n {
 					return
 				}
 			}
@@ -222,16 +223,16 @@ func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 }
 
 func (t *Tree) isCloseTag(tokens []byte) bool {
-	tokens = trimWhitespace(tokens)
+	tokens = lex.TrimWhitespace(tokens)
 	length := len(tokens)
 	if 4 > length {
 		return false
 	}
 
-	if itemLess != tokens[0] || itemSlash != tokens[1] {
+	if lex.ItemLess != tokens[0] || lex.ItemSlash != tokens[1] {
 		return false
 	}
-	if itemGreater != tokens[length-1] {
+	if lex.ItemGreater != tokens[length-1] {
 		return false
 	}
 
@@ -242,13 +243,13 @@ func (t *Tree) isCloseTag(tokens []byte) bool {
 	}
 
 	name := tokens[0:]
-	if !isASCIILetter(name[0]) {
+	if !lex.IsASCIILetter(name[0]) {
 		return false
 	}
 	if 1 < len(name) {
 		name = name[1:]
 		for _, n := range name {
-			if !isASCIILetterNumHyphen(n) {
+			if !lex.IsASCIILetterNumHyphen(n) {
 				return false
 			}
 		}

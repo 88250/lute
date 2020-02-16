@@ -13,10 +13,11 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 )
 
 func (context *Context) parseToC(paragraph *ast.Node) *ast.Node {
-	lines := split(paragraph.Tokens, itemNewline)
+	lines := lex.Split(paragraph.Tokens, lex.ItemNewline)
 	if 1 != len(lines) {
 		return nil
 	}

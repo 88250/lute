@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
@@ -52,7 +53,7 @@ func (lute *Lute) newBaseRenderer(tree *Tree) *BaseRenderer {
 func (r *BaseRenderer) Render() (output []byte, err error) {
 	defer RecoverPanic(&err)
 
-	r.lastOut = itemNewline
+	r.lastOut = lex.ItemNewline
 	r.writer = &bytes.Buffer{}
 	r.writer.Grow(4096)
 
@@ -126,8 +127,8 @@ func (r *BaseRenderer) writeString(content string) {
 
 // newline 会在最新内容不是换行符 \n 时输出一个换行符。
 func (r *BaseRenderer) newline() {
-	if itemNewline != r.lastOut {
-		r.writer.WriteByte(itemNewline)
-		r.lastOut = itemNewline
+	if lex.ItemNewline != r.lastOut {
+		r.writer.WriteByte(lex.ItemNewline)
+		r.lastOut = lex.ItemNewline
 	}
 }

@@ -42,7 +42,7 @@ var aliasUnicodeEmojiMap = map[string]string{
 	"ab":                                   "🆎",
 	"abc":                                  "🔤",
 	"abcd":                                 "🔡",
-	"accept":                               "🉑",
+	"Accept":                               "🉑",
 	"aerial_tramway":                       "🚡",
 	"afghanistan":                          "🇦🇫",
 	"airplane":                             "✈️",
