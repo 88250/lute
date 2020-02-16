@@ -10,13 +10,17 @@
 
 package lute
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
+)
 
 // emoji 将 node 下文本节点中的 Emoji 别名替换为原生 Unicode 字符。
-func (t *Tree) emoji(node *Node) {
+func (t *Tree) emoji(node *ast.Node) {
 	for child := node.FirstChild; nil != child; {
 		next := child.Next
-		if NodeText == child.Type {
+		if ast.NodeText == child.Type {
 			t.emoji0(child)
 		} else {
 			t.emoji(child) // 递归处理子节点
@@ -25,10 +29,10 @@ func (t *Tree) emoji(node *Node) {
 	}
 }
 
-var emojiSitePlaceholder = strToBytes("${emojiSite}")
-var emojiDot = strToBytes(".")
+var emojiSitePlaceholder = util.StrToBytes("${emojiSite}")
+var emojiDot = util.StrToBytes(".")
 
-func (t *Tree) emoji0(node *Node) {
+func (t *Tree) emoji0(node *ast.Node) {
 	first := node
 	tokens := node.Tokens
 	node.Tokens = []byte{} // 先清空，后面逐个添加或者添加 Tokens 或者 Emoji 兄弟节点
@@ -74,34 +78,34 @@ func (t *Tree) emoji0(node *Node) {
 			continue
 		}
 
-		if emoji, ok := t.context.option.AliasEmoji[bytesToStr(maybeEmoji)]; ok {
-			emojiNode := &Node{Type: NodeEmoji}
-			emojiUnicodeOrImg := &Node{Type: NodeEmojiUnicode}
+		if emoji, ok := t.context.option.AliasEmoji[util.BytesToStr(maybeEmoji)]; ok {
+			emojiNode := &ast.Node{Type: ast.NodeEmoji}
+			emojiUnicodeOrImg := &ast.Node{Type: ast.NodeEmojiUnicode}
 			emojiNode.AppendChild(emojiUnicodeOrImg)
-			emojiTokens := strToBytes(emoji)
+			emojiTokens := util.StrToBytes(emoji)
 			if bytes.Contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
-				alias := bytesToStr(maybeEmoji)
+				alias := util.BytesToStr(maybeEmoji)
 				suffix := ".png"
 				if "huaji" == alias {
 					suffix = ".gif"
 				}
 				src := t.context.option.EmojiSite + "/" + alias + suffix
-				emojiUnicodeOrImg.Type = NodeEmojiImg
+				emojiUnicodeOrImg.Type = ast.NodeEmojiImg
 				emojiUnicodeOrImg.Tokens = t.emojiImgTokens(alias, src)
 			} else if bytes.Contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
-				alias := bytesToStr(maybeEmoji)
-				emojiUnicodeOrImg.Type = NodeEmojiImg
+				alias := util.BytesToStr(maybeEmoji)
+				emojiUnicodeOrImg.Type = ast.NodeEmojiImg
 				emojiUnicodeOrImg.Tokens = t.emojiImgTokens(alias, emoji)
 			} else {
 				emojiUnicodeOrImg.Tokens = emojiTokens
 			}
 
-			emojiUnicodeOrImg.AppendChild(&Node{Type: NodeEmojiAlias, Tokens: tokens[i : pos+1]})
+			emojiUnicodeOrImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: tokens[i : pos+1]})
 			node.InsertAfter(emojiNode)
 
 			if pos+1 < length {
 				// 在 Emoji 节点后插入一个内容为空的文本节点，留作下次迭代
-				text := &Node{Type: NodeText, Tokens: []byte{}}
+				text := &ast.Node{Type: ast.NodeText, Tokens: []byte{}}
 				emojiNode.InsertAfter(text)
 				node = text
 			}
@@ -123,5 +127,5 @@ func (t *Tree) emoji0(node *Node) {
 }
 
 func (t *Tree) emojiImgTokens(alias, src string) []byte {
-	return strToBytes("<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + src + "\" title=\"" + alias + "\" />")
+	return util.StrToBytes("<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + src + "\" title=\"" + alias + "\" />")
 }

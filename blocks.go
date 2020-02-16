@@ -12,14 +12,16 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"strings"
 )
 
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.context.tip = t.Root
-	t.context.linkRefDefs = map[string]*Node{}
-	t.context.footnotesDefs = []*Node{}
+	t.context.linkRefDefs = map[string]*ast.Node{}
+	t.context.footnotesDefs = []*ast.Node{}
 	lines := 0
 	for line := t.lexer.nextLine(); nil != line; line = t.lexer.nextLine() {
 		if t.context.option.VditorWYSIWYG {
@@ -50,14 +52,14 @@ func (t *Tree) incorporateLine(line []byte) {
 	t.context.currentLineLen = len(t.context.currentLine)
 
 	allMatched := true
-	var container *Node
+	var container *ast.Node
 	container = t.Root
 	lastChild := container.LastChild
 	for ; nil != lastChild && !lastChild.Close; lastChild = container.LastChild {
 		container = lastChild
 		t.context.findNextNonspace()
 
-		switch container.Continue(t.context) {
+		switch _continue(container, t.context) {
 		case 0: // 说明匹配可继续处理
 			break
 		case 1: // 匹配失败，不能继续处理
@@ -76,7 +78,7 @@ func (t *Tree) incorporateLine(line []byte) {
 	t.context.allClosed = container == t.context.oldtip
 	t.context.lastMatchedContainer = container
 
-	matchedLeaf := container.Type != NodeParagraph && container.AcceptLines()
+	matchedLeaf := container.Type != ast.NodeParagraph && container.AcceptLines()
 	startsLen := len(blockStarts)
 
 	// 除非最后一个匹配到的是代码块，否则的话就起始一个新的块级节点
@@ -124,7 +126,7 @@ func (t *Tree) incorporateLine(line []byte) {
 
 	// offset 后余下的内容算作是文本行，需要将其添加到相应的块节点上
 
-	if !t.context.allClosed && !t.context.blank && t.context.tip.Type == NodeParagraph {
+	if !t.context.allClosed && !t.context.blank && t.context.tip.Type == ast.NodeParagraph {
 		// 该行是段落延续文本，直接添加到当前末梢段落上
 		t.addLine()
 	} else {
@@ -136,15 +138,15 @@ func (t *Tree) incorporateLine(line []byte) {
 		}
 
 		typ := container.Type
-		isFenced := NodeCodeBlock == typ && container.IsFencedCodeBlock
+		isFenced := ast.NodeCodeBlock == typ && container.IsFencedCodeBlock
 
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
 		var lastLineBlank = t.context.blank &&
-			!(typ == NodeFootnotesDef ||
-				typ == NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
-				(typ == NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
-				(typ == NodeMathBlock) || // 数学公式块不计入空行判断
-				(typ == NodeListItem && nil == container.FirstChild)) // 内容为空的列表项也不计入空行判断
+			!(typ == ast.NodeFootnotesDef ||
+				typ == ast.NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
+				(typ == ast.NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
+				(typ == ast.NodeMathBlock) || // 数学公式块不计入空行判断
+				(typ == ast.NodeListItem && nil == container.FirstChild)) // 内容为空的列表项也不计入空行判断
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 LastLineBlank
 		// LastLineBlank 目前仅在判断列表紧凑模式上使用
 		for cont := container; nil != cont; cont = cont.Parent {
@@ -153,7 +155,7 @@ func (t *Tree) incorporateLine(line []byte) {
 
 		if container.AcceptLines() {
 			t.addLine()
-			if typ == NodeHTMLBlock {
+			if typ == ast.NodeHTMLBlock {
 				// HTML 块（类型 1-5）需要检查是否满足闭合条件
 				html := container
 				if html.HtmlBlockType >= 1 && html.HtmlBlockType <= 5 {
@@ -165,7 +167,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			}
 		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
 			// 普通段落开始
-			t.context.addChild(NodeParagraph, t.context.offset)
+			t.context.addChild(ast.NodeParagraph, t.context.offset)
 			t.context.advanceNextNonspace()
 			t.addLine()
 		}
@@ -173,7 +175,7 @@ func (t *Tree) incorporateLine(line []byte) {
 }
 
 // blockStartFunc 定义了用于判断块是否开始的函数签名。
-type blockStartFunc func(t *Tree, container *Node) int
+type blockStartFunc func(t *Tree, container *ast.Node) int
 
 // blockStarts 定义了一系列函数，每个函数用于判断某种块节点是否可以开始，返回值：
 // 0：不匹配
@@ -182,7 +184,7 @@ type blockStartFunc func(t *Tree, container *Node) int
 var blockStarts = []blockStartFunc{
 
 	// 判断脚注定义（[^label]）是否开始
-	func(t *Tree, container *Node) int {
+	func(t *Tree, container *ast.Node) int {
 		if !t.context.option.Footnotes {
 			return 0
 		}
@@ -220,7 +222,7 @@ var blockStarts = []blockStartFunc{
 
 			t.context.closeUnmatchedBlocks()
 			t.context.advanceOffset(len(label)+2, true)
-			footnotesDef := t.context.addChild(NodeFootnotesDef, t.context.nextNonspace)
+			footnotesDef := t.context.addChild(ast.NodeFootnotesDef, t.context.nextNonspace)
 			footnotesDef.Tokens = label
 			lowerCaseLabel := bytes.ToLower(label)
 			if _, def := t.context.findFootnotesDef(lowerCaseLabel); nil == def {
@@ -232,7 +234,7 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断块引用（>）是否开始
-	func(t *Tree, container *Node) int {
+	func(t *Tree, container *ast.Node) int {
 		if !t.context.indented {
 			marker := peek(t.context.currentLine, t.context.nextNonspace)
 			if itemGreater == marker {
@@ -248,15 +250,15 @@ var blockStarts = []blockStartFunc{
 				}
 				if t.context.option.VditorWYSIWYG {
 					// Vditor 所见即所得模式下块引用标记符 > 后面不能为空
-					ln := bytesToStr(t.context.currentLine[t.context.offset:])
+					ln := util.BytesToStr(t.context.currentLine[t.context.offset:])
 					ln = strings.ReplaceAll(ln, caret, "")
 					if ln = strings.TrimSpace(ln); "" == ln {
 						return 0
 					}
 				}
 				t.context.closeUnmatchedBlocks()
-				t.context.addChild(NodeBlockquote, t.context.nextNonspace)
-				t.context.addChildMarker(NodeBlockquoteMarker, markers)
+				t.context.addChild(ast.NodeBlockquote, t.context.nextNonspace)
+				t.context.addChildMarker(ast.NodeBlockquoteMarker, markers)
 				return 1
 			}
 		}
@@ -264,16 +266,16 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 ATX 标题（#）是否开始
-	func(t *Tree, container *Node) int {
+	func(t *Tree, container *ast.Node) int {
 		if !t.context.indented {
 			if ok, markers, content, level := t.parseATXHeading(); ok {
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(len(content), false)
 				t.context.closeUnmatchedBlocks()
-				heading := t.context.addChild(NodeHeading, t.context.nextNonspace)
+				heading := t.context.addChild(ast.NodeHeading, t.context.nextNonspace)
 				heading.HeadingLevel = level
 				heading.Tokens = content
-				crosshatchMarker := &Node{Type: NodeHeadingC8hMarker, Tokens: markers}
+				crosshatchMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: markers}
 				heading.AppendChild(crosshatchMarker)
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
@@ -283,11 +285,11 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断围栏代码块（```）是否开始
-	func(t *Tree, container *Node) int {
+	func(t *Tree, container *ast.Node) int {
 		if !t.context.indented {
 			if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockOpenFence, codeBlockInfo := t.parseFencedCode(); ok {
 				t.context.closeUnmatchedBlocks()
-				container := t.context.addChild(NodeCodeBlock, t.context.nextNonspace)
+				container := t.context.addChild(ast.NodeCodeBlock, t.context.nextNonspace)
 				container.IsFencedCodeBlock = true
 				container.CodeBlockFenceLen = codeBlockFenceLen
 				container.CodeBlockFenceChar = codeBlockFenceChar
@@ -303,8 +305,8 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 Setext 标题（- =）是否开始
-	func(t *Tree, container *Node) int {
-		if !t.context.indented && container.Type == NodeParagraph {
+	func(t *Tree, container *ast.Node) int {
+		if !t.context.indented && container.Type == ast.NodeParagraph {
 			if level := t.parseSetextHeading(); 0 != level {
 				if t.context.option.GFMTable {
 					// 尝试解析表，因为可能出现如下情况：
@@ -318,7 +320,7 @@ var blockStarts = []blockStartFunc{
 					table := t.context.parseTable(container)
 					if nil != table {
 						// 将该段落节点转成表节点
-						container.Type = NodeTable
+						container.Type = ast.NodeTable
 						container.TableAligns = table.TableAligns
 						for tr := table.FirstChild; nil != tr; {
 							nextTr := tr.Next
@@ -341,7 +343,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				if value := container.Tokens; 0 < len(value) {
-					child := &Node{Type: NodeHeading, HeadingLevel: level}
+					child := &ast.Node{Type: ast.NodeHeading, HeadingLevel: level}
 					child.Tokens = trimWhitespace(value)
 					container.InsertAfter(child)
 					container.Unlink()
@@ -355,12 +357,12 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断 HTML 块（<）是否开始
-	func(t *Tree, container *Node) int {
+	func(t *Tree, container *ast.Node) int {
 		if !t.context.indented && peek(t.context.currentLine, t.context.nextNonspace) == itemLess {
 			tokens := t.context.currentLine[t.context.nextNonspace:]
 			if htmlType := t.parseHTML(tokens); 0 != htmlType {
 				t.context.closeUnmatchedBlocks()
-				block := t.context.addChild(NodeHTMLBlock, t.context.offset)
+				block := t.context.addChild(ast.NodeHTMLBlock, t.context.offset)
 				block.HtmlBlockType = htmlType
 				return 2
 			}
@@ -369,11 +371,11 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断分隔线（--- ***）是否开始
-	func(t *Tree, container *Node) int {
+	func(t *Tree, container *ast.Node) int {
 		if !t.context.indented {
 			if ok, caretTokens := t.parseThematicBreak(); ok {
 				t.context.closeUnmatchedBlocks()
-				thematicBreak := t.context.addChild(NodeThematicBreak, t.context.nextNonspace)
+				thematicBreak := t.context.addChild(ast.NodeThematicBreak, t.context.nextNonspace)
 				thematicBreak.Tokens = caretTokens
 				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
 				return 2
@@ -383,8 +385,8 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始
-	func(t *Tree, container *Node) int {
-		if !t.context.indented || container.Type == NodeList {
+	func(t *Tree, container *ast.Node) int {
+		if !t.context.indented || container.Type == ast.NodeList {
 			data := t.parseListMarker(container)
 			if nil == data {
 				return 0
@@ -392,12 +394,12 @@ var blockStarts = []blockStartFunc{
 
 			t.context.closeUnmatchedBlocks()
 
-			listsMatch := container.Type == NodeList && t.context.listsMatch(container.ListData, data)
-			if t.context.tip.Type != NodeList || !listsMatch {
-				list := t.context.addChild(NodeList, t.context.nextNonspace)
+			listsMatch := container.Type == ast.NodeList && t.context.listsMatch(container.ListData, data)
+			if t.context.tip.Type != ast.NodeList || !listsMatch {
+				list := t.context.addChild(ast.NodeList, t.context.nextNonspace)
 				list.ListData = data
 			}
-			listItem := t.context.addChild(NodeListItem, t.context.nextNonspace)
+			listItem := t.context.addChild(ast.NodeListItem, t.context.nextNonspace)
 			listItem.ListData = data
 			listItem.Tokens = data.Marker
 			if 1 == listItem.ListData.Typ || (3 == listItem.ListData.Typ && 0 == listItem.ListData.BulletChar) {
@@ -416,11 +418,11 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断数学公式块（$$）是否开始
-	func(t *Tree, container *Node) int {
+	func(t *Tree, container *ast.Node) int {
 		if !t.context.indented {
 			if ok, mathBlockDollarOffset := t.parseMathBlock(); ok {
 				t.context.closeUnmatchedBlocks()
-				block := t.context.addChild(NodeMathBlock, t.context.nextNonspace)
+				block := t.context.addChild(ast.NodeMathBlock, t.context.nextNonspace)
 				block.MathBlockDollarOffset = mathBlockDollarOffset
 				t.context.advanceNextNonspace()
 				t.context.advanceOffset(mathBlockDollarOffset, false)
@@ -431,11 +433,11 @@ var blockStarts = []blockStartFunc{
 	},
 
 	// 判断缩进代码块（    code）是否开始
-	func(t *Tree, container *Node) int {
-		if t.context.indented && t.context.tip.Type != NodeParagraph && !t.context.blank {
+	func(t *Tree, container *ast.Node) int {
+		if t.context.indented && t.context.tip.Type != ast.NodeParagraph && !t.context.blank {
 			t.context.advanceOffset(4, true)
 			t.context.closeUnmatchedBlocks()
-			t.context.addChild(NodeCodeBlock, t.context.offset)
+			t.context.addChild(ast.NodeCodeBlock, t.context.offset)
 			return 2
 		}
 		return 0
@@ -450,8 +452,32 @@ func (t *Tree) addLine() {
 		// add space characters:
 		var charsToTab = 4 - (t.context.column % 4)
 		for i := 0; i < charsToTab; i++ {
-			t.context.tip.AppendTokens(strToBytes(" "))
+			t.context.tip.AppendTokens(util.StrToBytes(" "))
 		}
 	}
 	t.context.tip.AppendTokens(t.context.currentLine[t.context.offset:])
+}
+
+// _continue 判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。
+// 如果可以继续处理返回 0，如果不能接续处理返回 1，如果返回 2（仅在围栏代码块闭合时）则说明可以继续下一行处理了。
+func _continue(n *ast.Node, context *Context) int {
+	switch n.Type {
+	case ast.NodeCodeBlock:
+		return CodeBlockContinue(n, context)
+	case ast.NodeHTMLBlock:
+		return HtmlBlockContinue(n, context)
+	case ast.NodeParagraph:
+		return ParagraphContinue(n, context)
+	case ast.NodeListItem:
+		return ListItemContinue(n, context)
+	case ast.NodeBlockquote:
+		return BlockquoteContinue(n, context)
+	case ast.NodeMathBlock:
+		return MathBlockContinue(n, context)
+	case ast.NodeFootnotesDef:
+		return FootnotesContinue(n, context)
+	case ast.NodeHeading, ast.NodeThematicBreak:
+		return 1
+	}
+	return 0
 }

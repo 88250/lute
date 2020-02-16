@@ -12,22 +12,24 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"strconv"
 )
 
-func (list *Node) ListFinalize(context *Context) {
+func listFinalize(list *ast.Node) {
 	item := list.FirstChild
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
 	for nil != item {
-		if list.endsWithBlankLine(item) && nil != item.Next {
+		if endsWithBlankLine(item) && nil != item.Next {
 			list.Tight = false
 			break
 		}
 
 		var subitem = item.FirstChild
 		for nil != subitem {
-			if list.endsWithBlankLine(subitem) &&
+			if endsWithBlankLine(subitem) &&
 				(nil != item.Next || nil != subitem.Next) {
 				list.Tight = false
 				break
@@ -38,17 +40,17 @@ func (list *Node) ListFinalize(context *Context) {
 	}
 }
 
-var items1 = strToBytes("1")
+var items1 = util.StrToBytes("1")
 
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记符。
-func (t *Tree) parseListMarker(container *Node) *ListData {
+func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 	if t.context.indent >= 4 {
 		return nil
 	}
 
 	ln := t.context.currentLine
 	tokens := ln[t.context.nextNonspace:]
-	data := &ListData{
+	data := &ast.ListData{
 		Typ:          0,                // 默认无序列表
 		Tight:        true,             // 默认紧凑模式
 		MarkerOffset: t.context.indent, // 设置前置相对缩进
@@ -61,9 +63,9 @@ func (t *Tree) parseListMarker(container *Node) *ListData {
 	if itemPlus == marker[0] || itemHyphen == marker[0] || itemAsterisk == marker[0] {
 		data.BulletChar = marker[0]
 	} else if marker, delim = t.parseOrderedListMarker(tokens); nil != marker {
-		if container.Type != NodeParagraph || bytes.Equal(items1, marker) {
+		if container.Type != ast.NodeParagraph || bytes.Equal(items1, marker) {
 			data.Typ = 1 // 有序列表
-			data.Start, _ = strconv.Atoi(bytesToStr(marker))
+			data.Start, _ = strconv.Atoi(util.BytesToStr(marker))
 			markerLength = len(marker) + 1
 			data.Delimiter = delim
 		} else {
@@ -82,7 +84,7 @@ func (t *Tree) parseListMarker(container *Node) *ListData {
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空
-	if container.Type == NodeParagraph && itemNewline == token {
+	if container.Type == ast.NodeParagraph && itemNewline == token {
 		return nil
 	}
 
@@ -147,13 +149,13 @@ func (t *Tree) parseOrderedListMarker(tokens []byte) (marker []byte, delimiter b
 }
 
 // endsWithBlankLine 判断块节点 block 是否是空行结束。如果 block 是列表或者列表项则迭代下降进入判断。
-func (list *Node) endsWithBlankLine(block *Node) bool {
+func endsWithBlankLine(block *ast.Node) bool {
 	for nil != block {
 		if block.LastLineBlank {
 			return true
 		}
 		t := block.Type
-		if !block.LastLineChecked && (t == NodeList || t == NodeListItem) {
+		if !block.LastLineChecked && (t == ast.NodeList || t == ast.NodeListItem) {
 			block.LastLineChecked = true
 			block = block.LastChild
 		} else {

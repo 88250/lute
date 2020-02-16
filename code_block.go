@@ -10,13 +10,17 @@
 
 package lute
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
+)
 
-func (codeBlock *Node) CodeBlockContinue(context *Context) int {
+func CodeBlockContinue(codeBlock *ast.Node, context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 	if codeBlock.IsFencedCodeBlock {
-		if ok, closeFence := codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.CodeBlockFenceChar, codeBlock.CodeBlockFenceLen); indent <= 3 && ok {
+		if ok, closeFence := isFencedCodeClose(ln[context.nextNonspace:], codeBlock.CodeBlockFenceChar, codeBlock.CodeBlockFenceLen); indent <= 3 && ok {
 			codeBlock.CodeBlockCloseFence = closeFence
 			context.finalize(codeBlock, context.lineNum)
 			return 2
@@ -45,7 +49,7 @@ func (codeBlock *Node) CodeBlockContinue(context *Context) int {
 	return 0
 }
 
-func (codeBlock *Node) CodeBlockFinalize(context *Context) {
+func codeBlockFinalize(codeBlock *ast.Node) {
 	if codeBlock.IsFencedCodeBlock {
 		content := codeBlock.Tokens
 		length := len(content)
@@ -65,7 +69,7 @@ func (codeBlock *Node) CodeBlockFinalize(context *Context) {
 	}
 }
 
-var codeBlockBacktick = strToBytes("`")
+var codeBlockBacktick = util.StrToBytes("`")
 
 func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOffset int, openFence, codeBlockInfo []byte) {
 	marker := t.context.currentLine[t.context.nextNonspace]
@@ -95,7 +99,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 	return true, fenceChar, fenceLen, t.context.indent, openFence, info
 }
 
-func (codeBlock *Node) isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeFence []byte) {
+func isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeFence []byte) {
 	closeMarker := tokens[0]
 	if closeMarker != openMarker {
 		return false, nil

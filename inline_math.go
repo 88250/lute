@@ -10,12 +10,17 @@
 
 package lute
 
-var dollar = strToBytes("$")
+import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
+)
 
-func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
+var dollar = util.StrToBytes("$")
+
+func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 	if 3 > ctx.tokensLen {
 		ctx.pos++
-		return &Node{Type: NodeText, Tokens: dollar}
+		return &ast.Node{Type: ast.NodeText, Tokens: dollar}
 	}
 
 	startPos := ctx.pos
@@ -37,10 +42,10 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 			}
 		}
 		if matchBlock {
-			ret = &Node{Type: NodeMathBlock}
-			ret.AppendChild(&Node{Type: NodeMathBlockOpenMarker})
-			ret.AppendChild(&Node{Type: NodeMathBlockContent, Tokens: ctx.tokens[blockStartPos:blockEndPos]})
-			ret.AppendChild(&Node{Type: NodeMathBlockCloseMarker})
+			ret = &ast.Node{Type: ast.NodeMathBlock}
+			ret.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
+			ret.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: ctx.tokens[blockStartPos:blockEndPos]})
+			ret.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
 			ctx.pos = blockEndPos + 2
 			return
 		}
@@ -48,13 +53,13 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 
 	if !t.context.option.InlineMathAllowDigitAfterOpenMarker && ctx.tokensLen > startPos+1 && isDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
 		ctx.pos += 3
-		return &Node{Type: NodeText, Tokens: ctx.tokens[startPos : startPos+3]}
+		return &ast.Node{Type: ast.NodeText, Tokens: ctx.tokens[startPos : startPos+3]}
 	}
 
 	endPos := t.matchInlineMathEnd(ctx.tokens[startPos+1:])
 	if 1 > endPos {
 		ctx.pos++
-		ret = &Node{Type: NodeText, Tokens: dollar}
+		ret = &ast.Node{Type: ast.NodeText, Tokens: dollar}
 		return
 	}
 
@@ -63,13 +68,13 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens[startPos+1 : endPos-1]
 	if 1 > len(trimWhitespace(tokens)) {
 		ctx.pos++
-		return &Node{Type: NodeText, Tokens: dollar}
+		return &ast.Node{Type: ast.NodeText, Tokens: dollar}
 	}
 
-	ret = &Node{Type: NodeInlineMath}
-	ret.AppendChild(&Node{Type: NodeInlineMathOpenMarker})
-	ret.AppendChild(&Node{Type: NodeInlineMathContent, Tokens: tokens})
-	ret.AppendChild(&Node{Type: NodeInlineMathCloseMarker})
+	ret = &ast.Node{Type: ast.NodeInlineMath}
+	ret.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
+	ret.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: tokens})
+	ret.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
 
 	ctx.pos = endPos
 	return

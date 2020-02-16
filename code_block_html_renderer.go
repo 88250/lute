@@ -14,6 +14,8 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"go/format"
 	"strings"
 
@@ -26,7 +28,7 @@ import (
 // languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
 var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 
-func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
+func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !node.IsFencedCodeBlock {
 		// 缩进代码块处理
 		r.newline()
@@ -45,19 +47,19 @@ func (r *HTMLRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
 		}
 		r.writeString("</code></pre>")
 		r.newline()
-		return WalkStop
+		return ast.WalkStop
 	}
 	r.newline()
-	return WalkContinue
+	return ast.WalkContinue
 }
 
 // renderCodeBlockCode 进行代码块 HTML 渲染，实现语法高亮。
-func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) WalkStatus {
+func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
 			infoWords := split(node.Previous.CodeBlockInfo, itemSpace)
-			language := bytesToStr(infoWords[0])
+			language := util.BytesToStr(infoWords[0])
 			rendered := false
 			if isGo(language) {
 				// Go 代码块自动格式化 https://github.com/b3log/lute/issues/37
@@ -91,14 +93,14 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *Node, entering bool) WalkStatus
 				r.write(tokens)
 			}
 		}
-		return WalkSkipChildren
+		return ast.WalkSkipChildren
 	}
 	r.writeString("</code></pre>")
-	return WalkStop
+	return ast.WalkStop
 }
 
 func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered bool) {
-	codeBlock := bytesToStr(tokens)
+	codeBlock := util.BytesToStr(tokens)
 	var lexer chroma.Lexer
 	if "" != language {
 		lexer = chromalexers.Get(language)

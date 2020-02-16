@@ -10,13 +10,17 @@
 
 package lute
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
+)
 
-func (mathBlock *Node) MathBlockContinue(context *Context) int {
+func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 
-	if indent <= 3 && mathBlock.isMathBlockClose(ln[context.nextNonspace:]) {
+	if indent <= 3 && isMathBlockClose(ln[context.nextNonspace:]) {
 		context.finalize(mathBlock, context.lineNum)
 		return 2
 	} else {
@@ -35,18 +39,18 @@ func (mathBlock *Node) MathBlockContinue(context *Context) int {
 	return 0
 }
 
-var mathBlockMarker = strToBytes("$$")
+var mathBlockMarker = util.StrToBytes("$$")
 
-func (mathBlock *Node) MathBlockFinalize(context *Context) {
+func mathBlockFinalize(mathBlock *ast.Node) {
 	tokens := mathBlock.Tokens[2:] // 剔除开头的两个 $$
 	tokens = trimWhitespace(tokens)
 	if bytes.HasSuffix(tokens, mathBlockMarker) {
 		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
 	}
 	mathBlock.Tokens = nil
-	mathBlock.AppendChild(&Node{Type: NodeMathBlockOpenMarker})
-	mathBlock.AppendChild(&Node{Type: NodeMathBlockContent, Tokens: tokens})
-	mathBlock.AppendChild(&Node{Type: NodeMathBlockCloseMarker})
+	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
+	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: tokens})
+	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
 }
 
 func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
@@ -68,7 +72,7 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 	return true, t.context.indent
 }
 
-func (mathBlock *Node) isMathBlockClose(tokens []byte) bool {
+func isMathBlockClose(tokens []byte) bool {
 	closeMarker := tokens[0]
 	if closeMarker != itemDollar {
 		return false

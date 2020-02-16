@@ -10,29 +10,33 @@
 
 package lute
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
+)
 
-func (html *Node) HtmlBlockContinue(context *Context) int {
+func HtmlBlockContinue(html *ast.Node, context *Context) int {
 	if context.blank && (html.HtmlBlockType == 6 || html.HtmlBlockType == 7) {
 		return 1
 	}
 	return 0
 }
 
-func (html *Node) HtmlBlockFinalize(context *Context) {
+func htmlBlockFinalize(html *ast.Node) {
 	_, html.Tokens = trimRight(replaceNewlineSpace(html.Tokens))
 }
 
 var (
-	htmlBlockTags1      = [][]byte{strToBytes("<script"), strToBytes("<pre"), strToBytes("<style")}
-	htmlBlockCloseTags1 = [][]byte{strToBytes("</script>"), strToBytes("</pre>"), strToBytes("</style>")}
+	htmlBlockTags1      = [][]byte{util.StrToBytes("<script"), util.StrToBytes("<pre"), util.StrToBytes("<style")}
+	htmlBlockCloseTags1 = [][]byte{util.StrToBytes("</script>"), util.StrToBytes("</pre>"), util.StrToBytes("</style>")}
 	htmlBlockTags6      = [][]byte{
-		strToBytes("<address"), strToBytes("<article"), strToBytes("<aside"), strToBytes("<base"), strToBytes("<basefont"), strToBytes("<blockquote"), strToBytes("<body"), strToBytes("<caption"), strToBytes("<center"), strToBytes("<col"), strToBytes("<colgroup"), strToBytes("<dd"), strToBytes("<details"), strToBytes("<dialog"), strToBytes("<dir"), strToBytes("<div"), strToBytes("<dl"), strToBytes("<dt"), strToBytes("<fieldset"), strToBytes("<figcaption"), strToBytes("<figure"), strToBytes("<footer"), strToBytes("<form"), strToBytes("<frame"), strToBytes("<frameset"), strToBytes("<h1"), strToBytes("<h2"), strToBytes("<h3"), strToBytes("<h4"), strToBytes("<h5"), strToBytes("<h6"), strToBytes("<head"), strToBytes("<header"), strToBytes("<hr"), strToBytes("<html"), strToBytes("<iframe"), strToBytes("<legend"), strToBytes("<li"), strToBytes("<link"), strToBytes("<main"), strToBytes("<menu"), strToBytes("<menuitem"), strToBytes("<nav"), strToBytes("<noframes"), strToBytes("<ol"), strToBytes("<optgroup"), strToBytes("<option"), strToBytes("<p"), strToBytes("<param"), strToBytes("<section"), strToBytes("<source"), strToBytes("<summary"), strToBytes("<table"), strToBytes("<tbody"), strToBytes("<td"), strToBytes("<tfoot"), strToBytes("<th"), strToBytes("<thead"), strToBytes("<title"), strToBytes("<tr"), strToBytes("<track"), strToBytes("<ul"),
-		strToBytes("</address"), strToBytes("</article"), strToBytes("</aside"), strToBytes("</base"), strToBytes("</basefont"), strToBytes("</blockquote"), strToBytes("</body"), strToBytes("</caption"), strToBytes("</center"), strToBytes("</col"), strToBytes("</colgroup"), strToBytes("</dd"), strToBytes("</details"), strToBytes("</dialog"), strToBytes("</dir"), strToBytes("</div"), strToBytes("</dl"), strToBytes("</dt"), strToBytes("</fieldset"), strToBytes("</figcaption"), strToBytes("</figure"), strToBytes("</footer"), strToBytes("</form"), strToBytes("</frame"), strToBytes("</frameset"), strToBytes("</h1"), strToBytes("</h2"), strToBytes("</h3"), strToBytes("</h4"), strToBytes("</h5"), strToBytes("</h6"), strToBytes("</head"), strToBytes("</header"), strToBytes("</hr"), strToBytes("</html"), strToBytes("</iframe"), strToBytes("</legend"), strToBytes("</li"), strToBytes("</link"), strToBytes("</main"), strToBytes("</menu"), strToBytes("</menuitem"), strToBytes("</nav"), strToBytes("</noframes"), strToBytes("</ol"), strToBytes("</optgroup"), strToBytes("</option"), strToBytes("</p"), strToBytes("</param"), strToBytes("</section"), strToBytes("</source"), strToBytes("</summary"), strToBytes("</table"), strToBytes("</tbody"), strToBytes("</td"), strToBytes("</tfoot"), strToBytes("</th"), strToBytes("</thead"), strToBytes("</title"), strToBytes("</tr"), strToBytes("</track"), strToBytes("</ul"),
+		util.StrToBytes("<address"), util.StrToBytes("<article"), util.StrToBytes("<aside"), util.StrToBytes("<base"), util.StrToBytes("<basefont"), util.StrToBytes("<blockquote"), util.StrToBytes("<body"), util.StrToBytes("<caption"), util.StrToBytes("<center"), util.StrToBytes("<col"), util.StrToBytes("<colgroup"), util.StrToBytes("<dd"), util.StrToBytes("<details"), util.StrToBytes("<dialog"), util.StrToBytes("<dir"), util.StrToBytes("<div"), util.StrToBytes("<dl"), util.StrToBytes("<dt"), util.StrToBytes("<fieldset"), util.StrToBytes("<figcaption"), util.StrToBytes("<figure"), util.StrToBytes("<footer"), util.StrToBytes("<form"), util.StrToBytes("<frame"), util.StrToBytes("<frameset"), util.StrToBytes("<h1"), util.StrToBytes("<h2"), util.StrToBytes("<h3"), util.StrToBytes("<h4"), util.StrToBytes("<h5"), util.StrToBytes("<h6"), util.StrToBytes("<head"), util.StrToBytes("<header"), util.StrToBytes("<hr"), util.StrToBytes("<html"), util.StrToBytes("<iframe"), util.StrToBytes("<legend"), util.StrToBytes("<li"), util.StrToBytes("<link"), util.StrToBytes("<main"), util.StrToBytes("<menu"), util.StrToBytes("<menuitem"), util.StrToBytes("<nav"), util.StrToBytes("<noframes"), util.StrToBytes("<ol"), util.StrToBytes("<optgroup"), util.StrToBytes("<option"), util.StrToBytes("<p"), util.StrToBytes("<param"), util.StrToBytes("<section"), util.StrToBytes("<source"), util.StrToBytes("<summary"), util.StrToBytes("<table"), util.StrToBytes("<tbody"), util.StrToBytes("<td"), util.StrToBytes("<tfoot"), util.StrToBytes("<th"), util.StrToBytes("<thead"), util.StrToBytes("<title"), util.StrToBytes("<tr"), util.StrToBytes("<track"), util.StrToBytes("<ul"),
+		util.StrToBytes("</address"), util.StrToBytes("</article"), util.StrToBytes("</aside"), util.StrToBytes("</base"), util.StrToBytes("</basefont"), util.StrToBytes("</blockquote"), util.StrToBytes("</body"), util.StrToBytes("</caption"), util.StrToBytes("</center"), util.StrToBytes("</col"), util.StrToBytes("</colgroup"), util.StrToBytes("</dd"), util.StrToBytes("</details"), util.StrToBytes("</dialog"), util.StrToBytes("</dir"), util.StrToBytes("</div"), util.StrToBytes("</dl"), util.StrToBytes("</dt"), util.StrToBytes("</fieldset"), util.StrToBytes("</figcaption"), util.StrToBytes("</figure"), util.StrToBytes("</footer"), util.StrToBytes("</form"), util.StrToBytes("</frame"), util.StrToBytes("</frameset"), util.StrToBytes("</h1"), util.StrToBytes("</h2"), util.StrToBytes("</h3"), util.StrToBytes("</h4"), util.StrToBytes("</h5"), util.StrToBytes("</h6"), util.StrToBytes("</head"), util.StrToBytes("</header"), util.StrToBytes("</hr"), util.StrToBytes("</html"), util.StrToBytes("</iframe"), util.StrToBytes("</legend"), util.StrToBytes("</li"), util.StrToBytes("</link"), util.StrToBytes("</main"), util.StrToBytes("</menu"), util.StrToBytes("</menuitem"), util.StrToBytes("</nav"), util.StrToBytes("</noframes"), util.StrToBytes("</ol"), util.StrToBytes("</optgroup"), util.StrToBytes("</option"), util.StrToBytes("</p"), util.StrToBytes("</param"), util.StrToBytes("</section"), util.StrToBytes("</source"), util.StrToBytes("</summary"), util.StrToBytes("</table"), util.StrToBytes("</tbody"), util.StrToBytes("</td"), util.StrToBytes("</tfoot"), util.StrToBytes("</th"), util.StrToBytes("</thead"), util.StrToBytes("</title"), util.StrToBytes("</tr"), util.StrToBytes("</track"), util.StrToBytes("</ul"),
 	}
-	htmlBlockSinglequote = strToBytes("'")
-	htmlBlockDoublequote = strToBytes("\"")
-	htmlBlockGreater     = strToBytes(">")
+	htmlBlockSinglequote = util.StrToBytes("'")
+	htmlBlockDoublequote = util.StrToBytes("\"")
+	htmlBlockGreater     = util.StrToBytes(">")
 )
 
 func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
@@ -100,33 +104,33 @@ func (t *Tree) parseHTML(tokens []byte) (typ int) {
 
 	tag := trimWhitespace(tokens)
 	isOpenTag := t.isOpenTag(tag)
-	if isOpenTag && t.context.tip.Type != NodeParagraph {
+	if isOpenTag && t.context.tip.Type != ast.NodeParagraph {
 		typ = 7
 		return
 	}
 	isCloseTag := t.isCloseTag(tag)
-	if isCloseTag && t.context.tip.Type != NodeParagraph {
+	if isCloseTag && t.context.tip.Type != ast.NodeParagraph {
 		typ = 7
 		return
 	}
 
-	if 0 == bytes.Index(tokens, strToBytes("<!--")) {
+	if 0 == bytes.Index(tokens, util.StrToBytes("<!--")) {
 		typ = 2
 		return
 	}
 
-	if 0 == bytes.Index(tokens, strToBytes("<?")) {
+	if 0 == bytes.Index(tokens, util.StrToBytes("<?")) {
 		typ = 3
 		return
 	}
 
-	if 2 < len(tokens) && 0 == bytes.Index(tokens, strToBytes("<!")) {
+	if 2 < len(tokens) && 0 == bytes.Index(tokens, util.StrToBytes("<!")) {
 		following := tokens[2:]
 		if 'A' <= following[0] && 'Z' >= following[0] {
 			typ = 4
 			return
 		}
-		if 0 == bytes.Index(following, strToBytes("[CDATA[")) {
+		if 0 == bytes.Index(following, util.StrToBytes("[CDATA[")) {
 			typ = 5
 			return
 		}

@@ -10,7 +10,9 @@
 
 package lute
 
-func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
+import "github.com/88250/lute/ast"
+
+func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
 	startPos := ctx.pos
 	n := 0
 	for ; startPos+n < ctx.tokensLen; n++ {
@@ -22,19 +24,19 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 	backticks := ctx.tokens[startPos : startPos+n]
 	if ctx.tokensLen <= startPos+n {
 		ctx.pos += n
-		ret = &Node{Type: NodeText, Tokens: backticks}
+		ret = &ast.Node{Type: ast.NodeText, Tokens: backticks}
 		return
 	}
-	openMarker := &Node{Type: NodeCodeSpanOpenMarker, Tokens: backticks}
+	openMarker := &ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: backticks}
 
 	endPos := t.matchCodeSpanEnd(ctx.tokens[startPos+n:], n)
 	if 1 > endPos {
 		ctx.pos += n
-		ret = &Node{Type: NodeText, Tokens: backticks}
+		ret = &ast.Node{Type: ast.NodeText, Tokens: backticks}
 		return
 	}
 	endPos = startPos + endPos + n
-	closeMarker := &Node{Type: NodeCodeSpanCloseMarker, Tokens: ctx.tokens[endPos : endPos+n]}
+	closeMarker := &ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: ctx.tokens[endPos : endPos+n]}
 
 	textTokens := ctx.tokens[startPos+n : endPos]
 	if !t.context.option.VditorWYSIWYG {
@@ -48,9 +50,9 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *Node) {
 		}
 	}
 
-	ret = &Node{Type: NodeCodeSpan, CodeMarkerLen: n}
+	ret = &ast.Node{Type: ast.NodeCodeSpan, CodeMarkerLen: n}
 	ret.AppendChild(openMarker)
-	ret.AppendChild(&Node{Type: NodeCodeSpanContent, Tokens: textTokens})
+	ret.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: textTokens})
 	ret.AppendChild(closeMarker)
 	ctx.pos = endPos + n
 	return

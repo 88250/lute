@@ -8,7 +8,11 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package ast
+
+import (
+	"github.com/88250/lute/util"
+)
 
 // Node 描述了节点结构。
 type Node struct {
@@ -99,7 +103,7 @@ type ListData struct {
 
 // TokensStr 返回 n 的 Tokens 字符串。
 func (n *Node) TokensStr() string {
-	return bytesToStr(n.Tokens)
+	return util.BytesToStr(n.Tokens)
 }
 
 // LastDeepestChild 返回 n 的最后一个最深子节点。
@@ -132,7 +136,7 @@ func (n *Node) ChildByType(childType NodeType) *Node {
 func (n *Node) Text() (ret string) {
 	Walk(n, func(n *Node, entering bool) WalkStatus {
 		if (NodeText == n.Type || NodeLinkText == n.Type) && entering {
-			ret += bytesToStr(n.Tokens)
+			ret += util.BytesToStr(n.Tokens)
 		}
 		return WalkContinue
 	})
@@ -151,71 +155,6 @@ func (n *Node) PreviousNodeText() string {
 		return ""
 	}
 	return n.Previous.Text()
-}
-
-// Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
-func (n *Node) Finalize(context *Context) {
-	switch n.Type {
-	case NodeCodeBlock:
-		n.CodeBlockFinalize(context)
-	case NodeHTMLBlock:
-		n.HtmlBlockFinalize(context)
-	case NodeParagraph:
-		n.ParagraphFinalize(context)
-	case NodeMathBlock:
-		n.MathBlockFinalize(context)
-	case NodeList:
-		n.ListFinalize(context)
-	}
-}
-
-// Continue 判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。
-// 如果可以继续处理返回 0，如果不能接续处理返回 1，如果返回 2（仅在围栏代码块闭合时）则说明可以继续下一行处理了。
-func (n *Node) Continue(context *Context) int {
-	switch n.Type {
-	case NodeCodeBlock:
-		return n.CodeBlockContinue(context)
-	case NodeHTMLBlock:
-		return n.HtmlBlockContinue(context)
-	case NodeParagraph:
-		return n.ParagraphContinue(context)
-	case NodeListItem:
-		return n.ListItemContinue(context)
-	case NodeBlockquote:
-		return n.BlockquoteContinue(context)
-	case NodeMathBlock:
-		return n.MathBlockContinue(context)
-	case NodeFootnotesDef:
-		return n.FootnotesContinue(context)
-	case NodeHeading, NodeThematicBreak:
-		return 1
-	}
-
-	return 0
-}
-
-// AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
-func (n *Node) AcceptLines() bool {
-	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock:
-		return true
-	}
-	return false
-}
-
-// CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（块级容器）只能包含列表项节点，
-// 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
-func (n *Node) CanContain(nodeType NodeType) bool {
-	switch n.Type {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock:
-		return false
-	case NodeList:
-		return NodeListItem == nodeType
-	case NodeFootnotesDef:
-		return NodeFootnotesDef != nodeType // 脚注不能包含脚注
-	}
-
-	return NodeListItem != nodeType
 }
 
 // Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
@@ -320,6 +259,30 @@ func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 		}
 	}
 	return false
+}
+
+// AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
+func (n *Node) AcceptLines() bool {
+	switch n.Type {
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock:
+		return true
+	}
+	return false
+}
+
+// CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（块级容器）只能包含列表项节点，
+// 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
+func (n *Node) CanContain(nodeType NodeType) bool {
+	switch n.Type {
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock:
+		return false
+	case NodeList:
+		return NodeListItem == nodeType
+	case NodeFootnotesDef:
+		return NodeFootnotesDef != nodeType // 脚注不能包含脚注
+	}
+
+	return NodeListItem != nodeType
 }
 
 //go:generate stringer -type=NodeType

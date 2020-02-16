@@ -10,7 +10,9 @@
 
 package lute
 
-func (context *Context) parseTable(paragraph *Node) (ret *Node) {
+import "github.com/88250/lute/ast"
+
+func (context *Context) parseTable(paragraph *ast.Node) (ret *ast.Node) {
 	lines := split(paragraph.Tokens, itemNewline)
 	length := len(lines)
 	if 2 > length {
@@ -27,13 +29,13 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 		return
 	}
 
-	var cells [][]*Node
-	cells = append(cells, []*Node{})
+	var cells [][]*ast.Node
+	cells = append(cells, []*ast.Node{})
 	for n := headRow.FirstChild; nil != n; n = n.Next {
 		cells[0] = append(cells[0], n)
 	}
 
-	ret = &Node{Type: NodeTable, TableAligns: aligns}
+	ret = &ast.Node{Type: ast.NodeTable, TableAligns: aligns}
 	ret.TableAligns = aligns
 	ret.AppendChild(context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
@@ -43,7 +45,7 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 		}
 		ret.AppendChild(tableRow)
 
-		cells = append(cells, []*Node{})
+		cells = append(cells, []*ast.Node{})
 		for n := tableRow.FirstChild; nil != n; n = n.Next {
 			cells[i-1] = append(cells[i-1], n)
 		}
@@ -64,9 +66,9 @@ func (context *Context) parseTable(paragraph *Node) (ret *Node) {
 	return
 }
 
-func (context *Context) newTableHead(headRow *Node) *Node {
-	ret := &Node{Type: NodeTableHead}
-	tr := &Node{Type: NodeTableRow}
+func (context *Context) newTableHead(headRow *ast.Node) *ast.Node {
+	ret := &ast.Node{Type: ast.NodeTableHead}
+	tr := &ast.Node{Type: ast.NodeTableRow}
 	ret.AppendChild(tr)
 	for c := headRow.FirstChild; nil != c; {
 		next := c.Next
@@ -76,8 +78,8 @@ func (context *Context) newTableHead(headRow *Node) *Node {
 	return ret
 }
 
-func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *Node) {
-	ret = &Node{Type: NodeTableRow, TableAligns: aligns}
+func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *ast.Node) {
+	ret = &ast.Node{Type: ast.NodeTableRow, TableAligns: aligns}
 	cols := splitWithoutBackslashEscape(line, itemPipe)
 	if 1 > len(cols) {
 		return nil
@@ -100,14 +102,14 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = trimWhitespace(cols[i])
 		width := len(col)
-		cell := &Node{Type: NodeTableCell, TableCellAlign: aligns[i], TableCellContentWidth: width}
+		cell := &ast.Node{Type: ast.NodeTableCell, TableCellAlign: aligns[i], TableCellContentWidth: width}
 		cell.Tokens = col
 		ret.AppendChild(cell)
 	}
 
 	// 可能需要补全剩余的列
 	for ; i < alignsLen; i++ {
-		cell := &Node{Type: NodeTableCell, TableCellAlign: aligns[i]}
+		cell := &ast.Node{Type: ast.NodeTableCell, TableCellAlign: aligns[i]}
 		ret.AppendChild(cell)
 	}
 	return

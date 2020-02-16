@@ -11,6 +11,7 @@
 package lute
 
 import (
+	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -23,7 +24,7 @@ func unescapeString(tokens []byte) (ret []byte) {
 		return
 	}
 
-	tokens = strToBytes(htmlUnescapeString(bytesToStr(tokens)))
+	tokens = util.StrToBytes(htmlUnescapeString(util.BytesToStr(tokens)))
 	length := len(tokens)
 	ret = make([]byte, 0, length)
 	for i := 0; i < length; i++ {

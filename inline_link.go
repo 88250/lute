@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/util"
 	"unicode/utf8"
 )
 
@@ -47,7 +48,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 			} else {
 				dest = []byte{}
 				r, size = utf8.DecodeRune(tokens[i:])
-				runes = strToBytes(string(r))
+				runes = util.StrToBytes(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}
@@ -82,7 +83,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 			} else {
 				dest = []byte{}
 				r, size = utf8.DecodeRune(tokens[i:])
-				runes = strToBytes(string(r))
+				runes = util.StrToBytes(string(r))
 				passed = append(passed, runes...)
 				dest = append(dest, runes...)
 			}
@@ -143,7 +144,7 @@ func (context *Context) relativePath(dest []byte) []byte {
 		return dest
 	}
 
-	return append(strToBytes(context.option.LinkBase), dest...)
+	return append(util.StrToBytes(context.option.LinkBase), dest...)
 }
 
 func (context *Context) isRelativePath(dest []byte) bool {

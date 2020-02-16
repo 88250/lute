@@ -10,9 +10,12 @@
 
 package lute
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/88250/lute/ast"
+)
 
-func (footnotesDef *Node) FootnotesContinue(context *Context) int {
+func FootnotesContinue(footnotesDef *ast.Node, context *Context) int {
 	if context.blank {
 		return 0
 	}
@@ -25,7 +28,7 @@ func (footnotesDef *Node) FootnotesContinue(context *Context) int {
 	return 0
 }
 
-func (context *Context) findFootnotesDef(label []byte) (int, *Node) {
+func (context *Context) findFootnotesDef(label []byte) (int, *ast.Node) {
 	for i, n := range context.footnotesDefs {
 		if bytes.EqualFold(label, n.Tokens) {
 			return i + 1, n

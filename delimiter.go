@@ -11,13 +11,14 @@
 package lute
 
 import (
+	"github.com/88250/lute/ast"
 	"unicode"
 	"unicode/utf8"
 )
 
 // delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _, ~）相关信息。
 type delimiter struct {
-	node           *Node      // 分隔符对应的文本节点
+	node           *ast.Node  // 分隔符对应的文本节点
 	typ            byte       // 分隔符字节 [*_~
 	num            int        // 分隔符字节数
 	originalNum    int        // 原始分隔符字节数
@@ -35,12 +36,12 @@ type delimiter struct {
 // 嵌套强调和链接的解析算法的中文解读可参考这里 https://hacpai.com/article/1566893557720
 
 // handleDelim 将分隔符 *_~ 入栈。
-func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
+func (t *Tree) handleDelim(block *ast.Node, ctx *InlineContext) {
 	startPos := ctx.pos
 	delim := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
-	node := &Node{Type: NodeText, Tokens: text}
+	node := &ast.Node{Type: ast.NodeText, Tokens: text}
 	block.AppendChild(node)
 
 	// 将这个分隔符入栈
@@ -68,7 +69,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	}
 
 	var opener, closer, oldCloser *delimiter
-	var openerInl, closerInl *Node
+	var openerInl, closerInl *ast.Node
 	var tempStack *delimiter
 	var useDelims int
 	var openerFound bool
@@ -134,39 +135,39 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			text = closerInl.Tokens[0 : len(closerInl.Tokens)-useDelims]
 			closerInl.Tokens = text
 
-			openMarker := &Node{Tokens: openerTokens, Close: true}
-			emStrongDel := &Node{Close: true}
-			closeMarker := &Node{Tokens: closerTokens, Close: true}
+			openMarker := &ast.Node{Tokens: openerTokens, Close: true}
+			emStrongDel := &ast.Node{Close: true}
+			closeMarker := &ast.Node{Tokens: closerTokens, Close: true}
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
-					emStrongDel.Type = NodeEmphasis
-					openMarker.Type = NodeEmA6kOpenMarker
-					closeMarker.Type = NodeEmA6kCloseMarker
+					emStrongDel.Type = ast.NodeEmphasis
+					openMarker.Type = ast.NodeEmA6kOpenMarker
+					closeMarker.Type = ast.NodeEmA6kCloseMarker
 				} else if itemUnderscore == closercc {
-					emStrongDel.Type = NodeEmphasis
-					openMarker.Type = NodeEmU8eOpenMarker
-					closeMarker.Type = NodeEmU8eCloseMarker
+					emStrongDel.Type = ast.NodeEmphasis
+					openMarker.Type = ast.NodeEmU8eOpenMarker
+					closeMarker.Type = ast.NodeEmU8eCloseMarker
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel.Type = NodeStrikethrough
-						openMarker.Type = NodeStrikethrough1OpenMarker
-						closeMarker.Type = NodeStrikethrough1CloseMarker
+						emStrongDel.Type = ast.NodeStrikethrough
+						openMarker.Type = ast.NodeStrikethrough1OpenMarker
+						closeMarker.Type = ast.NodeStrikethrough1CloseMarker
 					}
 				}
 			} else {
 				if itemAsterisk == closercc {
-					emStrongDel.Type = NodeStrong
-					openMarker.Type = NodeStrongA6kOpenMarker
-					closeMarker.Type = NodeStrongA6kCloseMarker
+					emStrongDel.Type = ast.NodeStrong
+					openMarker.Type = ast.NodeStrongA6kOpenMarker
+					closeMarker.Type = ast.NodeStrongA6kCloseMarker
 				} else if itemUnderscore == closercc {
-					emStrongDel.Type = NodeStrong
-					openMarker.Type = NodeStrongU8eOpenMarker
-					closeMarker.Type = NodeStrongU8eCloseMarker
+					emStrongDel.Type = ast.NodeStrong
+					openMarker.Type = ast.NodeStrongU8eOpenMarker
+					closeMarker.Type = ast.NodeStrongU8eCloseMarker
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel.Type = NodeStrikethrough
-						openMarker.Type = NodeStrikethrough2OpenMarker
-						closeMarker.Type = NodeStrikethrough2CloseMarker
+						emStrongDel.Type = ast.NodeStrikethrough
+						openMarker.Type = ast.NodeStrikethrough2OpenMarker
+						closeMarker.Type = ast.NodeStrikethrough2CloseMarker
 					}
 				}
 			}

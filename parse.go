@@ -10,6 +10,8 @@
 
 package lute
 
+import "github.com/88250/lute/ast"
+
 // parse 会将 markdown 原始文本字符数组解析为一颗语法树。
 func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	defer RecoverPanic(&err)
@@ -17,7 +19,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &Node{Type: NodeDocument}
+	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
@@ -30,16 +32,16 @@ type Context struct {
 	tree   *Tree    // 关联的语法树
 	option *options // 解析渲染选项
 
-	linkRefDefs   map[string]*Node // 链接引用定义集
-	footnotesDefs []*Node          // 脚注定义集
+	linkRefDefs   map[string]*ast.Node // 链接引用定义集
+	footnotesDefs []*ast.Node          // 脚注定义集
 
-	tip                                                               *Node  // 末梢节点
-	oldtip                                                            *Node  // 老的末梢节点
-	currentLine                                                       []byte // 当前行
-	currentLineLen                                                    int    // 当前行长
-	lineNum, offset, column, nextNonspace, nextNonspaceColumn, indent int    // 解析时用到的行号、下标、缩进空格数等
-	indented, blank, partiallyConsumedTab, allClosed                  bool   // 是否是缩进行、空行等标识
-	lastMatchedContainer                                              *Node  // 最后一个匹配的块节点
+	tip                                                               *ast.Node // 末梢节点
+	oldtip                                                            *ast.Node // 老的末梢节点
+	currentLine                                                       []byte    // 当前行
+	currentLineLen                                                    int       // 当前行长
+	lineNum, offset, column, nextNonspace, nextNonspaceColumn, indent int       // 解析时用到的行号、下标、缩进空格数等
+	indented, blank, partiallyConsumedTab, allClosed                  bool      // 是否是缩进行、空行等标识
+	lastMatchedContainer                                              *ast.Node // 最后一个匹配的块节点
 }
 
 // InlineContext 描述了行级元素解析上下文。
@@ -133,35 +135,49 @@ func (context *Context) closeUnmatchedBlocks() {
 }
 
 // finalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
-func (context *Context) finalize(block *Node, lineNum int) {
+func (context *Context) finalize(block *ast.Node, lineNum int) {
 	var parent = block.Parent
 	block.Close = true
-	block.Finalize(context)
+
+	// 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
+	switch block.Type {
+	case ast.NodeCodeBlock:
+		codeBlockFinalize(block)
+	case ast.NodeHTMLBlock:
+		htmlBlockFinalize(block)
+	case ast.NodeParagraph:
+		paragraphFinalize(block, context)
+	case ast.NodeMathBlock:
+		mathBlockFinalize(block)
+	case ast.NodeList:
+		listFinalize(block)
+	}
+
 	context.tip = parent
 }
 
 // addChildMarker 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.tip 上。
-func (context *Context) addChildMarker(nodeType NodeType, tokens []byte) (ret *Node) {
-	ret = &Node{Type: nodeType, Tokens: tokens, Close: true}
+func (context *Context) addChildMarker(nodeType ast.NodeType, tokens []byte) (ret *ast.Node) {
+	ret = &ast.Node{Type: nodeType, Tokens: tokens, Close: true}
 	context.tip.AppendChild(ret)
 	return ret
 }
 
 // addChild 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
 // 节点并向父节点方向尝试，直到找到一个能接受该子节点的节点为止。添加完成后该子节点会被设置为新的末梢节点。
-func (context *Context) addChild(nodeType NodeType, offset int) (ret *Node) {
+func (context *Context) addChild(nodeType ast.NodeType, offset int) (ret *ast.Node) {
 	for !context.tip.CanContain(nodeType) {
 		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
-	ret = &Node{Type: nodeType}
+	ret = &ast.Node{Type: nodeType}
 	context.tip.AppendChild(ret)
 	context.tip = ret
 	return ret
 }
 
 // listsMatch 用户判断指定的 listData 和 itemData 是否可归属于同一个列表。
-func (context *Context) listsMatch(listData, itemData *ListData) bool {
+func (context *Context) listsMatch(listData, itemData *ast.ListData) bool {
 	return listData.Typ == itemData.Typ &&
 		((0 == listData.Delimiter && 0 == itemData.Delimiter) || listData.Delimiter == itemData.Delimiter) &&
 		listData.BulletChar == itemData.BulletChar
@@ -170,7 +186,7 @@ func (context *Context) listsMatch(listData, itemData *ListData) bool {
 // Tree 描述了 Markdown 抽象语法树结构。
 type Tree struct {
 	Name          string         // 名称，可以为空
-	Root          *Node          // 根节点
+	Root          *ast.Node      // 根节点
 	lexer         *lexer         // 词法分析器
 	context       *Context       // 块级解析上下文
 	inlineContext *InlineContext // 行级解析上下文

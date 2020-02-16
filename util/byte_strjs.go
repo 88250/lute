@@ -8,20 +8,14 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-// +build !javascript
+// +build javascript
 
-package lute
+package util
 
-import "unsafe"
-
-// bytesToStr 快速转换 []byte 为 string。
-func bytesToStr(bytes []byte) string {
-	return *(*string)(unsafe.Pointer(&bytes))
+func StrToBytes(str string) (ret []byte) {
+	return []byte(str)
 }
 
-// strToBytes 快速转换 string 为 []byte。
-func strToBytes(str string) []byte {
-	x := (*[2]uintptr)(unsafe.Pointer(&str))
-	h := [3]uintptr{x[0], x[1], x[1]}
-	return *(*[]byte)(unsafe.Pointer(&h))
+func BytesToStr(items []byte) string {
+	return string(items)
 }

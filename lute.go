@@ -11,6 +11,8 @@
 package lute
 
 import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"github.com/gopherjs/gopherjs/js"
 	"strings"
 )
@@ -21,8 +23,8 @@ const Version = "1.1.3"
 type Lute struct {
 	*options // 解析和渲染选项配置
 
-	HTML2MdRendererFuncs        map[NodeType]ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
-	HTML2VditorDOMRendererFuncs map[NodeType]ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
+	HTML2MdRendererFuncs        map[ast.NodeType]ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
+	HTML2VditorDOMRendererFuncs map[ast.NodeType]ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：
@@ -61,8 +63,8 @@ func New(opts ...option) (ret *Lute) {
 	for _, opt := range opts {
 		opt(ret)
 	}
-	ret.HTML2MdRendererFuncs = map[NodeType]ExtRendererFunc{}
-	ret.HTML2VditorDOMRendererFuncs = map[NodeType]ExtRendererFunc{}
+	ret.HTML2MdRendererFuncs = map[ast.NodeType]ExtRendererFunc{}
+	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]ExtRendererFunc{}
 	return ret
 }
 
@@ -92,7 +94,7 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 		return
 	}
 
-	html = bytesToStr(htmlBytes)
+	html = util.BytesToStr(htmlBytes)
 	return
 }
 
@@ -117,7 +119,7 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 		return
 	}
 
-	formatted = bytesToStr(formattedBytes)
+	formatted = util.BytesToStr(formattedBytes)
 	return
 }
 
@@ -129,7 +131,7 @@ func (lute *Lute) Space(text string) string {
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	ret = make(map[string]string, len(lute.AliasEmoji))
-	placeholder := bytesToStr(emojiSitePlaceholder)
+	placeholder := util.BytesToStr(emojiSitePlaceholder)
 	for k, v := range lute.AliasEmoji {
 		if strings.Contains(v, placeholder) {
 			v = strings.ReplaceAll(v, placeholder, lute.EmojiSite)
@@ -327,7 +329,7 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			continue
 		}
 
-		var rendererFuncs map[NodeType]ExtRendererFunc
+		var rendererFuncs map[ast.NodeType]ExtRendererFunc
 		if "HTML2Md" == rendererType {
 			rendererFuncs = lute.HTML2MdRendererFuncs
 		} else if "HTML2VditorDOM" == rendererType {
@@ -339,11 +341,11 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 		renderFuncs := extRenderer.Interface().(map[string]interface{})
 		for funcName, _ := range renderFuncs {
 			nodeType := "Node" + funcName[len("render"):]
-			rendererFuncs[Str2NodeType(nodeType)] = func(node *Node, entering bool) (string, WalkStatus) {
+			rendererFuncs[ast.Str2NodeType(nodeType)] = func(node *ast.Node, entering bool) (string, ast.WalkStatus) {
 				nodeType := node.Type.String()
 				funcName = "render" + nodeType[len("Node"):]
 				ret := extRenderer.Call(funcName, js.MakeWrapper(node), entering).Interface().([]interface{})
-				return ret[0].(string), WalkStatus(ret[1].(float64))
+				return ret[0].(string), ast.WalkStatus(ret[1].(float64))
 			}
 		}
 	}

@@ -10,7 +10,10 @@
 
 package lute
 
-import "sync"
+import (
+	"github.com/88250/lute/ast"
+	"sync"
+)
 
 // parseInlines 解析并生成行级节点。
 func (t *Tree) parseInlines() {
@@ -18,7 +21,7 @@ func (t *Tree) parseInlines() {
 }
 
 // walkParseInline 解析生成节点 node 的行级子节点。
-func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
+func (t *Tree) walkParseInline(node *ast.Node, wg *sync.WaitGroup) {
 	defer RecoverPanic(nil)
 	if nil != wg {
 		defer wg.Done()
@@ -28,9 +31,9 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 	}
 
 	// 只有如下几种类型的块节点需要生成行级子节点
-	if typ := node.Type; NodeParagraph == typ || NodeHeading == typ || NodeTableCell == typ {
+	if typ := node.Type; ast.NodeParagraph == typ || ast.NodeHeading == typ || ast.NodeTableCell == typ {
 		tokens := node.Tokens
-		if NodeParagraph == typ && nil == tokens {
+		if ast.NodeParagraph == typ && nil == tokens {
 			// 解析 GFM 表节点后段落内容 Tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
 			// 在这里从语法树上移除空段落节点
 			next := node.Next
@@ -69,20 +72,20 @@ func (t *Tree) walkParseInline(node *Node, wg *sync.WaitGroup) {
 			t.emoji(node)
 		}
 		return
-	} else if NodeCodeBlock == typ {
+	} else if ast.NodeCodeBlock == typ {
 		if node.IsFencedCodeBlock {
 			// 细化围栏代码块子节点
-			openMarker := &Node{Type: NodeCodeBlockFenceOpenMarker, Tokens: node.CodeBlockOpenFence, CodeBlockFenceLen: node.CodeBlockFenceLen}
+			openMarker := &ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: node.CodeBlockOpenFence, CodeBlockFenceLen: node.CodeBlockFenceLen}
 			node.PrependChild(openMarker)
-			info := &Node{Type: NodeCodeBlockFenceInfoMarker, CodeBlockInfo: node.CodeBlockInfo}
+			info := &ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: node.CodeBlockInfo}
 			node.AppendChild(info)
-			code := &Node{Type: NodeCodeBlockCode, Tokens: node.Tokens}
+			code := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: node.Tokens}
 			node.AppendChild(code)
-			closeMarker := &Node{Type: NodeCodeBlockFenceCloseMarker, Tokens: node.CodeBlockCloseFence, CodeBlockFenceLen: node.CodeBlockFenceLen}
+			closeMarker := &ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: node.CodeBlockCloseFence, CodeBlockFenceLen: node.CodeBlockFenceLen}
 			node.AppendChild(closeMarker)
 		} else {
 			// 细化缩进代码块子节点
-			code := &Node{Type: NodeCodeBlockCode, Tokens: node.Tokens}
+			code := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: node.Tokens}
 			node.AppendChild(code)
 		}
 		node.Tokens = nil

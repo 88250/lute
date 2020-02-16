@@ -12,6 +12,8 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"unicode/utf8"
 )
 
@@ -75,10 +77,10 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 		remains = tokens
 	}
 
-	link := context.tree.newLink(NodeLink, label, destination, title, 1)
+	link := context.tree.newLink(ast.NodeLink, label, destination, title, 1)
 	lowerCaseLabel := bytes.ToLower(label)
-	if _, ok := context.linkRefDefs[bytesToStr(lowerCaseLabel)]; !ok {
-		context.linkRefDefs[bytesToStr(lowerCaseLabel)] = link
+	if _, ok := context.linkRefDefs[util.BytesToStr(lowerCaseLabel)]; !ok {
+		context.linkRefDefs[util.BytesToStr(lowerCaseLabel)] = link
 	}
 	return remains
 }
@@ -131,7 +133,7 @@ func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens []byte) 
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		title = append(title, strToBytes(string(r))...)
+		title = append(title, util.StrToBytes(string(r))...)
 		if closer == token && !isBackslashEscapePunct(tokens, i) {
 			closed = true
 			title = title[:len(title)-1]
@@ -183,7 +185,7 @@ func (context *Context) parseLinkDest2(tokens []byte) (ret, remains, destination
 		for j := 1; j < size; j++ {
 			ret = append(ret, tokens[i+j])
 		}
-		destination = append(destination, strToBytes(string(r))...)
+		destination = append(destination, util.StrToBytes(string(r))...)
 		if isWhitespace(token) || isControl(token) {
 			destination = destination[:len(destination)-1]
 			ret = ret[:len(ret)-1]
@@ -240,7 +242,7 @@ func (context *Context) parseLinkDest1(tokens []byte) (ret, remains, destination
 			for j := 1; j < size; j++ {
 				ret = append(ret, tokens[i+j])
 			}
-			destination = append(destination, strToBytes(string(r))...)
+			destination = append(destination, util.StrToBytes(string(r))...)
 			if itemLess == token && !isBackslashEscapePunct(tokens, i) {
 				ret = nil
 				return
@@ -286,7 +288,7 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 		for j := 1; j < size; j++ {
 			passed = append(passed, tokens[i+j])
 		}
-		label = append(label, strToBytes(string(r))...)
+		label = append(label, util.StrToBytes(string(r))...)
 		if itemCloseBracket == token && !isBackslashEscapePunct(tokens, i) {
 			closed = true
 			label = label[0 : len(label)-1]

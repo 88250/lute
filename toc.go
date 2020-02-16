@@ -10,9 +10,12 @@
 
 package lute
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/88250/lute/ast"
+)
 
-func (context *Context) parseToC(paragraph *Node) *Node {
+func (context *Context) parseToC(paragraph *ast.Node) *ast.Node {
 	lines := split(paragraph.Tokens, itemNewline)
 	if 1 != len(lines) {
 		return nil
@@ -23,5 +26,5 @@ func (context *Context) parseToC(paragraph *Node) *Node {
 		return nil
 	}
 
-	return &Node{Type: NodeToC}
+	return &ast.Node{Type: ast.NodeToC}
 }

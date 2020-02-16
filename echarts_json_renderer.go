@@ -11,6 +11,8 @@
 package lute
 
 import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"strings"
 )
 
@@ -22,103 +24,103 @@ type EChartsJSONRenderer struct {
 // newEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
 func (lute *Lute) newEChartsJSONRenderer(tree *Tree) Renderer {
 	ret := &EChartsJSONRenderer{lute.newBaseRenderer(tree)}
-	ret.rendererFuncs[NodeDocument] = ret.renderDocument
-	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
-	ret.rendererFuncs[NodeText] = ret.renderText
-	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
-	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
-	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
-	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
-	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
-	ret.rendererFuncs[NodeStrong] = ret.renderStrong
-	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
-	ret.rendererFuncs[NodeHeading] = ret.renderHeading
-	ret.rendererFuncs[NodeList] = ret.renderList
-	ret.rendererFuncs[NodeListItem] = ret.renderListItem
-	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
-	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
-	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
-	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTML
-	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
-	ret.rendererFuncs[NodeLink] = ret.renderLink
-	ret.rendererFuncs[NodeImage] = ret.renderImage
-	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
-	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
-	ret.rendererFuncs[NodeTable] = ret.renderTable
-	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
-	ret.rendererFuncs[NodeTableRow] = ret.renderTableRow
-	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
-	ret.rendererFuncs[NodeEmoji] = ret.renderEmoji
-	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
-	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
-	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
+	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
+	ret.rendererFuncs[ast.NodeText] = ret.renderText
+	ret.rendererFuncs[ast.NodeCodeSpan] = ret.renderCodeSpan
+	ret.rendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
+	ret.rendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
+	ret.rendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath
+	ret.rendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
+	ret.rendererFuncs[ast.NodeStrong] = ret.renderStrong
+	ret.rendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
+	ret.rendererFuncs[ast.NodeHeading] = ret.renderHeading
+	ret.rendererFuncs[ast.NodeList] = ret.renderList
+	ret.rendererFuncs[ast.NodeListItem] = ret.renderListItem
+	ret.rendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
+	ret.rendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
+	ret.rendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
+	ret.rendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
+	ret.rendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
+	ret.rendererFuncs[ast.NodeLink] = ret.renderLink
+	ret.rendererFuncs[ast.NodeImage] = ret.renderImage
+	ret.rendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
+	ret.rendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
+	ret.rendererFuncs[ast.NodeTable] = ret.renderTable
+	ret.rendererFuncs[ast.NodeTableHead] = ret.renderTableHead
+	ret.rendererFuncs[ast.NodeTableRow] = ret.renderTableRow
+	ret.rendererFuncs[ast.NodeTableCell] = ret.renderTableCell
+	ret.rendererFuncs[ast.NodeEmoji] = ret.renderEmoji
+	ret.rendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
+	ret.rendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
+	ret.rendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
 
 	ret.defaultRendererFunc = ret.renderDefault
 	return ret
 }
 
-func (r *EChartsJSONRenderer) renderDefault(n *Node, entering bool) WalkStatus {
-	return WalkStop
+func (r *EChartsJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderInlineMath(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Inline Math\nspan", node)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderMathBlock(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Math Block\ndiv", node)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderEmojiImg(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("Emoji Img\n", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderEmojiUnicode(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("Emoji Unicode\n", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderEmojiAlias(node *Node, entering bool) WalkStatus {
-	return WalkStop
+func (r *EChartsJSONRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderEmoji(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *EChartsJSONRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderTableCell(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("Table Cell\ntd", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderTableRow(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("Table Row\ntr", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderTableHead(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("Table Head\nthead", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderTable(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("Table\ntable", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderStrikethrough(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("Strikethrough\ndel", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderImage(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Image\nimg", node)
@@ -127,10 +129,10 @@ func (r *EChartsJSONRenderer) renderImage(node *Node, entering bool) WalkStatus 
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderLink(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Link\na", node)
@@ -139,20 +141,20 @@ func (r *EChartsJSONRenderer) renderLink(node *Node, entering bool) WalkStatus {
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderHTML(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("HTML Block\n", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderInlineHTML(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.leaf("Inline HTML\n", node)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderDocument(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.writeByte(itemOpenBracket)
 		r.openObj()
@@ -163,10 +165,10 @@ func (r *EChartsJSONRenderer) renderDocument(node *Node, entering bool) WalkStat
 		r.closeObj(node)
 		r.writeByte(itemCloseBracket)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Paragraph\np", node)
@@ -175,12 +177,12 @@ func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) WalkSta
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		text := bytesToStr(node.Tokens)
+		text := util.BytesToStr(node.Tokens)
 		var i int
 		summary := ""
 		for _, r := range text {
@@ -195,17 +197,17 @@ func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) WalkStatus {
 		r.val("Text\n"+summary, node)
 		r.closeObj(node)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderCodeSpan(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Code Span\ncode", node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderEmphasis(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Emphasis\nem", node)
@@ -214,10 +216,10 @@ func (r *EChartsJSONRenderer) renderEmphasis(node *Node, entering bool) WalkStat
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderStrong(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Strong\nstrong", node)
@@ -226,10 +228,10 @@ func (r *EChartsJSONRenderer) renderStrong(node *Node, entering bool) WalkStatus
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderBlockquote(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		r.val("Blockquote\nblockquote", node)
@@ -238,10 +240,10 @@ func (r *EChartsJSONRenderer) renderBlockquote(node *Node, entering bool) WalkSt
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderHeading(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		h := "h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1]
@@ -251,10 +253,10 @@ func (r *EChartsJSONRenderer) renderHeading(node *Node, entering bool) WalkStatu
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		list := "ul"
@@ -267,22 +269,22 @@ func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) WalkStatus {
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderListItem(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("List Item\nli "+bytesToStr(node.ListData.Marker), node)
+		r.val("List Item\nli "+util.BytesToStr(node.ListData.Marker), node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		check := " "
@@ -295,44 +297,44 @@ func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *Node, entering bool
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *EChartsJSONRenderer) renderThematicBreak(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Thematic Break\nhr", node)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderHardBreak(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Hard Break\nbr", node)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderSoftBreak(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Soft Break\n", node)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
+func (r *EChartsJSONRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Code Block\npre.code", node)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *EChartsJSONRenderer) leaf(val string, node *Node) {
+func (r *EChartsJSONRenderer) leaf(val string, node *ast.Node) {
 	r.openObj()
 	r.val(val, node)
 	r.closeObj(node)
 }
 
-func (r *EChartsJSONRenderer) val(val string, node *Node) {
+func (r *EChartsJSONRenderer) val(val string, node *ast.Node) {
 	val = strings.ReplaceAll(val, "\\", "\\\\")
 	val = strings.ReplaceAll(val, "\n", "\\n")
 	val = strings.ReplaceAll(val, "\"", "")
@@ -344,20 +346,20 @@ func (r *EChartsJSONRenderer) openObj() {
 	r.writeByte('{')
 }
 
-func (r *EChartsJSONRenderer) closeObj(node *Node) {
+func (r *EChartsJSONRenderer) closeObj(node *ast.Node) {
 	r.writeByte('}')
 	if !r.ignore(node.Next) {
 		r.comma()
 	}
 }
 
-func (r *EChartsJSONRenderer) openChildren(node *Node) {
+func (r *EChartsJSONRenderer) openChildren(node *ast.Node) {
 	if nil != node.FirstChild {
 		r.writeString(",\"children\":[")
 	}
 }
 
-func (r *EChartsJSONRenderer) closeChildren(node *Node) {
+func (r *EChartsJSONRenderer) closeChildren(node *ast.Node) {
 	if nil != node.FirstChild {
 		r.writeByte(']')
 	}
@@ -367,16 +369,16 @@ func (r *EChartsJSONRenderer) comma() {
 	r.writeString(",")
 }
 
-func (r *EChartsJSONRenderer) ignore(node *Node) bool {
+func (r *EChartsJSONRenderer) ignore(node *ast.Node) bool {
 	return nil == node ||
 		// 以下类型的节点不进行渲染，否则图画出来节点太多
-		NodeBlockquoteMarker == node.Type ||
-		NodeEmA6kOpenMarker == node.Type || NodeEmA6kCloseMarker == node.Type ||
-		NodeEmU8eOpenMarker == node.Type || NodeEmU8eCloseMarker == node.Type ||
-		NodeStrongA6kOpenMarker == node.Type || NodeStrongA6kCloseMarker == node.Type ||
-		NodeStrongU8eOpenMarker == node.Type || NodeStrongU8eCloseMarker == node.Type ||
-		NodeStrikethrough1OpenMarker == node.Type || NodeStrikethrough1CloseMarker == node.Type ||
-		NodeStrikethrough2OpenMarker == node.Type || NodeStrikethrough2CloseMarker == node.Type ||
-		NodeMathBlockOpenMarker == node.Type || NodeMathBlockContent == node.Type || NodeMathBlockCloseMarker == node.Type ||
-		NodeInlineMathOpenMarker == node.Type || NodeInlineMathContent == node.Type || NodeInlineMathCloseMarker == node.Type
+		ast.NodeBlockquoteMarker == node.Type ||
+		ast.NodeEmA6kOpenMarker == node.Type || ast.NodeEmA6kCloseMarker == node.Type ||
+		ast.NodeEmU8eOpenMarker == node.Type || ast.NodeEmU8eCloseMarker == node.Type ||
+		ast.NodeStrongA6kOpenMarker == node.Type || ast.NodeStrongA6kCloseMarker == node.Type ||
+		ast.NodeStrongU8eOpenMarker == node.Type || ast.NodeStrongU8eCloseMarker == node.Type ||
+		ast.NodeStrikethrough1OpenMarker == node.Type || ast.NodeStrikethrough1CloseMarker == node.Type ||
+		ast.NodeStrikethrough2OpenMarker == node.Type || ast.NodeStrikethrough2CloseMarker == node.Type ||
+		ast.NodeMathBlockOpenMarker == node.Type || ast.NodeMathBlockContent == node.Type || ast.NodeMathBlockCloseMarker == node.Type ||
+		ast.NodeInlineMathOpenMarker == node.Type || ast.NodeInlineMathContent == node.Type || ast.NodeInlineMathCloseMarker == node.Type
 }

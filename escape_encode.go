@@ -11,6 +11,7 @@
 package lute
 
 import (
+	"github.com/88250/lute/util"
 	"strings"
 	"unicode/utf8"
 
@@ -18,14 +19,14 @@ import (
 )
 
 var (
-	amp  = strToBytes("&amp;")
-	lt   = strToBytes("&lt;")
-	gt   = strToBytes("&gt;")
-	quot = strToBytes("&quot;")
+	amp  = util.StrToBytes("&amp;")
+	lt   = util.StrToBytes("&lt;")
+	gt   = util.StrToBytes("&gt;")
+	quot = util.StrToBytes("&quot;")
 )
 
 func unescapeHTML(h []byte) (ret []byte) {
-	return strToBytes(html.UnescapeString(bytesToStr(h)))
+	return util.StrToBytes(html.UnescapeString(util.BytesToStr(h)))
 }
 
 func escapeHTML(html []byte) (ret []byte) {

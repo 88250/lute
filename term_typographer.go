@@ -12,11 +12,13 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"unicode/utf8"
 )
 
 // fixTermTypo 修正文本节点 textNode 中出现的术语拼写问题。
-func (r *BaseRenderer) fixTermTypo(textNode *Node) {
+func (r *BaseRenderer) fixTermTypo(textNode *ast.Node) {
 	textNode.Tokens = r.fixTermTypo0(textNode.Tokens)
 }
 
@@ -57,7 +59,7 @@ func (r *BaseRenderer) fixTermTypo0(tokens []byte) []byte {
 		}
 
 		originalTerm = bytes.ToLower(tokens[i:j])
-		if to, ok := r.option.Terms[bytesToStr(originalTerm)]; ok {
+		if to, ok := r.option.Terms[util.BytesToStr(originalTerm)]; ok {
 			l = 0
 			for k = i; k < j; k++ {
 				tokens[k] = to[l]

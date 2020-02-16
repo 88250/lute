@@ -12,6 +12,8 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"strconv"
 	"unicode"
 	"unicode/utf8"
@@ -26,121 +28,121 @@ type FormatRenderer struct {
 // newFormatRenderer 创建一个格式化渲染器。
 func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
 	ret := &FormatRenderer{BaseRenderer: lute.newBaseRenderer(tree)}
-	ret.rendererFuncs[NodeDocument] = ret.renderDocument
-	ret.rendererFuncs[NodeParagraph] = ret.renderParagraph
-	ret.rendererFuncs[NodeText] = ret.renderText
-	ret.rendererFuncs[NodeCodeSpan] = ret.renderCodeSpan
-	ret.rendererFuncs[NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
-	ret.rendererFuncs[NodeCodeSpanContent] = ret.renderCodeSpanContent
-	ret.rendererFuncs[NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
-	ret.rendererFuncs[NodeCodeBlock] = ret.renderCodeBlock
-	ret.rendererFuncs[NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
-	ret.rendererFuncs[NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
-	ret.rendererFuncs[NodeCodeBlockCode] = ret.renderCodeBlockCode
-	ret.rendererFuncs[NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
-	ret.rendererFuncs[NodeMathBlock] = ret.renderMathBlock
-	ret.rendererFuncs[NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
-	ret.rendererFuncs[NodeMathBlockContent] = ret.renderMathBlockContent
-	ret.rendererFuncs[NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
-	ret.rendererFuncs[NodeInlineMath] = ret.renderInlineMath
-	ret.rendererFuncs[NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
-	ret.rendererFuncs[NodeInlineMathContent] = ret.renderInlineMathContent
-	ret.rendererFuncs[NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
-	ret.rendererFuncs[NodeEmphasis] = ret.renderEmphasis
-	ret.rendererFuncs[NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
-	ret.rendererFuncs[NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
-	ret.rendererFuncs[NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
-	ret.rendererFuncs[NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
-	ret.rendererFuncs[NodeStrong] = ret.renderStrong
-	ret.rendererFuncs[NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
-	ret.rendererFuncs[NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
-	ret.rendererFuncs[NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
-	ret.rendererFuncs[NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
-	ret.rendererFuncs[NodeBlockquote] = ret.renderBlockquote
-	ret.rendererFuncs[NodeBlockquoteMarker] = ret.renderBlockquoteMarker
-	ret.rendererFuncs[NodeHeading] = ret.renderHeading
-	ret.rendererFuncs[NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
-	ret.rendererFuncs[NodeList] = ret.renderList
-	ret.rendererFuncs[NodeListItem] = ret.renderListItem
-	ret.rendererFuncs[NodeThematicBreak] = ret.renderThematicBreak
-	ret.rendererFuncs[NodeHardBreak] = ret.renderHardBreak
-	ret.rendererFuncs[NodeSoftBreak] = ret.renderSoftBreak
-	ret.rendererFuncs[NodeHTMLBlock] = ret.renderHTML
-	ret.rendererFuncs[NodeInlineHTML] = ret.renderInlineHTML
-	ret.rendererFuncs[NodeLink] = ret.renderLink
-	ret.rendererFuncs[NodeImage] = ret.renderImage
-	ret.rendererFuncs[NodeBang] = ret.renderBang
-	ret.rendererFuncs[NodeOpenBracket] = ret.renderOpenBracket
-	ret.rendererFuncs[NodeCloseBracket] = ret.renderCloseBracket
-	ret.rendererFuncs[NodeOpenParen] = ret.renderOpenParen
-	ret.rendererFuncs[NodeCloseParen] = ret.renderCloseParen
-	ret.rendererFuncs[NodeLinkText] = ret.renderLinkText
-	ret.rendererFuncs[NodeLinkSpace] = ret.renderLinkSpace
-	ret.rendererFuncs[NodeLinkDest] = ret.renderLinkDest
-	ret.rendererFuncs[NodeLinkTitle] = ret.renderLinkTitle
-	ret.rendererFuncs[NodeStrikethrough] = ret.renderStrikethrough
-	ret.rendererFuncs[NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
-	ret.rendererFuncs[NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
-	ret.rendererFuncs[NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
-	ret.rendererFuncs[NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
-	ret.rendererFuncs[NodeTaskListItemMarker] = ret.renderTaskListItemMarker
-	ret.rendererFuncs[NodeTable] = ret.renderTable
-	ret.rendererFuncs[NodeTableHead] = ret.renderTableHead
-	ret.rendererFuncs[NodeTableRow] = ret.renderTableRow
-	ret.rendererFuncs[NodeTableCell] = ret.renderTableCell
-	ret.rendererFuncs[NodeEmoji] = ret.renderEmoji
-	ret.rendererFuncs[NodeEmojiUnicode] = ret.renderEmojiUnicode
-	ret.rendererFuncs[NodeEmojiImg] = ret.renderEmojiImg
-	ret.rendererFuncs[NodeEmojiAlias] = ret.renderEmojiAlias
-	ret.rendererFuncs[NodeFootnotesDef] = ret.renderFootnotesDef
-	ret.rendererFuncs[NodeFootnotesRef] = ret.renderFootnotesRef
-	ret.rendererFuncs[NodeBackslash] = ret.renderBackslash
-	ret.rendererFuncs[NodeBackslashContent] = ret.renderBackslashContent
+	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
+	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
+	ret.rendererFuncs[ast.NodeText] = ret.renderText
+	ret.rendererFuncs[ast.NodeCodeSpan] = ret.renderCodeSpan
+	ret.rendererFuncs[ast.NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
+	ret.rendererFuncs[ast.NodeCodeSpanContent] = ret.renderCodeSpanContent
+	ret.rendererFuncs[ast.NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
+	ret.rendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
+	ret.rendererFuncs[ast.NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
+	ret.rendererFuncs[ast.NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
+	ret.rendererFuncs[ast.NodeCodeBlockCode] = ret.renderCodeBlockCode
+	ret.rendererFuncs[ast.NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
+	ret.rendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
+	ret.rendererFuncs[ast.NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
+	ret.rendererFuncs[ast.NodeMathBlockContent] = ret.renderMathBlockContent
+	ret.rendererFuncs[ast.NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
+	ret.rendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath
+	ret.rendererFuncs[ast.NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
+	ret.rendererFuncs[ast.NodeInlineMathContent] = ret.renderInlineMathContent
+	ret.rendererFuncs[ast.NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
+	ret.rendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
+	ret.rendererFuncs[ast.NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
+	ret.rendererFuncs[ast.NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
+	ret.rendererFuncs[ast.NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
+	ret.rendererFuncs[ast.NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
+	ret.rendererFuncs[ast.NodeStrong] = ret.renderStrong
+	ret.rendererFuncs[ast.NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
+	ret.rendererFuncs[ast.NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
+	ret.rendererFuncs[ast.NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
+	ret.rendererFuncs[ast.NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
+	ret.rendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
+	ret.rendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
+	ret.rendererFuncs[ast.NodeHeading] = ret.renderHeading
+	ret.rendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
+	ret.rendererFuncs[ast.NodeList] = ret.renderList
+	ret.rendererFuncs[ast.NodeListItem] = ret.renderListItem
+	ret.rendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
+	ret.rendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
+	ret.rendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
+	ret.rendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
+	ret.rendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
+	ret.rendererFuncs[ast.NodeLink] = ret.renderLink
+	ret.rendererFuncs[ast.NodeImage] = ret.renderImage
+	ret.rendererFuncs[ast.NodeBang] = ret.renderBang
+	ret.rendererFuncs[ast.NodeOpenBracket] = ret.renderOpenBracket
+	ret.rendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
+	ret.rendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
+	ret.rendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.rendererFuncs[ast.NodeLinkText] = ret.renderLinkText
+	ret.rendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
+	ret.rendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
+	ret.rendererFuncs[ast.NodeLinkTitle] = ret.renderLinkTitle
+	ret.rendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
+	ret.rendererFuncs[ast.NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
+	ret.rendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
+	ret.rendererFuncs[ast.NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
+	ret.rendererFuncs[ast.NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
+	ret.rendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
+	ret.rendererFuncs[ast.NodeTable] = ret.renderTable
+	ret.rendererFuncs[ast.NodeTableHead] = ret.renderTableHead
+	ret.rendererFuncs[ast.NodeTableRow] = ret.renderTableRow
+	ret.rendererFuncs[ast.NodeTableCell] = ret.renderTableCell
+	ret.rendererFuncs[ast.NodeEmoji] = ret.renderEmoji
+	ret.rendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
+	ret.rendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
+	ret.rendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.rendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
+	ret.rendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
+	ret.rendererFuncs[ast.NodeBackslash] = ret.renderBackslash
+	ret.rendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	return ret
 }
 
-func (r *FormatRenderer) renderBackslashContent(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderBackslash(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.writeByte(itemBackslash)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderFootnotesRef(node *Node, entering bool) WalkStatus {
-	r.writeString("[" + bytesToStr(node.Tokens) + "]")
-	return WalkStop
+func (r *FormatRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
+	r.writeString("[" + util.BytesToStr(node.Tokens) + "]")
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderFootnotesDef(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeString("[" + bytesToStr(node.Tokens) + "]: ")
+		r.writeString("[" + util.BytesToStr(node.Tokens) + "]: ")
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderEmojiAlias(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderEmojiImg(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderEmojiUnicode(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderEmoji(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderTableCell(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
 	padding := node.TableCellContentMaxWidth - node.TableCellContentWidth
 	if entering {
 		r.writeByte(itemPipe)
@@ -161,17 +163,17 @@ func (r *FormatRenderer) renderTableCell(node *Node, entering bool) WalkStatus {
 		}
 		r.writeByte(itemSpace)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderTableRow(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		r.writeString("|\n")
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderTableHead(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		headRow := node.FirstChild
 		for th := headRow.FirstChild; nil != th; th = th.Next {
@@ -205,114 +207,114 @@ func (r *FormatRenderer) renderTableHead(node *Node, entering bool) WalkStatus {
 		}
 		r.writeString("|\n")
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderTable(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		r.newline()
 		if !r.isLastNode(r.tree.Root, node) {
 			r.writeByte(itemNewline)
 		}
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderStrikethrough(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderStrikethrough1OpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemTilde)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderStrikethrough1CloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemTilde)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderStrikethrough2OpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("~~")
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("~~")
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderLinkTitle(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("\"")
 	r.write(node.Tokens)
 	r.writeString("\"")
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderLinkDest(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderLinkSpace(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemSpace)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderLinkText(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCloseParen(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemCloseParen)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderOpenParen(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemOpenParen)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCloseBracket(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemCloseBracket)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderOpenBracket(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemOpenBracket)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderBang(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemBang)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderImage(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderLink(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderHTML(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.newline()
 	r.write(node.Tokens)
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderInlineHTML(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderDocument(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -323,17 +325,17 @@ func (r *FormatRenderer) renderDocument(node *Node, entering bool) WalkStatus {
 		r.writeBytes(buf)
 		r.writeByte(itemNewline)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderParagraph(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		r.newline()
 
 		inTightList := false
 		lastListItemLastPara := false
 		if parent := node.Parent; nil != parent {
-			if NodeListItem == parent.Type { // ListItem.Paragraph
+			if ast.NodeListItem == parent.Type { // ListItem.Paragraph
 				listItem := parent
 				if nil != listItem.Parent && nil != listItem.Parent.ListData {
 					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.Tight
@@ -355,10 +357,10 @@ func (r *FormatRenderer) renderParagraph(node *Node, entering bool) WalkStatus {
 			r.writeByte(itemNewline)
 		}
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderText(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if r.option.AutoSpace {
 		r.space(node)
 	}
@@ -369,10 +371,10 @@ func (r *FormatRenderer) renderText(node *Node, entering bool) WalkStatus {
 		r.chinesePunct(node)
 	}
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if r.option.AutoSpace {
 			if text := node.PreviousNodeText(); "" != text {
@@ -392,30 +394,30 @@ func (r *FormatRenderer) renderCodeSpan(node *Node, entering bool) WalkStatus {
 			}
 		}
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemBacktick)
 	if 1 < node.Parent.CodeMarkerLen {
 		r.writeByte(itemBacktick)
-		text := bytesToStr(node.Next.Tokens)
+		text := util.BytesToStr(node.Next.Tokens)
 		firstc, _ := utf8.DecodeRuneInString(text)
 		if '`' == firstc {
 			r.writeByte(itemSpace)
 		}
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCodeSpanContent(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if 1 < node.Parent.CodeMarkerLen {
-		text := bytesToStr(node.Previous.Tokens)
+		text := util.BytesToStr(node.Previous.Tokens)
 		lastc, _ := utf8.DecodeLastRuneInString(text)
 		if '`' == lastc {
 			r.writeByte(itemSpace)
@@ -423,81 +425,81 @@ func (r *FormatRenderer) renderCodeSpanCloseMarker(node *Node, entering bool) Wa
 		r.writeByte(itemBacktick)
 	}
 	r.writeByte(itemBacktick)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMathCloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemDollar)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMathContent(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMathOpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemDollar)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMath(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderMathBlockCloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(mathBlockMarker)
 	r.writeByte(itemNewline)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderMathBlockContent(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
 	r.writeByte(itemNewline)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderMathBlockOpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(mathBlockMarker)
 	r.writeByte(itemNewline)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderMathBlock(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.newline()
 	if !entering && !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderCodeBlockCloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.newline()
 	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.CodeBlockFenceLen))
 	r.newline()
 	if !r.isLastNode(r.tree.Root, node) {
 		r.writeByte(itemNewline)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCodeBlockCode(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.Tokens)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCodeBlockInfoMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.write(node.CodeBlockInfo)
 	r.writeByte(itemNewline)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCodeBlockOpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeBytes(bytes.Repeat([]byte{itemBacktick}, node.CodeBlockFenceLen))
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !node.IsFencedCodeBlock {
 		r.writeBytes(bytes.Repeat([]byte{itemBacktick}, 3))
 		r.writeByte(itemNewline)
@@ -507,60 +509,60 @@ func (r *FormatRenderer) renderCodeBlock(node *Node, entering bool) WalkStatus {
 		if !r.isLastNode(r.tree.Root, node) {
 			r.writeByte(itemNewline)
 		}
-		return WalkStop
+		return ast.WalkStop
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderEmphasis(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderEmAsteriskOpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemAsterisk)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderEmAsteriskCloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemAsterisk)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderEmUnderscoreOpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemUnderscore)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderEmUnderscoreCloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemUnderscore)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderStrong(node *Node, entering bool) WalkStatus {
-	return WalkContinue
+func (r *FormatRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderStrongA6kOpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("**")
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderStrongA6kCloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("**")
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderStrongU8eOpenMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("__")
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderStrongU8eCloseMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("__")
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -607,14 +609,14 @@ func (r *FormatRenderer) renderBlockquote(node *Node, entering bool) WalkStatus 
 		r.writeBytes(buf)
 		r.writeString("\n\n")
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderBlockquoteMarker(node *Node, entering bool) WalkStatus {
-	return WalkStop
+func (r *FormatRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderHeading(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.writeBytes(bytes.Repeat([]byte{itemCrosshatch}, node.HeadingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
 		r.writeByte(itemSpace)
@@ -622,14 +624,14 @@ func (r *FormatRenderer) renderHeading(node *Node, entering bool) WalkStatus {
 		r.newline()
 		r.writeByte(itemNewline)
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderHeadingC8hMarker(node *Node, entering bool) WalkStatus {
-	return WalkStop
+func (r *FormatRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderList(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -643,10 +645,10 @@ func (r *FormatRenderer) renderList(node *Node, entering bool) WalkStatus {
 		r.writeBytes(buf)
 		r.writeString("\n\n")
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderListItem(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.writer)
@@ -692,10 +694,10 @@ func (r *FormatRenderer) renderListItem(node *Node, entering bool) WalkStatus {
 		r.writeBytes(buf)
 		r.writeString("\n")
 	}
-	return WalkContinue
+	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderTaskListItemMarker(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeByte(itemOpenBracket)
 	if node.TaskListItemChecked {
 		r.writeByte('X')
@@ -703,42 +705,42 @@ func (r *FormatRenderer) renderTaskListItemMarker(node *Node, entering bool) Wal
 		r.writeByte(itemSpace)
 	}
 	r.writeByte(itemCloseBracket)
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderThematicBreak(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("---\n\n")
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderHardBreak(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if !r.option.SoftBreak2HardBreak {
 		r.writeString("\\\n")
 	} else {
 		r.writeByte(itemNewline)
 	}
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderSoftBreak(node *Node, entering bool) WalkStatus {
+func (r *FormatRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.newline()
-	return WalkStop
+	return ast.WalkStop
 }
 
-func (r *FormatRenderer) isLastNode(treeRoot, node *Node) bool {
+func (r *FormatRenderer) isLastNode(treeRoot, node *ast.Node) bool {
 	if treeRoot == node {
 		return true
 	}
 	if nil != node.Next {
 		return false
 	}
-	if NodeDocument == node.Parent.Type {
+	if ast.NodeDocument == node.Parent.Type {
 		return treeRoot.LastChild == node
 	}
 
-	var n *Node
+	var n *ast.Node
 	for n = node.Parent; ; n = n.Parent {
-		if NodeDocument == n.Parent.Type {
+		if ast.NodeDocument == n.Parent.Type {
 			break
 		}
 	}

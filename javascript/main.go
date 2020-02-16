@@ -12,6 +12,7 @@ package main
 
 import (
 	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
 	"github.com/gopherjs/gopherjs/js"
 )
 
@@ -25,8 +26,8 @@ func main() {
 	js.Global.Set("Lute", map[string]interface{}{
 		"Version":          lute.Version,
 		"New":              New,
-		"WalkStop":         lute.WalkStop,
-		"WalkSkipChildren": lute.WalkSkipChildren,
-		"WalkContinue":     lute.WalkContinue,
+		"WalkStop":         ast.WalkStop,
+		"WalkSkipChildren": ast.WalkSkipChildren,
+		"WalkContinue":     ast.WalkContinue,
 	})
 }
