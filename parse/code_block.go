@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -73,13 +73,13 @@ func codeBlockFinalize(codeBlock *ast.Node) {
 var codeBlockBacktick = util.StrToBytes("`")
 
 func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOffset int, openFence, codeBlockInfo []byte) {
-	marker := t.context.currentLine[t.context.nextNonspace]
+	marker := t.Context.currentLine[t.Context.nextNonspace]
 	if lex.ItemBacktick != marker && lex.ItemTilde != marker {
 		return
 	}
 
 	fenceChar = marker
-	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar == t.context.currentLine[i]; i++ {
+	for i := t.Context.nextNonspace; i < t.Context.currentLineLen && fenceChar == t.Context.currentLine[i]; i++ {
 		fenceLen++
 	}
 
@@ -87,17 +87,17 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 		return
 	}
 
-	openFence = t.context.currentLine[t.context.nextNonspace : t.context.nextNonspace+fenceLen]
+	openFence = t.Context.currentLine[t.Context.nextNonspace : t.Context.nextNonspace+fenceLen]
 
 	var info []byte
-	infoTokens := t.context.currentLine[t.context.nextNonspace+fenceLen:]
+	infoTokens := t.Context.currentLine[t.Context.nextNonspace+fenceLen:]
 	if lex.ItemBacktick == marker && bytes.Contains(infoTokens, codeBlockBacktick) {
 		// info 部分不能包含 `
 		return
 	}
 	info = lex.TrimWhitespace(infoTokens)
 	info = util.UnescapeString(info)
-	return true, fenceChar, fenceLen, t.context.indent, openFence, info
+	return true, fenceChar, fenceLen, t.Context.indent, openFence, info
 }
 
 func isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeFence []byte) {

@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -30,7 +30,7 @@ func (t *Tree) emoji(node *ast.Node) {
 	}
 }
 
-var emojiSitePlaceholder = util.StrToBytes("${emojiSite}")
+var EmojiSitePlaceholder = util.StrToBytes("${emojiSite}")
 var emojiDot = util.StrToBytes(".")
 
 func (t *Tree) emoji0(node *ast.Node) {
@@ -79,24 +79,24 @@ func (t *Tree) emoji0(node *ast.Node) {
 			continue
 		}
 
-		if emoji, ok := t.context.option.AliasEmoji[util.BytesToStr(maybeEmoji)]; ok {
+		if emoji, ok := t.Context.Option.AliasEmoji[util.BytesToStr(maybeEmoji)]; ok {
 			emojiNode := &ast.Node{Type: ast.NodeEmoji}
 			emojiUnicodeOrImg := &ast.Node{Type: ast.NodeEmojiUnicode}
 			emojiNode.AppendChild(emojiUnicodeOrImg)
 			emojiTokens := util.StrToBytes(emoji)
-			if bytes.Contains(emojiTokens, emojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
+			if bytes.Contains(emojiTokens, EmojiSitePlaceholder) { // 有的 Emoji 是图片链接，需要单独处理
 				alias := util.BytesToStr(maybeEmoji)
 				suffix := ".png"
 				if "huaji" == alias {
 					suffix = ".gif"
 				}
-				src := t.context.option.EmojiSite + "/" + alias + suffix
+				src := t.Context.Option.EmojiSite + "/" + alias + suffix
 				emojiUnicodeOrImg.Type = ast.NodeEmojiImg
-				emojiUnicodeOrImg.Tokens = t.emojiImgTokens(alias, src)
+				emojiUnicodeOrImg.Tokens = t.EmojiImgTokens(alias, src)
 			} else if bytes.Contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径
 				alias := util.BytesToStr(maybeEmoji)
 				emojiUnicodeOrImg.Type = ast.NodeEmojiImg
-				emojiUnicodeOrImg.Tokens = t.emojiImgTokens(alias, emoji)
+				emojiUnicodeOrImg.Tokens = t.EmojiImgTokens(alias, emoji)
 			} else {
 				emojiUnicodeOrImg.Tokens = emojiTokens
 			}
@@ -127,6 +127,6 @@ func (t *Tree) emoji0(node *ast.Node) {
 	}
 }
 
-func (t *Tree) emojiImgTokens(alias, src string) []byte {
+func (t *Tree) EmojiImgTokens(alias, src string) []byte {
 	return util.StrToBytes("<img alt=\"" + alias + "\" class=\"emoji\" src=\"" + src + "\" title=\"" + alias + "\" />")
 }

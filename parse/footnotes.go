@@ -8,25 +8,31 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
+	"bytes"
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/lex"
 )
 
-// parseBang 解析 !，可能是图片标记符开始 ![ 也可能是普通文本 !。
-func (t *Tree) parseBang(ctx *InlineContext) (ret *ast.Node) {
-	var startPos = ctx.pos
-	ctx.pos++
-	if ctx.pos < ctx.tokensLen && lex.ItemOpenBracket == ctx.tokens[ctx.pos] {
-		ctx.pos++
-		ret = &ast.Node{Type: ast.NodeText, Tokens: ctx.tokens[startPos:ctx.pos]}
-		// 将图片开始标记符入栈
-		t.addBracket(ret, startPos+2, true, ctx)
-		return
+func FootnotesContinue(footnotesDef *ast.Node, context *Context) int {
+	if context.blank {
+		return 0
 	}
 
-	ret = &ast.Node{Type: ast.NodeText, Tokens: ctx.tokens[startPos:ctx.pos]}
-	return
+	if 4 > context.indent {
+		return 1
+	}
+
+	context.advanceOffset(4, true)
+	return 0
+}
+
+func (context *Context) FindFootnotesDef(label []byte) (int, *ast.Node) {
+	for i, n := range context.FootnotesDefs {
+		if bytes.EqualFold(label, n.Tokens) {
+			return i + 1, n
+		}
+	}
+	return -1, nil
 }

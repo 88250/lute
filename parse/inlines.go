@@ -8,12 +8,13 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
+	"sync"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/util"
-	"sync"
 )
 
 // parseInlines 解析并生成行级节点。
@@ -64,12 +65,12 @@ func (t *Tree) walkParseInline(node *ast.Node, wg *sync.WaitGroup) {
 		// 2. 方便后续功能方面的处理，比如 GFM 自动链接解析
 		t.mergeText(node)
 
-		if t.context.option.GFMAutoLink && !t.context.option.VditorWYSIWYG {
+		if t.Context.Option.GFMAutoLink && !t.Context.Option.VditorWYSIWYG {
 			t.parseGFMAutoEmailLink(node)
 			t.parseGFMAutoLink(node)
 		}
 
-		if t.context.option.Emoji {
+		if t.Context.Option.Emoji {
 			t.emoji(node)
 		}
 		return
@@ -94,7 +95,7 @@ func (t *Tree) walkParseInline(node *ast.Node, wg *sync.WaitGroup) {
 
 	// 遍历处理子节点
 
-	if t.context.option.ParallelParsing {
+	if t.Context.Option.ParallelParsing {
 		// 通过并行处理提升性能
 		cwg := &sync.WaitGroup{}
 		for child := node.FirstChild; nil != child; child = child.Next {

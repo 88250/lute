@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"github.com/88250/lute/ast"
@@ -42,7 +42,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
 	closeMarker := &ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: ctx.tokens[endPos : endPos+n]}
 
 	textTokens := ctx.tokens[startPos+n : endPos]
-	if !t.context.option.VditorWYSIWYG {
+	if !t.Context.Option.VditorWYSIWYG {
 		textTokens = lex.ReplaceAll(textTokens, lex.ItemNewline, lex.ItemSpace)
 		if 2 < len(textTokens) && lex.ItemSpace == textTokens[0] && lex.ItemSpace == textTokens[len(textTokens)-1] && !lex.IsBlankLine(textTokens) {
 			// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格

@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
@@ -20,12 +21,6 @@ import (
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
 )
-
-// caret 插入符 \u2038。
-const caret = "‸"
-
-// zwsp 零宽空格。
-const zwsp = "\u200b"
 
 // Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
 func (lute *Lute) Md2HTML(markdown string) (html string) {
@@ -51,11 +46,11 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 	lute.VditorWYSIWYG = true
 
 	// 替换插入符
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", caret)
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", parse.Caret)
 
 	markdown := lute.vditorDOM2Md(htmlStr)
 
-	tree, err := lute.parse("", []byte(markdown))
+	tree, err := parse.Parse("", []byte(markdown), lute.Options)
 	if nil != err {
 		html = err.Error()
 		return
@@ -70,7 +65,7 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 	}
 
 	// 替换插入符
-	html = strings.ReplaceAll(string(output), caret, "<wbr>")
+	html = strings.ReplaceAll(string(output), parse.Caret, "<wbr>")
 	return html
 }
 
@@ -84,8 +79,8 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 		return
 	}
 
-	var tree *Tree
-	tree, err = lute.parse("", []byte(markdown))
+	var tree *parse.Tree
+	tree, err = parse.Parse("", []byte(markdown), lute.Options)
 	if nil != err {
 		html = err.Error()
 		return
@@ -117,7 +112,7 @@ func (lute *Lute) VditorDOM2HTML(vhtml string) (html string) {
 func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 	lute.VditorWYSIWYG = true
 
-	tree, err := lute.parse("", []byte(markdown))
+	tree, err := parse.Parse("", []byte(markdown), lute.Options)
 	if nil != err {
 		html = err.Error()
 		return
@@ -139,12 +134,12 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 
 	md := lute.vditorDOM2Md(htmlStr)
 	md = lute.FormatMd(md) // 再格式化一次处理表格对齐
-	return strings.ReplaceAll(md, zwsp, "")
+	return strings.ReplaceAll(md, parse.Zwsp, "")
 }
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
 func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
-	tree, err := lute.parse("", []byte(markdown))
+	tree, err := parse.Parse("", []byte(markdown), lute.Options)
 	if nil != err {
 		json = err.Error()
 		return
@@ -187,8 +182,8 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 
 	// 将 HTML 树转换为 Markdown AST
 
-	tree := &Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, context: &Context{option: lute.Options}}
-	tree.context.tip = tree.Root
+	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
+	tree.Context.Tip = tree.Root
 	for _, htmlNode := range htmlNodes {
 		lute.genASTByVditorDOM(htmlNode, tree)
 	}
@@ -226,7 +221,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 }
 
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
-func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
+func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	dataRender := lute.domAttrValue(n, "data-render")
 	if "false" == dataRender {
 		return
@@ -243,7 +238,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 	}
 
 	class := lute.domAttrValue(n, "class")
-	content := strings.ReplaceAll(n.Data, zwsp, "")
+	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
 	node := &ast.Node{Type: ast.NodeText, Tokens: []byte(content)}
 	switch n.DataAtom {
 	case 0:
@@ -254,16 +249,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.Type = ast.NodeLinkText
 		}
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 	case atom.P:
 		if nil != n.Parent && atom.Blockquote == n.Parent.DataAtom && "" == strings.TrimSpace(lute.domText(n)) { // vditorDOM2MdTests case 53
 			return
 		}
 
 		node.Type = ast.NodeParagraph
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		if "" == strings.TrimSpace(lute.domText(n)) {
 			return
@@ -271,23 +266,23 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.Type = ast.NodeHeading
 		node.HeadingLevel = int(node.Tokens[1] - byte('0'))
 		node.AppendChild(&ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: []byte(strings.Repeat("#", node.HeadingLevel))})
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Hr:
 		node.Type = ast.NodeThematicBreak
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 	case atom.Blockquote:
 		content := strings.TrimSpace(lute.domText(n))
-		if "" == content || "&gt;" == content || caret == content {
+		if "" == content || "&gt;" == content || parse.Caret == content {
 			return
 		}
 
 		node.Type = ast.NodeBlockquote
 		node.AppendChild(&ast.Node{Type: ast.NodeBlockquoteMarker, Tokens: []byte(">")})
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Ol, atom.Ul:
 		node.Type = ast.NodeList
 		node.ListData = &ast.ListData{}
@@ -298,16 +293,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if "true" == tight || "" == tight {
 			node.Tight = true
 		}
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Li:
 		if nil != n.FirstChild && nil == n.FirstChild.NextSibling && (atom.Ul == n.FirstChild.DataAtom || atom.Ol == n.FirstChild.DataAtom) {
 			break
 		}
 
 		if p := n.FirstChild; nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
-			tree.context.tip.Tight = false
+			tree.Context.Tip.Tight = false
 		}
 
 		node.Type = ast.NodeListItem
@@ -354,9 +349,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.ListData.Delimiter = marker[len(marker)-1]
 		}
 
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
 			marker := lute.domAttrValue(n.Parent, "data-marker")
@@ -376,11 +371,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
 				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: codeTokens})
 				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
-				tree.context.tip.AppendChild(node)
+				tree.Context.Tip.AppendChild(node)
 			case "html-block":
 				node.Type = ast.NodeHTMLBlock
 				node.Tokens = codeTokens
-				tree.context.tip.AppendChild(node)
+				tree.Context.Tip.AppendChild(node)
 			default:
 				node.Type = ast.NodeCodeBlock
 				node.IsFencedCodeBlock = true
@@ -395,7 +390,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: codeTokens}
 				node.AppendChild(content)
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: []byte(marker), CodeBlockFenceLen: len(marker)})
-				tree.context.tip.AppendChild(node)
+				tree.Context.Tip.AppendChild(node)
 			}
 		}
 		return
@@ -404,12 +399,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n))
-		if zwsp == text || "" == text {
+		if parse.Zwsp == text || "" == text {
 			return
 		}
-		if caret == text {
-			node.Tokens = []byte(caret)
-			tree.context.tip.AppendChild(node)
+		if parse.Caret == text {
+			node.Tokens = []byte(parse.Caret)
+			tree.Context.Tip.AppendChild(node)
 			return
 		}
 
@@ -423,11 +418,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: []byte(marker)})
 		}
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 
-		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(caret)})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
 			if "_" == marker {
 				node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
 			} else {
@@ -436,7 +431,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
-		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, zwsp, "")
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
 
 		// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
 		if strings.HasPrefix(n.FirstChild.Data, " ") {
@@ -448,19 +443,19 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
 
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Strong, atom.B:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n))
-		if zwsp == text || "" == text {
+		if parse.Zwsp == text || "" == text {
 			return
 		}
-		if caret == text {
-			node.Tokens = []byte(caret)
-			tree.context.tip.AppendChild(node)
+		if parse.Caret == text {
+			node.Tokens = []byte(parse.Caret)
+			tree.Context.Tip.AppendChild(node)
 			return
 		}
 
@@ -474,11 +469,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: []byte(marker)})
 		}
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 
-		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(caret)})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
 			if "__" == marker {
 				node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
 			} else {
@@ -487,7 +482,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
-		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, zwsp, "")
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
 		if strings.HasPrefix(n.FirstChild.Data, " ") {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
 			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
@@ -497,19 +492,19 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
 
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Del, atom.S, atom.Strike:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n))
-		if zwsp == text || "" == text {
+		if parse.Zwsp == text || "" == text {
 			return
 		}
-		if caret == text {
-			node.Tokens = []byte(caret)
-			tree.context.tip.AppendChild(node)
+		if parse.Caret == text {
+			node.Tokens = []byte(parse.Caret)
+			tree.Context.Tip.AppendChild(node)
 			return
 		}
 
@@ -520,11 +515,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker, Tokens: []byte(marker)})
 		}
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 
-		if nil != n.FirstChild && caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(caret)})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
 			if "~" == marker {
 				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
 			} else {
@@ -533,7 +528,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			return
 		}
 
-		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, zwsp, "")
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
 
 		if strings.HasPrefix(n.FirstChild.Data, " ") {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
@@ -544,16 +539,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
 
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Code:
 		if nil == n.FirstChild {
 			return
 		}
-		contentStr := strings.ReplaceAll(n.FirstChild.Data, zwsp, "")
-		if caret == contentStr {
-			node.Tokens = []byte(caret)
-			tree.context.tip.AppendChild(node)
+		contentStr := strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
+		if parse.Caret == contentStr {
+			node.Tokens = []byte(parse.Caret)
+			tree.Context.Tip.AppendChild(node)
 			return
 		}
 		if "" == contentStr {
@@ -570,12 +565,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker})
 		node.AppendChild(content)
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker})
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 		return
 	case atom.Br:
 		if nil != n.Parent {
 			if lute.parentIs(n, atom.Td, atom.Th) {
-				if (nil == n.PrevSibling || caret == n.PrevSibling.Data) && (nil == n.NextSibling || caret == n.NextSibling.Data) {
+				if (nil == n.PrevSibling || parse.Caret == n.PrevSibling.Data) && (nil == n.NextSibling || parse.Caret == n.NextSibling.Data) {
 					return
 				}
 				if nil == n.NextSibling {
@@ -584,37 +579,37 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 
 				node.Type = ast.NodeInlineHTML
 				node.Tokens = []byte("<br />")
-				tree.context.tip.AppendChild(node)
+				tree.Context.Tip.AppendChild(node)
 				return
 			}
 			if atom.P == n.Parent.DataAtom {
 				if nil != n.Parent.NextSibling && (atom.Ul == n.Parent.NextSibling.DataAtom || atom.Ol == n.Parent.NextSibling.DataAtom || atom.Blockquote == n.Parent.NextSibling.DataAtom) {
-					tree.context.tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(zwsp)})
+					tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
 					return
 				}
 				if nil != n.Parent.Parent && nil != n.Parent.Parent.NextSibling && atom.Li == n.Parent.Parent.NextSibling.DataAtom {
-					tree.context.tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(zwsp)})
+					tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
 					return
 				}
 			}
 		}
 
 		node.Type = ast.NodeHardBreak
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.A:
 		node.Type = ast.NodeLink
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Img:
 		imgClass := class
 		imgAlt := lute.domAttrValue(n, "alt")
 		if "emoji" == imgClass {
 			node.Type = ast.NodeEmoji
-			emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.emojiImgTokens(imgAlt, lute.domAttrValue(n, "src"))}
+			emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.EmojiImgTokens(imgAlt, lute.domAttrValue(n, "src"))}
 			emojiImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: []byte(":" + imgAlt + ":")})
 			node.AppendChild(emojiImg)
 		} else {
@@ -638,9 +633,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 		}
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Input:
 		if nil == n.Parent || nil == n.Parent.Parent || (atom.P != n.Parent.DataAtom && atom.Li != n.Parent.DataAtom) {
 			// 仅允许 input 出现在任务列表中
@@ -650,7 +645,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		if lute.hasAttr(n, "checked") {
 			node.TaskListItemChecked = true
 		}
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 		if nil != node.Parent.Parent && nil != node.Parent.Parent.ListData { // ul.li.input
 			node.Parent.Parent.ListData.Typ = 3
 		}
@@ -674,20 +669,20 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			}
 		}
 		node.TableAligns = tableAligns
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Thead:
 		node.Type = ast.NodeTableHead
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Tbody:
 	case atom.Tr:
 		node.Type = ast.NodeTableRow
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Th, atom.Td:
 		node.Type = ast.NodeTableCell
 		align := lute.domAttrValue(n, "align")
@@ -703,19 +698,19 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			tableAlign = 0
 		}
 		node.TableCellAlign = tableAlign
-		tree.context.tip.AppendChild(node)
-		tree.context.tip = node
-		defer tree.context.parentTip(n)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip(n)
 	case atom.Span:
 		if nil == n.FirstChild {
 			break
 		}
 		var codeTokens []byte
-		if zwsp == n.FirstChild.Data && "" == lute.domAttrValue(n, "style") && nil != n.FirstChild.NextSibling {
+		if parse.Zwsp == n.FirstChild.Data && "" == lute.domAttrValue(n, "style") && nil != n.FirstChild.NextSibling {
 			codeTokens = []byte(n.FirstChild.NextSibling.FirstChild.Data)
 		} else if atom.Code == n.FirstChild.DataAtom {
 			codeTokens = []byte(n.FirstChild.FirstChild.Data)
-			if zwsp == string(codeTokens) {
+			if parse.Zwsp == string(codeTokens) {
 				break
 			}
 		} else {
@@ -726,14 +721,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: codeTokens})
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
-			tree.context.tip.AppendChild(node)
+			tree.Context.Tip.AppendChild(node)
 		} else if "html-inline" == dataType {
 			node.Type = ast.NodeInlineHTML
 			node.Tokens = codeTokens
-			tree.context.tip.AppendChild(node)
+			tree.Context.Tip.AppendChild(node)
 		} else if "code-inline" == dataType {
 			node.Tokens = codeTokens
-			tree.context.tip.AppendChild(node)
+			tree.Context.Tip.AppendChild(node)
 		}
 		return
 	case atom.Font:
@@ -742,18 +737,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
 		node.Tokens = bytes.SplitAfter(node.Tokens, []byte("</summary>"))[0]
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 	case atom.Kbd:
 		node.Type = ast.NodeInlineHTML
 		node.Tokens = lute.domHTML(n)
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 		return
 	case atom.Summary:
 		return
 	default:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
-		tree.context.tip.AppendChild(node)
+		tree.Context.Tip.AppendChild(node)
 		return
 	}
 
@@ -804,13 +799,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
 		}
 	case atom.Details:
-		tree.context.tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
-	}
-}
-
-func (context *Context) parentTip(n *html.Node) {
-	if tip := context.tip.Parent; nil != tip {
-		context.tip = context.tip.Parent
+		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}
 }
 
@@ -897,5 +886,5 @@ func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
 func (lute *Lute) domHTML(n *html.Node) []byte {
 	buf := &bytes.Buffer{}
 	html.Render(buf, n)
-	return bytes.ReplaceAll(buf.Bytes(), []byte(zwsp), []byte(""))
+	return bytes.ReplaceAll(buf.Bytes(), []byte(parse.Zwsp), []byte(""))
 }

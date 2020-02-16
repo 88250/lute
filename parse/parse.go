@@ -8,20 +8,27 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
-// parse 会将 markdown 原始文本字符数组解析为一颗语法树。
-func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
+// Caret 插入符 \u2038。
+const Caret = "‸"
+
+// Zwsp 零宽空格。
+const Zwsp = "\u200b"
+
+// Parse 会将 markdown 原始文本字符数组解析为一颗语法树。
+func Parse(name string, markdown []byte, options *Options) (tree *Tree, err error) {
 	defer util.RecoverPanic(&err)
 
-	tree = &Tree{Name: name, context: &Context{option: lute.Options}}
-	tree.context.tree = tree
+	tree = &Tree{Name: name, Context: &Context{Option: options}}
+	tree.Context.Tree = tree
 	tree.lexer = lex.NewLexer(markdown)
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
@@ -33,13 +40,13 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 
 // Context 用于维护块级元素解析过程中使用到的公共数据。
 type Context struct {
-	tree   *Tree    // 关联的语法树
-	option *Options // 解析渲染选项
+	Tree   *Tree    // 关联的语法树
+	Option *Options // 解析渲染选项
 
 	linkRefDefs   map[string]*ast.Node // 链接引用定义集
-	footnotesDefs []*ast.Node          // 脚注定义集
+	FootnotesDefs []*ast.Node          // 脚注定义集
 
-	tip                                                               *ast.Node // 末梢节点
+	Tip                                                               *ast.Node // 末梢节点
 	oldtip                                                            *ast.Node // 老的末梢节点
 	currentLine                                                       []byte    // 当前行
 	currentLineLen                                                    int       // 当前行长
@@ -138,7 +145,7 @@ func (context *Context) closeUnmatchedBlocks() {
 	}
 }
 
-// finalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
+// finalize 执行 block 的最终化处理。调用该方法会将 context.Tip 置为 block 的父节点。
 func (context *Context) finalize(block *ast.Node, lineNum int) {
 	var parent = block.Parent
 	block.Close = true
@@ -157,26 +164,26 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 		listFinalize(block)
 	}
 
-	context.tip = parent
+	context.Tip = parent
 }
 
-// addChildMarker 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.tip 上。
+// addChildMarker 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.Tip 上。
 func (context *Context) addChildMarker(nodeType ast.NodeType, tokens []byte) (ret *ast.Node) {
 	ret = &ast.Node{Type: nodeType, Tokens: tokens, Close: true}
-	context.tip.AppendChild(ret)
+	context.Tip.AppendChild(ret)
 	return ret
 }
 
-// addChild 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
+// addChild 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.Tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
 // 节点并向父节点方向尝试，直到找到一个能接受该子节点的节点为止。添加完成后该子节点会被设置为新的末梢节点。
 func (context *Context) addChild(nodeType ast.NodeType, offset int) (ret *ast.Node) {
-	for !context.tip.CanContain(nodeType) {
-		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
+	for !context.Tip.CanContain(nodeType) {
+		context.finalize(context.Tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
 	ret = &ast.Node{Type: nodeType}
-	context.tip.AppendChild(ret)
-	context.tip = ret
+	context.Tip.AppendChild(ret)
+	context.Tip = ret
 	return ret
 }
 
@@ -191,7 +198,71 @@ func (context *Context) listsMatch(listData, itemData *ast.ListData) bool {
 type Tree struct {
 	Name          string         // 名称，可以为空
 	Root          *ast.Node      // 根节点
+	Context       *Context       // 块级解析上下文
 	lexer         *lex.Lexer     // 词法分析器
-	context       *Context       // 块级解析上下文
 	inlineContext *InlineContext // 行级解析上下文
+}
+
+// Options 描述了一些列解析和渲染选项。
+type Options struct {
+	// GFMTable 设置是否打开“GFM 表”支持。
+	GFMTable bool
+	// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。
+	GFMTaskListItem bool
+	// GFMTaskListItemClass 作为 GFM 任务列表项类名，默认为 "vditor-task"。
+	GFMTaskListItemClass string
+	// GFMStrikethrough 设置是否打开“GFM 删除线”支持。
+	GFMStrikethrough bool
+	// GFMAutoLink 设置是否打开“GFM 自动链接”支持。
+	GFMAutoLink bool
+	// SoftBreak2HardBreak 设置是否将软换行（\n）渲染为硬换行（<br />）。
+	SoftBreak2HardBreak bool
+	// CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
+	CodeSyntaxHighlight bool
+	// CodeSyntaxHighlightInlineStyle 设置语法高亮是否为内联样式，默认不内联。
+	CodeSyntaxHighlightInlineStyle bool
+	// CodeSyntaxHightLineNum 设置语法高亮是否显示行号，默认不显示。
+	CodeSyntaxHighlightLineNum bool
+	// CodeSyntaxHighlightStyleName 指定语法高亮样式名，默认为 "github"。
+	CodeSyntaxHighlightStyleName string
+	// Footnotes 设置是否打开“脚注”支持。
+	Footnotes bool
+	// ToC 设置是否打开“目录”支持。
+	ToC bool
+	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
+	// https://github.com/sparanoid/chinese-copywriting-guidelines
+	AutoSpace bool
+	// FixTermTypo 设置是否对普通文本中出现的术语进行修正。
+	// https://github.com/sparanoid/chinese-copywriting-guidelines
+	// 注意：开启术语修正的话会默认在中西文之间插入空格。
+	FixTermTypo bool
+	// ChinesePunct 设置是否对普通文本中出现中文后跟英文逗号句号等标点替换为中文对应标点。
+	ChinesePunct bool
+	// Emoji 设置是否对 Emoji 别名替换为原生 Unicode 字符。
+	Emoji bool
+	// AliasEmoji 存储 ASCII 别名到表情 Unicode 映射。
+	AliasEmoji map[string]string
+	// EmojiAlias 存储表情 Unicode 到 ASCII 别名映射。
+	EmojiAlias map[string]string
+	// EmojiSite 设置图片 Emoji URL 的路径前缀。
+	EmojiSite string
+	// HeadingAnchor 设置是否对标题生成链接锚点。
+	HeadingAnchor bool
+	// Terms 将传入的 terms 合并覆盖到已有的 Terms 字典。
+	Terms map[string]string
+	// Vditor 所见即所得支持
+	VditorWYSIWYG bool
+	// ParallelParsing 设置是否启用并行解析。
+	ParallelParsing bool
+	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
+	InlineMathAllowDigitAfterOpenMarker bool
+	// LinkBase 设置链接、图片的基础路径。如果用户在链接或者图片地址中使用相对路径（没有协议前缀且不以 / 开头）并且 LinkBase 不为空则会用该值作为前缀。
+	// 比如 LinkBase 设置为 http://domain.com/，对于 ![foo](bar.png) 则渲染为 <img src="http://domain.com/bar.png" alt="foo" />
+	LinkBase string
+}
+
+func (context *Context) ParentTip(n *html.Node) {
+	if tip := context.Tip.Parent; nil != tip {
+		context.Tip = context.Tip.Parent
+	}
 }

@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -40,12 +40,12 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 		p.Unlink()
 	}
 
-	if context.option.GFMTaskListItem {
+	if context.Option.GFMTaskListItem {
 		// 尝试解析任务列表项
 		if listItem := p.Parent; nil != listItem && ast.NodeListItem == listItem.Type && listItem.FirstChild == p {
 			if 3 == listItem.ListData.Typ {
 				isTaskListItem := false
-				if !context.option.VditorWYSIWYG {
+				if !context.Option.VditorWYSIWYG {
 					isTaskListItem = 3 < len(p.Tokens) && lex.IsWhitespace(p.Tokens[3])
 				} else {
 					isTaskListItem = 3 <= len(p.Tokens)
@@ -56,7 +56,7 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 					taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: p.Tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
 					p.PrependChild(taskListItemMarker)
 					p.Tokens = p.Tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
-					if context.option.VditorWYSIWYG {
+					if context.Option.VditorWYSIWYG {
 						if 1 > len(p.Tokens) {
 							p.Tokens = []byte(" ")
 						} else {
@@ -70,7 +70,7 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 		}
 	}
 
-	if context.option.GFMTable {
+	if context.Option.GFMTable {
 		if table := context.parseTable(p); nil != table {
 			// 将该段落节点转成表节点
 			p.Type = ast.NodeTable
@@ -85,7 +85,7 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 		}
 	}
 
-	if context.option.ToC {
+	if context.Option.ToC {
 		if toc := context.parseToC(p); nil != toc {
 			// 将该段落节点转换成目录节点
 			p.Type = ast.NodeToC

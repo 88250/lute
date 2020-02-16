@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -78,7 +78,7 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 		remains = tokens
 	}
 
-	link := context.tree.newLink(ast.NodeLink, label, destination, title, 1)
+	link := context.Tree.newLink(ast.NodeLink, label, destination, title, 1)
 	lowerCaseLabel := bytes.ToLower(label)
 	if _, ok := context.linkRefDefs[util.BytesToStr(lowerCaseLabel)]; !ok {
 		context.linkRefDefs[util.BytesToStr(lowerCaseLabel)] = link
@@ -102,7 +102,7 @@ func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, 
 		}
 	}
 	if nil != title {
-		if !context.option.VditorWYSIWYG {
+		if !context.Option.VditorWYSIWYG {
 			title = util.UnescapeString(title)
 		}
 	}
@@ -158,7 +158,7 @@ func (context *Context) parseLinkDest(tokens []byte) (ret, remains, destination 
 		ret, remains, destination = context.parseLinkDest2(tokens) // [label](/url)
 	}
 	if nil != ret {
-		if !context.option.VditorWYSIWYG {
+		if !context.Option.VditorWYSIWYG {
 			destination = util.EncodeDestination(util.UnescapeString(destination))
 		}
 	}
@@ -309,7 +309,7 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 	}
 
 	label = lex.TrimWhitespace(label)
-	if !context.option.VditorWYSIWYG {
+	if !context.Option.VditorWYSIWYG {
 		label = lex.ReplaceAll(label, lex.ItemNewline, lex.ItemSpace)
 		length := len(label)
 		var token byte

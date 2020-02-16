@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"github.com/88250/lute/ast"
@@ -121,7 +121,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			openerInl = opener.node
 			closerInl = closer.node
 
-			if t.context.option.GFMStrikethrough && lex.ItemTilde == closercc && opener.num != closer.num {
+			if t.Context.Option.GFMStrikethrough && lex.ItemTilde == closercc && opener.num != closer.num {
 				break
 			}
 
@@ -149,7 +149,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 					openMarker.Type = ast.NodeEmU8eOpenMarker
 					closeMarker.Type = ast.NodeEmU8eCloseMarker
 				} else if lex.ItemTilde == closercc {
-					if t.context.option.GFMStrikethrough {
+					if t.Context.Option.GFMStrikethrough {
 						emStrongDel.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough1OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough1CloseMarker
@@ -165,7 +165,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 					openMarker.Type = ast.NodeStrongU8eOpenMarker
 					closeMarker.Type = ast.NodeStrongU8eCloseMarker
 				} else if lex.ItemTilde == closercc {
-					if t.context.option.GFMStrikethrough {
+					if t.Context.Option.GFMStrikethrough {
 						emStrongDel.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough2OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough2CloseMarker
@@ -259,8 +259,8 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	if (lex.ItemAsterisk == token && '~' == tokenBefore) || (lex.ItemTilde == token && '*' == tokenBefore) {
 		beforeIsPunct = false
 	}
-	if t.context.option.VditorWYSIWYG {
-		if caret == string(tokenBefore) {
+	if t.Context.Option.VditorWYSIWYG {
+		if Caret == string(tokenBefore) {
 			beforeIsPunct = false
 		}
 	}

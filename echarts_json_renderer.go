@@ -13,6 +13,7 @@ package lute
 import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
 	"strings"
 )
@@ -23,7 +24,7 @@ type EChartsJSONRenderer struct {
 }
 
 // newEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
-func (lute *Lute) newEChartsJSONRenderer(tree *Tree) Renderer {
+func (lute *Lute) newEChartsJSONRenderer(tree *parse.Tree) Renderer {
 	ret := &EChartsJSONRenderer{lute.newBaseRenderer(tree)}
 	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph

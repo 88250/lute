@@ -8,17 +8,17 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 
+	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
+	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
 // parseInline 解析并生成块节点 block 的行级子节点。
@@ -166,10 +166,10 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 				break
 			}
 			ctx.pos += len(passed)
-			if passed, remains, dest = t.context.parseInlineLinkDest(remains); nil == passed {
+			if passed, remains, dest = t.Context.parseInlineLinkDest(remains); nil == passed {
 				break
 			}
-			if t.context.option.VditorWYSIWYG {
+			if t.Context.Option.VditorWYSIWYG {
 				if !isImage && nil == opener.node.Next {
 					break
 				}
@@ -198,7 +198,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			}
 			ctx.pos++
 			validTitle := false
-			if validTitle, passed, remains, title = t.context.parseLinkTitle(remains); !validTitle {
+			if validTitle, passed, remains, title = t.Context.parseLinkTitle(remains); !validTitle {
 				break
 			}
 			ctx.pos += len(passed)
@@ -217,7 +217,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 	if !matched {
 		// 尝试解析链接 label
 		var beforelabel = ctx.pos
-		n, _, label := t.context.parseLinkLabel(ctx.tokens[beforelabel:])
+		n, _, label := t.Context.parseLinkLabel(ctx.tokens[beforelabel:])
 		if 2 < n { // label 解析出来的话说明满足格式 [text][label]
 			reflabel = label
 			ctx.pos += n
@@ -235,9 +235,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			ctx.pos = startPos
 		}
 		if nil != reflabel {
-			if t.context.option.Footnotes {
+			if t.Context.Option.Footnotes {
 				// 查找脚注
-				if idx, footnotesDef := t.context.findFootnotesDef(reflabel); nil != footnotesDef {
+				if idx, footnotesDef := t.Context.FindFootnotesDef(reflabel); nil != footnotesDef {
 					t.removeBracket(ctx)
 					opener.node.Next.Unlink() // ^label
 					opener.node.Unlink()      // [
@@ -254,7 +254,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			}
 
 			// 查找链接引用
-			if link := t.context.linkRefDefs[strings.ToLower(util.BytesToStr(reflabel))]; nil != link {
+			if link := t.Context.linkRefDefs[strings.ToLower(util.BytesToStr(reflabel))]; nil != link {
 				dest = link.ChildByType(ast.NodeLinkDest).Tokens
 				titleNode := link.ChildByType(ast.NodeLinkTitle)
 				if nil != titleNode {

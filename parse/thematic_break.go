@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -18,17 +18,17 @@ import (
 func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	markerCnt := 0
 	var marker byte
-	ln := t.context.currentLine
+	ln := t.Context.currentLine
 	var caretInLn bool
-	if t.context.option.VditorWYSIWYG {
-		if bytes.Contains(ln, []byte(caret)) {
+	if t.Context.Option.VditorWYSIWYG {
+		if bytes.Contains(ln, []byte(Caret)) {
 			caretInLn = true
-			ln = bytes.ReplaceAll(ln, []byte(caret), []byte(""))
+			ln = bytes.ReplaceAll(ln, []byte(Caret), []byte(""))
 		}
 	}
 
 	length := len(ln)
-	for i := t.context.nextNonspace; i < length-1; i++ {
+	for i := t.Context.nextNonspace; i < length-1; i++ {
 		token := ln[i]
 		if lex.ItemSpace == token || lex.ItemTab == token {
 			continue
@@ -48,8 +48,8 @@ func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 		markerCnt++
 	}
 
-	if t.context.option.VditorWYSIWYG && caretInLn {
-		caretTokens = []byte(caret)
+	if t.Context.Option.VditorWYSIWYG && caretInLn {
+		caretTokens = []byte(Caret)
 	}
 
 	return 3 <= markerCnt, caretTokens

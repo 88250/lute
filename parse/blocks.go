@@ -8,24 +8,25 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
-	"strings"
 )
 
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
-	t.context.tip = t.Root
-	t.context.linkRefDefs = map[string]*ast.Node{}
-	t.context.footnotesDefs = []*ast.Node{}
+	t.Context.Tip = t.Root
+	t.Context.linkRefDefs = map[string]*ast.Node{}
+	t.Context.FootnotesDefs = []*ast.Node{}
 	lines := 0
 	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {
-		if t.context.option.VditorWYSIWYG {
+		if t.Context.Option.VditorWYSIWYG {
 			ln := []rune(string(line))
 			if 4 < len(ln) && lex.IsDigit(byte(ln[0])) && ('、' == ln[1] || '）' == ln[1]) {
 				// 列表标记符自动优化 https://github.com/Vanessa219/vditor/issues/68
@@ -36,21 +37,21 @@ func (t *Tree) parseBlocks() {
 		t.incorporateLine(line)
 		lines++
 	}
-	for nil != t.context.tip {
-		t.context.finalize(t.context.tip, lines)
+	for nil != t.Context.Tip {
+		t.Context.finalize(t.Context.Tip, lines)
 	}
 }
 
 // incorporateLine 处理文本行 line 并把生成的块级节点挂到树上。
 func (t *Tree) incorporateLine(line []byte) {
-	t.context.oldtip = t.context.tip
-	t.context.offset = 0
-	t.context.column = 0
-	t.context.blank = false
-	t.context.partiallyConsumedTab = false
-	t.context.lineNum++
-	t.context.currentLine = line
-	t.context.currentLineLen = len(t.context.currentLine)
+	t.Context.oldtip = t.Context.Tip
+	t.Context.offset = 0
+	t.Context.column = 0
+	t.Context.blank = false
+	t.Context.partiallyConsumedTab = false
+	t.Context.lineNum++
+	t.Context.currentLine = line
+	t.Context.currentLineLen = len(t.Context.currentLine)
 
 	allMatched := true
 	var container *ast.Node
@@ -58,9 +59,9 @@ func (t *Tree) incorporateLine(line []byte) {
 	lastChild := container.LastChild
 	for ; nil != lastChild && !lastChild.Close; lastChild = container.LastChild {
 		container = lastChild
-		t.context.findNextNonspace()
+		t.Context.findNextNonspace()
 
-		switch _continue(container, t.context) {
+		switch _continue(container, t.Context) {
 		case 0: // 说明匹配可继续处理
 			break
 		case 1: // 匹配失败，不能继续处理
@@ -76,20 +77,20 @@ func (t *Tree) incorporateLine(line []byte) {
 		}
 	}
 
-	t.context.allClosed = container == t.context.oldtip
-	t.context.lastMatchedContainer = container
+	t.Context.allClosed = container == t.Context.oldtip
+	t.Context.lastMatchedContainer = container
 
 	matchedLeaf := container.Type != ast.NodeParagraph && container.AcceptLines()
 	startsLen := len(blockStarts)
 
 	// 除非最后一个匹配到的是代码块，否则的话就起始一个新的块级节点
 	for !matchedLeaf {
-		t.context.findNextNonspace()
+		t.Context.findNextNonspace()
 
 		// 如果不由潜在的节点标记符开头 ^[#`~*+_=<>0-9-$]，则说明不用继续迭代生成子节点
 		// 这里仅做简单判断的话可以提升一些性能
-		maybeMarker := t.context.currentLine[t.context.nextNonspace]
-		if !t.context.indented && // 缩进代码块
+		maybeMarker := t.Context.currentLine[t.Context.nextNonspace]
+		if !t.Context.indented && // 缩进代码块
 			lex.ItemHyphen != maybeMarker && lex.ItemAsterisk != maybeMarker && lex.ItemPlus != maybeMarker && // 无序列表
 			!lex.IsDigit(maybeMarker) && // 有序列表
 			lex.ItemBacktick != maybeMarker && lex.ItemTilde != maybeMarker && // 代码块
@@ -99,7 +100,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
 			lex.ItemDollar != maybeMarker && // 数学公式
 			lex.ItemOpenBracket != maybeMarker { // 脚注
-			t.context.advanceNextNonspace()
+			t.Context.advanceNextNonspace()
 			break
 		}
 
@@ -108,10 +109,10 @@ func (t *Tree) incorporateLine(line []byte) {
 		for i < startsLen {
 			var res = blockStarts[i](t, container)
 			if res == 1 { // 匹配到容器块，继续迭代下降过程
-				container = t.context.tip
+				container = t.Context.Tip
 				break
 			} else if res == 2 { // 匹配到叶子块，跳出迭代下降过程
-				container = t.context.tip
+				container = t.Context.Tip
 				matchedLeaf = true
 				break
 			} else { // 没有匹配到，继续用下一个起始块模式进行匹配
@@ -120,21 +121,21 @@ func (t *Tree) incorporateLine(line []byte) {
 		}
 
 		if i == startsLen { // nothing matched
-			t.context.advanceNextNonspace()
+			t.Context.advanceNextNonspace()
 			break
 		}
 	}
 
 	// offset 后余下的内容算作是文本行，需要将其添加到相应的块节点上
 
-	if !t.context.allClosed && !t.context.blank && t.context.tip.Type == ast.NodeParagraph {
+	if !t.Context.allClosed && !t.Context.blank && t.Context.Tip.Type == ast.NodeParagraph {
 		// 该行是段落延续文本，直接添加到当前末梢段落上
 		t.addLine()
 	} else {
 		// 最终化未匹配的块
-		t.context.closeUnmatchedBlocks()
+		t.Context.closeUnmatchedBlocks()
 
-		if t.context.blank && nil != container.LastChild {
+		if t.Context.blank && nil != container.LastChild {
 			container.LastChild.LastLineBlank = true
 		}
 
@@ -142,7 +143,7 @@ func (t *Tree) incorporateLine(line []byte) {
 		isFenced := ast.NodeCodeBlock == typ && container.IsFencedCodeBlock
 
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
-		var lastLineBlank = t.context.blank &&
+		var lastLineBlank = t.Context.blank &&
 			!(typ == ast.NodeFootnotesDef ||
 				typ == ast.NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == ast.NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
@@ -160,16 +161,16 @@ func (t *Tree) incorporateLine(line []byte) {
 				// HTML 块（类型 1-5）需要检查是否满足闭合条件
 				html := container
 				if html.HtmlBlockType >= 1 && html.HtmlBlockType <= 5 {
-					tokens := t.context.currentLine[t.context.offset:]
+					tokens := t.Context.currentLine[t.Context.offset:]
 					if t.isHTMLBlockClose(tokens, html.HtmlBlockType) {
-						t.context.finalize(container, t.context.lineNum)
+						t.Context.finalize(container, t.Context.lineNum)
 					}
 				}
 			}
-		} else if t.context.offset < t.context.currentLineLen && !t.context.blank {
+		} else if t.Context.offset < t.Context.currentLineLen && !t.Context.blank {
 			// 普通段落开始
-			t.context.addChild(ast.NodeParagraph, t.context.offset)
-			t.context.advanceNextNonspace()
+			t.Context.addChild(ast.NodeParagraph, t.Context.offset)
+			t.Context.advanceNextNonspace()
 			t.addLine()
 		}
 	}
@@ -186,16 +187,16 @@ var blockStarts = []blockStartFunc{
 
 	// 判断脚注定义（[^label]）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.option.Footnotes {
+		if !t.Context.Option.Footnotes {
 			return 0
 		}
 
-		if !t.context.indented {
-			marker := lex.Peek(t.context.currentLine, t.context.nextNonspace)
+		if !t.Context.indented {
+			marker := lex.Peek(t.Context.currentLine, t.Context.nextNonspace)
 			if lex.ItemOpenBracket != marker {
 				return 0
 			}
-			caret := lex.Peek(t.context.currentLine, t.context.nextNonspace+1)
+			caret := lex.Peek(t.Context.currentLine, t.Context.nextNonspace+1)
 			if lex.ItemCaret != caret {
 				return 0
 			}
@@ -203,8 +204,8 @@ var blockStarts = []blockStartFunc{
 			var label = []byte{lex.ItemCaret}
 			var token byte
 			var i int
-			for i = t.context.nextNonspace + 2; i < t.context.currentLineLen; i++ {
-				token = t.context.currentLine[i]
+			for i = t.Context.nextNonspace + 2; i < t.Context.currentLineLen; i++ {
+				token = t.Context.currentLine[i]
 				if lex.ItemSpace == token || lex.ItemNewline == token || lex.ItemTab == token {
 					return 0
 				}
@@ -213,21 +214,21 @@ var blockStarts = []blockStartFunc{
 				}
 				label = append(label, token)
 			}
-			if i >= t.context.currentLineLen {
+			if i >= t.Context.currentLineLen {
 				return 0
 			}
-			if lex.ItemColon != t.context.currentLine[i+1] {
+			if lex.ItemColon != t.Context.currentLine[i+1] {
 				return 0
 			}
-			t.context.advanceOffset(1, false)
+			t.Context.advanceOffset(1, false)
 
-			t.context.closeUnmatchedBlocks()
-			t.context.advanceOffset(len(label)+2, true)
-			footnotesDef := t.context.addChild(ast.NodeFootnotesDef, t.context.nextNonspace)
+			t.Context.closeUnmatchedBlocks()
+			t.Context.advanceOffset(len(label)+2, true)
+			footnotesDef := t.Context.addChild(ast.NodeFootnotesDef, t.Context.nextNonspace)
 			footnotesDef.Tokens = label
 			lowerCaseLabel := bytes.ToLower(label)
-			if _, def := t.context.findFootnotesDef(lowerCaseLabel); nil == def {
-				t.context.footnotesDefs = append(t.context.footnotesDefs, footnotesDef)
+			if _, def := t.Context.FindFootnotesDef(lowerCaseLabel); nil == def {
+				t.Context.FootnotesDefs = append(t.Context.FootnotesDefs, footnotesDef)
 			}
 			return 1
 		}
@@ -236,30 +237,30 @@ var blockStarts = []blockStartFunc{
 
 	// 判断块引用（>）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented {
-			marker := lex.Peek(t.context.currentLine, t.context.nextNonspace)
+		if !t.Context.indented {
+			marker := lex.Peek(t.Context.currentLine, t.Context.nextNonspace)
 			if lex.ItemGreater == marker {
 				markers := []byte{marker}
-				t.context.advanceNextNonspace()
-				t.context.advanceOffset(1, false)
+				t.Context.advanceNextNonspace()
+				t.Context.advanceOffset(1, false)
 				// > 后面的空格是可选的
-				whitespace := lex.Peek(t.context.currentLine, t.context.offset)
+				whitespace := lex.Peek(t.Context.currentLine, t.Context.offset)
 				withSpace := lex.ItemSpace == whitespace || lex.ItemTab == whitespace
 				if withSpace {
-					t.context.advanceOffset(1, true)
+					t.Context.advanceOffset(1, true)
 					markers = append(markers, whitespace)
 				}
-				if t.context.option.VditorWYSIWYG {
+				if t.Context.Option.VditorWYSIWYG {
 					// Vditor 所见即所得模式下块引用标记符 > 后面不能为空
-					ln := util.BytesToStr(t.context.currentLine[t.context.offset:])
-					ln = strings.ReplaceAll(ln, caret, "")
+					ln := util.BytesToStr(t.Context.currentLine[t.Context.offset:])
+					ln = strings.ReplaceAll(ln, Caret, "")
 					if ln = strings.TrimSpace(ln); "" == ln {
 						return 0
 					}
 				}
-				t.context.closeUnmatchedBlocks()
-				t.context.addChild(ast.NodeBlockquote, t.context.nextNonspace)
-				t.context.addChildMarker(ast.NodeBlockquoteMarker, markers)
+				t.Context.closeUnmatchedBlocks()
+				t.Context.addChild(ast.NodeBlockquote, t.Context.nextNonspace)
+				t.Context.addChildMarker(ast.NodeBlockquoteMarker, markers)
 				return 1
 			}
 		}
@@ -268,17 +269,17 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 ATX 标题（#）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented {
+		if !t.Context.indented {
 			if ok, markers, content, level := t.parseATXHeading(); ok {
-				t.context.advanceNextNonspace()
-				t.context.advanceOffset(len(content), false)
-				t.context.closeUnmatchedBlocks()
-				heading := t.context.addChild(ast.NodeHeading, t.context.nextNonspace)
+				t.Context.advanceNextNonspace()
+				t.Context.advanceOffset(len(content), false)
+				t.Context.closeUnmatchedBlocks()
+				heading := t.Context.addChild(ast.NodeHeading, t.Context.nextNonspace)
 				heading.HeadingLevel = level
 				heading.Tokens = content
 				crosshatchMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: markers}
 				heading.AppendChild(crosshatchMarker)
-				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
+				t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
 				return 2
 			}
 		}
@@ -287,18 +288,18 @@ var blockStarts = []blockStartFunc{
 
 	// 判断围栏代码块（```）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented {
+		if !t.Context.indented {
 			if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockOpenFence, codeBlockInfo := t.parseFencedCode(); ok {
-				t.context.closeUnmatchedBlocks()
-				container := t.context.addChild(ast.NodeCodeBlock, t.context.nextNonspace)
+				t.Context.closeUnmatchedBlocks()
+				container := t.Context.addChild(ast.NodeCodeBlock, t.Context.nextNonspace)
 				container.IsFencedCodeBlock = true
 				container.CodeBlockFenceLen = codeBlockFenceLen
 				container.CodeBlockFenceChar = codeBlockFenceChar
 				container.CodeBlockFenceOffset = codeBlockFenceOffset
 				container.CodeBlockOpenFence = codeBlockOpenFence
 				container.CodeBlockInfo = codeBlockInfo
-				t.context.advanceNextNonspace()
-				t.context.advanceOffset(codeBlockFenceLen, false)
+				t.Context.advanceNextNonspace()
+				t.Context.advanceOffset(codeBlockFenceLen, false)
 				return 2
 			}
 		}
@@ -307,9 +308,9 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented && container.Type == ast.NodeParagraph {
+		if !t.Context.indented && container.Type == ast.NodeParagraph {
 			if level := t.parseSetextHeading(); 0 != level {
-				if t.context.option.GFMTable {
+				if t.Context.Option.GFMTable {
 					// 尝试解析表，因为可能出现如下情况：
 					//
 					//   0
@@ -318,7 +319,7 @@ var blockStarts = []blockStartFunc{
 					//
 					// 前两行可以解析出一个只有一个单元格的表。
 					// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
-					table := t.context.parseTable(container)
+					table := t.Context.parseTable(container)
 					if nil != table {
 						// 将该段落节点转成表节点
 						container.Type = ast.NodeTable
@@ -333,10 +334,10 @@ var blockStarts = []blockStartFunc{
 					}
 				}
 
-				t.context.closeUnmatchedBlocks()
+				t.Context.closeUnmatchedBlocks()
 				// 解析链接引用定义
 				for tokens := container.Tokens; 0 < len(tokens) && lex.ItemOpenBracket == tokens[0]; tokens = container.Tokens {
-					if remains := t.context.parseLinkRefDef(tokens); nil != remains {
+					if remains := t.Context.parseLinkRefDef(tokens); nil != remains {
 						container.Tokens = remains
 					} else {
 						break
@@ -348,8 +349,8 @@ var blockStarts = []blockStartFunc{
 					child.Tokens = lex.TrimWhitespace(value)
 					container.InsertAfter(child)
 					container.Unlink()
-					t.context.tip = child
-					t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
+					t.Context.Tip = child
+					t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
 					return 2
 				}
 			}
@@ -359,11 +360,11 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented && lex.Peek(t.context.currentLine, t.context.nextNonspace) == lex.ItemLess {
-			tokens := t.context.currentLine[t.context.nextNonspace:]
+		if !t.Context.indented && lex.Peek(t.Context.currentLine, t.Context.nextNonspace) == lex.ItemLess {
+			tokens := t.Context.currentLine[t.Context.nextNonspace:]
 			if htmlType := t.parseHTML(tokens); 0 != htmlType {
-				t.context.closeUnmatchedBlocks()
-				block := t.context.addChild(ast.NodeHTMLBlock, t.context.offset)
+				t.Context.closeUnmatchedBlocks()
+				block := t.Context.addChild(ast.NodeHTMLBlock, t.Context.offset)
 				block.HtmlBlockType = htmlType
 				return 2
 			}
@@ -373,12 +374,12 @@ var blockStarts = []blockStartFunc{
 
 	// 判断分隔线（--- ***）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented {
+		if !t.Context.indented {
 			if ok, caretTokens := t.parseThematicBreak(); ok {
-				t.context.closeUnmatchedBlocks()
-				thematicBreak := t.context.addChild(ast.NodeThematicBreak, t.context.nextNonspace)
+				t.Context.closeUnmatchedBlocks()
+				thematicBreak := t.Context.addChild(ast.NodeThematicBreak, t.Context.nextNonspace)
 				thematicBreak.Tokens = caretTokens
-				t.context.advanceOffset(t.context.currentLineLen-t.context.offset, false)
+				t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
 				return 2
 			}
 		}
@@ -387,20 +388,20 @@ var blockStarts = []blockStartFunc{
 
 	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented || container.Type == ast.NodeList {
+		if !t.Context.indented || container.Type == ast.NodeList {
 			data := t.parseListMarker(container)
 			if nil == data {
 				return 0
 			}
 
-			t.context.closeUnmatchedBlocks()
+			t.Context.closeUnmatchedBlocks()
 
-			listsMatch := container.Type == ast.NodeList && t.context.listsMatch(container.ListData, data)
-			if t.context.tip.Type != ast.NodeList || !listsMatch {
-				list := t.context.addChild(ast.NodeList, t.context.nextNonspace)
+			listsMatch := container.Type == ast.NodeList && t.Context.listsMatch(container.ListData, data)
+			if t.Context.Tip.Type != ast.NodeList || !listsMatch {
+				list := t.Context.addChild(ast.NodeList, t.Context.nextNonspace)
 				list.ListData = data
 			}
-			listItem := t.context.addChild(ast.NodeListItem, t.context.nextNonspace)
+			listItem := t.Context.addChild(ast.NodeListItem, t.Context.nextNonspace)
 			listItem.ListData = data
 			listItem.Tokens = data.Marker
 			if 1 == listItem.ListData.Typ || (3 == listItem.ListData.Typ && 0 == listItem.ListData.BulletChar) {
@@ -420,13 +421,13 @@ var blockStarts = []blockStartFunc{
 
 	// 判断数学公式块（$$）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.context.indented {
+		if !t.Context.indented {
 			if ok, mathBlockDollarOffset := t.parseMathBlock(); ok {
-				t.context.closeUnmatchedBlocks()
-				block := t.context.addChild(ast.NodeMathBlock, t.context.nextNonspace)
+				t.Context.closeUnmatchedBlocks()
+				block := t.Context.addChild(ast.NodeMathBlock, t.Context.nextNonspace)
 				block.MathBlockDollarOffset = mathBlockDollarOffset
-				t.context.advanceNextNonspace()
-				t.context.advanceOffset(mathBlockDollarOffset, false)
+				t.Context.advanceNextNonspace()
+				t.Context.advanceOffset(mathBlockDollarOffset, false)
 				return 2
 			}
 		}
@@ -435,28 +436,28 @@ var blockStarts = []blockStartFunc{
 
 	// 判断缩进代码块（    code）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if t.context.indented && t.context.tip.Type != ast.NodeParagraph && !t.context.blank {
-			t.context.advanceOffset(4, true)
-			t.context.closeUnmatchedBlocks()
-			t.context.addChild(ast.NodeCodeBlock, t.context.offset)
+		if t.Context.indented && t.Context.Tip.Type != ast.NodeParagraph && !t.Context.blank {
+			t.Context.advanceOffset(4, true)
+			t.Context.closeUnmatchedBlocks()
+			t.Context.addChild(ast.NodeCodeBlock, t.Context.offset)
 			return 2
 		}
 		return 0
 	},
 }
 
-// addLine 用于在当前的末梢节点 context.tip 上添加迭代行剩余的所有 Tokens。
+// addLine 用于在当前的末梢节点 context.Tip 上添加迭代行剩余的所有 Tokens。
 // 调用该方法前必须确认末梢 tip 能够接受新行。
 func (t *Tree) addLine() {
-	if t.context.partiallyConsumedTab {
-		t.context.offset++ // skip over tab
+	if t.Context.partiallyConsumedTab {
+		t.Context.offset++ // skip over tab
 		// add space characters:
-		var charsToTab = 4 - (t.context.column % 4)
+		var charsToTab = 4 - (t.Context.column % 4)
 		for i := 0; i < charsToTab; i++ {
-			t.context.tip.AppendTokens(util.StrToBytes(" "))
+			t.Context.Tip.AppendTokens(util.StrToBytes(" "))
 		}
 	}
-	t.context.tip.AppendTokens(t.context.currentLine[t.context.offset:])
+	t.Context.Tip.AppendTokens(t.Context.currentLine[t.Context.offset:])
 }
 
 // _continue 判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。

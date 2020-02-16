@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -40,12 +40,12 @@ func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 	return 0
 }
 
-var mathBlockMarker = util.StrToBytes("$$")
+var MathBlockMarker = util.StrToBytes("$$")
 
 func mathBlockFinalize(mathBlock *ast.Node) {
 	tokens := mathBlock.Tokens[2:] // 剔除开头的两个 $$
 	tokens = lex.TrimWhitespace(tokens)
-	if bytes.HasSuffix(tokens, mathBlockMarker) {
+	if bytes.HasSuffix(tokens, MathBlockMarker) {
 		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
 	}
 	mathBlock.Tokens = nil
@@ -55,14 +55,14 @@ func mathBlockFinalize(mathBlock *ast.Node) {
 }
 
 func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
-	marker := t.context.currentLine[t.context.nextNonspace]
+	marker := t.Context.currentLine[t.Context.nextNonspace]
 	if lex.ItemDollar != marker {
 		return
 	}
 
 	fenceChar := marker
 	fenceLength := 0
-	for i := t.context.nextNonspace; i < t.context.currentLineLen && fenceChar == t.context.currentLine[i]; i++ {
+	for i := t.Context.nextNonspace; i < t.Context.currentLineLen && fenceChar == t.Context.currentLine[i]; i++ {
 		fenceLength++
 	}
 
@@ -70,7 +70,7 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 		return
 	}
 
-	return true, t.context.indent
+	return true, t.Context.indent
 }
 
 func isMathBlockClose(tokens []byte) bool {

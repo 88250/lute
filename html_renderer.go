@@ -13,6 +13,7 @@ package lute
 import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
@@ -28,7 +29,7 @@ type HTMLRenderer struct {
 }
 
 // newHTMLRenderer 创建一个 HTML 渲染器。
-func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
+func (lute *Lute) newHTMLRenderer(tree *parse.Tree) Renderer {
 	ret := &HTMLRenderer{lute.newBaseRenderer(tree), false, 0}
 	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
@@ -151,14 +152,14 @@ func (r *HTMLRenderer) headings0(n *ast.Node, headings *[]*ast.Node) {
 	}
 }
 
-func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte {
+func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *parse.Context) []byte {
 	r.writeString("<div class=\"footnotes-defs-div\">")
 	r.writeString("<hr class=\"footnotes-defs-hr\" />\n")
 	r.writeString("<ol class=\"footnotes-defs-ol\">")
-	for i, def := range context.footnotesDefs {
+	for i, def := range context.FootnotesDefs {
 		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
-		tree := &Tree{Name: "", context: &Context{option: lute.Options}}
-		tree.context.tree = tree
+		tree := &parse.Tree{Name: "", Context: &parse.Context{Option: lute.Options}}
+		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := lute.newHTMLRenderer(tree)
@@ -183,7 +184,7 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 }
 
 func (r *HTMLRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	idx, _ := r.tree.context.findFootnotesDef(node.Tokens)
+	idx, _ := r.tree.Context.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
 	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
 	r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
@@ -404,7 +405,7 @@ func (r *HTMLRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.tree.context.relativePath(destTokens)
+			destTokens = r.tree.Context.RelativePath(destTokens)
 			r.write(util.EscapeHTML(destTokens))
 			r.writeString("\" alt=\"")
 		}
@@ -429,7 +430,7 @@ func (r *HTMLRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 	if entering {
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
-		destTokens = r.tree.context.relativePath(destTokens)
+		destTokens = r.tree.Context.RelativePath(destTokens)
 		attrs := [][]string{{"href", util.BytesToStr(util.EscapeHTML(destTokens))}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 			attrs = append(attrs, []string{"title", util.BytesToStr(util.EscapeHTML(title.Tokens))})

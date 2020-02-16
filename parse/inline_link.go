@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -129,15 +129,15 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 	}
 
 	if nil != passed {
-		if !context.option.VditorWYSIWYG {
+		if !context.Option.VditorWYSIWYG {
 			destination = util.EncodeDestination(util.UnescapeString(destination))
 		}
 	}
 	return
 }
 
-func (context *Context) relativePath(dest []byte) []byte {
-	if "" == context.option.LinkBase {
+func (context *Context) RelativePath(dest []byte) []byte {
+	if "" == context.Option.LinkBase {
 		return dest
 	}
 
@@ -145,7 +145,7 @@ func (context *Context) relativePath(dest []byte) []byte {
 		return dest
 	}
 
-	return append(util.StrToBytes(context.option.LinkBase), dest...)
+	return append(util.StrToBytes(context.Option.LinkBase), dest...)
 }
 
 func (context *Context) isRelativePath(dest []byte) bool {

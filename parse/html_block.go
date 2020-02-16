@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -105,12 +105,12 @@ func (t *Tree) parseHTML(tokens []byte) (typ int) {
 
 	tag := lex.TrimWhitespace(tokens)
 	isOpenTag := t.isOpenTag(tag)
-	if isOpenTag && t.context.tip.Type != ast.NodeParagraph {
+	if isOpenTag && t.Context.Tip.Type != ast.NodeParagraph {
 		typ = 7
 		return
 	}
 	isCloseTag := t.isCloseTag(tag)
-	if isCloseTag && t.context.tip.Type != ast.NodeParagraph {
+	if isCloseTag && t.Context.Tip.Type != ast.NodeParagraph {
 		typ = 7
 		return
 	}

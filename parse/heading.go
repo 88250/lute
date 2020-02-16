@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ import (
 )
 
 func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
-	tokens := t.context.currentLine[t.context.nextNonspace:]
+	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	marker := tokens[0]
 	if lex.ItemCrosshatch != marker {
 		return
@@ -31,7 +31,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 		return
 	}
 
-	markers = t.context.currentLine[t.context.nextNonspace : t.context.nextNonspace+level+1]
+	markers = t.Context.currentLine[t.Context.nextNonspace : t.Context.nextNonspace+level+1]
 
 	content = make([]byte, 0, 256)
 	_, tokens = lex.TrimLeft(tokens)
@@ -64,8 +64,8 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 		_, content = lex.TrimRight(content)
 	}
 
-	if t.context.option.VditorWYSIWYG {
-		if caret == string(content) || "" == string(content) {
+	if t.Context.Option.VditorWYSIWYG {
+		if Caret == string(content) || "" == string(content) {
 			return
 		}
 	}
@@ -75,7 +75,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 }
 
 func (t *Tree) parseSetextHeading() (level int) {
-	ln := lex.TrimWhitespace(t.context.currentLine)
+	ln := lex.TrimWhitespace(t.Context.currentLine)
 	start := 0
 	marker := ln[start]
 	if lex.ItemEqual != marker && lex.ItemHyphen != marker {
@@ -83,10 +83,10 @@ func (t *Tree) parseSetextHeading() (level int) {
 	}
 
 	var caretInLn bool
-	if t.context.option.VditorWYSIWYG {
-		if bytes.Contains(ln, []byte(caret)) {
+	if t.Context.Option.VditorWYSIWYG {
+		if bytes.Contains(ln, []byte(Caret)) {
 			caretInLn = true
-			ln = bytes.ReplaceAll(ln, []byte(caret), []byte(""))
+			ln = bytes.ReplaceAll(ln, []byte(Caret), []byte(""))
 		}
 	}
 
@@ -111,9 +111,9 @@ func (t *Tree) parseSetextHeading() (level int) {
 		level = 2
 	}
 
-	if t.context.option.VditorWYSIWYG && caretInLn {
-		t.context.oldtip.Tokens = lex.TrimWhitespace(t.context.oldtip.Tokens)
-		t.context.oldtip.AppendTokens([]byte(caret))
+	if t.Context.Option.VditorWYSIWYG && caretInLn {
+		t.Context.oldtip.Tokens = lex.TrimWhitespace(t.Context.oldtip.Tokens)
+		t.Context.oldtip.AppendTokens([]byte(Caret))
 	}
 
 	return

@@ -12,6 +12,7 @@ package lute
 
 import (
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
 	"github.com/gopherjs/gopherjs/js"
 	"strings"
@@ -21,7 +22,7 @@ const Version = "1.1.3"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
-	*Options // 解析和渲染选项配置
+	*parse.Options // 解析和渲染选项配置
 
 	HTML2MdRendererFuncs        map[ast.NodeType]ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
 	HTML2VditorDOMRendererFuncs map[ast.NodeType]ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
@@ -38,7 +39,7 @@ type Lute struct {
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 //  * 并行解析
 func New(opts ...Option) (ret *Lute) {
-	ret = &Lute{Options: &Options{}}
+	ret = &Lute{Options: &parse.Options{}}
 	ret.GFMTable = true
 	ret.GFMTaskListItem = true
 	ret.GFMTaskListItemClass = "vditor-task"
@@ -70,8 +71,8 @@ func New(opts ...Option) (ret *Lute) {
 
 // Markdown 将 markdown 文本字符数组处理为相应的 html 字符数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error) {
-	var tree *Tree
-	tree, err = lute.parse(name, markdown)
+	var tree *parse.Tree
+	tree, err = parse.Parse(name, markdown, lute.Options)
 	if nil != err {
 		return
 	}
@@ -79,8 +80,8 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 	renderer := lute.newHTMLRenderer(tree)
 	html, err = renderer.Render()
 
-	if lute.Options.Footnotes && 0 < len(tree.context.footnotesDefs) {
-		html = renderer.(*HTMLRenderer).renderFootnotesDefs(lute, tree.context)
+	if lute.Options.Footnotes && 0 < len(tree.Context.FootnotesDefs) {
+		html = renderer.(*HTMLRenderer).renderFootnotesDefs(lute, tree.Context)
 	}
 
 	return
@@ -100,8 +101,8 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 
 // Format 将 markdown 文本字符数组进行格式化。
 func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err error) {
-	var tree *Tree
-	tree, err = lute.parse(name, markdown)
+	var tree *parse.Tree
+	tree, err = parse.Parse(name, markdown, lute.Options)
 	if nil != err {
 		return
 	}
@@ -131,7 +132,7 @@ func (lute *Lute) Space(text string) string {
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	ret = make(map[string]string, len(lute.AliasEmoji))
-	placeholder := util.BytesToStr(emojiSitePlaceholder)
+	placeholder := util.BytesToStr(parse.EmojiSitePlaceholder)
 	for k, v := range lute.AliasEmoji {
 		if strings.Contains(v, placeholder) {
 			v = strings.ReplaceAll(v, placeholder, lute.EmojiSite)
@@ -159,64 +160,6 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 	for k, v := range termMap {
 		lute.Terms[k] = v
 	}
-}
-
-// Options 描述了一些列解析和渲染选项。
-type Options struct {
-	// GFMTable 设置是否打开“GFM 表”支持。
-	GFMTable bool
-	// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。
-	GFMTaskListItem bool
-	// GFMTaskListItemClass 作为 GFM 任务列表项类名，默认为 "vditor-task"。
-	GFMTaskListItemClass string
-	// GFMStrikethrough 设置是否打开“GFM 删除线”支持。
-	GFMStrikethrough bool
-	// GFMAutoLink 设置是否打开“GFM 自动链接”支持。
-	GFMAutoLink bool
-	// SoftBreak2HardBreak 设置是否将软换行（\n）渲染为硬换行（<br />）。
-	SoftBreak2HardBreak bool
-	// CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
-	CodeSyntaxHighlight bool
-	// CodeSyntaxHighlightInlineStyle 设置语法高亮是否为内联样式，默认不内联。
-	CodeSyntaxHighlightInlineStyle bool
-	// CodeSyntaxHightLineNum 设置语法高亮是否显示行号，默认不显示。
-	CodeSyntaxHighlightLineNum bool
-	// CodeSyntaxHighlightStyleName 指定语法高亮样式名，默认为 "github"。
-	CodeSyntaxHighlightStyleName string
-	// Footnotes 设置是否打开“脚注”支持。
-	Footnotes bool
-	// ToC 设置是否打开“目录”支持。
-	ToC bool
-	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
-	// https://github.com/sparanoid/chinese-copywriting-guidelines
-	AutoSpace bool
-	// FixTermTypo 设置是否对普通文本中出现的术语进行修正。
-	// https://github.com/sparanoid/chinese-copywriting-guidelines
-	// 注意：开启术语修正的话会默认在中西文之间插入空格。
-	FixTermTypo bool
-	// ChinesePunct 设置是否对普通文本中出现中文后跟英文逗号句号等标点替换为中文对应标点。
-	ChinesePunct bool
-	// Emoji 设置是否对 Emoji 别名替换为原生 Unicode 字符。
-	Emoji bool
-	// AliasEmoji 存储 ASCII 别名到表情 Unicode 映射。
-	AliasEmoji map[string]string
-	// EmojiAlias 存储表情 Unicode 到 ASCII 别名映射。
-	EmojiAlias map[string]string
-	// EmojiSite 设置图片 Emoji URL 的路径前缀。
-	EmojiSite string
-	// HeadingAnchor 设置是否对标题生成链接锚点。
-	HeadingAnchor bool
-	// Terms 将传入的 terms 合并覆盖到已有的 Terms 字典。
-	Terms map[string]string
-	// Vditor 所见即所得支持
-	VditorWYSIWYG bool
-	// ParallelParsing 设置是否启用并行解析。
-	ParallelParsing bool
-	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
-	InlineMathAllowDigitAfterOpenMarker bool
-	// LinkBase 设置链接、图片的基础路径。如果用户在链接或者图片地址中使用相对路径（没有协议前缀且不以 / 开头）并且 LinkBase 不为空则会用该值作为前缀。
-	// 比如 LinkBase 设置为 http://domain.com/，对于 ![foo](bar.png) 则渲染为 <img src="http://domain.com/bar.png" alt="foo" />
-	LinkBase string
 }
 
 // Option 描述了解析渲染选项设置函数签名。

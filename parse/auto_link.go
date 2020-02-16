@@ -8,14 +8,15 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
+	"unicode/utf8"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
-	"unicode/utf8"
 )
 
 func (t *Tree) parseGFMAutoEmailLink(node *ast.Node) {
@@ -164,7 +165,7 @@ var (
 )
 
 // AddAutoLinkDomainSuffix 添加自动链接解析域名后缀 suffix。
-func (lute *Lute) AddAutoLinkDomainSuffix(suffix string) {
+func AddAutoLinkDomainSuffix(suffix string) {
 	validAutoLinkDomainSuffix = append(validAutoLinkDomainSuffix, util.StrToBytes(suffix))
 }
 

@@ -8,7 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package parse
 
 import (
 	"bytes"
@@ -45,16 +45,16 @@ var items1 = util.StrToBytes("1")
 
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记符。
 func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
-	if t.context.indent >= 4 {
+	if t.Context.indent >= 4 {
 		return nil
 	}
 
-	ln := t.context.currentLine
-	tokens := ln[t.context.nextNonspace:]
+	ln := t.Context.currentLine
+	tokens := ln[t.Context.nextNonspace:]
 	data := &ast.ListData{
 		Typ:          0,                // 默认无序列表
 		Tight:        true,             // 默认紧凑模式
-		MarkerOffset: t.context.indent, // 设置前置相对缩进
+		MarkerOffset: t.Context.indent, // 设置前置相对缩进
 		Num:          -1,               // 假设有序列表起始为 -1，后面会进行计算赋值
 	}
 
@@ -78,7 +78,7 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 
 	data.Marker = marker
 
-	var token = ln[t.context.nextNonspace+markerLength]
+	var token = ln[t.Context.nextNonspace+markerLength]
 	// 列表项标记符后必须是空白字符
 	if !lex.IsWhitespace(token) {
 		return nil
@@ -90,27 +90,27 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 	}
 
 	// 到这里说明满足列表规则，开始解析并计算内部缩进空格数
-	t.context.advanceNextNonspace()             // 把起始下标移动到标记符起始位置
-	t.context.advanceOffset(markerLength, true) // 把结束下标移动到标记符结束位置
-	spacesStartCol := t.context.column
-	spacesStartOffset := t.context.offset
+	t.Context.advanceNextNonspace()             // 把起始下标移动到标记符起始位置
+	t.Context.advanceOffset(markerLength, true) // 把结束下标移动到标记符结束位置
+	spacesStartCol := t.Context.column
+	spacesStartOffset := t.Context.offset
 	for {
-		t.context.advanceOffset(1, true)
-		token = lex.Peek(ln, t.context.offset)
-		if t.context.column-spacesStartCol >= 5 || 0 == (token) || (lex.ItemSpace != token && lex.ItemTab != token) {
+		t.Context.advanceOffset(1, true)
+		token = lex.Peek(ln, t.Context.offset)
+		if t.Context.column-spacesStartCol >= 5 || 0 == (token) || (lex.ItemSpace != token && lex.ItemTab != token) {
 			break
 		}
 	}
 
-	token = lex.Peek(ln, t.context.offset)
+	token = lex.Peek(ln, t.Context.offset)
 	var isBlankItem = 0 == token || lex.ItemNewline == token
-	var spacesAfterMarker = t.context.column - spacesStartCol
+	var spacesAfterMarker = t.Context.column - spacesStartCol
 	if spacesAfterMarker >= 5 || spacesAfterMarker < 1 || isBlankItem {
 		data.Padding = markerLength + 1
-		t.context.column = spacesStartCol
-		t.context.offset = spacesStartOffset
-		if token = lex.Peek(ln, t.context.offset); lex.ItemSpace == token || lex.ItemTab == token {
-			t.context.advanceOffset(1, true)
+		t.Context.column = spacesStartCol
+		t.Context.offset = spacesStartOffset
+		if token = lex.Peek(ln, t.Context.offset); lex.ItemSpace == token || lex.ItemTab == token {
+			t.Context.advanceOffset(1, true)
 		}
 	} else {
 		data.Padding = markerLength + spacesAfterMarker
@@ -118,7 +118,7 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 
 	if !isBlankItem {
 		// 判断是否是任务列表项
-		content := ln[t.context.offset:]
+		content := ln[t.Context.offset:]
 		if 3 <= len(content) { // 至少需要 [ ] 或者 [x] 3 个字符
 			if lex.ItemOpenBracket == content[0] && ('x' == content[1] || 'X' == content[1] || lex.ItemSpace == content[1]) && lex.ItemCloseBracket == content[2] {
 				data.Typ = 3

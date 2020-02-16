@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
 	"strconv"
 	"unicode"
@@ -27,7 +28,7 @@ type FormatRenderer struct {
 }
 
 // newFormatRenderer 创建一个格式化渲染器。
-func (lute *Lute) newFormatRenderer(tree *Tree) Renderer {
+func (lute *Lute) newFormatRenderer(tree *parse.Tree) Renderer {
 	ret := &FormatRenderer{BaseRenderer: lute.newBaseRenderer(tree)}
 	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
@@ -449,7 +450,7 @@ func (r *FormatRenderer) renderInlineMath(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *FormatRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(mathBlockMarker)
+	r.write(parse.MathBlockMarker)
 	r.writeByte(lex.ItemNewline)
 	return ast.WalkStop
 }
@@ -461,7 +462,7 @@ func (r *FormatRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 }
 
 func (r *FormatRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(mathBlockMarker)
+	r.write(parse.MathBlockMarker)
 	r.writeByte(lex.ItemNewline)
 	return ast.WalkStop
 }
