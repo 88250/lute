@@ -12,7 +12,6 @@ package parse
 
 import (
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -34,7 +33,6 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree, err erro
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
-
 	return
 }
 
@@ -261,7 +259,7 @@ type Options struct {
 	LinkBase string
 }
 
-func (context *Context) ParentTip(n *html.Node) {
+func (context *Context) ParentTip() {
 	if tip := context.Tip.Parent; nil != tip {
 		context.Tip = context.Tip.Parent
 	}

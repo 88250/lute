@@ -259,7 +259,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		if "" == strings.TrimSpace(lute.domText(n)) {
 			return
@@ -269,7 +269,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.AppendChild(&ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: []byte(strings.Repeat("#", node.HeadingLevel))})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Hr:
 		node.Type = ast.NodeThematicBreak
 		tree.Context.Tip.AppendChild(node)
@@ -283,7 +283,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.AppendChild(&ast.Node{Type: ast.NodeBlockquoteMarker, Tokens: []byte(">")})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Ol, atom.Ul:
 		node.Type = ast.NodeList
 		node.ListData = &ast.ListData{}
@@ -296,7 +296,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Li:
 		if nil != n.FirstChild && nil == n.FirstChild.NextSibling && (atom.Ul == n.FirstChild.DataAtom || atom.Ol == n.FirstChild.DataAtom) {
 			break
@@ -352,7 +352,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
 			marker := lute.domAttrValue(n.Parent, "data-marker")
@@ -445,7 +445,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Strong, atom.B:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
@@ -494,7 +494,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Del, atom.S, atom.Strike:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
@@ -541,7 +541,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Code:
 		if nil == n.FirstChild {
 			return
@@ -598,13 +598,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeHardBreak
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.A:
 		node.Type = ast.NodeLink
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Img:
 		imgClass := class
 		imgAlt := lute.domAttrValue(n, "alt")
@@ -636,7 +636,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Input:
 		if nil == n.Parent || nil == n.Parent.Parent || (atom.P != n.Parent.DataAtom && atom.Li != n.Parent.DataAtom) {
 			// 仅允许 input 出现在任务列表中
@@ -672,18 +672,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.TableAligns = tableAligns
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Thead:
 		node.Type = ast.NodeTableHead
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Tbody:
 	case atom.Tr:
 		node.Type = ast.NodeTableRow
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Th, atom.Td:
 		node.Type = ast.NodeTableCell
 		align := lute.domAttrValue(n, "align")
@@ -701,7 +701,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.TableCellAlign = tableAlign
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip(n)
+		defer tree.Context.ParentTip()
 	case atom.Span:
 		if nil == n.FirstChild {
 			break
