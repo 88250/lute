@@ -11,10 +11,9 @@
 package test
 
 import (
+	"github.com/88250/lute/util"
 	"sync"
 	"testing"
-
-	"github.com/88250/lute"
 )
 
 func TestRecover(t *testing.T) {
@@ -24,7 +23,7 @@ func TestRecover(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		defer lute.RecoverPanic(&err)
+		defer util.RecoverPanic(&err)
 		panic("test panic")
 	}()
 	wg.Wait()

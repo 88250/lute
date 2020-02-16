@@ -96,7 +96,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 		return
 	}
 	info = lex.TrimWhitespace(infoTokens)
-	info = unescapeString(info)
+	info = util.UnescapeString(info)
 	return true, fenceChar, fenceLen, t.context.indent, openFence, info
 }
 

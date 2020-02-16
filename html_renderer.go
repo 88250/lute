@@ -105,7 +105,7 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 }
 
 func (r *HTMLRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -236,7 +236,7 @@ func (r *HTMLRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool
 }
 
 func (r *HTMLRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -256,7 +256,7 @@ func (r *HTMLRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool)
 }
 
 func (r *HTMLRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -375,7 +375,7 @@ func (r *HTMLRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkSta
 	if r.option.AutoSpace {
 		r.space(node)
 	}
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -405,7 +405,7 @@ func (r *HTMLRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 			r.writeString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.tree.context.relativePath(destTokens)
-			r.write(escapeHTML(destTokens))
+			r.write(util.EscapeHTML(destTokens))
 			r.writeString("\" alt=\"")
 		}
 		r.disableTags++
@@ -417,7 +417,7 @@ func (r *HTMLRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 		r.writeString("\"")
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(title.Tokens))
+			r.write(util.EscapeHTML(title.Tokens))
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -430,9 +430,9 @@ func (r *HTMLRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
 		destTokens = r.tree.context.relativePath(destTokens)
-		attrs := [][]string{{"href", util.BytesToStr(escapeHTML(destTokens))}}
+		attrs := [][]string{{"href", util.BytesToStr(util.EscapeHTML(destTokens))}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			attrs = append(attrs, []string{"title", util.BytesToStr(escapeHTML(title.Tokens))})
+			attrs = append(attrs, []string{"title", util.BytesToStr(util.EscapeHTML(title.Tokens))})
 		}
 		r.tag("a", attrs, false)
 	} else {
@@ -482,7 +482,7 @@ func (r *HTMLRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus 
 	if r.option.ChinesePunct {
 		r.chinesePunct(node)
 	}
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -515,7 +515,7 @@ func (r *HTMLRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) a
 }
 
 func (r *HTMLRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 

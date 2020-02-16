@@ -130,7 +130,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 
 	if nil != passed {
 		if !context.option.VditorWYSIWYG {
-			destination = encodeDestination(unescapeString(destination))
+			destination = util.EncodeDestination(util.UnescapeString(destination))
 		}
 	}
 	return

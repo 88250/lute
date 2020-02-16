@@ -8,11 +8,10 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package util
 
 import (
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 	"strings"
 	"unicode/utf8"
 
@@ -20,17 +19,17 @@ import (
 )
 
 var (
-	amp  = util.StrToBytes("&amp;")
-	lt   = util.StrToBytes("&lt;")
-	gt   = util.StrToBytes("&gt;")
-	quot = util.StrToBytes("&quot;")
+	amp  = StrToBytes("&amp;")
+	lt   = StrToBytes("&lt;")
+	gt   = StrToBytes("&gt;")
+	quot = StrToBytes("&quot;")
 )
 
-func unescapeHTML(h []byte) (ret []byte) {
-	return util.StrToBytes(html.UnescapeString(util.BytesToStr(h)))
+func UnescapeHTML(h []byte) (ret []byte) {
+	return StrToBytes(html.UnescapeString(BytesToStr(h)))
 }
 
-func escapeHTML(html []byte) (ret []byte) {
+func EscapeHTML(html []byte) (ret []byte) {
 	length := len(html)
 	var start, i int
 	inited := false
@@ -77,13 +76,13 @@ func escapeHTML(html []byte) (ret []byte) {
 	return
 }
 
-// encodeDestination percent-encodes rawurl, avoiding double encoding.
+// EncodeDestination percent-encodes rawurl, avoiding double encoding.
 // It doesn't touch:
 // - alphanumeric characters ([0-9a-zA-Z]);
 // - percent-encoded characters (%[0-9a-fA-F]{2});
 // - excluded characters ([;/?:@&=+$,-_.!~*'()#]).
 // Invalid UTF-8 sequences are replaced with U+FFFD.
-func encodeDestination(rawurl []byte) (ret []byte) {
+func EncodeDestination(rawurl []byte) (ret []byte) {
 	// 鸣谢 https://gitlab.com/golang-commonmark/mdurl
 
 	const hexdigit = "0123456789ABCDEF"

@@ -12,6 +12,7 @@ package lute
 
 import (
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"sync"
 )
 
@@ -22,7 +23,7 @@ func (t *Tree) parseInlines() {
 
 // walkParseInline 解析生成节点 node 的行级子节点。
 func (t *Tree) walkParseInline(node *ast.Node, wg *sync.WaitGroup) {
-	defer RecoverPanic(nil)
+	defer util.RecoverPanic(nil)
 	if nil != wg {
 		defer wg.Done()
 	}

@@ -38,12 +38,12 @@ func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 		if r.option.CodeSyntaxHighlight {
 			rendered = highlightChroma(tokens, "", r)
 			if !rendered {
-				tokens = escapeHTML(tokens)
+				tokens = util.EscapeHTML(tokens)
 				r.write(tokens)
 			}
 		} else {
 			r.writeString("<pre><code>")
-			tokens = escapeHTML(tokens)
+			tokens = util.EscapeHTML(tokens)
 			r.write(tokens)
 		}
 		r.writeString("</code></pre>")
@@ -77,7 +77,7 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				r.writeString("<pre><code class=\"language-")
 				r.writeString(language)
 				r.writeString("\">")
-				tokens = escapeHTML(tokens)
+				tokens = util.EscapeHTML(tokens)
 				r.write(tokens)
 			}
 		} else {
@@ -85,12 +85,12 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			if r.option.CodeSyntaxHighlight {
 				rendered = highlightChroma(tokens, "", r)
 				if !rendered {
-					tokens = escapeHTML(tokens)
+					tokens = util.EscapeHTML(tokens)
 					r.write(tokens)
 				}
 			} else {
 				r.writeString("<pre><code>")
-				tokens = escapeHTML(tokens)
+				tokens = util.EscapeHTML(tokens)
 				r.write(tokens)
 			}
 		}

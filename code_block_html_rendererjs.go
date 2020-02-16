@@ -15,6 +15,7 @@ package lute
 import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
 // renderCodeBlock 进行代码块 HTML 渲染，不实现语法高亮。
@@ -23,7 +24,7 @@ func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 		// 缩进代码块处理
 		r.newline()
 		r.writeString("<pre><code>")
-		r.write(escapeHTML(node.FirstChild.Tokens))
+		r.write(util.EscapeHTML(node.FirstChild.Tokens))
 		r.writeString("</code></pre>")
 		r.newline()
 		return ast.WalkStop
@@ -42,11 +43,11 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			r.writeString("<pre><code class=\"language-")
 			r.write(language)
 			r.writeString("\">")
-			tokens = escapeHTML(tokens)
+			tokens = util.EscapeHTML(tokens)
 			r.write(tokens)
 		} else {
 			r.writeString("<pre><code>")
-			tokens = escapeHTML(tokens)
+			tokens = util.EscapeHTML(tokens)
 			r.write(tokens)
 		}
 		return ast.WalkSkipChildren

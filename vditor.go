@@ -13,6 +13,7 @@ package lute
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 
@@ -198,7 +199,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 		if entering {
 			switch n.Type {
 			case ast.NodeInlineHTML, ast.NodeCodeSpan, ast.NodeInlineMath, ast.NodeHTMLBlock, ast.NodeCodeBlockCode, ast.NodeMathBlockContent:
-				n.Tokens = unescapeHTML(n.Tokens)
+				n.Tokens = util.UnescapeHTML(n.Tokens)
 			case ast.NodeList:
 				// 浏览器生成的子列表是 ul.ul 形式，需要将其调整为 ul.li.ul
 				if nil != n.Parent && ast.NodeList == n.Parent.Type {

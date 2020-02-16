@@ -103,7 +103,7 @@ func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, 
 	}
 	if nil != title {
 		if !context.option.VditorWYSIWYG {
-			title = unescapeString(title)
+			title = util.UnescapeString(title)
 		}
 	}
 
@@ -159,7 +159,7 @@ func (context *Context) parseLinkDest(tokens []byte) (ret, remains, destination 
 	}
 	if nil != ret {
 		if !context.option.VditorWYSIWYG {
-			destination = encodeDestination(unescapeString(destination))
+			destination = util.EncodeDestination(util.UnescapeString(destination))
 		}
 	}
 	return

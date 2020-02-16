@@ -118,7 +118,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *ast.Node) {
 		}
 	}
 
-	v := htmlUnescapeString(entityName)
+	v := util.HtmlUnescapeString(entityName)
 	if v == entityName {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: and}

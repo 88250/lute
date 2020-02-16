@@ -8,11 +8,10 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package util
 
 import (
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -20,12 +19,12 @@ import (
 	"github.com/88250/lute/html"
 )
 
-func unescapeString(tokens []byte) (ret []byte) {
+func UnescapeString(tokens []byte) (ret []byte) {
 	if nil == tokens {
 		return
 	}
 
-	tokens = util.StrToBytes(htmlUnescapeString(util.BytesToStr(tokens)))
+	tokens = StrToBytes(HtmlUnescapeString(BytesToStr(tokens)))
 	length := len(tokens)
 	ret = make([]byte, 0, length)
 	for i := 0; i < length; i++ {
@@ -37,7 +36,7 @@ func unescapeString(tokens []byte) (ret []byte) {
 	return
 }
 
-func htmlUnescapeString(s string) string {
+func HtmlUnescapeString(s string) string {
 	// 鸣谢 https://gitlab.com/golang-commonmark
 
 	i := strings.IndexByte(s, lex.ItemAmpersand)

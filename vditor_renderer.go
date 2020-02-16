@@ -103,7 +103,7 @@ func (lute *Lute) newVditorRenderer(tree *Tree) *VditorRenderer {
 }
 
 func (r *VditorRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -169,7 +169,7 @@ func (r *VditorRenderer) renderInlineMathContent(node *ast.Node, entering bool) 
 	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
 	r.tag("code", [][]string{{"data-type", "math-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(zwsp), []byte(""))
-	tokens = escapeHTML(tokens)
+	tokens = util.EscapeHTML(tokens)
 	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
 	r.writeString("</code></span>" + zwsp)
@@ -204,7 +204,7 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 	if codeIsEmpty {
 		r.writeString("<wbr>\n")
 	} else {
-		r.write(escapeHTML(node.Tokens))
+		r.write(util.EscapeHTML(node.Tokens))
 	}
 	r.writeString("</code></pre>")
 	return ast.WalkStop
@@ -398,7 +398,7 @@ func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.writeString("<pre>")
 	r.tag("code", nil, false)
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	r.writeString("</code></pre></div>")
 	return ast.WalkStop
 }
@@ -421,7 +421,7 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(zwsp), []byte(""))
-	tokens = escapeHTML(tokens)
+	tokens = util.EscapeHTML(tokens)
 	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
 	r.writeString("</code></span>" + zwsp)
@@ -462,7 +462,7 @@ func (r *VditorRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 	if !bytes.EqualFold(node.Tokens, []byte(caret+zwsp)) {
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(zwsp), []byte(""))
 	}
-	r.write(escapeHTML(node.Tokens))
+	r.write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -489,7 +489,7 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool)
 
 func (r *VditorRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(zwsp), []byte(""))
-	tokens = escapeHTML(tokens)
+	tokens = util.EscapeHTML(tokens)
 	tokens = append([]byte(zwsp), tokens...)
 	r.write(tokens)
 	return ast.WalkStop
@@ -718,7 +718,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	if codeIsEmpty {
 		r.writeString("<wbr>\n")
 	} else {
-		r.write(escapeHTML(node.Tokens))
+		r.write(util.EscapeHTML(node.Tokens))
 		r.newline()
 	}
 	r.writeString("</code></pre>")
