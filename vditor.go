@@ -12,14 +12,15 @@ package lute
 
 import (
 	"bytes"
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/parse"
-	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 
+	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
+	"github.com/88250/lute/parse"
+	"github.com/88250/lute/render"
+	"github.com/88250/lute/util"
 )
 
 // Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
@@ -56,7 +57,7 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 		return
 	}
 
-	renderer := lute.newVditorRenderer(tree)
+	renderer := render.NewVditorRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
 	if nil != err {
@@ -86,9 +87,9 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 		return
 	}
 
-	renderer := lute.newVditorRenderer(tree)
-	for nodeType, render := range lute.HTML2VditorDOMRendererFuncs {
-		renderer.extRendererFuncs[nodeType] = render
+	renderer := render.NewVditorRenderer(tree)
+	for nodeType, rendererFunc := range lute.HTML2VditorDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	var output []byte
 	output, err = renderer.Render()
@@ -118,7 +119,7 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 		return
 	}
 
-	renderer := lute.newVditorRenderer(tree)
+	renderer := render.NewVditorRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
 	if nil != err {
@@ -145,7 +146,7 @@ func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
 		return
 	}
 
-	renderer := lute.newEChartsJSONRenderer(tree)
+	renderer := render.NewEChartsJSONRenderer(tree)
 	var output []byte
 	output, err = renderer.Render()
 	if nil != err {
@@ -210,7 +211,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	// 将 AST 进行 Markdown 格式化渲染
 
 	var formatted []byte
-	renderer := lute.newFormatRenderer(tree)
+	renderer := render.NewFormatRenderer(tree)
 	formatted, err = renderer.Render()
 	if nil != err {
 		markdown = err.Error()

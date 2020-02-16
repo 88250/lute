@@ -8,13 +8,14 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package render
 
 import (
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/util"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 )
 
 // chinesePunct 会把文本节点 textNode 中的中文间的英文标点换成对应的中文标点。

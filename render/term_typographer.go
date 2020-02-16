@@ -8,14 +8,15 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package render
 
 import (
 	"bytes"
+	"unicode/utf8"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
-	"unicode/utf8"
 )
 
 // fixTermTypo 修正文本节点 textNode 中出现的术语拼写问题。
@@ -76,7 +77,7 @@ func isNotTerm(token byte) bool {
 	return token >= utf8.RuneSelf || lex.IsWhitespace(token) || lex.IsASCIIPunct(token)
 }
 
-func newTerms() (ret map[string]string) {
+func NewTerms() (ret map[string]string) {
 	ret = make(map[string]string, len(terms))
 	for k, v := range terms {
 		ret[k] = v

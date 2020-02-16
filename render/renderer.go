@@ -8,10 +8,11 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package render
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
@@ -32,19 +33,20 @@ type Renderer interface {
 
 // BaseRenderer 描述了渲染器结构。
 type BaseRenderer struct {
-	writer              *bytes.Buffer                    // 输出缓冲
-	lastOut             byte                             // 最新输出的一个字节
-	rendererFuncs       map[ast.NodeType]RendererFunc    // 渲染器
-	defaultRendererFunc RendererFunc                     // 默认渲染器，在 rendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
-	extRendererFuncs    map[ast.NodeType]ExtRendererFunc // 用户自定义的渲染器
-	disableTags         int                              // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
-	option              *parse.Options                   // 解析渲染选项
-	tree                *parse.Tree                      // 待渲染的树
+	writer              *bytes.Buffer                 // 输出缓冲
+	lastOut             byte                          // 最新输出的一个字节
+	rendererFuncs       map[ast.NodeType]RendererFunc // 渲染器
+	defaultRendererFunc RendererFunc                  // 默认渲染器，在 rendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
+	disableTags         int                           // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
+	option              *parse.Options                // 解析渲染选项
+	tree                *parse.Tree                   // 待渲染的树
+
+	ExtRendererFuncs map[ast.NodeType]ExtRendererFunc // 用户自定义的渲染器
 }
 
 // newBaseRenderer 构造一个 BaseRenderer。
-func (lute *Lute) newBaseRenderer(tree *parse.Tree) *BaseRenderer {
-	ret := &BaseRenderer{rendererFuncs: map[ast.NodeType]RendererFunc{}, extRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, option: lute.Options, tree: tree}
+func newBaseRenderer(tree *parse.Tree) *BaseRenderer {
+	ret := &BaseRenderer{rendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, option: tree.Context.Option, tree: tree}
 	ret.writer = &bytes.Buffer{}
 	ret.writer.Grow(4096)
 	return ret
@@ -59,7 +61,7 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 	r.writer.Grow(4096)
 
 	ast.Walk(r.tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		extRender := r.extRendererFuncs[n.Type]
+		extRender := r.ExtRendererFuncs[n.Type]
 		if nil != extRender {
 			output, status := extRender(n, entering)
 			r.writeString(output)

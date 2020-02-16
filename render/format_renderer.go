@@ -8,17 +8,18 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package render
 
 import (
 	"bytes"
+	"strconv"
+	"unicode"
+	"unicode/utf8"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
-	"strconv"
-	"unicode"
-	"unicode/utf8"
 )
 
 // FormatRenderer 描述了格式化渲染器。
@@ -27,9 +28,9 @@ type FormatRenderer struct {
 	nodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
 }
 
-// newFormatRenderer 创建一个格式化渲染器。
-func (lute *Lute) newFormatRenderer(tree *parse.Tree) Renderer {
-	ret := &FormatRenderer{BaseRenderer: lute.newBaseRenderer(tree)}
+// NewFormatRenderer 创建一个格式化渲染器。
+func NewFormatRenderer(tree *parse.Tree) Renderer {
+	ret := &FormatRenderer{BaseRenderer: newBaseRenderer(tree)}
 	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[ast.NodeText] = ret.renderText

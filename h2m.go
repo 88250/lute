@@ -12,13 +12,14 @@ package lute
 
 import (
 	"bytes"
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/parse"
-	"github.com/88250/lute/util"
 	"strings"
 
+	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
+	"github.com/88250/lute/parse"
+	"github.com/88250/lute/render"
+	"github.com/88250/lute/util"
 )
 
 // HTML2Markdown 将 HTML 转换为 Markdown。
@@ -62,9 +63,9 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 	// 将 AST 进行 Markdown 格式化渲染
 
 	var formatted []byte
-	renderer := lute.newFormatRenderer(tree)
-	for nodeType, render := range lute.HTML2MdRendererFuncs {
-		renderer.(*FormatRenderer).extRendererFuncs[nodeType] = render
+	renderer := render.NewFormatRenderer(tree)
+	for nodeType, rendererFunc := range lute.HTML2MdRendererFuncs {
+		renderer.(*render.FormatRenderer).ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	formatted, err = renderer.Render()
 	if nil != err {

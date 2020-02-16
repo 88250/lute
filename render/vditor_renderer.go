@@ -8,18 +8,19 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/lex"
-	"github.com/88250/lute/parse"
-	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+	"github.com/88250/lute/parse"
+	"github.com/88250/lute/util"
 )
 
 // VditorRenderer 描述了 Vditor DOM 渲染器。
@@ -27,9 +28,9 @@ type VditorRenderer struct {
 	*BaseRenderer
 }
 
-// newVditorRenderer 创建一个 HTML 渲染器。
-func (lute *Lute) newVditorRenderer(tree *parse.Tree) *VditorRenderer {
-	ret := &VditorRenderer{BaseRenderer: lute.newBaseRenderer(tree)}
+// NewVditorRenderer 创建一个 HTML 渲染器。
+func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
+	ret := &VditorRenderer{BaseRenderer: newBaseRenderer(tree)}
 	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[ast.NodeText] = ret.renderText

@@ -10,7 +10,7 @@
 
 // +build javascript
 
-package lute
+package render
 
 import (
 	"github.com/88250/lute/ast"

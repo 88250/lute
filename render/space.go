@@ -8,23 +8,24 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package render
 
 import (
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/util"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
 )
 
 // space 会把文本节点 textNode 中的中西文之间加上空格。
 func (r *BaseRenderer) space(textNode *ast.Node) {
 	text := util.BytesToStr(textNode.Tokens)
-	text = space0(text)
+	text = Space0(text)
 	textNode.Tokens = util.StrToBytes(text)
 }
 
-func space0(text string) (ret string) {
+func Space0(text string) (ret string) {
 	runes := []rune(text)
 	length := len(runes)
 	var r rune

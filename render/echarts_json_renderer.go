@@ -8,14 +8,15 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package render
 
 import (
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
-	"strings"
 )
 
 // EChartsJSONRenderer 描述了 JSON 渲染器。
@@ -24,8 +25,8 @@ type EChartsJSONRenderer struct {
 }
 
 // newEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
-func (lute *Lute) newEChartsJSONRenderer(tree *parse.Tree) Renderer {
-	ret := &EChartsJSONRenderer{lute.newBaseRenderer(tree)}
+func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
+	ret := &EChartsJSONRenderer{newBaseRenderer(tree)}
 	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[ast.NodeText] = ret.renderText

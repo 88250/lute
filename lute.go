@@ -11,11 +11,13 @@
 package lute
 
 import (
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
+	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
 	"github.com/gopherjs/gopherjs/js"
-	"strings"
 )
 
 const Version = "1.1.3"
@@ -24,8 +26,8 @@ const Version = "1.1.3"
 type Lute struct {
 	*parse.Options // 解析和渲染选项配置
 
-	HTML2MdRendererFuncs        map[ast.NodeType]ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
-	HTML2VditorDOMRendererFuncs map[ast.NodeType]ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
+	HTML2MdRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
+	HTML2VditorDOMRendererFuncs map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：
@@ -57,15 +59,15 @@ func New(opts ...Option) (ret *Lute) {
 	ret.ChinesePunct = true
 	ret.Emoji = true
 	ret.AliasEmoji, ret.EmojiAlias = newEmojis()
-	ret.Terms = newTerms()
+	ret.Terms = render.NewTerms()
 	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
 	ret.LinkBase = ""
 	ret.ParallelParsing = true
 	for _, opt := range opts {
 		opt(ret)
 	}
-	ret.HTML2MdRendererFuncs = map[ast.NodeType]ExtRendererFunc{}
-	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]ExtRendererFunc{}
+	ret.HTML2MdRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	return ret
 }
 
@@ -77,11 +79,11 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 		return
 	}
 
-	renderer := lute.newHTMLRenderer(tree)
+	renderer := render.NewHTMLRenderer(tree)
 	html, err = renderer.Render()
 
 	if lute.Options.Footnotes && 0 < len(tree.Context.FootnotesDefs) {
-		html = renderer.(*HTMLRenderer).renderFootnotesDefs(lute, tree.Context)
+		html = renderer.(*render.HTMLRenderer).RenderFootnotesDefs(tree.Context)
 	}
 
 	return
@@ -107,7 +109,7 @@ func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err er
 		return
 	}
 
-	renderer := lute.newFormatRenderer(tree)
+	renderer := render.NewFormatRenderer(tree)
 	formatted, err = renderer.Render()
 	return
 }
@@ -126,7 +128,7 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error)
 
 // Space 用于在 text 中的中西文之间插入空格。
 func (lute *Lute) Space(text string) string {
-	return space0(text)
+	return render.Space0(text)
 }
 
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
@@ -272,7 +274,7 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			continue
 		}
 
-		var rendererFuncs map[ast.NodeType]ExtRendererFunc
+		var rendererFuncs map[ast.NodeType]render.ExtRendererFunc
 		if "HTML2Md" == rendererType {
 			rendererFuncs = lute.HTML2MdRendererFuncs
 		} else if "HTML2VditorDOM" == rendererType {

@@ -8,17 +8,18 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package lute
+package render
 
 import (
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/lex"
-	"github.com/88250/lute/parse"
-	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
+	"github.com/88250/lute/parse"
+	"github.com/88250/lute/util"
 )
 
 // HTMLRenderer 描述了 HTML 渲染器。
@@ -28,9 +29,9 @@ type HTMLRenderer struct {
 	headingCnt             int
 }
 
-// newHTMLRenderer 创建一个 HTML 渲染器。
-func (lute *Lute) newHTMLRenderer(tree *parse.Tree) Renderer {
-	ret := &HTMLRenderer{lute.newBaseRenderer(tree), false, 0}
+// NewHTMLRenderer 创建一个 HTML 渲染器。
+func NewHTMLRenderer(tree *parse.Tree) Renderer {
+	ret := &HTMLRenderer{newBaseRenderer(tree), false, 0}
 	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.rendererFuncs[ast.NodeText] = ret.renderText
@@ -152,17 +153,17 @@ func (r *HTMLRenderer) headings0(n *ast.Node, headings *[]*ast.Node) {
 	}
 }
 
-func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *parse.Context) []byte {
+func (r *HTMLRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	r.writeString("<div class=\"footnotes-defs-div\">")
 	r.writeString("<hr class=\"footnotes-defs-hr\" />\n")
 	r.writeString("<ol class=\"footnotes-defs-ol\">")
 	for i, def := range context.FootnotesDefs {
 		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
-		tree := &parse.Tree{Name: "", Context: &parse.Context{Option: lute.Options}}
+		tree := &parse.Tree{Name: "", Context: context}
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
-		defRenderer := lute.newHTMLRenderer(tree)
+		defRenderer := NewHTMLRenderer(tree)
 		lc := tree.Root.LastDeepestChild()
 		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
 			ref := def.FootnotesRefs[i]
