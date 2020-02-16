@@ -37,13 +37,13 @@ type BaseRenderer struct {
 	defaultRendererFunc RendererFunc                     // 默认渲染器，在 rendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
 	extRendererFuncs    map[ast.NodeType]ExtRendererFunc // 用户自定义的渲染器
 	disableTags         int                              // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
-	option              *options                         // 解析渲染选项
+	option              *Options                         // 解析渲染选项
 	tree                *Tree                            // 待渲染的树
 }
 
 // newBaseRenderer 构造一个 BaseRenderer。
 func (lute *Lute) newBaseRenderer(tree *Tree) *BaseRenderer {
-	ret := &BaseRenderer{rendererFuncs: map[ast.NodeType]RendererFunc{}, extRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, option: lute.options, tree: tree}
+	ret := &BaseRenderer{rendererFuncs: map[ast.NodeType]RendererFunc{}, extRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, option: lute.Options, tree: tree}
 	ret.writer = &bytes.Buffer{}
 	ret.writer.Grow(4096)
 	return ret

@@ -20,7 +20,7 @@ import (
 func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	defer util.RecoverPanic(&err)
 
-	tree = &Tree{Name: name, context: &Context{option: lute.options}}
+	tree = &Tree{Name: name, context: &Context{option: lute.Options}}
 	tree.context.tree = tree
 	tree.lexer = lex.NewLexer(markdown)
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
@@ -34,7 +34,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 // Context 用于维护块级元素解析过程中使用到的公共数据。
 type Context struct {
 	tree   *Tree    // 关联的语法树
-	option *options // 解析渲染选项
+	option *Options // 解析渲染选项
 
 	linkRefDefs   map[string]*ast.Node // 链接引用定义集
 	footnotesDefs []*ast.Node          // 脚注定义集

@@ -157,7 +157,7 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 	r.writeString("<ol class=\"footnotes-defs-ol\">")
 	for i, def := range context.footnotesDefs {
 		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
-		tree := &Tree{Name: "", context: &Context{option: lute.options}}
+		tree := &Tree{Name: "", context: &Context{option: lute.Options}}
 		tree.context.tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)

@@ -21,7 +21,7 @@ const Version = "1.1.3"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
-	*options // 解析和渲染选项配置
+	*Options // 解析和渲染选项配置
 
 	HTML2MdRendererFuncs        map[ast.NodeType]ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
 	HTML2VditorDOMRendererFuncs map[ast.NodeType]ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
@@ -37,8 +37,8 @@ type Lute struct {
 //  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 //  * 并行解析
-func New(opts ...option) (ret *Lute) {
-	ret = &Lute{options: &options{}}
+func New(opts ...Option) (ret *Lute) {
+	ret = &Lute{Options: &Options{}}
 	ret.GFMTable = true
 	ret.GFMTaskListItem = true
 	ret.GFMTaskListItemClass = "vditor-task"
@@ -79,7 +79,7 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 	renderer := lute.newHTMLRenderer(tree)
 	html, err = renderer.Render()
 
-	if lute.options.Footnotes && 0 < len(tree.context.footnotesDefs) {
+	if lute.Options.Footnotes && 0 < len(tree.context.footnotesDefs) {
 		html = renderer.(*HTMLRenderer).renderFootnotesDefs(lute, tree.context)
 	}
 
@@ -161,8 +161,8 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 	}
 }
 
-// options 描述了一些列解析和渲染选项。
-type options struct {
+// Options 描述了一些列解析和渲染选项。
+type Options struct {
 	// GFMTable 设置是否打开“GFM 表”支持。
 	GFMTable bool
 	// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。
@@ -219,8 +219,8 @@ type options struct {
 	LinkBase string
 }
 
-// option 描述了解析渲染选项设置函数签名。
-type option func(lute *Lute)
+// Option 描述了解析渲染选项设置函数签名。
+type Option func(lute *Lute)
 
 // 以下 Setters 主要是给 JavaScript 端导出方法用。
 
