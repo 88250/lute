@@ -23,7 +23,7 @@ const Caret = "‸"
 // Zwsp 零宽空格。
 const Zwsp = "\u200b"
 
-// Parse 会将 markdown 原始文本字符数组解析为一颗语法树。
+// Parse 会将 markdown 原始文本字节数组解析为一颗语法树。
 func Parse(name string, markdown []byte, options *Options) (tree *Tree, err error) {
 	defer util.RecoverPanic(&err)
 

@@ -72,7 +72,7 @@ func New(opts ...Option) (ret *Lute) {
 	return ret
 }
 
-// Markdown 将 markdown 文本字符数组处理为相应的 html 字符数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
+// Markdown 将 markdown 文本字节数组处理为相应的 html 字节数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error) {
 	var tree *parse.Tree
 	tree, err = parse.Parse(name, markdown, lute.Options)
@@ -102,7 +102,7 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
 	return
 }
 
-// Format 将 markdown 文本字符数组进行格式化。
+// Format 将 markdown 文本字节数组进行格式化。
 func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err error) {
 	var tree *parse.Tree
 	tree, err = parse.Parse(name, markdown, lute.Options)
