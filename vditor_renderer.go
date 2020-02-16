@@ -401,7 +401,7 @@ func (r *VditorRenderer) renderHTML(node *Node, entering bool) WalkStatus {
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *Node, entering bool) WalkStatus {
-	if bytes.Equal(node.Tokens, []byte("<br />")) && node.parentIs(NodeTableCell) {
+	if bytes.Equal(node.Tokens, []byte("<br />")) && node.ParentIs(NodeTableCell) {
 		r.write(node.Tokens)
 		return WalkStop
 	}

@@ -12,14 +12,14 @@ package lute
 
 import "bytes"
 
-func (p *Node) paragraphContinue(context *Context) int {
+func (p *Node) ParagraphContinue(context *Context) int {
 	if context.blank {
 		return 1
 	}
 	return 0
 }
 
-func (p *Node) paragraphFinalize(context *Context) {
+func (p *Node) ParagraphFinalize(context *Context) {
 	p.Tokens = trimWhitespace(p.Tokens)
 
 	// 尝试解析链接引用定义

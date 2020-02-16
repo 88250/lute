@@ -12,7 +12,7 @@ package lute
 
 import "bytes"
 
-func (mathBlock *Node) mathBlockContinue(context *Context) int {
+func (mathBlock *Node) MathBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 
@@ -37,7 +37,7 @@ func (mathBlock *Node) mathBlockContinue(context *Context) int {
 
 var mathBlockMarker = strToBytes("$$")
 
-func (mathBlock *Node) mathBlockFinalize(context *Context) {
+func (mathBlock *Node) MathBlockFinalize(context *Context) {
 	tokens := mathBlock.Tokens[2:] // 剔除开头的两个 $$
 	tokens = trimWhitespace(tokens)
 	if bytes.HasSuffix(tokens, mathBlockMarker) {

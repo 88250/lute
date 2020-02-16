@@ -102,20 +102,20 @@ func (n *Node) TokensStr() string {
 	return bytesToStr(n.Tokens)
 }
 
-// lastDeepestChild 返回 n 的最后一个最深子节点。
-func (n *Node) lastDeepestChild() (ret *Node) {
+// LastDeepestChild 返回 n 的最后一个最深子节点。
+func (n *Node) LastDeepestChild() (ret *Node) {
 	if nil == n.LastChild {
 		return n
 	}
-	return n.LastChild.lastDeepestChild()
+	return n.LastChild.LastDeepestChild()
 }
 
-// firstDeepestChild 返回 n 的第一个最深的子节点。
-func (n *Node) firstDeepestChild() (ret *Node) {
+// FirstDeepestChild 返回 n 的第一个最深的子节点。
+func (n *Node) FirstDeepestChild() (ret *Node) {
 	if nil == n.FirstChild {
 		return n
 	}
-	return n.FirstChild.firstDeepestChild()
+	return n.FirstChild.FirstDeepestChild()
 }
 
 // LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。
@@ -157,15 +157,15 @@ func (n *Node) PreviousNodeText() string {
 func (n *Node) Finalize(context *Context) {
 	switch n.Type {
 	case NodeCodeBlock:
-		n.codeBlockFinalize(context)
+		n.CodeBlockFinalize(context)
 	case NodeHTMLBlock:
-		n.htmlBlockFinalize(context)
+		n.HtmlBlockFinalize(context)
 	case NodeParagraph:
-		n.paragraphFinalize(context)
+		n.ParagraphFinalize(context)
 	case NodeMathBlock:
-		n.mathBlockFinalize(context)
+		n.MathBlockFinalize(context)
 	case NodeList:
-		n.listFinalize(context)
+		n.ListFinalize(context)
 	}
 }
 
@@ -174,19 +174,19 @@ func (n *Node) Finalize(context *Context) {
 func (n *Node) Continue(context *Context) int {
 	switch n.Type {
 	case NodeCodeBlock:
-		return n.codeBlockContinue(context)
+		return n.CodeBlockContinue(context)
 	case NodeHTMLBlock:
-		return n.htmlBlockContinue(context)
+		return n.HtmlBlockContinue(context)
 	case NodeParagraph:
-		return n.paragraphContinue(context)
+		return n.ParagraphContinue(context)
 	case NodeListItem:
-		return n.listItemContinue(context)
+		return n.ListItemContinue(context)
 	case NodeBlockquote:
-		return n.blockquoteContinue(context)
+		return n.BlockquoteContinue(context)
 	case NodeMathBlock:
-		return n.mathBlockContinue(context)
+		return n.MathBlockContinue(context)
 	case NodeFootnotesDef:
-		return n.footnotesContinue(context)
+		return n.FootnotesContinue(context)
 	case NodeHeading, NodeThematicBreak:
 		return 1
 	}
@@ -310,19 +310,7 @@ func (n *Node) List() (ret []*Node) {
 	return
 }
 
-// isMarker 判断 n 是否是排版类（比如强调加粗）标记节点。
-func (n *Node) isMarker() bool {
-	switch n.Type {
-	case NodeEmA6kOpenMarker, NodeEmA6kCloseMarker, NodeEmU8eOpenMarker, NodeEmU8eCloseMarker,
-		NodeStrongA6kOpenMarker, NodeStrongA6kCloseMarker, NodeStrongU8eOpenMarker, NodeStrongU8eCloseMarker,
-		NodeStrikethrough1OpenMarker, NodeStrikethrough1CloseMarker, NodeStrikethrough2OpenMarker, NodeStrikethrough2CloseMarker:
-		// TODO: 判断节点是否是标记节点
-		return true
-	}
-	return false
-}
-
-func (n *Node) parentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
+func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 	types := append(nodeTypes, nodeType)
 	for p := n.Parent; nil != p; p = p.Parent {
 		for _, pt := range types {

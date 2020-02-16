@@ -12,14 +12,14 @@ package lute
 
 import "bytes"
 
-func (html *Node) htmlBlockContinue(context *Context) int {
+func (html *Node) HtmlBlockContinue(context *Context) int {
 	if context.blank && (html.HtmlBlockType == 6 || html.HtmlBlockType == 7) {
 		return 1
 	}
 	return 0
 }
 
-func (html *Node) htmlBlockFinalize(context *Context) {
+func (html *Node) HtmlBlockFinalize(context *Context) {
 	_, html.Tokens = trimRight(replaceNewlineSpace(html.Tokens))
 }
 

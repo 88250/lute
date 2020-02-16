@@ -12,7 +12,7 @@ package lute
 
 import "bytes"
 
-func (footnotesDef *Node) footnotesContinue(context *Context) int {
+func (footnotesDef *Node) FootnotesContinue(context *Context) int {
 	if context.blank {
 		return 0
 	}

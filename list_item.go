@@ -10,7 +10,7 @@
 
 package lute
 
-func (listItem *Node) listItemContinue(context *Context) int {
+func (listItem *Node) ListItemContinue(context *Context) int {
 	if context.blank {
 		if nil == listItem.FirstChild { // 列表项后面是空的
 			return 1

@@ -12,7 +12,7 @@ package lute
 
 import "bytes"
 
-func (codeBlock *Node) codeBlockContinue(context *Context) int {
+func (codeBlock *Node) CodeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 	if codeBlock.IsFencedCodeBlock {
@@ -45,7 +45,7 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	return 0
 }
 
-func (codeBlock *Node) codeBlockFinalize(context *Context) {
+func (codeBlock *Node) CodeBlockFinalize(context *Context) {
 	if codeBlock.IsFencedCodeBlock {
 		content := codeBlock.Tokens
 		length := len(content)

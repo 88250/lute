@@ -159,7 +159,7 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 		tree.Root = &Node{Type: NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := lute.newHTMLRenderer(tree)
-		lc := tree.Root.lastDeepestChild()
+		lc := tree.Root.LastDeepestChild()
 		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
 			ref := def.FootnotesRefs[i]
 			gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
