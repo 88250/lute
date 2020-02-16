@@ -17,7 +17,7 @@ type Lexer struct {
 	input  []byte // 输入的文本字节数组
 	length int    // 输入的文本字节数组的长度
 	offset int    // 当前读取字节位置
-	width  int    // 最新一个 token 的宽度（字节数）
+	width  int    // 最新一个字符的长度（字节数）
 }
 
 // NewLexer 创建一个词法分析器。
