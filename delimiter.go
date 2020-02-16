@@ -40,7 +40,7 @@ func (t *Tree) handleDelim(block *Node, ctx *InlineContext) {
 	delim := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
-	node := &Node{typ: NodeText, tokens: text}
+	node := &Node{Type: NodeText, Tokens: text}
 	block.AppendChild(node)
 
 	// 将这个分隔符入栈
@@ -127,53 +127,53 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			opener.num -= useDelims
 			closer.num -= useDelims
 
-			openerTokens := openerInl.tokens[len(openerInl.tokens)-useDelims:]
-			text := openerInl.tokens[0 : len(openerInl.tokens)-useDelims]
-			openerInl.tokens = text
-			closerTokens := closerInl.tokens[len(closerInl.tokens)-useDelims:]
-			text = closerInl.tokens[0 : len(closerInl.tokens)-useDelims]
-			closerInl.tokens = text
+			openerTokens := openerInl.Tokens[len(openerInl.Tokens)-useDelims:]
+			text := openerInl.Tokens[0 : len(openerInl.Tokens)-useDelims]
+			openerInl.Tokens = text
+			closerTokens := closerInl.Tokens[len(closerInl.Tokens)-useDelims:]
+			text = closerInl.Tokens[0 : len(closerInl.Tokens)-useDelims]
+			closerInl.Tokens = text
 
-			openMarker := &Node{tokens: openerTokens, close: true}
-			emStrongDel := &Node{close: true}
-			closeMarker := &Node{tokens: closerTokens, close: true}
+			openMarker := &Node{Tokens: openerTokens, Close: true}
+			emStrongDel := &Node{Close: true}
+			closeMarker := &Node{Tokens: closerTokens, Close: true}
 			if 1 == useDelims {
 				if itemAsterisk == closercc {
-					emStrongDel.typ = NodeEmphasis
-					openMarker.typ = NodeEmA6kOpenMarker
-					closeMarker.typ = NodeEmA6kCloseMarker
+					emStrongDel.Type = NodeEmphasis
+					openMarker.Type = NodeEmA6kOpenMarker
+					closeMarker.Type = NodeEmA6kCloseMarker
 				} else if itemUnderscore == closercc {
-					emStrongDel.typ = NodeEmphasis
-					openMarker.typ = NodeEmU8eOpenMarker
-					closeMarker.typ = NodeEmU8eCloseMarker
+					emStrongDel.Type = NodeEmphasis
+					openMarker.Type = NodeEmU8eOpenMarker
+					closeMarker.Type = NodeEmU8eCloseMarker
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel.typ = NodeStrikethrough
-						openMarker.typ = NodeStrikethrough1OpenMarker
-						closeMarker.typ = NodeStrikethrough1CloseMarker
+						emStrongDel.Type = NodeStrikethrough
+						openMarker.Type = NodeStrikethrough1OpenMarker
+						closeMarker.Type = NodeStrikethrough1CloseMarker
 					}
 				}
 			} else {
 				if itemAsterisk == closercc {
-					emStrongDel.typ = NodeStrong
-					openMarker.typ = NodeStrongA6kOpenMarker
-					closeMarker.typ = NodeStrongA6kCloseMarker
+					emStrongDel.Type = NodeStrong
+					openMarker.Type = NodeStrongA6kOpenMarker
+					closeMarker.Type = NodeStrongA6kCloseMarker
 				} else if itemUnderscore == closercc {
-					emStrongDel.typ = NodeStrong
-					openMarker.typ = NodeStrongU8eOpenMarker
-					closeMarker.typ = NodeStrongU8eCloseMarker
+					emStrongDel.Type = NodeStrong
+					openMarker.Type = NodeStrongU8eOpenMarker
+					closeMarker.Type = NodeStrongU8eCloseMarker
 				} else if itemTilde == closercc {
 					if t.context.option.GFMStrikethrough {
-						emStrongDel.typ = NodeStrikethrough
-						openMarker.typ = NodeStrikethrough2OpenMarker
-						closeMarker.typ = NodeStrikethrough2CloseMarker
+						emStrongDel.Type = NodeStrikethrough
+						openMarker.Type = NodeStrikethrough2OpenMarker
+						closeMarker.Type = NodeStrikethrough2CloseMarker
 					}
 				}
 			}
 
-			tmp := openerInl.next
+			tmp := openerInl.Next
 			for nil != tmp && tmp != closerInl {
-				next := tmp.next
+				next := tmp.Next
 				tmp.Unlink()
 				emStrongDel.AppendChild(tmp)
 				tmp = next

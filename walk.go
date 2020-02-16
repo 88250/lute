@@ -38,7 +38,7 @@ func Walk(n *Node, walker Walker) {
 
 	if status != WalkSkipChildren {
 		// 递归遍历子节点
-		for c := n.firstChild; nil != c; c = c.next {
+		for c := n.FirstChild; nil != c; c = c.Next {
 			Walk(c, walker)
 		}
 	}

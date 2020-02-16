@@ -55,16 +55,16 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 	r.writer.Grow(4096)
 
 	Walk(r.tree.Root, func(n *Node, entering bool) WalkStatus {
-		extRender := r.extRendererFuncs[n.typ]
+		extRender := r.extRendererFuncs[n.Type]
 		if nil != extRender {
 			output, status := extRender(n, entering)
 			r.writeString(output)
 			return status
 		}
 
-		render := r.rendererFuncs[n.typ]
+		render := r.rendererFuncs[n.Type]
 		if nil == render {
-			render = r.rendererFuncs[n.typ]
+			render = r.rendererFuncs[n.Type]
 			if nil == render {
 				if nil != r.defaultRendererFunc {
 					return r.defaultRendererFunc(n, entering)
@@ -88,7 +88,7 @@ func (r *BaseRenderer) RendererFuncs(nodeType NodeType) RendererFunc {
 }
 
 func (r *BaseRenderer) renderDefault(n *Node, entering bool) WalkStatus {
-	r.writeString("not found render function for node [type=" + n.typ.String() + ", tokens=" + bytesToStr(n.tokens) + "]")
+	r.writeString("not found render function for node [type=" + n.Type.String() + ", Tokens=" + bytesToStr(n.Tokens) + "]")
 	return WalkContinue
 }
 
@@ -106,7 +106,7 @@ func (r *BaseRenderer) writeBytes(bytes []byte) {
 	}
 }
 
-// write 输出指定的 tokens 数组 content。
+// write 输出指定的 Tokens 数组 content。
 func (r *BaseRenderer) write(content []byte) {
 	if length := len(content); 0 < length {
 		r.writer.Write(content)

@@ -13,7 +13,7 @@ package lute
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens
 	startPos := ctx.pos
-	ret = &Node{typ: NodeText, tokens: []byte{tokens[ctx.pos]}}
+	ret = &Node{Type: NodeText, Tokens: []byte{tokens[ctx.pos]}}
 	if 3 > ctx.tokensLen || ctx.tokensLen <= startPos+1 {
 		ctx.pos++
 		return
@@ -50,25 +50,25 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 		tags = append(tags, comment...)
 		tokens = remains
 		ctx.pos += len(tags)
-		ret = &Node{typ: NodeInlineHTML, tokens: tags}
+		ret = &Node{Type: NodeInlineHTML, Tokens: tags}
 		return
 	} else if valid, remains, ins := t.parseProcessingInstruction(tokens[ctx.pos+1:]); valid {
 		tags = append(tags, ins...)
 		tokens = remains
 		ctx.pos += len(tags)
-		ret = &Node{typ: NodeInlineHTML, tokens: tags}
+		ret = &Node{Type: NodeInlineHTML, Tokens: tags}
 		return
 	} else if valid, remains, decl := t.parseDeclaration(tokens[ctx.pos+1:]); valid {
 		tags = append(tags, decl...)
 		tokens = remains
 		ctx.pos += len(tags)
-		ret = &Node{typ: NodeInlineHTML, tokens: tags}
+		ret = &Node{Type: NodeInlineHTML, Tokens: tags}
 		return
 	} else if valid, remains, cdata := t.parseCDATA(tokens[ctx.pos+1:]); valid {
 		tags = append(tags, cdata...)
 		tokens = remains
 		ctx.pos += len(tags)
-		ret = &Node{typ: NodeInlineHTML, tokens: tags}
+		ret = &Node{Type: NodeInlineHTML, Tokens: tags}
 		return
 	} else {
 		ctx.pos++
@@ -90,7 +90,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *Node) {
 			tags = append(tags, tokens[1])
 		}
 		ctx.pos += len(tags)
-		ret = &Node{typ: NodeInlineHTML, tokens: tags}
+		ret = &Node{Type: NodeInlineHTML, Tokens: tags}
 		return
 	}
 

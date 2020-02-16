@@ -13,14 +13,14 @@ package lute
 // mergeText 合并 node 中所有（包括子节点）连续的文本节点。
 // 合并后顺便进行中文排版优化以及 GFM 自动邮件链接识别。
 func (t *Tree) mergeText(node *Node) {
-	for child := node.firstChild; nil != child; {
-		next := child.next
-		if NodeText == child.typ {
+	for child := node.FirstChild; nil != child; {
+		next := child.Next
+		if NodeText == child.Type {
 			// 逐个合并后续兄弟节点
-			for nil != next && NodeText == next.typ {
-				child.AppendTokens(next.tokens)
+			for nil != next && NodeText == next.Type {
+				child.AppendTokens(next.Tokens)
 				next.Unlink()
-				next = child.next
+				next = child.Next
 			}
 		} else {
 			t.mergeText(child) // 递归处理子节点

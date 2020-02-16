@@ -16,12 +16,12 @@ func (t *Tree) parseBang(ctx *InlineContext) (ret *Node) {
 	ctx.pos++
 	if ctx.pos < ctx.tokensLen && itemOpenBracket == ctx.tokens[ctx.pos] {
 		ctx.pos++
-		ret = &Node{typ: NodeText, tokens: ctx.tokens[startPos:ctx.pos]}
+		ret = &Node{Type: NodeText, Tokens: ctx.tokens[startPos:ctx.pos]}
 		// 将图片开始标记符入栈
 		t.addBracket(ret, startPos+2, true, ctx)
 		return
 	}
 
-	ret = &Node{typ: NodeText, tokens: ctx.tokens[startPos:ctx.pos]}
+	ret = &Node{Type: NodeText, Tokens: ctx.tokens[startPos:ctx.pos]}
 	return
 }

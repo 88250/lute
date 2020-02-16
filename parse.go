@@ -17,7 +17,7 @@ func (lute *Lute) parse(name string, markdown []byte) (tree *Tree, err error) {
 	tree = &Tree{Name: name, context: &Context{option: lute.options}}
 	tree.context.tree = tree
 	tree.lexer = newLexer(markdown)
-	tree.Root = &Node{typ: NodeDocument}
+	tree.Root = &Node{Type: NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
@@ -44,8 +44,8 @@ type Context struct {
 
 // InlineContext 描述了行级元素解析上下文。
 type InlineContext struct {
-	tokens     []byte     // 当前解析的 tokens
-	tokensLen  int        // 当前解析的 tokens 长度
+	tokens     []byte     // 当前解析的 Tokens
+	tokensLen  int        // 当前解析的 Tokens 长度
 	pos        int        // 当前解析到的 token 位置
 	lineNum    int        // 当前解析的起始行号
 	columnNum  int        // 当前解析的起始列号
@@ -124,7 +124,7 @@ func (context *Context) findNextNonspace() {
 func (context *Context) closeUnmatchedBlocks() {
 	if !context.allClosed {
 		for context.oldtip != context.lastMatchedContainer {
-			parent := context.oldtip.parent
+			parent := context.oldtip.Parent
 			context.finalize(context.oldtip, context.lineNum-1)
 			context.oldtip = parent
 		}
@@ -134,15 +134,15 @@ func (context *Context) closeUnmatchedBlocks() {
 
 // finalize 执行 block 的最终化处理。调用该方法会将 context.tip 置为 block 的父节点。
 func (context *Context) finalize(block *Node, lineNum int) {
-	var parent = block.parent
-	block.close = true
+	var parent = block.Parent
+	block.Close = true
 	block.Finalize(context)
 	context.tip = parent
 }
 
 // addChildMarker 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.tip 上。
 func (context *Context) addChildMarker(nodeType NodeType, tokens []byte) (ret *Node) {
-	ret = &Node{typ: nodeType, tokens: tokens, close: true}
+	ret = &Node{Type: nodeType, Tokens: tokens, Close: true}
 	context.tip.AppendChild(ret)
 	return ret
 }
@@ -154,17 +154,17 @@ func (context *Context) addChild(nodeType NodeType, offset int) (ret *Node) {
 		context.finalize(context.tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
-	ret = &Node{typ: nodeType}
+	ret = &Node{Type: nodeType}
 	context.tip.AppendChild(ret)
 	context.tip = ret
 	return ret
 }
 
 // listsMatch 用户判断指定的 listData 和 itemData 是否可归属于同一个列表。
-func (context *Context) listsMatch(listData, itemData *listData) bool {
-	return listData.typ == itemData.typ &&
-		((0 == listData.delimiter && 0 == itemData.delimiter) || listData.delimiter == itemData.delimiter) &&
-		listData.bulletChar == itemData.bulletChar
+func (context *Context) listsMatch(listData, itemData *ListData) bool {
+	return listData.Typ == itemData.Typ &&
+		((0 == listData.Delimiter && 0 == itemData.Delimiter) || listData.Delimiter == itemData.Delimiter) &&
+		listData.BulletChar == itemData.BulletChar
 }
 
 // Tree 描述了 Markdown 抽象语法树结构。

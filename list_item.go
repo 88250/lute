@@ -12,13 +12,13 @@ package lute
 
 func (listItem *Node) listItemContinue(context *Context) int {
 	if context.blank {
-		if nil == listItem.firstChild { // 列表项后面是空的
+		if nil == listItem.FirstChild { // 列表项后面是空的
 			return 1
 		}
 
 		context.advanceNextNonspace()
-	} else if context.indent >= listItem.markerOffset+listItem.padding {
-		context.advanceOffset(listItem.markerOffset+listItem.padding, true)
+	} else if context.indent >= listItem.MarkerOffset+listItem.Padding {
+		context.advanceOffset(listItem.MarkerOffset+listItem.Padding, true)
 	} else {
 		return 1
 	}

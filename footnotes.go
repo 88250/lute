@@ -27,7 +27,7 @@ func (footnotesDef *Node) footnotesContinue(context *Context) int {
 
 func (context *Context) findFootnotesDef(label []byte) (int, *Node) {
 	for i, n := range context.footnotesDefs {
-		if bytes.EqualFold(label, n.tokens) {
+		if bytes.EqualFold(label, n.Tokens) {
 			return i + 1, n
 		}
 	}

@@ -13,14 +13,14 @@ package lute
 import "bytes"
 
 func (html *Node) htmlBlockContinue(context *Context) int {
-	if context.blank && (html.htmlBlockType == 6 || html.htmlBlockType == 7) {
+	if context.blank && (html.HtmlBlockType == 6 || html.HtmlBlockType == 7) {
 		return 1
 	}
 	return 0
 }
 
 func (html *Node) htmlBlockFinalize(context *Context) {
-	_, html.tokens = trimRight(replaceNewlineSpace(html.tokens))
+	_, html.Tokens = trimRight(replaceNewlineSpace(html.Tokens))
 }
 
 var (
@@ -100,12 +100,12 @@ func (t *Tree) parseHTML(tokens []byte) (typ int) {
 
 	tag := trimWhitespace(tokens)
 	isOpenTag := t.isOpenTag(tag)
-	if isOpenTag && t.context.tip.typ != NodeParagraph {
+	if isOpenTag && t.context.tip.Type != NodeParagraph {
 		typ = 7
 		return
 	}
 	isCloseTag := t.isCloseTag(tag)
-	if isCloseTag && t.context.tip.typ != NodeParagraph {
+	if isCloseTag && t.context.tip.Type != NodeParagraph {
 		typ = 7
 		return
 	}

@@ -13,132 +13,115 @@ package lute
 // Node 描述了节点结构。
 type Node struct {
 	// 不用接口实现的原因：
-	//   1. 转换节点类型非常方便，只需修改 typ 属性
+	//   1. 转换节点类型非常方便，只需修改 Type 属性
 	//   2. 为了极致的性能而牺牲扩展性
 
 	// 节点基础结构
 
-	typ        NodeType // 节点类型
-	parent     *Node    // 父节点
-	previous   *Node    // 前一个兄弟节点
-	next       *Node    // 后一个兄弟节点
-	firstChild *Node    // 第一个子节点
-	lastChild  *Node    // 最后一个子节点
-	tokens     []byte   // 词法分析结果 tokens，语法分析阶段会继续操作这些 tokens
+	Type       NodeType // 节点类型
+	Parent     *Node    // 父节点
+	Previous   *Node    // 前一个兄弟节点
+	Next       *Node    // 后一个兄弟节点
+	FirstChild *Node    // 第一个子节点
+	LastChild  *Node    // 最后一个子节点
+	Tokens     []byte   // 词法分析结果 Tokens，语法分析阶段会继续操作这些 Tokens
 
 	// 解析过程标识
 
-	close           bool // 标识是否关闭
-	lastLineBlank   bool // 标识最后一行是否是空行
-	lastLineChecked bool // 标识最后一行是否检查过
+	Close           bool // 标识是否关闭
+	LastLineBlank   bool // 标识最后一行是否是空行
+	LastLineChecked bool // 标识最后一行是否检查过
 
 	// 代码
 
-	codeMarkerLen int // ` 个数，1 或 2
+	CodeMarkerLen int // ` 个数，1 或 2
 
 	// 代码块
 
-	isFencedCodeBlock    bool
-	codeBlockFenceChar   byte
-	codeBlockFenceLen    int
-	codeBlockFenceOffset int
-	codeBlockOpenFence   []byte
-	codeBlockInfo        []byte
-	codeBlockCloseFence  []byte
+	IsFencedCodeBlock    bool
+	CodeBlockFenceChar   byte
+	CodeBlockFenceLen    int
+	CodeBlockFenceOffset int
+	CodeBlockOpenFence   []byte
+	CodeBlockInfo        []byte
+	CodeBlockCloseFence  []byte
 
 	// HTML 块
 
-	htmlBlockType int // 规范中定义的 HTML 块类型（1-7）
+	HtmlBlockType int // 规范中定义的 HTML 块类型（1-7）
 
 	// 列表、列表项
 
-	*listData
+	*ListData
 
 	// 任务列表项 [ ]、[x] 或者 [X]
 
-	taskListItemChecked bool // 是否勾选
+	TaskListItemChecked bool // 是否勾选
 
 	// 表
 
-	tableAligns              []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
-	tableCellAlign           int   // 表的单元格对齐方式
-	tableCellContentWidth    int   // 表的单元格内容宽度（字符数）
-	tableCellContentMaxWidth int   // 表的单元格内容最大宽度
+	TableAligns              []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
+	TableCellAlign           int   // 表的单元格对齐方式
+	TableCellContentWidth    int   // 表的单元格内容宽度（字符数）
+	TableCellContentMaxWidth int   // 表的单元格内容最大宽度
 
 	// 链接
 
-	linkType int // 链接类型，0：内联链接 [foo](/bar)，1：链接引用 [label]，2：自动链接
+	LinkType int // 链接类型，0：内联链接 [foo](/bar)，1：链接引用 [label]，2：自动链接
 
 	// 标题
 
-	headingLevel int // 1~6
+	HeadingLevel int // 1~6
 
 	// 数学公式块
 
-	mathBlockDollarOffset int
+	MathBlockDollarOffset int
 
 	// 脚注
 
-	footnotesRefId string // 脚注 id
-
-	footnotesRefs []*Node // 脚注引用
+	FootnotesRefId string  // 脚注 id
+	FootnotesRefs  []*Node // 脚注引用
 }
 
-// Type 返回 n 的类型。
-func (n *Node) Type() NodeType {
-	return n.typ
+// ListData 用于记录列表或列表项节点的附加信息。
+type ListData struct {
+	Typ          int    // 0：无序列表，1：有序列表，3：任务列表
+	Tight        bool   // 是否是紧凑模式
+	BulletChar   byte   // 无序列表标识，* - 或者 +
+	Start        int    // 有序列表起始序号
+	Delimiter    byte   // 有序列表分隔符，. 或者 )
+	Padding      int    // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
+	MarkerOffset int    // 标识符（* - + 或者 1 2 3）相对缩进空格数
+	Checked      bool   // 任务列表项是否勾选
+	Marker       []byte // 列表标识符
+	Num          int    // 有序列表项修正过的序号
 }
 
-// Parent 返回 n 的父节点类型。
-func (n *Node) Parent() *Node {
-	return n.parent
-}
-
-// Previous 返回 n 的上一个兄弟节点。
-func (n *Node) Previous() *Node {
-	return n.previous
-}
-
-// Next 返回 n 的下一个兄弟节点。
-func (n *Node) Next() *Node {
-	return n.next
-}
-
-// FirstChild 返回 n 的第一个子节点。
-func (n *Node) FirstChild() *Node {
-	return n.firstChild
-}
-
-// LastChild 返回 n 的最后一个子节点。
-func (n *Node) LastChild() *Node {
-	return n.lastChild
-}
-
-// TokensStr 返回 n 的 tokens 字符串。
+// TokensStr 返回 n 的 Tokens 字符串。
 func (n *Node) TokensStr() string {
-	return bytesToStr(n.tokens)
+	return bytesToStr(n.Tokens)
 }
 
 // lastDeepestChild 返回 n 的最后一个最深子节点。
 func (n *Node) lastDeepestChild() (ret *Node) {
-	if nil == n.lastChild {
+	if nil == n.LastChild {
 		return n
 	}
-	return n.lastChild.lastDeepestChild()
+	return n.LastChild.lastDeepestChild()
 }
 
 // firstDeepestChild 返回 n 的第一个最深的子节点。
 func (n *Node) firstDeepestChild() (ret *Node) {
-	if nil == n.firstChild {
+	if nil == n.FirstChild {
 		return n
 	}
-	return n.firstChild.firstDeepestChild()
+	return n.FirstChild.firstDeepestChild()
 }
 
 // LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。
 func (n *Node) ChildByType(childType NodeType) *Node {
-	for c := n.firstChild; nil != c; c = c.next {
-		if c.typ == childType {
+	for c := n.FirstChild; nil != c; c = c.Next {
+		if c.Type == childType {
 			return c
 		}
 	}
@@ -148,8 +131,8 @@ func (n *Node) ChildByType(childType NodeType) *Node {
 // Text 返回 n 及其文本子节点的文本值。
 func (n *Node) Text() (ret string) {
 	Walk(n, func(n *Node, entering bool) WalkStatus {
-		if (NodeText == n.typ || NodeLinkText == n.typ) && entering {
-			ret += bytesToStr(n.tokens)
+		if (NodeText == n.Type || NodeLinkText == n.Type) && entering {
+			ret += bytesToStr(n.Tokens)
 		}
 		return WalkContinue
 	})
@@ -157,22 +140,22 @@ func (n *Node) Text() (ret string) {
 }
 
 func (n *Node) NextNodeText() string {
-	if nil == n.next {
+	if nil == n.Next {
 		return ""
 	}
-	return n.next.Text()
+	return n.Next.Text()
 }
 
 func (n *Node) PreviousNodeText() string {
-	if nil == n.previous {
+	if nil == n.Previous {
 		return ""
 	}
-	return n.previous.Text()
+	return n.Previous.Text()
 }
 
 // Finalize 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
 func (n *Node) Finalize(context *Context) {
-	switch n.typ {
+	switch n.Type {
 	case NodeCodeBlock:
 		n.codeBlockFinalize(context)
 	case NodeHTMLBlock:
@@ -189,7 +172,7 @@ func (n *Node) Finalize(context *Context) {
 // Continue 判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。
 // 如果可以继续处理返回 0，如果不能接续处理返回 1，如果返回 2（仅在围栏代码块闭合时）则说明可以继续下一行处理了。
 func (n *Node) Continue(context *Context) int {
-	switch n.typ {
+	switch n.Type {
 	case NodeCodeBlock:
 		return n.codeBlockContinue(context)
 	case NodeHTMLBlock:
@@ -213,7 +196,7 @@ func (n *Node) Continue(context *Context) int {
 
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
-	switch n.typ {
+	switch n.Type {
 	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock:
 		return true
 	}
@@ -223,7 +206,7 @@ func (n *Node) AcceptLines() bool {
 // CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（块级容器）只能包含列表项节点，
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
-	switch n.typ {
+	switch n.Type {
 	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock:
 		return false
 	case NodeList:
@@ -237,81 +220,81 @@ func (n *Node) CanContain(nodeType NodeType) bool {
 
 // Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
 func (n *Node) Unlink() {
-	if nil != n.previous {
-		n.previous.next = n.next
-	} else if nil != n.parent {
-		n.parent.firstChild = n.next
+	if nil != n.Previous {
+		n.Previous.Next = n.Next
+	} else if nil != n.Parent {
+		n.Parent.FirstChild = n.Next
 	}
-	if nil != n.next {
-		n.next.previous = n.previous
-	} else if nil != n.parent {
-		n.parent.lastChild = n.previous
+	if nil != n.Next {
+		n.Next.Previous = n.Previous
+	} else if nil != n.Parent {
+		n.Parent.LastChild = n.Previous
 	}
-	n.parent = nil
-	n.next = nil
-	n.previous = nil
+	n.Parent = nil
+	n.Next = nil
+	n.Previous = nil
 }
 
-// AppendTokens 添加 tokens。
+// AppendTokens 添加 Tokens。
 func (n *Node) AppendTokens(tokens []byte) {
-	n.tokens = append(n.tokens, tokens...)
+	n.Tokens = append(n.Tokens, tokens...)
 }
 
 // InsertAfter 在当前节点后插入一个兄弟节点。
 func (n *Node) InsertAfter(sibling *Node) {
 	sibling.Unlink()
-	sibling.next = n.next
-	if nil != sibling.next {
-		sibling.next.previous = sibling
+	sibling.Next = n.Next
+	if nil != sibling.Next {
+		sibling.Next.Previous = sibling
 	}
-	sibling.previous = n
-	n.next = sibling
-	sibling.parent = n.parent
-	if nil == sibling.next {
-		sibling.parent.lastChild = sibling
+	sibling.Previous = n
+	n.Next = sibling
+	sibling.Parent = n.Parent
+	if nil == sibling.Next {
+		sibling.Parent.LastChild = sibling
 	}
 }
 
 // InsertBefore 在当前节点前插入一个兄弟节点。
 func (n *Node) InsertBefore(sibling *Node) {
 	sibling.Unlink()
-	sibling.previous = n.previous
-	if nil != sibling.previous {
-		sibling.previous.next = sibling
+	sibling.Previous = n.Previous
+	if nil != sibling.Previous {
+		sibling.Previous.Next = sibling
 	}
-	sibling.next = n
-	n.previous = sibling
-	sibling.parent = n.parent
-	if nil == sibling.previous {
-		sibling.parent.firstChild = sibling
+	sibling.Next = n
+	n.Previous = sibling
+	sibling.Parent = n.Parent
+	if nil == sibling.Previous {
+		sibling.Parent.FirstChild = sibling
 	}
 }
 
 // AppendChild 在 n 的子节点最后再添加一个子节点。
 func (n *Node) AppendChild(child *Node) {
 	child.Unlink()
-	child.parent = n
-	if nil != n.lastChild {
-		n.lastChild.next = child
-		child.previous = n.lastChild
-		n.lastChild = child
+	child.Parent = n
+	if nil != n.LastChild {
+		n.LastChild.Next = child
+		child.Previous = n.LastChild
+		n.LastChild = child
 	} else {
-		n.firstChild = child
-		n.lastChild = child
+		n.FirstChild = child
+		n.LastChild = child
 	}
 }
 
 // PrependChild 在 n 的子节点最前添加一个子节点。
 func (n *Node) PrependChild(child *Node) {
 	child.Unlink()
-	child.parent = n
-	if nil != n.firstChild {
-		n.firstChild.previous = child
-		child.next = n.firstChild
-		n.firstChild = child
+	child.Parent = n
+	if nil != n.FirstChild {
+		n.FirstChild.Previous = child
+		child.Next = n.FirstChild
+		n.FirstChild = child
 	} else {
-		n.firstChild = child
-		n.lastChild = child
+		n.FirstChild = child
+		n.LastChild = child
 	}
 }
 
@@ -329,7 +312,7 @@ func (n *Node) List() (ret []*Node) {
 
 // isMarker 判断 n 是否是排版类（比如强调加粗）标记节点。
 func (n *Node) isMarker() bool {
-	switch n.typ {
+	switch n.Type {
 	case NodeEmA6kOpenMarker, NodeEmA6kCloseMarker, NodeEmU8eOpenMarker, NodeEmU8eCloseMarker,
 		NodeStrongA6kOpenMarker, NodeStrongA6kCloseMarker, NodeStrongU8eOpenMarker, NodeStrongU8eCloseMarker,
 		NodeStrikethrough1OpenMarker, NodeStrikethrough1CloseMarker, NodeStrikethrough2OpenMarker, NodeStrikethrough2CloseMarker:
@@ -341,9 +324,9 @@ func (n *Node) isMarker() bool {
 
 func (n *Node) parentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 	types := append(nodeTypes, nodeType)
-	for p := n.parent; nil != p; p = p.parent {
+	for p := n.Parent; nil != p; p = p.Parent {
 		for _, pt := range types {
-			if pt == p.typ {
+			if pt == p.Type {
 				return true
 			}
 		}

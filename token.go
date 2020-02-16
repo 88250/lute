@@ -62,7 +62,7 @@ func isControl(token byte) bool {
 	return unicode.IsControl(rune(token))
 }
 
-// isBlank 判断 tokens 是否都为空格。
+// isBlank 判断 Tokens 是否都为空格。
 func isBlank(tokens []byte) bool {
 	for _, token := range tokens {
 		if itemSpace != token {
@@ -127,7 +127,7 @@ func split(tokens []byte, separator byte) (ret [][]byte) {
 	return
 }
 
-// splitWithoutBackslashEscape 使用 separator 作为分隔符将 tokens 切分为多个子串，被反斜杠 \ 转义的字符不会计入切分。
+// splitWithoutBackslashEscape 使用 separator 作为分隔符将 Tokens 切分为多个子串，被反斜杠 \ 转义的字符不会计入切分。
 func splitWithoutBackslashEscape(tokens []byte, separator byte) (ret [][]byte) {
 	length := len(tokens)
 	var i int
@@ -149,7 +149,7 @@ func splitWithoutBackslashEscape(tokens []byte, separator byte) (ret [][]byte) {
 	return
 }
 
-// replaceAll 会将 tokens 中的所有 old 使用 new 替换。
+// replaceAll 会将 Tokens 中的所有 old 使用 new 替换。
 func replaceAll(tokens []byte, old, new byte) []byte {
 	for i, token := range tokens {
 		if token == old {
@@ -159,7 +159,7 @@ func replaceAll(tokens []byte, old, new byte) []byte {
 	return tokens
 }
 
-// replaceNewlineSpace 会将 tokens 中的所有 "\n " 替换为 "\n"。
+// replaceNewlineSpace 会将 Tokens 中的所有 "\n " 替换为 "\n"。
 func replaceNewlineSpace(tokens []byte) []byte {
 	length := len(tokens)
 	var token byte
@@ -305,7 +305,7 @@ func splitWhitespace(tokens []byte) (ret [][]byte) {
 	return
 }
 
-// isBackslashEscapePunct 判断 tokens 中 pos 所指的值是否是由反斜杠 \ 转义的 ASCII 标点符号。
+// isBackslashEscapePunct 判断 Tokens 中 pos 所指的值是否是由反斜杠 \ 转义的 ASCII 标点符号。
 func isBackslashEscapePunct(tokens []byte, pos int) bool {
 	if !isASCIIPunct(tokens[pos]) {
 		return false

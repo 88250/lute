@@ -180,7 +180,7 @@ func (r *EChartsJSONRenderer) renderParagraph(node *Node, entering bool) WalkSta
 
 func (r *EChartsJSONRenderer) renderText(node *Node, entering bool) WalkStatus {
 	if entering {
-		text := bytesToStr(node.tokens)
+		text := bytesToStr(node.Tokens)
 		var i int
 		summary := ""
 		for _, r := range text {
@@ -244,7 +244,7 @@ func (r *EChartsJSONRenderer) renderBlockquote(node *Node, entering bool) WalkSt
 func (r *EChartsJSONRenderer) renderHeading(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
-		h := "h" + " 123456"[node.headingLevel:node.headingLevel+1]
+		h := "h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1]
 		r.val("Heading\n"+h, node)
 		r.openChildren(node)
 	} else {
@@ -258,7 +258,7 @@ func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
 		list := "ul"
-		if 1 == node.listData.typ || (3 == node.listData.typ && 0 == node.listData.bulletChar) {
+		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			list = "ol"
 		}
 		r.val("List\n"+list, node)
@@ -273,7 +273,7 @@ func (r *EChartsJSONRenderer) renderList(node *Node, entering bool) WalkStatus {
 func (r *EChartsJSONRenderer) renderListItem(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("List Item\nli "+bytesToStr(node.listData.marker), node)
+		r.val("List Item\nli "+bytesToStr(node.ListData.Marker), node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -286,7 +286,7 @@ func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *Node, entering bool
 	if entering {
 		r.openObj()
 		check := " "
-		if node.taskListItemChecked {
+		if node.TaskListItemChecked {
 			check = "X"
 		}
 		r.val("Task List Item Marker\n["+check+"]", node)
@@ -346,19 +346,19 @@ func (r *EChartsJSONRenderer) openObj() {
 
 func (r *EChartsJSONRenderer) closeObj(node *Node) {
 	r.writeByte('}')
-	if !r.ignore(node.next) {
+	if !r.ignore(node.Next) {
 		r.comma()
 	}
 }
 
 func (r *EChartsJSONRenderer) openChildren(node *Node) {
-	if nil != node.firstChild {
+	if nil != node.FirstChild {
 		r.writeString(",\"children\":[")
 	}
 }
 
 func (r *EChartsJSONRenderer) closeChildren(node *Node) {
-	if nil != node.firstChild {
+	if nil != node.FirstChild {
 		r.writeByte(']')
 	}
 }
@@ -370,13 +370,13 @@ func (r *EChartsJSONRenderer) comma() {
 func (r *EChartsJSONRenderer) ignore(node *Node) bool {
 	return nil == node ||
 		// 以下类型的节点不进行渲染，否则图画出来节点太多
-		NodeBlockquoteMarker == node.typ ||
-		NodeEmA6kOpenMarker == node.typ || NodeEmA6kCloseMarker == node.typ ||
-		NodeEmU8eOpenMarker == node.typ || NodeEmU8eCloseMarker == node.typ ||
-		NodeStrongA6kOpenMarker == node.typ || NodeStrongA6kCloseMarker == node.typ ||
-		NodeStrongU8eOpenMarker == node.typ || NodeStrongU8eCloseMarker == node.typ ||
-		NodeStrikethrough1OpenMarker == node.typ || NodeStrikethrough1CloseMarker == node.typ ||
-		NodeStrikethrough2OpenMarker == node.typ || NodeStrikethrough2CloseMarker == node.typ ||
-		NodeMathBlockOpenMarker == node.typ || NodeMathBlockContent == node.typ || NodeMathBlockCloseMarker == node.typ ||
-		NodeInlineMathOpenMarker == node.typ || NodeInlineMathContent == node.typ || NodeInlineMathCloseMarker == node.typ
+		NodeBlockquoteMarker == node.Type ||
+		NodeEmA6kOpenMarker == node.Type || NodeEmA6kCloseMarker == node.Type ||
+		NodeEmU8eOpenMarker == node.Type || NodeEmU8eCloseMarker == node.Type ||
+		NodeStrongA6kOpenMarker == node.Type || NodeStrongA6kCloseMarker == node.Type ||
+		NodeStrongU8eOpenMarker == node.Type || NodeStrongU8eCloseMarker == node.Type ||
+		NodeStrikethrough1OpenMarker == node.Type || NodeStrikethrough1CloseMarker == node.Type ||
+		NodeStrikethrough2OpenMarker == node.Type || NodeStrikethrough2CloseMarker == node.Type ||
+		NodeMathBlockOpenMarker == node.Type || NodeMathBlockContent == node.Type || NodeMathBlockCloseMarker == node.Type ||
+		NodeInlineMathOpenMarker == node.Type || NodeInlineMathContent == node.Type || NodeInlineMathCloseMarker == node.Type
 }

@@ -21,7 +21,7 @@ func (mathBlock *Node) mathBlockContinue(context *Context) int {
 		return 2
 	} else {
 		// 跳过 $ 之前可能存在的空格
-		var i = mathBlock.mathBlockDollarOffset
+		var i = mathBlock.MathBlockDollarOffset
 		var token byte
 		for i > 0 {
 			token = peek(ln, context.offset)
@@ -38,15 +38,15 @@ func (mathBlock *Node) mathBlockContinue(context *Context) int {
 var mathBlockMarker = strToBytes("$$")
 
 func (mathBlock *Node) mathBlockFinalize(context *Context) {
-	tokens := mathBlock.tokens[2:] // 剔除开头的两个 $$
+	tokens := mathBlock.Tokens[2:] // 剔除开头的两个 $$
 	tokens = trimWhitespace(tokens)
 	if bytes.HasSuffix(tokens, mathBlockMarker) {
 		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
 	}
-	mathBlock.tokens = nil
-	mathBlock.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
-	mathBlock.AppendChild(&Node{typ: NodeMathBlockContent, tokens: tokens})
-	mathBlock.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
+	mathBlock.Tokens = nil
+	mathBlock.AppendChild(&Node{Type: NodeMathBlockOpenMarker})
+	mathBlock.AppendChild(&Node{Type: NodeMathBlockContent, Tokens: tokens})
+	mathBlock.AppendChild(&Node{Type: NodeMathBlockCloseMarker})
 }
 
 func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {

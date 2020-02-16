@@ -17,7 +17,7 @@ import (
 
 // fixTermTypo 修正文本节点 textNode 中出现的术语拼写问题。
 func (r *BaseRenderer) fixTermTypo(textNode *Node) {
-	textNode.tokens = r.fixTermTypo0(textNode.tokens)
+	textNode.Tokens = r.fixTermTypo0(textNode.Tokens)
 }
 
 func (r *BaseRenderer) fixTermTypo0(tokens []byte) []byte {

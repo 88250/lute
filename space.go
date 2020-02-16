@@ -17,9 +17,9 @@ import (
 
 // space 会把文本节点 textNode 中的中西文之间加上空格。
 func (r *BaseRenderer) space(textNode *Node) {
-	text := bytesToStr(textNode.tokens)
+	text := bytesToStr(textNode.Tokens)
 	text = space0(text)
-	textNode.tokens = strToBytes(text)
+	textNode.Tokens = strToBytes(text)
 }
 
 func space0(text string) (ret string) {

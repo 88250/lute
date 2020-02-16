@@ -15,7 +15,7 @@ var dollar = strToBytes("$")
 func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	if 3 > ctx.tokensLen {
 		ctx.pos++
-		return &Node{typ: NodeText, tokens: dollar}
+		return &Node{Type: NodeText, Tokens: dollar}
 	}
 
 	startPos := ctx.pos
@@ -37,10 +37,10 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 			}
 		}
 		if matchBlock {
-			ret = &Node{typ: NodeMathBlock}
-			ret.AppendChild(&Node{typ: NodeMathBlockOpenMarker})
-			ret.AppendChild(&Node{typ: NodeMathBlockContent, tokens: ctx.tokens[blockStartPos:blockEndPos]})
-			ret.AppendChild(&Node{typ: NodeMathBlockCloseMarker})
+			ret = &Node{Type: NodeMathBlock}
+			ret.AppendChild(&Node{Type: NodeMathBlockOpenMarker})
+			ret.AppendChild(&Node{Type: NodeMathBlockContent, Tokens: ctx.tokens[blockStartPos:blockEndPos]})
+			ret.AppendChild(&Node{Type: NodeMathBlockCloseMarker})
 			ctx.pos = blockEndPos + 2
 			return
 		}
@@ -48,13 +48,13 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 
 	if !t.context.option.InlineMathAllowDigitAfterOpenMarker && ctx.tokensLen > startPos+1 && isDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
 		ctx.pos += 3
-		return &Node{typ: NodeText, tokens: ctx.tokens[startPos : startPos+3]}
+		return &Node{Type: NodeText, Tokens: ctx.tokens[startPos : startPos+3]}
 	}
 
 	endPos := t.matchInlineMathEnd(ctx.tokens[startPos+1:])
 	if 1 > endPos {
 		ctx.pos++
-		ret = &Node{typ: NodeText, tokens: dollar}
+		ret = &Node{Type: NodeText, Tokens: dollar}
 		return
 	}
 
@@ -63,13 +63,13 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *Node) {
 	tokens := ctx.tokens[startPos+1 : endPos-1]
 	if 1 > len(trimWhitespace(tokens)) {
 		ctx.pos++
-		return &Node{typ: NodeText, tokens: dollar}
+		return &Node{Type: NodeText, Tokens: dollar}
 	}
 
-	ret = &Node{typ: NodeInlineMath}
-	ret.AppendChild(&Node{typ: NodeInlineMathOpenMarker})
-	ret.AppendChild(&Node{typ: NodeInlineMathContent, tokens: tokens})
-	ret.AppendChild(&Node{typ: NodeInlineMathCloseMarker})
+	ret = &Node{Type: NodeInlineMath}
+	ret.AppendChild(&Node{Type: NodeInlineMathOpenMarker})
+	ret.AppendChild(&Node{Type: NodeInlineMathContent, Tokens: tokens})
+	ret.AppendChild(&Node{Type: NodeInlineMathCloseMarker})
 
 	ctx.pos = endPos
 	return

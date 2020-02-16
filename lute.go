@@ -340,7 +340,7 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 		for funcName, _ := range renderFuncs {
 			nodeType := "Node" + funcName[len("render"):]
 			rendererFuncs[Str2NodeType(nodeType)] = func(node *Node, entering bool) (string, WalkStatus) {
-				nodeType := node.Type().String()
+				nodeType := node.Type.String()
 				funcName = "render" + nodeType[len("Node"):]
 				ret := extRenderer.Call(funcName, js.MakeWrapper(node), entering).Interface().([]interface{})
 				return ret[0].(string), WalkStatus(ret[1].(float64))

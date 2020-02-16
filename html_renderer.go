@@ -102,7 +102,7 @@ func (lute *Lute) newHTMLRenderer(tree *Tree) Renderer {
 }
 
 func (r *HTMLRenderer) renderBackslashContent(node *Node, entering bool) WalkStatus {
-	r.write(escapeHTML(node.tokens))
+	r.write(escapeHTML(node.Tokens))
 	return WalkStop
 }
 
@@ -118,8 +118,8 @@ func (r *HTMLRenderer) renderToC(node *Node, entering bool) WalkStatus {
 	}
 	r.writeString("<div class=\"toc-div\">")
 	for i, heading := range headings {
-		level := strconv.Itoa(heading.headingLevel)
-		spaces := (heading.headingLevel - 1) * 2
+		level := strconv.Itoa(heading.HeadingLevel)
+		spaces := (heading.HeadingLevel - 1) * 2
 		r.writeString(strings.Repeat("&emsp;", spaces))
 		r.writeString("<span class=\"toc-h" + level + "\">")
 		r.writeString("<a class=\"toc-a\" href=\"#toc_h" + level + "_" + strconv.Itoa(i) + "\">" + heading.Text() + "</a></span><br>")
@@ -130,19 +130,19 @@ func (r *HTMLRenderer) renderToC(node *Node, entering bool) WalkStatus {
 }
 
 func (r *HTMLRenderer) headings() (ret []*Node) {
-	for n := r.tree.Root.firstChild; nil != n; n = n.next {
+	for n := r.tree.Root.FirstChild; nil != n; n = n.Next {
 		r.headings0(n, &ret)
 	}
 	return
 }
 
 func (r *HTMLRenderer) headings0(n *Node, headings *[]*Node) {
-	if NodeHeading == n.typ {
+	if NodeHeading == n.Type {
 		*headings = append(*headings, n)
 		return
 	}
-	if NodeList == n.typ || NodeListItem == n.typ || NodeBlockquote == n.typ {
-		for c := n.firstChild; nil != c; c = c.next {
+	if NodeList == n.Type || NodeListItem == n.Type || NodeBlockquote == n.Type {
+		for c := n.FirstChild; nil != c; c = c.Next {
 			r.headings0(c, headings)
 		}
 	}
@@ -156,14 +156,14 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 		r.writeString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
 		tree := &Tree{Name: "", context: &Context{option: lute.options}}
 		tree.context.tree = tree
-		tree.Root = &Node{typ: NodeDocument}
+		tree.Root = &Node{Type: NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := lute.newHTMLRenderer(tree)
 		lc := tree.Root.lastDeepestChild()
-		for i = len(def.footnotesRefs) - 1; 0 <= i; i-- {
-			ref := def.footnotesRefs[i]
-			gotoRef := " <a href=\"#footnotes-ref-" + ref.footnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
-			link := &Node{typ: NodeInlineHTML, tokens: strToBytes(gotoRef)}
+		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
+			ref := def.FootnotesRefs[i]
+			gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
+			link := &Node{Type: NodeInlineHTML, Tokens: strToBytes(gotoRef)}
 			lc.InsertAfter(link)
 		}
 		defRenderer.(*HTMLRenderer).needRenderFootnotesDef = true
@@ -180,9 +180,9 @@ func (r *HTMLRenderer) renderFootnotesDefs(lute *Lute, context *Context) []byte 
 }
 
 func (r *HTMLRenderer) renderFootnotesRef(node *Node, entering bool) WalkStatus {
-	idx, _ := r.tree.context.findFootnotesDef(node.tokens)
+	idx, _ := r.tree.context.findFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
-	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.footnotesRefId}}, false)
+	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
 	r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
 	r.writeString(idxStr)
 	r.tag("/a", nil, false)
@@ -214,12 +214,12 @@ func (r *HTMLRenderer) renderEmojiAlias(node *Node, entering bool) WalkStatus {
 }
 
 func (r *HTMLRenderer) renderEmojiImg(node *Node, entering bool) WalkStatus {
-	r.write(node.tokens)
+	r.write(node.Tokens)
 	return WalkStop
 }
 
 func (r *HTMLRenderer) renderEmojiUnicode(node *Node, entering bool) WalkStatus {
-	r.write(node.tokens)
+	r.write(node.Tokens)
 	return WalkStop
 }
 
@@ -233,7 +233,7 @@ func (r *HTMLRenderer) renderInlineMathCloseMarker(node *Node, entering bool) Wa
 }
 
 func (r *HTMLRenderer) renderInlineMathContent(node *Node, entering bool) WalkStatus {
-	r.write(escapeHTML(node.tokens))
+	r.write(escapeHTML(node.Tokens))
 	return WalkStop
 }
 
@@ -253,7 +253,7 @@ func (r *HTMLRenderer) renderMathBlockCloseMarker(node *Node, entering bool) Wal
 }
 
 func (r *HTMLRenderer) renderMathBlockContent(node *Node, entering bool) WalkStatus {
-	r.write(escapeHTML(node.tokens))
+	r.write(escapeHTML(node.Tokens))
 	return WalkStop
 }
 
@@ -270,12 +270,12 @@ func (r *HTMLRenderer) renderMathBlock(node *Node, entering bool) WalkStatus {
 
 func (r *HTMLRenderer) renderTableCell(node *Node, entering bool) WalkStatus {
 	tag := "td"
-	if NodeTableHead == node.parent.parent.typ {
+	if NodeTableHead == node.Parent.Parent.Type {
 		tag = "th"
 	}
 	if entering {
 		var attrs [][]string
-		switch node.tableCellAlign {
+		switch node.TableCellAlign {
 		case 1:
 			attrs = append(attrs, []string{"align", "left"})
 		case 2:
@@ -309,7 +309,7 @@ func (r *HTMLRenderer) renderTableHead(node *Node, entering bool) WalkStatus {
 	} else {
 		r.tag("/thead", nil, false)
 		r.newline()
-		if nil != node.next {
+		if nil != node.Next {
 			r.tag("tbody", nil, false)
 		}
 		r.newline()
@@ -322,7 +322,7 @@ func (r *HTMLRenderer) renderTable(node *Node, entering bool) WalkStatus {
 		r.tag("table", nil, false)
 		r.newline()
 	} else {
-		if nil != node.firstChild.next {
+		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
 		}
 		r.newline()
@@ -372,7 +372,7 @@ func (r *HTMLRenderer) renderLinkText(node *Node, entering bool) WalkStatus {
 	if r.option.AutoSpace {
 		r.space(node)
 	}
-	r.write(escapeHTML(node.tokens))
+	r.write(escapeHTML(node.Tokens))
 	return WalkStop
 }
 
@@ -400,7 +400,7 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) WalkStatus {
 	if entering {
 		if 0 == r.disableTags {
 			r.writeString("<img src=\"")
-			destTokens := node.ChildByType(NodeLinkDest).tokens
+			destTokens := node.ChildByType(NodeLinkDest).Tokens
 			destTokens = r.tree.context.relativePath(destTokens)
 			r.write(escapeHTML(destTokens))
 			r.writeString("\" alt=\"")
@@ -412,9 +412,9 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) WalkStatus {
 	r.disableTags--
 	if 0 == r.disableTags {
 		r.writeString("\"")
-		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.Tokens {
 			r.writeString(" title=\"")
-			r.write(escapeHTML(title.tokens))
+			r.write(escapeHTML(title.Tokens))
 			r.writeString("\"")
 		}
 		r.writeString(" />")
@@ -425,11 +425,11 @@ func (r *HTMLRenderer) renderImage(node *Node, entering bool) WalkStatus {
 func (r *HTMLRenderer) renderLink(node *Node, entering bool) WalkStatus {
 	if entering {
 		dest := node.ChildByType(NodeLinkDest)
-		destTokens := dest.tokens
+		destTokens := dest.Tokens
 		destTokens = r.tree.context.relativePath(destTokens)
 		attrs := [][]string{{"href", bytesToStr(escapeHTML(destTokens))}}
-		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.tokens {
-			attrs = append(attrs, []string{"title", bytesToStr(escapeHTML(title.tokens))})
+		if title := node.ChildByType(NodeLinkTitle); nil != title && nil != title.Tokens {
+			attrs = append(attrs, []string{"title", bytesToStr(escapeHTML(title.Tokens))})
 		}
 		r.tag("a", attrs, false)
 	} else {
@@ -440,13 +440,13 @@ func (r *HTMLRenderer) renderLink(node *Node, entering bool) WalkStatus {
 
 func (r *HTMLRenderer) renderHTML(node *Node, entering bool) WalkStatus {
 	r.newline()
-	r.write(node.tokens)
+	r.write(node.Tokens)
 	r.newline()
 	return WalkStop
 }
 
 func (r *HTMLRenderer) renderInlineHTML(node *Node, entering bool) WalkStatus {
-	r.write(node.tokens)
+	r.write(node.Tokens)
 	return WalkStop
 }
 
@@ -455,7 +455,7 @@ func (r *HTMLRenderer) renderDocument(node *Node, entering bool) WalkStatus {
 }
 
 func (r *HTMLRenderer) renderParagraph(node *Node, entering bool) WalkStatus {
-	if grandparent := node.parent.parent; nil != grandparent && NodeList == grandparent.typ && grandparent.tight { // List.ListItem.Paragraph
+	if grandparent := node.Parent.Parent; nil != grandparent && NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
 		return WalkContinue
 	}
 
@@ -479,7 +479,7 @@ func (r *HTMLRenderer) renderText(node *Node, entering bool) WalkStatus {
 	if r.option.ChinesePunct {
 		r.chinesePunct(node)
 	}
-	r.write(escapeHTML(node.tokens))
+	r.write(escapeHTML(node.Tokens))
 	return WalkStop
 }
 
@@ -512,7 +512,7 @@ func (r *HTMLRenderer) renderCodeSpanOpenMarker(node *Node, entering bool) WalkS
 }
 
 func (r *HTMLRenderer) renderCodeSpanContent(node *Node, entering bool) WalkStatus {
-	r.write(escapeHTML(node.tokens))
+	r.write(escapeHTML(node.Tokens))
 	return WalkStop
 }
 
@@ -589,7 +589,7 @@ func (r *HTMLRenderer) renderBlockquoteMarker(node *Node, entering bool) WalkSta
 func (r *HTMLRenderer) renderHeading(node *Node, entering bool) WalkStatus {
 	if entering {
 		r.newline()
-		level := " 123456"[node.headingLevel : node.headingLevel+1]
+		level := " 123456"[node.HeadingLevel : node.HeadingLevel+1]
 		r.writeString("<h" + level)
 		if r.option.ToC {
 			r.writeString(" id=\"toc_h" + level + "_" + strconv.Itoa(r.headingCnt) + "\"")
@@ -605,7 +605,7 @@ func (r *HTMLRenderer) renderHeading(node *Node, entering bool) WalkStatus {
 			r.tag("/a", nil, false)
 		}
 	} else {
-		r.writeString("</h" + " 123456"[node.headingLevel:node.headingLevel+1] + ">")
+		r.writeString("</h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + ">")
 		r.newline()
 	}
 	return WalkContinue
@@ -617,13 +617,13 @@ func (r *HTMLRenderer) renderHeadingC8hMarker(node *Node, entering bool) WalkSta
 
 func (r *HTMLRenderer) renderList(node *Node, entering bool) WalkStatus {
 	tag := "ul"
-	if 1 == node.listData.typ || (3 == node.listData.typ && 0 == node.listData.bulletChar) {
+	if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 		tag = "ol"
 	}
 	if entering {
 		r.newline()
-		attrs := [][]string{{"start", strconv.Itoa(node.start)}}
-		if 0 == node.bulletChar && 1 != node.start {
+		attrs := [][]string{{"start", strconv.Itoa(node.Start)}}
+		if 0 == node.BulletChar && 1 != node.Start {
 			r.tag(tag, attrs, false)
 		} else {
 			r.tag(tag, nil, false)
@@ -639,8 +639,8 @@ func (r *HTMLRenderer) renderList(node *Node, entering bool) WalkStatus {
 
 func (r *HTMLRenderer) renderListItem(node *Node, entering bool) WalkStatus {
 	if entering {
-		if 3 == node.listData.typ && "" != r.option.GFMTaskListItemClass &&
-			nil != node.firstChild && nil != node.firstChild.firstChild && NodeTaskListItemMarker == node.firstChild.firstChild.typ {
+		if 3 == node.ListData.Typ && "" != r.option.GFMTaskListItemClass &&
+			nil != node.FirstChild && nil != node.FirstChild.FirstChild && NodeTaskListItemMarker == node.FirstChild.FirstChild.Type {
 			r.tag("li", [][]string{{"class", r.option.GFMTaskListItemClass}}, false)
 		} else {
 			r.tag("li", nil, false)
@@ -655,7 +655,7 @@ func (r *HTMLRenderer) renderListItem(node *Node, entering bool) WalkStatus {
 func (r *HTMLRenderer) renderTaskListItemMarker(node *Node, entering bool) WalkStatus {
 	if entering {
 		var attrs [][]string
-		if node.taskListItemChecked {
+		if node.TaskListItemChecked {
 			attrs = append(attrs, []string{"checked", ""})
 		}
 		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})

@@ -15,14 +15,14 @@ import "bytes"
 func (codeBlock *Node) codeBlockContinue(context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
-	if codeBlock.isFencedCodeBlock {
-		if ok, closeFence := codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.codeBlockFenceChar, codeBlock.codeBlockFenceLen); indent <= 3 && ok {
-			codeBlock.codeBlockCloseFence = closeFence
+	if codeBlock.IsFencedCodeBlock {
+		if ok, closeFence := codeBlock.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.CodeBlockFenceChar, codeBlock.CodeBlockFenceLen); indent <= 3 && ok {
+			codeBlock.CodeBlockCloseFence = closeFence
 			context.finalize(codeBlock, context.lineNum)
 			return 2
 		} else {
 			// 跳过围栏标记符之前可能存在的空格
-			var i = codeBlock.codeBlockFenceOffset
+			var i = codeBlock.CodeBlockFenceOffset
 			var token byte
 			for i > 0 {
 				token = peek(ln, context.offset)
@@ -46,8 +46,8 @@ func (codeBlock *Node) codeBlockContinue(context *Context) int {
 }
 
 func (codeBlock *Node) codeBlockFinalize(context *Context) {
-	if codeBlock.isFencedCodeBlock {
-		content := codeBlock.tokens
+	if codeBlock.IsFencedCodeBlock {
+		content := codeBlock.Tokens
 		length := len(content)
 		if 1 > length {
 			return
@@ -59,9 +59,9 @@ func (codeBlock *Node) codeBlockFinalize(context *Context) {
 				break
 			}
 		}
-		codeBlock.tokens = content[i+1:]
+		codeBlock.Tokens = content[i+1:]
 	} else { // 缩进代码块
-		codeBlock.tokens = replaceNewlineSpace(codeBlock.tokens)
+		codeBlock.Tokens = replaceNewlineSpace(codeBlock.Tokens)
 	}
 }
 
