@@ -48,8 +48,7 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
 			// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
 			openMarker.Tokens = append(openMarker.Tokens, textTokens[0])
 			closeMarker.Tokens = ctx.tokens[endPos-1 : endPos+n]
-			textTokens = textTokens[1:]
-			textTokens = textTokens[:len(textTokens)-1]
+			textTokens = textTokens[1 : len(textTokens)-1]
 		}
 	}
 
