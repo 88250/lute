@@ -14,6 +14,40 @@ import (
 	"unicode"
 )
 
+const (
+	ItemBacktick       = byte('`')
+	ItemTilde          = byte('~')
+	ItemBang           = byte('!')
+	ItemCrosshatch     = byte('#')
+	ItemAsterisk       = byte('*')
+	ItemOpenParen      = byte('(')
+	ItemCloseParen     = byte(')')
+	ItemHyphen         = byte('-')
+	ItemUnderscore     = byte('_')
+	ItemPlus           = byte('+')
+	ItemEqual          = byte('=')
+	ItemTab            = byte('\t')
+	ItemOpenBracket    = byte('[')
+	ItemCloseBracket   = byte(']')
+	ItemDoublequote    = byte('"')
+	ItemSinglequote    = byte('\'')
+	ItemLess           = byte('<')
+	ItemGreater        = byte('>')
+	ItemSpace          = byte(' ')
+	ItemNewline        = byte('\n')
+	ItemCarriageReturn = byte('\r')
+	ItemBackslash      = byte('\\')
+	ItemSlash          = byte('/')
+	ItemDot            = byte('.')
+	ItemColon          = byte(':')
+	ItemQuestion       = byte('?')
+	ItemAmpersand      = byte('&')
+	ItemSemicolon      = byte(';')
+	ItemPipe           = byte('|')
+	ItemDollar         = byte('$')
+	ItemCaret          = byte('^')
+)
+
 func IsWhitespace(token byte) bool {
 	return ItemSpace == token || ItemNewline == token || ItemTab == token || '\u000B' == token || '\u000C' == token || '\u000D' == token
 }
@@ -71,40 +105,6 @@ func IsBlank(tokens []byte) bool {
 	}
 	return true
 }
-
-const (
-	ItemBacktick       = byte('`')
-	ItemTilde          = byte('~')
-	ItemBang           = byte('!')
-	ItemCrosshatch     = byte('#')
-	ItemAsterisk       = byte('*')
-	ItemOpenParen      = byte('(')
-	ItemCloseParen     = byte(')')
-	ItemHyphen         = byte('-')
-	ItemUnderscore     = byte('_')
-	ItemPlus           = byte('+')
-	ItemEqual          = byte('=')
-	ItemTab            = byte('\t')
-	ItemOpenBracket    = byte('[')
-	ItemCloseBracket   = byte(']')
-	ItemDoublequote    = byte('"')
-	ItemSinglequote    = byte('\'')
-	ItemLess           = byte('<')
-	ItemGreater        = byte('>')
-	ItemSpace          = byte(' ')
-	ItemNewline        = byte('\n')
-	ItemCarriageReturn = byte('\r')
-	ItemBackslash      = byte('\\')
-	ItemSlash          = byte('/')
-	ItemDot            = byte('.')
-	ItemColon          = byte(':')
-	ItemQuestion       = byte('?')
-	ItemAmpersand      = byte('&')
-	ItemSemicolon      = byte(';')
-	ItemPipe           = byte('|')
-	ItemDollar         = byte('$')
-	ItemCaret          = byte('^')
-)
 
 func Split(tokens []byte, separator byte) (ret [][]byte) {
 	length := len(tokens)

@@ -8,6 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+// Lute 是一款对中文语境优化的 Markdown 引擎，支持 Go 和 JavaScript。
 package lute
 
 import (
@@ -58,7 +59,7 @@ func New(opts ...Option) (ret *Lute) {
 	ret.FixTermTypo = true
 	ret.ChinesePunct = true
 	ret.Emoji = true
-	ret.AliasEmoji, ret.EmojiAlias = newEmojis()
+	ret.AliasEmoji, ret.EmojiAlias = parse.NewEmojis()
 	ret.Terms = render.NewTerms()
 	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
 	ret.LinkBase = ""
