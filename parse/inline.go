@@ -399,20 +399,20 @@ func (t *Tree) parseNewline(block *ast.Node, ctx *InlineContext) (ret *ast.Node)
 	pos := ctx.pos
 	ctx.pos++
 
-	hardbreak := false
+	isHardBreak := false
 	// 检查前一个节点的结尾空格，如果大于等于两个则说明是硬换行
 	if lastc := block.LastChild; nil != lastc && ast.NodeText == lastc.Type {
 		tokens := lastc.Tokens
 		if valueLen := len(tokens); lex.ItemSpace == tokens[valueLen-1] {
 			_, lastc.Tokens = lex.TrimRight(tokens)
 			if 1 < valueLen {
-				hardbreak = lex.ItemSpace == tokens[len(tokens)-2]
+				isHardBreak = lex.ItemSpace == tokens[len(tokens)-2]
 			}
 		}
 	}
 
 	ret = &ast.Node{Type: ast.NodeSoftBreak, Tokens: []byte{ctx.tokens[pos]}}
-	if hardbreak {
+	if isHardBreak {
 		ret.Type = ast.NodeHardBreak
 	}
 	return
