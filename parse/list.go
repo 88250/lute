@@ -119,6 +119,10 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 	if !isBlankItem {
 		// 判断是否是任务列表项
 		content := ln[t.Context.offset:]
+		if t.Context.Option.VditorWYSIWYG {
+			content = bytes.ReplaceAll(content, []byte(Caret), nil)
+		}
+
 		if 3 <= len(content) { // 至少需要 [ ] 或者 [x] 3 个字符
 			if lex.ItemOpenBracket == content[0] && ('x' == content[1] || 'X' == content[1] || lex.ItemSpace == content[1]) && lex.ItemCloseBracket == content[2] {
 				data.Typ = 3

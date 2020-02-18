@@ -53,44 +53,50 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 
 				if isTaskListItem {
 					// 如果是任务列表项则添加任务列表标记符节点
-					taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: p.Tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
-					p.PrependChild(taskListItemMarker)
-					p.Tokens = p.Tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+					tokens := p.Tokens
+					startCaret := false
 					if context.Option.VditorWYSIWYG {
-						if 1 > len(p.Tokens) {
-							p.Tokens = []byte(" ")
-						} else {
-							if !bytes.HasPrefix(p.Tokens, []byte(" ")) {
-								p.Tokens = append([]byte(" "), p.Tokens...)
-							}
+						if bytes.HasPrefix(tokens, []byte(Caret)) {
+							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+							startCaret = true
+						}
+					}
+					taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
+					p.PrependChild(taskListItemMarker)
+					p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+					if context.Option.VditorWYSIWYG {
+						p.Tokens = bytes.TrimSpace(p.Tokens)
+						p.Tokens = append([]byte(" "), p.Tokens...)
+						if startCaret {
+							p.Tokens = append([]byte(Caret), p.Tokens...)
 						}
 					}
 				}
 			}
 		}
-	}
 
-	if context.Option.GFMTable {
-		if table := context.parseTable(p); nil != table {
-			// 将该段落节点转成表节点
-			p.Type = ast.NodeTable
-			p.TableAligns = table.TableAligns
-			for tr := table.FirstChild; nil != tr; {
-				nextTr := tr.Next
-				p.AppendChild(tr)
-				tr = nextTr
+		if context.Option.GFMTable {
+			if table := context.parseTable(p); nil != table {
+				// 将该段落节点转成表节点
+				p.Type = ast.NodeTable
+				p.TableAligns = table.TableAligns
+				for tr := table.FirstChild; nil != tr; {
+					nextTr := tr.Next
+					p.AppendChild(tr)
+					tr = nextTr
+				}
+				p.Tokens = nil
+				return
 			}
-			p.Tokens = nil
-			return
 		}
-	}
 
-	if context.Option.ToC {
-		if toc := context.parseToC(p); nil != toc {
-			// 将该段落节点转换成目录节点
-			p.Type = ast.NodeToC
-			p.Tokens = nil
-			return
+		if context.Option.ToC {
+			if toc := context.parseToC(p); nil != toc {
+				// 将该段落节点转换成目录节点
+				p.Type = ast.NodeToC
+				p.Tokens = nil
+				return
+			}
 		}
 	}
 }
