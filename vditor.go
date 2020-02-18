@@ -642,6 +642,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			// 仅允许 input 出现在任务列表中
 			return
 		}
+		if nil != n.NextSibling && atom.Span == n.NextSibling.DataAtom {
+			// 在任务列表前退格
+			n.NextSibling.FirstChild.Data = strings.TrimSpace(n.NextSibling.FirstChild.Data)
+			break
+		}
 		node.Type = ast.NodeTaskListItemMarker
 		if lute.hasAttr(n, "checked") {
 			node.TaskListItemChecked = true

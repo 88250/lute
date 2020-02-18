@@ -20,6 +20,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"89",`<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> foo<wbr><input type="checkbox"><span style="background-color: var(--textarea-background-color); color: var(--textarea-text-color);"> bar</span></p></li></ul>`, "* [ ] foobar\n"},
 	{"88", "<p data-block=\"0\">foo<strong>​ b<wbr></strong></p>", "foo **b**\n"},
 	{"87", "<p data-block=\"0\">foo<b> b<wbr></b>", "foo **b**\n"},
 	{"86", "<strong><em></em>foo</strong>", "**foo**\n"},
