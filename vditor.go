@@ -134,9 +134,10 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 	lute.VditorWYSIWYG = true
 
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
-	md := lute.vditorDOM2Md(htmlStr)
-	md = lute.FormatMd(md) // 再格式化一次处理表格对齐
-	return strings.ReplaceAll(md, parse.Zwsp, "")
+	markdown = lute.vditorDOM2Md(htmlStr)
+	markdown = lute.FormatMd(markdown) // 再格式化一次处理表格对齐
+	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
+	return
 }
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
@@ -248,6 +249,27 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		checkIndentCodeBlock := strings.ReplaceAll(content, parse.Caret, "")
+		checkIndentCodeBlock = strings.ReplaceAll(checkIndentCodeBlock, "\t", "    ")
+		if strings.HasPrefix(checkIndentCodeBlock, "    ") {
+			node.Type = ast.NodeCodeBlock
+			node.IsFencedCodeBlock = true
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
+			startCaret := strings.HasPrefix(content, parse.Caret)
+			if startCaret {
+				content = strings.ReplaceAll(content, parse.Caret, "")
+			}
+			content = strings.TrimSpace(content)
+			if startCaret {
+				content = parse.Caret + content
+			}
+			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: []byte(content)}
+			node.AppendChild(content)
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.Type = ast.NodeLinkText
 		}
