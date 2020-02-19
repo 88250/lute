@@ -20,7 +20,7 @@ import (
 const spec = "commonmark-spec"
 
 func BenchmarkLute(b *testing.B) {
-	bytes, err := ioutil.ReadFile(spec + ".md")
+	buf, err := ioutil.ReadFile(spec + ".md")
 	if nil != err {
 		b.Fatalf("read spec text failed: " + err.Error())
 	}
@@ -32,19 +32,26 @@ func BenchmarkLute(b *testing.B) {
 	luteEngine.GFMStrikethrough = true
 	luteEngine.SoftBreak2HardBreak = false
 	luteEngine.CodeSyntaxHighlight = false
+	luteEngine.Footnotes = false
+	luteEngine.ToC = false
 	luteEngine.AutoSpace = false
 	luteEngine.FixTermTypo = false
 	luteEngine.ChinesePunct = false
 	luteEngine.Emoji = false
-	html, err := luteEngine.Markdown("spec text", bytes)
+	output, err := luteEngine.Markdown("spec text", buf)
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)
 	}
-	if err := ioutil.WriteFile(spec+".html", html, 0644); nil != err {
+	if err := ioutil.WriteFile(spec+".html", output, 0644); nil != err {
 		b.Fatalf("write spec html failed: %s", err)
 	}
 
-	for i := 0; i < b.N; i++ {
-		luteEngine.Markdown("spec text", bytes)
-	}
+	b.SetParallelism(12)
+	b.ReportAllocs()
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			luteEngine.Markdown("spec text", buf)
+		}
+	})
 }

@@ -11,23 +11,18 @@
 package parse
 
 import (
-	"sync"
-
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/util"
 )
 
 // parseInlines 解析并生成行级节点。
 func (t *Tree) parseInlines() {
-	t.walkParseInline(t.Root, nil)
+	t.walkParseInline(t.Root)
 }
 
 // walkParseInline 解析生成节点 node 的行级子节点。
-func (t *Tree) walkParseInline(node *ast.Node, wg *sync.WaitGroup) {
+func (t *Tree) walkParseInline(node *ast.Node) {
 	defer util.RecoverPanic(nil)
-	if nil != wg {
-		defer wg.Done()
-	}
 	if nil == node {
 		return
 	}
@@ -94,18 +89,7 @@ func (t *Tree) walkParseInline(node *ast.Node, wg *sync.WaitGroup) {
 	}
 
 	// 遍历处理子节点
-
-	if t.Context.Option.ParallelParsing {
-		// 通过并行处理提升性能
-		cwg := &sync.WaitGroup{}
-		for child := node.FirstChild; nil != child; child = child.Next {
-			cwg.Add(1)
-			go t.walkParseInline(child, cwg)
-		}
-		cwg.Wait()
-	} else {
-		for child := node.FirstChild; nil != child; child = child.Next {
-			t.walkParseInline(child, nil)
-		}
+	for child := node.FirstChild; nil != child; child = child.Next {
+		t.walkParseInline(child)
 	}
 }

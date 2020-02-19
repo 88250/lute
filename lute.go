@@ -63,7 +63,6 @@ func New(opts ...Option) (ret *Lute) {
 	ret.Terms = render.NewTerms()
 	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
 	ret.LinkBase = ""
-	ret.ParallelParsing = true
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -256,10 +255,6 @@ func (lute *Lute) SetTerms(terms map[string]string) {
 
 func (lute *Lute) SetVditorWYSIWYG(b bool) {
 	lute.VditorWYSIWYG = b
-}
-
-func (lute *Lute) SetParallelParsing(b bool) {
-	lute.ParallelParsing = b
 }
 
 func (lute *Lute) SetInlineMathAllowDigitAfterOpenMarker(b bool) {
