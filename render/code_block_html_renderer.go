@@ -151,7 +151,10 @@ func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered 
 				r.writeString("<code class=\"")
 			}
 			if !r.option.CodeSyntaxHighlightInlineStyle {
-				r.writeString(" highlight-chroma")
+				if "" != language {
+					r.writeByte(lex.ItemSpace)
+				}
+				r.writeString("highlight-chroma")
 			}
 			r.writeString("\">")
 			r.writeBytes(b.Bytes())
