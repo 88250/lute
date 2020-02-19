@@ -217,6 +217,8 @@ type Options struct {
 	SoftBreak2HardBreak bool
 	// CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
 	CodeSyntaxHighlight bool
+	// CodeSyntaxHighlightDetectLang bool
+	CodeSyntaxHighlightDetectLang bool
 	// CodeSyntaxHighlightInlineStyle 设置语法高亮是否为内联样式，默认不内联。
 	CodeSyntaxHighlightInlineStyle bool
 	// CodeSyntaxHightLineNum 设置语法高亮是否显示行号，默认不显示。

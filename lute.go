@@ -198,6 +198,10 @@ func (lute *Lute) SetCodeSyntaxHighlight(b bool) {
 	lute.CodeSyntaxHighlight = b
 }
 
+func (lute *Lute) SetCodeSyntaxHighlightDetectLang(b bool) {
+	lute.CodeSyntaxHighlightDetectLang = b
+}
+
 func (lute *Lute) SetCodeSyntaxHighlightInlineStyle(b bool) {
 	lute.CodeSyntaxHighlightInlineStyle = b
 }

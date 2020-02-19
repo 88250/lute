@@ -14,11 +14,12 @@ package render
 
 import (
 	"bytes"
+	"go/format"
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
-	"go/format"
-	"strings"
 
 	"github.com/alecthomas/chroma"
 	chromahtml "github.com/alecthomas/chroma/formatters/html"
@@ -89,7 +90,16 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 					r.write(tokens)
 				}
 			} else {
-				r.writeString("<pre><code>")
+				if r.option.CodeSyntaxHighlightDetectLang {
+					language := detectLanguage(tokens)
+					if "" != language {
+						r.writeString("<pre><code class=\"language-" + language)
+					} else {
+						r.writeString("<pre><code>")
+					}
+				} else {
+					r.writeString("<pre><code>")
+				}
 				tokens = util.EscapeHTML(tokens)
 				r.write(tokens)
 			}
@@ -110,7 +120,8 @@ func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered 
 	}
 	if nil == lexer {
 		lexer = chromalexers.Fallback
-		language = lexer.Config().Name
+	} else {
+		language = lexer.Config().Aliases[0]
 	}
 	lexer = chroma.Coalesce(lexer)
 	iterator, err := lexer.Tokenise(nil, codeBlock)
@@ -134,7 +145,11 @@ func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered 
 			} else {
 				r.writeString("<pre style=\"" + chromahtml.StyleEntryToCSS(style.Get(chroma.Background)) + "\">")
 			}
-			r.writeString("<code class=\"language-" + language)
+			if "" != language {
+				r.writeString("<code class=\"language-" + language)
+			} else {
+				r.writeString("<code class=\"")
+			}
 			if !r.option.CodeSyntaxHighlightInlineStyle {
 				r.writeString(" highlight-chroma")
 			}
@@ -157,4 +172,25 @@ func noHighlight(language string) bool {
 
 func isGo(language string) bool {
 	return strings.EqualFold(language, "go") || strings.EqualFold(language, "golang")
+}
+
+// github.com/src-d/enry/v2 不怎么准确
+//
+//var candidateLangs = []string{
+//	"bash", "csharp", "cpp", "css", "go", "html", "xml", "java", "js", "json", "kotlin", "less", "lua", "makefile", "markdown",
+//	"nginx", "objc", "php", "properties", "python", "ruby", "rust", "scss", "sql", "shell", "toml", "ts", "yaml", "swift",
+//	"dart", "gradle", "julia", "matlab",
+//}
+//
+//func detectLanguage(code []byte) (language string) {
+//	language, _ = enry.GetLanguageByClassifier(code, candidateLangs)
+//	return
+//}
+
+func detectLanguage(code []byte) string {
+	lexer := chromalexers.Analyse(util.BytesToStr(code))
+	if nil == lexer {
+		return ""
+	}
+	return lexer.Config().Aliases[0]
 }
