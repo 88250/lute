@@ -503,6 +503,9 @@ func (r *FormatRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool
 }
 
 func (r *FormatRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.newline()
+	}
 	if !node.IsFencedCodeBlock {
 		r.writeBytes(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
 		r.writeByte(lex.ItemNewline)
