@@ -423,7 +423,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n))
-		if parse.Zwsp == text || "" == text {
+		if lute.isEmptyText(n) {
 			return
 		}
 		if parse.Caret == text {
@@ -474,7 +474,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n))
-		if parse.Zwsp == text || "" == text {
+		if lute.isEmptyText(n) {
 			return
 		}
 		if parse.Caret == text {
@@ -523,7 +523,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		text := strings.TrimSpace(lute.domText(n))
-		if parse.Zwsp == text || "" == text {
+		if lute.isEmptyText(n) {
 			return
 		}
 		if parse.Caret == text {
@@ -916,4 +916,15 @@ func (lute *Lute) domHTML(n *html.Node) []byte {
 	buf := &bytes.Buffer{}
 	html.Render(buf, n)
 	return bytes.ReplaceAll(buf.Bytes(), []byte(parse.Zwsp), []byte(""))
+}
+
+func (lute *Lute) isEmptyText(n *html.Node) bool {
+	text := strings.TrimSpace(lute.domText(n))
+	if "" == text || parse.Zwsp == text {
+		return true
+	}
+	if parse.Zwsp+parse.Caret == text {
+		return true
+	}
+	return false
 }
