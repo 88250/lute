@@ -20,6 +20,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"95", "<p data-block=\"0\"><strong data-marker=\"**\"><wbr></strong>\n</p>", "\n"},
 	{"94", "<blockquote data-block=\"0\"><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre style=\"display: none;\"><code>code block\n</code></pre><div class=\"vditor-wysiwyg__preview\" data-render=\"false\"><pre><div class=\"vditor-copy\"><textarea></textarea><span aria-label=\"复制\" onmouseover=\"this.setAttribute('aria-label', '复制')\" class=\"vditor-tooltipped vditor-tooltipped__w\" onclick=\"this.previousElementSibling.select();document.execCommand('copy');this.setAttribute('aria-label', '已复制')\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\" width=\"32px\" height=\"32px\"> <path d=\"M28.681 11.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-11.5c-1.379 0-2.5 1.121-2.5 2.5v23c0 1.378 1.121 2.5 2.5 2.5h19c1.378 0 2.5-1.122 2.5-2.5v-15.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 9.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268v0zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-19c-0.271 0-0.5-0.229-0.5-0.5v-23c0-0.271 0.229-0.5 0.5-0.5 0 0 11.499-0 11.5 0v7c0 0.552 0.448 1 1 1h7v15.5zM18.841 1.319c-1.612-1.182-2.393-1.319-2.841-1.319h-11.5c-1.378 0-2.5 1.121-2.5 2.5v23c0 1.207 0.86 2.217 2 2.45v-25.45c0-0.271 0.229-0.5 0.5-0.5h15.215c-0.301-0.248-0.595-0.477-0.873-0.681z\"></path> </svg></span></div><code class=\"hljs properties\" style=\"max-height: 1000px;\"><span class=\"hljs-attr\">code</span> <span class=\"hljs-string\">block</span></code></pre></div></div></li></ul><p><wbr><br></p></blockquote>", "> * foo\n>   ```\n>   code block\n>   ```\n"},
 	{"93", "<p data-block=\"0\"><wbr>    ***\n</p>", "```\n***\n```\n"},
 	{"92", "<p data-block=\"0\">    ***<wbr>\n</p>", "```\n***\n```\n"},
@@ -62,7 +63,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"56", "<p>~删除线~</p>", "~删除线~\n"},
 	{"55", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><br></li><li data-marker=\"*\"><wbr>bar</li></ul>", "* foo\n*\n* bar\n"},
 	{"54", "<p>f<code>o</code><wbr>o\n</p>", "f `o` o\n"},
-	{"53", "<blockquote><p><br></p><p><wbr>foo\n</p></blockquote>", "> foo\n"}, // 在块引用第一个字符前换行
+	{"53", "<blockquote><p><br></p><p><wbr>foo\n</p></blockquote>", ">\n>\n\n> foo\n"}, // 在块引用第一个字符前换行
 	{"52", "<blockquote><p>foo\n</p><blockquote><p>bar<wbr>\n</p></blockquote></blockquote>", "> foo\n>\n>> bar\n>>\n"},
 	{"51", "<blockquote><blockquote><p><wbr>\n</p></blockquote></blockquote>", "\n"},
 	{"50", "<blockquote><p><wbr>\n</p></blockquote>", "\n"},

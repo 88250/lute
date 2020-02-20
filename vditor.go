@@ -891,7 +891,7 @@ func (lute *Lute) parentIs(n *html.Node, parentTypes ...atom.Atom) bool {
 func (lute *Lute) domText(n *html.Node) string {
 	buf := &bytes.Buffer{}
 	for next := n; nil != next; next = next.NextSibling {
-		lute.domText0(n, buf)
+		lute.domText0(next, buf)
 	}
 	return buf.String()
 }
