@@ -18,6 +18,12 @@ import (
 
 var spaceTests = []parseTest{
 
+	{"24", "英文[1黑客派2](https://hacpai.com)需要", "<p>英文 <a href=\"https://hacpai.com\">1 黑客派 2</a> 需要</p>\n"},
+	{"23", "英文1[HacPai](https://hacpai.com)2需要", "<p>英文 1<a href=\"https://hacpai.com\">HacPai</a>2 需要</p>\n"},
+	{"22", "英文[HacPai](https://hacpai.com)需要", "<p>英文 <a href=\"https://hacpai.com\">HacPai</a> 需要</p>\n"},
+	{"21", "中文[黑客派](https://hacpai.com)不需要", "<p>中文<a href=\"https://hacpai.com\">黑客派</a>不需要</p>\n"},
+	{"20", "[黑客派HacPai](https://hacpai.com)需要", "<p><a href=\"https://hacpai.com\">黑客派 HacPai</a> 需要</p>\n"},
+
 	{"19", "测试ping空格", "<p>测试 ping 空格</p>\n"},
 	{"18", "foo❤️bar", "<p>foo❤️bar</p>\n"},
 
