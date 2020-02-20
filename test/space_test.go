@@ -18,7 +18,9 @@ import (
 
 var spaceTests = []parseTest{
 
-	{"24", "英文[1黑客派2](https://hacpai.com)需要", "<p>英文 <a href=\"https://hacpai.com\">1 黑客派 2</a> 需要</p>\n"},
+	// 链接前后自动空格改进 https://github.com/88250/lute/issues/24
+	{"25", "中文 [黑客派](https://hacpai.com) 不需要", "<p>中文 <a href=\"https://hacpai.com\">黑客派</a> 不需要</p>\n"},
+	{"24", "数字[1黑客派2](https://hacpai.com)需要", "<p>数字 <a href=\"https://hacpai.com\">1 黑客派 2</a> 需要</p>\n"},
 	{"23", "英文1[HacPai](https://hacpai.com)2需要", "<p>英文 1<a href=\"https://hacpai.com\">HacPai</a>2 需要</p>\n"},
 	{"22", "英文[HacPai](https://hacpai.com)需要", "<p>英文 <a href=\"https://hacpai.com\">HacPai</a> 需要</p>\n"},
 	{"21", "中文[黑客派](https://hacpai.com)不需要", "<p>中文<a href=\"https://hacpai.com\">黑客派</a>不需要</p>\n"},

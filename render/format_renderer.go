@@ -265,6 +265,9 @@ func (r *FormatRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *FormatRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.option.AutoSpace {
+		r.space(node)
+	}
 	r.write(node.Tokens)
 	return ast.WalkStop
 }
@@ -299,6 +302,32 @@ func (r *FormatRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 }
 
 func (r *FormatRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if r.option.AutoSpace {
+			if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
+				if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
+					prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
+					first, _ := utf8.DecodeRune(text.Tokens)
+					if allowSpace(prevLast, first) {
+						r.writer.WriteByte(lex.ItemSpace)
+					}
+				}
+			}
+		}
+	} else {
+		if r.option.AutoSpace {
+			if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
+				if next := node.Next; nil != next && ast.NodeText == next.Type {
+					nextFirst, _ := utf8.DecodeRune(next.Tokens)
+					last, _ := utf8.DecodeLastRune(text.Tokens)
+					if allowSpace(last, nextFirst) {
+						r.writer.WriteByte(lex.ItemSpace)
+					}
+				}
+			}
+		}
+	}
+
 	return ast.WalkContinue
 }
 

@@ -429,12 +429,14 @@ func (r *HTMLRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 
 func (r *HTMLRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
-			if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
-				prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
-				first, _ := utf8.DecodeRune(text.Tokens)
-				if allowSpace(prevLast, first) {
-					r.writer.WriteByte(lex.ItemSpace)
+		if r.option.AutoSpace {
+			if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
+				if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
+					prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
+					first, _ := utf8.DecodeRune(text.Tokens)
+					if allowSpace(prevLast, first) {
+						r.writer.WriteByte(lex.ItemSpace)
+					}
 				}
 			}
 		}
@@ -449,12 +451,14 @@ func (r *HTMLRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 		r.tag("a", attrs, false)
 	} else {
 		r.tag("/a", nil, false)
-		if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
-			if next := node.Next; nil != next && ast.NodeText == next.Type {
-				nextFirst, _ := utf8.DecodeRune(next.Tokens)
-				last, _ := utf8.DecodeLastRune(text.Tokens)
-				if allowSpace(last, nextFirst) {
-					r.writer.WriteByte(lex.ItemSpace)
+		if r.option.AutoSpace {
+			if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
+				if next := node.Next; nil != next && ast.NodeText == next.Type {
+					nextFirst, _ := utf8.DecodeRune(next.Tokens)
+					last, _ := utf8.DecodeLastRune(text.Tokens)
+					if allowSpace(last, nextFirst) {
+						r.writer.WriteByte(lex.ItemSpace)
+					}
 				}
 			}
 		}
