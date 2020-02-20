@@ -20,8 +20,8 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"91","<p data-block=\"0\"><wbr>    ***\n</p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code><wbr>***\n</code></pre></div>"},
-	{"90","<p data-block=\"0\">    ***<wbr>\n</p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code>***<wbr>\n</code></pre></div>"},
+	{"91", "<p data-block=\"0\"><wbr>    ***\n</p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code><wbr>***\n</code></pre></div>"},
+	{"90", "<p data-block=\"0\">    ***<wbr>\n</p>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code>***<wbr>\n</code></pre></div>"},
 	{"89", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><wbr><input type="checkbox"> foo</p></li></ul>`, "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /><wbr> foo</li></ul>"},
 	{"88", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><p>test</p></li></ul><ul data-tight="true" data-marker="-" data-block="0"><li data-marker="-"><p>--<wbr></p></li></ul>`, "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">test</li></ul><hr data-block=\"0\" /><p data-block=\"0\"><wbr>\n</p>"},
 	{"87", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> foo</p><ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> bar</p></li></ul><p data-block="0">b<wbr></p></li></ul>`, "<ul data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><p data-block=\"0\"><input type=\"checkbox\" /> foo\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> bar</li></ul><p data-block=\"0\">b<wbr>\n</p></li></ul>"},

@@ -20,12 +20,12 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
-	{"93","<p data-block=\"0\"><wbr>    ***\n</p>", "```\n***\n```\n"},
-	{"92","<p data-block=\"0\">    ***<wbr>\n</p>", "```\n***\n```\n"},
-	{"91","<p data-block=\"0\"><strong><em>\u200b</em></strong>\n</p>", "\n"},
-	{"90","<p data-block=\"0\"><strong>\u200b</strong>\n</p>", "\n"},
-	{"90",`<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><wbr><input type="checkbox"> foo</p></li><li data-marker="*" class="vditor-task"><p><input type="checkbox"> bar</p></li></ul>`, "* [ ] foo\n* [ ] bar\n"},
-	{"89",`<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> foo<wbr><input type="checkbox"><span style="background-color: var(--textarea-background-color); color: var(--textarea-text-color);"> bar</span></p></li></ul>`, "* [ ] foobar\n"},
+	{"93", "<p data-block=\"0\"><wbr>    ***\n</p>", "```\n***\n```\n"},
+	{"92", "<p data-block=\"0\">    ***<wbr>\n</p>", "```\n***\n```\n"},
+	{"91", "<p data-block=\"0\"><strong><em>\u200b</em></strong>\n</p>", "\n"},
+	{"90", "<p data-block=\"0\"><strong>\u200b</strong>\n</p>", "\n"},
+	{"90", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><wbr><input type="checkbox"> foo</p></li><li data-marker="*" class="vditor-task"><p><input type="checkbox"> bar</p></li></ul>`, "* [ ] foo\n* [ ] bar\n"},
+	{"89", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*" class="vditor-task"><p><input type="checkbox"> foo<wbr><input type="checkbox"><span style="background-color: var(--textarea-background-color); color: var(--textarea-text-color);"> bar</span></p></li></ul>`, "* [ ] foobar\n"},
 	{"88", "<p data-block=\"0\">foo<strong>​ b<wbr></strong></p>", "foo **b**\n"},
 	{"87", "<p data-block=\"0\">foo<b> b<wbr></b>", "foo **b**\n"},
 	{"86", "<strong><em></em>foo</strong>", "**foo**\n"},
