@@ -3,3 +3,4 @@ test/commonmark-spec.html linguist-detectable=false
 test/commonmark-spec.json linguist-detectable=false
 test/commonmark-spec.md linguist-detectable=false
 js/lute.min.js linguist-detectable=false
+benchmark/* linguist-detectable=false
