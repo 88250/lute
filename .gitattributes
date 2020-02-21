@@ -1,6 +1,6 @@
 chroma-styles/*.css linguist-generated=true
-test/commonmark-spec.html linguist-detectable=false
-test/commonmark-spec.json linguist-detectable=false
-test/commonmark-spec.md linguist-detectable=false
-js/lute.min.js linguist-detectable=false
+test/*.html linguist-detectable=false
+test/*.json linguist-detectable=false
+test/*.md linguist-detectable=false
+javascript/lute.min.js linguist-detectable=false
 benchmark/* linguist-detectable=false
