@@ -923,7 +923,7 @@ func (lute *Lute) isEmptyText(n *html.Node) bool {
 	if "" == text || parse.Zwsp == text {
 		return true
 	}
-	if parse.Zwsp+parse.Caret == text {
+	if parse.Zwsp+parse.Caret == text || parse.Caret+parse.Zwsp == text {
 		return true
 	}
 	return false
