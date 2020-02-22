@@ -18,6 +18,16 @@ import (
 
 var spaceTests = []parseTest{
 
+	// 加粗、强调和删除线自动空格改进 https://github.com/88250/lute/issues/25
+	{"32", "数字~1黑客派2~需要", "<p>数字 <del>1 黑客派 2</del> 需要</p>\n"},
+	{"32", "数字*1黑客派2*需要", "<p>数字 <em>1 黑客派 2</em> 需要</p>\n"},
+	{"31", "中文 **黑客派** 不需要", "<p>中文 <strong>黑客派</strong> 不需要</p>\n"},
+	{"30", "数字**1黑客派2**需要", "<p>数字 <strong>1 黑客派 2</strong> 需要</p>\n"},
+	{"29", "英文1**HacPai**2需要", "<p>英文 1<strong>HacPai</strong>2 需要</p>\n"},
+	{"28", "英文**HacPai**需要", "<p>英文 <strong>HacPai</strong> 需要</p>\n"},
+	{"27", "中文**黑客派**不需要", "<p>中文<strong>黑客派</strong>不需要</p>\n"},
+	{"26", "**黑客派HacPai**需要", "<p><strong>黑客派 HacPai</strong> 需要</p>\n"},
+
 	// 链接前后自动空格改进 https://github.com/88250/lute/issues/24
 	{"25", "中文 [黑客派](https://hacpai.com) 不需要", "<p>中文 <a href=\"https://hacpai.com\">黑客派</a> 不需要</p>\n"},
 	{"24", "数字[1黑客派2](https://hacpai.com)需要", "<p>数字 <a href=\"https://hacpai.com\">1 黑客派 2</a> 需要</p>\n"},

@@ -338,6 +338,11 @@ func (r *HTMLRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus
 }
 
 func (r *HTMLRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.textAutoSpacePrevious(node)
+	} else {
+		r.textAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -550,6 +555,11 @@ func (r *HTMLRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) 
 }
 
 func (r *HTMLRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.textAutoSpacePrevious(node)
+	} else {
+		r.textAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -574,6 +584,11 @@ func (r *HTMLRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bo
 }
 
 func (r *HTMLRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.textAutoSpacePrevious(node)
+	} else {
+		r.textAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -733,4 +748,33 @@ func (r *HTMLRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 		r.writeString(" /")
 	}
 	r.writeString(">")
+}
+
+
+func (r *HTMLRenderer) textAutoSpacePrevious(node *ast.Node) {
+	if r.option.AutoSpace {
+		if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
+			if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
+				prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
+				first, _ := utf8.DecodeRune(text.Tokens)
+				if allowSpace(prevLast, first) {
+					r.writer.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	}
+}
+
+func (r *HTMLRenderer) textAutoSpaceNext(node *ast.Node) {
+	if r.option.AutoSpace {
+		if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
+			if next := node.Next; nil != next && ast.NodeText == next.Type {
+				nextFirst, _ := utf8.DecodeRune(next.Tokens)
+				last, _ := utf8.DecodeLastRune(text.Tokens)
+				if allowSpace(last, nextFirst) {
+					r.writer.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	}
 }
