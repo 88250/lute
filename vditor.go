@@ -198,6 +198,11 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 			switch n.Type {
 			case ast.NodeInlineHTML, ast.NodeCodeSpan, ast.NodeInlineMath, ast.NodeHTMLBlock, ast.NodeCodeBlockCode, ast.NodeMathBlockContent:
 				n.Tokens = util.UnescapeHTML(n.Tokens)
+				if nil != n.Next && ast.NodeCodeSpan == n.Next.Type && n.CodeMarkerLen == n.Next.CodeMarkerLen {
+					// 合并代码节点 https://github.com/Vanessa219/vditor/issues/167
+					n.FirstChild.Next.Tokens = append(n.FirstChild.Next.Tokens, n.Next.FirstChild.Next.Tokens...)
+					n.Next.Unlink()
+				}
 			case ast.NodeList:
 				// 浏览器生成的子列表是 ul.ul 形式，需要将其调整为 ul.li.ul
 				if nil != n.Parent && ast.NodeList == n.Parent.Type {
