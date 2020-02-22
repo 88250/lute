@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -133,5 +134,61 @@ func (r *BaseRenderer) newline() {
 	if lex.ItemNewline != r.lastOut {
 		r.writer.WriteByte(lex.ItemNewline)
 		r.lastOut = lex.ItemNewline
+	}
+}
+
+func (r *BaseRenderer) textAutoSpacePrevious(node *ast.Node) {
+	if r.option.AutoSpace {
+		if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
+			if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
+				prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
+				first, _ := utf8.DecodeRune(text.Tokens)
+				if allowSpace(prevLast, first) {
+					r.writer.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	}
+}
+
+func (r *BaseRenderer) textAutoSpaceNext(node *ast.Node) {
+	if r.option.AutoSpace {
+		if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
+			if next := node.Next; nil != next && ast.NodeText == next.Type {
+				nextFirst, _ := utf8.DecodeRune(next.Tokens)
+				last, _ := utf8.DecodeLastRune(text.Tokens)
+				if allowSpace(last, nextFirst) {
+					r.writer.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	}
+}
+
+func (r *BaseRenderer) linkTextAutoSpacePrevious(node *ast.Node) {
+	if r.option.AutoSpace {
+		if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
+			if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
+				prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
+				first, _ := utf8.DecodeRune(text.Tokens)
+				if allowSpace(prevLast, first) {
+					r.writer.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	}
+}
+
+func (r *BaseRenderer) linkTextAutoSpaceNext(node *ast.Node) {
+	if r.option.AutoSpace {
+		if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
+			if next := node.Next; nil != next && ast.NodeText == next.Type {
+				nextFirst, _ := utf8.DecodeRune(next.Tokens)
+				last, _ := utf8.DecodeLastRune(text.Tokens)
+				if allowSpace(last, nextFirst) {
+					r.writer.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
 	}
 }
