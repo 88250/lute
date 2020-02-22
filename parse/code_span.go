@@ -42,14 +42,12 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
 	closeMarker := &ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: ctx.tokens[endPos : endPos+n]}
 
 	textTokens := ctx.tokens[startPos+n : endPos]
-	if !t.Context.Option.VditorWYSIWYG {
-		textTokens = lex.ReplaceAll(textTokens, lex.ItemNewline, lex.ItemSpace)
-		if 2 < len(textTokens) && lex.ItemSpace == textTokens[0] && lex.ItemSpace == textTokens[len(textTokens)-1] && !lex.IsBlankLine(textTokens) {
-			// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
-			openMarker.Tokens = append(openMarker.Tokens, textTokens[0])
-			closeMarker.Tokens = ctx.tokens[endPos-1 : endPos+n]
-			textTokens = textTokens[1 : len(textTokens)-1]
-		}
+	textTokens = lex.ReplaceAll(textTokens, lex.ItemNewline, lex.ItemSpace)
+	if 2 < len(textTokens) && lex.ItemSpace == textTokens[0] && lex.ItemSpace == textTokens[len(textTokens)-1] && !lex.IsBlankLine(textTokens) {
+		// 如果首尾是空格并且整行不是空行时剔除首尾的一个空格
+		openMarker.Tokens = append(openMarker.Tokens, textTokens[0])
+		closeMarker.Tokens = ctx.tokens[endPos-1 : endPos+n]
+		textTokens = textTokens[1 : len(textTokens)-1]
 	}
 
 	ret = &ast.Node{Type: ast.NodeCodeSpan, CodeMarkerLen: n}

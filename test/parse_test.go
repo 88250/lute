@@ -40,6 +40,7 @@ var parseTests = []parseTest{
 
 	// commonmark spec inline-level cases
 
+	{"spec637", "`code \nspan`\n", "<p><code>code  span</code></p>\n"},
 	{"spec626", "foo <![CDATA[>&<]]>\n", "<p>foo <![CDATA[>&<]]></p>\n"},
 	{"spec625", "foo <!ELEMENT br EMPTY>\n", "<p>foo <!ELEMENT br EMPTY></p>\n"},
 	{"spec624", "foo <?php echo $a; ?>\n", "<p>foo <?php echo $a; ?></p>\n"},
