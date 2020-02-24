@@ -475,6 +475,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+		}
 
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -524,6 +528,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+		}
 
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -562,7 +570,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-
 		if strings.HasPrefix(n.FirstChild.Data, " ") {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
 			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
@@ -570,6 +577,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if strings.HasSuffix(n.FirstChild.Data, " ") {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
 		}
 
 		tree.Context.Tip = node
