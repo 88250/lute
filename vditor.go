@@ -256,7 +256,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 
 		checkIndentCodeBlock := strings.ReplaceAll(content, parse.Caret, "")
 		checkIndentCodeBlock = strings.ReplaceAll(checkIndentCodeBlock, "\t", "    ")
-		if strings.HasPrefix(checkIndentCodeBlock, "    ") {
+		if (!lute.isInline(n.PrevSibling)) && strings.HasPrefix(checkIndentCodeBlock, "    ") {
 			node.Type = ast.NodeCodeBlock
 			node.IsFencedCodeBlock = true
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
@@ -346,7 +346,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 					marker = startAttr
 				}
 				if "" != firstLiMarker {
-					marker += firstLiMarker[len(firstLiMarker) -1:]
+					marker += firstLiMarker[len(firstLiMarker)-1:]
 				}
 			} else {
 				marker = lute.domAttrValue(n.Parent, "data-marker")
@@ -947,4 +947,17 @@ func (lute *Lute) isEmptyText(n *html.Node) bool {
 		return true
 	}
 	return false
+}
+
+func (lute *Lute) isInline(n *html.Node) bool {
+	if nil == n {
+		return false
+	}
+
+	return 0 == n.DataAtom ||
+		atom.Code == n.DataAtom ||
+		atom.Strong == n.DataAtom ||
+		atom.Em == n.DataAtom ||
+		atom.A == n.DataAtom ||
+		atom.Img == n.DataAtom
 }
