@@ -467,11 +467,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
 
 		// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
-		if strings.HasPrefix(n.FirstChild.Data, " ") {
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
 			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
 		}
-		if strings.HasSuffix(n.FirstChild.Data, " ") {
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
@@ -520,11 +520,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-		if strings.HasPrefix(n.FirstChild.Data, " ") {
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
 			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
 		}
-		if strings.HasSuffix(n.FirstChild.Data, " ") {
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
@@ -570,11 +570,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-		if strings.HasPrefix(n.FirstChild.Data, " ") {
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
 			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
 		}
-		if strings.HasSuffix(n.FirstChild.Data, " ") {
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
