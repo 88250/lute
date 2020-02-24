@@ -339,10 +339,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		var bullet byte
 		if "" == marker {
 			if atom.Ol == n.Parent.DataAtom {
+				firstLiMarker := lute.domAttrValue(n.Parent.FirstChild, "data-marker")
 				if startAttr := lute.domAttrValue(n.Parent, "start"); "" == startAttr {
-					marker = "1."
+					marker = "1"
 				} else {
-					marker = startAttr + "."
+					marker = startAttr
+				}
+				if "" != firstLiMarker {
+					marker += firstLiMarker[len(firstLiMarker) -1:]
 				}
 			} else {
 				marker = lute.domAttrValue(n.Parent, "data-marker")
