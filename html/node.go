@@ -88,7 +88,7 @@ func (n *Node) InsertAfter(sibling *Node) {
 	sibling.PrevSibling = n
 	n.NextSibling = sibling
 	sibling.Parent = n.Parent
-	if nil == sibling.NextSibling {
+	if nil == sibling.NextSibling && nil != sibling.Parent {
 		sibling.Parent.LastChild = sibling
 	}
 }

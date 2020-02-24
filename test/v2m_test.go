@@ -20,6 +20,8 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"100", "<p data-block=\"0\"><strong data-marker=\"**\">foo <em data-marker=\"_\">bar</em></strong>​ b<wbr>\n</p>", "**test and_test_** test\n"},
+	{"99", `<strong data-marker="**">test and <em data-marker="_">test</em></strong> test`, "**test and_test_** test\n"},
 	{"98", `<ul data-tight="true" data-marker="+" data-block="0"><li data-marker="+"><p>foo</p></li><ul data-tight="true" data-marker="+" data-block="0"><li data-marker="+"><p>bar</p></li></ul><li><p><wbr><br></p></li></ul>`, "+ foo\n  + bar\n+\n"},
 	{"97", `<ol data-tight="true" data-block="0"><li data-marker="1."><p>foo</p></li><ol data-tight="true" data-block="0"><li data-marker="1."><p>bar</p></li></ol><li><p><wbr><br></p></li></ol>`, "1. foo\n   1. bar\n2.\n"},
 	{"96", "<p data-block=\"0\">\u200b<code marker=\"`\">\u200bcode\nspan<wbr></code>\u200b\n</p>", "`code span`\n"},
