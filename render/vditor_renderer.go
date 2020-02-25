@@ -480,7 +480,7 @@ func (r *VditorRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 				r.writeByte(lex.ItemSpace)
 			}
 		}
-		r.tag("code", [][]string{{"marker", strings.Repeat("`", node.CodeMarkerLen)}}, false)
+		r.tag("code", [][]string{{"data-marker", strings.Repeat("`", node.CodeMarkerLen)}}, false)
 	}
 	return ast.WalkContinue
 }
