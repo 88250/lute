@@ -171,6 +171,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(content)
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
 				tree.Context.Tip.AppendChild(node)
+			} else if atom.Span == firstc.DataAtom {
+				break
 			} else {
 				node.Type = ast.NodeHTMLBlock
 				node.Tokens = lute.domHTML(n)

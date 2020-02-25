@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"19", "<pre><span>`foo`</span></pre>", "`foo`\n"},
 	{"18", "<del>foo</del>", "~foo~\n"},
 	{"17", "<img src=\"bar.png\" alt=\"foo\">", "![foo](bar.png)\n"},
 	{"16", "foo<br>bar", "foo\nbar\n"},
@@ -34,7 +35,7 @@ var html2MdTests = []parseTest{
 	{"5", `<!--StartFragment--><ul><li><input checked="" disabled="" type="checkbox"><span>&nbsp;</span>发布 Solo</li></ul><!--EndFragment-->`, "* [X] 发布 Solo\n"},
 	{"4", "<span>&nbsp;</span>发布 Solo", "发布 Solo\n"},
 	{"3", "<pre><ul><li>foo</li></ul></pre>", "<pre><ul><li>foo</li></ul></pre>\n"},
-	{"2", "<pre><span>//&#32;Lute&#32;-&#32;A&#32;structured&#32;markdown&#32;engine.<br></span><span>//&#32;Copyright&#32;(c)&#32;2019-present,&#32;b3log.org</span></pre>", "<pre><span>// Lute - A structured markdown engine.<br/></span><span>// Copyright (c) 2019-present, b3log.org</span></pre>\n"},
+	{"2", "<pre><span>//&#32;Lute&#32;-&#32;A&#32;structured&#32;markdown&#32;engine.<br></span><span>//&#32;Copyright&#32;(c)&#32;2019-present,&#32;b3log.org</span></pre>", "// Lute - A structured Markdown engine.\n// Copyright (c) 2019-present, b3log.org\n"},
 	{"1", "<meta charset='utf-8'><span>foo</span>", "foo\n"},
 	{"0", "<html><body><!--StartFragment--><p>foo</p><!--EndFragment--></body></html>", "foo\n"},
 }
