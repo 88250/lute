@@ -347,6 +347,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				}
 				if "" != firstLiMarker {
 					marker += firstLiMarker[len(firstLiMarker)-1:]
+				} else {
+					marker += "."
 				}
 			} else {
 				marker = lute.domAttrValue(n.Parent, "data-marker")
