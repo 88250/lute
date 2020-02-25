@@ -499,6 +499,10 @@ func (r *VditorRenderer) renderCodeSpanContent(node *ast.Node, entering bool) as
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.writeString("</code>")
+	codeSpan := node.Parent
+	if codeSpanParent := codeSpan.Parent; nil != codeSpanParent && ast.NodeLink == codeSpanParent.Type {
+		return ast.WalkStop
+	}
 	r.writeString(parse.Zwsp)
 	return ast.WalkStop
 }
