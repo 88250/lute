@@ -173,6 +173,10 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	// 删掉插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
 
+	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
+	htmlStr = strings.ReplaceAll(htmlStr, "\t\n", "\n")
+	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
+
 	// 将字符串解析为 DOM 树
 
 	reader := strings.NewReader(htmlStr)
