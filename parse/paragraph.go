@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 )
@@ -74,29 +75,29 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 				}
 			}
 		}
+	}
 
-		if context.Option.GFMTable {
-			if table := context.parseTable(p); nil != table {
-				// 将该段落节点转成表节点
-				p.Type = ast.NodeTable
-				p.TableAligns = table.TableAligns
-				for tr := table.FirstChild; nil != tr; {
-					nextTr := tr.Next
-					p.AppendChild(tr)
-					tr = nextTr
-				}
-				p.Tokens = nil
-				return
+	if context.Option.GFMTable {
+		if table := context.parseTable(p); nil != table {
+			// 将该段落节点转成表节点
+			p.Type = ast.NodeTable
+			p.TableAligns = table.TableAligns
+			for tr := table.FirstChild; nil != tr; {
+				nextTr := tr.Next
+				p.AppendChild(tr)
+				tr = nextTr
 			}
+			p.Tokens = nil
+			return
 		}
+	}
 
-		if context.Option.ToC {
-			if toc := context.parseToC(p); nil != toc {
-				// 将该段落节点转换成目录节点
-				p.Type = ast.NodeToC
-				p.Tokens = nil
-				return
-			}
+	if context.Option.ToC {
+		if toc := context.parseToC(p); nil != toc {
+			// 将该段落节点转换成目录节点
+			p.Type = ast.NodeToC
+			p.Tokens = nil
+			return
 		}
 	}
 }

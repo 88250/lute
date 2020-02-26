@@ -11,6 +11,8 @@
 package parse
 
 import (
+	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 )
@@ -24,6 +26,13 @@ func (context *Context) parseTable(paragraph *ast.Node) (ret *ast.Node) {
 
 	aligns := context.parseTableDelimRow(lex.TrimWhitespace(lines[1]))
 	if nil == aligns {
+		return
+	}
+
+	if 2 == length && 1 == len(aligns) && 0 == aligns[0] && !bytes.Contains(paragraph.Tokens, []byte("|")) {
+		// 如果只有两行并且对齐方式是默认对齐且没有 | 时（foo\n---）就和 Setext 标题规则冲突了
+		// 但在块级解析时显然已经尝试进行解析 Setext 标题，还能走到这里说明 Setetxt 标题解析失败，
+		// 所以这里也不能当作表进行解析了，返回普通段落
 		return
 	}
 
