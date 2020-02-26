@@ -20,6 +20,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"101", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><ul data-tight="true" data-marker="-" data-block="0"><li data-marker="-"><p>- -<wbr></p></li></ul></li></ul>`, "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><hr data-block=\"0\" /><p data-block=\"0\"><wbr>\n</p></li></ul>"},
 	{"100", "<em data-marker=\"*\">foo\nbar</em>\t\n---", "<h2 data-block=\"0\" data-marker=\"-\"><em data-marker=\"*\">foo\nbar</em></h2>"},
 	{"99", `<ol data-block="0"><li><p>f<wbr></p></li></ol>`, "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\">f<wbr></li></ol>"},
 	{"98", "<p data-block=\"0\">\u200b<code data-marker=\"`\">\u200bcode</code>​    <wbr><code data-marker=\"`\">\u200bcode</code>\u200b\n</p>", "<p data-block=\"0\">\u200b<code data-marker=\"`\">\u200bcode</code>\u200b    <wbr><code data-marker=\"`\">\u200bcode</code>\u200b\n</p>"},
@@ -97,7 +98,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"25", "<pre><code class=\"language-java\"><wbr>\n</code></pre>", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre><code class=\"language-java\"><wbr>\n</code></pre></div>"},
 	{"24", "<ul data-tight=\"true\"><li data-marker=\"*\"><wbr><br></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><wbr></li></ul>"},
 	{"23", "<ol><li data-marker=\"1.\">foo</li></ol>", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\">foo</li></ol>"},
-	{"22", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\">bar</li></ul></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo* bar</li></ul>"},
+	{"22", "<ul><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul><li data-marker=\"*\">bar</li></ul></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></li></ul>"},
 	{"21", "<p>[foo](/bar \"baz\")</p>", "<p data-block=\"0\"><a href=\"/bar\" title=\"baz\">foo</a>\n</p>"},
 	{"20", "<p>[foo](/bar)</p>", "<p data-block=\"0\"><a href=\"/bar\">foo</a>\n</p>"},
 	{"19", "<p>[foo]()</p>", "<p data-block=\"0\"><a href=\"\">foo</a>\n</p>"},

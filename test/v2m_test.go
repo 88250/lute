@@ -20,6 +20,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"103", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><ul data-tight="true" data-marker="-" data-block="0"><li data-marker="-"><p>- -<wbr></p></li></ul></li></ul>`, "* ---\n"},
 	{"102", `<h2 data-block="0" data-marker="-">Setext 标题<wbr></h2>`, "Setext 标题\n-----------\n"},
 	{"101", `<ol data-tight="true" data-block="0"><li data-marker="1)"><p>foo</p></li><ol data-tight="true" data-block="0"><li data-marker="1)"><p>bar</p></li><li data-marker="2)"><p>baz</p></li></ol><li><p><wbr><br></p></li></ol>`, "1) foo\n   1) bar\n   2) baz\n2)\n"},
 	{"100", "<p data-block=\"0\"><strong data-marker=\"**\">foo <em data-marker=\"_\">bar</em></strong>​ b<wbr>\n</p>", "**foo _bar_** b\n"},
@@ -93,7 +94,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"33", "<ol data-tight=\"true\"><li data-marker=\"1.\">foo</li></ul>", "1. foo\n"},
 	{"32", "<ul data-tight=\"true\"><li data-marker=\"*\">foo<wbr></li></ul>", "* foo\n"},
 	{"31", "<ul data-tight=\"true\"><li data-marker=\"*\"><p>foo</p><ul data-tight=\"true\"><li data-marker=\"*\"><p>bar</p></li></ul></li></ul>", "* foo\n  * bar\n"},
-	{"30", "<ul data-tight=\"true\"><li data-marker=\"*\"><p>foo</p></li><li data-marker=\"*\"><ul><li data-marker=\"*\"><p><br /></p></li></ul></li></ul>", "* foo\n  *\n"},
+	{"30", "<ul data-tight=\"true\"><li data-marker=\"*\"><p>foo</p></li><li data-marker=\"*\"><ul><li data-marker=\"*\"><p><br /></p></li></ul></li></ul>", "* foo\n* *\n"},
 	{"29", "<p><s>del</s></p>", "~~del~~\n"},
 	{"29", "<p>[]()</p>", "[]()\n"},
 	{"28", ":octocat:", ":octocat:\n"},
