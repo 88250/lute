@@ -26,6 +26,10 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	// 格式化支持 Setext 标题 https://github.com/88250/lute/issues/29
+	{"48", "Setext 标题\n==", "Setext 标题\n===========\n"},
+	{"47", "Setext 标题\n------", "Setext 标题\n-----------\n"},
+
 	// 链接前后自动空格改进 https://github.com/88250/lute/issues/24
 	{"46", "中文 [黑客派](https://hacpai.com) 不需要", "中文 [黑客派](https://hacpai.com) 不需要\n"},
 	{"45", "数字[1黑客派2](https://hacpai.com)需要", "数字 [1 黑客派 2](https://hacpai.com) 需要\n"},

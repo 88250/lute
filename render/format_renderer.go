@@ -13,6 +13,7 @@ package render
 import (
 	"bytes"
 	"strconv"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -647,9 +648,28 @@ func (r *FormatRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) a
 
 func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeBytes(bytes.Repeat([]byte{lex.ItemCrosshatch}, node.HeadingLevel)) // 统一使用 ATX 标题，不使用 Setext 标题
-		r.writeByte(lex.ItemSpace)
+		if !node.HeadingSetext {
+			r.writeBytes(bytes.Repeat([]byte{lex.ItemCrosshatch}, node.HeadingLevel))
+			r.writeByte(lex.ItemSpace)
+		}
 	} else {
+		if node.HeadingSetext {
+			r.writeByte(lex.ItemNewline)
+			content := node.Text()
+			contentLen := 0
+			for _, r := range content {
+				if utf8.RuneSelf <= r {
+					contentLen+=2
+				} else {
+					contentLen++
+				}
+			}
+			if 1 == node.HeadingLevel {
+				r.writeString(strings.Repeat("=", contentLen))
+			} else if 2 == node.HeadingLevel {
+				r.writeString(strings.Repeat("-", contentLen))
+			}
+		}
 		r.newline()
 		r.writeByte(lex.ItemNewline)
 	}

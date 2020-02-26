@@ -345,7 +345,7 @@ var blockStarts = []blockStartFunc{
 				}
 
 				if value := container.Tokens; 0 < len(value) {
-					child := &ast.Node{Type: ast.NodeHeading, HeadingLevel: level}
+					child := &ast.Node{Type: ast.NodeHeading, HeadingLevel: level, HeadingSetext: true}
 					child.Tokens = lex.TrimWhitespace(value)
 					container.InsertAfter(child)
 					container.Unlink()
