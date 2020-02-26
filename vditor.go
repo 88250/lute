@@ -294,7 +294,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		node.Type = ast.NodeHeading
 		node.HeadingLevel = int(node.Tokens[1] - byte('0'))
-		node.AppendChild(&ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: []byte(strings.Repeat("#", node.HeadingLevel))})
+		marker := lute.domAttrValue(n, "data-marker")
+		node.HeadingSetext = "=" == marker || "-" == marker
+		if !node.HeadingSetext {
+			headingC8hMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker}
+			headingC8hMarker.Tokens = []byte(strings.Repeat("#", node.HeadingLevel))
+			node.AppendChild(headingC8hMarker)
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()

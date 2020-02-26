@@ -570,7 +570,16 @@ func (r *VditorRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) a
 
 func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeString("<h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\">")
+		r.writeString("<h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\"")
+		if !node.HeadingSetext {
+			r.writeString(" data-marker=\"#\">")
+		} else {
+			if 1 == node.HeadingLevel {
+				r.writeString(" data-marker=\"=\">")
+			} else {
+				r.writeString(" data-marker=\"-\">")
+			}
+		}
 		if r.option.HeadingAnchor {
 			anchor := node.Text()
 			anchor = strings.ReplaceAll(anchor, " ", "-")
