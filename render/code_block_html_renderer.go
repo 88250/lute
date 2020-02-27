@@ -30,7 +30,7 @@ import (
 // languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
 var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 
-func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !node.IsFencedCodeBlock {
 		// 缩进代码块处理
 		r.Newline()
@@ -56,7 +56,7 @@ func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 }
 
 // renderCodeBlockCode 进行代码块 HTML 渲染，实现语法高亮。
-func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
@@ -110,7 +110,7 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkStop
 }
 
-func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered bool) {
+func highlightChroma(tokens []byte, language string, r *HtmlRenderer) (rendered bool) {
 	codeBlock := util.BytesToStr(tokens)
 	var lexer chroma.Lexer
 	if "" != language {

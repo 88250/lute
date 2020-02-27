@@ -19,7 +19,7 @@ import (
 )
 
 // renderCodeBlock 进行代码块 HTML 渲染，不实现语法高亮。
-func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !node.IsFencedCodeBlock {
 		// 缩进代码块处理
 		r.Newline()
@@ -33,7 +33,7 @@ func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
 		tokens := node.Tokens
