@@ -29,8 +29,8 @@ type HtmlRenderer struct {
 	headingCnt             int
 }
 
-// NewHTMLRenderer 创建一个 HTML 渲染器。
-func NewHTMLRenderer(tree *parse.Tree) Renderer {
+// NewHtmlRenderer 创建一个 HTML 渲染器。
+func NewHtmlRenderer(tree *parse.Tree) Renderer {
 	ret := &HtmlRenderer{NewBaseRenderer(tree), false, 0}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
@@ -163,7 +163,7 @@ func (r *HtmlRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
-		defRenderer := NewHTMLRenderer(tree)
+		defRenderer := NewHtmlRenderer(tree)
 		lc := tree.Root.LastDeepestChild()
 		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
 			ref := def.FootnotesRefs[i]

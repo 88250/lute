@@ -79,7 +79,7 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error
 		return
 	}
 
-	renderer := render.NewHTMLRenderer(tree)
+	renderer := render.NewHtmlRenderer(tree)
 	html, err = renderer.Render()
 
 	if lute.Options.Footnotes && 0 < len(tree.Context.FootnotesDefs) {
