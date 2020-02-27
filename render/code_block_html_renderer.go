@@ -33,25 +33,25 @@ var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
 func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !node.IsFencedCodeBlock {
 		// 缩进代码块处理
-		r.newline()
+		r.Newline()
 		rendered := false
 		tokens := node.FirstChild.Tokens
-		if r.option.CodeSyntaxHighlight {
+		if r.Option.CodeSyntaxHighlight {
 			rendered = highlightChroma(tokens, "", r)
 			if !rendered {
 				tokens = util.EscapeHTML(tokens)
-				r.write(tokens)
+				r.Write(tokens)
 			}
 		} else {
-			r.writeString("<pre><code>")
+			r.WriteString("<pre><code>")
 			tokens = util.EscapeHTML(tokens)
-			r.write(tokens)
+			r.Write(tokens)
 		}
-		r.writeString("</code></pre>")
-		r.newline()
+		r.WriteString("</code></pre>")
+		r.Newline()
 		return ast.WalkStop
 	}
-	r.newline()
+	r.Newline()
 	return ast.WalkContinue
 }
 
@@ -70,43 +70,43 @@ func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 					tokens = bytes
 				}
 			}
-			if r.option.CodeSyntaxHighlight && !noHighlight(language) {
+			if r.Option.CodeSyntaxHighlight && !noHighlight(language) {
 				rendered = highlightChroma(tokens, language, r)
 			}
 
 			if !rendered {
-				r.writeString("<pre><code class=\"language-")
-				r.writeString(language)
-				r.writeString("\">")
+				r.WriteString("<pre><code class=\"language-")
+				r.WriteString(language)
+				r.WriteString("\">")
 				tokens = util.EscapeHTML(tokens)
-				r.write(tokens)
+				r.Write(tokens)
 			}
 		} else {
 			rendered := false
-			if r.option.CodeSyntaxHighlight {
+			if r.Option.CodeSyntaxHighlight {
 				rendered = highlightChroma(tokens, "", r)
 				if !rendered {
 					tokens = util.EscapeHTML(tokens)
-					r.write(tokens)
+					r.Write(tokens)
 				}
 			} else {
-				if r.option.CodeSyntaxHighlightDetectLang {
+				if r.Option.CodeSyntaxHighlightDetectLang {
 					language := detectLanguage(tokens)
 					if "" != language {
-						r.writeString("<pre><code class=\"language-" + language)
+						r.WriteString("<pre><code class=\"language-" + language)
 					} else {
-						r.writeString("<pre><code>")
+						r.WriteString("<pre><code>")
 					}
 				} else {
-					r.writeString("<pre><code>")
+					r.WriteString("<pre><code>")
 				}
 				tokens = util.EscapeHTML(tokens)
-				r.write(tokens)
+				r.Write(tokens)
 			}
 		}
 		return ast.WalkSkipChildren
 	}
-	r.writeString("</code></pre>")
+	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
 
@@ -130,34 +130,34 @@ func highlightChroma(tokens []byte, language string, r *HTMLRenderer) (rendered 
 			chromahtml.PreventSurroundingPre(true),
 			chromahtml.ClassPrefix("highlight-"),
 		}
-		if !r.option.CodeSyntaxHighlightInlineStyle {
+		if !r.Option.CodeSyntaxHighlightInlineStyle {
 			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithClasses(true))
 		}
-		if r.option.CodeSyntaxHighlightLineNum {
+		if r.Option.CodeSyntaxHighlightLineNum {
 			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithLineNumbers(true))
 		}
 		formatter := chromahtml.New(chromahtmlOpts...)
-		style := styles.Get(r.option.CodeSyntaxHighlightStyleName)
+		style := styles.Get(r.Option.CodeSyntaxHighlightStyleName)
 		var b bytes.Buffer
 		if err = formatter.Format(&b, style, iterator); nil == err {
-			if !r.option.CodeSyntaxHighlightInlineStyle {
-				r.writeString("<pre>")
+			if !r.Option.CodeSyntaxHighlightInlineStyle {
+				r.WriteString("<pre>")
 			} else {
-				r.writeString("<pre style=\"" + chromahtml.StyleEntryToCSS(style.Get(chroma.Background)) + "\">")
+				r.WriteString("<pre style=\"" + chromahtml.StyleEntryToCSS(style.Get(chroma.Background)) + "\">")
 			}
 			if "" != language {
-				r.writeString("<code class=\"language-" + language)
+				r.WriteString("<code class=\"language-" + language)
 			} else {
-				r.writeString("<code class=\"")
+				r.WriteString("<code class=\"")
 			}
-			if !r.option.CodeSyntaxHighlightInlineStyle {
+			if !r.Option.CodeSyntaxHighlightInlineStyle {
 				if "" != language {
-					r.writeByte(lex.ItemSpace)
+					r.WriteByte(lex.ItemSpace)
 				}
-				r.writeString("highlight-chroma")
+				r.WriteString("highlight-chroma")
 			}
-			r.writeString("\">")
-			r.writeBytes(b.Bytes())
+			r.WriteString("\">")
+			r.WriteBytes(b.Bytes())
 			rendered = true
 		}
 	}

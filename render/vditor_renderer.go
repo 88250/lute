@@ -30,106 +30,106 @@ type VditorRenderer struct {
 
 // NewVditorRenderer 创建一个 HTML 渲染器。
 func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
-	ret := &VditorRenderer{BaseRenderer: newBaseRenderer(tree)}
-	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
-	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
-	ret.rendererFuncs[ast.NodeText] = ret.renderText
-	ret.rendererFuncs[ast.NodeCodeSpan] = ret.renderCodeSpan
-	ret.rendererFuncs[ast.NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
-	ret.rendererFuncs[ast.NodeCodeSpanContent] = ret.renderCodeSpanContent
-	ret.rendererFuncs[ast.NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
-	ret.rendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
-	ret.rendererFuncs[ast.NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
-	ret.rendererFuncs[ast.NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
-	ret.rendererFuncs[ast.NodeCodeBlockCode] = ret.renderCodeBlockCode
-	ret.rendererFuncs[ast.NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
-	ret.rendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
-	ret.rendererFuncs[ast.NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
-	ret.rendererFuncs[ast.NodeMathBlockContent] = ret.renderMathBlockContent
-	ret.rendererFuncs[ast.NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
-	ret.rendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath
-	ret.rendererFuncs[ast.NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
-	ret.rendererFuncs[ast.NodeInlineMathContent] = ret.renderInlineMathContent
-	ret.rendererFuncs[ast.NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
-	ret.rendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
-	ret.rendererFuncs[ast.NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
-	ret.rendererFuncs[ast.NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
-	ret.rendererFuncs[ast.NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
-	ret.rendererFuncs[ast.NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
-	ret.rendererFuncs[ast.NodeStrong] = ret.renderStrong
-	ret.rendererFuncs[ast.NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
-	ret.rendererFuncs[ast.NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
-	ret.rendererFuncs[ast.NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
-	ret.rendererFuncs[ast.NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
-	ret.rendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
-	ret.rendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
-	ret.rendererFuncs[ast.NodeHeading] = ret.renderHeading
-	ret.rendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
-	ret.rendererFuncs[ast.NodeList] = ret.renderList
-	ret.rendererFuncs[ast.NodeListItem] = ret.renderListItem
-	ret.rendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
-	ret.rendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
-	ret.rendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
-	ret.rendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
-	ret.rendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
-	ret.rendererFuncs[ast.NodeLink] = ret.renderLink
-	ret.rendererFuncs[ast.NodeImage] = ret.renderImage
-	ret.rendererFuncs[ast.NodeBang] = ret.renderBang
-	ret.rendererFuncs[ast.NodeOpenBracket] = ret.renderOpenBracket
-	ret.rendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
-	ret.rendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
-	ret.rendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
-	ret.rendererFuncs[ast.NodeLinkText] = ret.renderLinkText
-	ret.rendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
-	ret.rendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
-	ret.rendererFuncs[ast.NodeLinkTitle] = ret.renderLinkTitle
-	ret.rendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
-	ret.rendererFuncs[ast.NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
-	ret.rendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
-	ret.rendererFuncs[ast.NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
-	ret.rendererFuncs[ast.NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
-	ret.rendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
-	ret.rendererFuncs[ast.NodeTable] = ret.renderTable
-	ret.rendererFuncs[ast.NodeTableHead] = ret.renderTableHead
-	ret.rendererFuncs[ast.NodeTableRow] = ret.renderTableRow
-	ret.rendererFuncs[ast.NodeTableCell] = ret.renderTableCell
-	ret.rendererFuncs[ast.NodeEmoji] = ret.renderEmoji
-	ret.rendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
-	ret.rendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
-	ret.rendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
-	ret.rendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
-	ret.rendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
-	ret.rendererFuncs[ast.NodeBackslash] = ret.renderBackslash
-	ret.rendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
+	ret := &VditorRenderer{BaseRenderer: NewBaseRenderer(tree)}
+	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
+	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
+	ret.RendererFuncs[ast.NodeText] = ret.renderText
+	ret.RendererFuncs[ast.NodeCodeSpan] = ret.renderCodeSpan
+	ret.RendererFuncs[ast.NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
+	ret.RendererFuncs[ast.NodeCodeSpanContent] = ret.renderCodeSpanContent
+	ret.RendererFuncs[ast.NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
+	ret.RendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
+	ret.RendererFuncs[ast.NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
+	ret.RendererFuncs[ast.NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
+	ret.RendererFuncs[ast.NodeCodeBlockCode] = ret.renderCodeBlockCode
+	ret.RendererFuncs[ast.NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
+	ret.RendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
+	ret.RendererFuncs[ast.NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
+	ret.RendererFuncs[ast.NodeMathBlockContent] = ret.renderMathBlockContent
+	ret.RendererFuncs[ast.NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
+	ret.RendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath
+	ret.RendererFuncs[ast.NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
+	ret.RendererFuncs[ast.NodeInlineMathContent] = ret.renderInlineMathContent
+	ret.RendererFuncs[ast.NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
+	ret.RendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
+	ret.RendererFuncs[ast.NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
+	ret.RendererFuncs[ast.NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
+	ret.RendererFuncs[ast.NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
+	ret.RendererFuncs[ast.NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
+	ret.RendererFuncs[ast.NodeStrong] = ret.renderStrong
+	ret.RendererFuncs[ast.NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
+	ret.RendererFuncs[ast.NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
+	ret.RendererFuncs[ast.NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
+	ret.RendererFuncs[ast.NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
+	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
+	ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
+	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
+	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
+	ret.RendererFuncs[ast.NodeList] = ret.renderList
+	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
+	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
+	ret.RendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
+	ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
+	ret.RendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
+	ret.RendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
+	ret.RendererFuncs[ast.NodeLink] = ret.renderLink
+	ret.RendererFuncs[ast.NodeImage] = ret.renderImage
+	ret.RendererFuncs[ast.NodeBang] = ret.renderBang
+	ret.RendererFuncs[ast.NodeOpenBracket] = ret.renderOpenBracket
+	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
+	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
+	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
+	ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
+	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
+	ret.RendererFuncs[ast.NodeLinkTitle] = ret.renderLinkTitle
+	ret.RendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
+	ret.RendererFuncs[ast.NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
+	ret.RendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
+	ret.RendererFuncs[ast.NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
+	ret.RendererFuncs[ast.NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
+	ret.RendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
+	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
+	ret.RendererFuncs[ast.NodeTableHead] = ret.renderTableHead
+	ret.RendererFuncs[ast.NodeTableRow] = ret.renderTableRow
+	ret.RendererFuncs[ast.NodeTableCell] = ret.renderTableCell
+	ret.RendererFuncs[ast.NodeEmoji] = ret.renderEmoji
+	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
+	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
+	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
+	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
+	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
+	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	return ret
 }
 
 func (r *VditorRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(util.EscapeHTML(node.Tokens))
+	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
 func (r *VditorRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeString("<span data-type=\"backslash\">")
-		r.writeString("<span>")
-		r.writeByte(lex.ItemBackslash)
-		r.writeString("</span>")
+		r.WriteString("<span data-type=\"backslash\">")
+		r.WriteString("<span>")
+		r.WriteByte(lex.ItemBackslash)
+		r.WriteString("</span>")
 	} else {
-		r.writeString("</span>")
+		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeString("[" + util.BytesToStr(node.Tokens) + "]: ")
+		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]: ")
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeString("[" + util.BytesToStr(node.Tokens) + "]")
+	r.WriteString("[" + util.BytesToStr(node.Tokens) + "]")
 	return ast.WalkStop
 }
 
@@ -150,12 +150,12 @@ func (r *VditorRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(node.Tokens)
+	r.Write(node.Tokens)
 	return ast.WalkStop
 }
 
 func (r *VditorRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(node.Tokens)
+	r.Write(node.Tokens)
 	return ast.WalkStop
 }
 
@@ -168,13 +168,13 @@ func (r *VditorRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bo
 }
 
 func (r *VditorRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
+	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
 	r.tag("code", [][]string{{"data-type", "math-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), []byte(""))
 	tokens = util.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
-	r.write(tokens)
-	r.writeString("</code></span>" + parse.Zwsp)
+	r.Write(tokens)
+	r.WriteString("</code></span>" + parse.Zwsp)
 	return ast.WalkStop
 }
 
@@ -187,7 +187,7 @@ func (r *VditorRenderer) renderInlineMath(node *ast.Node, entering bool) ast.Wal
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
 		if "" == previousNodeText {
-			r.writeString(parse.Zwsp)
+			r.WriteString(parse.Zwsp)
 		}
 	}
 	return ast.WalkContinue
@@ -201,14 +201,14 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
-	r.writeString("<pre>")
+	r.WriteString("<pre>")
 	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
 	if codeIsEmpty {
-		r.writeString("<wbr>\n")
+		r.WriteString("<wbr>\n")
 	} else {
-		r.write(util.EscapeHTML(node.Tokens))
+		r.Write(util.EscapeHTML(node.Tokens))
 	}
-	r.writeString("</code></pre>")
+	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
 
@@ -218,9 +218,9 @@ func (r *VditorRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool
 
 func (r *VditorRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeString(`<div class="vditor-wysiwyg__block" data-type="math-block" data-block="0">`)
+		r.WriteString(`<div class="vditor-wysiwyg__block" data-type="math-block" data-block="0">`)
 	} else {
-		r.writeString("</div>")
+		r.WriteString("</div>")
 	}
 	return ast.WalkContinue
 }
@@ -317,7 +317,7 @@ func (r *VditorRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *VditorRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
-	r.write(node.Tokens)
+	r.Write(node.Tokens)
 	return ast.WalkStop
 }
 
@@ -343,31 +343,31 @@ func (r *VditorRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if 0 == r.disableTags {
-			r.writeString("<img src=\"")
+		if 0 == r.DisableTags {
+			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.tree.Context.RelativePath(destTokens)
+			destTokens = r.Tree.Context.RelativePath(destTokens)
 			destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), []byte(""))
-			r.write(destTokens)
-			r.writeString("\" alt=\"")
+			r.Write(destTokens)
+			r.WriteString("\" alt=\"")
 			if alt := node.ChildByType(ast.NodeLinkText); nil != alt && bytes.Contains(alt.Tokens, []byte(parse.Caret)) {
 				alt.Tokens = bytes.ReplaceAll(alt.Tokens, []byte(parse.Caret), []byte(""))
 			}
 		}
-		r.disableTags++
+		r.DisableTags++
 		return ast.WalkContinue
 	}
 
-	r.disableTags--
-	if 0 == r.disableTags {
-		r.writeString("\"")
+	r.DisableTags--
+	if 0 == r.DisableTags {
+		r.WriteString("\"")
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			r.writeString(" title=\"")
+			r.WriteString(" title=\"")
 			title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(parse.Caret), []byte(""))
-			r.write(title.Tokens)
-			r.writeString("\"")
+			r.Write(title.Tokens)
+			r.WriteString("\"")
 		}
-		r.writeString(" />")
+		r.WriteString(" />")
 	}
 	return ast.WalkContinue
 }
@@ -376,7 +376,7 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 	if entering {
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
-		destTokens = r.tree.Context.RelativePath(destTokens)
+		destTokens = r.Tree.Context.RelativePath(destTokens)
 		caretInDest := bytes.Contains(destTokens, []byte(parse.Caret))
 		if caretInDest {
 			text := node.ChildByType(ast.NodeLinkText)
@@ -396,18 +396,18 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 }
 
 func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
+	r.WriteString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
 	node.Tokens = bytes.TrimSpace(node.Tokens)
-	r.writeString("<pre>")
+	r.WriteString("<pre>")
 	r.tag("code", nil, false)
-	r.write(util.EscapeHTML(node.Tokens))
-	r.writeString("</code></pre></div>")
+	r.Write(util.EscapeHTML(node.Tokens))
+	r.WriteString("</code></pre></div>")
 	return ast.WalkStop
 }
 
 func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if bytes.Equal(node.Tokens, []byte("<br />")) && node.ParentIs(ast.NodeTableCell) {
-		r.write(node.Tokens)
+		r.Write(node.Tokens)
 		return ast.WalkStop
 	}
 
@@ -415,18 +415,18 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
 		if "" == previousNodeText {
-			r.writeString(parse.Zwsp)
+			r.WriteString(parse.Zwsp)
 		}
 	}
 
-	r.writeString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
+	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), []byte(""))
 	tokens = util.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
-	r.write(tokens)
-	r.writeString("</code></span>" + parse.Zwsp)
+	r.Write(tokens)
+	r.WriteString("</code></span>" + parse.Zwsp)
 	return ast.WalkStop
 }
 
@@ -442,21 +442,21 @@ func (r *VditorRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 	if entering {
 		r.tag("p", [][]string{{"data-block", "0"}}, false)
 	} else {
-		r.writeByte(lex.ItemNewline)
+		r.WriteByte(lex.ItemNewline)
 		r.tag("/p", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
-	if r.option.AutoSpace {
-		r.space(node)
+	if r.Option.AutoSpace {
+		r.Space(node)
 	}
-	if r.option.FixTermTypo {
-		r.fixTermTypo(node)
+	if r.Option.FixTermTypo {
+		r.FixTermTypo(node)
 	}
-	if r.option.ChinesePunct {
-		r.chinesePunct(node)
+	if r.Option.ChinesePunct {
+		r.ChinesePunct(node)
 	}
 
 	node.Tokens = bytes.TrimRight(node.Tokens, "\n")
@@ -464,7 +464,7 @@ func (r *VditorRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 	if !bytes.EqualFold(node.Tokens, []byte(parse.Caret+parse.Zwsp)) {
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), []byte(""))
 	}
-	r.write(util.EscapeHTML(node.Tokens))
+	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -473,11 +473,11 @@ func (r *VditorRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
 		if "" == previousNodeText {
-			r.writeString(parse.Zwsp)
+			r.WriteString(parse.Zwsp)
 		} else {
 			lastc, _ := utf8.DecodeLastRuneInString(previousNodeText)
 			if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
-				r.writeByte(lex.ItemSpace)
+				r.WriteByte(lex.ItemSpace)
 			}
 		}
 		r.tag("code", [][]string{{"data-marker", strings.Repeat("`", node.CodeMarkerLen)}}, false)
@@ -493,17 +493,17 @@ func (r *VditorRenderer) renderCodeSpanContent(node *ast.Node, entering bool) as
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), []byte(""))
 	tokens = util.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
-	r.write(tokens)
+	r.Write(tokens)
 	return ast.WalkStop
 }
 
 func (r *VditorRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeString("</code>")
+	r.WriteString("</code>")
 	codeSpan := node.Parent
 	if codeSpanParent := codeSpan.Parent; nil != codeSpanParent && ast.NodeLink == codeSpanParent.Type {
 		return ast.WalkStop
 	}
-	r.writeString(parse.Zwsp)
+	r.WriteString(parse.Zwsp)
 	return ast.WalkStop
 }
 
@@ -557,9 +557,9 @@ func (r *VditorRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering boo
 
 func (r *VditorRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeString(`<blockquote data-block="0">`)
+		r.WriteString(`<blockquote data-block="0">`)
 	} else {
-		r.writeString("</blockquote>")
+		r.WriteString("</blockquote>")
 	}
 	return ast.WalkContinue
 }
@@ -570,26 +570,26 @@ func (r *VditorRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) a
 
 func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeString("<h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\"")
+		r.WriteString("<h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\"")
 		if !node.HeadingSetext {
-			r.writeString(" data-marker=\"#\">")
+			r.WriteString(" data-marker=\"#\">")
 		} else {
 			if 1 == node.HeadingLevel {
-				r.writeString(" data-marker=\"=\">")
+				r.WriteString(" data-marker=\"=\">")
 			} else {
-				r.writeString(" data-marker=\"-\">")
+				r.WriteString(" data-marker=\"-\">")
 			}
 		}
-		if r.option.HeadingAnchor {
+		if r.Option.HeadingAnchor {
 			anchor := node.Text()
 			anchor = strings.ReplaceAll(anchor, " ", "-")
 			anchor = strings.ReplaceAll(anchor, ".", "")
 			r.tag("a", [][]string{{"id", "vditorAnchor-" + anchor}, {"class", "vditor-anchor"}, {"href", "#" + anchor}}, false)
-			r.writeString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
+			r.WriteString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
 			r.tag("/a", nil, false)
 		}
 	} else {
-		r.writeString("</h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + ">")
+		r.WriteString("</h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + ">")
 	}
 	return ast.WalkContinue
 }
@@ -638,7 +638,7 @@ func (r *VditorRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			}
 			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type {
-				attrs = append(attrs, []string{"class", r.option.GFMTaskListItemClass})
+				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
 		r.tag("li", attrs, false)
@@ -662,8 +662,8 @@ func (r *VditorRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.
 	r.tag("hr", [][]string{{"data-block", "0"}}, true)
 	if nil != node.Tokens {
 		r.tag("p", [][]string{{"data-block", "0"}}, false)
-		r.writeBytes(node.Tokens)
-		r.writeByte(lex.ItemNewline)
+		r.WriteBytes(node.Tokens)
+		r.WriteByte(lex.ItemNewline)
 		r.tag("/p", nil, false)
 	}
 	return ast.WalkStop
@@ -675,26 +675,26 @@ func (r *VditorRenderer) renderHardBreak(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *VditorRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.writeByte(lex.ItemNewline)
+	r.WriteByte(lex.ItemNewline)
 	return ast.WalkStop
 }
 
 func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
-	if r.disableTags > 0 {
+	if r.DisableTags > 0 {
 		return
 	}
 
-	r.writeString("<")
-	r.writeString(name)
+	r.WriteString("<")
+	r.WriteString(name)
 	if 0 < len(attrs) {
 		for _, attr := range attrs {
-			r.writeString(" " + attr[0] + "=\"" + attr[1] + "\"")
+			r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
 		}
 	}
 	if selfclosing {
-		r.writeString(" /")
+		r.WriteString(" /")
 	}
-	r.writeString(">")
+	r.WriteString(">")
 }
 
 func (r *VditorRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
@@ -703,9 +703,9 @@ func (r *VditorRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Walk
 		if nil != node.FirstChild {
 			marker = string(node.FirstChild.Tokens)
 		}
-		r.writeString(`<div class="vditor-wysiwyg__block" data-type="code-block" data-block="0" data-marker="` + marker + `">`)
+		r.WriteString(`<div class="vditor-wysiwyg__block" data-type="code-block" data-block="0" data-marker="` + marker + `">`)
 	} else {
-		r.writeString("</div>")
+		r.WriteString("</div>")
 	}
 	return ast.WalkContinue
 }
@@ -723,15 +723,15 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 		language := string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})
 	}
-	r.writeString("<pre>")
+	r.WriteString("<pre>")
 	r.tag("code", attrs, false)
 
 	if codeIsEmpty {
-		r.writeString("<wbr>\n")
+		r.WriteString("<wbr>\n")
 	} else {
-		r.write(util.EscapeHTML(node.Tokens))
-		r.newline()
+		r.Write(util.EscapeHTML(node.Tokens))
+		r.Newline()
 	}
-	r.writeString("</code></pre>")
+	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }

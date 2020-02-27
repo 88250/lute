@@ -22,37 +22,37 @@ import (
 func (r *HTMLRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !node.IsFencedCodeBlock {
 		// 缩进代码块处理
-		r.newline()
-		r.writeString("<pre><code>")
-		r.write(util.EscapeHTML(node.FirstChild.Tokens))
-		r.writeString("</code></pre>")
-		r.newline()
+		r.Newline()
+		r.WriteString("<pre><code>")
+		r.Write(util.EscapeHTML(node.FirstChild.Tokens))
+		r.WriteString("</code></pre>")
+		r.Newline()
 		return ast.WalkStop
 	}
-	r.newline()
+	r.Newline()
 	return ast.WalkContinue
 }
 
 func (r *HTMLRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.newline()
+		r.Newline()
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
 			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 			language := infoWords[0]
-			r.writeString("<pre><code class=\"language-")
-			r.write(language)
-			r.writeString("\">")
+			r.WriteString("<pre><code class=\"language-")
+			r.Write(language)
+			r.WriteString("\">")
 			tokens = util.EscapeHTML(tokens)
-			r.write(tokens)
+			r.Write(tokens)
 		} else {
-			r.writeString("<pre><code>")
+			r.WriteString("<pre><code>")
 			tokens = util.EscapeHTML(tokens)
-			r.write(tokens)
+			r.Write(tokens)
 		}
 		return ast.WalkSkipChildren
 	}
-	r.writeString("</code></pre>")
-	r.newline()
+	r.WriteString("</code></pre>")
+	r.Newline()
 	return ast.WalkStop
 }

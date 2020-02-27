@@ -34,22 +34,21 @@ type Renderer interface {
 
 // BaseRenderer 描述了渲染器结构。
 type BaseRenderer struct {
-	writer              *bytes.Buffer                 // 输出缓冲
-	lastOut             byte                          // 最新输出的一个字节
-	rendererFuncs       map[ast.NodeType]RendererFunc // 渲染器
-	defaultRendererFunc RendererFunc                  // 默认渲染器，在 rendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
-	disableTags         int                           // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
-	option              *parse.Options                // 解析渲染选项
-	tree                *parse.Tree                   // 待渲染的树
-
-	ExtRendererFuncs map[ast.NodeType]ExtRendererFunc // 用户自定义的渲染器
+	Option              *parse.Options                   // 解析渲染选项
+	RendererFuncs       map[ast.NodeType]RendererFunc    // 渲染器
+	DefaultRendererFunc RendererFunc                     // 默认渲染器，在 RendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
+	ExtRendererFuncs    map[ast.NodeType]ExtRendererFunc // 用户自定义的渲染器
+	Writer              *bytes.Buffer                    // 输出缓冲
+	LastOut             byte                             // 最新输出的一个字节
+	Tree                *parse.Tree                      // 待渲染的树
+	DisableTags         int                              // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
 }
 
-// newBaseRenderer 构造一个 BaseRenderer。
-func newBaseRenderer(tree *parse.Tree) *BaseRenderer {
-	ret := &BaseRenderer{rendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, option: tree.Context.Option, tree: tree}
-	ret.writer = &bytes.Buffer{}
-	ret.writer.Grow(4096)
+// NewBaseRenderer 构造一个 BaseRenderer。
+func NewBaseRenderer(tree *parse.Tree) *BaseRenderer {
+	ret := &BaseRenderer{RendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Option: tree.Context.Option, Tree: tree}
+	ret.Writer = &bytes.Buffer{}
+	ret.Writer.Grow(4096)
 	return ret
 }
 
@@ -57,24 +56,24 @@ func newBaseRenderer(tree *parse.Tree) *BaseRenderer {
 func (r *BaseRenderer) Render() (output []byte, err error) {
 	defer util.RecoverPanic(&err)
 
-	r.lastOut = lex.ItemNewline
-	r.writer = &bytes.Buffer{}
-	r.writer.Grow(4096)
+	r.LastOut = lex.ItemNewline
+	r.Writer = &bytes.Buffer{}
+	r.Writer.Grow(4096)
 
-	ast.Walk(r.tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+	ast.Walk(r.Tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		extRender := r.ExtRendererFuncs[n.Type]
 		if nil != extRender {
 			output, status := extRender(n, entering)
-			r.writeString(output)
+			r.WriteString(output)
 			return status
 		}
 
-		render := r.rendererFuncs[n.Type]
+		render := r.RendererFuncs[n.Type]
 		if nil == render {
-			render = r.rendererFuncs[n.Type]
+			render = r.RendererFuncs[n.Type]
 			if nil == render {
-				if nil != r.defaultRendererFunc {
-					return r.defaultRendererFunc(n, entering)
+				if nil != r.DefaultRendererFunc {
+					return r.DefaultRendererFunc(n, entering)
 				} else {
 					return r.renderDefault(n, entering)
 				}
@@ -86,107 +85,103 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 		return
 	}
 
-	output = r.writer.Bytes()
+	output = r.Writer.Bytes()
 	return
 }
 
-func (r *BaseRenderer) RendererFuncs(nodeType ast.NodeType) RendererFunc {
-	return r.rendererFuncs[nodeType]
-}
-
 func (r *BaseRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {
-	r.writeString("not found render function for node [type=" + n.Type.String() + ", Tokens=" + util.BytesToStr(n.Tokens) + "]")
+	r.WriteString("not found render function for node [type=" + n.Type.String() + ", Tokens=" + util.BytesToStr(n.Tokens) + "]")
 	return ast.WalkContinue
 }
 
-// writeByte 输出一个字节 c。
-func (r *BaseRenderer) writeByte(c byte) {
-	r.writer.WriteByte(c)
-	r.lastOut = c
+// WriteByte 输出一个字节 c。
+func (r *BaseRenderer) WriteByte(c byte) {
+	r.Writer.WriteByte(c)
+	r.LastOut = c
 }
 
-// writeBytes 输出字节数组 bytes。
-func (r *BaseRenderer) writeBytes(bytes []byte) {
+// WriteBytes 输出字节数组 bytes。
+func (r *BaseRenderer) WriteBytes(bytes []byte) {
 	if length := len(bytes); 0 < length {
-		r.writer.Write(bytes)
-		r.lastOut = bytes[length-1]
+		r.Writer.Write(bytes)
+		r.LastOut = bytes[length-1]
 	}
 }
 
-// write 输出指定的 Tokens 数组 content。
-func (r *BaseRenderer) write(content []byte) {
+// Write 输出指定的 Tokens 数组 content。
+func (r *BaseRenderer) Write(content []byte) {
 	if length := len(content); 0 < length {
-		r.writer.Write(content)
-		r.lastOut = content[length-1]
+		r.Writer.Write(content)
+		r.LastOut = content[length-1]
 	}
 }
 
-// writeString 输出指定的字符串 content。
-func (r *BaseRenderer) writeString(content string) {
+// WriteString 输出指定的字符串 content。
+func (r *BaseRenderer) WriteString(content string) {
 	if length := len(content); 0 < length {
-		r.writer.WriteString(content)
-		r.lastOut = content[length-1]
+		r.Writer.WriteString(content)
+		r.LastOut = content[length-1]
 	}
 }
 
-// newline 会在最新内容不是换行符 \n 时输出一个换行符。
-func (r *BaseRenderer) newline() {
-	if lex.ItemNewline != r.lastOut {
-		r.writer.WriteByte(lex.ItemNewline)
-		r.lastOut = lex.ItemNewline
+// Newline 会在最新内容不是换行符 \n 时输出一个换行符。
+func (r *BaseRenderer) Newline() {
+	if lex.ItemNewline != r.LastOut {
+		r.Writer.WriteByte(lex.ItemNewline)
+		r.LastOut = lex.ItemNewline
 	}
 }
 
-func (r *BaseRenderer) textAutoSpacePrevious(node *ast.Node) {
-	if r.option.AutoSpace {
+func (r *BaseRenderer) TextAutoSpacePrevious(node *ast.Node) {
+	if r.Option.AutoSpace {
 		if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
 			if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
 				prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
 				first, _ := utf8.DecodeRune(text.Tokens)
 				if allowSpace(prevLast, first) {
-					r.writer.WriteByte(lex.ItemSpace)
+					r.Writer.WriteByte(lex.ItemSpace)
 				}
 			}
 		}
 	}
 }
 
-func (r *BaseRenderer) textAutoSpaceNext(node *ast.Node) {
-	if r.option.AutoSpace {
+func (r *BaseRenderer) TextAutoSpaceNext(node *ast.Node) {
+	if r.Option.AutoSpace {
 		if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
 			if next := node.Next; nil != next && ast.NodeText == next.Type {
 				nextFirst, _ := utf8.DecodeRune(next.Tokens)
 				last, _ := utf8.DecodeLastRune(text.Tokens)
 				if allowSpace(last, nextFirst) {
-					r.writer.WriteByte(lex.ItemSpace)
+					r.Writer.WriteByte(lex.ItemSpace)
 				}
 			}
 		}
 	}
 }
 
-func (r *BaseRenderer) linkTextAutoSpacePrevious(node *ast.Node) {
-	if r.option.AutoSpace {
+func (r *BaseRenderer) LinkTextAutoSpacePrevious(node *ast.Node) {
+	if r.Option.AutoSpace {
 		if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
 			if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
 				prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
 				first, _ := utf8.DecodeRune(text.Tokens)
 				if allowSpace(prevLast, first) {
-					r.writer.WriteByte(lex.ItemSpace)
+					r.Writer.WriteByte(lex.ItemSpace)
 				}
 			}
 		}
 	}
 }
 
-func (r *BaseRenderer) linkTextAutoSpaceNext(node *ast.Node) {
-	if r.option.AutoSpace {
+func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
+	if r.Option.AutoSpace {
 		if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
 			if next := node.Next; nil != next && ast.NodeText == next.Type {
 				nextFirst, _ := utf8.DecodeRune(next.Tokens)
 				last, _ := utf8.DecodeLastRune(text.Tokens)
 				if allowSpace(last, nextFirst) {
-					r.writer.WriteByte(lex.ItemSpace)
+					r.Writer.WriteByte(lex.ItemSpace)
 				}
 			}
 		}

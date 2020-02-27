@@ -26,39 +26,39 @@ type EChartsJSONRenderer struct {
 
 // newEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
 func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
-	ret := &EChartsJSONRenderer{newBaseRenderer(tree)}
-	ret.rendererFuncs[ast.NodeDocument] = ret.renderDocument
-	ret.rendererFuncs[ast.NodeParagraph] = ret.renderParagraph
-	ret.rendererFuncs[ast.NodeText] = ret.renderText
-	ret.rendererFuncs[ast.NodeCodeSpan] = ret.renderCodeSpan
-	ret.rendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
-	ret.rendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
-	ret.rendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath
-	ret.rendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
-	ret.rendererFuncs[ast.NodeStrong] = ret.renderStrong
-	ret.rendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
-	ret.rendererFuncs[ast.NodeHeading] = ret.renderHeading
-	ret.rendererFuncs[ast.NodeList] = ret.renderList
-	ret.rendererFuncs[ast.NodeListItem] = ret.renderListItem
-	ret.rendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
-	ret.rendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
-	ret.rendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
-	ret.rendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
-	ret.rendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
-	ret.rendererFuncs[ast.NodeLink] = ret.renderLink
-	ret.rendererFuncs[ast.NodeImage] = ret.renderImage
-	ret.rendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
-	ret.rendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
-	ret.rendererFuncs[ast.NodeTable] = ret.renderTable
-	ret.rendererFuncs[ast.NodeTableHead] = ret.renderTableHead
-	ret.rendererFuncs[ast.NodeTableRow] = ret.renderTableRow
-	ret.rendererFuncs[ast.NodeTableCell] = ret.renderTableCell
-	ret.rendererFuncs[ast.NodeEmoji] = ret.renderEmoji
-	ret.rendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
-	ret.rendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
-	ret.rendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret := &EChartsJSONRenderer{NewBaseRenderer(tree)}
+	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
+	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
+	ret.RendererFuncs[ast.NodeText] = ret.renderText
+	ret.RendererFuncs[ast.NodeCodeSpan] = ret.renderCodeSpan
+	ret.RendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
+	ret.RendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
+	ret.RendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath
+	ret.RendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
+	ret.RendererFuncs[ast.NodeStrong] = ret.renderStrong
+	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
+	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
+	ret.RendererFuncs[ast.NodeList] = ret.renderList
+	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
+	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
+	ret.RendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
+	ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
+	ret.RendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
+	ret.RendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
+	ret.RendererFuncs[ast.NodeLink] = ret.renderLink
+	ret.RendererFuncs[ast.NodeImage] = ret.renderImage
+	ret.RendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
+	ret.RendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
+	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
+	ret.RendererFuncs[ast.NodeTableHead] = ret.renderTableHead
+	ret.RendererFuncs[ast.NodeTableRow] = ret.renderTableRow
+	ret.RendererFuncs[ast.NodeTableCell] = ret.renderTableCell
+	ret.RendererFuncs[ast.NodeEmoji] = ret.renderEmoji
+	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
+	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
+	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
 
-	ret.defaultRendererFunc = ret.renderDefault
+	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
 }
 
@@ -159,14 +159,14 @@ func (r *EChartsJSONRenderer) renderInlineHTML(node *ast.Node, entering bool) as
 
 func (r *EChartsJSONRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.writeByte(lex.ItemOpenBracket)
+		r.WriteByte(lex.ItemOpenBracket)
 		r.openObj()
 		r.val("Document", node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
 		r.closeObj(node)
-		r.writeByte(lex.ItemCloseBracket)
+		r.WriteByte(lex.ItemCloseBracket)
 	}
 	return ast.WalkContinue
 }
@@ -342,15 +342,15 @@ func (r *EChartsJSONRenderer) val(val string, node *ast.Node) {
 	val = strings.ReplaceAll(val, "\n", "\\n")
 	val = strings.ReplaceAll(val, "\"", "")
 	val = strings.ReplaceAll(val, "'", "")
-	r.writeString("\"name\":\"" + val + "\"")
+	r.WriteString("\"name\":\"" + val + "\"")
 }
 
 func (r *EChartsJSONRenderer) openObj() {
-	r.writeByte('{')
+	r.WriteByte('{')
 }
 
 func (r *EChartsJSONRenderer) closeObj(node *ast.Node) {
-	r.writeByte('}')
+	r.WriteByte('}')
 	if !r.ignore(node.Next) {
 		r.comma()
 	}
@@ -358,18 +358,18 @@ func (r *EChartsJSONRenderer) closeObj(node *ast.Node) {
 
 func (r *EChartsJSONRenderer) openChildren(node *ast.Node) {
 	if nil != node.FirstChild {
-		r.writeString(",\"children\":[")
+		r.WriteString(",\"children\":[")
 	}
 }
 
 func (r *EChartsJSONRenderer) closeChildren(node *ast.Node) {
 	if nil != node.FirstChild {
-		r.writeByte(']')
+		r.WriteByte(']')
 	}
 }
 
 func (r *EChartsJSONRenderer) comma() {
-	r.writeString(",")
+	r.WriteString(",")
 }
 
 func (r *EChartsJSONRenderer) ignore(node *ast.Node) bool {
