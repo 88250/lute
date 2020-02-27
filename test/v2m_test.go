@@ -20,6 +20,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"104", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;foo&gt;</code><span class=\"vditor-wysiwyg__preview\" data-render=\"false\" data-html=\"&amp;lt;foo&amp;gt;\">....</span></span>\u200b	bar<wbr>\n</p>", "<foo>\tbar\n"},
 	{"103", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><ul data-tight="true" data-marker="-" data-block="0"><li data-marker="-"><p>- -<wbr></p></li></ul></li></ul>`, "* ---\n"},
 	{"102", `<h2 data-block="0" data-marker="-">Setext 标题<wbr></h2>`, "Setext 标题\n-----------\n"},
 	{"101", `<ol data-tight="true" data-block="0"><li data-marker="1)"><p>foo</p></li><ol data-tight="true" data-block="0"><li data-marker="1)"><p>bar</p></li><li data-marker="2)"><p>baz</p></li></ol><li><p><wbr><br></p></li></ol>`, "1) foo\n   1) bar\n   2) baz\n2)\n"},

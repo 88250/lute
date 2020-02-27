@@ -968,5 +968,6 @@ func (lute *Lute) isInline(n *html.Node) bool {
 		atom.Strong == n.DataAtom ||
 		atom.Em == n.DataAtom ||
 		atom.A == n.DataAtom ||
-		atom.Img == n.DataAtom
+		atom.Img == n.DataAtom ||
+		atom.Span == n.DataAtom
 }
