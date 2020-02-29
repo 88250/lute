@@ -20,6 +20,8 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"103", "<p data-block=\"0\"><strong data-marker=\"**\">foo\n<em data-marker=\"*\">ba<wbr></em></strong>\n</p>", "<p data-block=\"0\"><strong data-marker=\"**\">foo\n<em data-marker=\"*\">ba<wbr></em></strong>\n</p>"},
+	{"102", "<p data-block=\"0\"><strong data-marker=\"**\">foo<em>\u200b\nb<wbr></em></strong>\n</p>", "<p data-block=\"0\"><strong data-marker=\"**\">foo\n<em data-marker=\"*\">b<wbr></em></strong>\n</p>"},
 	{"101", `<ul data-tight="true" data-marker="*" data-block="0"><li data-marker="*"><ul data-tight="true" data-marker="-" data-block="0"><li data-marker="-"><p>- -<wbr></p></li></ul></li></ul>`, "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><hr data-block=\"0\" /><p data-block=\"0\"><wbr>\n</p></li></ul>"},
 	{"100", "<em data-marker=\"*\">foo\nbar</em>\t\n---", "<h2 data-block=\"0\" data-marker=\"-\"><em data-marker=\"*\">foo\nbar</em></h2>"},
 	{"99", `<ol data-block="0"><li><p>f<wbr></p></li></ol>`, "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\">f<wbr></li></ol>"},

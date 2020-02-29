@@ -440,6 +440,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
+		if lute.starstWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+		}
 		text := strings.TrimSpace(lute.domText(n))
 		if lute.isEmptyText(n) {
 			return
@@ -484,7 +488,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
-		if strings.HasSuffix(n.FirstChild.Data, "\n") {
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
 		}
@@ -494,6 +498,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Strong, atom.B:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
+		}
+		if lute.starstWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
 		text := strings.TrimSpace(lute.domText(n))
 		if lute.isEmptyText(n) {
@@ -537,7 +545,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
-		if strings.HasSuffix(n.FirstChild.Data, "\n") {
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
 		}
@@ -547,6 +555,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Del, atom.S, atom.Strike:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
+		}
+		if lute.starstWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
 		text := strings.TrimSpace(lute.domText(n))
 		if lute.isEmptyText(n) {
@@ -587,7 +599,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 		}
-		if strings.HasSuffix(n.FirstChild.Data, "\n") {
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
 			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
 		}
@@ -956,6 +968,10 @@ func (lute *Lute) isEmptyText(n *html.Node) bool {
 		return true
 	}
 	return false
+}
+
+func (lute *Lute) starstWithNewline(n *html.Node) bool {
+	return strings.HasPrefix(n.Data, "\n") || strings.HasPrefix(n.Data, parse.Zwsp+"\n")
 }
 
 func (lute *Lute) isInline(n *html.Node) bool {
