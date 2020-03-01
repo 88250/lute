@@ -157,7 +157,7 @@ func highlightChroma(tokens []byte, language string, r *HtmlRenderer) (rendered 
 				r.WriteString("highlight-chroma")
 			}
 			r.WriteString("\">")
-			r.WriteBytes(b.Bytes())
+			r.Write(b.Bytes())
 			rendered = true
 		}
 	}

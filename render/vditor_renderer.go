@@ -662,7 +662,7 @@ func (r *VditorRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.
 	r.tag("hr", [][]string{{"data-block", "0"}}, true)
 	if nil != node.Tokens {
 		r.tag("p", [][]string{{"data-block", "0"}}, false)
-		r.WriteBytes(node.Tokens)
+		r.Write(node.Tokens)
 		r.WriteByte(lex.ItemNewline)
 		r.tag("/p", nil, false)
 	}

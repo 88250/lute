@@ -100,15 +100,7 @@ func (r *BaseRenderer) WriteByte(c byte) {
 	r.LastOut = c
 }
 
-// WriteBytes 输出字节数组 bytes。
-func (r *BaseRenderer) WriteBytes(bytes []byte) {
-	if length := len(bytes); 0 < length {
-		r.Writer.Write(bytes)
-		r.LastOut = bytes[length-1]
-	}
-}
-
-// Write 输出指定的 Tokens 数组 content。
+// Write 输出指定的字节数组 content。
 func (r *BaseRenderer) Write(content []byte) {
 	if length := len(content); 0 < length {
 		r.Writer.Write(content)

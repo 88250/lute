@@ -339,7 +339,7 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 		buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
 		r.Writer.Reset()
-		r.WriteBytes(buf)
+		r.Write(buf)
 		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
@@ -492,7 +492,7 @@ func (r *FormatRenderer) renderMathBlock(node *ast.Node, entering bool) ast.Walk
 
 func (r *FormatRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
-	r.WriteBytes(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
+	r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
 		r.WriteByte(lex.ItemNewline)
@@ -512,7 +512,7 @@ func (r *FormatRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool
 }
 
 func (r *FormatRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteBytes(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
+	r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
 	return ast.WalkStop
 }
 
@@ -521,10 +521,10 @@ func (r *FormatRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Walk
 		r.Newline()
 	}
 	if !node.IsFencedCodeBlock {
-		r.WriteBytes(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
+		r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
 		r.WriteByte(lex.ItemNewline)
 		r.Write(node.FirstChild.Tokens)
-		r.WriteBytes(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
+		r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
 			r.WriteByte(lex.ItemNewline)
@@ -636,7 +636,7 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
-		r.WriteBytes(buf)
+		r.Write(buf)
 		r.WriteString("\n\n")
 	}
 	return ast.WalkContinue
@@ -649,7 +649,7 @@ func (r *FormatRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) a
 func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if !node.HeadingSetext {
-			r.WriteBytes(bytes.Repeat([]byte{lex.ItemCrosshatch}, node.HeadingLevel))
+			r.Write(bytes.Repeat([]byte{lex.ItemCrosshatch}, node.HeadingLevel))
 			r.WriteByte(lex.ItemSpace)
 		}
 	} else {
@@ -691,7 +691,7 @@ func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf := bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
-		r.WriteBytes(buf)
+		r.Write(buf)
 		r.WriteString("\n\n")
 	}
 	return ast.WalkContinue
@@ -740,7 +740,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
-		r.WriteBytes(buf)
+		r.Write(buf)
 		r.WriteString("\n")
 	}
 	return ast.WalkContinue
