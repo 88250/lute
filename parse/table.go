@@ -64,16 +64,20 @@ func (context *Context) parseTable(paragraph *ast.Node) (ret *ast.Node) {
 	}
 
 	var maxWidth int
+	var maxWidthContent []byte
 	for col := 0; col < len(cells[0]); col++ {
 		for row := 0; row < len(cells); row++ {
 			if maxWidth < cells[row][col].TableCellContentWidth {
 				maxWidth = cells[row][col].TableCellContentWidth
+				maxWidthContent = cells[row][col].Tokens
 			}
 		}
 		for row := 0; row < len(cells); row++ {
 			cells[row][col].TableCellContentMaxWidth = maxWidth
+			cells[row][col].TableCellMaxWidthContent = maxWidthContent
 		}
 		maxWidth = 0
+		maxWidthContent = nil
 	}
 	return
 }
@@ -116,6 +120,7 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 		width := len(col)
 		cell := &ast.Node{Type: ast.NodeTableCell, TableCellAlign: aligns[i], TableCellContentWidth: width}
 		cell.Tokens = col
+		cell.TableCellContent = col
 		ret.AppendChild(cell)
 	}
 

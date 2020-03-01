@@ -64,10 +64,12 @@ type Node struct {
 
 	// 表
 
-	TableAligns              []int // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
-	TableCellAlign           int   // 表的单元格对齐方式
-	TableCellContentWidth    int   // 表的单元格内容宽度（字符数）
-	TableCellContentMaxWidth int   // 表的单元格内容最大宽度
+	TableAligns              []int  // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
+	TableCellAlign           int    // 表的单元格对齐方式
+	TableCellContentWidth    int    // 表的单元格内容宽度（字节数）
+	TableCellContentMaxWidth int    // 表的单元格内容最大宽度
+	TableCellContent         []byte // 表的单元格内容
+	TableCellMaxWidthContent []byte // 表的单元格最大宽度格的内容
 
 	// 链接
 
