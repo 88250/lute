@@ -13,9 +13,10 @@ package parse
 import (
 	"bytes"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
-func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
+func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, id []byte) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	marker := tokens[0]
 	if lex.ItemCrosshatch != marker {
@@ -70,6 +71,13 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 		}
 	}
 
+	if t.Context.Option.HeadingID || t.Context.Option.ToC || t.Context.Option.HeadingAnchor {
+		id = t.parseHeadingID(content)
+		if nil != id {
+			content = bytes.ReplaceAll(content, []byte("{"+util.BytesToStr(id)+"}"), nil)
+			_, content = lex.TrimRight(content)
+		}
+	}
 	ok = true
 	return
 }
@@ -116,5 +124,20 @@ func (t *Tree) parseSetextHeading() (level int) {
 		t.Context.oldtip.AppendTokens([]byte(Caret))
 	}
 
+	return
+}
+
+func (t *Tree) parseHeadingID(content []byte) (id []byte) {
+	length := len(content)
+	if '}' != content[length-1] {
+		return nil
+	}
+
+	curlyBracesStart := bytes.Index(content, []byte("{"))
+	if 1 > curlyBracesStart {
+		return nil
+	}
+
+	id = content[curlyBracesStart+1 : length-1]
 	return
 }

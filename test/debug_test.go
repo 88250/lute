@@ -19,25 +19,25 @@ import (
 var debugTests = []parseTest{
 
 	{"45", "*~foo~*bar\n", "<p><em><del>foo</del></em>bar</p>\n"},
-	//{"44", "~~foo~\n", "<p>~~foo~</p>\n"},
-	//{"43", "1. [x]\n2. [x] foo\n", "<ol>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ol>\n"},
-	//{"42", "* [x]\n* [x] foo\n", "<ul>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
-	//{"41", "f</\n", "<p>f&lt;/</p>\n"},
-	//
-	//// 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4
-	//{"40", "https://foo.com/bar}", "<p><a href=\"https://foo.com/bar%7D\">https://foo.com/bar}</a></p>\n"},
-	//
-	//{"39", "[label][] 是 label\n\n[label]: https://b3log.org\n", "<p><a href=\"https://b3log.org\">label</a> 是 label</p>\n"},
-	//{"38", "|abc|def|\n|---|---|\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
-	//
-	//// 链接解析括号匹配问题 https://github.com/b3log/lute/issues/36
-	//{"37", "[link](/u(ri\n)\n", "<p>[link](/u(ri<br />\n)</p>\n"},
-	//{"36", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
-	//
-	//{"35", "* [ ] foo [foo](/bar)\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo <a href=\"/bar\">foo</a></li>\n</ul>\n"},
-	//{"34", "[foo](/bar )1\n", "<p><a href=\"/bar\">foo</a>1</p>\n"},
-	//{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},
-	//{"32", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
+	{"44", "~~foo~\n", "<p>~~foo~</p>\n"},
+	{"43", "1. [x]\n2. [x] foo\n", "<ol>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ol>\n"},
+	{"42", "* [x]\n* [x] foo\n", "<ul>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
+	{"41", "f</\n", "<p>f&lt;/</p>\n"},
+
+	// 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4
+	{"40", "https://foo.com/bar}", "<p><a href=\"https://foo.com/bar%7D\">https://foo.com/bar}</a></p>\n"},
+
+	{"39", "[label][] 是 label\n\n[label]: https://b3log.org\n", "<p><a href=\"https://b3log.org\">label</a> 是 label</p>\n"},
+	{"38", "|abc|def|\n|---|---|\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
+
+	// 链接解析括号匹配问题 https://github.com/b3log/lute/issues/36
+	{"37", "[link](/u(ri\n)\n", "<p>[link](/u(ri<br />\n)</p>\n"},
+	{"36", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
+
+	{"35", "* [ ] foo [foo](/bar)\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo <a href=\"/bar\">foo</a></li>\n</ul>\n"},
+	{"34", "[foo](/bar )1\n", "<p><a href=\"/bar\">foo</a>1</p>\n"},
+	{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},
+	{"32", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
 	{"31", "*foo*<br>", "<p><em>foo</em><br></p>\n"},
 	{"30", "https://t.mex .mex 后缀不自动链接", "<p>https://t.mex .mex 后缀不自动链接</p>\n"},
 	{"29", "https://t.me .me 后缀自动链接", "<p><a href=\"https://t.me\">https://t.me</a> .me 后缀自动链接</p>\n"},
@@ -83,7 +83,7 @@ var debugTests = []parseTest{
 	{"8", "<\n", "<p>&lt;</p>\n"},
 	{"7", "|||\n|||\n", "<p>|||<br />\n|||</p>\n"},
 	{"6", "[https://github.com/88250/lute](https://github.com/88250/lute)\n", "<p><a href=\"https://github.com/88250/lute\">https://github.com/88250/lute</a></p>\n"},
-	{"5", "[1\n--\n", "<h2>[1</h2>\n"},
+	{"5", "[1\n--\n", "<h2 id=\"[1\">[1</h2>\n"},
 	{"4", "[1 \n", "<p>[1</p>\n"},
 	{"3", "- -\r\n", "<ul>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n</ul>\n"},
 	{"2", "foo@bar.baz\n", "<p><a href=\"mailto:foo@bar.baz\">foo@bar.baz</a></p>\n"},

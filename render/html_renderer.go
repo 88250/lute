@@ -26,12 +26,11 @@ import (
 type HtmlRenderer struct {
 	*BaseRenderer
 	needRenderFootnotesDef bool
-	headingCnt             int
 }
 
 // NewHtmlRenderer 创建一个 HTML 渲染器。
 func NewHtmlRenderer(tree *parse.Tree) Renderer {
-	ret := &HtmlRenderer{NewBaseRenderer(tree), false, 0}
+	ret := &HtmlRenderer{NewBaseRenderer(tree), false}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -122,12 +121,12 @@ func (r *HtmlRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 		return ast.WalkStop
 	}
 	r.WriteString("<div class=\"toc-div\">")
-	for i, heading := range headings {
+	for _, heading := range headings {
 		level := strconv.Itoa(heading.HeadingLevel)
 		spaces := (heading.HeadingLevel - 1) * 2
 		r.WriteString(strings.Repeat("&emsp;", spaces))
 		r.WriteString("<span class=\"toc-h" + level + "\">")
-		r.WriteString("<a class=\"toc-a\" href=\"#toc_h" + level + "_" + strconv.Itoa(i) + "\">" + heading.Text() + "</a></span><br>")
+		r.WriteString("<a class=\"toc-a\" href=\"#" + r.headingID(heading) + "\">" + heading.Text() + "</a></span><br>")
 	}
 	r.WriteString("</div>\n\n")
 
@@ -610,29 +609,38 @@ func (r *HtmlRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast
 	return ast.WalkStop
 }
 
+var headingLevel = " 123456"
+
 func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		level := " 123456"[node.HeadingLevel : node.HeadingLevel+1]
+		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		r.WriteString("<h" + level)
-		if r.Option.ToC {
-			r.WriteString(" id=\"toc_h" + level + "_" + strconv.Itoa(r.headingCnt) + "\"")
-			r.headingCnt++
+		id := r.headingID(node)
+		if r.Option.ToC || r.Option.HeadingID {
+			r.WriteString(" id=\"" + id + "\"")
 		}
 		r.WriteString(">")
 		if r.Option.HeadingAnchor {
-			anchor := node.Text()
-			anchor = strings.ReplaceAll(anchor, " ", "-")
-			anchor = strings.ReplaceAll(anchor, ".", "")
-			r.tag("a", [][]string{{"id", "vditorAnchor-" + anchor}, {"class", "vditor-anchor"}, {"href", "#" + anchor}}, false)
+			r.tag("a", [][]string{{"id", "vditorAnchor-" + id}, {"class", "vditor-anchor"}, {"href", "#" + id}}, false)
 			r.WriteString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
 			r.tag("/a", nil, false)
 		}
 	} else {
-		r.WriteString("</h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1] + ">")
+		r.WriteString("</h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + ">")
 		r.Newline()
 	}
 	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) headingID(heading *ast.Node) (id string) {
+	id = util.BytesToStr(heading.HeadingID)
+	if "" == id {
+		id = heading.Text()
+		id = strings.ReplaceAll(id, " ", "-")
+		id = strings.ReplaceAll(id, ".", "")
+	}
+	return
 }
 
 func (r *HtmlRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
