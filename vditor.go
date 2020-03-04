@@ -323,6 +323,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Ol, atom.Ul:
+		if nil == n.FirstChild {
+			return
+		}
+
 		node.Type = ast.NodeList
 		node.ListData = &ast.ListData{}
 		if atom.Ol == n.DataAtom {
