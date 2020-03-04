@@ -71,7 +71,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, i
 		}
 	}
 
-	if t.Context.Option.HeadingID || t.Context.Option.ToC || t.Context.Option.HeadingAnchor {
+	if t.Context.Option.HeadingID {
 		id = t.parseHeadingID(content)
 		if nil != id {
 			content = bytes.ReplaceAll(content, []byte("{"+util.BytesToStr(id)+"}"), nil)

@@ -249,7 +249,7 @@ func (r *EChartsJSONRenderer) renderBlockquote(node *ast.Node, entering bool) as
 func (r *EChartsJSONRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		h := "h" + " 123456"[node.HeadingLevel:node.HeadingLevel+1]
+		h := "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]
 		r.val("Heading\n"+h, node)
 		r.openChildren(node)
 	} else {

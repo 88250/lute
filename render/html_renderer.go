@@ -633,16 +633,6 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkContinue
 }
 
-func (r *HtmlRenderer) headingID(heading *ast.Node) (id string) {
-	id = util.BytesToStr(heading.HeadingID)
-	if "" == id {
-		id = heading.Text()
-		id = strings.ReplaceAll(id, " ", "-")
-		id = strings.ReplaceAll(id, ".", "")
-	}
-	return
-}
-
 func (r *HtmlRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }

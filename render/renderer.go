@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
@@ -178,4 +179,14 @@ func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
 			}
 		}
 	}
+}
+
+func (r *BaseRenderer) headingID(heading *ast.Node) (id string) {
+	id = util.BytesToStr(heading.HeadingID)
+	if "" == id {
+		id = heading.Text()
+		id = strings.ReplaceAll(id, " ", "-")
+		id = strings.ReplaceAll(id, ".", "")
+	}
+	return
 }

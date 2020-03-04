@@ -670,6 +670,9 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 				r.WriteString(strings.Repeat("-", contentLen))
 			}
 		}
+		if r.Option.HeadingID && nil != node.HeadingID {
+			r.WriteString(" {" + util.BytesToStr(node.HeadingID) + "}")
+		}
 		r.Newline()
 		r.WriteByte(lex.ItemNewline)
 	}
