@@ -241,6 +241,13 @@ func (r *VditorRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 			attrs = append(attrs, []string{"align", "right"})
 		}
 		r.tag(tag, attrs, false)
+		if nil == node.FirstChild {
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		} else if bytes.Equal(node.FirstChild.Tokens, []byte(parse.Caret)) {
+			node.FirstChild.Tokens = []byte(parse.Caret + " ")
+		} else {
+			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
+		}
 	} else {
 		r.tag("/"+tag, nil, false)
 	}
