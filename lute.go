@@ -36,6 +36,7 @@ type Lute struct {
 //  * 代码块语法高亮
 //  * 软换行转硬换行
 //  * 脚注
+//  * 标题自定义 ID
 //  * 中西文间插入空格
 //  * 修正术语拼写
 //  * 替换中文标点
@@ -55,6 +56,7 @@ func New(opts ...Option) (ret *Lute) {
 	ret.CodeSyntaxHighlightStyleName = "github"
 	ret.Footnotes = true
 	ret.ToC = false
+	ret.HeadingID = true
 	ret.AutoSpace = true
 	ret.FixTermTypo = true
 	ret.ChinesePunct = true
@@ -219,6 +221,10 @@ func (lute *Lute) SetFootnotes(b bool) {
 
 func (lute *Lute) SetToC(b bool) {
 	lute.ToC = b
+}
+
+func (lute *Lute) SetHeadingID(b bool) {
+	lute.HeadingID = b
 }
 
 func (lute *Lute) SetAutoSpace(b bool) {

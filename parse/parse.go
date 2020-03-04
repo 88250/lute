@@ -229,6 +229,8 @@ type Options struct {
 	Footnotes bool
 	// ToC 设置是否打开“目录”支持。
 	ToC bool
+	// HeadingID 设置是否打开“自定义标题 ID”支持。
+	HeadingID bool
 	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
 	// https://github.com/sparanoid/chinese-copywriting-guidelines
 	AutoSpace bool

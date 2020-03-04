@@ -34,6 +34,7 @@ func BenchmarkLute(b *testing.B) {
 	luteEngine.CodeSyntaxHighlight = false
 	luteEngine.Footnotes = false
 	luteEngine.ToC = false
+	luteEngine.HeadingID = false
 	luteEngine.AutoSpace = false
 	luteEngine.FixTermTypo = false
 	luteEngine.ChinesePunct = false
