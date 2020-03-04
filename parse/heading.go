@@ -129,6 +129,10 @@ func (t *Tree) parseSetextHeading() (level int) {
 
 func (t *Tree) parseHeadingID(content []byte) (id []byte) {
 	length := len(content)
+	if 3 > length {
+		return nil
+	}
+
 	if '}' != content[length-1] {
 		return nil
 	}
