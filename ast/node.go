@@ -77,8 +77,9 @@ type Node struct {
 
 	// 标题
 
-	HeadingLevel  int  // 1~6
-	HeadingSetext bool // 是否为 Setext
+	HeadingLevel  int    // 1~6
+	HeadingSetext bool   // 是否为 Setext
+	HeadingID     string // 标题自定义 ID
 
 	// 数学公式块
 
