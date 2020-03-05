@@ -12,7 +12,7 @@ package render
 
 import (
 	"bytes"
-	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
@@ -185,8 +185,18 @@ func (r *BaseRenderer) headingID(heading *ast.Node) (id string) {
 	id = util.BytesToStr(heading.HeadingID)
 	if "" == id {
 		id = heading.Text()
-		id = strings.ReplaceAll(id, " ", "-")
-		id = strings.ReplaceAll(id, ".", "")
+		id = r.normalizeHeadingID(id)
+	}
+	return
+}
+
+func (r *BaseRenderer) normalizeHeadingID(id string) (ret string) {
+	for _, r := range id {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			ret += "-"
+		} else {
+			ret += string(r)
+		}
 	}
 	return
 }
