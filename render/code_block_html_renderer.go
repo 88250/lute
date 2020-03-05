@@ -28,7 +28,7 @@ import (
 )
 
 // languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
-var languagesNoHighlight = []string{"mermaid", "echarts", "abc"}
+var languagesNoHighlight = []string{"mermaid", "echarts", "abc", "graphviz"}
 
 func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !node.IsFencedCodeBlock {
