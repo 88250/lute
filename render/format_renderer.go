@@ -30,7 +30,7 @@ type FormatRenderer struct {
 }
 
 // NewFormatRenderer 创建一个格式化渲染器。
-func NewFormatRenderer(tree *parse.Tree) Renderer {
+func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret := &FormatRenderer{BaseRenderer: NewBaseRenderer(tree)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
@@ -103,6 +103,24 @@ func NewFormatRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	return ret
+}
+
+func (r *FormatRenderer) Render() (output []byte, err error) {
+	output, err = r.BaseRenderer.Render()
+	if nil != err || 1 > len(r.Tree.Context.LinkRefDefs) {
+		return
+	}
+
+	buf := &bytes.Buffer{}
+	buf.WriteByte(lex.ItemNewline)
+	// 将链接引用定义添加到末尾
+	for _, node := range r.Tree.Context.LinkRefDefs {
+		label := node.LinkRefLabel
+		dest := node.ChildByType(ast.NodeLinkDest).Tokens
+		buf.WriteString("[" + util.BytesToStr(label) + "]: " + util.BytesToStr(dest) + "\n")
+	}
+	output = append(output, buf.Bytes()...)
+	return
 }
 
 func (r *FormatRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
@@ -310,6 +328,15 @@ func (r *FormatRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 func (r *FormatRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.LinkTextAutoSpacePrevious(node)
+		if 3 == node.LinkType {
+			text := node.ChildByType(ast.NodeLinkText).Tokens
+			if bytes.Equal(text, node.LinkRefLabel) {
+				r.WriteString("[" + util.BytesToStr(text) + "]")
+			} else {
+				r.WriteString("[" + util.BytesToStr(text) + "][" + util.BytesToStr(node.LinkRefLabel) + "]")
+			}
+			return ast.WalkStop
+		}
 	} else {
 		r.LinkTextAutoSpaceNext(node)
 	}
@@ -659,7 +686,7 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 			contentLen := 0
 			for _, r := range content {
 				if utf8.RuneSelf <= r {
-					contentLen+=2
+					contentLen += 2
 				} else {
 					contentLen++
 				}

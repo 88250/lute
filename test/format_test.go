@@ -26,6 +26,10 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	// 链接引用格式化改进 https://github.com/88250/lute/issues/36
+	{"50", "[text][foo]\n\n[foo]: bar\n", "[text][foo]\n\n[foo]: bar\n"},
+	{"49", "[foo]\n\n[foo]: bar\n", "[foo]\n\n[foo]: bar\n"},
+
 	// 格式化支持 Setext 标题 https://github.com/88250/lute/issues/29
 	{"48", "Setext 标题\n==", "Setext 标题\n===========\n"},
 	{"47", "Setext 标题\n------", "Setext 标题\n-----------\n"},

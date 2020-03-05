@@ -22,7 +22,7 @@ import (
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.Context.Tip = t.Root
-	t.Context.linkRefDefs = map[string]*ast.Node{}
+	t.Context.LinkRefDefs = map[string]*ast.Node{}
 	t.Context.FootnotesDefs = []*ast.Node{}
 	lines := 0
 	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {

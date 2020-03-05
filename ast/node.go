@@ -73,7 +73,8 @@ type Node struct {
 
 	// 链接
 
-	LinkType int // 链接类型，0：内联链接 [foo](/bar)，1：链接引用 [label]，2：自动链接
+	LinkType int // 链接类型，0：内联链接 [foo](/bar)，1：链接引用定义 [foo]: /bar，2：自动链接，3：链接引用 [foo]
+	LinkRefLabel []byte // 链接引用 label，[label] 或者 [text][label] 形式，[label] 情况下 text 和 label 相同
 
 	// 标题
 

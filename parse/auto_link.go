@@ -499,6 +499,9 @@ func (t *Tree) newLink(typ ast.NodeType, text, dest, title []byte, linkType int)
 		ret.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: title})
 	}
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+	if 1 == linkType {
+		ret.LinkRefLabel = text
+	}
 	return
 }
 

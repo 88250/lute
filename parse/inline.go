@@ -214,6 +214,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 	}
 
 	var reflabel []byte
+	var linkType int
 	if !matched {
 		// 尝试解析链接 label
 		var beforelabel = ctx.pos
@@ -254,19 +255,20 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			}
 
 			// 查找链接引用
-			if link := t.Context.linkRefDefs[strings.ToLower(util.BytesToStr(reflabel))]; nil != link {
+			if link := t.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(reflabel))]; nil != link {
 				dest = link.ChildByType(ast.NodeLinkDest).Tokens
 				titleNode := link.ChildByType(ast.NodeLinkTitle)
 				if nil != titleNode {
 					title = titleNode.Tokens
 				}
 				matched = true
+				linkType = 3
 			}
 		}
 	}
 
 	if matched {
-		node := &ast.Node{Type: ast.NodeLink, LinkType: 0}
+		node := &ast.Node{Type: ast.NodeLink, LinkType: linkType, LinkRefLabel:reflabel}
 		if isImage {
 			node.Type = ast.NodeImage
 			node.AppendChild(&ast.Node{Type: ast.NodeBang, Tokens: opener.node.Tokens[:1]})
