@@ -12,9 +12,10 @@ package parse
 
 import (
 	"bytes"
+	"unicode/utf8"
+
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
-	"unicode/utf8"
 )
 
 func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, destination []byte) {
@@ -141,10 +142,11 @@ func (context *Context) RelativePath(dest []byte) []byte {
 		return dest
 	}
 
+	// 强制将 %5C 即反斜杠 \ 转换为斜杠 / 以兼容 Windows 平台上使用的路径
+	dest = bytes.ReplaceAll(dest, []byte("%5C"), []byte("\\"))
 	if !context.isRelativePath(dest) {
 		return dest
 	}
-
 	return append(util.StrToBytes(context.Option.LinkBase), dest...)
 }
 
@@ -156,6 +158,5 @@ func (context *Context) isRelativePath(dest []byte) bool {
 	if '/' == dest[0] {
 		return false
 	}
-
-	return !bytes.Contains(dest, []byte("://"))
+	return !bytes.Contains(dest, []byte(":/")) && !bytes.Contains(dest, []byte(":\\"))
 }

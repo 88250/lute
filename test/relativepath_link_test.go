@@ -16,7 +16,7 @@ import (
 )
 
 var relativePathLinkTests = []parseTest{
-
+	{"2", "![foo](D:\\bar.png)\n", "<p><img src=\"D:\\bar.png\" alt=\"foo\" /></p>\n"},
 	{"1", "![foo](bar.png)\n", "<p><img src=\"http://domain.com/path/bar.png\" alt=\"foo\" /></p>\n"},
 	{"0", "[foo](bar.png)\n", "<p><a href=\"http://domain.com/path/bar.png\">foo</a></p>\n"},
 }
