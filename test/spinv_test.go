@@ -20,7 +20,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"105", "<p data-block=\"0\">[1]</p><p data-block=\"0\" data-type=\"linkRefDefs\">[1]: f<wbr>\n</p>", "<p data-block=\"0\"><a href=\"\"baz\"\">foo</a>\n</p>"},
+	{"105", "<p data-block=\"0\">[1]</p><p data-block=\"0\" data-type=\"linkRefDefs\">[1]: f<wbr>\n</p>", "<p data-block=\"0\"><span data-type=\"link-ref\" data-link-text=\"1\" data-link-label=\"1\">1</span>\n</p><p data-block=\"0\" data-type=\"link-ref-defs\">[1]: f<wbr>\n</p>"},
 	{"104", "<a href=\"\" title=\"baz\">foo</a>", "<p data-block=\"0\"><a href=\"\"baz\"\">foo</a>\n</p>"},
 	{"103", "<p data-block=\"0\"><strong data-marker=\"**\">foo\n<em data-marker=\"*\">ba<wbr></em></strong>\n</p>", "<p data-block=\"0\"><strong data-marker=\"**\">foo\n<em data-marker=\"*\">ba<wbr></em></strong>\n</p>"},
 	{"102", "<p data-block=\"0\"><strong data-marker=\"**\">foo<em>\u200b\nb<wbr></em></strong>\n</p>", "<p data-block=\"0\"><strong data-marker=\"**\">foo\n<em data-marker=\"*\">b<wbr></em></strong>\n</p>"},
