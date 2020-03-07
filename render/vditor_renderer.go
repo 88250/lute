@@ -104,6 +104,25 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	return ret
 }
 
+func (r *VditorRenderer) Render() (output []byte, err error) {
+	output, err = r.BaseRenderer.Render()
+	if nil != err || 1 > len(r.Tree.Context.LinkRefDefs) {
+		return
+	}
+
+	buf := &bytes.Buffer{}
+	// 将链接引用定义添加到末尾
+	buf.WriteString("<p data-block=\"0\" data-type=\"linkRefDefs\">")
+	for _, node := range r.Tree.Context.LinkRefDefs {
+		label := node.LinkRefLabel
+		dest := node.ChildByType(ast.NodeLinkDest).Tokens
+		buf.WriteString("[" + util.BytesToStr(label) + "]: " + util.BytesToStr(dest) + "\n")
+	}
+	buf.WriteString("</p>")
+	output = append(output, buf.Bytes()...)
+	return
+}
+
 func (r *VditorRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
