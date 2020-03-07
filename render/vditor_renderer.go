@@ -112,7 +112,7 @@ func (r *VditorRenderer) Render() (output []byte, err error) {
 
 	buf := &bytes.Buffer{}
 	// 将链接引用定义添加到末尾
-	buf.WriteString("<p data-block=\"0\" data-type=\"linkRefDefs\">")
+	buf.WriteString("<p data-block=\"0\" data-type=\"link-ref-defs\">")
 	for _, node := range r.Tree.Context.LinkRefDefs {
 		label := node.LinkRefLabel
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
