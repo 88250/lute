@@ -779,6 +779,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild {
 			break
 		}
+
+		if "link-ref" == dataType {
+			node.Type = ast.NodeText
+			node.Tokens = []byte("[" + lute.domAttrValue(n, "data-link-text") + "][" + lute.domAttrValue(n, "data-link-label") + "]")
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
 		var codeTokens []byte
 		if parse.Zwsp == n.FirstChild.Data && "" == lute.domAttrValue(n, "style") && nil != n.FirstChild.NextSibling {
 			codeTokens = []byte(n.FirstChild.NextSibling.FirstChild.Data)
@@ -802,10 +810,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 		} else if "code-inline" == dataType {
 			node.Tokens = codeTokens
-			tree.Context.Tip.AppendChild(node)
-		} else if "link-ref" == dataType {
-			node.Type = ast.NodeText
-			node.Tokens = []byte("[" + lute.domAttrValue(n, "link-text") + "][" + lute.domAttrValue(n, "link-label") + "]")
 			tree.Context.Tip.AppendChild(node)
 		}
 		return
