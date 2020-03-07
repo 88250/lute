@@ -404,9 +404,11 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
 			label := string(node.LinkRefLabel)
 			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-text", text}, {"data-link-label", label}}
+			r.WriteString(parse.Zwsp)
 			r.tag("span", attrs, false)
 			r.WriteString(text)
 			r.tag("/span", nil, false)
+			r.WriteString(parse.Zwsp)
 			return ast.WalkStop
 		}
 
