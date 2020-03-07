@@ -803,6 +803,15 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		} else if "code-inline" == dataType {
 			node.Tokens = codeTokens
 			tree.Context.Tip.AppendChild(node)
+		} else if "link-ref" == dataType {
+			node.Type = ast.NodeLink
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
+			node.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: []byte(lute.domAttrValue(n, "link-text"))})
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domAttrValue(n, "link-label"))})
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+			tree.Context.Tip.AppendChild(node)
 		}
 		return
 	case atom.Font:

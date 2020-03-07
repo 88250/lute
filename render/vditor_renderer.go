@@ -400,6 +400,16 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 
 func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if 3 == node.LinkType {
+			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
+			label := string(node.LinkRefLabel)
+			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-text", text}, {"data-link-label", label}}
+			r.tag("span", attrs, false)
+			r.WriteString(text)
+			r.tag("/span", nil, false)
+			return ast.WalkStop
+		}
+
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
 		destTokens = r.Tree.Context.RelativePath(destTokens)
