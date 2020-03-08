@@ -18,7 +18,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
-	{"11", "[foo][1]\n\n[1]: /bar\n", "<p data-block=\"0\"><span data-type=\"link-ref\" data-link-text=\"foo\" data-link-label=\"1\">foo</span>\n</p><p data-block=\"0\" data-type=\"link-ref-defs\">[1]: /bar\n</p>"},
+	{"11", "[foo][1]\n\n[1]: /bar\n", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"1\">foo</span>\u200b\n</p><p data-block=\"0\" data-type=\"link-ref-defs\">[1]: /bar\n</p>"},
 	{"10", "Foo\n    ---\n", "<p data-block=\"0\">Foo\n---\n</p>"},
 	{"9", "    ***\n     ***\n\n-     -      -      -", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"***\n ***\n\"><pre><code>***\n ***\n</code></pre></div><hr data-block=\"0\" />"},
 	{"8", "    ***\n", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"***\n\"><pre><code>***\n</code></pre></div>"},
