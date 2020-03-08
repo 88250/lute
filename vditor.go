@@ -782,7 +782,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 
 		if "link-ref" == dataType {
 			node.Type = ast.NodeText
-			node.Tokens = []byte("[" + lute.domAttrValue(n, "data-link-text") + "][" + lute.domAttrValue(n, "data-link-label") + "]")
+			node.Tokens = []byte("[" + n.FirstChild.Data + "][" + lute.domAttrValue(n, "data-link-label") + "]")
 			tree.Context.Tip.AppendChild(node)
 			return
 		}

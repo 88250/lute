@@ -116,7 +116,12 @@ func (r *VditorRenderer) Render() (output []byte, err error) {
 	for _, node := range r.Tree.Context.LinkRefDefs {
 		label := node.LinkRefLabel
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
-		buf.WriteString("[" + util.BytesToStr(label) + "]: " + util.BytesToStr(dest) + "\n")
+		destStr := util.BytesToStr(dest)
+		buf.WriteString("[" + util.BytesToStr(label) + "]:")
+		if parse.Caret != destStr {
+			buf.WriteString(" ")
+		}
+		buf.WriteString(destStr + "\n")
 	}
 	buf.WriteString("</p>")
 	output = append(output, buf.Bytes()...)
@@ -403,7 +408,7 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 		if 3 == node.LinkType {
 			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
 			label := string(node.LinkRefLabel)
-			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-text", text}, {"data-link-label", label}}
+			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
 			r.WriteString(parse.Zwsp)
 			r.tag("span", attrs, false)
 			r.WriteString(text)
