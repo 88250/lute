@@ -406,10 +406,14 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if 3 == node.LinkType {
+			previousNodeText := node.PreviousNodeText()
+			previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+			if "" == previousNodeText {
+				r.WriteString(parse.Zwsp)
+			}
 			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
 			label := string(node.LinkRefLabel)
 			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
-			r.WriteString(parse.Zwsp)
 			r.tag("span", attrs, false)
 			r.WriteString(text)
 			r.tag("/span", nil, false)
