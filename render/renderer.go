@@ -200,3 +200,22 @@ func (r *BaseRenderer) normalizeHeadingID(id string) (ret string) {
 	}
 	return
 }
+
+func (r *BaseRenderer) headings() (ret []*ast.Node) {
+	for n := r.Tree.Root.FirstChild; nil != n; n = n.Next {
+		r.headings0(n, &ret)
+	}
+	return
+}
+
+func (r *BaseRenderer) headings0(n *ast.Node, headings *[]*ast.Node) {
+	if ast.NodeHeading == n.Type {
+		*headings = append(*headings, n)
+		return
+	}
+	if ast.NodeList == n.Type || ast.NodeListItem == n.Type || ast.NodeBlockquote == n.Type {
+		for c := n.FirstChild; nil != c; c = c.Next {
+			r.headings0(c, headings)
+		}
+	}
+}

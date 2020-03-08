@@ -129,27 +129,7 @@ func (r *HtmlRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 		r.WriteString("<a class=\"toc-a\" href=\"#" + r.headingID(heading) + "\">" + heading.Text() + "</a></span><br>")
 	}
 	r.WriteString("</div>\n\n")
-
 	return ast.WalkStop
-}
-
-func (r *HtmlRenderer) headings() (ret []*ast.Node) {
-	for n := r.Tree.Root.FirstChild; nil != n; n = n.Next {
-		r.headings0(n, &ret)
-	}
-	return
-}
-
-func (r *HtmlRenderer) headings0(n *ast.Node, headings *[]*ast.Node) {
-	if ast.NodeHeading == n.Type {
-		*headings = append(*headings, n)
-		return
-	}
-	if ast.NodeList == n.Type || ast.NodeListItem == n.Type || ast.NodeBlockquote == n.Type {
-		for c := n.FirstChild; nil != c; c = c.Next {
-			r.headings0(c, headings)
-		}
-	}
 }
 
 func (r *HtmlRenderer) RenderFootnotesDefs(context *parse.Context) []byte {

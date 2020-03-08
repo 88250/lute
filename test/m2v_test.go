@@ -18,6 +18,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
+	{"12", "foo[^1]\n[^1]:bar\n    * baz", "<p data-block=\"0\">foo[^1]\n</p><div class=\"footnotes-defs-div\" data-type=\"footnotes-block\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\" data-marker=\"^1\"><p data-block=\"0\">bar\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">baz</li></ul></li>\n</ol></div>"},
 	{"11", "[foo][1]\n\n[1]: /bar\n", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"1\">foo</span>\u200b\n</p><p data-block=\"0\" data-type=\"link-ref-defs\">[1]: /bar\n</p>"},
 	{"10", "Foo\n    ---\n", "<p data-block=\"0\">Foo\n---\n</p>"},
 	{"9", "    ***\n     ***\n\n-     -      -      -", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"***\n ***\n\"><pre><code>***\n ***\n</code></pre></div><hr data-block=\"0\" />"},

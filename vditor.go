@@ -64,7 +64,9 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 		html = err.Error()
 		return
 	}
-
+	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
+		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
+	}
 	// 替换插入符
 	html = strings.ReplaceAll(string(output), parse.Caret, "<wbr>")
 	return html
@@ -96,6 +98,9 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 	if nil != err {
 		html = err.Error()
 	}
+	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
+		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
+	}
 	html = string(output)
 	return
 }
@@ -124,6 +129,9 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 	output, err = renderer.Render()
 	if nil != err {
 		html = err.Error()
+	}
+	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
+		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
 	html = string(output)
 	return
@@ -241,10 +249,40 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 
 	dataType := lute.domAttrValue(n, "data-type")
 
-	if atom.Div == n.DataAtom && ("code-block" == dataType || "html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType ||
-		"backslash" == dataType) {
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			lute.genASTByVditorDOM(c, tree)
+	if atom.Div == n.DataAtom {
+		if "code-block" == dataType || "html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType || "backslash" == dataType {
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				lute.genASTByVditorDOM(c, tree)
+			}
+		} else if "footnotes-block" == dataType {
+			hr := n.FirstChild
+			ol := hr.NextSibling.NextSibling
+			for li := ol.FirstChild; nil != li; li = li.NextSibling {
+				if "\n" == li.Data {
+					continue
+				}
+
+				originalHTML := &bytes.Buffer{}
+				if err := html.Render(originalHTML, li); nil == err {
+					md := lute.vditorDOM2Md(originalHTML.String())
+					if 2 < len(md) {
+						md = md[3:]
+					}
+					lines := strings.Split(md, "\n")
+					md = ""
+					for i, line := range lines {
+						if 0 < i {
+							md += "    " + strings.TrimSpace(line)
+						} else {
+							md = line
+						}
+						md += "\n"
+					}
+					md = "[" + lute.domAttrValue(li, "data-marker") + "]: " + md
+					node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
+					tree.Context.Tip.AppendChild(node)
+				}
+			}
 		}
 		return
 	}
@@ -348,7 +386,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		marker := lute.domAttrValue(n, "data-marker")
 		var bullet byte
 		if "" == marker {
-			if atom.Ol == n.Parent.DataAtom {
+			if nil != n.Parent && atom.Ol == n.Parent.DataAtom {
 				firstLiMarker := lute.domAttrValue(n.Parent.FirstChild, "data-marker")
 				if startAttr := lute.domAttrValue(n.Parent, "start"); "" == startAttr {
 					marker = "1"

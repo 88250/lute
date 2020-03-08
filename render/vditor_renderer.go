@@ -26,6 +26,7 @@ import (
 // VditorRenderer 描述了 Vditor DOM 渲染器。
 type VditorRenderer struct {
 	*BaseRenderer
+	needRenderFootnotesDef bool
 }
 
 // NewVditorRenderer 创建一个 HTML 渲染器。
@@ -99,6 +100,7 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
 	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
+	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	return ret
@@ -128,6 +130,37 @@ func (r *VditorRenderer) Render() (output []byte, err error) {
 	return
 }
 
+func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
+	r.WriteString("<div class=\"footnotes-defs-div\" data-type=\"footnotes-block\">")
+	r.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
+	r.WriteString("<ol class=\"footnotes-defs-ol\">")
+	for i, def := range context.FootnotesDefs {
+		r.WriteString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\" data-marker=\"" + string(def.Tokens) + "\">")
+		tree := &parse.Tree{Name: "", Context: context}
+		tree.Context.Tree = tree
+		tree.Root = &ast.Node{Type: ast.NodeDocument}
+		tree.Root.AppendChild(def)
+		defRenderer := NewVditorRenderer(tree)
+		//lc := tree.Root.LastDeepestChild()
+		//for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
+		//	ref := def.FootnotesRefs[i]
+		//	gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
+		//	link := &ast.Node{Type: ast.NodeInlineHTML, Tokens: util.StrToBytes(gotoRef)}
+		//	lc.InsertAfter(link)
+		//}
+		defRenderer.needRenderFootnotesDef = true
+		defContent, err := defRenderer.Render()
+		if nil != err {
+			break
+		}
+		r.Write(defContent)
+
+		r.WriteString("</li>\n")
+	}
+	r.WriteString("</ol></div>")
+	return r.Writer.Bytes()
+}
+
 func (r *VditorRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
@@ -145,9 +178,27 @@ func (r *VditorRenderer) renderBackslash(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
+func (r *VditorRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
+	headings := r.headings()
+	length := len(headings)
+	if 1 > length {
+		return ast.WalkStop
+	}
+	r.WriteString("<div class=\"toc-div\" data-type\"toc-block\">")
+	for _, heading := range headings {
+		level := strconv.Itoa(heading.HeadingLevel)
+		spaces := (heading.HeadingLevel - 1) * 2
+		r.WriteString(strings.Repeat("&emsp;", spaces))
+		r.WriteString("<span class=\"toc-h" + level + "\">")
+		r.WriteString("<a class=\"toc-a\" href=\"#" + r.headingID(heading) + "\">" + heading.Text() + "</a></span><br>")
+	}
+	r.WriteString("</div>\n\n")
+	return ast.WalkStop
+}
+
 func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]: ")
+	if !r.needRenderFootnotesDef {
+		return ast.WalkStop
 	}
 	return ast.WalkContinue
 }
