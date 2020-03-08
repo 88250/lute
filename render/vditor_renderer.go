@@ -141,6 +141,7 @@ func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := NewVditorRenderer(tree)
+		// 暂不渲染跳转锚点，因为解析回 md 时用 InlineHTML 有问题
 		//lc := tree.Root.LastDeepestChild()
 		//for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
 		//	ref := def.FootnotesRefs[i]
@@ -184,7 +185,7 @@ func (r *VditorRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus
 	if 1 > length {
 		return ast.WalkStop
 	}
-	r.WriteString("<div class=\"toc-div\" data-type\"toc-block\">")
+	r.WriteString("<div class=\"toc-div\" data-type=\"toc-block\">")
 	for _, heading := range headings {
 		level := strconv.Itoa(heading.HeadingLevel)
 		spaces := (heading.HeadingLevel - 1) * 2

@@ -20,6 +20,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"107", "<div class=\"toc-div\" data-type=\"toc-block\"><span class=\"toc-h1\"><a class=\"toc-a\" href=\"#foo\">foo</a></span><br></div>\n\n<h1 data-block=\"0\" data-marker=\"#\">foo</h1>", "<div class=\"toc-div\" data-type=\"toc-block\"><span class=\"toc-h1\"><a class=\"toc-a\" href=\"#foo\">foo</a></span><br></div>\n\n<h1 data-block=\"0\" data-marker=\"#\">foo</h1>"},
 	{"106", "<p data-block=\"0\">foo[^1]\n</p><div class=\"footnotes-defs-div\" data-type=\"footnotes-block\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\" data-marker=\"^1\"><p data-block=\"0\">bar\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">baz</li></ul></li>\n</ol></div>", "<p data-block=\"0\">foo[^1]\n</p><div class=\"footnotes-defs-div\" data-type=\"footnotes-block\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\" data-marker=\"^1\"><p data-block=\"0\">bar\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">baz</li></ul></li>\n</ol></div>"},
 	{"105", "<p data-block=\"0\"><span data-type=\"link-ref\" data-link-text=\"1\" data-link-label=\"1\">1</span>\n</p><p data-block=\"0\" data-type=\"link-ref-defs\">[1]: f<wbr>\n</p>", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"1\">1</span>\u200b\n</p><p data-block=\"0\" data-type=\"link-ref-defs\">[1]: f<wbr>\n</p>"},
 	{"104", "<a href=\"\" title=\"baz\">foo</a>", "<p data-block=\"0\"><a href=\"\"baz\"\">foo</a>\n</p>"},
@@ -130,6 +131,7 @@ var spinVditorDOMTests = []*parseTest{
 
 func TestSpinVditorDOM(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.ToC = true
 
 	for _, test := range spinVditorDOMTests {
 		html := luteEngine.SpinVditorDOM(test.from)
