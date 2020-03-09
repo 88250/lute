@@ -99,7 +99,8 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemLess != maybeMarker && // HTML 块
 			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
 			lex.ItemDollar != maybeMarker && // 数学公式
-			lex.ItemOpenBracket != maybeMarker { // 脚注
+			lex.ItemOpenBracket != maybeMarker && // 脚注
+			226 != maybeMarker { // Vditor 所见即所得
 			t.Context.advanceNextNonspace()
 			break
 		}

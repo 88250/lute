@@ -12,12 +12,19 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
 func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, id []byte) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
+	var startCaret bool
+	if t.Context.Option.VditorWYSIWYG && bytes.HasPrefix(tokens, []byte(Caret)) {
+		tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+		startCaret = true
+	}
+
 	marker := tokens[0]
 	if lex.ItemCrosshatch != marker {
 		return
@@ -43,7 +50,6 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, i
 		}
 		content = append(content, token)
 	}
-
 	_, content = lex.TrimRight(content)
 	closingCrosshatchIndex := len(content) - 1
 	for ; 0 <= closingCrosshatchIndex; closingCrosshatchIndex-- {
@@ -66,6 +72,10 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, i
 	}
 
 	if t.Context.Option.VditorWYSIWYG {
+		if startCaret {
+			content = append([]byte(Caret), content...)
+		}
+
 		if Caret == string(content) || "" == string(content) {
 			return
 		}

@@ -18,7 +18,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
-	{"13", "[toc]\n\n# foo", "<div class=\"toc-div\" data-type=\"toc-block\"><span class=\"toc-h1\"><a class=\"toc-a\" href=\"#foo\">foo</a></span><br></div>\n\n<h1 data-block=\"0\" data-marker=\"#\">foo</h1>"},
+	{"13", "[toc]\n\n# foo", "<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\"><span data-type=\"toc-h\">foo</span><br></div><p data-block=\"0\"></p><h1 data-block=\"0\" data-marker=\"#\">foo</h1>"},
 	{"12", "foo[^1]\n[^1]:bar\n    * baz", "<p data-block=\"0\">foo[^1]\n</p><div class=\"footnotes-defs-div\" data-type=\"footnotes-block\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\" data-marker=\"^1\"><p data-block=\"0\">bar\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">baz</li></ul></li>\n</ol></div>"},
 	{"11", "[foo][1]\n\n[1]: /bar\n", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"1\">foo</span>\u200b\n</p><p data-block=\"0\" data-type=\"link-ref-defs\">[1]: /bar\n</p>"},
 	{"10", "Foo\n    ---\n", "<p data-block=\"0\">Foo\n---\n</p>"},
