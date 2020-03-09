@@ -146,7 +146,7 @@ func (r *HtmlRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		lc := tree.Root.LastDeepestChild()
 		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
 			ref := def.FootnotesRefs[i]
-			gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
+			gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"vditor-footnotes__goto-ref\">↩</a>"
 			link := &ast.Node{Type: ast.NodeInlineHTML, Tokens: util.StrToBytes(gotoRef)}
 			lc.InsertAfter(link)
 		}

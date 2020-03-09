@@ -18,8 +18,8 @@ import (
 
 var fnTests = []parseTest{
 
-	{"1", "foo[^label]\n[^label]:bar\n    * baz", "<p>foo<sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar</p>\n<ul>\n<li>baz <a href=\"#footnotes-ref-1\" class=\"footnotes-goto-ref\">↩</a></li>\n</ul>\n</li>\n</ol></div>"},
-	{"0", "foo[^1]\n[^1]:bar\n    * baz", "<p>foo<sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar</p>\n<ul>\n<li>baz <a href=\"#footnotes-ref-1\" class=\"footnotes-goto-ref\">↩</a></li>\n</ul>\n</li>\n</ol></div>"},
+	{"1", "foo[^label]\n[^label]:bar\n    * baz", "<p>foo<sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar</p>\n<ul>\n<li>baz <a href=\"#footnotes-ref-1\" class=\"vditor-footnotes__goto-ref\">↩</a></li>\n</ul>\n</li>\n</ol></div>"},
+	{"0", "foo[^1]\n[^1]:bar\n    * baz", "<p>foo<sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar</p>\n<ul>\n<li>baz <a href=\"#footnotes-ref-1\" class=\"vditor-footnotes__goto-ref\">↩</a></li>\n</ul>\n</li>\n</ol></div>"},
 }
 
 func TestFootnotes(t *testing.T) {
