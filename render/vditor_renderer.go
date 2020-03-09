@@ -108,25 +108,24 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 
 func (r *VditorRenderer) Render() (output []byte, err error) {
 	output, err = r.BaseRenderer.Render()
-	if nil != err || 1 > len(r.Tree.Context.LinkRefDefs) {
+	if nil != err || 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
 		return
 	}
 
-	buf := &bytes.Buffer{}
 	// 将链接引用定义添加到末尾
-	buf.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
+	r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
 	for _, node := range r.Tree.Context.LinkRefDefs {
 		label := node.LinkRefLabel
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
 		destStr := util.BytesToStr(dest)
-		buf.WriteString("[" + util.BytesToStr(label) + "]:")
+		r.WriteString("[" + util.BytesToStr(label) + "]:")
 		if parse.Caret != destStr {
-			buf.WriteString(" ")
+			r.WriteString(" ")
 		}
-		buf.WriteString(destStr + "\n")
+		r.WriteString(destStr + "\n")
 	}
-	buf.WriteString("</div>")
-	output = append(output, buf.Bytes()...)
+	r.WriteString("</div>")
+	output = r.Writer.Bytes()
 	return
 }
 
@@ -140,14 +139,6 @@ func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := NewVditorRenderer(tree)
-		// 暂不渲染跳转锚点，因为解析回 md 时用 InlineHTML 有问题
-		//lc := tree.Root.LastDeepestChild()
-		//for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
-		//	ref := def.FootnotesRefs[i]
-		//	gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"footnotes-goto-ref\">↩</a>"
-		//	link := &ast.Node{Type: ast.NodeInlineHTML, Tokens: util.StrToBytes(gotoRef)}
-		//	lc.InsertAfter(link)
-		//}
 		defRenderer.needRenderFootnotesDef = true
 		defContent, err := defRenderer.Render()
 		if nil != err {
