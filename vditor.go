@@ -143,7 +143,6 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	markdown = lute.vditorDOM2Md(htmlStr)
-	//markdown = lute.FormatMd(markdown) // 再格式化一次处理表格对齐
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
 	return
 }
