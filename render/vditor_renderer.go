@@ -207,11 +207,16 @@ func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
+	previousNodeText := node.PreviousNodeText()
+	previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+	if "" == previousNodeText {
+		r.WriteString(parse.Zwsp)
+	}
 	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
 	r.tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)}}, false)
 	r.WriteString(idxStr)
-	r.tag("/sup", nil, false)
+	r.WriteString("</sup>" + parse.Zwsp)
 	return ast.WalkStop
 }
 
