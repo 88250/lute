@@ -202,20 +202,11 @@ func (r *BaseRenderer) normalizeHeadingID(id string) (ret string) {
 }
 
 func (r *BaseRenderer) headings() (ret []*ast.Node) {
+	// 仅有顶级标题（直接挂在根上的）才纳入 ToC 生成，挂在其他元素下的标题不生成 ToC https://github.com/88250/lute/issues/38
 	for n := r.Tree.Root.FirstChild; nil != n; n = n.Next {
-		r.headings0(n, &ret)
-	}
-	return
-}
-
-func (r *BaseRenderer) headings0(n *ast.Node, headings *[]*ast.Node) {
-	if ast.NodeHeading == n.Type {
-		*headings = append(*headings, n)
-		return
-	}
-	if ast.NodeList == n.Type || ast.NodeListItem == n.Type || ast.NodeBlockquote == n.Type {
-		for c := n.FirstChild; nil != c; c = c.Next {
-			r.headings0(c, headings)
+		if ast.NodeHeading == n.Type {
+			ret = append(ret, n)
 		}
 	}
+	return
 }
