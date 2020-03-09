@@ -41,7 +41,6 @@ type Lute struct {
 //  * 修正术语拼写
 //  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
-//  * 并行解析
 func New(opts ...Option) (ret *Lute) {
 	ret = &Lute{Options: &parse.Options{}}
 	ret.GFMTable = true

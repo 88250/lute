@@ -132,7 +132,7 @@ func (r *VditorRenderer) Render() (output []byte, err error) {
 
 func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	r.WriteString("<div class=\"footnotes-defs-div\" data-type=\"footnotes-block\">")
-	r.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
+	r.WriteString("<hr class=\"footnotes-defs-hr\" />")
 	r.WriteString("<ol class=\"footnotes-defs-ol\">")
 	for i, def := range context.FootnotesDefs {
 		r.WriteString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\" data-marker=\"" + string(def.Tokens) + "\">")
@@ -155,8 +155,7 @@ func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 			break
 		}
 		r.Write(defContent)
-
-		r.WriteString("</li>\n")
+		r.WriteString("</li>")
 	}
 	r.WriteString("</ol></div>")
 	return r.Writer.Bytes()
