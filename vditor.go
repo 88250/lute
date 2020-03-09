@@ -254,7 +254,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				lute.genASTByVditorDOM(c, tree)
 			}
 		} else if "footnotes-block" == dataType {
-			ol := n.FirstChild.NextSibling.NextSibling
+			ol := n.FirstChild
 			for li := ol.FirstChild; nil != li; li = li.NextSibling {
 				if "\n" == li.Data {
 					continue
