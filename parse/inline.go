@@ -248,7 +248,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 					if 0 < refsLen {
 						refId += ":" + strconv.Itoa(refsLen+1)
 					}
-					ref := &ast.Node{Type: ast.NodeFootnotesRef, Tokens: bytes.ToLower(reflabel), FootnotesRefId: refId}
+					ref := &ast.Node{Type: ast.NodeFootnotesRef, Tokens: bytes.ToLower(reflabel), FootnotesRefId: refId, FootnotesRefLabel: reflabel}
 					footnotesDef.FootnotesRefs = append(footnotesDef.FootnotesRefs, ref)
 					return ref
 				}
@@ -268,7 +268,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 	}
 
 	if matched {
-		node := &ast.Node{Type: ast.NodeLink, LinkType: linkType, LinkRefLabel:reflabel}
+		node := &ast.Node{Type: ast.NodeLink, LinkType: linkType, LinkRefLabel: reflabel}
 		if isImage {
 			node.Type = ast.NodeImage
 			node.AppendChild(&ast.Node{Type: ast.NodeBang, Tokens: opener.node.Tokens[:1]})
@@ -350,4 +350,3 @@ func (t *Tree) addBracket(node *ast.Node, index int, image bool, ctx *InlineCont
 func (t *Tree) removeBracket(ctx *InlineContext) {
 	ctx.brackets = ctx.brackets.previous
 }
-

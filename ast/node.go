@@ -88,6 +88,7 @@ type Node struct {
 
 	// 脚注
 
+	FootnotesRefLabel []byte // 脚注引用 label，[^label]
 	FootnotesRefId string  // 脚注 id
 	FootnotesRefs  []*Node // 脚注引用
 }

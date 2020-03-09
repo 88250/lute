@@ -134,7 +134,7 @@ func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
 	r.WriteString("<ol data-type=\"footnotes-defs-ol\">")
 	for _, def := range context.FootnotesDefs {
-		r.WriteString("<li data-marker=\"" + string(def.Tokens) + "\">")
+		r.WriteString("<li data-type=\"footnotes-li\" data-marker=\"" + string(def.Tokens) + "\">")
 		tree := &parse.Tree{Name: "", Context: context}
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
@@ -207,7 +207,11 @@ func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("[" + util.BytesToStr(node.Tokens) + "]")
+	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	idxStr := strconv.Itoa(idx)
+	r.tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)}}, false)
+	r.WriteString(idxStr)
+	r.tag("/sup", nil, false)
 	return ast.WalkStop
 }
 

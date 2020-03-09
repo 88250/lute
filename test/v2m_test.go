@@ -21,7 +21,7 @@ import (
 var vditorDOM2MdTests = []parseTest{
 
 	{"108", "<p data-block=\"0\">foo[^1]\n</p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-marker=\"^1\"><p data-block=\"0\">bar\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">baz</li></ul></li></ol></div>", "foo[^1]\n\n[^1]: bar\n       * baz\n"},
-	{"107", "<p data-block=\"0\">[^1]\n</p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-marker=\"^1\"></li></ol></div>", "[^1]\n\n[^1]:\n"},
+	{"107", "<p data-block=\"0\"><sup data-type=\"footnotes-ref\" data-footnotes-label=\"^1\">1</sup>\n</p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^1\"></li></ol></div>", "[^1]\n\n[^1]:\n"},
 	{"106", "<a href=\"\" title=\"baz\">foo</a>", "[foo]( \"baz\")\n"},
 	{"105", "<p data-block=\"0\"><strong data-marker=\"**\">foo<em>\u200b\nb<wbr></em></strong>\n</p>", "**foo\n*b***\n"},
 	{"104", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;foo&gt;</code><span class=\"vditor-wysiwyg__preview\" data-render=\"false\" data-html=\"&amp;lt;foo&amp;gt;\">....</span></span>\u200b	bar<wbr>\n</p>", "<foo>\tbar\n"},
