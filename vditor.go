@@ -253,6 +253,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				lute.genASTByVditorDOM(c, tree)
 			}
+		} else if "link-ref-defs-block" == dataType {
+			text :=lute.domText(n)
+			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
+			tree.Context.Tip.AppendChild(node)
 		} else if "footnotes-block" == dataType {
 			ol := n.FirstChild
 			for li := ol.FirstChild; nil != li; li = li.NextSibling {

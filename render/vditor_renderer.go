@@ -114,7 +114,7 @@ func (r *VditorRenderer) Render() (output []byte, err error) {
 
 	buf := &bytes.Buffer{}
 	// 将链接引用定义添加到末尾
-	buf.WriteString("<p data-block=\"0\" data-type=\"link-ref-defs\">")
+	buf.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
 	for _, node := range r.Tree.Context.LinkRefDefs {
 		label := node.LinkRefLabel
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
@@ -125,7 +125,7 @@ func (r *VditorRenderer) Render() (output []byte, err error) {
 		}
 		buf.WriteString(destStr + "\n")
 	}
-	buf.WriteString("</p>")
+	buf.WriteString("</div>")
 	output = append(output, buf.Bytes()...)
 	return
 }
