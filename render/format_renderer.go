@@ -100,6 +100,7 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
 	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
+	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	return ret
@@ -133,6 +134,11 @@ func (r *FormatRenderer) renderBackslash(node *ast.Node, entering bool) ast.Walk
 		r.WriteByte(lex.ItemBackslash)
 	}
 	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString("[ToC]\n\n")
+	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {

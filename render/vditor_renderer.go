@@ -185,15 +185,14 @@ func (r *VditorRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus
 	if 1 > length {
 		return ast.WalkStop
 	}
-	r.WriteString("<div class=\"toc-div\" data-type=\"toc-block\">")
+	r.WriteString("<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\">")
 	for _, heading := range headings {
-		level := strconv.Itoa(heading.HeadingLevel)
 		spaces := (heading.HeadingLevel - 1) * 2
 		r.WriteString(strings.Repeat("&emsp;", spaces))
-		r.WriteString("<span class=\"toc-h" + level + "\">")
-		r.WriteString("<a class=\"toc-a\" href=\"#" + r.headingID(heading) + "\">" + heading.Text() + "</a></span><br>")
+		r.WriteString("<span data-type=\"toc-h\">")
+		r.WriteString(heading.Text() + "</span><br>")
 	}
-	r.WriteString("</div>\n\n")
+	r.WriteString("</div><p data-block=\"0\"><p>")
 	return ast.WalkStop
 }
 
