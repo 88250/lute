@@ -143,7 +143,7 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	markdown = lute.vditorDOM2Md(htmlStr)
-	markdown = lute.FormatMd(markdown) // 再格式化一次处理表格对齐
+	//markdown = lute.FormatMd(markdown) // 再格式化一次处理表格对齐
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
 	return
 }
@@ -266,13 +266,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				if err := html.Render(originalHTML, li); nil == err {
 					md := lute.vditorDOM2Md(originalHTML.String())
 					if 2 < len(md) {
-						md = md[3:]
+						md = md[3:] // 去掉列表项标记符
 					}
 					lines := strings.Split(md, "\n")
 					md = ""
 					for i, line := range lines {
 						if 0 < i {
-							md += "    " + strings.TrimSpace(line)
+							md += "    " + line
 						} else {
 							md = line
 						}
