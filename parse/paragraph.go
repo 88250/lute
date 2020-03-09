@@ -96,7 +96,7 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 		if toc := context.parseToC(p); nil != toc {
 			// 将该段落节点转换成目录节点
 			p.Type = ast.NodeToC
-			p.Tokens = nil
+			p.Tokens = toc.Tokens
 			return
 		}
 	}

@@ -12,7 +12,6 @@ package render
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -195,7 +194,6 @@ func (r *VditorRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus
 	}
 	r.WriteString("</div><p data-block=\"0\">")
 	caretInDest := bytes.Contains(node.Tokens, []byte(parse.Caret))
-	fmt.Println(string(node.Tokens))
 	if caretInDest {
 		r.WriteString(parse.Caret)
 	}
