@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -192,7 +193,13 @@ func (r *VditorRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus
 		r.WriteString("<span data-type=\"toc-h\">")
 		r.WriteString(heading.Text() + "</span><br>")
 	}
-	r.WriteString("</div><p data-block=\"0\"><p>")
+	r.WriteString("</div><p data-block=\"0\">")
+	caretInDest := bytes.Contains(node.Tokens, []byte(parse.Caret))
+	fmt.Println(string(node.Tokens))
+	if caretInDest {
+		r.WriteString(parse.Caret)
+	}
+	r.WriteString("</p>")
 	return ast.WalkStop
 }
 

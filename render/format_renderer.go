@@ -137,7 +137,7 @@ func (r *FormatRenderer) renderBackslash(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *FormatRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("[ToC]\n\n")
+	r.WriteString("[toc]\n\n")
 	return ast.WalkStop
 }
 
