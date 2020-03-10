@@ -341,6 +341,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeHeading
 		node.HeadingLevel = int(node.Tokens[1] - byte('0'))
 		marker := lute.domAttrValue(n, "data-marker")
+		id := lute.domAttrValue(n, "data-id")
+		if "" != id {
+			node.HeadingID = []byte(id)
+		}
 		node.HeadingSetext = "=" == marker || "-" == marker
 		if !node.HeadingSetext {
 			headingC8hMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker}

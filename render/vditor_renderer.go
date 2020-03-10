@@ -672,9 +672,9 @@ func (r *VditorRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) a
 func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\"")
-		id := r.headingID(node)
-		if r.Option.HeadingID {
-			r.WriteString(" id=\"" + id + "\"")
+		id := string(node.HeadingID)
+		if r.Option.HeadingID && "" != id {
+			r.WriteString(" data-id=\"" + id + "\"")
 		}
 		if !node.HeadingSetext {
 			r.WriteString(" data-marker=\"#\">")
@@ -692,9 +692,6 @@ func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 			r.tag("/a", nil, false)
 		}
 	} else {
-		if nil != node.HeadingID {
-			r.WriteString(" {" + string(node.HeadingID) + "}")
-		}
 		r.WriteString("</h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + ">")
 	}
 	return ast.WalkContinue
