@@ -254,7 +254,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				lute.genASTByVditorDOM(c, tree)
 			}
 		} else if "link-ref-defs-block" == dataType {
-			text :=lute.domText(n)
+			text := lute.domText(n)
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
 			tree.Context.Tip.AppendChild(node)
 		} else if "footnotes-block" == dataType {
@@ -267,9 +267,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				originalHTML := &bytes.Buffer{}
 				if err := html.Render(originalHTML, li); nil == err {
 					md := lute.vditorDOM2Md(originalHTML.String())
-					if 2 < len(md) {
-						md = md[3:] // 去掉列表项标记符
-					}
+					label := lute.domAttrValue(li, "data-marker")
+					md = md[len(label)+1:] // 去掉列表项标记符
 					lines := strings.Split(md, "\n")
 					md = ""
 					for i, line := range lines {
@@ -280,7 +279,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 						}
 						md += "\n"
 					}
-					md = "[" + lute.domAttrValue(li, "data-marker") + "]: " + md
+					md = "[" + label + "]: " + md
 					node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
 					tree.Context.Tip.AppendChild(node)
 				}
