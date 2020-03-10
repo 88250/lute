@@ -18,7 +18,7 @@ import (
 
 var headingIDTests = []parseTest{
 
-	{"0", "### Heading3 {#custom-id}\n", "<h3 id=\"#custom-id\">Heading3</h3>\n"},
+	{"0", "### Heading3 {#custom-id}\n", "<h3 id=\"custom-id\">Heading3</h3>\n"},
 }
 
 func TestHeadingID(t *testing.T) {

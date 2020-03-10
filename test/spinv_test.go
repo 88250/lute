@@ -20,6 +20,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"111", "<h1 data-block=\"0\" data-marker=\"#\">foo {#custom-id}<wbr></h1>", "<h1 data-block=\"0\" data-id=\"#custom-id\" data-marker=\"#\">foo <wbr></h1>"},
 	{"110", "<div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^111\"><p data-block=\"0\">1<wbr>\n</p></li></ol></div>", "<div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^111\"><p data-block=\"0\">1<wbr>\n</p></li></ol></div>"},
 	// 109：重复的脚注定义 marker 会被去重，重现步骤：在脚注定义中换行
 	{"109", "<div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^1\"><p data-block=\"0\">foo</p></li><li data-type=\"footnotes-li\" data-marker=\"^1\"><p data-block=\"0\"><wbr>bar\n</p></li></ol></div>", "<div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^1\"><p data-block=\"0\">foo\n</p></li></ol></div>"},

@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -185,12 +186,13 @@ func (r *BaseRenderer) headingID(heading *ast.Node) (id string) {
 	id = util.BytesToStr(heading.HeadingID)
 	if "" == id {
 		id = heading.Text()
-		id = r.normalizeHeadingID(id)
 	}
+	id = r.normalizeHeadingID(id)
 	return
 }
 
 func (r *BaseRenderer) normalizeHeadingID(id string) (ret string) {
+	id = strings.TrimLeft(id, "#")
 	for _, r := range id {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
 			ret += "-"

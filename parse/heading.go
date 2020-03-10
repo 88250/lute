@@ -138,6 +138,10 @@ func (t *Tree) parseSetextHeading() (level int) {
 }
 
 func (t *Tree) parseHeadingID(content []byte) (id []byte) {
+	if t.Context.Option.VditorWYSIWYG {
+		content = bytes.ReplaceAll(content, []byte(Caret), nil)
+	}
+
 	length := len(content)
 	if 3 > length {
 		return nil
