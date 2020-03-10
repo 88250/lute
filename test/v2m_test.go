@@ -20,6 +20,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"109", "<li data-marker=\"*\" class=\"vditor-task\"><p><input checked=\"\" type=\"checkbox\"> foo</p></li><li data-marker=\"*\" class=\"vditor-task\"><p><input type=\"checkbox\"> bar</p></li>", "* [X] foo\n* [ ] bar\n"},
 	{"108", "<p data-block=\"0\">foo[^1]\n</p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-marker=\"^1\"><p data-block=\"0\">bar\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">baz</li></ul></li></ol></div>", "foo[^1]\n\n[^1]: bar\n       * baz\n"},
 	{"107", "<p data-block=\"0\"><sup data-type=\"footnotes-ref\" data-footnotes-label=\"^1\">1</sup>\n</p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^1\"></li></ol></div>", "[^1]\n\n[^1]:\n"},
 	{"106", "<a href=\"\" title=\"baz\">foo</a>", "[foo]( \"baz\")\n"},

@@ -429,6 +429,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 					}
 					bullet = marker[0]
 				}
+			} else {
+				marker = lute.domAttrValue(n, "data-marker")
+				if "" == marker {
+					marker = "*"
+				}
+				bullet = marker[0]
 			}
 		}
 		node.ListData = &ast.ListData{Marker: []byte(marker), BulletChar: bullet}
