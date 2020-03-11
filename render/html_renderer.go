@@ -151,10 +151,7 @@ func (r *HtmlRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 			lc.InsertAfter(link)
 		}
 		defRenderer.(*HtmlRenderer).needRenderFootnotesDef = true
-		defContent, err := defRenderer.Render()
-		if nil != err {
-			break
-		}
+		defContent := defRenderer.Render()
 		r.Write(defContent)
 
 		r.WriteString("</li>\n")

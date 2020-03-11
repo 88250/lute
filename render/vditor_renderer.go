@@ -106,9 +106,9 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	return ret
 }
 
-func (r *VditorRenderer) Render() (output []byte, err error) {
-	output, err = r.BaseRenderer.Render()
-	if nil != err || 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
+func (r *VditorRenderer) Render() (output []byte) {
+	output = r.BaseRenderer.Render()
+	if 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
 		return
 	}
 
@@ -140,10 +140,7 @@ func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		tree.Root.AppendChild(def)
 		defRenderer := NewVditorRenderer(tree)
 		defRenderer.needRenderFootnotesDef = true
-		defContent, err := defRenderer.Render()
-		if nil != err {
-			break
-		}
+		defContent := defRenderer.Render()
 		r.Write(defContent)
 		r.WriteString("</li>")
 	}

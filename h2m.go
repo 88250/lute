@@ -67,10 +67,7 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 	for nodeType, rendererFunc := range lute.HTML2MdRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
-	formatted, err = renderer.Render()
-	if nil != err {
-		return
-	}
+	formatted = renderer.Render()
 	markdown = util.BytesToStr(formatted)
 	return
 }

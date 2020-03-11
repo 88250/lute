@@ -58,12 +58,7 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 	}
 
 	renderer := render.NewVditorRenderer(tree)
-	var output []byte
-	output, err = renderer.Render()
-	if nil != err {
-		html = err.Error()
-		return
-	}
+	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
@@ -93,11 +88,7 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 	for nodeType, rendererFunc := range lute.HTML2VditorDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
-	var output []byte
-	output, err = renderer.Render()
-	if nil != err {
-		html = err.Error()
-	}
+	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
@@ -125,11 +116,7 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 	}
 
 	renderer := render.NewVditorRenderer(tree)
-	var output []byte
-	output, err = renderer.Render()
-	if nil != err {
-		html = err.Error()
-	}
+	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
@@ -156,12 +143,7 @@ func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
 	}
 
 	renderer := render.NewEChartsJSONRenderer(tree)
-	var output []byte
-	output, err = renderer.Render()
-	if nil != err {
-		json = err.Error()
-		return
-	}
+	output := renderer.Render()
 	json = string(output)
 	return
 }
@@ -228,13 +210,8 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 
 	// 将 AST 进行 Markdown 格式化渲染
 
-	var formatted []byte
 	renderer := render.NewFormatRenderer(tree)
-	formatted, err = renderer.Render()
-	if nil != err {
-		markdown = err.Error()
-		return
-	}
+	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
 }

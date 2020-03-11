@@ -106,9 +106,9 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	return ret
 }
 
-func (r *FormatRenderer) Render() (output []byte, err error) {
-	output, err = r.BaseRenderer.Render()
-	if nil != err || 1 > len(r.Tree.Context.LinkRefDefs) {
+func (r *FormatRenderer) Render() (output []byte) {
+	output = r.BaseRenderer.Render()
+	if 1 > len(r.Tree.Context.LinkRefDefs) {
 		return
 	}
 

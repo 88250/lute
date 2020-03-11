@@ -31,7 +31,7 @@ type ExtRendererFunc func(n *ast.Node, entering bool) (string, ast.WalkStatus)
 // Renderer 描述了渲染器接口。
 type Renderer interface {
 	// Render 渲染输出。
-	Render() (output []byte, err error)
+	Render() (output []byte)
 }
 
 // BaseRenderer 描述了渲染器结构。
@@ -54,10 +54,8 @@ func NewBaseRenderer(tree *parse.Tree) *BaseRenderer {
 	return ret
 }
 
-// Render 从指定的根节点 root 开始遍历并渲染。
-func (r *BaseRenderer) Render() (output []byte, err error) {
-	defer util.RecoverPanic(&err)
-
+// Render 从根节点开始遍历并渲染。
+func (r *BaseRenderer) Render() (output []byte) {
 	r.LastOut = lex.ItemNewline
 	r.Writer = &bytes.Buffer{}
 	r.Writer.Grow(4096)
@@ -72,20 +70,14 @@ func (r *BaseRenderer) Render() (output []byte, err error) {
 
 		render := r.RendererFuncs[n.Type]
 		if nil == render {
-			render = r.RendererFuncs[n.Type]
-			if nil == render {
-				if nil != r.DefaultRendererFunc {
-					return r.DefaultRendererFunc(n, entering)
-				} else {
-					return r.renderDefault(n, entering)
-				}
+			if nil != r.DefaultRendererFunc {
+				return r.DefaultRendererFunc(n, entering)
+			} else {
+				return r.renderDefault(n, entering)
 			}
 		}
 		return render(n, entering)
 	})
-	if nil != err {
-		return
-	}
 
 	output = r.Writer.Bytes()
 	return
