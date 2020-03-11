@@ -120,7 +120,7 @@ func (r *HtmlRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 	if 1 > length {
 		return ast.WalkStop
 	}
-	r.WriteString("<div class=\"toc-div\">")
+	r.WriteString("<div class=\"vditor-toc\">")
 	for _, heading := range headings {
 		level := strconv.Itoa(heading.HeadingLevel)
 		spaces := (heading.HeadingLevel - 1) * 2
@@ -128,7 +128,7 @@ func (r *HtmlRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 		r.WriteString("<span class=\"toc-h" + level + "\">")
 		r.WriteString("<a class=\"toc-a\" href=\"#" + r.headingID(heading) + "\">" + heading.Text() + "</a></span><br>")
 	}
-	r.WriteString("</div>\n\n")
+	r.WriteString("</div>")
 	return ast.WalkStop
 }
 

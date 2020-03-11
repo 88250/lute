@@ -171,18 +171,20 @@ func (r *VditorRenderer) renderBackslash(node *ast.Node, entering bool) ast.Walk
 func (r *VditorRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 	headings := r.headings()
 	length := len(headings)
-	if 1 > length {
-		return ast.WalkStop
-	}
 	r.WriteString("<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\">")
-	for _, heading := range headings {
-		spaces := (heading.HeadingLevel - 1) * 2
-		r.WriteString(strings.Repeat("&emsp;", spaces))
-		r.WriteString("<span data-type=\"toc-h\">")
-		r.WriteString(heading.Text() + "</span><br>")
+	if 0 < length {
+		for _, heading := range headings {
+			spaces := (heading.HeadingLevel - 1) * 2
+			r.WriteString(strings.Repeat("&emsp;", spaces))
+			r.WriteString("<span data-type=\"toc-h\">")
+			r.WriteString(heading.Text() + "</span><br>")
+		}
+	} else {
+		r.WriteString("[toc]<br>")
 	}
-	r.WriteString("</div><p data-block=\"0\">")
+	r.WriteString("</div>")
 	caretInDest := bytes.Contains(node.Tokens, []byte(parse.Caret))
+	r.WriteString("<p data-block=\"0\">")
 	if caretInDest {
 		r.WriteString(parse.Caret)
 	}
