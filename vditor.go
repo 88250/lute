@@ -285,7 +285,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 		} else if "toc-block" == dataType {
-			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]")}
+			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
 			tree.Context.Tip.AppendChild(node)
 		}
 		return
