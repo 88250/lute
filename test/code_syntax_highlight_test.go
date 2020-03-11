@@ -32,10 +32,7 @@ func TestCodeSyntaxHighlightIssue17(t *testing.T) {
 	luteEngine.SetCodeSyntaxHighlightLineNum(true)
 	style := "monokai"
 	luteEngine.SetCodeSyntaxHighlightStyleName(style)
-	htmlBytes, err := luteEngine.Markdown(caseName, data)
-	if nil != err {
-		t.Fatalf("markdown failed: %s", err)
-	}
+	htmlBytes := luteEngine.Markdown(caseName, data)
 	html := string(htmlBytes)
 	expected := `<pre style="color: #f8f8f2; background-color: #272822"><code class="language-go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span>

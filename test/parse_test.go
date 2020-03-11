@@ -288,9 +288,6 @@ func TestCase1(t *testing.T) {
 	}
 
 	luteEngine := lute.New()
-	html, err := luteEngine.Markdown("case1.md", bytes)
-	if nil != err {
-		t.Fatalf("markdown failed: %s", err)
-	}
+	html := luteEngine.Markdown("case1.md", bytes)
 	t.Log(string(html))
 }

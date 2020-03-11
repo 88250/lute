@@ -13,7 +13,6 @@ package parse
 import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 // Caret 插入符 \u2038。
@@ -23,9 +22,7 @@ const Caret = "‸"
 const Zwsp = "\u200b"
 
 // Parse 会将 markdown 原始文本字节数组解析为一颗语法树。
-func Parse(name string, markdown []byte, options *Options) (tree *Tree, err error) {
-	defer util.RecoverPanic(&err)
-
+func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree = &Tree{Name: name, Context: &Context{Option: options}}
 	tree.Context.Tree = tree
 	tree.lexer = lex.NewLexer(markdown)

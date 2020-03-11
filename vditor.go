@@ -48,15 +48,8 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 
 	// 替换插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", parse.Caret)
-
 	markdown := lute.vditorDOM2Md(htmlStr)
-
-	tree, err := parse.Parse("", []byte(markdown), lute.Options)
-	if nil != err {
-		html = err.Error()
-		return
-	}
-
+	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
 	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
@@ -77,13 +70,7 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 		return
 	}
 
-	var tree *parse.Tree
-	tree, err = parse.Parse("", []byte(markdown), lute.Options)
-	if nil != err {
-		html = err.Error()
-		return
-	}
-
+	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
 	for nodeType, rendererFunc := range lute.HTML2VditorDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -109,12 +96,7 @@ func (lute *Lute) VditorDOM2HTML(vhtml string) (html string) {
 func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 	lute.VditorWYSIWYG = true
 
-	tree, err := parse.Parse("", []byte(markdown), lute.Options)
-	if nil != err {
-		html = err.Error()
-		return
-	}
-
+	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
 	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
@@ -136,12 +118,7 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
 func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
-	tree, err := parse.Parse("", []byte(markdown), lute.Options)
-	if nil != err {
-		json = err.Error()
-		return
-	}
-
+	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewEChartsJSONRenderer(tree)
 	output := renderer.Render()
 	json = string(output)

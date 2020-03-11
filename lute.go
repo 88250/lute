@@ -73,42 +73,26 @@ func New(opts ...Option) (ret *Lute) {
 }
 
 // Markdown 将 markdown 文本字节数组处理为相应的 html 字节数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
-func (lute *Lute) Markdown(name string, markdown []byte) (html []byte, err error) {
-	var tree *parse.Tree
-	tree, err = parse.Parse(name, markdown, lute.Options)
-	if nil != err {
-		return
-	}
-
+func (lute *Lute) Markdown(name string, markdown []byte) (html []byte) {
+	tree := parse.Parse(name, markdown, lute.Options)
 	renderer := render.NewHtmlRenderer(tree)
 	html = renderer.Render()
 	if lute.Options.Footnotes && 0 < len(tree.Context.FootnotesDefs) {
 		html = renderer.(*render.HtmlRenderer).RenderFootnotesDefs(tree.Context)
 	}
-
 	return
 }
 
 // MarkdownStr 接受 string 类型的 markdown 后直接调用 Markdown 进行处理。
 func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
-	var htmlBytes []byte
-	htmlBytes, err = lute.Markdown(name, []byte(markdown))
-	if nil != err {
-		return
-	}
-
+	htmlBytes := lute.Markdown(name, []byte(markdown))
 	html = util.BytesToStr(htmlBytes)
 	return
 }
 
 // Format 将 markdown 文本字节数组进行格式化。
 func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err error) {
-	var tree *parse.Tree
-	tree, err = parse.Parse(name, markdown, lute.Options)
-	if nil != err {
-		return
-	}
-
+	tree := parse.Parse(name, markdown, lute.Options)
 	renderer := render.NewFormatRenderer(tree)
 	formatted = renderer.Render()
 	return

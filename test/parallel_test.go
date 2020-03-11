@@ -35,20 +35,14 @@ func TestParallel(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			luteEngine := lute.New()
-			_, err := luteEngine.Markdown("", data0)
-			if nil != err {
-				t.Fatalf(err.Error())
-			}
+			luteEngine.Markdown("", data0)
 		}()
 
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			luteEngine := lute.New()
-			_, err := luteEngine.Markdown("", data1)
-			if nil != err {
-				t.Fatalf(err.Error())
-			}
+			luteEngine.Markdown("", data1)
 		}()
 	}
 	wg.Wait()
