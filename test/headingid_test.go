@@ -26,11 +26,7 @@ func TestHeadingID(t *testing.T) {
 	luteEngine.HeadingID = true
 
 	for _, test := range headingIDTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.from)
-		if nil != err {
-			t.Fatalf("unexpected: %s", err)
-		}
-
+		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
@@ -48,11 +44,7 @@ func TestHeadingAnchor(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.HeadingAnchor = true
 	for _, test := range headingAnchorTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.from)
-		if nil != err {
-			t.Fatalf("test case [%s] unexpected: %s", test.name, err)
-		}
-
+		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}

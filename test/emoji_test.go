@@ -40,11 +40,7 @@ func TestEmoji(t *testing.T) {
 	luteEngine := lute.New() // 默认已经开启 Emoji 处理
 
 	for _, test := range emojiTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.from)
-		if nil != err {
-			t.Fatalf("unexpected: %s", err)
-		}
-
+		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}

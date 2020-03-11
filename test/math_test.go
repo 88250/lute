@@ -43,11 +43,7 @@ func TestMath(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range mathTests {
-		html, err := luteEngine.MarkdownStr(test.name, test.from)
-		if nil != err {
-			t.Fatalf("test case [%s] unexpected: %s", test.name, err)
-		}
-
+		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
 		}
@@ -64,10 +60,7 @@ func TestInlineMathDigit(t *testing.T) {
 	luteEngine := lute.New()
 
 	notAllowDigit := inlineMathDigitTests[0]
-	html, err := luteEngine.MarkdownStr(notAllowDigit.name, notAllowDigit.from)
-	if nil != err {
-		t.Fatalf("test case [%s] unexpected: %s", notAllowDigit.name, err)
-	}
+	html := luteEngine.MarkdownStr(notAllowDigit.name, notAllowDigit.from)
 	if notAllowDigit.to != html {
 		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", notAllowDigit.name, notAllowDigit.to, html, notAllowDigit.from)
 	}
@@ -75,10 +68,7 @@ func TestInlineMathDigit(t *testing.T) {
 	luteEngine.InlineMathAllowDigitAfterOpenMarker = true
 
 	allowDigit := inlineMathDigitTests[1]
-	html, err = luteEngine.MarkdownStr(allowDigit.name, allowDigit.from)
-	if nil != err {
-		t.Fatalf("test case [%s] unexpected: %s", allowDigit.name, err)
-	}
+	html = luteEngine.MarkdownStr(allowDigit.name, allowDigit.from)
 	if allowDigit.to != html {
 		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", allowDigit.name, allowDigit.to, html, allowDigit.from)
 	}

@@ -100,11 +100,7 @@ func TestFormat(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range formatTests {
-		formatted, err := luteEngine.FormatStr(test.name, test.original)
-		if nil != err {
-			t.Fatalf("unexpected: %s", err)
-		}
-
+		formatted := luteEngine.FormatStr(test.name, test.original)
 		if test.formatted != formatted {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.formatted, formatted, test.original)
 		}
@@ -135,10 +131,7 @@ func TestFormatCases(t *testing.T) {
 		}
 
 		luteEngine := lute.New()
-		htmlBytes, err := luteEngine.Format(caseName+".md", bytes)
-		if nil != err {
-			t.Fatalf("test case [%s] markdown format failed: %s", caseName, err)
-		}
+		htmlBytes := luteEngine.Format(caseName+".md", bytes)
 		html := string(htmlBytes)
 
 		bytes, err = ioutil.ReadFile(caseName + "-formatted.md")

@@ -33,11 +33,7 @@ func TestAutoLink(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range autoLinkTests {
-		result, err := luteEngine.MarkdownStr(test.name, test.from)
-		if nil != err {
-			t.Fatalf("test case [%s] unexpected: %s", test.name, err)
-		}
-
+		result:= luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != result {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
 		}

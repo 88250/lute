@@ -54,11 +54,7 @@ func TestSpec(t *testing.T) {
 
 	for _, test := range testcases {
 		testName := test.Section + " " + strconv.Itoa(test.Example)
-		html, err := luteEngine.MarkdownStr(testName, test.Markdown)
-		if nil != err {
-			t.Fatalf("test case [%s] unexpected: %s", testName, err)
-		}
-
+		html := luteEngine.MarkdownStr(testName, test.Markdown)
 		if test.HTML != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", testName, test.HTML, html, test.Markdown)
 		}
