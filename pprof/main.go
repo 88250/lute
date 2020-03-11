@@ -41,10 +41,7 @@ func main() {
 	cpuProfile, _ := os.Create("pprof/cpu_profile")
 	pprof.StartCPUProfile(cpuProfile)
 	for i := 0; i < 1024; i++ {
-		_, err := luteEngine.Markdown("pprof "+spec, bytes)
-		if nil != err {
-			panic(err)
-		}
+		luteEngine.Markdown("pprof "+spec, bytes)
 	}
 	pprof.StopCPUProfile()
 }
