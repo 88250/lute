@@ -12,7 +12,6 @@ package parse
 
 import (
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/util"
 )
 
 // parseInlines 解析并生成行级节点。
@@ -22,7 +21,6 @@ func (t *Tree) parseInlines() {
 
 // walkParseInline 解析生成节点 node 的行级子节点。
 func (t *Tree) walkParseInline(node *ast.Node) {
-	defer util.RecoverPanic(nil)
 	if nil == node {
 		return
 	}
