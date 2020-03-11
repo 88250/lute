@@ -29,7 +29,7 @@ func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", parse.Caret)
-	markdown := lute.vditorDOM2Md(ivHTML)
+	markdown := lute.vditorIRDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
 	output := renderer.Render()
@@ -41,7 +41,7 @@ func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 	return
 }
 
-// HTML2VditorDOM 将 HTML 转换为 Vditor Instant-Rendering DOM，用于及时渲染模式下粘贴。
+// HTML2VditorIRDOM 将 HTML 转换为 Vditor Instant-Rendering DOM，用于及时渲染模式下粘贴。
 func (lute *Lute) HTML2VditorIRDOM(sHTML string) (vHTML string) {
 	lute.VditorIR = true
 
@@ -64,18 +64,18 @@ func (lute *Lute) HTML2VditorIRDOM(sHTML string) (vHTML string) {
 	return
 }
 
-// VditorDOM2HTML 将 Vditor Instant-Rendering DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
+// VditorIRDOM2HTML 将 Vditor Instant-Rendering DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
 func (lute *Lute) VditorIRDOM2HTML(vhtml string) (sHTML string) {
-	lute.VditorWYSIWYG = true
+	lute.VditorIR = true
 
-	markdown := lute.vditorDOM2Md(vhtml)
+	markdown := lute.vditorIRDOM2Md(vhtml)
 	sHTML = lute.Md2HTML(markdown)
 	return
 }
 
-// Md2VditorDOM 将 markdown 转换为 Vditor Instant-Rendering DOM，用于从源码模式切换至所见即所得模式。
+// Md2VditorIRDOM 将 markdown 转换为 Vditor Instant-Rendering DOM，用于从源码模式切换至所见即所得模式。
 func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
-	lute.VditorWYSIWYG = true
+	lute.VditorIR = true
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
@@ -87,12 +87,12 @@ func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 	return
 }
 
-// VditorDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
+// VditorIRDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
 func (lute *Lute) VditorIRDOM2Md(htmlStr string) (markdown string) {
-	lute.VditorWYSIWYG = true
+	lute.VditorIR = true
 
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
-	markdown = lute.vditorDOM2Md(htmlStr)
+	markdown = lute.vditorIRDOM2Md(htmlStr)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
 	return
 }
@@ -182,7 +182,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 
 				originalHTML := &bytes.Buffer{}
 				if err := html.Render(originalHTML, li); nil == err {
-					md := lute.vditorDOM2Md(originalHTML.String())
+					md := lute.vditorIRDOM2Md(originalHTML.String())
 					label := lute.domAttrValue(li, "data-marker")
 					md = md[len(label)+1:] // 去掉列表项标记符
 					lines := strings.Split(md, "\n")
