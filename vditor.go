@@ -24,31 +24,25 @@ import (
 )
 
 // Md2HTML 将 markdown 转换为标准 HTML，用于源码模式预览。
-func (lute *Lute) Md2HTML(markdown string) (html string) {
+func (lute *Lute) Md2HTML(markdown string) (sHTML string) {
 	lute.VditorWYSIWYG = false
-	html, err := lute.MarkdownStr("", markdown)
-	if nil != err {
-		html = err.Error()
-	}
+	sHTML = lute.MarkdownStr("", markdown)
 	return
 }
 
 // FormatMd 将 markdown 进行格式化输出 formatted，用于源码模式格式化。
 func (lute *Lute) FormatMd(markdown string) (formatted string) {
-	formatted, err := lute.FormatStr("", markdown)
-	if nil != err {
-		formatted = err.Error()
-	}
+	formatted = lute.FormatStr("", markdown)
 	return
 }
 
 // SpinVditorDOM 自旋 Vditor DOM，用于所见即所得模式下的编辑。
-func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
+func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 	lute.VditorWYSIWYG = true
 
 	// 替换插入符
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", parse.Caret)
-	markdown := lute.vditorDOM2Md(htmlStr)
+	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", parse.Caret)
+	markdown := lute.vditorDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
 	output := renderer.Render()
@@ -56,17 +50,17 @@ func (lute *Lute) SpinVditorDOM(htmlStr string) (html string) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
 	// 替换插入符
-	html = strings.ReplaceAll(string(output), parse.Caret, "<wbr>")
-	return html
+	ovHTML = strings.ReplaceAll(string(output), parse.Caret, "<wbr>")
+	return
 }
 
 // HTML2VditorDOM 将 HTML 转换为 Vditor DOM，用于所见即所得模式下粘贴。
-func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
+func (lute *Lute) HTML2VditorDOM(sHTML string) (vHTML string) {
 	lute.VditorWYSIWYG = true
 
-	markdown, err := lute.HTML2Markdown(htmlStr)
+	markdown, err := lute.HTML2Markdown(sHTML)
 	if nil != err {
-		html = err.Error()
+		vHTML = err.Error()
 		return
 	}
 
@@ -79,21 +73,21 @@ func (lute *Lute) HTML2VditorDOM(htmlStr string) (html string) {
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
-	html = string(output)
+	vHTML = string(output)
 	return
 }
 
 // VditorDOM2HTML 将 Vditor DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
-func (lute *Lute) VditorDOM2HTML(vhtml string) (html string) {
+func (lute *Lute) VditorDOM2HTML(vhtml string) (sHTML string) {
 	lute.VditorWYSIWYG = true
 
 	markdown := lute.vditorDOM2Md(vhtml)
-	html = lute.Md2HTML(markdown)
+	sHTML = lute.Md2HTML(markdown)
 	return
 }
 
 // Md2VditorDOM 将 markdown 转换为 Vditor DOM，用于从源码模式切换至所见即所得模式。
-func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
+func (lute *Lute) Md2VditorDOM(markdown string) (vHTML string) {
 	lute.VditorWYSIWYG = true
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
@@ -102,7 +96,7 @@ func (lute *Lute) Md2VditorDOM(markdown string) (html string) {
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
-	html = string(output)
+	vHTML = string(output)
 	return
 }
 

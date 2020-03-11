@@ -84,14 +84,14 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte) {
 }
 
 // MarkdownStr 接受 string 类型的 markdown 后直接调用 Markdown 进行处理。
-func (lute *Lute) MarkdownStr(name, markdown string) (html string, err error) {
+func (lute *Lute) MarkdownStr(name, markdown string) (html string) {
 	htmlBytes := lute.Markdown(name, []byte(markdown))
 	html = util.BytesToStr(htmlBytes)
 	return
 }
 
 // Format 将 markdown 文本字节数组进行格式化。
-func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err error) {
+func (lute *Lute) Format(name string, markdown []byte) (formatted []byte) {
 	tree := parse.Parse(name, markdown, lute.Options)
 	renderer := render.NewFormatRenderer(tree)
 	formatted = renderer.Render()
@@ -99,13 +99,9 @@ func (lute *Lute) Format(name string, markdown []byte) (formatted []byte, err er
 }
 
 // FormatStr 接受 string 类型的 markdown 后直接调用 Format 进行处理。
-func (lute *Lute) FormatStr(name, markdown string) (formatted string, err error) {
+func (lute *Lute) FormatStr(name, markdown string) (formatted string) {
 	var formattedBytes []byte
-	formattedBytes, err = lute.Format(name, []byte(markdown))
-	if nil != err {
-		return
-	}
-
+	formattedBytes = lute.Format(name, []byte(markdown))
 	formatted = util.BytesToStr(formattedBytes)
 	return
 }
