@@ -612,7 +612,9 @@ func (r *VditorIRRenderer) renderEmphasis(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("em", [][]string{{"data-marker", "*"}}, false)
+	r.tag("span", [][]string{{"data-type", "em"}}, false)
+	r.tag("span", [][]string{{"data-marker", "*"}}, false)
+	r.tag("em", [][]string{{"data-type", "*"}}, false)
 	return ast.WalkStop
 }
 

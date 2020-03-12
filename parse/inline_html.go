@@ -214,6 +214,10 @@ func (t *Tree) parseProcessingInstruction(tokens []byte) (valid bool, remains, c
 
 func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []byte) {
 	remains = tokens
+	if 3 > len(tokens) {
+		return
+	}
+
 	if lex.ItemBang != tokens[0] || lex.ItemHyphen != tokens[1] || lex.ItemHyphen != tokens[2] {
 		return
 	}
@@ -246,7 +250,6 @@ func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []b
 	comment = append(comment, tokens[1], tokens[2])
 	valid = true
 	remains = tokens[3:]
-
 	return
 }
 
