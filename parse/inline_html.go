@@ -105,6 +105,9 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 
 func (t *Tree) parseCDATA(tokens []byte) (valid bool, remains, content []byte) {
 	remains = tokens
+	if 8 > len(tokens) {
+		return
+	}
 	if lex.ItemBang != tokens[0] {
 		return
 	}
@@ -138,7 +141,6 @@ func (t *Tree) parseCDATA(tokens []byte) (valid bool, remains, content []byte) {
 	content = append(content, tokens[1], tokens[2])
 	valid = true
 	remains = tokens[3:]
-
 	return
 }
 
@@ -179,7 +181,6 @@ func (t *Tree) parseDeclaration(tokens []byte) (valid bool, remains, content []b
 	}
 	valid = true
 	remains = tokens[1:]
-
 	return
 }
 
@@ -212,7 +213,6 @@ func (t *Tree) parseProcessingInstruction(tokens []byte) (valid bool, remains, c
 	content = append(content, tokens[1])
 	valid = true
 	remains = tokens[2:]
-
 	return
 }
 
