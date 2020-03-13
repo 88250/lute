@@ -144,6 +144,10 @@ func (t *Tree) parseCDATA(tokens []byte) (valid bool, remains, content []byte) {
 
 func (t *Tree) parseDeclaration(tokens []byte) (valid bool, remains, content []byte) {
 	remains = tokens
+	if 2 > len(tokens) {
+		return
+	}
+
 	if lex.ItemBang != tokens[0] {
 		return
 	}
