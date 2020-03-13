@@ -251,7 +251,7 @@ type Options struct {
 	Terms map[string]string
 	// Vditor 所见即所得支持
 	VditorWYSIWYG bool
-	// Vditor 及时渲染支持
+	// Vditor 即时渲染支持
 	VditorIR bool
 	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
 	InlineMathAllowDigitAfterOpenMarker bool

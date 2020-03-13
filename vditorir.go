@@ -23,7 +23,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// SpinVditorIRDOM 自旋 Vditor Instant-Rendering DOM，用于及时渲染模式下的编辑。
+// SpinVditorIRDOM 自旋 Vditor Instant-Rendering DOM，用于即时渲染模式下的编辑。
 func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true
@@ -42,7 +42,7 @@ func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 	return
 }
 
-// HTML2VditorIRDOM 将 HTML 转换为 Vditor Instant-Rendering DOM，用于及时渲染模式下粘贴。
+// HTML2VditorIRDOM 将 HTML 转换为 Vditor Instant-Rendering DOM，用于即时渲染模式下粘贴。
 func (lute *Lute) HTML2VditorIRDOM(sHTML string) (vHTML string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true
