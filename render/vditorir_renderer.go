@@ -363,7 +363,12 @@ func (r *VditorIRRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *VditorIRRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+		nextText := node.NextNodeText()
+		if strings.HasPrefix(nextText, parse.Caret) {
+			r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
+		} else {
+			r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+		}
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -644,7 +649,12 @@ func (r *VditorIRRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, enterin
 
 func (r *VditorIRRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+		nextText := node.NextNodeText()
+		if strings.HasPrefix(nextText, parse.Caret) {
+			r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
+		} else {
+			r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+		}
 	} else {
 		r.tag("/span", nil, false)
 	}
