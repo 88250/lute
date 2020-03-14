@@ -608,11 +608,15 @@ func (r *VditorIRRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bo
 }
 
 func (r *VditorIRRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"data-type", "em"}}, false)
+	} else {
+		r.tag("/span", nil, false)
+	}
 	return ast.WalkContinue
 }
 
 func (r *VditorIRRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-type", "em"}}, false)
 	r.tag("span", [][]string{{"data-marker", "*"}}, false)
 	r.tag("em", [][]string{{"data-type", "*"}}, false)
 	return ast.WalkStop
@@ -620,16 +624,19 @@ func (r *VditorIRRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering b
 
 func (r *VditorIRRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/em", nil, false)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-marker", "_"}}, false)
 	r.tag("em", [][]string{{"data-marker", "_"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/em", nil, false)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
