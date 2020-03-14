@@ -148,9 +148,9 @@ func TestSpinVditorDOM(t *testing.T) {
 
 var spinVditorIRDOMTests = []*parseTest{
 
-	{"3", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr>\n</p></blockquote>", "<p data-block=\"0\"><span class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em>foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>"},
-	{"2", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>", "<p data-block=\"0\"><span class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em>foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>"},
-	{"1", "<p data-block=\"0\">f<wbr></p><p data-block=\"0\">bar\n</p>", "<p data-block=\"0\">foo\n</p><p data-block=\"0\"><wbr>\n</p>"},
+	{"3", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr>\n</p></blockquote>", "<p data-block=\"0\">&gt; <wbr>\n</p>"},
+	{"2", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>"},
+	{"1", "<p data-block=\"0\">f<wbr></p><p data-block=\"0\">bar\n</p>", "<p data-block=\"0\">f<wbr>\n</p><p data-block=\"0\">bar\n</p>"},
 	{"0", "<p data-block=\"0\">foo\n</p><p data-block=\"0\"><wbr><br></p>", "<p data-block=\"0\">foo\n</p><p data-block=\"0\"><wbr>\n</p>"},
 }
 

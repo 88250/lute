@@ -168,6 +168,11 @@ func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
 		childBuf.WriteString("\n")
 		buffer.WriteString(childBuf.String())
 	case atom.Blockquote:
+		if parse.Caret + "\n\n\n" == childBuf.String() {
+			childBuf.Reset()
+			childBuf.WriteString(parse.Caret)
+		}
+
 		lines := strings.Split(childBuf.String(), "\n")
 		for _, line := range lines {
 			buffer.WriteString("> ")
