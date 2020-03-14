@@ -386,14 +386,17 @@ func (r *VditorIRRenderer) renderStrikethrough2CloseMarker(node *ast.Node, enter
 }
 
 func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(node.Tokens)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(node.Tokens)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteByte(lex.ItemSpace)
 	return ast.WalkStop
 }
 
@@ -403,18 +406,30 @@ func (r *VditorIRRenderer) renderLinkText(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemCloseParen)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemOpenParen)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemCloseBracket)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemOpenBracket)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -471,23 +486,26 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 			return ast.WalkStop
 		}
 
-		dest := node.ChildByType(ast.NodeLinkDest)
-		destTokens := dest.Tokens
-		destTokens = r.Tree.Context.RelativePath(destTokens)
-		caretInDest := bytes.Contains(destTokens, []byte(parse.Caret))
-		if caretInDest {
-			text := node.ChildByType(ast.NodeLinkText)
-			text.Tokens = append(text.Tokens, []byte(parse.Caret)...)
-			destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), []byte(""))
-		}
-		attrs := [][]string{{"href", string(destTokens)}}
-		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(parse.Caret), []byte(""))
-			attrs = append(attrs, []string{"title", string(title.Tokens)})
-		}
-		r.tag("a", attrs, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+
+		//dest := node.ChildByType(ast.NodeLinkDest)
+		//destTokens := dest.Tokens
+		//destTokens = r.Tree.Context.RelativePath(destTokens)
+		//caretInDest := bytes.Contains(destTokens, []byte(parse.Caret))
+		//if caretInDest {
+		//	text := node.ChildByType(ast.NodeLinkText)
+		//	text.Tokens = append(text.Tokens, []byte(parse.Caret)...)
+		//	destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), []byte(""))
+		//}
+		//attrs := [][]string{{"href", string(destTokens)}}
+		//if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
+		//	title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(parse.Caret), []byte(""))
+		//	attrs = append(attrs, []string{"title", string(title.Tokens)})
+		//}
+		//r.tag("a", attrs, false)
 	} else {
-		r.tag("/a", nil, false)
+		//r.tag("/a", nil, false)
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
