@@ -434,6 +434,9 @@ func (r *VditorIRRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.
 }
 
 func (r *VditorIRRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemBang)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
