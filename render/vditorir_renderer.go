@@ -12,15 +12,12 @@ package render
 
 import (
 	"bytes"
-	"strconv"
-	"strings"
-	"unicode"
-	"unicode/utf8"
-
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
+	"strconv"
+	"strings"
 )
 
 // VditorIRRenderer 描述了 Vditor Instant-Rendering DOM 渲染器。
@@ -570,46 +567,37 @@ func (r *VditorIRRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorIRRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
-		if "" == previousNodeText {
-			r.WriteString(parse.Zwsp)
-		} else {
-			lastc, _ := utf8.DecodeLastRuneInString(previousNodeText)
-			if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
-				r.WriteByte(lex.ItemSpace)
-			}
-		}
-		r.tag("code", [][]string{{"data-marker", strings.Repeat("`", node.CodeMarkerLen)}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+	} else {
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorIRRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	strings.Repeat("`", node.CodeMarkerLen)
+	r.tag("/span", nil, false)
+	r.tag("code", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
-	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), []byte(""))
-	tokens = util.EscapeHTML(tokens)
-	tokens = append([]byte(parse.Zwsp), tokens...)
-	r.Write(tokens)
+	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("</code>")
-	codeSpan := node.Parent
-	if codeSpanParent := codeSpan.Parent; nil != codeSpanParent && ast.NodeLink == codeSpanParent.Type {
-		return ast.WalkStop
-	}
-	r.WriteString(parse.Zwsp)
+	r.tag("/code", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	strings.Repeat("`", node.CodeMarkerLen)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"data-type", "em"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -617,32 +605,32 @@ func (r *VditorIRRenderer) renderEmphasis(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-marker", "*"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
-	r.tag("em", [][]string{{"data-type", "*"}}, false)
+	r.tag("em", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/em", nil, false)
-	r.tag("span", [][]string{{"data-marker", "*"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-marker", "_"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
 	r.tag("/span", nil, false)
-	r.tag("em", [][]string{{"data-type", "_"}}, false)
+	r.tag("em", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/em", nil, false)
-	r.tag("span", [][]string{{"data-marker", "_"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -650,7 +638,7 @@ func (r *VditorIRRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, enterin
 
 func (r *VditorIRRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"data-type", "strong"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -658,32 +646,32 @@ func (r *VditorIRRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *VditorIRRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-marker", "**"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("**")
 	r.tag("/span", nil, false)
-	r.tag("strong", [][]string{{"data-type", "**"}}, false)
+	r.tag("strong", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/strong", nil, false)
-	r.tag("span", [][]string{{"data-marker", "**"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("**")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-marker", "__"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("__")
 	r.tag("/span", nil, false)
-	r.tag("em", [][]string{{"data-type", "__"}}, false)
+	r.tag("em", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/strong", nil, false)
-	r.tag("span", [][]string{{"data-marker", "__"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("__")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
