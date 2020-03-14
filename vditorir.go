@@ -11,7 +11,10 @@
 package lute
 
 import (
+	"bytes"
 	"strings"
+
+	"github.com/88250/lute/html/atom"
 
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
@@ -119,7 +122,7 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 
 	var md string
 	for _, htmlNode := range htmlNodes {
-		md += lute.domText(htmlNode)
+		md += lute.irdomText(htmlNode)
 	}
 	tree := parse.Parse("", []byte(md), lute.Options)
 
@@ -129,4 +132,30 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
+}
+
+func (lute *Lute) irdomText(n *html.Node) string {
+	buf := &bytes.Buffer{}
+	for next := n; nil != next; next = next.NextSibling {
+		lute.irdomText0(next, buf)
+	}
+	return buf.String()
+}
+
+func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
+	if nil == n {
+		return
+	}
+	switch n.DataAtom {
+	case 0:
+		buffer.WriteString(n.Data)
+	case atom.Br:
+		buffer.WriteString("\n")
+	case atom.P:
+		buffer.WriteString("\n")
+	}
+
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		lute.irdomText0(child, buffer)
+	}
 }
