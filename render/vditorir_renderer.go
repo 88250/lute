@@ -576,7 +576,7 @@ func (r *VditorIRRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.Wal
 
 func (r *VditorIRRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
-	strings.Repeat("`", node.CodeMarkerLen)
+	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
 	r.tag("/span", nil, false)
 	r.tag("code", nil, false)
 	return ast.WalkStop
@@ -590,7 +590,7 @@ func (r *VditorIRRenderer) renderCodeSpanContent(node *ast.Node, entering bool) 
 func (r *VditorIRRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/code", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
-	strings.Repeat("`", node.CodeMarkerLen)
+	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
