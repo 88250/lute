@@ -618,49 +618,74 @@ func (r *VditorIRRenderer) renderEmphasis(node *ast.Node, entering bool) ast.Wal
 
 func (r *VditorIRRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-marker", "*"}}, false)
+	r.WriteByte(lex.ItemAsterisk)
+	r.tag("/span", nil, false)
 	r.tag("em", [][]string{{"data-type", "*"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/em", nil, false)
+	r.tag("span", [][]string{{"data-marker", "*"}}, false)
+	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-marker", "_"}}, false)
-	r.tag("em", [][]string{{"data-marker", "_"}}, false)
+	r.WriteByte(lex.ItemUnderscore)
+	r.tag("/span", nil, false)
+	r.tag("em", [][]string{{"data-type", "_"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/em", nil, false)
+	r.tag("span", [][]string{{"data-marker", "_"}}, false)
+	r.WriteByte(lex.ItemUnderscore)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"data-type", "strong"}}, false)
+	} else {
+		r.tag("/span", nil, false)
+	}
 	return ast.WalkContinue
 }
 
 func (r *VditorIRRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("strong", [][]string{{"data-marker", "**"}}, false)
+	r.tag("span", [][]string{{"data-marker", "**"}}, false)
+	r.WriteString("**")
+	r.tag("/span", nil, false)
+	r.tag("strong", [][]string{{"data-type", "**"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/strong", nil, false)
+	r.tag("span", [][]string{{"data-marker", "**"}}, false)
+	r.WriteString("**")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("strong", [][]string{{"data-marker", "__"}}, false)
+	r.tag("span", [][]string{{"data-marker", "__"}}, false)
+	r.WriteString("__")
+	r.tag("/span", nil, false)
+	r.tag("em", [][]string{{"data-type", "__"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/strong", nil, false)
+	r.tag("span", [][]string{{"data-marker", "__"}}, false)
+	r.WriteString("__")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
