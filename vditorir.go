@@ -151,20 +151,30 @@ func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
 		buffer.WriteString(n.Data)
 	case atom.Br:
 		buffer.WriteString("\n")
-	case atom.P:
-		buffer.WriteString("\n\n")
 	case atom.Li:
 		buffer.WriteString(lute.domAttrValue(n, "data-marker") + " ")
-	case atom.Blockquote:
-		buffer.WriteString("> ")
 	}
 
+	childBuf := &bytes.Buffer{}
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
-		lute.irdomText0(child, buffer)
+		lute.irdomText0(child, childBuf)
 	}
 
 	switch n.DataAtom {
+	case atom.P:
+		childBuf.WriteString("\n\n")
+		buffer.WriteString(childBuf.String())
 	case atom.Li:
-		buffer.WriteString("\n")
+		childBuf.WriteString("\n")
+		buffer.WriteString(childBuf.String())
+	case atom.Blockquote:
+		lines := strings.Split(childBuf.String(), "\n")
+		for _, line := range lines {
+			buffer.WriteString("> ")
+			buffer.WriteString(line)
+			buffer.WriteString("\n")
+		}
+	default:
+		buffer.WriteString(childBuf.String())
 	}
 }
