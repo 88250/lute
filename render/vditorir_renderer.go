@@ -408,7 +408,9 @@ func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -459,31 +461,9 @@ func (r *VditorIRRenderer) renderBang(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if 0 == r.DisableTags {
-			r.WriteString("<img src=\"")
-			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.Tree.Context.RelativePath(destTokens)
-			destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), []byte(""))
-			r.Write(destTokens)
-			r.WriteString("\" alt=\"")
-			if alt := node.ChildByType(ast.NodeLinkText); nil != alt && bytes.Contains(alt.Tokens, []byte(parse.Caret)) {
-				alt.Tokens = bytes.ReplaceAll(alt.Tokens, []byte(parse.Caret), []byte(""))
-			}
-		}
-		r.DisableTags++
-		return ast.WalkContinue
-	}
-
-	r.DisableTags--
-	if 0 == r.DisableTags {
-		r.WriteString("\"")
-		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			r.WriteString(" title=\"")
-			title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(parse.Caret), []byte(""))
-			r.Write(title.Tokens)
-			r.WriteString("\"")
-		}
-		r.WriteString(" />")
+		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+	} else {
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -507,24 +487,7 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 		}
 
 		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
-
-		//dest := node.ChildByType(ast.NodeLinkDest)
-		//destTokens := dest.Tokens
-		//destTokens = r.Tree.Context.RelativePath(destTokens)
-		//caretInDest := bytes.Contains(destTokens, []byte(parse.Caret))
-		//if caretInDest {
-		//	text := node.ChildByType(ast.NodeLinkText)
-		//	text.Tokens = append(text.Tokens, []byte(parse.Caret)...)
-		//	destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), []byte(""))
-		//}
-		//attrs := [][]string{{"href", string(destTokens)}}
-		//if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-		//	title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(parse.Caret), []byte(""))
-		//	attrs = append(attrs, []string{"title", string(title.Tokens)})
-		//}
-		//r.tag("a", attrs, false)
 	} else {
-		//r.tag("/a", nil, false)
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
