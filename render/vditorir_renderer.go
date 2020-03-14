@@ -362,26 +362,43 @@ func (r *VditorIRRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *VditorIRRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+	} else {
+		r.tag("/span", nil, false)
+	}
 	return ast.WalkContinue
 }
 
 func (r *VditorIRRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("s", [][]string{{"data-marker", "~"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("~")
+	r.tag("/span", nil, false)
+	r.tag("s", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/s", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("~")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("s", [][]string{{"data-marker", "~~"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("~~")
+	r.tag("/span", nil, false)
+	r.tag("s", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/s", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("~~")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
