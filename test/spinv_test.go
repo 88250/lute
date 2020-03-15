@@ -148,6 +148,7 @@ func TestSpinVditorDOM(t *testing.T) {
 
 var spinVditorIRDOMTests = []*parseTest{
 
+	{"4", "<h1 data-block=\"0\" data-marker=\"#\">foo</h1><p data-block=\"0\">b<wbr></p>", "<h1 data-block=\"0\" data-marker=\"#\">foo</h1><p data-block=\"0\">b<wbr>\n</p>"},
 	{"3", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr>\n</p></blockquote>", "<p data-block=\"0\">&gt; <wbr>\n</p>"},
 	{"2", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>"},
 	{"1", "<p data-block=\"0\">f<wbr></p><p data-block=\"0\">bar\n</p>", "<p data-block=\"0\">f<wbr>\n</p><p data-block=\"0\">bar\n</p>"},

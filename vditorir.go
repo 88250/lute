@@ -182,6 +182,9 @@ func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
 			buffer.WriteString(line)
 			buffer.WriteString("\n")
 		}
+	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		buffer.WriteString(childBuf.String())
+		buffer.WriteString("\n\n")
 	default:
 		buffer.WriteString(childBuf.String())
 	}
