@@ -147,7 +147,13 @@ func (context *Context) RelativePath(dest []byte) []byte {
 	if !context.isRelativePath(dest) {
 		return dest
 	}
-	return append(util.StrToBytes(context.Option.LinkBase), dest...)
+
+	linkBase := util.StrToBytes(context.Option.LinkBase)
+	ret := append(linkBase, dest...)
+	if bytes.Equal(linkBase, ret) {
+		return []byte("")
+	}
+	return ret
 }
 
 func (context *Context) isRelativePath(dest []byte) bool {
