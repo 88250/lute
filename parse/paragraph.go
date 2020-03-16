@@ -55,11 +55,18 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 				if isTaskListItem {
 					// 如果是任务列表项则添加任务列表标记符节点
 					tokens := p.Tokens
-					startCaret := false
+					var caretStartText, caretAfterCloseBracket, caretInBracket bool
 					if context.Option.VditorWYSIWYG {
+						closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
 						if bytes.HasPrefix(tokens, []byte(Caret)) {
 							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
-							startCaret = true
+							caretStartText = true
+						} else if bytes.HasPrefix(tokens[closeBracket:], []byte(Caret)) {
+							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+							caretAfterCloseBracket = true
+						} else if bytes.Contains(tokens[1:closeBracket], []byte(Caret)) {
+							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+							caretInBracket = true
 						}
 					}
 					taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
@@ -67,9 +74,10 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 					p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 					if context.Option.VditorWYSIWYG {
 						p.Tokens = bytes.TrimSpace(p.Tokens)
-						p.Tokens = append([]byte(" "), p.Tokens...)
-						if startCaret {
-							p.Tokens = append([]byte(Caret), p.Tokens...)
+						if caretStartText || caretAfterCloseBracket || caretInBracket {
+							p.Tokens = append([]byte(" "+Caret), p.Tokens...)
+						} else {
+							p.Tokens = append([]byte(" "), p.Tokens...)
 						}
 					}
 				}
