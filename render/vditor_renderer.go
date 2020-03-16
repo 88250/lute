@@ -744,6 +744,9 @@ func (r *VditorRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 			}
 		}
 		r.tag("li", attrs, false)
+		if nil == node.FirstChild {
+			r.WriteString(parse.Zwsp)
+		}
 	} else {
 		r.tag("/li", nil, false)
 	}

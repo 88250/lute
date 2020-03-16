@@ -20,6 +20,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"112", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"></li><li data-marker=\"*\"><p>f<wbr></p></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">\u200b</li><li data-marker=\"*\">f<wbr></li></ul>go"},
 	{"111", "<h1 data-block=\"0\" data-marker=\"#\">foo {#custom-id}<wbr></h1>", "<h1 data-block=\"0\" data-id=\"#custom-id\" data-marker=\"#\">foo <wbr></h1>"},
 	{"110", "<div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^111\"><p data-block=\"0\">1<wbr>\n</p></li></ol></div>", "<div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^111\"><p data-block=\"0\">1<wbr>\n</p></li></ol></div>"},
 	// 109：重复的脚注定义 marker 会被去重，重现步骤：在脚注定义中换行
