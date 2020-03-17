@@ -413,7 +413,7 @@ func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -425,7 +425,9 @@ func (r *VditorIRRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorIRRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__link"}}, false)
 	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
