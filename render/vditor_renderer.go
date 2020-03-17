@@ -819,14 +819,18 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
 	isFenced := node.Parent.IsFencedCodeBlock
-	if isFenced {
-		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), []byte(""))
-	}
+	var caretInInfo bool
 	var attrs [][]string
 	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
-		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-		language := string(infoWords[0])
-		attrs = append(attrs, []string{"class", "language-" + language})
+		if bytes.Contains(node.Previous.CodeBlockInfo, []byte(parse.Caret)) {
+			caretInInfo = true
+			node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), []byte(""))
+		}
+		if 0 < len(node.Previous.CodeBlockInfo) {
+			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
+			language := string(infoWords[0])
+			attrs = append(attrs, []string{"class", "language-" + language})
+		}
 	}
 	r.WriteString("<pre>")
 	r.tag("code", attrs, false)
@@ -834,6 +838,9 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	if codeIsEmpty {
 		r.WriteString("<wbr>\n")
 	} else {
+		if caretInInfo {
+			r.WriteString("<wbr>")
+		}
 		r.Write(util.EscapeHTML(node.Tokens))
 		r.Newline()
 	}
