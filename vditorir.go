@@ -154,8 +154,8 @@ func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
 	case atom.Li:
 		buffer.WriteString(lute.domAttrValue(n, "data-marker") + " ")
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
-		marker := strings.Repeat("#", int(n.Data[1]-byte('0')))
-		buffer.WriteString(marker + " ")
+		//marker := strings.Repeat("#", int(n.Data[1]-byte('0')))
+		//buffer.WriteString(marker + " ")
 	}
 
 	childBuf := &bytes.Buffer{}
