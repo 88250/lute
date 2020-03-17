@@ -363,12 +363,7 @@ func (r *VditorIRRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *VditorIRRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		nextText := node.NextNodeText()
-		if strings.HasPrefix(nextText, parse.Caret) {
-			r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
-		} else {
-			r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
-		}
+		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -493,7 +488,7 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 			return ast.WalkStop
 		}
 
-		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -605,12 +600,7 @@ func (r *VditorIRRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bo
 
 func (r *VditorIRRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		nextText := node.NextNodeText()
-		if strings.HasPrefix(nextText, parse.Caret) {
-			r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
-		} else {
-			r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
-		}
+		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -651,12 +641,7 @@ func (r *VditorIRRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, enterin
 
 func (r *VditorIRRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		nextText := node.NextNodeText()
-		if strings.HasPrefix(nextText, parse.Caret) {
-			r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
-		} else {
-			r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
-		}
+		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -876,4 +861,35 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	}
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
+}
+
+func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
+	text := r.Text(node)
+	if strings.Contains(text, parse.Caret) {
+		r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
+		return
+	}
+
+	preText := node.PreviousNodeText()
+	if strings.HasSuffix(preText, parse.Caret) {
+		r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
+		return
+	}
+
+	nexText := node.NextNodeText()
+	if strings.HasPrefix(nexText, parse.Caret) {
+		r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
+		return
+	}
+	r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+}
+
+func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if (ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeLinkDest == n.Type) && entering {
+			ret += util.BytesToStr(n.Tokens)
+		}
+		return ast.WalkContinue
+	})
+	return
 }
