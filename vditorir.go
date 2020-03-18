@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 
 	"github.com/88250/lute/html/atom"
@@ -142,16 +143,41 @@ func (lute *Lute) irdomText(n *html.Node) string {
 	return buf.String()
 }
 
+func (lute *Lute) listPadding(n *html.Node) (padding int) {
+	for parent := n; nil != parent; parent = parent.Parent {
+		if atom.Li == parent.DataAtom {
+			p, _ := strconv.Atoi(lute.domAttrValue(parent, "data-padding"))
+			padding += p
+		}
+	}
+	return
+}
+
 func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
 	if nil == n {
 		return
 	}
 	switch n.DataAtom {
 	case 0:
-		buffer.WriteString(n.Data)
+		content := n.Data
+		if strings.Contains(content, "\n") {
+			lines := strings.Split(content, "\n")
+			if padding := lute.listPadding(n); 0 < padding {
+				content = lines[0]
+				paddingSpace := strings.Repeat(" ", padding)
+				for _, ln := range lines[1:] {
+					content += "\n" + paddingSpace + ln
+				}
+			}
+		}
+		buffer.WriteString(content)
 	case atom.Br:
 		buffer.WriteString("\n")
 	case atom.Li:
+		if padding := lute.listPadding(n); 0 < padding {
+			paddingSpace := strings.Repeat(" ", padding)
+			buffer.WriteString(paddingSpace)
+		}
 		buffer.WriteString(lute.domAttrValue(n, "data-marker") + " ")
 	}
 

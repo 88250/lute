@@ -778,7 +778,11 @@ func (r *VditorIRRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
+		attrs = append(attrs, []string{"data-padding", strconv.Itoa(node.Padding)})
 		r.tag("li", attrs, false)
+		//r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+		//r.WriteString(string(node.ListData.Marker) + string(node.ListData.Delimiter) + " ")
+		//r.tag("/span", nil, false)
 	} else {
 		r.tag("/li", nil, false)
 	}
