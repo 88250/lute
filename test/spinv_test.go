@@ -151,6 +151,7 @@ func TestSpinVditorDOM(t *testing.T) {
 
 var spinVditorIRDOMTests = []*parseTest{
 
+	{"6", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"4\">bar\n* b<wbr></li></ul></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"4\">b<wbr></li></ul></li></ul>"},
 	{"5", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo\n* b<wbr></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"4\">b<wbr></li></ul></li></ul>"},
 	{"4", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo</li></ul><p><wbr><br></p>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo</li></ul><p data-block=\"0\"><wbr>\n</p>"},
 	{"3", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr>\n</p></blockquote>", "<p data-block=\"0\">&gt; <wbr>\n</p>"},

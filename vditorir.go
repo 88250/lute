@@ -174,11 +174,6 @@ func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
 	case atom.Br:
 		buffer.WriteString("\n")
 	case atom.Li:
-		if padding := lute.listPadding(n); 2 < padding {
-			buffer.WriteString("\n")
-			paddingSpace := strings.Repeat(" ", padding)
-			buffer.WriteString(paddingSpace)
-		}
 		buffer.WriteString(lute.domAttrValue(n, "data-marker") + " ")
 	}
 
