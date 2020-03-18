@@ -146,8 +146,8 @@ func (lute *Lute) irdomText(n *html.Node) string {
 func (lute *Lute) listPadding(n *html.Node) (padding int) {
 	for parent := n; nil != parent; parent = parent.Parent {
 		if atom.Li == parent.DataAtom {
-			p, _ := strconv.Atoi(lute.domAttrValue(parent, "data-padding"))
-			padding += p
+			padding, _ = strconv.Atoi(lute.domAttrValue(parent, "data-padding"))
+			return
 		}
 	}
 	return
@@ -174,7 +174,8 @@ func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
 	case atom.Br:
 		buffer.WriteString("\n")
 	case atom.Li:
-		if padding := lute.listPadding(n); 0 < padding {
+		if padding := lute.listPadding(n); 2 < padding {
+			buffer.WriteString("\n")
 			paddingSpace := strings.Repeat(" ", padding)
 			buffer.WriteString(paddingSpace)
 		}
