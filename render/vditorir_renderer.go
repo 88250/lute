@@ -374,7 +374,7 @@ func (r *VditorIRRenderer) renderStrikethrough1OpenMarker(node *ast.Node, enteri
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("~")
 	r.tag("/span", nil, false)
-	r.tag("s", nil, false)
+	r.tag("s", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
@@ -390,7 +390,7 @@ func (r *VditorIRRenderer) renderStrikethrough2OpenMarker(node *ast.Node, enteri
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("~~")
 	r.tag("/span", nil, false)
-	r.tag("s", nil, false)
+	r.tag("s", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
@@ -611,7 +611,7 @@ func (r *VditorIRRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering b
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
-	r.tag("em", nil, false)
+	r.tag("em", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
@@ -627,7 +627,7 @@ func (r *VditorIRRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
 	r.tag("/span", nil, false)
-	r.tag("em", nil, false)
+	r.tag("em", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
@@ -652,7 +652,7 @@ func (r *VditorIRRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("**")
 	r.tag("/span", nil, false)
-	r.tag("strong", nil, false)
+	r.tag("strong", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
@@ -668,7 +668,7 @@ func (r *VditorIRRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("__")
 	r.tag("/span", nil, false)
-	r.tag("em", nil, false)
+	r.tag("em", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
