@@ -875,23 +875,30 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 
 func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 	text := r.Text(node)
+	attrs := [][]string{{"data-type", "inline-node"}}
 	if strings.Contains(text, parse.Caret) {
-		r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}, {"data-type", "inline-node"}}, false)
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
 		return
 	}
 
 	preText := node.PreviousNodeText()
 	if strings.HasSuffix(preText, parse.Caret) {
-		r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
 		return
 	}
 
 	nexText := node.NextNodeText()
 	if strings.HasPrefix(nexText, parse.Caret) {
-		r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
 		return
 	}
-	r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+
+	attrs = append(attrs, []string{"class", "vditor-ir__node"})
+	r.tag("span", attrs, false)
+	return
 }
 
 func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {

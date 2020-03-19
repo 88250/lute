@@ -57,7 +57,7 @@ func TestMd2Vditor(t *testing.T) {
 var md2VditorIRTests = []parseTest{
 
 	{"1", "# foo", "<h1 data-block=\"0\" class=\"vditor-ir__node\" data-marker=\"#\"><span class=\"vditor-ir__marker\"># </span>foo</h1>"},
-	{"0", "*foo*", "<p data-block=\"0\"><span class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>"},
+	{"0", "*foo*", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>"},
 }
 
 func TestMd2VditorIR(t *testing.T) {

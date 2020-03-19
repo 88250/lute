@@ -151,11 +151,12 @@ func TestSpinVditorDOM(t *testing.T) {
 
 var spinVditorIRDOMTests = []*parseTest{
 
-	{"6", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"4\">bar\n* b<wbr></li></ul></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"4\">b<wbr></li></ul></li></ul>"},
-	{"5", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo\n* b<wbr></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"4\">b<wbr></li></ul></li></ul>"},
-	{"4", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo</li></ul><p><wbr><br></p>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-padding=\"2\">foo</li></ul><p data-block=\"0\"><wbr>\n</p>"},
-	{"3", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr>\n</p></blockquote>", "<p data-block=\"0\">&gt; <wbr>\n</p>"},
-	{"2", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>"},
+	{"7", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">bar\n* b<wbr></li></ul></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">b<wbr></li></ul></li></ul>"},
+	{"6", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo\n* b<wbr></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">b<wbr></li></ul></li></ul>"},
+	{"5", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo</li></ul><p><wbr><br></p>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo</li></ul><p data-block=\"0\"><wbr>\n</p>"},
+	{"4", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr>\n</p></blockquote>", "<p data-block=\"0\">&gt; <wbr>\n</p>"},
+	{"3", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\">fo<wbr>\n</p></blockquote>"},
+	{"2", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>"},
 	{"1", "<p data-block=\"0\">f<wbr></p><p data-block=\"0\">bar\n</p>", "<p data-block=\"0\">f<wbr>\n</p><p data-block=\"0\">bar\n</p>"},
 	{"0", "<p data-block=\"0\">foo\n</p><p data-block=\"0\"><wbr><br></p>", "<p data-block=\"0\">foo\n</p><p data-block=\"0\"><wbr>\n</p>"},
 }
