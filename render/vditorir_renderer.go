@@ -778,26 +778,12 @@ func (r *VditorIRRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
-
-		padding := r.listPadding(node)
-		attrs = append(attrs, []string{"data-padding", strconv.Itoa(padding)})
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
 	}
 	return ast.WalkContinue
 }
-
-
-func (r *VditorIRRenderer) listPadding(node *ast.Node) (padding int) {
-	for parent := node; nil != parent; parent = parent.Parent {
-		if ast.NodeListItem == parent.Type {
-			padding += parent.Padding
-		}
-	}
-	return
-}
-
 
 func (r *VditorIRRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	var attrs [][]string
