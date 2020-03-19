@@ -876,7 +876,7 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 	text := r.Text(node)
 	if strings.Contains(text, parse.Caret) {
-		r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__node vditor-ir__node--expand"}, {"data-type", "inline-node"}}, false)
 		return
 	}
 

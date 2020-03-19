@@ -764,6 +764,17 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
+		if "inline-node" == dataType {
+			childBuf := &bytes.Buffer{}
+			for child := n.FirstChild; nil != child; child = child.NextSibling {
+				lute.irdomText0(child, childBuf)
+			}
+			node.Type = ast.NodeText
+			node.Tokens = childBuf.Bytes()
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
 		if "link-ref" == dataType {
 			node.Type = ast.NodeText
 			node.Tokens = []byte("[" + n.FirstChild.Data + "][" + lute.domAttrValue(n, "data-link-label") + "]")
@@ -866,5 +877,62 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
+	}
+}
+
+func (lute *Lute) irdomText(n *html.Node) string {
+	buf := &bytes.Buffer{}
+	for next := n; nil != next; next = next.NextSibling {
+		lute.irdomText0(next, buf)
+	}
+	return buf.String()
+}
+
+
+func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
+	if nil == n {
+		return
+	}
+	switch n.DataAtom {
+	case 0:
+		buffer.WriteString(n.Data)
+	case atom.Br:
+		buffer.WriteString("\n")
+	case atom.Li:
+		buffer.WriteString(lute.domAttrValue(n, "data-marker") + " ")
+	}
+
+	childBuf := &bytes.Buffer{}
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		lute.irdomText0(child, childBuf)
+	}
+
+	switch n.DataAtom {
+	case atom.P:
+		childBuf.WriteString("\n\n")
+		buffer.WriteString(childBuf.String())
+	case atom.Li:
+		childBuf.WriteString("\n")
+		buffer.WriteString(childBuf.String())
+	case atom.Ul, atom.Ol:
+		childBuf.WriteString("\n")
+		buffer.WriteString(childBuf.String())
+	case atom.Blockquote:
+		if parse.Caret+"\n\n\n" == childBuf.String() {
+			childBuf.Reset()
+			childBuf.WriteString(parse.Caret)
+		}
+
+		lines := strings.Split(childBuf.String(), "\n")
+		for _, line := range lines {
+			buffer.WriteString("> ")
+			buffer.WriteString(line)
+			buffer.WriteString("\n")
+		}
+	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		buffer.WriteString(childBuf.String())
+		buffer.WriteString("\n\n")
+	default:
+		buffer.WriteString(childBuf.String())
 	}
 }

@@ -53,3 +53,21 @@ func TestMd2Vditor(t *testing.T) {
 		}
 	}
 }
+
+var md2VditorIRTests = []parseTest{
+
+	{"1", "# foo", "<h1 data-block=\"0\" class=\"vditor-ir__node\" data-marker=\"#\"><span class=\"vditor-ir__marker\"># </span>foo</h1>"},
+	{"0", "*foo*", "<p data-block=\"0\"><span class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>"},
+}
+
+func TestMd2VditorIR(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.ToC = true
+
+	for _, test := range md2VditorIRTests {
+		md := luteEngine.Md2VditorIRDOM(test.from)
+		if test.to != md {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
+		}
+	}
+}
