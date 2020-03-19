@@ -12,11 +12,12 @@ package lute
 
 import (
 	"bytes"
+	"strconv"
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/util"
-	"strconv"
-	"strings"
 
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
@@ -120,6 +121,11 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 		return
 	}
 
+	if 0 < len(htmlNodes) {
+		// 调整 DOM 结构
+		lute.adjustVditorIRDOM(htmlNodes[0])
+	}
+
 	// 将 HTML 树转换为 Markdown AST
 
 	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
@@ -160,6 +166,31 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
+func (lute *Lute) adjustVditorIRDOM(n *html.Node) {
+	for c := n; nil != c; c = c.NextSibling {
+		lute.adjustVditorIRDOM0(c)
+	}
+}
+
+func (lute *Lute) adjustVditorIRDOM0(n *html.Node) {
+	switch n.DataAtom {
+	case atom.Li:
+		// 在 li 下的每个非块容器节点用 p 包裹
+		for c := n.FirstChild; nil != c; c = c.NextSibling {
+			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom {
+				p := &html.Node{DataAtom: atom.P, NextSibling: c.NextSibling}
+				c.InsertBefore(p)
+				c.Unlink()
+				p.AppendChild(c)
+				c = p
+			}
+		}
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.adjustVditorIRDOM0(c)
+	}
+}
 
 // genASTByVditorIRDOM 根据指定的 Vditor IR DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
@@ -876,7 +907,6 @@ func (lute *Lute) irdomText(n *html.Node) string {
 	}
 	return buf.String()
 }
-
 
 func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
 	if nil == n {
