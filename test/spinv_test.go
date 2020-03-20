@@ -152,7 +152,7 @@ func TestSpinVditorDOM(t *testing.T) {
 var spinVditorIRDOMTests = []*parseTest{
 
 	{"3", "<blockquote data-block=\"0\"><p data-block=\"0\">foo<wbr>\n</p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\">foo<wbr>\n</p></blockquote>"},
-	{"2", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker\">*</span></span>\n</p>"},
+	{"2", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span></span>\n</p>", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span></span>\n</p>"},
 	{"1", "<p data-block=\"0\">f<wbr></p><p data-block=\"0\">bar\n</p>", "<p data-block=\"0\">f<wbr>\n</p><p data-block=\"0\">bar\n</p>"},
 	{"0", "<p data-block=\"0\">foo\n</p><p data-block=\"0\"><wbr><br></p>", "<p data-block=\"0\">foo\n</p><p data-block=\"0\"><wbr>\n</p>"},
 }
