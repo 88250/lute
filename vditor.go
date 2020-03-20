@@ -204,6 +204,7 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 	case atom.Li:
 		// 在 li 下的每个非块容器节点用 p 包裹
 		var nodes []*html.Node
+		var lastc *html.Node
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
 			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom {
 				nodes = append(nodes, c)
@@ -217,6 +218,20 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 				c.InsertBefore(p)
 				c = p
 			}
+			if nil == c.NextSibling {
+				lastc = c
+			}
+		}
+		if 0 < len(nodes) {
+			p := &html.Node{DataAtom: atom.P, NextSibling: lastc.NextSibling}
+			lastc.InsertBefore(p)
+			lastc.Unlink()
+			p.AppendChild(lastc)
+			for _, pChild := range nodes {
+				pChild.Unlink()
+				p.AppendChild(pChild)
+			}
+			nodes = nil
 		}
 	}
 

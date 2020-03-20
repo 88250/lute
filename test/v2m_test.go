@@ -20,6 +20,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"111", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">1</li><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">2</li></ul><li><wbr><br></li></ul>", "* 1\n  * 2\n*\n"},
 	{"110", "<ol data-tight=\"true\" start=\"3\" data-block=\"0\"><li data-marker=\"3.\"><p>foo<wbr></p></li></ol>", "3. foo\n"},
 	{"109", "<li data-marker=\"*\" class=\"vditor-task\"><p><input checked=\"\" type=\"checkbox\"> foo</p></li><li data-marker=\"*\" class=\"vditor-task\"><p><input type=\"checkbox\"> bar</p></li>", "* [X] foo\n* [ ] bar\n"},
 	{"108", "<p data-block=\"0\">foo[^1]\n</p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-marker=\"^1\"><p data-block=\"0\">bar\n</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">baz</li></ul></li></ol></div>", "foo[^1]\n\n[^1]: bar\n       * baz\n"},
@@ -76,7 +77,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"58", "<p><em data-marker=\"*\">foo </em>bar<wbr>\n</p>", "*foo* bar\n"},
 	{"57", "<h3>隐藏细节</h3><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\"><pre><code>&lt;details&gt;\n&lt;summary&gt;\n这里是摘要部分。\n&lt;/summary&gt;\n这里是细节部分。&lt;/details&gt;<br></code></pre><div class=\"vditor-wysiwyg__preview\" contenteditable=\"false\" data-render=\"false\"></div></div><p>1<wbr></p>", "### 隐藏细节\n\n<details>\n<summary>\n这里是摘要部分。\n</summary>\n这里是细节部分。</details>\n\n1\n"},
 	{"56", "<p>~删除线~</p>", "~删除线~\n"},
-	{"55", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><br></li><li data-marker=\"*\"><wbr>bar</li></ul>", "* foo\n*\n* bar\n"},
+	{"55", "<ul data-tight=\"true\"><li data-marker=\"*\">foo</li><li data-marker=\"*\"><br></li><li data-marker=\"*\"><wbr>bar</li></ul>", "* foo\n* \n* bar\n"},
 	{"54", "<p>f<code>o</code><wbr>o\n</p>", "f `o` o\n"},
 	{"53", "<blockquote><p><br></p><p><wbr>foo\n</p></blockquote>", ">\n>\n> foo\n"}, // 在块引用第一个字符前换行
 	{"52", "<blockquote><p>foo\n</p><blockquote><p>bar<wbr>\n</p></blockquote></blockquote>", "> foo\n>\n>> bar\n>>\n"},
