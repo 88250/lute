@@ -41,8 +41,10 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 		lute.genASTByDOM(htmlNode, tree)
 	}
 
-	// 调整树结构
-	// TODO: 列表项依赖入参带有 p 节点，需要在此调整为自动插入 p 节点
+	if 0 < len(htmlNodes) {
+		// 调整 DOM 结构
+		lute.adjustVditorDOM(htmlNodes[0])
+	}
 
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {

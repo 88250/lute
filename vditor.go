@@ -203,6 +203,7 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 	switch n.DataAtom {
 	case atom.Li:
 		// 在 li 下的每个非块容器节点用 p 包裹
+
 		var nodes []*html.Node
 		var lastc *html.Node
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
