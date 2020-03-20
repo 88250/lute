@@ -176,12 +176,18 @@ func (lute *Lute) adjustVditorIRDOM0(n *html.Node) {
 	switch n.DataAtom {
 	case atom.Li:
 		// 在 li 下的每个非块容器节点用 p 包裹
+		var nodes []*html.Node
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
 			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom {
+				nodes = append(nodes, c)
+			} else if 0 < len(nodes) {
 				p := &html.Node{DataAtom: atom.P, NextSibling: c.NextSibling}
+				for _, pChild := range nodes {
+					pChild.Unlink()
+					p.AppendChild(pChild)
+				}
+				nodes = nil
 				c.InsertBefore(p)
-				c.Unlink()
-				p.AppendChild(c)
 				c = p
 			}
 		}

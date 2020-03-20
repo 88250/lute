@@ -148,6 +148,11 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 		return
 	}
 
+	if 0 < len(htmlNodes) {
+		// 调整 DOM 结构
+		lute.adjustVditorDOM(htmlNodes[0])
+	}
+
 	// 将 HTML 树转换为 Markdown AST
 
 	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
@@ -186,6 +191,38 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
+}
+
+func (lute *Lute) adjustVditorDOM(n *html.Node) {
+	for c := n; nil != c; c = c.NextSibling {
+		lute.adjustVditorDOM0(c)
+	}
+}
+
+func (lute *Lute) adjustVditorDOM0(n *html.Node) {
+	switch n.DataAtom {
+	case atom.Li:
+		// 在 li 下的每个非块容器节点用 p 包裹
+		var nodes []*html.Node
+		for c := n.FirstChild; nil != c; c = c.NextSibling {
+			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom {
+				nodes = append(nodes, c)
+			} else if 0 < len(nodes) {
+				p := &html.Node{DataAtom: atom.P, NextSibling: c.NextSibling}
+				for _, pChild := range nodes {
+					pChild.Unlink()
+					p.AppendChild(pChild)
+				}
+				nodes = nil
+				c.InsertBefore(p)
+				c = p
+			}
+		}
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.adjustVditorDOM0(c)
+	}
 }
 
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
