@@ -290,7 +290,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		childBuf := &bytes.Buffer{}
 		for child := n.FirstChild; nil != child; child = child.NextSibling {
-			lute.irdomText0(child, childBuf)
+			lute.domText0(child, childBuf)
 		}
 		node.Type = ast.NodeText
 		node.Tokens = []byte(childBuf.String() + "\n")
@@ -786,7 +786,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 
 		if "inline-node" == dataType {
 			node.Type = ast.NodeText
-			node.Tokens = []byte(lute.irdomText(n))
+			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -894,31 +894,4 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}
-}
-
-func (lute *Lute) irdomText(n *html.Node) string {
-	buf := &bytes.Buffer{}
-	for child := n.FirstChild; nil != child; child = child.NextSibling {
-		lute.irdomText0(child, buf)
-	}
-	return buf.String()
-}
-
-func (lute *Lute) irdomText0(n *html.Node, buffer *bytes.Buffer) {
-	if nil == n {
-		return
-	}
-	switch n.DataAtom {
-	case 0:
-		buffer.WriteString(n.Data)
-	case atom.Br:
-		buffer.WriteString("\n")
-	}
-
-	childBuf := &bytes.Buffer{}
-	for child := n.FirstChild; nil != child; child = child.NextSibling {
-		lute.irdomText0(child, childBuf)
-	}
-
-	buffer.WriteString(childBuf.String())
 }
