@@ -668,7 +668,7 @@ func (r *VditorIRRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("__")
 	r.tag("/span", nil, false)
-	r.tag("em", [][]string{{"data-newline", "1"}}, false)
+	r.tag("strong", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
