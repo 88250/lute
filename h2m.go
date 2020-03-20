@@ -160,10 +160,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					language := class[len("language-"):]
 					node.LastChild.CodeBlockInfo = []byte(language)
 				}
-				firstc = firstc.FirstChild
-				for c := firstc; nil != c; c = c.NextSibling {
-					buf.WriteString(lute.domText(c))
-				}
+				buf.WriteString(lute.domText(n))
 				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()}
 				node.AppendChild(content)
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})

@@ -275,10 +275,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div:
-		if nil != n.Parent && atom.Blockquote == n.Parent.DataAtom && "" == strings.TrimSpace(lute.domText(n)) { // vditorDOM2MdTests case 53
-			return
-		}
-
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -954,8 +950,8 @@ func (lute *Lute) parentIs(n *html.Node, parentTypes ...atom.Atom) bool {
 
 func (lute *Lute) domText(n *html.Node) string {
 	buf := &bytes.Buffer{}
-	for next := n; nil != next; next = next.NextSibling {
-		lute.domText0(next, buf)
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		lute.domText0(child, buf)
 	}
 	return buf.String()
 }
