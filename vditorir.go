@@ -649,30 +649,12 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.EmojiImgTokens(imgAlt, lute.domAttrValue(n, "src"))}
 			emojiImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: []byte(":" + imgAlt + ":")})
 			node.AppendChild(emojiImg)
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
 		} else {
-			node.Type = ast.NodeImage
-			node.AppendChild(&ast.Node{Type: ast.NodeBang})
-			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
-			if "" != imgAlt {
-				node.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: []byte(imgAlt)})
-			}
-			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
-			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			src := lute.domAttrValue(n, "src")
-			if "" != lute.LinkBase {
-				src = strings.ReplaceAll(src, lute.LinkBase, "")
-			}
-			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(src)})
-			linkTitle := lute.domAttrValue(n, "title")
-			if "" != linkTitle {
-				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
-				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
-			}
-			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			return
 		}
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
 	case atom.Input:
 		if nil == n.Parent || nil == n.Parent.Parent || (atom.P != n.Parent.DataAtom && atom.Li != n.Parent.DataAtom) {
 			// 仅允许 input 出现在任务列表中

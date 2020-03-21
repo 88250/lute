@@ -424,7 +424,11 @@ func (r *VditorIRRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorIRRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__link vditor-ir__marker--linktext"}}, false)
+	if ast.NodeImage == node.Parent.Type {
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
+	} else {
+		r.tag("span", [][]string{{"class", "vditor-ir__link vditor-ir__marker--linktext"}}, false)
+	}
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -469,6 +473,8 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 	if entering {
 		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
 	} else {
+		dest := node.ChildByType(ast.NodeLinkDest)
+		r.WriteString("<img src=\"" + string(dest.Tokens) + "\">")
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
