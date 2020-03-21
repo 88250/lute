@@ -259,7 +259,7 @@ Markdown 原文：
 
 ## 💪 健壮性
 
-Lute 承载了[黑客派](https://hacpai.com)上的所有 Markdown 处理，每天处理数十万请求，运行表现稳定。
+Lute 承载了[黑客派](https://hacpai.com)上的所有 Markdown 处理，每天处理数百万解析渲染请求，运行表现稳定。
 
 ## 🔒 安全性
 
