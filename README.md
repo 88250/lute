@@ -1,5 +1,5 @@
 <p align = "center">
-<img alt="Lute" src="https://user-images.githubusercontent.com/873584/65254932-99b17300-db2f-11e9-815a-b0b63e812b89.png">
+<img alt="Lute" src="https://b3log.org/images/brand/lute-128.png">
 <br><br>
 一款对中文语境优化的 Markdown 引擎，支持 Go 和 JavaScript<br><br>
 <em>
@@ -313,7 +313,7 @@ func main() {
 
 简单示例可参考 JavaScript 目录下的 demo，结合前端编辑器的完整用法请参考 [Vditor 中的示例](https://github.com/Vanessa219/vditor/tree/master/demo)。
 
-![Vditor](https://user-images.githubusercontent.com/970828/64320104-624fac00-cff0-11e9-8727-0ad51a6f71c0.png)
+![Vditor](https://img.hacpai.com/file/2020/02/%E6%88%AA%E5%9B%BE%E4%B8%93%E7%94%A8-ef21ef12.png)
 
 一些细节：
 
