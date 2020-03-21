@@ -28,7 +28,7 @@
 
 [Lute](https://github.com/88250/lute) 是一款结构化的 Markdown 引擎，完整实现了最新的 [GFM](https://github.github.com/gfm/)/[CommonMark](https://commonmark.org) 规范，对中文语境支持更好。
 
-欢迎关注 B3log 开源社区微信公众号 `B3log开源`：
+欢迎到 [Lute 官方讨论区](https://hacpai.com/tag/lute)了解更多。同时也欢迎关注 B3log 开源社区微信公众号 `B3log开源`：
 
 ![b3logos.png](https://img.hacpai.com/file/2019/10/image-d3c00d78.png)
 
