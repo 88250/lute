@@ -403,12 +403,16 @@ func (r *VditorIRRenderer) renderStrikethrough2CloseMarker(node *ast.Node, enter
 }
 
 func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--code"}}, false)
+	r.WriteByte(lex.ItemDoublequote)
 	r.Write(node.Tokens)
+	r.WriteByte(lex.ItemDoublequote)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link vditor-ir__marker--link"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
