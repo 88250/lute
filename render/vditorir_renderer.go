@@ -215,7 +215,7 @@ func (r *VditorIRRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering b
 }
 
 func (r *VditorIRRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker"},{"data-type", "code-block-info"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}, {"data-type", "code-block-info"}}, false)
 	r.Write(node.CodeBlockInfo)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -954,8 +954,13 @@ func (r *VditorIRRenderer) renderDivNode(node *ast.Node) {
 
 func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if (ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeLinkDest == n.Type || ast.NodeCodeBlockCode == n.Type) && entering {
-			ret += util.BytesToStr(n.Tokens)
+		if entering {
+			switch n.Type {
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeCodeBlockCode:
+				ret += util.BytesToStr(n.Tokens)
+			case ast.NodeCodeBlockFenceInfoMarker:
+				ret += util.BytesToStr(n.CodeBlockInfo)
+			}
 		}
 		return ast.WalkContinue
 	})
