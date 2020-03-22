@@ -253,10 +253,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div:
-		if nil != n.Parent && atom.Blockquote == n.Parent.DataAtom && "" == strings.TrimSpace(lute.domText(n)) { // vditorDOM2MdTests case 53
-			return
-		}
-
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -744,6 +740,14 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
+		if "block-node" == dataType {
+			node.Type = ast.NodeParagraph
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
 			return
 		}
 

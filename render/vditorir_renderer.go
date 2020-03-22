@@ -208,14 +208,57 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 }
 
 func (r *VditorIRRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}, {"data-type", "block-node"}}, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	//r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	//r.Write(node.CodeBlockInfo)
+	//r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}, {"data-type", "block-node"}}, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorIRRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderDivNode(node)
+	} else {
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+	codeLen := len(node.Tokens)
+	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
+	isFenced := node.Parent.IsFencedCodeBlock
+	if isFenced {
+		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), []byte(""))
+	}
+	var attrs [][]string
+	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
+		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
+		language := string(infoWords[0])
+		attrs = append(attrs, []string{"class", "language-" + language})
+	}
+	r.WriteString("<pre>")
+	r.tag("code", attrs, false)
+	if codeIsEmpty {
+		r.WriteString("<wbr>\n")
+	} else {
+		r.Write(util.EscapeHTML(node.Tokens))
+		r.Newline()
+	}
+	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
 
@@ -844,41 +887,6 @@ func (r *VditorIRRenderer) tag(name string, attrs [][]string, selfclosing bool) 
 	r.WriteString(">")
 }
 
-func (r *VditorIRRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.renderDivNode(node)
-	} else {
-		r.WriteString("</div>")
-	}
-	return ast.WalkContinue
-}
-
-func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
-	codeLen := len(node.Tokens)
-	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
-	isFenced := node.Parent.IsFencedCodeBlock
-	if isFenced {
-		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), []byte(""))
-	}
-	var attrs [][]string
-	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
-		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-		language := string(infoWords[0])
-		attrs = append(attrs, []string{"class", "language-" + language})
-	}
-	r.WriteString("<pre>")
-	r.tag("code", attrs, false)
-
-	if codeIsEmpty {
-		r.WriteString("<wbr>\n")
-	} else {
-		r.Write(util.EscapeHTML(node.Tokens))
-		r.Newline()
-	}
-	r.WriteString("</code></pre>")
-	return ast.WalkStop
-}
-
 func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 	text := r.Text(node)
 	attrs := [][]string{{"data-type", "inline-node"}}
@@ -919,7 +927,6 @@ func (r *VditorIRRenderer) renderDivNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "math-block"})
 	}
 
-
 	if strings.Contains(text, parse.Caret) {
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
 		r.tag("div", attrs, false)
@@ -947,7 +954,7 @@ func (r *VditorIRRenderer) renderDivNode(node *ast.Node) {
 
 func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if (ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeLinkDest == n.Type) && entering {
+		if (ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeLinkDest == n.Type || ast.NodeCodeBlockCode == n.Type) && entering {
 			ret += util.BytesToStr(n.Tokens)
 		}
 		return ast.WalkContinue
