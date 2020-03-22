@@ -176,7 +176,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 	dataType := lute.domAttrValue(n, "data-type")
 
 	if atom.Div == n.DataAtom {
-		if "code-block" == dataType || "html-block" == dataType || "html-inline" == dataType || "math-block" == dataType || "math-inline" == dataType || "backslash" == dataType {
+		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				lute.genASTByVditorIRDOM(c, tree)
 			}

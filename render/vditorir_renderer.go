@@ -846,11 +846,7 @@ func (r *VditorIRRenderer) tag(name string, attrs [][]string, selfclosing bool) 
 
 func (r *VditorIRRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		marker := "```"
-		if nil != node.FirstChild {
-			marker = string(node.FirstChild.Tokens)
-		}
-		r.WriteString(`<div class="vditor-wysiwyg__block" data-type="code-block" data-block="0" data-marker="` + marker + `">`)
+		r.renderDivNode(node)
 	} else {
 		r.WriteString("</div>")
 	}
@@ -908,6 +904,44 @@ func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 
 	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("span", attrs, false)
+	return
+}
+
+func (r *VditorIRRenderer) renderDivNode(node *ast.Node) {
+	text := r.Text(node)
+	attrs := [][]string{{"data-block", "0"}}
+	switch node.Type {
+	case ast.NodeCodeBlock:
+		attrs = append(attrs, []string{"data-type", "code-block"})
+	case ast.NodeHTMLBlock:
+		attrs = append(attrs, []string{"data-type", "html-block"})
+	case ast.NodeMathBlock:
+		attrs = append(attrs, []string{"data-type", "math-block"})
+	}
+
+
+	if strings.Contains(text, parse.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("div", attrs, false)
+		return
+	}
+
+	preText := node.PreviousNodeText()
+	if strings.HasSuffix(preText, parse.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("div", attrs, false)
+		return
+	}
+
+	nexText := node.NextNodeText()
+	if strings.HasPrefix(nexText, parse.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("div", attrs, false)
+		return
+	}
+
+	attrs = append(attrs, []string{"class", "vditor-ir__node"})
+	r.tag("div", attrs, false)
 	return
 }
 
