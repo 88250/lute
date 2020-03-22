@@ -364,10 +364,10 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
-			marker := lute.domAttrValue(n.Parent, "data-marker")
-			if "" == marker {
-				marker = "```"
-			}
+			//marker := lute.domAttrValue(n.Parent, "data-marker")
+			//if "" == marker {
+			//	marker = "```"
+			//}
 
 			var codeTokens []byte
 			if nil != n.FirstChild.FirstChild {
@@ -387,19 +387,8 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 				node.Tokens = codeTokens
 				tree.Context.Tip.AppendChild(node)
 			default:
-				node.Type = ast.NodeCodeBlock
-				node.IsFencedCodeBlock = true
-				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: []byte(marker), CodeBlockFenceLen: len(marker)})
-				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
-				class := lute.domAttrValue(n.FirstChild, "class")
-				if strings.Contains(class, "language-") {
-					language := class[len("language-"):]
-					node.LastChild.CodeBlockInfo = []byte(language)
-				}
-
-				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: codeTokens}
-				node.AppendChild(content)
-				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: []byte(marker), CodeBlockFenceLen: len(marker)})
+				node.Type = ast.NodeCodeBlockCode
+				node.Tokens = codeTokens
 				tree.Context.Tip.AppendChild(node)
 			}
 		}
@@ -743,11 +732,26 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if "block-node" == dataType {
-			node.Type = ast.NodeParagraph
+		if "code-block-open-marker" == dataType {
+			marker := []byte(lute.domText(n))
+			node.Type = ast.NodeCodeBlock
+			node.IsFencedCodeBlock = true
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
+			return
+		}
+
+		if "code-block-close-marker" == dataType {
+			marker := []byte(lute.domText(n))
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
 			defer tree.Context.ParentTip()
+			return
+		}
+
+		if "code-block-info" == dataType {
+			info := []byte(lute.domText(n))
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: info})
 			return
 		}
 
