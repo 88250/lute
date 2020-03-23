@@ -770,6 +770,22 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 				marker = []byte("```")
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
+			if nil == n.NextSibling || (atom.Span != n.NextSibling.DataAtom && "code-block-close-marker-zwsp" != lute.domAttrValue(n.NextSibling, "data-type")) { // DOM 后缺少 close-marker-zswp span 节点
+				code := tree.Context.Tip.LastChild.Previous
+				code.Tokens = bytes.TrimSpace(code.Tokens)
+				code.Tokens = append(code.Tokens, []byte(parse.Caret)...)
+				if nil != n.NextSibling {
+					n.NextSibling.Unlink()
+				}
+				defer tree.Context.ParentTip()
+			}
+			return
+		case "code-block-close-marker-zwsp":
+			if nil != n.FirstChild && strings.Contains(n.FirstChild.Data, parse.Caret) {
+				code := tree.Context.Tip.LastChild.Previous
+				code.Tokens = bytes.TrimSpace(code.Tokens)
+				code.Tokens = append(code.Tokens, []byte(parse.Caret)...)
+			}
 			defer tree.Context.ParentTip()
 			return
 		case "link-ref":

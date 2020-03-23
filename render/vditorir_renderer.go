@@ -211,6 +211,7 @@ func (r *VditorIRRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering b
 	r.tag("span", [][]string{{"data-type", "code-block-close-marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
+	r.WriteString("<span data-type=\"code-block-close-marker-zwsp\">" + parse.Zwsp + "</span>")
 	return ast.WalkStop
 }
 
