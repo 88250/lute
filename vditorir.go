@@ -177,6 +177,16 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 
 	if atom.Div == n.DataAtom {
 		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType {
+			if "code-block" == dataType && "code-block-open-marker" != lute.domAttrValue(n.FirstChild, "data-type") {
+				// 处理在结尾 ``` 后换行的情况
+				p := &ast.Node{Type: ast.NodeParagraph}
+				text := &ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(n.FirstChild))}
+				p.AppendChild(text)
+				tree.Context.Tip.AppendChild(p)
+				tree.Context.Tip = p
+				return
+			}
+
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				lute.genASTByVditorIRDOM(c, tree)
 			}
