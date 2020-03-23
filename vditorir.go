@@ -721,19 +721,18 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		return
 	case atom.Span:
-		if "inline-node" == dataType {
+		switch dataType {
+		case "inline-node":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
 			return
-		}
-
-		if "code-block-open-marker" == dataType {
+		case "code-block-open-marker":
 			marker := []byte(lute.domText(n))
 			lastBacktick := bytes.LastIndex(marker, []byte("`")) + 1
 			if 0 < lastBacktick {
 				// 把 ` 后面的字符调整到 info 节点
-				n.NextSibling.AppendChild(&html.Node{Data:string(marker[lastBacktick:])})
+				n.NextSibling.AppendChild(&html.Node{Data: string(marker[lastBacktick:])})
 				marker = marker[:lastBacktick]
 			}
 			node.Type = ast.NodeCodeBlock
@@ -742,15 +741,11 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			return
-		}
-
-		if "code-block-info" == dataType {
+		case "code-block-info":
 			info := []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: info})
 			return
-		}
-
-		if "code-block-close-marker" == dataType {
+		case "code-block-close-marker":
 			marker := []byte(lute.domText(n))
 			if 0 == len(marker) {
 				marker = []byte("```")
@@ -758,9 +753,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
 			defer tree.Context.ParentTip()
 			return
-		}
-
-		if "link-ref" == dataType {
+		case "link-ref":
 			node.Type = ast.NodeText
 			node.Tokens = []byte("[" + n.FirstChild.Data + "][" + lute.domAttrValue(n, "data-link-label") + "]")
 			tree.Context.Tip.AppendChild(node)
