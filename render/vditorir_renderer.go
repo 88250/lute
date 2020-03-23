@@ -216,6 +216,7 @@ func (r *VditorIRRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering b
 
 func (r *VditorIRRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}, {"data-type", "code-block-info"}}, false)
+	r.WriteString(parse.Zwsp)
 	r.Write(node.CodeBlockInfo)
 	r.tag("/span", nil, false)
 	return ast.WalkStop

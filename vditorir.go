@@ -756,6 +756,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "code-block-info":
 			info := []byte(lute.domText(n))
+			info = bytes.ReplaceAll(info, []byte(parse.Zwsp), nil)
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: info})
 			return
 		case "code-block-close-marker":
