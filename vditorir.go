@@ -760,6 +760,11 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "code-block-close-marker":
 			marker := []byte(lute.domText(n))
+			lastBacktick := bytes.LastIndex(marker, []byte("`")) + 1
+			if 0 < lastBacktick {
+				marker = marker[:lastBacktick]
+			}
+
 			if 0 == len(marker) {
 				marker = []byte("```")
 			}

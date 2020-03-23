@@ -208,7 +208,7 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 }
 
 func (r *VditorIRRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker"}, {"data-type", "code-block-close-marker"}}, false)
+	r.tag("span", [][]string{{"data-type", "code-block-close-marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -222,7 +222,7 @@ func (r *VditorIRRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bo
 }
 
 func (r *VditorIRRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker"}, {"data-type", "code-block-open-marker"}}, false)
+	r.tag("span", [][]string{{"data-type", "code-block-open-marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -446,7 +446,7 @@ func (r *VditorIRRenderer) renderStrikethrough2CloseMarker(node *ast.Node, enter
 }
 
 func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--code"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--title"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
 	r.Write(node.Tokens)
 	r.WriteByte(lex.ItemDoublequote)
@@ -631,7 +631,7 @@ func (r *VditorIRRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--code"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
 	r.tag("/span", nil, false)
 	r.tag("code", [][]string{{"data-newline", "1"}}, false)
