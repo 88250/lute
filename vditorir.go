@@ -721,10 +721,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		return
 	case atom.Span:
-		if nil == n.FirstChild {
-			break
-		}
-
 		if "inline-node" == dataType {
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
@@ -734,18 +730,17 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 
 		if "code-block-open-marker" == dataType {
 			marker := []byte(lute.domText(n))
+			lastBacktick := bytes.LastIndex(marker, []byte("`")) + 1
+			if 0 < lastBacktick {
+				// 把 ` 后面的字符调整到 info 节点
+				n.NextSibling.AppendChild(&html.Node{Data:string(marker[lastBacktick:])})
+				marker = marker[:lastBacktick]
+			}
 			node.Type = ast.NodeCodeBlock
 			node.IsFencedCodeBlock = true
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
-			return
-		}
-
-		if "code-block-close-marker" == dataType {
-			marker := []byte(lute.domText(n))
-			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
-			defer tree.Context.ParentTip()
 			return
 		}
 
@@ -755,11 +750,25 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if "code-block-close-marker" == dataType {
+			marker := []byte(lute.domText(n))
+			if 0 == len(marker) {
+				marker = []byte("```")
+			}
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
+			defer tree.Context.ParentTip()
+			return
+		}
+
 		if "link-ref" == dataType {
 			node.Type = ast.NodeText
 			node.Tokens = []byte("[" + n.FirstChild.Data + "][" + lute.domAttrValue(n, "data-link-label") + "]")
 			tree.Context.Tip.AppendChild(node)
 			return
+		}
+
+		if nil == n.FirstChild {
+			break
 		}
 
 		var codeTokens []byte

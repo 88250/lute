@@ -76,6 +76,9 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 			node.AppendChild(info)
 			code := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: node.Tokens}
 			node.AppendChild(code)
+			if nil == node.CodeBlockCloseFence {
+				node.CodeBlockCloseFence = node.CodeBlockOpenFence
+			}
 			closeMarker := &ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: node.CodeBlockCloseFence, CodeBlockFenceLen: node.CodeBlockFenceLen}
 			node.AppendChild(closeMarker)
 		} else {
