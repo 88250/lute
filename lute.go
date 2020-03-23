@@ -27,8 +27,9 @@ const Version = "1.2.4"
 type Lute struct {
 	*parse.Options // 解析和渲染选项配置
 
-	HTML2MdRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
-	HTML2VditorDOMRendererFuncs map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
+	HTML2MdRendererFuncs          map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
+	HTML2VditorDOMRendererFuncs   map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
+	HTML2VditorIRDOMRendererFuncs map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorIRDOM 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：
@@ -69,6 +70,7 @@ func New(opts ...Option) (ret *Lute) {
 	}
 	ret.HTML2MdRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.HTML2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	return ret
 }
 
@@ -251,11 +253,11 @@ func (lute *Lute) SetLinkBase(linkBase string) {
 
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 	for rendererType, extRenderer := range options["renderers"] {
-		switch extRenderer.Interface().(type) {
+		switch extRenderer.Interface().(type) { // 稍微进行一点格式校验
 		case map[string]interface{}:
 			break
 		default:
-			continue
+			panic("invalid type [" + rendererType + "]")
 		}
 
 		var rendererFuncs map[ast.NodeType]render.ExtRendererFunc
@@ -263,8 +265,10 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			rendererFuncs = lute.HTML2MdRendererFuncs
 		} else if "HTML2VditorDOM" == rendererType {
 			rendererFuncs = lute.HTML2VditorDOMRendererFuncs
+		} else if "HTML2VditorIRDOM" == rendererType {
+			rendererFuncs = lute.HTML2VditorIRDOMRendererFuncs
 		} else {
-			continue
+			panic("unknown ext renderer func [" + rendererType + "]")
 		}
 
 		renderFuncs := extRenderer.Interface().(map[string]interface{})
