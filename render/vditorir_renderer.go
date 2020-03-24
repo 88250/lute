@@ -561,27 +561,11 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	if bytes.Equal(node.Tokens, []byte("<br />")) && node.ParentIs(ast.NodeTableCell) {
-		r.Write(node.Tokens)
-		return ast.WalkStop
-	}
-
-	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
-		if "" == previousNodeText {
-			r.WriteString(parse.Zwsp)
-		}
-	}
-
-	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
-	node.Tokens = bytes.TrimSpace(node.Tokens)
-	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
-	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), []byte(""))
-	tokens = util.EscapeHTML(tokens)
-	tokens = append([]byte(parse.Zwsp), tokens...)
-	r.Write(tokens)
-	r.WriteString("</code></span>" + parse.Zwsp)
+	r.renderSpanNode(node)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker--link"}}, false)
+	r.Write(util.EscapeHTML(node.Tokens))
+	r.tag("/span", nil, false)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
