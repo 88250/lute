@@ -264,12 +264,9 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 
 	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
 	r.tag("code", attrs, false)
-	if codeIsEmpty {
-		r.WriteString("<wbr>\n")
-	} else {
-		r.Write(util.EscapeHTML(node.Tokens))
-		r.Newline()
-	}
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+	r.Write(util.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -345,12 +342,9 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 
 	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
-	if codeIsEmpty {
-		r.WriteString("<wbr>\n")
-	} else {
-		r.Write(util.EscapeHTML(node.Tokens))
-		r.Newline()
-	}
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+	r.Write(util.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
