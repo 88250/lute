@@ -332,7 +332,7 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
 	r.tag("pre", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
-	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
+	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 	if codeIsEmpty {
 		r.WriteString("<wbr>\n")
 	} else {
@@ -341,7 +341,7 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	r.WriteString("</code></pre>")
 
 	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
-	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
+	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 	tokens := node.Tokens
 	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
 	r.Write(util.EscapeHTML(tokens))
