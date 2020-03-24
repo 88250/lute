@@ -374,11 +374,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
-			//marker := lute.domAttrValue(n.Parent, "data-marker")
-			//if "" == marker {
-			//	marker = "```"
-			//}
-
 			var codeTokens []byte
 			if nil != n.FirstChild.FirstChild {
 				codeTokens = []byte(n.FirstChild.FirstChild.Data)
