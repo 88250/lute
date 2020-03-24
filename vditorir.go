@@ -384,9 +384,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			switch divDataType {
 			case "math-block":
 				node.Type = ast.NodeMathBlock
-				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
 				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: codeTokens})
-				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
 				tree.Context.Tip.AppendChild(node)
 			case "html-block":
 				node.Type = ast.NodeHTMLBlock
