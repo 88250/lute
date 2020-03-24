@@ -248,6 +248,10 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 				i++
 			}
 
+			if nil != node.Previous {
+				node.Previous.Tokens = append(node.Previous.Tokens, url...)
+			}
+
 			textStart = i
 			textEnd = i
 			continue
