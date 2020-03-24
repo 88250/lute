@@ -21,7 +21,7 @@ func CodeBlockContinue(codeBlock *ast.Node, context *Context) int {
 	var ln = context.currentLine
 	var indent = context.indent
 	if codeBlock.IsFencedCodeBlock {
-		if ok, closeFence := isFencedCodeClose(ln[context.nextNonspace:], codeBlock.CodeBlockFenceChar, codeBlock.CodeBlockFenceLen); indent <= 3 && ok {
+		if ok, closeFence := context.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.CodeBlockFenceChar, codeBlock.CodeBlockFenceLen); indent <= 3 && ok {
 			codeBlock.CodeBlockCloseFence = closeFence
 			context.finalize(codeBlock, context.lineNum)
 			return 2
@@ -100,7 +100,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 	return true, fenceChar, fenceLen, t.Context.indent, openFence, info
 }
 
-func isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeFence []byte) {
+func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeFence []byte) {
 	closeMarker := tokens[0]
 	if closeMarker != openMarker {
 		return false, nil
@@ -109,6 +109,9 @@ func isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeF
 		return false, nil
 	}
 	tokens = lex.TrimWhitespace(tokens)
+	if context.Option.VditorWYSIWYG {
+		tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+	}
 	for _, token := range tokens {
 		if token != openMarker {
 			return false, nil
