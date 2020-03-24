@@ -283,31 +283,31 @@ func (r *VditorIRRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *VditorIRRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/code", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemDollar)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
-	r.tag("code", [][]string{{"data-type", "math-inline"}}, false)
-	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), []byte(""))
-	tokens = util.EscapeHTML(tokens)
-	tokens = append([]byte(parse.Zwsp), tokens...)
-	r.Write(tokens)
-	r.WriteString("</code></span>" + parse.Zwsp)
+	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemDollar)
+	r.tag("/span", nil, false)
+	r.tag("code", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
-		if "" == previousNodeText {
-			r.WriteString(parse.Zwsp)
-		}
+		r.renderSpanNode(node)
+	} else {
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
