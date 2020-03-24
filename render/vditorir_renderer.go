@@ -252,7 +252,17 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 		language := string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})
 	}
-	r.WriteString("<pre>")
+	r.tag("pre", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
+	r.tag("code", attrs, false)
+	if codeIsEmpty {
+		r.WriteString("<wbr>\n")
+	} else {
+		r.Write(util.EscapeHTML(node.Tokens))
+		r.Newline()
+	}
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
 	r.tag("code", attrs, false)
 	if codeIsEmpty {
 		r.WriteString("<wbr>\n")
@@ -313,6 +323,10 @@ func (r *VditorIRRenderer) renderInlineMath(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorIRRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "math-block-close-marker"}}, false)
+	r.WriteString("$$")
+	r.tag("/span", nil, false)
+	r.WriteString("<span data-type=\"math-block-close-marker-zwsp\">" + parse.Zwsp + "</span>")
 	return ast.WalkStop
 }
 
@@ -320,7 +334,7 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
-	r.WriteString("<pre>")
+	r.tag("pre", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
 	if codeIsEmpty {
 		r.WriteString("<wbr>\n")
@@ -328,16 +342,29 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 		r.Write(util.EscapeHTML(node.Tokens))
 	}
 	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
+	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
+	if codeIsEmpty {
+		r.WriteString("<wbr>\n")
+	} else {
+		r.Write(util.EscapeHTML(node.Tokens))
+		r.Newline()
+	}
+	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "math-block-open-marker"}}, false)
+	r.WriteString("$$")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<div class="vditor-wysiwyg__block" data-type="math-block" data-block="0">`)
+		r.renderDivNode(node)
 	} else {
 		r.WriteString("</div>")
 	}

@@ -177,8 +177,9 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 
 	if atom.Div == n.DataAtom {
 		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType {
-			if "code-block" == dataType && "code-block-open-marker" != lute.domAttrValue(n.FirstChild, "data-type") {
-				// 处理在结尾 ``` 后换行的情况
+			if ("code-block" == dataType || "math-block" == dataType) &&
+				!strings.Contains(lute.domAttrValue(n.FirstChild, "data-type"), "-block-open-marker") {
+				// 处理在结尾 ``` 或者 $$ 后换行的情况
 				p := &ast.Node{Type: ast.NodeParagraph}
 				text := &ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(n.FirstChild))}
 				p.AppendChild(text)
@@ -732,6 +733,24 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
 			return
+		case "math-block-close-marker":
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: []byte("$$")})
+			if nil == n.NextSibling || (atom.Span != n.NextSibling.DataAtom && "math-block-close-marker-zwsp" != lute.domAttrValue(n.NextSibling, "data-type")) { // DOM 后缺少 close-marker-zswp span 节点
+				code := tree.Context.Tip.LastChild.Previous
+				code.Tokens = bytes.TrimSpace(code.Tokens)
+				code.Tokens = append(code.Tokens, []byte(parse.Caret)...)
+				if nil != n.NextSibling {
+					n.NextSibling.Unlink()
+				}
+				defer tree.Context.ParentTip()
+			}
+			return
+		case "math-block-open-marker":
+			node.Type = ast.NodeMathBlock
+			node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker, Tokens: []byte("$$")})
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			return
 		case "code-block-open-marker":
 			if atom.Pre == n.NextSibling.DataAtom { // DOM 后缺少 info span 节点
 				n.InsertAfter(&html.Node{DataAtom: atom.Span, Attr: []html.Attribute{{Key: "data-type", Val: "code-block-info"}}})
@@ -760,7 +779,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			if 0 < lastBacktick {
 				marker = marker[:lastBacktick]
 			}
-
 			if 0 == len(marker) {
 				marker = []byte("```")
 			}
@@ -775,7 +793,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 				defer tree.Context.ParentTip()
 			}
 			return
-		case "code-block-close-marker-zwsp":
+		case "code-block-close-marker-zwsp", "math-block-close-marker-zwsp":
 			if nil != n.FirstChild && strings.Contains(n.FirstChild.Data, parse.Caret) {
 				code := tree.Context.Tip.LastChild.Previous
 				code.Tokens = bytes.TrimSpace(code.Tokens)
