@@ -894,7 +894,25 @@ func (r *VditorIRRenderer) tag(name string, attrs [][]string, selfclosing bool) 
 
 func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 	text := r.Text(node)
-	attrs := [][]string{{"data-type", "inline-node"}}
+	var attrs  [][]string
+
+	switch node.Type {
+	case ast.NodeEmphasis:
+		attrs = append(attrs, []string{"data-type", "em"})
+	case ast.NodeStrong:
+		attrs = append(attrs, []string{"data-type", "strong"})
+	case ast.NodeStrikethrough:
+		attrs = append(attrs, []string{"data-type", "s"})
+	case ast.NodeLink:
+		attrs = append(attrs, []string{"data-type", "a"})
+	case ast.NodeImage:
+		attrs = append(attrs, []string{"data-type", "img"})
+	case ast.NodeCodeSpan:
+		attrs = append(attrs, []string{"data-type", "code"})
+	default:
+		attrs = append(attrs, []string{"data-type", "inline-node"})
+	}
+
 	if strings.Contains(text, parse.Caret) {
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
 		r.tag("span", attrs, false)
