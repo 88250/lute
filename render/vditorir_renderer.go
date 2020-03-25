@@ -289,7 +289,6 @@ func (r *VditorIRRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *VditorIRRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/code", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDollar)
 	r.tag("/span", nil, false)
@@ -297,7 +296,14 @@ func (r *VditorIRRenderer) renderInlineMathCloseMarker(node *ast.Node, entering 
 }
 
 func (r *VditorIRRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(util.EscapeHTML(node.Tokens))
+	tokens := util.EscapeHTML(node.Tokens)
+	r.Write(tokens)
+	r.tag("/code", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
+	r.tag("code", [][]string{{"class", "language-math"}}, false)
+	r.Write(tokens)
+	r.tag("/code", nil, false)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -305,7 +311,7 @@ func (r *VditorIRRenderer) renderInlineMathOpenMarker(node *ast.Node, entering b
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDollar)
 	r.tag("/span", nil, false)
-	r.tag("code", [][]string{{"data-newline", "1"}}, false)
+	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
 	return ast.WalkStop
 }
 
@@ -894,7 +900,7 @@ func (r *VditorIRRenderer) tag(name string, attrs [][]string, selfclosing bool) 
 
 func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 	text := r.Text(node)
-	var attrs  [][]string
+	var attrs [][]string
 
 	switch node.Type {
 	case ast.NodeEmphasis:

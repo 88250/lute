@@ -1010,7 +1010,7 @@ func (lute *Lute) domText(n *html.Node) string {
 }
 
 func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
-	if nil == n {
+	if nil == n || "false" == lute.domAttrValue(n, "data-render") {
 		return
 	}
 	switch n.DataAtom {
