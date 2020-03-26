@@ -148,7 +148,6 @@ var terms = map[string]string{
 	"solr":          "Solr",
 	"b3log":         "B3log",
 	"hacpai":        "HacPai",
-	"lute":          "Lute",
 	"sphinx":        "Sphinx",
 	"linux":         "Linux",
 	"mac":           "Mac",
