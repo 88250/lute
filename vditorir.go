@@ -225,7 +225,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 		} else {
 			text := lute.domText(n)
-			if parse.Caret+"\n" == text {
+			if parse.Caret+"\n" == text { // 处理 FireFox 某些情况下产生的分段
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret + "\n")})
 			}
 		}
