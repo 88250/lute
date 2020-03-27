@@ -148,10 +148,8 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 		return
 	}
 
-	if 0 < len(htmlNodes) {
-		// 调整 DOM 结构
-		lute.adjustVditorDOM(htmlNodes[0])
-	}
+	// 调整 DOM 结构
+	lute.adjustVditorDOM(htmlNodes)
 
 	// 将 HTML 树转换为 Markdown AST
 
@@ -193,9 +191,11 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) adjustVditorDOM(n *html.Node) {
-	for c := n; nil != c; c = c.NextSibling {
-		lute.adjustVditorDOM0(c)
+func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
+	for _, n := range nodes {
+		for c := n; nil != c; c = c.NextSibling {
+			lute.adjustVditorDOM0(c)
+		}
 	}
 }
 

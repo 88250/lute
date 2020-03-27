@@ -121,10 +121,8 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 		return
 	}
 
-	if 0 < len(htmlNodes) {
-		// 调整 DOM 结构
-		lute.adjustVditorDOM(htmlNodes[0])
-	}
+	// 调整 DOM 结构
+	lute.adjustVditorDOM(htmlNodes)
 
 	// 将 HTML 树转换为 Markdown AST
 

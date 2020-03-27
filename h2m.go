@@ -41,10 +41,8 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 		lute.genASTByDOM(htmlNode, tree)
 	}
 
-	if 0 < len(htmlNodes) {
-		// 调整 DOM 结构
-		lute.adjustVditorDOM(htmlNodes[0])
-	}
+	// 调整 DOM 结构
+	lute.adjustVditorDOM(htmlNodes)
 
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
