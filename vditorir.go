@@ -223,6 +223,11 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		} else if "toc-block" == dataType {
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
 			tree.Context.Tip.AppendChild(node)
+		} else {
+			text := lute.domText(n)
+			if parse.Caret+"\n" == text {
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret + "\n")})
+			}
 		}
 		return
 	}
