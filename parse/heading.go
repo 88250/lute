@@ -30,9 +30,21 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, i
 		return
 	}
 
+	var inCaret bool
+	if t.Context.Option.VditorWYSIWYG && bytes.Contains(tokens, []byte("#"+Caret+"#")) {
+		tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+		inCaret = true
+	}
+
 	level = lex.Accept(tokens, lex.ItemCrosshatch)
 	if 6 < level {
 		return
+	}
+
+	var endCaret bool
+	if t.Context.Option.VditorWYSIWYG && bytes.HasPrefix(tokens[level:], []byte(Caret)) {
+		tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+		endCaret = true
 	}
 
 	if level < len(tokens) && !lex.IsWhitespace(tokens[level]) {
@@ -72,7 +84,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, i
 	}
 
 	if t.Context.Option.VditorWYSIWYG {
-		if startCaret {
+		if startCaret || inCaret || endCaret {
 			content = append([]byte(Caret), content...)
 		}
 
