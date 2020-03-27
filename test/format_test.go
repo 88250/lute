@@ -75,7 +75,7 @@ var formatTests = []formatTest{
 	{"21", "\u2003emsp\n", "\u2003emsp\n"},
 	{"20", "~删除线~\n", "~删除线~\n"},
 	{"19", "我们**需要Markdown Format**\n", "我们**需要 Markdown Format**\n"},
-	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 Lute 空格\n"},
+	{"18", "试下中西文间1自动插入lute空格\n", "试下中西文间 1 自动插入 lute 空格\n"},
 	{"17", "* [ ] 项一\n* [X] 项二\n", "* [ ] 项一\n* [X] 项二\n"},
 	{"16", "| abc | defghi |\n:-: | -----------:\nbar | baz\n", "| abc | defghi |\n| :-: | -----: |\n| bar |    baz |\n"},
 	{"15", "| abc | def |\n| --- | --- |\n", "| abc | def |\n| --- | --- |\n"},
