@@ -19,20 +19,24 @@ import (
 
 func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable *ast.Node) {
 	var tokens []byte
-	lines := lex.Split(paragraph.Tokens, lex.ItemNewline)
-	length := len(lines)
+	length := len(paragraph.Tokens)
+	lineCnt := 0
 	for i := 0; i < length; i++ {
-		content := lines[i:]
-		tokens = lex.Append(content)
-		if table := context.parseTable0(tokens); nil != table {
-			if 0 < i {
-				content := lines[:i]
-				tokens = lex.Append(content)
-				retParagraph = &ast.Node{Type: ast.NodeParagraph, Tokens: tokens}
+		if lex.ItemNewline == paragraph.Tokens[i] || 0 == i {
+			if 0 == i {
+				tokens = paragraph.Tokens[i:]
+			} else {
+				tokens = paragraph.Tokens[i+1:]
 			}
-			retTable = table
-			break
+			if table := context.parseTable0(tokens); nil != table {
+				if 0 < lineCnt {
+					retParagraph = &ast.Node{Type: ast.NodeParagraph, Tokens: paragraph.Tokens[0:i]}
+				}
+				retTable = table
+				break
+			}
 		}
+		lineCnt++
 	}
 	return
 }

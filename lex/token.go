@@ -132,17 +132,6 @@ func Split(tokens []byte, separator byte) (ret [][]byte) {
 	return
 }
 
-func Append(lines [][]byte) (ret []byte) {
-	length := len(lines)
-	for i, line := range lines {
-		if i < length-1 {
-			line = append(line, ItemNewline)
-		}
-		ret = append(ret, line...)
-	}
-	return
-}
-
 // SplitWithoutBackslashEscape 使用 separator 作为分隔符将 Tokens 切分为多个子串，被反斜杠 \ 转义的字符不会计入切分。
 func SplitWithoutBackslashEscape(tokens []byte, separator byte) (ret [][]byte) {
 	length := len(tokens)
