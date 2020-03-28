@@ -18,6 +18,8 @@ import (
 
 var debugTests = []parseTest{
 
+	{"49", "foo\n| bar |\n| --- |", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>bar</th>\n</tr>\n</thead>\n</table>\n"},
+
 	// 自动链接渲染问题 https://github.com/88250/lute/issues/41
 	{"48", "中 https://foo bar\n", "<p>中 https://foo bar</p>\n"},
 	{"47", "https://中 bar\n", "<p>https://中 bar</p>\n"},

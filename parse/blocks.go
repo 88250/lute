@@ -321,7 +321,7 @@ var blockStarts = []blockStartFunc{
 					//
 					// 前两行可以解析出一个只有一个单元格的表。
 					// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
-					table := t.Context.parseTable(container)
+					table := t.Context.parseTable0(container.Tokens)
 					if nil != table {
 						// 将该段落节点转成表节点
 						container.Type = ast.NodeTable

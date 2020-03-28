@@ -17,8 +17,28 @@ import (
 	"github.com/88250/lute/lex"
 )
 
-func (context *Context) parseTable(paragraph *ast.Node) (ret *ast.Node) {
+func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable *ast.Node) {
+	var tokens []byte
 	lines := lex.Split(paragraph.Tokens, lex.ItemNewline)
+	length := len(lines)
+	for i := 0; i < length; i++ {
+		content := lines[i:]
+		tokens = lex.Append(content)
+		if table := context.parseTable0(tokens); nil != table {
+			if 0 < i {
+				content := lines[:i]
+				tokens = lex.Append(content)
+				retParagraph = &ast.Node{Type: ast.NodeParagraph, Tokens: tokens}
+			}
+			retTable = table
+			break
+		}
+	}
+	return
+}
+
+func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
+	lines := lex.Split(tokens, lex.ItemNewline)
 	length := len(lines)
 	if 2 > length {
 		return
@@ -29,7 +49,7 @@ func (context *Context) parseTable(paragraph *ast.Node) (ret *ast.Node) {
 		return
 	}
 
-	if 2 == length && 1 == len(aligns) && 0 == aligns[0] && !bytes.Contains(paragraph.Tokens, []byte("|")) {
+	if 2 == length && 1 == len(aligns) && 0 == aligns[0] && !bytes.Contains(tokens, []byte("|")) {
 		// 如果只有两行并且对齐方式是默认对齐且没有 | 时（foo\n---）就和 Setext 标题规则冲突了
 		// 但在块级解析时显然已经尝试进行解析 Setext 标题，还能走到这里说明 Setetxt 标题解析失败，
 		// 所以这里也不能当作表进行解析了，返回普通段落

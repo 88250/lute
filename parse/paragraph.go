@@ -86,16 +86,21 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 	}
 
 	if context.Option.GFMTable {
-		if table := context.parseTable(p); nil != table {
-			// 将该段落节点转成表节点
-			p.Type = ast.NodeTable
-			p.TableAligns = table.TableAligns
-			for tr := table.FirstChild; nil != tr; {
-				nextTr := tr.Next
-				p.AppendChild(tr)
-				tr = nextTr
+		if paragraph, table := context.parseTable(p); nil != table {
+			if nil != paragraph {
+				p.Tokens = paragraph.Tokens
+				p.InsertAfter(table)
+			} else {
+				// 将该段落节点转成表节点
+				p.Type = ast.NodeTable
+				p.TableAligns = table.TableAligns
+				for tr := table.FirstChild; nil != tr; {
+					nextTr := tr.Next
+					p.AppendChild(tr)
+					tr = nextTr
+				}
+				p.Tokens = nil
 			}
-			p.Tokens = nil
 			return
 		}
 	}
