@@ -421,12 +421,14 @@ func (r *VditorIRRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorIRRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("table", [][]string{{"data-block", "0"}}, false)
+		r.WriteString("<div data-block=\"0\" data-type=\"table\">" + parse.Zwsp)
+		r.tag("table", nil, false)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
 		}
 		r.tag("/table", nil, false)
+		r.WriteString(parse.Zwsp + "</div>")
 	}
 	return ast.WalkContinue
 }

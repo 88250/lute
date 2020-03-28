@@ -223,6 +223,10 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		} else if "toc-block" == dataType {
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
 			tree.Context.Tip.AppendChild(node)
+		} else if "table" == dataType {
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				lute.genASTByVditorIRDOM(c, tree)
+			}
 		} else {
 			text := lute.domText(n)
 			if parse.Caret+"\n" == text { // 处理 FireFox 某些情况下产生的分段
