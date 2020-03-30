@@ -210,7 +210,7 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom {
 				nodes = append(nodes, c)
 			} else if 0 < len(nodes) {
-				p := &html.Node{DataAtom: atom.P, NextSibling: c.NextSibling}
+				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P, NextSibling: c.NextSibling}
 				for _, pChild := range nodes {
 					pChild.Unlink()
 					p.AppendChild(pChild)
@@ -224,7 +224,7 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 			}
 		}
 		if 0 < len(nodes) {
-			p := &html.Node{DataAtom: atom.P, NextSibling: lastc.NextSibling}
+			p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P, NextSibling: lastc.NextSibling}
 			lastc.InsertBefore(p)
 			lastc.Unlink()
 			p.AppendChild(lastc)
@@ -284,6 +284,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 					md = "[" + label + "]: " + md
 					node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
 					tree.Context.Tip.AppendChild(node)
+				} else {
+					panic(err)
 				}
 			}
 		} else if "toc-block" == dataType {
