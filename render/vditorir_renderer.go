@@ -261,7 +261,7 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	}
 	r.WriteString("</code></pre>")
 
-	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", attrs, false)
 	tokens := node.Tokens
 	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
@@ -299,7 +299,7 @@ func (r *VditorIRRenderer) renderInlineMathContent(node *ast.Node, entering bool
 	tokens := util.EscapeHTML(node.Tokens)
 	r.Write(tokens)
 	r.tag("/code", nil, false)
-	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", [][]string{{"class", "language-math"}}, false)
 	r.Write(tokens)
 	r.tag("/code", nil, false)
@@ -344,7 +344,7 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	}
 	r.WriteString("</code></pre>")
 
-	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "false"}}, false)
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 	tokens := node.Tokens
 	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)

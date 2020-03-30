@@ -167,7 +167,7 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 // genASTByVditorIRDOM 根据指定的 Vditor IR DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 	dataRender := lute.domAttrValue(n, "data-render")
-	if "false" == dataRender {
+	if "1" == dataRender || "2" == dataRender { // 1：浮动工具栏，2：preview 代码块、数学公式块
 		return
 	}
 

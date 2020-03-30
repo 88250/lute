@@ -79,7 +79,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	dataRender := lute.domAttrValue(n, "data-render")
-	if "false" == dataRender {
+	if "1" == dataRender {
 		return
 	}
 

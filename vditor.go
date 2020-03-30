@@ -244,7 +244,7 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	dataRender := lute.domAttrValue(n, "data-render")
-	if "false" == dataRender {
+	if "1" == dataRender || "2" == dataRender { // 1：浮动工具栏，2：preview 代码块、数学公式块
 		return
 	}
 
@@ -1010,7 +1010,7 @@ func (lute *Lute) domText(n *html.Node) string {
 }
 
 func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
-	if nil == n || "false" == lute.domAttrValue(n, "data-render") {
+	if nil == n || "1" == lute.domAttrValue(n, "data-render") {
 		return
 	}
 	switch n.DataAtom {
