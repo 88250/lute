@@ -23,7 +23,7 @@ func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	if t.Context.Option.VditorWYSIWYG {
 		if bytes.Contains(ln, []byte(Caret)) {
 			caretInLn = true
-			ln = bytes.ReplaceAll(ln, []byte(Caret), []byte(""))
+			ln = bytes.ReplaceAll(ln, []byte(Caret), nil)
 		}
 	}
 

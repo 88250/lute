@@ -243,7 +243,7 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
 	isFenced := node.Parent.IsFencedCodeBlock
 	if isFenced {
-		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), []byte(""))
+		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), nil)
 	}
 	var attrs [][]string
 	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
@@ -626,7 +626,7 @@ func (r *VditorIRRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 	node.Tokens = bytes.TrimRight(node.Tokens, "\n")
 	// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
 	if !bytes.EqualFold(node.Tokens, []byte(parse.Caret+parse.Zwsp)) {
-		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), []byte(""))
+		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
 	}
 	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
