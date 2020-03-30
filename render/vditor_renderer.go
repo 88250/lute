@@ -23,13 +23,13 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// VditorRenderer 描述了 Vditor DOM 渲染器。
+// VditorRenderer 描述了 Vditor WYSIWYG DOM 渲染器。
 type VditorRenderer struct {
 	*BaseRenderer
 	needRenderFootnotesDef bool
 }
 
-// NewVditorRenderer 创建一个 Vditor DOM 渲染器。
+// NewVditorRenderer 创建一个 Vditor WYSIWYG DOM 渲染器。
 func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret := &VditorRenderer{BaseRenderer: NewBaseRenderer(tree)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
