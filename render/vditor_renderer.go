@@ -252,6 +252,12 @@ func (r *VditorRenderer) renderInlineMathContent(node *ast.Node, entering bool) 
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
 	r.WriteString("</code></span>" + parse.Zwsp)
+
+	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", [][]string{{"class", "language-math"}}, false)
+	r.Write(tokens)
+	r.tag("/code", nil, false)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -285,6 +291,13 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 	} else {
 		r.Write(util.EscapeHTML(node.Tokens))
 	}
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+	r.Write(util.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -844,6 +857,13 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 		r.Write(util.EscapeHTML(node.Tokens))
 		r.Newline()
 	}
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", attrs, false)
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+	r.Write(util.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
