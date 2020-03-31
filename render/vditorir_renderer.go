@@ -261,12 +261,14 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	}
 	r.WriteString("</code></pre>")
 
-	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", attrs, false)
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
-	r.Write(util.EscapeHTML(tokens))
-	r.WriteString("</code></pre>")
+	if r.Option.VditorCodeBlockPreview {
+		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+		r.tag("code", attrs, false)
+		tokens := node.Tokens
+		tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+		r.Write(util.EscapeHTML(tokens))
+		r.WriteString("</code></pre>")
+	}
 	return ast.WalkStop
 }
 
