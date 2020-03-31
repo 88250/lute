@@ -154,7 +154,9 @@ func TestSpinVditorDOM(t *testing.T) {
 
 var spinVditorIRDOMTests = []*parseTest{
 
-	{"17", "<p data-block=\"0\">&lt;foo<wbr>&gt;\n</p>", "<p data-block=\"0\"><span data-type=\"strong\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">**</span><strong data-newline=\"1\"><wbr></strong><span class=\"vditor-ir__marker vditor-ir__marker--bi\">**</span></span>\n</p>"},
+	{"19", "<p data-block=\"0\">&lt;foo<wbr>&gt;\n</p>", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><code class=\"vditor-ir__marker\">&lt;foo<wbr>&gt;</code><span class=\"vditor-ir__preview\" data-render=\"1\"><foo></span></span>\n</p>"},
+	{"18", "<p data-block=\"0\">&lt;<wbr>\n</p>", "<p data-block=\"0\">&lt;<wbr>\n</p>"},
+	{"17", "<p data-block=\"0\">&lt;fo<wbr>o&gt;\n</p>", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><code class=\"vditor-ir__marker\">&lt;fo<wbr>o&gt;</code><span class=\"vditor-ir__preview\" data-render=\"1\"><foo></span></span>\n</p>"},
 	{"16", "<p data-block=\"0\">**<wbr>**</p>", "<p data-block=\"0\"><span data-type=\"strong\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">**</span><strong data-newline=\"1\"><wbr></strong><span class=\"vditor-ir__marker vditor-ir__marker--bi\">**</span></span>\n</p>"},
 	{"15", "<h1 data-block=\"0\" class=\"vditor-ir__node\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\"># </span>foo</h1><div><wbr><br></div>", "<h1 data-block=\"0\" class=\"vditor-ir__node\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\"># </span>foo</h1><p data-block=\"0\"><wbr>\n</p>"},
 	{"14", "<h1 data-block=\"0\" class=\"vditor-ir__node\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\">#<wbr># </span>f</h1>", "<h2 data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\">## </span><wbr>f</h2>"},
