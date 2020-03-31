@@ -258,6 +258,8 @@ type Options struct {
 	// LinkBase 设置链接、图片的基础路径。如果用户在链接或者图片地址中使用相对路径（没有协议前缀且不以 / 开头）并且 LinkBase 不为空则会用该值作为前缀。
 	// 比如 LinkBase 设置为 http://domain.com/，对于 ![foo](bar.png) 则渲染为 <img src="http://domain.com/bar.png" alt="foo" />
 	LinkBase string
+	// Vditor 代码块是否需要渲染预览部分
+	VditorCodeBlockPreview bool
 }
 
 func (context *Context) ParentTip() {

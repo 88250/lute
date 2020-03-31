@@ -11,6 +11,7 @@
 package parse
 
 import (
+	"bytes"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 )
@@ -290,7 +291,6 @@ func (t *Tree) parseTagAttr(tokens []byte) (valid bool, remains, attr []byte) {
 	attr = append(attr, whitespaces...)
 	attr = append(attr, attrName...)
 	attr = append(attr, valSpec...)
-
 	return
 }
 
@@ -363,7 +363,6 @@ func (t *Tree) parseAttrValSpec(tokens []byte) (valid bool, remains, valSpec []b
 	}
 
 	remains = tokens[i+1:]
-
 	return
 }
 
@@ -387,11 +386,18 @@ func (t *Tree) parseAttrName(tokens []byte) (remains, attrName []byte) {
 	}
 
 	remains = tokens[i:]
-
 	return
 }
 
 func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
+	var caretIndex int
+	if t.Context.Option.VditorWYSIWYG {
+		caretIndex = bytes.Index(tokens, []byte(Caret))
+		if -1 < caretIndex {
+			tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+		}
+	}
+
 	i := 0
 	token := tokens[i]
 	if !lex.IsASCIILetter(token) {
@@ -407,5 +413,13 @@ func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
 	}
 	remains = tokens[i:]
 
+	if t.Context.Option.VditorWYSIWYG && -1 < caretIndex {
+		if i <= caretIndex {
+			idx := caretIndex - i
+			remains = append(remains[:idx], append([]byte(Caret), remains[idx:]...)...)
+		} else {
+			tagName = append(tagName[:caretIndex], append([]byte(Caret), tagName[caretIndex:]...)...)
+		}
+	}
 	return
 }

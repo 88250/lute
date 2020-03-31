@@ -591,7 +591,8 @@ func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.W
 	r.Write(util.EscapeHTML(node.Tokens))
 	r.tag("/code", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "1"}}, false)
-	r.Write(node.Tokens)
+	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Caret), nil)
+	r.Write(tokens)
 	r.tag("/span", nil, false)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
