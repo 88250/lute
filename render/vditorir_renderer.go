@@ -590,6 +590,9 @@ func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.W
 	r.tag("span", [][]string{{"class", "vditor-ir__marker--link"}}, false)
 	r.Write(util.EscapeHTML(node.Tokens))
 	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
