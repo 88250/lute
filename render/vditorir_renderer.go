@@ -587,10 +587,10 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderSpanNode(node)
-	r.tag("span", [][]string{{"class", "vditor-ir__marker--link"}}, false)
+	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.Write(util.EscapeHTML(node.Tokens))
-	r.tag("/span", nil, false)
-	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	r.tag("/code", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "1"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	r.tag("/span", nil, false)
