@@ -11,7 +11,6 @@
 package parse
 
 import (
-	"bytes"
 	"github.com/88250/lute/lex"
 )
 
@@ -20,13 +19,6 @@ func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	var marker byte
 	ln := t.Context.currentLine
 	var caretInLn bool
-	if t.Context.Option.VditorWYSIWYG {
-		if bytes.Contains(ln, []byte(Caret)) {
-			caretInLn = true
-			ln = bytes.ReplaceAll(ln, []byte(Caret), nil)
-		}
-	}
-
 	length := len(ln)
 	for i := t.Context.nextNonspace; i < length-1; i++ {
 		token := ln[i]
