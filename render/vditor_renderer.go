@@ -255,11 +255,12 @@ func (r *VditorRenderer) renderInlineMathContent(node *ast.Node, entering bool) 
 	r.WriteString("</code>")
 
 	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", [][]string{{"class", "language-math"}}, false)
 	previewTokens = bytes.ReplaceAll(previewTokens, []byte(parse.Caret), nil)
 	r.Write(previewTokens)
+	r.tag("/code", nil, false)
 	r.tag("/span", nil, false)
 	r.WriteString("</span>" + parse.Zwsp)
-
 	return ast.WalkStop
 }
 
@@ -545,6 +546,7 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	r.WriteString("</code>")
 
 	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "1"}}, false)
+	r.WriteString(" ")
 	previewTokens = bytes.ReplaceAll(previewTokens, []byte(parse.Caret), nil)
 	r.Write(previewTokens)
 	r.tag("/span", nil, false)
