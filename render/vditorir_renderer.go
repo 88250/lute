@@ -583,9 +583,9 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
+	r.WriteString(`<div class="vditor-ir__block" data-type="html-block" data-block="0">`)
 	node.Tokens = bytes.TrimSpace(node.Tokens)
-	r.WriteString("<pre>")
+	r.WriteString("<pre class=\"vditor-ir__marker--pre\">")
 	r.tag("code", nil, false)
 	r.Write(util.EscapeHTML(node.Tokens))
 	r.WriteString("</code></pre></div>")
