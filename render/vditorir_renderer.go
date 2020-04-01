@@ -586,7 +586,7 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 	r.WriteString(`<div class="vditor-ir__block" data-type="html-block" data-block="0">`)
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.WriteString("<pre class=\"vditor-ir__marker--pre\">")
-	r.tag("code", nil, false)
+	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
 	r.Write(util.EscapeHTML(node.Tokens))
 	r.WriteString("</code></pre></div>")
 	return ast.WalkStop
