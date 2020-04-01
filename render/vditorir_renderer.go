@@ -251,7 +251,12 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 		language := string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})
 	}
-	r.tag("pre", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
+
+	class := "vditor-ir__marker--pre"
+	if r.Option.VditorCodeBlockPreview {
+		class += " vditor-ir__marker"
+	}
+	r.tag("pre", [][]string{{"class", class}}, false)
 	r.tag("code", attrs, false)
 	if codeIsEmpty {
 		r.WriteString("<wbr>\n")
@@ -337,7 +342,7 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
-	r.tag("pre", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
+	r.tag("pre", [][]string{{"class", "vditor-ir__marker--pre vditor-ir__marker"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 	if codeIsEmpty {
 		r.WriteString("<wbr>\n")
