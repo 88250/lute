@@ -207,9 +207,25 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			matched = isLink && 0 < len(remains)
 			if matched {
 				if t.Context.Option.VditorWYSIWYG {
-					if bytes.HasPrefix(remains, []byte(Caret + ")")) {
-						remains = remains[len([]byte(Caret + ")")):]
-						remains = append([]byte(")" + Caret), remains...)
+					if bytes.HasPrefix(remains, []byte(Caret+")")) {
+						if 0 < len(title) {
+							// 将 ‸) 换位为 )‸
+							remains = remains[len([]byte(Caret+")")):]
+							remains = append([]byte(")"+Caret), remains...)
+							copy(ctx.tokens[ctx.pos-1:], remains) // 同时也将 tokens 换位，后续解析从光标位置开始
+						} else {
+							// 将 ""‸ 换位为 "‸"
+							title = []byte(Caret)
+							remains = remains[len([]byte(Caret)):]
+							ctx.pos += 3
+						}
+					} else if bytes.HasPrefix(remains, []byte(")"+Caret)) {
+						if 0 == len(title) {
+							// 将 "")‸ 换位为 "‸")
+							title = []byte(Caret)
+							remains = bytes.ReplaceAll(remains, []byte(Caret), nil)
+							ctx.pos += 3
+						}
 					}
 				}
 				matched = lex.ItemCloseParen == remains[0]
