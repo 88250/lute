@@ -204,7 +204,16 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			ctx.pos += len(passed)
 			isLink, passed, remains = lex.Spnl(remains)
 			ctx.pos += len(passed)
-			matched = isLink && 0 < len(remains) && lex.ItemCloseParen == remains[0]
+			matched = isLink && 0 < len(remains)
+			if matched {
+				if t.Context.Option.VditorWYSIWYG {
+					if bytes.HasPrefix(remains, []byte(Caret + ")")) {
+						remains = remains[len([]byte(Caret + ")")):]
+						remains = append([]byte(")" + Caret), remains...)
+					}
+				}
+				matched = lex.ItemCloseParen == remains[0]
+			}
 			closeParen = remains[0:]
 			break
 		}
