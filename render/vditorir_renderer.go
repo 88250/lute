@@ -505,7 +505,11 @@ func (r *VditorIRRenderer) renderLinkText(node *ast.Node, entering bool) ast.Wal
 	if ast.NodeImage == node.Parent.Type {
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	} else {
-		r.tag("span", [][]string{{"class", "vditor-ir__link vditor-ir__marker--linktext"}}, false)
+		if 3 == node.Parent.LinkType {
+			r.tag("span", nil, false)
+		} else {
+			r.tag("span", [][]string{{"class", "vditor-ir__link"}}, false)
+		}
 	}
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
