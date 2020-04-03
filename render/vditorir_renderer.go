@@ -129,9 +129,9 @@ func (r *VditorIRRenderer) Render() (output []byte) {
 
 func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
-	r.WriteString("<ol data-type=\"footnotes-defs-ol\">")
 	for _, def := range context.FootnotesDefs {
-		r.WriteString("<li data-type=\"footnotes-li\" data-marker=\"" + string(def.Tokens) + "\">")
+		r.WriteString("<div data-type=\"footnotes-def\">")
+		r.WriteString("<span data-type=\"footnotes-def-label\">[" + string(def.Tokens) + "]: </span>")
 		tree := &parse.Tree{Name: "", Context: context}
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
@@ -140,9 +140,9 @@ func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		defRenderer.needRenderFootnotesDef = true
 		defContent := defRenderer.Render()
 		r.Write(defContent)
-		r.WriteString("</li>")
+		r.WriteString("</div>")
 	}
-	r.WriteString("</ol></div>")
+	r.WriteString("</div>")
 	return r.Writer.Bytes()
 }
 

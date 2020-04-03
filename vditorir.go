@@ -193,18 +193,15 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			text := lute.domText(n)
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
 			tree.Context.Tip.AppendChild(node)
+		} else if "footnotes-def" == dataType {
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				lute.genASTByVditorIRDOM(c, tree)
+			}
 		} else if "footnotes-block" == dataType {
-			ol := n.FirstChild
-			for li := ol.FirstChild; nil != li; li = li.NextSibling {
-				if "\n" == li.Data {
-					continue
-				}
-
+			for def := n.FirstChild; nil != def; def = def.NextSibling {
 				originalHTML := &bytes.Buffer{}
-				if err := html.Render(originalHTML, li); nil == err {
-					md := lute.vditorDOM2Md(originalHTML.String())
-					label := lute.domAttrValue(li, "data-marker")
-					md = md[len(label)+1:] // 去掉列表项标记符
+				if err := html.Render(originalHTML, def); nil == err {
+					md := lute.vditorIRDOM2Md(originalHTML.String())
 					lines := strings.Split(md, "\n")
 					md = ""
 					for i, line := range lines {
@@ -215,7 +212,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 						}
 						md += "\n"
 					}
-					md = "[" + label + "]: " + md
 					node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
 					tree.Context.Tip.AppendChild(node)
 				}
