@@ -685,7 +685,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 		node.TableAligns = tableAligns
-		tree.Context.Tip.AppendChild(&ast.Node{Type:ast.NodeParagraph}) // 表格开头输入会导致解析问题，所以插入一个空段落进行分隔
+		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeParagraph}) // 表格开头输入会导致解析问题，所以插入一个空段落进行分隔
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -730,7 +730,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Span:
 		switch dataType {
-		case "inline-node", "em", "strong", "s", "a", "img", "code":
+		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
@@ -778,11 +778,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
 			defer tree.Context.ParentTip()
-			return
-		case "link-ref":
-			node.Type = ast.NodeText
-			node.Tokens = []byte("[" + n.FirstChild.Data + "][" + lute.domAttrValue(n, "data-link-label") + "]")
-			tree.Context.Tip.AppendChild(node)
 			return
 		}
 

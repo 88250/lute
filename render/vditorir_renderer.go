@@ -12,12 +12,13 @@ package render
 
 import (
 	"bytes"
+	"strconv"
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
-	"strconv"
-	"strings"
 )
 
 // VditorIRRenderer 描述了 Vditor Instant-Rendering DOM 渲染器。
@@ -926,7 +927,11 @@ func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 	case ast.NodeStrikethrough:
 		attrs = append(attrs, []string{"data-type", "s"})
 	case ast.NodeLink:
-		attrs = append(attrs, []string{"data-type", "a"})
+		if 3 != node.LinkType {
+			attrs = append(attrs, []string{"data-type", "a"})
+		} else {
+			attrs = append(attrs, []string{"data-type", "link-ref"})
+		}
 	case ast.NodeImage:
 		attrs = append(attrs, []string{"data-type", "img"})
 	case ast.NodeCodeSpan:
