@@ -114,8 +114,8 @@ func (r *VditorIRRenderer) Render() (output []byte) {
 	for _, node := range r.Tree.Context.LinkRefDefs {
 		label := node.LinkRefLabel
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
-		destStr := util.BytesToStr(dest)
-		r.WriteString("[" + util.BytesToStr(label) + "]:")
+		destStr := string(dest)
+		r.WriteString("[" + string(label) + "]:")
 		if parse.Caret != destStr {
 			r.WriteString(" ")
 		}
@@ -529,6 +529,17 @@ func (r *VditorIRRenderer) renderCloseBracket(node *ast.Node, entering bool) ast
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemCloseBracket)
 	r.tag("/span", nil, false)
+
+	if 3 == node.Parent.LinkType {
+		linkText := node.Parent.ChildByType(ast.NodeLinkText)
+		if !bytes.EqualFold(node.Parent.LinkRefLabel, linkText.Tokens) {
+			r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
+			r.WriteByte(lex.ItemOpenBracket)
+			r.Write(node.Parent.LinkRefLabel)
+			r.WriteByte(lex.ItemCloseBracket)
+			r.tag("/span", nil, false)
+		}
+	}
 	return ast.WalkStop
 }
 
@@ -559,22 +570,6 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if 3 == node.LinkType {
-			previousNodeText := node.PreviousNodeText()
-			previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
-			if "" == previousNodeText {
-				r.WriteString(parse.Zwsp)
-			}
-			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
-			label := string(node.LinkRefLabel)
-			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
-			r.tag("span", attrs, false)
-			r.WriteString(text)
-			r.tag("/span", nil, false)
-			r.WriteString(parse.Zwsp)
-			return ast.WalkStop
-		}
-
 		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
@@ -997,9 +992,13 @@ func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
 		if entering {
 			switch n.Type {
 			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent:
-				ret += util.BytesToStr(n.Tokens)
+				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
-				ret += util.BytesToStr(n.CodeBlockInfo)
+				ret += string(n.CodeBlockInfo)
+			case ast.NodeLink:
+				if 3 == n.LinkType {
+					ret += string(n.LinkRefLabel)
+				}
 			}
 		}
 		return ast.WalkContinue

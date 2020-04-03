@@ -313,16 +313,17 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			tmp = next
 		}
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket, Tokens: closeBracket})
-		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen, Tokens: openParen})
-		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: dest})
-		if nil != space {
-			node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace, Tokens: space})
+		if 3 == linkType == !t.Context.Option.VditorIR {
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen, Tokens: openParen})
+			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: dest})
+			if nil != space {
+				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace, Tokens: space})
+			}
+			if 0 < len(title) {
+				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: title})
+			}
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen, Tokens: closeParen})
 		}
-		if 0 < len(title) {
-			node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: title})
-		}
-		node.AppendChild(&ast.Node{Type: ast.NodeCloseParen, Tokens: closeParen})
-
 		t.processEmphasis(opener.previousDelimiter, ctx)
 		t.removeBracket(ctx)
 		opener.node.Unlink()
