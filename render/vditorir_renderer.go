@@ -131,12 +131,12 @@ func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
 	for _, def := range context.FootnotesDefs {
 		r.WriteString("<div data-type=\"footnotes-def\">")
-		r.WriteString("<span data-type=\"footnotes-def-label\">[" + string(def.Tokens) + "]: </span>")
 		tree := &parse.Tree{Name: "", Context: context}
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := NewVditorIRRenderer(tree)
+		def.FirstChild.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
 		defRenderer.needRenderFootnotesDef = true
 		defContent := defRenderer.Render()
 		r.Write(defContent)
