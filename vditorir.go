@@ -720,7 +720,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		if "footnotes-ref" == dataType {
 			node.Type = ast.NodeText
-			node.Tokens = []byte("[" + lute.domAttrValue(n, "data-footnotes-label") + "]")
+			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
 		}
 		return

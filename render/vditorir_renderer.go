@@ -202,8 +202,29 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	}
 	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
-	r.tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)}}, false)
+
+	attrs := [][]string{{"data-type", "footnotes-ref"}}
+	text := node.Text()
+	expand := strings.Contains(text, parse.Caret)
+	if expand {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+	} else {
+		//attrs = append(attrs, []string{"class", "vditor-ir__node"})
+		attrs = append(attrs, []string{"class", "vditor-ir__node"})
+	}
+	r.tag("sup", attrs, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
+	r.WriteByte(lex.ItemOpenBracket)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker--hide"}, {"data-render", "1"}}, false)
 	r.WriteString(idxStr)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
+	r.WriteByte(lex.ItemCloseBracket)
+	r.tag("/span", nil, false)
 	r.WriteString("</sup>" + parse.Zwsp)
 	return ast.WalkStop
 }
