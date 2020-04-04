@@ -78,8 +78,7 @@ loopPart:
 		}
 		if i == j {
 			// 说明积攒组时第一个字符就是空白符，那就把这个空白符作为一个文本节点插到前面
-			text := &ast.Node{Type: ast.NodeText, Tokens: []byte{tokens[j]}}
-			node.InsertBefore(text)
+			t.addPreviousText(node, []byte{tokens[j]})
 			i++
 			continue
 		}
@@ -88,8 +87,7 @@ loopPart:
 		i = j
 
 		if 0 >= atIndex {
-			text := &ast.Node{Type: ast.NodeText, Tokens: group}
-			node.InsertBefore(text)
+			t.addPreviousText(node, group)
 			continue
 		}
 
@@ -99,8 +97,7 @@ loopPart:
 		for ; k < atIndex; k++ {
 			token = group[k]
 			if !t.isValidEmailSegment1(token) {
-				text := &ast.Node{Type: ast.NodeText, Tokens: group}
-				node.InsertBefore(text)
+				t.addPreviousText(node, group)
 				continue loopPart
 			}
 		}
@@ -111,8 +108,7 @@ loopPart:
 			item = group[k]
 			token = group[k]
 			if !t.isValidEmailSegment2(token) {
-				text := &ast.Node{Type: ast.NodeText, Tokens: group}
-				node.InsertBefore(text)
+				t.addPreviousText(node, group)
 				continue loopPart
 			}
 		}
@@ -124,19 +120,16 @@ loopPart:
 			link := t.newLink(ast.NodeLink, group, append(mailto, group...), nil, 2)
 			node.InsertBefore(link)
 			// . 作为文本节点插入
-			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte{item}})
+			t.addPreviousText(node, []byte{item})
 		} else if lex.ItemHyphen == token || lex.ItemUnderscore == token {
 			// 如果以 - 或者 _ 结尾则整个串都不能算作邮件链接
-			text := &ast.Node{Type: ast.NodeText, Tokens: group}
-			node.InsertBefore(text)
+			t.addPreviousText(node, group)
 			continue loopPart
 		} else {
 			// 以字母或者数字结尾
 			link := &ast.Node{Type: ast.NodeLink, LinkType: 2}
-			text := &ast.Node{Type: ast.NodeLinkText, Tokens: group}
-			link.AppendChild(text)
-			dest := &ast.Node{Type: ast.NodeLinkDest, Tokens: append(mailto, group...)}
-			link.AppendChild(dest)
+			link.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: group})
+			link.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: append(mailto, group...)})
 			node.InsertBefore(link)
 		}
 	}
@@ -204,9 +197,9 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			if length-i < minLinkLen { // 剩余字符不足，已经不可能形成链接了
 				if needUnlink {
 					if textStart < textEnd {
-						node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: tokens[textStart:]})
+						t.addPreviousText(node, tokens[textStart:])
 					} else {
-						node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: tokens[textEnd:]})
+						t.addPreviousText(node, tokens[textEnd:])
 					}
 					node.Unlink()
 				}
@@ -217,7 +210,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		}
 
 		if textStart < textEnd {
-			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: tokens[textStart:textEnd]})
+			t.addPreviousText(node, tokens[textStart:textEnd])
 			needUnlink = true
 			textStart = textEnd
 		}
@@ -269,7 +262,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		}
 		domain := url[:k]
 		if !t.isValidDomain(domain) {
-			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: tokens[textStart:i]})
+			t.addPreviousText(node, tokens[textStart:i])
 			needUnlink = true
 			textStart = i
 			textEnd = i
@@ -377,8 +370,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 	}
 
 	if textStart < textEnd {
-		text := &ast.Node{Type: ast.NodeText, Tokens: tokens[textStart:textEnd]}
-		node.InsertBefore(text)
+		t.addPreviousText(node, tokens[textStart:textEnd])
 		needUnlink = true
 	}
 	if needUnlink {
@@ -539,4 +531,12 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *ast.Node) {
 	}
 	ctx.pos = 1 + i
 	return t.newLink(ast.NodeLink, dest, util.EncodeDestination(dest), nil, 2)
+}
+
+func (t *Tree) addPreviousText(node *ast.Node, tokens []byte) {
+	if nil == node.Previous || ast.NodeText != node.Previous.Type {
+		node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: tokens})
+		return
+	}
+	node.Previous.AppendTokens(tokens)
 }

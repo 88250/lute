@@ -73,7 +73,7 @@ type Node struct {
 
 	// 链接
 
-	LinkType int // 链接类型，0：内联链接 [foo](/bar)，1：链接引用定义 [foo]: /bar，2：自动链接，3：链接引用 [foo]
+	LinkType     int    // 链接类型，0：内联链接 [foo](/bar)，1：链接引用定义 [foo]: /bar，2：自动链接，3：链接引用 [foo]
 	LinkRefLabel []byte // 链接引用 label，[label] 或者 [text][label] 形式，[label] 情况下 text 和 label 相同
 
 	// 标题
@@ -88,9 +88,9 @@ type Node struct {
 
 	// 脚注
 
-	FootnotesRefLabel []byte // 脚注引用 label，[^label]
-	FootnotesRefId string  // 脚注 id
-	FootnotesRefs  []*Node // 脚注引用
+	FootnotesRefLabel []byte  // 脚注引用 label，[^label]
+	FootnotesRefId    string  // 脚注 id
+	FootnotesRefs     []*Node // 脚注引用
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
@@ -195,7 +195,7 @@ func (n *Node) InsertAfter(sibling *Node) {
 	sibling.Previous = n
 	n.Next = sibling
 	sibling.Parent = n.Parent
-	if nil == sibling.Next && nil != sibling.Parent.LastChild {
+	if nil != sibling.Parent && nil == sibling.Next && nil != sibling.Parent.LastChild {
 		sibling.Parent.LastChild = sibling
 	}
 }
@@ -210,7 +210,7 @@ func (n *Node) InsertBefore(sibling *Node) {
 	sibling.Next = n
 	n.Previous = sibling
 	sibling.Parent = n.Parent
-	if nil == sibling.Previous {
+	if nil != sibling.Parent && nil == sibling.Previous {
 		sibling.Parent.FirstChild = sibling
 	}
 }

@@ -18,6 +18,7 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"9", "中http://notaurl文\n", "<p>中 http://notaurl 文</p>\n"},
 	{"8", "1 www.noturl 2\n", "<p>1 www.noturl 2</p>\n"},
 	{"7", "www.我的网址/console\n", "<p>www.我的网址/console</p>\n"},
 	{"6", "http://我的网址/console\n", "<p>http://我的网址/console</p>\n"},
