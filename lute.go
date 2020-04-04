@@ -66,6 +66,7 @@ func New(opts ...Option) (ret *Lute) {
 	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
 	ret.LinkBase = ""
 	ret.VditorCodeBlockPreview = true
+	ret.RenderListMarker = false
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -254,6 +255,10 @@ func (lute *Lute) SetLinkBase(linkBase string) {
 
 func (lute *Lute) SetVditorCodeBlockPreview(b bool) {
 	lute.VditorCodeBlockPreview = b
+}
+
+func (lute *Lute) SetRenderListMarker(b bool) {
+	lute.RenderListMarker = b
 }
 
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
