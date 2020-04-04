@@ -588,7 +588,13 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
 	} else {
 		dest := node.ChildByType(ast.NodeLinkDest)
-		r.WriteString("<img src=\"" + string(dest.Tokens) + "\">")
+		attrs := [][]string{{"src", string(dest.Tokens)}}
+		alt := node.ChildByType(ast.NodeLinkText)
+		if nil != alt && 0 < len(alt.Tokens) {
+			altTokens := bytes.ReplaceAll(alt.Tokens, []byte(parse.Caret), nil)
+			attrs = append(attrs, []string{"alt", string(altTokens)})
+		}
+		r.tag("img", attrs, true)
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
