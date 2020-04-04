@@ -585,7 +585,12 @@ func (r *VditorIRRenderer) renderBang(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+		text := r.Text(node)
+		class := "vditor-ir__node"
+		if strings.Contains(text, parse.Caret) {
+			class += " vditor-ir__node--expand"
+		}
+		r.tag("span", [][]string{{"class", class}}, false)
 	} else {
 		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 		destTokens = r.Tree.Context.RelativePath(destTokens)
