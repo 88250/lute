@@ -272,7 +272,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		node.Type = ast.NodeHeading
-		node.HeadingLevel = int(node.Tokens[1] - byte('0'))
 		marker := lute.domAttrValue(n, "data-marker")
 		id := lute.domAttrValue(n, "data-id")
 		if "" != id {
@@ -283,9 +282,17 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			marker := lute.domText(n.FirstChild)
 			level := bytes.Count([]byte(marker), []byte("#"))
 			node.HeadingLevel = level
-			headingC8hMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker}
-			headingC8hMarker.Tokens = []byte(marker)
-			node.AppendChild(headingC8hMarker)
+			//headingC8hMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker}
+			//headingC8hMarker.Tokens = []byte(marker)
+			//node.AppendChild(headingC8hMarker)
+		} else {
+			// 将 Setext 强制转为 ATX
+			node.HeadingSetext = false
+			if "=" == marker {
+				node.HeadingLevel = 1
+			} else {
+				node.HeadingLevel = 2
+			}
 		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node

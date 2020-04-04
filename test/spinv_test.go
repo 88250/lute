@@ -154,7 +154,7 @@ func TestSpinVditorDOM(t *testing.T) {
 
 var spinVditorIRDOMTests = []*parseTest{
 
-	{"28", "<h1 data-block=\"0\" data-marker=\"=\">foo</h1><p data-block=\"0\">b<wbr></p>", "<h1 data-block=\"0\" class=\"vditor-ir__node\" data-marker=\"=\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\" data-type=\"heading-marker\"># </span>foo</h1><p data-block=\"0\">b<wbr>\n</p>"},
+	{"28", "<h1 data-block=\"0\" data-marker=\"=\">foo</h1><p data-block=\"0\">b<wbr></p>", "<h1 data-block=\"0\" class=\"vditor-ir__node\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\" data-type=\"heading-marker\"># </span>foo</h1><p data-block=\"0\">b<wbr>\n</p>"},
 	{"27", "<div data-block=\"0\" data-type=\"footnotes-block\"><div data-type=\"footnotes-def\"><span data-type=\"footnotes-def-label\">[^fn]: </span><p data-block=\"0\">f<wbr>\n</p></div></div>", "<div data-block=\"0\" data-type=\"footnotes-block\"><div data-type=\"footnotes-def\"><p data-block=\"0\">[^fn]: f<wbr>\n</p></div></div>"},
 	{"26", "<p data-block=\"0\">[^fn]: f<wbr>\n</p>", "<div data-block=\"0\" data-type=\"footnotes-block\"><div data-type=\"footnotes-def\"><p data-block=\"0\">[^fn]: f<wbr>\n</p></div></div>"},
 	{"25", "<p data-block=\"0\">[text][foo]<wbr>\n</p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>", "<p data-block=\"0\"><span data-type=\"link-ref\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span>text</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">[foo]</span></span><wbr>\n</p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
