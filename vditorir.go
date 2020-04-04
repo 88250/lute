@@ -268,14 +268,28 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
-		childBuf := &bytes.Buffer{}
-		for child := n.FirstChild; nil != child; child = child.NextSibling {
-			lute.domText0(child, childBuf)
+		if "" == strings.TrimSpace(lute.domText(n)) {
+			return
 		}
-		node.Type = ast.NodeText
-		node.Tokens = []byte(childBuf.String() + "\n")
+		node.Type = ast.NodeHeading
+		node.HeadingLevel = int(node.Tokens[1] - byte('0'))
+		marker := lute.domAttrValue(n, "data-marker")
+		id := lute.domAttrValue(n, "data-id")
+		if "" != id {
+			node.HeadingID = []byte(id)
+		}
+		node.HeadingSetext = "=" == marker || "-" == marker
+		if !node.HeadingSetext {
+			marker := lute.domText(n.FirstChild)
+			level := bytes.Count([]byte(marker), []byte("#"))
+			node.HeadingLevel = level
+			headingC8hMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker}
+			headingC8hMarker.Tokens = []byte(marker)
+			node.AppendChild(headingC8hMarker)
+		}
 		tree.Context.Tip.AppendChild(node)
-		return
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	case atom.Hr:
 		node.Type = ast.NodeThematicBreak
 		tree.Context.Tip.AppendChild(node)
@@ -774,6 +788,11 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
 			defer tree.Context.ParentTip()
+			return
+		case "heading-marker":
+			if caretInMarker := strings.Contains(lute.domText(n), parse.Caret); caretInMarker {
+				n.InsertAfter(&html.Node{Type:html.TextNode, Data:parse.Caret})
+			}
 			return
 		}
 

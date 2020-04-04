@@ -828,7 +828,7 @@ func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 			r.tag("/a", nil, false)
 		}
 
-		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--heading"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--heading"}, {"data-type", "heading-marker"}}, false)
 		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
 		r.tag("/span", nil, false)
 	} else {
