@@ -22,7 +22,7 @@ var setextTests = []parseTest{
 }
 
 func TestSetext(t *testing.T) {
-	luteEngine := lute.New() // 默认已经开启解析 Setext 标题
+	luteEngine := lute.New() // 默认已经开启 Setext 标题解析
 
 	for _, test := range setextTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
