@@ -262,6 +262,8 @@ type Options struct {
 	VditorCodeBlockPreview bool
 	// RenderListMarker 设置在渲染 OL、UL 时是否添加 data-marker 属性 https://github.com/88250/lute/issues/48
 	RenderListMarker bool
+	// Setext 设置是否解析 Setext 标题 https://github.com/88250/lute/issues/50
+	Setext bool
 }
 
 func (context *Context) ParentTip() {

@@ -42,6 +42,7 @@ type Lute struct {
 //  * 修正术语拼写
 //  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
+//  * 解析 Setext 标题
 func New(opts ...Option) (ret *Lute) {
 	ret = &Lute{Options: &parse.Options{}}
 	ret.GFMTable = true
@@ -67,6 +68,7 @@ func New(opts ...Option) (ret *Lute) {
 	ret.LinkBase = ""
 	ret.VditorCodeBlockPreview = true
 	ret.RenderListMarker = false
+	ret.Setext = true
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -259,6 +261,10 @@ func (lute *Lute) SetVditorCodeBlockPreview(b bool) {
 
 func (lute *Lute) SetRenderListMarker(b bool) {
 	lute.RenderListMarker = b
+}
+
+func (lute *Lute) SetSetext(b bool) {
+	lute.Setext = b
 }
 
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
