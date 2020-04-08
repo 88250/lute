@@ -56,6 +56,7 @@ func TestMd2Vditor(t *testing.T) {
 
 var md2VditorIRTests = []parseTest{
 
+	{"8", "`foo`", "<p data-block=\"0\"><span data-type=\"code\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">`</span><code data-newline=\"1\">foo</code><span class=\"vditor-ir__marker\">`</span></span>\n</p>"},
 	{"7", "$$\nfoo\n$$", "<div data-block=\"0\" data-type=\"math-block\" class=\"vditor-ir__node\"><span data-type=\"math-block-open-marker\">$$</span><pre class=\"vditor-ir__marker--pre vditor-ir__marker\"><code data-type=\"math-block\" class=\"language-math\">foo</code></pre><pre class=\"vditor-ir__preview\" data-render=\"2\"><code data-type=\"math-block\" class=\"language-math\">foo</code></pre><span data-type=\"math-block-close-marker\">$$</span></div>"},
 	{"6", "foo<bar>baz", "<p data-block=\"0\">foo<span data-type=\"inline-node\" class=\"vditor-ir__node\"><code class=\"vditor-ir__marker\">&lt;bar&gt;</code><span class=\"vditor-ir__preview\" data-render=\"1\"><bar></span></span>baz\n</p>"},
 	{"5", "$foo$", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">$</span><code data-newline=\"1\" class=\"vditor-ir__marker vditor-ir__marker--pre\">foo</code><span class=\"vditor-ir__preview\" data-render=\"2\"><code class=\"language-math\">foo</code></span><span class=\"vditor-ir__marker\">$</span></span>\n</p>"},

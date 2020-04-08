@@ -436,44 +436,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		node.Type = ast.NodeEmphasis
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "*"
-		}
-		if "_" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeEmU8eOpenMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: []byte(marker)})
-		}
 		tree.Context.Tip.AppendChild(node)
-
-		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
-			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
-			if "_" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
-			}
-			return
-		}
-
-		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-
-		// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
-		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
-			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
-			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-		}
-		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
-			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
-			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
-		}
-		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
-			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
-			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
-		}
-
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Strong, atom.B:
@@ -495,42 +458,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		node.Type = ast.NodeStrong
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "**"
-		}
-		if "__" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eOpenMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: []byte(marker)})
-		}
 		tree.Context.Tip.AppendChild(node)
-
-		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
-			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
-			if "__" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
-			}
-			return
-		}
-
-		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
-			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
-			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-		}
-		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
-			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
-			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
-		}
-		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
-			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
-			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
-		}
-
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Del, atom.S, atom.Strike:
@@ -552,39 +480,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		node.Type = ast.NodeStrikethrough
-		marker := lute.domAttrValue(n, "data-marker")
-		if "~" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1OpenMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker, Tokens: []byte(marker)})
-		}
 		tree.Context.Tip.AppendChild(node)
-
-		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
-			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
-			if "~" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
-			}
-			return
-		}
-
-		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
-			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
-			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-		}
-		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
-			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
-			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
-		}
-		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
-			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
-			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
-		}
-
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Code:
@@ -602,15 +498,8 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		codeTokens := []byte(contentStr)
 		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: codeTokens}
-		marker := lute.domAttrValue(n, "marker")
-		if "" == marker {
-			marker = "`"
-		}
 		node.Type = ast.NodeCodeSpan
-		node.CodeMarkerLen = len(marker)
-		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker})
 		node.AppendChild(content)
-		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker})
 		tree.Context.Tip.AppendChild(node)
 		return
 	case atom.Br:
@@ -859,26 +748,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch n.DataAtom {
-	case atom.Em, atom.I:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "*"
-		}
-		if "_" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
-		}
-	case atom.Strong, atom.B:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "**"
-		}
-		if "__" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
-		}
 	case atom.A:
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
@@ -893,13 +762,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
 		}
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-	case atom.Del, atom.S, atom.Strike:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "~" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
-		}
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}

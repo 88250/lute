@@ -149,6 +149,9 @@ func TestVditorDOM2Md(t *testing.T) {
 
 var vditorIRDOM2MdTests = []parseTest{
 
+	{"7", "<span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span>", "*foo*\n"},
+	{"6", "<span class=\"vditor-ir__marker\">`</span><code data-newline=\"1\">foo</code><span class=\"vditor-ir__marker\">`</span>", "`foo`\n"},
+	{"5", "<p data-block=\"0\"><span data-type=\"code\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">`</span><code data-newline=\"1\">foo</code><span class=\"vditor-ir__marker\">`</span></span>\n</p>", "`foo`\n"},
 	{"4", "<ul data-tight=\"true\" data-marker=\"+\" data-block=\"0\"><li data-marker=\"+\">foo</li></ul><ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\">bar<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\">b<wbr></li></ul></li></ul>", "+ foo\n\n- bar\n  - b\n"},
 	{"3", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span></span>ba<wbr></li></ul>", "* *foo*ba\n"},
 	{"2", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul></li></ul>", "* foo\n  * bar\n"},
