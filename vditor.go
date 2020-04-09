@@ -234,6 +234,28 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 			}
 			nodes = nil
 		}
+	case atom.Ul:
+		// 合并邻接的 ul
+
+		if nil != n.NextSibling && atom.Ul == n.NextSibling.DataAtom {
+			if nextTight := lute.domAttrValue(n.NextSibling, "data-tight"); "" == nextTight {
+				for c := n.NextSibling.FirstChild; nil != c; c = c.NextSibling {
+					c.Unlink()
+					n.AppendChild(c)
+				}
+			}
+		}
+	case atom.Ol:
+		// 合并邻接的 ol
+
+		if nil != n.NextSibling && atom.Ol == n.NextSibling.DataAtom {
+			if nextTight := lute.domAttrValue(n.NextSibling, "data-tight"); "" == nextTight {
+				for c := n.NextSibling.FirstChild; nil != c; c = c.NextSibling {
+					c.Unlink()
+					n.AppendChild(c)
+				}
+			}
+		}
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
