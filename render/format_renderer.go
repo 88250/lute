@@ -392,8 +392,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 					// 设置紧凑标识的具体实现可参考函数 List.Finalize()
 					inTightList = listItem.Parent.Tight
 
-					nextItem := listItem.Next
-					if nil == nextItem {
+					if nextItem := listItem.Next; nil == nextItem {
 						nextPara := node.Next
 						lastListItemLastPara = nil == nextPara
 					}
