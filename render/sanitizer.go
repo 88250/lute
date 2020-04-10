@@ -12,11 +12,11 @@ package render
 
 import (
 	"bytes"
+	"io"
+	"strings"
+
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/util"
-	"io"
-	"net/url"
-	"strings"
 )
 
 // 没有实现可扩展的策略，仅过滤不安全的标签和属性。
@@ -164,13 +164,7 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 		tokenBuff.WriteString(`="`)
 		switch attr.Key {
 		case "href", "src":
-			u, err := sanitizedUrl(attr.Val)
-			if err == nil {
-				tokenBuff.WriteString(u)
-			} else {
-				// fallthrough
-				tokenBuff.WriteString(html.EscapeString(attr.Val))
-			}
+			tokenBuff.WriteString(html.EscapeString(attr.Val))
 		default:
 			// re-apply
 			tokenBuff.WriteString(html.EscapeString(attr.Val))
@@ -182,62 +176,6 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 	}
 	tokenBuff.WriteString(">")
 	buff.WriteString(tokenBuff.String())
-}
-
-func sanitizedUrl(val string) (string, error) {
-	u, err := url.Parse(val)
-	if err != nil {
-		return "", err
-	}
-	// sanitize the url query params
-	sanitizedQueryValues := make(url.Values, 0)
-	queryValues := u.Query()
-	for k, vals := range queryValues {
-		sk := html.EscapeString(k)
-		for _, v := range vals {
-			sv := escapeUrlComponent(v)
-			sanitizedQueryValues.Set(sk, sv)
-		}
-	}
-	u.RawQuery = sanitizedQueryValues.Encode()
-	// u.String() will also sanitize host/scheme/user/pass
-	return u.String(), nil
-}
-
-const escapedURLChars = "'<>\"\r"
-
-func escapeUrlComponent(val string) string {
-	w := bytes.NewBufferString("")
-	i := strings.IndexAny(val, escapedURLChars)
-	for i != -1 {
-		if _, err := w.WriteString(val[:i]); err != nil {
-			return w.String()
-		}
-		var esc string
-		switch val[i] {
-		case '\'':
-			// "&#39;" is shorter than "&apos;" and apos was not in HTML until HTML5.
-			esc = "&#39;"
-		case '<':
-			esc = "&lt;"
-		case '>':
-			esc = "&gt;"
-		case '"':
-			// "&#34;" is shorter than "&quot;".
-			esc = "&#34;"
-		case '\r':
-			esc = "&#13;"
-		default:
-			panic("unrecognized escape character")
-		}
-		val = val[i+1:]
-		if _, err := w.WriteString(esc); err != nil {
-			return w.String()
-		}
-		i = strings.IndexAny(val, escapedURLChars)
-	}
-	w.WriteString(val)
-	return w.String()
 }
 
 func sanitizeAttrs(attrs []html.Attribute) (ret []html.Attribute) {
