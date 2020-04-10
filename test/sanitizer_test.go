@@ -18,7 +18,7 @@ import (
 
 var sanitizerTests = []parseTest{
 
-	{"2", "<foo>bar", "<p><foo>bar</p>\n"},
+	{"2", "<FOo>bar", "<p><foo>bar</p>\n"},
 	{"1", "<img onerror=\"alert(1)\" src=\"bar.png\" />", "<img src=\"bar.png\"/>\n"},
 	{"0", "foo<script>alert(1)</script>bar", "<p>foo alert(1) bar</p>\n"},
 }

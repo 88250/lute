@@ -12,11 +12,9 @@ package render
 
 import (
 	"bytes"
-	"io"
-	"strings"
-
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/util"
+	"io"
 )
 
 // 没有实现可扩展的策略，仅过滤不安全的标签和属性。
@@ -73,7 +71,7 @@ func sanitize(tokens []byte) []byte {
 		case html.DoctypeToken:
 		case html.CommentToken:
 		case html.StartTagToken:
-			mostRecentlyStartedToken = strings.ToLower(token.Data)
+			mostRecentlyStartedToken = token.Data
 
 			if _, ok := setOfElementsToSkipContent[token.Data]; ok {
 				skipElementContent = true
@@ -95,7 +93,7 @@ func sanitize(tokens []byte) []byte {
 				}
 			}
 		case html.EndTagToken:
-			if mostRecentlyStartedToken == strings.ToLower(token.Data) {
+			if mostRecentlyStartedToken == token.Data {
 				mostRecentlyStartedToken = ""
 			}
 
