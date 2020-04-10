@@ -54,8 +54,6 @@ func sanitize(tokens []byte) []byte {
 		buff                     bytes.Buffer
 		skipElementContent       bool
 		skippingElementsCount    int64
-		skipClosingTag           bool
-		closingTagToSkipStack    []string
 		mostRecentlyStartedToken string
 	)
 
@@ -88,13 +86,6 @@ func sanitize(tokens []byte) []byte {
 				token.Attr = sanitizeAttrs(token.Attr)
 			}
 
-			if len(token.Attr) == 0 {
-				skipClosingTag = true
-				closingTagToSkipStack = append(closingTagToSkipStack, token.Data)
-				buff.WriteString(" ")
-				break
-			}
-
 			if !skipElementContent {
 				// do not escape multiple query parameters
 				if linkable(token.Data) {
@@ -106,15 +97,6 @@ func sanitize(tokens []byte) []byte {
 		case html.EndTagToken:
 			if mostRecentlyStartedToken == strings.ToLower(token.Data) {
 				mostRecentlyStartedToken = ""
-			}
-
-			if skipClosingTag && closingTagToSkipStack[len(closingTagToSkipStack)-1] == token.Data {
-				closingTagToSkipStack = closingTagToSkipStack[:len(closingTagToSkipStack)-1]
-				if len(closingTagToSkipStack) == 0 {
-					skipClosingTag = false
-				}
-				buff.WriteString(" ")
-				break
 			}
 
 			if _, ok := setOfElementsToSkipContent[token.Data]; ok {
