@@ -142,7 +142,7 @@ func (context *Context) closeUnmatchedBlocks() {
 
 // finalize 执行 block 的最终化处理。调用该方法会将 context.Tip 置为 block 的父节点。
 func (context *Context) finalize(block *ast.Node, lineNum int) {
-	var parent = block.Parent
+	parent := block.Parent
 	block.Close = true
 
 	// 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
@@ -152,7 +152,10 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 	case ast.NodeHTMLBlock:
 		htmlBlockFinalize(block)
 	case ast.NodeParagraph:
-		paragraphFinalize(block, context)
+		insertTable := paragraphFinalize(block, context)
+		if insertTable {
+			return
+		}
 	case ast.NodeMathBlock:
 		mathBlockFinalize(block)
 	case ast.NodeList:

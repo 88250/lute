@@ -18,6 +18,8 @@ import (
 
 var debugTests = []parseTest{
 
+	// 表格解析异常 https://github.com/88250/lute/issues/52
+	{"50", "foo\nname | age |\n---- | ---\n\nbar", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>name</th>\n<th>age</th>\n</tr>\n</thead>\n</table>\n<p>bar</p>\n"},
 	{"49", "foo\n| bar |\n| --- |", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>bar</th>\n</tr>\n</thead>\n</table>\n"},
 
 	// 自动链接渲染问题 https://github.com/88250/lute/issues/41

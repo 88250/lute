@@ -24,7 +24,7 @@ func ParagraphContinue(p *ast.Node, context *Context) int {
 	return 0
 }
 
-func paragraphFinalize(p *ast.Node, context *Context) {
+func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 	p.Tokens = lex.TrimWhitespace(p.Tokens)
 
 	// 尝试解析链接引用定义
@@ -90,6 +90,10 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 			if nil != paragraph {
 				p.Tokens = paragraph.Tokens
 				p.InsertAfter(table)
+				// 设置末梢及其状态
+				table.Close = true
+				context.Tip = table
+				return true
 			} else {
 				// 将该段落节点转成表节点
 				p.Type = ast.NodeTable
@@ -113,4 +117,5 @@ func paragraphFinalize(p *ast.Node, context *Context) {
 			return
 		}
 	}
+	return
 }
