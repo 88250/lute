@@ -12,9 +12,10 @@ package render
 
 import (
 	"bytes"
+	"io"
+
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/util"
-	"io"
 )
 
 // 没有实现可扩展的策略，仅过滤不安全的标签和属性。
