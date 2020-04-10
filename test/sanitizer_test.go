@@ -23,7 +23,8 @@ var sanitizerTests = []parseTest{
 }
 
 func TestSanitizer(t *testing.T) {
-	luteEngine := lute.New() // 默认已经开启 Setext 标题解析
+	luteEngine := lute.New()
+	luteEngine.Sanitize = true
 
 	for _, test := range sanitizerTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

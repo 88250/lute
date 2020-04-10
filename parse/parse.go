@@ -264,6 +264,8 @@ type Options struct {
 	RenderListMarker bool
 	// Setext 设置是否解析 Setext 标题 https://github.com/88250/lute/issues/50
 	Setext bool
+	// Sanitize 设置是否启用 XSS 安全过滤 https://github.com/88250/lute/issues/51
+	Sanitize bool
 }
 
 func (context *Context) ParentTip() {

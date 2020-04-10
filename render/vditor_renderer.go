@@ -513,10 +513,10 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
-	node.Tokens = bytes.TrimSpace(node.Tokens)
+	tokens := bytes.TrimSpace(node.Tokens)
 	r.WriteString("<pre>")
 	r.tag("code", nil, false)
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(util.EscapeHTML(tokens))
 	r.WriteString("</code></pre></div>")
 	return ast.WalkStop
 }
@@ -548,6 +548,7 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "1"}}, false)
 	r.WriteString(" ")
 	previewTokens = bytes.ReplaceAll(previewTokens, []byte(parse.Caret), nil)
+	previewTokens = sanitize(previewTokens)
 	r.Write(previewTokens)
 	r.tag("/span", nil, false)
 	r.WriteString("</span>" + parse.Zwsp)

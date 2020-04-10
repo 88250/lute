@@ -267,6 +267,10 @@ func (lute *Lute) SetSetext(b bool) {
 	lute.Setext = b
 }
 
+func (lute *Lute) SetSanitize(b bool) {
+	lute.Sanitize = b
+}
+
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 	for rendererType, extRenderer := range options["renderers"] {
 		switch extRenderer.Interface().(type) { // 稍微进行一点格式校验

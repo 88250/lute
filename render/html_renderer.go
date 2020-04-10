@@ -431,7 +431,9 @@ func (r *HtmlRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 func (r *HtmlRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 	tokens := node.Tokens
-	tokens = sanitize(tokens)
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
 	r.Write(tokens)
 	r.Newline()
 	return ast.WalkStop
@@ -439,7 +441,9 @@ func (r *HtmlRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus 
 
 func (r *HtmlRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	tokens := node.Tokens
-	tokens = sanitize(tokens)
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
 	r.Write(tokens)
 	return ast.WalkStop
 }
