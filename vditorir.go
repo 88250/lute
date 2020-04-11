@@ -686,8 +686,16 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			defer tree.Context.ParentTip()
 			return
 		case "heading-marker":
-			if caretInMarker := strings.Contains(lute.domText(n), parse.Caret); caretInMarker {
-				n.InsertAfter(&html.Node{Type:html.TextNode, Data:parse.Caret})
+			text := lute.domText(n)
+			if caretInMarker := strings.Contains(text, parse.Caret); caretInMarker {
+				caret := &html.Node{Type:html.TextNode, Data:parse.Caret}
+				n.InsertAfter(caret)
+				text = strings.ReplaceAll(text, "#", "")
+				text = strings.ReplaceAll(text, parse.Caret, "")
+				text = strings.TrimSpace(text)
+				if 0 < len(text) {
+					caret.Data = text + caret.Data
+				}
 			}
 			return
 		}
