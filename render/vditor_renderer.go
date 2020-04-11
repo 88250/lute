@@ -539,18 +539,10 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
-	previewTokens := tokens
 	tokens = util.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
 	r.WriteString("</code>")
-
-	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "1"}}, false)
-	r.WriteString(" ")
-	previewTokens = bytes.ReplaceAll(previewTokens, []byte(parse.Caret), nil)
-	previewTokens = sanitize(previewTokens)
-	r.Write(previewTokens)
-	r.tag("/span", nil, false)
 	r.WriteString("</span>" + parse.Zwsp)
 	return ast.WalkStop
 }
