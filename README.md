@@ -70,7 +70,7 @@ Finally, another important motivation is that the B3log open source community ne
 
 * [HacPai](https://hacpai.com), you can go to [here](https://hacpai.com/guide/markdown) for online testing.
 
-## 🇨 🇳 Chinese context optimization
+## 🇨🇳 Chinese context optimization
 
 * Enhanced automatic link recognition
 * Automatically insert spaces between Chinese and Western languages
