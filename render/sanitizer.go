@@ -13,6 +13,7 @@ package render
 import (
 	"bytes"
 	"io"
+	"strings"
 
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/util"
@@ -179,9 +180,16 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 
 func sanitizeAttrs(attrs []html.Attribute) (ret []html.Attribute) {
 	for _, attr := range attrs {
-		if _, ok := allowedAttrs[attr.Key]; ok {
-			ret = append(ret, attr)
+		if _, ok := allowedAttrs[attr.Key]; !ok {
+			continue
 		}
+		if "src" == attr.Key {
+			if strings.Contains(attr.Val, "data:image/svg+xml") {
+				continue
+			}
+		}
+
+		ret = append(ret, attr)
 	}
 	return
 }
