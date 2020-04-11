@@ -38,7 +38,7 @@ I have been using other Markdown engines before, and they are more or less "defe
 * The processing of "strange" text is very time-consuming and even hangs
 * Support for Chinese is not good enough
 
-Lute's goal is to build a structured Markdown engine that implements GFM / CM specifications and provides better support for Chinese. The so-called "structured" refers to the construction of an abstract syntax tree from the input MD text, HTML output, text formatting, etc. through the operation tree.
+Lute's goal is to build a structured Markdown engine that implements GFM/CM specifications and provides better support for Chinese. The so-called "structured" refers to the construction of an abstract syntax tree from the input MD text, HTML output, text formatting, etc. through the operation tree.
 The realization of the specification is to ensure that there is no ambiguity in Markdown rendering, so that the same Markdown text can be processed by the Markdown engine to achieve the same result, which is very important.
 
 There are not many engines that implement specifications. I want to see if I can write one, which is one of Lute's motivations. There are many opinions on the Internet about how to implement a Markdown engine:
@@ -46,7 +46,7 @@ There are not many engines that implement specifications. I want to see if I can
 * Some people say that Markdown is suitable for regular analysis, because the grammar rules are too simple
 * Some people say that Markdown can be handled by the compilation principle, but the rule is too difficult to maintain
 
-I agree with the latter, because regular expressions is indeed too difficult to maintain and has low operating efficiency. The most important reason is that the core parsing algorithm of the Markdown engine that conforms to the GFM / CM specification cannot be written in regular, because the rules defined by the specification are too complicated.
+I agree with the latter, because regular expressions is indeed too difficult to maintain and has low operating efficiency. The most important reason is that the core parsing algorithm of the Markdown engine that conforms to the GFM/CM specification cannot be written in regular, because the rules defined by the specification are too complicated.
 
 Finally, another important motivation is that the B3log open source community needs its own Markdown engine:
 
@@ -55,7 +55,7 @@ Finally, another important motivation is that the B3log open source community ne
 
 ## ✨  Features
 
-* Implement the latest version of GFM / CM specifications
+* Implement the latest version of GFM/CM specifications
 * Zero regular expressions, very fast
 * Built-in code block syntax highlighting
 * Better support for Chinese context
@@ -230,26 +230,26 @@ func main() {
 
 </details>
 
-## ✍️ 术语修正
+## ✍️ Terminology revision
 
-Markdown 原文：
+Markdown: 
 
 ```markdown
-在github上做开源项目是一件很开心的事情，请不要把Github拼写成`github`哦！
+Doing open source projects on github is a very happy thing, please don't spell Github as `github`!
 
-特别是简历中千万不要出现这样的情况：
+In particular, this should never happen in your resume:
 
-> 熟练使用JAVA、Javascript、GIT，对android、ios开发有一定了解，熟练使用Mysql、postgresql数据库。
+> Proficient in using JAVA, Javascript, GIT, have a certain understanding of android, ios development, proficient in using Mysql, postgresql database.
 ```
 
-修正后：
+after fixing:
 
 ```markdown
-在 GitHub 上做开源项目是一件很开心的事情，请不要把 GitHub 拼写成`github`哦！
+Doing open source projects on GitHub is a very happy thing, please don't spell Github as `github`!
 
-特别是简历中千万不要出现这样的情况：
+In particular, this should never happen in your resume:
 
-> 熟练使用 Java、JavaScript、Git，对 Android、iOS 开发有一定了解，熟练使用 MySQL、PostgreSQL 数据库。
+> Proficient in using Java, JavaScript, Git, have a certain understanding of Android, iOS development, proficient in using MySQL, PostgreSQL database.
 ```
 
 ## ⚡ Performance
