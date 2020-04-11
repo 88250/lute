@@ -258,7 +258,7 @@ Please see [Golang markdown engine performance benchmark](https://hacpai.com/art
 
 ## 💪 Robustness
 
-Lute carries all Markdown processing on [HacPai] (https://hacpai.com), processes millions of parsing and rendering requests every day, and runs stably.
+Lute carries all Markdown processing on [HacPai](https://hacpai.com), processes millions of parsing and rendering requests every day, and runs stably.
 
 ## 🔒 Safety
 
