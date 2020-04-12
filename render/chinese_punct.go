@@ -56,11 +56,16 @@ func chinesePunct00(prefix string, nextChar rune) string {
 	nextCharIsEnglishBang := '!' == nextChar
 	nextCharIsEnglishQuestion := '?' == nextChar
 
+	currentChar, size := utf8.DecodeLastRuneInString(prefix)
+	if 1 == size && (',' == currentChar) && unicode.Is(unicode.Han, nextChar) {
+		// test,测试 => test，测试
+		return prefix[:len(prefix)-1] + "，" + string(nextChar)
+	}
+
 	if !nextCharIsEnglishComma && !nextCharIsEnglishPeriod && !nextCharIsEnglishColon && !nextCharIsEnglishBang && !nextCharIsEnglishQuestion {
 		return prefix + string(nextChar)
 	}
 
-	currentChar, _ := utf8.DecodeLastRuneInString(prefix)
 	if !unicode.Is(unicode.Han, currentChar) {
 		return prefix + string(nextChar)
 	}
