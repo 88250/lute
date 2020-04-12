@@ -282,9 +282,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			marker := lute.domText(n.FirstChild)
 			level := bytes.Count([]byte(marker), []byte("#"))
 			node.HeadingLevel = level
-			//headingC8hMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker}
-			//headingC8hMarker.Tokens = []byte(marker)
-			//node.AppendChild(headingC8hMarker)
 		} else {
 			// 将 Setext 强制转为 ATX
 			node.HeadingSetext = false
