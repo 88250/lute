@@ -692,6 +692,10 @@ func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 		if r.Option.HeadingID && "" != id {
 			r.WriteString(" data-id=\"" + id + "\"")
 		}
+		if "" == id {
+			id = r.headingID(node)
+		}
+		r.WriteString(" id=\"wysiwyg-" + id + "\"")
 		if !node.HeadingSetext {
 			r.WriteString(" data-marker=\"#\">")
 		} else {

@@ -821,6 +821,10 @@ func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		if r.Option.HeadingID && "" != id {
 			r.WriteString(" data-id=\"" + id + "\"")
 		}
+		if "" == id {
+			id = r.headingID(node)
+		}
+		r.WriteString(" id=\"ir-" + id + "\"")
 		if !node.HeadingSetext {
 			r.WriteString(" data-marker=\"#\">")
 		} else {
