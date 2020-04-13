@@ -3,7 +3,7 @@ module github.com/88250/lute
 go 1.12
 
 require (
-	github.com/alecthomas/chroma v0.7.1
+	github.com/alecthomas/chroma v0.7.2
 	github.com/alecthomas/colour v0.1.0 // indirect
 	github.com/alecthomas/repr v0.0.0-20200325044227-4184120f674c // indirect
 	github.com/dlclark/regexp2 v1.2.0 // indirect
