@@ -388,6 +388,10 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.Tree.Context.RelativePath(destTokens)
+			if "" != r.Option.ImageLazyLoading {
+				r.Write(util.EscapeHTML(util.StrToBytes(r.Option.ImageLazyLoading)))
+				r.WriteString("\" data-src=\"")
+			}
 			r.Write(util.EscapeHTML(destTokens))
 			r.WriteString("\" alt=\"")
 		}

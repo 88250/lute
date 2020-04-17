@@ -269,6 +269,9 @@ type Options struct {
 	Setext bool
 	// Sanitize 设置是否启用 XSS 安全过滤 https://github.com/88250/lute/issues/51
 	Sanitize bool
+	// ImageLazyLoading 设置图片懒加载时使用的图片路径，配置该字段后将启用图片懒加载。
+	// 图片 src 的值会复制给新属性 data-src，然后使用该参数值作为 src 的值 https://github.com/88250/lute/issues/55
+	ImageLazyLoading string
 }
 
 func (context *Context) ParentTip() {
