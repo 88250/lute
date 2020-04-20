@@ -853,7 +853,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 			attrs = append(attrs, []string{"class", "language-" + language})
 		}
 	}
-	r.WriteString("<pre>")
+	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__pre"}}, false)
 	r.tag("code", attrs, false)
 
 	if codeIsEmpty {
