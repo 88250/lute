@@ -283,6 +283,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 		} else if "footnotes-block" == dataType {
 			ol := n.FirstChild
+			if atom.Ol != ol.DataAtom {
+				return
+			}
+
 			for li := ol.FirstChild; nil != li; li = li.NextSibling {
 				if "\n" == li.Data {
 					continue
@@ -290,7 +294,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 
 				originalHTML := &bytes.Buffer{}
 				if err := html.Render(originalHTML, li); nil == err {
-					md := lute.vditorDOM2Md(originalHTML.String())
+					md := lute.vditorDOM2Md("<ol>" + originalHTML.String() + "</ol>")
 					label := lute.domAttrValue(li, "data-marker")
 					md = md[len(label)+1:] // 去掉列表项标记符
 					lines := strings.Split(md, "\n")

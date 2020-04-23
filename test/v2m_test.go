@@ -20,6 +20,8 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"113", "<div data-block=\"0\" data-type=\"footnotes-block\"><p><wbr><br></p></div>", "\n"},
+	{"112", "<div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^bignote\"><p data-block=\"0\">foo\n</p><p data-block=\"0\">bar\n</p><div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none;\"><code>baz\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>codeblock\n</code></pre></div></li></ol></div>", "[^bignote]:   bar\n    \n    \n       ```\n       baz\n       ```\n"},
 	{"111", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">1</li><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">2</li></ul><li><wbr><br></li></ul>", "* 1\n  * 2\n*\n"},
 	{"110", "<ol data-tight=\"true\" start=\"3\" data-block=\"0\"><li data-marker=\"3.\"><p>foo<wbr></p></li></ol>", "3. foo\n"},
 	{"109", "<li data-marker=\"*\" class=\"vditor-task\"><p><input checked=\"\" type=\"checkbox\"> foo</p></li><li data-marker=\"*\" class=\"vditor-task\"><p><input type=\"checkbox\"> bar</p></li>", "* [X] foo\n* [ ] bar\n"},
