@@ -47,13 +47,16 @@ func (l *Lexer) NextLine() (ret []byte) {
 			i++
 			break
 		} else if ItemCarriageReturn == b {
-			// 处理 \r
 			if i < l.length-1 {
 				nb = l.input[i+1]
-				if ItemNewline == nb {
+				if ItemNewline == nb { // \r\n
 					l.input = append(l.input[:i], l.input[i+1:]...) // 移除 \r，依靠下一个的 \n 切行
 					l.length--                                      // 重新计算总长
+				} else { // \rX
+					l.input[i] = ItemNewline // 将 \r 替换为 \n
 				}
+			} else { // \rEOF
+				l.input[i] = ItemNewline // 将 \r 替换为 \n
 			}
 			i++
 			break
