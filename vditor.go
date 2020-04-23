@@ -296,7 +296,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				if err := html.Render(originalHTML, li); nil == err {
 					md := lute.vditorDOM2Md("<ol>" + originalHTML.String() + "</ol>")
 					label := lute.domAttrValue(li, "data-marker")
-					md = md[len(label)+1:] // 去掉列表项标记符
+					md = md[3:] // 去掉列表项标记符 1.
 					lines := strings.Split(md, "\n")
 					md = ""
 					for i, line := range lines {
