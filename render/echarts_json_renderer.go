@@ -57,6 +57,11 @@ func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
+	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
+	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
+	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
+	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
@@ -64,6 +69,43 @@ func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
 
 func (r *EChartsJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
+}
+
+func (r *EChartsJSONRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *EChartsJSONRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.leaf("Blackslash\ndiv", node)
+	}
+	return ast.WalkStop
+}
+
+func (r *EChartsJSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.leaf("ToC\ndiv", node)
+	}
+	return ast.WalkStop
+}
+
+func (r *EChartsJSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.leaf("Footnotes Ref\ndiv", node)
+	}
+	return ast.WalkStop
+}
+
+func (r *EChartsJSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.val("Footnotes Def\np", node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
 }
 
 func (r *EChartsJSONRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
