@@ -584,14 +584,21 @@ func (r *VditorIRRenderer) renderBang(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, []byte(parse.Caret))
+
 	if entering {
 		text := r.Text(node)
 		class := "vditor-ir__node"
-		if strings.Contains(text, parse.Caret) {
+		if strings.Contains(text, parse.Caret) || needResetCaret {
 			class += " vditor-ir__node--expand"
 		}
 		r.tag("span", [][]string{{"class", class}}, false)
 	} else {
+		if needResetCaret {
+			r.WriteString(parse.Caret)
+			node.Next.Tokens = bytes.ReplaceAll(node.Next.Tokens, []byte(parse.Caret), nil)
+		}
+
 		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 		destTokens = r.Tree.Context.RelativePath(destTokens)
 		destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), nil)
