@@ -29,7 +29,7 @@ type HtmlRenderer struct {
 }
 
 // NewHtmlRenderer 创建一个 HTML 渲染器。
-func NewHtmlRenderer(tree *parse.Tree) Renderer {
+func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret := &HtmlRenderer{NewBaseRenderer(tree), false}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
@@ -150,7 +150,7 @@ func (r *HtmlRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 			link := &ast.Node{Type: ast.NodeInlineHTML, Tokens: util.StrToBytes(gotoRef)}
 			lc.InsertAfter(link)
 		}
-		defRenderer.(*HtmlRenderer).needRenderFootnotesDef = true
+		defRenderer.needRenderFootnotesDef = true
 		defContent := defRenderer.Render()
 		r.Write(defContent)
 

@@ -30,6 +30,7 @@ type Lute struct {
 	HTML2MdRendererFuncs          map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
 	HTML2VditorDOMRendererFuncs   map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
 	HTML2VditorIRDOMRendererFuncs map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorIRDOM 渲染器函数
+	Md2HTMLRendererFuncs          map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2HTML 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：
@@ -75,6 +76,7 @@ func New(opts ...Option) (ret *Lute) {
 	ret.HTML2MdRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.Md2HTMLRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	return ret
 }
 
@@ -82,9 +84,12 @@ func New(opts ...Option) (ret *Lute) {
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte) {
 	tree := parse.Parse(name, markdown, lute.Options)
 	renderer := render.NewHtmlRenderer(tree)
+	for nodeType, rendererFunc := range lute.Md2HTMLRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
 	html = renderer.Render()
 	if lute.Options.Footnotes && 0 < len(tree.Context.FootnotesDefs) {
-		html = renderer.(*render.HtmlRenderer).RenderFootnotesDefs(tree.Context)
+		html = renderer.RenderFootnotesDefs(tree.Context)
 	}
 	return
 }
@@ -291,6 +296,8 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			rendererFuncs = lute.HTML2VditorDOMRendererFuncs
 		} else if "HTML2VditorIRDOM" == rendererType {
 			rendererFuncs = lute.HTML2VditorIRDOMRendererFuncs
+		} else if "Md2HTML" == rendererType {
+			rendererFuncs = lute.Md2HTMLRendererFuncs
 		} else {
 			panic("unknown ext renderer func [" + rendererType + "]")
 		}
