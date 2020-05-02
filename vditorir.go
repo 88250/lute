@@ -84,6 +84,9 @@ func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorIRRenderer(tree)
+	for nodeType, rendererFunc := range lute.HTML2VditorIRDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
 	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
@@ -685,7 +688,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		case "heading-marker":
 			text := lute.domText(n)
 			if caretInMarker := strings.Contains(text, parse.Caret); caretInMarker {
-				caret := &html.Node{Type:html.TextNode, Data:parse.Caret}
+				caret := &html.Node{Type: html.TextNode, Data: parse.Caret}
 				n.InsertAfter(caret)
 				text = strings.ReplaceAll(text, "#", "")
 				text = strings.ReplaceAll(text, parse.Caret, "")

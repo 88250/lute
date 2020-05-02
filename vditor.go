@@ -93,6 +93,9 @@ func (lute *Lute) Md2VditorDOM(markdown string) (vHTML string) {
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
+	for nodeType, rendererFunc := range lute.Md2VditorDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
 	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)

@@ -31,6 +31,8 @@ type Lute struct {
 	HTML2VditorDOMRendererFuncs   map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
 	HTML2VditorIRDOMRendererFuncs map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorIRDOM 渲染器函数
 	Md2HTMLRendererFuncs          map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2HTML 渲染器函数
+	Md2VditorDOMRendererFuncs     map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2VditorDOM 渲染器函数
+	Md2VditorIRDOMRendererFuncs   map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2VditorIRDOM 渲染器函数
 }
 
 // New 创建一个新的 Lute 引擎，默认启用：
@@ -77,6 +79,8 @@ func New(opts ...Option) (ret *Lute) {
 	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2HTMLRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.Md2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.Md2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	return ret
 }
 
@@ -298,6 +302,10 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			rendererFuncs = lute.HTML2VditorIRDOMRendererFuncs
 		} else if "Md2HTML" == rendererType {
 			rendererFuncs = lute.Md2HTMLRendererFuncs
+		} else if "Md2VditorDOM" == rendererType {
+			rendererFuncs = lute.Md2VditorDOMRendererFuncs
+		} else if "Md2VditorIRDOM" == rendererType {
+			rendererFuncs = lute.Md2VditorIRDOMRendererFuncs
 		} else {
 			panic("unknown ext renderer func [" + rendererType + "]")
 		}
