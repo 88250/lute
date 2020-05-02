@@ -464,6 +464,9 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 	if entering {
 		r.Newline()
 		r.tag("p", nil, false)
+		if r.Option.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
+			r.WriteString("&emsp;&emsp;")
+		}
 	} else {
 		r.tag("/p", nil, false)
 		r.Newline()

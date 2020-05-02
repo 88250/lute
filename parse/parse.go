@@ -272,6 +272,8 @@ type Options struct {
 	// ImageLazyLoading 设置图片懒加载时使用的图片路径，配置该字段后将启用图片懒加载。
 	// 图片 src 的值会复制给新属性 data-src，然后使用该参数值作为 src 的值 https://github.com/88250/lute/issues/55
 	ImageLazyLoading string
+	// ChineseParagraphBeginningSpace 设置是否使用传统中文排版“段落开头空两格”
+	ChineseParagraphBeginningSpace bool
 }
 
 func (context *Context) ParentTip() {

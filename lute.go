@@ -72,6 +72,7 @@ func New(opts ...Option) (ret *Lute) {
 	ret.VditorCodeBlockPreview = true
 	ret.RenderListMarker = false
 	ret.Setext = true
+	ret.ChineseParagraphBeginningSpace = false
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -282,6 +283,10 @@ func (lute *Lute) SetSanitize(b bool) {
 
 func (lute *Lute) SetImageLazyLoading(dataSrc string) {
 	lute.ImageLazyLoading = dataSrc
+}
+
+func (lute *Lute) SetChineseParagraphBeginningSpace(b bool) {
+	lute.ChineseParagraphBeginningSpace = b
 }
 
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
