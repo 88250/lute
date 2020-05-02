@@ -84,7 +84,7 @@ func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorIRRenderer(tree)
-	for nodeType, rendererFunc := range lute.HTML2VditorIRDOMRendererFuncs {
+	for nodeType, rendererFunc := range lute.Md2VditorIRDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
