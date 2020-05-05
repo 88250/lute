@@ -48,6 +48,11 @@ func addSpaceAtBoundary(prefix string, nextChar rune) string {
 		return string(nextChar)
 	}
 
+	if "1" <= prefix && "9" >= prefix && 65039 == nextChar { // Emoji 1-9
+		// 在这里处理并不是太合适，应该在 emoji.go 中直接将 Unicode Emoji 解析为节点
+		return prefix + string(nextChar)
+	}
+
 	currentChar, _ := utf8.DecodeLastRuneInString(prefix)
 	if allowSpace(currentChar, nextChar) {
 		return prefix + " " + string(nextChar)
