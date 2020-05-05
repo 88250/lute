@@ -77,18 +77,20 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	if html.CommentNode == n.Type || atom.Meta == n.DataAtom {
 		return
 	}
+
 	if "svg" == n.Namespace {
-		return
-	}
-	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			lute.genASTByDOM(c, tree)
-		}
 		return
 	}
 
 	dataRender := lute.domAttrValue(n, "data-render")
 	if "1" == dataRender {
+		return
+	}
+
+	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			lute.genASTByDOM(c, tree)
+		}
 		return
 	}
 
