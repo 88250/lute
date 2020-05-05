@@ -12,21 +12,18 @@ package render
 
 import (
 	"bytes"
-	"strconv"
-	"strings"
-	"unicode"
-	"unicode/utf8"
-
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
+	"strconv"
+	"strings"
 )
 
 // VditorSVRenderer 描述了 Vditor Split-View DOM 渲染器。
 type VditorSVRenderer struct {
 	*BaseRenderer
-	nodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
+	needRenderFootnotesDef bool
 }
 
 // NewVditorSVRenderer 创建一个 Vditor Split-View DOM 渲染器
@@ -108,184 +105,419 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 
 func (r *VditorSVRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) {
+	if 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
 		return
 	}
 
-	buf := &bytes.Buffer{}
-	buf.WriteByte(lex.ItemNewline)
 	// 将链接引用定义添加到末尾
+	r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
 	for _, node := range r.Tree.Context.LinkRefDefs {
 		label := node.LinkRefLabel
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
-		buf.WriteString("[" + util.BytesToStr(label) + "]: " + util.BytesToStr(dest) + "\n")
+		destStr := string(dest)
+		r.WriteString("[" + string(label) + "]:")
+		if parse.Caret != destStr {
+			r.WriteString(" ")
+		}
+		r.WriteString(destStr + "\n")
 	}
-	output = append(output, buf.Bytes()...)
+	r.WriteString("</div>")
+	output = r.Writer.Bytes()
 	return
 }
 
+func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
+	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
+	for _, def := range context.FootnotesDefs {
+		r.WriteString("<div data-type=\"footnotes-def\">")
+		tree := &parse.Tree{Name: "", Context: context}
+		tree.Context.Tree = tree
+		tree.Root = &ast.Node{Type: ast.NodeDocument}
+		tree.Root.AppendChild(def)
+		defRenderer := NewVditorIRRenderer(tree)
+		def.FirstChild.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
+		defRenderer.needRenderFootnotesDef = true
+		defContent := defRenderer.Render()
+		r.Write(defContent)
+		r.WriteString("</div>")
+	}
+	r.WriteString("</div>")
+	return r.Writer.Bytes()
+}
+
 func (r *VditorSVRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
+	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.WriteString("<span data-type=\"backslash\">")
+		r.WriteString("<span>")
 		r.WriteByte(lex.ItemBackslash)
+		r.WriteString("</span>")
+	} else {
+		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("[toc]\n\n")
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("[" + util.BytesToStr(node.Tokens) + "]")
+	headings := r.headings()
+	length := len(headings)
+	r.WriteString("<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\">")
+	if 0 < length {
+		for _, heading := range headings {
+			spaces := (heading.HeadingLevel - 1) * 2
+			r.WriteString(strings.Repeat("&emsp;", spaces))
+			r.WriteString("<span data-type=\"toc-h\">")
+			r.WriteString(heading.Text() + "</span><br>")
+		}
+	} else {
+		r.WriteString("[toc]<br>")
+	}
+	r.WriteString("</div>")
+	caretInDest := bytes.Contains(node.Tokens, []byte(parse.Caret))
+	r.WriteString("<p data-block=\"0\">")
+	if caretInDest {
+		r.WriteString(parse.Caret)
+	}
+	r.WriteString("</p>")
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]: ")
+	if !r.needRenderFootnotesDef {
+		return ast.WalkStop
 	}
 	return ast.WalkContinue
 }
 
-func (r *VditorSVRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
+	previousNodeText := node.PreviousNodeText()
+	previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+	if "" == previousNodeText {
+		r.WriteString(parse.Zwsp)
+	}
+	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	idxStr := strconv.Itoa(idx)
+
+	attrs := [][]string{{"data-type", "footnotes-ref"}}
+	text := node.Text()
+	expand := strings.Contains(text, parse.Caret)
+	if expand {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+	} else {
+		//attrs = append(attrs, []string{"class", "vditor-ir__node"})
+		attrs = append(attrs, []string{"class", "vditor-ir__node"})
+	}
+	r.tag("sup", attrs, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
+	r.WriteByte(lex.ItemOpenBracket)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
 	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker--hide"}, {"data-render", "1"}}, false)
+	r.WriteString(idxStr)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
+	r.WriteByte(lex.ItemCloseBracket)
+	r.tag("/span", nil, false)
+	r.WriteString("</sup>" + parse.Zwsp)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "code-block-close-marker"}}, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--info"}, {"data-type", "code-block-info"}}, false)
+	r.WriteString(parse.Zwsp)
+	r.Write(node.CodeBlockInfo)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "code-block-open-marker"}}, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderDivNode(node)
+	} else {
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+	codeLen := len(node.Tokens)
+	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
+	isFenced := node.Parent.IsFencedCodeBlock
+	caretInInfo := false
+	if isFenced {
+		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, []byte(parse.Caret))
+		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), nil)
+	}
+	var attrs [][]string
+	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
+		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
+		language := string(infoWords[0])
+		attrs = append(attrs, []string{"class", "language-" + language})
+	}
+
+	class := "vditor-ir__marker--pre"
+	if r.Option.VditorCodeBlockPreview {
+		class += " vditor-ir__marker"
+	}
+	r.tag("pre", [][]string{{"class", class}}, false)
+	r.tag("code", attrs, false)
+	if codeIsEmpty {
+		if !caretInInfo {
+			r.WriteString("<wbr>")
+		}
+		r.WriteByte(lex.ItemNewline)
+	} else {
+		r.Write(util.EscapeHTML(node.Tokens))
+		r.Newline()
+	}
+	r.WriteString("</code></pre>")
+
+	if r.Option.VditorCodeBlockPreview {
+		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+		r.tag("code", attrs, false)
+		tokens := node.Tokens
+		tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+		r.Write(util.EscapeHTML(tokens))
+		r.WriteString("</code></pre>")
+	}
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
+	r.Write(node.Tokens)
+	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
+	r.Write(node.Tokens)
+	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *VditorSVRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
-	padding := node.TableCellContentMaxWidth - node.TableCellContentWidth
+func (r *VditorSVRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemDollar)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
+	tokens := util.EscapeHTML(node.Tokens)
+	r.Write(tokens)
+	r.tag("/code", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", [][]string{{"class", "language-math"}}, false)
+	r.Write(tokens)
+	r.tag("/code", nil, false)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteByte(lex.ItemDollar)
+	r.tag("/span", nil, false)
+	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteByte(lex.ItemPipe)
-		r.WriteByte(lex.ItemSpace)
+		r.renderSpanNode(node)
+	} else {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "math-block-close-marker"}}, false)
+	r.WriteString("$$")
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
+	node.Tokens = bytes.TrimSpace(node.Tokens)
+	codeLen := len(node.Tokens)
+	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
+	r.tag("pre", [][]string{{"class", "vditor-ir__marker--pre vditor-ir__marker"}}, false)
+	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
+	if codeIsEmpty {
+		r.WriteString("<wbr>\n")
+	} else {
+		r.Write(util.EscapeHTML(node.Tokens))
+	}
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+	r.Write(util.EscapeHTML(tokens))
+	r.WriteString("</code></pre>")
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "math-block-open-marker"}}, false)
+	r.WriteString("$$")
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderDivNode(node)
+	} else {
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
+	tag := "td"
+	if ast.NodeTableHead == node.Parent.Parent.Type {
+		tag = "th"
+	}
+	if entering {
+		var attrs [][]string
 		switch node.TableCellAlign {
+		case 1:
+			attrs = append(attrs, []string{"align", "left"})
 		case 2:
-			r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
+			attrs = append(attrs, []string{"align", "center"})
 		case 3:
-			r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
+			attrs = append(attrs, []string{"align", "right"})
+		}
+		r.tag(tag, attrs, false)
+		if nil == node.FirstChild {
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		} else if bytes.Equal(node.FirstChild.Tokens, []byte(parse.Caret)) {
+			node.FirstChild.Tokens = []byte(parse.Caret + " ")
+		} else {
+			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
 		}
 	} else {
-		switch node.TableCellAlign {
-		case 2:
-			r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
-		case 3:
-		default:
-			r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
-		}
-		r.WriteByte(lex.ItemSpace)
+		r.tag("/"+tag, nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		r.WriteString("|\n")
+	if entering {
+		r.tag("tr", nil, false)
+	} else {
+		r.tag("/tr", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		headRow := node.FirstChild
-		for th := headRow.FirstChild; nil != th; th = th.Next {
-			align := th.TableCellAlign
-			switch align {
-			case 0:
-				r.WriteString("| -")
-				if padding := th.TableCellContentMaxWidth - 1; 0 < padding {
-					r.Write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
-				}
-				r.WriteByte(lex.ItemSpace)
-			case 1:
-				r.WriteString("| :-")
-				if padding := th.TableCellContentMaxWidth - 2; 0 < padding {
-					r.Write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
-				}
-				r.WriteByte(lex.ItemSpace)
-			case 2:
-				r.WriteString("| :-")
-				if padding := th.TableCellContentMaxWidth - 3; 0 < padding {
-					r.Write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
-				}
-				r.WriteString(": ")
-			case 3:
-				r.WriteString("| -")
-				if padding := th.TableCellContentMaxWidth - 2; 0 < padding {
-					r.Write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
-				}
-				r.WriteString(": ")
-			}
+	if entering {
+		r.tag("thead", nil, false)
+	} else {
+		r.tag("/thead", nil, false)
+		if nil != node.Next {
+			r.tag("tbody", nil, false)
 		}
-		r.WriteString("|\n")
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		r.Newline()
-		if !r.isLastNode(r.Tree.Root, node) {
-			r.WriteByte(lex.ItemNewline)
+	if entering {
+		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
+	} else {
+		if nil != node.FirstChild.Next {
+			r.tag("/tbody", nil, false)
 		}
+		r.tag("/table", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.TextAutoSpacePrevious(node)
+		r.renderSpanNode(node)
 	} else {
-		r.TextAutoSpaceNext(node)
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteByte(lex.ItemTilde)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("~")
+	r.tag("/span", nil, false)
+	r.tag("s", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteByte(lex.ItemTilde)
+	r.tag("/s", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("~")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("~~")
+	r.tag("/span", nil, false)
+	r.tag("s", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/s", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("~~")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("\"")
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--title"}}, false)
+	r.WriteByte(lex.ItemDoublequote)
 	r.Write(node.Tokens)
-	r.WriteString("\"")
+	r.WriteByte(lex.ItemDoublequote)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
 	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -295,116 +527,149 @@ func (r *VditorSVRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorSVRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
-	if r.Option.AutoSpace {
-		r.Space(node)
+	if ast.NodeImage == node.Parent.Type {
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
+	} else {
+		if 3 == node.Parent.LinkType {
+			r.tag("span", nil, false)
+		} else {
+			r.tag("span", [][]string{{"class", "vditor-ir__link"}}, false)
+		}
 	}
 	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--paren"}}, false)
 	r.WriteByte(lex.ItemCloseParen)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--paren"}}, false)
 	r.WriteByte(lex.ItemOpenParen)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemCloseBracket)
+	r.tag("/span", nil, false)
+
+	if 3 == node.Parent.LinkType {
+		linkText := node.Parent.ChildByType(ast.NodeLinkText)
+		if !bytes.EqualFold(node.Parent.LinkRefLabel, linkText.Tokens) {
+			r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
+			r.WriteByte(lex.ItemOpenBracket)
+			r.Write(node.Parent.LinkRefLabel)
+			r.WriteByte(lex.ItemCloseBracket)
+			r.tag("/span", nil, false)
+		}
+	}
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemBang)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, []byte(parse.Caret))
+
+	if entering {
+		text := r.Text(node)
+		class := "vditor-ir__node"
+		if strings.Contains(text, parse.Caret) || needResetCaret {
+			class += " vditor-ir__node--expand"
+		}
+		r.tag("span", [][]string{{"class", class}}, false)
+	} else {
+		if needResetCaret {
+			r.WriteString(parse.Caret)
+			node.Next.Tokens = bytes.ReplaceAll(node.Next.Tokens, []byte(parse.Caret), nil)
+		}
+
+		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
+		destTokens = r.Tree.Context.RelativePath(destTokens)
+		destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), nil)
+		attrs := [][]string{{"src", string(destTokens)}}
+		alt := node.ChildByType(ast.NodeLinkText)
+		if nil != alt && 0 < len(alt.Tokens) {
+			altTokens := bytes.ReplaceAll(alt.Tokens, []byte(parse.Caret), nil)
+			attrs = append(attrs, []string{"alt", string(altTokens)})
+		}
+		r.tag("img", attrs, true)
+		r.tag("/span", nil, false)
+	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.LinkTextAutoSpacePrevious(node)
 		if 3 == node.LinkType {
-			text := node.ChildByType(ast.NodeLinkText).Tokens
-			if bytes.Equal(text, node.LinkRefLabel) {
-				r.WriteString("[" + util.BytesToStr(text) + "]")
-			} else {
-				r.WriteString("[" + util.BytesToStr(text) + "][" + util.BytesToStr(node.LinkRefLabel) + "]")
+			node.ChildByType(ast.NodeOpenParen).Unlink()
+			node.ChildByType(ast.NodeLinkDest).Unlink()
+			if linkSpace := node.ChildByType(ast.NodeLinkSpace); nil != linkSpace {
+				linkSpace.Unlink()
+				node.ChildByType(ast.NodeLinkTitle).Unlink()
 			}
-			return ast.WalkStop
+			node.ChildByType(ast.NodeCloseParen).Unlink()
 		}
+
+		r.renderSpanNode(node)
 	} else {
-		r.LinkTextAutoSpaceNext(node)
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Newline()
-	r.Write(node.Tokens)
-	r.Newline()
-	if !r.isLastNode(r.Tree.Root, node) {
-		r.WriteByte(lex.ItemNewline)
-	}
+	r.WriteString(`<div class="vditor-ir__block" data-type="html-block" data-block="0">`)
+	node.Tokens = bytes.TrimSpace(node.Tokens)
+	r.WriteString("<pre class=\"vditor-ir__marker--pre\">")
+	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
+	r.Write(util.EscapeHTML(node.Tokens))
+	r.WriteString("</code></pre></div>")
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
+	r.renderSpanNode(node)
+	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.Write(util.EscapeHTML(node.Tokens))
+	r.tag("/code", nil, false)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Writer = &bytes.Buffer{}
-		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
-	} else {
-		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
-		r.Writer.Reset()
-		r.Write(buf)
-		r.WriteByte(lex.ItemNewline)
-	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		r.Newline()
+	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
+		return ast.WalkContinue
+	}
 
-		inTightList := false
-		lastListItemLastPara := false
-		if parent := node.Parent; nil != parent {
-			if ast.NodeListItem == parent.Type { // ListItem.Paragraph
-				listItem := parent
-				if nil != listItem.Parent && nil != listItem.Parent.ListData {
-					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.Tight
-					// 设置紧凑标识的具体实现可参考函数 List.Finalize()
-					inTightList = listItem.Parent.Tight
-
-					if nextItem := listItem.Next; nil == nextItem {
-						nextPara := node.Next
-						lastListItemLastPara = nil == nextPara
-					}
-				} else {
-					inTightList = true
-				}
-			}
-		}
-
-		if !inTightList || (lastListItemLastPara) {
-			r.WriteByte(lex.ItemNewline)
-		}
+	if entering {
+		r.tag("p", [][]string{{"data-block", "0"}}, false)
+	} else {
+		r.WriteByte(lex.ItemNewline)
+		r.tag("/p", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -419,257 +684,133 @@ func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 	if r.Option.ChinesePunct {
 		r.ChinesePunct(node)
 	}
-	r.Write(node.Tokens)
+
+	node.Tokens = bytes.TrimRight(node.Tokens, "\n")
+	// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
+	if !bytes.EqualFold(node.Tokens, []byte(parse.Caret+parse.Zwsp)) {
+		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
+	}
+	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if r.Option.AutoSpace {
-			if text := node.PreviousNodeText(); "" != text {
-				lastc, _ := utf8.DecodeLastRuneInString(text)
-				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
-					r.WriteByte(lex.ItemSpace)
-				}
-			}
-		}
+		r.renderSpanNode(node)
 	} else {
-		if r.Option.AutoSpace {
-			if text := node.NextNodeText(); "" != text {
-				firstc, _ := utf8.DecodeRuneInString(text)
-				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
-					r.WriteByte(lex.ItemSpace)
-				}
-			}
-		}
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteByte(lex.ItemBacktick)
-	if 1 < node.Parent.CodeMarkerLen {
-		r.WriteByte(lex.ItemBacktick)
-		text := util.BytesToStr(node.Next.Tokens)
-		firstc, _ := utf8.DecodeRuneInString(text)
-		if '`' == firstc {
-			r.WriteByte(lex.ItemSpace)
-		}
-	}
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
+	r.tag("/span", nil, false)
+	r.tag("code", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
+	r.Write(util.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if 1 < node.Parent.CodeMarkerLen {
-		text := util.BytesToStr(node.Previous.Tokens)
-		lastc, _ := utf8.DecodeLastRuneInString(text)
-		if '`' == lastc {
-			r.WriteByte(lex.ItemSpace)
-		}
-		r.WriteByte(lex.ItemBacktick)
-	}
-	r.WriteByte(lex.ItemBacktick)
+	r.tag("/code", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
+	r.tag("/span", nil, false)
 	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteByte(lex.ItemDollar)
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteByte(lex.ItemDollar)
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(parse.MathBlockMarker)
-	r.WriteByte(lex.ItemNewline)
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
-	r.WriteByte(lex.ItemNewline)
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(parse.MathBlockMarker)
-	r.WriteByte(lex.ItemNewline)
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Newline()
-	if !entering && !r.isLastNode(r.Tree.Root, node) {
-		r.WriteByte(lex.ItemNewline)
-	}
-	return ast.WalkContinue
-}
-
-func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Newline()
-	r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
-	r.Newline()
-	if !r.isLastNode(r.Tree.Root, node) {
-		r.WriteByte(lex.ItemNewline)
-	}
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.CodeBlockInfo)
-	r.WriteByte(lex.ItemNewline)
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
-	return ast.WalkStop
-}
-
-func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Newline()
-	}
-	if !node.IsFencedCodeBlock {
-		r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
-		r.WriteByte(lex.ItemNewline)
-		r.Write(node.FirstChild.Tokens)
-		r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
-		r.Newline()
-		if !r.isLastNode(r.Tree.Root, node) {
-			r.WriteByte(lex.ItemNewline)
-		}
-		return ast.WalkStop
-	}
-	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.TextAutoSpacePrevious(node)
+		r.renderSpanNode(node)
 	} else {
-		r.TextAutoSpaceNext(node)
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
+	r.tag("/span", nil, false)
+	r.tag("em", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/em", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
+	r.tag("/span", nil, false)
+	r.tag("em", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/em", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.TextAutoSpacePrevious(node)
+		r.renderSpanNode(node)
 	} else {
-		r.TextAutoSpaceNext(node)
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("**")
+	r.tag("/span", nil, false)
+	r.tag("strong", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/strong", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("**")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("__")
+	r.tag("/span", nil, false)
+	r.tag("strong", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/strong", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("__")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Writer = &bytes.Buffer{}
-		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+		r.WriteString(`<blockquote data-block="0">`)
 	} else {
-		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-
-		blockquoteLines := bytes.Buffer{}
-		buf := writer.Bytes()
-		lines := bytes.Split(buf, []byte{lex.ItemNewline})
-		length := len(lines)
-		if 2 < length && lex.IsBlank(lines[length-1]) && lex.IsBlank(lines[length-2]) {
-			lines = lines[:length-1]
-		}
-		if 1 == len(r.nodeWriterStack) { // 已经是根这一层
-			length = len(lines)
-			if 1 < length && lex.IsBlank(lines[length-1]) {
-				lines = lines[:length-1]
-			}
-		}
-
-		length = len(lines)
-		for _, line := range lines {
-			if 0 == len(line) {
-				blockquoteLines.WriteString(">\n")
-				continue
-			}
-
-			if lex.ItemGreater == line[0] {
-				blockquoteLines.WriteString(">")
-			} else {
-				blockquoteLines.WriteString("> ")
-			}
-			blockquoteLines.Write(line)
-			blockquoteLines.WriteByte(lex.ItemNewline)
-		}
-		buf = blockquoteLines.Bytes()
-		writer.Reset()
-		writer.Write(buf)
-		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
-		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		buf = bytes.TrimSpace(r.Writer.Bytes())
-		r.Writer.Reset()
-		r.Write(buf)
-		r.WriteString("\n\n")
+		r.WriteString("</blockquote>")
 	}
 	return ast.WalkContinue
 }
@@ -680,33 +821,42 @@ func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 
 func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		text := r.Text(node)
+		if strings.Contains(text, parse.Caret) {
+			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
+		} else {
+			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
+		}
+
+		id := string(node.HeadingID)
+		if r.Option.HeadingID && "" != id {
+			r.WriteString(" data-id=\"" + id + "\"")
+		}
+		if "" == id {
+			id = HeadingID(node)
+		}
+		r.WriteString(" id=\"ir-" + id + "\"")
 		if !node.HeadingSetext {
-			r.Write(bytes.Repeat([]byte{lex.ItemCrosshatch}, node.HeadingLevel))
-			r.WriteByte(lex.ItemSpace)
-		}
-	} else {
-		if node.HeadingSetext {
-			r.WriteByte(lex.ItemNewline)
-			content := node.Text()
-			contentLen := 0
-			for _, r := range content {
-				if utf8.RuneSelf <= r {
-					contentLen += 2
-				} else {
-					contentLen++
-				}
-			}
+			r.WriteString(" data-marker=\"#\">")
+		} else {
 			if 1 == node.HeadingLevel {
-				r.WriteString(strings.Repeat("=", contentLen))
-			} else if 2 == node.HeadingLevel {
-				r.WriteString(strings.Repeat("-", contentLen))
+				r.WriteString(" data-marker=\"=\">")
+			} else {
+				r.WriteString(" data-marker=\"-\">")
 			}
 		}
-		if r.Option.HeadingID && nil != node.HeadingID {
-			r.WriteString(" {" + util.BytesToStr(node.HeadingID) + "}")
+		if r.Option.HeadingAnchor {
+			id := HeadingID(node)
+			r.tag("a", [][]string{{"id", "vditorAnchor-" + id}, {"class", "vditor-anchor"}, {"href", "#" + id}}, false)
+			r.WriteString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
+			r.tag("/a", nil, false)
 		}
-		r.Newline()
-		r.WriteByte(lex.ItemNewline)
+
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--heading"}, {"data-type", "heading-marker"}}, false)
+		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
+		r.tag("/span", nil, false)
+	} else {
+		r.WriteString("</h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + ">")
 	}
 	return ast.WalkContinue
 }
@@ -716,117 +866,192 @@ func (r *VditorSVRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool)
 }
 
 func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
+	tag := "ul"
+	if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
+		tag = "ol"
+	}
 	if entering {
-		r.Writer = &bytes.Buffer{}
-		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+		var attrs [][]string
+		if node.Tight {
+			attrs = append(attrs, []string{"data-tight", "true"})
+		}
+		if 0 == node.BulletChar {
+			if 1 != node.Start {
+				attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
+			}
+		} else {
+			attrs = append(attrs, []string{"data-marker", string(node.BulletChar)})
+		}
+		attrs = append(attrs, []string{"data-block", "0"})
+		r.tag(tag, attrs, false)
 	} else {
-		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
-		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		buf := bytes.TrimSpace(r.Writer.Bytes())
-		r.Writer.Reset()
-		r.Write(buf)
-		r.WriteString("\n\n")
+		r.tag("/"+tag, nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Writer = &bytes.Buffer{}
-		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
-	} else {
-		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		indent := len(node.Marker) + 1
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			indent++
-		}
-		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
-		indentedLines := bytes.Buffer{}
-		buf := writer.Bytes()
-		lines := bytes.Split(buf, []byte{lex.ItemNewline})
-		for _, line := range lines {
-			if 0 == len(line) {
-				indentedLines.WriteByte(lex.ItemNewline)
-				continue
+		var attrs [][]string
+		switch node.ListData.Typ {
+		case 0:
+			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+		case 1:
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+		case 3:
+			if 0 == node.ListData.BulletChar {
+				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			} else {
+				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			}
-			indentedLines.Write(indentSpaces)
-			indentedLines.Write(line)
-			indentedLines.WriteByte(lex.ItemNewline)
+			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type {
+				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
+			}
 		}
-		buf = indentedLines.Bytes()
-		if indent < len(buf) {
-			buf = buf[indent:]
-		}
-
-		listItemBuf := bytes.Buffer{}
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			listItemBuf.WriteString(strconv.Itoa(node.Num) + string(node.ListData.Delimiter))
-		} else {
-			listItemBuf.Write(node.Marker)
-		}
-		listItemBuf.WriteByte(lex.ItemSpace)
-		buf = append(listItemBuf.Bytes(), buf...)
-		writer.Reset()
-		writer.Write(buf)
-		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
-		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		buf = bytes.TrimSpace(r.Writer.Bytes())
-		r.Writer.Reset()
-		r.Write(buf)
-		r.WriteString("\n")
+		r.tag("li", attrs, false)
+	} else {
+		r.tag("/li", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteByte(lex.ItemOpenBracket)
+	var attrs [][]string
 	if node.TaskListItemChecked {
-		r.WriteByte('X')
-	} else {
-		r.WriteByte(lex.ItemSpace)
+		attrs = append(attrs, []string{"checked", ""})
 	}
-	r.WriteByte(lex.ItemCloseBracket)
+	attrs = append(attrs, []string{"type", "checkbox"})
+	r.tag("input", attrs, true)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("---\n\n")
+	r.tag("hr", [][]string{{"data-block", "0"}}, true)
+	if nil != node.Tokens {
+		r.tag("p", [][]string{{"data-block", "0"}}, false)
+		r.Write(node.Tokens)
+		r.WriteByte(lex.ItemNewline)
+		r.tag("/p", nil, false)
+	}
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.Option.SoftBreak2HardBreak {
-		r.WriteString("\\\n")
-	} else {
-		r.WriteByte(lex.ItemNewline)
-	}
+	r.tag("br", nil, true)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Newline()
+	r.WriteByte(lex.ItemNewline)
 	return ast.WalkStop
 }
 
-func (r *VditorSVRenderer) isLastNode(treeRoot, node *ast.Node) bool {
-	if treeRoot == node {
-		return true
-	}
-	if nil != node.Next {
-		return false
-	}
-	if ast.NodeDocument == node.Parent.Type {
-		return treeRoot.LastChild == node
+func (r *VditorSVRenderer) tag(name string, attrs [][]string, selfclosing bool) {
+	if r.DisableTags > 0 {
+		return
 	}
 
-	var n *ast.Node
-	for n = node.Parent; ; n = n.Parent {
-		if ast.NodeDocument == n.Parent.Type {
-			break
+	r.WriteString("<")
+	r.WriteString(name)
+	if 0 < len(attrs) {
+		for _, attr := range attrs {
+			r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
 		}
 	}
-	return treeRoot.LastChild == n
+	if selfclosing {
+		r.WriteString(" /")
+	}
+	r.WriteString(">")
+}
+
+func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
+	text := r.Text(node)
+	var attrs [][]string
+
+	switch node.Type {
+	case ast.NodeEmphasis:
+		attrs = append(attrs, []string{"data-type", "em"})
+	case ast.NodeStrong:
+		attrs = append(attrs, []string{"data-type", "strong"})
+	case ast.NodeStrikethrough:
+		attrs = append(attrs, []string{"data-type", "s"})
+	case ast.NodeLink:
+		if 3 != node.LinkType {
+			attrs = append(attrs, []string{"data-type", "a"})
+		} else {
+			attrs = append(attrs, []string{"data-type", "link-ref"})
+		}
+	case ast.NodeImage:
+		attrs = append(attrs, []string{"data-type", "img"})
+	case ast.NodeCodeSpan:
+		attrs = append(attrs, []string{"data-type", "code"})
+	default:
+		attrs = append(attrs, []string{"data-type", "inline-node"})
+	}
+
+	if strings.Contains(text, parse.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
+		return
+	}
+
+	preText := node.PreviousNodeText()
+	if strings.HasSuffix(preText, parse.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
+		return
+	}
+
+	nexText := node.NextNodeText()
+	if strings.HasPrefix(nexText, parse.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
+		return
+	}
+
+	attrs = append(attrs, []string{"class", "vditor-ir__node"})
+	r.tag("span", attrs, false)
+	return
+}
+
+func (r *VditorSVRenderer) renderDivNode(node *ast.Node) {
+	text := r.Text(node)
+	attrs := [][]string{{"data-block", "0"}}
+	switch node.Type {
+	case ast.NodeCodeBlock:
+		attrs = append(attrs, []string{"data-type", "code-block"})
+	case ast.NodeHTMLBlock:
+		attrs = append(attrs, []string{"data-type", "html-block"})
+	case ast.NodeMathBlock:
+		attrs = append(attrs, []string{"data-type", "math-block"})
+	}
+
+	if strings.Contains(text, parse.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("div", attrs, false)
+		return
+	}
+
+	attrs = append(attrs, []string{"class", "vditor-ir__node"})
+	r.tag("div", attrs, false)
+	return
+}
+
+func (r *VditorSVRenderer) Text(node *ast.Node) (ret string) {
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering {
+			switch n.Type {
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent:
+				ret += string(n.Tokens)
+			case ast.NodeCodeBlockFenceInfoMarker:
+				ret += string(n.CodeBlockInfo)
+			case ast.NodeLink:
+				if 3 == n.LinkType {
+					ret += string(n.LinkRefLabel)
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
+	return
 }
