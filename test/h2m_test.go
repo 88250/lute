@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"20", "<h2 id=\"whats-markdown\">What’s Markdown?<a class=\"anchorjs-link \" aria-label=\"Anchor\" data-anchorjs-icon=\"\uE9CB\" href=\"https://www.markdownguide.org/getting-started/#whats-markdown\"></a></h2>", "## What’s Markdown?\n"},
 	{"19", "<pre><span>`foo`</span></pre>", "`foo`\n"},
 	{"18", "<del>foo</del>", "~foo~\n"},
 	{"17", "<img src=\"bar.png\" alt=\"foo\">", "![foo](bar.png)\n"},
