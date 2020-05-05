@@ -80,6 +80,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	if "svg" == n.Namespace {
 		return
 	}
+	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			lute.genASTByDOM(c, tree)
+		}
+		return
+	}
 
 	dataRender := lute.domAttrValue(n, "data-render")
 	if "1" == dataRender {
@@ -355,13 +361,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Summary:
 		return
 	default:
-		node.Type = ast.NodeHTMLBlock
-		tokens := lute.domHTML(n)
-		node.Tokens = tokens
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
-		return
+		break
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
