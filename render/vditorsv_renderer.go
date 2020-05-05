@@ -12,12 +12,13 @@ package render
 
 import (
 	"bytes"
+	"strconv"
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
-	"strconv"
-	"strings"
 )
 
 // VditorSVRenderer 描述了 Vditor Split-View DOM 渲染器。
@@ -202,15 +203,7 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
 
-	attrs := [][]string{{"data-type", "footnotes-ref"}}
-	text := node.Text()
-	expand := strings.Contains(text, parse.Caret)
-	if expand {
-		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-	} else {
-		//attrs = append(attrs, []string{"class", "vditor-ir__node"})
-		attrs = append(attrs, []string{"class", "vditor-ir__node"})
-	}
+	attrs := [][]string{{"data-type", "footnotes-ref"}, {"class", "vditor-ir__node"}}
 	r.tag("sup", attrs, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
@@ -591,12 +584,7 @@ func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, []byte(parse.Caret))
 
 	if entering {
-		text := r.Text(node)
-		class := "vditor-ir__node"
-		if strings.Contains(text, parse.Caret) || needResetCaret {
-			class += " vditor-ir__node--expand"
-		}
-		r.tag("span", [][]string{{"class", class}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
 	} else {
 		if needResetCaret {
 			r.WriteString(parse.Caret)
@@ -821,13 +809,7 @@ func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 
 func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		text := r.Text(node)
-		if strings.Contains(text, parse.Caret) {
-			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
-		} else {
-			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
-		}
-
+		r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
 		id := string(node.HeadingID)
 		if r.Option.HeadingID && "" != id {
 			r.WriteString(" data-id=\"" + id + "\"")
@@ -988,34 +970,12 @@ func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
-
-	if strings.Contains(text, parse.Caret) {
-		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-		r.tag("span", attrs, false)
-		return
-	}
-
-	preText := node.PreviousNodeText()
-	if strings.HasSuffix(preText, parse.Caret) {
-		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-		r.tag("span", attrs, false)
-		return
-	}
-
-	nexText := node.NextNodeText()
-	if strings.HasPrefix(nexText, parse.Caret) {
-		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-		r.tag("span", attrs, false)
-		return
-	}
-
 	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("span", attrs, false)
 	return
 }
 
 func (r *VditorSVRenderer) renderDivNode(node *ast.Node) {
-	text := r.Text(node)
 	attrs := [][]string{{"data-block", "0"}}
 	switch node.Type {
 	case ast.NodeCodeBlock:
@@ -1025,13 +985,6 @@ func (r *VditorSVRenderer) renderDivNode(node *ast.Node) {
 	case ast.NodeMathBlock:
 		attrs = append(attrs, []string{"data-type", "math-block"})
 	}
-
-	if strings.Contains(text, parse.Caret) {
-		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-		r.tag("div", attrs, false)
-		return
-	}
-
 	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("div", attrs, false)
 	return

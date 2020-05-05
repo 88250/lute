@@ -209,7 +209,6 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	if expand {
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
 	} else {
-		//attrs = append(attrs, []string{"class", "vditor-ir__node"})
 		attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	}
 	r.tag("sup", attrs, false)
