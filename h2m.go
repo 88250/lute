@@ -95,6 +95,30 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div, atom.Section:
+		if atom.Div == n.DataAtom {
+			// 解析 GitHub 语法高亮代码块
+			class := lute.domAttrValue(n, "class")
+			language := ""
+			if strings.Contains(class, "-source-") {
+				language = class[strings.LastIndex(class, "-source-")+len("-source-"):]
+			} else if strings.Contains(class, "-text-html-basic") {
+				language = "html"
+			}
+			if "" != language {
+				node.Type = ast.NodeCodeBlock
+				node.IsFencedCodeBlock = true
+				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
+				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
+				buf := &bytes.Buffer{}
+				node.LastChild.CodeBlockInfo = []byte(language)
+				buf.WriteString(lute.domText(n))
+				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()}
+				node.AppendChild(content)
+				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
+		}
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
