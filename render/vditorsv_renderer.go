@@ -947,9 +947,7 @@ func (r *VditorSVRenderer) tag(name string, attrs [][]string, selfclosing bool) 
 }
 
 func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
-	text := r.Text(node)
 	var attrs [][]string
-
 	switch node.Type {
 	case ast.NodeEmphasis:
 		attrs = append(attrs, []string{"data-type", "em"})
