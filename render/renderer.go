@@ -174,7 +174,7 @@ func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
 	}
 }
 
-func (r *BaseRenderer) headingID(heading *ast.Node) (ret string) {
+func HeadingID(heading *ast.Node) (ret string) {
 	id := util.BytesToStr(heading.HeadingID)
 	if "" == id {
 		id = heading.Text()

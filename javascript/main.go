@@ -13,6 +13,7 @@ package main
 import (
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/render"
 	"github.com/gopherjs/gopherjs/js"
 )
 
@@ -29,5 +30,6 @@ func main() {
 		"WalkStop":         ast.WalkStop,
 		"WalkSkipChildren": ast.WalkSkipChildren,
 		"WalkContinue":     ast.WalkContinue,
+		"GetHeadingID":     render.HeadingID,
 	})
 }

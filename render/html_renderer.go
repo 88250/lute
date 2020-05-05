@@ -126,7 +126,7 @@ func (r *HtmlRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 		spaces := (heading.HeadingLevel - 1) * 2
 		r.WriteString(strings.Repeat("&emsp;", spaces))
 		r.WriteString("<span class=\"toc-h" + level + "\">")
-		r.WriteString("<a class=\"toc-a\" href=\"#" + r.headingID(heading) + "\">" + heading.Text() + "</a></span><br>")
+		r.WriteString("<a class=\"toc-a\" href=\"#" + HeadingID(heading) + "\">" + heading.Text() + "</a></span><br>")
 	}
 	r.WriteString("</div>")
 	return ast.WalkStop
@@ -608,7 +608,7 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 		r.Newline()
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		r.WriteString("<h" + level)
-		id := r.headingID(node)
+		id := HeadingID(node)
 		if r.Option.ToC || r.Option.HeadingID {
 			r.WriteString(" id=\"" + id + "\"")
 		}

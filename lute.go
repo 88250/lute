@@ -316,7 +316,7 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 		}
 
 		renderFuncs := extRenderer.Interface().(map[string]interface{})
-		for funcName, _ := range renderFuncs {
+		for funcName := range renderFuncs {
 			nodeType := "Node" + funcName[len("render"):]
 			rendererFuncs[ast.Str2NodeType(nodeType)] = func(node *ast.Node, entering bool) (string, ast.WalkStatus) {
 				nodeType := node.Type.String()
