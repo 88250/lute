@@ -77,6 +77,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	if html.CommentNode == n.Type || atom.Meta == n.DataAtom {
 		return
 	}
+	if "svg" == n.Namespace {
+		return
+	}
 
 	dataRender := lute.domAttrValue(n, "data-render")
 	if "1" == dataRender {
@@ -213,7 +216,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.A:
 		node.Type = ast.NodeLink
-		if nil == n.FirstChild && (atom.H1 == n.Parent.DataAtom || atom.H2 == n.Parent.DataAtom || atom.H3 == n.Parent.DataAtom || atom.H4 == n.Parent.DataAtom || atom.H5 == n.Parent.DataAtom || atom.H6 == n.Parent.DataAtom) {
+		if "" == lute.domText(n) && (atom.H1 == n.Parent.DataAtom || atom.H2 == n.Parent.DataAtom || atom.H3 == n.Parent.DataAtom || atom.H4 == n.Parent.DataAtom || atom.H5 == n.Parent.DataAtom || atom.H6 == n.Parent.DataAtom) {
 			// 丢弃标题中文本为空的链接，这样的链接可能是锚点 https://github.com/Vanessa219/vditor/issues/359
 			return
 		}

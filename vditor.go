@@ -1044,6 +1044,10 @@ func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
 	if nil == n || "1" == lute.domAttrValue(n, "data-render") {
 		return
 	}
+	if "svg" == n.Namespace {
+		return
+	}
+
 	switch n.DataAtom {
 	case 0:
 		buffer.WriteString(n.Data)
