@@ -174,16 +174,13 @@ func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
 	}
 }
 
-func (r *BaseRenderer) headingID(heading *ast.Node) (id string) {
-	id = util.BytesToStr(heading.HeadingID)
+func (r *BaseRenderer) headingID(heading *ast.Node) (ret string) {
+	id := util.BytesToStr(heading.HeadingID)
 	if "" == id {
 		id = heading.Text()
 	}
-	id = r.normalizeHeadingID(id)
-	return
-}
 
-func (r *BaseRenderer) normalizeHeadingID(id string) (ret string) {
+	// normalize the heading ID
 	id = strings.TrimLeft(id, "#")
 	for _, r := range id {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
