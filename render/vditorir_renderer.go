@@ -264,7 +264,9 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
 	isFenced := node.Parent.IsFencedCodeBlock
+	caretInInfo := false
 	if isFenced {
+		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, []byte(parse.Caret))
 		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), nil)
 	}
 	var attrs [][]string
@@ -281,7 +283,10 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	r.tag("pre", [][]string{{"class", class}}, false)
 	r.tag("code", attrs, false)
 	if codeIsEmpty {
-		r.WriteString("<wbr>\n")
+		if !caretInInfo {
+			r.WriteString("<wbr>")
+		}
+		r.WriteByte(lex.ItemNewline)
 	} else {
 		r.Write(util.EscapeHTML(node.Tokens))
 		r.Newline()
