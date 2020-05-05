@@ -1033,20 +1033,6 @@ func (r *VditorIRRenderer) renderDivNode(node *ast.Node) {
 		return
 	}
 
-	preText := node.PreviousNodeText()
-	if strings.HasSuffix(preText, parse.Caret) {
-		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-		r.tag("div", attrs, false)
-		return
-	}
-
-	nexText := node.NextNodeText()
-	if strings.HasPrefix(nexText, parse.Caret) {
-		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-		r.tag("div", attrs, false)
-		return
-	}
-
 	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("div", attrs, false)
 	return
