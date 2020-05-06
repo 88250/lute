@@ -705,8 +705,11 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 		if r.Option.HeadingID && nil != node.HeadingID {
 			r.WriteString(" {" + util.BytesToStr(node.HeadingID) + "}")
 		}
-		r.Newline()
-		r.WriteByte(lex.ItemNewline)
+
+		if !node.ParentIs(ast.NodeTable) { // 在表格中不能换行，否则会破坏表格的排版 https://github.com/Vanessa219/vditor/issues/368
+			r.Newline()
+			r.WriteByte(lex.ItemNewline)
+		}
 	}
 	return ast.WalkContinue
 }
