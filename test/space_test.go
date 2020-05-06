@@ -18,6 +18,12 @@ import (
 
 var spaceTests = []parseTest{
 
+	// 井号 # 前后自动空格问题 https://github.com/88250/lute/issues/62
+	{"36", "前#foo", "<p>前 #foo</p>\n"},
+	{"35", "foo#后", "<p>foo# 后</p>\n"},
+	{"34", "foo#bar", "<p>foo#bar</p>\n"},
+	{"33", "前#后", "<p>前 # 后</p>\n"},
+
 	// 加粗、强调和删除线自动空格改进 https://github.com/88250/lute/issues/25
 	{"32", "数字~1黑客派2~需要", "<p>数字 <del>1 黑客派 2</del> 需要</p>\n"},
 	{"32", "数字*1黑客派2*需要", "<p>数字 <em>1 黑客派 2</em> 需要</p>\n"},

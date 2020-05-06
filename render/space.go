@@ -88,8 +88,8 @@ func allowSpace(currentChar, nextChar rune) bool {
 	nextIsDigit := '0' <= nextChar && '9' >= nextChar
 
 	nextIsSymbol := unicode.IsSymbol(nextChar) && '~' != nextChar
-	currentIsPunct := unicode.IsPunct(currentChar) || '~' == currentChar
-	nextIsPunct := unicode.IsPunct(nextChar) || '~' == nextChar
+	currentIsPunct := '#' != currentChar && (unicode.IsPunct(currentChar) || '~' == currentChar)
+	nextIsPunct := '#' != nextChar && (unicode.IsPunct(nextChar) || '~' == nextChar)
 
 	if !currentIsPunct && !currentIsASCII && !unicode.Is(unicode.Han, currentChar) {
 		// Emoji 后不应该有空格
