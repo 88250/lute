@@ -33,6 +33,9 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 		return
 	}
 
+	// 调整 DOM 结构
+	lute.adjustVditorDOM(htmlNodes)
+
 	// 将 HTML 树转换为 Markdown AST
 
 	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
@@ -40,9 +43,6 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 	for _, htmlNode := range htmlNodes {
 		lute.genASTByDOM(htmlNode, tree)
 	}
-
-	// 调整 DOM 结构
-	lute.adjustVditorDOM(htmlNodes)
 
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
@@ -160,6 +160,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Li:
 		node.Type = ast.NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
+		var bullet byte
 		if "" == marker {
 			if nil != n.Parent && atom.Ol == n.Parent.DataAtom {
 				start := lute.domAttrValue(n.Parent, "start")
@@ -170,6 +171,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 			} else {
 				marker = "*"
+				bullet = marker[0]
 			}
 		} else {
 			if nil != n.Parent && "1." != marker && atom.Ol == n.Parent.DataAtom && nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
@@ -177,7 +179,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				marker = "1."
 			}
 		}
-		node.ListData = &ast.ListData{Marker: []byte(marker)}
+		node.ListData = &ast.ListData{Marker: []byte(marker), BulletChar: bullet}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -228,7 +230,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		code := lute.domHTML(n.FirstChild)
+		code := lute.domHTML(n)
+		if bytes.Contains(code, []byte(">")) {
+			code = code[bytes.Index(code, []byte(">"))+1:]
+		}
+		code = bytes.TrimRight(code, "</code>")
 		unescaped := html.UnescapeString(string(code))
 		code = []byte(unescaped)
 		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: code}
