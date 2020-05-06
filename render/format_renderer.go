@@ -467,6 +467,7 @@ func (r *FormatRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool)
 func (r *FormatRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
 	tokens := node.Tokens
 	if node.ParentIs(ast.NodeTableCell) {
+		tokens = bytes.ReplaceAll(tokens, []byte("\\|"), []byte("|"))
 		tokens = bytes.ReplaceAll(tokens, []byte("|"), []byte("\\|"))
 		tokens = bytes.ReplaceAll(tokens, []byte("<br/>"), nil)
 	}
