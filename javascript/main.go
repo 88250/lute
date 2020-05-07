@@ -39,6 +39,7 @@ func main() {
 	})
 }
 
+// renderMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
 func renderMindmap(listContent string) string {
 	tree := parse.Parse("", []byte(listContent), lute.NewOptions())
 	if nil == tree.Root.FirstChild {
