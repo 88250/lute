@@ -380,8 +380,9 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 
 func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
-		r.Newline()
-
+		if !node.ParentIs(ast.NodeTableCell) {
+			r.Newline()
+		}
 		inTightList := false
 		lastListItemLastPara := false
 		if parent := node.Parent; nil != parent {
@@ -402,7 +403,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 			}
 		}
 
-		if !inTightList || (lastListItemLastPara) {
+		if (!inTightList || (lastListItemLastPara)) && !node.ParentIs(ast.NodeTableCell) {
 			r.WriteByte(lex.ItemNewline)
 		}
 	}
@@ -685,7 +686,9 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 		buf = bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
 		r.Write(buf)
-		r.WriteString("\n\n")
+		if !node.ParentIs(ast.NodeTableCell) { // 在表格中不能换行，否则会破坏表格的排版 https://github.com/Vanessa219/vditor/issues/368
+			r.WriteString("\n\n")
+		}
 	}
 	return ast.WalkContinue
 }
@@ -722,7 +725,7 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 			r.WriteString(" {" + util.BytesToStr(node.HeadingID) + "}")
 		}
 
-		if !node.ParentIs(ast.NodeTableCell) { // 在表格中不能换行，否则会破坏表格的排版 https://github.com/Vanessa219/vditor/issues/368
+		if !node.ParentIs(ast.NodeTableCell) {
 			r.Newline()
 			r.WriteByte(lex.ItemNewline)
 		}
@@ -746,7 +749,9 @@ func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 		buf := bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
 		r.Write(buf)
-		r.WriteString("\n\n")
+		if !node.ParentIs(ast.NodeTableCell) {
+			r.WriteString("\n\n")
+		}
 	}
 	return ast.WalkContinue
 }
@@ -788,14 +793,23 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		}
 		listItemBuf.WriteByte(lex.ItemSpace)
 		buf = append(listItemBuf.Bytes(), buf...)
+		if node.ParentIs(ast.NodeTableCell) {
+			buf = bytes.ReplaceAll(buf, []byte("\n"), nil)
+		}
 		writer.Reset()
 		writer.Write(buf)
-		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
+		buf = writer.Bytes()
+		if node.ParentIs(ast.NodeTableCell) {
+			buf = bytes.ReplaceAll(buf, []byte("\n"), nil)
+		}
+		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(buf)
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
 		r.Write(buf)
-		r.WriteString("\n")
+		if !node.ParentIs(ast.NodeTableCell) {
+			r.WriteString("\n")
+		}
 	}
 	return ast.WalkContinue
 }
@@ -812,7 +826,11 @@ func (r *FormatRenderer) renderTaskListItemMarker(node *ast.Node, entering bool)
 }
 
 func (r *FormatRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("---\n\n")
+	if node.ParentIs(ast.NodeTableCell) {
+		r.WriteString("<hr/>")
+	} else {
+		r.WriteString("---\n\n")
+	}
 	return ast.WalkStop
 }
 
@@ -820,7 +838,11 @@ func (r *FormatRenderer) renderHardBreak(node *ast.Node, entering bool) ast.Walk
 	if !r.Option.SoftBreak2HardBreak {
 		r.WriteString("\\\n")
 	} else {
-		r.WriteByte(lex.ItemNewline)
+		if node.ParentIs(ast.NodeTableCell) {
+			r.WriteString("<br/>")
+		} else {
+			r.WriteByte(lex.ItemNewline)
+		}
 	}
 	return ast.WalkStop
 }
