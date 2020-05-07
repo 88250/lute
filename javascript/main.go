@@ -12,6 +12,7 @@ package main
 
 import (
 	"bytes"
+	"github.com/88250/lute/util"
 
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
@@ -27,6 +28,8 @@ func New(options map[string]map[string]*js.Object) *js.Object {
 }
 
 func main() {
+	renderMindmap("*")
+
 	js.Global.Set("Lute", map[string]interface{}{
 		"Version":          lute.Version,
 		"New":              New,
@@ -34,23 +37,38 @@ func main() {
 		"WalkSkipChildren": ast.WalkSkipChildren,
 		"WalkContinue":     ast.WalkContinue,
 		"GetHeadingID":     render.HeadingID,
-		"RenderMindmap":    RenderMindmap,
+		"RenderMindmap":    renderMindmap,
 	})
 }
 
-func RenderMindmap(listContent string) string {
+func renderMindmap(listContent string) string {
 	tree := parse.Parse("", []byte(listContent), lute.NewOptions())
+	if nil == tree.Root.FirstChild {
+		return ""
+	}
+
 	buf := &bytes.Buffer{}
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		switch n.Type {
-		case ast.NodeDocument, ast.NodeList:
+		case ast.NodeDocument:
+			if entering {
+				if nil != n.FirstChild.FirstChild.Next {
+					buf.WriteString("{\"name\": \"Root\", \"children\": [")
+				}
+			} else {
+				if nil != n.FirstChild.FirstChild.Next {
+					buf.WriteString("]}")
+				}
+			}
+			return ast.WalkContinue
+		case ast.NodeList:
 			return ast.WalkContinue
 		case ast.NodeListItem:
 			children := nil != n.ChildByType(ast.NodeList)
 			if entering {
-				buf.WriteString("{\"name\": \"" + n.Text())
+				buf.WriteString("{\"name\": \"" + text(n.FirstChild) + "\"")
 				if children {
-					buf.WriteString("\", \"children\": [")
+					buf.WriteString(", \"children\": [")
 				}
 			} else {
 				if children {
@@ -67,4 +85,23 @@ func RenderMindmap(listContent string) string {
 		return ast.WalkContinue
 	})
 	return buf.String()
+}
+
+// text 返回列表项第一个子节点的文本内容。
+func text(listItemFirstChild *ast.Node) (ret string) {
+	if nil == listItemFirstChild {
+		return ""
+	}
+
+	ast.Walk(listItemFirstChild, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if ast.NodeList == n.Type || ast.NodeListItem == n.Type { // 遍历到下一个列表或者列表项时退出
+			return ast.WalkStop
+		}
+
+		if (ast.NodeText == n.Type || ast.NodeLinkText == n.Type) && entering {
+			ret += util.BytesToStr(n.Tokens)
+		}
+		return ast.WalkContinue
+	})
+	return
 }
