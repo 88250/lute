@@ -28,8 +28,6 @@ func New(options map[string]map[string]*js.Object) *js.Object {
 }
 
 func main() {
-	renderMindmap("*")
-
 	js.Global.Set("Lute", map[string]interface{}{
 		"Version":          lute.Version,
 		"New":              New,
