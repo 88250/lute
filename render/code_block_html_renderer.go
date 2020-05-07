@@ -65,9 +65,8 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			rendered := false
 			if isGo(language) {
 				// Go 代码块自动格式化 https://github.com/b3log/lute/issues/37
-				bytes := tokens
-				if bytes, err := format.Source(bytes); nil == err {
-					tokens = bytes
+				if buf, err := format.Source(tokens); nil == err {
+					tokens = buf
 				}
 			}
 			if r.Option.CodeSyntaxHighlight && !noHighlight(language) {
