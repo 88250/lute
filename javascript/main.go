@@ -42,20 +42,34 @@ func main() {
 // renderMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
 func renderMindmap(listContent string) string {
 	tree := parse.Parse("", []byte(listContent), lute.NewOptions())
-	if nil == tree.Root.FirstChild {
-		return ""
+	if nil == tree.Root.FirstChild || ast.NodeList != tree.Root.FirstChild.Type {
+		// 第一个节点如果不是列表的话直接返回
+		return "{}"
+	}
+
+	// 移除非列表节点
+	var toRemoved []*ast.Node
+	for c := tree.Root.FirstChild; nil != c; c = c.Next {
+		if ast.NodeList != c.Type {
+			toRemoved = append(toRemoved, c)
+		}
+	}
+	for _, c := range toRemoved {
+		c.Unlink()
 	}
 
 	buf := &bytes.Buffer{}
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		switch n.Type {
 		case ast.NodeDocument:
+			listItems := countListItem(n)
 			if entering {
-				if nil != n.FirstChild.FirstChild.Next {
+				if 0 < listItems {
+					// 如果根节点下的第一个列表包含多个列表项，则自动生成一个根节点，这些列表项都挂在这个根节点上
 					buf.WriteString("{\"name\": \"Root\", \"children\": [")
 				}
 			} else {
-				if nil != n.FirstChild.FirstChild.Next {
+				if 0 < listItems {
 					buf.WriteString("]}")
 				}
 			}
@@ -74,7 +88,7 @@ func renderMindmap(listContent string) string {
 					buf.WriteString("]")
 				}
 				buf.WriteString("}")
-				if nil != n.Next {
+				if nil != n.Next || nil != n.Parent.Next {
 					buf.WriteString(", ")
 				}
 			}
@@ -102,5 +116,19 @@ func text(listItemFirstChild *ast.Node) (ret string) {
 		}
 		return ast.WalkContinue
 	})
+	return
+}
+
+func countListItem(n *ast.Node) (ret int) {
+	if nil == n {
+		return 0
+	}
+
+	for c := n.FirstChild; nil != c; c = c.Next {
+		if ast.NodeList == c.Type || ast.NodeListItem == c.Type {
+			ret++
+		}
+	}
+
 	return
 }
