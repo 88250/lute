@@ -47,32 +47,7 @@ type Lute struct {
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 //  * 解析 Setext 标题
 func New(opts ...Option) (ret *Lute) {
-	ret = &Lute{Options: &parse.Options{}}
-	ret.GFMTable = true
-	ret.GFMTaskListItem = true
-	ret.GFMTaskListItemClass = "vditor-task"
-	ret.GFMStrikethrough = true
-	ret.GFMAutoLink = true
-	ret.SoftBreak2HardBreak = true
-	ret.CodeSyntaxHighlight = true
-	ret.CodeSyntaxHighlightInlineStyle = false
-	ret.CodeSyntaxHighlightLineNum = false
-	ret.CodeSyntaxHighlightStyleName = "github"
-	ret.Footnotes = true
-	ret.ToC = false
-	ret.HeadingID = true
-	ret.AutoSpace = true
-	ret.FixTermTypo = true
-	ret.ChinesePunct = true
-	ret.Emoji = true
-	ret.AliasEmoji, ret.EmojiAlias = parse.NewEmojis()
-	ret.Terms = render.NewTerms()
-	ret.EmojiSite = "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji"
-	ret.LinkBase = ""
-	ret.VditorCodeBlockPreview = true
-	ret.RenderListMarker = false
-	ret.Setext = true
-	ret.ChineseParagraphBeginningSpace = false
+	ret = &Lute{Options: NewOptions()}
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -83,6 +58,38 @@ func New(opts ...Option) (ret *Lute) {
 	ret.Md2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	return ret
+}
+
+func NewOptions() *parse.Options {
+	emojis, emoji := parse.NewEmojis()
+	return &parse.Options{
+		GFMTable:                       true,
+		GFMTaskListItem:                true,
+		GFMTaskListItemClass:           "vditor-task",
+		GFMStrikethrough:               true,
+		GFMAutoLink:                    true,
+		SoftBreak2HardBreak:            true,
+		CodeSyntaxHighlight:            true,
+		CodeSyntaxHighlightInlineStyle: false,
+		CodeSyntaxHighlightLineNum:     false,
+		CodeSyntaxHighlightStyleName:   "github",
+		Footnotes:                      true,
+		ToC:                            false,
+		HeadingID:                      true,
+		AutoSpace:                      true,
+		FixTermTypo:                    true,
+		ChinesePunct:                   true,
+		Emoji:                          true,
+		AliasEmoji:                     emojis,
+		EmojiAlias:                     emoji,
+		Terms:                          render.NewTerms(),
+		EmojiSite:                      "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
+		LinkBase:                       "",
+		VditorCodeBlockPreview:         true,
+		RenderListMarker:               false,
+		Setext:                         true,
+		ChineseParagraphBeginningSpace: false,
+	}
 }
 
 // Markdown 将 markdown 文本字节数组处理为相应的 html 字节数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
