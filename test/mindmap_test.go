@@ -8,29 +8,27 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package main
+package test
 
 import (
+	"testing"
+
 	"github.com/88250/lute"
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/render"
-	"github.com/gopherjs/gopherjs/js"
 )
 
-func New(options map[string]map[string]*js.Object) *js.Object {
-	engine := lute.New()
-	engine.SetJSRenderers(options)
-	return js.MakeWrapper(engine)
+var mindmapTests = []parseTest{
+
+	// 由 Vditor 调用 ECharts 渲染
+	{"0", "```mindmap\n* foo\n  * bar\n  * baz\n```", "<pre><code class=\"language-mindmap\">* foo\n  * bar\n  * baz\n</code></pre>\n"},
 }
 
-func main() {
-	js.Global.Set("Lute", map[string]interface{}{
-		"Version":          lute.Version,
-		"New":              New,
-		"WalkStop":         ast.WalkStop,
-		"WalkSkipChildren": ast.WalkSkipChildren,
-		"WalkContinue":     ast.WalkContinue,
-		"GetHeadingID":     render.HeadingID,
-		"RenderMindmap":    render.RenderMindmap,
-	})
+func TestMindmap(t *testing.T) {
+	luteEngine := lute.New()
+
+	for _, test := range mindmapTests {
+		result:= luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
 }
