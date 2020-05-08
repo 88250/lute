@@ -344,7 +344,7 @@ func (r *VditorIRRenderer) renderInlineMathOpenMarker(node *ast.Node, entering b
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDollar)
 	r.tag("/span", nil, false)
-	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
+	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "math-inline"}}, false)
 	return ast.WalkStop
 }
 
