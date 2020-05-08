@@ -28,6 +28,7 @@ func New(options map[string]map[string]*js.Object) *js.Object {
 }
 
 func main() {
+	renderMindmap("* foo\n* bar")
 	js.Global.Set("Lute", map[string]interface{}{
 		"Version":          lute.Version,
 		"New":              New,
@@ -62,14 +63,13 @@ func renderMindmap(listContent string) string {
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		switch n.Type {
 		case ast.NodeDocument:
-			listItems := countListItem(n)
 			if entering {
-				if 0 < listItems {
+				if needRoot(n) {
 					// 如果根节点下的第一个列表包含多个列表项，则自动生成一个根节点，这些列表项都挂在这个根节点上
 					buf.WriteString("{\"name\": \"Root\", \"children\": [")
 				}
 			} else {
-				if 0 < listItems {
+				if needRoot(n) {
 					buf.WriteString("]}")
 				}
 			}
@@ -119,16 +119,35 @@ func text(listItemFirstChild *ast.Node) (ret string) {
 	return
 }
 
-func countListItem(n *ast.Node) (ret int) {
-	if nil == n {
-		return 0
-	}
+func needRoot(root *ast.Node) bool {
+	count := 0
 
-	for c := n.FirstChild; nil != c; c = c.Next {
-		if ast.NodeList == c.Type || ast.NodeListItem == c.Type {
-			ret++
+	// 检查根节点下是否包含多个列表
+	for c := root.FirstChild; nil != c; c = c.Next {
+		if ast.NodeList == c.Type {
+			count++
 		}
 	}
+	if 1 < count {
+		// 包含多个列表则需要构建一个 Root 节点
+		return true
+	}
+	if 0 == count {
+		// 没有列表也需要构建一个 Root 节点
+		return true
+	}
 
-	return
+	count = 0
+
+	// 如果只有一个列表，则检查该列表下是否包含多个列表项
+	for c := root.FirstChild.FirstChild; nil != c; c = c.Next {
+		if ast.NodeListItem == c.Type {
+			count++
+		}
+	}
+	if 1 < count {
+		// 包含多个列表项则需要构建一个 Root 节点
+		return true
+	}
+	return false
 }
