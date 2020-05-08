@@ -613,6 +613,15 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 			attrs = append(attrs, []string{"alt", string(altTokens)})
 		}
 		r.tag("img", attrs, true)
+
+		// XSS 过滤
+		buf := r.Writer.Bytes()
+		idx := bytes.LastIndex(buf, []byte("<img src="))
+		imgBuf := buf[idx:]
+		imgBuf = sanitize(imgBuf)
+		r.Writer.Truncate(idx)
+		r.Writer.Write(imgBuf)
+
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue

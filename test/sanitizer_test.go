@@ -18,6 +18,8 @@ import (
 
 var sanitizerTests = []parseTest{
 
+	{"5", "<iframe src='javascript:parent.require(\"child_process\").exec(\"open -a Calculator\")'></iframe>", "  \n"},
+	{"4", "![Escape SRC - onerror](\"onerror=\"alert('ImageOnError'))", "<p><img src=\"%22onerror=%22alert(&#39;ImageOnError&#39;)\" alt=\"Escape SRC - onerror\"/></p>\n"},
 	{"3", "<EMBED SRC=\"data:image/svg+xml;base64,mock payload\" type=\"image/svg+xml\" AllowScriptAccess=\"always\"></EMBED>", "<p><embed></embed></p>\n"},
 	{"2", "<FOo>bar", "<p><foo>bar</p>\n"},
 	{"1", "<img onerror=\"alert(1)\" src=\"bar.png\" />", "<img src=\"bar.png\"/>\n"},
@@ -32,6 +34,27 @@ func TestSanitizer(t *testing.T) {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+var sanitizerVditorTests = []parseTest{
+
+	{"5", "<iframe src='javascript:parent.require(\"child_process\").exec(\"open -a Calculator\")'></iframe>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;iframe src=&quot;javascript:parent.require(&quot;child_process&quot;).exec(&quot;open -a Calculator&quot;)&quot;&gt;&lt;/iframe&gt;</code></pre></div>"},
+	{"4", "![Escape SRC - onerror](\"onerror=\"alert('ImageOnError'))", "<p data-block=\"0\"><img src=\"\" alt=\"Escape SRC - onerror\"/>\n</p>"},
+	{"3", "<EMBED SRC=\"data:image/svg+xml;base64,mock payload\" type=\"image/svg+xml\" AllowScriptAccess=\"always\"></EMBED>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;embed src=&quot;data:image/svg+xml;base64,mock payload&quot; type=&quot;image/svg+xml&quot; allowscriptaccess=&quot;always&quot;/&gt;</code></span>\u200b\n</p>"},
+	{"2", "<FOo>bar", "<p data-block=\"0\">foobar\n</p>"},
+	{"1", "<img onerror=\"alert(1)\" src=\"bar.png\" />", "<p data-block=\"0\"><img src=\"bar.png\" alt=\"\"/>\n</p>"},
+	{"0", "foo<script>alert(1)</script>bar", "<p data-block=\"0\">foo\n</p><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></pre></div><p data-block=\"0\">bar\n</p>"},
+}
+
+func TestSanitizerVditor(t *testing.T) {
+	luteEngine := lute.New()
+
+	for _, test := range sanitizerVditorTests {
+		html := luteEngine.SpinVditorDOM(test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal text\n\t%q", test.name, test.to, html, test.from)
 		}
 	}
 }

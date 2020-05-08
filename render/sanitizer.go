@@ -47,6 +47,7 @@ var allowedAttrs = map[string]interface{}{
 	"align":  nil,
 	"height": nil,
 	"width":  nil,
+	"data":   nil,
 }
 
 func sanitize(tokens []byte) []byte {
@@ -180,11 +181,11 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 
 func sanitizeAttrs(attrs []html.Attribute) (ret []html.Attribute) {
 	for _, attr := range attrs {
-		if _, ok := allowedAttrs[attr.Key]; !ok {
+		if !allowAttr(attr.Key) {
 			continue
 		}
 		if "src" == attr.Key {
-			if strings.Contains(attr.Val, "data:image/svg+xml") {
+			if strings.HasPrefix(attr.Val, "data:image/svg+xml") {
 				continue
 			}
 		}
@@ -192,4 +193,13 @@ func sanitizeAttrs(attrs []html.Attribute) (ret []html.Attribute) {
 		ret = append(ret, attr)
 	}
 	return
+}
+
+func allowAttr(attrName string) bool {
+	for name := range allowedAttrs {
+		if strings.HasPrefix(attrName, name) {
+			return true
+		}
+	}
+	return false
 }

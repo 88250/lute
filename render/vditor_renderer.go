@@ -468,6 +468,14 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			r.WriteString("\"")
 		}
 		r.WriteString(" />")
+
+		// XSS 过滤
+		buf := r.Writer.Bytes()
+		idx := bytes.LastIndex(buf, []byte("<img src="))
+		imgBuf := buf[idx:]
+		imgBuf = sanitize(imgBuf)
+		r.Writer.Truncate(idx)
+		r.Writer.Write(imgBuf)
 	}
 	return ast.WalkContinue
 }

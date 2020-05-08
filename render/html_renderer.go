@@ -11,6 +11,7 @@
 package render
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
 	"unicode"
@@ -408,6 +409,15 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 			r.WriteString("\"")
 		}
 		r.WriteString(" />")
+
+		if r.Option.Sanitize {
+			buf := r.Writer.Bytes()
+			idx := bytes.LastIndex(buf, []byte("<img src="))
+			imgBuf := buf[idx:]
+			imgBuf = sanitize(imgBuf)
+			r.Writer.Truncate(idx)
+			r.Writer.Write(imgBuf)
+		}
 	}
 	return ast.WalkContinue
 }
