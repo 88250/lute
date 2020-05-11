@@ -888,8 +888,18 @@ func (r *VditorIRRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 			if 1 != node.Start {
 				attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
 			}
-		} else {
-			attrs = append(attrs, []string{"data-marker", string(node.BulletChar)})
+		}
+		switch node.ListData.Typ {
+		case 0:
+			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+		case 1:
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+		case 3:
+			if 0 == node.ListData.BulletChar {
+				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			} else {
+				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+			}
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
 		r.tag(tag, attrs, false)
