@@ -749,6 +749,11 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.A:
+		text := lute.domText(n)
+		if "" == text || parse.Zwsp == text {
+			return
+		}
+
 		node.Type = ast.NodeLink
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 		tree.Context.Tip.AppendChild(node)
