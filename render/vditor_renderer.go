@@ -869,6 +869,10 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 			language := string(infoWords[0])
 			attrs = append(attrs, []string{"class", "language-" + language})
+			if "mindmap" == language {
+				dataCode := r.renderMindmap(node.Tokens)
+				attrs = append(attrs, []string{"data-code", string(dataCode)})
+			}
 		}
 	}
 	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__pre"}}, false)

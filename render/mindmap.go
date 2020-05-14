@@ -75,7 +75,7 @@ func (r *BaseRenderer) renderMindmap(listContent []byte) []byte {
 		}
 		return ast.WalkContinue
 	})
-	return buf.Bytes()
+	return util.EscapeHTML(buf.Bytes())
 }
 
 // text 返回列表项第一个子节点的文本内容。

@@ -273,6 +273,10 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language := string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})
+		if "mindmap" == language {
+			dataCode := r.renderMindmap(node.Tokens)
+			attrs = append(attrs, []string{"data-code", string(dataCode)})
+		}
 	}
 
 	class := "vditor-ir__marker--pre"

@@ -43,7 +43,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			if "mindmap" == language {
 				json := r.renderMindmap(tokens)
 				r.WriteString("<pre><code data-code=\"")
-				r.Write(util.EscapeHTML(json))
+				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")
 			} else {
 				r.WriteString("<pre><code class=\"language-" + language + "\">")
