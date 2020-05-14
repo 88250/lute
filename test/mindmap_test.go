@@ -18,8 +18,7 @@ import (
 
 var mindmapTests = []parseTest{
 
-	// 由 Vditor 调用 ECharts 渲染
-	{"0", "```mindmap\n* foo\n  * bar\n  * baz\n```", "<pre><code class=\"language-mindmap\">* foo\n  * bar\n  * baz\n</code></pre>\n"},
+	{"0", "```mindmap\n* foo\n  * bar\n  * baz\n```", "<pre><code data-code=\"{&quot;name&quot;: &quot;foo&quot;, &quot;children&quot;: [{&quot;name&quot;: &quot;bar&quot;}, {&quot;name&quot;: &quot;baz&quot;}]}\" class=\"language-mindmap\">* foo\n  * bar\n  * baz\n</code></pre>\n"},
 }
 
 func TestMindmap(t *testing.T) {

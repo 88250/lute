@@ -39,10 +39,15 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
 			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-			language := infoWords[0]
-			r.WriteString("<pre><code class=\"language-")
-			r.Write(language)
-			r.WriteString("\">")
+			language := string(infoWords[0])
+			if "mindmap" == language {
+				json := r.renderMindmap(tokens)
+				r.WriteString("<pre><code data-code=\"")
+				r.Write(util.EscapeHTML(json))
+				r.WriteString("\" class=\"language-mindmap\">")
+			} else {
+				r.WriteString("<pre><code class=\"language-" + language + "\">")
+			}
 			tokens = util.EscapeHTML(tokens)
 			r.Write(tokens)
 		} else {
