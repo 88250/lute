@@ -30,7 +30,7 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 		case lex.ItemBackslash:
 			n = t.parseBackslash(block, ctx)
 		case lex.ItemBacktick:
-			n = t.parseCodeSpan(ctx)
+			n = t.parseCodeSpan(block, ctx)
 		case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemTilde:
 			t.handleDelim(block, ctx)
 		case lex.ItemNewline:

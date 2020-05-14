@@ -11,11 +11,13 @@
 package parse
 
 import (
+	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 )
 
-func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
+func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node) {
 	startPos := ctx.pos
 	n := 0
 	for ; startPos+n < ctx.tokensLen; n++ {
@@ -48,6 +50,12 @@ func (t *Tree) parseCodeSpan(ctx *InlineContext) (ret *ast.Node) {
 		openMarker.Tokens = append(openMarker.Tokens, textTokens[0])
 		closeMarker.Tokens = ctx.tokens[endPos-1 : endPos+n]
 		textTokens = textTokens[1 : len(textTokens)-1]
+	}
+
+	if t.Context.Option.GFMTable {
+		if ast.NodeTableCell == block.Type {
+			textTokens = bytes.ReplaceAll(textTokens, []byte("\\|"), []byte("|"))
+		}
 	}
 
 	ret = &ast.Node{Type: ast.NodeCodeSpan, CodeMarkerLen: n}
