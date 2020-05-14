@@ -175,7 +175,7 @@ func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
 }
 
 func HeadingID(heading *ast.Node) (ret string) {
-	if 0 == len(heading.HeadingNormalizedID) {
+	if 0 == len(util.StrToBytes(heading.HeadingNormalizedID)) {
 		headingID0(heading)
 	}
 	return heading.HeadingNormalizedID
@@ -191,9 +191,7 @@ func headingID0(heading *ast.Node) {
 		if entering {
 			if ast.NodeHeading == n.Type {
 				id := normalizeHeadingID(n)
-				if 0 < idOccurs[id] {
-					for id += "-"; 1 <= idOccurs[id]; id += "-" {
-					}
+				for ; 0 < idOccurs[id]; id += "-" {
 				}
 				n.HeadingNormalizedID = id
 				idOccurs[id] = 1
@@ -210,11 +208,12 @@ func normalizeHeadingID(heading *ast.Node) (ret string) {
 	}
 
 	id = strings.TrimLeft(id, "#")
+	id = strings.ReplaceAll(id, parse.Caret, "")
 	for _, r := range id {
-		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
-			ret += "-"
-		} else {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			ret += string(r)
+		} else {
+			ret += "-"
 		}
 	}
 	return
