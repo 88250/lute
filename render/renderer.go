@@ -43,7 +43,7 @@ type BaseRenderer struct {
 	Writer              *bytes.Buffer                    // 输出缓冲
 	LastOut             byte                             // 最新输出的一个字节
 	Tree                *parse.Tree                      // 待渲染的树
-	DisableTags         int                              // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>。
+	DisableTags         int                              // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>
 }
 
 // NewBaseRenderer 构造一个 BaseRenderer。
@@ -175,12 +175,40 @@ func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
 }
 
 func HeadingID(heading *ast.Node) (ret string) {
+	if 0 == len(heading.HeadingNormalizedID) {
+		headingID0(heading)
+	}
+	return heading.HeadingNormalizedID
+}
+
+func headingID0(heading *ast.Node) {
+	var root *ast.Node
+	for root = heading.Parent; ast.NodeDocument != root.Type; root = root.Parent {
+	}
+
+	idOccurs := map[string]int{}
+	ast.Walk(root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering {
+			if ast.NodeHeading == n.Type {
+				id := normalizeHeadingID(n)
+				if 0 < idOccurs[id] {
+					for id += "-"; 1 <= idOccurs[id]; id += "-" {
+					}
+				}
+				n.HeadingNormalizedID = id
+				idOccurs[id] = 1
+			}
+		}
+		return ast.WalkContinue
+	})
+}
+
+func normalizeHeadingID(heading *ast.Node) (ret string) {
 	id := util.BytesToStr(heading.HeadingID)
 	if "" == id {
 		id = heading.Text()
 	}
 
-	// normalize the heading ID
 	id = strings.TrimLeft(id, "#")
 	for _, r := range id {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {

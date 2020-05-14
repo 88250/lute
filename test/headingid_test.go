@@ -18,6 +18,9 @@ import (
 
 var headingIDTests = []parseTest{
 
+	{"3", "# Same\n\n ## Same\n\n # Same-\n\n ## Test\n\n ## Test-\n\n ## Test\n\n ## Same\n\n ## Test\n", "<h1 id=\"Same\">Same</h1>\n<h2 id=\"Same-\">Same</h2>\n<h1 id=\"Same--\">Same-</h1>\n<h2 id=\"Test\">Test</h2>\n<h2 id=\"Test-\">Test-</h2>\n<h2 id=\"Test--\">Test</h2>\n<h2 id=\"Same---\">Same</h2>\n<h2 id=\"Test---\">Test</h2>\n"},
+	{"2", "# Same\n\n ## Same\n\n # Same-\n", "<h1 id=\"Same\">Same</h1>\n<h2 id=\"Same-\">Same</h2>\n<h1 id=\"Same--\">Same-</h1>\n"},
+	{"1", "# Same\n\n ## Same\n", "<h1 id=\"Same\">Same</h1>\n<h2 id=\"Same-\">Same</h2>\n"},
 	{"0", "### Heading3 {#custom-id}\n", "<h3 id=\"custom-id\">Heading3</h3>\n"},
 }
 
