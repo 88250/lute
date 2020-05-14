@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
@@ -75,7 +76,7 @@ func (r *BaseRenderer) renderMindmap(listContent []byte) []byte {
 		}
 		return ast.WalkContinue
 	})
-	return util.EscapeHTML(buf.Bytes())
+	return util.EncodeDestination(buf.Bytes())
 }
 
 // text 返回列表项第一个子节点的文本内容。
@@ -94,6 +95,10 @@ func text(listItemFirstChild *ast.Node) (ret string) {
 		}
 		return ast.WalkContinue
 	})
+
+	ret = strings.ReplaceAll(ret, "\\", "\\\\")
+	ret = strings.ReplaceAll(ret,"\"", "\\\"")
+	ret = strings.ReplaceAll(ret, parse.Caret, "")
 	return
 }
 
