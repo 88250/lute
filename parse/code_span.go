@@ -54,6 +54,7 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 
 	if t.Context.Option.GFMTable {
 		if ast.NodeTableCell == block.Type {
+			// 表格中的代码中带有管道符的处理 https://github.com/88250/lute/issues/63
 			textTokens = bytes.ReplaceAll(textTokens, []byte("\\|"), []byte("|"))
 		}
 	}
