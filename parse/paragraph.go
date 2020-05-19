@@ -61,7 +61,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 						if bytes.HasPrefix(tokens, []byte(Caret)) {
 							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
 							caretStartText = true
-						} else if bytes.HasPrefix(tokens[closeBracket:], []byte(Caret)) {
+						} else if bytes.HasPrefix(tokens[closeBracket+1:], []byte(Caret)) {
 							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
 							caretAfterCloseBracket = true
 						} else if bytes.Contains(tokens[1:closeBracket], []byte(Caret)) {
