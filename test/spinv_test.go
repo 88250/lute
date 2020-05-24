@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"119", "&parx", "<p data-block=\"0\">&amp;parx\n</p>"},
 	{"118", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\"><p>[ ]<wbr></p></li></ul>", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\" /> <wbr></li></ul>"},
 	{"117", "<p data-block=\"0\">foo<wbr><a>​</a></p>", "<p data-block=\"0\">foo<wbr>\n</p>"},
 	{"116", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\">foo<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\">bar</li></ol><ol data-block=\"0\"><li data-marker=\"1.\">‸foo2<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\">bar2</li></ol></li></ol></li></ol>", "<ol data-tight=\"true\" data-marker=\"1.\" data-block=\"0\"><li data-marker=\"1.\">foo<ol data-tight=\"true\" data-marker=\"1.\" data-block=\"0\"><li data-marker=\"1.\">bar</li><li data-marker=\"2.\"><wbr>foo2<ol data-tight=\"true\" data-marker=\"1.\" data-block=\"0\"><li data-marker=\"1.\">bar2</li></ol></li></ol></li></ol>"},

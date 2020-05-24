@@ -125,7 +125,7 @@ func parseEntity(s string) (string, int) {
 					return "", 0
 				}
 			case b == ';':
-				if e, ok := html.Entities[s[i-n:i]]; ok {
+				if e, ok := html.Entities[s[i-n:i+1]]; ok {
 					return e, i + 1
 				}
 				return "", 0
