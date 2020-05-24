@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"120", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\"> test<wbr></li></ul><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\"> test</li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> test<wbr></li><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> test</li></ul>"},
 	{"119", "&parx", "<p data-block=\"0\">&amp;parx\n</p>"},
 	{"118", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\"><p>[ ]<wbr></p></li></ul>", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\" /> <wbr></li></ul>"},
 	{"117", "<p data-block=\"0\">foo<wbr><a>​</a></p>", "<p data-block=\"0\">foo<wbr>\n</p>"},

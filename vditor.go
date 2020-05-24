@@ -195,10 +195,16 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
-	for _, n := range nodes {
-		for c := n; nil != c; c = c.NextSibling {
-			lute.adjustVditorDOM0(c)
+	if 1 < len(nodes) {
+		i := 0
+		for j := 1; j < len(nodes); j++ {
+			nodes[i].InsertAfter(nodes[j])
+			i++
 		}
+	}
+
+	for c := nodes[0]; nil != c; c = c.NextSibling {
+		lute.adjustVditorDOM0(c)
 	}
 }
 
@@ -241,7 +247,8 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 		// 合并邻接的 ul
 
 		if nil != n.NextSibling && atom.Ul == n.NextSibling.DataAtom {
-			if nextTight := lute.domAttrValue(n.NextSibling, "data-tight"); "" == nextTight {
+			tight := lute.domAttrValue(n, "data-tight")
+			if nextTight := lute.domAttrValue(n.NextSibling, "data-tight"); "" == nextTight || tight == nextTight {
 				for c := n.NextSibling.FirstChild; nil != c; c = c.NextSibling {
 					c.Unlink()
 					n.AppendChild(c)
@@ -252,7 +259,8 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 		// 合并邻接的 ol
 
 		if nil != n.NextSibling && atom.Ol == n.NextSibling.DataAtom {
-			if nextTight := lute.domAttrValue(n.NextSibling, "data-tight"); "" == nextTight {
+			tight := lute.domAttrValue(n, "data-tight")
+			if nextTight := lute.domAttrValue(n.NextSibling, "data-tight"); "" == nextTight || tight == nextTight {
 				for c := n.NextSibling.FirstChild; nil != c; c = c.NextSibling {
 					c.Unlink()
 					n.AppendChild(c)
