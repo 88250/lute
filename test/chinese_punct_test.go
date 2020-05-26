@@ -18,6 +18,9 @@ import (
 
 var chinesePunctTests = []parseTest{
 
+	{"13", "文件后缀.md测试\n", "<p>文件后缀.md 测试</p>\n"},
+	{"13", "文件后缀.textbundle测试\n", "<p>文件后缀.textbundle 测试</p>\n"},
+
 	// 英文逗号标点在英文和中文之间需要渲染为中文逗号 https://github.com/88250/lute/issues/54
 	{"12", "test,测试\n", "<p>test，测试</p>\n"},
 

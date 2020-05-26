@@ -28,7 +28,7 @@ func isFileExt(pos, length int, runes *[]rune) bool {
 }
 
 var commonFileTypesLen = len(commonFileTypes)
-var maxCommonFileTypeLen = 5 // woff2
+var maxCommonFileTypeLen = 10 // textbundle
 
 // commonFileTypes 列出了常见的文件后缀，主要用于判断是否需要将英文句号.转换为中文句号。
 var commonFileTypes = []string{
@@ -108,6 +108,7 @@ var commonFileTypes = []string{
 	"xlsx",
 	"ppt",
 	"pptx",
+	"md",
 
 	// 字体
 
@@ -128,4 +129,8 @@ var commonFileTypes = []string{
 	"css",
 	"go",
 	"java",
+
+	// 其他
+
+	"textbundle",
 }
