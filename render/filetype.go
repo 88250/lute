@@ -109,6 +109,7 @@ var commonFileTypes = []string{
 	"ppt",
 	"pptx",
 	"md",
+	"txt",
 
 	// 字体
 
