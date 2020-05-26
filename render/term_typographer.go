@@ -157,7 +157,7 @@ var terms = map[string]string{
 	"gitlab":        "GitLab",
 	"jquery":        "jQuery",
 	"angularjs":     "AngularJS",
-	"ffmpeg":        "FFMPEG",
+	"ffmpeg":        "FFmpeg",
 	"git":           "Git",
 	"svn":           "SVN",
 	"vim":           "VIM",
