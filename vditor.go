@@ -195,9 +195,14 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
-	if 1 < len(nodes) {
+	length := len(nodes)
+	if 0 == length {
+		return
+	}
+
+	if 1 < length {
 		i := 0
-		for j := 1; j < len(nodes); j++ {
+		for j := 1; j < length; j++ {
 			nodes[i].InsertAfter(nodes[j])
 			i++
 		}
