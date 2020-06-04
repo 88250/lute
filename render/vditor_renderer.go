@@ -525,7 +525,14 @@ func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 	r.WriteString("<pre>")
 	r.tag("code", nil, false)
 	r.Write(util.EscapeHTML(tokens))
-	r.WriteString("</code></pre></div>")
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+	r.Write(tokens)
+	r.WriteString("</pre>")
+
+	r.WriteString("</div>")
 	return ast.WalkStop
 }
 

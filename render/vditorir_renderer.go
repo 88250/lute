@@ -651,12 +651,19 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString(`<div class="vditor-ir__block" data-type="html-block" data-block="0">`)
+	r.WriteString(`<div class="vditor-ir__node" data-type="html-block" data-block="0">`)
 	node.Tokens = bytes.TrimSpace(node.Tokens)
-	r.WriteString("<pre class=\"vditor-ir__marker--pre\">")
+	r.WriteString("<pre class=\"vditor-ir__marker--pre vditor-ir__marker\">")
 	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
 	r.Write(util.EscapeHTML(node.Tokens))
-	r.WriteString("</code></pre></div>")
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Caret), nil)
+	r.Write(tokens)
+	r.WriteString("</pre>")
+
+	r.WriteString("</div>")
 	return ast.WalkStop
 }
 
