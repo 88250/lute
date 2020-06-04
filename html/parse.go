@@ -49,6 +49,8 @@ type parser struct {
 	// context is the context element when parsing an HTML fragment
 	// (section 12.4).
 	context *Node
+	// escapeHtmlEntity 配置是否反转文本内容中的 HTML 实体（&amp; -> &） 默认开启
+	escapeHtmlEntity bool
 }
 
 func (p *parser) top() *Node {
@@ -2325,6 +2327,13 @@ func ParseOptionEnableScripting(enable bool) ParseOption {
 	}
 }
 
+// ParseOptionHtmlEntity 设置是否进行 HTML 实体反转。
+func ParseOptionEnableHtmlEntity(enable bool) ParseOption {
+	return func(p *parser) {
+		p.escapeHtmlEntity = enable
+	}
+}
+
 // ParseWithOptions is like Parse, with options.
 func ParseWithOptions(r io.Reader, opts ...ParseOption) (*Node, error) {
 	p := &parser{
@@ -2364,7 +2373,6 @@ func ParseFragmentWithOptions(r io.Reader, context *Node, opts ...ParseOption) (
 		contextTag = context.DataAtom.String()
 	}
 	p := &parser{
-		tokenizer: NewTokenizerFragment(r, contextTag),
 		doc: &Node{
 			Type: DocumentNode,
 		},
@@ -2372,6 +2380,7 @@ func ParseFragmentWithOptions(r io.Reader, context *Node, opts ...ParseOption) (
 		fragment:  true,
 		context:   context,
 	}
+	p.tokenizer = NewTokenizerFragment(p, r, contextTag)
 
 	for _, f := range opts {
 		f(p)

@@ -51,7 +51,7 @@ var vditorDOM2MdTests = []parseTest{
 	{"84", `<table data-block="0"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>foo<wbr><br></td></tr></tbody></table>`, "| col1 |\n| - |\n| foo |\n"},
 	{"83", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p>foo</p><p data-block=\"0\">b<wbr></p></li></ul>", "* foo\n\n  b\n"},
 	{"82", "<ol data-tight=\"true\" data-block=\"0\"><li data-marker=\"1.\"><p>[x] foo<wbr></p></li></ol>", "1. [x] foo\n"},
-	{"81", "<p data-block=\"0\">f&#8203;b</p>", "fb\n"},
+	{"81", "<p data-block=\"0\">f&#8203;b</p>", "f&#8203;b\n"},
 	{"80", "<p data-block=\"0\"><span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">\u200b<code data-type=\"html-inline\" style=\"display: none;\">&lt;foo&gt;</code></span>b<wbr>\n</p>", "<foo>b\n"},
 	{"79", "<p>\u200bfoo<wbr></p>", "foo\n"},
 	{"78", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p>a​​​​</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p><br></p></li><li data-marker=\"*\"><p><wbr>b</p></li></ul></li></ul>", "* a\n  * \n  * b\n"},

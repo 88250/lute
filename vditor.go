@@ -145,7 +145,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 
 	reader := strings.NewReader(htmlStr)
 	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
+	htmlNodes, err := html.ParseFragmentWithOptions(reader, htmlRoot, html.ParseOptionEnableHtmlEntity(true))
 	if nil != err {
 		markdown = err.Error()
 		return
@@ -918,6 +918,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = codeTokens
 			tree.Context.Tip.AppendChild(node)
 		} else if "code-inline" == dataType {
+			node.Tokens = codeTokens
+			tree.Context.Tip.AppendChild(node)
+		} else if "html-entity" == dataType {
+			node.Type = ast.NodeText
 			node.Tokens = codeTokens
 			tree.Context.Tip.AppendChild(node)
 		}

@@ -92,6 +92,10 @@ type Node struct {
 	FootnotesRefLabel []byte  // 脚注引用 label，[^label]
 	FootnotesRefId    string  // 脚注 id
 	FootnotesRefs     []*Node // 脚注引用
+
+	// HTML 实体
+
+	EntityTokens []byte // 原始输入的实体 tokens，&amp;
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。

@@ -103,6 +103,7 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
+	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	return ret
 }
 
@@ -146,6 +147,30 @@ func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	}
 	r.WriteString("</ol></div>")
 	return r.Writer.Bytes()
+}
+
+func (r *VditorRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
+	previousNodeText := node.PreviousNodeText()
+	previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+	if "" == previousNodeText {
+		r.WriteString(parse.Zwsp)
+	}
+
+	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-entity\">")
+	r.tag("code", [][]string{{"data-type", "html-entity"}}, false)
+	tokens := append([]byte(parse.Zwsp), node.EntityTokens...)
+	r.Write(tokens)
+	r.WriteString("</code>")
+
+	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", nil, false)
+	previewTokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Caret), nil)
+	r.Write(util.EscapeHTML(previewTokens))
+	r.tag("/code", nil, false)
+	r.tag("/span", nil, false)
+	r.WriteString("</span>" + parse.Zwsp)
+
+	return ast.WalkStop
 }
 
 func (r *VditorRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
