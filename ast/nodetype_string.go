@@ -52,6 +52,7 @@ func _() {
 	_ = x[NodeLinkDest-41]
 	_ = x[NodeLinkTitle-42]
 	_ = x[NodeLinkSpace-43]
+	_ = x[NodeHTMLEntity-44]
 	_ = x[NodeTaskListItemMarker-100]
 	_ = x[NodeStrikethrough-101]
 	_ = x[NodeStrikethrough1OpenMarker-102]
@@ -83,7 +84,7 @@ func _() {
 }
 
 const (
-	_NodeType_name_0 = "NodeDocumentNodeParagraphNodeHeadingNodeHeadingC8hMarkerNodeThematicBreakNodeBlockquoteNodeBlockquoteMarkerNodeListNodeListItemNodeHTMLBlockNodeInlineHTMLNodeCodeBlockNodeCodeBlockFenceOpenMarkerNodeCodeBlockFenceCloseMarkerNodeCodeBlockFenceInfoMarkerNodeCodeBlockCodeNodeTextNodeEmphasisNodeEmA6kOpenMarkerNodeEmA6kCloseMarkerNodeEmU8eOpenMarkerNodeEmU8eCloseMarkerNodeStrongNodeStrongA6kOpenMarkerNodeStrongA6kCloseMarkerNodeStrongU8eOpenMarkerNodeStrongU8eCloseMarkerNodeCodeSpanNodeCodeSpanOpenMarkerNodeCodeSpanContentNodeCodeSpanCloseMarkerNodeHardBreakNodeSoftBreakNodeLinkNodeImageNodeBangNodeOpenBracketNodeCloseBracketNodeOpenParenNodeCloseParenNodeLinkTextNodeLinkDestNodeLinkTitleNodeLinkSpace"
+	_NodeType_name_0 = "NodeDocumentNodeParagraphNodeHeadingNodeHeadingC8hMarkerNodeThematicBreakNodeBlockquoteNodeBlockquoteMarkerNodeListNodeListItemNodeHTMLBlockNodeInlineHTMLNodeCodeBlockNodeCodeBlockFenceOpenMarkerNodeCodeBlockFenceCloseMarkerNodeCodeBlockFenceInfoMarkerNodeCodeBlockCodeNodeTextNodeEmphasisNodeEmA6kOpenMarkerNodeEmA6kCloseMarkerNodeEmU8eOpenMarkerNodeEmU8eCloseMarkerNodeStrongNodeStrongA6kOpenMarkerNodeStrongA6kCloseMarkerNodeStrongU8eOpenMarkerNodeStrongU8eCloseMarkerNodeCodeSpanNodeCodeSpanOpenMarkerNodeCodeSpanContentNodeCodeSpanCloseMarkerNodeHardBreakNodeSoftBreakNodeLinkNodeImageNodeBangNodeOpenBracketNodeCloseBracketNodeOpenParenNodeCloseParenNodeLinkTextNodeLinkDestNodeLinkTitleNodeLinkSpaceNodeHTMLEntity"
 	_NodeType_name_1 = "NodeTaskListItemMarkerNodeStrikethroughNodeStrikethrough1OpenMarkerNodeStrikethrough1CloseMarkerNodeStrikethrough2OpenMarkerNodeStrikethrough2CloseMarkerNodeTableNodeTableHeadNodeTableRowNodeTableCell"
 	_NodeType_name_2 = "NodeEmojiNodeEmojiUnicodeNodeEmojiImgNodeEmojiAlias"
 	_NodeType_name_3 = "NodeMathBlockNodeMathBlockOpenMarkerNodeMathBlockContentNodeMathBlockCloseMarkerNodeInlineMathNodeInlineMathOpenMarkerNodeInlineMathContentNodeInlineMathCloseMarker"
@@ -94,7 +95,7 @@ const (
 )
 
 var (
-	_NodeType_index_0 = [...]uint16{0, 12, 25, 36, 56, 73, 87, 107, 115, 127, 140, 154, 167, 195, 224, 252, 269, 277, 289, 308, 328, 347, 367, 377, 400, 424, 447, 471, 483, 505, 524, 547, 560, 573, 581, 590, 598, 613, 629, 642, 656, 668, 680, 693, 706}
+	_NodeType_index_0 = [...]uint16{0, 12, 25, 36, 56, 73, 87, 107, 115, 127, 140, 154, 167, 195, 224, 252, 269, 277, 289, 308, 328, 347, 367, 377, 400, 424, 447, 471, 483, 505, 524, 547, 560, 573, 581, 590, 598, 613, 629, 642, 656, 668, 680, 693, 706, 720}
 	_NodeType_index_1 = [...]uint8{0, 22, 39, 67, 96, 124, 153, 162, 175, 187, 200}
 	_NodeType_index_2 = [...]uint8{0, 9, 25, 37, 51}
 	_NodeType_index_3 = [...]uint8{0, 13, 36, 56, 80, 94, 118, 139, 164}
@@ -104,7 +105,7 @@ var (
 
 func (i NodeType) String() string {
 	switch {
-	case 0 <= i && i <= 43:
+	case 0 <= i && i <= 44:
 		return _NodeType_name_0[_NodeType_index_0[i]:_NodeType_index_0[i+1]]
 	case 100 <= i && i <= 109:
 		i -= 100

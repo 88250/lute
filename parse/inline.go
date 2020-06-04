@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -91,17 +90,12 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *ast.Node) {
 		}
 	}
 
-	entityName := util.BytesToStr(ctx.tokens[start:i])
-	if entityValue, ok := html.Entities[entityName]; ok {
-		ctx.pos += i - start
-		return &ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(entityValue)}
-	}
-
 	if !endWithSemicolon {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: and}
 	}
 
+	entityName := util.BytesToStr(ctx.tokens[start:i])
 	if numeric {
 		entityNameLen := len(entityName)
 		if 10 < entityNameLen || 4 > entityNameLen {
@@ -109,12 +103,9 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *ast.Node) {
 			return &ast.Node{Type: ast.NodeText, Tokens: and}
 		}
 
-		hex := 'x' == entityName[2] || 'X' == entityName[2]
-		if hex {
-			if 5 > entityNameLen {
-				ctx.pos++
-				return &ast.Node{Type: ast.NodeText, Tokens: and}
-			}
+		if ('x' == entityName[2] || 'X' == entityName[2]) && 5 > entityNameLen {
+			ctx.pos++
+			return &ast.Node{Type: ast.NodeText, Tokens: and}
 		}
 	}
 
@@ -124,7 +115,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *ast.Node) {
 		return &ast.Node{Type: ast.NodeText, Tokens: and}
 	}
 	ctx.pos += i - start
-	return &ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(v)}
+	return &ast.Node{Type: ast.NodeHTMLEntity, Tokens: util.StrToBytes(v)}
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,

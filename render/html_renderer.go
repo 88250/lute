@@ -103,7 +103,13 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
+	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	return ret
+}
+
+func (r *HtmlRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(util.EscapeHTML(node.Tokens))
+	return ast.WalkStop
 }
 
 func (r *HtmlRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {

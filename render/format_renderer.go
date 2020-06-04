@@ -103,6 +103,7 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
+	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	return ret
 }
 
@@ -122,6 +123,11 @@ func (r *FormatRenderer) Render() (output []byte) {
 	}
 	output = append(output, buf.Bytes()...)
 	return
+}
+
+func (r *FormatRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(node.Tokens)
+	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
