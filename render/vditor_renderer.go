@@ -165,7 +165,7 @@ func (r *VditorRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.Wal
 	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", nil, false)
 	previewTokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Caret), nil)
-	r.Write(util.EscapeHTML(previewTokens))
+	r.Write(util.EscapeHTML(util.EscapeHTML(previewTokens)))
 	r.tag("/code", nil, false)
 	r.tag("/span", nil, false)
 	r.WriteString("</span>" + parse.Zwsp)

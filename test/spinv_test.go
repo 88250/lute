@@ -18,7 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"121", "a&amp;b", "<p data-block=\"0\">a<span class=\"vditor-wysiwyg__block\" data-type=\"html-entity\"><code data-type=\"html-entity\">\u200b&amp;</code><span class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>&amp;</code></span></span>\u200bb\n</p>"},
+	{"121", "a&amp;b", "<p data-block=\"0\">a<span class=\"vditor-wysiwyg__block\" data-type=\"html-entity\"><code data-type=\"html-entity\">\u200b&amp;</code><span class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>&amp;amp;</code></span></span>\u200bb\n</p>"},
 	{"120", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\"> test<wbr></li></ul><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\"> test</li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> test<wbr></li><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> test</li></ul>"},
 	{"119", "&parx", "<p data-block=\"0\">&amp;parx\n</p>"},
 	{"118", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\"><p>[ ]<wbr></p></li></ul>", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\" class=\"vditor-task\"><input type=\"checkbox\" /> <wbr></li></ul>"},
