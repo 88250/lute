@@ -18,6 +18,7 @@ import (
 
 var html2VditorDOMTests = []parseTest{
 
+	{"4", `<iframe src="foo" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>`, `<iframe src="foo" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>`},
 	{"3", `<!--StartFragment--><a href="https://hacpai.com/article/1553314676872?r=Vanessa">每天 30 秒系列</a><!--EndFragment-->`, "<p data-block=\"0\"><a href=\"https://hacpai.com/article/1553314676872?r=Vanessa\">每天 30 秒系列</a>\n</p>"},
 	{"2", `<!--StartFragment--><span>Use<span>&nbsp;</span></span><code class="language-text">new Date()</code><span><span>&nbsp;</span>and</span><!--EndFragment-->`, "<p data-block=\"0\">Use <code data-marker=\"`\">\u200bnew Date()</code>\u200b and\n</p>"},
 	{"1", `<pre><code class="language-text">&gt;</code></pre>`, "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre class=\"vditor-wysiwyg__pre\"><code class=\"language-text\">&gt;\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code class=\"language-text\">&gt;\n</code></pre></div>"},

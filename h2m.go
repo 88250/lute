@@ -369,7 +369,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Summary:
 		return
 	default:
-		break
+	case atom.Iframe, atom.Audio, atom.Video:
+		node.Type = ast.NodeHTMLBlock
+		node.Tokens = lute.domHTML(n)
+		tree.Context.Tip.AppendChild(node)
+		return
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
