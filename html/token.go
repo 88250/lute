@@ -125,8 +125,6 @@ type span struct {
 
 // A Tokenizer returns a stream of HTML Tokens.
 type Tokenizer struct {
-	// parser is the parser related with this tokenizer
-	parser *parser
 	// r is the source of the HTML text.
 	r io.Reader
 	// tt is the TokenType of the current token.
@@ -1123,13 +1121,7 @@ func (z *Tokenizer) Text() []byte {
 			s = bytes.Replace(s, nul, replacement, -1)
 		}
 		if !z.textIsRaw {
-			if nil == z.parser {
-				s = unescape(s, false)
-			} else {
-				if !z.parser.escapeHtmlEntity {
-					s = unescape(s, false)
-				}
-			}
+			s = unescape(s, false)
 		}
 		return s
 	}
@@ -1201,7 +1193,7 @@ func (z *Tokenizer) SetMaxBuf(n int) {
 // NewTokenizer returns a new HTML Tokenizer for the given Reader.
 // The input is assumed to be UTF-8 encoded.
 func NewTokenizer(r io.Reader) *Tokenizer {
-	return NewTokenizerFragment(nil,r, "")
+	return NewTokenizerFragment(r, "")
 }
 
 // NewTokenizerFragment returns a new HTML Tokenizer for the given Reader, for
@@ -1212,11 +1204,10 @@ func NewTokenizer(r io.Reader) *Tokenizer {
 // for a <p> tag or a <script> tag.
 //
 // The input is assumed to be UTF-8 encoded.
-func NewTokenizerFragment(parser *parser, r io.Reader, contextTag string) *Tokenizer {
+func NewTokenizerFragment(r io.Reader, contextTag string) *Tokenizer {
 	z := &Tokenizer{
-		parser: parser,
-		r:      r,
-		buf:    make([]byte, 0, 4096),
+		r:   r,
+		buf: make([]byte, 0, 4096),
 	}
 	if contextTag != "" {
 		switch s := strings.ToLower(contextTag); s {

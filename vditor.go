@@ -145,7 +145,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 
 	reader := strings.NewReader(htmlStr)
 	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragmentWithOptions(reader, htmlRoot, html.ParseOptionEnableHtmlEntity(true))
+	htmlNodes, err := html.ParseFragmentWithOptions(reader, htmlRoot)
 	if nil != err {
 		markdown = err.Error()
 		return
