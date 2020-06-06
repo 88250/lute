@@ -101,6 +101,7 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
+	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	return ret
 }
 
@@ -144,6 +145,23 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	}
 	r.WriteString("</div>")
 	return r.Writer.Bytes()
+}
+
+func (r *VditorSVRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderSpanNode(node)
+		r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "html-entity"}}, false)
+		r.Write(util.EscapeHTML(util.EscapeHTML(node.Tokens)))
+		r.tag("/code", nil, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+		r.tag("code", nil, false)
+		r.Write(util.UnescapeHTML(node.HtmlEntityTokens))
+		r.tag("/code", nil, false)
+		r.tag("/span", nil, false)
+	} else {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
