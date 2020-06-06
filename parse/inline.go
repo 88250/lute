@@ -115,7 +115,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *ast.Node) {
 		return &ast.Node{Type: ast.NodeText, Tokens: and}
 	}
 	ctx.pos += i - start
-	return &ast.Node{Type: ast.NodeHTMLEntity, Tokens: util.StrToBytes(v), EntityTokens: util.StrToBytes(entityName)}
+	return &ast.Node{Type: ast.NodeHTMLEntity, Tokens: util.StrToBytes(v), HtmlEntityTokens: util.StrToBytes(entityName)}
 }
 
 // Try to match close bracket against an opening in the delimiter stack. Add either a link or image, or a plain [ character,

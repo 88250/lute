@@ -728,6 +728,10 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		} else if "code-inline" == dataType {
 			node.Tokens = codeTokens
 			tree.Context.Tip.AppendChild(node)
+		} else if "html-entity" == dataType {
+			node.Type = ast.NodeText
+			node.Tokens = codeTokens
+			tree.Context.Tip.AppendChild(node)
 		}
 		return
 	case atom.Font:

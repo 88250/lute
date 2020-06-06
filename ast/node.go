@@ -95,7 +95,7 @@ type Node struct {
 
 	// HTML 实体
 
-	EntityTokens []byte // 原始输入的实体 tokens，&amp;
+	HtmlEntityTokens []byte // 原始输入的实体 tokens，&amp;
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
