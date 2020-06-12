@@ -18,7 +18,28 @@ import (
 
 var html2MdTests = []parseTest{
 
-	{"26", "", "\n"},
+	{"27", `<html>
+<body>
+       <table>
+               <thead>
+                       <tr>
+                               <th>Month</th>
+                               <th>Savings</th>
+                       </tr>
+				</thead>
+               <tbody>
+                       <tr>
+                               <td>January</td>
+                               <td>$100</td>
+                       </tr>
+                       <tr>
+                               <td>February</td>
+                               <td>$80</td>
+                       </tr>
+               </tbody>
+       </table>
+</body>
+</html>`, "| Month | Savings |\n| - | - |\n| January | $100 |\n| February | $80 |\n"},
 	{"26", "<table class=\"markdown-reference\"><thead><tr><th>Type</th><th class=\"second-example\">Or</th><th>… to Get</th></tr></thead><tbody><tr><td class=\"preformatted\">*Italic*</td><td class=\"preformatted second-example\">_Italic_</td><td><em>Italic</em></td></tr><tr><td class=\"preformatted\">**Bold**</td><td class=\"preformatted second-example\">__Bold__</td><td><strong>Bold</strong></td></tr><tr><td class=\"preformatted\"># Heading 1</td><td class=\"preformatted second-example\">Heading 1<br>=========</td><td><h1 class=\"smaller-h1\">Heading 1</h1></td></tr><tr><td class=\"preformatted\">## Heading 2</td><td class=\"preformatted second-example\">Heading 2<br>---------</td><td><h2 class=\"smaller-h2\">Heading 2</h2></td></tr><tr><td class=\"preformatted\">[Link](http://a.com)</td><td class=\"preformatted second-example\">[Link][1]<br>⋮<br>[1]: http://b.org</td><td><a href=\"https://commonmark.org/\">Link</a></td></tr><tr><td class=\"preformatted\">![Image](http://url/a.png)</td><td class=\"preformatted second-example\">![Image][1]<br>⋮<br>[1]: http://url/b.jpg</td><td><img src=\"https://commonmark.org/help/images/favicon.png\" width=\"36\" height=\"36\" alt=\"Markdown\"></td></tr><tr><td class=\"preformatted\">&gt; Blockquote</td><td class=\"preformatted second-example\">&nbsp;</td><td><blockquote>Blockquote</blockquote></td></tr><tr><td class=\"preformatted\"><p>* List<br>* List<br>* List</p></td><td class=\"preformatted second-example\"><p>- List<br>- List<br>- List<br></p></td><td><ul><li>List</li><li>List</li><li>List</li></ul></td></tr></tbody></table>", "| Type | Or | … to Get |\n| - | - | - |\n| *Italic* | _Italic_ | *Italic* |\n| **Bold** | __Bold__ | **Bold** |\n| # Heading 1 | Heading 1<br/>========= | # Heading 1 |\n| ## Heading 2 | Heading 2<br/>--------- | ## Heading 2 |\n| [Link](http://a.com) | [Link][1]<br/>⋮<br/>[1]: http://b.org | [Link](https://commonmark.org/) |\n| ![Image](http://url/a.png) | ![Image][1]<br/>⋮<br/>[1]: http://url/b.jpg | ![Markdown](https://commonmark.org/help/images/favicon.png) |\n| > Blockquote |   | > Blockquote |\n| * List<br/>* List<br/>* List | - List<br/>- List<br/>- List<br/> | * List* List* List |\n"},
 	{"25", "<table class=\"table table-bordered\"><thead class=\"thead-light\"><tr><th>Element</th><th>Markdown Syntax</th></tr></thead><tbody><tr><td><a href=\"https://www.markdownguide.org/extended-syntax/#tables\">Table</a></td><td><code>| Syntax | Description |<br>| ----------- | ----------- |<br>| Header | Title |<br>| Paragraph | Text |</code></td></tr><tr><td><a href=\"https://www.markdownguide.org/extended-syntax/#fenced-code-blocks\">Fenced Code Block</a></td><td><code>```<br>{<br>&nbsp;&nbsp;\"firstName\": \"John\",<br>&nbsp;&nbsp;\"lastName\": \"Smith\",<br>&nbsp;&nbsp;\"age\": 25<br>}<br>```</code></td></tr></tbody></table>", "| Element | Markdown Syntax |\n| - | - |\n| [Table](https://www.markdownguide.org/extended-syntax/#tables) | <code>\\| Syntax \\| Description \\|\\| ----------- \\| ----------- \\|\\| Header \\| Title \\|\\| Paragraph \\| Text \\|</code> |\n| [Fenced Code Block](https://www.markdownguide.org/extended-syntax/#fenced-code-blocks) | <code>```{\u00a0\u00a0\"firstName\": \"John\",\u00a0\u00a0\"lastName\": \"Smith\",\u00a0\u00a0\"age\": 25}```</code> |\n"},
 	{"24", "<table><thead><tr><th>Element</th><th>Markdown Syntax</th></tr></thead><tbody><tr><td>Table</td><td><code>| Syntax | Description |<br>| ----------- | ----------- |<br>| Header | Title |<br>| Paragraph | Text |</code></td></tr></tbody></table>", "| Element | Markdown Syntax |\n| - | - |\n| Table | <code>\\| Syntax \\| Description \\|\\| ----------- \\| ----------- \\|\\| Header \\| Title \\|\\| Paragraph \\| Text \\|</code> |\n"},
