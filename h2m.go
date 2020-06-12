@@ -333,7 +333,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Tbody:
 	case atom.Tr:
+		table := n.Parent.Parent
 		node.Type = ast.NodeTableRow
+		if atom.Thead != table.FirstChild.DataAtom && n == n.Parent.FirstChild {
+			// 补全 thread 节点
+			thead := &ast.Node{Type: ast.NodeTableHead}
+			tree.Context.Tip.AppendChild(thead)
+			tree.Context.Tip = thead
+			defer tree.Context.ParentTip()
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
