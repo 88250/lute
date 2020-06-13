@@ -669,7 +669,7 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString(`<div class="vditor-ir__node" data-type="html-block" data-block="0">`)
+	r.renderDivNode(node)
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.WriteString("<pre class=\"vditor-ir__marker--pre vditor-ir__marker\">")
 	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
@@ -1089,7 +1089,7 @@ func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
-			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent:
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeHTMLBlock:
 				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
 				ret += string(n.CodeBlockInfo)
