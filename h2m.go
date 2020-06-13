@@ -234,7 +234,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if bytes.Contains(code, []byte(">")) {
 			code = code[bytes.Index(code, []byte(">"))+1:]
 		}
-		code = bytes.TrimRight(code, "</code>")
+		code = bytes.TrimSuffix(code, []byte("</code>"))
 		unescaped := html.UnescapeString(string(code))
 		code = []byte(unescaped)
 		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: code}

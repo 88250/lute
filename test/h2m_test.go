@@ -17,7 +17,7 @@ import (
 )
 
 var html2MdTests = []parseTest{
-
+	{"29", "<p>测试 <code>name</code> 属性。调用 <code>getValue</code> 时 <code>Method</code></p>", "测试 `name` 属性。调用 `getValue` 时 `Method`\n"},
 	{"28", `<html>
 <body>
 	<table>
