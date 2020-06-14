@@ -21,7 +21,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-const Version = "1.4.6"
+const Version = "1.4.7"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
