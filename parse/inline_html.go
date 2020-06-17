@@ -116,9 +116,6 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		if lex.ItemSlash == tokens[0] {
 			tags = append(tags, tokens[1])
 		}
-		if vditor &&  -1 < caretIndex && caretIndex >= greaterIndex {
-			tags = append(tags, []byte(Caret)...)
-		}
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 		return
