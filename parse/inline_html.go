@@ -83,9 +83,11 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 
 	vditor := t.Context.Option.VditorWYSIWYG
 	var caretIndex int
+	var greaterIndex int
 	if vditor {
 		caretIndex = bytes.Index(tokens, []byte(Caret))
 		if -1 < caretIndex {
+			greaterIndex = bytes.IndexByte(tokens, lex.ItemGreater)
 			tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
 		}
 	}
@@ -101,16 +103,21 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	if (lex.ItemGreater == tokens[0]) ||
 		(1 < ctx.tokensLen && lex.ItemSlash == tokens[0] && lex.ItemGreater == tokens[1]) {
 		if vditor {
-			if -1 < caretIndex && len(whitespaces) > caretIndex {
-				whitespaces = append(whitespaces[:caretIndex], append([]byte(Caret), whitespaces[caretIndex:]...)...)
-			} else {
-				whitespaces = append(whitespaces, []byte(Caret)...)
+			if caretIndex < greaterIndex {
+				if -1 < caretIndex && len(whitespaces) > caretIndex {
+					whitespaces = append(whitespaces[:caretIndex], append([]byte(Caret), whitespaces[caretIndex:]...)...)
+				} else {
+					whitespaces = append(whitespaces, []byte(Caret)...)
+				}
 			}
 		}
 		tags = append(tags, whitespaces...)
 		tags = append(tags, tokens[0])
 		if lex.ItemSlash == tokens[0] {
 			tags = append(tags, tokens[1])
+		}
+		if caretIndex >= greaterIndex {
+			tags = append(tags, []byte(Caret)...)
 		}
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}

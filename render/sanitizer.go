@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"github.com/88250/lute/parse"
 	"io"
 	"strings"
 
@@ -37,17 +38,18 @@ var setOfElementsToSkipContent = map[string]interface{}{
 }
 
 var allowedAttrs = map[string]interface{}{
-	"id":     nil,
-	"title":  nil,
-	"alt":    nil,
-	"href":   nil,
-	"src":    nil,
-	"class":  nil,
-	"value":  nil,
-	"align":  nil,
-	"height": nil,
-	"width":  nil,
-	"data":   nil,
+	"id":        nil,
+	"title":     nil,
+	"alt":       nil,
+	"href":      nil,
+	"src":       nil,
+	"class":     nil,
+	"value":     nil,
+	"align":     nil,
+	"height":    nil,
+	"width":     nil,
+	"data":      nil,
+	parse.Caret: nil,
 }
 
 func sanitize(tokens []byte) []byte {
@@ -160,6 +162,11 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 	tokenBuff.WriteString("<")
 	tokenBuff.WriteString(token.Data)
 	for _, attr := range token.Attr {
+		if attr.Key == parse.Caret {
+			tokenBuff.WriteString(parse.Caret + " ")
+			continue
+		}
+
 		tokenBuff.WriteByte(' ')
 		tokenBuff.WriteString(attr.Key)
 		tokenBuff.WriteString(`="`)
