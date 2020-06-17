@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -227,4 +228,21 @@ func (r *BaseRenderer) headings() (ret []*ast.Node) {
 		}
 	}
 	return
+}
+
+func (r *BaseRenderer) renderListStyle(node *ast.Node, attrs *[][]string) {
+	if r.Option.RenderListStyle {
+		switch node.ListData.Typ {
+		case 0:
+			*attrs = append(*attrs, []string{"data-style", string(node.Marker)})
+		case 1:
+			*attrs = append(*attrs, []string{"data-style", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+		case 3:
+			if 0 == node.ListData.BulletChar {
+				*attrs = append(*attrs, []string{"data-style", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			} else {
+				*attrs = append(*attrs, []string{"data-style", string(node.Marker)})
+			}
+		}
+	}
 }

@@ -821,6 +821,7 @@ func (r *VditorRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
+		r.renderListStyle(node, &attrs)
 		r.tag("li", attrs, false)
 		if nil == node.FirstChild {
 			r.WriteString(parse.Zwsp)

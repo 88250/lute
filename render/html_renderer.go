@@ -656,20 +656,7 @@ func (r *HtmlRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 	if entering {
 		r.Newline()
 		var attrs [][]string
-		if r.Option.RenderListMarker {
-			switch node.ListData.Typ {
-			case 0:
-				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
-			case 1:
-				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
-			case 3:
-				if 0 == node.ListData.BulletChar {
-					attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
-				} else {
-					attrs = append(attrs, []string{"data-marker", string(node.Marker)})
-				}
-			}
-		}
+		r.renderListStyle(node, &attrs)
 		if 0 == node.BulletChar && 1 != node.Start {
 			attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
 		}

@@ -86,7 +86,7 @@ func NewOptions() *parse.Options {
 		EmojiSite:                      "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
 		LinkBase:                       "",
 		VditorCodeBlockPreview:         true,
-		RenderListMarker:               false,
+		RenderListStyle:                false,
 		Setext:                         true,
 		ChineseParagraphBeginningSpace: false,
 	}
@@ -276,8 +276,8 @@ func (lute *Lute) SetVditorCodeBlockPreview(b bool) {
 	lute.VditorCodeBlockPreview = b
 }
 
-func (lute *Lute) SetRenderListMarker(b bool) {
-	lute.RenderListMarker = b
+func (lute *Lute) SetRenderListStyle(b bool) {
+	lute.RenderListStyle = b
 }
 
 func (lute *Lute) SetSetext(b bool) {

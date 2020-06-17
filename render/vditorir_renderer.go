@@ -965,6 +965,7 @@ func (r *VditorIRRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
+		r.renderListStyle(node, &attrs)
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
