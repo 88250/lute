@@ -103,8 +103,8 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	if (lex.ItemGreater == tokens[0]) ||
 		(1 < ctx.tokensLen && lex.ItemSlash == tokens[0] && lex.ItemGreater == tokens[1]) {
 		if vditor {
-			if caretIndex < greaterIndex {
-				if -1 < caretIndex && len(whitespaces) > caretIndex {
+			if -1 < caretIndex && caretIndex < greaterIndex {
+				if len(whitespaces) > caretIndex {
 					whitespaces = append(whitespaces[:caretIndex], append([]byte(Caret), whitespaces[caretIndex:]...)...)
 				} else {
 					whitespaces = append(whitespaces, []byte(Caret)...)
@@ -116,7 +116,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		if lex.ItemSlash == tokens[0] {
 			tags = append(tags, tokens[1])
 		}
-		if caretIndex >= greaterIndex {
+		if vditor &&  -1 < caretIndex && caretIndex >= greaterIndex {
 			tags = append(tags, []byte(Caret)...)
 		}
 		ctx.pos += len(tags)

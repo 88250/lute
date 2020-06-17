@@ -49,6 +49,7 @@ var allowedAttrs = map[string]interface{}{
 	"height":    nil,
 	"width":     nil,
 	"data":      nil,
+	"open":      nil,
 	parse.Caret: nil,
 }
 
@@ -180,7 +181,7 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 		tokenBuff.WriteByte('"')
 	}
 	if token.Type == html.SelfClosingTagToken {
-		tokenBuff.WriteString("/")
+		tokenBuff.WriteString(" /")
 	}
 	tokenBuff.WriteString(">")
 	buff.WriteString(tokenBuff.String())
