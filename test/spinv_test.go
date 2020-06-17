@@ -18,6 +18,11 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"126", "<p data-block=\"0\">&lt;img src 。<wbr>", "<p data-block=\"0\">&lt;img src 。<wbr>\n</p>"},
+	{"125", "<p data-block=\"0\">&lt;img src=\"\"&gt;<wbr>\n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img src=&quot;&quot;<wbr>&gt;</code></span>\u200b\n</p>"},
+	{"124", "<p data-block=\"0\">​<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">​&lt;img src=\"\"&gt;<wbr></code></span>​\n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img src=&quot;&quot;<wbr>&gt;</code></span>\u200b\n</p>"},
+	{"123", "<p data-block=\"0\">&lt;img src=\"\"<wbr>\n</p>", "<p data-block=\"0\">&lt;img src=&quot;&quot;<wbr>\n</p>"},
+	{"122", "<p data-block=\"0\">​<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">​&lt;img src=\"\" <wbr> &gt;</code></span>​ 1\n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img src=&quot;&quot; <wbr> &gt;</code></span>\u200b 1\n</p>"},
 	{"121", "<p data-block=\"0\">&amp;<wbr></p>", "<p data-block=\"0\">&amp;<wbr>\n</p>"},
 	{"120", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\"> test<wbr></li></ul><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\"> test</li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> test<wbr></li><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> test</li></ul>"},
 	{"119", "&parx", "<p data-block=\"0\">&amp;parx\n</p>"},
