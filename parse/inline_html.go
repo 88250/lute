@@ -103,13 +103,11 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 
 	if (lex.ItemGreater == tokens[0]) ||
 		(1 < ctx.tokensLen && lex.ItemSlash == tokens[0] && lex.ItemGreater == tokens[1]) {
-		if vditor {
-			if -1 < caretIndex && caretIndex < greaterIndex {
-				if len(whitespaces) > caretIndex {
-					whitespaces = append(whitespaces[:caretIndex], append([]byte(util.Caret), whitespaces[caretIndex:]...)...)
-				} else {
-					whitespaces = append(whitespaces, []byte(util.Caret)...)
-				}
+		if vditor && -1 < caretIndex && caretIndex < greaterIndex {
+			if len(whitespaces) > caretIndex {
+				whitespaces = append(whitespaces[:caretIndex], append([]byte(util.Caret), whitespaces[caretIndex:]...)...)
+			} else {
+				whitespaces = append(whitespaces, []byte(util.Caret)...)
 			}
 		}
 		tags = append(tags, whitespaces...)
