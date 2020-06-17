@@ -37,19 +37,19 @@ var setOfElementsToSkipContent = map[string]interface{}{
 }
 
 var allowedAttrs = map[string]interface{}{
-	"id":        nil,
-	"title":     nil,
-	"alt":      nil,
-	"href":     nil,
-	"src":      nil,
-	"class":    nil,
-	"value":    nil,
-	"align":    nil,
-	"height":   nil,
-	"width":    nil,
-	"data":     nil,
-	"open":     nil,
-	util.Caret: nil,
+	"id":                  nil,
+	"title":               nil,
+	"alt":                 nil,
+	"href":                nil,
+	"src":                 nil,
+	"class":               nil,
+	"value":               nil,
+	"align":               nil,
+	"height":              nil,
+	"width":               nil,
+	"data":                nil,
+	"open":                nil,
+	util.CaretReplacement: nil,
 }
 
 func sanitize(tokens []byte) []byte {
@@ -60,12 +60,16 @@ func sanitize(tokens []byte) []byte {
 		mostRecentlyStartedToken string
 	)
 
+	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), []byte(util.CaretReplacement))
+
 	tokenizer := html.NewTokenizer(bytes.NewReader(tokens))
 	for {
 		if tokenizer.Next() == html.ErrorToken {
 			err := tokenizer.Err()
 			if err == io.EOF {
-				return buff.Bytes()
+				ret := buff.Bytes()
+				ret = bytes.ReplaceAll(ret, []byte(util.CaretReplacement), []byte(util.Caret))
+				return ret
 			}
 
 			return util.StrToBytes(err.Error())
@@ -162,13 +166,11 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 	tokenBuff.WriteString("<")
 	tokenBuff.WriteString(token.Data)
 	for _, attr := range token.Attr {
-		if attr.Key == util.Caret {
-			tokenBuff.WriteString(util.Caret)
-			continue
-		}
-
 		tokenBuff.WriteByte(' ')
 		tokenBuff.WriteString(attr.Key)
+		if attr.Key == util.CaretReplacement {
+			continue
+		}
 		tokenBuff.WriteString(`="`)
 		switch attr.Key {
 		case "href", "src":
@@ -204,7 +206,7 @@ func sanitizeAttrs(attrs []html.Attribute) (ret []html.Attribute) {
 
 func allowAttr(attrName string) bool {
 	for name := range allowedAttrs {
-		if strings.HasPrefix(attrName, name) {
+		if strings.Contains(attrName, name) {
 			return true
 		}
 	}
