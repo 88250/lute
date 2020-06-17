@@ -17,8 +17,14 @@ import (
 	"github.com/88250/lute/util"
 )
 
+var caretreplacement = []byte("caretreplacement")
+
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	tokens := ctx.tokens
+	if t.Context.Option.VditorWYSIWYG {
+		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), caretreplacement)
+	}
+
 	startPos := ctx.pos
 	ret = &ast.Node{Type: ast.NodeText, Tokens: []byte{tokens[ctx.pos]}}
 	if 3 > ctx.tokensLen || ctx.tokensLen <= startPos+1 {
@@ -82,17 +88,6 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		return
 	}
 
-	vditor := t.Context.Option.VditorWYSIWYG
-	var caretIndex int
-	var greaterIndex int
-	if vditor {
-		caretIndex = bytes.Index(tokens, []byte(util.Caret))
-		if -1 < caretIndex {
-			greaterIndex = bytes.IndexByte(tokens, lex.ItemGreater)
-			tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
-		}
-	}
-
 	length := len(tokens)
 	if 1 > length {
 		ctx.pos = startPos + 1
@@ -103,17 +98,13 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 
 	if (lex.ItemGreater == tokens[0]) ||
 		(1 < ctx.tokensLen && lex.ItemSlash == tokens[0] && lex.ItemGreater == tokens[1]) {
-		if vditor && -1 < caretIndex && caretIndex < greaterIndex {
-			if len(whitespaces) > caretIndex {
-				whitespaces = append(whitespaces[:caretIndex], append([]byte(util.Caret), whitespaces[caretIndex:]...)...)
-			} else {
-				whitespaces = append(whitespaces, []byte(util.Caret)...)
-			}
-		}
 		tags = append(tags, whitespaces...)
 		tags = append(tags, tokens[0])
 		if lex.ItemSlash == tokens[0] {
 			tags = append(tags, tokens[1])
+		}
+		if t.Context.Option.VditorWYSIWYG {
+			tags = bytes.ReplaceAll(tags, caretreplacement, []byte(util.Caret))
 		}
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
@@ -410,13 +401,13 @@ func (t *Tree) parseAttrName(tokens []byte) (remains, attrName []byte) {
 }
 
 func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
-	var caretIndex int
-	if t.Context.Option.VditorWYSIWYG {
-		caretIndex = bytes.Index(tokens, []byte(util.Caret))
-		if -1 < caretIndex {
-			tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
-		}
-	}
+	//var caretIndex int
+	//if t.Context.Option.VditorWYSIWYG {
+	//	caretIndex = bytes.Index(tokens, []byte(util.Caret))
+	//	if -1 < caretIndex {
+	//		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+	//	}
+	//}
 
 	if 1 > len(tokens) {
 		return
@@ -437,13 +428,13 @@ func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
 	}
 	remains = tokens[i:]
 
-	if t.Context.Option.VditorWYSIWYG && -1 < caretIndex {
-		if i <= caretIndex {
-			idx := caretIndex - i
-			remains = append(remains[:idx], append([]byte(util.Caret), remains[idx:]...)...)
-		} else {
-			tagName = append(tagName[:caretIndex], append([]byte(util.Caret), tagName[caretIndex:]...)...)
-		}
-	}
+	//if t.Context.Option.VditorWYSIWYG && -1 < caretIndex {
+	//	if i <= caretIndex {
+	//		idx := caretIndex - i
+	//		remains = append(remains[:idx], append([]byte(util.Caret), remains[idx:]...)...)
+	//	} else {
+	//		tagName = append(tagName[:caretIndex], append([]byte(util.Caret), tagName[caretIndex:]...)...)
+	//	}
+	//}
 	return
 }
