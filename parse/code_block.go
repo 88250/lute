@@ -13,6 +13,7 @@ package parse
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -96,7 +97,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 		return
 	}
 	info = lex.TrimWhitespace(infoTokens)
-	info = util.UnescapeString(info)
+	info = html.UnescapeBytes(info)
 	return true, fenceChar, fenceLen, t.Context.indent, openFence, info
 }
 
@@ -110,7 +111,7 @@ func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num in
 	}
 	tokens = lex.TrimWhitespace(tokens)
 	if context.Option.VditorWYSIWYG {
-		tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
 	}
 	for _, token := range tokens {
 		if token != openMarker {

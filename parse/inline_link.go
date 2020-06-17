@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"unicode/utf8"
 
 	"github.com/88250/lute/lex"
@@ -131,7 +132,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 
 	if nil != passed {
 		if !context.Option.VditorWYSIWYG {
-			destination = util.EncodeDestination(util.UnescapeString(destination))
+			destination = html.EncodeDestination(html.UnescapeBytes(destination))
 		}
 	}
 	return

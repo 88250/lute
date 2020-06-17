@@ -12,6 +12,7 @@ package parse
 
 import (
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
 func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
@@ -41,7 +42,7 @@ func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	}
 
 	if t.Context.Option.VditorWYSIWYG && caretInLn {
-		caretTokens = []byte(Caret)
+		caretTokens = []byte(util.Caret)
 	}
 
 	return 3 <= markerCnt, caretTokens

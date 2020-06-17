@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
 	"unicode"
@@ -120,7 +121,7 @@ func (r *VditorRenderer) Render() (output []byte) {
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
 		destStr := util.BytesToStr(dest)
 		r.WriteString("[" + util.BytesToStr(label) + "]:")
-		if parse.Caret != destStr {
+		if util.Caret != destStr {
 			r.WriteString(" ")
 		}
 		r.WriteString(destStr + "\n")
@@ -151,7 +152,7 @@ func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 
 func (r *VditorRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	previousNodeText := node.PreviousNodeText()
-	previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+	previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
 	if "" == previousNodeText {
 		r.WriteString(parse.Zwsp)
 	}
@@ -159,13 +160,13 @@ func (r *VditorRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.Wal
 	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-entity\">")
 	r.tag("code", [][]string{{"data-type", "html-entity"}}, false)
 	tokens := append([]byte(parse.Zwsp), node.Tokens...)
-	r.Write(util.EscapeHTML(util.EscapeHTML(tokens)))
+	r.Write(html.EscapeHTML(html.EscapeHTML(tokens)))
 	r.WriteString("</code>")
 
 	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", nil, false)
-	previewTokens := bytes.ReplaceAll(node.HtmlEntityTokens, []byte(parse.Caret), nil)
-	r.Write(util.UnescapeHTML(previewTokens))
+	previewTokens := bytes.ReplaceAll(node.HtmlEntityTokens, []byte(util.Caret), nil)
+	r.Write(html.UnescapeHTML(previewTokens))
 	r.tag("/code", nil, false)
 	r.tag("/span", nil, false)
 	r.WriteString("</span>" + parse.Zwsp)
@@ -173,7 +174,7 @@ func (r *VditorRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -204,10 +205,10 @@ func (r *VditorRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus
 		r.WriteString("[toc]<br>")
 	}
 	r.WriteString("</div>")
-	caretInDest := bytes.Contains(node.Tokens, []byte(parse.Caret))
+	caretInDest := bytes.Contains(node.Tokens, []byte(util.Caret))
 	r.WriteString("<p data-block=\"0\">")
 	if caretInDest {
-		r.WriteString(parse.Caret)
+		r.WriteString(util.Caret)
 	}
 	r.WriteString("</p>")
 	return ast.WalkStop
@@ -222,7 +223,7 @@ func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.W
 
 func (r *VditorRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	previousNodeText := node.PreviousNodeText()
-	previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+	previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
 	if "" == previousNodeText {
 		r.WriteString(parse.Zwsp)
 	}
@@ -273,14 +274,14 @@ func (r *VditorRenderer) renderInlineMathContent(node *ast.Node, entering bool) 
 	r.tag("code", [][]string{{"data-type", "math-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
 	previewTokens := tokens
-	tokens = util.EscapeHTML(tokens)
+	tokens = html.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
 	r.WriteString("</code>")
 
 	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", [][]string{{"class", "language-math"}}, false)
-	previewTokens = bytes.ReplaceAll(previewTokens, []byte(parse.Caret), nil)
+	previewTokens = bytes.ReplaceAll(previewTokens, []byte(util.Caret), nil)
 	r.Write(previewTokens)
 	r.tag("/code", nil, false)
 	r.tag("/span", nil, false)
@@ -295,7 +296,7 @@ func (r *VditorRenderer) renderInlineMathOpenMarker(node *ast.Node, entering boo
 func (r *VditorRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
 		if "" == previousNodeText {
 			r.WriteString(parse.Zwsp)
 		}
@@ -310,21 +311,21 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *ast.Node, entering boo
 func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	codeLen := len(node.Tokens)
-	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
+	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	r.WriteString("<pre>")
 	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
 	if codeIsEmpty {
 		r.WriteString("<wbr>\n")
 	} else {
-		r.Write(util.EscapeHTML(node.Tokens))
+		r.Write(html.EscapeHTML(node.Tokens))
 	}
 	r.WriteString("</code></pre>")
 
 	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
-	r.Write(util.EscapeHTML(tokens))
+	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -360,8 +361,8 @@ func (r *VditorRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 		r.tag(tag, attrs, false)
 		if nil == node.FirstChild {
 			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-		} else if bytes.Equal(node.FirstChild.Tokens, []byte(parse.Caret)) {
-			node.FirstChild.Tokens = []byte(parse.Caret + " ")
+		} else if bytes.Equal(node.FirstChild.Tokens, []byte(util.Caret)) {
+			node.FirstChild.Tokens = []byte(util.Caret + " ")
 		} else {
 			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
 		}
@@ -471,11 +472,11 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.Tree.Context.RelativePath(destTokens)
-			destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), nil)
+			destTokens = bytes.ReplaceAll(destTokens, []byte(util.Caret), nil)
 			r.Write(destTokens)
 			r.WriteString("\" alt=\"")
-			if alt := node.ChildByType(ast.NodeLinkText); nil != alt && bytes.Contains(alt.Tokens, []byte(parse.Caret)) {
-				alt.Tokens = bytes.ReplaceAll(alt.Tokens, []byte(parse.Caret), nil)
+			if alt := node.ChildByType(ast.NodeLinkText); nil != alt && bytes.Contains(alt.Tokens, []byte(util.Caret)) {
+				alt.Tokens = bytes.ReplaceAll(alt.Tokens, []byte(util.Caret), nil)
 			}
 		}
 		r.DisableTags++
@@ -487,7 +488,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 		r.WriteString("\"")
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 			r.WriteString(" title=\"")
-			title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(parse.Caret), nil)
+			title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(util.Caret), nil)
 			r.Write(title.Tokens)
 			r.WriteString("\"")
 		}
@@ -510,7 +511,7 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 	if entering {
 		if 3 == node.LinkType {
 			previousNodeText := node.PreviousNodeText()
-			previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+			previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
 			if "" == previousNodeText {
 				r.WriteString(parse.Zwsp)
 			}
@@ -527,15 +528,15 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
 		destTokens = r.Tree.Context.RelativePath(destTokens)
-		caretInDest := bytes.Contains(destTokens, []byte(parse.Caret))
+		caretInDest := bytes.Contains(destTokens, []byte(util.Caret))
 		if caretInDest {
 			text := node.ChildByType(ast.NodeLinkText)
-			text.Tokens = append(text.Tokens, []byte(parse.Caret)...)
-			destTokens = bytes.ReplaceAll(destTokens, []byte(parse.Caret), nil)
+			text.Tokens = append(text.Tokens, []byte(util.Caret)...)
+			destTokens = bytes.ReplaceAll(destTokens, []byte(util.Caret), nil)
 		}
 		attrs := [][]string{{"href", string(destTokens)}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(parse.Caret), nil)
+			title.Tokens = bytes.ReplaceAll(title.Tokens, []byte(util.Caret), nil)
 			attrs = append(attrs, []string{"title", string(title.Tokens)})
 		}
 		r.tag("a", attrs, false)
@@ -553,11 +554,11 @@ func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 	}
 	r.WriteString("<pre>")
 	r.tag("code", nil, false)
-	r.Write(util.EscapeHTML(tokens))
+	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 
 	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
+	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
 	r.Write(tokens)
 	r.WriteString("</pre>")
 
@@ -573,7 +574,7 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 
 	if entering {
 		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
 		if "" == previousNodeText {
 			r.WriteString(parse.Zwsp)
 		}
@@ -586,7 +587,7 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	if r.Option.Sanitize {
 		tokens = sanitize(tokens)
 	}
-	tokens = util.EscapeHTML(tokens)
+	tokens = html.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
 	r.WriteString("</code>")
@@ -625,17 +626,17 @@ func (r *VditorRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 
 	node.Tokens = bytes.TrimRight(node.Tokens, "\n")
 	// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
-	if !bytes.EqualFold(node.Tokens, []byte(parse.Caret+parse.Zwsp)) {
+	if !bytes.EqualFold(node.Tokens, []byte(util.Caret+parse.Zwsp)) {
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
 	}
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
 func (r *VditorRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, parse.Caret, "")
+		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
 		if "" == previousNodeText {
 			r.WriteString(parse.Zwsp)
 		} else {
@@ -655,7 +656,7 @@ func (r *VditorRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool)
 
 func (r *VditorRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
-	tokens = util.EscapeHTML(tokens)
+	tokens = html.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
 	return ast.WalkStop
@@ -896,14 +897,14 @@ func (r *VditorRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Walk
 
 func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	codeLen := len(node.Tokens)
-	codeIsEmpty := 1 > codeLen || (len(parse.Caret) == codeLen && parse.Caret == string(node.Tokens))
+	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	isFenced := node.Parent.IsFencedCodeBlock
 	var caretInInfo bool
 	var attrs [][]string
 	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
-		if bytes.Contains(node.Previous.CodeBlockInfo, []byte(parse.Caret)) {
+		if bytes.Contains(node.Previous.CodeBlockInfo, []byte(util.Caret)) {
 			caretInInfo = true
-			node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(parse.Caret), nil)
+			node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(util.Caret), nil)
 		}
 		if 0 < len(node.Previous.CodeBlockInfo) {
 			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
@@ -924,7 +925,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 		if caretInInfo {
 			r.WriteString("<wbr>")
 		}
-		r.Write(util.EscapeHTML(node.Tokens))
+		r.Write(html.EscapeHTML(node.Tokens))
 		r.Newline()
 	}
 	r.WriteString("</code></pre>")
@@ -933,8 +934,8 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 		r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 		r.tag("code", attrs, false)
 		tokens := node.Tokens
-		tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
-		r.Write(util.EscapeHTML(tokens))
+		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+		r.Write(html.EscapeHTML(tokens))
 		r.WriteString("</code></pre>")
 	}
 	return ast.WalkStop

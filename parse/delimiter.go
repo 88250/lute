@@ -13,6 +13,7 @@ package parse
 import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 	"unicode"
 	"unicode/utf8"
 )
@@ -260,7 +261,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		beforeIsPunct = false
 	}
 	if t.Context.Option.VditorWYSIWYG {
-		if Caret == string(tokenBefore) {
+		if util.Caret == string(tokenBefore) {
 			beforeIsPunct = false
 		}
 	}

@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
 	"unicode"
@@ -108,12 +109,12 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 }
 
 func (r *HtmlRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
 func (r *HtmlRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -221,7 +222,7 @@ func (r *HtmlRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool
 }
 
 func (r *HtmlRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -241,7 +242,7 @@ func (r *HtmlRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool)
 }
 
 func (r *HtmlRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -365,7 +366,7 @@ func (r *HtmlRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkSta
 	if r.Option.AutoSpace {
 		r.Space(node)
 	}
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -396,10 +397,10 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.Tree.Context.RelativePath(destTokens)
 			if "" != r.Option.ImageLazyLoading {
-				r.Write(util.EscapeHTML(util.StrToBytes(r.Option.ImageLazyLoading)))
+				r.Write(html.EscapeHTML(util.StrToBytes(r.Option.ImageLazyLoading)))
 				r.WriteString("\" data-src=\"")
 			}
-			r.Write(util.EscapeHTML(destTokens))
+			r.Write(html.EscapeHTML(destTokens))
 			r.WriteString("\" alt=\"")
 		}
 		r.DisableTags++
@@ -411,7 +412,7 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 		r.WriteString("\"")
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 			r.WriteString(" title=\"")
-			r.Write(util.EscapeHTML(title.Tokens))
+			r.Write(html.EscapeHTML(title.Tokens))
 			r.WriteString("\"")
 		}
 		r.WriteString(" />")
@@ -437,9 +438,9 @@ func (r *HtmlRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
 		destTokens = r.Tree.Context.RelativePath(destTokens)
-		attrs := [][]string{{"href", util.BytesToStr(util.EscapeHTML(destTokens))}}
+		attrs := [][]string{{"href", util.BytesToStr(html.EscapeHTML(destTokens))}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			attrs = append(attrs, []string{"title", util.BytesToStr(util.EscapeHTML(title.Tokens))})
+			attrs = append(attrs, []string{"title", util.BytesToStr(html.EscapeHTML(title.Tokens))})
 		}
 		r.tag("a", attrs, false)
 	} else {
@@ -502,7 +503,7 @@ func (r *HtmlRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus 
 	if r.Option.ChinesePunct {
 		r.ChinesePunct(node)
 	}
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -535,7 +536,7 @@ func (r *HtmlRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) a
 }
 
 func (r *HtmlRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 

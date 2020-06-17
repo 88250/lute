@@ -254,7 +254,7 @@ var blockStarts = []blockStartFunc{
 				if t.Context.Option.VditorWYSIWYG {
 					// Vditor 所见即所得模式下块引用标记符 > 后面不能为空
 					ln := util.BytesToStr(t.Context.currentLine[t.Context.offset:])
-					ln = strings.ReplaceAll(ln, Caret, "")
+					ln = strings.ReplaceAll(ln, util.Caret, "")
 					if ln = strings.TrimSpace(ln); "" == ln {
 						return 0
 					}

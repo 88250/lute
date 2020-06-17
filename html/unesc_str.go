@@ -8,23 +8,22 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package util
+package html
 
 import (
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/88250/lute/html"
 )
 
-func UnescapeString(tokens []byte) (ret []byte) {
+func UnescapeBytes(tokens []byte) (ret []byte) {
 	if nil == tokens {
 		return
 	}
 
-	tokens = StrToBytes(HtmlUnescapeString(BytesToStr(tokens)))
+	tokens = util.StrToBytes(HtmlUnescapeString(util.BytesToStr(tokens)))
 	length := len(tokens)
 	ret = make([]byte, 0, length)
 	for i := 0; i < length; i++ {
@@ -125,7 +124,7 @@ func parseEntity(s string) (string, int) {
 					return "", 0
 				}
 			case b == ';':
-				if e, ok := html.Entities[s[i-n:i+1]]; ok {
+				if e, ok := Entities[s[i-n:i+1]]; ok {
 					return e, i + 1
 				}
 				return "", 0

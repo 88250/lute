@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
 
@@ -109,7 +110,7 @@ func (t *Tree) parseEntity(ctx *InlineContext) (ret *ast.Node) {
 		}
 	}
 
-	v := util.HtmlUnescapeString(entityName)
+	v := html.HtmlUnescapeString(entityName)
 	if v == entityName {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: and}
@@ -198,23 +199,23 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			matched = isLink && 0 < len(remains)
 			if matched {
 				if t.Context.Option.VditorWYSIWYG {
-					if bytes.HasPrefix(remains, []byte(Caret+")")) {
+					if bytes.HasPrefix(remains, []byte(util.Caret+")")) {
 						if 0 < len(title) {
 							// 将 ‸) 换位为 )‸
-							remains = remains[len([]byte(Caret+")")):]
-							remains = append([]byte(")"+Caret), remains...)
+							remains = remains[len([]byte(util.Caret+")")):]
+							remains = append([]byte(")"+util.Caret), remains...)
 							copy(ctx.tokens[ctx.pos-1:], remains) // 同时也将 tokens 换位，后续解析从光标位置开始
 						} else {
 							// 将 ""‸ 换位为 "‸"
-							title = []byte(Caret)
-							remains = remains[len([]byte(Caret)):]
+							title = []byte(util.Caret)
+							remains = remains[len([]byte(util.Caret)):]
 							ctx.pos += 3
 						}
-					} else if bytes.HasPrefix(remains, []byte(")"+Caret)) {
+					} else if bytes.HasPrefix(remains, []byte(")"+util.Caret)) {
 						if 0 == len(title) {
 							// 将 "")‸ 换位为 "‸")
-							title = []byte(Caret)
-							remains = bytes.ReplaceAll(remains, []byte(Caret), nil)
+							title = []byte(util.Caret)
+							remains = bytes.ReplaceAll(remains, []byte(util.Caret), nil)
 							ctx.pos += 3
 						}
 					}

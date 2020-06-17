@@ -14,6 +14,7 @@ package render
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"go/format"
 	"strings"
 
@@ -39,12 +40,12 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 		if r.Option.CodeSyntaxHighlight {
 			rendered = highlightChroma(tokens, "", r)
 			if !rendered {
-				tokens = util.EscapeHTML(tokens)
+				tokens = html.EscapeHTML(tokens)
 				r.Write(tokens)
 			}
 		} else {
 			r.WriteString("<pre><code>")
-			tokens = util.EscapeHTML(tokens)
+			tokens = html.EscapeHTML(tokens)
 			r.Write(tokens)
 		}
 		r.WriteString("</code></pre>")
@@ -75,7 +76,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				r.WriteString("<pre><code data-code=\"")
 				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")
-				r.Write(util.EscapeHTML(tokens))
+				r.Write(html.EscapeHTML(tokens))
 				rendered = true
 			} else {
 				if r.Option.CodeSyntaxHighlight && !noHighlight(language) {
@@ -87,7 +88,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				r.WriteString("<pre><code class=\"language-")
 				r.WriteString(language)
 				r.WriteString("\">")
-				tokens = util.EscapeHTML(tokens)
+				tokens = html.EscapeHTML(tokens)
 				r.Write(tokens)
 			}
 		} else {
@@ -95,7 +96,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			if r.Option.CodeSyntaxHighlight {
 				rendered = highlightChroma(tokens, "", r)
 				if !rendered {
-					tokens = util.EscapeHTML(tokens)
+					tokens = html.EscapeHTML(tokens)
 					r.Write(tokens)
 				}
 			} else {
@@ -109,7 +110,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				} else {
 					r.WriteString("<pre><code>")
 				}
-				tokens = util.EscapeHTML(tokens)
+				tokens = html.EscapeHTML(tokens)
 				r.Write(tokens)
 			}
 		}

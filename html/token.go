@@ -7,6 +7,7 @@ package html
 import (
 	"bytes"
 	"errors"
+	"github.com/88250/lute/util"
 	"io"
 	"strconv"
 	"strings"
@@ -87,6 +88,10 @@ func (t Token) tagString() string {
 	}
 	buf := bytes.NewBufferString(t.Data)
 	for _, a := range t.Attr {
+		if util.Caret == a.Key {
+			buf.WriteString(util.Caret)
+			continue
+		}
 		buf.WriteByte(' ')
 		buf.WriteString(a.Key)
 		buf.WriteString(`="`)

@@ -8,25 +8,24 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-package util
+package html
 
 import (
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/88250/lute/html"
 )
 
 var (
-	amp  = StrToBytes("&amp;")
-	lt   = StrToBytes("&lt;")
-	gt   = StrToBytes("&gt;")
-	quot = StrToBytes("&quot;")
+	amp  = util.StrToBytes("&amp;")
+	lt   = util.StrToBytes("&lt;")
+	gt   = util.StrToBytes("&gt;")
+	quot = util.StrToBytes("&quot;")
 )
 
 func UnescapeHTML(h []byte) (ret []byte) {
-	return StrToBytes(html.UnescapeString(BytesToStr(h)))
+	return util.StrToBytes(UnescapeString(util.BytesToStr(h)))
 }
 
 func EscapeHTML(html []byte) (ret []byte) {

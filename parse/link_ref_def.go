@@ -13,6 +13,7 @@ package parse
 import (
 	"bytes"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 	"unicode/utf8"
@@ -103,7 +104,7 @@ func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, 
 	}
 	if nil != title {
 		if !context.Option.VditorWYSIWYG {
-			title = util.UnescapeString(title)
+			title = html.UnescapeBytes(title)
 		}
 	}
 
@@ -159,7 +160,7 @@ func (context *Context) parseLinkDest(tokens []byte) (ret, remains, destination 
 	}
 	if nil != ret {
 		if !context.Option.VditorWYSIWYG {
-			destination = util.EncodeDestination(util.UnescapeString(destination))
+			destination = html.EncodeDestination(html.UnescapeBytes(destination))
 		}
 	}
 	return

@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
@@ -85,10 +86,10 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	var caretIndex int
 	var greaterIndex int
 	if vditor {
-		caretIndex = bytes.Index(tokens, []byte(Caret))
+		caretIndex = bytes.Index(tokens, []byte(util.Caret))
 		if -1 < caretIndex {
 			greaterIndex = bytes.IndexByte(tokens, lex.ItemGreater)
-			tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+			tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
 		}
 	}
 
@@ -105,9 +106,9 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		if vditor {
 			if -1 < caretIndex && caretIndex < greaterIndex {
 				if len(whitespaces) > caretIndex {
-					whitespaces = append(whitespaces[:caretIndex], append([]byte(Caret), whitespaces[caretIndex:]...)...)
+					whitespaces = append(whitespaces[:caretIndex], append([]byte(util.Caret), whitespaces[caretIndex:]...)...)
 				} else {
-					whitespaces = append(whitespaces, []byte(Caret)...)
+					whitespaces = append(whitespaces, []byte(util.Caret)...)
 				}
 			}
 		}
@@ -413,9 +414,9 @@ func (t *Tree) parseAttrName(tokens []byte) (remains, attrName []byte) {
 func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
 	var caretIndex int
 	if t.Context.Option.VditorWYSIWYG {
-		caretIndex = bytes.Index(tokens, []byte(Caret))
+		caretIndex = bytes.Index(tokens, []byte(util.Caret))
 		if -1 < caretIndex {
-			tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+			tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
 		}
 	}
 
@@ -441,9 +442,9 @@ func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
 	if t.Context.Option.VditorWYSIWYG && -1 < caretIndex {
 		if i <= caretIndex {
 			idx := caretIndex - i
-			remains = append(remains[:idx], append([]byte(Caret), remains[idx:]...)...)
+			remains = append(remains[:idx], append([]byte(util.Caret), remains[idx:]...)...)
 		} else {
-			tagName = append(tagName[:caretIndex], append([]byte(Caret), tagName[caretIndex:]...)...)
+			tagName = append(tagName[:caretIndex], append([]byte(util.Caret), tagName[caretIndex:]...)...)
 		}
 	}
 	return

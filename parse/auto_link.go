@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
@@ -361,7 +362,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		addr = append(addr, domain...)
 		addr = append(addr, path...)
 
-		link := t.newLink(ast.NodeLink, addr, util.EncodeDestination(dest), nil, 2)
+		link := t.newLink(ast.NodeLink, addr, html.EncodeDestination(dest), nil, 2)
 		node.InsertBefore(link)
 		needUnlink = true
 
@@ -530,7 +531,7 @@ func (t *Tree) parseAutolink(ctx *InlineContext) (ret *ast.Node) {
 		return nil
 	}
 	ctx.pos = 1 + i
-	return t.newLink(ast.NodeLink, dest, util.EncodeDestination(dest), nil, 2)
+	return t.newLink(ast.NodeLink, dest, html.EncodeDestination(dest), nil, 2)
 }
 
 func (t *Tree) addPreviousText(node *ast.Node, tokens []byte) {

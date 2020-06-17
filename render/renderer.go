@@ -209,7 +209,7 @@ func normalizeHeadingID(heading *ast.Node) (ret string) {
 	}
 
 	id = strings.TrimLeft(id, "#")
-	id = strings.ReplaceAll(id, parse.Caret, "")
+	id = strings.ReplaceAll(id, util.Caret, "")
 	for _, r := range id {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			ret += string(r)

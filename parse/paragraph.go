@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+	"github.com/88250/lute/util"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -58,14 +59,14 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					var caretStartText, caretAfterCloseBracket, caretInBracket bool
 					if context.Option.VditorWYSIWYG {
 						closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
-						if bytes.HasPrefix(tokens, []byte(Caret)) {
-							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+						if bytes.HasPrefix(tokens, []byte(util.Caret)) {
+							tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
 							caretStartText = true
-						} else if bytes.HasPrefix(tokens[closeBracket+1:], []byte(Caret)) {
-							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+						} else if bytes.HasPrefix(tokens[closeBracket+1:], []byte(util.Caret)) {
+							tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
 							caretAfterCloseBracket = true
-						} else if bytes.Contains(tokens[1:closeBracket], []byte(Caret)) {
-							tokens = bytes.ReplaceAll(tokens, []byte(Caret), nil)
+						} else if bytes.Contains(tokens[1:closeBracket], []byte(util.Caret)) {
+							tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
 							caretInBracket = true
 						}
 					}
@@ -75,7 +76,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					if context.Option.VditorWYSIWYG {
 						p.Tokens = bytes.TrimSpace(p.Tokens)
 						if caretStartText || caretAfterCloseBracket || caretInBracket {
-							p.Tokens = append([]byte(" "+Caret), p.Tokens...)
+							p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)
 						} else {
 							p.Tokens = append([]byte(" "), p.Tokens...)
 						}

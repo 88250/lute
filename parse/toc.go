@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
 func (context *Context) parseToC(paragraph *ast.Node) *ast.Node {
@@ -25,7 +26,7 @@ func (context *Context) parseToC(paragraph *ast.Node) *ast.Node {
 	content := bytes.TrimSpace(lines[0])
 	tokens := content
 	if context.Option.VditorWYSIWYG {
-		content = bytes.ReplaceAll(content, []byte(Caret), nil)
+		content = bytes.ReplaceAll(content, []byte(util.Caret), nil)
 	}
 	if !bytes.EqualFold(content, []byte("[toc]")) {
 		return nil

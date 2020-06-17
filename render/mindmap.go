@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"strings"
 
 	"github.com/88250/lute/ast"
@@ -21,7 +22,7 @@ import (
 
 // renderMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
 func (r *BaseRenderer) renderMindmap(listContent []byte) []byte {
-	listContent = bytes.ReplaceAll(listContent, []byte(parse.Caret), nil)
+	listContent = bytes.ReplaceAll(listContent, []byte(util.Caret), nil)
 	tree := parse.Parse("", listContent, r.Option)
 	if nil == tree.Root.FirstChild || ast.NodeList != tree.Root.FirstChild.Type {
 		// 第一个节点如果不是列表的话直接返回
@@ -77,7 +78,7 @@ func (r *BaseRenderer) renderMindmap(listContent []byte) []byte {
 		}
 		return ast.WalkContinue
 	})
-	return util.EncodeDestination(buf.Bytes())
+	return html.EncodeDestination(buf.Bytes())
 }
 
 // text 返回列表项第一个子节点的文本内容。
@@ -99,7 +100,7 @@ func text(listItemFirstChild *ast.Node) (ret string) {
 
 	ret = strings.ReplaceAll(ret, "\\", "\\\\")
 	ret = strings.ReplaceAll(ret,"\"", "\\\"")
-	ret = strings.ReplaceAll(ret, parse.Caret, "")
+	ret = strings.ReplaceAll(ret, util.Caret, "")
 	return
 }
 

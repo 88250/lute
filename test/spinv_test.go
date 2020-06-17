@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"127", "<p data-block=\"0\">​<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">​&lt;bar <wbr>&gt;</code></span>​\n</p>", "<p data-block=\"0\">​<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">​&lt;bar<wbr>&gt;</code></span>​\n</p>"},
 	{"126", "<p data-block=\"0\">&lt;img src=\"\"&gt;<wbr>\n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img src=&quot;&quot;&gt;</code></span>\u200b<wbr>\n</p>"},
 	{"125", "<p data-block=\"0\">​<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">​&lt;img src=\"\"&gt;<wbr></code></span>​\n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img src=&quot;&quot;&gt;</code></span>\u200b<wbr>\n</p>"},
 	{"124", "<p data-block=\"0\">&lt;img src=\"\"<wbr>\n</p>", "<p data-block=\"0\">&lt;img src=&quot;&quot;<wbr>\n</p>"},

@@ -42,7 +42,7 @@ func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 	lute.VditorWYSIWYG = true
 
 	// 替换插入符
-	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", parse.Caret)
+	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 	markdown := lute.vditorDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
@@ -51,7 +51,7 @@ func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
 	// 替换插入符
-	ovHTML = strings.ReplaceAll(string(output), parse.Caret, "<wbr>")
+	ovHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
 	return
 }
 
@@ -168,7 +168,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 		if entering {
 			switch n.Type {
 			case ast.NodeInlineHTML, ast.NodeCodeSpan, ast.NodeInlineMath, ast.NodeHTMLBlock, ast.NodeCodeBlockCode, ast.NodeMathBlockContent:
-				n.Tokens = util.UnescapeHTML(n.Tokens)
+				n.Tokens = html.UnescapeHTML(n.Tokens)
 				if nil != n.Next && ast.NodeCodeSpan == n.Next.Type && n.CodeMarkerLen == n.Next.CodeMarkerLen {
 					// 合并代码节点 https://github.com/Vanessa219/vditor/issues/167
 					n.FirstChild.Next.Tokens = append(n.FirstChild.Next.Tokens, n.Next.FirstChild.Next.Tokens...)
@@ -368,20 +368,20 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		checkIndentCodeBlock := strings.ReplaceAll(content, parse.Caret, "")
+		checkIndentCodeBlock := strings.ReplaceAll(content, util.Caret, "")
 		checkIndentCodeBlock = strings.ReplaceAll(checkIndentCodeBlock, "\t", "    ")
 		if (!lute.isInline(n.PrevSibling)) && strings.HasPrefix(checkIndentCodeBlock, "    ") {
 			node.Type = ast.NodeCodeBlock
 			node.IsFencedCodeBlock = true
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
-			startCaret := strings.HasPrefix(content, parse.Caret)
+			startCaret := strings.HasPrefix(content, util.Caret)
 			if startCaret {
-				content = strings.ReplaceAll(content, parse.Caret, "")
+				content = strings.ReplaceAll(content, util.Caret, "")
 			}
 			content = strings.TrimSpace(content)
 			if startCaret {
-				content = parse.Caret + content
+				content = util.Caret + content
 			}
 			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: []byte(content)}
 			node.AppendChild(content)
@@ -423,7 +423,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 	case atom.Blockquote:
 		content := strings.TrimSpace(lute.domText(n))
-		if "" == content || "&gt;" == content || parse.Caret == content {
+		if "" == content || "&gt;" == content || util.Caret == content {
 			return
 		}
 
@@ -568,8 +568,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if lute.isEmptyText(n) {
 			return
 		}
-		if parse.Caret == text {
-			node.Tokens = []byte(parse.Caret)
+		if util.Caret == text {
+			node.Tokens = []byte(util.Caret)
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -586,9 +586,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 
-		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(util.Caret)})
 			if "_" == marker {
 				node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
 			} else {
@@ -627,8 +627,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if lute.isEmptyText(n) {
 			return
 		}
-		if parse.Caret == text {
-			node.Tokens = []byte(parse.Caret)
+		if util.Caret == text {
+			node.Tokens = []byte(util.Caret)
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -645,9 +645,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 
-		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(util.Caret)})
 			if "__" == marker {
 				node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
 			} else {
@@ -684,8 +684,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if lute.isEmptyText(n) {
 			return
 		}
-		if parse.Caret == text {
-			node.Tokens = []byte(parse.Caret)
+		if util.Caret == text {
+			node.Tokens = []byte(util.Caret)
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -699,9 +699,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 
-		if nil != n.FirstChild && parse.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Caret)})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(util.Caret)})
 			if "~" == marker {
 				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
 			} else {
@@ -731,8 +731,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		contentStr := strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-		if parse.Caret == contentStr {
-			node.Tokens = []byte(parse.Caret)
+		if util.Caret == contentStr {
+			node.Tokens = []byte(util.Caret)
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -755,7 +755,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Br:
 		if nil != n.Parent {
 			if lute.parentIs(n, atom.Td, atom.Th) {
-				if (nil == n.PrevSibling || parse.Caret == n.PrevSibling.Data) && (nil == n.NextSibling || parse.Caret == n.NextSibling.Data) {
+				if (nil == n.PrevSibling || util.Caret == n.PrevSibling.Data) && (nil == n.NextSibling || util.Caret == n.NextSibling.Data) {
 					return
 				}
 				if nil == n.NextSibling {
@@ -1115,7 +1115,7 @@ func (lute *Lute) isEmptyText(n *html.Node) bool {
 	if "" == text || parse.Zwsp == text {
 		return true
 	}
-	if parse.Zwsp+parse.Caret == text || parse.Caret+parse.Zwsp == text {
+	if parse.Zwsp+util.Caret == text || util.Caret+parse.Zwsp == text {
 		return true
 	}
 	return false

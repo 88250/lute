@@ -15,9 +15,6 @@ import (
 	"github.com/88250/lute/lex"
 )
 
-// Caret 插入符 \u2038。
-const Caret = "‸"
-
 // Zwsp 零宽空格。
 const Zwsp = "\u200b"
 
