@@ -25,7 +25,7 @@ import (
 var setOfElementsToSkipContent = map[string]interface{}{
 	"frame":    nil,
 	"frameset": nil,
-	"iframe":   nil,
+	//"iframe":   nil,
 	"noembed":  nil,
 	"noframes": nil,
 	"noscript": nil,
@@ -185,7 +185,7 @@ func sanitizeAttrs(attrs []html.Attribute) (ret []html.Attribute) {
 			continue
 		}
 		if "src" == attr.Key {
-			if strings.HasPrefix(attr.Val, "data:image/svg+xml") {
+			if strings.HasPrefix(attr.Val, "data:image/svg+xml") || strings.HasPrefix(attr.Val, "javascript") {
 				continue
 			}
 		}

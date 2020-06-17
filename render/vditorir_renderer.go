@@ -640,7 +640,9 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
 		imgBuf := buf[idx:]
-		imgBuf = sanitize(imgBuf)
+		if r.Option.Sanitize {
+			imgBuf = sanitize(imgBuf)
+		}
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
 
@@ -670,14 +672,17 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderDivNode(node)
-	node.Tokens = bytes.TrimSpace(node.Tokens)
+	tokens := bytes.TrimSpace(node.Tokens)
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
 	r.WriteString("<pre class=\"vditor-ir__marker--pre vditor-ir__marker\">")
 	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
-	r.Write(util.EscapeHTML(node.Tokens))
+	r.Write(util.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 
 	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Caret), nil)
+	tokens = bytes.ReplaceAll(tokens, []byte(parse.Caret), nil)
 	r.Write(tokens)
 	r.WriteString("</pre>")
 
@@ -688,7 +693,11 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderSpanNode(node)
 	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
-	r.Write(util.EscapeHTML(node.Tokens))
+	tokens := node.Tokens
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
+	r.Write(util.EscapeHTML(tokens))
 	r.tag("/code", nil, false)
 	r.tag("/span", nil, false)
 	return ast.WalkStop

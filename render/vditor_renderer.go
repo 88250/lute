@@ -497,7 +497,9 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
 		imgBuf := buf[idx:]
-		imgBuf = sanitize(imgBuf)
+		if r.Option.Sanitize {
+			imgBuf = sanitize(imgBuf)
+		}
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
 	}
@@ -546,6 +548,9 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
 	tokens := bytes.TrimSpace(node.Tokens)
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
 	r.WriteString("<pre>")
 	r.tag("code", nil, false)
 	r.Write(util.EscapeHTML(tokens))
@@ -578,6 +583,9 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
 	tokens = util.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)

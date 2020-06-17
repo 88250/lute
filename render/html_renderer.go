@@ -420,7 +420,9 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 			buf := r.Writer.Bytes()
 			idx := bytes.LastIndex(buf, []byte("<img src="))
 			imgBuf := buf[idx:]
-			imgBuf = sanitize(imgBuf)
+			if r.Option.Sanitize {
+				imgBuf = sanitize(imgBuf)
+			}
 			r.Writer.Truncate(idx)
 			r.Writer.Write(imgBuf)
 		}
