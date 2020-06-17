@@ -163,7 +163,7 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 	tokenBuff.WriteString(token.Data)
 	for _, attr := range token.Attr {
 		if attr.Key == util.Caret {
-			tokenBuff.WriteString(util.Caret + " ")
+			tokenBuff.WriteString(util.Caret)
 			continue
 		}
 
