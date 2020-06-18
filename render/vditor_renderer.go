@@ -227,9 +227,11 @@ func (r *VditorRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.W
 	if "" == previousNodeText {
 		r.WriteString(parse.Zwsp)
 	}
-	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	idx, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
-	r.tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)}}, false)
+	label := def.Text()
+	r.tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)},
+		{"class", "vditor-tooltipped vditor-tooltipped__s"}, {"aria-label", html.EscapeString(label)}}, false)
 	r.WriteString(idxStr)
 	r.WriteString("</sup>" + parse.Zwsp)
 	return ast.WalkStop

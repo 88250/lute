@@ -219,9 +219,9 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	if "" == previousNodeText {
 		r.WriteString(parse.Zwsp)
 	}
-	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	idx, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
-
+	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}
 	text := node.Text()
 	expand := strings.Contains(text, util.Caret)
@@ -230,6 +230,8 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	} else {
 		attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	}
+	attrs = append(attrs, []string{"class", "vditor-tooltipped vditor-tooltipped__s"})
+	attrs = append(attrs, []string{"aria-label", html.EscapeString(label)})
 	r.tag("sup", attrs, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
