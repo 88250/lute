@@ -551,9 +551,6 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
 	tokens := bytes.TrimSpace(node.Tokens)
-	if r.Option.Sanitize {
-		tokens = sanitize(tokens)
-	}
 	r.WriteString("<pre>")
 	r.tag("code", nil, false)
 	r.Write(html.EscapeHTML(tokens))
@@ -561,6 +558,9 @@ func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 
 	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
 	r.Write(tokens)
 	r.WriteString("</pre>")
 
@@ -586,9 +586,6 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
-	if r.Option.Sanitize {
-		tokens = sanitize(tokens)
-	}
 	tokens = html.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)

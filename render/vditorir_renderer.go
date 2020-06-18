@@ -676,9 +676,6 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderDivNode(node)
 	tokens := bytes.TrimSpace(node.Tokens)
-	if r.Option.Sanitize {
-		tokens = sanitize(tokens)
-	}
 	r.WriteString("<pre class=\"vditor-ir__marker--pre vditor-ir__marker\">")
 	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
 	r.Write(html.EscapeHTML(tokens))
@@ -686,6 +683,9 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 
 	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
 	r.Write(tokens)
 	r.WriteString("</pre>")
 
@@ -696,11 +696,7 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderSpanNode(node)
 	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
-	tokens := node.Tokens
-	if r.Option.Sanitize {
-		tokens = sanitize(tokens)
-	}
-	r.Write(html.EscapeHTML(tokens))
+	r.Write(html.EscapeHTML(node.Tokens))
 	r.tag("/code", nil, false)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -1102,7 +1098,7 @@ func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
-			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeHTMLBlock:
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeHTMLBlock, ast.NodeInlineHTML:
 				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
 				ret += string(n.CodeBlockInfo)
