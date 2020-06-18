@@ -35,11 +35,11 @@ func TestRenderListStyle(t *testing.T) {
 }
 
 var renderListStyleVditorTests = []parseTest{
-	{"4", "1) foo\n", "<ol data-tight=\"true\" data-marker=\"1)\" data-block=\"0\"><li data-marker=\"1)\" data-style=\"1)\">foo</li></ol>"},
-	{"3", "1. foo\n", "<ol data-tight=\"true\" data-marker=\"1.\" data-block=\"0\"><li data-marker=\"1.\" data-style=\"1.\">foo</li></ol>"},
-	{"2", "- foo\n", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\" data-style=\"-\">foo</li></ul>"},
-	{"1", "+ foo\n", "<ul data-tight=\"true\" data-marker=\"+\" data-block=\"0\"><li data-marker=\"+\" data-style=\"+\">foo</li></ul>"},
-	{"0", "* foo\n", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-style=\"*\">foo</li></ul>"},
+	{"4", "1) foo\n", "<ol data-tight=\"true\" data-marker=\"1)\" data-block=\"0\" data-style=\"1)\"><li data-marker=\"1)\">foo</li></ol>"},
+	{"3", "1. foo\n", "<ol data-tight=\"true\" data-marker=\"1.\" data-block=\"0\" data-style=\"1.\"><li data-marker=\"1.\">foo</li></ol>"},
+	{"2", "- foo\n", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\" data-style=\"-\"><li data-marker=\"-\">foo</li></ul>"},
+	{"1", "+ foo\n", "<ul data-tight=\"true\" data-marker=\"+\" data-block=\"0\" data-style=\"+\"><li data-marker=\"+\">foo</li></ul>"},
+	{"0", "* foo\n", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-style=\"*\"><li data-marker=\"*\">foo</li></ul>"},
 }
 
 func TestRenderListStyleVditor(t *testing.T) {
@@ -54,11 +54,11 @@ func TestRenderListStyleVditor(t *testing.T) {
 }
 
 var renderListStyleVditorIRTests = []parseTest{
-	{"4", "1) foo\n", "<ol data-tight=\"true\" data-marker=\"1)\" data-block=\"0\"><li data-marker=\"1)\" data-style=\"1)\">foo</li></ol>"},
-	{"3", "1. foo\n", "<ol data-tight=\"true\" data-marker=\"1.\" data-block=\"0\"><li data-marker=\"1.\" data-style=\"1.\">foo</li></ol>"},
-	{"2", "- foo\n", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\"><li data-marker=\"-\" data-style=\"-\">foo</li></ul>"},
-	{"1", "+ foo\n", "<ul data-tight=\"true\" data-marker=\"+\" data-block=\"0\"><li data-marker=\"+\" data-style=\"+\">foo</li></ul>"},
-	{"0", "* foo\n", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" data-style=\"*\">foo</li></ul>"},
+	{"4", "1) foo\n", "<ol data-tight=\"true\" data-marker=\"1)\" data-block=\"0\" data-style=\"1)\"><li data-marker=\"1)\">foo</li></ol>"},
+	{"3", "1. foo\n", "<ol data-tight=\"true\" data-marker=\"1.\" data-block=\"0\" data-style=\"1.\"><li data-marker=\"1.\">foo</li></ol>"},
+	{"2", "- foo\n", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\" data-style=\"-\"><li data-marker=\"-\">foo</li></ul>"},
+	{"1", "+ foo\n", "<ul data-tight=\"true\" data-marker=\"+\" data-block=\"0\" data-style=\"+\"><li data-marker=\"+\">foo</li></ul>"},
+	{"0", "* foo\n", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-style=\"*\"><li data-marker=\"*\">foo</li></ul>"},
 }
 
 func TestRenderListStyleVditorIR(t *testing.T) {

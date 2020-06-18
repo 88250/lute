@@ -799,6 +799,7 @@ func (r *VditorRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 			}
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
+		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
 	} else {
 		r.tag("/"+tag, nil, false)
@@ -824,7 +825,6 @@ func (r *VditorRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
-		r.renderListStyle(node, &attrs)
 		r.tag("li", attrs, false)
 		if nil == node.FirstChild {
 			r.WriteString(parse.Zwsp)
