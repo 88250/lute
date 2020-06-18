@@ -88,11 +88,12 @@ func (t Token) tagString() string {
 	}
 	buf := bytes.NewBufferString(t.Data)
 	for _, a := range t.Attr {
-		buf.WriteByte(' ')
-		buf.WriteString(a.Key)
 		if a.Key == util.CaretReplacement {
+			buf.WriteString(util.CaretReplacement)
 			continue
 		}
+		buf.WriteByte(' ')
+		buf.WriteString(a.Key)
 		buf.WriteString(`="`)
 		escape(buf, a.Val)
 		buf.WriteByte('"')

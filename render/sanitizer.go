@@ -44,6 +44,7 @@ func sanitize(tokens []byte) []byte {
 		mostRecentlyStartedToken string
 	)
 
+	caretLeftSpace := bytes.Contains(tokens, []byte(" " + util.Caret))
 	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), []byte(util.CaretReplacement))
 
 	tokenizer := html.NewTokenizer(bytes.NewReader(tokens))
@@ -52,6 +53,9 @@ func sanitize(tokens []byte) []byte {
 			err := tokenizer.Err()
 			if err == io.EOF {
 				ret := buff.Bytes()
+				if caretLeftSpace {
+					ret = bytes.ReplaceAll(ret, []byte("\""+util.CaretReplacement), []byte("\" "+util.CaretReplacement))
+				}
 				ret = bytes.ReplaceAll(ret, []byte(util.CaretReplacement), []byte(util.Caret))
 				return ret
 			}
@@ -150,11 +154,12 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 	tokenBuff.WriteString("<")
 	tokenBuff.WriteString(token.Data)
 	for _, attr := range token.Attr {
-		tokenBuff.WriteByte(' ')
-		tokenBuff.WriteString(attr.Key)
 		if attr.Key == util.CaretReplacement {
+			tokenBuff.WriteString(util.CaretReplacement)
 			continue
 		}
+		tokenBuff.WriteByte(' ')
+		tokenBuff.WriteString(attr.Key)
 		tokenBuff.WriteString(`="`)
 		switch attr.Key {
 		case "href", "src":

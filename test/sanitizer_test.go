@@ -20,7 +20,7 @@ var sanitizerTests = []parseTest{
 
 	{"5", "<iframe src='javascript:parent.require(\"child_process\").exec(\"open -a Calculator\")'></iframe>", "<iframe></iframe>\n"},
 	{"4", "![Escape SRC - onerror](\"onerror=\"alert('ImageOnError'))", "<p><img src=\"%22onerror=%22alert(&#39;ImageOnError&#39;)\" alt=\"Escape SRC - onerror\" /></p>\n"},
-	{"3", "<EMBED SRC=\"data:image/svg+xml;base64,mock payload\" type=\"image/svg+xml\" AllowScriptAccess=\"always\"></EMBED>", "<p><embed></embed></p>\n"},
+	{"3", "<EMBED SRC=\"data:image/svg+xml;base64,mock payload\" type=\"image/svg+xml\" AllowScriptAccess=\"always\"></EMBED>", "<p><embed type=\"image/svg+xml\" allowscriptaccess=\"always\"></embed></p>\n"},
 	{"2", "<FOo>bar", "<p><foo>bar</p>\n"},
 	{"1", "<img onerror=\"alert(1)\" src=\"bar.png\" />", "<img src=\"bar.png\" />\n"},
 	{"0", "foo<script>alert(1)</script>bar", "<p>foo alert(1) bar</p>\n"},

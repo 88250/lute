@@ -17,12 +17,13 @@ import (
 	"github.com/88250/lute/util"
 )
 
-var caretreplacement = []byte("caretreplacement")
-
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	tokens := ctx.tokens
+	caretLeftSpace := false
 	if t.Context.Option.VditorWYSIWYG {
-		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), caretreplacement)
+		caretLeftSpace = bytes.Contains(tokens, []byte(" " + util.Caret))
+		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), []byte(util.CaretReplacement))
+		tokens = bytes.ReplaceAll(tokens, []byte("\""+util.CaretReplacement), []byte("\" "+util.CaretReplacement))
 	}
 
 	startPos := ctx.pos
@@ -104,7 +105,10 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			tags = append(tags, tokens[1])
 		}
 		if t.Context.Option.VditorWYSIWYG {
-			tags = bytes.ReplaceAll(tags, caretreplacement, []byte(util.Caret))
+			if !bytes.Contains(tags, []byte(util.CaretReplacement+" ")) && !caretLeftSpace {
+				tags = bytes.ReplaceAll(tags, []byte("\" "+util.CaretReplacement), []byte("\""+util.CaretReplacement))
+			}
+			tags = bytes.ReplaceAll(tags, []byte(util.CaretReplacement), []byte(util.Caret))
 		}
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
