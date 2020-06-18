@@ -19,11 +19,17 @@ import (
 
 func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	tokens := ctx.tokens
+	caretInTag := false
 	caretLeftSpace := false
 	if t.Context.Option.VditorWYSIWYG {
-		caretLeftSpace = bytes.Contains(tokens, []byte(" " + util.Caret))
-		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), []byte(util.CaretReplacement))
-		tokens = bytes.ReplaceAll(tokens, []byte("\""+util.CaretReplacement), []byte("\" "+util.CaretReplacement))
+		caretIndex := bytes.Index(tokens, []byte(util.Caret))
+		caretInTag = caretIndex > ctx.pos
+
+		if caretInTag {
+			caretLeftSpace = bytes.Contains(tokens, []byte(" "+util.Caret))
+			tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), []byte(util.CaretReplacement))
+			tokens = bytes.ReplaceAll(tokens, []byte("\""+util.CaretReplacement), []byte("\" "+util.CaretReplacement))
+		}
 	}
 
 	startPos := ctx.pos
@@ -104,7 +110,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		if lex.ItemSlash == tokens[0] {
 			tags = append(tags, tokens[1])
 		}
-		if t.Context.Option.VditorWYSIWYG {
+		if t.Context.Option.VditorWYSIWYG && caretInTag {
 			if !bytes.Contains(tags, []byte(util.CaretReplacement+" ")) && !caretLeftSpace {
 				tags = bytes.ReplaceAll(tags, []byte("\" "+util.CaretReplacement), []byte("\""+util.CaretReplacement))
 			}
@@ -405,14 +411,6 @@ func (t *Tree) parseAttrName(tokens []byte) (remains, attrName []byte) {
 }
 
 func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
-	//var caretIndex int
-	//if t.Context.Option.VditorWYSIWYG {
-	//	caretIndex = bytes.Index(tokens, []byte(util.Caret))
-	//	if -1 < caretIndex {
-	//		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
-	//	}
-	//}
-
 	if 1 > len(tokens) {
 		return
 	}
@@ -431,14 +429,5 @@ func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
 		tagName = append(tagName, token)
 	}
 	remains = tokens[i:]
-
-	//if t.Context.Option.VditorWYSIWYG && -1 < caretIndex {
-	//	if i <= caretIndex {
-	//		idx := caretIndex - i
-	//		remains = append(remains[:idx], append([]byte(util.Caret), remains[idx:]...)...)
-	//	} else {
-	//		tagName = append(tagName[:caretIndex], append([]byte(util.Caret), tagName[caretIndex:]...)...)
-	//	}
-	//}
 	return
 }

@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"133", "<p data-block=\"0\">​f<wbr>​<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">​&lt;img src=\"\"&gt;</code></span>​\n</p>", "<p data-block=\"0\">f<wbr><span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img src=&quot;&quot;&gt;</code></span>\u200b\n</p>"},
 	{"132", "<p data-block=\"0\">​<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">​&lt;img src=\"\" <wbr>&gt;</code></span>​\n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img src=&quot;&quot; <wbr>&gt;</code></span>\u200b\n</p>"},
 	{"131", "<p data-block=\"0\">&lt;img src=\"\"<wbr>&gt;1\n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img src=&quot;&quot;<wbr>&gt;</code></span>\u200b1\n</p>"},
 	{"130", "<p data-block=\"0\">​<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">​&lt;img s<wbr>&gt;</code></span>​\n</p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;img s<wbr>=&quot;&quot;&gt;</code></span>\u200b\n</p>"},
