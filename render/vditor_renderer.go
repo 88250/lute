@@ -916,7 +916,11 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 			}
 		}
 	}
-	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__pre"}}, false)
+	preAttrs := [][]string{{"class", "vditor-wysiwyg__pre"}}
+	if !bytes.Contains(node.Tokens, []byte(util.Caret)) && !caretInInfo {
+		preAttrs = append(preAttrs, []string{"style", "display: none"})
+	}
+	r.tag("pre", preAttrs, false)
 	r.tag("code", attrs, false)
 
 	if codeIsEmpty {
