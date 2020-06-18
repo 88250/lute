@@ -231,6 +231,7 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-tooltipped vditor-tooltipped__s"})
 	}
 	attrs = append(attrs, []string{"aria-label", html.EscapeString(label)})
+	attrs = append(attrs, []string{"data-footnotes-label", string(node.FootnotesRefLabel)})
 	r.tag("sup", attrs, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
