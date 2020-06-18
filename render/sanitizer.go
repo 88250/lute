@@ -36,22 +36,6 @@ var setOfElementsToSkipContent = map[string]interface{}{
 	"title":    nil,
 }
 
-var allowedAttrs = map[string]interface{}{
-	"id":                  nil,
-	"title":               nil,
-	"alt":                 nil,
-	"href":                nil,
-	"src":                 nil,
-	"class":               nil,
-	"value":               nil,
-	"align":               nil,
-	"height":              nil,
-	"width":               nil,
-	"data":                nil,
-	"open":                nil,
-	util.CaretReplacement: nil,
-}
-
 func sanitize(tokens []byte) []byte {
 	var (
 		buff                     bytes.Buffer
@@ -205,10 +189,6 @@ func sanitizeAttrs(attrs []html.Attribute) (ret []html.Attribute) {
 }
 
 func allowAttr(attrName string) bool {
-	for name := range allowedAttrs {
-		if strings.Contains(attrName, name) {
-			return true
-		}
-	}
-	return false
+	// https://www.w3schools.com/tags/ref_eventattributes.asp
+	return !strings.HasPrefix(attrName, "on")
 }
