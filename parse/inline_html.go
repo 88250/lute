@@ -24,7 +24,6 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	if t.Context.Option.VditorWYSIWYG {
 		caretIndex := bytes.Index(tokens, []byte(util.Caret))
 		caretInTag = caretIndex > ctx.pos
-
 		if caretInTag {
 			caretLeftSpace = bytes.Contains(tokens, []byte(" "+util.Caret))
 			tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), []byte(util.CaretReplacement))
