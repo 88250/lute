@@ -226,11 +226,10 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	text := node.Text()
 	expand := strings.Contains(text, util.Caret)
 	if expand {
-		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand vditor-tooltipped vditor-tooltipped__s"})
 	} else {
-		attrs = append(attrs, []string{"class", "vditor-ir__node"})
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-tooltipped vditor-tooltipped__s"})
 	}
-	attrs = append(attrs, []string{"class", "vditor-tooltipped vditor-tooltipped__s"})
 	attrs = append(attrs, []string{"aria-label", html.EscapeString(label)})
 	r.tag("sup", attrs, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
