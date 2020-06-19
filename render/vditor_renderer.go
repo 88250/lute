@@ -272,10 +272,14 @@ func (r *VditorRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bo
 }
 
 func (r *VditorRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
-	r.tag("code", [][]string{{"data-type", "math-inline"}}, false)
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
 	previewTokens := tokens
+	codeAttrs := [][]string{{"data-type", "math-inline"}}
+	if !bytes.Contains(previewTokens, []byte(util.Caret)) {
+		codeAttrs = append(codeAttrs, []string{"style", "display: none"})
+	}
+	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
+	r.tag("code", codeAttrs, false)
 	tokens = html.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
