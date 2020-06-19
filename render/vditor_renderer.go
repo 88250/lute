@@ -315,15 +315,19 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *ast.Node, entering boo
 }
 
 func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	node.Tokens = bytes.TrimSpace(node.Tokens)
-	codeLen := len(node.Tokens)
+	previewTokens := bytes.TrimSpace(node.Tokens)
+	var preAttrs [][]string
+	if !bytes.Contains(previewTokens, []byte(util.Caret)) {
+		preAttrs = append(preAttrs, []string{"style", "display: none"})
+	}
+	codeLen := len(previewTokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-	r.WriteString("<pre>")
+	r.tag("pre", preAttrs, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
 	if codeIsEmpty {
 		r.WriteString("<wbr>\n")
 	} else {
-		r.Write(html.EscapeHTML(node.Tokens))
+		r.Write(html.EscapeHTML(previewTokens))
 	}
 	r.WriteString("</code></pre>")
 
