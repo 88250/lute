@@ -17,6 +17,11 @@ import (
 )
 
 var html2MdTests = []parseTest{
+
+	{"32", "<ul>\n  <li>咖啡</li>\n  <li>茶\n    <ul>\n    <li>红茶</li>\n    <li>绿茶</li>\n    </ul>\n  </li>\n  <li>牛奶</li>\n</ul>", "* 咖啡\n* 茶\n  * 红茶\n  * 绿茶\n* 牛奶\n"},
+	{"32", "<ul>\n<li>foo</li>\n<li>bar\n<ul>\n<li>baz</li>\n<li>baz</li>\n</ul>\n</li>\n<li>bar</li>\n</ul>", "* foo\n* bar\n  * baz\n  * baz\n* bar\n"},
+	{"31", "<ul>\n<li>foo\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ul>", "* foo\n  * bar\n"},
+	{"30", "<ul><li>foo</li><li>bar<ul><li>baz</li><li>baz</li></ul></li><li>bar</li></ul>", "* foo\n* bar\n  * baz\n  * baz\n* bar\n"},
 	{"29", "<p>测试 <code>name</code> 属性。调用 <code>getValue</code> 时 <code>Method</code></p>", "测试 `name` 属性。调用 `getValue` 时 `Method`\n"},
 	{"28", `<html>
 <body>

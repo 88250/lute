@@ -208,6 +208,9 @@ func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
 		}
 	}
 
+	// 移除 HTML 中不需要的换行节点
+	lute.removeNewlines(nodes[0])
+
 	var emptyTextNodes []*html.Node
 	for c := nodes[0]; nil != c; c = c.NextSibling {
 		lute.adjustVditorDOM0(c, &emptyTextNodes)
@@ -228,6 +231,32 @@ func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
 			continue
 		}
 		emptyTextNode.Unlink()
+	}
+}
+
+func (lute *Lute) removeNewlines(node *html.Node) {
+	var newlineNodes []*html.Node
+	for c := node; nil != c; c = c.NextSibling {
+		lute.searchEmptyNodes(c, &newlineNodes)
+	}
+	for _, newlineNode := range newlineNodes {
+		newlineNode.Unlink()
+	}
+}
+
+func (lute *Lute) searchEmptyNodes(n *html.Node, newlineNodes *[]*html.Node) {
+	switch n.DataAtom {
+	case 0:
+		if nil != n.Parent && (atom.Ol == n.Parent.DataAtom || atom.Ul == n.Parent.DataAtom || atom.Li == n.Parent.DataAtom) {
+			n.Data = strings.TrimRight(n.Data, "\n\t ")
+		}
+		if "" == n.Data {
+			*newlineNodes = append(*newlineNodes, n)
+		}
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.searchEmptyNodes(c, newlineNodes)
 	}
 }
 
