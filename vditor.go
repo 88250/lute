@@ -208,59 +208,50 @@ func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
 		}
 	}
 
-	// 移除 HTML 中不需要的换行节点
-	lute.removeNewlines(nodes[0])
+	lute.removeEmptyNodes(nodes[0])
 
-	var emptyTextNodes []*html.Node
 	for c := nodes[0]; nil != c; c = c.NextSibling {
-		lute.adjustVditorDOM0(c, &emptyTextNodes)
-	}
-
-	for _, emptyTextNode := range emptyTextNodes {
-		if parent := emptyTextNode.Parent; nil != parent && (atom.Table == parent.DataAtom || atom.Thead == parent.DataAtom || atom.Tbody == parent.DataAtom || atom.Tr == parent.DataAtom) {
-			emptyTextNode.Unlink()
-			continue
-		}
-
-		if nil == emptyTextNode.PrevSibling || nil == emptyTextNode.NextSibling {
-			// 没有前后节点的话保留该空白
-			continue
-		}
-		if atom.Span == emptyTextNode.PrevSibling.DataAtom || atom.Span == emptyTextNode.NextSibling.DataAtom {
-			// 前节点或者后节点是 span 的话保留该空白
-			continue
-		}
-		emptyTextNode.Unlink()
+		lute.adjustVditorDOM0(c)
 	}
 }
 
-func (lute *Lute) removeNewlines(node *html.Node) {
-	var newlineNodes []*html.Node
+func (lute *Lute) removeEmptyNodes(node *html.Node) {
+	var emptyNodes []*html.Node
 	for c := node; nil != c; c = c.NextSibling {
-		lute.searchEmptyNodes(c, &newlineNodes)
+		lute.searchEmptyNodes(c, &emptyNodes)
 	}
-	for _, newlineNode := range newlineNodes {
-		newlineNode.Unlink()
+	for _, emptyNode := range emptyNodes {
+		emptyNode.Unlink()
 	}
 }
 
-func (lute *Lute) searchEmptyNodes(n *html.Node, newlineNodes *[]*html.Node) {
+func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 	switch n.DataAtom {
 	case 0:
-		if nil != n.Parent && (atom.Ol == n.Parent.DataAtom || atom.Ul == n.Parent.DataAtom || atom.Li == n.Parent.DataAtom) {
+		if (nil != n.PrevSibling && atom.Span == n.PrevSibling.DataAtom) || (nil != n.NextSibling && atom.Span == n.NextSibling.DataAtom) {
+			// 前节点或者后节点是 span 的话保留该空白
+			break
+		}
+
+		parent := n.Parent
+		if nil != parent && (atom.Ol == parent.DataAtom || atom.Ul == parent.DataAtom || atom.Li == parent.DataAtom) {
 			n.Data = strings.TrimRight(n.Data, "\n\t ")
 		}
+		if nil != parent && (atom.Table == parent.DataAtom || atom.Thead == parent.DataAtom || atom.Tbody == parent.DataAtom || atom.Tr == parent.DataAtom) {
+			n.Data = strings.TrimSpace(n.Data)
+		}
+
 		if "" == n.Data {
-			*newlineNodes = append(*newlineNodes, n)
+			*emptyNodes = append(*emptyNodes, n)
 		}
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.searchEmptyNodes(c, newlineNodes)
+		lute.searchEmptyNodes(c, emptyNodes)
 	}
 }
 
-func (lute *Lute) adjustVditorDOM0(n *html.Node, emptyTextNodes *[]*html.Node) {
+func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 	switch n.DataAtom {
 	case atom.Li:
 		// 在 li 下的每个非块容器节点用 p 包裹
@@ -319,14 +310,10 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node, emptyTextNodes *[]*html.Node) {
 				}
 			}
 		}
-	case 0:
-		if "" == strings.TrimSpace(n.Data) {
-			*emptyTextNodes = append(*emptyTextNodes, n)
-		}
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.adjustVditorDOM0(c, emptyTextNodes)
+		lute.adjustVditorDOM0(c)
 	}
 }
 
