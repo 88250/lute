@@ -11,6 +11,7 @@
 package parse
 
 import (
+	"bytes"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -59,6 +60,22 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 		n.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: []byte{token}})
 		return nil
 	}
+	if t.Context.Option.VditorWYSIWYG {
+		// 处理 \‸x 情况，光标后的字符才是待转义的
+		tokens := ctx.tokens[ctx.pos:]
+		caret := []byte(util.Caret)
+		if len(caret) < len(tokens) && bytes.HasPrefix(tokens, caret) {
+			ctx.pos+= len(caret)
+			token = ctx.tokens[ctx.pos]
+			ctx.pos++
+			n := &ast.Node{Type: ast.NodeBackslash}
+			block.AppendChild(n)
+			n.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: []byte{token}})
+			block.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: caret})
+			return nil
+		}
+	}
+
 	return &ast.Node{Type: ast.NodeText, Tokens: backslash}
 }
 
