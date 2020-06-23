@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -65,7 +66,7 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 		tokens := ctx.tokens[ctx.pos:]
 		caret := []byte(util.Caret)
 		if len(caret) < len(tokens) && bytes.HasPrefix(tokens, caret) {
-			ctx.pos+= len(caret)
+			ctx.pos += len(caret)
 			token = ctx.tokens[ctx.pos]
 			ctx.pos++
 			n := &ast.Node{Type: ast.NodeBackslash}
