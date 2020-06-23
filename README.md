@@ -1,7 +1,11 @@
 <p align = "center">
 <img alt="Lute" src="https://b3log.org/images/brand/lute-128.png">
 <br><br>
-A structured Markdown engine that supports Go and JavaScript
+一款对中文语境优化的 Markdown 引擎，支持 Go 和 JavaScript<br><br>
+<em>
+千呼万唤始出来 犹抱琵琶半遮面<br>
+转轴拨弦三两声 未成曲调先有情
+</em>
 <br><br>
 <a title="Build Status" target="_blank" href="https://travis-ci.org/88250/lute"><img src="https://img.shields.io/travis/88250/lute.svg?style=flat-square"></a>
 <a title="Go Report Card" target="_blank" href="https://goreportcard.com/report/github.com/88250/lute"><img src="https://goreportcard.com/badge/github.com/88250/lute?style=flat-square"></a>
@@ -21,69 +25,71 @@ A structured Markdown engine that supports Go and JavaScript
 </p>
 
 <p align="center">
-<a href="https://hacpai.com/article/1567047822949">中文</a>
+<a href="https://github.com/88250/lute/blob/master/README.md">English</a>
 </p>
 
-## 💡 Introduction
+## 💡 简介
 
-[Lute](https://github.com/88250/lute) is a structured Markdown engine that fully implements the latest [GFM](https://github.github.com/gfm/) / [CommonMark](https://commonmark.org) standard, better support for Chinese context.
+[Lute](https://github.com/88250/lute) 是一款结构化的 Markdown 引擎，完整实现了最新的 [GFM](https://github.github.com/gfm/)/[CommonMark](https://commonmark.org) 规范，对中文语境支持更好。
 
-Welcome to [Lute Official Discussion Forum](https://hacpai.com/tag/lute) to learn more.
+欢迎到 [Lute 官方讨论区](https://hacpai.com/tag/lute)了解更多。同时也欢迎关注 B3log 开源社区微信公众号 `B3log开源`：
 
-## 📽️ Background
+![b3logos.png](https://img.hacpai.com/file/2019/10/image-d3c00d78.png)
 
-I have been using other Markdown engines before, and they are more or less "defective":
+## 📽️ 背景
 
-* Inconsistent support for standard specifications
-* The processing of "strange" text is very time-consuming and even hangs
-* Support for Chinese is not good enough
+之前我一直在使用其他 Markdown 引擎，它们或多或少都有些“瑕疵”：
 
-Lute's goal is to build a structured Markdown engine that implements GFM/CM specifications and provides better support for Chinese. The so-called "structured" refers to the construction of an abstract syntax tree from the input MD text, HTML output, text formatting, etc. through the operation tree.
-The realization of the specification is to ensure that there is no ambiguity in Markdown rendering, so that the same Markdown text can be processed by the Markdown engine to achieve the same result, which is very important.
+* 对标准规范的支持不一致
+* 对“怪异”文本处理非常耗时，甚至挂死
+* 对中文支持不够好
 
-There are not many engines that implement specifications. I want to see if I can write one, which is one of Lute's motivations. There are many opinions on the Internet about how to implement a Markdown engine:
+Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范并对中文提供更好的支持。所谓的“结构化”指的是从输入的 MD 文本构建抽象语法树，通过操作树来进行 HTML 输出、原文格式化等。
+实现规范是为了保证 Markdown 渲染不存在二义性，让同一份 Markdown 文本可以在实现规范的 Markdown 引擎处理后得到一样的结果，这一点非常重要。
 
-* Some people say that Markdown is suitable for regular analysis, because the grammar rules are too simple
-* Some people say that Markdown can be handled by the compilation principle, but the rule is too difficult to maintain
+实现规范的引擎并不多，我想试试看自己能不能写上一个，这也是 Lute 的动机之一。关于如何实现一个 Markdown 引擎，网上众说纷纭：
 
-I agree with the latter, because regular expressions is indeed too difficult to maintain and has low operating efficiency. The most important reason is that the core parsing algorithm of the Markdown engine that conforms to the GFM/CM specification cannot be written in regular, because the rules defined by the specification are too complicated.
+* 有的人说 Markdown 适合用正则解析，因为文法规则太简单
+* 也有的人说 Markdown 可以用编译原理来处理，正则太难维护
 
-Finally, another important motivation is that the B3log open source community needs its own Markdown engine:
+我赞同后者，因为正则确实太难维护而且运行效率较低。最重要的原因是符合 GFM/CM 规范的 Markdown 引擎的核心解析算法不可能用正则写出来，因为规范定义的规则实在是太复杂了。
 
-* [Solo](https://github.com/88250/solo), [Pipe](https://github.com/88250/pipe), [Sym](https://github.com/88250/symphony ) Markdown rendering with uniform effects is required, and performance is very important
-* [Vditor](https://github.com/Vanessa219/vditor) needs a structured engine as support to achieve the next generation of Markdown editor
+最后，还有一个很重要的动机就是 B3log 开源社区需要一款自己的 Markdown 引擎：
 
-## ✨  Features
+* [Solo](https://github.com/88250/solo)、[Pipe](https://github.com/88250/pipe)、[Sym](https://github.com/88250/symphony) 需要效果统一的 Markdown 渲染，并且性能非常重要
+* [Vditor](https://github.com/Vanessa219/vditor) 需要一款结构化的引擎作为支撑以实现下一代的 Markdown 编辑器
 
-* Implement the latest version of GFM/CM specifications
-* Zero regular expressions, very fast
-* Built-in code block syntax highlighting
-* Better support for Chinese context
-* Terminology spelling correction
-* Markdown format
-* Emoji analysis
-* HTML to Markdown
-* Custom rendering function
-* Support JavaScript
+## ✨  特性
 
-## 🗃 Showcases
+* 实现最新版 GFM/CM 规范
+* 零正则，非常快
+* 内置代码块语法高亮
+* 对中文语境支持更好
+* 术语拼写修正
+* Markdown 格式化
+* Emoji 解析
+* HTML 转换 Markdown
+* 自定义渲染函数
+* 支持 JavaScript 端使用
 
-* [HacPai](https://hacpai.com), you can go to [here](https://hacpai.com/guide/markdown) for online testing.
+## 🗃 案例
 
-## 🇨🇳 Chinese context optimization
+* [黑客派](https://hacpai.com)，可以到[这里](https://hacpai.com/guide/markdown)进行在线测试。
 
-* Enhanced automatic link recognition
-* Automatically insert spaces between Chinese and Western languages
-* English punctuation is replaced with Chinese punctuation
+## 🇨🇳 中文语境优化
 
-## ♍ Format
+* 自动链接识别加强
+* 在中西文间自动插入空格
+* 英文标点替换为中文标点
 
-The formatting function can format "untidy" Markdown text into a unified style. In scenarios that require public editing, a unified typography style makes it easier for everyone to collaborate.
+## ♍ 格式化
+
+格式化功能可将“不整洁”的 Markdown 文本格式化为统一风格，在需要公共编辑的场景下，统一的排版风格能让大家更容易协作。
 
 <details>
-<summary>Click here to expand the formatting example.</summary>
+<summary>点此展开格式化示例。</summary>
 <br>
-Markdown: 
+Markdown 原文：
 
 ````````markdown
 # ATX 标题也有可能需要格式化的 ##
@@ -151,7 +157,7 @@ col1 without left pipe      |   this is col2   | col3 without right pipe
 **以上就是为什么我们需要Markdown Format，而且是带中西文自动空格的格式化。**
 ````````
 
-Formatted:
+格式化后：
 
 ````````markdown
 # ATX 标题也有可能需要格式化的
@@ -230,58 +236,58 @@ func main() {
 
 </details>
 
-## ✍️ Terminology revision
+## ✍️ 术语修正
 
-Markdown: 
-
-```markdown
-Doing open source projects on github is a very happy thing, please don't spell Github as `github`!
-
-In particular, this should never happen in your resume:
-
-> Proficient in using JAVA, Javascript, GIT, have a certain understanding of android, ios development, proficient in using Mysql, postgresql database.
-```
-
-after fixing:
+Markdown 原文：
 
 ```markdown
-Doing open source projects on GitHub is a very happy thing, please don't spell Github as `github`!
+在github上做开源项目是一件很开心的事情，请不要把Github拼写成`github`哦！
 
-In particular, this should never happen in your resume:
+特别是简历中千万不要出现这样的情况：
 
-> Proficient in using Java, JavaScript, Git, have a certain understanding of Android, iOS development, proficient in using MySQL, PostgreSQL database.
+> 熟练使用JAVA、Javascript、GIT，对android、ios开发有一定了解，熟练使用Mysql、postgresql数据库。
 ```
 
-## ⚡ Performance
+修正后：
 
-Please see [Golang markdown engine performance benchmark](https://hacpai.com/article/1574570835061).
+```markdown
+在 GitHub 上做开源项目是一件很开心的事情，请不要把 GitHub 拼写成`github`哦！
 
-## 💪 Robustness
+特别是简历中千万不要出现这样的情况：
 
-Lute carries all Markdown processing on [HacPai](https://hacpai.com), processes millions of parsing and rendering requests every day, and runs stably.
+> 熟练使用 Java、JavaScript、Git，对 Android、iOS 开发有一定了解，熟练使用 MySQL、PostgreSQL 数据库。
+```
 
-## 🔒 Safety
+## ⚡ 性能
 
-Lute does not implement [Disallowed Raw HTML (extension)](https://github.github.com/gfm/#disallowed-raw-html-extension-) in GFM, because the extension still has certain vulnerabilities `<input>`).
-It is recommended to use other libraries (such as [bluemonday](https://github.com/microcosm-cc/bluemonday)) for HTML security filtering, so that it can better adapt to the application scenario.
+请看 [Golang markdown 引擎性能基准测试](https://hacpai.com/article/1574570835061)。
 
-## 🛠️ Usages
+## 💪 健壮性
 
-There are three ways to use Lute:
+Lute 承载了[黑客派](https://hacpai.com)上的所有 Markdown 处理，每天处理数百万解析渲染请求，运行表现稳定。
 
-1. Backend: Introduce `github.com/88250/lute` package in Go language
-2. Backend: Start Lute as an HTTP service process for other processes to call, please refer to [here](https://github.com/88250/lute-http)
-3. Front end: Introduce lute.min.js in the js directory, support Node.js
+## 🔒 安全性
+
+Lute 没有实现实现 GFM 中的 [Disallowed Raw HTML (extension)](https://github.github.com/gfm/#disallowed-raw-html-extension-)，因为该扩展还是存在一定漏洞（比如没有处理 `<input>` ）。
+建议通过其他库（比如 [bluemonday](https://github.com/microcosm-cc/bluemonday)）来进行 HTML 安全过滤，这样也能更好地适配应用场景。
+
+## 🛠️ 使用
+
+有三种方式使用 Lute：
+
+1. 后端：用 Go 语言的话引入 `github.com/88250/lute` 包
+2. 后端：将 Lute 启动为一个 HTTP 服务进程供其他进程调用，具体请参考[这里](https://github.com/88250/lute-http)
+3. 前端：引入 js 目录下的 lute.min.js，支持 Node.js
 
 ### Go
 
-Introduce the Lute library:
+引入 Lute 库：
 
 ```shell
 go get -u github.com/88250/lute
 ```
 
-Working example of minimization:
+最小化可工作示例：
 
 ```go
 package main
@@ -293,49 +299,52 @@ import (
 )
 
 func main() {
-	luteEngine := lute.New() // GFM support and Chinese context optimization have been enabled by default
-	html := luteEngine.MarkdownStr("demo", "**Lute** - A structured markdown engine.")
+	luteEngine := lute.New() // 默认已经启用 GFM 支持以及中文语境优化
+	html:= luteEngine.MarkdownStr("demo", "**Lute** - A structured markdown engine.")
 	fmt.Println(html)
 	// <p><strong>Lute</strong> - A structured Markdown engine.</p>
 }
 ```
 
-About code block syntax highlighting:
+关于代码块语法高亮：
 
-* The external style sheet is used by default, and the theme is github.css. You can copy the style file from the chroma-styles directory to the project and import it
-* You can specify highlight-related parameters such as whether to enable inline styles, line numbers, and themes through `lutenEngine.SetCodeSyntaxHighlightXXX ()`
+* 默认使用外部样式表，主题为 github.css，可从 chroma-styles 目录下拷贝该样式文件到项目中引入
+* 可通过 `lutenEngine.SetCodeSyntaxHighlightXXX()` 来指定高亮相关参数，比如是否启用内联样式、行号以及主题
 
 ### JavaScript
 
-For a simple example, please refer to the demo in the JavaScript directory. For the complete usage of the front-end editor, please refer to [Demo in Vditor](https://github.com/Vanessa219/vditor/tree/master/demo)
+简单示例可参考 JavaScript 目录下的 demo，结合前端编辑器的完整用法请参考 [Vditor 中的示例](https://github.com/Vanessa219/vditor/tree/master/demo)。
 
 ![Vditor](https://img.hacpai.com/file/2020/02/%E6%88%AA%E5%9B%BE%E4%B8%93%E7%94%A8-ef21ef12.png)
 
-Some details:
+一些细节：
 
-1. lute.js has no built-in syntax highlighting feature
-2. The size of lute.js after compilation is ~1MB, the size after compression through `brotli -o lute.min.js.br lute.min.js` is ~130KB, the size after regular GZip compression is ~180KB
+1. lute.js 没有内置语法高亮特性
+2. lute.js 编译后大小为 ~1MB，通过 `brotli -o lute.min.js.br lute.min.js` 压缩后大小 ~130KB，常规 GZip 压缩后大小 ~180KB
 
-## 📜 Documentation
+## 📜 文档
 
-* [Interpretation of CommonMark specifications](https://hacpai.com/article/1566893557720)
-* [Lute Implementation Postscript](https://hacpai.com/article/1567062979327)
-* [Markdown parsing and Markdown AST](https://hacpai.com/article/1587637426085)
+* [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
+* [CommonMark 规范要点解读](https://hacpai.com/article/1566893557720)
+* [Lute 实现后记](https://hacpai.com/article/1567062979327)
+* [Markdown 解析原理详解和 Markdown AST 描述](https://hacpai.com/article/1587637426085)
 
-## 🏘️ Community
+## 🏘️ 社区
 
-* [Forum](https://hacpai.com/tag/lute)
-* [Issues](https://github.com/88250/lute/issues/new/choose)
+* [讨论区](https://hacpai.com/tag/lute)
+* [报告问题](https://github.com/88250/lute/issues/new/choose)
 
-## 📄 License
+## 📄 授权
 
-Lute uses the [Mulan Permissive Software License，Version 2](http://license.coscl.org.cn/MulanPSL2) open source license.
+Lute 使用 [木兰宽松许可证, 第2版](http://license.coscl.org.cn/MulanPSL2) 开源协议。
 
-## 🙏 Acknowledgement
+## 🙏 鸣谢
 
-* [commonmark.js](https://github.com/commonmark/commonmark.js): CommonMark parser and renderer in JavaScript
-* [goldmark](https://github.com/yuin/goldmark)：A markdown parser written in Go
-* [golang-commonmark](https://gitlab.com/golang-commonmark/markdown): A CommonMark-compliant markdown parser and renderer in Go
-* [Chroma](https://github.com/alecthomas/chroma): A general purpose syntax highlighter in pure Go
-* [中文文案排版指北](https://github.com/sparanoid/chinese-copywriting-guidelines): Chinese copywriting guidelines for better written communication
-* [GopherJS](https://github.com/gopherjs/gopherjs): A compiler from Go to JavaScript for running Go code in a browser
+Lute 的诞生离不开以下开源项目，在此对这些项目的贡献者们致敬！
+
+* [commonmark.js](https://github.com/commonmark/commonmark.js)：该项目是 CommonMark 官方参考实现的 JavaScript 版，Lute 参考了其解析器实现部分
+* [goldmark](https://github.com/yuin/goldmark)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其树遍历实现部分
+* [golang-commonmark](https://gitlab.com/golang-commonmark/markdown)：另一款用 golang 写的 Markdown 引擎，Lute 参考了其 URL 编码以及 HTML 转义算法
+* [Chroma](https://github.com/alecthomas/chroma)：用 golang 写的语法高亮引擎
+* [中文文案排版指北](https://github.com/sparanoid/chinese-copywriting-guidelines)：统一中文文案、排版的相关用法，降低团队成员之间的沟通成本，增强网站气质
+* [GopherJS](https://github.com/gopherjs/gopherjs)：将 Go 代码编译成 JavaScript 代码
