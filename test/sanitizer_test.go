@@ -40,15 +40,15 @@ func TestSanitizer(t *testing.T) {
 
 var sanitizerVditorTests = []parseTest{
 
-	{"8", "<img OnError=\"alert(1)\" src=\"bar.png\" />", "<p data-block=\"0\"><img src=\"bar.png\" alt=\"\" />\n</p>"},
+	{"8", "<img OnError=\"alert(1)\" src=\"bar.png\" />", "<p data-block=\"0\"><img src=\"bar.png\" alt=\"\" /></p>"},
 	{"7", "<iframe src=\"//player.bilibili.com/player.html?aid=test&page=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"> </iframe>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;iframe src=&quot;//player.bilibili.com/player.html?aid=test&amp;page=1&quot; scrolling=&quot;no&quot; border=&quot;0&quot; frameborder=&quot;no&quot; framespacing=&quot;0&quot; allowfullscreen=&quot;true&quot;&gt; &lt;/iframe&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><iframe src=\"//player.bilibili.com/player.html?aid=test&amp;page=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"> </iframe></pre></div>"},
 	{"6", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;img src=\"test1<wbr>\" onerror=\"alert('XSS')\"&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"1\"><img src=\"test\" onerror=\"alert('XSS')\"></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;img src=&quot;test1<wbr>&quot; onerror=&quot;alert('XSS')&quot;&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><img src=\"test1\"></pre></div>"},
 	{"5", "<iframe src=\"javascript:parent.require('child_process').exec('open -a Calculator')\"></iframe>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;iframe src=&quot;javascript:parent.require('child_process').exec('open -a Calculator')&quot;&gt;&lt;/iframe&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><iframe></iframe></pre></div>"},
-	{"4", "![Escape SRC - onerror](\"onerror=\"alert('ImageOnError'))", "<p data-block=\"0\"><img src=\"\" alt=\"Escape SRC - onerror\" />\n</p>"},
-	{"3", "<EMBED SRC=\"data:image/svg+xml;base64,mock payload\" type=\"image/svg+xml\" AllowScriptAccess=\"always\"></EMBED>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;embed src=&quot;data:image/svg+xml;base64,mock payload&quot; type=&quot;image/svg+xml&quot; allowscriptaccess=&quot;always&quot;/&gt;</code></span>\u200b\n</p>"},
-	{"2", "<FOo>bar", "<p data-block=\"0\">foobar\n</p>"},
-	{"1", "<img onerror=\"alert(1)\" src=\"bar.png\" />", "<p data-block=\"0\"><img src=\"bar.png\" alt=\"\" />\n</p>"},
-	{"0", "foo<script>alert(1)</script>bar", "<p data-block=\"0\">foo\n</p><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\">  </pre></div><p data-block=\"0\">bar\n</p>"},
+	{"4", "![Escape SRC - onerror](\"onerror=\"alert('ImageOnError'))", "<p data-block=\"0\"><img src=\"\" alt=\"Escape SRC - onerror\" /></p>"},
+	{"3", "<EMBED SRC=\"data:image/svg+xml;base64,mock payload\" type=\"image/svg+xml\" AllowScriptAccess=\"always\"></EMBED>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\"><code data-type=\"html-inline\">\u200b&lt;embed src=&quot;data:image/svg+xml;base64,mock payload&quot; type=&quot;image/svg+xml&quot; allowscriptaccess=&quot;always&quot;/&gt;</code></span>\u200b</p>"},
+	{"2", "<FOo>bar", "<p data-block=\"0\">foobar</p>"},
+	{"1", "<img onerror=\"alert(1)\" src=\"bar.png\" />", "<p data-block=\"0\"><img src=\"bar.png\" alt=\"\" /></p>"},
+	{"0", "foo<script>alert(1)</script>bar", "<p data-block=\"0\">foo</p><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\">  </pre></div><p data-block=\"0\">bar</p>"},
 }
 
 func TestSanitizerVditor(t *testing.T) {

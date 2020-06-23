@@ -614,7 +614,6 @@ func (r *VditorRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 	if entering {
 		r.tag("p", [][]string{{"data-block", "0"}}, false)
 	} else {
-		r.WriteByte(lex.ItemNewline)
 		r.tag("/p", nil, false)
 	}
 	return ast.WalkContinue
