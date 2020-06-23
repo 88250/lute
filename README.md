@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/88250/lute/blob/master/README.md">English</a>
+<a href="https://github.com/88250/lute/blob/master/README_en_US.md">English</a>
 </p>
 
 ## 💡 简介
