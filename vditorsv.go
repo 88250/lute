@@ -33,7 +33,7 @@ func (lute *Lute) SpinVditorSVDOM(ivHTML string) (ovHTML string) {
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 	markdown := lute.vditorSVDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewVditorIRRenderer(tree)
+	renderer := render.NewVditorSVRenderer(tree)
 	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
@@ -55,7 +55,7 @@ func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewVditorIRRenderer(tree)
+	renderer := render.NewVditorSVRenderer(tree)
 	for nodeType, rendererFunc := range lute.HTML2VditorSVDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -83,7 +83,7 @@ func (lute *Lute) Md2VditorSVDOM(markdown string) (vHTML string) {
 	lute.VditorWYSIWYG = true
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewVditorIRRenderer(tree)
+	renderer := render.NewVditorSVRenderer(tree)
 	for nodeType, rendererFunc := range lute.Md2VditorSVDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
