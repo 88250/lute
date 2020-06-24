@@ -314,12 +314,16 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			rendererFuncs = lute.HTML2VditorDOMRendererFuncs
 		} else if "HTML2VditorIRDOM" == rendererType {
 			rendererFuncs = lute.HTML2VditorIRDOMRendererFuncs
+		} else if "HTML2VditorSVDOM" == rendererType {
+			rendererFuncs = lute.HTML2VditorSVDOMRendererFuncs
 		} else if "Md2HTML" == rendererType {
 			rendererFuncs = lute.Md2HTMLRendererFuncs
 		} else if "Md2VditorDOM" == rendererType {
 			rendererFuncs = lute.Md2VditorDOMRendererFuncs
 		} else if "Md2VditorIRDOM" == rendererType {
 			rendererFuncs = lute.Md2VditorIRDOMRendererFuncs
+		} else if "Md2VditorSVDOM" == rendererType {
+			rendererFuncs = lute.Md2VditorSVDOMRendererFuncs
 		} else {
 			panic("unknown ext renderer func [" + rendererType + "]")
 		}
