@@ -219,10 +219,19 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	if "" == previousNodeText {
 		r.WriteString(parse.Zwsp)
 	}
-	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	idx, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
-
-	attrs := [][]string{{"data-type", "footnotes-ref"}, {"class", "vditor-ir__node"}}
+	label := def.Text()
+	attrs := [][]string{{"data-type", "footnotes-ref"}}
+	text := node.Text()
+	expand := strings.Contains(text, util.Caret)
+	if expand {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand vditor-tooltipped vditor-tooltipped__s"})
+	} else {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-tooltipped vditor-tooltipped__s"})
+	}
+	attrs = append(attrs, []string{"aria-label", html.EscapeString(label)})
+	attrs = append(attrs, []string{"data-footnotes-label", string(node.FootnotesRefLabel)})
 	r.tag("sup", attrs, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
@@ -285,6 +294,10 @@ func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language := string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})
+		if "mindmap" == language {
+			dataCode := r.renderMindmap(node.Tokens)
+			attrs = append(attrs, []string{"data-code", string(dataCode)})
+		}
 	}
 
 	class := "vditor-ir__marker--pre"
@@ -356,7 +369,7 @@ func (r *VditorSVRenderer) renderInlineMathOpenMarker(node *ast.Node, entering b
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDollar)
 	r.tag("/span", nil, false)
-	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}}, false)
+	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "math-inline"}}, false)
 	return ast.WalkStop
 }
 
@@ -603,7 +616,12 @@ func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, []byte(util.Caret))
 
 	if entering {
-		r.tag("span", [][]string{{"class", "vditor-ir__node"}}, false)
+		text := r.Text(node)
+		class := "vditor-ir__node"
+		if strings.Contains(text, util.Caret) || needResetCaret {
+			class += " vditor-ir__node--expand"
+		}
+		r.tag("span", [][]string{{"class", class}}, false)
 	} else {
 		if needResetCaret {
 			r.WriteString(util.Caret)
@@ -620,6 +638,17 @@ func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 			attrs = append(attrs, []string{"alt", string(altTokens)})
 		}
 		r.tag("img", attrs, true)
+
+		// XSS 过滤
+		buf := r.Writer.Bytes()
+		idx := bytes.LastIndex(buf, []byte("<img src="))
+		imgBuf := buf[idx:]
+		if r.Option.Sanitize {
+			imgBuf = sanitize(imgBuf)
+		}
+		r.Writer.Truncate(idx)
+		r.Writer.Write(imgBuf)
+
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
@@ -645,12 +674,22 @@ func (r *VditorSVRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString(`<div class="vditor-ir__block" data-type="html-block" data-block="0">`)
-	node.Tokens = bytes.TrimSpace(node.Tokens)
-	r.WriteString("<pre class=\"vditor-ir__marker--pre\">")
+	r.renderDivNode(node)
+	tokens := bytes.TrimSpace(node.Tokens)
+	r.WriteString("<pre class=\"vditor-ir__marker--pre vditor-ir__marker\">")
 	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
-	r.Write(html.EscapeHTML(node.Tokens))
-	r.WriteString("</code></pre></div>")
+	r.Write(html.EscapeHTML(tokens))
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+	if r.Option.Sanitize {
+		tokens = sanitize(tokens)
+	}
+	r.Write(tokens)
+	r.WriteString("</pre>")
+
+	r.WriteString("</div>")
 	return ast.WalkStop
 }
 
@@ -675,7 +714,6 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 	if entering {
 		r.tag("p", [][]string{{"data-block", "0"}}, false)
 	} else {
-		r.WriteByte(lex.ItemNewline)
 		r.tag("/p", nil, false)
 	}
 	return ast.WalkContinue
@@ -828,7 +866,13 @@ func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 
 func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
+		text := r.Text(node)
+		if strings.Contains(text, util.Caret) {
+			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
+		} else {
+			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
+		}
+
 		id := string(node.HeadingID)
 		if r.Option.HeadingID && "" != id {
 			r.WriteString(" data-id=\"" + id + "\"")
@@ -880,10 +924,21 @@ func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 			if 1 != node.Start {
 				attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
 			}
-		} else {
-			attrs = append(attrs, []string{"data-marker", string(node.BulletChar)})
+		}
+		switch node.ListData.Typ {
+		case 0:
+			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+		case 1:
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+		case 3:
+			if 0 == node.ListData.BulletChar {
+				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			} else {
+				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+			}
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
+		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
 	} else {
 		r.tag("/"+tag, nil, false)
@@ -966,7 +1021,9 @@ func (r *VditorSVRenderer) tag(name string, attrs [][]string, selfclosing bool) 
 }
 
 func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
+	text := r.Text(node)
 	var attrs [][]string
+
 	switch node.Type {
 	case ast.NodeEmphasis:
 		attrs = append(attrs, []string{"data-type", "em"})
@@ -987,12 +1044,34 @@ func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
+
+	if strings.Contains(text, util.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
+		return
+	}
+
+	preText := node.PreviousNodeText()
+	if strings.HasSuffix(preText, util.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
+		return
+	}
+
+	nexText := node.NextNodeText()
+	if strings.HasPrefix(nexText, util.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("span", attrs, false)
+		return
+	}
+
 	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("span", attrs, false)
 	return
 }
 
 func (r *VditorSVRenderer) renderDivNode(node *ast.Node) {
+	text := r.Text(node)
 	attrs := [][]string{{"data-block", "0"}}
 	switch node.Type {
 	case ast.NodeCodeBlock:
@@ -1002,6 +1081,13 @@ func (r *VditorSVRenderer) renderDivNode(node *ast.Node) {
 	case ast.NodeMathBlock:
 		attrs = append(attrs, []string{"data-type", "math-block"})
 	}
+
+	if strings.Contains(text, util.Caret) {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+		r.tag("div", attrs, false)
+		return
+	}
+
 	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("div", attrs, false)
 	return
@@ -1011,7 +1097,7 @@ func (r *VditorSVRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
-			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent:
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeHTMLBlock, ast.NodeInlineHTML:
 				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
 				ret += string(n.CodeBlockInfo)
