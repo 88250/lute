@@ -253,6 +253,8 @@ type Options struct {
 	VditorWYSIWYG bool
 	// Vditor 即时渲染支持
 	VditorIR bool
+	// Vditor 分屏预览支持
+	VditorSV bool
 	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
 	InlineMathAllowDigitAfterOpenMarker bool
 	// LinkBase 设置链接、图片的基础路径。如果用户在链接或者图片地址中使用相对路径（没有协议前缀且不以 / 开头）并且 LinkBase 不为空则会用该值作为前缀。
