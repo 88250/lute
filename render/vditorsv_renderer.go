@@ -855,7 +855,7 @@ func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 
 func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + ">")
+		r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1])
 		id := string(node.HeadingID)
 		if r.Option.HeadingID && "" != id {
 			r.WriteString(" data-id=\"" + id + "\"")
