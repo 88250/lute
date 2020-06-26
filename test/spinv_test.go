@@ -225,3 +225,21 @@ func TestSpinVditorIRDOM(t *testing.T) {
 		}
 	}
 }
+
+var spinVditorSVDOMTests = []*parseTest{
+
+	{"1", "<p data-type=\"p\" data-block=\"0\">| foo | bar |\n| --- | --- |\n|<wbr></p>", ""},
+	{"0", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<wbr></div>", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<wbr></div>"},
+}
+
+func TestSpinVditorSVDOM(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.ToC = true
+
+	for _, test := range spinVditorSVDOMTests {
+		html := luteEngine.SpinVditorSVDOM(test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}

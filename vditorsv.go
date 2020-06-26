@@ -12,7 +12,6 @@ package lute
 
 import (
 	"bytes"
-	"strconv"
 	"strings"
 
 	"github.com/88250/lute/ast"
@@ -124,8 +123,8 @@ func (lute *Lute) vditorSVDOM2Md(htmlStr string) (markdown string) {
 		return
 	}
 
-	// 调整 DOM 结构
-	lute.adjustVditorDOM(htmlNodes)
+	// TODO: 调整 DOM 结构
+	//lute.adjustVditorDOM(htmlNodes)
 
 	// 将 HTML 树转换为 Markdown AST
 
@@ -176,60 +175,60 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 
 	dataType := lute.domAttrValue(n, "data-type")
 
-	if atom.Div == n.DataAtom {
-		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType {
-			if ("code-block" == dataType || "math-block" == dataType) &&
-				!strings.Contains(lute.domAttrValue(n.FirstChild, "data-type"), "-block-open-marker") {
-				// 处理在结尾 ``` 或者 $$ 后换行的情况
-				p := &ast.Node{Type: ast.NodeParagraph}
-				text := &ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(n.FirstChild))}
-				p.AppendChild(text)
-				tree.Context.Tip.AppendChild(p)
-				tree.Context.Tip = p
-				return
-			}
-
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				lute.genASTByVditorSVDOM(c, tree)
-			}
-		} else if "link-ref-defs-block" == dataType {
-			text := lute.domText(n)
-			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
-			tree.Context.Tip.AppendChild(node)
-		} else if "footnotes-def" == dataType {
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				lute.genASTByVditorSVDOM(c, tree)
-			}
-		} else if "footnotes-block" == dataType {
-			for def := n.FirstChild; nil != def; def = def.NextSibling {
-				originalHTML := &bytes.Buffer{}
-				if err := html.Render(originalHTML, def); nil == err {
-					md := lute.vditorSVDOM2Md(originalHTML.String())
-					lines := strings.Split(md, "\n")
-					md = ""
-					for i, line := range lines {
-						if 0 < i {
-							md += "    " + line
-						} else {
-							md = line
-						}
-						md += "\n"
-					}
-					node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
-					tree.Context.Tip.AppendChild(node)
-				}
-			}
-		} else if "toc-block" == dataType {
-			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
-			tree.Context.Tip.AppendChild(node)
-		} else {
-			text := lute.domText(n)
-			if util.Caret+"\n" == text { // 处理 FireFox 某些情况下产生的分段
-				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(util.Caret + "\n")})
-			}
-		}
-		return
-	}
+	//if atom.Div == n.DataAtom {
+	//	if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType {
+	//		if ("code-block" == dataType || "math-block" == dataType) &&
+	//			!strings.Contains(lute.domAttrValue(n.FirstChild, "data-type"), "-block-open-marker") {
+	//			// 处理在结尾 ``` 或者 $$ 后换行的情况
+	//			p := &ast.Node{Type: ast.NodeParagraph}
+	//			text := &ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(n.FirstChild))}
+	//			p.AppendChild(text)
+	//			tree.Context.Tip.AppendChild(p)
+	//			tree.Context.Tip = p
+	//			return
+	//		}
+	//
+	//		for c := n.FirstChild; c != nil; c = c.NextSibling {
+	//			lute.genASTByVditorSVDOM(c, tree)
+	//		}
+	//	} else if "link-ref-defs-block" == dataType {
+	//		text := lute.domText(n)
+	//		node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
+	//		tree.Context.Tip.AppendChild(node)
+	//	} else if "footnotes-def" == dataType {
+	//		for c := n.FirstChild; c != nil; c = c.NextSibling {
+	//			lute.genASTByVditorSVDOM(c, tree)
+	//		}
+	//	} else if "footnotes-block" == dataType {
+	//		for def := n.FirstChild; nil != def; def = def.NextSibling {
+	//			originalHTML := &bytes.Buffer{}
+	//			if err := html.Render(originalHTML, def); nil == err {
+	//				md := lute.vditorSVDOM2Md(originalHTML.String())
+	//				lines := strings.Split(md, "\n")
+	//				md = ""
+	//				for i, line := range lines {
+	//					if 0 < i {
+	//						md += "    " + line
+	//					} else {
+	//						md = line
+	//					}
+	//					md += "\n"
+	//				}
+	//				node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
+	//				tree.Context.Tip.AppendChild(node)
+	//			}
+	//		}
+	//	} else if "toc-block" == dataType {
+	//		node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
+	//		tree.Context.Tip.AppendChild(node)
+	//	} else {
+	//		text := lute.domText(n)
+	//		if util.Caret+"\n" == text { // 处理 FireFox 某些情况下产生的分段
+	//			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(util.Caret + "\n")})
+	//		}
+	//	}
+	//	return
+	//}
 
 	class := lute.domAttrValue(n, "class")
 	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
@@ -308,88 +307,6 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 
 		node.Type = ast.NodeBlockquote
 		node.AppendChild(&ast.Node{Type: ast.NodeBlockquoteMarker, Tokens: []byte(">")})
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
-	case atom.Ol, atom.Ul:
-		if nil == n.FirstChild {
-			return
-		}
-
-		node.Type = ast.NodeList
-		node.ListData = &ast.ListData{}
-		if atom.Ol == n.DataAtom {
-			node.ListData.Typ = 1
-		}
-		tight := lute.domAttrValue(n, "data-tight")
-		if "true" == tight || "" == tight {
-			node.Tight = true
-		}
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
-	case atom.Li:
-		if p := n.FirstChild; nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
-			tree.Context.Tip.Tight = false
-		}
-
-		node.Type = ast.NodeListItem
-		marker := lute.domAttrValue(n, "data-marker")
-		var bullet byte
-		if "" == marker {
-			if nil != n.Parent && atom.Ol == n.Parent.DataAtom {
-				firstLiMarker := lute.domAttrValue(n.Parent.FirstChild, "data-marker")
-				if startAttr := lute.domAttrValue(n.Parent, "start"); "" == startAttr {
-					marker = "1"
-				} else {
-					marker = startAttr
-				}
-				if "" != firstLiMarker {
-					marker += firstLiMarker[len(firstLiMarker)-1:]
-				} else {
-					marker += "."
-				}
-			} else {
-				marker = lute.domAttrValue(n.Parent, "data-marker")
-				if "" == marker {
-					marker = "*"
-				}
-				bullet = marker[0]
-			}
-		} else {
-			if nil != n.Parent {
-				if atom.Ol == n.Parent.DataAtom {
-					if "*" == marker || "-" == marker || "+" == marker {
-						marker = "1."
-					}
-					if "1." != marker && "1)" != marker && nil != n.PrevSibling && atom.Li != n.PrevSibling.DataAtom &&
-						nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
-						// 子有序列表第一项必须从 1 开始
-						marker = "1."
-					}
-					if "1." != marker && "1)" != marker && atom.Ol == n.Parent.DataAtom && n.Parent.FirstChild == n && "" == lute.domAttrValue(n.Parent, "start") {
-						marker = "1."
-					}
-				} else {
-					if "*" != marker && "-" != marker && "+" != marker {
-						marker = "*"
-					}
-					bullet = marker[0]
-				}
-			} else {
-				marker = lute.domAttrValue(n, "data-marker")
-				if "" == marker {
-					marker = "*"
-				}
-				bullet = marker[0]
-			}
-		}
-		node.ListData = &ast.ListData{Marker: []byte(marker), BulletChar: bullet}
-		if 0 == bullet {
-			node.ListData.Num, _ = strconv.Atoi(string(marker[0]))
-			node.ListData.Delimiter = marker[len(marker)-1]
-		}
-
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
