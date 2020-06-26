@@ -326,11 +326,6 @@ func (r *VditorSVRenderer) renderInlineMathContent(node *ast.Node, entering bool
 	tokens := html.EscapeHTML(node.Tokens)
 	r.Write(tokens)
 	r.tag("/code", nil, false)
-	r.tag("span", [][]string{{"class", "vditor-sv__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", [][]string{{"class", "language-math"}}, false)
-	r.Write(tokens)
-	r.tag("/code", nil, false)
-	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -338,7 +333,6 @@ func (r *VditorSVRenderer) renderInlineMathOpenMarker(node *ast.Node, entering b
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteByte(lex.ItemDollar)
 	r.tag("/span", nil, false)
-	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-sv__marker--pre"}, {"data-type", "math-inline"}}, false)
 	return ast.WalkStop
 }
 
@@ -369,13 +363,6 @@ func (r *VditorSVRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	} else {
 		r.Write(html.EscapeHTML(node.Tokens))
 	}
-	r.WriteString("</code></pre>")
-
-	r.tag("pre", [][]string{{"class", "vditor-sv__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
-	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -749,14 +736,15 @@ func (r *VditorSVRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering b
 
 func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<blockquote data-block="0">`)
+		r.WriteString(`<div data-block="0" data-type="bq">`)
 	} else {
-		r.WriteString("</blockquote>")
+		r.WriteString("</div>")
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(node.Tokens)
 	return ast.WalkStop
 }
 
