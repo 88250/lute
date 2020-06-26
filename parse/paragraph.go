@@ -104,7 +104,6 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					p.AppendChild(tr)
 					tr = nextTr
 				}
-				p.Tokens = nil
 			}
 			return
 		}

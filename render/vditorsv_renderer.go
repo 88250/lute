@@ -436,10 +436,11 @@ func (r *VditorSVRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wa
 func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.tag("div", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
+		r.Write(node.Tokens)
 	} else {
 		r.tag("/div", nil, false)
 	}
-	return ast.WalkContinue
+	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {

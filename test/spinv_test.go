@@ -228,7 +228,7 @@ func TestSpinVditorIRDOM(t *testing.T) {
 
 var spinVditorSVDOMTests = []*parseTest{
 
-	{"1", "<p data-type=\"p\" data-block=\"0\">| foo | bar |\n| --- | --- |\n|<wbr></p>", ""},
+	{"1", "<p data-type=\"p\" data-block=\"0\">| foo | b*a*r |\n| --- | --- |\n|<wbr></p>", "<div data-block=\"0\" data-type=\"table\">| foo | b*a*r |\n| --- | --- |\n|<wbr>"},
 	{"0", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<wbr></div>", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<wbr></div>"},
 }
 
