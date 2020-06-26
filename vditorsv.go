@@ -191,11 +191,15 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				lute.genASTByVditorSVDOM(c, tree)
 			}
+		} else if "bq" == dataType {
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				lute.genASTByVditorSVDOM(c, tree)
+			}
 		} else if "link-ref-defs-block" == dataType {
 			text := lute.domText(n)
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
 			tree.Context.Tip.AppendChild(node)
-		} else if "footnotes-def" == dataType || "bq" == dataType {
+		} else if "footnotes-def" == dataType {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				lute.genASTByVditorSVDOM(c, tree)
 			}
@@ -299,17 +303,6 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Hr:
 		node.Type = ast.NodeThematicBreak
 		tree.Context.Tip.AppendChild(node)
-	case atom.Blockquote:
-		content := strings.TrimSpace(lute.domText(n))
-		if "" == content || "&gt;" == content || util.Caret == content {
-			return
-		}
-
-		node.Type = ast.NodeBlockquote
-		node.AppendChild(&ast.Node{Type: ast.NodeBlockquoteMarker, Tokens: []byte(">")})
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
 			var codeTokens []byte
@@ -320,8 +313,8 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
 			switch divDataType {
 			case "math-block":
-				node.Type = ast.NodeMathBlock
-				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: codeTokens})
+				node.Type = ast.NodeMathBlockContent
+				node.Tokens = codeTokens
 				tree.Context.Tip.AppendChild(node)
 			case "html-block":
 				node.Type = ast.NodeHTMLBlock
@@ -559,6 +552,10 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		case "math-block-close-marker":
+			marker := []byte(lute.domText(n))
+			if bytes.HasSuffix(marker, []byte(util.Caret)) {
+				tree.Context.Tip.LastChild.Tokens = append(tree.Context.Tip.LastChild.Tokens, []byte(util.Caret)...)
+			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: []byte("$$")})
 			defer tree.Context.ParentTip()
 			return
@@ -600,6 +597,9 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "code-block-close-marker":
 			marker := []byte(lute.domText(n))
+			if bytes.HasSuffix(marker, []byte(util.Caret)) {
+				tree.Context.Tip.LastChild.Tokens = append(tree.Context.Tip.LastChild.Tokens, []byte(util.Caret)...)
+			}
 			lastBacktick := bytes.LastIndex(marker, []byte("`")) + 1
 			if 0 < lastBacktick {
 				marker = marker[:lastBacktick]

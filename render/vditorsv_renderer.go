@@ -276,7 +276,7 @@ func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
 	r.tag("code", nil, false)
-	r.Write(html.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(bytes.TrimSpace(node.Tokens)))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -329,7 +329,7 @@ func (r *VditorSVRenderer) renderInlineMath(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-type", "math-block-close-marker"}}, false)
+	r.tag("span", [][]string{{"data-type", "math-block-close-marker"}, {"class", "vditor-sv__marker"}}, false)
 	r.WriteString("$$")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -338,13 +338,13 @@ func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering b
 func (r *VditorSVRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
-	r.Write(html.EscapeHTML(node.Tokens))
+	r.Write(html.EscapeHTML(bytes.TrimSpace(node.Tokens)))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-type", "math-block-open-marker"}}, false)
+	r.tag("span", [][]string{{"data-type", "math-block-open-marker"}, {"class", "vditor-sv__marker"}}, false)
 	r.WriteString("$$")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
