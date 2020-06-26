@@ -232,7 +232,7 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 				lute.genASTByVditorSVDOM(c, tree)
 			}
 			return
-		case "bq":
+		case "blockquote":
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				lute.genASTByVditorSVDOM(c, tree)
 			}

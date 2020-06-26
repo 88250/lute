@@ -25,6 +25,7 @@ import (
 // VditorSVRenderer 描述了 Vditor Split-View DOM 渲染器。
 type VditorSVRenderer struct {
 	*BaseRenderer
+	nodeWriterStack        []*bytes.Buffer // 节点输出缓冲栈
 	needRenderFootnotesDef bool
 }
 
@@ -553,6 +554,15 @@ func (r *VditorSVRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+	} else {
+		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+		buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
+		r.Writer.Reset()
+		r.Write(buf)
+	}
 	return ast.WalkContinue
 }
 
@@ -708,17 +718,61 @@ func (r *VditorSVRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering b
 
 func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<div data-block="0" data-type="bq">`)
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
 	} else {
-		r.WriteString("</div>")
+		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+
+		blockquoteLines := bytes.Buffer{}
+		buf := writer.Bytes()
+		lines := bytes.Split(buf, []byte{lex.ItemNewline})
+		length := len(lines)
+		if 2 < length && lex.IsBlank(lines[length-1]) && lex.IsBlank(lines[length-2]) {
+			lines = lines[:length-1]
+		}
+		if 1 == len(r.nodeWriterStack) { // 已经是根这一层
+			length = len(lines)
+			if 1 < length && lex.IsBlank(lines[length-1]) {
+				lines = lines[:length-1]
+			}
+		}
+
+		length = len(lines)
+		for _, line := range lines {
+			if 0 == len(line) {
+				blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt; </span>` + "\n")
+				continue
+			}
+
+			if lex.ItemGreater == line[0] {
+				blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt;</span>`)
+			} else {
+				blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt; </span>`)
+			}
+			blockquoteLines.Write(line)
+			blockquoteLines.WriteByte(lex.ItemNewline)
+		}
+		buf = blockquoteLines.Bytes()
+		writer.Reset()
+		bq := node.ParentIs(ast.NodeBlockquote)
+		if !bq {
+			writer.WriteString(`<div data-block="0" data-type="blockquote">`)
+		}
+		writer.Write(buf)
+		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
+		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		buf = bytes.TrimSpace(r.Writer.Bytes())
+		r.Writer.Reset()
+		r.Write(buf)
+		if !bq {
+			r.WriteString("</div>")
+		}
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
-	r.Write(html.EscapeHTML(node.Tokens))
-	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
