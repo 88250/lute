@@ -252,7 +252,6 @@ func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering b
 
 func (r *VditorSVRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--info"}, {"data-type", "code-block-info"}}, false)
-	r.WriteString(parse.Zwsp)
 	r.Write(node.CodeBlockInfo)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -275,25 +274,9 @@ func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
-	codeLen := len(node.Tokens)
-	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-	isFenced := node.Parent.IsFencedCodeBlock
-	caretInInfo := false
-	if isFenced {
-		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, []byte(util.Caret))
-		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(util.Caret), nil)
-	}
 	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
 	r.tag("code", nil, false)
-	if codeIsEmpty {
-		if !caretInInfo {
-			r.WriteString("<wbr>")
-		}
-		r.WriteByte(lex.ItemNewline)
-	} else {
-		r.Write(html.EscapeHTML(node.Tokens))
-		r.Newline()
-	}
+	r.Write(html.EscapeHTML(node.Tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -353,16 +336,9 @@ func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering b
 }
 
 func (r *VditorSVRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	node.Tokens = bytes.TrimSpace(node.Tokens)
-	codeLen := len(node.Tokens)
-	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
-	if codeIsEmpty {
-		r.WriteString("<wbr>\n")
-	} else {
-		r.Write(html.EscapeHTML(node.Tokens))
-	}
+	r.Write(html.EscapeHTML(node.Tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -563,15 +539,6 @@ func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
-
-	r.tag("pre", [][]string{{"class", "vditor-sv__preview"}, {"data-render", "2"}}, false)
-	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
-	if r.Option.Sanitize {
-		tokens = sanitize(tokens)
-	}
-	r.Write(tokens)
-	r.WriteString("</pre>")
-
 	r.WriteString("</div>")
 	return ast.WalkStop
 }
@@ -594,10 +561,15 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		return ast.WalkContinue
 	}
 
+	bq := node.ParentIs(ast.NodeBlockquote)
 	if entering {
-		r.tag("p", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
+		if !bq {
+			r.tag("p", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
+		}
 	} else {
-		r.tag("/p", nil, false)
+		if !bq {
+			r.tag("/p", nil, false)
+		}
 	}
 	return ast.WalkContinue
 }
@@ -744,7 +716,9 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+	r.Write(html.EscapeHTML(node.Tokens))
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 

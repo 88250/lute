@@ -228,6 +228,8 @@ func TestSpinVditorIRDOM(t *testing.T) {
 
 var spinVditorSVDOMTests = []*parseTest{
 
+	{"3", "<div data-block=\"0\" data-type=\"code-block\"><span data-type=\"code-block-open-marker\" class=\"vditor-sv__marker\">``</span></div><div data-block=\"0\" data-type=\"code-block\"><span data-type=\"code-block-open-marker\" class=\"vditor-sv__marker\"><wbr>`</span><span class=\"vditor-sv__marker--info\" data-type=\"code-block-info\"></span><pre class=\"vditor-sv__marker--pre\"><code></code></pre><span data-type=\"code-block-close-marker\" class=\"vditor-sv__marker\">```</span></div>", "> fo\n"},
+	{"2", "<div data-block=\"0\" data-type=\"bq\"><span class=\"vditor-sv__marker\">&gt; </span>fo<wbr></div>", "> fo\n"},
 	{"1", "<p data-type=\"p\" data-block=\"0\">| foo | b*a*r |\n| --- | --- |\n|<wbr></p>", "<div data-block=\"0\" data-type=\"table\">| foo | b*a*r |\n| --- | --- |\n|<wbr>"},
 	{"0", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<wbr></div>", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<wbr></div>"},
 }
