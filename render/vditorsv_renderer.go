@@ -244,7 +244,7 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 }
 
 func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-type", "code-block-close-marker"}}, false)
+	r.tag("span", [][]string{{"data-type", "code-block-close-marker"}, {"class", "vditor-sv__marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -259,7 +259,7 @@ func (r *VditorSVRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bo
 }
 
 func (r *VditorSVRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-type", "code-block-open-marker"}}, false)
+	r.tag("span", [][]string{{"data-type", "code-block-open-marker"}, {"class", "vditor-sv__marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -283,23 +283,8 @@ func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, []byte(util.Caret))
 		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(util.Caret), nil)
 	}
-	var attrs [][]string
-	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
-		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-		language := string(infoWords[0])
-		attrs = append(attrs, []string{"class", "language-" + language})
-		if "mindmap" == language {
-			dataCode := r.renderMindmap(node.Tokens)
-			attrs = append(attrs, []string{"data-code", string(dataCode)})
-		}
-	}
-
-	class := "vditor-sv__marker--pre"
-	if r.Option.VditorCodeBlockPreview {
-		class += " vditor-sv__marker"
-	}
-	r.tag("pre", [][]string{{"class", class}}, false)
-	r.tag("code", attrs, false)
+	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
+	r.tag("code", nil, false)
 	if codeIsEmpty {
 		if !caretInInfo {
 			r.WriteString("<wbr>")
@@ -310,15 +295,6 @@ func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 		r.Newline()
 	}
 	r.WriteString("</code></pre>")
-
-	if r.Option.VditorCodeBlockPreview {
-		r.tag("pre", [][]string{{"class", "vditor-sv__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", attrs, false)
-		tokens := node.Tokens
-		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
-		r.Write(html.EscapeHTML(tokens))
-		r.WriteString("</code></pre>")
-	}
 	return ast.WalkStop
 }
 
@@ -567,37 +543,9 @@ func (r *VditorSVRenderer) renderBang(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
-	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, []byte(util.Caret))
-
 	if entering {
 		r.tag("span", nil, false)
 	} else {
-		if needResetCaret {
-			r.WriteString(util.Caret)
-			node.Next.Tokens = bytes.ReplaceAll(node.Next.Tokens, []byte(util.Caret), nil)
-		}
-
-		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-		destTokens = r.Tree.Context.RelativePath(destTokens)
-		destTokens = bytes.ReplaceAll(destTokens, []byte(util.Caret), nil)
-		attrs := [][]string{{"src", string(destTokens)}}
-		alt := node.ChildByType(ast.NodeLinkText)
-		if nil != alt && 0 < len(alt.Tokens) {
-			altTokens := bytes.ReplaceAll(alt.Tokens, []byte(util.Caret), nil)
-			attrs = append(attrs, []string{"alt", string(altTokens)})
-		}
-		r.tag("img", attrs, true)
-
-		// XSS 过滤
-		buf := r.Writer.Bytes()
-		idx := bytes.LastIndex(buf, []byte("<img src="))
-		imgBuf := buf[idx:]
-		if r.Option.Sanitize {
-			imgBuf = sanitize(imgBuf)
-		}
-		r.Writer.Truncate(idx)
-		r.Writer.Write(imgBuf)
-
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
@@ -701,7 +649,7 @@ func (r *VditorSVRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering boo
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
 	r.tag("/span", nil, false)
-	r.tag("code", [][]string{{"data-newline", "1"}}, false)
+	r.tag("span", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
@@ -711,7 +659,7 @@ func (r *VditorSVRenderer) renderCodeSpanContent(node *ast.Node, entering bool) 
 }
 
 func (r *VditorSVRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/code", nil, false)
+	r.tag("/span", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
 	r.tag("/span", nil, false)
@@ -990,7 +938,6 @@ func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
-
 	r.tag("span", attrs, false)
 	return
 }
@@ -1005,7 +952,6 @@ func (r *VditorSVRenderer) renderDivNode(node *ast.Node) {
 	case ast.NodeMathBlock:
 		attrs = append(attrs, []string{"data-type", "math-block"})
 	}
-
 	r.tag("div", attrs, false)
 	return
 }
