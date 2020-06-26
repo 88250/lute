@@ -175,65 +175,6 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 
 	dataType := lute.domAttrValue(n, "data-type")
 
-	if atom.Div == n.DataAtom {
-		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType {
-			if ("code-block" == dataType || "math-block" == dataType) &&
-				!strings.Contains(lute.domAttrValue(n.FirstChild, "data-type"), "-block-open-marker") {
-				// 处理在结尾 ``` 或者 $$ 后换行的情况
-				p := &ast.Node{Type: ast.NodeParagraph}
-				text := &ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(n.FirstChild))}
-				p.AppendChild(text)
-				tree.Context.Tip.AppendChild(p)
-				tree.Context.Tip = p
-				return
-			}
-
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				lute.genASTByVditorSVDOM(c, tree)
-			}
-		} else if "bq" == dataType {
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				lute.genASTByVditorSVDOM(c, tree)
-			}
-		} else if "link-ref-defs-block" == dataType {
-			text := lute.domText(n)
-			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
-			tree.Context.Tip.AppendChild(node)
-		} else if "footnotes-def" == dataType {
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				lute.genASTByVditorSVDOM(c, tree)
-			}
-		} else if "footnotes-block" == dataType {
-			for def := n.FirstChild; nil != def; def = def.NextSibling {
-				originalHTML := &bytes.Buffer{}
-				if err := html.Render(originalHTML, def); nil == err {
-					md := lute.vditorSVDOM2Md(originalHTML.String())
-					lines := strings.Split(md, "\n")
-					md = ""
-					for i, line := range lines {
-						if 0 < i {
-							md += "    " + line
-						} else {
-							md = line
-						}
-						md += "\n"
-					}
-					node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
-					tree.Context.Tip.AppendChild(node)
-				}
-			}
-		} else if "toc-block" == dataType {
-			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
-			tree.Context.Tip.AppendChild(node)
-		} else {
-			text := lute.domText(n)
-			if util.Caret+"\n" == text { // 处理 FireFox 某些情况下产生的分段
-				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(util.Caret + "\n")})
-			}
-		}
-		return
-	}
-
 	class := lute.domAttrValue(n, "class")
 	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
 	node := &ast.Node{Type: ast.NodeText, Tokens: []byte(content)}
@@ -268,11 +209,74 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeLinkText
 		}
 		tree.Context.Tip.AppendChild(node)
-	case atom.P, atom.Div:
+	case atom.P:
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+	case atom.Div:
+		switch dataType {
+		case "code-block", "html-block", "math-block":
+			if ("code-block" == dataType || "math-block" == dataType) &&
+				!strings.Contains(lute.domAttrValue(n.FirstChild, "data-type"), "-block-open-marker") {
+				// 处理在结尾 ``` 或者 $$ 后换行的情况
+				p := &ast.Node{Type: ast.NodeParagraph}
+				text := &ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(n.FirstChild))}
+				p.AppendChild(text)
+				tree.Context.Tip.AppendChild(p)
+				tree.Context.Tip = p
+				return
+			}
+
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				lute.genASTByVditorSVDOM(c, tree)
+			}
+			return
+		case "bq":
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				lute.genASTByVditorSVDOM(c, tree)
+			}
+			return
+		case "link-ref-defs-block":
+			text := lute.domText(n)
+			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
+			tree.Context.Tip.AppendChild(node)
+			return
+		case "footnotes-def":
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				lute.genASTByVditorSVDOM(c, tree)
+			}
+			return
+		case "footnotes-block":
+			for def := n.FirstChild; nil != def; def = def.NextSibling {
+				originalHTML := &bytes.Buffer{}
+				if err := html.Render(originalHTML, def); nil == err {
+					md := lute.vditorSVDOM2Md(originalHTML.String())
+					lines := strings.Split(md, "\n")
+					md = ""
+					for i, line := range lines {
+						if 0 < i {
+							md += "    " + line
+						} else {
+							md = line
+						}
+						md += "\n"
+					}
+					node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
+					tree.Context.Tip.AppendChild(node)
+				}
+			}
+			return
+		case "toc-block":
+			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
+			tree.Context.Tip.AppendChild(node)
+			return
+		default:
+			node.Type = ast.NodeParagraph
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
+		}
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		if "" == strings.TrimSpace(lute.domText(n)) {
 			return
