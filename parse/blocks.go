@@ -251,8 +251,8 @@ var blockStarts = []blockStartFunc{
 					t.Context.advanceOffset(1, true)
 					markers = append(markers, whitespace)
 				}
-				if t.Context.Option.VditorWYSIWYG {
-					// Vditor 所见即所得模式下块引用标记符 > 后面不能为空
+				if t.Context.Option.VditorWYSIWYG && !t.Context.Option.VditorSV {
+					// Vditor 所见即所得模式下块引用标记符 > 后面不能为空，但分屏预览模式可以
 					ln := util.BytesToStr(t.Context.currentLine[t.Context.offset:])
 					ln = strings.ReplaceAll(ln, util.Caret, "")
 					if ln = strings.TrimSpace(ln); "" == ln {
