@@ -827,17 +827,15 @@ func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 				attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
 			}
 		}
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			attrs = append(attrs, []string{"data-type", "ol"})
-		} else {
-			attrs = append(attrs, []string{"data-type", "ul"})
-		}
 		switch node.ListData.Typ {
 		case 0:
+			attrs = append(attrs, []string{"data-type", "ul"})
 			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 		case 1:
+			attrs = append(attrs, []string{"data-type", "ol"})
 			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
 		case 3:
+			attrs = append(attrs, []string{"data-type", "task"})
 			if 0 == node.ListData.BulletChar {
 				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
 			} else {
@@ -867,28 +865,16 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 			} else {
 				marker = string(node.Marker)
 			}
-			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type {
-				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
-			}
 		}
-		//r.tag("div", [][]string{{"data-type", "li"}, {"data-marker", marker}}, false)
 		attrs = append(attrs, []string{"data-type", "li"}, []string{"data-marker", marker}, []string{"class", "vditor-sv__marker--bi"})
 		r.tag("span", attrs, false)
 		r.WriteString(marker + " ")
 		r.tag("/span", nil, false)
-	} else {
-		//r.tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	var attrs [][]string
-	if node.TaskListItemChecked {
-		attrs = append(attrs, []string{"checked", ""})
-	}
-	attrs = append(attrs, []string{"type", "checkbox"})
-	r.tag("input", attrs, true)
 	return ast.WalkStop
 }
 
