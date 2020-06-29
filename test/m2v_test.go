@@ -81,9 +81,9 @@ func TestMd2VditorIR(t *testing.T) {
 
 var md2VditorSVTests = []parseTest{
 
-	{"5", "> foo\n>> bar\n", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span>foo\n<span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span>bar\n<span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span></div>"},
+	{"5", "> foo\n>> bar\n", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span>foo\n<span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span>bar</div>"},
 	{"4", "* [ ] foo", "<div data-tight=\"true\" data-type=\"task\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span> foo\n</div>"},
-	{"3", ">>", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span></div>"},
+	{"3", ">>", "<div data-block=\"0\" data-type=\"blockquote\"></div>"},
 	{"2", "> foo", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span>foo</div>"},
 	{"1", ":heart: :huaji: ❤️ ", "<p data-type=\"p\" data-block=\"0\">:heart: :huaji: ❤️\n</p>"},
 	{"0", "* foo", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo\n</div>"},
