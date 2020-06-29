@@ -278,6 +278,9 @@ func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
 	r.tag("code", nil, false)
 	r.Write(html.EscapeHTML(bytes.TrimSpace(node.Tokens)))
+	if nil == node.Next.Next {
+		r.WriteByte(lex.ItemNewline)
+	}
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -559,8 +562,7 @@ func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.Wal
 		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
 	} else {
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		//buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
-		buf := r.Writer.Bytes()
+		buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
 		r.Writer.Reset()
 		r.Write(buf)
 	}
