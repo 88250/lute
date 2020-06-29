@@ -747,7 +747,6 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		length = len(lines)
 		for _, line := range lines {
 			if 0 == len(line) {
-				blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt; </span>` + "\n")
 				continue
 			}
 
