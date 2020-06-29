@@ -758,6 +758,8 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		bq := node.ParentIs(ast.NodeBlockquote)
 		if !bq {
 			writer.WriteString(`<div data-block="0" data-type="blockquote">`)
+		} else {
+			writer.WriteByte(lex.ItemNewline)
 		}
 		writer.Write(buf)
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
@@ -890,6 +892,7 @@ func (r *VditorSVRenderer) renderThematicBreak(node *ast.Node, entering bool) as
 }
 
 func (r *VditorSVRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteByte(lex.ItemNewline)
 	r.tag("br", nil, true)
 	return ast.WalkStop
 }
