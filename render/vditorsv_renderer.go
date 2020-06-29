@@ -559,7 +559,8 @@ func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.Wal
 		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
 	} else {
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
+		//buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
+		buf := r.Writer.Bytes()
 		r.Writer.Reset()
 		r.Write(buf)
 	}
@@ -577,6 +578,9 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 			r.tag("p", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
 		}
 	} else {
+		if nil == node.Next {
+			r.WriteByte(lex.ItemNewline)
+		}
 		if !bq {
 			r.tag("/p", nil, false)
 		}
@@ -819,6 +823,17 @@ func (r *VditorSVRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool)
 }
 
 func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
+	blockContainerParent := node.ParentIs(ast.NodeListItem, ast.NodeBlockquote)
+	if blockContainerParent {
+		if entering {
+			r.WriteString("\n")
+			if ast.NodeListItem == node.Parent.Type {
+				r.WriteString(strings.Repeat(" ", node.Parent.Padding))
+			}
+		}
+		return ast.WalkContinue
+	}
+
 	if entering {
 		var attrs [][]string
 		if node.Tight {
@@ -872,6 +887,8 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		r.tag("span", attrs, false)
 		r.WriteString(marker + " ")
 		r.tag("/span", nil, false)
+	} else {
+		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
 }
