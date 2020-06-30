@@ -572,9 +572,9 @@ func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.Wal
 
 func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	grandparent := node.Parent.Parent
-	inListItem,looseListItemFirstP := r.listItemParent(node)
+	inListItem, looseListItemFirstP := r.listItemParent(node)
 	if nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
-			return ast.WalkContinue
+		return ast.WalkContinue
 	}
 
 	rootParent := ast.NodeDocument == node.Parent.Type
@@ -762,10 +762,18 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 			}
 		}
 
+		inListItem, looseListItemFirstP := r.listItemParent(node)
+		if inListItem && !looseListItemFirstP {
+			blockquoteLines.WriteString("\n")
+		}
 		length = len(lines)
 		for _, line := range lines {
 			if 0 == len(line) {
 				continue
+			}
+
+			if inListItem && !looseListItemFirstP {
+				blockquoteLines.WriteString(strings.Repeat(" ", node.Parent.Padding))
 			}
 
 			if lex.ItemGreater == line[0] {
@@ -779,11 +787,12 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		buf = blockquoteLines.Bytes()
 		writer.Reset()
 		bq := node.ParentIs(ast.NodeBlockquote)
-		if !bq {
+		if !bq && !inListItem {
 			writer.WriteString(`<div data-block="0" data-type="blockquote">`)
 		} else {
 			writer.WriteByte(lex.ItemNewline)
 		}
+
 		writer.Write(buf)
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
@@ -793,7 +802,8 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		if nil != node.Next {
 			r.WriteByte(lex.ItemNewline)
 		}
-		if !bq {
+
+		if !bq && !inListItem {
 			r.WriteString("</div>")
 		}
 	}
