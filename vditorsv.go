@@ -549,6 +549,17 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 		}
 		return
 	case atom.Span:
+		if "blockquote" == lute.domAttrValue(n.Parent, "data-type") {
+			// 处理块引用 > 光标位置移动
+			marker := n.FirstChild.Data
+			marker = strings.ReplaceAll(marker, " ", "")
+			if strings.Contains(marker, ">" + util.Caret + ">") {
+				marker = strings.ReplaceAll(marker, util.Caret, "")
+				marker = marker + util.Caret
+				n.FirstChild.Data = marker
+			}
+		}
+
 		switch dataType {
 		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code":
 			node.Type = ast.NodeText
