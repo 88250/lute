@@ -563,15 +563,17 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 				if strings.HasPrefix(nextMarker, ">") {
 					marker += ">"
 					if atom.Span == n.NextSibling.DataAtom {
-						n.NextSibling.FirstChild.Data = strings.Replace(n.NextSibling.FirstChild.Data, ">", "", 1)
+						n.NextSibling.FirstChild.Data = strings.Replace(n.NextSibling.FirstChild.Data, "> ", "", 1)
 					} else {
-						n.NextSibling.Data = strings.Replace(n.NextSibling.Data, ">", "", 1)
+						n.NextSibling.Data = strings.Replace(n.NextSibling.Data, "> ", "", 1)
 					}
 				}
 			}
 
-			marker = strings.ReplaceAll(marker, " ", "")
-			if strings.Contains(marker, ">"+util.Caret+">") {
+			marker = strings.ReplaceAll(marker, ">   ", ">")
+			marker = strings.ReplaceAll(marker, ">  ", ">")
+			marker = strings.ReplaceAll(marker, "> ", ">")
+			if strings.Contains(marker, ">"+util.Caret+">") || strings.HasSuffix(marker, ">>"+util.Caret+" ") {
 				marker = strings.ReplaceAll(marker, util.Caret, "")
 				marker = marker + util.Caret
 
