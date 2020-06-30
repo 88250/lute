@@ -772,11 +772,11 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		buf = bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
 		r.Write(buf)
-		if !bq {
-			r.WriteString("</div>")
-		}
 		if nil != node.Next {
 			r.WriteByte(lex.ItemNewline)
+		}
+		if !bq {
+			r.WriteString("</div>")
 		}
 	}
 	return ast.WalkContinue
@@ -866,10 +866,10 @@ func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 		attrs = append(attrs, []string{"data-block", "0"})
 		r.tag("div", attrs, false)
 	} else {
-		r.tag("/div", nil, false)
 		if nil != node.Next {
 			r.WriteByte(lex.ItemNewline)
 		}
+		r.tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
