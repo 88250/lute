@@ -552,12 +552,22 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 		if "blockquote" == lute.domAttrValue(n.Parent, "data-type") {
 			// 处理块引用 > 光标位置移动
 			marker := n.FirstChild.Data
+			if nil != n.NextSibling {
+				nextMarker := n.NextSibling.Data
+				nextMarker = strings.ReplaceAll(nextMarker, " ", "")
+				if strings.HasPrefix(nextMarker, ">") {
+					marker += ">"
+					n.NextSibling.Data = strings.Replace(n.NextSibling.Data, ">", "", 1)
+				}
+			}
+
 			marker = strings.ReplaceAll(marker, " ", "")
-			if strings.Contains(marker, ">" + util.Caret + ">") {
+			if strings.Contains(marker, ">"+util.Caret+">") {
 				marker = strings.ReplaceAll(marker, util.Caret, "")
 				marker = marker + util.Caret
-				n.FirstChild.Data = marker
+
 			}
+			n.FirstChild.Data = marker
 		}
 
 		switch dataType {
