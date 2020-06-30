@@ -905,13 +905,11 @@ func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 }
 
 func (r *VditorSVRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("hr", [][]string{{"data-block", "0"}}, true)
-	if nil != node.Tokens {
-		r.tag("p", [][]string{{"data-block", "0"}}, false)
-		r.Write(node.Tokens)
-		r.WriteByte(lex.ItemNewline)
-		r.tag("/p", nil, false)
-	}
+	r.tag("div", [][]string{{"data-type", "thematic-break"}, {"class", "vditor-sv__marker"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+	r.WriteString("---\n\n")
+	r.tag("/span", nil, false)
+	r.tag("/div", nil, false)
 	return ast.WalkStop
 }
 
