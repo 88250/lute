@@ -775,6 +775,9 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		if !bq {
 			r.WriteString("</div>")
 		}
+		if nil != node.Next {
+			r.WriteByte(lex.ItemNewline)
+		}
 	}
 	return ast.WalkContinue
 }
@@ -864,6 +867,9 @@ func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 		r.tag("div", attrs, false)
 	} else {
 		r.tag("/div", nil, false)
+		if nil != node.Next {
+			r.WriteByte(lex.ItemNewline)
+		}
 	}
 	return ast.WalkContinue
 }
