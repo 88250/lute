@@ -570,21 +570,33 @@ func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
-		return ast.WalkContinue
+	grandparent := node.Parent.Parent
+	looseListItemFirstP := false
+	inListItem := false
+	if nil != grandparent && ast.NodeList == grandparent.Type { // List.ListItem.Paragraph
+		inListItem = true
+		if grandparent.Tight {
+			return ast.WalkContinue
+		} else {
+			looseListItemFirstP = node.Parent.FirstChild == node
+		}
 	}
 
-	bq := node.ParentIs(ast.NodeBlockquote)
+	rootParent := ast.NodeDocument == node.Parent.Type
 	if entering {
-		if !bq {
-			r.tag("p", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
+		if rootParent {
+			r.tag("div", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
+		} else {
+			if inListItem && !looseListItemFirstP {
+				r.WriteString("\n\n" + strings.Repeat(" ", node.Parent.Padding))
+			}
 		}
 	} else {
 		if nil == node.Next {
 			r.WriteByte(lex.ItemNewline)
 		}
-		if !bq {
-			r.tag("/p", nil, false)
+		if rootParent {
+			r.tag("/div", nil, false)
 		}
 	}
 	return ast.WalkContinue
@@ -894,6 +906,18 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		r.tag("span", attrs, false)
 		r.WriteString(marker + " ")
 		r.tag("/span", nil, false)
+
+		if 3 == node.ListData.Typ {
+			r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+			r.WriteString("[")
+			if node.ListData.Checked {
+				r.WriteString("x")
+			} else {
+				r.WriteString(" ")
+			}
+			r.WriteString("]")
+			r.tag("/span", nil, false)
+		}
 	} else {
 		r.WriteByte(lex.ItemNewline)
 	}
