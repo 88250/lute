@@ -12,9 +12,10 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
+
+	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -571,15 +572,9 @@ func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.Wal
 
 func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	grandparent := node.Parent.Parent
-	looseListItemFirstP := false
-	inListItem := false
-	if nil != grandparent && ast.NodeList == grandparent.Type { // List.ListItem.Paragraph
-		inListItem = true
-		if grandparent.Tight {
+	inListItem,looseListItemFirstP := r.listItemParent(node)
+	if nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
 			return ast.WalkContinue
-		} else {
-			looseListItemFirstP = node.Parent.FirstChild == node
-		}
 	}
 
 	rootParent := ast.NodeDocument == node.Parent.Type
@@ -600,6 +595,17 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		}
 	}
 	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) listItemParent(node *ast.Node) (inListItem, looseListItemFirstChild bool) {
+	grandparent := node.Parent.Parent
+	if nil != grandparent && ast.NodeList == grandparent.Type { // List.ListItem.Paragraph
+		inListItem = true
+		if !grandparent.Tight {
+			looseListItemFirstChild = node.Parent.FirstChild == node
+		}
+	}
+	return
 }
 
 func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
@@ -919,7 +925,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 			r.tag("/span", nil, false)
 		}
 	} else {
-		r.WriteByte(lex.ItemNewline)
+		r.Newline()
 	}
 	return ast.WalkContinue
 }
