@@ -553,11 +553,20 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 			// 处理块引用 > 光标位置移动
 			marker := n.FirstChild.Data
 			if nil != n.NextSibling {
-				nextMarker := n.NextSibling.Data
+				var nextMarker string
+				if atom.Span == n.NextSibling.DataAtom {
+					nextMarker = n.NextSibling.FirstChild.Data
+				} else {
+					nextMarker = n.NextSibling.Data
+				}
 				nextMarker = strings.ReplaceAll(nextMarker, " ", "")
 				if strings.HasPrefix(nextMarker, ">") {
 					marker += ">"
-					n.NextSibling.Data = strings.Replace(n.NextSibling.Data, ">", "", 1)
+					if atom.Span == n.NextSibling.DataAtom {
+						n.NextSibling.FirstChild.Data = strings.Replace(n.NextSibling.FirstChild.Data, ">", "", 1)
+					} else {
+						n.NextSibling.Data = strings.Replace(n.NextSibling.Data, ">", "", 1)
+					}
 				}
 			}
 
