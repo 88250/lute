@@ -769,7 +769,7 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		writer.Write(buf)
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		buf = bytes.TrimSpace(r.Writer.Bytes())
+		buf = r.Writer.Bytes()
 		r.Writer.Reset()
 		r.Write(buf)
 		if nil != node.Next {
