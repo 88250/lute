@@ -791,6 +791,9 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 			writer.WriteString(`<div data-block="0" data-type="blockquote">`)
 		} else {
 			writer.WriteByte(lex.ItemNewline)
+			if inListItem {
+				writer.WriteString(`<span data-type="blockquote">`)
+			}
 		}
 
 		writer.Write(buf)
@@ -805,6 +808,10 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 
 		if !bq && !inListItem {
 			r.WriteString("</div>")
+		} else {
+			if inListItem {
+				r.WriteString("</span>")
+			}
 		}
 	}
 	return ast.WalkContinue
