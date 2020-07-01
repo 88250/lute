@@ -271,42 +271,35 @@ func (lute *Lute) genASTByVditorSVDOM(n *html.Node, tree *parse.Tree) {
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
 			tree.Context.Tip.AppendChild(node)
 			return
+		case "heading":
+			if "" == strings.TrimSpace(lute.domText(n)) {
+				return
+			}
+			node.Type = ast.NodeHeading
+			marker := lute.domAttrValue(n, "data-marker")
+			node.HeadingSetext = "=" == marker || "-" == marker
+			if !node.HeadingSetext {
+				marker := lute.domText(n.FirstChild)
+				level := bytes.Count([]byte(marker), []byte("#"))
+				node.HeadingLevel = level
+			} else {
+				// 将 Setext 强制转为 ATX
+				node.HeadingSetext = false
+				if "=" == marker {
+					node.HeadingLevel = 1
+				} else {
+					node.HeadingLevel = 2
+				}
+			}
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
 		default:
 			node.Type = ast.NodeParagraph
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()
 		}
-	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
-		if "" == strings.TrimSpace(lute.domText(n)) {
-			return
-		}
-		node.Type = ast.NodeHeading
-		marker := lute.domAttrValue(n, "data-marker")
-		id := lute.domAttrValue(n, "data-id")
-		if "" != id {
-			node.HeadingID = []byte(id)
-		}
-		node.HeadingSetext = "=" == marker || "-" == marker
-		if !node.HeadingSetext {
-			marker := lute.domText(n.FirstChild)
-			level := bytes.Count([]byte(marker), []byte("#"))
-			node.HeadingLevel = level
-		} else {
-			// 将 Setext 强制转为 ATX
-			node.HeadingSetext = false
-			if "=" == marker {
-				node.HeadingLevel = 1
-			} else {
-				node.HeadingLevel = 2
-			}
-		}
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
-	case atom.Hr:
-		node.Type = ast.NodeThematicBreak
-		tree.Context.Tip.AppendChild(node)
 	case atom.Pre:
 		if atom.Code == n.FirstChild.DataAtom {
 			var codeTokens []byte
