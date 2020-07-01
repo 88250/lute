@@ -587,7 +587,8 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 			}
 		}
 	} else {
-		if nil == node.Next {
+		if !node.ParentIs(ast.NodeListItem) {
+			r.WriteByte(lex.ItemNewline)
 			r.WriteByte(lex.ItemNewline)
 		}
 		if rootParent {
