@@ -82,7 +82,19 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 
 	if t.Context.Option.VditorSV && token == util.Caret[0] && t.Context.Tip.ParentIs(ast.NodeListItem) {
 		token = lex.ItemSpace
-		ln = bytes.ReplaceAll(ln, []byte(string(marker) + util.Caret), []byte(string(marker)+ " " + util.Caret))
+		var from, to []byte
+		if 0 == delim {
+			from = []byte(string(marker) + util.Caret)
+			to = []byte(string(marker)+" "+util.Caret)
+		} else {
+			copy(marker, from)
+			from = append(from, delim)
+			from = append(from, []byte(util.Caret)...)
+			copy(marker, to)
+			to = append(to, delim)
+			to = append(to, []byte(" " + util.Caret)...)
+		}
+		ln = bytes.ReplaceAll(ln, from, to)
 		t.Context.currentLine = ln
 		t.Context.currentLineLen++
 	}
