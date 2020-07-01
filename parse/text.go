@@ -66,17 +66,18 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 		tokens := ctx.tokens[ctx.pos:]
 		caret := []byte(util.Caret)
 		if len(caret) < len(tokens) && bytes.HasPrefix(tokens, caret) {
-			ctx.pos += len(caret)
-			token = ctx.tokens[ctx.pos]
-			ctx.pos++
-			n := &ast.Node{Type: ast.NodeBackslash}
-			block.AppendChild(n)
-			n.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: []byte{token}})
-			block.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: caret})
-			return nil
+			token = ctx.tokens[ctx.pos + len(caret)]
+			if lex.IsASCIIPunct(token) {
+				ctx.pos += len(caret)
+				ctx.pos++
+				n := &ast.Node{Type: ast.NodeBackslash}
+				block.AppendChild(n)
+				n.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: []byte{token}})
+				block.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: caret})
+				return nil
+			}
 		}
 	}
-
 	return &ast.Node{Type: ast.NodeText, Tokens: backslash}
 }
 
