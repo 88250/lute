@@ -368,7 +368,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 	case atom.Font:
-		return
+		break
 	case atom.Details:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
