@@ -852,12 +852,6 @@ func (r *VditorSVRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool)
 func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	blockContainerParent := node.ParentIs(ast.NodeListItem, ast.NodeBlockquote)
 	if blockContainerParent {
-		if entering {
-			r.WriteString("\n")
-			if ast.NodeListItem == node.Parent.Type {
-				r.WriteString(strings.Repeat(" ", node.Parent.Padding))
-			}
-		}
 		return ast.WalkContinue
 	}
 
@@ -913,6 +907,15 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 				marker = string(node.Marker)
 			}
 		}
+
+		blockContainerParent := node.ParentIs(ast.NodeListItem, ast.NodeBlockquote)
+		if blockContainerParent {
+			r.Newline()
+			if nil != node.Parent.Parent && nil != node.Parent.Parent.ListData {
+				r.WriteString(strings.Repeat(" ", node.Parent.Parent.ListData.Padding))
+			}
+		}
+
 		attrs = append(attrs, []string{"data-type", "li"}, []string{"data-marker", marker}, []string{"class", "vditor-sv__marker--bi"})
 		r.tag("span", attrs, false)
 		r.WriteString(marker + " ")
