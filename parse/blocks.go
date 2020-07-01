@@ -100,7 +100,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
 			lex.ItemDollar != maybeMarker && // 数学公式
 			lex.ItemOpenBracket != maybeMarker && // 脚注
-			226 != maybeMarker { // Vditor 所见即所得
+			util.Caret[0] != maybeMarker { // Vditor 所见即所得
 			t.Context.advanceNextNonspace()
 			break
 		}

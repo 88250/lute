@@ -79,6 +79,14 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 	data.Marker = marker
 
 	var token = ln[t.Context.nextNonspace+markerLength]
+
+	if t.Context.Option.VditorSV && token == util.Caret[0] && t.Context.Tip.ParentIs(ast.NodeListItem) {
+		token = lex.ItemSpace
+		ln = bytes.ReplaceAll(ln, []byte(string(marker) + util.Caret), []byte(string(marker)+ " " + util.Caret))
+		t.Context.currentLine = ln
+		t.Context.currentLineLen++
+	}
+
 	// 列表项标记符后必须是空白字符
 	if !lex.IsWhitespace(token) {
 		return nil

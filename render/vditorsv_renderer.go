@@ -588,8 +588,10 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		}
 	} else {
 		if !node.ParentIs(ast.NodeListItem) {
-			r.WriteByte(lex.ItemNewline)
-			r.WriteByte(lex.ItemNewline)
+			r.WriteString("<br />")
+			if nil != node.Next {
+				r.WriteString("<br />")
+			}
 		}
 		if rootParent {
 			r.tag("/div", nil, false)
