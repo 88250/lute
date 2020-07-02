@@ -284,9 +284,14 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 }
 
 func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Newline()
 	r.tag("span", [][]string{{"data-type", "code-block-close-marker"}, {"class", "vditor-sv__marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
+	r.Newline()
+	if !r.isLastNode(r.Tree.Root, node) {
+		r.Write(newline)
+	}
 	return ast.WalkStop
 }
 
@@ -294,6 +299,7 @@ func (r *VditorSVRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--info"}, {"data-type", "code-block-info"}}, false)
 	r.Write(node.CodeBlockInfo)
 	r.tag("/span", nil, false)
+	r.Newline()
 	return ast.WalkStop
 }
 
@@ -317,9 +323,6 @@ func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
 	r.tag("code", nil, false)
 	r.Write(html.EscapeHTML(bytes.TrimSpace(node.Tokens)))
-	if nil == node.Next.Next {
-		r.Newline()
-	}
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }
@@ -397,6 +400,10 @@ func (r *VditorSVRenderer) renderMathBlock(node *ast.Node, entering bool) ast.Wa
 	if entering {
 		r.renderDivNode(node)
 	} else {
+		r.Newline()
+		if !entering && !r.isLastNode(r.Tree.Root, node) {
+			r.Write(newline)
+		}
 		r.WriteString("</div>")
 	}
 	return ast.WalkContinue
@@ -419,6 +426,10 @@ func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSt
 		r.tag("div", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
 		r.Write(node.Tokens)
 	} else {
+		r.Newline()
+		if !r.isLastNode(r.Tree.Root, node) {
+			r.Write(newline)
+		}
 		r.tag("/div", nil, false)
 	}
 	return ast.WalkStop
@@ -582,6 +593,10 @@ func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
+	r.Newline()
+	if !r.isLastNode(r.Tree.Root, node) {
+		r.Write(newline)
+	}
 	r.WriteString("</div>")
 	return ast.WalkStop
 }

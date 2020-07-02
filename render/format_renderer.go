@@ -857,23 +857,3 @@ func (r *FormatRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.Walk
 	r.Newline()
 	return ast.WalkStop
 }
-
-func (r *FormatRenderer) isLastNode(treeRoot, node *ast.Node) bool {
-	if treeRoot == node {
-		return true
-	}
-	if nil != node.Next {
-		return false
-	}
-	if ast.NodeDocument == node.Parent.Type {
-		return treeRoot.LastChild == node
-	}
-
-	var n *ast.Node
-	for n = node.Parent; ; n = n.Parent {
-		if ast.NodeDocument == n.Parent.Type {
-			break
-		}
-	}
-	return treeRoot.LastChild == n
-}
