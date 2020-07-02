@@ -229,7 +229,7 @@ func TestSpinVditorIRDOM(t *testing.T) {
 
 var spinVditorSVDOMTests = []*parseTest{
 
-	{"4", "* foo\n  >‸", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span><wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
+	{"4", "* foo", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span><wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"3", "> >‸", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span><wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"2", "> foo\n> # b‸", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span>foo<span><br /><span style=\"display: none\">\n</span></span><span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker--heading\" data-type=\"heading-marker\"># </span>b<wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"1", "> foo\n>‸", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span>foo<span><br /><span style=\"display: none\">\n</span></span><span class=\"vditor-sv__marker\">&gt; </span><wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},

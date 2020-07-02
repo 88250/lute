@@ -932,12 +932,13 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		}
 
 		listItemBuf := bytes.Buffer{}
+		var marker string
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			listItemBuf.WriteString(strconv.Itoa(node.Num) + string(node.ListData.Delimiter))
+			marker = strconv.Itoa(node.Num) + string(node.ListData.Delimiter)
 		} else {
-			listItemBuf.Write(node.Marker)
+			marker = string(node.Marker)
 		}
-		listItemBuf.WriteByte(lex.ItemSpace)
+		listItemBuf.WriteString(`<span data-type="li" data-marker="` + marker + `" class="vditor-sv__marker--bi">` + marker + " </span>")
 		buf = append(listItemBuf.Bytes(), buf...)
 		if node.ParentIs(ast.NodeTableCell) {
 			buf = bytes.ReplaceAll(buf, newline, nil)
