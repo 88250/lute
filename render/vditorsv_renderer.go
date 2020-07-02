@@ -621,8 +621,10 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		}
 	} else {
 		r.Newline()
-		if rootParent {
+		if node.ParentIs(ast.NodeListItem) || rootParent{
 			r.Write(newline)
+		}
+		if rootParent {
 			r.tag("/div", nil, false)
 		}
 	}
@@ -895,9 +897,7 @@ func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 		attrs = append(attrs, []string{"data-block", "0"})
 		r.tag("div", attrs, false)
 	} else {
-		if nil != node.Next {
-			r.Newline()
-		}
+		r.Newline()
 		r.tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -920,6 +920,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		lines := bytes.Split(buf, newline)
 		for _, line := range lines {
 			if 0 == len(line) {
+				indentedLines.Write(newline)
 				continue
 			}
 			indentedLines.Write(indentSpaces)
@@ -951,11 +952,11 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		}
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(buf)
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		buf = bytes.TrimSpace(r.Writer.Bytes())
+		buf = bytes.TrimSuffix(r.Writer.Bytes(), newline)
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) {
-			r.Write(newline)
+			r.Newline()
 		}
 	}
 	return ast.WalkContinue

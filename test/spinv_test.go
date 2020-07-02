@@ -229,11 +229,13 @@ func TestSpinVditorIRDOM(t *testing.T) {
 
 var spinVditorSVDOMTests = []*parseTest{
 
-	{"4", "* foo", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span><wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
+	{"6", "* foo\n  *‸", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<span><br /><span style=\"display: none\">\n</span></span>  *<wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
+	{"5", "* foo\n\n  b‸", "<div data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<span><br /><span style=\"display: none\">\n</span></span><span><br /><span style=\"display: none\">\n</span></span>  b<wbr><span><br /><span style=\"display: none\">\n</span></span><span><br /><span style=\"display: none\">\n</span></span></div>"},
+	{"4", "* foo", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo<span><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"3", "> >‸", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker\">&gt; </span><wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"2", "> foo\n> # b‸", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span>foo<span><br /><span style=\"display: none\">\n</span></span><span class=\"vditor-sv__marker\">&gt; </span><span class=\"vditor-sv__marker--heading\" data-type=\"heading-marker\"># </span>b<wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"1", "> foo\n>‸", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span>foo<span><br /><span style=\"display: none\">\n</span></span><span class=\"vditor-sv__marker\">&gt; </span><wbr><span><br /><span style=\"display: none\">\n</span></span></div>"},
-	{"0", "> \nf‸", "<div data-block=\"0\" data-type=\"blockquote\"><span class=\"vditor-sv__marker\">&gt; </span><span><br /><span style=\"display: none\">\n</span></span></div><div data-type=\"p\" data-block=\"0\">f<wbr><span><br /><span style=\"display: none\">\n</span></span><span><br /><span style=\"display: none\">\n</span></span></div>"},
+	{"0", "*foo*‸", "<div data-type=\"p\" data-block=\"0\"><span data-type=\"em\"><span class=\"vditor-sv__marker--bi\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-sv__marker--bi\">*</span></span><wbr><span><br /><span style=\"display: none\">\n</span></span><span><br /><span style=\"display: none\">\n</span></span></div>"},
 }
 
 func TestSpinVditorSVDOM(t *testing.T) {
