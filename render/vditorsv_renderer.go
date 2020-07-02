@@ -905,47 +905,57 @@ func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var attrs [][]string
-		var marker string
-		switch node.ListData.Typ {
-		case 0:
-			marker = string(node.Marker)
-		case 1:
-			marker = strconv.Itoa(node.Num) + string(node.ListData.Delimiter)
-		case 3:
-			if 0 == node.ListData.BulletChar {
-				marker = strconv.Itoa(node.Num) + string(node.ListData.Delimiter)
-			} else {
-				marker = string(node.Marker)
-			}
-		}
-
-		blockContainerParent := node.ParentIs(ast.NodeListItem, ast.NodeBlockquote)
-		if blockContainerParent {
-			r.Newline()
-			if nil != node.Parent.Parent && nil != node.Parent.Parent.ListData {
-				r.WriteString(strings.Repeat(" ", node.Parent.Parent.ListData.Padding))
-			}
-		}
-
-		attrs = append(attrs, []string{"data-type", "li"}, []string{"data-marker", marker}, []string{"class", "vditor-sv__marker--bi"})
-		r.tag("span", attrs, false)
-		r.WriteString(marker + " ")
-		r.tag("/span", nil, false)
-
-		if 3 == node.ListData.Typ {
-			r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
-			r.WriteString("[")
-			if node.ListData.Checked {
-				r.WriteString("x")
-			} else {
-				r.WriteString(" ")
-			}
-			r.WriteString("]")
-			r.tag("/span", nil, false)
-		}
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
 	} else {
-		r.Newline()
+		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+		indent := len(node.Marker) + 1
+		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
+			indent++
+		}
+		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
+		indentedLines := bytes.Buffer{}
+		buf := writer.Bytes()
+		lines := bytes.Split(buf, newline)
+		for _, line := range lines {
+			if 0 == len(line) {
+				continue
+			}
+			indentedLines.Write(indentSpaces)
+			indentedLines.Write(line)
+			indentedLines.Write(newline)
+		}
+		buf = indentedLines.Bytes()
+		if indent < len(buf) {
+			buf = buf[indent:]
+		}
+
+		listItemBuf := bytes.Buffer{}
+		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
+			listItemBuf.WriteString(strconv.Itoa(node.Num) + string(node.ListData.Delimiter))
+		} else {
+			listItemBuf.Write(node.Marker)
+		}
+		listItemBuf.WriteByte(lex.ItemSpace)
+		buf = append(listItemBuf.Bytes(), buf...)
+		if node.ParentIs(ast.NodeTableCell) {
+			buf = bytes.ReplaceAll(buf, newline, nil)
+		}
+		writer.Reset()
+		writer.Write(buf)
+		buf = writer.Bytes()
+		if node.ParentIs(ast.NodeTableCell) {
+			buf = bytes.ReplaceAll(buf, newline, nil)
+		}
+		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(buf)
+		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		buf = bytes.TrimSpace(r.Writer.Bytes())
+		r.Writer.Reset()
+		r.Write(buf)
+		if !node.ParentIs(ast.NodeTableCell) {
+			r.Write(newline)
+		}
 	}
 	return ast.WalkContinue
 }
