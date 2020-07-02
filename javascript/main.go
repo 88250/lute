@@ -14,6 +14,7 @@ import (
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/render"
+	"github.com/88250/lute/util"
 	"github.com/gopherjs/gopherjs/js"
 )
 
@@ -31,5 +32,6 @@ func main() {
 		"WalkSkipChildren": ast.WalkSkipChildren,
 		"WalkContinue":     ast.WalkContinue,
 		"GetHeadingID":     render.HeadingID,
+		"Caret":            util.Caret,
 	})
 }

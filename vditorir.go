@@ -77,7 +77,7 @@ func (lute *Lute) VditorIRDOM2HTML(vhtml string) (sHTML string) {
 	return
 }
 
-// Md2VditorIRDOM 将 markdown 转换为 Vditor Instant-Rendering DOM，用于从源码模式切换至所见即所得模式。
+// Md2VditorIRDOM 将 markdown 转换为 Vditor Instant-Rendering DOM，用于从源码模式切换至即时渲染模式。
 func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true
@@ -95,7 +95,7 @@ func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 	return
 }
 
-// VditorIRDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
+// VditorIRDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown，用于从即时渲染模式切换至源码模式。
 func (lute *Lute) VditorIRDOM2Md(htmlStr string) (markdown string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true

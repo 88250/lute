@@ -169,19 +169,3 @@ func TestVditorIRDOM2Md(t *testing.T) {
 		}
 	}
 }
-
-var vditorSVDOM2MdTests = []parseTest{
-
-	{"0", "<div data-tight=\"true\" data-type=\"ul\" data-marker=\"*\" data-block=\"0\"><span data-type=\"li\" data-marker=\"*\" class=\"vditor-sv__marker--bi\">* </span>foo</div>", "* foo\n"},
-}
-
-func TestVditorSVDOM2Md(t *testing.T) {
-	luteEngine := lute.New()
-
-	for _, test := range vditorSVDOM2MdTests {
-		md := luteEngine.VditorSVDOM2Md(test.from)
-		if test.to != md {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
-		}
-	}
-}
