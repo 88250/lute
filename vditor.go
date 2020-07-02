@@ -262,7 +262,7 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom {
 				nodes = append(nodes, c)
 			} else if 0 < len(nodes) {
-				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P, NextSibling: c.NextSibling}
+				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
 				for _, pChild := range nodes {
 					pChild.Unlink()
 					p.AppendChild(pChild)
@@ -276,15 +276,10 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 			}
 		}
 		if 0 < len(nodes) {
-			p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P, NextSibling: lastc.NextSibling}
+			p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
 			lastc.InsertBefore(p)
 			lastc.Unlink()
 			p.AppendChild(lastc)
-			for _, pChild := range nodes {
-				pChild.Unlink()
-				p.AppendChild(pChild)
-			}
-			nodes = nil
 		}
 	case atom.Ul:
 		// 合并邻接的 ul

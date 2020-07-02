@@ -73,7 +73,7 @@ func (n *Node) InsertBefore(sibling *Node) {
 	sibling.NextSibling = n
 	n.PrevSibling = sibling
 	sibling.Parent = n.Parent
-	if nil == sibling.PrevSibling {
+	if nil != sibling.Parent && nil == sibling.PrevSibling {
 		sibling.Parent.FirstChild = sibling
 	}
 }
