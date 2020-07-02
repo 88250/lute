@@ -33,7 +33,6 @@ type VditorSVRenderer struct {
 
 var newline = []byte("<span><br /><span style=\"display: none\">\n</span></span>")
 
-
 func (r *VditorSVRenderer) WriteByte(c byte) {
 	r.Writer.WriteByte(c)
 	r.LastOut = append(r.LastOut, c)
@@ -41,7 +40,6 @@ func (r *VditorSVRenderer) WriteByte(c byte) {
 		r.LastOut = r.LastOut[len(r.LastOut)-len(newline):]
 	}
 }
-
 
 func (r *VditorSVRenderer) Write(content []byte) {
 	if length := len(content); 0 < length {
@@ -623,8 +621,8 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		}
 	} else {
 		r.Newline()
-		r.Write(newline)
 		if rootParent {
+			r.Write(newline)
 			r.tag("/div", nil, false)
 		}
 	}
@@ -654,10 +652,6 @@ func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 	}
 
 	node.Tokens = bytes.TrimRight(node.Tokens, "\n")
-	// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
-	if !bytes.EqualFold(node.Tokens, []byte(util.Caret+parse.Zwsp)) {
-		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
-	}
 	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
@@ -786,9 +780,6 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		buf := writer.Bytes()
 		lines := bytes.Split(buf, newline)
 		length := len(lines)
-		if 2 < length && lex.IsBlank(lines[length-1]) && lex.IsBlank(lines[length-2]) {
-			lines = lines[:length-1]
-		}
 		if 1 == len(r.nodeWriterStack) { // 已经是根这一层
 			length = len(lines)
 			if 1 < length && lex.IsBlank(lines[length-1]) {
@@ -800,22 +791,11 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		if inListItem && !looseListItemFirstP {
 			blockquoteLines.Write(newline)
 		}
-		length = len(lines)
 		for _, line := range lines {
 			if 0 == len(line) {
-				blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt; </span>`)
 				continue
 			}
-
-			if inListItem && !looseListItemFirstP {
-				blockquoteLines.WriteString(strings.Repeat(" ", node.Parent.Padding))
-			}
-
-			if lex.ItemGreater == line[0] {
-				blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt;</span>`)
-			} else {
-				blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt; </span>`)
-			}
+			blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt; </span>`)
 			blockquoteLines.Write(line)
 			blockquoteLines.Write(newline)
 		}
@@ -825,9 +805,10 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		if !bq && !inListItem {
 			writer.WriteString(`<div data-block="0" data-type="blockquote">`)
 		} else {
-			writer.Write(newline)
 			if inListItem {
 				writer.WriteString(`<span data-type="blockquote">`)
+			} else {
+				writer.Write(newline)
 			}
 		}
 
@@ -837,10 +818,7 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		buf = r.Writer.Bytes()
 		r.Writer.Reset()
 		r.Write(buf)
-		if nil != node.Next {
-			r.Write(newline)
-		}
-
+		r.Newline()
 		if !bq && !inListItem {
 			r.WriteString("</div>")
 		} else {
@@ -857,8 +835,9 @@ func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 }
 
 func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
+	rootParent := ast.NodeDocument == node.Parent.Type
 	if entering {
-		if ast.NodeDocument == node.Parent.Type {
+		if rootParent {
 			r.tag("div", [][]string{{"data-block", "0"}, {"data-type", "heading"}}, false)
 			r.tag("span", [][]string{{"class", "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]}}, false)
 		}
@@ -866,15 +845,13 @@ func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
 		r.tag("/span", nil, false)
 	} else {
-		if ast.NodeDocument == node.Parent.Type {
+		if rootParent {
 			r.tag("/span", nil, false)
 		}
 		r.Newline()
-		r.Newline()
-		if ast.NodeDocument == node.Parent.Type {
+		if rootParent {
+			r.Write(newline)
 			r.WriteString("</div>")
-		} else {
-			r.WriteString("</span>")
 		}
 	}
 	return ast.WalkContinue
