@@ -663,15 +663,9 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *VditorSVRenderer) listItemParent(node *ast.Node) (inListItem, looseListItemFirstChild bool) {
+func (r *VditorSVRenderer) inListItem(node *ast.Node) bool {
 	grandparent := node.Parent.Parent
-	if nil != grandparent && ast.NodeList == grandparent.Type { // List.ListItem.Paragraph
-		inListItem = true
-		if !grandparent.Tight {
-			looseListItemFirstChild = node.Parent.FirstChild == node
-		}
-	}
-	return
+	return nil != grandparent && ast.NodeList == grandparent.Type
 }
 
 func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
@@ -821,10 +815,6 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 			}
 		}
 
-		inListItem, looseListItemFirstP := r.listItemParent(node)
-		if inListItem && !looseListItemFirstP {
-			blockquoteLines.Write(newline)
-		}
 		for _, line := range lines {
 			if 0 == len(line) {
 				continue
@@ -836,6 +826,7 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		buf = blockquoteLines.Bytes()
 		writer.Reset()
 		bq := node.ParentIs(ast.NodeBlockquote)
+		inListItem := r.inListItem(node)
 		if !bq && !inListItem {
 			writer.WriteString(`<div data-block="0" data-type="blockquote">`)
 		} else {
