@@ -96,6 +96,7 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 		ln = bytes.ReplaceAll(ln, from, to)
 		t.Context.currentLine = ln
 		t.Context.currentLineLen++
+		token = lex.ItemSpace
 	}
 
 	// 列表项标记符后必须是空白字符
