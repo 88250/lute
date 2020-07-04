@@ -11,6 +11,8 @@
 package lute
 
 import (
+	"bytes"
+	"github.com/88250/lute/ast"
 	"strings"
 
 	"github.com/88250/lute/parse"
@@ -24,6 +26,8 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 	lute.VditorWYSIWYG = true
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
+	lute.adjustVditorSVTree(tree)
+
 	renderer := render.NewVditorSVRenderer(tree)
 	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
@@ -55,5 +59,69 @@ func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
 	vHTML = string(output)
+	return
+}
+
+func (lute *Lute) adjustVditorSVTree(tree *parse.Tree) {
+	lute.continueListItem(tree.Root)
+}
+
+// continueListItem 用于延续列表项，当指定的 node 结构如下时
+//
+//   * foo
+//   ‸
+//
+//  将生成延续列表项
+//
+//   * foo
+//   * ‸
+func (lute *Lute) continueListItem(node *ast.Node) {
+	caretNode := lute.findCaretNode(node)
+	if nil == caretNode {
+		return
+	}
+
+	if !bytes.Equal(caretNode.Tokens, util.CaretTokens) {
+		return
+	}
+
+	if nil == caretNode.Previous || ast.NodeSoftBreak != caretNode.Previous.Type || (ast.NodeParagraph != caretNode.Parent.Type && ast.NodeBlockquote != caretNode.Parent.Type) {
+		return
+	}
+
+	if nil == caretNode.Parent.Parent || ast.NodeListItem != caretNode.Parent.Parent.Type {
+		return
+	}
+
+	prevLi := caretNode.Parent.Parent
+	li := &ast.Node{Type: ast.NodeListItem, Tokens: prevLi.Tokens, ListData: &ast.ListData{
+		Typ:          prevLi.ListData.Typ,
+		Tight:        prevLi.ListData.Tight,
+		BulletChar:   prevLi.ListData.BulletChar,
+		Start:        prevLi.ListData.Start,
+		Delimiter:    prevLi.ListData.Delimiter,
+		Padding:      prevLi.ListData.Padding,
+		MarkerOffset: prevLi.ListData.MarkerOffset,
+		Checked:      prevLi.ListData.Checked,
+		Marker:       prevLi.ListData.Marker,
+		Num:          prevLi.ListData.Num + 1,
+	}}
+	li.AppendChild(&ast.Node{Type: ast.NodeParagraph})
+	li.AppendChild(caretNode)
+	prevLi.InsertAfter(li)
+}
+
+func (lute *Lute) findCaretNode(node *ast.Node) (ret *ast.Node) {
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering {
+			if ast.NodeText == n.Type {
+				if bytes.Contains(n.Tokens, util.CaretTokens) {
+					ret = n
+					return ast.WalkStop
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
 	return
 }

@@ -26,7 +26,7 @@ func (context *Context) parseToC(paragraph *ast.Node) *ast.Node {
 	content := bytes.TrimSpace(lines[0])
 	tokens := content
 	if context.Option.VditorWYSIWYG {
-		content = bytes.ReplaceAll(content, []byte(util.Caret), nil)
+		content = bytes.ReplaceAll(content, util.CaretTokens, nil)
 	}
 	if !bytes.EqualFold(content, []byte("[toc]")) {
 		return nil

@@ -111,7 +111,7 @@ func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num in
 	}
 	tokens = lex.TrimWhitespace(tokens)
 	if context.Option.VditorWYSIWYG {
-		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	}
 	for _, token := range tokens {
 		if token != openMarker {

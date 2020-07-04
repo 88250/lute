@@ -64,7 +64,7 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 	if t.Context.Option.VditorWYSIWYG {
 		// 处理 \‸x 情况，光标后的字符才是待转义的
 		tokens := ctx.tokens[ctx.pos:]
-		caret := []byte(util.Caret)
+		caret := util.CaretTokens
 		if len(caret) < len(tokens) && bytes.HasPrefix(tokens, caret) {
 			token = ctx.tokens[ctx.pos + len(caret)]
 			if lex.IsASCIIPunct(token) {

@@ -22,11 +22,11 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	caretInTag := false
 	caretLeftSpace := false
 	if t.Context.Option.VditorWYSIWYG {
-		caretIndex := bytes.Index(tokens, []byte(util.Caret))
+		caretIndex := bytes.Index(tokens, util.CaretTokens)
 		caretInTag = caretIndex > ctx.pos
 		if caretInTag {
 			caretLeftSpace = bytes.Contains(tokens, []byte(" "+util.Caret))
-			tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), []byte(util.CaretReplacement))
+			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, []byte(util.CaretReplacement))
 			tokens = bytes.ReplaceAll(tokens, []byte("\""+util.CaretReplacement), []byte("\" "+util.CaretReplacement))
 		}
 	}
@@ -113,7 +113,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			if !bytes.Contains(tags, []byte(util.CaretReplacement+" ")) && !caretLeftSpace {
 				tags = bytes.ReplaceAll(tags, []byte("\" "+util.CaretReplacement), []byte("\""+util.CaretReplacement))
 			}
-			tags = bytes.ReplaceAll(tags, []byte(util.CaretReplacement), []byte(util.Caret))
+			tags = bytes.ReplaceAll(tags, []byte(util.CaretReplacement), util.CaretTokens)
 		}
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}

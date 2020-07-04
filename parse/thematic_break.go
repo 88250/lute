@@ -42,7 +42,7 @@ func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	}
 
 	if t.Context.Option.VditorWYSIWYG && caretInLn {
-		caretTokens = []byte(util.Caret)
+		caretTokens = util.CaretTokens
 	}
 
 	return 3 <= markerCnt, caretTokens

@@ -197,7 +197,7 @@ func (r *VditorIRRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStat
 		r.WriteString("[toc]<br>")
 	}
 	r.WriteString("</div>")
-	caretInDest := bytes.Contains(node.Tokens, []byte(util.Caret))
+	caretInDest := bytes.Contains(node.Tokens, util.CaretTokens)
 	r.WriteString("<p data-block=\"0\">")
 	if caretInDest {
 		r.WriteString(util.Caret)
@@ -286,8 +286,8 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	isFenced := node.Parent.IsFencedCodeBlock
 	caretInInfo := false
 	if isFenced {
-		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, []byte(util.Caret))
-		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, []byte(util.Caret), nil)
+		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, util.CaretTokens)
+		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
 	}
 	var attrs [][]string
 	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
@@ -321,7 +321,7 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 		r.tag("code", attrs, false)
 		tokens := node.Tokens
-		tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(html.EscapeHTML(tokens))
 		r.WriteString("</code></pre>")
 	}
@@ -405,7 +405,7 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
@@ -445,7 +445,7 @@ func (r *VditorIRRenderer) renderTableCell(node *ast.Node, entering bool) ast.Wa
 		r.tag(tag, attrs, false)
 		if nil == node.FirstChild {
 			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-		} else if bytes.Equal(node.FirstChild.Tokens, []byte(util.Caret)) {
+		} else if bytes.Equal(node.FirstChild.Tokens, util.CaretTokens) {
 			node.FirstChild.Tokens = []byte(util.Caret + " ")
 		} else {
 			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
@@ -613,7 +613,7 @@ func (r *VditorIRRenderer) renderBang(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
-	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, []byte(util.Caret))
+	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, util.CaretTokens)
 
 	if entering {
 		text := r.Text(node)
@@ -625,16 +625,16 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 	} else {
 		if needResetCaret {
 			r.WriteString(util.Caret)
-			node.Next.Tokens = bytes.ReplaceAll(node.Next.Tokens, []byte(util.Caret), nil)
+			node.Next.Tokens = bytes.ReplaceAll(node.Next.Tokens, util.CaretTokens, nil)
 		}
 
 		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 		destTokens = r.Tree.Context.RelativePath(destTokens)
-		destTokens = bytes.ReplaceAll(destTokens, []byte(util.Caret), nil)
+		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		attrs := [][]string{{"src", string(destTokens)}}
 		alt := node.ChildByType(ast.NodeLinkText)
 		if nil != alt && 0 < len(alt.Tokens) {
-			altTokens := bytes.ReplaceAll(alt.Tokens, []byte(util.Caret), nil)
+			altTokens := bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
 			attrs = append(attrs, []string{"alt", string(altTokens)})
 		}
 		r.tag("img", attrs, true)
@@ -682,7 +682,7 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 	r.WriteString("</code></pre>")
 
 	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	if r.Option.Sanitize {
 		tokens = sanitize(tokens)
 	}

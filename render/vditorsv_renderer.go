@@ -237,7 +237,7 @@ func (r *VditorSVRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStat
 		r.WriteString("[toc]<br>")
 	}
 	r.WriteString("</div>")
-	caretInDest := bytes.Contains(node.Tokens, []byte(util.Caret))
+	caretInDest := bytes.Contains(node.Tokens, util.CaretTokens)
 	r.WriteString("<p data-block=\"0\">")
 	if caretInDest {
 		r.WriteString(util.Caret)
@@ -933,7 +933,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 	} else {
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		indent := len(node.Marker) + 1
+		indent := len(node.ListData.Marker) + 1
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			indent++
 		}

@@ -59,14 +59,14 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					var caretStartText, caretAfterCloseBracket, caretInBracket bool
 					if context.Option.VditorWYSIWYG {
 						closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
-						if bytes.HasPrefix(tokens, []byte(util.Caret)) {
-							tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+						if bytes.HasPrefix(tokens, util.CaretTokens) {
+							tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 							caretStartText = true
-						} else if bytes.HasPrefix(tokens[closeBracket+1:], []byte(util.Caret)) {
-							tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+						} else if bytes.HasPrefix(tokens[closeBracket+1:], util.CaretTokens) {
+							tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 							caretAfterCloseBracket = true
-						} else if bytes.Contains(tokens[1:closeBracket], []byte(util.Caret)) {
-							tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), nil)
+						} else if bytes.Contains(tokens[1:closeBracket], util.CaretTokens) {
+							tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 							caretInBracket = true
 						}
 					}

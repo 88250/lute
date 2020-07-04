@@ -207,15 +207,15 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 							copy(ctx.tokens[ctx.pos-1:], remains) // 同时也将 tokens 换位，后续解析从光标位置开始
 						} else {
 							// 将 ""‸ 换位为 "‸"
-							title = []byte(util.Caret)
-							remains = remains[len([]byte(util.Caret)):]
+							title = util.CaretTokens
+							remains = remains[len(util.CaretTokens):]
 							ctx.pos += 3
 						}
 					} else if bytes.HasPrefix(remains, []byte(")"+util.Caret)) {
 						if 0 == len(title) {
 							// 将 "")‸ 换位为 "‸")
-							title = []byte(util.Caret)
-							remains = bytes.ReplaceAll(remains, []byte(util.Caret), nil)
+							title = util.CaretTokens
+							remains = bytes.ReplaceAll(remains, util.CaretTokens, nil)
 							ctx.pos += 3
 						}
 					}

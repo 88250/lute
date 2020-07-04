@@ -121,7 +121,7 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 		// 判断是否是任务列表项
 		content := ln[t.Context.offset:]
 		if t.Context.Option.VditorWYSIWYG {
-			content = bytes.ReplaceAll(content, []byte(util.Caret), nil)
+			content = bytes.ReplaceAll(content, util.CaretTokens, nil)
 		}
 
 		if 3 <= len(content) { // 至少需要 [ ] 或者 [x] 3 个字符

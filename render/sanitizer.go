@@ -45,7 +45,7 @@ func sanitize(tokens []byte) []byte {
 	)
 
 	caretLeftSpace := bytes.Contains(tokens, []byte(" "+util.Caret))
-	tokens = bytes.ReplaceAll(tokens, []byte(util.Caret), []byte(util.CaretReplacement))
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, []byte(util.CaretReplacement))
 
 	tokenizer := html.NewTokenizer(bytes.NewReader(tokens))
 	for {
@@ -58,7 +58,7 @@ func sanitize(tokens []byte) []byte {
 				} else {
 					ret = bytes.ReplaceAll(ret, []byte("\" "+util.CaretReplacement), []byte("\""+util.CaretReplacement))
 				}
-				ret = bytes.ReplaceAll(ret, []byte(util.CaretReplacement), []byte(util.Caret))
+				ret = bytes.ReplaceAll(ret, []byte(util.CaretReplacement), util.CaretTokens)
 				return ret
 			}
 

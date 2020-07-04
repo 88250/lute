@@ -22,7 +22,7 @@ import (
 
 // renderMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
 func (r *BaseRenderer) renderMindmap(listContent []byte) []byte {
-	listContent = bytes.ReplaceAll(listContent, []byte(util.Caret), nil)
+	listContent = bytes.ReplaceAll(listContent, util.CaretTokens, nil)
 	tree := parse.Parse("", listContent, r.Option)
 	if nil == tree.Root.FirstChild || ast.NodeList != tree.Root.FirstChild.Type {
 		// 第一个节点如果不是列表的话直接返回

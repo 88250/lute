@@ -430,7 +430,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		if util.Caret == text {
-			node.Tokens = []byte(util.Caret)
+			node.Tokens = util.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -452,7 +452,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		if util.Caret == text {
-			node.Tokens = []byte(util.Caret)
+			node.Tokens = util.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -474,7 +474,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		if util.Caret == text {
-			node.Tokens = []byte(util.Caret)
+			node.Tokens = util.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -489,7 +489,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		contentStr := strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
 		if util.Caret == contentStr {
-			node.Tokens = []byte(util.Caret)
+			node.Tokens = util.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
