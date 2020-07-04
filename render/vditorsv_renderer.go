@@ -31,7 +31,7 @@ type VditorSVRenderer struct {
 	LastOut                []byte // 最新输出的 newline 长度个字节
 }
 
-var newline = []byte("<span><br /><span style=\"display: none\">\n</span></span>")
+var newline = []byte("<span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span>")
 
 func (r *VditorSVRenderer) WriteByte(c byte) {
 	r.Writer.WriteByte(c)
@@ -951,7 +951,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 			indentedLines.Write(newline)
 		}
 		buf = indentedLines.Bytes()
-		if indent < len(buf) {
+		if indent < len(buf) && !bytes.HasPrefix(buf, newline) {
 			buf = buf[indent:]
 		}
 
@@ -986,6 +986,21 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-marker", "["}, {"class", "vditor-sv__marker--bi"}}, false)
+	r.WriteByte(lex.ItemOpenBracket)
+	r.tag("/span", nil, false)
+	if node.TaskListItemChecked {
+		r.tag("span", [][]string{{"data-marker", "x"}, {"class", "vditor-sv__marker--bi"}}, false)
+		r.WriteByte('x')
+		r.tag("/span", nil, false)
+	} else {
+		r.tag("span", [][]string{{"data-marker", " "}, {"class", "vditor-sv__marker--bi"}}, false)
+		r.WriteByte(lex.ItemSpace)
+		r.tag("/span", nil, false)
+	}
+	r.tag("span", [][]string{{"data-marker", "]"}, {"class", "vditor-sv__marker--bi"}}, false)
+	r.WriteByte(lex.ItemCloseBracket)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
