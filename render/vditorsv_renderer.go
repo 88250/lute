@@ -954,8 +954,12 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 				indentedLines.Write(newline)
 				continue
 			}
-			if !bytes.Contains(line, []byte("<span data-type=\"li\">")) { // 列表项标记符所在行不加缩进
+			if !bytes.Contains(line, []byte("data-type=\"li\"")) {
 				indentedLines.WriteString(indentSpacesStr)
+			} else {
+				idx := bytes.Index(line, []byte("\">")) + len("\">")
+				tmp := line[:idx]
+				tmp = append(tmp, []byte(indentSpacesStr)...)
 			}
 			indentedLines.Write(line)
 			indentedLines.Write(newline)
