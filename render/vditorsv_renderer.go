@@ -29,6 +29,8 @@ type VditorSVRenderer struct {
 	nodeWriterStack        []*bytes.Buffer // 节点输出缓冲栈
 	needRenderFootnotesDef bool
 	LastOut                []byte // 最新输出的 newline 长度个字节
+	ListIndentSpaces       int    // 列表绝对缩进空格数
+
 }
 
 var newline = []byte("<span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span>")
@@ -629,7 +631,7 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		if rootParent {
 			r.tag("div", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
 		}
-	} else  {
+	} else {
 		if !node.ParentIs(ast.NodeTableCell) {
 			r.Newline()
 		}
@@ -679,8 +681,10 @@ func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 		r.ChinesePunct(node)
 	}
 
+	r.tag("span", [][]string{{"data-type", "text"}}, false)
 	node.Tokens = bytes.TrimRight(node.Tokens, "\n")
 	r.Write(html.EscapeHTML(node.Tokens))
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -930,6 +934,9 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 	if entering {
 		r.Writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+		if ast.NodeDocument != node.Parent.Parent.Type {
+			r.ListIndentSpaces += node.ListData.Padding
+		}
 	} else {
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
@@ -941,18 +948,23 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		indentedLines := bytes.Buffer{}
 		buf := writer.Bytes()
 		lines := bytes.Split(buf, newline)
+		indentSpacesStr := `<span data-type="li-space">` + string(indentSpaces) + "</span>"
 		for _, line := range lines {
 			if 0 == len(line) {
 				indentedLines.Write(newline)
 				continue
 			}
-			indentedLines.Write(indentSpaces)
+			if !bytes.Contains(line, []byte("<span data-type=\"li\">")) { // 列表项标记符所在行不加缩进
+				indentedLines.WriteString(indentSpacesStr)
+			}
 			indentedLines.Write(line)
 			indentedLines.Write(newline)
 		}
 		buf = indentedLines.Bytes()
-		if indent < len(buf) && !bytes.HasPrefix(buf, newline) {
-			buf = buf[indent:]
+
+		length := len(indentSpacesStr)
+		if length < len(buf) && !bytes.HasPrefix(buf, newline) {
+			buf = buf[length:]
 		}
 
 		listItemBuf := bytes.Buffer{}
@@ -962,14 +974,9 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		} else {
 			marker = string(node.Marker)
 		}
-		listItemBuf.WriteString(`<span data-type="li" data-marker="` + marker + `" class="vditor-sv__marker--bi">` + marker + " </span>")
+		listItemBuf.WriteString(`<span data-type="li" data-space="` + strings.Repeat(" ", r.ListIndentSpaces) + `">`)
+		listItemBuf.WriteString(`<span class="vditor-sv__marker--bi">` + marker + " </span>")
 		buf = append(listItemBuf.Bytes(), buf...)
-		if node.ParentIs(ast.NodeTableCell) {
-			buf = bytes.ReplaceAll(buf, newline, nil)
-		}
-		writer.Reset()
-		writer.Write(buf)
-		buf = writer.Bytes()
 		if node.ParentIs(ast.NodeTableCell) {
 			buf = bytes.ReplaceAll(buf, newline, nil)
 		}
@@ -978,8 +985,10 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		buf = bytes.TrimSuffix(r.Writer.Bytes(), newline)
 		r.Writer.Reset()
 		r.Write(buf)
-		if !node.ParentIs(ast.NodeTableCell) {
-			r.Newline()
+		r.Newline()
+		r.tag("/span", nil, false)
+		if ast.NodeDocument != node.Parent.Parent.Type {
+			r.ListIndentSpaces -= node.ListData.Padding
 		}
 	}
 	return ast.WalkContinue
