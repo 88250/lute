@@ -823,7 +823,7 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 			if 0 == len(line) {
 				continue
 			}
-			blockquoteLines.WriteString(`<span class="vditor-sv__marker">&gt; </span>`)
+			blockquoteLines.WriteString(`<span data-type="blockquote-marker" class="vditor-sv__marker">&gt; </span>`)
 			blockquoteLines.Write(line)
 			blockquoteLines.Write(newline)
 		}
@@ -950,8 +950,16 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		lines := bytes.Split(buf, newline)
 		indentSpacesStr := `<span data-type="li-space">` + string(indentSpaces) + "</span>"
 		for _, line := range lines {
+			if bytes.Equal([]byte("</span>"), line) {
+				indentedLines.Write(line)
+				indentedLines.Write(newline)
+				continue
+			}
 			if 0 == len(line) {
 				if !bytes.HasSuffix(indentedLines.Bytes(), newline) {
+					indentedLines.Write(newline)
+				}
+				if !node.Tight {
 					indentedLines.Write(newline)
 				}
 				continue
@@ -978,7 +986,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 			marker = string(node.Marker)
 		}
 		listItemBuf.WriteString(`<span data-type="li" data-space="` + strings.Repeat(" ", r.ListIndentSpaces) + `">`)
-		listItemBuf.WriteString(`<span class="vditor-sv__marker--bi">` + marker + " </span>")
+		listItemBuf.WriteString(`<span data-type="li-marker" class="vditor-sv__marker--bi">` + marker + " </span>")
 		buf = append(listItemBuf.Bytes(), buf...)
 		if node.ParentIs(ast.NodeTableCell) {
 			buf = bytes.ReplaceAll(buf, newline, nil)
@@ -986,6 +994,11 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(buf)
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = bytes.TrimSuffix(r.Writer.Bytes(), newline)
+		newlieSpan := append(newline, []byte("</span>")...)
+		if bytes.HasSuffix(buf, newlieSpan) {
+			buf = bytes.TrimSuffix(buf, newlieSpan)
+			buf = append(buf, []byte("</span>")...)
+		}
 		r.Writer.Reset()
 		r.Write(buf)
 		r.Newline()
