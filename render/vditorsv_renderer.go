@@ -951,24 +951,23 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		indentSpacesStr := `<span data-type="li-space">` + string(indentSpaces) + "</span>"
 		for _, line := range lines {
 			if 0 == len(line) {
-				indentedLines.Write(newline)
+				if !bytes.HasSuffix(indentedLines.Bytes(), newline) {
+					indentedLines.Write(newline)
+				}
 				continue
 			}
 			if !bytes.Contains(line, []byte("data-type=\"li\"")) {
 				indentedLines.WriteString(indentSpacesStr)
 			} else {
 				idx := bytes.Index(line, []byte("\">")) + len("\">")
-				tmp := line[:idx]
-				tmp = append(tmp, []byte(indentSpacesStr)...)
+				line = append(line[:idx], append([]byte(indentSpacesStr), line[idx:]...)...)
 			}
 			indentedLines.Write(line)
 			indentedLines.Write(newline)
 		}
 		buf = indentedLines.Bytes()
-
-		length := len(indentSpacesStr)
-		if length < len(buf) && !bytes.HasPrefix(buf, newline) {
-			buf = buf[length:]
+		if bytes.HasPrefix(buf, []byte(indentSpacesStr)) {
+			buf = buf[len(indentSpacesStr):]
 		}
 
 		listItemBuf := bytes.Buffer{}
