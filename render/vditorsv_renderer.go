@@ -959,7 +959,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 				if !bytes.HasSuffix(indentedLines.Bytes(), newline) {
 					indentedLines.Write(newline)
 				}
-				if !node.Tight {
+				if !node.Parent.Tight {
 					indentedLines.Write(newline)
 				}
 				continue
