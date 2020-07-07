@@ -808,6 +808,8 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 
+		bq := node.ParentIs(ast.NodeBlockquote)
+
 		blockquoteLines := bytes.Buffer{}
 		buf := writer.Bytes()
 		lines := bytes.Split(buf, newline)
@@ -820,16 +822,26 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		}
 
 		for _, line := range lines {
+			if bytes.Equal([]byte("</span>"), line) {
+				blockquoteLines.Write(line)
+				blockquoteLines.Write(newline)
+				continue
+			}
 			if 0 == len(line) {
 				continue
+			}
+			if !bq {
+				blockquoteLines.WriteString(`<span data-type="blockquote-line">`)
 			}
 			blockquoteLines.WriteString(`<span data-type="blockquote-marker" class="vditor-sv__marker">&gt; </span>`)
 			blockquoteLines.Write(line)
 			blockquoteLines.Write(newline)
+			if !bq {
+				blockquoteLines.WriteString("</span>")
+			}
 		}
 		buf = blockquoteLines.Bytes()
 		writer.Reset()
-		bq := node.ParentIs(ast.NodeBlockquote)
 		inListItem := r.inListItem(node)
 		if !bq && !inListItem {
 			writer.WriteString(`<div data-block="0" data-type="blockquote">`)
