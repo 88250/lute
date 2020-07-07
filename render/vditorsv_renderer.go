@@ -809,7 +809,6 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 
 		bq := node.ParentIs(ast.NodeBlockquote)
-
 		blockquoteLines := bytes.Buffer{}
 		buf := writer.Bytes()
 		lines := bytes.Split(buf, newline)
@@ -956,6 +955,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			indent++
 		}
+		bq := node.ParentIs(ast.NodeBlockquote)
 		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
 		indentedLines := bytes.Buffer{}
 		buf := writer.Bytes()
@@ -976,11 +976,18 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 				}
 				continue
 			}
-			if !bytes.Contains(line, []byte("data-type=\"li\"")) {
-				indentedLines.WriteString(indentSpacesStr)
+
+			if !bq {
+				if !bytes.Contains(line, []byte("data-type=\"li\"")) {
+					indentedLines.WriteString(indentSpacesStr)
+				} else {
+					idx := bytes.Index(line, []byte("\">")) + len("\">")
+					line = append(line[:idx], append([]byte(indentSpacesStr), line[idx:]...)...)
+				}
 			} else {
-				idx := bytes.Index(line, []byte("\">")) + len("\">")
-				line = append(line[:idx], append([]byte(indentSpacesStr), line[idx:]...)...)
+				if !bytes.Equal(line, []byte("<span data-type=\"text\">" + util.Caret + "</span>")) {
+					indentedLines.WriteString(indentSpacesStr)
+				}
 			}
 			indentedLines.Write(line)
 			indentedLines.Write(newline)
