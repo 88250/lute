@@ -632,9 +632,6 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 			r.tag("div", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
 		}
 	} else {
-		if !node.ParentIs(ast.NodeTableCell) {
-			r.Newline()
-		}
 		inTightList := false
 		lastListItemLastPara := false
 		if parent := node.Parent; nil != parent {
@@ -655,7 +652,8 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 			}
 		}
 
-		if (!inTightList || (lastListItemLastPara)) && !node.ParentIs(ast.NodeTableCell) {
+		r.Write(newline)
+		if !inTightList || lastListItemLastPara {
 			r.Write(newline)
 		}
 		if rootParent {
@@ -819,14 +817,24 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 				lines = lines[:length-1]
 			}
 		}
-
-		for _, line := range lines {
+		length = len(lines)
+		for i, line := range lines {
 			if bytes.Equal([]byte("</span>"), line) {
 				blockquoteLines.Write(line)
 				blockquoteLines.Write(newline)
 				continue
 			}
 			if 0 == len(line) {
+				if !bytes.HasSuffix(blockquoteLines.Bytes(), newline) && i < length-1 {
+					if !bq {
+						blockquoteLines.WriteString(`<span data-type="blockquote-line">`)
+					}
+					blockquoteLines.WriteString(`<span data-type="blockquote-marker" class="vditor-sv__marker">&gt; </span>`)
+					blockquoteLines.Write(newline)
+					if !bq {
+						blockquoteLines.WriteString("</span>")
+					}
+				}
 				continue
 			}
 			if !bq {
@@ -888,9 +896,9 @@ func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		if rootParent {
 			r.tag("/span", nil, false)
 		}
-		r.Newline()
+		r.Write(newline)
+		r.Write(newline)
 		if rootParent {
-			r.Write(newline)
 			r.WriteString("</div>")
 		}
 	}
@@ -935,7 +943,7 @@ func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 		attrs = append(attrs, []string{"data-block", "0"})
 		r.tag("div", attrs, false)
 	} else {
-		r.Newline()
+		r.Write(newline)
 		r.tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -985,7 +993,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 					line = append(line[:idx], append([]byte(indentSpacesStr), line[idx:]...)...)
 				}
 			} else {
-				if !bytes.Equal(line, []byte("<span data-type=\"text\">" + util.Caret + "</span>")) {
+				if !bytes.Equal(line, []byte("<span data-type=\"text\">"+util.Caret+"</span>")) {
 					indentedLines.WriteString(indentSpacesStr)
 				}
 			}
@@ -1007,9 +1015,6 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		listItemBuf.WriteString(`<span data-type="li" data-space="` + strings.Repeat(" ", r.ListIndentSpaces) + `">`)
 		listItemBuf.WriteString(`<span data-type="li-marker" class="vditor-sv__marker--bi">` + marker + " </span>")
 		buf = append(listItemBuf.Bytes(), buf...)
-		if node.ParentIs(ast.NodeTableCell) {
-			buf = bytes.ReplaceAll(buf, newline, nil)
-		}
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(buf)
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = bytes.TrimSuffix(r.Writer.Bytes(), newline)
