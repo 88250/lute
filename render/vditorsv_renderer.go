@@ -1026,6 +1026,14 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		r.Writer.Reset()
 		r.Write(buf)
 		r.Newline()
+		if node.Parent.LastChild == node {
+			if bq {
+				if nil != node.Parent.Next {
+					r.Write(newline)
+				}
+			}
+		}
+
 		r.tag("/span", nil, false)
 		if ast.NodeDocument != node.Parent.Parent.Type {
 			r.ListIndentSpaces -= node.ListData.Padding
