@@ -322,10 +322,9 @@ func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
-	r.tag("code", nil, false)
+	r.WriteString("<span>")
 	r.Write(html.EscapeHTML(bytes.TrimSpace(node.Tokens)))
-	r.WriteString("</code></pre>")
+	r.WriteString("</span>")
 	return ast.WalkStop
 }
 
@@ -377,17 +376,21 @@ func (r *VditorSVRenderer) renderInlineMath(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Newline()
 	r.tag("span", [][]string{{"data-type", "math-block-close-marker"}, {"class", "vditor-sv__marker"}}, false)
 	r.WriteString("$$")
 	r.tag("/span", nil, false)
+	r.Newline()
+	if !r.isLastNode(r.Tree.Root, node) {
+		r.Write(newline)
+	}
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("pre", [][]string{{"class", "vditor-sv__marker--pre"}}, false)
-	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
+	r.WriteString("<span>")
 	r.Write(html.EscapeHTML(bytes.TrimSpace(node.Tokens)))
-	r.WriteString("</code></pre>")
+	r.WriteString("</span>")
 	return ast.WalkStop
 }
 
@@ -395,6 +398,7 @@ func (r *VditorSVRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"data-type", "math-block-open-marker"}, {"class", "vditor-sv__marker"}}, false)
 	r.WriteString("$$")
 	r.tag("/span", nil, false)
+	r.Newline()
 	return ast.WalkStop
 }
 
@@ -402,10 +406,6 @@ func (r *VditorSVRenderer) renderMathBlock(node *ast.Node, entering bool) ast.Wa
 	if entering {
 		r.renderDivNode(node)
 	} else {
-		r.Newline()
-		if !entering && !r.isLastNode(r.Tree.Root, node) {
-			r.Write(newline)
-		}
 		r.WriteString("</div>")
 	}
 	return ast.WalkContinue
@@ -450,7 +450,7 @@ func (r *VditorSVRenderer) renderStrikethrough1OpenMarker(node *ast.Node, enteri
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("~")
 	r.tag("/span", nil, false)
-	r.tag("s", [][]string{{"data-newline", "1"}}, false)
+	r.tag("s", nil, false)
 	return ast.WalkStop
 }
 
@@ -466,7 +466,7 @@ func (r *VditorSVRenderer) renderStrikethrough2OpenMarker(node *ast.Node, enteri
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("~~")
 	r.tag("/span", nil, false)
-	r.tag("s", [][]string{{"data-newline", "1"}}, false)
+	r.tag("s", nil, false)
 	return ast.WalkStop
 }
 
@@ -699,7 +699,7 @@ func (r *VditorSVRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering boo
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
 	r.tag("/span", nil, false)
-	r.tag("span", [][]string{{"data-newline", "1"}}, false)
+	r.tag("span", nil, false)
 	return ast.WalkStop
 }
 
@@ -729,7 +729,7 @@ func (r *VditorSVRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering b
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
-	r.tag("em", [][]string{{"data-newline", "1"}}, false)
+	r.tag("em", nil, false)
 	return ast.WalkStop
 }
 
@@ -745,7 +745,7 @@ func (r *VditorSVRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
 	r.tag("/span", nil, false)
-	r.tag("em", [][]string{{"data-newline", "1"}}, false)
+	r.tag("em", nil, false)
 	return ast.WalkStop
 }
 
@@ -770,7 +770,7 @@ func (r *VditorSVRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteString("**")
 	r.tag("/span", nil, false)
-	r.tag("strong", [][]string{{"data-newline", "1"}}, false)
+	r.tag("strong", nil, false)
 	return ast.WalkStop
 }
 
@@ -786,7 +786,7 @@ func (r *VditorSVRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteString("__")
 	r.tag("/span", nil, false)
-	r.tag("strong", [][]string{{"data-newline", "1"}}, false)
+	r.tag("strong", nil, false)
 	return ast.WalkStop
 }
 
