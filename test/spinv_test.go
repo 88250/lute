@@ -230,6 +230,7 @@ func TestSpinVditorIRDOM(t *testing.T) {
 
 var spinVditorSVDOMTests = []*parseTest{
 
+	{"19", "这里是一个脚注引用[^1]，这里是另一个脚注引用[^bignote]。\n\n[^1]: 第一个脚注定义。\n[^bignote]: 脚注定义可使用多段内容。\n\n    缩进对齐的段落包含在这个脚注定义内。‸\n", "<div data-block=\"0\" data-type=\"table\">|foo|bar|\n| ---| ---|\n|<wbr><span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"18", "|foo|bar|\n| ---| ---|\n|‸", "<div data-block=\"0\" data-type=\"table\">|foo|bar|\n| ---| ---|\n|<wbr><span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"17", "‸", "<div data-type=\"p\" data-block=\"0\"><span data-type=\"text\"><wbr></span><span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span></div>"},
 	{"16", "> * f‸\n> \n", "<div data-block=\"0\" data-type=\"blockquote\"><span data-type=\"blockquote-line\"><span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span><span data-type=\"li\" data-space=\"  \"><span data-type=\"li-marker\" class=\"vditor-sv__marker--bi\">* </span><span data-type=\"text\">f<wbr></span><span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span></span></span><span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span></div>"},

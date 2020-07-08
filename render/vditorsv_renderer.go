@@ -179,11 +179,29 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
-		defRenderer := NewVditorIRRenderer(tree)
+		defRenderer := NewVditorSVRenderer(tree)
 		def.FirstChild.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
 		defRenderer.needRenderFootnotesDef = true
 		defContent := defRenderer.Render()
-		r.Write(defContent)
+
+		defLines := &bytes.Buffer{}
+		indentSpacesStr := `<span data-type="footnotes-space">    </span>`
+		lines := bytes.Split(defContent, newline)
+		for i, line := range lines {
+			if 0 == len(line) {
+				if !bytes.HasSuffix(defLines.Bytes(), newline) {
+					defLines.Write(newline)
+				}
+				continue
+			}
+			if 0 < i {
+				defLines.WriteString(indentSpacesStr)
+			}
+			defLines.Write(line)
+			defLines.Write(newline)
+		}
+
+		r.Write(defLines.Bytes())
 		r.WriteString("</div>")
 	}
 	r.WriteString("</div>")
@@ -193,13 +211,8 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 func (r *VditorSVRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
-		r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-sv__marker--pre"}, {"data-type", "html-entity"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--pre"}, {"data-type", "html-entity"}}, false)
 		r.Write(html.EscapeHTML(html.EscapeHTML(node.Tokens)))
-		r.tag("/code", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-sv__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", nil, false)
-		r.Write(html.UnescapeHTML(node.HtmlEntityTokens))
-		r.tag("/code", nil, false)
 		r.tag("/span", nil, false)
 	} else {
 		r.tag("/span", nil, false)
@@ -258,30 +271,21 @@ func (r *VditorSVRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast
 func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	previousNodeText := node.PreviousNodeText()
 	previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-	if "" == previousNodeText {
-		r.WriteString(parse.Zwsp)
-	}
-	idx, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
-	idxStr := strconv.Itoa(idx)
+	_, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}
 	attrs = append(attrs, []string{"class", "vditor-tooltipped vditor-tooltipped__s"})
 	attrs = append(attrs, []string{"aria-label", html.EscapeString(label)})
 	attrs = append(attrs, []string{"data-footnotes-label", string(node.FootnotesRefLabel)})
-	r.tag("sup", attrs, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
 	r.tag("/span", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
-	r.tag("span", [][]string{{"class", "vditor-sv__marker--hide"}, {"data-render", "1"}}, false)
-	r.WriteString(idxStr)
-	r.tag("/span", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemCloseBracket)
 	r.tag("/span", nil, false)
-	r.WriteString("</sup>" + parse.Zwsp)
 	return ast.WalkStop
 }
 
@@ -503,7 +507,7 @@ func (r *VditorSVRenderer) renderLinkText(node *ast.Node, entering bool) ast.Wal
 		if 3 == node.Parent.LinkType {
 			r.tag("span", nil, false)
 		} else {
-			r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+			r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}, {"data-type", "link-text"}}, false)
 		}
 	}
 	r.Write(node.Tokens)
