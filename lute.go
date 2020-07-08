@@ -53,12 +53,15 @@ func New(opts ...Option) (ret *Lute) {
 	for _, opt := range opts {
 		opt(ret)
 	}
+
 	ret.HTML2MdRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.HTML2VditorSVDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2HTMLRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.Md2VditorSVDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	return ret
 }
 
