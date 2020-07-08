@@ -424,16 +424,13 @@ func (r *VditorSVRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.tag("div", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
-		r.Write(node.Tokens)
-	} else {
-		r.Newline()
-		if !r.isLastNode(r.Tree.Root, node) {
-			r.Write(newline)
-		}
-		r.tag("/div", nil, false)
+	r.tag("div", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
+	r.Write(node.Tokens)
+	r.Newline()
+	if !r.isLastNode(r.Tree.Root, node) {
+		r.Write(newline)
 	}
+	r.tag("/div", nil, false)
 	return ast.WalkStop
 }
 
