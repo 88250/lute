@@ -180,10 +180,18 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
 		defRenderer := NewVditorSVRenderer(tree)
-		def.FirstChild.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+		r.WriteByte(lex.ItemOpenBracket)
+		r.tag("/span", nil, false)
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}}, false)
+		r.Write(def.Tokens)
+		r.tag("/span", nil, false)
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+		r.WriteByte(lex.ItemCloseBracket)
+		r.tag("/span", nil, false)
+		r.WriteString(": ")
 		defRenderer.needRenderFootnotesDef = true
 		defContent := defRenderer.Render()
-
 		defLines := &bytes.Buffer{}
 		indentSpacesStr := `<span data-type="footnotes-space">    </span>`
 		lines := bytes.Split(defContent, newline)
@@ -277,6 +285,7 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	attrs = append(attrs, []string{"class", "vditor-tooltipped vditor-tooltipped__s"})
 	attrs = append(attrs, []string{"aria-label", html.EscapeString(label)})
 	attrs = append(attrs, []string{"data-footnotes-label", string(node.FootnotesRefLabel)})
+	r.tag("span", [][]string{{"class", "sup"}}, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
 	r.tag("/span", nil, false)
@@ -285,6 +294,7 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	r.tag("/span", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemCloseBracket)
+	r.tag("/span", nil, false)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
