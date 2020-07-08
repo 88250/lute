@@ -659,8 +659,10 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		}
 
 		r.Write(newline)
-		if (!inTightList || lastListItemLastPara) && !(rootParent && node.Parent.FirstChild == node.Parent.LastChild && node.Parent.FirstChild == node && bytes.Equal(node.FirstChild.Tokens, util.CaretTokens) && node.FirstChild == node.LastChild) {
-			r.Write(newline)
+		if nil != node.Next && ast.NodeBlockquote != node.Next.Type {
+			if (!inTightList || lastListItemLastPara) && !(rootParent && node.Parent.FirstChild == node.Parent.LastChild && node.Parent.FirstChild == node && bytes.Equal(node.FirstChild.Tokens, util.CaretTokens) && node.FirstChild == node.LastChild) {
+				r.Write(newline)
+			}
 		}
 		if rootParent {
 			r.tag("/div", nil, false)
@@ -824,6 +826,10 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 				continue
 			}
 			if 0 == len(line) {
+				if 0 == i {
+					continue
+				}
+
 				if !bytes.HasSuffix(blockquoteLines.Bytes(), newline) && i < length-1 {
 					if !bq {
 						blockquoteLines.WriteString(`<span data-type="blockquote-line">`)
