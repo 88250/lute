@@ -1056,8 +1056,9 @@ func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 		r.tag("/span", nil, false)
 	}
 	r.tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)
-	r.WriteByte(lex.ItemCloseBracket)
+	r.WriteString("] ")
 	r.tag("/span", nil, false)
+	node.Next.Tokens = bytes.TrimPrefix(node.Next.Tokens, []byte(" "))
 	return ast.WalkStop
 }
 
