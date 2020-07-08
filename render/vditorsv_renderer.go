@@ -214,7 +214,7 @@ func (r *VditorSVRenderer) renderBackslashContent(node *ast.Node, entering bool)
 
 func (r *VditorSVRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<span data-type=\"backslash\">")
+		r.WriteString(`<span data-type="backslash" class="vditor-sv__marker">`)
 		r.WriteString("<span>")
 		r.WriteByte(lex.ItemBackslash)
 		r.WriteString("</span>")
@@ -591,10 +591,9 @@ func (r *VditorSVRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderDivNode(node)
 	tokens := bytes.TrimSpace(node.Tokens)
-	r.WriteString("<pre class=\"vditor-sv__marker--pre vditor-sv__marker\">")
-	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
+	r.tag("span", [][]string{{"data-type", "html-block"}, {"class", "vditor-sv__marker"}}, false)
 	r.Write(html.EscapeHTML(tokens))
-	r.WriteString("</code></pre>")
+	r.WriteString("</span>")
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
 		r.Write(newline)
@@ -605,9 +604,9 @@ func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorSVRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderSpanNode(node)
-	r.tag("code", [][]string{{"class", "vditor-sv__marker"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.Write(html.EscapeHTML(node.Tokens))
-	r.tag("/code", nil, false)
+	r.tag("/span", nil, false)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
