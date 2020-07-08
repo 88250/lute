@@ -569,7 +569,7 @@ func (r *VditorSVRenderer) renderBang(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", nil, false)
+		r.tag("span", [][]string{{"data-type", "image"}}, false)
 	} else {
 		r.tag("/span", nil, false)
 	}
