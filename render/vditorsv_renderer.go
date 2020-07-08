@@ -214,8 +214,8 @@ func (r *VditorSVRenderer) renderBackslashContent(node *ast.Node, entering bool)
 
 func (r *VditorSVRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<span data-type="backslash" class="vditor-sv__marker">`)
-		r.WriteString("<span>")
+		r.WriteString(`<span data-type="backslash">`)
+		r.WriteString(`<span class="vditor-sv__marker">`)
 		r.WriteByte(lex.ItemBackslash)
 		r.WriteString("</span>")
 	} else {
