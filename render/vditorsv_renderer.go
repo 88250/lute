@@ -653,7 +653,7 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		}
 
 		r.Write(newline)
-		if !inTightList || lastListItemLastPara {
+		if (!inTightList || lastListItemLastPara) && !(rootParent && node.Parent.FirstChild == node.Parent.LastChild && node.Parent.FirstChild == node && bytes.Equal(node.FirstChild.Tokens, util.CaretTokens) && node.FirstChild == node.LastChild) {
 			r.Write(newline)
 		}
 		if rootParent {
