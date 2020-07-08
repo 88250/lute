@@ -183,7 +183,7 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
 		r.WriteByte(lex.ItemOpenBracket)
 		r.tag("/span", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}, {"data-type", "footnotes-link"}}, false)
 		r.Write(def.Tokens)
 		r.tag("/span", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
@@ -461,12 +461,10 @@ func (r *VditorSVRenderer) renderStrikethrough1OpenMarker(node *ast.Node, enteri
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("~")
 	r.tag("/span", nil, false)
-	r.tag("s", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/s", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("~")
 	r.tag("/span", nil, false)
@@ -477,12 +475,10 @@ func (r *VditorSVRenderer) renderStrikethrough2OpenMarker(node *ast.Node, enteri
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("~~")
 	r.tag("/span", nil, false)
-	r.tag("s", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/s", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("~~")
 	r.tag("/span", nil, false)
@@ -739,12 +735,11 @@ func (r *VditorSVRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering b
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
-	r.tag("em", nil, false)
+
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/em", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
@@ -755,12 +750,10 @@ func (r *VditorSVRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
 	r.tag("/span", nil, false)
-	r.tag("em", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/em", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
 	r.tag("/span", nil, false)
@@ -780,12 +773,10 @@ func (r *VditorSVRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteString("**")
 	r.tag("/span", nil, false)
-	r.tag("strong", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/strong", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteString("**")
 	r.tag("/span", nil, false)
@@ -796,12 +787,10 @@ func (r *VditorSVRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bo
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteString("__")
 	r.tag("/span", nil, false)
-	r.tag("strong", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/strong", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteString("__")
 	r.tag("/span", nil, false)
@@ -1114,10 +1103,13 @@ func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
 	switch node.Type {
 	case ast.NodeEmphasis:
 		attrs = append(attrs, []string{"data-type", "em"})
+		attrs = append(attrs, []string{"class", "em"})
 	case ast.NodeStrong:
 		attrs = append(attrs, []string{"data-type", "strong"})
+		attrs = append(attrs, []string{"class", "strong"})
 	case ast.NodeStrikethrough:
 		attrs = append(attrs, []string{"data-type", "s"})
+		attrs = append(attrs, []string{"class", "s"})
 	case ast.NodeLink:
 		if 3 != node.LinkType {
 			attrs = append(attrs, []string{"data-type", "a"})
