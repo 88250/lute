@@ -1043,19 +1043,19 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-marker", "["}, {"class", "vditor-sv__marker--bi"}}, false)
+	r.tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
 	r.tag("/span", nil, false)
 	if node.TaskListItemChecked {
-		r.tag("span", [][]string{{"data-marker", "x"}, {"class", "vditor-sv__marker--bi"}}, false)
+		r.tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--strong"}}, false)
 		r.WriteByte('x')
 		r.tag("/span", nil, false)
 	} else {
-		r.tag("span", [][]string{{"data-marker", " "}, {"class", "vditor-sv__marker--bi"}}, false)
+		r.tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)
 		r.WriteByte(lex.ItemSpace)
 		r.tag("/span", nil, false)
 	}
-	r.tag("span", [][]string{{"data-marker", "]"}, {"class", "vditor-sv__marker--bi"}}, false)
+	r.tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemCloseBracket)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
