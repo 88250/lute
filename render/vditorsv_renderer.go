@@ -659,11 +659,14 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		}
 
 		r.Write(newline)
-		if nil != node.Next && ast.NodeBlockquote != node.Next.Type {
-			if (!inTightList || lastListItemLastPara) && !(rootParent && node.Parent.FirstChild == node.Parent.LastChild && node.Parent.FirstChild == node && bytes.Equal(node.FirstChild.Tokens, util.CaretTokens) && node.FirstChild == node.LastChild) {
+		if !r.isLastNode(r.Tree.Root, node) {
+			if node.ParentIs(ast.NodeBlockquote) && nil != node.Next && ast.NodeBlockquote == node.Next.Type {
+
+			} else if !inTightList || lastListItemLastPara {
 				r.Write(newline)
 			}
 		}
+
 		if rootParent {
 			r.tag("/div", nil, false)
 		}
@@ -863,6 +866,10 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 			} else {
 				writer.Write(newline)
 			}
+		}
+
+		if bq && nil != node.Next {
+			buf = append(buf, newline...)
 		}
 
 		writer.Write(buf)
