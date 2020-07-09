@@ -898,6 +898,12 @@ func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
 		r.tag("/span", nil, false)
 	} else {
+		id := string(node.HeadingID)
+		if r.Option.HeadingID && "" != id {
+			r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+			r.WriteString(" {" + id + "}")
+			r.tag("/span", nil, false)
+		}
 		if rootParent {
 			r.tag("/span", nil, false)
 		}

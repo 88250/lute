@@ -40,6 +40,8 @@ func (lute *Lute) FormatMd(markdown string) (formatted string) {
 // SpinVditorDOM 自旋 Vditor DOM，用于所见即所得模式下的编辑。
 func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 	lute.VditorWYSIWYG = true
+	lute.VditorIR = false
+	lute.VditorSV = false
 
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
@@ -58,6 +60,8 @@ func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 // HTML2VditorDOM 将 HTML 转换为 Vditor DOM，用于所见即所得模式下粘贴。
 func (lute *Lute) HTML2VditorDOM(sHTML string) (vHTML string) {
 	lute.VditorWYSIWYG = true
+	lute.VditorIR = false
+	lute.VditorSV = false
 
 	markdown, err := lute.HTML2Markdown(sHTML)
 	if nil != err {
@@ -81,6 +85,8 @@ func (lute *Lute) HTML2VditorDOM(sHTML string) (vHTML string) {
 // VditorDOM2HTML 将 Vditor DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
 func (lute *Lute) VditorDOM2HTML(vhtml string) (sHTML string) {
 	lute.VditorWYSIWYG = true
+	lute.VditorIR = false
+	lute.VditorSV = false
 
 	markdown := lute.vditorDOM2Md(vhtml)
 	sHTML = lute.Md2HTML(markdown)
@@ -90,6 +96,8 @@ func (lute *Lute) VditorDOM2HTML(vhtml string) (sHTML string) {
 // Md2VditorDOM 将 markdown 转换为 Vditor DOM，用于从源码模式切换至所见即所得模式。
 func (lute *Lute) Md2VditorDOM(markdown string) (vHTML string) {
 	lute.VditorWYSIWYG = true
+	lute.VditorIR = false
+	lute.VditorSV = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
@@ -107,6 +115,8 @@ func (lute *Lute) Md2VditorDOM(markdown string) (vHTML string) {
 // VditorDOM2Md 将 Vditor DOM 转换为 markdown，用于从所见即所得模式切换至源码模式。
 func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 	lute.VditorWYSIWYG = true
+	lute.VditorIR = false
+	lute.VditorSV = false
 
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	markdown = lute.vditorDOM2Md(htmlStr)

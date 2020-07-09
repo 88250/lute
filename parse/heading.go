@@ -150,7 +150,7 @@ func (t *Tree) parseSetextHeading() (level int) {
 }
 
 func (t *Tree) parseHeadingID(content []byte) (id []byte) {
-	if t.Context.Option.VditorWYSIWYG {
+	if t.Context.Option.VditorWYSIWYG && !t.Context.Option.VditorIR && !t.Context.Option.VditorSV {
 		content = bytes.ReplaceAll(content, util.CaretTokens, nil)
 	}
 

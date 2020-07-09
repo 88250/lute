@@ -22,6 +22,7 @@ import (
 func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 	lute.VditorSV = true
 	lute.VditorWYSIWYG = true
+	lute.VditorIR = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 
@@ -39,6 +40,7 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 	lute.VditorSV = true
 	lute.VditorWYSIWYG = true
+	lute.VditorIR = false
 
 	markdown, err := lute.HTML2Markdown(sHTML)
 	if nil != err {
@@ -63,6 +65,7 @@ func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 func (lute *Lute) Md2VditorSVDOM(markdown string) (vHTML string) {
 	lute.VditorSV = true
 	lute.VditorWYSIWYG = true
+	lute.VditorIR = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorSVRenderer(tree)

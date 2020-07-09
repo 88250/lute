@@ -28,6 +28,7 @@ import (
 func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true
+	lute.VditorSV = false
 
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
@@ -47,6 +48,7 @@ func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 func (lute *Lute) HTML2VditorIRDOM(sHTML string) (vHTML string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true
+	lute.VditorSV = false
 
 	markdown, err := lute.HTML2Markdown(sHTML)
 	if nil != err {
@@ -71,6 +73,7 @@ func (lute *Lute) HTML2VditorIRDOM(sHTML string) (vHTML string) {
 func (lute *Lute) VditorIRDOM2HTML(vhtml string) (sHTML string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true
+	lute.VditorSV = false
 
 	markdown := lute.vditorIRDOM2Md(vhtml)
 	sHTML = lute.Md2HTML(markdown)
@@ -81,6 +84,7 @@ func (lute *Lute) VditorIRDOM2HTML(vhtml string) (sHTML string) {
 func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true
+	lute.VditorSV = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorIRRenderer(tree)
@@ -99,6 +103,7 @@ func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 func (lute *Lute) VditorIRDOM2Md(htmlStr string) (markdown string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = true
+	lute.VditorSV = false
 
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	markdown = lute.vditorIRDOM2Md(htmlStr)
@@ -276,10 +281,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		node.Type = ast.NodeHeading
 		marker := lute.domAttrValue(n, "data-marker")
-		id := lute.domAttrValue(n, "data-id")
-		if "" != id {
-			node.HeadingID = []byte(id)
-		}
 		node.HeadingSetext = "=" == marker || "-" == marker
 		if !node.HeadingSetext {
 			marker := lute.domText(n.FirstChild)
@@ -636,6 +637,11 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Span:
 		switch dataType {
+		case "heading-id":
+			headingID := strings.TrimSpace(lute.domText(n))
+			headingID = headingID[1 : len(headingID)-1]
+			tree.Context.Tip.HeadingID = []byte(headingID)
+			return
 		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))

@@ -867,16 +867,13 @@ func (r *VditorIRRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		text := r.Text(node)
-		if strings.Contains(text, util.Caret) {
+		if strings.Contains(text, util.Caret) || bytes.Contains(node.HeadingID, util.CaretTokens) {
 			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
 		} else {
 			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
 		id := string(node.HeadingID)
-		if r.Option.HeadingID && "" != id {
-			r.WriteString(" data-id=\"" + id + "\"")
-		}
 		if "" == id {
 			id = HeadingID(node)
 		}
@@ -901,6 +898,11 @@ func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
 		r.tag("/span", nil, false)
 	} else {
+		if 0 < len(node.HeadingID) {
+			r.tag("span", [][]string{{"data-type", "heading-id"}, {"class", "vditor-ir__marker"}}, false)
+			r.WriteString(" {" + string(node.HeadingID) + "}")
+			r.tag("/span", nil, false)
+		}
 		r.WriteString("</h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + ">")
 	}
 	return ast.WalkContinue
