@@ -30,7 +30,6 @@ type VditorSVRenderer struct {
 	needRenderFootnotesDef bool
 	LastOut                []byte // 最新输出的 newline 长度个字节
 	ListIndentSpaces       int    // 列表绝对缩进空格数
-
 }
 
 var newline = []byte("<span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span>")
@@ -327,10 +326,19 @@ func (r *VditorSVRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bo
 }
 
 func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	rootParent := ast.NodeDocument == node.Parent.Type
 	if entering {
-		r.renderDivNode(node)
+		if rootParent {
+			r.renderBlockNode("div", node)
+		} else {
+			r.renderBlockNode("span", node)
+		}
 	} else {
-		r.WriteString("</div>")
+		if rootParent {
+			r.WriteString("</div>")
+		} else {
+			r.WriteString("</span>")
+		}
 	}
 	return ast.WalkContinue
 }
@@ -417,10 +425,19 @@ func (r *VditorSVRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bo
 }
 
 func (r *VditorSVRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	rootParent := ast.NodeDocument == node.Parent.Type
 	if entering {
-		r.renderDivNode(node)
+		if rootParent {
+			r.renderBlockNode("div", node)
+		} else {
+			r.renderBlockNode("span", node)
+		}
 	} else {
-		r.WriteString("</div>")
+		if rootParent {
+			r.WriteString("</div>")
+		} else {
+			r.WriteString("</span>")
+		}
 	}
 	return ast.WalkContinue
 }
@@ -596,16 +613,16 @@ func (r *VditorSVRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.renderDivNode(node)
-	tokens := bytes.TrimSpace(node.Tokens)
 	r.tag("span", [][]string{{"data-type", "html-block"}, {"class", "vditor-sv__marker"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+	tokens := bytes.TrimSpace(node.Tokens)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</span>")
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
 		r.Write(newline)
 	}
-	r.WriteString("</div>")
+	r.WriteString("</span>")
 	return ast.WalkStop
 }
 
@@ -1146,7 +1163,7 @@ func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
 	return
 }
 
-func (r *VditorSVRenderer) renderDivNode(node *ast.Node) {
+func (r *VditorSVRenderer) renderBlockNode(tag string, node *ast.Node) {
 	attrs := [][]string{{"data-block", "0"}}
 	switch node.Type {
 	case ast.NodeCodeBlock:
@@ -1156,7 +1173,7 @@ func (r *VditorSVRenderer) renderDivNode(node *ast.Node) {
 	case ast.NodeMathBlock:
 		attrs = append(attrs, []string{"data-type", "math-block"})
 	}
-	r.tag("div", attrs, false)
+	r.tag(tag, attrs, false)
 	return
 }
 
