@@ -26,7 +26,7 @@ func (t *Tree) parseBlocks() {
 	t.Context.FootnotesDefs = []*ast.Node{}
 	lines := 0
 	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {
-		if t.Context.Option.VditorWYSIWYG {
+		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
 			ln := []rune(string(line))
 			if 4 < len(ln) && lex.IsDigit(byte(ln[0])) && ('、' == ln[1] || '）' == ln[1]) {
 				// 列表标记符自动优化 https://github.com/Vanessa219/vditor/issues/68
@@ -251,7 +251,7 @@ var blockStarts = []blockStartFunc{
 					t.Context.advanceOffset(1, true)
 					markers = append(markers, whitespace)
 				}
-				if t.Context.Option.VditorWYSIWYG && !t.Context.Option.VditorSV {
+				if (t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR) && !t.Context.Option.VditorSV {
 					// Vditor 所见即所得模式下块引用标记符 > 后面不能为空，但分屏预览模式可以
 					ln := util.BytesToStr(t.Context.currentLine[t.Context.offset:])
 					ln = strings.ReplaceAll(ln, util.Caret, "")

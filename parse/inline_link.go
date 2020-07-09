@@ -131,7 +131,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 	}
 
 	if nil != passed {
-		if !context.Option.VditorWYSIWYG {
+		if !context.Option.VditorWYSIWYG && !context.Option.VditorIR && !context.Option.VditorSV {
 			destination = html.EncodeDestination(html.UnescapeBytes(destination))
 		}
 	}

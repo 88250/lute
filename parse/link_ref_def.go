@@ -103,7 +103,7 @@ func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, 
 		}
 	}
 	if nil != title {
-		if !context.Option.VditorWYSIWYG {
+		if !context.Option.VditorWYSIWYG && !context.Option.VditorIR && !context.Option.VditorSV {
 			title = html.UnescapeBytes(title)
 		}
 	}
@@ -159,7 +159,7 @@ func (context *Context) parseLinkDest(tokens []byte) (ret, remains, destination 
 		ret, remains, destination = context.parseLinkDest2(tokens) // [label](/url)
 	}
 	if nil != ret {
-		if !context.Option.VditorWYSIWYG {
+		if !context.Option.VditorWYSIWYG && !context.Option.VditorIR && !context.Option.VditorSV {
 			destination = html.EncodeDestination(html.UnescapeBytes(destination))
 		}
 	}
@@ -310,7 +310,7 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 	}
 
 	label = lex.TrimWhitespace(label)
-	if !context.Option.VditorWYSIWYG {
+	if !context.Option.VditorWYSIWYG && !context.Option.VditorIR && !context.Option.VditorSV {
 		label = lex.ReplaceAll(label, lex.ItemNewline, lex.ItemSpace)
 		length := len(label)
 		var token byte

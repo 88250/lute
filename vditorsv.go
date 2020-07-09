@@ -21,7 +21,7 @@ import (
 // SpinVditorSVDOM 自旋 Vditor Split-View DOM，用于分屏预览模式下的编辑。
 func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 	lute.VditorSV = true
-	lute.VditorWYSIWYG = true
+	lute.VditorWYSIWYG = false
 	lute.VditorIR = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
@@ -39,7 +39,7 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 // HTML2VditorSVDOM 将 HTML 转换为 Vditor Split-View DOM，用于分屏预览模式下粘贴。
 func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 	lute.VditorSV = true
-	lute.VditorWYSIWYG = true
+	lute.VditorWYSIWYG = false
 	lute.VditorIR = false
 
 	markdown, err := lute.HTML2Markdown(sHTML)
@@ -64,7 +64,7 @@ func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 // Md2VditorSVDOM 将 markdown 转换为 Vditor Split-View DOM，用于从源码模式切换至分屏预览模式。
 func (lute *Lute) Md2VditorSVDOM(markdown string) (vHTML string) {
 	lute.VditorSV = true
-	lute.VditorWYSIWYG = true
+	lute.VditorWYSIWYG = false
 	lute.VditorIR = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)

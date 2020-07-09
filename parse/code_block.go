@@ -111,7 +111,7 @@ func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num in
 	}
 	tokens = lex.TrimWhitespace(tokens)
 	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
-	if context.Option.VditorWYSIWYG {
+	if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	}
 	if context.Option.VditorSV && endCaret {

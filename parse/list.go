@@ -120,7 +120,7 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 	if !isBlankItem {
 		// 判断是否是任务列表项
 		content := ln[t.Context.offset:]
-		if t.Context.Option.VditorWYSIWYG {
+		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
 			content = bytes.ReplaceAll(content, util.CaretTokens, nil)
 		}
 

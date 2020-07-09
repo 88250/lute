@@ -260,7 +260,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	if (lex.ItemAsterisk == token && '~' == tokenBefore) || (lex.ItemTilde == token && '*' == tokenBefore) {
 		beforeIsPunct = false
 	}
-	if t.Context.Option.VditorWYSIWYG {
+	if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
 		if util.Caret == string(tokenBefore) {
 			beforeIsPunct = false
 		}

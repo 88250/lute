@@ -27,7 +27,7 @@ import (
 // SpinVditorIRDOM 自旋 Vditor Instant-Rendering DOM，用于即时渲染模式下的编辑。
 func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 	lute.VditorIR = true
-	lute.VditorWYSIWYG = true
+	lute.VditorWYSIWYG = false
 	lute.VditorSV = false
 
 	// 替换插入符
@@ -47,7 +47,7 @@ func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 // HTML2VditorIRDOM 将 HTML 转换为 Vditor Instant-Rendering DOM，用于即时渲染模式下粘贴。
 func (lute *Lute) HTML2VditorIRDOM(sHTML string) (vHTML string) {
 	lute.VditorIR = true
-	lute.VditorWYSIWYG = true
+	lute.VditorWYSIWYG = false
 	lute.VditorSV = false
 
 	markdown, err := lute.HTML2Markdown(sHTML)
@@ -72,7 +72,7 @@ func (lute *Lute) HTML2VditorIRDOM(sHTML string) (vHTML string) {
 // VditorIRDOM2HTML 将 Vditor Instant-Rendering DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
 func (lute *Lute) VditorIRDOM2HTML(vhtml string) (sHTML string) {
 	lute.VditorIR = true
-	lute.VditorWYSIWYG = true
+	lute.VditorWYSIWYG = false
 	lute.VditorSV = false
 
 	markdown := lute.vditorIRDOM2Md(vhtml)
@@ -83,7 +83,7 @@ func (lute *Lute) VditorIRDOM2HTML(vhtml string) (sHTML string) {
 // Md2VditorIRDOM 将 markdown 转换为 Vditor Instant-Rendering DOM，用于从源码模式切换至即时渲染模式。
 func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 	lute.VditorIR = true
-	lute.VditorWYSIWYG = true
+	lute.VditorWYSIWYG = false
 	lute.VditorSV = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
@@ -102,7 +102,7 @@ func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 // VditorIRDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown，用于从即时渲染模式切换至源码模式。
 func (lute *Lute) VditorIRDOM2Md(htmlStr string) (markdown string) {
 	lute.VditorIR = true
-	lute.VditorWYSIWYG = true
+	lute.VditorWYSIWYG = false
 	lute.VditorSV = false
 
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")

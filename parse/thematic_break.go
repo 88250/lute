@@ -41,9 +41,8 @@ func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 		markerCnt++
 	}
 
-	if t.Context.Option.VditorWYSIWYG && caretInLn {
+	if (t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV) && caretInLn {
 		caretTokens = util.CaretTokens
 	}
-
 	return 3 <= markerCnt, caretTokens
 }
