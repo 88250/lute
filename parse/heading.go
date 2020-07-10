@@ -98,6 +98,9 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, i
 		if nil != id {
 			content = bytes.ReplaceAll(content, []byte("{"+util.BytesToStr(id)+"}"), nil)
 			_, content = lex.TrimRight(content)
+			if t.Context.Option.VditorSV || t.Context.Option.VditorIR {
+				content = bytes.ReplaceAll(content, []byte(" " + util.Caret), []byte(util.Caret))
+			}
 		}
 	}
 	ok = true
@@ -160,26 +163,20 @@ func (t *Tree) parseHeadingID(content []byte) (id []byte) {
 		return nil
 	}
 
+	if length-1 != curlyBracesEnd {
+		if !bytes.HasSuffix(content, []byte("}"+util.Caret)) {
+			return nil
+		}
+	}
+
 	curlyBracesStart := bytes.Index(content, []byte("{"))
 	if 1 > curlyBracesStart {
 		return nil
 	}
 
-	if t.Context.Option.VditorIR || t.Context.Option.VditorSV {
-		if bytes.HasSuffix(content, util.CaretTokens) {
-			content = content[:curlyBracesEnd]
-			content = append(content, util.CaretTokens...)
-			content = append(content, '}')
-		}
-	}
 	if t.Context.Option.VditorWYSIWYG {
 		content = bytes.ReplaceAll(content, util.CaretTokens, nil)
 	}
-
-	if length = len(content); '}' != content[length-1] {
-		return nil
-	}
-	curlyBracesStart = bytes.Index(content, []byte("{"))
-	id = content[curlyBracesStart+1 : length-1]
+	id = content[curlyBracesStart+1 : curlyBracesEnd]
 	return
 }
