@@ -655,31 +655,11 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 			r.tag("div", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
 		}
 	} else {
-		inTightList := false
-		lastListItemLastPara := false
-		if parent := node.Parent; nil != parent {
-			if ast.NodeListItem == parent.Type { // ListItem.Paragraph
-				listItem := parent
-				if nil != listItem.Parent && nil != listItem.Parent.ListData {
-					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.Tight
-					// 设置紧凑标识的具体实现可参考函数 List.Finalize()
-					inTightList = listItem.Parent.Tight
-
-					if nextItem := listItem.Next; nil == nextItem {
-						nextPara := node.Next
-						lastListItemLastPara = nil == nextPara
-					}
-				} else {
-					inTightList = true
-				}
-			}
-		}
-
 		r.Write(newline)
-		if !r.isLastNode(r.Tree.Root, node) {
-			if node.ParentIs(ast.NodeBlockquote) && nil != node.Next && ast.NodeBlockquote == node.Next.Type {
-
-			} else if !inTightList || lastListItemLastPara {
+		if !node.ParentIs(ast.NodeBlockquote) {
+			r.Write(newline)
+		} else {
+			if nil != node.Next && ast.NodeBlockquote != node.Next.Type {
 				r.Write(newline)
 			}
 		}

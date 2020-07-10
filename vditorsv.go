@@ -20,6 +20,11 @@ import (
 
 // SpinVditorSVDOM 自旋 Vditor Split-View DOM，用于分屏预览模式下的编辑。
 func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
+	// 为空的特殊情况处理
+	if util.Caret == markdown {
+		return "<div data-type=\"p\" data-block=\"0\"><span data-type=\"text\"><wbr></span><span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span></div>"
+	}
+
 	lute.VditorSV = true
 	lute.VditorWYSIWYG = false
 	lute.VditorIR = false
