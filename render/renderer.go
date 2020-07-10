@@ -203,7 +203,11 @@ func headingID0(heading *ast.Node) {
 }
 
 func normalizeHeadingID(heading *ast.Node) (ret string) {
-	id := util.BytesToStr(heading.HeadingID)
+	headingID := heading.ChildByType(ast.NodeHeadingID)
+	var id string
+	if nil != headingID {
+		id = util.BytesToStr(headingID.Tokens)
+	}
 	if "" == id {
 		id = heading.Text()
 	}

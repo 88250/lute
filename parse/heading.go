@@ -17,7 +17,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, id []byte) {
+func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	var startCaret bool
 	if (t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV) && bytes.HasPrefix(tokens, util.CaretTokens) {
@@ -92,17 +92,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int, i
 			return
 		}
 	}
-
-	if t.Context.Option.HeadingID {
-		id = t.parseHeadingID(content)
-		if nil != id {
-			content = bytes.ReplaceAll(content, []byte("{"+util.BytesToStr(id)+"}"), nil)
-			_, content = lex.TrimRight(content)
-			if t.Context.Option.VditorSV || t.Context.Option.VditorIR {
-				content = bytes.ReplaceAll(content, []byte(" " + util.Caret), []byte(util.Caret))
-			}
-		}
-	}
+	_, content = lex.TrimRight(content)
 	ok = true
 	return
 }
@@ -149,34 +139,5 @@ func (t *Tree) parseSetextHeading() (level int) {
 		t.Context.oldtip.AppendTokens(util.CaretTokens)
 	}
 
-	return
-}
-
-func (t *Tree) parseHeadingID(content []byte) (id []byte) {
-	length := len(content)
-	if 3 > length {
-		return nil
-	}
-
-	curlyBracesEnd := bytes.Index(content, []byte("}"))
-	if 1 > curlyBracesEnd {
-		return nil
-	}
-
-	if length-1 != curlyBracesEnd {
-		if !bytes.HasSuffix(content, []byte("}"+util.Caret)) {
-			return nil
-		}
-	}
-
-	curlyBracesStart := bytes.Index(content, []byte("{"))
-	if 1 > curlyBracesStart {
-		return nil
-	}
-
-	if t.Context.Option.VditorWYSIWYG {
-		content = bytes.ReplaceAll(content, util.CaretTokens, nil)
-	}
-	id = content[curlyBracesStart+1 : curlyBracesEnd]
 	return
 }

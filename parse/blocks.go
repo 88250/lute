@@ -271,14 +271,13 @@ var blockStarts = []blockStartFunc{
 	// 判断 ATX 标题（#）是否开始
 	func(t *Tree, container *ast.Node) int {
 		if !t.Context.indented {
-			if ok, markers, content, level, id := t.parseATXHeading(); ok {
+			if ok, markers, content, level:= t.parseATXHeading(); ok {
 				t.Context.advanceNextNonspace()
 				t.Context.advanceOffset(len(content), false)
 				t.Context.closeUnmatchedBlocks()
 				heading := t.Context.addChild(ast.NodeHeading, t.Context.nextNonspace)
 				heading.HeadingLevel = level
 				heading.Tokens = content
-				heading.HeadingID = id
 				crosshatchMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: markers}
 				heading.AppendChild(crosshatchMarker)
 				t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)

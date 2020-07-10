@@ -77,9 +77,11 @@ func _() {
 	_ = x[NodeInlineMathCloseMarker-307]
 	_ = x[NodeBackslash-400]
 	_ = x[NodeBackslashContent-401]
+	_ = x[NodeVditorCaret-402]
 	_ = x[NodeFootnotesDef-500]
 	_ = x[NodeFootnotesRef-501]
 	_ = x[NodeToC-600]
+	_ = x[NodeHeadingID-700]
 	_ = x[NodeTypeMaxVal-1024]
 }
 
@@ -88,10 +90,11 @@ const (
 	_NodeType_name_1 = "NodeTaskListItemMarkerNodeStrikethroughNodeStrikethrough1OpenMarkerNodeStrikethrough1CloseMarkerNodeStrikethrough2OpenMarkerNodeStrikethrough2CloseMarkerNodeTableNodeTableHeadNodeTableRowNodeTableCell"
 	_NodeType_name_2 = "NodeEmojiNodeEmojiUnicodeNodeEmojiImgNodeEmojiAlias"
 	_NodeType_name_3 = "NodeMathBlockNodeMathBlockOpenMarkerNodeMathBlockContentNodeMathBlockCloseMarkerNodeInlineMathNodeInlineMathOpenMarkerNodeInlineMathContentNodeInlineMathCloseMarker"
-	_NodeType_name_4 = "NodeBackslashNodeBackslashContent"
+	_NodeType_name_4 = "NodeBackslashNodeBackslashContentNodeVditorCaret"
 	_NodeType_name_5 = "NodeFootnotesDefNodeFootnotesRef"
 	_NodeType_name_6 = "NodeToC"
-	_NodeType_name_7 = "NodeTypeMaxVal"
+	_NodeType_name_7 = "NodeHeadingID"
+	_NodeType_name_8 = "NodeTypeMaxVal"
 )
 
 var (
@@ -99,7 +102,7 @@ var (
 	_NodeType_index_1 = [...]uint8{0, 22, 39, 67, 96, 124, 153, 162, 175, 187, 200}
 	_NodeType_index_2 = [...]uint8{0, 9, 25, 37, 51}
 	_NodeType_index_3 = [...]uint8{0, 13, 36, 56, 80, 94, 118, 139, 164}
-	_NodeType_index_4 = [...]uint8{0, 13, 33}
+	_NodeType_index_4 = [...]uint8{0, 13, 33, 48}
 	_NodeType_index_5 = [...]uint8{0, 16, 32}
 )
 
@@ -116,7 +119,7 @@ func (i NodeType) String() string {
 	case 300 <= i && i <= 307:
 		i -= 300
 		return _NodeType_name_3[_NodeType_index_3[i]:_NodeType_index_3[i+1]]
-	case 400 <= i && i <= 401:
+	case 400 <= i && i <= 402:
 		i -= 400
 		return _NodeType_name_4[_NodeType_index_4[i]:_NodeType_index_4[i+1]]
 	case 500 <= i && i <= 501:
@@ -124,8 +127,10 @@ func (i NodeType) String() string {
 		return _NodeType_name_5[_NodeType_index_5[i]:_NodeType_index_5[i+1]]
 	case i == 600:
 		return _NodeType_name_6
-	case i == 1024:
+	case i == 700:
 		return _NodeType_name_7
+	case i == 1024:
+		return _NodeType_name_8
 	default:
 		return "NodeType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}

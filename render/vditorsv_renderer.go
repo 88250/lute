@@ -106,6 +106,7 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
+	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
@@ -902,12 +903,6 @@ func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
 		r.tag("/span", nil, false)
 	} else {
-		id := string(node.HeadingID)
-		if r.Option.HeadingID && "" != id {
-			r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
-			r.WriteString(" {" + id + "}")
-			r.tag("/span", nil, false)
-		}
 		if rootParent {
 			r.tag("/span", nil, false)
 		}
@@ -921,6 +916,13 @@ func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *VditorSVRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+	r.WriteString(" {" + string(node.Tokens) + "}")
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 

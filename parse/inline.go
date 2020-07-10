@@ -53,6 +53,8 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 			n = t.parseBang(ctx)
 		case lex.ItemDollar:
 			n = t.parseInlineMath(ctx)
+		case lex.ItemOpenCurlyBrace:
+			n = t.parseHeadingID(block, ctx)
 		default:
 			n = t.parseText(ctx)
 		}
@@ -204,7 +206,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 							// 将 ‸) 换位为 )‸
 							remains = remains[len([]byte(util.Caret+")")):]
 							remains = append([]byte(")"+util.Caret), remains...)
-							copy(ctx.tokens[ctx.pos-1:], remains) // 同时也将 tokens 换位，后续解析从光标位置开始
+							copy(ctx.tokens[ctx.pos-1:], remains) // 同时也将 tokens 换位，后续解析从插入符位置开始
 						} else {
 							// 将 ""‸ 换位为 "‸"
 							title = util.CaretTokens

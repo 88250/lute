@@ -12,11 +12,12 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -67,6 +68,7 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
+	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
@@ -742,7 +744,11 @@ func (r *VditorRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) a
 func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\"")
-		id := string(node.HeadingID)
+		var id string
+		headingID := node.ChildByType(ast.NodeHeadingID)
+		if nil != headingID {
+			id = string(headingID.Tokens)
+		}
 		if r.Option.HeadingID && "" != id {
 			r.WriteString(" data-id=\"" + id + "\"")
 		}
@@ -772,6 +778,10 @@ func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *VditorRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *VditorRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }
 

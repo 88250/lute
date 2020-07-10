@@ -67,6 +67,7 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
+	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
@@ -646,6 +647,10 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 }
 
 func (r *HtmlRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *HtmlRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }
 

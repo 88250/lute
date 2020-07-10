@@ -80,7 +80,6 @@ type Node struct {
 
 	HeadingLevel        int    // 1~6
 	HeadingSetext       bool   // 是否为 Setext
-	HeadingID           []byte // 标题自定义 ID
 	HeadingNormalizedID string // 规范化后的 ID
 
 	// 数学公式块
@@ -388,10 +387,14 @@ const (
 	NodeInlineMathContent     NodeType = 306 // 内联数学公式内容
 	NodeInlineMathCloseMarker NodeType = 307 // 结束内联数学公式标记符 $
 
-	// Vditor 所见即所得
+	// 转义
 
 	NodeBackslash        NodeType = 400 // 转义反斜杠标记符 \
 	NodeBackslashContent NodeType = 401 // 转义反斜杠后的内容
+
+	// Vditor 支持
+
+	NodeVditorCaret NodeType = 402 // 插入符，某些情况下需要使用该节点进行插入符位置调整
 
 	// 脚注
 
@@ -401,6 +404,10 @@ const (
 	// 目录
 
 	NodeToC NodeType = 600 // 目录 [toc]
+
+	// 标题
+
+	NodeHeadingID NodeType = 700 // 标题 ID # foo {id}
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

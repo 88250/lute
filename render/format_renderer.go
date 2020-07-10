@@ -66,6 +66,7 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
+	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
@@ -727,9 +728,6 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 				r.WriteString(strings.Repeat("-", contentLen))
 			}
 		}
-		if r.Option.HeadingID && nil != node.HeadingID {
-			r.WriteString(" {" + util.BytesToStr(node.HeadingID) + "}")
-		}
 
 		if !node.ParentIs(ast.NodeTableCell) {
 			r.Newline()
@@ -740,6 +738,11 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *FormatRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString(" {" + util.BytesToStr(node.Tokens) + "}")
 	return ast.WalkStop
 }
 

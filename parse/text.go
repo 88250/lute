@@ -33,7 +33,7 @@ func (t *Tree) parseText(ctx *InlineContext) *ast.Node {
 func (t *Tree) isMarker(token byte) bool {
 	switch token {
 	case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemOpenBracket, lex.ItemBang, lex.ItemNewline, lex.ItemBackslash, lex.ItemBacktick, lex.ItemLess,
-		lex.ItemCloseBracket, lex.ItemAmpersand, lex.ItemTilde, lex.ItemDollar:
+		lex.ItemCloseBracket, lex.ItemAmpersand, lex.ItemTilde, lex.ItemDollar, lex.ItemOpenCurlyBrace:
 		return true
 	default:
 		return false
@@ -62,7 +62,7 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 		return nil
 	}
 	if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR {
-		// 处理 \‸x 情况，光标后的字符才是待转义的
+		// 处理 \‸x 情况，插入符后的字符才是待转义的
 		tokens := ctx.tokens[ctx.pos:]
 		caret := util.CaretTokens
 		if len(caret) < len(tokens) && bytes.HasPrefix(tokens, caret) {
