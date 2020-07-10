@@ -868,14 +868,14 @@ func (r *VditorIRRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		text := r.Text(node)
-		if strings.Contains(text, util.Caret) {
+		headingID := node.ChildByType(ast.NodeHeadingID)
+		if strings.Contains(text, util.Caret) || (nil != headingID && bytes.Contains(headingID.Tokens, util.CaretTokens)) {
 			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
 		} else {
 			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
 		var id string
-		headingID := node.ChildByType(ast.NodeHeadingID)
 		if nil != headingID {
 			id = string(headingID.Tokens)
 		}
