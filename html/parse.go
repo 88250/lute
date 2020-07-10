@@ -452,7 +452,7 @@ func (p *parser) resetInsertionMode() {
 			}
 			p.im = inSelectIM
 		case a.Td, a.Th:
-			// TODO: remove this divergence from the HTML5 spec.
+			// remove this divergence from the HTML5 spec.
 			//
 			// See https://bugs.chromium.org/p/chromium/issues/detail?id=829668
 			p.im = inCellIM
@@ -467,13 +467,13 @@ func (p *parser) resetInsertionMode() {
 		case a.Table:
 			p.im = inTableIM
 		case a.Template:
-			// TODO: remove this divergence from the HTML5 spec.
+			// remove this divergence from the HTML5 spec.
 			if n.Namespace != "" {
 				continue
 			}
 			p.im = p.templateStack.top()
 		case a.Head:
-			// TODO: remove this divergence from the HTML5 spec.
+			// remove this divergence from the HTML5 spec.
 			//
 			// See https://bugs.chromium.org/p/chromium/issues/detail?id=829668
 			p.im = inHeadIM
@@ -668,7 +668,7 @@ func inHeadIM(p *parser) bool {
 			if !p.oe.contains(a.Template) {
 				return true
 			}
-			// TODO: remove this divergence from the HTML5 spec.
+			// remove this divergence from the HTML5 spec.
 			//
 			// See https://bugs.chromium.org/p/chromium/issues/detail?id=829668
 			p.generateImpliedEndTags()
@@ -1194,7 +1194,7 @@ func inBodyIM(p *parser) bool {
 			Data: p.tok.Data,
 		})
 	case ErrorToken:
-		// TODO: remove this divergence from the HTML5 spec.
+		// remove this divergence from the HTML5 spec.
 		if len(p.templateStack) > 0 {
 			p.im = inTemplateIM
 			return false
@@ -1217,7 +1217,7 @@ func (p *parser) inBodyEndTagFormatting(tagAtom a.Atom, tagName string) {
 	// This is the "adoption agency" algorithm, described at
 	// https://html.spec.whatwg.org/multipage/syntax.html#adoptionAgency
 
-	// TODO: this is a fairly literal line-by-line translation of that algorithm.
+	// this is a fairly literal line-by-line translation of that algorithm.
 	// Once the code successfully parses the comprehensive test suite, we should
 	// refactor this code to be more idiomatic.
 
@@ -1909,7 +1909,7 @@ func inTemplateIM(p *parser) bool {
 			// Ignore the token.
 			return true
 		}
-		// TODO: remove this divergence from the HTML5 spec.
+		// remove this divergence from the HTML5 spec.
 		//
 		// See https://bugs.chromium.org/p/chromium/issues/detail?id=829668
 		p.generateImpliedEndTags()
