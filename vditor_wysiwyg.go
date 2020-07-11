@@ -30,13 +30,6 @@ func (lute *Lute) Md2HTML(markdown string) (sHTML string) {
 	return
 }
 
-// FormatMd 将 markdown 进行格式化输出 formatted，用于源码模式格式化。
-func (lute *Lute) FormatMd(markdown string) (formatted string) {
-	lute.VditorWYSIWYG = false
-	formatted = lute.FormatStr("", markdown)
-	return
-}
-
 // SpinVditorDOM 自旋 Vditor DOM，用于所见即所得模式下的编辑。
 func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 	lute.VditorWYSIWYG = true
