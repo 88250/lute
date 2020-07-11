@@ -761,15 +761,18 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		codeTokens := []byte(contentStr)
-		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: codeTokens}
-		marker := lute.domAttrValue(n, "marker")
+		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
 			marker = "`"
+		}
+		if bytes.HasPrefix(codeTokens, []byte("`")) {
+			codeTokens = append([]byte(" "), codeTokens...)
+			codeTokens = append(codeTokens, ' ')
 		}
 		node.Type = ast.NodeCodeSpan
 		node.CodeMarkerLen = len(marker)
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker})
-		node.AppendChild(content)
+		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: codeTokens})
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker})
 		tree.Context.Tip.AppendChild(node)
 		return
