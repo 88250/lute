@@ -334,7 +334,22 @@ func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 		} else {
 			r.renderBlockNode("span", node)
 		}
+
+		if !node.IsFencedCodeBlock {
+			r.tag("span", [][]string{{"data-type", "code-block-open-marker"}, {"class", "vditor-sv__marker"}}, false)
+			r.WriteString("```")
+			r.tag("/span", nil, false)
+			r.Newline()
+		}
 	} else {
+		if !node.IsFencedCodeBlock {
+			r.Newline()
+			r.tag("span", [][]string{{"class", "vditor-sv__marker--info"}, {"data-type", "code-block-info"}}, false)
+			r.WriteString("```")
+			r.tag("/span", nil, false)
+			r.Newline()
+		}
+
 		if rootParent {
 			r.WriteString("</div>")
 		} else {
