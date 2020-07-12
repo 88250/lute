@@ -831,51 +831,11 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 
 		bq := node.ParentIs(ast.NodeBlockquote)
 		buf := writer.Bytes()
-		//lines := bytes.Split(buf, newline)
-		//length := len(lines)
-		//if 1 == len(r.nodeWriterStack) { // 已经是根这一层
-		//	length = len(lines)
-		//	if 1 < length && lex.IsBlank(lines[length-1]) {
-		//		lines = lines[:length-1]
-		//	}
-		//}
-
-		//blockquoteLines := bytes.Buffer{}
-		//length = len(lines)
-		//for i, line := range lines {
-		//	if bytes.Equal(line, []byte("</span>")) {
-		//		blockquoteLines.Write(line)
-		//		blockquoteLines.Write(newline)
-		//		continue
-		//	}
-		//	if bytes.HasPrefix(line,[]byte("</span>")) {
-		//		blockquoteLines.Write([]byte("</span>"))
-		//		line = line[len("</span>"):]
-		//	}
-		//	if 0 == len(line) {
-		//		if 0 == i {
-		//			continue
-		//		}
-		//
-		//		if !bytes.HasSuffix(blockquoteLines.Bytes(), newline) && i < length-1 {
-		//			blockquoteLines.WriteString(`<span data-type="blockquote-marker" class="vditor-sv__marker">&gt; </span>`)
-		//			blockquoteLines.Write(newline)
-		//		}
-		//		continue
-		//	}
-		//
-		//	blockquoteLines.WriteString(`<span data-type="blockquote-marker" class="vditor-sv__marker">&gt; </span>`)
-		//	blockquoteLines.Write(line)
-		//	blockquoteLines.Write(newline)
-		//}
-		//buf = blockquoteLines.Bytes()
-
 		buf = bytes.TrimPrefix(buf, newline)
 		buf = bytes.TrimSuffix(buf, newline)
 		marker := []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")
 		buf = append(marker, buf...)
 		buf = bytes.ReplaceAll(buf, newline, append(newline, []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")...))
-
 		writer.Reset()
 		inListItem := r.inListItem(node)
 		if !bq && !inListItem {
