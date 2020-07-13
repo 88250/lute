@@ -929,7 +929,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		} else {
 			markerStr = string(node.Marker)
 		}
-		marker := []byte(`<span data-type="li" data-space="` + strings.Repeat(" ", r.ListIndentSpaces) + `">` + `<span data-type="li-marker" class="vditor-sv__marker--bi">` + markerStr + " </span>" )
+		marker := []byte(`<span data-type="li" data-space="` + strings.Repeat(" ", r.ListIndentSpaces) + `">` + `<span data-type="li-marker" class="vditor-sv__marker">` + markerStr + " </span>" )
 		buf = append(marker, buf...)
 		buf = bytes.ReplaceAll(buf, newline, append(newline, []byte(indentSpacesStr)...))
 		writer.Reset()
