@@ -330,7 +330,7 @@ func (r *VditorSVRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bo
 
 func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.renderBlockNode("span", node)
+		r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "code-block"}}, false)
 		if !node.IsFencedCodeBlock {
 			r.tag("span", [][]string{{"data-type", "code-block-open-marker"}, {"class", "vditor-sv__marker"}}, false)
 			r.WriteString("```")
@@ -433,7 +433,7 @@ func (r *VditorSVRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bo
 
 func (r *VditorSVRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.renderBlockNode("span", node)
+		r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "math-block"}}, false)
 	} else {
 		r.WriteString("</span>")
 	}
@@ -1033,20 +1033,6 @@ func (r *VditorSVRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
 	r.tag("span", attrs, false)
-	return
-}
-
-func (r *VditorSVRenderer) renderBlockNode(tag string, node *ast.Node) {
-	attrs := [][]string{{"data-block", "0"}}
-	switch node.Type {
-	case ast.NodeCodeBlock:
-		attrs = append(attrs, []string{"data-type", "code-block"})
-	case ast.NodeHTMLBlock:
-		attrs = append(attrs, []string{"data-type", "html-block"})
-	case ast.NodeMathBlock:
-		attrs = append(attrs, []string{"data-type", "math-block"})
-	}
-	r.tag(tag, attrs, false)
 	return
 }
 
