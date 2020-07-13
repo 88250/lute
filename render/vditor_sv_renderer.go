@@ -829,7 +829,6 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 
-		bq := node.ParentIs(ast.NodeBlockquote)
 		buf := writer.Bytes()
 		buf = bytes.TrimPrefix(buf, newline)
 		buf = bytes.TrimSuffix(buf, newline)
@@ -837,34 +836,23 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		buf = append(marker, buf...)
 		buf = bytes.ReplaceAll(buf, newline, append(newline, []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")...))
 		writer.Reset()
-		inListItem := r.inListItem(node)
-		if !bq && !inListItem {
+		rootParent := ast.NodeDocument == node.Parent.Type
+		if rootParent {
 			writer.WriteString(`<div data-block="0" data-type="blockquote">`)
 		} else {
-			if inListItem {
-				writer.WriteString(`<span data-type="blockquote">`)
-			} else {
-				writer.Write(newline)
-			}
+			writer.WriteString(`<span data-type="blockquote">`)
 		}
-
-		if bq && nil != node.Next {
-			buf = append(buf, newline...)
-		}
-
 		writer.Write(buf)
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
 		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		buf = r.Writer.Bytes()
 		r.Writer.Reset()
 		r.Write(buf)
-		r.Newline()
-		if !bq && !inListItem {
+		if rootParent {
+			r.Newline()
 			r.WriteString("</div>")
 		} else {
-			if inListItem {
-				r.WriteString("</span>")
-			}
+			r.WriteString("</span>")
 		}
 	}
 	return ast.WalkContinue
@@ -958,6 +946,7 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 	} else {
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+
 		indent := len(node.ListData.Marker) + 1
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			indent++
