@@ -651,7 +651,9 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		r.tag("span", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
 	} else {
 		r.Newline()
-		if grandparent := node.Parent.Parent; nil == grandparent || ast.NodeList != grandparent.Type || !grandparent.Tight {
+		grandparent := node.Parent.Parent
+		inTightList := nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight
+		if !inTightList {
 			// 不在紧凑列表内则需要输出换行分段
 			r.Write(newline)
 		}
@@ -803,8 +805,14 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 
 		buf := writer.Bytes()
-		// TODO
-		//buf = bytes.ReplaceAll(buf, append(newline, []byte("</span>")...), []byte("</span>"))
+		for {
+			if bytes.HasSuffix(buf, append(newline, []byte("</span>")...)) {
+				buf = bytes.TrimSuffix(buf, append(newline, []byte("</span>")...))
+				buf = append(buf, []byte("</span>")...)
+			} else {
+				break
+			}
+		}
 		marker := []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")
 		buf = append(marker, buf...)
 		buf = bytes.ReplaceAll(buf, newline, append(newline, []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")...))
