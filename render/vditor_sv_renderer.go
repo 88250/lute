@@ -650,13 +650,10 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 	if entering {
 		r.tag("span", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
 	} else {
-		r.Write(newline)
-		if !node.ParentIs(ast.NodeBlockquote) {
+		r.Newline()
+		if grandparent := node.Parent.Parent; nil == grandparent || ast.NodeList != grandparent.Type || !grandparent.Tight {
+			// 不在紧凑列表内则需要输出换行分段
 			r.Write(newline)
-		} else {
-			if nil != node.Next && ast.NodeBlockquote != node.Next.Type {
-				r.Write(newline)
-			}
 		}
 		r.tag("/span", nil, false)
 	}
@@ -806,8 +803,8 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 
 		buf := writer.Bytes()
-		buf = bytes.TrimPrefix(buf, newline)
-		buf = bytes.TrimSuffix(buf, newline)
+		// TODO
+		//buf = bytes.ReplaceAll(buf, append(newline, []byte("</span>")...), []byte("</span>"))
 		marker := []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")
 		buf = append(marker, buf...)
 		buf = bytes.ReplaceAll(buf, newline, append(newline, []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")...))
@@ -820,6 +817,7 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		r.Writer.Reset()
 		r.Write(buf)
 		r.Newline()
+		r.Write(newline)
 		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
@@ -864,11 +862,6 @@ func (r *VditorSVRenderer) renderHeadingID(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
-	blockContainerParent := node.ParentIs(ast.NodeListItem, ast.NodeBlockquote)
-	if blockContainerParent {
-		return ast.WalkContinue
-	}
-
 	if entering {
 		var attrs [][]string
 		if node.Tight {
@@ -921,8 +914,14 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
 		buf := writer.Bytes()
 		indentSpacesStr := `<span data-type="li-space">` + string(indentSpaces) + "</span>"
-		buf = bytes.TrimPrefix(buf, newline)
-		buf = bytes.TrimSuffix(buf, newline)
+		for {
+			if bytes.HasSuffix(buf, append(newline, []byte("</span>")...)) {
+				buf = bytes.TrimSuffix(buf, append(newline, []byte("</span>")...))
+				buf = append(buf, []byte("</span>")...)
+			} else {
+				break
+			}
+		}
 		var markerStr string
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			markerStr = strconv.Itoa(node.Num) + string(node.ListData.Delimiter)
