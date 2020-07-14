@@ -316,9 +316,7 @@ func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering b
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	r.Newline()
-	if !r.isLastNode(r.Tree.Root, node) {
-		r.Write(NewlineSV)
-	}
+	r.Write(NewlineSV)
 	return ast.WalkStop
 }
 
@@ -420,9 +418,7 @@ func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering b
 	r.WriteString("$$")
 	r.tag("/span", nil, false)
 	r.Newline()
-	if !r.isLastNode(r.Tree.Root, node) {
-		r.Write(NewlineSV)
-	}
+	r.Write(NewlineSV)
 	return ast.WalkStop
 }
 
@@ -469,9 +465,7 @@ func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSt
 	r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
 	r.Write(node.Tokens)
 	r.Newline()
-	if !r.isLastNode(r.Tree.Root, node) {
-		r.Write(NewlineSV)
-	}
+	r.Write(NewlineSV)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
@@ -632,9 +626,7 @@ func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</span>")
 	r.Newline()
-	if !r.isLastNode(r.Tree.Root, node) {
-		r.Write(NewlineSV)
-	}
+	r.Write(NewlineSV)
 	r.WriteString("</span>")
 	return ast.WalkStop
 }
