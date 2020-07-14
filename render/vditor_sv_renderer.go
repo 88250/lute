@@ -312,6 +312,7 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 
 func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
+	r.renderListItemBlockPadding(node)
 	r.tag("span", [][]string{{"data-type", "code-block-close-marker"}, {"class", "vditor-sv__marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
@@ -338,6 +339,7 @@ func (r *VditorSVRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bo
 func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderListItemBlockPadding(node)
+
 		r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "code-block"}}, false)
 		if !node.IsFencedCodeBlock {
 			r.tag("span", [][]string{{"data-type", "code-block-open-marker"}, {"class", "vditor-sv__marker"}}, false)
@@ -351,8 +353,9 @@ func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 			r.tag("span", [][]string{{"class", "vditor-sv__marker--info"}, {"data-type", "code-block-info"}}, false)
 			r.WriteString("```")
 			r.tag("/span", nil, false)
-			r.Newline()
 		}
+		r.Newline()
+		r.Write(NewlineSV)
 		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
@@ -360,7 +363,10 @@ func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString("<span>")
-	r.Write(html.EscapeHTML(bytes.TrimSpace(node.Tokens)))
+	r.renderListItemBlockPadding(node)
+	tokens := html.EscapeHTML(bytes.TrimSpace(node.Tokens))
+	tokens = r.renderListItemBlockTokensPadding(tokens)
+	r.Write(tokens)
 	r.WriteString("</span>")
 	return ast.WalkStop
 }
@@ -424,7 +430,10 @@ func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering b
 
 func (r *VditorSVRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString("<span>")
-	r.Write(html.EscapeHTML(bytes.TrimSpace(node.Tokens)))
+	r.renderListItemBlockPadding(node)
+	tokens := html.EscapeHTML(bytes.TrimSpace(node.Tokens))
+	tokens = r.renderListItemBlockTokensPadding(tokens)
+	r.Write(tokens)
 	r.WriteString("</span>")
 	return ast.WalkStop
 }
@@ -618,12 +627,12 @@ func (r *VditorSVRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.renderListItemBlockPadding(node)
-
 	r.tag("span", [][]string{{"data-type", "html-block"}, {"class", "vditor-sv__marker"}}, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
-	tokens := bytes.TrimSpace(node.Tokens)
-	r.Write(html.EscapeHTML(tokens))
+	r.renderListItemBlockPadding(node)
+	tokens := html.EscapeHTML(bytes.TrimSpace(node.Tokens))
+	tokens = r.renderListItemBlockTokensPadding(tokens)
+	r.Write(tokens)
 	r.WriteString("</span>")
 	r.Newline()
 	r.Write(NewlineSV)
@@ -975,6 +984,11 @@ func (r *VditorSVRenderer) renderListItemBlockPadding(node *ast.Node) {
 
 	padding := []byte(`<span data-type="padding">` + strings.Repeat(" ", r.ListPadding) + "</span>")
 	r.Writer.Write(padding)
+}
+
+func (r *VditorSVRenderer) renderListItemBlockTokensPadding(tokens []byte) []byte {
+	padding := []byte(`<span data-type="padding">` + strings.Repeat(" ", r.ListPadding) + "</span>")
+	return bytes.ReplaceAll(tokens, []byte("\n"), append([]byte("\n"), padding...))
 }
 
 func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
