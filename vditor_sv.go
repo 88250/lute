@@ -22,7 +22,7 @@ import (
 func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 	// 为空的特殊情况处理
 	if util.Caret == strings.TrimSpace(markdown) {
-		return "<div data-type=\"p\" data-block=\"0\"><span data-type=\"text\"><wbr></span><span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span></div>"
+		return "<span data-type=\"p\" data-block=\"0\"><span data-type=\"text\"><wbr></span>" + string(render.NewlineSV) + "</span>"
 	}
 
 	lute.VditorSV = true

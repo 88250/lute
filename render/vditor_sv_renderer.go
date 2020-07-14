@@ -29,16 +29,16 @@ type VditorSVRenderer struct {
 	nodeWriterStack        []*bytes.Buffer // 节点输出缓冲栈
 	needRenderFootnotesDef bool
 	LastOut                []byte // 最新输出的 newline 长度个字节
-	ListIndentSpaces       int    // 列表绝对缩进空格数
+	ListPadding            int    // 列表内部缩进空格数
 }
 
-var newline = []byte("<span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span>")
+var NewlineSV = []byte("<span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span>")
 
 func (r *VditorSVRenderer) WriteByte(c byte) {
 	r.Writer.WriteByte(c)
 	r.LastOut = append(r.LastOut, c)
-	if len(newline) < len(r.LastOut) {
-		r.LastOut = r.LastOut[len(r.LastOut)-len(newline):]
+	if 1024 < len(r.LastOut) {
+		r.LastOut = r.LastOut[512:]
 	}
 }
 
@@ -46,8 +46,8 @@ func (r *VditorSVRenderer) Write(content []byte) {
 	if length := len(content); 0 < length {
 		r.Writer.Write(content)
 		r.LastOut = append(r.LastOut, content...)
-		if len(newline) < len(r.LastOut) {
-			r.LastOut = r.LastOut[len(r.LastOut)-len(newline):]
+		if 1024 < len(r.LastOut) {
+			r.LastOut = r.LastOut[512:]
 		}
 	}
 }
@@ -56,16 +56,25 @@ func (r *VditorSVRenderer) WriteString(content string) {
 	if length := len(content); 0 < length {
 		r.Writer.WriteString(content)
 		r.LastOut = append(r.LastOut, content...)
-		if len(newline) < len(r.LastOut) {
-			r.LastOut = r.LastOut[len(r.LastOut)-len(newline):]
+		if 1024 < len(r.LastOut) {
+			r.LastOut = r.LastOut[512:]
 		}
 	}
 }
 
 func (r *VditorSVRenderer) Newline() {
-	if !bytes.Equal(newline, r.LastOut) {
-		r.Writer.Write(newline)
-		r.LastOut = newline
+	for {
+		if bytes.HasSuffix(r.LastOut, []byte("</span>")) {
+			r.LastOut = r.LastOut[:len(r.LastOut)-len("</span>")]
+		} else {
+			break
+		}
+	}
+
+	newline := NewlineSV[:len(NewlineSV)-len("</span>")*2]
+	if !bytes.HasSuffix(r.LastOut, newline) {
+		r.Writer.Write(NewlineSV)
+		r.LastOut = NewlineSV
 	}
 }
 
@@ -195,11 +204,11 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		defContent := defRenderer.Render()
 		defLines := &bytes.Buffer{}
 		indentSpacesStr := `<span data-type="footnotes-space">    </span>`
-		lines := bytes.Split(defContent, newline)
+		lines := bytes.Split(defContent, NewlineSV)
 		for i, line := range lines {
 			if 0 == len(line) {
-				if !bytes.HasSuffix(defLines.Bytes(), newline) {
-					defLines.Write(newline)
+				if !bytes.HasSuffix(defLines.Bytes(), NewlineSV) {
+					defLines.Write(NewlineSV)
 				}
 				continue
 			}
@@ -207,7 +216,7 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 				defLines.WriteString(indentSpacesStr)
 			}
 			defLines.Write(line)
-			defLines.Write(newline)
+			defLines.Write(NewlineSV)
 		}
 		r.Write(defLines.Bytes())
 		r.Newline()
@@ -308,7 +317,7 @@ func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering b
 	r.tag("/span", nil, false)
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
-		r.Write(newline)
+		r.Write(NewlineSV)
 	}
 	return ast.WalkStop
 }
@@ -330,6 +339,7 @@ func (r *VditorSVRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bo
 
 func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.renderListItemBlockPadding(node)
 		r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "code-block"}}, false)
 		if !node.IsFencedCodeBlock {
 			r.tag("span", [][]string{{"data-type", "code-block-open-marker"}, {"class", "vditor-sv__marker"}}, false)
@@ -411,7 +421,7 @@ func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering b
 	r.tag("/span", nil, false)
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
-		r.Write(newline)
+		r.Write(NewlineSV)
 	}
 	return ast.WalkStop
 }
@@ -433,6 +443,7 @@ func (r *VditorSVRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bo
 
 func (r *VditorSVRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.renderListItemBlockPadding(node)
 		r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "math-block"}}, false)
 	} else {
 		r.WriteString("</span>")
@@ -453,11 +464,13 @@ func (r *VditorSVRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
+	r.renderListItemBlockPadding(node)
+
 	r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
 	r.Write(node.Tokens)
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
-		r.Write(newline)
+		r.Write(NewlineSV)
 	}
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -611,6 +624,8 @@ func (r *VditorSVRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
+	r.renderListItemBlockPadding(node)
+
 	r.tag("span", [][]string{{"data-type", "html-block"}, {"class", "vditor-sv__marker"}}, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	tokens := bytes.TrimSpace(node.Tokens)
@@ -618,7 +633,7 @@ func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 	r.WriteString("</span>")
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
-		r.Write(newline)
+		r.Write(NewlineSV)
 	}
 	r.WriteString("</span>")
 	return ast.WalkStop
@@ -648,6 +663,7 @@ func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.Wal
 
 func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.renderListItemBlockPadding(node)
 		r.tag("span", [][]string{{"data-type", "p"}, {"data-block", "0"}}, false)
 	} else {
 		r.Newline()
@@ -655,7 +671,7 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 		inTightList := nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight
 		if !inTightList {
 			// 不在紧凑列表内则需要输出换行分段
-			r.Write(newline)
+			r.Write(NewlineSV)
 		}
 		r.tag("/span", nil, false)
 	}
@@ -801,13 +817,15 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		r.Writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
 	} else {
+		r.renderListItemBlockPadding(node)
+
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 
 		buf := writer.Bytes()
 		for {
-			if bytes.HasSuffix(buf, append(newline, []byte("</span>")...)) {
-				buf = bytes.TrimSuffix(buf, append(newline, []byte("</span>")...))
+			if bytes.HasSuffix(buf, append(NewlineSV, []byte("</span>")...)) {
+				buf = bytes.TrimSuffix(buf, append(NewlineSV, []byte("</span>")...))
 				buf = append(buf, []byte("</span>")...)
 			} else {
 				break
@@ -815,7 +833,7 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		}
 		marker := []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")
 		buf = append(marker, buf...)
-		buf = bytes.ReplaceAll(buf, newline, append(newline, []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")...))
+		buf = bytes.ReplaceAll(buf, NewlineSV, append(NewlineSV, []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")...))
 		writer.Reset()
 		writer.WriteString(`<span data-block="0" data-type="blockquote">`)
 		writer.Write(buf)
@@ -825,7 +843,7 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		r.Writer.Reset()
 		r.Write(buf)
 		r.Newline()
-		r.Write(newline)
+		r.Write(NewlineSV)
 		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
@@ -838,6 +856,8 @@ func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	rootParent := ast.NodeDocument == node.Parent.Type
 	if entering {
+		r.renderListItemBlockPadding(node)
+
 		if rootParent {
 			r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "heading"}}, false)
 			r.tag("span", [][]string{{"class", "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]}}, false)
@@ -849,8 +869,8 @@ func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		if rootParent {
 			r.tag("/span", nil, false)
 		}
-		r.Write(newline)
-		r.Write(newline)
+		r.Write(NewlineSV)
+		r.Write(NewlineSV)
 		if rootParent {
 			r.WriteString("</span>")
 		}
@@ -871,6 +891,8 @@ func (r *VditorSVRenderer) renderHeadingID(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.ListPadding += node.ListData.Padding
+
 		var attrs [][]string
 		if node.Tight {
 			attrs = append(attrs, []string{"data-tight", "true"})
@@ -898,8 +920,10 @@ func (r *VditorSVRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 		attrs = append(attrs, []string{"data-block", "0"})
 		r.tag("span", attrs, false)
 	} else {
-		r.Write(newline)
+		r.Write(NewlineSV)
 		r.tag("/span", nil, false)
+
+		r.ListPadding -= node.ListData.Padding
 	}
 	return ast.WalkContinue
 }
@@ -908,37 +932,31 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 	if entering {
 		r.Writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
-		if ast.NodeDocument != node.Parent.Parent.Type {
-			r.ListIndentSpaces += node.ListData.Padding
-		}
 	} else {
 		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
 		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
 
-		indent := len(node.ListData.Marker) + 1
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			indent++
-		}
-		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
+		li := []byte(`<span data-type="li">`)
 		buf := writer.Bytes()
-		indentSpacesStr := `<span data-type="li-space">` + string(indentSpaces) + "</span>"
 		for {
-			if bytes.HasSuffix(buf, append(newline, []byte("</span>")...)) {
-				buf = bytes.TrimSuffix(buf, append(newline, []byte("</span>")...))
+			if bytes.HasSuffix(buf, append(NewlineSV, []byte("</span>")...)) {
+				buf = bytes.TrimSuffix(buf, append(NewlineSV, []byte("</span>")...))
 				buf = append(buf, []byte("</span>")...)
 			} else {
 				break
 			}
 		}
+		marginCount := r.ListPadding - node.Padding
+		margin := []byte(`<span data-type="padding">` + strings.Repeat(" ", marginCount) + "</span>")
+		li = append(li, margin...)
 		var markerStr string
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			markerStr = strconv.Itoa(node.Num) + string(node.ListData.Delimiter)
 		} else {
 			markerStr = string(node.Marker)
 		}
-		marker := []byte(`<span data-type="li" data-space="` + strings.Repeat(" ", r.ListIndentSpaces) + `">` + `<span data-type="li-marker" class="vditor-sv__marker">` + markerStr + " </span>" )
-		buf = append(marker, buf...)
-		buf = bytes.ReplaceAll(buf, newline, append(newline, []byte(indentSpacesStr)...))
+		li = append(li, []byte(`<span data-type="li-marker" class="vditor-sv__marker">`+markerStr+" </span>")...)
+		buf = append(li, buf...)
 		writer.Reset()
 		writer.Write(buf)
 		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(buf)
@@ -948,11 +966,23 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		r.Write(buf)
 		r.Newline()
 		r.tag("/span", nil, false)
-		if ast.NodeDocument != node.Parent.Parent.Type {
-			r.ListIndentSpaces -= node.ListData.Padding
-		}
 	}
 	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderListItemBlockPadding(node *ast.Node) {
+	inList := node.ParentIs(ast.NodeListItem)
+	if !inList {
+		return
+	}
+
+	inFirstListItem := node.Parent.FirstChild == node
+	if inFirstListItem {
+		return
+	}
+
+	padding := []byte(`<span data-type="padding">` + strings.Repeat(" ", r.ListPadding) + "</span>")
+	r.Writer.Write(padding)
 }
 
 func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
@@ -976,23 +1006,27 @@ func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 }
 
 func (r *VditorSVRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
+	r.renderListItemBlockPadding(node)
+
 	r.tag("span", [][]string{{"data-type", "thematic-break"}, {"class", "vditor-sv__marker"}}, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("---")
 	r.tag("/span", nil, false)
 	r.Newline()
-	r.Write(newline)
+	r.Write(NewlineSV)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
+	r.renderListItemBlockPadding(node)
 	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
+	r.renderListItemBlockPadding(node)
 	return ast.WalkStop
 }
 
