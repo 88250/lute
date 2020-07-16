@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func adjustAttributeNames(aa []Attribute, nameMap map[string]string) {
+func adjustAttributeNames(aa []*Attribute, nameMap map[string]string) {
 	for i := range aa {
 		if newName, ok := nameMap[aa[i].Key]; ok {
 			aa[i].Key = newName
@@ -16,7 +16,7 @@ func adjustAttributeNames(aa []Attribute, nameMap map[string]string) {
 	}
 }
 
-func adjustForeignAttributes(aa []Attribute) {
+func adjustForeignAttributes(aa []*Attribute) {
 	for i, a := range aa {
 		if a.Key == "" || a.Key[0] != 'x' {
 			continue

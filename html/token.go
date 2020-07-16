@@ -78,7 +78,7 @@ type Token struct {
 	Type     TokenType
 	DataAtom atom.Atom
 	Data     string
-	Attr     []Attribute
+	Attr     []*Attribute
 }
 
 // tagString returns a string representation of a tag Token's Data and Attr.
@@ -1178,7 +1178,7 @@ func (z *Tokenizer) Token() Token {
 		for moreAttr {
 			var key, val []byte
 			key, val, moreAttr = z.TagAttr()
-			t.Attr = append(t.Attr, Attribute{"", atom.String(key), string(val)})
+			t.Attr = append(t.Attr, &Attribute{"", atom.String(key), string(val)})
 		}
 		if a := atom.Lookup(name); a != 0 {
 			t.DataAtom, t.Data = a, a.String()

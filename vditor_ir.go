@@ -660,7 +660,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "code-block-open-marker":
 			if atom.Pre == n.NextSibling.DataAtom { // DOM 后缺少 info span 节点
-				n.InsertAfter(&html.Node{DataAtom: atom.Span, Attr: []html.Attribute{{Key: "data-type", Val: "code-block-info"}}})
+				n.InsertAfter(&html.Node{DataAtom: atom.Span, Attr: []*html.Attribute{{Key: "data-type", Val: "code-block-info"}}})
 			}
 			marker := []byte(lute.domText(n))
 			lastBacktick := bytes.LastIndex(marker, []byte("`")) + 1

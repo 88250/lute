@@ -782,22 +782,61 @@ func (r *VditorSVRenderer) renderBlockquoteMarker(node *ast.Node, entering bool)
 }
 
 func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
-	rootParent := ast.NodeDocument == node.Parent.Type
 	if entering {
-		if rootParent {
-			r.tag("span", [][]string{{"class", "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]}}, false)
-		}
 		r.tag("span", [][]string{{"class", "vditor-sv__marker--heading"}, {"data-type", "heading-marker"}}, false)
 		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
 		r.tag("/span", nil, false)
 	} else {
-		r.Write(NewlineSV)
-		r.Write(NewlineSV)
-		if rootParent {
-			r.WriteString("</span>")
+		hClass := "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]
+
+		buf := r.Writer.Bytes()
+		reader := bytes.NewReader(buf)
+		htmlRoot := &html.Node{Type: html.ElementNode}
+		nodes, _ := html.ParseFragment(reader, htmlRoot)
+		r.Writer.Reset()
+		for i := 0; i < len(nodes); i++{
+			c := nodes[i]
+			class := r.domAttrValue(c, "class")
+			if "" == class {
+				class = hClass
+			} else {
+				class += " " + hClass
+			}
+			r.domSetAttrValue(c, "class", class)
+			html.Render(r.Writer, c)
 		}
+		r.Newline()
+		r.Write(NewlineSV)
 	}
 	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) domAttrValue(n *html.Node, attrName string) string {
+	if nil == n {
+		return ""
+	}
+
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			return attr.Val
+		}
+	}
+	return ""
+}
+
+func (r *VditorSVRenderer) domSetAttrValue(n *html.Node, attrName, attrVal string) {
+	if nil == n {
+		return
+	}
+
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			attr.Val = attrVal
+			return
+		}
+	}
+
+	n.Attr = append(n.Attr, &html.Attribute{Key: attrName, Val: attrVal})
 }
 
 func (r *VditorSVRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {

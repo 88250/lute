@@ -56,7 +56,7 @@ func parseDoctype(s string) (n *Node, quirks bool) {
 			id = s[:q]
 			s = s[q+1:]
 		}
-		n.Attr = append(n.Attr, Attribute{Key: key, Val: id})
+		n.Attr = append(n.Attr, &Attribute{Key: key, Val: id})
 		if key == "public" {
 			key = "system"
 		} else {

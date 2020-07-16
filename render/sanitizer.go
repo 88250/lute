@@ -179,7 +179,7 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 	buff.WriteString(tokenBuff.String())
 }
 
-func sanitizeAttrs(attrs []html.Attribute) (ret []html.Attribute) {
+func sanitizeAttrs(attrs []*html.Attribute) (ret []*html.Attribute) {
 	for _, attr := range attrs {
 		if !allowAttr(attr.Key) {
 			continue

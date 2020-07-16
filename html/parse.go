@@ -1021,7 +1021,7 @@ func inBodyIM(p *parser) bool {
 			}
 			action := ""
 			prompt := "This is a searchable index. Enter search keywords: "
-			attr := []Attribute{{Key: "name", Val: "isindex"}}
+			attr := []*Attribute{{Key: "name", Val: "isindex"}}
 			for _, t := range p.tok.Attr {
 				switch t.Key {
 				case "action":
@@ -1046,7 +1046,7 @@ func inBodyIM(p *parser) bool {
 				return true
 			}
 			if action != "" {
-				p.form.Attr = []Attribute{{Key: "action", Val: action}}
+				p.form.Attr = []*Attribute{{Key: "action", Val: action}}
 			}
 			p.parseImpliedToken(StartTagToken, a.Hr, a.Hr.String())
 			p.parseImpliedToken(StartTagToken, a.Label, a.Label.String())

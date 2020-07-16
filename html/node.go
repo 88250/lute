@@ -43,7 +43,7 @@ type Node struct {
 	DataAtom  atom.Atom
 	Data      string
 	Namespace string
-	Attr      []Attribute
+	Attr      []*Attribute
 }
 
 // Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。
@@ -185,7 +185,7 @@ func (n *Node) clone() *Node {
 		Type:     n.Type,
 		DataAtom: n.DataAtom,
 		Data:     n.Data,
-		Attr:     make([]Attribute, len(n.Attr)),
+		Attr:     make([]*Attribute, len(n.Attr)),
 	}
 	copy(m.Attr, n.Attr)
 	return m
