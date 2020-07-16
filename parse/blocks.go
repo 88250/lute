@@ -251,8 +251,8 @@ var blockStarts = []blockStartFunc{
 					t.Context.advanceOffset(1, true)
 					markers = append(markers, whitespace)
 				}
-				if (t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR) && !t.Context.Option.VditorSV {
-					// Vditor 所见即所得模式下块引用标记符 > 后面不能为空，但分屏预览模式可以
+				if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
+					// Vditor 三个模式都不能存在空的块引用
 					ln := util.BytesToStr(t.Context.currentLine[t.Context.offset:])
 					ln = strings.ReplaceAll(ln, util.Caret, "")
 					if ln = strings.TrimSpace(ln); "" == ln {
@@ -271,7 +271,7 @@ var blockStarts = []blockStartFunc{
 	// 判断 ATX 标题（#）是否开始
 	func(t *Tree, container *ast.Node) int {
 		if !t.Context.indented {
-			if ok, markers, content, level:= t.parseATXHeading(); ok {
+			if ok, markers, content, level := t.parseATXHeading(); ok {
 				t.Context.advanceNextNonspace()
 				t.Context.advanceOffset(len(content), false)
 				t.Context.closeUnmatchedBlocks()
