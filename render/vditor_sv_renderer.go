@@ -167,10 +167,11 @@ func (r *VditorSVRenderer) Render() (output []byte) {
 		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
 		r.WriteByte(lex.ItemCloseBracket)
 		r.tag("/span", nil, false)
-		r.WriteString(":")
+		r.WriteString("<span>:")
 		if util.Caret != destStr {
 			r.WriteString(" ")
 		}
+		r.WriteString("</span>")
 		r.WriteString(destStr)
 		r.Newline()
 	}
@@ -196,7 +197,7 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
 		r.WriteByte(lex.ItemCloseBracket)
 		r.tag("/span", nil, false)
-		r.WriteString(": ")
+		r.WriteString("<span>: </span>")
 		defRenderer.needRenderFootnotesDef = true
 		defContent := defRenderer.Render()
 		defLines := &bytes.Buffer{}
