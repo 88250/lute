@@ -636,8 +636,7 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 	} else {
 		r.Newline()
 		grandparent := node.Parent.Parent
-		inTightList := nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight
-		if !inTightList {
+		if inTightList := nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight; !inTightList {
 			// 不在紧凑列表内则需要输出换行分段
 			r.Write(NewlineSV)
 		}
@@ -790,6 +789,9 @@ func (r *VditorSVRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 		buf := writer.Bytes()
 		marker := []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")
 		buf = append(marker, buf...)
+		for bytes.HasSuffix(buf, NewlineSV) {
+			buf = bytes.TrimSuffix(buf, NewlineSV)
+		}
 		buf = bytes.ReplaceAll(buf, NewlineSV, append(NewlineSV, marker...))
 		writer.Reset()
 		writer.Write(buf)
@@ -857,8 +859,11 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		} else {
 			markerStr = string(node.Marker)
 		}
-		marker := []byte(`<span data-type="li-marker" class="vditor-sv__marker">`+markerStr+" </span>")
+		marker := []byte(`<span data-type="li-marker" class="vditor-sv__marker">` + markerStr + " </span>")
 		buf = append(marker, buf...)
+		for bytes.HasSuffix(buf, NewlineSV) {
+			buf = bytes.TrimSuffix(buf, NewlineSV)
+		}
 		padding := []byte(`<span data-type="padding">` + strings.Repeat(" ", node.Padding) + "</span>")
 		buf = bytes.ReplaceAll(buf, NewlineSV, append(NewlineSV, padding...))
 		writer.Reset()
@@ -869,7 +874,6 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		r.Writer.Reset()
 		r.Write(buf)
 		r.Newline()
-		r.Write(NewlineSV)
 	}
 	return ast.WalkContinue
 }
@@ -895,13 +899,11 @@ func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 }
 
 func (r *VditorSVRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-type", "thematic-break"}, {"class", "vditor-sv__marker"}}, false)
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("---")
 	r.tag("/span", nil, false)
 	r.Newline()
 	r.Write(NewlineSV)
-	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
