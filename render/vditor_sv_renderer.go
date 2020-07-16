@@ -154,27 +154,34 @@ func (r *VditorSVRenderer) Render() (output []byte) {
 	}
 
 	// 将链接引用定义添加到末尾
-	r.WriteString("<span data-type=\"link-ref-defs-block\">")
 	for _, node := range r.Tree.Context.LinkRefDefs {
 		label := node.LinkRefLabel
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
 		destStr := string(dest)
-		r.WriteString("[" + string(label) + "]:")
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+		r.WriteByte(lex.ItemOpenBracket)
+		r.tag("/span", nil, false)
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}, {"data-type", "footnotes-link"}}, false)
+		r.WriteString(string(label))
+		r.tag("/span", nil, false)
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+		r.WriteByte(lex.ItemCloseBracket)
+		r.tag("/span", nil, false)
+		r.WriteString(":")
 		if util.Caret != destStr {
 			r.WriteString(" ")
 		}
-		r.WriteString(destStr + "\n")
+		r.WriteString(destStr)
+		r.Newline()
 	}
 	r.Newline()
-	r.WriteString("</span>")
+	r.Write(NewlineSV)
 	output = r.Writer.Bytes()
 	return
 }
 
 func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
-	r.WriteString("<span data-type=\"footnotes-block\">")
 	for _, def := range context.FootnotesDefs {
-		r.WriteString("<span data-type=\"footnotes-def\">")
 		tree := &parse.Tree{Name: "", Context: context}
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
@@ -210,9 +217,9 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		}
 		r.Write(defLines.Bytes())
 		r.Newline()
-		r.WriteString("</span>")
 	}
-	r.WriteString("</span>")
+	r.Newline()
+	r.Write(NewlineSV)
 	return r.Writer.Bytes()
 }
 
@@ -254,8 +261,8 @@ func (r *VditorSVRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStat
 	} else {
 		r.WriteString("[toc]")
 	}
-	r.Newline()
 	r.WriteString("</span>")
+	r.Newline()
 	caretInDest := bytes.Contains(node.Tokens, util.CaretTokens)
 	r.WriteString("<span data-type=\"p\">")
 	if caretInDest {
