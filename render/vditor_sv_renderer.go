@@ -154,7 +154,7 @@ func (r *VditorSVRenderer) Render() (output []byte) {
 	}
 
 	// 将链接引用定义添加到末尾
-	r.WriteString("<span data-block=\"0\" data-type=\"link-ref-defs-block\">")
+	r.WriteString("<span data-type=\"link-ref-defs-block\">")
 	for _, node := range r.Tree.Context.LinkRefDefs {
 		label := node.LinkRefLabel
 		dest := node.ChildByType(ast.NodeLinkDest).Tokens
@@ -172,7 +172,7 @@ func (r *VditorSVRenderer) Render() (output []byte) {
 }
 
 func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
-	r.WriteString("<span data-block=\"0\" data-type=\"footnotes-block\">")
+	r.WriteString("<span data-type=\"footnotes-block\">")
 	for _, def := range context.FootnotesDefs {
 		r.WriteString("<span data-type=\"footnotes-def\">")
 		tree := &parse.Tree{Name: "", Context: context}
@@ -243,7 +243,7 @@ func (r *VditorSVRenderer) renderBackslash(node *ast.Node, entering bool) ast.Wa
 func (r *VditorSVRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 	headings := r.headings()
 	length := len(headings)
-	r.WriteString("<span class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\">")
+	r.WriteString("<span class=\"vditor-toc\" data-type=\"toc-block\" contenteditable=\"false\">")
 	if 0 < length {
 		for _, heading := range headings {
 			spaces := (heading.HeadingLevel - 1) * 2
@@ -257,7 +257,7 @@ func (r *VditorSVRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStat
 	r.Newline()
 	r.WriteString("</span>")
 	caretInDest := bytes.Contains(node.Tokens, util.CaretTokens)
-	r.WriteString("<span data-type=\"p\" data-block=\"0\">")
+	r.WriteString("<span data-type=\"p\">")
 	if caretInDest {
 		r.WriteString(util.Caret)
 	}
@@ -440,7 +440,7 @@ func (r *VditorSVRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
+	r.tag("span", [][]string{{"data-type", "table"}}, false)
 	r.Write(node.Tokens)
 	r.Newline()
 	r.Write(NewlineSV)
