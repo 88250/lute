@@ -301,7 +301,6 @@ func (r *VditorSVRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering b
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	r.Newline()
-	r.Write(NewlineSV)
 	return ast.WalkStop
 }
 
