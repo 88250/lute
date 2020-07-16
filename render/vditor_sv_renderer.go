@@ -450,6 +450,12 @@ func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *VditorSVRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+	} else {
+		r.popWriteClass(node, "s")
+	}
 	return ast.WalkContinue
 }
 
@@ -619,6 +625,8 @@ func (r *VditorSVRenderer) renderDocument(node *ast.Node, entering bool) ast.Wal
 
 func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
 	} else {
 		r.Newline()
 		grandparent := node.Parent.Parent
@@ -626,6 +634,8 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 			// 不在紧凑列表内则需要输出换行分段
 			r.Write(NewlineSV)
 		}
+
+		r.popWriter(node)
 	}
 	return ast.WalkContinue
 }
@@ -685,14 +695,32 @@ func (r *VditorSVRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bo
 }
 
 func (r *VditorSVRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+	} else {
+		r.popWriteClass(node, "em")
+	}
 	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) popWriteClass(node *ast.Node, class string) {
+	r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+	r.renderClass(node, class)
+	r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(r.Writer.Bytes())
+	r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+}
+
+func (r *VditorSVRenderer) popWriter(node *ast.Node) {
+	r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+	r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(r.Writer.Bytes())
+	r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
 }
 
 func (r *VditorSVRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
-
 	return ast.WalkStop
 }
 
@@ -718,6 +746,12 @@ func (r *VditorSVRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, enterin
 }
 
 func (r *VditorSVRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+	} else {
+		r.popWriteClass(node, "strong")
+	}
 	return ast.WalkContinue
 }
 
