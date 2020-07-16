@@ -787,28 +787,31 @@ func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
 		r.tag("/span", nil, false)
 	} else {
-		hClass := "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]
-
-		buf := r.Writer.Bytes()
-		reader := bytes.NewReader(buf)
-		htmlRoot := &html.Node{Type: html.ElementNode}
-		nodes, _ := html.ParseFragment(reader, htmlRoot)
-		r.Writer.Reset()
-		for i := 0; i < len(nodes); i++{
-			c := nodes[i]
-			class := r.domAttrValue(c, "class")
-			if "" == class {
-				class = hClass
-			} else {
-				class += " " + hClass
-			}
-			r.domSetAttrValue(c, "class", class)
-			html.Render(r.Writer, c)
-		}
+		class := "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]
+		r.renderClass(node, class)
 		r.Newline()
 		r.Write(NewlineSV)
 	}
 	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderClass(node *ast.Node, class string) {
+	buf := r.Writer.Bytes()
+	reader := bytes.NewReader(buf)
+	htmlRoot := &html.Node{Type: html.ElementNode}
+	nodes, _ := html.ParseFragment(reader, htmlRoot)
+	r.Writer.Reset()
+	for i := 0; i < len(nodes); i++ {
+		c := nodes[i]
+		clazz := r.domAttrValue(c, "class")
+		if "" == clazz {
+			clazz = class
+		} else {
+			clazz += " " + class
+		}
+		r.domSetAttrValue(c, "class", clazz)
+		html.Render(r.Writer, c)
+	}
 }
 
 func (r *VditorSVRenderer) domAttrValue(n *html.Node, attrName string) string {
