@@ -81,6 +81,7 @@ func (lute *Lute) Md2VditorSVDOM(markdown string) (vHTML string) {
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
-	vHTML = string(output)
+	// 替换插入符
+	vHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
 	return
 }
