@@ -351,13 +351,7 @@ func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "text"}}, false)
 	tokens := html.EscapeHTML(bytes.TrimSpace(node.Tokens))
-	if ast.NodeListItem == node.Parent.Parent.Type {
-		padding := []byte(`<span data-type="padding">` + strings.Repeat(" ", node.Parent.Parent.Padding) + "</span>")
-		tokens = bytes.ReplaceAll(tokens, []byte("\n"), append([]byte("\n"), padding...))
-	} else if ast.NodeBlockquote == node.Parent.Parent.Type {
-		marker := []byte("<span data-type=\"blockquote-marker\" class=\"vditor-sv__marker\">&gt; </span>")
-		tokens = bytes.ReplaceAll(tokens, []byte("\n"), append([]byte("\n"), marker...))
-	}
+	tokens = bytes.ReplaceAll(tokens, []byte("\n"), NewlineSV)
 	r.Write(tokens)
 	r.WriteString("</span>")
 	return ast.WalkStop
