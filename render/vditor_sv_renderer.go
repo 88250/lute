@@ -201,7 +201,7 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 		defRenderer.needRenderFootnotesDef = true
 		defContent := defRenderer.Render()
 		defLines := &bytes.Buffer{}
-		indentSpacesStr := `<span data-type="footnotes-space">    </span>`
+		indentSpacesStr := `<span data-type="padding">    </span>`
 		lines := bytes.Split(defContent, NewlineSV)
 		for i, line := range lines {
 			if 0 == len(line) {
