@@ -351,7 +351,8 @@ func (r *VditorSVRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 func (r *VditorSVRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "text"}}, false)
 	tokens := html.EscapeHTML(bytes.TrimSpace(node.Tokens))
-	tokens = bytes.ReplaceAll(tokens, []byte("\n"), NewlineSV)
+	newline := append([]byte(`<span data-type="padding"></span>`), NewlineSV...)
+	tokens = bytes.ReplaceAll(tokens, []byte("\n"), newline)
 	r.Write(tokens)
 	r.WriteString("</span>")
 	return ast.WalkStop
@@ -412,6 +413,8 @@ func (r *VditorSVRenderer) renderMathBlockCloseMarker(node *ast.Node, entering b
 func (r *VditorSVRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "text"}}, false)
 	tokens := html.EscapeHTML(bytes.TrimSpace(node.Tokens))
+	newline := append([]byte(`<span data-type="padding"></span>`), NewlineSV...)
+	tokens = bytes.ReplaceAll(tokens, []byte("\n"), newline)
 	r.Write(tokens)
 	r.WriteString("</span>")
 	return ast.WalkStop
@@ -592,6 +595,8 @@ func (r *VditorSVRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 func (r *VditorSVRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	tokens := html.EscapeHTML(bytes.TrimSpace(node.Tokens))
+	newline := append([]byte(`<span data-type="padding"></span>`), NewlineSV...)
+	tokens = bytes.ReplaceAll(tokens, []byte("\n"), newline)
 	r.Write(tokens)
 	r.WriteString("</span>")
 	r.Newline()
