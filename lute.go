@@ -128,9 +128,23 @@ func (lute *Lute) Format(name string, markdown []byte) (formatted []byte) {
 
 // FormatStr 接受 string 类型的 markdown 后直接调用 Format 进行处理。
 func (lute *Lute) FormatStr(name, markdown string) (formatted string) {
-	var formattedBytes []byte
-	formattedBytes = lute.Format(name, []byte(markdown))
+	formattedBytes := lute.Format(name, []byte(markdown))
 	formatted = util.BytesToStr(formattedBytes)
+	return
+}
+
+// TextBundle 将 markdown 文本字节数组进行 TextBundle 处理。
+func (lute *Lute) TextBundle(name string, markdown []byte, linkPrefixes []string) (textbundle []byte, originalLinks []string) {
+	tree := parse.Parse(name, markdown, lute.Options)
+	renderer := render.NewTextBundleRenderer(tree, linkPrefixes)
+	textbundle, originalLinks = renderer.Render()
+	return
+}
+
+// TextBundle 接受 string 类型的 markdown 后直接调用 TextBundle 进行处理。
+func (lute *Lute) TextBundleStr(name, markdown string, linkPrefixes []string) (textbundle string, originalLinks []string) {
+	textbundleBytes, originalLinks := lute.TextBundle(name, []byte(markdown), linkPrefixes)
+	textbundle = util.BytesToStr(textbundleBytes)
 	return
 }
 
