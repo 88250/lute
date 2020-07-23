@@ -29,7 +29,7 @@ var originalLinksCases = [][]string{
 
 var textbundleTests = []textbundleTest{
 
-	{"0", "[foo](" + originalLinksCases[0][0] + ")\n\n![foo](" + originalLinksCases[0][1] + ")", "[foo](assets/dir1/bar.zip)\n\n![foo](assets/dir2/baz.png)\n", originalLinksCases[0]},
+	{"0", "[foo](" + originalLinksCases[0][0] + ")\n\n![foo](" + originalLinksCases[0][1] + ")\n", "[foo](assets/dir1/bar.zip)\n\n![foo](assets/dir2/baz.png)\n", originalLinksCases[0]},
 }
 
 func TestTextBundle(t *testing.T) {
