@@ -920,6 +920,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if "footnotes-ref" == dataType {
 			node.Type = ast.NodeText
 			node.Tokens = []byte("[" + lute.domAttrValue(n, "data-footnotes-label") + "]")
+			if strings.Contains(n.FirstChild.Data, util.Caret) {
+				node.Tokens = append(node.Tokens, util.CaretTokens...)
+			}
 			tree.Context.Tip.AppendChild(node)
 		}
 		return
