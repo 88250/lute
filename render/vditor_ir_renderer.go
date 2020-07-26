@@ -338,16 +338,36 @@ func (r *VditorIRRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorIRRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString("<span data-render=\"2\">")
 	r.Write(node.Tokens)
+	r.WriteString("</span>")
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.Write(node.FirstChild.Tokens)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString("<span data-render=\"2\">")
 	r.Write(node.Tokens)
+	r.WriteString("</span>")
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.Write(node.FirstChild.Tokens)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		previousNodeText := node.PreviousNodeText()
+		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
+		if "" == previousNodeText {
+			r.WriteString(parse.Zwsp)
+		}
+		r.renderSpanNode(node)
+	} else {
+		r.WriteString("</span>")
+	}
 	return ast.WalkContinue
 }
 
@@ -1060,6 +1080,8 @@ func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "img"})
 	case ast.NodeCodeSpan:
 		attrs = append(attrs, []string{"data-type", "code"})
+	case ast.NodeEmoji:
+		attrs = append(attrs, []string{"data-type", "emoji"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
@@ -1116,7 +1138,7 @@ func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
-			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeHTMLBlock, ast.NodeInlineHTML:
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias:
 				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
 				ret += string(n.CodeBlockInfo)
