@@ -929,10 +929,23 @@ func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 			r.tag("/a", nil, false)
 		}
 
-		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--heading"}, {"data-type", "heading-marker"}}, false)
-		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
-		r.tag("/span", nil, false)
+		if !node.HeadingSetext {
+			r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--heading"}, {"data-type", "heading-marker"}}, false)
+			r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
+			r.tag("/span", nil, false)
+		}
 	} else {
+		if node.HeadingSetext {
+			r.Newline()
+			r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--heading"}, {"data-type", "heading-marker"}, {"data-render", "2"}}, false)
+			contentLen := r.setextHeadingLen(node)
+			if 1 == node.HeadingLevel {
+				r.WriteString(strings.Repeat("=", contentLen))
+			} else {
+				r.WriteString(strings.Repeat("-", contentLen))
+			}
+			r.tag("/span", nil, false)
+		}
 		r.WriteString("</h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + ">")
 	}
 	return ast.WalkContinue
