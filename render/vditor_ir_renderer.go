@@ -723,6 +723,13 @@ func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.W
 	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.Write(html.EscapeHTML(node.Tokens))
 	r.tag("/code", nil, false)
+
+	if bytes.Equal(node.Tokens, []byte("<kbd>")) || bytes.Equal(node.Tokens, []byte("</kbd>")) {
+		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+		r.Write(node.Tokens)
+		r.WriteString("</pre>")
+	}
+
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
@@ -936,8 +943,8 @@ func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		}
 	} else {
 		if node.HeadingSetext {
-			r.Newline()
 			r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--heading"}, {"data-type", "heading-marker"}, {"data-render", "2"}}, false)
+			r.Newline()
 			contentLen := r.setextHeadingLen(node)
 			if 1 == node.HeadingLevel {
 				r.WriteString(strings.Repeat("=", contentLen))
