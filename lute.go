@@ -47,7 +47,6 @@ type Lute struct {
 //  * 修正术语拼写
 //  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
-//  * 解析 Setext 标题
 func New(opts ...Option) (ret *Lute) {
 	ret = &Lute{Options: NewOptions()}
 	for _, opt := range opts {
@@ -92,7 +91,6 @@ func NewOptions() *parse.Options {
 		LinkBase:                       "",
 		VditorCodeBlockPreview:         true,
 		RenderListStyle:                false,
-		Setext:                         true,
 		ChineseParagraphBeginningSpace: false,
 	}
 }
@@ -297,10 +295,6 @@ func (lute *Lute) SetVditorCodeBlockPreview(b bool) {
 
 func (lute *Lute) SetRenderListStyle(b bool) {
 	lute.RenderListStyle = b
-}
-
-func (lute *Lute) SetSetext(b bool) {
-	lute.Setext = b
 }
 
 func (lute *Lute) SetSanitize(b bool) {

@@ -309,10 +309,6 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.Setext {
-			return 0
-		}
-
 		if !t.Context.indented && container.Type == ast.NodeParagraph {
 			if level := t.parseSetextHeading(); 0 != level {
 				if t.Context.Option.GFMTable {
