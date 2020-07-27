@@ -192,252 +192,278 @@ var blockStarts = []blockStartFunc{
 			return 0
 		}
 
-		if !t.Context.indented {
-			marker := lex.Peek(t.Context.currentLine, t.Context.nextNonspace)
-			if lex.ItemOpenBracket != marker {
-				return 0
-			}
-			caret := lex.Peek(t.Context.currentLine, t.Context.nextNonspace+1)
-			if lex.ItemCaret != caret {
-				return 0
-			}
-
-			var label = []byte{lex.ItemCaret}
-			var token byte
-			var i int
-			for i = t.Context.nextNonspace + 2; i < t.Context.currentLineLen; i++ {
-				token = t.Context.currentLine[i]
-				if lex.ItemSpace == token || lex.ItemNewline == token || lex.ItemTab == token {
-					return 0
-				}
-				if lex.ItemCloseBracket == token {
-					break
-				}
-				label = append(label, token)
-			}
-			if i >= t.Context.currentLineLen {
-				return 0
-			}
-			if lex.ItemColon != t.Context.currentLine[i+1] {
-				return 0
-			}
-			t.Context.advanceOffset(1, false)
-
-			t.Context.closeUnmatchedBlocks()
-			t.Context.advanceOffset(len(label)+2, true)
-			footnotesDef := t.Context.addChild(ast.NodeFootnotesDef, t.Context.nextNonspace)
-			footnotesDef.Tokens = label
-			lowerCaseLabel := bytes.ToLower(label)
-			if _, def := t.Context.FindFootnotesDef(lowerCaseLabel); nil == def {
-				t.Context.FootnotesDefs = append(t.Context.FootnotesDefs, footnotesDef)
-			}
-			return 1
+		if t.Context.indented {
+			return 0
 		}
-		return 0
+
+		marker := lex.Peek(t.Context.currentLine, t.Context.nextNonspace)
+		if lex.ItemOpenBracket != marker {
+			return 0
+		}
+		caret := lex.Peek(t.Context.currentLine, t.Context.nextNonspace+1)
+		if lex.ItemCaret != caret {
+			return 0
+		}
+
+		var label = []byte{lex.ItemCaret}
+		var token byte
+		var i int
+		for i = t.Context.nextNonspace + 2; i < t.Context.currentLineLen; i++ {
+			token = t.Context.currentLine[i]
+			if lex.ItemSpace == token || lex.ItemNewline == token || lex.ItemTab == token {
+				return 0
+			}
+			if lex.ItemCloseBracket == token {
+				break
+			}
+			label = append(label, token)
+		}
+		if i >= t.Context.currentLineLen {
+			return 0
+		}
+		if lex.ItemColon != t.Context.currentLine[i+1] {
+			return 0
+		}
+		t.Context.advanceOffset(1, false)
+
+		t.Context.closeUnmatchedBlocks()
+		t.Context.advanceOffset(len(label)+2, true)
+		footnotesDef := t.Context.addChild(ast.NodeFootnotesDef, t.Context.nextNonspace)
+		footnotesDef.Tokens = label
+		lowerCaseLabel := bytes.ToLower(label)
+		if _, def := t.Context.FindFootnotesDef(lowerCaseLabel); nil == def {
+			t.Context.FootnotesDefs = append(t.Context.FootnotesDefs, footnotesDef)
+		}
+		return 1
 	},
 
 	// 判断块引用（>）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.indented {
-			marker := lex.Peek(t.Context.currentLine, t.Context.nextNonspace)
-			if lex.ItemGreater == marker {
-				markers := []byte{marker}
-				t.Context.advanceNextNonspace()
-				t.Context.advanceOffset(1, false)
-				// > 后面的空格是可选的
-				whitespace := lex.Peek(t.Context.currentLine, t.Context.offset)
-				withSpace := lex.ItemSpace == whitespace || lex.ItemTab == whitespace
-				if withSpace {
-					t.Context.advanceOffset(1, true)
-					markers = append(markers, whitespace)
-				}
-				if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
-					// Vditor 三个模式都不能存在空的块引用
-					ln := util.BytesToStr(t.Context.currentLine[t.Context.offset:])
-					ln = strings.ReplaceAll(ln, util.Caret, "")
-					if ln = strings.TrimSpace(ln); "" == ln {
-						return 0
-					}
-				}
-				t.Context.closeUnmatchedBlocks()
-				t.Context.addChild(ast.NodeBlockquote, t.Context.nextNonspace)
-				t.Context.addChildMarker(ast.NodeBlockquoteMarker, markers)
-				return 1
+		if t.Context.indented {
+			return 0
+		}
+
+		marker := lex.Peek(t.Context.currentLine, t.Context.nextNonspace)
+		if lex.ItemGreater != marker {
+			return 0
+		}
+
+		markers := []byte{marker}
+		t.Context.advanceNextNonspace()
+		t.Context.advanceOffset(1, false)
+		// > 后面的空格是可选的
+		whitespace := lex.Peek(t.Context.currentLine, t.Context.offset)
+		withSpace := lex.ItemSpace == whitespace || lex.ItemTab == whitespace
+		if withSpace {
+			t.Context.advanceOffset(1, true)
+			markers = append(markers, whitespace)
+		}
+		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
+			// Vditor 三个模式都不能存在空的块引用
+			ln := util.BytesToStr(t.Context.currentLine[t.Context.offset:])
+			ln = strings.ReplaceAll(ln, util.Caret, "")
+			if ln = strings.TrimSpace(ln); "" == ln {
+				return 0
 			}
 		}
-		return 0
+		t.Context.closeUnmatchedBlocks()
+		t.Context.addChild(ast.NodeBlockquote, t.Context.nextNonspace)
+		t.Context.addChildMarker(ast.NodeBlockquoteMarker, markers)
+		return 1
 	},
 
 	// 判断 ATX 标题（#）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.indented {
-			if ok, markers, content, level := t.parseATXHeading(); ok {
-				t.Context.advanceNextNonspace()
-				t.Context.advanceOffset(len(content), false)
-				t.Context.closeUnmatchedBlocks()
-				heading := t.Context.addChild(ast.NodeHeading, t.Context.nextNonspace)
-				heading.HeadingLevel = level
-				heading.Tokens = content
-				crosshatchMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: markers}
-				heading.AppendChild(crosshatchMarker)
-				t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
-				return 2
-			}
+		if t.Context.indented {
+			return 0
+		}
+
+		if ok, markers, content, level := t.parseATXHeading(); ok {
+			t.Context.advanceNextNonspace()
+			t.Context.advanceOffset(len(content), false)
+			t.Context.closeUnmatchedBlocks()
+			heading := t.Context.addChild(ast.NodeHeading, t.Context.nextNonspace)
+			heading.HeadingLevel = level
+			heading.Tokens = content
+			crosshatchMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: markers}
+			heading.AppendChild(crosshatchMarker)
+			t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
+			return 2
 		}
 		return 0
 	},
 
 	// 判断围栏代码块（```）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.indented {
-			if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockOpenFence, codeBlockInfo := t.parseFencedCode(); ok {
-				t.Context.closeUnmatchedBlocks()
-				container := t.Context.addChild(ast.NodeCodeBlock, t.Context.nextNonspace)
-				container.IsFencedCodeBlock = true
-				container.CodeBlockFenceLen = codeBlockFenceLen
-				container.CodeBlockFenceChar = codeBlockFenceChar
-				container.CodeBlockFenceOffset = codeBlockFenceOffset
-				container.CodeBlockOpenFence = codeBlockOpenFence
-				container.CodeBlockInfo = codeBlockInfo
-				t.Context.advanceNextNonspace()
-				t.Context.advanceOffset(codeBlockFenceLen, false)
-				return 2
-			}
+		if t.Context.indented {
+			return 0
+		}
+
+		if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockOpenFence, codeBlockInfo := t.parseFencedCode(); ok {
+			t.Context.closeUnmatchedBlocks()
+			container := t.Context.addChild(ast.NodeCodeBlock, t.Context.nextNonspace)
+			container.IsFencedCodeBlock = true
+			container.CodeBlockFenceLen = codeBlockFenceLen
+			container.CodeBlockFenceChar = codeBlockFenceChar
+			container.CodeBlockFenceOffset = codeBlockFenceOffset
+			container.CodeBlockOpenFence = codeBlockOpenFence
+			container.CodeBlockInfo = codeBlockInfo
+			t.Context.advanceNextNonspace()
+			t.Context.advanceOffset(codeBlockFenceLen, false)
+			return 2
 		}
 		return 0
 	},
 
 	// 判断 Setext 标题（- =）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.indented && container.Type == ast.NodeParagraph {
-			if level := t.parseSetextHeading(); 0 != level {
-				if t.Context.Option.GFMTable {
-					// 尝试解析表，因为可能出现如下情况：
-					//
-					//   0
-					//   -:
-					//   -
-					//
-					// 前两行可以解析出一个只有一个单元格的表。
-					// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
-					table := t.Context.parseTable0(container.Tokens)
-					if nil != table {
-						// 将该段落节点转成表节点
-						container.Type = ast.NodeTable
-						container.TableAligns = table.TableAligns
-						for tr := table.FirstChild; nil != tr; {
-							nextTr := tr.Next
-							container.AppendChild(tr)
-							tr = nextTr
-						}
-						container.Tokens = nil
-						return 0
-					}
-				}
+		if t.Context.indented || ast.NodeParagraph != container.Type {
+			return 0
+		}
+		level := t.parseSetextHeading()
+		if 0 == level {
+			return 0
+		}
 
-				t.Context.closeUnmatchedBlocks()
-				// 解析链接引用定义
-				for tokens := container.Tokens; 0 < len(tokens) && lex.ItemOpenBracket == tokens[0]; tokens = container.Tokens {
-					if remains := t.Context.parseLinkRefDef(tokens); nil != remains {
-						container.Tokens = remains
-					} else {
-						break
-					}
+		if t.Context.Option.GFMTable {
+			// 尝试解析表，因为可能出现如下情况：
+			//
+			//   0
+			//   -:
+			//   -
+			//
+			// 前两行可以解析出一个只有一个单元格的表。
+			// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
+			table := t.Context.parseTable0(container.Tokens)
+			if nil != table {
+				// 将该段落节点转成表节点
+				container.Type = ast.NodeTable
+				container.TableAligns = table.TableAligns
+				for tr := table.FirstChild; nil != tr; {
+					nextTr := tr.Next
+					container.AppendChild(tr)
+					tr = nextTr
 				}
-
-				if value := container.Tokens; 0 < len(value) {
-					child := &ast.Node{Type: ast.NodeHeading, HeadingLevel: level, HeadingSetext: true}
-					child.Tokens = lex.TrimWhitespace(value)
-					container.InsertAfter(child)
-					container.Unlink()
-					t.Context.Tip = child
-					t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
-					return 2
-				}
+				container.Tokens = nil
+				return 0
 			}
+		}
+
+		t.Context.closeUnmatchedBlocks()
+		// 解析链接引用定义
+		for tokens := container.Tokens; 0 < len(tokens) && lex.ItemOpenBracket == tokens[0]; tokens = container.Tokens {
+			if remains := t.Context.parseLinkRefDef(tokens); nil != remains {
+				container.Tokens = remains
+			} else {
+				break
+			}
+		}
+
+		if 0 < len(container.Tokens) {
+			child := &ast.Node{Type: ast.NodeHeading, HeadingLevel: level, HeadingSetext: true}
+			child.Tokens = lex.TrimWhitespace(container.Tokens)
+			container.InsertAfter(child)
+			container.Unlink()
+			t.Context.Tip = child
+			t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
+			return 2
 		}
 		return 0
 	},
 
 	// 判断 HTML 块（<）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.indented && lex.Peek(t.Context.currentLine, t.Context.nextNonspace) == lex.ItemLess {
-			tokens := t.Context.currentLine[t.Context.nextNonspace:]
-			if htmlType := t.parseHTML(tokens); 0 != htmlType {
-				t.Context.closeUnmatchedBlocks()
-				block := t.Context.addChild(ast.NodeHTMLBlock, t.Context.offset)
-				block.HtmlBlockType = htmlType
-				return 2
-			}
+		if t.Context.indented {
+			return 0
+		}
+
+		if lex.ItemLess != lex.Peek(t.Context.currentLine, t.Context.nextNonspace) {
+			return 0
+		}
+
+		tokens := t.Context.currentLine[t.Context.nextNonspace:]
+		if htmlType := t.parseHTML(tokens); 0 != htmlType {
+			t.Context.closeUnmatchedBlocks()
+			block := t.Context.addChild(ast.NodeHTMLBlock, t.Context.offset)
+			block.HtmlBlockType = htmlType
+			return 2
 		}
 		return 0
 	},
 
 	// 判断分隔线（--- ***）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.indented {
-			if ok, caretTokens := t.parseThematicBreak(); ok {
-				t.Context.closeUnmatchedBlocks()
-				thematicBreak := t.Context.addChild(ast.NodeThematicBreak, t.Context.nextNonspace)
-				thematicBreak.Tokens = caretTokens
-				t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
-				return 2
-			}
+		if t.Context.indented {
+			return 0
+		}
+
+		if ok, caretTokens := t.parseThematicBreak(); ok {
+			t.Context.closeUnmatchedBlocks()
+			thematicBreak := t.Context.addChild(ast.NodeThematicBreak, t.Context.nextNonspace)
+			thematicBreak.Tokens = caretTokens
+			t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
+			return 2
 		}
 		return 0
 	},
 
 	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.indented || container.Type == ast.NodeList {
-			data := t.parseListMarker(container)
-			if nil == data {
-				return 0
-			}
-
-			t.Context.closeUnmatchedBlocks()
-
-			listsMatch := container.Type == ast.NodeList && t.Context.listsMatch(container.ListData, data)
-			if t.Context.Tip.Type != ast.NodeList || !listsMatch {
-				list := t.Context.addChild(ast.NodeList, t.Context.nextNonspace)
-				list.ListData = data
-			}
-			listItem := t.Context.addChild(ast.NodeListItem, t.Context.nextNonspace)
-			listItem.ListData = data
-			listItem.Tokens = data.Marker
-			if 1 == listItem.ListData.Typ || (3 == listItem.ListData.Typ && 0 == listItem.ListData.BulletChar) {
-				// 修正有序列表项序号
-				prev := listItem.Previous
-				if nil != prev {
-					listItem.Num = prev.Num + 1
-				} else {
-					listItem.Num = data.Start
-				}
-			}
-
-			return 1
+		if ast.NodeList != container.Type && t.Context.indented {
+			return 0
 		}
-		return 0
+
+		data := t.parseListMarker(container)
+		if nil == data {
+			return 0
+		}
+
+		t.Context.closeUnmatchedBlocks()
+
+		listsMatch := container.Type == ast.NodeList && t.Context.listsMatch(container.ListData, data)
+		if t.Context.Tip.Type != ast.NodeList || !listsMatch {
+			list := t.Context.addChild(ast.NodeList, t.Context.nextNonspace)
+			list.ListData = data
+		}
+		listItem := t.Context.addChild(ast.NodeListItem, t.Context.nextNonspace)
+		listItem.ListData = data
+		listItem.Tokens = data.Marker
+		if 1 == listItem.ListData.Typ || (3 == listItem.ListData.Typ && 0 == listItem.ListData.BulletChar) {
+			// 修正有序列表项序号
+			prev := listItem.Previous
+			if nil != prev {
+				listItem.Num = prev.Num + 1
+			} else {
+				listItem.Num = data.Start
+			}
+		}
+		return 1
 	},
 
 	// 判断数学公式块（$$）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.indented {
-			if ok, mathBlockDollarOffset := t.parseMathBlock(); ok {
-				t.Context.closeUnmatchedBlocks()
-				block := t.Context.addChild(ast.NodeMathBlock, t.Context.nextNonspace)
-				block.MathBlockDollarOffset = mathBlockDollarOffset
-				t.Context.advanceNextNonspace()
-				t.Context.advanceOffset(mathBlockDollarOffset, false)
-				return 2
-			}
+		if t.Context.indented {
+			return 0
+		}
+
+		if ok, mathBlockDollarOffset := t.parseMathBlock(); ok {
+			t.Context.closeUnmatchedBlocks()
+			block := t.Context.addChild(ast.NodeMathBlock, t.Context.nextNonspace)
+			block.MathBlockDollarOffset = mathBlockDollarOffset
+			t.Context.advanceNextNonspace()
+			t.Context.advanceOffset(mathBlockDollarOffset, false)
+			return 2
 		}
 		return 0
 	},
 
 	// 判断缩进代码块（    code）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if t.Context.indented && t.Context.Tip.Type != ast.NodeParagraph && !t.Context.blank {
+		if !t.Context.indented {
+			return 0
+		}
+
+		if t.Context.Tip.Type != ast.NodeParagraph && !t.Context.blank {
 			t.Context.advanceOffset(4, true)
 			t.Context.closeUnmatchedBlocks()
 			t.Context.addChild(ast.NodeCodeBlock, t.Context.offset)
