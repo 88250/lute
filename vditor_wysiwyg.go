@@ -419,9 +419,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeHeading
 		node.HeadingLevel = int(node.Tokens[1] - byte('0'))
 		marker := lute.domAttrValue(n, "data-marker")
-		id := lute.domAttrValue(n, "data-id")
-		if "" != id {
-			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " {" + id + "}"})
+		if id := lute.domAttrValue(n, "data-id"); "" != id {
+			n.LastChild.InsertAfter(&html.Node{Type: html.TextNode, Data: " {" + id + "}"})
 		}
 		node.HeadingSetext = "=" == marker || "-" == marker
 		if !node.HeadingSetext {

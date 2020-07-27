@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"140", "<h2 data-block=\"0\" id=\"wysiwyg-fo_0\" data-marker=\"#\" data-id=\"#custom-id\">foo<wbr></h2>", "<h2 data-block=\"0\" data-id=\"#custom-id\" id=\"wysiwyg-#custom-id\" data-marker=\"#\">foo<wbr></h2>"},
 	{"139", "<p data-block=\"0\">​<sup data-type=\"footnotes-ref\" data-footnotes-label=\"^foo\" class=\"vditor-tooltipped vditor-tooltipped__s\" aria-label=\"\">1<wbr></sup></p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^foo\"></li></ol></div>", "<p data-block=\"0\">\u200b<sup data-type=\"footnotes-ref\" data-footnotes-label=\"^foo\" class=\"vditor-tooltipped vditor-tooltipped__s\" aria-label=\"\">1</sup>\u200b<wbr></p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^foo\"></li></ol></div>"},
 	{"138", "<p data-block=\"0\">​<code data-marker=\"``\">​`code`</code>​f<wbr></p>", "<p data-block=\"0\">\u200b<code data-marker=\"``\">\u200b`code`</code>\u200b f<wbr></p>"},
 	{"137", "<p>\\<wbr>$foo$</p>", "<p data-block=\"0\"><span data-type=\"backslash\"><span>\\</span>$</span><wbr>foo$</p>"},
