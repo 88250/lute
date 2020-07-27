@@ -821,10 +821,24 @@ func (r *VditorSVRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 		r.Writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
 
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--heading"}, {"data-type", "heading-marker"}}, false)
-		r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
-		r.tag("/span", nil, false)
+		if !node.HeadingSetext {
+			r.tag("span", [][]string{{"class", "vditor-sv__marker--heading"}, {"data-type", "heading-marker"}}, false)
+			r.WriteString(strings.Repeat("#", node.HeadingLevel) + " ")
+			r.tag("/span", nil, false)
+		}
 	} else {
+		if node.HeadingSetext {
+			r.Newline()
+			r.tag("span", [][]string{{"class", "vditor-sv__marker--heading"}, {"data-type", "heading-marker"}}, false)
+			contentLen := r.setextHeadingLen(node)
+			if 1 == node.HeadingLevel {
+				r.WriteString(strings.Repeat("=", contentLen))
+			} else {
+				r.WriteString(strings.Repeat("-", contentLen))
+			}
+			r.tag("/span", nil, false)
+		}
+
 		class := "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]
 		r.renderClass(node, class)
 		r.Newline()

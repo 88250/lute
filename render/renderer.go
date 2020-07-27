@@ -234,6 +234,20 @@ func (r *BaseRenderer) headings() (ret []*ast.Node) {
 	return
 }
 
+func (r *BaseRenderer) setextHeadingLen(node *ast.Node) (ret int) {
+	content := node.Text()
+	content = strings.ReplaceAll(content, util.Caret, "")
+	for _, r := range content {
+		if utf8.RuneSelf <= r {
+			ret += 2
+		} else {
+			ret++
+		}
+	}
+	ret += 2
+	return
+}
+
 func (r *BaseRenderer) renderListStyle(node *ast.Node, attrs *[][]string) {
 	if r.Option.RenderListStyle {
 		switch node.ListData.Typ {

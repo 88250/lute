@@ -713,15 +713,7 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 	} else {
 		if node.HeadingSetext {
 			r.WriteByte(lex.ItemNewline)
-			content := node.Text()
-			contentLen := 0
-			for _, r := range content {
-				if utf8.RuneSelf <= r {
-					contentLen += 2
-				} else {
-					contentLen++
-				}
-			}
+			contentLen := r.setextHeadingLen(node)
 			if 1 == node.HeadingLevel {
 				r.WriteString(strings.Repeat("=", contentLen))
 			} else if 2 == node.HeadingLevel {
