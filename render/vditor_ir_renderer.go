@@ -719,13 +719,6 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	//r.renderSpanNode(node)
-	//r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
-	//r.Write(html.EscapeHTML(node.Tokens))
-	//r.tag("/code", nil, false)
-	//r.tag("/span", nil, false)
-
-	// TODO: 为 <kbd> 提供单独的渲染效果 https://github.com/Vanessa219/vditor/issues/627
 	openKbd := bytes.Equal(node.Tokens, []byte("<kbd>"))
 	closeKbd := bytes.Equal(node.Tokens, []byte("</kbd>"))
 	if openKbd || closeKbd {
