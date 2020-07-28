@@ -749,10 +749,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		node.Tokens = bytes.SplitAfter(node.Tokens, []byte("</summary>"))[0]
 		tree.Context.Tip.AppendChild(node)
 	case atom.Kbd:
-		node.Type = ast.NodeInlineHTML
-		node.Tokens = lute.domHTML(n)
-		tree.Context.Tip.AppendChild(node)
-		return
+		// kbd 标签由 code 标签构成节点
 	case atom.Summary:
 		return
 	default:

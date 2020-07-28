@@ -719,39 +719,73 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.renderSpanNode(node)
-	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
-	r.Write(html.EscapeHTML(node.Tokens))
-	r.tag("/code", nil, false)
-	r.tag("/span", nil, false)
+	//r.renderSpanNode(node)
+	//r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+	//r.Write(html.EscapeHTML(node.Tokens))
+	//r.tag("/code", nil, false)
+	//r.tag("/span", nil, false)
 
 	// TODO: 为 <kbd> 提供单独的渲染效果 https://github.com/Vanessa219/vditor/issues/627
-	//openKbd := bytes.Equal(node.Tokens, []byte("<kbd>"))
-	//closeKbd := bytes.Equal(node.Tokens, []byte("</kbd>"))
-	//if openKbd || closeKbd {
-	//	if openKbd {
-	//		r.renderSpanNode(node)
-	//		r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
-	//		r.Write(html.EscapeHTML(node.Tokens))
-	//		r.tag("/code", nil, false)
-	//		r.tag("/span", nil, false)
-	//		r.tag("kbd", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	//	} else {
-	//		r.tag("/kbd", nil, false)
-	//		r.renderSpanNode(node)
-	//		r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
-	//		r.Write(html.EscapeHTML(node.Tokens))
-	//		r.tag("/code", nil, false)
-	//		r.tag("/span", nil, false)
-	//	}
-	//} else {
-	//	r.renderSpanNode(node)
-	//	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
-	//	r.Write(html.EscapeHTML(node.Tokens))
-	//	r.tag("/code", nil, false)
-	//	r.tag("/span", nil, false)
-	//}
+	openKbd := bytes.Equal(node.Tokens, []byte("<kbd>"))
+	closeKbd := bytes.Equal(node.Tokens, []byte("</kbd>"))
+	if openKbd || closeKbd {
+		if openKbd {
+			if r.tagMatchClose("kbd", node) {
+				r.renderSpanNode(node)
+				r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+				r.Write(html.EscapeHTML(node.Tokens))
+				r.tag("/code", nil, false)
+				r.tag("/span", nil, false)
+				r.tag("kbd", nil, false)
+			} else {
+				r.renderSpanNode(node)
+				r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+				r.Write(html.EscapeHTML(node.Tokens))
+				r.tag("/code", nil, false)
+				r.tag("/span", nil, false)
+			}
+		} else {
+			if r.tagMatchOpen("kbd", node) {
+				r.tag("/kbd", nil, false)
+				r.renderSpanNode(node)
+				r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+				r.Write(html.EscapeHTML(node.Tokens))
+				r.tag("/code", nil, false)
+				r.tag("/span", nil, false)
+			} else {
+				r.renderSpanNode(node)
+				r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+				r.Write(html.EscapeHTML(node.Tokens))
+				r.tag("/code", nil, false)
+				r.tag("/span", nil, false)
+			}
+		}
+	} else {
+		r.renderSpanNode(node)
+		r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+		r.Write(html.EscapeHTML(node.Tokens))
+		r.tag("/code", nil, false)
+		r.tag("/span", nil, false)
+	}
 	return ast.WalkStop
+}
+
+func (r *VditorIRRenderer) tagMatchClose(tag string, node *ast.Node) bool {
+	for n := node.Next; nil != n; n = n.Next {
+		if ast.NodeInlineHTML == n.Type && "</"+tag+">" == n.TokensStr() {
+			return true
+		}
+	}
+	return false
+}
+
+func (r *VditorIRRenderer) tagMatchOpen(tag string, node *ast.Node) bool {
+	for n := node.Previous; nil != n; n = n.Previous {
+		if ast.NodeInlineHTML == n.Type && "<"+tag+">" == n.TokensStr() {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *VditorIRRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
