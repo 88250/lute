@@ -313,7 +313,7 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	r.tag("code", attrs, false)
 	if codeIsEmpty {
 		if !caretInInfo {
-			r.WriteString("<wbr>")
+			r.WriteString(util.FrontEndCaret)
 		}
 		r.WriteByte(lex.ItemNewline)
 	} else {
@@ -421,7 +421,7 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	r.tag("pre", [][]string{{"class", "vditor-ir__marker--pre vditor-ir__marker"}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 	if codeIsEmpty {
-		r.WriteString("<wbr>\n")
+		r.WriteString(util.FrontEndCaret + "\n")
 	} else {
 		r.Write(html.EscapeHTML(node.Tokens))
 	}

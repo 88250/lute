@@ -327,7 +327,7 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 	r.tag("pre", preAttrs, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
 	if codeIsEmpty {
-		r.WriteString("<wbr>\n")
+		r.WriteString(util.FrontEndCaret + "\n")
 	} else {
 		r.Write(html.EscapeHTML(previewTokens))
 	}
@@ -940,10 +940,10 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	r.tag("code", attrs, false)
 
 	if codeIsEmpty {
-		r.WriteString("<wbr>\n")
+		r.WriteString(util.FrontEndCaret + "\n")
 	} else {
 		if caretInInfo {
-			r.WriteString("<wbr>")
+			r.WriteString(util.FrontEndCaret)
 		}
 		r.Write(html.EscapeHTML(node.Tokens))
 		r.Newline()

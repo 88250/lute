@@ -37,7 +37,7 @@ func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 	lute.VditorSV = false
 
 	// 替换插入符
-	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
+	ivHTML = strings.ReplaceAll(ivHTML, util.FrontEndCaret, util.Caret)
 	markdown := lute.vditorDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewVditorRenderer(tree)
@@ -46,7 +46,7 @@ func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
 	}
 	// 替换插入符
-	ovHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
+	ovHTML = strings.ReplaceAll(string(output), util.Caret, util.FrontEndCaret)
 	return
 }
 
@@ -138,7 +138,7 @@ func (lute *Lute) HTML2Md(html string) (markdown string) {
 
 func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	// 删掉插入符
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
+	htmlStr = strings.ReplaceAll(htmlStr, util.FrontEndCaret, "")
 
 	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
 	htmlStr = strings.ReplaceAll(htmlStr, "\t\n", "\n")
