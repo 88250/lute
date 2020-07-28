@@ -28,7 +28,7 @@ func listFinalize(list *ast.Node) {
 			break
 		}
 
-		var subitem = item.FirstChild
+		subitem := item.FirstChild
 		for nil != subitem {
 			if endsWithBlankLine(subitem) &&
 				(nil != item.Next || nil != subitem.Next) {
@@ -45,7 +45,7 @@ var items1 = util.StrToBytes("1")
 
 // parseListMarker 用于解析泛列表（列表、列表项或者任务列表）标记符。
 func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
-	if t.Context.indent >= 4 {
+	if 4 <= t.Context.indent {
 		return nil
 	}
 
@@ -104,8 +104,8 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 	}
 
 	token = lex.Peek(ln, t.Context.offset)
-	var isBlankItem = 0 == token || lex.ItemNewline == token
-	var spacesAfterMarker = t.Context.column - spacesStartCol
+	isBlankItem := 0 == token || lex.ItemNewline == token
+	spacesAfterMarker := t.Context.column - spacesStartCol
 	if spacesAfterMarker >= 5 || spacesAfterMarker < 1 || isBlankItem {
 		data.Padding = markerLength + 1
 		t.Context.column = spacesStartCol

@@ -106,9 +106,9 @@ func (t *Tree) incorporateLine(line []byte) {
 		}
 
 		// 逐个尝试是否可以起始一个块级节点
-		var i = 0
+		i := 0
 		for i < startsLen {
-			var res = blockStarts[i](t, container)
+			res := blockStarts[i](t, container)
 			if res == 1 { // 匹配到容器块，继续迭代下降过程
 				container = t.Context.Tip
 				break
@@ -214,7 +214,7 @@ var blockStarts = []blockStartFunc{
 			return 0
 		}
 
-		var label = []byte{lex.ItemCaret}
+		label := []byte{lex.ItemCaret}
 		var token byte
 		var i int
 		for i = t.Context.nextNonspace + 2; i < t.Context.currentLineLen; i++ {

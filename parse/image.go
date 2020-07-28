@@ -17,7 +17,7 @@ import (
 
 // parseBang 解析 !，可能是图片标记符开始 ![ 也可能是普通文本 !。
 func (t *Tree) parseBang(ctx *InlineContext) (ret *ast.Node) {
-	var startPos = ctx.pos
+	startPos := ctx.pos
 	ctx.pos++
 	if ctx.pos < ctx.tokensLen && lex.ItemOpenBracket == ctx.tokens[ctx.pos] {
 		ctx.pos++

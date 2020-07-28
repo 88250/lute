@@ -25,7 +25,7 @@ func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 		return 2
 	} else {
 		// 跳过 $ 之前可能存在的空格
-		var i = mathBlock.MathBlockDollarOffset
+		i := mathBlock.MathBlockDollarOffset
 		var token byte
 		for i > 0 {
 			token = lex.Peek(ln, context.offset)

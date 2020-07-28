@@ -60,7 +60,7 @@ type InlineContext struct {
 
 // advanceOffset 用于移动 count 个字符位置，columns 指定了遇到 tab 时是否需要空格进行补偿偏移。
 func (context *Context) advanceOffset(count int, columns bool) {
-	var currentLine = context.currentLine
+	currentLine := context.currentLine
 	var charsToTab, charsToAdvance int
 	var c byte
 	for 0 < count {
