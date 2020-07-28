@@ -154,7 +154,7 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 			return
 		}
 	case ast.NodeMathBlock:
-		mathBlockFinalize(block)
+		context.mathBlockFinalize(block)
 	case ast.NodeList:
 		listFinalize(block)
 	}

@@ -723,14 +723,34 @@ func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.W
 	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.Write(html.EscapeHTML(node.Tokens))
 	r.tag("/code", nil, false)
-
-	if bytes.Equal(node.Tokens, []byte("<kbd>")) || bytes.Equal(node.Tokens, []byte("</kbd>")) {
-		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		r.Write(node.Tokens)
-		r.WriteString("</pre>")
-	}
-
 	r.tag("/span", nil, false)
+
+	// TODO: 为 <kbd> 提供单独的渲染效果 https://github.com/Vanessa219/vditor/issues/627
+	//openKbd := bytes.Equal(node.Tokens, []byte("<kbd>"))
+	//closeKbd := bytes.Equal(node.Tokens, []byte("</kbd>"))
+	//if openKbd || closeKbd {
+	//	if openKbd {
+	//		r.renderSpanNode(node)
+	//		r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+	//		r.Write(html.EscapeHTML(node.Tokens))
+	//		r.tag("/code", nil, false)
+	//		r.tag("/span", nil, false)
+	//		r.tag("kbd", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	//	} else {
+	//		r.tag("/kbd", nil, false)
+	//		r.renderSpanNode(node)
+	//		r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+	//		r.Write(html.EscapeHTML(node.Tokens))
+	//		r.tag("/code", nil, false)
+	//		r.tag("/span", nil, false)
+	//	}
+	//} else {
+	//	r.renderSpanNode(node)
+	//	r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+	//	r.Write(html.EscapeHTML(node.Tokens))
+	//	r.tag("/code", nil, false)
+	//	r.tag("/span", nil, false)
+	//}
 	return ast.WalkStop
 }
 

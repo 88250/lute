@@ -100,7 +100,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
 			lex.ItemDollar != maybeMarker && // 数学公式
 			lex.ItemOpenBracket != maybeMarker && // 脚注
-			util.Caret[0] != maybeMarker { // Vditor 所见即所得
+			util.Caret[0] != maybeMarker { // Vditor 编辑器支持
 			t.Context.advanceNextNonspace()
 			break
 		}
@@ -144,7 +144,7 @@ func (t *Tree) incorporateLine(line []byte) {
 		isFenced := ast.NodeCodeBlock == typ && container.IsFencedCodeBlock
 
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
-		var lastLineBlank = t.Context.blank &&
+		lastLineBlank := t.Context.blank &&
 			!(typ == ast.NodeFootnotesDef ||
 				typ == ast.NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == ast.NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
@@ -158,7 +158,8 @@ func (t *Tree) incorporateLine(line []byte) {
 
 		if container.AcceptLines() {
 			t.addLine()
-			if typ == ast.NodeHTMLBlock {
+			switch typ {
+			case ast.NodeHTMLBlock:
 				// HTML 块（类型 1-5）需要检查是否满足闭合条件
 				html := container
 				if html.HtmlBlockType >= 1 && html.HtmlBlockType <= 5 {
@@ -166,6 +167,14 @@ func (t *Tree) incorporateLine(line []byte) {
 					if t.isHTMLBlockClose(tokens, html.HtmlBlockType) {
 						t.Context.finalize(container, t.Context.lineNum)
 					}
+				}
+			case ast.NodeMathBlock:
+				// 数学公式块标记符没有换行的形式（$$foo$$）需要判断右边结尾的闭合标记符
+				if 3 < len(container.Tokens) &&
+					(bytes.HasSuffix(container.Tokens, MathBlockMarkerNewline) ||
+						bytes.HasSuffix(container.Tokens, MathBlockMarker) ||
+						bytes.HasSuffix(container.Tokens, MathBlockMarkerCaretNewline)) {
+					t.Context.finalize(container, t.Context.lineNum)
 				}
 			}
 		} else if t.Context.offset < t.Context.currentLineLen && !t.Context.blank {

@@ -18,10 +18,9 @@ import (
 )
 
 func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
-	var ln = context.currentLine
-	var indent = context.indent
-
-	if indent <= 3 && isMathBlockClose(ln[context.nextNonspace:]) {
+	ln := context.currentLine
+	indent := context.indent
+	if 3 >= indent && isMathBlockClose(ln[context.nextNonspace:]) {
 		context.finalize(mathBlock, context.lineNum)
 		return 2
 	} else {
@@ -41,12 +40,23 @@ func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 }
 
 var MathBlockMarker = util.StrToBytes("$$")
+var MathBlockMarkerNewline = util.StrToBytes("$$\n")
+var MathBlockMarkerCaret = util.StrToBytes("$$" + util.Caret)
+var MathBlockMarkerCaretNewline = util.StrToBytes("$$" + util.Caret + "\n")
 
-func mathBlockFinalize(mathBlock *ast.Node) {
-	tokens := mathBlock.Tokens[2:] // 剔除开头的两个 $$
+func (context *Context) mathBlockFinalize(mathBlock *ast.Node) {
+	tokens := mathBlock.Tokens[2:] // 剔除开头的 $$
 	tokens = lex.TrimWhitespace(tokens)
+	if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
+		if bytes.HasSuffix(tokens, MathBlockMarkerCaret) {
+			// 剔除结尾的 $$‸
+			tokens = bytes.TrimSuffix(tokens, MathBlockMarkerCaret)
+			// 把 Vditor 光标移动到内容末尾
+			tokens = append(tokens, util.CaretTokens...)
+		}
+	}
 	if bytes.HasSuffix(tokens, MathBlockMarker) {
-		tokens = tokens[:len(tokens)-2] // 剔除结尾的两个 $$
+		tokens = tokens[:len(tokens)-2] // 剔除结尾的 $$
 	}
 	mathBlock.Tokens = nil
 	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
@@ -69,7 +79,6 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 	if 2 > fenceLength {
 		return
 	}
-
 	return true, t.Context.indent
 }
 
