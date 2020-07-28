@@ -186,15 +186,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Pre:
 		firstc := n.FirstChild
 		if nil != firstc {
-			if atom.Code == firstc.DataAtom {
+			if atom.Code == firstc.DataAtom || atom.Span == firstc.DataAtom {
 				node.Type = ast.NodeCodeBlock
 				node.IsFencedCodeBlock = true
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
 				buf := &bytes.Buffer{}
 				class := lute.domAttrValue(firstc, "class")
+				if !strings.Contains(class, "language-") {
+					class = lute.domAttrValue(n, "class")
+				}
 				if strings.Contains(class, "language-") {
-					language := class[len("language-"):]
+					language := class[strings.Index(class, "language-")+len("language-"):]
 					node.LastChild.CodeBlockInfo = []byte(language)
 				}
 				buf.WriteString(lute.domText(n))
@@ -202,8 +205,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(content)
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
 				tree.Context.Tip.AppendChild(node)
-			} else if atom.Span == firstc.DataAtom {
-				break
 			} else {
 				node.Type = ast.NodeHTMLBlock
 				node.Tokens = lute.domHTML(n)

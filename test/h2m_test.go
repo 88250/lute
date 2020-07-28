@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"34", "<div class=\"gatsby-highlight\" data-language=\"js\"><pre class=\"blog-code language-js\"><span class=\"token keyword\">const</span></pre></div>", "```js\nconst\n```\n"},
 	{"33", "<table><tr><td><p>事件编号</p></td><td><p>事件类别(category)</p></td><td><p>事件操作(action)</p></td><td><p>事件标签(label)</p></td><td><p>事件值(value)</p></td></tr><tr><td><p>1</p></td><td><p>合作行业标签</p></td><td><p>点击</p></td><td><p>选择条件</p></td><td></td></tr><tr><td><p>2</p></td><td><p>营销目的标签</p></td><td><p>点击</p></td><td><p>选择条件</p></td><td></td></tr><tr><td><p>3</p></td><td><p>合作资源标签</p></td><td><p>点击</p></td><td><p>选择条件</p></td><td></td></tr><tr><td><p>4</p></td><td><p>合作平台标签</p></td><td><p>点击</p></td><td><p>选择条件</p></td><td></td></tr><tr><td><p>5</p></td><td><p>卡片</p></td><td><p>查看详情</p></td><td><p>案例名称</p></td><td></td></tr><tr><td><p>6</p></td><td><p>卡片</p></td><td><p>点赞</p></td><td><p>案例名称</p></td><td><p>点赞数</p></td></tr><tr><td><p>7</p></td><td><p>卡片</p></td><td><p>取消点赞</p></td><td><p>案例名称</p></td><td><p>点赞数</p></td></tr><tr><td><p>8</p></td><td><p>卡片</p></td><td><p>下载分享图</p></td><td><p>案例名称</p></td><td></td></tr></table>", "| 事件编号 | 事件类别(category) | 事件操作(action) | 事件标签(label) | 事件值(value) |\n| - | - | - | - | - |\n| 1 | 合作行业标签 | 点击 | 选择条件 |  |\n| 2 | 营销目的标签 | 点击 | 选择条件 |  |\n| 3 | 合作资源标签 | 点击 | 选择条件 |  |\n| 4 | 合作平台标签 | 点击 | 选择条件 |  |\n| 5 | 卡片 | 查看详情 | 案例名称 |  |\n| 6 | 卡片 | 点赞 | 案例名称 | 点赞数 |\n| 7 | 卡片 | 取消点赞 | 案例名称 | 点赞数 |\n| 8 | 卡片 | 下载分享图 | 案例名称 |  |\n"},
 	{"32", "<ul>\n  <li>咖啡</li>\n  <li>茶\n    <ul>\n    <li>红茶</li>\n    <li>绿茶</li>\n    </ul>\n  </li>\n  <li>牛奶</li>\n</ul>", "* 咖啡\n* 茶\n  * 红茶\n  * 绿茶\n* 牛奶\n"},
 	{"32", "<ul>\n<li>foo</li>\n<li>bar\n<ul>\n<li>baz</li>\n<li>baz</li>\n</ul>\n</li>\n<li>bar</li>\n</ul>", "* foo\n* bar\n  * baz\n  * baz\n* bar\n"},
@@ -71,7 +72,7 @@ var html2MdTests = []parseTest{
 	{"22", "<div class=\"highlight highlight-source-shell\"><pre>npm install vditor --save</pre></div>", "```shell\nnpm install vditor --save\n```\n"},
 	{"21", "<h4><a id=\"user-content-id\" class=\"anchor\" aria-hidden=\"true\" href=\"https://github.com/Vanessa219/vditor/blob/master/README.md#id\"><svg class=\"octicon octicon-link\" viewBox=\"0 0 16 16\" version=\"1.1\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z\"></path></svg></a>id</h4>", "#### id\n"},
 	{"20", "<h2 id=\"whats-markdown\">What’s Markdown?<a class=\"anchorjs-link \" aria-label=\"Anchor\" data-anchorjs-icon=\"\uE9CB\" href=\"https://www.markdownguide.org/getting-started/#whats-markdown\"></a></h2>", "## What’s Markdown?\n"},
-	{"19", "<pre><span>`foo`</span></pre>", "`foo`\n"},
+	{"19", "<pre><span>`foo`</span></pre>", "```\n`foo`\n```\n"},
 	{"18", "<del>foo</del>", "~foo~\n"},
 	{"17", "<img src=\"bar.png\" alt=\"foo\">", "![foo](bar.png)\n"},
 	{"16", "foo<br>bar", "foo\nbar\n"},
@@ -88,7 +89,7 @@ var html2MdTests = []parseTest{
 	{"5", `<!--StartFragment--><ul><li><input checked="" disabled="" type="checkbox"><span>&nbsp;</span>发布 Solo</li></ul><!--EndFragment-->`, "* [X] 发布 Solo\n"},
 	{"4", "<span>&nbsp;</span>发布 Solo", "发布 Solo\n"},
 	{"3", "<pre><ul><li>foo</li></ul></pre>", "<pre><ul><li><p>foo</p></li></ul></pre>\n"},
-	{"2", "<pre><span>//&#32;Lute&#32;-&#32;A&#32;structured&#32;markdown&#32;engine.<br></span><span>//&#32;Copyright&#32;(c)&#32;2019-present,&#32;b3log.org</span></pre>", "// Lute - A structured Markdown engine.\n// Copyright (c) 2019-present, b3log.org\n"},
+	{"2", "<pre><span>//&#32;Lute&#32;-&#32;A&#32;structured&#32;markdown&#32;engine.<br></span><span>//&#32;Copyright&#32;(c)&#32;2019-present,&#32;b3log.org</span></pre>", "```\n// Lute - A structured markdown engine.\n// Copyright (c) 2019-present, b3log.org\n```\n"},
 	{"1", "<meta charset='utf-8'><span>foo</span>", "foo\n"},
 	{"0", "<html><body><!--StartFragment--><p>foo</p><!--EndFragment--></body></html>", "foo\n"},
 }
