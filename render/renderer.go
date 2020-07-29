@@ -235,16 +235,23 @@ func (r *BaseRenderer) headings() (ret []*ast.Node) {
 }
 
 func (r *BaseRenderer) setextHeadingLen(node *ast.Node) (ret int) {
-	content := node.Text()
+	var content string
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if (ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeSoftBreak == n.Type) && entering {
+			content += util.BytesToStr(n.Tokens)
+		}
+		return ast.WalkContinue
+	})
 	content = strings.ReplaceAll(content, util.Caret, "")
-	for _, r := range content {
+	lines := strings.Split(content, "\n")
+	lastLine := lines[len(lines)-1]
+	for _, r := range lastLine {
 		if utf8.RuneSelf <= r {
 			ret += 2
 		} else {
 			ret++
 		}
 	}
-	ret += 2
 	return
 }
 
