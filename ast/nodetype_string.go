@@ -77,61 +77,99 @@ func _() {
 	_ = x[NodeInlineMathCloseMarker-307]
 	_ = x[NodeBackslash-400]
 	_ = x[NodeBackslashContent-401]
-	_ = x[NodeVditorCaret-402]
-	_ = x[NodeFootnotesDef-500]
-	_ = x[NodeFootnotesRef-501]
-	_ = x[NodeToC-600]
-	_ = x[NodeHeadingID-700]
+	_ = x[NodeVditorCaret-405]
+	_ = x[NodeFootnotesDef-410]
+	_ = x[NodeFootnotesRef-411]
+	_ = x[NodeToC-415]
+	_ = x[NodeHeadingID-420]
+	_ = x[NodeYamlFrontMatter-425]
 	_ = x[NodeTypeMaxVal-1024]
 }
 
-const (
-	_NodeType_name_0 = "NodeDocumentNodeParagraphNodeHeadingNodeHeadingC8hMarkerNodeThematicBreakNodeBlockquoteNodeBlockquoteMarkerNodeListNodeListItemNodeHTMLBlockNodeInlineHTMLNodeCodeBlockNodeCodeBlockFenceOpenMarkerNodeCodeBlockFenceCloseMarkerNodeCodeBlockFenceInfoMarkerNodeCodeBlockCodeNodeTextNodeEmphasisNodeEmA6kOpenMarkerNodeEmA6kCloseMarkerNodeEmU8eOpenMarkerNodeEmU8eCloseMarkerNodeStrongNodeStrongA6kOpenMarkerNodeStrongA6kCloseMarkerNodeStrongU8eOpenMarkerNodeStrongU8eCloseMarkerNodeCodeSpanNodeCodeSpanOpenMarkerNodeCodeSpanContentNodeCodeSpanCloseMarkerNodeHardBreakNodeSoftBreakNodeLinkNodeImageNodeBangNodeOpenBracketNodeCloseBracketNodeOpenParenNodeCloseParenNodeLinkTextNodeLinkDestNodeLinkTitleNodeLinkSpaceNodeHTMLEntity"
-	_NodeType_name_1 = "NodeTaskListItemMarkerNodeStrikethroughNodeStrikethrough1OpenMarkerNodeStrikethrough1CloseMarkerNodeStrikethrough2OpenMarkerNodeStrikethrough2CloseMarkerNodeTableNodeTableHeadNodeTableRowNodeTableCell"
-	_NodeType_name_2 = "NodeEmojiNodeEmojiUnicodeNodeEmojiImgNodeEmojiAlias"
-	_NodeType_name_3 = "NodeMathBlockNodeMathBlockOpenMarkerNodeMathBlockContentNodeMathBlockCloseMarkerNodeInlineMathNodeInlineMathOpenMarkerNodeInlineMathContentNodeInlineMathCloseMarker"
-	_NodeType_name_4 = "NodeBackslashNodeBackslashContentNodeVditorCaret"
-	_NodeType_name_5 = "NodeFootnotesDefNodeFootnotesRef"
-	_NodeType_name_6 = "NodeToC"
-	_NodeType_name_7 = "NodeHeadingID"
-	_NodeType_name_8 = "NodeTypeMaxVal"
-)
+const _NodeType_name = "NodeDocumentNodeParagraphNodeHeadingNodeHeadingC8hMarkerNodeThematicBreakNodeBlockquoteNodeBlockquoteMarkerNodeListNodeListItemNodeHTMLBlockNodeInlineHTMLNodeCodeBlockNodeCodeBlockFenceOpenMarkerNodeCodeBlockFenceCloseMarkerNodeCodeBlockFenceInfoMarkerNodeCodeBlockCodeNodeTextNodeEmphasisNodeEmA6kOpenMarkerNodeEmA6kCloseMarkerNodeEmU8eOpenMarkerNodeEmU8eCloseMarkerNodeStrongNodeStrongA6kOpenMarkerNodeStrongA6kCloseMarkerNodeStrongU8eOpenMarkerNodeStrongU8eCloseMarkerNodeCodeSpanNodeCodeSpanOpenMarkerNodeCodeSpanContentNodeCodeSpanCloseMarkerNodeHardBreakNodeSoftBreakNodeLinkNodeImageNodeBangNodeOpenBracketNodeCloseBracketNodeOpenParenNodeCloseParenNodeLinkTextNodeLinkDestNodeLinkTitleNodeLinkSpaceNodeHTMLEntityNodeTaskListItemMarkerNodeStrikethroughNodeStrikethrough1OpenMarkerNodeStrikethrough1CloseMarkerNodeStrikethrough2OpenMarkerNodeStrikethrough2CloseMarkerNodeTableNodeTableHeadNodeTableRowNodeTableCellNodeEmojiNodeEmojiUnicodeNodeEmojiImgNodeEmojiAliasNodeMathBlockNodeMathBlockOpenMarkerNodeMathBlockContentNodeMathBlockCloseMarkerNodeInlineMathNodeInlineMathOpenMarkerNodeInlineMathContentNodeInlineMathCloseMarkerNodeBackslashNodeBackslashContentNodeVditorCaretNodeFootnotesDefNodeFootnotesRefNodeToCNodeHeadingIDNodeYamlFrontMatterNodeTypeMaxVal"
 
-var (
-	_NodeType_index_0 = [...]uint16{0, 12, 25, 36, 56, 73, 87, 107, 115, 127, 140, 154, 167, 195, 224, 252, 269, 277, 289, 308, 328, 347, 367, 377, 400, 424, 447, 471, 483, 505, 524, 547, 560, 573, 581, 590, 598, 613, 629, 642, 656, 668, 680, 693, 706, 720}
-	_NodeType_index_1 = [...]uint8{0, 22, 39, 67, 96, 124, 153, 162, 175, 187, 200}
-	_NodeType_index_2 = [...]uint8{0, 9, 25, 37, 51}
-	_NodeType_index_3 = [...]uint8{0, 13, 36, 56, 80, 94, 118, 139, 164}
-	_NodeType_index_4 = [...]uint8{0, 13, 33, 48}
-	_NodeType_index_5 = [...]uint8{0, 16, 32}
-)
+var _NodeType_map = map[NodeType]string{
+	0:    _NodeType_name[0:12],
+	1:    _NodeType_name[12:25],
+	2:    _NodeType_name[25:36],
+	3:    _NodeType_name[36:56],
+	4:    _NodeType_name[56:73],
+	5:    _NodeType_name[73:87],
+	6:    _NodeType_name[87:107],
+	7:    _NodeType_name[107:115],
+	8:    _NodeType_name[115:127],
+	9:    _NodeType_name[127:140],
+	10:   _NodeType_name[140:154],
+	11:   _NodeType_name[154:167],
+	12:   _NodeType_name[167:195],
+	13:   _NodeType_name[195:224],
+	14:   _NodeType_name[224:252],
+	15:   _NodeType_name[252:269],
+	16:   _NodeType_name[269:277],
+	17:   _NodeType_name[277:289],
+	18:   _NodeType_name[289:308],
+	19:   _NodeType_name[308:328],
+	20:   _NodeType_name[328:347],
+	21:   _NodeType_name[347:367],
+	22:   _NodeType_name[367:377],
+	23:   _NodeType_name[377:400],
+	24:   _NodeType_name[400:424],
+	25:   _NodeType_name[424:447],
+	26:   _NodeType_name[447:471],
+	27:   _NodeType_name[471:483],
+	28:   _NodeType_name[483:505],
+	29:   _NodeType_name[505:524],
+	30:   _NodeType_name[524:547],
+	31:   _NodeType_name[547:560],
+	32:   _NodeType_name[560:573],
+	33:   _NodeType_name[573:581],
+	34:   _NodeType_name[581:590],
+	35:   _NodeType_name[590:598],
+	36:   _NodeType_name[598:613],
+	37:   _NodeType_name[613:629],
+	38:   _NodeType_name[629:642],
+	39:   _NodeType_name[642:656],
+	40:   _NodeType_name[656:668],
+	41:   _NodeType_name[668:680],
+	42:   _NodeType_name[680:693],
+	43:   _NodeType_name[693:706],
+	44:   _NodeType_name[706:720],
+	100:  _NodeType_name[720:742],
+	101:  _NodeType_name[742:759],
+	102:  _NodeType_name[759:787],
+	103:  _NodeType_name[787:816],
+	104:  _NodeType_name[816:844],
+	105:  _NodeType_name[844:873],
+	106:  _NodeType_name[873:882],
+	107:  _NodeType_name[882:895],
+	108:  _NodeType_name[895:907],
+	109:  _NodeType_name[907:920],
+	200:  _NodeType_name[920:929],
+	201:  _NodeType_name[929:945],
+	202:  _NodeType_name[945:957],
+	203:  _NodeType_name[957:971],
+	300:  _NodeType_name[971:984],
+	301:  _NodeType_name[984:1007],
+	302:  _NodeType_name[1007:1027],
+	303:  _NodeType_name[1027:1051],
+	304:  _NodeType_name[1051:1065],
+	305:  _NodeType_name[1065:1089],
+	306:  _NodeType_name[1089:1110],
+	307:  _NodeType_name[1110:1135],
+	400:  _NodeType_name[1135:1148],
+	401:  _NodeType_name[1148:1168],
+	405:  _NodeType_name[1168:1183],
+	410:  _NodeType_name[1183:1199],
+	411:  _NodeType_name[1199:1215],
+	415:  _NodeType_name[1215:1222],
+	420:  _NodeType_name[1222:1235],
+	425:  _NodeType_name[1235:1254],
+	1024: _NodeType_name[1254:1268],
+}
 
 func (i NodeType) String() string {
-	switch {
-	case 0 <= i && i <= 44:
-		return _NodeType_name_0[_NodeType_index_0[i]:_NodeType_index_0[i+1]]
-	case 100 <= i && i <= 109:
-		i -= 100
-		return _NodeType_name_1[_NodeType_index_1[i]:_NodeType_index_1[i+1]]
-	case 200 <= i && i <= 203:
-		i -= 200
-		return _NodeType_name_2[_NodeType_index_2[i]:_NodeType_index_2[i+1]]
-	case 300 <= i && i <= 307:
-		i -= 300
-		return _NodeType_name_3[_NodeType_index_3[i]:_NodeType_index_3[i+1]]
-	case 400 <= i && i <= 402:
-		i -= 400
-		return _NodeType_name_4[_NodeType_index_4[i]:_NodeType_index_4[i+1]]
-	case 500 <= i && i <= 501:
-		i -= 500
-		return _NodeType_name_5[_NodeType_index_5[i]:_NodeType_index_5[i+1]]
-	case i == 600:
-		return _NodeType_name_6
-	case i == 700:
-		return _NodeType_name_7
-	case i == 1024:
-		return _NodeType_name_8
-	default:
-		return "NodeType(" + strconv.FormatInt(int64(i), 10) + ")"
+	if str, ok := _NodeType_map[i]; ok {
+		return str
 	}
+	return "NodeType(" + strconv.FormatInt(int64(i), 10) + ")"
 }

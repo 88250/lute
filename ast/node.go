@@ -394,20 +394,24 @@ const (
 
 	// Vditor 支持
 
-	NodeVditorCaret NodeType = 402 // 插入符，某些情况下需要使用该节点进行插入符位置调整
+	NodeVditorCaret NodeType = 405 // 插入符，某些情况下需要使用该节点进行插入符位置调整
 
 	// 脚注
 
-	NodeFootnotesDef NodeType = 500 // 脚注定义 [^label]:
-	NodeFootnotesRef NodeType = 501 // 脚注引用 [^label]
+	NodeFootnotesDef NodeType = 410 // 脚注定义 [^label]:
+	NodeFootnotesRef NodeType = 411 // 脚注引用 [^label]
 
 	// 目录
 
-	NodeToC NodeType = 600 // 目录 [toc]
+	NodeToC NodeType = 415 // 目录 [toc]
 
 	// 标题
 
-	NodeHeadingID NodeType = 700 // 标题 ID # foo {id}
+	NodeHeadingID NodeType = 420 // 标题 ID # foo {id}
+
+	// YAML Front Matter
+
+	NodeYamlFrontMatter NodeType = 425 // https://jekyllrb.com/docs/front-matter/
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
