@@ -122,7 +122,7 @@ func (context *Context) findNextNonspace() {
 	context.nextNonspace = i
 	context.nextNonspaceColumn = cols
 	context.indent = context.nextNonspaceColumn - context.column
-	context.indented = context.indent >= 4
+	context.indented = 4 <= context.indent
 }
 
 // closeUnmatchedBlocks 最终化所有未匹配的块节点。
