@@ -134,7 +134,6 @@ func (r *VditorIRRenderer) Render() (output []byte) {
 	return
 }
 
-
 func (r *VditorIRRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "yaml-front-matter-close-marker"}}, false)
 	r.Write(parse.YamlFrontMatterMarker)
@@ -696,7 +695,7 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 		if strings.Contains(text, util.Caret) || needResetCaret {
 			class += " vditor-ir__node--expand"
 		}
-		r.tag("span", [][]string{{"class", class}}, false)
+		r.tag("span", [][]string{{"class", class}, {"data-type", "img"}}, false)
 	} else {
 		if needResetCaret {
 			r.WriteString(util.Caret)
@@ -1238,6 +1237,8 @@ func (r *VditorIRRenderer) renderDivNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "html-block"})
 	case ast.NodeMathBlock:
 		attrs = append(attrs, []string{"data-type", "math-block"})
+	case ast.NodeYamlFrontMatter:
+		attrs = append(attrs, []string{"data-type", "yaml-front-matter"})
 	}
 
 	if strings.Contains(text, util.Caret) {
@@ -1255,7 +1256,7 @@ func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
-			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias:
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeYamlFrontMatterContent, ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias:
 				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
 				ret += string(n.CodeBlockInfo)

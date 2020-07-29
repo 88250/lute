@@ -325,7 +325,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	dataType := lute.domAttrValue(n, "data-type")
 
 	if atom.Div == n.DataAtom {
-		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType {
+		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType || "yaml-front-matter" == dataType {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				lute.genASTByVditorDOM(c, tree)
 			}
@@ -546,6 +546,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
 				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: codeTokens})
 				node.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
+				tree.Context.Tip.AppendChild(node)
+			case "yaml-front-matter":
+				node.Type = ast.NodeYamlFrontMatter
+				node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterOpenMarker})
+				node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterContent, Tokens: codeTokens})
+				node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterCloseMarker})
 				tree.Context.Tip.AppendChild(node)
 			case "html-block":
 				node.Type = ast.NodeHTMLBlock

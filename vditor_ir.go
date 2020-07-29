@@ -182,7 +182,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 	dataType := lute.domAttrValue(n, "data-type")
 
 	if atom.Div == n.DataAtom {
-		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType {
+		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType || "yaml-front-matter" == dataType {
 			if ("code-block" == dataType || "math-block" == dataType) &&
 				!strings.Contains(lute.domAttrValue(n.FirstChild, "data-type"), "-block-open-marker") {
 				// 处理在结尾 ``` 或者 $$ 后换行的情况
@@ -410,6 +410,10 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			case "html-block":
 				node.Type = ast.NodeHTMLBlock
 				node.Tokens = codeTokens
+				tree.Context.Tip.AppendChild(node)
+			case "yaml-front-matter":
+				node.Type = ast.NodeYamlFrontMatter
+				node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterContent, Tokens: codeTokens})
 				tree.Context.Tip.AppendChild(node)
 			default:
 				node.Type = ast.NodeCodeBlockCode
@@ -649,12 +653,22 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		case "math-block-close-marker":
-			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: []byte("$$")})
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: parse.MathBlockMarker})
 			defer tree.Context.ParentTip()
 			return
 		case "math-block-open-marker":
 			node.Type = ast.NodeMathBlock
-			node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker, Tokens: []byte("$$")})
+			node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker, Tokens: parse.MathBlockMarker})
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			return
+		case "yaml-front-matter-close-marker":
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterCloseMarker, Tokens: parse.YamlFrontMatterMarker})
+			defer tree.Context.ParentTip()
+			return
+		case "yaml-front-matter-open-marker":
+			node.Type = ast.NodeYamlFrontMatter
+			node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterOpenMarker, Tokens: parse.YamlFrontMatterMarker})
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			return
