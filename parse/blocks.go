@@ -362,7 +362,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 YAML Front Matter（---）是否开始
 	func(t *Tree, container *ast.Node) int {
-		if t.Context.indented || nil != t.Root.FirstChild {
+		if !t.Context.Option.YamlFrontMatter || t.Context.indented || nil != t.Root.FirstChild {
 			return 0
 		}
 
