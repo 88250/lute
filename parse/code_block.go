@@ -113,10 +113,10 @@ func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num in
 	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
 	if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	}
-	if context.Option.VditorSV && endCaret {
-		context.Tip.Tokens = bytes.TrimSuffix(context.Tip.Tokens, []byte("\n"))
-		context.Tip.Tokens = append(context.Tip.Tokens, util.CaretTokens...)
+		if endCaret {
+			context.Tip.Tokens = bytes.TrimSuffix(context.Tip.Tokens, []byte("\n"))
+			context.Tip.Tokens = append(context.Tip.Tokens, util.CaretTokens...)
+		}
 	}
 	for _, token := range tokens {
 		if token != openMarker {
