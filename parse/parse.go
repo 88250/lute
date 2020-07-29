@@ -155,6 +155,8 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 		}
 	case ast.NodeMathBlock:
 		context.mathBlockFinalize(block)
+	case ast.NodeYamlFrontMatter:
+		context.yamlFrontMatterFinalize(block)
 	case ast.NodeList:
 		listFinalize(block)
 	}

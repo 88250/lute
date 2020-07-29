@@ -284,14 +284,13 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
 	switch n.Type {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
 	case NodeFootnotesDef:
 		return NodeFootnotesDef != nodeType // 脚注不能包含脚注
 	}
-
 	return NodeListItem != nodeType
 }
 
@@ -411,7 +410,10 @@ const (
 
 	// YAML Front Matter
 
-	NodeYamlFrontMatter NodeType = 425 // https://jekyllrb.com/docs/front-matter/
+	NodeYamlFrontMatter            NodeType = 425 // https://jekyllrb.com/docs/front-matter/
+	NodeYamlFrontMatterOpenMarker  NodeType = 426 // 开始 YAML Front Matter 标记符 ---
+	NodeYamlFrontMatterContent     NodeType = 427 // YAML Front Matter 内容
+	NodeYamlFrontMatterCloseMarker NodeType = 428 // 结束 YAML Front Matter 标记符 ---
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

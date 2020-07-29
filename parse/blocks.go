@@ -491,6 +491,21 @@ var blockStarts = []blockStartFunc{
 		}
 		return 1
 	},
+
+	// 判断 YAML Front Matter（---）是否开始
+	func(t *Tree, container *ast.Node) int {
+		if t.Context.indented || nil != t.Root.FirstChild {
+			return 0
+		}
+
+		if t.parseYamlFrontMatter() {
+			node := &ast.Node{Type: ast.NodeYamlFrontMatter}
+			t.Root.AppendChild(node)
+			t.Context.Tip = node
+			return 2
+		}
+		return 0
+	},
 }
 
 // addLine 用于在当前的末梢节点 context.Tip 上添加迭代行剩余的所有 Tokens。
@@ -521,6 +536,8 @@ func _continue(n *ast.Node, context *Context) int {
 		return BlockquoteContinue(n, context)
 	case ast.NodeMathBlock:
 		return MathBlockContinue(n, context)
+	case ast.NodeYamlFrontMatter:
+		return YamlFrontMatterContinue(n, context)
 	case ast.NodeFootnotesDef:
 		return FootnotesContinue(n, context)
 	case ast.NodeHeading, ast.NodeThematicBreak:
