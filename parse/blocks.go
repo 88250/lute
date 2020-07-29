@@ -206,57 +206,6 @@ type blockStartFunc func(t *Tree, container *ast.Node) int
 // 2：匹配到叶子块
 var blockStarts = []blockStartFunc{
 
-	// 判断脚注定义（[^label]）是否开始
-	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.Footnotes {
-			return 0
-		}
-
-		if t.Context.indented {
-			return 0
-		}
-
-		marker := lex.Peek(t.Context.currentLine, t.Context.nextNonspace)
-		if lex.ItemOpenBracket != marker {
-			return 0
-		}
-		caret := lex.Peek(t.Context.currentLine, t.Context.nextNonspace+1)
-		if lex.ItemCaret != caret {
-			return 0
-		}
-
-		label := []byte{lex.ItemCaret}
-		var token byte
-		var i int
-		for i = t.Context.nextNonspace + 2; i < t.Context.currentLineLen; i++ {
-			token = t.Context.currentLine[i]
-			if lex.ItemSpace == token || lex.ItemNewline == token || lex.ItemTab == token {
-				return 0
-			}
-			if lex.ItemCloseBracket == token {
-				break
-			}
-			label = append(label, token)
-		}
-		if i >= t.Context.currentLineLen {
-			return 0
-		}
-		if lex.ItemColon != t.Context.currentLine[i+1] {
-			return 0
-		}
-		t.Context.advanceOffset(1, false)
-
-		t.Context.closeUnmatchedBlocks()
-		t.Context.advanceOffset(len(label)+2, true)
-		footnotesDef := t.Context.addChild(ast.NodeFootnotesDef, t.Context.nextNonspace)
-		footnotesDef.Tokens = label
-		lowerCaseLabel := bytes.ToLower(label)
-		if _, def := t.Context.FindFootnotesDef(lowerCaseLabel); nil == def {
-			t.Context.FootnotesDefs = append(t.Context.FootnotesDefs, footnotesDef)
-		}
-		return 1
-	},
-
 	// 判断块引用（>）是否开始
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {
@@ -490,6 +439,57 @@ var blockStarts = []blockStartFunc{
 			return 2
 		}
 		return 0
+	},
+
+	// 判断脚注定义（[^label]）是否开始
+	func(t *Tree, container *ast.Node) int {
+		if !t.Context.Option.Footnotes {
+			return 0
+		}
+
+		if t.Context.indented {
+			return 0
+		}
+
+		marker := lex.Peek(t.Context.currentLine, t.Context.nextNonspace)
+		if lex.ItemOpenBracket != marker {
+			return 0
+		}
+		caret := lex.Peek(t.Context.currentLine, t.Context.nextNonspace+1)
+		if lex.ItemCaret != caret {
+			return 0
+		}
+
+		label := []byte{lex.ItemCaret}
+		var token byte
+		var i int
+		for i = t.Context.nextNonspace + 2; i < t.Context.currentLineLen; i++ {
+			token = t.Context.currentLine[i]
+			if lex.ItemSpace == token || lex.ItemNewline == token || lex.ItemTab == token {
+				return 0
+			}
+			if lex.ItemCloseBracket == token {
+				break
+			}
+			label = append(label, token)
+		}
+		if i >= t.Context.currentLineLen {
+			return 0
+		}
+		if lex.ItemColon != t.Context.currentLine[i+1] {
+			return 0
+		}
+		t.Context.advanceOffset(1, false)
+
+		t.Context.closeUnmatchedBlocks()
+		t.Context.advanceOffset(len(label)+2, true)
+		footnotesDef := t.Context.addChild(ast.NodeFootnotesDef, t.Context.nextNonspace)
+		footnotesDef.Tokens = label
+		lowerCaseLabel := bytes.ToLower(label)
+		if _, def := t.Context.FindFootnotesDef(lowerCaseLabel); nil == def {
+			t.Context.FootnotesDefs = append(t.Context.FootnotesDefs, footnotesDef)
+		}
+		return 1
 	},
 }
 
