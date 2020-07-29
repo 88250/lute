@@ -17,11 +17,11 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// emoji 将 node 下文本节点中的 Emoji 别名替换为原生 Unicode 字符。
+// emoji 将 node 下文本节点和链接文本节点中的 Emoji 别名替换为原生 Unicode 字符。
 func (t *Tree) emoji(node *ast.Node) {
 	for child := node.FirstChild; nil != child; {
 		next := child.Next
-		if ast.NodeText == child.Type {
+		if ast.NodeText == child.Type || ast.NodeLinkText == child.Type {
 			t.emoji0(child)
 		} else {
 			t.emoji(child) // 递归处理子节点
