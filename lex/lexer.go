@@ -22,9 +22,7 @@ type Lexer struct {
 
 // NewLexer 创建一个词法分析器。
 func NewLexer(input []byte) (ret *Lexer) {
-	ret = &Lexer{}
-	ret.input = input
-	ret.length = len(input)
+	ret = &Lexer{input: input, length: len(input)}
 	if 0 < ret.length && ItemNewline != ret.input[ret.length-1] {
 		// 以 \n 结尾预处理
 		ret.input = append(ret.input, ItemNewline)
