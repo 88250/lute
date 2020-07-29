@@ -360,6 +360,21 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
+	// 判断 YAML Front Matter（---）是否开始
+	func(t *Tree, container *ast.Node) int {
+		if t.Context.indented || nil != t.Root.FirstChild {
+			return 0
+		}
+
+		if t.parseYamlFrontMatter() {
+			node := &ast.Node{Type: ast.NodeYamlFrontMatter}
+			t.Root.AppendChild(node)
+			t.Context.Tip = node
+			return 2
+		}
+		return 0
+	},
+
 	// 判断分隔线（--- ***）是否开始
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {
@@ -490,21 +505,6 @@ var blockStarts = []blockStartFunc{
 			t.Context.FootnotesDefs = append(t.Context.FootnotesDefs, footnotesDef)
 		}
 		return 1
-	},
-
-	// 判断 YAML Front Matter（---）是否开始
-	func(t *Tree, container *ast.Node) int {
-		if t.Context.indented || nil != t.Root.FirstChild {
-			return 0
-		}
-
-		if t.parseYamlFrontMatter() {
-			node := &ast.Node{Type: ast.NodeYamlFrontMatter}
-			t.Root.AppendChild(node)
-			t.Context.Tip = node
-			return 2
-		}
-		return 0
 	},
 }
 

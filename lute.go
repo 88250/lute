@@ -47,6 +47,7 @@ type Lute struct {
 //  * 修正术语拼写
 //  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
+//  * YAML Front Matter
 func New(opts ...Option) (ret *Lute) {
 	ret = &Lute{Options: NewOptions()}
 	for _, opt := range opts {
@@ -92,6 +93,7 @@ func NewOptions() *parse.Options {
 		VditorCodeBlockPreview:         true,
 		RenderListStyle:                false,
 		ChineseParagraphBeginningSpace: false,
+		YamlFrontMatter:                true,
 	}
 }
 
@@ -307,6 +309,10 @@ func (lute *Lute) SetImageLazyLoading(dataSrc string) {
 
 func (lute *Lute) SetChineseParagraphBeginningSpace(b bool) {
 	lute.ChineseParagraphBeginningSpace = b
+}
+
+func (lute *Lute) SetYamlFrontMatter(b bool) {
+	lute.YamlFrontMatter = b
 }
 
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {

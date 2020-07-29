@@ -39,6 +39,7 @@ func BenchmarkLute(b *testing.B) {
 	luteEngine.FixTermTypo = false
 	luteEngine.ChinesePunct = false
 	luteEngine.Emoji = false
+	luteEngine.YamlFrontMatter = false
 	output := luteEngine.Markdown("spec text", buf)
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)
