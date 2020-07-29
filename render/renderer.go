@@ -252,6 +252,9 @@ func (r *BaseRenderer) setextHeadingLen(node *ast.Node) (ret int) {
 			ret++
 		}
 	}
+	if 0 == ret {
+		ret = 3
+	}
 	return
 }
 
