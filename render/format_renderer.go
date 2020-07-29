@@ -105,6 +105,10 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
+	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
+	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
+	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
+	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
 	return ret
 }
 
@@ -124,6 +128,32 @@ func (r *FormatRenderer) Render() (output []byte) {
 	}
 	output = append(output, buf.Bytes()...)
 	return
+}
+
+func (r *FormatRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(parse.YamlFrontMatterMarker)
+	r.WriteByte(lex.ItemNewline)
+	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(node.Tokens)
+	r.WriteByte(lex.ItemNewline)
+	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(parse.YamlFrontMatterMarker)
+	r.WriteByte(lex.ItemNewline)
+	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Newline()
+	if !entering && !r.isLastNode(r.Tree.Root, node) {
+		r.WriteByte(lex.ItemNewline)
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {

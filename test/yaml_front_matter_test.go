@@ -18,7 +18,7 @@ import (
 
 var yamlFrontMatterTests = []parseTest{
 
-	{"0", "---\ntitle: Hello World\n---\n", ""},
+	{"0", "---\ntitle: Hello World\n---\n", "<div class=\"vditor-yml-front-matter\">title: Hello World</div>\n"},
 }
 
 func TestYamlFrontMatter(t *testing.T) {

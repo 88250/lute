@@ -144,6 +144,10 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
+	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
+	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
+	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
+	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
 	return ret
 }
 
@@ -179,6 +183,38 @@ func (r *VditorSVRenderer) Render() (output []byte) {
 	r.Write(NewlineSV)
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorSVRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Newline()
+	r.tag("span", [][]string{{"data-type", "yaml-front-matter-close-marker"}, {"class", "vditor-sv__marker"}}, false)
+	r.Write(parse.YamlFrontMatterMarker)
+	r.tag("/span", nil, false)
+	r.Newline()
+	r.Write(NewlineSV)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "text"}}, false)
+	tokens := html.EscapeHTML(bytes.TrimSpace(node.Tokens))
+	newline := append([]byte(`<span data-type="padding"></span>`), NewlineSV...)
+	tokens = bytes.ReplaceAll(tokens, []byte("\n"), newline)
+	r.Write(tokens)
+	r.WriteString("</span>")
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "yaml-front-matter-open-marker"}, {"class", "vditor-sv__marker"}}, false)
+	r.Write(parse.YamlFrontMatterMarker)
+	r.tag("/span", nil, false)
+	r.Newline()
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {

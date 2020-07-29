@@ -107,6 +107,10 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
+	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
+	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
+	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
+	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
 	return ret
 }
 
@@ -131,6 +135,49 @@ func (r *VditorRenderer) Render() (output []byte) {
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *VditorRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
+	previewTokens := bytes.TrimSpace(node.Tokens)
+	var preAttrs [][]string
+	if !bytes.Contains(previewTokens, util.CaretTokens) {
+		preAttrs = append(preAttrs, []string{"style", "display: none"})
+	}
+	codeLen := len(previewTokens)
+	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
+	r.tag("pre", preAttrs, false)
+	r.tag("code", [][]string{{"data-type", "yaml-front-matter"}}, false)
+	if codeIsEmpty {
+		r.WriteString(util.FrontEndCaret + "\n")
+	} else {
+		r.Write(html.EscapeHTML(previewTokens))
+	}
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", [][]string{{"data-type", "yaml-front-matter"}, {"class", "language-yaml"}}, false)
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	r.Write(html.EscapeHTML(tokens))
+	r.WriteString("</code></pre>")
+	return ast.WalkStop
+}
+
+func (r *VditorRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *VditorRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString(`<div class="vditor-wysiwyg__block" data-type="yaml-front-matter" data-block="0">`)
+	} else {
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {

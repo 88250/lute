@@ -104,6 +104,10 @@ func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
+	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
+	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
+	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
+	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
 	return ret
 }
 
@@ -128,6 +132,52 @@ func (r *VditorIRRenderer) Render() (output []byte) {
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
+}
+
+
+func (r *VditorIRRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "yaml-front-matter-close-marker"}}, false)
+	r.Write(parse.YamlFrontMatterMarker)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorIRRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
+	node.Tokens = bytes.TrimSpace(node.Tokens)
+	codeLen := len(node.Tokens)
+	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
+	r.tag("pre", [][]string{{"class", "vditor-ir__marker--pre vditor-ir__marker"}}, false)
+	r.tag("code", [][]string{{"data-type", "yaml-front-matter"}, {"class", "language-yaml"}}, false)
+	if codeIsEmpty {
+		r.WriteString(util.FrontEndCaret + "\n")
+	} else {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	r.WriteString("</code></pre>")
+
+	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", [][]string{{"data-type", "yaml-front-matter"}, {"class", "language-yaml"}}, false)
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	r.Write(html.EscapeHTML(tokens))
+	r.WriteString("</code></pre>")
+	return ast.WalkStop
+}
+
+func (r *VditorIRRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"data-type", "yaml-front-matter-open-marker"}}, false)
+	r.Write(parse.YamlFrontMatterMarker)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorIRRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderDivNode(node)
+	} else {
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
@@ -409,7 +459,7 @@ func (r *VditorIRRenderer) renderInlineMath(node *ast.Node, entering bool) ast.W
 
 func (r *VditorIRRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "math-block-close-marker"}}, false)
-	r.WriteString("$$")
+	r.Write(parse.MathBlockMarker)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
@@ -438,7 +488,7 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 
 func (r *VditorIRRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "math-block-open-marker"}}, false)
-	r.WriteString("$$")
+	r.Write(parse.MathBlockMarker)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
