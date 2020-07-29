@@ -51,6 +51,7 @@ func TestSpec(t *testing.T) {
 	luteEngine.FixTermTypo = false
 	luteEngine.ChinesePunct = false
 	luteEngine.Emoji = false
+	luteEngine.YamlFrontMatter = false
 
 	for _, test := range testcases {
 		testName := test.Section + " " + strconv.Itoa(test.Example)

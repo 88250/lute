@@ -31,7 +31,7 @@ var YamlFrontMatterMarkerCaret = util.StrToBytes("---" + util.Caret)
 var YamlFrontMatterMarkerCaretNewline = util.StrToBytes("---" + util.Caret + "\n")
 
 func (context *Context) yamlFrontMatterFinalize(node *ast.Node) {
-	tokens := node.Tokens[4:] // 剔除开头的 ---\n
+	tokens := node.Tokens[3:] // 剔除开头的 ---\n
 	tokens = lex.TrimWhitespace(tokens)
 	if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
 		if bytes.HasSuffix(tokens, YamlFrontMatterMarkerCaret) {
