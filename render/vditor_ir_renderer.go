@@ -145,20 +145,13 @@ func (r *VditorIRRenderer) renderYamlFrontMatterContent(node *ast.Node, entering
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-	r.tag("pre", [][]string{{"class", "vditor-ir__marker--pre vditor-ir__marker"}}, false)
+	r.tag("pre", [][]string{{"class", "vditor-ir__marker--pre"}}, false)
 	r.tag("code", [][]string{{"data-type", "yaml-front-matter"}, {"class", "language-yaml"}}, false)
 	if codeIsEmpty {
 		r.WriteString(util.FrontEndCaret + "\n")
 	} else {
 		r.Write(html.EscapeHTML(node.Tokens))
 	}
-	r.WriteString("</code></pre>")
-
-	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", [][]string{{"data-type", "yaml-front-matter"}, {"class", "language-yaml"}}, false)
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }

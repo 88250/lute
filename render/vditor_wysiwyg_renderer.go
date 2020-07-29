@@ -143,26 +143,15 @@ func (r *VditorRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, enteri
 
 func (r *VditorRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
 	previewTokens := bytes.TrimSpace(node.Tokens)
-	var preAttrs [][]string
-	if !bytes.Contains(previewTokens, util.CaretTokens) {
-		preAttrs = append(preAttrs, []string{"style", "display: none"})
-	}
 	codeLen := len(previewTokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-	r.tag("pre", preAttrs, false)
+	r.tag("pre", nil, false)
 	r.tag("code", [][]string{{"data-type", "yaml-front-matter"}}, false)
 	if codeIsEmpty {
 		r.WriteString(util.FrontEndCaret + "\n")
 	} else {
 		r.Write(html.EscapeHTML(previewTokens))
 	}
-	r.WriteString("</code></pre>")
-
-	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", [][]string{{"data-type", "yaml-front-matter"}, {"class", "language-yaml"}}, false)
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 	return ast.WalkStop
 }

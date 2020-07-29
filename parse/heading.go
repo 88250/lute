@@ -99,18 +99,21 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 
 func (t *Tree) parseSetextHeading() (level int) {
 	ln := lex.TrimWhitespace(t.Context.currentLine)
-	start := 0
-	marker := ln[start]
-	if lex.ItemEqual != marker && lex.ItemHyphen != marker {
-		return
-	}
-
 	var caretInLn bool
 	if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
 		if bytes.Contains(ln, util.CaretTokens) {
 			caretInLn = true
 			ln = bytes.ReplaceAll(ln, util.CaretTokens, nil)
+			if 1 > len(ln) {
+				return
+			}
 		}
+	}
+
+	start := 0
+	marker := ln[start]
+	if lex.ItemEqual != marker && lex.ItemHyphen != marker {
+		return
 	}
 
 	length := len(ln)
@@ -138,6 +141,5 @@ func (t *Tree) parseSetextHeading() (level int) {
 		t.Context.oldtip.Tokens = lex.TrimWhitespace(t.Context.oldtip.Tokens)
 		t.Context.oldtip.AppendTokens(util.CaretTokens)
 	}
-
 	return
 }
