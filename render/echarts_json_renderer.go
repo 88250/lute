@@ -73,7 +73,7 @@ func (r *EChartsJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.Walk
 }
 
 func (r *EChartsJSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("YAML Front Matter\nspan", node)
+	r.leaf("Front Matter\nYAML", node)
 	return ast.WalkStop
 }
 
