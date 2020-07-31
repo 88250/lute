@@ -19,12 +19,12 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// EChartsJSONRenderer 描述了 JSON 渲染器。
+// EChartsJSONRenderer 描述了 ECharts JSON 渲染器。
 type EChartsJSONRenderer struct {
 	*BaseRenderer
 }
 
-// newEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
+// NewEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
 func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
 	ret := &EChartsJSONRenderer{NewBaseRenderer(tree)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
