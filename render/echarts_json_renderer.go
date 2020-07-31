@@ -62,7 +62,8 @@ func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
-
+	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
+	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
 }
@@ -71,28 +72,32 @@ func (r *EChartsJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.Walk
 	return ast.WalkStop
 }
 
+func (r *EChartsJSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("YAML Front Matter\nspan", node)
+	return ast.WalkStop
+}
+
+func (r *EChartsJSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("HTML Entity\nspan", node)
+	return ast.WalkStop
+}
+
 func (r *EChartsJSONRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }
 
 func (r *EChartsJSONRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Blackslash\ndiv", node)
-	}
+	r.leaf("Blackslash\ndiv", node)
 	return ast.WalkStop
 }
 
 func (r *EChartsJSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("ToC\ndiv", node)
-	}
+	r.leaf("ToC\ndiv", node)
 	return ast.WalkStop
 }
 
 func (r *EChartsJSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Footnotes Ref\ndiv", node)
-	}
+	r.leaf("Footnotes Ref\ndiv", node)
 	return ast.WalkStop
 }
 
@@ -109,16 +114,12 @@ func (r *EChartsJSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) 
 }
 
 func (r *EChartsJSONRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Inline Math\nspan", node)
-	}
+	r.leaf("Inline Math\nspan", node)
 	return ast.WalkStop
 }
 
 func (r *EChartsJSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Math Block\ndiv", node)
-	}
+	r.leaf("Math Block\ndiv", node)
 	return ast.WalkStop
 }
 
@@ -353,23 +354,17 @@ func (r *EChartsJSONRenderer) renderThematicBreak(node *ast.Node, entering bool)
 }
 
 func (r *EChartsJSONRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Hard Break\nbr", node)
-	}
+	r.leaf("Hard Break\nbr", node)
 	return ast.WalkStop
 }
 
 func (r *EChartsJSONRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Soft Break\n", node)
-	}
+	r.leaf("Soft Break\n", node)
 	return ast.WalkStop
 }
 
 func (r *EChartsJSONRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Code Block\npre.code", node)
-	}
+	r.leaf("Code Block\npre.code", node)
 	return ast.WalkStop
 }
 
@@ -425,5 +420,6 @@ func (r *EChartsJSONRenderer) ignore(node *ast.Node) bool {
 		ast.NodeStrikethrough1OpenMarker == node.Type || ast.NodeStrikethrough1CloseMarker == node.Type ||
 		ast.NodeStrikethrough2OpenMarker == node.Type || ast.NodeStrikethrough2CloseMarker == node.Type ||
 		ast.NodeMathBlockOpenMarker == node.Type || ast.NodeMathBlockContent == node.Type || ast.NodeMathBlockCloseMarker == node.Type ||
-		ast.NodeInlineMathOpenMarker == node.Type || ast.NodeInlineMathContent == node.Type || ast.NodeInlineMathCloseMarker == node.Type
+		ast.NodeInlineMathOpenMarker == node.Type || ast.NodeInlineMathContent == node.Type || ast.NodeInlineMathCloseMarker == node.Type ||
+		ast.NodeYamlFrontMatterOpenMarker == node.Type || ast.NodeYamlFrontMatterCloseMarker == node.Type || ast.NodeYamlFrontMatterContent == node.Type
 }

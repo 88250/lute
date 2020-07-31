@@ -199,11 +199,11 @@ func (r *VditorIRRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.W
 	if entering {
 		r.renderSpanNode(node)
 		r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "html-entity"}}, false)
-		r.Write(html.EscapeHTML(html.EscapeHTML(node.Tokens)))
+		r.Write(html.EscapeHTML(node.HtmlEntityTokens))
 		r.tag("/code", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 		r.tag("code", nil, false)
-		r.Write(html.UnescapeHTML(node.HtmlEntityTokens))
+		r.Write(node.HtmlEntityTokens)
 		r.tag("/code", nil, false)
 		r.tag("/span", nil, false)
 	} else {

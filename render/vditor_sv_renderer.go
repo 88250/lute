@@ -262,7 +262,7 @@ func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 
 func (r *VditorSVRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--pre"}, {"data-type", "html-entity"}}, false)
-	r.Write(html.EscapeHTML(html.EscapeHTML(node.Tokens)))
+	r.Write(html.EscapeHTML(node.HtmlEntityTokens))
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
