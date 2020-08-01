@@ -204,12 +204,12 @@ func (r *JSONRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) 
 }
 
 func (r *JSONRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Emoji Img\n", node)
+	r.leaf(util.BytesToStr(node.FirstChild.Tokens), node)
 	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Emoji Unicode\n", node)
+	r.leaf(util.BytesToStr(node.FirstChild.Tokens), node)
 	return ast.WalkStop
 }
 
@@ -222,23 +222,23 @@ func (r *JSONRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus
 }
 
 func (r *JSONRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Table Cell\ntd", node)
-	return ast.WalkStop
+	r.renderNode(node, entering)
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Table Row\ntr", node)
-	return ast.WalkStop
+	r.renderNode(node, entering)
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Table Head\nthead", node)
-	return ast.WalkStop
+	r.renderNode(node, entering)
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Table\ntable", node)
-	return ast.WalkStop
+	r.renderNode(node, entering)
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
@@ -317,14 +317,7 @@ func (r *JSONRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *JSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("Link\na", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
+	r.renderNode(node, entering)
 	return ast.WalkContinue
 }
 

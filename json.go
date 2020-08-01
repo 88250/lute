@@ -67,6 +67,8 @@ func (lute *Lute) genASTByJSON(jsonNode interface{}, tree *parse.Tree) {
 		listDataTyp := tree.Context.Tip.ListData.Typ
 		marker := node.Tokens
 		node.ListData = &ast.ListData{Typ: listDataTyp, Marker: marker}
+	case ast.NodeEmojiUnicode, ast.NodeEmojiImg:
+		node.Type = ast.NodeText
 	}
 	tree.Context.Tip.AppendChild(node)
 	tree.Context.Tip = node

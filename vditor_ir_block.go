@@ -17,12 +17,11 @@ import (
 	"time"
 
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/html/atom"
-	"github.com/88250/lute/util"
-
 	"github.com/88250/lute/html"
+	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
+	"github.com/88250/lute/util"
 )
 
 // SpinVditorIRBlockDOM 自旋 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下的编辑。
