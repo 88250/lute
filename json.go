@@ -12,6 +12,7 @@ package lute
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
@@ -55,6 +56,9 @@ func (lute *Lute) genASTByJSON(jsonNode interface{}, tree *parse.Tree) {
 		node.CodeBlockOpenFence = node.Tokens
 	case ast.NodeCodeBlockFenceCloseMarker:
 		node.CodeBlockCloseFence = node.Tokens
+	case ast.NodeHeading:
+		node.HeadingLevel,_ = strconv.Atoi(string(node.Tokens))
+		node.HeadingSetext = n["HeadingSetext"].(bool)
 	}
 	tree.Context.Tip.AppendChild(node)
 	tree.Context.Tip = node

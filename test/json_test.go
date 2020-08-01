@@ -20,6 +20,8 @@ import (
 
 var jsonTests = []parseTest{
 
+	{"7", "foo\n---\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeHeading\",\"Val\":\"2\",\"HeadingSetext\":true,\"Children\":[{\"Type\":\"NodeText\",\"Val\":\"foo\"}]}]}"},
+	{"6", "# foo\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeHeading\",\"Val\":\"1\",\"HeadingSetext\":false,\"Children\":[{\"Type\":\"NodeText\",\"Val\":\"foo\"}]}]}"},
 	{"5", "```\nfoo\n```\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeCodeBlock\",\"IsFencedCodeBlock\":true,\"Children\":[{\"Type\":\"NodeCodeBlockFenceOpenMarker\",\"Val\":\"```\"},{\"Type\":\"NodeCodeBlockFenceInfoMarker\"},{\"Type\":\"NodeCodeBlockCode\",\"Val\":\"foo\\n\"},{\"Type\":\"NodeCodeBlockFenceCloseMarker\",\"Val\":\"```\"}]}]}"},
 	{"4", "`foo`\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeParagraph\",\"Children\":[{\"Type\":\"NodeCodeSpan\",\"Children\":[{\"Type\":\"NodeCodeSpanOpenMarker\",\"Val\":\"`\"},{\"Type\":\"NodeCodeSpanContent\",\"Val\":\"foo\"},{\"Type\":\"NodeCodeSpanCloseMarker\",\"Val\":\"`\"}]}]}]}"},
 	{"3", "**foo** __bar__\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeParagraph\",\"Children\":[{\"Type\":\"NodeStrong\",\"Children\":[{\"Type\":\"NodeStrongA6kOpenMarker\",\"Val\":\"**\"},{\"Type\":\"NodeText\",\"Val\":\"foo\"},{\"Type\":\"NodeStrongA6kCloseMarker\",\"Val\":\"**\"}]},{\"Type\":\"NodeText\",\"Val\":\" \"},{\"Type\":\"NodeStrong\",\"Children\":[{\"Type\":\"NodeStrongU8eOpenMarker\",\"Val\":\"__\"},{\"Type\":\"NodeText\",\"Val\":\"bar\"},{\"Type\":\"NodeStrongU8eCloseMarker\",\"Val\":\"__\"}]}]}]}"},

@@ -60,8 +60,8 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
 	//ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
-	//ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
-	//ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
+	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
+	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
@@ -346,14 +346,25 @@ func (r *JSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkS
 func (r *JSONRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		h := "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]
-		r.val("Heading\n"+h, node)
+		h := headingLevel[node.HeadingLevel:node.HeadingLevel+1]
+		r.val(h, node)
+		r.comma()
+		r.WriteString("\"HeadingSetext\":" + strconv.FormatBool(node.HeadingSetext))
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString(" {" + util.BytesToStr(node.Tokens) + "}")
+	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
