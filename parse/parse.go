@@ -168,7 +168,7 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 func (context *Context) addChildMarker(nodeType ast.NodeType, tokens []byte) (ret *ast.Node) {
 	ret = &ast.Node{Type: nodeType, Tokens: tokens, Close: true}
 	context.Tip.AppendChild(ret)
-	return ret
+	return
 }
 
 // addChild 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.Tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
@@ -181,7 +181,7 @@ func (context *Context) addChild(nodeType ast.NodeType, offset int) (ret *ast.No
 	ret = &ast.Node{Type: nodeType}
 	context.Tip.AppendChild(ret)
 	context.Tip = ret
-	return ret
+	return
 }
 
 // listsMatch 用户判断指定的 listData 和 itemData 是否可归属于同一个列表。
