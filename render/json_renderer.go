@@ -81,10 +81,10 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	//ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
 	//ret.RendererFuncs[ast.NodeLinkTitle] = ret.renderLinkTitle
 	ret.RendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
-	//ret.RendererFuncs[ast.NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
-	//ret.RendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
-	//ret.RendererFuncs[ast.NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
-	//ret.RendererFuncs[ast.NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
+	ret.RendererFuncs[ast.NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
+	ret.RendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
+	ret.RendererFuncs[ast.NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
+	ret.RendererFuncs[ast.NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
 	ret.RendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
 	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
 	ret.RendererFuncs[ast.NodeTableHead] = ret.renderTableHead
@@ -197,7 +197,27 @@ func (r *JSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus
 }
 
 func (r *JSONRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Strikethrough\ndel", node)
+	r.renderNode(node, entering)
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("~", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("~", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("~~", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("~~", node)
 	return ast.WalkStop
 }
 

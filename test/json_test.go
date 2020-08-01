@@ -20,6 +20,7 @@ import (
 
 var jsonTests = []parseTest{
 
+	{"10", "~foo~\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeStrikethrough\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeStrikethrough1OpenMarker\",\"Val\":\"~\"},{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"},{\"ID\":\"\",\"Type\":\"NodeStrikethrough1CloseMarker\",\"Val\":\"~\"}]}]}]}"},
 	{"9", "> foo\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeBlockquote\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"}]}]}]}"},
 	{"8", "* foo\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeList\",\"Val\":\"0\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeListItem\",\"Val\":\"*\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"}]}]}]}]}"},
 	{"7", "foo\n---\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeHeading\",\"Val\":\"2\",\"HeadingSetext\":true,\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"}]}]}"},
