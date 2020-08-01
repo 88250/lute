@@ -20,6 +20,7 @@ import (
 
 var jsonTests = []parseTest{
 
+	{"4", "`foo`\n", "[{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeCodeSpan\",\"children\":[{\"type\":\"NodeCodeSpanOpenMarker\",\"val\":\"`\"},{\"type\":\"NodeCodeSpanContent\",\"val\":\"foo\"},{\"type\":\"NodeCodeSpanCloseMarker\",\"val\":\"`\"}]}]}]"},
 	{"3", "**foo** __bar__\n", "[{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeStrong\",\"children\":[{\"type\":\"NodeStrongA6kOpenMarker\",\"val\":\"**\"},{\"type\":\"NodeText\",\"val\":\"foo\"},{\"type\":\"NodeStrongA6kCloseMarker\",\"val\":\"**\"}]},{\"type\":\"NodeText\",\"val\":\" \"},{\"type\":\"NodeStrong\",\"children\":[{\"type\":\"NodeStrongU8eOpenMarker\",\"val\":\"__\"},{\"type\":\"NodeText\",\"val\":\"bar\"},{\"type\":\"NodeStrongU8eCloseMarker\",\"val\":\"__\"}]}]}]"},
 	{"2", "*foo* _bar_\n", "[{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeEmphasis\",\"children\":[{\"type\":\"NodeEmA6kOpenMarker\",\"val\":\"*\"},{\"type\":\"NodeText\",\"val\":\"foo\"},{\"type\":\"NodeEmA6kCloseMarker\",\"val\":\"*\"}]},{\"type\":\"NodeText\",\"val\":\" \"},{\"type\":\"NodeEmphasis\",\"children\":[{\"type\":\"NodeEmU8eOpenMarker\",\"val\":\"_\"},{\"type\":\"NodeText\",\"val\":\"bar\"},{\"type\":\"NodeEmU8eCloseMarker\",\"val\":\"_\"}]}]}]"},
 	{"1", "foo\n\nbar\n", "[{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeText\",\"val\":\"foo\"}]},{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeText\",\"val\":\"bar\"}]}]"},
@@ -39,7 +40,7 @@ func TestJSON(t *testing.T) {
 		renderer := render.NewFormatRenderer(tree)
 		markdown := util.BytesToStr(renderer.Render())
 		if test.from != markdown {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%s\ngot\n\t%s\noriginal markdown text\n\t%s", test.name, test.to, json, test.from)
+			t.Fatalf("test case [%s] failed\nexpected\n\t%s\ngot\n\t%s\noriginal markdown text\n\t%s", test.name, test.from, markdown, test.from)
 		}
 	}
 }

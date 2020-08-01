@@ -40,10 +40,9 @@ func (lute *Lute) genASTByJSON(jsonNode interface{}, tree *parse.Tree) {
 	typ := n["type"].(string)
 	node := &ast.Node{Type: ast.Str2NodeType(typ)}
 	switch node.Type {
-	case ast.NodeDocument:
-	case ast.NodeParagraph:
-	case ast.NodeText:
+	case ast.NodeText, ast.NodeCodeSpanContent:
 		node.Tokens = util.StrToBytes(n["val"].(string))
+
 	}
 	tree.Context.Tip.AppendChild(node)
 	tree.Context.Tip = node
