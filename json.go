@@ -49,6 +49,7 @@ func (lute *Lute) genASTByJSON(jsonNode interface{}, tree *parse.Tree) {
 	if nil != val {
 		node.Tokens = util.StrToBytes(n["Val"].(string))
 	}
+	node.ID = n["ID"].(string)
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		node.IsFencedCodeBlock = n["IsFencedCodeBlock"].(bool)

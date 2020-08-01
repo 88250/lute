@@ -12,24 +12,23 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
-	"strconv"
-	"strings"
-
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
+	"strconv"
+	"strings"
 )
 
-// VditorIRRenderer 描述了 Vditor Instant-Rendering DOM 渲染器。
-type VditorIRRenderer struct {
+// VditorIRBlockRenderer 描述了 Vditor Instant-Rendering Block DOM 渲染器。
+type VditorIRBlockRenderer struct {
 	*BaseRenderer
 	needRenderFootnotesDef bool
 }
 
-// NewVditorIRRenderer 创建一个 Vditor Instant-Rendering DOM 渲染器。
-func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
+// NewVditorIRBlockRenderer 创建一个 Vditor Instant-Rendering Block DOM 渲染器。
+func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRRenderer {
 	ret := &VditorIRRenderer{BaseRenderer: NewBaseRenderer(tree)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
@@ -111,7 +110,7 @@ func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
 	return ret
 }
 
-func (r *VditorIRRenderer) Render() (output []byte) {
+func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
 	if 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
 		return
@@ -134,14 +133,14 @@ func (r *VditorIRRenderer) Render() (output []byte) {
 	return
 }
 
-func (r *VditorIRRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "yaml-front-matter-close-marker"}}, false)
 	r.Write(parse.YamlFrontMatterMarker)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
@@ -156,14 +155,14 @@ func (r *VditorIRRenderer) renderYamlFrontMatterContent(node *ast.Node, entering
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "yaml-front-matter-open-marker"}}, false)
 	r.Write(parse.YamlFrontMatterMarker)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderDivNode(node)
 	} else {
@@ -172,7 +171,7 @@ func (r *VditorIRRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) 
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
+func (r *VditorIRBlockRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
 	for _, def := range context.FootnotesDefs {
 		r.WriteString("<div data-type=\"footnotes-def\">")
@@ -195,7 +194,7 @@ func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	return r.Writer.Bytes()
 }
 
-func (r *VditorIRRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
 		r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "html-entity"}}, false)
@@ -212,12 +211,12 @@ func (r *VditorIRRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.W
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<span data-type=\"backslash\">")
 		r.WriteString("<span>")
@@ -229,7 +228,7 @@ func (r *VditorIRRenderer) renderBackslash(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 	headings := r.headings()
 	length := len(headings)
 	r.WriteString("<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\">")
@@ -253,14 +252,14 @@ func (r *VditorIRRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if !r.needRenderFootnotesDef {
 		return ast.WalkStop
 	}
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	previousNodeText := node.PreviousNodeText()
 	previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
 	if "" == previousNodeText {
@@ -296,14 +295,14 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "code-block-close-marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--info"}, {"data-type", "code-block-info"}}, false)
 	r.WriteString(parse.Zwsp)
 	r.Write(node.CodeBlockInfo)
@@ -311,14 +310,14 @@ func (r *VditorIRRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bo
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "code-block-open-marker"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderDivNode(node)
 	} else {
@@ -327,7 +326,7 @@ func (r *VditorIRRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	isFenced := node.Parent.IsFencedCodeBlock
@@ -375,11 +374,11 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString("<span data-render=\"2\">")
 	r.Write(node.Tokens)
 	r.WriteString("</span>")
@@ -389,7 +388,7 @@ func (r *VditorIRRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString("<span data-render=\"2\">")
 	r.Write(node.Tokens)
 	r.WriteString("</span>")
@@ -399,7 +398,7 @@ func (r *VditorIRRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
@@ -413,14 +412,14 @@ func (r *VditorIRRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDollar)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
 	tokens := html.EscapeHTML(node.Tokens)
 	r.Write(tokens)
 	r.tag("/code", nil, false)
@@ -432,7 +431,7 @@ func (r *VditorIRRenderer) renderInlineMathContent(node *ast.Node, entering bool
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDollar)
 	r.tag("/span", nil, false)
@@ -440,7 +439,7 @@ func (r *VditorIRRenderer) renderInlineMathOpenMarker(node *ast.Node, entering b
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
 	} else {
@@ -449,14 +448,14 @@ func (r *VditorIRRenderer) renderInlineMath(node *ast.Node, entering bool) ast.W
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "math-block-close-marker"}}, false)
 	r.Write(parse.MathBlockMarker)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
@@ -478,14 +477,14 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "math-block-open-marker"}}, false)
 	r.Write(parse.MathBlockMarker)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderDivNode(node)
 	} else {
@@ -494,7 +493,7 @@ func (r *VditorIRRenderer) renderMathBlock(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
 	tag := "td"
 	if ast.NodeTableHead == node.Parent.Parent.Type {
 		tag = "th"
@@ -523,7 +522,7 @@ func (r *VditorIRRenderer) renderTableCell(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.tag("tr", nil, false)
 	} else {
@@ -532,7 +531,7 @@ func (r *VditorIRRenderer) renderTableRow(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.tag("thead", nil, false)
 	} else {
@@ -544,9 +543,9 @@ func (r *VditorIRRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", node.ID}}, false)
+		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
@@ -556,7 +555,7 @@ func (r *VditorIRRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
 	} else {
@@ -565,7 +564,7 @@ func (r *VditorIRRenderer) renderStrikethrough(node *ast.Node, entering bool) as
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("~")
 	r.tag("/span", nil, false)
@@ -573,7 +572,7 @@ func (r *VditorIRRenderer) renderStrikethrough1OpenMarker(node *ast.Node, enteri
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/s", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("~")
@@ -581,7 +580,7 @@ func (r *VditorIRRenderer) renderStrikethrough1CloseMarker(node *ast.Node, enter
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("~~")
 	r.tag("/span", nil, false)
@@ -589,7 +588,7 @@ func (r *VditorIRRenderer) renderStrikethrough2OpenMarker(node *ast.Node, enteri
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/s", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("~~")
@@ -597,7 +596,7 @@ func (r *VditorIRRenderer) renderStrikethrough2CloseMarker(node *ast.Node, enter
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--title"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
 	r.Write(node.Tokens)
@@ -606,19 +605,19 @@ func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteByte(lex.ItemSpace)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if ast.NodeImage == node.Parent.Type {
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	} else {
@@ -633,21 +632,21 @@ func (r *VditorIRRenderer) renderLinkText(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--paren"}}, false)
 	r.WriteByte(lex.ItemCloseParen)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--paren"}}, false)
 	r.WriteByte(lex.ItemOpenParen)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemCloseBracket)
 	r.tag("/span", nil, false)
@@ -665,21 +664,21 @@ func (r *VditorIRRenderer) renderCloseBracket(node *ast.Node, entering bool) ast
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bracket"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemBang)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, util.CaretTokens)
 
 	if entering {
@@ -721,7 +720,7 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if 3 == node.LinkType {
 			node.ChildByType(ast.NodeOpenParen).Unlink()
@@ -740,7 +739,7 @@ func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkSta
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderDivNode(node)
 	tokens := bytes.TrimSpace(node.Tokens)
 	r.WriteString("<pre class=\"vditor-ir__marker--pre vditor-ir__marker\">")
@@ -760,7 +759,7 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	openKbd := bytes.Equal(node.Tokens, []byte("<kbd>"))
 	closeKbd := bytes.Equal(node.Tokens, []byte("</kbd>"))
 	if openKbd || closeKbd {
@@ -805,7 +804,7 @@ func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.W
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) tagMatchClose(tag string, node *ast.Node) bool {
+func (r *VditorIRBlockRenderer) tagMatchClose(tag string, node *ast.Node) bool {
 	for n := node.Next; nil != n; n = n.Next {
 		if ast.NodeInlineHTML == n.Type && "</"+tag+">" == n.TokensStr() {
 			return true
@@ -814,7 +813,7 @@ func (r *VditorIRRenderer) tagMatchClose(tag string, node *ast.Node) bool {
 	return false
 }
 
-func (r *VditorIRRenderer) tagMatchOpen(tag string, node *ast.Node) bool {
+func (r *VditorIRBlockRenderer) tagMatchOpen(tag string, node *ast.Node) bool {
 	for n := node.Previous; nil != n; n = n.Previous {
 		if ast.NodeInlineHTML == n.Type && "<"+tag+">" == n.TokensStr() {
 			return true
@@ -823,24 +822,24 @@ func (r *VditorIRRenderer) tagMatchOpen(tag string, node *ast.Node) bool {
 	return false
 }
 
-func (r *VditorIRRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
 		return ast.WalkContinue
 	}
 
 	if entering {
-		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}, false)
+		r.tag("p", [][]string{{"data-block", "0"}}, false)
 	} else {
 		r.tag("/p", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if r.Option.AutoSpace {
 		r.Space(node)
 	}
@@ -860,7 +859,7 @@ func (r *VditorIRRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
 	} else {
@@ -869,7 +868,7 @@ func (r *VditorIRRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString(strings.Repeat("`", node.Parent.CodeMarkerLen))
 	if bytes.HasPrefix(node.Next.Tokens, []byte("`")) {
@@ -880,12 +879,12 @@ func (r *VditorIRRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering boo
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/code", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	if bytes.HasSuffix(node.Previous.Tokens, []byte("`")) {
@@ -896,7 +895,7 @@ func (r *VditorIRRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bo
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
 	} else {
@@ -905,7 +904,7 @@ func (r *VditorIRRenderer) renderEmphasis(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
 	r.tag("/span", nil, false)
@@ -913,7 +912,7 @@ func (r *VditorIRRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering b
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/em", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemAsterisk)
@@ -921,7 +920,7 @@ func (r *VditorIRRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering 
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
 	r.tag("/span", nil, false)
@@ -929,7 +928,7 @@ func (r *VditorIRRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/em", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemUnderscore)
@@ -937,7 +936,7 @@ func (r *VditorIRRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, enterin
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
 	} else {
@@ -946,7 +945,7 @@ func (r *VditorIRRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("**")
 	r.tag("/span", nil, false)
@@ -954,7 +953,7 @@ func (r *VditorIRRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bo
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/strong", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("**")
@@ -962,7 +961,7 @@ func (r *VditorIRRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering b
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("__")
 	r.tag("/span", nil, false)
@@ -970,7 +969,7 @@ func (r *VditorIRRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bo
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/strong", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteString("__")
@@ -978,20 +977,20 @@ func (r *VditorIRRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering b
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<blockquote data-block="0" data-node-id"` + node.ID + `">`)
+		r.WriteString(`<blockquote data-block="0">`)
 	} else {
 		r.WriteString("</blockquote>")
 	}
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		text := r.Text(node)
 		headingID := node.ChildByType(ast.NodeHeadingID)
@@ -1001,7 +1000,7 @@ func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
-		r.WriteString(" data-node-id=\"" + node.ID + "\"")
+		r.WriteString(" block-id=\"" + node.ID + "\"")
 
 		var id string
 		if nil != headingID {
@@ -1049,18 +1048,18 @@ func (r *VditorIRRenderer) renderHeading(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"data-type", "heading-id"}, {"class", "vditor-ir__marker"}}, false)
 	r.WriteString(" {" + string(node.Tokens) + "}")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	tag := "ul"
 	if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 		tag = "ol"
@@ -1088,7 +1087,6 @@ func (r *VditorIRRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 			}
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
-		attrs = append(attrs, []string{"data-node-id", node.ID})
 		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
 	} else {
@@ -1097,7 +1095,7 @@ func (r *VditorIRRenderer) renderList(node *ast.Node, entering bool) ast.WalkSta
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		switch node.ListData.Typ {
@@ -1115,7 +1113,6 @@ func (r *VditorIRRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
-		attrs = append(attrs, []string{"data-node-id", node.ID})
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
@@ -1123,7 +1120,7 @@ func (r *VditorIRRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	var attrs [][]string
 	if node.TaskListItemChecked {
 		attrs = append(attrs, []string{"checked", ""})
@@ -1133,7 +1130,7 @@ func (r *VditorIRRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("hr", [][]string{{"data-block", "0"}}, true)
 	if nil != node.Tokens {
 		r.tag("p", [][]string{{"data-block", "0"}}, false)
@@ -1144,17 +1141,17 @@ func (r *VditorIRRenderer) renderThematicBreak(node *ast.Node, entering bool) as
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("br", nil, true)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteByte(lex.ItemNewline)
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) tag(name string, attrs [][]string, selfclosing bool) {
+func (r *VditorIRBlockRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 	if r.DisableTags > 0 {
 		return
 	}
@@ -1172,7 +1169,7 @@ func (r *VditorIRRenderer) tag(name string, attrs [][]string, selfclosing bool) 
 	r.WriteString(">")
 }
 
-func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
+func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 	text := r.Text(node)
 	var attrs [][]string
 
@@ -1224,9 +1221,9 @@ func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 	return
 }
 
-func (r *VditorIRRenderer) renderDivNode(node *ast.Node) {
+func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	text := r.Text(node)
-	attrs := [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}
+	attrs := [][]string{{"data-block", "0"}}
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		attrs = append(attrs, []string{"data-type", "code-block"})
@@ -1249,7 +1246,7 @@ func (r *VditorIRRenderer) renderDivNode(node *ast.Node) {
 	return
 }
 
-func (r *VditorIRRenderer) Text(node *ast.Node) (ret string) {
+func (r *VditorIRBlockRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
