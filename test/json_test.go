@@ -20,6 +20,9 @@ import (
 
 var jsonTests = []parseTest{
 
+	{"25", "[toc]\n\n# foo\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeToC\"},{\"ID\":\"\",\"Type\":\"NodeHeading\",\"Val\":\"1\",\"HeadingSetext\":false,\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"}]}]}"},
+	{"24", "foo\\*\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"},{\"ID\":\"\",\"Type\":\"NodeBackslash\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeBackslashContent\",\"Val\":\"*\"}]}]}]}"},
+	{"23", "&hearts;\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeHTMLEntity\",\"Val\":\"&hearts;\"}]}]}"},
 	{"22", ":octocat:\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeEmojiImg\",\"Val\":\":octocat:\"}]}]}"},
 	{"21", ":heart:\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeEmojiUnicode\",\"Val\":\":heart:\"}]}]}"},
 	{"20", "| foo | bar |\n| - | - |\n| baz | baz2 |\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeTable\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeTableHead\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeTableRow\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeTableCell\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"}]},{\"ID\":\"\",\"Type\":\"NodeTableCell\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"bar\"}]}]}]},{\"ID\":\"\",\"Type\":\"NodeTableRow\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeTableCell\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"baz\"}]},{\"ID\":\"\",\"Type\":\"NodeTableCell\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"baz2\"}]}]}]}]}"},
@@ -47,6 +50,7 @@ var jsonTests = []parseTest{
 
 func TestJSON(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.ToC = true
 
 	for _, test := range jsonTests {
 		json := luteEngine.RenderJSON(test.from)

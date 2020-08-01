@@ -128,22 +128,23 @@ func (r *JSONRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering 
 }
 
 func (r *JSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("HTML Entity\nspan", node)
+	r.leaf(util.BytesToStr(node.HtmlEntityTokens), node)
 	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(util.BytesToStr(node.Tokens), node)
 	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Blackslash\ndiv", node)
-	return ast.WalkStop
+	r.renderNode(node, entering)
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("ToC\ndiv", node)
-	return ast.WalkStop
+	r.renderNode(node, entering)
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
