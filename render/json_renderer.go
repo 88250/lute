@@ -329,12 +329,12 @@ func (r *JSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 }
 
 func (r *JSONRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("HTML Block\n", node)
+	r.leaf(util.BytesToStr(node.Tokens), node)
 	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Inline HTML\n", node)
+	r.leaf(util.BytesToStr(node.Tokens), node)
 	return ast.WalkStop
 }
 
@@ -344,23 +344,14 @@ func (r *JSONRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *JSONRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
+	r.renderNode(node, entering)
 	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val(util.BytesToStr(node.Tokens), node)
-		r.closeObj(node)
-	}
+	r.openObj()
+	r.val(util.BytesToStr(node.Tokens), node)
+	r.closeObj(node)
 	return ast.WalkStop
 }
 
@@ -435,14 +426,7 @@ func (r *JSONRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool)
 }
 
 func (r *JSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
+	r.renderNode(node, entering)
 	return ast.WalkContinue
 }
 
@@ -515,19 +499,17 @@ func (r *JSONRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) a
 }
 
 func (r *JSONRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Thematic Break\nhr", node)
-	}
+	r.leaf("", node)
 	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Hard Break\nbr", node)
+	r.leaf("", node)
 	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Soft Break\n", node)
+	r.leaf("", node)
 	return ast.WalkStop
 }
 

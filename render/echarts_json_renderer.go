@@ -227,22 +227,20 @@ func (r *EChartsJSONRenderer) renderParagraph(node *ast.Node, entering bool) ast
 }
 
 func (r *EChartsJSONRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		text := util.BytesToStr(node.Tokens)
-		var i int
-		summary := ""
-		for _, r := range text {
-			i++
-			summary += string(r)
-			if 4 < i {
-				summary += "..."
-				break
-			}
+	text := util.BytesToStr(node.Tokens)
+	var i int
+	summary := ""
+	for _, r := range text {
+		i++
+		summary += string(r)
+		if 4 < i {
+			summary += "..."
+			break
 		}
-		r.openObj()
-		r.val("Text\n"+summary, node)
-		r.closeObj(node)
 	}
+	r.openObj()
+	r.val("Text\n"+summary, node)
+	r.closeObj(node)
 	return ast.WalkStop
 }
 
@@ -347,9 +345,7 @@ func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *ast.Node, entering 
 }
 
 func (r *EChartsJSONRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Thematic Break\nhr", node)
-	}
+	r.leaf("Thematic Break\nhr", node)
 	return ast.WalkStop
 }
 
