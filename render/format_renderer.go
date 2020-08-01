@@ -578,7 +578,7 @@ func (r *FormatRenderer) renderMathBlock(node *ast.Node, entering bool) ast.Walk
 
 func (r *FormatRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
-	r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
+	r.Write(node.Tokens)
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
 		r.WriteByte(lex.ItemNewline)
@@ -598,7 +598,7 @@ func (r *FormatRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool
 }
 
 func (r *FormatRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, node.CodeBlockFenceLen))
+	r.Write(node.Tokens)
 	return ast.WalkStop
 }
 

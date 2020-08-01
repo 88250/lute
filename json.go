@@ -21,15 +21,20 @@ import (
 
 // ParseJSON 用于解析 jsonStr 生成 Markdown 抽象语法树。
 func (lute *Lute) ParseJSON(jsonStr string) (ret *parse.Tree) {
-	var children []map[string]interface{}
-	err := json.Unmarshal(util.StrToBytes(jsonStr), &children)
+	var root map[string]interface{}
+	err := json.Unmarshal(util.StrToBytes(jsonStr), &root)
 	if nil != err {
 		return
 	}
 
 	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
 	ret.Context.Tip = ret.Root
-	for _, child := range children {
+	children := root["Children"]
+	if nil == children {
+		return
+	}
+	childNodes := children.([]interface{})
+	for _, child := range childNodes {
 		lute.genASTByJSON(child, ret)
 	}
 	return
@@ -37,21 +42,28 @@ func (lute *Lute) ParseJSON(jsonStr string) (ret *parse.Tree) {
 
 func (lute *Lute) genASTByJSON(jsonNode interface{}, tree *parse.Tree) {
 	n := jsonNode.(map[string]interface{})
-	typ := n["type"].(string)
+	typ := n["Type"].(string)
 	node := &ast.Node{Type: ast.Str2NodeType(typ)}
+	val := n["Val"]
+	if nil != val {
+		node.Tokens = util.StrToBytes(n["Val"].(string))
+	}
 	switch node.Type {
-	case ast.NodeText, ast.NodeCodeSpanContent:
-		node.Tokens = util.StrToBytes(n["val"].(string))
-
+	case ast.NodeCodeBlock:
+		node.IsFencedCodeBlock = n["IsFencedCodeBlock"].(bool)
+	case ast.NodeCodeBlockFenceOpenMarker:
+		node.CodeBlockOpenFence = node.Tokens
+	case ast.NodeCodeBlockFenceCloseMarker:
+		node.CodeBlockCloseFence = node.Tokens
 	}
 	tree.Context.Tip.AppendChild(node)
 	tree.Context.Tip = node
 	defer tree.Context.ParentTip()
 
-	if nil == n["children"] {
+	if nil == n["Children"] {
 		return
 	}
-	children := n["children"].([]interface{})
+	children := n["Children"].([]interface{})
 	for _, child := range children {
 		lute.genASTByJSON(child, tree)
 	}

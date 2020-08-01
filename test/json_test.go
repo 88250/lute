@@ -20,11 +20,12 @@ import (
 
 var jsonTests = []parseTest{
 
-	{"4", "`foo`\n", "[{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeCodeSpan\",\"children\":[{\"type\":\"NodeCodeSpanOpenMarker\",\"val\":\"`\"},{\"type\":\"NodeCodeSpanContent\",\"val\":\"foo\"},{\"type\":\"NodeCodeSpanCloseMarker\",\"val\":\"`\"}]}]}]"},
-	{"3", "**foo** __bar__\n", "[{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeStrong\",\"children\":[{\"type\":\"NodeStrongA6kOpenMarker\",\"val\":\"**\"},{\"type\":\"NodeText\",\"val\":\"foo\"},{\"type\":\"NodeStrongA6kCloseMarker\",\"val\":\"**\"}]},{\"type\":\"NodeText\",\"val\":\" \"},{\"type\":\"NodeStrong\",\"children\":[{\"type\":\"NodeStrongU8eOpenMarker\",\"val\":\"__\"},{\"type\":\"NodeText\",\"val\":\"bar\"},{\"type\":\"NodeStrongU8eCloseMarker\",\"val\":\"__\"}]}]}]"},
-	{"2", "*foo* _bar_\n", "[{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeEmphasis\",\"children\":[{\"type\":\"NodeEmA6kOpenMarker\",\"val\":\"*\"},{\"type\":\"NodeText\",\"val\":\"foo\"},{\"type\":\"NodeEmA6kCloseMarker\",\"val\":\"*\"}]},{\"type\":\"NodeText\",\"val\":\" \"},{\"type\":\"NodeEmphasis\",\"children\":[{\"type\":\"NodeEmU8eOpenMarker\",\"val\":\"_\"},{\"type\":\"NodeText\",\"val\":\"bar\"},{\"type\":\"NodeEmU8eCloseMarker\",\"val\":\"_\"}]}]}]"},
-	{"1", "foo\n\nbar\n", "[{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeText\",\"val\":\"foo\"}]},{\"type\":\"NodeParagraph\",\"children\":[{\"type\":\"NodeText\",\"val\":\"bar\"}]}]"},
-	{"0", "\n", "[]"},
+	{"5", "```\nfoo\n```\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeCodeBlock\",\"IsFencedCodeBlock\":true,\"Children\":[{\"Type\":\"NodeCodeBlockFenceOpenMarker\",\"Val\":\"```\"},{\"Type\":\"NodeCodeBlockFenceInfoMarker\"},{\"Type\":\"NodeCodeBlockCode\",\"Val\":\"foo\\n\"},{\"Type\":\"NodeCodeBlockFenceCloseMarker\",\"Val\":\"```\"}]}]}"},
+	{"4", "`foo`\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeParagraph\",\"Children\":[{\"Type\":\"NodeCodeSpan\",\"Children\":[{\"Type\":\"NodeCodeSpanOpenMarker\",\"Val\":\"`\"},{\"Type\":\"NodeCodeSpanContent\",\"Val\":\"foo\"},{\"Type\":\"NodeCodeSpanCloseMarker\",\"Val\":\"`\"}]}]}]}"},
+	{"3", "**foo** __bar__\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeParagraph\",\"Children\":[{\"Type\":\"NodeStrong\",\"Children\":[{\"Type\":\"NodeStrongA6kOpenMarker\",\"Val\":\"**\"},{\"Type\":\"NodeText\",\"Val\":\"foo\"},{\"Type\":\"NodeStrongA6kCloseMarker\",\"Val\":\"**\"}]},{\"Type\":\"NodeText\",\"Val\":\" \"},{\"Type\":\"NodeStrong\",\"Children\":[{\"Type\":\"NodeStrongU8eOpenMarker\",\"Val\":\"__\"},{\"Type\":\"NodeText\",\"Val\":\"bar\"},{\"Type\":\"NodeStrongU8eCloseMarker\",\"Val\":\"__\"}]}]}]}"},
+	{"2", "*foo* _bar_\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeParagraph\",\"Children\":[{\"Type\":\"NodeEmphasis\",\"Children\":[{\"Type\":\"NodeEmA6kOpenMarker\",\"Val\":\"*\"},{\"Type\":\"NodeText\",\"Val\":\"foo\"},{\"Type\":\"NodeEmA6kCloseMarker\",\"Val\":\"*\"}]},{\"Type\":\"NodeText\",\"Val\":\" \"},{\"Type\":\"NodeEmphasis\",\"Children\":[{\"Type\":\"NodeEmU8eOpenMarker\",\"Val\":\"_\"},{\"Type\":\"NodeText\",\"Val\":\"bar\"},{\"Type\":\"NodeEmU8eCloseMarker\",\"Val\":\"_\"}]}]}]}"},
+	{"1", "foo\n\nbar\n", "{\"Type\":\"NodeDocument\",\"Children\":[{\"Type\":\"NodeParagraph\",\"Children\":[{\"Type\":\"NodeText\",\"Val\":\"foo\"}]},{\"Type\":\"NodeParagraph\",\"Children\":[{\"Type\":\"NodeText\",\"Val\":\"bar\"}]}]}"},
+	{"0", "\n", "{\"Type\":\"NodeDocument\"}"},
 }
 
 func TestJSON(t *testing.T) {
@@ -33,14 +34,14 @@ func TestJSON(t *testing.T) {
 	for _, test := range jsonTests {
 		json := luteEngine.RenderJSON(test.from)
 		if test.to != json {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%s\ngot\n\t%s\noriginal markdown text\n\t%s", test.name, test.to, json, test.from)
+			t.Fatalf("test case [%s] failed\nexpected\n\t%s\ngot\n\t%s\noriginal markdown text\n\t%q", test.name, test.to, json, test.from)
 		}
 
 		tree := luteEngine.ParseJSON(json)
 		renderer := render.NewFormatRenderer(tree)
 		markdown := util.BytesToStr(renderer.Render())
 		if test.from != markdown {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%s\ngot\n\t%s\noriginal markdown text\n\t%s", test.name, test.from, markdown, test.from)
+			t.Fatalf("test case [%s] failed\nexpected\n\t%s\ngot\n\t%s\noriginal markdown text\n\t%q", test.name, test.from, markdown, test.from)
 		}
 	}
 }
