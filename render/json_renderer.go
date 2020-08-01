@@ -48,15 +48,15 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	//ret.RendererFuncs[ast.NodeInlineMathContent] = ret.renderInlineMathContent
 	//ret.RendererFuncs[ast.NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
 	ret.RendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
-	//ret.RendererFuncs[ast.NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
-	//ret.RendererFuncs[ast.NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
-	//ret.RendererFuncs[ast.NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
-	//ret.RendererFuncs[ast.NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
+	ret.RendererFuncs[ast.NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
+	ret.RendererFuncs[ast.NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
+	ret.RendererFuncs[ast.NodeEmU8eOpenMarker] = ret.renderEmUnderscoreOpenMarker
+	ret.RendererFuncs[ast.NodeEmU8eCloseMarker] = ret.renderEmUnderscoreCloseMarker
 	ret.RendererFuncs[ast.NodeStrong] = ret.renderStrong
-	//ret.RendererFuncs[ast.NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
-	//ret.RendererFuncs[ast.NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
-	//ret.RendererFuncs[ast.NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
-	//ret.RendererFuncs[ast.NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
+	ret.RendererFuncs[ast.NodeStrongA6kOpenMarker] = ret.renderStrongA6kOpenMarker
+	ret.RendererFuncs[ast.NodeStrongA6kCloseMarker] = ret.renderStrongA6kCloseMarker
+	ret.RendererFuncs[ast.NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
+	ret.RendererFuncs[ast.NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
 	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
 	//ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
@@ -276,7 +276,7 @@ func (r *JSONRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkSta
 func (r *JSONRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("Emphasis\nem", node)
+		r.val("", node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -285,16 +285,72 @@ func (r *JSONRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkSta
 	return ast.WalkContinue
 }
 
+func (r *JSONRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.openObj()
+	r.val("*", node)
+	r.closeObj(node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.openObj()
+	r.val("*", node)
+	r.closeObj(node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.openObj()
+	r.val("_", node)
+	r.closeObj(node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.openObj()
+	r.val("_", node)
+	r.closeObj(node)
+	return ast.WalkStop
+}
+
 func (r *JSONRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("Strong\nstrong", node)
+		r.val("", node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.openObj()
+	r.val("**", node)
+	r.closeObj(node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.openObj()
+	r.val("**", node)
+	r.closeObj(node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.openObj()
+	r.val("__", node)
+	r.closeObj(node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.openObj()
+	r.val("__", node)
+	r.closeObj(node)
+	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
