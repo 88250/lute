@@ -71,15 +71,15 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
 	ret.RendererFuncs[ast.NodeLink] = ret.renderLink
 	ret.RendererFuncs[ast.NodeImage] = ret.renderImage
-	//ret.RendererFuncs[ast.NodeBang] = ret.renderBang
-	//ret.RendererFuncs[ast.NodeOpenBracket] = ret.renderOpenBracket
-	//ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
-	//ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
-	//ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
-	//ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
-	//ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
-	//ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
-	//ret.RendererFuncs[ast.NodeLinkTitle] = ret.renderLinkTitle
+	ret.RendererFuncs[ast.NodeBang] = ret.renderBang
+	ret.RendererFuncs[ast.NodeOpenBracket] = ret.renderOpenBracket
+	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
+	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
+	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
+	ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
+	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
+	ret.RendererFuncs[ast.NodeLinkTitle] = ret.renderLinkTitle
 	ret.RendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
 	ret.RendererFuncs[ast.NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
 	ret.RendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
@@ -252,15 +252,53 @@ func (r *JSONRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering 
 }
 
 func (r *JSONRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("Image\nimg", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
+	r.renderNode(node, entering)
 	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(")", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("(", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("]", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("[", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("!", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(util.BytesToStr(node.Tokens), node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(util.BytesToStr(node.Tokens), node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(" ", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(util.BytesToStr(node.Tokens), node)
+	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
