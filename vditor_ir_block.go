@@ -12,16 +12,14 @@ package lute
 
 import (
 	"bytes"
-	"strconv"
-	"strings"
-	"time"
-
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
+	"strconv"
+	"strings"
 )
 
 // SpinVditorIRBlockDOM 自旋 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下的编辑。
@@ -172,11 +170,6 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) nodeID() string {
-	t := time.Now().UnixNano() / 1000
-	return strconv.FormatInt(t, 10)
-}
-
 // genASTByVditorIRBlockDOM 根据指定的 Vditor IR DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	dataRender := lute.domAttrValue(n, "data-render")
@@ -186,9 +179,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 
 	dataType := lute.domAttrValue(n, "data-type")
 	nodeID := lute.domAttrValue(n, "data-node-id")
-	if "" == nodeID {
-		nodeID = lute.nodeID()
-	}
 
 	if atom.Div == n.DataAtom {
 		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType || "yaml-front-matter" == dataType {

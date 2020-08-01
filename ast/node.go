@@ -112,6 +112,16 @@ type ListData struct {
 	Num          int    // 有序列表项修正过的序号
 }
 
+// IDStr 返回 n 的 ID。
+func (n *Node) IDStr() string {
+	// TODO 节点 ID 生成
+	//if "" == n.ID {
+	//	t := time.Now().UnixNano() / 1000
+	//	n.ID = strconv.FormatInt(t, 10)
+	//}
+	return n.ID
+}
+
 // TokensStr 返回 n 的 Tokens 字符串。
 func (n *Node) TokensStr() string {
 	return util.BytesToStr(n.Tokens)
