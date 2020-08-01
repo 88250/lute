@@ -148,14 +148,14 @@ func (r *JSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 }
 
 func (r *JSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Footnotes Ref\ndiv", node)
+	r.leaf(util.BytesToStr(node.FootnotesRefLabel), node)
 	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("Footnotes Def\np", node)
+		r.val(util.BytesToStr(node.Tokens), node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
