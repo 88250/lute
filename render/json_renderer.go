@@ -238,12 +238,7 @@ func (r *JSONRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkS
 func (r *JSONRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemOpenBracket)
-		r.openObj()
-		r.val("", node)
-		r.openChildren(node)
 	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
 		r.WriteByte(lex.ItemCloseBracket)
 	}
 	return ast.WalkContinue
@@ -401,7 +396,6 @@ func (r *JSONRenderer) leaf(val string, node *ast.Node) {
 
 func (r *JSONRenderer) val(val string, node *ast.Node) {
 	typ := node.Type.String()
-	typ = typ[len("Node"):]
 	r.WriteString("\"type\":\"" + typ + "\"")
 	if "" != val {
 		r.WriteString(",")
