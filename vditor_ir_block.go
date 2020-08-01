@@ -25,8 +25,8 @@ import (
 	"github.com/88250/lute/render"
 )
 
-// SpinVditorBlockDOM 自旋 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下的编辑。
-func (lute *Lute) SpinVditorBlockDOM(ivHTML string) (ovHTML string) {
+// SpinVditorIRBlockDOM 自旋 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下的编辑。
+func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = false
 	lute.VditorSV = false
