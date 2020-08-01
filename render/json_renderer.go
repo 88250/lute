@@ -101,14 +101,29 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
-	//ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
-	//ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
-	//ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
+	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
+	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
+	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
 	return ret
 }
 
 func (r *JSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Front Matter\nYAML", node)
+	r.renderNode(node, entering)
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(string(parse.YamlFrontMatterMarker), node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(util.BytesToStr(node.Tokens), node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(string(parse.YamlFrontMatterMarker), node)
 	return ast.WalkStop
 }
 
