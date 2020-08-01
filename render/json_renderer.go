@@ -469,8 +469,8 @@ func (r *JSONRenderer) leaf(val string, node *ast.Node) {
 }
 
 func (r *JSONRenderer) val(val string, node *ast.Node) {
-	id := node.Id
-	r.WriteString("\"Id\":\"" + id + "\"")
+	id := node.ID
+	r.WriteString("\"ID\":\"" + id + "\"")
 	r.comma()
 	typ := node.Type.String()
 	r.WriteString("\"Type\":\"" + typ + "\"")

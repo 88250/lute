@@ -12,13 +12,14 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
+	"strconv"
+	"strings"
+
+	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
-	"strconv"
-	"strings"
 )
 
 // VditorIRBlockRenderer 描述了 Vditor Instant-Rendering Block DOM 渲染器。
@@ -28,8 +29,8 @@ type VditorIRBlockRenderer struct {
 }
 
 // NewVditorIRBlockRenderer 创建一个 Vditor Instant-Rendering Block DOM 渲染器。
-func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRRenderer {
-	ret := &VditorIRRenderer{BaseRenderer: NewBaseRenderer(tree)}
+func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
+	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -545,7 +546,7 @@ func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) a
 
 func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}}, false)
+		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", node.ID}}, false)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
@@ -832,7 +833,7 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 	}
 
 	if entering {
-		r.tag("p", [][]string{{"data-block", "0"}}, false)
+		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}, false)
 	} else {
 		r.tag("/p", nil, false)
 	}
@@ -979,7 +980,7 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<blockquote data-block="0">`)
+		r.WriteString(`<blockquote data-block="0" data-node-id"` + node.ID + `">`)
 	} else {
 		r.WriteString("</blockquote>")
 	}
@@ -1000,7 +1001,7 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
-		r.WriteString(" block-id=\"" + node.ID + "\"")
+		r.WriteString(" data-node-id=\"" + node.ID + "\"")
 
 		var id string
 		if nil != headingID {
@@ -1087,6 +1088,7 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 			}
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
+		attrs = append(attrs, []string{"data-node-id", node.ID})
 		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
 	} else {
@@ -1113,6 +1115,7 @@ func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) as
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
+		attrs = append(attrs, []string{"data-node-id", node.ID})
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
@@ -1223,7 +1226,7 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 
 func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	text := r.Text(node)
-	attrs := [][]string{{"data-block", "0"}}
+	attrs := [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		attrs = append(attrs, []string{"data-type", "code-block"})
