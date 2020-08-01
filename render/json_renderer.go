@@ -58,7 +58,7 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeStrongU8eOpenMarker] = ret.renderStrongU8eOpenMarker
 	ret.RendererFuncs[ast.NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
 	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
-	//ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
+	ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
 	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
@@ -334,13 +334,17 @@ func (r *JSONRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool)
 func (r *JSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("Blockquote\nblockquote", node)
+		r.val("", node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
 		r.closeObj(node)
 	}
 	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
@@ -370,11 +374,7 @@ func (r *JSONRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkSt
 func (r *JSONRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		list := "ul"
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			list = "ol"
-		}
-		r.val("List\n"+list, node)
+		r.val(strconv.Itoa(node.ListData.Typ), node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -386,7 +386,7 @@ func (r *JSONRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 func (r *JSONRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("List Item\nli "+util.BytesToStr(node.ListData.Marker), node)
+		r.val(util.BytesToStr(node.ListData.Marker), node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)

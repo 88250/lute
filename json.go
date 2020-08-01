@@ -58,8 +58,15 @@ func (lute *Lute) genASTByJSON(jsonNode interface{}, tree *parse.Tree) {
 	case ast.NodeCodeBlockFenceCloseMarker:
 		node.CodeBlockCloseFence = node.Tokens
 	case ast.NodeHeading:
-		node.HeadingLevel,_ = strconv.Atoi(string(node.Tokens))
+		node.HeadingLevel, _ = strconv.Atoi(string(node.Tokens))
 		node.HeadingSetext = n["HeadingSetext"].(bool)
+	case ast.NodeList:
+		listDataTyp, _ := strconv.Atoi(string(node.Tokens))
+		node.ListData = &ast.ListData{Typ: listDataTyp}
+	case ast.NodeListItem:
+		listDataTyp := tree.Context.Tip.ListData.Typ
+		marker := node.Tokens
+		node.ListData = &ast.ListData{Typ: listDataTyp, Marker: marker}
 	}
 	tree.Context.Tip.AppendChild(node)
 	tree.Context.Tip = node
