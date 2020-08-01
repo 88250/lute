@@ -20,6 +20,8 @@ import (
 
 var jsonTests = []parseTest{
 
+	{"12", "$\nfoo\n$\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeInlineMath\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeInlineMathOpenMarker\",\"Val\":\"$\"},{\"ID\":\"\",\"Type\":\"NodeInlineMathContent\",\"Val\":\"\\nfoo\\n\"},{\"ID\":\"\",\"Type\":\"NodeInlineMathCloseMarker\",\"Val\":\"$\"}]}]}]}"},
+	{"11", "$$\nfoo\n$$\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeMathBlock\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeMathBlockOpenMarker\",\"Val\":\"$$\"},{\"ID\":\"\",\"Type\":\"NodeMathBlockContent\",\"Val\":\"foo\"},{\"ID\":\"\",\"Type\":\"NodeMathBlockCloseMarker\",\"Val\":\"$$\"}]}]}"},
 	{"10", "~foo~\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeStrikethrough\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeStrikethrough1OpenMarker\",\"Val\":\"~\"},{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"},{\"ID\":\"\",\"Type\":\"NodeStrikethrough1CloseMarker\",\"Val\":\"~\"}]}]}]}"},
 	{"9", "> foo\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeBlockquote\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"}]}]}]}"},
 	{"8", "* foo\n", "{\"ID\":\"\",\"Type\":\"NodeDocument\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeList\",\"Val\":\"0\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeListItem\",\"Val\":\"*\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeParagraph\",\"Children\":[{\"ID\":\"\",\"Type\":\"NodeText\",\"Val\":\"foo\"}]}]}]}]}"},

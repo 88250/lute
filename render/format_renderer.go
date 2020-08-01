@@ -531,7 +531,10 @@ func (r *FormatRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool
 	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+func (r *FormatRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteByte(lex.ItemDollar)
 	return ast.WalkStop
 }
@@ -541,13 +544,9 @@ func (r *FormatRenderer) renderInlineMathContent(node *ast.Node, entering bool) 
 	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteByte(lex.ItemDollar)
 	return ast.WalkStop
-}
-
-func (r *FormatRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {

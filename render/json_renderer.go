@@ -40,13 +40,13 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeCodeBlockCode] = ret.renderCodeBlockCode
 	ret.RendererFuncs[ast.NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
 	ret.RendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
-	//ret.RendererFuncs[ast.NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
-	//ret.RendererFuncs[ast.NodeMathBlockContent] = ret.renderMathBlockContent
-	//ret.RendererFuncs[ast.NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
+	ret.RendererFuncs[ast.NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
+	ret.RendererFuncs[ast.NodeMathBlockContent] = ret.renderMathBlockContent
+	ret.RendererFuncs[ast.NodeMathBlockCloseMarker] = ret.renderMathBlockCloseMarker
 	ret.RendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath
-	//ret.RendererFuncs[ast.NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
-	//ret.RendererFuncs[ast.NodeInlineMathContent] = ret.renderInlineMathContent
-	//ret.RendererFuncs[ast.NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
+	ret.RendererFuncs[ast.NodeInlineMathOpenMarker] = ret.renderInlineMathOpenMarker
+	ret.RendererFuncs[ast.NodeInlineMathContent] = ret.renderInlineMathContent
+	ret.RendererFuncs[ast.NodeInlineMathCloseMarker] = ret.renderInlineMathCloseMarker
 	ret.RendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
 	ret.RendererFuncs[ast.NodeEmA6kOpenMarker] = ret.renderEmAsteriskOpenMarker
 	ret.RendererFuncs[ast.NodeEmA6kCloseMarker] = ret.renderEmAsteriskCloseMarker
@@ -149,12 +149,42 @@ func (r *JSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *JSONRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Inline Math\nspan", node)
+	r.renderNode(node, entering)
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("$", node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(util.BytesToStr(node.Tokens), node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("$", node)
 	return ast.WalkStop
 }
 
 func (r *JSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Math Block\ndiv", node)
+	r.renderNode(node, entering)
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(string(parse.MathBlockMarker), node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(util.BytesToStr(node.Tokens), node)
+	return ast.WalkStop
+}
+
+func (r *JSONRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf(string(parse.MathBlockMarker), node)
 	return ast.WalkStop
 }
 
