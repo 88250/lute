@@ -346,7 +346,7 @@ func (r *JSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkS
 func (r *JSONRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		h := headingLevel[node.HeadingLevel:node.HeadingLevel+1]
+		h := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		r.val(h, node)
 		r.comma()
 		r.WriteString("\"HeadingSetext\":" + strconv.FormatBool(node.HeadingSetext))
@@ -469,6 +469,9 @@ func (r *JSONRenderer) leaf(val string, node *ast.Node) {
 }
 
 func (r *JSONRenderer) val(val string, node *ast.Node) {
+	id := node.Id
+	r.WriteString("\"Id\":\"" + id + "\"")
+	r.comma()
 	typ := node.Type.String()
 	r.WriteString("\"Type\":\"" + typ + "\"")
 	if "" != val {
