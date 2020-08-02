@@ -107,7 +107,6 @@ func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, 
 			title = html.UnescapeBytes(title)
 		}
 	}
-
 	return
 }
 
