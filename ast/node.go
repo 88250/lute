@@ -429,10 +429,9 @@ const (
 	// 内容块引用（Block Reference） https://github.com/88250/lute/issues/82
 
 	NodeBlockRef      NodeType = 430 // 内容块节点
-	NodeBlockRefText  NodeType = 431 // 内容块文本
-	NodeBlockRefID    NodeType = 432 // 内容块 ID
-	NodeBlockRefSpace NodeType = 433 // 内容块 ID 和内容块标题之间的空格
-	NodeBlockRefTitle          = 434 // 内容块标题
+	NodeBlockRefID    NodeType = 431 // 内容块 ID
+	NodeBlockRefSpace NodeType = 432 // 内容块 ID 和内容块文本之间的空格
+	NodeBlockRefText           = 433 // 内容块文本
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
