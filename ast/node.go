@@ -426,5 +426,13 @@ const (
 	NodeYamlFrontMatterContent     NodeType = 427 // YAML Front Matter 内容
 	NodeYamlFrontMatterCloseMarker NodeType = 428 // 结束 YAML Front Matter 标记符 ---
 
+	// 内容块引用（Block Reference） https://github.com/88250/lute/issues/82
+
+	NodeBlockRef      NodeType = 430 // 内容块节点
+	NodeBlockRefText  NodeType = 431 // 内容块文本
+	NodeBlockRefID    NodeType = 432 // 内容块 ID
+	NodeBlockRefSpace NodeType = 433 // 内容块 ID 和内容块标题之间的空格
+	NodeBlockRefTitle          = 434 // 内容块标题
+
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
