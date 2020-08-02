@@ -18,6 +18,14 @@ import (
 
 var spinVditorIRBlockDOMTests = []*parseTest{
 
+	{"8", "(( 12345678  \"text\" ))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"12345678\">text</a></p>"},
+	{"7", "(( 12345678  ))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"12345678\">placeholder</a></p>"},
+	{"6", "((12345678 text))\n", "<p data-block=\"0\" data-node-id=\"\">((12345678 text))</p>"},
+	{"5", "((12345678\"text\"))\n", "<p data-block=\"0\" data-node-id=\"\">((12345678&quot;text&quot;))</p>"},
+	{"4", "((12345678 \"text\"))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"12345678\">text</a></p>"},
+	{"3", "((12345678))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"12345678\">placeholder</a></p>"},
+	{"2", "((foo))\n", "<p data-block=\"0\" data-node-id=\"\">((foo))</p>"},
+	{"1", "<p data-block=\"0\" data-node-id=\"1\">foo</p><p data-block=\"0\"><wbr><br></p>", "<p data-block=\"0\" data-node-id=\"\">foo</p><p data-block=\"0\" data-node-id=\"\"><wbr></p>"},
 	{"0", "<p data-block=\"0\" data-node-id=\"1\">foo</p><p data-block=\"0\"><wbr><br></p>", "<p data-block=\"0\" data-node-id=\"\">foo</p><p data-block=\"0\" data-node-id=\"\"><wbr></p>"},
 }
 

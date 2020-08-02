@@ -108,6 +108,10 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
+	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
+	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
+	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
+	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
 	return ret
 }
 
@@ -132,6 +136,35 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
+}
+
+
+func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
+	r.LinkTextAutoSpacePrevious(node)
+	idTokens := node.ChildByType(ast.NodeBlockRefID).Tokens
+	attrs := [][]string{{"href", util.BytesToStr(html.EscapeHTML(idTokens))}}
+	r.tag("a", attrs, false)
+	if text := node.ChildByType(ast.NodeBlockRefText); nil != text && nil != text.Tokens {
+		r.Write(html.EscapeHTML(text.Tokens))
+	} else {
+		// TODO: 查找内容块引用摘要
+		r.WriteString("placeholder")
+	}
+	r.tag("/a", nil, false)
+	r.LinkTextAutoSpaceNext(node)
+	return ast.WalkStop
+}
+
+func (r *VditorIRBlockRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *VditorIRBlockRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *VditorIRBlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
