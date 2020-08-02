@@ -110,7 +110,39 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
+	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
+	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
+	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
+	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
 	return ret
+}
+
+func (r *HtmlRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
+	r.LinkTextAutoSpacePrevious(node)
+	idTokens := node.ChildByType(ast.NodeBlockRefID).Tokens
+	attrs := [][]string{{"href", util.BytesToStr(html.EscapeHTML(idTokens))}}
+	r.tag("a", attrs, false)
+	if text := node.ChildByType(ast.NodeBlockRefText); nil != text && nil != text.Tokens {
+		r.Write(html.EscapeHTML(text.Tokens))
+	} else {
+		// TODO: 查找内容块引用摘要
+		r.WriteString("placeholder")
+	}
+	r.tag("/a", nil, false)
+	r.LinkTextAutoSpaceNext(node)
+	return ast.WalkStop
+}
+
+func (r *HtmlRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *HtmlRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
+}
+
+func (r *HtmlRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkStop
 }
 
 func (r *HtmlRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {

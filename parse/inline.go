@@ -55,6 +55,8 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 			n = t.parseInlineMath(ctx)
 		case lex.ItemOpenCurlyBrace:
 			n = t.parseHeadingID(block, ctx)
+		case lex.ItemOpenParen:
+			n = t.parseBlockRef(ctx)
 		default:
 			n = t.parseText(ctx)
 		}
