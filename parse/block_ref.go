@@ -17,7 +17,7 @@ import (
 
 func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 	tokens := ctx.tokens
-	if 12 > len(tokens) || lex.ItemOpenParen != tokens[0] || lex.ItemOpenParen != ctx.tokens[1] {
+	if 5 > len(tokens) || lex.ItemOpenParen != tokens[0] || lex.ItemOpenParen != ctx.tokens[1] {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: []byte("(")}
 	}
@@ -31,7 +31,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 			break
 		}
 		ctx.pos += len(passed)
-		if passed, remains, id = t.Context.parseBlockRefID(remains); 8 > len(passed) {
+		if passed, remains, id = t.Context.parseBlockRefID(remains); 1 > len(passed) {
 			break
 		}
 		ctx.pos += len(passed)
@@ -92,7 +92,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 		return &ast.Node{Type: ast.NodeText, Tokens: []byte("(")}
 	}
 
-	ctx.pos+=2
+	ctx.pos += 2
 	ret := &ast.Node{Type: ast.NodeBlockRef}
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
@@ -108,31 +108,39 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []byte) {
 	remains = tokens
 	length := len(tokens)
-	if 10 > length {
+	if 1 > length {
 		return
 	}
 
-	passed = make([]byte, 0, 64)
-
-	id = tokens[:8]
-	for i := 0; i < 8; i++ {
-		if !lex.IsASCIILetterNum(id[i]) {
-			return
+	max := 64
+	idLen := length
+	if max < idLen {
+		idLen = max
+	}
+	id = tokens[:idLen]
+	var i int
+	for ; i < idLen; i++ {
+		if !lex.IsASCIILetterNumHyphen(id[i]) {
+			break
 		}
 	}
-
+	remains = id[i:]
+	id = id[:i]
+	if 2 > len(remains) {
+		return
+	}
+	passed = make([]byte, 0, 64)
 	passed = append(passed, id...)
-	closed := lex.ItemCloseParen == tokens[8] && lex.ItemCloseParen == tokens[9]
+	closed := lex.ItemCloseParen == remains[0] && lex.ItemCloseParen == remains[1]
 	if closed {
 		passed = append(passed, []byte("))")...)
-		remains = tokens[10:]
+		remains = tokens[idLen:]
 		return
 	}
 
-	if lex.ItemSpace != tokens[8] && lex.ItemNewline != tokens[8] {
+	if !lex.IsWhitespace(remains[0]) {
 		passed = nil
 		return
 	}
-	remains = tokens[8:]
 	return
 }
