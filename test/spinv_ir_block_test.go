@@ -18,18 +18,10 @@ import (
 
 var spinVditorIRBlockDOMTests = []*parseTest{
 
-	{"13", "<p data-block=\"0\">foo ((bar)) <wbr></p>", "<p data-block=\"0\" data-node-id=\"\">foo <a href=\"bar\">placeholder</a> <wbr></p>"},
-	{"12", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo \"text\")<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\">((foo &quot;text&quot;)<wbr></p>"},
-	{"11", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo \"text\"))<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">text</a><wbr></p>"},
-	{"10", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo))<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">placeholder</a><wbr></p>"},
-	{"9", "((foo_bar))\n", "<p data-block=\"0\" data-node-id=\"\">((foo_bar))</p>"},
-	{"8", "(( foo  \"text\" ))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">text</a></p>"},
-	{"7", "(( foo  ))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">placeholder</a></p>"},
-	{"6", "((foo text))\n", "<p data-block=\"0\" data-node-id=\"\">((foo text))</p>"},
-	{"5", "((foo\"text\"))\n", "<p data-block=\"0\" data-node-id=\"\">((foo&quot;text&quot;))</p>"},
-	{"4", "((foo-bar-123 \"text\"))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo-bar-123\">text</a></p>"},
-	{"3", "((foo-bar))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo-bar\">placeholder</a></p>"},
-	{"2", "((foo))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">placeholder</a></p>"},
+	{"5", "<p data-block=\"0\">foo ((bar)) <wbr></p>", "<p data-block=\"0\" data-node-id=\"\">foo <span data-type=\"block-ref\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span>bar<span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span></span> <wbr></p>"},
+	{"4", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo \"text\")<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\">((foo &quot;text&quot;)<wbr></p>"},
+	{"3", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo \"text\"))<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\"><span data-type=\"block-ref\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span>footext<span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span></span><wbr></p>"},
+	{"2", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo))<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\"><span data-type=\"block-ref\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span>foo<span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span></span><wbr></p>"},
 	{"1", "<p data-block=\"0\" data-node-id=\"1\">foo</p><p data-block=\"0\"><wbr><br></p>", "<p data-block=\"0\" data-node-id=\"\">foo</p><p data-block=\"0\" data-node-id=\"\"><wbr></p>"},
 	{"0", "<p data-block=\"0\" data-node-id=\"1\">foo</p><p data-block=\"0\"><wbr><br></p>", "<p data-block=\"0\" data-node-id=\"\">foo</p><p data-block=\"0\" data-node-id=\"\"><wbr></p>"},
 }

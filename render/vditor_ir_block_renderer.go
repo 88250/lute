@@ -12,11 +12,11 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
@@ -138,32 +138,27 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	return
 }
 
-
 func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
-	r.LinkTextAutoSpacePrevious(node)
-	idTokens := node.ChildByType(ast.NodeBlockRefID).Tokens
-	attrs := [][]string{{"href", util.BytesToStr(html.EscapeHTML(idTokens))}}
-	r.tag("a", attrs, false)
-	if text := node.ChildByType(ast.NodeBlockRefText); nil != text && nil != text.Tokens {
-		r.Write(html.EscapeHTML(text.Tokens))
+	if entering {
+		r.renderSpanNode(node)
 	} else {
-		// TODO: 查找内容块引用摘要
-		r.WriteString("placeholder")
+		r.tag("/span", nil, false)
 	}
-	r.tag("/a", nil, false)
-	r.LinkTextAutoSpaceNext(node)
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(node.Tokens)
 	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteByte(lex.ItemSpace)
 	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkStop
 }
 
@@ -1222,6 +1217,8 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		} else {
 			attrs = append(attrs, []string{"data-type", "link-ref"})
 		}
+	case ast.NodeBlockRef:
+		attrs = append(attrs, []string{"data-type", "block-ref"})
 	case ast.NodeImage:
 		attrs = append(attrs, []string{"data-type", "img"})
 	case ast.NodeCodeSpan:
