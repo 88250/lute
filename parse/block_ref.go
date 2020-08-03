@@ -54,6 +54,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 		ctx.pos += len(passed) + 1
 		matched = 2 <= len(remains) && lex.ItemCloseParen == remains[0] && lex.ItemCloseParen == remains[1]
 		if matched {
+			ctx.pos++
 			break
 		}
 		var validTitle bool
@@ -89,6 +90,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 			//	}
 			//}
 			matched = lex.ItemCloseParen == remains[0] && lex.ItemCloseParen == remains[1]
+			ctx.pos += 2
 		}
 		break
 	}
@@ -97,7 +99,6 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 		return &ast.Node{Type: ast.NodeText, Tokens: []byte("(")}
 	}
 
-	ctx.pos += 2
 	ret := &ast.Node{Type: ast.NodeBlockRef}
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
@@ -125,7 +126,7 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 	}
 	remains = tokens[i:]
 	id = tokens[:i]
-	if 64 < len(id) || 2 > len(remains){
+	if 64 < len(id) || 2 > len(remains) {
 		return
 	}
 	passed = make([]byte, 0, 64)
