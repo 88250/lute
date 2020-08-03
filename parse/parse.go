@@ -277,6 +277,8 @@ type Options struct {
 	ChineseParagraphBeginningSpace bool
 	// YamlFrontMatter 设置是否开启 YAML Front Matter 支持。
 	YamlFrontMatter bool
+	// BlockRef 设置是否开启内容块引用支持。
+	BlockRef bool
 }
 
 func (context *Context) ParentTip() {

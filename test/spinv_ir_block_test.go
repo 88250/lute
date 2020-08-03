@@ -34,8 +34,7 @@ var spinVditorIRBlockDOMTests = []*parseTest{
 
 func TestSpinVditorIRBlockDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ToC = true
-	luteEngine.Sanitize = true
+	luteEngine.BlockRef = true
 
 	for _, test := range spinVditorIRBlockDOMTests {
 		html := luteEngine.SpinVditorIRBlockDOM(test.from)

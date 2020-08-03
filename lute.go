@@ -98,6 +98,7 @@ func NewOptions() *parse.Options {
 		RenderListStyle:                false,
 		ChineseParagraphBeginningSpace: false,
 		YamlFrontMatter:                true,
+		BlockRef:                       false,
 	}
 }
 
@@ -317,6 +318,10 @@ func (lute *Lute) SetChineseParagraphBeginningSpace(b bool) {
 
 func (lute *Lute) SetYamlFrontMatter(b bool) {
 	lute.YamlFrontMatter = b
+}
+
+func (lute *Lute) SetBlockRef(b bool) {
+	lute.BlockRef = b
 }
 
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
