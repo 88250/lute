@@ -112,21 +112,15 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 		return
 	}
 
-	max := 64
-	idLen := length
-	if max < idLen {
-		idLen = max
-	}
-	id = tokens[:idLen]
 	var i int
-	for ; i < idLen; i++ {
-		if !lex.IsASCIILetterNumHyphen(id[i]) {
+	for ; i < length; i++ {
+		if !lex.IsASCIILetterNumHyphen(tokens[i]) {
 			break
 		}
 	}
-	remains = id[i:]
-	id = id[:i]
-	if 2 > len(remains) {
+	remains = tokens[i:]
+	id = tokens[:i]
+	if 64 < len(id) || 2 > len(remains){
 		return
 	}
 	passed = make([]byte, 0, 64)
@@ -134,7 +128,7 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 	closed := lex.ItemCloseParen == remains[0] && lex.ItemCloseParen == remains[1]
 	if closed {
 		passed = append(passed, []byte("))")...)
-		remains = tokens[idLen:]
+		remains = tokens[len(id):]
 		return
 	}
 
