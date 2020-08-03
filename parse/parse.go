@@ -198,6 +198,9 @@ type Tree struct {
 	Context       *Context       // 块级解析上下文
 	lexer         *lex.Lexer     // 词法分析器
 	inlineContext *InlineContext // 行级解析上下文
+
+	Dir  string // 地址目录
+	Path string // 地址路径
 }
 
 // Options 描述了一些列解析和渲染选项。
