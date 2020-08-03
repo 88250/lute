@@ -21,8 +21,8 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 		return &ast.Node{Type: ast.NodeText, Tokens: []byte("(")}
 	}
 
-	tokens := ctx.tokens
-	if 5 > len(tokens) || lex.ItemOpenParen != tokens[0] || lex.ItemOpenParen != ctx.tokens[1] {
+	tokens := ctx.tokens[ctx.pos:]
+	if 5 > len(tokens) || lex.ItemOpenParen != tokens[0] || lex.ItemOpenParen != tokens[1] {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: []byte("(")}
 	}

@@ -18,13 +18,11 @@ import (
 
 var spinVditorIRBlockDOMTests = []*parseTest{
 
-	{"15", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo \"text\")<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\">((foo &quot;text&quot;)<wbr></p>"},
-	{"14", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo \"text\"))<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">text</a><wbr></p>"},
-	{"13", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo))<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">placeholder</a><wbr></p>"},
-	{"12", "((foo_bar))\n", "<p data-block=\"0\" data-node-id=\"\">((foo_bar))</p>"},
-	{"11", "((000000000000000000000000000000000000000000000000000000000000000001 \"text\"))\n", "<p data-block=\"0\" data-node-id=\"\">((000000000000000000000000000000000000000000000000000000000000000001 &quot;text&quot;))</p>"},
-	{"10", "((00000000000000000000000000000000000000000000000000000000000000000 \"text\"))\n", "<p data-block=\"0\" data-node-id=\"\">(<a href=\"0000000000000000000000000000000000000000000000000000000000000000\">text</a></p>"},
-	{"9", "((00000000000000000000000000000000000000000000000000000000000000000))\n", "<p data-block=\"0\" data-node-id=\"\">(<a href=\"0000000000000000000000000000000000000000000000000000000000000000\">placeholder</a></p>"},
+	{"13", "<p data-block=\"0\">foo ((bar)) <wbr></p>", "<p data-block=\"0\" data-node-id=\"\">foo <a href=\"bar\">placeholder</a> <wbr></p>"},
+	{"12", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo \"text\")<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\">((foo &quot;text&quot;)<wbr></p>"},
+	{"11", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo \"text\"))<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">text</a><wbr></p>"},
+	{"10", "<p data-block=\"0\" data-node-id=\"1596459249782\">((foo))<wbr></p>\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">placeholder</a><wbr></p>"},
+	{"9", "((foo_bar))\n", "<p data-block=\"0\" data-node-id=\"\">((foo_bar))</p>"},
 	{"8", "(( foo  \"text\" ))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">text</a></p>"},
 	{"7", "(( foo  ))\n", "<p data-block=\"0\" data-node-id=\"\"><a href=\"foo\">placeholder</a></p>"},
 	{"6", "((foo text))\n", "<p data-block=\"0\" data-node-id=\"\">((foo text))</p>"},
