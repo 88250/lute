@@ -32,13 +32,9 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 	markdown := lute.vditorIRBlockDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewVditorIRBlockRenderer(tree)
-	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
+	ovHTML = lute.Tree2VditorIRBlockDOM(tree)
 	// 替换插入符
-	ovHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
+	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
 	return
 }
 
@@ -85,15 +81,7 @@ func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
 	lute.VditorSV = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewVditorIRBlockRenderer(tree)
-	for nodeType, rendererFunc := range lute.Md2VditorIRBlockDOMRendererFuncs {
-		renderer.ExtRendererFuncs[nodeType] = rendererFunc
-	}
-	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
-	vHTML = string(output)
+	vHTML = lute.Tree2VditorIRBlockDOM(tree)
 	return
 }
 
@@ -109,7 +97,20 @@ func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
+func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
+	renderer := render.NewVditorIRBlockRenderer(tree)
+	for nodeType, rendererFunc := range lute.Md2VditorIRBlockDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
+	output := renderer.Render()
+	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
+		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
+	}
+	vHTML = string(output)
+	return
+}
+
+func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
 	// 删掉插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
 
@@ -123,7 +124,6 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	htmlRoot := &html.Node{Type: html.ElementNode}
 	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
 	if nil != err {
-		markdown = err.Error()
 		return
 	}
 
@@ -132,15 +132,15 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 
 	// 将 HTML 树转换为 Markdown AST
 
-	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
-	tree.Context.Tip = tree.Root
+	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
+	ret.Context.Tip = ret.Root
 	for _, htmlNode := range htmlNodes {
-		lute.genASTByVditorIRBlockDOM(htmlNode, tree)
+		lute.genASTByVditorIRBlockDOM(htmlNode, ret)
 	}
 
 	// 调整树结构
 
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+	ast.Walk(ret.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
 			case ast.NodeInlineHTML, ast.NodeCodeSpan, ast.NodeInlineMath, ast.NodeHTMLBlock, ast.NodeCodeBlockCode, ast.NodeMathBlockContent:
@@ -161,6 +161,14 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 		}
 		return ast.WalkContinue
 	})
+	return
+}
+
+func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
+	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return err.Error()
+	}
 
 	// 将 AST 进行 Markdown 格式化渲染
 
