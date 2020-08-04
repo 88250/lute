@@ -199,8 +199,8 @@ type Tree struct {
 	lexer         *lex.Lexer     // 词法分析器
 	inlineContext *InlineContext // 行级解析上下文
 
-	Dir  string // 地址目录
-	Path string // 地址路径
+	URL  string // 地址部分
+	Path string // 地址路径部分
 }
 
 // Options 描述了一些列解析和渲染选项。
