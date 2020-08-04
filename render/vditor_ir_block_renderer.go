@@ -574,7 +574,7 @@ func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) a
 
 func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", node.IDStr()}}, false)
+		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", node.ID}}, false)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
@@ -861,7 +861,7 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 	}
 
 	if entering {
-		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", node.IDStr()}}, false)
+		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}, false)
 	} else {
 		r.tag("/p", nil, false)
 	}
@@ -1008,7 +1008,7 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<blockquote data-block="0" data-node-id"` + node.IDStr() + `">`)
+		r.WriteString(`<blockquote data-block="0" data-node-id"` + node.ID + `">`)
 	} else {
 		r.WriteString("</blockquote>")
 	}
@@ -1029,7 +1029,7 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
-		r.WriteString(" data-node-id=\"" + node.IDStr() + "\"")
+		r.WriteString(" data-node-id=\"" + node.ID + "\"")
 
 		var id string
 		if nil != headingID {
@@ -1116,7 +1116,7 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 			}
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
-		attrs = append(attrs, []string{"data-node-id", node.IDStr()})
+		attrs = append(attrs, []string{"data-node-id", node.ID})
 		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
 	} else {
@@ -1143,7 +1143,7 @@ func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) as
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
-		attrs = append(attrs, []string{"data-node-id", node.IDStr()})
+		attrs = append(attrs, []string{"data-node-id", node.ID})
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
@@ -1256,7 +1256,7 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 
 func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	text := r.Text(node)
-	attrs := [][]string{{"data-block", "0"}, {"data-node-id", node.IDStr()}}
+	attrs := [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		attrs = append(attrs, []string{"data-type", "code-block"})
