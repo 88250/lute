@@ -648,6 +648,15 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Span:
 		switch dataType {
+		case "block-ref":
+			node.Type = ast.NodeBlockRef
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(n.FirstChild.NextSibling.NextSibling.FirstChild.Data)})
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			tree.Context.Tip.AppendChild(node)
+			return
 		case "heading-id":
 			headingID := lute.domText(n)
 			node.Type = ast.NodeText

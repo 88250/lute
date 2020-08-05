@@ -148,7 +148,9 @@ func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) as
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__link"}}, false)
 	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
