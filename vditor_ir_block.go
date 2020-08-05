@@ -652,7 +652,13 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeBlockRef
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(n.FirstChild.NextSibling.NextSibling.FirstChild.Data)})
+			id := n.FirstChild.NextSibling.NextSibling.FirstChild
+			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id.Data)})
+			text := lute.domAttrValue(n, "data-text")
+			if "" != text {
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte(text)})
+			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			tree.Context.Tip.AppendChild(node)

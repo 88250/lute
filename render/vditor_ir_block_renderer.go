@@ -140,7 +140,12 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 
 func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.renderSpanNode(node)
+		attrs := [][]string{{"data-type", "block-ref"}, {"class", "vditor-ir__node vditor-ir__node--expand"}}
+		text := node.ChildByType(ast.NodeBlockRefText)
+		if nil != text {
+			attrs = append(attrs, []string{"data-text", util.BytesToStr(text.Tokens)})
+		}
+		r.tag("span", attrs, false)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -148,25 +153,24 @@ func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) as
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__link"}}, false)
-		r.Write(node.Tokens)
-		r.tag("/span", nil, false)
-	}
-	return ast.WalkContinue
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__link"}}, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteByte(lex.ItemSpace)
-	}
-	return ast.WalkContinue
+	r.WriteByte(lex.ItemSpace)
+	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Write(html.EscapeHTML(node.Tokens))
-	}
+	text := html.EscapeHTML(node.Tokens)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--title"}}, false)
+	r.WriteByte(lex.ItemDoublequote)
+	r.Write(text)
+	r.WriteByte(lex.ItemDoublequote)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 

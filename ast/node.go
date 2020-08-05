@@ -421,7 +421,7 @@ const (
 	NodeBlockRef      NodeType = 430 // 内容块节点
 	NodeBlockRefID    NodeType = 431 // 内容块 ID
 	NodeBlockRefSpace NodeType = 432 // 内容块 ID 和内容块文本之间的空格
-	NodeBlockRefText           = 433 // 内容块文本
+	NodeBlockRefText  NodeType = 433 // 内容块文本
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

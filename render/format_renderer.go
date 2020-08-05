@@ -154,7 +154,9 @@ func (r *FormatRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.
 
 func (r *FormatRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.WriteString("\"")
 		r.Write(node.Tokens)
+		r.WriteString("\"")
 	}
 	return ast.WalkStop
 }
