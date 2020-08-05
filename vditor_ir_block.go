@@ -648,28 +648,13 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Span:
 		switch dataType {
-		case "block-ref":
-			node.Type = ast.NodeBlockRef
-			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			id := n.FirstChild.NextSibling.NextSibling.FirstChild
-			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id.Data)})
-			text := lute.domAttrValue(n, "data-text")
-			if "" != text {
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte(text)})
-			}
-			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-			tree.Context.Tip.AppendChild(node)
-			return
 		case "heading-id":
 			headingID := lute.domText(n)
 			node.Type = ast.NodeText
 			node.Tokens = []byte(headingID)
 			tree.Context.Tip.AppendChild(node)
 			return
-		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code":
+		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code", "block-ref":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
