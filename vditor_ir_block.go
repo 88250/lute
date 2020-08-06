@@ -664,9 +664,8 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		case "heading-id":
-			headingID := lute.domText(n)
 			node.Type = ast.NodeText
-			node.Tokens = []byte(headingID)
+			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
 			return
 		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code":
