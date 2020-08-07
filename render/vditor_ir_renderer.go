@@ -683,6 +683,16 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, util.CaretTokens)
 
 	if entering {
+		if 3 == node.LinkType {
+			node.ChildByType(ast.NodeOpenParen).Unlink()
+			node.ChildByType(ast.NodeLinkDest).Unlink()
+			if linkSpace := node.ChildByType(ast.NodeLinkSpace); nil != linkSpace {
+				linkSpace.Unlink()
+				node.ChildByType(ast.NodeLinkTitle).Unlink()
+			}
+			node.ChildByType(ast.NodeCloseParen).Unlink()
+		}
+
 		text := r.Text(node)
 		class := "vditor-ir__node"
 		if strings.Contains(text, util.Caret) || needResetCaret {
@@ -695,11 +705,12 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 			node.Next.Tokens = bytes.ReplaceAll(node.Next.Tokens, util.CaretTokens, nil)
 		}
 
-		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
+		link := r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
+		destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
 		destTokens = r.Tree.Context.RelativePath(destTokens)
 		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		attrs := [][]string{{"src", string(destTokens)}}
-		alt := node.ChildByType(ast.NodeLinkText)
+		alt := link.ChildByType(ast.NodeLinkText)
 		if nil != alt && 0 < len(alt.Tokens) {
 			altTokens := bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
 			attrs = append(attrs, []string{"alt", string(altTokens)})
