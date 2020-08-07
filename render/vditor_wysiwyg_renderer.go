@@ -516,6 +516,51 @@ func (r *VditorRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if 3 == node.LinkType {
+			previousNodeText := node.PreviousNodeText()
+			previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
+			if "" == previousNodeText {
+				r.WriteString(parse.Zwsp)
+			}
+			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
+			label := string(node.LinkRefLabel)
+			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
+			r.tag("span", attrs, false)
+			r.WriteString(text)
+			r.tag("/span", nil, false)
+
+			r.WriteString("<img src=\"")
+			link := r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
+			destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
+			destTokens = r.Tree.Context.RelativePath(destTokens)
+			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
+			r.Write(destTokens)
+			r.WriteString("\" alt=\"")
+			alt := node.ChildByType(ast.NodeLinkText)
+			alt.Tokens = bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
+			r.Write(alt.Tokens)
+			r.WriteString("\"")
+			if title := link.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
+				r.WriteString(" title=\"")
+				title.Tokens = bytes.ReplaceAll(title.Tokens, util.CaretTokens, nil)
+				r.Write(title.Tokens)
+				r.WriteString("\"")
+			}
+			r.WriteString(" />")
+
+			// XSS 过滤
+			buf := r.Writer.Bytes()
+			idx := bytes.LastIndex(buf, []byte("<img src="))
+			imgBuf := buf[idx:]
+			if r.Option.Sanitize {
+				imgBuf = sanitize(imgBuf)
+			}
+			r.Writer.Truncate(idx)
+			r.Writer.Write(imgBuf)
+
+			return ast.WalkStop
+		}
+
 		if 0 == r.DisableTags {
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
