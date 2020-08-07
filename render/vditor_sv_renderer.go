@@ -610,6 +610,17 @@ func (r *VditorSVRenderer) renderBang(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if 3 == node.LinkType {
+			node.ChildByType(ast.NodeOpenParen).Unlink()
+			node.ChildByType(ast.NodeLinkDest).Unlink()
+			if linkSpace := node.ChildByType(ast.NodeLinkSpace); nil != linkSpace {
+				linkSpace.Unlink()
+				node.ChildByType(ast.NodeLinkTitle).Unlink()
+			}
+			node.ChildByType(ast.NodeCloseParen).Unlink()
+		}
+	}
 	return ast.WalkContinue
 }
 
