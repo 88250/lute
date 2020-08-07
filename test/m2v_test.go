@@ -18,6 +18,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
+	{"17", "![text][foo]\n\n[foo]: bar", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"foo\">text</span><img src=\"bar\" alt=\"text\" data-render=\"2\"/></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"16", "# heading {#custom-id}\n", "<h1 data-block=\"0\" data-id=\"#custom-id\" id=\"wysiwyg-#custom-id\" data-marker=\"#\">heading</h1>"},
 	{"15", "foo\n\n[^1]: 111\n\n[2]: 222\n", "<p data-block=\"0\">foo</p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[2]: 222\n</div><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^1\"><p data-block=\"0\">111</p></li></ol></div>"},
 	{"14", "[^1]\n\n[^1]:\n", "<p data-block=\"0\">\u200b<sup data-type=\"footnotes-ref\" data-footnotes-label=\"^1\" class=\"vditor-tooltipped vditor-tooltipped__s\" aria-label=\"\">1</sup>\u200b</p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^1\"></li></ol></div>"},
