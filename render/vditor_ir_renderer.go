@@ -705,12 +705,15 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 			node.Next.Tokens = bytes.ReplaceAll(node.Next.Tokens, util.CaretTokens, nil)
 		}
 
-		link := r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
+		link := node
+		if 3 == node.LinkType {
+			link = r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
+		}
 		destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
 		destTokens = r.Tree.Context.RelativePath(destTokens)
 		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		attrs := [][]string{{"src", string(destTokens)}}
-		alt := link.ChildByType(ast.NodeLinkText)
+		alt := node.ChildByType(ast.NodeLinkText)
 		if nil != alt && 0 < len(alt.Tokens) {
 			altTokens := bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
 			attrs = append(attrs, []string{"alt", string(altTokens)})

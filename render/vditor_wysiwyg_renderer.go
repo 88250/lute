@@ -529,7 +529,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			r.WriteString(text)
 			r.tag("/span", nil, false)
 
-			r.WriteString("<img src=\"")
+			r.WriteString("<img data-render=\"2\" src=\"")
 			link := r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
 			destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.Tree.Context.RelativePath(destTokens)
