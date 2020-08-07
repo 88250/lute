@@ -825,6 +825,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			emojiImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: []byte(":" + imgAlt + ":")})
 			node.AppendChild(emojiImg)
 		} else {
+			if "link-ref" == dataType {
+				node.Type = ast.NodeText
+				content := "![" + lute.domAttrValue(n, "alt") + "][" + lute.domAttrValue(n, "data-link-label") + "]"
+				node.Tokens = []byte(content)
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
+
 			node.Type = ast.NodeImage
 			node.AppendChild(&ast.Node{Type: ast.NodeBang})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})

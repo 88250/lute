@@ -522,17 +522,6 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			if "" == previousNodeText {
 				r.WriteString(parse.Zwsp)
 			}
-			text := node.ChildByType(ast.NodeLinkText)
-			var textContent string
-			if nil != text {
-				textContent = string(text.Tokens)
-			}
-			label := string(node.LinkRefLabel)
-			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
-			r.tag("span", attrs, false)
-			r.WriteString(textContent)
-			r.tag("/span", nil, false)
-
 			r.WriteString("<img src=\"")
 			link := r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
 			destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
@@ -540,7 +529,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 			r.Write(destTokens)
 			r.WriteString("\" alt=\"")
-			if alt := node.ChildByType(ast.NodeLinkText);nil!= alt {
+			if alt := node.ChildByType(ast.NodeLinkText); nil != alt {
 				alt.Tokens = bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
 				r.Write(alt.Tokens)
 			}
@@ -551,7 +540,8 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 				r.Write(title.Tokens)
 				r.WriteString("\"")
 			}
-			r.WriteString(" data-render=\"2\"/>")
+			r.WriteString(" data-type=\"link-ref\" data-link-label=\"" + string(node.LinkRefLabel) + "\"")
+			r.WriteString(" />")
 
 			// XSS 过滤
 			buf := r.Writer.Bytes()
