@@ -584,7 +584,7 @@ func (r *VditorSVRenderer) renderCloseBracket(node *ast.Node, entering bool) ast
 
 	if 3 == node.Parent.LinkType {
 		linkText := node.Parent.ChildByType(ast.NodeLinkText)
-		if !bytes.EqualFold(node.Parent.LinkRefLabel, linkText.Tokens) {
+		if nil == linkText || !bytes.EqualFold(node.Parent.LinkRefLabel, linkText.Tokens) {
 			r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}}, false)
 			r.WriteByte(lex.ItemOpenBracket)
 			r.Write(node.Parent.LinkRefLabel)

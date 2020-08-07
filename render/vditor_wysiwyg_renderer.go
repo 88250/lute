@@ -522,11 +522,15 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			if "" == previousNodeText {
 				r.WriteString(parse.Zwsp)
 			}
-			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
+			text := node.ChildByType(ast.NodeLinkText)
+			var textContent string
+			if nil != text {
+				textContent = string(text.Tokens)
+			}
 			label := string(node.LinkRefLabel)
 			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
 			r.tag("span", attrs, false)
-			r.WriteString(text)
+			r.WriteString(textContent)
 			r.tag("/span", nil, false)
 
 			r.WriteString("<img src=\"")
@@ -536,9 +540,10 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 			r.Write(destTokens)
 			r.WriteString("\" alt=\"")
-			alt := node.ChildByType(ast.NodeLinkText)
-			alt.Tokens = bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
-			r.Write(alt.Tokens)
+			if alt := node.ChildByType(ast.NodeLinkText);nil!= alt {
+				alt.Tokens = bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
+				r.Write(alt.Tokens)
+			}
 			r.WriteString("\"")
 			if title := link.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 				r.WriteString(" title=\"")

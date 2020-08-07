@@ -18,6 +18,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
+	{"18", "![][foo]\n\n[foo]: bar", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"foo\"></span><img src=\"bar\" alt=\"\" data-render=\"2\"/></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"17", "![text][foo]\n\n[foo]: bar", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"foo\">text</span><img src=\"bar\" alt=\"text\" data-render=\"2\"/></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"16", "# heading {#custom-id}\n", "<h1 data-block=\"0\" data-id=\"#custom-id\" id=\"wysiwyg-#custom-id\" data-marker=\"#\">heading</h1>"},
 	{"15", "foo\n\n[^1]: 111\n\n[2]: 222\n", "<p data-block=\"0\">foo</p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[2]: 222\n</div><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^1\"><p data-block=\"0\">111</p></li></ol></div>"},
@@ -57,6 +58,7 @@ func TestMd2Vditor(t *testing.T) {
 
 var md2VditorIRTests = []parseTest{
 
+	{"12", "![][foo]\n\n[foo]: bar", "<p data-block=\"0\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">[foo]</span><img src=\"bar\" /></span></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"11", "![text][foo]\n\n[foo]: bar", "<p data-block=\"0\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">text</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">[foo]</span><img src=\"bar\" alt=\"text\" /></span></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"10", "[^foo]\n\n[^foo]:", "<p data-block=\"0\">\u200b<sup data-type=\"footnotes-ref\" class=\"vditor-ir__node vditor-tooltipped vditor-tooltipped__s\" aria-label=\"\" data-footnotes-label=\"^foo\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">^foo</span><span class=\"vditor-ir__marker--hide\" data-render=\"1\">1</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span></sup>\u200b</p><div data-block=\"0\" data-type=\"footnotes-block\"><div data-type=\"footnotes-def\">[^foo]: </div></div>"},
 	{"9", "# foo {id}", "<h1 data-block=\"0\" class=\"vditor-ir__node\" id=\"ir-id\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\" data-type=\"heading-marker\"># </span>foo<span data-type=\"heading-id\" class=\"vditor-ir__marker\"> {id}</span></h1>"},
