@@ -110,7 +110,43 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
+	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
+	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
+	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
+	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
 	return ret
+}
+
+func (r *HtmlRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("((")
+	} else {
+		r.WriteString("))")
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemSpace)
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("\"")
+		r.Write(node.Tokens)
+		r.WriteString("\"")
+	}
+	return ast.WalkStop
 }
 
 func (r *HtmlRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
