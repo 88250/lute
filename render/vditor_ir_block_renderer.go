@@ -154,12 +154,7 @@ func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) as
 
 func (r *VditorIRBlockRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
 	var attrs [][]string
-	text := node.Parent.ChildByType(ast.NodeBlockRefText)
-	if nil != text {
-		attrs = append(attrs, []string{"class", "vditor-ir__marker vditor-ir__marker--link"})
-	} else {
-		attrs = append(attrs, []string{"class", "vditor-ir__marker--link"})
-	}
+	attrs = append(attrs, []string{"class", "vditor-ir__marker vditor-ir__marker--link"})
 	r.tag("span", attrs, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
