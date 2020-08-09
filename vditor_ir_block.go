@@ -140,6 +140,7 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 
 	// 调整树结构
 
+	var unlinkNodes []*ast.Node
 	ast.Walk(ret.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
@@ -170,11 +171,14 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 				for _, child := range children {
 					n.InsertBefore(child)
 				}
-				n.Unlink()
+				unlinkNodes = append(unlinkNodes, n)
 			}
 		}
 		return ast.WalkContinue
 	})
+	for _, unlinkNode := range unlinkNodes {
+		unlinkNode.Unlink()
+	}
 	return
 }
 
