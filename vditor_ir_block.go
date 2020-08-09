@@ -171,7 +171,7 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 					for child := subTree.Root.FirstChild.FirstChild; nil != child; child = child.Next {
 						children = append(children, child)
 					}
-				case ast.NodeBlockquote:
+				default:
 					children = append(children, subTree.Root.FirstChild)
 				}
 				for _, child := range children {
