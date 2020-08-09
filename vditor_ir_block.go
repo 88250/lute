@@ -157,6 +157,20 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 						previousLi.AppendChild(n)
 					}
 				}
+			case ast.NodeText: // 细化行级文本节点，从 span text 生成子树
+				// 行级上不会有带节点 ID，可以通过自旋来生成子树
+				if bytes.Contains(n.Tokens, []byte("((")) {
+					// 仅细化内容块引用子树
+					blockRef := parse.Parse("", n.Tokens, lute.Options)
+					var children []*ast.Node
+					for child := blockRef.Root.FirstChild.FirstChild /** root.p.first **/ ; nil != child; child = child.Next {
+						children = append(children, child)
+					}
+					for _, child := range children {
+						n.InsertBefore(child)
+					}
+					n.Unlink()
+				}
 			}
 		}
 		return ast.WalkContinue

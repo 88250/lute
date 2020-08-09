@@ -141,10 +141,6 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"data-type", "block-ref"}, {"class", "vditor-ir__node"}}
-		text := node.ChildByType(ast.NodeBlockRefText)
-		if nil != text {
-			attrs = append(attrs, []string{"data-text", util.BytesToStr(text.Tokens)})
-		}
 		r.tag("span", attrs, false)
 	} else {
 		r.tag("/span", nil, false)
