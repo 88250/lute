@@ -142,16 +142,15 @@ func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) as
 	if entering {
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if "" != previousNodeText {
+		if "" != previousNodeText && !strings.HasSuffix(previousNodeText, " ") {
 			r.WriteByte(lex.ItemSpace)
 		}
 		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
-		r.WriteByte(lex.ItemSpace)
 		nextNodeText := node.NextNodeText()
 		nextNodeText = strings.ReplaceAll(nextNodeText, util.Caret, "")
-		if "" != nextNodeText {
+		if "" != nextNodeText && !strings.HasPrefix(nextNodeText, " ") {
 			r.WriteByte(lex.ItemSpace)
 		}
 	}
