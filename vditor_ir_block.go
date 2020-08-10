@@ -651,7 +651,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		case "block-ref":
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.Options)
-			if nil != t.Root.FirstChild.FirstChild && ast.NodeBlockRef == t.Root.FirstChild.FirstChild.Type {
+			if blockRef :=  t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
 				node.Type = ast.NodeBlockRef
 				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
@@ -665,6 +665,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 				tree.Context.Tip.AppendChild(node)
+				if nil != blockRef.Next { // 插入符
+					tree.Context.Tip.AppendChild(blockRef.Next)
+				}
 				return
 			}
 			node.Type = ast.NodeText
