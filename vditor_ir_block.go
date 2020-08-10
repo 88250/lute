@@ -651,15 +651,17 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		case "block-ref":
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.Options)
-			if ast.NodeBlockRef == t.Root.FirstChild.Type {
+			if nil != t.Root.FirstChild.FirstChild && ast.NodeBlockRef == t.Root.FirstChild.FirstChild.Type {
 				node.Type = ast.NodeBlockRef
 				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				id := n.FirstChild.NextSibling.NextSibling.FirstChild
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id.Data)})
+				id := n.FirstChild.NextSibling.NextSibling.FirstChild.Data
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id)})
 				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-				text := n.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte(text.Data)})
+				text := n.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.Data
+				text = strings.TrimLeft(text, "\"")
+				text = strings.TrimRight(text, "\"")
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte(text)})
 				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 				tree.Context.Tip.AppendChild(node)
