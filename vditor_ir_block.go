@@ -648,12 +648,28 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Span:
 		switch dataType {
-		case "heading-id":
+		case "block-ref":
+			text := lute.domText(n)
+			t := parse.Parse("", []byte(text), lute.Options)
+			if ast.NodeBlockRef == t.Root.FirstChild.Type {
+				node.Type = ast.NodeBlockRef
+				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+				id := n.FirstChild.NextSibling.NextSibling.FirstChild
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id.Data)})
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
+				text := n.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte(text.Data)})
+				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
 			node.Type = ast.NodeText
-			node.Tokens = []byte(lute.domText(n))
+			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
-		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code", "block-ref":
+		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code", "heading-id":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)

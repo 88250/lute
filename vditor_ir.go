@@ -640,13 +640,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Span:
 		switch dataType {
-		case "heading-id":
-			headingID := lute.domText(n)
-			node.Type = ast.NodeText
-			node.Tokens = []byte(headingID)
-			tree.Context.Tip.AppendChild(node)
-			return
-		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code":
+		case "inline-node", "em", "strong", "s", "a", "link-ref", "img", "code", "heading-id":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
