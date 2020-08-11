@@ -369,6 +369,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.ListData = &ast.ListData{}
 		if atom.Ol == n.DataAtom {
 			node.ListData.Typ = 1
+			start := lute.domAttrValue(n, "start")
+			if "" == start {
+				start = "1"
+			}
+			node.ListData.Start, _ = strconv.Atoi(start)
 		}
 		tight := lute.domAttrValue(n, "data-tight")
 		if "true" == tight || "" == tight {
