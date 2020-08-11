@@ -710,10 +710,17 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
-		case "em", "strong", "s":
+		case "heading-id":
+			node.Type = ast.NodeHeadingID
+			text := lute.domText(n)
+			text = strings.TrimSpace(text)
+			node.Tokens = []byte(text[1 : len(text)-1])
+			tree.Context.Tip.AppendChild(node)
+			return
+		case "em", "strong", "s", "code":
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.Options)
-			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type || ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type) {
+			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type || ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type || ast.NodeCodeSpan == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
@@ -726,7 +733,23 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
-		case "inline-node", "a", "link-ref", "img", "code", "heading-id":
+		case "a", "link-ref", "img":
+			text := lute.domText(n)
+			t := parse.Parse("", []byte(text), lute.Options)
+			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && ast.NodeLink == inlineNode.Type {
+				node = inlineNode
+				next := inlineNode.Next
+				tree.Context.Tip.AppendChild(node)
+				if nil != next { // 插入符
+					tree.Context.Tip.AppendChild(next)
+				}
+				return
+			}
+			node.Type = ast.NodeText
+			node.Tokens = []byte(text)
+			tree.Context.Tip.AppendChild(node)
+			return
+		case "inline-node":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
 			tree.Context.Tip.AppendChild(node)
