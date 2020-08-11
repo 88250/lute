@@ -302,8 +302,13 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 	case atom.Blockquote:
 		content := strings.TrimSpace(lute.domText(n))
-		if "" == content || "&gt;" == content || util.Caret == content {
+		if "" == content || "&gt;" == content {
 			return
+		}
+		if util.Caret == content {
+			node.Type = ast.NodeText
+			node.Tokens = []byte(content)
+			tree.Context.Tip.AppendChild(node)
 		}
 
 		node.Type = ast.NodeBlockquote
