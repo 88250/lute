@@ -116,7 +116,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 }
 
 func (r *VditorIRBlockRenderer) Render() (output []byte) {
-	output = r.BaseRenderer.Render()
+	output = r.render()
 	if 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
 		return
 	}
@@ -134,6 +134,38 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 		r.WriteString(destStr + "\n")
 	}
 	r.WriteString("</div>")
+	output = r.Writer.Bytes()
+	return
+}
+
+func (r *VditorIRBlockRenderer) render() (output []byte) {
+	r.LastOut = lex.ItemNewline
+	r.Writer = &bytes.Buffer{}
+	r.Writer.Grow(4096)
+
+	ast.Walk(r.Tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering && nil != n.Parent && ast.NodeDocument == n.Parent.Type {
+			n.ID = ast.NewNodeID() // 重新生成根节点的直接子节点 ID
+		}
+
+		extRender := r.ExtRendererFuncs[n.Type]
+		if nil != extRender {
+			output, status := extRender(n, entering)
+			r.WriteString(output)
+			return status
+		}
+
+		render := r.RendererFuncs[n.Type]
+		if nil == render {
+			if nil != r.DefaultRendererFunc {
+				return r.DefaultRendererFunc(n, entering)
+			} else {
+				return r.renderDefault(n, entering)
+			}
+		}
+		return render(n, entering)
+	})
+
 	output = r.Writer.Bytes()
 	return
 }
@@ -1027,7 +1059,7 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<blockquote data-block="0" data-node-id"` + node.ID + `">`)
+		r.WriteString(`<blockquote data-block="0" data-node-id="` + node.ID + `">`)
 	} else {
 		r.WriteString("</blockquote>")
 	}

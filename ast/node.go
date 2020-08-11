@@ -11,6 +11,9 @@
 package ast
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/88250/lute/util"
 )
 
@@ -110,6 +113,16 @@ type ListData struct {
 	Checked      bool   // 任务列表项是否勾选
 	Marker       []byte // 列表标识符
 	Num          int    // 有序列表项修正过的序号
+}
+
+func NewNodeID() string {
+	now := time.Now()
+	nano := strconv.Itoa(now.Nanosecond())
+	length := len(nano)
+	if 3 < length {
+		nano = nano[:length-3]
+	}
+	return now.Format("20060102150405") + "-" + nano
 }
 
 // TokensStr 返回 n 的 Tokens 字符串。

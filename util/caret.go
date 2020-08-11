@@ -27,3 +27,6 @@ const CaretReplacement = "caretreplacement"
 
 // FrontEndCaret 前端插入符。
 const FrontEndCaret = "<wbr>"
+
+// FrontEndCaret 前端自动闭合插入符。
+const FrontEndCaretSelfClose = "<wbr/>"

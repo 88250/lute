@@ -1080,6 +1080,18 @@ func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
 	return ""
 }
 
+func (lute *Lute) setDOMAttrValue(n *html.Node, attrName, attrVal string) {
+	if nil == n {
+		return
+	}
+
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			attr.Val = attrVal
+		}
+	}
+}
+
 func (lute *Lute) domCode(n *html.Node) string {
 	buf := &bytes.Buffer{}
 	lute.domCode0(n, buf)

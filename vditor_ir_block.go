@@ -35,6 +35,8 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	ovHTML = lute.Tree2VditorIRBlockDOM(tree)
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
+	// 合并节点 ID
+	ovHTML = lute.mergeNodeID(ivHTML, ovHTML)
 	return
 }
 
@@ -51,15 +53,7 @@ func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewVditorIRBlockRenderer(tree)
-	for nodeType, rendererFunc := range lute.HTML2VditorIRBlockDOMRendererFuncs {
-		renderer.ExtRendererFuncs[nodeType] = rendererFunc
-	}
-	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
-	vHTML = string(output)
+	vHTML = lute.Tree2VditorIRBlockDOM(tree)
 	return
 }
 
@@ -94,6 +88,48 @@ func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	markdown = lute.vditorIRBlockDOM2Md(htmlStr)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
+	return
+}
+
+func (lute *Lute) mergeNodeID(ivHTML, ovHTML string) (ret string) {
+	var ids []string
+	reader := strings.NewReader(ivHTML)
+	htmlRoot := &html.Node{Type: html.ElementNode}
+	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
+	if nil != err {
+		return ovHTML
+	}
+	for _, htmlNode := range htmlNodes {
+		id := lute.domAttrValue(htmlNode, "data-node-id")
+
+		// ID 如果有重复，需要重新生成一个新的
+		var existID bool
+		for _, savedID := range ids {
+			if id == savedID {
+				existID = true
+				break
+			}
+		}
+		if "" == id || existID {
+			id = ast.NewNodeID()
+		}
+		ids = append(ids, id)
+	}
+	reader = strings.NewReader(ovHTML)
+	htmlRoot = &html.Node{Type: html.ElementNode}
+	htmlNodes, err = html.ParseFragment(reader, htmlRoot)
+	if nil != err {
+		return ovHTML
+	}
+	retBuf := &bytes.Buffer{}
+	for i, htmlNode := range htmlNodes {
+		lute.setDOMAttrValue(htmlNode, "data-node-id", ids[i])
+		if err = html.Render(retBuf, htmlNode); nil != err {
+			return ovHTML
+		}
+	}
+	ret = retBuf.String()
+	ret = strings.ReplaceAll(ret, util.FrontEndCaretSelfClose, util.FrontEndCaret)
 	return
 }
 
@@ -651,7 +687,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		case "block-ref":
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.Options)
-			if blockRef :=  t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
+			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
 				node.Type = ast.NodeBlockRef
 				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
