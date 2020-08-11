@@ -32,7 +32,7 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 	markdown := lute.vditorIRBlockDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	ovHTML = lute.Tree2VditorIRBlockDOM(tree)
+	ovHTML = lute.Tree2VditorIRBlockDOM(tree, false)
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
 	// 合并节点 ID
@@ -53,7 +53,7 @@ func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	vHTML = lute.Tree2VditorIRBlockDOM(tree)
+	vHTML = lute.Tree2VditorIRBlockDOM(tree, true)
 	return
 }
 
@@ -75,7 +75,7 @@ func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
 	lute.VditorSV = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	vHTML = lute.Tree2VditorIRBlockDOM(tree)
+	vHTML = lute.Tree2VditorIRBlockDOM(tree, true)
 	return
 }
 
@@ -133,8 +133,8 @@ func (lute *Lute) MergeNodeID(ivHTML, ovHTML string) (ret string) {
 	return
 }
 
-func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
-	renderer := render.NewVditorIRBlockRenderer(tree)
+func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree, genNodeID bool) (vHTML string) {
+	renderer := render.NewVditorIRBlockRenderer(tree, genNodeID)
 	for nodeType, rendererFunc := range lute.Md2VditorIRBlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}

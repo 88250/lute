@@ -26,11 +26,12 @@ import (
 type VditorIRBlockRenderer struct {
 	*BaseRenderer
 	needRenderFootnotesDef bool
+	genNodeID              bool
 }
 
 // NewVditorIRBlockRenderer 创建一个 Vditor Instant-Rendering Block DOM 渲染器。
-func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
-	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree)}
+func NewVditorIRBlockRenderer(tree *parse.Tree, genNodeID bool) *VditorIRBlockRenderer {
+	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree), genNodeID: genNodeID}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -144,7 +145,7 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 	r.Writer.Grow(4096)
 
 	ast.Walk(r.Tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if entering && nil != n.Parent && ast.NodeDocument == n.Parent.Type {
+		if r.genNodeID && entering && nil != n.Parent && ast.NodeDocument == n.Parent.Type {
 			n.ID = ast.NewNodeID() // 重新生成根节点的直接子节点 ID
 		}
 
