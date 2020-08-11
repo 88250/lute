@@ -33,5 +33,6 @@ func main() {
 		"WalkContinue":     ast.WalkContinue,
 		"GetHeadingID":     render.HeadingID,
 		"Caret":            util.Caret,
+		"NewNodeID":        ast.NewNodeID(),
 	})
 }
