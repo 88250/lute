@@ -120,7 +120,7 @@ func NewNodeID() string {
 	nano := strconv.Itoa(now.Nanosecond())
 	length := len(nano)
 	if 3 < length {
-		nano = nano[:length-3]
+		nano = nano[:3]
 	}
 	return now.Format("20060102150405") + "-" + nano
 }
