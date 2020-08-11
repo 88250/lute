@@ -314,7 +314,7 @@ For a simple example, please refer to the demo in the JavaScript directory. For 
 Some details:
 
 1. lute.js has no built-in syntax highlighting feature
-2. The size of lute.js after compilation is ~1MB, the size after compression through `brotli -o lute.min.js.br lute.min.js` is ~130KB, the size after regular GZip compression is ~180KB
+2. The size of lute.js after compilation is ~2MB, the size after compression through `brotli -o lute.min.js.br lute.min.js` is ~200KB, the size after regular GZip compression is ~300KB
 
 ## 📜 Documentation
 
