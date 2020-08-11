@@ -11,7 +11,7 @@
 package ast
 
 import (
-	"strconv"
+	"math/rand"
 	"time"
 
 	"github.com/88250/lute/util"
@@ -117,12 +117,17 @@ type ListData struct {
 
 func NewNodeID() string {
 	now := time.Now()
-	nano := strconv.Itoa(now.Nanosecond())
-	length := len(nano)
-	if 3 < length {
-		nano = nano[:3]
+	return now.Format("20060102150405") + "-" + randStr(7)
+}
+
+func randStr(length int) string {
+	rand.Seed(time.Now().UTC().UnixNano())
+	letter := []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = letter[rand.Intn(len(letter))]
 	}
-	return now.Format("20060102150405") + "-" + nano
+	return string(b)
 }
 
 // TokensStr 返回 n 的 Tokens 字符串。
