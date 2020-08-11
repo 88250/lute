@@ -36,7 +36,7 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
 	// 合并节点 ID
-	ovHTML = lute.mergeNodeID(ivHTML, ovHTML)
+	ovHTML = lute.MergeNodeID(ivHTML, ovHTML)
 	return
 }
 
@@ -91,7 +91,7 @@ func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) mergeNodeID(ivHTML, ovHTML string) (ret string) {
+func (lute *Lute) MergeNodeID(ivHTML, ovHTML string) (ret string) {
 	var ids []string
 	reader := strings.NewReader(ivHTML)
 	htmlRoot := &html.Node{Type: html.ElementNode}
