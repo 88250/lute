@@ -120,8 +120,11 @@ func NewNodeID() string {
 	return now.Format("20060102150405") + "-" + randStr(7)
 }
 
-func randStr(length int) string {
+func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
+}
+
+func randStr(length int) string {
 	letter := []rune("abcdefghijklmnopqrstuvwxyz0123456789")
 	b := make([]rune, length)
 	for i := range b {
