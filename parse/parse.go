@@ -193,12 +193,13 @@ func (context *Context) listsMatch(listData, itemData *ast.ListData) bool {
 
 // Tree 描述了 Markdown 抽象语法树结构。
 type Tree struct {
-	Name          string         // 名称，可以为空
 	Root          *ast.Node      // 根节点
 	Context       *Context       // 块级解析上下文
 	lexer         *lex.Lexer     // 词法分析器
 	inlineContext *InlineContext // 行级解析上下文
 
+	Name string // 名称，可以为空
+	ID   string // ID，可以为空
 	URL  string // 地址部分
 	Path string // 地址路径部分
 }
