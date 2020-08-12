@@ -12,9 +12,10 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
+
+	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -598,6 +599,10 @@ func (r *VditorIRRenderer) renderStrikethrough2CloseMarker(node *ast.Node, enter
 }
 
 func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--title"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
 	r.Write(node.Tokens)
@@ -607,6 +612,10 @@ func (r *VditorIRRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
@@ -614,6 +623,10 @@ func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.WriteByte(lex.ItemSpace)
 	return ast.WalkStop
 }
@@ -634,6 +647,10 @@ func (r *VditorIRRenderer) renderLinkText(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--paren"}}, false)
 	r.WriteByte(lex.ItemCloseParen)
 	r.tag("/span", nil, false)
@@ -641,6 +658,10 @@ func (r *VditorIRRenderer) renderCloseParen(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorIRRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--paren"}}, false)
 	r.WriteByte(lex.ItemOpenParen)
 	r.tag("/span", nil, false)
@@ -737,16 +758,6 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *VditorIRRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if 3 == node.LinkType {
-			node.ChildByType(ast.NodeOpenParen).Unlink()
-			node.ChildByType(ast.NodeLinkDest).Unlink()
-			if linkSpace := node.ChildByType(ast.NodeLinkSpace); nil != linkSpace {
-				linkSpace.Unlink()
-				node.ChildByType(ast.NodeLinkTitle).Unlink()
-			}
-			node.ChildByType(ast.NodeCloseParen).Unlink()
-		}
-
 		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)

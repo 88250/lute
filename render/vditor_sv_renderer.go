@@ -528,6 +528,10 @@ func (r *VditorSVRenderer) renderStrikethrough2CloseMarker(node *ast.Node, enter
 }
 
 func (r *VditorSVRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--title"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
 	r.Write(node.Tokens)
@@ -537,6 +541,10 @@ func (r *VditorSVRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorSVRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}}, false)
 	r.Write(node.Tokens)
 	r.tag("/span", nil, false)
@@ -544,6 +552,10 @@ func (r *VditorSVRenderer) renderLinkDest(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorSVRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.WriteByte(lex.ItemSpace)
 	return ast.WalkStop
 }
@@ -564,6 +576,10 @@ func (r *VditorSVRenderer) renderLinkText(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorSVRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--paren"}}, false)
 	r.WriteByte(lex.ItemCloseParen)
 	r.tag("/span", nil, false)
@@ -571,6 +587,10 @@ func (r *VditorSVRenderer) renderCloseParen(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorSVRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+	if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+		return ast.WalkStop
+	}
+
 	r.tag("span", [][]string{{"class", "vditor-sv__marker--paren"}}, false)
 	r.WriteByte(lex.ItemOpenParen)
 	r.tag("/span", nil, false)
@@ -625,17 +645,6 @@ func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *VditorSVRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		if 3 == node.LinkType {
-			node.ChildByType(ast.NodeOpenParen).Unlink()
-			node.ChildByType(ast.NodeLinkDest).Unlink()
-			if linkSpace := node.ChildByType(ast.NodeLinkSpace); nil != linkSpace {
-				linkSpace.Unlink()
-				node.ChildByType(ast.NodeLinkTitle).Unlink()
-			}
-			node.ChildByType(ast.NodeCloseParen).Unlink()
-		}
-	}
 	return ast.WalkContinue
 }
 
