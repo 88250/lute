@@ -26,7 +26,7 @@ type Node struct {
 	// 节点基础结构
 
 	ID         string   `json:",omitempty"` // 节点的唯一标识
-	Type       NodeType `json:",omitempty"` // 节点类型
+	Type       NodeType // 节点类型
 	Parent     *Node    `json:"-"`          // 父节点
 	Previous   *Node    `json:"-"`          // 前一个兄弟节点
 	Next       *Node    `json:"-"`          // 后一个兄弟节点
