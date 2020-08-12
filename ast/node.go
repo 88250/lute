@@ -25,80 +25,82 @@ type Node struct {
 
 	// 节点基础结构
 
-	ID         string   // 节点的唯一标识
-	Type       NodeType // 节点类型
-	Parent     *Node    // 父节点
-	Previous   *Node    // 前一个兄弟节点
-	Next       *Node    // 后一个兄弟节点
-	FirstChild *Node    // 第一个子节点
-	LastChild  *Node    // 最后一个子节点
-	Tokens     []byte   // 词法分析结果 Tokens，语法分析阶段会继续操作这些 Tokens
+	ID         string   `json:",omitempty"` // 节点的唯一标识
+	Type       NodeType `json:",omitempty"` // 节点类型
+	Parent     *Node    `json:"-"`          // 父节点
+	Previous   *Node    `json:"-"`          // 前一个兄弟节点
+	Next       *Node    `json:"-"`          // 后一个兄弟节点
+	FirstChild *Node    `json:"-"`          // 第一个子节点
+	LastChild  *Node    `json:"-"`          // 最后一个子节点
+	Children   []*Node  `json:",omitempty"` // 所有子节点
+	Tokens     []byte   `json:",omitempty"` // 词法分析结果 Tokens，语法分析阶段会继续操作这些 Tokens
 
 	// 解析过程标识
 
-	Close           bool // 标识是否关闭
-	LastLineBlank   bool // 标识最后一行是否是空行
-	LastLineChecked bool // 标识最后一行是否检查过
+	Close           bool `json:",omitempty"` // 标识是否关闭
+	LastLineBlank   bool `json:",omitempty"` // 标识最后一行是否是空行
+	LastLineChecked bool `json:",omitempty"` // 标识最后一行是否检查过
 
 	// 代码
 
-	CodeMarkerLen int // ` 个数，1 或 2
+	CodeMarkerLen int `json:",omitempty"` // ` 个数，1 或 2
 
 	// 代码块
 
-	IsFencedCodeBlock    bool
-	CodeBlockFenceChar   byte
-	CodeBlockFenceLen    int
-	CodeBlockFenceOffset int
-	CodeBlockOpenFence   []byte
-	CodeBlockInfo        []byte
-	CodeBlockCloseFence  []byte
+	IsFencedCodeBlock  bool `json:",omitempty"`
+	CodeBlockFenceChar byte `json:",omitempty"`
+
+	CodeBlockFenceLen    int    `json:",omitempty"`
+	CodeBlockFenceOffset int    `json:",omitempty"`
+	CodeBlockOpenFence   []byte `json:",omitempty"`
+	CodeBlockInfo        []byte `json:",omitempty"`
+	CodeBlockCloseFence  []byte `json:",omitempty"`
 
 	// HTML 块
 
-	HtmlBlockType int // 规范中定义的 HTML 块类型（1-7）
+	HtmlBlockType int `json:",omitempty"` // 规范中定义的 HTML 块类型（1-7）
 
 	// 列表、列表项
 
-	*ListData
+	*ListData `json:",omitempty"`
 
 	// 任务列表项 [ ]、[x] 或者 [X]
 
-	TaskListItemChecked bool // 是否勾选
+	TaskListItemChecked bool `json:",omitempty"` // 是否勾选
 
 	// 表
 
-	TableAligns              []int  // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
-	TableCellAlign           int    // 表的单元格对齐方式
-	TableCellContentWidth    int    // 表的单元格内容宽度（字节数）
-	TableCellContentMaxWidth int    // 表的单元格内容最大宽度
-	TableCellContent         []byte // 表的单元格内容
-	TableCellMaxWidthContent []byte // 表的单元格最大宽度格的内容
+	TableAligns              []int  `json:",omitempty"` // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
+	TableCellAlign           int    `json:",omitempty"` // 表的单元格对齐方式
+	TableCellContentWidth    int    `json:",omitempty"` // 表的单元格内容宽度（字节数）
+	TableCellContentMaxWidth int    `json:",omitempty"` // 表的单元格内容最大宽度
+	TableCellContent         []byte `json:",omitempty"` // 表的单元格内容
+	TableCellMaxWidthContent []byte `json:",omitempty"` // 表的单元格最大宽度格的内容
 
 	// 链接
 
-	LinkType     int    // 链接类型，0：内联链接 [foo](/bar)，1：链接引用定义 [foo]: /bar，2：自动链接，3：链接引用 [foo]
-	LinkRefLabel []byte // 链接引用 label，[label] 或者 [text][label] 形式，[label] 情况下 text 和 label 相同
+	LinkType     int    `json:",omitempty"` // 链接类型，0：内联链接 [foo](/bar)，1：链接引用定义 [foo]: /bar，2：自动链接，3：链接引用 [foo]
+	LinkRefLabel []byte `json:",omitempty"` // 链接引用 label，[label] 或者 [text][label] 形式，[label] 情况下 text 和 label 相同
 
 	// 标题
 
-	HeadingLevel        int    // 1~6
-	HeadingSetext       bool   // 是否为 Setext
-	HeadingNormalizedID string // 规范化后的 ID
+	HeadingLevel        int    `json:",omitempty"` // 1~6
+	HeadingSetext       bool   `json:",omitempty"` // 是否为 Setext
+	HeadingNormalizedID string `json:",omitempty"` // 规范化后的 ID
 
 	// 数学公式块
 
-	MathBlockDollarOffset int
+	MathBlockDollarOffset int `json:",omitempty"`
 
 	// 脚注
 
-	FootnotesRefLabel []byte  // 脚注引用 label，[^label]
-	FootnotesRefId    string  // 脚注 id
-	FootnotesRefs     []*Node // 脚注引用
+	FootnotesRefLabel []byte  `json:",omitempty"` // 脚注引用 label，[^label]
+	FootnotesRefId    string  `json:",omitempty"` // 脚注 id
+	FootnotesRefs     []*Node `json:",omitempty"` // 脚注引用
 
 	// HTML 实体
 
-	HtmlEntityTokens []byte // 原始输入的实体 tokens，&amp;
+	HtmlEntityTokens []byte `json:",omitempty"` // 原始输入的实体 tokens，&amp;
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
