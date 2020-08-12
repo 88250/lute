@@ -105,16 +105,16 @@ type Node struct {
 
 // ListData 用于记录列表或列表项节点的附加信息。
 type ListData struct {
-	Typ          int    // 0：无序列表，1：有序列表，3：任务列表
-	Tight        bool   // 是否是紧凑模式
-	BulletChar   byte   // 无序列表标识，* - 或者 +
-	Start        int    // 有序列表起始序号
-	Delimiter    byte   // 有序列表分隔符，. 或者 )
-	Padding      int    // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
-	MarkerOffset int    // 标识符（* - + 或者 1 2 3）相对缩进空格数
-	Checked      bool   // 任务列表项是否勾选
-	Marker       []byte // 列表标识符
-	Num          int    // 有序列表项修正过的序号
+	Typ          int    `json:",omitempty"` // 0：无序列表，1：有序列表，3：任务列表
+	Tight        bool   `json:",omitempty"` // 是否是紧凑模式
+	BulletChar   byte   `json:",omitempty"` // 无序列表标识，* - 或者 +
+	Start        int    `json:",omitempty"` // 有序列表起始序号
+	Delimiter    byte   `json:",omitempty"` // 有序列表分隔符，. 或者 )
+	Padding      int    `json:",omitempty"` // 列表内部缩进空格数（包含标识符长度，即规范中的 W+N）
+	MarkerOffset int    `json:",omitempty"` // 标识符（* - + 或者 1 2 3）相对缩进空格数
+	Checked      bool   `json:",omitempty"` // 任务列表项是否勾选
+	Marker       []byte `json:",omitempty"` // 列表标识符
+	Num          int    `json:",omitempty"` // 有序列表项修正过的序号
 }
 
 func NewNodeID() string {
