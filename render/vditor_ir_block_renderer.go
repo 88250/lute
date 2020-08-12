@@ -145,7 +145,7 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 	r.Writer.Grow(4096)
 
 	ast.Walk(r.Tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if r.genNodeID && entering && nil != n.Parent && ast.NodeDocument == n.Parent.Type {
+		if r.genNodeID && entering && (ast.NodeDocument == n.Type || ast.NodeDocument == n.Parent.Type) {
 			n.ID = ast.NewNodeID() // 重新生成根节点的直接子节点 ID
 		}
 
