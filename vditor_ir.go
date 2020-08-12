@@ -391,7 +391,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		node.ListData = &ast.ListData{Marker: []byte(marker), BulletChar: bullet}
 		if 0 == bullet {
-			node.ListData.Num, _ = strconv.Atoi(string(marker[0]))
+			node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
 			node.ListData.Delimiter = marker[len(marker)-1]
 		}
 
