@@ -11,6 +11,7 @@
 package test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/88250/lute"
@@ -18,6 +19,7 @@ import (
 
 var spinVditorIRBlockDOMTests = []*parseTest{
 
+	{"15", "<p data-block=\"0\" data-node-id=\"20200813185628-tdpjvvr\">foo</p><p data-block=\"0\" data-node-id=\"20200813185636-sp1i1bp\"><span data-type=\"block-ref\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">20200813185628-tdpjvvr</span> <span class=\"vditor-ir__blockref\">\"bar\"</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span> baz\n```\n[text](addr)\n```<wbr></p>", "<p data-block=\"0\" data-node-id=\"20200813185628-tdpjvvr\">foo</p><p data-block=\"0\" data-node-id=\"20200813185636-sp1i1bp\"><span data-type=\"block-ref\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">20200813185628-tdpjvvr</span> <span class=\"vditor-ir__blockref\">&#34;bar&#34;</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span> baz</p><div data-block=\"0\" data-node-id=\"20200813190155-d2yy4yv\" data-type=\"code-block\" class=\"vditor-ir__node vditor-ir__node--expand\"><span data-type=\"code-block-open-marker\">```</span><span class=\"vditor-ir__marker vditor-ir__marker--info\" data-type=\"code-block-info\">\u200b</span><pre class=\"vditor-ir__marker--pre vditor-ir__marker\"><code>[text](addr)<wbr>\n</code></pre><pre class=\"vditor-ir__preview\" data-render=\"2\"><code>[text](addr)</code></pre><span data-type=\"code-block-close-marker\">```</span></div>"},
 	{"14", "<p data-block=\"0\" data-node-id=\"20200813113846-42h0ba1\">![foo](bar)<wbr></p>", "<p data-block=\"0\" data-node-id=\"20200813113846-42h0ba1\"><span class=\"vditor-ir__node vditor-ir__node--expand\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">foo</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">bar</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><wbr><img src=\"bar\" alt=\"foo\"/></span></p>"},
 	{"13", "<p data-block=\"0\" data-node-id=\"20200811153824-grm842y\">foo</p><blockquote data-block=\"0\" data-node-id=\"20200811153825-amjdbjz\"><p data-block=\"0\" data-node-id=\"\"><wbr><br></p></blockquote>", "<p data-block=\"0\" data-node-id=\"20200811153824-grm842y\">foo</p><p data-block=\"0\" data-node-id=\"20200811153825-amjdbjz\">&gt; <wbr></p>"},
 	{"12", "<p data-block=\"0\" data-node-id=\"20200811153040-mrqu125\"><span data-type=\"a\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__link\">foo</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">bar</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)b<wbr></span></span></p>", "<p data-block=\"0\" data-node-id=\"20200811153040-mrqu125\"><span data-type=\"a\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__link\">foo</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">bar</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span>b<wbr></p>"},
@@ -41,6 +43,16 @@ func TestSpinVditorIRBlockDOM(t *testing.T) {
 
 	for _, test := range spinVditorIRBlockDOMTests {
 		html := luteEngine.SpinVditorIRBlockDOM(test.from)
+
+		if "15" == test.name {
+			// 去掉最后一个新生成的节点 ID，因为这个节点 ID 是随机生成，每次测试用例运行都不一样，比较没有意义，长度一致即可
+			lastNodeIDIdx := strings.LastIndex(html, "data-node-id=")
+			length := len("data-node-id=\"20200813190226-k3m61yt\" ")
+			html = html[:lastNodeIDIdx] + html[lastNodeIDIdx+length:]
+			lastNodeIDIdx = strings.LastIndex(test.to, "data-node-id=")
+			test.to = test.to[:lastNodeIDIdx] + test.to[lastNodeIDIdx+length:]
+		}
+
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
 		}

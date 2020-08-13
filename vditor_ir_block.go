@@ -95,13 +95,12 @@ func (lute *Lute) MergeNodeID(ivHTML, ovHTML string) (ret string) {
 	var ids []string
 	reader := strings.NewReader(ivHTML)
 	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
+	oldHtmlNodes, err := html.ParseFragment(reader, htmlRoot)
 	if nil != err {
 		return ovHTML
 	}
-	for _, htmlNode := range htmlNodes {
+	for _, htmlNode := range oldHtmlNodes {
 		id := lute.domAttrValue(htmlNode, "data-node-id")
-
 		// ID 如果有重复，需要重新生成一个新的
 		var existID bool
 		for _, savedID := range ids {
@@ -117,12 +116,15 @@ func (lute *Lute) MergeNodeID(ivHTML, ovHTML string) (ret string) {
 	}
 	reader = strings.NewReader(ovHTML)
 	htmlRoot = &html.Node{Type: html.ElementNode}
-	htmlNodes, err = html.ParseFragment(reader, htmlRoot)
+	newHtmlNodes, err := html.ParseFragment(reader, htmlRoot)
 	if nil != err {
 		return ovHTML
 	}
+	if len(oldHtmlNodes) < len(newHtmlNodes) {
+		ids = append(ids, ast.NewNodeID())
+	}
 	retBuf := &bytes.Buffer{}
-	for i, htmlNode := range htmlNodes {
+	for i, htmlNode := range newHtmlNodes {
 		lute.setDOMAttrValue(htmlNode, "data-node-id", ids[i])
 		if err = html.Render(retBuf, htmlNode); nil != err {
 			return ovHTML
