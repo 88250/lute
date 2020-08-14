@@ -911,7 +911,7 @@ func (r *VditorRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 			} else {
 				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			}
-			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type {
+			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type { // li.p.task
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}

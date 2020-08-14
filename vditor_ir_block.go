@@ -382,6 +382,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 
 		node.Type = ast.NodeList
 		node.ListData = &ast.ListData{}
+		marker := lute.domAttrValue(n, "data-marker")
 		if atom.Ol == n.DataAtom {
 			node.ListData.Typ = 1
 			start := lute.domAttrValue(n, "start")
@@ -389,7 +390,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				start = "1"
 			}
 			node.ListData.Start, _ = strconv.Atoi(start)
+		} else {
+			node.ListData.BulletChar = marker[0]
 		}
+		node.ListData.Marker = []byte(marker)
 		tight := lute.domAttrValue(n, "data-tight")
 		if "true" == tight || "" == tight {
 			node.Tight = true
@@ -643,9 +647,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		if nil != node.Parent.Parent && nil != node.Parent.Parent.ListData { // ul.li.input
 			node.Parent.Parent.ListData.Typ = 3
+			node.Parent.ListData.Typ = 3
 		}
 		if nil != node.Parent.Parent.Parent && nil != node.Parent.Parent.Parent.ListData { // ul.li.p.input
 			node.Parent.Parent.Parent.ListData.Typ = 3
+			node.Parent.Parent.ListData.Typ = 3
 		}
 	case atom.Table:
 		node.Type = ast.NodeTable
