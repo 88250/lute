@@ -12,14 +12,15 @@ package lute
 
 import (
 	"bytes"
+	"strconv"
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
-	"strconv"
-	"strings"
 )
 
 // SpinVditorIRBlockDOM 自旋 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下的编辑。
@@ -759,7 +760,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		case "a", "link-ref", "img":
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.Options)
-			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && ast.NodeLink == inlineNode.Type {
+			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeLink == inlineNode.Type || ast.NodeImage == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
