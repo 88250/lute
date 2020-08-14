@@ -91,6 +91,18 @@ func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
+func (lute *Lute) VditorIRBlockDOM2Text(htmlStr string) (text string) {
+	lute.VditorIR = true
+	lute.VditorWYSIWYG = false
+	lute.VditorSV = false
+
+	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return ""
+	}
+	return tree.Root.Text()
+}
+
 func (lute *Lute) MergeNodeID(ivHTML, ovHTML string) (ret string) {
 	var ids []string
 	reader := strings.NewReader(ivHTML)
