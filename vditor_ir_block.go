@@ -133,7 +133,9 @@ func (lute *Lute) MergeNodeID(ivHTML, ovHTML string) (ret string) {
 	if nil != err {
 		return ovHTML
 	}
-	if len(oldHtmlNodes) < len(newHtmlNodes) {
+	oldLen := len(oldHtmlNodes)
+	newLen := len(newHtmlNodes)
+	for i := oldLen; i < newLen; i++ {
 		ids = append(ids, ast.NewNodeID())
 	}
 	retBuf := &bytes.Buffer{}

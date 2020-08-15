@@ -172,19 +172,36 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if "" != previousNodeText && !strings.HasSuffix(previousNodeText, " ") {
-			r.WriteByte(lex.ItemSpace)
+	text := node.ChildByType(ast.NodeBlockRefText)
+	isEmbedded := bytes.Equal([]byte("*"), bytes.ReplaceAll(text.Tokens, util.CaretTokens, nil))
+	if isEmbedded {
+		if entering {
+			r.renderSpanNode(node)
+			r.WriteString("<span>")
+		} else {
+			r.WriteString("</span>")
+			defID := string(node.FirstChild.Tokens)
+			r.WriteString("<span data-block-def-id=\"" + defID + "\" data-render=\"2\"></span></span>")
 		}
-		r.renderSpanNode(node)
 	} else {
-		r.tag("/span", nil, false)
-		nextNodeText := node.NextNodeText()
-		nextNodeText = strings.ReplaceAll(nextNodeText, util.Caret, "")
-		if "" != nextNodeText && !strings.HasPrefix(nextNodeText, " ") {
-			r.WriteByte(lex.ItemSpace)
+		if entering {
+			previousNodeText := node.PreviousNodeText()
+			previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
+			if "" != previousNodeText && !strings.HasSuffix(previousNodeText, " ") {
+				r.WriteByte(lex.ItemSpace)
+			}
+			r.renderSpanNode(node)
+		} else {
+			if isEmbedded {
+				defID := string(node.FirstChild.Tokens)
+				r.WriteString("<span data-block-def-id=\"" + defID + "\" data-render=\"2\"></span>")
+			}
+			r.tag("/span", nil, false)
+			nextNodeText := node.NextNodeText()
+			nextNodeText = strings.ReplaceAll(nextNodeText, util.Caret, "")
+			if "" != nextNodeText && !strings.HasPrefix(nextNodeText, " ") {
+				r.WriteByte(lex.ItemSpace)
+			}
 		}
 	}
 	return ast.WalkContinue
@@ -1281,7 +1298,13 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 			attrs = append(attrs, []string{"data-type", "link-ref"})
 		}
 	case ast.NodeBlockRef:
-		attrs = append(attrs, []string{"data-type", "block-ref"})
+		text := node.ChildByType(ast.NodeBlockRefText)
+		isEmbedded := bytes.Equal([]byte("*"), bytes.ReplaceAll(text.Tokens, util.CaretTokens, nil))
+		if isEmbedded {
+			attrs = append(attrs, []string{"data-type", "block-ref-embed"})
+		} else {
+			attrs = append(attrs, []string{"data-type", "block-ref"})
+		}
 	case ast.NodeImage:
 		attrs = append(attrs, []string{"data-type", "img"})
 	case ast.NodeCodeSpan:
