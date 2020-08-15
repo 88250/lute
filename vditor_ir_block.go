@@ -716,6 +716,29 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Span:
 		switch dataType {
+		case "block-ref-embed":
+			text := lute.domText(n)
+			t := parse.Parse("", []byte(text), lute.Options)
+			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
+				node.Type = ast.NodeBlockRef
+				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+				id := n.FirstChild.FirstChild.NextSibling.NextSibling.FirstChild.Data
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id)})
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte("*")})
+				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+				tree.Context.Tip.AppendChild(node)
+				if nil != blockRef.Next { // 插入符
+					tree.Context.Tip.AppendChild(blockRef.Next)
+				}
+				return
+			}
+			node.Type = ast.NodeText
+			node.Tokens = []byte(text)
+			tree.Context.Tip.AppendChild(node)
+			return
 		case "block-ref":
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.Options)
