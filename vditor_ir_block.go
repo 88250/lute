@@ -718,6 +718,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		switch dataType {
 		case "block-ref-embed":
 			text := lute.domText(n)
+			if "" == text {
+				return
+			}
+
 			t := parse.Parse("", []byte(text), lute.Options)
 			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
 				node.Type = ast.NodeBlockRef
@@ -918,6 +922,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 		return
 	case atom.Font:
+		text := lute.domText(n)
+		if "" != text {
+			node.Type = ast.NodeText
+			node.Tokens = []byte(text)
+			tree.Context.Tip.AppendChild(node)
+		}
 		return
 	case atom.Details:
 		node.Type = ast.NodeHTMLBlock
