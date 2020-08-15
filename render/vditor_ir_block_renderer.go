@@ -180,8 +180,8 @@ func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) as
 			r.WriteString("<span>")
 		} else {
 			r.WriteString("</span>")
-			defID := string(node.FirstChild.Tokens)
-			r.WriteString("<span data-block-def-id=\"" + defID + "\" data-render=\"2\"></span></span>")
+			id := node.ChildByType(ast.NodeBlockRefID)
+			r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\"></span></span>")
 		}
 	} else {
 		if entering {
@@ -192,10 +192,6 @@ func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) as
 			}
 			r.renderSpanNode(node)
 		} else {
-			if isEmbedded {
-				defID := string(node.FirstChild.Tokens)
-				r.WriteString("<span data-block-def-id=\"" + defID + "\" data-render=\"2\"></span>")
-			}
 			r.tag("/span", nil, false)
 			nextNodeText := node.NextNodeText()
 			nextNodeText = strings.ReplaceAll(nextNodeText, util.Caret, "")
