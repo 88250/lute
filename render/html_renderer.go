@@ -118,25 +118,25 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 }
 
 func (r *HtmlRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("((")
-	} else {
-		r.WriteString("))")
-	}
+	//if entering {
+	//	r.WriteString("((")
+	//} else {
+	//	r.WriteString("))")
+	//}
 	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Write(node.Tokens)
-	}
+	//if entering {
+	//	r.Write(node.Tokens)
+	//}
 	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteByte(lex.ItemSpace)
-	}
+	//if entering {
+	//	r.WriteByte(lex.ItemSpace)
+	//}
 	return ast.WalkContinue
 }
 
