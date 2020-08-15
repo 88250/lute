@@ -181,7 +181,7 @@ func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) as
 		} else {
 			r.WriteString("</span>")
 			id := node.ChildByType(ast.NodeBlockRefID)
-			r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\"></span></span>")
+			r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\" data-type=\"block-render\"></span></span>")
 		}
 	} else {
 		if entering {
