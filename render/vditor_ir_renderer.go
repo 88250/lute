@@ -109,7 +109,9 @@ func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
-	// TODO Mark
+	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
+	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
+	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
 	return ret
 }
 
@@ -134,6 +136,31 @@ func (r *VditorIRRenderer) Render() (output []byte) {
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorIRRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderSpanNode(node)
+	} else {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("==")
+	r.tag("/span", nil, false)
+	r.tag("s", [][]string{{"data-newline", "1"}}, false)
+	return ast.WalkStop
+}
+
+func (r *VditorIRRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/s", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("==")
+	r.tag("/span", nil, false)
+	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
@@ -1205,6 +1232,8 @@ func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "strong"})
 	case ast.NodeStrikethrough:
 		attrs = append(attrs, []string{"data-type", "s"})
+	case ast.NodeMark:
+		attrs = append(attrs, []string{"data-type", "mark"})
 	case ast.NodeLink:
 		if 3 != node.LinkType {
 			attrs = append(attrs, []string{"data-type", "a"})

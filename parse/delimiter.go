@@ -155,42 +155,42 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			closerInl.Tokens = text
 
 			openMarker := &ast.Node{Tokens: openerTokens, Close: true}
-			emStrongDel := &ast.Node{Close: true}
+			emStrongDelMark := &ast.Node{Close: true}
 			closeMarker := &ast.Node{Tokens: closerTokens, Close: true}
 			if 1 == useDelims {
 				if lex.ItemAsterisk == closercc {
-					emStrongDel.Type = ast.NodeEmphasis
+					emStrongDelMark.Type = ast.NodeEmphasis
 					openMarker.Type = ast.NodeEmA6kOpenMarker
 					closeMarker.Type = ast.NodeEmA6kCloseMarker
 				} else if lex.ItemUnderscore == closercc {
-					emStrongDel.Type = ast.NodeEmphasis
+					emStrongDelMark.Type = ast.NodeEmphasis
 					openMarker.Type = ast.NodeEmU8eOpenMarker
 					closeMarker.Type = ast.NodeEmU8eCloseMarker
 				} else if lex.ItemTilde == closercc {
 					if t.Context.Option.GFMStrikethrough {
-						emStrongDel.Type = ast.NodeStrikethrough
+						emStrongDelMark.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough1OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough1CloseMarker
 					}
 				}
 			} else {
 				if lex.ItemAsterisk == closercc {
-					emStrongDel.Type = ast.NodeStrong
+					emStrongDelMark.Type = ast.NodeStrong
 					openMarker.Type = ast.NodeStrongA6kOpenMarker
 					closeMarker.Type = ast.NodeStrongA6kCloseMarker
 				} else if lex.ItemUnderscore == closercc {
-					emStrongDel.Type = ast.NodeStrong
+					emStrongDelMark.Type = ast.NodeStrong
 					openMarker.Type = ast.NodeStrongU8eOpenMarker
 					closeMarker.Type = ast.NodeStrongU8eCloseMarker
 				} else if lex.ItemTilde == closercc {
 					if t.Context.Option.GFMStrikethrough {
-						emStrongDel.Type = ast.NodeStrikethrough
+						emStrongDelMark.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough2OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough2CloseMarker
 					}
 				} else if lex.ItemEqual == closercc {
 					if t.Context.Option.Mark {
-						emStrongDel.Type = ast.NodeMark
+						emStrongDelMark.Type = ast.NodeMark
 						openMarker.Type = ast.NodeMarkOpenMarker
 						closeMarker.Type = ast.NodeMarkCloseMarker
 					}
@@ -201,13 +201,13 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			for nil != tmp && tmp != closerInl {
 				next := tmp.Next
 				tmp.Unlink()
-				emStrongDel.AppendChild(tmp)
+				emStrongDelMark.AppendChild(tmp)
 				tmp = next
 			}
 
-			emStrongDel.PrependChild(openMarker) // 插入起始标记符
-			emStrongDel.AppendChild(closeMarker) // 插入结束标记符
-			openerInl.InsertAfter(emStrongDel)
+			emStrongDelMark.PrependChild(openMarker) // 插入起始标记符
+			emStrongDelMark.AppendChild(closeMarker) // 插入结束标记符
+			openerInl.InsertAfter(emStrongDelMark)
 
 			// remove elts between opener and closer in delimiters stack
 			if opener.next != closer {

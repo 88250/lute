@@ -111,7 +111,9 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
-	// TODO Mark
+	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
+	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
+	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
 	return ret
 }
 
@@ -136,6 +138,20 @@ func (r *VditorRenderer) Render() (output []byte) {
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("mark", [][]string{{"data-marker", "=="}}, false)
+	return ast.WalkStop
+}
+
+func (r *VditorRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/mark", nil, false)
+	return ast.WalkStop
 }
 
 func (r *VditorRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {

@@ -64,9 +64,20 @@ func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
-	// TODO BlockRef, Mark
+	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
+	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
+}
+
+func (r *EChartsJSONRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("Mark\nmark", node)
+	return ast.WalkStop
+}
+
+func (r *EChartsJSONRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
+	r.leaf("BlockRef\n((id))", node)
+	return ast.WalkStop
 }
 
 func (r *EChartsJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {

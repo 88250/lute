@@ -113,7 +113,9 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
-	// TODO Mark
+	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
+	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
+	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
 	return ret
 }
 
@@ -133,6 +135,25 @@ func (r *FormatRenderer) Render() (output []byte) {
 	}
 	output = append(output, buf.Bytes()...)
 	return
+}
+
+func (r *FormatRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString("==")
+	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString("==")
+	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {

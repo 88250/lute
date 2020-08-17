@@ -148,7 +148,9 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
-	// TODO Mark
+	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
+	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
+	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
 	return ret
 }
 
@@ -184,6 +186,30 @@ func (r *VditorSVRenderer) Render() (output []byte) {
 	r.Write(NewlineSV)
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorSVRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+	} else {
+		r.popWriteClass(node, "s")
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+	r.WriteString("==")
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+	r.WriteString("==")
+	r.tag("/span", nil, false)
+	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {

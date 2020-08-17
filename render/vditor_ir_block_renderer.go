@@ -113,7 +113,9 @@ func NewVditorIRBlockRenderer(tree *parse.Tree, genNodeID bool) *VditorIRBlockRe
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
-	// TODO Mark
+	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
+	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
+	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
 	return ret
 }
 
@@ -138,6 +140,31 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorIRBlockRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderSpanNode(node)
+	} else {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("==")
+	r.tag("/span", nil, false)
+	r.tag("mark", [][]string{{"data-newline", "1"}}, false)
+	return ast.WalkStop
+}
+
+func (r *VditorIRBlockRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/mark", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.WriteString("==")
+	r.tag("/span", nil, false)
+	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) render() (output []byte) {
@@ -1288,6 +1315,8 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "strong"})
 	case ast.NodeStrikethrough:
 		attrs = append(attrs, []string{"data-type", "s"})
+	case ast.NodeMark:
+		attrs = append(attrs, []string{"data-type", "mark"})
 	case ast.NodeLink:
 		if 3 != node.LinkType {
 			attrs = append(attrs, []string{"data-type", "a"})
