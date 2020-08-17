@@ -1309,6 +1309,8 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "emoji"})
 	case ast.NodeInlineHTML:
 		attrs = append(attrs, []string{"data-type", "inline-html"})
+	case ast.NodeInlineMath:
+		attrs = append(attrs, []string{"data-type", "inline-math"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}

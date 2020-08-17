@@ -772,14 +772,20 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		case "heading-id":
 			node.Type = ast.NodeHeadingID
 			text := lute.domText(n)
+			if !strings.HasSuffix(text, "}") {
+				node.Type = ast.NodeText
+				node.Tokens = []byte(text)
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
 			text = strings.TrimSpace(text)
 			node.Tokens = []byte(text[1 : len(text)-1])
 			tree.Context.Tip.AppendChild(node)
 			return
-		case "em", "strong", "s", "code":
+		case "em", "strong", "s", "code", "inline-math":
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.Options)
-			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type || ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type || ast.NodeCodeSpan == inlineNode.Type) {
+			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type || ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type || ast.NodeCodeSpan == inlineNode.Type || ast.NodeInlineMath == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
@@ -902,17 +908,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		} else {
 			break
 		}
-		if "math-inline" == dataType {
-			node.Type = ast.NodeInlineMath
-			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
-			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: codeTokens})
-			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
-			tree.Context.Tip.AppendChild(node)
-		} else if "html-inline" == dataType {
-			node.Type = ast.NodeInlineHTML
-			node.Tokens = codeTokens
-			tree.Context.Tip.AppendChild(node)
-		} else if "code-inline" == dataType {
+		if "code-inline" == dataType {
 			node.Tokens = codeTokens
 			tree.Context.Tip.AppendChild(node)
 		} else if "html-entity" == dataType {
