@@ -11,12 +11,14 @@
 package test
 
 import (
-	"github.com/88250/lute"
 	"testing"
+
+	"github.com/88250/lute"
 )
 
 var markTests = []parseTest{
 
+	{"4", "=foo=\n", "<p>=foo=</p>\n"},
 	{"3", "==**foo==**\n", "<p><mark>**foo</mark>**</p>\n"},
 	{"2", "**==foo==**\n", "<p><strong><mark>foo</mark></strong></p>\n"},
 	{"1", "==**foo**==\n", "<p><mark><strong>foo</strong></mark></p>\n"},
@@ -28,6 +30,25 @@ func TestMark(t *testing.T) {
 	luteEngine.Mark = true
 
 	for _, test := range markTests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+var markDisableTests = []parseTest{
+
+	{"2", "*=foo*=\n", "<p><em>=foo</em>=</p>\n"},
+	{"1", "=foo=\n", "<p>=foo=</p>\n"},
+	{"0", "==foo==\n", "<p>==foo==</p>\n"},
+}
+
+func TestMarkDisable(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.Mark = false
+
+	for _, test := range markDisableTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)

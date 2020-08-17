@@ -11,11 +11,12 @@
 package parse
 
 import (
+	"unicode"
+	"unicode/utf8"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
-	"unicode"
-	"unicode/utf8"
 )
 
 // delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _, ~）相关信息。
@@ -122,10 +123,24 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			openerInl = opener.node
 			closerInl = closer.node
 
-			if ((t.Context.Option.GFMStrikethrough && lex.ItemTilde == closercc) ||
-				t.Context.Option.Mark && lex.ItemEqual == closercc) &&
-				opener.num != closer.num {
-				break
+			if t.Context.Option.GFMStrikethrough {
+				if lex.ItemTilde == closercc && opener.num != closer.num {
+					break
+				}
+			} else {
+				if lex.ItemTilde == closercc {
+					break
+				}
+			}
+
+			if t.Context.Option.Mark {
+				if lex.ItemEqual == closercc && (2 != opener.num || (opener.num != closer.num)) {
+					break
+				}
+			} else {
+				if lex.ItemEqual == closercc {
+					break
+				}
 			}
 
 			// remove used delimiters from stack elts and inlines
