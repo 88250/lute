@@ -18,6 +18,10 @@ import (
 
 var markTests = []parseTest{
 
+	{"7", "==*[foo](bar)*==\n", "<p><mark><em><a href=\"bar\">foo</a></em></mark></p>\n"},
+	{"6", "==*[foo](bar)==*\n", "<p><mark>*<a href=\"bar\">foo</a></mark>*</p>\n"},
+	{"5", "==[foo](bar)==\n", "<p><mark><a href=\"bar\">foo</a></mark></p>\n"},
+	{"5", "[==foo==](bar)\n", "<p><a href=\"bar\"><mark>foo</mark></a></p>\n"},
 	{"4", "=foo=\n", "<p>=foo=</p>\n"},
 	{"3", "==**foo==**\n", "<p><mark>**foo</mark>**</p>\n"},
 	{"2", "**==foo==**\n", "<p><strong><mark>foo</mark></strong></p>\n"},
@@ -39,6 +43,8 @@ func TestMark(t *testing.T) {
 
 var markDisableTests = []parseTest{
 
+	{"4", "==*[foo](bar)*==\n", "<p>==<em><a href=\"bar\">foo</a></em>==</p>\n"},
+	{"3", "[==foo==](bar)\n", "<p><a href=\"bar\">==foo==</a></p>\n"},
 	{"2", "*=foo*=\n", "<p><em>=foo</em>=</p>\n"},
 	{"1", "=foo=\n", "<p>=foo=</p>\n"},
 	{"0", "==foo==\n", "<p>==foo==</p>\n"},
