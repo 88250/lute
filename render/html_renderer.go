@@ -114,29 +114,40 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
+	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
+	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
+	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
 	return ret
 }
 
+func (r *HtmlRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("mark", nil, false)
+	return ast.WalkStop
+}
+
+func (r *HtmlRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/mark", nil, false)
+	return ast.WalkStop
+}
+
 func (r *HtmlRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
-	//if entering {
-	//	r.WriteString("((")
-	//} else {
-	//	r.WriteString("))")
-	//}
 	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
-	//if entering {
-	//	r.Write(node.Tokens)
-	//}
 	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	//if entering {
-	//	r.WriteByte(lex.ItemSpace)
-	//}
 	return ast.WalkContinue
 }
 

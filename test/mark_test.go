@@ -17,7 +17,10 @@ import (
 
 var markTests = []parseTest{
 
-	{"0", "==foo==\n", "<h2 id=\"foo\">foo</h2>\n"},
+	{"3", "==**foo==**\n", "<p><mark>**foo</mark>**</p>\n"},
+	{"2", "**==foo==**\n", "<p><strong><mark>foo</mark></strong></p>\n"},
+	{"1", "==**foo**==\n", "<p><mark><strong>foo</strong></mark></p>\n"},
+	{"0", "==foo==\n", "<p><mark>foo</mark></p>\n"},
 }
 
 func TestMark(t *testing.T) {
