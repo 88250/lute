@@ -37,6 +37,8 @@ func main() {
 	luteEngine.FixTermTypo = false
 	luteEngine.ChinesePunct = false
 	luteEngine.Emoji = false
+	luteEngine.BlockRef = false
+	luteEngine.Mark = false
 
 	cpuProfile, _ := os.Create("pprof/cpu_profile")
 	pprof.StartCPUProfile(cpuProfile)

@@ -122,7 +122,9 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			openerInl = opener.node
 			closerInl = closer.node
 
-			if t.Context.Option.GFMStrikethrough && lex.ItemTilde == closercc && opener.num != closer.num {
+			if ((t.Context.Option.GFMStrikethrough && lex.ItemTilde == closercc) ||
+				t.Context.Option.Mark && lex.ItemEqual == closercc) &&
+				opener.num != closer.num {
 				break
 			}
 
@@ -170,6 +172,12 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 						emStrongDel.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough2OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough2CloseMarker
+					}
+				} else if lex.ItemEqual == closercc {
+					if t.Context.Option.Mark {
+						emStrongDel.Type = ast.NodeMark
+						openMarker.Type = ast.NodeMarkOpenMarker
+						closeMarker.Type = ast.NodeMarkCloseMarker
 					}
 				}
 			}

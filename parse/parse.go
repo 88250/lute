@@ -283,6 +283,8 @@ type Options struct {
 	YamlFrontMatter bool
 	// BlockRef 设置是否开启内容块引用支持。
 	BlockRef bool
+	// Mark 设置是否打开“==标记==”支持。
+	Mark bool
 }
 
 func (context *Context) ParentTip() {

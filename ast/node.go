@@ -446,5 +446,10 @@ const (
 	NodeBlockRefSpace NodeType = 432 // 内容块 ID 和内容块文本之间的空格
 	NodeBlockRefText  NodeType = 433 // 内容块文本
 
+	// 支持 ==mark== 高亮语法 https://github.com/88250/lute/issues/84
+	NodeMark            NodeType = 450 // 标记
+	NodeMarkOpenMarker  NodeType = 451 // 开始标记标记符 ==
+	NodeMarkCloseMarker NodeType = 452 // 结束标记标记符 ==
+
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
