@@ -113,6 +113,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree, genNodeID bool) *VditorIRBlockRe
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
+	// TODO Mark
 	return ret
 }
 
