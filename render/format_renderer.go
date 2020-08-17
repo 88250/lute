@@ -188,7 +188,7 @@ func (r *FormatRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) as
 }
 
 func (r *FormatRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
+	r.Write(node.HtmlEntityTokens)
 	return ast.WalkStop
 }
 

@@ -68,9 +68,9 @@ var formatTests = []formatTest{
 	// 图片 Emoji 依然使用别名 https://github.com/b3log/lute/issues/14
 	{"24", ":heart: :hacpai:\n", ":heart: :hacpai:\n"},
 
-	// 原先是 HTML 实体 &amp; 格式化后反转义
-	{"23", "&&amp;\n", "&&\n"},
-	{"22", "&amp;123&emsp;456\n", "&123\u2003456\n"},
+	// HTML 实体
+	{"23", "&&amp;\n", "&&amp;\n"},
+	{"22", "&amp;foo&emsp;bar\n", "&amp;foo&emsp;bar\n"},
 
 	{"21", "\u2003emsp\n", "\u2003emsp\n"},
 	{"20", "~删除线~\n", "~删除线~\n"},

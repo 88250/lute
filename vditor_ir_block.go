@@ -715,6 +715,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 		return
 	case atom.Span:
+		if nil == n.FirstChild {
+			break
+		}
+
 		switch dataType {
 		case "block-ref-embed":
 			text := lute.domText(n)
@@ -820,6 +824,22 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
+		case "html-entity":
+			text := lute.domText(n)
+			t := parse.Parse("", []byte(text), lute.Options)
+			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeHTMLEntity == inlineNode.Type) {
+				node = inlineNode
+				next := inlineNode.Next
+				tree.Context.Tip.AppendChild(node)
+				if nil != next { // 插入符
+					tree.Context.Tip.AppendChild(next)
+				}
+				return
+			}
+			node.Type = ast.NodeText
+			node.Tokens = []byte(text)
+			tree.Context.Tip.AppendChild(node)
+			return
 		case "inline-node":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
@@ -892,30 +912,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 			return
-		}
-
-		if nil == n.FirstChild {
-			break
-		}
-
-		var codeTokens []byte
-		if parse.Zwsp == n.FirstChild.Data && "" == lute.domAttrValue(n, "style") && nil != n.FirstChild.NextSibling {
-			codeTokens = []byte(n.FirstChild.NextSibling.FirstChild.Data)
-		} else if atom.Code == n.FirstChild.DataAtom {
-			codeTokens = []byte(n.FirstChild.FirstChild.Data)
-			if parse.Zwsp == string(codeTokens) {
-				break
-			}
-		} else {
-			break
-		}
-		if "code-inline" == dataType {
-			node.Tokens = codeTokens
-			tree.Context.Tip.AppendChild(node)
-		} else if "html-entity" == dataType {
-			node.Type = ast.NodeText
-			node.Tokens = codeTokens
-			tree.Context.Tip.AppendChild(node)
 		}
 		return
 	case atom.Font:
