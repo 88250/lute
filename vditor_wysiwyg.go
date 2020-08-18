@@ -382,6 +382,16 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if content == "vditor-comment" {
+			node.Type = ast.NodeInlineHTML
+			node.Tokens = append([]byte("<"), node.Tokens...)
+			id := lute.domAttrValue(n, "data-id")
+			node.Tokens = append(node.Tokens, []byte(" data-id=\"" + id + "\"")...)
+			node.Tokens = append(node.Tokens, []byte(">")...)
+			tree.Context.Tip.AppendChild(node)
+			break
+		}
+
 		checkIndentCodeBlock := strings.ReplaceAll(content, util.Caret, "")
 		checkIndentCodeBlock = strings.ReplaceAll(checkIndentCodeBlock, "\t", "    ")
 		if (!lute.isInline(n.PrevSibling)) && strings.HasPrefix(checkIndentCodeBlock, "    ") {
@@ -1057,6 +1067,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch n.DataAtom {
+	case 0:
+		if content == "vditor-comment" {
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("</" + content + ">")})
+		}
 	case atom.Em, atom.I:
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {

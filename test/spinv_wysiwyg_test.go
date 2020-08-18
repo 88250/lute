@@ -18,6 +18,8 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"145", "<p data-block=\"0\">foo<vditor-comment data-id=\"1\">bar<wbr>baz</vditor-comment>foo<vditor-comment data-id=\"2\">bar</vditor-comment>baz</p>", "<p data-block=\"0\">foo\u200b<vditor-comment data-id=\"1\">bar<wbr>baz\u200b</vditor-comment>foo\u200b<vditor-comment data-id=\"2\">bar\u200b</vditor-comment>baz</p>"},
+	{"144", "<p data-block=\"0\"><vditor-comment data-id=\"1\">foo<wbr></vditor-comment></p>", "<p data-block=\"0\">\u200b\u200b<vditor-comment data-id=\"1\">foo<wbr>\u200b</vditor-comment></p>"},
 	{"143", "<p data-block=\"0\">​<img src=\"bar\" alt=\"text\" data-type=\"link-ref\" data-link-label=\"foo\"><wbr></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>", "<p data-block=\"0\">\u200b<img src=\"bar\" alt=\"text\" data-type=\"link-ref\" data-link-label=\"foo\" /><wbr></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"142", "<p data-block=\"0\">![text][foo]<wbr></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar", "<p data-block=\"0\">\u200b<img src=\"bar\" alt=\"text\" data-type=\"link-ref\" data-link-label=\"foo\" /><wbr></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"141", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">​</li><li data-marker=\"*\">b<wbr></li></ul></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo\n*<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">b<wbr></li></ul></li></ul>"},

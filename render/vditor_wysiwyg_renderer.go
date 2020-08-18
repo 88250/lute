@@ -685,12 +685,17 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 		}
 	}
 
+	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
+	tokens = append([]byte(parse.Zwsp), tokens...)
+	if bytes.Contains(tokens, []byte("vditor-comment")) {
+		r.Write(tokens)
+		return ast.WalkStop
+	}
+
 	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
-	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
 	tokens = html.EscapeHTML(tokens)
-	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
 	r.WriteString("</code>")
 	r.WriteString("</span>" + parse.Zwsp)
