@@ -862,7 +862,22 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
-		// TODO case "emoji" Emoji 首次加载渲染问题 #129
+		case "emoji":
+			text := lute.domText(n.FirstChild.NextSibling)
+			t := parse.Parse("", []byte(text), lute.Options)
+			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmoji == inlineNode.Type) {
+				node = inlineNode
+				next := inlineNode.Next
+				tree.Context.Tip.AppendChild(node)
+				if nil != next { // 插入符
+					tree.Context.Tip.AppendChild(next)
+				}
+				return
+			}
+			node.Type = ast.NodeText
+			node.Tokens = []byte(text)
+			tree.Context.Tip.AppendChild(node)
+			return
 		case "inline-node":
 			node.Type = ast.NodeText
 			node.Tokens = []byte(lute.domText(n))
