@@ -193,7 +193,7 @@ func (r *VditorSVRenderer) renderMark(node *ast.Node, entering bool) ast.WalkSta
 		r.Writer = &bytes.Buffer{}
 		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
 	} else {
-		r.popWriteClass(node, "s")
+		r.popWriteClass(node, "mark")
 	}
 	return ast.WalkContinue
 }
