@@ -18,8 +18,8 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
-	{"147", "<p data-block=\"0\"><mark data-marker=\"==\">markf<wbr></mark></p>", "<p data-block=\"0\"><mark data-marker=\"==\">markf<wbr></mark></p>"},
-	{"146", "<p data-block=\"0\">==mark==<wbr></p>", "<p data-block=\"0\"><mark data-marker=\"==\">mark</mark><wbr></p>"},
+	{"147", "<p data-block=\"0\"><mark data-marker=\"==\">markf<wbr></mark></p>", "<p data-block=\"0\">\u200b<mark data-marker=\"==\">markf<wbr></mark>\u200b</p>"},
+	{"146", "<p data-block=\"0\">==mark==<wbr></p>", "<p data-block=\"0\">\u200b<mark data-marker=\"==\">mark</mark>\u200b<wbr></p>"},
 	{"145", "<p data-block=\"0\">foo<vditor-comment data-id=\"1\">bar<wbr>baz</vditor-comment>foo<vditor-comment data-id=\"2\">bar</vditor-comment>baz</p>", "<p data-block=\"0\">foo\u200b<vditor-comment data-id=\"1\">bar<wbr>baz\u200b</vditor-comment>foo\u200b<vditor-comment data-id=\"2\">bar\u200b</vditor-comment>baz</p>"},
 	{"144", "<p data-block=\"0\"><vditor-comment data-id=\"1\">foo<wbr></vditor-comment></p>", "<p data-block=\"0\">\u200b\u200b<vditor-comment data-id=\"1\">foo<wbr>\u200b</vditor-comment></p>"},
 	{"143", "<p data-block=\"0\">​<img src=\"bar\" alt=\"text\" data-type=\"link-ref\" data-link-label=\"foo\"><wbr></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>", "<p data-block=\"0\">\u200b<img src=\"bar\" alt=\"text\" data-type=\"link-ref\" data-link-label=\"foo\" /><wbr></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},

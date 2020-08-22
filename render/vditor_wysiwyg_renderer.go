@@ -143,6 +143,15 @@ func (r *VditorRenderer) Render() (output []byte) {
 }
 
 func (r *VditorRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		previousNodeText := node.PreviousNodeText()
+		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
+		if "" == previousNodeText {
+			r.WriteString(parse.Zwsp)
+		}
+	} else {
+		r.WriteString(parse.Zwsp)
+	}
 	return ast.WalkContinue
 }
 
