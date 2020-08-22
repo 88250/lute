@@ -176,18 +176,16 @@ func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
 }
 
 func SubStr(str string, length int) (ret string) {
-	var before []rune
 	var count int
-	for i := len(str); 0 < i; {
-		r, size := utf8.DecodeLastRuneInString(str[:i])
-		i -= size
-		before = append([]rune{r}, before...)
+	for i := 0; i < len(str); {
+		r, size := utf8.DecodeRuneInString(str[i:])
+		i += size
+		ret += string(r)
 		count++
 		if length <= count {
 			break
 		}
 	}
-	ret = string(before)
 	return
 }
 
