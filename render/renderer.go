@@ -175,6 +175,22 @@ func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
 	}
 }
 
+func SubStr(str string, length int) (ret string) {
+	var before []rune
+	var count int
+	for i := len(str); 0 < i; {
+		r, size := utf8.DecodeLastRuneInString(str[:i])
+		i -= size
+		before = append([]rune{r}, before...)
+		count++
+		if length <= count {
+			break
+		}
+	}
+	ret = string(before)
+	return
+}
+
 func HeadingID(heading *ast.Node) (ret string) {
 	if 0 == len(util.StrToBytes(heading.HeadingNormalizedID)) {
 		headingID0(heading)
