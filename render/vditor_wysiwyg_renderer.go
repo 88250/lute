@@ -234,7 +234,7 @@ func (r *VditorRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.Wal
 	}
 
 	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-entity\">")
-	r.tag("code", [][]string{{"data-type", "html-entity"}}, false)
+	r.tag("code", [][]string{{"data-type", "html-entity"}, {"style", "display: none"}}, false)
 	tokens := append([]byte(parse.Zwsp), node.HtmlEntityTokens...)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code>")

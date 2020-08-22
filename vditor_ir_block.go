@@ -840,7 +840,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
-		case "inline-html":
+		case "html-inline":
 			text := lute.domText(n)
 			node.Type = ast.NodeInlineHTML
 			node.Tokens = []byte(text)
