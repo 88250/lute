@@ -198,8 +198,8 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				} else if lex.ItemEqual == closercc {
 					if t.Context.Option.Mark {
 						emStrongDelMark.Type = ast.NodeMark
-						openMarker.Type = ast.NodeMark1OpenMarker
-						closeMarker.Type = ast.NodeMark1CloseMarker
+						openMarker.Type = ast.NodeMark2OpenMarker
+						closeMarker.Type = ast.NodeMark2CloseMarker
 					}
 				}
 			}

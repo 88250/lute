@@ -774,13 +774,22 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		node.Type = ast.NodeMark
-		node.AppendChild(&ast.Node{Type: ast.NodeMark1OpenMarker, Tokens: []byte("==")})
+		marker := lute.domAttrValue(n, "data-marker")
+		if "=" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark1OpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark2OpenMarker, Tokens: []byte(marker)})
+		}
 		tree.Context.Tip.AppendChild(node)
 
 		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
 			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-			node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte("==")})
+			if "=" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
+			}
 			return
 		}
 
