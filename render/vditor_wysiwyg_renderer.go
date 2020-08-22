@@ -112,8 +112,10 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
-	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
-	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
+	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
+	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
+	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
+	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	return ret
 }
 
@@ -144,12 +146,22 @@ func (r *VditorRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatu
 	return ast.WalkContinue
 }
 
-func (r *VditorRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("mark", [][]string{{"data-marker", "="}}, false)
+	return ast.WalkStop
+}
+
+func (r *VditorRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/mark", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("mark", [][]string{{"data-marker", "=="}}, false)
 	return ast.WalkStop
 }
 
-func (r *VditorRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/mark", nil, false)
 	return ast.WalkStop
 }

@@ -149,8 +149,10 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
-	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
-	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
+	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
+	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
+	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
+	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	return ret
 }
 
@@ -198,19 +200,34 @@ func (r *VditorSVRenderer) renderMark(node *ast.Node, entering bool) ast.WalkSta
 	return ast.WalkContinue
 }
 
-func (r *VditorSVRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorSVRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+	r.WriteString("=")
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+	r.WriteString("=")
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorSVRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("==")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
-func (r *VditorSVRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorSVRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 	r.WriteString("==")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
+
 
 func (r *VditorSVRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()

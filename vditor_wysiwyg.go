@@ -386,7 +386,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeInlineHTML
 			node.Tokens = append([]byte("<"), node.Tokens...)
 			id := lute.domAttrValue(n, "data-id")
-			node.Tokens = append(node.Tokens, []byte(" data-id=\"" + id + "\"")...)
+			node.Tokens = append(node.Tokens, []byte(" data-id=\""+id+"\"")...)
 			node.Tokens = append(node.Tokens, []byte(">")...)
 			tree.Context.Tip.AppendChild(node)
 			break
@@ -774,13 +774,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		node.Type = ast.NodeMark
-		node.AppendChild(&ast.Node{Type: ast.NodeMarkOpenMarker, Tokens: []byte("==")})
+		node.AppendChild(&ast.Node{Type: ast.NodeMark1OpenMarker, Tokens: []byte("==")})
 		tree.Context.Tip.AppendChild(node)
 
 		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
 			// 处理结尾换行
 			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-			node.AppendChild(&ast.Node{Type: ast.NodeMarkCloseMarker, Tokens: []byte("==")})
+			node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte("==")})
 			return
 		}
 
@@ -1113,7 +1113,12 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
 		}
 	case atom.Mark:
-		node.AppendChild(&ast.Node{Type: ast.NodeMarkCloseMarker, Tokens: []byte("==")})
+		marker := lute.domAttrValue(n, "data-marker")
+		if "=" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
+		}
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}

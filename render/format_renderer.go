@@ -114,8 +114,10 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
-	ret.RendererFuncs[ast.NodeMarkOpenMarker] = ret.renderMarkOpenMarker
-	ret.RendererFuncs[ast.NodeMarkCloseMarker] = ret.renderMarkCloseMarker
+	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
+	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
+	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
+	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	return ret
 }
 
@@ -146,12 +148,22 @@ func (r *FormatRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatu
 	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString("=")
+	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteString("=")
+	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString("==")
 	return ast.WalkStop
 }
 
-func (r *FormatRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString("==")
 	return ast.WalkStop
 }

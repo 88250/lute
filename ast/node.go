@@ -447,9 +447,11 @@ const (
 	NodeBlockRefText  NodeType = 433 // 内容块文本
 
 	// 支持 ==Mark== 标记语法 https://github.com/88250/lute/issues/84
-	NodeMark            NodeType = 450 // 标记
-	NodeMarkOpenMarker  NodeType = 451 // 开始标记标记符 ==
-	NodeMarkCloseMarker NodeType = 452 // 结束标记标记符 ==
+	NodeMark             NodeType = 450 // 标记
+	NodeMark1OpenMarker  NodeType = 451 // 开始标记标记符 =
+	NodeMark1CloseMarker NodeType = 452 // 结束标记标记符 =
+	NodeMark2OpenMarker  NodeType = 453 // 开始标记标记符 ==
+	NodeMark2CloseMarker NodeType = 454 // 结束标记标记符 ==
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

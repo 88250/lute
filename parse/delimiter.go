@@ -82,6 +82,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	openersBottom[lex.ItemUnderscore] = stackBottom
 	openersBottom[lex.ItemAsterisk] = stackBottom
 	openersBottom[lex.ItemTilde] = stackBottom
+	openersBottom[lex.ItemEqual] = stackBottom
 
 	// find first closer above stack_bottom:
 	closer = ctx.delimiters
@@ -134,7 +135,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			}
 
 			if t.Context.Option.Mark {
-				if lex.ItemEqual == closercc && (2 != opener.num || (opener.num != closer.num)) {
+				if lex.ItemEqual == closercc && opener.num != closer.num {
 					break
 				}
 			} else {
@@ -172,6 +173,12 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 						openMarker.Type = ast.NodeStrikethrough1OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough1CloseMarker
 					}
+				} else if lex.ItemEqual == closercc {
+					if t.Context.Option.Mark {
+						emStrongDelMark.Type = ast.NodeMark
+						openMarker.Type = ast.NodeMark1OpenMarker
+						closeMarker.Type = ast.NodeMark1CloseMarker
+					}
 				}
 			} else {
 				if lex.ItemAsterisk == closercc {
@@ -191,8 +198,8 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				} else if lex.ItemEqual == closercc {
 					if t.Context.Option.Mark {
 						emStrongDelMark.Type = ast.NodeMark
-						openMarker.Type = ast.NodeMarkOpenMarker
-						closeMarker.Type = ast.NodeMarkCloseMarker
+						openMarker.Type = ast.NodeMark1OpenMarker
+						closeMarker.Type = ast.NodeMark1CloseMarker
 					}
 				}
 			}
