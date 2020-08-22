@@ -151,12 +151,12 @@ func (r *VditorIRRenderer) renderMarkOpenMarker(node *ast.Node, entering bool) a
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("==")
 	r.tag("/span", nil, false)
-	r.tag("s", [][]string{{"data-newline", "1"}}, false)
+	r.tag("mark", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/s", nil, false)
+	r.tag("/mark", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteString("==")
 	r.tag("/span", nil, false)

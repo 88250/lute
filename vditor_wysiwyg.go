@@ -1112,6 +1112,8 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
 		}
+	case atom.Mark:
+		node.AppendChild(&ast.Node{Type: ast.NodeMarkCloseMarker, Tokens: []byte("==")})
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}
