@@ -243,19 +243,16 @@ func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 }
 
 func (r *VditorIRRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.renderSpanNode(node)
-		r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "html-entity"}}, false)
-		r.Write(html.EscapeHTML(node.HtmlEntityTokens))
-		r.tag("/code", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", nil, false)
-		r.Write(node.HtmlEntityTokens)
-		r.tag("/code", nil, false)
-		r.tag("/span", nil, false)
-	} else {
-		r.tag("/span", nil, false)
-	}
+	r.renderSpanNode(node)
+	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "html-entity"}}, false)
+	r.Write(html.EscapeHTML(node.HtmlEntityTokens))
+	r.tag("/code", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	r.tag("code", nil, false)
+	r.Write(node.HtmlEntityTokens)
+	r.tag("/code", nil, false)
+	r.tag("/span", nil, false)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -1266,6 +1263,8 @@ func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "emoji"})
 	case ast.NodeInlineHTML:
 		attrs = append(attrs, []string{"data-type", "html-inline"})
+	case ast.NodeHTMLEntity:
+		attrs = append(attrs, []string{"data-type", "html-entity"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
