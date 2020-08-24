@@ -84,3 +84,20 @@ func TestMd2VditorIR(t *testing.T) {
 		}
 	}
 }
+
+var md2VditorIRBlockTests = []parseTest{
+
+	{"0", "", ""},
+}
+
+func TestMd2VditorIRBlock(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.ToC = true
+
+	for _, test := range md2VditorIRBlockTests {
+		md := luteEngine.Md2VditorIRBlockDOM(test.from)
+		if test.to != md {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
+		}
+	}
+}

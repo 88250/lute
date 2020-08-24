@@ -1283,12 +1283,6 @@ func (r *VditorIRBlockRenderer) renderTaskListItemMarker(node *ast.Node, enterin
 
 func (r *VditorIRBlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("hr", [][]string{{"data-block", "0"}}, true)
-	if nil != node.Tokens {
-		r.tag("p", [][]string{{"data-block", "0"}}, false)
-		r.Write(node.Tokens)
-		r.WriteByte(lex.ItemNewline)
-		r.tag("/p", nil, false)
-	}
 	return ast.WalkStop
 }
 
