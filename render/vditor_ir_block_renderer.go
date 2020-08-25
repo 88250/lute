@@ -684,6 +684,9 @@ func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) a
 func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", node.ID}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
+		r.WriteString("<svg><use xlink:href=\"vditor-icon-table\"></use></svg>")
+		r.tag("/span", nil, false)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
@@ -1131,6 +1134,9 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString(`<blockquote data-block="0" data-node-id="` + node.ID + `">`)
+		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#vditor-icon-quote\"></use></svg>")
+		r.tag("/span", nil, false)
 	} else {
 		r.WriteString("</blockquote>")
 	}
@@ -1145,11 +1151,11 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 	if entering {
 		text := r.Text(node)
 		headingID := node.ChildByType(ast.NodeHeadingID)
-		level := headingLevel[node.HeadingLevel:node.HeadingLevel+1]
+		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		if strings.Contains(text, util.Caret) || (nil != headingID && bytes.Contains(headingID.Tokens, util.CaretTokens)) {
 			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
 		} else {
-			r.WriteString("<h" + level+ " data-block=\"0\" class=\"vditor-ir__node\"")
+			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
 		r.WriteString(" data-node-id=\"" + node.ID + "\"")
@@ -1247,6 +1253,14 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 		attrs = append(attrs, []string{"data-node-id", node.ID})
 		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
+
+		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
+		if "ol" == tag {
+			r.WriteString("<svg><use xlink:href=\"#vditor-icon-list\"></use></svg>")
+		} else {
+			r.WriteString("<svg><use xlink:href=\"#vditor-icon-ordered-list\"></use></svg>")
+		}
+		r.tag("/span", nil, false)
 	} else {
 		r.tag("/"+tag, nil, false)
 	}
@@ -1407,12 +1421,21 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 
 	if strings.Contains(text, util.Caret) {
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-		r.tag("div", attrs, false)
-		return
+	} else {
+		attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	}
-
-	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("div", attrs, false)
+	switch node.Type {
+	case ast.NodeCodeBlock, ast.NodeHTMLBlock:
+		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#vditor-icon-code\"></use></svg>")
+		r.tag("/span", nil, false)
+	case ast.NodeMathBlock:
+		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconMath\n\"></use></svg>")
+		r.tag("/span", nil, false)
+	case ast.NodeYamlFrontMatter:
+	}
 	return
 }
 
