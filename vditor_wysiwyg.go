@@ -244,7 +244,7 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 			n.Data = strings.TrimSpace(n.Data)
 		}
 
-		if "" == n.Data{
+		if "" == n.Data {
 			*emptyNodes = append(*emptyNodes, n)
 		}
 	case atom.Span:
@@ -1214,9 +1214,13 @@ func (lute *Lute) domText(n *html.Node) string {
 }
 
 func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
-	if nil == n || "1" == lute.domAttrValue(n, "data-render") {
+	if nil == n {
 		return
 	}
+	if dataRender := lute.domAttrValue(n, "data-render"); "1" == dataRender || "2" == dataRender {
+		return
+	}
+
 	if "svg" == n.Namespace {
 		return
 	}
