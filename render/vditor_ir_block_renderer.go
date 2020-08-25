@@ -981,6 +981,9 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 
 	if entering {
 		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconParagraph\"></use></svg>")
+		r.tag("/span", nil, false)
 	} else {
 		r.tag("/p", nil, false)
 	}
@@ -1142,10 +1145,11 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 	if entering {
 		text := r.Text(node)
 		headingID := node.ChildByType(ast.NodeHeadingID)
+		level := headingLevel[node.HeadingLevel:node.HeadingLevel+1]
 		if strings.Contains(text, util.Caret) || (nil != headingID && bytes.Contains(headingID.Tokens, util.CaretTokens)) {
-			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
+			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
 		} else {
-			r.WriteString("<h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + " data-block=\"0\" class=\"vditor-ir__node\"")
+			r.WriteString("<h" + level+ " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
 		r.WriteString(" data-node-id=\"" + node.ID + "\"")
@@ -1169,7 +1173,7 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 		}
 
 		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
-		r.WriteString("<svg><use xlink:href=\"#vditor-icon-headings\"></use></svg>")
+		r.WriteString("<svg><use xlink:href=\"#iconH" + level + "\"></use></svg>")
 		r.tag("/span", nil, false)
 
 		if r.Option.HeadingAnchor {
