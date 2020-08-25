@@ -185,6 +185,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			if ("code-block" == dataType || "math-block" == dataType) &&
 				!strings.Contains(lute.domAttrValue(n.FirstChild, "data-type"), "-block-open-marker") {
 				// 处理在结尾 ``` 或者 $$ 后换行的情况
+				// TODO: 插入符现在已经不可能出现在该位置，确认后移除该段代码
 				p := &ast.Node{Type: ast.NodeParagraph}
 				text := &ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(n.FirstChild))}
 				p.AppendChild(text)

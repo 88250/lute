@@ -242,29 +242,17 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	nodeID := lute.domAttrValue(n, "data-node-id")
 
 	if atom.Div == n.DataAtom {
-		if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType || "yaml-front-matter" == dataType {
-			if ("code-block" == dataType || "math-block" == dataType) &&
-				!strings.Contains(lute.domAttrValue(n.FirstChild, "data-type"), "-block-open-marker") {
-				// 处理在结尾 ``` 或者 $$ 后换行的情况
-				p := &ast.Node{Type: ast.NodeParagraph}
-				text := &ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(n.FirstChild))}
-				p.AppendChild(text)
-				tree.Context.Tip.AppendChild(p)
-				tree.Context.Tip = p
-				return
-			}
-
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				lute.genASTByVditorIRBlockDOM(c, tree)
-			}
-		} else if "link-ref-defs-block" == dataType {
+		// TODO: 细化节点 https://github.com/88250/liandi/issues/163
+		if "link-ref-defs-block" == dataType {
 			text := lute.domText(n)
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
 			tree.Context.Tip.AppendChild(node)
+			return
 		} else if "footnotes-def" == dataType {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				lute.genASTByVditorIRBlockDOM(c, tree)
 			}
+			return
 		} else if "footnotes-block" == dataType {
 			for def := n.FirstChild; nil != def; def = def.NextSibling {
 				originalHTML := &bytes.Buffer{}
@@ -284,16 +272,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 					tree.Context.Tip.AppendChild(node)
 				}
 			}
+			return
 		} else if "toc-block" == dataType {
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
 			tree.Context.Tip.AppendChild(node)
-		} else {
-			text := lute.domText(n)
-			if util.Caret+"\n" == text { // 处理 FireFox 某些情况下产生的分段
-				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(util.Caret + "\n")})
-			}
+			return
 		}
-		return
 	}
 
 	class := lute.domAttrValue(n, "class")
@@ -330,7 +314,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeLinkText
 		}
 		tree.Context.Tip.AppendChild(node)
-	case atom.P, atom.Div:
+	case atom.P:
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -888,20 +872,18 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			defer tree.Context.ParentTip()
 			return
 		case "math-block-open-marker":
-			node.Type = ast.NodeMathBlock
-			node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker, Tokens: parse.MathBlockMarker})
+			node.Type = ast.NodeMathBlockOpenMarker
+			node.Tokens = parse.MathBlockMarker
 			tree.Context.Tip.AppendChild(node)
-			tree.Context.Tip = node
 			return
 		case "yaml-front-matter-close-marker":
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterCloseMarker, Tokens: parse.YamlFrontMatterMarker})
 			defer tree.Context.ParentTip()
 			return
 		case "yaml-front-matter-open-marker":
-			node.Type = ast.NodeYamlFrontMatter
-			node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterOpenMarker, Tokens: parse.YamlFrontMatterMarker})
+			node.Type = ast.NodeYamlFrontMatterOpenMarker
+			node.Tokens = parse.MathBlockMarker
 			tree.Context.Tip.AppendChild(node)
-			tree.Context.Tip = node
 			return
 		case "code-block-open-marker":
 			if atom.Pre == n.NextSibling.DataAtom { // DOM 后缺少 info span 节点
@@ -914,11 +896,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				n.NextSibling.AppendChild(&html.Node{Data: string(marker[lastBacktick:])})
 				marker = marker[:lastBacktick]
 			}
-			node.Type = ast.NodeCodeBlock
-			node.IsFencedCodeBlock = true
-			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
+			tree.Context.Tip.IsFencedCodeBlock = true
+			node.Type = ast.NodeCodeBlockFenceOpenMarker
+			node.Tokens = marker
+			node.CodeBlockFenceLen = len(marker)
 			tree.Context.Tip.AppendChild(node)
-			tree.Context.Tip = node
 			return
 		case "code-block-info":
 			info := []byte(lute.domText(n))
@@ -957,6 +939,29 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Tokens = []byte(text)
 		tree.Context.Tip.AppendChild(node)
 		return
+	case atom.Div:
+		switch dataType {
+		case "math-block":
+			node.Type = ast.NodeMathBlock
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
+		case "code-block":
+			node.Type = ast.NodeCodeBlock
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
+		case "html-block":
+			node.Type = ast.NodeHTMLBlock
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
+		case "yaml-front-matter":
+			node.Type = ast.NodeYamlFrontMatter
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
+		}
 	case atom.Font:
 		text := lute.domText(n)
 		if "" != text {
