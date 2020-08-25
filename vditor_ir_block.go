@@ -238,11 +238,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
-	dataMenu := lute.domAttrValue(n, "data-menu")
-	if "0" == dataMenu { // 不解析菜单部分
-		return
-	}
-
 	dataType := lute.domAttrValue(n, "data-type")
 	nodeID := lute.domAttrValue(n, "data-node-id")
 
@@ -348,7 +343,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		marker := lute.domAttrValue(n, "data-marker")
 		node.HeadingSetext = "=" == marker || "-" == marker
 		if !node.HeadingSetext {
-			marker := lute.domText(n.FirstChild.NextSibling)
+			marker := lute.domText(n.FirstChild)
 			node.HeadingLevel = bytes.Count([]byte(marker), []byte("#"))
 		} else {
 			if "=" == marker {

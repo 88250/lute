@@ -684,7 +684,6 @@ func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) a
 func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", node.ID}}, false)
-		r.renderMenu(node)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
@@ -1456,15 +1455,13 @@ func (r *VditorIRBlockRenderer) renderMenu(node *ast.Node) {
 		r.tag("/span", nil, false)
 		r.fillMenuEmpty(node)
 	case ast.NodeList:
-		tag := "ul"
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			tag = "ol"
-		}
 		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
-		if "ol" == tag {
+		if 0 == node.ListData.Typ {
 			r.WriteString("<svg><use xlink:href=\"#vditor-icon-list\"></use></svg>")
-		} else {
+		} else if 1 == node.ListData.Typ {
 			r.WriteString("<svg><use xlink:href=\"#vditor-icon-ordered-list\"></use></svg>")
+		} else if 3 == node.ListData.Typ {
+			r.WriteString("<svg><use xlink:href=\"#vditor-icon-check\"></use></svg>")
 		}
 		r.tag("/span", nil, false)
 	case ast.NodeCodeBlock, ast.NodeHTMLBlock:
@@ -1477,10 +1474,6 @@ func (r *VditorIRBlockRenderer) renderMenu(node *ast.Node) {
 		r.WriteString("<svg><use xlink:href=\"#iconMath\n\"></use></svg>")
 		r.tag("/span", nil, false)
 		r.fillMenuEmpty(node)
-	case ast.NodeTable:
-		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
-		r.WriteString("<svg><use xlink:href=\"vditor-icon-table\"></use></svg>")
-		r.tag("/span", nil, false)
 	}
 }
 
