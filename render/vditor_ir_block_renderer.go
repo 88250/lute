@@ -1441,37 +1441,37 @@ func (r *VditorIRBlockRenderer) renderMenu(node *ast.Node) {
 	switch node.Type {
 	case ast.NodeHeading:
 		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
-		r.WriteString("<svg><use xlink:href=\"#iconH" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + "\"></use></svg>")
+		r.WriteString("<svg class=\"fn__none\"><use xlink:href=\"#iconH" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + "\"></use></svg>")
 		r.tag("/span", nil, false)
 		r.fillMenuEmpty(node)
 	case ast.NodeParagraph:
 		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
-		r.WriteString("<svg><use xlink:href=\"#iconParagraph\"></use></svg>")
+		r.WriteString("<svg class=\"fn__none\"><use xlink:href=\"#iconParagraph\"></use></svg>")
 		r.tag("/span", nil, false)
 		r.fillMenuEmpty(node)
 	case ast.NodeBlockquote:
 		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
-		r.WriteString("<svg><use xlink:href=\"#vditor-icon-quote\"></use></svg>")
+		r.WriteString("<svg class=\"fn__none\"><use xlink:href=\"#vditor-icon-quote\"></use></svg>")
 		r.tag("/span", nil, false)
 		r.fillMenuEmpty(node)
 	case ast.NodeList:
 		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
 		if 0 == node.ListData.Typ {
-			r.WriteString("<svg><use xlink:href=\"#vditor-icon-list\"></use></svg>")
+			r.WriteString("<svg class=\"fn__none\"><use xlink:href=\"#vditor-icon-list\"></use></svg>")
 		} else if 1 == node.ListData.Typ {
-			r.WriteString("<svg><use xlink:href=\"#vditor-icon-ordered-list\"></use></svg>")
+			r.WriteString("<svg class=\"fn__none\"><use xlink:href=\"#vditor-icon-ordered-list\"></use></svg>")
 		} else if 3 == node.ListData.Typ {
-			r.WriteString("<svg><use xlink:href=\"#vditor-icon-check\"></use></svg>")
+			r.WriteString("<svg class=\"fn__none\"><use xlink:href=\"#vditor-icon-check\"></use></svg>")
 		}
 		r.tag("/span", nil, false)
 	case ast.NodeCodeBlock, ast.NodeHTMLBlock:
 		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
-		r.WriteString("<svg><use xlink:href=\"#vditor-icon-code\"></use></svg>")
+		r.WriteString("<svg class=\"fn__none\"><use xlink:href=\"#vditor-icon-code\"></use></svg>")
 		r.tag("/span", nil, false)
 		r.fillMenuEmpty(node)
 	case ast.NodeMathBlock:
 		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
-		r.WriteString("<svg><use xlink:href=\"#iconMath\n\"></use></svg>")
+		r.WriteString("<svg class=\"fn__none\"><use xlink:href=\"#iconMath\n\"></use></svg>")
 		r.tag("/span", nil, false)
 		r.fillMenuEmpty(node)
 	}
