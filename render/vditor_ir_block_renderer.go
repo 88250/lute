@@ -1167,6 +1167,11 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 				r.WriteString(" data-marker=\"-\">")
 			}
 		}
+
+		r.tag("span", [][]string{{"class", "vditor-ir__menu"}, {"data-menu", "0"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#vditor-icon-headings\"></use></svg>")
+		r.tag("/span", nil, false)
+
 		if r.Option.HeadingAnchor {
 			id := HeadingID(node)
 			r.tag("a", [][]string{{"id", "vditorAnchor-" + id}, {"class", "vditor-anchor"}, {"href", "#" + id}}, false)
