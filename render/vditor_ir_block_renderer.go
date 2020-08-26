@@ -1479,7 +1479,7 @@ func (r *VditorIRBlockRenderer) renderMenu(node *ast.Node) {
 
 func (r *VditorIRBlockRenderer) fillMenuEmpty(node *ast.Node) {
 	text := node.Text()
-	if util.Caret == text {
+	if util.Caret == text || "" == text {
 		r.WriteString(parse.Zwsp)
 	}
 }
