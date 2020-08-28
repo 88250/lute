@@ -30,6 +30,16 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	return
 }
 
+// Inline 会将 markdown 原始文本字节数组解析为一颗语法树，该语法树的第一个块级子节点是段落节点。
+func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
+	tree = &Tree{Name: name, Context: &Context{Option: options}}
+	tree.Context.Tree = tree
+	tree.Root = &ast.Node{Type: ast.NodeDocument}
+	tree.Root.AppendChild(&ast.Node{Type: ast.NodeParagraph, Tokens: markdown})
+	tree.parseInlines()
+	return
+}
+
 // Context 用于维护块级元素解析过程中使用到的公共数据。
 type Context struct {
 	Tree   *Tree    // 关联的语法树
