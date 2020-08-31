@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"35", "<a href=\"bar\">&lt;foo&gt;</a>", "[&lt;foo&gt;](bar)\n"},
 	{"34", "<div class=\"gatsby-highlight\" data-language=\"js\"><pre class=\"blog-code language-js\"><span class=\"token keyword\">const</span></pre></div>", "```js\nconst\n```\n"},
 	{"33", "<table><tr><td><p>事件编号</p></td><td><p>事件类别(category)</p></td><td><p>事件操作(action)</p></td><td><p>事件标签(label)</p></td><td><p>事件值(value)</p></td></tr><tr><td><p>1</p></td><td><p>合作行业标签</p></td><td><p>点击</p></td><td><p>选择条件</p></td><td></td></tr><tr><td><p>2</p></td><td><p>营销目的标签</p></td><td><p>点击</p></td><td><p>选择条件</p></td><td></td></tr><tr><td><p>3</p></td><td><p>合作资源标签</p></td><td><p>点击</p></td><td><p>选择条件</p></td><td></td></tr><tr><td><p>4</p></td><td><p>合作平台标签</p></td><td><p>点击</p></td><td><p>选择条件</p></td><td></td></tr><tr><td><p>5</p></td><td><p>卡片</p></td><td><p>查看详情</p></td><td><p>案例名称</p></td><td></td></tr><tr><td><p>6</p></td><td><p>卡片</p></td><td><p>点赞</p></td><td><p>案例名称</p></td><td><p>点赞数</p></td></tr><tr><td><p>7</p></td><td><p>卡片</p></td><td><p>取消点赞</p></td><td><p>案例名称</p></td><td><p>点赞数</p></td></tr><tr><td><p>8</p></td><td><p>卡片</p></td><td><p>下载分享图</p></td><td><p>案例名称</p></td><td></td></tr></table>", "| 事件编号 | 事件类别(category) | 事件操作(action) | 事件标签(label) | 事件值(value) |\n| - | - | - | - | - |\n| 1 | 合作行业标签 | 点击 | 选择条件 |  |\n| 2 | 营销目的标签 | 点击 | 选择条件 |  |\n| 3 | 合作资源标签 | 点击 | 选择条件 |  |\n| 4 | 合作平台标签 | 点击 | 选择条件 |  |\n| 5 | 卡片 | 查看详情 | 案例名称 |  |\n| 6 | 卡片 | 点赞 | 案例名称 | 点赞数 |\n| 7 | 卡片 | 取消点赞 | 案例名称 | 点赞数 |\n| 8 | 卡片 | 下载分享图 | 案例名称 |  |\n"},
 	{"32", "<ul>\n  <li>咖啡</li>\n  <li>茶\n    <ul>\n    <li>红茶</li>\n    <li>绿茶</li>\n    </ul>\n  </li>\n  <li>牛奶</li>\n</ul>", "* 咖啡\n* 茶\n  * 红茶\n  * 绿茶\n* 牛奶\n"},
@@ -29,40 +30,40 @@ var html2MdTests = []parseTest{
 <body>
 	<table>
 		<tr>
-        	<th>Month</th>
-            <th>Savings</th>
+       	<th>Month</th>
+           <th>Savings</th>
 		</tr>
 		<tr>
-        	<td>January</td>
-            <td>$100</td>
+       	<td>January</td>
+           <td>$100</td>
 		</tr>
 		<tr>
-        	<td>February</td>
-            <td>$80</td>
+       	<td>February</td>
+           <td>$80</td>
 		</tr>
 	</table>
 </body>
 </html>`, "| Month | Savings |\n| - | - |\n| January | $100 |\n| February | $80 |\n"},
 	{"27", `<html>
 <body>
-      <table>
-              <thead>
-                      <tr>
-                              <th>Month</th>
-                              <th>Savings</th>
-                      </tr>
+     <table>
+             <thead>
+                     <tr>
+                             <th>Month</th>
+                             <th>Savings</th>
+                     </tr>
 				</thead>
-              <tbody>
-                      <tr>
-                              <td>January</td>
-                              <td>$100</td>
-                      </tr>
-                      <tr>
-                              <td>February</td>
-                              <td>$80</td>
-                      </tr>
-              </tbody>
-      </table>
+             <tbody>
+                     <tr>
+                             <td>January</td>
+                             <td>$100</td>
+                     </tr>
+                     <tr>
+                             <td>February</td>
+                             <td>$80</td>
+                     </tr>
+             </tbody>
+     </table>
 </body>
 </html>`, "| Month | Savings |\n| - | - |\n| January | $100 |\n| February | $80 |\n"},
 	{"26", "<table class=\"markdown-reference\"><thead><tr><th>Type</th><th class=\"second-example\">Or</th><th>… to Get</th></tr></thead><tbody><tr><td class=\"preformatted\">*Italic*</td><td class=\"preformatted second-example\">_Italic_</td><td><em>Italic</em></td></tr><tr><td class=\"preformatted\">**Bold**</td><td class=\"preformatted second-example\">__Bold__</td><td><strong>Bold</strong></td></tr><tr><td class=\"preformatted\"># Heading 1</td><td class=\"preformatted second-example\">Heading 1<br>=========</td><td><h1 class=\"smaller-h1\">Heading 1</h1></td></tr><tr><td class=\"preformatted\">## Heading 2</td><td class=\"preformatted second-example\">Heading 2<br>---------</td><td><h2 class=\"smaller-h2\">Heading 2</h2></td></tr><tr><td class=\"preformatted\">[Link](http://a.com)</td><td class=\"preformatted second-example\">[Link][1]<br>⋮<br>[1]: http://b.org</td><td><a href=\"https://commonmark.org/\">Link</a></td></tr><tr><td class=\"preformatted\">![Image](http://url/a.png)</td><td class=\"preformatted second-example\">![Image][1]<br>⋮<br>[1]: http://url/b.jpg</td><td><img src=\"https://commonmark.org/help/images/favicon.png\" width=\"36\" height=\"36\" alt=\"Markdown\"></td></tr><tr><td class=\"preformatted\">&gt; Blockquote</td><td class=\"preformatted second-example\">&nbsp;</td><td><blockquote>Blockquote</blockquote></td></tr><tr><td class=\"preformatted\"><p>* List<br>* List<br>* List</p></td><td class=\"preformatted second-example\"><p>- List<br>- List<br>- List<br></p></td><td><ul><li>List</li><li>List</li><li>List</li></ul></td></tr></tbody></table>", "| Type | Or | … to Get |\n| - | - | - |\n| *Italic* | _Italic_ | *Italic* |\n| **Bold** | __Bold__ | **Bold** |\n| # Heading 1 | Heading 1<br/>========= | # Heading 1 |\n| ## Heading 2 | Heading 2<br/>--------- | ## Heading 2 |\n| [Link](http://a.com) | [Link][1]<br/>⋮<br/>[1]: http://b.org | [Link](https://commonmark.org/) |\n| ![Image](http://url/a.png) | ![Image][1]<br/>⋮<br/>[1]: http://url/b.jpg | ![Markdown](https://commonmark.org/help/images/favicon.png) |\n| > Blockquote |   | > Blockquote |\n| * List<br/>* List<br/>* List | - List<br/>- List<br/>- List<br/> | * List* List* List |\n"},
