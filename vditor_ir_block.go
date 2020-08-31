@@ -867,7 +867,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "math-block-close-marker":
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: parse.MathBlockMarker})
-			defer tree.Context.ParentTip()
 			return
 		case "math-block-open-marker":
 			node.Type = ast.NodeMathBlockOpenMarker
@@ -876,7 +875,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "yaml-front-matter-close-marker":
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterCloseMarker, Tokens: parse.YamlFrontMatterMarker})
-			defer tree.Context.ParentTip()
 			return
 		case "yaml-front-matter-open-marker":
 			node.Type = ast.NodeYamlFrontMatterOpenMarker
@@ -915,7 +913,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				marker = []byte("```")
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
-			defer tree.Context.ParentTip()
 			return
 		case "heading-marker":
 			text := lute.domText(n)
