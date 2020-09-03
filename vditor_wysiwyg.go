@@ -247,10 +247,6 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 		if "" == n.Data {
 			*emptyNodes = append(*emptyNodes, n)
 		}
-	case atom.Span:
-		if "0" == lute.domAttrValue(n, "data-menu") { // 移掉 IR 块模式的菜单节点
-			*emptyNodes = append(*emptyNodes, n)
-		}
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
