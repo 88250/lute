@@ -26,7 +26,7 @@ import (
 // FormatRenderer 描述了格式化渲染器。
 type FormatRenderer struct {
 	*BaseRenderer
-	nodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
+	NodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
 }
 
 // NewFormatRenderer 创建一个格式化渲染器。
@@ -469,9 +469,9 @@ func (r *FormatRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Writer = &bytes.Buffer{}
-		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 	} else {
-		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
 		buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
 		r.Writer.Reset()
 		r.Write(buf)
@@ -745,10 +745,10 @@ func (r *FormatRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering boo
 func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Writer = &bytes.Buffer{}
-		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 	} else {
-		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
+		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
 
 		blockquoteLines := bytes.Buffer{}
 		buf := writer.Bytes()
@@ -757,7 +757,7 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 		if 2 < length && lex.IsBlank(lines[length-1]) && lex.IsBlank(lines[length-2]) {
 			lines = lines[:length-1]
 		}
-		if 1 == len(r.nodeWriterStack) { // 已经是根这一层
+		if 1 == len(r.NodeWriterStack) { // 已经是根这一层
 			length = len(lines)
 			if 1 < length && lex.IsBlank(lines[length-1]) {
 				lines = lines[:length-1]
@@ -782,8 +782,8 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 		buf = blockquoteLines.Bytes()
 		writer.Reset()
 		writer.Write(buf)
-		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
-		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.NodeWriterStack[len(r.NodeWriterStack)-1].Write(writer.Bytes())
+		r.Writer = r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		buf = bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
 		r.Write(buf)
@@ -835,12 +835,12 @@ func (r *FormatRenderer) renderHeadingID(node *ast.Node, entering bool) ast.Walk
 func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Writer = &bytes.Buffer{}
-		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 	} else {
-		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
-		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(writer.Bytes())
-		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
+		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
+		r.NodeWriterStack[len(r.NodeWriterStack)-1].Write(writer.Bytes())
+		r.Writer = r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		buf := bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
 		r.Write(buf)
@@ -854,10 +854,10 @@ func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Writer = &bytes.Buffer{}
-		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 	} else {
-		writer := r.nodeWriterStack[len(r.nodeWriterStack)-1]
-		r.nodeWriterStack = r.nodeWriterStack[:len(r.nodeWriterStack)-1]
+		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
+		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
 		indent := len(node.Marker) + 1
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			indent++
@@ -897,8 +897,8 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		if node.ParentIs(ast.NodeTableCell) {
 			buf = bytes.ReplaceAll(buf, []byte("\n"), nil)
 		}
-		r.nodeWriterStack[len(r.nodeWriterStack)-1].Write(buf)
-		r.Writer = r.nodeWriterStack[len(r.nodeWriterStack)-1]
+		r.NodeWriterStack[len(r.NodeWriterStack)-1].Write(buf)
+		r.Writer = r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		buf = bytes.TrimSpace(r.Writer.Bytes())
 		r.Writer.Reset()
 		r.Write(buf)
