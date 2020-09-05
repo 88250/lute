@@ -172,7 +172,6 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
 
 	// 将字符串解析为 DOM 树
-
 	reader := strings.NewReader(htmlStr)
 	htmlRoot := &html.Node{Type: html.ElementNode}
 	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
@@ -192,7 +191,6 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 	}
 
 	// 调整树结构
-
 	ast.Walk(ret.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
@@ -724,7 +722,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		switch dataType {
-		case "block-ref-embed":
+		case "block-ref", "block-ref-embed":
 			text := lute.domText(n)
 			if "" == text {
 				return
@@ -735,33 +733,20 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				node.Type = ast.NodeBlockRef
 				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				id := n.FirstChild.FirstChild.NextSibling.NextSibling.FirstChild.Data
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id)})
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte("*")})
-				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-				tree.Context.Tip.AppendChild(node)
-				if nil != blockRef.Next { // 插入符
-					tree.Context.Tip.AppendChild(blockRef.Next)
+				var id string
+				if "block-ref" == dataType {
+					id = n.FirstChild.NextSibling.NextSibling.FirstChild.Data
+				} else {
+					id = n.FirstChild.FirstChild.NextSibling.NextSibling.FirstChild.Data
 				}
-				return
-			}
-			node.Type = ast.NodeText
-			node.Tokens = []byte(text)
-			tree.Context.Tip.AppendChild(node)
-			return
-		case "block-ref":
-			text := lute.domText(n)
-			t := parse.Parse("", []byte(text), lute.Options)
-			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
-				node.Type = ast.NodeBlockRef
-				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				id := n.FirstChild.NextSibling.NextSibling.FirstChild.Data
 				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id)})
 				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-				text := n.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.Data
+				var text string
+				if "block-ref" == dataType {
+					text = n.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.Data
+				} else {
+					text = n.FirstChild.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.Data
+				}
 				text = strings.TrimLeft(text, "\"")
 				text = strings.TrimRight(text, "\"")
 				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte(text)})
