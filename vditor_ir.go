@@ -272,9 +272,15 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div:
 		node.Type = ast.NodeParagraph
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
+		text := lute.domText(n)
+		if "\n" == text && ast.NodeBlockquote == tree.Context.Tip.Type && nil == tree.Context.Tip.FirstChild.Next {
+			// 不允许在 bq 第一个节点前换行
+			return
+		} else {
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
+		}
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		if "" == strings.TrimSpace(lute.domText(n)) {
 			return
