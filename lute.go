@@ -297,6 +297,10 @@ func (lute *Lute) SetLinkBase(linkBase string) {
 	lute.LinkBase = linkBase
 }
 
+func (lute *Lute) GetLinkBase() string {
+	return lute.LinkBase
+}
+
 func (lute *Lute) SetVditorCodeBlockPreview(b bool) {
 	lute.VditorCodeBlockPreview = b
 }
