@@ -166,7 +166,7 @@ func (r *HtmlRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.Wa
 func (r *HtmlRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("\"")
-		r.Write(node.Tokens)
+		r.Write(html.EscapeHTML(node.Tokens))
 		r.WriteString("\"")
 	}
 	return ast.WalkStop
