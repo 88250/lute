@@ -470,6 +470,7 @@ func (r *VditorIRRenderer) renderInlineMathContent(node *ast.Node, entering bool
 	r.tag("/code", nil, false)
 	r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 	r.tag("code", [][]string{{"class", "language-math"}}, false)
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	r.Write(tokens)
 	r.tag("/code", nil, false)
 	r.tag("/span", nil, false)
