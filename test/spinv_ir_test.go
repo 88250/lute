@@ -18,6 +18,7 @@ import (
 
 var spinVditorIRDOMTests = []*parseTest{
 
+	{"48", "<p data-block=\"0\">foo<span data-type=\"backslash\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">\\</span>*</span>bar<wbr></p>", "<p data-block=\"0\">foo<span data-type=\"backslash\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">\\</span>*</span>bar<wbr></p>"},
 	{"48", "<blockquote data-block=\"0\"><p data-block=\"0\"><br></p><p data-block=\"0\"><wbr>foo</p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr>foo</p></blockquote>"},
 	{"47", "<p data-block=\"0\"><span data-type=\"html-entity\" class=\"vditor-ir__node\"><code data-newline=\"1\" class=\"vditor-ir__marker vditor-ir__marker--pre\" data-type=\"html-entity\">&amp;emsp;</code><span class=\"vditor-ir__preview\" data-render=\"1\"><code> </code></span>foo<wbr></span></p>", "<p data-block=\"0\"><span data-type=\"html-entity\" class=\"vditor-ir__node\"><code data-newline=\"1\" class=\"vditor-ir__marker vditor-ir__marker--pre\" data-type=\"html-entity\">&amp;emsp;</code><span class=\"vditor-ir__preview\" data-render=\"2\"><code>&emsp;</code></span></span>foo<wbr></p>"},
 	{"46", "<p data-block=\"0\">==foo==<wbr></p>", "<p data-block=\"0\"><span data-type=\"mark\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker\">==</span><mark data-newline=\"1\">foo</mark><span class=\"vditor-ir__marker\">==</span></span><wbr></p>"},

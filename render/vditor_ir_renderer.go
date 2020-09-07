@@ -263,12 +263,12 @@ func (r *VditorIRRenderer) renderBackslashContent(node *ast.Node, entering bool)
 
 func (r *VditorIRRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<span data-type=\"backslash\">")
-		r.WriteString("<span>")
+		r.renderSpanNode(node)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 		r.WriteByte(lex.ItemBackslash)
 		r.WriteString("</span>")
 	} else {
-		r.WriteString("</span>")
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1259,6 +1259,8 @@ func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "html-inline"})
 	case ast.NodeHTMLEntity:
 		attrs = append(attrs, []string{"data-type", "html-entity"})
+	case ast.NodeBackslash:
+		attrs = append(attrs, []string{"data-type", "backslash"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}

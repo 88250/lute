@@ -335,7 +335,6 @@ func (r *VditorIRBlockRenderer) RenderFootnotesDefs(context *parse.Context) []by
 }
 
 func (r *VditorIRBlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-
 	r.renderSpanNode(node)
 	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "html-entity"}}, false)
 	r.Write(html.EscapeHTML(node.HtmlEntityTokens))
@@ -356,12 +355,12 @@ func (r *VditorIRBlockRenderer) renderBackslashContent(node *ast.Node, entering 
 
 func (r *VditorIRBlockRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<span data-type=\"backslash\">")
-		r.WriteString("<span>")
+		r.renderSpanNode(node)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 		r.WriteByte(lex.ItemBackslash)
 		r.WriteString("</span>")
 	} else {
-		r.WriteString("</span>")
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1355,6 +1354,8 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "inline-math"})
 	case ast.NodeHTMLEntity:
 		attrs = append(attrs, []string{"data-type", "html-entity"})
+	case ast.NodeBackslash:
+		attrs = append(attrs, []string{"data-type", "backslash"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
