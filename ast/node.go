@@ -25,9 +25,11 @@ type Node struct {
 
 	// 节点基础结构
 
-	ID   string `json:",omitempty"` // 节点的唯一标识
-	URL  string `json:"-"`          // 地址部分
-	Path string `json:"-"`          // 地址路径部分
+	ID       string    `json:",omitempty"` // 节点的唯一标识
+	URL      string    `json:"-"`          // 地址部分
+	Path     string    `json:"-"`          // 地址路径部分
+	Memo     string    `json:",omitempty"` // 节点备注
+	Bookmark *Bookmark `json:",omitempty"` // 书签
 
 	Type       NodeType // 节点类型
 	Parent     *Node    `json:"-"`          // 父节点
@@ -104,6 +106,12 @@ type Node struct {
 	// HTML 实体
 
 	HtmlEntityTokens []byte `json:",omitempty"` // 原始输入的实体 tokens，&amp;
+}
+
+// Bookmark 用于标识节点书签。
+type Bookmark struct {
+	Label       string // 书签标识
+	Description string // 书签描述
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。

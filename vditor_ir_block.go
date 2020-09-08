@@ -795,10 +795,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(text[1 : len(text)-1])
 			tree.Context.Tip.AppendChild(node)
 			return
-		case "em", "strong", "s", "code", "inline-math":
+		case "em", "strong", "s", "mark", "code", "inline-math":
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.Options)
-			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type || ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type || ast.NodeCodeSpan == inlineNode.Type || ast.NodeInlineMath == inlineNode.Type) {
+			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type || ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type || ast.NodeMark == inlineNode.Type || ast.NodeCodeSpan == inlineNode.Type || ast.NodeInlineMath == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
