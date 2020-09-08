@@ -110,8 +110,8 @@ type Node struct {
 
 // Bookmark 用于标识节点书签。
 type Bookmark struct {
-	Label       string // 书签标识
-	Description string // 书签描述
+	Label       string `json:",omitempty"` // 书签标识
+	Description string `json:",omitempty"` // 书签描述
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
