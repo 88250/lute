@@ -25,11 +25,12 @@ type Node struct {
 
 	// 节点基础结构
 
-	ID       string `json:",omitempty"` // 节点的唯一标识
-	URL      string `json:"-"`          // 地址部分
-	Path     string `json:"-"`          // 地址路径部分
-	Memo     string `json:",omitempty"` // 节点备注
-	Bookmark string `json:",omitempty"` // 节点书签
+	ID       string   `json:",omitempty"` // 节点的唯一标识
+	URL      string   `json:"-"`          // 地址部分
+	Path     string   `json:"-"`          // 地址路径部分
+	Memo     string   `json:",omitempty"` // 节点备注
+	Bookmark string   `json:",omitempty"` // 节点书签
+	Aliases  []string `json:",omitempty"` // 节点别名
 
 	Type       NodeType // 节点类型
 	Parent     *Node    `json:"-"`          // 父节点
