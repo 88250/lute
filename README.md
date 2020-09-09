@@ -315,7 +315,7 @@ func main() {
 
 简单示例可参考 JavaScript 目录下的 demo，结合前端编辑器的完整用法请参考 [Vditor 中的示例](https://github.com/Vanessa219/vditor/tree/master/demo)。
 
-![Vditor](https://img.hacpai.com/file/2020/02/%E6%88%AA%E5%9B%BE%E4%B8%93%E7%94%A8-ef21ef12.png)
+![Vditor](https://b3logfile.com/file/2020/02/%E6%88%AA%E5%9B%BE%E4%B8%93%E7%94%A8-ef21ef12.png)
 
 一些细节：
 

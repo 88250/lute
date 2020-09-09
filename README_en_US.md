@@ -68,7 +68,7 @@ Finally, another important motivation is that the B3log open source community ne
 
 ## 🗃 Showcases
 
-* [HacPai](https://ld246.com), you can go to [here](https://ld246.com/guide/markdown) for online testing.
+* [LianDi](https://ld246.com), you can go to [here](https://ld246.com/guide/markdown) for online testing.
 
 ## 🇨🇳 Chinese context optimization
 
@@ -258,7 +258,7 @@ Please see [Golang markdown engine performance benchmark](https://ld246.com/arti
 
 ## 💪 Robustness
 
-Lute carries all Markdown processing on [HacPai](https://ld246.com), processes millions of parsing and rendering requests every day, and runs stably.
+Lute carries all Markdown processing on [LianDi](https://ld246.com), processes millions of parsing and rendering requests every day, and runs stably.
 
 ## 🔒 Safety
 
@@ -309,7 +309,7 @@ About code block syntax highlighting:
 
 For a simple example, please refer to the demo in the JavaScript directory. For the complete usage of the front-end editor, please refer to [Demo in Vditor](https://github.com/Vanessa219/vditor/tree/master/demo)
 
-![Vditor](https://img.hacpai.com/file/2020/02/%E6%88%AA%E5%9B%BE%E4%B8%93%E7%94%A8-ef21ef12.png)
+![Vditor](https://b3logfile.com/file/2020/02/%E6%88%AA%E5%9B%BE%E4%B8%93%E7%94%A8-ef21ef12.png)
 
 Some details:
 
