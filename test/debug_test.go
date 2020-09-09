@@ -73,7 +73,7 @@ var debugTests = []parseTest{
 	{"19", "<a href =\"https://github.com\">GitHub</a>\n", "<a href =\"https://github.com\">GitHub</a>\n"},
 
 	// 链接结尾 / 处理
-	{"18", "https://hacpai.com/ https://hacpai.com", "<p><a href=\"https://hacpai.com/\">https://hacpai.com/</a> <a href=\"https://hacpai.com\">https://hacpai.com</a></p>\n"},
+	{"18", "https://ld246.com/ https://ld246.com", "<p><a href=\"https://ld246.com/\">https://ld246.com/</a> <a href=\"https://ld246.com\">https://ld246.com</a></p>\n"},
 
 	// 转义
 	{"17", "`<a href=\"`\">`\n", "<p><code>&lt;a href=&quot;</code>&quot;&gt;`</p>\n"},

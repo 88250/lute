@@ -32,7 +32,7 @@
 
 [Lute](https://github.com/88250/lute) 是一款结构化的 Markdown 引擎，完整实现了最新的 [GFM](https://github.github.com/gfm/)/[CommonMark](https://commonmark.org) 规范，对中文语境支持更好。
 
-欢迎到 [Lute 官方讨论区](https://hacpai.com/tag/lute)了解更多。同时也欢迎关注 B3log 开源社区微信公众号 `B3log开源`：
+欢迎到 [Lute 官方讨论区](https://ld246.com/tag/lute)了解更多。同时也欢迎关注 B3log 开源社区微信公众号 `B3log开源`：
 
 ![b3logos.jpg](https://b3logfile.com/file/2020/08/b3logos-032af045.jpg)
 
@@ -74,7 +74,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 
 ## 🗃 案例
 
-* [黑客派](https://hacpai.com)，可以到[这里](https://hacpai.com/guide/markdown)进行在线测试。
+* [链滴](https://ld246.com)，可以到[这里](https://ld246.com/guide/markdown)进行在线测试。
 
 ## 🇨🇳 中文语境优化
 
@@ -260,11 +260,11 @@ Markdown 原文：
 
 ## ⚡ 性能
 
-请看 [Golang markdown 引擎性能基准测试](https://hacpai.com/article/1574570835061)。
+请看 [Golang markdown 引擎性能基准测试](https://ld246.com/article/1574570835061)。
 
 ## 💪 健壮性
 
-Lute 承载了[黑客派](https://hacpai.com)上的所有 Markdown 处理，每天处理数百万解析渲染请求，运行表现稳定。
+Lute 承载了[链滴](https://ld246.com)上的所有 Markdown 处理，每天处理数百万解析渲染请求，运行表现稳定。
 
 ## 🔒 安全性
 
@@ -324,14 +324,14 @@ func main() {
 
 ## 📜 文档
 
-* [《提问的智慧》精读注解版](https://hacpai.com/article/1536377163156)
-* [CommonMark 规范要点解读](https://hacpai.com/article/1566893557720)
-* [Lute 实现后记](https://hacpai.com/article/1567062979327)
-* [Markdown 解析原理详解和 Markdown AST 描述](https://hacpai.com/article/1587637426085)
+* [《提问的智慧》精读注解版](https://ld246.com/article/1536377163156)
+* [CommonMark 规范要点解读](https://ld246.com/article/1566893557720)
+* [Lute 实现后记](https://ld246.com/article/1567062979327)
+* [Markdown 解析原理详解和 Markdown AST 描述](https://ld246.com/article/1587637426085)
 
 ## 🏘️ 社区
 
-* [讨论区](https://hacpai.com/tag/lute)
+* [讨论区](https://ld246.com/tag/lute)
 * [报告问题](https://github.com/88250/lute/issues/new/choose)
 
 ## 📄 授权

@@ -14,7 +14,7 @@
 - *倾斜* - `*倾斜*`
 - ~~删除线~~ - `~~删除线~~`
 - `Code 标记` - `` `Code 标记` ``
-- [超级链接](https://hacpai.com) - `[超级链接](https://hacpai.com)`
+- [超级链接](https://ld246.com) - `[超级链接](https://ld246.com)`
 - [username@gmail.com](mailto:username@gmail.com) - `[username@gmail.com](mailto:username@gmail.com)`
 
 ### 提及用户
@@ -265,4 +265,4 @@ K: Em
 
 ## 快捷键
 
-我们的编辑器支持很多快捷键，具体请参考 [键盘快捷键](https://hacpai.com/article/1474030007391)（或者按 "`?` ":smirk_cat:）
+我们的编辑器支持很多快捷键，具体请参考 [键盘快捷键](https://ld246.com/article/1474030007391)（或者按 "`?` ":smirk_cat:）

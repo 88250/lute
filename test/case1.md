@@ -36,7 +36,7 @@ Beyond 有一首歌叫《勇闯新世界》<sup>[5]</sup>，挺应景的。
 
 ### Sym
 
-这个季度 Sym 商业版加入了一个特性：回帖折叠<sup>[8]</sup>，设计这个功能的动机来自黑客派。黑客派上各式各样的回帖已经越来越多了，歪楼的情况时有发生。要想做一个对用户有价值的社区，就一定要处理好内容“降噪”，除了极端情况需要管理员介入封禁甚至删帖，其他小的噪音可通过更柔和的方式解决。这个方式就是让有权限的用户可以折叠其他人的回帖，解决问题的同时也让用户参与到社区的运营操作中，通过共产共建形成社区，这也是“社区”这一词的核心要义。
+这个季度 Sym 商业版加入了一个特性：回帖折叠<sup>[8]</sup>，设计这个功能的动机来自链滴。链滴上各式各样的回帖已经越来越多了，歪楼的情况时有发生。要想做一个对用户有价值的社区，就一定要处理好内容“降噪”，除了极端情况需要管理员介入封禁甚至删帖，其他小的噪音可通过更柔和的方式解决。这个方式就是让有权限的用户可以折叠其他人的回帖，解决问题的同时也让用户参与到社区的运营操作中，通过共产共建形成社区，这也是“社区”这一词的核心要义。
 
 另一个大的改进是搜索系统。对于搜索功能，之前只提供整体执行框架（比如内容新增、更新、删除时会调用搜索管理服务），具体的搜索实现上提供了较弱的 Elasticsearch 支持以及较强的 Algolia 接入支持。而对于客户而言：
 
@@ -54,7 +54,7 @@ Vditor 基本完成了核心的重构，将编辑区从 `<textarea>` 改为带 `
 
 下一代 Markdown 编辑器应该是所见即所得的，目前已经有人在这个方向上做出了一定成果，比如 Mark Text<sup>[11]</sup>。所见即所得编辑器的用户体验不言而喻，另外目前在富文本编辑器领域上一个大趋势是块编辑器（Block Editor）的逐步流行（比如 WordPress 的古腾堡<sup>[12]</sup>），反观现在大部分的 Markdown 编辑器在这方面的设计理念和用户体验落后太多了。Mark Text 为实现 Markdown 的所见即所得编辑方式提供了很好的思路，但它可能受限于底层引擎 Marked<sup>[13]</sup>，导致在处理一些场景时稍显不足。
 
-当初设计 Vditor 时我们就定下了它的目标——“下一代的 Markdown 编辑器，为未来而构建”。要实现这个目标仅在应用层包装的话很难，必须自己实现底层引擎，这点也是 Lute 的动机之一。预计明年年初就可以在黑客派上体验到下一代的 Markdown 编辑器了，敬请期待！ 
+当初设计 Vditor 时我们就定下了它的目标——“下一代的 Markdown 编辑器，为未来而构建”。要实现这个目标仅在应用层包装的话很难，必须自己实现底层引擎，这点也是 Lute 的动机之一。预计明年年初就可以在链滴上体验到下一代的 Markdown 编辑器了，敬请期待！ 
 
 ### 收入情况
 
@@ -79,17 +79,17 @@ Vditor 基本完成了核心的重构，将编辑区从 `<textarea>` 改为带 `
 13. [Marked - 为速度而生的 Markdown 解析器和编译器][13]
 14. [自由职业者、灵活就业人员社保缴费分享][14]
  
-[1]: <https://hacpai.com/article/1524191993505> "创业的第一个春天"
-[2]: <https://hacpai.com/article/1559578726531> "写在星火初版发布之际"
+[1]: <https://ld246.com/article/1524191993505> "创业的第一个春天"
+[2]: <https://ld246.com/article/1559578726531> "写在星火初版发布之际"
 [3]: <https://spec.commonmark.org> "CommonMark 规范"
 [4]: <https://github.com/commonmark/commonmark.js> "CommonMark 官方参考实现项目（JavaScript）"
 [5]: <https://music.163.com/#/song?id=347710> "Beyond - 勇闯新世界"
-[6]: <https://hacpai.com/article/1563154719934> "百度网盘不限速下载器 BND 下载地址"
-[7]: <https://hacpai.com/sponsor> "B3log 开源社区赞助系统"
-[8]: <https://hacpai.com/article/1558427377784> "关于回帖折叠功能"
+[6]: <https://ld246.com/article/1563154719934> "百度网盘不限速下载器 BND 下载地址"
+[7]: <https://ld246.com/sponsor> "B3log 开源社区赞助系统"
+[8]: <https://ld246.com/article/1558427377784> "关于回帖折叠功能"
 [9]: <https://github.com/b3log/symphony/milestone/34?closed=1> "Sym v3.5.1 变更记录"
-[10]: <https://hacpai.com/article/1565073452052> "Vditor v1.6.12 发布公告"
+[10]: <https://ld246.com/article/1565073452052> "Vditor v1.6.12 发布公告"
 [11]: <https://github.com/marktext/marktext> "Mark Text - 简单而优雅的开源 Markdown 编辑器"
 [12]: <https://github.com/WordPress/gutenberg> "古腾堡 - WordPress 的块编辑器"
 [13]: <https://github.com/markedjs/marked> "Marked - A markdown parser and compiler. Built for speed."
-[14]: <https://hacpai.com/article/1494732495592/comment/1559748941849> "自由职业者、灵活就业人员社保缴费分享"
+[14]: <https://ld246.com/article/1494732495592/comment/1559748941849> "自由职业者、灵活就业人员社保缴费分享"

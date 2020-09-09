@@ -35,12 +35,12 @@ var formatTests = []formatTest{
 	{"47", "Setext 标题\n------", "Setext 标题\n-----------\n"},
 
 	// 链接前后自动空格改进 https://github.com/88250/lute/issues/24
-	{"46", "中文 [黑客派](https://hacpai.com) 不需要", "中文 [黑客派](https://hacpai.com) 不需要\n"},
-	{"45", "数字[1黑客派2](https://hacpai.com)需要", "数字 [1 黑客派 2](https://hacpai.com) 需要\n"},
-	{"44", "数字1[HacPai](https://hacpai.com)2需要", "数字 1[HacPai](https://hacpai.com)2 需要\n"},
-	{"43", "英文[HacPai](https://hacpai.com)需要", "英文 [HacPai](https://hacpai.com) 需要\n"},
-	{"42", "中文[黑客派](https://hacpai.com)不需要", "中文[黑客派](https://hacpai.com)不需要\n"},
-	{"41", "[黑客派HacPai](https://hacpai.com)需要", "[黑客派 HacPai](https://hacpai.com) 需要\n"},
+	{"46", "中文 [链滴](https://ld246.com) 不需要", "中文 [链滴](https://ld246.com) 不需要\n"},
+	{"45", "数字[1链滴2](https://ld246.com)需要", "数字 [1 链滴 2](https://ld246.com) 需要\n"},
+	{"44", "数字1[HacPai](https://ld246.com)2需要", "数字 1[HacPai](https://ld246.com)2 需要\n"},
+	{"43", "英文[HacPai](https://ld246.com)需要", "英文 [HacPai](https://ld246.com) 需要\n"},
+	{"42", "中文[链滴](https://ld246.com)不需要", "中文[链滴](https://ld246.com)不需要\n"},
+	{"41", "[链滴HacPai](https://ld246.com)需要", "[链滴 HacPai](https://ld246.com) 需要\n"},
 
 	{"40", "foo[^bar]\nfoo[^baz]\nfoo[^bar]: bar\n[^baz]: baz\n", "foo[^bar]\nfoo[^baz]\nfoo[^bar]: bar\n\n[^baz]: baz\n"},
 	{"39", "foo[^bar]\n[^bar]: bar\n", "foo[^bar]\n\n[^bar]: bar\n"},

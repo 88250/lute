@@ -28,7 +28,7 @@ A structured Markdown engine that supports Go and JavaScript
 
 [Lute](https://github.com/88250/lute) is a structured Markdown engine that fully implements the latest [GFM](https://github.github.com/gfm/) / [CommonMark](https://commonmark.org) standard, better support for Chinese context.
 
-Welcome to [Lute Official Discussion Forum](https://hacpai.com/tag/lute) to learn more.
+Welcome to [Lute Official Discussion Forum](https://ld246.com/tag/lute) to learn more.
 
 ## 📽️ Background
 
@@ -68,7 +68,7 @@ Finally, another important motivation is that the B3log open source community ne
 
 ## 🗃 Showcases
 
-* [HacPai](https://hacpai.com), you can go to [here](https://hacpai.com/guide/markdown) for online testing.
+* [HacPai](https://ld246.com), you can go to [here](https://ld246.com/guide/markdown) for online testing.
 
 ## 🇨🇳 Chinese context optimization
 
@@ -254,11 +254,11 @@ In particular, this should never happen in your resume:
 
 ## ⚡ Performance
 
-Please see [Golang markdown engine performance benchmark](https://hacpai.com/article/1574570835061).
+Please see [Golang markdown engine performance benchmark](https://ld246.com/article/1574570835061).
 
 ## 💪 Robustness
 
-Lute carries all Markdown processing on [HacPai](https://hacpai.com), processes millions of parsing and rendering requests every day, and runs stably.
+Lute carries all Markdown processing on [HacPai](https://ld246.com), processes millions of parsing and rendering requests every day, and runs stably.
 
 ## 🔒 Safety
 
@@ -318,13 +318,13 @@ Some details:
 
 ## 📜 Documentation
 
-* [Interpretation of CommonMark specifications](https://hacpai.com/article/1566893557720)
-* [Lute Implementation Postscript](https://hacpai.com/article/1567062979327)
-* [Markdown parsing and Markdown AST](https://hacpai.com/article/1587637426085)
+* [Interpretation of CommonMark specifications](https://ld246.com/article/1566893557720)
+* [Lute Implementation Postscript](https://ld246.com/article/1567062979327)
+* [Markdown parsing and Markdown AST](https://ld246.com/article/1587637426085)
 
 ## 🏘️ Community
 
-* [Forum](https://hacpai.com/tag/lute)
+* [Forum](https://ld246.com/tag/lute)
 * [Issues](https://github.com/88250/lute/issues/new/choose)
 
 ## 📄 License

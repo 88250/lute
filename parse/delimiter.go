@@ -36,7 +36,7 @@ type delimiter struct {
 	previousDelimiter *delimiter
 }
 
-// 嵌套强调和链接的解析算法的中文解读可参考这里 https://hacpai.com/article/1566893557720
+// 嵌套强调和链接的解析算法的中文解读可参考这里 https://ld246.com/article/1566893557720
 
 // handleDelim 将分隔符 *_~ 入栈。
 func (t *Tree) handleDelim(block *ast.Node, ctx *InlineContext) {
