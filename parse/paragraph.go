@@ -73,7 +73,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
 					p.PrependChild(taskListItemMarker)
 					p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
-					if context.Option.VditorWYSIWYG || context.Option.VditorSV {
+					if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
 						p.Tokens = bytes.TrimSpace(p.Tokens)
 						if caretStartText || caretAfterCloseBracket || caretInBracket {
 							p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)

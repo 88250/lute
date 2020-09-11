@@ -607,9 +607,6 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			node.TaskListItemChecked = true
 		}
 		tree.Context.Tip.AppendChild(node)
-		if nil != node.Parent.Parent && nil != node.Parent.Parent.ListData { // ul.li.input
-			node.Parent.Parent.ListData.Typ = 3
-		}
 		if nil != node.Parent.Parent.Parent && nil != node.Parent.Parent.Parent.ListData { // ul.li.p.input
 			node.Parent.Parent.Parent.ListData.Typ = 3
 		}
