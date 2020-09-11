@@ -18,6 +18,9 @@ import (
 
 var spaceTests = []parseTest{
 
+	{"39", "中1=标记=1文", "<p>中 1 <mark>标记</mark> 1 文</p>\n"},
+	{"38", "中=标记=文", "<p>中<mark>标记</mark>文</p>\n"},
+
 	// 汉语拼音中文空格问题 https://github.com/88250/lute/issues/86
 	{"37", "中yā文", "<p>中 yā 文</p>\n"},
 
@@ -76,6 +79,7 @@ var spaceTests = []parseTest{
 func TestAutoSpace(t *testing.T) {
 	luteEngine := lute.New() // 默认已经开启自动空格优化
 	luteEngine.ChinesePunct = false
+	luteEngine.Mark = true
 
 	for _, test := range spaceTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
