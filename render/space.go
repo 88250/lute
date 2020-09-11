@@ -61,66 +61,26 @@ func addSpaceAtBoundary(prefix string, nextChar rune) string {
 }
 
 func allowSpace(currentChar, nextChar rune) bool {
-	if unicode.IsSpace(currentChar) || !unicode.IsPrint(currentChar) {
-		return false
-	}
-	if unicode.IsSpace(nextChar) || !unicode.IsPrint(nextChar) {
-		return false
-	}
-
-	currentIsASCII := utf8.RuneSelf > currentChar
-	nextIsASCII := utf8.RuneSelf > nextChar
-	currentIsLetter := unicode.IsLetter(currentChar)
-	nextIsLetter := unicode.IsLetter(nextChar)
-	if currentIsASCII == nextIsASCII && currentIsLetter && nextIsLetter {
+	if unicode.IsSpace(currentChar) || unicode.IsSpace(nextChar) ||
+		(util.CaretRune == currentChar) || (util.CaretRune == nextChar) ||
+		!unicode.IsPrint(currentChar) || !unicode.IsPrint(nextChar) {
 		return false
 	}
 
-	if (currentIsLetter && ('￥' == nextChar || '℃' == nextChar)) || (('￥' == currentChar || '℃' == currentChar) && nextIsLetter) {
-		return true
-	}
-
-	if ('%' == currentChar && nextIsLetter && !nextIsASCII) || (!currentIsASCII && currentIsLetter && '%' == nextChar) {
-		return true
-	}
-
-	currentIsDigit := '0' <= currentChar && '9' >= currentChar
-	nextIsDigit := '0' <= nextChar && '9' >= nextChar
-
-	nextIsSymbol := unicode.IsSymbol(nextChar) && '~' != nextChar
-	currentIsPunct := '#' != currentChar && (unicode.IsPunct(currentChar) || '~' == currentChar)
-	nextIsPunct := '#' != nextChar && (unicode.IsPunct(nextChar) || '~' == nextChar)
-
-	if !currentIsPunct && !currentIsASCII && !unicode.Is(unicode.Han, currentChar) {
-		// Emoji 后不应该有空格
+	currentIsHan := unicode.Is(unicode.Han, currentChar)
+	nextIsPunct := '#' != nextChar && '%' != nextChar && (unicode.IsPunct(nextChar) || '~' == nextChar)
+	if currentIsHan && nextIsPunct {
 		return false
 	}
 
-	if currentIsASCII {
-		if currentIsDigit && nextIsSymbol {
-			return false
-		}
-		if currentIsPunct && nextIsLetter {
-			return false
-		}
-		if nextIsPunct || nextIsSymbol {
-			return false
-		}
-		return !nextIsASCII
-	} else {
-		if currentIsPunct {
-			return false
-		}
-		if nextIsSymbol {
-			return true
-		}
-		currentIsSymbol := unicode.IsSymbol(currentChar) && '~' != currentChar
-		if currentIsSymbol && (nextIsDigit || nextIsPunct || !nextIsASCII) {
-			return false
-		}
-		if currentIsLetter && nextIsPunct {
-			return false
-		}
-		return true
+	currentIsPunct := '#' != currentChar && '%' != currentChar && (unicode.IsPunct(currentChar) || '~' == currentChar)
+	nextIsHan := unicode.Is(unicode.Han, nextChar)
+	if nextIsHan && currentIsPunct {
+		return false
 	}
+
+	if (!currentIsHan && !nextIsHan) || (currentIsHan && nextIsHan) {
+		return false
+	}
+	return true
 }

@@ -19,6 +19,9 @@ const CaretNewline = Caret + "\n"
 // CaretTokens 是插入符的字节数组。
 var CaretTokens = []byte(Caret)
 
+// CaretRune 是插入符的 Rune。
+var CaretRune = []rune(Caret)[0]
+
 // CaretNewlineTokens 插入符加换行字节数组。
 var CaretNewlineTokens = []byte(CaretNewline)
 

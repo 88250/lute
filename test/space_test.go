@@ -18,6 +18,9 @@ import (
 
 var spaceTests = []parseTest{
 
+	// 汉语拼音中文空格问题 https://github.com/88250/lute/issues/86
+	{"37", "中yā文", "<p>中 yā 文</p>\n"},
+
 	// 井号 # 前后自动空格问题 https://github.com/88250/lute/issues/62
 	{"36", "前#foo", "<p>前 #foo</p>\n"},
 	{"35", "foo#后", "<p>foo# 后</p>\n"},
