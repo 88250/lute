@@ -900,6 +900,10 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 	if r.Option.Sanitize {
 		tokens = sanitize(tokens)
 	}
+	bilibili := []byte("<iframe src=\"//player.bilibili.com/player.html")
+	if bytes.HasPrefix(tokens, bilibili) {
+		tokens = bytes.Replace(tokens, bilibili, []byte("<iframe class=\"iframe__video\" src=\"https://player.bilibili.com/player.html"), 1)
+	}
 	r.Write(tokens)
 	r.WriteString("</pre>")
 
