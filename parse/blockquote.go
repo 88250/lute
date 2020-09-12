@@ -16,7 +16,7 @@ import (
 )
 
 func BlockquoteContinue(blockquote *ast.Node, context *Context) int {
-	var ln = context.currentLine
+	ln := context.currentLine
 	if !context.indented && lex.Peek(ln, context.nextNonspace) == lex.ItemGreater {
 		context.advanceNextNonspace()
 		context.advanceOffset(1, false)

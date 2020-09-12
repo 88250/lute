@@ -106,7 +106,7 @@ type Node struct {
 
 	HtmlEntityTokens []byte `json:",omitempty"` // 原始输入的实体 tokens，&amp;
 
-	// Kramdown 行级属性列表
+	// Kramdown 内联属性列表
 	KramdownIAL [][]string
 }
 

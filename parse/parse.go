@@ -27,7 +27,6 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
-	tree.parseKramdownIALs()
 	return
 }
 
@@ -39,7 +38,6 @@ func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.Root.AppendChild(&ast.Node{Type: ast.NodeParagraph, Tokens: markdown})
 	tree.parseInlines()
 	tree.lexer = nil
-	tree.parseKramdownIALs()
 	return
 }
 
@@ -298,7 +296,7 @@ type Options struct {
 	BlockRef bool
 	// Mark 设置是否打开“==标记==”支持。
 	Mark bool
-	// KramdownIAL 设置是否打开 kramdown 行级属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
+	// KramdownIAL 设置是否打开 kramdown 内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
 	KramdownIAL bool
 }
 

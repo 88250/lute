@@ -98,7 +98,7 @@ func (t *Tree) incorporateLine(line []byte) {
 	for !matchedLeaf {
 		t.Context.findNextNonspace()
 
-		// 如果不由潜在的节点标记符开头 ^[#`~*+_=<>0-9-$]，则说明不用继续迭代生成子节点
+		// 如果不由潜在的节点标记符开头 ^[#`~*+_=<>0-9-${]，则说明不用继续迭代生成子节点
 		// 这里仅做简单判断的话可以提升一些性能
 		maybeMarker := t.Context.currentLine[t.Context.nextNonspace]
 		if !t.Context.indented && // 缩进代码块
@@ -111,6 +111,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
 			lex.ItemDollar != maybeMarker && // 数学公式
 			lex.ItemOpenBracket != maybeMarker && // 脚注
+			lex.ItemOpenCurlyBrace != maybeMarker && // kramdown 内联属性列表
 			util.Caret[0] != maybeMarker { // Vditor 编辑器支持
 			t.Context.advanceNextNonspace()
 			break
@@ -132,7 +133,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			}
 		}
 
-		if i == startsLen { // nothing matched
+		if i == startsLen { // 没有匹配到任何块
 			t.Context.advanceNextNonspace()
 			break
 		}
@@ -206,7 +207,7 @@ type blockStartFunc func(t *Tree, container *ast.Node) int
 // 2：匹配到叶子块
 var blockStarts = []blockStartFunc{
 
-	// 判断块引用（>）是否开始
+	// 判断块引用（>）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {
 			return 0
@@ -241,7 +242,7 @@ var blockStarts = []blockStartFunc{
 		return 1
 	},
 
-	// 判断 ATX 标题（#）是否开始
+	// 判断 ATX 标题（#）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {
 			return 0
@@ -262,7 +263,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断围栏代码块（```）是否开始
+	// 判断围栏代码块（```）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {
 			return 0
@@ -284,7 +285,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断 Setext 标题（- =）是否开始
+	// 判断 Setext 标题（- =）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented || ast.NodeParagraph != container.Type {
 			return 0
@@ -340,7 +341,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断 HTML 块（<）是否开始
+	// 判断 HTML 块（<）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {
 			return 0
@@ -360,7 +361,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断 YAML Front Matter（---）是否开始
+	// 判断 YAML Front Matter（---）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if !t.Context.Option.YamlFrontMatter || t.Context.indented || nil != t.Root.FirstChild {
 			return 0
@@ -375,7 +376,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断分隔线（--- ***）是否开始
+	// 判断分隔线（--- ***）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {
 			return 0
@@ -391,7 +392,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始
+	// 判断列表、列表项（* - + 1.）或者任务列表项是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if ast.NodeList != container.Type && t.Context.indented {
 			return 0
@@ -424,7 +425,7 @@ var blockStarts = []blockStartFunc{
 		return 1
 	},
 
-	// 判断数学公式块（$$）是否开始
+	// 判断数学公式块（$$）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {
 			return 0
@@ -441,7 +442,7 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断缩进代码块（    code）是否开始
+	// 判断缩进代码块（    code）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if !t.Context.indented {
 			return 0
@@ -456,13 +457,9 @@ var blockStarts = []blockStartFunc{
 		return 0
 	},
 
-	// 判断脚注定义（[^label]）是否开始
+	// 判断脚注定义（[^label]）是否开始。
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.Footnotes {
-			return 0
-		}
-
-		if t.Context.indented {
+		if !t.Context.Option.Footnotes || t.Context.indented {
 			return 0
 		}
 
@@ -505,6 +502,26 @@ var blockStarts = []blockStartFunc{
 			t.Context.FootnotesDefs = append(t.Context.FootnotesDefs, footnotesDef)
 		}
 		return 1
+	},
+
+	// 判断 kramdown 内联属性列表（{: attrs}）是否开始。
+	func(t *Tree, container *ast.Node) int {
+		if !t.Context.Option.KramdownIAL || t.Context.indented {
+			return 0
+		}
+
+		if ial := t.parseKramdownIAL(); nil != ial {
+			t.Context.closeUnmatchedBlocks()
+
+			if ast.NodeDocument == t.Context.Tip.Type {
+				t.Context.Tip.LastChild.KramdownIAL = ial // 挂到最后一个子块上
+			} else {
+				t.Context.Tip.KramdownIAL = ial // 挂到当前末梢上
+			}
+			t.Context.offset = t.Context.currentLineLen // 整行过
+			return 2
+		}
+		return 0
 	},
 }
 
