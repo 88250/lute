@@ -51,7 +51,7 @@ func CodeBlockContinue(codeBlock *ast.Node, context *Context) int {
 	return 0
 }
 
-func codeBlockFinalize(codeBlock *ast.Node) {
+func (context *Context) codeBlockFinalize(codeBlock *ast.Node) {
 	if codeBlock.IsFencedCodeBlock {
 		content := codeBlock.Tokens
 		length := len(content)

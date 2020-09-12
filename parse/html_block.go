@@ -24,7 +24,7 @@ func HtmlBlockContinue(html *ast.Node, context *Context) int {
 	return 0
 }
 
-func htmlBlockFinalize(html *ast.Node) {
+func (context *Context)  htmlBlockFinalize(html *ast.Node) {
 	_, html.Tokens = lex.TrimRight(lex.ReplaceNewlineSpace(html.Tokens))
 }
 

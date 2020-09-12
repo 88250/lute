@@ -100,6 +100,7 @@ func NewOptions() *parse.Options {
 		YamlFrontMatter:                true,
 		BlockRef:                       false,
 		Mark:                           false,
+		KramdownIAL:                    false,
 	}
 }
 

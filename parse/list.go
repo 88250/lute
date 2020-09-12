@@ -18,7 +18,7 @@ import (
 	"strconv"
 )
 
-func listFinalize(list *ast.Node) {
+func (context *Context)  listFinalize(list *ast.Node) {
 	item := list.FirstChild
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的

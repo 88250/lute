@@ -155,9 +155,9 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 	// 节点最终化处理。比如围栏代码块提取 info 部分；HTML 代码块剔除结尾空格；段落需要解析链接引用定义等。
 	switch block.Type {
 	case ast.NodeCodeBlock:
-		codeBlockFinalize(block)
+		context.codeBlockFinalize(block)
 	case ast.NodeHTMLBlock:
-		htmlBlockFinalize(block)
+		context.htmlBlockFinalize(block)
 	case ast.NodeParagraph:
 		insertTable := paragraphFinalize(block, context)
 		if insertTable {
@@ -168,9 +168,10 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 	case ast.NodeYamlFrontMatter:
 		context.yamlFrontMatterFinalize(block)
 	case ast.NodeList:
-		listFinalize(block)
+		context.listFinalize(block)
 	}
 
+	context.parseKramdownIAL(block)
 	context.Tip = parent
 }
 
@@ -295,6 +296,8 @@ type Options struct {
 	BlockRef bool
 	// Mark 设置是否打开“==标记==”支持。
 	Mark bool
+	// KramdownIAL 设置是否打开 kramdown 行级属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
+	KramdownIAL bool
 }
 
 func (context *Context) ParentTip() {

@@ -91,9 +91,11 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 			if nil != paragraph {
 				p.Tokens = paragraph.Tokens
 				p.InsertAfter(table)
+				context.parseKramdownIAL(p)
 				// 设置末梢及其状态
 				table.Close = true
 				context.Tip = table
+				context.parseKramdownIAL(table)
 				return true
 			} else {
 				// 将该段落节点转成表节点
