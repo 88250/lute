@@ -27,6 +27,7 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.lexer = nil
+	tree.parseKramdownIALs()
 	return
 }
 
@@ -37,6 +38,8 @@ func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.Root.AppendChild(&ast.Node{Type: ast.NodeParagraph, Tokens: markdown})
 	tree.parseInlines()
+	tree.lexer = nil
+	tree.parseKramdownIALs()
 	return
 }
 
@@ -171,7 +174,6 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 		context.listFinalize(block)
 	}
 
-	context.parseKramdownIAL(block)
 	context.Tip = parent
 }
 

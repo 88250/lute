@@ -567,7 +567,7 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 
 	if entering {
 		r.Newline()
-		r.tag("p", nil, false)
+		r.tag("p", node.KramdownIAL, false)
 		if r.Option.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
 			r.WriteString("&emsp;&emsp;")
 		}
@@ -691,7 +691,7 @@ func (r *HtmlRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool)
 func (r *HtmlRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.WriteString("<blockquote>")
+		r.tag("blockquote", node.KramdownIAL, false)
 		r.Newline()
 	} else {
 		r.Newline()
@@ -750,6 +750,7 @@ func (r *HtmlRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 		if 0 == node.BulletChar && 1 != node.Start {
 			attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
 		}
+		attrs = append(attrs, node.KramdownIAL...)
 		r.tag(tag, attrs, false)
 		r.Newline()
 	} else {
@@ -762,12 +763,13 @@ func (r *HtmlRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 
 func (r *HtmlRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		var attrs [][]string
+		attrs = append(attrs, node.KramdownIAL...)
 		if 3 == node.ListData.Typ && "" != r.Option.GFMTaskListItemClass &&
 			nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type {
-			r.tag("li", [][]string{{"class", r.Option.GFMTaskListItemClass}}, false)
-		} else {
-			r.tag("li", nil, false)
+			attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 		}
+		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
 		r.Newline()

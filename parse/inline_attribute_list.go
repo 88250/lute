@@ -10,16 +10,64 @@
 
 package parse
 
-import "github.com/88250/lute/ast"
+import (
+	"bytes"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/util"
+)
 
-func (context *Context) parseKramdownIAL(block *ast.Node) {
-	if !context.Option.KramdownIAL {
+var openCurlyBraceColon = util.StrToBytes("{:")
+var emptyIAL = util.StrToBytes("{:}")
+
+func (t *Tree) parseKramdownIALs() {
+	if !t.Context.Option.KramdownIAL {
 		return
 	}
 
+	t.parseKramdownIAL0(t.Root)
+}
 
-	switch block.Type {
-	case ast.NodeParagraph:
+func (t *Tree) parseKramdownIAL0(node *ast.Node) {
+	if ast.NodeText == node.Type {
+		if curlyBracesStart := bytes.Index(node.Tokens, []byte("{:")); 0 <= curlyBracesStart {
+			content := node.Tokens[curlyBracesStart+2:]
+			curlyBracesEnd := bytes.Index(content, closeCurlyBrace)
+			if 3 > curlyBracesEnd {
+				goto Continue
+			}
 
+			content = content[:len(content)-1]
+			for {
+				valid, remains, attr, name, val := t.parseTagAttr(content)
+				if !valid {
+					break
+				}
+
+				content = remains
+				if 1 > len(attr) {
+					break
+				}
+
+				node.Parent.KramdownIAL = append(node.Parent.KramdownIAL, []string{util.BytesToStr(name), util.BytesToStr(val)})
+				node.Tokens = bytes.Replace(node.Tokens, attr, nil, 1)
+			}
+
+			if bytes.Equal(emptyIAL, node.Tokens) {
+				if nil != node.Previous && ast.NodeSoftBreak == node.Previous.Type {
+					node.Previous.Unlink()
+				}
+				parent := node.Parent
+				node.Unlink()
+				if nil != parent && nil == parent.FirstChild { // 如果父节点已经没有子节点，说明这个父节点应该指向它的前一个兄弟节点
+					parent.Previous.KramdownIAL = parent.KramdownIAL
+					parent.Unlink()
+				}
+			}
+		}
+	}
+
+Continue: // 遍历处理子节点
+	for child := node.FirstChild; nil != child; child = child.Next {
+		t.parseKramdownIAL0(child)
 	}
 }

@@ -53,7 +53,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		tags = append(tags, tagName...)
 		tokens = remains
 		for {
-			valid, remains, attr := t.parseTagAttr(tokens)
+			valid, remains, attr, _, _ := t.parseTagAttr(tokens)
 			if !valid {
 				ctx.pos++
 				return
@@ -278,7 +278,7 @@ func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []b
 	return
 }
 
-func (t *Tree) parseTagAttr(tokens []byte) (valid bool, remains, attr []byte) {
+func (t *Tree) parseTagAttr(tokens []byte) (valid bool, remains, attr, name, val []byte) {
 	valid = true
 	remains = tokens
 	var whitespaces []byte
@@ -311,6 +311,10 @@ func (t *Tree) parseTagAttr(tokens []byte) (valid bool, remains, attr []byte) {
 	attr = append(attr, whitespaces...)
 	attr = append(attr, attrName...)
 	attr = append(attr, valSpec...)
+	if nil != valSpec {
+		name = attrName
+		val = valSpec[2 : len(valSpec)-1]
+	}
 	return
 }
 
