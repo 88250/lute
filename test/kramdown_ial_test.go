@@ -18,8 +18,8 @@ import (
 
 var kramIALTests = []parseTest{
 
-	//{"14", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<ul id=\"id\">\n<li>\n<p>foo</p>\n<blockquote id=\"bqid\">\n<p>bar</p>\n</blockquote>\n<blockquote>\n<p id=\"bazid\">baz</p>\n</blockquote>\n</li>\n<li>\n<p id=\"bazid\">baz</p>\n</li>\n</ul>\n"},
-	{"13", "foo\n{: id=\"fooid\"}\nbar", "<ul id=\"id\">\n<li>\n<p>foo</p>\n<blockquote id=\"bqid\">\n<p>bar</p>\n</blockquote>\n<blockquote>\n<p id=\"bazid\">baz</p>\n</blockquote>\n</li>\n<li>\n<p id=\"bazid\">baz</p>\n</li>\n</ul>\n"},
+	{"14", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p id=\"fooid\">foo</p>\n<p id=\"barid\">bar</p>\n"},
+	{"13", "foo\n{: id=\"fooid\"}\nbar", "<p id=\"fooid\">foo</p>\n<p>bar</p>\n"},
 	{"12", "* foo\n\n  > bar\n  {: id=\"bqid\"}\n  > baz\n  > {: id=\"bazid\"}\n* baz\n  {: id=\"bazid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li>\n<p>foo</p>\n<blockquote id=\"bqid\">\n<p>bar</p>\n</blockquote>\n<blockquote>\n<p id=\"bazid\">baz</p>\n</blockquote>\n</li>\n<li>\n<p id=\"bazid\">baz</p>\n</li>\n</ul>\n"},
 	{"11", "* foo\n  * bar\n  * baz\n  {: id=\"subid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li>foo\n<ul id=\"subid\">\n<li>bar</li>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n"},
 	{"10", "* foo\n  * bar\n  * baz\n  {: id=\"subid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li>foo\n<ul id=\"subid\">\n<li>bar</li>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n"},

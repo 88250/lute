@@ -518,6 +518,7 @@ var blockStarts = []blockStartFunc{
 			}
 			lastMatchedContainer.KramdownIAL = ial
 			t.Context.offset = t.Context.currentLineLen // 整行过
+			t.Context.addChild(ast.NodeKramdownIAL, t.Context.nextNonspace)
 			return 2
 		}
 		return 0
