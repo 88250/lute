@@ -140,6 +140,15 @@ func (r *VditorIRRenderer) Render() (output []byte) {
 	return
 }
 
+func (r *VditorIRRenderer) renderKramdownIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"data-type", "kramdown-ial"}}, false)
+		r.Write(node.Tokens)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
 func (r *VditorIRRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)

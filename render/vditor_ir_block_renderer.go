@@ -118,6 +118,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree, genNodeID bool) *VditorIRBlockRe
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
+	ret.RendererFuncs[ast.NodeKramdownIAL] = ret.renderKramdownIAL
 	return ret
 }
 
@@ -142,6 +143,15 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorIRBlockRenderer) renderKramdownIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"data-type", "kramdown-ial"}}, false)
+		r.Write(node.Tokens)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {

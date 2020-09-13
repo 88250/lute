@@ -153,6 +153,7 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
+	ret.RendererFuncs[ast.NodeKramdownIAL] = ret.renderKramdownIAL
 	return ret
 }
 
@@ -188,6 +189,17 @@ func (r *VditorSVRenderer) Render() (output []byte) {
 	r.Write(NewlineSV)
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorSVRenderer) renderKramdownIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		r.tag("span", [][]string{{"data-type", "kramdown-ial"}, {"class", "vditor-sv__marker"}}, false)
+		r.Write(node.Tokens)
+		r.tag("/span", nil, false)
+		r.Newline()
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorSVRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
