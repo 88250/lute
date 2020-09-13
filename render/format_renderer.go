@@ -125,6 +125,8 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 func (r *FormatRenderer) renderKramdownIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Write(node.Tokens)
+	} else {
+		r.Newline()
 	}
 	return ast.WalkContinue
 }
@@ -513,7 +515,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 			}
 		}
 
-		if (!inTightList || (lastListItemLastPara)) && !node.ParentIs(ast.NodeTableCell) {
+		if (!inTightList || (lastListItemLastPara)) && !node.ParentIs(ast.NodeTableCell) && 0 == len(node.KramdownIAL) {
 			r.WriteByte(lex.ItemNewline)
 		}
 	}

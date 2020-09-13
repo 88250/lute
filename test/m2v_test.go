@@ -18,6 +18,7 @@ import (
 
 var md2VditorTests = []parseTest{
 
+	{"19", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\" id=\"fooid\">foo</p><p data-block=\"0\" id=\"barid\">bar</p>"},
 	{"18", "![][foo]\n\n[foo]: bar", "<p data-block=\"0\">\u200b<img src=\"bar\" alt=\"\" data-type=\"link-ref\" data-link-label=\"foo\" /></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"17", "![text][foo]\n\n[foo]: bar", "<p data-block=\"0\">\u200b<img src=\"bar\" alt=\"text\" data-type=\"link-ref\" data-link-label=\"foo\" /></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"16", "# heading {#custom-id}\n", "<h1 data-block=\"0\" data-id=\"#custom-id\" id=\"wysiwyg-#custom-id\" data-marker=\"#\">heading</h1>"},
@@ -47,6 +48,7 @@ var md2VditorTests = []parseTest{
 func TestMd2Vditor(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ToC = true
+	luteEngine.KramdownIAL = true
 
 	for _, test := range md2VditorTests {
 		md := luteEngine.Md2VditorDOM(test.from)
@@ -58,6 +60,7 @@ func TestMd2Vditor(t *testing.T) {
 
 var md2VditorIRTests = []parseTest{
 
+	{"13", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\">foo</p><span data-type=\"kramdown-ial\">{: id=\"fooid\"}\n</span><p data-block=\"0\">bar</p><span data-type=\"kramdown-ial\">{: id=\"barid\"}\n</span>"},
 	{"12", "![][foo]\n\n[foo]: bar", "<p data-block=\"0\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">[foo]</span><img src=\"bar\" /></span></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"11", "![text][foo]\n\n[foo]: bar", "<p data-block=\"0\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">text</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">[foo]</span><img src=\"bar\" alt=\"text\" /></span></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"10", "[^foo]\n\n[^foo]:", "<p data-block=\"0\">\u200b<sup data-type=\"footnotes-ref\" class=\"vditor-ir__node vditor-tooltipped vditor-tooltipped__s\" aria-label=\"\" data-footnotes-label=\"^foo\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">^foo</span><span class=\"vditor-ir__marker--hide\" data-render=\"1\">1</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span></sup>\u200b</p><div data-block=\"0\" data-type=\"footnotes-block\"><div data-type=\"footnotes-def\">[^foo]: </div></div>"},
@@ -76,6 +79,7 @@ var md2VditorIRTests = []parseTest{
 func TestMd2VditorIR(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ToC = true
+	luteEngine.KramdownIAL = true
 
 	for _, test := range md2VditorIRTests {
 		md := luteEngine.Md2VditorIRDOM(test.from)
@@ -87,12 +91,14 @@ func TestMd2VditorIR(t *testing.T) {
 
 var md2VditorIRBlockTests = []parseTest{
 
+	{"1", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\" data-node-id=\"fooid\">foo</p><span data-type=\"kramdown-ial\">{: id=\"fooid\"}\n</span><p data-block=\"0\" data-node-id=\"barid\">bar</p><span data-type=\"kramdown-ial\">{: id=\"barid\"}\n</span>"},
 	{"0", "", ""},
 }
 
 func TestMd2VditorIRBlock(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ToC = true
+	luteEngine.KramdownIAL = true
 
 	for _, test := range md2VditorIRBlockTests {
 		md := luteEngine.Md2VditorIRBlockDOM(test.from)

@@ -26,12 +26,11 @@ import (
 type VditorIRBlockRenderer struct {
 	*BaseRenderer
 	needRenderFootnotesDef bool
-	genNodeID              bool
 }
 
 // NewVditorIRBlockRenderer 创建一个 Vditor Instant-Rendering Block DOM 渲染器。
-func NewVditorIRBlockRenderer(tree *parse.Tree, genNodeID bool) *VditorIRBlockRenderer {
-	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree), genNodeID: genNodeID}
+func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
+	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -201,10 +200,6 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 	r.Writer.Grow(4096)
 
 	ast.Walk(r.Tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if r.genNodeID && entering && (ast.NodeDocument == n.Type || ast.NodeDocument == n.Parent.Type) {
-			n.ID = ast.NewNodeID() // 重新生成根节点的直接子节点 ID
-		}
-
 		extRender := r.ExtRendererFuncs[n.Type]
 		if nil != extRender {
 			output, status := extRender(n, entering)
@@ -693,7 +688,7 @@ func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) a
 
 func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", node.ID}}, false)
+		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", r.NodeID(node)}}, false)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
@@ -994,7 +989,7 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 	}
 
 	if entering {
-		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}, false)
+		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}}, false)
 	} else {
 		r.tag("/p", nil, false)
 	}
@@ -1141,7 +1136,7 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<blockquote data-block="0" data-node-id="` + node.ID + `">`)
+		r.WriteString(`<blockquote data-block="0" data-node-id="` + r.NodeID(node) + `">`)
 	} else {
 		r.WriteString("</blockquote>")
 	}
@@ -1163,7 +1158,7 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
-		r.WriteString(" data-node-id=\"" + node.ID + "\"")
+		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\"")
 
 		var id string
 		if nil != headingID {
@@ -1251,7 +1246,7 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 			}
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
-		attrs = append(attrs, []string{"data-node-id", node.ID})
+		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})
 		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
 	} else {
@@ -1279,7 +1274,7 @@ func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) as
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
-		attrs = append(attrs, []string{"data-node-id", node.ID})
+		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
@@ -1402,7 +1397,7 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 
 func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	text := r.Text(node)
-	attrs := [][]string{{"data-block", "0"}, {"data-node-id", node.ID}}
+	attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}}
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		attrs = append(attrs, []string{"data-type", "code-block"})
@@ -1439,5 +1434,14 @@ func (r *VditorIRBlockRenderer) Text(node *ast.Node) (ret string) {
 		}
 		return ast.WalkContinue
 	})
+	return
+}
+
+func (r *VditorIRBlockRenderer) NodeID(node *ast.Node) (ret string) {
+	for _, kv := range node.KramdownIAL {
+		if "id" == kv[0] {
+			return kv[1]
+		}
+	}
 	return
 }

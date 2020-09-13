@@ -34,11 +34,9 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 
 	markdown := lute.vditorIRBlockDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	ovHTML = lute.Tree2VditorIRBlockDOM(tree, false)
+	ovHTML = lute.Tree2VditorIRBlockDOM(tree)
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
-	// 合并节点 ID
-	ovHTML = lute.MergeNodeID(ivHTML, ovHTML)
 	return
 }
 
@@ -55,7 +53,7 @@ func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewVditorIRBlockRenderer(tree, true)
+	renderer := render.NewVditorIRBlockRenderer(tree)
 	for nodeType, rendererFunc := range lute.HTML2VditorIRBlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -85,7 +83,7 @@ func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
 	lute.VditorSV = false
 
 	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewVditorIRBlockRenderer(tree, true)
+	renderer := render.NewVditorIRBlockRenderer(tree)
 	for nodeType, rendererFunc := range lute.Md2VditorIRBlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -121,54 +119,8 @@ func (lute *Lute) VditorIRBlockDOM2Text(htmlStr string) (text string) {
 	return tree.Root.Text()
 }
 
-func (lute *Lute) MergeNodeID(ivHTML, ovHTML string) (ret string) {
-	var ids []string
-	reader := strings.NewReader(ivHTML)
-	htmlRoot := &html.Node{Type: html.ElementNode}
-	oldHtmlNodes, err := html.ParseFragment(reader, htmlRoot)
-	if nil != err {
-		return ovHTML
-	}
-	for _, htmlNode := range oldHtmlNodes {
-		id := lute.domAttrValue(htmlNode, "data-node-id")
-		// ID 如果有重复，需要重新生成一个新的
-		var existID bool
-		for _, savedID := range ids {
-			if id == savedID {
-				existID = true
-				break
-			}
-		}
-		if "" == id || existID {
-			id = ast.NewNodeID()
-		}
-		ids = append(ids, id)
-	}
-	reader = strings.NewReader(ovHTML)
-	htmlRoot = &html.Node{Type: html.ElementNode}
-	newHtmlNodes, err := html.ParseFragment(reader, htmlRoot)
-	if nil != err {
-		return ovHTML
-	}
-	oldLen := len(oldHtmlNodes)
-	newLen := len(newHtmlNodes)
-	for i := oldLen; i < newLen; i++ {
-		ids = append(ids, ast.NewNodeID())
-	}
-	retBuf := &bytes.Buffer{}
-	for i, htmlNode := range newHtmlNodes {
-		lute.setDOMAttrValue(htmlNode, "data-node-id", ids[i])
-		if err = html.Render(retBuf, htmlNode); nil != err {
-			return ovHTML
-		}
-	}
-	ret = retBuf.String()
-	ret = strings.ReplaceAll(ret, util.FrontEndCaretSelfClose, util.FrontEndCaret)
-	return
-}
-
-func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree, genNodeID bool) (vHTML string) {
-	renderer := render.NewVditorIRBlockRenderer(tree, genNodeID)
+func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
+	renderer := render.NewVditorIRBlockRenderer(tree)
 	output := renderer.Render()
 	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
 		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
@@ -738,6 +690,22 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		switch dataType {
+		case "kramdown-ial":
+			text := lute.domText(n)
+			t := parse.Parse("", []byte(text), lute.Options)
+			if inlineNode := t.Root.FirstChild; nil != inlineNode && (ast.NodeKramdownIAL == inlineNode.Type) {
+				node = inlineNode
+				next := inlineNode.Next
+				tree.Context.Tip.AppendChild(node)
+				if nil != next { // 插入符
+					tree.Context.Tip.AppendChild(next)
+				}
+				return
+			}
+			node.Type = ast.NodeText
+			node.Tokens = []byte(text)
+			tree.Context.Tip.AppendChild(node)
+			return
 		case "block-ref", "block-ref-embed":
 			text := lute.domText(n)
 			if "" == text {

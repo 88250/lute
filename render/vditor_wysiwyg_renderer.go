@@ -144,7 +144,7 @@ func (r *VditorRenderer) Render() (output []byte) {
 }
 
 func (r *VditorRenderer) renderKramdownIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
@@ -738,7 +738,9 @@ func (r *VditorRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 	}
 
 	if entering {
-		r.tag("p", [][]string{{"data-block", "0"}}, false)
+		attr := [][]string{{"data-block", "0"}}
+		attr = append(attr, node.KramdownIAL...)
+		r.tag("p", attr, false)
 	} else {
 		r.tag("/p", nil, false)
 	}
