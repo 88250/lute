@@ -512,12 +512,11 @@ var blockStarts = []blockStartFunc{
 
 		if ial := t.parseKramdownIAL(); nil != ial {
 			t.Context.closeUnmatchedBlocks()
-
-			if ast.NodeDocument == t.Context.Tip.Type {
-				t.Context.Tip.LastChild.KramdownIAL = ial // 挂到最后一个子块上
-			} else {
-				t.Context.Tip.KramdownIAL = ial // 挂到当前末梢上
+			lastMatchedContainer := t.Context.lastMatchedContainer
+			if t.Context.allClosed && (ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type) {
+				lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
 			}
+			lastMatchedContainer.KramdownIAL = ial
 			t.Context.offset = t.Context.currentLineLen // 整行过
 			return 2
 		}
