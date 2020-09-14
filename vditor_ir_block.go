@@ -696,9 +696,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			if inlineNode := t.Root.FirstChild; nil != inlineNode && (ast.NodeKramdownIAL == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
-				tree.Context.Tip.AppendChild(node)
+				tree.Context.Tip.LastChild.KramdownIAL = [][]string{{"id", lute.domAttrValue(n, "id")}} // TODO: 其他属性
+				tree.Context.Tip.LastChild.InsertAfter(node)
 				if nil != next { // 插入符
-					tree.Context.Tip.AppendChild(next)
+					tree.Context.Tip.LastChild.InsertAfter(next)
 				}
 				return
 			}

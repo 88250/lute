@@ -515,6 +515,9 @@ var blockStarts = []blockStartFunc{
 			lastMatchedContainer := t.Context.lastMatchedContainer
 			if t.Context.allClosed && (ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type) {
 				lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
+				if nil == lastMatchedContainer {
+					lastMatchedContainer = t.Context.lastMatchedContainer
+				}
 			}
 			lastMatchedContainer.KramdownIAL = ial
 			t.Context.offset = t.Context.currentLineLen // 整行过
