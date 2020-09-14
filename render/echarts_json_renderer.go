@@ -81,7 +81,7 @@ func (r *EChartsJSONRenderer) renderBlockRef(node *ast.Node, entering bool) ast.
 }
 
 func (r *EChartsJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *EChartsJSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
