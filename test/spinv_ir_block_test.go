@@ -19,7 +19,7 @@ import (
 
 var spinVditorIRBlockDOMTests = []*parseTest{
 
-	{"0", "<p data-block=\"0\" data-node-id=\"fooid\">foo</p><span data-type=\"kramdown-ial\">{: id=\"fooid\"}\n</span><p data-block=\"0\" data-node-id=\"barid\">bar</p><span data-type=\"kramdown-ial\">{: id=\"barid\"}\n</span>", "<p data-block=\"0\" data-node-id=\"fooid\">foo</p><span data-type=\"kramdown-ial\">{: id=\"fooid\"}\n</span><p data-block=\"0\" data-node-id=\"barid\">bar</p><span data-type=\"kramdown-ial\">{: id=\"barid\"}\n</span>"},
+	{"0", "<p data-block=\"0\" data-node-id=\"fooid\">foo</p>\n<p data-block=\"0\" data-node-id=\"barid\">bar</p>", "<p data-block=\"0\" data-node-id=\"fooid\">foo</p><span data-type=\"kramdown-ial\">{: id=\"fooid\"}\n</span><p data-block=\"0\" data-node-id=\"barid\">bar</p><span data-type=\"kramdown-ial\">{: id=\"barid\"}\n</span>"},
 }
 
 func TestSpinVditorIRBlockDOM(t *testing.T) {

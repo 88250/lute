@@ -246,6 +246,13 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	class := lute.domAttrValue(n, "class")
 	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
 	node := &ast.Node{ID: nodeID, Type: ast.NodeText, Tokens: []byte(content)}
+
+	if "" != nodeID {
+		node.KramdownIAL = [][]string{{"id", nodeID}} // TODO: 其他属性
+		ial := &ast.Node{Type: ast.NodeKramdownIAL, Tokens: []byte("{: id=\"" + nodeID + "\"}")}
+		defer tree.Context.Tip.AppendChild(ial)
+	}
+
 	switch n.DataAtom {
 	case 0:
 		if "" == content {
@@ -690,23 +697,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		switch dataType {
-		case "kramdown-ial":
-			text := lute.domText(n)
-			t := parse.Parse("", []byte(text), lute.Options)
-			if inlineNode := t.Root.FirstChild; nil != inlineNode && (ast.NodeKramdownIAL == inlineNode.Type) {
-				node = inlineNode
-				next := inlineNode.Next
-				tree.Context.Tip.LastChild.KramdownIAL = [][]string{{"id", lute.domAttrValue(n, "id")}} // TODO: 其他属性
-				tree.Context.Tip.LastChild.InsertAfter(node)
-				if nil != next { // 插入符
-					tree.Context.Tip.LastChild.InsertAfter(next)
-				}
-				return
-			}
-			node.Type = ast.NodeText
-			node.Tokens = []byte(text)
-			tree.Context.Tip.AppendChild(node)
-			return
 		case "block-ref", "block-ref-embed":
 			text := lute.domText(n)
 			if "" == text {
