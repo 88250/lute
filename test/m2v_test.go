@@ -91,7 +91,7 @@ func TestMd2VditorIR(t *testing.T) {
 
 var md2VditorIRBlockTests = []parseTest{
 
-	{"1", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\" data-node-id=\"fooid\">foo</p><span data-type=\"kramdown-ial\">{: id=\"fooid\"}\n</span><p data-block=\"0\" data-node-id=\"barid\">bar</p><span data-type=\"kramdown-ial\">{: id=\"barid\"}\n</span>"},
+	{"1", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\" data-node-id=\"fooid\" data-type=\"p\">foo</p><p data-block=\"0\" data-node-id=\"barid\" data-type=\"p\">bar</p>"},
 	{"0", "", ""},
 }
 

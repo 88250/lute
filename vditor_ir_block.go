@@ -202,7 +202,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	dataType := lute.domAttrValue(n, "data-type")
-	nodeID := lute.domAttrValue(n, "data-node-id")
 
 	if atom.Div == n.DataAtom {
 		// TODO: 细化节点 https://github.com/88250/liandi/issues/163
@@ -245,10 +244,16 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 
 	class := lute.domAttrValue(n, "class")
 	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
+	nodeID := lute.domAttrValue(n, "data-node-id")
 	node := &ast.Node{ID: nodeID, Type: ast.NodeText, Tokens: []byte(content)}
-
+	if "" == nodeID {
+		if "p" == dataType || "ul" == dataType || "ol" == dataType || "blockquote" == dataType ||
+			"math-block" == dataType || "code-block" == dataType || "table" == dataType || "h" == dataType {
+			nodeID = ast.NewNodeID()
+		}
+	}
 	if "" != nodeID {
-		node.KramdownIAL = [][]string{{"id", nodeID}} // TODO: 其他属性
+		node.KramdownIAL = [][]string{{"id", nodeID}}
 		ial := &ast.Node{Type: ast.NodeKramdownIAL, Tokens: []byte("{: id=\"" + nodeID + "\"}")}
 		defer tree.Context.Tip.AppendChild(ial)
 	}

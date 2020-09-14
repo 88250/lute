@@ -145,11 +145,6 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 }
 
 func (r *VditorIRBlockRenderer) renderKramdownIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.tag("span", [][]string{{"data-type", "kramdown-ial"}}, false)
-		r.Write(node.Tokens)
-		r.tag("/span", nil, false)
-	}
 	return ast.WalkContinue
 }
 
@@ -989,7 +984,7 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 	}
 
 	if entering {
-		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}}, false)
+		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "p"}}, false)
 	} else {
 		r.tag("/p", nil, false)
 	}
@@ -1136,7 +1131,7 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<blockquote data-block="0" data-node-id="` + r.NodeID(node) + `">`)
+		r.tag("blockquote", [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "blockquote"}}, false)
 	} else {
 		r.WriteString("</blockquote>")
 	}
@@ -1158,7 +1153,7 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
-		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\"")
+		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\" data-type=\"h\"")
 
 		var id string
 		if nil != headingID {
@@ -1247,6 +1242,7 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
 		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})
+		attrs = append(attrs, []string{"data-type", tag})
 		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
 	} else {
