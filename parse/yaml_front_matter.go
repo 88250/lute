@@ -44,7 +44,7 @@ func (context *Context) yamlFrontMatterFinalize(node *ast.Node) {
 	if bytes.HasSuffix(tokens, YamlFrontMatterMarker) {
 		tokens = tokens[:len(tokens)-3] // 剔除结尾的 ---
 	}
-	node.Tokens = nil
+	node.Tokens = tokens
 	node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterOpenMarker})
 	node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterContent, Tokens: tokens})
 	node.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterCloseMarker})
