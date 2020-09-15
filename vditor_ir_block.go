@@ -33,6 +33,13 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 
 	markdown := lute.vditorIRBlockDOM2Md(ivHTML)
+	// 修正 ``` 未闭合时 IAL 错位情况
+	if strings.HasPrefix(markdown, "```" + util.Caret + "\n{: id=\"") &&
+			strings.HasSuffix(markdown, "\"}\n") {
+		lines := strings.Split(markdown, "\n")
+		markdown = lines[0] + "\n" + strings.ReplaceAll(lines[0], util.Caret, "") + "\n" + lines[1]
+	}
+
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	ovHTML = lute.Tree2VditorIRBlockDOM(tree)
 	// 替换插入符

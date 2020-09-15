@@ -19,6 +19,8 @@ import (
 
 var spinVditorIRBlockDOMTests = []*parseTest{
 
+	{"2", "<p data-block=\"0\" data-node-id=\"20200915173154-1wi2p2h\" data-type=\"p\">$$<wbr></p>", "<div data-block=\"0\" data-node-id=\"20200915173154-1wi2p2h\" data-type=\"math-block\" class=\"vditor-ir__node vditor-ir__node--expand\"><span data-type=\"math-block-open-marker\">$$</span><pre class=\"vditor-ir__marker--pre vditor-ir__marker\"><code data-type=\"math-block\" class=\"language-math\"><wbr>\n</code></pre><pre class=\"vditor-ir__preview\" data-render=\"2\"><code data-type=\"math-block\" class=\"language-math\"></code></pre><span data-type=\"math-block-close-marker\">$$</span></div>"},
+	{"1", "<p data-block=\"0\" data-node-id=\"20200915172226-iexs3bo\" data-type=\"p\">```<wbr></p>", "<div data-block=\"0\" data-node-id=\"20200915172226-iexs3bo\" data-type=\"code-block\" class=\"vditor-ir__node vditor-ir__node--expand\"><span data-type=\"code-block-open-marker\">```</span><span class=\"vditor-ir__marker vditor-ir__marker--info\" data-type=\"code-block-info\">\u200b<wbr></span><pre class=\"vditor-ir__marker--pre vditor-ir__marker\"><code>\n</code></pre><pre class=\"vditor-ir__preview\" data-render=\"2\"><code></code></pre><span data-type=\"code-block-close-marker\">```</span></div>"},
 	{"0", "<p data-block=\"0\" data-node-id=\"20200914181352-laa3jyd\" data-type=\"p\">foo<wbr></p>", "<p data-block=\"0\" data-node-id=\"20200914181352-laa3jyd\" data-type=\"p\">foo<wbr></p>"},
 }
 
