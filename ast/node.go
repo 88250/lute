@@ -25,10 +25,9 @@ type Node struct {
 
 	// 节点基础结构
 
-	ID       string `json:",omitempty"` // 节点的唯一标识
-	URL      string `json:"-"`          // 地址部分
-	Path     string `json:"-"`          // 地址路径部分
-	Bookmark string `json:",omitempty"` // 节点书签
+	ID   string `json:",omitempty"` // 节点的唯一标识
+	URL  string `json:"-"`          // 地址部分
+	Path string `json:"-"`          // 地址路径部分
 
 	Type       NodeType // 节点类型
 	Parent     *Node    `json:"-"`          // 父节点
@@ -140,6 +139,25 @@ func randStr(length int) string {
 		b[i] = letter[rand.Intn(len(letter))]
 	}
 	return string(b)
+}
+
+func (n *Node) SetIALAttr(name, value string) {
+	for _, kv := range n.KramdownIAL {
+		if name == kv[0] {
+			kv[1] = value
+			return
+		}
+	}
+	n.KramdownIAL = append(n.KramdownIAL, []string{name, value})
+}
+
+func (n *Node) IALAttr(name string) string {
+	for _, kv := range n.KramdownIAL {
+		if name == kv[0] {
+			return kv[1]
+		}
+	}
+	return ""
 }
 
 // TokensStr 返回 n 的 Tokens 字符串。

@@ -264,7 +264,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		ialTokens := []byte("{: id=\"" + nodeID + "\"")
 		bookmark := lute.domAttrValue(n, "bookmark")
 		if "" != bookmark {
-			node.KramdownIAL = append(node.KramdownIAL, []string{"bookmark", bookmark})
+			node.SetIALAttr("bookmark", bookmark)
 			ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
 		}
 		ialTokens = append(ialTokens, '}')
