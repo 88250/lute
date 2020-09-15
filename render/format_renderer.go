@@ -355,7 +355,9 @@ func (r *FormatRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStat
 	if !entering {
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
-			r.WriteByte(lex.ItemNewline)
+			if 0 == len(node.KramdownIAL) {
+				r.WriteByte(lex.ItemNewline)
+			}
 		}
 	}
 	return ast.WalkContinue
@@ -650,7 +652,9 @@ func (r *FormatRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool
 func (r *FormatRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 	if !entering && !r.isLastNode(r.Tree.Root, node) {
-		r.WriteByte(lex.ItemNewline)
+		if 0 == len(node.KramdownIAL) {
+			r.WriteByte(lex.ItemNewline)
+		}
 	}
 	return ast.WalkContinue
 }
@@ -694,7 +698,9 @@ func (r *FormatRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Walk
 		r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
-			r.WriteByte(lex.ItemNewline)
+			if 0 == len(node.KramdownIAL) {
+				r.WriteByte(lex.ItemNewline)
+			}
 		}
 		return ast.WalkStop
 	}
