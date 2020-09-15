@@ -118,16 +118,17 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
-	ret.RendererFuncs[ast.NodeKramdownIAL] = ret.renderKramdownIAL
+	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	return ret
 }
 
-func (r *FormatRenderer) renderKramdownIAL(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
 		r.Write(node.Tokens)
 	} else {
 		r.Newline()
+		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
 }
@@ -664,7 +665,7 @@ func (r *FormatRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering boo
 	r.Write(node.Tokens)
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
-		if 0 == len(node.KramdownIAL) {
+		if 0 == len(node.Parent.KramdownIAL) {
 			r.WriteByte(lex.ItemNewline)
 		}
 	}

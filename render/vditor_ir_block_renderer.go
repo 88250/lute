@@ -117,7 +117,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
-	ret.RendererFuncs[ast.NodeKramdownIAL] = ret.renderKramdownIAL
+	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	return ret
 }
 
@@ -144,7 +144,7 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	return
 }
 
-func (r *VditorIRBlockRenderer) renderKramdownIAL(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 

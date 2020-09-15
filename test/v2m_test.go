@@ -180,6 +180,7 @@ var vditorIRBlockDOM2MdTests = []parseTest{
 
 func TestVditorIRBlockDOM2Md(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.KramdownIAL = true
 
 	for _, test := range vditorIRBlockDOM2MdTests {
 		md := luteEngine.VditorIRBlockDOM2Md(test.from)

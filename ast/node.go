@@ -463,7 +463,7 @@ const (
 
 	// kramdown 内联属性列表 https://github.com/88250/lute/issues/89
 
-	NodeKramdownIAL NodeType = 455 // 内联属性列表 {: name="value"}
+	NodeKramdownBlockIAL NodeType = 455 // 块级内联属性列表 {: name="value"}
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

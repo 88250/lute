@@ -253,14 +253,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 	}
 	if "" != nodeID {
-		text := lute.domText(n)
-		text = strings.ReplaceAll(text, parse.Zwsp, "")
-		text = strings.TrimSpace(text)
-		if "" != text {
-			node.KramdownIAL = [][]string{{"id", nodeID}}
-			ial := &ast.Node{Type: ast.NodeKramdownIAL, Tokens: []byte("{: id=\"" + nodeID + "\"}")}
-			defer tree.Context.Tip.AppendChild(ial)
-		}
+		node.KramdownIAL = [][]string{{"id", nodeID}}
+		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: []byte("{: id=\"" + nodeID + "\"}")}
+		defer tree.Context.Tip.AppendChild(ial)
 	}
 
 	switch n.DataAtom {
