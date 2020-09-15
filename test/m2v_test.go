@@ -91,6 +91,8 @@ func TestMd2VditorIR(t *testing.T) {
 
 var md2VditorIRBlockTests = []parseTest{
 
+	{"4", "# foo\n{: id=\"test\" bookmark=\"bookmark\"}", "<h1 data-block=\"0\" class=\"vditor-ir__node\" data-node-id=\"test\" bookmark=\"bookmark\" data-type=\"h\" id=\"ir-foo\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\" data-type=\"heading-marker\"># </span>foo</h1>"},
+	{"3", "```\nfoo\n```\n{: id=\"test\" bookmark=\"bookmark\"}", "<div data-block=\"0\" data-node-id=\"test\" bookmark=\"bookmark\" data-type=\"code-block\" class=\"vditor-ir__node\"><span data-type=\"code-block-open-marker\">```</span><span class=\"vditor-ir__marker vditor-ir__marker--info\" data-type=\"code-block-info\">\u200b</span><pre class=\"vditor-ir__marker--pre vditor-ir__marker\"><code>foo\n</code></pre><pre class=\"vditor-ir__preview\" data-render=\"2\"><code>foo\n</code></pre><span data-type=\"code-block-close-marker\">```</span></div>"},
 	{"2", "```\nfoo\n```\n{: id=\"test\"}", "<div data-block=\"0\" data-node-id=\"test\" data-type=\"code-block\" class=\"vditor-ir__node\"><span data-type=\"code-block-open-marker\">```</span><span class=\"vditor-ir__marker vditor-ir__marker--info\" data-type=\"code-block-info\">\u200b</span><pre class=\"vditor-ir__marker--pre vditor-ir__marker\"><code>foo\n</code></pre><pre class=\"vditor-ir__preview\" data-render=\"2\"><code>foo\n</code></pre><span data-type=\"code-block-close-marker\">```</span></div>"},
 	{"1", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\" data-node-id=\"fooid\" data-type=\"p\">foo</p><p data-block=\"0\" data-node-id=\"barid\" data-type=\"p\">bar</p>"},
 	{"0", "", ""},

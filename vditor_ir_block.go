@@ -34,8 +34,8 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 
 	markdown := lute.vditorIRBlockDOM2Md(ivHTML)
 	// 修正 ``` 未闭合时 IAL 错位情况
-	if strings.HasPrefix(markdown, "```" + util.Caret + "\n{: id=\"") &&
-			strings.HasSuffix(markdown, "\"}\n") {
+	if strings.HasPrefix(markdown, "```"+util.Caret+"\n{: id=\"") &&
+		strings.HasSuffix(markdown, "\"}\n") {
 		lines := strings.Split(markdown, "\n")
 		markdown = lines[0] + "\n" + strings.ReplaceAll(lines[0], util.Caret, "") + "\n" + lines[1]
 	}
@@ -261,7 +261,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 	if "" != nodeID {
 		node.KramdownIAL = [][]string{{"id", nodeID}}
-		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: []byte("{: id=\"" + nodeID + "\"}")}
+		ialTokens := []byte("{: id=\"" + nodeID + "\"")
+		bookmark := lute.domAttrValue(n, "bookmark")
+		if "" != bookmark {
+			node.KramdownIAL = append(node.KramdownIAL, []string{"bookmark", bookmark})
+			ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
+		}
+		ialTokens = append(ialTokens, '}')
+		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
 		defer tree.Context.Tip.AppendChild(ial)
 	}
 

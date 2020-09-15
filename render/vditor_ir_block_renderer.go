@@ -683,7 +683,12 @@ func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) a
 
 func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("table", [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", r.NodeID(node)}}, false)
+		attrs := [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", r.NodeID(node)}}
+		ial := r.NodeAttrs(node)
+		if 0 < len(ial) {
+			attrs = append(attrs, ial...)
+		}
+		r.tag("table", attrs, false)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.tag("/tbody", nil, false)
@@ -984,7 +989,12 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 	}
 
 	if entering {
-		r.tag("p", [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "p"}}, false)
+		attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "p"}}
+		ial := r.NodeAttrs(node)
+		if 0 < len(ial) {
+			attrs = append(attrs, ial...)
+		}
+		r.tag("p", attrs, false)
 	} else {
 		r.tag("/p", nil, false)
 	}
@@ -1131,7 +1141,12 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("blockquote", [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "blockquote"}}, false)
+		attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "blockquote"}}
+		ial := r.NodeAttrs(node)
+		if 0 < len(ial) {
+			attrs = append(attrs, ial...)
+		}
+		r.tag("blockquote", attrs, false)
 	} else {
 		r.WriteString("</blockquote>")
 	}
@@ -1153,7 +1168,7 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
-		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\" data-type=\"h\"")
+		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\" " + r.NodeAttrsStr(node) + " data-type=\"h\"")
 
 		var id string
 		if nil != headingID {
@@ -1242,6 +1257,10 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
 		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})
+		ial := r.NodeAttrs(node)
+		if 0 < len(ial) {
+			attrs = append(attrs, ial...)
+		}
 		attrs = append(attrs, []string{"data-type", tag})
 		r.renderListStyle(node, &attrs)
 		r.tag(tag, attrs, false)
@@ -1271,6 +1290,10 @@ func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) as
 			}
 		}
 		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})
+		ial := r.NodeAttrs(node)
+		if 0 < len(ial) {
+			attrs = append(attrs, ial...)
+		}
 		r.tag("li", attrs, false)
 	} else {
 		r.tag("/li", nil, false)
@@ -1394,6 +1417,10 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	text := r.Text(node)
 	attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}}
+	ial := r.NodeAttrs(node)
+	if 0 < len(ial) {
+		attrs = append(attrs, ial...)
+	}
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		attrs = append(attrs, []string{"data-type", "code-block"})
@@ -1438,6 +1465,26 @@ func (r *VditorIRBlockRenderer) NodeID(node *ast.Node) (ret string) {
 		if "id" == kv[0] {
 			return kv[1]
 		}
+	}
+	return
+}
+
+func (r *VditorIRBlockRenderer) NodeAttrs(node *ast.Node) (ret [][]string) {
+	for _, kv := range node.KramdownIAL {
+		if "id" == kv[0] {
+			continue
+		}
+		ret = append(ret, kv)
+	}
+	return
+}
+
+func (r *VditorIRBlockRenderer) NodeAttrsStr(node *ast.Node) (ret string) {
+	for _, kv := range node.KramdownIAL {
+		if "id" == kv[0] {
+			continue
+		}
+		ret += kv[0] + "=\"" + kv[1] + "\""
 	}
 	return
 }
