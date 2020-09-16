@@ -130,23 +130,20 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 	ctx.pos++
 	startPos := ctx.pos
 
-	// get last [ or ![
+	// 获取最新一个 [ 或者 ![
 	opener := ctx.brackets
 	if nil == opener {
 		return &ast.Node{Type: ast.NodeText, Tokens: closeBracket}
 	}
 
 	if !opener.active {
-		// no matched opener, just return a literal
-		// take opener off brackets stack
 		t.removeBracket(ctx)
 		return &ast.Node{Type: ast.NodeText, Tokens: closeBracket}
 	}
 
-	// If we got here, open is a potential opener
 	isImage := opener.image
 
-	// Check to see if we have a link/image
+	// 检查是否满足链接或者图片规则
 
 	var openParen, dest, space, title, closeParen []byte
 	savepos := ctx.pos
@@ -336,8 +333,8 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 		}
 
 		return node
-	} else { // no match
-		t.removeBracket(ctx) // remove this opener from stack
+	} else { // 没有匹配到
+		t.removeBracket(ctx)
 		ctx.pos = startPos
 		return &ast.Node{Type: ast.NodeText, Tokens: closeBracket}
 	}

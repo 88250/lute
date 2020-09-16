@@ -302,7 +302,15 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.Type = ast.NodeLinkText
 		}
-		tree.Context.Tip.AppendChild(node)
+
+		// 尝试行级解析，处理段落图片文本节点转换为图片节点
+		subTree := parse.Inline("", node.Tokens, tree.Context.Option)
+		if ast.NodeParagraph == subTree.Root.FirstChild.Type && ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type &&
+			nil == subTree.Root.FirstChild.Next {
+			tree.Context.Tip.AppendChild(subTree.Root.FirstChild.FirstChild)
+		} else {
+			tree.Context.Tip.AppendChild(node)
+		}
 	case atom.P:
 		node.Type = ast.NodeParagraph
 		text := lute.domText(n)
