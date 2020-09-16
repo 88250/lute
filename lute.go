@@ -155,6 +155,15 @@ func (lute *Lute) TextBundleStr(name, markdown string, linkPrefixes []string) (t
 	return
 }
 
+// HTML2Text 将指定的 HTMl dom 转换为文本。
+func (lute *Lute) HTML2Text(dom string) string {
+	tree := lute.HTML2Tree(dom)
+	if nil == tree {
+		return ""
+	}
+	return tree.Root.Text()
+}
+
 // Space 用于在 text 中的中西文之间插入空格。
 func (lute *Lute) Space(text string) string {
 	return render.Space0(text)

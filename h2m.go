@@ -25,8 +25,22 @@ import (
 // HTML2Markdown 将 HTML 转换为 Markdown。
 func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 	// 将字符串解析为 DOM 树
+	tree := lute.HTML2Tree(htmlStr)
 
-	reader := strings.NewReader(htmlStr)
+	// 将 AST 进行 Markdown 格式化渲染
+	var formatted []byte
+	renderer := render.NewFormatRenderer(tree)
+	for nodeType, rendererFunc := range lute.HTML2MdRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
+	formatted = renderer.Render()
+	markdown = util.BytesToStr(formatted)
+	return
+}
+
+// HTML2Tree 将 HTML 转换为 AST。
+func (lute *Lute) HTML2Tree(dom string) (ret *parse.Tree) {
+	reader := strings.NewReader(dom)
 	htmlRoot := &html.Node{Type: html.ElementNode}
 	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
 	if nil != err {
@@ -38,13 +52,13 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 
 	// 将 HTML 树转换为 Markdown AST
 
-	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
-	tree.Context.Tip = tree.Root
+	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
+	ret.Context.Tip = ret.Root
 	for _, htmlNode := range htmlNodes {
-		lute.genASTByDOM(htmlNode, tree)
+		lute.genASTByDOM(htmlNode, ret)
 	}
 
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+	ast.Walk(ret.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			if ast.NodeList == n.Type {
 				// ul.ul => ul.li.ul
@@ -59,16 +73,6 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 		}
 		return ast.WalkContinue
 	})
-
-	// 将 AST 进行 Markdown 格式化渲染
-
-	var formatted []byte
-	renderer := render.NewFormatRenderer(tree)
-	for nodeType, rendererFunc := range lute.HTML2MdRendererFuncs {
-		renderer.ExtRendererFuncs[nodeType] = rendererFunc
-	}
-	formatted = renderer.Render()
-	markdown = util.BytesToStr(formatted)
 	return
 }
 
