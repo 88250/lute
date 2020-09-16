@@ -123,6 +123,10 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 }
 
 func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if !r.Option.KramdownIAL {
+		return ast.WalkContinue
+	}
+
 	if entering {
 		r.Newline()
 		r.Write(node.Tokens)
@@ -356,7 +360,7 @@ func (r *FormatRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStat
 	if !entering {
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
-			if 0 == len(node.KramdownIAL) {
+			if r.withoutKramdownIAL(node) {
 				r.WriteByte(lex.ItemNewline)
 			}
 		}
@@ -497,7 +501,7 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		if !node.ParentIs(ast.NodeTableCell) {
-			if 0 == len(node.KramdownIAL) {
+			if r.withoutKramdownIAL(node) {
 				r.Newline()
 			}
 		}
@@ -522,7 +526,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 		}
 
 		if (!inTightList || (lastListItemLastPara)) && !node.ParentIs(ast.NodeTableCell) {
-			if 0 == len(node.KramdownIAL) {
+			if r.withoutKramdownIAL(node) {
 				r.WriteByte(lex.ItemNewline)
 			}
 		}
@@ -653,7 +657,7 @@ func (r *FormatRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool
 func (r *FormatRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 	if !entering && !r.isLastNode(r.Tree.Root, node) {
-		if 0 == len(node.KramdownIAL) {
+		if r.withoutKramdownIAL(node) {
 			r.WriteByte(lex.ItemNewline)
 		}
 	}
@@ -665,7 +669,7 @@ func (r *FormatRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering boo
 	r.Write(node.Tokens)
 	r.Newline()
 	if !r.isLastNode(r.Tree.Root, node) {
-		if 0 == len(node.Parent.KramdownIAL) {
+		if r.withoutKramdownIAL(node.Parent) {
 			r.WriteByte(lex.ItemNewline)
 		}
 	}
@@ -699,7 +703,7 @@ func (r *FormatRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Walk
 		r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
-			if 0 == len(node.KramdownIAL) {
+			if r.withoutKramdownIAL(node) {
 				r.WriteByte(lex.ItemNewline)
 			}
 		}
@@ -812,7 +816,7 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) { // 在表格中不能换行，否则会破坏表格的排版 https://github.com/Vanessa219/vditor/issues/368
-			if 0 == len(node.KramdownIAL) {
+			if r.withoutKramdownIAL(node) {
 				r.WriteString("\n\n")
 			}
 		}
@@ -842,7 +846,7 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 		}
 
 		if !node.ParentIs(ast.NodeTableCell) {
-			if 0 == len(node.KramdownIAL) {
+			if r.withoutKramdownIAL(node) {
 				r.Newline()
 				r.WriteByte(lex.ItemNewline)
 			}
@@ -873,7 +877,7 @@ func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) {
-			if 0 == len(node.KramdownIAL) {
+			if r.withoutKramdownIAL(node) {
 				r.WriteString("\n\n")
 			} else {
 
@@ -935,7 +939,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) {
-			if 0 == len(node.KramdownIAL) {
+			if r.withoutKramdownIAL(node) {
 				r.WriteString("\n")
 			}
 		}
@@ -979,4 +983,8 @@ func (r *FormatRenderer) renderHardBreak(node *ast.Node, entering bool) ast.Walk
 func (r *FormatRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 	return ast.WalkStop
+}
+
+func (r *FormatRenderer) withoutKramdownIAL(node *ast.Node) bool {
+	return !r.Option.KramdownIAL || 0 == len(node.KramdownIAL)
 }

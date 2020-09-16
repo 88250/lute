@@ -378,7 +378,7 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	_, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}
-	attrs = append(attrs, []string{"class", "vditor-tooltipped vditor-tooltipped__s"})
+	attrs = append(attrs, []string{"class", "b3-tooltips b3-tooltips__s"})
 	attrs = append(attrs, []string{"aria-label", SubStr(html.EscapeString(label), 24)})
 	attrs = append(attrs, []string{"data-footnotes-label", string(node.FootnotesRefLabel)})
 	r.tag("span", [][]string{{"class", "sup"}}, false)
