@@ -308,3 +308,32 @@ func (r *BaseRenderer) isLastNode(treeRoot, node *ast.Node) bool {
 	}
 	return treeRoot.LastChild == n
 }
+
+func (r *BaseRenderer) NodeID(node *ast.Node) (ret string) {
+	for _, kv := range node.KramdownIAL {
+		if "id" == kv[0] {
+			return kv[1]
+		}
+	}
+	return
+}
+
+func (r *BaseRenderer) NodeAttrs(node *ast.Node) (ret [][]string) {
+	for _, kv := range node.KramdownIAL {
+		if "id" == kv[0] {
+			continue
+		}
+		ret = append(ret, kv)
+	}
+	return
+}
+
+func (r *BaseRenderer) NodeAttrsStr(node *ast.Node) (ret string) {
+	for _, kv := range node.KramdownIAL {
+		if "id" == kv[0] {
+			continue
+		}
+		ret += kv[0] + "=\"" + kv[1] + "\""
+	}
+	return
+}

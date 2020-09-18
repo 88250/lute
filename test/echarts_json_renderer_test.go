@@ -18,6 +18,7 @@ import (
 
 var echartsJSONRendererTests = []parseTest{
 
+	{"5", "foo\n{: id=\"fooid\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Text\\nfoo\"}]},{\"name\":\"Block IAL\\n{: fooid}\"}]}]"},
 	{"4", "&hearts;", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"HTML Entity\\nspan\"}]}]}]"},
 	{"3", ":smile:", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Emoji Unicode\\n\"}]}]}]"},
 	{"2", "~foo~\n", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Strikethrough\\ndel\"}]}]}]"},
@@ -27,6 +28,7 @@ var echartsJSONRendererTests = []parseTest{
 
 func TestEChartsJSONRenderer(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.KramdownIAL = true
 
 	for _, test := range echartsJSONRendererTests {
 		html := luteEngine.RenderEChartsJSON(test.from)

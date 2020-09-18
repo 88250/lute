@@ -1460,31 +1460,3 @@ func (r *VditorIRBlockRenderer) Text(node *ast.Node) (ret string) {
 	return
 }
 
-func (r *VditorIRBlockRenderer) NodeID(node *ast.Node) (ret string) {
-	for _, kv := range node.KramdownIAL {
-		if "id" == kv[0] {
-			return kv[1]
-		}
-	}
-	return
-}
-
-func (r *VditorIRBlockRenderer) NodeAttrs(node *ast.Node) (ret [][]string) {
-	for _, kv := range node.KramdownIAL {
-		if "id" == kv[0] {
-			continue
-		}
-		ret = append(ret, kv)
-	}
-	return
-}
-
-func (r *VditorIRBlockRenderer) NodeAttrsStr(node *ast.Node) (ret string) {
-	for _, kv := range node.KramdownIAL {
-		if "id" == kv[0] {
-			continue
-		}
-		ret += kv[0] + "=\"" + kv[1] + "\""
-	}
-	return
-}
