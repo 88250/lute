@@ -85,7 +85,9 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 func (context *Context) isMathBlockClose(tokens []byte) bool {
 	if context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
+		context.Option.KramdownIAL = false // 关闭待解析后再打开避免死循环
 		inlineTree := Parse("", tokens, context.Option)
+		context.Option.KramdownIAL = true
 		if nil != inlineTree.Root.FirstChild && ast.NodeKramdownBlockIAL == inlineTree.Root.FirstChild.Type {
 			context.Tip.KramdownIAL = context.parseKramdownIAL(inlineTree.Root.FirstChild.Tokens)
 			context.Tip.InsertAfter(inlineTree.Root.FirstChild)
