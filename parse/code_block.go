@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
@@ -105,7 +106,7 @@ func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num in
 	if context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
 		inlineTree := Parse("", tokens, context.Option)
-		if ast.NodeKramdownBlockIAL == inlineTree.Root.FirstChild.Type {
+		if nil != inlineTree.Root.FirstChild && ast.NodeKramdownBlockIAL == inlineTree.Root.FirstChild.Type {
 			context.Tip.KramdownIAL = context.parseKramdownIAL(inlineTree.Root.FirstChild.Tokens)
 			context.Tip.InsertAfter(inlineTree.Root.FirstChild)
 			return true, context.Tip.CodeBlockOpenFence
