@@ -21,12 +21,9 @@ func HtmlBlockContinue(html *ast.Node, context *Context) int {
 	tokens := context.currentLine
 	if context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
-		context.Option.KramdownIAL = false // 关闭待解析后再打开避免死循环
-		inlineTree := Parse("", tokens, context.Option)
-		context.Option.KramdownIAL = true
-		if nil != inlineTree.Root.FirstChild && ast.NodeKramdownBlockIAL == inlineTree.Root.FirstChild.Type {
-			context.Tip.KramdownIAL = context.parseKramdownIAL(inlineTree.Root.FirstChild.Tokens)
-			context.Tip.InsertAfter(inlineTree.Root.FirstChild)
+		if ial := context.parseKramdownIAL(tokens); 0 < len(ial) {
+			context.Tip.KramdownIAL = ial
+			context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: tokens})
 			return 1
 		}
 	}
@@ -37,7 +34,7 @@ func HtmlBlockContinue(html *ast.Node, context *Context) int {
 	return 0
 }
 
-func (context *Context)  htmlBlockFinalize(html *ast.Node) {
+func (context *Context) htmlBlockFinalize(html *ast.Node) {
 	_, html.Tokens = lex.TrimRight(lex.ReplaceNewlineSpace(html.Tokens))
 }
 
@@ -56,12 +53,9 @@ var (
 func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
 	if t.Context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
-		t.Context.Option.KramdownIAL = false // 关闭待解析后再打开避免死循环
-		inlineTree := Parse("", tokens, t.Context.Option)
-		t.Context.Option.KramdownIAL = true
-		if nil != inlineTree.Root.FirstChild && ast.NodeKramdownBlockIAL == inlineTree.Root.FirstChild.Type {
-			t.Context.Tip.KramdownIAL = t.Context.parseKramdownIAL(inlineTree.Root.FirstChild.Tokens)
-			t.Context.Tip.InsertAfter(inlineTree.Root.FirstChild)
+		if ial := t.Context.parseKramdownIAL(tokens); 0 < len(ial) {
+			t.Context.Tip.KramdownIAL = ial
+			t.Context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: tokens})
 			return true
 		}
 	}
@@ -94,7 +88,6 @@ func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
 			}
 		}
 	}
-
 	return false
 }
 
@@ -279,6 +272,5 @@ func (t *Tree) isCloseTag(tokens []byte) bool {
 			}
 		}
 	}
-
 	return true
 }

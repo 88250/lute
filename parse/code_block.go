@@ -105,12 +105,9 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeFence []byte) {
 	if context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
-		context.Option.KramdownIAL = false // 关闭待解析后再打开避免死循环
-		inlineTree := Parse("", tokens, context.Option)
-		context.Option.KramdownIAL = true
-		if nil != inlineTree.Root.FirstChild && ast.NodeKramdownBlockIAL == inlineTree.Root.FirstChild.Type {
-			context.Tip.KramdownIAL = context.parseKramdownIAL(inlineTree.Root.FirstChild.Tokens)
-			context.Tip.InsertAfter(inlineTree.Root.FirstChild)
+		if ial := context.parseKramdownIAL(tokens); 0 < len(ial) {
+			context.Tip.KramdownIAL = ial
+			context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: tokens})
 			return true, context.Tip.CodeBlockOpenFence
 		}
 	}
