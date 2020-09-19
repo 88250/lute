@@ -12,8 +12,6 @@ package parse
 
 import (
 	"bytes"
-	"strings"
-
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -227,14 +225,6 @@ var blockStarts = []blockStartFunc{
 		if withSpace {
 			t.Context.advanceOffset(1, true)
 			markers = append(markers, whitespace)
-		}
-		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
-			// Vditor 三个模式都不能存在空的块引用
-			ln := util.BytesToStr(t.Context.currentLine[t.Context.offset:])
-			ln = strings.ReplaceAll(ln, util.Caret, "")
-			if ln = strings.TrimSpace(ln); "" == ln {
-				return 0
-			}
 		}
 		t.Context.closeUnmatchedBlocks()
 		t.Context.addChild(ast.NodeBlockquote, t.Context.nextNonspace)

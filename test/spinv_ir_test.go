@@ -18,6 +18,7 @@ import (
 
 var spinVditorIRDOMTests = []*parseTest{
 
+	{"50", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr><br></p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr></p></blockquote>"},
 	{"49", "<p data-block=\"0\"><span data-type=\"inline-math\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">$<wbr></span><span class=\"vditor-ir__marker\">$</span></span></p>", "<p data-block=\"0\"><span data-type=\"inline-node\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker\">$</span><code data-newline=\"1\" class=\"vditor-ir__marker vditor-ir__marker--pre\" data-type=\"math-inline\"><wbr></code><span class=\"vditor-ir__preview\" data-render=\"2\"><code class=\"language-math\"></code></span><span class=\"vditor-ir__marker\">$</span></span></p>"},
 	{"48", "<p data-block=\"0\">foo<span data-type=\"backslash\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">\\</span>*</span>bar<wbr></p>", "<p data-block=\"0\">foo<span data-type=\"backslash\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">\\</span>*</span>bar<wbr></p>"},
 	{"48", "<blockquote data-block=\"0\"><p data-block=\"0\"><br></p><p data-block=\"0\"><wbr>foo</p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr>foo</p></blockquote>"},
