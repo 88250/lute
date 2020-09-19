@@ -20,7 +20,7 @@ import (
 func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 	ln := context.currentLine
 	indent := context.indent
-	if 3 >= indent && isMathBlockClose(ln[context.nextNonspace:]) {
+	if 3 >= indent && context.isMathBlockClose(ln[context.nextNonspace:]) {
 		context.finalize(mathBlock, context.lineNum)
 		return 2
 	} else {
@@ -82,7 +82,17 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 	return true, t.Context.indent
 }
 
-func isMathBlockClose(tokens []byte) bool {
+func (context *Context) isMathBlockClose(tokens []byte) bool {
+	if context.Option.KramdownIAL {
+		// 判断 IAL 打断
+		inlineTree := Parse("", tokens, context.Option)
+		if ast.NodeKramdownBlockIAL == inlineTree.Root.FirstChild.Type {
+			context.Tip.KramdownIAL = context.parseKramdownIAL(inlineTree.Root.FirstChild.Tokens)
+			context.Tip.InsertAfter(inlineTree.Root.FirstChild)
+			return true
+		}
+	}
+
 	closeMarker := tokens[0]
 	if closeMarker != lex.ItemDollar {
 		return false

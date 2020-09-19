@@ -19,22 +19,26 @@ var openCurlyBraceColon = util.StrToBytes("{: ")
 var emptyIAL = util.StrToBytes("{:}")
 
 func (t *Tree) parseKramdownIAL() (ret [][]string) {
-	content := t.Context.currentLine[t.Context.nextNonspace:]
-	if curlyBracesStart := bytes.Index(content, []byte("{:")); 0 <= curlyBracesStart {
-		content = content[curlyBracesStart+2:]
-		curlyBracesEnd := bytes.Index(content, closeCurlyBrace)
+	tokens := t.Context.currentLine[t.Context.nextNonspace:]
+	return t.Context.parseKramdownIAL(tokens)
+}
+
+func (context *Context) parseKramdownIAL(tokens []byte) (ret [][]string) {
+	if curlyBracesStart := bytes.Index(tokens, []byte("{:")); 0 <= curlyBracesStart {
+		tokens = tokens[curlyBracesStart+2:]
+		curlyBracesEnd := bytes.Index(tokens, closeCurlyBrace)
 		if 3 > curlyBracesEnd {
 			return
 		}
 
-		content = content[:len(content)-2]
+		tokens = tokens[:len(tokens)-2]
 		for {
-			valid, remains, attr, name, val := t.parseTagAttr(content)
+			valid, remains, attr, name, val := context.Tree.parseTagAttr(tokens)
 			if !valid {
 				break
 			}
 
-			content = remains
+			tokens = remains
 			if 1 > len(attr) {
 				break
 			}
