@@ -18,7 +18,7 @@ import (
 
 var markTests = []parseTest{
 
-	{"11", "==foo=t= **bar**\n", "<p>==foo<mark>t</mark> <strong>bar</strong></p>\n"},
+	{"11", "==foo=t= **bar**\n", "<p>==foo=t= <strong>bar</strong></p>\n"},
 	{"10", "*[==foo==*](bar)\n", "<p>*<a href=\"bar\"><mark>foo</mark>*</a></p>\n"},
 	{"9", "==[*foo*==](bar)\n", "<p>==<a href=\"bar\"><em>foo</em>==</a></p>\n"},
 	{"8", "==[*foo*](bar)==\n", "<p><mark><a href=\"bar\"><em>foo</em></a></mark></p>\n"},
@@ -26,7 +26,7 @@ var markTests = []parseTest{
 	{"6", "==*[foo](bar)==*\n", "<p><mark>*<a href=\"bar\">foo</a></mark>*</p>\n"},
 	{"5", "==[foo](bar)==\n", "<p><mark><a href=\"bar\">foo</a></mark></p>\n"},
 	{"5", "[==foo==](bar)\n", "<p><a href=\"bar\"><mark>foo</mark></a></p>\n"},
-	{"4", "=foo=\n", "<p><mark>foo</mark></p>\n"},
+	{"4", "=foo=\n", "<p>=foo=</p>\n"},
 	{"3", "==**foo==**\n", "<p><mark>**foo</mark>**</p>\n"},
 	{"2", "**==foo==**\n", "<p><strong><mark>foo</mark></strong></p>\n"},
 	{"1", "==**foo**==\n", "<p><mark><strong>foo</strong></mark></p>\n"},

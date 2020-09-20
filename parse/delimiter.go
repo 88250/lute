@@ -303,8 +303,13 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
 	} else {
-		canOpen = isLeftFlanking
-		canClose = isRightFlanking
+		if lex.ItemEqual == token && 2 != delimitersCount { // ==Mark== 标记必须使用两个等号
+			canOpen = false
+			canClose = false
+		} else {
+			canOpen = isLeftFlanking
+			canClose = isRightFlanking
+		}
 	}
 
 	return &delimiter{typ: token, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
