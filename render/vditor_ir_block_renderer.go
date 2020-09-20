@@ -226,7 +226,7 @@ func (r *VditorIRBlockRenderer) renderBlockEmbed(node *ast.Node, entering bool) 
 		r.renderDivNode(node)
 	} else {
 		id := node.ChildByType(ast.NodeBlockEmbedID)
-		r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\" data-type=\"block-render\"></span>")
+		r.WriteString("<div data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\" data-type=\"block-render\"></div>")
 		r.WriteString("</div>")
 	}
 	return ast.WalkContinue
@@ -248,9 +248,13 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedSpace(node *ast.Node, entering b
 
 func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
 	text := html.EscapeHTML(node.Tokens)
-	r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
 	r.Write(text)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
@@ -258,19 +262,9 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bo
 
 func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if "" != previousNodeText && !strings.HasSuffix(previousNodeText, " ") {
-			r.WriteByte(lex.ItemSpace)
-		}
 		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
-		nextNodeText := node.NextNodeText()
-		nextNodeText = strings.ReplaceAll(nextNodeText, util.Caret, "")
-		if "" != nextNodeText && !strings.HasPrefix(nextNodeText, " ") {
-			r.WriteByte(lex.ItemSpace)
-		}
 	}
 	return ast.WalkContinue
 }
@@ -291,9 +285,13 @@ func (r *VditorIRBlockRenderer) renderBlockRefSpace(node *ast.Node, entering boo
 
 func (r *VditorIRBlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	text := html.EscapeHTML(node.Tokens)
-	r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
 	r.Write(text)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
 	r.tag("/span", nil, false)
 	return ast.WalkStop

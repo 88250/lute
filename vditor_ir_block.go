@@ -728,18 +728,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 
 			t := parse.Parse("", []byte(text), lute.Options)
 			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
-				node.Type = ast.NodeBlockRef
-				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				id := n.FirstChild.NextSibling.NextSibling.FirstChild.Data
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: []byte(id)})
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-				text := n.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.Data
-				text = strings.TrimLeft(text, "\"")
-				text = strings.TrimRight(text, "\"")
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: []byte(text)})
-				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+				node = blockRef
 				tree.Context.Tip.AppendChild(node)
 				if nil != blockRef.Next { // 插入符
 					tree.Context.Tip.AppendChild(blockRef.Next)
@@ -953,19 +942,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 
 			t := parse.Parse("", []byte(text), lute.Options)
 			if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
-				node.Type = ast.NodeBlockEmbed
-				node.AppendChild(&ast.Node{Type: ast.NodeBang})
-				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				id := n.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedID, Tokens: []byte(id)})
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedSpace})
-				text := n.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.Data
-				text = strings.TrimLeft(text, "\"")
-				text = strings.TrimRight(text, "\"")
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedText, Tokens: []byte(text)})
-				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+				node = blockEmbed
 				tree.Context.Tip.AppendChild(node)
 				if nil != blockEmbed.Next { // 插入符
 					tree.Context.Tip.AppendChild(blockEmbed.Next)
