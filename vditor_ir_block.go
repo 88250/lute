@@ -729,9 +729,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			t := parse.Parse("", []byte(text), lute.Options)
 			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
 				node = blockRef
+				next := blockRef.Next
 				tree.Context.Tip.AppendChild(node)
-				if nil != blockRef.Next { // 插入符
-					tree.Context.Tip.AppendChild(blockRef.Next)
+				if nil != next { // 插入符
+					tree.Context.Tip.AppendChild(next)
 				}
 				return
 			}
@@ -943,9 +944,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			t := parse.Parse("", []byte(text), lute.Options)
 			if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
 				node = blockEmbed
+				next := blockEmbed.Next
 				tree.Context.Tip.AppendChild(node)
-				if nil != blockEmbed.Next { // 插入符
-					tree.Context.Tip.AppendChild(blockEmbed.Next)
+				if nil != next { // 插入符
+					tree.Context.Tip.AppendChild(next)
 				}
 				return
 			}
