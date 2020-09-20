@@ -223,12 +223,11 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 
 func (r *VditorIRBlockRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.renderSpanNode(node)
-		r.WriteString("<span>")
+		r.renderDivNode(node)
 	} else {
-		r.WriteString("</span>")
 		id := node.ChildByType(ast.NodeBlockEmbedID)
-		r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\" data-type=\"block-render\"></span></span>")
+		r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\" data-type=\"block-render\"></span>")
+		r.WriteString("</div>")
 	}
 	return ast.WalkContinue
 }
@@ -1392,8 +1391,6 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		}
 	case ast.NodeBlockRef:
 		attrs = append(attrs, []string{"data-type", "block-ref"})
-	case ast.NodeBlockEmbed:
-		attrs = append(attrs, []string{"data-type", "block-ref-embed"})
 	case ast.NodeImage:
 		attrs = append(attrs, []string{"data-type", "img"})
 	case ast.NodeCodeSpan:
@@ -1453,6 +1450,8 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "math-block"})
 	case ast.NodeYamlFrontMatter:
 		attrs = append(attrs, []string{"data-type", "yaml-front-matter"})
+	case ast.NodeBlockEmbed:
+		attrs = append(attrs, []string{"data-type", "block-ref-embed"})
 	}
 
 	if strings.Contains(text, util.Caret) {

@@ -531,6 +531,10 @@ var blockStarts = []blockStartFunc{
 		}
 
 		t.Context.closeUnmatchedBlocks()
+
+		for !t.Context.Tip.CanContain(ast.NodeBlockEmbed) {
+			t.Context.finalize(t.Context.Tip, t.Context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
+		}
 		t.Context.Tip.AppendChild(node)
 		t.Context.Tip = node
 		return 2
@@ -569,7 +573,7 @@ func _continue(n *ast.Node, context *Context) int {
 		return YamlFrontMatterContinue(n, context)
 	case ast.NodeFootnotesDef:
 		return FootnotesContinue(n, context)
-	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL:
+	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeBlockEmbed:
 		return 1
 	}
 	return 0

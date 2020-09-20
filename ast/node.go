@@ -323,7 +323,7 @@ func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock, NodeYamlFrontMatter:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed:
 		return true
 	}
 	return false

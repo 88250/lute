@@ -189,6 +189,11 @@ func (r *FormatRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) a
 }
 
 func (r *FormatRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+	} else {
+		r.Newline()
+	}
 	return ast.WalkContinue
 }
 

@@ -161,6 +161,13 @@ func (r *HtmlRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast
 }
 
 func (r *HtmlRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		r.tag("div", nil, false)
+	} else {
+		r.tag("/div", nil, false)
+		r.Newline()
+	}
 	return ast.WalkContinue
 }
 
