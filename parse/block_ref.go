@@ -26,6 +26,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: []byte("(")}
 	}
+
 	var id, text []byte
 	savePos := ctx.pos
 	ctx.pos += 2

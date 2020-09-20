@@ -227,7 +227,7 @@ func (r *VditorIRBlockRenderer) renderBlockEmbed(node *ast.Node, entering bool) 
 		r.WriteString("<span>")
 	} else {
 		r.WriteString("</span>")
-		id := node.ChildByType(ast.NodeBlockRefID)
+		id := node.ChildByType(ast.NodeBlockEmbedID)
 		r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\" data-type=\"block-render\"></span></span>")
 	}
 	return ast.WalkContinue

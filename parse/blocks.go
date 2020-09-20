@@ -110,6 +110,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemDollar != maybeMarker && // 数学公式
 			lex.ItemOpenBracket != maybeMarker && // 脚注
 			lex.ItemOpenCurlyBrace != maybeMarker && // kramdown 内联属性列表
+			lex.ItemBang != maybeMarker && // 内容块嵌入
 			util.Caret[0] != maybeMarker { // Vditor 编辑器支持
 			t.Context.advanceNextNonspace()
 			break
@@ -516,6 +517,23 @@ var blockStarts = []blockStartFunc{
 			return 2
 		}
 		return 0
+	},
+
+	// 判断内容块嵌入（!((id "text"))）是否开始。
+	func(t *Tree, container *ast.Node) int {
+		if !t.Context.Option.BlockRef || t.Context.indented {
+			return 0
+		}
+
+		node := t.parseBlockEmbed()
+		if nil == node {
+			return 0
+		}
+
+		t.Context.closeUnmatchedBlocks()
+		t.Context.Tip.AppendChild(node)
+		t.Context.Tip = node
+		return 2
 	},
 }
 
