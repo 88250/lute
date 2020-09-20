@@ -298,7 +298,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		// 尝试行级解析，处理段落图片文本节点转换为图片节点
-		subTree := parse.Inline("", node.Tokens, tree.Context.Option)
+		tokens := make([]byte, len(node.Tokens))
+		copy(tokens, node.Tokens)
+		subTree := parse.Inline("", tokens, tree.Context.Option)
 		if ast.NodeParagraph == subTree.Root.FirstChild.Type && ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type &&
 			nil == subTree.Root.FirstChild.Next {
 			tree.Context.Tip.AppendChild(subTree.Root.FirstChild.FirstChild)
