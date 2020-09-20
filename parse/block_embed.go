@@ -32,6 +32,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 		}
 		pos += len(passed)
 		if passed, remains, id = t.Context.parseBlockRefID(remains); 1 > len(passed) {
+			ok = false
 			break
 		}
 		pos += len(passed)
@@ -40,6 +41,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 			break
 		}
 		if 1 > len(remains) || !lex.IsWhitespace(remains[0]) {
+			ok = false
 			break
 		}
 		// 跟空格的话后续尝试 title 解析
