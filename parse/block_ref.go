@@ -66,29 +66,6 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 		ctx.pos += len(passed)
 		matched = ok && 1 < len(remains)
 		if matched {
-			// TODO: Vditor 内容块引用输入优化
-			//if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
-			//	if bytes.HasPrefix(remains, []byte(util.Caret+")")) {
-			//		if 0 < len(title) {
-			//			// 将 ‸) 换位为 )‸
-			//			remains = remains[len([]byte(util.Caret+")")):]
-			//			remains = append([]byte(")"+util.Caret), remains...)
-			//			copy(ctx.tokens[ctx.pos-1:], remains) // 同时也将 tokens 换位，后续解析从插入符位置开始
-			//		} else {
-			//			// 将 ""‸ 换位为 "‸"
-			//			title = util.CaretTokens
-			//			remains = remains[len(util.CaretTokens):]
-			//			ctx.pos += 3
-			//		}
-			//	} else if bytes.HasPrefix(remains, []byte(")"+util.Caret)) {
-			//		if 0 == len(title) {
-			//			// 将 "")‸ 换位为 "‸")
-			//			title = util.CaretTokens
-			//			remains = bytes.ReplaceAll(remains, util.CaretTokens, nil)
-			//			ctx.pos += 3
-			//		}
-			//	}
-			//}
 			matched = lex.ItemCloseParen == remains[0] && lex.ItemCloseParen == remains[1]
 			ctx.pos += 2
 		}
