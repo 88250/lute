@@ -118,6 +118,10 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
+	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
+	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
+	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
 	return ret
 }
 
@@ -217,33 +221,56 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 	return
 }
 
-func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
-	text := node.ChildByType(ast.NodeBlockRefText)
-	isEmbedded := bytes.Equal([]byte("*"), bytes.ReplaceAll(text.Tokens, util.CaretTokens, nil))
-	if isEmbedded {
-		if entering {
-			r.renderSpanNode(node)
-			r.WriteString("<span>")
-		} else {
-			r.WriteString("</span>")
-			id := node.ChildByType(ast.NodeBlockRefID)
-			r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\" data-type=\"block-render\"></span></span>")
-		}
+func (r *VditorIRBlockRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderSpanNode(node)
+		r.WriteString("<span>")
 	} else {
-		if entering {
-			previousNodeText := node.PreviousNodeText()
-			previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-			if "" != previousNodeText && !strings.HasSuffix(previousNodeText, " ") {
-				r.WriteByte(lex.ItemSpace)
-			}
-			r.renderSpanNode(node)
-		} else {
-			r.tag("/span", nil, false)
-			nextNodeText := node.NextNodeText()
-			nextNodeText = strings.ReplaceAll(nextNodeText, util.Caret, "")
-			if "" != nextNodeText && !strings.HasPrefix(nextNodeText, " ") {
-				r.WriteByte(lex.ItemSpace)
-			}
+		r.WriteString("</span>")
+		id := node.ChildByType(ast.NodeBlockRefID)
+		r.WriteString("<span data-block-def-id=\"" + string(id.Tokens) + "\" data-render=\"2\" data-type=\"block-render\"></span></span>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) renderBlockEmbedID(node *ast.Node, entering bool) ast.WalkStatus {
+	var attrs [][]string
+	attrs = append(attrs, []string{"class", "vditor-ir__marker vditor-ir__marker--link"})
+	r.tag("span", attrs, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorIRBlockRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteByte(lex.ItemSpace)
+	return ast.WalkStop
+}
+
+func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
+	text := html.EscapeHTML(node.Tokens)
+	r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+	r.WriteByte(lex.ItemDoublequote)
+	r.Write(text)
+	r.WriteByte(lex.ItemDoublequote)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
+}
+
+func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		previousNodeText := node.PreviousNodeText()
+		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
+		if "" != previousNodeText && !strings.HasSuffix(previousNodeText, " ") {
+			r.WriteByte(lex.ItemSpace)
+		}
+		r.renderSpanNode(node)
+	} else {
+		r.tag("/span", nil, false)
+		nextNodeText := node.NextNodeText()
+		nextNodeText = strings.ReplaceAll(nextNodeText, util.Caret, "")
+		if "" != nextNodeText && !strings.HasPrefix(nextNodeText, " ") {
+			r.WriteByte(lex.ItemSpace)
 		}
 	}
 	return ast.WalkContinue
@@ -1364,13 +1391,9 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 			attrs = append(attrs, []string{"data-type", "link-ref"})
 		}
 	case ast.NodeBlockRef:
-		text := node.ChildByType(ast.NodeBlockRefText)
-		isEmbedded := bytes.Equal([]byte("*"), bytes.ReplaceAll(text.Tokens, util.CaretTokens, nil))
-		if isEmbedded {
-			attrs = append(attrs, []string{"data-type", "block-ref-embed"})
-		} else {
-			attrs = append(attrs, []string{"data-type", "block-ref"})
-		}
+		attrs = append(attrs, []string{"data-type", "block-ref"})
+	case ast.NodeBlockEmbed:
+		attrs = append(attrs, []string{"data-type", "block-ref-embed"})
 	case ast.NodeImage:
 		attrs = append(attrs, []string{"data-type", "img"})
 	case ast.NodeCodeSpan:

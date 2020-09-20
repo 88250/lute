@@ -119,6 +119,10 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
+	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
+	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
+	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
 	return ret
 }
 
@@ -184,6 +188,33 @@ func (r *FormatRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) a
 	return ast.WalkStop
 }
 
+func (r *FormatRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderBlockEmbedID(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemSpace)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemDoublequote)
+		r.Write(node.Tokens)
+		r.WriteByte(lex.ItemDoublequote)
+	}
+	return ast.WalkStop
+}
+
 func (r *FormatRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -204,9 +235,9 @@ func (r *FormatRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.
 
 func (r *FormatRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("\"")
+		r.WriteByte(lex.ItemDoublequote)
 		r.Write(node.Tokens)
-		r.WriteString("\"")
+		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkStop
 }
@@ -398,9 +429,9 @@ func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *ast.Node, enterin
 }
 
 func (r *FormatRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("\"")
+	r.WriteByte(lex.ItemDoublequote)
 	r.Write(node.Tokens)
-	r.WriteString("\"")
+	r.WriteByte(lex.ItemDoublequote)
 	return ast.WalkStop
 }
 

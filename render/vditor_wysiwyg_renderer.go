@@ -576,12 +576,12 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 				alt.Tokens = bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
 				r.Write(alt.Tokens)
 			}
-			r.WriteString("\"")
+			r.WriteByte(lex.ItemDoublequote)
 			if title := link.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 				r.WriteString(" title=\"")
 				title.Tokens = bytes.ReplaceAll(title.Tokens, util.CaretTokens, nil)
 				r.Write(title.Tokens)
-				r.WriteString("\"")
+				r.WriteByte(lex.ItemDoublequote)
 			}
 			r.WriteString(" data-type=\"link-ref\" data-link-label=\"" + string(node.LinkRefLabel) + "\"")
 			r.WriteString(" />")
@@ -616,12 +616,12 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 
 	r.DisableTags--
 	if 0 == r.DisableTags {
-		r.WriteString("\"")
+		r.WriteByte(lex.ItemDoublequote)
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 			r.WriteString(" title=\"")
 			title.Tokens = bytes.ReplaceAll(title.Tokens, util.CaretTokens, nil)
 			r.Write(title.Tokens)
-			r.WriteString("\"")
+			r.WriteByte(lex.ItemDoublequote)
 		}
 		r.WriteString(" />")
 

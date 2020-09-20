@@ -120,6 +120,10 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
+	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
+	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
+	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
 	return ret
 }
 
@@ -156,6 +160,27 @@ func (r *HtmlRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast
 	return ast.WalkStop
 }
 
+func (r *HtmlRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderBlockEmbedID(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemDoublequote)
+		r.Write(html.EscapeHTML(node.Tokens))
+		r.WriteByte(lex.ItemDoublequote)
+	}
+	return ast.WalkStop
+}
+
 func (r *HtmlRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -170,9 +195,9 @@ func (r *HtmlRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.Wa
 
 func (r *HtmlRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("\"")
+		r.WriteByte(lex.ItemDoublequote)
 		r.Write(html.EscapeHTML(node.Tokens))
-		r.WriteString("\"")
+		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkStop
 }
@@ -499,11 +524,11 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 
 	r.DisableTags--
 	if 0 == r.DisableTags {
-		r.WriteString("\"")
+		r.WriteByte(lex.ItemDoublequote)
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 			r.WriteString(" title=\"")
 			r.Write(html.EscapeHTML(title.Tokens))
-			r.WriteString("\"")
+			r.WriteByte(lex.ItemDoublequote)
 		}
 		r.WriteString(" />")
 
