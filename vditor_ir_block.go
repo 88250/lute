@@ -720,37 +720,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		switch dataType {
-		case "block-ref-embed":
-			text := lute.domText(n)
-			if "" == text {
-				return
-			}
-
-			t := parse.Parse("", []byte(text), lute.Options)
-			if blockEmbed := t.Root.FirstChild.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
-				node.Type = ast.NodeBlockEmbed
-				node.AppendChild(&ast.Node{Type: ast.NodeBang})
-				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-				id := n.FirstChild.FirstChild.NextSibling.NextSibling.FirstChild.Data
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedID, Tokens: []byte(id)})
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedSpace})
-				text := n.FirstChild.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.Data
-				text = strings.TrimLeft(text, "\"")
-				text = strings.TrimRight(text, "\"")
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedText, Tokens: []byte(text)})
-				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-				tree.Context.Tip.AppendChild(node)
-				if nil != blockEmbed.Next { // 插入符
-					tree.Context.Tip.AppendChild(blockEmbed.Next)
-				}
-				return
-			}
-			node.Type = ast.NodeText
-			node.Tokens = []byte(text)
-			tree.Context.Tip.AppendChild(node)
-			return
 		case "block-ref":
 			text := lute.domText(n)
 			if "" == text {
@@ -976,6 +945,38 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()
+		case "block-ref-embed":
+			text := lute.domText(n)
+			if "" == text {
+				return
+			}
+
+			t := parse.Parse("", []byte(text), lute.Options)
+			if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
+				node.Type = ast.NodeBlockEmbed
+				node.AppendChild(&ast.Node{Type: ast.NodeBang})
+				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+				node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+				id := n.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedID, Tokens: []byte(id)})
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedSpace})
+				text := n.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.Data
+				text = strings.TrimLeft(text, "\"")
+				text = strings.TrimRight(text, "\"")
+				node.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedText, Tokens: []byte(text)})
+				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+				node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+				tree.Context.Tip.AppendChild(node)
+				if nil != blockEmbed.Next { // 插入符
+					tree.Context.Tip.AppendChild(blockEmbed.Next)
+				}
+				return
+			}
+			node.Type = ast.NodeText
+			node.Tokens = []byte(text)
+			tree.Context.Tip.AppendChild(node)
+			defer tree.Context.ParentTip()
+			return
 		}
 	case atom.Font:
 		text := lute.domText(n)
