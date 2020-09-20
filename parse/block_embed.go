@@ -68,6 +68,9 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 		}
 		break
 	}
+	if pos != len(tokens)-1 {
+		ok = false
+	}
 	if !ok {
 		return
 	}
@@ -77,9 +80,6 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedID, Tokens: id})
-	if 1 > len(text) {
-		text = id
-	}
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedSpace})
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedText, Tokens: text})
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})

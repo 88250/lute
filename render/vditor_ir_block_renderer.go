@@ -242,7 +242,9 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedID(node *ast.Node, entering bool
 }
 
 func (r *VditorIRBlockRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemSpace)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -279,7 +281,9 @@ func (r *VditorIRBlockRenderer) renderBlockRefID(node *ast.Node, entering bool) 
 }
 
 func (r *VditorIRBlockRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemSpace)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -1450,6 +1454,10 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "yaml-front-matter"})
 	case ast.NodeBlockEmbed:
 		attrs = append(attrs, []string{"data-type", "block-ref-embed"})
+		text := node.ChildByType(ast.NodeBlockEmbedText)
+		if 0 == len(text.Tokens) {
+			attrs = append(attrs, []string{"data-text", "0"})
+		}
 	}
 
 	if strings.Contains(text, util.Caret) {
