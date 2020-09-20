@@ -1459,4 +1459,3 @@ func (r *VditorIRBlockRenderer) Text(node *ast.Node) (ret string) {
 	})
 	return
 }
-
