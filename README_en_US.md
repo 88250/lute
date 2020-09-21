@@ -68,7 +68,8 @@ Finally, another important motivation is that the B3log open source community ne
 
 ## 🗃 Showcases
 
-* [LianDi](https://ld246.com), you can go to [here](https://ld246.com/guide/markdown) for online testing.
+* [LianDi](https://ld246.com)
+* [SiYuan](https://github.com/siyuan-note/siyuan)
 
 ## 🇨🇳 Chinese context optimization
 
