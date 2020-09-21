@@ -135,7 +135,11 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 		r.Newline()
 		r.Write(node.Tokens)
 	} else {
-		r.Newline()
+		if ast.NodeListItem == node.Parent.Type || ast.NodeList == node.Parent.Type {
+			if !node.Parent.Tight {
+				r.Newline()
+			}
+		}
 		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
@@ -915,8 +919,6 @@ func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 		if !node.ParentIs(ast.NodeTableCell) {
 			if r.withoutKramdownIAL(node) {
 				r.WriteString("\n\n")
-			} else {
-
 			}
 		}
 	}
