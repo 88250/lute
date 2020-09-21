@@ -1443,6 +1443,7 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	if 0 < len(ial) {
 		attrs = append(attrs, ial...)
 	}
+	var expand bool
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		attrs = append(attrs, []string{"data-type", "code-block"})
@@ -1458,9 +1459,11 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 		if 0 == len(text.Tokens) {
 			attrs = append(attrs, []string{"data-text", "0"})
 		}
+		id := node.ChildByType(ast.NodeBlockEmbedID)
+		expand = bytes.Contains(id.Tokens, util.CaretTokens)
 	}
 
-	if strings.Contains(text, util.Caret) {
+	if strings.Contains(text, util.Caret) || expand {
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
 	} else {
 		attrs = append(attrs, []string{"class", "vditor-ir__node"})
