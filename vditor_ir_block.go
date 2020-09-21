@@ -129,7 +129,7 @@ func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 	buf := &bytes.Buffer{}
 	for _, heading := range headings {
 		padding := 10 * heading.HeadingLevel
-		buf.WriteString(`<div data-id="` + heading.HeadingNormalizedID + `" style="padding-left:` + strconv.Itoa(padding) +
+		buf.WriteString(`<div data-id="ir-` + render.HeadingID(heading) + `" style="padding-left:` + strconv.Itoa(padding) +
 			`px" class="vditor-outline__item fn__ellipsis">` + heading.Text() + `</div>`)
 	}
 	ret = buf.String()
