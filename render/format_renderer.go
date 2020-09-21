@@ -139,6 +139,8 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 			if !node.Parent.Tight {
 				r.Newline()
 			}
+		} else {
+			r.Newline()
 		}
 		r.WriteByte(lex.ItemNewline)
 	}
