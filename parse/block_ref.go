@@ -104,7 +104,11 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 	var token byte
 	for ; i < length; i++ {
 		token = tokens[i]
-		if lex.IsWhitespace(token) || ')' == token {
+		if bytes.Contains(util.CaretTokens, []byte{token}) {
+			continue
+		}
+
+		if lex.IsWhitespace(token) || ')' == token || !lex.IsASCIILetterNumHyphen(tokens[i]) {
 			break
 		}
 	}
