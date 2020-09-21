@@ -242,9 +242,6 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedID(node *ast.Node, entering bool
 }
 
 func (r *VditorIRBlockRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	if 0 == len(bytes.ReplaceAll(node.Next.Tokens, util.CaretTokens, nil)) {
-		return ast.WalkStop
-	}
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemSpace)
 	r.tag("/span", nil, false)
@@ -253,9 +250,6 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedSpace(node *ast.Node, entering b
 
 func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
 	text := html.EscapeHTML(node.Tokens)
-	if 0 == len(bytes.ReplaceAll(text, util.CaretTokens, nil)) {
-		return ast.WalkStop
-	}
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 	r.WriteByte(lex.ItemDoublequote)
 	r.tag("/span", nil, false)
@@ -1479,7 +1473,10 @@ func (r *VditorIRBlockRenderer) Text(node *ast.Node) (ret string) {
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
-			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkSpace, ast.NodeLinkTitle, ast.NodeCodeBlockCode, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeYamlFrontMatterContent, ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias, ast.NodeBlockRefText, ast.NodeBlockRefSpace:
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkSpace, ast.NodeLinkTitle, ast.NodeCodeBlockCode,
+				ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeYamlFrontMatterContent,
+				ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias, ast.NodeBlockRefText, ast.NodeBlockRefSpace,
+				ast.NodeBlockEmbedText, ast.NodeBlockEmbedSpace:
 				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
 				ret += string(n.CodeBlockInfo)

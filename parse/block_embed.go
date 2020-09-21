@@ -70,6 +70,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 		}
 		break
 	}
+	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
 	tokens = bytes.TrimSuffix(tokens, util.CaretTokens)
 	if pos != len(tokens) {
 		ok = false
@@ -87,5 +88,8 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedText, Tokens: text})
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+	if endCaret {
+		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+	}
 	return
 }

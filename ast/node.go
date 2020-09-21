@@ -194,7 +194,7 @@ func (n *Node) ChildByType(childType NodeType) *Node {
 // Text 返回 n 及其文本子节点的文本值。
 func (n *Node) Text() (ret string) {
 	Walk(n, func(n *Node, entering bool) WalkStatus {
-		if (NodeText == n.Type || NodeLinkText == n.Type || NodeBlockRefText == n.Type) && entering {
+		if (NodeText == n.Type || NodeLinkText == n.Type || NodeBlockRefText == n.Type || NodeBlockEmbedText == n.Type) && entering {
 			ret += util.BytesToStr(n.Tokens)
 		}
 		return WalkContinue
