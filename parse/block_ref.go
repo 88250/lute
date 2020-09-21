@@ -11,8 +11,10 @@
 package parse
 
 import (
+	"bytes"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
 func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
@@ -99,8 +101,10 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 	}
 
 	var i int
+	var token byte
 	for ; i < length; i++ {
-		if !lex.IsASCIILetterNumHyphen(tokens[i]) {
+		token = tokens[i]
+		if lex.IsWhitespace(token) || ')' == token {
 			break
 		}
 	}
@@ -111,10 +115,13 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 	}
 	passed = make([]byte, 0, 64)
 	passed = append(passed, id...)
+	if bytes.HasPrefix(remains, util.CaretTokens) {
+		passed = append(passed, util.CaretTokens...)
+		remains = remains[len(util.CaretTokens):]
+	}
 	closed := lex.ItemCloseParen == remains[0] && lex.ItemCloseParen == remains[1]
 	if closed {
 		passed = append(passed, []byte("))")...)
-		remains = tokens[len(id):]
 		return
 	}
 
