@@ -242,7 +242,7 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedID(node *ast.Node, entering bool
 }
 
 func (r *VditorIRBlockRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	if 0 == len(node.Next.Tokens) {
+	if 0 == len(bytes.ReplaceAll(node.Next.Tokens, util.CaretTokens, nil)) {
 		return ast.WalkStop
 	}
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
@@ -253,7 +253,7 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedSpace(node *ast.Node, entering b
 
 func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
 	text := html.EscapeHTML(node.Tokens)
-	if 0 == len(text) {
+	if 0 == len(bytes.ReplaceAll(text, util.CaretTokens, nil)) {
 		return ast.WalkStop
 	}
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)

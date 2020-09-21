@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
 func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
@@ -23,6 +24,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	}
 
 	tokens = tokens[3:]
+	tokens = tokens[:len(tokens)-1] // 去掉结尾换行
 	var passed, remains, id, text []byte
 	var pos int
 	var ok bool
@@ -68,7 +70,8 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 		}
 		break
 	}
-	if pos != len(tokens)-1 {
+	tokens = bytes.TrimSuffix(tokens, util.CaretTokens)
+	if pos != len(tokens) {
 		ok = false
 	}
 	if !ok {
