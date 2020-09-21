@@ -120,6 +120,22 @@ func (lute *Lute) VditorIRBlockDOM2Text(htmlStr string) (text string) {
 	return tree.Root.Text()
 }
 
+func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
+	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return ""
+	}
+	headings := tree.Root.ChildrenByType(ast.NodeHeading)
+	buf := &bytes.Buffer{}
+	for _, heading := range headings {
+		padding := 10 * heading.HeadingLevel
+		buf.WriteString(`<div data-id="` + heading.HeadingNormalizedID + `" style="paddint-left:` + strconv.Itoa(padding) +
+			`px" class="vditor-outline__item fn__ellipsis">` + heading.Text() + `</div>`)
+	}
+	ret = buf.String()
+	return
+}
+
 func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
 	renderer := render.NewVditorIRBlockRenderer(tree)
 	output := renderer.Render()

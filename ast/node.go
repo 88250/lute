@@ -191,6 +191,18 @@ func (n *Node) ChildByType(childType NodeType) *Node {
 	return nil
 }
 
+// ChildrenByType 返回 n 下所有类型为 childType 的子节点。
+func (n *Node) ChildrenByType(childType NodeType) (ret []*Node) {
+	ret = []*Node{}
+	Walk(n, func(n *Node, entering bool) WalkStatus {
+		if (childType == n.Type) && entering {
+			ret = append(ret, n)
+		}
+		return WalkContinue
+	})
+	return
+}
+
 // Text 返回 n 及其文本子节点的文本值。
 func (n *Node) Text() (ret string) {
 	Walk(n, func(n *Node, entering bool) WalkStatus {
