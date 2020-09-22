@@ -483,6 +483,13 @@ const (
 	NodeBlockRefSpace NodeType = 432 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
 	NodeBlockRefText  NodeType = 433 // 内容块引用锚点本
 
+	// 内容块嵌入（Block Embed） https://github.com/88250/lute/issues/91
+
+	NodeBlockEmbed      NodeType = 440 // 内容块嵌入节点
+	NodeBlockEmbedID    NodeType = 441 // 被引用的内容块（定义块） ID
+	NodeBlockEmbedSpace NodeType = 442 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
+	NodeBlockEmbedText  NodeType = 443 // 内容块嵌入锚点本
+
 	// ==Mark== 标记语法 https://github.com/88250/lute/issues/84
 
 	NodeMark             NodeType = 450 // 标记
@@ -495,12 +502,11 @@ const (
 
 	NodeKramdownBlockIAL NodeType = 455 // 块级内联属性列表 {: name="value"}
 
-	// 内容块嵌入（Block Embed） https://github.com/88250/lute/issues/91
+	// #Tag# 标签语法 https://github.com/88250/lute/issues/92
 
-	NodeBlockEmbed      NodeType = 460 // 内容块嵌入节点
-	NodeBlockEmbedID    NodeType = 461 // 被引用的内容块（定义块） ID
-	NodeBlockEmbedSpace NodeType = 462 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
-	NodeBlockEmbedText  NodeType = 463 // 内容块嵌入锚点本
+	NodeTag            NodeType = 460 // 标签
+	NodeTagOpenMarker  NodeType = 461 // 开始标签标记符 #
+	NodeTagCloseMarker NodeType = 462 // 结束标签标记符 #
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
