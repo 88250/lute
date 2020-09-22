@@ -124,7 +124,31 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
 	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
 	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
+	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
+	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
+	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	return ret
+}
+
+func (r *HtmlRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("em", nil, false)
+	r.WriteByte(lex.ItemCrosshatch)
+	return ast.WalkStop
+}
+
+func (r *HtmlRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteByte(lex.ItemCrosshatch)
+	r.tag("/em", nil, false)
+	return ast.WalkStop
 }
 
 func (r *HtmlRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {

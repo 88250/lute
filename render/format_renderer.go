@@ -123,7 +123,29 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
 	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
 	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
+	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
+	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
+	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	return ret
+}
+
+func (r *FormatRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteByte(lex.ItemCrosshatch)
+	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.WriteByte(lex.ItemCrosshatch)
+	return ast.WalkStop
 }
 
 func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {

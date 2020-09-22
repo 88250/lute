@@ -18,8 +18,8 @@ import (
 
 var tagTests = []parseTest{
 
-	{"1", "#**foo**#\n", "<p><mark><strong>foo</strong></mark></p>\n"},
-	{"0", "#foo#\n", "<p><mark>foo</mark></p>\n"},
+	{"1", "#**foo**#\n", "<p><em>#<strong>foo</strong>#</em></p>\n"},
+	{"0", "#foo#\n", "<p><em>#foo#</em></p>\n"},
 }
 
 func TestTag(t *testing.T) {

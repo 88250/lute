@@ -122,6 +122,9 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
 	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
 	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
+	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
+	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
+	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	return ret
 }
 
@@ -146,6 +149,31 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorIRBlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderSpanNode(node)
+	} else {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
+	r.WriteByte(lex.ItemCrosshatch)
+	r.tag("/span", nil, false)
+	r.tag("em", [][]string{{"data-newline", "1"}}, false)
+	return ast.WalkStop
+}
+
+func (r *VditorIRBlockRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/em", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
+	r.WriteByte(lex.ItemCrosshatch)
+	r.tag("/span", nil, false)
+	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
@@ -1407,6 +1435,8 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "html-entity"})
 	case ast.NodeBackslash:
 		attrs = append(attrs, []string{"data-type", "backslash"})
+	case ast.NodeTag:
+		attrs = append(attrs, []string{"data-type", "tag"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
