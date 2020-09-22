@@ -747,9 +747,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				node = blockRef
 				next := blockRef.Next
 				tree.Context.Tip.AppendChild(node)
-				if nil != next { // 插入符
-					tree.Context.Tip.AppendChild(next)
-				}
+				appendNextToTip(next, tree)
 				return
 			}
 			node.Type = ast.NodeText
@@ -790,9 +788,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				node = inlineNode
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
-				if nil != next { // 插入符
-					tree.Context.Tip.AppendChild(next)
-				}
+				appendNextToTip(next, tree)
 				return
 			}
 			node.Type = ast.NodeText
@@ -812,9 +808,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				node = inlineNode
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
-				if nil != next { // 插入符
-					tree.Context.Tip.AppendChild(next)
-				}
+				appendNextToTip(next, tree)
 				return
 			}
 			node.Type = ast.NodeText
@@ -828,9 +822,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				node = inlineNode
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
-				if nil != next { // 插入符
-					tree.Context.Tip.AppendChild(next)
-				}
+				appendNextToTip(next, tree)
 				return
 			}
 			node.Type = ast.NodeText
@@ -844,9 +836,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				node = inlineNode
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
-				if nil != next { // 插入符
-					tree.Context.Tip.AppendChild(next)
-				}
+				appendNextToTip(next, tree)
 				return
 			}
 			node.Type = ast.NodeText
