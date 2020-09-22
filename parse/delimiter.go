@@ -83,6 +83,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	openersBottom[lex.ItemAsterisk] = stackBottom
 	openersBottom[lex.ItemTilde] = stackBottom
 	openersBottom[lex.ItemEqual] = stackBottom
+	openersBottom[lex.ItemCrosshatch] = stackBottom
 
 	// find first closer above stack_bottom:
 	closer = ctx.delimiters
@@ -144,6 +145,16 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				}
 			}
 
+			if t.Context.Option.Tag {
+				if lex.ItemCrosshatch == closercc && opener.num != closer.num {
+					break
+				}
+			} else {
+				if lex.ItemCrosshatch == closercc {
+					break
+				}
+			}
+
 			// remove used delimiters from stack elts and inlines
 			opener.num -= useDelims
 			closer.num -= useDelims
@@ -178,6 +189,12 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 						emStrongDelMark.Type = ast.NodeMark
 						openMarker.Type = ast.NodeMark1OpenMarker
 						closeMarker.Type = ast.NodeMark1CloseMarker
+					}
+				} else if lex.ItemCrosshatch == closercc {
+					if t.Context.Option.Tag {
+						emStrongDelMark.Type = ast.NodeTag
+						openMarker.Type = ast.NodeTagOpenMarker
+						closeMarker.Type = ast.NodeTagCloseMarker
 					}
 				}
 			} else {
@@ -303,7 +320,10 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
 	} else {
-		if lex.ItemEqual == token && 2 != delimitersCount { // ==Mark== 标记必须使用两个等号
+		if lex.ItemEqual == token && 2 != delimitersCount { // ==Mark== 标记使用两个等号
+			canOpen = false
+			canClose = false
+		} else if lex.ItemCrosshatch == token && 1 != delimitersCount { // #Tag# 标记使用一个井号
 			canOpen = false
 			canClose = false
 		} else {

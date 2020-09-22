@@ -294,10 +294,12 @@ type Options struct {
 	YamlFrontMatter bool
 	// BlockRef 设置是否开启内容块引用支持。
 	BlockRef bool
-	// Mark 设置是否打开“==标记==”支持。
+	// Mark 设置是否打开 ==标记== 支持。
 	Mark bool
 	// KramdownIAL 设置是否打开 kramdown 内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
 	KramdownIAL bool
+	// Tag 设置是否开启 #标签# 支持。
+	Tag bool
 }
 
 func (context *Context) ParentTip() {
