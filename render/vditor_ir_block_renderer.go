@@ -153,7 +153,7 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 
 func (r *VditorIRBlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.renderSpanNode(node)
+		r.tag("span", [][]string{{"data-type", "tag"}, {"class", "vditor-ir__tag"}}, false)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -161,18 +161,12 @@ func (r *VditorIRBlockRenderer) renderTag(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRBlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemCrosshatch)
-	r.tag("/span", nil, false)
-	r.tag("em", [][]string{{"data-newline", "1"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/em", nil, false)
-	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
 	r.WriteByte(lex.ItemCrosshatch)
-	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -1404,7 +1398,6 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 	text := r.Text(node)
 	var attrs [][]string
 
-	var expand bool
 	switch node.Type {
 	case ast.NodeEmphasis:
 		attrs = append(attrs, []string{"data-type", "em"})
@@ -1436,28 +1429,25 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "html-entity"})
 	case ast.NodeBackslash:
 		attrs = append(attrs, []string{"data-type", "backslash"})
-	case ast.NodeTag:
-		attrs = append(attrs, []string{"data-type", "tag"})
-		expand = true
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
 
-	if strings.Contains(text, util.Caret) || expand {
+	if strings.Contains(text, util.Caret) {
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
 		r.tag("span", attrs, false)
 		return
 	}
 
 	preText := node.PreviousNodeText()
-	if strings.HasSuffix(preText, util.Caret) || expand {
+	if strings.HasSuffix(preText, util.Caret) {
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
 		r.tag("span", attrs, false)
 		return
 	}
 
 	nexText := node.NextNodeText()
-	if strings.HasPrefix(nexText, util.Caret) || expand {
+	if strings.HasPrefix(nexText, util.Caret) {
 		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
 		r.tag("span", attrs, false)
 		return
