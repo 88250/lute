@@ -901,3 +901,13 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}
 }
+
+func appendNextToTip(next *ast.Node, tree *parse.Tree) {
+	var nodes []*ast.Node
+	for n := next; nil != n; n = n.Next {
+		nodes = append(nodes, n)
+	}
+	for _, n := range nodes {
+		tree.Context.Tip.AppendChild(n)
+	}
+}

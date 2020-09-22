@@ -40,6 +40,7 @@ var spinVditorIRBlockDOMTests = []*parseTest{
 
 func TestSpinVditorIRBlockDOM(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.Mark = true
 	luteEngine.BlockRef = true
 	luteEngine.KramdownIAL = true
 	luteEngine.Mark = true
