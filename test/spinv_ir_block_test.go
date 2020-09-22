@@ -43,7 +43,6 @@ func TestSpinVditorIRBlockDOM(t *testing.T) {
 	luteEngine.Mark = true
 	luteEngine.BlockRef = true
 	luteEngine.KramdownIAL = true
-	luteEngine.Mark = true
 	luteEngine.SetLinkBase(" http://127.0.0.1:6807/webdav/q0fk7yv/测试笔记/")
 
 	for _, test := range spinVditorIRBlockDOMTests {
