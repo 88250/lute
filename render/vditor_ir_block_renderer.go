@@ -1010,23 +1010,31 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 			}
 		}
 	} else {
-		r.tag("span", [][]string{{"data-type", "html-inline"}}, false)
+
 		var attrs [][]string
 		htmlRoot := &html.Node{Type: html.ElementNode}
-		n, err := html.ParseFragment(strings.NewReader(util.BytesToStr(node.Tokens)), htmlRoot)
-		if nil == err {
+		n, _ := html.ParseFragment(strings.NewReader(util.BytesToStr(node.Tokens)), htmlRoot)
+		var rendered bool
+		if 0 < len(n) {
 			switch n[0].DataAtom {
 			case atom.Br:
+				r.tag("span", [][]string{{"data-type", "html-inline"}}, false)
+
 				attrs = [][]string{{"class", "vditor-ir__marker vditor-ir__br"}}
-			default:
-				attrs = [][]string{{"class", "vditor-ir__marker"}}
+				r.tag("span", attrs, false)
+				r.Write(html.EscapeHTML(node.Tokens))
+				r.tag("/span", nil, false)
+				rendered = true
 			}
-		} else {
-			attrs = [][]string{{"class", "vditor-ir__marker"}}
 		}
-		r.tag("span", attrs, false)
-		r.Write(html.EscapeHTML(node.Tokens))
-		r.tag("/span", nil, false)
+		if !rendered {
+			r.renderSpanNode(node)
+			attrs = [][]string{{"class", "vditor-ir__marker"}}
+			r.tag("code", attrs, false)
+			r.Write(html.EscapeHTML(node.Tokens))
+			r.tag("/code", nil, false)
+		}
+
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkStop
