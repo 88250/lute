@@ -1010,11 +1010,11 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 			}
 		}
 	} else {
-
 		var attrs [][]string
 		htmlRoot := &html.Node{Type: html.ElementNode}
 		n, _ := html.ParseFragment(strings.NewReader(util.BytesToStr(node.Tokens)), htmlRoot)
 		var rendered bool
+		content := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
 		if 0 < len(n) {
 			switch n[0].DataAtom {
 			case atom.Br:
@@ -1025,14 +1025,18 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 				r.Write(html.EscapeHTML(node.Tokens))
 				r.tag("/span", nil, false)
 				rendered = true
+			default:
+
 			}
 		}
 		if !rendered {
+			r.Write(content)
+
 			r.renderSpanNode(node)
 			attrs = [][]string{{"class", "vditor-ir__marker"}}
-			r.tag("code", attrs, false)
+			r.tag("span", attrs, false)
 			r.Write(html.EscapeHTML(node.Tokens))
-			r.tag("/code", nil, false)
+			r.tag("/span", nil, false)
 		}
 
 		r.tag("/span", nil, false)
