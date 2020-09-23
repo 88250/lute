@@ -130,7 +130,7 @@ func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 	for _, heading := range headings {
 		padding := 10 * heading.HeadingLevel
 		buf.WriteString(`<div data-id="ir-` + render.HeadingID(heading) + `" style="padding-left:` + strconv.Itoa(padding) +
-			`px" class="vditor-outline__item fn__ellipsis">` + heading.Text() + `</div>`)
+			`px" class="b3-list-item">` + heading.Text() + `</div>`)
 	}
 	ret = buf.String()
 	return
@@ -311,6 +311,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.Type = ast.NodeLinkText
+		}
+
+		if ast.NodeCodeBlock == tree.Context.Tip.Type {
+			// 开始代码块标记符后退格的情况
+			tree.Context.Tip.Type = ast.NodeParagraph
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(content)})
+			n.Parent.RemoveChild(n.NextSibling.NextSibling.NextSibling.NextSibling)
+			break
 		}
 
 		// 尝试行级解析，处理段落图片文本节点转换为图片节点
