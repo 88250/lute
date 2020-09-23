@@ -1024,9 +1024,9 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 		} else {
 			attrs = [][]string{{"class", "vditor-ir__marker"}}
 		}
-		r.tag("code", attrs, false)
+		r.tag("span", attrs, false)
 		r.Write(html.EscapeHTML(node.Tokens))
-		r.tag("/code", nil, false)
+		r.tag("/span", nil, false)
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkStop
