@@ -128,7 +128,7 @@ func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 	headings := tree.Root.ChildrenByType(ast.NodeHeading)
 	buf := &bytes.Buffer{}
 	for _, heading := range headings {
-		padding := 10 * heading.HeadingLevel
+		padding := 16 + 14*(heading.HeadingLevel-1)
 		buf.WriteString(`<div data-id="ir-` + render.HeadingID(heading) + `" style="padding-left:` + strconv.Itoa(padding) +
 			`px" class="b3-list-item">` + heading.Text() + `</div>`)
 	}
