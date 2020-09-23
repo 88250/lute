@@ -943,7 +943,14 @@ func (r *VditorIRBlockRenderer) renderLink(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.renderDivNode(node)
+	attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}}
+	ial := r.NodeAttrs(node)
+	if 0 < len(ial) {
+		attrs = append(attrs, ial...)
+	}
+	attrs = append(attrs, [][]string{{"data-type", "html-block"}}...)
+	r.tag("div", attrs, false)
+
 	tokens := bytes.TrimSpace(node.Tokens)
 	r.WriteString("<pre class=\"vditor-ir__marker--pre vditor-ir__marker\">")
 	r.tag("code", [][]string{{"data-type", "html-block"}}, false)
@@ -1002,7 +1009,7 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 			}
 		}
 	} else {
-		r.renderSpanNode(node)
+		r.tag("span", [][]string{{"data-type", "html-inline"}}, false)
 		r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
 		r.Write(html.EscapeHTML(node.Tokens))
 		r.tag("/code", nil, false)
@@ -1421,8 +1428,6 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "code"})
 	case ast.NodeEmoji:
 		attrs = append(attrs, []string{"data-type", "emoji"})
-	case ast.NodeInlineHTML:
-		attrs = append(attrs, []string{"data-type", "html-inline"})
 	case ast.NodeInlineMath:
 		attrs = append(attrs, []string{"data-type", "inline-math"})
 	case ast.NodeHTMLEntity:
@@ -1469,8 +1474,6 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		attrs = append(attrs, []string{"data-type", "code-block"})
-	case ast.NodeHTMLBlock:
-		attrs = append(attrs, []string{"data-type", "html-block"})
 	case ast.NodeMathBlock:
 		attrs = append(attrs, []string{"data-type", "math-block"})
 	case ast.NodeYamlFrontMatter:

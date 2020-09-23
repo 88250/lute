@@ -269,7 +269,7 @@ func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []b
 		}
 	}
 	tokens = tokens[i:]
-	if lex.ItemHyphen != tokens[0] || lex.ItemHyphen != tokens[1] || lex.ItemGreater != tokens[2] {
+	if 3 > len(tokens) || lex.ItemHyphen != tokens[0] || lex.ItemHyphen != tokens[1] || lex.ItemGreater != tokens[2] {
 		return
 	}
 	comment = append(comment, tokens[1], tokens[2])
