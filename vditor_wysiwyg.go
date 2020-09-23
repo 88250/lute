@@ -282,7 +282,7 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 		var nodes []*html.Node
 		var lastc *html.Node
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
-			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom {
+			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom && atom.Div != c.DataAtom {
 				nodes = append(nodes, c)
 			} else if 0 < len(nodes) {
 				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
