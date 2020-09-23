@@ -214,7 +214,11 @@ func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
 	lute.removeEmptyNodes(nodes[0])
 
 	for c := nodes[0]; nil != c; c = c.NextSibling {
-		lute.adjustVditorDOM0(c)
+		lute.adjustVditorDOMListTight0(c)
+	}
+
+	for c := nodes[0]; nil != c; c = c.NextSibling {
+		lute.adjustVditorDOMListItemInP(c)
 	}
 }
 
@@ -254,11 +258,27 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 	}
 }
 
-func (lute *Lute) adjustVditorDOM0(n *html.Node) {
+func (lute *Lute) adjustVditorDOMListTight0(n *html.Node) {
+	switch n.DataAtom {
+	case atom.Ul:
+		if !lute.parentIs(n, atom.Pre) {
+			lute.setDOMAttrValue(n, "data-tight", lute.isTightList(n))
+		}
+	case atom.Ol:
+		if !lute.parentIs(n, atom.Pre) {
+			lute.setDOMAttrValue(n, "data-tight", lute.isTightList(n))
+		}
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.adjustVditorDOMListTight0(c)
+	}
+}
+
+func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 	switch n.DataAtom {
 	case atom.Li:
 		// 在 li 下的每个非块容器节点用 p 包裹
-
 		var nodes []*html.Node
 		var lastc *html.Node
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
@@ -284,35 +304,27 @@ func (lute *Lute) adjustVditorDOM0(n *html.Node) {
 			lastc.Unlink()
 			p.AppendChild(lastc)
 		}
-	case atom.Ul:
-		// 合并邻接的 ul
-
-		if nil != n.NextSibling && atom.Ul == n.NextSibling.DataAtom {
-			tight := lute.domAttrValue(n, "data-tight")
-			if nextTight := lute.domAttrValue(n.NextSibling, "data-tight"); "" == nextTight || tight == nextTight {
-				for c := n.NextSibling.FirstChild; nil != c; c = c.NextSibling {
-					c.Unlink()
-					n.AppendChild(c)
-				}
-			}
-		}
-	case atom.Ol:
-		// 合并邻接的 ol
-
-		if nil != n.NextSibling && atom.Ol == n.NextSibling.DataAtom {
-			tight := lute.domAttrValue(n, "data-tight")
-			if nextTight := lute.domAttrValue(n.NextSibling, "data-tight"); "" == nextTight || tight == nextTight {
-				for c := n.NextSibling.FirstChild; nil != c; c = c.NextSibling {
-					c.Unlink()
-					n.AppendChild(c)
-				}
-			}
-		}
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.adjustVditorDOM0(c)
+		lute.adjustVditorDOMListItemInP(c)
 	}
+}
+
+func (lute *Lute) isTightList(list *html.Node) string {
+	blocks := 0
+	for li := list.FirstChild; nil != li; li = li.NextSibling {
+		for c := li.FirstChild; nil != c; c = c.NextSibling {
+			if atom.P == c.DataAtom || atom.Blockquote == c.DataAtom || atom.Ul == c.DataAtom || atom.Ol == c.DataAtom || atom.Div == c.DataAtom {
+				blocks++
+			}
+		}
+	}
+
+	if 1 < blocks {
+		return "false"
+	}
+	return "true"
 }
 
 // genASTByVditorDOM 根据指定的 Vditor DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
@@ -473,10 +485,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Li:
-		if p := n.FirstChild; nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
-			tree.Context.Tip.Tight = false
-		}
-
 		node.Type = ast.NodeListItem
 		marker := lute.domAttrValue(n, "data-marker")
 		var bullet byte
@@ -1163,8 +1171,29 @@ func (lute *Lute) setDOMAttrValue(n *html.Node, attrName, attrVal string) {
 	for _, attr := range n.Attr {
 		if attr.Key == attrName {
 			attr.Val = attrVal
+			return
 		}
 	}
+
+	n.Attr = append(n.Attr, &html.Attribute{Key: attrName, Val: attrVal})
+}
+
+func (lute *Lute) removeDOMAttr(n *html.Node, attrName string) {
+	if nil == n {
+		return
+	}
+
+	if 1 > len(n.Attr) {
+		return
+	}
+
+	tmp := (n.Attr)[:0]
+	for _, attr := range n.Attr {
+		if attr.Key != attrName {
+			tmp = append(tmp, attr)
+		}
+	}
+	n.Attr = tmp
 }
 
 func (lute *Lute) domCode(n *html.Node) string {
