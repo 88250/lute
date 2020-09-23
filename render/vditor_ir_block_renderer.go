@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"github.com/88250/lute/html/atom"
 	"strconv"
 	"strings"
 
@@ -1010,7 +1011,20 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 		}
 	} else {
 		r.tag("span", [][]string{{"data-type", "html-inline"}}, false)
-		r.tag("code", [][]string{{"class", "vditor-ir__marker"}}, false)
+		var attrs [][]string
+		htmlRoot := &html.Node{Type: html.ElementNode}
+		n, err := html.ParseFragment(strings.NewReader(util.BytesToStr(node.Tokens)), htmlRoot)
+		if nil == err {
+			switch n[0].DataAtom {
+			case atom.Br:
+				attrs = [][]string{{"class", "vditor-ir__marker vditor-ir__br"}}
+			default:
+				attrs = [][]string{{"class", "vditor-ir__marker"}}
+			}
+		} else {
+			attrs = [][]string{{"class", "vditor-ir__marker"}}
+		}
+		r.tag("code", attrs, false)
 		r.Write(html.EscapeHTML(node.Tokens))
 		r.tag("/code", nil, false)
 		r.tag("/span", nil, false)
