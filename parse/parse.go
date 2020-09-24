@@ -307,3 +307,7 @@ func (context *Context) ParentTip() {
 		context.Tip = context.Tip.Parent
 	}
 }
+
+func (context *Context) TipAppendChild(child *ast.Node) {
+	context.Tip.AppendChild(child)
+}

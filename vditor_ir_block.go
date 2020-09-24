@@ -283,7 +283,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 		ialTokens = append(ialTokens, '}')
 		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
-		defer tree.Context.Tip.AppendChild(ial)
+		defer tree.Context.TipAppendChild(ial)
 	}
 
 	switch n.DataAtom {
@@ -961,12 +961,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 
 			t := parse.Parse("", []byte(text), lute.Options)
 			if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
+				ial, id := node.KramdownIAL, node.ID
 				node = blockEmbed
+				node.KramdownIAL, node.ID = ial, id
 				next := blockEmbed.Next
 				tree.Context.Tip.AppendChild(node)
-				if nil != next { // 插入符
-					tree.Context.Tip.AppendChild(next)
-				}
+				appendNextToTip(next, tree)
 				return
 			}
 			node.Type = ast.NodeText
