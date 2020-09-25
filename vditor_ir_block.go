@@ -755,6 +755,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			t := parse.Parse("", []byte(text), lute.Options)
+			if textNode := t.Root.FirstChild.FirstChild; nil != textNode && ast.NodeText == textNode.Type &&
+				nil != textNode.Next && ast.NodeBlockRef == textNode.Next.Type {
+				content := textNode.Text()
+				if ("！" + util.Caret == content) || ("!" + util.Caret == content) {
+					text = strings.Replace(text, content, "!", 1) + util.Caret
+					t = parse.Parse("", []byte(text), lute.Options)
+				}
+			}
 			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
 				node = blockRef
 				next := blockRef.Next
@@ -762,6 +770,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				appendNextToTip(next, tree)
 				return
 			}
+			if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
+				node = blockEmbed
+				next := blockEmbed.Next
+				tree.Context.Tip.AppendChild(node)
+				appendNextToTip(next, tree)
+				return
+			}
+
 			node.Type = ast.NodeText
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
