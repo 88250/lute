@@ -110,7 +110,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemDollar != maybeMarker && // 数学公式
 			lex.ItemOpenBracket != maybeMarker && // 脚注
 			lex.ItemOpenCurlyBrace != maybeMarker && // kramdown 内联属性列表
-			lex.ItemBang != maybeMarker && // 内容块嵌入
+			lex.ItemBang != maybeMarker && "！"[0] != maybeMarker && // 内容块嵌入
 			util.Caret[0] != maybeMarker { // Vditor 编辑器支持
 			t.Context.advanceNextNonspace()
 			break
