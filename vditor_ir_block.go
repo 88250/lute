@@ -336,6 +336,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			nil == subTree.Root.FirstChild.Next {
 			tree.Context.Tip.AppendChild(subTree.Root.FirstChild.FirstChild)
 		} else {
+			node.Tokens = bytes.TrimSpace(node.Tokens)
 			tree.Context.Tip.AppendChild(node)
 		}
 	case atom.P:
