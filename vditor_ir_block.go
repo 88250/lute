@@ -750,7 +750,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		switch dataType {
 		case "block-ref":
 			text := lute.domText(n)
-			if "" == text {
+			if "" == strings.TrimSpace(text) {
 				return
 			}
 
@@ -758,7 +758,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			if textNode := t.Root.FirstChild.FirstChild; nil != textNode && ast.NodeText == textNode.Type &&
 				nil != textNode.Next && ast.NodeBlockRef == textNode.Next.Type {
 				content := textNode.Text()
-				if ("！" + util.Caret == content) || ("!" + util.Caret == content) {
+				if ("！"+util.Caret == content) || ("!"+util.Caret == content) {
 					text = strings.Replace(text, content, "!", 1) + util.Caret
 					t = parse.Parse("", []byte(text), lute.Options)
 				}
@@ -785,6 +785,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		case "heading-id":
 			node.Type = ast.NodeHeadingID
 			text := lute.domText(n)
+			if "" == strings.TrimSpace(text) {
+				return
+			}
+
 			if !strings.HasSuffix(text, "}") {
 				node.Type = ast.NodeText
 				node.Tokens = []byte(text)
@@ -797,6 +801,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "em", "strong", "s", "mark", "code", "inline-math", "tag":
 			text := lute.domText(n)
+			if "" == strings.TrimSpace(text) {
+				return
+			}
+
 			t := parse.Parse("", []byte(text), lute.Options)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type ||
 				ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type || ast.NodeMark == inlineNode.Type ||
@@ -813,6 +821,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "a", "link-ref", "img":
 			text := lute.domText(n)
+			if "" == strings.TrimSpace(text) {
+				return
+			}
+
 			t := parse.Parse("", []byte(text), lute.Options)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeLink == inlineNode.Type || ast.NodeImage == inlineNode.Type) {
 				node = inlineNode
@@ -827,12 +839,20 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "html-inline":
 			text := lute.domText(n)
+			if "" == strings.TrimSpace(text) {
+				return
+			}
+
 			node.Type = ast.NodeInlineHTML
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
 		case "html-entity":
 			text := lute.domText(n)
+			if "" == strings.TrimSpace(text) {
+				return
+			}
+
 			t := parse.Parse("", []byte(text), lute.Options)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeHTMLEntity == inlineNode.Type) {
 				node = inlineNode
@@ -847,6 +867,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "emoji":
 			text := lute.domText(n.FirstChild.NextSibling)
+			if "" == strings.TrimSpace(text) {
+				return
+			}
+
 			t := parse.Parse("", []byte(text), lute.Options)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmoji == inlineNode.Type) {
 				node = inlineNode
@@ -861,6 +885,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "backslash":
 			text := lute.domText(n)
+			if "" == strings.TrimSpace(text) {
+				return
+			}
+
 			t := parse.Parse("", []byte(text), lute.Options)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeBackslash == inlineNode.Type) {
 				node = inlineNode
