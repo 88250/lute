@@ -1353,6 +1353,21 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
+func (r *VditorIRBlockRenderer) NodeID(node *ast.Node) (ret string) {
+	for _, kv := range node.KramdownIAL {
+		if "id" == kv[0] {
+			return kv[1]
+		}
+	}
+	if Testing {
+		return "" // 测试环境不生成 ID
+	}
+	if ast.NodeListItem == node.Type { // 列表项暂时不生成 ID，等确定是否需要列表项块类型后再打开
+		return ""
+	}
+	return ast.NewNodeID()
+}
+
 func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string

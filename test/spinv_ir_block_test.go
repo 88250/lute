@@ -11,6 +11,7 @@
 package test
 
 import (
+	"github.com/88250/lute/render"
 	"testing"
 
 	"github.com/88250/lute"
@@ -54,6 +55,7 @@ func TestSpinVditorIRBlockDOM(t *testing.T) {
 	luteEngine.KramdownIAL = true
 	luteEngine.SetLinkBase(" http://127.0.0.1:6807/webdav/q0fk7yv/测试笔记/")
 
+	render.Testing = true
 	for _, test := range spinVditorIRBlockDOMTests {
 		html := luteEngine.SpinVditorIRBlockDOM(test.from)
 
@@ -61,4 +63,5 @@ func TestSpinVditorIRBlockDOM(t *testing.T) {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
 		}
 	}
+	render.Testing = false
 }

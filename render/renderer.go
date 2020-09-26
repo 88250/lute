@@ -23,6 +23,9 @@ import (
 	"github.com/88250/lute/util"
 )
 
+// Testing 标识是否为测试环境。
+var Testing bool
+
 // RendererFunc 描述了渲染器函数签名。
 type RendererFunc func(n *ast.Node, entering bool) ast.WalkStatus
 
@@ -315,7 +318,10 @@ func (r *BaseRenderer) NodeID(node *ast.Node) (ret string) {
 			return kv[1]
 		}
 	}
-	return
+	if ast.NodeListItem == node.Type { // 列表项暂时不生成 ID，等确定是否需要列表项块类型后再打开
+		return ""
+	}
+	return ast.NewNodeID()
 }
 
 func (r *BaseRenderer) NodeAttrs(node *ast.Node) (ret [][]string) {

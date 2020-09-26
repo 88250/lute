@@ -11,6 +11,7 @@
 package test
 
 import (
+	"github.com/88250/lute/render"
 	"testing"
 
 	"github.com/88250/lute"
@@ -112,10 +113,12 @@ func TestMd2VditorIRBlock(t *testing.T) {
 	luteEngine.KramdownIAL = true
 	luteEngine.Tag = true
 
+	render.Testing = true
 	for _, test := range md2VditorIRBlockTests {
 		md := luteEngine.Md2VditorIRBlockDOM(test.from)
 		if test.to != md {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
 		}
 	}
+	render.Testing = false
 }
