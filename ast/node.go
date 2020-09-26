@@ -320,6 +320,7 @@ func (n *Node) List() (ret []*Node) {
 	return
 }
 
+// ParentIs 判断 n 的类型是否在指定的 nodeTypes 类型列表内。
 func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 	types := append(nodeTypes, nodeType)
 	for p := n.Parent; nil != p; p = p.Parent {
@@ -328,6 +329,17 @@ func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 				return true
 			}
 		}
+	}
+	return false
+}
+
+// IsBlock 判断 n 是否为块级元素。
+func (n *Node) IsBlock() bool {
+	switch n.Type {
+	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
+		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockEmbed,
+		NodeKramdownBlockIAL:
+		return true
 	}
 	return false
 }
