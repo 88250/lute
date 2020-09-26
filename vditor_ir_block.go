@@ -321,7 +321,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			// 开始代码块标记符后退格的情况
 			tree.Context.Tip.Type = ast.NodeParagraph
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(content)})
-			n.Parent.RemoveChild(n.NextSibling.NextSibling.NextSibling.NextSibling)
+			if nil != n.NextSibling && nil != n.NextSibling.NextSibling && nil != n.NextSibling.NextSibling.NextSibling &&
+				nil != n.NextSibling.NextSibling.NextSibling.NextSibling {
+				n.Parent.RemoveChild(n.NextSibling.NextSibling.NextSibling.NextSibling)
+			}
 			break
 		}
 
