@@ -336,7 +336,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			nil == subTree.Root.FirstChild.Next {
 			tree.Context.Tip.AppendChild(subTree.Root.FirstChild.FirstChild)
 		} else {
-			node.Tokens = bytes.TrimSpace(node.Tokens)
+			node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
 			tree.Context.Tip.AppendChild(node)
 		}
 	case atom.P:
@@ -478,6 +478,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if 0 == bullet {
 			node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
 			node.ListData.Delimiter = marker[len(marker)-1]
+		}
+		if "vditor-task" == lute.domAttrValue(n, "class") {
+			node.ListData.Typ = 3
+			tree.Context.Tip.ListData.Typ = 3
 		}
 
 		tree.Context.Tip.AppendChild(node)
