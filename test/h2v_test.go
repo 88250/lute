@@ -11,6 +11,7 @@
 package test
 
 import (
+	"github.com/88250/lute/render"
 	"testing"
 
 	"github.com/88250/lute"
@@ -36,3 +37,21 @@ func TestHTML2VditorDOM(t *testing.T) {
 		}
 	}
 }
+
+var html2VditorIRBlockDOMTests = []parseTest{
+
+	{"0", `<!--StartFragment--><a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/users/88250/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/88250"><img class="avatar avatar-user" height="20" width="20" alt="@88250" src="https://avatars2.githubusercontent.com/u/873584?s=60&amp;u=f7f95251dd56b576aefd20094b6695a2db23a927&amp;v=4"></a><span><span>&nbsp;</span></span><!--EndFragment-->`, "<p data-block=\"0\" data-node-id=\"\" data-type=\"p\"><span data-type=\"a\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">@88250</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">https://avatars2.githubusercontent.com/u/873584?s=60&u=f7f95251dd56b576aefd20094b6695a2db23a927&v=4</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><img src=\"https://avatars2.githubusercontent.com/u/873584?s=60&u=f7f95251dd56b576aefd20094b6695a2db23a927&v=4\" alt=\"@88250\" /></span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">https://github.com/88250</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span></p>"},
+}
+
+func TestHTML2VditorIRBlockDOM(t *testing.T) {
+	luteEngine := lute.New()
+
+	render.Testing = true
+	for _, test := range html2VditorIRBlockDOMTests {
+		result := luteEngine.HTML2VditorIRBlockDOM(test.from)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+}
+
