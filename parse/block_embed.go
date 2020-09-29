@@ -20,11 +20,15 @@ import (
 func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	chinese := bytes.HasPrefix(tokens, []byte("！(("))
-	if 6 > t.Context.currentLineLen || (!bytes.HasPrefix(tokens, []byte("!((")) && !chinese) {
+	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"!(("))
+	if 6 > t.Context.currentLineLen || (!bytes.HasPrefix(tokens, []byte("!((")) && !chinese && !startCaret) {
 		return
 	}
 	if chinese {
 		tokens = bytes.Replace(tokens, []byte("！(("), []byte("!(("), 1)
+	}
+	if startCaret {
+		tokens = bytes.Replace(tokens, []byte(util.Caret+"!(("), []byte("!(("), 1)
 	}
 
 	tokens = tokens[3:]
@@ -92,7 +96,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockEmbedText, Tokens: text})
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-	if endCaret {
+	if endCaret || startCaret {
 		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
 	}
 	return
