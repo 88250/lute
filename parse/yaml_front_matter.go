@@ -37,7 +37,7 @@ func (context *Context) yamlFrontMatterFinalize(node *ast.Node) {
 		if bytes.HasSuffix(tokens, YamlFrontMatterMarkerCaret) {
 			// 剔除结尾的 ---‸
 			tokens = bytes.TrimSuffix(tokens, YamlFrontMatterMarkerCaret)
-			// 把 Vditor 光标移动到内容末尾
+			// 把 Vditor 插入符移动到内容末尾
 			tokens = append(tokens, util.CaretTokens...)
 		}
 	}

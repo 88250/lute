@@ -281,13 +281,27 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 
 	tokenBefore, tokenAfter := rune(lex.ItemNewline), rune(lex.ItemNewline)
 	if 0 < startPos {
-		t := ctx.tokens[startPos-1]
-		if t >= utf8.RuneSelf {
+		c := ctx.tokens[startPos-1]
+		if c >= utf8.RuneSelf {
 			tokenBefore, _ = utf8.DecodeLastRune(ctx.tokens[:startPos])
 		} else {
-			tokenBefore = rune(t)
+			tokenBefore = rune(c)
+		}
+
+		if (t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV) && util.Caret == string(tokenBefore) {
+			// 跳过插入符位置向前看
+			caretLen := len(util.Caret)
+			if 0 < startPos-caretLen {
+				c = ctx.tokens[startPos-caretLen-1]
+				if c >= utf8.RuneSelf {
+					tokenBefore, _ = utf8.DecodeLastRune(ctx.tokens[:startPos-caretLen])
+				} else {
+					tokenBefore = rune(c)
+				}
+			}
 		}
 	}
+
 	if ctx.tokensLen > ctx.pos {
 		t := ctx.tokens[ctx.pos]
 		if t >= utf8.RuneSelf {
@@ -306,11 +320,6 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	beforeIsPunct := unicode.IsPunct(tokenBefore) || unicode.IsSymbol(tokenBefore)
 	if (lex.ItemAsterisk == token && '~' == tokenBefore) || (lex.ItemTilde == token && '*' == tokenBefore) {
 		beforeIsPunct = false
-	}
-	if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
-		if util.Caret == string(tokenBefore) {
-			beforeIsPunct = false
-		}
 	}
 
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)

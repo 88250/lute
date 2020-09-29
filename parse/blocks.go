@@ -26,7 +26,7 @@ func (t *Tree) parseBlocks() {
 	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {
 		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
 			if !bytes.Equal(line, util.CaretNewlineTokens) && t.Context.Tip.ParentIs(ast.NodeListItem) && bytes.HasPrefix(line, util.CaretTokens) {
-				// 光标在开头的话移动到上一行结尾，处理 https://github.com/Vanessa219/vditor/issues/633 中的一些情况
+				// 插入符在开头的话移动到上一行结尾，处理 https://github.com/Vanessa219/vditor/issues/633 中的一些情况
 				if ast.NodeListItem == t.Context.Tip.Type {
 					t.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: line})
 					break
