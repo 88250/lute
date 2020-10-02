@@ -140,11 +140,10 @@ func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 	return
 }
 
-func VditorIRBlockMdHeadings(md string) (ret string) {
+func VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 	luteEngine := New()
 	luteEngine.KramdownIAL = true
-	dom := luteEngine.Md2VditorIRBlockDOM(md)
-	return luteEngine.VditorIRBlockDOMHeadings(dom)
+	return luteEngine.VditorIRBlockDOMHeadings(htmlStr)
 }
 
 func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
