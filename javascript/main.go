@@ -26,15 +26,16 @@ func New(options map[string]map[string]*js.Object) *js.Object {
 
 func main() {
 	js.Global.Set("Lute", map[string]interface{}{
-		"Version":          lute.Version,
-		"New":              New,
-		"WalkStop":         ast.WalkStop,
-		"WalkSkipChildren": ast.WalkSkipChildren,
-		"WalkContinue":     ast.WalkContinue,
-		"GetHeadingID":     render.HeadingID,
-		"Caret":            util.Caret,
-		"NewNodeID":        ast.NewNodeID,
-		"FilePath":         lute.FilePath,
-		"FileID":           lute.FileID,
+		"Version":                 lute.Version,
+		"New":                     New,
+		"WalkStop":                ast.WalkStop,
+		"WalkSkipChildren":        ast.WalkSkipChildren,
+		"WalkContinue":            ast.WalkContinue,
+		"GetHeadingID":            render.HeadingID,
+		"VditorIRBlockMdHeadings": lute.VditorIRBlockMdHeadings,
+		"Caret":                   util.Caret,
+		"NewNodeID":               ast.NewNodeID,
+		"FilePath":                lute.FilePath,
+		"FileID":                  lute.FileID,
 	})
 }
