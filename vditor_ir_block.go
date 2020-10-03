@@ -120,7 +120,7 @@ func (lute *Lute) VditorIRBlockDOM2Text(htmlStr string) (text string) {
 	return tree.Root.Text()
 }
 
-func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
+func (lute *Lute) VditorIRBlockDOMHeadings0(htmlStr string) (ret string) {
 	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
 	if nil != err {
 		return ""
@@ -143,7 +143,7 @@ func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 func VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 	luteEngine := New()
 	luteEngine.KramdownIAL = true
-	return luteEngine.VditorIRBlockDOMHeadings(htmlStr)
+	return luteEngine.VditorIRBlockDOMHeadings0(htmlStr)
 }
 
 func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
