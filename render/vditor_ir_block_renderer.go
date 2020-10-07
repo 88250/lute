@@ -187,7 +187,7 @@ func (r *VditorIRBlockRenderer) renderMark(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorIRBlockRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--mark"}}, false)
 	r.WriteString("=")
 	r.tag("/span", nil, false)
 	r.tag("mark", [][]string{{"data-newline", "1"}}, false)
@@ -196,14 +196,14 @@ func (r *VditorIRBlockRenderer) renderMark1OpenMarker(node *ast.Node, entering b
 
 func (r *VditorIRBlockRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/mark", nil, false)
-	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--mark"}}, false)
 	r.WriteString("=")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--mark"}}, false)
 	r.WriteString("==")
 	r.tag("/span", nil, false)
 	r.tag("mark", [][]string{{"data-newline", "1"}}, false)
@@ -212,7 +212,7 @@ func (r *VditorIRBlockRenderer) renderMark2OpenMarker(node *ast.Node, entering b
 
 func (r *VditorIRBlockRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/mark", nil, false)
-	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--mark"}}, false)
 	r.WriteString("==")
 	r.tag("/span", nil, false)
 	return ast.WalkStop
