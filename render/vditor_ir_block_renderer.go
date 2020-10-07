@@ -409,7 +409,7 @@ func (r *VditorIRBlockRenderer) renderBackslashContent(node *ast.Node, entering 
 func (r *VditorIRBlockRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
-		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--bi"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--backslash"}}, false)
 		r.WriteByte(lex.ItemBackslash)
 		r.WriteString("</span>")
 	} else {
