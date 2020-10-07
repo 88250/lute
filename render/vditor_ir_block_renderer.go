@@ -12,9 +12,11 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html/atom"
 	"strconv"
 	"strings"
+	"unicode/utf8"
+
+	"github.com/88250/lute/html/atom"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
@@ -1101,8 +1103,37 @@ func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.Wa
 	if !bytes.EqualFold(node.Tokens, []byte(util.Caret+parse.Zwsp)) {
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
 	}
-	r.Write(html.EscapeHTML(node.Tokens))
+
+	text := string(html.EscapeHTML(node.Tokens))
+	for _, mark := range r.Tree.Marks {
+		_, text = markText(text, mark, 1024*1024)
+	}
+	r.WriteString(text)
 	return ast.WalkStop
+}
+
+func markText(text string, keyword string, beforeLen int) (pos int, marked string) {
+	if pos = strings.Index(strings.ToLower(text), strings.ToLower(keyword)); -1 < pos {
+		var before []rune
+		var count int
+		for i := pos; 0 < i; { // 关键字前面太长的话缩短一些
+			r, size := utf8.DecodeLastRuneInString(text[:i])
+			i -= size
+			before = append([]rune{r}, before...)
+			count++
+			if beforeLen < count {
+				break
+			}
+		}
+		mark := text[pos : pos+len(keyword)]
+		marked = string(before)
+		if "" != mark {
+			marked += "<mark>" + mark + "</mark>"
+		}
+		marked += text[pos+len(keyword):]
+		return
+	}
+	return
 }
 
 func (r *VditorIRBlockRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
