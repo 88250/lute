@@ -68,12 +68,12 @@ func allowSpace(currentChar, nextChar rune) bool {
 	}
 
 	currentIsHan := unicode.Is(unicode.Han, currentChar)
-	nextIsPunct := '#' != nextChar && '%' != nextChar && (unicode.IsPunct(nextChar) || '~' == nextChar || '=' == nextChar)
+	nextIsPunct := '%' != nextChar && (unicode.IsPunct(nextChar) || '~' == nextChar || '=' == nextChar || '#' == nextChar)
 	if currentIsHan && nextIsPunct {
 		return false
 	}
 
-	currentIsPunct := '#' != currentChar && '%' != currentChar && (unicode.IsPunct(currentChar) || '~' == currentChar || '=' == currentChar)
+	currentIsPunct := '%' != currentChar && (unicode.IsPunct(currentChar) || '~' == currentChar || '=' == currentChar || '#' == currentChar)
 	nextIsHan := unicode.Is(unicode.Han, nextChar)
 	if nextIsHan && currentIsPunct {
 		return false

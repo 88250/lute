@@ -18,6 +18,8 @@ import (
 
 var spaceTests = []parseTest{
 
+	{"41", "中1#标签#1文", "<p>中 1 <em>#标签#</em> 1 文</p>\n"},
+	{"40", "中#标签#文", "<p>中<em>#标签#</em>文</p>\n"},
 	{"39", "中1==标记==1文", "<p>中 1 <mark>标记</mark> 1 文</p>\n"},
 	{"38", "中==标记==文", "<p>中<mark>标记</mark>文</p>\n"},
 
@@ -25,10 +27,10 @@ var spaceTests = []parseTest{
 	{"37", "中yā文", "<p>中 yā 文</p>\n"},
 
 	// 井号 # 前后自动空格问题 https://github.com/88250/lute/issues/62
-	{"36", "前#foo", "<p>前 #foo</p>\n"},
-	{"35", "foo#后", "<p>foo# 后</p>\n"},
+	{"36", "前#foo", "<p>前#foo</p>\n"},
+	{"35", "foo#后", "<p>foo#后</p>\n"},
 	{"34", "foo#bar", "<p>foo#bar</p>\n"},
-	{"33", "前#后", "<p>前 # 后</p>\n"},
+	{"33", "前#后", "<p>前#后</p>\n"},
 
 	// 加粗、强调和删除线自动空格改进 https://github.com/88250/lute/issues/25
 	{"32", "数字~1链滴2~需要", "<p>数字 <del>1 链滴 2</del> 需要</p>\n"},
@@ -80,6 +82,7 @@ func TestAutoSpace(t *testing.T) {
 	luteEngine := lute.New() // 默认已经开启自动空格优化
 	luteEngine.ChinesePunct = false
 	luteEngine.Mark = true
+	luteEngine.Tag = true
 
 	for _, test := range spaceTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
