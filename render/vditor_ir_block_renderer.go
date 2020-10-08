@@ -1113,6 +1113,7 @@ func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.Wa
 }
 
 func markText(text string, keyword string, beforeLen int) (pos int, marked string) {
+	marked = text
 	if pos = strings.Index(strings.ToLower(text), strings.ToLower(keyword)); -1 < pos {
 		var before []rune
 		var count int
