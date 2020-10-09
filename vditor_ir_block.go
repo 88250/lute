@@ -406,6 +406,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeList
 		node.ListData = &ast.ListData{}
 		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "*"
+		}
 		if atom.Ol == n.DataAtom {
 			node.ListData.Typ = 1
 			start := lute.domAttrValue(n, "start")
