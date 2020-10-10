@@ -150,6 +150,9 @@ func (context *Context) RelativePath(dest []byte) []byte {
 	}
 
 	linkBase := util.StrToBytes(context.Option.LinkBase)
+	if !bytes.HasSuffix(linkBase, []byte("/")) {
+		linkBase = append(linkBase, []byte("/")...)
+	}
 	ret := append(linkBase, dest...)
 	if bytes.Equal(linkBase, ret) {
 		return []byte("")
