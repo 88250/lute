@@ -1124,3 +1124,18 @@ func FileID(p string) (ret string) {
 	}
 	return
 }
+
+func NormalizeLinkBase(linkBase string) string {
+	ret := linkBase
+	if !strings.HasPrefix(ret, "http://127.0.0.1") {
+		// 远程 WebDAV，走本地反代
+		ret = "/remote?url=" + ret + "/"
+		return ret
+	}
+
+	ret = ret[len("http://127.0.0.1:6806"):]
+	if !strings.HasSuffix(ret, "/") {
+		ret += "/"
+	}
+	return ret
+}

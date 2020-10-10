@@ -36,6 +36,6 @@ func main() {
 		"Caret":                    util.Caret,
 		"NewNodeID":                ast.NewNodeID,
 		"FilePath":                 lute.FilePath,
-		"FileID":                   lute.FileID,
+		"FileID":                   lute.NormalizeLinkBase,
 	})
 }
