@@ -340,7 +340,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		subTree := parse.Inline("", tokens, tree.Context.Option)
 		if ast.NodeParagraph == subTree.Root.FirstChild.Type && ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type &&
 			nil == subTree.Root.FirstChild.Next {
-			tree.Context.Tip.AppendChild(subTree.Root.FirstChild.FirstChild)
+			appendNextToTip(subTree.Root.FirstChild.FirstChild, tree)
 		} else {
 			node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
 			tree.Context.Tip.AppendChild(node)
