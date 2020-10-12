@@ -17,8 +17,9 @@ import (
 	"github.com/88250/lute"
 )
 
-var md2VditorTests = []parseTest{
+var md2VditorDOMTests = []parseTest{
 
+	{"20", "\n      > foo", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none\"><code>  &gt; foo\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>  &gt; foo\n</code></pre></div>"},
 	{"19", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\" id=\"fooid\">foo</p><p data-block=\"0\" id=\"barid\">bar</p>"},
 	{"18", "![][foo]\n\n[foo]: bar", "<p data-block=\"0\">\u200b<img src=\"bar\" alt=\"\" data-type=\"link-ref\" data-link-label=\"foo\" /></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"17", "![text][foo]\n\n[foo]: bar", "<p data-block=\"0\">\u200b<img src=\"bar\" alt=\"text\" data-type=\"link-ref\" data-link-label=\"foo\" /></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
@@ -29,8 +30,8 @@ var md2VditorTests = []parseTest{
 	{"12", "foo[^1]\n[^1]:bar\n    * baz", "<p data-block=\"0\">foo<sup data-type=\"footnotes-ref\" data-footnotes-label=\"^1\" class=\"b3-tooltips b3-tooltips__s\" aria-label=\"barbaz\">1</sup>\u200b</p><div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^1\"><p data-block=\"0\">bar</p><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">baz</li></ul></li></ol></div>"},
 	{"11", "[foo][1]\n\n[1]: /bar\n", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"1\">foo</span>\u200b</p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[1]: /bar\n</div>"},
 	{"10", "Foo\n    ---\n", "<p data-block=\"0\">Foo\n---</p>"},
-	{"9", "    ***\n     ***\n\n-     -      -      -", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"***\n ***\n\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none\"><code>***\n ***\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>***\n ***\n</code></pre></div><hr data-block=\"0\" />"},
-	{"8", "    ***\n", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"***\n\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none\"><code>***\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>***\n</code></pre></div>"},
+	{"9", "    ***\n     ***\n\n-     -      -      -", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none\"><code>***\n ***\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>***\n ***\n</code></pre></div><hr data-block=\"0\" />"},
+	{"8", "    ***\n", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none\"><code>***\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>***\n</code></pre></div>"},
 	{"7", "* a\n  * b", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">a<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">b</li></ul></li></ul>"},
 	{"6", "[]()", "<p data-block=\"0\">[]()</p>"},
 	{"5", "* [ ]", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> </li></ul>"},
@@ -46,12 +47,12 @@ var md2VditorTests = []parseTest{
 </details>`, "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;details&gt;\n&lt;summary&gt;foo&lt;/summary&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><details>\n<summary>foo</summary></pre></div><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">bar</li></ul><div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;/details&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"></details></pre></div>"},
 }
 
-func TestMd2Vditor(t *testing.T) {
+func TestMd2VditorDOM(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ToC = true
 	luteEngine.KramdownIAL = true
 
-	for _, test := range md2VditorTests {
+	for _, test := range md2VditorDOMTests {
 		md := luteEngine.Md2VditorDOM(test.from)
 		if test.to != md {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
@@ -59,7 +60,7 @@ func TestMd2Vditor(t *testing.T) {
 	}
 }
 
-var md2VditorIRTests = []parseTest{
+var md2VditorIRDOMTests = []parseTest{
 
 	{"13", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\">foo</p><span data-type=\"kramdown-ial\">{: id=\"fooid\"}\n</span><p data-block=\"0\">bar</p><span data-type=\"kramdown-ial\">{: id=\"barid\"}\n</span>"},
 	{"12", "![][foo]\n\n[foo]: bar", "<p data-block=\"0\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">[foo]</span><img src=\"bar\" /></span></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
@@ -77,12 +78,12 @@ var md2VditorIRTests = []parseTest{
 	{"0", "*foo*", "<p data-block=\"0\"><span data-type=\"em\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span><em data-newline=\"1\">foo</em><span class=\"vditor-ir__marker vditor-ir__marker--bi\">*</span></span></p>"},
 }
 
-func TestMd2VditorIR(t *testing.T) {
+func TestMd2VditorIRDOM(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ToC = true
 	luteEngine.KramdownIAL = true
 
-	for _, test := range md2VditorIRTests {
+	for _, test := range md2VditorIRDOMTests {
 		md := luteEngine.Md2VditorIRDOM(test.from)
 		if test.to != md {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
@@ -90,7 +91,7 @@ func TestMd2VditorIR(t *testing.T) {
 	}
 }
 
-var md2VditorIRBlockTests = []parseTest{
+var md2VditorIRBlockDOMTests = []parseTest{
 
 	{"10", "foo#bar#baz", "<p data-block=\"0\" data-node-id=\"\" data-type=\"p\">foo<span data-type=\"tag\" class=\"vditor-ir__tag\">#bar#</span>baz</p>"},
 	{"9", "foo\n((id \"text\"))bar", "<p data-block=\"0\" data-node-id=\"\" data-type=\"p\">foo\n<span data-type=\"block-ref\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">id</span><span class=\"vditor-ir__marker\"> </span><span class=\"vditor-ir__marker\">\"</span><span class=\"vditor-ir__blockref\">text</span><span class=\"vditor-ir__marker\">\"</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span>bar</p>"},
@@ -106,7 +107,7 @@ var md2VditorIRBlockTests = []parseTest{
 	{"0", "", ""},
 }
 
-func TestMd2VditorIRBlock(t *testing.T) {
+func TestMd2VditorIRBlockDOM(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ToC = true
 	luteEngine.BlockRef = true
@@ -114,7 +115,7 @@ func TestMd2VditorIRBlock(t *testing.T) {
 	luteEngine.Tag = true
 
 	render.Testing = true
-	for _, test := range md2VditorIRBlockTests {
+	for _, test := range md2VditorIRBlockDOMTests {
 		md := luteEngine.Md2VditorIRBlockDOM(test.from)
 		if test.to != md {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)

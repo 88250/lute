@@ -1027,7 +1027,7 @@ func (r *VditorRenderer) tag(name string, attrs [][]string, selfclosing bool) {
 func (r *VditorRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		marker := "```"
-		if nil != node.FirstChild {
+		if nil != node.FirstChild && bytes.HasPrefix(node.FirstChild.Tokens, []byte(marker)) {
 			marker = string(node.FirstChild.Tokens)
 		}
 		r.WriteString(`<div class="vditor-wysiwyg__block" data-type="code-block" data-block="0" data-marker="` + marker + `">`)
