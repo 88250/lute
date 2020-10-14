@@ -156,7 +156,7 @@ func (r *VditorIRBlockRenderer) Render() (output []byte) {
 
 func (r *VditorIRBlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"data-type", "tag"}, {"class", "vditor-ir__tag"}}, false)
+		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
 	}
@@ -164,12 +164,18 @@ func (r *VditorIRBlockRenderer) renderTag(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRBlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--tag"}}, false)
 	r.WriteByte(lex.ItemCrosshatch)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__tag"}}, false)
 	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--tag"}}, false)
 	r.WriteByte(lex.ItemCrosshatch)
+	r.tag("/span", nil, false)
 	return ast.WalkStop
 }
 
@@ -1488,6 +1494,8 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "s"})
 	case ast.NodeMark:
 		attrs = append(attrs, []string{"data-type", "mark"})
+	case ast.NodeTag:
+		attrs = append(attrs, []string{"data-type", "tag"})
 	case ast.NodeLink:
 		if 3 != node.LinkType {
 			attrs = append(attrs, []string{"data-type", "a"})
@@ -1531,6 +1539,8 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		r.tag("span", attrs, false)
 		return
 	}
+
+	// TODO {"class", "vditor-ir__tag"}
 
 	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("span", attrs, false)
