@@ -94,6 +94,7 @@ func NewOptions() *parse.Options {
 		Terms:                          render.NewTerms(),
 		EmojiSite:                      "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
 		LinkBase:                       "",
+		LinkPrefix:                     "",
 		VditorCodeBlockPreview:         true,
 		RenderListStyle:                false,
 		ChineseParagraphBeginningSpace: false,
@@ -301,6 +302,10 @@ func (lute *Lute) SetVditorWYSIWYG(b bool) {
 
 func (lute *Lute) SetInlineMathAllowDigitAfterOpenMarker(b bool) {
 	lute.InlineMathAllowDigitAfterOpenMarker = b
+}
+
+func (lute *Lute) SetLinkPrefix(linkPrefix string) {
+	lute.LinkPrefix = linkPrefix
 }
 
 func (lute *Lute) SetLinkBase(linkBase string) {

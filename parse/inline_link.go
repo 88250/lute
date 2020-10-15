@@ -138,6 +138,22 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 	return
 }
 
+func (context *Context) LinkPath(dest []byte) []byte {
+	dest = context.RelativePath(dest)
+	dest = context.PrefixPath(dest)
+	return dest
+}
+
+func (context *Context) PrefixPath(dest []byte) []byte {
+	if "" == context.Option.LinkPrefix {
+		return dest
+	}
+
+	linkPrefix := util.StrToBytes(context.Option.LinkPrefix)
+	ret := append(linkPrefix, dest...)
+	return ret
+}
+
 func (context *Context) RelativePath(dest []byte) []byte {
 	if "" == context.Option.LinkBase {
 		return dest

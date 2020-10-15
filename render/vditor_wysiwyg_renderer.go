@@ -568,7 +568,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			r.WriteString("<img src=\"")
 			link := r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
 			destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.Tree.Context.RelativePath(destTokens)
+			destTokens = r.Tree.Context.LinkPath(destTokens)
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 			r.Write(destTokens)
 			r.WriteString("\" alt=\"")
@@ -602,7 +602,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 		if 0 == r.DisableTags {
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.Tree.Context.RelativePath(destTokens)
+			destTokens = r.Tree.Context.LinkPath(destTokens)
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 			r.Write(destTokens)
 			r.WriteString("\" alt=\"")
@@ -658,7 +658,7 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
-		destTokens = r.Tree.Context.RelativePath(destTokens)
+		destTokens = r.Tree.Context.LinkPath(destTokens)
 		caretInDest := bytes.Contains(destTokens, util.CaretTokens)
 		if caretInDest {
 			text := node.ChildByType(ast.NodeLinkText)

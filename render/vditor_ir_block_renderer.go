@@ -918,7 +918,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		}
 
 		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-		destTokens = r.Tree.Context.RelativePath(destTokens)
+		destTokens = r.Tree.Context.LinkPath(destTokens)
 		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		attrs := [][]string{{"src", string(destTokens)}}
 		alt := node.ChildByType(ast.NodeLinkText)

@@ -15,17 +15,34 @@ import (
 	"testing"
 )
 
-var relativePathLinkTests = []parseTest{
+var linkBaseTests = []parseTest{
 	{"2", "![foo](D:\\bar.png)\n", "<p><img src=\"D:\\bar.png\" alt=\"foo\" /></p>\n"},
 	{"1", "![foo](bar.png)\n", "<p><img src=\"http://domain.com/path/bar.png\" alt=\"foo\" /></p>\n"},
 	{"0", "[foo](bar.png)\n", "<p><a href=\"http://domain.com/path/bar.png\">foo</a></p>\n"},
 }
 
-func TestRelativePathLink(t *testing.T) {
+func TestLinkBase(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.LinkBase = "http://domain.com/path/"
 
-	for _, test := range relativePathLinkTests {
+	for _, test := range linkBaseTests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+var linkBasePrefixTests = []parseTest{
+	{"0", "[foo](bar.png)\n", "<p><a href=\"prefix:http://domain.com/path/bar.png\">foo</a></p>\n"},
+}
+
+func TestLinkBasePrefix(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.LinkBase = "http://domain.com/path/"
+	luteEngine.LinkPrefix = "prefix:"
+
+	for _, test := range linkBasePrefixTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)

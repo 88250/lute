@@ -785,7 +785,7 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 			link = r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
 		}
 		destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
-		destTokens = r.Tree.Context.RelativePath(destTokens)
+		destTokens = r.Tree.Context.LinkPath(destTokens)
 		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		attrs := [][]string{{"src", string(destTokens)}}
 		alt := node.ChildByType(ast.NodeLinkText)

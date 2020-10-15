@@ -810,6 +810,9 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		if "" != lute.LinkBase {
 			href = strings.ReplaceAll(href, lute.LinkBase, "")
 		}
+		if "" != lute.LinkPrefix {
+			href = strings.ReplaceAll(href, lute.LinkPrefix, "")
+		}
 		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
 		linkTitle := lute.domAttrValue(n, "title")
 		if "" != linkTitle {

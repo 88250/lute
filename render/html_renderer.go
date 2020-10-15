@@ -541,7 +541,7 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 		if 0 == r.DisableTags {
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.Tree.Context.RelativePath(destTokens)
+			destTokens = r.Tree.Context.LinkPath(destTokens)
 			if "" != r.Option.ImageLazyLoading {
 				r.Write(html.EscapeHTML(util.StrToBytes(r.Option.ImageLazyLoading)))
 				r.WriteString("\" data-src=\"")
@@ -583,7 +583,7 @@ func (r *HtmlRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
-		destTokens = r.Tree.Context.RelativePath(destTokens)
+		destTokens = r.Tree.Context.LinkPath(destTokens)
 		attrs := [][]string{{"href", util.BytesToStr(html.EscapeHTML(destTokens))}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 			attrs = append(attrs, []string{"title", util.BytesToStr(html.EscapeHTML(title.Tokens))})

@@ -917,6 +917,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			if "" != lute.LinkBase {
 				src = strings.ReplaceAll(src, lute.LinkBase, "")
 			}
+			if "" != lute.LinkPrefix {
+				src = strings.ReplaceAll(src, lute.LinkPrefix, "")
+			}
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(src)})
 			linkTitle := lute.domAttrValue(n, "title")
 			if "" != linkTitle {
@@ -1114,6 +1117,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		href := lute.domAttrValue(n, "href")
 		if "" != lute.LinkBase {
 			href = strings.ReplaceAll(href, lute.LinkBase, "")
+		}
+		if "" != lute.LinkPrefix {
+			href = strings.ReplaceAll(href, lute.LinkPrefix, "")
 		}
 		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
 		linkTitle := lute.domAttrValue(n, "title")
