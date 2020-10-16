@@ -919,8 +919,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		case "inline-node":
+			text := lute.domText(n)
 			node.Type = ast.NodeText
-			node.Tokens = []byte(lute.domText(n))
+			if "</font>" == text {
+				node.Type = ast.NodeInlineHTML
+			}
+			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
 		case "math-block-close-marker":
@@ -1038,11 +1042,8 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 	case atom.Font:
 		text := lute.domText(n)
-		if "" != text {
-			node.Type = ast.NodeText
-			node.Tokens = []byte(text)
-			tree.Context.Tip.AppendChild(node)
-		}
+		inlineTree := parse.Inline("", []byte(text), tree.Context.Option)
+		appendNextToTip(inlineTree.Root.FirstChild.FirstChild, tree)
 		return
 	case atom.Details:
 		node.Type = ast.NodeHTMLBlock
