@@ -1256,6 +1256,10 @@ func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
 		return
 	}
 
+	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
+		return
+	}
+
 	switch n.DataAtom {
 	case 0:
 		buffer.WriteString(n.Data)

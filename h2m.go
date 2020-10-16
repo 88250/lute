@@ -217,6 +217,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		return
 	case atom.Em, atom.I:
+		text := lute.domText(n)
+		if "" == text {
+			break
+		}
+
 		node.Type = ast.NodeEmphasis
 		marker := "*"
 		node.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: util.StrToBytes(marker)})
@@ -224,6 +229,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Strong, atom.B:
+		text := lute.domText(n)
+		if "" == text {
+			break
+		}
+
 		node.Type = ast.NodeStrong
 		marker := "**"
 		node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: util.StrToBytes(marker)})
