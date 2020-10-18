@@ -134,9 +134,20 @@ func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 
 		padding := 16 + 14*(heading.HeadingLevel-1)
 		buf.WriteString(`<div data-id="ir-` + render.HeadingID(heading) + `" style="padding-left:` + strconv.Itoa(padding) +
-			`px" class="b3-list-item">` + heading.Text() + `</div>`)
+			`px" class="b3-list-item">` + headingText(heading) + `</div>`)
 	}
 	ret = buf.String()
+	return
+}
+
+func headingText(n *ast.Node) (ret string) {
+	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if (ast.NodeText == n.Type || ast.NodeCodeSpanContent == n.Type ||
+			ast.NodeLinkText == n.Type || ast.NodeBlockRefText == n.Type || ast.NodeBlockEmbedText == n.Type) && entering {
+			ret += util.BytesToStr(n.Tokens)
+		}
+		return ast.WalkContinue
+	})
 	return
 }
 
