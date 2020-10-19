@@ -103,7 +103,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	whitespaces, tokens := lex.TrimLeft(tokens)
 
 	if (lex.ItemGreater == tokens[0]) ||
-		(1 < ctx.tokensLen && lex.ItemSlash == tokens[0] && lex.ItemGreater == tokens[1]) {
+		(1 < length && lex.ItemSlash == tokens[0] && lex.ItemGreater == tokens[1]) {
 		tags = append(tags, whitespaces...)
 		tags = append(tags, tokens[0])
 		if lex.ItemSlash == tokens[0] {
