@@ -175,6 +175,7 @@ func TestVditorIRDOM2Md(t *testing.T) {
 
 var vditorIRBlockDOM2MdTests = []parseTest{
 
+	{"1", "<li data-marker=\"*\" class=\"vditor-task\" data-node-id=\"\"><input type=\"checkbox\"> foo</li><li data-marker=\"*\" class=\"vditor-task\" data-node-id=\"\"><input type=\"checkbox\" checked=\"checked\"> bar</li>", "* [ ] foo\n* [X] bar\n"},
 	{"0", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\" data-node-id=\"20200910154204-c4bobg8\"><li data-marker=\"-\" class=\"vditor-task\" data-node-id=\"\"><input checked=\"\" type=\"checkbox\"></li></ul>", "- [X]\n{: id=\"20200910154204-c4bobg8\"}\n"},
 }
 

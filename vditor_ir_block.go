@@ -439,6 +439,18 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Li:
+		if ast.NodeList != tree.Context.Tip.Type {
+			parent := &ast.Node{}
+			parent.Type = ast.NodeList
+			parent.ListData = &ast.ListData{Tight: true}
+			marker := lute.domAttrValue(n, "data-marker")
+			if "" == marker {
+				marker = "*"
+			}
+			tree.Context.Tip.AppendChild(parent)
+			tree.Context.Tip = parent
+		}
+
 		if p := n.FirstChild; nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
 			tree.Context.Tip.Tight = false
 		}
@@ -693,7 +705,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 	case atom.Input:
-		if nil == n.Parent || nil == n.Parent.Parent || (atom.P != n.Parent.DataAtom && atom.Li != n.Parent.DataAtom) {
+		if nil == n.Parent || (atom.P != n.Parent.DataAtom && atom.Li != n.Parent.DataAtom) {
 			// 仅允许 input 出现在任务列表中
 			return
 		}
