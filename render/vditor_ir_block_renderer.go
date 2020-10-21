@@ -656,7 +656,12 @@ func (r *VditorIRBlockRenderer) renderMathBlockContent(node *ast.Node, entering 
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-	r.tag("pre", [][]string{{"class", "vditor-ir__marker--pre vditor-ir__marker"}}, false)
+
+	class := "vditor-ir__marker--pre"
+	if r.Option.VditorMathBlockPreview {
+		class += " vditor-ir__marker"
+	}
+	r.tag("pre", [][]string{{"class", class}}, false)
 	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 	if codeIsEmpty {
 		r.WriteString(util.FrontEndCaret + "\n")
@@ -665,13 +670,15 @@ func (r *VditorIRBlockRenderer) renderMathBlockContent(node *ast.Node, entering 
 	}
 	r.WriteString("</code></pre>")
 
-	r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
-	r.tag("div", [][]string{{"class", "vditor-math"}}, false)
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	r.Write(html.EscapeHTML(tokens))
-	r.WriteString("</div></code></pre>")
+	if r.Option.VditorMathBlockPreview {
+		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+		r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
+		r.tag("div", [][]string{{"class", "vditor-math"}}, false)
+		tokens := node.Tokens
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		r.Write(html.EscapeHTML(tokens))
+		r.WriteString("</div></code></pre>")
+	}
 	return ast.WalkStop
 }
 

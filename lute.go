@@ -96,6 +96,7 @@ func NewOptions() *parse.Options {
 		LinkBase:                       "",
 		LinkPrefix:                     "",
 		VditorCodeBlockPreview:         true,
+		VditorMathBlockPreview:         true,
 		RenderListStyle:                false,
 		ChineseParagraphBeginningSpace: false,
 		YamlFrontMatter:                true,
@@ -318,6 +319,10 @@ func (lute *Lute) GetLinkBase() string {
 
 func (lute *Lute) SetVditorCodeBlockPreview(b bool) {
 	lute.VditorCodeBlockPreview = b
+}
+
+func (lute *Lute) SetVditorMathBlockPreview(b bool) {
+	lute.VditorMathBlockPreview = b
 }
 
 func (lute *Lute) SetRenderListStyle(b bool) {

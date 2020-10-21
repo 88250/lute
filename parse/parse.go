@@ -284,6 +284,8 @@ type Options struct {
 	LinkPrefix string
 	// VditorCodeBlockPreview 设置 Vditor 代码块是否需要渲染预览部分
 	VditorCodeBlockPreview bool
+	// VditorMathBlockPreview 设置 Vditor 数学公式块是否需要渲染预览部分
+	VditorMathBlockPreview bool
 	// RenderListStyle 设置在渲染 OL、UL 时是否添加 data-style 属性 https://github.com/88250/lute/issues/48
 	RenderListStyle bool
 	// Setext 设置是否解析 Setext 标题 https://github.com/88250/lute/issues/50
