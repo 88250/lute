@@ -175,6 +175,7 @@ func TestVditorIRDOM2Md(t *testing.T) {
 
 var vditorIRBlockDOM2MdTests = []parseTest{
 
+	{"2", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul1\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul2\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"barid\">bar</li></ul></li></ul>", "* {: id=\"fooid\"}foo\n  * {: id=\"barid\"}bar\n  {: id=\"ul2\"}\n{: id=\"ul1\"}\n"},
 	{"1", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"id\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo</li></ul>", "* {: id=\"fooid\"}foo\n{: id=\"id\"}\n"},
 	{"0", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\" data-node-id=\"20200910154204-c4bobg8\"><li data-marker=\"-\" class=\"vditor-task\" data-node-id=\"\"><input checked=\"\" type=\"checkbox\"></li></ul>", "- [X]\n{: id=\"20200910154204-c4bobg8\"}\n"},
 }
