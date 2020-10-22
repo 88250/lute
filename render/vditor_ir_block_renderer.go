@@ -1408,9 +1408,6 @@ func (r *VditorIRBlockRenderer) NodeID(node *ast.Node) (ret string) {
 	if Testing {
 		return "" // 测试环境不生成 ID
 	}
-	if ast.NodeListItem == node.Type { // 列表项暂时不生成 ID，等确定是否需要列表项块类型后再打开
-		return ""
-	}
 	return ast.NewNodeID()
 }
 
