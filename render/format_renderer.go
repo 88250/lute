@@ -563,7 +563,18 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
+	if entering {
+		if r.Option.KramdownIAL {
+			parent := node.Parent
+			if ast.NodeListItem == parent.Type && parent.FirstChild == node { // 列表项下第一个段落
+				if nil != parent.Next && ast.NodeKramdownBlockIAL == parent.Next.Type {
+					liIAL := parent.Next
+					r.Write(liIAL.Tokens)
+					liIAL.Unlink()
+				}
+			}
+		}
+	} else {
 		if !node.ParentIs(ast.NodeTableCell) {
 			if r.withoutKramdownIAL(node) {
 				r.Newline()

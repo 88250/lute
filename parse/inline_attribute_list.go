@@ -51,3 +51,29 @@ func (context *Context) parseKramdownIAL(tokens []byte) (ret [][]string) {
 	}
 	return
 }
+
+func (context *Context) parseKramdownIALInListItem(tokens []byte) (ret [][]string) {
+	if curlyBracesStart := bytes.Index(tokens, []byte("{:")); 0 <= curlyBracesStart {
+		tokens = tokens[curlyBracesStart+2:]
+		curlyBracesEnd := bytes.Index(tokens, closeCurlyBrace)
+		if 3 > curlyBracesEnd {
+			return
+		}
+
+		tokens = tokens[:bytes.Index(tokens, []byte("}"))]
+		for {
+			valid, remains, attr, name, val := context.Tree.parseTagAttr(tokens)
+			if !valid {
+				break
+			}
+
+			tokens = remains
+			if 1 > len(attr) {
+				break
+			}
+
+			ret = append(ret, []string{util.BytesToStr(name), util.BytesToStr(val)})
+		}
+	}
+	return
+}

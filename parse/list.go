@@ -18,7 +18,7 @@ import (
 	"strconv"
 )
 
-func (context *Context)  listFinalize(list *ast.Node) {
+func (context *Context) listFinalize(list *ast.Node) {
 	item := list.FirstChild
 
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
@@ -38,6 +38,25 @@ func (context *Context)  listFinalize(list *ast.Node) {
 			subitem = subitem.Next
 		}
 		item = item.Next
+	}
+
+	if context.Option.KramdownIAL {
+		for li := list.FirstChild; nil != li; li = li.Next {
+			if nil == li.FirstChild {
+				continue
+			}
+
+			switch li.FirstChild.Type {
+			case ast.NodeParagraph:
+				if ial := context.parseKramdownIALInListItem(li.FirstChild.Tokens); 0 < len(ial) {
+					li.KramdownIAL = ial
+					li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL})
+					tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}")) +1:]
+					tokens = lex.TrimWhitespace(tokens)
+					li.FirstChild.Tokens = tokens
+				}
+			}
+		}
 	}
 }
 
