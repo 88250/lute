@@ -18,6 +18,7 @@ import (
 
 var kramBlockIALTests = []parseTest{
 
+	{"21", "* {: id=\"fooid\"}foo\n\n  > bar\n  {: id=\"barid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li id=\"fooid\">\n<p>foo</p>\n<blockquote id=\"barid\">\n<p>bar</p>\n</blockquote>\n</li>\n</ul>\n"},
 	{"20", "* {: id=\"fooid\"} foo\n{: id=\"id\"}", "<ul id=\"id\">\n<li id=\"fooid\">foo</li>\n</ul>\n"},
 	{"19", "* foo\n\n  bar\n  {: id=\"barid\"}\n\n  > baz\n  {: id=\"bazid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li>\n<p>foo</p>\n<p id=\"barid\">bar</p>\n<blockquote id=\"bazid\">\n<p>baz</p>\n</blockquote>\n</li>\n</ul>\n"},
 	{"18", "* foo\n\n  bar\n  {: id=\"barid\"}\n\n  baz\n{: id=\"id\"}", "<ul id=\"id\">\n<li>\n<p>foo</p>\n<p id=\"barid\">bar</p>\n<p>baz</p>\n</li>\n</ul>\n"},
