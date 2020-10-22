@@ -31,6 +31,9 @@ func (context *Context) parseKramdownIAL(tokens []byte) (ret [][]string) {
 			return
 		}
 
+		if !bytes.Equal(tokens[curlyBracesEnd:], []byte("}\n")) { // IAL 后不能存在其他内容，比如独占一行
+			return
+		}
 		tokens = tokens[:len(tokens)-2]
 		for {
 			valid, remains, attr, name, val := context.Tree.parseTagAttr(tokens)

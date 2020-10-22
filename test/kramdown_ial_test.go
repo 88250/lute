@@ -18,6 +18,7 @@ import (
 
 var kramBlockIALTests = []parseTest{
 
+	{"20", "* {: id=\"fooid\"} foo\n{: id=\"id\"}", "<ul id=\"id\">\n<li id=\"fooid\">foo</li>\n</ul>\n"},
 	{"19", "* foo\n\n  bar\n  {: id=\"barid\"}\n\n  > baz\n  {: id=\"bazid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li>\n<p>foo</p>\n<p id=\"barid\">bar</p>\n<blockquote id=\"bazid\">\n<p>baz</p>\n</blockquote>\n</li>\n</ul>\n"},
 	{"18", "* foo\n\n  bar\n  {: id=\"barid\"}\n\n  baz\n{: id=\"id\"}", "<ul id=\"id\">\n<li>\n<p>foo</p>\n<p id=\"barid\">bar</p>\n<p>baz</p>\n</li>\n</ul>\n"},
 	{"17", "> * foo\n>   * bar\n>     * baz\n>\n>       bazz\n>       {: id=\"bazzid\"}\n>     {: id=\"bazid\"}\n>   {: id=\"barid\"}\n> {: id=\"fooid\"}\n{: id=\"id\"}", "<blockquote id=\"id\">\n<ul id=\"fooid\">\n<li>foo\n<ul id=\"barid\">\n<li>bar\n<ul id=\"bazid\">\n<li>\n<p>baz</p>\n<p id=\"bazzid\">bazz</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n</blockquote>\n"},
