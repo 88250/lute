@@ -54,6 +54,7 @@ func (context *Context) listFinalize(list *ast.Node) {
 					tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}")) +1:]
 					tokens = lex.TrimWhitespace(tokens)
 					li.FirstChild.Tokens = tokens
+					li = li.Next
 				}
 			}
 		}

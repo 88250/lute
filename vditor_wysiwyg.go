@@ -282,6 +282,17 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 		var nodes []*html.Node
 		var lastc *html.Node
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
+			if lute.listItemEnter(n) {
+				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
+				p.AppendChild(&html.Node{Type: html.TextNode, Data: util.Caret})
+				p.AppendChild(&html.Node{Type: html.ElementNode, Data: "br", DataAtom: atom.Br})
+				n.FirstChild.Unlink()
+				n.FirstChild.Unlink()
+				n.AppendChild(p)
+				c = p
+				continue
+			}
+
 			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom && atom.Div != c.DataAtom {
 				nodes = append(nodes, c)
 			} else if 0 < len(nodes) {
@@ -309,6 +320,16 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		lute.adjustVditorDOMListItemInP(c)
 	}
+}
+
+func (lute *Lute) listItemEnter(li *html.Node) bool {
+	if nil == li.FirstChild {
+		return false
+	}
+	if util.Caret == li.FirstChild.Data && "br" == li.LastChild.Data {
+		return true
+	}
+	return false
 }
 
 func (lute *Lute) isTightList(list *html.Node) string {

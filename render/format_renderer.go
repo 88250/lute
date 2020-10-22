@@ -1018,9 +1018,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) {
-			if r.withoutKramdownIAL(node) {
-				r.WriteString("\n")
-			}
+			r.WriteString("\n")
 		}
 	}
 	return ast.WalkContinue
