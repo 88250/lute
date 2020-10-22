@@ -278,6 +278,13 @@ func (lute *Lute) adjustVditorDOMListTight0(n *html.Node) {
 func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 	switch n.DataAtom {
 	case atom.Li:
+		// li 换行时 id 重复需要重新生成
+		if nil != n.PrevSibling && lute.domAttrValue(n.PrevSibling, "data-node-id") == lute.domAttrValue(n, "data-node-id") {
+			if !render.Testing {
+				lute.setDOMAttrValue(n, "data-node-id", ast.NewNodeID())
+			}
+		}
+
 		// 在 li 下的每个非块容器节点用 p 包裹
 		var nodes []*html.Node
 		var lastc *html.Node
