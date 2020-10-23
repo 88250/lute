@@ -389,7 +389,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				node.Tokens = []byte(text)
 				tree.Context.Tip.AppendChild(node)
 				tree.Context.Tip = node
-				return
+				break
 			}
 
 			if "=" == marker {
