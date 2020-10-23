@@ -384,7 +384,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			marker := lute.domText(n.FirstChild)
 			node.HeadingLevel = bytes.Count([]byte(marker), []byte("#"))
 		} else {
-			if nil == n.NextSibling ||  "" == strings.ReplaceAll(lute.domText(n.NextSibling), util.Caret, "") {
+			if "" == strings.TrimSpace(strings.ReplaceAll(lute.domText(n.LastChild), util.Caret, "")) {
 				node.Type = ast.NodeText
 				node.Tokens = []byte(text)
 				tree.Context.Tip.AppendChild(node)
