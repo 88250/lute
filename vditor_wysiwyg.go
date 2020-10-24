@@ -307,8 +307,6 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 		}
 
 		// 在 li 下的每个非块容器节点用 p 包裹
-		var nodes []*html.Node
-		var lastc *html.Node
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
 			if lute.listItemEnter(n) {
 				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
@@ -322,32 +320,35 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 			}
 
 			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom && atom.Div != c.DataAtom {
-				nodes = append(nodes, c)
-			} else if 0 < len(nodes) {
+				spans, nextBlock := lute.forwardNextBlock(c)
 				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
-				for _, pChild := range nodes {
-					pChild.Unlink()
-					p.AppendChild(pChild)
-				}
-				nodes = nil
 				c.InsertBefore(p)
-				c = p
+				for _, span := range spans {
+					span.Unlink()
+					p.AppendChild(span)
+				}
+				if c = nextBlock;nil == c {
+					break
+				}
 			}
-			if nil == c.NextSibling {
-				lastc = c
-			}
-		}
-		if 0 < len(nodes) {
-			p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
-			lastc.InsertBefore(p)
-			lastc.Unlink()
-			p.AppendChild(lastc)
 		}
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		lute.adjustVditorDOMListItemInP(c)
 	}
+}
+
+// forwardNextBlock 向前移动至下一个块级节点，即跳过行级节点。
+func (lute *Lute) forwardNextBlock(spanNode *html.Node) (spans []*html.Node, nextBlock *html.Node) {
+	for next := spanNode; nil != next; next = next.NextSibling {
+		switch next.DataAtom {
+		case atom.Ol,atom.Ul,atom.Div,atom.Blockquote:
+			return
+		}
+		spans = append(spans, next)
+	}
+	return
 }
 
 func (lute *Lute) listItemEnter(li *html.Node) bool {
@@ -379,7 +380,7 @@ func (lute *Lute) isTightList(list *html.Node) string {
 			return "false"
 		}
 
-		if 1 < subParagraphs + subDivs || 1 < subParagraphs + subBlockquotes || 1 < subParagraphs + subLists {
+		if 1 < subParagraphs+subDivs || 1 < subParagraphs+subBlockquotes || 1 < subParagraphs+subLists {
 			return "false"
 		}
 

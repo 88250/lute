@@ -11,6 +11,7 @@
 package test
 
 import (
+	"github.com/88250/lute/render"
 	"testing"
 
 	"github.com/88250/lute"
@@ -175,6 +176,7 @@ func TestVditorIRDOM2Md(t *testing.T) {
 
 var vditorIRBlockDOM2MdTests = []parseTest{
 
+	{"3", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20201024153454-bqqcbc1\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20201024153456-ktna8mm\">foo<span data-type=\"strong\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span><strong data-newline=\"1\">bar</strong><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span></span></li><li data-marker=\"*\" data-node-id=\"20201024153456-ktna8mm\"><span data-type=\"strong\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--strong\"><wbr><br></span></span></li></ul>", "* {: id=\"20201024153456-ktna8mm\"}foo**bar**\n* {: id=\"20201024153456-ktna8mm\"}\n{: id=\"20201024153454-bqqcbc1\"}\n"},
 	{"2", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul1\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul2\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"barid\">bar</li></ul></li></ul>", "* {: id=\"fooid\"}foo\n  * {: id=\"barid\"}bar\n  {: id=\"ul2\"}\n{: id=\"ul1\"}\n"},
 	{"1", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"id\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo</li></ul>", "* {: id=\"fooid\"}foo\n{: id=\"id\"}\n"},
 	{"0", "<ul data-tight=\"true\" data-marker=\"-\" data-block=\"0\" data-node-id=\"20200910154204-c4bobg8\"><li data-marker=\"-\" class=\"vditor-task\" data-node-id=\"\"><input checked=\"\" type=\"checkbox\"></li></ul>", "- [X]\n{: id=\"20200910154204-c4bobg8\"}\n"},
@@ -184,6 +186,7 @@ func TestVditorIRBlockDOM2Md(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.KramdownIAL = true
 
+	render.Testing = true
 	for _, test := range vditorIRBlockDOM2MdTests {
 		md := luteEngine.VditorIRBlockDOM2Md(test.from)
 		if test.to != md {
