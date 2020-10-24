@@ -354,7 +354,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		tokens := make([]byte, len(node.Tokens))
 		copy(tokens, node.Tokens)
 		subTree := parse.Inline("", tokens, tree.Context.Option)
-		if ast.NodeParagraph == subTree.Root.FirstChild.Type && ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type &&
+		if ast.NodeParagraph == subTree.Root.FirstChild.Type &&
+			(ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type ||
+				(ast.NodeSoftBreak == subTree.Root.FirstChild.FirstChild.Type && nil != subTree.Root.FirstChild.FirstChild.Next &&
+					(ast.NodeText == subTree.Root.FirstChild.FirstChild.Next.Type ||
+						ast.NodeEmphasis == subTree.Root.FirstChild.FirstChild.Next.Type ||
+						ast.NodeStrong == subTree.Root.FirstChild.FirstChild.Next.Type ||
+						ast.NodeStrikethrough == subTree.Root.FirstChild.FirstChild.Next.Type ||
+						ast.NodeMark == subTree.Root.FirstChild.FirstChild.Next.Type))) && // 软换行后跟普通文本
 			nil == subTree.Root.FirstChild.Next {
 			appendNextToTip(subTree.Root.FirstChild.FirstChild, tree)
 		} else {
