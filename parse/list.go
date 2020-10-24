@@ -30,8 +30,7 @@ func (context *Context) listFinalize(list *ast.Node) {
 
 		subitem := item.FirstChild
 		for nil != subitem {
-			if endsWithBlankLine(subitem) &&
-				(nil != item.Next || nil != subitem.Next) {
+			if endsWithBlankLine(subitem) && (nil != item.Next || nil != subitem.Next) {
 				list.Tight = false
 				break
 			}

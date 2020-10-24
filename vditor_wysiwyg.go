@@ -214,6 +214,10 @@ func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
 	lute.removeEmptyNodes(nodes[0])
 
 	for c := nodes[0]; nil != c; c = c.NextSibling {
+		lute.mergeVditorDOMList0(c)
+	}
+
+	for c := nodes[0]; nil != c; c = c.NextSibling {
 		lute.adjustVditorDOMListTight0(c)
 	}
 
@@ -255,6 +259,23 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		lute.searchEmptyNodes(c, emptyNodes)
+	}
+}
+
+func (lute *Lute) mergeVditorDOMList0(n *html.Node) {
+	switch n.DataAtom {
+	case atom.Ul, atom.Ol:
+		if nil != n.NextSibling && n.DataAtom == n.NextSibling.DataAtom && 1 == len(n.NextSibling.Attr) {
+			for c := n.NextSibling.FirstChild; nil != c; c = c.NextSibling {
+				c.Unlink()
+				n.AppendChild(c)
+			}
+			n.NextSibling.Unlink()
+		}
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.mergeVditorDOMList0(c)
 	}
 }
 
@@ -340,17 +361,28 @@ func (lute *Lute) listItemEnter(li *html.Node) bool {
 }
 
 func (lute *Lute) isTightList(list *html.Node) string {
-	blocks := 0
 	for li := list.FirstChild; nil != li; li = li.NextSibling {
+		var subLists, subDivs, subBlockquotes, subParagraphs int
 		for c := li.FirstChild; nil != c; c = c.NextSibling {
-			if atom.P == c.DataAtom || atom.Blockquote == c.DataAtom || atom.Ul == c.DataAtom || atom.Ol == c.DataAtom || atom.Div == c.DataAtom {
-				blocks++
+			switch c.DataAtom {
+			case atom.Ul, atom.Ol:
+				subLists++
+			case atom.Div:
+				subDivs++
+			case atom.Blockquote:
+				subBlockquotes++
+			case atom.P:
+				subParagraphs++
 			}
 		}
-	}
+		if 1 < subParagraphs || 1 < subBlockquotes || 1 < subDivs || 1 < subLists {
+			return "false"
+		}
 
-	if 1 < blocks {
-		return "false"
+		if 1 < subParagraphs + subDivs || 1 < subParagraphs + subBlockquotes || 1 < subParagraphs + subLists {
+			return "false"
+		}
+
 	}
 	return "true"
 }
