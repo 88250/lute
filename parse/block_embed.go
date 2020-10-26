@@ -101,3 +101,39 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	}
 	return
 }
+
+func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
+	tokens := t.Context.currentLine[t.Context.nextNonspace:]
+	chinese := bytes.HasPrefix(tokens, []byte("！{{"))
+	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"!{{"))
+	if 6 > t.Context.currentLineLen || (!bytes.HasPrefix(tokens, []byte("!{{")) && !chinese && !startCaret) {
+		return
+	}
+	if chinese {
+		tokens = bytes.Replace(tokens, []byte("！{{"), []byte("!{{"), 1)
+	}
+	if startCaret {
+		tokens = bytes.Replace(tokens, []byte(util.Caret+"!{{"), []byte("!{{"), 1)
+	}
+
+	tokens = tokens[3:]
+	tokens = tokens[:len(tokens)-1] // 去掉结尾换行
+
+	// TODO: Script
+	script := "SELECT * FROM blocks"
+
+	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
+	tokens = bytes.TrimSuffix(tokens, util.CaretTokens)
+
+	ret = &ast.Node{Type: ast.NodeBlockQueryEmbed}
+	ret.AppendChild(&ast.Node{Type: ast.NodeBang})
+	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
+	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
+	ret.AppendChild(&ast.Node{Type: ast.NodeBlockQueryEmbedScript, Tokens: []byte(script)})
+	ret.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+	ret.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+	if endCaret || startCaret {
+		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+	}
+	return
+}

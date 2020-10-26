@@ -539,6 +539,27 @@ var blockStarts = []blockStartFunc{
 		t.Context.Tip = node
 		return 2
 	},
+
+	// 判断内容块查询嵌入（!{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}）是否开始。
+	func(t *Tree, container *ast.Node) int {
+		if !t.Context.Option.BlockRef || t.Context.indented {
+			return 0
+		}
+
+		node := t.parseBlockQueryEmbed()
+		if nil == node {
+			return 0
+		}
+
+		t.Context.closeUnmatchedBlocks()
+
+		for !t.Context.Tip.CanContain(ast.NodeBlockQueryEmbed) {
+			t.Context.finalize(t.Context.Tip, t.Context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
+		}
+		t.Context.Tip.AppendChild(node)
+		t.Context.Tip = node
+		return 2
+	},
 }
 
 // addLine 用于在当前的末梢节点 context.Tip 上添加迭代行剩余的所有 Tokens。

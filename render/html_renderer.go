@@ -120,6 +120,8 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
+	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
 	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
@@ -182,6 +184,26 @@ func (r *HtmlRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.
 func (r *HtmlRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("/mark", nil, false)
 	return ast.WalkStop
+}
+
+func (r *HtmlRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		r.tag("div", nil, false)
+	} else {
+		r.tag("/div", nil, false)
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemDoublequote)
+		r.Write(node.Tokens)
+		r.WriteByte(lex.ItemDoublequote)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {

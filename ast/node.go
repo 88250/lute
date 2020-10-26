@@ -337,7 +337,7 @@ func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
-		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockEmbed,
+		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed,
 		NodeKramdownBlockIAL:
 		return true
 	}
@@ -347,7 +347,7 @@ func (n *Node) IsBlock() bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed:
 		return true
 	}
 	return false
@@ -519,6 +519,11 @@ const (
 	NodeTag            NodeType = 460 // 标签
 	NodeTagOpenMarker  NodeType = 461 // 开始标签标记符 #
 	NodeTagCloseMarker NodeType = 462 // 结束标签标记符 #
+
+	// 内容块查询嵌入（Block Query Embed） https://github.com/88250/lute/issues/96
+
+	NodeBlockQueryEmbed       NodeType = 465 // 内容块查询嵌入节点
+	NodeBlockQueryEmbedScript NodeType = 466 // 内容块查询嵌入脚本
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

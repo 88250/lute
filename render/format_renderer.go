@@ -119,6 +119,8 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
+	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
 	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
@@ -214,6 +216,22 @@ func (r *FormatRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) as
 func (r *FormatRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.WriteString("==")
 	return ast.WalkStop
+}
+
+func (r *FormatRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+	} else {
+		r.Newline()
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {

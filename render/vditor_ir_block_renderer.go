@@ -121,6 +121,8 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
+	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
 	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
@@ -250,6 +252,23 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 
 	output = r.Writer.Bytes()
 	return
+}
+
+func (r *VditorIRBlockRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderDivNode(node)
+	} else {
+		r.WriteString("<div data-render=\"2\" data-type=\"block-render\"></div>")
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
@@ -1575,6 +1594,10 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 		}
 		id := node.ChildByType(ast.NodeBlockEmbedID)
 		expand = bytes.Contains(id.Tokens, util.CaretTokens)
+	case ast.NodeBlockQueryEmbed:
+		attrs = append(attrs, []string{"data-type", "block-query-embed"})
+		script := node.ChildByType(ast.NodeBlockQueryEmbedScript)
+		expand = bytes.Contains(script.Tokens, util.CaretTokens)
 	}
 
 	if strings.Contains(text, util.Caret) || expand {
