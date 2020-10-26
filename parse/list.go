@@ -47,13 +47,21 @@ func (context *Context) listFinalize(list *ast.Node) {
 
 			switch li.FirstChild.Type {
 			case ast.NodeParagraph:
-				if ial := context.parseKramdownIALInListItem(li.FirstChild.Tokens); 0 < len(ial) {
-					li.KramdownIAL = ial
+				if nil != li.FirstChild.KramdownIAL && 3 == li.Parent.ListData.Typ {
+					// 任务列表项 IAL
+					li.KramdownIAL =  li.FirstChild.KramdownIAL
+					li.FirstChild.KramdownIAL = nil // 置空
 					li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL})
-					tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}")) +1:]
-					tokens = lex.TrimWhitespace(tokens)
-					li.FirstChild.Tokens = tokens
 					li = li.Next
+				} else {
+					if ial := context.parseKramdownIALInListItem(li.FirstChild.Tokens); 0 < len(ial) {
+						li.KramdownIAL = ial
+						li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL})
+						tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}"))+1:]
+						tokens = lex.TrimWhitespace(tokens)
+						li.FirstChild.Tokens = tokens
+						li = li.Next
+					}
 				}
 			}
 		}
@@ -138,15 +146,22 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 
 	if !isBlankItem {
 		// 判断是否是任务列表项
-		content := ln[t.Context.offset:]
-		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
-			content = bytes.ReplaceAll(content, util.CaretTokens, nil)
+
+		tokens := ln[t.Context.offset:]
+		if t.Context.Option.KramdownIAL {
+			if ial := t.Context.parseKramdownIALInListItem(tokens); 0 < len(ial) {
+				tokens = tokens[bytes.Index(tokens, []byte("}"))+1:]
+			}
 		}
 
-		if 3 <= len(content) { // 至少需要 [ ] 或者 [x] 3 个字符
-			if lex.ItemOpenBracket == content[0] && ('x' == content[1] || 'X' == content[1] || lex.ItemSpace == content[1]) && lex.ItemCloseBracket == content[2] {
+		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
+			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		}
+
+		if 3 <= len(tokens) { // 至少需要 [ ] 或者 [x] 3 个字符
+			if lex.ItemOpenBracket == tokens[0] && ('x' == tokens[1] || 'X' == tokens[1] || lex.ItemSpace == tokens[1]) && lex.ItemCloseBracket == tokens[2] {
 				data.Typ = 3
-				data.Checked = 'x' == content[1] || 'X' == content[1]
+				data.Checked = 'x' == tokens[1] || 'X' == tokens[1]
 			}
 		}
 	}
