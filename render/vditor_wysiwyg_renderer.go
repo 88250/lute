@@ -398,7 +398,7 @@ func (r *VditorRenderer) renderMathBlockCloseMarker(node *ast.Node, entering boo
 func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	previewTokens := bytes.TrimSpace(node.Tokens)
 	var preAttrs [][]string
-	if !bytes.Contains(previewTokens, util.CaretTokens) {
+	if !bytes.Contains(previewTokens, util.CaretTokens) && r.Option.VditorMathBlockPreview {
 		preAttrs = append(preAttrs, []string{"style", "display: none"})
 	}
 	codeLen := len(previewTokens)
@@ -412,12 +412,14 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 	}
 	r.WriteString("</code></pre>")
 
-	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	r.Write(html.EscapeHTML(tokens))
-	r.WriteString("</code></pre>")
+	if r.Option.VditorMathBlockPreview {
+		r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+		r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
+		tokens := node.Tokens
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		r.Write(html.EscapeHTML(tokens))
+		r.WriteString("</code></pre>")
+	}
 	return ast.WalkStop
 }
 
@@ -1059,7 +1061,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 		}
 	}
 	preAttrs := [][]string{{"class", "vditor-wysiwyg__pre"}}
-	if !bytes.Contains(node.Tokens, util.CaretTokens) && !caretInInfo {
+	if !bytes.Contains(node.Tokens, util.CaretTokens) && !caretInInfo && r.Option.VditorCodeBlockPreview {
 		preAttrs = append(preAttrs, []string{"style", "display: none"})
 	}
 	r.tag("pre", preAttrs, false)
@@ -1076,11 +1078,13 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	}
 	r.WriteString("</code></pre>")
 
-	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", attrs, false)
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	r.Write(html.EscapeHTML(tokens))
-	r.WriteString("</code></pre>")
+	if r.Option.VditorCodeBlockPreview {
+		r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+		r.tag("code", attrs, false)
+		tokens := node.Tokens
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		r.Write(html.EscapeHTML(tokens))
+		r.WriteString("</code></pre>")
+	}
 	return ast.WalkStop
 }
