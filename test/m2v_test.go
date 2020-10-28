@@ -93,6 +93,7 @@ func TestMd2VditorIRDOM(t *testing.T) {
 
 var md2VditorIRBlockDOMTests = []parseTest{
 
+	{"14", "| foo |\n| - |\n| bar *baz* |\n", "<table data-block=\"0\" data-type=\"table\" data-node-id=\"\"><thead><tr><th>foo</th></tr></thead><tbody><tr><td>bar <span data-type=\"em\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span><em data-newline=\"1\">baz</em><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span></span></td></tr></tbody></table>"},
 	{"13", "* {: id=\"fooid\"}foo\n  * {: id=\"barid\"}bar\n  {: id=\"ul2\"}\n{: id=\"ul1\"}\n", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul1\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul2\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"barid\">bar</li></ul></li></ul>"},
 	{"12", "* {: id=\"fooid\"}foo\n  * {: id=\"barid\"}bar\n  {: id=\"ul2\"}\n{: id=\"ul1\"}", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul1\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul2\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"barid\">bar</li></ul></li></ul>"},
 	{"11", "* {: id=\"fooid\"}foo\n{: id=\"id\"}", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"id\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo</li></ul>"},
