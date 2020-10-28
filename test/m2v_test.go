@@ -34,7 +34,7 @@ var md2VditorDOMTests = []parseTest{
 	{"8", "    ***\n", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none\"><code>***\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>***\n</code></pre></div>"},
 	{"7", "* a\n  * b", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">a<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">b</li></ul></li></ul>"},
 	{"6", "[]()", "<p data-block=\"0\">[]()</p>"},
-	{"5", "* [ ]", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> </li></ul>"},
+	{"5", "* [ ]", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">[ ]</li></ul>"},
 	{"4", "*", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">\u200b</li></ul>"},
 	{"3", "foo'%'bar", "<p data-block=\"0\">foo'%'bar</p>"},
 	{"2", "<p align=\"center\">\nfoo</p>\n\nbar", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;p align=&quot;center&quot;&gt;\nfoo&lt;/p&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><p align=\"center\">\nfoo</p></pre></div><p data-block=\"0\">bar</p>"},

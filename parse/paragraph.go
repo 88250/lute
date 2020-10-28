@@ -46,13 +46,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 		// 尝试解析任务列表项
 		if listItem := p.Parent; nil != listItem && ast.NodeListItem == listItem.Type && listItem.FirstChild == p {
 			if 3 == listItem.ListData.Typ {
-				isTaskListItem := false
-				if !(context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV) {
-					isTaskListItem = 3 < len(p.Tokens) && lex.IsWhitespace(p.Tokens[3])
-				} else {
-					isTaskListItem = 3 <= len(p.Tokens)
-				}
-
+				isTaskListItem := 3 < len(p.Tokens)
 				if isTaskListItem {
 					// 如果是任务列表项则添加任务列表标记符节点
 
@@ -64,29 +58,31 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 						}
 					}
 
-					var caretStartText, caretAfterCloseBracket, caretInBracket bool
-					if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
-						closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
-						if bytes.HasPrefix(tokens, util.CaretTokens) {
-							tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-							caretStartText = true
-						} else if bytes.HasPrefix(tokens[closeBracket+1:], util.CaretTokens) {
-							tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-							caretAfterCloseBracket = true
-						} else if bytes.Contains(tokens[1:closeBracket], util.CaretTokens) {
-							tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-							caretInBracket = true
+					if lex.IsWhitespace(tokens[3]) || util.CaretTokens[0] == tokens[3] {
+						var caretStartText, caretAfterCloseBracket, caretInBracket bool
+						if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
+							closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
+							if bytes.HasPrefix(tokens, util.CaretTokens) {
+								tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+								caretStartText = true
+							} else if bytes.HasPrefix(tokens[closeBracket+1:], util.CaretTokens) {
+								tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+								caretAfterCloseBracket = true
+							} else if bytes.Contains(tokens[1:closeBracket], util.CaretTokens) {
+								tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+								caretInBracket = true
+							}
 						}
-					}
-					taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
-					p.PrependChild(taskListItemMarker)
-					p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
-					if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
-						p.Tokens = bytes.TrimSpace(p.Tokens)
-						if caretStartText || caretAfterCloseBracket || caretInBracket {
-							p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)
-						} else {
-							p.Tokens = append([]byte(" "), p.Tokens...)
+						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
+						p.PrependChild(taskListItemMarker)
+						p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+						if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
+							p.Tokens = bytes.TrimSpace(p.Tokens)
+							if caretStartText || caretAfterCloseBracket || caretInBracket {
+								p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)
+							} else {
+								p.Tokens = append([]byte(" "), p.Tokens...)
+							}
 						}
 					}
 				}
