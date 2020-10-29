@@ -19,8 +19,18 @@ import (
 
 func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
+	var inTaskListItem bool
+	var ial [][]string
 	if ast.NodeListItem == t.Context.Tip.Type && 0 < bytes.Index(tokens, []byte("}")) {
-		tokens = tokens[bytes.Index(tokens, []byte("}"))+1:]
+		if ial = t.Context.parseKramdownIALInListItem(tokens); 0 < len(ial) {
+			tokens = tokens[bytes.Index(tokens, []byte("}"))+1:]
+		}
+
+		if 3 == t.Context.Tip.ListData.Typ {
+			tokens = tokens[bytes.Index(tokens, []byte("]"))+1:]
+			tokens = tokens[1:] // 去掉开头的空格
+			inTaskListItem = true
+		}
 	}
 
 	chinese := bytes.HasPrefix(tokens, []byte("！(("))
@@ -102,6 +112,13 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	if endCaret || startCaret {
 		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+	}
+
+	if inTaskListItem {
+		listItem := t.Context.Tip
+		taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: nil, TaskListItemChecked: listItem.ListData.Checked}
+		taskListItemMarker.KramdownIAL = ial // 暂存于 task marker 的 IAL 上，最终化列表时会被置空
+		listItem.AppendChild(taskListItemMarker)
 	}
 	return
 }

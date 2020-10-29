@@ -46,6 +46,11 @@ func (context *Context) listFinalize(list *ast.Node) {
 			}
 
 			switch li.FirstChild.Type {
+			case ast.NodeTaskListItemMarker: // 任务列表项下挂嵌入块
+				li.KramdownIAL = li.FirstChild.KramdownIAL
+				li.FirstChild.KramdownIAL = nil // 置空
+				li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL})
+				li = li.Next
 			case ast.NodeParagraph, ast.NodeBlockEmbed:
 				if nil != li.FirstChild.KramdownIAL && 3 == li.Parent.ListData.Typ {
 					// 任务列表项 IAL
