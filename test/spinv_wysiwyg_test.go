@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"148", "<p data-block=\"0\"><span comment-id-1=\"\" data-type=\"comment\">​f<wbr></span></p>\n", "<p data-block=\"0\">\u200b<mark data-marker=\"==\">markf<wbr></mark>\u200b</p>"},
 	{"147", "<p data-block=\"0\"><mark data-marker=\"==\">markf<wbr></mark></p>", "<p data-block=\"0\">\u200b<mark data-marker=\"==\">markf<wbr></mark>\u200b</p>"},
 	{"146", "<p data-block=\"0\">==mark==<wbr></p>", "<p data-block=\"0\">\u200b<mark data-marker=\"==\">mark</mark>\u200b<wbr></p>"},
 	{"145", "<p data-block=\"0\">foo<vditor-comment data-id=\"1\">bar<wbr>baz</vditor-comment>foo<vditor-comment data-id=\"2\">bar</vditor-comment>baz</p>", "<p data-block=\"0\">foo\u200b<vditor-comment data-id=\"1\">bar<wbr>baz\u200b</vditor-comment>foo\u200b<vditor-comment data-id=\"2\">bar\u200b</vditor-comment>baz</p>"},

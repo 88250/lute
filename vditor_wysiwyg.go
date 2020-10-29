@@ -327,7 +327,7 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 					span.Unlink()
 					p.AppendChild(span)
 				}
-				if c = nextBlock;nil == c {
+				if c = nextBlock; nil == c {
 					break
 				}
 			}
@@ -343,7 +343,7 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 func (lute *Lute) forwardNextBlock(spanNode *html.Node) (spans []*html.Node, nextBlock *html.Node) {
 	for next := spanNode; nil != next; next = next.NextSibling {
 		switch next.DataAtom {
-		case atom.Ol,atom.Ul,atom.Div,atom.Blockquote:
+		case atom.Ol, atom.Ul, atom.Div, atom.Blockquote:
 			return
 		}
 		spans = append(spans, next)
@@ -1100,8 +1100,6 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			if parse.Zwsp == string(codeTokens) {
 				break
 			}
-		} else {
-			break
 		}
 		if "math-inline" == dataType {
 			node.Type = ast.NodeInlineMath
@@ -1119,6 +1117,22 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		} else if "html-entity" == dataType {
 			node.Type = ast.NodeText
 			node.Tokens = codeTokens
+			tree.Context.Tip.AppendChild(node)
+		} else if "comment" == dataType {
+			node.Type = ast.NodeInlineHTML
+			buf := bytes.Buffer{}
+			buf.WriteString("<span ")
+			for i, attr := range n.Attr {
+				buf.WriteString(attr.Key)
+				if "" != attr.Val {
+					buf.WriteString("=")
+					buf.WriteString(attr.Val)
+				}
+				if i < len(n.Attr) - 1 {
+					buf.WriteString(" ")
+				}
+			}
+			node.Tokens = buf.Bytes()
 			tree.Context.Tip.AppendChild(node)
 		}
 		return
