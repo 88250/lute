@@ -216,6 +216,7 @@ type Tree struct {
 	Marks   []string // 文本标记
 	Created int64    // 创建时间
 	Updated int64    // 更新时间
+	Hash    string   // 内容哈希
 }
 
 // Options 描述了一些列解析和渲染选项。
