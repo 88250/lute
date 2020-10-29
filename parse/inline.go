@@ -36,10 +36,8 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 		case lex.ItemNewline:
 			n = t.parseNewline(block, ctx)
 		case lex.ItemLess:
-			n = t.parseAutolink(ctx)
-			if nil == n {
-				n = t.parseAutoEmailLink(ctx)
-				if nil == n {
+			if n = t.parseAutolink(ctx); nil == n {
+				if n = t.parseAutoEmailLink(ctx); nil == n {
 					n = t.parseInlineHTML(ctx)
 				}
 			}

@@ -705,6 +705,11 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 		return ast.WalkStop
 	}
 
+	if bytes.Contains(node.Tokens, []byte("<span comment-id-")) || bytes.Equal(node.Tokens, []byte("</span>")) {
+		r.Write(node.Tokens)
+		return ast.WalkStop
+	}
+
 	if entering {
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
