@@ -46,7 +46,7 @@ func (context *Context) listFinalize(list *ast.Node) {
 			}
 
 			switch li.FirstChild.Type {
-			case ast.NodeParagraph:
+			case ast.NodeParagraph, ast.NodeBlockEmbed:
 				if nil != li.FirstChild.KramdownIAL && 3 == li.Parent.ListData.Typ {
 					// 任务列表项 IAL
 					li.KramdownIAL =  li.FirstChild.KramdownIAL

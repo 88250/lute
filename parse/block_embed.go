@@ -19,6 +19,10 @@ import (
 
 func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
+	if ast.NodeListItem == t.Context.Tip.Type && 0 < bytes.Index(tokens, []byte("}")) {
+		tokens = tokens[bytes.Index(tokens, []byte("}"))+1:]
+	}
+
 	chinese := bytes.HasPrefix(tokens, []byte("！(("))
 	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"!(("))
 	if 6 > t.Context.currentLineLen || (!bytes.HasPrefix(tokens, []byte("!((")) && !chinese && !startCaret) {
