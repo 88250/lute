@@ -214,8 +214,8 @@ type Tree struct {
 	URL     string   // 地址部分
 	Path    string   // 地址路径部分
 	Marks   []string // 文本标记
-	Created uint64   // 创建时间
-	Updated uint64   // 更新时间
+	Created int64    // 创建时间
+	Updated int64    // 更新时间
 }
 
 // Options 描述了一些列解析和渲染选项。
