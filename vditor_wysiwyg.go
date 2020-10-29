@@ -1107,17 +1107,21 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: codeTokens})
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
 			tree.Context.Tip.AppendChild(node)
+			return
 		} else if "html-inline" == dataType {
 			node.Type = ast.NodeInlineHTML
 			node.Tokens = codeTokens
 			tree.Context.Tip.AppendChild(node)
+			return
 		} else if "code-inline" == dataType {
 			node.Tokens = codeTokens
 			tree.Context.Tip.AppendChild(node)
+			return
 		} else if "html-entity" == dataType {
 			node.Type = ast.NodeText
 			node.Tokens = codeTokens
 			tree.Context.Tip.AppendChild(node)
+			return
 		} else if "comment" == dataType {
 			node.Type = ast.NodeInlineHTML
 			buf := bytes.Buffer{}
@@ -1125,17 +1129,20 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			for i, attr := range n.Attr {
 				buf.WriteString(attr.Key)
 				if "" != attr.Val {
-					buf.WriteString("=")
+					buf.WriteString("=\"")
 					buf.WriteString(attr.Val)
+					buf.WriteString("\"")
 				}
-				if i < len(n.Attr) - 1 {
+				if i < len(n.Attr)-1 {
 					buf.WriteString(" ")
 				}
 			}
+			buf.WriteString(">")
 			node.Tokens = buf.Bytes()
 			tree.Context.Tip.AppendChild(node)
+			break
 		}
-		return
+		break
 	case atom.Font:
 		return
 	case atom.Details:
@@ -1165,6 +1172,10 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	case 0:
 		if content == "vditor-comment" {
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("</" + content + ">")})
+		}
+	case atom.Span:
+		if "comment" == dataType {
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("</span>")})
 		}
 	case atom.Em, atom.I:
 		marker := lute.domAttrValue(n, "data-marker")
