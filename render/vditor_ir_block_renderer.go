@@ -1063,7 +1063,9 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 			}
 		}
 		if !rendered {
-			r.Write(content)
+			if !bytes.Equal([]byte("<>"), content) {
+				r.Write(content)
+			}
 
 			r.renderSpanNode(node)
 			attrs = [][]string{{"class", "vditor-ir__marker"}}

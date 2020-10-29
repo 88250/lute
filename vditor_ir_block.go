@@ -314,6 +314,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if html.ElementNode == n.Type {
+			break
+		}
+
 		checkIndentCodeBlock := strings.ReplaceAll(content, util.Caret, "")
 		checkIndentCodeBlock = strings.ReplaceAll(checkIndentCodeBlock, "\t", "    ")
 		if (!lute.isInline(n.PrevSibling)) && strings.HasPrefix(checkIndentCodeBlock, "    ") {
