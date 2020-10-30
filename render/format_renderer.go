@@ -236,7 +236,9 @@ func (r *FormatRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) as
 
 func (r *FormatRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
+		if nil != node.Previous && ast.NodeTaskListItemMarker != node.Previous.Type {
+			r.Newline()
+		}
 	} else {
 		r.Newline()
 	}
@@ -1043,6 +1045,15 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *FormatRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.Option.KramdownIAL {
+		parent := node.Parent
+		if nil != parent.Next && ast.NodeKramdownBlockIAL == parent.Next.Type {
+			liIAL := parent.Next
+			r.Write(liIAL.Tokens)
+			liIAL.Unlink()
+		}
+	}
+
 	r.WriteByte(lex.ItemOpenBracket)
 	if node.TaskListItemChecked {
 		r.WriteByte('X')
