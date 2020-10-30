@@ -236,8 +236,12 @@ func (r *FormatRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) as
 
 func (r *FormatRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if nil != node.Previous && ast.NodeTaskListItemMarker != node.Previous.Type {
-			r.Newline()
+		if nil != node.Previous {
+			if ast.NodeTaskListItemMarker != node.Previous.Type {
+				r.Newline()
+			} else {
+				r.WriteByte(lex.ItemSpace)
+			}
 		}
 	} else {
 		r.Newline()
