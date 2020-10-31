@@ -920,6 +920,9 @@ func (r *VditorIRBlockRenderer) renderOpenBracket(node *ast.Node, entering bool)
 
 func (r *VditorIRBlockRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
 	r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+	if ast.NodeBlockEmbed == node.Parent.Type && nil != node.Parent.Previous && ast.NodeTaskListItemMarker == node.Parent.Previous.Type {
+		r.WriteByte(lex.ItemSpace)
+	}
 	r.WriteByte(lex.ItemBang)
 	r.tag("/span", nil, false)
 	return ast.WalkStop
