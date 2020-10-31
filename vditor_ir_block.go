@@ -309,7 +309,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch n.DataAtom {
-	case 0:
+	case 0, atom.Scope:
 		if "" == content {
 			return
 		}
