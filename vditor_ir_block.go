@@ -365,16 +365,17 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		} else {
 			// 尝试行级解析，处理段落图片文本节点转换为图片节点
 			subTree = parse.Inline("", tokens, tree.Context.Option)
-			if ast.NodeParagraph == subTree.Root.FirstChild.Type &&
-				(ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type ||
-					(ast.NodeSoftBreak == subTree.Root.FirstChild.FirstChild.Type && nil != subTree.Root.FirstChild.FirstChild.Next &&
-						(ast.NodeText == subTree.Root.FirstChild.FirstChild.Next.Type ||
-							ast.NodeEmphasis == subTree.Root.FirstChild.FirstChild.Next.Type ||
-							ast.NodeStrong == subTree.Root.FirstChild.FirstChild.Next.Type ||
-							ast.NodeStrikethrough == subTree.Root.FirstChild.FirstChild.Next.Type ||
-							ast.NodeCodeSpan == subTree.Root.FirstChild.FirstChild.Next.Type ||
-							ast.NodeMark == subTree.Root.FirstChild.FirstChild.Next.Type))) && // 软换行后跟普通文本
-				nil == subTree.Root.FirstChild.Next {
+			if ast.NodeSoftBreak == subTree.Root.FirstChild.FirstChild.Type || // 软换行
+				(ast.NodeParagraph == subTree.Root.FirstChild.Type &&
+					(ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type ||
+						(ast.NodeSoftBreak == subTree.Root.FirstChild.FirstChild.Type && nil != subTree.Root.FirstChild.FirstChild.Next &&
+							(ast.NodeText == subTree.Root.FirstChild.FirstChild.Next.Type ||
+								ast.NodeEmphasis == subTree.Root.FirstChild.FirstChild.Next.Type ||
+								ast.NodeStrong == subTree.Root.FirstChild.FirstChild.Next.Type ||
+								ast.NodeStrikethrough == subTree.Root.FirstChild.FirstChild.Next.Type ||
+								ast.NodeCodeSpan == subTree.Root.FirstChild.FirstChild.Next.Type ||
+								ast.NodeMark == subTree.Root.FirstChild.FirstChild.Next.Type))) && // 软换行后跟普通文本
+					nil == subTree.Root.FirstChild.Next) {
 				appendNextToTip(subTree.Root.FirstChild.FirstChild, tree)
 			} else {
 				node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
