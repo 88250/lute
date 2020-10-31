@@ -354,23 +354,32 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
-		// 尝试行级解析，处理段落图片文本节点转换为图片节点
 		tokens := make([]byte, len(node.Tokens))
 		copy(tokens, node.Tokens)
-		subTree := parse.Inline("", tokens, tree.Context.Option)
-		if ast.NodeParagraph == subTree.Root.FirstChild.Type &&
-			(ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type ||
-				(ast.NodeSoftBreak == subTree.Root.FirstChild.FirstChild.Type && nil != subTree.Root.FirstChild.FirstChild.Next &&
-					(ast.NodeText == subTree.Root.FirstChild.FirstChild.Next.Type ||
-						ast.NodeEmphasis == subTree.Root.FirstChild.FirstChild.Next.Type ||
-						ast.NodeStrong == subTree.Root.FirstChild.FirstChild.Next.Type ||
-						ast.NodeStrikethrough == subTree.Root.FirstChild.FirstChild.Next.Type ||
-						ast.NodeMark == subTree.Root.FirstChild.FirstChild.Next.Type))) && // 软换行后跟普通文本
-			nil == subTree.Root.FirstChild.Next {
-			appendNextToTip(subTree.Root.FirstChild.FirstChild, tree)
-		} else {
+
+		// 尝试块级解析，处理列表代码块
+		subTree := parse.Parse("", tokens, tree.Context.Option)
+		if nil != subTree.Root.FirstChild && ast.NodeCodeBlock == subTree.Root.FirstChild.Type {
 			node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
 			tree.Context.Tip.AppendChild(node)
+		} else {
+			// 尝试行级解析，处理段落图片文本节点转换为图片节点
+			subTree = parse.Inline("", tokens, tree.Context.Option)
+			if ast.NodeParagraph == subTree.Root.FirstChild.Type &&
+				(ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type ||
+					(ast.NodeSoftBreak == subTree.Root.FirstChild.FirstChild.Type && nil != subTree.Root.FirstChild.FirstChild.Next &&
+						(ast.NodeText == subTree.Root.FirstChild.FirstChild.Next.Type ||
+							ast.NodeEmphasis == subTree.Root.FirstChild.FirstChild.Next.Type ||
+							ast.NodeStrong == subTree.Root.FirstChild.FirstChild.Next.Type ||
+							ast.NodeStrikethrough == subTree.Root.FirstChild.FirstChild.Next.Type ||
+							ast.NodeCodeSpan == subTree.Root.FirstChild.FirstChild.Next.Type ||
+							ast.NodeMark == subTree.Root.FirstChild.FirstChild.Next.Type))) && // 软换行后跟普通文本
+				nil == subTree.Root.FirstChild.Next {
+				appendNextToTip(subTree.Root.FirstChild.FirstChild, tree)
+			} else {
+				node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
+				tree.Context.Tip.AppendChild(node)
+			}
 		}
 	case atom.P:
 		node.Type = ast.NodeParagraph
