@@ -305,7 +305,8 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 		}
 		// 松散 li 换行时和上一个 li.last id 重复
 		if nil != n.PrevSibling && nil != n.FirstChild {
-			if nil != n.PrevSibling.LastChild && lute.domAttrValue(n.PrevSibling.LastChild, "data-node-id") == lute.domAttrValue(n.FirstChild, "data-node-id") {
+			id := lute.domAttrValue(n.FirstChild, "data-node-id") // id 为空的话是行级节点，列表项行级排版自动换行问题 https://github.com/siyuan-note/siyuan/issues/379
+			if "" != id && nil != n.PrevSibling.LastChild && lute.domAttrValue(n.PrevSibling.LastChild, "data-node-id") == id {
 				lute.setDOMAttrValue(n.FirstChild, "data-node-id", ast.NewNodeID())
 			}
 		}
