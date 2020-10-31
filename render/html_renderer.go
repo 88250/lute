@@ -849,7 +849,9 @@ func (r *HtmlRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSta
 		var attrs [][]string
 		attrs = append(attrs, node.KramdownIAL...)
 		if 3 == node.ListData.Typ && "" != r.Option.GFMTaskListItemClass &&
-			nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type {
+			nil != node.FirstChild && (
+			(ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
+				(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
 			attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 		}
 		r.tag("li", attrs, false)
