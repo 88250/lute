@@ -1424,9 +1424,6 @@ func (r *VditorIRBlockRenderer) NodeID(node *ast.Node) (ret string) {
 			return kv[1]
 		}
 	}
-	if Testing {
-		return "" // 测试环境不生成 ID
-	}
 	return ast.NewNodeID()
 }
 

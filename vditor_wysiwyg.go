@@ -301,8 +301,12 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 	case atom.Li:
 		// li 换行时 id 重复需要重新生成
 		if nil != n.PrevSibling && lute.domAttrValue(n.PrevSibling, "data-node-id") == lute.domAttrValue(n, "data-node-id") {
-			if !render.Testing {
-				lute.setDOMAttrValue(n, "data-node-id", ast.NewNodeID())
+			lute.setDOMAttrValue(n, "data-node-id", ast.NewNodeID())
+		}
+		// 松散 li 换行时和上一个 li.last id 重复
+		if nil != n.PrevSibling && nil != n.FirstChild {
+			if nil != n.PrevSibling.LastChild && lute.domAttrValue(n.PrevSibling.LastChild, "data-node-id") == lute.domAttrValue(n.FirstChild, "data-node-id") {
+				lute.setDOMAttrValue(n.FirstChild, "data-node-id", ast.NewNodeID())
 			}
 		}
 

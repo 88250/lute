@@ -23,9 +23,6 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// Testing 标识是否为测试环境。
-var Testing bool
-
 // RendererFunc 描述了渲染器函数签名。
 type RendererFunc func(n *ast.Node, entering bool) ast.WalkStatus
 

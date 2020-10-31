@@ -123,7 +123,13 @@ type ListData struct {
 	Num          int    `json:",omitempty"` // 有序列表项修正过的序号
 }
 
+// Testing 标识是否为测试环境。
+var Testing bool
+
 func NewNodeID() string {
+	if Testing {
+		return "20060102150405-1a2b3c4" // 测试环境 ID
+	}
 	now := time.Now()
 	return now.Format("20060102150405") + "-" + randStr(7)
 }
