@@ -63,6 +63,7 @@ func TestMd2VditorDOM(t *testing.T) {
 
 var md2VditorIRDOMTests = []parseTest{
 
+	{"14", "foo\n`bar`\n", "<p data-block=\"0\">foo\n<span data-type=\"code\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">`</span><code data-newline=\"1\">bar</code><span class=\"vditor-ir__marker\">`</span></span></p>"},
 	{"13", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\">foo</p><span data-type=\"kramdown-ial\">{: id=\"fooid\"}\n</span><p data-block=\"0\">bar</p><span data-type=\"kramdown-ial\">{: id=\"barid\"}\n</span>"},
 	{"12", "![][foo]\n\n[foo]: bar", "<p data-block=\"0\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">[foo]</span><img src=\"bar\" /></span></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
 	{"11", "![text][foo]\n\n[foo]: bar", "<p data-block=\"0\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">text</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">[foo]</span><img src=\"bar\" alt=\"text\" /></span></p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[foo]: bar\n</div>"},
@@ -94,6 +95,7 @@ func TestMd2VditorIRDOM(t *testing.T) {
 
 var md2VditorIRBlockDOMTests = []parseTest{
 
+	{"16", "foo\n`bar`\n", "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">foo\n<span data-type=\"code\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">`</span><code data-newline=\"1\">bar</code><span class=\"vditor-ir__marker\">`</span></span></p>"},
 	{"15", "![](assets/中文/foo.png)\n", "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">assets/中文/foo.png</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><img src=\"assets/中文/foo.png\" /></span></p>"},
 	{"14", "| foo |\n| - |\n| bar *baz* |\n", "<table data-block=\"0\" data-type=\"table\" data-node-id=\"20060102150405-1a2b3c4\"><thead><tr><th>foo</th></tr></thead><tbody><tr><td>bar <span data-type=\"em\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span><em data-newline=\"1\">baz</em><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span></span></td></tr></tbody></table>"},
 	{"13", "* {: id=\"fooid\"}foo\n  * {: id=\"barid\"}bar\n  {: id=\"ul2\"}\n{: id=\"ul1\"}\n", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul1\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"ul2\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"barid\">bar</li></ul></li></ul>"},
@@ -122,9 +124,9 @@ func TestMd2VditorIRBlockDOM(t *testing.T) {
 
 	ast.Testing = true
 	for _, test := range md2VditorIRBlockDOMTests {
-		md := luteEngine.Md2VditorIRBlockDOM(test.from)
-		if test.to != md {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
+		result := luteEngine.Md2VditorIRBlockDOM(test.from)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
 		}
 	}
 	ast.Testing = false

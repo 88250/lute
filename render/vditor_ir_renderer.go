@@ -936,7 +936,6 @@ func (r *VditorIRRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 		r.ChinesePunct(node)
 	}
 
-	node.Tokens = bytes.TrimRight(node.Tokens, "\n")
 	// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
 	if !bytes.EqualFold(node.Tokens, []byte(util.Caret+parse.Zwsp)) {
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
