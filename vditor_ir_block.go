@@ -309,7 +309,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch n.DataAtom {
-	case 0, atom.Scope:
+	case 0:
 		if "" == content {
 			return
 		}
@@ -1113,6 +1113,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Summary:
 		return
 	default:
+		if html.ElementNode == n.Type {
+			break
+		}
+
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
 		tree.Context.Tip.AppendChild(node)
