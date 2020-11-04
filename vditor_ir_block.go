@@ -672,6 +672,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild {
 			return
 		}
+		text := lute.domText(n.FirstChild)
+		if strings.HasPrefix(text, "<code>") {
+			break
+		}
+
 		contentStr := strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
 		if util.Caret == contentStr {
 			node.Tokens = util.CaretTokens
