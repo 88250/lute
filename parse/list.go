@@ -51,7 +51,7 @@ func (context *Context) listFinalize(list *ast.Node) {
 				li.FirstChild.KramdownIAL = nil // 置空
 				li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL})
 				li = li.Next
-			case ast.NodeParagraph, ast.NodeBlockEmbed:
+			case ast.NodeParagraph, ast.NodeBlockEmbed, ast.NodeHeading:
 				if nil != li.FirstChild.KramdownIAL && 3 == li.Parent.ListData.Typ {
 					// 任务列表项 IAL
 					li.KramdownIAL =  li.FirstChild.KramdownIAL

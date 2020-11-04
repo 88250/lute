@@ -40,7 +40,7 @@ func (t *Tree) parseHeadingID(block *ast.Node, ctx *InlineContext) (ret *ast.Nod
 
 	length := len(content)
 	if length-1 != curlyBracesEnd {
-		if !bytes.HasSuffix(content, []byte("}"+util.Caret)) && bytes.HasSuffix(content,util.CaretTokens) {
+		if !bytes.HasSuffix(content, []byte("}"+util.Caret)) && bytes.HasSuffix(content, util.CaretTokens) {
 			// # foo {id}b‸
 			ctx.pos++
 			return &ast.Node{Type: ast.NodeText, Tokens: openCurlyBrace}
