@@ -672,8 +672,8 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild {
 			return
 		}
-		text := lute.domText(n.FirstChild)
-		if strings.HasPrefix(text, "<code>") {
+		firstChildDataType := lute.domAttrValue(n.FirstChild, "data-type")
+		if firstChildDataType == "html-inline" {
 			break
 		}
 
