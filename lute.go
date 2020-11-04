@@ -103,6 +103,7 @@ func NewOptions() *parse.Options {
 		BlockRef:                       false,
 		Mark:                           false,
 		KramdownIAL:                    false,
+		KramdownIALIDRenderName:        "id",
 	}
 }
 
@@ -355,6 +356,10 @@ func (lute *Lute) SetMark(b bool) {
 
 func (lute *Lute) SetKramdownIAL(b bool) {
 	lute.KramdownIAL = b
+}
+
+func (lute *Lute) SetKramdownIALIDRenderName(name string) {
+	lute.KramdownIALIDRenderName = name
 }
 
 func (lute *Lute) SetTag(b bool) {

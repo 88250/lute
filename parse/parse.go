@@ -308,6 +308,9 @@ type Options struct {
 	Mark bool
 	// KramdownIAL 设置是否打开 kramdown 内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
 	KramdownIAL bool
+	// KramdownIALIDRenderName 设置 kramdown 内联属性列表中出现 id 属性时渲染 id 属性用的 name(key) 名称，默认为 "id"。
+	// 仅在 HTML 渲染器 HtmlRenderer 中支持。
+	KramdownIALIDRenderName string
 	// Tag 设置是否开启 #标签# 支持。
 	Tag bool
 }

@@ -223,7 +223,12 @@ func normalizeHeadingID(heading *ast.Node) (ret string) {
 		id = util.BytesToStr(headingID.Tokens)
 	}
 	if "" == id {
-		id = heading.Text()
+		if 0 < len(heading.KramdownIAL) {
+			id = heading.KramdownIAL[0][1]
+		}
+		if "" == id {
+			id = heading.Text()
+		}
 	}
 
 	id = strings.TrimLeft(id, "#")

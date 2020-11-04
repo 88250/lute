@@ -53,3 +53,22 @@ func TestKramBlockIALs(t *testing.T) {
 		}
 	}
 }
+
+var kramBlockIALIDNAmeTests = []parseTest{
+
+	{"1", "> foo\n> {: id=\"fooid\" name=\"bar\"}", "<blockquote>\n<p data-block-id=\"fooid\" name=\"bar\">foo</p>\n</blockquote>\n"},
+	{"0", "# foo\n{: id=\"fooid\" class=\"bar\"}", "<h1 id=\"fooid\" data-block-id=\"fooid\" class=\"bar\">foo</h1>\n"},
+}
+
+func TestKramBlockIALIDName(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.KramdownIAL = true
+	luteEngine.KramdownIALIDRenderName = "data-block-id"
+
+	for _, test := range kramBlockIALIDNAmeTests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
