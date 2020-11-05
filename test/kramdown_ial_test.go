@@ -56,6 +56,7 @@ func TestKramBlockIALs(t *testing.T) {
 
 var kramBlockIALIDNAmeTests = []parseTest{
 
+	{"2", "# foo", "<h1 id=\"foo\" data-block-id=\"foo\">foo</h1>\n"},
 	{"1", "> foo\n> {: id=\"fooid\" name=\"bar\"}", "<blockquote>\n<p data-block-id=\"fooid\" name=\"bar\">foo</p>\n</blockquote>\n"},
 	{"0", "# foo\n{: id=\"fooid\" class=\"bar\"}", "<h1 id=\"fooid\" data-block-id=\"fooid\" class=\"bar\">foo</h1>\n"},
 }

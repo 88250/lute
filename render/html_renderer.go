@@ -805,7 +805,7 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 			if r.Option.KramdownIAL && "id" != r.Option.KramdownIALIDRenderName {
 				r.WriteString(" " + r.Option.KramdownIALIDRenderName + "=\"" + id + "\"")
 			}
-			if r.Option.KramdownIAL {
+			if r.Option.KramdownIAL && 1 < len(node.KramdownIAL) {
 				exceptID := node.KramdownIAL[1:]
 				for _, attr := range exceptID {
 					r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
