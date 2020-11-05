@@ -1079,7 +1079,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
-		if class == "vditor-comment" {
+		if strings.Contains(class, "vditor-comment") {
 			node.Type = ast.NodeInlineHTML
 			buf := bytes.Buffer{}
 			buf.WriteString("<span ")
@@ -1171,7 +1171,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 
 	switch n.DataAtom {
 	case atom.Span:
-		if "vditor-comment" == class {
+		if strings.Contains(class, "vditor-comment") {
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("</span>")})
 		}
 	case atom.Em, atom.I:
