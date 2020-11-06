@@ -802,13 +802,15 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 		id := HeadingID(node)
 		if r.Option.ToC || r.Option.HeadingID || r.Option.KramdownIAL {
 			r.WriteString(" id=\"" + id + "\"")
-			if r.Option.KramdownIAL && "id" != r.Option.KramdownIALIDRenderName {
-				r.WriteString(" " + r.Option.KramdownIALIDRenderName + "=\"" + id + "\"")
-			}
-			if r.Option.KramdownIAL && 1 < len(node.KramdownIAL) {
-				exceptID := node.KramdownIAL[1:]
-				for _, attr := range exceptID {
-					r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
+			if r.Option.KramdownIAL {
+				if "id" != r.Option.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
+					r.WriteString(" " + r.Option.KramdownIALIDRenderName + "=\"" + node.KramdownIAL[0][1] + "\"")
+				}
+				if 1 < len(node.KramdownIAL) {
+					exceptID := node.KramdownIAL[1:]
+					for _, attr := range exceptID {
+						r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
+					}
 				}
 			}
 		}
