@@ -258,6 +258,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				if nil == c.FirstChild {
 					continue
 				}
+				if c == n.FirstChild && !strings.HasPrefix(c.FirstChild.Data, "[^") {
+					tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(lute.domText(c))})
+					continue
+				}
+
 				if strings.HasPrefix(c.FirstChild.Data, "[^") && strings.Contains(c.FirstChild.Data, "]: ") {
 					label := c.FirstChild.Data[1:strings.Index(c.FirstChild.Data, "]: ")]
 					tree.Context.Tip.Tokens = []byte(label)
