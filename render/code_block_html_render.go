@@ -38,13 +38,17 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 		rendered := false
 		tokens := node.FirstChild.Tokens
 		if r.Option.CodeSyntaxHighlight {
-			rendered = highlightChroma(tokens, "", r)
+			rendered = highlightChroma(node, tokens, "", r)
 			if !rendered {
 				tokens = html.EscapeHTML(tokens)
 				r.Write(tokens)
 			}
 		} else {
-			r.WriteString("<pre><code>")
+			var attrs [][]string
+			r.handleKramdownIAL(node)
+			attrs = append(attrs, node.KramdownIAL...)
+			r.tag("pre", attrs, false)
+			r.WriteString("<code>")
 			tokens = html.EscapeHTML(tokens)
 			r.Write(tokens)
 		}
@@ -59,6 +63,10 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 // renderCodeBlockCode 进行代码块 HTML 渲染，实现语法高亮。
 func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		var attrs [][]string
+		r.handleKramdownIAL(node.Parent)
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
 			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
@@ -73,19 +81,21 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 
 			if "mindmap" == language {
 				json := r.renderMindmap(tokens)
-				r.WriteString("<pre><code data-code=\"")
+				r.tag("pre", attrs, false)
+				r.WriteString("<code data-code=\"")
 				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")
 				r.Write(html.EscapeHTML(tokens))
 				rendered = true
 			} else {
 				if r.Option.CodeSyntaxHighlight && !noHighlight(language) {
-					rendered = highlightChroma(tokens, language, r)
+					rendered = highlightChroma(node.Parent, tokens, language, r)
 				}
 			}
 
 			if !rendered {
-				r.WriteString("<pre><code class=\"language-")
+				r.tag("pre", attrs, false)
+				r.WriteString("<code class=\"language-")
 				r.WriteString(language)
 				r.WriteString("\">")
 				tokens = html.EscapeHTML(tokens)
@@ -94,21 +104,22 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		} else {
 			rendered := false
 			if r.Option.CodeSyntaxHighlight {
-				rendered = highlightChroma(tokens, "", r)
+				rendered = highlightChroma(node.Parent, tokens, "", r)
 				if !rendered {
 					tokens = html.EscapeHTML(tokens)
 					r.Write(tokens)
 				}
 			} else {
+				r.tag("pre", attrs, false)
 				if r.Option.CodeSyntaxHighlightDetectLang {
 					language := detectLanguage(tokens)
 					if "" != language {
-						r.WriteString("<pre><code class=\"language-" + language)
+						r.WriteString("<code class=\"language-" + language)
 					} else {
-						r.WriteString("<pre><code>")
+						r.WriteString("<code>")
 					}
 				} else {
-					r.WriteString("<pre><code>")
+					r.WriteString("<code>")
 				}
 				tokens = html.EscapeHTML(tokens)
 				r.Write(tokens)
@@ -120,7 +131,11 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkStop
 }
 
-func highlightChroma(tokens []byte, language string, r *HtmlRenderer) (rendered bool) {
+func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *HtmlRenderer) (rendered bool) {
+	var attrs [][]string
+	r.handleKramdownIAL(codeNode)
+	attrs = append(attrs, codeNode.KramdownIAL...)
+
 	codeBlock := util.BytesToStr(tokens)
 	var lexer chroma.Lexer
 	if "" != language {
@@ -151,9 +166,10 @@ func highlightChroma(tokens []byte, language string, r *HtmlRenderer) (rendered 
 		var b bytes.Buffer
 		if err = formatter.Format(&b, style, iterator); nil == err {
 			if !r.Option.CodeSyntaxHighlightInlineStyle {
-				r.WriteString("<pre>")
+				r.tag("pre", attrs, false)
 			} else {
-				r.WriteString("<pre style=\"" + chromahtml.StyleEntryToCSS(style.Get(chroma.Background)) + "\">")
+				attrs = append(attrs, []string{"style", chromahtml.StyleEntryToCSS(style.Get(chroma.Background))})
+				r.tag("pre", attrs, false)
 			}
 			if "" != language {
 				r.WriteString("<code class=\"language-" + language)

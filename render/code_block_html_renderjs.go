@@ -36,22 +36,26 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
+		var attrs [][]string
+		r.handleKramdownIAL(node)
+		attrs = append(attrs, node.KramdownIAL...)
+		r.tag("pre", attrs, false)
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
 			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 			language := string(infoWords[0])
 			if "mindmap" == language {
 				json := r.renderMindmap(tokens)
-				r.WriteString("<pre><code data-code=\"")
+				r.WriteString("<code data-code=\"")
 				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")
 			} else {
-				r.WriteString("<pre><code class=\"language-" + language + "\">")
+				r.WriteString("<code class=\"language-" + language + "\">")
 			}
 			tokens = html.EscapeHTML(tokens)
 			r.Write(tokens)
 		} else {
-			r.WriteString("<pre><code>")
+			r.WriteString("<code>")
 			tokens = html.EscapeHTML(tokens)
 			r.Write(tokens)
 		}

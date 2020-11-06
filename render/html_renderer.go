@@ -416,13 +416,17 @@ func (r *HtmlRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast
 }
 
 func (r *HtmlRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	attrs := [][]string{{"class", "vditor-math"}}
-	r.tag("div", attrs, false)
 	return ast.WalkStop
 }
 
 func (r *HtmlRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
+	if entering {
+		attrs := [][]string{{"class", "vditor-math"}}
+		r.handleKramdownIAL(node)
+		attrs = append(attrs, node.KramdownIAL...)
+		r.tag("div", attrs, false)
+	}
 	return ast.WalkContinue
 }
 
