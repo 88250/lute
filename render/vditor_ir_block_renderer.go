@@ -397,7 +397,7 @@ func (r *VditorIRBlockRenderer) RenderFootnotesDefs(context *parse.Context) []by
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
 		tree.Root.AppendChild(def)
-		defRenderer := NewVditorIRRenderer(tree)
+		defRenderer := NewVditorIRBlockRenderer(tree)
 		if nil != def.FirstChild {
 			def.FirstChild.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
 		} else {
@@ -1563,8 +1563,6 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		r.tag("span", attrs, false)
 		return
 	}
-
-	// TODO {"class", "vditor-ir__tag"}
 
 	attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	r.tag("span", attrs, false)

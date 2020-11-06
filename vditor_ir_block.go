@@ -255,26 +255,36 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		} else if "footnotes-def" == dataType {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				if nil == c.FirstChild {
+					continue
+				}
+				if strings.HasPrefix(c.FirstChild.Data, "[^") {
+					label := c.FirstChild.Data[1:strings.Index(c.FirstChild.Data, "]: ")]
+					tree.Context.Tip.Tokens = []byte(label)
+					c.FirstChild.Data = c.FirstChild.Data[strings.Index(c.FirstChild.Data, "]: ")+3:]
+				}
 				lute.genASTByVditorIRBlockDOM(c, tree)
 			}
 			return
 		} else if "footnotes-block" == dataType {
 			for def := n.FirstChild; nil != def; def = def.NextSibling {
+				defNode := &ast.Node{Type: ast.NodeFootnotesDef}
 				originalHTML := &bytes.Buffer{}
 				if err := html.Render(originalHTML, def); nil == err {
-					md := lute.vditorIRBlockDOM2Md(originalHTML.String())
-					lines := strings.Split(md, "\n")
-					md = ""
-					for i, line := range lines {
-						if 0 < i {
-							md += "    " + line
-						} else {
-							md = line
+					subTree, _ := lute.VditorIRBlockDOM2Tree(originalHTML.String())
+					if nil != subTree.Root.Tokens {
+						var children []*ast.Node
+						for c := subTree.Root.FirstChild; nil != c; c = c.Next {
+							children = append(children, c)
 						}
-						md += "\n"
+						for _, c := range children {
+							defNode.AppendChild(c)
+						}
+						defNode.Tokens = subTree.Root.Tokens
+						tree.Context.Tip.AppendChild(defNode)
+					} else {
+						tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(subTree.Root.Text())})
 					}
-					node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
-					tree.Context.Tip.AppendChild(node)
 				}
 			}
 			return
@@ -711,11 +721,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				if nil != n.Parent.NextSibling && (atom.Ul == n.Parent.NextSibling.DataAtom || atom.Ol == n.Parent.NextSibling.DataAtom || atom.Blockquote == n.Parent.NextSibling.DataAtom) {
 					tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
 					return
-				}
-				if nil != n.Parent.Parent && nil != n.Parent.Parent.NextSibling && atom.Li == n.Parent.Parent.NextSibling.DataAtom {
-					// TODO 暂不确定是否能彻底移除
-					//tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
-					//return
 				}
 			}
 		}

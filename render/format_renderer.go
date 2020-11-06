@@ -354,7 +354,28 @@ func (r *FormatRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.W
 
 func (r *FormatRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]: ")
+	} else {
+		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
+		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
+		buf := writer.String()
+		lines := strings.Split(buf, "\n")
+		contentBuf := bytes.Buffer{}
+		for i, line := range lines {
+			if 0 == i {
+				contentBuf.WriteString(line + "\n")
+			} else {
+				if "" == line {
+					contentBuf.WriteString("\n")
+				} else {
+					contentBuf.WriteString("    " + line + "\n")
+				}
+			}
+		}
+		r.NodeWriterStack[len(r.NodeWriterStack)-1].Write(contentBuf.Bytes())
+		r.Writer = r.NodeWriterStack[len(r.NodeWriterStack)-1]
 	}
 	return ast.WalkContinue
 }
