@@ -367,6 +367,8 @@ func (n *Node) CanContain(nodeType NodeType) bool {
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
+	case NodeFootnotesDefBlock:
+		return NodeFootnotesDef == nodeType
 	case NodeFootnotesDef:
 		return NodeFootnotesDef != nodeType // 脚注不能包含脚注
 	}
@@ -476,8 +478,9 @@ const (
 
 	// 脚注
 
-	NodeFootnotesDef NodeType = 410 // 脚注定义 [^label]:
-	NodeFootnotesRef NodeType = 411 // 脚注引用 [^label]
+	NodeFootnotesDefBlock NodeType = 410 // 脚注定义块
+	NodeFootnotesDef      NodeType = 411 // 脚注定义 [^label]:
+	NodeFootnotesRef      NodeType = 412 // 脚注引用 [^label]
 
 	// 目录
 

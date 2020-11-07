@@ -33,9 +33,6 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 
 	renderer := render.NewVditorSVRenderer(tree)
 	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
 	return
@@ -59,9 +56,6 @@ func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
 	vHTML = string(output)
 	return
 }
@@ -78,9 +72,6 @@ func (lute *Lute) Md2VditorSVDOM(markdown string) (vHTML string) {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
 	// 替换插入符
 	vHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
 	return

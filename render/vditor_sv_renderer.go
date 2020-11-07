@@ -274,7 +274,7 @@ func (r *VditorSVRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) 
 }
 
 func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
-	for _, def := range context.FootnotesDefs {
+	for _, def := range r.FootnotesDefs {
 		tree := &parse.Tree{Name: "", Context: context}
 		tree.Context.Tree = tree
 		tree.Root = &ast.Node{Type: ast.NodeDocument}
@@ -375,7 +375,7 @@ func (r *VditorSVRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast
 func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	previousNodeText := node.PreviousNodeText()
 	previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-	_, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	_, def := r.Tree.FindFootnotesDef(node.Tokens)
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}
 	attrs = append(attrs, []string{"class", "b3-tooltips b3-tooltips__s"})

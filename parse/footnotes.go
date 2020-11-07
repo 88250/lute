@@ -28,11 +28,18 @@ func FootnotesContinue(footnotesDef *ast.Node, context *Context) int {
 	return 0
 }
 
-func (context *Context) FindFootnotesDef(label []byte) (int, *ast.Node) {
-	for i, n := range context.FootnotesDefs {
-		if bytes.EqualFold(label, n.Tokens) {
-			return i + 1, n
+func (t *Tree) FindFootnotesDef(label []byte) (pos int, def *ast.Node) {
+	pos = 0
+	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if ast.NodeFootnotesDef != n.Type {
+			return ast.WalkContinue
 		}
-	}
-	return -1, nil
+		pos++
+		if bytes.EqualFold(n.Tokens, label) {
+			def = n
+			return ast.WalkStop
+		}
+		return ast.WalkContinue
+	})
+	return
 }

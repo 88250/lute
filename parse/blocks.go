@@ -21,7 +21,6 @@ import (
 func (t *Tree) parseBlocks() {
 	t.Context.Tip = t.Root
 	t.Context.LinkRefDefs = map[string]*ast.Node{}
-	t.Context.FootnotesDefs = []*ast.Node{}
 	lines := 0
 	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {
 		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
@@ -190,7 +189,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			}
 		} else if t.Context.offset < t.Context.currentLineLen && !t.Context.blank {
 			// 普通段落开始
-			t.Context.addChild(ast.NodeParagraph, t.Context.offset)
+			t.Context.addChild(ast.NodeParagraph)
 			t.Context.advanceNextNonspace()
 			t.addLine()
 		}
@@ -228,7 +227,7 @@ var blockStarts = []blockStartFunc{
 			markers = append(markers, whitespace)
 		}
 		t.Context.closeUnmatchedBlocks()
-		t.Context.addChild(ast.NodeBlockquote, t.Context.nextNonspace)
+		t.Context.addChild(ast.NodeBlockquote)
 		t.Context.addChildMarker(ast.NodeBlockquoteMarker, markers)
 		return 1
 	},
@@ -243,7 +242,7 @@ var blockStarts = []blockStartFunc{
 			t.Context.advanceNextNonspace()
 			t.Context.advanceOffset(len(content), false)
 			t.Context.closeUnmatchedBlocks()
-			heading := t.Context.addChild(ast.NodeHeading, t.Context.nextNonspace)
+			heading := t.Context.addChild(ast.NodeHeading)
 			heading.HeadingLevel = level
 			heading.Tokens = content
 			crosshatchMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: markers}
@@ -262,7 +261,7 @@ var blockStarts = []blockStartFunc{
 
 		if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockOpenFence, codeBlockInfo := t.parseFencedCode(); ok {
 			t.Context.closeUnmatchedBlocks()
-			container := t.Context.addChild(ast.NodeCodeBlock, t.Context.nextNonspace)
+			container := t.Context.addChild(ast.NodeCodeBlock)
 			container.IsFencedCodeBlock = true
 			container.CodeBlockFenceLen = codeBlockFenceLen
 			container.CodeBlockFenceChar = codeBlockFenceChar
@@ -345,7 +344,7 @@ var blockStarts = []blockStartFunc{
 		tokens := t.Context.currentLine[t.Context.nextNonspace:]
 		if htmlType := t.parseHTML(tokens); 0 != htmlType {
 			t.Context.closeUnmatchedBlocks()
-			block := t.Context.addChild(ast.NodeHTMLBlock, t.Context.offset)
+			block := t.Context.addChild(ast.NodeHTMLBlock)
 			block.HtmlBlockType = htmlType
 			return 2
 		}
@@ -375,7 +374,7 @@ var blockStarts = []blockStartFunc{
 
 		if ok, caretTokens := t.parseThematicBreak(); ok {
 			t.Context.closeUnmatchedBlocks()
-			thematicBreak := t.Context.addChild(ast.NodeThematicBreak, t.Context.nextNonspace)
+			thematicBreak := t.Context.addChild(ast.NodeThematicBreak)
 			thematicBreak.Tokens = caretTokens
 			t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
 			return 2
@@ -398,10 +397,10 @@ var blockStarts = []blockStartFunc{
 
 		listsMatch := container.Type == ast.NodeList && t.Context.listsMatch(container.ListData, data)
 		if t.Context.Tip.Type != ast.NodeList || !listsMatch {
-			list := t.Context.addChild(ast.NodeList, t.Context.nextNonspace)
+			list := t.Context.addChild(ast.NodeList)
 			list.ListData = data
 		}
-		listItem := t.Context.addChild(ast.NodeListItem, t.Context.nextNonspace)
+		listItem := t.Context.addChild(ast.NodeListItem)
 		listItem.ListData = data
 		listItem.Tokens = data.Marker
 		if 1 == listItem.ListData.Typ || (3 == listItem.ListData.Typ && 0 == listItem.ListData.BulletChar) {
@@ -424,7 +423,7 @@ var blockStarts = []blockStartFunc{
 
 		if ok, mathBlockDollarOffset := t.parseMathBlock(); ok {
 			t.Context.closeUnmatchedBlocks()
-			block := t.Context.addChild(ast.NodeMathBlock, t.Context.nextNonspace)
+			block := t.Context.addChild(ast.NodeMathBlock)
 			block.MathBlockDollarOffset = mathBlockDollarOffset
 			t.Context.advanceNextNonspace()
 			t.Context.advanceOffset(mathBlockDollarOffset, false)
@@ -442,7 +441,7 @@ var blockStarts = []blockStartFunc{
 		if t.Context.Tip.Type != ast.NodeParagraph && !t.Context.blank {
 			t.Context.advanceOffset(4, true)
 			t.Context.closeUnmatchedBlocks()
-			t.Context.addChild(ast.NodeCodeBlock, t.Context.offset)
+			t.Context.addChild(ast.NodeCodeBlock)
 			return 2
 		}
 		return 0
@@ -486,12 +485,13 @@ var blockStarts = []blockStartFunc{
 
 		t.Context.closeUnmatchedBlocks()
 		t.Context.advanceOffset(len(label)+2, true)
-		footnotesDef := t.Context.addChild(ast.NodeFootnotesDef, t.Context.nextNonspace)
-		footnotesDef.Tokens = label
-		lowerCaseLabel := bytes.ToLower(label)
-		if _, def := t.Context.FindFootnotesDef(lowerCaseLabel); nil == def {
-			t.Context.FootnotesDefs = append(t.Context.FootnotesDefs, footnotesDef)
+
+		if ast.NodeFootnotesDefBlock != t.Context.Tip.Type {
+			t.Context.addChild(ast.NodeFootnotesDefBlock)
 		}
+
+		def := t.Context.addChild(ast.NodeFootnotesDef)
+		def.Tokens = label
 		return 1
 	},
 
@@ -512,7 +512,7 @@ var blockStarts = []blockStartFunc{
 			}
 			lastMatchedContainer.KramdownIAL = ial
 			t.Context.offset = t.Context.currentLineLen // 整行过
-			node := t.Context.addChild(ast.NodeKramdownBlockIAL, t.Context.nextNonspace)
+			node := t.Context.addChild(ast.NodeKramdownBlockIAL)
 			node.Tokens = t.Context.currentLine[t.Context.nextNonspace:]
 			return 2
 		}

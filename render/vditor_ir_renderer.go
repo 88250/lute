@@ -231,7 +231,7 @@ func (r *VditorIRRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) 
 
 func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
-	for _, def := range context.FootnotesDefs {
+	for _, def := range r.FootnotesDefs {
 		r.WriteString("<div data-type=\"footnotes-def\">")
 		tree := &parse.Tree{Name: "", Context: context}
 		tree.Context.Tree = tree
@@ -320,7 +320,7 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	if "" == previousNodeText {
 		r.WriteString(parse.Zwsp)
 	}
-	idx, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	idx, def := r.Tree.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}

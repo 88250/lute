@@ -115,9 +115,6 @@ func (lute *Lute) Markdown(name string, markdown []byte) (html []byte) {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	html = renderer.Render()
-	if lute.Options.Footnotes && 0 < len(tree.Context.FootnotesDefs) {
-		html = renderer.RenderFootnotesDefs(tree.Context)
-	}
 	return
 }
 

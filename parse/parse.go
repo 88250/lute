@@ -47,7 +47,6 @@ type Context struct {
 	Option *Options // 解析渲染选项
 
 	LinkRefDefs   map[string]*ast.Node // 链接引用定义集
-	FootnotesDefs []*ast.Node          // 脚注定义集
 
 	Tip                                                               *ast.Node // 末梢节点
 	oldtip                                                            *ast.Node // 老的末梢节点
@@ -184,7 +183,7 @@ func (context *Context) addChildMarker(nodeType ast.NodeType, tokens []byte) (re
 
 // addChild 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.Tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
 // 节点并向父节点方向尝试，直到找到一个能接受该子节点的节点为止。添加完成后该子节点会被设置为新的末梢节点。
-func (context *Context) addChild(nodeType ast.NodeType, offset int) (ret *ast.Node) {
+func (context *Context) addChild(nodeType ast.NodeType) (ret *ast.Node) {
 	for !context.Tip.CanContain(nodeType) {
 		context.finalize(context.Tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
 	}

@@ -28,7 +28,6 @@ import (
 // VditorIRBlockRenderer 描述了 Vditor Instant-Rendering Block DOM 渲染器。
 type VditorIRBlockRenderer struct {
 	*BaseRenderer
-	needRenderFootnotesDef bool
 }
 
 // NewVditorIRBlockRenderer 创建一个 Vditor Instant-Rendering Block DOM 渲染器。
@@ -135,7 +134,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 
 func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	output = r.render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
+	if 1 > len(r.Tree.Context.LinkRefDefs) {
 		return
 	}
 
@@ -391,7 +390,7 @@ func (r *VditorIRBlockRenderer) renderYamlFrontMatter(node *ast.Node, entering b
 
 func (r *VditorIRBlockRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
 	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
-	for _, def := range context.FootnotesDefs {
+	for _, def := range r.FootnotesDefs {
 		r.WriteString("<div data-type=\"footnotes-def\">")
 		tree := &parse.Tree{Name: "", Context: context}
 		tree.Context.Tree = tree
@@ -403,7 +402,6 @@ func (r *VditorIRBlockRenderer) RenderFootnotesDefs(context *parse.Context) []by
 		} else {
 			def.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
 		}
-		defRenderer.needRenderFootnotesDef = true
 		defContent := defRenderer.Render()
 		r.Write(defContent)
 		r.WriteString("</div>")
@@ -468,9 +466,7 @@ func (r *VditorIRBlockRenderer) renderToC(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorIRBlockRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.needRenderFootnotesDef {
-		return ast.WalkStop
-	}
+	// TODO: render fn def
 	return ast.WalkContinue
 }
 
@@ -480,7 +476,7 @@ func (r *VditorIRBlockRenderer) renderFootnotesRef(node *ast.Node, entering bool
 	if "" == previousNodeText {
 		r.WriteString(parse.Zwsp)
 	}
-	idx, def := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	idx, def := r.Tree.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}

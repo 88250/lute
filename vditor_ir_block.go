@@ -59,9 +59,6 @@ func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
 	vHTML = string(output)
 	return
 }
@@ -89,9 +86,6 @@ func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
 	vHTML = string(output)
 	return
 }
@@ -160,9 +154,6 @@ func VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
 	renderer := render.NewVditorIRBlockRenderer(tree)
 	output := renderer.Render()
-	if renderer.Option.Footnotes && 0 < len(renderer.Tree.Context.FootnotesDefs) {
-		output = renderer.RenderFootnotesDefs(renderer.Tree.Context)
-	}
 	vHTML = string(output)
 	return
 }

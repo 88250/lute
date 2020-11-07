@@ -45,6 +45,8 @@ type BaseRenderer struct {
 	LastOut             byte                             // 最新输出的一个字节
 	Tree                *parse.Tree                      // 待渲染的树
 	DisableTags         int                              // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>
+	FootnotesDefs       []*ast.Node                      // 脚注定义集
+	RenderingFootnotes  bool                             // 是否正在渲染脚注定义
 }
 
 // NewBaseRenderer 构造一个 BaseRenderer。

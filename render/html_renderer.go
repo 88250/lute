@@ -27,12 +27,11 @@ import (
 // HtmlRenderer 描述了 HTML 渲染器。
 type HtmlRenderer struct {
 	*BaseRenderer
-	needRenderFootnotesDef bool
 }
 
 // NewHtmlRenderer 创建一个 HTML 渲染器。
 func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
-	ret := &HtmlRenderer{NewBaseRenderer(tree), false}
+	ret := &HtmlRenderer{NewBaseRenderer(tree)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -100,6 +99,7 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.RendererFuncs[ast.NodeFootnotesDefBlock] = ret.renderFootnotesDefBlock
 	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
@@ -130,6 +130,12 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	return ret
+}
+
+func (r *HtmlRenderer) Render() (output []byte) {
+	output = r.BaseRenderer.Render()
+	output = append(output, r.RenderFootnotes()...)
+	return
 }
 
 func (r *HtmlRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
@@ -309,36 +315,8 @@ func (r *HtmlRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkStop
 }
 
-func (r *HtmlRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
-	r.WriteString("<div class=\"footnotes-defs-div\">")
-	r.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
-	r.WriteString("<ol class=\"footnotes-defs-ol\">")
-	for i, def := range context.FootnotesDefs {
-		r.WriteString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
-		tree := &parse.Tree{Name: "", Context: context}
-		tree.Context.Tree = tree
-		tree.Root = &ast.Node{Type: ast.NodeDocument}
-		tree.Root.AppendChild(def)
-		defRenderer := NewHtmlRenderer(tree)
-		lc := tree.Root.LastDeepestChild()
-		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
-			ref := def.FootnotesRefs[i]
-			gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"vditor-footnotes__goto-ref\">↩</a>"
-			link := &ast.Node{Type: ast.NodeInlineHTML, Tokens: util.StrToBytes(gotoRef)}
-			lc.InsertAfter(link)
-		}
-		defRenderer.needRenderFootnotesDef = true
-		defContent := defRenderer.Render()
-		r.Write(defContent)
-
-		r.WriteString("</li>\n")
-	}
-	r.WriteString("</ol></div>")
-	return r.Writer.Bytes()
-}
-
 func (r *HtmlRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	idx, _ := r.Tree.Context.FindFootnotesDef(node.Tokens)
+	idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
 	idxStr := strconv.Itoa(idx)
 	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
 	r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
@@ -348,11 +326,57 @@ func (r *HtmlRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkStop
 }
 
-func (r *HtmlRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.needRenderFootnotesDef {
-		return ast.WalkStop
-	}
+func (r *HtmlRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) RenderFootnotes() []byte {
+	if 1 > len(r.FootnotesDefs) {
+		return nil
+	}
+
+	buf := bytes.Buffer{}
+	buf.WriteString("<div class=\"footnotes-defs-div\">")
+	buf.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
+	buf.WriteString("<ol class=\"footnotes-defs-ol\">")
+	for i, def := range r.FootnotesDefs {
+		buf.WriteString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
+		footnotesTree := &parse.Tree{Name: "", Context: r.Tree.Context}
+		footnotesTree.Context.Tree = footnotesTree
+		footnotesTree.Root = &ast.Node{Type: ast.NodeDocument}
+		footnotesTree.Root.AppendChild(def)
+		defRenderer := NewHtmlRenderer(footnotesTree)
+		lc := footnotesTree.Root.LastDeepestChild()
+		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
+			ref := def.FootnotesRefs[i]
+			gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"vditor-footnotes__goto-ref\">↩</a>"
+			link := &ast.Node{Type: ast.NodeInlineHTML, Tokens: util.StrToBytes(gotoRef)}
+			lc.InsertAfter(link)
+		}
+		defRenderer.RenderingFootnotes = true
+		defContent := defRenderer.Render()
+		buf.Write(defContent)
+		buf.WriteString("</li>\n")
+	}
+	buf.WriteString("</ol></div>")
+	return buf.Bytes()
+}
+
+func (r *HtmlRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.RenderingFootnotes {
+		return ast.WalkContinue
+	}
+	var found bool
+	for _, n := range r.FootnotesDefs {
+		if bytes.EqualFold(node.Tokens, n.Tokens) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		r.FootnotesDefs = append(r.FootnotesDefs, node)
+	}
+	return ast.WalkStop
 }
 
 func (r *HtmlRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
