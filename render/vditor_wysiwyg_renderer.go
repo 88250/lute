@@ -28,7 +28,6 @@ import (
 // VditorRenderer 描述了 Vditor WYSIWYG DOM 渲染器。
 type VditorRenderer struct {
 	*BaseRenderer
-	needRenderFootnotesDef bool
 }
 
 // NewVditorRenderer 创建一个 Vditor WYSIWYG DOM 渲染器。
@@ -101,6 +100,7 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.RendererFuncs[ast.NodeFootnotesDefBlock] = ret.renderFootnotesDefBlock
 	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
@@ -122,7 +122,7 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 
 func (r *VditorRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
+	if 1 > len(r.Tree.Context.LinkRefDefs) || r.RenderingFootnotes {
 		return
 	}
 
@@ -212,25 +212,6 @@ func (r *VditorRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) as
 	return ast.WalkContinue
 }
 
-func (r *VditorRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
-	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
-	r.WriteString("<ol data-type=\"footnotes-defs-ol\">")
-	for _, def := range r.FootnotesDefs {
-		r.WriteString("<li data-type=\"footnotes-li\" data-marker=\"" + string(def.Tokens) + "\">")
-		tree := &parse.Tree{Name: "", Context: context}
-		tree.Context.Tree = tree
-		tree.Root = &ast.Node{Type: ast.NodeDocument}
-		tree.Root.AppendChild(def)
-		defRenderer := NewVditorRenderer(tree)
-		defRenderer.needRenderFootnotesDef = true
-		defContent := defRenderer.Render()
-		r.Write(defContent)
-		r.WriteString("</li>")
-	}
-	r.WriteString("</ol></div>")
-	return r.Writer.Bytes()
-}
-
 func (r *VditorRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	previousNodeText := node.PreviousNodeText()
 	previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
@@ -295,11 +276,29 @@ func (r *VditorRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus
 	return ast.WalkStop
 }
 
-func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.needRenderFootnotesDef {
-		return ast.WalkStop
+func (r *VditorRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
+		r.WriteString("<ol data-type=\"footnotes-defs-ol\">")
+	} else {
+		r.WriteString("</ol></div>")
 	}
 	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.RenderingFootnotes {
+		return ast.WalkContinue
+	}
+
+	r.WriteString("<li data-type=\"footnotes-li\" data-marker=\"" + string(node.Tokens) + "\">")
+	for c := node.FirstChild; nil != c; c = c.Next {
+		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
+			return r.RendererFuncs[n.Type](n, entering)
+		})
+	}
+	r.WriteString("</li>")
+	return ast.WalkStop
 }
 
 func (r *VditorRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
