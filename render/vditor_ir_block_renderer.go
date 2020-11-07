@@ -459,7 +459,7 @@ func (r *VditorIRBlockRenderer) renderFootnotesDef(node *ast.Node, entering bool
 	}
 
 	r.WriteString("<div data-type=\"footnotes-def\">")
-	r.WriteString("[" + string(node.Tokens) + "]: ")
+	r.WriteString("<span>[" + string(node.Tokens) + "]</span>: ")
 	for c := node.FirstChild; nil != c; c = c.Next {
 		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
 			return r.RendererFuncs[n.Type](n, entering)
