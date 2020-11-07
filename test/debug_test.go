@@ -17,18 +17,18 @@ import (
 )
 
 var debugTests = []parseTest{
-	//
-	//// 表格解析异常 https://github.com/88250/lute/issues/52
-	//{"50", "foo\nname | age |\n---- | ---\n\nbar", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>name</th>\n<th>age</th>\n</tr>\n</thead>\n</table>\n<p>bar</p>\n"},
-	//{"49", "foo\n| bar |\n| --- |", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>bar</th>\n</tr>\n</thead>\n</table>\n"},
-	//
-	//// 自动链接渲染问题 https://github.com/88250/lute/issues/41
-	//{"48", "中 https://foo bar\n", "<p>中 https://foo bar</p>\n"},
-	//{"47", "https://中 bar\n", "<p>https://中 bar</p>\n"},
-	//{"46", "foo https://” bar\n", "<p>foo https://” bar</p>\n"},
-	//
-	//{"45", "*~foo~*bar\n", "<p><em><del>foo</del></em>bar</p>\n"},
-	//{"44", "~~foo~\n", "<p>~~foo~</p>\n"},
+
+	// 表格解析异常 https://github.com/88250/lute/issues/52
+	{"50", "foo\nname | age |\n---- | ---\n\nbar", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>name</th>\n<th>age</th>\n</tr>\n</thead>\n</table>\n<p>bar</p>\n"},
+	{"49", "foo\n| bar |\n| --- |", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>bar</th>\n</tr>\n</thead>\n</table>\n"},
+
+	// 自动链接渲染问题 https://github.com/88250/lute/issues/41
+	{"48", "中 https://foo bar\n", "<p>中 https://foo bar</p>\n"},
+	{"47", "https://中 bar\n", "<p>https://中 bar</p>\n"},
+	{"46", "foo https://” bar\n", "<p>foo https://” bar</p>\n"},
+
+	{"45", "*~foo~*bar\n", "<p><em><del>foo</del></em>bar</p>\n"},
+	{"44", "~~foo~\n", "<p>~~foo~</p>\n"},
 	{"43", "1. [x]\n2. [x] foo\n", "<ol>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ol>\n"},
 	{"42", "* [x]\n* [x] foo\n", "<ul>\n<li>[x]</li>\n<li class=\"vditor-task\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
 	{"41", "f</\n", "<p>f&lt;/</p>\n"},
