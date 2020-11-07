@@ -26,7 +26,6 @@ import (
 // VditorIRRenderer 描述了 Vditor Instant-Rendering DOM 渲染器。
 type VditorIRRenderer struct {
 	*BaseRenderer
-	needRenderFootnotesDef bool
 }
 
 // NewVditorIRRenderer 创建一个 Vditor Instant-Rendering DOM 渲染器。
@@ -99,6 +98,7 @@ func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
 	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.RendererFuncs[ast.NodeFootnotesDefBlock] = ret.renderFootnotesDefBlock
 	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
@@ -120,7 +120,7 @@ func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
 
 func (r *VditorIRRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
+	if 1 > len(r.Tree.Context.LinkRefDefs) || r.RenderingFootnotes {
 		return
 	}
 
@@ -229,29 +229,6 @@ func (r *VditorIRRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) 
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
-	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
-	for _, def := range r.FootnotesDefs {
-		r.WriteString("<div data-type=\"footnotes-def\">")
-		tree := &parse.Tree{Name: "", Context: context}
-		tree.Context.Tree = tree
-		tree.Root = &ast.Node{Type: ast.NodeDocument}
-		tree.Root.AppendChild(def)
-		defRenderer := NewVditorIRRenderer(tree)
-		if nil != def.FirstChild {
-			def.FirstChild.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
-		} else {
-			def.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
-		}
-		defRenderer.needRenderFootnotesDef = true
-		defContent := defRenderer.Render()
-		r.Write(defContent)
-		r.WriteString("</div>")
-	}
-	r.WriteString("</div>")
-	return r.Writer.Bytes()
-}
-
 func (r *VditorIRRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderSpanNode(node)
 	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "html-entity"}}, false)
@@ -307,11 +284,29 @@ func (r *VditorIRRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkStop
 }
 
-func (r *VditorIRRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.needRenderFootnotesDef {
-		return ast.WalkStop
+func (r *VditorIRRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
+	} else {
+		r.WriteString("</div>")
 	}
 	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.RenderingFootnotes {
+		return ast.WalkContinue
+	}
+
+	r.WriteString("<div data-type=\"footnotes-def\">")
+	r.WriteString("[" + string(node.Tokens) + "]: ")
+	for c := node.FirstChild; nil != c; c = c.Next {
+		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
+			return r.RendererFuncs[n.Type](n, entering)
+		})
+	}
+	r.WriteString("</div>")
+	return ast.WalkStop
 }
 
 func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {

@@ -291,6 +291,10 @@ func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.W
 		return ast.WalkContinue
 	}
 
+	if nil != node.Previous && bytes.EqualFold(node.Previous.Tokens, node.Tokens) {
+		return ast.WalkStop
+	}
+
 	r.WriteString("<li data-type=\"footnotes-li\" data-marker=\"" + string(node.Tokens) + "\">")
 	for c := node.FirstChild; nil != c; c = c.Next {
 		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {

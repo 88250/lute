@@ -100,6 +100,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.RendererFuncs[ast.NodeFootnotesDefBlock] = ret.renderFootnotesDefBlock
 	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
@@ -134,7 +135,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 
 func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	output = r.render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) {
+	if 1 > len(r.Tree.Context.LinkRefDefs) || r.RenderingFootnotes {
 		return
 	}
 
@@ -388,28 +389,6 @@ func (r *VditorIRBlockRenderer) renderYamlFrontMatter(node *ast.Node, entering b
 	return ast.WalkContinue
 }
 
-func (r *VditorIRBlockRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
-	r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
-	for _, def := range r.FootnotesDefs {
-		r.WriteString("<div data-type=\"footnotes-def\">")
-		tree := &parse.Tree{Name: "", Context: context}
-		tree.Context.Tree = tree
-		tree.Root = &ast.Node{Type: ast.NodeDocument}
-		tree.Root.AppendChild(def)
-		defRenderer := NewVditorIRBlockRenderer(tree)
-		if nil != def.FirstChild {
-			def.FirstChild.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
-		} else {
-			def.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("[" + string(def.Tokens) + "]: ")})
-		}
-		defContent := defRenderer.Render()
-		r.Write(defContent)
-		r.WriteString("</div>")
-	}
-	r.WriteString("</div>")
-	return r.Writer.Bytes()
-}
-
 func (r *VditorIRBlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	r.renderSpanNode(node)
 	r.tag("code", [][]string{{"data-newline", "1"}, {"class", "vditor-ir__marker vditor-ir__marker--pre"}, {"data-type", "html-entity"}}, false)
@@ -465,9 +444,29 @@ func (r *VditorIRBlockRenderer) renderToC(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkStop
 }
 
-func (r *VditorIRBlockRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	// TODO: render fn def
+func (r *VditorIRBlockRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
+	} else {
+		r.WriteString("</div>")
+	}
 	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.RenderingFootnotes {
+		return ast.WalkContinue
+	}
+
+	r.WriteString("<div data-type=\"footnotes-def\">")
+	r.WriteString("[" + string(node.Tokens) + "]: ")
+	for c := node.FirstChild; nil != c; c = c.Next {
+		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
+			return r.RendererFuncs[n.Type](n, entering)
+		})
+	}
+	r.WriteString("</div>")
+	return ast.WalkStop
 }
 
 func (r *VditorIRBlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {

@@ -26,9 +26,8 @@ import (
 // VditorSVRenderer 描述了 Vditor Split-View DOM 渲染器。
 type VditorSVRenderer struct {
 	*BaseRenderer
-	nodeWriterStack        []*bytes.Buffer // 节点输出缓冲栈
-	needRenderFootnotesDef bool
-	LastOut                []byte // 最新输出的 newline 长度个字节
+	nodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
+	LastOut         []byte          // 最新输出的 newline 长度个字节
 }
 
 var NewlineSV = []byte("<span data-type=\"newline\"><br /><span style=\"display: none\">\n</span></span>")
@@ -138,6 +137,7 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.RendererFuncs[ast.NodeFootnotesDefBlock] = ret.renderFootnotesDefBlock
 	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
 	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
@@ -159,7 +159,7 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 
 func (r *VditorSVRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) || r.needRenderFootnotesDef {
+	if 1 > len(r.Tree.Context.LinkRefDefs) || r.RenderingFootnotes {
 		return
 	}
 
@@ -240,7 +240,6 @@ func (r *VditorSVRenderer) renderMark2CloseMarker(node *ast.Node, entering bool)
 	return ast.WalkStop
 }
 
-
 func (r *VditorSVRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 	r.tag("span", [][]string{{"data-type", "yaml-front-matter-close-marker"}, {"class", "vditor-sv__marker"}}, false)
@@ -271,49 +270,6 @@ func (r *VditorSVRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, enter
 
 func (r *VditorSVRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
-}
-
-func (r *VditorSVRenderer) RenderFootnotesDefs(context *parse.Context) []byte {
-	for _, def := range r.FootnotesDefs {
-		tree := &parse.Tree{Name: "", Context: context}
-		tree.Context.Tree = tree
-		tree.Root = &ast.Node{Type: ast.NodeDocument}
-		tree.Root.AppendChild(def)
-		defRenderer := NewVditorSVRenderer(tree)
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
-		r.WriteByte(lex.ItemOpenBracket)
-		r.tag("/span", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}, {"data-type", "footnotes-link"}}, false)
-		r.Write(def.Tokens)
-		r.tag("/span", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
-		r.WriteByte(lex.ItemCloseBracket)
-		r.tag("/span", nil, false)
-		r.WriteString("<span>: </span>")
-		defRenderer.needRenderFootnotesDef = true
-		defContent := defRenderer.Render()
-		defLines := &bytes.Buffer{}
-		indentSpacesStr := `<span data-type="padding">    </span>`
-		lines := bytes.Split(defContent, NewlineSV)
-		for i, line := range lines {
-			if 0 == len(line) {
-				if !bytes.HasSuffix(defLines.Bytes(), NewlineSV) {
-					defLines.Write(NewlineSV)
-				}
-				continue
-			}
-			if 0 < i {
-				defLines.WriteString(indentSpacesStr)
-			}
-			defLines.Write(line)
-			defLines.Write(NewlineSV)
-		}
-		r.Write(defLines.Bytes())
-		r.Newline()
-	}
-	r.Newline()
-	r.Write(NewlineSV)
-	return r.Writer.Bytes()
 }
 
 func (r *VditorSVRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
@@ -365,11 +321,32 @@ func (r *VditorSVRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkStop
 }
 
-func (r *VditorSVRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.needRenderFootnotesDef {
-		return ast.WalkStop
-	}
+func (r *VditorSVRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.RenderingFootnotes {
+		return ast.WalkContinue
+	}
+
+	r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+	r.WriteByte(lex.ItemOpenBracket)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}, {"data-type", "footnotes-link"}}, false)
+	r.Write(node.Tokens)
+	r.tag("/span", nil, false)
+	r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+	r.WriteByte(lex.ItemCloseBracket)
+	r.tag("/span", nil, false)
+	r.WriteString("<span>: </span>")
+	for c := node.FirstChild; nil != c; c = c.Next {
+		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
+			// indentSpacesStr := `<span data-type="padding">    </span>`
+			return r.RendererFuncs[n.Type](n, entering)
+		})
+	}
+	return ast.WalkStop
 }
 
 func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
