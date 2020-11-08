@@ -51,13 +51,15 @@ func (r *TextBundleRenderer) Render() (output []byte, originalLink []string) {
 }
 
 func (r *TextBundleRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
-	dest := util.BytesToStr(node.Tokens)
-	for _, linkPrefix := range r.linkPrefixes {
-		if "" != linkPrefix && strings.HasPrefix(dest, linkPrefix) {
-			r.originalLink = append(r.originalLink, dest)
-			dest = "assets" + dest[len(linkPrefix):]
+	if entering {
+		dest := util.BytesToStr(node.Tokens)
+		for _, linkPrefix := range r.linkPrefixes {
+			if "" != linkPrefix && strings.HasPrefix(dest, linkPrefix) {
+				r.originalLink = append(r.originalLink, dest)
+				dest = "assets" + dest[len(linkPrefix):]
+			}
 		}
+		r.WriteString(dest)
 	}
-	r.WriteString(dest)
-	return ast.WalkStop
+	return ast.WalkContinue
 }
