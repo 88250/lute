@@ -28,22 +28,26 @@ type Walker func(n *Node, entering bool) WalkStatus
 
 // Walk 使用深度优先算法遍历指定的树节点 n。
 func Walk(n *Node, walker Walker) {
-	var status WalkStatus
+	walk(n, walker)
+}
 
+func walk(n *Node, walker Walker) (ret WalkStatus) {
 	// 进入节点
-	status = walker(n, true)
-	if status == WalkStop {
+	ret = walker(n, true)
+	if ret == WalkStop {
 		return
 	}
 
-	if status != WalkSkipChildren {
+	if ret != WalkSkipChildren {
 		// 递归遍历子节点
 		for c := n.FirstChild; nil != c; c = c.Next {
-			Walk(c, walker)
+			if ret = walk(c, walker); WalkStop == ret {
+				return WalkStop
+			}
 		}
 	}
 
 	// 离开节点
-	status = walker(n, false)
+	ret = walker(n, false)
 	return
 }

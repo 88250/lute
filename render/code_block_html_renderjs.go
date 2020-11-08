@@ -20,16 +20,20 @@ import (
 
 // renderCodeBlock 进行代码块 HTML 渲染，不实现语法高亮。
 func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if !node.IsFencedCodeBlock {
-		// 缩进代码块处理
-		r.Newline()
-		r.WriteString("<pre><code>")
-		r.Write(html.EscapeHTML(node.FirstChild.Tokens))
-		r.WriteString("</code></pre>")
-		r.Newline()
-		return ast.WalkStop
-	}
 	r.Newline()
+
+	if !node.IsFencedCodeBlock {
+		if entering {
+			// 缩进代码块处理
+			r.WriteString("<pre><code>")
+			r.Write(html.EscapeHTML(node.FirstChild.Tokens))
+			r.WriteString("</code></pre>")
+			r.Newline()
+			return ast.WalkSkipChildren
+		} else {
+			return ast.WalkContinue
+		}
+	}
 	return ast.WalkContinue
 }
 
@@ -59,9 +63,9 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			tokens = html.EscapeHTML(tokens)
 			r.Write(tokens)
 		}
-		return ast.WalkSkipChildren
+	} else {
+		r.WriteString("</code></pre>")
+		r.Newline()
 	}
-	r.WriteString("</code></pre>")
-	r.Newline()
-	return ast.WalkStop
+	return ast.WalkContinue
 }

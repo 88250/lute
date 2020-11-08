@@ -32,31 +32,34 @@ import (
 var languagesNoHighlight = []string{"mermaid", "echarts", "abc", "graphviz"}
 
 func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Newline()
+
 	if !node.IsFencedCodeBlock {
-		// 缩进代码块处理
-		r.Newline()
-		rendered := false
-		tokens := node.FirstChild.Tokens
-		if r.Option.CodeSyntaxHighlight {
-			rendered = highlightChroma(node, tokens, "", r)
-			if !rendered {
+		if entering {
+			// 缩进代码块处理
+			rendered := false
+			tokens := node.FirstChild.Tokens
+			if r.Option.CodeSyntaxHighlight {
+				rendered = highlightChroma(node, tokens, "", r)
+				if !rendered {
+					tokens = html.EscapeHTML(tokens)
+					r.Write(tokens)
+				}
+			} else {
+				var attrs [][]string
+				r.handleKramdownIAL(node)
+				attrs = append(attrs, node.KramdownIAL...)
+				r.tag("pre", attrs, false)
+				r.WriteString("<code>")
 				tokens = html.EscapeHTML(tokens)
 				r.Write(tokens)
 			}
+			r.WriteString("</code></pre>")
+			return ast.WalkSkipChildren
 		} else {
-			var attrs [][]string
-			r.handleKramdownIAL(node)
-			attrs = append(attrs, node.KramdownIAL...)
-			r.tag("pre", attrs, false)
-			r.WriteString("<code>")
-			tokens = html.EscapeHTML(tokens)
-			r.Write(tokens)
+			return ast.WalkContinue
 		}
-		r.WriteString("</code></pre>")
-		r.Newline()
-		return ast.WalkStop
 	}
-	r.Newline()
 	return ast.WalkContinue
 }
 
@@ -125,10 +128,10 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				r.Write(tokens)
 			}
 		}
-		return ast.WalkSkipChildren
+	} else {
+		r.WriteString("</code></pre>")
 	}
-	r.WriteString("</code></pre>")
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *HtmlRenderer) (rendered bool) {

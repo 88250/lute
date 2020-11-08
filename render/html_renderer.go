@@ -148,15 +148,19 @@ func (r *HtmlRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 }
 
 func (r *HtmlRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("em", nil, false)
-	r.WriteByte(lex.ItemCrosshatch)
-	return ast.WalkStop
+	if entering {
+		r.tag("em", nil, false)
+		r.WriteByte(lex.ItemCrosshatch)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteByte(lex.ItemCrosshatch)
-	r.tag("/em", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.WriteByte(lex.ItemCrosshatch)
+		r.tag("/em", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
@@ -173,23 +177,31 @@ func (r *HtmlRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus 
 }
 
 func (r *HtmlRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("mark", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("mark", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/mark", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/mark", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("mark", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("mark", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/mark", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/mark", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
@@ -238,7 +250,7 @@ func (r *HtmlRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.W
 		r.Write(html.EscapeHTML(node.Tokens))
 		r.WriteByte(lex.ItemDoublequote)
 	}
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
@@ -259,23 +271,29 @@ func (r *HtmlRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.Wal
 		r.Write(html.EscapeHTML(node.Tokens))
 		r.WriteByte(lex.ItemDoublequote)
 	}
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/div", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/div", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(html.EscapeHTML(node.Tokens))
-	return ast.WalkStop
+	if entering {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	attrs := [][]string{{"class", "vditor-yml-front-matter"}}
-	r.tag("div", attrs, false)
-	return ast.WalkStop
+	if entering {
+		attrs := [][]string{{"class", "vditor-yml-front-matter"}}
+		r.tag("div", attrs, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
@@ -284,13 +302,17 @@ func (r *HtmlRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.
 }
 
 func (r *HtmlRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(html.EscapeHTML(node.Tokens))
-	return ast.WalkStop
+	if entering {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(html.EscapeHTML(node.Tokens))
-	return ast.WalkStop
+	if entering {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
@@ -298,32 +320,36 @@ func (r *HtmlRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *HtmlRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	headings := r.headings()
-	length := len(headings)
-	if 1 > length {
-		return ast.WalkStop
+	if entering {
+		headings := r.headings()
+		length := len(headings)
+		if 1 > length {
+			return ast.WalkContinue
+		}
+		r.WriteString("<div class=\"vditor-toc\">")
+		for _, heading := range headings {
+			level := strconv.Itoa(heading.HeadingLevel)
+			spaces := (heading.HeadingLevel - 1) * 2
+			r.WriteString(strings.Repeat("&emsp;", spaces))
+			r.WriteString("<span class=\"toc-h" + level + "\">")
+			r.WriteString("<a class=\"toc-a\" href=\"#" + HeadingID(heading) + "\">" + heading.Text() + "</a></span><br>")
+		}
+		r.WriteString("</div>")
 	}
-	r.WriteString("<div class=\"vditor-toc\">")
-	for _, heading := range headings {
-		level := strconv.Itoa(heading.HeadingLevel)
-		spaces := (heading.HeadingLevel - 1) * 2
-		r.WriteString(strings.Repeat("&emsp;", spaces))
-		r.WriteString("<span class=\"toc-h" + level + "\">")
-		r.WriteString("<a class=\"toc-a\" href=\"#" + HeadingID(heading) + "\">" + heading.Text() + "</a></span><br>")
-	}
-	r.WriteString("</div>")
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
-	idxStr := strconv.Itoa(idx)
-	r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
-	r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
-	r.WriteString(idxStr)
-	r.tag("/a", nil, false)
-	r.tag("/sup", nil, false)
-	return ast.WalkStop
+	if entering {
+		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
+		idxStr := strconv.Itoa(idx)
+		r.tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
+		r.tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
+		r.WriteString(idxStr)
+		r.tag("/a", nil, false)
+		r.tag("/sup", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
@@ -366,43 +392,50 @@ func (r *HtmlRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.Wal
 	if r.RenderingFootnotes {
 		return ast.WalkContinue
 	}
-	var found bool
-	for _, n := range r.FootnotesDefs {
-		if bytes.EqualFold(node.Tokens, n.Tokens) {
-			found = true
-			break
+
+	if entering {
+		var found bool
+		for _, n := range r.FootnotesDefs {
+			if bytes.EqualFold(node.Tokens, n.Tokens) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			r.FootnotesDefs = append(r.FootnotesDefs, node)
 		}
 	}
-	if !found {
-		r.FootnotesDefs = append(r.FootnotesDefs, node)
-	}
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
-	return ast.WalkStop
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(node.Tokens)
-	return ast.WalkStop
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
@@ -410,19 +443,25 @@ func (r *HtmlRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus
 }
 
 func (r *HtmlRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/span", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(html.EscapeHTML(node.Tokens))
-	return ast.WalkStop
+	if entering {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	attrs := [][]string{{"class", "vditor-math"}}
-	r.tag("span", attrs, false)
-	return ast.WalkStop
+	if entering {
+		attrs := [][]string{{"class", "vditor-math"}}
+		r.tag("span", attrs, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
@@ -430,17 +469,21 @@ func (r *HtmlRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *HtmlRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/div", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/div", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(html.EscapeHTML(node.Tokens))
-	return ast.WalkStop
+	if entering {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
@@ -529,63 +572,73 @@ func (r *HtmlRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *HtmlRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("del", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("del", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/del", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/del", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("del", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("del", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/del", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/del", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
-	if r.Option.AutoSpace {
-		r.Space(node)
+	if entering {
+		if r.Option.AutoSpace {
+			r.Space(node)
+		}
+		r.Write(html.EscapeHTML(node.Tokens))
 	}
-	r.Write(html.EscapeHTML(node.Tokens))
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
@@ -650,23 +703,27 @@ func (r *HtmlRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 }
 
 func (r *HtmlRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Newline()
-	tokens := node.Tokens
-	if r.Option.Sanitize {
-		tokens = sanitize(tokens)
+	if entering {
+		r.Newline()
+		tokens := node.Tokens
+		if r.Option.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		r.Write(tokens)
+		r.Newline()
 	}
-	r.Write(tokens)
-	r.Newline()
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	tokens := node.Tokens
-	if r.Option.Sanitize {
-		tokens = sanitize(tokens)
+	if entering {
+		tokens := node.Tokens
+		if r.Option.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		r.Write(tokens)
 	}
-	r.Write(tokens)
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
@@ -693,17 +750,19 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *HtmlRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
-	if r.Option.AutoSpace {
-		r.Space(node)
+	if entering {
+		if r.Option.AutoSpace {
+			r.Space(node)
+		}
+		if r.Option.FixTermTypo {
+			r.FixTermTypo(node)
+		}
+		if r.Option.ChinesePunct {
+			r.ChinesePunct(node)
+		}
+		r.Write(html.EscapeHTML(node.Tokens))
 	}
-	if r.Option.FixTermTypo {
-		r.FixTermTypo(node)
-	}
-	if r.Option.ChinesePunct {
-		r.ChinesePunct(node)
-	}
-	r.Write(html.EscapeHTML(node.Tokens))
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
@@ -730,18 +789,24 @@ func (r *HtmlRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *HtmlRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("<code>")
-	return ast.WalkStop
+	if entering {
+		r.WriteString("<code>")
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Write(html.EscapeHTML(node.Tokens))
-	return ast.WalkStop
+	if entering {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.WriteString("</code>")
-	return ast.WalkStop
+	if entering {
+		r.WriteString("</code>")
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
@@ -754,23 +819,31 @@ func (r *HtmlRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *HtmlRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("em", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("em", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/em", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/em", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("em", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("em", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/em", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/em", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
@@ -783,23 +856,31 @@ func (r *HtmlRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatu
 }
 
 func (r *HtmlRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("strong", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("strong", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/strong", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/strong", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("strong", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("strong", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("/strong", nil, false)
-	return ast.WalkStop
+	if entering {
+		r.tag("/strong", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
@@ -817,7 +898,7 @@ func (r *HtmlRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *HtmlRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 var headingLevel = " 123456"
@@ -857,11 +938,11 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 }
 
 func (r *HtmlRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
@@ -920,10 +1001,12 @@ func (r *HtmlRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) a
 }
 
 func (r *HtmlRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.Newline()
-	r.tag("hr", nil, true)
-	r.Newline()
-	return ast.WalkStop
+	if entering {
+		r.Newline()
+		r.tag("hr", nil, true)
+		r.Newline()
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
@@ -931,17 +1014,19 @@ func (r *HtmlRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkSt
 		r.tag("br", nil, true)
 		r.Newline()
 	}
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if r.Option.SoftBreak2HardBreak {
-		r.tag("br", nil, true)
-		r.Newline()
-	} else {
-		r.Newline()
+	if entering {
+		if r.Option.SoftBreak2HardBreak {
+			r.tag("br", nil, true)
+			r.Newline()
+		} else {
+			r.Newline()
+		}
 	}
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) tag(name string, attrs [][]string, selfclosing bool) {
