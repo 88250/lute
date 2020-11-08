@@ -1314,6 +1314,7 @@ func (lute *Lute) domText(n *html.Node) string {
 	buf := &bytes.Buffer{}
 	if html.TextNode == n.Type {
 		buf.WriteString(n.Data)
+		return buf.String()
 	}
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
 		lute.domText0(child, buf)

@@ -464,10 +464,9 @@ func (r *VditorIRBlockRenderer) renderFootnotesDef(node *ast.Node, entering bool
 		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
 			return r.RendererFuncs[n.Type](n, entering)
 		})
-		return ast.WalkSkipChildren
 	}
 	r.WriteString("</div>")
-	return ast.WalkStop
+	return ast.WalkSkipChildren
 }
 
 func (r *VditorIRBlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
@@ -477,7 +476,7 @@ func (r *VditorIRBlockRenderer) renderFootnotesRef(node *ast.Node, entering bool
 		r.WriteString(parse.Zwsp)
 	}
 	idx, def := r.Tree.FindFootnotesDef(node.Tokens)
- 	idxStr := strconv.Itoa(idx)
+	idxStr := strconv.Itoa(idx)
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}
 	text := node.Text()
