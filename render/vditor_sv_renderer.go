@@ -345,6 +345,7 @@ func (r *VditorSVRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast
 			// indentSpacesStr := `<span data-type="padding">    </span>`
 			return r.RendererFuncs[n.Type](n, entering)
 		})
+		return ast.WalkSkipChildren
 	}
 	return ast.WalkStop
 }

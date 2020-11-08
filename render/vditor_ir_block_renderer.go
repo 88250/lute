@@ -464,6 +464,7 @@ func (r *VditorIRBlockRenderer) renderFootnotesDef(node *ast.Node, entering bool
 		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
 			return r.RendererFuncs[n.Type](n, entering)
 		})
+		return ast.WalkSkipChildren
 	}
 	r.WriteString("</div>")
 	return ast.WalkStop

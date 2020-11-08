@@ -300,6 +300,7 @@ func (r *VditorRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.W
 		ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
 			return r.RendererFuncs[n.Type](n, entering)
 		})
+		return ast.WalkSkipChildren
 	}
 	r.WriteString("</li>")
 	return ast.WalkStop

@@ -327,6 +327,7 @@ func (r *VditorIRRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast
 			})
 		}
 		r.WriteString("</div>")
+		return ast.WalkSkipChildren
 	}
 	return ast.WalkContinue
 }
