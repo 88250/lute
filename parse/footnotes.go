@@ -34,8 +34,8 @@ func (t *Tree) FindFootnotesDef(label []byte) (pos int, def *ast.Node) {
 		if !entering || ast.NodeFootnotesDef != n.Type {
 			return ast.WalkContinue
 		}
-		pos++
 		if bytes.EqualFold(n.Tokens, label) {
+			pos++
 			def = n
 			return ast.WalkStop
 		}
