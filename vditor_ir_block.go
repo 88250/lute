@@ -825,9 +825,16 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild {
 			break
 		}
+
+		text := lute.domText(n)
 		if "footnotes-ref" == dataType {
-			node.Type = ast.NodeText
-			node.Tokens = []byte(lute.domText(n))
+			node.Type = ast.NodeFootnotesRef
+			node.Tokens = []byte(text[1 : len(text)-1])
+			tree.Context.Tip.AppendChild(node)
+		} else {
+			node.Type = ast.NodeInlineHTML
+			text := lute.domText(n)
+			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 		}
 		return
