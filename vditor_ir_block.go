@@ -263,6 +263,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			return
 		} else if "footnotes-block" == dataType {
+			footnotesBlock := &ast.Node{Type: ast.NodeFootnotesDefBlock}
+			tree.Context.Tip.AppendChild(footnotesBlock)
+			tree.Context.Tip = footnotesBlock
+			defer tree.Context.ParentTip()
 			for def := n.FirstChild; nil != def; def = def.NextSibling {
 				defNode := &ast.Node{Type: ast.NodeFootnotesDef}
 				originalHTML := &bytes.Buffer{}
@@ -277,9 +281,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 							defNode.AppendChild(c)
 						}
 						defNode.Tokens = subTree.Root.Tokens
-						tree.Context.Tip.AppendChild(defNode)
+						footnotesBlock.AppendChild(defNode)
 					} else {
-						tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(subTree.Root.Text())})
+						footnotesBlock.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(subTree.Root.Text())})
 					}
 				}
 			}
