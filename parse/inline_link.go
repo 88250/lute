@@ -109,7 +109,6 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 				openParens--
 				if 1 > openParens {
 					if lex.ItemOpenParen == destination[0] {
-						// TODO: 需要重写边界判断
 						destination = destination[1:]
 					}
 					destination = destination[:len(destination)-1]

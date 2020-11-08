@@ -242,7 +242,6 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			// [text][] 格式，将 text 视为 label 进行解析
 			start := opener.index
 			if lex.ItemOpenBracket == ctx.tokens[start] {
-				// TODO: 链接引用定义 key 还是包括方括号好些 [xxx]
 				start++
 			}
 			reflabel = ctx.tokens[start : startPos-1]

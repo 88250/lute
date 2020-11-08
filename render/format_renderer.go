@@ -631,7 +631,7 @@ func (r *FormatRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 			} else {
 				r.WriteString("[" + util.BytesToStr(text) + "][" + util.BytesToStr(node.LinkRefLabel) + "]")
 			}
-			return ast.WalkContinue
+			return ast.WalkSkipChildren
 		}
 	} else {
 		r.LinkTextAutoSpaceNext(node)
@@ -914,19 +914,19 @@ func (r *FormatRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool
 func (r *FormatRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-	}
-	if !node.IsFencedCodeBlock {
-		r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
-		r.WriteByte(lex.ItemNewline)
-		r.Write(node.FirstChild.Tokens)
-		r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
-		r.Newline()
-		if !r.isLastNode(r.Tree.Root, node) {
-			if r.withoutKramdownIAL(node) {
-				r.WriteByte(lex.ItemNewline)
+		if !node.IsFencedCodeBlock {
+			r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
+			r.WriteByte(lex.ItemNewline)
+			r.Write(node.FirstChild.Tokens)
+			r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
+			r.Newline()
+			if !r.isLastNode(r.Tree.Root, node) {
+				if r.withoutKramdownIAL(node) {
+					r.WriteByte(lex.ItemNewline)
+				}
 			}
+			return ast.WalkSkipChildren
 		}
-		return ast.WalkSkipChildren
 	}
 	return ast.WalkContinue
 }

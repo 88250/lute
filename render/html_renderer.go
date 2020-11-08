@@ -389,20 +389,19 @@ func (r *HtmlRenderer) RenderFootnotes() []byte {
 }
 
 func (r *HtmlRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if r.RenderingFootnotes {
-		return ast.WalkContinue
-	}
-
 	if entering {
-		var found bool
-		for _, n := range r.FootnotesDefs {
-			if bytes.EqualFold(node.Tokens, n.Tokens) {
-				found = true
-				break
+		if !r.RenderingFootnotes {
+			var found bool
+			for _, n := range r.FootnotesDefs {
+				if bytes.EqualFold(node.Tokens, n.Tokens) {
+					found = true
+					break
+				}
 			}
-		}
-		if !found {
-			r.FootnotesDefs = append(r.FootnotesDefs, node)
+			if !found {
+				r.FootnotesDefs = append(r.FootnotesDefs, node)
+			}
+			return ast.WalkSkipChildren
 		}
 	}
 	return ast.WalkContinue

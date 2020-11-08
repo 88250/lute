@@ -4,8 +4,11 @@ const lute = Lute.New()
 
 const renderers = {
   renderText: (node, entering) => {
-    console.log("    start render text")
-    return [node.Text() + " via Lute", Lute.WalkStop]
+    if (entering) {
+      console.log("    render text")
+      return [node.Text() + " via Lute", Lute.WalkContinue]
+    }
+    return ["", Lute.WalkContinue]
   },
   renderStrong: (node, entering) => {
     entering ? console.log("    start render strong") : console.log("    end render strong")

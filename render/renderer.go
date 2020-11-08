@@ -75,9 +75,8 @@ func (r *BaseRenderer) Render() (output []byte) {
 		if nil == render {
 			if nil != r.DefaultRendererFunc {
 				return r.DefaultRendererFunc(n, entering)
-			} else {
-				return r.renderDefault(n, entering)
 			}
+			return r.renderDefault(n, entering)
 		}
 		return render(n, entering)
 	})

@@ -238,7 +238,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	dataType := lute.domAttrValue(n, "data-type")
 
 	if atom.Div == n.DataAtom {
-		// TODO: 细化节点 https://github.com/siyuan-note/siyuan-src/issues/27
 		if "link-ref-defs-block" == dataType {
 			text := lute.domText(n)
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
@@ -415,12 +414,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			marker := lute.domText(n.FirstChild)
 			node.HeadingLevel = bytes.Count([]byte(marker), []byte("#"))
 		} else {
-			if "" == strings.TrimSpace(strings.ReplaceAll(lute.domText(n.LastChild), util.Caret, "")) {
+			if n.FirstChild == n.LastChild || "" == strings.TrimSpace(strings.ReplaceAll(lute.domText(n.LastChild), util.Caret, ""))  {
 				node.Type = ast.NodeText
 				node.Tokens = []byte(text)
 				tree.Context.Tip.AppendChild(node)
 				tree.Context.Tip = node
-				break
+				return
 			}
 
 			if "=" == marker {
