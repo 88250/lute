@@ -543,7 +543,9 @@ func (r *VditorRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.
 }
 
 func (r *VditorRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	r.tag("s", [][]string{{"data-marker", "~"}}, false)
+	if entering {
+		r.tag("s", [][]string{{"data-marker", "~"}}, false)
+	}
 	return ast.WalkContinue
 }
 
@@ -688,8 +690,8 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 }
 
 func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		if 3 == node.LinkType {
+	if 3 == node.LinkType {
+		if entering {
 			previousNodeText := node.PreviousNodeText()
 			previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
 			if "" == previousNodeText {
@@ -702,9 +704,13 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 			r.WriteString(text)
 			r.tag("/span", nil, false)
 			r.WriteString(parse.Zwsp)
+			return ast.WalkSkipChildren
+		} else {
 			return ast.WalkContinue
 		}
+	}
 
+	if entering {
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
 		destTokens = r.Tree.Context.LinkPath(destTokens)
