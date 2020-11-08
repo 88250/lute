@@ -82,23 +82,31 @@ func (r *EChartsJSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bo
 }
 
 func (r *EChartsJSONRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Mark\nmark", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Mark\nmark", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("BlockQueryEmbed\n!{{script}}", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("BlockQueryEmbed\n!{{script}}", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("BlockEmbed\n!((id))", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("BlockEmbed\n!((id))", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("BlockRef\n((id))", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("BlockRef\n((id))", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {
@@ -106,32 +114,42 @@ func (r *EChartsJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.Walk
 }
 
 func (r *EChartsJSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Front Matter\nYAML", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Front Matter\nYAML", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("HTML Entity\nspan", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("HTML Entity\nspan", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Blackslash\ndiv", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Blackslash\ndiv", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("ToC\ndiv", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("ToC\ndiv", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Footnotes Ref\ndiv", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Footnotes Ref\ndiv", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
@@ -147,27 +165,35 @@ func (r *EChartsJSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) 
 }
 
 func (r *EChartsJSONRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Inline Math\nspan", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Inline Math\nspan", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Math Block\ndiv", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Math Block\ndiv", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Emoji Img\n", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Emoji Img\n", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Emoji Unicode\n", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Emoji Unicode\n", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkStop
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
@@ -175,28 +201,38 @@ func (r *EChartsJSONRenderer) renderEmoji(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *EChartsJSONRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Table Cell\ntd", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Table Cell\ntd", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Table Row\ntr", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Table Row\ntr", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Table Head\nthead", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Table Head\nthead", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Table\ntable", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Table\ntable", node)
+	}
+	return ast.WalkContinue
 }
 
 func (r *EChartsJSONRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Strikethrough\ndel", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Strikethrough\ndel", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
@@ -224,13 +260,17 @@ func (r *EChartsJSONRenderer) renderLink(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *EChartsJSONRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("HTML Block\n", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("HTML Block\n", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Inline HTML\n", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Inline HTML\n", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
@@ -260,21 +300,23 @@ func (r *EChartsJSONRenderer) renderParagraph(node *ast.Node, entering bool) ast
 }
 
 func (r *EChartsJSONRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
-	text := util.BytesToStr(node.Tokens)
-	var i int
-	summary := ""
-	for _, r := range text {
-		i++
-		summary += string(r)
-		if 4 < i {
-			summary += "..."
-			break
+	if entering {
+		text := util.BytesToStr(node.Tokens)
+		var i int
+		summary := ""
+		for _, r := range text {
+			i++
+			summary += string(r)
+			if 4 < i {
+				summary += "..."
+				break
+			}
 		}
+		r.openObj()
+		r.val("Text\n"+summary, node)
+		r.closeObj(node)
 	}
-	r.openObj()
-	r.val("Text\n"+summary, node)
-	r.closeObj(node)
-	return ast.WalkStop
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
@@ -378,23 +420,31 @@ func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *ast.Node, entering 
 }
 
 func (r *EChartsJSONRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Thematic Break\nhr", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Thematic Break\nhr", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Hard Break\nbr", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Hard Break\nbr", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Soft Break\n", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Soft Break\n", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	r.leaf("Code Block\npre.code", node)
-	return ast.WalkStop
+	if entering {
+		r.leaf("Code Block\npre.code", node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *EChartsJSONRenderer) leaf(val string, node *ast.Node) {
