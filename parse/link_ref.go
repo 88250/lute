@@ -80,11 +80,24 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 	}
 
 	link := context.Tree.newLink(ast.NodeLink, label, destination, title, 1)
-	lowerCaseLabel := bytes.ToLower(label)
-	if _, ok := context.LinkRefDefs[util.BytesToStr(lowerCaseLabel)]; !ok {
-		context.LinkRefDefs[util.BytesToStr(lowerCaseLabel)] = link
-	}
+	def := &ast.Node{Type: ast.NodeLinkRefDef, Tokens: label}
+	def.AppendChild(link)
+	context.Tip.Parent.AppendChild(def)
 	return remains
+}
+
+func (t *Tree) FindLinkRefDefLink(label []byte) (link *ast.Node) {
+	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || ast.NodeLinkRefDef != n.Type {
+			return ast.WalkContinue
+		}
+		if bytes.EqualFold(n.Tokens, label) {
+			link = n.FirstChild
+			return ast.WalkStop
+		}
+		return ast.WalkContinue
+	})
+	return
 }
 
 func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, remains, title []byte) {

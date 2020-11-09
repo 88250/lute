@@ -25,6 +25,7 @@ type parseTest struct {
 
 var parseTests = []parseTest{
 
+	{"link ref node", "[foo]\n\n[foo]: bar", "<p><a href=\"bar\">foo</a></p>\n"},
 	{"details", `<details>
 <summary>foo</summary>
 

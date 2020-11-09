@@ -12,11 +12,10 @@ package parse
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"strconv"
-	"strings"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -263,14 +262,14 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 					if 0 < refsLen {
 						refId += ":" + strconv.Itoa(refsLen+1)
 					}
-					ref := &ast.Node{Type: ast.NodeFootnotesRef, Tokens: bytes.ToLower(reflabel), FootnotesRefId: refId, FootnotesRefLabel: reflabel}
+					ref := &ast.Node{Type: ast.NodeFootnotesRef, Tokens: reflabel, FootnotesRefId: refId, FootnotesRefLabel: reflabel}
 					footnotesDef.FootnotesRefs = append(footnotesDef.FootnotesRefs, ref)
 					return ref
 				}
 			}
 
-			// 查找链接引用
-			if link := t.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(reflabel))]; nil != link {
+			// 查找链接引用定义
+			if link := t.FindLinkRefDefLink(reflabel); nil != link {
 				dest = link.ChildByType(ast.NodeLinkDest).Tokens
 				titleNode := link.ChildByType(ast.NodeLinkTitle)
 				if nil != titleNode {
