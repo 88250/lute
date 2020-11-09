@@ -126,14 +126,14 @@ func (r *VditorRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.Wal
 		r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
 		dest := node.FirstChild.ChildByType(ast.NodeLinkDest).Tokens
 		destStr := util.BytesToStr(dest)
-		r.WriteString("[" + util.BytesToStr(node.LinkRefLabel) + "]:")
+		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]:")
 		if util.Caret != destStr {
 			r.WriteString(" ")
 		}
 		r.WriteString(destStr + "\n")
 		r.WriteString("</div>")
 	}
-	return ast.WalkContinue
+	return ast.WalkSkipChildren
 }
 
 func (r *VditorRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
