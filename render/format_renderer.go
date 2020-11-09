@@ -625,6 +625,11 @@ func (r *FormatRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 			}
 			return ast.WalkSkipChildren
 		}
+		if 1 == node.LinkType {
+			dest := node.ChildByType(ast.NodeLinkDest).Tokens
+			r.Write(dest)
+			return ast.WalkSkipChildren
+		}
 	} else {
 		r.LinkTextAutoSpaceNext(node)
 	}

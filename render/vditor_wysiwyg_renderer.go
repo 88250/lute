@@ -117,30 +117,23 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
 	return ret
 }
 
-func (r *VditorRenderer) Render() (output []byte) {
-	output = r.BaseRenderer.Render()
-	if r.RenderingFootnotes {
-		return
+func (r *VditorRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
+		dest := node.FirstChild.ChildByType(ast.NodeLinkDest).Tokens
+		destStr := util.BytesToStr(dest)
+		r.WriteString("[" + util.BytesToStr(node.LinkRefLabel) + "]:")
+		if util.Caret != destStr {
+			r.WriteString(" ")
+		}
+		r.WriteString(destStr + "\n")
+		r.WriteString("</div>")
 	}
-
-	// TODO 将链接引用定义添加到末尾
-	r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
-	//for _, node := range r.Tree.Context.LinkRefDefs {
-	//	label := node.LinkRefLabel
-	//	dest := node.ChildByType(ast.NodeLinkDest).Tokens
-	//	destStr := util.BytesToStr(dest)
-	//	r.WriteString("[" + util.BytesToStr(label) + "]:")
-	//	if util.Caret != destStr {
-	//		r.WriteString(" ")
-	//	}
-	//	r.WriteString(destStr + "\n")
-	//}
-	r.WriteString("</div>")
-	output = r.Writer.Bytes()
-	return
+	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
