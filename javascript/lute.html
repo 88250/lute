@@ -7,40 +7,45 @@
 <body>
 <script src="lute.min.js"></script>
 <script>
-    let lute = Lute.New();
-    // 支持重写渲染器 https://github.com/88250/lute/issues/5
-    let html2MdRenderer = {
-        renderLinkDest: function (node, entering) {
-            console.log('重写 LinkDest 节点', node.__internal_object__.typ, node.TokensStr(), entering);
-            return [node.TokensStr(), Lute.WalkStop]
-        },
-        renderBang: function (node, entering) {
-            console.log('重写 Bang 节点', node.TokensStr(), entering);
-            return ["!", Lute.WalkStop]
-        },
-    };
-    lute.SetJSRenderers({
-        "renderers": {
-            "HTML2Md": html2MdRenderer,
-        }
-    });
-
-    function onMarkdown(it) {
-        let result = lute.MarkdownStr("", it.value);
-        let output = result[1] ? result[1] : result[0];
-        document.getElementById('output').innerHTML = output;
-
-        console.log(lute.HTML2Md(output));
+  const lute = Lute.New();
+  const html2MdRenderer = {
+    renderLinkDest: function (node, entering) {
+      if (entering) {
+        console.log('重写 LinkDest 节点', node.__internal_object__.typ, node.TokensStr(), entering);
+        return [node.TokensStr(), Lute.WalkContinue]
+      } else {
+        return ["", Lute.WalkContinue]
+      }
+    },
+    renderBang: function (node, entering) {
+      if (entering) {
+        console.log('重写 Bang 节点', node.TokensStr(), entering);
+        return ["!", Lute.WalkContinue]
+      } else {
+        return ["", Lute.WalkContinue]
+      }
+    },
+  };
+  lute.SetJSRenderers({
+    "renderers": {
+      "HTML2Md": html2MdRenderer,
     }
+  });
+
+  function onMarkdown(it) {
+    const result = lute.MarkdownStr("", it.value);
+    console.log(result)
+    document.getElementById('output').innerHTML = result;
+
+    console.log(lute.HTML2Md(result));
+  }
 </script>
 
-<textarea id="input" rows="10" cols="150"
-          oninput="onMarkdown(this)">**Lute** - A structured markdown engine.</textarea>
+<textarea id="input" rows="10" cols="150" oninput="onMarkdown(this)">**Lute** - A structured markdown engine.</textarea>
 <div id="output"></div>
 <script>
-    let result = lute.MarkdownStr("", document.getElementById('input').value);
-    let output = result[1] ? result[1] : result[0];
-    document.getElementById('output').innerHTML = output;
+  const result = lute.MarkdownStr("", document.getElementById('input').value);
+  document.getElementById('output').innerHTML = result;
 </script>
 </body>
 </html>
