@@ -237,14 +237,48 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 
 	dataType := lute.domAttrValue(n, "data-type")
 
+	class := lute.domAttrValue(n, "class")
+	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
+	nodeID := lute.domAttrValue(n, "data-node-id")
+	node := &ast.Node{ID: nodeID, Type: ast.NodeText, Tokens: []byte(content)}
+	if "" == nodeID {
+		if "p" == dataType || "ul" == dataType || "ol" == dataType || "blockquote" == dataType ||
+			"math-block" == dataType || "code-block" == dataType || "table" == dataType || "h" == dataType ||
+			"link-ref-defs-block" == dataType || "footnotes-block" == dataType {
+			nodeID = ast.NewNodeID()
+		}
+	}
+	if "" != nodeID {
+		node.KramdownIAL = [][]string{{"id", nodeID}}
+		ialTokens := []byte("{: id=\"" + nodeID + "\"")
+		bookmark := lute.domAttrValue(n, "bookmark")
+		if "" != bookmark {
+			node.SetIALAttr("bookmark", bookmark)
+			ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
+		}
+		ialTokens = append(ialTokens, '}')
+		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
+		defer tree.Context.TipAppendChild(ial)
+	}
+
 	if atom.Div == n.DataAtom {
 		if "link-ref-defs-block" == dataType {
-			linkRefDef := &ast.Node{Type: ast.NodeLinkRefDef, }
-			tree.Context.Tip.AppendChild(linkRefDef)
-			for def := n.FirstChild; nil != def; def = def.NextSibling {
-				text := lute.domText(def)
+			text := lute.domText(n)
+			if !strings.HasPrefix(text, "[") {
 				subTree := parse.Parse("", []byte(text), lute.Options)
-				linkRefDef.AppendChild(subTree.Root.FirstChild.FirstChild)
+				tree.Context.Tip.AppendChild(subTree.Root.FirstChild)
+				return
+			}
+
+			defBlock := &ast.Node{Type: ast.NodeLinkRefDefBlock}
+			tree.Context.Tip.AppendChild(defBlock)
+			for def := n.FirstChild; nil != def; def = def.NextSibling {
+				text = lute.domText(def)
+				subTree := parse.Parse("", []byte(text), lute.Options)
+				child := subTree.Root.FirstChild.FirstChild
+				if ast.NodeLinkRefDef == child.Type {
+					defBlock.AppendChild(subTree.Root.FirstChild.FirstChild)
+				}
 			}
 			return
 		} else if "footnotes-def" == dataType {
@@ -294,29 +328,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
-	}
-
-	class := lute.domAttrValue(n, "class")
-	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
-	nodeID := lute.domAttrValue(n, "data-node-id")
-	node := &ast.Node{ID: nodeID, Type: ast.NodeText, Tokens: []byte(content)}
-	if "" == nodeID {
-		if "p" == dataType || "ul" == dataType || "ol" == dataType || "blockquote" == dataType ||
-			"math-block" == dataType || "code-block" == dataType || "table" == dataType || "h" == dataType {
-			nodeID = ast.NewNodeID()
-		}
-	}
-	if "" != nodeID {
-		node.KramdownIAL = [][]string{{"id", nodeID}}
-		ialTokens := []byte("{: id=\"" + nodeID + "\"")
-		bookmark := lute.domAttrValue(n, "bookmark")
-		if "" != bookmark {
-			node.SetIALAttr("bookmark", bookmark)
-			ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
-		}
-		ialTokens = append(ialTokens, '}')
-		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
-		defer tree.Context.TipAppendChild(ial)
 	}
 
 	switch n.DataAtom {

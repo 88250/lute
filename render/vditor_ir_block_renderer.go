@@ -148,11 +148,11 @@ func (r *VditorIRBlockRenderer) renderLinkRefDef(node *ast.Node, entering bool) 
 	if entering {
 		dest := node.FirstChild.ChildByType(ast.NodeLinkDest).Tokens
 		destStr := util.BytesToStr(dest)
-		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]:")
+		r.WriteString("<span><span>[" + util.BytesToStr(node.Tokens) + "]:")
 		if util.Caret != destStr {
-			r.WriteString(" ")
+			r.WriteString(" </span>")
 		}
-		r.WriteString(destStr + "\n")
+		r.WriteString(destStr + "\n</span>")
 	}
 	return ast.WalkSkipChildren
 }
