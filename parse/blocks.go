@@ -20,7 +20,6 @@ import (
 // parseBlocks 解析并生成块级节点。
 func (t *Tree) parseBlocks() {
 	t.Context.Tip = t.Root
-	t.Context.LinkRefDefs = map[string]*ast.Node{}
 	lines := 0
 	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {
 		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {

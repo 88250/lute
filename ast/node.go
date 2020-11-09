@@ -435,6 +435,7 @@ const (
 	NodeLinkTitle                 NodeType = 42 // 链接标题
 	NodeLinkSpace                 NodeType = 43 // 链接地址和链接标题之间的空格
 	NodeHTMLEntity                NodeType = 44 // HTML 实体
+	NodeLinkRefDef                NodeType = 45 // 链接引用定义 [label]:
 
 	// GFM
 

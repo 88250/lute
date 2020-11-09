@@ -135,22 +135,22 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 
 func (r *VditorIRBlockRenderer) Render() (output []byte) {
 	output = r.render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) || r.RenderingFootnotes {
+	if  r.RenderingFootnotes {
 		return
 	}
 
-	// 将链接引用定义添加到末尾
+	// TODO 将链接引用定义添加到末尾
 	r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
-	for _, node := range r.Tree.Context.LinkRefDefs {
-		label := node.LinkRefLabel
-		dest := node.ChildByType(ast.NodeLinkDest).Tokens
-		destStr := string(dest)
-		r.WriteString("[" + string(label) + "]:")
-		if util.Caret != destStr {
-			r.WriteString(" ")
-		}
-		r.WriteString(destStr + "\n")
-	}
+	//for _, node := range r.Tree.Context.LinkRefDefs {
+	//	label := node.LinkRefLabel
+	//	dest := node.ChildByType(ast.NodeLinkDest).Tokens
+	//	destStr := string(dest)
+	//	r.WriteString("[" + string(label) + "]:")
+	//	if util.Caret != destStr {
+	//		r.WriteString(" ")
+	//	}
+	//	r.WriteString(destStr + "\n")
+	//}
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return

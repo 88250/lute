@@ -122,22 +122,22 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 
 func (r *VditorRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) || r.RenderingFootnotes {
+	if r.RenderingFootnotes {
 		return
 	}
 
-	// 将链接引用定义添加到末尾
+	// TODO 将链接引用定义添加到末尾
 	r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
-	for _, node := range r.Tree.Context.LinkRefDefs {
-		label := node.LinkRefLabel
-		dest := node.ChildByType(ast.NodeLinkDest).Tokens
-		destStr := util.BytesToStr(dest)
-		r.WriteString("[" + util.BytesToStr(label) + "]:")
-		if util.Caret != destStr {
-			r.WriteString(" ")
-		}
-		r.WriteString(destStr + "\n")
-	}
+	//for _, node := range r.Tree.Context.LinkRefDefs {
+	//	label := node.LinkRefLabel
+	//	dest := node.ChildByType(ast.NodeLinkDest).Tokens
+	//	destStr := util.BytesToStr(dest)
+	//	r.WriteString("[" + util.BytesToStr(label) + "]:")
+	//	if util.Caret != destStr {
+	//		r.WriteString(" ")
+	//	}
+	//	r.WriteString(destStr + "\n")
+	//}
 	r.WriteString("</div>")
 	output = r.Writer.Bytes()
 	return
@@ -618,7 +618,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 				r.WriteString(parse.Zwsp)
 			}
 			r.WriteString("<img src=\"")
-			link := r.Tree.Context.LinkRefDefs[strings.ToLower(util.BytesToStr(node.LinkRefLabel))]
+			link := r.Tree.FindLinkRefDefLink(node.LinkRefLabel)
 			destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.Tree.Context.LinkPath(destTokens)
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)

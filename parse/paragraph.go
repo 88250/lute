@@ -28,7 +28,7 @@ func ParagraphContinue(p *ast.Node, context *Context) int {
 func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 	p.Tokens = lex.TrimWhitespace(p.Tokens)
 
-	// 尝试解析链接引用定义
+	// 解析链接引用定义
 	hasReferenceDefs := false
 	for tokens := p.Tokens; 0 < len(tokens) && lex.ItemOpenBracket == tokens[0]; tokens = p.Tokens {
 		if tokens = context.parseLinkRefDef(tokens); nil != tokens {

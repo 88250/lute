@@ -159,32 +159,32 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 
 func (r *VditorSVRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) || r.RenderingFootnotes {
+	if  r.RenderingFootnotes {
 		return
 	}
 
-	// 将链接引用定义添加到末尾
-	for _, node := range r.Tree.Context.LinkRefDefs {
-		label := node.LinkRefLabel
-		dest := node.ChildByType(ast.NodeLinkDest).Tokens
-		destStr := string(dest)
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
-		r.WriteByte(lex.ItemOpenBracket)
-		r.tag("/span", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}, {"data-type", "footnotes-link"}}, false)
-		r.WriteString(string(label))
-		r.tag("/span", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
-		r.WriteByte(lex.ItemCloseBracket)
-		r.tag("/span", nil, false)
-		r.WriteString("<span>:")
-		if util.Caret != destStr {
-			r.WriteString(" ")
-		}
-		r.WriteString("</span>")
-		r.WriteString(destStr)
-		r.Newline()
-	}
+	// TODO 将链接引用定义添加到末尾
+	//for _, node := range r.Tree.Context.LinkRefDefs {
+	//	label := node.LinkRefLabel
+	//	dest := node.ChildByType(ast.NodeLinkDest).Tokens
+	//	destStr := string(dest)
+	//	r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+	//	r.WriteByte(lex.ItemOpenBracket)
+	//	r.tag("/span", nil, false)
+	//	r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}, {"data-type", "footnotes-link"}}, false)
+	//	r.WriteString(string(label))
+	//	r.tag("/span", nil, false)
+	//	r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
+	//	r.WriteByte(lex.ItemCloseBracket)
+	//	r.tag("/span", nil, false)
+	//	r.WriteString("<span>:")
+	//	if util.Caret != destStr {
+	//		r.WriteString(" ")
+	//	}
+	//	r.WriteString("</span>")
+	//	r.WriteString(destStr)
+	//	r.Newline()
+	//}
 	r.Newline()
 	r.Write(NewlineSV)
 	output = r.Writer.Bytes()

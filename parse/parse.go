@@ -46,8 +46,6 @@ type Context struct {
 	Tree   *Tree    // 关联的语法树
 	Option *Options // 解析渲染选项
 
-	LinkRefDefs   map[string]*ast.Node // 链接引用定义集
-
 	Tip                                                               *ast.Node // 末梢节点
 	oldtip                                                            *ast.Node // 老的末梢节点
 	currentLine                                                       []byte    // 当前行

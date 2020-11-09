@@ -129,7 +129,17 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
 	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
+	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
 	return ret
+}
+
+func (r *FormatRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemOpenBracket)
+		r.Write(node.Tokens)
+		r.WriteString("]: ")
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
@@ -174,24 +184,6 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) Render() (output []byte) {
-	output = r.BaseRenderer.Render()
-	if 1 > len(r.Tree.Context.LinkRefDefs) {
-		return
-	}
-
-	buf := &bytes.Buffer{}
-	buf.WriteByte(lex.ItemNewline)
-	// 将链接引用定义添加到末尾
-	for _, node := range r.Tree.Context.LinkRefDefs {
-		label := node.LinkRefLabel
-		dest := node.ChildByType(ast.NodeLinkDest).Tokens
-		buf.WriteString("[" + util.BytesToStr(label) + "]: " + util.BytesToStr(dest) + "\n")
-	}
-	output = append(output, buf.Bytes()...)
-	return
 }
 
 func (r *FormatRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
