@@ -129,6 +129,7 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
 	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
+	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
 	return ret
 }
@@ -137,6 +138,10 @@ func (r *HtmlRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
 	output = append(output, r.RenderFootnotes()...)
 	return
+}
+
+func (r *HtmlRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
 }
 
 func (r *HtmlRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {

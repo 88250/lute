@@ -82,7 +82,12 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 	link := context.Tree.newLink(ast.NodeLink, label, destination, title, 1)
 	def := &ast.Node{Type: ast.NodeLinkRefDef, Tokens: label}
 	def.AppendChild(link)
-	context.Tip.Parent.AppendChild(def)
+	defBlock := context.Tip
+	if ast.NodeLinkRefDefBlock != defBlock.Type {
+		defBlock = &ast.Node{Type: ast.NodeLinkRefDefBlock}
+	}
+	defBlock.AppendChild(def)
+	context.Tip.Parent.AppendChild(defBlock)
 	return remains
 }
 

@@ -115,13 +115,22 @@ func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
 	return ret
 }
 
-func (r *VditorIRRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
+	} else {
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
 		dest := node.FirstChild.ChildByType(ast.NodeLinkDest).Tokens
 		destStr := util.BytesToStr(dest)
 		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]:")
@@ -129,7 +138,6 @@ func (r *VditorIRRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.W
 			r.WriteString(" ")
 		}
 		r.WriteString(destStr + "\n")
-		r.WriteString("</div>")
 	}
 	return ast.WalkSkipChildren
 }
