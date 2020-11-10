@@ -143,6 +143,8 @@ func (r *FormatRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.Wal
 		r.WriteByte(lex.ItemOpenBracket)
 		r.Write(node.Tokens)
 		r.WriteString("]: ")
+	} else {
+		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
 }

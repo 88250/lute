@@ -278,6 +278,8 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				child := subTree.Root.FirstChild.FirstChild
 				if ast.NodeLinkRefDef == child.Type {
 					defBlock.AppendChild(subTree.Root.FirstChild.FirstChild)
+				} else {
+					tree.Context.Tip.AppendChild(subTree.Root.FirstChild)
 				}
 			}
 			return

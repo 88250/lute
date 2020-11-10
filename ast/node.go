@@ -374,7 +374,7 @@ func (n *Node) CanContain(nodeType NodeType) bool {
 	case NodeFootnotesDefBlock:
 		return NodeFootnotesDef == nodeType
 	case NodeFootnotesDef:
-		return NodeFootnotesDef != nodeType // 脚注不能包含脚注
+		return NodeFootnotesDef != nodeType
 	}
 	return NodeListItem != nodeType
 }
