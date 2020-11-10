@@ -266,7 +266,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			text := lute.domText(n)
 			if !strings.HasPrefix(text, "[") {
 				subTree := parse.Parse("", []byte(text), lute.Options)
-				tree.Context.Tip.AppendChild(subTree.Root.FirstChild)
+				if nil != subTree.Root.FirstChild {
+					tree.Context.Tip.AppendChild(subTree.Root.FirstChild)
+				}
 				return
 			}
 
