@@ -92,6 +92,9 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 }
 
 func (t *Tree) FindLinkRefDefLink(label []byte) (link *ast.Node) {
+	if t.Context.Option.VditorIR || t.Context.Option.VditorSV || t.Context.Option.VditorWYSIWYG {
+		label = bytes.ReplaceAll(label, util.CaretTokens, nil)
+	}
 	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering || ast.NodeLinkRefDef != n.Type {
 			return ast.WalkContinue
