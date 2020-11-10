@@ -52,6 +52,8 @@ func (t *Tree) parseHeadingID(block *ast.Node, ctx *InlineContext) (ret *ast.Nod
 	}
 	id := content[curlyBracesStart+1 : curlyBracesEnd]
 	ctx.pos += curlyBracesEnd + 1
-	block.LastChild.Tokens = bytes.TrimRight(block.LastChild.Tokens, " ")
+	if nil != block.LastChild {
+		block.LastChild.Tokens = bytes.TrimRight(block.LastChild.Tokens, " ")
+	}
 	return &ast.Node{Type: ast.NodeHeadingID, Tokens: id}
 }
