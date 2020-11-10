@@ -262,7 +262,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 					if 0 < refsLen {
 						refId += ":" + strconv.Itoa(refsLen+1)
 					}
-					ref := &ast.Node{Type: ast.NodeFootnotesRef, Tokens: reflabel, FootnotesRefId: refId, FootnotesRefLabel: reflabel}
+					ref := &ast.Node{Type: ast.NodeFootnotesRef, Tokens: reflabel, FootnotesRefId: refId, FootnotesRefLabel: bytes.ReplaceAll(reflabel, util.CaretTokens, nil)}
 					footnotesDef.FootnotesRefs = append(footnotesDef.FootnotesRefs, ref)
 					return ref
 				}
