@@ -170,7 +170,7 @@ func (r *VditorSVRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.W
 		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
 		r.WriteByte(lex.ItemOpenBracket)
 		r.tag("/span", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}, {"data-type", "footnotes-link"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--link"}, {"data-type", "link-ref-defs-block"}}, false)
 		r.Write(node.Tokens)
 		r.tag("/span", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-sv__marker--bracket"}}, false)
