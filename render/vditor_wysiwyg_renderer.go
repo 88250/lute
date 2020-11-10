@@ -340,7 +340,7 @@ func (r *VditorRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.W
 		idxStr := strconv.Itoa(idx)
 		label := def.Text()
 		r.tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)},
-			{"class", "b3-tooltips b3-tooltips__s"}, {"aria-label", SubStr(html.EscapeString(label), 24)}}, false)
+			{"class", "vditor-tooltipped vditor-tooltipped__s"}, {"aria-label", SubStr(html.EscapeString(label), 24)}}, false)
 		r.WriteString(idxStr)
 		r.WriteString("</sup>" + parse.Zwsp)
 	}
