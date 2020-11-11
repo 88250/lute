@@ -119,6 +119,8 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
 	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
 	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
+	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
 	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
 	ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
 	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
@@ -689,6 +691,31 @@ func (r *VditorSVRenderer) renderOpenParen(node *ast.Node, entering bool) ast.Wa
 
 		r.tag("span", [][]string{{"class", "vditor-sv__marker--paren"}}, false)
 		r.WriteByte(lex.ItemOpenParen)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderCloseBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+			return ast.WalkContinue
+		}
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--brace"}}, false)
+		r.WriteByte(lex.ItemCloseBrace)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderOpenBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if ast.NodeLink == node.Parent.Type && 3 == node.Parent.LinkType {
+			return ast.WalkContinue
+		}
+
+		r.tag("span", [][]string{{"class", "vditor-sv__marker--brace"}}, false)
+		r.WriteByte(lex.ItemOpenBrace)
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue

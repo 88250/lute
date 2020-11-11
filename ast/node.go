@@ -538,7 +538,9 @@ const (
 	// 内容块查询嵌入（Block Query Embed） https://github.com/88250/lute/issues/96
 
 	NodeBlockQueryEmbed       NodeType = 465 // 内容块查询嵌入节点
-	NodeBlockQueryEmbedScript NodeType = 466 // 内容块查询嵌入脚本
+	NodeOpenBrace             NodeType = 466 // {
+	NodeCloseBrace            NodeType = 467 // }
+	NodeBlockQueryEmbedScript NodeType = 468 // 内容块查询嵌入脚本
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

@@ -50,7 +50,7 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 			n = t.parseBang(ctx)
 		case lex.ItemDollar:
 			n = t.parseInlineMath(ctx)
-		case lex.ItemOpenCurlyBrace:
+		case lex.ItemOpenBrace:
 			n = t.parseHeadingID(block, ctx)
 		case lex.ItemOpenParen:
 			n = t.parseBlockRef(ctx)

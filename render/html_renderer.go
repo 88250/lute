@@ -81,6 +81,8 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
 	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
 	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
+	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
 	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
 	ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
 	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
@@ -627,6 +629,14 @@ func (r *HtmlRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkSta
 		}
 		r.Write(html.EscapeHTML(node.Tokens))
 	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderCloseBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderOpenBrace(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 

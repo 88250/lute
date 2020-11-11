@@ -81,6 +81,8 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
 	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
 	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
+	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
 	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
 	ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
 	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
@@ -591,6 +593,20 @@ func (r *FormatRenderer) renderCloseParen(node *ast.Node, entering bool) ast.Wal
 func (r *FormatRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemOpenParen)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderCloseBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemCloseBrace)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderOpenBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemOpenBrace)
 	}
 	return ast.WalkContinue
 }

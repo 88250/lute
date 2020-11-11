@@ -82,6 +82,8 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
 	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
 	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
+	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
 	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
 	ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
 	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
@@ -595,6 +597,14 @@ func (r *VditorRenderer) renderCloseParen(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderCloseBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderOpenBrace(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 

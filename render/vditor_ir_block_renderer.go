@@ -82,6 +82,8 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
 	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
 	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
+	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
 	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
 	ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
 	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
@@ -971,6 +973,24 @@ func (r *VditorIRBlockRenderer) renderOpenParen(node *ast.Node, entering bool) a
 
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--paren"}}, false)
 		r.WriteByte(lex.ItemOpenParen)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) renderCloseBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--brace"}}, false)
+		r.WriteByte(lex.ItemCloseBrace)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) renderOpenBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--brace"}}, false)
+		r.WriteByte(lex.ItemOpenBrace)
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue

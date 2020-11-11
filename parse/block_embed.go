@@ -138,15 +138,24 @@ func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 	}
 
 	tokens = tokens[3:]
-	tokens = tokens[:len(tokens)-3] // 去掉结尾换行和 }}
 	tokens = bytes.TrimSpace(tokens)
+	if !bytes.HasSuffix(tokens, []byte("}}")) {
+		return
+	}
+
+	tokens = tokens[:len(tokens)-2] // 去掉结尾 }}
 	script := tokens
 
 	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
 	tokens = bytes.TrimSuffix(tokens, util.CaretTokens)
 
 	ret = &ast.Node{Type: ast.NodeBlockQueryEmbed}
+	ret.AppendChild(&ast.Node{Type: ast.NodeBang})
+	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
+	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockQueryEmbedScript, Tokens: script})
+	ret.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
+	ret.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
 	if endCaret || startCaret {
 		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
 	}
