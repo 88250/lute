@@ -11,6 +11,8 @@
 package parse
 
 import (
+	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 )
@@ -158,6 +160,12 @@ var blockStarts = []blockStartFunc{
 
 		if lex.ItemLess != lex.Peek(t.Context.currentLine, t.Context.nextNonspace) {
 			return 0
+		}
+
+		if t.Context.Option.VditorWYSIWYG {
+			if bytes.Contains(t.Context.currentLine, []byte("vditor-comment")) {
+				return 0
+			}
 		}
 
 		tokens := t.Context.currentLine[t.Context.nextNonspace:]

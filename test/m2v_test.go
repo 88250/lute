@@ -19,6 +19,7 @@ import (
 
 var md2VditorDOMTests = []parseTest{
 
+	{"22", "<span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span>", "<p data-block=\"0\"><span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span></p>"},
 	{"21", "<span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span>b", "<p data-block=\"0\"><span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span>b</p>"},
 	{"20", "\n      > foo", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none\"><code>  &gt; foo\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>  &gt; foo\n</code></pre></div>"},
 	{"19", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<p data-block=\"0\" id=\"fooid\">foo</p><p data-block=\"0\" id=\"barid\">bar</p>"},
