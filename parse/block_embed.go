@@ -125,13 +125,9 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 
 func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
-	chinese := bytes.HasPrefix(tokens, []byte("！{{"))
 	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"!{{"))
-	if 6 > t.Context.currentLineLen || (!bytes.HasPrefix(tokens, []byte("!{{")) && !chinese && !startCaret) {
+	if 16 > t.Context.currentLineLen || (!bytes.HasPrefix(tokens, []byte("!{{")) && !startCaret) {
 		return
-	}
-	if chinese {
-		tokens = bytes.Replace(tokens, []byte("！{{"), []byte("!{{"), 1)
 	}
 	if startCaret {
 		tokens = bytes.Replace(tokens, []byte(util.Caret+"!{{"), []byte("!{{"), 1)
@@ -144,9 +140,7 @@ func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 	}
 
 	tokens = tokens[:len(tokens)-2] // 去掉结尾 }}
-	script := tokens
-
-	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
+	script := bytes.TrimSpace(tokens)
 	tokens = bytes.TrimSuffix(tokens, util.CaretTokens)
 
 	ret = &ast.Node{Type: ast.NodeBlockQueryEmbed}
@@ -156,8 +150,5 @@ func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockQueryEmbedScript, Tokens: script})
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
-	if endCaret || startCaret {
-		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-	}
 	return
 }

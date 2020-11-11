@@ -333,7 +333,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		} else if "block-query-embed" == dataType {
 			text := lute.domText(n)
-			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("!{{" +text + "}}")}
+			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
