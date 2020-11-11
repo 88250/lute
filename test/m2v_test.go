@@ -95,6 +95,7 @@ func TestMd2VditorIRDOM(t *testing.T) {
 
 var md2VditorIRBlockDOMTests = []parseTest{
 
+	{"18", "!{{‸SELECT * FROM blocks WHERE content LIKE '% 待办 %'}}\n{: id=\"20201111181139-e5me0f2\"}\n", "<div data-block=\"0\" data-node-id=\"20201111181139-e5me0f2\" data-type=\"block-query-embed\" class=\"vditor-ir__node vditor-ir__node--expand\">‸SELECT * FROM blocks WHERE content LIKE '% 待办 %'</div>"},
 	{"17", "!{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}", "<div data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"block-query-embed\" class=\"vditor-ir__node\">SELECT * FROM blocks WHERE content LIKE '%待办%'</div>"},
 	{"16", "foo\n`bar`\n", "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">foo\n<span data-type=\"code\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">`</span><code data-newline=\"1\">bar</code><span class=\"vditor-ir__marker\">`</span></span></p>"},
 	{"15", "![](assets/中文/foo.png)\n", "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\"><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">assets/中文/foo.png</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><img src=\"assets/中文/foo.png\" /></span></p>"},

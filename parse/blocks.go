@@ -227,7 +227,7 @@ func _continue(n *ast.Node, context *Context) int {
 		return YamlFrontMatterContinue(n, context)
 	case ast.NodeFootnotesDef:
 		return FootnotesContinue(n, context)
-	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeBlockEmbed, ast.NodeLinkRefDefBlock:
+	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeBlockEmbed, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed:
 		return 1
 	}
 	return 0
