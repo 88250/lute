@@ -280,7 +280,7 @@ func (r *HtmlRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.Wa
 func (r *HtmlRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(html.EscapeHTML(node.Tokens))
+	} else {
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
