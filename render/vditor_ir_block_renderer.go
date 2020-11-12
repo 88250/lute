@@ -271,7 +271,10 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 
 func (r *VditorIRBlockRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.tag("span", [][]string{{"class", "vditor-ir__block-query-embed-script"}}, false)
 		r.Write(node.Tokens)
+	} else {
+		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -324,6 +327,7 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bo
 		r.tag("/span", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
 		r.Write(text)
+	} else {
 		r.tag("/span", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 		r.WriteByte(lex.ItemDoublequote)
