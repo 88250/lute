@@ -58,7 +58,8 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 						}
 					}
 
-					if 3 < len(tokens) && (lex.IsWhitespace(tokens[3]) || util.CaretTokens[0] == tokens[3] || util.CaretTokens[0] == tokens[2]) {
+					if (3 == len(tokens) && (bytes.EqualFold(tokens, []byte("[x]")) || bytes.Equal(tokens, []byte("[ ]")))) ||
+						(3 < len(tokens) && (lex.IsWhitespace(tokens[3]) || util.CaretTokens[0] == tokens[3] || util.CaretTokens[0] == tokens[2])) {
 						var caretStartText, caretAfterCloseBracket, caretInBracket bool
 						if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
 							closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
