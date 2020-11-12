@@ -363,12 +363,11 @@ func (r *VditorIRBlockRenderer) renderBlockRefSpace(node *ast.Node, entering boo
 
 func (r *VditorIRBlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		text := html.EscapeHTML(node.Tokens)
 		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 		r.WriteByte(lex.ItemDoublequote)
 		r.tag("/span", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
-		r.Write(text)
+	} else {
 		r.tag("/span", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 		r.WriteByte(lex.ItemDoublequote)

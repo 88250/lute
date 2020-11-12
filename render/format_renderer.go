@@ -307,7 +307,7 @@ func (r *FormatRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.
 func (r *FormatRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
+	} else {
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
