@@ -310,6 +310,8 @@ type Options struct {
 	KramdownIALIDRenderName string
 	// Tag 设置是否开启 #标签# 支持。
 	Tag bool
+	// ImgPathAllowSpace 设置是否支持图片路径带空格。
+	ImgPathAllowSpace bool
 }
 
 func (context *Context) ParentTip() {

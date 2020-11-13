@@ -96,11 +96,23 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 				destination = destination[1:]
 				destination = lex.TrimWhitespace(destination)
 			}
-			if destStarted && (lex.IsWhitespace(token) || lex.IsControl(token)) {
-				destination = destination[:len(destination)-size]
-				passed = passed[:len(passed)-1]
-				openParens--
-				break
+			if !context.Option.ImgPathAllowSpace {
+				if destStarted && (lex.IsWhitespace(token) || lex.IsControl(token)) {
+					destination = destination[:len(destination)-size]
+					passed = passed[:len(passed)-1]
+					openParens--
+					break
+				}
+			} else {
+				if destStarted && lex.IsWhitespace(token) && i+1 < length {
+					nextToken := tokens[i+1]
+					if '"' == nextToken || '\'' == nextToken {
+						destination = destination[:len(destination)-size]
+						passed = passed[:len(passed)-1]
+						openParens--
+						break
+					}
+				}
 			}
 			if lex.ItemOpenParen == token && !lex.IsBackslashEscapePunct(tokens, i) {
 				openParens++

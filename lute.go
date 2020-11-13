@@ -363,6 +363,10 @@ func (lute *Lute) SetTag(b bool) {
 	lute.Tag = b
 }
 
+func (lute *Lute) SetImgPathAllowSpace(b bool) {
+	lute.ImgPathAllowSpace = b
+}
+
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 	for rendererType, extRenderer := range options["renderers"] {
 		switch extRenderer.Interface().(type) { // 稍微进行一点格式校验
