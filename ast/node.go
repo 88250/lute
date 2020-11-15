@@ -11,6 +11,7 @@
 package ast
 
 import (
+	"bytes"
 	"math/rand"
 	"time"
 
@@ -211,17 +212,18 @@ func (n *Node) ChildrenByType(childType NodeType) (ret []*Node) {
 
 // Text 返回 n 及其文本子节点的文本值。
 func (n *Node) Text() (ret string) {
+	buf := &bytes.Buffer{}
 	Walk(n, func(n *Node, entering bool) WalkStatus {
 		if !entering {
 			return WalkContinue
 		}
 		switch n.Type {
 		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockEmbedText, NodeFootnotesRef:
-			ret += util.BytesToStr(n.Tokens)
+			buf.Write(n.Tokens)
 		}
 		return WalkContinue
 	})
-	return
+	return buf.String()
 }
 
 func (n *Node) NextNodeText() string {

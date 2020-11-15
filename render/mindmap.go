@@ -87,19 +87,21 @@ func text(listItemFirstChild *ast.Node) (ret string) {
 		return ""
 	}
 
+	buf := &bytes.Buffer{}
 	ast.Walk(listItemFirstChild, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if ast.NodeList == n.Type || ast.NodeListItem == n.Type { // 遍历到下一个列表或者列表项时退出
 			return ast.WalkContinue
 		}
 
 		if (ast.NodeText == n.Type || ast.NodeLinkText == n.Type) && entering {
-			ret += util.BytesToStr(n.Tokens)
+			buf.Write(n.Tokens)
 		}
 		return ast.WalkContinue
 	})
 
+	ret = buf.String()
 	ret = strings.ReplaceAll(ret, "\\", "\\\\")
-	ret = strings.ReplaceAll(ret,"\"", "\\\"")
+	ret = strings.ReplaceAll(ret, "\"", "\\\"")
 	ret = strings.ReplaceAll(ret, util.Caret, "")
 	return
 }

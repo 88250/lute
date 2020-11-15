@@ -135,14 +135,15 @@ func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 }
 
 func headingText(n *ast.Node) (ret string) {
+	buf := &bytes.Buffer{}
 	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if (ast.NodeText == n.Type || ast.NodeCodeSpanContent == n.Type ||
 			ast.NodeLinkText == n.Type || ast.NodeBlockRefText == n.Type || ast.NodeBlockEmbedText == n.Type) && entering {
-			ret += util.BytesToStr(n.Tokens)
+			buf.Write(n.Tokens)
 		}
 		return ast.WalkContinue
 	})
-	return
+	return buf.String()
 }
 
 func VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
