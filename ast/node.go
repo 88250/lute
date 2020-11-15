@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"math/rand"
 	"time"
+	"unicode/utf8"
 
 	"github.com/88250/lute/util"
 )
@@ -224,6 +225,22 @@ func (n *Node) Text() (ret string) {
 		return WalkContinue
 	})
 	return buf.String()
+}
+
+// TextLen 返回 n 及其文本子节点的累计长度。
+func (n *Node) TextLen() (ret int) {
+	buf := make([]byte, 0, 4096)
+	Walk(n, func(n *Node, entering bool) WalkStatus {
+		if !entering {
+			return WalkContinue
+		}
+		switch n.Type {
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockEmbedText, NodeFootnotesRef:
+			buf = append(buf, n.Tokens...)
+		}
+		return WalkContinue
+	})
+	return utf8.RuneCount(buf)
 }
 
 func (n *Node) NextNodeText() string {

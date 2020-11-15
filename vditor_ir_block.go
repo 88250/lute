@@ -114,6 +114,18 @@ func (lute *Lute) VditorIRBlockDOM2Text(htmlStr string) (text string) {
 	return tree.Root.Text()
 }
 
+func (lute *Lute) VditorIRBlockDOM2TextLen(htmlStr string) int {
+	lute.VditorIR = true
+	lute.VditorWYSIWYG = false
+	lute.VditorSV = false
+
+	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return 0
+	}
+	return tree.Root.TextLen()
+}
+
 func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
 	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
 	if nil != err {
