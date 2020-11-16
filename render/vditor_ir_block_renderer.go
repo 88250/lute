@@ -283,7 +283,7 @@ func (r *VditorIRBlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering b
 	if entering {
 		r.renderDivNode(node)
 	} else {
-		r.WriteString("</div>")
+		r.WriteString("<div data-render=\"2\" data-type=\"block-render\"></div></div>")
 	}
 	return ast.WalkContinue
 }
