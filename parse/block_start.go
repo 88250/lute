@@ -387,4 +387,21 @@ var blockStarts = []blockStartFunc{
 		t.Context.Tip = node
 		return 2
 	},
+
+	// 判断超级块（{{{ blocks }}}）是否开始。
+	func(t *Tree, container *ast.Node) int {
+		if !t.Context.Option.SuperBlock || t.Context.indented {
+			return 0
+		}
+
+		if ok, layout := t.parseSuperBlock(); ok {
+			t.Context.closeUnmatchedBlocks()
+			container := t.Context.addChild(ast.NodeSuperBlock)
+			container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockOpenMarker})
+			container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockLayout, Tokens: layout})
+			t.Context.advanceNextNonspace()
+			return 1
+		}
+		return 0
+	},
 }

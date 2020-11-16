@@ -167,6 +167,8 @@ func (context *Context) finalize(block *ast.Node, lineNum int) {
 		context.yamlFrontMatterFinalize(block)
 	case ast.NodeList:
 		context.listFinalize(block)
+	case ast.NodeSuperBlock:
+		context.superBlockFinalize(block)
 	}
 
 	context.Tip = parent
@@ -312,6 +314,8 @@ type Options struct {
 	Tag bool
 	// ImgPathAllowSpace 设置是否支持图片路径带空格。
 	ImgPathAllowSpace bool
+	// SuperBlock 设置是否支持超级块。 https://github.com/88250/lute/issues/111
+	SuperBlock bool
 }
 
 func (context *Context) ParentTip() {

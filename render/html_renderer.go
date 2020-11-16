@@ -133,6 +133,10 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
+	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderNodeSuperBlock
+	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderNodeSuperBlockOpenMarker
+	ret.RendererFuncs[ast.NodeSuperBlockLayout] = ret.renderNodeSuperBlockLayout
+	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderNodeSuperBlockCloseMarker
 	return ret
 }
 
@@ -140,6 +144,22 @@ func (r *HtmlRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
 	output = append(output, r.RenderFootnotes()...)
 	return
+}
+
+func (r *HtmlRenderer) renderNodeSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *HtmlRenderer) renderNodeSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *HtmlRenderer) renderNodeSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *HtmlRenderer) renderNodeSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
 }
 
 func (r *HtmlRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {

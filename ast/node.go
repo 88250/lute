@@ -394,6 +394,8 @@ func (n *Node) CanContain(nodeType NodeType) bool {
 		return NodeFootnotesDef == nodeType
 	case NodeFootnotesDef:
 		return NodeFootnotesDef != nodeType
+	case NodeSuperBlock:
+		return true
 	}
 	return NodeListItem != nodeType
 }
@@ -554,12 +556,19 @@ const (
 	NodeTagOpenMarker  NodeType = 461 // 开始标签标记符 #
 	NodeTagCloseMarker NodeType = 462 // 结束标签标记符 #
 
-	// 内容块查询嵌入（Block Query Embed） https://github.com/88250/lute/issues/96
+	// 内容块查询嵌入（Block Query Embed）语法 https://github.com/88250/lute/issues/96
 
-	NodeBlockQueryEmbed       NodeType = 465 // 内容块查询嵌入节点
+	NodeBlockQueryEmbed       NodeType = 465 // 内容块查询嵌入
 	NodeOpenBrace             NodeType = 466 // {
 	NodeCloseBrace            NodeType = 467 // }
 	NodeBlockQueryEmbedScript NodeType = 468 // 内容块查询嵌入脚本
+
+	// 超级块语法 https://github.com/88250/lute/issues/111
+
+	NodeSuperBlock            NodeType = 475 // 超级块节点
+	NodeSuperBlockOpenMarker  NodeType = 476 // 开始超级块标记符 {{{
+	NodeSuperBlockLayout      NodeType = 477 // 超级块布局 row/col
+	NodeSuperBlockCloseMarker NodeType = 478 // 结束超级块标记符 }}}
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
