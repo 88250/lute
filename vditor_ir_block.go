@@ -346,6 +346,16 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		} else if "block-query-embed" == dataType {
 			text := lute.domText(n)
+
+			t := parse.Parse("", []byte(text), lute.Options)
+			if blockQueryEmbed := t.Root.FirstChild; nil != blockQueryEmbed && ast.NodeBlockQueryEmbed == blockQueryEmbed.Type {
+				node = blockQueryEmbed
+				next := blockQueryEmbed.Next
+				tree.Context.Tip.AppendChild(node)
+				appendNextToTip(next, tree)
+				return
+			}
+
 			node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
 			tree.Context.Tip.AppendChild(node)
 			return
