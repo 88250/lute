@@ -18,6 +18,9 @@ import (
 
 var debugTests = []parseTest{
 
+	// 表格和 Setext 标题解析冲突问题 https://github.com/88250/lute/issues/110
+	{"51", "|   foo   | \n| :-----: |\n|   bar   |\n=======\nbaz\n", "<table>\n<thead>\n<tr>\n<th align=\"center\">foo</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"center\">bar</td>\n</tr>\n</tbody>\n</table>\n<p>=======<br />\nbaz</p>\n"},
+
 	// 表格解析异常 https://github.com/88250/lute/issues/52
 	{"50", "foo\nname | age |\n---- | ---\n\nbar", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>name</th>\n<th>age</th>\n</tr>\n</thead>\n</table>\n<p>bar</p>\n"},
 	{"49", "foo\n| bar |\n| --- |", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>bar</th>\n</tr>\n</thead>\n</table>\n"},
