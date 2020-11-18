@@ -569,7 +569,7 @@ func (r *VditorSVRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSt
 		r.Write(NewlineSV)
 		r.tag("/span", nil, false)
 	}
-	return ast.WalkContinue
+	return ast.WalkSkipChildren // 不支持表格内的行级渲染
 }
 
 func (r *VditorSVRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
@@ -837,6 +837,10 @@ func (r *VditorSVRenderer) inListItem(node *ast.Node) bool {
 }
 
 func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
+	if node.ParentIs(ast.NodeTableCell) {
+		return ast.WalkContinue
+	}
+
 	if entering {
 		if r.Option.AutoSpace {
 			r.Space(node)
