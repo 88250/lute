@@ -1258,18 +1258,14 @@ func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.Wa
 		}
 
 		text := string(html.EscapeHTML(node.Tokens))
-		for _, mark := range r.Tree.Marks {
-			_, text = markText(text, mark, 1024*1024)
-		}
+		_, text = markText(text, r.Tree.Marks, 1024*1024)
 		r.WriteString(text)
 	}
 	return ast.WalkContinue
 }
 
-func markText(text string, keyword string, beforeLen int) (pos int, marked string) {
-	text = html.EscapeString(text)
-		keywords := splitKeyword(keyword)
-		marked = encloseIgnoreCase(text, "<mark>", "</mark>", keywords...)
+func markText(text string, keywords []string, beforeLen int) (pos int, marked string) {
+	marked = encloseIgnoreCase(text, "<mark>", "</mark>", keywords...)
 
 	pos = strings.Index(marked, "<mark>")
 	if 0 > pos {
@@ -1291,20 +1287,6 @@ func markText(text string, keyword string, beforeLen int) (pos int, marked strin
 	return
 }
 
-func splitKeyword(keyword string) (keywords []string) {
-	keyword = strings.TrimSpace(keyword)
-	if "" == keyword {
-		return
-	}
-	words := strings.Split(keyword, " ")
-	if 1 < len(words) {
-		keywords = append(keywords, words...)
-	} else {
-		keywords = append(keywords, keyword)
-	}
-	return
-}
-
 func encloseIgnoreCase(text, open, close string, searchStrs ...string) string {
 	buf := &bytes.Buffer{}
 	textLower := strings.ToLower(text)
@@ -1317,7 +1299,7 @@ func encloseIgnoreCase(text, open, close string, searchStrs ...string) string {
 				continue
 			}
 			buf.WriteString(open)
-			buf.WriteString(text[i:i+len(searchStrs[j])])
+			buf.WriteString(text[i : i+len(searchStrs[j])])
 			buf.WriteString(close)
 			i += len(searchStrs[j]) - 1
 			found = true
