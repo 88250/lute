@@ -1267,28 +1267,67 @@ func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.Wa
 }
 
 func markText(text string, keyword string, beforeLen int) (pos int, marked string) {
-	marked = text
-	if pos = strings.Index(strings.ToLower(text), strings.ToLower(keyword)); -1 < pos {
-		var before []rune
-		var count int
-		for i := pos; 0 < i; { // 关键字前面太长的话缩短一些
-			r, size := utf8.DecodeLastRuneInString(text[:i])
-			i -= size
-			before = append([]rune{r}, before...)
-			count++
-			if beforeLen < count {
-				break
-			}
-		}
-		mark := text[pos : pos+len(keyword)]
-		marked = string(before)
-		if "" != mark {
-			marked += "<mark>" + mark + "</mark>"
-		}
-		marked += text[pos+len(keyword):]
+	text = html.EscapeString(text)
+		keywords := splitKeyword(keyword)
+		marked = encloseIgnoreCase(text, "<mark>", "</mark>", keywords...)
+
+	pos = strings.Index(marked, "<mark>")
+	if 0 > pos {
 		return
 	}
+
+	var before []rune
+	var count int
+	for i := pos; 0 < i; { // 关键字前面太长的话缩短一些
+		r, size := utf8.DecodeLastRuneInString(marked[:i])
+		i -= size
+		before = append([]rune{r}, before...)
+		count++
+		if beforeLen < count {
+			break
+		}
+	}
+	marked = string(before) + marked[pos:]
 	return
+}
+
+func splitKeyword(keyword string) (keywords []string) {
+	keyword = strings.TrimSpace(keyword)
+	if "" == keyword {
+		return
+	}
+	words := strings.Split(keyword, " ")
+	if 1 < len(words) {
+		keywords = append(keywords, words...)
+	} else {
+		keywords = append(keywords, keyword)
+	}
+	return
+}
+
+func encloseIgnoreCase(text, open, close string, searchStrs ...string) string {
+	buf := &bytes.Buffer{}
+	textLower := strings.ToLower(text)
+	for i := 0; i < len(textLower); i++ {
+		sub := textLower[i:]
+		var found bool
+		for j := 0; j < len(searchStrs); j++ {
+			idx := strings.Index(sub, strings.ToLower(searchStrs[j]))
+			if 0 != idx {
+				continue
+			}
+			buf.WriteString(open)
+			buf.WriteString(text[i:i+len(searchStrs[j])])
+			buf.WriteString(close)
+			i += len(searchStrs[j]) - 1
+			found = true
+			break
+		}
+		if !found {
+			buf.WriteByte(text[i])
+		}
+	}
+	return buf.String()
 }
 
 func (r *VditorIRBlockRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
