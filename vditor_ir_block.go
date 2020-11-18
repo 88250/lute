@@ -1179,6 +1179,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		// kbd 标签由 code 标签构成节点
 	case atom.Summary:
 		return
+	case atom.Audio:
+		node.Type = ast.NodeHTMLBlock
+		node.Tokens = lute.domHTML(n)
+		tree.Context.Tip.AppendChild(node)
+		return
 	default:
 		if html.ElementNode == n.Type {
 			break
