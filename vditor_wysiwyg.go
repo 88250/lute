@@ -304,10 +304,6 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 
 		// 在 li 下的每个非块容器节点用 p 包裹
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
-			if atom.Input == c.DataAtom { // 跳过任务列表
-				continue
-			}
-
 			if lute.listItemEnter(n) {
 				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
 				p.AppendChild(&html.Node{Type: html.TextNode, Data: util.Caret})

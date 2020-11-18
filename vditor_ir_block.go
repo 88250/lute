@@ -807,11 +807,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if lute.hasAttr(n, "checked") {
 			node.TaskListItemChecked = true
 		}
-		if ast.NodeParagraph == tree.Context.Tip.Type { // 松散任务列表，task marker 挂在 li 下第一个子节点
-			tree.Context.Tip.Parent.PrependChild(node)
-		} else {
-			tree.Context.Tip.AppendChild(node)
-		}
+		tree.Context.Tip.AppendChild(node)
 		if nil != node.Parent.Parent.Parent && nil != node.Parent.Parent.Parent.ListData { // ul.li.p.input
 			node.Parent.Parent.Parent.ListData.Typ = 3
 			node.Parent.Parent.ListData.Typ = 3

@@ -1202,15 +1202,6 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 
 func (r *FormatRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if r.Option.KramdownIAL {
-			parent := node.Parent
-			if nil != parent.Next && ast.NodeKramdownBlockIAL == parent.Next.Type {
-				liIAL := parent.Next
-				r.Write(liIAL.Tokens)
-				liIAL.Unlink()
-			}
-		}
-
 		r.WriteByte(lex.ItemOpenBracket)
 		if node.TaskListItemChecked {
 			r.WriteByte('X')
