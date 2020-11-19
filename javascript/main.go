@@ -32,7 +32,6 @@ func main() {
 		"WalkSkipChildren":         ast.WalkSkipChildren,
 		"WalkContinue":             ast.WalkContinue,
 		"GetHeadingID":             render.HeadingID,
-		"VditorIRBlockDOMHeadings": lute.VditorIRBlockDOMHeadings,
 		"Caret":                    util.Caret,
 		"NewNodeID":                ast.NewNodeID,
 		"FilePath":                 lute.FilePath,

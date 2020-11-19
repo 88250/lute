@@ -126,44 +126,6 @@ func (lute *Lute) VditorIRBlockDOM2TextLen(htmlStr string) int {
 	return tree.Root.TextLen()
 }
 
-func (lute *Lute) VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
-	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
-	if nil != err {
-		return ""
-	}
-	headings := tree.Root.ChildrenByType(ast.NodeHeading)
-	buf := &bytes.Buffer{}
-	for _, heading := range headings {
-		if tree.Root != heading.Parent {
-			continue
-		}
-
-		padding := 16 + 14*(heading.HeadingLevel-1)
-		buf.WriteString(`<div data-id="ir-` + render.HeadingID(heading) + `" style="padding-left:` + strconv.Itoa(padding) +
-			`px" class="b3-list-item">` + headingText(heading) + `</div>`)
-	}
-	ret = buf.String()
-	return
-}
-
-func headingText(n *ast.Node) (ret string) {
-	buf := &bytes.Buffer{}
-	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if (ast.NodeText == n.Type || ast.NodeCodeSpanContent == n.Type ||
-			ast.NodeLinkText == n.Type || ast.NodeBlockRefText == n.Type || ast.NodeBlockEmbedText == n.Type) && entering {
-			buf.Write(n.Tokens)
-		}
-		return ast.WalkContinue
-	})
-	return buf.String()
-}
-
-func VditorIRBlockDOMHeadings(htmlStr string) (ret string) {
-	luteEngine := New()
-	luteEngine.KramdownIAL = true
-	return luteEngine.VditorIRBlockDOMHeadings(htmlStr)
-}
-
 func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
 	renderer := render.NewVditorIRBlockRenderer(tree)
 	output := renderer.Render()
