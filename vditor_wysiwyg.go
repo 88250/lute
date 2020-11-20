@@ -257,9 +257,11 @@ func (lute *Lute) mergeVditorDOMList0(n *html.Node) {
 	switch n.DataAtom {
 	case atom.Ul, atom.Ol:
 		if nil != n.NextSibling && n.DataAtom == n.NextSibling.DataAtom && 1 == len(n.NextSibling.Attr) {
-			for c := n.NextSibling.FirstChild; nil != c; c = c.NextSibling {
+			for c := n.NextSibling.FirstChild; nil != c;  {
+				next := c.NextSibling
 				c.Unlink()
 				n.AppendChild(c)
+				c = next
 			}
 			n.NextSibling.Unlink()
 		}
