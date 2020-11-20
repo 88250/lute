@@ -20,7 +20,7 @@ import (
 
 func SuperBlockContinue(superBlock *ast.Node, context *Context) int {
 	if ok := context.isSuperBlockClose(context.currentLine[context.nextNonspace:]); ok {
-		context.finalize(superBlock)
+		context.finalize(context.Tip) // 最终化所有子块
 		return 2
 	}
 	return 0

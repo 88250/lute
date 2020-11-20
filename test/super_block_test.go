@@ -18,8 +18,10 @@ import (
 
 var superBlockTests = []parseTest{
 
-	//{"1", "{{{\nfoo\n\nbar\n\n * baz\n}}}", ""},
-	{"0", "{{{\nfoo\n}}}", ""},
+	{"3", "{{{\nfoo\n\n* bar\n\n  baz\n}}}", "<p>foo</p>\n<ul>\n<li>\n<p>bar</p>\n<p>baz</p>\n</li>\n</ul>\n"},
+	{"2", "{{{\nfoo\n\n* bar\n  * baz\n}}}", "<p>foo</p>\n<ul>\n<li>bar\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n"},
+	{"1", "{{{\nfoo\n\nbar\n\n}}}", "<p>foo</p>\n<p>bar</p>\n"},
+	{"0", "{{{\nfoo\n}}}", "<p>foo</p>\n"},
 }
 
 func TestSuperBlock(t *testing.T) {
