@@ -147,7 +147,7 @@ func (r *HtmlRenderer) Render() (output []byte) {
 }
 
 func (r *HtmlRenderer) renderNodeSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderNodeSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {

@@ -360,7 +360,7 @@ var blockStarts = []blockStartFunc{
 		t.Context.closeUnmatchedBlocks()
 
 		for !t.Context.Tip.CanContain(ast.NodeBlockEmbed) {
-			t.Context.finalize(t.Context.Tip, t.Context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
+			t.Context.finalize(t.Context.Tip) // 注意调用 finalize 会向父节点方向进行迭代
 		}
 		t.Context.Tip.AppendChild(node)
 		t.Context.Tip = node
@@ -381,7 +381,7 @@ var blockStarts = []blockStartFunc{
 		t.Context.closeUnmatchedBlocks()
 
 		for !t.Context.Tip.CanContain(ast.NodeBlockQueryEmbed) {
-			t.Context.finalize(t.Context.Tip, t.Context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
+			t.Context.finalize(t.Context.Tip) // 注意调用 finalize 会向父节点方向进行迭代
 		}
 		t.Context.Tip.AppendChild(node)
 		t.Context.Tip = node
@@ -396,10 +396,10 @@ var blockStarts = []blockStartFunc{
 
 		if ok, layout := t.parseSuperBlock(); ok {
 			t.Context.closeUnmatchedBlocks()
-			container := t.Context.addChild(ast.NodeSuperBlock)
-			container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockOpenMarker})
-			container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockLayout, Tokens: layout})
-			t.Context.advanceNextNonspace()
+			t.Context.addChild(ast.NodeSuperBlock)
+			t.Context.addChildMarker(ast.NodeSuperBlockOpenMarker, []byte("{{{"))
+			t.Context.addChildMarker(ast.NodeSuperBlockLayout, layout)
+			t.Context.offset = t.Context.currentLineLen - 1 // 整行过
 			return 1
 		}
 		return 0
