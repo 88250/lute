@@ -1053,7 +1053,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 			class += " vditor-ir__node--expand"
 		}
 		if renderFigure {
-			r.tag("figure", nil, false)
+			r.tag("span", nil, false)
 		}
 		r.tag("span", [][]string{{"class", class}, {"data-type", "img"}}, false)
 	} else {
@@ -1084,15 +1084,15 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		r.Writer.Write(imgBuf)
 
 		if renderFigure {
-			r.tag("figcaption", [][]string{{"data-render", "1"}}, false)
+			r.tag("span", [][]string{{"data-render", "1"}}, false)
 			titleTokens := title.Tokens
 			titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
 			r.Write(titleTokens)
-			r.tag("/figcaption", nil, false)
+			r.tag("/span", nil, false)
 		}
 		r.tag("/span", nil, false)
 		if renderFigure {
-			r.tag("/figure", nil, false)
+			r.tag("/span", nil, false)
 		}
 	}
 	return ast.WalkContinue

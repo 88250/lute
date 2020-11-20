@@ -755,8 +755,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		} else {
 			return
 		}
-	case atom.Figure, atom.Figcaption:
-		break
 	case atom.Input:
 		if nil == n.Parent || (atom.P != n.Parent.DataAtom && atom.Li != n.Parent.DataAtom) {
 			// 仅允许 input 出现在任务列表中
