@@ -20,14 +20,19 @@ import (
 
 func SuperBlockContinue(superBlock *ast.Node, context *Context) int {
 	if ok := context.isSuperBlockClose(context.currentLine[context.nextNonspace:]); ok {
-		context.finalize(context.Tip) // 最终化所有子块
 		return 2
 	}
 	return 0
 }
 
 func (context *Context) superBlockFinalize(superBlock *ast.Node) {
-	superBlock.Tokens = bytes.TrimSuffix(superBlock.Tokens, []byte("}}}"))
+	// 最终化所有子块
+	for child := superBlock.FirstChild; nil != child; child = child.Next {
+		if child.Close {
+			continue
+		}
+		context.finalize(child)
+	}
 }
 
 func (t *Tree) parseSuperBlock() (ok bool, layout []byte) {

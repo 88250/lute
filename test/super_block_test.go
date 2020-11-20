@@ -18,6 +18,9 @@ import (
 
 var superBlockTests = []parseTest{
 
+	{"6", "start\n{{{\nfoo\n\n> bar\n>\n> baz\n\n{{{\n* list\n  * para\n\nbazz\n}}}\n\npara\n\n{{{\n# foo\n\nbar\n}}}\n\n}}}\nend\n", "<p>start</p>\n<p>foo</p>\n<blockquote>\n<p>bar</p>\n<p>baz</p>\n</blockquote>\n<ul>\n<li>list\n<ul>\n<li>para</li>\n</ul>\n</li>\n</ul>\n<p>bazz</p>\n<p>para</p>\n<h1 id=\"foo\">foo</h1>\n<p>bar</p>\n<p>end</p>\n"},
+	{"5", "{{{\n# foo\n\n{{{\nbar\n\nbaz\n}}}\n}}}\n", "<h1 id=\"foo\">foo</h1>\n<p>bar</p>\n<p>baz</p>\n"},
+	{"4", "{{{\nfoo\n\n{{{\nbar\n}}}\n\nbaz\n}}}", "<p>foo</p>\n<p>bar</p>\n<p>baz</p>\n"},
 	{"3", "{{{\nfoo\n\n* bar\n\n  baz\n}}}", "<p>foo</p>\n<ul>\n<li>\n<p>bar</p>\n<p>baz</p>\n</li>\n</ul>\n"},
 	{"2", "{{{\nfoo\n\n* bar\n  * baz\n}}}", "<p>foo</p>\n<ul>\n<li>bar\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n"},
 	{"1", "{{{\nfoo\n\nbar\n\n}}}", "<p>foo</p>\n<p>bar</p>\n"},
