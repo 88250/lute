@@ -1042,20 +1042,23 @@ func (r *VditorIRBlockRenderer) renderBang(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, util.CaretTokens)
-	single := nil == node.Previous && nil == node.Next
-	title := node.ChildByType(ast.NodeLinkTitle)
-	withTitle := nil != title && nil != title.Tokens
-	renderFigure := single && withTitle
 	if entering {
 		text := r.Text(node)
 		class := "vditor-ir__node"
 		if strings.Contains(text, util.Caret) || needResetCaret {
 			class += " vditor-ir__node--expand"
 		}
+		attrs := [][]string{{"class", class}, {"data-type", "img"}}
+		single := nil == node.Previous && nil == node.Next
+		title := node.ChildByType(ast.NodeLinkTitle)
+		withTitle := nil != title && nil != title.Tokens
+		renderFigure := single && withTitle
 		if renderFigure {
-			r.tag("span", nil, false)
+			titleTokens := title.Tokens
+			titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
+			attrs = append(attrs, []string{"data-title", string(titleTokens)})
 		}
-		r.tag("span", [][]string{{"class", class}, {"data-type", "img"}}, false)
+		r.tag("span", attrs, false)
 	} else {
 		if needResetCaret {
 			r.WriteString(util.Caret)
@@ -1082,18 +1085,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		}
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
-
-		if renderFigure {
-			r.tag("span", [][]string{{"data-render", "1"}}, false)
-			titleTokens := title.Tokens
-			titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
-			r.Write(titleTokens)
-			r.tag("/span", nil, false)
-		}
 		r.tag("/span", nil, false)
-		if renderFigure {
-			r.tag("/span", nil, false)
-		}
 	}
 	return ast.WalkContinue
 }
