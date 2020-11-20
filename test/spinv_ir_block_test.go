@@ -99,6 +99,7 @@ func TestSpinVditorIRBlockDOM(t *testing.T) {
 	luteEngine.Mark = true
 	luteEngine.BlockRef = true
 	luteEngine.KramdownIAL = true
+	luteEngine.SuperBlock = true
 	luteEngine.SetLinkBase("http://127.0.0.1:6807/siyuan/0/测试笔记/")
 
 	ast.Testing = true

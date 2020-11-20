@@ -169,6 +169,21 @@ func (lute *Lute) Space(text string) string {
 	return render.Space0(text)
 }
 
+// IsValidLinkDest 判断 str 是否为合法的链接地址。
+func (lute *Lute) IsValidLinkDest(str string) bool {
+	tree := parse.Parse("", []byte(str), lute.Options)
+	if nil == tree.Root.FirstChild || nil == tree.Root.FirstChild.FirstChild {
+		return false
+	}
+	if tree.Root.LastChild != tree.Root.FirstChild {
+		return false
+	}
+	if ast.NodeLink != tree.Root.FirstChild.FirstChild.Type {
+		return false
+	}
+	return true
+}
+
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	ret = make(map[string]string, len(lute.AliasEmoji))
