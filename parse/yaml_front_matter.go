@@ -19,7 +19,7 @@ import (
 
 func YamlFrontMatterContinue(node *ast.Node, context *Context) int {
 	if isYamlFrontMatterClose(context) {
-		context.finalize(node, context.lineNum)
+		context.finalize(node)
 		return 2
 	}
 	return 0

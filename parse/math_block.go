@@ -21,7 +21,7 @@ func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 	ln := context.currentLine
 	indent := context.indent
 	if 3 >= indent && context.isMathBlockClose(ln[context.nextNonspace:]) {
-		context.finalize(mathBlock, context.lineNum)
+		context.finalize(mathBlock)
 		return 2
 	} else {
 		// 跳过 $ 之前可能存在的空格

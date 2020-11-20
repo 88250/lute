@@ -46,13 +46,13 @@ type Context struct {
 	Tree   *Tree    // 关联的语法树
 	Option *Options // 解析渲染选项
 
-	Tip                                                               *ast.Node // 末梢节点
-	oldtip                                                            *ast.Node // 老的末梢节点
-	currentLine                                                       []byte    // 当前行
-	currentLineLen                                                    int       // 当前行长
-	lineNum, offset, column, nextNonspace, nextNonspaceColumn, indent int       // 解析时用到的行号、下标、缩进空格数等
-	indented, blank, partiallyConsumedTab, allClosed                  bool      // 是否是缩进行、空行等标识
-	lastMatchedContainer                                              *ast.Node // 最后一个匹配的块节点
+	Tip                                                      *ast.Node // 末梢节点
+	oldtip                                                   *ast.Node // 老的末梢节点
+	currentLine                                              []byte    // 当前行
+	currentLineLen                                           int       // 当前行长
+	offset, column, nextNonspace, nextNonspaceColumn, indent int       // 解析时用到的下标、缩进空格数等
+	indented, blank, partiallyConsumedTab, allClosed         bool      // 是否是缩进行、空行等标识
+	lastMatchedContainer                                     *ast.Node // 最后一个匹配的块节点
 }
 
 // InlineContext 描述了行级元素解析上下文。
@@ -138,7 +138,7 @@ func (context *Context) closeUnmatchedBlocks() {
 	if !context.allClosed {
 		for context.oldtip != context.lastMatchedContainer {
 			parent := context.oldtip.Parent
-			context.finalize(context.oldtip, context.lineNum-1)
+			context.finalize(context.oldtip)
 			context.oldtip = parent
 		}
 		context.allClosed = true
@@ -146,7 +146,7 @@ func (context *Context) closeUnmatchedBlocks() {
 }
 
 // finalize 执行 block 的最终化处理。调用该方法会将 context.Tip 置为 block 的父节点。
-func (context *Context) finalize(block *ast.Node, lineNum int) {
+func (context *Context) finalize(block *ast.Node) {
 	parent := block.Parent
 	block.Close = true
 
@@ -185,7 +185,7 @@ func (context *Context) addChildMarker(nodeType ast.NodeType, tokens []byte) (re
 // 节点并向父节点方向尝试，直到找到一个能接受该子节点的节点为止。添加完成后该子节点会被设置为新的末梢节点。
 func (context *Context) addChild(nodeType ast.NodeType) (ret *ast.Node) {
 	for !context.Tip.CanContain(nodeType) {
-		context.finalize(context.Tip, context.lineNum-1) // 注意调用 finalize 会向父节点方向进行迭代
+		context.finalize(context.Tip) // 注意调用 finalize 会向父节点方向进行迭代
 	}
 
 	ret = &ast.Node{Type: nodeType}

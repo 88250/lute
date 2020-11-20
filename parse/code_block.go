@@ -25,7 +25,7 @@ func CodeBlockContinue(codeBlock *ast.Node, context *Context) int {
 	if codeBlock.IsFencedCodeBlock {
 		if ok, closeFence := context.isFencedCodeClose(ln[context.nextNonspace:], codeBlock.CodeBlockFenceChar, codeBlock.CodeBlockFenceLen); indent <= 3 && ok {
 			codeBlock.CodeBlockCloseFence = closeFence
-			context.finalize(codeBlock, context.lineNum)
+			context.finalize(codeBlock)
 			return 2
 		} else {
 			// 跳过围栏标记符之前可能存在的空格

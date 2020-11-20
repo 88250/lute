@@ -45,7 +45,7 @@ func (t *Tree) parseBlocks() {
 		lines++
 	}
 	for nil != t.Context.Tip {
-		t.Context.finalize(t.Context.Tip, lines)
+		t.Context.finalize(t.Context.Tip)
 	}
 }
 
@@ -56,7 +56,6 @@ func (t *Tree) incorporateLine(line []byte) {
 	t.Context.column = 0
 	t.Context.blank = false
 	t.Context.partiallyConsumedTab = false
-	t.Context.lineNum++
 	t.Context.currentLine = line
 	t.Context.currentLineLen = len(t.Context.currentLine)
 
@@ -174,7 +173,7 @@ func (t *Tree) incorporateLine(line []byte) {
 				if html.HtmlBlockType >= 1 && html.HtmlBlockType <= 5 {
 					tokens := t.Context.currentLine[t.Context.offset:]
 					if t.isHTMLBlockClose(tokens, html.HtmlBlockType) {
-						t.Context.finalize(container, t.Context.lineNum)
+						t.Context.finalize(container)
 					}
 				}
 			case ast.NodeMathBlock:
@@ -183,7 +182,7 @@ func (t *Tree) incorporateLine(line []byte) {
 					(bytes.HasSuffix(container.Tokens, MathBlockMarkerNewline) ||
 						bytes.HasSuffix(container.Tokens, MathBlockMarker) ||
 						bytes.HasSuffix(container.Tokens, MathBlockMarkerCaretNewline)) {
-					t.Context.finalize(container, t.Context.lineNum)
+					t.Context.finalize(container)
 				}
 			}
 		} else if t.Context.offset < t.Context.currentLineLen && !t.Context.blank {
