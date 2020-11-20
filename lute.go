@@ -171,7 +171,9 @@ func (lute *Lute) Space(text string) string {
 
 // IsValidLinkDest 判断 str 是否为合法的链接地址。
 func (lute *Lute) IsValidLinkDest(str string) bool {
-	tree := parse.Parse("", []byte(str), lute.Options)
+	luteEngine := New()
+	luteEngine.GFMAutoLink = true
+	tree := parse.Parse("", []byte(str),luteEngine.Options)
 	if nil == tree.Root.FirstChild || nil == tree.Root.FirstChild.FirstChild {
 		return false
 	}

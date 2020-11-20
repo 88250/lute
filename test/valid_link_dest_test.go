@@ -30,4 +30,8 @@ func TestIsValidLinkDest(t *testing.T) {
 	if luteEngine.IsValidLinkDest("ld246.com") {
 		t.Fatalf("check link dest failed")
 	}
+
+	if !luteEngine.IsValidLinkDest("https://www.electronjs.org/docs/api/shell") {
+		t.Fatalf("check link dest failed")
+	}
 }
