@@ -18,6 +18,7 @@ import (
 
 var echartsJSONRendererTests = []parseTest{
 
+	{"7", "| foo |\n| - |\n|   |\n{: id=\"20201122125005-kc4sl0l\"}\n\n{: id=\"20201122125319-t74imwc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Table\\ntable\",\"children\":[{\"name\":\"Table Head\\nthead\"},{\"name\":\"Table Row\\ntr\"}]},{\"name\":\"Block IAL\\n{: 20201122125005-kc4sl0l}\"},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
 	{"6", "{: id=\"20201122125005-kc4sl0l\"}", "[{\"name\":\"Document\",\"children\":[]}]"},
 	{"5", "foo\n{: id=\"fooid\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Text\\nfoo\"}]},{\"name\":\"Block IAL\\n{: fooid}\"}]}]"},
 	{"4", "&hearts;", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"HTML Entity\\nspan\"}]}]}]"},
@@ -32,9 +33,9 @@ func TestEChartsJSONRenderer(t *testing.T) {
 	luteEngine.KramdownIAL = true
 
 	for _, test := range echartsJSONRendererTests {
-		html := luteEngine.RenderEChartsJSON(test.from)
-		if test.to != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		jsonStr := luteEngine.RenderEChartsJSON(test.from)
+		if test.to != jsonStr {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, jsonStr, test.from)
 		}
 	}
 }

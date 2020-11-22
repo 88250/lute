@@ -226,7 +226,12 @@ func (r *EChartsJSONRenderer) renderTableHead(node *ast.Node, entering bool) ast
 
 func (r *EChartsJSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.leaf("Table\ntable", node)
+		r.openObj()
+		r.val("Table\ntable", node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
 	}
 	return ast.WalkContinue
 }
