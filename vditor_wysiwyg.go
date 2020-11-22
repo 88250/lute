@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -110,6 +111,7 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
 func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
+	fmt.Println(markdown)
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewEChartsJSONRenderer(tree)
 	output := renderer.Render()

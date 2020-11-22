@@ -75,6 +75,9 @@ func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
 
 func (r *EChartsJSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if nil == node.Previous {
+			return ast.WalkContinue
+		}
 		id := r.NodeID(node.Previous)
 		r.leaf("Block IAL\n{: "+id+"}", node)
 	}

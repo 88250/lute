@@ -18,6 +18,7 @@ import (
 
 var echartsJSONRendererTests = []parseTest{
 
+	{"6", "{: id=\"20201122125005-kc4sl0l\"}", "[{\"name\":\"Document\",\"children\":[]}]"},
 	{"5", "foo\n{: id=\"fooid\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Text\\nfoo\"}]},{\"name\":\"Block IAL\\n{: fooid}\"}]}]"},
 	{"4", "&hearts;", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"HTML Entity\\nspan\"}]}]}]"},
 	{"3", ":smile:", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Emoji Unicode\\n\"}]}]}]"},
