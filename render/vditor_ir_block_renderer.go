@@ -763,12 +763,11 @@ func (r *VditorIRBlockRenderer) renderMathBlockContent(node *ast.Node, entering 
 
 	if r.Option.VditorMathBlockPreview {
 		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
-		r.tag("div", [][]string{{"class", "vditor-math"}}, false)
+		r.tag("div", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 		tokens := node.Tokens
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(html.EscapeHTML(tokens))
-		r.WriteString("</div></code></pre>")
+		r.WriteString("</div></pre>")
 	}
 	return ast.WalkContinue
 }
