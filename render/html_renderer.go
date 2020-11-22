@@ -489,7 +489,7 @@ func (r *HtmlRenderer) renderInlineMathContent(node *ast.Node, entering bool) as
 
 func (r *HtmlRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := [][]string{{"class", "vditor-math"}}
+		attrs := [][]string{{"class", "language-math"}}
 		r.tag("span", attrs, false)
 	}
 	return ast.WalkContinue
@@ -520,7 +520,7 @@ func (r *HtmlRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) 
 func (r *HtmlRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 	if entering {
-		attrs := [][]string{{"class", "vditor-math"}}
+		attrs := [][]string{{"class", "language-math"}}
 		r.handleKramdownIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		r.tag("div", attrs, false)

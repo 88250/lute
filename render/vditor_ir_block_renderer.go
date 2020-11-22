@@ -702,11 +702,10 @@ func (r *VditorIRBlockRenderer) renderInlineMathContent(node *ast.Node, entering
 		r.Write(tokens)
 		r.tag("/code", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", [][]string{{"class", "language-math"}}, false)
-		r.tag("span", [][]string{{"class", "vditor-math"}}, false)
+		r.tag("span", [][]string{{"class", "language-math"}}, false)
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(tokens)
-		r.WriteString("</span></code></span>")
+		r.WriteString("</span></span>")
 	}
 	return ast.WalkContinue
 }
