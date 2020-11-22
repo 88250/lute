@@ -23,20 +23,20 @@ var mathTests = []parseTest{
 	// 解析问题 10$ https://github.com/88250/lute/issues/1
 	{"解析问题 10$", "10$\n", "<p>10$</p>\n"},
 
-	{"13", "$$a^2 + b^2 = \\color{red}c^2$$\n## foo\n", "<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</div>\n<h2 id=\"foo\">foo</h2>\n"},
-	{"12", "$$\n", "<div class=\"vditor-math\"></div>\n"},
+	{"13", "$$a^2 + b^2 = \\color{red}c^2$$\n## foo\n", "<div class=\"language-math\">a^2 + b^2 = \\color{red}c^2</div>\n<h2 id=\"foo\">foo</h2>\n"},
+	{"12", "$$\n", "<div class=\"language-math\"></div>\n"},
 	{"11", "$\n", "<p>$</p>\n"},
-	{"10", "lu$$a^2 + b^2 = \\color{red}c^2$$te\n", "<p>lu\n<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</div>\nte</p>\n"},
-	{"9", "b$\\color{red}a^2$a\n", "<p>b<span class=\"vditor-math\">\\color{red}a^2</span>a</p>\n"},
+	{"10", "lu$$a^2 + b^2 = \\color{red}c^2$$te\n", "<p>lu\n<div class=\"language-math\">a^2 + b^2 = \\color{red}c^2</div>\nte</p>\n"},
+	{"9", "b$\\color{red}a^2$a\n", "<p>b<span class=\"language-math\">\\color{red}a^2</span>a</p>\n"},
 	{"8", "lu$a^2 + b^2 = \\color{red}c^2$1te\n", "<p>lu$a^2 + b^2 = \\color{red}c^2$1te</p>\n"},
 	{"7", "lu$1a^2 + b^2 = \\color{red}c^2$te\n", "<p>lu$1a^2 + b^2 = \\color{red}c^2$te</p>\n"},
-	{"6", "lu$a^2 + b^2 = \\color{red}c^2$te$a^2$m\n", "<p>lu<span class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</span>te<span class=\"vditor-math\">a^2</span>m</p>\n"},
-	{"5", "lu$a^2 + b^2 = \\color{red}c^2$te\n", "<p>lu<span class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</span>te</p>\n"},
-	{"4", "lu$$a^2 + b^2 = \\color{red}c^2$$te\n", "<p>lu\n<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</div>\nte</p>\n"},
-	{"3", "$$\na^2 + b^2 = \\color{red}c^2\n$$\n", "<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</div>\n"},
-	{"2", "| $a^2 + b^2 = \\color{red}c^2$ | bar |\n| --- | --- |\n| baz | bim |\n", "<table>\n<thead>\n<tr>\n<th><span class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</span></th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>baz</td>\n<td>bim</td>\n</tr>\n</tbody>\n</table>\n"},
-	{"1", "$a^2 + b^2 = \\color{red}c^2$\n", "<p><span class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</span></p>\n"},
-	{"0", "$$a^2 + b^2 = \\color{red}c^2$$\n", "<div class=\"vditor-math\">a^2 + b^2 = \\color{red}c^2</div>\n"},
+	{"6", "lu$a^2 + b^2 = \\color{red}c^2$te$a^2$m\n", "<p>lu<span class=\"language-math\">a^2 + b^2 = \\color{red}c^2</span>te<span class=\"language-math\">a^2</span>m</p>\n"},
+	{"5", "lu$a^2 + b^2 = \\color{red}c^2$te\n", "<p>lu<span class=\"language-math\">a^2 + b^2 = \\color{red}c^2</span>te</p>\n"},
+	{"4", "lu$$a^2 + b^2 = \\color{red}c^2$$te\n", "<p>lu\n<div class=\"language-math\">a^2 + b^2 = \\color{red}c^2</div>\nte</p>\n"},
+	{"3", "$$\na^2 + b^2 = \\color{red}c^2\n$$\n", "<div class=\"language-math\">a^2 + b^2 = \\color{red}c^2</div>\n"},
+	{"2", "| $a^2 + b^2 = \\color{red}c^2$ | bar |\n| --- | --- |\n| baz | bim |\n", "<table>\n<thead>\n<tr>\n<th><span class=\"language-math\">a^2 + b^2 = \\color{red}c^2</span></th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>baz</td>\n<td>bim</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"1", "$a^2 + b^2 = \\color{red}c^2$\n", "<p><span class=\"language-math\">a^2 + b^2 = \\color{red}c^2</span></p>\n"},
+	{"0", "$$a^2 + b^2 = \\color{red}c^2$$\n", "<div class=\"language-math\">a^2 + b^2 = \\color{red}c^2</div>\n"},
 }
 
 func TestMath(t *testing.T) {
@@ -53,7 +53,7 @@ func TestMath(t *testing.T) {
 var inlineMathDigitTests = []parseTest{
 
 	{"not allow digit after $", "$1$", "<p>$1$</p>\n"},
-	{"allow digit after $", "$1$", "<p><span class=\"vditor-math\">1</span></p>\n"},
+	{"allow digit after $", "$1$", "<p><span class=\"language-math\">1</span></p>\n"},
 }
 
 func TestInlineMathDigit(t *testing.T) {
