@@ -436,6 +436,12 @@ func (r *VditorIRBlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) 
 		r.tag("/code", nil, false)
 		r.tag("/span", nil, false)
 		r.tag("/span", nil, false)
+
+		nextNodeText := node.NextNodeText()
+		nextNodeText = strings.ReplaceAll(nextNodeText, util.Caret, "")
+		if "" == nextNodeText {
+			r.WriteString(parse.Zwsp)
+		}
 	}
 	return ast.WalkContinue
 }
