@@ -50,7 +50,9 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		var attrs [][]string
 		r.handleKramdownIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
-		r.tag("pre", attrs, false)
+		if !preDiv {
+			r.tag("pre", attrs, false)
+		}
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
 			if "mindmap" == language {
@@ -74,7 +76,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		}
 	} else {
 		if preDiv {
-			r.WriteString("</div></pre>")
+			r.WriteString("</div>")
 		} else {
 			r.WriteString("</code></pre>")
 		}

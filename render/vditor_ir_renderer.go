@@ -455,11 +455,11 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 
 	if r.Option.VditorCodeBlockPreview {
 		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", attrs, false)
+		r.tag("div", attrs, false)
 		tokens := node.Tokens
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(html.EscapeHTML(tokens))
-		r.WriteString("</code></pre>")
+		r.WriteString("</div></pre>")
 	}
 	return ast.WalkContinue
 }

@@ -1185,11 +1185,11 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 
 	if r.Option.VditorCodeBlockPreview {
 		r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", attrs, false)
+		r.tag("div", attrs, false)
 		tokens := node.Tokens
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(html.EscapeHTML(tokens))
-		r.WriteString("</code></pre>")
+		r.WriteString("</div></pre>")
 	}
 	return ast.WalkContinue
 }

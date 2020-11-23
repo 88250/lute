@@ -85,7 +85,6 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 
 			if "mindmap" == language {
 				json := r.renderMindmap(tokens)
-				r.tag("pre", attrs, false)
 				r.WriteString("<div data-code=\"")
 				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")
@@ -98,8 +97,12 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			}
 
 			if !rendered {
-				r.tag("pre", attrs, false)
-				r.WriteString("<code class=\"language-")
+				if preDiv {
+					r.WriteString("<div class=\"language-")
+				} else {
+					r.tag("pre", attrs, false)
+					r.WriteString("<code class=\"language-")
+				}
 				r.WriteString(language)
 				r.WriteString("\">")
 				tokens = html.EscapeHTML(tokens)
@@ -131,7 +134,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		}
 	} else {
 		if preDiv {
-			r.WriteString("</div></pre>")
+			r.WriteString("</div>")
 		} else {
 			r.WriteString("</code></pre>")
 		}
