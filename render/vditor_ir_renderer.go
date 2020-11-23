@@ -521,10 +521,10 @@ func (r *VditorIRRenderer) renderInlineMathContent(node *ast.Node, entering bool
 		r.Write(tokens)
 		r.tag("/code", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", [][]string{{"class", "language-math"}}, false)
+		r.tag("span", [][]string{{"class", "language-math"}}, false)
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(tokens)
-		r.tag("/code", nil, false)
+		r.tag("/span", nil, false)
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
@@ -581,11 +581,11 @@ func (r *VditorIRRenderer) renderMathBlockContent(node *ast.Node, entering bool)
 
 	if r.Option.VditorMathBlockPreview {
 		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		r.tag("code", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
+		r.tag("div", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 		tokens := node.Tokens
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(html.EscapeHTML(tokens))
-		r.WriteString("</code></pre>")
+		r.WriteString("</div></pre>")
 	}
 	return ast.WalkContinue
 }
