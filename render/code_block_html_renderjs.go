@@ -38,6 +38,13 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+	var language string
+	if 0 < len(node.Previous.CodeBlockInfo) {
+		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
+		language = string(infoWords[0])
+	}
+	preDiv := noHighlight(language)
+
 	if entering {
 		r.Newline()
 		var attrs [][]string
@@ -46,15 +53,17 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		r.tag("pre", attrs, false)
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
-			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-			language := string(infoWords[0])
 			if "mindmap" == language {
 				json := r.renderMindmap(tokens)
-				r.WriteString("<code data-code=\"")
+				r.WriteString("<div data-code=\"")
 				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")
 			} else {
-				r.WriteString("<code class=\"language-" + language + "\">")
+				if preDiv {
+					r.WriteString("<div class=\"language-" + language + "\">")
+				} else {
+					r.WriteString("<code class=\"language-" + language + "\">")
+				}
 			}
 			tokens = html.EscapeHTML(tokens)
 			r.Write(tokens)
@@ -64,7 +73,11 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			r.Write(tokens)
 		}
 	} else {
-		r.WriteString("</code></pre>")
+		if preDiv {
+			r.WriteString("</div></pre>")
+		} else {
+			r.WriteString("</code></pre>")
+		}
 		r.Newline()
 	}
 	return ast.WalkContinue

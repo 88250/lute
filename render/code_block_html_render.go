@@ -28,9 +28,6 @@ import (
 	"github.com/alecthomas/chroma/styles"
 )
 
-// languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
-var languagesNoHighlight = []string{"mermaid", "echarts", "abc", "graphviz"}
-
 func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 
@@ -65,6 +62,12 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 
 // renderCodeBlockCode 进行代码块 HTML 渲染，实现语法高亮。
 func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+	var language string
+	if 0 < len(node.Previous.CodeBlockInfo) {
+		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
+		language = util.BytesToStr(infoWords[0])
+	}
+	preDiv := noHighlight(language)
 	if entering {
 		var attrs [][]string
 		r.handleKramdownIAL(node.Parent)
@@ -72,8 +75,6 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
-			infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-			language := util.BytesToStr(infoWords[0])
 			rendered := false
 			if isGo(language) {
 				// Go 代码块自动格式化 https://github.com/b3log/lute/issues/37
@@ -85,13 +86,13 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			if "mindmap" == language {
 				json := r.renderMindmap(tokens)
 				r.tag("pre", attrs, false)
-				r.WriteString("<code data-code=\"")
+				r.WriteString("<div data-code=\"")
 				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")
 				r.Write(html.EscapeHTML(tokens))
 				rendered = true
 			} else {
-				if r.Option.CodeSyntaxHighlight && !noHighlight(language) {
+				if r.Option.CodeSyntaxHighlight && !preDiv {
 					rendered = highlightChroma(node.Parent, tokens, language, r)
 				}
 			}
@@ -129,7 +130,11 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			}
 		}
 	} else {
-		r.WriteString("</code></pre>")
+		if preDiv {
+			r.WriteString("</div></pre>")
+		} else {
+			r.WriteString("</code></pre>")
+		}
 	}
 	return ast.WalkContinue
 }
@@ -191,15 +196,6 @@ func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *Html
 		}
 	}
 	return
-}
-
-func noHighlight(language string) bool {
-	for _, langNoHighlight := range languagesNoHighlight {
-		if language == langNoHighlight {
-			return true
-		}
-	}
-	return false
 }
 
 func isGo(language string) bool {
