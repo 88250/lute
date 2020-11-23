@@ -142,19 +142,40 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 }
 
 func (r *VditorIRBlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderDivNode(node)
+	} else {
+		r.WriteString("</div>")
+	}
 	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
+	if entering {
+		r.tag("span", [][]string{{"data-type", "super-block-open-marker"}}, false)
+		r.Write(node.Tokens)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--info"}, {"data-type", "super-block-info"}}, false)
+		r.WriteString(parse.Zwsp)
+		r.Write(node.Tokens)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
+	if entering {
+		r.tag("span", [][]string{{"data-type", "super-block-close-marker"}}, false)
+		r.Write(node.Tokens)
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
@@ -1795,6 +1816,8 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	switch node.Type {
 	case ast.NodeCodeBlock:
 		attrs = append(attrs, []string{"data-type", "code-block"})
+	case ast.NodeSuperBlock:
+		attrs = append(attrs, []string{"data-type", "super-block"})
 	case ast.NodeMathBlock:
 		attrs = append(attrs, []string{"data-type", "math-block"})
 	case ast.NodeYamlFrontMatter:
