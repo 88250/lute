@@ -133,7 +133,47 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
+	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
+	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
+	ret.RendererFuncs[ast.NodeSuperBlockLayout] = ret.renderSuperBlockLayout
+	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	return ret
+}
+
+func (r *FormatRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.CodeBlockInfo)
+		r.WriteByte(lex.ItemNewline)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		r.Write(node.Tokens)
+		r.Newline()
+		if !r.isLastNode(r.Tree.Root, node) {
+			if r.withoutKramdownIAL(node.Parent) {
+				r.WriteByte(lex.ItemNewline)
+			}
+		}
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {

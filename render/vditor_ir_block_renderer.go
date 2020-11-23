@@ -134,7 +134,27 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
+	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
+	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
+	ret.RendererFuncs[ast.NodeSuperBlockLayout] = ret.renderSuperBlockLayout
+	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	return ret
+}
+
+func (r *VditorIRBlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *VditorIRBlockRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *VditorIRBlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
 }
 
 func (r *VditorIRBlockRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
