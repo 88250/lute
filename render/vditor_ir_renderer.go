@@ -421,6 +421,7 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	isFenced := node.Parent.IsFencedCodeBlock
 	caretInInfo := false
+	var language string
 	if isFenced {
 		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, util.CaretTokens)
 		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
@@ -428,7 +429,7 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 	var attrs [][]string
 	if isFenced && 0 < len(node.Previous.CodeBlockInfo) {
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-		language := string(infoWords[0])
+		language = string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})
 		if "mindmap" == language {
 			dataCode := r.renderMindmap(node.Tokens)
@@ -455,11 +456,20 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 
 	if r.Option.VditorCodeBlockPreview {
 		r.tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		r.tag("div", attrs, false)
+		preDiv := noHighlight(language)
+		if preDiv {
+			r.tag("div", attrs, false)
+		} else {
+			r.tag("code", attrs, false)
+		}
 		tokens := node.Tokens
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(html.EscapeHTML(tokens))
-		r.WriteString("</div></pre>")
+		if preDiv {
+			r.WriteString("</div></pre>")
+		} else {
+			r.WriteString("</code></pre>")
+		}
 	}
 	return ast.WalkContinue
 }
