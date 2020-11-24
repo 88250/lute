@@ -106,7 +106,8 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
 			lex.ItemDollar != maybeMarker && // 数学公式
 			lex.ItemOpenBracket != maybeMarker && // 脚注
-			lex.ItemOpenBrace != maybeMarker && // kramdown 内联属性列表或超级块
+			lex.ItemOpenBrace != maybeMarker && // kramdown 内联属性列表或超级块开始
+			lex.ItemCloseBrace != maybeMarker && // 超级块闭合
 			lex.ItemBang != maybeMarker && "！"[0] != maybeMarker && // 内容块嵌入
 			util.Caret[0] != maybeMarker { // Vditor 编辑器支持
 			t.Context.advanceNextNonspace()
