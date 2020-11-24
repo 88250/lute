@@ -219,7 +219,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	if "" == nodeID {
 		if "p" == dataType || "ul" == dataType || "ol" == dataType || "blockquote" == dataType ||
 			"math-block" == dataType || "code-block" == dataType || "table" == dataType || "h" == dataType ||
-			"link-ref-defs-block" == dataType || "footnotes-block" == dataType {
+			"link-ref-defs-block" == dataType || "footnotes-block" == dataType || "super-block" == dataType {
 			nodeID = ast.NewNodeID()
 		}
 	}
@@ -1063,6 +1063,20 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: marker, CodeBlockFenceLen: len(marker)})
 			return
+		case "super-block-open-marker":
+			tree.Context.Tip.IsFencedCodeBlock = true
+			node.Type = ast.NodeCodeBlockFenceOpenMarker
+			node.Tokens = []byte("{{{")
+			tree.Context.Tip.AppendChild(node)
+			return
+		case "super-block-layout":
+			info := []byte(lute.domText(n))
+			info = bytes.ReplaceAll(info, []byte(parse.Zwsp), nil)
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeSuperBlockLayout, Tokens: info})
+			return
+		case "super-block-close-marker":
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker, Tokens: []byte("}}}")})
+			return
 		case "heading-marker":
 			text := lute.domText(n)
 			if caretInMarker := strings.Contains(text, util.Caret); caretInMarker {
@@ -1085,6 +1099,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Div:
 		switch dataType {
+		case "super-block":
+			node.Type = ast.NodeSuperBlock
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
 		case "math-block":
 			node.Type = ast.NodeMathBlock
 			tree.Context.Tip.AppendChild(node)

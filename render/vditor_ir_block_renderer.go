@@ -161,7 +161,7 @@ func (r *VditorIRBlockRenderer) renderSuperBlockOpenMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--info"}, {"data-type", "super-block-info"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--info"}, {"data-type", "super-block-layout"}}, false)
 		r.WriteString(parse.Zwsp)
 		r.Write(node.Tokens)
 		r.tag("/span", nil, false)
