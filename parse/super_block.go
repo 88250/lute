@@ -19,7 +19,7 @@ import (
 )
 
 func SuperBlockContinue(superBlock *ast.Node, context *Context) int {
-	if ok := context.isSuperBlockClose(context.currentLine[context.nextNonspace:]); ok {
+	if context.isSuperBlockClose(context.currentLine[context.nextNonspace:]) {
 		return 2
 	}
 	return 0
@@ -67,8 +67,11 @@ func (context *Context) isSuperBlockClose(tokens []byte) (ok bool) {
 		return
 	}
 	if endCaret {
-		c := context.Tip.FirstChild.Next.Next.LastDeepestChild()
-		c.Tokens = append(c.Tokens, util.CaretTokens...)
+		paras := context.Tip.ChildrenByType(ast.NodeParagraph)
+		if length := len(paras); 0 < length {
+			lastP := paras[length-1]
+			lastP.Tokens = append(lastP.Tokens, util.CaretTokens...)
+		}
 	}
 	return true
 }
