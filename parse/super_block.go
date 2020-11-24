@@ -60,15 +60,6 @@ func (t *Tree) parseSuperBlock() (ok bool, layout []byte) {
 }
 
 func (context *Context) isSuperBlockClose(tokens []byte) (ok bool) {
-	if context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
-		//// TODO: 超级块结束判断 IAL 打断
-		//if ial := context.parseKramdownIAL(tokens); 0 < len(ial) {
-		//	context.Tip.KramdownIAL = ial
-		//	context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: tokens})
-		//	return true
-		//}
-	}
-
 	tokens = lex.TrimWhitespace(tokens)
 	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
 	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)

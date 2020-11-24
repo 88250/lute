@@ -395,6 +395,10 @@ func (n *Node) CanContain(nodeType NodeType) bool {
 	case NodeFootnotesDef:
 		return NodeFootnotesDef != nodeType
 	case NodeSuperBlock:
+		if nil != n.LastChild && NodeSuperBlockCloseMarker == n.LastChild.Type {
+			// 超级块已经闭合
+			return false
+		}
 		return true
 	}
 	return NodeListItem != nodeType
