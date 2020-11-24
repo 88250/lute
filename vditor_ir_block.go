@@ -1082,6 +1082,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(text)})
 			} else {
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker})
+				if strings.Contains(text, util.Caret) {
+					// 将插入符移到最后一个文本节点末尾
+					paras := tree.Context.Tip.ChildrenByType(ast.NodeText)
+					if length := len(paras); 0 < length {
+						lastP := paras[length-1]
+						lastP.Tokens = append(lastP.Tokens, util.CaretTokens...)
+					}
+				}
 			}
 			return
 		case "heading-marker":
