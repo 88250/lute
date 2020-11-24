@@ -73,7 +73,7 @@ func (t *Tree) incorporateLine(line []byte) {
 		case 1: // 匹配失败，不能继续处理
 			allMatched = false
 			break
-		case 2: // 匹配围栏代码块闭合，处理下一行
+		case 2: // 匹配围栏代码块或超级块闭合，处理下一行
 			return
 		}
 

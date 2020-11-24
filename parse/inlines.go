@@ -25,8 +25,20 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 		return
 	}
 
+	typ := node.Type
+
+	if ast.NodeSuperBlock == typ {
+		if nil != node.LastChild && ast.NodeSuperBlockLayout == node.LastChild.Type {
+			node.Type = ast.NodeParagraph
+			node.Tokens = append([]byte("{{{"), node.LastChild.Tokens...)
+			node.FirstChild.Unlink()
+			node.LastChild.Unlink()
+			typ = ast.NodeParagraph
+		}
+	}
+
 	// 只有如下几种类型的块节点需要生成行级子节点
-	if typ := node.Type; ast.NodeParagraph == typ || ast.NodeHeading == typ || ast.NodeTableCell == typ {
+	if ast.NodeParagraph == typ || ast.NodeHeading == typ || ast.NodeTableCell == typ {
 		tokens := node.Tokens
 		if ast.NodeParagraph == typ && nil == tokens {
 			// 解析 GFM 表节点后段落内容 Tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
