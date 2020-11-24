@@ -1065,7 +1065,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "super-block-open-marker":
 			text := lute.domText(n)
-			if "{{{"  != strings.ReplaceAll(text, util.Caret, "") {
+			if "{{{" != strings.ReplaceAll(text, util.Caret, "") {
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(text)})
 			} else {
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeSuperBlockOpenMarker})
@@ -1078,7 +1078,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "super-block-close-marker":
 			text := lute.domText(n)
-			if "}}}"  != strings.ReplaceAll(text, util.Caret, "") {
+			if "}}}" != strings.ReplaceAll(text, util.Caret, "") {
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(text)})
 			} else {
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker})
@@ -1107,7 +1107,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Div:
 		switch dataType {
 		case "super-block":
-			node.Type = ast.NodeParagraph
+			node.Type = ast.NodeSuperBlock
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()

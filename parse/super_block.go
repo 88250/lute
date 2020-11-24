@@ -20,7 +20,16 @@ import (
 
 func SuperBlockContinue(superBlock *ast.Node, context *Context) int {
 	if context.isSuperBlockClose(context.currentLine[context.nextNonspace:]) {
-		return 2
+		level := 0
+		for p := context.Tip; nil != p; p = p.Parent {
+			if ast.NodeSuperBlock == p.Type {
+				level++
+			}
+		}
+		if 1 < level {
+			return 4 // 嵌套层闭合
+		}
+		return 3 // 顶层闭合
 	}
 	return 0
 }

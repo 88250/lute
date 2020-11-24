@@ -73,10 +73,19 @@ func (t *Tree) incorporateLine(line []byte) {
 		case 1: // 匹配失败，不能继续处理
 			allMatched = false
 			break
-		case 2: // 匹配围栏代码块或超级块闭合，处理下一行
-			if ast.NodeSuperBlock == container.Type {
-				container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker, Close: true})
+		case 2: // 匹配围栏代码块闭合，处理下一行
+			return
+		case 3: // 匹配顶层超级块闭合，处理下一行
+			container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker, Close: true})
+			return
+		case 4: // 匹配超级块嵌套层闭合
+			for p := t.Context.Tip; nil != p; p = p.Parent {
+				if ast.NodeSuperBlock == p.Type {
+					container = p // 找到最近的超级块
+					break
+				}
 			}
+			container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker, Close: true})
 			return
 		}
 
@@ -213,10 +222,6 @@ func (t *Tree) addLine() {
 // _continue 判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。
 // 如果可以继续处理返回 0，如果不能接续处理返回 1，如果返回 2（仅在围栏代码块或超级块闭合时）则说明可以继续下一行处理了。
 func _continue(n *ast.Node, context *Context) int {
-	if context.isSuperBlockClose(context.currentLine) {
-		return 2
-	}
-
 	switch n.Type {
 	case ast.NodeCodeBlock:
 		return CodeBlockContinue(n, context)
