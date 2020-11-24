@@ -1065,7 +1065,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		case "super-block-open-marker":
 			tree.Context.Tip.IsFencedCodeBlock = true
-			node.Type = ast.NodeCodeBlockFenceOpenMarker
+			node.Type = ast.NodeSuperBlockOpenMarker
 			node.Tokens = []byte("{{{")
 			tree.Context.Tip.AppendChild(node)
 			return
