@@ -153,7 +153,7 @@ func (r *VditorIRBlockRenderer) renderSuperBlock(node *ast.Node, entering bool) 
 func (r *VditorIRBlockRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.tag("span", [][]string{{"data-type", "super-block-open-marker"}}, false)
-		r.Write(node.Tokens)
+		r.Write([]byte("{{{"))
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
@@ -172,7 +172,7 @@ func (r *VditorIRBlockRenderer) renderSuperBlockLayout(node *ast.Node, entering 
 func (r *VditorIRBlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.tag("span", [][]string{{"data-type", "super-block-close-marker"}}, false)
-		r.Write(node.Tokens)
+		r.Write([]byte("}}}"))
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue

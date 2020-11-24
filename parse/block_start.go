@@ -397,7 +397,7 @@ var blockStarts = []blockStartFunc{
 		if ok, layout := t.parseSuperBlock(); ok {
 			t.Context.closeUnmatchedBlocks()
 			t.Context.addChild(ast.NodeSuperBlock)
-			t.Context.addChildMarker(ast.NodeSuperBlockOpenMarker, []byte("{{{"))
+			t.Context.addChildMarker(ast.NodeSuperBlockOpenMarker, nil)
 			t.Context.addChildMarker(ast.NodeSuperBlockLayout, layout)
 			t.Context.offset = t.Context.currentLineLen - 1 // 整行过
 			return 1

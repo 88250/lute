@@ -87,6 +87,8 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 			node.AppendChild(code)
 		}
 		node.Tokens = nil
+	} else if ast.NodeSuperBlock == typ {
+		node.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker})
 	}
 
 	// 遍历处理子节点

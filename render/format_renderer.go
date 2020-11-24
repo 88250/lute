@@ -149,14 +149,14 @@ func (r *FormatRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.Wal
 
 func (r *FormatRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.Tokens)
+		r.Write([]byte("{{{"))
 	}
 	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.CodeBlockInfo)
+		r.Write(node.Tokens)
 		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkContinue
@@ -165,7 +165,7 @@ func (r *FormatRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) a
 func (r *FormatRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.Write(node.Tokens)
+		r.Write([]byte("}}}"))
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
 			if r.withoutKramdownIAL(node.Parent) {
