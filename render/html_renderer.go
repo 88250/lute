@@ -14,7 +14,6 @@ import (
 	"bytes"
 	"github.com/88250/lute/html"
 	"strconv"
-	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -352,23 +351,7 @@ func (r *HtmlRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *HtmlRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		headings := r.headings()
-		length := len(headings)
-		if 1 > length {
-			return ast.WalkContinue
-		}
-		r.WriteString("<div class=\"vditor-toc\">")
-		for _, heading := range headings {
-			level := strconv.Itoa(heading.HeadingLevel)
-			spaces := (heading.HeadingLevel - 1) * 2
-			r.WriteString(strings.Repeat("&emsp;", spaces))
-			r.WriteString("<span class=\"toc-h" + level + "\">")
-			r.WriteString("<a class=\"toc-a\" href=\"#" + HeadingID(heading) + "\">" + heading.Text() + "</a></span><br>")
-		}
-		r.WriteString("</div>")
-	}
-	return ast.WalkContinue
+	return r.BaseRenderer.renderToC(node, entering)
 }
 
 func (r *HtmlRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {

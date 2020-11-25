@@ -282,29 +282,7 @@ func (r *VditorIRRenderer) renderBackslash(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *VditorIRRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		headings := r.headings()
-		length := len(headings)
-		r.WriteString("<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\">")
-		if 0 < length {
-			for _, heading := range headings {
-				spaces := (heading.HeadingLevel - 1) * 2
-				r.WriteString(strings.Repeat("&emsp;", spaces))
-				r.WriteString("<span data-type=\"toc-h\">")
-				r.WriteString(heading.Text() + "</span><br>")
-			}
-		} else {
-			r.WriteString("[toc]<br>")
-		}
-		r.WriteString("</div>")
-		caretInDest := bytes.Contains(node.Tokens, util.CaretTokens)
-		r.WriteString("<p data-block=\"0\">")
-		if caretInDest {
-			r.WriteString(util.Caret)
-		}
-		r.WriteString("</p>")
-	}
-	return ast.WalkContinue
+	return r.BaseRenderer.renderToC(node, entering)
 }
 
 func (r *VditorIRRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {

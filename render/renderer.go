@@ -239,14 +239,141 @@ func normalizeHeadingID(heading *ast.Node) (ret string) {
 	return
 }
 
-func (r *BaseRenderer) headings() (ret []*ast.Node) {
-	// 仅有顶级标题（直接挂在根上的）才纳入 ToC 生成，挂在其他元素下的标题不生成 ToC https://github.com/88250/lute/issues/38
-	for n := r.Tree.Root.FirstChild; nil != n; n = n.Next {
-		if ast.NodeHeading == n.Type {
-			ret = append(ret, n)
+type Heading struct {
+	URL      string     `json:"url"`
+	Path     string     `json:"path"`
+	ID       string     `json:"id"`
+	Content  string     `json:"content"`
+	Level    int        `json:"level"`
+	Children []*Heading `json:"children"`
+	parent   *Heading
+}
+
+func (r *BaseRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		headings := r.headings()
+		length := len(headings)
+		r.WriteString("<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\">")
+		if 0 < length {
+			r.WriteString("<ul>")
+			for _, child := range headings {
+				r.renderToC0(child)
+			}
+			r.WriteString("</ul>")
+		} else {
+			r.WriteString("[toc]<br>")
 		}
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *BaseRenderer) renderToC0(heading *Heading) {
+	r.WriteString("<li>")
+	r.WriteString(heading.Content)
+	if 0 < len(heading.Children) {
+		r.WriteString("<ul>")
+		for _, child := range heading.Children {
+			r.renderToC0(child)
+		}
+		r.WriteString("</ul>")
+	}
+	r.WriteString("</li>")
+}
+
+func (r *BaseRenderer) headings() (ret []*Heading) {
+	headings := r.Tree.Root.ChildrenByType(ast.NodeHeading)
+	var tip *Heading
+	for _, heading := range headings {
+		if r.Tree.Root != heading.Parent {
+			continue
+		}
+
+		h := &Heading{
+			URL:     r.Tree.URL,
+			Path:    r.Tree.Path,
+			ID:      heading.ID,
+			Content: headingText(heading),
+			Level:   heading.HeadingLevel,
+		}
+
+		if nil == tip {
+			ret = append(ret, h)
+		} else {
+			if tip.Level < h.Level {
+				tip.Children = append(tip.Children, h)
+				h.parent = tip
+			} else {
+				if parent := parentTip(h, tip); nil == parent {
+					ret = append(ret, h)
+				} else {
+					parent.Children = append(parent.Children, h)
+					h.parent = tip.parent
+				}
+			}
+		}
+		tip = h
 	}
 	return
+}
+
+func parentTip(currentHeading, tip *Heading) *Heading {
+	if nil == tip.parent {
+		return nil
+	}
+
+	for parent := tip.parent; nil != parent; parent = parent.parent {
+		if parent.Level < currentHeading.Level {
+			return parent
+		}
+	}
+	return nil
+}
+
+func headingText(n *ast.Node) (ret string) {
+	buf := &bytes.Buffer{}
+	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		switch n.Type {
+		case ast.NodeLinkText, ast.NodeBlockRefText, ast.NodeBlockEmbedText:
+			buf.Write(n.Tokens)
+		case ast.NodeInlineMathContent:
+			buf.WriteString("<span class=\"language-math\">")
+			buf.Write(n.Tokens)
+			buf.WriteString("</span>")
+		case ast.NodeCodeSpanContent:
+			buf.WriteString("<code>")
+			buf.Write(n.Tokens)
+			buf.WriteString("</code>")
+		case ast.NodeText:
+			if n.ParentIs(ast.NodeStrong) {
+				buf.WriteString("<strong>")
+				buf.Write(n.Tokens)
+				buf.WriteString("</strong>")
+			} else if n.ParentIs(ast.NodeEmphasis) {
+				buf.WriteString("<em>")
+				buf.Write(n.Tokens)
+				buf.WriteString("</em>")
+			} else {
+				if nil != n.Previous && ast.NodeInlineHTML == n.Previous.Type {
+					if bytes.HasPrefix(n.Previous.Tokens, []byte("<font ")) {
+						buf.Write(n.Previous.Tokens)
+						buf.Write(n.Tokens)
+					}
+					if nil != n.Next && bytes.Equal(n.Next.Tokens, []byte("</font>")) {
+						buf.Write(n.Next.Tokens)
+					}
+				} else {
+					buf.Write(n.Tokens)
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
+	return buf.String()
 }
 
 func (r *BaseRenderer) setextHeadingLen(node *ast.Node) (ret int) {

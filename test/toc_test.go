@@ -18,7 +18,7 @@ import (
 
 var tocTests = []parseTest{
 
-	{"0", "[toc]\n\n# 1\n\n## 1.1\n\n# 2\n", "<div class=\"vditor-toc\"><span class=\"toc-h1\"><a class=\"toc-a\" href=\"#1\">1</a></span><br>&emsp;&emsp;<span class=\"toc-h2\"><a class=\"toc-a\" href=\"#1-1\">1.1</a></span><br><span class=\"toc-h1\"><a class=\"toc-a\" href=\"#2\">2</a></span><br></div>\n<h1 id=\"1\">1</h1>\n<h2 id=\"1-1\">1.1</h2>\n<h1 id=\"2\">2</h1>\n"},
+	{"0", "[toc]\n\n# 1\n\n## 1.1\n\n# 2\n", "<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\"><ul><li>1<ul><li>1.1</li></ul></li><li>2</li></ul></div>\n<h1 id=\"1\">1</h1>\n<h2 id=\"1-1\">1.1</h2>\n<h1 id=\"2\">2</h1>\n"},
 }
 
 func TestToC(t *testing.T) {
