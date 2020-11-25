@@ -847,10 +847,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 		return
 	case atom.Span:
-		if nil == n.FirstChild {
-			break
-		}
-
 		switch dataType {
 		case "block-ref":
 			text := lute.domText(n)

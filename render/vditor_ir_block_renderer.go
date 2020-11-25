@@ -143,7 +143,6 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 
 func (r *VditorIRBlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
 		r.renderDivNode(node)
 	} else {
 		r.WriteString("</div>")
@@ -165,15 +164,12 @@ func (r *VditorIRBlockRenderer) renderSuperBlockLayout(node *ast.Node, entering 
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--info"}, {"data-type", "super-block-layout"}}, false)
 		r.Write(node.Tokens)
 		r.tag("/span", nil, false)
-	} else {
-		r.Newline()
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
 		r.tag("span", [][]string{{"data-type", "super-block-close-marker"}}, false)
 		r.Write([]byte("}}}"))
 		r.tag("/span", nil, false)
