@@ -63,6 +63,15 @@ func (t *Tree) parseYamlFrontMatter() bool {
 }
 
 func isYamlFrontMatterClose(context *Context) bool {
+	if context.Option.KramdownIAL && len("{: id=\"") < len(context.currentLine) {
+		// 判断 IAL 打断
+		if ial := context.parseKramdownIAL(context.currentLine); 0 < len(ial) {
+			context.Tip.KramdownIAL = ial
+			context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: context.currentLine})
+			return true
+		}
+	}
+
 	if lex.ItemHyphen != context.currentLine[0] {
 		return false
 	}
