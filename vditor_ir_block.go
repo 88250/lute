@@ -575,6 +575,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			var codeTokens []byte
 			if nil != n.FirstChild.FirstChild {
 				codeTokens = []byte(n.FirstChild.FirstChild.Data)
+				for next := n.FirstChild.FirstChild.NextSibling; nil != next; next = next.NextSibling {
+					// YAML Front Matter 中删除问题 https://github.com/siyuan-note/siyuan/issues/109
+					codeTokens = append(codeTokens, []byte(lute.domText(next))...)
+				}
 			}
 
 			divDataType := lute.domAttrValue(n.Parent, "data-type")
