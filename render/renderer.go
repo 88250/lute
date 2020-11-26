@@ -121,56 +121,64 @@ func (r *BaseRenderer) Newline() {
 }
 
 func (r *BaseRenderer) TextAutoSpacePrevious(node *ast.Node) {
-	if r.Option.AutoSpace {
-		if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
-			if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
-				prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
-				first, _ := utf8.DecodeRune(text.Tokens)
-				if allowSpace(prevLast, first) {
-					r.Writer.WriteByte(lex.ItemSpace)
-				}
+	if !r.Option.AutoSpace {
+		return
+	}
+
+	if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
+		if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
+			prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
+			first, _ := utf8.DecodeRune(text.Tokens)
+			if allowSpace(prevLast, first) {
+				r.Writer.WriteByte(lex.ItemSpace)
 			}
 		}
 	}
 }
 
 func (r *BaseRenderer) TextAutoSpaceNext(node *ast.Node) {
-	if r.Option.AutoSpace {
-		if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
-			if next := node.Next; nil != next && ast.NodeText == next.Type {
-				nextFirst, _ := utf8.DecodeRune(next.Tokens)
-				last, _ := utf8.DecodeLastRune(text.Tokens)
-				if allowSpace(last, nextFirst) {
-					r.Writer.WriteByte(lex.ItemSpace)
-				}
+	if !r.Option.AutoSpace {
+		return
+	}
+
+	if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
+		if next := node.Next; nil != next && ast.NodeText == next.Type {
+			nextFirst, _ := utf8.DecodeRune(next.Tokens)
+			last, _ := utf8.DecodeLastRune(text.Tokens)
+			if allowSpace(last, nextFirst) {
+				r.Writer.WriteByte(lex.ItemSpace)
 			}
 		}
 	}
 }
 
 func (r *BaseRenderer) LinkTextAutoSpacePrevious(node *ast.Node) {
-	if r.Option.AutoSpace {
-		if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
-			if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
-				prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
-				first, _ := utf8.DecodeRune(text.Tokens)
-				if allowSpace(prevLast, first) {
-					r.Writer.WriteByte(lex.ItemSpace)
-				}
+	if !r.Option.AutoSpace {
+		return
+	}
+
+	if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
+		if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
+			prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
+			first, _ := utf8.DecodeRune(text.Tokens)
+			if allowSpace(prevLast, first) {
+				r.Writer.WriteByte(lex.ItemSpace)
 			}
 		}
 	}
 }
 
 func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
-	if r.Option.AutoSpace {
-		if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
-			if next := node.Next; nil != next && ast.NodeText == next.Type {
-				nextFirst, _ := utf8.DecodeRune(next.Tokens)
-				last, _ := utf8.DecodeLastRune(text.Tokens)
-				if allowSpace(last, nextFirst) {
-					r.Writer.WriteByte(lex.ItemSpace)
-				}
+	if !r.Option.AutoSpace {
+		return
+	}
+
+	if text := node.ChildByType(ast.NodeLinkText); nil != text && nil != text.Tokens {
+		if next := node.Next; nil != next && ast.NodeText == next.Type {
+			nextFirst, _ := utf8.DecodeRune(next.Tokens)
+			last, _ := utf8.DecodeLastRune(text.Tokens)
+			if allowSpace(last, nextFirst) {
+				r.Writer.WriteByte(lex.ItemSpace)
 			}
 		}
 	}
