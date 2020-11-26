@@ -1351,24 +1351,6 @@ func (r *VditorIRRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *VditorIRRenderer) tag(name string, attrs [][]string, selfclosing bool) {
-	if r.DisableTags > 0 {
-		return
-	}
-
-	r.WriteString("<")
-	r.WriteString(name)
-	if 0 < len(attrs) {
-		for _, attr := range attrs {
-			r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
-		}
-	}
-	if selfclosing {
-		r.WriteString(" /")
-	}
-	r.WriteString(">")
-}
-
 func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 	text := r.Text(node)
 	var attrs [][]string

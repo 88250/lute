@@ -278,7 +278,9 @@ func (r *BaseRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 
 func (r *BaseRenderer) renderToC0(heading *Heading) {
 	r.WriteString("<li>")
+	r.tag("span", [][]string{{"data-target-id", heading.ID}}, false)
 	r.WriteString(heading.Content)
+	r.tag("/span", nil, false)
 	if 0 < len(heading.Children) {
 		r.WriteString("<ul>")
 		for _, child := range heading.Children {
@@ -289,6 +291,24 @@ func (r *BaseRenderer) renderToC0(heading *Heading) {
 	r.WriteString("</li>")
 }
 
+func (r *BaseRenderer) tag(name string, attrs [][]string, selfclosing bool) {
+	if r.DisableTags > 0 {
+		return
+	}
+
+	r.WriteString("<")
+	r.WriteString(name)
+	if 0 < len(attrs) {
+		for _, attr := range attrs {
+			r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
+		}
+	}
+	if selfclosing {
+		r.WriteString(" /")
+	}
+	r.WriteString(">")
+}
+
 func (r *BaseRenderer) headings() (ret []*Heading) {
 	headings := r.Tree.Root.ChildrenByType(ast.NodeHeading)
 	var tip *Heading
@@ -297,10 +317,20 @@ func (r *BaseRenderer) headings() (ret []*Heading) {
 			continue
 		}
 
+		id := HeadingID(heading)
+		if r.Option.KramdownIAL {
+			for _, kv := range heading.KramdownIAL {
+				if "id" == kv[0] {
+					id = kv[1]
+					break
+				}
+			}
+		}
+
 		h := &Heading{
 			URL:     r.Tree.URL,
 			Path:    r.Tree.Path,
-			ID:      heading.ID,
+			ID:      id,
 			Content: headingText(heading),
 			Level:   heading.HeadingLevel,
 		}

@@ -1051,24 +1051,6 @@ func (r *HtmlRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *HtmlRenderer) tag(name string, attrs [][]string, selfclosing bool) {
-	if r.DisableTags > 0 {
-		return
-	}
-
-	r.WriteString("<")
-	r.WriteString(name)
-	if 0 < len(attrs) {
-		for _, attr := range attrs {
-			r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
-		}
-	}
-	if selfclosing {
-		r.WriteString(" /")
-	}
-	r.WriteString(">")
-}
-
 func (r *HtmlRenderer) handleKramdownIAL(node *ast.Node) {
 	if r.Option.KramdownIAL && "id" != r.Option.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
 		// 第一项必须是 ID
