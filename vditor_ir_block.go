@@ -303,7 +303,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			return
 		} else if "toc-block" == dataType {
-			node := &ast.Node{Type: ast.NodeText, Tokens: []byte("[toc]\n\n")}
+			node := &ast.Node{Type: ast.NodeToC}
 			tree.Context.Tip.AppendChild(node)
 			return
 		} else if "block-query-embed" == dataType {
