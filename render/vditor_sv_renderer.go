@@ -155,6 +155,12 @@ func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
+	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
+	ret.RendererFuncs[ast.NodeSupOpenMarker] = ret.renderSupOpenMarker
+	ret.RendererFuncs[ast.NodeSupCloseMarker] = ret.renderSupCloseMarker
+	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
+	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
+	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
@@ -242,6 +248,63 @@ func (r *VditorSVRenderer) renderMark2CloseMarker(node *ast.Node, entering bool)
 	if entering {
 		r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
 		r.WriteString("==")
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+	} else {
+		r.popWriteClass(node, "sup")
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+		r.WriteString("^")
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+		r.WriteString("^")
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+
+func (r *VditorSVRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Writer = &bytes.Buffer{}
+		r.nodeWriterStack = append(r.nodeWriterStack, r.Writer)
+	} else {
+		r.popWriteClass(node, "sub")
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+		r.WriteString("~")
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorSVRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
+		r.WriteString("~")
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue

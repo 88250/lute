@@ -114,6 +114,12 @@ func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
+	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
+	ret.RendererFuncs[ast.NodeSupOpenMarker] = ret.renderSupOpenMarker
+	ret.RendererFuncs[ast.NodeSupCloseMarker] = ret.renderSupCloseMarker
+	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
+	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
+	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
@@ -197,6 +203,64 @@ func (r *VditorIRRenderer) renderMark2CloseMarker(node *ast.Node, entering bool)
 		r.tag("/mark", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 		r.WriteString("==")
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderSpanNode(node)
+	} else {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+		r.WriteString("^")
+		r.tag("/span", nil, false)
+		r.tag("sup", [][]string{{"data-newline", "1"}}, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("/sup", nil, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+		r.WriteString("^")
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderSpanNode(node)
+	} else {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+		r.WriteString("~")
+		r.tag("/span", nil, false)
+		r.tag("sub", [][]string{{"data-newline", "1"}}, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("/sub", nil, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+		r.WriteString("~")
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
@@ -1364,6 +1428,10 @@ func (r *VditorIRRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "s"})
 	case ast.NodeMark:
 		attrs = append(attrs, []string{"data-type", "mark"})
+	case ast.NodeSup:
+		attrs = append(attrs, []string{"data-type", "sup"})
+	case ast.NodeSub:
+		attrs = append(attrs, []string{"data-type", "sub"})
 	case ast.NodeLink:
 		if 3 != node.LinkType {
 			attrs = append(attrs, []string{"data-type", "a"})
