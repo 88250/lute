@@ -574,5 +574,14 @@ const (
 	NodeSuperBlockLayout      NodeType = 477 // 超级块布局 row/col
 	NodeSuperBlockCloseMarker NodeType = 478 // 结束超级块标记符 }}}
 
+	// 上标下标语法 https://github.com/88250/lute/issues/113
+
+	NodeSup            NodeType = 485 // 上标
+	NodeSupOpenMarker  NodeType = 486 // 开始上标标记符 ^
+	NodeSupCloseMarker NodeType = 487 // 结束上标标记符 ^
+	NodeSub            NodeType = 490 // 下标
+	NodeSubOpenMarker  NodeType = 491 // 开始下标标记符 ~
+	NodeSubCloseMarker NodeType = 492 // 结束下标标记符 ~
+
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

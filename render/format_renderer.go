@@ -121,6 +121,12 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
+	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
+	ret.RendererFuncs[ast.NodeSupOpenMarker] = ret.renderSupOpenMarker
+	ret.RendererFuncs[ast.NodeSupCloseMarker] = ret.renderSupCloseMarker
+	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
+	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
+	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
@@ -268,6 +274,42 @@ func (r *FormatRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) as
 func (r *FormatRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("==")
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("^")
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("^")
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("~")
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("~")
 	}
 	return ast.WalkContinue
 }

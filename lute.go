@@ -388,6 +388,14 @@ func (lute *Lute) SetSuperBlock(b bool) {
 	lute.SuperBlock = b
 }
 
+func (lute *Lute) SetSup(b bool) {
+	lute.Sup = b
+}
+
+func (lute *Lute) SetSub(b bool) {
+	lute.Sub = b
+}
+
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 	for rendererType, extRenderer := range options["renderers"] {
 		switch extRenderer.Interface().(type) { // 稍微进行一点格式校验

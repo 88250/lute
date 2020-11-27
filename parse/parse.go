@@ -316,6 +316,10 @@ type Options struct {
 	ImgPathAllowSpace bool
 	// SuperBlock 设置是否支持超级块。 https://github.com/88250/lute/issues/111
 	SuperBlock bool
+	// Sup 设置是否打开 ^上标^ 支持。
+	Sup bool
+	// Sub 设置是否打开 ~下标~ 支持。
+	Sub bool
 }
 
 func (context *Context) ParentTip() {

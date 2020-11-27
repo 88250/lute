@@ -66,6 +66,8 @@ func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
 	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
+	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
+	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
@@ -87,6 +89,20 @@ func (r *EChartsJSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bo
 func (r *EChartsJSONRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Mark\nmark", node)
+	}
+	return ast.WalkSkipChildren
+}
+
+func (r *EChartsJSONRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.leaf("Sup\nsup", node)
+	}
+	return ast.WalkSkipChildren
+}
+
+func (r *EChartsJSONRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.leaf("Sub\nsub", node)
 	}
 	return ast.WalkSkipChildren
 }

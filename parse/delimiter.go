@@ -179,7 +179,11 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 					openMarker.Type = ast.NodeEmU8eOpenMarker
 					closeMarker.Type = ast.NodeEmU8eCloseMarker
 				} else if lex.ItemTilde == closercc {
-					if t.Context.Option.GFMStrikethrough {
+					if t.Context.Option.Sub { // 优先下标
+						emStrongDelMark.Type = ast.NodeSub
+						openMarker.Type = ast.NodeSubOpenMarker
+						closeMarker.Type = ast.NodeSubCloseMarker
+					} else if t.Context.Option.GFMStrikethrough {
 						emStrongDelMark.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough1OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough1CloseMarker
@@ -195,6 +199,12 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 						emStrongDelMark.Type = ast.NodeTag
 						openMarker.Type = ast.NodeTagOpenMarker
 						closeMarker.Type = ast.NodeTagCloseMarker
+					}
+				} else if lex.ItemCaret == closercc {
+					if t.Context.Option.Sup {
+						emStrongDelMark.Type = ast.NodeSup
+						openMarker.Type = ast.NodeSupOpenMarker
+						closeMarker.Type = ast.NodeSupCloseMarker
 					}
 				}
 			} else {
