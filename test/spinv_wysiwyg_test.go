@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"147", "<p>[ToC]</p><h2 data-block=\"0\" id=\"wysiwyg-foo_1\" data-marker=\"#\">foo</h2><h3 data-block=\"0\" id=\"wysiwyg-foo_2\" data-marker=\"#\">foo<wbr></h3>", "<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\"><ul><li><span data-target-id=\"wysiwyg-foo\">foo</span><ul><li><span data-target-id=\"wysiwyg-foo-\">foo<wbr></span></li></ul></li></ul></div><h2 data-block=\"0\" id=\"wysiwyg-foo\" data-marker=\"#\">foo</h2><h3 data-block=\"0\" id=\"wysiwyg-foo-\" data-marker=\"#\">foo<wbr></h3>"},
 	{"146", "<p data-block=\"0\"><span class=\"vditor-comment\" data-cmtids=\"20201105092654-8uy3k8g\">foo</span>ba<wbr></p>\n", "<p data-block=\"0\"><span class=\"vditor-comment\" data-cmtids=\"20201105092654-8uy3k8g\">foo</span>ba<wbr></p>"},
 	{"145", "<p data-block=\"0\"><mark data-marker=\"==\">markf<wbr></mark></p>", "<p data-block=\"0\">\u200b<mark data-marker=\"==\">markf<wbr></mark>\u200b</p>"},
 	{"144", "<p data-block=\"0\">==mark==<wbr></p>", "<p data-block=\"0\">\u200b<mark data-marker=\"==\">mark</mark>\u200b<wbr></p>"},
