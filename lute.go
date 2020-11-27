@@ -173,7 +173,7 @@ func (lute *Lute) Space(text string) string {
 func (lute *Lute) IsValidLinkDest(str string) bool {
 	luteEngine := New()
 	luteEngine.GFMAutoLink = true
-	tree := parse.Parse("", []byte(str),luteEngine.Options)
+	tree := parse.Parse("", []byte(str), luteEngine.Options)
 	if nil == tree.Root.FirstChild || nil == tree.Root.FirstChild.FirstChild {
 		return false
 	}
