@@ -118,6 +118,12 @@ func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
 	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
 	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
+	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
+	ret.RendererFuncs[ast.NodeSupOpenMarker] = ret.renderSupOpenMarker
+	ret.RendererFuncs[ast.NodeSupCloseMarker] = ret.renderSupCloseMarker
+	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
+	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
+	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
@@ -187,6 +193,42 @@ func (r *VditorRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) as
 func (r *VditorRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.tag("/mark", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("sup", [][]string{{"data-marker", "^"}}, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("/sup", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("sub", [][]string{{"data-marker", "~"}}, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("/sub", nil, false)
 	}
 	return ast.WalkContinue
 }
