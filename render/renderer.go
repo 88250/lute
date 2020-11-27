@@ -318,6 +318,12 @@ func (r *BaseRenderer) headings() (ret []*Heading) {
 		}
 
 		id := HeadingID(heading)
+		if r.Option.VditorWYSIWYG {
+			id = "wysiwyg-" + id
+		} else if r.Option.VditorIR {
+			id = "ir-" + id
+		}
+
 		if r.Option.KramdownIAL {
 			for _, kv := range heading.KramdownIAL {
 				if "id" == kv[0] {

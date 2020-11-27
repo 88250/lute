@@ -319,6 +319,7 @@ func (r *VditorSVRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStat
 		r.WriteString("[toc]")
 		r.WriteString("</span>")
 		r.Newline()
+		r.Write(NewlineSV)
 	}
 	return ast.WalkContinue
 }
