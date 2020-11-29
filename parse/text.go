@@ -33,9 +33,13 @@ func (t *Tree) parseText(ctx *InlineContext) *ast.Node {
 func (t *Tree) isMarker(token byte) bool {
 	switch token {
 	case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemOpenBracket, lex.ItemBang, lex.ItemNewline, lex.ItemBackslash, lex.ItemBacktick, lex.ItemLess,
-		lex.ItemCloseBracket, lex.ItemAmpersand, lex.ItemTilde, lex.ItemDollar, lex.ItemOpenBrace, lex.ItemOpenParen, lex.ItemEqual, lex.ItemCrosshatch,
-		lex.ItemCaret:
+		lex.ItemCloseBracket, lex.ItemAmpersand, lex.ItemTilde, lex.ItemDollar, lex.ItemOpenBrace, lex.ItemOpenParen, lex.ItemEqual, lex.ItemCrosshatch:
 		return true
+	case lex.ItemCaret:
+		if t.Context.Option.Sup {
+			return true
+		}
+		return false
 	default:
 		return false
 	}

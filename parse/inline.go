@@ -30,8 +30,14 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 			n = t.parseBackslash(block, ctx)
 		case lex.ItemBacktick:
 			n = t.parseCodeSpan(block, ctx)
-		case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemTilde, lex.ItemEqual, lex.ItemCrosshatch, lex.ItemCaret:
+		case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemTilde, lex.ItemEqual, lex.ItemCrosshatch:
 			t.handleDelim(block, ctx)
+		case lex.ItemCaret:
+			if t.Context.Option.Sup {
+				t.handleDelim(block, ctx)
+			} else {
+				n = t.parseText(ctx)
+			}
 		case lex.ItemNewline:
 			n = t.parseNewline(block, ctx)
 		case lex.ItemLess:
@@ -254,8 +260,14 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 				// 查找脚注
 				if idx, footnotesDef := t.FindFootnotesDef(reflabel); nil != footnotesDef {
 					t.removeBracket(ctx)
-					opener.node.Next.Unlink() // ^label
-					opener.node.Unlink()      // [
+
+					if t.Context.Option.Sup {
+						opener.node.Next.Next.Unlink() // label
+						opener.node.Next.Unlink()      // ^
+					} else {
+						opener.node.Next.Unlink() // ^label
+					}
+					opener.node.Unlink() // [
 
 					refId := strconv.Itoa(idx)
 					refsLen := len(footnotesDef.FootnotesRefs)
