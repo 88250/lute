@@ -814,9 +814,17 @@ func (r *VditorIRBlockRenderer) renderInlineMathOpenMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		preText := node.PreviousNodeText()
+		if "" != preText && !strings.HasSuffix(preText, " ") {
+			r.WriteByte(lex.ItemSpace)
+		}
 		r.renderSpanNode(node)
 	} else {
 		r.tag("/span", nil, false)
+		nextText := node.NextNodeText()
+		if "" != nextText && !strings.HasPrefix(nextText, " ") {
+			r.WriteByte(lex.ItemSpace)
+		}
 	}
 	return ast.WalkContinue
 }
