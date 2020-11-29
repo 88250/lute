@@ -84,6 +84,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	openersBottom[lex.ItemTilde] = stackBottom
 	openersBottom[lex.ItemEqual] = stackBottom
 	openersBottom[lex.ItemCrosshatch] = stackBottom
+	openersBottom[lex.ItemCaret] = stackBottom
 
 	// find first closer above stack_bottom:
 	closer = ctx.delimiters
@@ -125,12 +126,22 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			openerInl = opener.node
 			closerInl = closer.node
 
-			if t.Context.Option.GFMStrikethrough {
+			if t.Context.Option.GFMStrikethrough || t.Context.Option.Sub {
 				if lex.ItemTilde == closercc && opener.num != closer.num {
 					break
 				}
 			} else {
 				if lex.ItemTilde == closercc {
+					break
+				}
+			}
+
+			if t.Context.Option.Sup {
+				if lex.ItemCaret == closercc && opener.num != closer.num {
+					break
+				}
+			} else {
+				if lex.ItemCaret == closercc {
 					break
 				}
 			}
