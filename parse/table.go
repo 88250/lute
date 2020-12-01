@@ -65,12 +65,6 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		return
 	}
 
-	var cells [][]*ast.Node
-	cells = append(cells, []*ast.Node{})
-	for n := headRow.FirstChild; nil != n; n = n.Next {
-		cells[0] = append(cells[0], n)
-	}
-
 	ret = &ast.Node{Type: ast.NodeTable, TableAligns: aligns}
 	ret.TableAligns = aligns
 	ret.AppendChild(context.newTableHead(headRow))
@@ -80,28 +74,6 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 			return
 		}
 		ret.AppendChild(tableRow)
-
-		cells = append(cells, []*ast.Node{})
-		for n := tableRow.FirstChild; nil != n; n = n.Next {
-			cells[i-1] = append(cells[i-1], n)
-		}
-	}
-
-	var maxWidth int
-	var maxWidthContent []byte
-	for col := 0; col < len(cells[0]); col++ {
-		for row := 0; row < len(cells); row++ {
-			if maxWidth < cells[row][col].TableCellContentWidth {
-				maxWidth = cells[row][col].TableCellContentWidth
-				maxWidthContent = cells[row][col].Tokens
-			}
-		}
-		for row := 0; row < len(cells); row++ {
-			cells[row][col].TableCellContentMaxWidth = maxWidth
-			cells[row][col].TableCellMaxWidthContent = maxWidthContent
-		}
-		maxWidth = 0
-		maxWidthContent = nil
 	}
 	return
 }
@@ -141,10 +113,8 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	var col []byte
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = lex.TrimWhitespace(cols[i])
-		width := len(col)
-		cell := &ast.Node{Type: ast.NodeTableCell, TableCellAlign: aligns[i], TableCellContentWidth: width}
+		cell := &ast.Node{Type: ast.NodeTableCell, TableCellAlign: aligns[i]}
 		cell.Tokens = col
-		cell.TableCellContent = col
 		ret.AppendChild(cell)
 	}
 

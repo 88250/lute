@@ -75,12 +75,10 @@ type Node struct {
 
 	// 表
 
-	TableAligns              []int  `json:",omitempty"` // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
-	TableCellAlign           int    `json:",omitempty"` // 表的单元格对齐方式
-	TableCellContentWidth    int    `json:",omitempty"` // 表的单元格内容宽度（字节数）
-	TableCellContentMaxWidth int    `json:",omitempty"` // 表的单元格内容最大宽度
-	TableCellContent         []byte `json:",omitempty"` // 表的单元格内容
-	TableCellMaxWidthContent []byte `json:",omitempty"` // 表的单元格最大宽度格的内容
+	TableAligns              []int `json:",omitempty"` // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
+	TableCellAlign           int   `json:",omitempty"` // 表的单元格对齐方式
+	TableCellContentWidth    int   `json:",omitempty"` // 表的单元格内容宽度（字节数）
+	TableCellContentMaxWidth int   `json:",omitempty"` // 表的单元格内容最大宽度
 
 	// 链接
 
@@ -241,6 +239,18 @@ func (n *Node) TextLen() (ret int) {
 		return WalkContinue
 	})
 	return utf8.RuneCount(buf)
+}
+
+// TokenLen 返回 n 及其子节点 tokens 累计长度。
+func (n *Node) TokenLen() (ret int) {
+	Walk(n, func(n *Node, entering bool) WalkStatus {
+		if !entering {
+			return WalkContinue
+		}
+		ret += len(n.Tokens)
+		return WalkContinue
+	})
+	return
 }
 
 func (n *Node) NextNodeText() string {

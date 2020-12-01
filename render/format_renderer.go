@@ -584,7 +584,40 @@ func (r *FormatRenderer) renderTableHead(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *FormatRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
+	if entering {
+		// 遍历单元格算出最大宽度
+
+		var cells [][]*ast.Node
+		cells = append(cells, []*ast.Node{})
+
+		headRow := node.ChildByType(ast.NodeTableHead)
+		for n := headRow.FirstChild.FirstChild; nil != n; n = n.Next {
+			cells[0] = append(cells[0], n)
+		}
+
+		i := 1
+		for tableRow := node.FirstChild.Next; nil != tableRow; tableRow = tableRow.Next {
+			cells = append(cells, []*ast.Node{})
+			for n := tableRow.FirstChild; nil != n; n = n.Next {
+				cells[i] = append(cells[i], n)
+			}
+			i++
+		}
+
+		var maxWidth int
+		for col := 0; col < len(cells[0]); col++ {
+			for row := 0; row < len(cells); row++ {
+				cells[row][col].TableCellContentWidth = cells[row][col].TokenLen()
+				if maxWidth < cells[row][col].TableCellContentWidth {
+					maxWidth = cells[row][col].TableCellContentWidth
+				}
+			}
+			for row := 0; row < len(cells); row++ {
+				cells[row][col].TableCellContentMaxWidth = maxWidth
+			}
+			maxWidth = 0
+		}
+	} else {
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
 			if r.withoutKramdownIAL(node) {

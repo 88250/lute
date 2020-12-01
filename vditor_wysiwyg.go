@@ -1047,6 +1047,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			tableAlign = 0
 		}
 		node.TableCellAlign = tableAlign
+		node.Tokens = nil
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()

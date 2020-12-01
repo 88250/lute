@@ -622,6 +622,7 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 		node.TableAligns = tableAligns
+		node.Tokens = nil
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeParagraph}) // 表格开头输入会导致解析问题，所以插入一个空段落进行分隔
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
