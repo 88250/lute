@@ -18,6 +18,10 @@ import (
 
 var kramdownSpanIALTests = []parseTest{
 
+	{"9", "`foo`{: style=\"color: red\"}bar", "<p><code style=\"color: red\">foo</code>bar</p>\n"},
+	{"8", "#foo#{: style=\"color: red\"}bar", "<p><em style=\"color: red\">#foo#</em>bar</p>\n"},
+	{"7", "==foo=={: style=\"color: red\"}bar", "<p><mark style=\"color: red\">foo</mark>bar</p>\n"},
+	{"6", "~~foo~~{: style=\"color: red\"}bar", "<p><del style=\"color: red\">foo</del>bar</p>\n"},
 	{"5", "![foo](bar){: width=\"80%\" height=\"80%\"}bar", "<p><img src=\"bar\" alt=\"foo\" width=\"80%\" height=\"80%\" />bar</p>\n"},
 	{"4", "![foo](bar){: style=\"zoom:80%;\"}bar", "<p><img src=\"bar\" alt=\"foo\" style=\"zoom:80%;\" />bar</p>\n"},
 	{"3", "__foo__{: style=\"color: red\"}bar", "<p><strong style=\"color: red\">foo</strong>bar</p>\n"},
@@ -29,6 +33,8 @@ var kramdownSpanIALTests = []parseTest{
 func TestKramdownSpanIALs(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.KramdownIAL = true
+	luteEngine.Mark = true
+	luteEngine.Tag = true
 
 	for _, test := range kramdownSpanIALTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

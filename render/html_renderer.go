@@ -187,7 +187,7 @@ func (r *HtmlRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 
 func (r *HtmlRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("em", nil, false)
+		r.tag("em", node.Parent.KramdownIAL, false)
 		r.WriteByte(lex.ItemCrosshatch)
 	}
 	return ast.WalkContinue
@@ -220,7 +220,7 @@ func (r *HtmlRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus 
 
 func (r *HtmlRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("mark", nil, false)
+		r.tag("mark", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }
@@ -234,7 +234,7 @@ func (r *HtmlRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast
 
 func (r *HtmlRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("mark", nil, false)
+		r.tag("mark", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }
@@ -634,7 +634,7 @@ func (r *HtmlRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.Wa
 
 func (r *HtmlRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("del", nil, false)
+		r.tag("del", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }
@@ -648,7 +648,7 @@ func (r *HtmlRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering 
 
 func (r *HtmlRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("del", nil, false)
+		r.tag("del", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }
@@ -863,7 +863,7 @@ func (r *HtmlRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *HtmlRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<code>")
+		r.tag("code", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }
@@ -877,7 +877,7 @@ func (r *HtmlRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.
 
 func (r *HtmlRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("</code>")
+		r.tag("/code", nil, false)
 	}
 	return ast.WalkContinue
 }
