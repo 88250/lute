@@ -509,7 +509,10 @@ func (r *BaseRenderer) NodeAttrsStr(node *ast.Node) (ret string) {
 		if "id" == kv[0] {
 			continue
 		}
-		ret += kv[0] + "=\"" + kv[1] + "\""
+		ret += kv[0] + "=\"" + kv[1] + "\" "
+	}
+	if "" != ret {
+		ret = ret[:len(ret)-1]
 	}
 	return
 }

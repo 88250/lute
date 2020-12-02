@@ -18,6 +18,11 @@ import (
 
 var kramdownSpanIALTests = []parseTest{
 
+	{"5", "![foo](bar){: width=\"80%\" height=\"80%\"}bar", "<p><img src=\"bar\" alt=\"foo\" width=\"80%\" height=\"80%\" />bar</p>\n"},
+	{"4", "![foo](bar){: style=\"zoom:80%;\"}bar", "<p><img src=\"bar\" alt=\"foo\" style=\"zoom:80%;\" />bar</p>\n"},
+	{"3", "__foo__{: style=\"color: red\"}bar", "<p><strong style=\"color: red\">foo</strong>bar</p>\n"},
+	{"2", "**foo**{: style=\"color: red\"}bar", "<p><strong style=\"color: red\">foo</strong>bar</p>\n"},
+	{"1", "_foo_{: style=\"color: red\"}bar", "<p><em style=\"color: red\">foo</em>bar</p>\n"},
 	{"0", "*foo*{: style=\"color: red\"}bar", "<p><em style=\"color: red\">foo</em>bar</p>\n"},
 }
 

@@ -735,6 +735,10 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 			r.Write(html.EscapeHTML(title.Tokens))
 			r.WriteByte(lex.ItemDoublequote)
 		}
+		ial := r.NodeAttrsStr(node)
+		if "" != ial {
+			r.WriteString(" " + ial)
+		}
 		r.WriteString(" />")
 
 		if r.Option.Sanitize {
