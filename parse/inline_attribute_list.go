@@ -24,31 +24,32 @@ func (t *Tree) parseKramdownBlockIAL() (ret [][]string) {
 	return t.Context.parseKramdownBlockIAL(tokens)
 }
 
-func (t *Tree) parseKramdownSpanIAL(block *ast.Node, ctx *InlineContext) (ret *ast.Node) {
-	if !t.Context.Option.KramdownIAL {
-		return nil
-	}
+func (t *Tree) parseKramdownSpanIAL() {
+	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
 
-	span := block.LastChild
-	if nil == span {
-		return nil
-	}
+		switch n.Type {
+		case ast.NodeEmphasis, ast.NodeStrong, ast.NodeImage:
+			break
+		default:
+			return ast.WalkContinue
+		}
 
-	switch span.Type {
-	case ast.NodeEmphasis, ast.NodeStrong, ast.NodeImage:
-		break
-	default:
-		return nil
-	}
+		if nil == n.Next || ast.NodeText != n.Next.Type {
+			return ast.WalkContinue
+		}
 
-	tokens := ctx.tokens[ctx.pos:]
-	if pos, ial := t.Context.parseKramdownSpanIAL(tokens); 0 < len(ial) {
-		span.KramdownIAL = ial
-		tokens = tokens[:pos]
-		ret = &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: tokens}
-		ctx.pos += pos
-		return
-	}
+		tokens := n.Next.Tokens
+		if pos, ial := t.Context.parseKramdownSpanIAL(tokens); 0 < len(ial) {
+			n.KramdownIAL = ial
+			n.Next.Tokens = tokens[pos+1:]
+			spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: tokens[:pos+1]}
+			n.InsertAfter(spanIAL)
+		}
+		return ast.WalkContinue
+	})
 	return
 }
 
@@ -82,14 +83,14 @@ func (context *Context) parseKramdownBlockIAL(tokens []byte) (ret [][]string) {
 }
 
 func (context *Context) parseKramdownSpanIAL(tokens []byte) (pos int, ret [][]string) {
-	if curlyBracesStart := bytes.Index(tokens, []byte("{:")); 0 <= curlyBracesStart {
+	pos = bytes.Index(tokens, []byte("}"))
+	if curlyBracesStart := bytes.Index(tokens, []byte("{:")); 0 == curlyBracesStart && curlyBracesStart+2 < pos {
 		tokens = tokens[curlyBracesStart+2:]
 		curlyBracesEnd := bytes.Index(tokens, closeCurlyBrace)
 		if 3 > curlyBracesEnd {
 			return
 		}
 
-		pos := bytes.Index(tokens, []byte("}"))
 		tokens = tokens[:pos]
 		for {
 			valid, remains, attr, name, val := context.Tree.parseTagAttr(tokens)

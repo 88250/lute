@@ -18,7 +18,7 @@ import (
 
 var kramdownSpanIALTests = []parseTest{
 
-	{"0", "*foo*{: style=\"color: red\"}", "<p><em style=\"color: red\">foo</em></p>\n"},
+	{"0", "*foo*{: style=\"color: red\"}bar", "<p><em style=\"color: red\">foo</em>bar</p>\n"},
 }
 
 func TestKramdownSpanIALs(t *testing.T) {

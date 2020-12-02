@@ -127,6 +127,7 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
 	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
@@ -201,6 +202,10 @@ func (r *HtmlRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.W
 }
 
 func (r *HtmlRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
@@ -884,7 +889,7 @@ func (r *HtmlRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *HtmlRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("em", nil, false)
+		r.tag("em", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }
@@ -898,7 +903,7 @@ func (r *HtmlRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool
 
 func (r *HtmlRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("em", nil, false)
+		r.tag("em", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }
@@ -921,7 +926,7 @@ func (r *HtmlRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *HtmlRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("strong", nil, false)
+		r.tag("strong", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }
@@ -935,7 +940,7 @@ func (r *HtmlRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool)
 
 func (r *HtmlRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("strong", nil, false)
+		r.tag("strong", node.Parent.KramdownIAL, false)
 	}
 	return ast.WalkContinue
 }

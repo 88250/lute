@@ -26,6 +26,9 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
+	if tree.Context.Option.KramdownIAL {
+		tree.parseKramdownSpanIAL()
+	}
 	tree.lexer = nil
 	return
 }
@@ -37,6 +40,9 @@ func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.Root.AppendChild(&ast.Node{Type: ast.NodeParagraph, Tokens: markdown})
 	tree.parseInlines()
+	if tree.Context.Option.KramdownIAL {
+		tree.parseKramdownSpanIAL()
+	}
 	tree.lexer = nil
 	return
 }
