@@ -60,8 +60,6 @@ type InlineContext struct {
 	tokens     []byte     // 当前解析的 Tokens
 	tokensLen  int        // 当前解析的 Tokens 长度
 	pos        int        // 当前解析到的 token 位置
-	lineNum    int        // 当前解析的起始行号
-	columnNum  int        // 当前解析的起始列号
 	delimiters *delimiter // 分隔符栈，用于强调解析
 	brackets   *delimiter // 括号栈，用于图片和链接解析
 }

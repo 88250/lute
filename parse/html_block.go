@@ -21,7 +21,7 @@ func HtmlBlockContinue(html *ast.Node, context *Context) int {
 	tokens := context.currentLine
 	if context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
-		if ial := context.parseKramdownIAL(tokens); 0 < len(ial) {
+		if ial := context.parseKramdownBlockIAL(tokens); 0 < len(ial) {
 			context.Tip.KramdownIAL = ial
 			context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: tokens})
 			return 1
@@ -53,7 +53,7 @@ var (
 func (t *Tree) isHTMLBlockClose(tokens []byte, htmlType int) bool {
 	if t.Context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
-		if ial := t.Context.parseKramdownIAL(tokens); 0 < len(ial) {
+		if ial := t.Context.parseKramdownBlockIAL(tokens); 0 < len(ial) {
 			t.Context.Tip.KramdownIAL = ial
 			t.Context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: tokens})
 			return true

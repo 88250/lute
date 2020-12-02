@@ -322,13 +322,13 @@ var blockStarts = []blockStartFunc{
 		return 1
 	},
 
-	// 判断 kramdown 内联属性列表（{: attrs}）是否开始。
+	// 判断 kramdown 块级内联属性列表（{: attrs}）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if !t.Context.Option.KramdownIAL || t.Context.indented {
 			return 0
 		}
 
-		if ial := t.parseKramdownIAL(); nil != ial {
+		if ial := t.parseKramdownBlockIAL(); nil != ial {
 			t.Context.closeUnmatchedBlocks()
 			lastMatchedContainer := t.Context.lastMatchedContainer
 			if t.Context.allClosed && (ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type) {

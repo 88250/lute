@@ -560,9 +560,10 @@ const (
 	NodeMark2OpenMarker  NodeType = 453 // 开始标记标记符 ==
 	NodeMark2CloseMarker NodeType = 454 // 结束标记标记符 ==
 
-	// kramdown 内联属性列表 https://github.com/88250/lute/issues/89
+	// kramdown 内联属性列表 https://github.com/88250/lute/issues/89 and https://github.com/88250/lute/issues/118
 
 	NodeKramdownBlockIAL NodeType = 455 // 块级内联属性列表 {: name="value"}
+	NodeKramdownSpanIAL  NodeType = 456 // 行级内联属性列表 *foo*{: name="value"}bar
 
 	// #Tag# 标签语法 https://github.com/88250/lute/issues/92
 

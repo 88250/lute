@@ -16,7 +16,7 @@ import (
 	"github.com/88250/lute"
 )
 
-var kramBlockIALTests = []parseTest{
+var kramdownBlockIALTests = []parseTest{
 
 	{"21", "* {: id=\"fooid\"}foo\n\n  > bar\n  {: id=\"barid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li id=\"fooid\">\n<p>foo</p>\n<blockquote id=\"barid\">\n<p>bar</p>\n</blockquote>\n</li>\n</ul>\n"},
 	{"20", "* {: id=\"fooid\"} foo\n{: id=\"id\"}", "<ul id=\"id\">\n<li id=\"fooid\">foo</li>\n</ul>\n"},
@@ -42,11 +42,11 @@ var kramBlockIALTests = []parseTest{
 	{"0", "foo\n{: id=\"fooid\" class=\"bar\"}", "<p id=\"fooid\" class=\"bar\">foo</p>\n"},
 }
 
-func TestKramBlockIALs(t *testing.T) {
+func TestKramdownBlockIALs(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.KramdownIAL = true
 
-	for _, test := range kramBlockIALTests {
+	for _, test := range kramdownBlockIALTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
@@ -54,7 +54,7 @@ func TestKramBlockIALs(t *testing.T) {
 	}
 }
 
-var kramBlockIALIDNAmeTests = []parseTest{
+var kramdownBlockIALIDNAmeTests = []parseTest{
 
 	{"4", "```\nfoo\n```\n{: id=\"20201105103725-3ad5wcz\"}", "<pre data-block-id=\"20201105103725-3ad5wcz\"><code class=\"highlight-chroma\">foo\n</code></pre>\n"},
 	{"3", "$$\nfoo\n$$\n{: id=\"20201105103725-3ad5wcz\"}", "<div class=\"language-math\" data-block-id=\"20201105103725-3ad5wcz\">foo</div>\n"},
@@ -63,12 +63,12 @@ var kramBlockIALIDNAmeTests = []parseTest{
 	{"0", "# foo", "<h1 id=\"foo\">foo</h1>\n"},
 }
 
-func TestKramBlockIALIDName(t *testing.T) {
+func TestKramdownBlockIALIDName(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.KramdownIAL = true
 	luteEngine.KramdownIALIDRenderName = "data-block-id"
 
-	for _, test := range kramBlockIALIDNAmeTests {
+	for _, test := range kramdownBlockIALIDNAmeTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
