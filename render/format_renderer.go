@@ -128,6 +128,7 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
 	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
@@ -221,10 +222,6 @@ func (r *FormatRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast
 }
 
 func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.Option.KramdownIAL {
-		return ast.WalkContinue
-	}
-
 	if entering {
 		r.Newline()
 		r.Write(node.Tokens)
@@ -237,6 +234,13 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 			r.Newline()
 		}
 		r.WriteByte(lex.ItemNewline)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
 	}
 	return ast.WalkContinue
 }

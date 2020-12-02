@@ -69,6 +69,7 @@ func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
 	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.DefaultRendererFunc = ret.renderDefault
@@ -82,6 +83,17 @@ func (r *EChartsJSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bo
 		}
 		id := r.NodeID(node.Previous)
 		r.leaf("Block IAL\n{: "+id+"}", node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *EChartsJSONRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if nil == node.Previous {
+			return ast.WalkContinue
+		}
+		id := r.NodeID(node.Previous)
+		r.leaf("Span IAL\n{: "+id+"}", node)
 	}
 	return ast.WalkContinue
 }
