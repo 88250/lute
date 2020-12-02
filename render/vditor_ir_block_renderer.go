@@ -129,6 +129,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
 	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
@@ -219,7 +220,9 @@ func (r *VditorIRBlockRenderer) renderTagOpenMarker(node *ast.Node, entering boo
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--tag"}}, false)
 		r.WriteByte(lex.ItemCrosshatch)
 		r.tag("/span", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-ir__tag"}}, false)
+		attrs := [][]string{{"class", "vditor-ir__tag"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("span", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -238,6 +241,16 @@ func (r *VditorIRBlockRenderer) renderKramdownBlockIAL(node *ast.Node, entering 
 	return ast.WalkContinue
 }
 
+func (r *VditorIRBlockRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderSpanNode(node)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+		r.Write(node.Tokens)
+		r.WriteString("</span></span>")
+	}
+	return ast.WalkContinue
+}
+
 func (r *VditorIRBlockRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderSpanNode(node)
@@ -252,7 +265,9 @@ func (r *VditorIRBlockRenderer) renderMark1OpenMarker(node *ast.Node, entering b
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--mark"}}, false)
 		r.WriteString("=")
 		r.tag("/span", nil, false)
-		r.tag("mark", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("mark", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -272,7 +287,9 @@ func (r *VditorIRBlockRenderer) renderMark2OpenMarker(node *ast.Node, entering b
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--mark"}}, false)
 		r.WriteString("==")
 		r.tag("/span", nil, false)
-		r.tag("mark", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("mark", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -968,7 +985,9 @@ func (r *VditorIRBlockRenderer) renderStrikethrough1OpenMarker(node *ast.Node, e
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--s"}}, false)
 		r.WriteString("~")
 		r.tag("/span", nil, false)
-		r.tag("s", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("s", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -988,7 +1007,9 @@ func (r *VditorIRBlockRenderer) renderStrikethrough2OpenMarker(node *ast.Node, e
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--s"}}, false)
 		r.WriteString("~~")
 		r.tag("/span", nil, false)
-		r.tag("s", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("s", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -1179,6 +1200,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 			attrs = append(attrs, []string{"alt", string(altTokens)})
 		}
 
+		attrs = append(attrs, r.NodeAttrs(node.Parent)...)
 		r.tag("img", attrs, true)
 		// XSS 过滤
 		buf := r.Writer.Bytes()
@@ -1441,7 +1463,9 @@ func (r *VditorIRBlockRenderer) renderCodeSpanOpenMarker(node *ast.Node, enterin
 			r.WriteByte(lex.ItemSpace)
 		}
 		r.tag("/span", nil, false)
-		r.tag("code", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("code", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -1480,7 +1504,9 @@ func (r *VditorIRBlockRenderer) renderEmAsteriskOpenMarker(node *ast.Node, enter
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--em"}}, false)
 		r.WriteByte(lex.ItemAsterisk)
 		r.tag("/span", nil, false)
-		r.tag("em", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("em", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -1500,7 +1526,9 @@ func (r *VditorIRBlockRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, ent
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--em"}}, false)
 		r.WriteByte(lex.ItemUnderscore)
 		r.tag("/span", nil, false)
-		r.tag("em", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("em", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -1529,7 +1557,9 @@ func (r *VditorIRBlockRenderer) renderStrongA6kOpenMarker(node *ast.Node, enteri
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--strong"}}, false)
 		r.WriteString("**")
 		r.tag("/span", nil, false)
-		r.tag("strong", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("strong", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -1549,7 +1579,9 @@ func (r *VditorIRBlockRenderer) renderStrongU8eOpenMarker(node *ast.Node, enteri
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--strong"}}, false)
 		r.WriteString("__")
 		r.tag("/span", nil, false)
-		r.tag("strong", [][]string{{"data-newline", "1"}}, false)
+		attrs := [][]string{{"data-newline", "1"}}
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.tag("strong", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -1811,6 +1843,8 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "backslash"})
 	case ast.NodeInlineHTML:
 		attrs = append(attrs, []string{"data-type", "html-inline"})
+	case ast.NodeKramdownSpanIAL:
+		attrs = append(attrs, []string{"data-type", "span-ial"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
@@ -1890,7 +1924,7 @@ func (r *VditorIRBlockRenderer) Text(node *ast.Node) (ret string) {
 			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkSpace, ast.NodeLinkTitle, ast.NodeCodeBlockCode,
 				ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeYamlFrontMatterContent,
 				ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias, ast.NodeBlockRefText, ast.NodeBlockRefSpace,
-				ast.NodeBlockEmbedText, ast.NodeBlockEmbedSpace:
+				ast.NodeBlockEmbedText, ast.NodeBlockEmbedSpace, ast.NodeKramdownSpanIAL:
 				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
 				ret += string(n.CodeBlockInfo)

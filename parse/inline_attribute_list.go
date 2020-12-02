@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/util"
+	"strings"
 )
 
 var openCurlyBraceColon = util.StrToBytes("{: ")
@@ -103,7 +104,9 @@ func (context *Context) parseKramdownSpanIAL(tokens []byte) (pos int, ret [][]st
 				break
 			}
 
-			ret = append(ret, []string{util.BytesToStr(name), util.BytesToStr(val)})
+			nameStr := strings.ReplaceAll(util.BytesToStr(name), util.Caret, "")
+			valStr := strings.ReplaceAll(util.BytesToStr(val), util.Caret, "")
+			ret = append(ret, []string{nameStr, valStr})
 		}
 	}
 	return
