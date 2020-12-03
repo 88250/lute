@@ -1107,6 +1107,13 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 			return
+		default:
+			if nil != n.FirstChild && (atom.Audio == n.FirstChild.DataAtom || atom.Video == n.FirstChild.DataAtom) {
+				node.Type = ast.NodeHTMLBlock
+				node.Tokens = lute.domHTML(n.FirstChild)
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
 		}
 
 		text := lute.domText(n)
@@ -1177,7 +1184,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		// kbd 标签由 code 标签构成节点
 	case atom.Summary:
 		return
-	case atom.Audio:
+	case atom.Audio, atom.Video:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
 		tree.Context.Tip.AppendChild(node)
