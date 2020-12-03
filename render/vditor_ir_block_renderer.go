@@ -347,14 +347,14 @@ func (r *VditorIRBlockRenderer) renderSubOpenMarker(node *ast.Node, entering boo
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--sub"}}, false)
 		r.WriteString("~")
 		r.tag("/span", nil, false)
-		r.tag("sup", [][]string{{"data-newline", "1"}}, false)
+		r.tag("sub", [][]string{{"data-newline", "1"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/sup", nil, false)
+		r.tag("/sub", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--sub"}}, false)
 		r.WriteString("~")
 		r.tag("/span", nil, false)
