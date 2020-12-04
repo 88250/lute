@@ -102,6 +102,45 @@ func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
+// VditorIRBlockDOM2StdMd 将 Vditor Instant-Rendering DOM 转换为标准 markdown，用于复制剪切。
+func (lute *Lute) VditorIRBlockDOM2StdMd(htmlStr string) (markdown string) {
+	lute.VditorIR = true
+	lute.VditorWYSIWYG = false
+	lute.VditorSV = false
+
+	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
+
+	// DOM 转 AST
+	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return err.Error()
+	}
+
+	// 删掉 kramdown IAL 节点
+	var unlinks []*ast.Node
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeKramdownBlockIAL == n.Type || ast.NodeKramdownSpanIAL == n.Type {
+			unlinks = append(unlinks, n)
+		}
+		return ast.WalkContinue
+	})
+
+	for _, n := range unlinks {
+		n.Unlink()
+	}
+
+	// 将 AST 进行 Markdown 格式化渲染
+	renderer := render.NewFormatRenderer(tree)
+	formatted := renderer.Render()
+	markdown = string(formatted)
+	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
+	return
+}
+
 func (lute *Lute) VditorIRBlockDOM2Text(htmlStr string) (text string) {
 	lute.VditorIR = true
 	lute.VditorWYSIWYG = false
@@ -904,7 +943,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(text[1 : len(text)-1])
 			tree.Context.Tip.AppendChild(node)
 			return
-		case "em", "strong", "s", "mark", "code", "inline-math", "tag", "sup", "sub":
+		case "em", "strong", "s", "mark", "code", "inline-math", "tag", "sup", "sub", "span-ial":
 			text := lute.domText(n)
 			if "" == strings.TrimSpace(text) {
 				return
@@ -917,6 +956,13 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				ast.NodeSup == inlineNode.Type || ast.NodeSub == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
+				tree.Context.Tip.AppendChild(node)
+				appendNextToTip(next, tree)
+				return
+			} else if ast.NodeKramdownBlockIAL == t.Root.FirstChild.Type { // Span IAL 单独存在时会被解析为 Block IAL
+				t.Root.FirstChild.Type = ast.NodeKramdownSpanIAL
+				node = t.Root.FirstChild
+				next := t.Root.FirstChild.Next
 				tree.Context.Tip.AppendChild(node)
 				appendNextToTip(next, tree)
 				return

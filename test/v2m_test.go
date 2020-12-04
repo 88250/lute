@@ -198,3 +198,23 @@ func TestVditorIRBlockDOM2Md(t *testing.T) {
 		}
 	}
 }
+
+var vditorIRBlockDOM2StdMdTests = []parseTest{
+
+	{"2", "<p data-block=\"0\" data-node-id=\"20201204160321-3nclve2\" data-type=\"p\"><span data-type=\"em\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span><em data-newline=\"1\" style=\"color: red\">foo</em><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span></span><span data-type=\"span-ial\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker\">{: style=\"color: red\"}</span></span><wbr></p>", "*foo*\n"},
+	{"1", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20201204165248-f1lyosm\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20201204165346-lvuphf2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20201204165347-9fl7pnt\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20201204165346-9qw84fg\">bar<wbr></li></ul></li></ul>", "* foo\n  * bar\n"},
+	{"0", "<p data-block=\"0\" data-node-id=\"20201204165248-f1lyosm\" data-type=\"p\">foo<wbr></p>", "foo\n"},
+}
+
+func TestVditorIRBlockDOM2StdMd(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.KramdownIAL = true
+
+	ast.Testing = true
+	for _, test := range vditorIRBlockDOM2StdMdTests {
+		md := luteEngine.VditorIRBlockDOM2StdMd(test.from)
+		if test.to != md {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
+		}
+	}
+}
