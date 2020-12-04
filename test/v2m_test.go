@@ -201,6 +201,7 @@ func TestVditorIRBlockDOM2Md(t *testing.T) {
 
 var vditorIRBlockDOM2StdMdTests = []parseTest{
 
+	{"3", "<p data-block=\"0\" data-node-id=\"20201204201015-jci98xe\" data-type=\"p\">foo</p><p data-block=\"0\" data-node-id=\"20201204201016-by0ypft\" data-type=\"p\">bar</p>", "foo\n\nbar\n"},
 	{"2", "<p data-block=\"0\" data-node-id=\"20201204160321-3nclve2\" data-type=\"p\"><span data-type=\"em\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span><em data-newline=\"1\" style=\"color: red\">foo</em><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span></span><span data-type=\"span-ial\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker\">{: style=\"color: red\"}</span></span><wbr></p>", "*foo*\n"},
 	{"1", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20201204165248-f1lyosm\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20201204165346-lvuphf2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20201204165347-9fl7pnt\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20201204165346-9qw84fg\">bar<wbr></li></ul></li></ul>", "* foo\n  * bar\n"},
 	{"0", "<p data-block=\"0\" data-node-id=\"20201204165248-f1lyosm\" data-type=\"p\">foo<wbr></p>", "foo\n"},

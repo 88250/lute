@@ -116,21 +116,21 @@ func (lute *Lute) VditorIRBlockDOM2StdMd(htmlStr string) (markdown string) {
 		return err.Error()
 	}
 
-	// 删掉 kramdown IAL 节点
-	var unlinks []*ast.Node
+	// 将 kramdown IAL 节点内容置空
+	var ials []*ast.Node
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering {
 			return ast.WalkContinue
 		}
 
 		if ast.NodeKramdownBlockIAL == n.Type || ast.NodeKramdownSpanIAL == n.Type {
-			unlinks = append(unlinks, n)
+			ials = append(ials, n)
 		}
 		return ast.WalkContinue
 	})
 
-	for _, n := range unlinks {
-		n.Unlink()
+	for _, n := range ials {
+		n.Tokens = nil
 	}
 
 	// 将 AST 进行 Markdown 格式化渲染
