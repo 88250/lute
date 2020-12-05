@@ -167,6 +167,20 @@ func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
 	return
 }
 
+func RenderNodeVditorIRBlockDOM(node *ast.Node, options *parse.Options) string {
+	root := &ast.Node{Type: ast.NodeDocument}
+	luteEngine := New()
+	luteEngine.Options = options
+	tree := &parse.Tree{Root: root, Context: &parse.Context{Option: luteEngine.Options}}
+	renderer := render.NewVditorIRBlockRenderer(tree)
+	renderer.Writer = &bytes.Buffer{}
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		rendererFunc := renderer.RendererFuncs[n.Type]
+		return rendererFunc(n, entering)
+	})
+	return strings.TrimSpace(renderer.Writer.String())
+}
+
 func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
 	// 删掉插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")

@@ -540,17 +540,19 @@ const (
 
 	// 内容块引用（Block Reference） https://github.com/88250/lute/issues/82
 
-	NodeBlockRef      NodeType = 430 // 内容块引用节点
-	NodeBlockRefID    NodeType = 431 // 被引用的内容块（定义块）ID
-	NodeBlockRefSpace NodeType = 432 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
-	NodeBlockRefText  NodeType = 433 // 内容块引用锚点本
+	NodeBlockRef                    NodeType = 430 // 内容块引用节点
+	NodeBlockRefID                  NodeType = 431 // 被引用的内容块（定义块）ID
+	NodeBlockRefSpace               NodeType = 432 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
+	NodeBlockRefText                NodeType = 433 // 内容块引用锚点本
+	NodeBlockRefTextTplRenderResult NodeType = 434 // 内容块引用锚文本模板渲染结果
 
 	// 内容块嵌入（Block Embed） https://github.com/88250/lute/issues/91
 
-	NodeBlockEmbed      NodeType = 440 // 内容块嵌入节点
-	NodeBlockEmbedID    NodeType = 441 // 被引用的内容块（定义块） ID
-	NodeBlockEmbedSpace NodeType = 442 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
-	NodeBlockEmbedText  NodeType = 443 // 内容块嵌入锚点本
+	NodeBlockEmbed                    NodeType = 440 // 内容块嵌入节点
+	NodeBlockEmbedID                  NodeType = 441 // 被引用的内容块（定义块） ID
+	NodeBlockEmbedSpace               NodeType = 442 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
+	NodeBlockEmbedText                NodeType = 443 // 内容块嵌入锚点本
+	NodeBlockEmbedTextTplRenderResult NodeType = 444 // 内容块嵌入锚点本模板渲染结果
 
 	// ==Mark== 标记语法 https://github.com/88250/lute/issues/84
 

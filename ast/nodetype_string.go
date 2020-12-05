@@ -93,16 +93,19 @@ func _() {
 	_ = x[NodeBlockRefID-431]
 	_ = x[NodeBlockRefSpace-432]
 	_ = x[NodeBlockRefText-433]
+	_ = x[NodeBlockRefTextTplRenderResult-434]
 	_ = x[NodeBlockEmbed-440]
 	_ = x[NodeBlockEmbedID-441]
 	_ = x[NodeBlockEmbedSpace-442]
 	_ = x[NodeBlockEmbedText-443]
+	_ = x[NodeBlockEmbedTextTplRenderResult-444]
 	_ = x[NodeMark-450]
 	_ = x[NodeMark1OpenMarker-451]
 	_ = x[NodeMark1CloseMarker-452]
 	_ = x[NodeMark2OpenMarker-453]
 	_ = x[NodeMark2CloseMarker-454]
 	_ = x[NodeKramdownBlockIAL-455]
+	_ = x[NodeKramdownSpanIAL-456]
 	_ = x[NodeTag-460]
 	_ = x[NodeTagOpenMarker-461]
 	_ = x[NodeTagCloseMarker-462]
@@ -123,7 +126,7 @@ func _() {
 	_ = x[NodeTypeMaxVal-1024]
 }
 
-const _NodeType_name = "NodeDocumentNodeParagraphNodeHeadingNodeHeadingC8hMarkerNodeThematicBreakNodeBlockquoteNodeBlockquoteMarkerNodeListNodeListItemNodeHTMLBlockNodeInlineHTMLNodeCodeBlockNodeCodeBlockFenceOpenMarkerNodeCodeBlockFenceCloseMarkerNodeCodeBlockFenceInfoMarkerNodeCodeBlockCodeNodeTextNodeEmphasisNodeEmA6kOpenMarkerNodeEmA6kCloseMarkerNodeEmU8eOpenMarkerNodeEmU8eCloseMarkerNodeStrongNodeStrongA6kOpenMarkerNodeStrongA6kCloseMarkerNodeStrongU8eOpenMarkerNodeStrongU8eCloseMarkerNodeCodeSpanNodeCodeSpanOpenMarkerNodeCodeSpanContentNodeCodeSpanCloseMarkerNodeHardBreakNodeSoftBreakNodeLinkNodeImageNodeBangNodeOpenBracketNodeCloseBracketNodeOpenParenNodeCloseParenNodeLinkTextNodeLinkDestNodeLinkTitleNodeLinkSpaceNodeHTMLEntityNodeLinkRefDefBlockNodeLinkRefDefNodeTaskListItemMarkerNodeStrikethroughNodeStrikethrough1OpenMarkerNodeStrikethrough1CloseMarkerNodeStrikethrough2OpenMarkerNodeStrikethrough2CloseMarkerNodeTableNodeTableHeadNodeTableRowNodeTableCellNodeEmojiNodeEmojiUnicodeNodeEmojiImgNodeEmojiAliasNodeMathBlockNodeMathBlockOpenMarkerNodeMathBlockContentNodeMathBlockCloseMarkerNodeInlineMathNodeInlineMathOpenMarkerNodeInlineMathContentNodeInlineMathCloseMarkerNodeBackslashNodeBackslashContentNodeVditorCaretNodeFootnotesDefBlockNodeFootnotesDefNodeFootnotesRefNodeToCNodeHeadingIDNodeYamlFrontMatterNodeYamlFrontMatterOpenMarkerNodeYamlFrontMatterContentNodeYamlFrontMatterCloseMarkerNodeBlockRefNodeBlockRefIDNodeBlockRefSpaceNodeBlockRefTextNodeBlockEmbedNodeBlockEmbedIDNodeBlockEmbedSpaceNodeBlockEmbedTextNodeMarkNodeMark1OpenMarkerNodeMark1CloseMarkerNodeMark2OpenMarkerNodeMark2CloseMarkerNodeKramdownBlockIALNodeTagNodeTagOpenMarkerNodeTagCloseMarkerNodeBlockQueryEmbedNodeOpenBraceNodeCloseBraceNodeBlockQueryEmbedScriptNodeSuperBlockNodeSuperBlockOpenMarkerNodeSuperBlockLayoutNodeSuperBlockCloseMarkerNodeSupNodeSupOpenMarkerNodeSupCloseMarkerNodeSubNodeSubOpenMarkerNodeSubCloseMarkerNodeTypeMaxVal"
+const _NodeType_name = "NodeDocumentNodeParagraphNodeHeadingNodeHeadingC8hMarkerNodeThematicBreakNodeBlockquoteNodeBlockquoteMarkerNodeListNodeListItemNodeHTMLBlockNodeInlineHTMLNodeCodeBlockNodeCodeBlockFenceOpenMarkerNodeCodeBlockFenceCloseMarkerNodeCodeBlockFenceInfoMarkerNodeCodeBlockCodeNodeTextNodeEmphasisNodeEmA6kOpenMarkerNodeEmA6kCloseMarkerNodeEmU8eOpenMarkerNodeEmU8eCloseMarkerNodeStrongNodeStrongA6kOpenMarkerNodeStrongA6kCloseMarkerNodeStrongU8eOpenMarkerNodeStrongU8eCloseMarkerNodeCodeSpanNodeCodeSpanOpenMarkerNodeCodeSpanContentNodeCodeSpanCloseMarkerNodeHardBreakNodeSoftBreakNodeLinkNodeImageNodeBangNodeOpenBracketNodeCloseBracketNodeOpenParenNodeCloseParenNodeLinkTextNodeLinkDestNodeLinkTitleNodeLinkSpaceNodeHTMLEntityNodeLinkRefDefBlockNodeLinkRefDefNodeTaskListItemMarkerNodeStrikethroughNodeStrikethrough1OpenMarkerNodeStrikethrough1CloseMarkerNodeStrikethrough2OpenMarkerNodeStrikethrough2CloseMarkerNodeTableNodeTableHeadNodeTableRowNodeTableCellNodeEmojiNodeEmojiUnicodeNodeEmojiImgNodeEmojiAliasNodeMathBlockNodeMathBlockOpenMarkerNodeMathBlockContentNodeMathBlockCloseMarkerNodeInlineMathNodeInlineMathOpenMarkerNodeInlineMathContentNodeInlineMathCloseMarkerNodeBackslashNodeBackslashContentNodeVditorCaretNodeFootnotesDefBlockNodeFootnotesDefNodeFootnotesRefNodeToCNodeHeadingIDNodeYamlFrontMatterNodeYamlFrontMatterOpenMarkerNodeYamlFrontMatterContentNodeYamlFrontMatterCloseMarkerNodeBlockRefNodeBlockRefIDNodeBlockRefSpaceNodeBlockRefTextNodeBlockRefTextTplRenderResultNodeBlockEmbedNodeBlockEmbedIDNodeBlockEmbedSpaceNodeBlockEmbedTextNodeBlockEmbedTextTplRenderResultNodeMarkNodeMark1OpenMarkerNodeMark1CloseMarkerNodeMark2OpenMarkerNodeMark2CloseMarkerNodeKramdownBlockIALNodeKramdownSpanIALNodeTagNodeTagOpenMarkerNodeTagCloseMarkerNodeBlockQueryEmbedNodeOpenBraceNodeCloseBraceNodeBlockQueryEmbedScriptNodeSuperBlockNodeSuperBlockOpenMarkerNodeSuperBlockLayoutNodeSuperBlockCloseMarkerNodeSupNodeSupOpenMarkerNodeSupCloseMarkerNodeSubNodeSubOpenMarkerNodeSubCloseMarkerNodeTypeMaxVal"
 
 var _NodeType_map = map[NodeType]string{
 	0:    _NodeType_name[0:12],
@@ -211,34 +214,37 @@ var _NodeType_map = map[NodeType]string{
 	431:  _NodeType_name[1405:1419],
 	432:  _NodeType_name[1419:1436],
 	433:  _NodeType_name[1436:1452],
-	440:  _NodeType_name[1452:1466],
-	441:  _NodeType_name[1466:1482],
-	442:  _NodeType_name[1482:1501],
-	443:  _NodeType_name[1501:1519],
-	450:  _NodeType_name[1519:1527],
-	451:  _NodeType_name[1527:1546],
-	452:  _NodeType_name[1546:1566],
-	453:  _NodeType_name[1566:1585],
-	454:  _NodeType_name[1585:1605],
-	455:  _NodeType_name[1605:1625],
-	460:  _NodeType_name[1625:1632],
-	461:  _NodeType_name[1632:1649],
-	462:  _NodeType_name[1649:1667],
-	465:  _NodeType_name[1667:1686],
-	466:  _NodeType_name[1686:1699],
-	467:  _NodeType_name[1699:1713],
-	468:  _NodeType_name[1713:1738],
-	475:  _NodeType_name[1738:1752],
-	476:  _NodeType_name[1752:1776],
-	477:  _NodeType_name[1776:1796],
-	478:  _NodeType_name[1796:1821],
-	485:  _NodeType_name[1821:1828],
-	486:  _NodeType_name[1828:1845],
-	487:  _NodeType_name[1845:1863],
-	490:  _NodeType_name[1863:1870],
-	491:  _NodeType_name[1870:1887],
-	492:  _NodeType_name[1887:1905],
-	1024: _NodeType_name[1905:1919],
+	434:  _NodeType_name[1452:1483],
+	440:  _NodeType_name[1483:1497],
+	441:  _NodeType_name[1497:1513],
+	442:  _NodeType_name[1513:1532],
+	443:  _NodeType_name[1532:1550],
+	444:  _NodeType_name[1550:1583],
+	450:  _NodeType_name[1583:1591],
+	451:  _NodeType_name[1591:1610],
+	452:  _NodeType_name[1610:1630],
+	453:  _NodeType_name[1630:1649],
+	454:  _NodeType_name[1649:1669],
+	455:  _NodeType_name[1669:1689],
+	456:  _NodeType_name[1689:1708],
+	460:  _NodeType_name[1708:1715],
+	461:  _NodeType_name[1715:1732],
+	462:  _NodeType_name[1732:1750],
+	465:  _NodeType_name[1750:1769],
+	466:  _NodeType_name[1769:1782],
+	467:  _NodeType_name[1782:1796],
+	468:  _NodeType_name[1796:1821],
+	475:  _NodeType_name[1821:1835],
+	476:  _NodeType_name[1835:1859],
+	477:  _NodeType_name[1859:1879],
+	478:  _NodeType_name[1879:1904],
+	485:  _NodeType_name[1904:1911],
+	486:  _NodeType_name[1911:1928],
+	487:  _NodeType_name[1928:1946],
+	490:  _NodeType_name[1946:1953],
+	491:  _NodeType_name[1953:1970],
+	492:  _NodeType_name[1970:1988],
+	1024: _NodeType_name[1988:2002],
 }
 
 func (i NodeType) String() string {
