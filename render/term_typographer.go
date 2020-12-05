@@ -14,14 +14,13 @@ import (
 	"bytes"
 	"unicode/utf8"
 
-	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
-// FixTermTypo 修正文本节点 textNode 中出现的术语拼写问题。
-func (r *BaseRenderer) FixTermTypo(textNode *ast.Node) {
-	textNode.Tokens = r.fixTermTypo0(textNode.Tokens)
+// FixTermTypo 修正 tokens 中出现的术语拼写问题。
+func (r *BaseRenderer) FixTermTypo(tokens []byte) []byte {
+	return r.fixTermTypo0(tokens)
 }
 
 func (r *BaseRenderer) fixTermTypo0(tokens []byte) []byte {

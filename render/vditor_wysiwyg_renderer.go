@@ -801,7 +801,7 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	if entering {
 		previousNodeText := node.PreviousNodeText()
 		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if "" == previousNodeText {
+		if parse.Zwsp == previousNodeText || "" == previousNodeText {
 			r.WriteString(parse.Zwsp)
 		}
 	}
@@ -840,22 +840,26 @@ func (r *VditorRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 
 func (r *VditorRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		var tokens []byte
 		if r.Option.AutoSpace {
-			r.Space(node)
-		}
-		if r.Option.FixTermTypo {
-			r.FixTermTypo(node)
-		}
-		if r.Option.ChinesePunct {
-			r.ChinesePunct(node)
+			tokens = r.Space(node.Tokens)
+		} else {
+			tokens = node.Tokens
 		}
 
-		node.Tokens = bytes.TrimRight(node.Tokens, "\n")
-		// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
-		if !bytes.EqualFold(node.Tokens, []byte(util.Caret+parse.Zwsp)) {
-			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
+		if r.Option.FixTermTypo {
+			tokens = r.FixTermTypo(tokens)
 		}
-		r.Write(html.EscapeHTML(node.Tokens))
+		if r.Option.ChinesePunct {
+			tokens = r.ChinesePunct(tokens)
+		}
+
+		tokens = bytes.TrimRight(tokens, "\n")
+		// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
+		if !bytes.EqualFold(tokens, []byte(util.Caret+parse.Zwsp)) {
+			tokens = bytes.ReplaceAll(tokens, []byte(parse.Zwsp), nil)
+		}
+		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue
 }

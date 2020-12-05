@@ -14,15 +14,14 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/88250/lute/ast"
 	"github.com/88250/lute/util"
 )
 
-// ChinesePunct 会把文本节点 textNode 中的中文间的英文标点换成对应的中文标点。
-func (r *BaseRenderer) ChinesePunct(textNode *ast.Node) {
-	text := util.BytesToStr(textNode.Tokens)
+// ChinesePunct 会把 tokens 中的中文间的英文标点换成对应的中文标点。
+func (r *BaseRenderer) ChinesePunct(tokens []byte) []byte {
+	text := util.BytesToStr(tokens)
 	text = chinesePunct0(text)
-	textNode.Tokens = util.StrToBytes(text)
+	return util.StrToBytes(text)
 }
 
 func chinesePunct0(text string) (ret string) {

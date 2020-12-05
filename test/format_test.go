@@ -11,6 +11,8 @@
 package test
 
 import (
+	"github.com/88250/lute/parse"
+	"github.com/88250/lute/render"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -140,7 +142,26 @@ func TestFormatCases(t *testing.T) {
 		}
 		expected := string(bytes)
 		if expected != html {
-			t.Fatalf("test case [%s] failed\nexpected\n%s\ngot\n%s\n", caseName, expected, html)
+			t.Fatalf("test case [%s] failed\nexpected\n%q\ngot\n%q\n", caseName, expected, html)
 		}
+	}
+}
+
+func TestFormatNode(t *testing.T) {
+	md := "foo中文bar"
+	luteEngine := lute.New()
+	tree := parse.Parse("", []byte(md), luteEngine.Options)
+	renderer := render.NewFormatRenderer(tree)
+	output := string(renderer.Render())
+	expected := "foo 中文 bar\n"
+	if expected != output {
+		t.Fatalf("format node [%s] failed\nexpected\n%q\ngot\n%q\n", md, expected, output)
+	}
+
+	luteEngine.AutoSpace = false
+	output = lute.FormatNode(tree.Root, luteEngine.Options)
+	expected = "foo中文bar"
+	if expected != output {
+		t.Fatalf("format node [%s] failed\nexpected\n%q\ngot\n%q\n", md, expected, output)
 	}
 }

@@ -1080,21 +1080,25 @@ func (r *VditorIRRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorIRRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		var tokens []byte
 		if r.Option.AutoSpace {
-			r.Space(node)
+			tokens = r.Space(node.Tokens)
+		} else {
+			tokens = node.Tokens
 		}
+
 		if r.Option.FixTermTypo {
-			r.FixTermTypo(node)
+			tokens = r.FixTermTypo(tokens)
 		}
 		if r.Option.ChinesePunct {
-			r.ChinesePunct(node)
+			tokens = r.ChinesePunct(tokens)
 		}
 
 		// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
-		if !bytes.EqualFold(node.Tokens, []byte(util.Caret+parse.Zwsp)) {
-			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
+		if !bytes.EqualFold(tokens, []byte(util.Caret+parse.Zwsp)) {
+			tokens = bytes.ReplaceAll(tokens, []byte(parse.Zwsp), nil)
 		}
-		r.Write(html.EscapeHTML(node.Tokens))
+		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue
 }

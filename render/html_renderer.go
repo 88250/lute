@@ -674,10 +674,13 @@ func (r *HtmlRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *HtmlRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		var tokens []byte
 		if r.Option.AutoSpace {
-			r.Space(node)
+			tokens = r.Space(node.Tokens)
+		} else {
+			tokens = node.Tokens
 		}
-		r.Write(html.EscapeHTML(node.Tokens))
+		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue
 }
@@ -824,16 +827,20 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *HtmlRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		var tokens []byte
 		if r.Option.AutoSpace {
-			r.Space(node)
+			tokens = r.Space(node.Tokens)
+		} else {
+			tokens = node.Tokens
 		}
+
 		if r.Option.FixTermTypo {
-			r.FixTermTypo(node)
+			tokens = r.FixTermTypo(tokens)
 		}
 		if r.Option.ChinesePunct {
-			r.ChinesePunct(node)
+			tokens = r.ChinesePunct(tokens)
 		}
-		r.Write(html.EscapeHTML(node.Tokens))
+		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue
 }

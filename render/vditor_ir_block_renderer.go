@@ -1376,22 +1376,26 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 
 func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		var tokens []byte
 		if r.Option.AutoSpace {
-			r.Space(node)
+			tokens = r.Space(node.Tokens)
+		} else {
+			tokens = node.Tokens
 		}
+
 		if r.Option.FixTermTypo {
-			r.FixTermTypo(node)
+			tokens = r.FixTermTypo(tokens)
 		}
 		if r.Option.ChinesePunct {
-			r.ChinesePunct(node)
+			tokens = r.ChinesePunct(tokens)
 		}
 
 		// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
-		if !bytes.EqualFold(node.Tokens, []byte(util.Caret+parse.Zwsp)) {
-			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
+		if !bytes.EqualFold(tokens, []byte(util.Caret+parse.Zwsp)) {
+			tokens = bytes.ReplaceAll(tokens, []byte(parse.Zwsp), nil)
 		}
 
-		text := string(html.EscapeHTML(node.Tokens))
+		text := string(html.EscapeHTML(tokens))
 		_, text = markText(text, r.Tree.Marks, 1024*1024)
 		r.WriteString(text)
 	}

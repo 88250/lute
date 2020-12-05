@@ -14,15 +14,14 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/88250/lute/ast"
 	"github.com/88250/lute/util"
 )
 
-// Space 会把文本节点 textNode 中的中西文之间加上空格。
-func (r *BaseRenderer) Space(textNode *ast.Node) {
-	text := util.BytesToStr(textNode.Tokens)
+// Space 会把 tokens 中的中西文之间加上空格。
+func (r *BaseRenderer) Space(tokens []byte) []byte {
+	text := util.BytesToStr(tokens)
 	text = Space0(text)
-	textNode.Tokens = util.StrToBytes(text)
+	return util.StrToBytes(text)
 }
 
 func Space0(text string) (ret string) {

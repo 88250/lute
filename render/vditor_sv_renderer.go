@@ -281,7 +281,6 @@ func (r *VditorSVRenderer) renderSupCloseMarker(node *ast.Node, entering bool) a
 	return ast.WalkContinue
 }
 
-
 func (r *VditorSVRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Writer = &bytes.Buffer{}
@@ -889,19 +888,23 @@ func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 	}
 
 	if entering {
+		var tokens []byte
 		if r.Option.AutoSpace {
-			r.Space(node)
+			tokens = r.Space(node.Tokens)
+		} else {
+			tokens = node.Tokens
 		}
+
 		if r.Option.FixTermTypo {
-			r.FixTermTypo(node)
+			tokens = r.FixTermTypo(tokens)
 		}
 		if r.Option.ChinesePunct {
-			r.ChinesePunct(node)
+			tokens = r.ChinesePunct(tokens)
 		}
 
 		r.tag("span", [][]string{{"data-type", "text"}}, false)
-		node.Tokens = bytes.TrimRight(node.Tokens, "\n")
-		r.Write(html.EscapeHTML(node.Tokens))
+		tokens = bytes.TrimRight(tokens, "\n")
+		r.Write(html.EscapeHTML(tokens))
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue

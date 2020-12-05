@@ -12,6 +12,7 @@
 package lute
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/88250/lute/ast"
@@ -217,6 +218,22 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 	for k, v := range termMap {
 		lute.Terms[k] = v
 	}
+}
+
+// FormatNode 使用指定的 options 格式化 node，返回格式化后的 Markdown 文本。
+func FormatNode(node *ast.Node, options *parse.Options) string {
+	root := &ast.Node{Type: ast.NodeDocument}
+	luteEngine := New()
+	luteEngine.Options = options
+	tree := &parse.Tree{Root: root, Context: &parse.Context{Option: luteEngine.Options}}
+	renderer := render.NewFormatRenderer(tree)
+	renderer.Writer = &bytes.Buffer{}
+	renderer.NodeWriterStack = append(renderer.NodeWriterStack, renderer.Writer)
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		rendererFunc := renderer.RendererFuncs[n.Type]
+		return rendererFunc(n, entering)
+	})
+	return strings.TrimSpace(renderer.Writer.String())
 }
 
 // Option 描述了解析渲染选项设置函数签名。
