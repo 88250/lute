@@ -137,6 +137,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
 	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
 	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
+	ret.RendererFuncs[ast.NodeBlockEmbedTextTplRenderResult] = ret.renderBlockEmbedTextTplRenderResult
 	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
 	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
@@ -447,16 +448,31 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bo
 		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 		r.WriteByte(lex.ItemDoublequote)
 		r.tag("/span", nil, false)
-		r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+		r.tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--info"}}, false)
 		r.Write(text)
 	} else {
 		r.tag("/span", nil, false)
 		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 		r.WriteByte(lex.ItemDoublequote)
 		r.tag("/span", nil, false)
+		if nil == node.Next || ast.NodeBlockEmbedTextTplRenderResult != node.Next.Type {
+			r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+			r.tag("/span", nil, false)
+		}
 	}
 	return ast.WalkContinue
 }
+
+func (r *VditorIRBlockRenderer) renderBlockEmbedTextTplRenderResult(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+		r.Write(node.Tokens)
+	} else {
+		r.tag("/span", nil, false)
+	}
+	return ast.WalkContinue
+}
+
 
 func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
