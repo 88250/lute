@@ -498,6 +498,10 @@ func (r *VditorIRBlockRenderer) renderBlockRefText(node *ast.Node, entering bool
 		r.tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
 		r.WriteByte(lex.ItemDoublequote)
 		r.tag("/span", nil, false)
+		if nil == node.Next || ast.NodeBlockRefTextTplRenderResult != node.Next.Type {
+			r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+			r.tag("/span", nil, false)
+		}
 	}
 	return ast.WalkContinue
 }
