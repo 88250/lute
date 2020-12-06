@@ -1326,7 +1326,12 @@ func FileID(p string) (ret string) {
 func NormalizeLinkBase(linkBase, url string) string {
 	ret := linkBase
 	ret = strings.Replace(ret, "://", "", 1)
-	ret = ret[strings.Index(ret, "/"):]
+	if "" == ret {
+		return ""
+	}
+	if strings.Contains(ret, "/") {
+		ret = ret[strings.Index(ret, "/"):]
+	}
 	if !strings.HasSuffix(ret, "/") {
 		ret += "/"
 	}
