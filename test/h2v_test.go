@@ -40,6 +40,15 @@ func TestHTML2VditorDOM(t *testing.T) {
 
 var html2VditorIRBlockDOMTests = []parseTest{
 
+	{"0", `<!--StartFragment-->
+<table border="0" cellpadding="0" cellspacing="0" width="144" height="18">
+ <colgroup><col width="72" span="2">
+ </colgroup><tbody><tr height="18">
+  <td height="18" width="72" x:str="">foo</td>
+  <td width="72" x:str="">bar</td>
+ </tr>
+</tbody></table>
+<!--EndFragment-->`, "<table data-block=\"0\" data-type=\"table\" data-node-id=\"20060102150405-1a2b3c4\"><thead><tr><th>foo</th><th>bar</th></tr></thead></table>"},
 	{"0", `<!--StartFragment--><a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/users/88250/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/88250"><img class="avatar avatar-user" height="20" width="20" alt="@88250" src="https://avatars2.githubusercontent.com/u/873584?s=60&amp;u=f7f95251dd56b576aefd20094b6695a2db23a927&amp;v=4"></a><span><span>&nbsp;</span></span><!--EndFragment-->`, "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\"><span data-type=\"a\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">@88250</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">https://avatars2.githubusercontent.com/u/873584?s=60&u=f7f95251dd56b576aefd20094b6695a2db23a927&v=4</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><img src=\"https://avatars2.githubusercontent.com/u/873584?s=60&u=f7f95251dd56b576aefd20094b6695a2db23a927&v=4\" alt=\"@88250\" /></span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">https://github.com/88250</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span></p>"},
 }
 
@@ -54,4 +63,3 @@ func TestHTML2VditorIRBlockDOM(t *testing.T) {
 		}
 	}
 }
-

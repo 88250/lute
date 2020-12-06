@@ -397,6 +397,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+	case atom.Colgroup, atom.Col:
+		return
 	case atom.Span:
 		if nil == n.FirstChild {
 			return
@@ -410,12 +412,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 	case atom.Summary:
 		return
-	default:
 	case atom.Iframe, atom.Audio, atom.Video:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
+	default:
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
