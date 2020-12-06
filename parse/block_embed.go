@@ -19,6 +19,7 @@ import (
 
 func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
+	tokens = bytes.TrimSpace(tokens)
 	var inTaskListItem bool
 	var ial [][]string
 	if ast.NodeListItem == t.Context.Tip.Type && 0 < bytes.Index(tokens, []byte("}")) {
@@ -28,7 +29,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 
 		if 3 == t.Context.Tip.ListData.Typ {
 			tokens = tokens[bytes.Index(tokens, []byte("]"))+1:]
-			tokens = tokens[1:] // 去掉开头的空格
+			tokens = bytes.TrimSpace(tokens)
 			inTaskListItem = true
 		}
 	}
@@ -46,7 +47,6 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	}
 
 	tokens = tokens[3:]
-	tokens = tokens[:len(tokens)-1] // 去掉结尾换行
 	var passed, remains, id, text []byte
 	var pos int
 	var ok bool
