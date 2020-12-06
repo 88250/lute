@@ -456,7 +456,7 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bo
 		r.WriteByte(lex.ItemDoublequote)
 		r.tag("/span", nil, false)
 		if nil == node.Next || ast.NodeBlockEmbedTextTplRenderResult != node.Next.Type {
-			r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+			r.tag("span", [][]string{{"data-type", "ref-text-tpl-render-result"}, {"class", "vditor-ir__blockref"}}, false)
 			r.tag("/span", nil, false)
 		}
 	}
@@ -465,14 +465,13 @@ func (r *VditorIRBlockRenderer) renderBlockEmbedText(node *ast.Node, entering bo
 
 func (r *VditorIRBlockRenderer) renderBlockEmbedTextTplRenderResult(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+		r.tag("span", [][]string{{"data-type", "ref-text-tpl-render-result"}, {"class", "vditor-ir__blockref"}}, false)
 		r.Write(node.Tokens)
 	} else {
 		r.tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
-
 
 func (r *VditorIRBlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
@@ -515,7 +514,7 @@ func (r *VditorIRBlockRenderer) renderBlockRefText(node *ast.Node, entering bool
 		r.WriteByte(lex.ItemDoublequote)
 		r.tag("/span", nil, false)
 		if nil == node.Next || ast.NodeBlockRefTextTplRenderResult != node.Next.Type {
-			r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+			r.tag("span", [][]string{{"data-type", "ref-text-tpl-render-result"}, {"class", "vditor-ir__blockref"}}, false)
 			r.tag("/span", nil, false)
 		}
 	}
@@ -524,7 +523,7 @@ func (r *VditorIRBlockRenderer) renderBlockRefText(node *ast.Node, entering bool
 
 func (r *VditorIRBlockRenderer) renderBlockRefTextTplRenderResult(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("span", [][]string{{"class", "vditor-ir__blockref"}}, false)
+		r.tag("span", [][]string{{"data-type", "ref-text-tpl-render-result"}, {"class", "vditor-ir__blockref"}}, false)
 		r.Write(node.Tokens)
 	} else {
 		r.tag("/span", nil, false)

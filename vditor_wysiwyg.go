@@ -1329,6 +1329,10 @@ func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
 		return
 	}
 
+	if dataType := lute.domAttrValue(n, "data-type"); "ref-text-tpl-render-result" == dataType {
+		return
+	}
+
 	if "svg" == n.Namespace {
 		return
 	}

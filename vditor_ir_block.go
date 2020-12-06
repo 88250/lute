@@ -178,7 +178,7 @@ func RenderNodeVditorIRBlockDOM(node *ast.Node, options *parse.Options) string {
 		rendererFunc := renderer.RendererFuncs[n.Type]
 		return rendererFunc(n, entering)
 	})
-	return strings.TrimSpace(renderer.Writer.String())
+	return renderer.Writer.String()
 }
 
 func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
