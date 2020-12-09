@@ -1211,7 +1211,9 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		if renderFigure {
 			titleTokens := title.Tokens
 			titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
-			attrs = append(attrs, []string{"data-title", html.EscapeString(string(titleTokens))})
+			titleTree := parse.Inline("", titleTokens, r.Tree.Context.Option)
+			figureTitle := RenderHeadingText(titleTree.Root)
+			attrs = append(attrs, []string{"data-title", html.EscapeString(figureTitle)})
 		}
 		r.tag("span", attrs, false)
 	} else {

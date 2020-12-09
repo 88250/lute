@@ -12,6 +12,7 @@ package render
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
 	"unicode"
@@ -515,4 +516,50 @@ func (r *BaseRenderer) NodeAttrsStr(node *ast.Node) (ret string) {
 		ret = ret[:len(ret)-1]
 	}
 	return
+}
+
+func RenderHeadingText(n *ast.Node) (ret string) {
+	buf := &bytes.Buffer{}
+	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		switch n.Type {
+		case ast.NodeLinkText, ast.NodeBlockRefText, ast.NodeBlockEmbedText:
+			buf.Write(n.Tokens)
+		case ast.NodeInlineMathContent:
+			buf.WriteString("<span class=\"language-math\">")
+			buf.Write(html.EscapeHTML(n.Tokens))
+			buf.WriteString("</span>")
+		case ast.NodeCodeSpanContent:
+			buf.WriteString("<code>")
+			buf.Write(html.EscapeHTML(n.Tokens))
+			buf.WriteString("</code>")
+		case ast.NodeText:
+			if n.ParentIs(ast.NodeStrong) {
+				buf.WriteString("<strong>")
+				buf.Write(html.EscapeHTML(n.Tokens))
+				buf.WriteString("</strong>")
+			} else if n.ParentIs(ast.NodeEmphasis) {
+				buf.WriteString("<em>")
+				buf.Write(html.EscapeHTML(n.Tokens))
+				buf.WriteString("</em>")
+			} else {
+				if nil != n.Previous && ast.NodeInlineHTML == n.Previous.Type {
+					if bytes.HasPrefix(n.Previous.Tokens, []byte("<font ")) {
+						buf.Write(n.Previous.Tokens)
+						buf.Write(html.EscapeHTML(n.Tokens))
+					}
+					if nil != n.Next && bytes.Equal(n.Next.Tokens, []byte("</font>")) {
+						buf.Write(n.Next.Tokens)
+					}
+				} else {
+					buf.Write(html.EscapeHTML(n.Tokens))
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
+	return buf.String()
 }
