@@ -208,6 +208,14 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 	}
 }
 
+// RemoveEmoji 用于删除 str 中的 Emoji Unicode。
+func (lute *Lute) RemoveEmoji(str string) string {
+	for u, _ := range lute.EmojiAlias {
+		str = strings.ReplaceAll(str, u, "")
+	}
+	return strings.TrimSpace(str)
+}
+
 // GetTerms 返回术语字典。
 func (lute *Lute) GetTerms() map[string]string {
 	return lute.Terms

@@ -54,3 +54,22 @@ func TestEmoji(t *testing.T) {
 		}
 	}
 }
+
+func TestCleanEmoji(t *testing.T) {
+	luteEngine := lute.New()
+
+	result := luteEngine.RemoveEmoji("❤️ foo")
+	if "foo" != result {
+		t.Fatalf("remove emoji failed")
+	}
+
+	result = luteEngine.RemoveEmoji("bar ❤️ foo")
+	if "bar  foo" != result {
+		t.Fatalf("remove emoji failed")
+	}
+
+	result = luteEngine.RemoveEmoji("❤️ foo ❤️bar")
+	if "foo bar" != result {
+		t.Fatalf("remove emoji failed")
+	}
+}
