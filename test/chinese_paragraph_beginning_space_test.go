@@ -21,8 +21,8 @@ var chineseParagraphBeginningSpaceTests = []parseTest{
 	{"4", "* 段落开头空两格\n\n  第二段", "<ul>\n<li>\n<p>段落开头空两格</p>\n<p>第二段</p>\n</li>\n</ul>\n"},
 	{"3", "* 段落开头空两格\n", "<ul>\n<li>段落开头空两格</li>\n</ul>\n"},
 	{"2", "> 段落开头空两格\n", "<blockquote>\n<p>段落开头空两格</p>\n</blockquote>\n"},
-	{"1", "段落开头空两格\n换行\n\n 第二段", "<p>&emsp;&emsp;段落开头空两格<br />\n换行</p>\n<p>&emsp;&emsp;第二段</p>\n"},
-	{"0", "段落开头空两格\n", "<p>&emsp;&emsp;段落开头空两格</p>\n"},
+	{"1", "段落开头空两格\n换行\n\n 第二段", "<p class=\"indent--2\">段落开头空两格<br />\n换行</p>\n<p class=\"indent--2\">第二段</p>\n"},
+	{"0", "段落开头空两格\n", "<p class=\"indent--2\">段落开头空两格</p>\n"},
 }
 
 func TestChineseParagraphBeginningSpace(t *testing.T) {

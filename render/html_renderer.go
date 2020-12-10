@@ -814,10 +814,12 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 	if entering {
 		r.Newline()
 		r.handleKramdownIAL(node)
-		r.tag("p", node.KramdownIAL, false)
+		var attrs [][]string
+		attrs = append(attrs, node.KramdownIAL...)
 		if r.Option.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
-			r.WriteString("&emsp;&emsp;")
+			attrs = append(attrs, []string{"class", "indent--2"})
 		}
+		r.tag("p", attrs, false)
 	} else {
 		r.tag("/p", nil, false)
 		r.Newline()
