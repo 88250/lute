@@ -1197,12 +1197,21 @@ func (r *VditorIRBlockRenderer) renderBang(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, util.CaretTokens)
+	single := nil == node.Previous && nil == node.Next
+	title := node.ChildByType(ast.NodeLinkTitle)
+	withTitle := nil != title && nil != title.Tokens
+	renderFigure := single && withTitle
+
 	if entering {
 		text := r.Text(node)
 		class := "vditor-ir__node"
 		if strings.Contains(text, util.Caret) || needResetCaret {
 			class += " vditor-ir__node--expand"
 		}
+		if renderFigure {
+			class += " img--center"
+		}
+
 		attrs := [][]string{{"class", class}, {"data-type", "img"}}
 		r.tag("span", attrs, false)
 	} else {
@@ -1233,10 +1242,6 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
 
-		single := nil == node.Previous && nil == node.Next
-		title := node.ChildByType(ast.NodeLinkTitle)
-		withTitle := nil != title && nil != title.Tokens
-		renderFigure := single && withTitle
 		if renderFigure {
 			titleTokens := title.Tokens
 			titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
