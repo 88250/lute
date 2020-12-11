@@ -171,28 +171,28 @@ func (r *VditorRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *VditorRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("mark", [][]string{{"data-marker", "="}}, false)
+		r.Tag("mark", [][]string{{"data-marker", "="}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/mark", nil, false)
+		r.Tag("/mark", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("mark", [][]string{{"data-marker", "=="}}, false)
+		r.Tag("mark", [][]string{{"data-marker", "=="}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/mark", nil, false)
+		r.Tag("/mark", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -203,14 +203,14 @@ func (r *VditorRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus
 
 func (r *VditorRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("sup", [][]string{{"data-marker", "^"}}, false)
+		r.Tag("sup", [][]string{{"data-marker", "^"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/sup", nil, false)
+		r.Tag("/sup", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -221,14 +221,14 @@ func (r *VditorRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus
 
 func (r *VditorRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("sub", [][]string{{"data-marker", "~"}}, false)
+		r.Tag("sub", [][]string{{"data-marker", "~"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/sub", nil, false)
+		r.Tag("/sub", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -242,8 +242,8 @@ func (r *VditorRenderer) renderYamlFrontMatterContent(node *ast.Node, entering b
 		previewTokens := bytes.TrimSpace(node.Tokens)
 		codeLen := len(previewTokens)
 		codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-		r.tag("pre", nil, false)
-		r.tag("code", [][]string{{"data-type", "yaml-front-matter"}}, false)
+		r.Tag("pre", nil, false)
+		r.Tag("code", [][]string{{"data-type", "yaml-front-matter"}}, false)
 		if codeIsEmpty {
 			r.WriteString(util.FrontEndCaret + "\n")
 		} else {
@@ -279,17 +279,17 @@ func (r *VditorRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.Wal
 	}
 
 	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-entity\">")
-	r.tag("code", [][]string{{"data-type", "html-entity"}, {"style", "display: none"}}, false)
+	r.Tag("code", [][]string{{"data-type", "html-entity"}, {"style", "display: none"}}, false)
 	tokens := append([]byte(parse.Zwsp), node.HtmlEntityTokens...)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code>")
 
-	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	r.tag("code", nil, false)
+	r.Tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	r.Tag("code", nil, false)
 	previewTokens := bytes.ReplaceAll(node.HtmlEntityTokens, util.CaretTokens, nil)
 	r.Write(previewTokens)
-	r.tag("/code", nil, false)
-	r.tag("/span", nil, false)
+	r.Tag("/code", nil, false)
+	r.Tag("/span", nil, false)
 	r.WriteString("</span>" + parse.Zwsp)
 	return ast.WalkContinue
 }
@@ -359,7 +359,7 @@ func (r *VditorRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.W
 		idx, def := r.Tree.FindFootnotesDef(node.Tokens)
 		idxStr := strconv.Itoa(idx)
 		label := def.Text()
-		r.tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)},
+		r.Tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)},
 			{"class", "vditor-tooltipped vditor-tooltipped__s"}, {"aria-label", SubStr(html.EscapeString(label), 24)}}, false)
 		r.WriteString(idxStr)
 		r.WriteString("</sup>" + parse.Zwsp)
@@ -417,18 +417,18 @@ func (r *VditorRenderer) renderInlineMathContent(node *ast.Node, entering bool) 
 		codeAttrs = append(codeAttrs, []string{"style", "display: none"})
 	}
 	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
-	r.tag("code", codeAttrs, false)
+	r.Tag("code", codeAttrs, false)
 	tokens = html.EscapeHTML(tokens)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
 	r.WriteString("</code>")
 
-	r.tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	r.tag("span", [][]string{{"class", "language-math"}}, false)
+	r.Tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	r.Tag("span", [][]string{{"class", "language-math"}}, false)
 	previewTokens = bytes.ReplaceAll(previewTokens, util.CaretTokens, nil)
 	r.Write(previewTokens)
-	r.tag("/span", nil, false)
-	r.tag("/span", nil, false)
+	r.Tag("/span", nil, false)
+	r.Tag("/span", nil, false)
 	r.WriteString("</span>" + parse.Zwsp)
 	return ast.WalkContinue
 }
@@ -464,8 +464,8 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 	}
 	codeLen := len(previewTokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-	r.tag("pre", preAttrs, false)
-	r.tag("code", [][]string{{"data-type", "math-block"}}, false)
+	r.Tag("pre", preAttrs, false)
+	r.Tag("code", [][]string{{"data-type", "math-block"}}, false)
 	if codeIsEmpty {
 		r.WriteString(util.FrontEndCaret + "\n")
 	} else {
@@ -474,8 +474,8 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 	r.WriteString("</code></pre>")
 
 	if r.Option.VditorMathBlockPreview {
-		r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-		r.tag("div", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
+		r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+		r.Tag("div", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 		tokens := node.Tokens
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Write(html.EscapeHTML(tokens))
@@ -512,7 +512,7 @@ func (r *VditorRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 		case 3:
 			attrs = append(attrs, []string{"align", "right"})
 		}
-		r.tag(tag, attrs, false)
+		r.Tag(tag, attrs, false)
 		if nil == node.FirstChild {
 			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
 		} else if bytes.Equal(node.FirstChild.Tokens, util.CaretTokens) {
@@ -521,27 +521,27 @@ func (r *VditorRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
 		}
 	} else {
-		r.tag("/"+tag, nil, false)
+		r.Tag("/"+tag, nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("tr", nil, false)
+		r.Tag("tr", nil, false)
 	} else {
-		r.tag("/tr", nil, false)
+		r.Tag("/tr", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("thead", nil, false)
+		r.Tag("thead", nil, false)
 	} else {
-		r.tag("/thead", nil, false)
+		r.Tag("/thead", nil, false)
 		if nil != node.Next {
-			r.tag("tbody", nil, false)
+			r.Tag("tbody", nil, false)
 		}
 	}
 	return ast.WalkContinue
@@ -549,12 +549,12 @@ func (r *VditorRenderer) renderTableHead(node *ast.Node, entering bool) ast.Walk
 
 func (r *VditorRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("table", [][]string{{"data-block", "0"}}, false)
+		r.Tag("table", [][]string{{"data-block", "0"}}, false)
 	} else {
 		if nil != node.FirstChild.Next {
-			r.tag("/tbody", nil, false)
+			r.Tag("/tbody", nil, false)
 		}
-		r.tag("/table", nil, false)
+		r.Tag("/table", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -565,28 +565,28 @@ func (r *VditorRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.
 
 func (r *VditorRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("s", [][]string{{"data-marker", "~"}}, false)
+		r.Tag("s", [][]string{{"data-marker", "~"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/s", nil, false)
+		r.Tag("/s", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("s", [][]string{{"data-marker", "~~"}}, false)
+		r.Tag("s", [][]string{{"data-marker", "~~"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/s", nil, false)
+		r.Tag("/s", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -729,9 +729,9 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
 			label := string(node.LinkRefLabel)
 			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
-			r.tag("span", attrs, false)
+			r.Tag("span", attrs, false)
 			r.WriteString(text)
-			r.tag("/span", nil, false)
+			r.Tag("/span", nil, false)
 			r.WriteString(parse.Zwsp)
 			return ast.WalkSkipChildren
 		} else {
@@ -754,9 +754,9 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 			title.Tokens = bytes.ReplaceAll(title.Tokens, util.CaretTokens, nil)
 			attrs = append(attrs, []string{"title", string(title.Tokens)})
 		}
-		r.tag("a", attrs, false)
+		r.Tag("a", attrs, false)
 	} else {
-		r.tag("/a", nil, false)
+		r.Tag("/a", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -769,11 +769,11 @@ func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 	r.WriteString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
 	tokens := bytes.TrimSpace(node.Tokens)
 	r.WriteString("<pre>")
-	r.tag("code", nil, false)
+	r.Tag("code", nil, false)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 
-	r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+	r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	if r.Option.Sanitize {
 		tokens = sanitize(tokens)
@@ -811,7 +811,7 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 
 	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
 	node.Tokens = bytes.TrimSpace(node.Tokens)
-	r.tag("code", [][]string{{"data-type", "html-inline"}}, false)
+	r.Tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	tokens = html.EscapeHTML(tokens)
 	r.Write(tokens)
 	r.WriteString("</code>")
@@ -831,9 +831,9 @@ func (r *VditorRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 	if entering {
 		attr := [][]string{{"data-block", "0"}}
 		attr = append(attr, node.KramdownIAL...)
-		r.tag("p", attr, false)
+		r.Tag("p", attr, false)
 	} else {
-		r.tag("/p", nil, false)
+		r.Tag("/p", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -876,7 +876,7 @@ func (r *VditorRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 				r.WriteByte(lex.ItemSpace)
 			}
 		}
-		r.tag("code", [][]string{{"data-marker", strings.Repeat("`", node.CodeMarkerLen)}}, false)
+		r.Tag("code", [][]string{{"data-marker", strings.Repeat("`", node.CodeMarkerLen)}}, false)
 	}
 	return ast.WalkContinue
 }
@@ -913,28 +913,28 @@ func (r *VditorRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkS
 
 func (r *VditorRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("em", [][]string{{"data-marker", "*"}}, false)
+		r.Tag("em", [][]string{{"data-marker", "*"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/em", nil, false)
+		r.Tag("/em", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("em", [][]string{{"data-marker", "_"}}, false)
+		r.Tag("em", [][]string{{"data-marker", "_"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/em", nil, false)
+		r.Tag("/em", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -945,28 +945,28 @@ func (r *VditorRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *VditorRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("strong", [][]string{{"data-marker", "**"}}, false)
+		r.Tag("strong", [][]string{{"data-marker", "**"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/strong", nil, false)
+		r.Tag("/strong", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("strong", [][]string{{"data-marker", "__"}}, false)
+		r.Tag("strong", [][]string{{"data-marker", "__"}}, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("/strong", nil, false)
+		r.Tag("/strong", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1010,9 +1010,9 @@ func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 		}
 		if r.Option.HeadingAnchor {
 			id := HeadingID(node)
-			r.tag("a", [][]string{{"id", "vditorAnchor-" + id}, {"class", "vditor-anchor"}, {"href", "#" + id}}, false)
+			r.Tag("a", [][]string{{"id", "vditorAnchor-" + id}, {"class", "vditor-anchor"}, {"href", "#" + id}}, false)
 			r.WriteString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
-			r.tag("/a", nil, false)
+			r.Tag("/a", nil, false)
 		}
 	} else {
 		r.WriteString("</h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1] + ">")
@@ -1057,9 +1057,9 @@ func (r *VditorRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
 		r.renderListStyle(node, &attrs)
-		r.tag(tag, attrs, false)
+		r.Tag(tag, attrs, false)
 	} else {
-		r.tag("/"+tag, nil, false)
+		r.Tag("/"+tag, nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1082,12 +1082,12 @@ func (r *VditorRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
 			}
 		}
-		r.tag("li", attrs, false)
+		r.Tag("li", attrs, false)
 		if nil == node.FirstChild {
 			r.WriteString(parse.Zwsp)
 		}
 	} else {
-		r.tag("/li", nil, false)
+		r.Tag("/li", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1099,19 +1099,19 @@ func (r *VditorRenderer) renderTaskListItemMarker(node *ast.Node, entering bool)
 			attrs = append(attrs, []string{"checked", ""})
 		}
 		attrs = append(attrs, []string{"type", "checkbox"})
-		r.tag("input", attrs, true)
+		r.Tag("input", attrs, true)
 	}
 	return ast.WalkContinue
 }
 
 func (r *VditorRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("hr", [][]string{{"data-block", "0"}}, true)
+		r.Tag("hr", [][]string{{"data-block", "0"}}, true)
 		if nil != node.Tokens {
-			r.tag("p", [][]string{{"data-block", "0"}}, false)
+			r.Tag("p", [][]string{{"data-block", "0"}}, false)
 			r.Write(node.Tokens)
 			r.WriteByte(lex.ItemNewline)
-			r.tag("/p", nil, false)
+			r.Tag("/p", nil, false)
 		}
 	}
 	return ast.WalkContinue
@@ -1119,7 +1119,7 @@ func (r *VditorRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.
 
 func (r *VditorRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.tag("br", nil, true)
+		r.Tag("br", nil, true)
 	}
 	return ast.WalkContinue
 }
@@ -1174,8 +1174,8 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	if !bytes.Contains(node.Tokens, util.CaretTokens) && !caretInInfo && r.Option.VditorCodeBlockPreview {
 		preAttrs = append(preAttrs, []string{"style", "display: none"})
 	}
-	r.tag("pre", preAttrs, false)
-	r.tag("code", attrs, false)
+	r.Tag("pre", preAttrs, false)
+	r.Tag("code", attrs, false)
 
 	if codeIsEmpty {
 		r.WriteString(util.FrontEndCaret + "\n")
@@ -1189,12 +1189,12 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	r.WriteString("</code></pre>")
 
 	if r.Option.VditorCodeBlockPreview {
-		r.tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
+		r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 		preDiv := noHighlight(language)
 		if preDiv {
-			r.tag("div", attrs, false)
+			r.Tag("div", attrs, false)
 		} else {
-			r.tag("code", attrs, false)
+			r.Tag("code", attrs, false)
 		}
 		tokens := node.Tokens
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)

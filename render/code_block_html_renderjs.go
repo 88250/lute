@@ -51,7 +51,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		r.handleKramdownIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		if !preDiv {
-			r.tag("pre", attrs, false)
+			r.Tag("pre", attrs, false)
 		}
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {

@@ -46,7 +46,7 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 				var attrs [][]string
 				r.handleKramdownIAL(node)
 				attrs = append(attrs, node.KramdownIAL...)
-				r.tag("pre", attrs, false)
+				r.Tag("pre", attrs, false)
 				r.WriteString("<code>")
 				tokens = html.EscapeHTML(tokens)
 				r.Write(tokens)
@@ -100,7 +100,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				if preDiv {
 					r.WriteString("<div class=\"language-")
 				} else {
-					r.tag("pre", attrs, false)
+					r.Tag("pre", attrs, false)
 					r.WriteString("<code class=\"language-")
 				}
 				r.WriteString(language)
@@ -117,7 +117,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 					r.Write(tokens)
 				}
 			} else {
-				r.tag("pre", attrs, false)
+				r.Tag("pre", attrs, false)
 				if r.Option.CodeSyntaxHighlightDetectLang {
 					language := detectLanguage(tokens)
 					if "" != language {
@@ -177,10 +177,10 @@ func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *Html
 		var b bytes.Buffer
 		if err = formatter.Format(&b, style, iterator); nil == err {
 			if !r.Option.CodeSyntaxHighlightInlineStyle {
-				r.tag("pre", attrs, false)
+				r.Tag("pre", attrs, false)
 			} else {
 				attrs = append(attrs, []string{"style", chromahtml.StyleEntryToCSS(style.Get(chroma.Background))})
-				r.tag("pre", attrs, false)
+				r.Tag("pre", attrs, false)
 			}
 			if "" != language {
 				r.WriteString("<code class=\"language-" + language)
