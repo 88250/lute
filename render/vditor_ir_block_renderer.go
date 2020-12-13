@@ -1276,7 +1276,7 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 
 	tokens := bytes.TrimSpace(node.Tokens)
 	class := "vditor-ir__marker--pre"
-	if r.Option.VditorMathBlockPreview {
+	if r.Option.VditorHTMLBlockPreview {
 		class += " vditor-ir__marker"
 	}
 	r.Tag("pre", [][]string{{"class", class}}, false)
