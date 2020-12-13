@@ -151,14 +151,6 @@ func (r *VditorIRRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorIRRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		if util.IsDocIAL(node.Tokens) {
-			return ast.WalkContinue
-		}
-		r.Tag("span", [][]string{{"data-type", "kramdown-ial"}}, false)
-		r.Write(node.Tokens)
-		r.Tag("/span", nil, false)
-	}
 	return ast.WalkContinue
 }
 

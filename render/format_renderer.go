@@ -224,6 +224,9 @@ func (r *FormatRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast
 func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
+		if util.IsDocIAL(node.Tokens) {
+			r.WriteByte(lex.ItemNewline)
+		}
 		r.Write(node.Tokens)
 	} else {
 		if ast.NodeListItem == node.Parent.Type || ast.NodeList == node.Parent.Type {
