@@ -28,6 +28,18 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.parseInlines()
 	if tree.Context.Option.KramdownIAL {
 		tree.parseKramdownSpanIAL()
+
+		var docIAL *ast.Node
+		var id string
+		if nil != tree.Context.rootIAL {
+			docIAL = tree.Context.rootIAL
+		} else {
+			id = ast.NewNodeID()
+			docIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: []byte("{: id=\"" + id + "\" type=\"doc\"}")}
+			tree.Root.ID = id
+			tree.ID = id
+		}
+		tree.Root.AppendChild(docIAL)
 	}
 	tree.lexer = nil
 	return
@@ -59,6 +71,8 @@ type Context struct {
 	offset, column, nextNonspace, nextNonspaceColumn, indent int       // 解析时用到的下标、缩进空格数等
 	indented, blank, partiallyConsumedTab, allClosed         bool      // 是否是缩进行、空行等标识
 	lastMatchedContainer                                     *ast.Node // 最后一个匹配的块节点
+
+	rootIAL *ast.Node // 根节点 kramdown IAL
 }
 
 // InlineContext 描述了行级元素解析上下文。

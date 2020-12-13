@@ -18,14 +18,14 @@ import (
 
 var echartsJSONRendererTests = []parseTest{
 
-	{"7", "| foo |\n| - |\n|   |\n{: id=\"20201122125005-kc4sl0l\"}\n\n{: id=\"20201122125319-t74imwc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Table\\ntable\",\"children\":[{\"name\":\"Table Head\\nthead\"},{\"name\":\"Table Row\\ntr\"}]},{\"name\":\"Block IAL\\n{: 20201122125005-kc4sl0l}\"},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
-	{"6", "{: id=\"20201122125005-kc4sl0l\"}", "[{\"name\":\"Document\",\"children\":[]}]"},
-	{"5", "foo\n{: id=\"fooid\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Text\\nfoo\"}]},{\"name\":\"Block IAL\\n{: fooid}\"}]}]"},
-	{"4", "&hearts;", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"HTML Entity\\nspan\"}]}]}]"},
-	{"3", ":smile:", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Emoji Unicode\\n\"}]}]}]"},
-	{"2", "~foo~\n", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Strikethrough\\ndel\"}]}]}]"},
-	{"1", "# foo\n*bar*\n", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Heading\\nh1\",\"children\":[{\"name\":\"Text\\nfoo\"}]},{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Emphasis\\nem\",\"children\":[{\"name\":\"Text\\nbar\"}]}]}]}]"},
-	{"0", "", "[{\"name\":\"Document\"}]"},
+	{"7", "| foo |\n| - |\n|   |\n{: id=\"20201122125005-kc4sl0l\"}\n\n{: id=\"20201122125319-t74imwc\" type=\"doc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Table\\ntable\",\"children\":[{\"name\":\"Table Head\\nthead\"},{\"name\":\"Table Row\\ntr\"}]},{\"name\":\"Block IAL\\n{: 20201122125005-kc4sl0l}\"},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
+	{"6", "foo\n{: id=\"20201122125005-kc4sl0l\"}\n\n{: id=\"20201122125319-t74imwc\" type=\"doc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Text\\nfoo\"}]},{\"name\":\"Block IAL\\n{: 20201122125005-kc4sl0l}\"},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
+	{"5", "foo\n{: id=\"fooid\"}\n\n{: id=\"20201122125319-t74imwc\" type=\"doc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Text\\nfoo\"}]},{\"name\":\"Block IAL\\n{: fooid}\"},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
+	{"4", "&hearts;\n\n{: id=\"20201122125319-t74imwc\" type=\"doc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"HTML Entity\\nspan\"}]},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
+	{"3", ":smile:\n\n{: id=\"20201122125319-t74imwc\" type=\"doc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Emoji Unicode\\n\"}]},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
+	{"2", "~foo~\n\n{: id=\"20201122125319-t74imwc\" type=\"doc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Strikethrough\\ndel\"}]},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
+	{"1", "# foo\n*bar*\n\n{: id=\"20201122125319-t74imwc\" type=\"doc\"}", "[{\"name\":\"Document\",\"children\":[{\"name\":\"Heading\\nh1\",\"children\":[{\"name\":\"Text\\nfoo\"}]},{\"name\":\"Paragraph\\np\",\"children\":[{\"name\":\"Emphasis\\nem\",\"children\":[{\"name\":\"Text\\nbar\"}]}]},{\"name\":\"Block IAL\\n{: 20201122125319-t74imwc}\"}]}]"},
+	{"0", "", "[{\"name\":\"Document\",\"children\":[]}]"},
 }
 
 func TestEChartsJSONRenderer(t *testing.T) {

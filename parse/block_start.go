@@ -339,8 +339,10 @@ var blockStarts = []blockStartFunc{
 			}
 			lastMatchedContainer.KramdownIAL = ial
 			t.Context.offset = t.Context.currentLineLen                    // 整行过
-			if 1 < len(ial) && "type" == ial[1][0] && "doc" == ial[1][1] { // 文档块 IAL 作为 Root.Next
-				t.Root.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: t.Context.currentLine[t.Context.nextNonspace:]})
+			if 1 < len(ial) && "type" == ial[1][0] && "doc" == ial[1][1] { // 文档块 IAL
+				t.Context.rootIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: t.Context.currentLine[t.Context.nextNonspace:]}
+				t.Root.ID = ial[0][1]
+				t.ID = t.Root.ID
 				return 2
 			}
 			node := t.Context.addChild(ast.NodeKramdownBlockIAL)

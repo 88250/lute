@@ -86,6 +86,7 @@ func TestMd2VditorIRDOM(t *testing.T) {
 	luteEngine.ToC = true
 	luteEngine.KramdownIAL = true
 
+	ast.Testing = true
 	for _, test := range md2VditorIRDOMTests {
 		md := luteEngine.Md2VditorIRDOM(test.from)
 		if test.to != md {
