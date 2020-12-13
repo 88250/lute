@@ -1272,31 +1272,32 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 		return ast.WalkContinue
 	}
 
-	attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}}
-	ial := r.NodeAttrs(node)
-	if 0 < len(ial) {
-		attrs = append(attrs, ial...)
-	}
-	attrs = append(attrs, [][]string{{"data-type", "html-block"}}...)
-	r.Tag("div", attrs, false)
+	r.renderDivNode(node)
 
 	tokens := bytes.TrimSpace(node.Tokens)
-	r.WriteString("<pre class=\"vditor-ir__marker--pre vditor-ir__marker\">")
+	class := "vditor-ir__marker--pre"
+	if r.Option.VditorMathBlockPreview {
+		class += " vditor-ir__marker"
+	}
+	r.Tag("pre", [][]string{{"class", class}}, false)
 	r.Tag("code", [][]string{{"data-type", "html-block"}}, false)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 
-	r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	if r.Option.Sanitize {
-		tokens = sanitize(tokens)
+	if r.Option.VditorHTMLBlockPreview {
+		r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		if r.Option.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		bilibili := []byte("<iframe src=\"//player.bilibili.com/player.html")
+		if bytes.HasPrefix(tokens, bilibili) {
+			tokens = bytes.Replace(tokens, bilibili, []byte("<iframe class=\"iframe__video\" src=\"https://player.bilibili.com/player.html"), 1)
+		}
+		r.Write(tokens)
+		r.WriteString("</pre>")
 	}
-	bilibili := []byte("<iframe src=\"//player.bilibili.com/player.html")
-	if bytes.HasPrefix(tokens, bilibili) {
-		tokens = bytes.Replace(tokens, bilibili, []byte("<iframe class=\"iframe__video\" src=\"https://player.bilibili.com/player.html"), 1)
-	}
-	r.Write(tokens)
-	r.WriteString("</pre></div>")
+	r.WriteString("</div>")
 	return ast.WalkContinue
 }
 
@@ -1893,7 +1894,7 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "span-ial"})
 	case ast.NodeBlockQueryEmbedScript:
 		attrs = append(attrs, []string{"data-type", "block-query-embed-script"})
-		attrs = append(attrs, []string{"class", "vditor-ir__marker vditor-ir__block-query-embed-script"})
+		attrs = append(attrs, []string{"class", "vditor-ir__marker vditor-ir__marker--script"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}
@@ -1938,6 +1939,8 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "super-block"})
 	case ast.NodeMathBlock:
 		attrs = append(attrs, []string{"data-type", "math-block"})
+	case ast.NodeHTMLBlock:
+		attrs = append(attrs, []string{"data-type", "html-block"})
 	case ast.NodeYamlFrontMatter:
 		attrs = append(attrs, []string{"data-type", "yaml-front-matter"})
 	case ast.NodeBlockEmbed:

@@ -98,6 +98,7 @@ func NewOptions() *parse.Options {
 		LinkPrefix:                     "",
 		VditorCodeBlockPreview:         true,
 		VditorMathBlockPreview:         true,
+		VditorHTMLBlockPreview:         true,
 		RenderListStyle:                false,
 		ChineseParagraphBeginningSpace: false,
 		YamlFrontMatter:                true,
@@ -363,6 +364,10 @@ func (lute *Lute) SetVditorCodeBlockPreview(b bool) {
 
 func (lute *Lute) SetVditorMathBlockPreview(b bool) {
 	lute.VditorMathBlockPreview = b
+}
+
+func (lute *Lute) SetVditorHTMLBlockPreview(b bool) {
+	lute.VditorHTMLBlockPreview = b
 }
 
 func (lute *Lute) SetRenderListStyle(b bool) {
