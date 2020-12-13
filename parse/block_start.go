@@ -330,6 +330,14 @@ var blockStarts = []blockStartFunc{
 
 		if ial := t.parseKramdownBlockIAL(); nil != ial {
 			t.Context.closeUnmatchedBlocks()
+			t.Context.offset = t.Context.currentLineLen                    // 整行过
+			if 1 < len(ial) && "type" == ial[1][0] && "doc" == ial[1][1] { // 文档块 IAL
+				t.Context.rootIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: t.Context.currentLine[t.Context.nextNonspace:]}
+				t.Root.ID = ial[0][1]
+				t.ID = t.Root.ID
+				return 2
+			}
+
 			lastMatchedContainer := t.Context.lastMatchedContainer
 			if t.Context.allClosed && (ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type) {
 				lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
@@ -338,13 +346,6 @@ var blockStarts = []blockStartFunc{
 				}
 			}
 			lastMatchedContainer.KramdownIAL = ial
-			t.Context.offset = t.Context.currentLineLen                    // 整行过
-			if 1 < len(ial) && "type" == ial[1][0] && "doc" == ial[1][1] { // 文档块 IAL
-				t.Context.rootIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: t.Context.currentLine[t.Context.nextNonspace:]}
-				t.Root.ID = ial[0][1]
-				t.ID = t.Root.ID
-				return 2
-			}
 			node := t.Context.addChild(ast.NodeKramdownBlockIAL)
 			node.Tokens = t.Context.currentLine[t.Context.nextNonspace:]
 			return 2

@@ -82,6 +82,9 @@ func (r *EChartsJSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bo
 			return ast.WalkContinue
 		}
 		id := r.NodeID(node.Previous)
+		if util.IsDocIAL(node.Tokens) {
+			id = r.Tree.ID
+		}
 		r.leaf("Block IAL\n{: "+id+"}", node)
 	}
 	return ast.WalkContinue
