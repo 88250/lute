@@ -1291,37 +1291,6 @@ func appendNextToTip(next *ast.Node, tree *parse.Tree) {
 	}
 }
 
-func FilePath(p string) string {
-	id := FileID(p)
-	if "" == id {
-		return p
-	}
-	ret := strings.TrimSuffix(p, ".sy.md")
-	ret = strings.TrimSuffix(ret, "_"+id)
-	return ret
-}
-
-func FileID(p string) (ret string) {
-	if 0 <= strings.Index(ret, "/") {
-		p = p[strings.LastIndex(p, "/"):]
-	}
-	p = strings.TrimSuffix(p, ".md")
-	p = strings.TrimSuffix(p, ".sy")
-	if !strings.Contains(p, "_") {
-		return
-	}
-	idx := strings.LastIndex(p, "_")
-	if len(p)-1 == idx {
-		return
-	}
-
-	ret = p[idx+1:]
-	if len(ret) != len("20201001000000-1949101") {
-		return ""
-	}
-	return
-}
-
 func NormalizeLinkBase(linkBase, url string) string {
 	ret := linkBase
 	ret = strings.Replace(ret, "://", "", 1)

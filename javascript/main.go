@@ -34,7 +34,6 @@ func main() {
 		"GetHeadingID":      render.HeadingID,
 		"Caret":             util.Caret,
 		"NewNodeID":         ast.NewNodeID,
-		"FilePath":          lute.FilePath,
 		"NormalizeLinkBase": lute.NormalizeLinkBase,
 	})
 }
