@@ -394,7 +394,7 @@ func (r *VditorIRBlockRenderer) render() (output []byte) {
 
 func (r *VditorIRBlockRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("span", [][]string{{"class", "vditor-ir__block-query-embed-script"}}, false)
+		r.renderSpanNode(node)
 		r.Write(node.Tokens)
 	} else {
 		r.Tag("/span", nil, false)
@@ -1891,6 +1891,9 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "html-inline"})
 	case ast.NodeKramdownSpanIAL:
 		attrs = append(attrs, []string{"data-type", "span-ial"})
+	case ast.NodeBlockQueryEmbedScript:
+		attrs = append(attrs, []string{"data-type", "block-query-embed-script"})
+		attrs = append(attrs, []string{"class", "vditor-ir__marker vditor-ir__block-query-embed-script"})
 	default:
 		attrs = append(attrs, []string{"data-type", "inline-node"})
 	}

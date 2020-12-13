@@ -356,7 +356,6 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		} else if "block-query-embed" == dataType {
 			text := lute.domText(n)
-
 			t := parse.Parse("", []byte(text), lute.Options)
 			if blockQueryEmbed := t.Root.FirstChild; nil != blockQueryEmbed && ast.NodeBlockQueryEmbed == blockQueryEmbed.Type {
 				node = blockQueryEmbed
