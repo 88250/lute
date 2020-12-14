@@ -59,13 +59,15 @@ func (context *Context) listFinalize(list *ast.Node) {
 					li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL})
 					li = li.Next
 				} else {
-					if ial := context.parseKramdownIALInListItem(li.FirstChild.Tokens); 0 < len(ial) {
-						li.KramdownIAL = ial
-						li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL})
-						tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}"))+1:]
-						tokens = lex.TrimWhitespace(tokens)
-						li.FirstChild.Tokens = tokens
-						li = li.Next
+					if 7 < len(li.FirstChild.Tokens) && '{' == li.FirstChild.Tokens[0] {
+						if ial := context.parseKramdownIALInListItem(li.FirstChild.Tokens); 0 < len(ial) {
+							li.KramdownIAL = ial
+							li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL})
+							tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}"))+1:]
+							tokens = lex.TrimWhitespace(tokens)
+							li.FirstChild.Tokens = tokens
+							li = li.Next
+						}
 					}
 				}
 			}
