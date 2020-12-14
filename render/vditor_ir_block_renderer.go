@@ -1198,9 +1198,7 @@ func (r *VditorIRBlockRenderer) renderBang(node *ast.Node, entering bool) ast.Wa
 func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, util.CaretTokens)
 	single := nil == node.Previous && nil == node.Next
-	title := node.ChildByType(ast.NodeLinkTitle)
-	withTitle := nil != title && nil != title.Tokens
-	renderFigure := single && withTitle
+	renderFigure := single
 
 	if entering {
 		text := r.Text(node)
@@ -1243,14 +1241,16 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		r.Writer.Write(imgBuf)
 
 		if renderFigure {
-			titleTokens := title.Tokens
-			titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
-			titleTree := parse.Inline("", titleTokens, r.Tree.Context.Option)
-			figureTitle := RenderHeadingText(titleTree.Root)
-			attrs = [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}
-			r.Tag("span", attrs, false)
-			r.Writer.WriteString(figureTitle)
-			r.Tag("/span", nil, false)
+			if title := node.ChildByType(ast.NodeLinkTitle);nil!=title {
+				titleTokens := title.Tokens
+				titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
+				titleTree := parse.Inline("", titleTokens, r.Tree.Context.Option)
+				figureTitle := RenderHeadingText(titleTree.Root)
+				attrs = [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}
+				r.Tag("span", attrs, false)
+				r.Writer.WriteString(figureTitle)
+				r.Tag("/span", nil, false)
+			}
 		}
 
 		r.Tag("/span", nil, false)
