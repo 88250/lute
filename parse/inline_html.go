@@ -197,11 +197,7 @@ func (t *Tree) parseDeclaration(tokens []byte) (valid bool, remains, content []b
 		}
 	}
 	tokens = tokens[i:]
-	if 1 > len(tokens) {
-		return
-	}
-
-	if lex.ItemGreater != tokens[0] {
+	if 1 > len(tokens) || lex.ItemGreater != tokens[0] {
 		return
 	}
 	valid = true
