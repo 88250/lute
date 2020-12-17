@@ -372,12 +372,27 @@ func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 	return false
 }
 
-// IsBlock 判断 n 是否为块级元素。
+// IsBlock 判断 n 是否为块级节点。
 func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed,
 		NodeKramdownBlockIAL, NodeSuperBlock:
+		return true
+	}
+	return false
+}
+
+// IsMarker 判断 n 是否为标记符节点。
+func (n *Node) IsMarker() bool {
+	switch n.Type {
+	case NodeHeadingC8hMarker, NodeBlockquoteMarker, NodeCodeBlockFenceOpenMarker, NodeCodeBlockFenceCloseMarker, NodeCodeBlockFenceInfoMarker,
+		NodeEmA6kOpenMarker, NodeEmA6kCloseMarker, NodeEmU8eOpenMarker, NodeEmU8eCloseMarker, NodeStrongA6kOpenMarker, NodeStrongA6kCloseMarker,
+		NodeStrongU8eOpenMarker, NodeStrongU8eCloseMarker, NodeCodeSpanOpenMarker, NodeCodeSpanCloseMarker, NodeTaskListItemMarker,
+		NodeStrikethrough1OpenMarker, NodeStrikethrough1CloseMarker, NodeStrikethrough2OpenMarker, NodeStrikethrough2CloseMarker,
+		NodeMathBlockOpenMarker, NodeMathBlockCloseMarker, NodeInlineMathOpenMarker, NodeInlineMathCloseMarker, NodeYamlFrontMatterOpenMarker, NodeYamlFrontMatterCloseMarker,
+		NodeMark1OpenMarker, NodeMark1CloseMarker, NodeMark2OpenMarker, NodeMark2CloseMarker, NodeTagOpenMarker, NodeTagCloseMarker,
+		NodeSuperBlockOpenMarker, NodeSuperBlockCloseMarker, NodeSupOpenMarker, NodeSupCloseMarker, NodeSubOpenMarker, NodeSubCloseMarker:
 		return true
 	}
 	return false
