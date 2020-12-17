@@ -752,10 +752,7 @@ func (r *VditorIRBlockRenderer) renderCodeBlockCode(node *ast.Node, entering boo
 		}
 	}
 
-	class := "vditor-ir__marker--pre"
-	if r.Option.VditorCodeBlockPreview {
-		class += " vditor-ir__marker"
-	}
+	class := "vditor-ir__marker--pre vditor-ir__marker"
 	r.Tag("pre", [][]string{{"class", class}}, false)
 	r.Tag("code", attrs, false)
 	if codeIsEmpty {
@@ -769,22 +766,20 @@ func (r *VditorIRBlockRenderer) renderCodeBlockCode(node *ast.Node, entering boo
 	}
 	r.WriteString("</code></pre>")
 
-	if r.Option.VditorCodeBlockPreview {
-		r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		preDiv := noHighlight(language)
-		if preDiv {
-			r.Tag("div", attrs, false)
-		} else {
-			r.Tag("code", attrs, false)
-		}
-		tokens := node.Tokens
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-		r.Write(html.EscapeHTML(tokens))
-		if preDiv {
-			r.WriteString("</div></pre>")
-		} else {
-			r.WriteString("</code></pre>")
-		}
+	r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
+	preDiv := noHighlight(language)
+	if preDiv {
+		r.Tag("div", attrs, false)
+	} else {
+		r.Tag("code", attrs, false)
+	}
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	r.Write(html.EscapeHTML(tokens))
+	if preDiv {
+		r.WriteString("</div></pre>")
+	} else {
+		r.WriteString("</code></pre>")
 	}
 	return ast.WalkContinue
 }
@@ -1246,7 +1241,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		r.Writer.Write(imgBuf)
 
 		if renderFigure {
-			if title := node.ChildByType(ast.NodeLinkTitle);nil!=title {
+			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
 				titleTokens := title.Tokens
 				titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
 				titleTree := parse.Inline("", titleTokens, r.Tree.Context.Option)
