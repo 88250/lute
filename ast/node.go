@@ -377,7 +377,7 @@ func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed,
-		NodeKramdownBlockIAL:
+		NodeKramdownBlockIAL, NodeSuperBlock:
 		return true
 	}
 	return false
