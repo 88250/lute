@@ -28,7 +28,7 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 	typ := node.Type
 
 	if ast.NodeSuperBlock == typ {
-		if nil != node.LastChild && ast.NodeSuperBlockLayout == node.LastChild.Type {
+		if nil != node.LastChild && ast.NodeSuperBlockLayoutMarker == node.LastChild.Type {
 			node.Type = ast.NodeParagraph
 			node.Tokens = append([]byte("{{{"), node.LastChild.Tokens...)
 			node.FirstChild.Unlink()

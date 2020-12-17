@@ -142,7 +142,7 @@ func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
 	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
 	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
-	ret.RendererFuncs[ast.NodeSuperBlockLayout] = ret.renderSuperBlockLayout
+	ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
 	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	return ret
 }
@@ -161,7 +161,7 @@ func (r *FormatRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering boo
 	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Write(node.Tokens)
 		r.WriteByte(lex.ItemNewline)

@@ -597,10 +597,10 @@ const (
 
 	// 超级块语法 https://github.com/88250/lute/issues/111
 
-	NodeSuperBlock            NodeType = 475 // 超级块节点
-	NodeSuperBlockOpenMarker  NodeType = 476 // 开始超级块标记符 {{{
-	NodeSuperBlockLayout      NodeType = 477 // 超级块布局 row/col
-	NodeSuperBlockCloseMarker NodeType = 478 // 结束超级块标记符 }}}
+	NodeSuperBlock             NodeType = 475 // 超级块节点
+	NodeSuperBlockOpenMarker   NodeType = 476 // 开始超级块标记符 {{{
+	NodeSuperBlockLayoutMarker NodeType = 477 // 超级块布局 row/col
+	NodeSuperBlockCloseMarker  NodeType = 478 // 结束超级块标记符 }}}
 
 	// 上标下标语法 https://github.com/88250/lute/issues/113
 

@@ -141,7 +141,7 @@ func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
 	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
 	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
-	ret.RendererFuncs[ast.NodeSuperBlockLayout] = ret.renderSuperBlockLayout
+	ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
 	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	return ret
 }
@@ -160,7 +160,7 @@ func (r *HtmlRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool)
 	return ast.WalkSkipChildren
 }
 
-func (r *HtmlRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *HtmlRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkSkipChildren
 }
 

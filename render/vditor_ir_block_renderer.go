@@ -145,7 +145,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree) *VditorIRBlockRenderer {
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
 	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
 	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
-	ret.RendererFuncs[ast.NodeSuperBlockLayout] = ret.renderSuperBlockLayout
+	ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
 	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	return ret
 }
@@ -168,7 +168,7 @@ func (r *VditorIRBlockRenderer) renderSuperBlockOpenMarker(node *ast.Node, enter
 	return ast.WalkContinue
 }
 
-func (r *VditorIRBlockRenderer) renderSuperBlockLayout(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--info"}, {"data-type", "super-block-layout"}}, false)
 		r.Write(node.Tokens)

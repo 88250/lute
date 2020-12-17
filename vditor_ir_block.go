@@ -1130,7 +1130,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		case "super-block-layout":
 			layout := lute.domText(n)
 			layout = strings.ReplaceAll(layout, parse.Zwsp, "")
-			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeSuperBlockLayout, Tokens: []byte(layout)})
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeSuperBlockLayoutMarker, Tokens: []byte(layout)})
 			return
 		case "super-block-close-marker":
 			text := lute.domText(n)
