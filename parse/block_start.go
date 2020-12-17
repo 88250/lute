@@ -333,6 +333,7 @@ var blockStarts = []blockStartFunc{
 			t.Context.offset = t.Context.currentLineLen                    // 整行过
 			if 1 < len(ial) && "type" == ial[1][0] && "doc" == ial[1][1] { // 文档块 IAL
 				t.Context.rootIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: t.Context.currentLine[t.Context.nextNonspace:]}
+				t.Root.KramdownIAL = ial
 				t.Root.ID = ial[0][1]
 				t.ID = t.Root.ID
 				return 2
