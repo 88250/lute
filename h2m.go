@@ -188,22 +188,23 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Pre:
-		firstc := n.FirstChild
-		if nil != firstc {
-			if atom.Code == firstc.DataAtom || atom.Span == firstc.DataAtom {
+		if firstc := n.FirstChild; nil != firstc {
+			if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom {
 				node.Type = ast.NodeCodeBlock
 				node.IsFencedCodeBlock = true
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
+				if atom.Code == firstc.DataAtom || atom.Span == firstc.DataAtom {
+					class := lute.domAttrValue(firstc, "class")
+					if !strings.Contains(class, "language-") {
+						class = lute.domAttrValue(n, "class")
+					}
+					if strings.Contains(class, "language-") {
+						language := class[strings.Index(class, "language-")+len("language-"):]
+						node.LastChild.CodeBlockInfo = []byte(language)
+					}
+				}
 				buf := &bytes.Buffer{}
-				class := lute.domAttrValue(firstc, "class")
-				if !strings.Contains(class, "language-") {
-					class = lute.domAttrValue(n, "class")
-				}
-				if strings.Contains(class, "language-") {
-					language := class[strings.Index(class, "language-")+len("language-"):]
-					node.LastChild.CodeBlockInfo = []byte(language)
-				}
 				buf.WriteString(lute.domText(n))
 				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()}
 				node.AppendChild(content)
