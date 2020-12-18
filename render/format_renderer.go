@@ -613,13 +613,13 @@ func (r *FormatRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStat
 
 		var maxWidth int
 		for col := 0; col < len(cells[0]); col++ {
-			for row := 0; row < len(cells); row++ {
+			for row := 0; row < len(cells) && col < len(cells[row]); row++ {
 				cells[row][col].TableCellContentWidth = cells[row][col].TokenLen()
 				if maxWidth < cells[row][col].TableCellContentWidth {
 					maxWidth = cells[row][col].TableCellContentWidth
 				}
 			}
-			for row := 0; row < len(cells); row++ {
+			for row := 0; row < len(cells) && col < len(cells[row]); row++ {
 				cells[row][col].TableCellContentMaxWidth = maxWidth
 			}
 			maxWidth = 0
