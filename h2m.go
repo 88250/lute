@@ -367,6 +367,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Tbody:
 	case atom.Tr:
+		if nil == n.FirstChild {
+			break
+		}
 		table := n.Parent.Parent
 		node.Type = ast.NodeTableRow
 		if atom.Thead != table.FirstChild.DataAtom && n == n.Parent.FirstChild {
