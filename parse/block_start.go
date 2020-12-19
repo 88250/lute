@@ -22,7 +22,7 @@ type blockStartFunc func(t *Tree, container *ast.Node) int
 
 // blockStarts 定义了一系列函数，每个函数用于判断某种块节点是否可以开始，返回值：
 // 0：不匹配
-// 1：匹配到块容器，需要继续迭代下降
+// 1：匹配到容器块，需要继续迭代下降
 // 2：匹配到叶子块
 var blockStarts = []blockStartFunc{
 
