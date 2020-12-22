@@ -1350,7 +1350,7 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 			switch n[0].DataAtom {
 			case atom.Br:
 				r.Tag("span", [][]string{{"data-type", "html-inline"}}, false)
-				attrs = [][]string{{"class", "vditor-ir__marker vditor-ir__br"}}
+				attrs = [][]string{{"class", "vditor-ir__br"}}
 				r.Tag("span", attrs, false)
 				r.Write(html.EscapeHTML(node.Tokens))
 				r.Tag("/span", nil, false)
