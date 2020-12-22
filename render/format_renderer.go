@@ -224,10 +224,12 @@ func (r *FormatRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast
 func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		if util.IsDocIAL(node.Tokens) {
-			r.WriteByte(lex.ItemNewline)
+		if r.Option.KramdownIAL {
+			if util.IsDocIAL(node.Tokens) {
+				r.WriteByte(lex.ItemNewline)
+			}
+			r.Write(node.Tokens)
 		}
-		r.Write(node.Tokens)
 	} else {
 		if ast.NodeListItem == node.Parent.Type || ast.NodeList == node.Parent.Type {
 			if !node.Parent.Tight {
@@ -242,6 +244,10 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 }
 
 func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if !r.Option.KramdownIAL {
+		return ast.WalkContinue
+	}
+
 	if entering {
 		r.Write(node.Tokens)
 	}
