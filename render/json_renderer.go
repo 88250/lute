@@ -70,40 +70,40 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
 	ret.RendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
 	ret.RendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
-	//ret.RendererFuncs[ast.NodeLink] = ret.renderLink
+	ret.RendererFuncs[ast.NodeLink] = ret.renderLink
 	//ret.RendererFuncs[ast.NodeImage] = ret.renderImage
-	//ret.RendererFuncs[ast.NodeBang] = ret.renderBang
-	//ret.RendererFuncs[ast.NodeOpenBracket] = ret.renderOpenBracket
-	//ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
-	//ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
-	//ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
-	//ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
-	//ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
-	//ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
-	//ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
-	//ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
-	//ret.RendererFuncs[ast.NodeLinkTitle] = ret.renderLinkTitle
-	//ret.RendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
-	//ret.RendererFuncs[ast.NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
-	//ret.RendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
-	//ret.RendererFuncs[ast.NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
-	//ret.RendererFuncs[ast.NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
+	ret.RendererFuncs[ast.NodeBang] = ret.renderBang
+	ret.RendererFuncs[ast.NodeOpenBracket] = ret.renderOpenBracket
+	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
+	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
+	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
+	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
+	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
+	ret.RendererFuncs[ast.NodeLinkSpace] = ret.renderLinkSpace
+	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
+	ret.RendererFuncs[ast.NodeLinkTitle] = ret.renderLinkTitle
+	ret.RendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
+	ret.RendererFuncs[ast.NodeStrikethrough1OpenMarker] = ret.renderStrikethrough1OpenMarker
+	ret.RendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
+	ret.RendererFuncs[ast.NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
+	ret.RendererFuncs[ast.NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
 	//ret.RendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
-	//ret.RendererFuncs[ast.NodeTable] = ret.renderTable
-	//ret.RendererFuncs[ast.NodeTableHead] = ret.renderTableHead
-	//ret.RendererFuncs[ast.NodeTableRow] = ret.renderTableRow
-	//ret.RendererFuncs[ast.NodeTableCell] = ret.renderTableCell
-	//ret.RendererFuncs[ast.NodeEmoji] = ret.renderEmoji
-	//ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
-	//ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
-	//ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
+	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
+	ret.RendererFuncs[ast.NodeTableHead] = ret.renderTableHead
+	ret.RendererFuncs[ast.NodeTableRow] = ret.renderTableRow
+	ret.RendererFuncs[ast.NodeTableCell] = ret.renderTableCell
+	ret.RendererFuncs[ast.NodeEmoji] = ret.renderEmoji
+	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
+	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
+	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
 	//ret.RendererFuncs[ast.NodeFootnotesDefBlock] = ret.renderFootnotesDefBlock
 	//ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
 	//ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
 	//ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	//ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
 	//ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
-	//ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
+	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	//ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
 	//ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
 	//ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
@@ -538,6 +538,236 @@ func (r *JSONRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
+// 处理链接
+func (r *JSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		dest := node.ChildByType(ast.NodeLinkDest)
+		destTokens := dest.Tokens
+		destTokens = r.Tree.Context.LinkPath(destTokens)
+		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
+			r.val(node.Type, util.BytesToStr(title.Tokens) + "|" + util.BytesToStr(destTokens))
+		} else {
+			r.val(node.Type, util.BytesToStr(destTokens))
+		}
+	} else {
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+// TODO 处理图片
+func (r *JSONRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+	//// TODO 处理图片渲染
+	//if entering {
+	//	r.openObj()
+	//	if 0 == r.DisableTags {
+	//		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
+	//		// 图片的地址
+	//		destTokens = r.Tree.Context.LinkPath(destTokens)
+	//	}
+	//	r.DisableTags++
+	//	return ast.WalkContinue
+	//} else {
+	//	r.closeObj(node)
+	//}
+	//// 获取alt?
+	////
+	//r.DisableTags--
+	//if 0 == r.DisableTags {
+	//	if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
+	//		// title的值
+	//		//fmt.Println(util.BytesToStr(title.Tokens))
+	//		//r.Write(html.EscapeHTML(title.Tokens))
+	//	}
+	//	ial := r.NodeAttrsStr(node)
+	//	if "" != ial {
+	//		fmt.Println(ial)
+	//		//r.WriteString(" " + ial)
+	//	}
+	//}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderOpenBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderCloseBrace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var tokens []byte
+		if r.Option.AutoSpace {
+			tokens = r.Space(node.Tokens)
+		} else {
+			tokens = node.Tokens
+		}
+		r.WriteString(",\"text\":" + util.BytesToStr(tokens) + "\"")
+	}
+	return ast.WalkContinue
+}
+
+// 删除线标识
+func (r *JSONRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.flag(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var align string
+		switch node.TableCellAlign {
+		case 1:
+			align = "left"
+		case 2:
+			align = "center"
+		case 3:
+			align = "right"
+		default:
+			align = "left"
+		}
+		r.openObj()
+		r.val(node.Type, align)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+// 表格新行标识
+func (r *JSONRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.flag(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+// 表头标识
+func (r *JSONRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.flag(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+// 表格标识
+func (r *JSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.flag(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.leaf(node.Type, util.BytesToStr(node.Tokens), node)
+	}
+	return ast.WalkSkipChildren
+}
+
+func (r *JSONRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.leaf(node.Type, util.BytesToStr(node.Tokens), node)
+	}
+	return ast.WalkSkipChildren
+}
+
+func (r *JSONRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *JSONRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+// HTML实体符号处理
+func (r *JSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.val(node.Type, util.BytesToStr(node.Tokens))
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
 //// TODO 需要检验KramdownBlockIAL
 //func (r *JSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 //	if entering {
@@ -620,19 +850,6 @@ func (r *JSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.
 	return ast.WalkSkipChildren
 }
 
-// HTML实体符号处理
-func (r *JSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val(node.Type, util.BytesToStr(node.Tokens))
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
 func (r *JSONRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkSkipChildren
 }
@@ -659,190 +876,6 @@ func (r *JSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *JSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val(node.Type, node.Text())
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-func (r *JSONRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf(node.Type, util.BytesToStr(node.Tokens), node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf(node.Type, util.BytesToStr(node.Tokens), node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-// TODO 处理表格渲染
-// TODO Cell渲染函数才能拿到对齐
-func (r *JSONRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		var align string
-		switch node.TableCellAlign {
-		case 1:
-			align = "left"
-		case 2:
-			align = "center"
-		case 3:
-			align = "right"
-		default:
-			align = "left"
-		}
-		r.openObj()
-		r.val(node.Type, align)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-// 表格新行标识
-func (r *JSONRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val(node.Type, "")
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-// 表头标识
-func (r *JSONRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val(node.Type, "")
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-// 表格标识
-func (r *JSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val(node.Type, "")
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-// 删除线标识
-func (r *JSONRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val(node.Type, "")
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-func (r *JSONRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
-	// TODO 处理图片渲染
-	//if entering {
-	//	if 0 == r.DisableTags {
-	//		r.WriteString("<img src=\"")
-	//		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-	//		destTokens = r.Tree.Context.LinkPath(destTokens)
-	//		if "" != r.Option.ImageLazyLoading {
-	//			r.Write(html.EscapeHTML(util.StrToBytes(r.Option.ImageLazyLoading)))
-	//			r.WriteString("\" data-src=\"")
-	//		}
-	//		r.Write(html.EscapeHTML(destTokens))
-	//		r.WriteString("\" alt=\"")
-	//	}
-	//	r.DisableTags++
-	//	return ast.WalkContinue
-	//}
-	//
-	//r.DisableTags--
-	//if 0 == r.DisableTags {
-	//	r.WriteByte(lex.ItemDoublequote)
-	//	if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-	//		r.WriteString(" title=\"")
-	//		r.Write(html.EscapeHTML(title.Tokens))
-	//		r.WriteByte(lex.ItemDoublequote)
-	//	}
-	//	ial := r.NodeAttrsStr(node)
-	//	if "" != ial {
-	//		r.WriteString(" " + ial)
-	//	}
-	//	r.WriteString(" />")
-	//
-	//	if r.Option.Sanitize {
-	//		buf := r.Writer.Bytes()
-	//		idx := bytes.LastIndex(buf, []byte("<img src="))
-	//		imgBuf := buf[idx:]
-	//		if r.Option.Sanitize {
-	//			imgBuf = sanitize(imgBuf)
-	//		}
-	//		r.Writer.Truncate(idx)
-	//		r.Writer.Write(imgBuf)
-	//	}
-	//}
-	//return ast.WalkContinue
-	if entering {
-		r.openObj()
-		r.val(node.Type, node.Text())
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-func (r *JSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
-    // TODO 处理链接渲染
-	//if entering {
-	//	r.LinkTextAutoSpacePrevious(node)
-	//
-	//	dest := node.ChildByType(ast.NodeLinkDest)
-	//	destTokens := dest.Tokens
-	//	destTokens = r.Tree.Context.LinkPath(destTokens)
-	//	attrs := [][]string{{"href", util.BytesToStr(html.EscapeHTML(destTokens))}}
-	//	if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-	//		attrs = append(attrs, []string{"title", util.BytesToStr(html.EscapeHTML(title.Tokens))})
-	//	}
-	//	r.Tag("a", attrs, false)
-	//} else {
-	//	r.Tag("/a", nil, false)
-	//
-	//	r.LinkTextAutoSpaceNext(node)
-	//}
-	//return ast.WalkContinue
 	if entering {
 		r.openObj()
 		r.val(node.Type, node.Text())

@@ -17,7 +17,7 @@ import (
 	"github.com/88250/lute"
 )
 
-var JSONRendererTest = "- 测试1\n- 测试2\n- 测试3\n"
+var JSONRendererTest = "| 表头 | 标题 |\n| --- | --- |\n| item1 | item2 |\n"
 
 func TestJSONRenderer(t *testing.T) {
 	luteEngine := lute.New()
