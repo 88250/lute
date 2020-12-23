@@ -1075,13 +1075,7 @@ func (r *VditorIRRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorIRRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var tokens []byte
-		if r.Option.AutoSpace {
-			tokens = r.Space(node.Tokens)
-		} else {
-			tokens = node.Tokens
-		}
-
+		tokens := node.Tokens
 		if r.Option.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}

@@ -888,13 +888,7 @@ func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 	}
 
 	if entering {
-		var tokens []byte
-		if r.Option.AutoSpace {
-			tokens = r.Space(node.Tokens)
-		} else {
-			tokens = node.Tokens
-		}
-
+		tokens := node.Tokens
 		if r.Option.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}

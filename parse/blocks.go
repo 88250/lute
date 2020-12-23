@@ -22,7 +22,7 @@ func (t *Tree) parseBlocks() {
 	t.Context.Tip = t.Root
 	lines := 0
 	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {
-		if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
+		if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
 			if !bytes.Equal(line, util.CaretNewlineTokens) && t.Context.Tip.ParentIs(ast.NodeListItem) && bytes.HasPrefix(line, util.CaretTokens) {
 				// 插入符在开头的话移动到上一行结尾，处理 https://github.com/Vanessa219/vditor/issues/633 中的一些情况
 				if ast.NodeListItem == t.Context.Tip.Type {

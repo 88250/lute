@@ -29,7 +29,7 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 	lute.VditorWYSIWYG = false
 	lute.VditorIR = false
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	renderer := render.NewVditorSVRenderer(tree)
 	output := renderer.Render()
@@ -50,7 +50,7 @@ func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 		return
 	}
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorSVRenderer(tree)
 	for nodeType, rendererFunc := range lute.HTML2VditorSVDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -66,7 +66,7 @@ func (lute *Lute) Md2VditorSVDOM(markdown string) (vHTML string) {
 	lute.VditorWYSIWYG = false
 	lute.VditorIR = false
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorSVRenderer(tree)
 	for nodeType, rendererFunc := range lute.Md2VditorSVDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc

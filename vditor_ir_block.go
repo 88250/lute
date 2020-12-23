@@ -33,7 +33,7 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 
 	markdown := lute.vditorIRBlockDOM2Md(ivHTML)
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	ovHTML = lute.Tree2VditorIRBlockDOM(tree)
 	// 替换插入符
@@ -53,7 +53,7 @@ func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
 		return
 	}
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorIRBlockRenderer(tree)
 	for nodeType, rendererFunc := range lute.HTML2VditorIRBlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -80,7 +80,7 @@ func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
 	lute.VditorWYSIWYG = false
 	lute.VditorSV = false
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorIRBlockRenderer(tree)
 	for nodeType, rendererFunc := range lute.Md2VditorIRBlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -167,11 +167,11 @@ func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
 	return
 }
 
-func RenderNodeVditorIRBlockDOM(node *ast.Node, options *parse.Options) string {
+func RenderNodeVditorIRBlockDOM(node *ast.Node, options *parse.ParseOptions) string {
 	root := &ast.Node{Type: ast.NodeDocument}
 	luteEngine := New()
-	luteEngine.Options = options
-	tree := &parse.Tree{Root: root, Context: &parse.Context{Option: luteEngine.Options}}
+	luteEngine.ParseOptions = options
+	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: luteEngine.ParseOptions}}
 	renderer := render.NewVditorIRBlockRenderer(tree)
 	renderer.Writer = &bytes.Buffer{}
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -202,7 +202,7 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 
 	// 将 HTML 树转换为 Markdown AST
 
-	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
+	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	ret.Context.Tip = ret.Root
 	for _, htmlNode := range htmlNodes {
 		lute.genASTByVditorIRBlockDOM(htmlNode, ret)
@@ -245,8 +245,11 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	}
 
 	// 将 AST 进行 Markdown 格式化渲染
+	space := tree.Context.ParseOption.AutoSpace
+	tree.Context.ParseOption.AutoSpace = false
 	renderer := render.NewFormatRenderer(tree)
 	formatted := renderer.Render()
+	tree.Context.ParseOption.AutoSpace = space
 	markdown = string(formatted)
 	return
 }
@@ -288,7 +291,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if "link-ref-defs-block" == dataType {
 			text := lute.domText(n)
 			if !strings.HasPrefix(text, "[") {
-				subTree := parse.Parse("", []byte(text), lute.Options)
+				subTree := parse.Parse("", []byte(text), lute.ParseOptions)
 				if nil != subTree.Root.FirstChild {
 					tree.Context.Tip.AppendChild(subTree.Root.FirstChild)
 				}
@@ -299,7 +302,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(defBlock)
 			for def := n.FirstChild; nil != def; def = def.NextSibling {
 				text = lute.domText(def)
-				subTree := parse.Parse("", []byte(text), lute.Options)
+				subTree := parse.Parse("", []byte(text), lute.ParseOptions)
 				child := subTree.Root.FirstChild.FirstChild
 				if ast.NodeLinkRefDef == child.Type {
 					defBlock.AppendChild(subTree.Root.FirstChild.FirstChild)
@@ -356,7 +359,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		} else if "block-query-embed" == dataType {
 			text := lute.domText(n)
-			t := parse.Parse("", []byte(text), lute.Options)
+			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			if blockQueryEmbed := t.Root.FirstChild; nil != blockQueryEmbed && ast.NodeBlockQueryEmbed == blockQueryEmbed.Type {
 				node = blockQueryEmbed
 				next := blockQueryEmbed.Next
@@ -421,13 +424,13 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		copy(tokens, node.Tokens)
 
 		// 尝试块级解析，处理列表代码块
-		subTree := parse.Parse("", tokens, tree.Context.Option)
+		subTree := parse.Parse("", tokens, tree.Context.ParseOption)
 		if nil != subTree.Root.FirstChild && ast.NodeCodeBlock == subTree.Root.FirstChild.Type {
 			node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
 			tree.Context.Tip.AppendChild(node)
 		} else {
 			// 尝试行级解析，处理段落图片文本节点转换为图片节点
-			subTree = parse.Inline("", tokens, tree.Context.Option)
+			subTree = parse.Inline("", tokens, tree.Context.ParseOption)
 			if ast.NodeSoftBreak == subTree.Root.FirstChild.FirstChild.Type || // 软换行
 				(ast.NodeParagraph == subTree.Root.FirstChild.Type &&
 					(ast.NodeImage == subTree.Root.FirstChild.FirstChild.Type ||
@@ -906,13 +909,13 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			t := parse.Parse("", []byte(text), lute.Options)
+			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			if textNode := t.Root.FirstChild.FirstChild; nil != textNode && ast.NodeText == textNode.Type &&
 				nil != textNode.Next && ast.NodeBlockRef == textNode.Next.Type {
 				content := textNode.Text()
 				if ("！"+util.Caret == content) || ("!"+util.Caret == content) {
 					text = strings.Replace(text, content, "!", 1) + util.Caret
-					t = parse.Parse("", []byte(text), lute.Options)
+					t = parse.Parse("", []byte(text), lute.ParseOptions)
 				}
 			}
 			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
@@ -957,7 +960,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			t := parse.Parse("", []byte(text), lute.Options)
+			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type ||
 				ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type || ast.NodeMark == inlineNode.Type ||
 				ast.NodeCodeSpan == inlineNode.Type || ast.NodeInlineMath == inlineNode.Type || ast.NodeTag == inlineNode.Type ||
@@ -985,7 +988,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			t := parse.Parse("", []byte(text), lute.Options)
+			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeLink == inlineNode.Type || ast.NodeImage == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
@@ -1013,7 +1016,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			t := parse.Parse("", []byte(text), lute.Options)
+			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeHTMLEntity == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
@@ -1031,7 +1034,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			t := parse.Parse("", []byte(text), lute.Options)
+			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmoji == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
@@ -1049,7 +1052,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			t := parse.Parse("", []byte(text), lute.Options)
+			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeBackslash == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
@@ -1208,7 +1211,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			t := parse.Parse("", []byte(text), lute.Options)
+			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
 				ial, id := node.KramdownIAL, node.ID
 				node = blockEmbed
@@ -1226,7 +1229,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 	case atom.Font:
 		text := lute.domText(n)
-		inlineTree := parse.Inline("", []byte(text), tree.Context.Option)
+		inlineTree := parse.Inline("", []byte(text), tree.Context.ParseOption)
 		appendNextToTip(inlineTree.Root.FirstChild.FirstChild, tree)
 		return
 	case atom.Details:

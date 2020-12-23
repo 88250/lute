@@ -19,7 +19,7 @@ import (
 )
 
 func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
-	if !t.Context.Option.BlockRef {
+	if !t.Context.ParseOption.BlockRef {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: []byte("(")}
 	}
@@ -88,7 +88,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 		text = id
 	}
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-	subTree := Inline("", text, t.Context.Option)
+	subTree := Inline("", text, t.Context.ParseOption)
 	textNode := &ast.Node{Type: ast.NodeBlockRefText}
 	ret.AppendChild(textNode)
 	for c := subTree.Root.FirstChild.FirstChild; nil != c; {

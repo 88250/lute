@@ -52,7 +52,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 		}
 	}
 
-	if !t.Context.Option.InlineMathAllowDigitAfterOpenMarker && ctx.tokensLen > startPos+1 && lex.IsDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
+	if !t.Context.ParseOption.InlineMathAllowDigitAfterOpenMarker && ctx.tokensLen > startPos+1 && lex.IsDigit(ctx.tokens[startPos+1]) { // $ 后面不能紧跟数字
 		ctx.pos += 3
 		return &ast.Node{Type: ast.NodeText, Tokens: ctx.tokens[startPos : startPos+3]}
 	}

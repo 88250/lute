@@ -33,7 +33,7 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 		case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemTilde, lex.ItemEqual, lex.ItemCrosshatch:
 			t.handleDelim(block, ctx)
 		case lex.ItemCaret:
-			if t.Context.Option.Sup {
+			if t.Context.ParseOption.Sup {
 				t.handleDelim(block, ctx)
 			} else {
 				n = t.parseText(ctx)
@@ -165,7 +165,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			if passed, remains, dest = t.Context.parseInlineLinkDest(remains); nil == passed {
 				break
 			}
-			if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
+			if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
 				if !isImage && nil == opener.node.Next {
 					break
 				}
@@ -202,7 +202,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			ctx.pos += len(passed)
 			matched = isLink && 0 < len(remains)
 			if matched {
-				if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
+				if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
 					if bytes.HasPrefix(remains, []byte(util.Caret+")")) {
 						if 0 < len(title) {
 							// 将 ‸) 换位为 )‸
@@ -256,12 +256,12 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			ctx.pos = startPos
 		}
 		if nil != reflabel {
-			if t.Context.Option.Footnotes {
+			if t.Context.ParseOption.Footnotes {
 				// 查找脚注
 				if idx, footnotesDef := t.FindFootnotesDef(reflabel); nil != footnotesDef {
 					t.removeBracket(ctx)
 
-					if t.Context.Option.Sup {
+					if t.Context.ParseOption.Sup {
 						opener.node.Next.Next.Unlink() // label
 						opener.node.Next.Unlink()      // ^
 					} else {

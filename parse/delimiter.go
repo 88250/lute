@@ -126,7 +126,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			openerInl = opener.node
 			closerInl = closer.node
 
-			if t.Context.Option.GFMStrikethrough || t.Context.Option.Sub {
+			if t.Context.ParseOption.GFMStrikethrough || t.Context.ParseOption.Sub {
 				if lex.ItemTilde == closercc && opener.num != closer.num {
 					break
 				}
@@ -136,7 +136,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				}
 			}
 
-			if t.Context.Option.Sup {
+			if t.Context.ParseOption.Sup {
 				if lex.ItemCaret == closercc && opener.num != closer.num {
 					break
 				}
@@ -146,7 +146,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				}
 			}
 
-			if t.Context.Option.Mark {
+			if t.Context.ParseOption.Mark {
 				if lex.ItemEqual == closercc && opener.num != closer.num {
 					break
 				}
@@ -156,7 +156,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				}
 			}
 
-			if t.Context.Option.Tag {
+			if t.Context.ParseOption.Tag {
 				if lex.ItemCrosshatch == closercc && opener.num != closer.num {
 					break
 				}
@@ -190,29 +190,29 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 					openMarker.Type = ast.NodeEmU8eOpenMarker
 					closeMarker.Type = ast.NodeEmU8eCloseMarker
 				} else if lex.ItemTilde == closercc {
-					if t.Context.Option.Sub { // 优先下标
+					if t.Context.ParseOption.Sub { // 优先下标
 						emStrongDelMark.Type = ast.NodeSub
 						openMarker.Type = ast.NodeSubOpenMarker
 						closeMarker.Type = ast.NodeSubCloseMarker
-					} else if t.Context.Option.GFMStrikethrough {
+					} else if t.Context.ParseOption.GFMStrikethrough {
 						emStrongDelMark.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough1OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough1CloseMarker
 					}
 				} else if lex.ItemEqual == closercc {
-					if t.Context.Option.Mark {
+					if t.Context.ParseOption.Mark {
 						emStrongDelMark.Type = ast.NodeMark
 						openMarker.Type = ast.NodeMark1OpenMarker
 						closeMarker.Type = ast.NodeMark1CloseMarker
 					}
 				} else if lex.ItemCrosshatch == closercc {
-					if t.Context.Option.Tag {
+					if t.Context.ParseOption.Tag {
 						emStrongDelMark.Type = ast.NodeTag
 						openMarker.Type = ast.NodeTagOpenMarker
 						closeMarker.Type = ast.NodeTagCloseMarker
 					}
 				} else if lex.ItemCaret == closercc {
-					if t.Context.Option.Sup {
+					if t.Context.ParseOption.Sup {
 						emStrongDelMark.Type = ast.NodeSup
 						openMarker.Type = ast.NodeSupOpenMarker
 						closeMarker.Type = ast.NodeSupCloseMarker
@@ -228,13 +228,13 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 					openMarker.Type = ast.NodeStrongU8eOpenMarker
 					closeMarker.Type = ast.NodeStrongU8eCloseMarker
 				} else if lex.ItemTilde == closercc {
-					if t.Context.Option.GFMStrikethrough {
+					if t.Context.ParseOption.GFMStrikethrough {
 						emStrongDelMark.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough2OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough2CloseMarker
 					}
 				} else if lex.ItemEqual == closercc {
-					if t.Context.Option.Mark {
+					if t.Context.ParseOption.Mark {
 						emStrongDelMark.Type = ast.NodeMark
 						openMarker.Type = ast.NodeMark2OpenMarker
 						closeMarker.Type = ast.NodeMark2CloseMarker
@@ -309,7 +309,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 			tokenBefore = rune(c)
 		}
 
-		if (t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV) && util.Caret == string(tokenBefore) {
+		if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && util.Caret == string(tokenBefore) {
 			// 跳过插入符位置向前看
 			caretLen := len(util.Caret)
 			if 0 < startPos-caretLen {

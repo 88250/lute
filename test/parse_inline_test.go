@@ -29,7 +29,7 @@ func TestInline(t *testing.T) {
 	luteEngine := lute.New()
 
 	for _, test := range inlineTests {
-		tree := parse.Inline("", util.StrToBytes(test.from), luteEngine.Options)
+		tree := parse.Inline("", util.StrToBytes(test.from), luteEngine.ParseOptions)
 		if ast.NodeParagraph != tree.Root.FirstChild.Type {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, ast.NodeParagraph, tree.Root.FirstChild.Type, test.from)
 		}

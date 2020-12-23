@@ -38,7 +38,7 @@ type Renderer interface {
 
 // BaseRenderer 描述了渲染器结构。
 type BaseRenderer struct {
-	Option              *parse.Options                   // 解析渲染选项
+	Option              *parse.ParseOptions              // 解析渲染选项
 	RendererFuncs       map[ast.NodeType]RendererFunc    // 渲染器
 	DefaultRendererFunc RendererFunc                     // 默认渲染器，在 RendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
 	ExtRendererFuncs    map[ast.NodeType]ExtRendererFunc // 用户自定义的渲染器
@@ -52,7 +52,7 @@ type BaseRenderer struct {
 
 // NewBaseRenderer 构造一个 BaseRenderer。
 func NewBaseRenderer(tree *parse.Tree) *BaseRenderer {
-	ret := &BaseRenderer{RendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Option: tree.Context.Option, Tree: tree}
+	ret := &BaseRenderer{RendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Option: tree.Context.ParseOption, Tree: tree}
 	ret.Writer = &bytes.Buffer{}
 	ret.Writer.Grow(4096)
 	return ret

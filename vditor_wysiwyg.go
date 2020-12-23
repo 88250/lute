@@ -39,7 +39,7 @@ func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, util.FrontEndCaret, util.Caret)
 	markdown := lute.vditorDOM2Md(ivHTML)
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorRenderer(tree)
 	output := renderer.Render()
 	// 替换插入符
@@ -59,7 +59,7 @@ func (lute *Lute) HTML2VditorDOM(sHTML string) (vHTML string) {
 		return
 	}
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorRenderer(tree)
 	for nodeType, rendererFunc := range lute.HTML2VditorDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -86,7 +86,7 @@ func (lute *Lute) Md2VditorDOM(markdown string) (vHTML string) {
 	lute.VditorIR = false
 	lute.VditorSV = false
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorRenderer(tree)
 	for nodeType, rendererFunc := range lute.Md2VditorDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -110,7 +110,7 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
 func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewEChartsJSONRenderer(tree)
 	output := renderer.Render()
 	json = string(output)
@@ -150,7 +150,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 
 	// 将 HTML 树转换为 Markdown AST
 
-	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
+	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	tree.Context.Tip = tree.Root
 	for _, htmlNode := range htmlNodes {
 		lute.genASTByVditorDOM(htmlNode, tree)

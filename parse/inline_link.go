@@ -96,7 +96,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 				destination = destination[1:]
 				destination = lex.TrimWhitespace(destination)
 			}
-			if !context.Option.ImgPathAllowSpace {
+			if !context.ParseOption.ImgPathAllowSpace {
 				if destStarted && (lex.IsWhitespace(token) || lex.IsControl(token)) {
 					destination = destination[:len(destination)-size]
 					passed = passed[:len(passed)-1]
@@ -142,7 +142,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 	}
 
 	if nil != passed {
-		if !context.Option.VditorWYSIWYG && !context.Option.VditorIR && !context.Option.VditorSV {
+		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV {
 			destination = html.EncodeDestination(html.UnescapeBytes(destination))
 		}
 	}
@@ -156,17 +156,17 @@ func (context *Context) LinkPath(dest []byte) []byte {
 }
 
 func (context *Context) PrefixPath(dest []byte) []byte {
-	if "" == context.Option.LinkPrefix {
+	if "" == context.ParseOption.LinkPrefix {
 		return dest
 	}
 
-	linkPrefix := util.StrToBytes(context.Option.LinkPrefix)
+	linkPrefix := util.StrToBytes(context.ParseOption.LinkPrefix)
 	ret := append(linkPrefix, dest...)
 	return ret
 }
 
 func (context *Context) RelativePath(dest []byte) []byte {
-	if "" == context.Option.LinkBase {
+	if "" == context.ParseOption.LinkBase {
 		return dest
 	}
 
@@ -176,7 +176,7 @@ func (context *Context) RelativePath(dest []byte) []byte {
 		return dest
 	}
 
-	linkBase := util.StrToBytes(context.Option.LinkBase)
+	linkBase := util.StrToBytes(context.ParseOption.LinkBase)
 	if !bytes.HasSuffix(linkBase, []byte("/")) {
 		linkBase = append(linkBase, []byte("/")...)
 	}

@@ -31,7 +31,7 @@ func FootnotesContinue(footnotesDef *ast.Node, context *Context) int {
 
 func (t *Tree) FindFootnotesDef(label []byte) (pos int, def *ast.Node) {
 	pos = 0
-	if t.Context.Option.VditorIR || t.Context.Option.VditorSV || t.Context.Option.VditorWYSIWYG {
+	if t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG {
 		label = bytes.ReplaceAll(label, util.CaretTokens, nil)
 	}
 	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {

@@ -150,7 +150,7 @@ func TestFormatCases(t *testing.T) {
 func TestFormatNode(t *testing.T) {
 	md := "foo中文bar"
 	luteEngine := lute.New()
-	tree := parse.Parse("", []byte(md), luteEngine.Options)
+	tree := parse.Parse("", []byte(md), luteEngine.ParseOptions)
 	renderer := render.NewFormatRenderer(tree)
 	output := string(renderer.Render())
 	expected := "foo 中文 bar\n"
@@ -159,7 +159,7 @@ func TestFormatNode(t *testing.T) {
 	}
 
 	luteEngine.AutoSpace = false
-	output = lute.FormatNode(tree.Root, luteEngine.Options)
+	output = lute.FormatNode(tree.Root, luteEngine.ParseOptions)
 	expected = "foo中文bar"
 	if expected != output {
 		t.Fatalf("format node [%s] failed\nexpected\n%q\ngot\n%q\n", md, expected, output)

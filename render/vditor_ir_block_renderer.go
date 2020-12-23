@@ -1244,7 +1244,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
 				titleTokens := title.Tokens
 				titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
-				titleTree := parse.Inline("", titleTokens, r.Tree.Context.Option)
+				titleTree := parse.Inline("", titleTokens, r.Tree.Context.ParseOption)
 				figureTitle := RenderHeadingText(titleTree.Root)
 				attrs = [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}
 				r.Tag("span", attrs, false)
@@ -1418,13 +1418,7 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 
 func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var tokens []byte
-		if r.Option.AutoSpace {
-			tokens = r.Space(node.Tokens)
-		} else {
-			tokens = node.Tokens
-		}
-
+		tokens := node.Tokens
 		if r.Option.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}

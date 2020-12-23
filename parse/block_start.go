@@ -106,7 +106,7 @@ var blockStarts = []blockStartFunc{
 			return 0
 		}
 
-		if t.Context.Option.GFMTable {
+		if t.Context.ParseOption.GFMTable {
 			// 尝试解析表，因为可能出现如下情况：
 			//
 			//   0
@@ -162,7 +162,7 @@ var blockStarts = []blockStartFunc{
 			return 0
 		}
 
-		if t.Context.Option.VditorWYSIWYG {
+		if t.Context.ParseOption.VditorWYSIWYG {
 			if bytes.Contains(t.Context.currentLine, []byte("vditor-comment")) {
 				return 0
 			}
@@ -180,7 +180,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 YAML Front Matter（---）是否开始。
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.YamlFrontMatter || t.Context.indented || nil != t.Root.FirstChild {
+		if !t.Context.ParseOption.YamlFrontMatter || t.Context.indented || nil != t.Root.FirstChild {
 			return 0
 		}
 
@@ -276,7 +276,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断脚注定义（[^label]）是否开始。
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.Footnotes || t.Context.indented {
+		if !t.Context.ParseOption.Footnotes || t.Context.indented {
 			return 0
 		}
 
@@ -324,7 +324,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 kramdown 块级内联属性列表（{: attrs}）是否开始。
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.KramdownIAL || t.Context.indented {
+		if !t.Context.ParseOption.KramdownIAL || t.Context.indented {
 			return 0
 		}
 
@@ -356,7 +356,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断内容块嵌入（!((id "text"))）是否开始。
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.BlockRef || t.Context.indented {
+		if !t.Context.ParseOption.BlockRef || t.Context.indented {
 			return 0
 		}
 
@@ -377,7 +377,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断内容块查询嵌入（!{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}）是否开始。
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.BlockRef || t.Context.indented {
+		if !t.Context.ParseOption.BlockRef || t.Context.indented {
 			return 0
 		}
 
@@ -398,7 +398,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断超级块（{{{ blocks }}}）是否开始。
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.Option.SuperBlock || t.Context.indented {
+		if !t.Context.ParseOption.SuperBlock || t.Context.indented {
 			return 0
 		}
 

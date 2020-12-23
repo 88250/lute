@@ -19,14 +19,14 @@ import (
 const Zwsp = "\u200b"
 
 // Parse 会将 markdown 原始文本字节数组解析为一颗语法树。
-func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
-	tree = &Tree{Name: name, Context: &Context{Option: options}}
+func Parse(name string, markdown []byte, options *ParseOptions) (tree *Tree) {
+	tree = &Tree{Name: name, Context: &Context{ParseOption: options}}
 	tree.Context.Tree = tree
 	tree.lexer = lex.NewLexer(markdown)
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
-	if tree.Context.Option.KramdownIAL {
+	if tree.Context.ParseOption.KramdownIAL {
 		tree.parseKramdownSpanIAL()
 
 		var docIAL *ast.Node
@@ -46,13 +46,13 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 }
 
 // Inline 会将 markdown 原始文本字节数组解析为一颗语法树，该语法树的第一个块级子节点是段落节点。
-func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
-	tree = &Tree{Name: name, Context: &Context{Option: options}}
+func Inline(name string, markdown []byte, options *ParseOptions) (tree *Tree) {
+	tree = &Tree{Name: name, Context: &Context{ParseOption: options}}
 	tree.Context.Tree = tree
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.Root.AppendChild(&ast.Node{Type: ast.NodeParagraph, Tokens: markdown})
 	tree.parseInlines()
-	if tree.Context.Option.KramdownIAL {
+	if tree.Context.ParseOption.KramdownIAL {
 		tree.parseKramdownSpanIAL()
 	}
 	tree.lexer = nil
@@ -61,8 +61,8 @@ func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
 
 // Context 用于维护块级元素解析过程中使用到的公共数据。
 type Context struct {
-	Tree   *Tree    // 关联的语法树
-	Option *Options // 解析渲染选项
+	Tree        *Tree         // 关联的语法树
+	ParseOption *ParseOptions // 解析选项
 
 	Tip                                                      *ast.Node // 末梢节点
 	oldtip                                                   *ast.Node // 老的末梢节点
@@ -236,8 +236,8 @@ type Tree struct {
 	Hash    string   // 内容哈希
 }
 
-// Options 描述了一些列解析和渲染选项。
-type Options struct {
+// ParseOptions 描述了一些列解析和渲染选项。
+type ParseOptions struct {
 	// GFMTable 设置是否打开“GFM 表”支持。
 	GFMTable bool
 	// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。
@@ -266,7 +266,7 @@ type Options struct {
 	ToC bool
 	// HeadingID 设置是否打开“自定义标题 ID”支持。
 	HeadingID bool
-	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
+	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格，仅在渲染时添加。
 	// https://github.com/sparanoid/chinese-copywriting-guidelines
 	AutoSpace bool
 	// FixTermTypo 设置是否对普通文本中出现的术语进行修正。

@@ -32,7 +32,7 @@ func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 	markdown := lute.vditorIRDOM2Md(ivHTML)
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorIRRenderer(tree)
 	output := renderer.Render()
 	// 替换插入符
@@ -52,7 +52,7 @@ func (lute *Lute) HTML2VditorIRDOM(sHTML string) (vHTML string) {
 		return
 	}
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorIRRenderer(tree)
 	for nodeType, rendererFunc := range lute.HTML2VditorIRDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -79,7 +79,7 @@ func (lute *Lute) Md2VditorIRDOM(markdown string) (vHTML string) {
 	lute.VditorWYSIWYG = false
 	lute.VditorSV = false
 
-	tree := parse.Parse("", []byte(markdown), lute.Options)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorIRRenderer(tree)
 	for nodeType, rendererFunc := range lute.Md2VditorIRDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -124,7 +124,7 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 
 	// 将 HTML 树转换为 Markdown AST
 
-	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
+	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	tree.Context.Tip = tree.Root
 	for _, htmlNode := range htmlNodes {
 		lute.genASTByVditorIRDOM(htmlNode, tree)

@@ -36,7 +36,7 @@ func (t *Tree) isMarker(token byte) bool {
 		lex.ItemCloseBracket, lex.ItemAmpersand, lex.ItemTilde, lex.ItemDollar, lex.ItemOpenBrace, lex.ItemOpenParen, lex.ItemEqual, lex.ItemCrosshatch:
 		return true
 	case lex.ItemCaret:
-		if t.Context.Option.Sup {
+		if t.Context.ParseOption.Sup {
 			return true
 		}
 		return false
@@ -66,7 +66,7 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 		n.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: []byte{token}})
 		return nil
 	}
-	if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR {
+	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR {
 		// 处理 \‸x 情况，插入符后的字符才是待转义的
 		tokens := ctx.tokens[ctx.pos:]
 		caret := util.CaretTokens

@@ -21,7 +21,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	tokens := ctx.tokens
 	caretInTag := false
 	caretLeftSpace := false
-	if t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV {
+	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
 		caretIndex := bytes.Index(tokens, util.CaretTokens)
 		caretInTag = caretIndex > ctx.pos
 		if caretInTag {
@@ -109,7 +109,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		if lex.ItemSlash == tokens[0] {
 			tags = append(tags, tokens[1])
 		}
-		if (t.Context.Option.VditorWYSIWYG || t.Context.Option.VditorIR || t.Context.Option.VditorSV) && caretInTag {
+		if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && caretInTag {
 			if !bytes.Contains(tags, []byte(util.CaretReplacement+" ")) && !caretLeftSpace {
 				tags = bytes.ReplaceAll(tags, []byte("\" "+util.CaretReplacement), []byte("\""+util.CaretReplacement))
 			}

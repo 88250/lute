@@ -42,7 +42,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 		p.Unlink()
 	}
 
-	if context.Option.GFMTaskListItem {
+	if context.ParseOption.GFMTaskListItem {
 		// 尝试解析任务列表项
 		if listItem := p.Parent; nil != listItem && ast.NodeListItem == listItem.Type && listItem.FirstChild == p {
 			if 3 == listItem.ListData.Typ {
@@ -51,7 +51,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					// 如果是任务列表项则添加任务列表标记符节点
 
 					tokens := p.Tokens
-					if context.Option.KramdownIAL {
+					if context.ParseOption.KramdownIAL {
 						if ial := context.parseKramdownIALInListItem(tokens); 0 < len(ial) {
 							tokens = tokens[bytes.Index(tokens, []byte("}"))+1:]
 							p.KramdownIAL = ial // 暂存于 p 的 IAL 上，最终化列表时会被置空
@@ -61,7 +61,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					if (3 == len(tokens) && (bytes.EqualFold(tokens, []byte("[x]")) || bytes.Equal(tokens, []byte("[ ]")))) ||
 						(3 < len(tokens) && (lex.IsWhitespace(tokens[3]) || util.CaretTokens[0] == tokens[3] || util.CaretTokens[0] == tokens[2])) {
 						var caretStartText, caretAfterCloseBracket, caretInBracket bool
-						if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
+						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
 							closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
 							if bytes.HasPrefix(tokens, util.CaretTokens) {
 								tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
@@ -77,7 +77,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
 						p.PrependChild(taskListItemMarker)
 						p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
-						if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
+						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
 							p.Tokens = bytes.TrimSpace(p.Tokens)
 							if caretStartText || caretAfterCloseBracket || caretInBracket {
 								p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)
@@ -91,7 +91,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 		}
 	}
 
-	if context.Option.GFMTable {
+	if context.ParseOption.GFMTable {
 		if paragraph, table := context.parseTable(p); nil != table {
 			if nil != paragraph {
 				p.Tokens = paragraph.Tokens
@@ -114,7 +114,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 		}
 	}
 
-	if context.Option.ToC {
+	if context.ParseOption.ToC {
 		if toc := context.parseToC(p); nil != toc {
 			// 将该段落节点转换成目录节点
 			p.Type = ast.NodeToC

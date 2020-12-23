@@ -33,7 +33,7 @@ var YamlFrontMatterMarkerCaretNewline = util.StrToBytes("---" + util.Caret + "\n
 func (context *Context) yamlFrontMatterFinalize(node *ast.Node) {
 	tokens := node.Tokens[3:] // 剔除开头的 ---\n
 	tokens = lex.TrimWhitespace(tokens)
-	if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
+	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
 		if bytes.HasSuffix(tokens, YamlFrontMatterMarkerCaret) {
 			// 剔除结尾的 ---‸
 			tokens = bytes.TrimSuffix(tokens, YamlFrontMatterMarkerCaret)
@@ -63,7 +63,7 @@ func (t *Tree) parseYamlFrontMatter() bool {
 }
 
 func isYamlFrontMatterClose(context *Context) bool {
-	if context.Option.KramdownIAL && len("{: id=\"") < len(context.currentLine) {
+	if context.ParseOption.KramdownIAL && len("{: id=\"") < len(context.currentLine) {
 		// 判断 IAL 打断
 		if ial := context.parseKramdownBlockIAL(context.currentLine); 0 < len(ial) {
 			context.Tip.KramdownIAL = ial

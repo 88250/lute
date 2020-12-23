@@ -26,7 +26,7 @@ const Version = "1.7.0"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
-	*parse.Options // 解析和渲染选项配置
+	*parse.ParseOptions // 解析和渲染选项配置
 
 	HTML2MdRendererFuncs               map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
 	HTML2VditorDOMRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
@@ -51,8 +51,8 @@ type Lute struct {
 //  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 //  * YAML Front Matter
-func New(opts ...Option) (ret *Lute) {
-	ret = &Lute{Options: NewOptions()}
+func New(opts ...ParseOption) (ret *Lute) {
+	ret = &Lute{ParseOptions: NewOptions()}
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -70,9 +70,9 @@ func New(opts ...Option) (ret *Lute) {
 	return ret
 }
 
-func NewOptions() *parse.Options {
+func NewOptions() *parse.ParseOptions {
 	emojis, emoji := parse.NewEmojis()
-	return &parse.Options{
+	return &parse.ParseOptions{
 		GFMTable:                       true,
 		GFMTaskListItem:                true,
 		GFMTaskListItemClass:           "vditor-task",
@@ -111,7 +111,7 @@ func NewOptions() *parse.Options {
 
 // Markdown 将 markdown 文本字节数组处理为相应的 html 字节数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte) {
-	tree := parse.Parse(name, markdown, lute.Options)
+	tree := parse.Parse(name, markdown, lute.ParseOptions)
 	renderer := render.NewHtmlRenderer(tree)
 	for nodeType, rendererFunc := range lute.Md2HTMLRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
@@ -129,7 +129,7 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string) {
 
 // Format 将 markdown 文本字节数组进行格式化。
 func (lute *Lute) Format(name string, markdown []byte) (formatted []byte) {
-	tree := parse.Parse(name, markdown, lute.Options)
+	tree := parse.Parse(name, markdown, lute.ParseOptions)
 	renderer := render.NewFormatRenderer(tree)
 	formatted = renderer.Render()
 	return
@@ -144,7 +144,7 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string) {
 
 // TextBundle 将 markdown 文本字节数组进行 TextBundle 处理。
 func (lute *Lute) TextBundle(name string, markdown []byte, linkPrefixes []string) (textbundle []byte, originalLinks []string) {
-	tree := parse.Parse(name, markdown, lute.Options)
+	tree := parse.Parse(name, markdown, lute.ParseOptions)
 	renderer := render.NewTextBundleRenderer(tree, linkPrefixes)
 	textbundle, originalLinks = renderer.Render()
 	return
@@ -175,7 +175,7 @@ func (lute *Lute) Space(text string) string {
 func (lute *Lute) IsValidLinkDest(str string) bool {
 	luteEngine := New()
 	luteEngine.GFMAutoLink = true
-	tree := parse.Parse("", []byte(str), luteEngine.Options)
+	tree := parse.Parse("", []byte(str), luteEngine.ParseOptions)
 	if nil == tree.Root.FirstChild || nil == tree.Root.FirstChild.FirstChild {
 		return false
 	}
@@ -230,11 +230,11 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 }
 
 // FormatNode 使用指定的 options 格式化 node，返回格式化后的 Markdown 文本。
-func FormatNode(node *ast.Node, options *parse.Options) string {
+func FormatNode(node *ast.Node, options *parse.ParseOptions) string {
 	root := &ast.Node{Type: ast.NodeDocument}
 	luteEngine := New()
-	luteEngine.Options = options
-	tree := &parse.Tree{Root: root, Context: &parse.Context{Option: luteEngine.Options}}
+	luteEngine.ParseOptions = options
+	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: luteEngine.ParseOptions}}
 	renderer := render.NewFormatRenderer(tree)
 	renderer.Writer = &bytes.Buffer{}
 	renderer.NodeWriterStack = append(renderer.NodeWriterStack, renderer.Writer)
@@ -245,8 +245,8 @@ func FormatNode(node *ast.Node, options *parse.Options) string {
 	return strings.TrimSpace(renderer.Writer.String())
 }
 
-// Option 描述了解析渲染选项设置函数签名。
-type Option func(lute *Lute)
+// ParseOption 描述了解析选项设置函数签名。
+type ParseOption func(lute *Lute)
 
 // 以下 Setters 主要是给 JavaScript 端导出方法用。
 

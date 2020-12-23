@@ -20,7 +20,7 @@ var openCurlyBrace = util.StrToBytes("{")
 var closeCurlyBrace = util.StrToBytes("}")
 
 func (t *Tree) parseHeadingID(block *ast.Node, ctx *InlineContext) (ret *ast.Node) {
-	if !t.Context.Option.HeadingID || ast.NodeHeading != block.Type || 3 > ctx.tokensLen {
+	if !t.Context.ParseOption.HeadingID || ast.NodeHeading != block.Type || 3 > ctx.tokensLen {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: openCurlyBrace}
 	}
@@ -47,7 +47,7 @@ func (t *Tree) parseHeadingID(block *ast.Node, ctx *InlineContext) (ret *ast.Nod
 		}
 	}
 
-	if t.Context.Option.VditorWYSIWYG {
+	if t.Context.ParseOption.VditorWYSIWYG {
 		content = bytes.ReplaceAll(content, util.CaretTokens, nil)
 	}
 	id := content[curlyBracesStart+1 : curlyBracesEnd]

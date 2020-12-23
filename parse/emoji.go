@@ -79,7 +79,7 @@ func (t *Tree) emoji0(node *ast.Node) {
 			continue
 		}
 
-		if emoji, ok := t.Context.Option.AliasEmoji[util.BytesToStr(maybeEmoji)]; ok {
+		if emoji, ok := t.Context.ParseOption.AliasEmoji[util.BytesToStr(maybeEmoji)]; ok {
 			emojiNode := &ast.Node{Type: ast.NodeEmoji}
 			emojiUnicodeOrImg := &ast.Node{Type: ast.NodeEmojiUnicode}
 			emojiNode.AppendChild(emojiUnicodeOrImg)
@@ -90,7 +90,7 @@ func (t *Tree) emoji0(node *ast.Node) {
 				if "huaji" == alias {
 					suffix = ".gif"
 				}
-				src := t.Context.Option.EmojiSite + "/" + alias + suffix
+				src := t.Context.ParseOption.EmojiSite + "/" + alias + suffix
 				emojiUnicodeOrImg.Type = ast.NodeEmojiImg
 				emojiUnicodeOrImg.Tokens = t.EmojiImgTokens(alias, src)
 			} else if bytes.Contains(emojiTokens, emojiDot) { // 自定义 Emoji 路径用 . 判断，包含 . 的认为是图片路径

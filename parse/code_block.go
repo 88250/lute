@@ -103,7 +103,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 }
 
 func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeFence []byte) {
-	if context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
+	if context.ParseOption.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
 		if ial := context.parseKramdownBlockIAL(tokens); 0 < len(ial) {
 			context.Tip.KramdownIAL = ial
@@ -121,7 +121,7 @@ func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num in
 	}
 	tokens = lex.TrimWhitespace(tokens)
 	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
-	if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
+	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		if endCaret {
 			context.Tip.Tokens = bytes.TrimSuffix(context.Tip.Tokens, []byte("\n"))

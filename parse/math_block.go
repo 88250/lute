@@ -47,7 +47,7 @@ var MathBlockMarkerCaretNewline = util.StrToBytes("$$" + util.Caret + "\n")
 func (context *Context) mathBlockFinalize(mathBlock *ast.Node) {
 	tokens := mathBlock.Tokens[2:] // 剔除开头的 $$
 	tokens = lex.TrimWhitespace(tokens)
-	if context.Option.VditorWYSIWYG || context.Option.VditorIR || context.Option.VditorSV {
+	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
 		if bytes.HasSuffix(tokens, MathBlockMarkerCaret) {
 			// 剔除结尾的 $$‸
 			tokens = bytes.TrimSuffix(tokens, MathBlockMarkerCaret)
@@ -83,7 +83,7 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 }
 
 func (context *Context) isMathBlockClose(tokens []byte) bool {
-	if context.Option.KramdownIAL && len("{: id=\"") < len(tokens) {
+	if context.ParseOption.KramdownIAL && len("{: id=\"") < len(tokens) {
 		// 判断 IAL 打断
 		if ial := context.parseKramdownBlockIAL(tokens); 0 < len(ial) {
 			context.Tip.KramdownIAL = ial

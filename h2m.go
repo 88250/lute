@@ -52,7 +52,7 @@ func (lute *Lute) HTML2Tree(dom string) (ret *parse.Tree) {
 
 	// 将 HTML 树转换为 Markdown AST
 
-	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{Option: lute.Options}}
+	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	ret.Context.Tip = ret.Root
 	for _, htmlNode := range htmlNodes {
 		lute.genASTByDOM(htmlNode, ret)
