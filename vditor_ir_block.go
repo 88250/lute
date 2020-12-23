@@ -135,7 +135,7 @@ func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
 	return
 }
 
-func RenderNodeVditorIRBlockDOM(node *ast.Node, parseOptions *parse.ParseOptions, renderOptions *render.Options) string {
+func RenderNodeVditorIRBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
 	root := &ast.Node{Type: ast.NodeDocument}
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
 	renderer := render.NewVditorIRBlockRenderer(tree, renderOptions)

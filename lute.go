@@ -26,8 +26,8 @@ const Version = "1.7.0"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
-	ParseOptions  *parse.ParseOptions // 解析选项
-	RenderOptions *render.Options     // 渲染选项
+	ParseOptions  *parse.Options  // 解析选项
+	RenderOptions *render.Options // 渲染选项
 
 	HTML2MdRendererFuncs               map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
 	HTML2VditorDOMRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
@@ -195,7 +195,7 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 }
 
 // FormatNode 使用指定的 options 格式化 node，返回格式化后的 Markdown 文本。
-func FormatNode(node *ast.Node, parseOptions *parse.ParseOptions, renderOptions *render.Options) string {
+func FormatNode(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
 	root := &ast.Node{Type: ast.NodeDocument}
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
 	renderer := render.NewFormatRenderer(tree, renderOptions)

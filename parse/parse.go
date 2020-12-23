@@ -19,7 +19,7 @@ import (
 const Zwsp = "\u200b"
 
 // Parse 会将 markdown 原始文本字节数组解析为一颗语法树。
-func Parse(name string, markdown []byte, options *ParseOptions) (tree *Tree) {
+func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree = &Tree{Name: name, Context: &Context{ParseOption: options}}
 	tree.Context.Tree = tree
 	tree.lexer = lex.NewLexer(markdown)
@@ -46,7 +46,7 @@ func Parse(name string, markdown []byte, options *ParseOptions) (tree *Tree) {
 }
 
 // Inline 会将 markdown 原始文本字节数组解析为一颗语法树，该语法树的第一个块级子节点是段落节点。
-func Inline(name string, markdown []byte, options *ParseOptions) (tree *Tree) {
+func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree = &Tree{Name: name, Context: &Context{ParseOption: options}}
 	tree.Context.Tree = tree
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
@@ -61,8 +61,8 @@ func Inline(name string, markdown []byte, options *ParseOptions) (tree *Tree) {
 
 // Context 用于维护块级元素解析过程中使用到的公共数据。
 type Context struct {
-	Tree        *Tree         // 关联的语法树
-	ParseOption *ParseOptions // 解析选项
+	Tree        *Tree    // 关联的语法树
+	ParseOption *Options // 解析选项
 
 	Tip                                                      *ast.Node // 末梢节点
 	oldtip                                                   *ast.Node // 老的末梢节点
@@ -236,8 +236,8 @@ type Tree struct {
 	Hash    string   // 内容哈希
 }
 
-// ParseOptions 描述了解析选项。
-type ParseOptions struct {
+// Options 描述了解析选项。
+type Options struct {
 	// GFMTable 设置是否打开“GFM 表”支持。
 	GFMTable bool
 	// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。
@@ -290,9 +290,9 @@ type ParseOptions struct {
 	Sub bool
 }
 
-func NewOptions() *ParseOptions {
+func NewOptions() *Options {
 	emojis, emoji := NewEmojis()
-	return &ParseOptions{
+	return &Options{
 		GFMTable:         true,
 		GFMTaskListItem:  true,
 		GFMStrikethrough: true,
