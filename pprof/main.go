@@ -26,19 +26,18 @@ func main() {
 	}
 
 	luteEngine := lute.New()
-	luteEngine.GFMTaskListItem = false
-	luteEngine.GFMTable = false
-	luteEngine.GFMAutoLink = false
-	luteEngine.GFMStrikethrough = false
-	luteEngine.SoftBreak2HardBreak = false
-	luteEngine.CodeSyntaxHighlight = false
-	luteEngine.Footnotes = false
-	luteEngine.AutoSpace = false
-	luteEngine.FixTermTypo = false
-	luteEngine.ChinesePunct = false
-	luteEngine.Emoji = false
-	luteEngine.BlockRef = false
-	luteEngine.Mark = false
+	luteEngine.SetGFMTaskListItem(false)
+	luteEngine.SetGFMTable(false)
+	luteEngine.SetGFMAutoLink(false)
+	luteEngine.SetGFMStrikethrough(false)
+	luteEngine.SetSoftBreak2HardBreak(false)
+	luteEngine.SetCodeSyntaxHighlight(false)
+	luteEngine.SetFootnotes(false)
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetFixTermTypo(false)
+	luteEngine.SetEmoji(false)
+	luteEngine.SetBlockRef(false)
+	luteEngine.SetMark(false)
 
 	cpuProfile, _ := os.Create("pprof/cpu_profile")
 	pprof.StartCPUProfile(cpuProfile)

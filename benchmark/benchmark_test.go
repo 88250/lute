@@ -26,20 +26,19 @@ func BenchmarkLute(b *testing.B) {
 	}
 
 	luteEngine := lute.New()
-	luteEngine.GFMTaskListItem = true
-	luteEngine.GFMTable = true
-	luteEngine.GFMAutoLink = true
-	luteEngine.GFMStrikethrough = true
-	luteEngine.SoftBreak2HardBreak = false
-	luteEngine.CodeSyntaxHighlight = false
-	luteEngine.Footnotes = false
-	luteEngine.ToC = false
-	luteEngine.HeadingID = false
-	luteEngine.AutoSpace = false
-	luteEngine.FixTermTypo = false
-	luteEngine.ChinesePunct = false
-	luteEngine.Emoji = false
-	luteEngine.YamlFrontMatter = false
+	luteEngine.SetGFMTaskListItem(true)
+	luteEngine.SetGFMTable(true)
+	luteEngine.SetGFMAutoLink(true)
+	luteEngine.SetGFMStrikethrough(true)
+	luteEngine.SetSoftBreak2HardBreak(false)
+	luteEngine.SetCodeSyntaxHighlight(false)
+	luteEngine.SetFootnotes(false)
+	luteEngine.SetToC(false)
+	luteEngine.SetHeadingID(false)
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetFixTermTypo(false)
+	luteEngine.SetEmoji(false)
+	luteEngine.SetYamlFrontMatter(false)
 	output := luteEngine.Markdown("spec text", buf)
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)
