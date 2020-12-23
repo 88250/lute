@@ -51,6 +51,7 @@ var md2VditorDOMTests = []parseTest{
 
 func TestMd2VditorDOM(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetVditorWYSIWYG(true)
 	luteEngine.ParseOptions.ToC = true
 	luteEngine.RenderOptions.ToC = true
 	luteEngine.ParseOptions.KramdownIAL = true
@@ -131,8 +132,8 @@ var md2VditorIRBlockDOMTests = []parseTest{
 
 func TestMd2VditorIRBlockDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ParseOptions.ToC = true
-	luteEngine.RenderOptions.ToC = true
+	luteEngine.SetVditorIR(true)
+	luteEngine.SetToC(true)
 	luteEngine.ParseOptions.BlockRef = true
 	luteEngine.ParseOptions.KramdownIAL = true
 	luteEngine.RenderOptions.KramdownIAL = true

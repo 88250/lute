@@ -47,6 +47,7 @@ func TestSpec(t *testing.T) {
 	luteEngine.RenderOptions.SoftBreak2HardBreak = false
 	luteEngine.RenderOptions.CodeSyntaxHighlight = false
 	luteEngine.ParseOptions.HeadingID = false
+	luteEngine.RenderOptions.HeadingID = false
 	luteEngine.RenderOptions.AutoSpace = false
 	luteEngine.RenderOptions.FixTermTypo = false
 	luteEngine.RenderOptions.ChinesePunct = false

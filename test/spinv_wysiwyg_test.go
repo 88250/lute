@@ -172,6 +172,7 @@ var spinVditorDOMTests = []*parseTest{
 
 func TestSpinVditorDOM(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetVditorWYSIWYG(true)
 	luteEngine.ParseOptions.ToC = true
 	luteEngine.RenderOptions.Sanitize = true
 	luteEngine.ParseOptions.Mark = true

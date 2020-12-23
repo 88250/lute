@@ -196,12 +196,10 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 }
 
 // FormatNode 使用指定的 options 格式化 node，返回格式化后的 Markdown 文本。
-func FormatNode(node *ast.Node, options *parse.ParseOptions) string {
+func FormatNode(node *ast.Node, parseOptions *parse.ParseOptions, renderOptions *render.Options) string {
 	root := &ast.Node{Type: ast.NodeDocument}
-	luteEngine := New()
-	luteEngine.ParseOptions = options
-	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: luteEngine.ParseOptions}}
-	renderer := render.NewFormatRenderer(tree, luteEngine.RenderOptions)
+	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
+	renderer := render.NewFormatRenderer(tree, renderOptions)
 	renderer.Writer = &bytes.Buffer{}
 	renderer.NodeWriterStack = append(renderer.NodeWriterStack, renderer.Writer)
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -316,7 +314,7 @@ func (lute *Lute) SetVditorIR(b bool) {
 	lute.RenderOptions.VditorIR = b
 }
 
-func (lute *Lute) SetVditorIRBlock(b bool) {
+func (lute *Lute) SetVditorSV(b bool) {
 	lute.ParseOptions.VditorSV = b
 	lute.RenderOptions.VditorSV = b
 }

@@ -29,6 +29,7 @@ var superBlockTests = []parseTest{
 
 func TestSuperBlock(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetVditorIR(true)
 	luteEngine.ParseOptions.SuperBlock = true
 	for _, test := range superBlockTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
