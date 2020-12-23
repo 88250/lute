@@ -86,8 +86,8 @@ var spinVditorSVDOMTests = []*parseTest{
 
 func TestSpinVditorSVDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ToC = true
-	luteEngine.Mark = true
+	luteEngine.ParseOptions.ToC = true
+	luteEngine.ParseOptions.Mark = true
 
 	for _, test := range spinVditorSVDOMTests {
 		html := luteEngine.SpinVditorSVDOM(test.from)

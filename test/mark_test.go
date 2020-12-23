@@ -35,7 +35,7 @@ var markTests = []parseTest{
 
 func TestMark(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Mark = true
+	luteEngine.ParseOptions.Mark = true
 
 	for _, test := range markTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
@@ -59,7 +59,7 @@ var markDisableTests = []parseTest{
 
 func TestMarkDisable(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Mark = false
+	luteEngine.ParseOptions.Mark = false
 
 	for _, test := range markDisableTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

@@ -38,8 +38,8 @@ type TextBundleRenderer struct {
 }
 
 // NewTextBundleRenderer 创建一个 TextBundle 渲染器。
-func NewTextBundleRenderer(tree *parse.Tree, linkPrefixes []string) *TextBundleRenderer {
-	ret := &TextBundleRenderer{FormatRenderer: NewFormatRenderer(tree), linkPrefixes: linkPrefixes}
+func NewTextBundleRenderer(tree *parse.Tree, linkPrefixes []string, options *Options) *TextBundleRenderer {
+	ret := &TextBundleRenderer{FormatRenderer: NewFormatRenderer(tree, options), linkPrefixes: linkPrefixes}
 	ret.RendererFuncs[ast.NodeLinkDest] = ret.renderLinkDest
 	return ret
 }

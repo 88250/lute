@@ -25,13 +25,9 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 		return "<span data-type=\"text\"><wbr></span>" + string(render.NewlineSV)
 	}
 
-	lute.VditorSV = true
-	lute.VditorWYSIWYG = false
-	lute.VditorIR = false
-
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
-	renderer := render.NewVditorSVRenderer(tree)
+	renderer := render.NewVditorSVRenderer(tree, lute.RenderOptions)
 	output := renderer.Render()
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
@@ -40,10 +36,6 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 
 // HTML2VditorSVDOM 将 HTML 转换为 Vditor Split-View DOM，用于分屏预览模式下粘贴。
 func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
-	lute.VditorSV = true
-	lute.VditorWYSIWYG = false
-	lute.VditorIR = false
-
 	markdown, err := lute.HTML2Markdown(sHTML)
 	if nil != err {
 		vHTML = err.Error()
@@ -51,7 +43,7 @@ func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorSVRenderer(tree)
+	renderer := render.NewVditorSVRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.HTML2VditorSVDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -62,12 +54,8 @@ func (lute *Lute) HTML2VditorSVDOM(sHTML string) (vHTML string) {
 
 // Md2VditorSVDOM 将 markdown 转换为 Vditor Split-View DOM，用于从源码模式切换至分屏预览模式。
 func (lute *Lute) Md2VditorSVDOM(markdown string) (vHTML string) {
-	lute.VditorSV = true
-	lute.VditorWYSIWYG = false
-	lute.VditorIR = false
-
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorSVRenderer(tree)
+	renderer := render.NewVditorSVRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2VditorSVDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}

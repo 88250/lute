@@ -23,7 +23,7 @@ var tocTests = []parseTest{
 
 func TestToC(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ToC = true
+	luteEngine.ParseOptions.ToC = true
 
 	for _, test := range tocTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

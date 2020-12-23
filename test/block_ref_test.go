@@ -24,7 +24,7 @@ var blockrefTests = []parseTest{
 
 func TestBlockRef(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.BlockRef = true
+	luteEngine.ParseOptions.BlockRef = true
 	for _, test := range blockrefTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

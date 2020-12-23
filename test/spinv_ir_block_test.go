@@ -111,10 +111,10 @@ var spinVditorIRBlockDOMTests = []*parseTest{
 
 func TestSpinVditorIRBlockDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Mark = true
-	luteEngine.BlockRef = true
-	luteEngine.KramdownIAL = true
-	luteEngine.SuperBlock = true
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.ParseOptions.SuperBlock = true
 	luteEngine.SetLinkBase("http://127.0.0.1:6807/siyuan/0/测试笔记/")
 
 	ast.Testing = true

@@ -23,7 +23,7 @@ var blockQueryEmbedTests = []parseTest{
 
 func TestBlockQueryEmbed(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.BlockRef = true
+	luteEngine.ParseOptions.BlockRef = true
 	for _, test := range blockQueryEmbedTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

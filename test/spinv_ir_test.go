@@ -74,9 +74,9 @@ var spinVditorIRDOMTests = []*parseTest{
 
 func TestSpinVditorIRDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ToC = true
-	luteEngine.Sanitize = true
-	luteEngine.Mark = true
+	luteEngine.ParseOptions.ToC = true
+	luteEngine.RenderOptions.Sanitize = true
+	luteEngine.ParseOptions.Mark = true
 
 	for _, test := range spinVditorIRDOMTests {
 		html := luteEngine.SpinVditorIRDOM(test.from)

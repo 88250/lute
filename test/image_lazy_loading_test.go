@@ -23,7 +23,7 @@ var imageLazyLoadingTests = []parseTest{
 
 func TestImageLazyLoading(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ImageLazyLoading = "/images/img-loading.svg"
+	luteEngine.RenderOptions.ImageLazyLoading = "/images/img-loading.svg"
 
 	for _, test := range imageLazyLoadingTests {
 		md := luteEngine.MarkdownStr("", test.from)

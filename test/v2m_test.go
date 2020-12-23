@@ -188,7 +188,7 @@ var vditorIRBlockDOM2MdTests = []parseTest{
 
 func TestVditorIRBlockDOM2Md(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.KramdownIAL = true
+	luteEngine.ParseOptions.KramdownIAL = true
 
 	ast.Testing = true
 	for _, test := range vditorIRBlockDOM2MdTests {
@@ -209,7 +209,7 @@ var vditorIRBlockDOM2StdMdTests = []parseTest{
 
 func TestVditorIRBlockDOM2StdMd(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.KramdownIAL = true
+	luteEngine.ParseOptions.KramdownIAL = true
 
 	ast.Testing = true
 	for _, test := range vditorIRBlockDOM2StdMdTests {

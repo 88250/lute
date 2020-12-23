@@ -26,7 +26,8 @@ var headingIDTests = []parseTest{
 
 func TestHeadingID(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.HeadingID = true
+	luteEngine.ParseOptions.HeadingID = true
+	luteEngine.RenderOptions.HeadingID = true
 
 	for _, test := range headingIDTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
@@ -45,7 +46,7 @@ var headingAnchorTests = []parseTest{
 
 func TestHeadingAnchor(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.HeadingAnchor = true
+	luteEngine.RenderOptions.HeadingAnchor = true
 	for _, test := range headingAnchorTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

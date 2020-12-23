@@ -11,7 +11,6 @@
 package parse
 
 import (
-	"bytes"
 	"github.com/88250/lute/html"
 	"unicode/utf8"
 
@@ -147,53 +146,4 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 		}
 	}
 	return
-}
-
-func (context *Context) LinkPath(dest []byte) []byte {
-	dest = context.RelativePath(dest)
-	dest = context.PrefixPath(dest)
-	return dest
-}
-
-func (context *Context) PrefixPath(dest []byte) []byte {
-	if "" == context.ParseOption.LinkPrefix {
-		return dest
-	}
-
-	linkPrefix := util.StrToBytes(context.ParseOption.LinkPrefix)
-	ret := append(linkPrefix, dest...)
-	return ret
-}
-
-func (context *Context) RelativePath(dest []byte) []byte {
-	if "" == context.ParseOption.LinkBase {
-		return dest
-	}
-
-	// 强制将 %5C 即反斜杠 \ 转换为斜杠 / 以兼容 Windows 平台上使用的路径
-	dest = bytes.ReplaceAll(dest, []byte("%5C"), []byte("\\"))
-	if !context.isRelativePath(dest) {
-		return dest
-	}
-
-	linkBase := util.StrToBytes(context.ParseOption.LinkBase)
-	if !bytes.HasSuffix(linkBase, []byte("/")) {
-		linkBase = append(linkBase, []byte("/")...)
-	}
-	ret := append(linkBase, dest...)
-	if bytes.Equal(linkBase, ret) {
-		return []byte("")
-	}
-	return ret
-}
-
-func (context *Context) isRelativePath(dest []byte) bool {
-	if 1 > len(dest) {
-		return true
-	}
-
-	if '/' == dest[0] {
-		return false
-	}
-	return !bytes.Contains(dest, []byte(":/")) && !bytes.Contains(dest, []byte(":\\"))
 }

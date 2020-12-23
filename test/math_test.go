@@ -65,7 +65,7 @@ func TestInlineMathDigit(t *testing.T) {
 		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", notAllowDigit.name, notAllowDigit.to, html, notAllowDigit.from)
 	}
 
-	luteEngine.InlineMathAllowDigitAfterOpenMarker = true
+	luteEngine.ParseOptions.InlineMathAllowDigitAfterOpenMarker = true
 
 	allowDigit := inlineMathDigitTests[1]
 	html = luteEngine.MarkdownStr(allowDigit.name, allowDigit.from)

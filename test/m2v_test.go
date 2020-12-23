@@ -51,8 +51,10 @@ var md2VditorDOMTests = []parseTest{
 
 func TestMd2VditorDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ToC = true
-	luteEngine.KramdownIAL = true
+	luteEngine.ParseOptions.ToC = true
+	luteEngine.RenderOptions.ToC = true
+	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.RenderOptions.KramdownIAL = true
 
 	for _, test := range md2VditorDOMTests {
 		md := luteEngine.Md2VditorDOM(test.from)
@@ -83,8 +85,10 @@ var md2VditorIRDOMTests = []parseTest{
 
 func TestMd2VditorIRDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ToC = true
-	luteEngine.KramdownIAL = true
+	luteEngine.ParseOptions.ToC = true
+	luteEngine.RenderOptions.ToC = true
+	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.RenderOptions.KramdownIAL = true
 
 	ast.Testing = true
 	for _, test := range md2VditorIRDOMTests {
@@ -127,11 +131,13 @@ var md2VditorIRBlockDOMTests = []parseTest{
 
 func TestMd2VditorIRBlockDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ToC = true
-	luteEngine.BlockRef = true
-	luteEngine.KramdownIAL = true
-	luteEngine.Tag = true
-	luteEngine.SuperBlock = true
+	luteEngine.ParseOptions.ToC = true
+	luteEngine.RenderOptions.ToC = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.RenderOptions.KramdownIAL = true
+	luteEngine.ParseOptions.Tag = true
+	luteEngine.ParseOptions.SuperBlock = true
 
 	ast.Testing = true
 	for _, test := range md2VditorIRBlockDOMTests {

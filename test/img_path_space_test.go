@@ -24,7 +24,7 @@ var imgPathSpaceTests = []parseTest{
 
 func TestImgPathSpace(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ImgPathAllowSpace = true
+	luteEngine.ParseOptions.ImgPathAllowSpace = true
 	for _, test := range imgPathSpaceTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

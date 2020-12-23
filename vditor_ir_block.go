@@ -25,10 +25,6 @@ import (
 
 // SpinVditorIRBlockDOM 自旋 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下的编辑。
 func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
-	lute.VditorIR = true
-	lute.VditorWYSIWYG = false
-	lute.VditorSV = false
-
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 
@@ -43,10 +39,6 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 
 // HTML2VditorIRBlockDOM 将 HTML 转换为 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下粘贴。
 func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
-	lute.VditorIR = true
-	lute.VditorWYSIWYG = false
-	lute.VditorSV = false
-
 	markdown, err := lute.HTML2Markdown(sHTML)
 	if nil != err {
 		vHTML = err.Error()
@@ -54,7 +46,7 @@ func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorIRBlockRenderer(tree)
+	renderer := render.NewVditorIRBlockRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.HTML2VditorIRBlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -65,10 +57,6 @@ func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
 
 // VditorIRBlockDOM2HTML 将 Vditor Instant-Rendering Block DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
 func (lute *Lute) VditorIRBlockDOM2HTML(vhtml string) (sHTML string) {
-	lute.VditorIR = true
-	lute.VditorWYSIWYG = false
-	lute.VditorSV = false
-
 	markdown := lute.vditorIRBlockDOM2Md(vhtml)
 	sHTML = lute.Md2HTML(markdown)
 	return
@@ -76,12 +64,8 @@ func (lute *Lute) VditorIRBlockDOM2HTML(vhtml string) (sHTML string) {
 
 // Md2VditorIRBlockDOM 将 markdown 转换为 Vditor Instant-Rendering Block DOM，用于从源码模式切换至即时渲染块模式。
 func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
-	lute.VditorIR = true
-	lute.VditorWYSIWYG = false
-	lute.VditorSV = false
-
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorIRBlockRenderer(tree)
+	renderer := render.NewVditorIRBlockRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2VditorIRBlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -92,10 +76,6 @@ func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
 
 // VditorIRBlockDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown，用于从即时渲染块模式切换至源码模式。
 func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
-	lute.VditorIR = true
-	lute.VditorWYSIWYG = false
-	lute.VditorSV = false
-
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	markdown = lute.vditorIRBlockDOM2Md(htmlStr)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
@@ -104,10 +84,6 @@ func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 
 // VditorIRBlockDOM2StdMd 将 Vditor Instant-Rendering DOM 转换为标准 markdown，用于复制剪切。
 func (lute *Lute) VditorIRBlockDOM2StdMd(htmlStr string) (markdown string) {
-	lute.VditorIR = true
-	lute.VditorWYSIWYG = false
-	lute.VditorSV = false
-
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 
 	// DOM 转 AST
@@ -129,7 +105,7 @@ func (lute *Lute) VditorIRBlockDOM2StdMd(htmlStr string) (markdown string) {
 	})
 
 	// 将 AST 进行 Markdown 格式化渲染
-	renderer := render.NewFormatRenderer(tree)
+	renderer := render.NewFormatRenderer(tree, lute.RenderOptions)
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
@@ -137,10 +113,6 @@ func (lute *Lute) VditorIRBlockDOM2StdMd(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) VditorIRBlockDOM2Text(htmlStr string) (text string) {
-	lute.VditorIR = true
-	lute.VditorWYSIWYG = false
-	lute.VditorSV = false
-
 	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
 	if nil != err {
 		return ""
@@ -149,10 +121,6 @@ func (lute *Lute) VditorIRBlockDOM2Text(htmlStr string) (text string) {
 }
 
 func (lute *Lute) VditorIRBlockDOM2TextLen(htmlStr string) int {
-	lute.VditorIR = true
-	lute.VditorWYSIWYG = false
-	lute.VditorSV = false
-
 	tree, err := lute.VditorIRBlockDOM2Tree(htmlStr)
 	if nil != err {
 		return 0
@@ -161,18 +129,16 @@ func (lute *Lute) VditorIRBlockDOM2TextLen(htmlStr string) int {
 }
 
 func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
-	renderer := render.NewVditorIRBlockRenderer(tree)
+	renderer := render.NewVditorIRBlockRenderer(tree, lute.RenderOptions)
 	output := renderer.Render()
 	vHTML = string(output)
 	return
 }
 
-func RenderNodeVditorIRBlockDOM(node *ast.Node, options *parse.ParseOptions) string {
+func RenderNodeVditorIRBlockDOM(node *ast.Node, parseOptions *parse.ParseOptions, renderOptions *render.Options) string {
 	root := &ast.Node{Type: ast.NodeDocument}
-	luteEngine := New()
-	luteEngine.ParseOptions = options
-	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: luteEngine.ParseOptions}}
-	renderer := render.NewVditorIRBlockRenderer(tree)
+	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
+	renderer := render.NewVditorIRBlockRenderer(tree, renderOptions)
 	renderer.Writer = &bytes.Buffer{}
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		rendererFunc := renderer.RendererFuncs[n.Type]
@@ -245,11 +211,8 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	}
 
 	// 将 AST 进行 Markdown 格式化渲染
-	space := tree.Context.ParseOption.AutoSpace
-	tree.Context.ParseOption.AutoSpace = false
-	renderer := render.NewFormatRenderer(tree)
+	renderer := render.NewFormatRenderer(tree, lute.RenderOptions)
 	formatted := renderer.Render()
-	tree.Context.ParseOption.AutoSpace = space
 	markdown = string(formatted)
 	return
 }
@@ -1266,11 +1229,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 		href := lute.domAttrValue(n, "href")
-		if "" != lute.LinkBase {
-			href = strings.ReplaceAll(href, lute.LinkBase, "")
+		if "" != lute.RenderOptions.LinkBase {
+			href = strings.ReplaceAll(href, lute.RenderOptions.LinkBase, "")
 		}
-		if "" != lute.LinkPrefix {
-			href = strings.ReplaceAll(href, lute.LinkPrefix, "")
+		if "" != lute.RenderOptions.LinkPrefix {
+			href = strings.ReplaceAll(href, lute.RenderOptions.LinkPrefix, "")
 		}
 		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
 		linkTitle := lute.domAttrValue(n, "title")

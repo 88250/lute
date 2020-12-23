@@ -38,6 +38,8 @@ type Renderer interface {
 
 // Options 描述了渲染选项。
 type Options struct {
+	// SoftBreak2HardBreak 设置是否将软换行（\n）渲染为硬换行（<br />）。
+	SoftBreak2HardBreak bool
 	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
 	// https://github.com/sparanoid/chinese-copywriting-guidelines
 	AutoSpace bool
@@ -66,6 +68,68 @@ type Options struct {
 	ImageLazyLoading string
 	// ChineseParagraphBeginningSpace 设置是否使用传统中文排版“段落开头空两格”。
 	ChineseParagraphBeginningSpace bool
+	// Sanitize 设置是否启用 XSS 安全过滤 https://github.com/88250/lute/issues/51
+	Sanitize bool
+	// FixTermTypo 设置是否对普通文本中出现的术语进行修正。
+	// https://github.com/sparanoid/chinese-copywriting-guidelines
+	// 注意：开启术语修正的话会默认在中西文之间插入空格。
+	FixTermTypo bool
+	// ChinesePunct 设置是否对普通文本中出现中文后跟英文逗号句号等标点替换为中文对应标点。
+	ChinesePunct bool
+	// ToC 设置是否打开“目录”支持。
+	ToC bool
+	// HeadingID 设置是否打开“自定义标题 ID”支持。
+	HeadingID bool
+	// KramdownIALIDRenderName 设置 kramdown 内联属性列表中出现 id 属性时渲染 id 属性用的 name(key) 名称，默认为 "id"。
+	// 仅在 HTML 渲染器 HtmlRenderer 中支持。
+	KramdownIALIDRenderName string
+	// HeadingAnchor 设置是否对标题生成链接锚点。
+	HeadingAnchor bool
+	// GFMTaskListItemClass 作为 GFM 任务列表项类名，默认为 "vditor-task"。
+	GFMTaskListItemClass string
+	// VditorCodeBlockPreview 设置 Vditor 代码块是否需要渲染预览部分
+	VditorCodeBlockPreview bool
+	// VditorMathBlockPreview 设置 Vditor 数学公式块是否需要渲染预览部分
+	VditorMathBlockPreview bool
+	// VditorHTMLBlockPreview 设置 Vditor HTML 块是否需要渲染预览部分
+	VditorHTMLBlockPreview bool
+	// Terms 将传入的 terms 合并覆盖到已有的 Terms 字典。
+	Terms map[string]string
+	// LinkBase 设置链接、图片的基础路径。如果用户在链接或者图片地址中使用相对路径（没有协议前缀且不以 / 开头）并且 LinkBase 不为空则会用该值作为前缀。
+	// 比如 LinkBase 设置为 http://domain.com/，对于 ![foo](bar.png) 则渲染为 <img src="http://domain.com/bar.png" alt="foo" />
+	LinkBase string
+	// LinkPrefix 设置连接、图片的路径前缀。一旦设置该值，链接渲染将强制添加该值作为链接前缀，这有别于 LinkBase。
+	// 比如 LinkPrefix 设置为 http://domain.com，对于使用绝对路径的 ![foo](/local/path/bar.png) 则渲染为 <img src="http://domain.com/local/path/bar.png" alt="foo" />；
+	// 在 LinkBase 和 LinkPrefix 同时设置的情况下，会先处理 LinkBase 逻辑，最后再在 LinkBase 处理结果上加上 LinkPrefix。
+	LinkPrefix string
+}
+
+func NewOptions() *Options {
+	return &Options{
+		SoftBreak2HardBreak:            true,
+		AutoSpace:                      true,
+		RenderListStyle:                false,
+		CodeSyntaxHighlight:            true,
+		CodeSyntaxHighlightInlineStyle: false,
+		CodeSyntaxHighlightLineNum:     false,
+		CodeSyntaxHighlightStyleName:   "github",
+		VditorWYSIWYG:                  false,
+		VditorIR:                       false,
+		VditorSV:                       false,
+		KramdownIAL:                    false,
+		ChineseParagraphBeginningSpace: false,
+		FixTermTypo:                    true,
+		ChinesePunct:                   true,
+		ToC:                            false,
+		HeadingID:                      true,
+		KramdownIALIDRenderName:        "id",
+		GFMTaskListItemClass:           "vditor-task",
+		VditorCodeBlockPreview:         true,
+		VditorMathBlockPreview:         true,
+		VditorHTMLBlockPreview:         true,
+		LinkBase:                       "",
+		LinkPrefix:                     "",
+	}
 }
 
 // BaseRenderer 描述了渲染器结构。

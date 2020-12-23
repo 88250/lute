@@ -27,7 +27,7 @@ var chineseParagraphBeginningSpaceTests = []parseTest{
 
 func TestChineseParagraphBeginningSpace(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ChineseParagraphBeginningSpace = true
+	luteEngine.RenderOptions.ChineseParagraphBeginningSpace = true
 
 	for _, test := range chineseParagraphBeginningSpaceTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

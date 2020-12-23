@@ -28,7 +28,7 @@ var sanitizerTests = []parseTest{
 
 func TestSanitizer(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Sanitize = true
+	luteEngine.RenderOptions.Sanitize = true
 
 	for _, test := range sanitizerTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
@@ -53,7 +53,7 @@ var sanitizerVditorTests = []parseTest{
 
 func TestSanitizerVditor(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Sanitize = true
+	luteEngine.RenderOptions.Sanitize = true
 
 	for _, test := range sanitizerVditorTests {
 		html := luteEngine.SpinVditorDOM(test.from)

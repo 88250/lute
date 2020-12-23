@@ -65,9 +65,9 @@ var gfmSpecTests = []parseTest{
 
 func TestGFMSpec(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.SoftBreak2HardBreak = false
-	luteEngine.AutoSpace = false
-	luteEngine.GFMTaskListItemClass = "" // 关闭类名渲染
+	luteEngine.RenderOptions.SoftBreak2HardBreak = false
+	luteEngine.RenderOptions.AutoSpace = false
+	luteEngine.RenderOptions.GFMTaskListItemClass = "" // 关闭类名渲染
 	parse.AddAutoLinkDomainSuffix("baz")
 
 	for _, test := range gfmSpecTests {

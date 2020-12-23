@@ -30,7 +30,7 @@ var echartsJSONRendererTests = []parseTest{
 
 func TestEChartsJSONRenderer(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.KramdownIAL = true
+	luteEngine.ParseOptions.KramdownIAL = true
 
 	for _, test := range echartsJSONRendererTests {
 		jsonStr := luteEngine.RenderEChartsJSON(test.from)

@@ -27,8 +27,8 @@ var supsubTests = []parseTest{
 
 func TestSupSub(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Sup = true
-	luteEngine.Sub = true
+	luteEngine.ParseOptions.Sup = true
+	luteEngine.ParseOptions.Sub = true
 
 	for _, test := range supsubTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

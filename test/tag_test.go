@@ -24,7 +24,7 @@ var tagTests = []parseTest{
 
 func TestTag(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Tag = true
+	luteEngine.ParseOptions.Tag = true
 
 	for _, test := range tagTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
@@ -41,7 +41,7 @@ var tagDisableTests = []parseTest{
 
 func TestTagDisable(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Tag = false
+	luteEngine.ParseOptions.Tag = false
 
 	for _, test := range tagDisableTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

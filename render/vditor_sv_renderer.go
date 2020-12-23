@@ -68,8 +68,8 @@ func (r *VditorSVRenderer) Newline() {
 }
 
 // NewVditorSVRenderer 创建一个 Vditor Split-View DOM 渲染器
-func NewVditorSVRenderer(tree *parse.Tree) *VditorSVRenderer {
-	ret := &VditorSVRenderer{BaseRenderer: NewBaseRenderer(tree)}
+func NewVditorSVRenderer(tree *parse.Tree, options *Options) *VditorSVRenderer {
+	ret := &VditorSVRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

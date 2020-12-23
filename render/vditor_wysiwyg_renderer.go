@@ -31,8 +31,8 @@ type VditorRenderer struct {
 }
 
 // NewVditorRenderer 创建一个 Vditor WYSIWYG DOM 渲染器。
-func NewVditorRenderer(tree *parse.Tree) *VditorRenderer {
-	ret := &VditorRenderer{BaseRenderer: NewBaseRenderer(tree)}
+func NewVditorRenderer(tree *parse.Tree, options *Options) *VditorRenderer {
+	ret := &VditorRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -649,7 +649,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			r.WriteString("<img src=\"")
 			link := r.Tree.FindLinkRefDefLink(node.LinkRefLabel)
 			destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.Tree.Context.LinkPath(destTokens)
+			destTokens = r.LinkPath(destTokens)
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 			r.Write(destTokens)
 			r.WriteString("\" alt=\"")
@@ -682,7 +682,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 		if 0 == r.DisableTags {
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.Tree.Context.LinkPath(destTokens)
+			destTokens = r.LinkPath(destTokens)
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 			r.Write(destTokens)
 			r.WriteString("\" alt=\"")
@@ -742,7 +742,7 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 	if entering {
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
-		destTokens = r.Tree.Context.LinkPath(destTokens)
+		destTokens = r.LinkPath(destTokens)
 		caretInDest := bytes.Contains(destTokens, util.CaretTokens)
 		if caretInDest {
 			text := node.ChildByType(ast.NodeLinkText)

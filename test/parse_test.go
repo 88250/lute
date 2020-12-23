@@ -258,17 +258,17 @@ var parseTests = []parseTest{
 
 func TestParse(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.GFMTaskListItem = false
-	luteEngine.GFMTable = false
-	luteEngine.GFMAutoLink = false
-	luteEngine.GFMStrikethrough = false
-	luteEngine.SoftBreak2HardBreak = false
-	luteEngine.CodeSyntaxHighlight = false
-	luteEngine.HeadingID = false
-	luteEngine.AutoSpace = false
-	luteEngine.FixTermTypo = false
-	luteEngine.ChinesePunct = false
-	luteEngine.Emoji = false
+	luteEngine.ParseOptions.GFMTaskListItem = false
+	luteEngine.ParseOptions.GFMTable = false
+	luteEngine.ParseOptions.GFMAutoLink = false
+	luteEngine.ParseOptions.GFMStrikethrough = false
+	luteEngine.RenderOptions.SoftBreak2HardBreak = false
+	luteEngine.RenderOptions.CodeSyntaxHighlight = false
+	luteEngine.ParseOptions.HeadingID = false
+	luteEngine.RenderOptions.AutoSpace = false
+	luteEngine.RenderOptions.FixTermTypo = false
+	luteEngine.RenderOptions.ChinesePunct = false
+	luteEngine.ParseOptions.Emoji = false
 
 	for _, test := range parseTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

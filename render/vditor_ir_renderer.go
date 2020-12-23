@@ -29,8 +29,8 @@ type VditorIRRenderer struct {
 }
 
 // NewVditorIRRenderer 创建一个 Vditor Instant-Rendering DOM 渲染器。
-func NewVditorIRRenderer(tree *parse.Tree) *VditorIRRenderer {
-	ret := &VditorIRRenderer{BaseRenderer: NewBaseRenderer(tree)}
+func NewVditorIRRenderer(tree *parse.Tree, options *Options) *VditorIRRenderer {
+	ret := &VditorIRRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -935,7 +935,7 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 			link = r.Tree.FindLinkRefDefLink(node.LinkRefLabel)
 		}
 		destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
-		destTokens = r.Tree.Context.LinkPath(destTokens)
+		destTokens = r.LinkPath(destTokens)
 		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		attrs := [][]string{{"src", string(destTokens)}}
 		alt := node.ChildByType(ast.NodeLinkText)

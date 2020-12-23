@@ -23,7 +23,7 @@ var linkBaseTests = []parseTest{
 
 func TestLinkBase(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.LinkBase = "http://domain.com/path/"
+	luteEngine.RenderOptions.LinkBase = "http://domain.com/path/"
 
 	for _, test := range linkBaseTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
@@ -39,8 +39,8 @@ var linkBasePrefixTests = []parseTest{
 
 func TestLinkBasePrefix(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.LinkBase = "http://domain.com/path/"
-	luteEngine.LinkPrefix = "prefix:"
+	luteEngine.RenderOptions.LinkBase = "http://domain.com/path/"
+	luteEngine.RenderOptions.LinkPrefix = "prefix:"
 
 	for _, test := range linkBasePrefixTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

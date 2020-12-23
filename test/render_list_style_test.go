@@ -25,7 +25,7 @@ var renderListStyleTests = []parseTest{
 
 func TestRenderListStyle(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.RenderListStyle = true
+	luteEngine.RenderOptions.RenderListStyle = true
 	for _, test := range renderListStyleTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
@@ -44,7 +44,7 @@ var renderListStyleVditorTests = []parseTest{
 
 func TestRenderListStyleVditor(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.RenderListStyle = true
+	luteEngine.RenderOptions.RenderListStyle = true
 	for _, test := range renderListStyleVditorTests {
 		html := luteEngine.SpinVditorDOM(test.from)
 		if test.to != html {
@@ -63,7 +63,7 @@ var renderListStyleVditorIRTests = []parseTest{
 
 func TestRenderListStyleVditorIR(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.RenderListStyle = true
+	luteEngine.RenderOptions.RenderListStyle = true
 	for _, test := range renderListStyleVditorIRTests {
 		html := luteEngine.SpinVditorIRDOM(test.from)
 		if test.to != html {

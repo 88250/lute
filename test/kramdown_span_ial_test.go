@@ -32,9 +32,10 @@ var kramdownSpanIALTests = []parseTest{
 
 func TestKramdownSpanIALs(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.KramdownIAL = true
-	luteEngine.Mark = true
-	luteEngine.Tag = true
+	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.RenderOptions.KramdownIAL = true
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.Tag = true
 
 	for _, test := range kramdownSpanIALTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
