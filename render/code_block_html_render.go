@@ -36,7 +36,7 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 			// 缩进代码块处理
 			rendered := false
 			tokens := node.FirstChild.Tokens
-			if r.Option.CodeSyntaxHighlight {
+			if r.Options.CodeSyntaxHighlight {
 				rendered = highlightChroma(node, tokens, "", r)
 				if !rendered {
 					tokens = html.EscapeHTML(tokens)
@@ -91,7 +91,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				r.Write(html.EscapeHTML(tokens))
 				rendered = true
 			} else {
-				if r.Option.CodeSyntaxHighlight && !preDiv {
+				if r.Options.CodeSyntaxHighlight && !preDiv {
 					rendered = highlightChroma(node.Parent, tokens, language, r)
 				}
 			}
@@ -110,7 +110,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			}
 		} else {
 			rendered := false
-			if r.Option.CodeSyntaxHighlight {
+			if r.Options.CodeSyntaxHighlight {
 				rendered = highlightChroma(node.Parent, tokens, "", r)
 				if !rendered {
 					tokens = html.EscapeHTML(tokens)
@@ -118,7 +118,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				}
 			} else {
 				r.Tag("pre", attrs, false)
-				if r.Option.CodeSyntaxHighlightDetectLang {
+				if r.Options.CodeSyntaxHighlightDetectLang {
 					language := detectLanguage(tokens)
 					if "" != language {
 						r.WriteString("<code class=\"language-" + language)
@@ -166,17 +166,17 @@ func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *Html
 			chromahtml.PreventSurroundingPre(true),
 			chromahtml.ClassPrefix("highlight-"),
 		}
-		if !r.Option.CodeSyntaxHighlightInlineStyle {
+		if !r.Options.CodeSyntaxHighlightInlineStyle {
 			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithClasses(true))
 		}
-		if r.Option.CodeSyntaxHighlightLineNum {
+		if r.Options.CodeSyntaxHighlightLineNum {
 			chromahtmlOpts = append(chromahtmlOpts, chromahtml.WithLineNumbers(true))
 		}
 		formatter := chromahtml.New(chromahtmlOpts...)
-		style := styles.Get(r.Option.CodeSyntaxHighlightStyleName)
+		style := styles.Get(r.Options.CodeSyntaxHighlightStyleName)
 		var b bytes.Buffer
 		if err = formatter.Format(&b, style, iterator); nil == err {
-			if !r.Option.CodeSyntaxHighlightInlineStyle {
+			if !r.Options.CodeSyntaxHighlightInlineStyle {
 				r.Tag("pre", attrs, false)
 			} else {
 				attrs = append(attrs, []string{"style", chromahtml.StyleEntryToCSS(style.Get(chroma.Background))})
@@ -187,7 +187,7 @@ func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *Html
 			} else {
 				r.WriteString("<code class=\"")
 			}
-			if !r.Option.CodeSyntaxHighlightInlineStyle {
+			if !r.Options.CodeSyntaxHighlightInlineStyle {
 				if "" != language {
 					r.WriteByte(lex.ItemSpace)
 				}

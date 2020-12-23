@@ -895,7 +895,7 @@ func (r *VditorIRBlockRenderer) renderMathBlockContent(node *ast.Node, entering 
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 
 	class := "vditor-ir__marker--pre"
-	if r.Option.VditorMathBlockPreview {
+	if r.Options.VditorMathBlockPreview {
 		class += " vditor-ir__marker"
 	}
 	r.Tag("pre", [][]string{{"class", class}}, false)
@@ -907,7 +907,7 @@ func (r *VditorIRBlockRenderer) renderMathBlockContent(node *ast.Node, entering 
 	}
 	r.WriteString("</code></pre>")
 
-	if r.Option.VditorMathBlockPreview {
+	if r.Options.VditorMathBlockPreview {
 		r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 		r.Tag("div", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 		tokens := node.Tokens
@@ -1234,7 +1234,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
 		imgBuf := buf[idx:]
-		if r.Option.Sanitize {
+		if r.Options.Sanitize {
 			imgBuf = sanitize(imgBuf)
 		}
 		r.Writer.Truncate(idx)
@@ -1276,7 +1276,7 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 
 	tokens := bytes.TrimSpace(node.Tokens)
 	class := "vditor-ir__marker--pre"
-	if r.Option.VditorHTMLBlockPreview {
+	if r.Options.VditorHTMLBlockPreview {
 		class += " vditor-ir__marker"
 	}
 	r.Tag("pre", [][]string{{"class", class}}, false)
@@ -1284,10 +1284,10 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 
-	if r.Option.VditorHTMLBlockPreview {
+	if r.Options.VditorHTMLBlockPreview {
 		r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-		if r.Option.Sanitize {
+		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
 		bilibili := []byte("<iframe src=\"//player.bilibili.com/player.html")
@@ -1419,10 +1419,10 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := node.Tokens
-		if r.Option.FixTermTypo {
+		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Option.ChinesePunct {
+		if r.Options.ChinesePunct {
 			tokens = r.ChinesePunct(tokens)
 		}
 
@@ -1685,7 +1685,7 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 			}
 		}
 
-		if r.Option.HeadingAnchor {
+		if r.Options.HeadingAnchor {
 			id := HeadingID(node)
 			r.Tag("a", [][]string{{"id", "vditorAnchor-" + id}, {"class", "vditor-anchor"}, {"href", "#" + id}}, false)
 			r.WriteString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
@@ -1794,7 +1794,7 @@ func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) as
 			}
 			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type /* li.p.task */ ||
 				ast.NodeTaskListItemMarker == node.FirstChild.Type /* VditorIRBlockDOM2Tree 忽略了 p */ {
-				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
+				attrs = append(attrs, []string{"class", r.Options.GFMTaskListItemClass})
 			}
 		}
 		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})

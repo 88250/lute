@@ -236,7 +236,7 @@ type Tree struct {
 	Hash    string   // 内容哈希
 }
 
-// ParseOptions 描述了一些列解析和渲染选项。
+// ParseOptions 描述了解析选项。
 type ParseOptions struct {
 	// GFMTable 设置是否打开“GFM 表”支持。
 	GFMTable bool
@@ -250,25 +250,12 @@ type ParseOptions struct {
 	GFMAutoLink bool
 	// SoftBreak2HardBreak 设置是否将软换行（\n）渲染为硬换行（<br />）。
 	SoftBreak2HardBreak bool
-	// CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
-	CodeSyntaxHighlight bool
-	// CodeSyntaxHighlightDetectLang bool
-	CodeSyntaxHighlightDetectLang bool
-	// CodeSyntaxHighlightInlineStyle 设置语法高亮是否为内联样式，默认不内联。
-	CodeSyntaxHighlightInlineStyle bool
-	// CodeSyntaxHightLineNum 设置语法高亮是否显示行号，默认不显示。
-	CodeSyntaxHighlightLineNum bool
-	// CodeSyntaxHighlightStyleName 指定语法高亮样式名，默认为 "github"。
-	CodeSyntaxHighlightStyleName string
 	// Footnotes 设置是否打开“脚注”支持。
 	Footnotes bool
 	// ToC 设置是否打开“目录”支持。
 	ToC bool
 	// HeadingID 设置是否打开“自定义标题 ID”支持。
 	HeadingID bool
-	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格，仅在渲染时添加。
-	// https://github.com/sparanoid/chinese-copywriting-guidelines
-	AutoSpace bool
 	// FixTermTypo 设置是否对普通文本中出现的术语进行修正。
 	// https://github.com/sparanoid/chinese-copywriting-guidelines
 	// 注意：开启术语修正的话会默认在中西文之间插入空格。
@@ -287,11 +274,11 @@ type ParseOptions struct {
 	HeadingAnchor bool
 	// Terms 将传入的 terms 合并覆盖到已有的 Terms 字典。
 	Terms map[string]string
-	// Vditor 所见即所得支持
+	// Vditor 所见即所得支持。
 	VditorWYSIWYG bool
-	// Vditor 即时渲染支持
+	// Vditor 即时渲染支持。
 	VditorIR bool
-	// Vditor 分屏预览支持
+	// Vditor 分屏预览支持。
 	VditorSV bool
 	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
 	InlineMathAllowDigitAfterOpenMarker bool
@@ -308,17 +295,10 @@ type ParseOptions struct {
 	VditorMathBlockPreview bool
 	// VditorHTMLBlockPreview 设置 Vditor HTML 块是否需要渲染预览部分
 	VditorHTMLBlockPreview bool
-	// RenderListStyle 设置在渲染 OL、UL 时是否添加 data-style 属性 https://github.com/88250/lute/issues/48
-	RenderListStyle bool
 	// Setext 设置是否解析 Setext 标题 https://github.com/88250/lute/issues/50
 	Setext bool
 	// Sanitize 设置是否启用 XSS 安全过滤 https://github.com/88250/lute/issues/51
 	Sanitize bool
-	// ImageLazyLoading 设置图片懒加载时使用的图片路径，配置该字段后将启用图片懒加载。
-	// 图片 src 的值会复制给新属性 data-src，然后使用该参数值作为 src 的值 https://github.com/88250/lute/issues/55
-	ImageLazyLoading string
-	// ChineseParagraphBeginningSpace 设置是否使用传统中文排版“段落开头空两格”。
-	ChineseParagraphBeginningSpace bool
 	// YamlFrontMatter 设置是否开启 YAML Front Matter 支持。
 	YamlFrontMatter bool
 	// BlockRef 设置是否开启内容块引用支持。

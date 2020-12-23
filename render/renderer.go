@@ -36,9 +36,41 @@ type Renderer interface {
 	Render() (output []byte)
 }
 
+// Options 描述了渲染选项。
+type Options struct {
+	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。
+	// https://github.com/sparanoid/chinese-copywriting-guidelines
+	AutoSpace bool
+	// RenderListStyle 设置在渲染 OL、UL 时是否添加 data-style 属性 https://github.com/88250/lute/issues/48
+	RenderListStyle bool
+	// CodeSyntaxHighlight 设置是否对代码块进行语法高亮。
+	CodeSyntaxHighlight bool
+	// CodeSyntaxHighlightDetectLang bool
+	CodeSyntaxHighlightDetectLang bool
+	// CodeSyntaxHighlightInlineStyle 设置语法高亮是否为内联样式，默认不内联。
+	CodeSyntaxHighlightInlineStyle bool
+	// CodeSyntaxHightLineNum 设置语法高亮是否显示行号，默认不显示。
+	CodeSyntaxHighlightLineNum bool
+	// CodeSyntaxHighlightStyleName 指定语法高亮样式名，默认为 "github"。
+	CodeSyntaxHighlightStyleName string
+	// Vditor 所见即所得支持。
+	VditorWYSIWYG bool
+	// Vditor 即时渲染支持。
+	VditorIR bool
+	// Vditor 分屏预览支持。
+	VditorSV bool
+	// KramdownIAL 设置是否打开 kramdown 内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
+	KramdownIAL bool
+	// ImageLazyLoading 设置图片懒加载时使用的图片路径，配置该字段后将启用图片懒加载。
+	// 图片 src 的值会复制给新属性 data-src，然后使用该参数值作为 src 的值 https://github.com/88250/lute/issues/55
+	ImageLazyLoading string
+	// ChineseParagraphBeginningSpace 设置是否使用传统中文排版“段落开头空两格”。
+	ChineseParagraphBeginningSpace bool
+}
+
 // BaseRenderer 描述了渲染器结构。
 type BaseRenderer struct {
-	Option              *parse.ParseOptions              // 解析渲染选项
+	Options             *Options                         // 渲染选项
 	RendererFuncs       map[ast.NodeType]RendererFunc    // 渲染器
 	DefaultRendererFunc RendererFunc                     // 默认渲染器，在 RendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
 	ExtRendererFuncs    map[ast.NodeType]ExtRendererFunc // 用户自定义的渲染器
@@ -51,8 +83,8 @@ type BaseRenderer struct {
 }
 
 // NewBaseRenderer 构造一个 BaseRenderer。
-func NewBaseRenderer(tree *parse.Tree) *BaseRenderer {
-	ret := &BaseRenderer{RendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Option: tree.Context.ParseOption, Tree: tree}
+func NewBaseRenderer(tree *parse.Tree, options *Options) *BaseRenderer {
+	ret := &BaseRenderer{RendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Options: options, Tree: tree}
 	ret.Writer = &bytes.Buffer{}
 	ret.Writer.Grow(4096)
 	return ret
@@ -122,7 +154,7 @@ func (r *BaseRenderer) Newline() {
 }
 
 func (r *BaseRenderer) TextAutoSpacePrevious(node *ast.Node) {
-	if !r.Option.AutoSpace {
+	if !r.Options.AutoSpace {
 		return
 	}
 
@@ -138,7 +170,7 @@ func (r *BaseRenderer) TextAutoSpacePrevious(node *ast.Node) {
 }
 
 func (r *BaseRenderer) TextAutoSpaceNext(node *ast.Node) {
-	if !r.Option.AutoSpace {
+	if !r.Options.AutoSpace {
 		return
 	}
 
@@ -154,7 +186,7 @@ func (r *BaseRenderer) TextAutoSpaceNext(node *ast.Node) {
 }
 
 func (r *BaseRenderer) LinkTextAutoSpacePrevious(node *ast.Node) {
-	if !r.Option.AutoSpace {
+	if !r.Options.AutoSpace {
 		return
 	}
 
@@ -170,7 +202,7 @@ func (r *BaseRenderer) LinkTextAutoSpacePrevious(node *ast.Node) {
 }
 
 func (r *BaseRenderer) LinkTextAutoSpaceNext(node *ast.Node) {
-	if !r.Option.AutoSpace {
+	if !r.Options.AutoSpace {
 		return
 	}
 
@@ -319,13 +351,13 @@ func (r *BaseRenderer) headings() (ret []*Heading) {
 		}
 
 		id := HeadingID(heading)
-		if r.Option.VditorWYSIWYG {
+		if r.Options.VditorWYSIWYG {
 			id = "wysiwyg-" + id
-		} else if r.Option.VditorIR {
+		} else if r.Options.VditorIR {
 			id = "ir-" + id
 		}
 
-		if r.Option.KramdownIAL {
+		if r.Options.KramdownIAL {
 			for _, kv := range heading.KramdownIAL {
 				if "id" == kv[0] {
 					id = kv[1]
@@ -447,7 +479,7 @@ func (r *BaseRenderer) setextHeadingLen(node *ast.Node) (ret int) {
 }
 
 func (r *BaseRenderer) renderListStyle(node *ast.Node, attrs *[][]string) {
-	if r.Option.RenderListStyle {
+	if r.Options.RenderListStyle {
 		switch node.ListData.Typ {
 		case 0:
 			*attrs = append(*attrs, []string{"data-style", string(node.Marker)})

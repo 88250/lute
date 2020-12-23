@@ -60,7 +60,7 @@ func (r *BaseRenderer) fixTermTypo0(tokens []byte) []byte {
 		}
 
 		originalTerm = bytes.ToLower(tokens[i:j])
-		if to, ok := r.Option.Terms[util.BytesToStr(originalTerm)]; ok {
+		if to, ok := r.Options.Terms[util.BytesToStr(originalTerm)]; ok {
 			l = 0
 			for k = i; k < j; k++ {
 				tokens[k] = to[l]

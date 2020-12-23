@@ -29,8 +29,8 @@ type HtmlRenderer struct {
 }
 
 // NewHtmlRenderer 创建一个 HTML 渲染器。
-func NewHtmlRenderer(tree *parse.Tree) *HtmlRenderer {
-	ret := &HtmlRenderer{NewBaseRenderer(tree)}
+func NewHtmlRenderer(tree *parse.Tree, options *Options) *HtmlRenderer {
+	ret := &HtmlRenderer{NewBaseRenderer(tree, options)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -433,7 +433,7 @@ func (r *HtmlRenderer) RenderFootnotes() []byte {
 		footnotesTree.Context.Tree = footnotesTree
 		footnotesTree.Root = &ast.Node{Type: ast.NodeDocument}
 		footnotesTree.Root.AppendChild(def)
-		defRenderer := NewHtmlRenderer(footnotesTree)
+		defRenderer := NewHtmlRenderer(footnotesTree, r.Options)
 		lc := footnotesTree.Root.LastDeepestChild()
 		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
 			ref := def.FootnotesRefs[i]
@@ -675,7 +675,7 @@ func (r *HtmlRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkSt
 func (r *HtmlRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var tokens []byte
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			tokens = r.Space(node.Tokens)
 		} else {
 			tokens = node.Tokens
@@ -719,8 +719,8 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.Tree.Context.LinkPath(destTokens)
-			if "" != r.Option.ImageLazyLoading {
-				r.Write(html.EscapeHTML(util.StrToBytes(r.Option.ImageLazyLoading)))
+			if "" != r.Options.ImageLazyLoading {
+				r.Write(html.EscapeHTML(util.StrToBytes(r.Options.ImageLazyLoading)))
 				r.WriteString("\" data-src=\"")
 			}
 			r.Write(html.EscapeHTML(destTokens))
@@ -744,11 +744,11 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 		}
 		r.WriteString(" />")
 
-		if r.Option.Sanitize {
+		if r.Options.Sanitize {
 			buf := r.Writer.Bytes()
 			idx := bytes.LastIndex(buf, []byte("<img src="))
 			imgBuf := buf[idx:]
-			if r.Option.Sanitize {
+			if r.Options.Sanitize {
 				imgBuf = sanitize(imgBuf)
 			}
 			r.Writer.Truncate(idx)
@@ -782,7 +782,7 @@ func (r *HtmlRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus 
 	if entering {
 		r.Newline()
 		tokens := node.Tokens
-		if r.Option.Sanitize {
+		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
 		r.Write(tokens)
@@ -794,7 +794,7 @@ func (r *HtmlRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus 
 func (r *HtmlRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := node.Tokens
-		if r.Option.Sanitize {
+		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
 		r.Write(tokens)
@@ -816,7 +816,7 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 		r.handleKramdownIAL(node)
 		var attrs [][]string
 		attrs = append(attrs, node.KramdownIAL...)
-		if r.Option.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
+		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
 			attrs = append(attrs, []string{"class", "indent--2"})
 		}
 		r.Tag("p", attrs, false)
@@ -830,16 +830,16 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 func (r *HtmlRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var tokens []byte
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			tokens = r.Space(node.Tokens)
 		} else {
 			tokens = node.Tokens
 		}
 
-		if r.Option.FixTermTypo {
+		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Option.ChinesePunct {
+		if r.Options.ChinesePunct {
 			tokens = r.ChinesePunct(tokens)
 		}
 		r.Write(html.EscapeHTML(tokens))
@@ -849,7 +849,7 @@ func (r *HtmlRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus 
 
 func (r *HtmlRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			if text := node.PreviousNodeText(); "" != text {
 				lastc, _ := utf8.DecodeLastRuneInString(text)
 				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
@@ -858,7 +858,7 @@ func (r *HtmlRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkSta
 			}
 		}
 	} else {
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			if text := node.NextNodeText(); "" != text {
 				firstc, _ := utf8.DecodeRuneInString(text)
 				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
@@ -991,11 +991,11 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		r.WriteString("<h" + level)
 		id := HeadingID(node)
-		if r.Option.ToC || r.Option.HeadingID || r.Option.KramdownIAL {
+		if r.Options.ToC || r.Options.HeadingID || r.Options.KramdownIAL {
 			r.WriteString(" id=\"" + id + "\"")
-			if r.Option.KramdownIAL {
-				if "id" != r.Option.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
-					r.WriteString(" " + r.Option.KramdownIALIDRenderName + "=\"" + node.KramdownIAL[0][1] + "\"")
+			if r.Options.KramdownIAL {
+				if "id" != r.Options.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
+					r.WriteString(" " + r.Options.KramdownIALIDRenderName + "=\"" + node.KramdownIAL[0][1] + "\"")
 				}
 				if 1 < len(node.KramdownIAL) {
 					exceptID := node.KramdownIAL[1:]
@@ -1007,7 +1007,7 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 		}
 		r.WriteString(">")
 	} else {
-		if r.Option.HeadingAnchor {
+		if r.Options.HeadingAnchor {
 			id := HeadingID(node)
 			r.Tag("a", [][]string{{"id", "vditorAnchor-" + id}, {"class", "vditor-anchor"}, {"href", "#" + id}}, false)
 			r.WriteString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
@@ -1056,11 +1056,11 @@ func (r *HtmlRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSta
 		var attrs [][]string
 		r.handleKramdownIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
-		if 3 == node.ListData.Typ && "" != r.Option.GFMTaskListItemClass &&
+		if 3 == node.ListData.Typ && "" != r.Options.GFMTaskListItemClass &&
 			nil != node.FirstChild && (
 			(ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
 				(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
-			attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
+			attrs = append(attrs, []string{"class", r.Options.GFMTaskListItemClass})
 		}
 		r.Tag("li", attrs, false)
 	} else {
@@ -1101,7 +1101,7 @@ func (r *HtmlRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *HtmlRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if r.Option.SoftBreak2HardBreak {
+		if r.Options.SoftBreak2HardBreak {
 			r.Tag("br", nil, true)
 			r.Newline()
 		} else {
@@ -1112,9 +1112,9 @@ func (r *HtmlRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *HtmlRenderer) handleKramdownIAL(node *ast.Node) {
-	if r.Option.KramdownIAL && "id" != r.Option.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
+	if r.Options.KramdownIAL && "id" != r.Options.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
 		// 第一项必须是 ID
-		node.KramdownIAL[0][0] = r.Option.KramdownIALIDRenderName
+		node.KramdownIAL[0][0] = r.Options.KramdownIALIDRenderName
 	}
 }
 

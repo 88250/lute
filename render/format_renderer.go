@@ -30,8 +30,8 @@ type FormatRenderer struct {
 }
 
 // NewFormatRenderer 创建一个格式化渲染器。
-func NewFormatRenderer(tree *parse.Tree) *FormatRenderer {
-	ret := &FormatRenderer{BaseRenderer: NewBaseRenderer(tree)}
+func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
+	ret := &FormatRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -224,7 +224,7 @@ func (r *FormatRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast
 func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		if r.Option.KramdownIAL {
+		if r.Options.KramdownIAL {
 			if util.IsDocIAL(node.Tokens) {
 				r.WriteByte(lex.ItemNewline)
 			}
@@ -244,7 +244,7 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 }
 
 func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.Option.KramdownIAL {
+	if !r.Options.KramdownIAL {
 		return ast.WalkContinue
 	}
 
@@ -704,7 +704,7 @@ func (r *FormatRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.Walk
 func (r *FormatRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var tokens []byte
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			tokens = r.Space(node.Tokens)
 		} else {
 			tokens = node.Tokens
@@ -825,7 +825,7 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 
 func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if r.Option.KramdownIAL {
+		if r.Options.KramdownIAL {
 			parent := node.Parent
 			if ast.NodeListItem == parent.Type && parent.FirstChild == node { // 列表项下第一个段落
 				if nil != parent.Next && ast.NodeKramdownBlockIAL == parent.Next.Type {
@@ -873,16 +873,16 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var tokens []byte
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			tokens = r.Space(node.Tokens)
 		} else {
 			tokens = node.Tokens
 		}
 
-		if r.Option.FixTermTypo {
+		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Option.ChinesePunct {
+		if r.Options.ChinesePunct {
 			tokens = r.ChinesePunct(tokens)
 		}
 		if nil == node.Previous && nil != node.Parent.Parent && nil != node.Parent.Parent.ListData && 3 == node.Parent.Parent.ListData.Typ {
@@ -898,7 +898,7 @@ func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *FormatRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			if text := node.PreviousNodeText(); "" != text {
 				lastc, _ := utf8.DecodeLastRuneInString(text)
 				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
@@ -907,7 +907,7 @@ func (r *FormatRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 			}
 		}
 	} else {
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			if text := node.NextNodeText(); "" != text {
 				firstc, _ := utf8.DecodeRuneInString(text)
 				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
@@ -1361,7 +1361,7 @@ func (r *FormatRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.
 
 func (r *FormatRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if !r.Option.SoftBreak2HardBreak {
+		if !r.Options.SoftBreak2HardBreak {
 			r.WriteString("\\\n")
 		} else {
 			if node.ParentIs(ast.NodeTableCell) {
@@ -1382,5 +1382,5 @@ func (r *FormatRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *FormatRenderer) withoutKramdownIAL(node *ast.Node) bool {
-	return !r.Option.KramdownIAL || 0 == len(node.KramdownIAL)
+	return !r.Options.KramdownIAL || 0 == len(node.KramdownIAL)
 }

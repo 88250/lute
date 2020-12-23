@@ -889,10 +889,10 @@ func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 
 	if entering {
 		tokens := node.Tokens
-		if r.Option.FixTermTypo {
+		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Option.ChinesePunct {
+		if r.Options.ChinesePunct {
 			tokens = r.ChinesePunct(tokens)
 		}
 

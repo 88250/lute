@@ -25,8 +25,8 @@ type EChartsJSONRenderer struct {
 }
 
 // NewEChartsJSONRenderer 创建一个 ECharts JSON 渲染器。
-func NewEChartsJSONRenderer(tree *parse.Tree) Renderer {
-	ret := &EChartsJSONRenderer{NewBaseRenderer(tree)}
+func NewEChartsJSONRenderer(tree *parse.Tree, options *Options) Renderer {
+	ret := &EChartsJSONRenderer{NewBaseRenderer(tree, options)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

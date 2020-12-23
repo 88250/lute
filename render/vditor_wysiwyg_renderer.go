@@ -459,7 +459,7 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 
 	previewTokens := bytes.TrimSpace(node.Tokens)
 	var preAttrs [][]string
-	if !bytes.Contains(previewTokens, util.CaretTokens) && r.Option.VditorMathBlockPreview {
+	if !bytes.Contains(previewTokens, util.CaretTokens) && r.Options.VditorMathBlockPreview {
 		preAttrs = append(preAttrs, []string{"style", "display: none"})
 	}
 	codeLen := len(previewTokens)
@@ -473,7 +473,7 @@ func (r *VditorRenderer) renderMathBlockContent(node *ast.Node, entering bool) a
 	}
 	r.WriteString("</code></pre>")
 
-	if r.Option.VditorMathBlockPreview {
+	if r.Options.VditorMathBlockPreview {
 		r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 		r.Tag("div", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
 		tokens := node.Tokens
@@ -671,7 +671,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 			buf := r.Writer.Bytes()
 			idx := bytes.LastIndex(buf, []byte("<img src="))
 			imgBuf := buf[idx:]
-			if r.Option.Sanitize {
+			if r.Options.Sanitize {
 				imgBuf = sanitize(imgBuf)
 			}
 			r.Writer.Truncate(idx)
@@ -709,7 +709,7 @@ func (r *VditorRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStat
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
 		imgBuf := buf[idx:]
-		if r.Option.Sanitize {
+		if r.Options.Sanitize {
 			imgBuf = sanitize(imgBuf)
 		}
 		r.Writer.Truncate(idx)
@@ -775,7 +775,7 @@ func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 
 	r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	if r.Option.Sanitize {
+	if r.Options.Sanitize {
 		tokens = sanitize(tokens)
 	}
 	r.Write(tokens)
@@ -841,10 +841,10 @@ func (r *VditorRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 func (r *VditorRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := node.Tokens
-		if r.Option.FixTermTypo {
+		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Option.ChinesePunct {
+		if r.Options.ChinesePunct {
 			tokens = r.ChinesePunct(tokens)
 		}
 
@@ -986,7 +986,7 @@ func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 		if nil != headingID {
 			id = string(headingID.Tokens)
 		}
-		if r.Option.HeadingID && "" != id {
+		if r.Options.HeadingID && "" != id {
 			r.WriteString(" data-id=\"" + id + "\"")
 		}
 		if "" == id {
@@ -1002,7 +1002,7 @@ func (r *VditorRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 				r.WriteString(" data-marker=\"-\">")
 			}
 		}
-		if r.Option.HeadingAnchor {
+		if r.Options.HeadingAnchor {
 			id := HeadingID(node)
 			r.Tag("a", [][]string{{"id", "vditorAnchor-" + id}, {"class", "vditor-anchor"}, {"href", "#" + id}}, false)
 			r.WriteString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>`)
@@ -1073,7 +1073,7 @@ func (r *VditorRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			}
 			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type { // li.p.task
-				attrs = append(attrs, []string{"class", r.Option.GFMTaskListItemClass})
+				attrs = append(attrs, []string{"class", r.Options.GFMTaskListItemClass})
 			}
 		}
 		r.Tag("li", attrs, false)
@@ -1165,7 +1165,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 		}
 	}
 	preAttrs := [][]string{{"class", "vditor-wysiwyg__pre"}}
-	if !bytes.Contains(node.Tokens, util.CaretTokens) && !caretInInfo && r.Option.VditorCodeBlockPreview {
+	if !bytes.Contains(node.Tokens, util.CaretTokens) && !caretInInfo && r.Options.VditorCodeBlockPreview {
 		preAttrs = append(preAttrs, []string{"style", "display: none"})
 	}
 	r.Tag("pre", preAttrs, false)
@@ -1182,7 +1182,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 	}
 	r.WriteString("</code></pre>")
 
-	if r.Option.VditorCodeBlockPreview {
+	if r.Options.VditorCodeBlockPreview {
 		r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 		preDiv := noHighlight(language)
 		if preDiv {

@@ -26,7 +26,8 @@ const Version = "1.7.0"
 
 // Lute 描述了 Lute 引擎的顶层使用入口。
 type Lute struct {
-	*parse.ParseOptions // 解析和渲染选项配置
+	ParseOptions  *parse.ParseOptions // 解析选项
+	RenderOptions *render.Options     // 渲染选项
 
 	HTML2MdRendererFuncs               map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
 	HTML2VditorDOMRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
@@ -40,19 +41,23 @@ type Lute struct {
 	Md2VditorSVDOMRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2VditorSVDOM 渲染器函数
 }
 
-// New 创建一个新的 Lute 引擎，默认启用：
+// New 创建一个新的 Lute 引擎。
+//
+// 默认启用的解析选项：
 //  * GFM 支持
-//  * 代码块语法高亮
 //  * 软换行转硬换行
 //  * 脚注
 //  * 标题自定义 ID
-//  * 中西文间插入空格
 //  * 修正术语拼写
 //  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 //  * YAML Front Matter
+//
+// 默认启用的渲染选项：
+//  * 代码块语法高亮
+//  * 中西文间插入空格
 func New(opts ...ParseOption) (ret *Lute) {
-	ret = &Lute{ParseOptions: NewOptions()}
+	ret = &Lute{ParseOptions: NewParseOptions()}
 	for _, opt := range opts {
 		opt(ret)
 	}
@@ -70,49 +75,58 @@ func New(opts ...ParseOption) (ret *Lute) {
 	return ret
 }
 
-func NewOptions() *parse.ParseOptions {
-	emojis, emoji := parse.NewEmojis()
-	return &parse.ParseOptions{
-		GFMTable:                       true,
-		GFMTaskListItem:                true,
-		GFMTaskListItemClass:           "vditor-task",
-		GFMStrikethrough:               true,
-		GFMAutoLink:                    true,
-		SoftBreak2HardBreak:            true,
+func NewRenderOptions() *render.Options {
+	return &render.Options{
+		AutoSpace:                      true,
+		RenderListStyle:                false,
 		CodeSyntaxHighlight:            true,
 		CodeSyntaxHighlightInlineStyle: false,
 		CodeSyntaxHighlightLineNum:     false,
 		CodeSyntaxHighlightStyleName:   "github",
-		Footnotes:                      true,
-		ToC:                            false,
-		HeadingID:                      true,
-		AutoSpace:                      true,
-		FixTermTypo:                    true,
-		ChinesePunct:                   true,
-		Emoji:                          true,
-		AliasEmoji:                     emojis,
-		EmojiAlias:                     emoji,
-		Terms:                          render.NewTerms(),
-		EmojiSite:                      "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
-		LinkBase:                       "",
-		LinkPrefix:                     "",
-		VditorCodeBlockPreview:         true,
-		VditorMathBlockPreview:         true,
-		VditorHTMLBlockPreview:         true,
-		RenderListStyle:                false,
-		ChineseParagraphBeginningSpace: false,
-		YamlFrontMatter:                true,
-		BlockRef:                       false,
-		Mark:                           false,
+		VditorWYSIWYG:                  false,
+		VditorIR:                       false,
+		VditorSV:                       false,
 		KramdownIAL:                    false,
-		KramdownIALIDRenderName:        "id",
+		ChineseParagraphBeginningSpace: false,
+	}
+}
+
+func NewParseOptions() *parse.ParseOptions {
+	emojis, emoji := parse.NewEmojis()
+	return &parse.ParseOptions{
+		GFMTable:                true,
+		GFMTaskListItem:         true,
+		GFMTaskListItemClass:    "vditor-task",
+		GFMStrikethrough:        true,
+		GFMAutoLink:             true,
+		SoftBreak2HardBreak:     true,
+		Footnotes:               true,
+		ToC:                     false,
+		HeadingID:               true,
+		FixTermTypo:             true,
+		ChinesePunct:            true,
+		Emoji:                   true,
+		AliasEmoji:              emojis,
+		EmojiAlias:              emoji,
+		Terms:                   render.NewTerms(),
+		EmojiSite:               "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
+		LinkBase:                "",
+		LinkPrefix:              "",
+		VditorCodeBlockPreview:  true,
+		VditorMathBlockPreview:  true,
+		VditorHTMLBlockPreview:  true,
+		YamlFrontMatter:         true,
+		BlockRef:                false,
+		Mark:                    false,
+		KramdownIAL:             false,
+		KramdownIALIDRenderName: "id",
 	}
 }
 
 // Markdown 将 markdown 文本字节数组处理为相应的 html 字节数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte) {
 	tree := parse.Parse(name, markdown, lute.ParseOptions)
-	renderer := render.NewHtmlRenderer(tree)
+	renderer := render.NewHtmlRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2HTMLRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -130,7 +144,7 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string) {
 // Format 将 markdown 文本字节数组进行格式化。
 func (lute *Lute) Format(name string, markdown []byte) (formatted []byte) {
 	tree := parse.Parse(name, markdown, lute.ParseOptions)
-	renderer := render.NewFormatRenderer(tree)
+	renderer := render.NewFormatRenderer(tree, lute.RenderOptions)
 	formatted = renderer.Render()
 	return
 }
@@ -174,7 +188,7 @@ func (lute *Lute) Space(text string) string {
 // IsValidLinkDest 判断 str 是否为合法的链接地址。
 func (lute *Lute) IsValidLinkDest(str string) bool {
 	luteEngine := New()
-	luteEngine.GFMAutoLink = true
+	luteEngine.ParseOptions.GFMAutoLink = true
 	tree := parse.Parse("", []byte(str), luteEngine.ParseOptions)
 	if nil == tree.Root.FirstChild || nil == tree.Root.FirstChild.FirstChild {
 		return false
@@ -190,11 +204,11 @@ func (lute *Lute) IsValidLinkDest(str string) bool {
 
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
-	ret = make(map[string]string, len(lute.AliasEmoji))
+	ret = make(map[string]string, len(lute.ParseOptions.AliasEmoji))
 	placeholder := util.BytesToStr(parse.EmojiSitePlaceholder)
-	for k, v := range lute.AliasEmoji {
+	for k, v := range lute.ParseOptions.AliasEmoji {
 		if strings.Contains(v, placeholder) {
-			v = strings.ReplaceAll(v, placeholder, lute.EmojiSite)
+			v = strings.ReplaceAll(v, placeholder, lute.ParseOptions.EmojiSite)
 		}
 		ret[k] = v
 	}
@@ -204,14 +218,14 @@ func (lute *Lute) GetEmojis() (ret map[string]string) {
 // PutEmojis 将指定的 emojiMap 合并覆盖已有的 Emoji 字典。
 func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 	for k, v := range emojiMap {
-		lute.AliasEmoji[k] = v
-		lute.EmojiAlias[v] = k
+		lute.ParseOptions.AliasEmoji[k] = v
+		lute.ParseOptions.EmojiAlias[v] = k
 	}
 }
 
 // RemoveEmoji 用于删除 str 中的 Emoji Unicode。
 func (lute *Lute) RemoveEmoji(str string) string {
-	for u, _ := range lute.EmojiAlias {
+	for u, _ := range lute.ParseOptions.EmojiAlias {
 		str = strings.ReplaceAll(str, u, "")
 	}
 	return strings.TrimSpace(str)
@@ -219,13 +233,13 @@ func (lute *Lute) RemoveEmoji(str string) string {
 
 // GetTerms 返回术语字典。
 func (lute *Lute) GetTerms() map[string]string {
-	return lute.Terms
+	return lute.ParseOptions.Terms
 }
 
 // PutTerms 将制定的 termMap 合并覆盖已有的术语字典。
 func (lute *Lute) PutTerms(termMap map[string]string) {
 	for k, v := range termMap {
-		lute.Terms[k] = v
+		lute.ParseOptions.Terms[k] = v
 	}
 }
 
@@ -235,7 +249,7 @@ func FormatNode(node *ast.Node, options *parse.ParseOptions) string {
 	luteEngine := New()
 	luteEngine.ParseOptions = options
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: luteEngine.ParseOptions}}
-	renderer := render.NewFormatRenderer(tree)
+	renderer := render.NewFormatRenderer(tree, luteEngine.RenderOptions)
 	renderer.Writer = &bytes.Buffer{}
 	renderer.NodeWriterStack = append(renderer.NodeWriterStack, renderer.Writer)
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -251,179 +265,191 @@ type ParseOption func(lute *Lute)
 // 以下 Setters 主要是给 JavaScript 端导出方法用。
 
 func (lute *Lute) SetGFMTable(b bool) {
-	lute.GFMTable = b
+	lute.ParseOptions.GFMTable = b
 }
 
 func (lute *Lute) SetGFMTaskListItem(b bool) {
-	lute.GFMTaskListItem = b
+	lute.ParseOptions.GFMTaskListItem = b
 }
 
 func (lute *Lute) SetGFMTaskListItemClass(class string) {
-	lute.GFMTaskListItemClass = class
+	lute.ParseOptions.GFMTaskListItemClass = class
 }
 
 func (lute *Lute) SetGFMStrikethrough(b bool) {
-	lute.GFMStrikethrough = b
+	lute.ParseOptions.GFMStrikethrough = b
 }
 
 func (lute *Lute) SetGFMAutoLink(b bool) {
-	lute.GFMAutoLink = b
+	lute.ParseOptions.GFMAutoLink = b
 }
 
 func (lute *Lute) SetSoftBreak2HardBreak(b bool) {
-	lute.SoftBreak2HardBreak = b
+	lute.ParseOptions.SoftBreak2HardBreak = b
 }
 
 func (lute *Lute) SetCodeSyntaxHighlight(b bool) {
-	lute.CodeSyntaxHighlight = b
+	lute.RenderOptions.CodeSyntaxHighlight = b
 }
 
 func (lute *Lute) SetCodeSyntaxHighlightDetectLang(b bool) {
-	lute.CodeSyntaxHighlightDetectLang = b
+	lute.RenderOptions.CodeSyntaxHighlightDetectLang = b
 }
 
 func (lute *Lute) SetCodeSyntaxHighlightInlineStyle(b bool) {
-	lute.CodeSyntaxHighlightInlineStyle = b
+	lute.RenderOptions.CodeSyntaxHighlightInlineStyle = b
 }
 
 func (lute *Lute) SetCodeSyntaxHighlightLineNum(b bool) {
-	lute.CodeSyntaxHighlightLineNum = b
+	lute.RenderOptions.CodeSyntaxHighlightLineNum = b
 }
 
 func (lute *Lute) SetCodeSyntaxHighlightStyleName(name string) {
-	lute.CodeSyntaxHighlightStyleName = name
+	lute.RenderOptions.CodeSyntaxHighlightStyleName = name
 }
 
 func (lute *Lute) SetFootnotes(b bool) {
-	lute.Footnotes = b
+	lute.ParseOptions.Footnotes = b
 }
 
 func (lute *Lute) SetToC(b bool) {
-	lute.ToC = b
+	lute.ParseOptions.ToC = b
 }
 
 func (lute *Lute) SetHeadingID(b bool) {
-	lute.HeadingID = b
+	lute.ParseOptions.HeadingID = b
 }
 
 func (lute *Lute) SetAutoSpace(b bool) {
-	lute.AutoSpace = b
+	lute.RenderOptions.AutoSpace = b
 }
 
 func (lute *Lute) SetFixTermTypo(b bool) {
-	lute.FixTermTypo = b
+	lute.ParseOptions.FixTermTypo = b
 }
 
 func (lute *Lute) SetChinesePunct(b bool) {
-	lute.ChinesePunct = b
+	lute.ParseOptions.ChinesePunct = b
 }
 
 func (lute *Lute) SetEmoji(b bool) {
-	lute.Emoji = b
+	lute.ParseOptions.Emoji = b
 }
 
 func (lute *Lute) SetEmojis(emojis map[string]string) {
-	lute.AliasEmoji = emojis
+	lute.ParseOptions.AliasEmoji = emojis
 }
 
 func (lute *Lute) SetEmojiSite(emojiSite string) {
-	lute.EmojiSite = emojiSite
+	lute.ParseOptions.EmojiSite = emojiSite
 }
 
 func (lute *Lute) SetHeadingAnchor(b bool) {
-	lute.HeadingAnchor = b
+	lute.ParseOptions.HeadingAnchor = b
 }
 
 func (lute *Lute) SetTerms(terms map[string]string) {
-	lute.Terms = terms
+	lute.ParseOptions.Terms = terms
 }
 
 func (lute *Lute) SetVditorWYSIWYG(b bool) {
-	lute.VditorWYSIWYG = b
+	lute.ParseOptions.VditorWYSIWYG = b
+	lute.RenderOptions.VditorWYSIWYG = b
+}
+
+func (lute *Lute) SetVditorIR(b bool) {
+	lute.ParseOptions.VditorIR = b
+	lute.RenderOptions.VditorIR = b
+}
+
+func (lute *Lute) SetVditorIRBlock(b bool) {
+	lute.ParseOptions.VditorSV = b
+	lute.RenderOptions.VditorSV = b
 }
 
 func (lute *Lute) SetInlineMathAllowDigitAfterOpenMarker(b bool) {
-	lute.InlineMathAllowDigitAfterOpenMarker = b
+	lute.ParseOptions.InlineMathAllowDigitAfterOpenMarker = b
 }
 
 func (lute *Lute) SetLinkPrefix(linkPrefix string) {
-	lute.LinkPrefix = linkPrefix
+	lute.ParseOptions.LinkPrefix = linkPrefix
 }
 
 func (lute *Lute) SetLinkBase(linkBase string) {
-	lute.LinkBase = linkBase
+	lute.ParseOptions.LinkBase = linkBase
 }
 
 func (lute *Lute) GetLinkBase() string {
-	return lute.LinkBase
+	return lute.ParseOptions.LinkBase
 }
 
 func (lute *Lute) SetVditorCodeBlockPreview(b bool) {
-	lute.VditorCodeBlockPreview = b
+	lute.ParseOptions.VditorCodeBlockPreview = b
 }
 
 func (lute *Lute) SetVditorMathBlockPreview(b bool) {
-	lute.VditorMathBlockPreview = b
+	lute.ParseOptions.VditorMathBlockPreview = b
 }
 
 func (lute *Lute) SetVditorHTMLBlockPreview(b bool) {
-	lute.VditorHTMLBlockPreview = b
+	lute.ParseOptions.VditorHTMLBlockPreview = b
 }
 
 func (lute *Lute) SetRenderListStyle(b bool) {
-	lute.RenderListStyle = b
+	lute.RenderOptions.RenderListStyle = b
 }
 
 func (lute *Lute) SetSanitize(b bool) {
-	lute.Sanitize = b
+	lute.ParseOptions.Sanitize = b
 }
 
 func (lute *Lute) SetImageLazyLoading(dataSrc string) {
-	lute.ImageLazyLoading = dataSrc
+	lute.RenderOptions.ImageLazyLoading = dataSrc
 }
 
 func (lute *Lute) SetChineseParagraphBeginningSpace(b bool) {
-	lute.ChineseParagraphBeginningSpace = b
+	lute.RenderOptions.ChineseParagraphBeginningSpace = b
 }
 
 func (lute *Lute) SetYamlFrontMatter(b bool) {
-	lute.YamlFrontMatter = b
+	lute.ParseOptions.YamlFrontMatter = b
 }
 
 func (lute *Lute) SetBlockRef(b bool) {
-	lute.BlockRef = b
+	lute.ParseOptions.BlockRef = b
 }
 
 func (lute *Lute) SetMark(b bool) {
-	lute.Mark = b
+	lute.ParseOptions.Mark = b
 }
 
 func (lute *Lute) SetKramdownIAL(b bool) {
-	lute.KramdownIAL = b
+	lute.ParseOptions.KramdownIAL = b
+	lute.RenderOptions.KramdownIAL = b
 }
 
 func (lute *Lute) SetKramdownIALIDRenderName(name string) {
-	lute.KramdownIALIDRenderName = name
+	lute.ParseOptions.KramdownIALIDRenderName = name
 }
 
 func (lute *Lute) SetTag(b bool) {
-	lute.Tag = b
+	lute.ParseOptions.Tag = b
 }
 
 func (lute *Lute) SetImgPathAllowSpace(b bool) {
-	lute.ImgPathAllowSpace = b
+	lute.ParseOptions.ImgPathAllowSpace = b
 }
 
 func (lute *Lute) SetSuperBlock(b bool) {
-	lute.SuperBlock = b
+	lute.ParseOptions.SuperBlock = b
 }
 
 func (lute *Lute) SetSup(b bool) {
-	lute.Sup = b
+	lute.ParseOptions.Sup = b
 }
 
 func (lute *Lute) SetSub(b bool) {
-	lute.Sub = b
+	lute.ParseOptions.Sub = b
 }
 
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
