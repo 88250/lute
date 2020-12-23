@@ -160,8 +160,10 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	})
 
 	// 将 AST 进行 Markdown 格式化渲染
-
-	renderer := render.NewFormatRenderer(tree, lute.RenderOptions)
+	options := render.NewOptions()
+	options.AutoSpace = false
+	options.FixTermTypo = false
+	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return

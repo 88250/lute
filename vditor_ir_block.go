@@ -105,7 +105,11 @@ func (lute *Lute) VditorIRBlockDOM2StdMd(htmlStr string) (markdown string) {
 	})
 
 	// 将 AST 进行 Markdown 格式化渲染
-	renderer := render.NewFormatRenderer(tree, lute.RenderOptions)
+	options := render.NewOptions()
+	options.AutoSpace = false
+	options.FixTermTypo = false
+	options.KramdownIAL = true
+	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
@@ -211,7 +215,11 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	}
 
 	// 将 AST 进行 Markdown 格式化渲染
-	renderer := render.NewFormatRenderer(tree, lute.RenderOptions)
+	options := render.NewOptions()
+	options.AutoSpace = false
+	options.FixTermTypo = false
+	options.KramdownIAL = true
+	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
