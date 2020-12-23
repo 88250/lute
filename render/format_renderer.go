@@ -1284,7 +1284,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		buf := writer.Bytes()
 		lines := bytes.Split(buf, []byte{lex.ItemNewline})
 		for _, line := range lines {
-			if 0 == len(line) && !r.Options.VditorIR {
+			if 0 == len(line) {
 				indentedLines.WriteByte(lex.ItemNewline)
 				continue
 			}
