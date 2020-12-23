@@ -268,7 +268,6 @@ func TestParse(t *testing.T) {
 	luteEngine.RenderOptions.HeadingID = false
 	luteEngine.RenderOptions.AutoSpace = false
 	luteEngine.RenderOptions.FixTermTypo = false
-	luteEngine.RenderOptions.ChinesePunct = false
 	luteEngine.ParseOptions.Emoji = false
 
 	for _, test := range parseTests {

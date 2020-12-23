@@ -844,9 +844,6 @@ func (r *VditorRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Options.ChinesePunct {
-			tokens = r.ChinesePunct(tokens)
-		}
 
 		tokens = bytes.TrimRight(tokens, "\n")
 		// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉

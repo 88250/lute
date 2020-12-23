@@ -1079,9 +1079,6 @@ func (r *VditorIRRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Options.ChinesePunct {
-			tokens = r.ChinesePunct(tokens)
-		}
 
 		// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
 		if !bytes.EqualFold(tokens, []byte(util.Caret+parse.Zwsp)) {

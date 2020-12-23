@@ -74,8 +74,6 @@ type Options struct {
 	// https://github.com/sparanoid/chinese-copywriting-guidelines
 	// 注意：开启术语修正的话会默认在中西文之间插入空格。
 	FixTermTypo bool
-	// ChinesePunct 设置是否对普通文本中出现中文后跟英文逗号句号等标点替换为中文对应标点。
-	ChinesePunct bool
 	// ToC 设置是否打开“目录”支持。
 	ToC bool
 	// HeadingID 设置是否打开“自定义标题 ID”支持。
@@ -119,7 +117,6 @@ func NewOptions() *Options {
 		KramdownIAL:                    false,
 		ChineseParagraphBeginningSpace: false,
 		FixTermTypo:                    true,
-		ChinesePunct:                   true,
 		ToC:                            false,
 		HeadingID:                      true,
 		KramdownIALIDRenderName:        "id",

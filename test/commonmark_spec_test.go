@@ -50,7 +50,6 @@ func TestSpec(t *testing.T) {
 	luteEngine.RenderOptions.HeadingID = false
 	luteEngine.RenderOptions.AutoSpace = false
 	luteEngine.RenderOptions.FixTermTypo = false
-	luteEngine.RenderOptions.ChinesePunct = false
 	luteEngine.ParseOptions.Emoji = false
 	luteEngine.ParseOptions.YamlFrontMatter = false
 

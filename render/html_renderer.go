@@ -839,9 +839,6 @@ func (r *HtmlRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus 
 		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Options.ChinesePunct {
-			tokens = r.ChinesePunct(tokens)
-		}
 		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue

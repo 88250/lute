@@ -892,9 +892,6 @@ func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if r.Options.ChinesePunct {
-			tokens = r.ChinesePunct(tokens)
-		}
 
 		r.Tag("span", [][]string{{"data-type", "text"}}, false)
 		tokens = bytes.TrimRight(tokens, "\n")

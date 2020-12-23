@@ -280,10 +280,6 @@ func (lute *Lute) SetFixTermTypo(b bool) {
 	lute.RenderOptions.FixTermTypo = b
 }
 
-func (lute *Lute) SetChinesePunct(b bool) {
-	lute.RenderOptions.ChinesePunct = b
-}
-
 func (lute *Lute) SetEmoji(b bool) {
 	lute.ParseOptions.Emoji = b
 }
