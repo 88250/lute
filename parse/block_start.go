@@ -328,6 +328,10 @@ var blockStarts = []blockStartFunc{
 			return 0
 		}
 
+		if ast.NodeListItem == t.Context.Tip.Type && nil == t.Context.Tip.FirstChild { // 列表项 IAL 由后续第一个段落块进行解析
+			return 0
+		}
+
 		if ial := t.parseKramdownBlockIAL(); nil != ial {
 			t.Context.closeUnmatchedBlocks()
 			t.Context.offset = t.Context.currentLineLen                    // 整行过
@@ -340,10 +344,12 @@ var blockStarts = []blockStartFunc{
 			}
 
 			lastMatchedContainer := t.Context.lastMatchedContainer
-			if t.Context.allClosed && (ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type) {
-				lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
-				if nil == lastMatchedContainer {
-					lastMatchedContainer = t.Context.lastMatchedContainer
+			if t.Context.allClosed {
+				if ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type {
+					lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
+					if nil == lastMatchedContainer {
+						lastMatchedContainer = t.Context.lastMatchedContainer
+					}
 				}
 			}
 			lastMatchedContainer.KramdownIAL = ial

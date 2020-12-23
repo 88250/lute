@@ -1272,6 +1272,9 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 			r.Write(liIAL.Tokens)
 			liIAL.Unlink()
 		}
+		if nil != node.FirstChild && ast.NodeList == node.FirstChild.Type {
+			r.Newline()
+		}
 	} else {
 		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
