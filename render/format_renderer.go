@@ -824,18 +824,7 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		if r.Options.KramdownIAL {
-			parent := node.Parent
-			if ast.NodeListItem == parent.Type && parent.FirstChild == node { // 列表项下第一个段落
-				if nil != parent.Next && ast.NodeKramdownBlockIAL == parent.Next.Type {
-					liIAL := parent.Next
-					r.Write(liIAL.Tokens)
-					liIAL.Unlink()
-				}
-			}
-		}
-	} else {
+	if !entering {
 		if !node.ParentIs(ast.NodeTableCell) {
 			if r.withoutKramdownIAL(node) {
 				r.Newline()
@@ -1278,6 +1267,11 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 	if entering {
 		r.Writer = &bytes.Buffer{}
 		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
+		if nil != node.Next && ast.NodeKramdownBlockIAL == node.Next.Type {
+			liIAL := node.Next
+			r.Write(liIAL.Tokens)
+			liIAL.Unlink()
+		}
 	} else {
 		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
@@ -1290,7 +1284,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		buf := writer.Bytes()
 		lines := bytes.Split(buf, []byte{lex.ItemNewline})
 		for _, line := range lines {
-			if 0 == len(line) {
+			if 0 == len(line) && !r.Options.VditorIR {
 				indentedLines.WriteByte(lex.ItemNewline)
 				continue
 			}
