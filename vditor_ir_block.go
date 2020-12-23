@@ -323,6 +323,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		} else if "block-query-embed" == dataType {
 			text := lute.domText(n)
 			t := parse.Parse("", []byte(text), lute.ParseOptions)
+			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if blockQueryEmbed := t.Root.FirstChild; nil != blockQueryEmbed && ast.NodeBlockQueryEmbed == blockQueryEmbed.Type {
 				node = blockQueryEmbed
 				next := blockQueryEmbed.Next
@@ -881,6 +882,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 					t = parse.Parse("", []byte(text), lute.ParseOptions)
 				}
 			}
+			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if blockRef := t.Root.FirstChild.FirstChild; nil != blockRef && ast.NodeBlockRef == blockRef.Type {
 				node = blockRef
 				next := blockRef.Next
@@ -924,6 +926,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			t := parse.Parse("", []byte(text), lute.ParseOptions)
+			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmphasis == inlineNode.Type ||
 				ast.NodeStrong == inlineNode.Type || ast.NodeStrikethrough == inlineNode.Type || ast.NodeMark == inlineNode.Type ||
 				ast.NodeCodeSpan == inlineNode.Type || ast.NodeInlineMath == inlineNode.Type || ast.NodeTag == inlineNode.Type ||
@@ -952,6 +955,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			t := parse.Parse("", []byte(text), lute.ParseOptions)
+			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeLink == inlineNode.Type || ast.NodeImage == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
@@ -980,6 +984,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			t := parse.Parse("", []byte(text), lute.ParseOptions)
+			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeHTMLEntity == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
@@ -998,6 +1003,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			t := parse.Parse("", []byte(text), lute.ParseOptions)
+			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeEmoji == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
@@ -1016,6 +1022,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			t := parse.Parse("", []byte(text), lute.ParseOptions)
+			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if inlineNode := t.Root.FirstChild.FirstChild; nil != inlineNode && (ast.NodeBackslash == inlineNode.Type) {
 				node = inlineNode
 				next := inlineNode.Next
@@ -1175,6 +1182,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			t := parse.Parse("", []byte(text), lute.ParseOptions)
+			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
 				ial, id := node.KramdownIAL, node.ID
 				node = blockEmbed
