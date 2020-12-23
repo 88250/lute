@@ -48,7 +48,6 @@ type Lute struct {
 //  * 脚注
 //  * 标题自定义 ID
 //  * 修正术语拼写
-//  * 替换中文标点
 //  * Emoji 别名替换，比如 :heart: 替换为 ❤️
 //  * YAML Front Matter
 //

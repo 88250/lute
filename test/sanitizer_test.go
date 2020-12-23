@@ -53,6 +53,7 @@ var sanitizerVditorTests = []parseTest{
 
 func TestSanitizerVditor(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetVditorWYSIWYG(true)
 	luteEngine.RenderOptions.Sanitize = true
 
 	for _, test := range sanitizerVditorTests {

@@ -145,6 +145,7 @@ type BaseRenderer struct {
 
 // NewBaseRenderer 构造一个 BaseRenderer。
 func NewBaseRenderer(tree *parse.Tree, options *Options) *BaseRenderer {
+	options.Terms = NewTerms()
 	ret := &BaseRenderer{RendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Options: options, Tree: tree}
 	ret.Writer = &bytes.Buffer{}
 	ret.Writer.Grow(4096)
