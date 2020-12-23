@@ -230,6 +230,7 @@ type Tree struct {
 	ID      string   // ID，可以为空
 	URL     string   // 地址部分
 	Path    string   // 地址路径部分
+	BaseURL string   // 链接地址基础 URL（如果链接是相对链接则会使用该字段拼接）
 	Marks   []string // 文本标记
 	Created int64    // 创建时间
 	Updated int64    // 更新时间
