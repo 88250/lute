@@ -1290,10 +1290,18 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
-		bilibili := []byte("<iframe src=\"//player.bilibili.com/player.html")
-		if bytes.HasPrefix(tokens, bilibili) {
-			tokens = bytes.Replace(tokens, bilibili, []byte("<iframe class=\"iframe__video\" src=\"https://player.bilibili.com/player.html"), 1)
+
+		if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 < srcIndex {
+			src := tokens[srcIndex+len("src=\""):]
+			src = src[:bytes.Index(src, []byte("\""))]
+			targetSrc := r.LinkPath(src)
+			originSrc := string(targetSrc)
+			if bytes.HasPrefix(targetSrc, []byte("//")) {
+				originSrc = "https://" + originSrc
+			}
+			tokens = bytes.ReplaceAll(tokens, src, []byte(originSrc))
 		}
+
 		r.Write(tokens)
 		r.WriteString("</pre>")
 	}
