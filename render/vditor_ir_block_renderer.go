@@ -1237,6 +1237,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		if r.Options.Sanitize {
 			imgBuf = sanitize(imgBuf)
 		}
+		imgBuf = r.tagSrcPath(imgBuf)
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
 

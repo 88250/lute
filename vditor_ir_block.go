@@ -1272,19 +1272,3 @@ func appendNextToTip(next *ast.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(n)
 	}
 }
-
-func NormalizeLinkBase(linkBase, url string) string {
-	ret := linkBase
-	ret = strings.Replace(ret, "://", "", 1)
-	if "" == ret {
-		return ""
-	}
-	if strings.Contains(ret, "/") {
-		ret = ret[strings.Index(ret, "/"):]
-	}
-	if !strings.HasSuffix(ret, "/") {
-		ret += "/"
-	}
-	ret = url + ret
-	return ret
-}
