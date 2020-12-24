@@ -785,6 +785,7 @@ func (r *HtmlRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus 
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
+		tokens = r.tagSrcPath(tokens)
 		r.Write(tokens)
 		r.Newline()
 	}

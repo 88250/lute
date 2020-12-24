@@ -557,6 +557,20 @@ func (r *BaseRenderer) renderListStyle(node *ast.Node, attrs *[][]string) {
 	}
 }
 
+func (r *BaseRenderer) tagSrcPath(tokens []byte) []byte {
+	if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 < srcIndex {
+		src := tokens[srcIndex+len("src=\""):]
+		src = src[:bytes.Index(src, []byte("\""))]
+		targetSrc := r.LinkPath(src)
+		originSrc := string(targetSrc)
+		if bytes.HasPrefix(targetSrc, []byte("//")) {
+			originSrc = "https://" + originSrc
+		}
+		tokens = bytes.ReplaceAll(tokens, src, []byte(originSrc))
+	}
+	return tokens
+}
+
 func (r *BaseRenderer) isLastNode(treeRoot, node *ast.Node) bool {
 	if treeRoot == node {
 		return true

@@ -1290,18 +1290,7 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
-
-		if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 < srcIndex {
-			src := tokens[srcIndex+len("src=\""):]
-			src = src[:bytes.Index(src, []byte("\""))]
-			targetSrc := r.LinkPath(src)
-			originSrc := string(targetSrc)
-			if bytes.HasPrefix(targetSrc, []byte("//")) {
-				originSrc = "https://" + originSrc
-			}
-			tokens = bytes.ReplaceAll(tokens, src, []byte(originSrc))
-		}
-
+		tokens = r.tagSrcPath(tokens)
 		r.Write(tokens)
 		r.WriteString("</pre>")
 	}
