@@ -689,7 +689,9 @@ func (r *FormatRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.Walk
 
 func (r *FormatRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.Tokens)
+		tokens := node.Tokens
+		tokens = r.LinkPath(tokens)
+		r.Write(tokens)
 	}
 	return ast.WalkContinue
 }
@@ -793,7 +795,9 @@ func (r *FormatRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 func (r *FormatRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.Write(node.Tokens)
+		tokens := node.Tokens
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
 			r.WriteByte(lex.ItemNewline)

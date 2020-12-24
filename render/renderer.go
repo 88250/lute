@@ -564,7 +564,7 @@ func (r *BaseRenderer) tagSrcPath(tokens []byte) []byte {
 		targetSrc := r.LinkPath(src)
 		originSrc := string(targetSrc)
 		if bytes.HasPrefix(targetSrc, []byte("//")) {
-			originSrc = "https://" + originSrc
+			originSrc = "https:" + originSrc
 		}
 		tokens = bytes.ReplaceAll(tokens, src, []byte(originSrc))
 	}
