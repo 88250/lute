@@ -31,7 +31,7 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	markdown := lute.vditorIRBlockDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
-	ovHTML = lute.Tree2VditorIRBlockDOM(tree)
+	ovHTML = lute.Tree2VditorIRBlockDOM(tree, lute.RenderOptions)
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
 	return
@@ -132,8 +132,8 @@ func (lute *Lute) VditorIRBlockDOM2TextLen(htmlStr string) int {
 	return tree.Root.TextLen()
 }
 
-func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree) (vHTML string) {
-	renderer := render.NewVditorIRBlockRenderer(tree, lute.RenderOptions)
+func (lute *Lute) Tree2VditorIRBlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
+	renderer := render.NewVditorIRBlockRenderer(tree, options)
 	output := renderer.Render()
 	vHTML = string(output)
 	return
