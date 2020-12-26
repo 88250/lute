@@ -12,7 +12,9 @@ package render
 
 import (
 	"fmt"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
+	"go/format"
 	"strings"
 
 	"github.com/88250/lute/ast"
@@ -20,7 +22,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// EChartsJSONRenderer 描述了 JSON 渲染器。
+// JSONRenderer 描述了 JSON 渲染器。
 type JSONRenderer struct {
 	*BaseRenderer
 }
@@ -35,11 +37,11 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeCodeSpanOpenMarker] = ret.renderCodeSpanOpenMarker
 	ret.RendererFuncs[ast.NodeCodeSpanContent] = ret.renderCodeSpanContent
 	ret.RendererFuncs[ast.NodeCodeSpanCloseMarker] = ret.renderCodeSpanCloseMarker
-	//ret.RendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
-	//ret.RendererFuncs[ast.NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
-	//ret.RendererFuncs[ast.NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
-	//ret.RendererFuncs[ast.NodeCodeBlockCode] = ret.renderCodeBlockCode
-	//ret.RendererFuncs[ast.NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
+	ret.RendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
+	ret.RendererFuncs[ast.NodeCodeBlockFenceOpenMarker] = ret.renderCodeBlockOpenMarker
+	ret.RendererFuncs[ast.NodeCodeBlockFenceInfoMarker] = ret.renderCodeBlockInfoMarker
+	ret.RendererFuncs[ast.NodeCodeBlockCode] = ret.renderCodeBlockCode
+	ret.RendererFuncs[ast.NodeCodeBlockFenceCloseMarker] = ret.renderCodeBlockCloseMarker
 	ret.RendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
 	ret.RendererFuncs[ast.NodeMathBlockOpenMarker] = ret.renderMathBlockOpenMarker
 	ret.RendererFuncs[ast.NodeMathBlockContent] = ret.renderMathBlockContent
@@ -140,54 +142,6 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	//ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
 	//ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
 	//ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
-
-	//ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph  // 已测试
-	//ret.RendererFuncs[ast.NodeText] = ret.renderText  // TODO 需要酌情清除
-	//ret.RendererFuncs[ast.NodeCodeSpanContent] = ret.renderCodeSpanContent  // 解析行内代码块，已测试
-	//ret.RendererFuncs[ast.NodeCodeSpan] = ret.renderCodeSpan  // TODO 移除
-	////ret.RendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock  // TODO 处理代码块
-	////ret.RendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock  // TODO 移除
-	//ret.RendererFuncs[ast.NodeMathBlockContent] = ret.renderMathBlockContent  // 解析数学块公式，已测试
-	////ret.RendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath  // TODO 移除
-	//ret.RendererFuncs[ast.NodeInlineMathContent] = ret.renderInlineMathContent  // 解析行内数学公式，已测试
-	//ret.RendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis // 已测试
-	//ret.RendererFuncs[ast.NodeStrong] = ret.renderStrong // 已测试
-	//ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote // 已测试
-	//ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading  // 已测试 TODO 指定ID
-	//ret.RendererFuncs[ast.NodeList] = ret.renderList  // 已测试
-	//ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem  // 已测试
-	//ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak  // 已测试
-	//ret.RendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak  // TODO 与InlineHTML冲突
-	//ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak  // 已测试
-	//ret.RendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML  // TODO HTML块
-	//ret.RendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML  // TODO 已测试
-	//ret.RendererFuncs[ast.NodeLink] = ret.renderLink  // TODO 渲染链接
-	//ret.RendererFuncs[ast.NodeImage] = ret.renderImage  // TODO 渲染图片
-	//ret.RendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough  // 已测试
-	//ret.RendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker  // 已测试
-	//ret.RendererFuncs[ast.NodeTable] = ret.renderTable  // 已测试
-	//ret.RendererFuncs[ast.NodeTableHead] = ret.renderTableHead // 已测试
-	//ret.RendererFuncs[ast.NodeTableRow] = ret.renderTableRow // 已测试
-	//ret.RendererFuncs[ast.NodeTableCell] = ret.renderTableCell  // 已测试
-	//ret.RendererFuncs[ast.NodeEmoji] = ret.renderEmoji  // 已测试
-	//ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode  // 已测试
-	//ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg  // 已测试
-	//ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias  // 已测试
-	//ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef  // TODO
-	//ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef  // TODO
-	//ret.RendererFuncs[ast.NodeToC] = ret.renderToC  // TODO 渲染TOC
-	//ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash  // TODO 处理中括号，触发条件不明
-	//ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent  // TODO 处理中括号，触发条件不明
-	//ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity  // 已测试
-	//ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter  // TODO 处理yaml
-	//ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
-	//ret.RendererFuncs[ast.NodeMark] = ret.renderMark  // TODO 处理高亮
-	//ret.RendererFuncs[ast.NodeSup] = ret.renderSup  // TODO 处理上下角标
-	//ret.RendererFuncs[ast.NodeSub] = ret.renderSub  // TODO
-	//ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL  // TODO 处理Kramdown
-	//ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL  // TODO 处理Kramdown
-	//ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed  // TODO 内容块嵌入
-	//ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed  // TODO 内容块引用
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
 }
@@ -319,6 +273,55 @@ func (r *JSONRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.
 func (r *JSONRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
+
+// 渲染代码块
+func (r *JSONRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+func (r *JSONRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+func (r *JSONRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+	var language string
+	if 0 < len(node.Previous.CodeBlockInfo) {
+		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
+		language = util.BytesToStr(infoWords[0])
+	}
+	if entering {
+		r.openObj()
+		tokens := node.Tokens
+		if 0 < len(node.Previous.CodeBlockInfo) {
+			if isGo(language) {
+				if buf, err := format.Source(tokens); nil == err {
+					tokens = buf
+				}
+			}
+			r.language(ast.NodeCodeBlock, util.BytesToStr(tokens), language)
+
+			if "mindmap" == language {
+				// 给echarts调用
+				json := r.renderMindmap(tokens)
+				r.mindMap(util.BytesToStr(json))
+			}
+		} else {
+			language = detectLanguage(tokens)
+			tokens = html.EscapeHTML(tokens)
+			r.language(ast.NodeCodeBlock, util.BytesToStr(tokens), language)
+		}
+	} else {
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
 
 func (r *JSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
@@ -768,7 +771,7 @@ func (r *JSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-//// TODO 需要检验KramdownBlockIAL
+// TODO https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
 //func (r *JSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 //	if entering {
 //		if nil == node.Previous {
@@ -912,19 +915,6 @@ func (r *JSONRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) a
 	return ast.WalkContinue
 }
 
-// TODO 重新考虑处理代码内容和语言类型
-//func (r *JSONRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
-//	if entering {
-//		//r.leaf(node.Type, "Code Block\npre.code", node)
-//		r.openObj()
-//		fmt.Println(node.Children)
-//		r.val(node.Type, util.BytesToStr(node.FirstChild.Tokens), node)
-//	} else {
-//		r.closeObj(node)
-//	}
-//	return ast.WalkContinue
-//}
-
 func (r *JSONRenderer) leaf(nodeType ast.NodeType, val string, node *ast.Node) {
 	r.openObj()
 	r.val(nodeType, val)
@@ -934,35 +924,30 @@ func (r *JSONRenderer) leaf(nodeType ast.NodeType, val string, node *ast.Node) {
 func (r *JSONRenderer) val(nodeType ast.NodeType , val string) {
 	val = strings.ReplaceAll(val, "\\", "\\\\")
 	val = strings.ReplaceAll(val, "\n", "\\n")
-	val = strings.ReplaceAll(val, "\"", "")
-	val = strings.ReplaceAll(val, "'", "")
+	val = strings.ReplaceAll(val, "\"", "\\\"")
+	val = strings.ReplaceAll(val, "'", "\\'")
 	// 要写入Type和Value
 	r.WriteString("\"type\":\"" + nodeType.String()[4:] + "\"" + ",")
 	r.WriteString("\"value\":\"" + val + "\"")
 }
 
-// 写入如果节点是Text
-//func (r *JSONRenderer) text(val string) {
-//	r.WriteString(",\"text\":\"" + val + "\"")
-//}
+func (r *JSONRenderer) language(nodeType ast.NodeType, val string, language string) {
+	// TODO type 节点类型，language 语言类型，value 值
+	val = strings.ReplaceAll(val, "\\", "\\\\")
+	val = strings.ReplaceAll(val, "\n", "\\n")
+	val = strings.ReplaceAll(val, "\"", "\\\"")
+	val = strings.ReplaceAll(val, "'", "\\'")
+	r.WriteString("\"type\":\"" + nodeType.String()[4:] + "\"" + ",")
+	r.WriteString("\"value\":\"" + val + "\"")
+	r.WriteString(",\"language\":\"" + language + "\"")
+}
+
+// 写入 mindmap
+func (r *JSONRenderer) mindMap(val string) {
+	r.WriteString(",\"mindmap\":\"" + val + "\"")
+}
 
 func (r *JSONRenderer) flag(node *ast.Node) {
-	//if !checkIfFlag(node.Parent.Type) {
-	//	// 父节点不是flag
-	//	r.openObj()
-	//	r.WriteString("\"flags\":\"" + node.Type.String()[4:])
-	//} else {
-	//	//	父节点是flag
-	//	r.WriteString(node.Type.String()[4:])
-	//}
-	//// 判断是不是Marker
-	////	不需要闭合的条件 --> 有一个子节点，并且子节点还是flag类型
-	////fmt.Println(node.FirstChild)
-	//if len(node.Children) == 1 && checkIfFlag(node.FirstChild.Type) {
-	//	r.WriteString("|")
-	//} else {
-	//	r.WriteString("\"")
-	//}
 	r.WriteString("\"flag\":\"" + node.Type.String()[4:]+"\"")
 }
 
@@ -971,7 +956,6 @@ func (r *JSONRenderer) openObj() {
 	r.WriteByte('{')
 }
 
-// TODO BUG 关闭对象
 func (r *JSONRenderer) closeObj(node *ast.Node) {
 	r.WriteByte('}')
 	if !r.ignore(node.Next) {
