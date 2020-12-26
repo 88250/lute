@@ -118,7 +118,7 @@ func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
 }
 
 // RenderJSON 用于渲染 JSON 格式数据
-func (lute *Lute) RenderJSON(markdown string)(json string) {
+func (lute *Lute) RenderJSON(markdown string) (json string) {
 	tree := parse.Parse("", []byte(markdown), lute.Options)
 	renderer := render.NewJSONRenderer(tree)
 	output := renderer.Render()

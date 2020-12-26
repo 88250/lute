@@ -11,7 +11,6 @@
 package render
 
 import (
-	"fmt"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"go/format"
@@ -73,7 +72,7 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
 	ret.RendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
 	ret.RendererFuncs[ast.NodeLink] = ret.renderLink
-	//ret.RendererFuncs[ast.NodeImage] = ret.renderImage
+	ret.RendererFuncs[ast.NodeImage] = ret.renderImage
 	ret.RendererFuncs[ast.NodeBang] = ret.renderBang
 	ret.RendererFuncs[ast.NodeOpenBracket] = ret.renderOpenBracket
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
@@ -90,7 +89,7 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeStrikethrough1CloseMarker] = ret.renderStrikethrough1CloseMarker
 	ret.RendererFuncs[ast.NodeStrikethrough2OpenMarker] = ret.renderStrikethrough2OpenMarker
 	ret.RendererFuncs[ast.NodeStrikethrough2CloseMarker] = ret.renderStrikethrough2CloseMarker
-	//ret.RendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
+	ret.RendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
 	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
 	ret.RendererFuncs[ast.NodeTableHead] = ret.renderTableHead
 	ret.RendererFuncs[ast.NodeTableRow] = ret.renderTableRow
@@ -99,62 +98,76 @@ func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
 	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
 	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
-	//ret.RendererFuncs[ast.NodeFootnotesDefBlock] = ret.renderFootnotesDefBlock
-	//ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
-	//ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
-	//ret.RendererFuncs[ast.NodeToC] = ret.renderToC
-	//ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
-	//ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
+	ret.RendererFuncs[ast.NodeFootnotesDefBlock] = ret.renderFootnotesDefBlock
+	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
+	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
+	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
+	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
+	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
 	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
-	//ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
-	//ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
-	//ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
-	//ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
-	//ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
-	//ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
-	//ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
-	//ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
-	//ret.RendererFuncs[ast.NodeMark] = ret.renderMark
-	//ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
-	//ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
-	//ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
-	//ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
-	//ret.RendererFuncs[ast.NodeSup] = ret.renderSup
-	//ret.RendererFuncs[ast.NodeSupOpenMarker] = ret.renderSupOpenMarker
-	//ret.RendererFuncs[ast.NodeSupCloseMarker] = ret.renderSupCloseMarker
-	//ret.RendererFuncs[ast.NodeSub] = ret.renderSub
-	//ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
-	//ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
-	//ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
-	//ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
-	//ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
-	//ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
-	//ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
-	//ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
-	//ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
-	//ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
-	//ret.RendererFuncs[ast.NodeTag] = ret.renderTag
-	//ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
-	//ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
-	//ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
-	//ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
-	//ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
-	//ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
-	//ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
-	//ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
+	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
+	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
+	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
+	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
+	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
+	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
+	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
+	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
+	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
+	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
+	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
+	ret.RendererFuncs[ast.NodeMark2OpenMarker] = ret.renderMark2OpenMarker
+	ret.RendererFuncs[ast.NodeMark2CloseMarker] = ret.renderMark2CloseMarker
+	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
+	ret.RendererFuncs[ast.NodeSupOpenMarker] = ret.renderSupOpenMarker
+	ret.RendererFuncs[ast.NodeSupCloseMarker] = ret.renderSupCloseMarker
+	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
+	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
+	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
+	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
+	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
+	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
+	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
+	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
+	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
+	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
+	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
+	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
+	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
+	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
+	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
+	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
+	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
+	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
+	ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
+	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
 }
 
-// TODO AST树核心设计概念
+// AST树核心设计概念
 // 1. 忽略根节点渲染
 // 2. 对于实际只起控制渲染效果的设为flag
 // 3. 妥善处理Marker对于树构建过程中的影响
-// TODO 4. Flag注释
-// Paragraph 新的段
+// 4. 不支持Kramdown
 
-// TODO OpenMarker处理
-// OpenMarker必定上一个节点是其类型根节点
+// ==> Flag注释
+// Paragraph 新的段
+// Emphasis 斜体
+// Strong 加粗
+// Blockquote 引用块
+// ListItem 列表项
+// Strikethrough 删除线
+// TableHead 表头
+// Table 表格
+// TableRow 表行
+// Mark 高亮
+// Sub 下标
+// Sup 上标
+// Tag 标记
+// BlockRef 块引用
+
+// OpenMarker处理
 func isOpenMarker(node *ast.Node) bool {
 	switch node.Type {
 	case ast.NodeCodeBlockFenceOpenMarker,
@@ -178,7 +191,7 @@ func isOpenMarker(node *ast.Node) bool {
 	return false
 }
 
-// TODO CloseMarker处理
+// CloseMarker处理
 func isCloseMarker(node *ast.Node) bool {
 	switch node.Type {
 	case ast.NodeCodeBlockFenceCloseMarker,
@@ -205,7 +218,20 @@ func isCloseMarker(node *ast.Node) bool {
 // 是否是标识
 func isFlag(node *ast.Node) bool {
 	switch node.Type {
-	case ast.NodeParagraph:
+	case ast.NodeParagraph,
+	ast.NodeEmphasis,
+	ast.NodeStrong,
+	ast.NodeBlockquote,
+	ast.NodeListItem,
+	ast.NodeStrikethrough,
+	ast.NodeTableHead,
+	ast.NodeTable,
+	ast.NodeTableRow,
+	ast.NodeMark,
+	ast.NodeSub,
+	ast.NodeSup,
+	ast.NodeTag,
+	ast.NodeBlockRef:
 		return true
 	}
 	return false
@@ -226,7 +252,6 @@ func (r *JSONRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 	if entering {
 		r.openObj()
 		r.flag(node)
-		// TODO 判断下一个节点是不是Text
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -235,7 +260,7 @@ func (r *JSONRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-// 处理文本 - "text"属性
+// 处理文本
 func (r *JSONRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
@@ -486,7 +511,7 @@ func (r *JSONRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 	return ast.WalkContinue
 }
 
-// TODO 修复可能的BUG
+// flag ListItem标识
 func (r *JSONRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
@@ -508,7 +533,7 @@ func (r *JSONRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.Wa
 }
 
 
-// TODO 硬换行，与InlineHTML冲突
+// 硬换行
 func (r *JSONRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf(node.Type, "br", node)
@@ -548,47 +573,23 @@ func (r *JSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
 		destTokens = r.Tree.Context.LinkPath(destTokens)
-		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			r.val(node.Type, util.BytesToStr(title.Tokens) + "|" + util.BytesToStr(destTokens))
-		} else {
-			r.val(node.Type, util.BytesToStr(destTokens))
-		}
+		r.val(node.Type, util.BytesToStr(destTokens))
 	} else {
 		r.closeObj(node)
 	}
 	return ast.WalkContinue
 }
 
-// TODO 处理图片
+// 处理图片
 func (r *JSONRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
-	//// TODO 处理图片渲染
-	//if entering {
-	//	r.openObj()
-	//	if 0 == r.DisableTags {
-	//		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-	//		// 图片的地址
-	//		destTokens = r.Tree.Context.LinkPath(destTokens)
-	//	}
-	//	r.DisableTags++
-	//	return ast.WalkContinue
-	//} else {
-	//	r.closeObj(node)
-	//}
-	//// 获取alt?
-	////
-	//r.DisableTags--
-	//if 0 == r.DisableTags {
-	//	if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-	//		// title的值
-	//		//fmt.Println(util.BytesToStr(title.Tokens))
-	//		//r.Write(html.EscapeHTML(title.Tokens))
-	//	}
-	//	ial := r.NodeAttrsStr(node)
-	//	if "" != ial {
-	//		fmt.Println(ial)
-	//		//r.WriteString(" " + ial)
-	//	}
-	//}
+	if entering {
+		r.openObj()
+		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
+		destTokens = r.Tree.Context.LinkPath(destTokens)
+		r.val(node.Type, util.BytesToStr(destTokens))
+	} else {
+		r.closeObj(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -640,7 +641,7 @@ func (r *JSONRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkSta
 		} else {
 			tokens = node.Tokens
 		}
-		r.WriteString(",\"text\":" + util.BytesToStr(tokens) + "\"")
+		r.WriteString(",\"title\":\"" + util.BytesToStr(tokens) + "\"")
 	}
 	return ast.WalkContinue
 }
@@ -671,6 +672,22 @@ func (r *JSONRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering b
 }
 
 func (r *JSONRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		check := "false"
+		if node.TaskListItemChecked {
+			check = "true"
+		}
+		r.val(node.Type, check)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -758,6 +775,19 @@ func (r *JSONRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus
 	return ast.WalkContinue
 }
 
+func (r *JSONRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+// TODO 不支持脚注
+func (r *JSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
 // HTML实体符号处理
 func (r *JSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
@@ -771,148 +801,248 @@ func (r *JSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-// TODO https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
-//func (r *JSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
-//	if entering {
-//		if nil == node.Previous {
-//			return ast.WalkContinue
-//		}
-//		id := r.NodeID(node.Previous)
-//		if util.IsDocIAL(node.Tokens) {
-//			id = r.Tree.ID
-//		}
-//		r.leaf(node.Type, "Block IAL\n{: "+id+"}", node)
-//	}
-//	return ast.WalkContinue
-//}
-//
-//func (r *JSONRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
-//	if entering {
-//		if nil == node.Previous {
-//			return ast.WalkContinue
-//		}
-//		id := r.NodeID(node.Previous)
-//		r.leaf(node.Type,"Span IAL\n{: "+id+"}", node)
-//	}
-//	return ast.WalkContinue
-//}
-
-// TODO Mark是指？
-func (r *JSONRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+// Yaml处理
+func (r *JSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		fmt.Println(node.Text())
-		r.leaf(node.Type, "Mark\nmark", node)
+		r.openObj()
+	} else {
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r JSONRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+func (r JSONRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.val(ast.NodeYamlFrontMatter, util.BytesToStr(node.Tokens))
 	}
 	return ast.WalkSkipChildren
 }
+func (r JSONRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
 
-// TODO 处理上下角标
+func (r *JSONRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.val(ast.NodeBackslash, util.BytesToStr(node.Tokens))
+	} else {
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
+	// 忽略大纲渲染
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.flag(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
 func (r *JSONRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.leaf(node.Type, "Sup\nsup", node)
+		r.openObj()
+		r.flag(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
 	}
-	return ast.WalkSkipChildren
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+func (r *JSONRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.leaf(node.Type, "Sub\nsub", node)
+		r.openObj()
+		r.flag(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
 	}
-	return ast.WalkSkipChildren
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.leaf(node.Type,"BlockQueryEmbed\n!{{script}}", node)
+		r.openObj()
+		r.val(ast.NodeBlockQueryEmbed, util.BytesToStr(node.Tokens))
+	} else {
+		r.closeObj(node)
 	}
-	return ast.WalkSkipChildren
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.leaf(node.Type,"BlockEmbed\n!((id))", node)
+		r.openObj()
+	} else {
+		r.closeObj(node)
 	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockEmbedID(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.val(ast.NodeBlockEmbed, util.BytesToStr(node.Tokens))
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.flag(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *JSONRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *JSONRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *JSONRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkSkipChildren
+}
+
+func (r *JSONRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkSkipChildren
 }
 
 func (r *JSONRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.leaf(node.Type,"BlockRef\n((id))", node)
+		r.openObj()
+		r.flag(node)
+	} else {
+		r.closeObj(node)
 	}
-	return ast.WalkSkipChildren
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+	}
+	return ast.WalkContinue
 }
 
 func (r *JSONRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *JSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf(node.Type, "Front Matter\nYAML", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf(node.Type, "Blackslash\ndiv", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf(node.Type, "ToC\ndiv", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf(node.Type, "Footnotes Ref\ndiv", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val(node.Type, node.Text())
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-// TODO HTML块
 func (r *JSONRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.leaf(node.Type, "HTML Block\n", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *JSONRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
 		r.openObj()
-		check := "false"
-		if node.TaskListItemChecked {
-			check = "true"
+		tokens := node.Tokens
+		if r.Option.Sanitize {
+			tokens = sanitize(tokens)
 		}
-		// 返回勾选情况
-		r.val(node.Type, check)
-		r.openChildren(node)
+		r.val(node.Type, util.BytesToStr(tokens))
 	} else {
-		r.closeChildren(node)
 		r.closeObj(node)
 	}
-	return ast.WalkContinue
+	return ast.WalkSkipChildren
 }
 
 func (r *JSONRenderer) leaf(nodeType ast.NodeType, val string, node *ast.Node) {
@@ -932,7 +1062,6 @@ func (r *JSONRenderer) val(nodeType ast.NodeType , val string) {
 }
 
 func (r *JSONRenderer) language(nodeType ast.NodeType, val string, language string) {
-	// TODO type 节点类型，language 语言类型，value 值
 	val = strings.ReplaceAll(val, "\\", "\\\\")
 	val = strings.ReplaceAll(val, "\n", "\\n")
 	val = strings.ReplaceAll(val, "\"", "\\\"")
