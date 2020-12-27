@@ -222,6 +222,9 @@ func (r *FormatRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast
 }
 
 func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if nil != node.Previous && ast.NodeListItem == node.Previous.Type {
+		return ast.WalkContinue
+	}
 	if entering {
 		r.Newline()
 		if r.Options.KramdownIAL {
@@ -1274,7 +1277,6 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		if nil != node.Next && ast.NodeKramdownBlockIAL == node.Next.Type {
 			liIAL := node.Next
 			r.Write(liIAL.Tokens)
-			liIAL.Unlink()
 		}
 		if nil != node.FirstChild && ast.NodeList == node.FirstChild.Type {
 			r.Newline()
