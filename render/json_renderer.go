@@ -779,7 +779,7 @@ func (r *JSONRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) as
 	return ast.WalkContinue
 }
 
-// TODO 不支持脚注
+// 不支持脚注
 func (r *JSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -992,6 +992,7 @@ func (r *JSONRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool
 	return ast.WalkSkipChildren
 }
 
+// 不支持链接引用
 func (r *JSONRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkSkipChildren
 }

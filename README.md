@@ -318,6 +318,92 @@ func main() {
 
 ![Vditor](https://b3logfile.com/file/2020/02/%E6%88%AA%E5%9B%BE%E4%B8%93%E7%94%A8-ef21ef12.png)
 
+- 关于`lute.JSONRenderer()`的使用
+
+```typescript
+// JSONRenderer的类型
+type JSONRendererType = Array<JSONRendererItemType>
+
+// Flag节点
+type FlagType = |
+    | "Paragraph"
+    | "Emphasis"
+    | "Strong"
+    | "Blockquote"
+    | "ListItem"
+    | "Strikethrough"
+    | "TableHead"
+    | "Table"
+    | "TableRow"
+    | "Mark"
+    | "Sub"
+    | "Sup"
+    | "Tag"
+    | "BlockRef"
+
+// 非Flag节点
+type NotFlagType = |
+    | "Heading"
+    | "ThematicBreak"
+    | "List"
+    | "HTMLBlock"
+    | "InlineHTML"
+    | "CodeBlock"
+    | "Text"
+    | "CodeSpan"
+    | "HardBreak"     
+    | "SoftBreak"
+    | "Link"
+    | "Image"
+    | "HTMLEntity"
+    | "TaskListItemMarker"
+    | "TableCell"
+    | "EmojiUnicode"
+    | "EmojiImg"
+    | "MathBlock"
+    | "InlineMath"
+    | "YamlFrontMatter"
+    | "Backslash"
+    | "BlockEmbed"
+    | "BlockQueryEmbed"
+
+interface JSONRendererItemType {
+    type?: string
+    value?: string
+    flag?: string
+    title?: string
+    language?: string
+    children?: Array<JSONRendererItemType>
+}
+
+// 节点分为四类：常规节点、flag节点、链接节点、代码块节点
+interface NormalNodeType {
+    type: string
+    value: string
+    children?: Array<JSONRendererItemType>
+}
+
+interface FlagNodeType {
+    flag: string
+    children?: Array<JSONRendererItemType>
+}
+
+// 链接或者图片
+interface LinkNodeType {
+    type: string
+    value: string
+    title: string
+    children?: Array<JSONRendererItemType>
+}
+
+interface CodeBlockType {
+    type: string
+    value: string
+    language: string
+    mindmap?: string // 如果language为mingmap
+}
+```
+
 一些细节：
 
 1. lute.js 没有内置语法高亮特性
