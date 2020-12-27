@@ -318,7 +318,7 @@ func main() {
 
 ![Vditor](https://b3logfile.com/file/2020/02/%E6%88%AA%E5%9B%BE%E4%B8%93%E7%94%A8-ef21ef12.png)
 
-- 关于`lute.JSONRenderer()`的使用
+- 关于`lute.RenderJSON()`的使用
 
 ```typescript
 // JSONRenderer的类型
@@ -373,6 +373,7 @@ interface JSONRendererItemType {
     flag?: string
     title?: string
     language?: string
+    mindmap?: string
     children?: Array<JSONRendererItemType>
 }
 
