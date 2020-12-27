@@ -208,6 +208,13 @@ func FormatNode(node *ast.Node, parseOptions *parse.Options, renderOptions *rend
 	return strings.TrimSpace(renderer.Writer.String())
 }
 
+// Tree2HTML 使用指定的 options 渲染 tree 为标准 HTML。
+func (lute *Lute) Tree2HTML(tree *parse.Tree, options *render.Options) string {
+	renderer := render.NewHtmlRenderer(tree, options)
+	output := renderer.Render()
+	return string(output)
+}
+
 // ParseOption 描述了解析选项设置函数签名。
 type ParseOption func(lute *Lute)
 
