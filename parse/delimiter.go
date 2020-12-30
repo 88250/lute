@@ -334,12 +334,16 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 
 	afterIsWhitespace := lex.IsUnicodeWhitespace(tokenAfter)
 	afterIsPunct := unicode.IsPunct(tokenAfter) || unicode.IsSymbol(tokenAfter)
-	if (lex.ItemAsterisk == token && '~' == tokenAfter) || (lex.ItemTilde == token && '*' == tokenAfter) {
+	if (lex.ItemAsterisk == token && '~' == tokenAfter) || (lex.ItemTilde == token && '*' == tokenAfter) ||
+		(lex.ItemCaret == token && ('+' == tokenAfter || '-' == tokenAfter)) ||
+		(lex.ItemTilde == token && ('+' == tokenAfter || '-' == tokenAfter)) {
 		afterIsPunct = false
 	}
 	beforeIsWhitespace := lex.IsUnicodeWhitespace(tokenBefore)
 	beforeIsPunct := unicode.IsPunct(tokenBefore) || unicode.IsSymbol(tokenBefore)
-	if (lex.ItemAsterisk == token && '~' == tokenBefore) || (lex.ItemTilde == token && '*' == tokenBefore) {
+	if (lex.ItemAsterisk == token && '~' == tokenBefore) || (lex.ItemTilde == token && '*' == tokenBefore) ||
+		(lex.ItemCaret == token && ('+' == tokenBefore || '-' == tokenBefore)) ||
+		(lex.ItemTilde == token && ('+' == tokenBefore || '-' == tokenBefore)) {
 		beforeIsPunct = false
 	}
 
@@ -350,10 +354,16 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
 	} else {
-		if lex.ItemEqual == token && 2 != delimitersCount { // ==Mark== 标记使用两个等号
+		if t.Context.ParseOption.Mark && lex.ItemEqual == token && 2 != delimitersCount { // ==Mark== 标记使用两个等号
 			canOpen = false
 			canClose = false
-		} else if lex.ItemCrosshatch == token && 1 != delimitersCount { // #Tag# 标记使用一个井号
+		} else if t.Context.ParseOption.Tag && lex.ItemCrosshatch == token && 1 != delimitersCount { // #Tag# 标记使用一个井号
+			canOpen = false
+			canClose = false
+		} else if t.Context.ParseOption.Sup && lex.ItemCaret == token && 1 != delimitersCount { // ^Sup^ 标记使用一个 ^
+			canOpen = false
+			canClose = false
+		} else if t.Context.ParseOption.Sub && lex.ItemTilde == token && 1 != delimitersCount { // ~Sub~ 标记使用一个 ~
 			canOpen = false
 			canClose = false
 		} else {

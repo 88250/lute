@@ -18,6 +18,11 @@ import (
 
 var supsubTests = []parseTest{
 
+	{"9", "foo~-bar~baz", "<p>foo<sub>-bar</sub>baz</p>\n"},
+	{"8", "foo~-~", "<p>foo<sub>-</sub></p>\n"},
+	{"7", "foo~+~", "<p>foo<sub>+</sub></p>\n"},
+	{"6", "foo^-^", "<p>foo<sup>-</sup></p>\n"},
+	{"5", "foo^+^", "<p>foo<sup>+</sup></p>\n"},
 	{"4", "foo^b~ar^ba~z", "<p>foo<sup>b~ar</sup>ba~z</p>\n"},
 	{"3", "foo^barbaz", "<p>foo^barbaz</p>\n"},
 	{"2", "foo*^bar^*baz", "<p>foo*<sup>bar</sup>*baz</p>\n"},
