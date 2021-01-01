@@ -291,7 +291,6 @@ type Options struct {
 }
 
 func NewOptions() *Options {
-	emojis, emoji := NewEmojis()
 	return &Options{
 		GFMTable:         true,
 		GFMTaskListItem:  true,
@@ -299,8 +298,8 @@ func NewOptions() *Options {
 		GFMAutoLink:      true,
 		Footnotes:        true,
 		Emoji:            true,
-		AliasEmoji:       emojis,
-		EmojiAlias:       emoji,
+		AliasEmoji:       EmojiAliasUnicode,
+		EmojiAlias:       EmojiUnicodeAlias,
 		EmojiSite:        "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
 		YamlFrontMatter:  true,
 		BlockRef:         false,

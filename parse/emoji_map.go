@@ -10,26 +10,16 @@
 
 package parse
 
-func NewEmojis() (emojiAlias, aliasEmoji map[string]string) {
-	emojiAlias = make(map[string]string, len(aliasUnicodeEmojiMap))
-	aliasEmoji = make(map[string]string, len(aliasUnicodeEmojiMap))
-	for k, v := range aliasUnicodeEmojiMap {
-		emojiAlias[k] = v
-		aliasEmoji[v] = k
-	}
-	return
-}
-
-var unicodeAliasEmojiMap map[string]string
+var EmojiUnicodeAlias map[string]string
 
 func init() {
-	unicodeAliasEmojiMap = make(map[string]string, len(aliasUnicodeEmojiMap))
-	for k, v := range aliasUnicodeEmojiMap {
-		unicodeAliasEmojiMap[v] = k
+	EmojiUnicodeAlias = make(map[string]string, len(EmojiAliasUnicode))
+	for k, v := range EmojiAliasUnicode {
+		EmojiUnicodeAlias[v] = k
 	}
 }
 
-var aliasUnicodeEmojiMap = map[string]string{
+var EmojiAliasUnicode = map[string]string{
 	"+1":                                   "👍",
 	"-1":                                   "👎",
 	"100":                                  "💯",
