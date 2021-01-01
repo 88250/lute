@@ -1652,24 +1652,19 @@ func (r *VditorIRBlockRenderer) renderBlockquoteMarker(node *ast.Node, entering 
 func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		text := r.Text(node)
-		headingID := node.ChildByType(ast.NodeHeadingID)
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
-		if strings.Contains(text, util.Caret) || (nil != headingID && bytes.Contains(headingID.Tokens, util.CaretTokens)) {
+		if strings.Contains(text, util.Caret) {
 			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
 		} else {
 			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node\"")
 		}
 
 		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\" " + r.NodeAttrsStr(node) + " data-type=\"h\"")
-
-		var id string
-		if nil != headingID {
-			id = string(headingID.Tokens)
+		if id := node.IALAttr("id");"" != id {
+			r.WriteString(" id=\"" + id + "\"")
+		} else {
+			r.WriteString(" id=\"ir-" + HeadingID(node) + "\"")
 		}
-		if "" == id {
-			id = HeadingID(node)
-		}
-		r.WriteString(" id=\"ir-" + id + "\"")
 		if !node.HeadingSetext {
 			r.WriteString(" data-marker=\"#\">")
 		} else {
