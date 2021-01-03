@@ -34,11 +34,6 @@ func (t *Tree) parseBlocks() {
 				}
 				line = line[len(util.CaretTokens):]
 			}
-			ln := []rune(string(line))
-			if 4 < len(ln) && lex.IsDigit(byte(ln[0])) && ('、' == ln[1] || '）' == ln[1]) {
-				// 列表标记符自动优化 https://github.com/Vanessa219/vditor/issues/68
-				line = []byte(string(ln[0]) + ". " + string(ln[2:]))
-			}
 		}
 
 		t.incorporateLine(line)
