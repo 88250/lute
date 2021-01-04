@@ -117,15 +117,6 @@ func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
 	return
 }
 
-// RenderJSON 用于渲染 JSON 格式数据
-func (lute *Lute) RenderJSON(markdown string) (json string) {
-	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewJSONRenderer(tree)
-	output := renderer.Render()
-	json = string(output)
-	return
-}
-
 // HTML2Md 用于将 HTML 转换为 markdown。
 func (lute *Lute) HTML2Md(html string) (markdown string) {
 	markdown, err := lute.HTML2Markdown(html)

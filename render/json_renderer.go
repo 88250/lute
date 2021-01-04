@@ -26,7 +26,7 @@ type JSONRenderer struct {
 	*BaseRenderer
 }
 
-// NewEChartsJSONRenderer 创建一个 JSON 渲染器。
+// NewJSONRenderer 创建一个 JSON 渲染器。
 func NewJSONRenderer(tree *parse.Tree) Renderer {
 	ret := &JSONRenderer{NewBaseRenderer(tree)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument

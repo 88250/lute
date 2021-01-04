@@ -166,6 +166,15 @@ func (lute *Lute) HTML2Text(dom string) string {
 	return tree.Root.Text()
 }
 
+// RenderJSON 用于渲染 JSON 格式数据
+func (lute *Lute) RenderJSON(markdown string) (json string) {
+	tree := parse.Parse("", []byte(markdown), lute.Options)
+	renderer := render.NewJSONRenderer(tree)
+	output := renderer.Render()
+	json = string(output)
+	return
+}
+
 // Space 用于在 text 中的中西文之间插入空格。
 func (lute *Lute) Space(text string) string {
 	return render.Space0(text)
