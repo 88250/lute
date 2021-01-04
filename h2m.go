@@ -12,14 +12,14 @@ package lute
 
 import (
 	"bytes"
-	"strings"
-
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
+	"strings"
+	"unicode"
 )
 
 // HTML2Markdown 将 HTML 转换为 Markdown。
@@ -432,9 +432,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Em, atom.I:
 		marker := "*"
 		node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: util.StrToBytes(marker)})
+		appendSpace(n, tree, lute)
 	case atom.Strong, atom.B:
 		marker := "**"
 		node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: util.StrToBytes(marker)})
+		appendSpace(n, tree, lute)
 	case atom.A:
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
@@ -448,14 +450,29 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Del, atom.S, atom.Strike:
 		marker := "~"
 		node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: util.StrToBytes(marker)})
+		appendSpace(n, tree, lute)
 	case atom.Mark:
 		marker := "=="
 		node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: util.StrToBytes(marker)})
+		appendSpace(n, tree, lute)
 	case atom.Sup:
 		node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
+		appendSpace(n, tree, lute)
 	case atom.Sub:
 		node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
+		appendSpace(n, tree, lute)
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
+	}
+}
+
+func appendSpace(n *html.Node, tree *parse.Tree, lute *Lute) {
+	if nil != n.NextSibling {
+		if nextText := lute.domText(n.NextSibling); "" != nextText {
+			if runes := []rune(nextText); !unicode.IsSpace(runes[0]) {
+				space := &ast.Node{Type: ast.NodeText, Tokens: []byte(" ")}
+				tree.Context.Tip.InsertAfter(space)
+			}
+		}
 	}
 }

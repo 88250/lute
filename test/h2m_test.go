@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"40", "<!--StartFragment--><strong>foo.</strong><span>bar</span><!--EndFragment-->", "**foo.** bar\n"},
 	{"39", "<!--StartFragment--><p><strong>Js版</strong></p><pre>&lt;script&gt;\n&nbsp;&nbsp;&nbsp;&nbsp; test = \"你好abc\"\n&nbsp;&nbsp;&nbsp;&nbsp; str = \"\"\n&nbsp;&nbsp;&nbsp;&nbsp; for( i=0;&nbsp;&nbsp;&nbsp; i&lt;test.length; i++ )\n&nbsp;&nbsp;&nbsp;&nbsp; {\n&nbsp;&nbsp;&nbsp;&nbsp;  temp = test.charCodeAt(i).toString(16);\n&nbsp;&nbsp;&nbsp;&nbsp;  str&nbsp;&nbsp;&nbsp; += \"\\\\u\"+ new Array(5-String(temp).length).join(\"0\") +temp;\n&nbsp;&nbsp;&nbsp;&nbsp; }\n&nbsp;&nbsp;&nbsp;&nbsp; document.write (str)\n&lt;/script&gt;</pre><br><!--EndFragment-->", "**Js 版**\n\n```\n<script>\n\u00a0\u00a0\u00a0\u00a0 test = \"你好abc\"\n\u00a0\u00a0\u00a0\u00a0 str = \"\"\n\u00a0\u00a0\u00a0\u00a0 for( i=0;\u00a0\u00a0\u00a0 i<test.length; i++ )\n\u00a0\u00a0\u00a0\u00a0 {\n\u00a0\u00a0\u00a0\u00a0  temp = test.charCodeAt(i).toString(16);\n\u00a0\u00a0\u00a0\u00a0  str\u00a0\u00a0\u00a0 += \"\\\\u\"+ new Array(5-String(temp).length).join(\"0\") +temp;\n\u00a0\u00a0\u00a0\u00a0 }\n\u00a0\u00a0\u00a0\u00a0 document.write (str)\n</script>\n```\n"},
 	{"38", "<!--StartFragment--><table width=\"778\"><tbody><tr><td class=\"key\">ú</td><td>&amp;uacute;</td><td>&amp;#250;</td><td class=\"key\">û</td><td>&amp;ucirc;</td><td>&amp;#251;</td><td class=\"key\">ü</td><td>&amp;uuml;</td><td>&amp;#252;</td><td class=\"key\">ý</td><td>&amp;yacute;</td><td>&amp;#253;</td><td class=\"key\">þ</td><td>&amp;thorn;</td><td>&amp;#254;</td></tr><tr><td class=\"key\">ÿ</td><td>&amp;yuml;</td></tr></tbody></table><!--EndFragment-->\n", "| ú | &uacute; | &#250; | û | &ucirc; | &#251; | ü | &uuml; | &#252; | ý | &yacute; | &#253; | þ | &thorn; | &#254; |\n| ---- | ---------- | -------- | ---- | --------- | -------- | ---- | -------- | -------- | ---- | ---------- | -------- | ---- | --------- | -------- |\n| ÿ | &yuml;   |\n"},
 	{"37", "<!--StartFragment--><table width=\"400\"><tbody><tr><th>显示</th><th>说明</th><th>实体名称</th><th>实体编号</th></tr><tr><td class=\"key\"></td><td>半方大的空白</td><td>&amp;ensp;</td><td>&amp;#8194;</td></tr><tr></tr><tr><td class=\"key\"></td><td>全方大的空白</td><td>&amp;emsp;</td><td>&amp;#8195;</td></tr><tr></tr><tr><td class=\"key\"></td><td>不断行的空白格</td><td>&amp;nbsp;</td><td>&amp;#160;</td></tr><tr><td class=\"key\">&lt;</td><td>小于</td><td>&amp;lt;</td><td>&amp;#60;</td></tr><tr><td class=\"key\">&gt;</td><td>大于</td><td>&amp;gt;</td><td>&amp;#62;</td></tr><tr><td class=\"key\">&amp;</td><td>&amp;符号</td><td>&amp;amp;</td><td>&amp;#38;</td></tr><tr><td class=\"key\">\"</td><td>双引号</td><td>&amp;quot;</td><td>&amp;#34;</td></tr><tr><td class=\"key\">©</td><td>版权</td><td>&amp;copy;</td><td>&amp;#169;</td></tr><tr><td class=\"key\">®</td><td>已注册商标</td><td>&amp;reg;</td><td>&amp;#174;</td></tr><tr><td class=\"key\">™</td><td>商标（美国）</td><td>™</td><td>&amp;#8482;</td></tr><tr></tr><tr><td class=\"key\">×</td><td>乘号</td><td>&amp;times;</td><td>&amp;#215;</td></tr><tr><td class=\"key\">÷</td><td>除号</td><td>&amp;divide;</td><td>&amp;#247;</td></tr></tbody></table><!--EndFragment-->\n", "| 显示 | 说明                | 实体名称 | 实体编号 |\n| -------- | ----------------------- | -------------- | -------------- |\n|        | 半方大的空白    | &ensp;       | &#8194;      |\n|        | 全方大的空白    | &emsp;       | &#8195;      |\n|        | 不断行的空白格 | &nbsp;       | &#160;       |\n| <      | 小于                | &lt;         | &#60;        |\n| >      | 大于                | &gt;         | &#62;        |\n| &      | &符号               | &amp;        | &#38;        |\n| \"      | 双引号             | &quot;       | &#34;        |\n| ©     | 版权                | &copy;       | &#169;       |\n| ®     | 已注册商标       | &reg;        | &#174;       |\n| ™    | 商标（美国）    | ™          | &#8482;      |\n| ×     | 乘号                | &times;      | &#215;       |\n| ÷     | 除号                | &divide;     | &#247;       |\n"},
@@ -34,40 +35,40 @@ var html2MdTests = []parseTest{
 <body>
 	<table>
 		<tr>
-       	<th>Month</th>
-           <th>Savings</th>
+      	<th>Month</th>
+          <th>Savings</th>
 		</tr>
 		<tr>
-       	<td>January</td>
-           <td>$100</td>
+      	<td>January</td>
+          <td>$100</td>
 		</tr>
 		<tr>
-       	<td>February</td>
-           <td>$80</td>
+      	<td>February</td>
+          <td>$80</td>
 		</tr>
 	</table>
 </body>
 </html>`, "| Month    | Savings |\n| ---------- | --------- |\n| January  | $100    |\n| February | $80     |\n"},
 	{"27", `<html>
 <body>
-     <table>
-             <thead>
-                     <tr>
-                             <th>Month</th>
-                             <th>Savings</th>
-                     </tr>
+    <table>
+            <thead>
+                    <tr>
+                            <th>Month</th>
+                            <th>Savings</th>
+                    </tr>
 				</thead>
-             <tbody>
-                     <tr>
-                             <td>January</td>
-                             <td>$100</td>
-                     </tr>
-                     <tr>
-                             <td>February</td>
-                             <td>$80</td>
-                     </tr>
-             </tbody>
-     </table>
+            <tbody>
+                    <tr>
+                            <td>January</td>
+                            <td>$100</td>
+                    </tr>
+                    <tr>
+                            <td>February</td>
+                            <td>$80</td>
+                    </tr>
+            </tbody>
+    </table>
 </body>
 </html>`, "| Month    | Savings |\n| ---------- | --------- |\n| January  | $100    |\n| February | $80     |\n"},
 	{"26", "<table class=\"markdown-reference\"><thead><tr><th>Type</th><th class=\"second-example\">Or</th><th>… to Get</th></tr></thead><tbody><tr><td class=\"preformatted\">*Italic*</td><td class=\"preformatted second-example\">_Italic_</td><td><em>Italic</em></td></tr><tr><td class=\"preformatted\">**Bold**</td><td class=\"preformatted second-example\">__Bold__</td><td><strong>Bold</strong></td></tr><tr><td class=\"preformatted\"># Heading 1</td><td class=\"preformatted second-example\">Heading 1<br>=========</td><td><h1 class=\"smaller-h1\">Heading 1</h1></td></tr><tr><td class=\"preformatted\">## Heading 2</td><td class=\"preformatted second-example\">Heading 2<br>---------</td><td><h2 class=\"smaller-h2\">Heading 2</h2></td></tr><tr><td class=\"preformatted\">[Link](http://a.com)</td><td class=\"preformatted second-example\">[Link][1]<br>⋮<br>[1]: http://b.org</td><td><a href=\"https://commonmark.org/\">Link</a></td></tr><tr><td class=\"preformatted\">![Image](http://url/a.png)</td><td class=\"preformatted second-example\">![Image][1]<br>⋮<br>[1]: http://url/b.jpg</td><td><img src=\"https://commonmark.org/help/images/favicon.png\" width=\"36\" height=\"36\" alt=\"Markdown\"></td></tr><tr><td class=\"preformatted\">&gt; Blockquote</td><td class=\"preformatted second-example\">&nbsp;</td><td><blockquote>Blockquote</blockquote></td></tr><tr><td class=\"preformatted\"><p>* List<br>* List<br>* List</p></td><td class=\"preformatted second-example\"><p>- List<br>- List<br>- List<br></p></td><td><ul><li>List</li><li>List</li><li>List</li></ul></td></tr></tbody></table>", "| Type                       | Or                                    | … to Get                                                |\n| ---------------------------- | --------------------------------------- | ----------------------------------------------------------- |\n| *Italic*                   | _Italic_                              | *Italic*                                                |\n| **Bold**                   | __Bold__                              | **Bold**                                            |\n| # Heading 1                | Heading 1<br/>=========                   | # Heading 1                                              |\n| ## Heading 2               | Heading 2<br/>---------                   | ## Heading 2                                             |\n| [Link](http://a.com)       | [Link][1]<br/>⋮<br/>[1]: http://b.org       | [Link](https://commonmark.org/)                              |\n| ![Image](http://url/a.png) | ![Image][1]<br/>⋮<br/>[1]: http://url/b.jpg | ![Markdown](https://commonmark.org/help/images/favicon.png) |\n| > Blockquote               |                                       | > Blockquote                                     |\n| * List<br/>* List<br/>* List      | - List<br/>- List<br/>- List<br/>                | * List* List* List                                   |\n"},
