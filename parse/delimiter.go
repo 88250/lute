@@ -366,6 +366,10 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		} else if t.Context.ParseOption.Sub && lex.ItemTilde == token && 1 != delimitersCount { // ~Sub~ 标记使用一个 ~
 			canOpen = false
 			canClose = false
+			if t.Context.ParseOption.GFMStrikethrough && 2 == delimitersCount {
+				canOpen = isLeftFlanking
+				canClose = isRightFlanking
+			}
 		} else {
 			canOpen = isLeftFlanking
 			canClose = isRightFlanking
