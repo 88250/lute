@@ -947,6 +947,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			} else if ast.NodeKramdownBlockIAL == t.Root.FirstChild.Type { // Span IAL 单独存在时会被解析为 Block IAL
 				t.Root.FirstChild.Type = ast.NodeKramdownSpanIAL
 				node = t.Root.FirstChild
+				node.Tokens = bytes.TrimSpace(node.Tokens)
 				next := t.Root.FirstChild.Next
 				tree.Context.Tip.AppendChild(node)
 				appendNextToTip(next, tree)
