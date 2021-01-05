@@ -147,6 +147,16 @@ func randStr(length int) string {
 	return string(b)
 }
 
+func (n *Node) RemoveIALAttr(name string) {
+	tmp := n.KramdownIAL[0:]
+	for _, kv := range n.KramdownIAL {
+		if name != kv[0] {
+			tmp = append(tmp, kv)
+		}
+	}
+	n.KramdownIAL = tmp
+}
+
 func (n *Node) SetIALAttr(name, value string) {
 	for _, kv := range n.KramdownIAL {
 		if name == kv[0] {
