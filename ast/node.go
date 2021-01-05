@@ -148,7 +148,7 @@ func randStr(length int) string {
 }
 
 func (n *Node) RemoveIALAttr(name string) {
-	tmp := n.KramdownIAL[0:]
+	tmp := n.KramdownIAL[:0]
 	for _, kv := range n.KramdownIAL {
 		if name != kv[0] {
 			tmp = append(tmp, kv)
