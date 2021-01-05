@@ -970,6 +970,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
 				appendNextToTip(next, tree)
+				if nil != t.Root.FirstChild.Next {
+					tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
+					nextBlock := t.Root.FirstChild.Next
+					tree.Context.Tip.InsertAfter(nextBlock)
+					tree.Context.Tip = nextBlock
+				}
 				return
 			}
 			node.Type = ast.NodeText
