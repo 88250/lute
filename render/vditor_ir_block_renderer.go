@@ -244,12 +244,6 @@ func (r *VditorIRBlockRenderer) renderKramdownBlockIAL(node *ast.Node, entering 
 }
 
 func (r *VditorIRBlockRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.renderSpanNode(node)
-		r.Tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
-		r.Write(node.Tokens)
-		r.WriteString("</span></span>")
-	}
 	return ast.WalkContinue
 }
 
@@ -1242,7 +1236,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		r.Writer.Write(imgBuf)
 
 		r.Tag("span", [][]string{{"class", "vditor-ir__drag"}}, false)
-		r.Tag("/span", nil ,false)
+		r.Tag("/span", nil, false)
 
 		if renderFigure {
 			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
@@ -1876,8 +1870,6 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "backslash"})
 	case ast.NodeInlineHTML:
 		attrs = append(attrs, []string{"data-type", "html-inline"})
-	case ast.NodeKramdownSpanIAL:
-		attrs = append(attrs, []string{"data-type", "span-ial"})
 	case ast.NodeBlockQueryEmbedScript:
 		attrs = append(attrs, []string{"data-type", "block-query-embed-script"})
 		attrs = append(attrs, []string{"class", "vditor-ir__marker vditor-ir__marker--script"})

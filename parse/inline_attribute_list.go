@@ -84,7 +84,7 @@ func (context *Context) parseKramdownBlockIAL(tokens []byte) (ret [][]string) {
 }
 
 func (context *Context) parseKramdownSpanIAL(tokens []byte) (pos int, ret [][]string) {
-	pos = bytes.Index(tokens, []byte("}"))
+	pos = bytes.Index(tokens, closeCurlyBrace)
 	if curlyBracesStart := bytes.Index(tokens, []byte("{:")); 0 == curlyBracesStart && curlyBracesStart+2 < pos {
 		tokens = tokens[curlyBracesStart+2:]
 		curlyBracesEnd := bytes.Index(tokens, closeCurlyBrace)
@@ -92,7 +92,7 @@ func (context *Context) parseKramdownSpanIAL(tokens []byte) (pos int, ret [][]st
 			return
 		}
 
-		tokens = tokens[:pos]
+		tokens = tokens[:curlyBracesEnd]
 		for {
 			valid, remains, attr, name, val := context.Tree.parseTagAttr(tokens)
 			if !valid {
