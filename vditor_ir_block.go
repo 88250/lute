@@ -943,6 +943,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				next := inlineNode.Next
 				tree.Context.Tip.AppendChild(node)
 				appendNextToTip(next, tree)
+				style := lute.domAttrValue(n.FirstChild.NextSibling, "style")
+				if "" != style {
+					node.SetIALAttr("style", style)
+					node.KramdownIAL = [][]string{{"style", style}}
+					ialTokens := []byte("{: style=\"" + style + "\"}")
+					ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+					node.InsertAfter(ial)
+				}
 				return
 			} else if ast.NodeKramdownBlockIAL == t.Root.FirstChild.Type { // Span IAL 单独存在时会被解析为 Block IAL
 				t.Root.FirstChild.Type = ast.NodeKramdownSpanIAL
