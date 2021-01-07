@@ -1655,11 +1655,6 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 		}
 
 		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\" " + r.NodeAttrsStr(node) + " data-type=\"h\"")
-		if id := node.IALAttr("id"); "" != id {
-			r.WriteString(" id=\"" + id + "\"")
-		} else {
-			r.WriteString(" id=\"ir-" + HeadingID(node) + "\"")
-		}
 		if !node.HeadingSetext {
 			r.WriteString(" data-marker=\"#\">")
 		} else {
