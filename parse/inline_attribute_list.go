@@ -20,6 +20,22 @@ import (
 var openCurlyBraceColon = util.StrToBytes("{: ")
 var emptyIAL = util.StrToBytes("{:}")
 
+func IAL2Tokens(ial [][]string) []byte {
+	buf := bytes.Buffer{}
+	buf.WriteString("{: ")
+	for i, kv := range ial {
+		buf.WriteString(kv[0])
+		buf.WriteString("=\"")
+		buf.WriteString(kv[1])
+		buf.WriteByte('"')
+		if i < len(ial)-1 {
+			buf.WriteByte(' ')
+		}
+	}
+	buf.WriteByte('}')
+	return buf.Bytes()
+}
+
 func (t *Tree) parseKramdownBlockIAL() (ret [][]string) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	return t.Context.parseKramdownBlockIAL(tokens)
