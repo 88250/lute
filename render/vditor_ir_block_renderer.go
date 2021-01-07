@@ -1235,9 +1235,6 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
 
-		r.Tag("span", [][]string{{"class", "vditor-ir__drag"}}, false)
-		r.Tag("/span", nil, false)
-
 		if renderFigure {
 			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
 				titleTokens := title.Tokens

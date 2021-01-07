@@ -1223,6 +1223,15 @@ func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
 	return ""
 }
 
+func (lute *Lute) domChild(n *html.Node, dataAtom atom.Atom) *html.Node {
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		if c.DataAtom == dataAtom {
+			return c
+		}
+	}
+	return nil
+}
+
 func (lute *Lute) setDOMAttrValue(n *html.Node, attrName, attrVal string) {
 	if nil == n {
 		return

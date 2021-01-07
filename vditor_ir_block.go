@@ -986,6 +986,15 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 					tree.Context.Tip.InsertAfter(nextBlock)
 					tree.Context.Tip = nextBlock
 				}
+				img := lute.domChild(n, atom.Img)
+				style := lute.domAttrValue(img, "style")
+				if "" != style {
+					node.SetIALAttr("style", style)
+					node.KramdownIAL = [][]string{{"style", style}}
+					ialTokens := []byte("{: style=\"" + style + "\"}")
+					ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+					node.InsertAfter(ial)
+				}
 				return
 			}
 			node.Type = ast.NodeText
