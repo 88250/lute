@@ -1223,6 +1223,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		}
 
 		attrs = append(attrs, r.NodeAttrs(node.Parent)...)
+		attrs = append(attrs, node.KramdownIAL...)
 		r.Tag("img", attrs, true)
 		// XSS 过滤
 		buf := r.Writer.Bytes()
