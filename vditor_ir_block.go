@@ -333,7 +333,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			t := parse.Parse("", []byte(text), lute.ParseOptions)
 			t.Root.LastChild.Unlink() // 移除 doc IAL
 			if blockQueryEmbed := t.Root.FirstChild; nil != blockQueryEmbed && ast.NodeBlockQueryEmbed == blockQueryEmbed.Type {
+				ial, id := node.KramdownIAL, node.ID
 				node = blockQueryEmbed
+				node.KramdownIAL, node.ID = ial, id
 				next := blockQueryEmbed.Next
 				tree.Context.Tip.AppendChild(node)
 				appendNextToTip(next, tree)
