@@ -161,7 +161,7 @@ func (r *VditorIRBlockRenderer) renderSuperBlock(node *ast.Node, entering bool) 
 
 func (r *VditorIRBlockRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("span", [][]string{{"data-type", "super-block-open-marker"}}, false)
+		r.Tag("span", [][]string{{"data-type", "super-block-open-marker"}, {"class", "vditor-ir__marker"}}, false)
 		r.Write([]byte("{{{"))
 		r.Tag("/span", nil, false)
 	}
@@ -179,7 +179,7 @@ func (r *VditorIRBlockRenderer) renderSuperBlockLayoutMarker(node *ast.Node, ent
 
 func (r *VditorIRBlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("span", [][]string{{"data-type", "super-block-close-marker"}}, false)
+		r.Tag("span", [][]string{{"data-type", "super-block-close-marker"}, {"class", "vditor-ir__marker"}}, false)
 		r.Write([]byte("}}}"))
 		r.Tag("/span", nil, false)
 	}
@@ -1934,13 +1934,13 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 		expand = bytes.Contains(script.Tokens, util.CaretTokens)
 	}
 
-	if ast.NodeSuperBlock != node.Type {
-		if strings.Contains(text, util.Caret) || expand {
-			attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
-		} else {
-			attrs = append(attrs, []string{"class", "vditor-ir__node"})
-		}
+	//if ast.NodeSuperBlock != node.Type {
+	if strings.Contains(text, util.Caret) || expand {
+		attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
+	} else {
+		attrs = append(attrs, []string{"class", "vditor-ir__node"})
 	}
+	//}
 	r.Tag("div", attrs, false)
 	return
 }
