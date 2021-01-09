@@ -18,8 +18,9 @@ import (
 
 var kitymindJSONRendererTests = []parseTest{
 
-	{"1", "# foo\n\n para1\n\npara2", ""},
-	{"0", "foo **bar**\n", ""},
+	{"2", "foo\nbar", "{\"root\":{\"data\":{\"text\":\"文档名 TODO\"},\"children\":[{\"data\":{\"text\":\"foo\\nbar\"},\"children\":[]}]}}"},
+	{"1", "# foo\n\n para1\n\npara2", "{\"root\":{\"data\":{\"text\":\"文档名 TODO\"},\"children\":[{\"data\":{\"text\":\"# foo\"},\"children\":[{\"data\":{\"text\":\"para1\"},\"children\":[]},{\"data\":{\"text\":\"para2\"},\"children\":[]}]}]}}"},
+	{"0", "foo **bar**\n", "{\"root\":{\"data\":{\"text\":\"文档名 TODO\"},\"children\":[{\"data\":{\"text\":\"foo **bar**\"},\"children\":[]}]}}"},
 }
 
 func TestKityMinderJSONRenderer(t *testing.T) {

@@ -44,21 +44,16 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
+	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
 }
 
 func (r *KityMinderJSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("BlockQueryEmbed\n!{{script}}", node)
-	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("BlockEmbed\n!((id))", node)
-	}
 	return ast.WalkSkipChildren
 }
 
@@ -67,30 +62,21 @@ func (r *KityMinderJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.W
 }
 
 func (r *KityMinderJSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Front Matter\nYAML", node)
-	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("ToC\ndiv", node)
-	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Math Block\ndiv", node)
-	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("Table\ntable", node)
+		r.dataText("table TODO")
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -100,9 +86,6 @@ func (r *KityMinderJSONRenderer) renderTable(node *ast.Node, entering bool) ast.
 }
 
 func (r *KityMinderJSONRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("HTML Block\n", node)
-	}
 	return ast.WalkSkipChildren
 }
 
@@ -115,8 +98,13 @@ func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) 
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
-		if nil != node.Next {
-			r.comma()
+		if next := node.Next; nil != next {
+			if ast.NodeKramdownBlockIAL == next.Type {
+				next = next.Next
+			}
+			if nil != next {
+				r.comma()
+			}
 		}
 	}
 	return ast.WalkSkipChildren
@@ -125,7 +113,7 @@ func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) 
 func (r *KityMinderJSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("Blockquote\nblockquote", node)
+		r.dataText("Blockquote")
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -183,30 +171,22 @@ func (r *KityMinderJSONRenderer) renderListItem(node *ast.Node, entering bool) a
 }
 
 func (r *KityMinderJSONRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Thematic Break\nhr", node)
-	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Hard Break\nbr", node)
-	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Soft Break\n", node)
-	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Code Block\npre.code", node)
-	}
+	return ast.WalkSkipChildren
+}
+
+func (r *KityMinderJSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkSkipChildren
 }
 
@@ -225,25 +205,15 @@ func (r *KityMinderJSONRenderer) renderDocument(node *ast.Node, entering bool) a
 	return ast.WalkContinue
 }
 
-func (r *KityMinderJSONRenderer) leaf(val string, node *ast.Node) {
-	r.openObj()
-	r.val(val, node)
-	r.closeObj()
-}
-
 func (r *KityMinderJSONRenderer) dataText(text string) {
 	r.WriteString("\"data\":")
 	r.openObj()
+	text = strings.ReplaceAll(text, "\\", "\\\\")
+	text = strings.ReplaceAll(text, "\n", "\\n")
+	text = strings.ReplaceAll(text, "\"", "")
+	text = strings.ReplaceAll(text, "'", "")
 	r.WriteString("\"text\":\"" + text + "\"")
 	r.closeObj()
-}
-
-func (r *KityMinderJSONRenderer) val(val string, node *ast.Node) {
-	val = strings.ReplaceAll(val, "\\", "\\\\")
-	val = strings.ReplaceAll(val, "\n", "\\n")
-	val = strings.ReplaceAll(val, "\"", "")
-	val = strings.ReplaceAll(val, "'", "")
-	r.WriteString("\"data\":\"{text:\"" + val + "\"}}")
 }
 
 func (r *KityMinderJSONRenderer) openObj() {
