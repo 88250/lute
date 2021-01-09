@@ -18,6 +18,7 @@ import (
 
 var kitymindJSONRendererTests = []parseTest{
 
+	{"1", "# foo\n\n para1\n\npara2", ""},
 	{"0", "foo **bar**\n", ""},
 }
 

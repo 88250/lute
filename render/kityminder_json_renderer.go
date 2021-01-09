@@ -106,30 +106,18 @@ func (r *KityMinderJSONRenderer) renderHTML(node *ast.Node, entering bool) ast.W
 	return ast.WalkSkipChildren
 }
 
-func (r *KityMinderJSONRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteByte(lex.ItemOpenBrace)
-		r.WriteString("\"root\":")
-		r.openObj()
-		r.dataText("文档名")
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj()
-		r.WriteByte(lex.ItemCloseBrace)
-	}
-	return ast.WalkContinue
-}
-
 func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.renderBlockMarkdown(node)
+		md := r.formatNode(node)
 		r.dataText(md)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
+		if nil != node.Next {
+			r.comma()
+		}
 	}
 	return ast.WalkSkipChildren
 }
@@ -149,9 +137,18 @@ func (r *KityMinderJSONRenderer) renderBlockquote(node *ast.Node, entering bool)
 func (r *KityMinderJSONRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.renderBlockMarkdown(node)
+		md := r.formatNode(node)
 		r.dataText(md)
 		r.openChildren(node)
+
+		for c := node.FirstChild; nil != c; c = c.Next {
+			c.Unlink()
+		}
+
+		children := headingChildren(node)
+		for _, c := range children {
+			node.AppendChild(c)
+		}
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
@@ -162,7 +159,7 @@ func (r *KityMinderJSONRenderer) renderHeading(node *ast.Node, entering bool) as
 func (r *KityMinderJSONRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.renderBlockMarkdown(node)
+		md := r.formatNode(node)
 		r.dataText(md)
 		r.openChildren(node)
 	} else {
@@ -175,7 +172,7 @@ func (r *KityMinderJSONRenderer) renderList(node *ast.Node, entering bool) ast.W
 func (r *KityMinderJSONRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.renderBlockMarkdown(node)
+		md := r.formatNode(node)
 		r.dataText(md)
 		r.openChildren(node)
 	} else {
@@ -211,6 +208,21 @@ func (r *KityMinderJSONRenderer) renderCodeBlock(node *ast.Node, entering bool) 
 		r.leaf("Code Block\npre.code", node)
 	}
 	return ast.WalkSkipChildren
+}
+
+func (r *KityMinderJSONRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemOpenBrace)
+		r.WriteString("\"root\":")
+		r.openObj()
+		r.dataText("文档名 TODO")
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.WriteByte(lex.ItemCloseBrace)
+	}
+	return ast.WalkContinue
 }
 
 func (r *KityMinderJSONRenderer) leaf(val string, node *ast.Node) {
@@ -258,29 +270,14 @@ func (r *KityMinderJSONRenderer) comma() {
 	r.WriteString(",")
 }
 
-func (r *KityMinderJSONRenderer) renderBlockMarkdown(node *ast.Node) string {
-	var nodes []*ast.Node
-	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if entering {
-			nodes = append(nodes, n)
-			if ast.NodeHeading == node.Type {
-				// 支持“标题块”引用
-				children := headingChildren(n)
-				nodes = append(nodes, children...)
-			}
-		}
-		return ast.WalkSkipChildren
-	})
-
+func (r *KityMinderJSONRenderer) formatNode(node *ast.Node) string {
 	renderer := NewFormatRenderer(r.Tree, r.Options)
 	renderer.Writer = &bytes.Buffer{}
 	renderer.NodeWriterStack = append(renderer.NodeWriterStack, renderer.Writer)
-	for _, node := range nodes {
-		ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-			rendererFunc := renderer.RendererFuncs[n.Type]
-			return rendererFunc(n, entering)
-		})
-	}
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		rendererFunc := renderer.RendererFuncs[n.Type]
+		return rendererFunc(n, entering)
+	})
 	return strings.TrimSpace(renderer.Writer.String())
 }
 
@@ -290,7 +287,7 @@ func headingChildren(heading *ast.Node) (ret []*ast.Node) {
 		start = heading.Next.Next
 	}
 	currentLevel := heading.HeadingLevel
-	for n := start; nil != n; n = n.Next {
+	for n := start.Next; nil != n; n = n.Next {
 		if ast.NodeHeading == n.Type {
 			if currentLevel >= n.HeadingLevel {
 				break
