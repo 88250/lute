@@ -96,6 +96,15 @@ func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
 	return
 }
 
+// RenderKityMinderJSON 用于渲染 KityMinder JSON 格式数据。
+func (lute *Lute) RenderKityMinderJSON(markdown string) (json string) {
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
+	renderer := render.NewKityMinderJSONRenderer(tree, lute.RenderOptions)
+	output := renderer.Render()
+	json = string(output)
+	return
+}
+
 // HTML2Md 用于将 HTML 转换为 markdown。
 func (lute *Lute) HTML2Md(html string) (markdown string) {
 	markdown, err := lute.HTML2Markdown(html)
