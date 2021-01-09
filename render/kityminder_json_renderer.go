@@ -98,14 +98,7 @@ func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) 
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
-		if next := node.Next; nil != next {
-			if ast.NodeKramdownBlockIAL == next.Type {
-				next = next.Next
-			}
-			if nil != next {
-				r.comma()
-			}
-		}
+		r.comma(node)
 	}
 	return ast.WalkSkipChildren
 }
@@ -140,6 +133,7 @@ func (r *KityMinderJSONRenderer) renderHeading(node *ast.Node, entering bool) as
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
+		r.comma(node)
 	}
 	return ast.WalkContinue
 }
@@ -153,6 +147,7 @@ func (r *KityMinderJSONRenderer) renderList(node *ast.Node, entering bool) ast.W
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
+		r.comma(node)
 	}
 	return ast.WalkContinue
 }
@@ -166,6 +161,7 @@ func (r *KityMinderJSONRenderer) renderListItem(node *ast.Node, entering bool) a
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
+		r.comma(node)
 	}
 	return ast.WalkContinue
 }
@@ -236,8 +232,15 @@ func (r *KityMinderJSONRenderer) closeChildren(node *ast.Node) {
 	}
 }
 
-func (r *KityMinderJSONRenderer) comma() {
-	r.WriteString(",")
+func (r *KityMinderJSONRenderer) comma(node *ast.Node) {
+	if next := node.Next; nil != next {
+		if ast.NodeKramdownBlockIAL == next.Type {
+			next = next.Next
+		}
+		if nil != next {
+			r.WriteString(",")
+		}
+	}
 }
 
 func (r *KityMinderJSONRenderer) formatNode(node *ast.Node) string {
