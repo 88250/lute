@@ -17,7 +17,6 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
-	"github.com/88250/lute/util"
 )
 
 // KityMinderJSONRenderer 描述了 KityMinder JSON 渲染器。
@@ -30,13 +29,8 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret := &KityMinderJSONRenderer{NewBaseRenderer(tree, options)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
-	ret.RendererFuncs[ast.NodeText] = ret.renderText
-	ret.RendererFuncs[ast.NodeCodeSpan] = ret.renderCodeSpan
 	ret.RendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
 	ret.RendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
-	ret.RendererFuncs[ast.NodeInlineMath] = ret.renderInlineMath
-	ret.RendererFuncs[ast.NodeEmphasis] = ret.renderEmphasis
-	ret.RendererFuncs[ast.NodeStrong] = ret.renderStrong
 	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
@@ -45,72 +39,13 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
 	ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
 	ret.RendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
-	ret.RendererFuncs[ast.NodeInlineHTML] = ret.renderInlineHTML
-	ret.RendererFuncs[ast.NodeLink] = ret.renderLink
-	ret.RendererFuncs[ast.NodeImage] = ret.renderImage
-	ret.RendererFuncs[ast.NodeStrikethrough] = ret.renderStrikethrough
-	ret.RendererFuncs[ast.NodeTaskListItemMarker] = ret.renderTaskListItemMarker
 	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
-	ret.RendererFuncs[ast.NodeTableHead] = ret.renderTableHead
-	ret.RendererFuncs[ast.NodeTableRow] = ret.renderTableRow
-	ret.RendererFuncs[ast.NodeTableCell] = ret.renderTableCell
-	ret.RendererFuncs[ast.NodeEmoji] = ret.renderEmoji
-	ret.RendererFuncs[ast.NodeEmojiUnicode] = ret.renderEmojiUnicode
-	ret.RendererFuncs[ast.NodeEmojiImg] = ret.renderEmojiImg
-	ret.RendererFuncs[ast.NodeEmojiAlias] = ret.renderEmojiAlias
-	ret.RendererFuncs[ast.NodeFootnotesDef] = ret.renderFootnotesDef
-	ret.RendererFuncs[ast.NodeFootnotesRef] = ret.renderFootnotesRef
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
-	ret.RendererFuncs[ast.NodeBackslash] = ret.renderBackslash
-	ret.RendererFuncs[ast.NodeBackslashContent] = ret.renderBackslashContent
-	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
-	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
-	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
-	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
-	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
-	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
-	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
-}
-
-func (r *KityMinderJSONRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *KityMinderJSONRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		if nil == node.Previous {
-			return ast.WalkContinue
-		}
-		id := r.NodeID(node.Previous)
-		r.leaf("Span IAL\n{: "+id+"}", node)
-	}
-	return ast.WalkContinue
-}
-
-func (r *KityMinderJSONRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Mark\nmark", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Sup\nsup", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Sub\nsub", node)
-	}
-	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
@@ -127,13 +62,6 @@ func (r *KityMinderJSONRenderer) renderBlockEmbed(node *ast.Node, entering bool)
 	return ast.WalkSkipChildren
 }
 
-func (r *KityMinderJSONRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("BlockRef\n((id))", node)
-	}
-	return ast.WalkSkipChildren
-}
-
 func (r *KityMinderJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -145,24 +73,6 @@ func (r *KityMinderJSONRenderer) renderYamlFrontMatter(node *ast.Node, entering 
 	return ast.WalkSkipChildren
 }
 
-func (r *KityMinderJSONRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("HTML Entity\nspan", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Blackslash\ndiv", node)
-	}
-	return ast.WalkSkipChildren
-}
-
 func (r *KityMinderJSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("ToC\ndiv", node)
@@ -170,78 +80,9 @@ func (r *KityMinderJSONRenderer) renderToC(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkSkipChildren
 }
 
-func (r *KityMinderJSONRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Footnotes Ref\ndiv", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("Footnotes Def\np", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj()
-	}
-	return ast.WalkContinue
-}
-
-func (r *KityMinderJSONRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Inline Math\nspan", node)
-	}
-	return ast.WalkSkipChildren
-}
-
 func (r *KityMinderJSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("Math Block\ndiv", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Emoji Img\n", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Emoji Unicode\n", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *KityMinderJSONRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Table Cell\ntd", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Table Row\ntr", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Table Head\nthead", node)
 	}
 	return ast.WalkSkipChildren
 }
@@ -258,47 +99,9 @@ func (r *KityMinderJSONRenderer) renderTable(node *ast.Node, entering bool) ast.
 	return ast.WalkContinue
 }
 
-func (r *KityMinderJSONRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Strikethrough\ndel", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("Image\nimg", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj()
-	}
-	return ast.WalkContinue
-}
-
-func (r *KityMinderJSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("Link\na", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj()
-	}
-	return ast.WalkContinue
-}
-
 func (r *KityMinderJSONRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("HTML Block\n", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Inline HTML\n", node)
 	}
 	return ast.WalkSkipChildren
 }
@@ -321,7 +124,7 @@ func (r *KityMinderJSONRenderer) renderDocument(node *ast.Node, entering bool) a
 func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.formatNode(node)
+		md := r.renderBlockMarkdown(node)
 		r.dataText(md)
 		r.openChildren(node)
 	} else {
@@ -329,47 +132,6 @@ func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) 
 		r.closeObj()
 	}
 	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		text := util.BytesToStr(node.Tokens)
-		r.openObj()
-		r.dataText(text)
-		r.closeObj()
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("Code Span\ncode", node)
-	}
-	return ast.WalkContinue
-}
-
-func (r *KityMinderJSONRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("Emphasis\nem", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj()
-	}
-	return ast.WalkContinue
-}
-
-func (r *KityMinderJSONRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.val("Strong\nstrong", node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj()
-	}
-	return ast.WalkContinue
 }
 
 func (r *KityMinderJSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
@@ -387,8 +149,8 @@ func (r *KityMinderJSONRenderer) renderBlockquote(node *ast.Node, entering bool)
 func (r *KityMinderJSONRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		h := "h" + headingLevel[node.HeadingLevel:node.HeadingLevel+1]
-		r.val("Heading\n"+h, node)
+		md := r.renderBlockMarkdown(node)
+		r.dataText(md)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -400,11 +162,8 @@ func (r *KityMinderJSONRenderer) renderHeading(node *ast.Node, entering bool) as
 func (r *KityMinderJSONRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		list := "ul"
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			list = "ol"
-		}
-		r.val("List\n"+list, node)
+		md := r.renderBlockMarkdown(node)
+		r.dataText(md)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -416,23 +175,8 @@ func (r *KityMinderJSONRenderer) renderList(node *ast.Node, entering bool) ast.W
 func (r *KityMinderJSONRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val("List Item\nli "+util.BytesToStr(node.ListData.Marker), node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj()
-	}
-	return ast.WalkContinue
-}
-
-func (r *KityMinderJSONRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		check := " "
-		if node.TaskListItemChecked {
-			check = "X"
-		}
-		r.val("Task List Item Marker\n["+check+"]", node)
+		md := r.renderBlockMarkdown(node)
+		r.dataText(md)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -514,28 +258,51 @@ func (r *KityMinderJSONRenderer) comma() {
 	r.WriteString(",")
 }
 
-func (r *KityMinderJSONRenderer) ignore(node *ast.Node) bool {
-	return nil == node ||
-		// 以下类型的节点不进行渲染，否则图画出来节点太多
-		ast.NodeBlockquoteMarker == node.Type ||
-		ast.NodeEmA6kOpenMarker == node.Type || ast.NodeEmA6kCloseMarker == node.Type ||
-		ast.NodeEmU8eOpenMarker == node.Type || ast.NodeEmU8eCloseMarker == node.Type ||
-		ast.NodeStrongA6kOpenMarker == node.Type || ast.NodeStrongA6kCloseMarker == node.Type ||
-		ast.NodeStrongU8eOpenMarker == node.Type || ast.NodeStrongU8eCloseMarker == node.Type ||
-		ast.NodeStrikethrough1OpenMarker == node.Type || ast.NodeStrikethrough1CloseMarker == node.Type ||
-		ast.NodeStrikethrough2OpenMarker == node.Type || ast.NodeStrikethrough2CloseMarker == node.Type ||
-		ast.NodeMathBlockOpenMarker == node.Type || ast.NodeMathBlockContent == node.Type || ast.NodeMathBlockCloseMarker == node.Type ||
-		ast.NodeInlineMathOpenMarker == node.Type || ast.NodeInlineMathContent == node.Type || ast.NodeInlineMathCloseMarker == node.Type ||
-		ast.NodeYamlFrontMatterOpenMarker == node.Type || ast.NodeYamlFrontMatterCloseMarker == node.Type || ast.NodeYamlFrontMatterContent == node.Type
-}
+func (r *KityMinderJSONRenderer) renderBlockMarkdown(node *ast.Node) string {
+	var nodes []*ast.Node
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering {
+			nodes = append(nodes, n)
+			if ast.NodeHeading == node.Type {
+				// 支持“标题块”引用
+				children := headingChildren(n)
+				nodes = append(nodes, children...)
+			}
+		}
+		return ast.WalkSkipChildren
+	})
 
-func (r *KityMinderJSONRenderer) formatNode(node *ast.Node) string {
 	renderer := NewFormatRenderer(r.Tree, r.Options)
 	renderer.Writer = &bytes.Buffer{}
 	renderer.NodeWriterStack = append(renderer.NodeWriterStack, renderer.Writer)
-	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-		rendererFunc := renderer.RendererFuncs[n.Type]
-		return rendererFunc(n, entering)
-	})
+	for _, node := range nodes {
+		ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+			rendererFunc := renderer.RendererFuncs[n.Type]
+			return rendererFunc(n, entering)
+		})
+	}
 	return strings.TrimSpace(renderer.Writer.String())
+}
+
+func headingChildren(heading *ast.Node) (ret []*ast.Node) {
+	start := heading
+	if nil != heading.Next && ast.NodeKramdownBlockIAL == heading.Next.Type {
+		start = heading.Next.Next
+	}
+	currentLevel := heading.HeadingLevel
+	for n := start; nil != n; n = n.Next {
+		if ast.NodeHeading == n.Type {
+			if currentLevel >= n.HeadingLevel {
+				break
+			}
+		}
+		if ast.NodeKramdownBlockIAL == n.Type {
+			if !bytes.Contains(n.Tokens, []byte("type=\"doc\"")) {
+				ret = append(ret, n)
+			}
+		} else {
+			ret = append(ret, n)
+		}
+	}
+	return
 }
