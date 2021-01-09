@@ -317,7 +317,7 @@ Some details:
 1. lute.js has no built-in syntax highlighting feature
 2. The size of lute.js after compilation is ~2MB, the size after compression through `brotli -o lute.min.js.br lute.min.js` is ~200KB, the size after regular GZip compression is ~300KB
 
-- How to use `lute.RenderJSON()`
+#### How to use `lute.RenderJSON()`
 
 ```typescript
 // Type of JSONRenderer

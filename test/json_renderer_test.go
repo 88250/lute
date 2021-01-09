@@ -17,7 +17,7 @@ import (
 )
 
 var JSONRendererTests = []parseTest{
-	{"测试普通文本","普通文本测试","[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"普通文本测试\"}]}]"},
+	{"测试普通文本", "普通文本测试", "[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"普通文本测试\"}]}]"},
 	{"测试行内代码", "`console.log(\"Hello World\")`", "[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"CodeSpan\",\"value\":\"console.log(\\\"Hello World\\\")\"}]}]"},
 	{"测试代码块", "```js\nconsole.log(\"Hello World\")\n```\n", "[{\"type\":\"CodeBlock\",\"value\":\"console.log(\\\"Hello World\\\")\\n\",\"language\":\"js\"}]"},
 	{"测试数学块", "$$\na + b = c\n$$\n", "[{\"type\":\"MathBlock\",\"value\":\"a + b = c\"}]"},
@@ -51,14 +51,14 @@ var JSONRendererTests = []parseTest{
 
 func TestJSONRenderer(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.Sup = true
-	luteEngine.Sub = true
-	luteEngine.Mark = true
- 	luteEngine.KramdownIAL = false
- 	luteEngine.Footnotes = true
- 	luteEngine.BlockRef = true
- 	luteEngine.Tag = true
- 	luteEngine.SoftBreak2HardBreak = true
+	luteEngine.SetSup(true)
+	luteEngine.SetSub(true)
+	luteEngine.SetMark(true)
+	luteEngine.SetKramdownIAL(false)
+	luteEngine.SetFootnotes(true)
+	luteEngine.SetBlockRef(true)
+	luteEngine.SetTag(true)
+	luteEngine.SetSoftBreak2HardBreak(true)
 
 	for _, test := range JSONRendererTests {
 		jsonStr := luteEngine.RenderJSON(test.from)

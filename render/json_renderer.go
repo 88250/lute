@@ -13,7 +13,6 @@ package render
 import (
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
-	"go/format"
 	"strings"
 
 	"github.com/88250/lute/ast"
@@ -27,8 +26,8 @@ type JSONRenderer struct {
 }
 
 // NewJSONRenderer 创建一个 JSON 渲染器。
-func NewJSONRenderer(tree *parse.Tree) Renderer {
-	ret := &JSONRenderer{NewBaseRenderer(tree)}
+func NewJSONRenderer(tree *parse.Tree, options *Options) Renderer {
+	ret := &JSONRenderer{NewBaseRenderer(tree, options)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -219,19 +218,19 @@ func isCloseMarker(node *ast.Node) bool {
 func isFlag(node *ast.Node) bool {
 	switch node.Type {
 	case ast.NodeParagraph,
-	ast.NodeEmphasis,
-	ast.NodeStrong,
-	ast.NodeBlockquote,
-	ast.NodeListItem,
-	ast.NodeStrikethrough,
-	ast.NodeTableHead,
-	ast.NodeTable,
-	ast.NodeTableRow,
-	ast.NodeMark,
-	ast.NodeSub,
-	ast.NodeSup,
-	ast.NodeTag,
-	ast.NodeBlockRef:
+		ast.NodeEmphasis,
+		ast.NodeStrong,
+		ast.NodeBlockquote,
+		ast.NodeListItem,
+		ast.NodeStrikethrough,
+		ast.NodeTableHead,
+		ast.NodeTable,
+		ast.NodeTableRow,
+		ast.NodeMark,
+		ast.NodeSub,
+		ast.NodeSup,
+		ast.NodeTag,
+		ast.NodeBlockRef:
 		return true
 	}
 	return false
@@ -320,11 +319,6 @@ func (r *JSONRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		r.openObj()
 		tokens := node.Tokens
 		if 0 < len(node.Previous.CodeBlockInfo) {
-			if isGo(language) {
-				if buf, err := format.Source(tokens); nil == err {
-					tokens = buf
-				}
-			}
 			r.language(ast.NodeCodeBlock, util.BytesToStr(tokens), language)
 
 			if "mindmap" == language {
@@ -333,7 +327,6 @@ func (r *JSONRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				r.mindMap(util.BytesToStr(json))
 			}
 		} else {
-			language = detectLanguage(tokens)
 			tokens = html.EscapeHTML(tokens)
 			r.language(ast.NodeCodeBlock, util.BytesToStr(tokens), language)
 		}
@@ -347,7 +340,6 @@ func (r *JSONRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool)
 	return ast.WalkContinue
 }
 
-
 func (r *JSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -360,7 +352,7 @@ func (r *JSONRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) 
 func (r *JSONRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.val(ast.NodeMathBlock,util.BytesToStr(node.Tokens))
+		r.val(ast.NodeMathBlock, util.BytesToStr(node.Tokens))
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -532,7 +524,6 @@ func (r *JSONRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkSkipChildren
 }
 
-
 // 硬换行
 func (r *JSONRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
@@ -554,7 +545,7 @@ func (r *JSONRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkS
 	if entering {
 		r.openObj()
 		tokens := node.Tokens
-		if r.Option.Sanitize {
+		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
 		r.val(node.Type, util.BytesToStr(tokens))
@@ -572,7 +563,7 @@ func (r *JSONRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 		r.openObj()
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
-		destTokens = r.Tree.Context.LinkPath(destTokens)
+		destTokens = r.LinkPath(destTokens)
 		r.val(node.Type, util.BytesToStr(destTokens))
 	} else {
 		r.closeObj(node)
@@ -585,7 +576,7 @@ func (r *JSONRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 	if entering {
 		r.openObj()
 		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-		destTokens = r.Tree.Context.LinkPath(destTokens)
+		destTokens = r.LinkPath(destTokens)
 		r.val(node.Type, util.BytesToStr(destTokens))
 	} else {
 		r.closeObj(node)
@@ -636,7 +627,7 @@ func (r *JSONRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkSt
 func (r *JSONRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var tokens []byte
-		if r.Option.AutoSpace {
+		if r.Options.AutoSpace {
 			tokens = r.Space(node.Tokens)
 		} else {
 			tokens = node.Tokens
@@ -1036,7 +1027,7 @@ func (r *JSONRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus 
 	if entering {
 		r.openObj()
 		tokens := node.Tokens
-		if r.Option.Sanitize {
+		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
 		r.val(node.Type, util.BytesToStr(tokens))
@@ -1052,7 +1043,7 @@ func (r *JSONRenderer) leaf(nodeType ast.NodeType, val string, node *ast.Node) {
 	r.closeObj(node)
 }
 
-func (r *JSONRenderer) val(nodeType ast.NodeType , val string) {
+func (r *JSONRenderer) val(nodeType ast.NodeType, val string) {
 	val = strings.ReplaceAll(val, "\\", "\\\\")
 	val = strings.ReplaceAll(val, "\n", "\\n")
 	val = strings.ReplaceAll(val, "\"", "\\\"")
@@ -1078,7 +1069,7 @@ func (r *JSONRenderer) mindMap(val string) {
 }
 
 func (r *JSONRenderer) flag(node *ast.Node) {
-	r.WriteString("\"flag\":\"" + node.Type.String()[4:]+"\"")
+	r.WriteString("\"flag\":\"" + node.Type.String()[4:] + "\"")
 }
 
 // 打开对象

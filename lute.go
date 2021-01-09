@@ -131,10 +131,10 @@ func (lute *Lute) HTML2Text(dom string) string {
 	return tree.Root.Text()
 }
 
-// RenderJSON 用于渲染 JSON 格式数据
+// RenderJSON 用于渲染 JSON 格式数据。
 func (lute *Lute) RenderJSON(markdown string) (json string) {
-	tree := parse.Parse("", []byte(markdown), lute.Options)
-	renderer := render.NewJSONRenderer(tree)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
+	renderer := render.NewJSONRenderer(tree, lute.RenderOptions)
 	output := renderer.Render()
 	json = string(output)
 	return
