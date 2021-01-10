@@ -292,7 +292,7 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 		text = buf.String()
 	}
 
-	text = strings.ReplaceAll(text, "\\", "\\\\")
+	text = strings.ReplaceAll(text, "\\", "")
 	text = strings.ReplaceAll(text, "\n", "")
 	text = strings.ReplaceAll(text, "\"", "")
 	text = strings.ReplaceAll(text, "'", "")
