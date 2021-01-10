@@ -33,6 +33,7 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock
 	ret.RendererFuncs[ast.NodeMathBlock] = ret.renderMathBlock
 	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
+	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
@@ -157,6 +158,19 @@ func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) 
 }
 
 func (r *KityMinderJSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *KityMinderJSONRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		r.data(node)

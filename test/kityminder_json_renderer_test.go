@@ -19,12 +19,13 @@ import (
 
 var kitymindJSONRendererTests = []parseTest{
 
-	{"0", "# foo\n\nbar", "{\"root\":{\"data\":{\"text\":\"\",\"id\":\"\",\"type\":\"NodeDocument\"},\"children\":[{\"data\":{\"text\":\"foo\",\"id\":\"\",\"type\":\"NodeHeading\"},\"children\":[]},{\"data\":{\"text\":\"bar\",\"id\":\"\",\"type\":\"NodeParagraph\"},\"children\":[]}]}}"},
+	{"0", "{{{\nfoo\n{: id=\"20210110174236-xe4fzwr\"}\n\nbar\n{: id=\"20210110174236-xe4fzwr\"}\n\n}}}\n{: id=\"20210110174239-afmuohb\"}\n\nbaz\n{: id=\"20210110174252-qte4wlu\"}\n\n\n{: id=\"20210110005118-gqrx3wm\" type=\"doc\"}\n", "{\"root\":{\"data\":{\"text\":\"\",\"id\":\"20210110005118-gqrx3wm\",\"type\":\"NodeDocument\"},\"children\":[{\"data\":{\"text\":\"foobar\",\"id\":\"20210110174239-afmuohb\",\"type\":\"NodeSuperBlock\"},\"children\":[{\"data\":{\"text\":\"foo\",\"id\":\"20210110174236-xe4fzwr\",\"type\":\"NodeParagraph\"},\"children\":[]},{\"data\":{\"text\":\"bar\",\"id\":\"20210110174236-xe4fzwr\",\"type\":\"NodeParagraph\"},\"children\":[]}]},{\"data\":{\"text\":\"baz\",\"id\":\"20210110174252-qte4wlu\",\"type\":\"NodeParagraph\"},\"children\":[]}]}}"},
 }
 
 func TestKityMinderJSONRenderer(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.SetSuperBlock(true)
 
 	ast.Testing = true
 	for _, test := range kitymindJSONRendererTests {
