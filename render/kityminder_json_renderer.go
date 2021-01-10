@@ -205,9 +205,9 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 	var text string
 	switch node.Type {
 	case ast.NodeDocument:
-		text = "文档名 TODO"
+		text = r.Tree.Name
 	default:
-		text = r.formatNode(node)
+		text = node.Text()
 	}
 
 	text = strings.ReplaceAll(text, "\\", "\\\\")
@@ -254,17 +254,6 @@ func (r *KityMinderJSONRenderer) comma(node *ast.Node) {
 			r.WriteString(",")
 		}
 	}
-}
-
-func (r *KityMinderJSONRenderer) formatNode(node *ast.Node) string {
-	renderer := NewFormatRenderer(r.Tree, r.Options)
-	renderer.Writer = &bytes.Buffer{}
-	renderer.NodeWriterStack = append(renderer.NodeWriterStack, renderer.Writer)
-	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-		rendererFunc := renderer.RendererFuncs[n.Type]
-		return rendererFunc(n, entering)
-	})
-	return strings.TrimSpace(renderer.Writer.String())
 }
 
 func headingChildren(heading *ast.Node) (ret []*ast.Node) {
