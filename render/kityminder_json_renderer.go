@@ -271,7 +271,25 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 	case ast.NodeDocument:
 		text = r.Tree.Name
 	default:
-		text = node.Text()
+		buf := &bytes.Buffer{}
+		ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if !entering {
+				return ast.WalkContinue
+			}
+
+			if ast.NodeTag == n.Type {
+				buf.WriteString("#" + n.Text() + "#")
+				return ast.WalkSkipChildren
+			}
+
+			if ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeBlockRefText == n.Type || ast.NodeBlockEmbedText == n.Type ||
+				ast.NodeCodeSpanContent == n.Type || ast.NodeCodeBlockCode == n.Type || ast.NodeLinkTitle == n.Type || ast.NodeMathBlockContent == n.Type ||
+				ast.NodeInlineMathContent == n.Type || ast.NodeYamlFrontMatterContent == n.Type {
+				buf.Write(n.Tokens)
+			}
+			return ast.WalkContinue
+		})
+		text = buf.String()
 	}
 
 	text = strings.ReplaceAll(text, "\\", "\\\\")
