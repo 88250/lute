@@ -13,6 +13,7 @@ package render
 import (
 	"bytes"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -76,7 +77,7 @@ func (r *KityMinderJSONRenderer) renderMathBlock(node *ast.Node, entering bool) 
 func (r *KityMinderJSONRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.dataText("table TODO")
+		r.data(node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -92,8 +93,7 @@ func (r *KityMinderJSONRenderer) renderHTML(node *ast.Node, entering bool) ast.W
 func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.formatNode(node)
-		r.dataText(md)
+		r.data(node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -106,7 +106,7 @@ func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) 
 func (r *KityMinderJSONRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		r.dataText("Blockquote")
+		r.data(node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -118,8 +118,7 @@ func (r *KityMinderJSONRenderer) renderBlockquote(node *ast.Node, entering bool)
 func (r *KityMinderJSONRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.formatNode(node)
-		r.dataText(md)
+		r.data(node)
 		r.openChildren(node)
 
 		for c := node.FirstChild; nil != c; c = c.Next {
@@ -141,8 +140,7 @@ func (r *KityMinderJSONRenderer) renderHeading(node *ast.Node, entering bool) as
 func (r *KityMinderJSONRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.formatNode(node)
-		r.dataText(md)
+		r.data(node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -155,8 +153,7 @@ func (r *KityMinderJSONRenderer) renderList(node *ast.Node, entering bool) ast.W
 func (r *KityMinderJSONRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		md := r.formatNode(node)
-		r.dataText(md)
+		r.data(node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -191,7 +188,7 @@ func (r *KityMinderJSONRenderer) renderDocument(node *ast.Node, entering bool) a
 		r.WriteByte(lex.ItemOpenBrace)
 		r.WriteString("\"root\":")
 		r.openObj()
-		r.dataText("文档名 TODO")
+		r.data(node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
@@ -201,14 +198,27 @@ func (r *KityMinderJSONRenderer) renderDocument(node *ast.Node, entering bool) a
 	return ast.WalkContinue
 }
 
-func (r *KityMinderJSONRenderer) dataText(text string) {
+func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 	r.WriteString("\"data\":")
 	r.openObj()
+
+	var text string
+	switch node.Type {
+	case ast.NodeDocument:
+		text = "文档名 TODO"
+	default:
+		text = r.formatNode(node)
+	}
+
 	text = strings.ReplaceAll(text, "\\", "\\\\")
 	text = strings.ReplaceAll(text, "\n", "\\n")
 	text = strings.ReplaceAll(text, "\"", "")
 	text = strings.ReplaceAll(text, "'", "")
-	r.WriteString("\"text\":\"" + text + "\"")
+	if 16 < utf8.RuneCountInString(text) {
+		text = SubStr(text, 16) + "..."
+	}
+	r.WriteString("\"text\":\"" + text + "\",")
+	r.WriteString("\"id\":\"" + node.ID + "\"")
 	r.closeObj()
 }
 
