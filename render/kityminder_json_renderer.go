@@ -218,7 +218,7 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 		text = SubStr(text, 16) + "..."
 	}
 	r.WriteString("\"text\":\"" + text + "\",")
-	r.WriteString("\"id\":\"" + node.ID + "\"")
+	r.WriteString("\"id\":\"" + node.IALAttr("id") + "\"")
 	r.closeObj()
 }
 

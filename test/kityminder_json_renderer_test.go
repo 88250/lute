@@ -19,9 +19,7 @@ import (
 
 var kitymindJSONRendererTests = []parseTest{
 
-	{"2", "foo\nbar", "{\"root\":{\"data\":{\"text\":\"文档名 TODO\",\"id\":\"20060102150405-1a2b3c4\"},\"children\":[{\"data\":{\"text\":\"foobar\",\"id\":\"\"},\"children\":[]}]}}"},
-	{"1", "# foo\n\n para1\n\npara2", "{\"root\":{\"data\":{\"text\":\"文档名 TODO\",\"id\":\"20060102150405-1a2b3c4\"},\"children\":[{\"data\":{\"text\":\"# foo\",\"id\":\"\"},\"children\":[{\"data\":{\"text\":\"para1\",\"id\":\"\"},\"children\":[]},{\"data\":{\"text\":\"para2\",\"id\":\"\"},\"children\":[]}]}]}}"},
-	{"0", "foo **bar**\n", "{\"root\":{\"data\":{\"text\":\"文档名 TODO\",\"id\":\"20060102150405-1a2b3c4\"},\"children\":[{\"data\":{\"text\":\"foo **bar**\",\"id\":\"\"},\"children\":[]}]}}"},
+	{"0", "# foo\n{: id=\"20210110005758-m303ovi\"}\n\nbar\n{: id=\"20210110115402-21ltd5v\"}\n\nbaz **bazz**\n{: id=\"20210110115405-17ng22v\"}\n\n\n{: id=\"20201228004131-bys3g5x\" type=\"doc\"}\n", "{\"root\":{\"data\":{\"text\":\"文档名 TODO\",\"id\":\"20201228004131-bys3g5x\"},\"children\":[{\"data\":{\"text\":\"# foo\",\"id\":\"20210110005758-m303ovi\"},\"children\":[{\"data\":{\"text\":\"baz **bazz**\",\"id\":\"20210110115405-17ng22v\"},\"children\":[]}]},{\"data\":{\"text\":\"bar\",\"id\":\"20210110115402-21ltd5v\"},\"children\":[]}]}}"},
 }
 
 func TestKityMinderJSONRenderer(t *testing.T) {
