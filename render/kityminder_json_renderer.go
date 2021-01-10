@@ -244,8 +244,10 @@ func (r *KityMinderJSONRenderer) closeChildren(node *ast.Node) {
 
 func (r *KityMinderJSONRenderer) comma(node *ast.Node) {
 	if next := node.Next; nil != next {
-		if ast.NodeKramdownBlockIAL == next.Type {
-			next = next.Next
+		for ; nil != next; next = next.Next {
+			if ast.NodeKramdownBlockIAL != next.Type {
+				break
+			}
 		}
 		if nil != next {
 			r.WriteString(",")
@@ -270,7 +272,7 @@ func headingChildren(heading *ast.Node) (ret []*ast.Node) {
 		start = heading.Next.Next
 	}
 	currentLevel := heading.HeadingLevel
-	for n := start.Next; nil != n; n = n.Next {
+	for n := start; nil != n; n = n.Next {
 		if ast.NodeHeading == n.Type {
 			if currentLevel >= n.HeadingLevel {
 				break
