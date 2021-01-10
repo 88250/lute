@@ -37,8 +37,6 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
-	ret.RendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
-	ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
 	ret.RendererFuncs[ast.NodeHTMLBlock] = ret.renderHTML
 	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
@@ -51,10 +49,28 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 }
 
 func (r *KityMinderJSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
 	return ast.WalkSkipChildren
 }
 
@@ -63,14 +79,41 @@ func (r *KityMinderJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.W
 }
 
 func (r *KityMinderJSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
 	return ast.WalkSkipChildren
 }
 
@@ -82,11 +125,21 @@ func (r *KityMinderJSONRenderer) renderTable(node *ast.Node, entering bool) ast.
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
+		r.comma(node)
 	}
 	return ast.WalkContinue
 }
 
 func (r *KityMinderJSONRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
 	return ast.WalkSkipChildren
 }
 
@@ -111,6 +164,7 @@ func (r *KityMinderJSONRenderer) renderBlockquote(node *ast.Node, entering bool)
 	} else {
 		r.closeChildren(node)
 		r.closeObj()
+		r.comma(node)
 	}
 	return ast.WalkContinue
 }
@@ -164,18 +218,28 @@ func (r *KityMinderJSONRenderer) renderListItem(node *ast.Node, entering bool) a
 }
 
 func (r *KityMinderJSONRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
 	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
 	return ast.WalkSkipChildren
 }
 
@@ -250,7 +314,7 @@ func (r *KityMinderJSONRenderer) comma(node *ast.Node) {
 				break
 			}
 		}
-		if nil != next {
+		if nil != next && next.IsBlock() {
 			r.WriteString(",")
 		}
 	}
