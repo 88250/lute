@@ -145,6 +145,12 @@ func (r *KityMinderJSONRenderer) renderHTML(node *ast.Node, entering bool) ast.W
 }
 
 func (r *KityMinderJSONRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
+	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
+		if node.Parent.FirstChild == node && node.Parent.LastChild == node { // ListItem 下面只有一个段落时不渲染该段落
+			return ast.WalkContinue
+		}
+	}
+
 	if entering {
 		r.openObj()
 		r.data(node)
