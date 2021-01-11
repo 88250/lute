@@ -62,6 +62,9 @@ func (t *Tree) parseKramdownSpanIAL() {
 		if pos, ial := t.Context.parseKramdownSpanIAL(tokens); 0 < len(ial) {
 			n.KramdownIAL = ial
 			n.Next.Tokens = tokens[pos+1:]
+			if 1 > len(n.Next.Tokens) {
+				n.Next.Unlink() // 移掉空的文本节点 {: ial}
+			}
 			spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: tokens[:pos+1]}
 			n.InsertAfter(spanIAL)
 		}

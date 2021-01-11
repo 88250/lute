@@ -1191,7 +1191,12 @@ func (r *VditorIRBlockRenderer) renderBang(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, util.CaretTokens)
-	single := nil == node.Previous && nil == node.Next
+	single := nil == node.Previous
+	if single {
+		if nil != node.Next {
+			single = nil == node.Next.Next // 跳过 Span IAL 节点
+		}
+	}
 	renderFigure := single
 
 	if entering {
