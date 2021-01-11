@@ -126,7 +126,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"!{{"))
-	if 16 > t.Context.currentLineLen || (!bytes.HasPrefix(tokens, []byte("!{{")) && !startCaret) {
+	if !bytes.HasPrefix(tokens, []byte("!{{")) && !startCaret {
 		return
 	}
 	if startCaret {
