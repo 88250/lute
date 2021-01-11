@@ -353,6 +353,7 @@ var blockStarts = []blockStartFunc{
 				}
 			}
 			lastMatchedContainer.KramdownIAL = ial
+			lastMatchedContainer.ID = ial[0][1]
 			node := t.Context.addChild(ast.NodeKramdownBlockIAL)
 			node.Tokens = t.Context.currentLine[t.Context.nextNonspace:]
 			return 2
