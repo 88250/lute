@@ -322,7 +322,7 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 	}
 	r.WriteString("\"text\":\"" + text + "\",")
 	r.WriteString("\"id\":\"" + node.IALAttr("id") + "\",")
-	r.WriteString("\"type\":\"" + node.Type.String() + "\"")
+	r.WriteString("\"type\":\"" + node.Type.String() + "\",")
 	r.WriteString("\"isContainer\":" + fmt.Sprintf("%v", node.IsContainerBlock()))
 	r.closeObj()
 }
