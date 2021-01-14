@@ -291,6 +291,14 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 	switch node.Type {
 	case ast.NodeDocument:
 		text = r.Tree.Name
+	case ast.NodeList:
+		if 0 == node.ListData.Typ {
+			r.WriteString("\"priority\": \"iconList\",")
+		} else if 1 == node.ListData.Typ {
+			r.WriteString("\"priority\": \"iconOrderedList\",")
+		} else {
+			r.WriteString("\"priority\": \"iconCheck\",")
+		}
 	default:
 		buf := &bytes.Buffer{}
 		ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
