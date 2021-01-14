@@ -35,7 +35,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	}
 
 	chinese := bytes.HasPrefix(tokens, []byte("！(("))
-	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"!(("))
+	startCaret := (bytes.HasPrefix(tokens, []byte(util.Caret+"!(("))) || (bytes.HasPrefix(tokens, []byte("!"+util.Caret+"((")))
 	if 6 > t.Context.currentLineLen || (!bytes.HasPrefix(tokens, []byte("!((")) && !chinese && !startCaret) {
 		return
 	}
@@ -44,6 +44,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	}
 	if startCaret {
 		tokens = bytes.Replace(tokens, []byte(util.Caret+"!(("), []byte("!(("), 1)
+		tokens = bytes.Replace(tokens, []byte("!"+util.Caret+"(("), []byte("!(("), 1)
 	}
 
 	tokens = tokens[3:]
