@@ -12,7 +12,7 @@ package render
 
 import (
 	"bytes"
-	"fmt"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 
@@ -317,7 +317,7 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 	r.WriteString("\"text\":\"" + text + "\",")
 	r.WriteString("\"id\":\"" + node.IALAttr("id") + "\",")
 	r.WriteString("\"type\":\"" + node.Type.String() + "\",")
-	r.WriteString("\"isContainer\":" + fmt.Sprintf("%v", node.IsContainerBlock()))
+	r.WriteString("\"isContainer\":" + strconv.FormatBool(node.IsContainerBlock()))
 	r.closeObj()
 }
 
