@@ -299,6 +299,10 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 		} else {
 			r.WriteString("\"priority\": \"iconCheck\",")
 		}
+	case ast.NodeBlockquote:
+		r.WriteString("\"priority\": \"iconQuote\",")
+	case ast.NodeSuperBlock:
+		r.WriteString("\"priority\": \"iconSuper\",")
 	default:
 		buf := &bytes.Buffer{}
 		ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
