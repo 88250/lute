@@ -809,13 +809,11 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
 	tokens = append([]byte(parse.Zwsp), tokens...)
 
-	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-inline\">")
 	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.Tag("code", [][]string{{"data-type", "html-inline"}}, false)
 	tokens = html.EscapeHTML(tokens)
 	r.Write(tokens)
 	r.WriteString("</code>")
-	r.WriteString("</span>" + parse.Zwsp)
 	return ast.WalkContinue
 }
 
