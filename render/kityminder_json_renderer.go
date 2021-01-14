@@ -43,6 +43,8 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
+	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
+	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
@@ -50,6 +52,32 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 
 func (r *KityMinderJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
+}
+
+func (r *KityMinderJSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
+	return ast.WalkSkipChildren
+}
+
+func (r *KityMinderJSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.data(node)
+		r.openChildren(node)
+	} else {
+		r.closeChildren(node)
+		r.closeObj()
+		r.comma(node)
+	}
+	return ast.WalkSkipChildren
 }
 
 func (r *KityMinderJSONRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
