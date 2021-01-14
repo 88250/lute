@@ -64,6 +64,7 @@ func (context *Context) listFinalize(list *ast.Node) {
 					if 7 < len(li.FirstChild.Tokens) && '{' == li.FirstChild.Tokens[0] {
 						if ial := context.parseKramdownIALInListItem(li.FirstChild.Tokens); 0 < len(ial) {
 							li.KramdownIAL = ial
+							li.ID = ial[0][1]
 							ialTokens := IAL2Tokens(ial)
 							li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
 							tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}"))+1:]
