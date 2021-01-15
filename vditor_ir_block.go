@@ -233,6 +233,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	dataType := lute.domAttrValue(n, "data-type")
+	if "ref-text-tpl-render-result" == dataType { // 剔除渲染好的锚文本
+		return
+	}
 
 	class := lute.domAttrValue(n, "class")
 	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
