@@ -325,9 +325,13 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 		text = buf.String()
 	}
 
-	text = strings.ReplaceAll(text, "\\", "")
-	text = strings.ReplaceAll(text, "\n", "")
-	text = strings.ReplaceAll(text, "\"", "")
+	replacer := strings.NewReplacer("\\", "",
+		"\n", "",
+		"\"", "",
+		"\t", "",
+		"'", "")
+	text = replacer.Replace(text)
+
 	text = strings.ReplaceAll(text, "'", "")
 	if 16 < utf8.RuneCountInString(text) {
 		text = SubStr(text, 16) + "..."
