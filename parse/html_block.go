@@ -204,7 +204,7 @@ func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 			continue
 		}
 
-		nameAndValue := lex.Split(attr, lex.ItemEqual)
+		nameAndValue := bytes.SplitN(attr, []byte("="), 2)
 		name := nameAndValue[0]
 		if 1 > len(name) { // 等号前面空格的情况
 			continue
