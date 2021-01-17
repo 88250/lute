@@ -1305,6 +1305,10 @@ func (lute *Lute) setIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		node.SetIALAttr("memo", memo)
 		ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
 	}
+	if alias := lute.domAttrValue(n, "alias"); "" != alias {
+		node.SetIALAttr("alias", alias)
+		ialTokens = append(ialTokens, []byte(" alias=\""+alias+"\"")...)
+	}
 	ialTokens = append(ialTokens, '}')
 	return ialTokens
 }
