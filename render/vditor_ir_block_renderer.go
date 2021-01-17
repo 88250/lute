@@ -1364,15 +1364,14 @@ func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) 
 			}
 		}
 		if !rendered {
-			if !bytes.Equal([]byte("<>"), content) {
-				r.Write(content)
-			}
-
 			r.renderSpanNode(node)
 			attrs = [][]string{{"class", "vditor-ir__marker"}}
 			r.Tag("span", attrs, false)
 			r.Write(html.EscapeHTML(node.Tokens))
 			r.Tag("/span", nil, false)
+			if !bytes.Equal([]byte("<>"), content) {
+				r.Write(content)
+			}
 		}
 
 		r.Tag("/span", nil, false)
