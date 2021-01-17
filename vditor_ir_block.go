@@ -259,6 +259,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.SetIALAttr("style", style)
 			ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
 		}
+		if name := lute.domAttrValue(n, "name"); "" != name {
+			node.SetIALAttr("name", name)
+			ialTokens = append(ialTokens, []byte(" name=\""+name+"\"")...)
+		}
+		if memo := lute.domAttrValue(n, "memo"); "" != memo {
+			node.SetIALAttr("memo", memo)
+			ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
+		}
 		ialTokens = append(ialTokens, '}')
 		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
 		defer tree.Context.TipAppendChild(ial)
