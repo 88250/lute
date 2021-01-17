@@ -246,28 +246,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			"math-block" == dataType || "code-block" == dataType || "table" == dataType || "h" == dataType ||
 			"link-ref-defs-block" == dataType || "footnotes-block" == dataType || "super-block" == dataType {
 			nodeID = ast.NewNodeID()
+			node.ID = nodeID
 		}
 	}
-	if "" != nodeID {
-		node.KramdownIAL = [][]string{{"id", nodeID}}
-		ialTokens := []byte("{: id=\"" + nodeID + "\"")
-		if bookmark := lute.domAttrValue(n, "bookmark"); "" != bookmark {
-			node.SetIALAttr("bookmark", bookmark)
-			ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
-		}
-		if style := lute.domAttrValue(n, "style"); "" != style {
-			node.SetIALAttr("style", style)
-			ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
-		}
-		if name := lute.domAttrValue(n, "name"); "" != name {
-			node.SetIALAttr("name", name)
-			ialTokens = append(ialTokens, []byte(" name=\""+name+"\"")...)
-		}
-		if memo := lute.domAttrValue(n, "memo"); "" != memo {
-			node.SetIALAttr("memo", memo)
-			ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
-		}
-		ialTokens = append(ialTokens, '}')
+	if "" != node.ID {
+		node.KramdownIAL = [][]string{{"id", node.ID}}
+		ialTokens := lute.setIAL(n, node)
 		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
 		defer tree.Context.TipAppendChild(ial)
 	}
@@ -1301,6 +1285,28 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}
+}
+
+func (lute *Lute) setIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
+	ialTokens = []byte("{: id=\"" + node.ID + "\"")
+	if bookmark := lute.domAttrValue(n, "bookmark"); "" != bookmark {
+		node.SetIALAttr("bookmark", bookmark)
+		ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
+	}
+	if style := lute.domAttrValue(n, "style"); "" != style {
+		node.SetIALAttr("style", style)
+		ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
+	}
+	if name := lute.domAttrValue(n, "name"); "" != name {
+		node.SetIALAttr("name", name)
+		ialTokens = append(ialTokens, []byte(" name=\""+name+"\"")...)
+	}
+	if memo := lute.domAttrValue(n, "memo"); "" != memo {
+		node.SetIALAttr("memo", memo)
+		ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
+	}
+	ialTokens = append(ialTokens, '}')
+	return ialTokens
 }
 
 func appendNextToTip(next *ast.Node, tree *parse.Tree) {
