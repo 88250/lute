@@ -1990,6 +1990,7 @@ func (r *VditorIRBlockRenderer) nodeTipAttr(node *ast.Node, attrs *[][]string) {
 		tip += bookmark
 	}
 	if "" != tip {
+		tip = strings.TrimSpace(tip)
 		*attrs = append(*attrs, []string{"tip", tip})
 	}
 }
