@@ -991,6 +991,7 @@ func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.W
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
 		}
+		r.nodeTipAttr(node, &attrs)
 		r.Tag("table", attrs, false)
 	} else {
 		if nil != node.FirstChild.Next {
@@ -1412,6 +1413,7 @@ func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) a
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
 		}
+		r.nodeTipAttr(node, &attrs)
 		r.Tag("p", attrs, false)
 	} else {
 		r.Tag("/p", nil, false)
@@ -1643,6 +1645,7 @@ func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) 
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
 		}
+		r.nodeTipAttr(node, &attrs)
 		r.Tag("blockquote", attrs, false)
 	} else {
 		r.WriteString("</blockquote>")
@@ -1750,6 +1753,7 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
 		}
+		r.nodeTipAttr(node, &attrs)
 		attrs = append(attrs, []string{"data-type", tag})
 		r.renderListStyle(node, &attrs)
 		r.Tag(tag, attrs, false)
@@ -1792,6 +1796,7 @@ func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) as
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
 		}
+		r.nodeTipAttr(node, &attrs)
 		r.Tag("li", attrs, false)
 	} else {
 		r.Tag("/li", nil, false)
@@ -1912,6 +1917,7 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	if 0 < len(ial) {
 		attrs = append(attrs, ial...)
 	}
+	r.nodeTipAttr(node, &attrs)
 	var expand bool
 	switch node.Type {
 	case ast.NodeCodeBlock:
@@ -1970,4 +1976,20 @@ func (r *VditorIRBlockRenderer) Text(node *ast.Node) (ret string) {
 		return ast.WalkContinue
 	})
 	return
+}
+
+func (r *VditorIRBlockRenderer) nodeTipAttr(node *ast.Node, attrs *[][]string) {
+	var tip string
+	if name := node.IALAttr("name"); "" != name {
+		tip += name + " "
+	}
+	if alias := node.IALAttr("alias"); "" != alias {
+		tip += alias + " "
+	}
+	if bookmark := node.IALAttr("bookmark"); "" != bookmark {
+		tip += bookmark
+	}
+	if "" != tip {
+		*attrs = append(*attrs, []string{"tip", tip})
+	}
 }
