@@ -63,6 +63,8 @@ type Options struct {
 	VditorSV bool
 	// KramdownBlockIAL 设置是否打开 kramdown 块级内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
 	KramdownBlockIAL bool
+	// KramdownSpanIAL 设置是否打开 kramdown 行级内联属性列表支持。
+	KramdownSpanIAL bool
 	// ImageLazyLoading 设置图片懒加载时使用的图片路径，配置该字段后将启用图片懒加载。
 	// 图片 src 的值会复制给新属性 data-src，然后使用该参数值作为 src 的值 https://github.com/88250/lute/issues/55
 	ImageLazyLoading string

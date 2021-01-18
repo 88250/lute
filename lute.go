@@ -390,6 +390,7 @@ func (lute *Lute) SetKramdownIAL(b bool) {
 	lute.ParseOptions.KramdownBlockIAL = b
 	lute.ParseOptions.KramdownSpanIAL = b
 	lute.RenderOptions.KramdownBlockIAL = b
+	lute.RenderOptions.KramdownSpanIAL = b
 }
 
 func (lute *Lute) SetKramdownBlockIAL(b bool) {
@@ -399,6 +400,7 @@ func (lute *Lute) SetKramdownBlockIAL(b bool) {
 
 func (lute *Lute) SetKramdownSpanIAL(b bool) {
 	lute.ParseOptions.KramdownSpanIAL = b
+	lute.RenderOptions.KramdownSpanIAL = b
 }
 
 func (lute *Lute) SetKramdownIALIDRenderName(name string) {

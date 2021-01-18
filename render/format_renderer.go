@@ -247,7 +247,7 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 }
 
 func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.Options.KramdownBlockIAL {
+	if !r.Options.KramdownSpanIAL {
 		return ast.WalkContinue
 	}
 

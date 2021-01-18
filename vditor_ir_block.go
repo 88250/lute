@@ -109,6 +109,7 @@ func (lute *Lute) VditorIRBlockDOM2StdMd(htmlStr string) (markdown string) {
 	options.AutoSpace = false
 	options.FixTermTypo = false
 	options.KramdownBlockIAL = true
+	options.KramdownSpanIAL = true
 	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = string(formatted)
@@ -219,6 +220,7 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	options.AutoSpace = false
 	options.FixTermTypo = false
 	options.KramdownBlockIAL = true
+	options.KramdownSpanIAL = true
 	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = string(formatted)
