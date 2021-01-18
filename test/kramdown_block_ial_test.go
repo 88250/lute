@@ -45,7 +45,7 @@ var kramdownBlockIALTests = []parseTest{
 func TestKramdownBlockIALs(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ParseOptions.KramdownIAL = true
-	luteEngine.RenderOptions.KramdownIAL = true
+	luteEngine.RenderOptions.KramdownBlockIAL = true
 
 	for _, test := range kramdownBlockIALTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
@@ -67,7 +67,7 @@ var kramdownBlockIALIDNAmeTests = []parseTest{
 func TestKramdownBlockIALIDName(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ParseOptions.KramdownIAL = true
-	luteEngine.RenderOptions.KramdownIAL = true
+	luteEngine.RenderOptions.KramdownBlockIAL = true
 	luteEngine.RenderOptions.KramdownIALIDRenderName = "data-block-id"
 
 	for _, test := range kramdownBlockIALIDNAmeTests {

@@ -44,7 +44,7 @@ func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkSt
 				}
 			} else {
 				var attrs [][]string
-				r.handleKramdownIAL(node)
+				r.handleKramdownBlockIAL(node)
 				attrs = append(attrs, node.KramdownIAL...)
 				r.Tag("pre", attrs, false)
 				r.WriteString("<code>")
@@ -70,7 +70,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 	preDiv := noHighlight(language)
 	if entering {
 		var attrs [][]string
-		r.handleKramdownIAL(node.Parent)
+		r.handleKramdownBlockIAL(node.Parent)
 		attrs = append(attrs, node.Parent.KramdownIAL...)
 
 		tokens := node.Tokens
@@ -144,7 +144,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 
 func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *HtmlRenderer) (rendered bool) {
 	var attrs [][]string
-	r.handleKramdownIAL(codeNode)
+	r.handleKramdownBlockIAL(codeNode)
 	attrs = append(attrs, codeNode.KramdownIAL...)
 
 	codeBlock := util.BytesToStr(tokens)

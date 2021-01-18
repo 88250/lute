@@ -175,7 +175,7 @@ func (r *FormatRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bo
 		r.Write([]byte("}}}"))
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
-			if r.withoutKramdownIAL(node.Parent) {
+			if r.withoutKramdownBlockIAL(node.Parent) {
 				r.WriteByte(lex.ItemNewline)
 			}
 		}
@@ -227,7 +227,7 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 	}
 	if entering {
 		r.Newline()
-		if r.Options.KramdownIAL {
+		if r.Options.KramdownBlockIAL {
 			if util.IsDocIAL(node.Tokens) {
 				r.WriteByte(lex.ItemNewline)
 			}
@@ -247,7 +247,7 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 }
 
 func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.Options.KramdownIAL {
+	if !r.Options.KramdownBlockIAL {
 		return ast.WalkContinue
 	}
 
@@ -636,7 +636,7 @@ func (r *FormatRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStat
 	} else {
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
-			if r.withoutKramdownIAL(node) {
+			if r.withoutKramdownBlockIAL(node) {
 				r.WriteByte(lex.ItemNewline)
 			}
 		}
@@ -833,7 +833,7 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		if !node.ParentIs(ast.NodeTableCell) {
-			if r.withoutKramdownIAL(node) {
+			if r.withoutKramdownBlockIAL(node) {
 				r.Newline()
 			}
 		}
@@ -858,7 +858,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 		}
 
 		if (!inTightList || (lastListItemLastPara)) && !node.ParentIs(ast.NodeTableCell) {
-			if r.withoutKramdownIAL(node) {
+			if r.withoutKramdownBlockIAL(node) {
 				r.WriteByte(lex.ItemNewline)
 			}
 		}
@@ -1016,7 +1016,7 @@ func (r *FormatRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool
 func (r *FormatRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 	if !entering && !r.isLastNode(r.Tree.Root, node) {
-		if r.withoutKramdownIAL(node) {
+		if r.withoutKramdownBlockIAL(node) {
 			r.WriteByte(lex.ItemNewline)
 		}
 	}
@@ -1029,7 +1029,7 @@ func (r *FormatRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering boo
 		r.Write(node.Tokens)
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
-			if r.withoutKramdownIAL(node.Parent) {
+			if r.withoutKramdownBlockIAL(node.Parent) {
 				r.WriteByte(lex.ItemNewline)
 			}
 		}
@@ -1069,7 +1069,7 @@ func (r *FormatRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.Walk
 			r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
 			r.Newline()
 			if !r.isLastNode(r.Tree.Root, node) {
-				if r.withoutKramdownIAL(node) {
+				if r.withoutKramdownBlockIAL(node) {
 					r.WriteByte(lex.ItemNewline)
 				}
 			}
@@ -1199,7 +1199,7 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) { // 在表格中不能换行，否则会破坏表格的排版 https://github.com/Vanessa219/vditor/issues/368
-			if r.withoutKramdownIAL(node) {
+			if r.withoutKramdownBlockIAL(node) {
 				r.WriteString("\n\n")
 			}
 		}
@@ -1229,7 +1229,7 @@ func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSt
 		}
 
 		if !node.ParentIs(ast.NodeTableCell) {
-			if r.withoutKramdownIAL(node) {
+			if r.withoutKramdownBlockIAL(node) {
 				r.Newline()
 				r.WriteByte(lex.ItemNewline)
 			}
@@ -1262,7 +1262,7 @@ func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) {
-			if r.withoutKramdownIAL(node) {
+			if r.withoutKramdownBlockIAL(node) {
 				r.WriteString("\n\n")
 			}
 		}
@@ -1381,6 +1381,6 @@ func (r *FormatRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) withoutKramdownIAL(node *ast.Node) bool {
-	return !r.Options.KramdownIAL || 0 == len(node.KramdownIAL)
+func (r *FormatRenderer) withoutKramdownBlockIAL(node *ast.Node) bool {
+	return !r.Options.KramdownBlockIAL || 0 == len(node.KramdownIAL)
 }

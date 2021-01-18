@@ -33,7 +33,7 @@ var kramdownSpanIALTests = []parseTest{
 func TestKramdownSpanIALs(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ParseOptions.KramdownIAL = true
-	luteEngine.RenderOptions.KramdownIAL = true
+	luteEngine.RenderOptions.KramdownBlockIAL = false
 	luteEngine.ParseOptions.Mark = true
 	luteEngine.ParseOptions.Tag = true
 

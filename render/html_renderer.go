@@ -305,7 +305,7 @@ func (r *HtmlRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool
 func (r *HtmlRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.handleKramdownIAL(node)
+		r.handleKramdownBlockIAL(node)
 		r.Tag("div", node.KramdownIAL, false)
 	} else {
 		r.Tag("/div", nil, false)
@@ -551,7 +551,7 @@ func (r *HtmlRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkSt
 	r.Newline()
 	if entering {
 		attrs := [][]string{{"class", "language-math"}}
-		r.handleKramdownIAL(node)
+		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		r.Tag("div", attrs, false)
 	}
@@ -609,7 +609,7 @@ func (r *HtmlRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *HtmlRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.handleKramdownIAL(node)
+		r.handleKramdownBlockIAL(node)
 		r.Tag("table", node.KramdownIAL, false)
 		r.Newline()
 	} else {
@@ -814,7 +814,7 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 
 	if entering {
 		r.Newline()
-		r.handleKramdownIAL(node)
+		r.handleKramdownBlockIAL(node)
 		var attrs [][]string
 		attrs = append(attrs, node.KramdownIAL...)
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
@@ -966,7 +966,7 @@ func (r *HtmlRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool)
 func (r *HtmlRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.handleKramdownIAL(node)
+		r.handleKramdownBlockIAL(node)
 		r.Tag("blockquote", node.KramdownIAL, false)
 		r.Newline()
 	} else {
@@ -989,9 +989,9 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		r.WriteString("<h" + level)
 		id := HeadingID(node)
-		if r.Options.ToC || r.Options.HeadingID || r.Options.KramdownIAL {
+		if r.Options.ToC || r.Options.HeadingID || r.Options.KramdownBlockIAL {
 			r.WriteString(" id=\"" + id + "\"")
-			if r.Options.KramdownIAL {
+			if r.Options.KramdownBlockIAL {
 				if "id" != r.Options.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
 					r.WriteString(" " + r.Options.KramdownIALIDRenderName + "=\"" + node.KramdownIAL[0][1] + "\"")
 				}
@@ -1037,7 +1037,7 @@ func (r *HtmlRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 		if 0 == node.BulletChar && 1 != node.Start {
 			attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
 		}
-		r.handleKramdownIAL(node)
+		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		r.Tag(tag, attrs, false)
 		r.Newline()
@@ -1052,7 +1052,7 @@ func (r *HtmlRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 func (r *HtmlRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		r.handleKramdownIAL(node)
+		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		if 3 == node.ListData.Typ && "" != r.Options.GFMTaskListItemClass &&
 			nil != node.FirstChild && (
@@ -1109,8 +1109,8 @@ func (r *HtmlRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *HtmlRenderer) handleKramdownIAL(node *ast.Node) {
-	if r.Options.KramdownIAL && "id" != r.Options.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
+func (r *HtmlRenderer) handleKramdownBlockIAL(node *ast.Node) {
+	if r.Options.KramdownBlockIAL && "id" != r.Options.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
 		// 第一项必须是 ID
 		node.KramdownIAL[0][0] = r.Options.KramdownIALIDRenderName
 	}

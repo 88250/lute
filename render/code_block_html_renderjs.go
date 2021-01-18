@@ -48,7 +48,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 	if entering {
 		r.Newline()
 		var attrs [][]string
-		r.handleKramdownIAL(node)
+		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		if !preDiv {
 			r.Tag("pre", attrs, false)

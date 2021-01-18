@@ -61,8 +61,8 @@ type Options struct {
 	VditorIR bool
 	// Vditor 分屏预览支持。
 	VditorSV bool
-	// KramdownIAL 设置是否打开 kramdown 内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
-	KramdownIAL bool
+	// KramdownBlockIAL 设置是否打开 kramdown 块级内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
+	KramdownBlockIAL bool
 	// ImageLazyLoading 设置图片懒加载时使用的图片路径，配置该字段后将启用图片懒加载。
 	// 图片 src 的值会复制给新属性 data-src，然后使用该参数值作为 src 的值 https://github.com/88250/lute/issues/55
 	ImageLazyLoading string
@@ -114,7 +114,7 @@ func NewOptions() *Options {
 		VditorWYSIWYG:                  false,
 		VditorIR:                       false,
 		VditorSV:                       false,
-		KramdownIAL:                    false,
+		KramdownBlockIAL:               false,
 		ChineseParagraphBeginningSpace: false,
 		FixTermTypo:                    true,
 		ToC:                            false,
@@ -419,7 +419,7 @@ func (r *BaseRenderer) headings() (ret []*Heading) {
 			id = "ir-" + id
 		}
 
-		if r.Options.KramdownIAL {
+		if r.Options.KramdownBlockIAL {
 			for _, kv := range heading.KramdownIAL {
 				if "id" == kv[0] {
 					id = kv[1]
