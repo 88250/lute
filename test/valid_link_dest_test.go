@@ -17,7 +17,11 @@ import (
 )
 
 func TestIsValidLinkDest(t *testing.T) {
-	luteEngine := lute.New() // 默认已经开启 YAML Front Matter 支持
+	luteEngine := lute.New()
+
+	if !luteEngine.IsValidLinkDest("http://127.0.0.1:6806") {
+		t.Fatalf("check link dest failed")
+	}
 
 	if !luteEngine.IsValidLinkDest("https://ld246.com") {
 		t.Fatalf("check link dest failed")

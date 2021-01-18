@@ -262,6 +262,12 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			}
 		}
 		domain := url[:k]
+		var port []byte
+		if idx := bytes.Index(domain, []byte(":")); 0 < idx {
+			port = domain[idx:]
+			domain = domain[:idx]
+		}
+
 		if !t.isValidDomain(domain) {
 			t.addPreviousText(node, tokens[textStart:i])
 			needUnlink = true
@@ -354,6 +360,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		}
 
 		dest := append(protocol, domain...)
+		dest = append(dest, port...)
 		dest = append(dest, path...)
 		var addr []byte
 		if !www {
@@ -412,11 +419,22 @@ func (t *Tree) isValidDomain(domain []byte) bool {
 
 		if i == length-1 {
 			validSuffix := false
-			for j := 0; j < len(validAutoLinkDomainSuffix); j++ {
-				if bytes.Equal(segment, validAutoLinkDomainSuffix[j]) {
-					validSuffix = true
+			suffixIsDigit := true // 校验后缀是否全为数字
+			for _, b := range segment {
+				if !lex.IsDigit(b) {
+					suffixIsDigit = false
 					break
 				}
+			}
+			if !suffixIsDigit { // 如果后缀不是数字的话检查是否在后缀可用名单中
+				for j := 0; j < len(validAutoLinkDomainSuffix); j++ {
+					if bytes.Equal(segment, validAutoLinkDomainSuffix[j]) {
+						validSuffix = true
+						break
+					}
+				}
+			} else { // 后缀全为数字的话可能是 IPv4 地址
+				validSuffix = true
 			}
 			if !validSuffix {
 				return false
