@@ -51,7 +51,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					// 如果是任务列表项则添加任务列表标记符节点
 
 					tokens := p.Tokens
-					if context.ParseOption.KramdownIAL {
+					if context.ParseOption.KramdownBlockIAL {
 						if ial := context.parseKramdownIALInListItem(tokens); 0 < len(ial) {
 							tokens = tokens[bytes.Index(tokens, []byte("}"))+1:]
 							p.KramdownIAL = ial // 暂存于 p 的 IAL 上，最终化列表时会被置空

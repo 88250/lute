@@ -54,7 +54,7 @@ func TestMd2VditorDOM(t *testing.T) {
 	luteEngine.SetVditorWYSIWYG(true)
 	luteEngine.ParseOptions.ToC = true
 	luteEngine.RenderOptions.ToC = true
-	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.ParseOptions.KramdownBlockIAL = true
 	luteEngine.RenderOptions.KramdownBlockIAL = true
 
 	for _, test := range md2VditorDOMTests {
@@ -90,7 +90,7 @@ func TestMd2VditorIRDOM(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.ParseOptions.ToC = true
 	luteEngine.RenderOptions.ToC = true
-	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.ParseOptions.KramdownBlockIAL = true
 	luteEngine.RenderOptions.KramdownBlockIAL = true
 
 	ast.Testing = true
@@ -138,7 +138,7 @@ func TestMd2VditorIRBlockDOM(t *testing.T) {
 	luteEngine.SetVditorIR(true)
 	luteEngine.SetToC(true)
 	luteEngine.ParseOptions.BlockRef = true
-	luteEngine.ParseOptions.KramdownIAL = true
+	luteEngine.ParseOptions.KramdownBlockIAL = true
 	luteEngine.RenderOptions.KramdownBlockIAL = true
 	luteEngine.ParseOptions.Tag = true
 	luteEngine.ParseOptions.SuperBlock = true

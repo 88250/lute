@@ -63,7 +63,7 @@ func (t *Tree) parseYamlFrontMatter() bool {
 }
 
 func isYamlFrontMatterClose(context *Context) bool {
-	if context.ParseOption.KramdownIAL && len("{: id=\"") < len(context.currentLine) {
+	if context.ParseOption.KramdownBlockIAL && len("{: id=\"") < len(context.currentLine) {
 		// 判断 IAL 打断
 		if ial := context.parseKramdownBlockIAL(context.currentLine); 0 < len(ial) {
 			context.Tip.KramdownIAL = ial

@@ -39,7 +39,7 @@ func (context *Context) listFinalize(list *ast.Node) {
 		item = item.Next
 	}
 
-	if context.ParseOption.KramdownIAL {
+	if context.ParseOption.KramdownBlockIAL {
 		for li := list.FirstChild; nil != li; li = li.Next {
 			if nil == li.FirstChild {
 				continue
@@ -159,7 +159,7 @@ func (t *Tree) parseListMarker(container *ast.Node) *ast.ListData {
 		// 判断是否是任务列表项
 
 		tokens := ln[t.Context.offset:]
-		if t.Context.ParseOption.KramdownIAL {
+		if t.Context.ParseOption.KramdownBlockIAL {
 			if ial := t.Context.parseKramdownIALInListItem(tokens); 0 < len(ial) {
 				tokens = tokens[bytes.Index(tokens, []byte("}"))+1:]
 			}

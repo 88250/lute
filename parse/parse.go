@@ -26,9 +26,10 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
-	if tree.Context.ParseOption.KramdownIAL {
+	if tree.Context.ParseOption.KramdownSpanIAL {
 		tree.parseKramdownSpanIAL()
-
+	}
+	if tree.Context.ParseOption.KramdownBlockIAL {
 		var docIAL *ast.Node
 		var id string
 		if nil != tree.Context.rootIAL {
@@ -52,7 +53,7 @@ func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.Root.AppendChild(&ast.Node{Type: ast.NodeParagraph, Tokens: markdown})
 	tree.parseInlines()
-	if tree.Context.ParseOption.KramdownIAL {
+	if tree.Context.ParseOption.KramdownSpanIAL {
 		tree.parseKramdownSpanIAL()
 	}
 	tree.lexer = nil
@@ -276,8 +277,10 @@ type Options struct {
 	BlockRef bool
 	// Mark 设置是否打开 ==标记== 支持。
 	Mark bool
-	// KramdownIAL 设置是否打开 kramdown 内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
-	KramdownIAL bool
+	// KramdownBlockIAL 设置是否打开 kramdown 块级内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
+	KramdownBlockIAL bool
+	// KramdownSpanIAL 设置是否打开 kramdown 行级内联属性列表支持。
+	KramdownSpanIAL bool
 	// Tag 设置是否开启 #标签# 支持。
 	Tag bool
 	// ImgPathAllowSpace 设置是否支持图片路径带空格。
@@ -304,7 +307,7 @@ func NewOptions() *Options {
 		YamlFrontMatter:  true,
 		BlockRef:         false,
 		Mark:             false,
-		KramdownIAL:      false,
+		KramdownBlockIAL: false,
 		HeadingID:        true,
 	}
 }

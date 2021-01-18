@@ -324,7 +324,7 @@ var blockStarts = []blockStartFunc{
 
 	// 判断 kramdown 块级内联属性列表（{: attrs}）是否开始。
 	func(t *Tree, container *ast.Node) int {
-		if !t.Context.ParseOption.KramdownIAL || t.Context.indented {
+		if !t.Context.ParseOption.KramdownBlockIAL || t.Context.indented {
 			return 0
 		}
 
