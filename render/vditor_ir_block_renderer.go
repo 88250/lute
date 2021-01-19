@@ -1077,7 +1077,7 @@ func (r *VditorIRBlockRenderer) renderLinkDest(node *ast.Node, entering bool) as
 		}
 
 		r.Tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
-		r.Write(node.Tokens)
+		r.Write(html.EscapeHTML(node.Tokens))
 		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
