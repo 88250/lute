@@ -13,6 +13,7 @@ package main
 import (
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
 	"github.com/gopherjs/gopherjs/js"
@@ -34,5 +35,7 @@ func main() {
 		"GetHeadingID":     render.HeadingID,
 		"Caret":            util.Caret,
 		"NewNodeID":        ast.NewNodeID,
+		"EscapeStr":        html.EscapeString,
+		"UnEscapeStr":      html.UnescapeString,
 	})
 }
