@@ -1292,6 +1292,8 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 func (lute *Lute) setIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	ialTokens = []byte("{: id=\"" + node.ID + "\"")
 	if bookmark := lute.domAttrValue(n, "bookmark"); "" != bookmark {
+		bookmark = html.UnescapeString(bookmark)
+		bookmark = html.EscapeString(bookmark)
 		node.SetIALAttr("bookmark", bookmark)
 		ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
 	}
@@ -1300,14 +1302,20 @@ func (lute *Lute) setIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
 	}
 	if name := lute.domAttrValue(n, "name"); "" != name {
+		name = html.UnescapeString(name)
+		name = html.EscapeString(name)
 		node.SetIALAttr("name", name)
 		ialTokens = append(ialTokens, []byte(" name=\""+name+"\"")...)
 	}
 	if memo := lute.domAttrValue(n, "memo"); "" != memo {
+		memo = html.UnescapeString(memo)
+		memo = html.EscapeString(memo)
 		node.SetIALAttr("memo", memo)
 		ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
 	}
 	if alias := lute.domAttrValue(n, "alias"); "" != alias {
+		alias = html.UnescapeString(alias)
+		alias = html.EscapeString(alias)
 		node.SetIALAttr("alias", alias)
 		ialTokens = append(ialTokens, []byte(" alias=\""+alias+"\"")...)
 	}
