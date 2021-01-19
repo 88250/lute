@@ -345,7 +345,7 @@ var blockStarts = []blockStartFunc{
 
 			lastMatchedContainer := t.Context.lastMatchedContainer
 			if t.Context.allClosed {
-				if ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type {
+				if ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type || ast.NodeBlockquote == lastMatchedContainer.Type {
 					lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
 					if nil == lastMatchedContainer {
 						lastMatchedContainer = t.Context.lastMatchedContainer
