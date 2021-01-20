@@ -165,6 +165,7 @@ func (t *Tree) incorporateLine(line []byte) {
 				typ == ast.NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
 				(typ == ast.NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
 				(typ == ast.NodeMathBlock) || // 数学公式块不计入空行判断
+				(typ == ast.NodeGitConflict) || // Git 冲突标记不计入空行判断
 				(typ == ast.NodeListItem && nil == container.FirstChild)) // 内容为空的列表项也不计入空行判断
 		// 因为列表是块级容器（可进行嵌套），所以需要在父节点方向上传播 LastLineBlank
 		// LastLineBlank 目前仅在判断列表紧凑模式上使用
@@ -236,6 +237,8 @@ func _continue(n *ast.Node, context *Context) int {
 		return FootnotesContinue(n, context)
 	case ast.NodeSuperBlock:
 		return SuperBlockContinue(n, context)
+	case ast.NodeGitConflict:
+		return GitConflictContinue(n, context)
 	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeBlockEmbed, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed:
 		return 1
 	}

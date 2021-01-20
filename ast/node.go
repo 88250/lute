@@ -387,7 +387,7 @@ func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed,
-		NodeKramdownBlockIAL, NodeSuperBlock:
+		NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict:
 		return true
 	}
 	return false
@@ -420,7 +420,7 @@ func (n *Node) IsMarker() bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed, NodeGitConflict:
 		return true
 	}
 	return false
@@ -430,7 +430,7 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
 	switch n.Type {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
@@ -629,6 +629,15 @@ const (
 	NodeSub            NodeType = 490 // 下标
 	NodeSubOpenMarker  NodeType = 491 // 开始下标标记符 ~
 	NodeSubCloseMarker NodeType = 492 // 结束下标标记符 ~
+
+	// Git 冲突标记 https://github.com/88250/lute/issues/131
+
+	NodeGitConflict              NodeType = 495 // Git 冲突标记
+	NodeGitConflictOpenMarker    NodeType = 496 // 开始 Git 冲突标记标记符 <<<<<<<
+	NodeGitConflictLocalContent  NodeType = 497 // Git 冲突标记本地内容
+	NodeGitConflictSepMarker     NodeType = 498 // Git 冲突标记分割符 =======
+	NodeGitConflictRemoteContent NodeType = 499 // Git 冲突标记远程内容
+	NodeGitConflictCloseMarker   NodeType = 500 // 结束 Git 冲突标记标记符 >>>>>>>
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

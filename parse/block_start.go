@@ -26,6 +26,25 @@ type blockStartFunc func(t *Tree, container *ast.Node) int
 // 2：匹配到叶子块
 var blockStarts = []blockStartFunc{
 
+	// 判断 Git 冲突标记是否开始。
+	//   <<<<<<< HEAD
+	//   这里是本地原来的内容
+	//   =======
+	//   这里是拉取下来的内容
+	//   >>>>>>> feebfeb6bef44cf1384d51cdd7aef7e4197b8180
+	func(t *Tree, container *ast.Node) int {
+		if t.Context.indented {
+			return 0
+		}
+
+		if ok := t.parseGitConflict(); ok {
+			t.Context.closeUnmatchedBlocks()
+			t.Context.addChild(ast.NodeGitConflict)
+			return 2
+		}
+		return 1
+	},
+
 	// 判断块引用（>）是否开始。
 	func(t *Tree, container *ast.Node) int {
 		if t.Context.indented {

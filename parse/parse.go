@@ -188,6 +188,8 @@ func (context *Context) finalize(block *ast.Node) {
 		context.listFinalize(block)
 	case ast.NodeSuperBlock:
 		context.superBlockFinalize(block)
+	case ast.NodeGitConflict:
+		context.gitConflictFinalize(block)
 	}
 
 	context.Tip = parent
