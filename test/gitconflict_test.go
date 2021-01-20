@@ -18,7 +18,7 @@ import (
 
 var gitConflictTests = []parseTest{
 
-	{"0", "<<<<<<< HEAD\n这里是本地原来的内容\n=======\n这里是拉取下来的内容\n>>>>>>> feebfeb6bef44cf1384d51cdd7aef7e4197b8180", "<div class=\"language-math\">a^2 + b^2 = \\color{red}c^2</div>\n"},
+	{"0", "<<<<<<< HEAD\n这里是本地原来的内容\n=======\n这里是拉取下来的内容\n>>>>>>> feebfeb6bef44cf1384d51cdd7aef7e4197b8180", "<div class=\"language-git-conflict\"><<<<<<< HEAD\n这里是本地原来的内容\n=======\n这里是拉取下来的内容\n>>>>>>> feebfeb6bef44cf1384d51cdd7aef7e4197b8180\n</div>"},
 }
 
 func TestGitConflict(t *testing.T) {

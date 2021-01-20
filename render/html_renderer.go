@@ -143,6 +143,12 @@ func NewHtmlRenderer(tree *parse.Tree, options *Options) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
 	ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
 	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
+	ret.RendererFuncs[ast.NodeGitConflict] = ret.renderGitConflict
+	ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
+	ret.RendererFuncs[ast.NodeGitConflictLocalContent] = ret.renderGitConflictLocal
+	ret.RendererFuncs[ast.NodeGitConflictSepMarker] = ret.renderGitConflictSep
+	ret.RendererFuncs[ast.NodeGitConflictRemoteContent] = ret.renderGitConflictRemote
+	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	return ret
 }
 
@@ -150,6 +156,59 @@ func (r *HtmlRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
 	output = append(output, r.RenderFootnotes()...)
 	return
+}
+
+func (r *HtmlRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderGitConflictRemote(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(html.EscapeHTML(node.Tokens))
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderGitConflictSep(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("=======")
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderGitConflictLocal(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(html.EscapeHTML(node.Tokens))
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderGitConflictOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderGitConflict(node *ast.Node, entering bool) ast.WalkStatus {
+	r.Newline()
+	if entering {
+		attrs := [][]string{{"class", "language-git-conflict"}}
+		r.handleKramdownBlockIAL(node)
+		attrs = append(attrs, node.KramdownIAL...)
+		r.Tag("div", attrs, false)
+	} else {
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
