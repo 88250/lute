@@ -632,12 +632,10 @@ const (
 
 	// Git 冲突标记 https://github.com/88250/lute/issues/131
 
-	NodeGitConflict              NodeType = 495 // Git 冲突标记
-	NodeGitConflictOpenMarker    NodeType = 496 // 开始 Git 冲突标记标记符 <<<<<<<
-	NodeGitConflictLocalContent  NodeType = 497 // Git 冲突标记本地内容
-	NodeGitConflictSepMarker     NodeType = 498 // Git 冲突标记分割符 =======
-	NodeGitConflictRemoteContent NodeType = 499 // Git 冲突标记远程内容
-	NodeGitConflictCloseMarker   NodeType = 500 // 结束 Git 冲突标记标记符 >>>>>>>
+	NodeGitConflict            NodeType = 495 // Git 冲突标记
+	NodeGitConflictOpenMarker  NodeType = 496 // 开始 Git 冲突标记标记符 <<<<<<<
+	NodeGitConflictContent     NodeType = 497 // Git 冲突标记内容
+	NodeGitConflictCloseMarker NodeType = 498 // 结束 Git 冲突标记标记符 >>>>>>>
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

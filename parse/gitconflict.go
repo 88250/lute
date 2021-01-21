@@ -25,19 +25,14 @@ func GitConflictContinue(gitConflictBlock *ast.Node, context *Context) int {
 
 func (context *Context) gitConflictFinalize(gitConflictBlock *ast.Node) {
 	tokens := gitConflictBlock.Tokens
-	lines := bytes.Split(tokens, []byte("=======\n"))
-	parts := lines[0]
-	localParts := bytes.Split(parts, []byte("\n"))
-	openMarkerTokens := localParts[0]
-	local := bytes.Join(localParts[1:], []byte("\n"))
-	local = bytes.TrimSpace(local)
-	remote := bytes.TrimSpace(lines[1])
+	contentParts := bytes.Split(tokens, []byte("\n"))
+	openMarkerTokens := contentParts[0]
+	content := bytes.Join(contentParts[1:], []byte("\n"))
+	content = bytes.TrimSpace(content)
 	closeMarkerTokens := bytes.TrimSpace(context.currentLine)
 	gitConflictBlock.Tokens = nil
 	gitConflictBlock.AppendChild(&ast.Node{Type: ast.NodeGitConflictOpenMarker, Tokens: openMarkerTokens})
-	gitConflictBlock.AppendChild(&ast.Node{Type: ast.NodeGitConflictLocalContent, Tokens: local})
-	gitConflictBlock.AppendChild(&ast.Node{Type: ast.NodeGitConflictSepMarker})
-	gitConflictBlock.AppendChild(&ast.Node{Type: ast.NodeGitConflictRemoteContent, Tokens: remote})
+	gitConflictBlock.AppendChild(&ast.Node{Type: ast.NodeGitConflictContent, Tokens: content})
 	gitConflictBlock.AppendChild(&ast.Node{Type: ast.NodeGitConflictCloseMarker, Tokens: closeMarkerTokens})
 }
 

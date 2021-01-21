@@ -149,9 +149,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree, options *Options) *VditorIRBlock
 	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	ret.RendererFuncs[ast.NodeGitConflict] = ret.renderGitConflict
 	ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
-	ret.RendererFuncs[ast.NodeGitConflictLocalContent] = ret.renderGitConflictLocal
-	ret.RendererFuncs[ast.NodeGitConflictSepMarker] = ret.renderGitConflictSep
-	ret.RendererFuncs[ast.NodeGitConflictRemoteContent] = ret.renderGitConflictRemote
+	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	return ret
 }
@@ -165,15 +163,7 @@ func (r *VditorIRBlockRenderer) renderGitConflictCloseMarker(node *ast.Node, ent
 	return ast.WalkContinue
 }
 
-func (r *VditorIRBlockRenderer) renderGitConflictRemote(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *VditorIRBlockRenderer) renderGitConflictSep(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *VditorIRBlockRenderer) renderGitConflictLocal(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorIRBlockRenderer) renderGitConflictContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		return ast.WalkContinue
 	}
@@ -183,8 +173,6 @@ func (r *VditorIRBlockRenderer) renderGitConflictLocal(node *ast.Node, entering 
 	r.Tag("pre", [][]string{{"class", class}}, false)
 	r.Tag("code", attrs, false)
 	r.Write(html.EscapeHTML(node.Tokens))
-	r.WriteString("=======")
-	r.Write(html.EscapeHTML(node.Next.Next.Tokens))
 	r.Newline()
 	r.WriteString("</code></pre>")
 	return ast.WalkContinue

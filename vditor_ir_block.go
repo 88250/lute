@@ -246,7 +246,8 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	if "" == nodeID {
 		if "p" == dataType || "ul" == dataType || "ol" == dataType || "blockquote" == dataType ||
 			"math-block" == dataType || "code-block" == dataType || "table" == dataType || "h" == dataType ||
-			"link-ref-defs-block" == dataType || "footnotes-block" == dataType || "super-block" == dataType {
+			"link-ref-defs-block" == dataType || "footnotes-block" == dataType || "super-block" == dataType ||
+			"git-conflict" == dataType {
 			nodeID = ast.NewNodeID()
 			node.ID = nodeID
 		}
@@ -609,6 +610,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			switch divDataType {
 			case "math-block":
 				node.Type = ast.NodeMathBlockContent
+				node.Tokens = codeTokens
+				tree.Context.Tip.AppendChild(node)
+			case "git-conflict":
+				node.Type = ast.NodeGitConflictContent
 				node.Tokens = codeTokens
 				tree.Context.Tip.AppendChild(node)
 			case "html-block":
@@ -1077,13 +1082,17 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
 			return
+		case "git-conflict-close-marker":
+			text := lute.domText(n)
+			tree.Context.TipAppendChild(&ast.Node{Type: ast.NodeGitConflictCloseMarker, Tokens: []byte(text)})
+		case "git-conflict-open-marker":
+			text := lute.domText(n)
+			tree.Context.TipAppendChild(&ast.Node{Type: ast.NodeGitConflictOpenMarker, Tokens: []byte(text)})
 		case "math-block-close-marker":
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: parse.MathBlockMarker})
 			return
 		case "math-block-open-marker":
-			node.Type = ast.NodeMathBlockOpenMarker
-			node.Tokens = parse.MathBlockMarker
-			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker, Tokens: parse.MathBlockMarker})
 			return
 		case "yaml-front-matter-close-marker":
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeYamlFrontMatterCloseMarker, Tokens: parse.YamlFrontMatterMarker})
@@ -1184,6 +1193,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Div:
 		switch dataType {
+		case "git-conflict":
+			node.Type = ast.NodeGitConflict
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
 		case "super-block":
 			node.Type = ast.NodeSuperBlock
 			tree.Context.Tip.AppendChild(node)

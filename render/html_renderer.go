@@ -145,9 +145,7 @@ func NewHtmlRenderer(tree *parse.Tree, options *Options) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	ret.RendererFuncs[ast.NodeGitConflict] = ret.renderGitConflict
 	ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
-	ret.RendererFuncs[ast.NodeGitConflictLocalContent] = ret.renderGitConflictLocal
-	ret.RendererFuncs[ast.NodeGitConflictSepMarker] = ret.renderGitConflictSep
-	ret.RendererFuncs[ast.NodeGitConflictRemoteContent] = ret.renderGitConflictRemote
+	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	return ret
 }
@@ -166,23 +164,7 @@ func (r *HtmlRenderer) renderGitConflictCloseMarker(node *ast.Node, entering boo
 	return ast.WalkContinue
 }
 
-func (r *HtmlRenderer) renderGitConflictRemote(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Write(html.EscapeHTML(node.Tokens))
-		r.Newline()
-	}
-	return ast.WalkContinue
-}
-
-func (r *HtmlRenderer) renderGitConflictSep(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("=======")
-		r.Newline()
-	}
-	return ast.WalkContinue
-}
-
-func (r *HtmlRenderer) renderGitConflictLocal(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *HtmlRenderer) renderGitConflictContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Write(html.EscapeHTML(node.Tokens))
 		r.Newline()
