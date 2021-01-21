@@ -40,6 +40,7 @@ func TestHTML2VditorDOM(t *testing.T) {
 
 var html2VditorIRBlockDOMTests = []parseTest{
 
+	{"1", `<!--StartFragment--><span>第9号</span><!--EndFragment-->`, "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">第9号</p>"},
 	{"0", `<!--StartFragment-->
 <table border="0" cellpadding="0" cellspacing="0" width="144" height="18">
  <colgroup><col width="72" span="2">
@@ -54,6 +55,7 @@ var html2VditorIRBlockDOMTests = []parseTest{
 
 func TestHTML2VditorIRBlockDOM(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetAutoSpace(false)
 
 	ast.Testing = true
 	for _, test := range html2VditorIRBlockDOMTests {
