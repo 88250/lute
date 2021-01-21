@@ -46,7 +46,7 @@ var blockStarts = []blockStartFunc{
 			t.Context.addChild(ast.NodeGitConflict)
 			return 2
 		}
-		return 1
+		return 0
 	},
 
 	// 判断块引用（>）是否开始。

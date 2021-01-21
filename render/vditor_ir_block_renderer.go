@@ -181,7 +181,7 @@ func (r *VditorIRBlockRenderer) renderGitConflictContent(node *ast.Node, enterin
 func (r *VditorIRBlockRenderer) renderGitConflictOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("span", [][]string{{"data-type", "git-conflict-open-marker"}}, false)
-		r.Write(parse.MathBlockMarker)
+		r.Write(node.Tokens)
 		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
