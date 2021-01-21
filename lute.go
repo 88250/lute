@@ -427,7 +427,7 @@ func (lute *Lute) SetSub(b bool) {
 	lute.ParseOptions.Sub = b
 }
 
-func (lute *Lute) GitConflict(b bool) {
+func (lute *Lute) SetGitConflict(b bool) {
 	lute.ParseOptions.GitConflict = b
 }
 
