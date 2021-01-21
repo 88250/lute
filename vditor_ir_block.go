@@ -1085,9 +1085,11 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		case "git-conflict-close-marker":
 			text := lute.domText(n)
 			tree.Context.TipAppendChild(&ast.Node{Type: ast.NodeGitConflictCloseMarker, Tokens: []byte(text)})
+			return
 		case "git-conflict-open-marker":
 			text := lute.domText(n)
 			tree.Context.TipAppendChild(&ast.Node{Type: ast.NodeGitConflictOpenMarker, Tokens: []byte(text)})
+			return
 		case "math-block-close-marker":
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: parse.MathBlockMarker})
 			return
