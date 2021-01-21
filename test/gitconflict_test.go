@@ -23,6 +23,7 @@ var gitConflictTests = []parseTest{
 
 func TestGitConflict(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.ParseOptions.GitConflict = true
 
 	for _, test := range gitConflictTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

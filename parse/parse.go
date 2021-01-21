@@ -293,6 +293,8 @@ type Options struct {
 	Sup bool
 	// Sub 设置是否打开 ~下标~ 支持。
 	Sub bool
+	// GitConflict 设置是否打开 Git 冲突标记支持。
+	GitConflict bool
 }
 
 func NewOptions() *Options {
