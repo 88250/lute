@@ -144,7 +144,42 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
 	ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
 	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
+	ret.RendererFuncs[ast.NodeGitConflict] = ret.renderGitConflict
+	ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
+	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
+	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	return ret
+}
+
+func (r *FormatRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderGitConflictContent(node *ast.Node, entering bool) ast.WalkStatus {
+	if !entering {
+		r.Write(node.Tokens)
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderGitConflictOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderGitConflict(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {

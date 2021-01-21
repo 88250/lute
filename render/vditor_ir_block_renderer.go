@@ -156,7 +156,7 @@ func NewVditorIRBlockRenderer(tree *parse.Tree, options *Options) *VditorIRBlock
 
 func (r *VditorIRBlockRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("span", [][]string{{"data-type", "git-conflict-close-marker"}}, false)
+		r.Tag("span", [][]string{{"data-type", "git-conflict-close-marker"}, {"class", "vditor-ir__marker"}}, false)
 		r.Write(node.Tokens)
 		r.Tag("/span", nil, false)
 	}
@@ -164,23 +164,21 @@ func (r *VditorIRBlockRenderer) renderGitConflictCloseMarker(node *ast.Node, ent
 }
 
 func (r *VditorIRBlockRenderer) renderGitConflictContent(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		return ast.WalkContinue
+	if entering {
+		var attrs [][]string
+		class := "vditor-ir__marker--pre"
+		r.Tag("pre", [][]string{{"class", class}}, false)
+		r.Tag("code", attrs, false)
+		r.Write(html.EscapeHTML(node.Tokens))
+		r.Newline()
+		r.WriteString("</code></pre>")
 	}
-
-	var attrs [][]string
-	class := "vditor-ir__marker--pre"
-	r.Tag("pre", [][]string{{"class", class}}, false)
-	r.Tag("code", attrs, false)
-	r.Write(html.EscapeHTML(node.Tokens))
-	r.Newline()
-	r.WriteString("</code></pre>")
 	return ast.WalkContinue
 }
 
 func (r *VditorIRBlockRenderer) renderGitConflictOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("span", [][]string{{"data-type", "git-conflict-open-marker"}}, false)
+		r.Tag("span", [][]string{{"data-type", "git-conflict-open-marker"}, {"class", "vditor-ir__marker"}}, false)
 		r.Write(node.Tokens)
 		r.Tag("/span", nil, false)
 	}
