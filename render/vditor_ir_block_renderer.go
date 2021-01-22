@@ -1256,11 +1256,10 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		if strings.Contains(text, util.Caret) || needResetCaret {
 			class += " vditor-ir__node--expand"
 		}
-		if renderFigure {
-			class += " img--center"
-		}
-
 		attrs := [][]string{{"class", class}, {"data-type", "img"}}
+		if renderFigure {
+			attrs = append(attrs, []string{"style", "display: block; text-align: center;"})
+		}
 		r.Tag("span", attrs, false)
 	} else {
 		if needResetCaret {
