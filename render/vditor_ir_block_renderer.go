@@ -1242,13 +1242,7 @@ func (r *VditorIRBlockRenderer) renderBang(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	needResetCaret := nil != node.Next && ast.NodeText == node.Next.Type && bytes.HasPrefix(node.Next.Tokens, util.CaretTokens)
-	single := nil == node.Previous
-	if single {
-		if nil != node.Next {
-			single = nil == node.Next.Next // 跳过 Span IAL 节点
-		}
-	}
-	renderFigure := single
+	renderFigure := nil != node.ChildByType(ast.NodeLinkTitle)
 
 	if entering {
 		text := r.Text(node)
@@ -1257,9 +1251,16 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 			class += " vditor-ir__node--expand"
 		}
 		attrs := [][]string{{"class", class}, {"data-type", "img"}}
-		if renderFigure {
-			attrs = append(attrs, []string{"style", "display: block; text-align: center;"})
+
+		parentStyle := node.IALAttr("parent-style")
+		if "" != parentStyle { // 手动设置了位置
+			attrs = append(attrs, []string{"style", parentStyle})
+		} else {
+			if renderFigure { // 未手动设置位置且需要渲染图注
+				attrs = append(attrs, []string{"style", "display: block; text-align: center;"})
+			}
 		}
+
 		r.Tag("span", attrs, false)
 	} else {
 		if needResetCaret {
@@ -1278,7 +1279,9 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		}
 
 		attrs = append(attrs, r.NodeAttrs(node.Parent)...)
-		attrs = append(attrs, node.KramdownIAL...)
+		if style := node.IALAttr("style"); "" != style {
+			attrs = append(attrs, []string{"style", style})
+		}
 		r.Tag("img", attrs, true)
 		// XSS 过滤
 		buf := r.Writer.Bytes()
