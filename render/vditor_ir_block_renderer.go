@@ -1714,6 +1714,13 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 		}
 
 		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\" " + r.NodeAttrsStr(node) + " data-type=\"h\"")
+
+		var tipAttrs [][]string
+		r.nodeTipAttr(node, &tipAttrs)
+		if 0 < len(tipAttrs) {
+			r.WriteString(" tip=\"" + tipAttrs[0][1] + "\"")
+		}
+
 		if !node.HeadingSetext {
 			r.WriteString(" data-marker=\"#\">")
 		} else {
