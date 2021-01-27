@@ -40,6 +40,19 @@ func TestHTML2VditorDOM(t *testing.T) {
 
 var html2VditorIRBlockDOMTests = []parseTest{
 
+	{"2", `<table border="0" cellpadding="0" cellspacing="0" width="144">
+<!--StartFragment-->
+ <colgroup><col width="72" span="2">
+ </colgroup><tbody><tr height="19">
+  <td height="19" width="72">foo</td>
+  <td width="72">bar</td>
+ </tr>
+ <tr height="19">
+  <td height="19">baz</td>
+  <td>bazz</td>
+ </tr>
+<!--EndFragment-->
+</tbody></table>`, "<table data-block=\"0\" data-type=\"table\" data-node-id=\"20060102150405-1a2b3c4\"><thead><tr><th>foo</th><th>bar</th></tr></thead><tbody><tr><td>baz</td><td>bazz</td></tr></tbody></table>"},
 	{"1", `<!--StartFragment--><span>第9号</span><!--EndFragment-->`, "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">第9号</p>"},
 	{"0", `<!--StartFragment-->
 <table border="0" cellpadding="0" cellspacing="0" width="144" height="18">
