@@ -395,7 +395,7 @@ func (r *HtmlRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.Wal
 
 func (r *HtmlRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/div", nil, false)
+		r.WriteString("</code></pre>")
 	}
 	return ast.WalkContinue
 }
@@ -410,7 +410,9 @@ func (r *HtmlRenderer) renderYamlFrontMatterContent(node *ast.Node, entering boo
 func (r *HtmlRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"class", "vditor-yml-front-matter"}}
-		r.Tag("div", attrs, false)
+		attrs = append(attrs, node.Parent.KramdownIAL...)
+		r.Tag("pre", attrs, false)
+		r.WriteString("<code class=\"language-yaml\">")
 	}
 	return ast.WalkContinue
 }
