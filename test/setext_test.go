@@ -22,8 +22,8 @@ var setextTests = []parseTest{
 }
 
 func TestSetext(t *testing.T) {
-	luteEngine := lute.New() // 默认已经开启 Setext 标题解析
-
+	luteEngine := lute.New()
+	luteEngine.SetHeadingID(true)
 	for _, test := range setextTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

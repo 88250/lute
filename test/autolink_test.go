@@ -32,7 +32,7 @@ var autoLinkTests = []parseTest{
 
 func TestAutoLink(t *testing.T) {
 	luteEngine := lute.New()
-
+	luteEngine.SetAutoSpace(true)
 	for _, test := range autoLinkTests {
 		result:= luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != result {

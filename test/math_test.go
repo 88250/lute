@@ -41,7 +41,7 @@ var mathTests = []parseTest{
 
 func TestMath(t *testing.T) {
 	luteEngine := lute.New()
-
+	luteEngine.SetHeadingID(true)
 	for _, test := range mathTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

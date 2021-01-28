@@ -79,7 +79,8 @@ var spaceTests = []parseTest{
 }
 
 func TestAutoSpace(t *testing.T) {
-	luteEngine := lute.New() // 默认已经开启自动空格优化
+	luteEngine := lute.New()
+	luteEngine.SetAutoSpace(true)
 	luteEngine.ParseOptions.Mark = true
 	luteEngine.ParseOptions.Tag = true
 

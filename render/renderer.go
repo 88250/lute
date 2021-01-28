@@ -107,7 +107,7 @@ type Options struct {
 func NewOptions() *Options {
 	return &Options{
 		SoftBreak2HardBreak:            true,
-		AutoSpace:                      true,
+		AutoSpace:                      false,
 		RenderListStyle:                false,
 		CodeSyntaxHighlight:            true,
 		CodeSyntaxHighlightInlineStyle: false,
@@ -118,9 +118,9 @@ func NewOptions() *Options {
 		VditorSV:                       false,
 		KramdownBlockIAL:               false,
 		ChineseParagraphBeginningSpace: false,
-		FixTermTypo:                    true,
+		FixTermTypo:                    false,
 		ToC:                            false,
-		HeadingID:                      true,
+		HeadingID:                      false,
 		KramdownIALIDRenderName:        "id",
 		GFMTaskListItemClass:           "vditor-task",
 		VditorCodeBlockPreview:         true,

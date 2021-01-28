@@ -23,6 +23,7 @@ var tocTests = []parseTest{
 
 func TestToC(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetHeadingID(true)
 	luteEngine.ParseOptions.ToC = true
 
 	for _, test := range tocTests {

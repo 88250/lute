@@ -100,7 +100,7 @@ var formatTests = []formatTest{
 
 func TestFormat(t *testing.T) {
 	luteEngine := lute.New()
-
+	luteEngine.SetAutoSpace(true)
 	for _, test := range formatTests {
 		formatted := luteEngine.FormatStr(test.name, test.original)
 		if test.formatted != formatted {
@@ -133,6 +133,7 @@ func TestFormatCases(t *testing.T) {
 		}
 
 		luteEngine := lute.New()
+		luteEngine.SetAutoSpace(true)
 		htmlBytes := luteEngine.Format(caseName+".md", bytes)
 		html := string(htmlBytes)
 
@@ -150,6 +151,7 @@ func TestFormatCases(t *testing.T) {
 func TestFormatNode(t *testing.T) {
 	md := "foo中文bar"
 	luteEngine := lute.New()
+	luteEngine.SetAutoSpace(true)
 	tree := parse.Parse("", []byte(md), luteEngine.ParseOptions)
 	renderer := render.NewFormatRenderer(tree, luteEngine.RenderOptions)
 	output := string(renderer.Render())

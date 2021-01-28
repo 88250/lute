@@ -28,8 +28,9 @@ var termTypoTests = []parseTest{
 }
 
 func TestTermTypo(t *testing.T) {
-	luteEngine := lute.New() // 默认已经开启了术语修正
-
+	luteEngine := lute.New()
+	luteEngine.SetAutoSpace(true)
+	luteEngine.SetFixTermTypo(true)
 	for _, test := range termTypoTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

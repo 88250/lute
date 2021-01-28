@@ -105,6 +105,7 @@ var debugTests = []parseTest{
 
 func TestDebug(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetHeadingID(true)
 	for _, test := range debugTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

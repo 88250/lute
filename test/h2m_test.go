@@ -102,7 +102,7 @@ var html2MdTests = []parseTest{
 
 func TestHTML2Md(t *testing.T) {
 	luteEngine := lute.New()
-
+	luteEngine.SetAutoSpace(true)
 	for _, test := range html2MdTests {
 		md := luteEngine.HTML2Md(test.from)
 		if test.to != md {
