@@ -235,8 +235,11 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 	buf := &bytes.Buffer{}
 	for _, line := range lines {
 		if strings.Contains(line, util.Caret) {
-			if "tab" == command {
+			switch command {
+			case "tab":
 				buf.WriteString("  " + line + "\n")
+			case "stab":
+				buf.WriteString(line[2:] + "\n")
 			}
 		} else {
 			buf.WriteString(line + "\n")
