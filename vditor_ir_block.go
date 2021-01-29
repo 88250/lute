@@ -233,17 +233,28 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 	md := lute.vditorIRBlockDOM2Md(listHTML)
 	lines := strings.Split(md, "\n")
 	buf := &bytes.Buffer{}
-	for _, line := range lines {
+	var lastLineLen int
+	for i, line := range lines {
+		var writeLine string
 		if strings.Contains(line, util.Caret) {
 			switch command {
 			case "tab":
-				buf.WriteString("  " + line + "\n")
+				if 0 < i {
+					// 判断上一行是否是列表 IAL，如果是的话这里直接移除
+					if last := strings.TrimSpace(lines[i-1]); strings.HasPrefix(last, "{: ") {
+						buf.Truncate(buf.Len() - lastLineLen)
+					}
+				}
+				writeLine = "  " + line + "\n"
 			case "stab":
-				buf.WriteString(line[2:] + "\n")
+				writeLine = line[2:] + "\n"
 			}
 		} else {
-			buf.WriteString(line + "\n")
+			writeLine = line + "\n"
 		}
+
+		buf.WriteString(writeLine)
+		lastLineLen = len(writeLine)
 	}
 	md = buf.String()
 	vHTML = lute.Md2VditorIRBlockDOM(md)
