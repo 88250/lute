@@ -227,6 +227,28 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
+func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML string) {
+	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
+
+	md := lute.vditorIRBlockDOM2Md(listHTML)
+	lines := strings.Split(md, "\n")
+	buf := &bytes.Buffer{}
+	for _, line := range lines {
+		if strings.Contains(line, util.Caret) {
+			if "tab" == command {
+				buf.WriteString("  " + line + "\n")
+			}
+		} else {
+			buf.WriteString(line + "\n")
+		}
+	}
+	md = buf.String()
+	vHTML = lute.Md2VditorIRBlockDOM(md)
+
+	vHTML = strings.ReplaceAll(vHTML, util.Caret, "<wbr>")
+	return
+}
+
 // genASTByVditorIRBlockDOM 根据指定的 Vditor IR DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	dataRender := lute.domAttrValue(n, "data-render")
