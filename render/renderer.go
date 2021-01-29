@@ -562,7 +562,9 @@ func (r *BaseRenderer) renderListStyle(node *ast.Node, attrs *[][]string) {
 func (r *BaseRenderer) tagSrcPath(tokens []byte) []byte {
 	if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 < srcIndex {
 		src := tokens[srcIndex+len("src=\""):]
-		src = src[:bytes.Index(src, []byte("\""))]
+		if  1 > len(bytes.ReplaceAll(src, util.CaretTokens, nil)) {
+			return tokens
+		}
 		targetSrc := r.LinkPath(src)
 		originSrc := string(targetSrc)
 		if bytes.HasPrefix(targetSrc, []byte("//")) {
