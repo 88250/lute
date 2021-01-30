@@ -12,6 +12,8 @@ package lute
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/88250/lute/lex"
 	"strconv"
 	"strings"
 
@@ -216,28 +218,47 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML string) {
+	fmt.Println(listHTML, command)
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)
 	lines := strings.Split(md, "\n")
 	buf := &bytes.Buffer{}
-	var lastLineLen int
+	var lastLine string
 	for i:=0;i<len(lines);i++ {
 		line := lines[i]
 		var writeLine string
 		if strings.Contains(line, util.Caret) {
+			isOrder := lex.IsDigit(strings.TrimSpace(line)[0])
+
 			switch command {
-			case "tab":
+			case "tab0":
+				writeLine = "  " + line + "\n"
+				if isOrder {
+					writeLine = " " + writeLine
+				}
+				buf.WriteString(writeLine)
+				lastLine = writeLine
+				continue
+			case "tab1":
 				if 0 < i {
-					// 判断上一行是否是列表 IAL，如果是的话这里直接移除
 					if last := strings.TrimSpace(lines[i-1]); strings.HasPrefix(last, "{: ") {
-						buf.Truncate(buf.Len() - lastLineLen)
+						buf.Truncate(buf.Len() - len(lastLine))
 					}
 				}
 				writeLine = "  " + line + "\n"
+				if isOrder {
+					writeLine = " " + writeLine
+				}
+				buf.WriteString(writeLine)
+				buf.WriteString(lastLine)
+				lastLine = writeLine
+				continue
 			case "stab":
 				writeLine = line[2:] + "\n"
 				writeLine = strings.ReplaceAll(writeLine, "}"+util.Caret, "}"+parse.Zwsp+util.Caret)
+				buf.WriteString(writeLine)
+				lastLine = writeLine
 			case "enter":
 				buf.WriteString(strings.ReplaceAll(line, util.Caret, "") + "\n")
 				buf.WriteString(lines[i+1] + "\n\n")
@@ -249,10 +270,9 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 			}
 		} else {
 			writeLine = line + "\n"
+			buf.WriteString(writeLine)
+			lastLine = writeLine
 		}
-
-		buf.WriteString(writeLine)
-		lastLineLen = len(writeLine)
 	}
 	md = buf.String()
 	vHTML = lute.Md2VditorIRBlockDOM(md)

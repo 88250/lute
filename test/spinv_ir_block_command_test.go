@@ -17,11 +17,16 @@ import (
 	"github.com/88250/lute"
 )
 
-var vditorIRBlockDOMListCommandTabTests = []*parseTest{
+type cmdTest struct {
+	cmd string
+	*parseTest
+}
 
-	{"2", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130183105-s07dvyx\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130113945-0974ppq\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130190601-wcnhone\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130191136-dl45lo9\"></li><li data-marker=\"*\" data-node-id=\"20210130190137-0n7j6j3\"><wbr>bar</li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130183105-s07dvyx\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130113945-0974ppq\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">foo</p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130190601-wcnhone\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130191136-dl45lo9\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">\u200b</p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130190137-0n7j6j3\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\"><wbr>bar</p></li></ul></li></ul></li></ul>"},
-	{"1", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129233054-46gy2j6\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129233055-7696gne\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129235255-ja5gq0n\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129235250-8iwmh3o\">bar</li></ul></li><li data-marker=\"*\" data-node-id=\"20210129235251-d0d17bv\"><wbr>baz</li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129233054-46gy2j6\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129233055-7696gne\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">foo</p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129235250-8iwmh3o\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">bar</p></li><li data-marker=\"*\" data-node-id=\"20210129235251-d0d17bv\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\"><wbr>baz</p></li></ul></li></ul>"},
-	{"0", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129215814-ztc4hye\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129213421-p4d5yrp\">foo</li><li data-marker=\"*\" data-node-id=\"20210129213421-1qqjs0a\"><wbr><br><ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129230307-4oqo3do\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129215550-bt8jdxi\">ccc</li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129215814-ztc4hye\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129213421-p4d5yrp\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">foo</p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129230307-4oqo3do\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129213421-1qqjs0a\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">\u200b<wbr></p></li><li data-marker=\"*\" data-node-id=\"20210129215550-bt8jdxi\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">ccc</p></li></ul></li></ul>"},
+var vditorIRBlockDOMListCommandTests = []*cmdTest{
+	{"stab", &parseTest{"3", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-0iexx8w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213415-rbeto7n\"><p data-block=\"0\" data-node-id=\"20210130222621-8o6zx51\" data-type=\"p\">foo</p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130222701-uxus28e\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130222701-11iujzf\"><p data-block=\"0\" data-node-id=\"20210130222822-80j0pqu\" data-type=\"p\"><wbr>bar</p></li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-0iexx8w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213415-rbeto7n\"><p data-block=\"0\" data-node-id=\"20210130222621-8o6zx51\" data-type=\"p\">foo</p></li><li data-marker=\"*\" data-node-id=\"20210130222701-11iujzf\"><p data-block=\"0\" data-node-id=\"20210130222822-80j0pqu\" data-type=\"p\">\u200b<wbr>bar</p></li></ul>"}},
+	{"enter", &parseTest{"2", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-0iexx8w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213415-rbeto7n\"><p data-block=\"0\" data-node-id=\"20210130222621-8o6zx51\" data-type=\"p\">foo</p></li><li data-marker=\"*\" data-node-id=\"20210130222701-11iujzf\"><p data-block=\"0\" data-node-id=\"20210130222701-uxus28e\" data-type=\"p\">bar<wbr></p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130222707-0a8o2t4\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130222707-e5fngvv\"><p data-block=\"0\" data-node-id=\"20210130222723-j3vxsk9\" data-type=\"p\">baz</p></li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-0iexx8w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213415-rbeto7n\"><p data-block=\"0\" data-node-id=\"20210130222621-8o6zx51\" data-type=\"p\">foo</p></li><li data-marker=\"*\" data-node-id=\"20210130222701-11iujzf\"><p data-block=\"0\" data-node-id=\"20210130222701-uxus28e\" data-type=\"p\">bar</p></li><li data-marker=\"*\" data-node-id=\"20060102150405-1a2b3c4\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">\u200b<wbr></p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130222707-0a8o2t4\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130222707-e5fngvv\"><p data-block=\"0\" data-node-id=\"20210130222723-j3vxsk9\" data-type=\"p\">baz</p></li></ul></li></ul>"}},
+	{"tab1", &parseTest{"1", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-0iexx8w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213415-rbeto7n\"><p data-block=\"0\" data-node-id=\"20210130213415-3pdjf5w\" data-type=\"p\">foo</p></li><li data-marker=\"*\" data-node-id=\"20210130213421-4ym3unk\"><p data-block=\"0\" data-node-id=\"20210130222504-3o12agi\" data-type=\"p\">​<wbr>bar</p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213422-gu8cqov\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130222616-95qmu4z\"><p data-block=\"0\" data-node-id=\"20210130222616-2ixnd7w\" data-type=\"p\">baz</p></li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-0iexx8w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213415-rbeto7n\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">foo</p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-3pdjf5w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213421-4ym3unk\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\"><wbr>bar</p></li></ul><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213422-gu8cqov\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130222616-95qmu4z\"><p data-block=\"0\" data-node-id=\"20210130222616-2ixnd7w\" data-type=\"p\">baz</p></li></ul></li></ul>"}},
+	{"tab0", &parseTest{"0", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-0iexx8w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213415-rbeto7n\"><p data-block=\"0\" data-node-id=\"20210130213415-3pdjf5w\" data-type=\"p\">foo</p></li><li data-marker=\"*\" data-node-id=\"20210130213421-4ym3unk\"><p data-block=\"0\" data-node-id=\"20210130213422-gu8cqov\" data-type=\"p\"><wbr>bar</p></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213415-0iexx8w\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213415-rbeto7n\"><p data-block=\"0\" data-node-id=\"20210130213415-3pdjf5w\" data-type=\"p\">foo</p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130213422-gu8cqov\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130213421-4ym3unk\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\"><wbr>bar</p></li></ul></li></ul>"}},
 }
 
 func TestVditorIRBlockDOMListCommand(t *testing.T) {
@@ -38,68 +43,8 @@ func TestVditorIRBlockDOMListCommand(t *testing.T) {
 	luteEngine.SetGitConflict(true)
 
 	ast.Testing = true
-	for _, test := range vditorIRBlockDOMListCommandTabTests {
-		html := luteEngine.VditorIRBlockDOMListCommand(test.from, "tab")
-
-		if test.to != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
-		}
-	}
-	ast.Testing = false
-}
-
-var vditorIRBlockDOMListCommandSTabTests = []*parseTest{
-
-	{"1", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130183105-s07dvyx\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130113945-0974ppq\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130190138-rh6fpw6\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130190139-yny17o1\"><wbr></li><li data-marker=\"*\" data-node-id=\"20210130190137-0n7j6j3\">bar</li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130183105-s07dvyx\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130113945-0974ppq\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">foo</p></li><li data-marker=\"*\" data-node-id=\"20210130190139-yny17o1\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">\u200b<wbr></p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130190138-rh6fpw6\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130190137-0n7j6j3\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">bar</p></li></ul></li></ul>"},
-	{"0", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129233054-46gy2j6\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129233055-7696gne\">foo<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129233106-nen167c\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129233106-d3oiwuc\"><wbr>bar</li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210129233054-46gy2j6\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210129233055-7696gne\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">foo</p></li><li data-marker=\"*\" data-node-id=\"20210129233106-d3oiwuc\"><p data-block=\"0\" data-node-id=\"20210129233106-nen167c\" data-type=\"p\">\u200b<wbr>bar</p></li></ul>"},
-}
-
-func TestVditorIRBlockDOMListCommandSTab(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetVditorIR(true)
-	luteEngine.ParseOptions.Mark = true
-	luteEngine.ParseOptions.BlockRef = true
-	luteEngine.SetKramdownIAL(true)
-	luteEngine.ParseOptions.SuperBlock = true
-	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
-	luteEngine.SetAutoSpace(false)
-	luteEngine.SetSub(true)
-	luteEngine.SetSup(true)
-	luteEngine.SetGitConflict(true)
-
-	ast.Testing = true
-	for _, test := range vditorIRBlockDOMListCommandSTabTests {
-		html := luteEngine.VditorIRBlockDOMListCommand(test.from, "stab")
-
-		if test.to != html {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
-		}
-	}
-	ast.Testing = false
-}
-
-
-var vditorIRBlockDOMListCommandEnterTests = []*parseTest{
-
-	{"0", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130210502-h5p7mhf\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130210503-p89seth\"><p data-block=\"0\" data-node-id=\"20210130210506-jfsx7bc\" data-type=\"p\">foo<wbr></p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130210503-nqslo5q\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130210503-4jj2eqq\"><p data-block=\"0\" data-node-id=\"20210130210506-u1x76c9\" data-type=\"p\">bar</p></li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130210502-h5p7mhf\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130210503-p89seth\"><p data-block=\"0\" data-node-id=\"20210130210506-jfsx7bc\" data-type=\"p\">foo</p></li><li data-marker=\"*\" data-node-id=\"20060102150405-1a2b3c4\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">\u200b<wbr></p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130210503-nqslo5q\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130210503-4jj2eqq\"><p data-block=\"0\" data-node-id=\"20210130210506-u1x76c9\" data-type=\"p\">bar</p></li></ul></li></ul>"},
-}
-
-func TestVditorIRBlockDOMListCommandEnter(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetVditorIR(true)
-	luteEngine.ParseOptions.Mark = true
-	luteEngine.ParseOptions.BlockRef = true
-	luteEngine.SetKramdownIAL(true)
-	luteEngine.ParseOptions.SuperBlock = true
-	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
-	luteEngine.SetAutoSpace(false)
-	luteEngine.SetSub(true)
-	luteEngine.SetSup(true)
-	luteEngine.SetGitConflict(true)
-
-	ast.Testing = true
-	for _, test := range vditorIRBlockDOMListCommandEnterTests {
-		html := luteEngine.VditorIRBlockDOMListCommand(test.from, "enter")
+	for _, test := range vditorIRBlockDOMListCommandTests {
+		html := luteEngine.VditorIRBlockDOMListCommand(test.from, test.cmd)
 
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
