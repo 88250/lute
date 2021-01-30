@@ -203,11 +203,11 @@ func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
 	}
 
 	for c := nodes[0]; nil != c; c = c.NextSibling {
-		lute.adjustVditorDOMListItemInP(c)
+		lute.adjustVditorDOMListList(c)
 	}
 
 	for c := nodes[0]; nil != c; c = c.NextSibling {
-		lute.adjustVditorDOMListList(c)
+		lute.adjustVditorDOMListItemInP(c)
 	}
 }
 
@@ -217,10 +217,23 @@ func (lute *Lute) adjustVditorDOMListList(n *html.Node) {
 		return
 	}
 
-	if nil != n.Parent && atom.Li != n.DataAtom && (atom.Ul == n.Parent.DataAtom || atom.Ol == n.Parent.DataAtom) {
-		if prevLi := n.PrevSibling; nil != prevLi {
-			n.Unlink()
-			prevLi.AppendChild(n)
+	if atom.Li == n.DataAtom {
+		if nil != n.FirstChild && atom.Br == n.FirstChild.DataAtom {
+			// 规范化换行时 li 的结构，对调 ZWSP 和 <br> 的位置
+			n.FirstChild.DataAtom = 0
+			n.FirstChild.Data = parse.Zwsp
+			if nextLi := n.NextSibling; nil != n.NextSibling && atom.Li == n.NextSibling.DataAtom {
+				if caret := nextLi.FirstChild; nil != caret && util.Caret+parse.Zwsp == caret.Data {
+					caret.Data = util.Caret + "\n"
+				}
+			}
+		}
+	} else {
+		if nil != n.Parent && (atom.Ul == n.Parent.DataAtom || atom.Ol == n.Parent.DataAtom) {
+			if prevLi := n.PrevSibling; nil != prevLi {
+				n.Unlink()
+				prevLi.AppendChild(n)
+			}
 		}
 	}
 

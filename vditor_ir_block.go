@@ -808,7 +808,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			if atom.P == n.Parent.DataAtom {
 				if nil != n.Parent.NextSibling && (atom.Ul == n.Parent.NextSibling.DataAtom || atom.Ol == n.Parent.NextSibling.DataAtom || atom.Blockquote == n.Parent.NextSibling.DataAtom) {
-					tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
+					tree.Context.Tip.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
 					return
 				}
 			}
