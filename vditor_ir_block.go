@@ -12,7 +12,6 @@ package lute
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/88250/lute/lex"
 	"strconv"
 	"strings"
@@ -218,7 +217,7 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML string) {
-	fmt.Println(listHTML, command)
+	//fmt.Println(listHTML, command)
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)
@@ -239,11 +238,11 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 				for ; ialIdx < len(lines); ialIdx++ {
 					ial := lines[ialIdx]
 					if isOrder {
-						if strings.HasPrefix(ial, "   " + indent+"{:") {
+						if strings.HasPrefix(ial, "   "+indent+"{:") {
 							break
 						}
 					} else {
-						if strings.HasPrefix(ial, "  " + indent+"{:") {
+						if strings.HasPrefix(ial, "  "+indent+"{:") {
 							break
 						}
 					}
@@ -253,10 +252,10 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 				if isOrder {
 					l := strings.TrimSpace(line)[1:]
 					writeLine = "   " + indent + "1" + l + "\n"
-					lines[ialIdx] =  "   " + lines[ialIdx]
+					lines[ialIdx] = "   " + lines[ialIdx]
 				} else {
 					writeLine = "  " + line + "\n"
-					lines[ialIdx] =  "  " + lines[ialIdx]
+					lines[ialIdx] = "  " + lines[ialIdx]
 				}
 
 				buf.WriteString(writeLine)
