@@ -629,6 +629,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.ListData.Typ = 3
 			tree.Context.Tip.ListData.Typ = 3
 		}
+		if nil == n.FirstChild {
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
+		}
 
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
