@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -216,6 +217,7 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML string) {
+	fmt.Println(listHTML, command)
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)
@@ -236,9 +238,7 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 				writeLine = "  " + line + "\n"
 			case "stab":
 				writeLine = line[2:] + "\n"
-			case "enter":
-				//indent := countIndent(line)
-				//writeLine =
+				writeLine = strings.ReplaceAll(writeLine, "}"+util.Caret, "}"+parse.Zwsp+util.Caret)
 			}
 		} else {
 			writeLine = line + "\n"
