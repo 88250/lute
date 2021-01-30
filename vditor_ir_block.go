@@ -224,54 +224,41 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 	md := lute.vditorIRBlockDOM2Md(listHTML)
 	lines := strings.Split(md, "\n")
 	buf := &bytes.Buffer{}
-	var lastLine string
-	for i:=0;i<len(lines);i++ {
+	for i := 0; i < len(lines); i++ {
 		line := lines[i]
 		var writeLine string
 		if strings.Contains(line, util.Caret) {
 			isOrder := lex.IsDigit(strings.TrimSpace(line)[0])
 
 			switch command {
-			case "tab0":
-				writeLine = "  " + line + "\n"
+			case "tab0", "tab1":
+				buf.WriteString("\n")
+				indent := countIndent(line)
 				if isOrder {
-					writeLine = " " + writeLine
+					l := strings.TrimSpace(line)[1:]
+					writeLine = "   " + indent + "1" + l + "\n"
+				} else {
+					writeLine = "  " + line + "\n"
 				}
+
 				buf.WriteString(writeLine)
-				lastLine = writeLine
-				continue
-			case "tab1":
-				if 0 < i {
-					if last := strings.TrimSpace(lines[i-1]); strings.HasPrefix(last, "{: ") {
-						buf.Truncate(buf.Len() - len(lastLine))
-					}
-				}
-				writeLine = "  " + line + "\n"
-				if isOrder {
-					writeLine = " " + writeLine
-				}
-				buf.WriteString(writeLine)
-				buf.WriteString(lastLine)
-				lastLine = writeLine
 				continue
 			case "stab":
 				writeLine = line[2:] + "\n"
 				writeLine = strings.ReplaceAll(writeLine, "}"+util.Caret, "}"+parse.Zwsp+util.Caret)
 				buf.WriteString(writeLine)
-				lastLine = writeLine
 			case "enter":
 				buf.WriteString(strings.ReplaceAll(line, util.Caret, "") + "\n")
 				buf.WriteString(lines[i+1] + "\n\n")
 				indent := countIndent(line)
-				buf.WriteString(indent + "* {: id=\"" + ast.NewNodeID() + "\"}" + parse.Zwsp+util.Caret + "\n")
+				buf.WriteString(indent + "* {: id=\"" + ast.NewNodeID() + "\"}" + parse.Zwsp + util.Caret + "\n")
 				buf.WriteString(indent + "  {: id=\"" + ast.NewNodeID() + "\"}\n\n")
-				i+=2
+				i += 2
 				continue
 			}
 		} else {
 			writeLine = line + "\n"
 			buf.WriteString(writeLine)
-			lastLine = writeLine
 		}
 	}
 	md = buf.String()
