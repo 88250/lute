@@ -1474,11 +1474,6 @@ func (r *VditorIRBlockRenderer) renderText(node *ast.Node, entering bool) ast.Wa
 			tokens = r.FixTermTypo(tokens)
 		}
 
-		// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
-		if !bytes.EqualFold(tokens, []byte(util.Caret+parse.Zwsp)) {
-			tokens = bytes.ReplaceAll(tokens, []byte(parse.Zwsp), nil)
-		}
-
 		text := string(html.EscapeHTML(tokens))
 		_, text = markText(text, r.Tree.Marks, 1024*1024)
 		r.WriteString(text)

@@ -190,18 +190,6 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 					n.FirstChild.Next.Tokens = append(n.FirstChild.Next.Tokens, n.Next.FirstChild.Next.Tokens...)
 					n.Next.Unlink()
 				}
-			case ast.NodeList:
-				// 浏览器生成的子列表是 ul.ul 形式，需要将其调整为 ul.li.ul
-				//if nil != n.Parent && ast.NodeList == n.Parent.Type {
-				//	if previousLi := n.Previous; nil != previousLi {
-				//		if ast.NodeKramdownBlockIAL == previousLi.Type {
-				//			previousLi = previousLi.Previous
-				//		}
-				//		listIAL := n.Next
-				//		previousLi.AppendChild(n)
-				//		previousLi.AppendChild(listIAL)
-				//	}
-				//}
 			}
 		}
 		return ast.WalkContinue
