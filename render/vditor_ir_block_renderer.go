@@ -1449,10 +1449,6 @@ func (r *VditorIRBlockRenderer) renderDocument(node *ast.Node, entering bool) as
 }
 
 func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
-		return ast.WalkContinue
-	}
-
 	if entering {
 		attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "p"}}
 		ial := r.NodeAttrs(node)
@@ -1775,9 +1771,6 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 	}
 	if entering {
 		var attrs [][]string
-		if node.Tight {
-			attrs = append(attrs, []string{"data-tight", "true"})
-		}
 		if 0 == node.BulletChar {
 			if 1 != node.Start {
 				attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
