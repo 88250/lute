@@ -234,11 +234,29 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 			case "tab0", "tab1":
 				buf.WriteString("\n")
 				indent := countIndent(line)
+
+				ialIdx := i + 1
+				for ; ialIdx < len(lines); ialIdx++ {
+					ial := lines[ialIdx]
+					if isOrder {
+						if strings.HasPrefix(ial, "   " + indent+"{:") {
+							break
+						}
+					} else {
+						if strings.HasPrefix(ial, "  " + indent+"{:") {
+							break
+						}
+					}
+
+				}
+
 				if isOrder {
 					l := strings.TrimSpace(line)[1:]
 					writeLine = "   " + indent + "1" + l + "\n"
+					lines[ialIdx] =  "   " + lines[ialIdx]
 				} else {
 					writeLine = "  " + line + "\n"
+					lines[ialIdx] =  "  " + lines[ialIdx]
 				}
 
 				buf.WriteString(writeLine)
