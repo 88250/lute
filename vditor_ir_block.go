@@ -12,7 +12,6 @@ package lute
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -217,14 +216,14 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML string) {
-	fmt.Println(listHTML, command)
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)
 	lines := strings.Split(md, "\n")
 	buf := &bytes.Buffer{}
 	var lastLineLen int
-	for i, line := range lines {
+	for i:=0;i<len(lines);i++ {
+		line := lines[i]
 		var writeLine string
 		if strings.Contains(line, util.Caret) {
 			switch command {
@@ -239,6 +238,14 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 			case "stab":
 				writeLine = line[2:] + "\n"
 				writeLine = strings.ReplaceAll(writeLine, "}"+util.Caret, "}"+parse.Zwsp+util.Caret)
+			case "enter":
+				buf.WriteString(line + "\n")
+				buf.WriteString(lines[i+1] + "\n\n")
+				indent := countIndent(line)
+				buf.WriteString(indent + "* {: id=\"" + ast.NewNodeID() + "\"}" + parse.Zwsp+util.Caret + "\n")
+				buf.WriteString(indent + "  {: id=\"" + ast.NewNodeID() + "\"}\n\n")
+				i+=2
+				continue
 			}
 		} else {
 			writeLine = line + "\n"

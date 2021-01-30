@@ -77,3 +77,33 @@ func TestVditorIRBlockDOMListCommandSTab(t *testing.T) {
 	}
 	ast.Testing = false
 }
+
+
+var vditorIRBlockDOMListCommandEnterTests = []*parseTest{
+
+	{"0", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130210502-h5p7mhf\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130210503-p89seth\"><p data-block=\"0\" data-node-id=\"20210130210506-jfsx7bc\" data-type=\"p\">foo<wbr></p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130210503-nqslo5q\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130210503-4jj2eqq\"><p data-block=\"0\" data-node-id=\"20210130210506-u1x76c9\" data-type=\"p\">bar</p></li></ul></li></ul>", "<ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130210502-h5p7mhf\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130210503-p89seth\"><p data-block=\"0\" data-node-id=\"20210130210506-jfsx7bc\" data-type=\"p\">foo<wbr></p></li><li data-marker=\"*\" data-node-id=\"20060102150405-1a2b3c4\"><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">\u200b<wbr></p><ul data-marker=\"*\" data-block=\"0\" data-node-id=\"20210130210503-nqslo5q\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20210130210503-4jj2eqq\"><p data-block=\"0\" data-node-id=\"20210130210506-u1x76c9\" data-type=\"p\">bar</p></li></ul></li></ul>"},
+}
+
+func TestVditorIRBlockDOMListCommandEnter(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetVditorIR(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+
+	ast.Testing = true
+	for _, test := range vditorIRBlockDOMListCommandEnterTests {
+		html := luteEngine.VditorIRBlockDOMListCommand(test.from, "enter")
+
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+	ast.Testing = false
+}
