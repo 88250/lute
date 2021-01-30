@@ -205,6 +205,30 @@ func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
 	for c := nodes[0]; nil != c; c = c.NextSibling {
 		lute.adjustVditorDOMListItemInP(c)
 	}
+
+	for c := nodes[0]; nil != c; c = c.NextSibling {
+		lute.adjustVditorDOMListList(c)
+	}
+}
+
+// adjustVditorDOMListList 用于将 ul.ul 调整为 ul.li.ul。
+func (lute *Lute) adjustVditorDOMListList(n *html.Node) {
+	if atom.Ul != n.DataAtom && atom.Ol != n.DataAtom && atom.Li != n.DataAtom {
+		return
+	}
+
+	if nil != n.Parent && atom.Li != n.DataAtom && (atom.Ul == n.Parent.DataAtom || atom.Ol == n.Parent.DataAtom) {
+		if prevLi := n.PrevSibling; nil != prevLi {
+			n.Unlink()
+			prevLi.AppendChild(n)
+		}
+	}
+
+	for c := n.FirstChild; c != nil; {
+		next := c.NextSibling
+		lute.adjustVditorDOMListList(c)
+		c = next
+	}
 }
 
 func (lute *Lute) removeEmptyNodes(node *html.Node) {

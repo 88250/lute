@@ -192,16 +192,16 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 				}
 			case ast.NodeList:
 				// 浏览器生成的子列表是 ul.ul 形式，需要将其调整为 ul.li.ul
-				if nil != n.Parent && ast.NodeList == n.Parent.Type {
-					if previousLi := n.Previous; nil != previousLi {
-						if ast.NodeKramdownBlockIAL == previousLi.Type {
-							previousLi = previousLi.Previous
-						}
-						listIAL := n.Next
-						previousLi.AppendChild(n)
-						previousLi.AppendChild(listIAL)
-					}
-				}
+				//if nil != n.Parent && ast.NodeList == n.Parent.Type {
+				//	if previousLi := n.Previous; nil != previousLi {
+				//		if ast.NodeKramdownBlockIAL == previousLi.Type {
+				//			previousLi = previousLi.Previous
+				//		}
+				//		listIAL := n.Next
+				//		previousLi.AppendChild(n)
+				//		previousLi.AppendChild(listIAL)
+				//	}
+				//}
 			}
 		}
 		return ast.WalkContinue
@@ -248,6 +248,9 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 				writeLine = "  " + line + "\n"
 			case "stab":
 				writeLine = line[2:] + "\n"
+			case "enter":
+				//indent := countIndent(line)
+				//writeLine =
 			}
 		} else {
 			writeLine = line + "\n"
@@ -260,6 +263,17 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 	vHTML = lute.Md2VditorIRBlockDOM(md)
 
 	vHTML = strings.ReplaceAll(vHTML, util.Caret, "<wbr>")
+	return
+}
+
+func countIndent(line string) (ret string) {
+	for _, b := range line {
+		if ' ' == b {
+			ret += " "
+		} else {
+			break
+		}
+	}
 	return
 }
 
