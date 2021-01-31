@@ -263,14 +263,6 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 			case "stab": // 反向缩进
 				writeLine = line[2:] + "\n"
 				buf.WriteString(writeLine)
-			case "enter": // 末尾回车
-				buf.WriteString(strings.ReplaceAll(line, util.Caret, "") + "\n")
-				buf.WriteString(lines[i+1] + "\n\n")
-				indent := countIndent(line)
-				buf.WriteString(indent + "* {: id=\"" + ast.NewNodeID() + "\"}" + util.Caret + "\n")
-				buf.WriteString(indent + "  {: id=\"" + ast.NewNodeID() + "\"}\n\n")
-				i += 2
-				continue
 			}
 		} else {
 			writeLine = line + "\n"
