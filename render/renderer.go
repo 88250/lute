@@ -562,7 +562,7 @@ func (r *BaseRenderer) renderListStyle(node *ast.Node, attrs *[][]string) {
 func (r *BaseRenderer) tagSrcPath(tokens []byte) []byte {
 	if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 < srcIndex {
 		src := tokens[srcIndex+len("src=\""):]
-		if  1 > len(bytes.ReplaceAll(src, util.CaretTokens, nil)) {
+		if 1 > len(bytes.ReplaceAll(src, util.CaretTokens, nil)) {
 			return tokens
 		}
 		targetSrc := r.LinkPath(src)
@@ -659,11 +659,10 @@ func RenderHeadingText(n *ast.Node) (ret string) {
 				buf.WriteString("</em>")
 			} else {
 				if nil != n.Previous && ast.NodeInlineHTML == n.Previous.Type {
-					if bytes.HasPrefix(n.Previous.Tokens, []byte("<font ")) {
+					if !bytes.HasPrefix(n.Previous.Tokens, []byte("</")) {
 						buf.Write(n.Previous.Tokens)
 						buf.Write(html.EscapeHTML(n.Tokens))
-					}
-					if nil != n.Next && bytes.Equal(n.Next.Tokens, []byte("</font>")) {
+					} else {
 						buf.Write(n.Next.Tokens)
 					}
 				} else {
