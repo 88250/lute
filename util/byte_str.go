@@ -26,18 +26,3 @@ func StrToBytes(str string) []byte {
 	return *(*[]byte)(unsafe.Pointer(&h))
 }
 
-// BytesShowLength 获取字节数组展示为UTF8字符串时的长度
-func BytesShowLength(bytes []byte) int {
-	length := 0
-	for i := 0; i < len(bytes); i++ {
-		//按位与 11000000 为 10000000 则表示为utf8字节首位
-		if (bytes[i] & 0xc0) != 0x80 {
-			if bytes[i] < 0x7f {
-				length++
-			} else {
-				length += 2
-			}
-		}
-	}
-	return length
-}

@@ -16,6 +16,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
@@ -257,7 +258,7 @@ func (n *Node) TokenLen() (ret int) {
 		if !entering {
 			return WalkContinue
 		}
-		ret += util.BytesShowLength(n.Tokens)
+		ret += lex.BytesShowLength(n.Tokens)
 		return WalkContinue
 	})
 	return
