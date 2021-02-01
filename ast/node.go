@@ -257,11 +257,18 @@ func (n *Node) TokenLen() (ret int) {
 		if !entering {
 			return WalkContinue
 		}
-		ret += len(n.Tokens)
+		ret += util.BytesShowLength(n.Tokens)
+		//ret += len(n.Tokens)
 		return WalkContinue
 	})
 	return
 }
+
+//func GetShowLen(bytes []byte) (count int) {
+//	for i:=0; i< len(bytes); {
+//
+//	}
+//}
 
 func (n *Node) NextNodeText() string {
 	if nil == n.Next {
