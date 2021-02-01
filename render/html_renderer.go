@@ -1160,7 +1160,7 @@ func (r *HtmlRenderer) handleKramdownBlockIAL(node *ast.Node) {
 }
 
 // languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
-var languagesNoHighlight = []string{"mermaid", "echarts", "abc", "graphviz", "mindmap", "flowchart"}
+var languagesNoHighlight = []string{"mermaid", "echarts", "abc", "graphviz", "mindmap", "flowchart", "plantuml"}
 
 func noHighlight(language string) bool {
 	if "" == language {
