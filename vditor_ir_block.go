@@ -1072,25 +1072,28 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 					tree.Context.Tip.InsertAfter(nextBlock)
 					tree.Context.Tip = nextBlock
 				}
-				img := lute.domChild(n, atom.Img)
-				if nil == img {
-					if nil != n.Parent.NextSibling {
-						img = lute.domChild(n.Parent.NextSibling.FirstChild, atom.Img)
-					}
-				}
 
-				style = lute.domAttrValue(img, "style") // 大小
-				if "" != style {
-					node.SetIALAttr("style", style)
-					if styled {
-						node.KramdownIAL = append(node.KramdownIAL, []string{"style", style})
-						ialTokens := parse.IAL2Tokens(node.KramdownIAL)
-						node.Next.Tokens = ialTokens
-					} else {
-						node.KramdownIAL = [][]string{{"style", style}}
-						ialTokens := parse.IAL2Tokens(node.KramdownIAL)
-						ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-						node.InsertAfter(ial)
+				if "img" == dataType {
+					img := lute.domChild(n, atom.Img)
+					if nil == img {
+						if nil != n.Parent.NextSibling {
+							img = lute.domChild(n.Parent.NextSibling.FirstChild, atom.Img)
+						}
+					}
+
+					style = lute.domAttrValue(img, "style") // 大小
+					if "" != style {
+						node.SetIALAttr("style", style)
+						if styled {
+							node.KramdownIAL = append(node.KramdownIAL, []string{"style", style})
+							ialTokens := parse.IAL2Tokens(node.KramdownIAL)
+							node.Next.Tokens = ialTokens
+						} else {
+							node.KramdownIAL = [][]string{{"style", style}}
+							ialTokens := parse.IAL2Tokens(node.KramdownIAL)
+							ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+							node.InsertAfter(ial)
+						}
 					}
 				}
 				return

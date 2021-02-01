@@ -1274,6 +1274,10 @@ func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
 }
 
 func (lute *Lute) domChild(n *html.Node, dataAtom atom.Atom) *html.Node {
+	if nil == n {
+		return nil
+	}
+
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
 		if c.DataAtom == dataAtom {
 			return c
