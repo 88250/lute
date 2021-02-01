@@ -258,7 +258,6 @@ func (n *Node) TokenLen() (ret int) {
 			return WalkContinue
 		}
 		ret += util.BytesShowLength(n.Tokens)
-		//ret += len(n.Tokens)
 		return WalkContinue
 	})
 	return
