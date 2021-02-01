@@ -1073,6 +1073,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 					tree.Context.Tip = nextBlock
 				}
 				img := lute.domChild(n, atom.Img)
+				if nil == img {
+					if nil != n.Parent.NextSibling {
+						img = lute.domChild(n.Parent.NextSibling.FirstChild, atom.Img)
+					}
+				}
+
 				style = lute.domAttrValue(img, "style") // 大小
 				if "" != style {
 					node.SetIALAttr("style", style)
