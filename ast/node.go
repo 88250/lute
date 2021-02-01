@@ -257,7 +257,7 @@ func (n *Node) TokenLen() (ret int) {
 		if !entering {
 			return WalkContinue
 		}
-		ret += len(n.Tokens)
+		ret += util.BytesShowLength(n.Tokens)
 		return WalkContinue
 	})
 	return
