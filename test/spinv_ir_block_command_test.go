@@ -45,7 +45,7 @@ func TestVditorIRBlockDOMListCommand(t *testing.T) {
 
 	ast.Testing = true
 	for _, test := range vditorIRBlockDOMListCommandTests {
-		html := luteEngine.VditorIRBlockDOMListCommand(test.from, test.cmd)
+		html := luteEngine.VditorIRBlockDOMListCommand(test.from, test.cmd, "")
 
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)

@@ -216,8 +216,7 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML string) {
-	//fmt.Println(listHTML, command)
+func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param string) (vHTML string) {
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)
@@ -226,11 +225,15 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
 		var writeLine string
+		if "tab1" == command && strings.Contains(line, param) { // 缩进到上下子列表
+			// 忽略上方子列表 IAL
+			continue
+		}
+
 		if strings.Contains(line, util.Caret) {
 			isOrder := lex.IsDigit(strings.TrimSpace(line)[0])
-
 			switch command {
-			case "tab0": // 缩进
+			case "tab0", "tab1":
 				buf.WriteString("\n")
 				indent := countIndent(line)
 
@@ -261,7 +264,11 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string) (vHTML s
 				buf.WriteString(writeLine)
 				continue
 			case "stab": // 反向缩进
-				writeLine = line[2:] + "\n"
+				if isOrder {
+					writeLine = line[3:] + "\n"
+				} else {
+					writeLine = line[2:] + "\n"
+				}
 				buf.WriteString(writeLine)
 			}
 		} else {
