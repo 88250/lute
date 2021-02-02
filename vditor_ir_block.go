@@ -228,7 +228,7 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 			continue
 		}
 
-		if "tab2" == command && !strings.Contains(line, param1) {
+		if "tab2" == command && strings.Contains(line, param1) {
 			continue
 		}
 
