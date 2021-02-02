@@ -214,7 +214,7 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, param2 string) (vHTML string) {
-	//fmt.Println(listHTML, command, param1, param2)
+	//fmt.Println(listHTML, command, "id1:"+ param1, "id2:"+param2)
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)
@@ -223,8 +223,12 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
 		var writeLine string
-		if ("tab1" == command || "tab2" == command) && strings.Contains(line, param1) { // 缩进到上下子列表
+		if ("tab1" == command) && strings.Contains(line, param1) { // 缩进到上下子列表
 			// 忽略上方子列表 IAL
+			continue
+		}
+
+		if "tab2" == command && !strings.Contains(line, param1) {
 			continue
 		}
 
