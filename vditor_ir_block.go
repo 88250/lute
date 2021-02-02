@@ -222,7 +222,7 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param st
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
 		var writeLine string
-		if ("tab1" == command || "tab2" == command) && strings.Contains(line, param) { // 缩进到上下子列表
+		if ("tab1" == command) && strings.Contains(line, param) { // 缩进到上下子列表
 			// 忽略上方子列表 IAL
 			continue
 		}
@@ -241,10 +241,12 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param st
 						if strings.HasPrefix(ial, "   "+indent+"{:") {
 							break
 						}
+						lines[ialIdx] = "   " + lines[ialIdx]
 					} else {
 						if strings.HasPrefix(ial, "  "+indent+"{:") {
 							break
 						}
+						lines[ialIdx] = "  " + lines[ialIdx]
 					}
 				}
 
