@@ -12,7 +12,6 @@ package lute
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/88250/lute/lex"
 	"strconv"
 	"strings"
@@ -214,8 +213,8 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param string) (vHTML string) {
-	fmt.Println(listHTML, command, param)
+func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, param2 string) (vHTML string) {
+	//fmt.Println(listHTML, command, param1, param2)
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)
@@ -224,7 +223,7 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param st
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
 		var writeLine string
-		if ("tab1" == command) && strings.Contains(line, param) { // 缩进到上下子列表
+		if ("tab1" == command || "tab2" == command) && strings.Contains(line, param1) { // 缩进到上下子列表
 			// 忽略上方子列表 IAL
 			continue
 		}
@@ -236,32 +235,29 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param st
 				buf.WriteString("\n")
 				indent := countIndent(line)
 
-				ialIdx := i + 1
-				for ; ialIdx < len(lines); ialIdx++ {
-					ial := lines[ialIdx]
-					if isOrder {
-						if strings.HasPrefix(ial, "   "+indent+"{:") {
-							break
-						}
-						lines[ialIdx] = "   " + lines[ialIdx]
-					} else {
-						if strings.HasPrefix(ial, "  "+indent+"{:") {
-							break
-						}
-						lines[ialIdx] = "  " + lines[ialIdx]
-					}
-				}
-
 				if isOrder {
 					l := strings.TrimSpace(line)[1:]
 					writeLine = "   " + indent + "1" + l + "\n"
-					lines[ialIdx] = "   " + lines[ialIdx]
+					buf.WriteString(writeLine)
 				} else {
 					writeLine = "  " + line + "\n"
-					lines[ialIdx] = "  " + lines[ialIdx]
+					buf.WriteString(writeLine)
 				}
 
-				buf.WriteString(writeLine)
+				j := i + 1
+				for ; j < len(lines); j++ {
+					ial := lines[j]
+					if strings.Contains(ial, param2) {
+						buf.WriteString(ial + "\n")
+						break
+					}
+					if isOrder {
+						buf.WriteString("   " + lines[j] + "\n")
+					} else {
+						buf.WriteString("  " + lines[j] + "\n")
+					}
+				}
+				i = j
 				continue
 			case "tab0", "tab1": // 不带子项缩进
 				buf.WriteString("\n")
