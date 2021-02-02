@@ -222,7 +222,7 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param st
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
 		var writeLine string
-		if "tab1" == command && strings.Contains(line, param) { // 缩进到上下子列表
+		if ("tab1" == command || "tab2" == command) && strings.Contains(line, param) { // 缩进到上下子列表
 			// 忽略上方子列表 IAL
 			continue
 		}
@@ -230,7 +230,7 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param st
 		if strings.Contains(line, util.Caret) {
 			isOrder := lex.IsDigit(strings.TrimSpace(line)[0])
 			switch command {
-			case "tab0", "tab1":
+			case "tab2": // 带子项缩进
 				buf.WriteString("\n")
 				indent := countIndent(line)
 
@@ -246,7 +246,35 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param st
 							break
 						}
 					}
+				}
 
+				if isOrder {
+					l := strings.TrimSpace(line)[1:]
+					writeLine = "   " + indent + "1" + l + "\n"
+					lines[ialIdx] = "   " + lines[ialIdx]
+				} else {
+					writeLine = "  " + line + "\n"
+					lines[ialIdx] = "  " + lines[ialIdx]
+				}
+
+				buf.WriteString(writeLine)
+				continue
+			case "tab0", "tab1": // 不带子项缩进
+				buf.WriteString("\n")
+				indent := countIndent(line)
+
+				ialIdx := i + 1
+				for ; ialIdx < len(lines); ialIdx++ {
+					ial := lines[ialIdx]
+					if isOrder {
+						if strings.HasPrefix(ial, "   "+indent+"{:") {
+							break
+						}
+					} else {
+						if strings.HasPrefix(ial, "  "+indent+"{:") {
+							break
+						}
+					}
 				}
 
 				if isOrder {
@@ -1074,7 +1102,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 					img := lute.domChild(n, atom.Img)
 					if nil == img {
 						if nil != n.Parent.NextSibling {
+							// 段落中换行
 							img = lute.domChild(n.Parent.NextSibling.FirstChild, atom.Img)
+						}
+					}
+					if nil == img {
+						if nil != n.Parent.Parent && nil != n.Parent.Parent.NextSibling && nil != n.Parent.Parent.NextSibling.FirstChild && nil != n.Parent.Parent.NextSibling.FirstChild.FirstChild {
+							// 列表项中换行
+							img = lute.domChild(n.Parent.Parent.NextSibling.FirstChild.FirstChild, atom.Img)
 						}
 					}
 
