@@ -753,6 +753,9 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		return
 	case atom.Font:
+		node.Type = ast.NodeText
+		node.Tokens = []byte(lute.domText(n))
+		tree.Context.Tip.AppendChild(node)
 		return
 	case atom.Details:
 		node.Type = ast.NodeHTMLBlock

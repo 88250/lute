@@ -31,13 +31,11 @@ func (lute *Lute) Md2HTML(markdown string) (sHTML string) {
 
 // SpinVditorDOM 自旋 Vditor DOM，用于所见即所得模式下的编辑。
 func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
-	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, util.FrontEndCaret, util.Caret)
 	markdown := lute.vditorDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorRenderer(tree, lute.RenderOptions)
 	output := renderer.Render()
-	// 替换插入符
 	ovHTML = strings.ReplaceAll(string(output), util.Caret, util.FrontEndCaret)
 	return
 }
@@ -1170,6 +1168,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		break
 	case atom.Font:
+		node.Type = ast.NodeText
+		node.Tokens = []byte(lute.domText(n))
+		tree.Context.Tip.AppendChild(node)
 		return
 	case atom.Details:
 		node.Type = ast.NodeHTMLBlock

@@ -406,7 +406,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 	case atom.Font:
-		break
+		node.Type = ast.NodeText
+		node.Tokens = []byte(lute.domText(n))
+		tree.Context.Tip.AppendChild(node)
+		return
 	case atom.Details:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
