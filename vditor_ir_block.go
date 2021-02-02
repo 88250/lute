@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/88250/lute/lex"
 	"strconv"
 	"strings"
@@ -214,6 +215,7 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param string) (vHTML string) {
+	fmt.Println(listHTML, command, param)
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)

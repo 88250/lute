@@ -663,7 +663,8 @@ func RenderHeadingText(n *ast.Node) (ret string) {
 						buf.Write(n.Previous.Tokens)
 						buf.Write(html.EscapeHTML(n.Tokens))
 					} else {
-						buf.Write(n.Next.Tokens)
+						buf.Write(n.Previous.Tokens)
+						buf.Write(html.EscapeHTML(n.Tokens))
 					}
 				} else {
 					buf.Write(html.EscapeHTML(n.Tokens))
