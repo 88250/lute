@@ -40,24 +40,22 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 
 // HTML2Tree 将 HTML 转换为 AST。
 func (lute *Lute) HTML2Tree(dom string) (ret *parse.Tree) {
-	reader := strings.NewReader(dom)
-	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
-	if nil != err {
+	htmlRoot := lute.parseHTML(dom)
+	if nil == htmlRoot {
 		return
 	}
 
 	// 调整 DOM 结构
-	lute.adjustVditorDOM(htmlNodes)
+	lute.adjustVditorDOM(htmlRoot)
 
 	// 将 HTML 树转换为 Markdown AST
-
 	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	ret.Context.Tip = ret.Root
-	for _, htmlNode := range htmlNodes {
-		lute.genASTByDOM(htmlNode, ret)
+	for c := htmlRoot.FirstChild; nil != c; c = c.NextSibling {
+		lute.genASTByDOM(c, ret)
 	}
 
+	// 调整树结构
 	ast.Walk(ret.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			if ast.NodeList == n.Type {

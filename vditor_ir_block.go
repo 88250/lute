@@ -162,22 +162,19 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
 
 	// 将字符串解析为 DOM 树
-	reader := strings.NewReader(htmlStr)
-	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
-	if nil != err {
+	htmlRoot := lute.parseHTML(htmlStr)
+	if nil == htmlRoot {
 		return
 	}
 
 	// 调整 DOM 结构
-	lute.adjustVditorDOM(htmlNodes)
+	lute.adjustVditorDOM(htmlRoot)
 
 	// 将 HTML 树转换为 Markdown AST
-
 	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	ret.Context.Tip = ret.Root
-	for _, htmlNode := range htmlNodes {
-		lute.genASTByVditorIRBlockDOM(htmlNode, ret)
+	for c := htmlRoot.FirstChild; nil != c; c = c.NextSibling {
+		lute.genASTByVditorIRBlockDOM(c, ret)
 	}
 
 	// 调整树结构

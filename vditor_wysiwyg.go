@@ -124,28 +124,22 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
 
 	// 将字符串解析为 DOM 树
-
-	reader := strings.NewReader(htmlStr)
-	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragmentWithOptions(reader, htmlRoot)
-	if nil != err {
-		markdown = err.Error()
+	htmlRoot := lute.parseHTML(htmlStr)
+	if nil == htmlRoot {
 		return
 	}
 
 	// 调整 DOM 结构
-	lute.adjustVditorDOM(htmlNodes)
+	lute.adjustVditorDOM(htmlRoot)
 
 	// 将 HTML 树转换为 Markdown AST
-
 	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	tree.Context.Tip = tree.Root
-	for _, htmlNode := range htmlNodes {
-		lute.genASTByVditorDOM(htmlNode, tree)
+	for c := htmlRoot.FirstChild; nil != c; c = c.NextSibling {
+		lute.genASTByVditorDOM(c, tree)
 	}
 
 	// 调整树结构
-
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
@@ -178,35 +172,34 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) adjustVditorDOM(nodes []*html.Node) {
-	length := len(nodes)
-	if 0 == length {
-		return
+func (lute *Lute) parseHTML(htmlStr string) *html.Node {
+	reader := strings.NewReader(htmlStr)
+	doc, err := html.Parse(reader)
+	if nil != err {
+		return nil
 	}
-
-	if 1 < length {
-		i := 0
-		for j := 1; j < length; j++ {
-			nodes[i].InsertAfter(nodes[j])
-			i++
-		}
+	if "html" != doc.FirstChild.Data {
+		return doc
 	}
+	return doc.FirstChild.LastChild // doc.html.body
+}
 
-	lute.removeEmptyNodes(nodes[0])
+func (lute *Lute) adjustVditorDOM(root *html.Node) {
+	lute.removeEmptyNodes(root)
 
-	for c := nodes[0]; nil != c; c = c.NextSibling {
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.mergeVditorDOMList0(c)
 	}
 
-	for c := nodes[0]; nil != c; c = c.NextSibling {
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustVditorDOMListTight0(c)
 	}
 
-	for c := nodes[0]; nil != c; c = c.NextSibling {
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustVditorDOMListList(c)
 	}
 
-	for c := nodes[0]; nil != c; c = c.NextSibling {
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustVditorDOMListItemInP(c)
 	}
 }
@@ -281,6 +274,17 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		lute.searchEmptyNodes(c, emptyNodes)
+	}
+
+	switch n.DataAtom {
+	case atom.Ol, atom.Ul:
+		if "footnotes-defs-ol" == lute.domAttrValue(n, "data-type") {
+			return
+		}
+		text := lute.domText(n)
+		if "" == text {
+			*emptyNodes = append(*emptyNodes, n)
+		}
 	}
 }
 
@@ -448,7 +452,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 
 				originalHTML := &bytes.Buffer{}
 				if err := html.Render(originalHTML, li); nil == err {
-					md := lute.vditorDOM2Md("<ol>" + originalHTML.String() + "</ol>")
+					md := lute.vditorDOM2Md("<ol data-type=\"footnotes-defs-ol\">" + originalHTML.String() + "</ol>")
 					label := lute.domAttrValue(li, "data-marker")
 					md = md[3:] // 去掉列表项标记符 1.
 					lines := strings.Split(md, "\n")

@@ -90,28 +90,22 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
 
 	// 将字符串解析为 DOM 树
-
-	reader := strings.NewReader(htmlStr)
-	htmlRoot := &html.Node{Type: html.ElementNode}
-	htmlNodes, err := html.ParseFragment(reader, htmlRoot)
-	if nil != err {
-		markdown = err.Error()
+	htmlRoot := lute.parseHTML(htmlStr)
+	if nil == htmlRoot {
 		return
 	}
 
 	// 调整 DOM 结构
-	lute.adjustVditorDOM(htmlNodes)
+	lute.adjustVditorDOM(htmlRoot)
 
 	// 将 HTML 树转换为 Markdown AST
-
 	tree := &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	tree.Context.Tip = tree.Root
-	for _, htmlNode := range htmlNodes {
-		lute.genASTByVditorIRDOM(htmlNode, tree)
+	for c := htmlRoot.FirstChild; nil != c; c = c.NextSibling {
+		lute.genASTByVditorIRDOM(c, tree)
 	}
 
 	// 调整树结构
-
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			switch n.Type {
