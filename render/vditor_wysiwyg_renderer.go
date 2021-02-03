@@ -1154,7 +1154,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 			language = string(infoWords[0])
 			attrs = append(attrs, []string{"class", "language-" + language})
 			if "mindmap" == language {
-				dataCode := r.renderMindmap(node.Tokens)
+				dataCode := r.RenderMindmap(node.Tokens)
 				attrs = append(attrs, []string{"data-code", string(dataCode)})
 			}
 		}
@@ -1179,7 +1179,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 
 	if r.Options.VditorCodeBlockPreview {
 		r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-		preDiv := noHighlight(language)
+		preDiv := r.NoHighlight(language)
 		if preDiv {
 			r.Tag("div", attrs, false)
 		} else {

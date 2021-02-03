@@ -67,7 +67,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = util.BytesToStr(infoWords[0])
 	}
-	preDiv := noHighlight(language)
+	preDiv := r.NoHighlight(language)
 	if entering {
 		var attrs [][]string
 		r.handleKramdownBlockIAL(node.Parent)
@@ -84,7 +84,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			}
 
 			if "mindmap" == language {
-				json := r.renderMindmap(tokens)
+				json := r.RenderMindmap(tokens)
 				r.WriteString("<div data-code=\"")
 				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")

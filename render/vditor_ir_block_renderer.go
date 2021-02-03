@@ -785,7 +785,7 @@ func (r *VditorIRBlockRenderer) renderCodeBlockCode(node *ast.Node, entering boo
 		language = string(infoWords[0])
 		attrs = append(attrs, []string{"class", "language-" + language})
 		if "mindmap" == language {
-			dataCode := r.renderMindmap(node.Tokens)
+			dataCode := r.RenderMindmap(node.Tokens)
 			attrs = append(attrs, []string{"data-code", string(dataCode)})
 		}
 	}
@@ -805,7 +805,7 @@ func (r *VditorIRBlockRenderer) renderCodeBlockCode(node *ast.Node, entering boo
 	r.WriteString("</code></pre>")
 
 	r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	preDiv := noHighlight(language)
+	preDiv := r.NoHighlight(language)
 	if preDiv {
 		r.Tag("div", attrs, false)
 	} else {

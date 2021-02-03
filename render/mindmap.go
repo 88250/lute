@@ -20,8 +20,8 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// renderMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
-func (r *BaseRenderer) renderMindmap(listContent []byte) []byte {
+// RenderMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
+func (r *BaseRenderer) RenderMindmap(listContent []byte) []byte {
 	listContent = bytes.ReplaceAll(listContent, util.CaretTokens, nil)
 	tree := parse.Parse("", listContent, parse.NewOptions())
 	if nil == tree.Root.FirstChild || ast.NodeList != tree.Root.FirstChild.Type {

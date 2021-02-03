@@ -630,6 +630,22 @@ func (r *BaseRenderer) NodeAttrsStr(node *ast.Node) (ret string) {
 	return
 }
 
+// languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
+var languagesNoHighlight = []string{"mermaid", "echarts", "abc", "graphviz", "mindmap", "flowchart", "plantuml"}
+
+func (r *BaseRenderer) NoHighlight(language string) bool {
+	if "" == language {
+		return false
+	}
+
+	for _, langNoHighlight := range languagesNoHighlight {
+		if language == langNoHighlight {
+			return true
+		}
+	}
+	return false
+}
+
 func RenderHeadingText(n *ast.Node) (ret string) {
 	buf := &bytes.Buffer{}
 	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {
