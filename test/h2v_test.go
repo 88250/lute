@@ -39,7 +39,41 @@ func TestHTML2VditorDOM(t *testing.T) {
 }
 
 var html2VditorIRBlockDOMTests = []parseTest{
+	{"3", `<!--StartFragment-->
 
+<p class="MsoNormal"><span lang="EN-US">Para1<o:p></o:p></span></p>
+
+<table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" align="left">
+ <tbody><tr>
+  <td width="189" valign="top">
+  <p class="MsoNormal"><span lang="EN-US">Foo<o:p></o:p></span></p>
+  </td>
+  <td width="189" valign="top">
+  <p class="MsoNormal"><span lang="EN-US">Bar<o:p></o:p></span></p>
+  </td>
+  <td width="189" valign="top">
+  <p class="MsoNormal"><span lang="EN-US">baz<o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width="189" valign="top">
+  <p class="MsoNormal"><span lang="EN-US">Foo2<o:p></o:p></span></p>
+  <p class="MsoNormal"><span lang="EN-US">Foo3<o:p></o:p></span></p>
+  </td>
+  <td width="189" valign="top">
+  <p class="MsoNormal"><span lang="EN-US">Bar2<o:p></o:p></span></p>
+  </td>
+  <td width="189" valign="top">
+  <p class="MsoNormal"><span lang="EN-US">Baz2<o:p></o:p></span></p>
+  </td>
+ </tr>
+</tbody></table>
+
+<p class="MsoNormal"><span lang="EN-US"><o:p>&nbsp;</o:p></span></p>
+
+<p class="MsoNormal"><span lang="EN-US">Para2<o:p></o:p></span></p>
+
+<!--EndFragment-->`, "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">Para1</p><table data-block=\"0\" data-type=\"table\" data-node-id=\"20060102150405-1a2b3c4\"><thead><tr><th>Foo</th><th>Bar</th><th>baz</th></tr></thead><tbody><tr><td>Foo2 Foo3</td><td>Bar2</td><td>Baz2</td></tr></tbody></table><p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">Para2</p>"},
 	{"2", `<table border="0" cellpadding="0" cellspacing="0" width="144">
 <!--StartFragment-->
  <colgroup><col width="72" span="2">

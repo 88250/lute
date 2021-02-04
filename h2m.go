@@ -102,9 +102,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.Type = ast.NodeLinkText
 		}
+		if "" == strings.TrimSpace(n.Data) && lute.parentIs(n, atom.Table) {
+			node.Tokens = []byte(" ")
+			tree.Context.Tip.AppendChild(node)
+			break
+		}
+
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div, atom.Section:
+		if lute.parentIs(n, atom.Table) {
+			break
+		}
+
 		if atom.Div == n.DataAtom {
 			// 解析 GitHub 语法高亮代码块
 			class := lute.domAttrValue(n, "class")
