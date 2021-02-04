@@ -348,7 +348,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.ID = nodeID
 		}
 	}
-	if "" != node.ID {
+	if "" != node.ID && !lute.parentIs(n, atom.Table) {
 		node.KramdownIAL = [][]string{{"id", node.ID}}
 		ialTokens := lute.setIAL(n, node)
 		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
@@ -535,6 +535,15 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if "" == strings.TrimSpace(text) {
 			return
 		}
+		if lute.parentIs(n, atom.Table) {
+			node.Tokens = []byte(strings.TrimSpace(text))
+			for bytes.HasPrefix(node.Tokens, []byte("#")) {
+				node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("#"))
+			}
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
 		node.Type = ast.NodeHeading
 		marker := lute.domAttrValue(n, "data-marker")
 		node.HeadingSetext = "=" == marker || "-" == marker
