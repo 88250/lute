@@ -1239,7 +1239,7 @@ func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Wal
 			blockquoteLines.Write(line)
 			blockquoteLines.WriteByte(lex.ItemNewline)
 		}
-		buf = blockquoteLines.Bytes()
+		buf = bytes.TrimSpace(blockquoteLines.Bytes())
 		writer.Reset()
 		writer.Write(buf)
 		r.NodeWriterStack[len(r.NodeWriterStack)-1].Write(writer.Bytes())
