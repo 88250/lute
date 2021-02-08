@@ -39,6 +39,7 @@ func TestHTML2VditorDOM(t *testing.T) {
 }
 
 var html2VditorIRBlockDOMTests = []parseTest{
+	{"4", "<!--StartFragment--><span class=\"tiao\">第一条</span><span>　为</span><!--EndFragment-->", "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\"><span data-type=\"strong\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span><strong data-newline=\"1\">第一条</strong><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span></span>\u3000为</p>"},
 	{"3", `<!--StartFragment-->
 
 <p class="MsoNormal"><span lang="EN-US">Para1<o:p></o:p></span></p>

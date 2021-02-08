@@ -40,6 +40,7 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 
 // HTML2VditorIRBlockDOM 将 HTML 转换为 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下粘贴。
 func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
+	//fmt.Println(sHTML)
 	markdown, err := lute.HTML2Markdown(sHTML)
 	if nil != err {
 		vHTML = err.Error()
