@@ -759,6 +759,10 @@ func (r *HtmlRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus 
 func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if 0 == r.DisableTags {
+			if style := node.IALAttr("parent-style"); "" != style {
+				r.Tag("span", [][]string{{"style", style}}, false)
+			}
+
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.LinkPath(destTokens)
@@ -786,6 +790,9 @@ func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus
 			r.WriteString(" " + ial)
 		}
 		r.WriteString(" />")
+		if style := node.IALAttr("parent-style"); "" != style {
+			r.Tag("/span", nil, false)
+		}
 
 		if r.Options.Sanitize {
 			buf := r.Writer.Bytes()
