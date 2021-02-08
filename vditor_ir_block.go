@@ -214,10 +214,11 @@ func (lute *Lute) vditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, param2 string) (vHTML string) {
-	//fmt.Println(listHTML, command, "id1:"+ param1, "id2:"+param2)
+	//fmt.Println(listHTML, command, "id1:"+param1, "id2:"+param2)
 	listHTML = strings.ReplaceAll(listHTML, "<wbr>", util.Caret)
 
 	md := lute.vditorIRBlockDOM2Md(listHTML)
+	//fmt.Println(md)
 	lines := strings.Split(md, "\n")
 	buf := &bytes.Buffer{}
 	for i := 0; i < len(lines); i++ {
@@ -263,15 +264,20 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 				}
 				i = j
 				continue
-			case "tab0", "tab1": // 不带子项缩进
+			case "tab0": // 不带子项缩进
 				buf.WriteString("\n")
 				indent := countIndent(line)
+				if isOrder {
+					if spaces := IndentOrder(line); 0 < spaces {
+						indent += strings.Repeat(" ", spaces)
+					}
+				}
 
 				ialIdx := i + 1
 				for ; ialIdx < len(lines); ialIdx++ {
 					ial := lines[ialIdx]
 					if isOrder {
-						if strings.HasPrefix(ial, "   "+indent+"{:") {
+						if strings.HasPrefix(ial, "  "+indent+"{:") {
 							break
 						}
 					} else {
@@ -282,8 +288,8 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 				}
 
 				if isOrder {
-					l := strings.TrimSpace(line)[1:]
-					writeLine = "   " + indent + "1" + l + "\n"
+					l := trimOrder(line)
+					writeLine = "  " + indent + "1" + l + "\n"
 					lines[ialIdx] = "   " + lines[ialIdx]
 				} else {
 					writeLine = "  " + line + "\n"
@@ -306,10 +312,24 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 		}
 	}
 	md = buf.String()
+	//fmt.Println(md)
 	vHTML = lute.Md2VditorIRBlockDOM(md)
-
 	vHTML = strings.ReplaceAll(vHTML, util.Caret, "<wbr>")
 	return
+}
+
+func trimOrder(orderListItemLine string) string {
+	l := strings.TrimSpace(orderListItemLine)
+	if idx := strings.Index(l, ". "); 0 > idx {
+		return l
+	} else {
+		return l[idx:]
+	}
+}
+
+func IndentOrder(orderListItemLine string) int {
+	l := strings.TrimSpace(orderListItemLine)
+	return strings.Index(l, ".")
 }
 
 func countIndent(line string) (ret string) {
