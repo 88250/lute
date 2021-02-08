@@ -70,6 +70,10 @@ func (t *Tree) parseSuperBlock() (ok bool, layout []byte) {
 
 func (context *Context) isSuperBlockClose(tokens []byte) (ok bool) {
 	tokens = lex.TrimWhitespace(tokens)
+	if bytes.Equal(tokens, []byte(util.Caret + "}}}")) {
+		p := &ast.Node{Type: ast.NodeParagraph, Tokens: util.CaretTokens}
+		context.TipAppendChild(p)
+	}
 	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
 	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	if !bytes.Equal([]byte("}}}"), tokens) {
