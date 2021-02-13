@@ -899,23 +899,9 @@ func (r *VditorIRBlockRenderer) renderInlineMathOpenMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		preText := node.PreviousNodeText()
-		if "" != preText && !strings.HasSuffix(preText, " ") && !strings.HasSuffix(preText, util.Caret) {
-			r.WriteByte(lex.ItemSpace)
-		}
-		if "" == preText {
-			r.WriteByte(lex.ItemSpace)
-		}
 		r.renderSpanNode(node)
 	} else {
 		r.Tag("/span", nil, false)
-		nextText := node.NextNodeText()
-		if "" != nextText && !strings.HasPrefix(nextText, " ") && !strings.HasPrefix(nextText, util.Caret) {
-			r.WriteByte(lex.ItemSpace)
-		}
-		if "" == nextText {
-			r.WriteByte(lex.ItemSpace)
-		}
 	}
 	return ast.WalkContinue
 }
