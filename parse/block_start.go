@@ -351,7 +351,7 @@ var blockStarts = []blockStartFunc{
 			return 0
 		}
 
-		if ast.NodeListItem == t.Context.Tip.Type && nil == t.Context.Tip.FirstChild { // 列表项 IAL 由后续第一个段落块进行解析
+		if ast.NodeListItem == t.Context.Tip.Type && nil == t.Context.Tip.FirstChild { // 在列表最终化过程中处理
 			return 0
 		}
 
