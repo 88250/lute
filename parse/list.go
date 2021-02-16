@@ -18,6 +18,54 @@ import (
 	"strconv"
 )
 
+// 判断列表、列表项（* - + 1.）或者任务列表项是否开始。
+func ListStart(t *Tree, container *ast.Node) int {
+	if ast.NodeList != container.Type && t.Context.indented {
+		return 0
+	}
+
+	data := t.parseListMarker(container)
+	if nil == data {
+		return 0
+	}
+
+	t.Context.closeUnmatchedBlocks()
+
+	listsMatch := container.Type == ast.NodeList && t.Context.listsMatch(container.ListData, data)
+	if t.Context.Tip.Type != ast.NodeList || !listsMatch {
+		list := t.Context.addChild(ast.NodeList)
+		list.ListData = data
+	}
+	listItem := t.Context.addChild(ast.NodeListItem)
+	listItem.ListData = data
+	listItem.Tokens = data.Marker
+	if 1 == listItem.ListData.Typ || (3 == listItem.ListData.Typ && 0 == listItem.ListData.BulletChar) {
+		// 修正有序列表项序号
+		prev := listItem.Previous
+		if nil != prev {
+			listItem.Num = prev.Num + 1
+		} else {
+			listItem.Num = data.Start
+		}
+	}
+	return 1
+}
+
+func ListItemContinue(listItem *ast.Node, context *Context) int {
+	if context.blank {
+		if nil == listItem.FirstChild { // 列表项后面是空的
+			return 1
+		}
+
+		context.advanceNextNonspace()
+	} else if context.indent >= listItem.MarkerOffset+listItem.Padding {
+		context.advanceOffset(listItem.MarkerOffset+listItem.Padding, true)
+	} else {
+		return 1
+	}
+	return 0
+}
+
 func (context *Context) listFinalize(list *ast.Node) {
 	item := list.FirstChild
 
@@ -70,6 +118,19 @@ func (context *Context) listFinalize(list *ast.Node) {
 							tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}"))+1:]
 							tokens = lex.TrimWhitespace(tokens)
 							li.FirstChild.Tokens = tokens
+
+							// 列表项下第一个子节点会因为 li 的 IAL 文本影响解析，所以此处单独作为子树处理
+							liFirstChildID := li.FirstChild.ID
+							liFirstChildIAL := li.FirstChild.KramdownIAL
+							subTree := Parse("", li.FirstChild.Tokens, context.ParseOption)
+							first := subTree.Root.FirstChild
+							if ast.NodeParagraph != first.Type { // 只有非段落才需要类型转换
+								first.ID = liFirstChildID
+								first.KramdownIAL = liFirstChildIAL
+								li.FirstChild.InsertAfter(first)
+								li.FirstChild.Unlink()
+							}
+
 							li = li.Next
 						}
 					}
