@@ -963,11 +963,6 @@ func (r *FormatRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkS
 
 func (r *FormatRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if node.ParentIs(ast.NodeTableCell) && (bytes.Contains(node.Next.Tokens, []byte("|")) || bytes.Contains(node.Next.Tokens, []byte("`"))) {
-			r.WriteString("<code>")
-			return ast.WalkContinue
-		}
-
 		r.WriteByte(lex.ItemBacktick)
 		if 1 < node.Parent.CodeMarkerLen {
 			r.WriteByte(lex.ItemBacktick)
@@ -996,11 +991,6 @@ func (r *FormatRenderer) renderCodeSpanContent(node *ast.Node, entering bool) as
 
 func (r *FormatRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if node.ParentIs(ast.NodeTableCell) && (bytes.Contains(node.Previous.Tokens, []byte("|")) || bytes.Contains(node.Previous.Tokens, []byte("`"))) {
-			r.WriteString("</code>")
-			return ast.WalkContinue
-		}
-
 		if 1 < node.Parent.CodeMarkerLen {
 			text := util.BytesToStr(node.Previous.Tokens)
 			lastc, _ := utf8.DecodeLastRuneInString(text)

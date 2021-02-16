@@ -184,7 +184,7 @@ func (lute *Lute) VditorIRBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err er
 			switch n.Type {
 			case ast.NodeInlineHTML, ast.NodeCodeSpan, ast.NodeInlineMath, ast.NodeHTMLBlock, ast.NodeCodeBlockCode, ast.NodeMathBlockContent:
 				n.Tokens = html.UnescapeHTML(n.Tokens)
-				if nil != n.Next && ast.NodeCodeSpan == n.Next.Type && n.CodeMarkerLen == n.Next.CodeMarkerLen {
+				if nil != n.Next && ast.NodeCodeSpan == n.Next.Type && n.CodeMarkerLen == n.Next.CodeMarkerLen && nil != n.FirstChild && nil != n.FirstChild.Next {
 					// 合并代码节点 https://github.com/Vanessa219/vditor/issues/167
 					n.FirstChild.Next.Tokens = append(n.FirstChild.Next.Tokens, n.Next.FirstChild.Next.Tokens...)
 					n.Next.Unlink()
