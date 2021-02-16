@@ -17,6 +17,27 @@ import (
 	"github.com/88250/lute/util"
 )
 
+// 判断内容块嵌入（!((id "text"))）是否开始。
+func BlockEmbedStart(t *Tree, container *ast.Node) int {
+	if !t.Context.ParseOption.BlockRef || t.Context.indented {
+		return 0
+	}
+
+	node := t.parseBlockEmbed()
+	if nil == node {
+		return 0
+	}
+
+	t.Context.closeUnmatchedBlocks()
+
+	for !t.Context.Tip.CanContain(ast.NodeBlockEmbed) {
+		t.Context.finalize(t.Context.Tip) // 注意调用 finalize 会向父节点方向进行迭代
+	}
+	t.Context.Tip.AppendChild(node)
+	t.Context.Tip = node
+	return 2
+}
+
 func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	tokens = bytes.TrimSpace(tokens)
@@ -122,6 +143,27 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 		listItem.AppendChild(taskListItemMarker)
 	}
 	return
+}
+
+// 判断内容块查询嵌入（!{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}）是否开始。
+func BlockQueryEmbedStart(t *Tree, container *ast.Node) int {
+	if !t.Context.ParseOption.BlockRef || t.Context.indented {
+		return 0
+	}
+
+	node := t.parseBlockQueryEmbed()
+	if nil == node {
+		return 0
+	}
+
+	t.Context.closeUnmatchedBlocks()
+
+	for !t.Context.Tip.CanContain(ast.NodeBlockQueryEmbed) {
+		t.Context.finalize(t.Context.Tip) // 注意调用 finalize 会向父节点方向进行迭代
+	}
+	t.Context.Tip.AppendChild(node)
+	t.Context.Tip = node
+	return 2
 }
 
 func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {

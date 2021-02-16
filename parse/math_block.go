@@ -17,6 +17,23 @@ import (
 	"github.com/88250/lute/util"
 )
 
+// 判断数学公式块（$$）是否开始。
+func MathBlockStart(t *Tree, container *ast.Node) int {
+	if t.Context.indented {
+		return 0
+	}
+
+	if ok, mathBlockDollarOffset := t.parseMathBlock(); ok {
+		t.Context.closeUnmatchedBlocks()
+		block := t.Context.addChild(ast.NodeMathBlock)
+		block.MathBlockDollarOffset = mathBlockDollarOffset
+		t.Context.advanceNextNonspace()
+		t.Context.advanceOffset(mathBlockDollarOffset, false)
+		return 2
+	}
+	return 0
+}
+
 func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 	ln := context.currentLine
 	indent := context.indent

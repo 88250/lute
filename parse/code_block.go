@@ -19,6 +19,43 @@ import (
 	"github.com/88250/lute/util"
 )
 
+// 判断围栏代码块（```）是否开始。
+func FenceCodeBlockStart(t *Tree, container *ast.Node) int {
+	if t.Context.indented {
+		return 0
+	}
+
+	if ok, codeBlockFenceChar, codeBlockFenceLen, codeBlockFenceOffset, codeBlockOpenFence, codeBlockInfo := t.parseFencedCode(); ok {
+		t.Context.closeUnmatchedBlocks()
+		container := t.Context.addChild(ast.NodeCodeBlock)
+		container.IsFencedCodeBlock = true
+		container.CodeBlockFenceLen = codeBlockFenceLen
+		container.CodeBlockFenceChar = codeBlockFenceChar
+		container.CodeBlockFenceOffset = codeBlockFenceOffset
+		container.CodeBlockOpenFence = codeBlockOpenFence
+		container.CodeBlockInfo = codeBlockInfo
+		t.Context.advanceNextNonspace()
+		t.Context.advanceOffset(codeBlockFenceLen, false)
+		return 2
+	}
+	return 0
+}
+
+// 判断缩进代码块（    code）是否开始。
+func IndentCodeBlockStart(t *Tree, container *ast.Node) int {
+	if !t.Context.indented {
+		return 0
+	}
+
+	if t.Context.Tip.Type != ast.NodeParagraph && !t.Context.blank {
+		t.Context.advanceOffset(4, true)
+		t.Context.closeUnmatchedBlocks()
+		t.Context.addChild(ast.NodeCodeBlock)
+		return 2
+	}
+	return 0
+}
+
 func CodeBlockContinue(codeBlock *ast.Node, context *Context) int {
 	ln := context.currentLine
 	indent := context.indent

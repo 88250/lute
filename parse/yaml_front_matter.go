@@ -17,6 +17,21 @@ import (
 	"github.com/88250/lute/util"
 )
 
+// 判断 YAML Front Matter（---）是否开始。
+func YamlFrontMatterStart(t *Tree, container *ast.Node) int {
+	if !t.Context.ParseOption.YamlFrontMatter || t.Context.indented || nil != t.Root.FirstChild {
+		return 0
+	}
+
+	if t.parseYamlFrontMatter() {
+		node := &ast.Node{Type: ast.NodeYamlFrontMatter}
+		t.Root.AppendChild(node)
+		t.Context.Tip = node
+		return 2
+	}
+	return 0
+}
+
 func YamlFrontMatterContinue(node *ast.Node, context *Context) int {
 	if isYamlFrontMatterClose(context) {
 		context.finalize(node)

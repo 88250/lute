@@ -94,7 +94,8 @@ func (t *Tree) incorporateLine(line []byte) {
 	t.Context.lastMatchedContainer = container
 
 	matchedLeaf := container.Type != ast.NodeParagraph && container.AcceptLines()
-	startsLen := len(blockStarts)
+	blockParsers := blockStarts()
+	startsLen := len(blockParsers)
 
 	// 除非最后一个匹配到的是代码块，否则的话就起始一个新的块级节点
 	for !matchedLeaf {
@@ -124,7 +125,7 @@ func (t *Tree) incorporateLine(line []byte) {
 		// 逐个尝试是否可以起始一个块级节点
 		i := 0
 		for i < startsLen {
-			res := blockStarts[i](t, container)
+			res := blockParsers[i](t, container)
 			if res == 1 { // 匹配到容器块，继续迭代下降过程
 				container = t.Context.Tip
 				break

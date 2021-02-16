@@ -17,6 +17,32 @@ import (
 	"github.com/88250/lute/util"
 )
 
+// 判断 HTML 块（<）是否开始。
+func HtmlBlockStart(t *Tree, container *ast.Node) int {
+	if t.Context.indented {
+		return 0
+	}
+
+	if lex.ItemLess != lex.Peek(t.Context.currentLine, t.Context.nextNonspace) {
+		return 0
+	}
+
+	if t.Context.ParseOption.VditorWYSIWYG {
+		if bytes.Contains(t.Context.currentLine, []byte("vditor-comment")) {
+			return 0
+		}
+	}
+
+	tokens := t.Context.currentLine[t.Context.nextNonspace:]
+	if htmlType := t.parseHTML(tokens); 0 != htmlType {
+		t.Context.closeUnmatchedBlocks()
+		block := t.Context.addChild(ast.NodeHTMLBlock)
+		block.HtmlBlockType = htmlType
+		return 2
+	}
+	return 0
+}
+
 func HtmlBlockContinue(html *ast.Node, context *Context) int {
 	tokens := context.currentLine
 	if context.ParseOption.KramdownBlockIAL && len("{: id=\"") < len(tokens) {

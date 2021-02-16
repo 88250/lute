@@ -12,10 +12,88 @@ package parse
 
 import (
 	"bytes"
+	"github.com/88250/lute/ast"
 
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
+
+// 判断 ATX 标题（#）是否开始。
+func ATXHeadingStart(t *Tree, container *ast.Node) int {
+	if t.Context.indented {
+		return 0
+	}
+
+	if ok, markers, content, level := t.parseATXHeading(); ok {
+		t.Context.advanceNextNonspace()
+		t.Context.advanceOffset(len(content), false)
+		t.Context.closeUnmatchedBlocks()
+		heading := t.Context.addChild(ast.NodeHeading)
+		heading.HeadingLevel = level
+		heading.Tokens = content
+		crosshatchMarker := &ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: markers}
+		heading.AppendChild(crosshatchMarker)
+		t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
+		return 2
+	}
+	return 0
+}
+
+// 判断 Setext 标题（- =）是否开始。
+func SetextHeadingStart(t *Tree, container *ast.Node) int {
+	if t.Context.indented || ast.NodeParagraph != container.Type {
+		return 0
+	}
+	level := t.parseSetextHeading()
+	if 0 == level {
+		return 0
+	}
+
+	if t.Context.ParseOption.GFMTable {
+		// 尝试解析表，因为可能出现如下情况：
+		//
+		//   0
+		//   -:
+		//   -
+		//
+		// 前两行可以解析出一个只有一个单元格的表。
+		// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
+		table := t.Context.parseTable0(container.Tokens)
+		if nil != table {
+			// 将该段落节点转成表节点
+			container.Type = ast.NodeTable
+			container.TableAligns = table.TableAligns
+			for tr := table.FirstChild; nil != tr; {
+				nextTr := tr.Next
+				container.AppendChild(tr)
+				tr = nextTr
+			}
+			container.Tokens = nil
+			return 0
+		}
+	}
+
+	t.Context.closeUnmatchedBlocks()
+	// 解析链接引用定义
+	for tokens := container.Tokens; 0 < len(tokens) && lex.ItemOpenBracket == tokens[0]; tokens = container.Tokens {
+		if remains := t.Context.parseLinkRefDef(tokens); nil != remains {
+			container.Tokens = remains
+		} else {
+			break
+		}
+	}
+
+	if 0 < len(container.Tokens) {
+		child := &ast.Node{Type: ast.NodeHeading, HeadingLevel: level, HeadingSetext: true}
+		child.Tokens = lex.TrimWhitespace(container.Tokens)
+		container.InsertAfter(child)
+		container.Unlink()
+		t.Context.Tip = child
+		t.Context.advanceOffset(t.Context.currentLineLen-t.Context.offset, false)
+		return 2
+	}
+	return 0
+}
 
 func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]

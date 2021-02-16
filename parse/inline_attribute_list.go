@@ -17,6 +17,45 @@ import (
 	"strings"
 )
 
+// 判断 kramdown 块级内联属性列表（{: attrs}）是否开始。
+func IALStart(t *Tree, container *ast.Node) int {
+	if !t.Context.ParseOption.KramdownBlockIAL || t.Context.indented {
+		return 0
+	}
+
+	if ast.NodeListItem == t.Context.Tip.Type && nil == t.Context.Tip.FirstChild { // 在列表最终化过程中处理
+		return 0
+	}
+
+	if ial := t.parseKramdownBlockIAL(); nil != ial {
+		t.Context.closeUnmatchedBlocks()
+		t.Context.offset = t.Context.currentLineLen                    // 整行过
+		if 1 < len(ial) && "type" == ial[1][0] && "doc" == ial[1][1] { // 文档块 IAL
+			t.Context.rootIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: t.Context.currentLine[t.Context.nextNonspace:]}
+			t.Root.KramdownIAL = ial
+			t.Root.ID = ial[0][1]
+			t.ID = t.Root.ID
+			return 2
+		}
+
+		lastMatchedContainer := t.Context.lastMatchedContainer
+		if t.Context.allClosed {
+			if ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type || ast.NodeBlockquote == lastMatchedContainer.Type {
+				lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
+				if nil == lastMatchedContainer {
+					lastMatchedContainer = t.Context.lastMatchedContainer
+				}
+			}
+		}
+		lastMatchedContainer.KramdownIAL = ial
+		lastMatchedContainer.ID = ial[0][1]
+		node := t.Context.addChild(ast.NodeKramdownBlockIAL)
+		node.Tokens = t.Context.currentLine[t.Context.nextNonspace:]
+		return 2
+	}
+	return 0
+}
+
 var openCurlyBraceColon = util.StrToBytes("{: ")
 var emptyIAL = util.StrToBytes("{:}")
 

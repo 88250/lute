@@ -15,6 +15,29 @@ import (
 	"github.com/88250/lute/ast"
 )
 
+// 判断 Git 冲突标记是否开始。
+//   <<<<<<< HEAD
+//   这里是本地原来的内容
+//   =======
+//   这里是拉取下来的内容
+//   >>>>>>> feebfeb6bef44cf1384d51cdd7aef7e4197b8180
+func GitConflictStart(t *Tree, container *ast.Node) int {
+	if !t.Context.ParseOption.GitConflict {
+		return 0
+	}
+
+	if t.Context.indented {
+		return 0
+	}
+
+	if ok := t.parseGitConflict(); ok {
+		t.Context.closeUnmatchedBlocks()
+		t.Context.addChild(ast.NodeGitConflict)
+		return 2
+	}
+	return 0
+}
+
 func GitConflictContinue(gitConflictBlock *ast.Node, context *Context) int {
 	if context.isGitConflictClose() {
 		context.finalize(gitConflictBlock)

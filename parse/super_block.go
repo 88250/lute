@@ -18,6 +18,23 @@ import (
 	"github.com/88250/lute/util"
 )
 
+// 判断超级块（{{{ blocks }}}）是否开始。
+func SuperBlockStart(t *Tree, container *ast.Node) int {
+	if !t.Context.ParseOption.SuperBlock || t.Context.indented {
+		return 0
+	}
+
+	if ok, layout := t.parseSuperBlock(); ok {
+		t.Context.closeUnmatchedBlocks()
+		t.Context.addChild(ast.NodeSuperBlock)
+		t.Context.addChildMarker(ast.NodeSuperBlockOpenMarker, nil)
+		t.Context.addChildMarker(ast.NodeSuperBlockLayoutMarker, layout)
+		t.Context.offset = t.Context.currentLineLen - 1 // 整行过
+		return 1
+	}
+	return 0
+}
+
 func SuperBlockContinue(superBlock *ast.Node, context *Context) int {
 	if context.isSuperBlockClose(context.currentLine[context.nextNonspace:]) {
 		level := 0
@@ -70,7 +87,7 @@ func (t *Tree) parseSuperBlock() (ok bool, layout []byte) {
 
 func (context *Context) isSuperBlockClose(tokens []byte) (ok bool) {
 	tokens = lex.TrimWhitespace(tokens)
-	if bytes.Equal(tokens, []byte(util.Caret + "}}}")) {
+	if bytes.Equal(tokens, []byte(util.Caret+"}}}")) {
 		p := &ast.Node{Type: ast.NodeParagraph, Tokens: util.CaretTokens}
 		context.TipAppendChild(p)
 	}
