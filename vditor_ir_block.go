@@ -515,11 +515,29 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		tokens := make([]byte, len(node.Tokens))
 		copy(tokens, node.Tokens)
 
-		// 尝试块级解析，处理列表代码块
+		// 尝试块级解析
 		subTree := parse.Parse("", tokens, tree.Context.ParseOption)
-		if nil != subTree.Root.FirstChild && ast.NodeCodeBlock == subTree.Root.FirstChild.Type {
-			node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
-			tree.Context.Tip.AppendChild(node)
+		if nil != subTree.Root.FirstChild && (ast.NodeCodeBlock == subTree.Root.FirstChild.Type || ast.NodeList == subTree.Root.FirstChild.Type) {
+			if ast.NodeCodeBlock == subTree.Root.FirstChild.Type {
+				// 处理列表代码块
+				node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
+				tree.Context.Tip.AppendChild(node)
+			} else if ast.NodeList == subTree.Root.FirstChild.Type {
+				if nil == n.Parent.NextSibling {
+					node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
+					tree.Context.Tip.AppendChild(node)
+				} else {
+					// 处理空列表
+					if "" == subTree.Root.FirstChild.Text() && util.Caret == n.Parent.NextSibling.FirstChild.Data {
+						tree.Context.Tip.Type = subTree.Root.FirstChild.Type
+						node = subTree.Root.FirstChild.FirstChild
+						tree.Context.Tip.AppendChild(subTree.Root.FirstChild.FirstChild)
+						node = &ast.Node{Type: ast.NodeParagraph}
+						tree.Context.Tip.LastChild.AppendChild(node)
+						tree.Context.Tip = node
+					}
+				}
+			}
 		} else {
 			// 尝试行级解析，处理段落图片文本节点转换为图片节点
 			subTree = parse.Inline("", tokens, tree.Context.ParseOption)
