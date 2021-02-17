@@ -171,7 +171,7 @@ func (context *Context) parseKramdownSpanIAL(tokens []byte) (pos int, ret [][]st
 }
 
 func (context *Context) parseKramdownIALInListItem(tokens []byte) (ret [][]string) {
-	if curlyBracesStart := bytes.Index(tokens, []byte("{:")); 0 <= curlyBracesStart {
+	if curlyBracesStart := bytes.Index(tokens, []byte("{:")); 0 == curlyBracesStart {
 		tokens = tokens[curlyBracesStart+2:]
 		curlyBracesEnd := bytes.Index(tokens, closeCurlyBrace)
 		if 3 > curlyBracesEnd {
