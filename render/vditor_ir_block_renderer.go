@@ -1813,9 +1813,18 @@ func (r *VditorIRBlockRenderer) renderListItem(node *ast.Node, entering bool) as
 			} else {
 				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			}
-			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type /* li.p.task */ ||
-				ast.NodeTaskListItemMarker == node.FirstChild.Type /* VditorIRBlockDOM2Tree 忽略了 p */ {
-				attrs = append(attrs, []string{"class", r.Options.GFMTaskListItemClass})
+			if nil != node.FirstChild {
+				taskListItemMarker := node.FirstChild.FirstChild // li.p.task
+				if nil == taskListItemMarker {
+					taskListItemMarker = node.FirstChild // 非 p 块，例如 li.task.bq
+				}
+				if nil != taskListItemMarker {
+					taskClass := r.Options.GFMTaskListItemClass
+					if taskListItemMarker.TaskListItemChecked {
+						taskClass += " vditor-task--done"
+					}
+					attrs = append(attrs, []string{"class", taskClass})
+				}
 			}
 		}
 		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})
