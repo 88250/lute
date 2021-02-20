@@ -89,7 +89,10 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 						subTree := Parse("", p.Tokens, context.ParseOption)
 						subBlock := subTree.Root.FirstChild
 						if ast.NodeParagraph != subBlock.Type {
+							listItem.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
 							listItem.PrependChild(p.FirstChild)
+							subBlock.ID = p.ID
+							subBlock.KramdownIAL = p.KramdownIAL
 							p.InsertAfter(subBlock)
 							p.Unlink()
 						}

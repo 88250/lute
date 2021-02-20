@@ -954,6 +954,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.Parent.Parent.Parent.ListData.Typ = 3
 			node.Parent.Parent.ListData.Typ = 3
 		}
+		if nil != n.NextSibling && (atom.H1 == n.NextSibling.DataAtom || atom.H2 == n.NextSibling.DataAtom || atom.H3 == n.NextSibling.DataAtom || atom.H4 == n.NextSibling.DataAtom || atom.H5 == n.NextSibling.DataAtom || atom.H6 == n.NextSibling.DataAtom ||
+			atom.Blockquote == n.NextSibling.DataAtom) {
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		}
 	case atom.Table:
 		node.Type = ast.NodeTable
 		var tableAligns []int
