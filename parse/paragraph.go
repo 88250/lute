@@ -86,7 +86,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							}
 						}
 
-						subTree :=Parse("", p.Tokens, context.ParseOption)
+						subTree := Parse("", p.Tokens, context.ParseOption)
 						subBlock := subTree.Root.FirstChild
 						if ast.NodeParagraph != subBlock.Type {
 							listItem.PrependChild(p.FirstChild)

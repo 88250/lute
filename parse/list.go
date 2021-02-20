@@ -40,6 +40,7 @@ func ListStart(t *Tree, container *ast.Node) int {
 	listItem.ListData = data
 	if t.Context.ParseOption.KramdownBlockIAL && nil != ial {
 		listItem.KramdownIAL = ial
+		listItem.ID = listItem.IALAttr("id")
 		t.Context.offset += len(IAL2Tokens(ial))
 	}
 
@@ -98,25 +99,16 @@ func (context *Context) listFinalize(list *ast.Node) {
 				continue
 			}
 
-			if nil != li.FirstChild.KramdownIAL && 3 == li.Parent.ListData.Typ {
-				// 任务列表项 IAL
-				li.KramdownIAL = li.FirstChild.KramdownIAL
-				li.FirstChild.KramdownIAL = nil // 置空
-				ialTokens := IAL2Tokens(li.KramdownIAL)
-				li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
-				li = li.Next
-			} else {
-				if 7 < len(li.FirstChild.Tokens) && '{' == li.FirstChild.Tokens[0] {
-					if ial := context.parseKramdownIALInListItem(li.FirstChild.Tokens); 0 < len(ial) {
-						li.KramdownIAL = ial
-						li.ID = ial[0][1]
-						ialTokens := IAL2Tokens(ial)
-						li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
-						tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}"))+1:]
-						tokens = lex.TrimWhitespace(tokens)
-						li.FirstChild.Tokens = tokens
-						li = li.Next
-					}
+			if 7 < len(li.FirstChild.Tokens) && '{' == li.FirstChild.Tokens[0] {
+				if ial := context.parseKramdownIALInListItem(li.FirstChild.Tokens); 0 < len(ial) {
+					li.KramdownIAL = ial
+					li.ID = ial[0][1]
+					ialTokens := IAL2Tokens(ial)
+					li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+					tokens := li.FirstChild.Tokens[bytes.Index(li.FirstChild.Tokens, []byte("}"))+1:]
+					tokens = lex.TrimWhitespace(tokens)
+					li.FirstChild.Tokens = tokens
+					li = li.Next
 				}
 			}
 		}
