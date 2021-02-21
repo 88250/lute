@@ -110,6 +110,9 @@ func (context *Context) listFinalize(list *ast.Node) {
 					li.FirstChild.Tokens = tokens
 					li = li.Next
 				}
+			} else {
+				ialTokens := IAL2Tokens(li.KramdownIAL)
+				li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
 			}
 		}
 	}
