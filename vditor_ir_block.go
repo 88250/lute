@@ -643,6 +643,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		if "" == marker {
 			marker = "*"
 		}
+		// 固定标记符，降低复杂度
+		if atom.Ol == n.DataAtom {
+			marker = "*"
+		} else {
+			marker = strings.ReplaceAll(marker, ")", ".")
+		}
 		if atom.Ol == n.DataAtom {
 			node.ListData.Typ = 1
 			start := lute.domAttrValue(n, "start")
