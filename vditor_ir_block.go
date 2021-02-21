@@ -1540,6 +1540,12 @@ func (lute *Lute) setIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		node.SetIALAttr("parent-fold", val)
 		ialTokens = append(ialTokens, []byte(" parent-fold=\""+val+"\"")...)
 	}
+	if val := lute.domAttrValue(n, "update"); "" != val {
+		val = html.UnescapeString(val)
+		val = html.EscapeString(val)
+		node.SetIALAttr("update", val)
+		ialTokens = append(ialTokens, []byte(" update=\""+val+"\"")...)
+	}
 	ialTokens = append(ialTokens, '}')
 	return ialTokens
 }
