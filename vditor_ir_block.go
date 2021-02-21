@@ -305,6 +305,9 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 				} else {
 					writeLine = line[2:] + "\n"
 				}
+				if strings.HasPrefix(writeLine, ".") {
+					writeLine = "*" + writeLine[1:]
+				}
 				buf.WriteString(writeLine)
 			}
 		} else {
