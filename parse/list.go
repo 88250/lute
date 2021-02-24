@@ -111,7 +111,15 @@ func (context *Context) listFinalize(list *ast.Node) {
 					li = li.Next
 				}
 			} else {
-				ialTokens := IAL2Tokens(li.KramdownIAL)
+				var ialTokens []byte
+				if nil == li.KramdownIAL {
+					id := ast.NewNodeID()
+					ialTokens = []byte("{: id=\"" + id + "\"}")
+					li.KramdownIAL = [][]string{{"id", id}}
+					li.ID = id
+				} else {
+					ialTokens = IAL2Tokens(li.KramdownIAL)
+				}
 				li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
 			}
 		}
