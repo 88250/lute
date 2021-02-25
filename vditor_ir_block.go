@@ -530,14 +530,18 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 					node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
 					tree.Context.Tip.AppendChild(node)
 				} else {
-					if "" == subTree.Root.FirstChild.Text() && util.Caret == n.Parent.NextSibling.FirstChild.Data {
-						// 处理空列表
-						tree.Context.Tip.Type = subTree.Root.FirstChild.Type
-						node = subTree.Root.FirstChild.FirstChild
-						tree.Context.Tip.AppendChild(subTree.Root.FirstChild.FirstChild)
-						node = &ast.Node{Type: ast.NodeParagraph}
-						tree.Context.Tip.LastChild.AppendChild(node)
-						tree.Context.Tip = node
+					if "" == subTree.Root.FirstChild.Text() {
+						if nil != n.Parent.NextSibling && nil != n.Parent.NextSibling.FirstChild && util.Caret == n.Parent.NextSibling.FirstChild.Data {
+							// 处理空列表
+							tree.Context.Tip.Type = subTree.Root.FirstChild.Type
+							node = subTree.Root.FirstChild.FirstChild
+							tree.Context.Tip.AppendChild(subTree.Root.FirstChild.FirstChild)
+							node = &ast.Node{Type: ast.NodeParagraph}
+							tree.Context.Tip.LastChild.AppendChild(node)
+							tree.Context.Tip = node
+						} else {
+							tree.Context.Tip.AppendChild(node)
+						}
 					}
 				}
 			}
