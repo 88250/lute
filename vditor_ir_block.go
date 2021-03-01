@@ -479,6 +479,14 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
+		if nil != n.Parent && nil != n.Parent.Parent && atom.Li == n.Parent.Parent.DataAtom &&
+			nil != tree.Context.Tip.Parent && ast.NodeListItem == tree.Context.Tip.Parent.Type && 3 == tree.Context.Tip.Parent.ListData.Typ &&
+			"" == strings.TrimSpace(content) {
+			// 保留空的任务列表项
+			content = " " + parse.Zwsp
+			node.Tokens = []byte(" " + parse.Zwsp)
+		}
+
 		checkIndentCodeBlock := strings.ReplaceAll(content, util.Caret, "")
 		checkIndentCodeBlock = strings.ReplaceAll(checkIndentCodeBlock, "\t", "    ")
 		if (!lute.isInline(n.PrevSibling)) && strings.HasPrefix(checkIndentCodeBlock, "    ") {
@@ -744,12 +752,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
 			node.ListData.Delimiter = marker[len(marker)-1]
 		}
+		if nil == n.FirstChild {
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
+		}
 		if "vditor-task" == lute.domAttrValue(n, "class") {
 			node.ListData.Typ = 3
 			tree.Context.Tip.ListData.Typ = 3
-		}
-		if nil == n.FirstChild {
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
 		}
 
 		tree.Context.Tip.AppendChild(node)
