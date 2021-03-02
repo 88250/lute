@@ -125,7 +125,7 @@ func (context *Context) parseKramdownBlockIAL(tokens []byte) (ret [][]string) {
 		}
 		tokens = tokens[:len(tokens)-2]
 		for {
-			valid, remains, attr, name, val := context.Tree.parseTagAttr(tokens)
+			valid, remains, attr, name, val := ParseTagAttr(tokens)
 			if !valid {
 				break
 			}
@@ -152,7 +152,7 @@ func (context *Context) parseKramdownSpanIAL(tokens []byte) (pos int, ret [][]st
 
 		tokens = tokens[:curlyBracesEnd]
 		for {
-			valid, remains, attr, name, val := context.Tree.parseTagAttr(tokens)
+			valid, remains, attr, name, val := ParseTagAttr(tokens)
 			if !valid {
 				break
 			}
@@ -180,7 +180,7 @@ func (context *Context) parseKramdownIALInListItem(tokens []byte) (ret [][]strin
 
 		tokens = tokens[:bytes.Index(tokens, []byte("}"))]
 		for {
-			valid, remains, attr, name, val := context.Tree.parseTagAttr(tokens)
+			valid, remains, attr, name, val := ParseTagAttr(tokens)
 			if !valid {
 				break
 			}

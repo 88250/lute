@@ -53,7 +53,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		tags = append(tags, tagName...)
 		tokens = remains
 		for {
-			valid, remains, attr, _, _ := t.parseTagAttr(tokens)
+			valid, remains, attr, _, _ := ParseTagAttr(tokens)
 			if !valid {
 				ctx.pos++
 				return
@@ -278,7 +278,7 @@ func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []b
 	return
 }
 
-func (t *Tree) parseTagAttr(tokens []byte) (valid bool, remains, attr, name, val []byte) {
+func ParseTagAttr(tokens []byte) (valid bool, remains, attr, name, val []byte) {
 	valid = true
 	remains = tokens
 	var whitespaces []byte
@@ -296,13 +296,13 @@ func (t *Tree) parseTagAttr(tokens []byte) (valid bool, remains, attr, name, val
 	tokens = tokens[i:]
 
 	var attrName []byte
-	tokens, attrName = t.parseAttrName(tokens)
+	tokens, attrName = parseAttrName(tokens)
 	if 1 > len(attrName) {
 		return
 	}
 
 	var valSpec []byte
-	valid, tokens, valSpec = t.parseAttrValSpec(tokens)
+	valid, tokens, valSpec = parseAttrValSpec(tokens)
 	if !valid {
 		return
 	}
@@ -318,7 +318,7 @@ func (t *Tree) parseTagAttr(tokens []byte) (valid bool, remains, attr, name, val
 	return
 }
 
-func (t *Tree) parseAttrValSpec(tokens []byte) (valid bool, remains, valSpec []byte) {
+func parseAttrValSpec(tokens []byte) (valid bool, remains, valSpec []byte) {
 	valid = true
 	remains = tokens
 	var i int
@@ -390,7 +390,7 @@ func (t *Tree) parseAttrValSpec(tokens []byte) (valid bool, remains, valSpec []b
 	return
 }
 
-func (t *Tree) parseAttrName(tokens []byte) (remains, attrName []byte) {
+func parseAttrName(tokens []byte) (remains, attrName []byte) {
 	remains = tokens
 	if !lex.IsASCIILetter(tokens[0]) && lex.ItemUnderscore != tokens[0] && lex.ItemColon != tokens[0] {
 		return
