@@ -75,6 +75,27 @@ func IAL2Tokens(ial [][]string) []byte {
 	return buf.Bytes()
 }
 
+func Tokens2IAL(tokens []byte) (ret [][]string) {
+	// tokens 开头必须是空格
+	tokens = bytes.TrimRight(tokens, " \n")
+	tokens = bytes.TrimPrefix(tokens, []byte("{:"))
+	tokens = bytes.TrimSuffix(tokens, []byte("}"))
+	for {
+		valid, remains, attr, name, val := TagAttr(tokens)
+		if !valid {
+			break
+		}
+
+		tokens = remains
+		if 1 > len(attr) {
+			break
+		}
+
+		ret = append(ret, []string{util.BytesToStr(name), util.BytesToStr(val)})
+	}
+	return
+}
+
 func (t *Tree) parseKramdownBlockIAL() (ret [][]string) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	return t.Context.parseKramdownBlockIAL(tokens)
@@ -123,20 +144,7 @@ func (context *Context) parseKramdownBlockIAL(tokens []byte) (ret [][]string) {
 		if !bytes.Equal(tokens[curlyBracesEnd:], []byte("}\n")) { // IAL 后不能存在其他内容，必须独占一行
 			return
 		}
-		tokens = tokens[:len(tokens)-2]
-		for {
-			valid, remains, attr, name, val := ParseTagAttr(tokens)
-			if !valid {
-				break
-			}
-
-			tokens = remains
-			if 1 > len(attr) {
-				break
-			}
-
-			ret = append(ret, []string{util.BytesToStr(name), util.BytesToStr(val)})
-		}
+		ret = Tokens2IAL(tokens)
 	}
 	return
 }
@@ -152,7 +160,7 @@ func (context *Context) parseKramdownSpanIAL(tokens []byte) (pos int, ret [][]st
 
 		tokens = tokens[:curlyBracesEnd]
 		for {
-			valid, remains, attr, name, val := ParseTagAttr(tokens)
+			valid, remains, attr, name, val := TagAttr(tokens)
 			if !valid {
 				break
 			}
@@ -180,7 +188,7 @@ func (context *Context) parseKramdownIALInListItem(tokens []byte) (ret [][]strin
 
 		tokens = tokens[:bytes.Index(tokens, []byte("}"))]
 		for {
-			valid, remains, attr, name, val := ParseTagAttr(tokens)
+			valid, remains, attr, name, val := TagAttr(tokens)
 			if !valid {
 				break
 			}
