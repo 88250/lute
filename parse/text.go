@@ -121,6 +121,12 @@ func (t *Tree) mergeText(node *ast.Node) {
 				next.Unlink()
 				next = child.Next
 			}
+		} else if ast.NodeLinkText == child.Type {
+			for nil != next && ast.NodeLinkText == next.Type {
+				child.AppendTokens(next.Tokens)
+				next.Unlink()
+				next = child.Next
+			}
 		} else {
 			t.mergeText(child) // 递归处理子节点
 		}
