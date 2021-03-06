@@ -257,6 +257,10 @@ func (r *FormatRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast
 }
 
 func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if !r.Options.KramdownBlockIAL {
+		return ast.WalkContinue
+	}
+
 	if nil != node.Previous && ast.NodeListItem == node.Previous.Type {
 		return ast.WalkContinue
 	}
