@@ -336,6 +336,9 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 	if 16 < utf8.RuneCountInString(text) {
 		text = SubStr(text, 16) + "..."
 	}
+	if ast.NodeDocument == node.Type {
+		r.WriteString("\"layout\":\"right\",")
+	}
 	r.WriteString("\"text\":\"" + text + "\",")
 	r.WriteString("\"id\":\"" + node.IALAttr("id") + "\",")
 	r.WriteString("\"type\":\"" + node.Type.String() + "\",")
