@@ -1854,7 +1854,13 @@ func (r *VditorIRBlockRenderer) renderTaskListItemMarker(node *ast.Node, enterin
 
 func (r *VditorIRBlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("hr", [][]string{{"data-block", "0"}}, true)
+		attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "hr"}}
+		ial := r.NodeAttrs(node)
+		if 0 < len(ial) {
+			attrs = append(attrs, ial...)
+		}
+		r.nodeTipAttr(node, &attrs)
+		r.Tag("hr", attrs, true)
 	}
 	return ast.WalkContinue
 }

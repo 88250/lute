@@ -1396,7 +1396,11 @@ func (r *FormatRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.
 		if node.ParentIs(ast.NodeTableCell) {
 			r.WriteString("<hr/>")
 		} else {
-			r.WriteString("---\n\n")
+			r.WriteString("---")
+			if r.withoutKramdownBlockIAL(node) {
+				r.WriteByte(lex.ItemNewline)
+				r.WriteByte(lex.ItemNewline)
+			}
 		}
 	}
 	return ast.WalkContinue
