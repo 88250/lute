@@ -1104,11 +1104,18 @@ func (r *HtmlRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSta
 		var attrs [][]string
 		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
-		if 3 == node.ListData.Typ && "" != r.Options.GFMTaskListItemClass &&
-			nil != node.FirstChild && (
-			(ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
+		if 3 == node.ListData.Typ && "" != r.Options.GFMTaskListItemClass && nil != node.FirstChild &&
+			((ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
 				(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
-			attrs = append(attrs, []string{"class", r.Options.GFMTaskListItemClass})
+			taskListItemMarker := node.FirstChild.FirstChild
+			if nil == taskListItemMarker {
+				taskListItemMarker = node.FirstChild
+			}
+			taskClass := r.Options.GFMTaskListItemClass
+			if taskListItemMarker.TaskListItemChecked {
+				taskClass += " vditor-task--done"
+			}
+			attrs = append(attrs, []string{"class", taskClass})
 		}
 		r.Tag("li", attrs, false)
 	} else {
