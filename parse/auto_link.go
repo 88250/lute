@@ -155,7 +155,7 @@ var (
 	validAutoLinkDomainSuffix = [][]byte{util.StrToBytes("top"), util.StrToBytes("com"), util.StrToBytes("net"), util.StrToBytes("org"), util.StrToBytes("edu"), util.StrToBytes("gov"),
 		util.StrToBytes("cn"), util.StrToBytes("io"), util.StrToBytes("me"), util.StrToBytes("biz"), util.StrToBytes("co"), util.StrToBytes("live"), util.StrToBytes("pro"), util.StrToBytes("xyz"),
 		util.StrToBytes("win"), util.StrToBytes("club"), util.StrToBytes("tv"), util.StrToBytes("wiki"), util.StrToBytes("site"), util.StrToBytes("tech"), util.StrToBytes("space"), util.StrToBytes("cc"),
-		util.StrToBytes("name"), util.StrToBytes("social"), util.StrToBytes("band"), util.StrToBytes("pub"), util.StrToBytes("info")}
+		util.StrToBytes("name"), util.StrToBytes("social"), util.StrToBytes("band"), util.StrToBytes("pub"), util.StrToBytes("info"), util.StrToBytes("app"), util.StrToBytes("md"), util.StrToBytes("edu")}
 )
 
 // AddAutoLinkDomainSuffix 添加自动链接解析域名后缀 suffix。

@@ -18,6 +18,9 @@ import (
 
 var debugTests = []parseTest{
 
+	// Auto link `.app` domain suffix https://github.com/Vanessa219/vditor/issues/936
+	{"52", "https://netlify.app/", "<p><a href=\"https://netlify.app/\">https://netlify.app/</a></p>\n"},
+
 	// 表格和 Setext 标题解析冲突问题 https://github.com/88250/lute/issues/110
 	{"51", "|   foo   | \n| :-----: |\n|   bar   |\n=======\nbaz\n", "<table>\n<thead>\n<tr>\n<th align=\"center\">foo</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"center\">bar</td>\n</tr>\n</tbody>\n</table>\n<p>=======<br />\nbaz</p>\n"},
 
