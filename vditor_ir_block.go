@@ -982,6 +982,10 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Table:
 		node.Type = ast.NodeTable
 		var tableAligns []int
+		if nil == n.FirstChild {
+			return
+		}
+
 		for th := n.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
 			align := lute.domAttrValue(th, "align")
 			switch align {
