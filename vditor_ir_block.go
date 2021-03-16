@@ -550,6 +550,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 						} else {
 							tree.Context.Tip.AppendChild(node)
 						}
+					} else {
+						node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("\n"))
+						tree.Context.Tip.AppendChild(node)
 					}
 				}
 			}
