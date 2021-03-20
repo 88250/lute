@@ -30,6 +30,21 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 		tree.parseKramdownSpanIAL()
 	}
 	if tree.Context.ParseOption.KramdownBlockIAL {
+		ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if !entering || !n.IsBlock() || ast.NodeDocument == n.Type || ast.NodeKramdownBlockIAL == n.Type {
+				return ast.WalkContinue
+			}
+
+			ial := n.Next
+			if nil == ial || ast.NodeKramdownBlockIAL != ial.Type {
+				return ast.WalkContinue
+			}
+
+			n.KramdownIAL = Tokens2IAL(ial.Tokens)
+			n.ID = n.IALAttr("id")
+			return ast.WalkContinue
+		})
+
 		var docIAL *ast.Node
 		var id string
 		if nil != tree.Context.rootIAL {
