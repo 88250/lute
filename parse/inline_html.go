@@ -249,6 +249,10 @@ func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []b
 
 	comment = append(comment, tokens[0], tokens[1], tokens[2])
 	tokens = tokens[3:]
+	length := len(tokens)
+	if 2 > length {
+		return
+	}
 	if lex.ItemGreater == tokens[0] {
 		return
 	}
@@ -257,7 +261,6 @@ func (t *Tree) parseHTMLComment(tokens []byte) (valid bool, remains, comment []b
 	}
 	var token byte
 	var i int
-	length := len(tokens)
 	for ; i < length; i++ {
 		token = tokens[i]
 		comment = append(comment, token)
