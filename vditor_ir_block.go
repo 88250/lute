@@ -265,7 +265,7 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 				}
 				i = j
 				continue
-			case "tab0": // 不带子项缩进
+			case "tab0", "tab1": // 不带子项缩进
 				buf.WriteString("\n")
 				indent := countIndent(line)
 				if isOrder {
@@ -319,6 +319,7 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 	//fmt.Println(md)
 	vHTML = lute.Md2VditorIRBlockDOM(md)
 	vHTML = strings.ReplaceAll(vHTML, util.Caret, "<wbr>")
+	//fmt.Println(vHTML)
 	return
 }
 
