@@ -316,7 +316,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(lute.domAttrValue(n, "src"))})
+			src := lute.domAttrValue(n, "src")
+			if strings.HasPrefix(src, "data:image") {
+				// 处理可能存在的预加载情况
+				src = lute.domAttrValue(n, "data-src")
+			}
+			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
 			linkTitle := lute.domAttrValue(n, "title")
 			if "" != linkTitle {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
