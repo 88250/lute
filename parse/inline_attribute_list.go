@@ -29,8 +29,8 @@ func IALStart(t *Tree, container *ast.Node) int {
 
 	if ial := t.parseKramdownBlockIAL(); nil != ial {
 		t.Context.closeUnmatchedBlocks()
-		t.Context.offset = t.Context.currentLineLen                    // 整行过
-		if 1 < len(ial) && "type" == ial[1][0] && "doc" == ial[1][1] { // 文档块 IAL
+		t.Context.offset = t.Context.currentLineLen // 整行过
+		if util.IsDocIAL2(ial) {                    // 文档块 IAL
 			t.Context.rootIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: t.Context.currentLine[t.Context.nextNonspace:]}
 			t.Root.KramdownIAL = ial
 			t.Root.ID = ial[0][1]
