@@ -12,18 +12,20 @@ package lute
 
 import (
 	"bytes"
+	"strings"
+	"unicode"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
-	"strings"
-	"unicode"
 )
 
 // HTML2Markdown 将 HTML 转换为 Markdown。
 func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
+	//fmt.Println(htmlStr)
 	// 将字符串解析为 DOM 树
 	tree := lute.HTML2Tree(htmlStr)
 
@@ -110,7 +112,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 		if nil != n.Parent && atom.Span == n.Parent.DataAtom && ("" != lute.domAttrValue(n.Parent, "class")) {
-			node.Tokens = []byte("**" + util.BytesToStr(node.Tokens) + "**" )
+			node.Tokens = []byte("**" + util.BytesToStr(node.Tokens) + "**")
 		}
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div, atom.Section:
@@ -215,6 +217,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 						node.LastChild.CodeBlockInfo = []byte(language)
 					}
 				}
+
+				if atom.Code == n.FirstChild.DataAtom && nil != n.FirstChild.NextSibling && atom.Code == n.FirstChild.NextSibling.DataAtom {
+					// pre.code code 每个 code 为一行的结构，需要在 code 中间插入换行
+					for c := n.FirstChild.NextSibling; nil != c; c = c.NextSibling {
+						c.InsertBefore(&html.Node{DataAtom: atom.Br})
+					}
+				}
+
 				buf := &bytes.Buffer{}
 				buf.WriteString(lute.domText(n))
 				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()}
