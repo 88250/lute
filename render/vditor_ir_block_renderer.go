@@ -790,8 +790,13 @@ func (r *VditorIRBlockRenderer) renderCodeBlockCode(node *ast.Node, entering boo
 		}
 	}
 
-	class := "vditor-ir__marker--pre vditor-ir__marker"
-	r.Tag("pre", [][]string{{"class", class}}, false)
+	noHighlight := r.NoHighlight(language)
+	if noHighlight {
+		class := "vditor-ir__marker--pre vditor-ir__marker"
+		r.Tag("pre", [][]string{{"class", class}}, false)
+	} else {
+		r.Tag("pre", nil, false)
+	}
 	r.Tag("code", attrs, false)
 	if codeIsEmpty {
 		if !caretInInfo {
@@ -804,20 +809,13 @@ func (r *VditorIRBlockRenderer) renderCodeBlockCode(node *ast.Node, entering boo
 	}
 	r.WriteString("</code></pre>")
 
-	r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-	preDiv := r.NoHighlight(language)
-	if preDiv {
+	if noHighlight {
+		r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 		r.Tag("div", attrs, false)
-	} else {
-		r.Tag("code", attrs, false)
-	}
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	r.Write(html.EscapeHTML(tokens))
-	if preDiv {
+		tokens := node.Tokens
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		r.Write(html.EscapeHTML(tokens))
 		r.WriteString("</div></pre>")
-	} else {
-		r.WriteString("</code></pre>")
 	}
 	return ast.WalkContinue
 }
