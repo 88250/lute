@@ -12,13 +12,13 @@ package lute
 
 import (
 	"bytes"
-	"github.com/88250/lute/lex"
 	"strconv"
 	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
@@ -288,13 +288,18 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 					}
 				}
 
-				if isOrder {
-					l := trimOrder(line)
-					writeLine = "  " + indent + "1" + l + "\n"
-					lines[ialIdx] = "   " + lines[ialIdx]
+				if len(lines) > ialIdx {
+					if isOrder {
+						l := trimOrder(line)
+						writeLine = "  " + indent + "1" + l + "\n"
+						lines[ialIdx] = "   " + lines[ialIdx]
+					} else {
+						writeLine = "  " + line + "\n"
+						lines[ialIdx] = "  " + lines[ialIdx]
+					}
 				} else {
-					writeLine = "  " + line + "\n"
-					lines[ialIdx] = "  " + lines[ialIdx]
+					// 不在列表项上缩进，而是在列表项下的子块上缩进
+					writeLine = line + "\n"
 				}
 
 				buf.WriteString(writeLine)
