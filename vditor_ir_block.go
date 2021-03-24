@@ -254,7 +254,11 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 				for ; j < len(lines); j++ {
 					ial := lines[j]
 					if strings.Contains(ial, param2) {
-						buf.WriteString(ial + "\n")
+						if isOrder {
+							buf.WriteString("   " + ial + "\n")
+						} else {
+							buf.WriteString("  " + ial + "\n")
+						}
 						break
 					}
 					if isOrder {
@@ -277,14 +281,8 @@ func (lute *Lute) VditorIRBlockDOMListCommand(listHTML, command string, param1, 
 				ialIdx := i + 1
 				for ; ialIdx < len(lines); ialIdx++ {
 					ial := lines[ialIdx]
-					if isOrder {
-						if strings.HasPrefix(ial, "  "+indent+"{:") {
-							break
-						}
-					} else {
-						if strings.HasPrefix(ial, "  "+indent+"{:") {
-							break
-						}
+					if strings.HasPrefix(ial, "  "+indent+"{:") {
+						break
 					}
 				}
 
