@@ -145,7 +145,7 @@ func (t *Tree) parseKramdownSpanIAL() {
 func (context *Context) parseKramdownBlockIAL(tokens []byte) (ret [][]string) {
 	if curlyBracesStart := bytes.Index(tokens, []byte("{:")); 0 == curlyBracesStart {
 		tokens = tokens[curlyBracesStart+2:]
-		curlyBracesEnd := bytes.Index(tokens, closeCurlyBrace)
+		curlyBracesEnd := bytes.LastIndex(tokens, closeCurlyBrace)
 		if 3 > curlyBracesEnd {
 			return
 		}
