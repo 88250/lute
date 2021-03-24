@@ -260,6 +260,25 @@ func (n *Node) TextLen() (ret int) {
 	return utf8.RuneCount(buf)
 }
 
+// CharLen 返回 n 及其所有内容子节点的累计长度。
+func (n *Node) CharLen() (ret int) {
+	buf := make([]byte, 0, 8192)
+	Walk(n, func(n *Node, entering bool) WalkStatus {
+		if !entering {
+			return WalkContinue
+		}
+		switch n.Type {
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockEmbedText, NodeFootnotesRef,
+			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
+			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
+			NodeGitConflictContent:
+			buf = append(buf, n.Tokens...)
+		}
+		return WalkContinue
+	})
+	return utf8.RuneCount(buf)
+}
+
 // TokenLen 返回 n 及其子节点 tokens 累计长度。
 func (n *Node) TokenLen() (ret int) {
 	Walk(n, func(n *Node, entering bool) WalkStatus {
