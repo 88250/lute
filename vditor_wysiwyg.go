@@ -184,6 +184,7 @@ func (lute *Lute) parseHTML(htmlStr string) *html.Node {
 
 func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	lute.removeEmptyNodes(root)
+	lute.removeHighlightJSSpans(root)
 
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.mergeVditorDOMList0(c)
@@ -232,6 +233,28 @@ func (lute *Lute) adjustVditorDOMListList(n *html.Node) {
 		next := c.NextSibling
 		lute.adjustVditorDOMListList(c)
 		c = next
+	}
+}
+
+func (lute *Lute) removeHighlightJSSpans(node *html.Node) {
+	var spans []*html.Node
+	for c := node; nil != c; c = c.NextSibling {
+		lute.hljsSpans(c, &spans)
+	}
+	for _, span := range spans {
+		span.Unlink()
+	}
+}
+
+func (lute *Lute) hljsSpans(n *html.Node, spans *[]*html.Node) {
+	if atom.Span == n.DataAtom && strings.HasPrefix(lute.domAttrValue(n, "class"), "hljs-") {
+		*spans = append(*spans, n)
+		text := lute.domText(n)
+		n.InsertBefore(&html.Node{Type: html.TextNode, Data: text})
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.hljsSpans(c, spans)
 	}
 }
 

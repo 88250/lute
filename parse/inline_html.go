@@ -338,6 +338,11 @@ func parseAttrValSpec(tokens []byte) (valid bool, remains, valSpec []byte) {
 	}
 	valSpec = append(valSpec, token)
 	tokens = tokens[i+1:]
+	if 1 > len(tokens) {
+		valid = false
+		return
+	}
+
 	for i, token = range tokens {
 		if !lex.IsWhitespace(token) {
 			break

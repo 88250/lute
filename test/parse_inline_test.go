@@ -21,6 +21,7 @@ import (
 
 var inlineTests = []parseTest{
 
+	{"2", "<form enctype=", "<form enctype="},
 	{"1", "**foo** [foo](bar)\n", "foo foo"},
 	{"0", "1. foo\n", "1. foo"},
 }
