@@ -1228,6 +1228,12 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
+			if ("<br />" == text || "<br>" == text) && !lute.parentIs(n, atom.Table){
+				// 非表格下将 <br> 换成 \n
+				text = "\n"
+				node.Type = ast.NodeText
+			}
+
 			node.Type = ast.NodeInlineHTML
 			node.Tokens = []byte(text)
 			tree.Context.Tip.AppendChild(node)
