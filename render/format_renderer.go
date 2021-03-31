@@ -885,11 +885,17 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 
 func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
-		if !node.ParentIs(ast.NodeTableCell) {
-			if r.withoutKramdownBlockIAL(node) {
-				r.Newline()
+		if node.ParentIs(ast.NodeTableCell) {
+			if nil != node.Next && ast.NodeText != node.Next.Type {
+				r.WriteString("<br /><br />")
 			}
+			return ast.WalkContinue
 		}
+
+		if r.withoutKramdownBlockIAL(node) {
+			r.Newline()
+		}
+
 		inTightList := false
 		lastListItemLastPara := false
 		if parent := node.Parent; nil != parent {
@@ -910,7 +916,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 			}
 		}
 
-		if (!inTightList || (lastListItemLastPara)) && !node.ParentIs(ast.NodeTableCell) {
+		if !inTightList || (lastListItemLastPara) {
 			if r.withoutKramdownBlockIAL(node) {
 				r.WriteByte(lex.ItemNewline)
 			}
