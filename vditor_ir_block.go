@@ -695,6 +695,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			if "" == marker {
 				marker = "*"
 			}
+			if "*" != marker {
+				parent.ListData.Typ = 1
+			}
 			tree.Context.Tip.AppendChild(parent)
 			tree.Context.Tip = parent
 		}
@@ -728,7 +731,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 		} else {
 			if nil != n.Parent {
-				if atom.Ol == n.Parent.DataAtom {
+				if atom.Ol == n.Parent.DataAtom || tree.Context.Tip.Typ == 1 {
 					if "*" == marker || "-" == marker || "+" == marker {
 						marker = "1."
 					}
@@ -1228,7 +1231,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			if ("<br />" == text || "<br>" == text) && !lute.parentIs(n, atom.Table){
+			if ("<br />" == text || "<br>" == text) && !lute.parentIs(n, atom.Table) {
 				// 非表格下将 <br> 换成 \n
 				text = "\n"
 				node.Type = ast.NodeText
