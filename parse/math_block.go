@@ -62,6 +62,19 @@ var MathBlockMarkerCaret = util.StrToBytes("$$" + util.Caret)
 var MathBlockMarkerCaretNewline = util.StrToBytes("$$" + util.Caret + "\n")
 
 func (context *Context) mathBlockFinalize(mathBlock *ast.Node) {
+	if 2 > len(mathBlock.Tokens) {
+		/*
+			- foo
+
+			    $$
+			bar
+			$$
+		*/
+		mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
+		mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent})
+		mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
+		return
+	}
 	tokens := mathBlock.Tokens[2:] // 剔除开头的 $$
 	tokens = lex.TrimWhitespace(tokens)
 	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {

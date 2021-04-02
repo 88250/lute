@@ -18,6 +18,9 @@ import (
 
 var debugTests = []parseTest{
 
+	{"54", "- foo\n\n    ```\nbar\n```", "<ul>\n<li>\n<p>foo</p>\n<pre><code class=\"highlight-chroma\"></code></pre>\n</li>\n</ul>\n<p>bar</p>\n<pre><code class=\"highlight-chroma\"></code></pre>\n"},
+	{"53", "- foo\n\n    $$\nbar\n$$\n", "<ul>\n<li>\n<p>foo</p>\n<div class=\"language-math\"></div>\n</li>\n</ul>\n<p>bar</p>\n<div class=\"language-math\"></div>\n"},
+
 	// Auto link `.app` domain suffix https://github.com/Vanessa219/vditor/issues/936
 	{"52", "https://netlify.app/", "<p><a href=\"https://netlify.app/\">https://netlify.app/</a></p>\n"},
 
