@@ -1241,7 +1241,7 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 			attrs = append(attrs, []string{"style", parentStyle})
 		} else {
 			if renderFigure { // 未手动设置位置且需要渲染图注
-				attrs = append(attrs, []string{"style", "display: block; text-align: center;"})
+				attrs = append(attrs, []string{"style", "display: block; text-align: center; white-space: initial;"})
 			}
 		}
 
