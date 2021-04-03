@@ -1974,11 +1974,6 @@ func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 		attrs = append(attrs, []string{"data-type", "yaml-front-matter"})
 	case ast.NodeBlockEmbed:
 		attrs = append(attrs, []string{"data-type", "block-ref-embed"})
-		text := node.ChildByType(ast.NodeBlockEmbedText)
-		tokens := bytes.ReplaceAll(text.Tokens, util.CaretTokens, nil)
-		if 0 == len(tokens) {
-			attrs = append(attrs, []string{"data-text", "0"})
-		}
 		id := node.ChildByType(ast.NodeBlockEmbedID)
 		expand = bytes.Contains(id.Tokens, util.CaretTokens)
 	case ast.NodeBlockQueryEmbed:
