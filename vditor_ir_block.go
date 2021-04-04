@@ -776,11 +776,16 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Pre:
-		if atom.Code == n.FirstChild.DataAtom {
+		code := n.FirstChild // HTML Block
+		if atom.Code != code.DataAtom {
+			code = code.NextSibling // Code Block
+		}
+
+		if atom.Code == code.DataAtom {
 			var codeTokens []byte
-			if nil != n.FirstChild.FirstChild {
-				codeTokens = util.StrToBytes(lute.domText(n.FirstChild.FirstChild))
-				for next := n.FirstChild.FirstChild.NextSibling; nil != next; next = next.NextSibling {
+			if nil != code.FirstChild {
+				codeTokens = util.StrToBytes(lute.domText(code.FirstChild))
+				for next := code.FirstChild.NextSibling; nil != next; next = next.NextSibling {
 					// YAML Front Matter 中删除问题 https://github.com/siyuan-note/siyuan/issues/109
 					codeTokens = append(codeTokens, []byte(lute.domText(next))...)
 				}
