@@ -789,6 +789,9 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Pre:
 		code := n.FirstChild // HTML Block
+		if nil == code {
+			return
+		}
 		if atom.Code != code.DataAtom {
 			code = code.NextSibling // Code Block
 		}
