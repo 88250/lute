@@ -156,3 +156,29 @@ func TestMd2VditorIRBlockDOM(t *testing.T) {
 	}
 	ast.Testing = false
 }
+
+var inlineMd2VditorIRBlockDOMTests = []parseTest{
+
+	{"0", "1. foo", "<p data-block=\"0\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\">1. foo</p>"},
+}
+
+func TestInlineMd2VditorIRBlockDOM(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetVditorIR(true)
+	luteEngine.SetToC(true)
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.ParseOptions.KramdownBlockIAL = true
+	luteEngine.RenderOptions.KramdownBlockIAL = true
+	luteEngine.ParseOptions.Tag = true
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.ParseOptions.GitConflict = true
+
+	ast.Testing = true
+	for _, test := range inlineMd2VditorIRBlockDOMTests {
+		result := luteEngine.InlineMd2VditorIRBlockDOM(test.from)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+	ast.Testing = false
+}

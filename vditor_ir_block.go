@@ -24,7 +24,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// SpinVditorIRBlockDOM 自旋 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下的编辑。
+// SpinVditorIRBlockDOM 自旋 Vditor Instant-Rendering Block DOM。
 func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
@@ -38,7 +38,7 @@ func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	return
 }
 
-// HTML2VditorIRBlockDOM 将 HTML 转换为 Vditor Instant-Rendering Block DOM，用于即时渲染块模式下粘贴。
+// HTML2VditorIRBlockDOM 将 HTML 转换为 Vditor Instant-Rendering Block DOM。
 func (lute *Lute) HTML2VditorIRBlockDOM(sHTML string) (vHTML string) {
 	//fmt.Println(sHTML)
 	markdown, err := lute.HTML2Markdown(sHTML)
@@ -64,7 +64,7 @@ func (lute *Lute) VditorIRBlockDOM2HTML(vhtml string) (sHTML string) {
 	return
 }
 
-// Md2VditorIRBlockDOM 将 markdown 转换为 Vditor Instant-Rendering Block DOM，用于从源码模式切换至即时渲染块模式。
+// Md2VditorIRBlockDOM 将 markdown 转换为 Vditor Instant-Rendering Block DOM。
 func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
 	//fmt.Println(markdown)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
@@ -77,7 +77,19 @@ func (lute *Lute) Md2VditorIRBlockDOM(markdown string) (vHTML string) {
 	return
 }
 
-// VditorIRBlockDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown，用于从即时渲染块模式切换至源码模式。
+// InlineMd2VditorIRBlockDOM 将 markdown 以行级方式转换为 Vditor Instant-Rendering Block DOM。
+func (lute *Lute) InlineMd2VditorIRBlockDOM(markdown string) (vHTML string) {
+	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
+	renderer := render.NewVditorIRBlockRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.Md2VditorIRBlockDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
+	output := renderer.Render()
+	vHTML = string(output)
+	return
+}
+
+// VditorIRBlockDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown。
 func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	//fmt.Println(htmlStr)
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
@@ -86,7 +98,7 @@ func (lute *Lute) VditorIRBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-// VditorIRBlockDOM2StdMd 将 Vditor Instant-Rendering DOM 转换为标准 markdown，用于复制剪切。
+// VditorIRBlockDOM2StdMd 将 Vditor Instant-Rendering DOM 转换为标准 markdown。
 func (lute *Lute) VditorIRBlockDOM2StdMd(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 
