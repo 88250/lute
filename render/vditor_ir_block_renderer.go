@@ -1316,6 +1316,7 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 	}
 	r.Tag("pre", [][]string{{"class", class}}, false)
 	r.Tag("code", [][]string{{"data-type", "html-block"}}, false)
+	tokens = r.autoCloseTag(tokens)
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code></pre>")
 
@@ -1328,6 +1329,28 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 	}
 	r.WriteString("</div>")
 	return ast.WalkContinue
+}
+
+func (r *VditorIRBlockRenderer) autoCloseTag(tokens []byte) []byte {
+	if bytes.HasSuffix(tokens, []byte("/>")) || bytes.HasPrefix(tokens, []byte("<!")) || bytes.HasPrefix(tokens, []byte("<?")) {
+		return tokens
+	}
+
+	tag := r.tagName(tokens)
+	closeTag := []byte("</" + tag + ">")
+	if !bytes.HasSuffix(tokens, closeTag) {
+		tokens = append(tokens, closeTag...)
+	}
+	return tokens
+}
+
+func (r *VditorIRBlockRenderer) tagName(tokens []byte) string {
+	tokens = bytes.Split(tokens, []byte(" "))[0]
+	tokens = tokens[1:]
+	if idx := bytes.Index(tokens, []byte(">"));1 < idx {
+		tokens = tokens[:idx]
+	}
+	return util.BytesToStr(tokens)
 }
 
 func (r *VditorIRBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
