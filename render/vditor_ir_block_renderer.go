@@ -1271,9 +1271,6 @@ func (r *VditorIRBlockRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
 		imgBuf := buf[idx:]
-		if r.Options.Sanitize {
-			imgBuf = sanitize(imgBuf)
-		}
 		imgBuf = r.tagSrcPath(imgBuf)
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
@@ -1325,9 +1322,6 @@ func (r *VditorIRBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 	if r.Options.VditorHTMLBlockPreview {
 		r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-		if r.Options.Sanitize {
-			tokens = sanitize(tokens)
-		}
 		tokens = r.tagSrcPath(tokens)
 		r.Write(tokens)
 		r.WriteString("</pre>")
