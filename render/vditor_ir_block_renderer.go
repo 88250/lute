@@ -33,7 +33,7 @@ type VditorIRBlockRenderer struct {
 
 // NewVditorIRBlockRenderer 创建一个 Vditor Instant-Rendering Block DOM 渲染器。
 func NewVditorIRBlockRenderer(tree *parse.Tree, options *Options) *VditorIRBlockRenderer {
-	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree, options), BlockIndex: 1}
+	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree, options), BlockIndex: options.BlockIndexStart}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

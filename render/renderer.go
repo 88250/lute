@@ -102,6 +102,8 @@ type Options struct {
 	// 比如 LinkPrefix 设置为 http://domain.com，对于使用绝对路径的 ![foo](/local/path/bar.png) 则渲染为 <img src="http://domain.com/local/path/bar.png" alt="foo" />；
 	// 在 LinkBase 和 LinkPrefix 同时设置的情况下，会先处理 LinkBase 逻辑，最后再在 LinkBase 处理结果上加上 LinkPrefix。
 	LinkPrefix string
+	// BlockIndexStart 用于设置 IR Block 块级节点编号起始值。
+	BlockIndexStart int
 }
 
 func NewOptions() *Options {
@@ -128,6 +130,7 @@ func NewOptions() *Options {
 		VditorHTMLBlockPreview:         true,
 		LinkBase:                       "",
 		LinkPrefix:                     "",
+		BlockIndexStart:                1,
 	}
 }
 
