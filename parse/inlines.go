@@ -17,6 +17,10 @@ import (
 // parseInlines 解析并生成行级节点。
 func (t *Tree) parseInlines() {
 	t.walkParseInline(t.Root)
+
+	if t.Context.ParseOption.KramdownSpanIAL {
+		t.parseKramdownSpanIAL()
+	}
 }
 
 // walkParseInline 解析生成节点 node 的行级子节点。

@@ -18,7 +18,7 @@ import (
 // Zwsp 零宽空格。
 const Zwsp = "\u200b"
 
-// Parse 会将 markdown 原始文本字节数组解析为一颗语法树。
+// Parse 会将 markdown 原始文本字节数组解析为一棵语法树。
 func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree = &Tree{Name: name, Context: &Context{ParseOption: options}}
 	tree.Context.Tree = tree
@@ -26,51 +26,63 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
 	tree.parseInlines()
-	if tree.Context.ParseOption.KramdownSpanIAL {
-		tree.parseKramdownSpanIAL()
-	}
-	if tree.Context.ParseOption.KramdownBlockIAL {
-		ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-			if !entering || !n.IsBlock() || ast.NodeDocument == n.Type || ast.NodeKramdownBlockIAL == n.Type {
-				return ast.WalkContinue
-			}
-
-			ial := n.Next
-			if nil == ial || ast.NodeKramdownBlockIAL != ial.Type {
-				return ast.WalkContinue
-			}
-
-			n.KramdownIAL = Tokens2IAL(ial.Tokens)
-			n.ID = n.IALAttr("id")
-			return ast.WalkContinue
-		})
-
-		var docIAL *ast.Node
-		var id string
-		if nil != tree.Context.rootIAL {
-			docIAL = tree.Context.rootIAL
-		} else {
-			id = ast.NewNodeID()
-			docIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: []byte("{: id=\"" + id + "\" type=\"doc\"}")}
-			tree.Root.ID = id
-			tree.ID = id
-		}
-		tree.Root.AppendChild(docIAL)
-	}
+	tree.finalParseBlockIAL()
 	tree.lexer = nil
 	return
 }
 
-// Inline 会将 markdown 原始文本字节数组解析为一颗语法树，该语法树的第一个块级子节点是段落节点。
+func (tree *Tree) finalParseBlockIAL() {
+	if !tree.Context.ParseOption.KramdownBlockIAL {
+		return
+	}
+
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || !n.IsBlock() || ast.NodeDocument == n.Type || ast.NodeKramdownBlockIAL == n.Type {
+			return ast.WalkContinue
+		}
+
+		ial := n.Next
+		if nil == ial || ast.NodeKramdownBlockIAL != ial.Type {
+			return ast.WalkContinue
+		}
+
+		n.KramdownIAL = Tokens2IAL(ial.Tokens)
+		n.ID = n.IALAttr("id")
+		return ast.WalkContinue
+	})
+
+	var docIAL *ast.Node
+	var id string
+	if nil != tree.Context.rootIAL {
+		docIAL = tree.Context.rootIAL
+	} else {
+		id = ast.NewNodeID()
+		docIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: []byte("{: id=\"" + id + "\" type=\"doc\"}")}
+		tree.Root.ID = id
+		tree.ID = id
+	}
+	tree.Root.AppendChild(docIAL)
+}
+
+// Block 会将 markdown 原始文本字节数组解析为一棵语法树，该语法树的第一个块级子节点是段落节点。
+func Block(name string, markdown []byte, options *Options) (tree *Tree) {
+	tree = &Tree{Name: name, Context: &Context{ParseOption: options}}
+	tree.Context.Tree = tree
+	tree.lexer = lex.NewLexer(markdown)
+	tree.Root = &ast.Node{Type: ast.NodeDocument}
+	tree.parseBlocks()
+	tree.finalParseBlockIAL()
+	tree.lexer = nil
+	return
+}
+
+// Inline 会将 markdown 原始文本字节数组解析为一棵语法树，该语法树的第一个块级子节点是段落节点。
 func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree = &Tree{Name: name, Context: &Context{ParseOption: options}}
 	tree.Context.Tree = tree
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.Root.AppendChild(&ast.Node{Type: ast.NodeParagraph, Tokens: markdown})
 	tree.parseInlines()
-	if tree.Context.ParseOption.KramdownSpanIAL {
-		tree.parseKramdownSpanIAL()
-	}
 	tree.lexer = nil
 	return
 }
