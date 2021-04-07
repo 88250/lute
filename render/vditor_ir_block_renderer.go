@@ -232,7 +232,7 @@ func (r *VditorIRBlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, ente
 
 func (r *VditorIRBlockRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
+		r.WriteString("<div data-type=\"link-ref-defs-block\">")
 	} else {
 		r.WriteString("</div>")
 	}
@@ -660,7 +660,7 @@ func (r *VditorIRBlockRenderer) renderToC(node *ast.Node, entering bool) ast.Wal
 
 func (r *VditorIRBlockRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
+		r.WriteString("<div data-type=\"footnotes-block\">")
 	} else {
 		r.WriteString("</div>")
 	}
@@ -1014,7 +1014,7 @@ func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) a
 
 func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := [][]string{{"data-block", "0"}, {"data-type", "table"}, {"data-node-id", r.NodeID(node)}}
+		attrs := [][]string{{"data-type", "table"}, {"data-node-id", r.NodeID(node)}}
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
@@ -1347,7 +1347,7 @@ func (r *VditorIRBlockRenderer) autoCloseTag(tokens []byte) []byte {
 func (r *VditorIRBlockRenderer) tagName(tokens []byte) string {
 	tokens = bytes.Split(tokens, []byte(" "))[0]
 	tokens = tokens[1:]
-	if idx := bytes.Index(tokens, []byte(">"));1 < idx {
+	if idx := bytes.Index(tokens, []byte(">")); 1 < idx {
 		tokens = tokens[:idx]
 	}
 	return util.BytesToStr(tokens)
@@ -1451,7 +1451,7 @@ func (r *VditorIRBlockRenderer) renderDocument(node *ast.Node, entering bool) as
 
 func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "p"}}
+		attrs := [][]string{{"data-node-id", r.NodeID(node)}, {"data-type", "p"}}
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
@@ -1678,7 +1678,7 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "blockquote"}}
+		attrs := [][]string{{"data-node-id", r.NodeID(node)}, {"data-type", "blockquote"}}
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
@@ -1700,9 +1700,9 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 		text := r.Text(node)
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		if strings.Contains(text, util.Caret) {
-			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node vditor-ir__node--expand\"")
+			r.WriteString("<h" + level + " class=\"vditor-ir__node vditor-ir__node--expand\"")
 		} else {
-			r.WriteString("<h" + level + " data-block=\"0\" class=\"vditor-ir__node\"")
+			r.WriteString("<h" + level + " class=\"vditor-ir__node\"")
 		}
 
 		r.WriteString(" data-node-id=\"" + r.NodeID(node) + "\" " + r.NodeAttrsStr(node) + " data-type=\"h\"")
@@ -1789,7 +1789,6 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			}
 		}
-		attrs = append(attrs, []string{"data-block", "0"})
 		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
@@ -1869,7 +1868,7 @@ func (r *VditorIRBlockRenderer) renderTaskListItemMarker(node *ast.Node, enterin
 
 func (r *VditorIRBlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}, {"data-type", "hr"}}
+		attrs := [][]string{{"data-node-id", r.NodeID(node)}, {"data-type", "hr"}}
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
@@ -1969,7 +1968,7 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 
 func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	text := r.Text(node)
-	attrs := [][]string{{"data-block", "0"}, {"data-node-id", r.NodeID(node)}}
+	attrs := [][]string{{"data-node-id", r.NodeID(node)}}
 	ial := r.NodeAttrs(node)
 	if 0 < len(ial) {
 		attrs = append(attrs, ial...)
