@@ -1720,23 +1720,20 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 			attrs = append(attrs, []string{kv[0], kv[1]})
 		}
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
-		r.Tag("h"+level, attrs, false)
 
-		var tipAttrs [][]string
-		r.nodeTipAttr(node, &tipAttrs)
-		if 0 < len(tipAttrs) {
-			r.WriteString(" tip=\"" + tipAttrs[0][1] + "\"")
-		}
+		r.nodeTipAttr(node, &attrs)
 
 		if !node.HeadingSetext {
-			r.WriteString(" data-marker=\"#\">")
+			attrs = append(attrs, []string{"data-marker", "#"})
 		} else {
 			if 1 == node.HeadingLevel {
-				r.WriteString(" data-marker=\"=\">")
+				attrs = append(attrs, []string{"data-marker", "="})
 			} else {
-				r.WriteString(" data-marker=\"-\">")
+				attrs = append(attrs, []string{"data-marker", "-"})
 			}
 		}
+
+		r.Tag("h"+level, attrs, false)
 
 		if r.Options.HeadingAnchor {
 			id := HeadingID(node)
@@ -1986,7 +1983,7 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	text := r.Text(node)
 	attrs := [][]string{{"data-node-id", r.NodeID(node)}}
-	 r.blockIndex(node, &attrs)
+	r.blockIndex(node, &attrs)
 	ial := r.NodeAttrs(node)
 	if 0 < len(ial) {
 		attrs = append(attrs, ial...)
