@@ -50,7 +50,7 @@ func (t *Tree) BlockCount() (ret int) {
 			return ast.WalkContinue
 		}
 
-		if !n.IsBlock() {
+		if "" == n.ID || !n.IsBlock() {
 			return ast.WalkContinue
 		}
 
@@ -66,7 +66,7 @@ func (t *Tree) DocBlockCount() (ret int) {
 			return ast.WalkContinue
 		}
 
-		if !n.IsBlock() {
+		if "" == n.ID || !n.IsBlock() {
 			return ast.WalkContinue
 		}
 
