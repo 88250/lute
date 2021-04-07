@@ -44,6 +44,42 @@ func (t *Tree) parseBlocks() {
 	}
 }
 
+func (t *Tree) BlockCount() (ret int) {
+	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if !n.IsBlock() {
+			return ast.WalkContinue
+		}
+
+		ret++
+		return ast.WalkContinue
+	})
+	return
+}
+
+func (t *Tree) DocBlockCount() (ret int) {
+	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if !n.IsBlock() {
+			return ast.WalkContinue
+		}
+
+		if parent := n.Parent; nil == parent || ast.NodeDocument != parent.Type {
+			return ast.WalkContinue
+		}
+
+		ret++
+		return ast.WalkContinue
+	})
+	return
+}
+
 // incorporateLine 处理文本行 line 并把生成的块级节点挂到树上。
 func (t *Tree) incorporateLine(line []byte) {
 	t.Context.oldtip = t.Context.Tip

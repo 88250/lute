@@ -31,12 +31,12 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	return
 }
 
-func (tree *Tree) finalParseBlockIAL() {
-	if !tree.Context.ParseOption.KramdownBlockIAL {
+func (t *Tree) finalParseBlockIAL() {
+	if !t.Context.ParseOption.KramdownBlockIAL {
 		return
 	}
 
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering || !n.IsBlock() || ast.NodeDocument == n.Type || ast.NodeKramdownBlockIAL == n.Type {
 			return ast.WalkContinue
 		}
@@ -53,15 +53,15 @@ func (tree *Tree) finalParseBlockIAL() {
 
 	var docIAL *ast.Node
 	var id string
-	if nil != tree.Context.rootIAL {
-		docIAL = tree.Context.rootIAL
+	if nil != t.Context.rootIAL {
+		docIAL = t.Context.rootIAL
 	} else {
 		id = ast.NewNodeID()
 		docIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: []byte("{: id=\"" + id + "\" type=\"doc\"}")}
-		tree.Root.ID = id
-		tree.ID = id
+		t.Root.ID = id
+		t.ID = id
 	}
-	tree.Root.AppendChild(docIAL)
+	t.Root.AppendChild(docIAL)
 }
 
 // Block 会将 markdown 原始文本字节数组解析为一棵语法树，该语法树的第一个块级子节点是段落节点。

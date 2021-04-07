@@ -58,38 +58,10 @@ func TestBlock(t *testing.T) {
 	now := time.Now().UnixNano() / int64(time.Millisecond)
 	tree = parse.Block("", data, luteEngine.ParseOptions)
 	elapsed := time.Now().UnixNano()/int64(time.Millisecond) - now
-	blocks := 0
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering {
-			return ast.WalkContinue
-		}
-
-		if !n.IsBlock() {
-			return ast.WalkContinue
-		}
-
-		blocks++
-		return ast.WalkContinue
-	})
-
-	t.Logf("blocks [%d], ellapsed [%d]ms", blocks, elapsed)
+	t.Logf("blocks [%d], doc blocks [%d], ellapsed [%d]ms", tree.BlockCount(), tree.DocBlockCount(), elapsed)
 
 	now = time.Now().UnixNano() / int64(time.Millisecond)
 	tree = parse.Parse("", data, luteEngine.ParseOptions)
 	elapsed = time.Now().UnixNano()/int64(time.Millisecond) - now
-	blocks = 0
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering {
-			return ast.WalkContinue
-		}
-
-		if !n.IsBlock() {
-			return ast.WalkContinue
-		}
-
-		blocks++
-		return ast.WalkContinue
-	})
-
-	t.Logf("blocks [%d], ellapsed [%d]ms", blocks, elapsed)
+	t.Logf("blocks [%d], doc blocks [%d], ellapsed [%d]ms", tree.BlockCount(), tree.DocBlockCount(), elapsed)
 }
