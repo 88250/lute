@@ -310,6 +310,37 @@ func (n *Node) TokenLen() (ret int) {
 	return
 }
 
+// IsChildBlockOf 用于检查块级节点 n 的父节点是否是 parent 节点，depth 指定层级，0 为任意层级。
+// n 如果不是块级节点，则直接返回 false。
+func (n *Node) IsChildBlockOf(parent *Node, depth int) bool {
+	if "" == n.ID || !n.IsBlock() {
+		return false
+	}
+
+	if depth == 0 {
+		// 任何层级上只要 n 的父节点和 parent 一样就认为是子节点
+		for p := n.Parent; nil != p; p = p.Parent {
+			if p == parent {
+				return true
+			}
+		}
+		return false
+	}
+
+	// 只在指定层级上匹配父节点
+	nodeParent := n.Parent
+	for i := 1; i < depth; i++ {
+		if nil == nodeParent {
+			break
+		}
+		nodeParent = nodeParent.Parent
+	}
+	if parent != nodeParent {
+		return false
+	}
+	return true
+}
+
 func (n *Node) NextNodeText() string {
 	if nil == n.Next {
 		return ""

@@ -11,14 +11,12 @@
 package test
 
 import (
-	"github.com/88250/lute/ast"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/88250/lute"
 	"github.com/88250/lute/parse"
-	"github.com/88250/lute/util"
 )
 
 func TestBlock(t *testing.T) {
@@ -33,30 +31,13 @@ func TestBlock(t *testing.T) {
 	luteEngine.SetSup(true)
 	luteEngine.SetGitConflict(true)
 
-	tree := parse.Block("", util.StrToBytes("1. *foo*"), luteEngine.ParseOptions)
-	list := tree.Root.FirstChild
-	if ast.NodeList != list.Type {
-		t.Fatalf("is not a list")
-	}
-	li := list.FirstChild
-	if ast.NodeListItem != li.Type {
-		t.Fatalf("is not a list item")
-	}
-	paragraph := li.FirstChild
-	if ast.NodeParagraph != paragraph.Type {
-		t.Fatalf("is not a paragraph")
-	}
-	if nil != paragraph.FirstChild {
-		t.Fatalf("paragraph has children")
-	}
-
-	data, err := os.ReadFile("commonmark-spec.md")
+	data, err := os.ReadFile("commonmark-spec-kramdown.md")
 	if nil != err {
 		t.Fatalf("read test data failed: %s", err)
 	}
 
 	now := time.Now().UnixNano() / int64(time.Millisecond)
-	tree = parse.Block("", data, luteEngine.ParseOptions)
+	tree := parse.Block("", data, luteEngine.ParseOptions)
 	elapsed := time.Now().UnixNano()/int64(time.Millisecond) - now
 	t.Logf("blocks [%d], doc blocks [%d], ellapsed [%d]ms", tree.BlockCount(), tree.DocBlockCount(), elapsed)
 

@@ -66,11 +66,7 @@ func (t *Tree) DocBlockCount() (ret int) {
 			return ast.WalkContinue
 		}
 
-		if "" == n.ID || !n.IsBlock() {
-			return ast.WalkContinue
-		}
-
-		if parent := n.Parent; nil == parent || ast.NodeDocument != parent.Type {
+		if !n.IsChildBlockOf(t.Root,1) {
 			return ast.WalkContinue
 		}
 
