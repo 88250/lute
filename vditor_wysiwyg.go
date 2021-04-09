@@ -702,7 +702,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
-		if lute.starstWithNewline(n.FirstChild) {
+		if lute.startsWithNewline(n.FirstChild) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
@@ -761,7 +761,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
-		if lute.starstWithNewline(n.FirstChild) {
+		if lute.startsWithNewline(n.FirstChild) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
@@ -818,7 +818,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
-		if lute.starstWithNewline(n.FirstChild) {
+		if lute.startsWithNewline(n.FirstChild) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
@@ -872,7 +872,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
-		if lute.starstWithNewline(n.FirstChild) {
+		if lute.startsWithNewline(n.FirstChild) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
@@ -1442,7 +1442,7 @@ func (lute *Lute) isEmptyText(n *html.Node) bool {
 	return false
 }
 
-func (lute *Lute) starstWithNewline(n *html.Node) bool {
+func (lute *Lute) startsWithNewline(n *html.Node) bool {
 	return strings.HasPrefix(n.Data, "\n") || strings.HasPrefix(n.Data, parse.Zwsp+"\n")
 }
 
