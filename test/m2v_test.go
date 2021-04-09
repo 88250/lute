@@ -185,6 +185,7 @@ func TestInlineMd2VditorIRBlockDOM(t *testing.T) {
 
 var md2VditorBlockDOMTests = []parseTest{
 
+	{"2", "* {: id=\"20210408153137-zds0o4x\"}foo\n  {: id=\"20210408153138-td774lp\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"p\" class=\"p\" bookmark=\"bm\"><div class=\"vditor-gutter\"><svg><use xlink:href=\"#iconParagraph\"></use></svg></div><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"vditor-attr\"><div class=\"vditor-attr--bookmark\">bm</div></div></div><div data-node-id=\"20210408204848-qyy54ha\" data-node-index=\"2\" data-type=\"p\" class=\"p\"><div class=\"vditor-gutter\"><svg><use xlink:href=\"#iconParagraph\"></use></svg></div><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"vditor-attr\"></div></div>"},
 	{"1", "foo\n{: id=\"20210408204847-qyy54hz\" bookmark=\"bm\"}\nbar\n{: id=\"20210408204848-qyy54ha\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"p\" class=\"p\" bookmark=\"bm\"><div class=\"vditor-gutter\"><svg><use xlink:href=\"#iconParagraph\"></use></svg></div><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"vditor-attr\"><div class=\"vditor-attr--bookmark\">bm</div></div></div><div data-node-id=\"20210408204848-qyy54ha\" data-node-index=\"2\" data-type=\"p\" class=\"p\"><div class=\"vditor-gutter\"><svg><use xlink:href=\"#iconParagraph\"></use></svg></div><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"vditor-attr\"></div></div>"},
 	{"0", "", ""},
 }

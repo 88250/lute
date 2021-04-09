@@ -848,22 +848,17 @@ func (r *VditorBlockRenderer) renderDocument(node *ast.Node, entering bool) ast.
 
 func (r *VditorBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var attr [][]string
-		r.nodeAttrs(node, &attr, "p")
-		r.Tag("div", attr, false)
-
-		attr = [][]string{{"class", "vditor-gutter"}}
-		r.Tag("div", attr, false)
-		r.WriteString("<svg><use xlink:href=\"#iconParagraph\"></use></svg>")
-		r.Tag("/div", nil, false)
-
-		attr = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
-		r.Tag("div", attr, false)
+		var attrs [][]string
+		r.nodeAttrs(node, &attrs, "p")
+		r.Tag("div", attrs, false)
+		r.renderGutter(node)
+		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		r.Tag("div", attrs, false)
 	} else {
 		r.Tag("/div", nil, false)
 
-		attr := [][]string{{"class", "vditor-attr"}}
-		r.Tag("div", attr, false)
+		attrs := [][]string{{"class", "vditor-attr"}}
+		r.Tag("div", attrs, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
 
@@ -1054,10 +1049,6 @@ func (r *VditorBlockRenderer) renderHeadingID(node *ast.Node, entering bool) ast
 }
 
 func (r *VditorBlockRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
-	tag := "div"
-	if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-		tag = "div"
-	}
 	if entering {
 		var attrs [][]string
 		if 0 == node.BulletChar {
@@ -1078,10 +1069,15 @@ func (r *VditorBlockRenderer) renderList(node *ast.Node, entering bool) ast.Walk
 			}
 		}
 		r.nodeAttrs(node, &attrs, "list")
-		r.renderListStyle(node, &attrs)
-		r.Tag(tag, attrs, false)
+		r.Tag("div", attrs, false)
+		r.renderGutter(node)
 	} else {
-		r.Tag("/"+tag, nil, false)
+		attrs := [][]string{{"class", "vditor-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1104,12 +1100,19 @@ func (r *VditorBlockRenderer) renderListItem(node *ast.Node, entering bool) ast.
 				attrs = append(attrs, []string{"class", r.Options.GFMTaskListItemClass})
 			}
 		}
-		r.Tag("li", attrs, false)
-		if nil == node.FirstChild {
-			r.WriteString(parse.Zwsp)
-		}
+		r.nodeAttrs(node, &attrs, "li")
+		r.Tag("div", attrs, false)
+
+		attr := [][]string{{"class", "vditor-bullet"}}
+		r.Tag("div", attr, false)
+		r.Tag("/div", nil, false)
 	} else {
-		r.Tag("/li", nil, false)
+		attrs := [][]string{{"class", "vditor-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1289,5 +1292,24 @@ func (r *VditorBlockRenderer) renderIAL(node *ast.Node) {
 		r.Tag("div", [][]string{{"class", "vditor-attr--bookmark"}}, false)
 		r.WriteString(bookmark)
 		r.Tag("/div", nil, false)
+	}
+}
+
+func (r *VditorBlockRenderer) renderGutter(node *ast.Node) {
+	left := -16
+
+	for c := node; nil != c && c.IsBlock(); c = c.FirstChild {
+		attr := [][]string{{"class", "vditor-gutter"}, {"style", "left: " + strconv.Itoa(left) + "px"}}
+		r.Tag("div", attr, false)
+		switch c.Type {
+		case ast.NodeParagraph:
+			r.WriteString("<svg><use xlink:href=\"#iconParagraph\"></use></svg>")
+		case ast.NodeList:
+			r.WriteString("<svg><use xlink:href=\"#iconList\"></use></svg>")
+		case ast.NodeListItem:
+			r.WriteString("<svg><use xlink:href=\"#iconListItem\"></use></svg>")
+		}
+		r.Tag("/div", nil, false)
+		left -= 16
 	}
 }

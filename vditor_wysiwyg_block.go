@@ -63,7 +63,6 @@ func (lute *Lute) VditorBlockDOM2HTML(vhtml string) (sHTML string) {
 
 // Md2VditorBlockDOM 将 markdown 转换为 Vditor Instant-Rendering Block DOM。
 func (lute *Lute) Md2VditorBlockDOM(markdown string) (vHTML string) {
-	//fmt.Println(markdown)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2VditorBlockDOMRendererFuncs {
