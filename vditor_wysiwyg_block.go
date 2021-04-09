@@ -226,65 +226,21 @@ func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
-	dataRender := lute.domAttrValue(n, "data-render")
-	if "1" == dataRender || "2" == dataRender { // 1：浮动工具栏，2：preview 代码块、数学公式块
+	if class := lute.domAttrValue(n, "class"); "vditor-gutter" == class || "vditor-attr" == class {
+		return
+	}
+
+	if "true" == lute.domAttrValue(n, "contenteditable") {
+		content := lute.domText(n)
+		node := &ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(content)}
+		tree.Context.Tip.AppendChild(node)
 		return
 	}
 
 	dataType := lute.domAttrValue(n, "data-type")
 
-	//if atom.Div == n.DataAtom {
-	//	if "code-block" == dataType || "html-block" == dataType || "math-block" == dataType || "yaml-front-matter" == dataType {
-	//		for c := n.FirstChild; c != nil; c = c.NextSibling {
-	//			lute.genASTByVditorBlockDOM(c, tree)
-	//		}
-	//	} else if "link-ref-defs-block" == dataType {
-	//		text := lute.domText(n)
-	//		node := &ast.Node{Type: ast.NodeText, Tokens: []byte(text)}
-	//		tree.Context.Tip.AppendChild(node)
-	//	} else if "footnotes-block" == dataType {
-	//		ol := n.FirstChild
-	//		if atom.Ol != ol.DataAtom {
-	//			return
-	//		}
-	//
-	//		for li := ol.FirstChild; nil != li; li = li.NextSibling {
-	//			if "\n" == li.Data {
-	//				continue
-	//			}
-	//
-	//			originalHTML := &bytes.Buffer{}
-	//			if err := html.Render(originalHTML, li); nil == err {
-	//				md := lute.vditorBlockDOM2Md("<ol data-type=\"footnotes-defs-ol\">" + originalHTML.String() + "</ol>")
-	//				label := lute.domAttrValue(li, "data-marker")
-	//				md = md[3:] // 去掉列表项标记符 1.
-	//				lines := strings.Split(md, "\n")
-	//				md = ""
-	//				for i, line := range lines {
-	//					if 0 < i {
-	//						md += "    " + line
-	//					} else {
-	//						md = line
-	//					}
-	//					md += "\n"
-	//				}
-	//				md = "[" + label + "]: " + md
-	//				node := &ast.Node{Type: ast.NodeText, Tokens: []byte(md)}
-	//				tree.Context.Tip.AppendChild(node)
-	//			} else {
-	//				panic(err)
-	//			}
-	//		}
-	//	} else if "toc-block" == dataType {
-	//		node := &ast.Node{Type: ast.NodeToC}
-	//		tree.Context.Tip.AppendChild(node)
-	//	}
-	//	return
-	//}
-
-	content := strings.ReplaceAll(n.Data, parse.Zwsp, "")
 	nodeID := lute.domAttrValue(n, "data-node-id")
-	node := &ast.Node{ID: nodeID, Type: ast.NodeText, Tokens: []byte(content)}
+	node := &ast.Node{ID: nodeID}
 	if "" == nodeID {
 		if "p" == dataType || "ul" == dataType || "ol" == dataType || "blockquote" == dataType ||
 			"math-block" == dataType || "code-block" == dataType || "table" == dataType || "h" == dataType ||
@@ -301,17 +257,8 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.TipAppendChild(ial)
 	}
 
-	if 0 == n.DataAtom {
-		tree.Context.Tip.AppendChild(node)
-		return
-	}
-
 	switch dataType {
 	case "p":
-		if "" == content {
-			return
-		}
-
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node

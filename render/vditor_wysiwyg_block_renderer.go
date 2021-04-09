@@ -851,7 +851,22 @@ func (r *VditorBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast
 		var attr [][]string
 		r.nodeAttrs(node, &attr, "p")
 		r.Tag("div", attr, false)
+
+		attr = [][]string{{"class", "vditor-gutter"}}
+		r.Tag("div", attr, false)
+		r.WriteString("<svg><use xlink:href=\"#iconParagraph\"></use></svg>")
+		r.Tag("/div", nil, false)
+
+		attr = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		r.Tag("div", attr, false)
 	} else {
+		r.Tag("/div", nil, false)
+
+		attr := [][]string{{"class", "vditor-attr"}}
+		r.Tag("div", attr, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -1062,8 +1077,7 @@ func (r *VditorBlockRenderer) renderList(node *ast.Node, entering bool) ast.Walk
 				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			}
 		}
-		r.nodeID(node, &attrs)
-		r.nodeIndex(node, &attrs)
+		r.nodeAttrs(node, &attrs, "list")
 		r.renderListStyle(node, &attrs)
 		r.Tag(tag, attrs, false)
 	} else {
@@ -1248,4 +1262,25 @@ func (r *VditorBlockRenderer) nodeIndex(node *ast.Node, attrs *[][]string) {
 	*attrs = append(*attrs, []string{"data-node-index", strconv.Itoa(r.NodeIndex)})
 	r.NodeIndex++
 	return
+}
+
+func (r *VditorBlockRenderer) renderIAL(node *ast.Node) {
+	name := node.IALAttr("name")
+	if "" != name {
+		r.Tag("div", [][]string{{"class", "vditor-attr--name"}}, false)
+		r.WriteString(name)
+		r.Tag("/div", nil, false)
+	}
+	alias := node.IALAttr("alias")
+	if "" != alias {
+		r.Tag("div", [][]string{{"class", "vditor-attr--alias"}}, false)
+		r.WriteString(alias)
+		r.Tag("/div", nil, false)
+	}
+	bookmark := node.IALAttr("bookmark")
+	if "" != bookmark {
+		r.Tag("div", [][]string{{"class", "vditor-attr--bookmark"}}, false)
+		r.WriteString(bookmark)
+		r.Tag("/div", nil, false)
+	}
 }
