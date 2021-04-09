@@ -28,12 +28,12 @@ import (
 // VditorIRBlockRenderer 描述了 Vditor Instant-Rendering Block DOM 渲染器。
 type VditorIRBlockRenderer struct {
 	*BaseRenderer
-	BlockIndex int
+	NodeIndex int
 }
 
 // NewVditorIRBlockRenderer 创建一个 Vditor Instant-Rendering Block DOM 渲染器。
 func NewVditorIRBlockRenderer(tree *parse.Tree, options *Options) *VditorIRBlockRenderer {
-	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree, options), BlockIndex: options.BlockIndexStart}
+	ret := &VditorIRBlockRenderer{BaseRenderer: NewBaseRenderer(tree, options), NodeIndex: options.NodeIndexStart}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -234,7 +234,7 @@ func (r *VditorIRBlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, ente
 func (r *VditorIRBlockRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"data-type", "link-ref-defs-block"}}
-		r.blockIndex(node, &attrs)
+		r.nodeIndex(node, &attrs)
 		r.Tag("div", attrs, false)
 	} else {
 		r.WriteString("</div>")
@@ -664,7 +664,7 @@ func (r *VditorIRBlockRenderer) renderToC(node *ast.Node, entering bool) ast.Wal
 func (r *VditorIRBlockRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"data-type", "footnotes-block"}}
-		r.blockIndex(node, &attrs)
+		r.nodeIndex(node, &attrs)
 		r.Tag("div", attrs, false)
 	} else {
 		r.WriteString("</div>")
@@ -1020,7 +1020,7 @@ func (r *VditorIRBlockRenderer) renderTableHead(node *ast.Node, entering bool) a
 func (r *VditorIRBlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"data-type", "table"}, {"data-node-id", r.NodeID(node)}}
-		r.blockIndex(node, &attrs)
+		r.nodeIndex(node, &attrs)
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
@@ -1458,7 +1458,7 @@ func (r *VditorIRBlockRenderer) renderDocument(node *ast.Node, entering bool) as
 func (r *VditorIRBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"data-node-id", r.NodeID(node)}, {"data-type", "p"}}
-		r.blockIndex(node, &attrs)
+		r.nodeIndex(node, &attrs)
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
@@ -1686,7 +1686,7 @@ func (r *VditorIRBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enter
 func (r *VditorIRBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"data-node-id", r.NodeID(node)}, {"data-type", "blockquote"}}
-		r.blockIndex(node, &attrs)
+		r.nodeIndex(node, &attrs)
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
@@ -1707,7 +1707,7 @@ func (r *VditorIRBlockRenderer) renderHeading(node *ast.Node, entering bool) ast
 	if entering {
 		text := r.Text(node)
 		var attrs [][]string
-		r.blockIndex(node, &attrs)
+		r.nodeIndex(node, &attrs)
 		if strings.Contains(text, util.Caret) {
 			attrs = append(attrs, []string{"class", "vditor-ir__node vditor-ir__node--expand"})
 		} else {
@@ -1801,7 +1801,7 @@ func (r *VditorIRBlockRenderer) renderList(node *ast.Node, entering bool) ast.Wa
 				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			}
 		}
-		r.blockIndex(node, &attrs)
+		r.nodeIndex(node, &attrs)
 		attrs = append(attrs, []string{"data-node-id", r.NodeID(node)})
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
@@ -1882,7 +1882,7 @@ func (r *VditorIRBlockRenderer) renderTaskListItemMarker(node *ast.Node, enterin
 func (r *VditorIRBlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"data-node-id", r.NodeID(node)}, {"data-type", "hr"}}
-		r.blockIndex(node, &attrs)
+		r.nodeIndex(node, &attrs)
 		ial := r.NodeAttrs(node)
 		if 0 < len(ial) {
 			attrs = append(attrs, ial...)
@@ -1983,7 +1983,7 @@ func (r *VditorIRBlockRenderer) renderSpanNode(node *ast.Node) {
 func (r *VditorIRBlockRenderer) renderDivNode(node *ast.Node) {
 	text := r.Text(node)
 	attrs := [][]string{{"data-node-id", r.NodeID(node)}}
-	r.blockIndex(node, &attrs)
+	r.nodeIndex(node, &attrs)
 	ial := r.NodeAttrs(node)
 	if 0 < len(ial) {
 		attrs = append(attrs, ial...)
@@ -2061,12 +2061,12 @@ func (r *VditorIRBlockRenderer) nodeTipAttr(node *ast.Node, attrs *[][]string) {
 	}
 }
 
-func (r *VditorIRBlockRenderer) blockIndex(node *ast.Node, attrs *[][]string) {
+func (r *VditorIRBlockRenderer) nodeIndex(node *ast.Node, attrs *[][]string) {
 	if nil == node.Parent || ast.NodeDocument != node.Parent.Type {
 		return
 	}
 
-	*attrs = append(*attrs, []string{"data-block-index", strconv.Itoa(r.BlockIndex)})
-	r.BlockIndex++
+	*attrs = append(*attrs, []string{"data-block-index", strconv.Itoa(r.NodeIndex)})
+	r.NodeIndex++
 	return
 }
