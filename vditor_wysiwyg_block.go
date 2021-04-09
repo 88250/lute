@@ -24,23 +24,205 @@ import (
 )
 
 func (lute *Lute) SpinVditorBlockDOM(ivHTML string) (ovHTML string) {
-	ivHTML = strings.ReplaceAll(ivHTML, util.FrontEndCaret, util.Caret)
-	markdown := lute.vditorDOM2Md(ivHTML)
+	// 替换插入符
+	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
+
+	markdown := lute.vditorBlockDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorRenderer(tree, lute.RenderOptions)
-	output := renderer.Render()
-	ovHTML = strings.ReplaceAll(string(output), util.Caret, util.FrontEndCaret)
+
+	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	// 替换插入符
+	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
 	return
 }
 
-func (lute *Lute) Md2VditorBlockDOM(markdown string) (vHTML string) {
+// HTML2VditorBlockDOM 将 HTML 转换为 Vditor Instant-Rendering Block DOM。
+func (lute *Lute) HTML2VditorBlockDOM(sHTML string) (vHTML string) {
+	//fmt.Println(sHTML)
+	markdown, err := lute.HTML2Markdown(sHTML)
+	if nil != err {
+		vHTML = err.Error()
+		return
+	}
+
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
-	for nodeType, rendererFunc := range lute.Md2VditorIRBlockDOMRendererFuncs {
+	for nodeType, rendererFunc := range lute.HTML2VditorBlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
 	vHTML = string(output)
+	return
+}
+
+// VditorBlockDOM2HTML 将 Vditor Instant-Rendering Block DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
+func (lute *Lute) VditorBlockDOM2HTML(vhtml string) (sHTML string) {
+	markdown := lute.vditorBlockDOM2Md(vhtml)
+	sHTML = lute.Md2HTML(markdown)
+	return
+}
+
+// Md2VditorBlockDOM 将 markdown 转换为 Vditor Instant-Rendering Block DOM。
+func (lute *Lute) Md2VditorBlockDOM(markdown string) (vHTML string) {
+	//fmt.Println(markdown)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
+	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.Md2VditorBlockDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
+	output := renderer.Render()
+	vHTML = string(output)
+	return
+}
+
+// InlineMd2VditorBlockDOM 将 markdown 以行级方式转换为 Vditor Instant-Rendering Block DOM。
+func (lute *Lute) InlineMd2VditorBlockDOM(markdown string) (vHTML string) {
+	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
+	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.Md2VditorBlockDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
+	output := renderer.Render()
+	vHTML = string(output)
+	return
+}
+
+// VditorBlockDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown。
+func (lute *Lute) VditorBlockDOM2Md(htmlStr string) (markdown string) {
+	//fmt.Println(htmlStr)
+	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
+	markdown = lute.vditorBlockDOM2Md(htmlStr)
+	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
+	return
+}
+
+// VditorBlockDOM2StdMd 将 Vditor Instant-Rendering DOM 转换为标准 markdown。
+func (lute *Lute) VditorBlockDOM2StdMd(htmlStr string) (markdown string) {
+	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
+
+	// DOM 转 AST
+	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return err.Error()
+	}
+
+	// 将 kramdown IAL 节点内容置空
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeKramdownBlockIAL == n.Type || ast.NodeKramdownSpanIAL == n.Type {
+			n.Tokens = nil
+		}
+		return ast.WalkContinue
+	})
+
+	// 将 AST 进行 Markdown 格式化渲染
+	options := render.NewOptions()
+	options.AutoSpace = false
+	options.FixTermTypo = false
+	options.KramdownBlockIAL = true
+	options.KramdownSpanIAL = true
+	renderer := render.NewFormatRenderer(tree, options)
+	formatted := renderer.Render()
+	markdown = string(formatted)
+	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
+	return
+}
+
+func (lute *Lute) VditorBlockDOM2Text(htmlStr string) (text string) {
+	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return ""
+	}
+	return tree.Root.Text()
+}
+
+func (lute *Lute) VditorBlockDOM2TextLen(htmlStr string) int {
+	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return 0
+	}
+	return tree.Root.TextLen()
+}
+
+func (lute *Lute) Tree2VditorBlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
+	renderer := render.NewVditorBlockRenderer(tree, options)
+	output := renderer.Render()
+	vHTML = string(output)
+	return
+}
+
+func RenderNodeVditorBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
+	root := &ast.Node{Type: ast.NodeDocument}
+	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
+	renderer := render.NewVditorBlockRenderer(tree, renderOptions)
+	renderer.Writer = &bytes.Buffer{}
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		rendererFunc := renderer.RendererFuncs[n.Type]
+		return rendererFunc(n, entering)
+	})
+	return renderer.Writer.String()
+}
+
+func (lute *Lute) VditorBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
+	// 删掉插入符
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
+
+	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
+	htmlStr = strings.ReplaceAll(htmlStr, "\t\n", "\n")
+	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
+
+	// 将字符串解析为 DOM 树
+	htmlRoot := lute.parseHTML(htmlStr)
+	if nil == htmlRoot {
+		return
+	}
+
+	// 调整 DOM 结构
+	lute.adjustVditorDOM(htmlRoot)
+
+	// 将 HTML 树转换为 Markdown AST
+	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
+	ret.Context.Tip = ret.Root
+	for c := htmlRoot.FirstChild; nil != c; c = c.NextSibling {
+		lute.genASTByVditorBlockDOM(c, ret)
+	}
+
+	// 调整树结构
+	ast.Walk(ret.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering {
+			switch n.Type {
+			case ast.NodeInlineHTML, ast.NodeCodeSpan, ast.NodeInlineMath, ast.NodeHTMLBlock, ast.NodeCodeBlockCode, ast.NodeMathBlockContent:
+				n.Tokens = html.UnescapeHTML(n.Tokens)
+				if nil != n.Next && ast.NodeCodeSpan == n.Next.Type && n.CodeMarkerLen == n.Next.CodeMarkerLen && nil != n.FirstChild && nil != n.FirstChild.Next {
+					// 合并代码节点 https://github.com/Vanessa219/vditor/issues/167
+					n.FirstChild.Next.Tokens = append(n.FirstChild.Next.Tokens, n.Next.FirstChild.Next.Tokens...)
+					n.Next.Unlink()
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
+	return
+}
+
+func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
+	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
+	if nil != err {
+		return err.Error()
+	}
+
+	// 将 AST 进行 Markdown 格式化渲染
+	options := render.NewOptions()
+	options.AutoSpace = false
+	options.FixTermTypo = false
+	options.KramdownBlockIAL = true
+	options.KramdownSpanIAL = true
+	renderer := render.NewFormatRenderer(tree, options)
+	formatted := renderer.Render()
+	markdown = string(formatted)
 	return
 }
 

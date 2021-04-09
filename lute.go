@@ -33,11 +33,13 @@ type Lute struct {
 	HTML2VditorDOMRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
 	HTML2VditorIRDOMRendererFuncs      map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorIRDOM 渲染器函数
 	HTML2VditorIRBlockDOMRendererFuncs map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorIRBlockDOM 渲染器函数
+	HTML2VditorBlockDOMRendererFuncs   map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorBlockDOM 渲染器函数
 	HTML2VditorSVDOMRendererFuncs      map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorSVDOM 渲染器函数
 	Md2HTMLRendererFuncs               map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2HTML 渲染器函数
 	Md2VditorDOMRendererFuncs          map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2VditorDOM 渲染器函数
 	Md2VditorIRDOMRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2VditorIRDOM 渲染器函数
 	Md2VditorIRBlockDOMRendererFuncs   map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2VditorIRBlockDOM 渲染器函数
+	Md2VditorBlockDOMRendererFuncs     map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2VditorBlockDOM 渲染器函数
 	Md2VditorSVDOMRendererFuncs        map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 Md2VditorSVDOM 渲染器函数
 }
 
@@ -66,11 +68,13 @@ func New(opts ...ParseOption) (ret *Lute) {
 	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorIRBlockDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.HTML2VditorBlockDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorSVDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2HTMLRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2VditorIRBlockDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.Md2VditorBlockDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.Md2VditorSVDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	return ret
 }
@@ -450,6 +454,8 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			rendererFuncs = lute.HTML2VditorIRDOMRendererFuncs
 		} else if "HTML2VditorIRBlockDOM" == rendererType {
 			rendererFuncs = lute.HTML2VditorIRBlockDOMRendererFuncs
+		} else if "HTML2VditorBlockDOM" == rendererType {
+			rendererFuncs = lute.HTML2VditorBlockDOMRendererFuncs
 		} else if "HTML2VditorSVDOM" == rendererType {
 			rendererFuncs = lute.HTML2VditorSVDOMRendererFuncs
 		} else if "Md2HTML" == rendererType {
@@ -460,6 +466,8 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			rendererFuncs = lute.Md2VditorIRDOMRendererFuncs
 		} else if "Md2VditorIRBlockDOM" == rendererType {
 			rendererFuncs = lute.Md2VditorIRBlockDOMRendererFuncs
+		} else if "Md2VditorBlockDOM" == rendererType {
+			rendererFuncs = lute.Md2VditorBlockDOMRendererFuncs
 		} else if "Md2VditorSVDOM" == rendererType {
 			rendererFuncs = lute.Md2VditorSVDOMRendererFuncs
 		} else {
