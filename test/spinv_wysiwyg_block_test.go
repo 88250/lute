@@ -19,7 +19,7 @@ import (
 
 var spinVditorBlockDOMTests = []*parseTest{
 
-	{"0", "<div data-node-id=\"fooid\" data-node-index=\"1\" data-type=\"paragraph\" class=\"p\">foo</div><div data-node-id=\"barid\" data-node-index=\"2\" data-type=\"paragraph\" class=\"p\">bar</div>", ""},
+	{"0", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"p\" class=\"p\">foo</div><div data-node-id=\"20210408204848-qyy54ha\" data-node-index=\"2\" data-type=\"p\" class=\"p\">bar</div>", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"p\" class=\"p\">foo</div><div data-node-id=\"20210408204848-qyy54ha\" data-node-index=\"2\" data-type=\"p\" class=\"p\">bar</div>"},
 }
 
 func TestSpinVditorBlockDOM(t *testing.T) {

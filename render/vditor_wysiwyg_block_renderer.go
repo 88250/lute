@@ -1228,8 +1228,11 @@ func (r *VditorBlockRenderer) nodeClass(node *ast.Node, attrs *[][]string, class
 }
 
 func (r *VditorBlockRenderer) nodeDataType(node *ast.Node, attrs *[][]string) {
-	nodeType := node.Type.String()
-	nodeType = strings.ToLower(nodeType)[4:] // NodeXXX
+	var nodeType string
+	switch node.Type {
+	case ast.NodeParagraph:
+		nodeType = "p"
+	}
 	*attrs = append(*attrs, []string{"data-type", nodeType})
 }
 

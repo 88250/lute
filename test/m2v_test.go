@@ -185,7 +185,7 @@ func TestInlineMd2VditorIRBlockDOM(t *testing.T) {
 
 var md2VditorBlockDOMTests = []parseTest{
 
-	{"1", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<div data-node-id=\"fooid\" data-node-index=\"1\" data-type=\"paragraph\" class=\"p\">foo</div><div data-node-id=\"barid\" data-node-index=\"2\" data-type=\"paragraph\" class=\"p\">bar</div>"},
+	{"1", "foo\n{: id=\"fooid\"}\nbar\n{: id=\"barid\"}", "<div data-node-id=\"fooid\" data-node-index=\"1\" data-type=\"p\" class=\"p\">foo</div><div data-node-id=\"barid\" data-node-index=\"2\" data-type=\"p\" class=\"p\">bar</div>"},
 	{"0", "", ""},
 }
 
