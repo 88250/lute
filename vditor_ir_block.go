@@ -392,7 +392,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 	if "" != node.ID && !lute.parentIs(n, atom.Table) {
 		node.KramdownIAL = [][]string{{"id", node.ID}}
-		ialTokens := lute.setIAL(n, node)
+		ialTokens := lute.setIRBlockIAL(n, node)
 		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
 		defer tree.Context.TipAppendChild(ial)
 	}
@@ -1555,7 +1555,7 @@ func (lute *Lute) genASTByVditorIRBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 }
 
-func (lute *Lute) setIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
+func (lute *Lute) setIRBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	ialTokens = []byte("{: id=\"" + node.ID + "\"")
 	if bookmark := lute.domAttrValue(n, "bookmark"); "" != bookmark {
 		bookmark = html.UnescapeString(bookmark)

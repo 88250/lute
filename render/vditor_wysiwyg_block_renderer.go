@@ -1235,6 +1235,13 @@ func (r *VditorBlockRenderer) nodeAttrs(node *ast.Node, attrs *[][]string, class
 	r.nodeIndex(node, attrs)
 	r.nodeDataType(node, attrs)
 	r.nodeClass(node, attrs, class)
+
+	for _, ial := range node.KramdownIAL {
+		if "id" == ial[0] {
+			continue
+		}
+		*attrs = append(*attrs, []string{ial[0], ial[1]})
+	}
 }
 
 func (r *VditorBlockRenderer) nodeClass(node *ast.Node, attrs *[][]string, class string) {
