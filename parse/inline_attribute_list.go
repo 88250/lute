@@ -45,9 +45,10 @@ func IALStart(t *Tree, container *ast.Node) int {
 				if nil == lastMatchedContainer {
 					lastMatchedContainer = t.Context.lastMatchedContainer
 				}
-				if ast.NodeKramdownBlockIAL == lastMatchedContainer.Type && nil != lastMatchedContainer.Parent && ast.NodeDocument == lastMatchedContainer.Parent.Type { // 两个连续的 IAL
+				if ast.NodeKramdownBlockIAL == lastMatchedContainer.Type && nil != lastMatchedContainer.Parent { // 两个连续的 IAL
 					tokens := IAL2Tokens(ial)
 					if !bytes.HasPrefix(lastMatchedContainer.Tokens, tokens) { // 有的块解析已经做过打断处理
+						// 在两个连续的 IAL 之间插入空段落，这样能够保持空行留白
 						p := &ast.Node{Type: ast.NodeParagraph, Tokens: []byte(" ")}
 						lastMatchedContainer.InsertAfter(p)
 						t.Context.Tip = p

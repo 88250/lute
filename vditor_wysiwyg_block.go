@@ -237,19 +237,10 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
-	dataType := lute.domAttrValue(n, "data-type")
+	dataType := ast.Str2NodeType(lute.domAttrValue(n, "data-type"))
 
 	nodeID := lute.domAttrValue(n, "data-node-id")
 	node := &ast.Node{ID: nodeID}
-	if "" == nodeID {
-		if "p" == dataType || "ul" == dataType || "ol" == dataType || "blockquote" == dataType ||
-			"math-block" == dataType || "code-block" == dataType || "table" == dataType || "h" == dataType ||
-			"link-ref-defs-block" == dataType || "footnotes-block" == dataType || "super-block" == dataType ||
-			"git-conflict" == dataType {
-			nodeID = ast.NewNodeID()
-			node.ID = nodeID
-		}
-	}
 	if "" != node.ID && !lute.parentIs(n, atom.Table) {
 		node.KramdownIAL = [][]string{{"id", node.ID}}
 		ialTokens := lute.setBlockIAL(n, node)
@@ -258,12 +249,12 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch dataType {
-	case "p":
+	case ast.NodeParagraph:
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
-	case "ul":
+	case ast.NodeList:
 		node.Type = ast.NodeList
 		node.ListData = &ast.ListData{}
 		marker := lute.domAttrValue(n, "data-marker")
@@ -276,7 +267,7 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
-	case "listitem":
+	case ast.NodeListItem:
 		if ast.NodeList != tree.Context.Tip.Type {
 			parent := &ast.Node{}
 			parent.Type = ast.NodeList

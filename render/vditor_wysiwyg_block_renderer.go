@@ -1250,22 +1250,7 @@ func (r *VditorBlockRenderer) nodeClass(node *ast.Node, attrs *[][]string, class
 }
 
 func (r *VditorBlockRenderer) nodeDataType(node *ast.Node, attrs *[][]string) {
-	var nodeType string
-	switch node.Type {
-	case ast.NodeParagraph:
-		nodeType = "p"
-	case ast.NodeList:
-		if 0 == node.ListData.Typ {
-			nodeType = "ul"
-		} else if 1 == node.ListData.Typ {
-			nodeType = "ol"
-		} else if 3 == node.ListData.Typ {
-			nodeType = "tl"
-		}
-	case ast.NodeListItem:
-		nodeType = "listitem"
-	}
-	*attrs = append(*attrs, []string{"data-type", nodeType})
+	*attrs = append(*attrs, []string{"data-type", node.Type.String()})
 }
 
 func (r *VditorBlockRenderer) nodeID(node *ast.Node, attrs *[][]string) {

@@ -11,6 +11,7 @@
 package test
 
 import (
+	"github.com/88250/lute/ast"
 	"testing"
 
 	"github.com/88250/lute"
@@ -18,6 +19,7 @@ import (
 
 var kramdownBlockIALTests = []parseTest{
 
+	{"23", "* {: id=\"20210410235101-qckdxca\"}foo\n  {: id=\"20210411001135-u2jnm4r\"}\n\n  {: id=\"20210411001219-0t9swv3\"}\n{: id=\"20210410181814-3ar1jd9\"}\n\n\n{: id=\"20210410173314-j8kfyel\" type=\"doc\"}\n", "<ul id=\"20210410181814-3ar1jd9\">\n<li id=\"20210410235101-qckdxca\">\n<p id=\"20210411001135-u2jnm4r\">foo</p>\n<p id=\"20210411001219-0t9swv3\"></p>\n</li>\n</ul>\n"},
 	{"22", "* {: id=\"20210221200613-7vpmc8h\"}foo\n  {: id=\"20210221195351-x5tgalq\" updated=\"20210221201411\"}\n{: id=\"20210221195349-czsad7f\" updated=\"20210221195351\"}\n\n\n{: id=\"20210215183533-l36k5mo\" type=\"doc\"}", "<ul id=\"20210221195349-czsad7f\" updated=\"20210221195351\">\n<li id=\"20210221200613-7vpmc8h\">foo</li>\n</ul>\n"},
 	{"21", "* {: id=\"fooid\"}foo\n\n  > bar\n  {: id=\"barid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li id=\"fooid\">\n<p>foo</p>\n<blockquote id=\"barid\">\n<p>bar</p>\n</blockquote>\n</li>\n</ul>\n"},
 	{"20", "* {: id=\"fooid\"} foo\n{: id=\"id\"}", "<ul id=\"id\">\n<li id=\"fooid\">foo</li>\n</ul>\n"},
@@ -48,6 +50,7 @@ func TestKramdownBlockIALs(t *testing.T) {
 	luteEngine.ParseOptions.KramdownBlockIAL = true
 	luteEngine.RenderOptions.KramdownBlockIAL = true
 
+	ast.Testing = true
 	for _, test := range kramdownBlockIALTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
@@ -71,6 +74,7 @@ func TestKramdownBlockIALIDName(t *testing.T) {
 	luteEngine.RenderOptions.KramdownBlockIAL = true
 	luteEngine.RenderOptions.KramdownIALIDRenderName = "data-block-id"
 
+	ast.Testing = true
 	for _, test := range kramdownBlockIALIDNAmeTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
