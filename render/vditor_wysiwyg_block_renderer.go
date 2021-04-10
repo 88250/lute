@@ -1254,6 +1254,10 @@ func (r *VditorBlockRenderer) nodeDataType(node *ast.Node, attrs *[][]string) {
 	switch node.Type {
 	case ast.NodeParagraph:
 		nodeType = "p"
+	case ast.NodeList:
+		nodeType = "list"
+	case ast.NodeListItem:
+		nodeType = "listitem"
 	}
 	*attrs = append(*attrs, []string{"data-type", nodeType})
 }
