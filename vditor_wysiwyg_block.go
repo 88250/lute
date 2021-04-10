@@ -263,34 +263,16 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
-	case "list":
+	case "ul":
 		node.Type = ast.NodeList
 		node.ListData = &ast.ListData{}
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
 			marker = "*"
 		}
-		// 固定标记符，降低复杂度
-		if atom.Ol == n.DataAtom {
-			marker = "*"
-		} else {
-			marker = strings.ReplaceAll(marker, ")", ".")
-		}
-		if atom.Ol == n.DataAtom {
-			node.ListData.Typ = 1
-			start := lute.domAttrValue(n, "start")
-			if "" == start {
-				start = "1"
-			}
-			node.ListData.Start, _ = strconv.Atoi(start)
-		} else {
-			node.ListData.BulletChar = marker[0]
-		}
+
+		node.ListData.BulletChar = '*'
 		node.ListData.Marker = []byte(marker)
-		tight := lute.domAttrValue(n, "data-tight")
-		if "true" == tight || "" == tight {
-			node.Tight = true
-		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -298,7 +280,7 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		if ast.NodeList != tree.Context.Tip.Type {
 			parent := &ast.Node{}
 			parent.Type = ast.NodeList
-			parent.ListData = &ast.ListData{Tight: true}
+			parent.ListData = &ast.ListData{}
 			marker := lute.domAttrValue(n, "data-marker")
 			if "" == marker {
 				marker = "*"
@@ -308,10 +290,6 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			tree.Context.Tip.AppendChild(parent)
 			tree.Context.Tip = parent
-		}
-
-		if p := n.FirstChild; nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
-			tree.Context.Tip.Tight = false
 		}
 
 		node.Type = ast.NodeListItem

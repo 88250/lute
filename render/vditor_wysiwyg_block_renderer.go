@@ -1255,7 +1255,13 @@ func (r *VditorBlockRenderer) nodeDataType(node *ast.Node, attrs *[][]string) {
 	case ast.NodeParagraph:
 		nodeType = "p"
 	case ast.NodeList:
-		nodeType = "list"
+		if 0 == node.ListData.Typ {
+			nodeType = "ul"
+		} else if 1 == node.ListData.Typ {
+			nodeType = "ol"
+		} else if 3 == node.ListData.Typ {
+			nodeType = "tl"
+		}
 	case ast.NodeListItem:
 		nodeType = "listitem"
 	}
