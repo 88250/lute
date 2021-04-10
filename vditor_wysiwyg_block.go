@@ -225,7 +225,7 @@ func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
-	if class := lute.domAttrValue(n, "class"); "vditor-gutter" == class || "vditor-attr" == class {
+	if class := lute.domAttrValue(n, "class"); "vditor-attr" == class {
 		return
 	}
 

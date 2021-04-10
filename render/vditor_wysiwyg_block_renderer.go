@@ -851,7 +851,6 @@ func (r *VditorBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast
 		var attrs [][]string
 		r.nodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
-		r.renderGutter(node)
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 	} else {
@@ -1070,7 +1069,6 @@ func (r *VditorBlockRenderer) renderList(node *ast.Node, entering bool) ast.Walk
 		}
 		r.nodeAttrs(node, &attrs, "list")
 		r.Tag("div", attrs, false)
-		r.renderGutter(node)
 	} else {
 		attrs := [][]string{{"class", "vditor-attr"}}
 		r.Tag("div", attrs, false)
@@ -1292,24 +1290,5 @@ func (r *VditorBlockRenderer) renderIAL(node *ast.Node) {
 		r.Tag("div", [][]string{{"class", "vditor-attr--bookmark"}}, false)
 		r.WriteString(bookmark)
 		r.Tag("/div", nil, false)
-	}
-}
-
-func (r *VditorBlockRenderer) renderGutter(node *ast.Node) {
-	left := -16
-
-	for c := node; nil != c && c.IsBlock(); c = c.FirstChild {
-		attr := [][]string{{"class", "vditor-gutter"}, {"style", "left: " + strconv.Itoa(left) + "px"}}
-		r.Tag("div", attr, false)
-		switch c.Type {
-		case ast.NodeParagraph:
-			r.WriteString("<svg><use xlink:href=\"#iconParagraph\"></use></svg>")
-		case ast.NodeList:
-			r.WriteString("<svg><use xlink:href=\"#iconList\"></use></svg>")
-		case ast.NodeListItem:
-			r.WriteString("<svg><use xlink:href=\"#iconListItem\"></use></svg>")
-		}
-		r.Tag("/div", nil, false)
-		left -= 16
 	}
 }
