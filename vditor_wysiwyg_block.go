@@ -254,6 +254,26 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+	case ast.NodeHeading:
+		text := lute.domText(n)
+		if "" == strings.TrimSpace(text) {
+			return
+		}
+		if lute.parentIs(n, atom.Table) {
+			node.Tokens = []byte(strings.TrimSpace(text))
+			for bytes.HasPrefix(node.Tokens, []byte("#")) {
+				node.Tokens = bytes.TrimPrefix(node.Tokens, []byte("#"))
+			}
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
+		node.Type = ast.NodeHeading
+		level := lute.domAttrValue(n, "data-heading-level")
+		node.HeadingLevel, _ = strconv.Atoi(level)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	case ast.NodeBlockquote:
 		content := strings.TrimSpace(lute.domText(n))
 		if "" == content || "&gt;" == content {

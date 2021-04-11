@@ -471,7 +471,7 @@ func (n *Node) IsBlock() bool {
 	return false
 }
 
-// IsContainerBlock
+// IsContainerBlock 判断 n 是否为容器块。
 func (n *Node) IsContainerBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeBlockquote, NodeList, NodeListItem, NodeFootnotesDefBlock, NodeFootnotesDef, NodeSuperBlock:
