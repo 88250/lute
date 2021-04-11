@@ -992,9 +992,11 @@ func (r *VditorBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enterin
 
 func (r *VditorBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<blockquote data-block="0">`)
+		var attrs [][]string
+		r.nodeAttrs(node, &attrs, "blockquote")
+		r.Tag("div", attrs, false)
 	} else {
-		r.WriteString("</blockquote>")
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
