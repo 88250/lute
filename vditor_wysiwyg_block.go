@@ -545,6 +545,171 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+	case atom.Strong, atom.B:
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
+			return
+		}
+		if lute.startsWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+		}
+		text := strings.TrimSpace(lute.domText(n))
+		if lute.isEmptyText(n) {
+			return
+		}
+		if util.Caret == text {
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
+		node.Type = ast.NodeStrong
+		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "**"
+		}
+		if "__" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eOpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: []byte(marker)})
+		}
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+			if "__" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
+			}
+			return
+		}
+
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+		}
+
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case atom.Del, atom.S, atom.Strike:
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
+			return
+		}
+		if lute.startsWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+		}
+		text := strings.TrimSpace(lute.domText(n))
+		if lute.isEmptyText(n) {
+			return
+		}
+		if util.Caret == text {
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
+		node.Type = ast.NodeStrikethrough
+		marker := lute.domAttrValue(n, "data-marker")
+		if "~" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1OpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker, Tokens: []byte(marker)})
+		}
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+			if "~" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
+			}
+			return
+		}
+
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+		}
+
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case atom.Mark:
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
+			return
+		}
+		if lute.startsWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+		}
+		text := strings.TrimSpace(lute.domText(n))
+		if lute.isEmptyText(n) {
+			return
+		}
+		if util.Caret == text {
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
+		node.Type = ast.NodeMark
+		marker := lute.domAttrValue(n, "data-marker")
+		if "=" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark1OpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark2OpenMarker, Tokens: []byte(marker)})
+		}
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+			if "=" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
+			}
+			return
+		}
+
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+		}
+
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
