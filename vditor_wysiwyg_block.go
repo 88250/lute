@@ -231,9 +231,7 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	if "true" == lute.domAttrValue(n, "contenteditable") {
-		content := lute.domText(n)
-		node := &ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(content)}
-		tree.Context.Tip.AppendChild(node)
+		lute.genASTContenteditable(n, tree)
 		return
 	}
 
@@ -395,6 +393,162 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		lute.genASTByVditorBlockDOM(c, tree)
+	}
+
+	switch n.DataAtom {
+	case atom.Em, atom.I:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "*"
+		}
+		if "_" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
+		}
+	case atom.Strong, atom.B:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "**"
+		}
+		if "__" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
+		}
+	case atom.A:
+		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+		href := lute.domAttrValue(n, "href")
+		if "" != lute.RenderOptions.LinkBase {
+			href = strings.ReplaceAll(href, lute.RenderOptions.LinkBase, "")
+		}
+		if "" != lute.RenderOptions.LinkPrefix {
+			href = strings.ReplaceAll(href, lute.RenderOptions.LinkPrefix, "")
+		}
+		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
+		linkTitle := lute.domAttrValue(n, "title")
+		if "" != linkTitle {
+			node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
+			node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
+		}
+		node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+	case atom.Del, atom.S, atom.Strike:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "~" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
+		}
+	case atom.Mark:
+		marker := lute.domAttrValue(n, "data-marker")
+		if "=" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
+		}
+	case atom.Details:
+		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
+	}
+}
+
+func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
+	content := n.Data
+	node := &ast.Node{Type: ast.NodeText, Tokens: []byte(content)}
+	switch n.DataAtom {
+	case 0:
+		if "" == content {
+			return
+		}
+
+		checkIndentCodeBlock := strings.ReplaceAll(content, util.Caret, "")
+		checkIndentCodeBlock = strings.ReplaceAll(checkIndentCodeBlock, "\t", "    ")
+		if (!lute.isInline(n.PrevSibling)) && strings.HasPrefix(checkIndentCodeBlock, "    ") {
+			node.Type = ast.NodeCodeBlock
+			node.IsFencedCodeBlock = true
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
+			startCaret := strings.HasPrefix(content, util.Caret)
+			if startCaret {
+				content = strings.ReplaceAll(content, util.Caret, "")
+			}
+			content = strings.TrimSpace(content)
+			if startCaret {
+				content = util.Caret + content
+			}
+			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: []byte(content)}
+			node.AppendChild(content)
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if nil != n.Parent && atom.A == n.Parent.DataAtom {
+			node.Type = ast.NodeLinkText
+		}
+		tree.Context.Tip.AppendChild(node)
+	case atom.Em, atom.I:
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
+			return
+		}
+		if lute.startsWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+		}
+		text := strings.TrimSpace(lute.domText(n))
+		if lute.isEmptyText(n) {
+			return
+		}
+		if util.Caret == text {
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
+		node.Type = ast.NodeEmphasis
+		marker := lute.domAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "*"
+		}
+		if "_" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeEmU8eOpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: []byte(marker)})
+		}
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+			if "_" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
+			}
+			return
+		}
+
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
+
+		// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+		}
+
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.genASTContenteditable(c, tree)
 	}
 
 	switch n.DataAtom {
