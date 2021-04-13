@@ -384,6 +384,61 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+	case ast.NodeGitConflict:
+		node.Type = ast.NodeGitConflict
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case ast.NodeSuperBlock:
+		node.Type = ast.NodeSuperBlock
+		tree.Context.Tip.AppendChild(node)
+		node.AppendChild(&ast.Node{Type: ast.NodeSuperBlockOpenMarker})
+		layout := lute.domAttrValue(n, "data-sb-layout")
+		node.AppendChild(&ast.Node{Type: ast.NodeSuperBlockLayoutMarker, Tokens: []byte(layout)})
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case ast.NodeMathBlock:
+		node.Type = ast.NodeMathBlock
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case ast.NodeCodeBlock:
+		node.Type = ast.NodeCodeBlock
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case ast.NodeHTMLBlock:
+		node.Type = ast.NodeHTMLBlock
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case ast.NodeYamlFrontMatter:
+		node.Type = ast.NodeYamlFrontMatter
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case ast.NodeBlockEmbed:
+		text := lute.domText(n)
+		if "" == text {
+			return
+		}
+
+		t := parse.Parse("", []byte(text), lute.ParseOptions)
+		t.Root.LastChild.Unlink() // 移除 doc IAL
+		if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
+			ial, id := node.KramdownIAL, node.ID
+			node = blockEmbed
+			node.KramdownIAL, node.ID = ial, id
+			next := blockEmbed.Next
+			tree.Context.Tip.AppendChild(node)
+			appendNextToTip(next, tree)
+			return
+		}
+		node.Type = ast.NodeText
+		node.Tokens = []byte(text)
+		tree.Context.Tip.AppendChild(node)
+		defer tree.Context.ParentTip()
+		return
 	default:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
@@ -395,60 +450,9 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		lute.genASTByVditorBlockDOM(c, tree)
 	}
 
-	switch n.DataAtom {
-	case atom.Em, atom.I:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "*"
-		}
-		if "_" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
-		}
-	case atom.Strong, atom.B:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "**"
-		}
-		if "__" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
-		}
-	case atom.A:
-		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
-		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-		href := lute.domAttrValue(n, "href")
-		if "" != lute.RenderOptions.LinkBase {
-			href = strings.ReplaceAll(href, lute.RenderOptions.LinkBase, "")
-		}
-		if "" != lute.RenderOptions.LinkPrefix {
-			href = strings.ReplaceAll(href, lute.RenderOptions.LinkPrefix, "")
-		}
-		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
-		linkTitle := lute.domAttrValue(n, "title")
-		if "" != linkTitle {
-			node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
-			node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
-		}
-		node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-	case atom.Del, atom.S, atom.Strike:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "~" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
-		}
-	case atom.Mark:
-		marker := lute.domAttrValue(n, "data-marker")
-		if "=" == marker {
-			node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
-		}
-	case atom.Details:
-		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
+	switch dataType {
+	case ast.NodeSuperBlock:
+		node.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker})
 	}
 }
 

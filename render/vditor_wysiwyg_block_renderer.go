@@ -144,15 +144,48 @@ func NewVditorBlockRenderer(tree *parse.Tree, options *Options) *VditorBlockRend
 	//ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
-	//ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
-	//ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
-	//ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
-	//ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
+	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
+	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
+	ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
+	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
 	//ret.RendererFuncs[ast.NodeGitConflict] = ret.renderGitConflict
 	//ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
 	//ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	//ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	return ret
+}
+
+func (r *VditorBlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var attrs [][]string
+		r.nodeAttrs(node, &attrs, "sb")
+		layout := node.FirstChild.Next.TokensStr()
+		if "" == layout {
+			layout = "row"
+		}
+		attrs = append(attrs, []string{"data-sb-layout", layout})
+		r.Tag("div", attrs, false)
+	} else {
+		attrs := [][]string{{"class", "vditor-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
 func (r *VditorBlockRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
