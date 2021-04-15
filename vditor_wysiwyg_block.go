@@ -342,13 +342,15 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.ListData = &ast.ListData{}
 		subType := lute.domAttrValue(n, "data-subtype")
 		if "u" == subType {
-			node.ListData.BulletChar = '*'
 			node.ListData.Typ = 0
+			node.ListData.BulletChar = '*'
 		} else if "o" == subType {
 			node.ListData.Typ = 1
+			node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
+			node.ListData.Delimiter = '.'
 		} else if "t" == subType {
-			node.ListData.BulletChar = '*'
 			node.ListData.Typ = 3
+			node.ListData.BulletChar = '*'
 		}
 		node.ListData.Marker = []byte(marker)
 		tree.Context.Tip.AppendChild(node)
@@ -362,14 +364,15 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 			parent.ListData = &ast.ListData{}
 			subType := lute.domAttrValue(n, "data-subtype")
 			if "u" == subType {
-				node.ListData.BulletChar = '*'
 				node.ListData.Typ = 0
+				node.ListData.BulletChar = '*'
 			} else if "o" == subType {
 				node.ListData.Typ = 1
 				node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
+				node.ListData.Delimiter = '.'
 			} else if "t" == subType {
-				node.ListData.BulletChar = '*'
 				node.ListData.Typ = 3
+				node.ListData.BulletChar = '*'
 			}
 			tree.Context.Tip.AppendChild(parent)
 			tree.Context.Tip = parent
@@ -380,11 +383,14 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		subType := lute.domAttrValue(n, "data-subtype")
 		if "u" == subType {
 			node.ListData.Typ = 0
+			node.ListData.BulletChar = '*'
 		} else if "o" == subType {
 			node.ListData.Typ = 1
 			node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
+			node.ListData.Delimiter = '.'
 		} else if "t" == subType {
 			node.ListData.Typ = 3
+			node.ListData.BulletChar = '*'
 		}
 		node.ListData.Marker = []byte(marker)
 		tree.Context.Tip.AppendChild(node)
