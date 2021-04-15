@@ -33,13 +33,20 @@ func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
 		return ivHTML
 	}
 
+	var num int
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
 			return ast.WalkContinue
 		}
 
+		if ast.NodeList == n.Type {
+			num = 0
+		} else {
+			num++
+		}
+
 		n.ListData.Typ = 1
-		n.ListData.Num = 1
+		n.ListData.Num = num
 		return ast.WalkContinue
 	})
 

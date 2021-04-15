@@ -1078,13 +1078,10 @@ func (r *VditorBlockRenderer) renderList(node *ast.Node, entering bool) ast.Walk
 		}
 		switch node.ListData.Typ {
 		case 0:
-			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "u"})
 		case 1:
-			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + "."})
 			attrs = append(attrs, []string{"data-subtype", "o"})
 		case 3:
-			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			attrs = append(attrs, []string{"data-subtype", "t"})
 		}
 		r.nodeAttrs(node, &attrs, "list")
@@ -1105,13 +1102,10 @@ func (r *VditorBlockRenderer) renderListItem(node *ast.Node, entering bool) ast.
 		var attrs [][]string
 		switch node.ListData.Typ {
 		case 0:
-			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "u"})
 		case 1:
-			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + "."})
 			attrs = append(attrs, []string{"data-subtype", "o"})
 		case 3:
-			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
 			attrs = append(attrs, []string{"data-subtype", "t"})
 		}
 		r.nodeAttrs(node, &attrs, "li")
