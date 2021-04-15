@@ -338,6 +338,7 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeList:
 		node.Type = ast.NodeList
+		marker := lute.domAttrValue(n, "data-marker")
 		node.ListData = &ast.ListData{}
 		subType := lute.domAttrValue(n, "data-subtype")
 		if "u" == subType {
@@ -349,12 +350,12 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.ListData.BulletChar = '*'
 			node.ListData.Typ = 3
 		}
-		marker := lute.domAttrValue(n, "data-marker")
 		node.ListData.Marker = []byte(marker)
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case ast.NodeListItem:
+		marker := lute.domAttrValue(n, "data-marker")
 		if ast.NodeList != tree.Context.Tip.Type {
 			parent := &ast.Node{}
 			parent.Type = ast.NodeList
@@ -365,6 +366,7 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 				node.ListData.Typ = 0
 			} else if "o" == subType {
 				node.ListData.Typ = 1
+				node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
 			} else if "t" == subType {
 				node.ListData.BulletChar = '*'
 				node.ListData.Typ = 3
@@ -383,7 +385,6 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		} else if "t" == subType {
 			node.ListData.Typ = 3
 		}
-		marker := lute.domAttrValue(n, "data-marker")
 		node.ListData.Marker = []byte(marker)
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
