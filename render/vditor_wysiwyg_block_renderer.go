@@ -1042,7 +1042,7 @@ func (r *VditorBlockRenderer) renderHeading(node *ast.Node, entering bool) ast.W
 	if entering {
 		var attrs [][]string
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
-		attrs = append(attrs, []string{"data-heading-level", level})
+		attrs = append(attrs, []string{"data-subtype", "h" + level})
 		r.nodeAttrs(node, &attrs, "h"+level)
 		r.Tag("div", attrs, false)
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}

@@ -315,7 +315,7 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		node.Type = ast.NodeHeading
-		level := lute.domAttrValue(n, "data-heading-level")
+		level := lute.domAttrValue(n, "data-subtype")[1:]
 		node.HeadingLevel, _ = strconv.Atoi(level)
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
