@@ -382,6 +382,7 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 			node.ListData.Typ = 0
 		} else if "o" == subType {
 			node.ListData.Typ = 1
+			node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
 		} else if "t" == subType {
 			node.ListData.Typ = 3
 		}
