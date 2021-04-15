@@ -23,6 +23,30 @@ import (
 	"github.com/88250/lute/util"
 )
 
+func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
+	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
+	if nil != err {
+		return err.Error()
+	}
+
+	if ast.NodeList != tree.Root.FirstChild.Type {
+		return ivHTML
+	}
+
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
+			return ast.WalkContinue
+		}
+
+		n.ListData.Typ = 1
+		n.ListData.Num = 1
+		return ast.WalkContinue
+	})
+
+	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) SpinVditorBlockDOM(ivHTML string) (ovHTML string) {
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
@@ -36,7 +60,6 @@ func (lute *Lute) SpinVditorBlockDOM(ivHTML string) (ovHTML string) {
 	return
 }
 
-// HTML2VditorBlockDOM 将 HTML 转换为 Vditor Instant-Rendering Block DOM。
 func (lute *Lute) HTML2VditorBlockDOM(sHTML string) (vHTML string) {
 	//fmt.Println(sHTML)
 	markdown, err := lute.HTML2Markdown(sHTML)
@@ -55,14 +78,12 @@ func (lute *Lute) HTML2VditorBlockDOM(sHTML string) (vHTML string) {
 	return
 }
 
-// VditorBlockDOM2HTML 将 Vditor Instant-Rendering Block DOM 转换为 HTML，用于 Vditor.getHTML() 接口。
 func (lute *Lute) VditorBlockDOM2HTML(vhtml string) (sHTML string) {
 	markdown := lute.vditorBlockDOM2Md(vhtml)
 	sHTML = lute.Md2HTML(markdown)
 	return
 }
 
-// Md2VditorBlockDOM 将 markdown 转换为 Vditor Instant-Rendering Block DOM。
 func (lute *Lute) Md2VditorBlockDOM(markdown string) (vHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
@@ -74,7 +95,6 @@ func (lute *Lute) Md2VditorBlockDOM(markdown string) (vHTML string) {
 	return
 }
 
-// InlineMd2VditorBlockDOM 将 markdown 以行级方式转换为 Vditor Instant-Rendering Block DOM。
 func (lute *Lute) InlineMd2VditorBlockDOM(markdown string) (vHTML string) {
 	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
@@ -86,7 +106,6 @@ func (lute *Lute) InlineMd2VditorBlockDOM(markdown string) (vHTML string) {
 	return
 }
 
-// VditorBlockDOM2Md 将 Vditor Instant-Rendering DOM 转换为 markdown。
 func (lute *Lute) VditorBlockDOM2Md(htmlStr string) (markdown string) {
 	//fmt.Println(htmlStr)
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
@@ -95,7 +114,6 @@ func (lute *Lute) VditorBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-// VditorBlockDOM2StdMd 将 Vditor Instant-Rendering DOM 转换为标准 markdown。
 func (lute *Lute) VditorBlockDOM2StdMd(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 
@@ -772,8 +790,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
 		}
-	case atom.Details:
-		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}
 }
 

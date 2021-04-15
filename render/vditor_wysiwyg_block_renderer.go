@@ -1078,15 +1078,14 @@ func (r *VditorBlockRenderer) renderList(node *ast.Node, entering bool) ast.Walk
 		}
 		switch node.ListData.Typ {
 		case 0:
-			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+			attrs = append(attrs, []string{"data-marker", "*"})
+			attrs = append(attrs, []string{"data-subtype", "u"})
 		case 1:
-			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + "."})
+			attrs = append(attrs, []string{"data-subtype", "o"})
 		case 3:
-			if 0 == node.ListData.BulletChar {
-				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
-			} else {
-				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
-			}
+			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+			attrs = append(attrs, []string{"data-subtype", "t"})
 		}
 		r.nodeAttrs(node, &attrs, "list")
 		r.Tag("div", attrs, false)
@@ -1106,25 +1105,28 @@ func (r *VditorBlockRenderer) renderListItem(node *ast.Node, entering bool) ast.
 		var attrs [][]string
 		switch node.ListData.Typ {
 		case 0:
-			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+			attrs = append(attrs, []string{"data-marker", "*"})
+			attrs = append(attrs, []string{"data-subtype", "u"})
 		case 1:
-			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + "."})
+			attrs = append(attrs, []string{"data-subtype", "o"})
 		case 3:
-			if 0 == node.ListData.BulletChar {
-				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
-			} else {
-				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
-			}
-			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type { // li.p.task
-				attrs = append(attrs, []string{"class", r.Options.GFMTaskListItemClass})
-			}
+			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+			attrs = append(attrs, []string{"data-subtype", "t"})
 		}
 		r.nodeAttrs(node, &attrs, "li")
 		r.Tag("div", attrs, false)
 
-		attr := [][]string{{"class", "vditor-bullet"}}
-		r.Tag("div", attr, false)
-		r.Tag("/div", nil, false)
+		if 0 == node.ListData.Typ {
+			attr := [][]string{{"class", "vditor-bullet"}}
+			r.Tag("div", attr, false)
+			r.Tag("/div", nil, false)
+		} else if 1 == node.ListData.Typ {
+			attr := [][]string{{"class", "vditor-bullet vditor-bullet--order"}}
+			r.Tag("div", attr, false)
+			r.WriteString(strconv.Itoa(node.Num) + ".")
+			r.Tag("/div", nil, false)
+		}
 	} else {
 		attrs := [][]string{{"class", "vditor-attr"}}
 		r.Tag("div", attrs, false)
