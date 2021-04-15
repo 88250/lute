@@ -23,6 +23,39 @@ import (
 	"github.com/88250/lute/util"
 )
 
+func (lute *Lute) H2P(ivHTML string) (ovHTML string) {
+	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
+	if nil != err {
+		return err.Error()
+	}
+
+	node := tree.Root.FirstChild
+	if ast.NodeHeading != node.Type {
+		return ivHTML
+	}
+
+	node.Type = ast.NodeParagraph
+	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
+	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
+	if nil != err {
+		return err.Error()
+	}
+
+	node := tree.Root.FirstChild
+	if ast.NodeParagraph != node.Type {
+		return ivHTML
+	}
+
+	node.Type = ast.NodeHeading
+	node.HeadingLevel, _ = strconv.Atoi(level)
+	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
 	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
 	if nil != err {
