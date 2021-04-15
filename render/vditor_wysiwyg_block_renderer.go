@@ -1071,11 +1071,6 @@ func (r *VditorBlockRenderer) renderHeadingID(node *ast.Node, entering bool) ast
 func (r *VditorBlockRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		if 0 == node.BulletChar {
-			if 1 != node.Start {
-				attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
-			}
-		}
 		switch node.ListData.Typ {
 		case 0:
 			attrs = append(attrs, []string{"data-subtype", "u"})
@@ -1102,10 +1097,13 @@ func (r *VditorBlockRenderer) renderListItem(node *ast.Node, entering bool) ast.
 		var attrs [][]string
 		switch node.ListData.Typ {
 		case 0:
+			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "u"})
 		case 1:
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + "."})
 			attrs = append(attrs, []string{"data-subtype", "o"})
 		case 3:
+			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "t"})
 		}
 		r.nodeAttrs(node, &attrs, "li")

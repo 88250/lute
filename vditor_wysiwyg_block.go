@@ -23,6 +23,29 @@ import (
 	"github.com/88250/lute/util"
 )
 
+func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
+	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
+	if nil != err {
+		return err.Error()
+	}
+
+	if ast.NodeList != tree.Root.FirstChild.Type {
+		return ivHTML
+	}
+
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
+			return ast.WalkContinue
+		}
+
+		n.ListData.Typ = 0
+		return ast.WalkContinue
+	})
+
+	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
 	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
 	if nil != err {
@@ -251,7 +274,7 @@ func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
-	if class := lute.domAttrValue(n, "class"); "vditor-bullet" == class || "vditor-attr" == class {
+	if class := lute.domAttrValue(n, "class"); strings.Contains(class, "vditor-bullet") || "vditor-attr" == class {
 		return
 	}
 
@@ -316,12 +339,17 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 	case ast.NodeList:
 		node.Type = ast.NodeList
 		node.ListData = &ast.ListData{}
-		marker := lute.domAttrValue(n, "data-marker")
-		if "" == marker {
-			marker = "*"
+		subType := lute.domAttrValue(n, "data-subtype")
+		if "u" == subType {
+			node.ListData.BulletChar = '*'
+			node.ListData.Typ = 0
+		} else if "o" == subType {
+			node.ListData.Typ = 1
+		} else if "t" == subType {
+			node.ListData.BulletChar = '*'
+			node.ListData.Typ = 3
 		}
-
-		node.ListData.BulletChar = '*'
+		marker := lute.domAttrValue(n, "data-marker")
 		node.ListData.Marker = []byte(marker)
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -331,81 +359,32 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 			parent := &ast.Node{}
 			parent.Type = ast.NodeList
 			parent.ListData = &ast.ListData{}
-			marker := lute.domAttrValue(n, "data-marker")
-			if "" == marker {
-				marker = "*"
-			}
-			if "*" != marker {
-				parent.ListData.Typ = 1
+			subType := lute.domAttrValue(n, "data-subtype")
+			if "u" == subType {
+				node.ListData.BulletChar = '*'
+				node.ListData.Typ = 0
+			} else if "o" == subType {
+				node.ListData.Typ = 1
+			} else if "t" == subType {
+				node.ListData.BulletChar = '*'
+				node.ListData.Typ = 3
 			}
 			tree.Context.Tip.AppendChild(parent)
 			tree.Context.Tip = parent
 		}
 
 		node.Type = ast.NodeListItem
-		marker := lute.domAttrValue(n, "data-marker")
-		var bullet byte
-		if "" == marker {
-			if nil != n.Parent && atom.Ol == n.Parent.DataAtom {
-				firstLiMarker := lute.domAttrValue(n.Parent.FirstChild, "data-marker")
-				if startAttr := lute.domAttrValue(n.Parent, "start"); "" == startAttr {
-					marker = "1"
-				} else {
-					marker = startAttr
-				}
-				if "" != firstLiMarker {
-					marker += firstLiMarker[len(firstLiMarker)-1:]
-				} else {
-					marker += "."
-				}
-			} else {
-				marker = lute.domAttrValue(n.Parent, "data-marker")
-				if "" == marker {
-					marker = "*"
-				}
-				bullet = marker[0]
-			}
-		} else {
-			if nil != n.Parent {
-				if atom.Ol == n.Parent.DataAtom || tree.Context.Tip.Typ == 1 {
-					if "*" == marker || "-" == marker || "+" == marker {
-						marker = "1."
-					}
-					if "1." != marker && "1)" != marker && nil != n.PrevSibling && atom.Li != n.PrevSibling.DataAtom &&
-						nil != n.Parent.Parent && (atom.Ol == n.Parent.Parent.DataAtom || atom.Ul == n.Parent.Parent.DataAtom) {
-						// 子有序列表第一项必须从 1 开始
-						marker = "1."
-					}
-					if "1." != marker && "1)" != marker && atom.Ol == n.Parent.DataAtom && n.Parent.FirstChild == n && "" == lute.domAttrValue(n.Parent, "start") {
-						marker = "1."
-					}
-				} else {
-					if "*" != marker && "-" != marker && "+" != marker {
-						marker = "*"
-					}
-					bullet = marker[0]
-				}
-			} else {
-				marker = lute.domAttrValue(n, "data-marker")
-				if "" == marker {
-					marker = "*"
-				}
-				bullet = marker[0]
-			}
-		}
-		node.ListData = &ast.ListData{Marker: []byte(marker), BulletChar: bullet}
-		if 0 == bullet {
-			node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
-			node.ListData.Delimiter = marker[len(marker)-1]
-		}
-		if nil == n.FirstChild {
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp)})
-		}
-		if "vditor-task" == lute.domAttrValue(n, "class") {
+		node.ListData = &ast.ListData{}
+		subType := lute.domAttrValue(n, "data-subtype")
+		if "u" == subType {
+			node.ListData.Typ = 0
+		} else if "o" == subType {
+			node.ListData.Typ = 1
+		} else if "t" == subType {
 			node.ListData.Typ = 3
-			tree.Context.Tip.ListData.Typ = 3
 		}
-
+		marker := lute.domAttrValue(n, "data-marker")
+		node.ListData.Marker = []byte(marker)
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
