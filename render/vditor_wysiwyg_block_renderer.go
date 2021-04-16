@@ -215,15 +215,6 @@ func (r *VditorBlockRenderer) renderKramdownBlockIAL(node *ast.Node, entering bo
 }
 
 func (r *VditorBlockRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if "" == previousNodeText {
-			r.WriteString(parse.Zwsp)
-		}
-	} else {
-		r.WriteString(parse.Zwsp)
-	}
 	return ast.WalkContinue
 }
 
@@ -468,7 +459,7 @@ func (r *VditorBlockRenderer) renderInlineMathContent(node *ast.Node, entering b
 		return ast.WalkContinue
 	}
 
-	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
+	tokens := node.Tokens
 	previewTokens := tokens
 	codeAttrs := [][]string{{"data-type", "math-inline"}}
 	if !bytes.Contains(previewTokens, util.CaretTokens) {
@@ -477,7 +468,6 @@ func (r *VditorBlockRenderer) renderInlineMathContent(node *ast.Node, entering b
 	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
 	r.Tag("code", codeAttrs, false)
 	tokens = html.EscapeHTML(tokens)
-	tokens = append([]byte(parse.Zwsp), tokens...)
 	r.Write(tokens)
 	r.WriteString("</code>")
 
@@ -487,7 +477,7 @@ func (r *VditorBlockRenderer) renderInlineMathContent(node *ast.Node, entering b
 	r.Write(previewTokens)
 	r.Tag("/span", nil, false)
 	r.Tag("/span", nil, false)
-	r.WriteString("</span>" + parse.Zwsp)
+	r.WriteString("</span>")
 	return ast.WalkContinue
 }
 
@@ -496,13 +486,6 @@ func (r *VditorBlockRenderer) renderInlineMathOpenMarker(node *ast.Node, enterin
 }
 
 func (r *VditorBlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if "" == previousNodeText {
-			r.WriteString(parse.Zwsp)
-		}
-	}
 	return ast.WalkContinue
 }
 
@@ -699,11 +682,6 @@ func (r *VditorBlockRenderer) renderBang(node *ast.Node, entering bool) ast.Walk
 func (r *VditorBlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if 3 == node.LinkType {
-			previousNodeText := node.PreviousNodeText()
-			previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-			if "" == previousNodeText {
-				r.WriteString(parse.Zwsp)
-			}
 			r.WriteString("<img src=\"")
 			link := r.Tree.FindLinkRefDefLink(node.LinkRefLabel)
 			destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
@@ -779,18 +757,12 @@ func (r *VditorBlockRenderer) renderImage(node *ast.Node, entering bool) ast.Wal
 func (r *VditorBlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if 3 == node.LinkType {
 		if entering {
-			previousNodeText := node.PreviousNodeText()
-			previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-			if "" == previousNodeText {
-				r.WriteString(parse.Zwsp)
-			}
 			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
 			label := string(node.LinkRefLabel)
 			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
 			r.Tag("span", attrs, false)
 			r.WriteString(text)
 			r.Tag("/span", nil, false)
-			r.WriteString(parse.Zwsp)
 			return ast.WalkSkipChildren
 		} else {
 			return ast.WalkContinue
@@ -939,9 +911,8 @@ func (r *VditorBlockRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering 
 
 func (r *VditorBlockRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
+		tokens := node.Tokens
 		tokens = html.EscapeHTML(tokens)
-		tokens = append([]byte(parse.Zwsp), tokens...)
 		r.Write(tokens)
 	}
 	return ast.WalkContinue
@@ -954,7 +925,6 @@ func (r *VditorBlockRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering
 		if codeSpanParent := codeSpan.Parent; nil != codeSpanParent && ast.NodeLink == codeSpanParent.Type {
 			return ast.WalkContinue
 		}
-		r.WriteString(parse.Zwsp)
 	}
 	return ast.WalkContinue
 }
