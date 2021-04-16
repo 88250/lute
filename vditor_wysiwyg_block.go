@@ -531,6 +531,26 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeLinkText
 		}
 		tree.Context.Tip.AppendChild(node)
+	case atom.Sub:
+		if lute.isEmptyText(n) {
+			return
+		}
+
+		node.Type = ast.NodeSub
+		node.AppendChild(&ast.Node{Type: ast.NodeSubOpenMarker})
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case atom.Sup:
+		if lute.isEmptyText(n) {
+			return
+		}
+
+		node.Type = ast.NodeSup
+		node.AppendChild(&ast.Node{Type: ast.NodeSupOpenMarker})
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	case atom.U:
 		if lute.isEmptyText(n) {
 			return
@@ -771,6 +791,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch n.DataAtom {
+	case atom.Sub:
+		node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
+	case atom.Sup:
+		node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
 	case atom.U:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("</u>")})
 	case atom.Em, atom.I:
