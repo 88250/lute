@@ -471,7 +471,8 @@ func (r *VditorBlockRenderer) renderInlineMath(node *ast.Node, entering bool) as
 
 func (r *VditorBlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("span", [][]string{{"data-type", "inline-math"}}, false)
+		tokens := html.EscapeHTML(node.Next.Tokens)
+		r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-content", util.BytesToStr(tokens)}}, false)
 	}
 	return ast.WalkContinue
 }
@@ -757,20 +758,6 @@ func (r *VditorBlockRenderer) renderImage(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *VditorBlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
-	if 3 == node.LinkType {
-		if entering {
-			text := string(node.ChildByType(ast.NodeLinkText).Tokens)
-			label := string(node.LinkRefLabel)
-			attrs := [][]string{{"data-type", "link-ref"}, {"data-link-label", label}}
-			r.Tag("span", attrs, false)
-			r.WriteString(text)
-			r.Tag("/span", nil, false)
-			return ast.WalkSkipChildren
-		} else {
-			return ast.WalkContinue
-		}
-	}
-
 	if entering {
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
@@ -781,14 +768,13 @@ func (r *VditorBlockRenderer) renderLink(node *ast.Node, entering bool) ast.Walk
 			text.Tokens = append(text.Tokens, util.CaretTokens...)
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		}
-		attrs := [][]string{{"href", string(destTokens)}}
+		attrs := [][]string{{"data-href", string(destTokens)}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			title.Tokens = bytes.ReplaceAll(title.Tokens, util.CaretTokens, nil)
-			attrs = append(attrs, []string{"title", string(title.Tokens)})
+			attrs = append(attrs, []string{"data-title", util.BytesToStr(title.Tokens)})
 		}
-		r.Tag("a", attrs, false)
+		r.Tag("span", attrs, false)
 	} else {
-		r.Tag("/a", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
