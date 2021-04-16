@@ -12,11 +12,10 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"strconv"
-	"strings"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
@@ -336,15 +335,9 @@ func (r *VditorBlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) as
 		return ast.WalkContinue
 	}
 
-	previousNodeText := node.PreviousNodeText()
-	previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-	if "" == previousNodeText {
-		r.WriteString(parse.Zwsp)
-	}
-
 	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"html-entity\">")
 	r.Tag("code", [][]string{{"data-type", "html-entity"}, {"style", "display: none"}}, false)
-	tokens := append([]byte(parse.Zwsp), node.HtmlEntityTokens...)
+	tokens := node.HtmlEntityTokens
 	r.Write(html.EscapeHTML(tokens))
 	r.WriteString("</code>")
 
@@ -354,7 +347,7 @@ func (r *VditorBlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) as
 	r.Write(previewTokens)
 	r.Tag("/code", nil, false)
 	r.Tag("/span", nil, false)
-	r.WriteString("</span>" + parse.Zwsp)
+	r.WriteString("</span>")
 	return ast.WalkContinue
 }
 
@@ -415,18 +408,13 @@ func (r *VditorBlockRenderer) renderFootnotesDef(node *ast.Node, entering bool) 
 
 func (r *VditorBlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if "" == previousNodeText {
-			r.WriteString(parse.Zwsp)
-		}
 		idx, def := r.Tree.FindFootnotesDef(node.Tokens)
 		idxStr := strconv.Itoa(idx)
 		label := def.Text()
 		r.Tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)},
 			{"class", "vditor-tooltipped vditor-tooltipped__s"}, {"aria-label", SubStr(html.EscapeString(label), 24)}}, false)
 		r.WriteString(idxStr)
-		r.WriteString("</sup>" + parse.Zwsp)
+		r.WriteString("</sup>")
 	}
 	return ast.WalkContinue
 }
@@ -849,17 +837,7 @@ func (r *VditorBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast
 
 func (r *VditorBlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		tokens := node.Tokens
-		if r.Options.FixTermTypo {
-			tokens = r.FixTermTypo(tokens)
-		}
-
-		tokens = bytes.TrimRight(tokens, "\n")
-		// 有的场景需要零宽空格撑起，但如果有其他文本内容的话需要把零宽空格删掉
-		if !bytes.EqualFold(tokens, []byte(util.Caret+parse.Zwsp)) {
-			tokens = bytes.ReplaceAll(tokens, []byte(parse.Zwsp), nil)
-		}
-		r.Write(html.EscapeHTML(tokens))
+		r.Write(html.EscapeHTML(node.Tokens))
 	}
 	return ast.WalkContinue
 }
