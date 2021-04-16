@@ -460,7 +460,7 @@ func (r *VditorBlockRenderer) renderInlineMath(node *ast.Node, entering bool) as
 func (r *VditorBlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := html.EscapeHTML(node.Next.Tokens)
-		r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-content", util.BytesToStr(tokens)}}, false)
+		r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}}, false)
 	}
 	return ast.WalkContinue
 }
