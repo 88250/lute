@@ -139,9 +139,9 @@ func NewVditorBlockRenderer(tree *parse.Tree, options *Options) *VditorBlockRend
 	//ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
 	//ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
 	//ret.RendererFuncs[ast.NodeBlockEmbedTextTplRenderResult] = ret.renderBlockEmbedTextTplRenderResult
-	//ret.RendererFuncs[ast.NodeTag] = ret.renderTag
-	//ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
-	//ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
+	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
+	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
+	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
 	ret.RendererFuncs[ast.NodeLinkRefDefBlock] = ret.renderLinkRefDefBlock
 	ret.RendererFuncs[ast.NodeLinkRefDef] = ret.renderLinkRefDef
 	ret.RendererFuncs[ast.NodeSuperBlock] = ret.renderSuperBlock
@@ -153,6 +153,24 @@ func NewVditorBlockRenderer(tree *parse.Tree, options *Options) *VditorBlockRend
 	//ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	//ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	return ret
+}
+
+func (r *VditorBlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("span", [][]string{{"data-type", "tag"}}, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("/span", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *VditorBlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
@@ -220,7 +238,7 @@ func (r *VditorBlockRenderer) renderMark(node *ast.Node, entering bool) ast.Walk
 
 func (r *VditorBlockRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("mark", [][]string{{"data-marker", "="}}, false)
+		r.Tag("mark", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -234,7 +252,7 @@ func (r *VditorBlockRenderer) renderMark1CloseMarker(node *ast.Node, entering bo
 
 func (r *VditorBlockRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("mark", [][]string{{"data-marker", "=="}}, false)
+		r.Tag("mark", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -252,7 +270,7 @@ func (r *VditorBlockRenderer) renderSup(node *ast.Node, entering bool) ast.WalkS
 
 func (r *VditorBlockRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("sup", [][]string{{"data-marker", "^"}}, false)
+		r.Tag("sup", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -270,7 +288,7 @@ func (r *VditorBlockRenderer) renderSub(node *ast.Node, entering bool) ast.WalkS
 
 func (r *VditorBlockRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("sub", [][]string{{"data-marker", "~"}}, false)
+		r.Tag("sub", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -606,7 +624,7 @@ func (r *VditorBlockRenderer) renderStrikethrough(node *ast.Node, entering bool)
 
 func (r *VditorBlockRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("s", [][]string{{"data-marker", "~"}}, false)
+		r.Tag("s", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -620,7 +638,7 @@ func (r *VditorBlockRenderer) renderStrikethrough1CloseMarker(node *ast.Node, en
 
 func (r *VditorBlockRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("s", [][]string{{"data-marker", "~~"}}, false)
+		r.Tag("s", nil, false)
 	}
 	return ast.WalkContinue
 }
