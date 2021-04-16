@@ -823,25 +823,13 @@ func (r *VditorBlockRenderer) renderInlineHTML(node *ast.Node, entering bool) as
 		return ast.WalkContinue
 	}
 
-	if bytes.Contains(node.Tokens, []byte("<span class=\"vditor-comment")) || bytes.Equal(node.Tokens, []byte("</span>")) {
+	if bytes.Equal(node.Tokens, []byte("<u>")) || bytes.Equal(node.Tokens, []byte("</u>")) {
 		r.Write(node.Tokens)
 		return ast.WalkContinue
 	}
 
-	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if parse.Zwsp == previousNodeText || "" == previousNodeText {
-			r.WriteString(parse.Zwsp)
-		}
-	}
-
-	tokens := bytes.ReplaceAll(node.Tokens, []byte(parse.Zwsp), nil)
-	tokens = append([]byte(parse.Zwsp), tokens...)
-
-	node.Tokens = bytes.TrimSpace(node.Tokens)
 	r.Tag("code", [][]string{{"data-type", "html-inline"}}, false)
-	tokens = html.EscapeHTML(tokens)
+	tokens := html.EscapeHTML(node.Tokens)
 	r.Write(tokens)
 	r.WriteString("</code>")
 	return ast.WalkContinue
