@@ -550,6 +550,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()
+		} else if "inline-math" == dataType {
+			node.Type = ast.NodeInlineMath
+			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
+			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent})
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
 		}
 	case atom.Sub:
 		if lute.isEmptyText(n) {
@@ -817,6 +824,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		dataType := lute.domAttrValue(n, "data-type")
 		if "tag" == dataType {
 			node.AppendChild(&ast.Node{Type: ast.NodeTagCloseMarker})
+		} else if "inline-math" == dataType {
+			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
 		}
 	case atom.Sub:
 		node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})

@@ -465,42 +465,29 @@ func (r *VditorBlockRenderer) renderEmoji(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkContinue
 }
 
-func (r *VditorBlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *VditorBlockRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		return ast.WalkContinue
-	}
-
-	tokens := node.Tokens
-	previewTokens := tokens
-	codeAttrs := [][]string{{"data-type", "math-inline"}}
-	if !bytes.Contains(previewTokens, util.CaretTokens) {
-		codeAttrs = append(codeAttrs, []string{"style", "display: none"})
-	}
-	r.WriteString("<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\">")
-	r.Tag("code", codeAttrs, false)
-	tokens = html.EscapeHTML(tokens)
-	r.Write(tokens)
-	r.WriteString("</code>")
-
-	r.Tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	r.Tag("span", [][]string{{"class", "language-math"}}, false)
-	previewTokens = bytes.ReplaceAll(previewTokens, util.CaretTokens, nil)
-	r.Write(previewTokens)
-	r.Tag("/span", nil, false)
-	r.Tag("/span", nil, false)
-	r.WriteString("</span>")
+func (r *VditorBlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
 func (r *VditorBlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("span", [][]string{{"data-type", "inline-math"}}, false)
+	}
 	return ast.WalkContinue
 }
 
-func (r *VditorBlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *VditorBlockRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		tokens := html.EscapeHTML(node.Tokens)
+		r.Write(tokens)
+	}
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("/span", nil, false)
+	}
 	return ast.WalkContinue
 }
 
@@ -892,13 +879,13 @@ func (r *VditorBlockRenderer) renderText(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *VditorBlockRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Tag("code", nil, false)
-	}
 	return ast.WalkContinue
 }
 
 func (r *VditorBlockRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("code", nil, false)
+	}
 	return ast.WalkContinue
 }
 
