@@ -12,12 +12,9 @@ package render
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
-	"unicode"
-	"unicode/utf8"
-
-	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -896,17 +893,7 @@ func (r *VditorBlockRenderer) renderText(node *ast.Node, entering bool) ast.Walk
 
 func (r *VditorBlockRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		previousNodeText := node.PreviousNodeText()
-		previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
-		if "" == previousNodeText {
-			r.WriteString(parse.Zwsp)
-		} else {
-			lastc, _ := utf8.DecodeLastRuneInString(previousNodeText)
-			if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
-				r.WriteByte(lex.ItemSpace)
-			}
-		}
-		r.Tag("code", [][]string{{"data-marker", strings.Repeat("`", node.CodeMarkerLen)}}, false)
+		r.Tag("code", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -917,8 +904,7 @@ func (r *VditorBlockRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering 
 
 func (r *VditorBlockRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		tokens := node.Tokens
-		tokens = html.EscapeHTML(tokens)
+		tokens := html.EscapeHTML(node.Tokens)
 		r.Write(tokens)
 	}
 	return ast.WalkContinue
@@ -927,10 +913,6 @@ func (r *VditorBlockRenderer) renderCodeSpanContent(node *ast.Node, entering boo
 func (r *VditorBlockRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("</code>")
-		codeSpan := node.Parent
-		if codeSpanParent := codeSpan.Parent; nil != codeSpanParent && ast.NodeLink == codeSpanParent.Type {
-			return ast.WalkContinue
-		}
 	}
 	return ast.WalkContinue
 }
