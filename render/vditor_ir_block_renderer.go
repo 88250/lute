@@ -26,6 +26,7 @@ import (
 )
 
 // VditorIRBlockRenderer 描述了 Vditor Instant-Rendering Block DOM 渲染器。
+// TODO: 移除即时渲染块（IR Block）模式 https://github.com/88250/lute/issues/139
 type VditorIRBlockRenderer struct {
 	*BaseRenderer
 	NodeIndex int

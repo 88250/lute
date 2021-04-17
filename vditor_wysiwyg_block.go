@@ -553,7 +553,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		} else if "inline-math" == dataType {
 			node.Type = ast.NodeInlineMath
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
-			content := lute.domAttrValue(n, "data-content")
+			content = lute.domAttrValue(n, "data-content")
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(content)})
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
 			tree.Context.Tip.AppendChild(node)

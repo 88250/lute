@@ -25,6 +25,7 @@ import (
 )
 
 // SpinVditorIRBlockDOM 自旋 Vditor Instant-Rendering Block DOM。
+// TODO: 移除即时渲染块（IR Block）模式 https://github.com/88250/lute/issues/139
 func (lute *Lute) SpinVditorIRBlockDOM(ivHTML string) (ovHTML string) {
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)

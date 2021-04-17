@@ -17,6 +17,8 @@ import (
 	"github.com/88250/lute"
 )
 
+// TODO: 移除即时渲染块（IR Block）模式 https://github.com/88250/lute/issues/139
+
 var spinVditorIRBlockDOMTests = []*parseTest{
 
 	{"129", "<p data-block-index=\"1\" data-node-id=\"20210406113023-abgc92r\" data-type=\"p\" updated=\"20210406115544\">&lt;iframe&gt;<wbr></p>", "<div data-node-id=\"20210406113023-abgc92r\" data-block-index=\"1\" updated=\"20210406115544\" data-type=\"html-block\" class=\"vditor-ir__node vditor-ir__node--expand\"><pre class=\"vditor-ir__marker--pre vditor-ir__marker\"><code data-type=\"html-block\">&lt;iframe&gt;<wbr>&lt;/iframe&gt;</code></pre><pre class=\"vditor-ir__preview\" data-render=\"2\"><iframe></iframe></pre></div>"},
