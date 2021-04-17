@@ -171,7 +171,6 @@ func (lute *Lute) InlineMd2VditorBlockDOM(markdown string) (vHTML string) {
 
 func (lute *Lute) VditorBlockDOM2Md(htmlStr string) (markdown string) {
 	//fmt.Println(htmlStr)
-	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	markdown = lute.vditorBlockDOM2Md(htmlStr)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
 	return
@@ -289,6 +288,7 @@ func (lute *Lute) VditorBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err erro
 }
 
 func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
+	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
 	if nil != err {
 		return err.Error()
