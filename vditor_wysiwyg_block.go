@@ -704,6 +704,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
 		}
 
+		lute.setSpanIAL(n, node)
+
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Del, atom.S, atom.Strike:
@@ -885,6 +887,17 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
 		}
+	}
+}
+
+func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
+	style := lute.domAttrValue(n, "style")
+	if "" != style {
+		node.SetIALAttr("style", style)
+		node.KramdownIAL = [][]string{{"style", style}}
+		ialTokens := []byte("{: style=\"" + style + "\"}")
+		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+		node.InsertAfter(ial)
 	}
 }
 

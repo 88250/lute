@@ -127,7 +127,7 @@ func NewVditorBlockRenderer(tree *parse.Tree, options *Options) *VditorBlockRend
 	ret.RendererFuncs[ast.NodeSubOpenMarker] = ret.renderSubOpenMarker
 	ret.RendererFuncs[ast.NodeSubCloseMarker] = ret.renderSubCloseMarker
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
-	//ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
+	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	//ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	//ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
 	//ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
@@ -172,7 +172,7 @@ func (r *VditorBlockRenderer) renderTagCloseMarker(node *ast.Node, entering bool
 func (r *VditorBlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		r.nodeAttrs(node, &attrs, "sb")
+		r.blockNodeAttrs(node, &attrs, "sb")
 		layout := node.FirstChild.Next.TokensStr()
 		if "" == layout {
 			layout = "row"
@@ -225,6 +225,10 @@ func (r *VditorBlockRenderer) renderLinkRefDef(node *ast.Node, entering bool) as
 }
 
 func (r *VditorBlockRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
@@ -818,7 +822,7 @@ func (r *VditorBlockRenderer) renderDocument(node *ast.Node, entering bool) ast.
 func (r *VditorBlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		r.nodeAttrs(node, &attrs, "p")
+		r.blockNodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
@@ -874,7 +878,7 @@ func (r *VditorBlockRenderer) renderEmphasis(node *ast.Node, entering bool) ast.
 
 func (r *VditorBlockRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", [][]string{{"data-marker", "*"}}, false)
+		r.Tag("em", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -888,7 +892,7 @@ func (r *VditorBlockRenderer) renderEmAsteriskCloseMarker(node *ast.Node, enteri
 
 func (r *VditorBlockRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", [][]string{{"data-marker", "_"}}, false)
+		r.Tag("em", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -906,7 +910,9 @@ func (r *VditorBlockRenderer) renderStrong(node *ast.Node, entering bool) ast.Wa
 
 func (r *VditorBlockRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("strong", [][]string{{"data-marker", "**"}}, false)
+		var attrs [][]string
+		r.spanNodeAttrs(node.Parent, &attrs)
+		r.Tag("strong", attrs, false)
 	}
 	return ast.WalkContinue
 }
@@ -920,7 +926,7 @@ func (r *VditorBlockRenderer) renderStrongA6kCloseMarker(node *ast.Node, enterin
 
 func (r *VditorBlockRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("strong", [][]string{{"data-marker", "__"}}, false)
+		r.Tag("strong", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -935,7 +941,7 @@ func (r *VditorBlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, enterin
 func (r *VditorBlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		r.nodeAttrs(node, &attrs, "bq")
+		r.blockNodeAttrs(node, &attrs, "bq")
 		r.Tag("div", attrs, false)
 	} else {
 		r.Tag("/div", nil, false)
@@ -952,7 +958,7 @@ func (r *VditorBlockRenderer) renderHeading(node *ast.Node, entering bool) ast.W
 		var attrs [][]string
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		attrs = append(attrs, []string{"data-subtype", "h" + level})
-		r.nodeAttrs(node, &attrs, "h"+level)
+		r.blockNodeAttrs(node, &attrs, "h"+level)
 		r.Tag("div", attrs, false)
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
@@ -988,7 +994,7 @@ func (r *VditorBlockRenderer) renderList(node *ast.Node, entering bool) ast.Walk
 		case 3:
 			attrs = append(attrs, []string{"data-subtype", "t"})
 		}
-		r.nodeAttrs(node, &attrs, "list")
+		r.blockNodeAttrs(node, &attrs, "list")
 		r.Tag("div", attrs, false)
 	} else {
 		attrs := [][]string{{"class", "vditor-attr"}}
@@ -1015,7 +1021,7 @@ func (r *VditorBlockRenderer) renderListItem(node *ast.Node, entering bool) ast.
 			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "t"})
 		}
-		r.nodeAttrs(node, &attrs, "li")
+		r.blockNodeAttrs(node, &attrs, "li")
 		r.Tag("div", attrs, false)
 
 		if 0 == node.ListData.Typ {
@@ -1080,13 +1086,11 @@ func (r *VditorBlockRenderer) renderSoftBreak(node *ast.Node, entering bool) ast
 
 func (r *VditorBlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		marker := "```"
-		if nil != node.FirstChild && bytes.HasPrefix(node.FirstChild.Tokens, []byte(marker)) {
-			marker = string(node.FirstChild.Tokens)
-		}
-		r.WriteString(`<div class="vditor-wysiwyg__block" data-type="code-block" data-block="0" data-marker="` + marker + `">`)
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "code-block")
+		r.Tag("div", attrs, false)
 	} else {
-		r.WriteString("</div>")
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1155,7 +1159,11 @@ func (r *VditorBlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool)
 	return ast.WalkContinue
 }
 
-func (r *VditorBlockRenderer) nodeAttrs(node *ast.Node, attrs *[][]string, class string) {
+func (r *VditorBlockRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
+	*attrs = append(*attrs, node.KramdownIAL...)
+}
+
+func (r *VditorBlockRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class string) {
 	r.nodeID(node, attrs)
 	r.nodeIndex(node, attrs)
 	r.nodeDataType(node, attrs)
