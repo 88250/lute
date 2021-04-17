@@ -144,11 +144,47 @@ func NewVditorBlockRenderer(tree *parse.Tree, options *Options) *VditorBlockRend
 	ret.RendererFuncs[ast.NodeSuperBlockOpenMarker] = ret.renderSuperBlockOpenMarker
 	ret.RendererFuncs[ast.NodeSuperBlockLayoutMarker] = ret.renderSuperBlockLayoutMarker
 	ret.RendererFuncs[ast.NodeSuperBlockCloseMarker] = ret.renderSuperBlockCloseMarker
-	//ret.RendererFuncs[ast.NodeGitConflict] = ret.renderGitConflict
-	//ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
-	//ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
-	//ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
+	ret.RendererFuncs[ast.NodeGitConflict] = ret.renderGitConflict
+	ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
+	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
+	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	return ret
+}
+
+func (r *VditorBlockRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderGitConflictContent(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "git-conflict")
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		r.Tag("div", attrs, false)
+
+		tokens := bytes.TrimSpace(node.Tokens)
+		r.Write(html.EscapeHTML(tokens))
+	} else {
+		r.Tag("/div", nil, false)
+
+		attrs := [][]string{{"class", "vditor-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
+	}
+
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderGitConflictOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorBlockRenderer) renderGitConflict(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
 func (r *VditorBlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
@@ -772,24 +808,28 @@ func (r *VditorBlockRenderer) renderLink(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *VditorBlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		return ast.WalkContinue
-	}
+	if entering {
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "html")
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		r.Tag("div", attrs, false)
 
-	r.WriteString(`<div class="vditor-wysiwyg__block" data-type="html-block" data-block="0">`)
-	tokens := bytes.TrimSpace(node.Tokens)
-	r.WriteString("<pre>")
-	r.Tag("code", nil, false)
-	r.Write(html.EscapeHTML(tokens))
-	r.WriteString("</code></pre>")
+		tokens := bytes.TrimSpace(node.Tokens)
+		r.WriteString("<pre>")
+		r.Tag("code", nil, false)
+		r.Write(html.EscapeHTML(tokens))
+		r.WriteString("</code></pre>")
+	} else {
+		r.Tag("/div", nil, false)
 
-	r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	if r.Options.Sanitize {
-		tokens = sanitize(tokens)
+		attrs := [][]string{{"class", "vditor-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
 	}
-	r.Write(tokens)
-	r.WriteString("</pre></div>")
 	return ast.WalkContinue
 }
 
