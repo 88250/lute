@@ -307,7 +307,8 @@ func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
-	if class := lute.domAttrValue(n, "class"); strings.Contains(class, "vditor-bullet") || "vditor-attr" == class {
+	if class := lute.domAttrValue(n, "class"); "vditor-attr" == class ||
+		strings.Contains(class, "vditor-bullet") || strings.Contains(class, "vditor-meta") {
 		return
 	}
 
@@ -445,6 +446,8 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeCodeBlock:
 		node.Type = ast.NodeCodeBlock
+		node.IsFencedCodeBlock = true
+		node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```")})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -498,6 +501,18 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 }
 
 func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
+	if ast.NodeCodeBlock == tree.Context.Tip.Type {
+		languageNode := n.PrevSibling.FirstChild
+		language := "plaintext"
+		if nil != languageNode.FirstChild {
+			language = languageNode.FirstChild.Data
+		}
+		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, Tokens: util.StrToBytes(language)})
+		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(lute.domText(n))})
+		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```")})
+		return
+	}
+
 	content := n.Data
 	node := &ast.Node{Type: ast.NodeText, Tokens: []byte(content)}
 	switch n.DataAtom {
