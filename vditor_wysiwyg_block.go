@@ -542,7 +542,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
-		if nil != n.Parent && atom.A == n.Parent.DataAtom {
+		if ast.NodeLink == tree.Context.Tip.Type {
 			node.Type = ast.NodeLinkText
 		}
 		tree.Context.Tip.AppendChild(node)
@@ -575,6 +575,12 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()
 			return
+		} else if "a" == dataType {
+			node.Type = ast.NodeLink
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
 		}
 	case atom.Sub:
 		if lute.isEmptyText(n) {
@@ -844,6 +850,23 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		dataType := lute.domAttrValue(n, "data-type")
 		if "tag" == dataType {
 			node.AppendChild(&ast.Node{Type: ast.NodeTagCloseMarker})
+		} else if "a" == dataType {
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			href := lute.domAttrValue(n, "data-href")
+			if "" != lute.RenderOptions.LinkBase {
+				href = strings.ReplaceAll(href, lute.RenderOptions.LinkBase, "")
+			}
+			if "" != lute.RenderOptions.LinkPrefix {
+				href = strings.ReplaceAll(href, lute.RenderOptions.LinkPrefix, "")
+			}
+			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
+			linkTitle := lute.domAttrValue(n, "data-title")
+			if "" != linkTitle {
+				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
+				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
+			}
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 		}
 	case atom.Sub:
 		node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
@@ -871,23 +894,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
 		}
-	case atom.A:
-		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
-		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-		href := lute.domAttrValue(n, "href")
-		if "" != lute.RenderOptions.LinkBase {
-			href = strings.ReplaceAll(href, lute.RenderOptions.LinkBase, "")
-		}
-		if "" != lute.RenderOptions.LinkPrefix {
-			href = strings.ReplaceAll(href, lute.RenderOptions.LinkPrefix, "")
-		}
-		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
-		linkTitle := lute.domAttrValue(n, "title")
-		if "" != linkTitle {
-			node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
-			node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
-		}
-		node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	case atom.Del, atom.S, atom.Strike:
 		marker := lute.domAttrValue(n, "data-marker")
 		if "~" == marker {

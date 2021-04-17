@@ -796,7 +796,7 @@ func (r *VditorBlockRenderer) renderLink(node *ast.Node, entering bool) ast.Walk
 			text.Tokens = append(text.Tokens, util.CaretTokens...)
 			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		}
-		attrs := [][]string{{"data-href", string(destTokens)}}
+		attrs := [][]string{{"data-type", "a"}, {"data-href", string(destTokens)}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
 			attrs = append(attrs, []string{"data-title", util.BytesToStr(title.Tokens)})
 		}
