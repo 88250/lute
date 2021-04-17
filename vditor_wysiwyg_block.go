@@ -895,7 +895,7 @@ func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 	if "" != style {
 		node.SetIALAttr("style", style)
 		node.KramdownIAL = [][]string{{"style", style}}
-		ialTokens := []byte("{: style=\"" + style + "\"}")
+		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 		node.InsertAfter(ial)
 	}
