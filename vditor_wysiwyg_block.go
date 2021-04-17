@@ -308,7 +308,8 @@ func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
 
 func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 	if class := lute.domAttrValue(n, "class"); "vditor-attr" == class ||
-		strings.Contains(class, "vditor-bullet") || strings.Contains(class, "vditor-meta") {
+		strings.Contains(class, "vditor-bullet") || strings.Contains(class, "vditor-meta") ||
+		strings.Contains(class, "vditor-linenumber__rows") {
 		return
 	}
 
