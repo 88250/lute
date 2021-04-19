@@ -1171,7 +1171,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	r.WriteString(language)
 	r.Tag("/div", nil, false)
 
-	r.Tag("div", [][]string{{"class", "protyle-meta__copy"}}, false)
+	r.Tag("div", [][]string{{"class", "protyle-code__copy"}}, false)
 	r.Tag("/div", nil, false)
 	r.Tag("/div", nil, false)
 
