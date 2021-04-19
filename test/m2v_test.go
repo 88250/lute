@@ -207,7 +207,7 @@ func TestMd2VditorBlockDOM(t *testing.T) {
 
 	ast.Testing = true
 	for _, test := range md2VditorBlockDOMTests {
-		result := luteEngine.Md2VditorBlockDOM(test.from)
+		result := luteEngine.Md2BlockDOM(test.from)
 		if test.to != result {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
 		}

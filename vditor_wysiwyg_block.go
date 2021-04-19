@@ -24,7 +24,7 @@ import (
 )
 
 func (lute *Lute) H2P(ivHTML string) (ovHTML string) {
-	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
+	tree, err := lute.BlockDOM2Tree(ivHTML)
 	if nil != err {
 		return err.Error()
 	}
@@ -35,12 +35,12 @@ func (lute *Lute) H2P(ivHTML string) (ovHTML string) {
 	}
 
 	node.Type = ast.NodeParagraph
-	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
 }
 
 func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
-	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
+	tree, err := lute.BlockDOM2Tree(ivHTML)
 	if nil != err {
 		return err.Error()
 	}
@@ -52,12 +52,12 @@ func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
 
 	node.Type = ast.NodeHeading
 	node.HeadingLevel, _ = strconv.Atoi(level)
-	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
 }
 
 func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
-	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
+	tree, err := lute.BlockDOM2Tree(ivHTML)
 	if nil != err {
 		return err.Error()
 	}
@@ -75,12 +75,12 @@ func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
 		return ast.WalkContinue
 	})
 
-	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
 }
 
 func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
-	tree, err := lute.VditorBlockDOM2Tree(ivHTML)
+	tree, err := lute.BlockDOM2Tree(ivHTML)
 	if nil != err {
 		return err.Error()
 	}
@@ -106,24 +106,24 @@ func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
 		return ast.WalkContinue
 	})
 
-	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
 }
 
-func (lute *Lute) SpinVditorBlockDOM(ivHTML string) (ovHTML string) {
+func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
 
-	markdown := lute.vditorBlockDOM2Md(ivHTML)
+	markdown := lute.blockDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
-	ovHTML = lute.Tree2VditorBlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
 	return
 }
 
-func (lute *Lute) HTML2VditorBlockDOM(sHTML string) (vHTML string) {
+func (lute *Lute) HTML2BlockDOM(sHTML string) (vHTML string) {
 	//fmt.Println(sHTML)
 	markdown, err := lute.HTML2Markdown(sHTML)
 	if nil != err {
@@ -132,8 +132,8 @@ func (lute *Lute) HTML2VditorBlockDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
-	for nodeType, rendererFunc := range lute.HTML2VditorBlockDOMRendererFuncs {
+	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.HTML2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
@@ -141,16 +141,16 @@ func (lute *Lute) HTML2VditorBlockDOM(sHTML string) (vHTML string) {
 	return
 }
 
-func (lute *Lute) VditorBlockDOM2HTML(vhtml string) (sHTML string) {
-	markdown := lute.vditorBlockDOM2Md(vhtml)
+func (lute *Lute) BlockDOM2HTML(vhtml string) (sHTML string) {
+	markdown := lute.blockDOM2Md(vhtml)
 	sHTML = lute.Md2HTML(markdown)
 	return
 }
 
-func (lute *Lute) Md2VditorBlockDOM(markdown string) (vHTML string) {
+func (lute *Lute) Md2BlockDOM(markdown string) (vHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
-	for nodeType, rendererFunc := range lute.Md2VditorBlockDOMRendererFuncs {
+	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
@@ -158,10 +158,10 @@ func (lute *Lute) Md2VditorBlockDOM(markdown string) (vHTML string) {
 	return
 }
 
-func (lute *Lute) InlineMd2VditorBlockDOM(markdown string) (vHTML string) {
+func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorBlockRenderer(tree, lute.RenderOptions)
-	for nodeType, rendererFunc := range lute.Md2VditorBlockDOMRendererFuncs {
+	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
@@ -169,18 +169,18 @@ func (lute *Lute) InlineMd2VditorBlockDOM(markdown string) (vHTML string) {
 	return
 }
 
-func (lute *Lute) VditorBlockDOM2Md(htmlStr string) (markdown string) {
+func (lute *Lute) BlockDOM2Md(htmlStr string) (markdown string) {
 	//fmt.Println(htmlStr)
-	markdown = lute.vditorBlockDOM2Md(htmlStr)
+	markdown = lute.blockDOM2Md(htmlStr)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
 	return
 }
 
-func (lute *Lute) VditorBlockDOM2StdMd(htmlStr string) (markdown string) {
+func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 
 	// DOM 转 AST
-	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
+	tree, err := lute.BlockDOM2Tree(htmlStr)
 	if nil != err {
 		return err.Error()
 	}
@@ -210,33 +210,33 @@ func (lute *Lute) VditorBlockDOM2StdMd(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) VditorBlockDOM2Text(htmlStr string) (text string) {
-	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
+func (lute *Lute) BlockDOM2Text(htmlStr string) (text string) {
+	tree, err := lute.BlockDOM2Tree(htmlStr)
 	if nil != err {
 		return ""
 	}
 	return tree.Root.Text()
 }
 
-func (lute *Lute) VditorBlockDOM2TextLen(htmlStr string) int {
-	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
+func (lute *Lute) BlockDOM2TextLen(htmlStr string) int {
+	tree, err := lute.BlockDOM2Tree(htmlStr)
 	if nil != err {
 		return 0
 	}
 	return tree.Root.TextLen()
 }
 
-func (lute *Lute) Tree2VditorBlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
-	renderer := render.NewVditorBlockRenderer(tree, options)
+func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
+	renderer := render.NewBlockRenderer(tree, options)
 	output := renderer.Render()
 	vHTML = string(output)
 	return
 }
 
-func RenderNodeVditorBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
+func RenderNodeBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
 	root := &ast.Node{Type: ast.NodeDocument}
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
-	renderer := render.NewVditorBlockRenderer(tree, renderOptions)
+	renderer := render.NewBlockRenderer(tree, renderOptions)
 	renderer.Writer = &bytes.Buffer{}
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		rendererFunc := renderer.RendererFuncs[n.Type]
@@ -245,7 +245,7 @@ func RenderNodeVditorBlockDOM(node *ast.Node, parseOptions *parse.Options, rende
 	return renderer.Writer.String()
 }
 
-func (lute *Lute) VditorBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
+func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
 	// 删掉插入符
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
 
@@ -266,7 +266,7 @@ func (lute *Lute) VditorBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err erro
 	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	ret.Context.Tip = ret.Root
 	for c := htmlRoot.FirstChild; nil != c; c = c.NextSibling {
-		lute.genASTByVditorBlockDOM(c, ret)
+		lute.genASTByBlockDOM(c, ret)
 	}
 
 	// 调整树结构
@@ -287,9 +287,9 @@ func (lute *Lute) VditorBlockDOM2Tree(htmlStr string) (ret *parse.Tree, err erro
 	return
 }
 
-func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
+func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
-	tree, err := lute.VditorBlockDOM2Tree(htmlStr)
+	tree, err := lute.BlockDOM2Tree(htmlStr)
 	if nil != err {
 		return err.Error()
 	}
@@ -306,10 +306,10 @@ func (lute *Lute) vditorBlockDOM2Md(htmlStr string) (markdown string) {
 	return
 }
 
-func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
-	if class := lute.domAttrValue(n, "class"); "vditor-attr" == class ||
-		strings.Contains(class, "vditor-bullet") || strings.Contains(class, "vditor-meta") ||
-		strings.Contains(class, "vditor-linenumber__rows") {
+func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
+	if class := lute.domAttrValue(n, "class"); "protyle-attr" == class ||
+		strings.Contains(class, "protyle-bullet") || strings.Contains(class, "protyle-meta") ||
+		strings.Contains(class, "protyle-linenumber__rows") {
 		return
 	}
 
@@ -492,7 +492,7 @@ func (lute *Lute) genASTByVditorBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		lute.genASTByVditorBlockDOM(c, tree)
+		lute.genASTByBlockDOM(c, tree)
 	}
 
 	switch dataType {
