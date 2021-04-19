@@ -23,93 +23,6 @@ import (
 	"github.com/88250/lute/util"
 )
 
-func (lute *Lute) H2P(ivHTML string) (ovHTML string) {
-	tree, err := lute.BlockDOM2Tree(ivHTML)
-	if nil != err {
-		return err.Error()
-	}
-
-	node := tree.Root.FirstChild
-	if ast.NodeHeading != node.Type {
-		return ivHTML
-	}
-
-	node.Type = ast.NodeParagraph
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
-	return
-}
-
-func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
-	tree, err := lute.BlockDOM2Tree(ivHTML)
-	if nil != err {
-		return err.Error()
-	}
-
-	node := tree.Root.FirstChild
-	if ast.NodeParagraph != node.Type {
-		return ivHTML
-	}
-
-	node.Type = ast.NodeHeading
-	node.HeadingLevel, _ = strconv.Atoi(level)
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
-	return
-}
-
-func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
-	tree, err := lute.BlockDOM2Tree(ivHTML)
-	if nil != err {
-		return err.Error()
-	}
-
-	if ast.NodeList != tree.Root.FirstChild.Type {
-		return ivHTML
-	}
-
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
-			return ast.WalkContinue
-		}
-
-		n.ListData.Typ = 0
-		return ast.WalkContinue
-	})
-
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
-	return
-}
-
-func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
-	tree, err := lute.BlockDOM2Tree(ivHTML)
-	if nil != err {
-		return err.Error()
-	}
-
-	if ast.NodeList != tree.Root.FirstChild.Type {
-		return ivHTML
-	}
-
-	var num int
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
-			return ast.WalkContinue
-		}
-
-		if ast.NodeList == n.Type {
-			num = 0
-		} else {
-			num++
-		}
-
-		n.ListData.Typ = 1
-		n.ListData.Num = num
-		return ast.WalkContinue
-	})
-
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
-	return
-}
-
 func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	// 替换插入符
 	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
@@ -287,6 +200,93 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
 	return
 }
 
+func (lute *Lute) H2P(ivHTML string) (ovHTML string) {
+	tree, err := lute.BlockDOM2Tree(ivHTML)
+	if nil != err {
+		return err.Error()
+	}
+
+	node := tree.Root.FirstChild
+	if ast.NodeHeading != node.Type {
+		return ivHTML
+	}
+
+	node.Type = ast.NodeParagraph
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
+	tree, err := lute.BlockDOM2Tree(ivHTML)
+	if nil != err {
+		return err.Error()
+	}
+
+	node := tree.Root.FirstChild
+	if ast.NodeParagraph != node.Type {
+		return ivHTML
+	}
+
+	node.Type = ast.NodeHeading
+	node.HeadingLevel, _ = strconv.Atoi(level)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
+	tree, err := lute.BlockDOM2Tree(ivHTML)
+	if nil != err {
+		return err.Error()
+	}
+
+	if ast.NodeList != tree.Root.FirstChild.Type {
+		return ivHTML
+	}
+
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
+			return ast.WalkContinue
+		}
+
+		n.ListData.Typ = 0
+		return ast.WalkContinue
+	})
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
+	tree, err := lute.BlockDOM2Tree(ivHTML)
+	if nil != err {
+		return err.Error()
+	}
+
+	if ast.NodeList != tree.Root.FirstChild.Type {
+		return ivHTML
+	}
+
+	var num int
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeList == n.Type {
+			num = 0
+		} else {
+			num++
+		}
+
+		n.ListData.Typ = 1
+		n.ListData.Num = num
+		return ast.WalkContinue
+	})
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	tree, err := lute.BlockDOM2Tree(htmlStr)
@@ -307,10 +307,24 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
-	if class := lute.domAttrValue(n, "class"); "protyle-attr" == class ||
-		strings.Contains(class, "protyle-bullet") || strings.Contains(class, "protyle-meta") ||
+	class := lute.domAttrValue(n, "class")
+	if "protyle-attr" == class ||
+		strings.Contains(class, "protyle-bullet") || strings.Contains(class, "__copy") ||
 		strings.Contains(class, "protyle-linenumber__rows") {
 		return
+	}
+
+	if "protyle-code" == class {
+		if ast.NodeCodeBlock == tree.Context.Tip.Type {
+			languageNode := n.FirstChild
+			language := "plaintext"
+			if nil != languageNode.FirstChild {
+				language = languageNode.FirstChild.Data
+			}
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, Tokens: util.StrToBytes(language)})
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(lute.domText(n.NextSibling))})
+			return
+		}
 	}
 
 	if "true" == lute.domAttrValue(n, "contenteditable") {
@@ -498,19 +512,13 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	switch dataType {
 	case ast.NodeSuperBlock:
 		node.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker})
+	case ast.NodeCodeBlock:
+		node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```")})
 	}
 }
 
 func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	if ast.NodeCodeBlock == tree.Context.Tip.Type {
-		languageNode := n.PrevSibling.FirstChild
-		language := "plaintext"
-		if nil != languageNode.FirstChild {
-			language = languageNode.FirstChild.Data
-		}
-		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, Tokens: util.StrToBytes(language)})
-		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(lute.domText(n))})
-		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```")})
 		return
 	}
 
