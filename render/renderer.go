@@ -649,6 +649,28 @@ func (r *BaseRenderer) NoHighlight(language string) bool {
 	return false
 }
 
+func (r *BaseRenderer) Text(node *ast.Node) (ret string) {
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering {
+			switch n.Type {
+			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkSpace, ast.NodeLinkTitle, ast.NodeCodeBlockCode,
+				ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeYamlFrontMatterContent,
+				ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias, ast.NodeBlockRefText, ast.NodeBlockRefSpace,
+				ast.NodeBlockEmbedText, ast.NodeBlockEmbedSpace, ast.NodeKramdownSpanIAL:
+				ret += string(n.Tokens)
+			case ast.NodeCodeBlockFenceInfoMarker:
+				ret += string(n.CodeBlockInfo)
+			case ast.NodeLink:
+				if 3 == n.LinkType {
+					ret += string(n.LinkRefLabel)
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
+	return
+}
+
 func RenderHeadingText(n *ast.Node) (ret string) {
 	buf := &bytes.Buffer{}
 	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {
