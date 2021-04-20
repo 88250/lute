@@ -456,9 +456,12 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeMathBlock:
 		node.Type = ast.NodeMathBlock
+		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
+		content := lute.domAttrValue(n, "data-content")
+		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: util.StrToBytes(content)})
+		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
 		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
+		return
 	case ast.NodeCodeBlock:
 		node.Type = ast.NodeCodeBlock
 		node.IsFencedCodeBlock = true
@@ -585,8 +588,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(content)})
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
 			tree.Context.Tip.AppendChild(node)
-			tree.Context.Tip = node
-			defer tree.Context.ParentTip()
 			return
 		} else if "a" == dataType {
 			node.Type = ast.NodeLink

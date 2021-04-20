@@ -582,7 +582,11 @@ func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering boo
 func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		r.blockNodeAttrs(node, &attrs, "math-block")
+		r.blockNodeAttrs(node, &attrs, "language-math")
+		attrs = append(attrs, []string{"data-type", "math-block"})
+		tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 		r.Tag("div", attrs, false)
 	} else {
 		attrs := [][]string{{"class", "protyle-attr"}}
@@ -600,21 +604,6 @@ func (r *BlockRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool)
 }
 
 func (r *BlockRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		return ast.WalkContinue
-	}
-
-	codeLen := len(node.Tokens)
-	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-
-	attrs := [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
-	r.Tag("div", attrs, false)
-	if codeIsEmpty {
-		r.WriteString(util.FrontEndCaret)
-	} else {
-		r.Write(html.EscapeHTML(node.Tokens))
-	}
-	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
 
@@ -674,12 +663,26 @@ func (r *BlockRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkS
 
 func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("table", [][]string{{"data-block", "0"}}, false)
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "table")
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		r.Tag("div", attrs, false)
+		r.Tag("table", nil, false)
 	} else {
 		if nil != node.FirstChild.Next {
 			r.Tag("/tbody", nil, false)
 		}
 		r.Tag("/table", nil, false)
+
+		r.Tag("/div", nil, false)
+
+		attrs := [][]string{{"class", "protyle-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
