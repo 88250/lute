@@ -474,6 +474,9 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	case ast.NodeYamlFrontMatter:
 		node.Type = ast.NodeYamlFrontMatter
 		tree.Context.Tip.AppendChild(node)
+	case ast.NodeThematicBreak:
+		node.Type = ast.NodeThematicBreak
+		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case ast.NodeBlockEmbed:
