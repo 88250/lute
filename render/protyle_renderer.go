@@ -596,22 +596,21 @@ func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering boo
 }
 
 func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		var attrs [][]string
-		r.blockNodeAttrs(node, &attrs, "language-math")
-		tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
-		r.Tag("div", attrs, false)
-	} else {
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
-		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
-		r.Tag("/div", nil, false)
-	}
-	return ast.WalkContinue
+	var attrs [][]string
+	r.blockNodeAttrs(node, &attrs, "render-block")
+	tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	tokens = bytes.TrimSpace(tokens)
+	attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
+	attrs = append(attrs, []string{"data-subtype", "math"})
+	r.Tag("div", attrs, false)
+	r.Tag("div", [][]string{{"spin", "1"}}, false)
+	r.Tag("/div", nil, false)
+	r.Tag("div", [][]string{{"class", "protyle-attr"}}, false)
+	r.renderIAL(node)
+	r.Tag("/div", nil, false)
+	r.Tag("/div", nil, false)
+	return ast.WalkStop
 }
 
 func (r *BlockRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
