@@ -461,6 +461,22 @@ func (r *BlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wa
 
 func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if 0 < len(node.FirstChild.Next.CodeBlockInfo) {
+			if language := util.BytesToStr(node.FirstChild.Next.CodeBlockInfo); r.NoHighlight(language) {
+				var attrs [][]string
+				r.blockNodeAttrs(node, &attrs, "render-block")
+				tokens := html.EscapeHTML(node.FirstChild.Next.Next.Tokens)
+				tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+				attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
+				r.Tag("div", attrs, false)
+				r.Tag("div", [][]string{{"class", "protyle-attr"}}, false)
+				r.renderIAL(node)
+				r.Tag("/div", nil, false)
+				r.Tag("/div", nil, false)
+				return ast.WalkStop
+			}
+		}
+
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "code-block")
 		r.Tag("div", attrs, false)
@@ -499,10 +515,6 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	if 0 < len(node.Previous.CodeBlockInfo) {
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = string(infoWords[0])
-		if "mindmap" == language {
-			dataCode := r.RenderMindmap(node.Tokens)
-			attrs = append(attrs, []string{"data-code", string(dataCode)})
-		}
 	}
 
 	r.Tag("div", attrs, false)
@@ -583,7 +595,6 @@ func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkS
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "language-math")
-		attrs = append(attrs, []string{"data-type", "math-block"})
 		tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
