@@ -314,6 +314,10 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
+	if "1" == lute.domAttrValue(n, "spin") {
+		return
+	}
+
 	if "protyle-code" == class {
 		if ast.NodeCodeBlock == tree.Context.Tip.Type {
 			languageNode := n.FirstChild
@@ -466,6 +470,15 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeCodeBlock
 		node.IsFencedCodeBlock = true
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```")})
+		if "render-block" == class {
+			language := lute.domAttrValue(n, "data-subtype")
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: util.StrToBytes(language)})
+			content := lute.domAttrValue(n, "data-content")
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(content)})
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```")})
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
