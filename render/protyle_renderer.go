@@ -1163,13 +1163,20 @@ func (r *BlockRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) 
 
 func (r *BlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("hr", [][]string{{"data-block", "0"}}, true)
-		if nil != node.Tokens {
-			r.Tag("p", [][]string{{"data-block", "0"}}, false)
-			r.Write(node.Tokens)
-			r.WriteByte(lex.ItemNewline)
-			r.Tag("/p", nil, false)
-		}
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "hr")
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		r.Tag("div", attrs, false)
+	} else {
+		r.Tag("/div", nil, false)
+
+		attrs := [][]string{{"class", "protyle-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
