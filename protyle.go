@@ -474,11 +474,12 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	case ast.NodeYamlFrontMatter:
 		node.Type = ast.NodeYamlFrontMatter
 		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	case ast.NodeThematicBreak:
 		node.Type = ast.NodeThematicBreak
 		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
+		return
 	case ast.NodeBlockEmbed:
 		text := lute.domText(n)
 		if "" == text {
