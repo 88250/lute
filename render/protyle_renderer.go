@@ -464,7 +464,7 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 		if 0 < len(node.FirstChild.Next.CodeBlockInfo) {
 			if language := util.BytesToStr(node.FirstChild.Next.CodeBlockInfo); r.NoHighlight(language) {
 				var attrs [][]string
-				r.blockNodeAttrs(node, &attrs, "render-block")
+				r.blockNodeAttrs(node, &attrs, "render-node")
 				tokens := html.EscapeHTML(node.FirstChild.Next.Next.Tokens)
 				tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 				tokens = bytes.TrimSpace(tokens)
@@ -575,7 +575,7 @@ func (r *BlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.Walk
 func (r *BlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := html.EscapeHTML(node.Next.Tokens)
-		r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "language-math"}}, false)
+		r.Tag("span", [][]string{{"data-type", "math"}, {"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}, false)
 	}
 	return ast.WalkContinue
 }
@@ -597,7 +597,7 @@ func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering boo
 
 func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	var attrs [][]string
-	r.blockNodeAttrs(node, &attrs, "render-block")
+	r.blockNodeAttrs(node, &attrs, "render-node")
 	tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
 	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	tokens = bytes.TrimSpace(tokens)

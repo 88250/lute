@@ -470,8 +470,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeCodeBlock
 		node.IsFencedCodeBlock = true
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```")})
-		if "render-block" == class {
-			language := lute.domAttrValue(n, "data-subtype")
+		if language := lute.domAttrValue(n, "data-subtype"); "" != language {
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: util.StrToBytes(language)})
 			content := lute.domAttrValue(n, "data-content")
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(content)})
