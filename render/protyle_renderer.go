@@ -1166,16 +1166,9 @@ func (r *BlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.W
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "hr")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 	} else {
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
-		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
