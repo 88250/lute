@@ -317,7 +317,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	if "protyle-code" == class {
 		if ast.NodeCodeBlock == tree.Context.Tip.Type {
 			languageNode := n.FirstChild
-			language := "plaintext"
+			language := ""
 			if nil != languageNode.FirstChild {
 				language = languageNode.FirstChild.Data
 			}
