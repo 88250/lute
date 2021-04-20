@@ -459,7 +459,23 @@ func (r *BlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "code-block")
+		r.Tag("div", attrs, false)
+	} else {
+		attrs := [][]string{{"class", "protyle-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
@@ -467,7 +483,50 @@ func (r *BlockRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool)
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+	if !entering {
+		return ast.WalkContinue
+	}
+
+	r.Tag("div", [][]string{{"class", "protyle-meta"}}, false)
+	codeLen := len(node.Tokens)
+	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
+	var language string
+	caretInInfo := bytes.Contains(node.Previous.CodeBlockInfo, util.CaretTokens)
+	node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
+
+	attrs := [][]string{{"class", "protyle-code__language"}}
+	if 0 < len(node.Previous.CodeBlockInfo) {
+		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
+		language = string(infoWords[0])
+		if "mindmap" == language {
+			dataCode := r.RenderMindmap(node.Tokens)
+			attrs = append(attrs, []string{"data-code", string(dataCode)})
+		}
+	}
+
+	r.Tag("div", attrs, false)
+	r.WriteString(language)
+	r.Tag("/div", nil, false)
+
+	r.Tag("div", [][]string{{"class", "protyle-code__copy"}}, false)
+	r.Tag("/div", nil, false)
+	r.Tag("/div", nil, false)
+
+	attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+	r.Tag("div", attrs, false)
+	if codeIsEmpty {
+		if caretInInfo {
+			r.WriteString(util.FrontEndCaret)
+		}
+	} else {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	r.Tag("/div", nil, false)
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
@@ -520,38 +579,18 @@ func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering boo
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		return ast.WalkContinue
-	}
-
-	previewTokens := bytes.TrimSpace(node.Tokens)
-	var preAttrs [][]string
-	if !bytes.Contains(previewTokens, util.CaretTokens) && r.Options.VditorMathBlockPreview {
-		preAttrs = append(preAttrs, []string{"style", "display: none"})
-	}
-	codeLen := len(previewTokens)
-	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-	r.Tag("pre", preAttrs, false)
-	r.Tag("code", [][]string{{"data-type", "math-block"}}, false)
-	if codeIsEmpty {
-		r.WriteString(util.FrontEndCaret + "\n")
+func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "math-block")
+		r.Tag("div", attrs, false)
 	} else {
-		r.Write(html.EscapeHTML(previewTokens))
-	}
-	r.WriteString("</code></pre>")
+		attrs := [][]string{{"class", "protyle-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
 
-	if r.Options.VditorMathBlockPreview {
-		r.Tag("pre", [][]string{{"class", "protyle-wysiwyg__preview"}, {"data-render", "2"}}, false)
-		r.Tag("div", [][]string{{"data-type", "math-block"}, {"class", "language-math"}}, false)
-		tokens := node.Tokens
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-		r.Write(html.EscapeHTML(tokens))
-		r.WriteString("</div></pre>")
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -560,12 +599,32 @@ func (r *BlockRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool)
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString(`<div class="protyle-wysiwyg__block" data-type="math-block" data-block="0">`)
-	} else {
-		r.WriteString("</div>")
+func (r *BlockRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
+	if !entering {
+		return ast.WalkContinue
 	}
+
+	r.Tag("div", [][]string{{"class", "protyle-meta"}}, false)
+	codeLen := len(node.Tokens)
+	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
+	node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
+
+	r.Tag("div", [][]string{{"class", "protyle-math__copy"}}, false)
+	r.Tag("/div", nil, false)
+	r.Tag("/div", nil, false)
+
+	attrs := [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+	r.Tag("div", attrs, false)
+	if codeIsEmpty {
+		r.WriteString(util.FrontEndCaret)
+	} else {
+		r.Write(html.EscapeHTML(node.Tokens))
+	}
+	r.Tag("/div", nil, false)
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
@@ -1126,65 +1185,6 @@ func (r *BlockRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkS
 	if entering {
 		r.WriteByte(lex.ItemNewline)
 	}
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		var attrs [][]string
-		r.blockNodeAttrs(node, &attrs, "code-block")
-		r.Tag("div", attrs, false)
-	} else {
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
-		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
-		r.Tag("/div", nil, false)
-	}
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
-	if !entering {
-		return ast.WalkContinue
-	}
-
-	r.Tag("div", [][]string{{"class", "protyle-meta"}}, false)
-	codeLen := len(node.Tokens)
-	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
-	var language string
-	caretInInfo := bytes.Contains(node.Previous.CodeBlockInfo, util.CaretTokens)
-	node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
-
-	attrs := [][]string{{"class", "protyle-code__language"}}
-	if 0 < len(node.Previous.CodeBlockInfo) {
-		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-		language = string(infoWords[0])
-		if "mindmap" == language {
-			dataCode := r.RenderMindmap(node.Tokens)
-			attrs = append(attrs, []string{"data-code", string(dataCode)})
-		}
-	}
-
-	r.Tag("div", attrs, false)
-	r.WriteString(language)
-	r.Tag("/div", nil, false)
-
-	r.Tag("div", [][]string{{"class", "protyle-code__copy"}}, false)
-	r.Tag("/div", nil, false)
-	r.Tag("/div", nil, false)
-
-	attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
-	r.Tag("div", attrs, false)
-	if codeIsEmpty {
-		if caretInInfo {
-			r.WriteString(util.FrontEndCaret)
-		}
-	} else {
-		r.Write(html.EscapeHTML(node.Tokens))
-	}
-	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
 
