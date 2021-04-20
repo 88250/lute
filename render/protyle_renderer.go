@@ -1166,7 +1166,7 @@ func (r *BlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.W
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "hr")
 		r.Tag("div", attrs, false)
-		r.Tag("div", attrs, false)
+		r.Tag("div", nil, false)
 	} else {
 		r.Tag("/div", nil, false)
 		r.Tag("/div", nil, false)
