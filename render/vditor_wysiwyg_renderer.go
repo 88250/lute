@@ -1154,7 +1154,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 			language = string(infoWords[0])
 			attrs = append(attrs, []string{"class", "language-" + language})
 			if "mindmap" == language {
-				dataCode := r.RenderMindmap(node.Tokens)
+				dataCode := EChartsMindmap(node.Tokens)
 				attrs = append(attrs, []string{"data-code", string(dataCode)})
 			}
 		}

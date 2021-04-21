@@ -323,7 +323,7 @@ func (r *JSONRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 
 			if "mindmap" == language {
 				// 给echarts调用
-				json := r.RenderMindmap(tokens)
+				json := EChartsMindmap(tokens)
 				r.mindMap(util.BytesToStr(json))
 			}
 		} else {

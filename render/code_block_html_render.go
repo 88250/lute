@@ -84,7 +84,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 			}
 
 			if "mindmap" == language {
-				json := r.RenderMindmap(tokens)
+				json := EChartsMindmap(tokens)
 				r.WriteString("<div data-code=\"")
 				r.Write(json)
 				r.WriteString("\" class=\"language-mindmap\">")
