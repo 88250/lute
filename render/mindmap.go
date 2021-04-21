@@ -21,11 +21,15 @@ import (
 )
 
 func EChartsMindmapStr(listContent string) string {
-	return util.BytesToStr(EChartsMindmap(util.StrToBytes(listContent)))
+	return util.BytesToStr(echartsMindmap(util.StrToBytes(listContent)))
 }
 
-// EChartsMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
 func EChartsMindmap(listContent []byte) []byte {
+	return html.EncodeDestination(echartsMindmap(listContent))
+}
+
+// echartsMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
+func echartsMindmap(listContent []byte) []byte {
 	listContent = bytes.ReplaceAll(listContent, util.CaretTokens, nil)
 	tree := parse.Parse("", listContent, parse.NewOptions())
 	if nil == tree.Root.FirstChild || ast.NodeList != tree.Root.FirstChild.Type {
@@ -82,7 +86,7 @@ func EChartsMindmap(listContent []byte) []byte {
 		}
 		return ast.WalkContinue
 	})
-	return html.EncodeDestination(buf.Bytes())
+	return buf.Bytes()
 }
 
 // text 返回列表项第一个子节点的文本内容。
