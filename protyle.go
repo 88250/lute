@@ -348,6 +348,9 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch dataType {
+	case ast.NodeTable:
+		lute.genASTContenteditable(n.FirstChild.FirstChild, tree)
+		return
 	case ast.NodeParagraph:
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
@@ -574,6 +577,60 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeLinkText
 		}
 		tree.Context.Tip.AppendChild(node)
+	case atom.Table:
+		node.Type = ast.NodeTable
+		var tableAligns []int
+		if nil == n.FirstChild {
+			return
+		}
+
+		for th := n.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
+			align := lute.domAttrValue(th, "align")
+			switch align {
+			case "left":
+				tableAligns = append(tableAligns, 1)
+			case "center":
+				tableAligns = append(tableAligns, 2)
+			case "right":
+				tableAligns = append(tableAligns, 3)
+			default:
+				tableAligns = append(tableAligns, 0)
+			}
+		}
+		node.TableAligns = tableAligns
+		node.Tokens = nil
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case atom.Thead:
+		node.Type = ast.NodeTableHead
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case atom.Tbody:
+	case atom.Tr:
+		node.Type = ast.NodeTableRow
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case atom.Th, atom.Td:
+		node.Type = ast.NodeTableCell
+		align := lute.domAttrValue(n, "align")
+		var tableAlign int
+		switch align {
+		case "left":
+			tableAlign = 1
+		case "center":
+			tableAlign = 2
+		case "right":
+			tableAlign = 3
+		default:
+			tableAlign = 0
+		}
+		node.TableCellAlign = tableAlign
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	case atom.Code:
 		if lute.isEmptyText(n) {
 			return
