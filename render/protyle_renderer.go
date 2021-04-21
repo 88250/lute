@@ -460,31 +460,40 @@ func (r *BlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	noHighlight := false
+	var language string
+	if 0 < len(node.FirstChild.Next.CodeBlockInfo) {
+		language = util.BytesToStr(node.FirstChild.Next.CodeBlockInfo)
+		noHighlight = r.NoHighlight(language)
+	}
+
 	if entering {
-		if 0 < len(node.FirstChild.Next.CodeBlockInfo) {
-			if language := util.BytesToStr(node.FirstChild.Next.CodeBlockInfo); r.NoHighlight(language) {
-				var attrs [][]string
-				r.blockNodeAttrs(node, &attrs, "render-node")
-				tokens := html.EscapeHTML(node.FirstChild.Next.Next.Tokens)
-				tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-				tokens = bytes.TrimSpace(tokens)
-				attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
-				attrs = append(attrs, []string{"data-subtype", language})
-				r.Tag("div", attrs, false)
-				r.Tag("div", [][]string{{"spin", "1"}}, false)
-				r.Tag("/div", nil, false)
-				r.Tag("div", [][]string{{"class", "protyle-attr"}}, false)
-				r.renderIAL(node)
-				r.Tag("/div", nil, false)
-				r.Tag("/div", nil, false)
-				return ast.WalkStop
-			}
+		if noHighlight {
+			var attrs [][]string
+			r.blockNodeAttrs(node, &attrs, "render-node")
+			tokens := html.EscapeHTML(node.FirstChild.Next.Next.Tokens)
+			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+			tokens = bytes.TrimSpace(tokens)
+			attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
+			attrs = append(attrs, []string{"data-subtype", language})
+			r.Tag("div", attrs, false)
+			r.Tag("div", [][]string{{"spin", "1"}}, false)
+			r.Tag("/div", nil, false)
+			r.Tag("div", [][]string{{"class", "protyle-attr"}}, false)
+			r.renderIAL(node)
+			r.Tag("/div", nil, false)
+			r.Tag("/div", nil, false)
+			return ast.WalkSkipChildren
 		}
 
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "code-block")
 		r.Tag("div", attrs, false)
 	} else {
+		if noHighlight {
+			return ast.WalkSkipChildren
+		}
+
 		attrs := [][]string{{"class", "protyle-attr"}}
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)
@@ -596,6 +605,10 @@ func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering boo
 }
 
 func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if !entering {
+		return ast.WalkContinue
+	}
+
 	var attrs [][]string
 	r.blockNodeAttrs(node, &attrs, "render-node")
 	tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
@@ -610,7 +623,7 @@ func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkS
 	r.renderIAL(node)
 	r.Tag("/div", nil, false)
 	r.Tag("/div", nil, false)
-	return ast.WalkStop
+	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
