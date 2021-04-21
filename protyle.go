@@ -28,8 +28,6 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
-	// 替换插入符
-	ovHTML = strings.ReplaceAll(ovHTML, util.Caret, "<wbr>")
 	return
 }
 
@@ -47,7 +45,7 @@ func (lute *Lute) HTML2BlockDOM(sHTML string) (vHTML string) {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
-	vHTML = string(output)
+	vHTML = util.BytesToStr(output)
 	return
 }
 
@@ -64,7 +62,7 @@ func (lute *Lute) Md2BlockDOM(markdown string) (vHTML string) {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
-	vHTML = string(output)
+	vHTML = util.BytesToStr(output)
 	return
 }
 
@@ -75,7 +73,7 @@ func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
 	output := renderer.Render()
-	vHTML = string(output)
+	vHTML = util.BytesToStr(output)
 	return
 }
 
@@ -115,7 +113,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	options.KramdownSpanIAL = true
 	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
-	markdown = string(formatted)
+	markdown = util.BytesToStr(formatted)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
 	return
 }
@@ -139,7 +137,8 @@ func (lute *Lute) BlockDOM2TextLen(htmlStr string) int {
 func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
 	renderer := render.NewBlockRenderer(tree, options)
 	output := renderer.Render()
-	vHTML = string(output)
+	vHTML = util.BytesToStr(output)
+	vHTML = strings.ReplaceAll(vHTML, util.Caret, "<wbr>")
 	return
 }
 
