@@ -24,7 +24,7 @@ var ul2olTests = []*parseTest{
 
 func TestUL2OL(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.SetVditorWYSIWYG(true)
+	luteEngine.SetWYSIWYG(true)
 	luteEngine.ParseOptions.Mark = true
 	luteEngine.ParseOptions.BlockRef = true
 	luteEngine.SetKramdownIAL(true)
@@ -52,7 +52,7 @@ var ol2ulTests = []*parseTest{
 
 func TestOL2UL(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.SetVditorWYSIWYG(true)
+	luteEngine.SetWYSIWYG(true)
 	luteEngine.ParseOptions.Mark = true
 	luteEngine.ParseOptions.BlockRef = true
 	luteEngine.SetKramdownIAL(true)
@@ -80,7 +80,7 @@ var p2hTests = []*parseTest{
 
 func TestP2H(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.SetVditorWYSIWYG(true)
+	luteEngine.SetWYSIWYG(true)
 	luteEngine.ParseOptions.Mark = true
 	luteEngine.ParseOptions.BlockRef = true
 	luteEngine.SetKramdownIAL(true)

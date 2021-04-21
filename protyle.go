@@ -159,9 +159,6 @@ func RenderNodeBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptio
 }
 
 func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
-	// 删掉插入符
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", "")
-
 	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
 	htmlStr = strings.ReplaceAll(htmlStr, "\t\n", "\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
@@ -349,6 +346,31 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 
 	switch dataType {
 	case ast.NodeTable:
+		node.Type = ast.NodeTable
+		var tableAligns []int
+		if nil == n.FirstChild {
+			return
+		}
+
+		for th := n.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
+			align := lute.domAttrValue(th, "align")
+			switch align {
+			case "left":
+				tableAligns = append(tableAligns, 1)
+			case "center":
+				tableAligns = append(tableAligns, 2)
+			case "right":
+				tableAligns = append(tableAligns, 3)
+			default:
+				tableAligns = append(tableAligns, 0)
+			}
+		}
+		node.TableAligns = tableAligns
+		node.Tokens = nil
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+
 		lute.genASTContenteditable(n.FirstChild.FirstChild, tree)
 		return
 	case ast.NodeParagraph:
@@ -577,31 +599,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeLinkText
 		}
 		tree.Context.Tip.AppendChild(node)
-	case atom.Table:
-		node.Type = ast.NodeTable
-		var tableAligns []int
-		if nil == n.FirstChild {
-			return
-		}
-
-		for th := n.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
-			align := lute.domAttrValue(th, "align")
-			switch align {
-			case "left":
-				tableAligns = append(tableAligns, 1)
-			case "center":
-				tableAligns = append(tableAligns, 2)
-			case "right":
-				tableAligns = append(tableAligns, 3)
-			default:
-				tableAligns = append(tableAligns, 0)
-			}
-		}
-		node.TableAligns = tableAligns
-		node.Tokens = nil
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
 	case atom.Thead:
 		node.Type = ast.NodeTableHead
 		tree.Context.Tip.AppendChild(node)
