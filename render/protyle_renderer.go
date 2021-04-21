@@ -575,7 +575,7 @@ func (r *BlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.Walk
 func (r *BlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := html.EscapeHTML(node.Next.Tokens)
-		r.Tag("span", [][]string{{"data-type", "math"}, {"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}, false)
+		r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}, false)
 	}
 	return ast.WalkContinue
 }
