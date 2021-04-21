@@ -75,7 +75,7 @@ func TestOL2UL(t *testing.T) {
 
 var p2hTests = []*parseTest{
 
-	{"0", "<div data-node-id=\"20210415115149-65rm92t\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210415190606\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\"></div></div>", "<div data-subtype=\"h1\" data-node-id=\"20210415115149-65rm92t\" data-node-index=\"1\" data-type=\"NodeHeading\" class=\"h1\" updated=\"20210415190606\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\"></div></div>"},
+	{"0", "<div data-node-id=\"20210415115149-65rm92t\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210415190606\"><div contenteditable=\"true\" spellcheck=\"false\">foo<wbr></div><div class=\"protyle-attr\"></div></div>", "<div data-subtype=\"h1\" data-node-id=\"20210415115149-65rm92t\" data-node-index=\"1\" data-type=\"NodeHeading\" class=\"h1\" updated=\"20210415190606\"><div contenteditable=\"true\" spellcheck=\"false\">foo‸</div><div class=\"protyle-attr\"></div></div>"},
 }
 
 func TestP2H(t *testing.T) {

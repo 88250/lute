@@ -24,9 +24,6 @@ import (
 )
 
 func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
-	// 替换插入符
-	ivHTML = strings.ReplaceAll(ivHTML, "<wbr>", util.Caret)
-
 	markdown := lute.blockDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
@@ -159,6 +156,8 @@ func RenderNodeBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptio
 }
 
 func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", util.Caret)
+
 	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
 	htmlStr = strings.ReplaceAll(htmlStr, "\t\n", "\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
