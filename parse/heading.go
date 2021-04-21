@@ -18,7 +18,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// 判断 ATX 标题（#）是否开始。
+// ATXHeadingStart 判断 ATX 标题（#）是否开始。
 func ATXHeadingStart(t *Tree, container *ast.Node) int {
 	if t.Context.indented {
 		return 0
@@ -164,10 +164,6 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
 		if startCaret || inCaret || endCaret {
 			content = append(util.CaretTokens, content...)
-		}
-
-		if util.Caret == string(content) || "" == string(content) {
-			return
 		}
 	}
 	_, content = lex.TrimRight(content)
