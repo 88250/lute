@@ -17,7 +17,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// 判断 HTML 块（<）是否开始。
+// HtmlBlockStart 判断 HTML 块（<）是否开始。
 func HtmlBlockStart(t *Tree, container *ast.Node) int {
 	if t.Context.indented {
 		return 0
@@ -27,7 +27,7 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 		return 0
 	}
 
-	if t.Context.ParseOption.VditorWYSIWYG {
+	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG {
 		if bytes.Contains(t.Context.currentLine, []byte("vditor-comment")) {
 			return 0
 		}

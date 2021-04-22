@@ -165,7 +165,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			if passed, remains, dest = t.Context.parseInlineLinkDest(remains); nil == passed {
 				break
 			}
-			if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
+			if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
 				if !isImage && nil == opener.node.Next {
 					break
 				}
@@ -202,7 +202,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			ctx.pos += len(passed)
 			matched = isLink && 0 < len(remains)
 			if matched {
-				if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
+				if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
 					if bytes.HasPrefix(remains, []byte(util.Caret+")")) {
 						if 0 < len(title) {
 							// 将 ‸) 换位为 )‸

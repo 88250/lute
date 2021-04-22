@@ -61,7 +61,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					if (3 == len(tokens) && (bytes.EqualFold(tokens, []byte("[x]")) || bytes.Equal(tokens, []byte("[ ]")))) ||
 						(3 < len(tokens) && (lex.IsWhitespace(tokens[3]) || util.CaretTokens[0] == tokens[3] || util.CaretTokens[0] == tokens[2])) {
 						var caretStartText, caretAfterCloseBracket, caretInBracket bool
-						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
+						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
 							closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
 							if bytes.HasPrefix(tokens, util.CaretTokens) {
 								tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
@@ -77,7 +77,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
 						p.PrependChild(taskListItemMarker)
 						p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
-						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
+						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
 							p.Tokens = bytes.TrimSpace(p.Tokens)
 							if caretStartText || caretAfterCloseBracket || caretInBracket {
 								p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)

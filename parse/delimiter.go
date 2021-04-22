@@ -309,7 +309,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 			tokenBefore = rune(c)
 		}
 
-		if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && util.Caret == string(tokenBefore) {
+		if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && util.Caret == string(tokenBefore) {
 			// 跳过插入符位置向前看
 			caretLen := len(util.Caret)
 			if 0 < startPos-caretLen {

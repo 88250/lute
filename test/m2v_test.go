@@ -185,6 +185,7 @@ func TestInlineMd2VditorIRBlockDOM(t *testing.T) {
 
 var md2BlockDOMTests = []parseTest{
 
+	{"12", "<p>foo</p>\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"block-ref\" data-id=\"20210121085548-9vnyjk4\" data-anchor=\"{{.text}}\"></span><strong>bar</strong></div><div class=\"protyle-attr\"></div></div>"},
 	{"11", "foo((20210121085548-9vnyjk4 \"{{.text}}\"))**bar**\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"block-ref\" data-id=\"20210121085548-9vnyjk4\" data-anchor=\"{{.text}}\"></span><strong>bar</strong></div><div class=\"protyle-attr\"></div></div>"},
 	{"10", "$$\nfoo\n$$\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeMathBlock\" class=\"render-node\" data-content=\"foo\" data-subtype=\"math\"><div spin=\"1\"></div><div class=\"protyle-attr\"></div></div>"},
 	{"9", "```abc\nfoo\n```\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeCodeBlock\" class=\"render-node\" data-content=\"foo\" data-subtype=\"abc\"><div spin=\"1\"></div><div class=\"protyle-attr\"></div></div>"},

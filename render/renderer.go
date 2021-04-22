@@ -61,6 +61,8 @@ type Options struct {
 	VditorIR bool
 	// Vditor 分屏预览支持。
 	VditorSV bool
+	// Protyle 所见即所得支持。
+	ProtyleWYSIWYG bool
 	// KramdownBlockIAL 设置是否打开 kramdown 块级内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
 	KramdownBlockIAL bool
 	// KramdownSpanIAL 设置是否打开 kramdown 行级内联属性列表支持。
@@ -118,6 +120,7 @@ func NewOptions() *Options {
 		VditorWYSIWYG:                  false,
 		VditorIR:                       false,
 		VditorSV:                       false,
+		ProtyleWYSIWYG:                 false,
 		KramdownBlockIAL:               false,
 		ChineseParagraphBeginningSpace: false,
 		FixTermTypo:                    false,

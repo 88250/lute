@@ -158,7 +158,7 @@ func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num in
 	}
 	tokens = lex.TrimWhitespace(tokens)
 	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
-	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
+	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		if endCaret {
 			context.Tip.Tokens = bytes.TrimSuffix(context.Tip.Tokens, []byte("\n"))

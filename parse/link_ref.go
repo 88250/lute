@@ -92,7 +92,7 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 }
 
 func (t *Tree) FindLinkRefDefLink(label []byte) (link *ast.Node) {
-	if t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG {
+	if t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG {
 		label = bytes.ReplaceAll(label, util.CaretTokens, nil)
 	}
 	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -124,7 +124,7 @@ func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, 
 		}
 	}
 	if nil != title {
-		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV {
+		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV && !context.ParseOption.ProtyleWYSIWYG {
 			title = html.UnescapeBytes(title)
 		}
 	}
@@ -179,7 +179,7 @@ func (context *Context) parseLinkDest(tokens []byte) (ret, remains, destination 
 		ret, remains, destination = context.parseLinkDest2(tokens) // [label](/url)
 	}
 	if nil != ret {
-		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV {
+		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV || !context.ParseOption.ProtyleWYSIWYG {
 			destination = html.EncodeDestination(html.UnescapeBytes(destination))
 		}
 	}
@@ -330,7 +330,7 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 	}
 
 	label = lex.TrimWhitespace(label)
-	if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV {
+	if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV && !context.ParseOption.ProtyleWYSIWYG {
 		label = lex.ReplaceAll(label, lex.ItemNewline, lex.ItemSpace)
 		length := len(label)
 		var token byte

@@ -77,7 +77,7 @@ func (context *Context) mathBlockFinalize(mathBlock *ast.Node) {
 	}
 	tokens := mathBlock.Tokens[2:] // 剔除开头的 $$
 	tokens = lex.TrimWhitespace(tokens)
-	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
+	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG  {
 		if bytes.HasSuffix(tokens, MathBlockMarkerCaret) {
 			// 剔除结尾的 $$‸
 			tokens = bytes.TrimSuffix(tokens, MathBlockMarkerCaret)

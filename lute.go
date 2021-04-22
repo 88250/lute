@@ -325,9 +325,9 @@ func (lute *Lute) SetVditorWYSIWYG(b bool) {
 	lute.RenderOptions.VditorWYSIWYG = b
 }
 
-func (lute *Lute) SetWYSIWYG(b bool) {
-	lute.ParseOptions.VditorWYSIWYG = b
-	lute.RenderOptions.VditorWYSIWYG = b
+func (lute *Lute) SetProtyleWYSIWYG(b bool) {
+	lute.ParseOptions.ProtyleWYSIWYG = b
+	lute.RenderOptions.ProtyleWYSIWYG = b
 }
 
 func (lute *Lute) SetVditorIR(b bool) {

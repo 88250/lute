@@ -296,6 +296,8 @@ type Options struct {
 	VditorIR bool
 	// Vditor 分屏预览支持。
 	VditorSV bool
+	// Protyle 所见即所得支持。
+	ProtyleWYSIWYG bool
 	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
 	InlineMathAllowDigitAfterOpenMarker bool
 	// Setext 设置是否解析 Setext 标题 https://github.com/88250/lute/issues/50

@@ -922,16 +922,14 @@ func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus
 func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		r.blockNodeAttrs(node, &attrs, "html")
+		node.Type = ast.NodeParagraph
+		r.blockNodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 
 		tokens := bytes.TrimSpace(node.Tokens)
-		r.WriteString("<pre>")
-		r.Tag("code", nil, false)
 		r.Write(html.EscapeHTML(tokens))
-		r.WriteString("</code></pre>")
 	} else {
 		r.Tag("/div", nil, false)
 

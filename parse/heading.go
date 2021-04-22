@@ -98,7 +98,7 @@ func SetextHeadingStart(t *Tree, container *ast.Node) int {
 func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	var startCaret bool
-	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.HasPrefix(tokens, util.CaretTokens) {
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && bytes.HasPrefix(tokens, util.CaretTokens) {
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		startCaret = true
 	}
@@ -109,7 +109,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	}
 
 	var inCaret bool
-	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.Contains(tokens, []byte("#"+util.Caret+"#")) {
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && bytes.Contains(tokens, []byte("#"+util.Caret+"#")) {
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		inCaret = true
 	}
@@ -120,7 +120,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	}
 
 	var endCaret bool
-	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.HasPrefix(tokens[level:], util.CaretTokens) {
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && bytes.HasPrefix(tokens[level:], util.CaretTokens) {
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		endCaret = true
 	}
@@ -161,7 +161,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 		_, content = lex.TrimRight(content)
 	}
 
-	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
+	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
 		if startCaret || inCaret || endCaret {
 			content = append(util.CaretTokens, content...)
 		}
@@ -174,7 +174,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 func (t *Tree) parseSetextHeading() (level int) {
 	ln := lex.TrimWhitespace(t.Context.currentLine)
 	var caretInLn bool
-	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
+	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
 		if bytes.Contains(ln, util.CaretTokens) {
 			caretInLn = true
 			ln = bytes.ReplaceAll(ln, util.CaretTokens, nil)
@@ -211,7 +211,7 @@ func (t *Tree) parseSetextHeading() (level int) {
 		level = 2
 	}
 
-	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && caretInLn {
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && caretInLn {
 		t.Context.oldtip.Tokens = lex.TrimWhitespace(t.Context.oldtip.Tokens)
 		t.Context.oldtip.AppendTokens(util.CaretTokens)
 	}
