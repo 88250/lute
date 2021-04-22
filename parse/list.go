@@ -18,7 +18,7 @@ import (
 	"strconv"
 )
 
-// 判断列表、列表项（* - + 1.）或者任务列表项是否开始。
+// ListStart 判断列表、列表项（* - + 1.）或者任务列表项是否开始。
 func ListStart(t *Tree, container *ast.Node) int {
 	if ast.NodeList != container.Type && t.Context.indented {
 		return 0
@@ -82,13 +82,13 @@ func (context *Context) listFinalize(list *ast.Node) {
 			break
 		}
 
-		subitem := item.FirstChild
-		for nil != subitem {
-			if endsWithBlankLine(subitem) && (nil != item.Next || nil != subitem.Next) {
+		subItem := item.FirstChild
+		for nil != subItem {
+			if endsWithBlankLine(subItem) && (nil != item.Next || nil != subItem.Next) {
 				list.Tight = false
 				break
 			}
-			subitem = subitem.Next
+			subItem = subItem.Next
 		}
 		item = item.Next
 	}

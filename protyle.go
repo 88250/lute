@@ -28,6 +28,7 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = strings.ReplaceAll(ovHTML, parse.Zwsp, "")
 	return
 }
 
@@ -283,7 +284,6 @@ func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
 }
 
 func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
-	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 	tree, err := lute.BlockDOM2Tree(htmlStr)
 	if nil != err {
 		return err.Error()

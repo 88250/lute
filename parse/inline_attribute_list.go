@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-// 判断 kramdown 块级内联属性列表（{: attrs}）是否开始。
+// IALStart 判断 kramdown 块级内联属性列表（{: attrs}）是否开始。
 func IALStart(t *Tree, container *ast.Node) int {
 	if !t.Context.ParseOption.KramdownBlockIAL || t.Context.indented {
 		return 0
