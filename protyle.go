@@ -659,6 +659,20 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()
+		} else if "block-ref" == dataType {
+			node.Type = ast.NodeBlockRef
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			id := lute.domAttrValue(n, "data-id")
+			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(id)})
+			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
+			refText := lute.domAttrValue(n, "data-anchor")
+			refTextNode := &ast.Node{Type: ast.NodeBlockRefText}
+			refTextNode.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(refText)})
+			node.AppendChild(refTextNode)
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
 		}
 	case atom.Sub:
 		if lute.isEmptyText(n) {
@@ -944,6 +958,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
 			}
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+		} else if "block-ref" == dataType {
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 		}
 	case atom.Sub:

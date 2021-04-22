@@ -110,11 +110,11 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeYamlFrontMatterOpenMarker] = ret.renderYamlFrontMatterOpenMarker
 	ret.RendererFuncs[ast.NodeYamlFrontMatterContent] = ret.renderYamlFrontMatterContent
 	ret.RendererFuncs[ast.NodeYamlFrontMatterCloseMarker] = ret.renderYamlFrontMatterCloseMarker
-	//ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
-	//ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
-	//ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
-	//ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
-	//ret.RendererFuncs[ast.NodeBlockRefTextTplRenderResult] = ret.renderBlockRefTextTplRenderResult
+	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
+	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
+	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
+	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
+	ret.RendererFuncs[ast.NodeBlockRefTextTplRenderResult] = ret.renderBlockRefTextTplRenderResult
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
@@ -149,6 +149,35 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	return ret
+}
+
+func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		idNode := node.ChildByType(ast.NodeBlockRefID)
+		refTextNode := node.ChildByType(ast.NodeBlockRefText)
+		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", refTextNode.Text()}}
+		r.Tag("span", attrs, false)
+		r.Tag("/span", nil, false)
+		return ast.WalkSkipChildren
+
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderBlockRefTextTplRenderResult(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {

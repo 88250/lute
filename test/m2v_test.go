@@ -185,6 +185,7 @@ func TestInlineMd2VditorIRBlockDOM(t *testing.T) {
 
 var md2BlockDOMTests = []parseTest{
 
+	{"11", "foo((20210121085548-9vnyjk4 \"{{.text}}\"))**bar**\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"block-ref\" data-id=\"20210121085548-9vnyjk4\" data-anchor=\"{{.text}}\"></span><strong>bar</strong></div><div class=\"protyle-attr\"></div></div>"},
 	{"10", "$$\nfoo\n$$\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeMathBlock\" class=\"render-node\" data-content=\"foo\" data-subtype=\"math\"><div spin=\"1\"></div><div class=\"protyle-attr\"></div></div>"},
 	{"9", "```abc\nfoo\n```\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeCodeBlock\" class=\"render-node\" data-content=\"foo\" data-subtype=\"abc\"><div spin=\"1\"></div><div class=\"protyle-attr\"></div></div>"},
 	{"8", "```\nfoo\n```\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeCodeBlock\" class=\"code-block\"><div class=\"protyle-code\"><div class=\"protyle-code__language\"></div><div class=\"protyle-code__copy\"></div></div><div contenteditable=\"true\" spellcheck=\"false\">foo\n</div><div class=\"protyle-attr\"></div></div>"},
