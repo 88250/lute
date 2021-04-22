@@ -36,6 +36,12 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	if htmlType := t.parseHTML(tokens); 0 != htmlType {
 		t.Context.closeUnmatchedBlocks()
+
+		if t.Context.ParseOption.ProtyleWYSIWYG {
+			// Protyle 中不存在 HTML 块，使用段落块
+			return 0
+		}
+
 		block := t.Context.addChild(ast.NodeHTMLBlock)
 		block.HtmlBlockType = htmlType
 		return 2

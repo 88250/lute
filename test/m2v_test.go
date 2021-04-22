@@ -202,7 +202,7 @@ var md2BlockDOMTests = []parseTest{
 
 func TestMd2BlockDOM(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.SetWYSIWYG(true)
+	luteEngine.SetProtyleWYSIWYG(true)
 	luteEngine.SetToC(true)
 	luteEngine.ParseOptions.BlockRef = true
 	luteEngine.ParseOptions.KramdownBlockIAL = true

@@ -920,6 +920,8 @@ func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus
 }
 
 func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
+	// Protyle 中不存在 HTML 块，所以应该不会进入这里的渲染实现
+
 	if entering {
 		var attrs [][]string
 		node.Type = ast.NodeParagraph
