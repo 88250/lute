@@ -44,6 +44,10 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 			if n = t.parseAutolink(ctx); nil == n {
 				if n = t.parseAutoEmailLink(ctx); nil == n {
 					n = t.parseInlineHTML(ctx)
+					if t.Context.ParseOption.ProtyleWYSIWYG && nil != n {
+						// Protyle 中不存在内联 HTML，使用文本
+						n.Type = ast.NodeText
+					}
 				}
 			}
 		case lex.ItemOpenBracket:

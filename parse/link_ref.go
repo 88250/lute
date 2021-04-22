@@ -179,7 +179,7 @@ func (context *Context) parseLinkDest(tokens []byte) (ret, remains, destination 
 		ret, remains, destination = context.parseLinkDest2(tokens) // [label](/url)
 	}
 	if nil != ret {
-		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV || !context.ParseOption.ProtyleWYSIWYG {
+		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV && !context.ParseOption.ProtyleWYSIWYG {
 			destination = html.EncodeDestination(html.UnescapeBytes(destination))
 		}
 	}
