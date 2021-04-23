@@ -13,6 +13,7 @@ package render
 import (
 	"bytes"
 	"strconv"
+	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
@@ -155,11 +156,11 @@ func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkSt
 	if entering {
 		idNode := node.ChildByType(ast.NodeBlockRefID)
 		refTextNode := node.ChildByType(ast.NodeBlockRefText)
-		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", refTextNode.Text()}}
+		anchor := strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
+		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", anchor}, {"contenteditable", "false"}}
 		r.Tag("span", attrs, false)
 		r.Tag("/span", nil, false)
 		return ast.WalkSkipChildren
-
 	}
 	return ast.WalkContinue
 }
@@ -722,6 +723,11 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
+
+		r.Tag("div", [][]string{{"class", "protyle-action"}}, false)
+		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
+		r.Tag("/div", nil, false)
+
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 		r.Tag("table", nil, false)
@@ -823,76 +829,64 @@ func (r *BlockRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus
 }
 
 func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+	renderFigure := nil != node.ChildByType(ast.NodeLinkTitle)
+
 	if entering {
-		if 3 == node.LinkType {
-			r.WriteString("<img src=\"")
-			link := r.Tree.FindLinkRefDefLink(node.LinkRefLabel)
-			destTokens := link.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.LinkPath(destTokens)
-			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
-			r.Write(destTokens)
-			r.WriteString("\" alt=\"")
-			if alt := node.ChildByType(ast.NodeLinkText); nil != alt {
-				alt.Tokens = bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
-				r.Write(alt.Tokens)
-			}
-			r.WriteByte(lex.ItemDoublequote)
-			if title := link.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-				r.WriteString(" title=\"")
-				title.Tokens = bytes.ReplaceAll(title.Tokens, util.CaretTokens, nil)
-				r.Write(title.Tokens)
-				r.WriteByte(lex.ItemDoublequote)
-			}
-			r.WriteString(" data-type=\"link-ref\" data-link-label=\"" + string(node.LinkRefLabel) + "\"")
-			r.WriteString(" />")
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "img")
 
-			// XSS 过滤
-			buf := r.Writer.Bytes()
-			idx := bytes.LastIndex(buf, []byte("<img src="))
-			imgBuf := buf[idx:]
-			if r.Options.Sanitize {
-				imgBuf = sanitize(imgBuf)
-			}
-			r.Writer.Truncate(idx)
-			r.Writer.Write(imgBuf)
-			return ast.WalkSkipChildren
-		}
-
-		if 0 == r.DisableTags {
-			r.WriteString("<img src=\"")
-			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.LinkPath(destTokens)
-			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
-			r.Write(destTokens)
-			r.WriteString("\" alt=\"")
-			if alt := node.ChildByType(ast.NodeLinkText); nil != alt && bytes.Contains(alt.Tokens, util.CaretTokens) {
-				alt.Tokens = bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
+		parentStyle := node.IALAttr("parent-style")
+		if "" != parentStyle { // 手动设置了位置
+			attrs = append(attrs, []string{"style", parentStyle})
+		} else {
+			if renderFigure { // 未手动设置位置且需要渲染图注
+				attrs = append(attrs, []string{"style", "display: block; text-align: center; white-space: initial;"})
 			}
 		}
-		r.DisableTags++
-		return ast.WalkContinue
-	}
 
-	r.DisableTags--
-	if 0 == r.DisableTags {
-		r.WriteByte(lex.ItemDoublequote)
-		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			r.WriteString(" title=\"")
-			title.Tokens = bytes.ReplaceAll(title.Tokens, util.CaretTokens, nil)
-			r.Write(title.Tokens)
-			r.WriteByte(lex.ItemDoublequote)
+		r.Tag("span", attrs, false)
+
+		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
+		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
+		r.Tag("/span", nil, false)
+	} else {
+		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
+		destTokens = r.LinkPath(destTokens)
+		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
+		attrs := [][]string{{"src", string(destTokens)}}
+		alt := node.ChildByType(ast.NodeLinkText)
+		if nil != alt && 0 < len(alt.Tokens) {
+			altTokens := bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
+			attrs = append(attrs, []string{"alt", string(altTokens)})
 		}
-		r.WriteString(" />")
 
+		attrs = append(attrs, r.NodeAttrs(node.Parent)...)
+		if style := node.IALAttr("style"); "" != style {
+			attrs = append(attrs, []string{"style", style})
+		}
+		r.Tag("img", attrs, true)
 		// XSS 过滤
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
 		imgBuf := buf[idx:]
-		if r.Options.Sanitize {
-			imgBuf = sanitize(imgBuf)
-		}
+		imgBuf = r.tagSrcPath(imgBuf)
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
+
+		if renderFigure {
+			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
+				titleTokens := title.Tokens
+				titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
+				titleTree := parse.Inline("", titleTokens, r.Tree.Context.ParseOption)
+				figureTitle := RenderHeadingText(titleTree.Root)
+				attrs = [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}
+				r.Tag("span", attrs, false)
+				r.Writer.WriteString(figureTitle)
+				r.Tag("/span", nil, false)
+			}
+		}
+
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }

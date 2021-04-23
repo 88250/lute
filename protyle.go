@@ -369,7 +369,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 
-		lute.genASTContenteditable(n.FirstChild.FirstChild, tree)
+		lute.genASTContenteditable(n.FirstChild.NextSibling.FirstChild, tree)
 		return
 	case ast.NodeParagraph:
 		node.Type = ast.NodeParagraph
