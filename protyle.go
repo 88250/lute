@@ -667,12 +667,12 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(id)})
 			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
 			refText := lute.domAttrValue(n, "data-anchor")
-			refTextNode := &ast.Node{Type: ast.NodeBlockRefText}
-			refTextNode.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(refText)})
+			refTextNode := &ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(refText)}
 			node.AppendChild(refTextNode)
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			tree.Context.Tip.AppendChild(node)
-			tree.Context.Tip = node
-			defer tree.Context.ParentTip()
+			return
 		} else if "img" == dataType {
 			img := n.FirstChild.NextSibling
 			node.Type = ast.NodeImage

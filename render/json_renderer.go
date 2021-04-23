@@ -926,6 +926,7 @@ func (r *JSONRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool
 func (r *JSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
+		r.flag(node)
 	} else {
 		r.closeObj(node)
 	}
@@ -1012,9 +1013,7 @@ func (r *JSONRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.Wa
 
 func (r *JSONRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
+		r.val(ast.NodeBlockRef, util.BytesToStr(node.Tokens))
 	}
 	return ast.WalkContinue
 }
