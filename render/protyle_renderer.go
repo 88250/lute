@@ -616,10 +616,6 @@ func (r *BlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool
 }
 
 func (r *BlockRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		tokens := html.EscapeHTML(node.Tokens)
-		r.Write(tokens)
-	}
 	return ast.WalkContinue
 }
 
