@@ -304,7 +304,7 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	class := lute.domAttrValue(n, "class")
 	if "protyle-attr" == class ||
-		strings.Contains(class, "protyle-bullet") || strings.Contains(class, "__copy") ||
+		strings.Contains(class, "__copy") ||
 		strings.Contains(class, "protyle-linenumber__rows") {
 		return
 	}
@@ -313,7 +313,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
-	if "protyle-code" == class {
+	if "protyle-action" == class {
 		if ast.NodeCodeBlock == tree.Context.Tip.Type {
 			languageNode := n.FirstChild
 			language := ""
@@ -322,8 +322,8 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, Tokens: util.StrToBytes(language)})
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(lute.domText(n.NextSibling))})
-			return
 		}
+		return
 	}
 
 	if "true" == lute.domAttrValue(n, "contenteditable") {

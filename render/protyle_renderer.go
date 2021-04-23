@@ -546,14 +546,14 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 		return ast.WalkContinue
 	}
 
-	r.Tag("div", [][]string{{"class", "protyle-code"}}, false)
+	r.Tag("div", [][]string{{"class", "protyle-action"}}, false)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	var language string
 	caretInInfo := bytes.Contains(node.Previous.CodeBlockInfo, util.CaretTokens)
 	node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
 
-	attrs := [][]string{{"class", "protyle-code__language"}}
+	attrs := [][]string{{"class", "protyle-action__language"}}
 	if 0 < len(node.Previous.CodeBlockInfo) {
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = string(infoWords[0])
@@ -563,7 +563,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	r.WriteString(language)
 	r.Tag("/div", nil, false)
 
-	r.Tag("div", [][]string{{"class", "protyle-code__copy"}}, false)
+	r.Tag("div", [][]string{{"class", "protyle-action__copy"}}, false)
 	r.Tag("/div", nil, false)
 	r.Tag("/div", nil, false)
 
@@ -1182,11 +1182,11 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 		r.Tag("div", attrs, false)
 
 		if 0 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-bullet"}}
+			attr := [][]string{{"class", "protyle-action"}}
 			r.Tag("div", attr, false)
 			r.Tag("/div", nil, false)
 		} else if 1 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-bullet protyle-bullet--order"}}
+			attr := [][]string{{"class", "protyle-action protyle-action--order"}}
 			r.Tag("div", attr, false)
 			r.WriteString(strconv.Itoa(node.Num) + ".")
 			r.Tag("/div", nil, false)
