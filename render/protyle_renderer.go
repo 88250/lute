@@ -840,10 +840,6 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		parentStyle := node.IALAttr("parent-style")
 		if "" != parentStyle { // 手动设置了位置
 			attrs = append(attrs, []string{"style", parentStyle})
-		} else {
-			if renderFigure { // 未手动设置位置且需要渲染图注
-				attrs = append(attrs, []string{"style", "display: block; text-align: center; white-space: initial;"})
-			}
 		}
 
 		r.Tag("span", attrs, false)
@@ -853,13 +849,14 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("/span", nil, false)
 	} else {
 		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-		destTokens = r.LinkPath(destTokens)
 		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
-		attrs := [][]string{{"src", string(destTokens)}}
+		dataSrc := util.BytesToStr(destTokens)
+		src := util.BytesToStr(r.LinkPath(destTokens))
+		attrs := [][]string{{"src", src}, {"data-src", dataSrc}}
 		alt := node.ChildByType(ast.NodeLinkText)
 		if nil != alt && 0 < len(alt.Tokens) {
 			altTokens := bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
-			attrs = append(attrs, []string{"alt", string(altTokens)})
+			attrs = append(attrs, []string{"alt", util.BytesToStr(altTokens)})
 		}
 
 		attrs = append(attrs, r.NodeAttrs(node.Parent)...)
