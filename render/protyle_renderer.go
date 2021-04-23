@@ -151,7 +151,10 @@ func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkSt
 	if entering {
 		idNode := node.ChildByType(ast.NodeBlockRefID)
 		refTextNode := node.ChildByType(ast.NodeBlockRefText)
-		anchor := strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
+		var anchor string
+		if nil != refTextNode {
+			anchor = strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
+		}
 		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", anchor}, {"contenteditable", "false"}}
 		r.Tag("span", attrs, false)
 		r.WriteString(anchor)

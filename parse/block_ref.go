@@ -84,12 +84,11 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: id})
-	if 1 > len(text) {
-		text = id
+	if 1 < len(text) {
+		ret.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
+		textNode := &ast.Node{Type: ast.NodeBlockRefText, Tokens: text}
+		ret.AppendChild(textNode)
 	}
-	ret.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-	textNode := &ast.Node{Type: ast.NodeBlockRefText, Tokens: text}
-	ret.AppendChild(textNode)
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	return ret
