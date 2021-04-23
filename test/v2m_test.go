@@ -11,7 +11,6 @@
 package test
 
 import (
-	"github.com/88250/lute/ast"
 	"testing"
 
 	"github.com/88250/lute"
@@ -170,60 +169,6 @@ func TestVditorIRDOM2Md(t *testing.T) {
 
 	for _, test := range vditorIRDOM2MdTests {
 		md := luteEngine.VditorIRDOM2Md(test.from)
-		if test.to != md {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
-		}
-	}
-}
-
-var vditorIRBlockDOM2MdTests = []parseTest{
-
-	{"10", "<li data-marker=\"1.\" data-node-id=\"20210331103348-c2gre69\"><p data-node-id=\"20210331103348-9i5ubl0\" data-type=\"p\" updated=\"20210331103151\">foo</p></li><li data-marker=\"2.\" data-node-id=\"20210331103348-ob0yl1y\" class=\"\"><p data-node-id=\"20210331103348-c5g7jim\" data-type=\"p\" updated=\"20210331103152\">bar</p></li>", "1. {: id=\"20210331103348-c2gre69\"}foo\n   {: id=\"20210331103348-9i5ubl0\" updated=\"20210331103151\"}\n2. {: id=\"20210331103348-ob0yl1y\"}bar\n   {: id=\"20210331103348-c5g7jim\" updated=\"20210331103152\"}\n"},
-	{"9", "&lt;form enctype=<span class=\"hljs-string\">\"multipart/form-data\"</span> action=<span class=\"hljs-string\">\"xx.php\"</span> method=<span class=\"hljs-string\">\"POST\"</span>&gt;\n    Send this file: &lt;input name=<span class=\"hljs-string\">\"userfile\"</span> type=<span class=\"hljs-string\">\"file\"</span> /&gt;\n    &lt;input type=<span class=\"hljs-string\">\"submit\"</span> value=<span class=\"hljs-string\">\"Send File\"</span> /&gt;\n&lt;/form&gt;", "<form enctype=\"multipart/form-data\" action=\"xx.php\" method=\"POST\">\n    Send this file: <input name=\"userfile\" type=\"file\" />\n    <input type=\"submit\" value=\"Send File\" />\n</form>\n"},
-	{"8", "<span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">20210221135604-cqzzpky</span><span class=\"vditor-ir__marker\"> </span><span class=\"vditor-ir__marker\">\"</span><span class=\"vditor-ir__marker vditor-ir__marker--info\">{{.text}}</span><span class=\"vditor-ir__marker\">\"</span><span data-type=\"ref-text-tpl-render-result\" class=\"vditor-ir__blockref\">foo</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span>", "((20210221135604-cqzzpky \"{{.text}}\"))\n"},
-	{"7", "<h1 class=\"vditor-ir__node\" data-node-id=\"20210218114934-rof1mw4\" data-type=\"h\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\" data-type=\"heading-marker\"># </span>0. foo</h1><h1 class=\"vditor-ir__node vditor-ir__node--expand\" data-node-id=\"20210218123107-2xtvzvv\" data-type=\"h\" data-marker=\"#\"><span class=\"vditor-ir__marker vditor-ir__marker--heading\" data-type=\"heading-marker\"># </span>bar</h1>", "# 0. foo\n{: id=\"20210218114934-rof1mw4\"}\n\n# bar\n{: id=\"20210218123107-2xtvzvv\"}\n"},
-	{"6", "<div data-type=\"footnotes-block\"><div data-type=\"footnotes-def\"><p data-node-id=\"20201106195335-zufg3eh\" data-type=\"p\">[^1]: foo</p><p data-node-id=\"20201106195338-pxxn5j3\" data-type=\"p\"></p></div></div>", "[^1]: foo\n    {: id=\"20201106195335-zufg3eh\"}\n\n\n{: id=\"20060102150405-1a2b3c4\"}\n"},
-	{"4", "<p data-node-id=\"20201024165528-n88b4e2\" data-type=\"p\"><span data-type=\"strong\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span><strong data-newline=\"1\">foo</strong><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span></span>\nba<wbr></p>", "**foo**\nba\n{: id=\"20201024165528-n88b4e2\"}\n"},
-	{"3", "<ul data-tight=\"true\" data-marker=\"*\" data-node-id=\"20201024153454-bqqcbc1\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20201024153456-ktna8mm\">foo<span data-type=\"strong\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span><strong data-newline=\"1\">bar</strong><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span></span></li><li data-marker=\"*\" data-node-id=\"20201024153456-ktna8mm\"><span data-type=\"strong\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--strong\"><wbr><br></span></span></li></ul>", "* {: id=\"20201024153456-ktna8mm\"}foo**bar**\n* {: id=\"20060102150405-1a2b3c4\"}\n{: id=\"20201024153454-bqqcbc1\"}\n"},
-	{"2", "<ul data-tight=\"true\" data-marker=\"*\" data-node-id=\"ul1\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo<ul data-tight=\"true\" data-marker=\"*\" data-node-id=\"ul2\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"barid\">bar</li></ul></li></ul>", "* {: id=\"fooid\"}foo\n  * {: id=\"barid\"}bar\n  {: id=\"ul2\"}\n{: id=\"ul1\"}\n"},
-	{"1", "<ul data-tight=\"true\" data-marker=\"*\" data-node-id=\"id\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"fooid\">foo</li></ul>", "* {: id=\"fooid\"}foo\n{: id=\"id\"}\n"},
-	{"0", "<ul data-tight=\"true\" data-marker=\"-\" data-node-id=\"20200910154204-c4bobg8\"><li data-marker=\"-\" class=\"vditor-task\" data-node-id=\"\"><input checked=\"\" type=\"checkbox\"></li></ul>", "\n"},
-}
-
-func TestVditorIRBlockDOM2Md(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetVditorIR(true)
-	luteEngine.SetKramdownIAL(true)
-
-	ast.Testing = true
-	for _, test := range vditorIRBlockDOM2MdTests {
-		md := luteEngine.VditorIRBlockDOM2Md(test.from)
-		if test.to != md {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
-		}
-	}
-}
-
-var vditorIRBlockDOM2StdMdTests = []parseTest{
-
-	{"7", "<table data-type=\"table\" data-node-id=\"20210329095451-z38gxwu\" updated=\"20210329110736\" class=\"\"><thead><tr><th>col1</th><th>col2</th><th>col3</th></tr></thead><tbody><tr><td>foo<span data-type=\"html-inline\"><span class=\"vditor-ir__br\">&lt;br /&gt;</span></span>bar</td><td> </td><td> </td></tr><tr><td> </td><td> </td><td> </td></tr></tbody></table>", "| col1         | col2 | col3 |\n| -------------- | ------ | ------ |\n| foo<br />bar |      |      |\n|              |      |      |\n"},
-	{"6", "foo<span data-type=\"html-inline\"><span class=\"vditor-ir__br\">&lt;br&gt;</span></span>bar", "foo\nbar\n"},
-	{"5", "foo<span data-type=\"html-inline\"><span class=\"vditor-ir__br\">&lt;br /&gt;</span></span>bar", "foo\nbar\n"},
-	{"4", "foo <span data-type=\"block-ref\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">20210115181353-n9ow8tk</span><span class=\"vditor-ir__marker\"> </span><span class=\"vditor-ir__marker\">\"</span><span class=\"vditor-ir__marker vditor-ir__marker--info\">{{.text}}</span><span class=\"vditor-ir__marker\">\"</span><span data-type=\"ref-text-tpl-render-result\" class=\"vditor-ir__blockref\">bar</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span> baz", "foo ((20210115181353-n9ow8tk \"{{.text}}\")) baz\n"},
-	{"3", "<p data-node-id=\"20201204201015-jci98xe\" data-type=\"p\">foo</p><p data-node-id=\"20201204201016-by0ypft\" data-type=\"p\">bar</p>", "foo\n\nbar\n"},
-	{"2", "<p data-node-id=\"20201204160321-3nclve2\" data-type=\"p\"><span data-type=\"em\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span><em data-newline=\"1\" style=\"color: red\">foo</em><span class=\"vditor-ir__marker vditor-ir__marker--em\">*</span></span><span data-type=\"span-ial\" class=\"vditor-ir__node vditor-ir__node--expand\"><span class=\"vditor-ir__marker\">{: style=\"color: red\"}</span></span><wbr></p>", "*foo*\n"},
-	{"1", "<ul data-tight=\"true\" data-marker=\"*\" data-node-id=\"20201204165248-f1lyosm\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20201204165346-lvuphf2\">foo<ul data-tight=\"true\" data-marker=\"*\" data-node-id=\"20201204165347-9fl7pnt\" data-type=\"ul\"><li data-marker=\"*\" data-node-id=\"20201204165346-9qw84fg\">bar<wbr></li></ul></li></ul>", "* foo\n  * bar\n"},
-	{"0", "<p data-node-id=\"20201204165248-f1lyosm\" data-type=\"p\">foo<wbr></p>", "foo\n"},
-}
-
-func TestVditorIRBlockDOM2StdMd(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetVditorIR(true)
-	luteEngine.SetKramdownIAL(true)
-
-	ast.Testing = true
-	for _, test := range vditorIRBlockDOM2StdMdTests {
-		md := luteEngine.VditorIRBlockDOM2StdMd(test.from)
 		if test.to != md {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
 		}

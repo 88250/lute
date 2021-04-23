@@ -1068,3 +1068,13 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	ialTokens = append(ialTokens, '}')
 	return ialTokens
 }
+
+func appendNextToTip(next *ast.Node, tree *parse.Tree) {
+	var nodes []*ast.Node
+	for n := next; nil != n; n = n.Next {
+		nodes = append(nodes, n)
+	}
+	for _, n := range nodes {
+		tree.Context.Tip.AppendChild(n)
+	}
+}

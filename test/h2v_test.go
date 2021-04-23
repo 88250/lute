@@ -11,7 +11,6 @@
 package test
 
 import (
-	"github.com/88250/lute/ast"
 	"testing"
 
 	"github.com/88250/lute"
@@ -32,82 +31,6 @@ func TestHTML2VditorDOM(t *testing.T) {
 
 	for _, test := range html2VditorDOMTests {
 		result := luteEngine.HTML2VditorDOM(test.from)
-		if test.to != result {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
-		}
-	}
-}
-
-var html2VditorIRBlockDOMTests = []parseTest{
-	{"5", "<!--StartFragment--><span class=\"tiao\">第一条</span><span>　为</span><!--EndFragment-->", "<p data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\" data-block-index=\"1\"><span data-type=\"strong\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span><strong data-newline=\"1\">第一条</strong><span class=\"vditor-ir__marker vditor-ir__marker--strong\">**</span></span>\u3000为</p>"},
-	{"4", `<!--StartFragment-->
-
-<p class="MsoNormal"><span lang="EN-US">Para1<o:p></o:p></span></p>
-
-<table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" align="left">
- <tbody><tr>
-  <td width="189" valign="top">
-  <p class="MsoNormal"><span lang="EN-US">Foo<o:p></o:p></span></p>
-  </td>
-  <td width="189" valign="top">
-  <p class="MsoNormal"><span lang="EN-US">Bar<o:p></o:p></span></p>
-  </td>
-  <td width="189" valign="top">
-  <p class="MsoNormal"><span lang="EN-US">baz<o:p></o:p></span></p>
-  </td>
- </tr>
- <tr>
-  <td width="189" valign="top">
-  <p class="MsoNormal"><span lang="EN-US">Foo2<o:p></o:p></span></p>
-  <p class="MsoNormal"><span lang="EN-US">Foo3<o:p></o:p></span></p>
-  </td>
-  <td width="189" valign="top">
-  <p class="MsoNormal"><span lang="EN-US">Bar2<o:p></o:p></span></p>
-  </td>
-  <td width="189" valign="top">
-  <p class="MsoNormal"><span lang="EN-US">Baz2<o:p></o:p></span></p>
-  </td>
- </tr>
-</tbody></table>
-
-<p class="MsoNormal"><span lang="EN-US"><o:p>&nbsp;</o:p></span></p>
-
-<p class="MsoNormal"><span lang="EN-US">Para2<o:p></o:p></span></p>
-
-<!--EndFragment-->`, "<p data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\" data-block-index=\"1\">Para1</p><table data-type=\"table\" data-node-id=\"20060102150405-1a2b3c4\" data-block-index=\"2\"><thead><tr><th>Foo</th><th>Bar</th><th>baz</th></tr></thead><tbody><tr><td>Foo2 Foo3</td><td>Bar2</td><td>Baz2</td></tr></tbody></table><p data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\" data-block-index=\"3\">Para2</p>"},
-	{"3", `<table border="0" cellpadding="0" cellspacing="0" width="144">
-<!--StartFragment-->
- <colgroup><col width="72" span="2">
- </colgroup><tbody><tr height="19">
-  <td height="19" width="72">foo</td>
-  <td width="72">bar</td>
- </tr>
- <tr height="19">
-  <td height="19">baz</td>
-  <td>bazz</td>
- </tr>
-<!--EndFragment-->
-</tbody></table>`, "<table data-type=\"table\" data-node-id=\"20060102150405-1a2b3c4\" data-block-index=\"1\"><thead><tr><th>foo</th><th>bar</th></tr></thead><tbody><tr><td>baz</td><td>bazz</td></tr></tbody></table>"},
-	{"2", `<!--StartFragment--><span>第9号</span><!--EndFragment-->`, "<p data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\" data-block-index=\"1\">第9号</p>"},
-	{"1", `<!--StartFragment-->
-<table border="0" cellpadding="0" cellspacing="0" width="144" height="18">
- <colgroup><col width="72" span="2">
- </colgroup><tbody><tr height="18">
-  <td height="18" width="72" x:str="">foo</td>
-  <td width="72" x:str="">bar</td>
- </tr>
-</tbody></table>
-<!--EndFragment-->`, "<table data-type=\"table\" data-node-id=\"20060102150405-1a2b3c4\" data-block-index=\"1\"><thead><tr><th>foo</th><th>bar</th></tr></thead></table>"},
-	{"0", `<!--StartFragment--><a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/users/88250/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/88250"><img class="avatar avatar-user" height="20" width="20" alt="@88250" src="https://avatars2.githubusercontent.com/u/873584?s=60&amp;u=f7f95251dd56b576aefd20094b6695a2db23a927&amp;v=4"></a><span><span>&nbsp;</span></span><!--EndFragment-->`, "<p data-node-id=\"20060102150405-1a2b3c4\" data-type=\"p\" data-block-index=\"1\"><span data-type=\"a\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__node\" data-type=\"img\"><span class=\"vditor-ir__marker\">!</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">@88250</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">https://avatars2.githubusercontent.com/u/873584?s=60&amp;u=f7f95251dd56b576aefd20094b6695a2db23a927&amp;v=4</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span><img src=\"https://avatars2.githubusercontent.com/u/873584?s=60&u=f7f95251dd56b576aefd20094b6695a2db23a927&v=4\" alt=\"@88250\" /></span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">https://github.com/88250</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span></p>"},
-}
-
-func TestHTML2VditorIRBlockDOM(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetAutoSpace(false)
-
-	ast.Testing = true
-	for _, test := range html2VditorIRBlockDOMTests {
-		result := luteEngine.HTML2VditorIRBlockDOM(test.from)
 		if test.to != result {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
 		}
