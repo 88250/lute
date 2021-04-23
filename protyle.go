@@ -673,6 +673,24 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()
+		} else if "img" == dataType {
+			img := n.FirstChild.NextSibling
+			node.Type = ast.NodeImage
+			node.AppendChild(&ast.Node{Type: ast.NodeBang})
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
+			alt := lute.domAttrValue(img, "alt")
+			node.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: util.StrToBytes(alt)})
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			src := lute.domAttrValue(img, "data-src")
+			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
+			if title := lute.domAttrValue(img, "title"); "" != title {
+				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
+				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: util.StrToBytes(title)})
+			}
+			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			tree.Context.Tip.AppendChild(node)
+			return
 		}
 	case atom.Sub:
 		if lute.isEmptyText(n) {

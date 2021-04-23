@@ -831,17 +831,12 @@ func (r *BlockRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus
 }
 
 func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
-	renderFigure := nil != node.ChildByType(ast.NodeLinkTitle)
-
 	if entering {
-		attrs := [][]string{{"contenteditable", "false"}}
-		r.blockNodeAttrs(node, &attrs, "img")
-
+		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
 		parentStyle := node.IALAttr("parent-style")
 		if "" != parentStyle { // 手动设置了位置
 			attrs = append(attrs, []string{"style", parentStyle})
 		}
-
 		r.Tag("span", attrs, false)
 
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
@@ -855,8 +850,14 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		attrs := [][]string{{"src", src}, {"data-src", dataSrc}}
 		alt := node.ChildByType(ast.NodeLinkText)
 		if nil != alt && 0 < len(alt.Tokens) {
-			altTokens := bytes.ReplaceAll(alt.Tokens, util.CaretTokens, nil)
-			attrs = append(attrs, []string{"alt", util.BytesToStr(altTokens)})
+			attrs = append(attrs, []string{"alt", util.BytesToStr(alt.Tokens)})
+		}
+
+		title := node.ChildByType(ast.NodeLinkTitle)
+		var titleTokens []byte
+		if nil != title && 0 < len(title.Tokens) {
+			titleTokens = title.Tokens
+			attrs = append(attrs, []string{"title", util.BytesToStr(titleTokens)})
 		}
 
 		attrs = append(attrs, r.NodeAttrs(node.Parent)...)
@@ -875,18 +876,10 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
 
-		if renderFigure {
-			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
-				titleTokens := title.Tokens
-				titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
-				titleTree := parse.Inline("", titleTokens, r.Tree.Context.ParseOption)
-				figureTitle := RenderHeadingText(titleTree.Root)
-				attrs = [][]string{{"class", "protyle-action__title"}}
-				r.Tag("span", attrs, false)
-				r.Writer.WriteString(figureTitle)
-				r.Tag("/span", nil, false)
-			}
-		}
+		attrs = [][]string{{"class", "protyle-action__title"}}
+		r.Tag("span", attrs, false)
+		r.Writer.Write(titleTokens)
+		r.Tag("/span", nil, false)
 
 		r.Tag("/span", nil, false)
 	}

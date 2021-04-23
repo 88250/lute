@@ -105,7 +105,7 @@ func TestMd2VditorIRDOM(t *testing.T) {
 
 var md2BlockDOMTests = []parseTest{
 
-	{"14", "![alt](bar)\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span contenteditable=\"false\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeImage\" class=\"img\"><span class=\"protyle-action\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span><img src=\"bar\" data-src=\"bar\" alt=\"alt\" /><span class=\"protyle-action__drag\"></span></span></div><div class=\"protyle-attr\"></div></div>"},
+	{"14", "![alt](bar)\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span contenteditable=\"false\" data-type=\"img\" class=\"img\"><span class=\"protyle-action\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span><img src=\"/siyuan/0/测试笔记/bar\" data-src=\"bar\" alt=\"alt\" /><span class=\"protyle-action__drag\"></span><span class=\"protyle-action__title\"></span></span></div><div class=\"protyle-attr\"></div></div>"},
 	{"13", "|foo|\n|-|\n|bar|\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeTable\" class=\"table\"><div class=\"protyle-action\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></div><div contenteditable=\"true\" spellcheck=\"false\"><table><thead><tr><th>foo</th></tr></thead><tbody><tr><td>bar</td></tr></tbody></table></div><div class=\"protyle-attr\"></div></div>"},
 	{"12", "<p>foo</p>\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">&lt;p&gt;foo&lt;/p&gt;</div><div class=\"protyle-attr\"></div></div>"},
 	{"11", "foo((20210121085548-9vnyjk4 \"{{.text}}\"))**bar**\n{: id=\"20210408204847-qyy54hz\"}", "<div data-node-id=\"20210408204847-qyy54hz\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"block-ref\" data-id=\"20210121085548-9vnyjk4\" data-anchor=\"{{.text}}\" contenteditable=\"false\"></span><strong>bar</strong></div><div class=\"protyle-attr\"></div></div>"},
@@ -131,6 +131,7 @@ func TestMd2BlockDOM(t *testing.T) {
 	luteEngine.RenderOptions.KramdownBlockIAL = true
 	luteEngine.ParseOptions.Tag = true
 	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
 	luteEngine.ParseOptions.GitConflict = true
 
 	ast.Testing = true
