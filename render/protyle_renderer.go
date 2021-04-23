@@ -795,7 +795,9 @@ func (r *BlockRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkS
 
 func (r *BlockRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.Tokens)
+		if ast.NodeImage != node.Parent.Type {
+			r.Write(node.Tokens)
+		}
 	}
 	return ast.WalkContinue
 }
@@ -832,7 +834,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 	renderFigure := nil != node.ChildByType(ast.NodeLinkTitle)
 
 	if entering {
-		var attrs [][]string
+		attrs := [][]string{{"contenteditable", "false"}}
 		r.blockNodeAttrs(node, &attrs, "img")
 
 		parentStyle := node.IALAttr("parent-style")
@@ -873,13 +875,16 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
 
+		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
+		r.Tag("/span", nil, false)
+
 		if renderFigure {
 			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
 				titleTokens := title.Tokens
 				titleTokens = bytes.ReplaceAll(titleTokens, util.CaretTokens, nil)
 				titleTree := parse.Inline("", titleTokens, r.Tree.Context.ParseOption)
 				figureTitle := RenderHeadingText(titleTree.Root)
-				attrs = [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}
+				attrs = [][]string{{"class", "protyle-action__title"}}
 				r.Tag("span", attrs, false)
 				r.Writer.WriteString(figureTitle)
 				r.Tag("/span", nil, false)

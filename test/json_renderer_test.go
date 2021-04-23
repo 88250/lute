@@ -40,7 +40,7 @@ var JSONRendererTests = []parseTest{
 	{"测试emoji", ":cn:", "[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"EmojiUnicode\",\"value\":\"🇨🇳\"}]}]"},
 	{"测试HTML实体符号", "&copy;", "[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"HTMLEntity\",\"value\":\"©\"}]}]"},
 	{"测试yaml", "---\nyaml测试\n---\n", "[{\"type\":\"YamlFrontMatter\",\"value\":\"yaml测试\"}]"},
-	{"测试块引用", "((20200817123136-in6y5m1 \"内容块引用\"))", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"BlockRef\",\"children\":[{\"type\":\"Text\",\"value\":\"内容块引用\"}]}]}]"},
+	{"测试块引用", "((20200817123136-in6y5m1 \"内容块引用\"))", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"BlockRef\"}]}]"},
 	{"测试高亮", "==高亮==", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Mark\",\"children\":[{\"type\":\"Text\",\"value\":\"高亮\"}]}]}]"},
 	{"测试上标", "^上标^", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Sup\",\"children\":[{\"type\":\"Text\",\"value\":\"上标\"}]}]}]"},
 	{"测试下标", "~下标~", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Sub\",\"children\":[{\"type\":\"Text\",\"value\":\"下标\"}]}]}]"},
