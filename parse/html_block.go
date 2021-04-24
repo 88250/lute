@@ -38,6 +38,11 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 		t.Context.closeUnmatchedBlocks()
 
 		if t.Context.ParseOption.ProtyleWYSIWYG {
+			if bytes.HasPrefix(tokens, []byte("<iframe")) {
+				t.Context.addChild(ast.NodeIFrame)
+				return 2
+			}
+
 			// Protyle 中不存在 HTML 块，使用段落块
 			return 0
 		}

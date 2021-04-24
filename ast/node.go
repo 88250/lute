@@ -498,7 +498,7 @@ func (n *Node) IsMarker() bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed, NodeGitConflict:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame:
 		return true
 	}
 	return false
@@ -508,7 +508,7 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
 	switch n.Type {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict, NodeIFrame:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
@@ -714,6 +714,18 @@ const (
 	NodeGitConflictOpenMarker  NodeType = 496 // 开始 Git 冲突标记标记符 <<<<<<<
 	NodeGitConflictContent     NodeType = 497 // Git 冲突标记内容
 	NodeGitConflictCloseMarker NodeType = 498 // 结束 Git 冲突标记标记符 >>>>>>>
+
+	// <iframe> 标签
+
+	NodeIFrame NodeType = 500 // <iframe> 标签
+
+	// <audio> 标签
+
+	NodeAudio NodeType = 505 // <audio> 标签
+
+	// <video> 标签
+
+	NodeVideo NodeType = 510 // <video> 标签
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
