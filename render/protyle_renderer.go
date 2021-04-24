@@ -158,12 +158,14 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
-		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
-		r.Tag("/span", nil, false)
-
+		r.Tag("div", nil, false)
 		r.Write(node.Tokens)
 	} else {
+		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
+		r.Tag("/span", nil, false)
+		r.Tag("/div", nil, false)
+
 		attrs := [][]string{{"class", "protyle-attr"}}
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)
@@ -182,12 +184,14 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
-		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
-		r.Tag("/span", nil, false)
-
+		r.Tag("div", nil, false)
 		r.Write(node.Tokens)
 	} else {
+		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
+		r.Tag("/span", nil, false)
+		r.Tag("/div", nil, false)
+
 		attrs := [][]string{{"class", "protyle-attr"}}
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)
@@ -206,12 +210,14 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
-		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
-		r.Tag("/span", nil, false)
-
+		r.Tag("div", nil, false)
 		r.Write(node.Tokens)
 	} else {
+		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
+		r.Tag("/span", nil, false)
+		r.Tag("/div", nil, false)
+
 		attrs := [][]string{{"class", "protyle-attr"}}
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)
