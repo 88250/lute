@@ -324,6 +324,8 @@ type Options struct {
 	Sub bool
 	// GitConflict 设置是否打开 Git 冲突标记支持。
 	GitConflict bool
+	// LinkRef 设置是否打开“链接引用”支持。
+	LinkRef bool
 }
 
 func NewOptions() *Options {
@@ -342,6 +344,7 @@ func NewOptions() *Options {
 		Mark:             false,
 		KramdownBlockIAL: false,
 		HeadingID:        true,
+		LinkRef:          true,
 	}
 }
 

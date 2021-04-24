@@ -20,6 +20,10 @@ import (
 )
 
 func (context *Context) parseLinkRefDef(tokens []byte) []byte {
+	if !context.ParseOption.LinkRef {
+		return nil
+	}
+
 	_, tokens = lex.TrimLeft(tokens)
 	if 1 > len(tokens) {
 		return nil
@@ -92,6 +96,10 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 }
 
 func (t *Tree) FindLinkRefDefLink(label []byte) (link *ast.Node) {
+	if !t.Context.ParseOption.LinkRef {
+		return
+	}
+
 	if t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG {
 		label = bytes.ReplaceAll(label, util.CaretTokens, nil)
 	}

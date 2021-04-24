@@ -17,7 +17,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// 判断脚注定义（[^label]）是否开始。
+// FootnotesStart 判断脚注定义（[^label]）是否开始。
 func FootnotesStart(t *Tree, container *ast.Node) int {
 	if !t.Context.ParseOption.Footnotes || t.Context.indented {
 		return 0

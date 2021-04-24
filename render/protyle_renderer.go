@@ -158,8 +158,11 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 
-		tokens := bytes.TrimSpace(node.Tokens)
-		r.Write(tokens)
+		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
+		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
+		r.Tag("/span", nil, false)
+
+		r.Write(node.Tokens)
 	} else {
 		r.Tag("/div", nil, false)
 
@@ -181,8 +184,11 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 
-		tokens := bytes.TrimSpace(node.Tokens)
-		r.Write(tokens)
+		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
+		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
+		r.Tag("/span", nil, false)
+
+		r.Write(node.Tokens)
 	} else {
 		r.Tag("/div", nil, false)
 
@@ -204,8 +210,11 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 
-		tokens := bytes.TrimSpace(node.Tokens)
-		r.Write(tokens)
+		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
+		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
+		r.Tag("/span", nil, false)
+
+		r.Write(node.Tokens)
 	} else {
 		r.Tag("/div", nil, false)
 

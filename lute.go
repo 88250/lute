@@ -437,6 +437,10 @@ func (lute *Lute) SetGitConflict(b bool) {
 	lute.ParseOptions.GitConflict = b
 }
 
+func (lute *Lute) SetLinkRef(b bool) {
+	lute.ParseOptions.LinkRef = b
+}
+
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 	for rendererType, extRenderer := range options["renderers"] {
 		switch extRenderer.Interface().(type) { // 稍微进行一点格式校验
