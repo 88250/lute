@@ -155,8 +155,6 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "video")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
-		r.Tag("div", attrs, false)
 
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
@@ -164,8 +162,6 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 
 		r.Write(node.Tokens)
 	} else {
-		r.Tag("/div", nil, false)
-
 		attrs := [][]string{{"class", "protyle-attr"}}
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)
@@ -181,8 +177,6 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "audio")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
-		r.Tag("div", attrs, false)
 
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
@@ -190,8 +184,6 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 
 		r.Write(node.Tokens)
 	} else {
-		r.Tag("/div", nil, false)
-
 		attrs := [][]string{{"class", "protyle-attr"}}
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)
@@ -207,8 +199,6 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
-		r.Tag("div", attrs, false)
 
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
@@ -216,8 +206,6 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 
 		r.Write(node.Tokens)
 	} else {
-		r.Tag("/div", nil, false)
-
 		attrs := [][]string{{"class", "protyle-attr"}}
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)

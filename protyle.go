@@ -542,17 +542,17 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case ast.NodeIFrame:
 		node.Type = ast.NodeIFrame
-		node.Tokens = lute.domHTML(n.FirstChild.FirstChild.NextSibling)
+		node.Tokens = lute.domHTML(n.FirstChild.NextSibling)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case ast.NodeVideo:
 		node.Type = ast.NodeVideo
-		node.Tokens = lute.domHTML(n.FirstChild.FirstChild)
+		node.Tokens = lute.domHTML(n.FirstChild.NextSibling)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case ast.NodeAudio:
 		node.Type = ast.NodeAudio
-		node.Tokens = lute.domHTML(n.FirstChild.FirstChild)
+		node.Tokens = lute.domHTML(n.FirstChild.NextSibling)
 		tree.Context.Tip.AppendChild(node)
 		return
 	default:
@@ -576,6 +576,11 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 
 func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	if ast.NodeCodeBlock == tree.Context.Tip.Type {
+		return
+	}
+
+	class := lute.domAttrValue(n, "class")
+	if "svg" == class {
 		return
 	}
 
