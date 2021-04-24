@@ -436,15 +436,15 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			parent.ListData = &ast.ListData{}
 			subType := lute.domAttrValue(n, "data-subtype")
 			if "u" == subType {
-				node.ListData.Typ = 0
-				node.ListData.BulletChar = '*'
+				parent.ListData.Typ = 0
+				parent.ListData.BulletChar = '*'
 			} else if "o" == subType {
-				node.ListData.Typ = 1
-				node.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
-				node.ListData.Delimiter = '.'
+				parent.ListData.Typ = 1
+				parent.ListData.Num, _ = strconv.Atoi(marker[:len(marker)-1])
+				parent.ListData.Delimiter = '.'
 			} else if "t" == subType {
-				node.ListData.Typ = 3
-				node.ListData.BulletChar = '*'
+				parent.ListData.Typ = 3
+				parent.ListData.BulletChar = '*'
 			}
 			tree.Context.Tip.AppendChild(parent)
 			tree.Context.Tip = parent
