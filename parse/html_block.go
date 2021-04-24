@@ -41,6 +41,12 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 			if bytes.HasPrefix(tokens, []byte("<iframe")) {
 				t.Context.addChild(ast.NodeIFrame)
 				return 2
+			} else if bytes.HasPrefix(tokens, []byte("<video")) {
+				t.Context.addChild(ast.NodeVideo)
+				return 2
+			} else if bytes.HasPrefix(tokens, []byte("audio")) {
+				t.Context.addChild(ast.NodeAudio)
+				return 2
 			}
 
 			// Protyle 中不存在 HTML 块，使用段落块

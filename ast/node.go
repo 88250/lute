@@ -498,7 +498,7 @@ func (n *Node) IsMarker() bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame, NodeVideo, NodeAudio:
 		return true
 	}
 	return false
@@ -508,7 +508,7 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
 	switch n.Type {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict, NodeIFrame:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict, NodeIFrame, NodeVideo, NodeAudio:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType

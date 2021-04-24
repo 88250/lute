@@ -254,7 +254,7 @@ func _continue(n *ast.Node, context *Context) int {
 	switch n.Type {
 	case ast.NodeCodeBlock:
 		return CodeBlockContinue(n, context)
-	case ast.NodeHTMLBlock, ast.NodeIFrame:
+	case ast.NodeHTMLBlock, ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio:
 		return HtmlBlockContinue(n, context)
 	case ast.NodeParagraph:
 		return ParagraphContinue(n, context)

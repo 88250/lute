@@ -200,7 +200,7 @@ func (context *Context) finalize(block *ast.Node) {
 	switch block.Type {
 	case ast.NodeCodeBlock:
 		context.codeBlockFinalize(block)
-	case ast.NodeHTMLBlock, ast.NodeIFrame:
+	case ast.NodeHTMLBlock, ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio:
 		context.htmlBlockFinalize(block)
 	case ast.NodeParagraph:
 		insertTable := paragraphFinalize(block, context)

@@ -145,7 +145,55 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	ret.RendererFuncs[ast.NodeIFrame] = ret.renderIFrame
+	ret.RendererFuncs[ast.NodeVideo] = ret.renderVideo
+	ret.RendererFuncs[ast.NodeAudio] = ret.renderAudio
 	return ret
+}
+
+func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "video")
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		r.Tag("div", attrs, false)
+
+		tokens := bytes.TrimSpace(node.Tokens)
+		r.Write(tokens)
+	} else {
+		r.Tag("/div", nil, false)
+
+		attrs := [][]string{{"class", "protyle-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "audio")
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		r.Tag("div", attrs, false)
+
+		tokens := bytes.TrimSpace(node.Tokens)
+		r.Write(tokens)
+	} else {
+		r.Tag("/div", nil, false)
+
+		attrs := [][]string{{"class", "protyle-attr"}}
+		r.Tag("div", attrs, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
+
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
