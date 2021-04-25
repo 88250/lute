@@ -170,7 +170,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if atom.Ol == n.DataAtom {
 			node.ListData.Typ = 1
 		}
-		node.Tight = true
+		node.ListData.Tight = true
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()

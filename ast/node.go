@@ -70,7 +70,7 @@ type Node struct {
 
 	// 列表、列表项
 
-	*ListData `json:",omitempty"`
+	ListData *ListData `json:",omitempty"`
 
 	// 任务列表项 [ ]、[x] 或者 [X]
 

@@ -867,7 +867,7 @@ func (r *VditorSVRenderer) renderParagraph(node *ast.Node, entering bool) ast.Wa
 	} else {
 		r.Newline()
 		grandparent := node.Parent.Parent
-		if inTightList := nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight; !inTightList {
+		if inTightList := nil != grandparent && ast.NodeList == grandparent.Type && grandparent.ListData.Tight; !inTightList {
 			// 不在紧凑列表内则需要输出换行分段
 			r.Write(NewlineSV)
 		}
@@ -1186,16 +1186,16 @@ func (r *VditorSVRenderer) renderListItem(node *ast.Node, entering bool) ast.Wal
 		buf := writer.Bytes()
 		var markerStr string
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			markerStr = strconv.Itoa(node.Num) + string(node.ListData.Delimiter)
+			markerStr = strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter)
 		} else {
-			markerStr = string(node.Marker)
+			markerStr = string(node.ListData.Marker)
 		}
 		marker := []byte(`<span data-type="li-marker" class="vditor-sv__marker">` + markerStr + " </span>")
 		buf = append(marker, buf...)
 		for bytes.HasSuffix(buf, NewlineSV) {
 			buf = bytes.TrimSuffix(buf, NewlineSV)
 		}
-		padding := []byte(`<span data-type="padding">` + strings.Repeat(" ", node.Padding) + "</span>")
+		padding := []byte(`<span data-type="padding">` + strings.Repeat(" ", node.ListData.Padding) + "</span>")
 		buf = bytes.ReplaceAll(buf, NewlineSV, append(NewlineSV, padding...))
 		writer.Reset()
 		writer.Write(buf)

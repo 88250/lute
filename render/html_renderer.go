@@ -859,7 +859,7 @@ func (r *HtmlRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
+	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.ListData.Tight { // List.ListItem.Paragraph
 		return ast.WalkContinue
 	}
 
@@ -1085,8 +1085,8 @@ func (r *HtmlRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 		r.Newline()
 		var attrs [][]string
 		r.renderListStyle(node, &attrs)
-		if 0 == node.BulletChar && 1 != node.Start {
-			attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
+		if 0 == node.ListData.BulletChar && 1 != node.ListData.Start {
+			attrs = append(attrs, []string{"start", strconv.Itoa(node.ListData.Start)})
 		}
 		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)

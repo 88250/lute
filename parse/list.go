@@ -49,9 +49,9 @@ func ListStart(t *Tree, container *ast.Node) int {
 		// 修正有序列表项序号
 		prev := listItem.Previous
 		if nil != prev {
-			listItem.Num = prev.Num + 1
+			listItem.ListData.Num = prev.ListData.Num + 1
 		} else {
-			listItem.Num = data.Start
+			listItem.ListData.Num = data.Start
 		}
 	}
 	return 1
@@ -64,8 +64,8 @@ func ListItemContinue(listItem *ast.Node, context *Context) int {
 		}
 
 		context.advanceNextNonspace()
-	} else if context.indent >= listItem.MarkerOffset+listItem.Padding {
-		context.advanceOffset(listItem.MarkerOffset+listItem.Padding, true)
+	} else if context.indent >= listItem.ListData.MarkerOffset+listItem.ListData.Padding {
+		context.advanceOffset(listItem.ListData.MarkerOffset+listItem.ListData.Padding, true)
 	} else {
 		return 1
 	}
@@ -78,14 +78,14 @@ func (context *Context) listFinalize(list *ast.Node) {
 	// 检查子列表项之间是否包含空行，包含的话说明该列表是非紧凑的，即松散的
 	for nil != item {
 		if endsWithBlankLine(item) && nil != item.Next {
-			list.Tight = false
+			list.ListData.Tight = false
 			break
 		}
 
 		subItem := item.FirstChild
 		for nil != subItem {
 			if endsWithBlankLine(subItem) && (nil != item.Next || nil != subItem.Next) {
-				list.Tight = false
+				list.ListData.Tight = false
 				break
 			}
 			subItem = subItem.Next

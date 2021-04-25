@@ -584,7 +584,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tight := lute.domAttrValue(n, "data-tight")
 		if "true" == tight || "" == tight {
-			node.Tight = true
+			node.ListData.Tight = true
 		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node

@@ -319,7 +319,7 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 		}
 	} else {
 		if ast.NodeListItem == node.Parent.Type || ast.NodeList == node.Parent.Type {
-			if !node.Parent.Tight {
+			if !node.Parent.ListData.Tight {
 				r.Newline()
 			}
 		} else {
@@ -949,7 +949,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 				if nil != listItem.Parent && nil != listItem.Parent.ListData {
 					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.Tight
 					// 设置紧凑标识的具体实现可参考函数 List.Finalize()
-					inTightList = listItem.Parent.Tight
+					inTightList = listItem.Parent.ListData.Tight
 
 					if nextItem := listItem.Next; nil == nextItem {
 						nextPara := node.Next
@@ -1378,7 +1378,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 	} else {
 		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
-		indent := len(node.Marker) + 1
+		indent := len(node.ListData.Marker) + 1
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			indent++
 		}
@@ -1402,9 +1402,9 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 
 		listItemBuf := bytes.Buffer{}
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			listItemBuf.WriteString(strconv.Itoa(node.Num) + string(node.ListData.Delimiter))
+			listItemBuf.WriteString(strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter))
 		} else {
-			listItemBuf.Write(node.Marker)
+			listItemBuf.Write(node.ListData.Marker)
 		}
 		listItemBuf.WriteByte(lex.ItemSpace)
 		buf = append(listItemBuf.Bytes(), buf...)

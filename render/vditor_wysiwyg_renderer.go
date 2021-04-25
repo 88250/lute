@@ -822,7 +822,7 @@ func (r *VditorRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *VditorRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.Tight { // List.ListItem.Paragraph
+	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.ListData.Tight { // List.ListItem.Paragraph
 		return ast.WalkContinue
 	}
 
@@ -1024,24 +1024,24 @@ func (r *VditorRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatu
 	}
 	if entering {
 		var attrs [][]string
-		if node.Tight {
+		if node.ListData.Tight {
 			attrs = append(attrs, []string{"data-tight", "true"})
 		}
-		if 0 == node.BulletChar {
-			if 1 != node.Start {
-				attrs = append(attrs, []string{"start", strconv.Itoa(node.Start)})
+		if 0 == node.ListData.BulletChar {
+			if 1 != node.ListData.Start {
+				attrs = append(attrs, []string{"start", strconv.Itoa(node.ListData.Start)})
 			}
 		}
 		switch node.ListData.Typ {
 		case 0:
-			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+			attrs = append(attrs, []string{"data-marker", string(node.ListData.Marker)})
 		case 1:
-			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter)})
 		case 3:
 			if 0 == node.ListData.BulletChar {
-				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter)})
 			} else {
-				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+				attrs = append(attrs, []string{"data-marker", string(node.ListData.Marker)})
 			}
 		}
 		attrs = append(attrs, []string{"data-block", "0"})
@@ -1058,14 +1058,14 @@ func (r *VditorRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		var attrs [][]string
 		switch node.ListData.Typ {
 		case 0:
-			attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+			attrs = append(attrs, []string{"data-marker", string(node.ListData.Marker)})
 		case 1:
-			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter)})
 		case 3:
 			if 0 == node.ListData.BulletChar {
-				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+				attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter)})
 			} else {
-				attrs = append(attrs, []string{"data-marker", string(node.Marker)})
+				attrs = append(attrs, []string{"data-marker", string(node.ListData.Marker)})
 			}
 			if nil != node.FirstChild && nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type { // li.p.task
 				attrs = append(attrs, []string{"class", r.Options.GFMTaskListItemClass})

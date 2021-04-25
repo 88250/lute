@@ -552,14 +552,14 @@ func (r *BaseRenderer) renderListStyle(node *ast.Node, attrs *[][]string) {
 	if r.Options.RenderListStyle {
 		switch node.ListData.Typ {
 		case 0:
-			*attrs = append(*attrs, []string{"data-style", string(node.Marker)})
+			*attrs = append(*attrs, []string{"data-style", string(node.ListData.Marker)})
 		case 1:
-			*attrs = append(*attrs, []string{"data-style", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+			*attrs = append(*attrs, []string{"data-style", strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter)})
 		case 3:
 			if 0 == node.ListData.BulletChar {
-				*attrs = append(*attrs, []string{"data-style", strconv.Itoa(node.Num) + string(node.ListData.Delimiter)})
+				*attrs = append(*attrs, []string{"data-style", strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter)})
 			} else {
-				*attrs = append(*attrs, []string{"data-style", string(node.Marker)})
+				*attrs = append(*attrs, []string{"data-style", string(node.ListData.Marker)})
 			}
 		}
 	}

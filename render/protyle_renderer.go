@@ -153,7 +153,7 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		r.blockNodeAttrs(node, &attrs, "video")
+		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
 
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
@@ -1179,7 +1179,7 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "u"})
 		case 1:
-			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.Num) + "."})
+			attrs = append(attrs, []string{"data-marker", strconv.Itoa(node.ListData.Num) + "."})
 			attrs = append(attrs, []string{"data-subtype", "o"})
 		case 3:
 			attrs = append(attrs, []string{"data-marker", "*"})
@@ -1196,7 +1196,7 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 		} else if 1 == node.ListData.Typ {
 			attr := [][]string{{"class", "protyle-action protyle-action--order"}}
 			r.Tag("div", attr, false)
-			r.WriteString(strconv.Itoa(node.Num) + ".")
+			r.WriteString(strconv.Itoa(node.ListData.Num) + ".")
 			r.Tag("/div", nil, false)
 		}
 	} else {

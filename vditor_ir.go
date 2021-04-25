@@ -311,14 +311,14 @@ func (lute *Lute) genASTByVditorIRDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tight := lute.domAttrValue(n, "data-tight")
 		if "true" == tight || "" == tight {
-			node.Tight = true
+			node.ListData.Tight = true
 		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Li:
 		if p := n.FirstChild; nil != p && atom.P == p.DataAtom && nil != p.NextSibling && atom.P == p.NextSibling.DataAtom {
-			tree.Context.Tip.Tight = false
+			tree.Context.Tip.ListData.Tight = false
 		}
 
 		node.Type = ast.NodeListItem
