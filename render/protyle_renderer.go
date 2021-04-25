@@ -159,7 +159,7 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
 		r.Tag("/span", nil, false)
-		r.Tag("div", nil, false)
+		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		r.Write(node.Tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
@@ -180,7 +180,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
 		r.Tag("/span", nil, false)
-		r.Tag("div", nil, false)
+		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		r.Write(node.Tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
@@ -201,7 +201,7 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 		r.Tag("span", [][]string{{"class", "protyle-action"}}, false)
 		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
 		r.Tag("/span", nil, false)
-		r.Tag("div", nil, false)
+		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		r.Write(node.Tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)

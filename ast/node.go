@@ -45,9 +45,9 @@ type Node struct {
 
 	// 解析过程标识
 
-	Close           bool `json:",omitempty"` // 标识是否关闭
-	LastLineBlank   bool `json:",omitempty"` // 标识最后一行是否是空行
-	LastLineChecked bool `json:",omitempty"` // 标识最后一行是否检查过
+	Close           bool `json:"-"` // 标识是否关闭
+	LastLineBlank   bool `json:"-"` // 标识最后一行是否是空行
+	LastLineChecked bool `json:"-"` // 标识最后一行是否检查过
 
 	// 代码
 
