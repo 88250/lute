@@ -85,6 +85,22 @@ func IAL2Tokens(ial [][]string) []byte {
 	return buf.Bytes()
 }
 
+func IAL2Map(ial [][]string) (ret map[string]string) {
+	ret = map[string]string{}
+	for _, kv := range ial {
+		ret[kv[0]] = kv[1]
+	}
+	return
+}
+
+func Map2IAL(properties map[string]string) (ret [][]string) {
+	ret = [][]string{}
+	for k, v := range properties {
+		ret = append(ret, []string{k, v})
+	}
+	return
+}
+
 func Tokens2IAL(tokens []byte) (ret [][]string) {
 	// tokens 开头必须是空格
 	tokens = bytes.TrimRight(tokens, " \n")

@@ -165,12 +165,7 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -191,12 +186,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -217,12 +207,7 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -280,12 +265,7 @@ func (r *BlockRenderer) renderGitConflictContent(node *ast.Node, entering bool) 
 		r.Write(html.EscapeHTML(tokens))
 	} else {
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 
@@ -329,11 +309,7 @@ func (r *BlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.Walk
 		attrs = append(attrs, []string{"data-sb-layout", layout})
 		r.Tag("div", attrs, false)
 	} else {
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -592,9 +568,7 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 			r.Tag("div", attrs, false)
 			r.Tag("div", [][]string{{"spin", "1"}}, false)
 			r.Tag("/div", nil, false)
-			r.Tag("div", [][]string{{"class", "protyle-attr"}}, false)
 			r.renderIAL(node)
-			r.Tag("/div", nil, false)
 			r.Tag("/div", nil, false)
 			return ast.WalkSkipChildren
 		}
@@ -606,12 +580,7 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 		if noHighlight {
 			return ast.WalkSkipChildren
 		}
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -728,9 +697,7 @@ func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkS
 	r.Tag("div", attrs, false)
 	r.Tag("div", [][]string{{"spin", "1"}}, false)
 	r.Tag("/div", nil, false)
-	r.Tag("div", [][]string{{"class", "protyle-attr"}}, false)
 	r.renderIAL(node)
-	r.Tag("/div", nil, false)
 	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
@@ -817,12 +784,7 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("/table", nil, false)
 
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -1002,12 +964,7 @@ func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus
 		r.Write(html.EscapeHTML(tokens))
 	} else {
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -1048,12 +1005,7 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 		r.Tag("div", attrs, false)
 	} else {
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -1164,11 +1116,7 @@ func (r *BlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Walk
 		r.blockNodeAttrs(node, &attrs, "bq")
 		r.Tag("div", attrs, false)
 	} else {
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -1189,12 +1137,7 @@ func (r *BlockRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSta
 		r.Tag("div", attrs, false)
 	} else {
 		r.Tag("/div", nil, false)
-
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -1222,11 +1165,7 @@ func (r *BlockRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus
 		r.blockNodeAttrs(node, &attrs, "list")
 		r.Tag("div", attrs, false)
 	} else {
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -1252,6 +1191,7 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 		if 0 == node.ListData.Typ {
 			attr := [][]string{{"class", "protyle-action"}}
 			r.Tag("div", attr, false)
+			r.WriteString("<svg><use xlink:href=\"#iconDot\"></use></svg>")
 			r.Tag("/div", nil, false)
 		} else if 1 == node.ListData.Typ {
 			attr := [][]string{{"class", "protyle-action protyle-action--order"}}
@@ -1260,11 +1200,7 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 			r.Tag("/div", nil, false)
 		}
 	} else {
-		attrs := [][]string{{"class", "protyle-attr"}}
-		r.Tag("div", attrs, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
@@ -1350,15 +1286,20 @@ func (r *BlockRenderer) nodeIndex(node *ast.Node, attrs *[][]string) {
 }
 
 func (r *BlockRenderer) renderIAL(node *ast.Node) {
+	attrs := [][]string{{"class", "protyle-attr"}, {"contenteditable", "false"}}
+	r.Tag("div", attrs, false)
+
 	name := node.IALAttr("name")
 	if "" != name {
 		r.Tag("div", [][]string{{"class", "protyle-attr--name"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconN\"></use></svg>")
 		r.WriteString(name)
 		r.Tag("/div", nil, false)
 	}
 	alias := node.IALAttr("alias")
 	if "" != alias {
 		r.Tag("div", [][]string{{"class", "protyle-attr--alias"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconA\"></use></svg>")
 		r.WriteString(alias)
 		r.Tag("/div", nil, false)
 	}
@@ -1368,4 +1309,6 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 		r.WriteString(bookmark)
 		r.Tag("/div", nil, false)
 	}
+
+	r.Tag("/div", nil, false)
 }

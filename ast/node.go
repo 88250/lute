@@ -32,14 +32,16 @@ type Node struct {
 	URL  string `json:"-"`          // 地址部分
 	Path string `json:"-"`          // 地址路径部分
 
-	Type       NodeType // 节点类型
-	Parent     *Node    `json:"-"`          // 父节点
-	Previous   *Node    `json:"-"`          // 前一个兄弟节点
-	Next       *Node    `json:"-"`          // 后一个兄弟节点
-	FirstChild *Node    `json:"-"`          // 第一个子节点
-	LastChild  *Node    `json:"-"`          // 最后一个子节点
-	Children   []*Node  `json:",omitempty"` // 所有子节点
-	Tokens     []byte   `json:",omitempty"` // 词法分析结果 Tokens，语法分析阶段会继续操作这些 Tokens
+	Type       NodeType `json:"-"`              // 节点类型
+	Parent     *Node    `json:"-"`              // 父节点
+	Previous   *Node    `json:"-"`              // 前一个兄弟节点
+	Next       *Node    `json:"-"`              // 后一个兄弟节点
+	FirstChild *Node    `json:"-"`              // 第一个子节点
+	LastChild  *Node    `json:"-"`              // 最后一个子节点
+	Children   []*Node  `json:",omitempty"`     // 所有子节点
+	Tokens     []byte   `json:"-"`              // 词法分析结果 Tokens，语法分析阶段会继续操作这些 Tokens
+	TypeStr    string   `json:"Type"`           // 类型字符串
+	Data       string   `json:"Data,omitempty"` // Tokens 字符串
 
 	// 解析过程标识
 
@@ -106,8 +108,10 @@ type Node struct {
 
 	HtmlEntityTokens []byte `json:",omitempty"` // 原始输入的实体 tokens，&amp;
 
-	// Kramdown 内联属性列表
-	KramdownIAL [][]string
+	// 属性
+
+	KramdownIAL [][]string        `json:"-"`          // Kramdown 内联属性列表
+	Properties  map[string]string `json:",omitempty"` // 属性
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
