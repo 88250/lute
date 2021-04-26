@@ -565,6 +565,16 @@ func (r *BaseRenderer) renderListStyle(node *ast.Node, attrs *[][]string) {
 	}
 }
 
+func (r *BaseRenderer) tagSrc(tokens []byte) []byte {
+	if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 > srcIndex {
+		return nil
+	} else {
+		src := tokens[srcIndex+len("src=\""):]
+		src = src[:bytes.Index(src, []byte("\""))]
+		return src
+	}
+}
+
 func (r *BaseRenderer) tagSrcPath(tokens []byte) []byte {
 	if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 < srcIndex {
 		src := tokens[srcIndex+len("src=\""):]
