@@ -154,8 +154,9 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		script := node.ChildByType(ast.NodeBlockQueryEmbedScript).Tokens
-		attrs = append(attrs, []string{"data-script", util.BytesToStr(html.EscapeHTML(script))})
+		tokens := node.ChildByType(ast.NodeBlockQueryEmbedScript).Tokens
+		tokens = html.EscapeHTML(bytes.ReplaceAll(tokens, util.CaretTokens, nil))
+		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 		r.blockNodeAttrs(node, &attrs, "render-node")
 		r.Tag("div", attrs, false)
 		r.Tag("/div", nil, false)
