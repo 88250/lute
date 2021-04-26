@@ -19,6 +19,7 @@ import (
 
 var md2BlockDOMTests = []parseTest{
 
+	{"1", "<kbd>foo</kbd>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><kbd>foo</kbd></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"0", "<audio src=\"assets/foo\"></audio>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeAudio\" class=\"iframe\"><span class=\"protyle-action\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span><audio src=\"/siyuan/0/测试笔记/assets/foo\" data-src=\"assets/foo\"></audio><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 }
 

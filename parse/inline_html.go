@@ -116,6 +116,13 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			tags = bytes.ReplaceAll(tags, []byte(util.CaretReplacement), util.CaretTokens)
 		}
 		ctx.pos += len(tags)
+
+		if t.Context.ParseOption.ProtyleWYSIWYG {
+			if bytes.Equal(tags, []byte("<kbd>")) || bytes.Equal(tags, []byte("</kbd>")) {
+				ret = &ast.Node{Type: ast.NodeKbd, Tokens: tags}
+				return
+			}
+		}
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 		return
 	}

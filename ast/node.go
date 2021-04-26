@@ -731,5 +731,9 @@ const (
 
 	NodeVideo NodeType = 510 // <video> 标签
 
+	// <kbd> 标签
+
+	NodeKbd NodeType = 515 // <kbd> 标签
+
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

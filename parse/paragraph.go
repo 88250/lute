@@ -75,7 +75,11 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							}
 						}
 						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
-						p.PrependChild(taskListItemMarker)
+						if context.ParseOption.ProtyleWYSIWYG {
+							p.InsertBefore(taskListItemMarker)
+						} else {
+							p.PrependChild(taskListItemMarker)
+						}
 						p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
 						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
 							p.Tokens = bytes.TrimSpace(p.Tokens)

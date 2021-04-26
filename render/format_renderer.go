@@ -151,7 +151,15 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeIFrame] = ret.renderIFrame
 	ret.RendererFuncs[ast.NodeVideo] = ret.renderVideo
 	ret.RendererFuncs[ast.NodeAudio] = ret.renderAudio
+	ret.RendererFuncs[ast.NodeKbd] = ret.renderKbd
 	return ret
+}
+
+func (r *FormatRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {

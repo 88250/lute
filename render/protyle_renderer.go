@@ -147,7 +147,15 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeIFrame] = ret.renderIFrame
 	ret.RendererFuncs[ast.NodeVideo] = ret.renderVideo
 	ret.RendererFuncs[ast.NodeAudio] = ret.renderAudio
+	ret.RendererFuncs[ast.NodeKbd] = ret.renderKbd
 	return ret
+}
+
+func (r *BlockRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {
