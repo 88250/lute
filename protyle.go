@@ -343,6 +343,17 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch dataType {
+	case ast.NodeBlockQueryEmbed:
+		node.Type = ast.NodeBlockQueryEmbed
+		node.AppendChild(&ast.Node{Type: ast.NodeBang})
+		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
+		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
+		script := lute.domAttrValue(n, "data-script")
+		node.AppendChild(&ast.Node{Type: ast.NodeBlockQueryEmbedScript, Tokens: util.StrToBytes(script)})
+		node.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
+		node.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
+		tree.Context.Tip.AppendChild(node)
+		return
 	case ast.NodeTable:
 		node.Type = ast.NodeTable
 		var tableAligns []int
