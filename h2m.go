@@ -334,9 +334,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Input:
 		node.Type = ast.NodeTaskListItemMarker
-		if lute.hasAttr(n, "checked") {
-			node.TaskListItemChecked = true
-		}
+		node.TaskListItemChecked = lute.hasAttr(n, "checked")
 		tree.Context.Tip.AppendChild(node)
 		if nil != node.Parent.Parent {
 			node.Parent.Parent.ListData.Typ = 3
