@@ -179,6 +179,9 @@ func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 
 	tokens = tokens[2:]
 	tokens = bytes.TrimSpace(tokens)
+	if t.Context.ParseOption.ProtyleWYSIWYG {
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	}
 	if !bytes.HasSuffix(tokens, []byte("}}")) {
 		return
 	}
