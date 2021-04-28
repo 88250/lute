@@ -17,7 +17,8 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// 判断内容块嵌入（!((id "text"))）是否开始。
+// BlockEmbedStart 判断内容块嵌入（!((id "text"))）是否开始。
+// TODO: 待移除
 func BlockEmbedStart(t *Tree, container *ast.Node) int {
 	if !t.Context.ParseOption.BlockRef || t.Context.indented {
 		return 0
@@ -145,7 +146,7 @@ func (t *Tree) parseBlockEmbed() (ret *ast.Node) {
 	return
 }
 
-// 判断内容块查询嵌入（!{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}）是否开始。
+// BlockQueryEmbedStart 判断内容块查询嵌入（{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}）是否开始。
 func BlockQueryEmbedStart(t *Tree, container *ast.Node) int {
 	if !t.Context.ParseOption.BlockRef || t.Context.indented {
 		return 0
@@ -168,15 +169,15 @@ func BlockQueryEmbedStart(t *Tree, container *ast.Node) int {
 
 func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
-	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"!{{"))
-	if !bytes.HasPrefix(tokens, []byte("!{{")) && !startCaret {
+	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"{{"))
+	if !bytes.HasPrefix(tokens, []byte("{{")) && !startCaret {
 		return
 	}
 	if startCaret {
-		tokens = bytes.Replace(tokens, []byte(util.Caret+"!{{"), []byte("!{{"), 1)
+		tokens = bytes.Replace(tokens, []byte(util.Caret+"{{"), []byte("{{"), 1)
 	}
 
-	tokens = tokens[3:]
+	tokens = tokens[2:]
 	tokens = bytes.TrimSpace(tokens)
 	if !bytes.HasSuffix(tokens, []byte("}}")) {
 		return
@@ -187,7 +188,6 @@ func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 	tokens = bytes.TrimSuffix(tokens, util.CaretTokens)
 
 	ret = &ast.Node{Type: ast.NodeBlockQueryEmbed}
-	ret.AppendChild(&ast.Node{Type: ast.NodeBang})
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
 	ret.AppendChild(&ast.Node{Type: ast.NodeBlockQueryEmbedScript, Tokens: script})

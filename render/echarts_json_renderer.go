@@ -124,7 +124,7 @@ func (r *EChartsJSONRenderer) renderSub(node *ast.Node, entering bool) ast.WalkS
 
 func (r *EChartsJSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.leaf("BlockQueryEmbed\n!{{script}}", node)
+		r.leaf("BlockQueryEmbed\n{{script}}", node)
 	}
 	return ast.WalkSkipChildren
 }

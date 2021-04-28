@@ -44,7 +44,7 @@ var JSONRendererTests = []parseTest{
 	{"测试高亮", "==高亮==", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Mark\",\"children\":[{\"type\":\"Text\",\"value\":\"高亮\"}]}]}]"},
 	{"测试上标", "^上标^", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Sup\",\"children\":[{\"type\":\"Text\",\"value\":\"上标\"}]}]}]"},
 	{"测试下标", "~下标~", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Sub\",\"children\":[{\"type\":\"Text\",\"value\":\"下标\"}]}]}]"},
-	{"测试内容块查询嵌入", "!{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}", "[{\"type\":\"BlockQueryEmbed\",\"value\":\"SELECT * FROM blocks WHERE content LIKE \\'%待办%\\'\"},]"},
+	{"测试内容块查询嵌入", "{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}", "[{\"type\":\"BlockQueryEmbed\",\"value\":\"SELECT * FROM blocks WHERE content LIKE \\'%待办%\\'\"},]"},
 	{"测试内容块嵌入节点", "!((id \"text\"))", "[{\"flag\":\"BlockEmbed\"\"type\":\"BlockEmbed\",\"value\":\"text\"}]"},
 	{"测试标签", "#标签测试#", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Tag\",\"children\":[{\"type\":\"Text\",\"value\":\"标签测试\"}]}]}]"},
 }

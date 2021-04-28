@@ -345,7 +345,6 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	switch dataType {
 	case ast.NodeBlockQueryEmbed:
 		node.Type = ast.NodeBlockQueryEmbed
-		node.AppendChild(&ast.Node{Type: ast.NodeBang})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
 		content := lute.domAttrValue(n, "data-content")

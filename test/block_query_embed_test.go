@@ -18,7 +18,7 @@ import (
 
 var blockQueryEmbedTests = []parseTest{
 
-	{"0", "foo\n!{{ SELECT * FROM blocks }}\nbar", "<p>foo</p>\n<div>\"SELECT * FROM blocks\"</div>\n<p>bar</p>\n"},
+	{"0", "foo\n{{ SELECT * FROM blocks }}\nbar", "<p>foo</p>\n<div>\"SELECT * FROM blocks\"</div>\n<p>bar</p>\n"},
 }
 
 func TestBlockQueryEmbed(t *testing.T) {
