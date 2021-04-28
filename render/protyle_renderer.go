@@ -636,11 +636,14 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	var language string
-	caretInInfo := bytes.Contains(node.Previous.CodeBlockInfo, util.CaretTokens)
-	node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
+	caretInInfo := false
+	if nil != node.Previous {
+		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, util.CaretTokens)
+		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
+	}
 
 	attrs := [][]string{{"class", "protyle-action__language"}}
-	if 0 < len(node.Previous.CodeBlockInfo) {
+	if nil != node.Previous && 0 < len(node.Previous.CodeBlockInfo) {
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = string(infoWords[0])
 	}
