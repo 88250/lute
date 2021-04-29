@@ -25,6 +25,7 @@ import (
 
 func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	markdown := lute.blockDOM2Md(ivHTML)
+	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	firstChild := tree.Root.FirstChild
@@ -39,7 +40,6 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	}
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
-	ovHTML = strings.ReplaceAll(ovHTML, parse.Zwsp, "")
 	return
 }
 
@@ -563,17 +563,17 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case ast.NodeIFrame:
 		node.Type = ast.NodeIFrame
-		node.Tokens = lute.domHTML(n.FirstChild.NextSibling.FirstChild)
+		node.Tokens = lute.domHTML(n.FirstChild.NextSibling)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case ast.NodeVideo:
 		node.Type = ast.NodeVideo
-		node.Tokens = lute.domHTML(n.FirstChild.NextSibling.FirstChild)
+		node.Tokens = lute.domHTML(n.FirstChild.NextSibling)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case ast.NodeAudio:
 		node.Type = ast.NodeAudio
-		node.Tokens = lute.domHTML(n.FirstChild.NextSibling.FirstChild)
+		node.Tokens = lute.domHTML(n.FirstChild.NextSibling)
 		tree.Context.Tip.AppendChild(node)
 		return
 	default:

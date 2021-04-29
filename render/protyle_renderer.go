@@ -190,6 +190,7 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		src := r.LinkPath(dataSrc)
 		tokens = bytes.ReplaceAll(tokens, []byte("src=\""), []byte("src=\""+util.BytesToStr(src)+"\" data-src=\""))
 		r.Write(tokens)
+		r.WriteString(parse.Zwsp)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
@@ -214,6 +215,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		src := r.LinkPath(dataSrc)
 		tokens = bytes.ReplaceAll(tokens, []byte("src=\""), []byte("src=\""+util.BytesToStr(src)+"\" data-src=\""))
 		r.Write(tokens)
+		r.WriteString(parse.Zwsp)
 	} else {
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
