@@ -1099,52 +1099,68 @@ func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 
 func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	ialTokens = []byte("{: id=\"" + node.ID + "\"")
+
+	if refcount := lute.domAttrValue(n, "refcount"); "" != refcount {
+		refcount = html.UnescapeString(refcount)
+		refcount = html.EscapeString(refcount)
+		node.SetIALAttr("refcount", refcount)
+		ialTokens = append(ialTokens, []byte(" refcount=\""+refcount+"\"")...)
+	}
+
 	if bookmark := lute.domAttrValue(n, "bookmark"); "" != bookmark {
 		bookmark = html.UnescapeString(bookmark)
 		bookmark = html.EscapeString(bookmark)
 		node.SetIALAttr("bookmark", bookmark)
 		ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
 	}
+
 	if style := lute.domAttrValue(n, "style"); "" != style {
 		node.SetIALAttr("style", style)
 		ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
 	}
+
 	if name := lute.domAttrValue(n, "name"); "" != name {
 		name = html.UnescapeString(name)
 		name = html.EscapeString(name)
 		node.SetIALAttr("name", name)
 		ialTokens = append(ialTokens, []byte(" name=\""+name+"\"")...)
 	}
+
 	if memo := lute.domAttrValue(n, "memo"); "" != memo {
 		memo = html.UnescapeString(memo)
 		memo = html.EscapeString(memo)
 		node.SetIALAttr("memo", memo)
 		ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
 	}
+
 	if alias := lute.domAttrValue(n, "alias"); "" != alias {
 		alias = html.UnescapeString(alias)
 		alias = html.EscapeString(alias)
 		node.SetIALAttr("alias", alias)
 		ialTokens = append(ialTokens, []byte(" alias=\""+alias+"\"")...)
 	}
-	if val := lute.domAttrValue(n, "fold"); "" != val {
-		val = html.UnescapeString(val)
-		val = html.EscapeString(val)
-		node.SetIALAttr("fold", val)
-		ialTokens = append(ialTokens, []byte(" fold=\""+val+"\"")...)
+
+	if fold := lute.domAttrValue(n, "fold"); "" != fold {
+		fold = html.UnescapeString(fold)
+		fold = html.EscapeString(fold)
+		node.SetIALAttr("fold", fold)
+		ialTokens = append(ialTokens, []byte(" fold=\""+fold+"\"")...)
 	}
-	if val := lute.domAttrValue(n, "parent-fold"); "" != val {
-		val = html.UnescapeString(val)
-		val = html.EscapeString(val)
-		node.SetIALAttr("parent-fold", val)
-		ialTokens = append(ialTokens, []byte(" parent-fold=\""+val+"\"")...)
+
+	if parentFold := lute.domAttrValue(n, "parent-fold"); "" != parentFold {
+		parentFold = html.UnescapeString(parentFold)
+		parentFold = html.EscapeString(parentFold)
+		node.SetIALAttr("parent-fold", parentFold)
+		ialTokens = append(ialTokens, []byte(" parent-fold=\""+parentFold+"\"")...)
 	}
-	if val := lute.domAttrValue(n, "updated"); "" != val {
-		val = html.UnescapeString(val)
-		val = html.EscapeString(val)
-		node.SetIALAttr("updated", val)
-		ialTokens = append(ialTokens, []byte(" updated=\""+val+"\"")...)
+
+	if updated := lute.domAttrValue(n, "updated"); "" != updated {
+		updated = html.UnescapeString(updated)
+		updated = html.EscapeString(updated)
+		node.SetIALAttr("updated", updated)
+		ialTokens = append(ialTokens, []byte(" updated=\""+updated+"\"")...)
 	}
+
 	ialTokens = append(ialTokens, '}')
 	return ialTokens
 }

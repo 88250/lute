@@ -1325,24 +1325,29 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	attrs := [][]string{{"class", "protyle-attr"}, {"contenteditable", "false"}}
 	r.Tag("div", attrs, false)
 
-	name := node.IALAttr("name")
-	if "" != name {
+	if name := node.IALAttr("name"); "" != name {
 		r.Tag("div", [][]string{{"class", "protyle-attr--name"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconN\"></use></svg>")
 		r.WriteString(name)
 		r.Tag("/div", nil, false)
 	}
-	alias := node.IALAttr("alias")
-	if "" != alias {
+
+	if alias := node.IALAttr("alias"); "" != alias {
 		r.Tag("div", [][]string{{"class", "protyle-attr--alias"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconA\"></use></svg>")
 		r.WriteString(alias)
 		r.Tag("/div", nil, false)
 	}
-	bookmark := node.IALAttr("bookmark")
-	if "" != bookmark {
+
+	if bookmark := node.IALAttr("bookmark"); "" != bookmark {
 		r.Tag("div", [][]string{{"class", "protyle-attr--bookmark"}}, false)
 		r.WriteString(bookmark)
+		r.Tag("/div", nil, false)
+	}
+
+	if refCount := node.IALAttr("refcount"); "" != refCount {
+		r.Tag("div", [][]string{{"class", "protyle-attr--refcount"}}, false)
+		r.WriteString(refCount)
 		r.Tag("/div", nil, false)
 	}
 
