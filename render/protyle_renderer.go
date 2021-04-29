@@ -1346,7 +1346,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	}
 
 	if refCount := node.IALAttr("refcount"); "" != refCount {
-		r.Tag("div", [][]string{{"class", "protyle-attr--refcount"}}, false)
+		r.Tag("div", [][]string{{"class", "protyle-attr--refcount popover__block"}}, false)
 		r.WriteString(refCount)
 		r.Tag("/div", nil, false)
 	}
