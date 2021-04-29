@@ -1376,7 +1376,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 	if entering {
 		r.Writer = &bytes.Buffer{}
 		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
-		if nil != node.Next && ast.NodeKramdownBlockIAL == node.Next.Type {
+		if r.Options.KramdownBlockIAL && nil != node.Next && ast.NodeKramdownBlockIAL == node.Next.Type {
 			liIAL := node.Next
 			r.Write(liIAL.Tokens)
 		}
