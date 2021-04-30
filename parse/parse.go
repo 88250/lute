@@ -15,8 +15,13 @@ import (
 	"github.com/88250/lute/lex"
 )
 
-// Zwsp 零宽空格。
-const Zwsp = "\u200b"
+const (
+	// Zwsp 零宽空格。
+	Zwsp = "\u200b"
+
+	// Zwj 零宽连字。
+	Zwj = "\u200d"
+)
 
 // Parse 会将 markdown 原始文本字节数组解析为一棵语法树。
 func Parse(name string, markdown []byte, options *Options) (tree *Tree) {

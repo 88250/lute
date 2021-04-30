@@ -332,7 +332,21 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 				language = languageNode.FirstChild.Data
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: util.StrToBytes(language)})
-			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(lute.domText(n.NextSibling))})
+			code := lute.domText(n.NextSibling)
+			lines := strings.Split(code, "\n")
+			buf := bytes.Buffer{}
+			for i, line := range lines {
+				if strings.Contains(line, "```") {
+					line = strings.ReplaceAll(line, "```", parse.Zwj+"```")
+				} else {
+					line = strings.ReplaceAll(line, parse.Zwj, "")
+				}
+				buf.WriteString(line)
+				if i < len(lines)-1 {
+					buf.WriteByte('\n')
+				}
+			}
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()})
 		}
 		return
 	}
