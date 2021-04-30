@@ -1232,7 +1232,7 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 			r.WriteString("<svg><use xlink:href=\"#iconDot\"></use></svg>")
 			r.Tag("/div", nil, false)
 		} else if 1 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-action protyle-action--order"}}
+			attr := [][]string{{"class", "protyle-action protyle-action--order"}, {"contenteditable", "false"}}
 			r.Tag("div", attr, false)
 			r.WriteString(strconv.Itoa(node.ListData.Num) + ".")
 			r.Tag("/div", nil, false)
