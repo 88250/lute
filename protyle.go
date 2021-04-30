@@ -413,9 +413,6 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeHeading:
 		text := lute.domText(n)
-		if "" == strings.TrimSpace(text) {
-			return
-		}
 		if lute.parentIs(n, atom.Table) {
 			node.Tokens = []byte(strings.TrimSpace(text))
 			for bytes.HasPrefix(node.Tokens, []byte("#")) {
@@ -433,9 +430,6 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeBlockquote:
 		content := strings.TrimSpace(lute.domText(n))
-		if "" == content || "&gt;" == content {
-			return
-		}
 		if util.Caret == content {
 			node.Type = ast.NodeText
 			node.Tokens = []byte(content)
