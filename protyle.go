@@ -24,14 +24,15 @@ import (
 )
 
 func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
+	//fmt.Println(ivHTML)
 	markdown := lute.blockDOM2Md(ivHTML)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	firstChild := tree.Root.FirstChild
 	if ast.NodeParagraph == firstChild.Type && "" == firstChild.ID {
-		if second := firstChild.Next; nil != second && ast.NodeParagraph == second.Type && nil != second.Next && ast.NodeKramdownBlockIAL == second.Next.Type {
-			// 段落软换行后生成两个段落，需要把老 ID 调整到第一个段落上
+		if second := firstChild.Next; nil != second && nil != second.Next && ast.NodeKramdownBlockIAL == second.Next.Type {
+			// 软换行后生成两个块，需要把老 ID 调整到第一个块上
 			ial := second.Next
 			firstChild.ID, second.ID = second.ID, ""
 			firstChild.InsertAfter(ial)
