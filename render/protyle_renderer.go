@@ -1211,6 +1211,7 @@ func (r *BlockRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus
 
 func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		class := "li"
 		var attrs [][]string
 		switch node.ListData.Typ {
 		case 0:
@@ -1222,8 +1223,11 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 		case 3:
 			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "t"})
+			if node.FirstChild.TaskListItemChecked {
+				class += " protyle-task--done"
+			}
 		}
-		r.blockNodeAttrs(node, &attrs, "li")
+		r.blockNodeAttrs(node, &attrs, class)
 		r.Tag("div", attrs, false)
 
 		if 0 == node.ListData.Typ {
@@ -1246,12 +1250,11 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *BlockRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var attrs [][]string
 		if node.TaskListItemChecked {
-			attrs = append(attrs, []string{"checked", ""})
+			r.WriteString("<div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
+		} else {
+			r.WriteString("<div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
 		}
-		attrs = append(attrs, []string{"type", "checkbox"})
-		r.Tag("input", attrs, true)
 	}
 	return ast.WalkContinue
 }

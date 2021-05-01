@@ -347,6 +347,10 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()})
+		} else if ast.NodeListItem == tree.Context.Tip.Type {
+			if 3 == tree.Context.Tip.ListData.Typ { // 任务列表
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeTaskListItemMarker, TaskListItemChecked: strings.Contains(lute.domAttrValue(n.Parent, "class"), "protyle-task--done")})
+			}
 		}
 		return
 	}
