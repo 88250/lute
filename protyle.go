@@ -101,10 +101,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
 
 	// DOM 转 AST
-	tree, err := lute.BlockDOM2Tree(htmlStr)
-	if nil != err {
-		return err.Error()
-	}
+	tree := lute.BlockDOM2Tree(htmlStr)
 
 	// 将 kramdown IAL 节点内容置空
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -132,18 +129,12 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) BlockDOM2Text(htmlStr string) (text string) {
-	tree, err := lute.BlockDOM2Tree(htmlStr)
-	if nil != err {
-		return ""
-	}
+	tree := lute.BlockDOM2Tree(htmlStr)
 	return tree.Root.Text()
 }
 
 func (lute *Lute) BlockDOM2TextLen(htmlStr string) int {
-	tree, err := lute.BlockDOM2Tree(htmlStr)
-	if nil != err {
-		return 0
-	}
+	tree := lute.BlockDOM2Tree(htmlStr)
 	return tree.Root.TextLen()
 }
 
@@ -167,7 +158,7 @@ func RenderNodeBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptio
 	return renderer.Writer.String()
 }
 
-func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
+func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", util.Caret)
 
 	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
@@ -209,11 +200,7 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree, err error) {
 }
 
 func (lute *Lute) H2P(ivHTML string) (ovHTML string) {
-	tree, err := lute.BlockDOM2Tree(ivHTML)
-	if nil != err {
-		return err.Error()
-	}
-
+	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild
 	if ast.NodeHeading != node.Type {
 		return ivHTML
@@ -225,11 +212,7 @@ func (lute *Lute) H2P(ivHTML string) (ovHTML string) {
 }
 
 func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
-	tree, err := lute.BlockDOM2Tree(ivHTML)
-	if nil != err {
-		return err.Error()
-	}
-
+	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild
 	if ast.NodeParagraph != node.Type {
 		return ivHTML
@@ -242,11 +225,7 @@ func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
 }
 
 func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
-	tree, err := lute.BlockDOM2Tree(ivHTML)
-	if nil != err {
-		return err.Error()
-	}
-
+	tree := lute.BlockDOM2Tree(ivHTML)
 	if ast.NodeList != tree.Root.FirstChild.Type {
 		return ivHTML
 	}
@@ -265,11 +244,7 @@ func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
 }
 
 func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
-	tree, err := lute.BlockDOM2Tree(ivHTML)
-	if nil != err {
-		return err.Error()
-	}
-
+	tree := lute.BlockDOM2Tree(ivHTML)
 	if ast.NodeList != tree.Root.FirstChild.Type {
 		return ivHTML
 	}
@@ -296,10 +271,7 @@ func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
 }
 
 func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
-	tree, err := lute.BlockDOM2Tree(htmlStr)
-	if nil != err {
-		return err.Error()
-	}
+	tree := lute.BlockDOM2Tree(htmlStr)
 
 	// 将 AST 进行 Markdown 格式化渲染
 	options := render.NewOptions()
@@ -751,7 +723,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: util.StrToBytes(title)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			if parentStyle := lute.domAttrValue(n, "style");""!=parentStyle {
+				node.SetIALAttr("parent-style", parentStyle)
+			}
 			tree.Context.Tip.AppendChild(node)
+			lute.setSpanIAL(img, tree.Context.Tip.LastChild)
 			return
 		}
 	case atom.Sub:
@@ -1098,10 +1074,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 }
 
 func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
-	style := lute.domAttrValue(n, "style")
-	if "" != style {
+	if style := lute.domAttrValue(n, "style"); "" != style {
 		node.SetIALAttr("style", style)
-		node.KramdownIAL = [][]string{{"style", style}}
 		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 		node.InsertAfter(ial)
