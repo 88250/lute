@@ -251,9 +251,8 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idNode := node.ChildByType(ast.NodeBlockRefID)
-		refTextNode := node.ChildByType(ast.NodeBlockRefText)
 		var anchor string
-		if nil != refTextNode {
+		if refTextNode := node.ChildByType(ast.NodeBlockRefText); nil != refTextNode {
 			anchor = strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
 		}
 		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", anchor}, {"contenteditable", "false"}}
