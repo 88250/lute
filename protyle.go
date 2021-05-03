@@ -598,7 +598,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	}
 
 	content := n.Data
-	node := &ast.Node{Type: ast.NodeText, Tokens: []byte(content)}
+	node := &ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(content)}
 	switch n.DataAtom {
 	case 0:
 		if "" == content {
@@ -620,7 +620,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if startCaret {
 				content = util.Caret + content
 			}
-			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: []byte(content)}
+			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(content)}
 			node.AppendChild(content)
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
 			tree.Context.Tip.AppendChild(node)
