@@ -514,75 +514,45 @@ func (r *ProtylePreviewRenderer) renderFootnotesDef(node *ast.Node, entering boo
 func (r *ProtylePreviewRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
 
-	if !node.IsFencedCodeBlock {
-		if entering {
-			// 缩进代码块处理
-			tokens := node.FirstChild.Tokens
+	noHighlight := false
+	var language string
+	if nil != node.FirstChild.Next && 0 < len(node.FirstChild.Next.CodeBlockInfo) {
+		language = util.BytesToStr(node.FirstChild.Next.CodeBlockInfo)
+		noHighlight = r.NoHighlight(language)
+	}
+
+	if entering {
+		if noHighlight {
 			var attrs [][]string
-			r.handleKramdownBlockIAL(node)
-			attrs = append(attrs, node.KramdownIAL...)
-			r.Tag("pre", attrs, false)
-			r.WriteString("<code>")
-			tokens = html.EscapeHTML(tokens)
-			r.Write(tokens)
-			r.WriteString("</code></pre>")
+			tokens := html.EscapeHTML(node.FirstChild.Next.Next.Tokens)
+			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+			tokens = bytes.TrimSpace(tokens)
+			attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
+			attrs = append(attrs, []string{"data-subtype", language})
+			r.Tag("div", attrs, false)
+			r.Tag("div", [][]string{{"spin", "1"}}, false)
+			r.Tag("/div", nil, false)
+			r.Tag("/div", nil, false)
 			return ast.WalkSkipChildren
 		}
-		return ast.WalkContinue
+
+		attrs := [][]string{{"class", "code-block"}}
+		r.Tag("pre", attrs, false)
+		r.WriteString("<code>")
+	} else {
+		if noHighlight {
+			return ast.WalkSkipChildren
+		}
+
+		r.Tag("/code", nil, false)
+		r.Tag("/pre", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *ProtylePreviewRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
-	var language string
-	if 0 < len(node.Previous.CodeBlockInfo) {
-		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
-		language = util.BytesToStr(infoWords[0])
-	}
-	preDiv := r.NoHighlight(language)
 	if entering {
-		var attrs [][]string
-		r.handleKramdownBlockIAL(node.Parent)
-		attrs = append(attrs, node.Parent.KramdownIAL...)
-
-		tokens := node.Tokens
-		if 0 < len(node.Previous.CodeBlockInfo) {
-			rendered := false
-			if "mindmap" == language {
-				json := EChartsMindmap(tokens)
-				r.WriteString("<div data-code=\"")
-				r.Write(json)
-				r.WriteString("\" class=\"language-mindmap\">")
-				r.Write(html.EscapeHTML(tokens))
-				rendered = true
-			}
-
-			if !rendered {
-				if preDiv {
-					r.WriteString("<div class=\"language-")
-				} else {
-					attrs = append(attrs, []string{"class", "code-block"})
-					r.Tag("pre", attrs, false)
-					r.WriteString("<code class=\"language-")
-				}
-				r.WriteString(language)
-				r.WriteString("\">")
-				tokens = html.EscapeHTML(tokens)
-				r.Write(tokens)
-			}
-		} else {
-			attrs = append(attrs, []string{"class", "code-block"})
-			r.Tag("pre", attrs, false)
-			r.WriteString("<code>")
-			tokens = html.EscapeHTML(tokens)
-			r.Write(tokens)
-		}
-	} else {
-		if preDiv {
-			r.WriteString("</div>")
-		} else {
-			r.WriteString("</code></pre>")
-		}
+		r.Write(html.EscapeHTML(node.Tokens))
 	}
 	return ast.WalkContinue
 }
@@ -652,9 +622,6 @@ func (r *ProtylePreviewRenderer) renderMathBlockCloseMarker(node *ast.Node, ente
 }
 
 func (r *ProtylePreviewRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Write(html.EscapeHTML(node.Tokens))
-	}
 	return ast.WalkContinue
 }
 
@@ -664,12 +631,20 @@ func (r *ProtylePreviewRenderer) renderMathBlockOpenMarker(node *ast.Node, enter
 
 func (r *ProtylePreviewRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
-	if entering {
-		attrs := [][]string{{"class", "language-math"}}
-		r.handleKramdownBlockIAL(node)
-		attrs = append(attrs, node.KramdownIAL...)
-		r.Tag("div", attrs, false)
+	if !entering {
+		return ast.WalkContinue
 	}
+
+	var attrs [][]string
+	tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	tokens = bytes.TrimSpace(tokens)
+	attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
+	attrs = append(attrs, []string{"data-subtype", "math"})
+	r.Tag("div", attrs, false)
+	r.Tag("div", [][]string{{"spin", "1"}}, false)
+	r.Tag("/div", nil, false)
+	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
 
