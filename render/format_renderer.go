@@ -152,12 +152,46 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeVideo] = ret.renderVideo
 	ret.RendererFuncs[ast.NodeAudio] = ret.renderAudio
 	ret.RendererFuncs[ast.NodeKbd] = ret.renderKbd
+	ret.RendererFuncs[ast.NodeKbdOpenMarker] = ret.renderKbdOpenMarker
+	ret.RendererFuncs[ast.NodeKbdCloseMarker] = ret.renderKbdCloseMarker
+	ret.RendererFuncs[ast.NodeUnderline] = ret.renderUnderline
+	ret.RendererFuncs[ast.NodeUnderlineOpenMarker] = ret.renderUnderlineOpenMarker
+	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	return ret
 }
 
-func (r *FormatRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderUnderline(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderUnderlineOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.Tokens)
+		r.WriteString("<u>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderUnderlineCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</u>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<kbd>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderKbdCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</kbd>")
 	}
 	return ast.WalkContinue
 }

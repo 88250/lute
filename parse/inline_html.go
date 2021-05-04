@@ -118,8 +118,19 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		ctx.pos += len(tags)
 
 		if t.Context.ParseOption.ProtyleWYSIWYG {
-			if bytes.Equal(tags, []byte("<kbd>")) || bytes.Equal(tags, []byte("</kbd>")) {
-				ret = &ast.Node{Type: ast.NodeKbd, Tokens: tags}
+			if bytes.Equal(tags, []byte("<kbd>")) {
+				ret = &ast.Node{Type: ast.NodeKbd}
+				ret.AppendChild(&ast.Node{Type: ast.NodeKbdOpenMarker})
+				return
+			} else if bytes.Equal(tags, []byte("</kbd>")) {
+				ret = &ast.Node{Type: ast.NodeKbdCloseMarker}
+				return
+			} else if bytes.Equal(tags, []byte("<u>")) {
+				ret = &ast.Node{Type: ast.NodeUnderline}
+				ret.AppendChild(&ast.Node{Type: ast.NodeUnderlineOpenMarker})
+				return
+			} else if bytes.Equal(tags, []byte("</u>")) {
+				ret = &ast.Node{Type: ast.NodeUnderlineCloseMarker}
 				return
 			}
 		}

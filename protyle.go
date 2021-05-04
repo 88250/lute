@@ -723,7 +723,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: util.StrToBytes(title)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-			if parentStyle := lute.domAttrValue(n, "style");""!=parentStyle {
+			if parentStyle := lute.domAttrValue(n, "style"); "" != parentStyle {
 				node.SetIALAttr("parent-style", parentStyle)
 			}
 			tree.Context.Tip.AppendChild(node)
@@ -754,8 +754,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		if lute.isEmptyText(n) {
 			return
 		}
-		node.Type = ast.NodeInlineHTML
-		node.Tokens = []byte("<u>")
+		node.Type = ast.NodeUnderline
+		node.AppendChild(&ast.Node{Type: ast.NodeUnderlineOpenMarker})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -764,7 +764,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		node.Type = ast.NodeKbd
-		node.Tokens = []byte("<kbd>")
+		node.AppendChild(&ast.Node{Type: ast.NodeKbdOpenMarker})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1033,9 +1033,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	case atom.Sup:
 		node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
 	case atom.U:
-		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("</u>")})
+		node.AppendChild(&ast.Node{Type: ast.NodeUnderlineCloseMarker})
 	case atom.Kbd:
-		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeKbd, Tokens: []byte("</kbd>")})
+		node.AppendChild(&ast.Node{Type: ast.NodeKbdCloseMarker})
 	case atom.Em, atom.I:
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {

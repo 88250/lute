@@ -148,7 +148,48 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeVideo] = ret.renderVideo
 	ret.RendererFuncs[ast.NodeAudio] = ret.renderAudio
 	ret.RendererFuncs[ast.NodeKbd] = ret.renderKbd
+	ret.RendererFuncs[ast.NodeKbdOpenMarker] = ret.renderKbdOpenMarker
+	ret.RendererFuncs[ast.NodeKbdCloseMarker] = ret.renderKbdCloseMarker
+	ret.RendererFuncs[ast.NodeUnderline] = ret.renderUnderline
+	ret.RendererFuncs[ast.NodeUnderlineOpenMarker] = ret.renderUnderlineOpenMarker
+	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	return ret
+}
+
+func (r *BlockRenderer) renderUnderline(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderUnderlineOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<u>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderUnderlineCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</u>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<kbd>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderKbdCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</kbd>")
+	}
+	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
@@ -165,13 +206,6 @@ func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast
 }
 
 func (r *BlockRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Write(node.Tokens)
-	}
 	return ast.WalkContinue
 }
 

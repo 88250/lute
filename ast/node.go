@@ -733,7 +733,15 @@ const (
 
 	// <kbd> 标签
 
-	NodeKbd NodeType = 515 // <kbd> 标签
+	NodeKbd            NodeType = 515 // 键盘
+	NodeKbdOpenMarker  NodeType = 516 // 开始 kbd 标记符 <kbd>
+	NodeKbdCloseMarker NodeType = 517 // 结束 kbd 标记符 </kbd>
+
+	// <u> 下划线
+
+	NodeUnderline            NodeType = 520 // 下划线
+	NodeUnderlineOpenMarker  NodeType = 521 // 开始下划线标记符 <u>
+	NodeUnderlineCloseMarker NodeType = 522 // 结束下划线标记符 </u>
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
