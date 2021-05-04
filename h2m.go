@@ -337,7 +337,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		node.TaskListItemChecked = lute.hasAttr(n, "checked")
 		tree.Context.Tip.AppendChild(node)
 		if nil != node.Parent.Parent {
-			node.Parent.Parent.ListData.Typ = 3
+			if nil == node.Parent.Parent.ListData {
+				node.Parent.Parent.ListData = &ast.ListData{Typ: 3}
+			} else {
+				node.Parent.Parent.ListData.Typ = 3
+			}
 		}
 	case atom.Del, atom.S, atom.Strike:
 		node.Type = ast.NodeStrikethrough
@@ -446,6 +450,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Iframe, atom.Audio, atom.Video:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = lute.domHTML(n)
+		tree.Context.Tip.AppendChild(node)
+		return
+	case atom.Noscript:
+		return
+	case atom.Figcaption:
+		node.Type = ast.NodeParagraph
+		node.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
+		node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(lute.domText(n))})
 		tree.Context.Tip.AppendChild(node)
 		return
 	default:
