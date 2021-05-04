@@ -687,6 +687,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		} else if "a" == dataType {
+			if nil == n.FirstChild {
+				// 丢弃没有锚文本的链接
+				return
+			}
+
 			node.Type = ast.NodeLink
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 			tree.Context.Tip.AppendChild(node)
