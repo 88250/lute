@@ -132,6 +132,9 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			} else if bytes.Equal(tags, []byte("</u>")) {
 				ret = &ast.Node{Type: ast.NodeUnderlineCloseMarker}
 				return
+			} else if bytes.Equal(tags, []byte("<br />")) {
+				ret = &ast.Node{Type: ast.NodeBr}
+				return
 			}
 		}
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}

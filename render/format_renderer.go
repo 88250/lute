@@ -157,7 +157,15 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeUnderline] = ret.renderUnderline
 	ret.RendererFuncs[ast.NodeUnderlineOpenMarker] = ret.renderUnderlineOpenMarker
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
+	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	return ret
+}
+
+func (r *FormatRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<br />")
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderUnderline(node *ast.Node, entering bool) ast.WalkStatus {

@@ -773,6 +773,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+	case atom.Br:
+		node.Type = ast.NodeBr
+		tree.Context.Tip.AppendChild(node)
+		return
 	case atom.Em, atom.I:
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return

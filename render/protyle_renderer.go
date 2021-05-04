@@ -153,7 +153,15 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeUnderline] = ret.renderUnderline
 	ret.RendererFuncs[ast.NodeUnderlineOpenMarker] = ret.renderUnderlineOpenMarker
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
+	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	return ret
+}
+
+func (r *BlockRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<br />")
+	}
+	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderUnderline(node *ast.Node, entering bool) ast.WalkStatus {
