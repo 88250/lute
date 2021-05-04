@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"43", "<!--StartFragment-->foo<strong>bar.</strong><span>baz</span><!--EndFragment-->", "foo **bar.** baz\n"},
 	{"42", "\n<!--StartFragment--><img class=\"rich_pages img_loading\" data-ratio=\"0.5625\" data-s=\"300,640\" data-src=\"https://foo\" data-type=\"jpeg\" data-w=\"1280\" data-backw=\"578\" data-backh=\"326\" _width=\"100%\" src=\"data:image/gif;base64,dataimge\" crossorigin=\"anonymous\" alt=\"图片\">", "![图片](https://foo)\n"},
 	{"41", "<section class=\"code-snippet__fix code-snippet__js\"><pre class=\"code-snippet__js\" data-lang=\"makefile\"><code><span class=\"code-snippet_outer\">foo</span></code><code><span class=\"code-snippet_outer\">bar</span></code></pre></section>", "```\nfoo\nbar\n```\n"},
 	{"40", "<!--StartFragment--><strong>foo.</strong><span>bar</span><!--EndFragment-->", "**foo.** bar\n"},
