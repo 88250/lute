@@ -137,7 +137,7 @@ func (lute *Lute) RenderJSON(markdown string) (json string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewJSONRenderer(tree, lute.RenderOptions)
 	output := renderer.Render()
-	json = string(output)
+	json = util.BytesToStr(output)
 	return
 }
 
@@ -215,14 +215,21 @@ func FormatNode(node *ast.Node, parseOptions *parse.Options, renderOptions *rend
 		rendererFunc := renderer.RendererFuncs[n.Type]
 		return rendererFunc(n, entering)
 	})
-	return strings.TrimSpace(renderer.Writer.String())
+	return util.BytesToStr(bytes.TrimSpace(renderer.Writer.Bytes()))
+}
+
+// ProtylePreview 使用指定的 options 渲染 tree 为 Protyle 预览 HTML。
+func (lute *Lute) ProtylePreview(tree *parse.Tree, options *render.Options) string {
+	renderer := render.NewProtylePreviewRenderer(tree, options)
+	output := renderer.Render()
+	return util.BytesToStr(output)
 }
 
 // Tree2HTML 使用指定的 options 渲染 tree 为标准 HTML。
 func (lute *Lute) Tree2HTML(tree *parse.Tree, options *render.Options) string {
 	renderer := render.NewHtmlRenderer(tree, options)
 	output := renderer.Render()
-	return string(output)
+	return util.BytesToStr(output)
 }
 
 // ParseOption 描述了解析选项设置函数签名。
