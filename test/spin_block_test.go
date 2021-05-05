@@ -19,6 +19,7 @@ import (
 
 var spinBlockDOMTests = []*parseTest{
 
+	{"18", "<div data-node-id=\"20210505171041-me8noe4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210505183238\"><div contenteditable=\"true\" spellcheck=\"false\">foo <img alt=\"huaji\" class=\"emoji\" src=\"http://127.0.0.1:6806/stage/protyle/images/emoji/huaji.gif\" title=\"huaji\"><wbr></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-node-id=\"20210505171041-me8noe4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210505183238\"><div contenteditable=\"true\" spellcheck=\"false\">foo <img alt=\"huaji\" class=\"emoji\" src=\"http://127.0.0.1:6806/stage/protyle/images/emoji/huaji.gif\" title=\"huaji\" /><wbr></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"17", "<div data-node-id=\"20210504111639-jjqdgx5\" data-node-index=\"1\" data-type=\"NodeTable\" class=\"table\" updated=\"20210504111846\"><div class=\"protyle-action\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></div><div contenteditable=\"true\" spellcheck=\"false\"><table><thead><tr><th>col1</th></tr></thead><tbody><tr><td>foo<br />bar<wbr></td></tr></tbody></table></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-node-id=\"20210504111639-jjqdgx5\" data-node-index=\"1\" data-type=\"NodeTable\" class=\"table\" updated=\"20210504111846\"><div class=\"protyle-action\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></div><div contenteditable=\"true\" spellcheck=\"false\"><table><thead><tr><th>col1</th></tr></thead><tbody><tr><td>foo<br />bar<wbr></td></tr></tbody></table></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"16", "<div data-node-id=\"20210504103508-y9plmyi\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210504103508\"><div contenteditable=\"true\" spellcheck=\"false\">t<wbr><span data-type=\"a\" data-href=\"bar\" data-title=\"baz\"></span></div><div class=\"protyle-attr\"></div></div>", "<div data-node-id=\"20210504103508-y9plmyi\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210504103508\"><div contenteditable=\"true\" spellcheck=\"false\">t<wbr></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"15", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><u>foo</u></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><u>foo</u></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
@@ -51,6 +52,7 @@ func TestSpinBlockDOM(t *testing.T) {
 	luteEngine.SetSub(true)
 	luteEngine.SetSup(true)
 	luteEngine.SetGitConflict(true)
+	luteEngine.SetEmojiSite("http://127.0.0.1:6806/stage/protyle/images/emoji")
 
 	ast.Testing = true
 	for _, test := range spinBlockDOMTests {
