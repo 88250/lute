@@ -358,7 +358,7 @@ func Peek(tokens []byte, pos int) byte {
 	return 0
 }
 
-// BytesShowLength 获取字节数组展示为UTF8字符串时的长度。
+// BytesShowLength 获取字节数组展示为 UTF8 字符串时的长度。
 func BytesShowLength(bytes []byte) int {
 	length := 0
 	for i := 0; i < len(bytes); i++ {

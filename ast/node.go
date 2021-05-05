@@ -297,8 +297,12 @@ func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 			NodeGitConflictContent:
 			buf = append(buf, n.Tokens...)
 		}
+		if n.IsBlock() {
+			buf = append(buf, ' ')
+		}
 		return WalkContinue
 	})
+	buf = bytes.TrimSpace(buf)
 	return util.WordCount(util.BytesToStr(buf))
 }
 
