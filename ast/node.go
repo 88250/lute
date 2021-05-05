@@ -284,7 +284,7 @@ func (n *Node) Content() (ret string) {
 }
 
 // ContentLen 返回 n 及其所有内容子节点的累计长度。
-func (n *Node) ContentLen() (ret int) {
+func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 	buf := make([]byte, 0, 8192)
 	Walk(n, func(n *Node, entering bool) WalkStatus {
 		if !entering {
@@ -299,7 +299,7 @@ func (n *Node) ContentLen() (ret int) {
 		}
 		return WalkContinue
 	})
-	return utf8.RuneCount(buf)
+	return util.WordCount(util.BytesToStr(buf))
 }
 
 // TokenLen 返回 n 及其子节点 tokens 累计长度。
