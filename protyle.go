@@ -1007,7 +1007,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		if "emoji" == class {
 			alt := lute.domAttrValue(n, "alt")
 			node.Type = ast.NodeEmoji
-			emojiImg := &ast.Node{Type: ast.NodeEmojiAlias, Tokens: []byte(":" + alt + ":")}
+			emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.EmojiImgTokens(alt, lute.domAttrValue(n, "src"))}
+			emojiImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: []byte(":" + alt + ":")})
 			node.AppendChild(emojiImg)
 			tree.Context.Tip.AppendChild(node)
 			return
