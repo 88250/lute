@@ -145,7 +145,102 @@ func NewProtylePreviewRenderer(tree *parse.Tree, options *Options) *ProtylePrevi
 	ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
 	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
+	ret.RendererFuncs[ast.NodeIFrame] = ret.renderIFrame
+	ret.RendererFuncs[ast.NodeVideo] = ret.renderVideo
+	ret.RendererFuncs[ast.NodeAudio] = ret.renderAudio
+	ret.RendererFuncs[ast.NodeKbd] = ret.renderKbd
+	ret.RendererFuncs[ast.NodeKbdOpenMarker] = ret.renderKbdOpenMarker
+	ret.RendererFuncs[ast.NodeKbdCloseMarker] = ret.renderKbdCloseMarker
+	ret.RendererFuncs[ast.NodeUnderline] = ret.renderUnderline
+	ret.RendererFuncs[ast.NodeUnderlineOpenMarker] = ret.renderUnderlineOpenMarker
+	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
+	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	return ret
+}
+
+func (r *ProtylePreviewRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<br />")
+	}
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderUnderline(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderUnderlineOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<u>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderUnderlineCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</u>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<kbd>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderKbdCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</kbd>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		tokens := node.Tokens
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		tokens := node.Tokens
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
+		r.Newline()
+	}
+	return ast.WalkContinue
+}
+
+func (r *ProtylePreviewRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		tokens := node.Tokens
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
+		r.Newline()
+	}
+	return ast.WalkContinue
 }
 
 func (r *ProtylePreviewRenderer) Render() (output []byte) {
