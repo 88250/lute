@@ -1296,6 +1296,9 @@ func (r *BlockRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) 
 		} else {
 			r.WriteString("<div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
 		}
+		if nil == node.Next {
+			node.InsertAfter(&ast.Node{ID: ast.NewNodeID(), Type: ast.NodeParagraph})
+		}
 	}
 	return ast.WalkContinue
 }
