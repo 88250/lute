@@ -86,7 +86,9 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							if caretStartText || caretAfterCloseBracket || caretInBracket {
 								p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)
 							} else {
-								p.Tokens = append([]byte(" "), p.Tokens...)
+								if !context.ParseOption.ProtyleWYSIWYG {
+									p.Tokens = append([]byte(" "), p.Tokens...)
+								}
 							}
 						}
 
