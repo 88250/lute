@@ -199,6 +199,18 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	return
 }
 
+func (lute *Lute) HLevel(ivHTML string, level string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	node := tree.Root.FirstChild
+	if ast.NodeHeading != node.Type {
+		return ivHTML
+	}
+
+	node.HeadingLevel, _ = strconv.Atoi(level)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) H2P(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild
