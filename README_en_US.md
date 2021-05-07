@@ -75,7 +75,6 @@ Finally, another important motivation is that the B3log open source community ne
 
 * Enhanced automatic link recognition
 * Automatically insert spaces between Chinese and Western languages
-* English punctuation is replaced with Chinese punctuation
 
 ## ♍ Format
 
