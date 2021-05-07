@@ -1388,6 +1388,13 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 		r.Tag("/div", nil, false)
 	}
 
+	if memo := node.IALAttr("memo"); "" != memo {
+		r.Tag("div", [][]string{{"class", "protyle-attr--memo"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconM\"></use></svg>")
+		r.WriteString(memo)
+		r.Tag("/div", nil, false)
+	}
+
 	if bookmark := node.IALAttr("bookmark"); "" != bookmark {
 		r.Tag("div", [][]string{{"class", "protyle-attr--bookmark"}}, false)
 		r.WriteString(bookmark)
