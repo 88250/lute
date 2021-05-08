@@ -18,6 +18,7 @@ import (
 
 var termTypoTests = []parseTest{
 
+	{"7", "customtest\n", "<p>CUSTOMtest</p>\n"},
 	{"6", "gorm orm\n", "<p>GORM ORM</p>\n"},
 	{"5", "test.html\n", "<p>test.html</p>\n"},
 	{"4", "cookie ie ieo\n", "<p>cookie IE ieo</p>\n"},
@@ -31,6 +32,7 @@ func TestTermTypo(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetAutoSpace(true)
 	luteEngine.SetFixTermTypo(true)
+	luteEngine.PutTerms(map[string]string{"customtest": "CUSTOMtest"})
 	for _, test := range termTypoTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
