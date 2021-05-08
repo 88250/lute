@@ -19,7 +19,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// 判断围栏代码块（```）是否开始。
+// FenceCodeBlockStart 判断围栏代码块（```）是否开始。
 func FenceCodeBlockStart(t *Tree, container *ast.Node) int {
 	if t.Context.indented {
 		return 0
@@ -41,9 +41,9 @@ func FenceCodeBlockStart(t *Tree, container *ast.Node) int {
 	return 0
 }
 
-// 判断缩进代码块（    code）是否开始。
+// IndentCodeBlockStart 判断缩进代码块（    code）是否开始。
 func IndentCodeBlockStart(t *Tree, container *ast.Node) int {
-	if !t.Context.indented {
+	if !t.Context.ParseOption.IndentCodeBlock || !t.Context.indented {
 		return 0
 	}
 

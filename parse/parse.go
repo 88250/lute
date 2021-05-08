@@ -331,6 +331,8 @@ type Options struct {
 	GitConflict bool
 	// LinkRef 设置是否打开“链接引用”支持。
 	LinkRef bool
+	// IndentCodeBlock 设置是否打开“缩进代码块”支持。
+	IndentCodeBlock bool
 }
 
 func NewOptions() *Options {
@@ -350,6 +352,7 @@ func NewOptions() *Options {
 		KramdownBlockIAL: false,
 		HeadingID:        true,
 		LinkRef:          true,
+		IndentCodeBlock:  true,
 	}
 }
 
