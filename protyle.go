@@ -617,27 +617,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		checkIndentCodeBlock := strings.ReplaceAll(content, util.Caret, "")
-		checkIndentCodeBlock = strings.ReplaceAll(checkIndentCodeBlock, "\t", "    ")
-		if (!lute.isInline(n.PrevSibling)) && strings.HasPrefix(checkIndentCodeBlock, "    ") {
-			node.Type = ast.NodeCodeBlock
-			node.IsFencedCodeBlock = true
-			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
-			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
-			startCaret := strings.HasPrefix(content, util.Caret)
-			if startCaret {
-				content = strings.ReplaceAll(content, util.Caret, "")
-			}
-			content = strings.TrimSpace(content)
-			if startCaret {
-				content = util.Caret + content
-			}
-			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(content)}
-			node.AppendChild(content)
-			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: []byte("```"), CodeBlockFenceLen: 3})
-			tree.Context.Tip.AppendChild(node)
-			return
-		}
 		if ast.NodeLink == tree.Context.Tip.Type {
 			node.Type = ast.NodeLinkText
 		}
