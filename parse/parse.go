@@ -196,6 +196,13 @@ func (context *Context) closeUnmatchedBlocks() {
 	}
 }
 
+// closeSuperBlockChildren 最终化超级块下的子节点。
+func (context *Context) closeSuperBlockChildren() {
+	for n := context.Tip; nil != n && ast.NodeSuperBlock != n.Type; n = n.Parent {
+		context.finalize(n)
+	}
+}
+
 // finalize 执行 block 的最终化处理。调用该方法会将 context.Tip 置为 block 的父节点。
 func (context *Context) finalize(block *ast.Node) {
 	parent := block.Parent

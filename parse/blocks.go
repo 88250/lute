@@ -103,6 +103,7 @@ func (t *Tree) incorporateLine(line []byte) {
 		case 2: // 匹配围栏代码块闭合，处理下一行
 			return
 		case 3: // 匹配超级块闭合，处理下一行
+			t.Context.closeSuperBlockChildren() // 闭合超级块下的子节点
 			if ast.NodeSuperBlock != t.Context.Tip.Type {
 				sb := t.Context.Tip.Parent
 				sb.Close = true
@@ -114,8 +115,6 @@ func (t *Tree) incorporateLine(line []byte) {
 				t.Context.Tip = t.Context.Tip.Parent
 				t.Context.lastMatchedContainer = t.Context.Tip
 			}
-			t.Context.allClosed = false
-			t.Context.closeUnmatchedBlocks()
 			return
 		}
 
