@@ -449,11 +449,16 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	case ast.NodeTable:
 		node.Type = ast.NodeTable
 		var tableAligns []int
-		if nil == n.FirstChild {
+		if nil == n.FirstChild || nil == n.FirstChild.NextSibling {
 			return
 		}
 
-		for th := n.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
+		tableDiv := n.FirstChild.NextSibling
+		table := lute.domChild(tableDiv, atom.Table)
+		if nil == table {
+			return
+		}
+		for th := table.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
 			align := lute.domAttrValue(th, "align")
 			switch align {
 			case "left":
@@ -472,7 +477,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 
-		lute.genASTContenteditable(n.FirstChild.NextSibling.FirstChild, tree)
+		lute.genASTContenteditable(table, tree)
 		return
 	case ast.NodeParagraph:
 		node.Type = ast.NodeParagraph
