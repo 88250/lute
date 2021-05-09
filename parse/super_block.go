@@ -18,7 +18,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// 判断超级块（{{{ blocks }}}）是否开始。
+// SuperBlockStart 判断超级块（{{{ blocks }}}）是否开始。
 func SuperBlockStart(t *Tree, container *ast.Node) int {
 	if !t.Context.ParseOption.SuperBlock || t.Context.indented {
 		return 0
@@ -36,17 +36,16 @@ func SuperBlockStart(t *Tree, container *ast.Node) int {
 }
 
 func SuperBlockContinue(superBlock *ast.Node, context *Context) int {
+	if nil != context.Tip.LastChild && ast.NodeSuperBlockCloseMarker == context.Tip.LastChild.Type && context.Tip.LastChild.Close {
+		return 1
+	}
+
 	if context.isSuperBlockClose(context.currentLine[context.nextNonspace:]) {
-		level := 0
 		for p := context.Tip; nil != p; p = p.Parent {
 			if ast.NodeSuperBlock == p.Type {
-				level++
+				return 3 // 闭合
 			}
 		}
-		if 1 < level {
-			return 4 // 嵌套层闭合
-		}
-		return 3 // 顶层闭合
 	}
 	return 0
 }

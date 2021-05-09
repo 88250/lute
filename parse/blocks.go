@@ -102,17 +102,20 @@ func (t *Tree) incorporateLine(line []byte) {
 			break
 		case 2: // 匹配围栏代码块闭合，处理下一行
 			return
-		case 3: // 匹配顶层超级块闭合，处理下一行
-			container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker, Close: true})
-			return
-		case 4: // 匹配超级块嵌套层闭合
-			for p := t.Context.Tip; nil != p; p = p.Parent {
-				if ast.NodeSuperBlock == p.Type {
-					container = p // 找到最近的超级块
-					break
-				}
+		case 3: // 匹配超级块闭合，处理下一行
+			if ast.NodeSuperBlock != t.Context.Tip.Type {
+				sb := t.Context.Tip.Parent
+				sb.Close = true
+				sb.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker})
+				t.Context.Tip = sb.Parent
+				t.Context.lastMatchedContainer = sb
+			} else {
+				t.Context.Tip.Close = true
+				t.Context.Tip = t.Context.Tip.Parent
+				t.Context.lastMatchedContainer = t.Context.Tip
 			}
-			container.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker, Close: true})
+			t.Context.allClosed = false
+			t.Context.closeUnmatchedBlocks()
 			return
 		}
 
