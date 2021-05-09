@@ -263,6 +263,54 @@ func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) TL2OL(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	list := tree.Root.FirstChild
+	if ast.NodeList != list.Type || 3 != list.ListData.Typ {
+		return ivHTML
+	}
+
+	list.ListData.Typ = 1
+	var unlinks []*ast.Node
+	for li := list.FirstChild; nil != li; li = li.Next {
+		if ast.NodeKramdownBlockIAL == li.Type {
+			continue
+		}
+		unlinks = append(unlinks, li.FirstChild) // task marker
+		li.ListData.Typ = 1
+	}
+	for _, n := range unlinks {
+		n.Unlink()
+	}
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) TL2UL(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	list := tree.Root.FirstChild
+	if ast.NodeList != list.Type || 3 != list.ListData.Typ {
+		return ivHTML
+	}
+
+	list.ListData.Typ = 0
+	var unlinks []*ast.Node
+	for li := list.FirstChild; nil != li; li = li.Next {
+		if ast.NodeKramdownBlockIAL == li.Type {
+			continue
+		}
+		unlinks = append(unlinks, li.FirstChild) // task marker
+		li.ListData.Typ = 0
+	}
+	for _, n := range unlinks {
+		n.Unlink()
+	}
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	if ast.NodeList != tree.Root.FirstChild.Type {

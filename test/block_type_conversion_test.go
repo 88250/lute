@@ -17,6 +17,33 @@ import (
 	"github.com/88250/lute"
 )
 
+var tl2olTests = []*parseTest{
+	{"0", "<div data-subtype=\"t\" data-node-id=\"20210509151848-gfzph2c\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\" updated=\"20210509152952\"><div data-marker=\"*\" data-subtype=\"t\" data-node-id=\"20210509152953-u1z5oe6\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div><div data-node-id=\"20210509152953-giswzj9\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509152956\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-subtype=\"u\" data-node-id=\"20210509151848-gfzph2c\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\" updated=\"20210509152952\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210509152953-u1z5oe6\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20210509152953-giswzj9\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509152956\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
+}
+
+func TestTL2OL(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+
+	ast.Testing = true
+	for _, test := range tl2olTests {
+		ovHTML := luteEngine.TL2UL(test.from)
+		if test.to != ovHTML {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, ovHTML, test.from)
+		}
+	}
+	ast.Testing = false
+}
+
 var cancelListTests = []*parseTest{
 	{"0", "<div data-subtype=\"u\" data-node-id=\"20210509095907-rixmte6\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\" updated=\"20210509103643\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210509103643-es01df0\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20210509103643-xr4nn64\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509103643\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210509103701-dnmzej3\" data-type=\"NodeList\" class=\"list\" data-subtype=\"u\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210509103644-zfqz75l\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20210509103644-uednsdt\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509103651\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\"></div></div><div class=\"protyle-attr\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-node-id=\"20210509103643-xr4nn64\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509103643\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"u\" data-node-id=\"20210509103701-dnmzej3\" data-node-index=\"2\" data-type=\"NodeList\" class=\"list\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210509103644-zfqz75l\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20210509103644-uednsdt\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509103651\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 }
