@@ -278,6 +278,10 @@ func (lute *Lute) TL2OL(ivHTML string) (ovHTML string) {
 		}
 		unlinks = append(unlinks, li.FirstChild) // task marker
 		li.ListData.Typ = 1
+		if nil == li.Previous {
+			li.ListData.Start = 1
+			li.ListData.Num = 1
+		}
 	}
 	for _, n := range unlinks {
 		n.Unlink()
