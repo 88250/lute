@@ -1000,7 +1000,7 @@ func (r *ProtylePreviewRenderer) renderDocument(node *ast.Node, entering bool) a
 }
 
 func (r *ProtylePreviewRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.ListData.Tight { // List.ListItem.Paragraph
+	if ast.NodeListItem == node.Parent.Type && nil == node.Next && nil == node.Previous {
 		return ast.WalkContinue
 	}
 
@@ -1244,16 +1244,15 @@ func (r *ProtylePreviewRenderer) renderListItem(node *ast.Node, entering bool) a
 		var attrs [][]string
 		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
-		if 3 == node.ListData.Typ && "" != r.Options.GFMTaskListItemClass && nil != node.FirstChild &&
-			((ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
-				(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
+		if 3 == node.ListData.Typ && nil != node.FirstChild && ((ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
+			(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
 			taskListItemMarker := node.FirstChild.FirstChild
 			if nil == taskListItemMarker {
 				taskListItemMarker = node.FirstChild
 			}
-			taskClass := r.Options.GFMTaskListItemClass
+			taskClass := "protyle-task"
 			if taskListItemMarker.TaskListItemChecked {
-				taskClass += " vditor-task--done"
+				taskClass += " protyle-task--done"
 			}
 			attrs = append(attrs, []string{"class", taskClass})
 		}
