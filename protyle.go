@@ -199,6 +199,33 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	return
 }
 
+func (lute *Lute) CancelList(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	if ast.NodeList != tree.Root.FirstChild.Type {
+		return ivHTML
+	}
+
+	list := tree.Root.FirstChild
+
+	var appends, unlinks []*ast.Node
+	for li := list.FirstChild; nil != li; li = li.Next {
+		for c := li.FirstChild; nil != c; c = c.Next {
+			appends = append(appends, c)
+		}
+		unlinks = append(unlinks, li)
+	}
+	for _, c := range appends {
+		tree.Root.AppendChild(c)
+	}
+	for _, n := range unlinks {
+		n.Unlink()
+	}
+	list.Unlink()
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) HLevel(ivHTML string, level string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild
