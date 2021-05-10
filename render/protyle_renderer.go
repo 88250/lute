@@ -1087,7 +1087,11 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 	} else {
-		r.WriteString("\n") // 主要是为了解决 img 插入符后置问题
+		if (nil != node.LastChild && util.Caret == node.LastChild.TokensStr() && nil != node.LastChild.Previous && ast.NodeImage == node.LastChild.Previous.Type) ||
+			(nil != node.LastChild && ast.NodeImage == node.LastChild.Type) ||
+			(nil != node.LastChild && ast.NodeKramdownSpanIAL == node.LastChild.Type && nil != node.LastChild.Previous && ast.NodeImage == node.LastChild.Previous.Type) {
+			r.WriteString("\n") // 主要是为了解决 img 插入符后置问题
+		}
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
