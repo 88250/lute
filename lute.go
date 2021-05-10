@@ -116,7 +116,7 @@ func (lute *Lute) TextBundle(name string, markdown []byte, linkPrefixes []string
 	return
 }
 
-// TextBundle 接受 string 类型的 markdown 后直接调用 TextBundle 进行处理。
+// TextBundleStr 接受 string 类型的 markdown 后直接调用 TextBundle 进行处理。
 func (lute *Lute) TextBundleStr(name, markdown string, linkPrefixes []string) (textbundle string, originalLinks []string) {
 	textbundleBytes, originalLinks := lute.TextBundle(name, []byte(markdown), linkPrefixes)
 	textbundle = util.BytesToStr(textbundleBytes)
@@ -186,7 +186,7 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 
 // RemoveEmoji 用于删除 str 中的 Emoji Unicode。
 func (lute *Lute) RemoveEmoji(str string) string {
-	for u, _ := range lute.ParseOptions.EmojiAlias {
+	for u := range lute.ParseOptions.EmojiAlias {
 		str = strings.ReplaceAll(str, u, "")
 	}
 	return strings.TrimSpace(str)
