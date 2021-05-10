@@ -1,7 +1,7 @@
 <p align = "center">
 <img alt="Lute" src="https://b3log.org/images/brand/lute-128.png">
 <br><br>
-一款对中文语境优化的 Markdown 引擎，支持 Go 和 JavaScript<br><br>
+一款结构化的 Markdown 引擎，支持 Go 和 JavaScript<br><br>
 <em>
 千呼万唤始出来 犹抱琵琶半遮面<br>
 转轴拨弦三两声 未成曲调先有情
