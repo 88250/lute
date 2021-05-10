@@ -299,10 +299,14 @@ func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkSt
 		}
 		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", anchor}, {"contenteditable", "false"}}
 		r.Tag("span", attrs, false)
-		refText := node.ChildByType(ast.NodeBlockRefTextTplRenderResult)
-		if nil != refText {
-			r.Write(refText.Tokens)
+		refTextNode := node.ChildByType(ast.NodeBlockRefTextTplRenderResult)
+		var refText string
+		if nil != refTextNode {
+			refText = refTextNode.TokensStr()
+		} else {
+			refText = anchor
 		}
+		r.WriteString(refText)
 		r.Tag("/span", nil, false)
 		return ast.WalkSkipChildren
 	}
@@ -952,7 +956,7 @@ func (r *BlockRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus
 
 func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
+		attrs := [][]string{{"data-type", "img"}, {"class", "img"}}
 		parentStyle := node.IALAttr("parent-style")
 		if "" != parentStyle { // 手动设置了位置
 			attrs = append(attrs, []string{"style", parentStyle})
@@ -996,13 +1000,12 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
 
-		attrs = [][]string{{"class", "protyle-action__title"}}
+		attrs = [][]string{{"contenteditable", "false"}, {"class", "protyle-action__title"}}
 		r.Tag("span", attrs, false)
 		r.Writer.Write(titleTokens)
 		r.Tag("/span", nil, false)
 
 		r.Tag("/span", nil, false)
-		r.WriteString(parse.Zwsp)
 	}
 	return ast.WalkContinue
 }
