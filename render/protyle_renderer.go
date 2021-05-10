@@ -956,7 +956,7 @@ func (r *BlockRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus
 
 func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := [][]string{{"data-type", "img"}, {"class", "img"}}
+		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
 		parentStyle := node.IALAttr("parent-style")
 		if "" != parentStyle { // 手动设置了位置
 			attrs = append(attrs, []string{"style", parentStyle})
@@ -1000,7 +1000,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
 
-		attrs = [][]string{{"contenteditable", "false"}, {"class", "protyle-action__title"}}
+		attrs = [][]string{{"class", "protyle-action__title"}}
 		r.Tag("span", attrs, false)
 		r.Writer.Write(titleTokens)
 		r.Tag("/span", nil, false)
@@ -1087,6 +1087,7 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 	} else {
+		r.WriteString("\n") // 主要是为了解决 img 插入符后置问题
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
