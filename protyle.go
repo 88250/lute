@@ -658,6 +658,23 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		return
 	default:
+		switch n.DataAtom {
+		case 0:
+			node.Type = ast.NodeText
+			node.Tokens = util.StrToBytes(n.Data)
+			if ast.NodeDocument == tree.Context.Tip.Type {
+				p := &ast.Node{Type: ast.NodeParagraph}
+				tree.Context.Tip.AppendChild(p)
+				tree.Context.Tip = p
+			}
+			lute.genASTContenteditable(n, tree)
+			return
+		case atom.U:
+			lute.genASTContenteditable(n, tree)
+			return
+		}
+
+
 		if ast.NodeListItem == tree.Context.Tip.Type && atom.Input == n.DataAtom {
 			node.Type = ast.NodeTaskListItemMarker
 			node.TaskListItemChecked = lute.hasAttr(n, "checked")
