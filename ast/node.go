@@ -667,6 +667,7 @@ const (
 	NodeBlockRefTextTplRenderResult NodeType = 434 // 内容块引用锚文本模板渲染结果
 
 	// 内容块嵌入（Block Embed） https://github.com/88250/lute/issues/91
+	// 该节点已经废弃。
 
 	NodeBlockEmbed                    NodeType = 440 // 内容块嵌入节点
 	NodeBlockEmbedID                  NodeType = 441 // 被引用的内容块（定义块） ID
