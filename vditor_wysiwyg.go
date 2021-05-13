@@ -1424,6 +1424,9 @@ func (lute *Lute) domText0(n *html.Node, buffer *bytes.Buffer) {
 }
 
 func (lute *Lute) domHTML(n *html.Node) []byte {
+	if nil == n {
+		return nil
+	}
 	buf := &bytes.Buffer{}
 	html.Render(buf, n)
 	return bytes.ReplaceAll(buf.Bytes(), []byte(parse.Zwsp), nil)

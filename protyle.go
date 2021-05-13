@@ -656,8 +656,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case ast.NodeAudio:
 		node.Type = ast.NodeAudio
-		n = lute.domChild(n.FirstChild.NextSibling, atom.Audio)
-		node.Tokens = lute.domHTML(n)
+		node.Tokens = lute.domHTML(n.FirstChild.NextSibling)
 		tree.Context.Tip.AppendChild(node)
 		return
 	default:
