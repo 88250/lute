@@ -35,6 +35,8 @@ func main() {
 		"GetHeadingID":      render.HeadingID,
 		"Caret":             util.Caret,
 		"NewNodeID":         ast.NewNodeID,
+		"EscapeHTMLStr":     html.EscapeHTMLStr,
+		"UnEscapeHTMLStr":   html.UnescapeHTMLStr,
 		"EscapeStr":         html.EscapeString,
 		"UnEscapeStr":       html.UnescapeString,
 		"EChartsMindmapStr": render.EChartsMindmapStr,

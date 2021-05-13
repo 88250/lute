@@ -24,6 +24,14 @@ var (
 	quot = util.StrToBytes("&quot;")
 )
 
+func UnescapeHTMLStr(h string) string {
+	return UnescapeString(h)
+}
+
+func EscapeHTMLStr(h string) string {
+	return util.BytesToStr(UnescapeHTML(util.StrToBytes(h)))
+}
+
 func UnescapeHTML(h []byte) (ret []byte) {
 	return util.StrToBytes(UnescapeString(util.BytesToStr(h)))
 }
