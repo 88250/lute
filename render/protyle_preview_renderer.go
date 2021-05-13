@@ -898,7 +898,7 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 	if entering {
 		if 0 == r.DisableTags {
 			if style := node.IALAttr("parent-style"); "" != style {
-				r.Tag("span", [][]string{{"style", style}}, false)
+				r.Tag("span", [][]string{{"style", style}, {"class", "img"}}, false)
 			}
 
 			r.WriteString("<img src=\"")
@@ -918,9 +918,11 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 	r.DisableTags--
 	if 0 == r.DisableTags {
 		r.WriteByte(lex.ItemDoublequote)
-		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
+		title := node.ChildByType(ast.NodeLinkTitle)
+		titleTokens := html.EscapeHTML(title.Tokens)
+		if nil != title && nil != title.Tokens {
 			r.WriteString(" title=\"")
-			r.Write(html.EscapeHTML(title.Tokens))
+			r.Write(titleTokens)
 			r.WriteByte(lex.ItemDoublequote)
 		}
 		ial := r.NodeAttrsStr(node)
@@ -928,6 +930,11 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 			r.WriteString(" " + ial)
 		}
 		r.WriteString(" />")
+		if 0 < len(titleTokens) {
+			r.Tag("span", [][]string{{"class", "protyle-action__title"}}, false)
+			r.Write(titleTokens)
+			r.Tag("/span", nil, false)
+		}
 		if style := node.IALAttr("parent-style"); "" != style {
 			r.Tag("/span", nil, false)
 		}
