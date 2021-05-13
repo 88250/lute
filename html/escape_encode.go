@@ -29,7 +29,7 @@ func UnescapeHTMLStr(h string) string {
 }
 
 func EscapeHTMLStr(h string) string {
-	return util.BytesToStr(UnescapeHTML(util.StrToBytes(h)))
+	return util.BytesToStr(EscapeHTML(util.StrToBytes(h)))
 }
 
 func UnescapeHTML(h []byte) (ret []byte) {
