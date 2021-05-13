@@ -680,7 +680,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 		return ast.WalkContinue
 	}
 
-	r.Tag("div", [][]string{{"class", "protyle-action"}}, false)
+	r.Tag("div", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	var language string
@@ -696,12 +696,12 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 		language = string(infoWords[0])
 	}
 
-	r.Tag("div", attrs, false)
+	r.Tag("span", attrs, false)
 	r.WriteString(language)
-	r.Tag("/div", nil, false)
+	r.Tag("/span", nil, false)
 
-	r.Tag("div", [][]string{{"class", "protyle-action__copy"}}, false)
-	r.Tag("/div", nil, false)
+	r.Tag("span", [][]string{{"class", "protyle-action__copy"}}, false)
+	r.Tag("/span", nil, false)
 	r.Tag("/div", nil, false)
 
 	attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
