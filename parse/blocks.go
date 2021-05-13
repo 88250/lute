@@ -256,7 +256,7 @@ func _continue(n *ast.Node, context *Context) int {
 	switch n.Type {
 	case ast.NodeCodeBlock:
 		return CodeBlockContinue(n, context)
-	case ast.NodeHTMLBlock, ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio:
+	case ast.NodeHTMLBlock:
 		return HtmlBlockContinue(n, context)
 	case ast.NodeParagraph:
 		return ParagraphContinue(n, context)
@@ -274,7 +274,8 @@ func _continue(n *ast.Node, context *Context) int {
 		return SuperBlockContinue(n, context)
 	case ast.NodeGitConflict:
 		return GitConflictContinue(n, context)
-	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeBlockEmbed, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed:
+	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeBlockEmbed, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed,
+		ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio:
 		return 1
 	}
 	return 0
