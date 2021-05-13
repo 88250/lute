@@ -723,17 +723,19 @@ func (r *ProtylePreviewRenderer) renderMathBlockOpenMarker(node *ast.Node, enter
 
 func (r *ProtylePreviewRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
-	var attrs [][]string
-	tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	tokens = bytes.TrimSpace(tokens)
-	attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
-	attrs = append(attrs, []string{"data-subtype", "math"})
-	r.Tag("div", attrs, false)
-	r.Tag("div", [][]string{{"spin", "1"}}, false)
-	r.Tag("/div", nil, false)
-	r.Tag("/div", nil, false)
-	r.Newline()
+	if entering {
+		var attrs [][]string
+		tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		tokens = bytes.TrimSpace(tokens)
+		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
+		attrs = append(attrs, []string{"data-subtype", "math"})
+		r.Tag("div", attrs, false)
+		r.Tag("div", [][]string{{"spin", "1"}}, false)
+		r.Tag("/div", nil, false)
+		r.Tag("/div", nil, false)
+		r.Newline()
+	}
 	return ast.WalkSkipChildren
 }
 
