@@ -897,10 +897,11 @@ func (r *ProtylePreviewRenderer) renderBang(node *ast.Node, entering bool) ast.W
 func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if 0 == r.DisableTags {
+			attrs := [][]string{{"class", "img"}}
 			if style := node.IALAttr("parent-style"); "" != style {
-				r.Tag("span", [][]string{{"style", style}, {"class", "img"}}, false)
+				attrs = append(attrs, []string{"style", style})
 			}
-
+			r.Tag("span", attrs, false)
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.LinkPath(destTokens)
@@ -936,9 +937,7 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 			r.Write(titleTokens)
 			r.Tag("/span", nil, false)
 		}
-		if style := node.IALAttr("parent-style"); "" != style {
-			r.Tag("/span", nil, false)
-		}
+		r.Tag("/span", nil, false)
 
 		if r.Options.Sanitize {
 			buf := r.Writer.Bytes()
