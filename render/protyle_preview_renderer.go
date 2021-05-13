@@ -994,10 +994,6 @@ func (r *ProtylePreviewRenderer) renderDocument(node *ast.Node, entering bool) a
 }
 
 func (r *ProtylePreviewRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
-	if ast.NodeListItem == node.Parent.Type && nil == node.Next && nil == node.Previous {
-		return ast.WalkContinue
-	}
-
 	if entering {
 		r.Newline()
 		r.handleKramdownBlockIAL(node)
