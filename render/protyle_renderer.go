@@ -854,8 +854,8 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
 
-		r.Tag("div", [][]string{{"class", "protyle-action"}}, false)
-		r.WriteString("<svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg>")
+		r.Tag("div", [][]string{{"class", "protyle-action protyle-icons"}}, false)
+		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/div", nil, false)
 
 		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
