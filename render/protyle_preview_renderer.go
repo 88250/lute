@@ -919,8 +919,9 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 	if 0 == r.DisableTags {
 		r.WriteByte(lex.ItemDoublequote)
 		title := node.ChildByType(ast.NodeLinkTitle)
-		titleTokens := html.EscapeHTML(title.Tokens)
+		var titleTokens []byte
 		if nil != title && nil != title.Tokens {
+			titleTokens = html.EscapeHTML(title.Tokens)
 			r.WriteString(" title=\"")
 			r.Write(titleTokens)
 			r.WriteByte(lex.ItemDoublequote)
