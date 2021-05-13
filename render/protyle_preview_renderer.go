@@ -203,42 +203,42 @@ func (r *ProtylePreviewRenderer) renderKbdCloseMarker(node *ast.Node, entering b
 
 func (r *ProtylePreviewRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
+		r.Tag("div", [][]string{{"class", "iframe"}}, false)
 		tokens := node.Tokens
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
 		tokens = r.tagSrcPath(tokens)
 		r.Write(tokens)
-		r.Newline()
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *ProtylePreviewRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
+		r.Tag("div", [][]string{{"class", "iframe"}}, false)
 		tokens := node.Tokens
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
 		tokens = r.tagSrcPath(tokens)
 		r.Write(tokens)
-		r.Newline()
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *ProtylePreviewRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
+		r.Tag("div", [][]string{{"class", "iframe"}}, false)
 		tokens := node.Tokens
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
 		tokens = r.tagSrcPath(tokens)
 		r.Write(tokens)
-		r.Newline()
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
