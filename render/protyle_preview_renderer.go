@@ -710,9 +710,6 @@ func (r *ProtylePreviewRenderer) renderInlineMath(node *ast.Node, entering bool)
 }
 
 func (r *ProtylePreviewRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Tag("/div", nil, false)
-	}
 	return ast.WalkContinue
 }
 
@@ -726,10 +723,6 @@ func (r *ProtylePreviewRenderer) renderMathBlockOpenMarker(node *ast.Node, enter
 
 func (r *ProtylePreviewRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
-	if !entering {
-		return ast.WalkContinue
-	}
-
 	var attrs [][]string
 	tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
 	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
@@ -740,7 +733,8 @@ func (r *ProtylePreviewRenderer) renderMathBlock(node *ast.Node, entering bool) 
 	r.Tag("div", [][]string{{"spin", "1"}}, false)
 	r.Tag("/div", nil, false)
 	r.Tag("/div", nil, false)
-	return ast.WalkContinue
+	r.Newline()
+	return ast.WalkSkipChildren
 }
 
 func (r *ProtylePreviewRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
