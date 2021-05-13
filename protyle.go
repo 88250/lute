@@ -650,13 +650,13 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case ast.NodeVideo:
 		node.Type = ast.NodeVideo
-		n = lute.domChild(n.FirstChild.NextSibling, atom.Iframe)
+		n = lute.domChild(n.FirstChild.NextSibling, atom.Video)
 		node.Tokens = lute.domHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case ast.NodeAudio:
 		node.Type = ast.NodeAudio
-		n = lute.domChild(n.FirstChild.NextSibling, atom.Iframe)
+		n = lute.domChild(n.FirstChild.NextSibling, atom.Audio)
 		node.Tokens = lute.domHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
@@ -676,7 +676,6 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			lute.genASTContenteditable(n, tree)
 			return
 		}
-
 
 		if ast.NodeListItem == tree.Context.Tip.Type && atom.Input == n.DataAtom {
 			node.Type = ast.NodeTaskListItemMarker
