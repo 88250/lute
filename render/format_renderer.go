@@ -1530,5 +1530,5 @@ func (r *FormatRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *FormatRenderer) withoutKramdownBlockIAL(node *ast.Node) bool {
-	return !r.Options.KramdownBlockIAL || 0 == len(node.KramdownIAL)
+	return !r.Options.KramdownBlockIAL || 0 == len(node.KramdownIAL) || nil == node.Next || ast.NodeKramdownBlockIAL != node.Next.Type
 }
