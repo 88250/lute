@@ -631,7 +631,7 @@ func (r *ProtylePreviewRenderer) renderCodeBlock(node *ast.Node, entering bool) 
 			return ast.WalkSkipChildren
 		}
 
-		attrs := [][]string{{"class", "code-block"}}
+		attrs := [][]string{{"class", "code-block"}, {"data-language", language}}
 		r.Tag("pre", attrs, false)
 		r.WriteString("<code>")
 	} else {
