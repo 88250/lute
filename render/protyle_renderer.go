@@ -620,7 +620,7 @@ func (r *BlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wa
 		idxStr := strconv.Itoa(idx)
 		label := def.Text()
 		r.Tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)},
-			{"class", "protyle-tooltipped protyle-tooltipped__s"}, {"aria-label", SubStr(html.EscapeString(label), 24)}}, false)
+			{"class", "protyle-tooltipped protyle-tooltipped__s"}, {"aria-label", SubStr(html.EscapeHTMLStr(label), 24)}}, false)
 		r.WriteString(idxStr)
 		r.WriteString("</sup>")
 	}
