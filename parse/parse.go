@@ -353,6 +353,7 @@ func NewOptions() *Options {
 		AliasEmoji:       EmojiAliasUnicode,
 		EmojiAlias:       EmojiUnicodeAlias,
 		EmojiSite:        "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
+		Setext:           true,
 		YamlFrontMatter:  true,
 		BlockRef:         false,
 		Mark:             false,

@@ -31,3 +31,18 @@ func TestSetext(t *testing.T) {
 		}
 	}
 }
+
+var setextDisableTests = []parseTest {
+	{"0", "foo\n---\n", "<p>foo</p>\n<hr />\n"},
+}
+
+func TestDisableSetext(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetSetext(false)
+	for _, test := range setextDisableTests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}

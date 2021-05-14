@@ -39,11 +39,12 @@ func ATXHeadingStart(t *Tree, container *ast.Node) int {
 	return 0
 }
 
-// 判断 Setext 标题（- =）是否开始。
+// SetextHeadingStart 判断 Setext 标题（- =）是否开始。
 func SetextHeadingStart(t *Tree, container *ast.Node) int {
-	if t.Context.indented || ast.NodeParagraph != container.Type {
+	if t.Context.indented || ast.NodeParagraph != container.Type || !t.Context.ParseOption.Setext {
 		return 0
 	}
+
 	level := t.parseSetextHeading()
 	if 0 == level {
 		return 0

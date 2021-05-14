@@ -395,6 +395,10 @@ func (lute *Lute) SetYamlFrontMatter(b bool) {
 	lute.ParseOptions.YamlFrontMatter = b
 }
 
+func (lute *Lute) SetSetext(b bool) {
+	lute.ParseOptions.Setext = b
+}
+
 func (lute *Lute) SetBlockRef(b bool) {
 	lute.ParseOptions.BlockRef = b
 }
