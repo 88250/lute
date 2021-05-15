@@ -847,6 +847,10 @@ func (r *BlockRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkS
 }
 
 func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
+	if nil == node.FirstChild {
+		return ast.WalkSkipChildren
+	}
+
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")

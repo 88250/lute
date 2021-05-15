@@ -741,6 +741,10 @@ func (r *FormatRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStat
 		cells = append(cells, []*ast.Node{})
 
 		headRow := node.ChildByType(ast.NodeTableHead)
+		if nil == headRow {
+			return ast.WalkSkipChildren
+		}
+
 		for n := headRow.FirstChild.FirstChild; nil != n; n = n.Next {
 			cells[0] = append(cells[0], n)
 		}
