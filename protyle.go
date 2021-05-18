@@ -278,6 +278,7 @@ func (lute *Lute) Blocks2TLs(ivHTML string) (ovHTML string) {
 		}
 	}
 	for i, li := range lis {
+		li.AppendChild(&ast.Node{Type: ast.NodeTaskListItemMarker})
 		li.AppendChild(blocks[i])
 		li.AppendChild(ials[i])
 		liID := ast.NewNodeID()
