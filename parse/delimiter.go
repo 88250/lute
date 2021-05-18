@@ -347,6 +347,11 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		beforeIsPunct = false
 	}
 
+	if t.Context.ParseOption.ProtyleWYSIWYG {
+		// Markdown 中 ** 加粗失效问题 https://ld246.com/article/1597581380183
+		afterIsPunct, beforeIsPunct = false, false
+	}
+
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
 	var canOpen, canClose bool
