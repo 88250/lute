@@ -263,7 +263,7 @@ func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
 	return
 }
 
-func (lute *Lute) Blocks2ULs(ivHTML string) (ovHTML string) {
+func (lute *Lute) Blocks2OLs(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 
 	list := &ast.Node{Type: ast.NodeList, ListData: &ast.ListData{Marker: []byte("*")}}
@@ -277,6 +277,31 @@ func (lute *Lute) Blocks2ULs(ivHTML string) (ovHTML string) {
 	}
 	for _, c := range lis {
 		list.AppendChild(c)
+	}
+	tree.Root.AppendChild(list)
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) Blocks2ULs(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+
+	list := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeList, ListData: &ast.ListData{Marker: []byte("*")}}
+	var lis,blocks, ials []*ast.Node
+	for n := tree.Root.FirstChild; nil != n; n = n.Next {
+		if ast.NodeKramdownBlockIAL != n.Type {
+			li := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeListItem, ListData: &ast.ListData{Marker: []byte("*")}}
+			lis = append(lis, li)
+			blocks = append(blocks, n)
+		} else {
+			ials = append(ials, n)
+		}
+	}
+	for i, li := range lis {
+		li.AppendChild(blocks[i])
+		li.AppendChild(ials[i])
+		list.AppendChild(li)
 	}
 	tree.Root.AppendChild(list)
 
