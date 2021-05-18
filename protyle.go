@@ -263,20 +263,59 @@ func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) Blocks2TLs(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+
+	list := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeList, ListData: &ast.ListData{Typ: 3}}
+	var lis, blocks, ials []*ast.Node
+	for n := tree.Root.FirstChild; nil != n; n = n.Next {
+		if ast.NodeKramdownBlockIAL != n.Type {
+			li := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeListItem, ListData: &ast.ListData{Marker: []byte("*"), Typ: 3}}
+			lis = append(lis, li)
+			blocks = append(blocks, n)
+		} else {
+			ials = append(ials, n)
+		}
+	}
+	for i, li := range lis {
+		li.AppendChild(blocks[i])
+		li.AppendChild(ials[i])
+		liID := ast.NewNodeID()
+		liIAL := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: parse.IAL2Tokens([][]string{{"id", liID}})}
+		li.SetIALAttr("id", liID)
+		li.InsertAfter(liIAL)
+		list.AppendChild(li)
+	}
+	tree.Root.AppendChild(list)
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) Blocks2OLs(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 
-	list := &ast.Node{Type: ast.NodeList, ListData: &ast.ListData{Marker: []byte("*")}}
-	var lis []*ast.Node
+	list := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeList, ListData: &ast.ListData{Typ: 1, Start: 1}}
+	var lis, blocks, ials []*ast.Node
+	num := 1
 	for n := tree.Root.FirstChild; nil != n; n = n.Next {
 		if ast.NodeKramdownBlockIAL != n.Type {
-			n.Type = ast.NodeListItem
-			n.ListData = &ast.ListData{Marker: []byte("*")}
+			li := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeListItem, ListData: &ast.ListData{Marker: []byte("*"), Num: num, Typ: 1}}
+			lis = append(lis, li)
+			blocks = append(blocks, n)
+			num++
+		} else {
+			ials = append(ials, n)
 		}
-		lis = append(lis, n)
 	}
-	for _, c := range lis {
-		list.AppendChild(c)
+	for i, li := range lis {
+		li.AppendChild(blocks[i])
+		li.AppendChild(ials[i])
+		liID := ast.NewNodeID()
+		liIAL := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: parse.IAL2Tokens([][]string{{"id", liID}})}
+		li.SetIALAttr("id", liID)
+		li.InsertAfter(liIAL)
+		list.AppendChild(li)
 	}
 	tree.Root.AppendChild(list)
 
@@ -287,8 +326,8 @@ func (lute *Lute) Blocks2OLs(ivHTML string) (ovHTML string) {
 func (lute *Lute) Blocks2ULs(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 
-	list := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeList, ListData: &ast.ListData{Marker: []byte("*")}}
-	var lis,blocks, ials []*ast.Node
+	list := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeList, ListData: &ast.ListData{}}
+	var lis, blocks, ials []*ast.Node
 	for n := tree.Root.FirstChild; nil != n; n = n.Next {
 		if ast.NodeKramdownBlockIAL != n.Type {
 			li := &ast.Node{ID: ast.NewNodeID(), Type: ast.NodeListItem, ListData: &ast.ListData{Marker: []byte("*")}}
@@ -301,6 +340,10 @@ func (lute *Lute) Blocks2ULs(ivHTML string) (ovHTML string) {
 	for i, li := range lis {
 		li.AppendChild(blocks[i])
 		li.AppendChild(ials[i])
+		liID := ast.NewNodeID()
+		liIAL := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: parse.IAL2Tokens([][]string{{"id", liID}})}
+		li.SetIALAttr("id", liID)
+		li.InsertAfter(liIAL)
 		list.AppendChild(li)
 	}
 	tree.Root.AppendChild(list)
