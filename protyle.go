@@ -263,6 +263,33 @@ func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	node := tree.Root.FirstChild
+
+	for p := node; nil != p; p = p.Next {
+		if ast.NodeHeading == p.Type {
+			p.Type = ast.NodeParagraph
+		}
+	}
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) Blocks2Hs(ivHTML, level string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	node := tree.Root.FirstChild
+
+	for p := node; nil != p; p = p.Next {
+		if ast.NodeParagraph == p.Type {
+			p.Type = ast.NodeHeading
+			p.HeadingLevel, _ = strconv.Atoi(level)
+		}
+	}
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) TL2OL(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	list := tree.Root.FirstChild
@@ -721,6 +748,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if ast.NodeLink == tree.Context.Tip.Type {
 			node.Type = ast.NodeLinkText
+		} else if ast.NodeHeading == tree.Context.Tip.Type {
+			content = strings.ReplaceAll(content, "\n", "")
+			node.Tokens = util.StrToBytes(content)
 		}
 		tree.Context.Tip.AppendChild(node)
 	case atom.Thead:
@@ -867,6 +897,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Br:
+		if ast.NodeHeading == tree.Context.Tip.Type {
+			return
+		}
+
 		node.Type = ast.NodeBr
 		tree.Context.Tip.AppendChild(node)
 		return
