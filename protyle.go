@@ -263,6 +263,27 @@ func (lute *Lute) P2H(ivHTML, level string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) Blocks2ULs(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+
+	list := &ast.Node{Type: ast.NodeList, ListData: &ast.ListData{Marker: []byte("*")}}
+	var lis []*ast.Node
+	for n := tree.Root.FirstChild; nil != n; n = n.Next {
+		if ast.NodeKramdownBlockIAL != n.Type {
+			n.Type = ast.NodeListItem
+			n.ListData = &ast.ListData{Marker: []byte("*")}
+		}
+		lis = append(lis, n)
+	}
+	for _, c := range lis {
+		list.AppendChild(c)
+	}
+	tree.Root.AppendChild(list)
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild

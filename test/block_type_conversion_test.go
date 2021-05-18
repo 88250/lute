@@ -17,6 +17,60 @@ import (
 	"github.com/88250/lute"
 )
 
+var blocks2olsTests = []*parseTest{
+	{"0", "<div data-node-id=\"20210518185646-hjjhl5p\" data-node-index=\"0\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210518191256\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210518191256-m1ij6pn\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" fold=\"0\" updated=\"20210518191257\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210518185646-pcdktyp\" data-node-index=\"2\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-subtype=\"u\" data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210518185646-hjjhl5p\" data-type=\"NodeListItem\" class=\"li\" updated=\"20210518191256\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div>foo<div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210518191256-m1ij6pn\" data-type=\"NodeListItem\" class=\"li\" fold=\"0\" updated=\"20210518191257\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div>bar<div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210518185646-pcdktyp\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
+}
+
+func TestBlocks2ULs(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+
+	ast.Testing = true
+	for _, test := range blocks2olsTests {
+		ovHTML := luteEngine.Blocks2ULs(test.from)
+		if test.to != ovHTML {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, ovHTML, test.from)
+		}
+	}
+	ast.Testing = false
+}
+
+var blocks2hsTests = []*parseTest{
+	{"0", "<div data-node-id=\"20210518185646-hjjhl5p\" data-node-index=\"0\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210518191256\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210518191256-m1ij6pn\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" fold=\"0\" updated=\"20210518191257\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210518185646-pcdktyp\" data-node-index=\"2\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-subtype=\"h1\" data-node-id=\"20210518185646-hjjhl5p\" data-node-index=\"1\" data-type=\"NodeHeading\" class=\"h1\" updated=\"20210518191256\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"h1\" data-node-id=\"20210518191256-m1ij6pn\" data-node-index=\"2\" data-type=\"NodeHeading\" class=\"h1\" fold=\"0\" updated=\"20210518191257\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"h1\" data-node-id=\"20210518185646-pcdktyp\" data-node-index=\"3\" data-type=\"NodeHeading\" class=\"h1\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
+}
+
+func TestBlocks2Hs(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+
+	ast.Testing = true
+	for _, test := range blocks2hsTests {
+		ovHTML := luteEngine.Blocks2Hs(test.from, "1")
+		if test.to != ovHTML {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, ovHTML, test.from)
+		}
+	}
+	ast.Testing = false
+}
+
 var tl2olTests = []*parseTest{
 	{"0", "<div data-subtype=\"t\" data-node-id=\"20210509151848-gfzph2c\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\" updated=\"20210509152952\"><div data-marker=\"*\" data-subtype=\"t\" data-node-id=\"20210509152953-u1z5oe6\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div><div data-node-id=\"20210509152953-giswzj9\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509152956\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-subtype=\"u\" data-node-id=\"20210509151848-gfzph2c\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\" updated=\"20210509152952\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210509152953-u1z5oe6\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20210509152953-giswzj9\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509152956\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 }
