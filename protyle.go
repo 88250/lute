@@ -908,6 +908,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	case atom.Span:
 		dataType := lute.domAttrValue(n, "data-type")
 		if "tag" == dataType {
+			if nil == n.FirstChild {
+				return
+			}
+
 			node.Type = ast.NodeTag
 			node.AppendChild(&ast.Node{Type: ast.NodeTagOpenMarker})
 			tree.Context.Tip.AppendChild(node)
