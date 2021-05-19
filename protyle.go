@@ -199,6 +199,27 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	return
 }
 
+func (lute *Lute) CancelSuperBlock(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	if ast.NodeSuperBlock != tree.Root.FirstChild.Type {
+		return ivHTML
+	}
+
+	sb := tree.Root.FirstChild
+
+	var blocks []*ast.Node
+	for b := sb.FirstChild; nil != b; b = b.Next {
+		blocks = append(blocks, b)
+	}
+	for _, b := range blocks {
+		tree.Root.AppendChild(b)
+	}
+	sb.Unlink()
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) BlocksMergeSuperBlock(ivHTML string, layout string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 
