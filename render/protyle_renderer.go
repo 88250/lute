@@ -337,7 +337,7 @@ func (r *BlockRenderer) renderGitConflictContent(node *ast.Node, entering bool) 
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "git-conflict")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		attrs = [][]string{{"contenteditable", "false"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 
 		tokens := bytes.TrimSpace(node.Tokens)
@@ -702,7 +702,9 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	r.Tag("/span", nil, false)
 	r.Tag("/div", nil, false)
 
-	attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+	attrs = [][]string{}
+	r.contenteditable(&attrs)
+	r.spellcheck(&attrs)
 	r.Tag("div", attrs, false)
 	if codeIsEmpty {
 		if caretInInfo {
@@ -860,7 +862,9 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/div", nil, false)
 
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		attrs = [][]string{}
+		r.contenteditable(&attrs)
+		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 		r.Tag("table", nil, false)
 	} else {
@@ -1043,7 +1047,7 @@ func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus
 		node.Type = ast.NodeParagraph
 		r.blockNodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		attrs = [][]string{{"contenteditable", "false"}, {"spellcheck", "false"}}
 		r.Tag("div", attrs, false)
 
 		tokens := bytes.TrimSpace(node.Tokens)
@@ -1089,7 +1093,9 @@ func (r *BlockRenderer) renderNodeBlockEmbed(node *ast.Node, entering bool) ast.
 		node.Type = ast.NodeParagraph
 		r.blockNodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		attrs = [][]string{}
+		r.contenteditable(&attrs)
+		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 		idNode := node.ChildByType(ast.NodeBlockEmbedID)
 		id := idNode.TokensStr()
@@ -1112,7 +1118,9 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		attrs = [][]string{}
+		r.contenteditable(&attrs)
+		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 	} else {
 		if (nil != node.LastChild && util.Caret == node.LastChild.TokensStr() && nil != node.LastChild.Previous && ast.NodeImage == node.LastChild.Previous.Type) ||
@@ -1249,7 +1257,9 @@ func (r *BlockRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSta
 		attrs = append(attrs, []string{"data-subtype", "h" + level})
 		r.blockNodeAttrs(node, &attrs, "h"+level)
 		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "true"}, {"spellcheck", "false"}}
+		attrs = [][]string{}
+		r.contenteditable(&attrs)
+		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 	} else {
 		r.Tag("/div", nil, false)
@@ -1404,6 +1414,16 @@ func (r *BlockRenderer) nodeIndex(node *ast.Node, attrs *[][]string) {
 
 	*attrs = append(*attrs, []string{"data-node-index", strconv.Itoa(r.NodeIndex)})
 	r.NodeIndex++
+	return
+}
+
+func (r *BlockRenderer) spellcheck(attrs *[][]string) {
+	*attrs = append(*attrs, []string{"spellcheck", "false"})
+	return
+}
+
+func (r *BlockRenderer) contenteditable(attrs *[][]string) {
+	*attrs = append(*attrs, []string{"contenteditable", strconv.FormatBool(r.Options.ProtyleContenteditable)})
 	return
 }
 

@@ -106,6 +106,8 @@ type Options struct {
 	LinkPrefix string
 	// NodeIndexStart 用于设置块级节点编号起始值。
 	NodeIndexStart int
+	// ProtyleContenteditable 设置 Protyle 渲染时标签中的 contenteditable 属性。
+	ProtyleContenteditable bool
 }
 
 func NewOptions() *Options {
@@ -134,6 +136,7 @@ func NewOptions() *Options {
 		LinkBase:                       "",
 		LinkPrefix:                     "",
 		NodeIndexStart:                 1,
+		ProtyleContenteditable:         true,
 	}
 }
 
