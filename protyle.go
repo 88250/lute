@@ -1379,6 +1379,11 @@ func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 		node.InsertAfter(ial)
+
+		if nil != node.Next && ast.NodeKramdownSpanIAL == node.Next.Type && strings.HasSuffix(n.FirstChild.Data, "\n"+util.Caret) {
+			node.Next.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte("\n" + util.Caret)})
+			n.FirstChild.Data = strings.TrimSuffix(n.FirstChild.Data, "\n"+util.Caret)
+		}
 	}
 }
 
