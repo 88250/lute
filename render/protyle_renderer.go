@@ -247,7 +247,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
-
+		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/span", nil, false)
@@ -257,6 +257,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		tokens = r.replaceSrc(tokens, src, dataSrc)
 		r.Write(tokens)
 	} else {
+		r.Tag("/div", nil, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
 	}
@@ -295,7 +296,7 @@ func (r *BlockRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
 	if bytes.Contains(tokens, []byte("data-src=")) {
 		return bytes.ReplaceAll(tokens, dataSrc1, src1)
 	}
-	src1 = append(src1, []byte(" data-src=\"" + util.BytesToStr(dataSrc) + "\"")...)
+	src1 = append(src1, []byte(" data-src=\""+util.BytesToStr(dataSrc)+"\"")...)
 	return bytes.ReplaceAll(tokens, dataSrc1, src1)
 }
 
@@ -871,7 +872,7 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
-
+		r.Tag("div", nil, false)
 		r.Tag("div", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/div", nil, false)
@@ -886,9 +887,9 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 			r.Tag("/tbody", nil, false)
 		}
 		r.Tag("/table", nil, false)
-
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
+		r.Tag("/div", nil, false)
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
