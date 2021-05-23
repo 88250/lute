@@ -760,6 +760,7 @@ func (r *BlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.Walk
 func (r *BlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := html.EscapeHTML(node.Next.Tokens)
+		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}, false)
 	}
 	return ast.WalkContinue
@@ -772,6 +773,9 @@ func (r *BlockRenderer) renderInlineMathContent(node *ast.Node, entering bool) a
 func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("/span", nil, false)
+		if bytes.Contains(node.Previous.Tokens, util.CaretTokens) {
+			r.WriteString(util.Caret)
+		}
 	}
 	return ast.WalkContinue
 }
