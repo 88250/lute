@@ -1388,6 +1388,15 @@ func (r *BlockRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkS
 func (r *BlockRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemNewline)
+		if nil != node.Previous && (ast.NodeStrong == node.Previous.Type ||
+			ast.NodeEmphasis == node.Previous.Type ||
+			ast.NodeTag == node.Previous.Type ||
+			ast.NodeStrikethrough == node.Previous.Type ||
+			ast.NodeUnderline == node.Previous.Type ||
+			ast.NodeKramdownSpanIAL == node.Previous.Type) &&
+			nil != node.Next && bytes.Equal(util.CaretTokens, node.Next.Tokens) {
+			r.WriteByte(lex.ItemNewline)
+		}
 	}
 	return ast.WalkContinue
 }

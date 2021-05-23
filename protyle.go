@@ -159,6 +159,11 @@ func RenderNodeBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptio
 }
 
 func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
+	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</strong>", "</strong>\n<wbr>\n")
+	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</em>", "</em>\n<wbr>\n")
+	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</s>", "</s>\n<wbr>\n")
+	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</u>", "</u>\n<wbr>\n")
+	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</span>", "</span>\n<wbr>\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", util.Caret)
 
 	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
@@ -1379,11 +1384,6 @@ func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 		node.InsertAfter(ial)
-
-		if nil != node.Next && ast.NodeKramdownSpanIAL == node.Next.Type && strings.HasSuffix(n.FirstChild.Data, "\n"+util.Caret) {
-			node.Next.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte("\n" + util.Caret)})
-			n.FirstChild.Data = strings.TrimSuffix(n.FirstChild.Data, "\n"+util.Caret)
-		}
 	}
 }
 
