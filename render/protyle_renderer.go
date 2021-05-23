@@ -223,15 +223,14 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
-
+		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/span", nil, false)
-		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = bytes.ReplaceAll(tokens, []byte("src=\""), []byte("src=\""+util.BytesToStr(src)+"\" data-src=\""))
+		tokens = r.replaceSrc(tokens, src, dataSrc)
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
@@ -255,7 +254,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = bytes.ReplaceAll(tokens, []byte("src=\""), []byte("src=\""+util.BytesToStr(src)+"\" data-src=\""))
+		tokens = r.replaceSrc(tokens, src, dataSrc)
 		r.Write(tokens)
 	} else {
 		r.renderIAL(node)
@@ -269,15 +268,14 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
-
+		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/span", nil, false)
-		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = bytes.ReplaceAll(tokens, []byte("src=\""), []byte("src=\""+util.BytesToStr(src)+"\" data-src=\""))
+		tokens = r.replaceSrc(tokens, src, dataSrc)
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
@@ -287,6 +285,18 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
+	src1 := append([]byte(" src=\""), src...)
+	src1 = append(src1, []byte("\"")...)
+	dataSrc1 := append([]byte(" src=\""), dataSrc...)
+	dataSrc1 = append(dataSrc1, []byte("\"")...)
+	if bytes.Contains(tokens, []byte("data-src=")) {
+		return bytes.ReplaceAll(tokens, dataSrc1, src1)
+	}
+	src1 = append(src1, []byte(" data-src=\"" + util.BytesToStr(dataSrc) + "\"")...)
+	return bytes.ReplaceAll(tokens, dataSrc1, src1)
 }
 
 func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
@@ -969,7 +979,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 			attrs = append(attrs, []string{"style", parentStyle})
 		}
 		r.Tag("span", attrs, false)
-
+		r.Tag("span", nil, false)
 		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/span", nil, false)
@@ -1011,7 +1021,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", attrs, false)
 		r.Writer.Write(titleTokens)
 		r.Tag("/span", nil, false)
-
+		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
