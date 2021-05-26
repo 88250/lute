@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"44", "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"72\">\n <colgroup><col width=\"72\">\n </colgroup><tbody><tr height=\"36\">\n\n  <td height=\"36\" class=\"xl65\" width=\"72\">foo<br>\n    bar</td>\n\n </tr>\n</tbody></table>", "| foo<br/>bar |\n| --------- |\n"},
 	{"43", "<!--StartFragment-->foo<strong>bar.</strong><span>baz</span><!--EndFragment-->", "foo **bar.** baz\n"},
 	{"42", "\n<!--StartFragment--><img class=\"rich_pages img_loading\" data-ratio=\"0.5625\" data-s=\"300,640\" data-src=\"https://foo\" data-type=\"jpeg\" data-w=\"1280\" data-backw=\"578\" data-backh=\"326\" _width=\"100%\" src=\"data:image/gif;base64,dataimge\" crossorigin=\"anonymous\" alt=\"图片\">", "![图片](https://foo)\n"},
 	{"41", "<section class=\"code-snippet__fix code-snippet__js\"><pre class=\"code-snippet__js\" data-lang=\"makefile\"><code><span class=\"code-snippet_outer\">foo</span></code><code><span class=\"code-snippet_outer\">bar</span></code></pre></section>", "```\nfoo\nbar\n```\n"},

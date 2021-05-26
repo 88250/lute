@@ -1379,10 +1379,7 @@ func (r *BlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.W
 }
 
 func (r *BlockRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Tag("br", nil, true)
-	}
-	return ast.WalkContinue
+	return r.renderBr(node, entering)
 }
 
 func (r *BlockRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {

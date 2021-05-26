@@ -104,12 +104,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.Type = ast.NodeLinkText
 		}
-		if "" == strings.TrimSpace(n.Data) && lute.parentIs(n, atom.Table) {
-			node.Tokens = []byte(" ")
-			tree.Context.Tip.AppendChild(node)
-			break
+		if lute.parentIs(n, atom.Table) {
+			if "" == strings.TrimSpace(n.Data) {
+				node.Tokens = []byte(" ")
+				tree.Context.Tip.AppendChild(node)
+				break
+			}
+			node.Tokens = bytes.TrimSpace(node.Tokens)
 		}
-
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 		if nil != n.Parent && atom.Span == n.Parent.DataAtom && ("" != lute.domAttrValue(n.Parent, "class")) {
 			node.Tokens = []byte("**" + util.BytesToStr(node.Tokens) + "**")
@@ -284,8 +286,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 		return
 	case atom.Br:
-		node.Type = ast.NodeHardBreak
-		node.Tokens = util.StrToBytes("\n")
+		if tree.Context.ParseOption.ProtyleWYSIWYG {
+			node.Type = ast.NodeBr
+		} else {
+			node.Type = ast.NodeHardBreak
+			node.Tokens = util.StrToBytes("\n")
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
