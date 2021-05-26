@@ -445,6 +445,34 @@ func (lute *Lute) Blocks2Hs(ivHTML, level string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) OL2TL(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+
+	tree.Root.FirstChild.ListData.Typ = 3
+	for li := tree.Root.FirstChild.FirstChild; nil != li; li = li.Next {
+		if ast.NodeListItem == li.Type {
+			li.ListData.Typ = 3
+			li.PrependChild(&ast.Node{Type: ast.NodeTaskListItemMarker})
+		}
+	}
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) UL2TL(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+
+	tree.Root.FirstChild.ListData.Typ = 3
+	for li := tree.Root.FirstChild.FirstChild; nil != li; li = li.Next {
+		if ast.NodeListItem == li.Type {
+			li.ListData.Typ = 3
+			li.PrependChild(&ast.Node{Type: ast.NodeTaskListItemMarker})
+		}
+	}
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) TL2OL(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	list := tree.Root.FirstChild
