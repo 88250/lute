@@ -829,13 +829,6 @@ func (r *BlockRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkS
 			attrs = append(attrs, []string{"align", "right"})
 		}
 		r.Tag(tag, attrs, false)
-		if nil == node.FirstChild {
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-		} else if bytes.Equal(node.FirstChild.Tokens, util.CaretTokens) {
-			node.FirstChild.Tokens = []byte(util.Caret + " ")
-		} else {
-			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
-		}
 	} else {
 		r.Tag("/"+tag, nil, false)
 	}
