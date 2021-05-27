@@ -935,6 +935,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			content = strings.ReplaceAll(content, "\n", "")
 			node.Tokens = util.StrToBytes(content)
 		}
+
+		if lute.parentIs(n, atom.Table) {
+			node.Tokens = util.StrToBytes(strings.ReplaceAll(content, "\n", "<br />"))
+		}
+
 		tree.Context.Tip.AppendChild(node)
 	case atom.Thead:
 		node.Type = ast.NodeTableHead
