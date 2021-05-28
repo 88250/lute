@@ -209,6 +209,7 @@ func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast
 		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 		r.blockNodeAttrs(node, &attrs, "render-node")
 		r.Tag("div", attrs, false)
+		r.renderIAL(node)
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
