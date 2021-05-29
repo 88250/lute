@@ -866,11 +866,6 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
-		r.Tag("div", nil, false)
-		r.Tag("div", [][]string{{"class", "protyle-action protyle-icons"}}, false)
-		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
-		r.Tag("/div", nil, false)
-
 		attrs = [][]string{}
 		r.contenteditable(&attrs)
 		r.spellcheck(&attrs)
@@ -883,7 +878,6 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("/table", nil, false)
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
-		r.Tag("/div", nil, false)
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue

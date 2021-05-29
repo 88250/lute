@@ -659,11 +659,11 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	case ast.NodeTable:
 		node.Type = ast.NodeTable
 		var tableAligns []int
-		if nil == n.FirstChild || nil == n.FirstChild.FirstChild || nil == n.FirstChild.FirstChild.NextSibling {
+		if nil == n.FirstChild {
 			return
 		}
 
-		tableDiv := n.FirstChild.FirstChild.NextSibling
+		tableDiv := n.FirstChild
 		table := lute.domChild(tableDiv, atom.Table)
 		if nil == table {
 			return
