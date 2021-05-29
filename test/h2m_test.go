@@ -18,6 +18,8 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"47", "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"207\">\n <colgroup><col width=\"207\">\n </colgroup><tbody><tr height=\"126\">\n\n  <td height=\"126\" class=\"xl66\" width=\"207\">foo<font class=\"font7\">bar</font><font class=\"font6\">；<br>\n    baz</font></td>\n\n </tr>\n</tbody></table>", "| foobar；    baz |\n| ----------------- |\n"},
+	{"46", "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"207\">\n <colgroup><col width=\"207\">\n </colgroup><tbody><tr height=\"180\">\n\n  <td height=\"180\" class=\"xl66\" width=\"207\"><font class=\"font6\">foo<br>\n    </font><font class=\"font7\">bar</font></td>\n\n </tr>\n</tbody></table>", "| foo    bar |\n| ------------ |\n"},
 	{"45", "<ul class=\"dictBing-Cdef\"><li class=\"dictBing-CdefItem\"><span class=\"dictBing-CdefItem_Pos\">adj.</span><span class=\"dictBing-CdefItem_Def\">完全正确；对极了</span></li><li class=\"dictBing-CdefItem\"></li></ul><br class=\"Apple-interchange-newline\">", "* **adj.**完全正确；对极了\n*\n"},
 	{"44", "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"72\">\n <colgroup><col width=\"72\">\n </colgroup><tbody><tr height=\"36\">\n\n  <td height=\"36\" class=\"xl65\" width=\"72\">foo<br>\n    bar</td>\n\n </tr>\n</tbody></table>", "| foo<br/>bar |\n| --------- |\n"},
 	{"43", "<!--StartFragment-->foo<strong>bar.</strong><span>baz</span><!--EndFragment-->", "foo **bar.** baz\n"},
