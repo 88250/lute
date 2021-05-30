@@ -527,18 +527,18 @@ func (lute *Lute) TL2UL(ivHTML string) (ovHTML string) {
 
 func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
-	if ast.NodeList != tree.Root.FirstChild.Type {
+	list := tree.Root.FirstChild
+	if ast.NodeList != list.Type {
 		return ivHTML
 	}
 
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
-			return ast.WalkContinue
+	list.ListData.Typ = 0
+	for li := list.FirstChild; nil != li; li = li.Next {
+		if ast.NodeKramdownBlockIAL == li.Type {
+			continue
 		}
-
-		n.ListData.Typ = 0
-		return ast.WalkContinue
-	})
+		li.ListData.Typ = 0
+	}
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
@@ -546,26 +546,21 @@ func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
 
 func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
-	if ast.NodeList != tree.Root.FirstChild.Type {
+	list := tree.Root.FirstChild
+	if ast.NodeList != list.Type {
 		return ivHTML
 	}
 
-	var num int
-	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || !n.IsBlock() || (ast.NodeList != n.Type && ast.NodeListItem != n.Type) {
-			return ast.WalkContinue
+	num := 1
+	list.ListData.Typ = 1
+	for li := list.FirstChild; nil != li; li = li.Next {
+		if ast.NodeKramdownBlockIAL == li.Type {
+			continue
 		}
-
-		if ast.NodeList == n.Type {
-			num = 0
-		} else {
-			num++
-		}
-
-		n.ListData.Typ = 1
-		n.ListData.Num = num
-		return ast.WalkContinue
-	})
+		li.ListData.Typ = 1
+		li.ListData.Num = num
+		num++
+	}
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
