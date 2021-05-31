@@ -12,15 +12,14 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
-	"strconv"
-	"unicode"
-	"unicode/utf8"
-
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
+	"strconv"
+	"unicode"
+	"unicode/utf8"
 )
 
 type ProtylePreviewRenderer struct {
@@ -706,6 +705,11 @@ func (r *ProtylePreviewRenderer) renderInlineMathOpenMarker(node *ast.Node, ente
 }
 
 func (r *ProtylePreviewRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -1026,10 +1030,6 @@ func (r *ProtylePreviewRenderer) renderText(node *ast.Node, entering bool) ast.W
 			tokens = r.Space(node.Tokens)
 		} else {
 			tokens = node.Tokens
-		}
-
-		if r.Options.FixTermTypo {
-			tokens = r.FixTermTypo(tokens)
 		}
 		r.Write(html.EscapeHTML(tokens))
 	}

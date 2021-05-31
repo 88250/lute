@@ -14,6 +14,8 @@ import (
 	"bytes"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
@@ -372,6 +374,11 @@ func (r *BlockRenderer) renderGitConflict(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *BlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -449,6 +456,11 @@ func (r *BlockRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast
 }
 
 func (r *BlockRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -756,6 +768,25 @@ func (r *BlockRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatu
 }
 
 func (r *BlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if r.Options.AutoSpace {
+			if text := node.PreviousNodeText(); "" != text {
+				lastc, _ := utf8.DecodeLastRuneInString(text)
+				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
+					r.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	} else {
+		if r.Options.AutoSpace {
+			if text := node.NextNodeText(); "" != text {
+				firstc, _ := utf8.DecodeRuneInString(text)
+				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
+					r.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	}
 	return ast.WalkContinue
 }
 
@@ -884,6 +915,11 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 }
 
 func (r *BlockRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -1140,12 +1176,37 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 
 func (r *BlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(html.EscapeHTML(node.Tokens))
+		var tokens []byte
+		if r.Options.AutoSpace {
+			tokens = r.Space(node.Tokens)
+		} else {
+			tokens = node.Tokens
+		}
+		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if r.Options.AutoSpace {
+			if text := node.PreviousNodeText(); "" != text {
+				lastc, _ := utf8.DecodeLastRuneInString(text)
+				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
+					r.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	} else {
+		if r.Options.AutoSpace {
+			if text := node.NextNodeText(); "" != text {
+				firstc, _ := utf8.DecodeRuneInString(text)
+				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
+					r.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	}
 	return ast.WalkContinue
 }
 
@@ -1172,6 +1233,11 @@ func (r *BlockRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool)
 }
 
 func (r *BlockRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -1204,6 +1270,11 @@ func (r *BlockRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering b
 }
 
 func (r *BlockRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
