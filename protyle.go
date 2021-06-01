@@ -876,7 +876,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			lute.genASTContenteditable(n, tree)
 			return
-		case atom.U:
+		case atom.U, atom.Code, atom.Strong, atom.Em, atom.Kbd, atom.Mark, atom.S, atom.Sub, atom.Sup, atom.Span:
 			lute.genASTContenteditable(n, tree)
 			return
 		}
@@ -888,7 +888,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		node.Type = ast.NodeHTMLBlock
+		node.Type = ast.NodeInlineHTML
 		node.Tokens = lute.domHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return

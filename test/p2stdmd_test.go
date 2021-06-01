@@ -19,6 +19,8 @@ import (
 
 var blockDOM2StdMd = []parseTest{
 
+	{"2", "<span data-type=\"tag\">foo</span> bar <em>foo</em> bar", "#foo# bar *foo* bar\n"},
+	{"1", "foo <code>bar</code> baz", "foo `bar` baz\n"},
 	{"0", "foo<u>bar</u>baz~~abc~~xyz", "foo<u>bar</u>baz~~abc~~xyz\n"},
 }
 
