@@ -40,6 +40,13 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 			firstChild.KramdownIAL, second.KramdownIAL = second.KramdownIAL, nil
 		}
 	}
+	if ast.NodeKramdownBlockIAL == firstChild.Type && nil != firstChild.Next && ast.NodeKramdownBlockIAL == firstChild.Next.Type && util.IsDocIAL(firstChild.Next.Tokens) {
+		// 空段落块还原
+		ialArray := parse.Tokens2IAL(firstChild.Tokens)
+		ial := parse.IAL2Map(ialArray)
+		p := &ast.Node{Type: ast.NodeParagraph, ID: ial["id"], KramdownIAL: ialArray}
+		firstChild.InsertBefore(p)
+	}
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
