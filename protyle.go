@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"github.com/88250/lute/lex"
 	"strconv"
 	"strings"
 
@@ -933,6 +934,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.parentIs(n, atom.Table) {
 			node.Tokens = util.StrToBytes(strings.ReplaceAll(content, "\n", "<br />"))
+			array := lex.SplitWithoutBackslashEscape(node.Tokens, '|')
+			node.Tokens = nil
+			for i, tokens := range array {
+				node.Tokens = append(node.Tokens, tokens...)
+				if i < len(array)-1 {
+					node.Tokens = append(node.Tokens, []byte("\\|")...)
+				}
+			}
 		}
 		if ast.NodeCodeSpan == tree.Context.Tip.Type || ast.NodeInlineMath == tree.Context.Tip.Type {
 			tree.Context.Tip.FirstChild.Next.Tokens = util.StrToBytes(content)
