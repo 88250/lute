@@ -384,7 +384,9 @@ func (r *BlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus 
 
 func (r *BlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("span", [][]string{{"data-type", "tag"}}, false)
+		content := node.Parent.Text()
+		content = strings.ReplaceAll(content, util.Caret, "")
+		r.Tag("span", [][]string{{"data-type", "tag"}, {"data-content", content}}, false)
 	}
 	return ast.WalkContinue
 }
