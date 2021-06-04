@@ -1179,7 +1179,7 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 func (r *BlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var tokens []byte
-		if r.Options.AutoSpace {
+		if r.Options.AutoSpace && ast.NodeKbd != node.Parent.Type {
 			tokens = r.Space(node.Tokens)
 		} else {
 			tokens = node.Tokens
