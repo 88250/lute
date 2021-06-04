@@ -426,6 +426,31 @@ func (lute *Lute) Blocks2ULs(ivHTML string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) Blocks2Blockquote(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+
+	var blocks, ials []*ast.Node
+	for n := tree.Root.FirstChild; nil != n; n = n.Next {
+		if ast.NodeKramdownBlockIAL != n.Type {
+			blocks = append(blocks, n)
+		} else {
+			ials = append(ials, n)
+		}
+	}
+
+	bqID := ast.NewNodeID()
+	bq := &ast.Node{ID: bqID, Type: ast.NodeBlockquote}
+	for i, _ := range blocks {
+		bq.AppendChild(blocks[i])
+		bq.AppendChild(ials[i])
+	}
+	bqIAL := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: parse.IAL2Tokens([][]string{{"id", bqID}})}
+	bq.InsertAfter(bqIAL)
+	tree.Root.AppendChild(bq)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild
