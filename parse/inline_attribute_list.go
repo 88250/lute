@@ -85,6 +85,12 @@ func IAL2Tokens(ial [][]string) []byte {
 	return buf.Bytes()
 }
 
+func IALVal(ial *ast.Node, name string) string {
+	array := Tokens2IAL(ial.Tokens)
+	m := IAL2Map(array)
+	return m[name]
+}
+
 func IAL2Map(ial [][]string) (ret map[string]string) {
 	ret = map[string]string{}
 	for _, kv := range ial {
