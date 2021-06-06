@@ -91,6 +91,13 @@ func IALVal(ial *ast.Node, name string) string {
 	return m[name]
 }
 
+func IALValMap(ial *ast.Node) (ret map[string]string) {
+	ret = map[string]string{}
+	array := Tokens2IAL(ial.Tokens)
+	ret = IAL2Map(array)
+	return
+}
+
 func IAL2Map(ial [][]string) (ret map[string]string) {
 	ret = map[string]string{}
 	for _, kv := range ial {
