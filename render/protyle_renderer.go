@@ -1395,12 +1395,12 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 		r.Tag("div", attrs, false)
 
 		if 0 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-action"}}
+			attr := [][]string{{"class", "protyle-action"}, {"draggable", "true"}}
 			r.Tag("div", attr, false)
 			r.WriteString("<svg><use xlink:href=\"#iconDot\"></use></svg>")
 			r.Tag("/div", nil, false)
 		} else if 1 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-action protyle-action--order"}, {"contenteditable", "false"}}
+			attr := [][]string{{"class", "protyle-action protyle-action--order"}, {"contenteditable", "false"}, {"draggable", "true"}}
 			r.Tag("div", attr, false)
 			r.WriteString(strconv.Itoa(node.ListData.Num) + ".")
 			r.Tag("/div", nil, false)
