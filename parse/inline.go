@@ -82,9 +82,11 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 					n.Type = ast.NodeText
 					n.Tokens = []byte("</kbd>")
 				} else {
+					openMarker := kbd.FirstChild
 					for _, c := range children {
-						kbd.AppendChild(c)
+						kbd.PrependChild(c)
 					}
+					kbd.PrependChild(openMarker)
 					kbd.AppendChild(n)
 					continue
 				}
@@ -101,9 +103,11 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 					n.Type = ast.NodeText
 					n.Tokens = []byte("</u>")
 				} else {
+					openMarker := underline.FirstChild
 					for _, c := range children {
-						underline.AppendChild(c)
+						underline.PrependChild(c)
 					}
+					underline.PrependChild(openMarker)
 					underline.AppendChild(n)
 					continue
 				}
