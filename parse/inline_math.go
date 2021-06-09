@@ -92,6 +92,8 @@ func (t *Tree) matchInlineMathEnd(tokens []byte) (pos int) {
 			} else {
 				return pos
 			}
+		} else if lex.ItemNewline == tokens[pos] {
+			return -1
 		}
 	}
 	return -1
