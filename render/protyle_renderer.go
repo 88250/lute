@@ -235,8 +235,7 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
 		r.Tag("/span", nil, false)
-		r.Tag("div", [][]string{{"style", "position: absolute;top: 0"}, {"contenteditable", "false"}}, false)
-		r.Tag("/div", nil, false)
+		r.WriteString(parse.Zwsp)
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
@@ -255,8 +254,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, src, dataSrc)
 		r.Write(tokens)
-		r.Tag("div", [][]string{{"style", "position: absolute;top: 0"}, {"contenteditable", "false"}}, false)
-		r.Tag("/div", nil, false)
+		r.WriteString(parse.Zwsp)
 	} else {
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
