@@ -1528,9 +1528,8 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	}
 
 	if memo := node.IALAttr("memo"); "" != memo {
-		r.Tag("div", [][]string{{"class", "protyle-attr--memo"}}, false)
+		r.Tag("div", [][]string{{"class", "protyle-attr--memo b3-tooltips b3-tooltips__nw"}, {"aria-label", "memo"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconM\"></use></svg>")
-		r.WriteString(memo)
 		r.Tag("/div", nil, false)
 	}
 
