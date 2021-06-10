@@ -179,7 +179,35 @@ func TestBlocks2Blockquote(t *testing.T) {
 	ast.Testing = false
 }
 
+var blocks2psTests = []*parseTest{
+	{"0", "", ""},
+}
+
+func TestBlocks2Ps(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+
+	ast.Testing = true
+	for _, test := range blocks2psTests {
+		ovHTML := luteEngine.Blocks2Ps(test.from)
+		if test.to != ovHTML {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, ovHTML, test.from)
+		}
+	}
+	ast.Testing = false
+}
+
 var blocks2hsTests = []*parseTest{
+	{"1", "<div data-subtype=\"h2\" data-node-id=\"20210610154900-5r20m2j\" data-node-index=\"1\" data-type=\"NodeHeading\" class=\"h2\" updated=\"20210610154902\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"h2\" data-node-id=\"20210610154909-wemyt8x\" data-node-index=\"2\" data-type=\"NodeHeading\" class=\"h2\" updated=\"20210610154910\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-subtype=\"h1\" data-node-id=\"20210610154900-5r20m2j\" data-node-index=\"1\" data-type=\"NodeHeading\" class=\"h1\" updated=\"20210610154902\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"h1\" data-node-id=\"20210610154909-wemyt8x\" data-node-index=\"2\" data-type=\"NodeHeading\" class=\"h1\" updated=\"20210610154910\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"0", "<div data-node-id=\"20210518185646-hjjhl5p\" data-node-index=\"0\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210518191256\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210518191256-m1ij6pn\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" fold=\"0\" updated=\"20210518191257\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210518185646-pcdktyp\" data-node-index=\"2\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-subtype=\"h1\" data-node-id=\"20210518185646-hjjhl5p\" data-node-index=\"1\" data-type=\"NodeHeading\" class=\"h1\" updated=\"20210518191256\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"h1\" data-node-id=\"20210518191256-m1ij6pn\" data-node-index=\"2\" data-type=\"NodeHeading\" class=\"h1\" fold=\"0\" updated=\"20210518191257\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"h1\" data-node-id=\"20210518185646-pcdktyp\" data-node-index=\"3\" data-type=\"NodeHeading\" class=\"h1\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 }
 
@@ -261,6 +289,7 @@ func TestTL2OL(t *testing.T) {
 }
 
 var cancelListTests = []*parseTest{
+	{"1", "<div data-subtype=\"t\" data-node-id=\"20210610155819-dvxb0ws\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\" updated=\"20210610155823\"><div data-marker=\"*\" data-subtype=\"t\" data-node-id=\"20210610155824-ibbpfdr\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div><div data-node-id=\"20210610155824-6pcn10x\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210610155825\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-marker=\"*\" data-subtype=\"t\" data-node-id=\"20210610155825-trhucha\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div><div data-node-id=\"20210610155825-8v3wz67\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210610155825\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-node-id=\"20210610155824-6pcn10x\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210610155825\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210610155825-8v3wz67\" data-node-index=\"2\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210610155825\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"0", "<div data-subtype=\"u\" data-node-id=\"20210509095907-rixmte6\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\" updated=\"20210509103643\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210509103643-es01df0\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20210509103643-xr4nn64\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509103643\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20210509103701-dnmzej3\" data-type=\"NodeList\" class=\"list\" data-subtype=\"u\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210509103644-zfqz75l\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20210509103644-uednsdt\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509103651\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\"></div></div><div class=\"protyle-attr\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-node-id=\"20210509103643-xr4nn64\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509103643\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"u\" data-node-id=\"20210509103701-dnmzej3\" data-node-index=\"2\" data-type=\"NodeList\" class=\"list\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20210509103644-zfqz75l\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action\" draggable=\"true\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20210509103644-uednsdt\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210509103651\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 }
 

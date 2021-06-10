@@ -283,7 +283,9 @@ func (lute *Lute) CancelList(ivHTML string) (ovHTML string) {
 	var appends, unlinks []*ast.Node
 	for li := list.FirstChild; nil != li; li = li.Next {
 		for c := li.FirstChild; nil != c; c = c.Next {
-			appends = append(appends, c)
+			if ast.NodeTaskListItemMarker != c.Type {
+				appends = append(appends, c)
+			}
 		}
 		unlinks = append(unlinks, li)
 	}
@@ -469,7 +471,7 @@ func (lute *Lute) Blocks2Hs(ivHTML, level string) (ovHTML string) {
 	node := tree.Root.FirstChild
 
 	for p := node; nil != p; p = p.Next {
-		if ast.NodeParagraph == p.Type {
+		if ast.NodeParagraph == p.Type || ast.NodeHeading == p.Type {
 			p.Type = ast.NodeHeading
 			p.HeadingLevel, _ = strconv.Atoi(level)
 		}
