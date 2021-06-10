@@ -707,7 +707,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
 	}
 
-	attrs := [][]string{{"class", "protyle-action__language"}}
+	attrs := [][]string{{"class", "protyle-action__language"}, {"contenteditable", "false"}}
 	if nil != node.Previous && 0 < len(node.Previous.CodeBlockInfo) {
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = string(infoWords[0])
