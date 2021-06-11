@@ -1531,6 +1531,15 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" updated=\""+updated+"\"")...)
 	}
 
+	if customAttrs := lute.domCustomAttrs(n); nil != customAttrs {
+		for k, v := range customAttrs {
+			v = html.UnescapeHTMLStr(v)
+			v = html.EscapeHTMLStr(v)
+			node.SetIALAttr(k, v)
+			ialTokens = append(ialTokens, []byte(" "+k+"=\""+v+"\"")...)
+		}
+	}
+
 	ialTokens = append(ialTokens, '}')
 	return ialTokens
 }

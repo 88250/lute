@@ -1299,6 +1299,19 @@ func (lute *Lute) domAttrValue(n *html.Node, attrName string) string {
 	return ""
 }
 
+func (lute *Lute) domCustomAttrs(n *html.Node) (ret map[string]string) {
+	ret = map[string]string{}
+	for _, attr := range n.Attr {
+		if strings.HasPrefix(attr.Key, "custom-") {
+			ret[attr.Key] = attr.Val
+		}
+	}
+	if 1 > len(ret) {
+		return nil
+	}
+	return
+}
+
 func (lute *Lute) domChild(n *html.Node, dataAtom atom.Atom) *html.Node {
 	if nil == n {
 		return nil

@@ -13,6 +13,7 @@ package ast
 import (
 	"bytes"
 	"math/rand"
+	"strings"
 	"time"
 	"unicode/utf8"
 
@@ -150,6 +151,17 @@ func randStr(length int) string {
 		b[i] = letter[rand.Intn(len(letter))]
 	}
 	return string(b)
+}
+
+// ClearIALAttrs 用于删除 name、alias、memo 和 bookmark 以及所有 custom- 前缀属性。
+func (n *Node) ClearIALAttrs() {
+	tmp := n.KramdownIAL[:0]
+	for _, kv := range n.KramdownIAL {
+		if "name" != kv[0] && "alias" != kv[0] && "memo" != kv[0] && "bookmark" != kv[0] && !strings.HasPrefix(kv[0], "custom-") {
+			tmp = append(tmp, kv)
+		}
+	}
+	n.KramdownIAL = tmp
 }
 
 func (n *Node) RemoveIALAttr(name string) {
