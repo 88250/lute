@@ -1085,11 +1085,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: util.StrToBytes(title)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-			if parentStyle := lute.domAttrValue(n, "style"); "" != parentStyle {
-				node.SetIALAttr("parent-style", parentStyle)
-			}
 			tree.Context.Tip.AppendChild(node)
-			lute.setSpanIAL(img, tree.Context.Tip.LastChild)
+			if style := lute.domAttrValue(n, "style"); "" != style {
+				node.SetIALAttr("style", style)
+				ialTokens := parse.IAL2Tokens(node.KramdownIAL)
+				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+				tree.Context.Tip.AppendChild(ial)
+			}
 			return
 		} else if "backslash" == dataType {
 			node.Type = ast.NodeText
@@ -1258,7 +1260,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		lute.setSpanIAL(n, node)
-
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Del, atom.S, atom.Strike:

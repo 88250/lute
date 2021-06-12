@@ -998,9 +998,8 @@ func (r *BlockRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus
 func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
-		parentStyle := node.IALAttr("parent-style")
-		if "" != parentStyle { // 手动设置了位置
-			attrs = append(attrs, []string{"style", parentStyle})
+		if style := node.IALAttr("style"); "" != style { // 手动设置了位置
+			attrs = append(attrs, []string{"style", style})
 		}
 		r.Tag("span", attrs, false)
 		r.Tag("span", nil, false)
