@@ -1092,6 +1092,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 				tree.Context.Tip.AppendChild(ial)
 			}
+			lute.setSpanIAL(img, tree.Context.Tip.LastChild)
 			return
 		} else if "backslash" == dataType {
 			node.Type = ast.NodeText
