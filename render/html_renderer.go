@@ -760,7 +760,7 @@ func (r *HtmlRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus 
 func (r *HtmlRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if 0 == r.DisableTags {
-			if style := node.IALAttr("style"); "" != style {
+			if style := node.IALAttr("parent-style"); "" != style {
 				r.Tag("span", [][]string{{"style", style}}, false)
 			}
 

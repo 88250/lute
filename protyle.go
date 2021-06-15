@@ -1086,12 +1086,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			tree.Context.Tip.AppendChild(node)
-			if style := lute.domAttrValue(n, "style"); "" != style {
-				node.SetIALAttr("style", style)
-				ialTokens := parse.IAL2Tokens(node.KramdownIAL)
-				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-				tree.Context.Tip.AppendChild(ial)
-			}
 			lute.setSpanIAL(img, tree.Context.Tip.LastChild)
 			return
 		} else if "backslash" == dataType {
@@ -1461,11 +1455,30 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 }
 
 func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
+	insertedIAL := false
 	if style := lute.domAttrValue(n, "style"); "" != style {
 		node.SetIALAttr("style", style)
 		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 		node.InsertAfter(ial)
+		insertedIAL = true
+	}
+
+	if nil != n.Parent && nil != n.Parent.Parent {
+		if parentStyle := lute.domAttrValue(n.Parent.Parent, "style"); "" != parentStyle {
+			if insertedIAL {
+				m := parse.Tokens2IAL(node.Next.Tokens)
+				m = append(m, []string{"parent-style", parentStyle})
+				node.Next.Tokens = parse.IAL2Tokens(m)
+				node.SetIALAttr("parent-style", parentStyle)
+				node.KramdownIAL = m
+			} else {
+				node.SetIALAttr("parent-style", parentStyle)
+				ialTokens := parse.IAL2Tokens(node.KramdownIAL)
+				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+				node.InsertAfter(ial)
+			}
+		}
 	}
 }
 

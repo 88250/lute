@@ -902,7 +902,7 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 	if entering {
 		if 0 == r.DisableTags {
 			attrs := [][]string{{"class", "img"}}
-			if style := node.IALAttr("style"); "" != style {
+			if style := node.IALAttr("parent-style"); "" != style {
 				attrs = append(attrs, []string{"style", style})
 			}
 			r.Tag("span", attrs, false)
