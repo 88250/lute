@@ -330,6 +330,18 @@ func (n *Node) TokenLen() (ret int) {
 	return
 }
 
+// DocChild 返回 n 的父节点，该该父节点是 doc 的直接子节点。
+func (n *Node) DocChild() (ret *Node) {
+	ret = n
+	for p := n; nil != p; p = p.Parent {
+		if NodeDocument == p.Type {
+			return
+		}
+		ret = p
+	}
+	return
+}
+
 // IsChildBlockOf 用于检查块级节点 n 的父节点是否是 parent 节点，depth 指定层级，0 为任意层级。
 // n 如果不是块级节点，则直接返回 false。
 func (n *Node) IsChildBlockOf(parent *Node, depth int) bool {
