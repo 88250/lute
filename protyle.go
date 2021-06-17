@@ -1546,6 +1546,27 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" updated=\""+updated+"\"")...)
 	}
 
+	if linewrap := lute.domAttrValue(n, "linewrap"); "" != linewrap {
+		linewrap = html.UnescapeHTMLStr(linewrap)
+		linewrap = html.EscapeHTMLStr(linewrap)
+		node.SetIALAttr("linewrap", linewrap)
+		ialTokens = append(ialTokens, []byte(" linewrap=\""+linewrap+"\"")...)
+	}
+
+	if ligatures := lute.domAttrValue(n, "ligatures"); "" != ligatures {
+		ligatures = html.UnescapeHTMLStr(ligatures)
+		ligatures = html.EscapeHTMLStr(ligatures)
+		node.SetIALAttr("ligatures", ligatures)
+		ialTokens = append(ialTokens, []byte(" ligatures=\""+ligatures+"\"")...)
+	}
+
+	if linenumber := lute.domAttrValue(n, "linenumber"); "" != linenumber {
+		linenumber = html.UnescapeHTMLStr(linenumber)
+		linenumber = html.EscapeHTMLStr(linenumber)
+		node.SetIALAttr("linenumber", linenumber)
+		ialTokens = append(ialTokens, []byte(" linenumber=\""+linenumber+"\"")...)
+	}
+
 	if customAttrs := lute.domCustomAttrs(n); nil != customAttrs {
 		for k, v := range customAttrs {
 			v = html.UnescapeHTMLStr(v)
