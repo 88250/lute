@@ -1532,6 +1532,13 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" fold=\""+fold+"\"")...)
 	}
 
+	if headingFold := lute.domAttrValue(n, "heading-fold"); "" != headingFold {
+		headingFold = html.UnescapeHTMLStr(headingFold)
+		headingFold = html.EscapeHTMLStr(headingFold)
+		node.SetIALAttr("heading-fold", headingFold)
+		ialTokens = append(ialTokens, []byte(" heading-fold=\""+headingFold+"\"")...)
+	}
+
 	if parentFold := lute.domAttrValue(n, "parent-fold"); "" != parentFold {
 		parentFold = html.UnescapeHTMLStr(parentFold)
 		parentFold = html.EscapeHTMLStr(parentFold)
