@@ -3,10 +3,10 @@ module github.com/88250/lute
 go 1.12
 
 require (
-	github.com/alecthomas/chroma v0.9.1
+	github.com/alecthomas/chroma v0.9.2
 	github.com/alecthomas/colour v0.1.0 // indirect
 	github.com/alecthomas/repr v0.0.0-20200325044227-4184120f674c // indirect
-	github.com/gopherjs/gopherjs v0.0.0-20210519211817-2312de329ae4
+	github.com/gopherjs/gopherjs v0.0.0-20210614142143-03070f63dd63
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect

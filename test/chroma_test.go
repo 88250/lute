@@ -114,7 +114,7 @@ var expected = `<html>
 /* TextWhitespace */ .chroma .w { color: #bbbbbb }
 body { background-color: #ffffff; }
 </style><body class="chroma">
-<pre class="chroma">
+<pre tabindex="0" class="chroma">
 	<span class="nd">@RequestProcessing</span><span class="o">(</span><span class="s">&#34;/&#34;</span><span class="o">)</span>
 	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">index</span><span class="o">(</span><span class="kd">final</span> <span class="n">RequestContext</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
 		<span class="n">context</span><span class="o">.</span><span class="na">setRenderer</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleFMRenderer</span><span class="o">(</span><span class="s">&#34;index.ftl&#34;</span><span class="o">));</span>
