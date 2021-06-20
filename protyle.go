@@ -1090,6 +1090,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		} else if "backslash" == dataType {
 			node.Type = ast.NodeBackslash
+			if nil == n.FirstChild {
+				return
+			}
 			node.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: util.StrToBytes(n.FirstChild.NextSibling.Data)})
 			tree.Context.Tip.AppendChild(node)
 			return
