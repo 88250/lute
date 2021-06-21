@@ -515,6 +515,7 @@ func (lute *Lute) TL2OL(ivHTML string) (ovHTML string) {
 		return ivHTML
 	}
 
+	num := 1
 	list.ListData.Typ = 1
 	var unlinks []*ast.Node
 	for li := list.FirstChild; nil != li; li = li.Next {
@@ -523,10 +524,8 @@ func (lute *Lute) TL2OL(ivHTML string) (ovHTML string) {
 		}
 		unlinks = append(unlinks, li.FirstChild) // task marker
 		li.ListData.Typ = 1
-		if nil == li.Previous {
-			li.ListData.Start = 1
-			li.ListData.Num = 1
-		}
+		li.ListData.Num = num
+		num++
 	}
 	for _, n := range unlinks {
 		n.Unlink()
