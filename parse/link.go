@@ -11,12 +11,12 @@
 package parse
 
 import (
-	"bytes"
+	"unicode/utf8"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
-	"unicode/utf8"
 )
 
 func (context *Context) parseLinkRefDef(tokens []byte) []byte {
@@ -93,27 +93,6 @@ func (context *Context) parseLinkRefDef(tokens []byte) []byte {
 	defBlock.AppendChild(def)
 	context.Tip.Parent.AppendChild(defBlock)
 	return remains
-}
-
-func (t *Tree) FindLinkRefDefLink(label []byte) (link *ast.Node) {
-	if !t.Context.ParseOption.LinkRef {
-		return
-	}
-
-	if t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG {
-		label = bytes.ReplaceAll(label, util.CaretTokens, nil)
-	}
-	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || ast.NodeLinkRefDef != n.Type {
-			return ast.WalkContinue
-		}
-		if bytes.EqualFold(n.Tokens, label) {
-			link = n.FirstChild
-			return ast.WalkStop
-		}
-		return ast.WalkContinue
-	})
-	return
 }
 
 func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, remains, title []byte) {

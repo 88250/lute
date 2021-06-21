@@ -18,6 +18,11 @@ import (
 
 var debugTests = []parseTest{
 
+	// CommonMark 0.30 https://spec.commonmark.org/0.30/changes.html#part-66
+	{"57", "[Толпой][Толпой] is a Russian word.\n\n[ТОЛПОЙ]: /url\n", "<p><a href=\"/url\">Толпой</a> is a Russian word.</p>\n"},
+	{"56", "[SS]\n\n[ẞ]: /url\n", "<p><a href=\"/url\">SS</a></p>\n"},
+	{"55", "[ẞ]\n\n[SS]: /url\n", "<p><a href=\"/url\">ẞ</a></p>\n"},
+
 	{"54", "- foo\n\n    ```\nbar\n```", "<ul>\n<li>\n<p>foo</p>\n<pre><code class=\"highlight-chroma\"></code></pre>\n</li>\n</ul>\n<p>bar</p>\n<pre><code class=\"highlight-chroma\"></code></pre>\n"},
 	{"53", "- foo\n\n    $$\nbar\n$$\n", "<ul>\n<li>\n<p>foo</p>\n<div class=\"language-math\"></div>\n</li>\n</ul>\n<p>bar</p>\n<div class=\"language-math\"></div>\n"},
 
