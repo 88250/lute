@@ -18,6 +18,7 @@ import (
 
 var spaceTests = []parseTest{
 
+	{"44", "aかb中タ1가.に我し", "<p>a か b 中タ 1 가.に我し</p>\n"},
 	{"43", "中@文", "<p>中 @ 文</p>\n"},
 	{"42", "中@Component文", "<p>中 @Component 文</p>\n"},
 

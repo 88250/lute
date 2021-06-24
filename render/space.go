@@ -66,20 +66,26 @@ func allowSpace(currentChar, nextChar rune) bool {
 		return false
 	}
 
-	currentIsHan := unicode.Is(unicode.Han, currentChar)
+	currentIsCJK := isCJK(currentChar)
 	nextIsPunct := '%' != nextChar && '@' != nextChar && (unicode.IsPunct(nextChar) || '~' == nextChar || '=' == nextChar || '#' == nextChar)
-	if currentIsHan && nextIsPunct {
+	if currentIsCJK && nextIsPunct {
 		return false
 	}
 
 	currentIsPunct := '%' != currentChar && '@' != currentChar && (unicode.IsPunct(currentChar) || '~' == currentChar || '=' == currentChar || '#' == currentChar)
-	nextIsHan := unicode.Is(unicode.Han, nextChar)
-	if nextIsHan && currentIsPunct {
+	nextIsCJK := isCJK(nextChar)
+	if nextIsCJK && currentIsPunct {
 		return false
 	}
 
-	if (!currentIsHan && !nextIsHan) || (currentIsHan && nextIsHan) {
+	if (!currentIsCJK && !nextIsCJK) || (currentIsCJK && nextIsCJK) {
 		return false
 	}
 	return true
+}
+
+func isCJK(r rune) bool {
+	return unicode.Is(unicode.Han, r) ||
+		unicode.Is(unicode.Hiragana, r) || unicode.Is(unicode.Katakana, r) ||
+		unicode.Is(unicode.Hangul, r)
 }
