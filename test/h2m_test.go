@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"48", "<figure data-size=\"normal\"><img src=\"foo.png\"></figure><h2>bar</h2>", "![](foo.png)\n\n## bar\n"},
 	{"47", "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"207\">\n <colgroup><col width=\"207\">\n </colgroup><tbody><tr height=\"126\">\n\n  <td height=\"126\" class=\"xl66\" width=\"207\">foo<font class=\"font7\">bar</font><font class=\"font6\">；<br>\n    baz</font></td>\n\n </tr>\n</tbody></table>", "| foobar；    baz |\n| ----------------- |\n"},
 	{"46", "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"207\">\n <colgroup><col width=\"207\">\n </colgroup><tbody><tr height=\"180\">\n\n  <td height=\"180\" class=\"xl66\" width=\"207\"><font class=\"font6\">foo<br>\n    </font><font class=\"font7\">bar</font></td>\n\n </tr>\n</tbody></table>", "| foo    bar |\n| ------------ |\n"},
 	{"45", "<ul class=\"dictBing-Cdef\"><li class=\"dictBing-CdefItem\"><span class=\"dictBing-CdefItem_Pos\">adj.</span><span class=\"dictBing-CdefItem_Def\">完全正确；对极了</span></li><li class=\"dictBing-CdefItem\"></li></ul><br class=\"Apple-interchange-newline\">", "* **adj.**完全正确；对极了\n*\n"},
