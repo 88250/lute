@@ -1048,6 +1048,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
+			if ast.NodeLink == tree.Context.Tip.Type {
+				break
+			}
+
 			node.Type = ast.NodeLink
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 			tree.Context.Tip.AppendChild(node)
