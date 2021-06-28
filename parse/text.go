@@ -48,19 +48,6 @@ func (t *Tree) isMarker(token byte) bool {
 var backslash = util.StrToBytes("\\")
 
 func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
-	//if t.Context.ParseOption.ProtyleWYSIWYG {
-	//	ctx.pos++
-	//	// 单个 \ 的情况自动添加为 \\
-	//	if nextPos := ctx.pos + 1; nextPos < ctx.tokensLen && lex.ItemBackslash == ctx.tokens[nextPos] {
-	//		return nil
-	//	}
-	//
-	//	n := &ast.Node{Type: ast.NodeBackslash}
-	//	block.AppendChild(n)
-	//	n.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: []byte{lex.ItemBackslash}})
-	//	return nil
-	//}
-
 	if ctx.pos == ctx.tokensLen-1 {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: backslash}
