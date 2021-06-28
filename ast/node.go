@@ -776,5 +776,11 @@ const (
 
 	NodeBr NodeType = 525 // <br> 换行
 
+	// <span data-type="mark">foo</span> 通用的行级文本标记
+
+	NodeTextMark            NodeType = 530 // 文本标记
+	NodeTextMarkOpenMarker  NodeType = 526 // 开始文本标记符 <span>
+	NodeTextMarkCloseMarker NodeType = 527 // 开始文本标记符 </span>
+
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
