@@ -649,7 +649,7 @@ func (r *BlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wa
 func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	noHighlight := false
 	var language string
-	if nil != node.FirstChild.Next && 0 < len(node.FirstChild.Next.CodeBlockInfo) {
+	if nil != node.FirstChild && nil != node.FirstChild.Next && 0 < len(node.FirstChild.Next.CodeBlockInfo) {
 		language = util.BytesToStr(node.FirstChild.Next.CodeBlockInfo)
 		noHighlight = r.NoHighlight(language)
 	}
