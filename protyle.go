@@ -967,6 +967,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.parentIs(n, atom.Table) {
+			if nil == n.NextSibling {
+				content = strings.ReplaceAll(content, "\n", "") // 表格内存在行级公式时编辑会产生换行 https://github.com/siyuan-note/siyuan/issues/2279
+			}
+
 			node.Tokens = util.StrToBytes(strings.ReplaceAll(content, "\n", "<br />"))
 			array := lex.SplitWithoutBackslashEscape(node.Tokens, '|')
 			node.Tokens = nil
