@@ -967,7 +967,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.parentIs(n, atom.Table) {
-			if nil == n.NextSibling {
+			if nil == n.NextSibling || (atom.Br == n.NextSibling.DataAtom && strings.HasPrefix(content, "\n")) {
 				content = strings.ReplaceAll(content, "\n", "") // 表格内存在行级公式时编辑会产生换行 https://github.com/siyuan-note/siyuan/issues/2279
 			}
 
@@ -1149,6 +1149,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Br:
 		if ast.NodeHeading == tree.Context.Tip.Type {
+			return
+		}
+		if nil != n.PrevSibling && "\n" == n.PrevSibling.Data && lute.parentIs(n, atom.Table) {
 			return
 		}
 
