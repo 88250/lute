@@ -1322,6 +1322,9 @@ func (r *BlockRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) as
 func (r *BlockRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
+		if 6 < node.HeadingLevel {
+			node.HeadingLevel = 6
+		}
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		attrs = append(attrs, []string{"data-subtype", "h" + level})
 		r.blockNodeAttrs(node, &attrs, "h"+level)
