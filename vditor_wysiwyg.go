@@ -278,7 +278,9 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 
 		parent := n.Parent
 		if nil != parent && (atom.Ol == parent.DataAtom || atom.Ul == parent.DataAtom || atom.Li == parent.DataAtom) {
-			n.Data = strings.TrimRight(n.Data, "\n\t ")
+			if nil == n.NextSibling || (html.TextNode == n.NextSibling.Type || atom.Ul == n.NextSibling.DataAtom) || "" == strings.TrimSpace(n.Data) {
+				n.Data = strings.TrimRight(n.Data, "\n\t ")
+			}
 		}
 		if nil != parent && (atom.Table == parent.DataAtom || atom.Thead == parent.DataAtom || atom.Tbody == parent.DataAtom || atom.Tr == parent.DataAtom) {
 			n.Data = strings.TrimSpace(n.Data)

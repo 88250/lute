@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"150", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo <em data-marker=\"*\">bar<wbr></em>​</li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo <em data-marker=\"*\">bar<wbr></em></li></ul>"},
 	{"149", "<p data-block=\"0\">$a&lt;b$<wbr></p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" style=\"display: none\">\u200ba&lt;b</code><span class=\"vditor-wysiwyg__preview\" data-render=\"2\"><span class=\"language-math\">a&lt;b</span></span></span>\u200b<wbr></p>"},
 	{"148", "<p data-block=\"0\">foo<wbr><font color=\"red\">bar</font></p>", "<p data-block=\"0\">foo<wbr>bar</p>"},
 	{"147", "<p>[ToC]</p><h2 data-block=\"0\" id=\"wysiwyg-foo_1\" data-marker=\"#\">foo</h2><h3 data-block=\"0\" id=\"wysiwyg-foo_2\" data-marker=\"#\">foo<wbr></h3>", "<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\"><ul><li><span data-target-id=\"wysiwyg-foo\">foo</span><ul><li><span data-target-id=\"wysiwyg-foo-\">foo<wbr></span></li></ul></li></ul></div><h2 data-block=\"0\" id=\"wysiwyg-foo\" data-marker=\"#\">foo</h2><h3 data-block=\"0\" id=\"wysiwyg-foo-\" data-marker=\"#\">foo<wbr></h3>"},
