@@ -1085,7 +1085,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		} else if "img" == dataType {
-			img := n.FirstChild.FirstChild.NextSibling
+			img := lute.domChild(n, atom.Img) //n.FirstChild.NextSibling.FirstChild.NextSibling
 			node.Type = ast.NodeImage
 			node.AppendChild(&ast.Node{Type: ast.NodeBang})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})

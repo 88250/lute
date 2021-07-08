@@ -1320,8 +1320,21 @@ func (lute *Lute) domChild(n *html.Node, dataAtom atom.Atom) *html.Node {
 	}
 
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		if c.DataAtom == dataAtom {
-			return c
+		if ret := lute.domChild0(c, dataAtom);nil != ret {
+			return ret
+		}
+	}
+	return nil
+}
+
+func (lute *Lute) domChild0(n *html.Node, dataAtom atom.Atom) *html.Node {
+	if n.DataAtom == dataAtom {
+		return n
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		if ret := lute.domChild0(c, dataAtom);nil != ret {
+			return ret
 		}
 	}
 	return nil

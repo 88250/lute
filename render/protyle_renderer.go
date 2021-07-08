@@ -1004,6 +1004,9 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		}
 		r.Tag("span", attrs, false)
 		r.Tag("span", nil, false)
+		r.WriteString(" ")
+		r.Tag("/span", nil, false)
+		r.Tag("span", nil, false)
 		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/span", nil, false)
@@ -1045,6 +1048,9 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("span", attrs, false)
 		r.Writer.Write(titleTokens)
 		r.Tag("/span", nil, false)
+		r.Tag("/span", nil, false)
+		r.Tag("span", nil, false)
+		r.WriteString(" ")
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
 	}
@@ -1157,11 +1163,6 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 	} else {
-		if (nil != node.LastChild && util.Caret == node.LastChild.TokensStr() && nil != node.LastChild.Previous && ast.NodeImage == node.LastChild.Previous.Type) ||
-			(nil != node.LastChild && ast.NodeImage == node.LastChild.Type) ||
-			(nil != node.LastChild && ast.NodeKramdownSpanIAL == node.LastChild.Type && nil != node.LastChild.Previous && ast.NodeImage == node.LastChild.Previous.Type) {
-			r.WriteString("\n") // 主要是为了解决 img 插入符后置问题
-		}
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
