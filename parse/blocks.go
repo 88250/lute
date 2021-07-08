@@ -247,7 +247,13 @@ func (t *Tree) addLine() {
 		charsToTab := 4 - (t.Context.column % 4)
 		t.Context.Tip.AppendTokens(bytes.Repeat(util.StrToBytes(" "), charsToTab))
 	}
-	t.Context.Tip.AppendTokens(t.Context.currentLine[t.Context.offset:])
+
+	startWithSpace := 1 < t.Context.currentLineLen && (' ' == t.Context.currentLine[0] || '\t' == t.Context.currentLine[0])
+	if t.Context.ParseOption.ParagraphBeginningSpace && startWithSpace {
+		t.Context.Tip.AppendTokens(t.Context.currentLine)
+	} else {
+		t.Context.Tip.AppendTokens(t.Context.currentLine[t.Context.offset:])
+	}
 }
 
 // _continue 判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。

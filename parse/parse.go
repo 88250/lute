@@ -340,6 +340,8 @@ type Options struct {
 	LinkRef bool
 	// IndentCodeBlock 设置是否打开“缩进代码块”支持。
 	IndentCodeBlock bool
+	// ParagraphBeginningSpace 设置是否打开“段首空格”支持。
+	ParagraphBeginningSpace bool
 }
 
 func NewOptions() *Options {

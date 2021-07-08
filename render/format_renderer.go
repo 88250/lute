@@ -974,7 +974,13 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 	} else {
 		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
-		buf := bytes.Trim(r.Writer.Bytes(), " \t\n")
+		var buf []byte
+		if r.Options.KeepParagraphBeginningSpace {
+			buf = bytes.TrimRight(r.Writer.Bytes(), " \t\n")
+			buf = bytes.TrimLeft(buf, "\n")
+		} else {
+			buf = bytes.Trim(r.Writer.Bytes(), " \t\n")
+		}
 		r.Writer.Reset()
 		r.Write(buf)
 		r.WriteByte(lex.ItemNewline)
@@ -984,6 +990,10 @@ func (r *FormatRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkS
 
 func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
+		if !r.Options.KeepParagraphBeginningSpace && nil != node.FirstChild {
+			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
+		}
+
 		if node.ParentIs(ast.NodeTableCell) {
 			if nil != node.Next && ast.NodeText != node.Next.Type {
 				r.WriteString("<br /><br />")

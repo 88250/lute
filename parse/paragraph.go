@@ -26,7 +26,11 @@ func ParagraphContinue(p *ast.Node, context *Context) int {
 }
 
 func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
-	p.Tokens = lex.TrimWhitespace(p.Tokens)
+	if context.ParseOption.ParagraphBeginningSpace {
+		_, p.Tokens = lex.TrimRight(p.Tokens)
+	} else {
+		p.Tokens = lex.TrimWhitespace(p.Tokens)
+	}
 
 	// 解析链接引用定义
 	hasReferenceDefs := false

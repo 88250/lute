@@ -129,6 +129,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	options.FixTermTypo = false
 	options.KramdownBlockIAL = true
 	options.KramdownSpanIAL = true
+	options.KeepParagraphBeginningSpace = true
 	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = util.BytesToStr(formatted)
@@ -610,6 +611,7 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	options.FixTermTypo = false
 	options.KramdownBlockIAL = true
 	options.KramdownSpanIAL = true
+	options.KeepParagraphBeginningSpace = true
 	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = string(formatted)

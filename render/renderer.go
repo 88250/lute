@@ -108,6 +108,8 @@ type Options struct {
 	NodeIndexStart int
 	// ProtyleContenteditable 设置 Protyle 渲染时标签中的 contenteditable 属性。
 	ProtyleContenteditable bool
+	// KeepParagraphBeginningSpace 设置是否保留段首空格
+	KeepParagraphBeginningSpace bool
 }
 
 func NewOptions() *Options {
