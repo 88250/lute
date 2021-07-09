@@ -38,13 +38,14 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 		t.Context.closeUnmatchedBlocks()
 
 		if t.Context.ParseOption.ProtyleWYSIWYG {
-			if bytes.HasPrefix(tokens, []byte("<iframe")) {
+			tokens = bytes.TrimSpace(tokens)
+			if bytes.HasPrefix(tokens, []byte("<iframe")) && bytes.HasSuffix(tokens, []byte(">")) {
 				t.Context.addChild(ast.NodeIFrame)
 				return 2
-			} else if bytes.HasPrefix(tokens, []byte("<video")) {
+			} else if bytes.HasPrefix(tokens, []byte("<video")) && bytes.HasSuffix(tokens, []byte(">")) {
 				t.Context.addChild(ast.NodeVideo)
 				return 2
-			} else if bytes.HasPrefix(tokens, []byte("<audio")) {
+			} else if bytes.HasPrefix(tokens, []byte("<audio")) && bytes.HasSuffix(tokens, []byte(">")) {
 				t.Context.addChild(ast.NodeAudio)
 				return 2
 			}
