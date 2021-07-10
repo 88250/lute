@@ -205,8 +205,12 @@ func (r *BlockRenderer) renderKbdCloseMarker(node *ast.Node, entering bool) ast.
 
 func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		script := node.ChildByType(ast.NodeBlockQueryEmbedScript)
+		if nil == script {
+			return ast.WalkContinue
+		}
 		var attrs [][]string
-		tokens := node.ChildByType(ast.NodeBlockQueryEmbedScript).Tokens
+		tokens := script.Tokens
 		tokens = html.EscapeHTML(bytes.ReplaceAll(tokens, util.CaretTokens, nil))
 		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 		r.blockNodeAttrs(node, &attrs, "render-node")
