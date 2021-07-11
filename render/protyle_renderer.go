@@ -500,6 +500,11 @@ func (r *BlockRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) as
 }
 
 func (r *BlockRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
@@ -518,6 +523,11 @@ func (r *BlockRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.
 }
 
 func (r *BlockRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
 	return ast.WalkContinue
 }
 
