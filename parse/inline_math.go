@@ -31,6 +31,12 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 		dollars++
 	}
 	if 2 <= dollars {
+		if t.Context.ParseOption.ProtyleWYSIWYG {
+			// Protyle 不允许从行级派生块级
+			ctx.pos++
+			return &ast.Node{Type: ast.NodeText, Tokens: dollar}
+		}
+
 		// 块节点
 		matchBlock := false
 		blockEndPos := blockStartPos + dollars

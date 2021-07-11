@@ -17,7 +17,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// 判断数学公式块（$$）是否开始。
+// MathBlockStart 判断数学公式块（$$）是否开始。
 func MathBlockStart(t *Tree, container *ast.Node) int {
 	if t.Context.indented {
 		return 0
