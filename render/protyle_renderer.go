@@ -397,6 +397,10 @@ func (r *BlockRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.
 
 func (r *BlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if nil == node.FirstChild {
+			return ast.WalkContinue
+		}
+
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "sb")
 		layout := node.FirstChild.Next.TokensStr()
@@ -435,6 +439,10 @@ func (r *BlockRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast
 
 func (r *BlockRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if nil == node.FirstChild {
+			return ast.WalkContinue
+		}
+
 		dest := node.FirstChild.ChildByType(ast.NodeLinkDest).Tokens
 		destStr := util.BytesToStr(dest)
 		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]:")
@@ -660,6 +668,10 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 
 	if entering {
 		if noHighlight {
+			if nil == node.FirstChild {
+				return ast.WalkContinue
+			}
+
 			var attrs [][]string
 			r.blockNodeAttrs(node, &attrs, "render-node")
 			tokens := html.EscapeHTML(node.FirstChild.Next.Next.Tokens)
@@ -814,6 +826,10 @@ func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering boo
 
 func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
+		return ast.WalkContinue
+	}
+
+	if nil == node.FirstChild {
 		return ast.WalkContinue
 	}
 
