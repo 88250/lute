@@ -249,7 +249,8 @@ func (t *Tree) addLine() {
 	}
 
 	startWithSpace := 1 < t.Context.currentLineLen && (' ' == t.Context.currentLine[0] || '\t' == t.Context.currentLine[0])
-	if t.Context.ParseOption.ParagraphBeginningSpace && startWithSpace {
+	docChildPara := ast.NodeDocument == t.Context.Tip.Parent.Type
+	if t.Context.ParseOption.ParagraphBeginningSpace && startWithSpace && docChildPara {
 		t.Context.Tip.AppendTokens(t.Context.currentLine)
 	} else {
 		t.Context.Tip.AppendTokens(t.Context.currentLine[t.Context.offset:])
