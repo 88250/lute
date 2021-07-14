@@ -195,7 +195,6 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 		lute.genASTByBlockDOM(c, ret)
 	}
 
-	var unlinks []*ast.Node
 	// 调整树结构
 	ast.Walk(ret.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
@@ -208,23 +207,12 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 					n.FirstChild.Next.Tokens = append(n.FirstChild.Next.Tokens, n.Next.FirstChild.Next.Tokens...)
 					n.Next.Unlink()
 				}
-
-				if ast.NodeInlineMath == n.Type {
-					content := n.ChildByType(ast.NodeInlineMathContent)
-					if nil == content || 1 > len(content.Tokens) {
-						unlinks  = append(unlinks, n)
-					}
-				}
 			case ast.NodeStrong, ast.NodeEmphasis, ast.NodeStrikethrough, ast.NodeUnderline:
 				lute.mergeSameSpan(n, n.Type)
 			}
 		}
 		return ast.WalkContinue
 	})
-
-	for _, n := range unlinks {
-		n.Unlink()
-	}
 	return
 }
 
@@ -1062,6 +1050,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeInlineMath
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
 			content = lute.domAttrValue(n, "data-content")
+			if "" == content {
+				return
+			}
+
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(content)})
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
 			tree.Context.Tip.AppendChild(node)
