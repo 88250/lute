@@ -78,10 +78,35 @@ func (lute *Lute) BlockDOM2HTML(vHTML string) (sHTML string) {
 
 func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 	markdown := lute.blockDOM2Md(vHTML)
-	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
+	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
+	var inlines []*ast.Node
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if !n.IsBlock() {
+			inlines = append(inlines, n)
+			return ast.WalkSkipChildren
+		}
+		return ast.WalkContinue
+	})
+
+	var unlinks []*ast.Node
+	for n := tree.Root.FirstChild; nil != n; n = n.Next {
+		unlinks = append(unlinks, n)
+	}
+	for _, n := range unlinks {
+		n.Unlink()
+	}
+
+	for _, n := range inlines {
+		tree.Root.AppendChild(n)
+	}
+
 	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
 	output := renderer.Render()
-	vHTML = util.BytesToStr(output)
+	vIHTML = util.BytesToStr(output)
 	return
 }
 
