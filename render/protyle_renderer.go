@@ -24,7 +24,7 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// BlockRenderer 描述了 WYSIWYG Block DOM 渲染器。
+// BlockRenderer 描述了 Protyle WYSIWYG Block DOM 渲染器。
 type BlockRenderer struct {
 	*BaseRenderer
 	NodeIndex int

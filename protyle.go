@@ -70,9 +70,18 @@ func (lute *Lute) HTML2BlockDOM(sHTML string) (vHTML string) {
 	return
 }
 
-func (lute *Lute) BlockDOM2HTML(vhtml string) (sHTML string) {
-	markdown := lute.blockDOM2Md(vhtml)
+func (lute *Lute) BlockDOM2HTML(vHTML string) (sHTML string) {
+	markdown := lute.blockDOM2Md(vHTML)
 	sHTML = lute.Md2HTML(markdown)
+	return
+}
+
+func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
+	markdown := lute.blockDOM2Md(vHTML)
+	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
+	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
+	output := renderer.Render()
+	vHTML = util.BytesToStr(output)
 	return
 }
 
