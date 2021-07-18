@@ -94,13 +94,12 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		return
 	}
 
+	whitespaces, tokens := lex.TrimLeft(tokens)
 	length := len(tokens)
 	if 1 > length {
 		ctx.pos = startPos + 1
 		return
 	}
-
-	whitespaces, tokens := lex.TrimLeft(tokens)
 
 	if (lex.ItemGreater == tokens[0]) ||
 		(1 < length && lex.ItemSlash == tokens[0] && lex.ItemGreater == tokens[1]) {
