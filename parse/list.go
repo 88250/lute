@@ -212,7 +212,7 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 			}
 		}
 
-		if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
+		if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
 			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		}
 
