@@ -157,7 +157,30 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeUnderlineOpenMarker] = ret.renderUnderlineOpenMarker
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
+	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
+	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
+	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
 	return ret
+}
+
+func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<span data-type=\"")
+		r.Write(node.Tokens)
+		r.WriteString("\">")
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderTextMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</span>")
+	}
+	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
