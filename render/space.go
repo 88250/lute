@@ -85,7 +85,7 @@ func allowSpace(currentChar, nextChar rune) bool {
 }
 
 func isCJK(r rune) bool {
-	return unicode.Is(unicode.Han, r) ||
+	return unicode.Is(unicode.Han, r) || unicode.Is(unicode.Lm, r) ||
 		unicode.Is(unicode.Hiragana, r) || unicode.Is(unicode.Katakana, r) ||
 		unicode.Is(unicode.Hangul, r)
 }
