@@ -153,6 +153,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		if ast.NodeLink == tree.Context.Tip.Type {
+			break
+		}
+
 		node.Type = ast.NodeHeading
 		node.HeadingLevel = int(node.Tokens[1] - byte('0'))
 		node.AppendChild(&ast.Node{Type: ast.NodeHeadingC8hMarker, Tokens: util.StrToBytes(strings.Repeat("#", node.HeadingLevel))})
