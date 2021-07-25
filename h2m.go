@@ -120,7 +120,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div, atom.Section:
-		if lute.parentIs(n, atom.Table) {
+		if lute.parentIs(n, atom.Table) || ast.NodeLink == tree.Context.Tip.Type {
 			break
 		}
 
@@ -292,6 +292,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 		return
 	case atom.Br:
+		if ast.NodeLink == tree.Context.Tip.Type {
+			break
+		}
+
 		if tree.Context.ParseOption.ProtyleWYSIWYG {
 			node.Type = ast.NodeBr
 		} else {
