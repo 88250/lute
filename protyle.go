@@ -976,7 +976,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 			id := lute.domAttrValue(n, "data-id")
 			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(id)})
-			if refText := lute.domAttrValue(n, "data-anchor"); "" != refText {
+			refText := strings.ReplaceAll(lute.domAttrValue(n, "data-anchor"), "\n", "")
+			if "" != refText {
 				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
 				refTextNode := &ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(refText)}
 				node.AppendChild(refTextNode)
