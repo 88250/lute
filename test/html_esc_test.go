@@ -11,8 +11,9 @@
 package test
 
 import (
-	"github.com/88250/lute/html"
 	"testing"
+
+	"github.com/88250/lute/html"
 )
 
 func TestEscapeHTMLStr(t *testing.T) {
