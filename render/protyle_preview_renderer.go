@@ -1035,10 +1035,10 @@ func (r *ProtylePreviewRenderer) renderParagraph(node *ast.Node, entering bool) 
 		r.handleKramdownBlockIAL(node)
 		var attrs [][]string
 		attrs = append(attrs, node.KramdownIAL...)
-		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
-			attrs = append(attrs, []string{"class", "indent--2"})
-		}
 		r.Tag("p", attrs, false)
+		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
+			r.WriteString("　　")
+		}
 	} else {
 		r.Tag("/p", nil, false)
 		r.Newline()
