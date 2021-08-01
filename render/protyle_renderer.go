@@ -1523,7 +1523,7 @@ func (r *BlockRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class 
 		if "id" == ial[0] {
 			continue
 		}
-		*attrs = append(*attrs, []string{ial[0], ial[1]})
+		*attrs = append(*attrs, []string{ial[0], strings.ReplaceAll(ial[1], util.IALValEscNewLine, "\n")})
 	}
 }
 
@@ -1564,6 +1564,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	r.Tag("div", attrs, false)
 
 	if name := node.IALAttr("name"); "" != name {
+		name = strings.ReplaceAll(name, util.IALValEscNewLine, "\n")
 		r.Tag("div", [][]string{{"class", "protyle-attr--name"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconN\"></use></svg>")
 		r.WriteString(name)
@@ -1571,6 +1572,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	}
 
 	if alias := node.IALAttr("alias"); "" != alias {
+		alias = strings.ReplaceAll(alias, util.IALValEscNewLine, "\n")
 		r.Tag("div", [][]string{{"class", "protyle-attr--alias"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconA\"></use></svg>")
 		r.WriteString(alias)
@@ -1578,18 +1580,21 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	}
 
 	if memo := node.IALAttr("memo"); "" != memo {
+		memo = strings.ReplaceAll(memo, util.IALValEscNewLine, "\n")
 		r.Tag("div", [][]string{{"class", "protyle-attr--memo b3-tooltips b3-tooltips__nw"}, {"aria-label", memo}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconM\"></use></svg>")
 		r.Tag("/div", nil, false)
 	}
 
 	if bookmark := node.IALAttr("bookmark"); "" != bookmark {
+		bookmark = strings.ReplaceAll(bookmark, util.IALValEscNewLine, "\n")
 		r.Tag("div", [][]string{{"class", "protyle-attr--bookmark"}}, false)
 		r.WriteString(bookmark)
 		r.Tag("/div", nil, false)
 	}
 
 	if refCount := node.IALAttr("refcount"); "" != refCount {
+		refCount = strings.ReplaceAll(refCount, util.IALValEscNewLine, "\n")
 		r.Tag("div", [][]string{{"class", "protyle-attr--refcount popover__block"}}, false)
 		r.WriteString(refCount)
 		r.Tag("/div", nil, false)

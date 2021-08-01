@@ -16,10 +16,17 @@ import (
 	"github.com/88250/lute/html"
 )
 
+func TestEscapeAttrVal(t *testing.T) {
+	str := "foo\n<bar>'baz&中 文"
+	result := html.EscapeAttrVal(str)
+	if html.UnescapAttrVal(result) != str {
+		t.Fatalf("escape html failed")
+	}
+}
+
 func TestEscapeHTMLStr(t *testing.T) {
 	str := "foo\n<bar>'baz&中 文"
 	result := html.EscapeHTMLStr(str)
-	t.Log(result)
 	if html.UnescapeHTMLStr(result) != str {
 		t.Fatalf("escape html failed")
 	}
@@ -28,7 +35,6 @@ func TestEscapeHTMLStr(t *testing.T) {
 func TestEscapeString(t *testing.T) {
 	str := "foo\n<bar>'baz&中 文"
 	result := html.EscapeString(str)
-	t.Log(result)
 	if html.UnescapeString(result) != str {
 		t.Fatalf("escape html failed")
 	}

@@ -10,7 +10,11 @@
 
 package util
 
-import "bytes"
+import (
+	"bytes"
+)
+
+const IALValEscNewLine = "_esc_newline_"
 
 func IsDocIAL(tokens []byte) bool {
 	return bytes.Contains(tokens, []byte("type=\"doc\""))

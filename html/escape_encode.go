@@ -26,6 +26,17 @@ var (
 	quot = util.StrToBytes("&quot;")
 )
 
+func UnescapAttrVal(v string) string {
+	v = strings.ReplaceAll(v, util.IALValEscNewLine, "\n")
+	return UnescapeString(v)
+}
+
+func EscapeAttrVal(v string) (ret string) {
+	ret = util.BytesToStr(EscapeHTML(util.StrToBytes(v)))
+	ret = strings.ReplaceAll(ret, "\n", util.IALValEscNewLine)
+	return
+}
+
 func UnescapeHTMLStr(h string) string {
 	return UnescapeString(h)
 }
