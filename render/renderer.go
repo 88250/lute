@@ -355,9 +355,10 @@ func normalizeHeadingID(heading *ast.Node) (ret string) {
 }
 
 type Heading struct {
+	ID       string     `json:"id"`
 	URL      string     `json:"url"`
 	Path     string     `json:"path"`
-	ID       string     `json:"id"`
+	HPath    string     `json:"hPath"`
 	Content  string     `json:"content"`
 	Level    int        `json:"level"`
 	Children []*Heading `json:"children"`
@@ -441,9 +442,10 @@ func (r *BaseRenderer) headings() (ret []*Heading) {
 		}
 
 		h := &Heading{
+			ID:      id,
 			URL:     r.Tree.URL,
 			Path:    r.Tree.Path,
-			ID:      id,
+			HPath:   r.Tree.HPath,
 			Content: headingText(heading),
 			Level:   heading.HeadingLevel,
 		}

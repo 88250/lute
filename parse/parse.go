@@ -268,10 +268,11 @@ type Tree struct {
 	lexer         *lex.Lexer     // 词法分析器
 	inlineContext *InlineContext // 行级解析上下文
 
-	Name    string   // 名称，可以为空
-	ID      string   // ID，可以为空
-	URL     string   // 地址部分
-	Path    string   // 地址路径部分
+	Name    string   // 名称
+	ID      string   // ID
+	URL     string   // URL
+	Path    string   // 路径
+	HPath   string   // 人类可读的路径
 	Marks   []string // 文本标记
 	Created int64    // 创建时间
 	Updated int64    // 更新时间
