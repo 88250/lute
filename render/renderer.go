@@ -356,7 +356,7 @@ func normalizeHeadingID(heading *ast.Node) (ret string) {
 
 type Heading struct {
 	ID       string     `json:"id"`
-	URL      string     `json:"url"`
+	Box      string     `json:"box"`
 	Path     string     `json:"path"`
 	HPath    string     `json:"hPath"`
 	Content  string     `json:"content"`
@@ -443,7 +443,7 @@ func (r *BaseRenderer) headings() (ret []*Heading) {
 
 		h := &Heading{
 			ID:      id,
-			URL:     r.Tree.URL,
+			Box:     r.Tree.Box,
 			Path:    r.Tree.Path,
 			HPath:   r.Tree.HPath,
 			Content: headingText(heading),
