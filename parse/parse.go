@@ -270,7 +270,7 @@ type Tree struct {
 
 	Name    string   // 名称
 	ID      string   // ID
-	Box     string   // 所在容器 ID
+	Box     string   // 容器
 	Path    string   // 路径
 	HPath   string   // 人类可读的路径
 	Marks   []string // 文本标记

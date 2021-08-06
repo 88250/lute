@@ -30,8 +30,8 @@ type Node struct {
 	// 节点基础结构
 
 	ID   string `json:",omitempty"` // 节点的唯一标识
-	URL  string `json:"-"`          // 地址部分
-	Path string `json:"-"`          // 地址路径部分
+	Box  string `json:"-"`          // 容器
+	Path string `json:"-"`          // 路径
 
 	Type       NodeType `json:"-"`              // 节点类型
 	Parent     *Node    `json:"-"`              // 父节点
