@@ -1437,7 +1437,7 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 		case 3:
 			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "t"})
-			if node.FirstChild.TaskListItemChecked {
+			if node.FirstChild != nil && node.FirstChild.TaskListItemChecked {
 				class += " protyle-task--done"
 			}
 		}
