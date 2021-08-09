@@ -12,9 +12,10 @@ package lute
 
 import (
 	"bytes"
-	"github.com/88250/lute/lex"
 	"strconv"
 	"strings"
+
+	"github.com/88250/lute/lex"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
@@ -882,7 +883,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 		}
 		if ast.NodeCodeSpan == tree.Context.Tip.Type || ast.NodeInlineMath == tree.Context.Tip.Type {
-			tree.Context.Tip.FirstChild.Next.Tokens = util.StrToBytes(content)
+			if nil != tree.Context.Tip.Previous && tree.Context.Tip.Type == tree.Context.Tip.Previous.Type { // 合并相邻的代码
+				tree.Context.Tip.FirstChild.Next.Tokens = util.StrToBytes(content)
+			} else { // 叠加代码
+				tree.Context.Tip.FirstChild.Next.Tokens = append(tree.Context.Tip.FirstChild.Next.Tokens, util.StrToBytes(content)...)
+			}
 			return
 		}
 		if ast.NodeKbd == tree.Context.Tip.Type {
