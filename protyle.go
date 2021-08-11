@@ -593,6 +593,13 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if lute.parentIs(n, atom.Table) {
+			text := lute.domText(n)
+			node.Tokens = []byte(strings.TrimSpace(text))
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
 		tableDiv := n.FirstChild
 		table := lute.domChild(tableDiv, atom.Table)
 		if nil == table {
@@ -897,6 +904,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 	case atom.Thead:
+		if lute.parentIs(n.Parent.Parent, atom.Table) {
+			text := lute.domText(n.Parent.Parent)
+			text = strings.ReplaceAll(text, util.Caret, "")
+			node.Tokens = []byte(strings.TrimSpace(text))
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
 		node.Type = ast.NodeTableHead
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
