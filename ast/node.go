@@ -222,7 +222,7 @@ func (n *Node) FirstDeepestChild() (ret *Node) {
 	return n.FirstChild.FirstDeepestChild()
 }
 
-// LinkDest 在 n 的子节点中查找 childType 指定类型的第一个子节点。
+// ChildByType 在 n 的子节点中查找 childType 指定类型的第一个子节点。
 func (n *Node) ChildByType(childType NodeType) *Node {
 	for c := n.FirstChild; nil != c; c = c.Next {
 		if c.Type == childType {
