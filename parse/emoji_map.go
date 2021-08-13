@@ -1200,7 +1200,7 @@ var EmojiAliasUnicode = map[string]string{
 	"signal_strength":                      "📶",
 	"singapore":                            "🇸🇬",
 	"sint_maarten":                         "🇸🇽",
-	"siyuan":                               "${emojiSite}/siyuan.png",
+	"siyuan":                               "${emojiSite}/siyuan.svg",
 	"six":                                  "6️⃣",
 	"six_pointed_star":                     "🔯",
 	"ski":                                  "🎿",
