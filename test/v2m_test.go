@@ -18,6 +18,7 @@ import (
 
 var vditorDOM2MdTests = []parseTest{
 
+	{"115", "<ul><li><img src=\"xxx.png\"></li></ul>", "* ![](xxx.png)\n"},
 	{"114", "<p data-block=\"0\"><span class=\"vditor-comment vditor-comment--focus\" data-cmtids=\"20201105103606-fpmdc18\">foo<wbr></span></p>", "<span class=\"vditor-comment vditor-comment--focus\" data-cmtids=\"20201105103606-fpmdc18\">foo</span>\n"},
 	{"113", "<div data-block=\"0\" data-type=\"footnotes-block\"><p><wbr><br></p></div>", "\n"},
 	{"112", "<div data-block=\"0\" data-type=\"footnotes-block\"><ol data-type=\"footnotes-defs-ol\"><li data-type=\"footnotes-li\" data-marker=\"^bignote\"><p data-block=\"0\">foo</p><p data-block=\"0\">bar</p><div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"```\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none;\"><code>baz\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code>codeblock\n</code></pre></div></li></ol></div>", "[^bignote]: foo\n    \n       bar\n    \n       ```\n       baz\n       ```\n"},

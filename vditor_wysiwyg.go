@@ -301,9 +301,13 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 
 	switch n.DataAtom {
 	case atom.Ol, atom.Ul:
-		if "footnotes-defs-ol" == lute.domAttrValue(n, "data-type") {
+		if dataType := lute.domAttrValue(n, "data-type"); "footnotes-defs-ol" == dataType {
 			return
 		}
+		if nil != n.FirstChild && nil != n.FirstChild.FirstChild && atom.Input != n.FirstChild.FirstChild.DataAtom {
+			return
+		}
+
 		text := lute.domText(n)
 		if "" == text {
 			*emptyNodes = append(*emptyNodes, n)
@@ -1320,7 +1324,7 @@ func (lute *Lute) domChild(n *html.Node, dataAtom atom.Atom) *html.Node {
 	}
 
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		if ret := lute.domChild0(c, dataAtom);nil != ret {
+		if ret := lute.domChild0(c, dataAtom); nil != ret {
 			return ret
 		}
 	}
@@ -1333,7 +1337,7 @@ func (lute *Lute) domChild0(n *html.Node, dataAtom atom.Atom) *html.Node {
 	}
 
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		if ret := lute.domChild0(c, dataAtom);nil != ret {
+		if ret := lute.domChild0(c, dataAtom); nil != ret {
 			return ret
 		}
 	}
