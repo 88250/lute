@@ -18,6 +18,9 @@ import (
 
 var debugTests = []parseTest{
 
+	{"59", "<img src=' foo.png'/>\n", "<p><img src=' foo.png'/></p>\n"},
+	{"58", "<img src=\" foo.png\"/>\n", "<p><img src=\" foo.png\"/></p>\n"},
+
 	// CommonMark 0.30 https://spec.commonmark.org/0.30/changes.html#part-66
 	{"57", "[Толпой][Толпой] is a Russian word.\n\n[ТОЛПОЙ]: /url\n", "<p><a href=\"/url\">Толпой</a> is a Russian word.</p>\n"},
 	{"56", "[SS]\n\n[ẞ]: /url\n", "<p><a href=\"/url\">SS</a></p>\n"},

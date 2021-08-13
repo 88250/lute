@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -269,12 +270,16 @@ func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 		if 1 < len(nameAndValue) {
 			value := nameAndValue[1]
 			if bytes.HasPrefix(value, htmlBlockSinglequote) && bytes.HasSuffix(value, htmlBlockSinglequote) {
-				value = value[1:]
+				if value = value[1:]; 1 > len(value) {
+					return
+				}
 				value = value[:len(value)-1]
 				return !bytes.Contains(value, htmlBlockSinglequote)
 			}
 			if bytes.HasPrefix(value, htmlBlockDoublequote) && bytes.HasSuffix(value, htmlBlockDoublequote) {
-				value = value[1:]
+				if value = value[1:]; 1 > len(value) {
+					return
+				}
 				value = value[:len(value)-1]
 				return !bytes.Contains(value, htmlBlockDoublequote)
 			}
