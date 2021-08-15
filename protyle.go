@@ -1422,6 +1422,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 	insertedIAL := false
 	if style := lute.domAttrValue(n, "style"); "" != style {
+		style = styleValue(style)
 		node.SetIALAttr("style", style)
 		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
@@ -1465,6 +1466,7 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	}
 
 	if style := lute.domAttrValue(n, "style"); "" != style {
+		style = styleValue(style)
 		node.SetIALAttr("style", style)
 		ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
 	}
@@ -1560,4 +1562,11 @@ func appendNextToTip(next *ast.Node, tree *parse.Tree) {
 	for _, n := range nodes {
 		tree.Context.Tip.AppendChild(n)
 	}
+}
+
+func styleValue(style string) (ret string) {
+	ret = strings.TrimSpace(style)
+	ret = strings.ReplaceAll(ret, "\n", "")
+	ret = strings.Join(strings.Fields(ret), " ")
+	return
 }
