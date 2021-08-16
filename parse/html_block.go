@@ -41,7 +41,7 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 		if t.Context.ParseOption.ProtyleWYSIWYG {
 			tokens = bytes.TrimSpace(tokens)
 			if bytes.HasPrefix(tokens, []byte("<iframe")) && bytes.HasSuffix(tokens, []byte(">")) {
-				if bytes.Contains(tokens, []byte("sub-data-type=\"widget\"")) {
+				if bytes.Contains(tokens, []byte("data-subtype=\"widget\"")) {
 					t.Context.addChild(ast.NodeWidget)
 				} else {
 					t.Context.addChild(ast.NodeIFrame)

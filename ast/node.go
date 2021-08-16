@@ -784,7 +784,7 @@ const (
 
 	// Protyle 挂件，<iframe data-type="NodeWidget">
 
-	NodeWidget NodeType = 535 // <iframe data-type="NodeWidget" sub-data-type="widget"></iframe>
+	NodeWidget NodeType = 535 // <iframe data-type="NodeWidget" data-subtype="widget"></iframe>
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
