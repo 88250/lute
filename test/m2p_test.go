@@ -11,14 +11,17 @@
 package test
 
 import (
-	"github.com/88250/lute/ast"
 	"testing"
+
+	"github.com/88250/lute/ast"
 
 	"github.com/88250/lute"
 )
 
 var md2BlockDOMTests = []parseTest{
 
+	{"16", "<iframe src=\"https://b3log.org\" sub-data-type=\"widget\"></iframe>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeWidget\" class=\"iframe\"><div class=\"iframe-content\"><iframe src=\"https://b3log.org\" data-src=\"https://b3log.org\" sub-data-type=\"widget\"></iframe><span class=\"protyle-action__drag\" contenteditable=\"false\"></span></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
+	{"15", "<iframe src=\"https://b3log.org\"></iframe>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeIFrame\" class=\"iframe\"><div class=\"iframe-content\"><iframe src=\"https://b3log.org\" data-src=\"https://b3log.org\"></iframe><span class=\"protyle-action__drag\" contenteditable=\"false\"></span></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"14", "foo<span data-type=\"virtual-block-ref\">bar</span>baz\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"virtual-block-ref\">bar</span>baz</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"13", "1. foo\n\n    1. bar\n", "<div data-subtype=\"o\" data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\"><div data-marker=\"1.\" data-subtype=\"o\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action protyle-action--order\" contenteditable=\"false\" draggable=\"true\">1.</div><div data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-subtype=\"o\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeList\" class=\"list\"><div data-marker=\"1.\" data-subtype=\"o\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action protyle-action--order\" contenteditable=\"false\" draggable=\"true\">1.</div><div data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
 	{"12", "![foo](bar)", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span contenteditable=\"false\" data-type=\"img\" class=\"img\"><span> </span><span><span class=\"protyle-action protyle-icons\"><span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span></span><img src=\"/siyuan/0/测试笔记/bar\" data-src=\"bar\" alt=\"foo\" /><span class=\"protyle-action__drag\"></span><span class=\"protyle-action__title\"></span></span><span> </span></span></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},

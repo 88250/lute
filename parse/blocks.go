@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -282,7 +283,7 @@ func _continue(n *ast.Node, context *Context) int {
 	case ast.NodeGitConflict:
 		return GitConflictContinue(n, context)
 	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeBlockEmbed, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed,
-		ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio:
+		ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio, ast.NodeWidget:
 		return 1
 	}
 	return 0

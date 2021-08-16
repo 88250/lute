@@ -795,6 +795,12 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Tokens = lute.domHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
+	case ast.NodeWidget:
+		node.Type = ast.NodeWidget
+		n = lute.domChild(n.FirstChild, atom.Iframe)
+		node.Tokens = lute.domHTML(n)
+		tree.Context.Tip.AppendChild(node)
+		return
 	case ast.NodeVideo:
 		node.Type = ast.NodeVideo
 		n = lute.domChild(n.FirstChild, atom.Video)

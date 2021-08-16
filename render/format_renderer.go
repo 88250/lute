@@ -149,6 +149,7 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
 	ret.RendererFuncs[ast.NodeIFrame] = ret.renderIFrame
+	ret.RendererFuncs[ast.NodeWidget] = ret.renderWidget
 	ret.RendererFuncs[ast.NodeVideo] = ret.renderVideo
 	ret.RendererFuncs[ast.NodeAudio] = ret.renderAudio
 	ret.RendererFuncs[ast.NodeKbd] = ret.renderKbd
@@ -256,6 +257,20 @@ func (r *FormatRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStat
 }
 
 func (r *FormatRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		tokens := node.Tokens
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
+		r.Newline()
+		if !r.isLastNode(r.Tree.Root, node) {
+			r.WriteByte(lex.ItemNewline)
+		}
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
 		tokens := node.Tokens

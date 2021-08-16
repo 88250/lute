@@ -497,7 +497,7 @@ func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed,
-		NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame:
+		NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget:
 		return true
 	}
 	return false
@@ -530,7 +530,7 @@ func (n *Node) IsMarker() bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame, NodeVideo, NodeAudio:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio:
 		return true
 	}
 	return false
@@ -540,7 +540,7 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
 	switch n.Type {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict, NodeIFrame, NodeVideo, NodeAudio:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
@@ -779,8 +779,12 @@ const (
 	// <span data-type="mark">foo</span> 通用的行级文本标记
 
 	NodeTextMark            NodeType = 530 // 文本标记
-	NodeTextMarkOpenMarker  NodeType = 526 // 开始文本标记符 <span>
-	NodeTextMarkCloseMarker NodeType = 527 // 开始文本标记符 </span>
+	NodeTextMarkOpenMarker  NodeType = 531 // 开始文本标记符 <span>
+	NodeTextMarkCloseMarker NodeType = 532 // 开始文本标记符 </span>
+
+	// Protyle 挂件，<iframe data-type="NodeWidget">
+
+	NodeWidget NodeType = 535 // <iframe data-type="NodeWidget" sub-data-type="widget"></iframe>
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
