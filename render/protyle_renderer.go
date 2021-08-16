@@ -295,6 +295,7 @@ func (r *BlockRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStat
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
+		attrs = append(attrs, []string{"data-subtype", "widget"})
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
