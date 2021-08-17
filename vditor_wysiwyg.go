@@ -1465,6 +1465,10 @@ func (lute *Lute) domHTML(n *html.Node) []byte {
 }
 
 func (lute *Lute) isEmptyText(n *html.Node) bool {
+	if nil != n.FirstChild && "block-ref" == lute.domAttrValue(n.FirstChild, "data-type") {
+		return false
+	}
+
 	text := strings.TrimSpace(lute.domText(n))
 	if "" == text || parse.Zwsp == text {
 		return true
