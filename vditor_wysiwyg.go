@@ -277,8 +277,8 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 		}
 
 		if html.TextNode == n.Type {
-			data := strings.TrimPrefix(n.Data, " ")
-			data = strings.TrimSuffix(n.Data, " ")
+			data := strings.TrimLeft(n.Data, " ")
+			data = strings.TrimRight(data, " ")
 			if "" == data {
 				*emptyNodes = append(*emptyNodes, n)
 				return
