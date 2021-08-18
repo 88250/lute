@@ -276,6 +276,15 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 			break
 		}
 
+		if html.TextNode == n.Type {
+			data := strings.TrimPrefix(n.Data, " ")
+			data = strings.TrimSuffix(n.Data, " ")
+			if "" == data {
+				*emptyNodes = append(*emptyNodes, n)
+				return
+			}
+		}
+
 		parent := n.Parent
 		if nil != parent && (atom.Ol == parent.DataAtom || atom.Ul == parent.DataAtom || atom.Li == parent.DataAtom) {
 			if nil == n.NextSibling || (html.TextNode == n.NextSibling.Type || atom.Ul == n.NextSibling.DataAtom) || "" == strings.TrimSpace(n.Data) {
