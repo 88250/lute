@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -78,7 +79,7 @@ func (t *Tree) parseYamlFrontMatter() bool {
 }
 
 func isYamlFrontMatterClose(context *Context) bool {
-	if context.ParseOption.KramdownBlockIAL && len("{: id=\"") < len(context.currentLine) {
+	if context.ParseOption.KramdownBlockIAL && simpleCheckIsBlockIAL(context.currentLine) {
 		// 判断 IAL 打断
 		if ial := context.parseKramdownBlockIAL(context.currentLine); 0 < len(ial) {
 			context.Tip.KramdownIAL = ial

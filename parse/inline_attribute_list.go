@@ -12,9 +12,10 @@ package parse
 
 import (
 	"bytes"
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/util"
-	"strings"
 )
 
 // IALStart 判断 kramdown 块级内联属性列表（{: attrs}）是否开始。
@@ -112,6 +113,13 @@ func Map2IAL(properties map[string]string) (ret [][]string) {
 		ret = append(ret, []string{k, v})
 	}
 	return
+}
+
+func simpleCheckIsBlockIAL(tokens []byte) bool {
+	if len("{: id=\"") >= len(tokens) {
+		return false
+	}
+	return bytes.Contains(tokens, []byte("id=\""))
 }
 
 func Tokens2IAL(tokens []byte) (ret [][]string) {

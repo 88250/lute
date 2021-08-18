@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -77,7 +78,7 @@ func (context *Context) mathBlockFinalize(mathBlock *ast.Node) {
 	}
 	tokens := mathBlock.Tokens[2:] // 剔除开头的 $$
 	tokens = lex.TrimWhitespace(tokens)
-	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG  {
+	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
 		if bytes.HasSuffix(tokens, MathBlockMarkerCaret) {
 			// 剔除结尾的 $$‸
 			tokens = bytes.TrimSuffix(tokens, MathBlockMarkerCaret)
@@ -113,7 +114,7 @@ func (t *Tree) parseMathBlock() (ok bool, mathBlockDollarOffset int) {
 }
 
 func (context *Context) isMathBlockClose(tokens []byte) bool {
-	if context.ParseOption.KramdownBlockIAL && len("{: id=\"") < len(tokens) {
+	if context.ParseOption.KramdownBlockIAL && simpleCheckIsBlockIAL(tokens) {
 		// 判断 IAL 打断
 		if ial := context.parseKramdownBlockIAL(tokens); 0 < len(ial) {
 			context.Tip.KramdownIAL = ial
