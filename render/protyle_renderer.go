@@ -1118,12 +1118,12 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
 
+		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
+		r.Tag("/span", nil, false)
+
 		if !bytes.HasPrefix(dataSrcTokens, []byte("assets/")) {
 			r.WriteString("<span class=\"img__net\"><svg><use xlink:href=\"#iconLanguage\"></use></svg></span>")
 		}
-
-		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
-		r.Tag("/span", nil, false)
 
 		attrs = [][]string{{"class", "protyle-action__title"}}
 		r.Tag("span", attrs, false)
