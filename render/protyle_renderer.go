@@ -1089,7 +1089,8 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 	} else {
 		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
-		dataSrc := util.BytesToStr(destTokens)
+		dataSrcTokens := destTokens
+		dataSrc := util.BytesToStr(dataSrcTokens)
 		src := util.BytesToStr(r.LinkPath(destTokens))
 		attrs := [][]string{{"src", src}, {"data-src", dataSrc}}
 		alt := node.ChildByType(ast.NodeLinkText)
@@ -1116,6 +1117,10 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		imgBuf = r.tagSrcPath(imgBuf)
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
+
+		if !bytes.HasPrefix(dataSrcTokens, []byte("assets/")) {
+			r.WriteString("<span class=\"img__net\"><svg><use xlink:href=\"#iconLanguage\"></use></svg></span>")
+		}
 
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
