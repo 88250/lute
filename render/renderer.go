@@ -12,11 +12,12 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -110,6 +111,8 @@ type Options struct {
 	ProtyleContenteditable bool
 	// KeepParagraphBeginningSpace 设置是否保留段首空格
 	KeepParagraphBeginningSpace bool
+	// NetImgMarker 设置 Protyle 是否标记网络图片
+	ProtyleMarkNetImg bool
 }
 
 func NewOptions() *Options {
@@ -139,6 +142,7 @@ func NewOptions() *Options {
 		LinkPrefix:                     "",
 		NodeIndexStart:                 1,
 		ProtyleContenteditable:         true,
+		ProtyleMarkNetImg:              true,
 	}
 }
 

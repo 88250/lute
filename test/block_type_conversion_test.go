@@ -11,10 +11,10 @@
 package test
 
 import (
-	"github.com/88250/lute/ast"
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
 )
 
 var cancelSuperBlockTests = []*parseTest{
@@ -181,9 +181,7 @@ func TestCancelList(t *testing.T) {
 	ast.Testing = false
 }
 
-var ul2olTests = []*parseTest{
-
-}
+var ul2olTests = []*parseTest{}
 
 func TestUL2OL(t *testing.T) {
 	luteEngine := lute.New()
@@ -208,9 +206,7 @@ func TestUL2OL(t *testing.T) {
 	ast.Testing = false
 }
 
-var ol2ulTests = []*parseTest{
-
-}
+var ol2ulTests = []*parseTest{}
 
 func TestOL2UL(t *testing.T) {
 	luteEngine := lute.New()
@@ -235,9 +231,7 @@ func TestOL2UL(t *testing.T) {
 	ast.Testing = false
 }
 
-var p2hTests = []*parseTest{
-
-}
+var p2hTests = []*parseTest{}
 
 func TestP2H(t *testing.T) {
 	luteEngine := lute.New()
