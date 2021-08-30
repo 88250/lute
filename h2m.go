@@ -296,7 +296,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
-		if tree.Context.ParseOption.ProtyleWYSIWYG {
+		if tree.Context.ParseOption.ProtyleWYSIWYG && lute.parentIs(n, atom.Table) {
 			node.Type = ast.NodeBr
 		} else {
 			node.Type = ast.NodeHardBreak
