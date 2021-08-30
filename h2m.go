@@ -248,7 +248,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Em, atom.I:
 		text := lute.domText(n)
-		if "" == text {
+		if "" == strings.TrimSpace(text) {
 			break
 		}
 
@@ -260,7 +260,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Strong, atom.B:
 		text := lute.domText(n)
-		if "" == text {
+		if "" == strings.TrimSpace(text) {
 			break
 		}
 
