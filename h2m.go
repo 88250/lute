@@ -395,17 +395,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Table:
 		node.Type = ast.NodeTable
 		var tableAligns []int
-		for th := n.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
-			align := lute.domAttrValue(th, "align")
-			switch align {
-			case "left":
-				tableAligns = append(tableAligns, 1)
-			case "center":
-				tableAligns = append(tableAligns, 2)
-			case "right":
-				tableAligns = append(tableAligns, 3)
-			default:
-				tableAligns = append(tableAligns, 0)
+		if nil != n.FirstChild && nil != n.FirstChild.FirstChild && nil != n.FirstChild.FirstChild.FirstChild {
+			for th := n.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
+				align := lute.domAttrValue(th, "align")
+				switch align {
+				case "left":
+					tableAligns = append(tableAligns, 1)
+				case "center":
+					tableAligns = append(tableAligns, 2)
+				case "right":
+					tableAligns = append(tableAligns, 3)
+				default:
+					tableAligns = append(tableAligns, 0)
+				}
 			}
 		}
 		node.TableAligns = tableAligns

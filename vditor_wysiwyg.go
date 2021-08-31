@@ -271,8 +271,8 @@ func (lute *Lute) removeEmptyNodes(node *html.Node) {
 func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 	switch n.DataAtom {
 	case 0:
-		if (nil != n.PrevSibling && atom.Span == n.PrevSibling.DataAtom) || (nil != n.NextSibling && atom.Span == n.NextSibling.DataAtom) {
-			// 前节点或者后节点是 span 的话保留该空白
+		if lute.isInline(n.PrevSibling) || lute.isInline(n.NextSibling) {
+			// 前节点或者后节点是行级节点的话保留该空白
 			break
 		}
 
@@ -1499,8 +1499,10 @@ func (lute *Lute) isInline(n *html.Node) bool {
 
 	return 0 == n.DataAtom ||
 		atom.Code == n.DataAtom ||
-		atom.Strong == n.DataAtom ||
-		atom.Em == n.DataAtom ||
+		atom.Strong == n.DataAtom || atom.B == n.DataAtom ||
+		atom.Em == n.DataAtom || atom.I == n.DataAtom ||
+		atom.Mark == n.DataAtom ||
+		atom.Del == n.DataAtom || atom.S == n.DataAtom || atom.Strike == n.DataAtom ||
 		atom.A == n.DataAtom ||
 		atom.Img == n.DataAtom ||
 		atom.Span == n.DataAtom
