@@ -802,12 +802,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 			r.WriteString(util.FrontEndCaret)
 		}
 	} else {
-		tokens := node.Tokens
-		if bytes.HasSuffix(node.Tokens, []byte(util.Caret+"\n")) {
-			// https://github.com/siyuan-note/siyuan/issues/2834
-			tokens = bytes.TrimSuffix(node.Tokens, []byte("\n"))
-		}
-		r.Write(html.EscapeHTML(tokens))
+		r.Write(html.EscapeHTML(node.Tokens))
 	}
 	r.Tag("/div", nil, false)
 	return ast.WalkContinue

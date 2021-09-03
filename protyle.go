@@ -537,6 +537,10 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: util.StrToBytes(language)})
 			code := lute.domText(n.NextSibling)
+			if strings.HasSuffix(code, "\n\n" + util.Caret) {
+				code = strings.TrimSuffix(code, "\n\n" + util.Caret)
+				code += "\n" + util.Caret + "\n"
+			}
 			lines := strings.Split(code, "\n")
 			buf := bytes.Buffer{}
 			for i, line := range lines {
