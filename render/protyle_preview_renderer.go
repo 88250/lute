@@ -283,7 +283,6 @@ func (r *ProtylePreviewRenderer) renderWidget(node *ast.Node, entering bool) ast
 
 func (r *ProtylePreviewRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
-	output = append(output, r.RenderFootnotes()...)
 	return
 }
 
@@ -590,56 +589,21 @@ func (r *ProtylePreviewRenderer) renderFootnotesRef(node *ast.Node, entering boo
 }
 
 func (r *ProtylePreviewRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<div class=\"footnotes-defs-div\">")
+		r.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
+		r.WriteString("<ol class=\"footnotes-defs-ol\">")
+	} else {
+		r.WriteString("</ol></div>")
+	}
 	return ast.WalkContinue
-}
-
-func (r *ProtylePreviewRenderer) RenderFootnotes() []byte {
-	if 1 > len(r.FootnotesDefs) {
-		return nil
-	}
-
-	buf := bytes.Buffer{}
-	buf.WriteString("<div class=\"footnotes-defs-div\">")
-	buf.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
-	buf.WriteString("<ol class=\"footnotes-defs-ol\">")
-	for i, def := range r.FootnotesDefs {
-		buf.WriteString("<li id=\"footnotes-def-" + strconv.Itoa(i+1) + "\">")
-		footnotesTree := &parse.Tree{Name: "", Context: r.Tree.Context}
-		footnotesTree.Context.Tree = footnotesTree
-		footnotesTree.Root = &ast.Node{Type: ast.NodeDocument}
-		footnotesTree.Root.AppendChild(def)
-		defRenderer := NewProtylePreviewRenderer(footnotesTree, r.Options)
-		lc := footnotesTree.Root.LastDeepestChild()
-		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
-			ref := def.FootnotesRefs[i]
-			gotoRef := " <a href=\"#footnotes-ref-" + ref.FootnotesRefId + "\" class=\"vditor-footnotes__goto-ref\">↩</a>"
-			link := &ast.Node{Type: ast.NodeInlineHTML, Tokens: util.StrToBytes(gotoRef)}
-			lc.InsertAfter(link)
-		}
-		defRenderer.RenderingFootnotes = true
-		defContent := defRenderer.Render()
-		buf.Write(defContent)
-		buf.WriteString("</li>\n")
-	}
-	buf.WriteString("</ol></div>")
-	return buf.Bytes()
 }
 
 func (r *ProtylePreviewRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if !r.RenderingFootnotes {
-			var found bool
-			for _, n := range r.FootnotesDefs {
-				if bytes.EqualFold(node.Tokens, n.Tokens) {
-					found = true
-					break
-				}
-			}
-			if !found {
-				r.FootnotesDefs = append(r.FootnotesDefs, node)
-			}
-			return ast.WalkSkipChildren
-		}
+		r.WriteString("<li id=\"footnotes-def-" + node.FootnotesRefId + "\">")
+	} else {
+		r.WriteString("</li>\n")
 	}
 	return ast.WalkContinue
 }
