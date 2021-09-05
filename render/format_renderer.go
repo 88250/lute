@@ -318,6 +318,10 @@ func (r *FormatRenderer) renderGitConflict(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *FormatRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if !r.Options.SuperBlock {
+		return ast.WalkSkipChildren
+	}
+
 	if entering {
 		r.Newline()
 	}

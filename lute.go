@@ -438,6 +438,7 @@ func (lute *Lute) SetImgPathAllowSpace(b bool) {
 
 func (lute *Lute) SetSuperBlock(b bool) {
 	lute.ParseOptions.SuperBlock = b
+	lute.RenderOptions.SuperBlock = b
 }
 
 func (lute *Lute) SetSup(b bool) {
