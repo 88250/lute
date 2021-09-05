@@ -318,10 +318,6 @@ func (r *FormatRenderer) renderGitConflict(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *FormatRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
-	if !r.Options.SuperBlock {
-		return ast.WalkSkipChildren
-	}
-
 	if entering {
 		r.Newline()
 	}
@@ -329,14 +325,14 @@ func (r *FormatRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *FormatRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
+	if entering && r.Options.SuperBlock {
 		r.Write([]byte("{{{"))
 	}
 	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
+	if entering && r.Options.SuperBlock {
 		r.Write(node.Tokens)
 		r.WriteByte(lex.ItemNewline)
 	}
@@ -345,9 +341,11 @@ func (r *FormatRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering b
 
 func (r *FormatRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
-		r.Write([]byte("}}}"))
-		r.Newline()
+		if r.Options.SuperBlock {
+			r.Newline()
+			r.Write([]byte("}}}"))
+			r.Newline()
+		}
 		if !r.isLastNode(r.Tree.Root, node) {
 			if r.withoutKramdownBlockIAL(node.Parent) {
 				r.WriteByte(lex.ItemNewline)
