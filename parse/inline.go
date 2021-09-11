@@ -43,10 +43,12 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 		case lex.ItemLess:
 			if n = t.parseAutolink(ctx); nil == n {
 				if n = t.parseAutoEmailLink(ctx); nil == n {
-					n = t.parseInlineHTML(ctx)
-					if t.Context.ParseOption.ProtyleWYSIWYG && nil != n && ast.NodeInlineHTML == n.Type {
-						// Protyle 中不存在内联 HTML，使用文本
-						n.Type = ast.NodeText
+					if n = t.parseFileAnnotationRef(ctx); nil == n {
+						n = t.parseInlineHTML(ctx)
+						if t.Context.ParseOption.ProtyleWYSIWYG && nil != n && ast.NodeInlineHTML == n.Type {
+							// Protyle 中不存在内联 HTML，使用文本
+							n.Type = ast.NodeText
+						}
 					}
 				}
 			}
@@ -111,7 +113,7 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 					underline.AppendChild(n)
 					continue
 				}
-			}else if ast.NodeTextMarkCloseMarker == n.Type {
+			} else if ast.NodeTextMarkCloseMarker == n.Type {
 				var textMark *ast.Node
 				var children []*ast.Node
 				for textMark = block.LastChild; nil != textMark; textMark = textMark.Previous {

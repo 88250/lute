@@ -12,13 +12,14 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
 
 // BlockEmbedStart 判断内容块嵌入（!((id "text"))）是否开始。
-// TODO: 待移除
+// TODO: 嵌入块已经废弃，待移除
 func BlockEmbedStart(t *Tree, container *ast.Node) int {
 	if !t.Context.ParseOption.BlockRef || t.Context.indented {
 		return 0

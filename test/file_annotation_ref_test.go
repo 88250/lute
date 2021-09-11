@@ -16,16 +16,15 @@ import (
 	"github.com/88250/lute"
 )
 
-var blockRefTests = []parseTest{
+var fileAnnotationRefTests = []parseTest{
 
-	{"1", "((20201105103725-dd01qas \"$foo$\"))", "<p>\"$foo$\"</p>\n"},
-	{"0", "((20201105103725-dd01qas \"思源笔记\"))", "<p>\"思源笔记\"</p>\n"},
+	{"0", "<<assets/文件名-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;assets/文件名-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},
 }
 
-func TestBlockRef(t *testing.T) {
+func TestFileAnnotationRef(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ParseOptions.BlockRef = true
-	for _, test := range blockRefTests {
+	luteEngine.SetFileAnnotationRef(true)
+	for _, test := range fileAnnotationRefTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)

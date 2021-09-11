@@ -65,6 +65,7 @@ func NewEChartsJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeHTMLEntity] = ret.renderHtmlEntity
 	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
 	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderBlockRef
+	ret.RendererFuncs[ast.NodeFileAnnotationRef] = ret.renderFileAnnotationRef
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeSup] = ret.renderSup
 	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
@@ -139,6 +140,13 @@ func (r *EChartsJSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) as
 func (r *EChartsJSONRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("BlockRef\n((id))", node)
+	}
+	return ast.WalkSkipChildren
+}
+
+func (r *EChartsJSONRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.leaf("FileAnnotationRef\n<<id>>", node)
 	}
 	return ast.WalkSkipChildren
 }

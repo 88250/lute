@@ -620,6 +620,8 @@ const (
 	NodeHTMLEntity                NodeType = 44 // HTML 实体
 	NodeLinkRefDefBlock           NodeType = 45 // 链接引用定义块
 	NodeLinkRefDef                NodeType = 46 // 链接引用定义 [label]:
+	NodeLess                      NodeType = 47 // <
+	NodeGreater                   NodeType = 48 // >
 
 	// GFM
 
@@ -785,6 +787,13 @@ const (
 	// Protyle 挂件，<iframe data-type="NodeWidget">
 
 	NodeWidget NodeType = 535 // <iframe data-type="NodeWidget" data-subtype="widget"></iframe>
+
+	// 文件注解引用 https://github.com/88250/lute/issues/155
+
+	NodeFileAnnotationRef      NodeType = 540 // 文件注解引用节点
+	NodeFileAnnotationRefID    NodeType = 541 // 被引用的文件注解 ID（file/annotation）
+	NodeFileAnnotationRefSpace NodeType = 542 // 被引用的文件注解 ID 和文件注解引用锚文本之间的空格
+	NodeFileAnnotationRefText  NodeType = 543 // 文件注解引用锚文本（不能为空，如果为空的话会自动使用 ID 渲染）
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

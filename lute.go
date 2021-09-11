@@ -403,6 +403,10 @@ func (lute *Lute) SetBlockRef(b bool) {
 	lute.ParseOptions.BlockRef = b
 }
 
+func (lute *Lute) SetFileAnnotationRef(b bool) {
+	lute.ParseOptions.FileAnnotationRef = b
+}
+
 func (lute *Lute) SetMark(b bool) {
 	lute.ParseOptions.Mark = b
 }

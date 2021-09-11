@@ -11,9 +11,10 @@
 package render
 
 import (
+	"strings"
+
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
-	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
@@ -77,6 +78,8 @@ func NewJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
 	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
 	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeLess] = ret.renderLess
+	ret.RendererFuncs[ast.NodeGreater] = ret.renderGreater
 	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
 	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
 	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
@@ -112,6 +115,10 @@ func NewJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
+	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderFileAnnotationRef
+	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderFileAnnotationRefID
+	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderFileAnnotationRefSpace
+	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderFileAnnotationRefText
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
@@ -230,7 +237,8 @@ func isFlag(node *ast.Node) bool {
 		ast.NodeSub,
 		ast.NodeSup,
 		ast.NodeTag,
-		ast.NodeBlockRef:
+		ast.NodeBlockRef,
+		ast.NodeFileAnnotationRef:
 		return true
 	}
 	return false
@@ -601,6 +609,14 @@ func (r *JSONRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkSt
 }
 
 func (r *JSONRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderLess(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderGreater(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
@@ -1014,6 +1030,31 @@ func (r *JSONRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.Wa
 func (r *JSONRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.val(ast.NodeBlockRef, util.BytesToStr(node.Tokens))
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.openObj()
+		r.flag(node)
+	} else {
+		r.closeObj(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderFileAnnotationRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.val(ast.NodeFileAnnotationRef, util.BytesToStr(node.Tokens))
 	}
 	return ast.WalkContinue
 }

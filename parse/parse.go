@@ -319,6 +319,8 @@ type Options struct {
 	YamlFrontMatter bool
 	// BlockRef 设置是否开启内容块引用支持。
 	BlockRef bool
+	// FileAnnotationRef 设置是否开启文件注解引用支持。
+	FileAnnotationRef bool
 	// Mark 设置是否打开 ==标记== 支持。
 	Mark bool
 	// KramdownBlockIAL 设置是否打开 kramdown 块级内联属性列表支持。 https://kramdown.gettalong.org/syntax.html#inline-attribute-lists
@@ -347,23 +349,24 @@ type Options struct {
 
 func NewOptions() *Options {
 	return &Options{
-		GFMTable:         true,
-		GFMTaskListItem:  true,
-		GFMStrikethrough: true,
-		GFMAutoLink:      true,
-		Footnotes:        true,
-		Emoji:            true,
-		AliasEmoji:       EmojiAliasUnicode,
-		EmojiAlias:       EmojiUnicodeAlias,
-		EmojiSite:        "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
-		Setext:           true,
-		YamlFrontMatter:  true,
-		BlockRef:         false,
-		Mark:             false,
-		KramdownBlockIAL: false,
-		HeadingID:        true,
-		LinkRef:          true,
-		IndentCodeBlock:  true,
+		GFMTable:          true,
+		GFMTaskListItem:   true,
+		GFMStrikethrough:  true,
+		GFMAutoLink:       true,
+		Footnotes:         true,
+		Emoji:             true,
+		AliasEmoji:        EmojiAliasUnicode,
+		EmojiAlias:        EmojiUnicodeAlias,
+		EmojiSite:         "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
+		Setext:            true,
+		YamlFrontMatter:   true,
+		BlockRef:          false,
+		FileAnnotationRef: false,
+		Mark:              false,
+		KramdownBlockIAL:  false,
+		HeadingID:         true,
+		LinkRef:           true,
+		IndentCodeBlock:   true,
 	}
 }
 
