@@ -537,8 +537,8 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: util.StrToBytes(language)})
 			code := lute.domText(n.NextSibling)
-			if strings.HasSuffix(code, "\n\n" + util.Caret) {
-				code = strings.TrimSuffix(code, "\n\n" + util.Caret)
+			if strings.HasSuffix(code, "\n\n"+util.Caret) {
+				code = strings.TrimSuffix(code, "\n\n"+util.Caret)
 				code += "\n" + util.Caret + "\n"
 			}
 			lines := strings.Split(code, "\n")
@@ -1031,6 +1031,25 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			tree.Context.Tip.AppendChild(node)
+			if nil != n.FirstChild && strings.Contains(n.FirstChild.Data, util.Caret) {
+				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+			}
+			return
+		} else if "file-annotation-ref" == dataType {
+			node.Type = ast.NodeFileAnnotationRef
+			node.AppendChild(&ast.Node{Type: ast.NodeLess})
+			node.AppendChild(&ast.Node{Type: ast.NodeLess})
+			id := lute.domAttrValue(n, "data-id")
+			node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefID, Tokens: util.StrToBytes(id)})
+			refText := strings.ReplaceAll(lute.domAttrValue(n, "data-anchor"), "\n", "")
+			if "" != refText {
+				node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefSpace})
+				refTextNode := &ast.Node{Type: ast.NodeFileAnnotationRefText, Tokens: util.StrToBytes(refText)}
+				node.AppendChild(refTextNode)
+			}
+			node.AppendChild(&ast.Node{Type: ast.NodeGreater})
+			node.AppendChild(&ast.Node{Type: ast.NodeGreater})
 			tree.Context.Tip.AppendChild(node)
 			if nil != n.FirstChild && strings.Contains(n.FirstChild.Data, util.Caret) {
 				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})

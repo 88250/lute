@@ -81,6 +81,8 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
 	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
 	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeLess] = ret.renderLess
+	ret.RendererFuncs[ast.NodeGreater] = ret.renderGreater
 	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
 	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
 	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
@@ -116,6 +118,10 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
+	ret.RendererFuncs[ast.NodeFileAnnotationRef] = ret.renderFileAnnotationRef
+	ret.RendererFuncs[ast.NodeFileAnnotationRefID] = ret.renderFileAnnotationRefID
+	ret.RendererFuncs[ast.NodeFileAnnotationRefSpace] = ret.renderFileAnnotationRefSpace
+	ret.RendererFuncs[ast.NodeFileAnnotationRefText] = ret.renderFileAnnotationRefText
 	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderNodeBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockRefTextTplRenderResult] = ret.renderBlockRefTextTplRenderResult
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
@@ -587,6 +593,33 @@ func (r *FormatRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.W
 	return ast.WalkContinue
 }
 
+func (r *FormatRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderFileAnnotationRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemSpace)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemDoublequote)
+		r.Write(node.Tokens)
+		r.WriteByte(lex.ItemDoublequote)
+	}
+	return ast.WalkContinue
+}
+
 func (r *FormatRenderer) renderNodeBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -931,6 +964,20 @@ func (r *FormatRenderer) renderCloseParen(node *ast.Node, entering bool) ast.Wal
 func (r *FormatRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemOpenParen)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderGreater(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemGreater)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderLess(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemLess)
 	}
 	return ast.WalkContinue
 }

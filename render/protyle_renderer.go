@@ -82,6 +82,8 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeCloseBracket] = ret.renderCloseBracket
 	ret.RendererFuncs[ast.NodeOpenParen] = ret.renderOpenParen
 	ret.RendererFuncs[ast.NodeCloseParen] = ret.renderCloseParen
+	ret.RendererFuncs[ast.NodeLess] = ret.renderLess
+	ret.RendererFuncs[ast.NodeGreater] = ret.renderGreater
 	ret.RendererFuncs[ast.NodeOpenBrace] = ret.renderOpenBrace
 	ret.RendererFuncs[ast.NodeCloseBrace] = ret.renderCloseBrace
 	ret.RendererFuncs[ast.NodeLinkText] = ret.renderLinkText
@@ -117,8 +119,12 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
-	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderNodeBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockRefTextTplRenderResult] = ret.renderBlockRefTextTplRenderResult
+	ret.RendererFuncs[ast.NodeFileAnnotationRef] = ret.renderFileAnnotationRef
+	ret.RendererFuncs[ast.NodeFileAnnotationRefID] = ret.renderFileAnnotationRefID
+	ret.RendererFuncs[ast.NodeFileAnnotationRefSpace] = ret.renderFileAnnotationRefSpace
+	ret.RendererFuncs[ast.NodeFileAnnotationRefText] = ret.renderFileAnnotationRefText
+	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderNodeBlockEmbed
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
@@ -382,6 +388,41 @@ func (r *BlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *BlockRenderer) renderBlockRefTextTplRenderResult(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		idNode := node.ChildByType(ast.NodeFileAnnotationRefID)
+		id := idNode.TokensStr()
+		anchor := id
+		if refTextNode := node.ChildByType(ast.NodeFileAnnotationRefText); nil != refTextNode {
+			anchor = strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
+		}
+		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}, {"data-anchor", anchor}}
+		r.Tag("span", attrs, false)
+		r.WriteString(anchor)
+		r.Tag("/span", nil, false)
+		return ast.WalkSkipChildren
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderFileAnnotationRefID(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemDoublequote)
+		r.Write(node.Tokens)
+	} else {
+		r.WriteByte(lex.ItemDoublequote)
+	}
 	return ast.WalkContinue
 }
 
@@ -1048,6 +1089,14 @@ func (r *BlockRenderer) renderCloseParen(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *BlockRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderLess(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderGreater(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
