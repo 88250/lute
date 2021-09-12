@@ -24,7 +24,7 @@ var JSONRendererTests = []parseTest{
 	{"测试行内数学公式", "$a + b = c$", "[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"InlineMath\",\"value\":\"a + b = c\"}]}]"},
 	{"测试斜体", "*测试斜体*", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Emphasis\",\"children\":[{\"type\":\"Text\",\"value\":\"测试斜体\"}]}]}]"},
 	{"测试加粗", "**测试粗体**", "[{\"flag\":\"Paragraph\",\"children\":[{\"flag\":\"Strong\",\"children\":[{\"type\":\"Text\",\"value\":\"测试粗体\"}]}]}]"},
-	{"测试引用块", "> 测试引用块", "[{\"flag\":\"Blockquote\",\"children\":[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"测试引用块\"}]}]}]"},
+	{"测试引述块", "> 测试引述块", "[{\"flag\":\"Blockquote\",\"children\":[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"测试引述块\"}]}]}]"},
 	{"测试标题", "# 一级标题", "[{\"type\":\"Heading\",\"value\":\"h1\",\"children\":[{\"type\":\"Text\",\"value\":\"一级标题\"}]}]"},
 	{"测试无序列表", "- item1\n- item2\n- item3\n", "[{\"type\":\"List\",\"value\":\"ul\",\"children\":[{\"flag\":\"ListItem\",\"children\":[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"item1\"}]}]},{\"flag\":\"ListItem\",\"children\":[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"item2\"}]}]},{\"flag\":\"ListItem\",\"children\":[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"item3\"}]}]}]}]"},
 	{"测试有序列表", "1. item1\n2. item2\n3. item3\n", "[{\"type\":\"List\",\"value\":\"ol\",\"children\":[{\"flag\":\"ListItem\",\"children\":[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"item1\"}]}]},{\"flag\":\"ListItem\",\"children\":[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"item2\"}]}]},{\"flag\":\"ListItem\",\"children\":[{\"flag\":\"Paragraph\",\"children\":[{\"type\":\"Text\",\"value\":\"item3\"}]}]}]}]"},
@@ -59,6 +59,7 @@ func TestJSONRenderer(t *testing.T) {
 	luteEngine.SetBlockRef(true)
 	luteEngine.SetTag(true)
 	luteEngine.SetSoftBreak2HardBreak(true)
+	luteEngine.SetFileAnnotationRef(true)
 
 	for _, test := range JSONRendererTests {
 		jsonStr := luteEngine.RenderJSON(test.from)

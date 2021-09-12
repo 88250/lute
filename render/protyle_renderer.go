@@ -417,12 +417,6 @@ func (r *BlockRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering bo
 }
 
 func (r *BlockRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
-	} else {
-		r.WriteByte(lex.ItemDoublequote)
-	}
 	return ast.WalkContinue
 }
 

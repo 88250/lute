@@ -30,6 +30,7 @@ func TestBlock(t *testing.T) {
 	luteEngine.SetSub(true)
 	luteEngine.SetSup(true)
 	luteEngine.SetGitConflict(true)
+	luteEngine.SetFileAnnotationRef(true)
 
 	data, err := os.ReadFile("commonmark-spec-kramdown.md")
 	if nil != err {

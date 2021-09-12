@@ -252,7 +252,7 @@ func (n *Node) Text() (ret string) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockEmbedText, NodeFootnotesRef:
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeBlockEmbedText, NodeFootnotesRef:
 			buf.Write(n.Tokens)
 		}
 		return WalkContinue
@@ -268,7 +268,7 @@ func (n *Node) TextLen() (ret int) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockEmbedText, NodeFootnotesRef:
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeBlockEmbedText, NodeFootnotesRef:
 			buf = append(buf, n.Tokens...)
 		}
 		return WalkContinue
@@ -276,7 +276,7 @@ func (n *Node) TextLen() (ret int) {
 	return utf8.RuneCount(buf)
 }
 
-// Text 返回 n 及其所有内容子节点的文本值。
+// Content 返回 n 及其所有内容子节点的文本值。
 func (n *Node) Content() (ret string) {
 	buf := &bytes.Buffer{}
 	Walk(n, func(n *Node, entering bool) WalkStatus {
@@ -284,7 +284,7 @@ func (n *Node) Content() (ret string) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockEmbedText, NodeFootnotesRef,
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeBlockEmbedText, NodeFootnotesRef,
 			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
 			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
 			NodeGitConflictContent:
@@ -303,7 +303,7 @@ func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockEmbedText, NodeFootnotesRef,
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeBlockEmbedText, NodeFootnotesRef,
 			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
 			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
 			NodeGitConflictContent:

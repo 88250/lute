@@ -115,10 +115,10 @@ func NewJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
-	ret.RendererFuncs[ast.NodeBlockRef] = ret.renderFileAnnotationRef
-	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderFileAnnotationRefID
-	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderFileAnnotationRefSpace
-	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderFileAnnotationRefText
+	ret.RendererFuncs[ast.NodeFileAnnotationRef] = ret.renderFileAnnotationRef
+	ret.RendererFuncs[ast.NodeFileAnnotationRefID] = ret.renderFileAnnotationRefID
+	ret.RendererFuncs[ast.NodeFileAnnotationRefSpace] = ret.renderFileAnnotationRefSpace
+	ret.RendererFuncs[ast.NodeFileAnnotationRefText] = ret.renderFileAnnotationRefText
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker

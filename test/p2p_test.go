@@ -39,6 +39,7 @@ func TestBlockDOM2InlineBlockDOM(t *testing.T) {
 	luteEngine.SetEmojiSite("http://127.0.0.1:6806/stage/protyle/images/emoji")
 	luteEngine.SetAutoSpace(true)
 	luteEngine.SetParagraphBeginningSpace(true)
+	luteEngine.SetFileAnnotationRef(true)
 
 	for _, test := range blockDOM2InlineBlockDOM {
 		result := luteEngine.BlockDOM2InlineBlockDOM(test.from)
@@ -72,6 +73,7 @@ func TestBlockDOM2StdMd(t *testing.T) {
 	luteEngine.SetEmojiSite("http://127.0.0.1:6806/stage/protyle/images/emoji")
 	luteEngine.SetAutoSpace(true)
 	luteEngine.SetParagraphBeginningSpace(true)
+	luteEngine.SetFileAnnotationRef(true)
 
 	for _, test := range blockDOM2StdMd {
 		result := luteEngine.BlockDOM2StdMd(test.from)

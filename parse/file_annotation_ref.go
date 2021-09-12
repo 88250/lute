@@ -20,18 +20,15 @@ import (
 
 func (t *Tree) parseFileAnnotationRef(ctx *InlineContext) *ast.Node {
 	if !t.Context.ParseOption.FileAnnotationRef {
-		ctx.pos++
-		return &ast.Node{Type: ast.NodeText, Tokens: []byte("<")}
+		return nil
 	}
 
 	tokens := ctx.tokens[ctx.pos:]
 	if 48 > len(tokens) || lex.ItemLess != tokens[0] || lex.ItemLess != tokens[1] {
-		ctx.pos++
-		return &ast.Node{Type: ast.NodeText, Tokens: []byte("<")}
+		return nil
 	}
 
 	var id, text []byte
-	savePos := ctx.pos
 	ctx.pos += 2
 	var ok, matched bool
 	var passed, remains []byte
@@ -76,8 +73,7 @@ func (t *Tree) parseFileAnnotationRef(ctx *InlineContext) *ast.Node {
 		break
 	}
 	if !matched {
-		ctx.pos = savePos + 1
-		return &ast.Node{Type: ast.NodeText, Tokens: []byte("<")}
+		return nil
 	}
 
 	ret := &ast.Node{Type: ast.NodeFileAnnotationRef}
