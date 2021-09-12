@@ -11,8 +11,9 @@
 package parse
 
 import (
-	"github.com/88250/lute/html"
 	"unicode/utf8"
+
+	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -62,7 +63,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 			}
 		}
 
-		if !matchEnd || (length > i && lex.ItemCloseParen != tokens[i+1]) {
+		if !matchEnd || length <= i+1 || lex.ItemCloseParen != tokens[i+1] {
 			passed = nil
 			return
 		}
