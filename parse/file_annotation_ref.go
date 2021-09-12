@@ -109,16 +109,16 @@ func (context *Context) parseFileAnnotationRefID(tokens []byte) (passed, remains
 			continue
 		}
 
-		if lex.IsWhitespace(token) || '>' == token || !lex.IsASCIILetterNumHyphen(tokens[i]) {
+		if lex.IsWhitespace(token) || '>' == token {
 			break
 		}
 	}
 	remains = tokens[i:]
 	id = tokens[:i]
-	if 2 > len(remains) {
+	if 6 > len(remains) {
 		return
 	}
-	passed = make([]byte, 0, 64)
+	passed = make([]byte, 0, 1024)
 	passed = append(passed, id...)
 	if bytes.HasPrefix(remains, util.CaretTokens) {
 		passed = append(passed, util.CaretTokens...)

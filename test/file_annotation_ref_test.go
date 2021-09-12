@@ -18,7 +18,7 @@ import (
 
 var fileAnnotationRefTests = []parseTest{
 
-	{"0", "<<assets/文件名-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;assets/文件名-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},
+	{"0", "<<assets/文件名-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>\"注解锚文本\"</p>\n"},
 }
 
 func TestFileAnnotationRef(t *testing.T) {
