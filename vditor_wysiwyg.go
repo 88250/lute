@@ -1505,5 +1505,7 @@ func (lute *Lute) isInline(n *html.Node) bool {
 		atom.Del == n.DataAtom || atom.S == n.DataAtom || atom.Strike == n.DataAtom ||
 		atom.A == n.DataAtom ||
 		atom.Img == n.DataAtom ||
+		atom.U == n.DataAtom ||
+		atom.Kbd == n.DataAtom ||
 		atom.Span == n.DataAtom
 }
