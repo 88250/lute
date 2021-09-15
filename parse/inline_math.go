@@ -90,7 +90,7 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 func (t *Tree) matchInlineMathEnd(tokens []byte) (pos int) {
 	length := len(tokens)
 	for ; pos < length; pos++ {
-		if lex.ItemDollar == tokens[pos] {
+		if lex.ItemDollar == tokens[pos] && 0 < pos && lex.ItemBackslash != tokens[pos-1] {
 			if pos < length-1 {
 				if !lex.IsDigit(tokens[pos+1]) {
 					return pos
