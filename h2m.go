@@ -296,10 +296,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
-		if "presentation" == lute.domAttrValue(n, "role") {
-			return
-		}
-
 		if tree.Context.ParseOption.ProtyleWYSIWYG && lute.parentIs(n, atom.Table) {
 			node.Type = ast.NodeBr
 		} else {
