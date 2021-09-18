@@ -1483,7 +1483,7 @@ func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 }
 
 func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
-	ialTokens = []byte("{: id=\"" + node.ID + "\"")
+	node.SetIALAttr("id", node.ID)
 
 	if refcount := lute.domAttrValue(n, "refcount"); "" != refcount {
 		node.SetIALAttr("refcount", refcount)
@@ -1558,7 +1558,7 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		}
 	}
 
-	ialTokens = append(ialTokens, '}')
+	ialTokens = parse.IAL2Tokens(node.KramdownIAL)
 	return ialTokens
 }
 
