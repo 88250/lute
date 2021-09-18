@@ -128,6 +128,7 @@ func Tokens2IAL(tokens []byte) (ret [][]string) {
 	tokens = bytes.TrimRight(tokens, " \n")
 	tokens = bytes.TrimPrefix(tokens, []byte("{:"))
 	tokens = bytes.TrimSuffix(tokens, []byte("}"))
+	tokens = bytes.ReplaceAll(tokens, []byte("\n"), []byte(util.IALValEscNewLine))
 	for {
 		valid, remains, attr, name, val := TagAttr(tokens)
 		if !valid {
@@ -139,6 +140,7 @@ func Tokens2IAL(tokens []byte) (ret [][]string) {
 			break
 		}
 
+		val = bytes.ReplaceAll(val, []byte(util.IALValEscNewLine), []byte("\n"))
 		ret = append(ret, []string{util.BytesToStr(name), util.BytesToStr(val)})
 	}
 	return
