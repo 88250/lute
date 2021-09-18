@@ -37,8 +37,6 @@ func main() {
 		"NewNodeID":         ast.NewNodeID,
 		"EscapeHTMLStr":     html.EscapeHTMLStr,
 		"UnEscapeHTMLStr":   html.UnescapeHTMLStr,
-		"EscapeAttrVal":     html.EscapeAttrVal,
-		"UnEscapeAttrVal":   html.UnescapAttrVal,
 		"EChartsMindmapStr": render.EChartsMindmapStr,
 	})
 }

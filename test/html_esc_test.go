@@ -19,7 +19,7 @@ import (
 func TestEscapeAttrVal(t *testing.T) {
 	str := "foo\n<bar>'baz&中 文"
 	result := html.EscapeAttrVal(str)
-	if html.UnescapAttrVal(result) != str {
+	if html.UnescapeAttrVal(result) != str {
 		t.Fatalf("escape html failed")
 	}
 }

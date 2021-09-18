@@ -103,7 +103,7 @@ func IALValMap(ial *ast.Node) (ret map[string]string) {
 func IAL2Map(ial [][]string) (ret map[string]string) {
 	ret = map[string]string{}
 	for _, kv := range ial {
-		ret[kv[0]] = html.UnescapAttrVal(kv[1])
+		ret[kv[0]] = html.UnescapeAttrVal(kv[1])
 	}
 	return
 }

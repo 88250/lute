@@ -26,7 +26,7 @@ var (
 	quot = util.StrToBytes("&quot;")
 )
 
-func UnescapAttrVal(v string) string {
+func UnescapeAttrVal(v string) string {
 	v = strings.ReplaceAll(v, util.IALValEscNewLine, "\n")
 	return UnescapeString(v)
 }

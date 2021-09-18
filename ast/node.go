@@ -17,6 +17,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -175,6 +176,7 @@ func (n *Node) RemoveIALAttr(name string) {
 }
 
 func (n *Node) SetIALAttr(name, value string) {
+	value = html.EscapeAttrVal(value)
 	for _, kv := range n.KramdownIAL {
 		if name == kv[0] {
 			kv[1] = value
@@ -195,7 +197,7 @@ func (n *Node) SetIALAttr(name, value string) {
 func (n *Node) IALAttr(name string) string {
 	for _, kv := range n.KramdownIAL {
 		if name == kv[0] {
-			return kv[1]
+			return html.UnescapeAttrVal(kv[1])
 		}
 	}
 	return ""
