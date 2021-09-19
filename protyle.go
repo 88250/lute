@@ -1491,27 +1491,32 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	}
 
 	if bookmark := lute.domAttrValue(n, "bookmark"); "" != bookmark {
+		bookmark = html.UnescapeHTMLStr(bookmark)
 		node.SetIALAttr("bookmark", bookmark)
 		ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
 	}
 
 	if style := lute.domAttrValue(n, "style"); "" != style {
+		style = html.UnescapeHTMLStr(style)
 		style = styleValue(style)
 		node.SetIALAttr("style", style)
 		ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
 	}
 
 	if name := lute.domAttrValue(n, "name"); "" != name {
+		name = html.UnescapeHTMLStr(name)
 		node.SetIALAttr("name", name)
 		ialTokens = append(ialTokens, []byte(" name=\""+name+"\"")...)
 	}
 
 	if memo := lute.domAttrValue(n, "memo"); "" != memo {
+		memo = html.UnescapeHTMLStr(memo)
 		node.SetIALAttr("memo", memo)
 		ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
 	}
 
 	if alias := lute.domAttrValue(n, "alias"); "" != alias {
+		alias = html.UnescapeHTMLStr(alias)
 		node.SetIALAttr("alias", alias)
 		ialTokens = append(ialTokens, []byte(" alias=\""+alias+"\"")...)
 	}
@@ -1553,6 +1558,7 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 
 	if customAttrs := lute.domCustomAttrs(n); nil != customAttrs {
 		for k, v := range customAttrs {
+			v = html.UnescapeHTMLStr(v)
 			node.SetIALAttr(k, v)
 			ialTokens = append(ialTokens, []byte(" "+k+"=\""+v+"\"")...)
 		}
