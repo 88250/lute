@@ -1283,7 +1283,11 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 		r.blockNodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
 		attrs = [][]string{}
-		r.contenteditable(&attrs)
+		if contenteditable := node.IALAttr("contenteditable"); "" != contenteditable {
+			attrs = append(attrs, []string{"contenteditable", contenteditable})
+		} else {
+			r.contenteditable(&attrs)
+		}
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 	} else {
