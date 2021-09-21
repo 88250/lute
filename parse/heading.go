@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 
 	"github.com/88250/lute/lex"
@@ -121,7 +122,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	}
 
 	var endCaret bool
-	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.HasPrefix(tokens[level:], util.CaretTokens) {
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.HasPrefix(tokens[level:], []byte(" "+util.Caret)) {
 		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 		endCaret = true
 	}
