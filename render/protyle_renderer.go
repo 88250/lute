@@ -829,7 +829,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	r.Tag("/div", nil, false)
 
 	attrs = [][]string{}
-	r.contenteditable(&attrs)
+	r.contenteditable(node, &attrs)
 	r.spellcheck(&attrs)
 	r.Tag("div", attrs, false)
 	if codeIsEmpty {
@@ -1004,7 +1004,7 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
 		attrs = [][]string{}
-		r.contenteditable(&attrs)
+		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 		r.Tag("table", nil, false)
@@ -1258,7 +1258,7 @@ func (r *BlockRenderer) renderNodeBlockEmbed(node *ast.Node, entering bool) ast.
 		r.blockNodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
 		attrs = [][]string{}
-		r.contenteditable(&attrs)
+		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 		idNode := node.ChildByType(ast.NodeBlockEmbedID)
@@ -1286,7 +1286,7 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 		if contenteditable := node.IALAttr("contenteditable"); "" != contenteditable {
 			attrs = append(attrs, []string{"contenteditable", contenteditable})
 		} else {
-			r.contenteditable(&attrs)
+			r.contenteditable(node, &attrs)
 		}
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
@@ -1459,7 +1459,7 @@ func (r *BlockRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSta
 		r.blockNodeAttrs(node, &attrs, "h"+level)
 		r.Tag("div", attrs, false)
 		attrs = [][]string{}
-		r.contenteditable(&attrs)
+		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 	} else {
@@ -1629,8 +1629,12 @@ func (r *BlockRenderer) spellcheck(attrs *[][]string) {
 	return
 }
 
-func (r *BlockRenderer) contenteditable(attrs *[][]string) {
-	*attrs = append(*attrs, []string{"contenteditable", strconv.FormatBool(r.Options.ProtyleContenteditable)})
+func (r *BlockRenderer) contenteditable(node *ast.Node, attrs *[][]string) {
+	if contenteditable := node.IALAttr("contenteditable"); "" != contenteditable {
+		*attrs = append(*attrs, []string{"contenteditable", contenteditable})
+	} else {
+		*attrs = append(*attrs, []string{"contenteditable", strconv.FormatBool(r.Options.ProtyleContenteditable)})
+	}
 	return
 }
 
