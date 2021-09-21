@@ -38,5 +38,6 @@ func main() {
 		"EscapeHTMLStr":     html.EscapeHTMLStr,
 		"UnEscapeHTMLStr":   html.UnescapeHTMLStr,
 		"EChartsMindmapStr": render.EChartsMindmapStr,
+		"Sanitize":          render.Sanitize,
 	})
 }

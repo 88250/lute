@@ -36,6 +36,10 @@ var setOfElementsToSkipContent = map[string]interface{}{
 	"title":    nil,
 }
 
+func Sanitize(str string) string {
+	return string(sanitize([]byte(str)))
+}
+
 func sanitize(tokens []byte) []byte {
 	var (
 		buff                     bytes.Buffer

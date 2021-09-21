@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/render"
 )
 
 var sanitizerTests = []parseTest{
@@ -62,5 +63,12 @@ func TestSanitizerVditor(t *testing.T) {
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal text\n\t%q", test.name, test.to, html, test.from)
 		}
+	}
+}
+
+func TestSanitize(t *testing.T) {
+	output := render.Sanitize("<img src=\"foo\" onload=\"alert(1)\" onerror=\"alert(2)\"/>")
+	if "<img src=\"foo\" />" != output {
+		t.Fatalf("sanitize failed")
 	}
 }
