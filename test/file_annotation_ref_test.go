@@ -18,6 +18,7 @@ import (
 
 var fileAnnotationRefTests = []parseTest{
 
+	{"1", "<<assets/foo bar-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>\"注解锚文本\"</p>\n"},
 	{"0", "<<assets/文件名-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>\"注解锚文本\"</p>\n"},
 }
 

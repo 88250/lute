@@ -105,7 +105,11 @@ func (context *Context) parseFileAnnotationRefID(tokens []byte) (passed, remains
 			continue
 		}
 
-		if lex.IsWhitespace(token) || '>' == token {
+		if bytes.HasPrefix(tokens[i:], []byte(" \"")) {
+			break
+		}
+
+		if '>' == token {
 			break
 		}
 	}
