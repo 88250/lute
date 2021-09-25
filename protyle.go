@@ -882,6 +882,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		} else if ast.NodeHeading == tree.Context.Tip.Type {
 			content = strings.ReplaceAll(content, "\n", "")
 			node.Tokens = util.StrToBytes(content)
+		} else if ast.NodeStrong == tree.Context.Tip.Type {
+			content = strings.ReplaceAll(content, "**", "")
+			content = strings.ReplaceAll(content, "*"+util.Caret, util.Caret)
+			content = strings.ReplaceAll(content, util.Caret+"*", util.Caret)
+			node.Tokens = util.StrToBytes(content)
 		}
 
 		if lute.parentIs(n, atom.Table) {
