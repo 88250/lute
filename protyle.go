@@ -1202,9 +1202,16 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
-		if nil != tree.Context.Tip.LastChild && bytes.HasSuffix(tree.Context.Tip.LastChild.Tokens, []byte("\\"+util.Caret)) {
-			// foo\‸**bar** https://github.com/siyuan-note/siyuan/issues/2160
-			tree.Context.Tip.LastChild.Tokens = bytes.ReplaceAll(tree.Context.Tip.LastChild.Tokens, []byte("\\"+util.Caret), []byte("\\\\"+util.Caret))
+		if nil != tree.Context.Tip.LastChild {
+			// 转义符导致的行级元素样式属性暴露 https://github.com/siyuan-note/siyuan/issues/2969
+			if bytes.HasSuffix(tree.Context.Tip.LastChild.Tokens, []byte("\\"+util.Caret)) {
+				// foo\‸**bar**
+				tree.Context.Tip.LastChild.Tokens = bytes.ReplaceAll(tree.Context.Tip.LastChild.Tokens, []byte("\\"+util.Caret), []byte("\\\\"+util.Caret))
+			}
+			if bytes.HasSuffix(tree.Context.Tip.LastChild.Tokens, []byte("\\")) {
+				// foo\**bar**
+				tree.Context.Tip.LastChild.Tokens = bytes.ReplaceAll(tree.Context.Tip.LastChild.Tokens, []byte("\\"), []byte("\\\\"))
+			}
 		}
 
 		if lute.startsWithNewline(n.FirstChild) {
