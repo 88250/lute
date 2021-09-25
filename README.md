@@ -76,7 +76,7 @@ Lute 的目标是构建一个结构化的 Markdown 引擎，实现 GFM/CM 规范
 
 * [链滴](https://ld246.com)
 * [思源笔记](https://github.com/siyuan-note/siyuan)
-* [Vditor](https://github.com/Vanessa219/vditor)
+* [Vditor 编辑器](https://github.com/Vanessa219/vditor)
 * [Sym 社区系统](https://github.com/88250/symphony)
 * [Solo 博客系统](https://github.com/88250/solo)
 * [Pipe 博客系统](https://github.com/88250/pipe)
