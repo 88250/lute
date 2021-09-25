@@ -1085,7 +1085,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				return
 			}
 			if nil != n.FirstChild.NextSibling {
-				node.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: util.StrToBytes(n.FirstChild.NextSibling.Data)})
+				data := n.FirstChild.NextSibling.Data
+				data = strings.ReplaceAll(data, "\\\\", "\\")
+				node.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: util.StrToBytes(data)})
 			}
 			tree.Context.Tip.AppendChild(node)
 			return
