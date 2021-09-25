@@ -1202,6 +1202,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
 			return
 		}
+		if nil != tree.Context.Tip.LastChild && bytes.HasSuffix(tree.Context.Tip.LastChild.Tokens, []byte("\\"+util.Caret)) {
+			// foo\‸**bar** https://github.com/siyuan-note/siyuan/issues/2160
+			tree.Context.Tip.LastChild.Tokens = bytes.ReplaceAll(tree.Context.Tip.LastChild.Tokens, []byte("\\"+util.Caret), []byte("\\\\"+util.Caret))
+		}
+
 		if lute.startsWithNewline(n.FirstChild) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
