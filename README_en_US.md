@@ -68,9 +68,10 @@ Finally, another important motivation is that the B3log open source community ne
 
 ## 🗃 Showcases
 
-* [链滴](https://ld246.com)
-* [Sym](https://github.com/88250/symphony)
+* [LianDi](https://ld246.com)
 * [SiYuan](https://github.com/siyuan-note/siyuan)
+* [Vditor](https://github.com/Vanessa219/vditor)
+* [Sym](https://github.com/88250/symphony)
 * [Solo](https://github.com/88250/solo)
 * [Pipe](https://github.com/88250/pipe)
 
