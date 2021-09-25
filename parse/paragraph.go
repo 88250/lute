@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/util"
 
 	"github.com/88250/lute/ast"
@@ -50,7 +51,11 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 		// 尝试解析任务列表项
 		if listItem := p.Parent; nil != listItem && ast.NodeListItem == listItem.Type && listItem.FirstChild == p {
 			if 3 == listItem.ListData.Typ {
+				isEditor := context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG
 				isTaskListItem := 3 < len(p.Tokens)
+				if context.ParseOption.ProtyleWYSIWYG {
+					isTaskListItem = 3 <= len(p.Tokens)
+				}
 				if isTaskListItem {
 					// 如果是任务列表项则添加任务列表标记符节点
 
@@ -85,7 +90,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							p.PrependChild(taskListItemMarker)
 						}
 						p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
-						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
+						if isEditor {
 							p.Tokens = bytes.TrimSpace(p.Tokens)
 							if caretStartText || caretAfterCloseBracket || caretInBracket {
 								p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)
@@ -96,19 +101,21 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							}
 						}
 
-						subTree := Parse("", p.Tokens, context.ParseOption)
-						subBlock := subTree.Root.FirstChild
-						if ast.NodeParagraph != subBlock.Type {
-							listItem.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-							if nil != p.FirstChild {
-								listItem.PrependChild(p.FirstChild)
-							} else {
-								listItem.PrependChild(&ast.Node{Type: ast.NodeParagraph})
+						if 0 < len(p.Tokens) {
+							subTree := Parse("", p.Tokens, context.ParseOption)
+							subBlock := subTree.Root.FirstChild
+							if ast.NodeParagraph != subBlock.Type {
+								listItem.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+								if nil != p.FirstChild {
+									listItem.PrependChild(p.FirstChild)
+								} else {
+									listItem.PrependChild(&ast.Node{Type: ast.NodeParagraph})
+								}
+								subBlock.ID = p.ID
+								subBlock.KramdownIAL = p.KramdownIAL
+								p.InsertAfter(subBlock)
+								p.Unlink()
 							}
-							subBlock.ID = p.ID
-							subBlock.KramdownIAL = p.KramdownIAL
-							p.InsertAfter(subBlock)
-							p.Unlink()
 						}
 					}
 				}
