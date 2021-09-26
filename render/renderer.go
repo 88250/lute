@@ -497,7 +497,7 @@ func headingText(n *ast.Node) (ret string) {
 		}
 
 		switch n.Type {
-		case ast.NodeLinkText, ast.NodeBlockRefText, ast.NodeBlockEmbedText:
+		case ast.NodeLinkText, ast.NodeBlockRefText, ast.NodeFileAnnotationRefText, ast.NodeBlockEmbedText:
 			buf.Write(n.Tokens)
 		case ast.NodeInlineMathContent:
 			buf.WriteString("<span class=\"language-math\">")
@@ -680,7 +680,8 @@ func (r *BaseRenderer) Text(node *ast.Node) (ret string) {
 			switch n.Type {
 			case ast.NodeText, ast.NodeLinkText, ast.NodeLinkDest, ast.NodeLinkSpace, ast.NodeLinkTitle, ast.NodeCodeBlockCode,
 				ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeMathBlockContent, ast.NodeYamlFrontMatterContent,
-				ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias, ast.NodeBlockRefText, ast.NodeBlockRefSpace,
+				ast.NodeHTMLBlock, ast.NodeInlineHTML, ast.NodeEmojiAlias, ast.NodeFileAnnotationRefText, ast.NodeFileAnnotationRefSpace,
+				ast.NodeBlockRefText, ast.NodeBlockRefSpace,
 				ast.NodeBlockEmbedText, ast.NodeBlockEmbedSpace, ast.NodeKramdownSpanIAL:
 				ret += string(n.Tokens)
 			case ast.NodeCodeBlockFenceInfoMarker:
@@ -704,7 +705,7 @@ func RenderHeadingText(n *ast.Node) (ret string) {
 		}
 
 		switch n.Type {
-		case ast.NodeLinkText, ast.NodeBlockRefText, ast.NodeBlockEmbedText:
+		case ast.NodeLinkText, ast.NodeBlockRefText, ast.NodeFileAnnotationRefText, ast.NodeBlockEmbedText:
 			buf.Write(n.Tokens)
 		case ast.NodeInlineMathContent:
 			buf.WriteString("<span class=\"language-math\">")
