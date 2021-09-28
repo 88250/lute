@@ -14,6 +14,7 @@ package lute
 import (
 	"bytes"
 	"strings"
+	"sync"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
@@ -176,8 +177,13 @@ func (lute *Lute) GetEmojis() (ret map[string]string) {
 	return
 }
 
+var emojiLock = sync.Mutex{}
+
 // PutEmojis 将指定的 emojiMap 合并覆盖已有的 Emoji 字典。
 func (lute *Lute) PutEmojis(emojiMap map[string]string) {
+	emojiLock.Lock()
+	defer emojiLock.Unlock()
+
 	for k, v := range emojiMap {
 		lute.ParseOptions.AliasEmoji[k] = v
 		lute.ParseOptions.EmojiAlias[v] = k
