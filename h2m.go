@@ -91,6 +91,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
+	if strings.HasPrefix(lute.domAttrValue(n, "class"), "line-numbers") {
+		return
+	}
+
 	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			lute.genASTByDOM(c, tree)
@@ -239,9 +243,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(content)
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
 				tree.Context.Tip.AppendChild(node)
-				if nil != n.NextSibling && strings.Contains(lute.domAttrValue(n.NextSibling, "class"), "line-numbers") {
-					n.NextSibling.Unlink()
-				}
 			} else {
 				node.Type = ast.NodeHTMLBlock
 				node.Tokens = lute.domHTML(n)
