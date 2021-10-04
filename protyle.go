@@ -236,7 +236,6 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 			switch n.Type {
 			case ast.NodeInlineHTML, ast.NodeHTMLBlock, ast.NodeCodeSpanContent, ast.NodeCodeBlockCode, ast.NodeInlineMathContent, ast.NodeMathBlockContent,
 				ast.NodeCodeSpan, ast.NodeInlineMath:
-				n.Tokens = html.UnescapeHTML(n.Tokens)
 				if nil != n.Next && ast.NodeCodeSpan == n.Next.Type && n.CodeMarkerLen == n.Next.CodeMarkerLen && nil != n.FirstChild && nil != n.FirstChild.Next {
 					// 合并代码节点 https://github.com/Vanessa219/vditor/issues/167
 					n.FirstChild.Next.Tokens = append(n.FirstChild.Next.Tokens, n.Next.FirstChild.Next.Tokens...)
