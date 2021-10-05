@@ -1148,7 +1148,6 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 			attrs = append(attrs, []string{"title", util.BytesToStr(titleTokens)})
 		}
 
-		attrs = append(attrs, r.NodeAttrs(node.Parent)...)
 		if style := node.IALAttr("style"); "" != style {
 			attrs = append(attrs, []string{"style", style})
 		}
