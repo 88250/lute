@@ -1050,7 +1050,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil != n.FirstChild {
 				refText = lute.domText(n.FirstChild)
 			}
-			//refText = strings.ReplaceAll(refText, util.Caret, "")
+			if refText == util.Caret {
+				return
+			}
 			if "" != refText {
 				node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefSpace})
 				refTextNode := &ast.Node{Type: ast.NodeFileAnnotationRefText, Tokens: util.StrToBytes(refText)}
