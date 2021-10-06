@@ -112,6 +112,7 @@ func (t *Tree) incorporateLine(line []byte) {
 				t.Context.Tip = sb.Parent
 				t.Context.lastMatchedContainer = sb
 			} else {
+				t.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeSuperBlockCloseMarker})
 				t.Context.Tip.Close = true
 				t.Context.Tip = t.Context.Tip.Parent
 				t.Context.lastMatchedContainer = t.Context.Tip
