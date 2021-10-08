@@ -28,6 +28,11 @@ func (t *Tree) parseFileAnnotationRef(ctx *InlineContext) *ast.Node {
 		return nil
 	}
 
+	idPart := tokens[2:48]
+	if bytes.ContainsAny(idPart, "<>") {
+		return nil
+	}
+
 	var id, text []byte
 	ctx.pos += 2
 	var ok, matched bool
