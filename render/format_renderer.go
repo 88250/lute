@@ -1143,10 +1143,14 @@ func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
-		if nil == node.Previous && nil != node.Parent.Parent && nil != node.Parent.Parent.ListData && 3 == node.Parent.Parent.ListData.Typ {
-			// 任务列表起始位置使用 `<font>` 标签的预览问题 https://github.com/siyuan-note/siyuan/issues/33
-			if !bytes.HasPrefix(tokens, []byte(" ")) && ' ' != r.LastOut {
-				tokens = append([]byte(" "), tokens...)
+		if (nil == node.Previous || ast.NodeTaskListItemMarker == node.Previous.Type) &&
+			nil != node.Parent.Parent && nil != node.Parent.Parent.ListData && 3 == node.Parent.Parent.ListData.Typ {
+			if ' ' == r.LastOut {
+				tokens = bytes.TrimPrefix(tokens, []byte(" "))
+				if bytes.HasPrefix(tokens, []byte(util.Caret + " ")) {
+					tokens = bytes.TrimPrefix(tokens, []byte(util.Caret + " "))
+					tokens = append(util.CaretTokens, tokens...)
+				}
 			}
 		}
 		r.Write(tokens)
@@ -1599,6 +1603,8 @@ func (r *FormatRenderer) renderTaskListItemMarker(node *ast.Node, entering bool)
 			r.WriteByte(lex.ItemSpace)
 		}
 		r.WriteByte(lex.ItemCloseBracket)
+	} else {
+		r.WriteByte(' ')
 	}
 	return ast.WalkContinue
 }

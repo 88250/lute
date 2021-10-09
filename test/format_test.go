@@ -11,13 +11,13 @@
 package test
 
 import (
-	"github.com/88250/lute/parse"
-	"github.com/88250/lute/render"
 	"io/ioutil"
 	"strings"
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/parse"
+	"github.com/88250/lute/render"
 )
 
 type formatTest struct {
