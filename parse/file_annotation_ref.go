@@ -34,6 +34,7 @@ func (t *Tree) parseFileAnnotationRef(ctx *InlineContext) *ast.Node {
 	}
 
 	var id, text []byte
+	savePos := ctx.pos
 	ctx.pos += 2
 	var ok, matched bool
 	var passed, remains []byte
@@ -43,6 +44,7 @@ func (t *Tree) parseFileAnnotationRef(ctx *InlineContext) *ast.Node {
 		}
 		ctx.pos += len(passed)
 		if passed, remains, id = t.Context.parseFileAnnotationRefID(remains); 1 > len(passed) {
+			ctx.pos = savePos
 			break
 		}
 		ctx.pos += len(passed)
@@ -119,6 +121,35 @@ func (context *Context) parseFileAnnotationRefID(tokens []byte) (passed, remains
 		}
 	}
 	remains = tokens[i:]
+	idPart := tokens[:i]
+	if !bytes.HasPrefix(idPart, []byte("assets/")) {
+		return nil, nil, nil
+	}
+	idPart = bytes.TrimPrefix(idPart, []byte("assets/"))
+	if !bytes.Contains(idPart, []byte("/")) {
+		return
+	}
+	idParts := bytes.Split(idPart, []byte("/"))
+	if 2 != len(idParts) {
+		return
+	}
+	filePart := idParts[0]
+	if !bytes.Contains(filePart, []byte("-")) || !bytes.HasSuffix(bytes.ToLower(filePart), []byte(".pdf")) {
+		return
+	}
+	fileName := filePart[:len(filePart)-4]
+	if 23 > len(fileName) {
+		return
+	}
+	fileID := fileName[len(fileName)-22:]
+	if !ast.IsNodeIDPattern(string(fileID)) {
+		return
+	}
+	annotationIDPart := idParts[1]
+	if !ast.IsNodeIDPattern(string(annotationIDPart)) {
+		return
+	}
+
 	id = tokens[:i]
 	if 6 > len(remains) {
 		return

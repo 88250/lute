@@ -18,6 +18,10 @@ import (
 
 var fileAnnotationRefTests = []parseTest{
 
+	{"6", "<<assets/foo bar.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;assets/foo bar.pdf/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},
+	{"5", "<<foo bar-20210911230735-pzlpdt.txt/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;foo bar-20210911230735-pzlpdt.txt/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},
+	{"4", "<<assets/foo bar-20210911230735-pzlpdt.txt/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;assets/foo bar-20210911230735-pzlpdt.txt/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},
+	{"3", "<<assets/foo bar-20210911230735-pzlpdt.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;assets/foo bar-20210911230735-pzlpdt.pdf/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},
 	{"2", "foo<<<bar>>>bazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbaz", "<p>foo&lt;&lt;<bar>&gt;&gt;bazbazbazbazbazbazbazbazbazbazbazbazbazbazbazbaz</p>\n"},
 	{"1", "<<assets/foo bar-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>\"注解锚文本\"</p>\n"},
 	{"0", "<<assets/文件名-20210911230735-pzlpdtf.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>\"注解锚文本\"</p>\n"},
