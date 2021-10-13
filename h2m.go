@@ -226,14 +226,25 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					}
 					if strings.Contains(class, "language-") {
 						language := class[strings.Index(class, "language-")+len("language-"):]
+						language = strings.Split(language, " ")[0]
 						node.LastChild.CodeBlockInfo = []byte(language)
 					}
 				}
 
-				if atom.Code == n.FirstChild.DataAtom && nil != n.FirstChild.NextSibling && atom.Code == n.FirstChild.NextSibling.DataAtom {
-					// pre.code code 每个 code 为一行的结构，需要在 code 中间插入换行
-					for c := n.FirstChild.NextSibling; nil != c; c = c.NextSibling {
-						c.InsertBefore(&html.Node{DataAtom: atom.Br})
+				if atom.Code == n.FirstChild.DataAtom {
+					if nil != n.FirstChild.NextSibling && atom.Code == n.FirstChild.NextSibling.DataAtom {
+						// pre.code code 每个 code 为一行的结构，需要在 code 中间插入换行
+						for c := n.FirstChild.NextSibling; nil != c; c = c.NextSibling {
+							c.InsertBefore(&html.Node{DataAtom: atom.Br})
+						}
+					}
+					if nil != n.FirstChild.FirstChild && atom.Ol == n.FirstChild.FirstChild.DataAtom {
+						// CSDN 代码块：pre.code.ol.li
+						for li := n.FirstChild.FirstChild.FirstChild; nil != li; li = li.NextSibling {
+							if li != n.FirstChild.FirstChild.FirstChild {
+								li.InsertBefore(&html.Node{DataAtom: atom.Br})
+							}
+						}
 					}
 				}
 
