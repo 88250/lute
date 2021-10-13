@@ -18,6 +18,8 @@ import (
 
 var debugTests = []parseTest{
 
+	{"60", "123\n456\n| a | b |\n| ---| --- |\nd | e", "<p>123<br />\n456</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>d</td>\n<td>e</td>\n</tr>\n</tbody>\n</table>\n"},
+
 	{"59", "<img src=' foo.png'/>\n", "<p><img src=' foo.png'/></p>\n"},
 	{"58", "<img src=\" foo.png\"/>\n", "<p><img src=\" foo.png\"/></p>\n"},
 

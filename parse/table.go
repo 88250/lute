@@ -33,6 +33,7 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 					retParagraph = &ast.Node{Type: ast.NodeParagraph, Tokens: paragraph.Tokens[0:i]}
 				}
 				retTable = table
+				retTable.Tokens = tokens
 				break
 			}
 		}
