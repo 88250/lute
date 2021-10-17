@@ -11,6 +11,7 @@
 package lex
 
 import (
+	"bytes"
 	"unicode"
 )
 
@@ -137,12 +138,16 @@ func Split(tokens []byte, separator byte) (ret [][]byte) {
 // SplitWithoutBackslashEscape 使用 separator 作为分隔符将 Tokens 切分为多个子串，被反斜杠 \ 转义的字符不会计入切分。
 func SplitWithoutBackslashEscape(tokens []byte, separator byte) (ret [][]byte) {
 	length := len(tokens)
-	var i int
 	var token byte
 	var line []byte
-	for ; i < length; i++ {
+	for i := 0; i < length; i++ {
 		token = tokens[i]
 		if separator != token || IsBackslashEscapePunct(tokens, i) {
+			line = append(line, token)
+			continue
+		}
+
+		if ItemPipe == token && inInlineMath(tokens, i) {
 			line = append(line, token)
 			continue
 		}
@@ -154,6 +159,16 @@ func SplitWithoutBackslashEscape(tokens []byte, separator byte) (ret [][]byte) {
 		ret = append(ret, line)
 	}
 	return
+}
+
+func inInlineMath(tokens []byte, i int) bool {
+	if i+1 >= len(tokens) || i < 1 {
+		return false
+	}
+
+	start := bytes.IndexByte(tokens[:i], ItemDollar)
+	end := bytes.IndexByte(tokens[i+1:], ItemDollar)
+	return -1 < start && -1 < end
 }
 
 // ReplaceAll 会将 Tokens 中的所有 old 使用 new 替换。
