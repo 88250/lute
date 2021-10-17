@@ -167,6 +167,10 @@ func inInlineMath(tokens []byte, i int) bool {
 	}
 
 	start := bytes.IndexByte(tokens[:i], ItemDollar)
+	startClosed := 0 == bytes.Count(tokens[:i], []byte{ItemDollar})%2
+	if startClosed {
+		return false
+	}
 	end := bytes.IndexByte(tokens[i+1:], ItemDollar)
 	return -1 < start && -1 < end
 }

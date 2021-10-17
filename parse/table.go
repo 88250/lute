@@ -70,7 +70,8 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 	ret.TableAligns = aligns
 	ret.AppendChild(context.newTableHead(headRow))
 	for i := 2; i < length; i++ {
-		tableRow := context.parseTableRow(lex.TrimWhitespace(lines[i]), aligns, false)
+		line := lex.TrimWhitespace(lines[i])
+		tableRow := context.parseTableRow(line, aligns, false)
 		if nil == tableRow {
 			return
 		}

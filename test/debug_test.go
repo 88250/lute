@@ -18,7 +18,7 @@ import (
 
 var debugTests = []parseTest{
 
-	{"61", "| foo  | bar  |\n| ---- | ---- |\n| $a|b$  | $c|d$  |\n", "<table>\n<thead>\n<tr>\n<th>foo</th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><span class=\"language-math\">a|b</span>  | <span class=\"language-math\">c|d</span></td>\n<td></td>\n</tr>\n</tbody>\n</table>\n"},
+	{"61", "| foo  | bar  |\n| ---- | ---- |\n| $a|b$  | $c|d$  |\n", "<table>\n<thead>\n<tr>\n<th>foo</th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><span class=\"language-math\">a|b</span></td>\n<td><span class=\"language-math\">c|d</span></td>\n</tr>\n</tbody>\n</table>\n"},
 
 	{"60", "123\n456\n| a | b |\n| ---| --- |\nd | e", "<p>123<br />\n456</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>d</td>\n<td>e</td>\n</tr>\n</tbody>\n</table>\n"},
 
