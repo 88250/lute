@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -131,7 +132,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			} else if bytes.Equal(tags, []byte("</u>")) {
 				ret = &ast.Node{Type: ast.NodeUnderlineCloseMarker}
 				return
-			} else if bytes.Equal(tags, []byte("<br />")) {
+			} else if bytes.Equal(tags, []byte("<br />")) || bytes.Equal(tags, []byte("<br/>")) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
 			} else if bytes.HasPrefix(tags, []byte("<span data-type=")) {
