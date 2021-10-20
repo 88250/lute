@@ -1073,9 +1073,7 @@ func (r *ProtylePreviewRenderer) renderText(node *ast.Node, entering bool) ast.W
 		} else {
 			tokens = node.Tokens
 		}
-		tokens = html.EscapeHTML(tokens)
-		tokens = bytes.ReplaceAll(tokens, []byte("\n"), []byte("<br>")) // 导出软换行 https://github.com/siyuan-note/siyuan/issues/3207
-		r.Write(tokens)
+		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue
 }
