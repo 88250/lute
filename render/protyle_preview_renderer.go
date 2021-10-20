@@ -632,7 +632,10 @@ func (r *ProtylePreviewRenderer) renderFootnotesDef(node *ast.Node, entering boo
 		// r.WriteString("<li id=\"footnotes-def-" + node.FootnotesRefId + "\">")
 		// 在 li 上带 id 后，Pandoc HTML 转换 Docx 会有问题
 		r.WriteString("<li>")
-		node.FirstChild.PrependChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("<span id=\"footnotes-def-" + node.FootnotesRefId + "\"></span>")})
+		if 0 < len(node.FootnotesRefs) {
+			refId := node.FootnotesRefs[0].FootnotesRefId
+			node.FirstChild.PrependChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("<span id=\"footnotes-def-" + refId + "\"></span>")})
+		}
 	} else {
 		r.WriteString("</li>\n")
 	}
