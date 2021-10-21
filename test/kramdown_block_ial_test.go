@@ -11,10 +11,10 @@
 package test
 
 import (
-	"github.com/88250/lute/ast"
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
 )
 
 var kramdownBlockIALTests = []parseTest{

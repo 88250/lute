@@ -46,7 +46,7 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 		tokens := node.Tokens
 		if ast.NodeParagraph == typ {
 			if nil == tokens {
-				if ast.NodeListItem != node.Parent.Type {
+				if ast.NodeListItem != node.Parent.Type || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
 					// 解析 GFM 表节点后段落内容 Tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
 					// 在这里从语法树上移除空段落节点
 					next := node.Next
@@ -55,10 +55,13 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 					node.Next = next
 				}
 				return
-			} else if 0 < len(t.Context.parseKramdownIALInListItem(tokens)) {
-				// 解析 kramdown 列表时可能出现列表项下面为空（* \n{id:foo}），此时 IAL 应该被移除
-				node.Tokens = nil
-				return
+			} else if ial := t.Context.parseKramdownIALInListItem(tokens); 0 < len(ial) {
+				if nil != node.Previous {
+					// 解析 kramdown 列表时可能出现列表项下面为空（* \n{id:foo}），此时 IAL 应该用于覆盖前一个 List 的
+					node.Previous.SetIALAttr("id", ial[0][1])
+					node.Unlink()
+					return
+				}
 			}
 		}
 

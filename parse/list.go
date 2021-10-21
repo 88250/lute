@@ -110,7 +110,8 @@ func (context *Context) listFinalize(list *ast.Node) {
 				p.ID = id
 				p.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
 				li.AppendChild(p)
-				break
+				li = li.Next
+				continue
 			}
 
 			if 7 < len(li.FirstChild.Tokens) && '{' == li.FirstChild.Tokens[0] {
