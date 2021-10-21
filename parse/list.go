@@ -12,10 +12,11 @@ package parse
 
 import (
 	"bytes"
+	"strconv"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
-	"strconv"
 )
 
 // ListStart 判断列表、列表项（* - + 1.）或者任务列表项是否开始。
@@ -96,7 +97,20 @@ func (context *Context) listFinalize(list *ast.Node) {
 	if context.ParseOption.KramdownBlockIAL {
 		for li := list.FirstChild; nil != li; li = li.Next {
 			if nil == li.FirstChild {
-				continue
+				id := ast.NewNodeID()
+				ialTokens := []byte("{: id=\"" + id + "\"}")
+				li.KramdownIAL = [][]string{{"id", id}}
+				li.ID = id
+				li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+
+				id = ast.NewNodeID()
+				ialTokens = []byte("{: id=\"" + id + "\"}")
+				p := &ast.Node{Type: ast.NodeParagraph, ID: id}
+				p.KramdownIAL = [][]string{{"id", id}}
+				p.ID = id
+				p.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+				li.AppendChild(p)
+				break
 			}
 
 			if 7 < len(li.FirstChild.Tokens) && '{' == li.FirstChild.Tokens[0] {

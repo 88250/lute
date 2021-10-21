@@ -44,14 +44,22 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 	// 只有如下几种类型的块节点需要生成行级子节点
 	if ast.NodeParagraph == typ || ast.NodeHeading == typ || ast.NodeTableCell == typ {
 		tokens := node.Tokens
-		if ast.NodeParagraph == typ && nil == tokens {
-			// 解析 GFM 表节点后段落内容 Tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
-			// 在这里从语法树上移除空段落节点
-			next := node.Next
-			node.Unlink()
-			// Unlink 会将后一个兄弟节点置空，此处是在在遍历过程中修改树结构，所以需要保持继续迭代后面的兄弟节点
-			node.Next = next
-			return
+		if ast.NodeParagraph == typ {
+			if nil == tokens {
+				if ast.NodeListItem != node.Parent.Type {
+					// 解析 GFM 表节点后段落内容 Tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
+					// 在这里从语法树上移除空段落节点
+					next := node.Next
+					node.Unlink()
+					// Unlink 会将后一个兄弟节点置空，此处是在在遍历过程中修改树结构，所以需要保持继续迭代后面的兄弟节点
+					node.Next = next
+				}
+				return
+			} else if 0 < len(t.Context.parseKramdownIALInListItem(tokens)) {
+				// 解析 kramdown 列表时可能出现列表项下面为空（* \n{id:foo}），此时 IAL 应该被移除
+				node.Tokens = nil
+				return
+			}
 		}
 
 		length := len(tokens)
