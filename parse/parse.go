@@ -41,9 +41,16 @@ func (t *Tree) finalParseBlockIAL() {
 		return
 	}
 
+	// 补全空段落
+	var appends []*ast.Node
+
 	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering || !n.IsBlock() || ast.NodeDocument == n.Type || ast.NodeKramdownBlockIAL == n.Type {
 			return ast.WalkContinue
+		}
+
+		if ast.NodeBlockquote == n.Type && nil != n.FirstChild && nil == n.FirstChild.Next {
+			appends = append(appends, n)
 		}
 
 		ial := n.Next
@@ -55,6 +62,16 @@ func (t *Tree) finalParseBlockIAL() {
 		n.ID = n.IALAttr("id")
 		return ast.WalkContinue
 	})
+
+	for _, n := range appends {
+		id := ast.NewNodeID()
+		ialTokens := []byte("{: id=\"" + id + "\"}")
+		p := &ast.Node{Type: ast.NodeParagraph, ID: id}
+		p.KramdownIAL = [][]string{{"id", id}}
+		p.ID = id
+		p.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+		n.AppendChild(p)
+	}
 
 	var docIAL *ast.Node
 	var id string

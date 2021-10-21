@@ -15,7 +15,7 @@ import (
 	"github.com/88250/lute/lex"
 )
 
-// 判断块引用（>）是否开始。
+// BlockquoteStart 判断块引用（>）是否开始。
 func BlockquoteStart(t *Tree, container *ast.Node) int {
 	if t.Context.indented {
 		return 0
