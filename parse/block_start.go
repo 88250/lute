@@ -30,7 +30,6 @@ func blockStarts() []blockStartFunc {
 		IndentCodeBlockStart,
 		FootnotesStart,
 		IALStart,
-		BlockEmbedStart,
 		BlockQueryEmbedStart,
 		SuperBlockStart,
 	}

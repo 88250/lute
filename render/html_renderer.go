@@ -137,10 +137,6 @@ func NewHtmlRenderer(tree *parse.Tree, options *Options) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
-	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
-	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
-	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
-	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
 	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
 	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
@@ -345,35 +341,6 @@ func (r *HtmlRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
 		r.Write(node.Tokens)
-		r.WriteByte(lex.ItemDoublequote)
-	}
-	return ast.WalkContinue
-}
-
-func (r *HtmlRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Newline()
-		r.handleKramdownBlockIAL(node)
-		r.Tag("div", node.KramdownIAL, false)
-	} else {
-		r.Tag("/div", nil, false)
-		r.Newline()
-	}
-	return ast.WalkContinue
-}
-
-func (r *HtmlRenderer) renderBlockEmbedID(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *HtmlRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *HtmlRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteByte(lex.ItemDoublequote)
-		r.Write(html.EscapeHTML(node.Tokens))
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue

@@ -71,7 +71,6 @@ func NewEChartsJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeSub] = ret.renderSub
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
-	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.DefaultRendererFunc = ret.renderDefault
 	return ret
@@ -126,13 +125,6 @@ func (r *EChartsJSONRenderer) renderSub(node *ast.Node, entering bool) ast.WalkS
 func (r *EChartsJSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.leaf("BlockQueryEmbed\n{{script}}", node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *EChartsJSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.leaf("BlockEmbed\n!((id))", node)
 	}
 	return ast.WalkSkipChildren
 }

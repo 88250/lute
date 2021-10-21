@@ -770,28 +770,6 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeThematicBreak
 		tree.Context.Tip.AppendChild(node)
 		return
-	case ast.NodeBlockEmbed:
-		text := lute.domText(n)
-		if "" == text {
-			return
-		}
-
-		t := parse.Parse("", []byte(text), lute.ParseOptions)
-		t.Root.LastChild.Unlink() // 移除 doc IAL
-		if blockEmbed := t.Root.FirstChild; nil != blockEmbed && ast.NodeBlockEmbed == blockEmbed.Type {
-			ial, id := node.KramdownIAL, node.ID
-			node = blockEmbed
-			node.KramdownIAL, node.ID = ial, id
-			next := blockEmbed.Next
-			tree.Context.Tip.AppendChild(node)
-			appendNextToTip(next, tree)
-			return
-		}
-		node.Type = ast.NodeText
-		node.Tokens = []byte(text)
-		tree.Context.Tip.AppendChild(node)
-		defer tree.Context.ParentTip()
-		return
 	case ast.NodeIFrame:
 		node.Type = ast.NodeIFrame
 		n = lute.domChild(n.FirstChild, atom.Iframe)

@@ -124,7 +124,6 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeFileAnnotationRefID] = ret.renderFileAnnotationRefID
 	ret.RendererFuncs[ast.NodeFileAnnotationRefSpace] = ret.renderFileAnnotationRefSpace
 	ret.RendererFuncs[ast.NodeFileAnnotationRefText] = ret.renderFileAnnotationRefText
-	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderNodeBlockEmbed
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
@@ -1247,33 +1246,6 @@ func (r *BlockRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Walk
 
 func (r *BlockRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderNodeBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	// 嵌入节点 !((id)) 已被废弃，这里按照段落渲染
-	if entering {
-		var attrs [][]string
-		node.Type = ast.NodeParagraph
-		r.blockNodeAttrs(node, &attrs, "p")
-		r.Tag("div", attrs, false)
-		attrs = [][]string{}
-		r.contenteditable(node, &attrs)
-		r.spellcheck(&attrs)
-		r.Tag("div", attrs, false)
-		idNode := node.ChildByType(ast.NodeBlockEmbedID)
-		id := idNode.TokensStr()
-		r.WriteString("!((" + id + "))")
-	} else {
-		if (nil != node.LastChild && util.Caret == node.LastChild.TokensStr() && nil != node.LastChild.Previous && ast.NodeImage == node.LastChild.Previous.Type) ||
-			(nil != node.LastChild && ast.NodeImage == node.LastChild.Type) ||
-			(nil != node.LastChild && ast.NodeKramdownSpanIAL == node.LastChild.Type && nil != node.LastChild.Previous && ast.NodeImage == node.LastChild.Previous.Type) {
-			r.WriteString("\n") // 主要是为了解决 img 插入符后置问题
-		}
-		r.Tag("/div", nil, false)
-		r.renderIAL(node)
-		r.Tag("/div", nil, false)
-	}
-	return ast.WalkSkipChildren
 }
 
 func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {

@@ -288,7 +288,7 @@ func (n *Node) Text() (ret string) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeBlockEmbedText, NodeFootnotesRef:
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeFootnotesRef:
 			buf.Write(n.Tokens)
 		}
 		return WalkContinue
@@ -304,7 +304,7 @@ func (n *Node) TextLen() (ret int) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeBlockEmbedText, NodeFootnotesRef:
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeFootnotesRef:
 			buf = append(buf, n.Tokens...)
 		}
 		return WalkContinue
@@ -320,7 +320,7 @@ func (n *Node) Content() (ret string) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeBlockEmbedText, NodeFootnotesRef,
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeFootnotesRef,
 			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
 			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
 			NodeGitConflictContent:
@@ -339,7 +339,7 @@ func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeBlockEmbedText, NodeFootnotesRef,
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeFootnotesRef,
 			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
 			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
 			NodeGitConflictContent:
@@ -532,7 +532,7 @@ func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
-		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed,
+		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockQueryEmbed,
 		NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget:
 		return true
 	}
@@ -566,7 +566,7 @@ func (n *Node) IsMarker() bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockEmbed, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio:
 		return true
 	}
 	return false
@@ -727,15 +727,6 @@ const (
 	NodeBlockRefSpace               NodeType = 432 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
 	NodeBlockRefText                NodeType = 433 // 内容块引用锚文本
 	NodeBlockRefTextTplRenderResult NodeType = 434 // 内容块引用锚文本模板渲染结果
-
-	// 内容块嵌入（Block Embed） https://github.com/88250/lute/issues/91
-	// 该节点已经废弃。
-
-	NodeBlockEmbed                    NodeType = 440 // 内容块嵌入节点
-	NodeBlockEmbedID                  NodeType = 441 // 被引用的内容块（定义块） ID
-	NodeBlockEmbedSpace               NodeType = 442 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
-	NodeBlockEmbedText                NodeType = 443 // 内容块嵌入锚文本
-	NodeBlockEmbedTextTplRenderResult NodeType = 444 // 内容块嵌入锚文本模板渲染结果
 
 	// ==Mark== 标记语法 https://github.com/88250/lute/issues/84
 

@@ -283,7 +283,7 @@ func _continue(n *ast.Node, context *Context) int {
 		return SuperBlockContinue(n, context)
 	case ast.NodeGitConflict:
 		return GitConflictContinue(n, context)
-	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeBlockEmbed, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed,
+	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed,
 		ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio, ast.NodeWidget:
 		return 1
 	}

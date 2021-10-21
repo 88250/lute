@@ -134,10 +134,6 @@ func NewJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
-	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
-	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
-	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
-	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
 	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
 	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
@@ -935,31 +931,6 @@ func (r *JSONRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool
 		r.val(ast.NodeBlockQueryEmbed, util.BytesToStr(node.Tokens))
 	} else {
 		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-func (r *JSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.flag(node)
-	} else {
-		r.closeObj(node)
-	}
-	return ast.WalkContinue
-}
-
-func (r *JSONRenderer) renderBlockEmbedID(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *JSONRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *JSONRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.val(ast.NodeBlockEmbed, util.BytesToStr(node.Tokens))
 	}
 	return ast.WalkContinue
 }

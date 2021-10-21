@@ -122,7 +122,6 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeFileAnnotationRefID] = ret.renderFileAnnotationRefID
 	ret.RendererFuncs[ast.NodeFileAnnotationRefSpace] = ret.renderFileAnnotationRefSpace
 	ret.RendererFuncs[ast.NodeFileAnnotationRefText] = ret.renderFileAnnotationRefText
-	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderNodeBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockRefTextTplRenderResult] = ret.renderBlockRefTextTplRenderResult
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
@@ -139,10 +138,6 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeKramdownSpanIAL] = ret.renderKramdownSpanIAL
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbedScript] = ret.renderBlockQueryEmbedScript
-	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
-	ret.RendererFuncs[ast.NodeBlockEmbedID] = ret.renderBlockEmbedID
-	ret.RendererFuncs[ast.NodeBlockEmbedSpace] = ret.renderBlockEmbedSpace
-	ret.RendererFuncs[ast.NodeBlockEmbedText] = ret.renderBlockEmbedText
 	ret.RendererFuncs[ast.NodeTag] = ret.renderTag
 	ret.RendererFuncs[ast.NodeTagOpenMarker] = ret.renderTagOpenMarker
 	ret.RendererFuncs[ast.NodeTagCloseMarker] = ret.renderTagCloseMarker
@@ -528,44 +523,6 @@ func (r *FormatRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) as
 	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		if nil != node.Previous {
-			if ast.NodeTaskListItemMarker != node.Previous.Type {
-				r.Newline()
-			} else {
-				r.WriteByte(lex.ItemSpace)
-			}
-		}
-	} else {
-		r.Newline()
-	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderBlockEmbedID(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Write(node.Tokens)
-	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderBlockEmbedSpace(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteByte(lex.ItemSpace)
-	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderBlockEmbedText(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
-		r.WriteByte(lex.ItemDoublequote)
-	}
-	return ast.WalkContinue
-}
-
 func (r *FormatRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -617,10 +574,6 @@ func (r *FormatRenderer) renderFileAnnotationRefText(node *ast.Node, entering bo
 		r.Write(node.Tokens)
 		r.WriteByte(lex.ItemDoublequote)
 	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderNodeBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
@@ -1147,8 +1100,8 @@ func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 			nil != node.Parent.Parent && nil != node.Parent.Parent.ListData && 3 == node.Parent.Parent.ListData.Typ {
 			if ' ' == r.LastOut {
 				tokens = bytes.TrimPrefix(tokens, []byte(" "))
-				if bytes.HasPrefix(tokens, []byte(util.Caret + " ")) {
-					tokens = bytes.TrimPrefix(tokens, []byte(util.Caret + " "))
+				if bytes.HasPrefix(tokens, []byte(util.Caret+" ")) {
+					tokens = bytes.TrimPrefix(tokens, []byte(util.Caret+" "))
 					tokens = append(util.CaretTokens, tokens...)
 				}
 			}

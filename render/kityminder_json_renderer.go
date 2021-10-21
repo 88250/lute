@@ -43,7 +43,6 @@ func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeTable] = ret.renderTable
 	ret.RendererFuncs[ast.NodeToC] = ret.renderToC
 	ret.RendererFuncs[ast.NodeYamlFrontMatter] = ret.renderYamlFrontMatter
-	ret.RendererFuncs[ast.NodeBlockEmbed] = ret.renderBlockEmbed
 	ret.RendererFuncs[ast.NodeBlockQueryEmbed] = ret.renderBlockQueryEmbed
 	ret.RendererFuncs[ast.NodeKramdownBlockIAL] = ret.renderKramdownBlockIAL
 	ret.DefaultRendererFunc = ret.renderDefault
@@ -55,19 +54,6 @@ func (r *KityMinderJSONRenderer) renderDefault(n *ast.Node, entering bool) ast.W
 }
 
 func (r *KityMinderJSONRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.openObj()
-		r.data(node)
-		r.openChildren(node)
-	} else {
-		r.closeChildren(node)
-		r.closeObj()
-		r.comma(node)
-	}
-	return ast.WalkSkipChildren
-}
-
-func (r *KityMinderJSONRenderer) renderBlockEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
 		r.data(node)
@@ -315,7 +301,7 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 				return ast.WalkSkipChildren
 			}
 
-			if ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeBlockRefText == n.Type || ast.NodeBlockEmbedText == n.Type ||
+			if ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeBlockRefText == n.Type ||
 				ast.NodeCodeSpanContent == n.Type || ast.NodeCodeBlockCode == n.Type || ast.NodeLinkTitle == n.Type || ast.NodeMathBlockContent == n.Type ||
 				ast.NodeInlineMathContent == n.Type || ast.NodeYamlFrontMatterContent == n.Type {
 				buf.Write(n.Tokens)
