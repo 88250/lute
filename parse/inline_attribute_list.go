@@ -108,6 +108,14 @@ func IAL2Map(ial [][]string) (ret map[string]string) {
 	return
 }
 
+func IAL2MapUnEsc(ial [][]string) (ret map[string]string) {
+	ret = map[string]string{}
+	for _, kv := range ial {
+		ret[kv[0]] = kv[1]
+	}
+	return
+}
+
 func Map2IAL(properties map[string]string) (ret [][]string) {
 	ret = [][]string{}
 	for k, v := range properties {
