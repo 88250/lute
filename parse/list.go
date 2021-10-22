@@ -97,20 +97,23 @@ func (context *Context) listFinalize(list *ast.Node) {
 	if context.ParseOption.KramdownBlockIAL {
 		for li := list.FirstChild; nil != li; li = li.Next {
 			if nil == li.FirstChild {
-				id := ast.NewNodeID()
-				ialTokens := []byte("{: id=\"" + id + "\"}")
-				li.KramdownIAL = [][]string{{"id", id}}
-				li.ID = id
-				li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+				if ast.NodeKramdownBlockIAL != li.Type {
+					id := ast.NewNodeID()
+					ialTokens := []byte("{: id=\"" + id + "\"}")
+					li.KramdownIAL = [][]string{{"id", id}}
+					li.ID = id
+					li.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
 
-				id = ast.NewNodeID()
-				ialTokens = []byte("{: id=\"" + id + "\"}")
-				p := &ast.Node{Type: ast.NodeParagraph, ID: id}
-				p.KramdownIAL = [][]string{{"id", id}}
-				p.ID = id
-				p.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
-				li.AppendChild(p)
-				li = li.Next
+					id = ast.NewNodeID()
+					ialTokens = []byte("{: id=\"" + id + "\"}")
+					p := &ast.Node{Type: ast.NodeParagraph, ID: id}
+					p.KramdownIAL = [][]string{{"id", id}}
+					p.ID = id
+					p.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+					li.AppendChild(p)
+					li = li.Next
+				}
+
 				continue
 			}
 
