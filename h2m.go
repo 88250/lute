@@ -501,11 +501,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(lute.domText(n))})
 		tree.Context.Tip.AppendChild(node)
 		return
-	//case atom.Figure:
-	//	node.Type = ast.NodeParagraph
-	//	tree.Context.Tip.AppendChild(node)
-	//	tree.Context.Tip = node
-	//	defer tree.Context.ParentTip()
+	case atom.Figure:
+		node.Type = ast.NodeParagraph
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	default:
 	}
 
