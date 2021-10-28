@@ -604,7 +604,7 @@ func (r *BaseRenderer) tagSrcPath(tokens []byte) []byte {
 }
 
 func (r *BaseRenderer) isLastNode(treeRoot, node *ast.Node) bool {
-	if treeRoot == node {
+	if treeRoot == node || nil == node || nil == node.Parent {
 		return true
 	}
 	if nil != node.Next {
@@ -616,7 +616,7 @@ func (r *BaseRenderer) isLastNode(treeRoot, node *ast.Node) bool {
 
 	var n *ast.Node
 	for n = node.Parent; ; n = n.Parent {
-		if nil == n {
+		if nil == n || nil == n.Parent {
 			return true
 		}
 		if ast.NodeDocument == n.Parent.Type {
