@@ -361,7 +361,7 @@ func (r *HtmlRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.Wa
 func (r *HtmlRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
+		r.Write(html.EscapeHTML(node.Tokens))
 	} else {
 		r.WriteByte(lex.ItemDoublequote)
 	}
@@ -383,7 +383,7 @@ func (r *HtmlRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering boo
 func (r *HtmlRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
+		r.Write(html.EscapeHTML(node.Tokens))
 	} else {
 		r.WriteByte(lex.ItemDoublequote)
 	}

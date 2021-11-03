@@ -358,7 +358,7 @@ func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkSt
 		if refTextNode := node.ChildByType(ast.NodeBlockRefText); nil != refTextNode {
 			anchor = strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
 		}
-		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", anchor}}
+		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", html.EscapeHTMLStr(anchor)}}
 		r.Tag("span", attrs, false)
 		refTextNode := node.ChildByType(ast.NodeBlockRefTextTplRenderResult)
 		var refText string
@@ -398,7 +398,7 @@ func (r *BlockRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) a
 		if refTextNode := node.ChildByType(ast.NodeFileAnnotationRefText); nil != refTextNode {
 			anchor = strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
 		}
-		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}, {"data-anchor", anchor}}
+		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}, {"data-anchor", html.EscapeHTMLStr(anchor)}}
 		r.Tag("span", attrs, false)
 		r.WriteString(html.EscapeHTMLStr(anchor))
 		r.Tag("/span", nil, false)

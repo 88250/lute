@@ -18,6 +18,7 @@ import (
 
 var blockRefTests = []parseTest{
 
+	{"1", "((20201105103725-dd01qas \"foo<a>bar\"))", "<p>\"foo&lt;a&gt;bar\"</p>\n"},
 	{"1", "((20201105103725-dd01qas \"$foo$\"))", "<p>\"$foo$\"</p>\n"},
 	{"0", "((20201105103725-dd01qas \"思源笔记\"))", "<p>\"思源笔记\"</p>\n"},
 }
