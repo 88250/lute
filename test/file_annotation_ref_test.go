@@ -18,6 +18,7 @@ import (
 
 var fileAnnotationRefTests = []parseTest{
 
+	{"7", "<<assets/foo bar.pdf/20210911230820-lhiaysx \"注解<锚文本>\">>", "<p>&lt;&lt;assets/foo bar.pdf/20210911230820-lhiaysx &quot;注解&lt;锚文本&gt;&quot;&gt;&gt;</p>\n"},
 	{"6", "<<assets/foo bar.pdf/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;assets/foo bar.pdf/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},
 	{"5", "<<foo bar-20210911230735-pzlpdt.txt/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;foo bar-20210911230735-pzlpdt.txt/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},
 	{"4", "<<assets/foo bar-20210911230735-pzlpdt.txt/20210911230820-lhiaysx \"注解锚文本\">>", "<p>&lt;&lt;assets/foo bar-20210911230735-pzlpdt.txt/20210911230820-lhiaysx &quot;注解锚文本&quot;&gt;&gt;</p>\n"},

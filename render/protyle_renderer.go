@@ -367,7 +367,7 @@ func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkSt
 		} else {
 			refText = anchor
 		}
-		r.WriteString(refText)
+		r.WriteString(html.EscapeHTMLStr(refText))
 		r.Tag("/span", nil, false)
 		return ast.WalkSkipChildren
 	}
@@ -400,7 +400,7 @@ func (r *BlockRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) a
 		}
 		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}, {"data-anchor", anchor}}
 		r.Tag("span", attrs, false)
-		r.WriteString(anchor)
+		r.WriteString(html.EscapeHTMLStr(anchor))
 		r.Tag("/span", nil, false)
 		return ast.WalkSkipChildren
 	}
@@ -1071,7 +1071,7 @@ func (r *BlockRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkS
 func (r *BlockRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if ast.NodeImage != node.Parent.Type {
-			r.Write(node.Tokens)
+			r.Write(html.EscapeHTML(node.Tokens))
 		}
 	}
 	return ast.WalkContinue

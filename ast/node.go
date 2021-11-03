@@ -442,7 +442,7 @@ func (n *Node) Unlink() {
 
 // AppendTokens 添加 Tokens。
 func (n *Node) AppendTokens(tokens []byte) {
-	n.Tokens = append(n.Tokens, tokens...)
+	n.Tokens = append(n.Tokens, string(tokens)...)
 }
 
 // InsertAfter 在当前节点后插入一个兄弟节点。
