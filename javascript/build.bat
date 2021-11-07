@@ -14,3 +14,4 @@ SET GOOS=linux
 
 go list -tags javascript  -f {{.Deps}}
 gopherjs build --tags javascript -o lute.min.js -m
+powershell -Command "(gc lute.min.js) -replace '//# sourceMappingURL=lute.min.js.map', '' | Out-File -encoding ASCII lute.min.js"
