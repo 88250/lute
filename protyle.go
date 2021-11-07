@@ -315,6 +315,30 @@ func (lute *Lute) CancelList(ivHTML string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) CancelBlockquote(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	if ast.NodeBlockquote != tree.Root.FirstChild.Type {
+		return ivHTML
+	}
+
+	bq := tree.Root.FirstChild
+
+	var appends, unlinks []*ast.Node
+	for sub := bq.FirstChild; nil != sub; sub = sub.Next {
+		if ast.NodeBlockquoteMarker != sub.Type {
+			appends = append(appends, sub)
+		}
+		unlinks = append(unlinks, sub)
+	}
+	for _, c := range appends {
+		tree.Root.AppendChild(c)
+	}
+	bq.Unlink()
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) HLevel(ivHTML string, level string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild

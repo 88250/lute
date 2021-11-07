@@ -181,6 +181,33 @@ func TestCancelList(t *testing.T) {
 	ast.Testing = false
 }
 
+var cancelBlockquoteTests = []*parseTest{
+	{"0", "<div data-node-id=\"20211107212413-7y4w6vm\" data-node-index=\"1\" data-type=\"NodeBlockquote\" class=\"bq\" updated=\"20211107235603\"><div data-node-id=\"20211107235603-js5hmfn\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20211107235606\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20211107235606-7ceugn5\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20211107235607\"><div contenteditable=\"true\" spellcheck=\"false\" data-tip=\"键入文字或 '/' 选择\">bar</div><div class=\"protyle-attr\"></div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<div data-node-id=\"20211107235603-js5hmfn\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20211107235606\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div><div data-node-id=\"20211107235606-7ceugn5\" data-node-index=\"2\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20211107235607\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>"},
+}
+
+func TestCancelBlockquote(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+
+	ast.Testing = true
+	for _, test := range cancelBlockquoteTests {
+		ovHTML := luteEngine.CancelBlockquote(test.from)
+		if test.to != ovHTML {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, ovHTML, test.from)
+		}
+	}
+	ast.Testing = false
+}
+
 var ul2olTests = []*parseTest{}
 
 func TestUL2OL(t *testing.T) {
