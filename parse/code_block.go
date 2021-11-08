@@ -140,15 +140,6 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 }
 
 func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num int) (ok bool, closeFence []byte) {
-	if context.ParseOption.KramdownBlockIAL && simpleCheckIsBlockIAL(tokens) {
-		// 判断 IAL 打断
-		if ial := context.parseKramdownBlockIAL(tokens); 0 < len(ial) {
-			context.Tip.KramdownIAL = ial
-			context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: tokens})
-			return true, context.Tip.CodeBlockOpenFence
-		}
-	}
-
 	closeMarker := tokens[0]
 	if closeMarker != openMarker {
 		return false, nil
