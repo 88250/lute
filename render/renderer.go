@@ -164,7 +164,7 @@ type BaseRenderer struct {
 
 // NewBaseRenderer 构造一个 BaseRenderer。
 func NewBaseRenderer(tree *parse.Tree, options *Options) *BaseRenderer {
-	ret := &BaseRenderer{RendererFuncs: map[ast.NodeType]RendererFunc{}, ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Options: options, Tree: tree}
+	ret := &BaseRenderer{RendererFuncs: make(map[ast.NodeType]RendererFunc, 192), ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Options: options, Tree: tree}
 	ret.Writer = &bytes.Buffer{}
 	ret.Writer.Grow(4096)
 	return ret

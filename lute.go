@@ -17,6 +17,7 @@ import (
 	"sync"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
@@ -214,18 +215,29 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 	}
 }
 
-// FormatNode 使用指定的 options 格式化 node，返回格式化后的 Markdown 文本。
-func FormatNode(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
+var (
+	formatRendererSync = render.NewFormatRenderer(nil, nil)
+	formatRendererLock = sync.Mutex{}
+)
+
+// FormatNodeSync 使用指定的 options 格式化 node，返回格式化后的 Markdown 文本。
+func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
+	formatRendererLock.Lock()
+	defer formatRendererLock.Unlock()
+
 	root := &ast.Node{Type: ast.NodeDocument}
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
-	renderer := render.NewFormatRenderer(tree, renderOptions)
-	renderer.Writer = &bytes.Buffer{}
-	renderer.NodeWriterStack = append(renderer.NodeWriterStack, renderer.Writer)
+	formatRendererSync.Tree = tree
+	formatRendererSync.Options = renderOptions
+	formatRendererSync.LastOut = lex.ItemNewline
+	formatRendererSync.Writer = &bytes.Buffer{}
+	formatRendererSync.Writer.Grow(4096)
+	formatRendererSync.NodeWriterStack = []*bytes.Buffer{formatRendererSync.Writer}
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
-		rendererFunc := renderer.RendererFuncs[n.Type]
+		rendererFunc := formatRendererSync.RendererFuncs[n.Type]
 		return rendererFunc(n, entering)
 	})
-	return util.BytesToStr(bytes.TrimSpace(renderer.Writer.Bytes()))
+	return util.BytesToStr(bytes.TrimSpace(formatRendererSync.Writer.Bytes()))
 }
 
 // ProtylePreview 使用指定的 options 渲染 tree 为 Protyle 预览 HTML。
