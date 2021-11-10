@@ -230,14 +230,19 @@ func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *
 	formatRendererSync.Tree = tree
 	formatRendererSync.Options = renderOptions
 	formatRendererSync.LastOut = lex.ItemNewline
-	formatRendererSync.Writer = &bytes.Buffer{}
-	formatRendererSync.Writer.Grow(4096)
 	formatRendererSync.NodeWriterStack = []*bytes.Buffer{formatRendererSync.Writer}
+
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		rendererFunc := formatRendererSync.RendererFuncs[n.Type]
 		return rendererFunc(n, entering)
 	})
-	return util.BytesToStr(bytes.TrimSpace(formatRendererSync.Writer.Bytes()))
+
+	ret := util.BytesToStr(bytes.TrimSpace(formatRendererSync.Writer.Bytes()))
+	formatRendererSync.Tree = nil
+	formatRendererSync.Options = nil
+	formatRendererSync.Writer.Reset()
+	formatRendererSync.NodeWriterStack = nil
+	return ret
 }
 
 // ProtylePreview 使用指定的 options 渲染 tree 为 Protyle 预览 HTML。
