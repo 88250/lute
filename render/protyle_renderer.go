@@ -354,11 +354,12 @@ func (r *BlockRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
 func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idNode := node.ChildByType(ast.NodeBlockRefID)
-		var anchor string
+		var anchor, dataAnchor string
 		if refTextNode := node.ChildByType(ast.NodeBlockRefText); nil != refTextNode {
-			anchor = strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
+			anchor = refTextNode.Text()
+			dataAnchor = strings.ReplaceAll(anchor, util.Caret, "")
 		}
-		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", html.EscapeHTMLStr(anchor)}}
+		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", html.EscapeHTMLStr(dataAnchor)}}
 		r.Tag("span", attrs, false)
 		refTextNode := node.ChildByType(ast.NodeBlockRefTextTplRenderResult)
 		var refText string
@@ -395,10 +396,12 @@ func (r *BlockRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) a
 		idNode := node.ChildByType(ast.NodeFileAnnotationRefID)
 		id := idNode.TokensStr()
 		anchor := id
+		var dataAnchor string
 		if refTextNode := node.ChildByType(ast.NodeFileAnnotationRefText); nil != refTextNode {
-			anchor = strings.ReplaceAll(refTextNode.Text(), util.Caret, "")
+			anchor = refTextNode.Text()
+			dataAnchor = strings.ReplaceAll(anchor, util.Caret, "")
 		}
-		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}, {"data-anchor", html.EscapeHTMLStr(anchor)}}
+		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}, {"data-anchor", html.EscapeHTMLStr(dataAnchor)}}
 		r.Tag("span", attrs, false)
 		r.WriteString(html.EscapeHTMLStr(anchor))
 		r.Tag("/span", nil, false)

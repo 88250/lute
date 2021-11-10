@@ -1031,6 +1031,12 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(id)})
 			refText := strings.ReplaceAll(lute.domAttrValue(n, "data-anchor"), "\n", "")
 			if "" != refText {
+				if nil != n.FirstChild {
+					if text := lute.domText(n.FirstChild); strings.Contains(text, util.Caret) {
+						refText = text
+					}
+				}
+
 				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
 				refTextNode := &ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(refText)}
 				node.AppendChild(refTextNode)
@@ -1038,9 +1044,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			tree.Context.Tip.AppendChild(node)
-			if nil != n.FirstChild && strings.Contains(n.FirstChild.Data, util.Caret) {
-				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-			}
 			return
 		} else if "file-annotation-ref" == dataType {
 			node.Type = ast.NodeFileAnnotationRef
@@ -1063,9 +1066,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeGreater})
 			node.AppendChild(&ast.Node{Type: ast.NodeGreater})
 			tree.Context.Tip.AppendChild(node)
-			if nil != n.FirstChild && strings.Contains(n.FirstChild.Data, util.Caret) {
-				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-			}
 			return
 		} else if "img" == dataType {
 			img := lute.domChild(n, atom.Img) //n.FirstChild.NextSibling.FirstChild.NextSibling
