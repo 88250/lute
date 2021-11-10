@@ -237,7 +237,7 @@ func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *
 		return rendererFunc(n, entering)
 	})
 
-	ret := util.BytesToStr(bytes.TrimSpace(formatRendererSync.Writer.Bytes()))
+	ret := strings.TrimSpace(formatRendererSync.Writer.String())
 	formatRendererSync.Tree = nil
 	formatRendererSync.Options = nil
 	formatRendererSync.Writer.Reset()

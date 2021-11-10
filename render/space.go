@@ -19,9 +19,9 @@ import (
 
 // Space 会把 tokens 中的中西文之间加上空格。
 func (r *BaseRenderer) Space(tokens []byte) []byte {
-	text := util.BytesToStr(tokens)
+	text := string(tokens)
 	text = Space0(text)
-	return util.StrToBytes(text)
+	return []byte(text)
 }
 
 func Space0(text string) (ret string) {
