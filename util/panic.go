@@ -17,7 +17,7 @@ import (
 	"runtime/debug"
 )
 
-// Recover recovers a panic.
+// RecoverPanic recovers a panic.
 func RecoverPanic(err *error) {
 	if e := recover(); nil != e {
 		stack := debug.Stack()

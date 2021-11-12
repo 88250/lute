@@ -160,7 +160,11 @@ func TestFormatNodeSync(t *testing.T) {
 	}
 
 	luteEngine.RenderOptions.AutoSpace = false
-	output = lute.FormatNodeSync(tree.Root, luteEngine.ParseOptions, luteEngine.RenderOptions)
+	output, err := lute.FormatNodeSync(tree.Root, luteEngine.ParseOptions, luteEngine.RenderOptions)
+	if nil != err {
+		t.Fatalf("format node [%s] failed: %s", md, err)
+	}
+
 	expected = "foo中文bar"
 	if expected != output {
 		t.Fatalf("format node [%s] failed\nexpected\n%q\ngot\n%q\n", md, expected, output)

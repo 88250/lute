@@ -13,6 +13,7 @@ package lute
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 	"sync"
 
@@ -221,9 +222,10 @@ var (
 )
 
 // FormatNodeSync 使用指定的 options 格式化 node，返回格式化后的 Markdown 文本。
-func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
+func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) (ret string, err error) {
 	formatRendererLock.Lock()
 	defer formatRendererLock.Unlock()
+	defer util.RecoverPanic(&err)
 
 	root := &ast.Node{Type: ast.NodeDocument}
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
@@ -234,15 +236,19 @@ func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *
 
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		rendererFunc := formatRendererSync.RendererFuncs[n.Type]
+		if nil == rendererFunc {
+			err = errors.New("not found renderer for node [type=" + n.Type.String() + "]")
+			return ast.WalkStop
+		}
 		return rendererFunc(n, entering)
 	})
 
-	ret := strings.TrimSpace(formatRendererSync.Writer.String())
+	ret = strings.TrimSpace(formatRendererSync.Writer.String())
 	formatRendererSync.Tree = nil
 	formatRendererSync.Options = nil
 	formatRendererSync.Writer.Reset()
 	formatRendererSync.NodeWriterStack = nil
-	return ret
+	return
 }
 
 // ProtylePreview 使用指定的 options 渲染 tree 为 Protyle 预览 HTML。
