@@ -28,6 +28,9 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	{"52", "[foo](bar \"&quot;baz&quot;\")", "[foo](bar \"&quot;baz&quot;\")\n"},
+	{"51", "[foo](bar \"\\\"baz\\\"\")", "[foo](bar \"&quot;baz&quot;\")\n"},
+
 	// 链接引用格式化改进 https://github.com/88250/lute/issues/36
 	{"50", "[text][foo]\n\n[foo]: bar\n", "[text][foo]\n\n[foo]: bar\n"},
 	{"49", "[foo]\n\n[foo]: bar\n", "[foo]\n\n[foo]: bar\n"},

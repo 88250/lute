@@ -18,6 +18,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
@@ -544,7 +545,7 @@ func (r *FormatRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.
 func (r *FormatRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
+		r.Write(html.EscapeHTML(node.Tokens))
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
@@ -571,7 +572,7 @@ func (r *FormatRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering b
 func (r *FormatRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
+		r.Write(html.EscapeHTML(node.Tokens))
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
@@ -872,7 +873,7 @@ func (r *FormatRenderer) renderStrikethrough2CloseMarker(node *ast.Node, enterin
 func (r *FormatRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
+		r.Write(html.EscapeHTML(node.Tokens))
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
