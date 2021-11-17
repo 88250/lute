@@ -955,16 +955,14 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 		}
 		r.Tag("/span", nil, false)
 
+		buf := r.Writer.Bytes()
+		idx := bytes.LastIndex(buf, []byte("<img src="))
+		imgBuf := buf[idx:]
 		if r.Options.Sanitize {
-			buf := r.Writer.Bytes()
-			idx := bytes.LastIndex(buf, []byte("<img src="))
-			imgBuf := buf[idx:]
-			if r.Options.Sanitize {
-				imgBuf = sanitize(imgBuf)
-			}
-			r.Writer.Truncate(idx)
-			r.Writer.Write(imgBuf)
+			imgBuf = sanitize(imgBuf)
 		}
+		r.Writer.Truncate(idx)
+		r.Writer.Write(imgBuf)
 	}
 	return ast.WalkContinue
 }

@@ -261,6 +261,9 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, src, dataSrc)
@@ -283,6 +286,9 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, src, dataSrc)
@@ -304,6 +310,9 @@ func (r *BlockRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStat
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, src, dataSrc)
@@ -325,6 +334,9 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, src, dataSrc)
@@ -1155,10 +1167,13 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 			attrs = append(attrs, []string{"style", style})
 		}
 		r.Tag("img", attrs, true)
-		// XSS 过滤
+
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
 		imgBuf := buf[idx:]
+		if r.Options.Sanitize {
+			imgBuf = sanitize(imgBuf)
+		}
 		imgBuf = r.tagSrcPath(imgBuf)
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
