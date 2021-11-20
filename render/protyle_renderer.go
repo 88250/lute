@@ -1205,7 +1205,21 @@ func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus
 	if entering {
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
+		if r.Options.Sanitize {
+			destTokens = sanitize(destTokens)
+		}
+
 		destTokens = r.LinkPath(destTokens)
+		if bytes.HasPrefix(destTokens, []byte("assets/")) {
+			if bytes.Contains(destTokens, []byte("?")) {
+				idx := bytes.IndexByte(destTokens, '?')
+				d := bytes.ReplaceAll(destTokens[:idx], []byte("#"), []byte("%23"))
+				destTokens = append(d, destTokens[idx:]...)
+			} else {
+				destTokens = bytes.ReplaceAll(destTokens, []byte("#"), []byte("%23"))
+			}
+		}
+
 		caretInDest := bytes.Contains(destTokens, util.CaretTokens)
 		if caretInDest {
 			text := node.ChildByType(ast.NodeLinkText)
