@@ -19,6 +19,7 @@ import (
 
 var sanitizerTests = []parseTest{
 
+	{"7", "![a](\"<img src=xss onerror=alert(1)>)\n", "<p>![a](&quot;&lt;img src=xss onerror=alert(1)&gt;)</p>\n"},
 	{"6", "<img src=\"foo\" onload=\"alert(1)\" onerror=\"alert(2)\"/>", "<img src=\"foo\" />\n"},
 	{"5", "<iframe src='javascript:parent.require(\"child_process\").exec(\"open -a Calculator\")'></iframe>", "<iframe></iframe>\n"},
 	{"4", "![Escape SRC - onerror](\"onerror=\"alert('ImageOnError'))", "<p><img src=\"%22onerror=%22alert(&#39;ImageOnError&#39;)\" alt=\"Escape SRC - onerror\" /></p>\n"},
@@ -69,6 +70,11 @@ func TestSanitizerVditor(t *testing.T) {
 func TestSanitize(t *testing.T) {
 	output := render.Sanitize("<img src=\"foo\" onload=\"alert(1)\" onerror=\"alert(2)\"/>")
 	if "<img src=\"foo\" />" != output {
+		t.Fatalf("sanitize failed")
+	}
+
+	output = render.Sanitize("![a](&quot;<img src=xss onerror=alert(1)>)\n")
+	if "![a](&#34;<img src=\"xss\">)\n" != output {
 		t.Fatalf("sanitize failed")
 	}
 }

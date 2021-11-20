@@ -1146,6 +1146,9 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("/span", nil, false)
 	} else {
 		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
+		if r.Options.Sanitize {
+			destTokens = sanitize(destTokens)
+		}
 		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
 		dataSrcTokens := destTokens
 		dataSrc := util.BytesToStr(dataSrcTokens)
