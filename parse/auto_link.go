@@ -375,7 +375,19 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			repo = repo[:bytes.Index(repo, []byte("/issues/"))]
 			num := bytes.Split(linkText, []byte("/issues/"))[1]
 			num = bytes.Split(num, []byte("?"))[0]
-			linkText = []byte("Issue #" + string(num) + " · " + string(repo))
+			if 0 < len(num) {
+				isDigit := true
+				for _, d := range num {
+					if !lex.IsDigit(d) {
+						isDigit = false
+						break
+					}
+				}
+				if isDigit {
+					linkText = []byte("Issue #" + string(num) + " · " + string(repo))
+				}
+			}
+
 		}
 
 		link := t.newLink(ast.NodeLink, linkText, html.EncodeDestination(dest), nil, 2)
