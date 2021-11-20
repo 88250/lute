@@ -12,10 +12,10 @@ package parse
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -369,8 +369,16 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		}
 		addr = append(addr, domain...)
 		addr = append(addr, path...)
+		linkText := addr
+		if bytes.HasPrefix(linkText, []byte("https://github.com/")) && bytes.Contains(linkText, []byte("/issues/")) {
+			repo := linkText[len("https://github.com/"):]
+			repo = repo[:bytes.Index(repo, []byte("/issues/"))]
+			num := bytes.Split(linkText, []byte("/issues/"))[1]
+			num = bytes.Split(num, []byte("?"))[0]
+			linkText = []byte("Issue #" + string(num) + " · " + string(repo))
+		}
 
-		link := t.newLink(ast.NodeLink, addr, html.EncodeDestination(dest), nil, 2)
+		link := t.newLink(ast.NodeLink, linkText, html.EncodeDestination(dest), nil, 2)
 		node.InsertBefore(link)
 		needUnlink = true
 
