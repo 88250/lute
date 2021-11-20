@@ -371,6 +371,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		addr = append(addr, path...)
 		linkText := addr
 		if bytes.HasPrefix(linkText, []byte("https://github.com/")) && bytes.Contains(linkText, []byte("/issues/")) {
+			// 优化 GitHub Issues 自动链接文本 https://github.com/88250/lute/issues/161
 			repo := linkText[len("https://github.com/"):]
 			repo = repo[:bytes.Index(repo, []byte("/issues/"))]
 			num := bytes.Split(linkText, []byte("/issues/"))[1]
