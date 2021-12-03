@@ -1038,7 +1038,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				}
 
 				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-				refTextNode := &ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(refText)}
+				var refTextNode *ast.Node
+				subtype := lute.domAttrValue(n, "data-subtype")
+				if "s" == subtype || "" == subtype {
+					refTextNode = &ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(refText)}
+				} else {
+					refTextNode = &ast.Node{Type: ast.NodeBlockRefDynamicText, Tokens: util.StrToBytes(refText)}
+				}
 				node.AppendChild(refTextNode)
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})

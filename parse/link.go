@@ -118,6 +118,28 @@ func (context *Context) parseLinkTitle(tokens []byte) (validTitle bool, passed, 
 	return
 }
 
+func (context *Context) parseBlockRefText(tokens []byte) (validTitle bool, passed, remains, title []byte, subtype string) {
+	if 1 > len(tokens) {
+		return true, nil, tokens, nil, ""
+	}
+	if lex.ItemOpenBracket == tokens[0] {
+		return true, nil, tokens, nil, ""
+	}
+
+	validTitle, passed, remains, title = context.parseLinkTitleMatch(lex.ItemDoublequote, lex.ItemDoublequote, tokens)
+	subtype = "s"
+	if !validTitle {
+		validTitle, passed, remains, title = context.parseLinkTitleMatch(lex.ItemSinglequote, lex.ItemSinglequote, tokens)
+		subtype = "d"
+	}
+	if nil != title {
+		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV && !context.ParseOption.ProtyleWYSIWYG {
+			title = html.UnescapeBytes(title)
+		}
+	}
+	return
+}
+
 func (context *Context) parseLinkTitleMatch(opener, closer byte, tokens []byte) (validTitle bool, passed, remains, title []byte) {
 	remains = tokens
 	length := len(tokens)

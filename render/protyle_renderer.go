@@ -119,7 +119,7 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
-	ret.RendererFuncs[ast.NodeBlockRefTextTplRenderResult] = ret.renderBlockRefTextTplRenderResult
+	ret.RendererFuncs[ast.NodeBlockRefDynamicText] = ret.renderBlockRefDynamicText
 	ret.RendererFuncs[ast.NodeFileAnnotationRef] = ret.renderFileAnnotationRef
 	ret.RendererFuncs[ast.NodeFileAnnotationRefID] = ret.renderFileAnnotationRefID
 	ret.RendererFuncs[ast.NodeFileAnnotationRefSpace] = ret.renderFileAnnotationRefSpace
@@ -366,22 +366,20 @@ func (r *BlockRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
 func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idNode := node.ChildByType(ast.NodeBlockRefID)
-		var anchor, dataAnchor string
-		if refTextNode := node.ChildByType(ast.NodeBlockRefText); nil != refTextNode {
+		var anchor, dataAnchor, subtype string
+		refTextNode := node.ChildByType(ast.NodeBlockRefText)
+		subtype = "s"
+		if nil == refTextNode {
+			refTextNode = node.ChildByType(ast.NodeBlockRefDynamicText)
+			subtype = "d"
+		}
+		if nil != refTextNode {
 			anchor = refTextNode.Text()
 			dataAnchor = strings.ReplaceAll(anchor, util.Caret, "")
 		}
-		attrs := [][]string{{"data-type", "block-ref"}, {"data-id", idNode.TokensStr()}, {"data-anchor", dataAnchor}}
+		attrs := [][]string{{"data-type", "block-ref"}, {"data-subtype", subtype}, {"data-id", idNode.TokensStr()}, {"data-anchor", dataAnchor}}
 		r.Tag("span", attrs, false)
-		refTextNode := node.ChildByType(ast.NodeBlockRefTextTplRenderResult)
-		var refText string
-		if nil != refTextNode {
-			refText = refTextNode.TokensStr()
-			refText = html.EscapeHTMLStr(refText)
-		} else {
-			refText = anchor
-		}
-		r.WriteString(refText)
+		r.WriteString(anchor)
 		r.Tag("/span", nil, false)
 		return ast.WalkSkipChildren
 	}
@@ -400,7 +398,7 @@ func (r *BlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBlockRefTextTplRenderResult(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *BlockRenderer) renderBlockRefDynamicText(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 

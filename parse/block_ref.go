@@ -31,6 +31,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 	}
 
 	var id, text []byte
+	var subtype string
 	savePos := ctx.pos
 	ctx.pos += 2
 	var ok, matched bool
@@ -51,7 +52,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 		if 1 > len(remains) || !lex.IsWhitespace(remains[0]) {
 			break
 		}
-		// 跟空格的话后续尝试 title 解析
+		// 跟空格的话后续尝试锚文本解析
 		if ok, passed, remains = lex.Spnl(remains); !ok {
 			break
 		}
@@ -62,7 +63,7 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 			break
 		}
 		var validTitle bool
-		if validTitle, passed, remains, text = t.Context.parseLinkTitle(remains); !validTitle {
+		if validTitle, passed, remains, text, subtype = t.Context.parseBlockRefText(remains); !validTitle {
 			break
 		}
 		ctx.pos += len(passed)
@@ -87,6 +88,9 @@ func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
 	if 0 < len(text) {
 		ret.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
 		textNode := &ast.Node{Type: ast.NodeBlockRefText, Tokens: text}
+		if "d" == subtype {
+			textNode.Type = ast.NodeBlockRefDynamicText
+		}
 		ret.AppendChild(textNode)
 	}
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})

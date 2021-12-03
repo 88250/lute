@@ -301,7 +301,7 @@ func (r *KityMinderJSONRenderer) data(node *ast.Node) {
 				return ast.WalkSkipChildren
 			}
 
-			if ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeBlockRefText == n.Type ||
+			if ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeBlockRefText == n.Type || ast.NodeBlockRefDynamicText == n.Type ||
 				ast.NodeCodeSpanContent == n.Type || ast.NodeCodeBlockCode == n.Type || ast.NodeLinkTitle == n.Type || ast.NodeMathBlockContent == n.Type ||
 				ast.NodeInlineMathContent == n.Type || ast.NodeYamlFrontMatterContent == n.Type {
 				buf.Write(n.Tokens)

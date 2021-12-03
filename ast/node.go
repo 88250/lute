@@ -288,7 +288,7 @@ func (n *Node) Text() (ret string) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeFootnotesRef:
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockRefDynamicText, NodeFileAnnotationRefText, NodeFootnotesRef:
 			buf.Write(n.Tokens)
 		}
 		return WalkContinue
@@ -304,7 +304,7 @@ func (n *Node) TextLen() (ret int) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeFootnotesRef:
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockRefDynamicText, NodeFileAnnotationRefText, NodeFootnotesRef:
 			buf = append(buf, n.Tokens...)
 		}
 		return WalkContinue
@@ -320,7 +320,7 @@ func (n *Node) Content() (ret string) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeFootnotesRef,
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockRefDynamicText, NodeFileAnnotationRefText, NodeFootnotesRef,
 			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
 			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
 			NodeGitConflictContent:
@@ -339,7 +339,7 @@ func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 			return WalkContinue
 		}
 		switch n.Type {
-		case NodeText, NodeLinkText, NodeBlockRefText, NodeFileAnnotationRefText, NodeFootnotesRef,
+		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockRefDynamicText, NodeFileAnnotationRefText, NodeFootnotesRef,
 			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
 			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
 			NodeGitConflictContent:
@@ -722,11 +722,11 @@ const (
 
 	// 内容块引用（Block Reference） https://github.com/88250/lute/issues/82
 
-	NodeBlockRef                    NodeType = 430 // 内容块引用节点
-	NodeBlockRefID                  NodeType = 431 // 被引用的内容块（定义块）ID
-	NodeBlockRefSpace               NodeType = 432 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
-	NodeBlockRefText                NodeType = 433 // 内容块引用锚文本
-	NodeBlockRefTextTplRenderResult NodeType = 434 // 内容块引用锚文本模板渲染结果
+	NodeBlockRef            NodeType = 430 // 内容块引用节点
+	NodeBlockRefID          NodeType = 431 // 被引用的内容块（定义块）ID
+	NodeBlockRefSpace       NodeType = 432 // 被引用的内容块 ID 和内容块引用锚文本之间的空格
+	NodeBlockRefText        NodeType = 433 // 内容块引用锚文本
+	NodeBlockRefDynamicText NodeType = 434 // 内容块引用动态锚文本
 
 	// ==Mark== 标记语法 https://github.com/88250/lute/issues/84
 

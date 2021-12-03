@@ -119,11 +119,11 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
+	ret.RendererFuncs[ast.NodeBlockRefDynamicText] = ret.renderBlockRefDynamicText
 	ret.RendererFuncs[ast.NodeFileAnnotationRef] = ret.renderFileAnnotationRef
 	ret.RendererFuncs[ast.NodeFileAnnotationRefID] = ret.renderFileAnnotationRefID
 	ret.RendererFuncs[ast.NodeFileAnnotationRefSpace] = ret.renderFileAnnotationRefSpace
 	ret.RendererFuncs[ast.NodeFileAnnotationRefText] = ret.renderFileAnnotationRefText
-	ret.RendererFuncs[ast.NodeBlockRefTextTplRenderResult] = ret.renderBlockRefTextTplRenderResult
 	ret.RendererFuncs[ast.NodeMark] = ret.renderMark
 	ret.RendererFuncs[ast.NodeMark1OpenMarker] = ret.renderMark1OpenMarker
 	ret.RendererFuncs[ast.NodeMark1CloseMarker] = ret.renderMark1CloseMarker
@@ -551,6 +551,15 @@ func (r *FormatRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.W
 	return ast.WalkContinue
 }
 
+func (r *FormatRenderer) renderBlockRefDynamicText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteByte(lex.ItemSinglequote)
+		r.Write(html.EscapeHTML(node.Tokens))
+		r.WriteByte(lex.ItemSinglequote)
+	}
+	return ast.WalkContinue
+}
+
 func (r *FormatRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -575,10 +584,6 @@ func (r *FormatRenderer) renderFileAnnotationRefText(node *ast.Node, entering bo
 		r.Write(html.EscapeHTML(node.Tokens))
 		r.WriteByte(lex.ItemDoublequote)
 	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderBlockRefTextTplRenderResult(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 

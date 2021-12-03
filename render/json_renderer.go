@@ -115,6 +115,7 @@ func NewJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 	ret.RendererFuncs[ast.NodeBlockRefID] = ret.renderBlockRefID
 	ret.RendererFuncs[ast.NodeBlockRefSpace] = ret.renderBlockRefSpace
 	ret.RendererFuncs[ast.NodeBlockRefText] = ret.renderBlockRefText
+	ret.RendererFuncs[ast.NodeBlockRefDynamicText] = ret.renderBlockRefDynamicText
 	ret.RendererFuncs[ast.NodeFileAnnotationRef] = ret.renderFileAnnotationRef
 	ret.RendererFuncs[ast.NodeFileAnnotationRefID] = ret.renderFileAnnotationRefID
 	ret.RendererFuncs[ast.NodeFileAnnotationRefSpace] = ret.renderFileAnnotationRefSpace
@@ -999,6 +1000,13 @@ func (r *JSONRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *JSONRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.val(ast.NodeBlockRef, util.BytesToStr(node.Tokens))
+	}
+	return ast.WalkContinue
+}
+
+func (r *JSONRenderer) renderBlockRefDynamicText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.val(ast.NodeBlockRef, util.BytesToStr(node.Tokens))
 	}
