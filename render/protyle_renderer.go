@@ -366,7 +366,7 @@ func (r *BlockRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
 func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idNode := node.ChildByType(ast.NodeBlockRefID)
-		var anchor, dataAnchor, subtype string
+		var anchor, subtype string
 		refTextNode := node.ChildByType(ast.NodeBlockRefText)
 		subtype = "s"
 		if nil == refTextNode {
@@ -375,9 +375,8 @@ func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkSt
 		}
 		if nil != refTextNode {
 			anchor = refTextNode.Text()
-			dataAnchor = strings.ReplaceAll(anchor, util.Caret, "")
 		}
-		attrs := [][]string{{"data-type", "block-ref"}, {"data-subtype", subtype}, {"data-id", idNode.TokensStr()}, {"data-anchor", dataAnchor}}
+		attrs := [][]string{{"data-type", "block-ref"}, {"data-subtype", subtype}, {"data-id", idNode.TokensStr()}}
 		r.Tag("span", attrs, false)
 		r.WriteString(anchor)
 		r.Tag("/span", nil, false)
@@ -407,12 +406,10 @@ func (r *BlockRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) a
 		idNode := node.ChildByType(ast.NodeFileAnnotationRefID)
 		id := idNode.TokensStr()
 		anchor := id
-		var dataAnchor string
 		if refTextNode := node.ChildByType(ast.NodeFileAnnotationRefText); nil != refTextNode {
 			anchor = refTextNode.Text()
-			dataAnchor = strings.ReplaceAll(anchor, util.Caret, "")
 		}
-		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}, {"data-anchor", dataAnchor}}
+		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}}
 		r.Tag("span", attrs, false)
 		r.WriteString(anchor)
 		r.Tag("/span", nil, false)

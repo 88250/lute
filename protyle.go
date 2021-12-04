@@ -1029,24 +1029,22 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 			id := lute.domAttrValue(n, "data-id")
 			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(id)})
-			refText := strings.ReplaceAll(lute.domAttrValue(n, "data-anchor"), "\n", "")
-			if "" != refText {
-				if nil != n.FirstChild {
-					if text := lute.domText(n.FirstChild); strings.Contains(text, util.Caret) {
-						refText = text
-					}
-				}
-
-				node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
-				var refTextNode *ast.Node
-				subtype := lute.domAttrValue(n, "data-subtype")
-				if "s" == subtype || "" == subtype {
-					refTextNode = &ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(refText)}
-				} else {
-					refTextNode = &ast.Node{Type: ast.NodeBlockRefDynamicText, Tokens: util.StrToBytes(refText)}
-				}
-				node.AppendChild(refTextNode)
+			var refText string
+			if nil != n.FirstChild {
+				refText = lute.domText(n.FirstChild)
 			}
+			if refText == util.Caret || "" == refText {
+				return
+			}
+			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
+			var refTextNode *ast.Node
+			subtype := lute.domAttrValue(n, "data-subtype")
+			if "s" == subtype || "" == subtype {
+				refTextNode = &ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(refText)}
+			} else {
+				refTextNode = &ast.Node{Type: ast.NodeBlockRefDynamicText, Tokens: util.StrToBytes(refText)}
+			}
+			node.AppendChild(refTextNode)
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			tree.Context.Tip.AppendChild(node)
@@ -1057,18 +1055,16 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeLess})
 			id := lute.domAttrValue(n, "data-id")
 			node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefID, Tokens: util.StrToBytes(id)})
-			refText := strings.ReplaceAll(lute.domAttrValue(n, "data-anchor"), "\n", "")
+			var refText string
 			if nil != n.FirstChild {
 				refText = lute.domText(n.FirstChild)
 			}
-			if refText == util.Caret {
+			if refText == util.Caret || "" == refText {
 				return
 			}
-			if "" != refText {
-				node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefSpace})
-				refTextNode := &ast.Node{Type: ast.NodeFileAnnotationRefText, Tokens: util.StrToBytes(refText)}
-				node.AppendChild(refTextNode)
-			}
+			node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefSpace})
+			refTextNode := &ast.Node{Type: ast.NodeFileAnnotationRefText, Tokens: util.StrToBytes(refText)}
+			node.AppendChild(refTextNode)
 			node.AppendChild(&ast.Node{Type: ast.NodeGreater})
 			node.AppendChild(&ast.Node{Type: ast.NodeGreater})
 			tree.Context.Tip.AppendChild(node)
