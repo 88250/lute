@@ -545,7 +545,9 @@ func (r *FormatRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.
 func (r *FormatRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(html.EscapeHTML(node.Tokens))
+		tokens := html.EscapeHTML(node.Tokens)
+		tokens = bytes.ReplaceAll(tokens, []byte("'"), []byte("&apos;"))
+		r.Write(tokens)
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
@@ -554,7 +556,9 @@ func (r *FormatRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.W
 func (r *FormatRenderer) renderBlockRefDynamicText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemSinglequote)
-		r.Write(html.EscapeHTML(node.Tokens))
+		tokens := html.EscapeHTML(node.Tokens)
+		tokens = bytes.ReplaceAll(tokens, []byte("'"), []byte("&apos;"))
+		r.Write(tokens)
 		r.WriteByte(lex.ItemSinglequote)
 	}
 	return ast.WalkContinue
@@ -581,7 +585,9 @@ func (r *FormatRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering b
 func (r *FormatRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(html.EscapeHTML(node.Tokens))
+		tokens := html.EscapeHTML(node.Tokens)
+		tokens = bytes.ReplaceAll(tokens, []byte("'"), []byte("&apos;"))
+		r.Write(tokens)
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
