@@ -419,7 +419,7 @@ func (r *BlockRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) a
 			refText = refTextNode.Text()
 		}
 		refText = r.escapeRefText(refText)
-		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-id", id}}
+		attrs := [][]string{{"data-type", "file-annotation-ref"}, {"data-subtype", "s"}, {"data-id", id}}
 		r.Tag("span", attrs, false)
 		r.WriteString(refText)
 		r.Tag("/span", nil, false)
