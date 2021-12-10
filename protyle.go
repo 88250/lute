@@ -1033,7 +1033,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil != n.FirstChild {
 				refText = lute.domText(n.FirstChild)
 			}
-			if refText == util.Caret || "" == refText {
+			if "" == refText {
+				return
+			}
+			if refText == util.Caret {
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
 				return
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
@@ -1059,7 +1063,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil != n.FirstChild {
 				refText = lute.domText(n.FirstChild)
 			}
-			if refText == util.Caret || "" == refText {
+			if "" == refText {
+				return
+			}
+			if refText == util.Caret {
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
 				return
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefSpace})
