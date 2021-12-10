@@ -1208,6 +1208,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
 		processSpanMarkerSpace(n, node)
+		lute.removeInnerMarker(n, "__")
 
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1265,6 +1266,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		processSpanMarkerSpace(n, node)
+		lute.removeInnerMarker(n, "**")
 
 		lute.setSpanIAL(n, node)
 		tree.Context.Tip = node
@@ -1308,6 +1310,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		processSpanMarkerSpace(n, node)
+		lute.removeInnerMarker(n, "~~")
 
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1350,6 +1353,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		processSpanMarkerSpace(n, node)
+		lute.removeInnerMarker(n, "==")
 
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1590,5 +1594,40 @@ func processSpanMarkerSpace(n *html.Node, node *ast.Node) {
 	if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
 		n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
 		n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+	}
+}
+
+func (lute *Lute) removeInnerMarker(n *html.Node, marker string) {
+	if html.TextNode == n.Type {
+		n.Data = strings.ReplaceAll(n.Data, marker, "")
+	}
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		lute.removeInnerMarker0(child, marker)
+	}
+}
+
+func (lute *Lute) removeInnerMarker0(n *html.Node, marker string) {
+	if nil == n {
+		return
+	}
+	if dataRender := lute.domAttrValue(n, "data-render"); "1" == dataRender || "2" == dataRender {
+		return
+	}
+
+	if "svg" == n.Namespace {
+		return
+	}
+
+	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
+		return
+	}
+
+	switch n.DataAtom {
+	case 0:
+		n.Data = strings.ReplaceAll(n.Data, marker, "")
+	}
+
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		lute.removeInnerMarker0(child, marker)
 	}
 }
