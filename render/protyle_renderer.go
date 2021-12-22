@@ -774,6 +774,7 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 	var language string
 	if nil != node.FirstChild && nil != node.FirstChild.Next && 0 < len(node.FirstChild.Next.CodeBlockInfo) {
 		language = util.BytesToStr(node.FirstChild.Next.CodeBlockInfo)
+		language = strings.ReplaceAll(language, util.Caret, "")
 		noHighlight = r.NoHighlight(language)
 	}
 
