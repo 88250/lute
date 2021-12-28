@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"math/rand"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -177,6 +178,10 @@ func IsNodeIDPattern(str string) bool {
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
+
+	for t := NodeDocument; t < NodeTypeMaxVal; t++ {
+		strNodeTypeMap[t.String()] = t
+	}
 }
 
 func randStr(length int) string {
@@ -597,13 +602,17 @@ func (n *Node) CanContain(nodeType NodeType) bool {
 //go:generate stringer -type=NodeType
 type NodeType int
 
+var strNodeTypeMap = map[string]NodeType{}
+var strNodeTypeMapLock = sync.RWMutex{}
+
 func Str2NodeType(nodeTypeStr string) NodeType {
-	for t := NodeDocument; t < NodeTypeMaxVal; t++ {
-		if nodeTypeStr == t.String() {
-			return t
-		}
+	strNodeTypeMapLock.RLock()
+	defer strNodeTypeMapLock.RUnlock()
+	if ret, ok := strNodeTypeMap[nodeTypeStr]; !ok {
+		return -1
+	} else {
+		return ret
 	}
-	return -1
 }
 
 const (
