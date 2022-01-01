@@ -1169,7 +1169,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		var titleTokens []byte
 		if nil != title && 0 < len(title.Tokens) {
 			titleTokens = title.Tokens
-			attrs = append(attrs, []string{"title", util.BytesToStr(titleTokens)})
+			attrs = append(attrs, []string{"title", r.escapeRefText(string(titleTokens))})
 		}
 
 		if style := node.IALAttr("style"); "" != style {
@@ -1234,7 +1234,7 @@ func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus
 		}
 		attrs := [][]string{{"data-type", "a"}, {"data-href", string(destTokens)}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
-			attrs = append(attrs, []string{"data-title", util.BytesToStr(title.Tokens)})
+			attrs = append(attrs, []string{"data-title", r.escapeRefText(string(title.Tokens))})
 		}
 		r.Tag("span", attrs, false)
 	} else {
