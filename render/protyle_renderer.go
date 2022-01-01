@@ -1196,7 +1196,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 
 		attrs = [][]string{{"class", "protyle-action__title"}}
 		r.Tag("span", attrs, false)
-		r.Writer.Write(titleTokens)
+		r.Writer.Write(html.EscapeHTML(titleTokens))
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
 		r.Tag("span", nil, false)
