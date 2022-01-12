@@ -726,8 +726,9 @@ func (r *BlockRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus 
 
 func (r *BlockRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<div data-block=\"0\" data-type=\"footnotes-block\">")
-		r.WriteString("<ol data-type=\"footnotes-defs-ol\">")
+		r.WriteString("<div class=\"footnotes-defs-div\">")
+		r.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
+		r.WriteString("<ol class=\"footnotes-defs-ol\">")
 	} else {
 		r.WriteString("</ol></div>")
 	}
@@ -735,36 +736,29 @@ func (r *BlockRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) a
 }
 
 func (r *BlockRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
-	if r.RenderingFootnotes {
-		return ast.WalkContinue
-	}
-
 	if entering {
-		if nil != node.Previous && bytes.EqualFold(node.Previous.Tokens, node.Tokens) {
-			return ast.WalkContinue
+		// r.WriteString("<li id=\"footnotes-def-" + node.FootnotesRefId + "\">")
+		// 在 li 上带 id 后，Pandoc HTML 转换 Docx 会有问题
+		r.WriteString("<li>")
+		if 0 < len(node.FootnotesRefs) {
+			refId := node.FootnotesRefs[0].FootnotesRefId
+			node.FirstChild.PrependChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("<span id=\"footnotes-def-" + refId + "\"></span>")})
 		}
-
-		r.WriteString("<li data-type=\"footnotes-li\" data-marker=\"" + string(node.Tokens) + "\">")
-		for c := node.FirstChild; nil != c; c = c.Next {
-			ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
-				return r.RendererFuncs[n.Type](n, entering)
-			})
-		}
-		r.WriteString("</li>")
-		return ast.WalkSkipChildren
+	} else {
+		r.WriteString("</li>\n")
 	}
 	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		idx, def := r.Tree.FindFootnotesDef(node.Tokens)
+		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
 		idxStr := strconv.Itoa(idx)
-		label := def.Text()
-		r.Tag("sup", [][]string{{"data-type", "footnotes-ref"}, {"data-footnotes-label", string(node.FootnotesRefLabel)},
-			{"class", "protyle-tooltipped protyle-tooltipped__s"}, {"aria-label", SubStr(html.EscapeHTMLStr(label), 24)}}, false)
+		r.Tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
+		r.Tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
 		r.WriteString(idxStr)
-		r.WriteString("</sup>")
+		r.Tag("/a", nil, false)
+		r.Tag("/sup", nil, false)
 	}
 	return ast.WalkContinue
 }
