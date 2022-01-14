@@ -11,6 +11,7 @@
 package parse
 
 import (
+	"bytes"
 	"unicode/utf8"
 
 	"github.com/88250/lute/html"
@@ -139,6 +140,10 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 			passed = nil
 			return
 		}
+	}
+
+	if (context.ParseOption.ProtyleWYSIWYG || !context.ParseOption.DataImage) && bytes.HasPrefix(bytes.ToLower(destination), []byte("data:image")) {
+		return nil, nil, nil
 	}
 
 	if nil != passed {

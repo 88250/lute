@@ -362,6 +362,8 @@ type Options struct {
 	IndentCodeBlock bool
 	// ParagraphBeginningSpace 设置是否打开“段首空格”支持。
 	ParagraphBeginningSpace bool
+	// DataImage 设置是否打开 ![foo](data:image...) 形式的图片支持。
+	DataImage bool
 }
 
 func NewOptions() *Options {
@@ -384,6 +386,7 @@ func NewOptions() *Options {
 		HeadingID:         true,
 		LinkRef:           true,
 		IndentCodeBlock:   true,
+		DataImage:         true,
 	}
 }
 
