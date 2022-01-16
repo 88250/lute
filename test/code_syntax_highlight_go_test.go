@@ -11,8 +11,9 @@
 package test
 
 import (
-	"github.com/88250/lute"
 	"testing"
+
+	"github.com/88250/lute"
 )
 
 var code = `go
@@ -25,7 +26,7 @@ fmt.Println("Hello, World!")
 
 var codeSyntaxHighlightGoTests = []parseTest{
 
-	{"0", "```" + code + "```\n", "<pre><code class=\"language-go highlight-chroma\"><span class=\"highlight-kn\">package</span> <span class=\"highlight-nx\">main</span>\n\n<span class=\"highlight-kn\">import</span> <span class=\"highlight-s\">&#34;fmt&#34;</span>\n\n<span class=\"highlight-kd\">func</span> <span class=\"highlight-nf\">main</span><span class=\"highlight-p\">()</span> <span class=\"highlight-p\">{</span>\n\t<span class=\"highlight-nx\">fmt</span><span class=\"highlight-p\">.</span><span class=\"highlight-nf\">Println</span><span class=\"highlight-p\">(</span><span class=\"highlight-s\">&#34;Hello, World!&#34;</span><span class=\"highlight-p\">)</span>\n<span class=\"highlight-p\">}</span>\n</code></pre>\n"},
+	{"0", "```" + code + "```\n", "<pre><code class=\"language-go highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kn\">package</span> <span class=\"highlight-nx\">main</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kn\">import</span> <span class=\"highlight-s\">&#34;fmt&#34;</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kd\">func</span> <span class=\"highlight-nf\">main</span><span class=\"highlight-p\">()</span> <span class=\"highlight-p\">{</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\t<span class=\"highlight-nx\">fmt</span><span class=\"highlight-p\">.</span><span class=\"highlight-nf\">Println</span><span class=\"highlight-p\">(</span><span class=\"highlight-s\">&#34;Hello, World!&#34;</span><span class=\"highlight-p\">)</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-p\">}</span>\n</span></span></code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightGo(t *testing.T) {

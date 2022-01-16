@@ -40,13 +40,15 @@ func TestChroma(t *testing.T) {
 
 var expected = `<html>
 <style type="text/css">
-/* Background */ .chroma { background-color: #ffffff }
+/* Background */ .bg { background-color: #ffffff }
+/* PreWrapper */ .chroma { background-color: #ffffff; }
 /* Error */ .chroma .err { color: #a61717; background-color: #e3d2d2 }
 /* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
-/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; width: auto; overflow: auto; display: block; }
-/* LineHighlight */ .chroma .hl { display: block; width: 100%;background-color: #e5e5e5 }
-/* LineNumbersTable */ .chroma .lnt { margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
-/* LineNumbers */ .chroma .ln { margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineTable */ .chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }
+/* LineHighlight */ .chroma .hl { background-color: #e5e5e5 }
+/* LineNumbersTable */ .chroma .lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineNumbers */ .chroma .ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* Line */ .chroma .line { display: flex; }
 /* Keyword */ .chroma .k { color: #000000; font-weight: bold }
 /* KeywordConstant */ .chroma .kc { color: #000000; font-weight: bold }
 /* KeywordDeclaration */ .chroma .kd { color: #000000; font-weight: bold }
@@ -113,14 +115,14 @@ var expected = `<html>
 /* GenericUnderline */ .chroma .gl { text-decoration: underline }
 /* TextWhitespace */ .chroma .w { color: #bbbbbb }
 body { background-color: #ffffff; }
-</style><body class="chroma">
-<pre tabindex="0" class="chroma">
-	<span class="nd">@RequestProcessing</span><span class="o">(</span><span class="s">&#34;/&#34;</span><span class="o">)</span>
-	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">index</span><span class="o">(</span><span class="kd">final</span> <span class="n">RequestContext</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
-		<span class="n">context</span><span class="o">.</span><span class="na">setRenderer</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleFMRenderer</span><span class="o">(</span><span class="s">&#34;index.ftl&#34;</span><span class="o">));</span>
-		<span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">dataModel</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getRenderer</span><span class="o">().</span><span class="na">getRenderDataModel</span><span class="o">();</span>
-		<span class="n">dataModel</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&#34;greeting&#34;</span><span class="o">,</span> <span class="s">&#34;Hello, Latke!&#34;</span><span class="o">);</span>
-	<span class="o">}</span></pre>
+</style><body class="bg">
+<pre tabindex="0" class="chroma"><code><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nd">@RequestProcessing</span><span class="o">(</span><span class="s">&#34;/&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">index</span><span class="o">(</span><span class="kd">final</span> <span class="n">RequestContext</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">context</span><span class="o">.</span><span class="na">setRenderer</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleFMRenderer</span><span class="o">(</span><span class="s">&#34;index.ftl&#34;</span><span class="o">));</span>
+</span></span><span class="line"><span class="cl">		<span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">dataModel</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getRenderer</span><span class="o">().</span><span class="na">getRenderDataModel</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">dataModel</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&#34;greeting&#34;</span><span class="o">,</span> <span class="s">&#34;Hello, Latke!&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">	<span class="o">}</span></span></span></code></pre>
 </body>
 </html>
 `

@@ -41,5 +41,5 @@ func test() {
 	return
 }
 ` + "```",
-	"<pre><code class=\"language-go highlight-chroma\"><span class=\"highlight-kn\">package</span> <span class=\"highlight-nx\">lute</span>\n\n<span class=\"highlight-kd\">func</span> <span class=\"highlight-nf\">test</span><span class=\"highlight-p\">()</span> <span class=\"highlight-p\">{</span>\n\t<span class=\"highlight-k\">return</span>\n<span class=\"highlight-p\">}</span>\n</code></pre>\n",
+	"<pre><code class=\"language-go highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kn\">package</span> <span class=\"highlight-nx\">lute</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kd\">func</span> <span class=\"highlight-nf\">test</span><span class=\"highlight-p\">()</span> <span class=\"highlight-p\">{</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\t<span class=\"highlight-k\">return</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-p\">}</span>\n</span></span></code></pre>\n",
 }

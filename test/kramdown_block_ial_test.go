@@ -61,7 +61,7 @@ func TestKramdownBlockIALs(t *testing.T) {
 
 var kramdownBlockIALIDNAmeTests = []parseTest{
 
-	{"4", "```\nfoo\n```\n{: id=\"20201105103725-3ad5wcz\"}", "<pre data-block-id=\"20201105103725-3ad5wcz\"><code class=\"highlight-chroma\">foo\n</code></pre>\n"},
+	{"4", "```\nfoo\n```\n{: id=\"20201105103725-3ad5wcz\"}", "<pre data-block-id=\"20201105103725-3ad5wcz\"><code class=\"highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\">foo\n</span></span></code></pre>\n"},
 	{"3", "$$\nfoo\n$$\n{: id=\"20201105103725-3ad5wcz\"}", "<div class=\"language-math\" data-block-id=\"20201105103725-3ad5wcz\">foo</div>\n"},
 	{"2", "> foo\n> {: id=\"fooid\" name=\"bar\"}", "<blockquote>\n<p data-block-id=\"fooid\" name=\"bar\">foo</p>\n</blockquote>\n"},
 	{"1", "# foo\n{: id=\"fooid\" class=\"bar\"}", "<h1 id=\"foo\" data-block-id=\"fooid\" class=\"bar\">foo</h1>\n"},
