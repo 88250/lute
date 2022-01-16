@@ -1645,6 +1645,14 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	attrs := [][]string{{"class", "protyle-attr"}, {"contenteditable", "false"}}
 	r.Tag("div", attrs, false)
 
+	if bookmark := node.IALAttr("bookmark"); "" != bookmark {
+		bookmark = strings.ReplaceAll(bookmark, util.IALValEscNewLine, "\n")
+		bookmark = html.EscapeHTMLStr(bookmark)
+		r.Tag("div", [][]string{{"class", "protyle-attr--bookmark"}}, false)
+		r.WriteString(bookmark)
+		r.Tag("/div", nil, false)
+	}
+
 	if name := node.IALAttr("name"); "" != name {
 		name = strings.ReplaceAll(name, util.IALValEscNewLine, "\n")
 		name = html.EscapeHTMLStr(name)
@@ -1668,14 +1676,6 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 		memo = html.EscapeHTMLStr(memo)
 		r.Tag("div", [][]string{{"class", "protyle-attr--memo b3-tooltips b3-tooltips__nw"}, {"aria-label", memo}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconM\"></use></svg>")
-		r.Tag("/div", nil, false)
-	}
-
-	if bookmark := node.IALAttr("bookmark"); "" != bookmark {
-		bookmark = strings.ReplaceAll(bookmark, util.IALValEscNewLine, "\n")
-		bookmark = html.EscapeHTMLStr(bookmark)
-		r.Tag("div", [][]string{{"class", "protyle-attr--bookmark"}}, false)
-		r.WriteString(bookmark)
 		r.Tag("/div", nil, false)
 	}
 
