@@ -2,8 +2,6 @@ language: go
 
 go:
   - 1.17.x
-env:
-  - GO111MODULE=on
 before_install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
