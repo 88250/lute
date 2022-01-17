@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - 1.12.x
+  - 1.17.x
 env:
   - GO111MODULE=on
 before_install:
