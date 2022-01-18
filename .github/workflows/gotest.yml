@@ -16,7 +16,7 @@ jobs:
           go mod download
       - name: Run Unit tests
         run: |
-          go test -covermode atomic -coverprofile=covprofile ./...
+          go test -coverprofile=covprofile -coverpkg="github.com/88250/lute" ./...
       - name: Install goveralls
         run: go install github.com/mattn/goveralls@latest
       - name: Send coverage
