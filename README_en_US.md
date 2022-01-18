@@ -3,9 +3,9 @@
 <br><br>
 A structured Markdown engine that supports Go and JavaScript
 <br><br>
-<a title="Build Status" target="_blank" href="https://travis-ci.org/88250/lute"><img src="https://img.shields.io/travis/88250/lute.svg?style=flat-square"></a>
+<a title="Build Status" target="_blank" href="https://github.com/88250/lute/actions/workflows/gotest.yml"><img src="https://img.shields.io/github/workflow/status/88250/lute/gotest?style=flat-square"></a>
 <a title="Go Report Card" target="_blank" href="https://goreportcard.com/report/github.com/88250/lute"><img src="https://goreportcard.com/badge/github.com/88250/lute?style=flat-square"></a>
-<a title="Coverage Status" target="_blank" href="https://coveralls.io/repos/github/88250/lute/badge.svg?branch=master"><img src="https://img.shields.io/coveralls/github/88250/lute.svg?style=flat-square&color=CC9933"></a>
+<a title="Coverage Status" target="_blank" href="https://coveralls.io/github/88250/lute"><img src="https://img.shields.io/coveralls/github/88250/lute.svg?style=flat-square&color=CC9933"></a>
 <a title="Code Size" target="_blank" href="https://github.com/88250/lute"><img src="https://img.shields.io/github/languages/code-size/88250/lute.svg?style=flat-square"></a>
 <a title="MulanPSL" target="_blank" href="https://github.com/88250/lute/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MulanPSL-orange.svg?style=flat-square"></a>
 <br>
