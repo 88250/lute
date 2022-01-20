@@ -260,6 +260,7 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
+		r.WriteString(parse.Zwsp)
 		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
@@ -271,7 +272,6 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
 		r.Tag("/span", nil, false)
-		r.WriteString(parse.Zwsp)
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
