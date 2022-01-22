@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"152", "<p data-block=\"0\">​<code data-type=\"html-inline\">​&lt;font size=12&gt;t<wbr></code></p>", "<p data-block=\"0\">\u200b<code data-type=\"html-inline\">\u200b&lt;font size=12&gt;</code>t<wbr></p>"},
 	{"151", "<p data-block=\"0\">​#<wbr></p>", "<p data-block=\"0\">#<wbr></p>"},
 	{"150", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo <em data-marker=\"*\">bar<wbr></em>​</li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">foo <em data-marker=\"*\">bar<wbr></em></li></ul>"},
 	{"149", "<p data-block=\"0\">$a&lt;b$<wbr></p>", "<p data-block=\"0\">\u200b<span class=\"vditor-wysiwyg__block\" data-type=\"math-inline\"><code data-type=\"math-inline\" style=\"display: none\">\u200ba&lt;b</code><span class=\"vditor-wysiwyg__preview\" data-render=\"2\"><span class=\"language-math\">a&lt;b</span></span></span>\u200b<wbr></p>"},

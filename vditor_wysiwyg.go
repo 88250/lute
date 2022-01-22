@@ -951,6 +951,14 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		codeTokens := []byte(contentStr)
+		if "html-inline" == dataType {
+			// 所见即所得行级 HTML 解析 https://github.com/Vanessa219/vditor/issues/1156
+			node.Type = ast.NodeInlineHTML
+			node.Tokens = codeTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
 		marker := lute.domAttrValue(n, "data-marker")
 		if "" == marker {
 			marker = "`"
