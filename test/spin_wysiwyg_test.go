@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"154", "```<Table></Table>```", "<div class=\"vditor-wysiwyg__block\" data-type=\"code-block\" data-block=\"0\" data-marker=\"``````\"><pre class=\"vditor-wysiwyg__pre\" style=\"display: none\"><code><wbr>\n</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><code></code></pre></div>"},
 	{"153", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;/a&gt;\n&lt;svg&gt;&lt;animate onbegin=alert(11) attributeName=x dur=1s&gt;<wbr></code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"1\">\n<svg><animate onbegin=\"alert(11)\" attributeName=\"x\" dur=\"1s\"></animate></svg></pre></div>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;/a&gt;\n&lt;svg&gt;&lt;animate onbegin=alert(11) attributeName=x dur=1s&gt;<wbr></code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"></a>\n<svg><animate attributename=\"x\" dur=\"1s\"></pre></div>"},
 	{"152", "<p data-block=\"0\">​<code data-type=\"html-inline\">​&lt;font size=12&gt;t<wbr></code></p>", "<p data-block=\"0\">\u200b<code data-type=\"html-inline\">\u200b&lt;font size=12&gt;</code>t<wbr></p>"},
 	{"151", "<p data-block=\"0\">​#<wbr></p>", "<p data-block=\"0\">#<wbr></p>"},
