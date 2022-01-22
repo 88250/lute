@@ -297,4 +297,9 @@ var eventAttrs = map[string]interface{}{
 
 	// Misc
 	"ontoggle": nil,
+
+	// SVG
+	"onbegin":  nil,
+	"onend":    nil,
+	"onrepeat": nil,
 }
