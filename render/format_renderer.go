@@ -1190,6 +1190,25 @@ func (r *FormatRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool
 }
 
 func (r *FormatRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if r.Options.AutoSpace {
+			if text := node.PreviousNodeText(); "" != text {
+				lastc, _ := utf8.DecodeLastRuneInString(text)
+				if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
+					r.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	} else {
+		if r.Options.AutoSpace {
+			if text := node.NextNodeText(); "" != text {
+				firstc, _ := utf8.DecodeRuneInString(text)
+				if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
+					r.WriteByte(lex.ItemSpace)
+				}
+			}
+		}
+	}
 	return ast.WalkContinue
 }
 func (r *FormatRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
