@@ -32,14 +32,13 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	firstChild := tree.Root.FirstChild
-	if ast.NodeParagraph == firstChild.Type && "" == firstChild.ID {
-		if second := firstChild.Next; nil != second && nil != second.Next && ast.NodeKramdownBlockIAL == second.Next.Type {
-			// 软换行后生成两个块，需要把老 ID 调整到第一个块上
-			ial := second.Next
-			firstChild.ID, second.ID = second.ID, ""
-			firstChild.InsertAfter(ial)
-			firstChild.KramdownIAL, second.KramdownIAL = second.KramdownIAL, nil
-		}
+	lastChildMaybeIAL := tree.Root.LastChild.Previous
+	if ast.NodeParagraph == firstChild.Type && "" == firstChild.ID && nil != lastChildMaybeIAL && firstChild != lastChildMaybeIAL.Previous &&
+		ast.NodeKramdownBlockIAL == lastChildMaybeIAL.Type {
+		// 软换行后生成多个块，需要把老 ID 调整到第一个块上
+		firstChild.ID, lastChildMaybeIAL.Previous.ID = lastChildMaybeIAL.Previous.ID, ""
+		firstChild.KramdownIAL, lastChildMaybeIAL.Previous.KramdownIAL = lastChildMaybeIAL.Previous.KramdownIAL, nil
+		firstChild.InsertAfter(lastChildMaybeIAL)
 	}
 	if ast.NodeKramdownBlockIAL == firstChild.Type && nil != firstChild.Next && ast.NodeKramdownBlockIAL == firstChild.Next.Type && util.IsDocIAL(firstChild.Next.Tokens) {
 		// 空段落块还原
