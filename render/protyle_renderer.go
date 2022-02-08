@@ -1136,6 +1136,10 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		if "" != parentStyle { // 手动设置了位置
 			attrs = append(attrs, []string{"style", parentStyle})
 		}
+		if !strings.Contains(parentStyle, "display") && !strings.Contains(parentStyle, "block") &&
+			r.LastOut == '\n' {
+			r.WriteString(parse.Zwsp)
+		}
 		r.Tag("span", attrs, false)
 		r.Tag("span", nil, false)
 		r.WriteString(" ")
