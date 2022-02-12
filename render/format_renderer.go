@@ -717,22 +717,26 @@ func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 	padding := node.TableCellContentMaxWidth - node.TableCellContentWidth
 	if entering {
 		r.WriteByte(lex.ItemPipe)
-		r.WriteByte(lex.ItemSpace)
-		switch node.TableCellAlign {
-		case 2:
-			r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
-		case 3:
-			r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
+		if !r.Options.ProtyleWYSIWYG {
+			r.WriteByte(lex.ItemSpace)
+			switch node.TableCellAlign {
+			case 2:
+				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
+			case 3:
+				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
+			}
 		}
 	} else {
-		switch node.TableCellAlign {
-		case 2:
-			r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
-		case 3:
-		default:
-			r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
+		if !r.Options.ProtyleWYSIWYG {
+			switch node.TableCellAlign {
+			case 2:
+				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
+			case 3:
+			default:
+				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
+			}
+			r.WriteByte(lex.ItemSpace)
 		}
-		r.WriteByte(lex.ItemSpace)
 	}
 	return ast.WalkContinue
 }
@@ -748,6 +752,10 @@ func (r *FormatRenderer) renderTableHead(node *ast.Node, entering bool) ast.Walk
 	if !entering {
 		headRow := node.FirstChild
 		for th := headRow.FirstChild; nil != th; th = th.Next {
+			if ast.NodeKramdownSpanIAL == th.Type {
+				continue
+			}
+
 			align := th.TableCellAlign
 			switch align {
 			case 0:
@@ -755,13 +763,17 @@ func (r *FormatRenderer) renderTableHead(node *ast.Node, entering bool) ast.Walk
 				if padding := th.TableCellContentMaxWidth - 1; 0 < padding {
 					r.Write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
 				}
-				r.WriteByte(lex.ItemSpace)
+				if !r.Options.ProtyleWYSIWYG {
+					r.WriteByte(lex.ItemSpace)
+				}
 			case 1:
 				r.WriteString("| :-")
 				if padding := th.TableCellContentMaxWidth - 2; 0 < padding {
 					r.Write(bytes.Repeat([]byte{lex.ItemHyphen}, padding))
 				}
-				r.WriteByte(lex.ItemSpace)
+				if !r.Options.ProtyleWYSIWYG {
+					r.WriteByte(lex.ItemSpace)
+				}
 			case 2:
 				r.WriteString("| :-")
 				if padding := th.TableCellContentMaxWidth - 3; 0 < padding {

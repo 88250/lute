@@ -532,6 +532,7 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	options.KramdownBlockIAL = true
 	options.KramdownSpanIAL = true
 	options.KeepParagraphBeginningSpace = true
+	options.ProtyleWYSIWYG = true
 	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = string(formatted)
@@ -954,6 +955,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 		node.TableCellAlign = tableAlign
 		tree.Context.Tip.AppendChild(node)
+		lute.setSpanIAL(n, node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Code:

@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -64,6 +65,24 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 	headRow := context.parseTableRow(lex.TrimWhitespace(lines[0]), aligns, true)
 	if nil == headRow {
 		return
+	}
+
+	if context.ParseOption.KramdownSpanIAL {
+		for th := headRow.FirstChild; nil != th; th = th.Next {
+			ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
+			if 0 > ialStart {
+				continue
+			}
+			subTokens := th.Tokens[ialStart:]
+			if pos, ial := context.parseKramdownSpanIAL(subTokens); 1 == len(ial) && "style" == ial[0][0] && strings.Contains(ial[0][1], "width") {
+				th.KramdownIAL = ial
+				ialTokens := subTokens[:pos+1]
+				th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
+				spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+				th.InsertAfter(spanIAL)
+				th = th.Next
+			}
+		}
 	}
 
 	ret = &ast.Node{Type: ast.NodeTable, TableAligns: aligns}
