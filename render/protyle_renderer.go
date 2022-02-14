@@ -1000,6 +1000,21 @@ func (r *BlockRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *BlockRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.Tag("colgroup", nil, false)
+		if colgroup := node.Parent.IALAttr("colgroup"); "" == colgroup {
+			for th := node.FirstChild.FirstChild; nil != th; th = th.Next {
+				if ast.NodeTableCell == th.Type {
+					r.Tag("col", nil, true)
+				}
+			}
+		} else {
+			cols := strings.Split(colgroup, "||")
+			for _, style := range cols {
+				r.Tag("col", [][]string{{"style", style}}, true)
+			}
+		}
+		r.Tag("/colgroup", nil, false)
+
 		r.Tag("thead", nil, false)
 	} else {
 		r.Tag("/thead", nil, false)

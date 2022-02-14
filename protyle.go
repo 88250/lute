@@ -632,7 +632,9 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		if nil == table {
 			return
 		}
-		for th := table.FirstChild.FirstChild.FirstChild; nil != th; th = th.NextSibling {
+
+		thead := lute.domChild(table, atom.Thead)
+		for th := thead.FirstChild.FirstChild; nil != th; th = th.NextSibling {
 			align := lute.domAttrValue(th, "align")
 			switch align {
 			case "left":
@@ -863,6 +865,10 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 
 func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	if ast.NodeCodeBlock == tree.Context.Tip.Type {
+		return
+	}
+
+	if atom.Colgroup == n.DataAtom {
 		return
 	}
 
@@ -1559,18 +1565,24 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		}
 	}
 
+	if "NodeTable" == lute.domAttrValue(n, "data-type") {
+		colgroup := lute.domChild(n, atom.Colgroup)
+		var colgroupAttrVal string
+		if nil != colgroup {
+			for col := colgroup.FirstChild; nil != col; col = col.NextSibling {
+				colStyle := lute.domAttrValue(col, "style")
+				colgroupAttrVal += colStyle
+				if nil != col.NextSibling {
+					colgroupAttrVal += "||"
+				}
+			}
+			node.SetIALAttr("colgroup", colgroupAttrVal)
+			ialTokens = append(ialTokens, []byte(" colgroup=\""+colgroupAttrVal+"\"")...)
+		}
+	}
+
 	ialTokens = parse.IAL2Tokens(node.KramdownIAL)
 	return ialTokens
-}
-
-func appendNextToTip(next *ast.Node, tree *parse.Tree) {
-	var nodes []*ast.Node
-	for n := next; nil != n; n = n.Next {
-		nodes = append(nodes, n)
-	}
-	for _, n := range nodes {
-		tree.Context.Tip.AppendChild(n)
-	}
 }
 
 func styleValue(style string) (ret string) {
