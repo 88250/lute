@@ -1475,7 +1475,11 @@ func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 		if "" != rowspan {
 			node.SetIALAttr("rowspan", rowspan)
 		}
-		if "" != colspan || "" != rowspan {
+		class := lute.domAttrValue(n, "class")
+		if "" != class {
+			node.SetIALAttr("class", class)
+		}
+		if "" != colspan || "" != rowspan || "" != class {
 			ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 			ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 			node.InsertAfter(ial)
