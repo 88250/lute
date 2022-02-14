@@ -1456,13 +1456,31 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 	insertedIAL := false
-	if style := lute.domAttrValue(n, "style"); "" != style {
+	if style := lute.domAttrValue(n, "style"); "" != style { // 比如设置表格列宽
 		style = styleValue(style)
 		node.SetIALAttr("style", style)
 		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 		node.InsertAfter(ial)
 		insertedIAL = true
+	}
+
+	if atom.Th == n.DataAtom || atom.Td == n.DataAtom {
+		// 设置表格合并单元格
+		colspan := lute.domAttrValue(n, "colspan")
+		if "" != colspan {
+			node.SetIALAttr("colspan", colspan)
+		}
+		rowspan := lute.domAttrValue(n, "rowspan")
+		if "" != rowspan {
+			node.SetIALAttr("rowspan", rowspan)
+		}
+		if "" != colspan || "" != rowspan {
+			ialTokens := parse.IAL2Tokens(node.KramdownIAL)
+			ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+			node.InsertAfter(ial)
+			insertedIAL = true
+		}
 	}
 
 	if nil != n.Parent && nil != n.Parent.Parent {
@@ -1573,7 +1591,7 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 				colStyle := lute.domAttrValue(col, "style")
 				colgroupAttrVal += colStyle
 				if nil != col.NextSibling {
-					colgroupAttrVal += "||"
+					colgroupAttrVal += "|"
 				}
 			}
 			node.SetIALAttr("colgroup", colgroupAttrVal)

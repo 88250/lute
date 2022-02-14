@@ -12,7 +12,6 @@ package parse
 
 import (
 	"bytes"
-	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -74,7 +73,7 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 				continue
 			}
 			subTokens := th.Tokens[ialStart:]
-			if pos, ial := context.parseKramdownSpanIAL(subTokens); 1 == len(ial) && "style" == ial[0][0] && strings.Contains(ial[0][1], "width") {
+			if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
 				th.KramdownIAL = ial
 				ialTokens := subTokens[:pos+1]
 				th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
@@ -93,6 +92,23 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		tableRow := context.parseTableRow(line, aligns, false)
 		if nil == tableRow {
 			return
+		}
+		if context.ParseOption.KramdownSpanIAL {
+			for th := tableRow.FirstChild; nil != th; th = th.Next {
+				ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
+				if 0 > ialStart {
+					continue
+				}
+				subTokens := th.Tokens[ialStart:]
+				if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
+					th.KramdownIAL = ial
+					ialTokens := subTokens[:pos+1]
+					th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
+					spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+					th.InsertAfter(spanIAL)
+					th = th.Next
+				}
+			}
 		}
 		ret.AppendChild(tableRow)
 	}
