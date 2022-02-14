@@ -1029,7 +1029,7 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 			r.Tag("/tbody", nil, false)
 		}
 		r.Tag("/table", nil, false)
-		r.WriteString("<div class=\"protyle-action__table\"><div class=\"table__resize\"></div></div>")
+		r.WriteString("<div class=\"protyle-action__table\"><div class=\"table__resize\"></div><div class=\"table__select\"></div></div>")
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
