@@ -1026,9 +1026,7 @@ func (r *BlockRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkS
 		r.Tag("thead", nil, false)
 	} else {
 		r.Tag("/thead", nil, false)
-		if nil != node.Next {
-			r.Tag("tbody", nil, false)
-		}
+		r.Tag("tbody", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1048,9 +1046,7 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("div", attrs, false)
 		r.Tag("table", nil, false)
 	} else {
-		if nil != node.FirstChild.Next {
-			r.Tag("/tbody", nil, false)
-		}
+		r.Tag("/tbody", nil, false)
 		r.Tag("/table", nil, false)
 		r.WriteString("<div class=\"protyle-action__table\"><div class=\"table__resize\"></div><div class=\"table__select\"></div></div>")
 		r.Tag("/div", nil, false)
