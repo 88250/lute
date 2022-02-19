@@ -54,12 +54,14 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 					}
 					subTokens := th.Tokens[ialStart:]
 					if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
-						th.KramdownIAL = ial
 						ialTokens := subTokens[:pos+1]
-						th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
-						spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-						th.InsertAfter(spanIAL)
-						th = th.Next
+						if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
+							th.KramdownIAL = ial
+							th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
+							spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+							th.InsertAfter(spanIAL)
+							th = th.Next
+						}
 					}
 				}
 			}
@@ -75,19 +77,21 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 					return
 				}
 				if context.ParseOption.KramdownSpanIAL {
-					for th := tableRow.FirstChild; nil != th; th = th.Next {
-						ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
+					for td := tableRow.FirstChild; nil != td; td = td.Next {
+						ialStart := bytes.LastIndex(td.Tokens, []byte("{:"))
 						if 0 > ialStart {
 							continue
 						}
-						subTokens := th.Tokens[ialStart:]
+						subTokens := td.Tokens[ialStart:]
 						if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
-							th.KramdownIAL = ial
 							ialTokens := subTokens[:pos+1]
-							th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
-							spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-							th.InsertAfter(spanIAL)
-							th = th.Next
+							if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
+								td.KramdownIAL = ial
+								td.Tokens = td.Tokens[:len(td.Tokens)-len(ialTokens)]
+								spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+								td.InsertAfter(spanIAL)
+								td = td.Next
+							}
 						}
 					}
 				}
