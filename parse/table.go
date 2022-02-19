@@ -53,7 +53,7 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 						continue
 					}
 					subTokens := th.Tokens[ialStart:]
-					if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
+					if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) && len(subTokens) == pos+1 {
 						ialTokens := subTokens[:pos+1]
 						if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
 							th.KramdownIAL = ial
@@ -83,7 +83,7 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 							continue
 						}
 						subTokens := td.Tokens[ialStart:]
-						if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
+						if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) && len(subTokens) == pos+1 {
 							ialTokens := subTokens[:pos+1]
 							if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
 								td.KramdownIAL = ial
