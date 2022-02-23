@@ -115,6 +115,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				break
 			}
 			node.Tokens = bytes.TrimSpace(node.Tokens)
+			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte(""))
 		}
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 		if nil != n.Parent && atom.Span == n.Parent.DataAtom && ("" != lute.domAttrValue(n.Parent, "class")) {
