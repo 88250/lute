@@ -1040,11 +1040,12 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
-		attrs = [][]string{}
-		r.contenteditable(node, &attrs)
+		attrs = [][]string{{"contenteditable", "false"}}
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
-		r.Tag("table", nil, false)
+		attrs = [][]string{}
+		r.contenteditable(node, &attrs)
+		r.Tag("table", attrs, false)
 	} else {
 		r.Tag("/tbody", nil, false)
 		r.Tag("/table", nil, false)
