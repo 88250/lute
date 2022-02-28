@@ -13,6 +13,7 @@ package render
 import (
 	"bytes"
 	"strconv"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -488,6 +489,14 @@ func (r *ProtylePreviewRenderer) renderBlockRefSpace(node *ast.Node, entering bo
 	return ast.WalkContinue
 }
 
+func (r *ProtylePreviewRenderer) escapeRefText(refText string) string {
+	refText = strings.ReplaceAll(refText, ">", "&gt;")
+	refText = strings.ReplaceAll(refText, "<", "&lt;")
+	refText = strings.ReplaceAll(refText, "\"", "&quot;")
+	refText = strings.ReplaceAll(refText, "'", "&apos;")
+	return refText
+}
+
 func (r *ProtylePreviewRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
@@ -773,10 +782,10 @@ func (r *ProtylePreviewRenderer) renderTableCell(node *ast.Node, entering bool) 
 		case 3:
 			attrs = append(attrs, []string{"align", "right"})
 		}
+		r.spanNodeAttrs(node, &attrs)
 		r.Tag(tag, attrs, false)
 	} else {
 		r.Tag("/"+tag, nil, false)
-		r.Newline()
 	}
 	return ast.WalkContinue
 }
@@ -784,41 +793,67 @@ func (r *ProtylePreviewRenderer) renderTableCell(node *ast.Node, entering bool) 
 func (r *ProtylePreviewRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("tr", nil, false)
-		r.Newline()
 	} else {
 		r.Tag("/tr", nil, false)
-		r.Newline()
 	}
 	return ast.WalkContinue
 }
 
 func (r *ProtylePreviewRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.Tag("colgroup", nil, false)
+		if colgroup := node.Parent.IALAttr("colgroup"); "" == colgroup {
+			for th := node.FirstChild.FirstChild; nil != th; th = th.Next {
+				if ast.NodeTableCell == th.Type {
+					if style := th.IALAttr("style"); "" != style {
+						r.Tag("col", [][]string{{"style", style}}, true)
+					} else {
+						r.Tag("col", nil, true)
+					}
+				}
+			}
+		} else {
+			cols := strings.Split(colgroup, "|")
+			for _, style := range cols {
+				if "" != style {
+					r.Tag("col", [][]string{{"style", style}}, true)
+				} else {
+					r.Tag("col", nil, true)
+				}
+			}
+		}
+		r.Tag("/colgroup", nil, false)
+
 		r.Tag("thead", nil, false)
-		r.Newline()
 	} else {
 		r.Tag("/thead", nil, false)
-		r.Newline()
-		if nil != node.Next {
-			r.Tag("tbody", nil, false)
-		}
-		r.Newline()
+		r.Tag("tbody", nil, false)
 	}
 	return ast.WalkContinue
 }
 
 func (r *ProtylePreviewRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
+	if nil == node.FirstChild {
+		return ast.WalkSkipChildren
+	}
+
 	if entering {
-		r.handleKramdownBlockIAL(node)
-		r.Tag("table", node.KramdownIAL, false)
-		r.Newline()
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "table")
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"contenteditable", "false"}}
+		r.Tag("div", attrs, false)
+		attrs = [][]string{}
+		r.contenteditable(node, &attrs)
+		r.spellcheck(&attrs)
+		r.Tag("table", attrs, false)
 	} else {
-		if nil != node.FirstChild.Next {
-			r.Tag("/tbody", nil, false)
-		}
-		r.Newline()
+		r.Tag("/tbody", nil, false)
 		r.Tag("/table", nil, false)
-		r.Newline()
+		r.WriteString("<div class=\"protyle-action__table\"><div class=\"table__resize\"></div><div class=\"table__select\"></div></div>")
+		r.Tag("/div", nil, false)
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -923,48 +958,49 @@ func (r *ProtylePreviewRenderer) renderBang(node *ast.Node, entering bool) ast.W
 
 func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if 0 == r.DisableTags {
-			attrs := [][]string{{"class", "img"}}
-			if style := node.IALAttr("parent-style"); "" != style {
-				attrs = append(attrs, []string{"style", style})
-			}
-			r.Tag("span", attrs, false)
-			r.WriteString("<img src=\"")
-			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.LinkPath(destTokens)
-			if "" != r.Options.ImageLazyLoading {
-				r.Write(html.EscapeHTML(util.StrToBytes(r.Options.ImageLazyLoading)))
-				r.WriteString("\" data-src=\"")
-			}
-			r.Write(html.EscapeHTML(destTokens))
-			r.WriteString("\" alt=\"")
+		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
+		parentStyle := node.IALAttr("parent-style")
+		if "" != parentStyle { // 手动设置了位置
+			attrs = append(attrs, []string{"style", parentStyle})
 		}
-		r.DisableTags++
-		return ast.WalkContinue
-	}
+		if !strings.Contains(parentStyle, "display") && !strings.Contains(parentStyle, "block") &&
+			r.LastOut == '\n' {
+			r.WriteString(parse.Zwsp)
+		}
+		r.Tag("span", attrs, false)
+		r.Tag("span", nil, false)
+		r.WriteString(" ")
+		r.Tag("/span", nil, false)
+		r.Tag("span", nil, false)
+		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
+		r.WriteString("<span><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
+		r.Tag("/span", nil, false)
+	} else {
+		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
+		if r.Options.Sanitize {
+			destTokens = sanitize(destTokens)
+		}
+		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
+		dataSrcTokens := destTokens
+		dataSrc := util.BytesToStr(dataSrcTokens)
+		src := util.BytesToStr(r.LinkPath(destTokens))
+		attrs := [][]string{{"src", src}, {"data-src", dataSrc}}
+		alt := node.ChildByType(ast.NodeLinkText)
+		if nil != alt && 0 < len(alt.Tokens) {
+			attrs = append(attrs, []string{"alt", util.BytesToStr(alt.Tokens)})
+		}
 
-	r.DisableTags--
-	if 0 == r.DisableTags {
-		r.WriteByte(lex.ItemDoublequote)
 		title := node.ChildByType(ast.NodeLinkTitle)
 		var titleTokens []byte
-		if nil != title && nil != title.Tokens {
-			titleTokens = html.EscapeHTML(title.Tokens)
-			r.WriteString(" title=\"")
-			r.Write(titleTokens)
-			r.WriteByte(lex.ItemDoublequote)
+		if nil != title && 0 < len(title.Tokens) {
+			titleTokens = title.Tokens
+			attrs = append(attrs, []string{"title", r.escapeRefText(string(titleTokens))})
 		}
-		ial := r.NodeAttrsStr(node)
-		if "" != ial {
-			r.WriteString(" " + ial)
+
+		if style := node.IALAttr("style"); "" != style {
+			attrs = append(attrs, []string{"style", style})
 		}
-		r.WriteString(" />")
-		if 0 < len(titleTokens) {
-			r.Tag("span", [][]string{{"class", "protyle-action__title"}}, false)
-			r.Write(titleTokens)
-			r.Tag("/span", nil, false)
-		}
-		r.Tag("/span", nil, false)
+		r.Tag("img", attrs, true)
 
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
@@ -972,8 +1008,26 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 		if r.Options.Sanitize {
 			imgBuf = sanitize(imgBuf)
 		}
+		imgBuf = r.tagSrcPath(imgBuf)
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
+
+		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
+		r.Tag("/span", nil, false)
+
+		if r.Options.ProtyleMarkNetImg && !bytes.HasPrefix(dataSrcTokens, []byte("assets/")) {
+			r.WriteString("<span class=\"img__net\"><svg><use xlink:href=\"#iconLanguage\"></use></svg></span>")
+		}
+
+		attrs = [][]string{{"class", "protyle-action__title"}}
+		r.Tag("span", attrs, false)
+		r.Writer.Write(html.EscapeHTML(titleTokens))
+		r.Tag("/span", nil, false)
+		r.Tag("/span", nil, false)
+		r.Tag("span", nil, false)
+		r.WriteString(" ")
+		r.Tag("/span", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1330,4 +1384,96 @@ func (r *ProtylePreviewRenderer) handleKramdownBlockIAL(node *ast.Node) {
 		// 第一项必须是 ID
 		node.KramdownIAL[0][0] = r.Options.KramdownIALIDRenderName
 	}
+}
+
+func (r *ProtylePreviewRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
+	*attrs = append(*attrs, node.KramdownIAL...)
+}
+
+func (r *ProtylePreviewRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class string) {
+	r.nodeID(node, attrs)
+	r.nodeDataType(node, attrs)
+	r.nodeClass(node, attrs, class)
+
+	for _, ial := range node.KramdownIAL {
+		if "id" == ial[0] {
+			continue
+		}
+		*attrs = append(*attrs, []string{ial[0], strings.ReplaceAll(ial[1], util.IALValEscNewLine, "\n")})
+	}
+}
+
+func (r *ProtylePreviewRenderer) nodeClass(node *ast.Node, attrs *[][]string, class string) {
+	*attrs = append(*attrs, []string{"class", class})
+}
+
+func (r *ProtylePreviewRenderer) nodeDataType(node *ast.Node, attrs *[][]string) {
+	*attrs = append(*attrs, []string{"data-type", node.Type.String()})
+}
+
+func (r *ProtylePreviewRenderer) nodeID(node *ast.Node, attrs *[][]string) {
+	*attrs = append(*attrs, []string{"data-node-id", r.NodeID(node)})
+}
+
+func (r *ProtylePreviewRenderer) spellcheck(attrs *[][]string) {
+	*attrs = append(*attrs, []string{"spellcheck", "false"})
+	return
+}
+
+func (r *ProtylePreviewRenderer) contenteditable(node *ast.Node, attrs *[][]string) {
+	if contenteditable := node.IALAttr("contenteditable"); "" != contenteditable {
+		*attrs = append(*attrs, []string{"contenteditable", contenteditable})
+	} else {
+		*attrs = append(*attrs, []string{"contenteditable", strconv.FormatBool(r.Options.ProtyleContenteditable)})
+	}
+	return
+}
+
+func (r *ProtylePreviewRenderer) renderIAL(node *ast.Node) {
+	attrs := [][]string{{"class", "protyle-attr"}, {"contenteditable", "false"}}
+	r.Tag("div", attrs, false)
+
+	if bookmark := node.IALAttr("bookmark"); "" != bookmark {
+		bookmark = strings.ReplaceAll(bookmark, util.IALValEscNewLine, "\n")
+		bookmark = html.EscapeHTMLStr(bookmark)
+		r.Tag("div", [][]string{{"class", "protyle-attr--bookmark"}}, false)
+		r.WriteString(bookmark)
+		r.Tag("/div", nil, false)
+	}
+
+	if name := node.IALAttr("name"); "" != name {
+		name = strings.ReplaceAll(name, util.IALValEscNewLine, "\n")
+		name = html.EscapeHTMLStr(name)
+		r.Tag("div", [][]string{{"class", "protyle-attr--name"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconN\"></use></svg>")
+		r.WriteString(name)
+		r.Tag("/div", nil, false)
+	}
+
+	if alias := node.IALAttr("alias"); "" != alias {
+		alias = strings.ReplaceAll(alias, util.IALValEscNewLine, "\n")
+		alias = html.EscapeHTMLStr(alias)
+		r.Tag("div", [][]string{{"class", "protyle-attr--alias"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconA\"></use></svg>")
+		r.WriteString(alias)
+		r.Tag("/div", nil, false)
+	}
+
+	if memo := node.IALAttr("memo"); "" != memo {
+		memo = strings.ReplaceAll(memo, util.IALValEscNewLine, "\n")
+		memo = html.EscapeHTMLStr(memo)
+		r.Tag("div", [][]string{{"class", "protyle-attr--memo b3-tooltips b3-tooltips__nw"}, {"aria-label", memo}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconM\"></use></svg>")
+		r.Tag("/div", nil, false)
+	}
+
+	if refCount := node.IALAttr("refcount"); "" != refCount {
+		refCount = strings.ReplaceAll(refCount, util.IALValEscNewLine, "\n")
+		refCount = html.EscapeHTMLStr(refCount)
+		r.Tag("div", [][]string{{"class", "protyle-attr--refcount popover__block"}}, false)
+		r.WriteString(refCount)
+		r.Tag("/div", nil, false)
+	}
+
+	r.Tag("/div", nil, false)
 }
