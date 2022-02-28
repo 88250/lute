@@ -979,6 +979,7 @@ func (r *BlockExportRenderer) renderTableCell(node *ast.Node, entering bool) ast
 		case 3:
 			attrs = append(attrs, []string{"align", "right"})
 		}
+		r.spanNodeAttrs(node, &attrs)
 		r.Tag(tag, attrs, false)
 	} else {
 		r.Tag("/"+tag, nil, false)
@@ -997,12 +998,33 @@ func (r *BlockExportRenderer) renderTableRow(node *ast.Node, entering bool) ast.
 
 func (r *BlockExportRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.Tag("colgroup", nil, false)
+		if colgroup := node.Parent.IALAttr("colgroup"); "" == colgroup {
+			for th := node.FirstChild.FirstChild; nil != th; th = th.Next {
+				if ast.NodeTableCell == th.Type {
+					if style := th.IALAttr("style"); "" != style {
+						r.Tag("col", [][]string{{"style", style}}, true)
+					} else {
+						r.Tag("col", nil, true)
+					}
+				}
+			}
+		} else {
+			cols := strings.Split(colgroup, "|")
+			for _, style := range cols {
+				if "" != style {
+					r.Tag("col", [][]string{{"style", style}}, true)
+				} else {
+					r.Tag("col", nil, true)
+				}
+			}
+		}
+		r.Tag("/colgroup", nil, false)
+
 		r.Tag("thead", nil, false)
 	} else {
 		r.Tag("/thead", nil, false)
-		if nil != node.Next {
-			r.Tag("tbody", nil, false)
-		}
+		r.Tag("tbody", nil, false)
 	}
 	return ast.WalkContinue
 }
@@ -1016,16 +1038,16 @@ func (r *BlockExportRenderer) renderTable(node *ast.Node, entering bool) ast.Wal
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
+		attrs = [][]string{{"contenteditable", "false"}}
+		r.Tag("div", attrs, false)
 		attrs = [][]string{}
 		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
-		r.Tag("div", attrs, false)
-		r.Tag("table", nil, false)
+		r.Tag("table", attrs, false)
 	} else {
-		if nil != node.FirstChild.Next {
-			r.Tag("/tbody", nil, false)
-		}
+		r.Tag("/tbody", nil, false)
 		r.Tag("/table", nil, false)
+		r.WriteString("<div class=\"protyle-action__table\"><div class=\"table__resize\"></div><div class=\"table__select\"></div></div>")
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)
