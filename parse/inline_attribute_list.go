@@ -42,7 +42,7 @@ func IALStart(t *Tree, container *ast.Node) int {
 
 		lastMatchedContainer := t.Context.lastMatchedContainer
 		if t.Context.allClosed {
-			if ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type || ast.NodeBlockquote == lastMatchedContainer.Type {
+			if ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type || ast.NodeBlockquote == lastMatchedContainer.Type || ast.NodeSuperBlock == lastMatchedContainer.Type {
 				lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
 				if nil == lastMatchedContainer {
 					lastMatchedContainer = t.Context.lastMatchedContainer
