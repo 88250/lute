@@ -537,8 +537,9 @@ func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
-		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter, NodeBlockQueryEmbed,
-		NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget:
+		NodeCodeBlock, NodeCodeBlockCode, NodeTable, NodeMathBlock, NodeMathBlockContent, NodeFootnotesDefBlock, NodeFootnotesDef,
+		NodeToC, NodeYamlFrontMatter, NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeGitConflictContent,
+		NodeAudio, NodeVideo, NodeIFrame, NodeWidget:
 		return true
 	}
 	return false
@@ -553,7 +554,7 @@ func (n *Node) IsContainerBlock() bool {
 	return false
 }
 
-// IsMarker 判断 n 是否为标记符节点。
+// IsMarker 判断 n 是否为节点标记符。
 func (n *Node) IsMarker() bool {
 	switch n.Type {
 	case NodeHeadingC8hMarker, NodeBlockquoteMarker, NodeCodeBlockFenceOpenMarker, NodeCodeBlockFenceCloseMarker, NodeCodeBlockFenceInfoMarker,
