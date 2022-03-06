@@ -924,6 +924,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			// `<kbd>` 中反斜杠转义问题 https://github.com/siyuan-note/siyuan/issues/2242
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\\\\"), []byte("\\"))
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\\"), []byte("\\\\"))
+
+			if bytes.Equal(node.Tokens, util.CaretTokens) {
+				// `<kbd>` 无法删除 https://github.com/siyuan-note/siyuan/issues/4162
+				parent := tree.Context.Tip.Parent
+				tree.Context.Tip.Unlink()
+				tree.Context.Tip = parent
+			}
 		}
 		tree.Context.Tip.AppendChild(node)
 	case atom.Thead:
