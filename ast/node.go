@@ -537,9 +537,8 @@ func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
-		NodeCodeBlock, NodeCodeBlockCode, NodeTable, NodeMathBlock, NodeMathBlockContent, NodeFootnotesDefBlock, NodeFootnotesDef,
-		NodeToC, NodeYamlFrontMatter, NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeGitConflictContent,
-		NodeAudio, NodeVideo, NodeIFrame, NodeWidget:
+		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter,
+		NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget:
 		return true
 	}
 	return false
