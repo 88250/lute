@@ -28,7 +28,7 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 		return 0
 	}
 
-	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG {
+	if t.Context.ParseOption.VditorWYSIWYG {
 		if bytes.Contains(t.Context.currentLine, []byte("vditor-comment")) {
 			return 0
 		}
@@ -54,9 +54,6 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 				t.Context.addChild(ast.NodeAudio)
 				return 2
 			}
-
-			// Protyle 中不存在 HTML 块，使用段落块
-			return 0
 		}
 
 		block := t.Context.addChild(ast.NodeHTMLBlock)

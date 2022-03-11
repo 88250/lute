@@ -1264,23 +1264,21 @@ func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus
 }
 
 func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	// Protyle 中不存在 HTML 块，所以应该不会进入这里的渲染实现
-
-	if entering {
-		var attrs [][]string
-		node.Type = ast.NodeParagraph
-		r.blockNodeAttrs(node, &attrs, "p")
-		r.Tag("div", attrs, false)
-		attrs = [][]string{{"contenteditable", "false"}, {"spellcheck", "false"}}
-		r.Tag("div", attrs, false)
-
-		tokens := bytes.TrimSpace(node.Tokens)
-		r.Write(html.EscapeHTML(tokens))
-	} else {
-		r.Tag("/div", nil, false)
-		r.renderIAL(node)
-		r.Tag("/div", nil, false)
+	if !entering {
+		return ast.WalkContinue
 	}
+
+	var attrs [][]string
+	r.blockNodeAttrs(node, &attrs, "render-node")
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	attrs = append(attrs, []string{"data-subtype", "block"})
+	r.Tag("div", attrs, false)
+	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
+	r.Tag("protyle-html", attrs, false)
+	r.Tag("/protyle-html", nil, false)
+	r.renderIAL(node)
+	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
 
@@ -1289,20 +1287,17 @@ func (r *BlockRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Walk
 		return ast.WalkContinue
 	}
 
-	if bytes.Equal(node.Tokens, []byte("<br />")) && node.ParentIs(ast.NodeTableCell) {
-		r.Write(node.Tokens)
-		return ast.WalkContinue
-	}
-
-	if bytes.Equal(node.Tokens, []byte("<u>")) || bytes.Equal(node.Tokens, []byte("</u>")) {
-		r.Write(node.Tokens)
-		return ast.WalkContinue
-	}
-
-	r.Tag("code", [][]string{{"data-type", "html-inline"}}, false)
-	tokens := html.EscapeHTML(node.Tokens)
-	r.Write(tokens)
-	r.WriteString("</code>")
+	var attrs [][]string
+	r.blockNodeAttrs(node, &attrs, "render-node")
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	attrs = append(attrs, []string{"data-subtype", "inline"})
+	r.Tag("div", attrs, false)
+	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
+	r.Tag("protyle-html", attrs, false)
+	r.Tag("/protyle-html", nil, false)
+	r.renderIAL(node)
+	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
 
