@@ -785,9 +785,11 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeHTMLBlock:
 		node.Type = ast.NodeHTMLBlock
+		content := lute.domAttrValue(n.FirstChild.FirstChild, "data-content")
+		content = html.UnescapeHTMLStr(content)
+		node.Tokens = util.StrToBytes(content)
 		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
+		return
 	case ast.NodeYamlFrontMatter:
 		node.Type = ast.NodeYamlFrontMatter
 		tree.Context.Tip.AppendChild(node)
