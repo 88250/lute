@@ -1290,20 +1290,18 @@ func (r *BlockRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Walk
 		return ast.WalkContinue
 	}
 
-	var attrs [][]string
-	r.blockNodeAttrs(node, &attrs, "render-node")
-	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-	attrs = append(attrs, []string{"data-subtype", "inline"})
-	r.Tag("span", attrs, false)
-	r.WriteString("<span>")
-	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
-	r.Tag("protyle-html", attrs, false)
-	r.Tag("/protyle-html", nil, false)
-	r.WriteString("<span style=\"position: absolute\">" + parse.Zwsp + "</span>")
-	r.WriteString("</span>")
-	r.renderIAL(node)
-	r.Tag("/span", nil, false)
+	if bytes.Equal(node.Tokens, []byte("<br />")) && node.ParentIs(ast.NodeTableCell) {
+		r.Write(node.Tokens)
+		return ast.WalkContinue
+	}
+
+	if bytes.Equal(node.Tokens, []byte("<u>")) || bytes.Equal(node.Tokens, []byte("</u>")) {
+		r.Write(node.Tokens)
+		return ast.WalkContinue
+	}
+
+	tokens := html.EscapeHTML(node.Tokens)
+	r.Write(tokens)
 	return ast.WalkContinue
 }
 
