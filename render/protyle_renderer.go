@@ -1274,9 +1274,12 @@ func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus
 	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	attrs = append(attrs, []string{"data-subtype", "block"})
 	r.Tag("div", attrs, false)
+	r.WriteString("<div>")
 	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
 	r.Tag("protyle-html", attrs, false)
 	r.Tag("/protyle-html", nil, false)
+	r.WriteString("<span style=\"position: absolute\">" + parse.Zwsp + "</span>")
+	r.WriteString("</div>")
 	r.renderIAL(node)
 	r.Tag("/div", nil, false)
 	return ast.WalkContinue
@@ -1292,12 +1295,15 @@ func (r *BlockRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Walk
 	tokens := node.Tokens
 	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
 	attrs = append(attrs, []string{"data-subtype", "inline"})
-	r.Tag("div", attrs, false)
+	r.Tag("span", attrs, false)
+	r.WriteString("<span>")
 	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
 	r.Tag("protyle-html", attrs, false)
 	r.Tag("/protyle-html", nil, false)
+	r.WriteString("<span style=\"position: absolute\">" + parse.Zwsp + "</span>")
+	r.WriteString("</span>")
 	r.renderIAL(node)
-	r.Tag("/div", nil, false)
+	r.Tag("/span", nil, false)
 	return ast.WalkContinue
 }
 

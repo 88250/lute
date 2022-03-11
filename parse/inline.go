@@ -45,10 +45,6 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 				if n = t.parseAutoEmailLink(ctx); nil == n {
 					if n = t.parseFileAnnotationRef(ctx); nil == n {
 						n = t.parseInlineHTML(ctx)
-						if t.Context.ParseOption.ProtyleWYSIWYG && nil != n && ast.NodeInlineHTML == n.Type {
-							// Protyle 中不存在内联 HTML，使用文本
-							n.Type = ast.NodeText
-						}
 					}
 				}
 			}
