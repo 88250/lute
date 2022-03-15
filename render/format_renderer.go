@@ -1029,7 +1029,9 @@ func (r *FormatRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 		r.Write(tokens)
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
-			r.WriteByte(lex.ItemNewline)
+			if r.withoutKramdownBlockIAL(node) {
+				r.WriteByte(lex.ItemNewline)
+			}
 		}
 	}
 	return ast.WalkContinue
