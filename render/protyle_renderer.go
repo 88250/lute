@@ -484,7 +484,7 @@ func (r *BlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.W
 	if entering {
 		content := node.Parent.Text()
 		content = strings.ReplaceAll(content, util.Caret, "")
-		r.Tag("span", [][]string{{"data-type", "tag"}, {"data-content", content}}, false)
+		r.Tag("span", [][]string{{"data-type", "tag"}, {"data-content", html.EscapeHTMLStr(content)}}, false)
 	}
 	return ast.WalkContinue
 }
