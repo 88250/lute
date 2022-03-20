@@ -108,8 +108,6 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 								listItem.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
 								if nil != p.FirstChild {
 									listItem.PrependChild(p.FirstChild)
-								} else {
-									listItem.PrependChild(&ast.Node{Type: ast.NodeParagraph})
 								}
 								subBlock.ID = p.ID
 								subBlock.KramdownIAL = p.KramdownIAL
