@@ -1065,6 +1065,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil != n.FirstChild {
 				refText = lute.domText(n.FirstChild)
 			}
+			refText = strings.TrimSpace(refText)
 			if "" == refText {
 				return
 			}
@@ -1095,6 +1096,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil != n.FirstChild {
 				refText = lute.domText(n.FirstChild)
 			}
+			refText = strings.TrimSpace(refText)
 			if "" == refText {
 				return
 			}
