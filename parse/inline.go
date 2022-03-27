@@ -334,7 +334,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 				if idx, footnotesDef := t.FindFootnotesDef(reflabel); nil != footnotesDef {
 					t.removeBracket(ctx)
 
-					if t.Context.ParseOption.Sup {
+					if t.Context.ParseOption.Sup && nil != opener.node.Next.Next {
 						opener.node.Next.Next.Unlink() // label
 						opener.node.Next.Unlink()      // ^
 					} else {
