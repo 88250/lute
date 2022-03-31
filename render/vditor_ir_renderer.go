@@ -788,7 +788,15 @@ func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.Wal
 		}
 
 		r.Tag("span", [][]string{{"class", "vditor-ir__marker vditor-ir__marker--link"}}, false)
-		r.Write(node.Tokens)
+		dest := node.Tokens
+		if r.Options.Sanitize {
+			tokens := bytes.TrimSpace(dest)
+			tokens = bytes.ToLower(tokens)
+			if bytes.HasPrefix(tokens, []byte("javascript:")) {
+				dest = nil
+			}
+		}
+		r.Write(dest)
 		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue

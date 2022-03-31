@@ -830,6 +830,13 @@ func (r *HtmlRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus 
 
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
+		if r.Options.Sanitize {
+			tokens := bytes.TrimSpace(destTokens)
+			tokens = bytes.ToLower(tokens)
+			if bytes.HasPrefix(tokens, []byte("javascript:")) {
+				destTokens = nil
+			}
+		}
 		destTokens = r.LinkPath(destTokens)
 		attrs := [][]string{{"href", util.BytesToStr(html.EscapeHTML(destTokens))}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {

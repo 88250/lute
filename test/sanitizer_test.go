@@ -19,6 +19,7 @@ import (
 
 var sanitizerTests = []parseTest{
 
+	{"8", "[xss](javascript:alert(document.domain))", "<p><a href=\"\">xss</a></p>\n"},
 	{"7", "![a](\"<img src=xss onerror=alert(1)>)\n", "<p>![a](&quot;&lt;img src=xss onerror=alert(1)&gt;)</p>\n"},
 	{"6", "<img src=\"foo\" onload=\"alert(1)\" onerror=\"alert(2)\"/>", "<img src=\"foo\" />\n"},
 	{"5", "<iframe src='javascript:parent.require(\"child_process\").exec(\"open -a Calculator\")'></iframe>", "<iframe></iframe>\n"},

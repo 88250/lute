@@ -1234,9 +1234,13 @@ func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
 		if r.Options.Sanitize {
+			destTokens = bytes.TrimSpace(destTokens)
 			destTokens = sanitize(destTokens)
+			tokens := bytes.ToLower(destTokens)
+			if bytes.HasPrefix(tokens, []byte("javascript:")) {
+				destTokens = nil
+			}
 		}
-
 		destTokens = r.LinkPath(destTokens)
 		if bytes.HasPrefix(destTokens, []byte("assets/")) {
 			if bytes.Contains(destTokens, []byte("?")) {
