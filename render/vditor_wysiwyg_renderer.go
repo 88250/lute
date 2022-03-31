@@ -28,6 +28,7 @@ import (
 // VditorRenderer 描述了 Vditor WYSIWYG DOM 渲染器。
 type VditorRenderer struct {
 	*BaseRenderer
+	commentStackDepth int
 }
 
 // NewVditorRenderer 创建一个 Vditor WYSIWYG DOM 渲染器。
@@ -805,9 +806,18 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 		return ast.WalkContinue
 	}
 
-	if bytes.Contains(node.Tokens, []byte("<span class=\"vditor-comment")) || bytes.Equal(node.Tokens, []byte("</span>")) {
+	if bytes.Contains(node.Tokens, []byte("<span class=\"vditor-comment")) {
+		r.commentStackDepth++
 		r.Write(node.Tokens)
 		return ast.WalkContinue
+	}
+
+	if bytes.Equal(node.Tokens, []byte("</span>")) {
+		if 0 < r.commentStackDepth {
+			r.commentStackDepth--
+			r.Write(node.Tokens)
+			return ast.WalkContinue
+		}
 	}
 
 	if entering {
