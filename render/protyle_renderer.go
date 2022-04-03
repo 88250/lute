@@ -1718,5 +1718,6 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 		r.Tag("/div", nil, false)
 	}
 
+	r.WriteString(parse.Zwsp)
 	r.Tag("/div", nil, false)
 }
