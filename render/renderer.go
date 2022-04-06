@@ -501,20 +501,20 @@ func headingText(n *ast.Node) (ret string) {
 			buf.Write(n.Tokens)
 		case ast.NodeInlineMathContent:
 			buf.WriteString("<span class=\"language-math\">")
-			buf.Write(n.Tokens)
+			buf.Write(html.EscapeHTML(n.Tokens))
 			buf.WriteString("</span>")
 		case ast.NodeCodeSpanContent:
 			buf.WriteString("<code>")
-			buf.Write(n.Tokens)
+			buf.Write(html.EscapeHTML(n.Tokens))
 			buf.WriteString("</code>")
 		case ast.NodeText:
 			if n.ParentIs(ast.NodeStrong) {
 				buf.WriteString("<strong>")
-				buf.Write(n.Tokens)
+				buf.Write(html.EscapeHTML(n.Tokens))
 				buf.WriteString("</strong>")
 			} else if n.ParentIs(ast.NodeEmphasis) {
 				buf.WriteString("<em>")
-				buf.Write(n.Tokens)
+				buf.Write(html.EscapeHTML(n.Tokens))
 				buf.WriteString("</em>")
 			} else {
 				if nil != n.Previous && ast.NodeInlineHTML == n.Previous.Type {
@@ -526,7 +526,7 @@ func headingText(n *ast.Node) (ret string) {
 						buf.Write(n.Next.Tokens)
 					}
 				} else {
-					buf.Write(n.Tokens)
+					buf.Write(html.EscapeHTML(n.Tokens))
 				}
 			}
 		}
