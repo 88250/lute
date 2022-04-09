@@ -989,7 +989,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Code:
-		if lute.isEmptyText(n) {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if isEmpty {
 			return
 		}
 
@@ -1149,7 +1156,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 	case atom.Sub:
-		if lute.isEmptyText(n) {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if isEmpty {
 			return
 		}
 
@@ -1159,7 +1173,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Sup:
-		if lute.isEmptyText(n) {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if isEmpty {
 			return
 		}
 
@@ -1169,18 +1190,34 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.U:
-		if lute.isEmptyText(n) {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
 			return
 		}
+		if isEmpty {
+			return
+		}
+
 		node.Type = ast.NodeUnderline
 		node.AppendChild(&ast.Node{Type: ast.NodeUnderlineOpenMarker})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Kbd:
-		if lute.isEmptyText(n) {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
+			node.Tokens = util.CaretTokens
+			tree.Context.Tip.AppendChild(node)
 			return
 		}
+		if isEmpty {
+			return
+		}
+
 		node.Type = ast.NodeKbd
 		node.AppendChild(&ast.Node{Type: ast.NodeKbdOpenMarker})
 		tree.Context.Tip.AppendChild(node)
@@ -1205,13 +1242,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
-		text := strings.TrimSpace(lute.domText(n))
-		if lute.isEmptyText(n) {
-			return
-		}
-		if util.Caret == text {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
 			node.Tokens = util.CaretTokens
 			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if isEmpty {
 			return
 		}
 
@@ -1266,13 +1304,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
-		text := strings.TrimSpace(lute.domText(n))
-		if lute.isEmptyText(n) {
-			return
-		}
-		if util.Caret == text {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
 			node.Tokens = util.CaretTokens
 			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if isEmpty {
 			return
 		}
 
@@ -1313,13 +1352,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
-		text := strings.TrimSpace(lute.domText(n))
-		if lute.isEmptyText(n) {
-			return
-		}
-		if util.Caret == text {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
 			node.Tokens = util.CaretTokens
 			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if isEmpty {
 			return
 		}
 
@@ -1356,13 +1396,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
 		}
-		text := strings.TrimSpace(lute.domText(n))
-		if lute.isEmptyText(n) {
-			return
-		}
-		if util.Caret == text {
+		isCaret, isEmpty := lute.isCaret(n)
+		if isCaret {
+			node.Type = ast.NodeText
 			node.Tokens = util.CaretTokens
 			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if isEmpty {
 			return
 		}
 

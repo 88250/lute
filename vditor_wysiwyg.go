@@ -1483,6 +1483,11 @@ func (lute *Lute) domHTML(n *html.Node) []byte {
 	return bytes.ReplaceAll(buf.Bytes(), []byte(parse.Zwsp), nil)
 }
 
+func (lute *Lute) isCaret(n *html.Node) (isCaret, isEmptyText bool) {
+	text := strings.TrimSpace(lute.domText(n))
+	return util.Caret == text || parse.Zwsp+util.Caret == text || util.Caret+parse.Zwsp == text, "" == text || parse.Zwsp == text
+}
+
 func (lute *Lute) isEmptyText(n *html.Node) bool {
 	if nil != n.FirstChild && "block-ref" == lute.domAttrValue(n.FirstChild, "data-type") {
 		return false
