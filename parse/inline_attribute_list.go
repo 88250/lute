@@ -60,7 +60,8 @@ func IALStart(t *Tree, container *ast.Node) int {
 			}
 		}
 		lastMatchedContainer.KramdownIAL = ial
-		lastMatchedContainer.ID = ial[0][1]
+		ialMap := IAL2MapUnEsc(ial)
+		lastMatchedContainer.ID = ialMap["id"]
 		node := t.Context.addChild(ast.NodeKramdownBlockIAL)
 		node.Tokens = t.Context.currentLine[t.Context.nextNonspace:]
 		return 2

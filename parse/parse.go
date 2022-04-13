@@ -45,8 +45,12 @@ func (t *Tree) finalParseBlockIAL() {
 	var appends []*ast.Node
 
 	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || !n.IsBlock() || ast.NodeDocument == n.Type || ast.NodeKramdownBlockIAL == n.Type {
+		if !entering || !n.IsBlock() || ast.NodeKramdownBlockIAL == n.Type {
 			return ast.WalkContinue
+		}
+
+		if "" == n.ID {
+			n.ID = ast.NewNodeID()
 		}
 
 		if ast.NodeBlockquote == n.Type && nil != n.FirstChild && nil == n.FirstChild.Next {
@@ -55,11 +59,17 @@ func (t *Tree) finalParseBlockIAL() {
 
 		ial := n.Next
 		if nil == ial || ast.NodeKramdownBlockIAL != ial.Type {
+			if t.Context.ParseOption.ProtyleWYSIWYG {
+				n.SetIALAttr("updated", n.ID[:14])
+			}
 			return ast.WalkContinue
 		}
 
 		n.KramdownIAL = Tokens2IAL(ial.Tokens)
-		n.ID = n.IALAttr("id")
+		if "" == n.IALAttr("updated") && t.Context.ParseOption.ProtyleWYSIWYG {
+			n.SetIALAttr("updated", n.ID[:14])
+			ial.Tokens = IAL2Tokens(n.KramdownIAL)
+		}
 		return ast.WalkContinue
 	})
 
@@ -67,7 +77,7 @@ func (t *Tree) finalParseBlockIAL() {
 		id := ast.NewNodeID()
 		ialTokens := []byte("{: id=\"" + id + "\"}")
 		p := &ast.Node{Type: ast.NodeParagraph, ID: id}
-		p.KramdownIAL = [][]string{{"id", id}}
+		p.KramdownIAL = [][]string{{"id", id}, {"updated", id[:14]}}
 		p.ID = id
 		p.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
 		n.AppendChild(p)
@@ -79,7 +89,7 @@ func (t *Tree) finalParseBlockIAL() {
 		docIAL = t.Context.rootIAL
 	} else {
 		id = ast.NewNodeID()
-		docIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: []byte("{: id=\"" + id + "\" type=\"doc\"}")}
+		docIAL = &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: []byte("{: id=\"" + id + "\" updated=\"" + id[:14] + "\" type=\"doc\"}")}
 		t.Root.ID = id
 		t.ID = id
 	}

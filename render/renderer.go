@@ -632,9 +632,6 @@ func (r *BaseRenderer) NodeID(node *ast.Node) (ret string) {
 			return kv[1]
 		}
 	}
-	if ast.NodeListItem == node.Type { // 列表项暂时不生成 ID，等确定是否需要列表项块类型后再打开
-		return ""
-	}
 	return ast.NewNodeID()
 }
 
