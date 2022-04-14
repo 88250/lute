@@ -50,26 +50,20 @@ func TestMath(t *testing.T) {
 	}
 }
 
-var inlineMathDigitTests = []parseTest{
+var inlineMathDigitAllowTests = []parseTest{
 
-	{"not allow digit after $", "$1$", "<p>$1$</p>\n"},
-	{"allow digit after $", "$1$", "<p><span class=\"language-math\">1</span></p>\n"},
+	{"1", "$1$2", "<p><span class=\"language-math\">1</span>2</p>\n"},
+	{"0", "$1$", "<p><span class=\"language-math\">1</span></p>\n"},
 }
 
 func TestInlineMathDigit(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetInlineMathAllowDigitAfterOpenMarker(true)
 
-	notAllowDigit := inlineMathDigitTests[0]
-	html := luteEngine.MarkdownStr(notAllowDigit.name, notAllowDigit.from)
-	if notAllowDigit.to != html {
-		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", notAllowDigit.name, notAllowDigit.to, html, notAllowDigit.from)
-	}
-
-	luteEngine.ParseOptions.InlineMathAllowDigitAfterOpenMarker = true
-
-	allowDigit := inlineMathDigitTests[1]
-	html = luteEngine.MarkdownStr(allowDigit.name, allowDigit.from)
-	if allowDigit.to != html {
-		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", allowDigit.name, allowDigit.to, html, allowDigit.from)
+	for _, test := range inlineMathDigitAllowTests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
 	}
 }

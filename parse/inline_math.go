@@ -92,7 +92,7 @@ func (t *Tree) matchInlineMathEnd(tokens []byte) (pos int) {
 	for ; pos < length; pos++ {
 		if lex.ItemDollar == tokens[pos] && 0 < pos && lex.ItemBackslash != tokens[pos-1] {
 			if pos < length-1 {
-				if !lex.IsDigit(tokens[pos+1]) {
+				if !lex.IsDigit(tokens[pos+1]) || t.Context.ParseOption.InlineMathAllowDigitAfterOpenMarker {
 					return pos
 				}
 			} else {
