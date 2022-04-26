@@ -379,9 +379,22 @@ func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild
 
-	for p := node; nil != p; p = p.Next {
-		if ast.NodeHeading == p.Type {
-			p.Type = ast.NodeParagraph
+	for n := node; nil != n; n = n.Next {
+		switch n.Type {
+		case ast.NodeHeading:
+			n.Type = ast.NodeParagraph
+		case ast.NodeBlockquote:
+			var children []*ast.Node
+			for c := n.LastChild; nil != c; c = c.Previous {
+				if ast.NodeBlockquoteMarker == c.Type {
+					continue
+				}
+				children = append(children, c)
+			}
+			for _, c := range children {
+				n.InsertBefore(c)
+			}
+			n.Unlink()
 		}
 	}
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)

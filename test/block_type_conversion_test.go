@@ -45,7 +45,7 @@ func TestCancelSuperBlock(t *testing.T) {
 }
 
 var blocks2psTests = []*parseTest{
-	{"0", "", ""},
+	{"0", "<div data-node-id=\"20220426231409-k3dkf3a\" data-node-index=\"0\" data-type=\"NodeBlockquote\" class=\"bq\" updated=\"20220426231411\"><div data-node-id=\"20220426231411-0xk2nas\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20220426231412\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div><div data-node-id=\"20220426231413-zp3tgl0\" data-node-index=\"1\" data-type=\"NodeBlockquote\" class=\"bq\" updated=\"20220426231415\"><div data-node-id=\"20220426231415-p90jao5\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20220426231416\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div>", "<div data-node-id=\"20220426231411-0xk2nas\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20220426231412\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20220426231413-zp3tgl0\" data-node-index=\"2\" data-type=\"NodeBlockquote\" class=\"bq\" updated=\"20220426231415\"><div data-node-id=\"20220426231415-p90jao5\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20220426231416\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 }
 
 func TestBlocks2Ps(t *testing.T) {
