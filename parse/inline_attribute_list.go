@@ -47,7 +47,9 @@ func IALStart(t *Tree, container *ast.Node) int {
 				if nil == lastMatchedContainer {
 					lastMatchedContainer = t.Context.lastMatchedContainer
 				}
-				if ast.NodeKramdownBlockIAL == lastMatchedContainer.Type && nil != lastMatchedContainer.Parent { // 两个连续的 IAL
+				if (ast.NodeSuperBlockLayoutMarker == lastMatchedContainer.Type || // 三个空块合并的超级块导出模版后使用会变成两个块  https://github.com/siyuan-note/siyuan/issues/4692
+					ast.NodeKramdownBlockIAL == lastMatchedContainer.Type) &&
+					nil != lastMatchedContainer.Parent { // 两个连续的 IAL
 					tokens := IAL2Tokens(ial)
 					if !bytes.HasPrefix(lastMatchedContainer.Tokens, tokens) { // 有的块解析已经做过打断处理
 						// 在两个连续的 IAL 之间插入空段落，这样能够保持空行留白
