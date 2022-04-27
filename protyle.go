@@ -952,6 +952,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil != tree.Context.Tip.Previous && tree.Context.Tip.Type == tree.Context.Tip.Previous.Type { // 合并相邻的代码
 				tree.Context.Tip.FirstChild.Next.Tokens = util.StrToBytes(content)
 			} else { // 叠加代码
+				if nil != tree.Context.Tip.FirstChild.Next.Next && ast.NodeBackslash == tree.Context.Tip.FirstChild.Next.Next.Type {
+					// 表格单元格中使用代码和 `|` 的问题 https://github.com/siyuan-note/siyuan/issues/4717
+					content = util.BytesToStr(tree.Context.Tip.FirstChild.Next.Next.FirstChild.Tokens) + content
+					tree.Context.Tip.FirstChild.Next.Next.Unlink()
+				}
 				tree.Context.Tip.FirstChild.Next.Tokens = append(tree.Context.Tip.FirstChild.Next.Tokens, util.StrToBytes(content)...)
 			}
 			return
