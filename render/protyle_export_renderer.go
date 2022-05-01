@@ -817,7 +817,7 @@ func (r *BlockExportRenderer) renderCodeBlockCode(node *ast.Node, entering bool)
 		return ast.WalkContinue
 	}
 
-	r.Tag("div", [][]string{{"class", "protyle-action protyle-icons"}}, false)
+	r.Tag("div", [][]string{{"class", "protyle-action"}}, false)
 	codeLen := len(node.Tokens)
 	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
 	var language string
@@ -827,7 +827,7 @@ func (r *BlockExportRenderer) renderCodeBlockCode(node *ast.Node, entering bool)
 		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
 	}
 
-	attrs := [][]string{{"class", "protyle-action__language"}, {"contenteditable", "false"}}
+	attrs := [][]string{{"class", "protyle-action--first protyle-action__language"}, {"contenteditable", "false"}}
 	if nil != node.Previous && 0 < len(node.Previous.CodeBlockInfo) {
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = string(infoWords[0])
@@ -836,8 +836,9 @@ func (r *BlockExportRenderer) renderCodeBlockCode(node *ast.Node, entering bool)
 	r.Tag("span", attrs, false)
 	r.WriteString(language)
 	r.Tag("/span", nil, false)
-
-	r.Tag("span", [][]string{{"class", "protyle-action__copy"}}, false)
+	r.WriteString("<span class=\"fn__flex-1\"></span>")
+	r.Tag("span", [][]string{{"class", "protyle-icon protyle-icon--only protyle-action__copy"}}, false)
+	r.WriteString("<svg><use xlink:href=\"#iconCopy\"></use></svg>")
 	r.Tag("/span", nil, false)
 	r.Tag("/div", nil, false)
 
