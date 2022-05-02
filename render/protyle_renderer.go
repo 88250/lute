@@ -842,7 +842,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	r.Tag("span", [][]string{{"class", "protyle-icon protyle-icon--first protyle-action__copy"}}, false)
 	r.WriteString("<svg><use xlink:href=\"#iconCopy\"></use></svg>")
 	r.Tag("/span", nil, false)
-	r.WriteString("<span class=\"protyle-icon protyle-icon—last protyle-action__menu\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
+	r.WriteString("<span class=\"protyle-icon protyle-icon--last protyle-action__menu\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
 	r.Tag("/div", nil, false)
 
 	attrs = [][]string{}
