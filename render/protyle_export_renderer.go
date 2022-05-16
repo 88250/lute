@@ -1296,6 +1296,9 @@ func (r *BlockExportRenderer) renderParagraph(node *ast.Node, entering bool) ast
 		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
+		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
+			r.WriteString("　　")
+		}
 	} else {
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
