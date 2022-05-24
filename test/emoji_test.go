@@ -18,11 +18,11 @@ import (
 
 var emojiTests = []parseTest{
 
-	{"22", ":siyuan:", "<p><img alt=\"siyuan\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/siyuan.svg\" title=\"siyuan\" /></p>\n"},
+	{"22", ":siyuan:", "<p><img alt=\"siyuan\" class=\"emoji\" src=\"https://unpkg.com/npm/vditor/dist/images/emoji/siyuan.svg\" title=\"siyuan\" /></p>\n"},
 
 	// 链接文本节点内 Emoji 的解析 https://github.com/88250/lute/issues/76
 	{"21", "[foo *:star:*](bar)", "<p><a href=\"bar\">foo <em>⭐️</em></a></p>\n"},
-	{"20", "[foo :octocat:](bar)", "<p><a href=\"bar\">foo <img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></a></p>\n"},
+	{"20", "[foo :octocat:](bar)", "<p><a href=\"bar\">foo <img alt=\"octocat\" class=\"emoji\" src=\"https://unpkg.com/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></a></p>\n"},
 	{"19", "[foo :star:](bar)", "<p><a href=\"bar\">foo ⭐️</a></p>\n"},
 
 	{"18", "8️⃣\n", "<p>8️⃣</p>\n"},
@@ -40,9 +40,9 @@ var emojiTests = []parseTest{
 	{"6", ":heart:开头表情\n", "<p>❤️开头表情</p>\n"},
 	{"5", "结尾表情:heart:\n", "<p>结尾表情❤️</p>\n"},
 	{"4", "没有表情\n", "<p>没有表情</p>\n"},
-	{"3", "0 :b3log: 1 :heart: 2\n", "<p>0 <img alt=\"b3log\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/b3log.png\" title=\"b3log\" /> 1 ❤️ 2</p>\n"},
+	{"3", "0 :b3log: 1 :heart: 2\n", "<p>0 <img alt=\"b3log\" class=\"emoji\" src=\"https://unpkg.com/npm/vditor/dist/images/emoji/b3log.png\" title=\"b3log\" /> 1 ❤️ 2</p>\n"},
 	{"2", ":smile: :heart:\n", "<p>😄 ❤️</p>\n"},
-	{"1", ":b3log:\n", "<p><img alt=\"b3log\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/b3log.png\" title=\"b3log\" /></p>\n"},
+	{"1", ":b3log:\n", "<p><img alt=\"b3log\" class=\"emoji\" src=\"https://unpkg.com/npm/vditor/dist/images/emoji/b3log.png\" title=\"b3log\" /></p>\n"},
 	{"0", "爱心:heart:一个\n", "<p>爱心❤️一个</p>\n"},
 }
 
