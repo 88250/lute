@@ -387,7 +387,7 @@ func NewOptions() *Options {
 		AliasEmoji:       EmojiAliasUnicode,
 		EmojiAlias:       EmojiUnicodeAlias,
 		//EmojiSite:         "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
-		EmojiSite:         "https://unpkg.com/npm/vditor/dist/images/emoji", // 表情图片从 `cdn.jsdelivr.net` 切换到 `unpkg.com`
+		EmojiSite:         "https://unpkg.com/vditor/dist/images/emoji", // 表情图片从 `cdn.jsdelivr.net` 切换到 `unpkg.com` https://github.com/88250/lute/issues/171
 		Setext:            true,
 		YamlFrontMatter:   true,
 		BlockRef:          false,
