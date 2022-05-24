@@ -378,15 +378,16 @@ type Options struct {
 
 func NewOptions() *Options {
 	return &Options{
-		GFMTable:          true,
-		GFMTaskListItem:   true,
-		GFMStrikethrough:  true,
-		GFMAutoLink:       true,
-		Footnotes:         true,
-		Emoji:             true,
-		AliasEmoji:        EmojiAliasUnicode,
-		EmojiAlias:        EmojiUnicodeAlias,
-		EmojiSite:         "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
+		GFMTable:         true,
+		GFMTaskListItem:  true,
+		GFMStrikethrough: true,
+		GFMAutoLink:      true,
+		Footnotes:        true,
+		Emoji:            true,
+		AliasEmoji:       EmojiAliasUnicode,
+		EmojiAlias:       EmojiUnicodeAlias,
+		//EmojiSite:         "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
+		EmojiSite:         "https://unpkg.com/npm/vditor/dist/images/emoji", // 表情图片从 `cdn.jsdelivr.net` 切换到 `unpkg.com`
 		Setext:            true,
 		YamlFrontMatter:   true,
 		BlockRef:          false,
