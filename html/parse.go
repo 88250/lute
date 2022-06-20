@@ -5,7 +5,6 @@
 package html
 
 import (
-	"bytes"
 	"errors"
 	"io"
 	"strconv"
@@ -2283,12 +2282,6 @@ func (p *parser) parse() error {
 			if err != nil && err != io.EOF {
 				return err
 			}
-		}
-		if nil != n && a.A == n.DataAtom && TextToken == p.tok.Type {
-			// A 标签锚文本部分进行转义 html2MdTests case 35
-			buf := &bytes.Buffer{}
-			escape(buf, p.tok.Data)
-			p.tok.Data = buf.String()
 		}
 
 		p.parseCurrentToken()
