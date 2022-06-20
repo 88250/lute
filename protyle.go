@@ -184,6 +184,11 @@ func (lute *Lute) BlockDOM2TextLen(htmlStr string) int {
 	return tree.Root.TextLen()
 }
 
+func (lute *Lute) BlockDOM2Content(htmlStr string) (text string) {
+	tree := lute.BlockDOM2Tree(htmlStr)
+	return tree.Root.Content()
+}
+
 func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
 	renderer := render.NewBlockRenderer(tree, options)
 	output := renderer.Render()
