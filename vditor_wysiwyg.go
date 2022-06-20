@@ -271,7 +271,7 @@ func (lute *Lute) removeEmptyNodes(node *html.Node) {
 func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 	switch n.DataAtom {
 	case 0:
-		if lute.isInline(n.PrevSibling) || lute.isInline(n.NextSibling) {
+		if lute.isInline(n.PrevSibling) || lute.isInline(n.NextSibling) || lute.isInline(n.Parent) {
 			// 前节点或者后节点是行级节点的话保留该空白
 			break
 		}
