@@ -842,7 +842,7 @@ func (r *BlockExportRenderer) renderCodeBlockCode(node *ast.Node, entering bool)
 	r.Tag("/span", nil, false)
 	r.Tag("/div", nil, false)
 
-	attrs = [][]string{}
+	attrs = [][]string{{"class", "hljs"}}
 	r.contenteditable(node, &attrs)
 	r.spellcheck(&attrs)
 	r.Tag("div", attrs, false)

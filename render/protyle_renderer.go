@@ -845,7 +845,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	r.WriteString("<span class=\"protyle-icon protyle-icon--last protyle-action__menu\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
 	r.Tag("/div", nil, false)
 
-	attrs = [][]string{}
+	attrs = [][]string{{"class", "hljs"}}
 	r.contenteditable(node, &attrs)
 	r.spellcheck(&attrs)
 	r.Tag("div", attrs, false)

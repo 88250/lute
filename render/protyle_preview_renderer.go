@@ -647,7 +647,7 @@ func (r *ProtylePreviewRenderer) renderCodeBlock(node *ast.Node, entering bool) 
 
 		attrs := [][]string{{"class", "code-block"}, {"data-language", language}}
 		r.Tag("pre", attrs, false)
-		r.WriteString("<code>")
+		r.WriteString("<code class=\"hljs\">")
 	} else {
 		if noHighlight {
 			return ast.WalkSkipChildren
