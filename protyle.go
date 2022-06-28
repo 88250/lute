@@ -249,7 +249,7 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 					n.Next.Unlink()
 				}
 			case ast.NodeStrong, ast.NodeEmphasis, ast.NodeStrikethrough, ast.NodeUnderline:
-				lute.mergeSameSpan(n, n.Type)
+				lute.MergeSameSpan(n, n.Type)
 			}
 		}
 		return ast.WalkContinue
@@ -257,7 +257,7 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	return
 }
 
-func (lute *Lute) mergeSameSpan(n *ast.Node, typ ast.NodeType) {
+func (lute *Lute) MergeSameSpan(n *ast.Node, typ ast.NodeType) {
 	if nil != n.Next && typ == n.Next.Type && nil != n.Next.Next && ast.NodeKramdownSpanIAL != n.Next.Next.Type {
 		var spanChildren []*ast.Node
 		n.Next.FirstChild.Unlink() // open marker
