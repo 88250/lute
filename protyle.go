@@ -258,18 +258,23 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 }
 
 func (lute *Lute) MergeSameSpan(n *ast.Node, typ ast.NodeType) {
-	if nil != n.Next && typ == n.Next.Type && nil != n.Next.Next && ast.NodeKramdownSpanIAL != n.Next.Next.Type {
-		var spanChildren []*ast.Node
-		n.Next.FirstChild.Unlink() // open marker
-		n.Next.LastChild.Unlink()  // close marker
-		for c := n.Next.FirstChild; nil != c; c = c.Next {
-			spanChildren = append(spanChildren, c)
-		}
-		for _, c := range spanChildren {
-			n.LastChild.InsertBefore(c)
-		}
-		n.Next.Unlink()
+	if nil == n.Next || typ != n.Next.Type {
+		return
 	}
+	if nil != n.Next.Next && ast.NodeKramdownSpanIAL == n.Next.Next.Type {
+		return
+	}
+
+	var spanChildren []*ast.Node
+	n.Next.FirstChild.Unlink() // open marker
+	n.Next.LastChild.Unlink()  // close marker
+	for c := n.Next.FirstChild; nil != c; c = c.Next {
+		spanChildren = append(spanChildren, c)
+	}
+	for _, c := range spanChildren {
+		n.LastChild.InsertBefore(c)
+	}
+	n.Next.Unlink()
 }
 
 func (lute *Lute) CancelSuperBlock(ivHTML string) (ovHTML string) {
