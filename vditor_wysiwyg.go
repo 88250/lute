@@ -1484,8 +1484,14 @@ func (lute *Lute) domHTML(n *html.Node) []byte {
 }
 
 func (lute *Lute) isCaret(n *html.Node) (isCaret, isEmptyText bool) {
-	text := strings.TrimSpace(lute.domText(n))
-	return util.Caret == text || parse.Zwsp+util.Caret == text || util.Caret+parse.Zwsp == text, "" == text || parse.Zwsp == text
+	text := lute.domText(n)
+	trimSpaceText := strings.TrimSpace(text)
+	if 1 > len(trimSpaceText) && 1 < len(text) && strings.Contains(text, util.Caret) {
+		return true, false
+	}
+	isCaret = util.Caret == text || parse.Zwsp+util.Caret == text || util.Caret+parse.Zwsp == text
+	isEmptyText = "" == text || parse.Zwsp == text
+	return
 }
 
 func (lute *Lute) isEmptyText(n *html.Node) bool {

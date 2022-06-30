@@ -1033,9 +1033,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
-
-		// 行内代码为空格时应该保留 https://github.com/siyuan-note/siyuan/issues/5256
-		_ = isEmpty
+		if isEmpty {
+			return
+		}
 
 		node.Type = ast.NodeCodeSpan
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker})
@@ -1251,9 +1251,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
-
-		// 键盘为空格时应该保留 https://github.com/siyuan-note/siyuan/issues/5256
-		_ = isEmpty
+		if isEmpty {
+			return
+		}
 
 		node.Type = ast.NodeKbd
 		node.AppendChild(&ast.Node{Type: ast.NodeKbdOpenMarker})
