@@ -1108,6 +1108,15 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			var refText string
 			if nil != n.FirstChild {
 				refText = lute.domText(n.FirstChild)
+
+				// 引用锚文本中粘贴行级元素问题 https://github.com/siyuan-note/siyuan/issues/5342
+				if nil != n.FirstChild.NextSibling && atom.Span == n.FirstChild.NextSibling.DataAtom {
+					refText += lute.domText(n.FirstChild.NextSibling)
+					if remainText := n.FirstChild.NextSibling.NextSibling; nil != remainText && 0 == remainText.DataAtom {
+						refText += remainText.Data
+					}
+					n.FirstChild.NextSibling.Unlink()
+				}
 			}
 			refText = strings.TrimSpace(refText)
 			if "" == refText {
@@ -1139,6 +1148,15 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			var refText string
 			if nil != n.FirstChild {
 				refText = lute.domText(n.FirstChild)
+
+				// 引用锚文本中粘贴行级元素问题 https://github.com/siyuan-note/siyuan/issues/5342
+				if nil != n.FirstChild.NextSibling && atom.Span == n.FirstChild.NextSibling.DataAtom {
+					refText += lute.domText(n.FirstChild.NextSibling)
+					if remainText := n.FirstChild.NextSibling.NextSibling; nil != remainText && 0 == remainText.DataAtom {
+						refText += remainText.Data
+					}
+					n.FirstChild.NextSibling.Unlink()
+				}
 			}
 			refText = strings.TrimSpace(refText)
 			if "" == refText {
