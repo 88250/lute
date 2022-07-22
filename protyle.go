@@ -1105,19 +1105,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 			id := lute.domAttrValue(n, "data-id")
 			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(id)})
-			var refText string
-			if nil != n.FirstChild {
-				refText = lute.domText(n.FirstChild)
-
-				// 引用锚文本中粘贴行级元素问题 https://github.com/siyuan-note/siyuan/issues/5342
-				if nil != n.FirstChild.NextSibling && atom.Span == n.FirstChild.NextSibling.DataAtom {
-					refText += lute.domText(n.FirstChild.NextSibling)
-					if remainText := n.FirstChild.NextSibling.NextSibling; nil != remainText && 0 == remainText.DataAtom {
-						refText += remainText.Data
-					}
-					n.FirstChild.NextSibling.Unlink()
-				}
-			}
+			refText := lute.domText(n)
 			refText = strings.TrimSpace(refText)
 			if "" == refText {
 				return
@@ -1145,19 +1133,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeLess})
 			id := lute.domAttrValue(n, "data-id")
 			node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefID, Tokens: util.StrToBytes(id)})
-			var refText string
-			if nil != n.FirstChild {
-				refText = lute.domText(n.FirstChild)
-
-				// 引用锚文本中粘贴行级元素问题 https://github.com/siyuan-note/siyuan/issues/5342
-				if nil != n.FirstChild.NextSibling && atom.Span == n.FirstChild.NextSibling.DataAtom {
-					refText += lute.domText(n.FirstChild.NextSibling)
-					if remainText := n.FirstChild.NextSibling.NextSibling; nil != remainText && 0 == remainText.DataAtom {
-						refText += remainText.Data
-					}
-					n.FirstChild.NextSibling.Unlink()
-				}
-			}
+			refText := lute.domText(n)
 			refText = strings.TrimSpace(refText)
 			if "" == refText {
 				return
