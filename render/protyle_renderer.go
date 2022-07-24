@@ -1227,6 +1227,9 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.WriteString(" ")
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
+		if nil == node.Next || util.Caret == node.Next.Text() {
+			r.WriteString(parse.Zwsp)
+		}
 	}
 	return ast.WalkContinue
 }
