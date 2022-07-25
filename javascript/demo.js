@@ -10,8 +10,8 @@ const renderers = {
     }
     return ["", Lute.WalkContinue]
   },
-  renderStrong: (node, entering) => {
-    entering ? console.log("    start render strong") : console.log("    end render strong")
+  renderString: (node, entering) => {
+    entering ? console.log("    start render string") : console.log("    end render string")
     return ["", Lute.WalkContinue]
   },
   renderParagraph: (node, entering) => {
