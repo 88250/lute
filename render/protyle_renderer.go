@@ -856,8 +856,8 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	} else {
 		tokens := html.EscapeHTML(node.Tokens)
 		// TODO: 支持代码块搜索定位和高亮 https://github.com/siyuan-note/siyuan/issues/5520
-		//tokens = bytes.ReplaceAll(tokens, []byte("__@mark__"), []byte("<span data-type=\"search-mark\">"))
-		//tokens = bytes.ReplaceAll(tokens, []byte("__mark@__"), []byte("</span>"))
+		tokens = bytes.ReplaceAll(tokens, []byte("__@mark__"), []byte("<span data-type=\"search-mark\">"))
+		tokens = bytes.ReplaceAll(tokens, []byte("__mark@__"), []byte("</span>"))
 		r.Write(tokens)
 	}
 	r.Tag("/div", nil, false)
