@@ -457,7 +457,7 @@ func (r *HtmlRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wal
 		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
 		idxStr := strconv.Itoa(idx)
 		r.Tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
-		r.Tag("a", [][]string{{"href", "#footnotes-def-" + idxStr}}, false)
+		r.Tag("a", [][]string{{"href", r.Options.LinkBase + "#footnotes-def-" + idxStr}}, false)
 		r.WriteString(idxStr)
 		r.Tag("/a", nil, false)
 		r.Tag("/sup", nil, false)
