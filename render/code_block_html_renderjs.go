@@ -8,6 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+//go:build javascript
 // +build javascript
 
 package render
@@ -43,7 +44,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = string(infoWords[0])
 	}
-	preDiv := r.NoHighlight(language)
+	preDiv := NoHighlight(language)
 
 	if entering {
 		r.Newline()

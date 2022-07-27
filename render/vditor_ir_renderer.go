@@ -493,7 +493,7 @@ func (r *VditorIRRenderer) renderCodeBlockCode(node *ast.Node, entering bool) as
 
 	if r.Options.VditorCodeBlockPreview {
 		r.Tag("pre", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
-		preDiv := r.NoHighlight(language)
+		preDiv := NoHighlight(language)
 		if preDiv {
 			r.Tag("div", attrs, false)
 		} else {

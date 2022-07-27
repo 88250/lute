@@ -769,7 +769,7 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 	if nil != node.FirstChild && nil != node.FirstChild.Next && 0 < len(node.FirstChild.Next.CodeBlockInfo) {
 		language = util.BytesToStr(node.FirstChild.Next.CodeBlockInfo)
 		language = strings.ReplaceAll(language, util.Caret, "")
-		noHighlight = r.NoHighlight(language)
+		noHighlight = NoHighlight(language)
 	}
 
 	if entering {
@@ -1731,4 +1731,14 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 
 	r.WriteString(parse.Zwsp)
 	r.Tag("/div", nil, false)
+}
+
+func IsChartCodeBlockCode(code *ast.Node) bool {
+	if nil == code.Previous || ast.NodeCodeBlockFenceInfoMarker != code.Previous.Type || 1 > len(code.Previous.CodeBlockInfo) {
+		return false
+	}
+
+	language := util.BytesToStr(code.Previous.CodeBlockInfo)
+	language = strings.ReplaceAll(language, util.Caret, "")
+	return NoHighlight(language)
 }

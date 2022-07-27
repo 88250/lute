@@ -8,15 +8,17 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+//go:build !javascript
 // +build !javascript
 
 package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"go/format"
 	"strings"
+
+	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -67,7 +69,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = util.BytesToStr(infoWords[0])
 	}
-	preDiv := r.NoHighlight(language)
+	preDiv := NoHighlight(language)
 	if entering {
 		var attrs [][]string
 		r.handleKramdownBlockIAL(node.Parent)

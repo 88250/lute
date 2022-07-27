@@ -1201,7 +1201,7 @@ func (r *VditorRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.
 
 	if r.Options.VditorCodeBlockPreview {
 		r.Tag("pre", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
-		preDiv := r.NoHighlight(language)
+		preDiv := NoHighlight(language)
 		if preDiv {
 			r.Tag("div", attrs, false)
 		} else {

@@ -661,7 +661,7 @@ func (r *BaseRenderer) NodeAttrsStr(node *ast.Node) (ret string) {
 // languagesNoHighlight 中定义的语言不要进行代码语法高亮。这些代码块会在前端进行渲染，比如各种图表。
 var languagesNoHighlight = []string{"mermaid", "echarts", "abc", "graphviz", "mindmap", "flowchart", "plantuml"}
 
-func (r *BaseRenderer) NoHighlight(language string) bool {
+func NoHighlight(language string) bool {
 	if "" == language {
 		return false
 	}
