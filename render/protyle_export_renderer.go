@@ -867,7 +867,10 @@ func (r *BlockExportRenderer) renderEmojiAlias(node *ast.Node, entering bool) as
 
 func (r *BlockExportRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.Tokens)
+		dataSrc := r.tagSrc(node.Tokens)
+		src := r.LinkPath(dataSrc[1:])
+		tokens := bytes.ReplaceAll(node.Tokens, dataSrc, src)
+		r.Write(tokens)
 	}
 	return ast.WalkContinue
 }
