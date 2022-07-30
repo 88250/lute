@@ -584,14 +584,14 @@ func appendSpace(n *html.Node, tree *parse.Tree, lute *Lute) {
 						}
 
 						text := tree.Context.Tip.ChildByType(ast.NodeText)
-						text.Tokens = bytes.TrimLeft(text.Tokens, "  ")
+						text.Tokens = bytes.TrimLeft(text.Tokens, " \u0160")
 					}
 					spaces = lute.suffixSpaces(curText)
 					if "" != spaces {
 						texts := tree.Context.Tip.ChildrenByType(ast.NodeText)
 						if 0 < len(texts) {
 							text := texts[len(texts)-1]
-							text.Tokens = bytes.TrimRight(text.Tokens, " ")
+							text.Tokens = bytes.TrimRight(text.Tokens, " \u0160")
 							if 1 > len(text.Tokens) {
 								text.Unlink()
 							}
