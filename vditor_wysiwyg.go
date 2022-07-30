@@ -1533,7 +1533,7 @@ func (lute *Lute) isInline(n *html.Node) bool {
 
 func (lute *Lute) prefixSpaces(text string) (ret string) {
 	for _, c := range text {
-		if ' ' == c {
+		if ' ' == c || 160 == c {
 			ret += " "
 		} else {
 			return
@@ -1544,7 +1544,7 @@ func (lute *Lute) prefixSpaces(text string) (ret string) {
 
 func (lute *Lute) suffixSpaces(text string) (ret string) {
 	for i := len(text) - 1; i >= 0; i-- {
-		if ' ' == text[i] {
+		if ' ' == text[i] || 160 == text[i] {
 			ret += " "
 		} else {
 			return
