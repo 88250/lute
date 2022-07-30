@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"57", "a<strong>  b: </strong>c", "a  **b:** c\n"},
 	{"56", "<a href=\"https://b3log.org\">foo'bar</a>", "[foo'bar](https://b3log.org)\n"},
 	{"55", "foo'bar", "foo'bar\n"},
 	{"54", "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"198\">\n <colgroup><col width=\"198\">\n </colgroup><tbody><tr height=\"45\">\n\n  <td height=\"45\" class=\"xl65\" width=\"198\">foobar\n  baz</td>\n\n </tr>\n</tbody></table>", "| foobar  baz |\n| ------------- |\n"},

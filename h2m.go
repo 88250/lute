@@ -569,6 +569,37 @@ func appendSpace(n *html.Node, tree *parse.Tree, lute *Lute) {
 						tree.Context.Tip.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
 						return
 					}
+
+					spaces := lute.prefixSpaces(curText)
+					if "" != spaces {
+						previous := tree.Context.Tip.Previous
+						if nil != previous {
+							if ast.NodeText == previous.Type {
+								previous.Tokens = append(previous.Tokens, util.StrToBytes(spaces)...)
+							} else {
+								previous.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(spaces)})
+							}
+						} else {
+							tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(spaces)})
+						}
+
+						text := tree.Context.Tip.ChildByType(ast.NodeText)
+						text.Tokens = bytes.TrimLeft(text.Tokens, " ")
+					}
+					spaces = lute.suffixSpaces(curText)
+					if "" != spaces {
+						text := tree.Context.Tip.ChildByType(ast.NodeText)
+						text.Tokens = bytes.TrimRight(text.Tokens, " ")
+						if nil != n.NextSibling {
+							if html.TextNode == n.NextSibling.Type {
+								n.NextSibling.Data = spaces + n.NextSibling.Data
+							} else {
+								tree.Context.Tip.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(spaces)})
+							}
+						} else {
+							tree.Context.Tip.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(spaces)})
+						}
+					}
 				}
 			}
 		}

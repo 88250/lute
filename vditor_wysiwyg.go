@@ -1530,3 +1530,25 @@ func (lute *Lute) isInline(n *html.Node) bool {
 		atom.Kbd == n.DataAtom ||
 		atom.Span == n.DataAtom
 }
+
+func (lute *Lute) prefixSpaces(text string) (ret string) {
+	for _, c := range text {
+		if ' ' == c {
+			ret += " "
+		} else {
+			return
+		}
+	}
+	return
+}
+
+func (lute *Lute) suffixSpaces(text string) (ret string) {
+	for i := len(text) - 1; i >= 0; i-- {
+		if ' ' == text[i] {
+			ret += " "
+		} else {
+			return
+		}
+	}
+	return
+}
