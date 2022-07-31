@@ -91,7 +91,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
-	if strings.HasPrefix(lute.domAttrValue(n, "class"), "line-number") {
+	class := lute.domAttrValue(n, "class")
+	if strings.HasPrefix(class, "line-number") &&
+		!strings.HasPrefix(class, "line-numbers" /* 简书代码块 https://github.com/siyuan-note/siyuan/issues/4361 */) {
 		return
 	}
 
