@@ -1233,6 +1233,11 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.Tag("/span", nil, false)
 		if nil == node.Next || util.Caret == node.Next.Text() {
 			r.WriteString(parse.Zwsp)
+			return ast.WalkContinue
+		}
+		if ast.NodeKramdownSpanIAL == node.Next.Type && (nil == node.Next.Next || util.Caret == node.Next.Next.Text()) {
+			r.WriteString(parse.Zwsp)
+			return ast.WalkContinue
 		}
 	}
 	return ast.WalkContinue
