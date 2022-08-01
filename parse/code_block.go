@@ -127,6 +127,9 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 	}
 
 	openFence = t.Context.currentLine[t.Context.nextNonspace : t.Context.nextNonspace+fenceLen]
+	if t.Context.ParseOption.ProtyleWYSIWYG && bytes.ContainsAny(t.Context.currentLine[fenceLen:], " ~`") {
+		return
+	}
 
 	var info []byte
 	infoTokens := t.Context.currentLine[t.Context.nextNonspace+fenceLen:]
