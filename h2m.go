@@ -249,6 +249,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 							}
 						}
 					}
+					if nil != n.LastChild && atom.Ul == n.LastChild.DataAtom {
+						// CSDN 代码块：pre.code,ul
+						n.LastChild.Unlink() // 去掉最后一个代码行号子块 https://github.com/siyuan-note/siyuan/issues/5564
+					}
 				}
 
 				buf := &bytes.Buffer{}
