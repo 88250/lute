@@ -692,6 +692,7 @@ func (r *VditorSVRenderer) renderLinkDest(node *ast.Node, entering bool) ast.Wal
 				dest = nil
 			}
 		}
+		dest = html.EscapeHTML(dest)
 		r.Write(dest)
 		r.Tag("/span", nil, false)
 	}
