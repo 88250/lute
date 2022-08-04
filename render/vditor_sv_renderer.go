@@ -408,7 +408,10 @@ func (r *VditorSVRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast
 		r.WriteString("<span>: </span>")
 		for c := node.FirstChild; nil != c; c = c.Next {
 			ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
-				// indentSpacesStr := `<span data-type="padding">    </span>`
+				if entering && n != node.FirstChild && n.IsBlock() {
+					indentSpacesStr := `<span data-type="padding">    </span>`
+					r.WriteString(indentSpacesStr)
+				}
 				return r.RendererFuncs[n.Type](n, entering)
 			})
 		}
