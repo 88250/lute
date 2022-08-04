@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+	"unicode"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
@@ -127,8 +128,16 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 	}
 
 	openFence = t.Context.currentLine[t.Context.nextNonspace : t.Context.nextNonspace+fenceLen]
-	if t.Context.ParseOption.ProtyleWYSIWYG && bytes.ContainsAny(t.Context.currentLine[fenceLen:], " ~`") {
-		return
+	if t.Context.ParseOption.ProtyleWYSIWYG {
+		str := string(t.Context.currentLine[fenceLen:])
+		for _, c := range str {
+			if util.Caret == string(c) || "\n" == string(c) {
+				continue
+			}
+			if !unicode.IsLetter(c) && !unicode.IsNumber(c) {
+				return
+			}
+		}
 	}
 
 	var info []byte
