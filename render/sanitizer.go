@@ -189,7 +189,8 @@ func sanitizeAttrs(attrs []*html.Attribute) (ret []*html.Attribute) {
 			continue
 		}
 		if "src" == attr.Key {
-			if strings.HasPrefix(attr.Val, "data:image/svg+xml") || strings.HasPrefix(attr.Val, "javascript") {
+			val := strings.TrimSpace(attr.Val)
+			if strings.HasPrefix(val, "data:image/svg+xml") || strings.HasPrefix(val, "data:text/html") || strings.HasPrefix(val, "javascript") {
 				continue
 			}
 		}

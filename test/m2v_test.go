@@ -20,6 +20,7 @@ import (
 
 var md2VditorDOMTests = []parseTest{
 
+	{"24", "<form ><iframe/src=\"data:text/html,<script>alert('xss');</script>\"></iframe>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;form &gt;&lt;iframe/src=&quot;data:text/html,&lt;script&gt;alert('xss');&lt;/script&gt;&quot;&gt;&lt;/iframe&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><form><iframe></iframe></pre></div>"},
 	{"23", "[**foo**][bar]\n\n[bar]:https://github.com", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"bar\">foo</span>\u200b</p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[bar]: https://github.com\n</div>"},
 	{"22", "<span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span>", "<p data-block=\"0\"><span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span></p>"},
 	{"21", "<span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span>b", "<p data-block=\"0\"><span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span>b</p>"},
@@ -59,6 +60,7 @@ func TestMd2VditorDOM(t *testing.T) {
 	luteEngine.RenderOptions.ToC = true
 	luteEngine.ParseOptions.KramdownBlockIAL = true
 	luteEngine.RenderOptions.KramdownBlockIAL = true
+	luteEngine.RenderOptions.Sanitize = true
 
 	for _, test := range md2VditorDOMTests {
 		md := luteEngine.Md2VditorDOM(test.from)
