@@ -252,6 +252,8 @@ var eventAttrs = map[string]interface{}{
 	"onmousemove":  nil,
 	"onmouseout":   nil,
 	"onmouseover":  nil,
+	"onmouseleave": nil,
+	"onmouseenter": nil,
 	"onmouseup":    nil,
 	"onmousewheel": nil,
 	"onwheel":      nil,

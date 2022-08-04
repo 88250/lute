@@ -20,6 +20,7 @@ import (
 
 var md2VditorDOMTests = []parseTest{
 
+	{"25", "<input autofocus>\n<img src=https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png onmouseleave=alert('XSS')>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;input autofocus&gt;\n&lt;img src=https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png onmouseleave=alert('XSS')&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><input autofocus=\"\">\n<img src=\"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png\"></pre></div>"},
 	{"24", "<form ><iframe/src=\"data:text/html,<script>alert('xss');</script>\"></iframe>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;form &gt;&lt;iframe/src=&quot;data:text/html,&lt;script&gt;alert('xss');&lt;/script&gt;&quot;&gt;&lt;/iframe&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><form><iframe></iframe></pre></div>"},
 	{"23", "[**foo**][bar]\n\n[bar]:https://github.com", "<p data-block=\"0\">\u200b<span data-type=\"link-ref\" data-link-label=\"bar\">foo</span>\u200b</p><div data-block=\"0\" data-type=\"link-ref-defs-block\">[bar]: https://github.com\n</div>"},
 	{"22", "<span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span>", "<p data-block=\"0\"><span class=\"vditor-comment\" data-cmtids=\"20201105091940-wtpsc3a\">foo</span></p>"},
