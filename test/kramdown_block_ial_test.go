@@ -19,6 +19,7 @@ import (
 
 var kramdownBlockIALTests = []parseTest{
 
+	{"24", "* {: id=\"20220810110631-x6ycsc2\"}foo\n  {: id=\"20220810110631-3ppdll8\"}\n* {: id=\"20220810110631-txapkc7\"}bar\n  {: id=\"20220810110631-c5cuvm5\"}\n* {: id=\"20220810110631-fdlccs9\"}\n  {: id=\"20220810110631-56rznx9\"}\n{: id=\"20220810110631-jjbmho2\"}\n\nbaz\n{: id=\"20220810110631-bmiq3pg\"}", "<ul id=\"20220810110631-jjbmho2\">\n<li id=\"20220810110631-x6ycsc2\">foo</li>\n<li id=\"20220810110631-txapkc7\">bar</li>\n<li id=\"20220810110631-fdlccs9\"></li>\n</ul>\n<p id=\"20220810110631-bmiq3pg\">baz</p>\n"},
 	{"23", "* {: id=\"20210410235101-qckdxca\"}foo\n  {: id=\"20210411001135-u2jnm4r\"}\n\n  {: id=\"20210411001219-0t9swv3\"}\n{: id=\"20210410181814-3ar1jd9\"}\n\n\n{: id=\"20210410173314-j8kfyel\" type=\"doc\"}\n", "<ul id=\"20210410181814-3ar1jd9\">\n<li id=\"20210410235101-qckdxca\">\n<p id=\"20210411001135-u2jnm4r\">foo</p>\n<p id=\"20210411001219-0t9swv3\"></p>\n</li>\n</ul>\n"},
 	{"22", "* {: id=\"20210221200613-7vpmc8h\"}foo\n  {: id=\"20210221195351-x5tgalq\" updated=\"20210221201411\"}\n{: id=\"20210221195349-czsad7f\" updated=\"20210221195351\"}\n\n\n{: id=\"20210215183533-l36k5mo\" type=\"doc\"}", "<ul id=\"20210221195349-czsad7f\" updated=\"20210221195351\">\n<li id=\"20210221200613-7vpmc8h\">foo</li>\n</ul>\n"},
 	{"21", "* {: id=\"fooid\"}foo\n\n  > bar\n  {: id=\"barid\"}\n{: id=\"id\"}", "<ul id=\"id\">\n<li id=\"fooid\">\n<p>foo</p>\n<blockquote id=\"barid\">\n<p>bar</p>\n</blockquote>\n</li>\n</ul>\n"},
@@ -47,8 +48,7 @@ var kramdownBlockIALTests = []parseTest{
 
 func TestKramdownBlockIALs(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.ParseOptions.KramdownBlockIAL = true
-	luteEngine.RenderOptions.KramdownBlockIAL = true
+	luteEngine.SetKramdownBlockIAL(true)
 
 	ast.Testing = true
 	for _, test := range kramdownBlockIALTests {

@@ -47,6 +47,19 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 		p.Unlink()
 	}
 
+	if context.ParseOption.KramdownBlockIAL && nil != context.Tip.Parent && ast.NodeListItem == context.Tip.Parent.Type && p == context.Tip.Parent.FirstChild {
+		if ial := Tokens2IAL(p.Tokens); nil != ial {
+			// 列表项下没有子节点，应该挂一个空段落上去，并将当前段落转换为空段落的 IAL 节点
+			emptyP := &ast.Node{Type: ast.NodeParagraph, KramdownIAL: ial}
+			m := IAL2Map(ial)
+			emptyP.ID = m["id"]
+			context.Tip.Parent.AppendChild(emptyP)
+			emptyP.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: IAL2Tokens(ial)})
+			p.Unlink()
+			return
+		}
+	}
+
 	if context.ParseOption.GFMTaskListItem {
 		// 尝试解析任务列表项
 		if listItem := p.Parent; nil != listItem && ast.NodeListItem == listItem.Type && listItem.FirstChild == p {
