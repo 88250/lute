@@ -1236,6 +1236,9 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 			return ast.WalkContinue
 		}
 		if ast.NodeKramdownSpanIAL == node.Next.Type && (nil == node.Next.Next || util.Caret == node.Next.Next.Text()) {
+			if bytes.Contains(node.Next.Tokens, []byte("display: block")) {
+				return ast.WalkContinue
+			}
 			r.WriteString(parse.Zwsp)
 			return ast.WalkContinue
 		}
