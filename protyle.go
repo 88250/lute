@@ -1122,6 +1122,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			} else {
 				refTextNode = &ast.Node{Type: ast.NodeBlockRefDynamicText, Tokens: util.StrToBytes(refText)}
 			}
+			if lute.parentIs(n, atom.Table) {
+				refTextNode.Tokens = bytes.ReplaceAll(refTextNode.Tokens, []byte("|"), []byte("&#124;"))
+			}
 			node.AppendChild(refTextNode)
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})

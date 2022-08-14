@@ -379,6 +379,7 @@ func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkSt
 		refText = r.escapeRefText(refText)
 		attrs := [][]string{{"data-type", "block-ref"}, {"data-subtype", subtype}, {"data-id", idNode.TokensStr()}}
 		r.Tag("span", attrs, false)
+		refText = strings.ReplaceAll(refText, "&amp;#124;", "|")
 		r.WriteString(refText)
 		r.Tag("/span", nil, false)
 		return ast.WalkSkipChildren
