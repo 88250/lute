@@ -1046,7 +1046,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	case atom.Span:
 		dataType := lute.domAttrValue(n, "data-type")
 		if "tag" == dataType {
-			if nil == n.FirstChild {
+			_, isEmpty := lute.isCaret(n)
+			if nil == n.FirstChild || isEmpty {
 				return
 			}
 
