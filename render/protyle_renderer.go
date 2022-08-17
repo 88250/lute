@@ -1594,9 +1594,9 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 func (r *BlockRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if node.TaskListItemChecked {
-			r.WriteString("<div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
+			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"true\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
 		} else {
-			r.WriteString("<div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
+			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"true\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
 		}
 		if nil == node.Next {
 			node.InsertAfter(&ast.Node{ID: ast.NewNodeID(), Type: ast.NodeParagraph})
