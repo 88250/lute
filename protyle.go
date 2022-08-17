@@ -217,6 +217,24 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</span>", "</span>\n<wbr>\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", util.Caret)
 
+	var startSpaces, endSpaces int
+	for _, c := range htmlStr {
+		if ' ' == c {
+			startSpaces++
+		} else {
+			break
+		}
+	}
+	for i := len(htmlStr) - 1; i >= 0; i-- {
+		if ' ' == htmlStr[i] {
+			endSpaces++
+		} else {
+			break
+		}
+	}
+	htmlStr = strings.TrimSpace(htmlStr)
+	htmlStr = strings.Repeat("&nbsp;", startSpaces) + htmlStr + strings.Repeat("&nbsp;", endSpaces)
+
 	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
 	htmlStr = strings.ReplaceAll(htmlStr, "\t\n", "\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
@@ -250,6 +268,8 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 				}
 			case ast.NodeStrong, ast.NodeEmphasis, ast.NodeStrikethrough, ast.NodeUnderline:
 				lute.MergeSameSpan(n, n.Type)
+			case ast.NodeText:
+				n.Tokens = bytes.ReplaceAll(n.Tokens, []byte("\u00a0"), []byte(" "))
 			}
 		}
 		return ast.WalkContinue
