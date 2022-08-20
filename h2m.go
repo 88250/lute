@@ -329,10 +329,16 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.A:
 		node.Type = ast.NodeLink
-		if "" == lute.domText(n) && nil != n.Parent && (atom.H1 == n.Parent.DataAtom || atom.H2 == n.Parent.DataAtom || atom.H3 == n.Parent.DataAtom || atom.H4 == n.Parent.DataAtom || atom.H5 == n.Parent.DataAtom || atom.H6 == n.Parent.DataAtom) {
+		text := lute.domText(n)
+		if "" == text && nil != n.Parent && (atom.H1 == n.Parent.DataAtom || atom.H2 == n.Parent.DataAtom || atom.H3 == n.Parent.DataAtom || atom.H4 == n.Parent.DataAtom || atom.H5 == n.Parent.DataAtom || atom.H6 == n.Parent.DataAtom) {
 			// 丢弃标题中文本为空的链接，这样的链接可能是锚点 https://github.com/Vanessa219/vditor/issues/359
 			return
 		}
+		if "" == text && nil == n.FirstChild {
+			// 剪藏时过滤空的超链接 https://github.com/siyuan-note/siyuan/issues/5686
+			return
+		}
+
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
