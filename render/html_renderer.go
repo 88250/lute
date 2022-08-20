@@ -151,6 +151,20 @@ func NewHtmlRenderer(tree *parse.Tree, options *Options) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeGitConflictOpenMarker] = ret.renderGitConflictOpenMarker
 	ret.RendererFuncs[ast.NodeGitConflictContent] = ret.renderGitConflictContent
 	ret.RendererFuncs[ast.NodeGitConflictCloseMarker] = ret.renderGitConflictCloseMarker
+	ret.RendererFuncs[ast.NodeIFrame] = ret.renderIFrame
+	ret.RendererFuncs[ast.NodeWidget] = ret.renderWidget
+	ret.RendererFuncs[ast.NodeVideo] = ret.renderVideo
+	ret.RendererFuncs[ast.NodeAudio] = ret.renderAudio
+	ret.RendererFuncs[ast.NodeKbd] = ret.renderKbd
+	ret.RendererFuncs[ast.NodeKbdOpenMarker] = ret.renderKbdOpenMarker
+	ret.RendererFuncs[ast.NodeKbdCloseMarker] = ret.renderKbdCloseMarker
+	ret.RendererFuncs[ast.NodeUnderline] = ret.renderUnderline
+	ret.RendererFuncs[ast.NodeUnderlineOpenMarker] = ret.renderUnderlineOpenMarker
+	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
+	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
+	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
+	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
+	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
 	return ret
 }
 
@@ -158,6 +172,125 @@ func (r *HtmlRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
 	output = append(output, r.RenderFootnotes()...)
 	return
+}
+
+func (r *HtmlRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<span data-type=\"")
+		r.Write(node.Tokens)
+		r.WriteString("\">")
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderTextMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</span>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<br />")
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderUnderline(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderUnderlineOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<u>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderUnderlineCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</u>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("<kbd>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderKbdCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.WriteString("</kbd>")
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("div", [][]string{{"class", "iframe"}}, false)
+		tokens := node.Tokens
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("div", [][]string{{"class", "iframe"}}, false)
+		tokens := node.Tokens
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("div", [][]string{{"class", "iframe"}}, false)
+		tokens := node.Tokens
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("div", [][]string{{"class", "iframe"}}, false)
+		tokens := node.Tokens
+		if r.Options.Sanitize {
+			tokens = sanitize(tokens)
+		}
+		tokens = r.tagSrcPath(tokens)
+		r.Write(tokens)
+		r.Tag("/div", nil, false)
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {

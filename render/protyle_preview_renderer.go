@@ -165,6 +165,11 @@ func NewProtylePreviewRenderer(tree *parse.Tree, options *Options) *ProtylePrevi
 	return ret
 }
 
+func (r *ProtylePreviewRenderer) Render() (output []byte) {
+	output = r.BaseRenderer.Render()
+	return
+}
+
 func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -282,11 +287,6 @@ func (r *ProtylePreviewRenderer) renderWidget(node *ast.Node, entering bool) ast
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
-}
-
-func (r *ProtylePreviewRenderer) Render() (output []byte) {
-	output = r.BaseRenderer.Render()
-	return
 }
 
 func (r *ProtylePreviewRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
