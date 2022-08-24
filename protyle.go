@@ -1100,6 +1100,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if "" == content {
 				return
 			}
+			content = html.UnescapeHTMLStr(content)
 
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(content)})
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
