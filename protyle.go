@@ -660,6 +660,8 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
 		content := lute.domAttrValue(n, "data-content")
+		// 嵌入块中存在换行 SQL 语句时会被转换为段落文本 https://github.com/siyuan-note/siyuan/issues/5728
+		content = strings.ReplaceAll(content, "\n", util.IALValEscNewLine)
 		node.AppendChild(&ast.Node{Type: ast.NodeBlockQueryEmbedScript, Tokens: util.StrToBytes(content)})
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})

@@ -241,7 +241,10 @@ func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast
 		var attrs [][]string
 		tokens := script.Tokens
 		tokens = html.EscapeHTML(bytes.ReplaceAll(tokens, util.CaretTokens, nil))
-		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
+		content := util.BytesToStr(tokens)
+		// 嵌入块中存在换行 SQL 语句时会被转换为段落文本 https://github.com/siyuan-note/siyuan/issues/5728
+		content = strings.ReplaceAll(content, util.IALValEscNewLine, "\n")
+		attrs = append(attrs, []string{"data-content", content})
 		r.blockNodeAttrs(node, &attrs, "render-node")
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)
