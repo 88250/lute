@@ -56,27 +56,22 @@ func (t *Tree) finalParseBlockIAL() {
 		if "" == n.ID {
 			n.ID = ast.NewNodeID()
 
-			if ast.NodeDocument != n.Type && nil != n.Next && ast.NodeKramdownBlockIAL != n.Next.Type {
-				if t.Context.ParseOption.ProtyleWYSIWYG {
-					// 这个节点是 spin 后新生成的，将 n.Next 的 ID 和属性赋予它，并认为 n.Next 是新节点
-					n.ID = n.Next.ID
-					if "" == n.ID {
-						n.ID = ast.NewNodeID()
-					}
-					n.KramdownIAL = n.Next.KramdownIAL
-					if "" == n.IALAttr("updated") {
-						n.SetIALAttr("updated", n.ID[:14])
-					}
-					n.Next.ID = ast.NewNodeID()
-					n.Next.KramdownIAL = nil
-					n.Next.SetIALAttr("id", n.Next.ID)
-					n.Next.SetIALAttr("updated", n.Next.ID[:14])
-					if nil != n.Next.Next && ast.NodeKramdownBlockIAL == n.Next.Next.Type {
-						n.Next.Next.Tokens = IAL2Tokens(n.Next.KramdownIAL)
-					}
-					n.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: IAL2Tokens(n.KramdownIAL)})
-					return ast.WalkContinue
+			if t.Context.ParseOption.ProtyleWYSIWYG && ast.NodeDocument != n.Type && nil != n.Next && ast.NodeKramdownBlockIAL != n.Next.Type && "" != n.Next.ID {
+				// 这个节点是 spin 后新生成的，将 n.Next 的 ID 和属性赋予它，并认为 n.Next 是新节点
+				n.ID = n.Next.ID
+				n.KramdownIAL = n.Next.KramdownIAL
+				if "" == n.IALAttr("updated") {
+					n.SetIALAttr("updated", n.ID[:14])
 				}
+				n.Next.ID = ast.NewNodeID()
+				n.Next.KramdownIAL = nil
+				n.Next.SetIALAttr("id", n.Next.ID)
+				n.Next.SetIALAttr("updated", n.Next.ID[:14])
+				if nil != n.Next.Next && ast.NodeKramdownBlockIAL == n.Next.Next.Type {
+					n.Next.Next.Tokens = IAL2Tokens(n.Next.KramdownIAL)
+				}
+				n.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: IAL2Tokens(n.KramdownIAL)})
+				return ast.WalkContinue
 			}
 		}
 
