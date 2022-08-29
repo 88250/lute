@@ -258,28 +258,3 @@ func TestOL2UL(t *testing.T) {
 	}
 	ast.Testing = false
 }
-
-var p2hTests = []*parseTest{}
-
-func TestP2H(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetProtyleWYSIWYG(true)
-	luteEngine.ParseOptions.Mark = true
-	luteEngine.ParseOptions.BlockRef = true
-	luteEngine.SetKramdownIAL(true)
-	luteEngine.ParseOptions.SuperBlock = true
-	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
-	luteEngine.SetAutoSpace(false)
-	luteEngine.SetSub(true)
-	luteEngine.SetSup(true)
-	luteEngine.SetGitConflict(true)
-
-	ast.Testing = true
-	for _, test := range p2hTests {
-		ovHTML := luteEngine.P2H(test.from, "1")
-		if test.to != ovHTML {
-			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, ovHTML, test.from)
-		}
-	}
-	ast.Testing = false
-}
