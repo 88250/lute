@@ -149,9 +149,13 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 				typ = typ[:bytes.Index(typ, []byte("\""))]
 				ret = &ast.Node{Type: ast.NodeVirtualSpan, Tokens: typ}
 				ret.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
-				return
-			} else if bytes.Equal(tags, []byte("</v-span>")) {
-				ret = &ast.Node{Type: ast.NodeVirtualSpanCloseMarker}
+				// v-span 节点不会出现嵌套，所以这里可以一次性解析完整个节点结构
+				remains := ctx.tokens[ctx.pos:]
+				end := bytes.LastIndex(remains, []byte("</v-span>"))
+				ctx.pos += end + len("</v-span>")
+				text := remains[:end]
+				ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: text})
+				ret.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
 				return
 			}
 		}

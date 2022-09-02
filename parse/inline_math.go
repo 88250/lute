@@ -11,6 +11,8 @@
 package parse
 
 import (
+	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -68,6 +70,14 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 		ctx.pos++
 		ret = &ast.Node{Type: ast.NodeText, Tokens: dollar}
 		return
+	}
+
+	if t.Context.ParseOption.VirtualSpan {
+		if bytes.Contains(ctx.tokens[startPos+1:startPos+endPos+1], []byte("<v-span")) {
+			// 中间包含 v-span 节点的话打断公式，以 v-span 优先
+			ctx.pos++
+			return &ast.Node{Type: ast.NodeText, Tokens: dollar}
+		}
 	}
 
 	endPos = startPos + endPos + 2

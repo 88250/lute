@@ -173,10 +173,33 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 }
 
 func (r *BlockRenderer) renderVirtualSpan(node *ast.Node, entering bool) ast.WalkStatus {
+	tag := node.TokensStr()
 	if entering {
-		r.TextAutoSpacePrevious(node)
+		if "code" == tag || "inline-math" == tag {
+			if r.Options.AutoSpace {
+				if text := node.PreviousNodeText(); "" != text {
+					lastc, _ := utf8.DecodeLastRuneInString(text)
+					if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
+						r.WriteByte(lex.ItemSpace)
+					}
+				}
+			}
+		} else {
+			r.TextAutoSpacePrevious(node)
+		}
 	} else {
-		r.TextAutoSpaceNext(node)
+		if "code" == tag || "inline-math" == tag {
+			if r.Options.AutoSpace {
+				if text := node.NextNodeText(); "" != text {
+					firstc, _ := utf8.DecodeRuneInString(text)
+					if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
+						r.WriteByte(lex.ItemSpace)
+					}
+				}
+			}
+		} else {
+			r.TextAutoSpaceNext(node)
+		}
 	}
 	return ast.WalkContinue
 }
@@ -185,11 +208,19 @@ func (r *BlockRenderer) renderVirtualSpanOpenMarker(node *ast.Node, entering boo
 	if entering {
 		var attrs [][]string
 		r.spanNodeAttrs(node.Parent, &attrs)
-		if "strong" == node.Parent.TokensStr() {
-			r.Tag("strong", attrs, false)
+		tag := node.Parent.TokensStr()
+		if "inline-math" == tag {
+			inlineMathContent := node.Next
+			tokens := html.EscapeHTML(inlineMathContent.Tokens)
+			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+			r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}, false)
+			inlineMathContent.Unlink()
+		} else if "tag" == tag {
+			tagContent := node.Next.Text()
+			tagContent = strings.ReplaceAll(tagContent, util.Caret, "")
+			r.Tag("span", [][]string{{"data-type", "tag"}, {"data-content", html.EscapeHTMLStr(tagContent)}}, false)
 		} else {
-			attrs = append(attrs, []string{"data-type", node.Parent.TokensStr()})
-			r.Tag("span", attrs, false)
+			r.Tag(tag, attrs, false)
 		}
 	}
 	return ast.WalkContinue
@@ -197,10 +228,11 @@ func (r *BlockRenderer) renderVirtualSpanOpenMarker(node *ast.Node, entering boo
 
 func (r *BlockRenderer) renderVirtualSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if "strong" == node.Parent.TokensStr() {
-			r.WriteString("</strong>")
+		tag := node.Parent.TokensStr()
+		if "inline-math" == tag || "tag" == tag {
+			r.Tag("/span", nil, false)
 		} else {
-			r.WriteString("</span>")
+			r.WriteString("</" + tag + ">")
 		}
 	}
 	return ast.WalkContinue
@@ -1400,7 +1432,17 @@ func (r *BlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus
 		} else {
 			tokens = node.Tokens
 		}
-		r.Write(html.EscapeHTML(tokens))
+		if node.ParentIs(ast.NodeVirtualSpan) {
+			if "code" == node.Parent.TokensStr() {
+				if node.ParentIs(ast.NodeTableCell) {
+					tokens = bytes.ReplaceAll(tokens, []byte("\\|"), []byte("|"))
+				}
+				tokens = html.EscapeHTML(tokens)
+			}
+			r.Write(tokens)
+		} else {
+			r.Write(html.EscapeHTML(tokens))
+		}
 	}
 	return ast.WalkContinue
 }

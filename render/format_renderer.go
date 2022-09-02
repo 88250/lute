@@ -182,6 +182,15 @@ func (r *FormatRenderer) renderVirtualSpan(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *FormatRenderer) renderVirtualSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if node.ParentIs(ast.NodeTableCell) {
+			tokens := node.Next.Tokens
+			tokens = bytes.ReplaceAll(tokens, []byte("\\|"), []byte("|"))
+			tokens = bytes.ReplaceAll(tokens, []byte("|"), []byte("\\|"))
+			tokens = bytes.ReplaceAll(tokens, []byte("<br/>"), nil)
+			node.Next.Tokens = tokens
+		}
+	}
 	return ast.WalkContinue
 }
 
