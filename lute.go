@@ -47,18 +47,18 @@ type Lute struct {
 // New 创建一个新的 Lute 引擎。
 //
 // 默认启用的解析选项：
-//  * GFM 支持
-//  * 脚注
-//  * 标题自定义 ID
-//  * Emoji 别名替换，比如 :heart: 替换为 ❤️
-//  * YAML Front Matter
+//   - GFM 支持
+//   - 脚注
+//   - 标题自定义 ID
+//   - Emoji 别名替换，比如 :heart: 替换为 ❤️
+//   - YAML Front Matter
 //
 // 默认启用的渲染选项：
-//  * 软换行转硬换行
-//  * 代码块语法高亮
-//  * 中西文间插入空格
-//  * 修正术语拼写
-//  * 标题自定义 ID
+//   - 软换行转硬换行
+//   - 代码块语法高亮
+//   - 中西文间插入空格
+//   - 修正术语拼写
+//   - 标题自定义 ID
 func New(opts ...ParseOption) (ret *Lute) {
 	ret = &Lute{ParseOptions: parse.NewOptions(), RenderOptions: render.NewOptions()}
 	for _, opt := range opts {
@@ -492,6 +492,10 @@ func (lute *Lute) SetLinkRef(b bool) {
 
 func (lute *Lute) SetIndentCodeBlock(b bool) {
 	lute.ParseOptions.IndentCodeBlock = b
+}
+
+func (lute *Lute) SetVirtualSpan(b bool) {
+	lute.ParseOptions.VirtualSpan = b
 }
 
 func (lute *Lute) SetParagraphBeginningSpace(b bool) {

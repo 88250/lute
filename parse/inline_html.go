@@ -144,6 +144,15 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			} else if bytes.Equal(tags, []byte("</span>")) {
 				ret = &ast.Node{Type: ast.NodeTextMarkCloseMarker}
 				return
+			} else if bytes.HasPrefix(tags, []byte("<v-span data-type=")) {
+				typ := tags[len("<v-span data-type=")+1:]
+				typ = typ[:bytes.Index(typ, []byte("\""))]
+				ret = &ast.Node{Type: ast.NodeVirtualSpan, Tokens: typ}
+				ret.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
+				return
+			} else if bytes.Equal(tags, []byte("</v-span>")) {
+				ret = &ast.Node{Type: ast.NodeVirtualSpanCloseMarker}
+				return
 			}
 		}
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}

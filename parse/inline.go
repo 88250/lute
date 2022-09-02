@@ -134,6 +134,27 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 					textMark.AppendChild(n)
 					continue
 				}
+			} else if ast.NodeVirtualSpanCloseMarker == n.Type {
+				var vSpan *ast.Node
+				var children []*ast.Node
+				for vSpan = block.LastChild; nil != vSpan; vSpan = vSpan.Previous {
+					if ast.NodeVirtualSpan == vSpan.Type {
+						break
+					}
+					children = append(children, vSpan)
+				}
+				if nil == vSpan {
+					n.Type = ast.NodeVirtualSpan
+					n.Tokens = []byte("</span>")
+				} else {
+					openMarker := vSpan.FirstChild
+					for _, c := range children {
+						vSpan.PrependChild(c)
+					}
+					vSpan.PrependChild(openMarker)
+					vSpan.AppendChild(n)
+					continue
+				}
 			}
 		}
 

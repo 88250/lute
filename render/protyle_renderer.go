@@ -166,7 +166,44 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
 	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
 	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
+	ret.RendererFuncs[ast.NodeVirtualSpan] = ret.renderVirtualSpan
+	ret.RendererFuncs[ast.NodeVirtualSpanOpenMarker] = ret.renderVirtualSpanOpenMarker
+	ret.RendererFuncs[ast.NodeVirtualSpanCloseMarker] = ret.renderVirtualSpanCloseMarker
 	return ret
+}
+
+func (r *BlockRenderer) renderVirtualSpan(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.TextAutoSpacePrevious(node)
+	} else {
+		r.TextAutoSpaceNext(node)
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderVirtualSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		var attrs [][]string
+		r.spanNodeAttrs(node.Parent, &attrs)
+		if "strong" == node.Parent.TokensStr() {
+			r.Tag("strong", attrs, false)
+		} else {
+			attrs = append(attrs, []string{"data-type", node.Parent.TokensStr()})
+			r.Tag("span", attrs, false)
+		}
+	}
+	return ast.WalkContinue
+}
+
+func (r *BlockRenderer) renderVirtualSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		if "strong" == node.Parent.TokensStr() {
+			r.WriteString("</strong>")
+		} else {
+			r.WriteString("</span>")
+		}
+	}
+	return ast.WalkContinue
 }
 
 func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
