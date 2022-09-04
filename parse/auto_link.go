@@ -149,7 +149,8 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 }
 
 var (
-	httpProto = util.StrToBytes("http://")
+	httpProto   = util.StrToBytes("http://")
+	siyuanProto = util.StrToBytes("siyuan://")
 
 	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
 	validAutoLinkDomainSuffix = [][]byte{util.StrToBytes("top"), util.StrToBytes("com"), util.StrToBytes("net"), util.StrToBytes("org"), util.StrToBytes("edu"), util.StrToBytes("gov"),
@@ -196,6 +197,9 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == tokens[i] && 't' == tokens[i+1] && 'p' == tokens[i+2] && ':' == tokens[i+3] && '/' == tokens[i+4] && '/' == tokens[i+5] {
 			protocol = tokens[i : i+6]
 			i += 6
+		} else if 29 <= tmpLen /* siyuan://blocks/20220817180757-c57m8qi */ && 's' == tokens[i] && 'i' == tokens[i+1] && 'y' == tokens[i+2] && 'u' == tokens[i+3] && 'a' == tokens[i+4] && 'n' == tokens[i+5] && ':' == tokens[i+6] && '/' == tokens[i+7] && '/' == tokens[i+8] {
+			protocol = siyuanProto
+			i += 9
 		} else {
 			textEnd++
 			if length-i < minLinkLen { // 剩余字符不足，已经不可能形成链接了
@@ -417,6 +421,10 @@ func (t *Tree) isValidDomain(domain []byte) bool {
 	segments := lex.Split(domain, '.')
 	length := len(segments)
 	if 2 > length { // 域名至少被 . 分隔为两部分，小于两部分的话不合法
+		// 单独处理 siyuan:// 协议
+		if 1 == length && 6 == len(domain) && bytes.Equal(domain, []byte("blocks")) {
+			return true
+		}
 		return false
 	}
 

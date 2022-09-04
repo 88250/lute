@@ -19,6 +19,10 @@ import (
 func TestIsValidLinkDest(t *testing.T) {
 	luteEngine := lute.New()
 
+	if !luteEngine.IsValidLinkDest("siyuan://blocks/20220817180757-c57m8qi") {
+		t.Fatalf("check link dest failed")
+	}
+
 	if !luteEngine.IsValidLinkDest("https://abc.to/") {
 		t.Fatalf("check link dest failed")
 	}

@@ -18,6 +18,7 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"13", "siyuan://blocks/20220817180757-c57m8qi测试foo", "<p><a href=\"siyuan://blocks/20220817180757-c57m8qi\">siyuan://blocks/20220817180757-c57m8qi</a> 测试 foo</p>\n"},
 	{"12", "https://github.com/siyuan-note/siyuan/issues/?page=1&q=is%3Aissue+is%3Aopen", "<p><a href=\"https://github.com/siyuan-note/siyuan/issues/?page=1&amp;q=is%3Aissue+is%3Aopen\">https://github.com/siyuan-note/siyuan/issues/?page=1&amp;q=is%3Aissue+is%3Aopen</a></p>\n"},
 	{"11", "https://github.com/88250/lute/issues/101", "<p><a href=\"https://github.com/88250/lute/issues/101\">Issue #101 · 88250/lute</a></p>\n"},
 	{"10", "https://github.com/pages#标题\nhttps://www.google.com.hk/search?q=博客\nhttps://例子.网站/pages#home\n", "<p><a href=\"https://github.com/pages\">https://github.com/pages</a>#标题<br />\n<a href=\"https://www.google.com.hk/search?q\">https://www.google.com.hk/search?q</a>=博客<br />\nhttps://例子.网站/pages#home</p>\n"},
@@ -37,7 +38,7 @@ func TestAutoLink(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetAutoSpace(true)
 	for _, test := range autoLinkTests {
-		result:= luteEngine.MarkdownStr(test.name, test.from)
+		result := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != result {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
 		}
