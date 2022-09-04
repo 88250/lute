@@ -156,7 +156,9 @@ var (
 		util.StrToBytes("cn"), util.StrToBytes("io"), util.StrToBytes("me"), util.StrToBytes("biz"), util.StrToBytes("co"), util.StrToBytes("live"), util.StrToBytes("pro"), util.StrToBytes("xyz"),
 		util.StrToBytes("win"), util.StrToBytes("club"), util.StrToBytes("tv"), util.StrToBytes("wiki"), util.StrToBytes("site"), util.StrToBytes("tech"), util.StrToBytes("space"), util.StrToBytes("cc"),
 		util.StrToBytes("name"), util.StrToBytes("social"), util.StrToBytes("band"), util.StrToBytes("pub"), util.StrToBytes("info"), util.StrToBytes("app"), util.StrToBytes("md"), util.StrToBytes("edu"),
-		util.StrToBytes("hk"), util.StrToBytes("so"), util.StrToBytes("vip"), util.StrToBytes("ai"), util.StrToBytes("ink"), util.StrToBytes("mobi"), util.StrToBytes("pro"), util.StrToBytes("dev")}
+		util.StrToBytes("hk"), util.StrToBytes("so"), util.StrToBytes("vip"), util.StrToBytes("ai"), util.StrToBytes("ink"), util.StrToBytes("mobi"), util.StrToBytes("pro"), util.StrToBytes("dev"),
+		util.StrToBytes("pm"), util.StrToBytes("to"), util.StrToBytes("store"), util.StrToBytes("shop"), util.StrToBytes("love"), util.StrToBytes("icu"), util.StrToBytes("ltd"), util.StrToBytes("news"),
+		util.StrToBytes("work"), util.StrToBytes("group"), util.StrToBytes("online"), util.StrToBytes("game"), util.StrToBytes("design"), util.StrToBytes("link")}
 )
 
 // AddAutoLinkDomainSuffix 添加自动链接解析域名后缀 suffix。
