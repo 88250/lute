@@ -1053,8 +1053,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	case atom.Span:
 		dataType := lute.domAttrValue(n, "data-type")
 		if "tag" == dataType {
-			_, isEmpty := lute.isCaret(n)
-			if nil == n.FirstChild || isEmpty {
+			isCaret, isEmpty := lute.isCaret(n)
+			if isCaret {
+				node.Type = ast.NodeText
+				node.Tokens = util.CaretTokens
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
+			if isEmpty {
 				return
 			}
 
