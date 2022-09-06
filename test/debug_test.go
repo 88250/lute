@@ -18,6 +18,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"64", "1. foo\n\nbar\n\n2. baz", "<ol>\n<li>foo</li>\n</ol>\n<p>bar</p>\n<ol start=\"2\">\n<li>baz</li>\n</ol>\n"},
 	{"63", "[请从这里开始](siyuan://blocks/20200812220555-lj3enxa)", "<p><a href=\"siyuan://blocks/20200812220555-lj3enxa\">请从这里开始</a></p>\n"},
 	{"62", "![a](\"<img src=xss onerror=alert(1)>)", "<p>![a](&quot;&lt;img src=xss onerror=alert(1)&gt;)</p>\n"},
 	{"61", "| foo  | bar  |\n| ---- | ---- |\n| $a|b$  | $c|d$  |\n", "<table>\n<thead>\n<tr>\n<th>foo</th>\n<th>bar</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><span class=\"language-math\">a|b</span></td>\n<td><span class=\"language-math\">c|d</span></td>\n</tr>\n</tbody>\n</table>\n"},
