@@ -814,7 +814,7 @@ const (
 
 	NodeBr NodeType = 525 // <br> 换行
 
-	// <span data-type="mark">foo</span> 通用的行级文本标记
+	// <span data-type="mark">foo</span> 通用的行级文本标记，不能嵌套
 
 	NodeTextMark            NodeType = 530 // 文本标记
 	NodeTextMarkOpenMarker  NodeType = 531 // 开始文本标记符 <span>
@@ -830,12 +830,6 @@ const (
 	NodeFileAnnotationRefID    NodeType = 541 // 被引用的文件注解 ID（file/annotation）
 	NodeFileAnnotationRefSpace NodeType = 542 // 被引用的文件注解 ID 和文件注解引用锚文本之间的空格
 	NodeFileAnnotationRefText  NodeType = 543 // 文件注解引用锚文本（不能为空，如果为空的话会自动使用 ID 渲染）
-
-	// <v-span data-type="strong">foo</v-span> 虚拟行级节点，用于 Spin 过程中保留完整的行级节点
-
-	NodeVirtualSpan            NodeType = 550 // 虚拟行级节点
-	NodeVirtualSpanOpenMarker  NodeType = 551 // 开始虚拟行级节点标记符 <v-span>
-	NodeVirtualSpanCloseMarker NodeType = 552 // 结束虚拟行级节点标记符 </v-span>
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

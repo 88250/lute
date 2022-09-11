@@ -494,8 +494,8 @@ func (lute *Lute) SetIndentCodeBlock(b bool) {
 	lute.ParseOptions.IndentCodeBlock = b
 }
 
-func (lute *Lute) SetVirtualSpan(b bool) {
-	lute.ParseOptions.VirtualSpan = b
+func (lute *Lute) SetTextMark(b bool) {
+	lute.ParseOptions.TextMark = b
 }
 
 func (lute *Lute) SetParagraphBeginningSpace(b bool) {

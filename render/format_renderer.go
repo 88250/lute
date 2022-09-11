@@ -166,22 +166,19 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
 	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
 	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
-	ret.RendererFuncs[ast.NodeVirtualSpan] = ret.renderVirtualSpan
-	ret.RendererFuncs[ast.NodeVirtualSpanOpenMarker] = ret.renderVirtualSpanOpenMarker
-	ret.RendererFuncs[ast.NodeVirtualSpanCloseMarker] = ret.renderVirtualSpanCloseMarker
 	return ret
 }
 
-func (r *FormatRenderer) renderVirtualSpan(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<v-span data-type=\"")
+		r.WriteString("<span data-type=\"")
 		r.Write(node.Tokens)
 		r.WriteString("\">")
 	}
 	return ast.WalkContinue
 }
 
-func (r *FormatRenderer) renderVirtualSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *FormatRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if node.ParentIs(ast.NodeTableCell) {
 			tokens := node.Next.Tokens
@@ -190,26 +187,6 @@ func (r *FormatRenderer) renderVirtualSpanOpenMarker(node *ast.Node, entering bo
 			tokens = bytes.ReplaceAll(tokens, []byte("<br/>"), nil)
 			node.Next.Tokens = tokens
 		}
-	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderVirtualSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("</v-span>")
-	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("<span data-type=\"")
-		r.Write(node.Tokens)
-		r.WriteString("\">")
 	}
 	return ast.WalkContinue
 }

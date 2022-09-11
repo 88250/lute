@@ -72,9 +72,9 @@ func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
 		return
 	}
 
-	if t.Context.ParseOption.VirtualSpan {
-		if bytes.Contains(ctx.tokens[startPos+1:startPos+endPos+1], []byte("<v-span")) {
-			// 中间包含 v-span 节点的话打断公式，以 v-span 优先
+	if t.Context.ParseOption.TextMark {
+		if bytes.Contains(ctx.tokens[startPos+1:startPos+endPos+1], []byte("<span")) {
+			// 中间包含 span 节点的话打断公式，以 span 优先
 			ctx.pos++
 			return &ast.Node{Type: ast.NodeText, Tokens: dollar}
 		}

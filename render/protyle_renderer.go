@@ -166,13 +166,10 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
 	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
 	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
-	ret.RendererFuncs[ast.NodeVirtualSpan] = ret.renderVirtualSpan
-	ret.RendererFuncs[ast.NodeVirtualSpanOpenMarker] = ret.renderVirtualSpanOpenMarker
-	ret.RendererFuncs[ast.NodeVirtualSpanCloseMarker] = ret.renderVirtualSpanCloseMarker
 	return ret
 }
 
-func (r *BlockRenderer) renderVirtualSpan(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	tag := node.TokensStr()
 	if entering {
 		if "code" == tag || "inline-math" == tag {
@@ -204,49 +201,27 @@ func (r *BlockRenderer) renderVirtualSpan(node *ast.Node, entering bool) ast.Wal
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderVirtualSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *BlockRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var attrs [][]string
+		dataType := node.Parent.TokensStr()
+		attrs := [][]string{{"data-type", dataType}}
 		r.spanNodeAttrs(node.Parent, &attrs)
-		tag := node.Parent.TokensStr()
-		if "inline-math" == tag {
+
+		if "inline-math" == dataType {
 			inlineMathContent := node.Next
 			tokens := html.EscapeHTML(inlineMathContent.Tokens)
 			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-			r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}, false)
+			attrs = append(attrs, [][]string{{"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}...)
+			r.Tag("span", attrs, false)
 			inlineMathContent.Unlink()
-		} else if "tag" == tag {
+		} else if "tag" == dataType {
 			tagContent := node.Next.Text()
 			tagContent = strings.ReplaceAll(tagContent, util.Caret, "")
-			r.Tag("span", [][]string{{"data-type", "tag"}, {"data-content", html.EscapeHTMLStr(tagContent)}}, false)
+			attrs = append(attrs, [][]string{{"data-content", html.EscapeHTMLStr(tagContent)}}...)
+			r.Tag("span", attrs, false)
 		} else {
-			r.Tag(tag, attrs, false)
+			r.Tag("span", attrs, false)
 		}
-	}
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderVirtualSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		tag := node.Parent.TokensStr()
-		if "inline-math" == tag || "tag" == tag {
-			r.Tag("/span", nil, false)
-		} else {
-			r.WriteString("</" + tag + ">")
-		}
-	}
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("<span data-type=\"")
-		r.Write(node.Tokens)
-		r.WriteString("\">")
 	}
 	return ast.WalkContinue
 }
@@ -1432,7 +1407,7 @@ func (r *BlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus
 		} else {
 			tokens = node.Tokens
 		}
-		if node.ParentIs(ast.NodeVirtualSpan) {
+		if node.ParentIs(ast.NodeTextMark) {
 			if "code" == node.Parent.TokensStr() {
 				if node.ParentIs(ast.NodeTableCell) {
 					tokens = bytes.ReplaceAll(tokens, []byte("\\|"), []byte("|"))

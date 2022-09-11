@@ -136,26 +136,17 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
 			} else if bytes.HasPrefix(tags, []byte("<span data-type=")) {
-				ret = &ast.Node{Type: ast.NodeTextMark}
 				typ := tags[len("<span data-type=")+1:]
 				typ = typ[:bytes.Index(typ, []byte("\""))]
-				ret.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker, Tokens: typ})
-				return
-			} else if bytes.Equal(tags, []byte("</span>")) {
-				ret = &ast.Node{Type: ast.NodeTextMarkCloseMarker}
-				return
-			} else if bytes.HasPrefix(tags, []byte("<v-span data-type=")) {
-				typ := tags[len("<v-span data-type=")+1:]
-				typ = typ[:bytes.Index(typ, []byte("\""))]
-				ret = &ast.Node{Type: ast.NodeVirtualSpan, Tokens: typ}
-				ret.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
-				// v-span 节点不会出现嵌套，所以这里可以一次性解析完整个节点结构
+				ret = &ast.Node{Type: ast.NodeTextMark, Tokens: typ}
+				ret.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
+				// span 节点不会出现嵌套，所以这里可以一次性解析完整个节点结构
 				remains := ctx.tokens[ctx.pos:]
-				end := bytes.LastIndex(remains, []byte("</v-span>"))
-				ctx.pos += end + len("</v-span>")
+				end := bytes.LastIndex(remains, []byte("</span>"))
+				ctx.pos += end + len("</span>")
 				text := remains[:end]
 				ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: text})
-				ret.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
+				ret.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 				return
 			}
 		}

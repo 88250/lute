@@ -392,8 +392,8 @@ type Options struct {
 	ParagraphBeginningSpace bool
 	// DataImage 设置是否打开 ![foo](data:image...) 形式的图片支持。
 	DataImage bool
-	// VirtualSpan 设置是否打开虚拟行级节点解析支持。
-	VirtualSpan bool
+	// TextMark 设置是否打开通用行级节点解析支持。
+	TextMark bool
 }
 
 func NewOptions() *Options {

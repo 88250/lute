@@ -963,7 +963,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 			return
 		}
-		if ast.NodeVirtualSpan == tree.Context.Tip.Type {
+		if ast.NodeTextMark == tree.Context.Tip.Type {
 			if "code" == tree.Context.Tip.TokensStr() {
 				if nil != tree.Context.Tip.FirstChild && nil != tree.Context.Tip.FirstChild.Next && nil != tree.Context.Tip.FirstChild.Next.Next && ast.NodeBackslash == tree.Context.Tip.FirstChild.Next.Next.Type {
 					// 表格单元格中使用代码和 `|` 的问题 https://github.com/siyuan-note/siyuan/issues/4717
@@ -1038,10 +1038,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if lute.ParseOptions.VirtualSpan {
-			node.Type = ast.NodeVirtualSpan
+		if lute.ParseOptions.TextMark {
+			node.Type = ast.NodeTextMark
 			node.Tokens = []byte("code")
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 		} else {
 			node.Type = ast.NodeCodeSpan
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker})
@@ -1066,10 +1066,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
 
-			if lute.ParseOptions.VirtualSpan {
-				node.Type = ast.NodeVirtualSpan
+			if lute.ParseOptions.TextMark {
+				node.Type = ast.NodeTextMark
 				node.Tokens = []byte("tag")
-				node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
+				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			} else {
 				node.Type = ast.NodeTag
 				node.AppendChild(&ast.Node{Type: ast.NodeTagOpenMarker})
@@ -1087,12 +1087,12 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 			content = html.UnescapeHTMLStr(content)
 
-			if lute.ParseOptions.VirtualSpan {
-				node.Type = ast.NodeVirtualSpan
+			if lute.ParseOptions.TextMark {
+				node.Type = ast.NodeTextMark
 				node.Tokens = []byte("inline-math")
-				node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
+				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(content)})
-				node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
+				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 			} else {
 				node.Type = ast.NodeInlineMath
 				node.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
@@ -1304,10 +1304,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if lute.ParseOptions.VirtualSpan {
-			node.Type = ast.NodeVirtualSpan
+		if lute.ParseOptions.TextMark {
+			node.Type = ast.NodeTextMark
 			node.Tokens = []byte("em")
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			tree.Context.Tip.AppendChild(node)
 		} else {
 			node.Type = ast.NodeEmphasis
@@ -1373,10 +1373,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if lute.ParseOptions.VirtualSpan {
-			node.Type = ast.NodeVirtualSpan
+		if lute.ParseOptions.TextMark {
+			node.Type = ast.NodeTextMark
 			node.Tokens = []byte("strong")
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			tree.Context.Tip.AppendChild(node)
 		} else {
 			node.Type = ast.NodeStrong
@@ -1428,10 +1428,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if lute.ParseOptions.VirtualSpan {
-			node.Type = ast.NodeVirtualSpan
+		if lute.ParseOptions.TextMark {
+			node.Type = ast.NodeTextMark
 			node.Tokens = []byte("s")
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			tree.Context.Tip.AppendChild(node)
 		} else {
 			node.Type = ast.NodeStrikethrough
@@ -1479,10 +1479,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if lute.ParseOptions.VirtualSpan {
-			node.Type = ast.NodeVirtualSpan
+		if lute.ParseOptions.TextMark {
+			node.Type = ast.NodeTextMark
 			node.Tokens = []byte("mark")
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanOpenMarker})
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			lute.removeInnerMarker(n, "==")
 			tree.Context.Tip.AppendChild(node)
 		} else {
@@ -1530,16 +1530,16 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 	switch n.DataAtom {
 	case atom.Code:
-		if lute.ParseOptions.VirtualSpan {
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
+		if lute.ParseOptions.TextMark {
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker})
 		}
 	case atom.Span:
 		dataType := lute.domAttrValue(n, "data-type")
 		if "tag" == dataType {
-			if lute.ParseOptions.VirtualSpan {
-				node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
+			if lute.ParseOptions.TextMark {
+				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 			} else {
 				node.AppendChild(&ast.Node{Type: ast.NodeTagCloseMarker})
 			}
@@ -1573,8 +1573,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	case atom.Kbd:
 		node.AppendChild(&ast.Node{Type: ast.NodeKbdCloseMarker})
 	case atom.Em, atom.I:
-		if lute.ParseOptions.VirtualSpan {
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
+		if lute.ParseOptions.TextMark {
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 		} else {
 			marker := lute.domAttrValue(n, "data-marker")
 			if "" == marker {
@@ -1587,8 +1587,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 		}
 	case atom.Strong, atom.B:
-		if lute.ParseOptions.VirtualSpan {
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
+		if lute.ParseOptions.TextMark {
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 		} else {
 			marker := lute.domAttrValue(n, "data-marker")
 			if "" == marker {
@@ -1601,8 +1601,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 		}
 	case atom.Del, atom.S, atom.Strike:
-		if lute.ParseOptions.VirtualSpan {
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
+		if lute.ParseOptions.TextMark {
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 		} else {
 			marker := lute.domAttrValue(n, "data-marker")
 			if "~" == marker {
@@ -1612,8 +1612,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 		}
 	case atom.Mark:
-		if lute.ParseOptions.VirtualSpan {
-			node.AppendChild(&ast.Node{Type: ast.NodeVirtualSpanCloseMarker})
+		if lute.ParseOptions.TextMark {
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 		} else {
 			marker := lute.domAttrValue(n, "data-marker")
 			if "=" == marker {
