@@ -18,6 +18,8 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"15", "中https://notaurl文\n", "<p>中 https://notaurl 文</p>\n"},
+	{"14", "abc://xyz测试foo", "<p><a href=\"abc://xyz\">abc://xyz</a> 测试 foo</p>\n"},
 	{"13", "siyuan://blocks/20220817180757-c57m8qi测试foo", "<p><a href=\"siyuan://blocks/20220817180757-c57m8qi\">siyuan://blocks/20220817180757-c57m8qi</a> 测试 foo</p>\n"},
 	{"12", "https://github.com/siyuan-note/siyuan/issues/?page=1&q=is%3Aissue+is%3Aopen", "<p><a href=\"https://github.com/siyuan-note/siyuan/issues/?page=1&amp;q=is%3Aissue+is%3Aopen\">https://github.com/siyuan-note/siyuan/issues/?page=1&amp;q=is%3Aissue+is%3Aopen</a></p>\n"},
 	{"11", "https://github.com/88250/lute/issues/101", "<p><a href=\"https://github.com/88250/lute/issues/101\">Issue #101 · 88250/lute</a></p>\n"},

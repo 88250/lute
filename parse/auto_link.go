@@ -149,8 +149,9 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 }
 
 var (
-	httpProto   = util.StrToBytes("http://")
-	siyuanProto = util.StrToBytes("siyuan://")
+	httpProto  = util.StrToBytes("http://")
+	httpsProto = util.StrToBytes("https://")
+	ftpProto   = util.StrToBytes("ftp://")
 
 	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
 	validAutoLinkDomainSuffix = [][]byte{util.StrToBytes("top"), util.StrToBytes("com"), util.StrToBytes("net"), util.StrToBytes("org"), util.StrToBytes("edu"), util.StrToBytes("gov"),
@@ -197,9 +198,10 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == tokens[i] && 't' == tokens[i+1] && 'p' == tokens[i+2] && ':' == tokens[i+3] && '/' == tokens[i+4] && '/' == tokens[i+5] {
 			protocol = tokens[i : i+6]
 			i += 6
-		} else if 29 <= tmpLen /* siyuan://blocks/20220817180757-c57m8qi */ && 's' == tokens[i] && 'i' == tokens[i+1] && 'y' == tokens[i+2] && 'u' == tokens[i+3] && 'a' == tokens[i+4] && 'n' == tokens[i+5] && ':' == tokens[i+6] && '/' == tokens[i+7] && '/' == tokens[i+8] {
-			protocol = siyuanProto
-			i += 9
+		} else if parts := bytes.Split(tokens[i:], []byte("://")); 2 == len(parts) && 0 < len(parts[0]) && 0 < len(parts[1]) && !bytes.Contains(tokens[i:], httpProto) && !bytes.Contains(tokens[i:], httpsProto) && !bytes.Contains(tokens[i:], ftpProto) {
+			// 自定义协议均认为是有效的 https://github.com/siyuan-note/siyuan/issues/5865
+			protocol = append(parts[0], []byte("://")...)
+			i += len(parts[0]) + 3
 		} else {
 			textEnd++
 			if length-i < minLinkLen { // 剩余字符不足，已经不可能形成链接了
@@ -275,7 +277,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			domain = domain[:idx]
 		}
 
-		if !t.isValidDomain(domain) {
+		if !t.isValidDomain(protocol, domain) {
 			t.addPreviousText(node, tokens[textStart:i])
 			needUnlink = true
 			textStart = i
@@ -417,14 +419,15 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 
 // isValidDomain 校验 GFM 规范自动链接规则中定义的合法域名。
 // https://github.github.com/gfm/#valid-domain
-func (t *Tree) isValidDomain(domain []byte) bool {
+func (t *Tree) isValidDomain(protocol, domain []byte) bool {
+	if 0 < len(protocol) && !bytes.Contains(protocol, httpProto) && !bytes.Contains(protocol, httpsProto) && !bytes.Contains(protocol, ftpProto) {
+		// 自定义协议均认为是有效的 https://github.com/siyuan-note/siyuan/issues/5865
+		return true
+	}
+
 	segments := lex.Split(domain, '.')
 	length := len(segments)
 	if 2 > length { // 域名至少被 . 分隔为两部分，小于两部分的话不合法
-		// 单独处理 siyuan:// 协议
-		if 1 == length && 6 == len(domain) && bytes.Equal(domain, []byte("blocks")) {
-			return true
-		}
 		return false
 	}
 
