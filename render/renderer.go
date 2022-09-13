@@ -239,13 +239,23 @@ func (r *BaseRenderer) TextAutoSpacePrevious(node *ast.Node) {
 		return
 	}
 
-	if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
-		if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
-			prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
-			first, _ := utf8.DecodeRune(text.Tokens)
-			if allowSpace(prevLast, first) {
-				r.Writer.WriteByte(lex.ItemSpace)
-			}
+	text := node.ChildByType(ast.NodeText)
+	var tokens []byte
+	if nil != text {
+		tokens = text.Tokens
+	}
+	if ast.NodeTextMark == node.Type {
+		tokens = []byte(node.TextMarkTextContent)
+	}
+	if 1 > len(tokens) {
+		return
+	}
+
+	if previous := node.Previous; nil != previous && ast.NodeText == previous.Type {
+		prevLast, _ := utf8.DecodeLastRune(previous.Tokens)
+		first, _ := utf8.DecodeRune(tokens)
+		if allowSpace(prevLast, first) {
+			r.Writer.WriteByte(lex.ItemSpace)
 		}
 	}
 }
@@ -255,13 +265,23 @@ func (r *BaseRenderer) TextAutoSpaceNext(node *ast.Node) {
 		return
 	}
 
-	if text := node.ChildByType(ast.NodeText); nil != text && nil != text.Tokens {
-		if next := node.Next; nil != next && ast.NodeText == next.Type {
-			nextFirst, _ := utf8.DecodeRune(next.Tokens)
-			last, _ := utf8.DecodeLastRune(text.Tokens)
-			if allowSpace(last, nextFirst) {
-				r.Writer.WriteByte(lex.ItemSpace)
-			}
+	text := node.ChildByType(ast.NodeText)
+	var tokens []byte
+	if nil != text {
+		tokens = text.Tokens
+	}
+	if ast.NodeTextMark == node.Type {
+		tokens = []byte(node.TextMarkTextContent)
+	}
+	if 1 > len(tokens) {
+		return
+	}
+
+	if next := node.Next; nil != next && ast.NodeText == next.Type {
+		nextFirst, _ := utf8.DecodeRune(next.Tokens)
+		last, _ := utf8.DecodeLastRune(tokens)
+		if allowSpace(last, nextFirst) {
+			r.Writer.WriteByte(lex.ItemSpace)
 		}
 	}
 }
