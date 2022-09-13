@@ -170,6 +170,19 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 
 func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
+			if r.Options.AutoSpace {
+				if text := node.PreviousNodeText(); "" != text {
+					lastc, _ := utf8.DecodeLastRuneInString(text)
+					if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
+						r.WriteByte(lex.ItemSpace)
+					}
+				}
+			}
+		} else {
+			r.TextAutoSpacePrevious(node)
+		}
+
 		attrs := r.renderTextMarkAttrs(node)
 		r.Tag("span", attrs, false)
 		textContent := node.TextMarkTextContent
@@ -184,6 +197,18 @@ func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkS
 		r.WriteString(textContent)
 	} else {
 		r.WriteString("</span>")
+		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
+			if r.Options.AutoSpace {
+				if text := node.NextNodeText(); "" != text {
+					firstc, _ := utf8.DecodeRuneInString(text)
+					if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
+						r.WriteByte(lex.ItemSpace)
+					}
+				}
+			}
+		} else {
+			r.TextAutoSpaceNext(node)
+		}
 	}
 	return ast.WalkContinue
 }

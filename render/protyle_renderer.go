@@ -169,9 +169,8 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 }
 
 func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
-	tag := node.TextMarkType
 	if entering {
-		if "code" == tag || "inline-math" == tag || "kbd" == tag {
+		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
 			if r.Options.AutoSpace {
 				if text := node.PreviousNodeText(); "" != text {
 					lastc, _ := utf8.DecodeLastRuneInString(text)
@@ -194,7 +193,7 @@ func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSt
 		r.WriteString(textContent)
 	} else {
 		r.WriteString("</span>")
-		if "code" == tag || "inline-math" == tag || "kbd" == tag {
+		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
 			if r.Options.AutoSpace {
 				if text := node.NextNodeText(); "" != text {
 					firstc, _ := utf8.DecodeRuneInString(text)

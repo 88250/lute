@@ -536,6 +536,18 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 	}
 }
 
+func ContainTextMark(node *ast.Node, dataTypes ...string) bool {
+	parts := strings.Split(node.TextMarkType, " ")
+	for _, typ := range parts {
+		for _, dataType := range dataTypes {
+			if typ == dataType {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func SetTextMarkNode(node *ast.Node, n *html.Node) {
 	node.Type = ast.NodeTextMark
 	dataType := util.DomAttrValue(n, "data-type")
