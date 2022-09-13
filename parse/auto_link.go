@@ -171,7 +171,7 @@ func AddAutoLinkDomainSuffix(suffix string) {
 func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 	tokens := node.Tokens
 	length := len(tokens)
-	minLinkLen := 10 // 太短的情况肯定不可能有链接，最短的情况是 www.xxx.xx
+	minLinkLen := 5 // 太短的情况肯定不可能有链接，最短的情况是 a://b 或者 www.xxx.xx
 	if minLinkLen > length {
 		return
 	}

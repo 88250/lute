@@ -18,6 +18,7 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"16", "abc://xyz", "<p><a href=\"abc://xyz\">abc://xyz</a></p>\n"},
 	{"15", "中https://notaurl文\n", "<p>中 https://notaurl 文</p>\n"},
 	{"14", "abc://xyz测试foo", "<p><a href=\"abc://xyz\">abc://xyz</a> 测试 foo</p>\n"},
 	{"13", "siyuan://blocks/20220817180757-c57m8qi测试foo", "<p><a href=\"siyuan://blocks/20220817180757-c57m8qi\">siyuan://blocks/20220817180757-c57m8qi</a> 测试 foo</p>\n"},
