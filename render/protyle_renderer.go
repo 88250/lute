@@ -183,7 +183,7 @@ func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSt
 		} else {
 			r.TextAutoSpacePrevious(node)
 		}
-		attrs := renderTextMarkAttrs(node)
+		attrs := r.renderTextMarkAttrs(node)
 		r.spanNodeAttrs(node, &attrs)
 		r.Tag("span", attrs, false)
 		textContent := node.TextMarkTextContent
@@ -1766,17 +1766,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	r.Tag("/div", nil, false)
 }
 
-func IsChartCodeBlockCode(code *ast.Node) bool {
-	if nil == code.Previous || ast.NodeCodeBlockFenceInfoMarker != code.Previous.Type || 1 > len(code.Previous.CodeBlockInfo) {
-		return false
-	}
-
-	language := util.BytesToStr(code.Previous.CodeBlockInfo)
-	language = strings.ReplaceAll(language, editor.Caret, "")
-	return NoHighlight(language)
-}
-
-func renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
+func (r *BlockRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 	attrs = [][]string{{"data-type", node.TextMarkType}}
 
 	types := strings.Split(node.TextMarkType, " ")
@@ -1791,7 +1781,12 @@ func renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 			}
 		} else if "inline-math" == typ {
 			attrs = append(attrs, []string{"data-subtype", "math"})
-			attrs = append(attrs, []string{"data-content", node.TextMarkInlineMathContent})
+			inlineMathContent := node.TextMarkInlineMathContent
+			if node.ParentIs(ast.NodeTableCell) {
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
+			}
+			attrs = append(attrs, []string{"data-content", inlineMathContent})
 			attrs = append(attrs, []string{"contenteditable", "false"})
 			attrs = append(attrs, []string{"class", "render-node"})
 		} else if "file-annotation-ref" == typ {

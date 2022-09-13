@@ -170,7 +170,7 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 
 func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := renderTextMarkAttrs(node)
+		attrs := r.renderTextMarkAttrs(node)
 		r.Tag("span", attrs, false)
 		textContent := node.TextMarkTextContent
 		if node.ParentIs(ast.NodeTableCell) {
@@ -186,6 +186,38 @@ func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkS
 		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
+	attrs = [][]string{{"data-type", node.TextMarkType}}
+
+	types := strings.Split(node.TextMarkType, " ")
+	for _, typ := range types {
+		if "block-ref" == typ {
+			attrs = append(attrs, []string{"data-subtype", node.TextMarkBlockRefSubtype})
+			attrs = append(attrs, []string{"data-id", node.TextMarkBlockRefID})
+		} else if "a" == typ {
+			attrs = append(attrs, []string{"data-href", node.TextMarkAHref})
+			if "" != node.TextMarkATitle {
+				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
+			}
+		} else if "inline-math" == typ {
+			attrs = append(attrs, []string{"data-subtype", "math"})
+			inlineMathContent := node.TextMarkInlineMathContent
+			if node.ParentIs(ast.NodeTableCell) {
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "\\|")
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
+			}
+			attrs = append(attrs, []string{"data-content", inlineMathContent})
+			attrs = append(attrs, []string{"contenteditable", "false"})
+			attrs = append(attrs, []string{"class", "render-node"})
+		} else if "file-annotation-ref" == typ {
+			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
+		}
+	}
+
+	return
 }
 
 func (r *FormatRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
