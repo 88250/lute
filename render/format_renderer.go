@@ -18,6 +18,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
@@ -164,35 +165,24 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
-	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
-	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
 	return ret
 }
 
 func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<span data-type=\"")
-		r.Write(node.Tokens)
-		r.WriteString("\">")
-	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
+		attrs := renderTextMarkAttrs(node)
+		r.Tag("span", attrs, false)
+		textContent := node.TextMarkTextContent
 		if node.ParentIs(ast.NodeTableCell) {
-			tokens := node.Next.Tokens
-			tokens = bytes.ReplaceAll(tokens, []byte("\\|"), []byte("|"))
-			tokens = bytes.ReplaceAll(tokens, []byte("|"), []byte("\\|"))
-			tokens = bytes.ReplaceAll(tokens, []byte("<br/>"), nil)
-			node.Next.Tokens = tokens
+			textContent = strings.ReplaceAll(textContent, "\\|", "|")
+			textContent = strings.ReplaceAll(textContent, "|", "\\|")
+			textContent = strings.ReplaceAll(textContent, "\n", "<br/>")
+			if strings.Contains(node.TextMarkType, "code") {
+				textContent = strings.ReplaceAll(textContent, "<br/>", "")
+			}
 		}
-	}
-	return ast.WalkContinue
-}
-
-func (r *FormatRenderer) renderTextMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
+		r.WriteString(textContent)
+	} else {
 		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
@@ -1135,9 +1125,9 @@ func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 			nil != node.Parent.Parent && nil != node.Parent.Parent.ListData && 3 == node.Parent.Parent.ListData.Typ {
 			if ' ' == r.LastOut {
 				tokens = bytes.TrimPrefix(tokens, []byte(" "))
-				if bytes.HasPrefix(tokens, []byte(util.Caret+" ")) {
-					tokens = bytes.TrimPrefix(tokens, []byte(util.Caret+" "))
-					tokens = append(util.CaretTokens, tokens...)
+				if bytes.HasPrefix(tokens, []byte(editor.Caret+" ")) {
+					tokens = bytes.TrimPrefix(tokens, []byte(editor.Caret+" "))
+					tokens = append(editor.CaretTokens, tokens...)
 				}
 			}
 		}

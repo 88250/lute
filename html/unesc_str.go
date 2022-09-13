@@ -11,11 +11,11 @@
 package html
 
 import (
-	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/88250/lute/lex"
 )
 
 func UnescapeBytes(tokens []byte) (ret []byte) {
@@ -23,7 +23,7 @@ func UnescapeBytes(tokens []byte) (ret []byte) {
 		return
 	}
 
-	tokens = util.StrToBytes(HtmlUnescapeString(util.BytesToStr(tokens)))
+	tokens = []byte(HtmlUnescapeString(string(tokens)))
 	length := len(tokens)
 	ret = make([]byte, 0, length)
 	for i := 0; i < length; i++ {

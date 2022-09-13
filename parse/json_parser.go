@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/util"
 )
 
@@ -52,7 +53,7 @@ func ParseJSON(jsonData []byte, options *Options) (ret *Tree, needFix bool, err 
 	for _, kv := range ret.Root.KramdownIAL {
 		if strings.Contains(kv[1], "\n") {
 			val := kv[1]
-			val = strings.ReplaceAll(val, "\n", util.IALValEscNewLine)
+			val = strings.ReplaceAll(val, "\n", editor.IALValEscNewLine)
 			ret.Root.SetIALAttr(kv[0], val)
 			needFix = true
 		}
@@ -225,7 +226,7 @@ func fixLegacyData(tip, node *ast.Node, idMap *map[string]bool, needFix *bool) {
 	for _, kv := range node.KramdownIAL {
 		if strings.Contains(kv[1], "\n") {
 			val := kv[1]
-			val = strings.ReplaceAll(val, "\n", util.IALValEscNewLine)
+			val = strings.ReplaceAll(val, "\n", editor.IALValEscNewLine)
 			node.SetIALAttr(kv[0], val)
 			*needFix = true
 		}

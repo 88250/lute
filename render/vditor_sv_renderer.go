@@ -15,12 +15,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
-	"github.com/88250/lute/util"
 )
 
 // VditorSVRenderer 描述了 Vditor Split-View DOM 渲染器。
@@ -185,7 +185,7 @@ func (r *VditorSVRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.W
 		r.WriteByte(lex.ItemCloseBracket)
 		r.Tag("/span", nil, false)
 		r.WriteString("<span>:")
-		if util.Caret != destStr {
+		if editor.Caret != destStr {
 			r.WriteString(" ")
 		}
 		r.WriteString("</span>")
@@ -430,7 +430,7 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	}
 
 	previousNodeText := node.PreviousNodeText()
-	previousNodeText = strings.ReplaceAll(previousNodeText, util.Caret, "")
+	previousNodeText = strings.ReplaceAll(previousNodeText, editor.Caret, "")
 	_, def := r.Tree.FindFootnotesDef(node.Tokens)
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}

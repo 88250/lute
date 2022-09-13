@@ -14,8 +14,8 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 // SuperBlockStart 判断超级块（{{{ blocks }}}）是否开始。
@@ -86,12 +86,12 @@ func (t *Tree) parseSuperBlock() (ok bool, layout []byte) {
 
 func (context *Context) isSuperBlockClose(tokens []byte) (ok bool) {
 	tokens = lex.TrimWhitespace(tokens)
-	if bytes.Equal(tokens, []byte(util.Caret+"}}}")) {
-		p := &ast.Node{Type: ast.NodeParagraph, Tokens: util.CaretTokens}
+	if bytes.Equal(tokens, []byte(editor.Caret+"}}}")) {
+		p := &ast.Node{Type: ast.NodeParagraph, Tokens: editor.CaretTokens}
 		context.TipAppendChild(p)
 	}
-	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	endCaret := bytes.HasSuffix(tokens, editor.CaretTokens)
+	tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 	if !bytes.Equal([]byte("}}}"), tokens) {
 		return
 	}
@@ -99,7 +99,7 @@ func (context *Context) isSuperBlockClose(tokens []byte) (ok bool) {
 		paras := context.Tip.ChildrenByType(ast.NodeParagraph)
 		if length := len(paras); 0 < length {
 			lastP := paras[length-1]
-			lastP.Tokens = append(lastP.Tokens, util.CaretTokens...)
+			lastP.Tokens = append(lastP.Tokens, editor.CaretTokens...)
 		}
 	}
 	return true

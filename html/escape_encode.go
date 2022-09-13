@@ -15,25 +15,25 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 var (
-	amp  = util.StrToBytes("&amp;")
-	lt   = util.StrToBytes("&lt;")
-	gt   = util.StrToBytes("&gt;")
-	quot = util.StrToBytes("&quot;")
+	amp  = []byte("&amp;")
+	lt   = []byte("&lt;")
+	gt   = []byte("&gt;")
+	quot = []byte("&quot;")
 )
 
 func UnescapeAttrVal(v string) string {
-	v = strings.ReplaceAll(v, util.IALValEscNewLine, "\n")
+	v = strings.ReplaceAll(v, editor.IALValEscNewLine, "\n")
 	return UnescapeString(v)
 }
 
 func EscapeAttrVal(v string) (ret string) {
-	ret = util.BytesToStr(EscapeHTML(util.StrToBytes(v)))
-	ret = strings.ReplaceAll(ret, "\n", util.IALValEscNewLine)
+	ret = string(EscapeHTML([]byte(v)))
+	ret = strings.ReplaceAll(ret, "\n", editor.IALValEscNewLine)
 	return
 }
 
@@ -42,11 +42,11 @@ func UnescapeHTMLStr(h string) string {
 }
 
 func EscapeHTMLStr(h string) string {
-	return util.BytesToStr(EscapeHTML(util.StrToBytes(h)))
+	return string(EscapeHTML([]byte(h)))
 }
 
 func UnescapeHTML(h []byte) (ret []byte) {
-	return util.StrToBytes(UnescapeString(util.BytesToStr(h)))
+	return []byte(UnescapeString(string(h)))
 }
 
 func EscapeHTML(html []byte) (ret []byte) {

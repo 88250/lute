@@ -115,6 +115,16 @@ type Node struct {
 
 	KramdownIAL [][]string        `json:"-"`          // Kramdown 内联属性列表
 	Properties  map[string]string `json:",omitempty"` // 属性
+
+	// 文本标记
+	TextMarkType                string `json:",omitempty"` // 文本标记类型
+	TextMarkAHref               string `json:",omitempty"` // 文本标记超链接 data-href 属性
+	TextMarkATitle              string `json:",omitempty"` // 文本标记超链接 data-title 属性
+	TextMarkInlineMathContent   string `json:",omitempty"` // 文本标记内联数学公式内容 data-content 属性
+	TextMarkBlockRefID          string `json:",omitempty"` // 文本标记块引用 ID data-id 属性
+	TextMarkBlockRefSubtype     string `json:",omitempty"` // 文本标记块引用子类型（静态/动态锚文本） data-subtype 属性
+	TextMarkFileAnnotationRefID string `json:",omitempty"` // 文本标记文件注解引用 ID data-id 属性
+	TextMarkTextContent         string `json:",omitempty"` // 文本标记文本内容
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
@@ -816,9 +826,7 @@ const (
 
 	// <span data-type="mark">foo</span> 通用的行级文本标记，不能嵌套
 
-	NodeTextMark            NodeType = 530 // 文本标记
-	NodeTextMarkOpenMarker  NodeType = 531 // 开始文本标记符 <span>
-	NodeTextMarkCloseMarker NodeType = 532 // 开始文本标记符 </span>
+	NodeTextMark NodeType = 530 // 文本标记，该节点因为不存在嵌套，所以不使用 Open/Close 标记符
 
 	// Protyle 挂件，<iframe data-type="NodeWidget">
 

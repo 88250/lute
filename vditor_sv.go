@@ -13,15 +13,15 @@ package lute
 import (
 	"strings"
 
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
-	"github.com/88250/lute/util"
 )
 
 // SpinVditorSVDOM 自旋 Vditor Split-View DOM，用于分屏预览模式下的编辑。
 func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 	// 为空的特殊情况处理
-	if util.Caret == strings.TrimSpace(markdown) {
+	if editor.Caret == strings.TrimSpace(markdown) {
 		return "<span data-type=\"text\"><wbr></span>" + string(render.NewlineSV)
 	}
 
@@ -30,7 +30,7 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 	renderer := render.NewVditorSVRenderer(tree, lute.RenderOptions)
 	output := renderer.Render()
 	// 替换插入符
-	ovHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
+	ovHTML = strings.ReplaceAll(string(output), editor.Caret, "<wbr>")
 	return
 }
 
@@ -61,6 +61,6 @@ func (lute *Lute) Md2VditorSVDOM(markdown string) (vHTML string) {
 	}
 	output := renderer.Render()
 	// 替换插入符
-	vHTML = strings.ReplaceAll(string(output), util.Caret, "<wbr>")
+	vHTML = strings.ReplaceAll(string(output), editor.Caret, "<wbr>")
 	return
 }

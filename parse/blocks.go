@@ -14,6 +14,7 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -24,16 +25,16 @@ func (t *Tree) parseBlocks() {
 	lines := 0
 	for line := t.lexer.NextLine(); nil != line; line = t.lexer.NextLine() {
 		if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
-			if !bytes.Equal(line, util.CaretNewlineTokens) && t.Context.Tip.ParentIs(ast.NodeListItem) && bytes.HasPrefix(line, util.CaretTokens) {
+			if !bytes.Equal(line, editor.CaretNewlineTokens) && t.Context.Tip.ParentIs(ast.NodeListItem) && bytes.HasPrefix(line, editor.CaretTokens) {
 				// 插入符在开头的话移动到上一行结尾，处理 https://github.com/Vanessa219/vditor/issues/633 中的一些情况
 				if ast.NodeListItem == t.Context.Tip.Type {
 					t.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: line})
 					break
 				} else {
 					t.Context.Tip.Tokens = bytes.TrimSuffix(t.Context.Tip.Tokens, []byte("\n"))
-					t.Context.Tip.Tokens = append(t.Context.Tip.Tokens, util.CaretNewlineTokens...)
+					t.Context.Tip.Tokens = append(t.Context.Tip.Tokens, editor.CaretNewlineTokens...)
 				}
-				line = line[len(util.CaretTokens):]
+				line = line[len(editor.CaretTokens):]
 			}
 		}
 
@@ -153,7 +154,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemOpenBrace != maybeMarker && // kramdown 内联属性列表或超级块开始
 			lex.ItemCloseBrace != maybeMarker && // 超级块闭合
 			lex.ItemBang != maybeMarker && "！"[0] != maybeMarker && // 内容块嵌入
-			util.Caret[0] != maybeMarker { // Vditor 编辑器支持
+			editor.Caret[0] != maybeMarker { // Vditor 编辑器支持
 			t.Context.advanceNextNonspace()
 			break
 		}

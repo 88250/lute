@@ -15,6 +15,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -536,9 +537,9 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *ast.Node) {
 }
 
 func (t *Tree) newLink(typ ast.NodeType, text, dest, title []byte, linkType int) (ret *ast.Node) {
-	appendCaret := t.Context.ParseOption.ProtyleWYSIWYG && bytes.HasSuffix(text, util.CaretTokens) && bytes.HasSuffix(dest, []byte("%E2%80%B8"))
+	appendCaret := t.Context.ParseOption.ProtyleWYSIWYG && bytes.HasSuffix(text, editor.CaretTokens) && bytes.HasSuffix(dest, []byte("%E2%80%B8"))
 	if appendCaret {
-		text = bytes.ReplaceAll(text, util.CaretTokens, nil)
+		text = bytes.ReplaceAll(text, editor.CaretTokens, nil)
 		dest = bytes.ReplaceAll(dest, []byte("%E2%80%B8"), nil)
 	}
 
@@ -556,7 +557,7 @@ func (t *Tree) newLink(typ ast.NodeType, text, dest, title []byte, linkType int)
 	}
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	if appendCaret {
-		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
 	}
 	if 1 == linkType {
 		ret.LinkRefLabel = text

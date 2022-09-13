@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/util"
 )
@@ -139,7 +140,7 @@ func Tokens2IAL(tokens []byte) (ret [][]string) {
 	tokens = bytes.TrimRight(tokens, " \n")
 	tokens = bytes.TrimPrefix(tokens, []byte("{:"))
 	tokens = bytes.TrimSuffix(tokens, []byte("}"))
-	tokens = bytes.ReplaceAll(tokens, []byte("\n"), []byte(util.IALValEscNewLine))
+	tokens = bytes.ReplaceAll(tokens, []byte("\n"), []byte(editor.IALValEscNewLine))
 	for {
 		valid, remains, attr, name, val := TagAttr(tokens)
 		if !valid {
@@ -151,7 +152,7 @@ func Tokens2IAL(tokens []byte) (ret [][]string) {
 			break
 		}
 
-		val = bytes.ReplaceAll(val, []byte(util.IALValEscNewLine), []byte("\n"))
+		val = bytes.ReplaceAll(val, []byte(editor.IALValEscNewLine), []byte("\n"))
 		ret = append(ret, []string{util.BytesToStr(name), util.BytesToStr(val)})
 	}
 	return
@@ -231,8 +232,8 @@ func (context *Context) parseKramdownSpanIAL(tokens []byte) (pos int, ret [][]st
 				break
 			}
 
-			nameStr := strings.ReplaceAll(util.BytesToStr(name), util.Caret, "")
-			valStr := strings.ReplaceAll(util.BytesToStr(val), util.Caret, "")
+			nameStr := strings.ReplaceAll(util.BytesToStr(name), editor.Caret, "")
+			valStr := strings.ReplaceAll(util.BytesToStr(val), editor.Caret, "")
 			ret = append(ret, []string{nameStr, valStr})
 		}
 	}

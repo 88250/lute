@@ -12,8 +12,12 @@ package parse
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
+	"github.com/88250/lute/html"
+	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -23,12 +27,12 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	caretInTag := false
 	caretLeftSpace := false
 	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
-		caretIndex := bytes.Index(tokens, util.CaretTokens)
+		caretIndex := bytes.Index(tokens, editor.CaretTokens)
 		caretInTag = caretIndex > ctx.pos
 		if caretInTag {
-			caretLeftSpace = bytes.Contains(tokens, []byte(" "+util.Caret))
-			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, []byte(util.CaretReplacement))
-			tokens = bytes.ReplaceAll(tokens, []byte("\""+util.CaretReplacement), []byte("\" "+util.CaretReplacement))
+			caretLeftSpace = bytes.Contains(tokens, []byte(" "+editor.Caret))
+			tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, []byte(editor.CaretReplacement))
+			tokens = bytes.ReplaceAll(tokens, []byte("\""+editor.CaretReplacement), []byte("\" "+editor.CaretReplacement))
 		}
 	}
 
@@ -110,10 +114,10 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			tags = append(tags, tokens[1])
 		}
 		if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && caretInTag || t.Context.ParseOption.ProtyleWYSIWYG {
-			if !bytes.Contains(tags, []byte(util.CaretReplacement+" ")) && !caretLeftSpace {
-				tags = bytes.ReplaceAll(tags, []byte("\" "+util.CaretReplacement), []byte("\""+util.CaretReplacement))
+			if !bytes.Contains(tags, []byte(editor.CaretReplacement+" ")) && !caretLeftSpace {
+				tags = bytes.ReplaceAll(tags, []byte("\" "+editor.CaretReplacement), []byte("\""+editor.CaretReplacement))
 			}
-			tags = bytes.ReplaceAll(tags, []byte(util.CaretReplacement), util.CaretTokens)
+			tags = bytes.ReplaceAll(tags, []byte(editor.CaretReplacement), editor.CaretTokens)
 		}
 		ctx.pos += len(tags)
 
@@ -135,18 +139,22 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			} else if bytes.Equal(tags, []byte("<br />")) || bytes.Equal(tags, []byte("<br/>")) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
-			} else if bytes.HasPrefix(tags, []byte("<span data-type=")) {
+			} else if bytes.HasPrefix(tags, []byte("<span ")) {
+				remains := ctx.tokens[ctx.pos:]
+				end := bytes.Index(remains, []byte("</span>"))
+				closerLen := len("</span>")
+				tokens = append(tags, remains[:end+closerLen]...)
+				nodes, _ := html.ParseFragment(bytes.NewReader(tokens), &html.Node{Type: html.ElementNode})
+				if 1 != len(nodes) {
+					ctx.pos = startPos + 1
+					return
+				}
 				typ := tags[len("<span data-type=")+1:]
 				typ = typ[:bytes.Index(typ, []byte("\""))]
-				ret = &ast.Node{Type: ast.NodeTextMark, Tokens: typ}
-				ret.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-				// span 节点不会出现嵌套，所以这里可以一次性解析完整个节点结构
-				remains := ctx.tokens[ctx.pos:]
-				end := bytes.LastIndex(remains, []byte("</span>"))
-				ctx.pos += end + len("</span>")
-				text := remains[:end]
-				ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: text})
-				ret.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
+				ret = &ast.Node{Type: ast.NodeTextMark, TextMarkType: string(typ)}
+				ret.Tokens = tokens
+				SetTextMarkNode(ret, nodes[0])
+				ctx.pos += end + closerLen
 				return
 			}
 		}
@@ -474,5 +482,93 @@ func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
 		tagName = append(tagName, token)
 	}
 	remains = tokens[i:]
+	return
+}
+
+func SetSpanIAL(node *ast.Node, n *html.Node) {
+	insertedIAL := false
+	if style := util.DomAttrValue(n, "style"); "" != style { // 比如设置表格列宽
+		style = StyleValue(style)
+		node.SetIALAttr("style", style)
+		ialTokens := IAL2Tokens(node.KramdownIAL)
+		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+		node.InsertAfter(ial)
+		insertedIAL = true
+	}
+
+	if atom.Th == n.DataAtom || atom.Td == n.DataAtom {
+		// 设置表格合并单元格
+		colspan := util.DomAttrValue(n, "colspan")
+		if "" != colspan {
+			node.SetIALAttr("colspan", colspan)
+		}
+		rowspan := util.DomAttrValue(n, "rowspan")
+		if "" != rowspan {
+			node.SetIALAttr("rowspan", rowspan)
+		}
+		class := util.DomAttrValue(n, "class")
+		if "" != class {
+			node.SetIALAttr("class", class)
+		}
+		if "" != colspan || "" != rowspan || "" != class {
+			ialTokens := IAL2Tokens(node.KramdownIAL)
+			ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+			node.InsertAfter(ial)
+			insertedIAL = true
+		}
+	}
+
+	if nil != n.Parent && nil != n.Parent.Parent {
+		if parentStyle := util.DomAttrValue(n.Parent.Parent, "style"); "" != parentStyle {
+			if insertedIAL {
+				m := Tokens2IAL(node.Next.Tokens)
+				m = append(m, []string{"parent-style", parentStyle})
+				node.Next.Tokens = IAL2Tokens(m)
+				node.SetIALAttr("parent-style", parentStyle)
+				node.KramdownIAL = m
+			} else {
+				node.SetIALAttr("parent-style", parentStyle)
+				ialTokens := IAL2Tokens(node.KramdownIAL)
+				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+				node.InsertAfter(ial)
+			}
+		}
+	}
+}
+
+func SetTextMarkNode(node *ast.Node, n *html.Node) {
+	node.Type = ast.NodeTextMark
+	dataType := util.DomAttrValue(n, "data-type")
+	if "" == dataType {
+		dataType = n.DataAtom.String()
+	}
+	node.TextMarkType = dataType
+	node.Tokens = util.DomHTML(n)
+	types := strings.Split(dataType, " ")
+	for _, typ := range types {
+		switch typ {
+		case "a":
+			node.TextMarkAHref, node.TextMarkATitle = util.GetTextMarkAData(n)
+			node.TextMarkTextContent = util.GetTextMarkTextData(n)
+		case "inline-math":
+			node.TextMarkInlineMathContent = util.GetTextMarkInlineMathData(n)
+		case "block-ref":
+			node.TextMarkBlockRefID, node.TextMarkBlockRefSubtype = util.GetTextMarkBlockRefData(n)
+			node.TextMarkTextContent = util.GetTextMarkTextData(n)
+		case "file-annotation-ref":
+			node.TextMarkFileAnnotationRefID = util.GetTextMarkFileAnnotationRefData(n)
+			node.TextMarkTextContent = util.GetTextMarkTextData(n)
+		default:
+			node.TextMarkTextContent = util.GetTextMarkTextData(n)
+		}
+	}
+
+	SetSpanIAL(node, n)
+}
+
+func StyleValue(style string) (ret string) {
+	ret = strings.TrimSpace(style)
+	ret = strings.ReplaceAll(ret, "\n", "")
+	ret = strings.Join(strings.Fields(ret), " ")
 	return
 }

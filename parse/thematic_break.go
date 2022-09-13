@@ -12,8 +12,8 @@ package parse
 
 import (
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 // 判断分隔线（--- ***）是否开始。
@@ -59,7 +59,7 @@ func (t *Tree) parseThematicBreak() (ok bool, caretTokens []byte) {
 	}
 
 	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && caretInLn {
-		caretTokens = util.CaretTokens
+		caretTokens = editor.CaretTokens
 	}
 	return 3 <= markerCnt, caretTokens
 }

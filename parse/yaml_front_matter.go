@@ -14,6 +14,7 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -43,8 +44,8 @@ func YamlFrontMatterContinue(node *ast.Node, context *Context) int {
 
 var YamlFrontMatterMarker = util.StrToBytes("---")
 var YamlFrontMatterMarkerNewline = util.StrToBytes("---\n")
-var YamlFrontMatterMarkerCaret = util.StrToBytes("---" + util.Caret)
-var YamlFrontMatterMarkerCaretNewline = util.StrToBytes("---" + util.Caret + "\n")
+var YamlFrontMatterMarkerCaret = util.StrToBytes("---" + editor.Caret)
+var YamlFrontMatterMarkerCaretNewline = util.StrToBytes("---" + editor.Caret + "\n")
 
 func (context *Context) yamlFrontMatterFinalize(node *ast.Node) {
 	tokens := node.Tokens[3:] // 剔除开头的 ---\n
@@ -54,7 +55,7 @@ func (context *Context) yamlFrontMatterFinalize(node *ast.Node) {
 			// 剔除结尾的 ---‸
 			tokens = bytes.TrimSuffix(tokens, YamlFrontMatterMarkerCaret)
 			// 把 Vditor 插入符移动到内容末尾
-			tokens = append(tokens, util.CaretTokens...)
+			tokens = append(tokens, editor.CaretTokens...)
 		}
 	}
 	if bytes.HasSuffix(tokens, YamlFrontMatterMarker) {

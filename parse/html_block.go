@@ -33,6 +33,11 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 			return 0
 		}
 	}
+	if t.Context.ParseOption.ProtyleWYSIWYG {
+		if bytes.Contains(t.Context.currentLine, []byte("<span ")) {
+			return 0
+		}
+	}
 
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	if htmlType := t.parseHTML(tokens); 0 != htmlType {

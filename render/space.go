@@ -14,7 +14,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/88250/lute/util"
+	"github.com/88250/lute/editor"
 )
 
 // Space 会把 tokens 中的中西文之间加上空格。
@@ -61,7 +61,7 @@ func addSpaceAtBoundary(prefix string, nextChar rune) string {
 
 func allowSpace(currentChar, nextChar rune) bool {
 	if unicode.IsSpace(currentChar) || unicode.IsSpace(nextChar) ||
-		(util.CaretRune == currentChar) || (util.CaretRune == nextChar) ||
+		(editor.CaretRune == currentChar) || (editor.CaretRune == nextChar) ||
 		!unicode.IsPrint(currentChar) || !unicode.IsPrint(nextChar) {
 		return false
 	}

@@ -14,7 +14,7 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/util"
+	"github.com/88250/lute/editor"
 )
 
 // BlockQueryEmbedStart 判断内容块查询嵌入（{{ SELECT * FROM blocks WHERE content LIKE '%待办%' }}）是否开始。
@@ -40,18 +40,18 @@ func BlockQueryEmbedStart(t *Tree, container *ast.Node) int {
 
 func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
-	startCaret := bytes.HasPrefix(tokens, []byte(util.Caret+"{{"))
+	startCaret := bytes.HasPrefix(tokens, []byte(editor.Caret+"{{"))
 	if !bytes.HasPrefix(tokens, []byte("{{")) && !startCaret {
 		return
 	}
 	if startCaret {
-		tokens = bytes.Replace(tokens, []byte(util.Caret+"{{"), []byte("{{"), 1)
+		tokens = bytes.Replace(tokens, []byte(editor.Caret+"{{"), []byte("{{"), 1)
 	}
 
 	tokens = tokens[2:]
 	tokens = bytes.TrimSpace(tokens)
 	if t.Context.ParseOption.ProtyleWYSIWYG {
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 	}
 	if !bytes.HasSuffix(tokens, []byte("}}")) {
 		return
@@ -59,7 +59,7 @@ func (t *Tree) parseBlockQueryEmbed() (ret *ast.Node) {
 
 	tokens = tokens[:len(tokens)-2] // 去掉结尾 }}
 	script := bytes.TrimSpace(tokens)
-	tokens = bytes.TrimSuffix(tokens, util.CaretTokens)
+	tokens = bytes.TrimSuffix(tokens, editor.CaretTokens)
 
 	ret = &ast.Node{Type: ast.NodeBlockQueryEmbed}
 	ret.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})

@@ -14,8 +14,8 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 func (t *Tree) parseBlockRef(ctx *InlineContext) *ast.Node {
@@ -109,7 +109,7 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 	var token byte
 	for ; i < length; i++ {
 		token = tokens[i]
-		if bytes.Contains(util.CaretTokens, []byte{token}) {
+		if bytes.Contains(editor.CaretTokens, []byte{token}) {
 			continue
 		}
 
@@ -124,9 +124,9 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 	}
 	passed = make([]byte, 0, 64)
 	passed = append(passed, id...)
-	if bytes.HasPrefix(remains, util.CaretTokens) {
-		passed = append(passed, util.CaretTokens...)
-		remains = remains[len(util.CaretTokens):]
+	if bytes.HasPrefix(remains, editor.CaretTokens) {
+		passed = append(passed, editor.CaretTokens...)
+		remains = remains[len(editor.CaretTokens):]
 	}
 	closed := lex.ItemCloseParen == remains[0] && lex.ItemCloseParen == remains[1]
 	if closed {

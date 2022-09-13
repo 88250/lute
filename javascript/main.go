@@ -13,9 +13,9 @@ package main
 import (
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/render"
-	"github.com/88250/lute/util"
 	"github.com/gopherjs/gopherjs/js"
 )
 
@@ -27,7 +27,7 @@ func main() {
 		"WalkSkipChildren":  ast.WalkSkipChildren,
 		"WalkContinue":      ast.WalkContinue,
 		"GetHeadingID":      render.HeadingID,
-		"Caret":             util.Caret,
+		"Caret":             editor.Caret,
 		"NewNodeID":         ast.NewNodeID,
 		"EscapeHTMLStr":     html.EscapeHTMLStr,
 		"UnEscapeHTMLStr":   html.UnescapeHTMLStr,

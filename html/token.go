@@ -7,11 +7,11 @@ package html
 import (
 	"bytes"
 	"errors"
-	"github.com/88250/lute/util"
 	"io"
 	"strconv"
 	"strings"
 
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html/atom"
 )
 
@@ -88,8 +88,8 @@ func (t Token) tagString() string {
 	}
 	buf := bytes.NewBufferString(t.Data)
 	for _, a := range t.Attr {
-		if a.Key == util.CaretReplacement {
-			buf.WriteString(util.CaretReplacement)
+		if a.Key == editor.CaretReplacement {
+			buf.WriteString(editor.CaretReplacement)
 			continue
 		}
 		buf.WriteByte(' ')

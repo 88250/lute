@@ -15,6 +15,7 @@ import (
 	"strconv"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -111,27 +112,6 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 					}
 					underline.PrependChild(openMarker)
 					underline.AppendChild(n)
-					continue
-				}
-			} else if ast.NodeTextMarkCloseMarker == n.Type {
-				var textMark *ast.Node
-				var children []*ast.Node
-				for textMark = block.LastChild; nil != textMark; textMark = textMark.Previous {
-					if ast.NodeTextMark == textMark.Type {
-						break
-					}
-					children = append(children, textMark)
-				}
-				if nil == textMark {
-					n.Type = ast.NodeText
-					n.Tokens = []byte("</span>")
-				} else {
-					openMarker := textMark.FirstChild
-					for _, c := range children {
-						textMark.PrependChild(c)
-					}
-					textMark.PrependChild(openMarker)
-					textMark.AppendChild(n)
 					continue
 				}
 			}
@@ -276,23 +256,23 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			matched = isLink && 0 < len(remains)
 			if matched {
 				if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
-					if bytes.HasPrefix(remains, []byte(util.Caret+")")) {
+					if bytes.HasPrefix(remains, []byte(editor.Caret+")")) {
 						if 0 < len(title) {
 							// 将 ‸) 换位为 )‸
-							remains = remains[len([]byte(util.Caret+")")):]
-							remains = append([]byte(")"+util.Caret), remains...)
+							remains = remains[len([]byte(editor.Caret+")")):]
+							remains = append([]byte(")"+editor.Caret), remains...)
 							copy(ctx.tokens[ctx.pos-1:], remains) // 同时也将 tokens 换位，后续解析从插入符位置开始
 						} else {
 							// 将 ""‸ 换位为 "‸"
-							title = util.CaretTokens
-							remains = remains[len(util.CaretTokens):]
+							title = editor.CaretTokens
+							remains = remains[len(editor.CaretTokens):]
 							ctx.pos += 3
 						}
-					} else if bytes.HasPrefix(remains, []byte(")"+util.Caret)) {
+					} else if bytes.HasPrefix(remains, []byte(")"+editor.Caret)) {
 						if 0 == len(title) {
 							// 将 "")‸ 换位为 "‸")
-							title = util.CaretTokens
-							remains = bytes.ReplaceAll(remains, util.CaretTokens, nil)
+							title = editor.CaretTokens
+							remains = bytes.ReplaceAll(remains, editor.CaretTokens, nil)
 							ctx.pos += 3
 						}
 					}
@@ -347,7 +327,7 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 					if 0 < refsLen {
 						refId += ":" + strconv.Itoa(refsLen+1)
 					}
-					ref := &ast.Node{Type: ast.NodeFootnotesRef, Tokens: reflabel, FootnotesRefId: refId, FootnotesRefLabel: bytes.ReplaceAll(reflabel, util.CaretTokens, nil)}
+					ref := &ast.Node{Type: ast.NodeFootnotesRef, Tokens: reflabel, FootnotesRefId: refId, FootnotesRefLabel: bytes.ReplaceAll(reflabel, editor.CaretTokens, nil)}
 					footnotesDef.FootnotesRefs = append(footnotesDef.FootnotesRefs, ref)
 					return ref
 				}

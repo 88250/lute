@@ -12,9 +12,10 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 func (context *Context) parseToC(paragraph *ast.Node) *ast.Node {
@@ -25,7 +26,7 @@ func (context *Context) parseToC(paragraph *ast.Node) *ast.Node {
 
 	content := bytes.TrimSpace(lines[0])
 	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV {
-		content = bytes.ReplaceAll(content, util.CaretTokens, nil)
+		content = bytes.ReplaceAll(content, editor.CaretTokens, nil)
 	}
 	if !bytes.EqualFold(content, []byte("[toc]")) {
 		return nil

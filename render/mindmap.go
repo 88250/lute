@@ -12,8 +12,10 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
 	"strings"
+
+	"github.com/88250/lute/editor"
+	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
@@ -30,7 +32,7 @@ func EChartsMindmap(listContent []byte) []byte {
 
 // echartsMindmap 用于将列表 Markdown 原文转为 ECharts 树图结构，提供给前端渲染脑图。
 func echartsMindmap(listContent []byte) []byte {
-	listContent = bytes.ReplaceAll(listContent, util.CaretTokens, nil)
+	listContent = bytes.ReplaceAll(listContent, editor.CaretTokens, nil)
 	tree := parse.Parse("", listContent, parse.NewOptions())
 	if nil == tree.Root.FirstChild || ast.NodeList != tree.Root.FirstChild.Type {
 		// 第一个节点如果不是列表的话直接返回
@@ -110,7 +112,7 @@ func text(listItemFirstChild *ast.Node) (ret string) {
 	ret = buf.String()
 	ret = strings.ReplaceAll(ret, "\\", "\\\\")
 	ret = strings.ReplaceAll(ret, "\"", "\\\"")
-	ret = strings.ReplaceAll(ret, util.Caret, "")
+	ret = strings.ReplaceAll(ret, editor.Caret, "")
 	return
 }
 

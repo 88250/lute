@@ -18,6 +18,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
@@ -164,15 +165,13 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
-	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
-	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
 	return ret
 }
 
 func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
-	tag := node.TokensStr()
+	tag := node.TextMarkType
 	if entering {
-		if "code" == tag || "inline-math" == tag {
+		if "code" == tag || "inline-math" == tag || "kbd" == tag {
 			if r.Options.AutoSpace {
 				if text := node.PreviousNodeText(); "" != text {
 					lastc, _ := utf8.DecodeLastRuneInString(text)
@@ -184,8 +183,18 @@ func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSt
 		} else {
 			r.TextAutoSpacePrevious(node)
 		}
+		attrs := renderTextMarkAttrs(node)
+		r.spanNodeAttrs(node, &attrs)
+		r.Tag("span", attrs, false)
+		textContent := node.TextMarkTextContent
+		if node.ParentIs(ast.NodeTableCell) {
+			textContent = strings.ReplaceAll(textContent, "\\|", "|")
+			textContent = strings.ReplaceAll(textContent, "\n", "<br />")
+		}
+		r.WriteString(textContent)
 	} else {
-		if "code" == tag || "inline-math" == tag {
+		r.WriteString("</span>")
+		if "code" == tag || "inline-math" == tag || "kbd" == tag {
 			if r.Options.AutoSpace {
 				if text := node.NextNodeText(); "" != text {
 					firstc, _ := utf8.DecodeRuneInString(text)
@@ -197,38 +206,6 @@ func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSt
 		} else {
 			r.TextAutoSpaceNext(node)
 		}
-	}
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		dataType := node.Parent.TokensStr()
-		attrs := [][]string{{"data-type", dataType}}
-		r.spanNodeAttrs(node.Parent, &attrs)
-
-		if "inline-math" == dataType {
-			inlineMathContent := node.Next
-			tokens := html.EscapeHTML(inlineMathContent.Tokens)
-			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
-			attrs = append(attrs, [][]string{{"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}...)
-			r.Tag("span", attrs, false)
-			inlineMathContent.Unlink()
-		} else if "tag" == dataType {
-			tagContent := node.Next.Text()
-			tagContent = strings.ReplaceAll(tagContent, util.Caret, "")
-			attrs = append(attrs, [][]string{{"data-content", html.EscapeHTMLStr(tagContent)}}...)
-			r.Tag("span", attrs, false)
-		} else {
-			r.Tag("span", attrs, false)
-		}
-	}
-	return ast.WalkContinue
-}
-
-func (r *BlockRenderer) renderTextMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }
@@ -284,10 +261,10 @@ func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast
 		}
 		var attrs [][]string
 		tokens := script.Tokens
-		tokens = html.EscapeHTML(bytes.ReplaceAll(tokens, util.CaretTokens, nil))
+		tokens = html.EscapeHTML(bytes.ReplaceAll(tokens, editor.CaretTokens, nil))
 		content := util.BytesToStr(tokens)
 		// 嵌入块中存在换行 SQL 语句时会被转换为段落文本 https://github.com/siyuan-note/siyuan/issues/5728
-		content = strings.ReplaceAll(content, util.IALValEscNewLine, "\n")
+		content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
 		attrs = append(attrs, []string{"data-content", content})
 		r.blockNodeAttrs(node, &attrs, "render-node")
 		r.Tag("div", attrs, false)
@@ -307,8 +284,8 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
-		r.WriteString(parse.Zwsp)
-		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
+		r.WriteString(editor.Zwsp)
+		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
@@ -332,7 +309,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
-		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
+		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
@@ -340,7 +317,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, src, dataSrc)
 		r.Write(tokens)
-		r.WriteString(parse.Zwsp)
+		r.WriteString(editor.Zwsp)
 	} else {
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
@@ -356,7 +333,7 @@ func (r *BlockRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStat
 		attrs = append(attrs, []string{"data-subtype", "widget"})
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
-		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
+		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
@@ -380,7 +357,7 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
-		tokens := bytes.ReplaceAll(node.Tokens, util.CaretTokens, nil)
+		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
@@ -531,7 +508,7 @@ func (r *BlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus 
 func (r *BlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		content := node.Parent.Text()
-		content = strings.ReplaceAll(content, util.Caret, "")
+		content = strings.ReplaceAll(content, editor.Caret, "")
 		r.Tag("span", [][]string{{"data-type", "tag"}, {"data-content", html.EscapeHTMLStr(content)}}, false)
 	}
 	return ast.WalkContinue
@@ -595,7 +572,7 @@ func (r *BlockRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.Walk
 		dest := node.FirstChild.ChildByType(ast.NodeLinkDest).Tokens
 		destStr := util.BytesToStr(dest)
 		r.WriteString("[" + util.BytesToStr(node.Tokens) + "]:")
-		if util.Caret != destStr {
+		if editor.Caret != destStr {
 			r.WriteString(" ")
 		}
 		r.WriteString(destStr + "\n")
@@ -649,11 +626,6 @@ func (r *BlockRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) as
 }
 
 func (r *BlockRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.TextAutoSpacePrevious(node)
-	} else {
-		r.TextAutoSpaceNext(node)
-	}
 	return ast.WalkContinue
 }
 
@@ -672,11 +644,6 @@ func (r *BlockRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.
 }
 
 func (r *BlockRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.TextAutoSpacePrevious(node)
-	} else {
-		r.TextAutoSpaceNext(node)
-	}
 	return ast.WalkContinue
 }
 
@@ -702,11 +669,11 @@ func (r *BlockRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bo
 	if entering {
 		previewTokens := bytes.TrimSpace(node.Tokens)
 		codeLen := len(previewTokens)
-		codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
+		codeIsEmpty := 1 > codeLen || (len(editor.Caret) == codeLen && editor.Caret == string(node.Tokens))
 		r.Tag("pre", nil, false)
 		r.Tag("code", [][]string{{"data-type", "yaml-front-matter"}}, false)
 		if codeIsEmpty {
-			r.WriteString(util.FrontEndCaret + "\n")
+			r.WriteString(editor.FrontEndCaret + "\n")
 		} else {
 			r.Write(html.EscapeHTML(previewTokens))
 		}
@@ -741,7 +708,7 @@ func (r *BlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.Walk
 
 	r.Tag("span", [][]string{{"class", "protyle-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	r.Tag("code", nil, false)
-	previewTokens := bytes.ReplaceAll(node.HtmlEntityTokens, util.CaretTokens, nil)
+	previewTokens := bytes.ReplaceAll(node.HtmlEntityTokens, editor.CaretTokens, nil)
 	r.Write(previewTokens)
 	r.Tag("/code", nil, false)
 	r.Tag("/span", nil, false)
@@ -816,7 +783,7 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 	var language string
 	if nil != node.FirstChild && nil != node.FirstChild.Next && 0 < len(node.FirstChild.Next.CodeBlockInfo) {
 		language = util.BytesToStr(node.FirstChild.Next.CodeBlockInfo)
-		language = strings.ReplaceAll(language, util.Caret, "")
+		language = strings.ReplaceAll(language, editor.Caret, "")
 		noHighlight = NoHighlight(language)
 	}
 
@@ -829,7 +796,7 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 			var attrs [][]string
 			r.blockNodeAttrs(node, &attrs, "render-node")
 			tokens := html.EscapeHTML(node.FirstChild.Next.Next.Tokens)
-			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+			tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 			tokens = bytes.TrimSpace(tokens)
 			attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 			attrs = append(attrs, []string{"data-subtype", language})
@@ -869,12 +836,12 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 
 	r.Tag("div", [][]string{{"class", "protyle-action"}}, false)
 	codeLen := len(node.Tokens)
-	codeIsEmpty := 1 > codeLen || (len(util.Caret) == codeLen && util.Caret == string(node.Tokens))
+	codeIsEmpty := 1 > codeLen || (len(editor.Caret) == codeLen && editor.Caret == string(node.Tokens))
 	var language string
 	caretInInfo := false
 	if nil != node.Previous {
-		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, util.CaretTokens)
-		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, util.CaretTokens, nil)
+		caretInInfo = bytes.Contains(node.Previous.CodeBlockInfo, editor.CaretTokens)
+		node.Previous.CodeBlockInfo = bytes.ReplaceAll(node.Previous.CodeBlockInfo, editor.CaretTokens, nil)
 	}
 
 	attrs := [][]string{{"class", "protyle-action--first protyle-action__language"}, {"contenteditable", "false"}}
@@ -899,7 +866,7 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	r.Tag("div", attrs, false)
 	if codeIsEmpty {
 		if caretInInfo {
-			r.WriteString(util.FrontEndCaret)
+			r.WriteString(editor.FrontEndCaret)
 		}
 	} else {
 		tokens := html.EscapeHTML(node.Tokens)
@@ -964,7 +931,7 @@ func (r *BlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.Walk
 func (r *BlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := html.EscapeHTML(node.Next.Tokens)
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 		r.Tag("span", [][]string{{"data-type", "inline-math"}, {"data-subtype", "math"}, {"data-content", util.BytesToStr(tokens)}, {"contenteditable", "false"}, {"class", "render-node"}}, false)
 	}
 	return ast.WalkContinue
@@ -977,8 +944,8 @@ func (r *BlockRenderer) renderInlineMathContent(node *ast.Node, entering bool) a
 func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("/span", nil, false)
-		if bytes.Contains(node.Previous.Tokens, util.CaretTokens) {
-			r.WriteString(util.Caret)
+		if bytes.Contains(node.Previous.Tokens, editor.CaretTokens) {
+			r.WriteString(editor.Caret)
 		}
 	}
 	return ast.WalkContinue
@@ -996,7 +963,7 @@ func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkS
 	var attrs [][]string
 	r.blockNodeAttrs(node, &attrs, "render-node")
 	tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 	tokens = bytes.TrimSpace(tokens)
 	attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 	attrs = append(attrs, []string{"data-subtype", "math"})
@@ -1216,7 +1183,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		}
 		if !strings.Contains(parentStyle, "display") && !strings.Contains(parentStyle, "block") &&
 			r.LastOut == '\n' {
-			r.WriteString(parse.Zwsp)
+			r.WriteString(editor.Zwsp)
 		}
 		r.Tag("span", attrs, false)
 		r.Tag("span", nil, false)
@@ -1231,7 +1198,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		if r.Options.Sanitize {
 			destTokens = sanitize(destTokens)
 		}
-		destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
+		destTokens = bytes.ReplaceAll(destTokens, editor.CaretTokens, nil)
 		dataSrcTokens := destTokens
 		dataSrc := util.BytesToStr(dataSrcTokens)
 		src := util.BytesToStr(r.LinkPath(destTokens))
@@ -1279,15 +1246,15 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 		r.WriteString(" ")
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
-		if nil == node.Next || util.Caret == node.Next.Text() {
-			r.WriteString(parse.Zwsp)
+		if nil == node.Next || editor.Caret == node.Next.Text() {
+			r.WriteString(editor.Zwsp)
 			return ast.WalkContinue
 		}
-		if ast.NodeKramdownSpanIAL == node.Next.Type && (nil == node.Next.Next || util.Caret == node.Next.Next.Text()) {
+		if ast.NodeKramdownSpanIAL == node.Next.Type && (nil == node.Next.Next || editor.Caret == node.Next.Next.Text()) {
 			if bytes.Contains(node.Next.Tokens, []byte("display: block")) {
 				return ast.WalkContinue
 			}
-			r.WriteString(parse.Zwsp)
+			r.WriteString(editor.Zwsp)
 			return ast.WalkContinue
 		}
 	}
@@ -1317,11 +1284,11 @@ func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus
 			}
 		}
 
-		caretInDest := bytes.Contains(destTokens, util.CaretTokens)
+		caretInDest := bytes.Contains(destTokens, editor.CaretTokens)
 		if caretInDest {
 			text := node.ChildByType(ast.NodeLinkText)
-			text.Tokens = append(text.Tokens, util.CaretTokens...)
-			destTokens = bytes.ReplaceAll(destTokens, util.CaretTokens, nil)
+			text.Tokens = append(text.Tokens, editor.CaretTokens...)
+			destTokens = bytes.ReplaceAll(destTokens, editor.CaretTokens, nil)
 		}
 		attrs := [][]string{{"data-type", "a"}, {"data-href", string(destTokens)}}
 		if title := node.ChildByType(ast.NodeLinkTitle); nil != title && nil != title.Tokens {
@@ -1342,7 +1309,7 @@ func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus
 	var attrs [][]string
 	r.blockNodeAttrs(node, &attrs, "render-node")
 	tokens := node.Tokens
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 	attrs = append(attrs, []string{"data-subtype", "block"})
 	r.Tag("div", attrs, false)
 	r.WriteString("<div class=\"protyle-icons\">")
@@ -1351,7 +1318,7 @@ func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus
 	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
 	r.Tag("protyle-html", attrs, false)
 	r.Tag("/protyle-html", nil, false)
-	r.WriteString("<span style=\"position: absolute\">" + parse.Zwsp + "</span>")
+	r.WriteString("<span style=\"position: absolute\">" + editor.Zwsp + "</span>")
 	r.WriteString("</div>")
 	r.renderIAL(node)
 	r.Tag("/div", nil, false)
@@ -1688,7 +1655,7 @@ func (r *BlockRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkS
 			ast.NodeStrikethrough == node.Previous.Type ||
 			ast.NodeUnderline == node.Previous.Type ||
 			ast.NodeKramdownSpanIAL == node.Previous.Type) &&
-			nil != node.Next && bytes.Equal(util.CaretTokens, node.Next.Tokens) {
+			nil != node.Next && bytes.Equal(editor.CaretTokens, node.Next.Tokens) {
 			r.WriteByte(lex.ItemNewline)
 		}
 	}
@@ -1709,7 +1676,7 @@ func (r *BlockRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class 
 		if "id" == ial[0] {
 			continue
 		}
-		*attrs = append(*attrs, []string{ial[0], strings.ReplaceAll(ial[1], util.IALValEscNewLine, "\n")})
+		*attrs = append(*attrs, []string{ial[0], strings.ReplaceAll(ial[1], editor.IALValEscNewLine, "\n")})
 	}
 }
 
@@ -1754,7 +1721,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	r.Tag("div", attrs, false)
 
 	if bookmark := node.IALAttr("bookmark"); "" != bookmark {
-		bookmark = strings.ReplaceAll(bookmark, util.IALValEscNewLine, "\n")
+		bookmark = strings.ReplaceAll(bookmark, editor.IALValEscNewLine, "\n")
 		bookmark = html.EscapeHTMLStr(bookmark)
 		r.Tag("div", [][]string{{"class", "protyle-attr--bookmark"}}, false)
 		r.WriteString(bookmark)
@@ -1762,7 +1729,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	}
 
 	if name := node.IALAttr("name"); "" != name {
-		name = strings.ReplaceAll(name, util.IALValEscNewLine, "\n")
+		name = strings.ReplaceAll(name, editor.IALValEscNewLine, "\n")
 		name = html.EscapeHTMLStr(name)
 		r.Tag("div", [][]string{{"class", "protyle-attr--name"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconN\"></use></svg>")
@@ -1771,7 +1738,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	}
 
 	if alias := node.IALAttr("alias"); "" != alias {
-		alias = strings.ReplaceAll(alias, util.IALValEscNewLine, "\n")
+		alias = strings.ReplaceAll(alias, editor.IALValEscNewLine, "\n")
 		alias = html.EscapeHTMLStr(alias)
 		r.Tag("div", [][]string{{"class", "protyle-attr--alias"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconA\"></use></svg>")
@@ -1780,7 +1747,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	}
 
 	if memo := node.IALAttr("memo"); "" != memo {
-		memo = strings.ReplaceAll(memo, util.IALValEscNewLine, "\n")
+		memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, "\n")
 		memo = html.EscapeHTMLStr(memo)
 		r.Tag("div", [][]string{{"class", "protyle-attr--memo b3-tooltips b3-tooltips__nw"}, {"aria-label", memo}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconM\"></use></svg>")
@@ -1788,14 +1755,14 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	}
 
 	if refCount := node.IALAttr("refcount"); "" != refCount {
-		refCount = strings.ReplaceAll(refCount, util.IALValEscNewLine, "\n")
+		refCount = strings.ReplaceAll(refCount, editor.IALValEscNewLine, "\n")
 		refCount = html.EscapeHTMLStr(refCount)
 		r.Tag("div", [][]string{{"class", "protyle-attr--refcount popover__block"}}, false)
 		r.WriteString(refCount)
 		r.Tag("/div", nil, false)
 	}
 
-	r.WriteString(parse.Zwsp)
+	r.WriteString(editor.Zwsp)
 	r.Tag("/div", nil, false)
 }
 
@@ -1805,6 +1772,32 @@ func IsChartCodeBlockCode(code *ast.Node) bool {
 	}
 
 	language := util.BytesToStr(code.Previous.CodeBlockInfo)
-	language = strings.ReplaceAll(language, util.Caret, "")
+	language = strings.ReplaceAll(language, editor.Caret, "")
 	return NoHighlight(language)
+}
+
+func renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
+	attrs = [][]string{{"data-type", node.TextMarkType}}
+
+	types := strings.Split(node.TextMarkType, " ")
+	for _, typ := range types {
+		if "block-ref" == typ {
+			attrs = append(attrs, []string{"data-subtype", node.TextMarkBlockRefSubtype})
+			attrs = append(attrs, []string{"data-id", node.TextMarkBlockRefID})
+		} else if "a" == typ {
+			attrs = append(attrs, []string{"data-href", node.TextMarkAHref})
+			if "" != node.TextMarkATitle {
+				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
+			}
+		} else if "inline-math" == typ {
+			attrs = append(attrs, []string{"data-subtype", "math"})
+			attrs = append(attrs, []string{"data-content", node.TextMarkInlineMathContent})
+			attrs = append(attrs, []string{"contenteditable", "false"})
+			attrs = append(attrs, []string{"class", "render-node"})
+		} else if "file-annotation-ref" == typ {
+			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
+		}
+	}
+
+	return
 }

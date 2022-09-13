@@ -8,6 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+//go:build !javascript
 // +build !javascript
 
 package parse
@@ -16,7 +17,7 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/util"
+	"github.com/88250/lute/editor"
 	"golang.org/x/text/cases"
 )
 
@@ -26,7 +27,7 @@ func (t *Tree) FindLinkRefDefLink(label []byte) (link *ast.Node) {
 	}
 
 	if t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG {
-		label = bytes.ReplaceAll(label, util.CaretTokens, nil)
+		label = bytes.ReplaceAll(label, editor.CaretTokens, nil)
 	}
 	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering || ast.NodeLinkRefDef != n.Type {

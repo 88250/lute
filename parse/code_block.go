@@ -14,6 +14,7 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -159,12 +160,12 @@ func (context *Context) isFencedCodeClose(tokens []byte, openMarker byte, num in
 		return false, nil
 	}
 	tokens = lex.TrimWhitespace(tokens)
-	endCaret := bytes.HasSuffix(tokens, util.CaretTokens)
+	endCaret := bytes.HasSuffix(tokens, editor.CaretTokens)
 	if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 		if endCaret {
 			context.Tip.Tokens = bytes.TrimSuffix(context.Tip.Tokens, []byte("\n"))
-			context.Tip.Tokens = append(context.Tip.Tokens, util.CaretTokens...)
+			context.Tip.Tokens = append(context.Tip.Tokens, editor.CaretTokens...)
 		}
 	}
 	for _, token := range tokens {

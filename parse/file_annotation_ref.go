@@ -14,8 +14,8 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 func (t *Tree) parseFileAnnotationRef(ctx *InlineContext) *ast.Node {
@@ -108,7 +108,7 @@ func (context *Context) parseFileAnnotationRefID(tokens []byte) (passed, remains
 	var token byte
 	for ; i < length; i++ {
 		token = tokens[i]
-		if bytes.Contains(util.CaretTokens, []byte{token}) {
+		if bytes.Contains(editor.CaretTokens, []byte{token}) {
 			continue
 		}
 
@@ -156,9 +156,9 @@ func (context *Context) parseFileAnnotationRefID(tokens []byte) (passed, remains
 	}
 	passed = make([]byte, 0, 1024)
 	passed = append(passed, id...)
-	if bytes.HasPrefix(remains, util.CaretTokens) {
-		passed = append(passed, util.CaretTokens...)
-		remains = remains[len(util.CaretTokens):]
+	if bytes.HasPrefix(remains, editor.CaretTokens) {
+		passed = append(passed, editor.CaretTokens...)
+		remains = remains[len(editor.CaretTokens):]
 	}
 	closed := lex.ItemGreater == remains[0] && lex.ItemGreater == remains[1]
 	if closed {

@@ -14,6 +14,7 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -69,7 +70,7 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.ProtyleWYSIWYG {
 		// 处理 \‸x 情况，插入符后的字符才是待转义的
 		tokens := ctx.tokens[ctx.pos:]
-		caret := util.CaretTokens
+		caret := editor.CaretTokens
 		if len(caret) < len(tokens) && bytes.HasPrefix(tokens, caret) {
 			token = ctx.tokens[ctx.pos+len(caret)]
 			if lex.IsASCIIPunct(token) {

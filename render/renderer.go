@@ -17,6 +17,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
@@ -349,7 +350,7 @@ func normalizeHeadingID(heading *ast.Node) (ret string) {
 	}
 
 	id = strings.TrimLeft(id, "#")
-	id = strings.ReplaceAll(id, util.Caret, "")
+	id = strings.ReplaceAll(id, editor.Caret, "")
 	for _, r := range id {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			ret += string(r)
@@ -544,7 +545,7 @@ func (r *BaseRenderer) setextHeadingLen(node *ast.Node) (ret int) {
 		return ast.WalkContinue
 	})
 	content := buf.String()
-	content = strings.ReplaceAll(content, util.Caret, "")
+	content = strings.ReplaceAll(content, editor.Caret, "")
 	lines := strings.Split(content, "\n")
 	lastLine := lines[len(lines)-1]
 	for _, r := range lastLine {
@@ -590,7 +591,7 @@ func (r *BaseRenderer) tagSrc(tokens []byte) []byte {
 func (r *BaseRenderer) tagSrcPath(tokens []byte) []byte {
 	if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 < srcIndex {
 		src := tokens[srcIndex+len("src=\""):]
-		if 1 > len(bytes.ReplaceAll(src, util.CaretTokens, nil)) {
+		if 1 > len(bytes.ReplaceAll(src, editor.CaretTokens, nil)) {
 			return tokens
 		}
 		targetSrc := r.LinkPath(src)

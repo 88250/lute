@@ -14,9 +14,9 @@ import (
 	"bytes"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 // ATXHeadingStart 判断 ATX 标题（#）是否开始。
@@ -100,8 +100,8 @@ func SetextHeadingStart(t *Tree, container *ast.Node) int {
 func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	tokens := t.Context.currentLine[t.Context.nextNonspace:]
 	var startCaret bool
-	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && bytes.HasPrefix(tokens, util.CaretTokens) {
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && bytes.HasPrefix(tokens, editor.CaretTokens) {
+		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 		startCaret = true
 	}
 
@@ -111,8 +111,8 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	}
 
 	var inCaret bool
-	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.Contains(tokens, []byte("#"+util.Caret+"#")) {
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.Contains(tokens, []byte("#"+editor.Caret+"#")) {
+		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 		inCaret = true
 	}
 
@@ -122,8 +122,8 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 	}
 
 	var endCaret bool
-	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.HasPrefix(tokens[level:], []byte(" "+util.Caret)) {
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && bytes.HasPrefix(tokens[level:], []byte(" "+editor.Caret)) {
+		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 		endCaret = true
 	}
 
@@ -165,7 +165,7 @@ func (t *Tree) parseATXHeading() (ok bool, markers, content []byte, level int) {
 
 	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
 		if startCaret || inCaret || endCaret {
-			content = append(util.CaretTokens, content...)
+			content = append(editor.CaretTokens, content...)
 		}
 	}
 	_, content = lex.TrimRight(content)
@@ -177,9 +177,9 @@ func (t *Tree) parseSetextHeading() (level int) {
 	ln := lex.TrimWhitespace(t.Context.currentLine)
 	var caretInLn bool
 	if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
-		if bytes.Contains(ln, util.CaretTokens) {
+		if bytes.Contains(ln, editor.CaretTokens) {
 			caretInLn = true
-			ln = bytes.ReplaceAll(ln, util.CaretTokens, nil)
+			ln = bytes.ReplaceAll(ln, editor.CaretTokens, nil)
 			if 1 > len(ln) {
 				return
 			}
@@ -215,7 +215,7 @@ func (t *Tree) parseSetextHeading() (level int) {
 
 	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && caretInLn {
 		t.Context.oldtip.Tokens = lex.TrimWhitespace(t.Context.oldtip.Tokens)
-		t.Context.oldtip.AppendTokens(util.CaretTokens)
+		t.Context.oldtip.AppendTokens(editor.CaretTokens)
 	}
 	return
 }

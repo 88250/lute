@@ -15,8 +15,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
-	"github.com/88250/lute/util"
 )
 
 // delimiter 描述了强调、链接和图片解析过程中用到的分隔符（[, ![, *, _, ~）相关信息。
@@ -309,9 +309,9 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 			tokenBefore = rune(c)
 		}
 
-		if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && util.Caret == string(tokenBefore) {
+		if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG) && editor.Caret == string(tokenBefore) {
 			// 跳过插入符位置向前看
-			caretLen := len(util.Caret)
+			caretLen := len(editor.Caret)
 			if 0 < startPos-caretLen {
 				c = ctx.tokens[startPos-caretLen-1]
 				if c >= utf8.RuneSelf {

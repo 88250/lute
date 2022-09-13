@@ -15,6 +15,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/util"
 )
@@ -48,8 +49,8 @@ func sanitize(tokens []byte) []byte {
 		mostRecentlyStartedToken string
 	)
 
-	caretLeftSpace := bytes.Contains(tokens, []byte(" "+util.Caret))
-	tokens = bytes.ReplaceAll(tokens, util.CaretTokens, []byte(util.CaretReplacement))
+	caretLeftSpace := bytes.Contains(tokens, []byte(" "+editor.Caret))
+	tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, []byte(editor.CaretReplacement))
 
 	tokenizer := html.NewTokenizer(bytes.NewReader(tokens))
 	for {
@@ -58,11 +59,11 @@ func sanitize(tokens []byte) []byte {
 			if err == io.EOF {
 				ret := buff.Bytes()
 				if caretLeftSpace {
-					ret = bytes.ReplaceAll(ret, []byte("\""+util.CaretReplacement), []byte("\" "+util.CaretReplacement))
+					ret = bytes.ReplaceAll(ret, []byte("\""+editor.CaretReplacement), []byte("\" "+editor.CaretReplacement))
 				} else {
-					ret = bytes.ReplaceAll(ret, []byte("\" "+util.CaretReplacement), []byte("\""+util.CaretReplacement))
+					ret = bytes.ReplaceAll(ret, []byte("\" "+editor.CaretReplacement), []byte("\""+editor.CaretReplacement))
 				}
-				ret = bytes.ReplaceAll(ret, []byte(util.CaretReplacement), util.CaretTokens)
+				ret = bytes.ReplaceAll(ret, []byte(editor.CaretReplacement), editor.CaretTokens)
 				return ret
 			}
 
@@ -160,8 +161,8 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 	tokenBuff.WriteString("<")
 	tokenBuff.WriteString(token.Data)
 	for _, attr := range token.Attr {
-		if attr.Key == util.CaretReplacement {
-			tokenBuff.WriteString(" " + util.CaretReplacement)
+		if attr.Key == editor.CaretReplacement {
+			tokenBuff.WriteString(" " + editor.CaretReplacement)
 			continue
 		}
 		tokenBuff.WriteByte(' ')

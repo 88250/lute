@@ -12,7 +12,9 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/util"
 )
 
@@ -40,7 +42,7 @@ func (t *Tree) parseHeadingID(block *ast.Node, ctx *InlineContext) (ret *ast.Nod
 
 	length := len(content)
 	if length-1 != curlyBracesEnd {
-		if !bytes.HasSuffix(content, []byte("}"+util.Caret)) && bytes.HasSuffix(content, util.CaretTokens) {
+		if !bytes.HasSuffix(content, []byte("}"+editor.Caret)) && bytes.HasSuffix(content, editor.CaretTokens) {
 			// # foo {id}b‸
 			ctx.pos++
 			return &ast.Node{Type: ast.NodeText, Tokens: openCurlyBrace}
@@ -48,7 +50,7 @@ func (t *Tree) parseHeadingID(block *ast.Node, ctx *InlineContext) (ret *ast.Nod
 	}
 
 	if t.Context.ParseOption.VditorWYSIWYG {
-		content = bytes.ReplaceAll(content, util.CaretTokens, nil)
+		content = bytes.ReplaceAll(content, editor.CaretTokens, nil)
 	}
 	id := content[curlyBracesStart+1 : curlyBracesEnd]
 	ctx.pos += curlyBracesEnd + 1

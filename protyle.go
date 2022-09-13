@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
 
 	"github.com/88250/lute/ast"
@@ -28,7 +29,7 @@ import (
 func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	//fmt.Println(ivHTML)
 	markdown := lute.blockDOM2Md(ivHTML)
-	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
+	markdown = strings.ReplaceAll(markdown, editor.Zwsp, "")
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	firstChild := tree.Root.FirstChild
@@ -138,12 +139,12 @@ func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 func (lute *Lute) BlockDOM2Md(htmlStr string) (markdown string) {
 	//fmt.Println(htmlStr)
 	markdown = lute.blockDOM2Md(htmlStr)
-	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
+	markdown = strings.ReplaceAll(markdown, editor.Zwsp, "")
 	return
 }
 
 func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
-	htmlStr = strings.ReplaceAll(htmlStr, parse.Zwsp, "")
+	htmlStr = strings.ReplaceAll(htmlStr, editor.Zwsp, "")
 
 	// DOM 转 AST
 	tree := lute.BlockDOM2Tree(htmlStr)
@@ -170,7 +171,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = util.BytesToStr(formatted)
-	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
+	markdown = strings.ReplaceAll(markdown, editor.Zwsp, "")
 	return
 }
 
@@ -193,7 +194,7 @@ func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTM
 	renderer := render.NewBlockRenderer(tree, options)
 	output := renderer.Render()
 	vHTML = util.BytesToStr(output)
-	vHTML = strings.ReplaceAll(vHTML, util.Caret, "<wbr>")
+	vHTML = strings.ReplaceAll(vHTML, editor.Caret, "<wbr>")
 	return
 }
 
@@ -215,7 +216,7 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</s>", "</s>\n<wbr>\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</u>", "</u>\n<wbr>\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</span>", "</span>\n<wbr>\n")
-	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", util.Caret)
+	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", editor.Caret)
 
 	var startSpaces, endSpaces int
 	for _, c := range htmlStr {
@@ -555,14 +556,14 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
-	class := lute.domAttrValue(n, "class")
+	class := util.DomAttrValue(n, "class")
 	if "protyle-attr" == class ||
 		strings.Contains(class, "__copy") ||
 		strings.Contains(class, "protyle-linenumber__rows") {
 		return
 	}
 
-	if "1" == lute.domAttrValue(n, "spin") {
+	if "1" == util.DomAttrValue(n, "spin") {
 		return
 	}
 
@@ -574,18 +575,18 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 				language = languageNode.FirstChild.Data
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: util.StrToBytes(language)})
-			code := lute.domText(n.NextSibling)
-			if strings.HasSuffix(code, "\n\n"+util.Caret) {
-				code = strings.TrimSuffix(code, "\n\n"+util.Caret)
-				code += "\n" + util.Caret + "\n"
+			code := util.DomText(n.NextSibling)
+			if strings.HasSuffix(code, "\n\n"+editor.Caret) {
+				code = strings.TrimSuffix(code, "\n\n"+editor.Caret)
+				code += "\n" + editor.Caret + "\n"
 			}
 			lines := strings.Split(code, "\n")
 			buf := bytes.Buffer{}
 			for i, line := range lines {
 				if strings.Contains(line, "```") {
-					line = strings.ReplaceAll(line, "```", parse.Zwj+"```")
+					line = strings.ReplaceAll(line, "```", editor.Zwj+"```")
 				} else {
-					line = strings.ReplaceAll(line, parse.Zwj, "")
+					line = strings.ReplaceAll(line, editor.Zwj, "")
 				}
 				buf.WriteString(line)
 				if i < len(lines)-1 {
@@ -595,20 +596,20 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()})
 		} else if ast.NodeListItem == tree.Context.Tip.Type {
 			if 3 == tree.Context.Tip.ListData.Typ { // 任务列表
-				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeTaskListItemMarker, TaskListItemChecked: strings.Contains(lute.domAttrValue(n.Parent, "class"), "protyle-task--done")})
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeTaskListItemMarker, TaskListItemChecked: strings.Contains(util.DomAttrValue(n.Parent, "class"), "protyle-task--done")})
 			}
 		}
 		return
 	}
 
-	if "true" == lute.domAttrValue(n, "contenteditable") {
+	if "true" == util.DomAttrValue(n, "contenteditable") {
 		lute.genASTContenteditable(n, tree)
 		return
 	}
 
-	dataType := ast.Str2NodeType(lute.domAttrValue(n, "data-type"))
+	dataType := ast.Str2NodeType(util.DomAttrValue(n, "data-type"))
 
-	nodeID := lute.domAttrValue(n, "data-node-id")
+	nodeID := util.DomAttrValue(n, "data-node-id")
 	node := &ast.Node{ID: nodeID}
 	if "" != node.ID && !lute.parentIs(n, atom.Table) {
 		node.KramdownIAL = [][]string{{"id", node.ID}}
@@ -622,9 +623,9 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeBlockQueryEmbed
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
-		content := lute.domAttrValue(n, "data-content")
+		content := util.DomAttrValue(n, "data-content")
 		// 嵌入块中存在换行 SQL 语句时会被转换为段落文本 https://github.com/siyuan-note/siyuan/issues/5728
-		content = strings.ReplaceAll(content, "\n", util.IALValEscNewLine)
+		content = strings.ReplaceAll(content, "\n", editor.IALValEscNewLine)
 		node.AppendChild(&ast.Node{Type: ast.NodeBlockQueryEmbedScript, Tokens: util.StrToBytes(content)})
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBrace})
@@ -642,7 +643,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.parentIs(n, atom.Table) {
-			text := lute.domText(n)
+			text := util.DomText(n)
 			node.Tokens = []byte(strings.TrimSpace(text))
 			tree.Context.Tip.AppendChild(node)
 			return
@@ -667,7 +668,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		for th := thead.FirstChild.FirstChild; nil != th; th = th.NextSibling {
-			align := lute.domAttrValue(th, "align")
+			align := util.DomAttrValue(th, "align")
 			switch align {
 			case "left":
 				tableAligns = append(tableAligns, 1)
@@ -693,7 +694,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case ast.NodeHeading:
-		text := lute.domText(n)
+		text := util.DomText(n)
 		if lute.parentIs(n, atom.Table) {
 			node.Tokens = []byte(strings.TrimSpace(text))
 			for bytes.HasPrefix(node.Tokens, []byte("#")) {
@@ -704,14 +705,14 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		node.Type = ast.NodeHeading
-		level := lute.domAttrValue(n, "data-subtype")[1:]
+		level := util.DomAttrValue(n, "data-subtype")[1:]
 		node.HeadingLevel, _ = strconv.Atoi(level)
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case ast.NodeBlockquote:
-		content := strings.TrimSpace(lute.domText(n))
-		if util.Caret == content {
+		content := strings.TrimSpace(util.DomText(n))
+		if editor.Caret == content {
 			node.Type = ast.NodeText
 			node.Tokens = []byte(content)
 			tree.Context.Tip.AppendChild(node)
@@ -724,9 +725,9 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeList:
 		node.Type = ast.NodeList
-		marker := lute.domAttrValue(n, "data-marker")
+		marker := util.DomAttrValue(n, "data-marker")
 		node.ListData = &ast.ListData{}
-		subType := lute.domAttrValue(n, "data-subtype")
+		subType := util.DomAttrValue(n, "data-subtype")
 		if "u" == subType {
 			node.ListData.Typ = 0
 		} else if "o" == subType {
@@ -739,12 +740,12 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case ast.NodeListItem:
-		marker := lute.domAttrValue(n, "data-marker")
+		marker := util.DomAttrValue(n, "data-marker")
 		if ast.NodeList != tree.Context.Tip.Type {
 			parent := &ast.Node{}
 			parent.Type = ast.NodeList
 			parent.ListData = &ast.ListData{}
-			subType := lute.domAttrValue(n, "data-subtype")
+			subType := util.DomAttrValue(n, "data-subtype")
 			if "u" == subType {
 				parent.ListData.Typ = 0
 				parent.ListData.BulletChar = '*'
@@ -762,7 +763,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 
 		node.Type = ast.NodeListItem
 		node.ListData = &ast.ListData{}
-		subType := lute.domAttrValue(n, "data-subtype")
+		subType := util.DomAttrValue(n, "data-subtype")
 		if "u" == subType {
 			node.ListData.Typ = 0
 			node.ListData.BulletChar = '*'
@@ -787,14 +788,14 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeSuperBlock
 		tree.Context.Tip.AppendChild(node)
 		node.AppendChild(&ast.Node{Type: ast.NodeSuperBlockOpenMarker})
-		layout := lute.domAttrValue(n, "data-sb-layout")
+		layout := util.DomAttrValue(n, "data-sb-layout")
 		node.AppendChild(&ast.Node{Type: ast.NodeSuperBlockLayoutMarker, Tokens: []byte(layout)})
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case ast.NodeMathBlock:
 		node.Type = ast.NodeMathBlock
 		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
-		content := lute.domAttrValue(n, "data-content")
+		content := util.DomAttrValue(n, "data-content")
 		content = html.UnescapeHTMLStr(content)
 		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: util.StrToBytes(content)})
 		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
@@ -804,9 +805,9 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeCodeBlock
 		node.IsFencedCodeBlock = true
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```")})
-		if language := lute.domAttrValue(n, "data-subtype"); "" != language {
+		if language := util.DomAttrValue(n, "data-subtype"); "" != language {
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: util.StrToBytes(language)})
-			content := lute.domAttrValue(n, "data-content")
+			content := util.DomAttrValue(n, "data-content")
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: util.StrToBytes(content)})
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```")})
 			tree.Context.Tip.AppendChild(node)
@@ -817,7 +818,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeHTMLBlock:
 		node.Type = ast.NodeHTMLBlock
-		content := lute.domAttrValue(n.FirstChild.NextSibling.FirstChild, "data-content")
+		content := util.DomAttrValue(n.FirstChild.NextSibling.FirstChild, "data-content")
 		content = html.UnescapeHTMLStr(content)
 		node.Tokens = util.StrToBytes(content)
 		tree.Context.Tip.AppendChild(node)
@@ -834,25 +835,25 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	case ast.NodeIFrame:
 		node.Type = ast.NodeIFrame
 		n = lute.domChild(n.FirstChild, atom.Iframe)
-		node.Tokens = lute.domHTML(n)
+		node.Tokens = util.DomHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case ast.NodeWidget:
 		node.Type = ast.NodeWidget
 		n = lute.domChild(n.FirstChild, atom.Iframe)
-		node.Tokens = lute.domHTML(n)
+		node.Tokens = util.DomHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case ast.NodeVideo:
 		node.Type = ast.NodeVideo
 		n = lute.domChild(n.FirstChild, atom.Video)
-		node.Tokens = lute.domHTML(n)
+		node.Tokens = util.DomHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case ast.NodeAudio:
 		node.Type = ast.NodeAudio
 		n = lute.domChild(n.FirstChild, atom.Audio)
-		node.Tokens = lute.domHTML(n)
+		node.Tokens = util.DomHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
 	default:
@@ -880,7 +881,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		node.Type = ast.NodeInlineHTML
-		node.Tokens = lute.domHTML(n)
+		node.Tokens = util.DomHTML(n)
 		tree.Context.Tip.AppendChild(node)
 		return
 	}
@@ -906,7 +907,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
-	class := lute.domAttrValue(n, "class")
+	class := util.DomAttrValue(n, "class")
 	if "svg" == class {
 		return
 	}
@@ -926,8 +927,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.Tokens = util.StrToBytes(content)
 		} else if ast.NodeStrong == tree.Context.Tip.Type {
 			content = strings.ReplaceAll(content, "**", "")
-			content = strings.ReplaceAll(content, "*"+util.Caret, util.Caret)
-			content = strings.ReplaceAll(content, util.Caret+"*", util.Caret)
+			content = strings.ReplaceAll(content, "*"+editor.Caret, editor.Caret)
+			content = strings.ReplaceAll(content, editor.Caret+"*", editor.Caret)
 			node.Tokens = util.StrToBytes(content)
 		}
 
@@ -976,7 +977,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\\\\"), []byte("\\"))
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\\"), []byte("\\\\"))
 
-			if bytes.Equal(node.Tokens, util.CaretTokens) {
+			if bytes.Equal(node.Tokens, editor.CaretTokens) {
 				// `<kbd>` 无法删除 https://github.com/siyuan-note/siyuan/issues/4162
 				parent := tree.Context.Tip.Parent
 				tree.Context.Tip.Unlink()
@@ -986,8 +987,8 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 	case atom.Thead:
 		if lute.parentIs(n.Parent.Parent, atom.Table) {
-			text := lute.domText(n.Parent.Parent)
-			text = strings.ReplaceAll(text, util.Caret, "")
+			text := util.DomText(n.Parent.Parent)
+			text = strings.ReplaceAll(text, editor.Caret, "")
 			node.Tokens = []byte(strings.TrimSpace(text))
 			tree.Context.Tip.AppendChild(node)
 			return
@@ -1005,7 +1006,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Th, atom.Td:
 		node.Type = ast.NodeTableCell
-		align := lute.domAttrValue(n, "align")
+		align := util.DomAttrValue(n, "align")
 		var tableAlign int
 		switch align {
 		case "left":
@@ -1019,14 +1020,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 		node.TableCellAlign = tableAlign
 		tree.Context.Tip.AppendChild(node)
-		lute.setSpanIAL(n, node)
+		parse.SetSpanIAL(node, n)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Code:
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1035,24 +1036,24 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("code")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-		} else {
-			node.Type = ast.NodeCodeSpan
-			node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker})
-			node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent})
+			tree.Context.Tip.AppendChild(node)
+			parse.SetTextMarkNode(node, n)
+			return
 		}
+
+		node.Type = ast.NodeCodeSpan
+		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker})
+		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Span:
-		dataType := lute.domAttrValue(n, "data-type")
+		dataType := util.DomAttrValue(n, "data-type")
 		if "tag" == dataType {
 			isCaret, isEmpty := lute.isCaret(n)
 			if isCaret {
 				node.Type = ast.NodeText
-				node.Tokens = util.CaretTokens
+				node.Tokens = editor.CaretTokens
 				tree.Context.Tip.AppendChild(node)
 				return
 			}
@@ -1060,41 +1061,36 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-
 			if lute.ParseOptions.TextMark {
-				node.Type = ast.NodeTextMark
-				node.Tokens = []byte(dataType)
-				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-			} else {
-				node.Type = ast.NodeTag
-				node.AppendChild(&ast.Node{Type: ast.NodeTagOpenMarker})
-
-				// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
-				processSpanMarkerSpace(n, node)
+				tree.Context.Tip.AppendChild(node)
+				parse.SetTextMarkNode(node, n)
+				return
 			}
+
+			n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, editor.Zwsp, "")
+			node.Type = ast.NodeTag
+			node.AppendChild(&ast.Node{Type: ast.NodeTagOpenMarker})
+			// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
+			processSpanMarkerSpace(n, node)
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()
 		} else if "inline-math" == dataType {
-			content = lute.domAttrValue(n, "data-content")
-			if "" == content {
+			inlineMathContent := util.GetTextMarkInlineMathData(n)
+			if "" == inlineMathContent {
 				return
 			}
-			content = html.UnescapeHTMLStr(content)
 
 			if lute.ParseOptions.TextMark {
-				node.Type = ast.NodeTextMark
-				node.Tokens = []byte(dataType)
-				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(content)})
-				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
-			} else {
-				node.Type = ast.NodeInlineMath
-				node.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
-				node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(content)})
-				node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
+				tree.Context.Tip.AppendChild(node)
+				parse.SetTextMarkNode(node, n)
+				return
 			}
+
+			node.Type = ast.NodeInlineMath
+			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
+			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(inlineMathContent)})
+			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
 			tree.Context.Tip.AppendChild(node)
 			return
 		} else if "a" == dataType {
@@ -1107,29 +1103,43 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				break
 			}
 
+			if lute.ParseOptions.TextMark {
+				tree.Context.Tip.AppendChild(node)
+				parse.SetTextMarkNode(node, n)
+				return
+			}
+
 			node.Type = ast.NodeLink
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 			tree.Context.Tip.AppendChild(node)
 			tree.Context.Tip = node
 			defer tree.Context.ParentTip()
 		} else if "block-ref" == dataType {
-			node.Type = ast.NodeBlockRef
-			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			id := lute.domAttrValue(n, "data-id")
-			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(id)})
-			refText := lute.domText(n)
+			refText := util.DomText(n)
 			refText = strings.TrimSpace(refText)
 			if "" == refText {
 				return
 			}
-			if refText == util.Caret {
-				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+			if refText == editor.Caret {
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
 				return
 			}
+
+			if lute.ParseOptions.TextMark {
+				tree.Context.Tip.AppendChild(node)
+				parse.SetTextMarkNode(node, n)
+				return
+			}
+
+			node.Type = ast.NodeBlockRef
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			id := util.DomAttrValue(n, "data-id")
+			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(id)})
+
 			node.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
 			var refTextNode *ast.Node
-			subtype := lute.domAttrValue(n, "data-subtype")
+			subtype := util.DomAttrValue(n, "data-subtype")
 			if "s" == subtype || "" == subtype {
 				refTextNode = &ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(refText)}
 			} else {
@@ -1144,20 +1154,27 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		} else if "file-annotation-ref" == dataType {
-			node.Type = ast.NodeFileAnnotationRef
-			node.AppendChild(&ast.Node{Type: ast.NodeLess})
-			node.AppendChild(&ast.Node{Type: ast.NodeLess})
-			id := lute.domAttrValue(n, "data-id")
-			node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefID, Tokens: util.StrToBytes(id)})
-			refText := lute.domText(n)
+			refText := util.DomText(n)
 			refText = strings.TrimSpace(refText)
 			if "" == refText {
 				return
 			}
-			if refText == util.Caret {
-				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
+			if refText == editor.Caret {
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
 				return
 			}
+
+			if lute.ParseOptions.TextMark {
+				tree.Context.Tip.AppendChild(node)
+				parse.SetTextMarkNode(node, n)
+				return
+			}
+
+			node.Type = ast.NodeFileAnnotationRef
+			node.AppendChild(&ast.Node{Type: ast.NodeLess})
+			node.AppendChild(&ast.Node{Type: ast.NodeLess})
+			id := util.DomAttrValue(n, "data-id")
+			node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefID, Tokens: util.StrToBytes(id)})
 			node.AppendChild(&ast.Node{Type: ast.NodeFileAnnotationRefSpace})
 			refTextNode := &ast.Node{Type: ast.NodeFileAnnotationRefText, Tokens: util.StrToBytes(refText)}
 			node.AppendChild(refTextNode)
@@ -1170,20 +1187,22 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeImage
 			node.AppendChild(&ast.Node{Type: ast.NodeBang})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
-			alt := lute.domAttrValue(img, "alt")
+			alt := util.DomAttrValue(img, "alt")
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: util.StrToBytes(alt)})
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			src := lute.domAttrValue(img, "data-src")
+			src := util.DomAttrValue(img, "data-src")
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
-			if title := lute.domAttrValue(img, "title"); "" != title {
+			if title := util.DomAttrValue(img, "title"); "" != title {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: util.StrToBytes(title)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 			tree.Context.Tip.AppendChild(node)
-			lute.setSpanIAL(img, tree.Context.Tip.LastChild)
+			parse.SetSpanIAL(tree.Context.Tip.LastChild, img)
 			return
+		} else if "" == "sub" {
+			// TODO
 		} else if "backslash" == dataType {
 			node.Type = ast.NodeBackslash
 			if nil == n.FirstChild {
@@ -1206,7 +1225,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			isCaret, isEmpty := lute.isCaret(n)
 			if isCaret {
 				node.Type = ast.NodeText
-				node.Tokens = util.CaretTokens
+				node.Tokens = editor.CaretTokens
 				tree.Context.Tip.AppendChild(node)
 				return
 			}
@@ -1214,25 +1233,15 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			content = lute.domAttrValue(n, "data-content")
-			if "" == content {
-				content = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-			}
-			content = html.UnescapeHTMLStr(content)
-
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte(dataType)
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(content)})
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 			tree.Context.Tip.AppendChild(node)
+			parse.SetTextMarkNode(node, n)
 			return
 		}
 	case atom.Sub:
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1241,13 +1250,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("sub")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-		} else {
-			node.Type = ast.NodeSub
-			node.AppendChild(&ast.Node{Type: ast.NodeSubOpenMarker})
+			tree.Context.Tip.AppendChild(node)
+			parse.SetTextMarkNode(node, n)
+			return
 		}
+
+		node.Type = ast.NodeSub
+		node.AppendChild(&ast.Node{Type: ast.NodeSubOpenMarker})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1255,7 +1264,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1264,13 +1273,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("sup")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-		} else {
-			node.Type = ast.NodeSup
-			node.AppendChild(&ast.Node{Type: ast.NodeSupOpenMarker})
+			tree.Context.Tip.AppendChild(node)
+			parse.SetTextMarkNode(node, n)
+			return
 		}
+
+		node.Type = ast.NodeSup
+		node.AppendChild(&ast.Node{Type: ast.NodeSupOpenMarker})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1278,7 +1287,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1287,13 +1296,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("u")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-		} else {
-			node.Type = ast.NodeUnderline
-			node.AppendChild(&ast.Node{Type: ast.NodeUnderlineOpenMarker})
+			tree.Context.Tip.AppendChild(node)
+			parse.SetTextMarkNode(node, n)
+			return
 		}
+
+		node.Type = ast.NodeUnderline
+		node.AppendChild(&ast.Node{Type: ast.NodeUnderlineOpenMarker})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1301,7 +1310,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1310,13 +1319,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("kbd")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-		} else {
-			node.Type = ast.NodeKbd
-			node.AppendChild(&ast.Node{Type: ast.NodeKbdOpenMarker})
+			tree.Context.Tip.AppendChild(node)
+			parse.SetTextMarkNode(node, n)
+			return
 		}
+
+		node.Type = ast.NodeKbd
+		node.AppendChild(&ast.Node{Type: ast.NodeKbdOpenMarker})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1336,13 +1345,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		if lute.startsWithNewline(n.FirstChild) {
-			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
-			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, editor.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(editor.Zwsp + "\n")})
 		}
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1351,41 +1360,39 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("em")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			tree.Context.Tip.AppendChild(node)
-		} else {
-			node.Type = ast.NodeEmphasis
-			marker := lute.domAttrValue(n, "data-marker")
-			if "" == marker {
-				marker = "*"
-			}
-			if "_" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeEmU8eOpenMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: []byte(marker)})
-			}
-			tree.Context.Tip.AppendChild(node)
-
-			if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
-				// 处理结尾换行
-				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-				if "_" == marker {
-					node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
-				} else {
-					node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
-				}
-				return
-			}
-
-			n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
-
-			// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
-			processSpanMarkerSpace(n, node)
-			lute.removeInnerMarker(n, "__")
+			parse.SetTextMarkNode(node, n)
+			return
 		}
 
+		node.Type = ast.NodeEmphasis
+		marker := util.DomAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "*"
+		}
+		if "_" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeEmU8eOpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: []byte(marker)})
+		}
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && editor.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+			if "_" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
+			}
+			return
+		}
+
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, editor.Zwsp, "")
+
+		// 开头结尾空格后会形成 * foo * 导致强调、加粗删除线标记失效，这里将空格移到右标记符前后 _*foo*_
+		processSpanMarkerSpace(n, node)
+		lute.removeInnerMarker(n, "__")
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Strong, atom.B:
@@ -1394,9 +1401,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 		if nil != tree.Context.Tip.LastChild {
 			// 转义符导致的行级元素样式属性暴露 https://github.com/siyuan-note/siyuan/issues/2969
-			if bytes.HasSuffix(tree.Context.Tip.LastChild.Tokens, []byte("\\"+util.Caret)) {
+			if bytes.HasSuffix(tree.Context.Tip.LastChild.Tokens, []byte("\\"+editor.Caret)) {
 				// foo\‸**bar**
-				tree.Context.Tip.LastChild.Tokens = bytes.ReplaceAll(tree.Context.Tip.LastChild.Tokens, []byte("\\"+util.Caret), []byte("\\\\"+util.Caret))
+				tree.Context.Tip.LastChild.Tokens = bytes.ReplaceAll(tree.Context.Tip.LastChild.Tokens, []byte("\\"+editor.Caret), []byte("\\\\"+editor.Caret))
 			}
 			if bytes.HasSuffix(tree.Context.Tip.LastChild.Tokens, []byte("\\")) {
 				// foo\**bar**
@@ -1405,13 +1412,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.startsWithNewline(n.FirstChild) {
-			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
-			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, editor.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(editor.Zwsp + "\n")})
 		}
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1420,39 +1427,37 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("strong")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			tree.Context.Tip.AppendChild(node)
-		} else {
-			node.Type = ast.NodeStrong
-			marker := lute.domAttrValue(n, "data-marker")
-			if "" == marker {
-				marker = "**"
-			}
-			if "__" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eOpenMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: []byte(marker)})
-			}
-			tree.Context.Tip.AppendChild(node)
-
-			if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
-				// 处理结尾换行
-				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-				if "__" == marker {
-					node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
-				} else {
-					node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
-				}
-				return
-			}
-
-			processSpanMarkerSpace(n, node)
-			lute.removeInnerMarker(n, "**")
+			parse.SetTextMarkNode(node, n)
+			return
 		}
 
-		lute.setSpanIAL(n, node)
+		node.Type = ast.NodeStrong
+		marker := util.DomAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "**"
+		}
+		if "__" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eOpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: []byte(marker)})
+		}
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && editor.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+			if "__" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
+			}
+			return
+		}
+
+		processSpanMarkerSpace(n, node)
+		lute.removeInnerMarker(n, "**")
+		parse.SetSpanIAL(node, n)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Del, atom.S, atom.Strike:
@@ -1460,13 +1465,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		if lute.startsWithNewline(n.FirstChild) {
-			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
-			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, editor.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(editor.Zwsp + "\n")})
 		}
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1475,35 +1480,33 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("s")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			tree.Context.Tip.AppendChild(node)
-		} else {
-			node.Type = ast.NodeStrikethrough
-			marker := lute.domAttrValue(n, "data-marker")
-			if "~" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1OpenMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker, Tokens: []byte(marker)})
-			}
-			tree.Context.Tip.AppendChild(node)
-
-			if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
-				// 处理结尾换行
-				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-				if "~" == marker {
-					node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
-				} else {
-					node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
-				}
-				return
-			}
-
-			processSpanMarkerSpace(n, node)
-			lute.removeInnerMarker(n, "~~")
+			parse.SetTextMarkNode(node, n)
+			return
 		}
 
+		node.Type = ast.NodeStrikethrough
+		marker := util.DomAttrValue(n, "data-marker")
+		if "~" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1OpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker, Tokens: []byte(marker)})
+		}
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && editor.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+			if "~" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
+			}
+			return
+		}
+
+		processSpanMarkerSpace(n, node)
+		lute.removeInnerMarker(n, "~~")
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Mark:
@@ -1511,13 +1514,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 		if lute.startsWithNewline(n.FirstChild) {
-			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, parse.Zwsp+"\n")
-			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(parse.Zwsp + "\n")})
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, editor.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(editor.Zwsp + "\n")})
 		}
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {
 			node.Type = ast.NodeText
-			node.Tokens = util.CaretTokens
+			node.Tokens = editor.CaretTokens
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
@@ -1526,43 +1529,40 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.ParseOptions.TextMark {
-			node.Type = ast.NodeTextMark
-			node.Tokens = []byte("mark")
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
-			lute.removeInnerMarker(n, "==")
 			tree.Context.Tip.AppendChild(node)
-		} else {
-			node.Type = ast.NodeMark
-			marker := lute.domAttrValue(n, "data-marker")
-			if "=" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeMark1OpenMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeMark2OpenMarker, Tokens: []byte(marker)})
-			}
-			tree.Context.Tip.AppendChild(node)
-
-			if nil != n.FirstChild && util.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
-				// 处理结尾换行
-				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.CaretTokens})
-				if "=" == marker {
-					node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
-				} else {
-					node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
-				}
-				return
-			}
-
-			processSpanMarkerSpace(n, node)
-			lute.removeInnerMarker(n, "==")
+			parse.SetTextMarkNode(node, n)
+			return
 		}
 
+		node.Type = ast.NodeMark
+		marker := util.DomAttrValue(n, "data-marker")
+		if "=" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark1OpenMarker, Tokens: []byte(marker)})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark2OpenMarker, Tokens: []byte(marker)})
+		}
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && editor.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+			if "=" == marker {
+				node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
+			} else {
+				node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
+			}
+			return
+		}
+
+		processSpanMarkerSpace(n, node)
+		lute.removeInnerMarker(n, "==")
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Img:
 		if "emoji" == class {
-			alt := lute.domAttrValue(n, "alt")
+			alt := util.DomAttrValue(n, "alt")
 			node.Type = ast.NodeEmoji
-			emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.EmojiImgTokens(alt, lute.domAttrValue(n, "src"))}
+			emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.EmojiImgTokens(alt, util.DomAttrValue(n, "src"))}
 			emojiImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: []byte(":" + alt + ":")})
 			node.AppendChild(emojiImg)
 			tree.Context.Tip.AppendChild(node)
@@ -1574,25 +1574,21 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		lute.genASTContenteditable(c, tree)
 	}
 
+	if lute.ParseOptions.TextMark {
+		return
+	}
+
 	switch n.DataAtom {
 	case atom.Code:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker})
-		}
+		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker})
 	case atom.Span:
-		dataType := lute.domAttrValue(n, "data-type")
+		dataType := util.DomAttrValue(n, "data-type")
 		if "tag" == dataType {
-			if lute.ParseOptions.TextMark {
-				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeTagCloseMarker})
-			}
+			node.AppendChild(&ast.Node{Type: ast.NodeTagCloseMarker})
 		} else if "a" == dataType {
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			href := lute.domAttrValue(n, "data-href")
+			href := util.DomAttrValue(n, "data-href")
 			if "" != lute.RenderOptions.LinkBase {
 				href = strings.ReplaceAll(href, lute.RenderOptions.LinkBase, "")
 			}
@@ -1600,140 +1596,54 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				href = strings.ReplaceAll(href, lute.RenderOptions.LinkPrefix, "")
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
-			linkTitle := lute.domAttrValue(n, "data-title")
+			linkTitle := util.DomAttrValue(n, "data-title")
 			if "" != linkTitle {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-		} else if "block-ref" == dataType {
-			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 		}
 	case atom.Sub:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
-		}
+		node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
 	case atom.Sup:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
-		}
+		node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
 	case atom.U:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeUnderlineCloseMarker})
-		}
+		node.AppendChild(&ast.Node{Type: ast.NodeUnderlineCloseMarker})
 	case atom.Kbd:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
-		} else {
-			node.AppendChild(&ast.Node{Type: ast.NodeKbdCloseMarker})
-		}
+		node.AppendChild(&ast.Node{Type: ast.NodeKbdCloseMarker})
 	case atom.Em, atom.I:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
+		marker := util.DomAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "*"
+		}
+		if "_" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
 		} else {
-			marker := lute.domAttrValue(n, "data-marker")
-			if "" == marker {
-				marker = "*"
-			}
-			if "_" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeEmU8eCloseMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
-			}
+			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: []byte(marker)})
 		}
 	case atom.Strong, atom.B:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
+		marker := util.DomAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "**"
+		}
+		if "__" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
 		} else {
-			marker := lute.domAttrValue(n, "data-marker")
-			if "" == marker {
-				marker = "**"
-			}
-			if "__" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrongU8eCloseMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
-			}
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: []byte(marker)})
 		}
 	case atom.Del, atom.S, atom.Strike:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
+		marker := util.DomAttrValue(n, "data-marker")
+		if "~" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
 		} else {
-			marker := lute.domAttrValue(n, "data-marker")
-			if "~" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough1CloseMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
-			}
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: []byte(marker)})
 		}
 	case atom.Mark:
-		if lute.ParseOptions.TextMark {
-			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
+		marker := util.DomAttrValue(n, "data-marker")
+		if "=" == marker {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
 		} else {
-			marker := lute.domAttrValue(n, "data-marker")
-			if "=" == marker {
-				node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: []byte(marker)})
-			} else {
-				node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
-			}
-		}
-	}
-}
-
-func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
-	insertedIAL := false
-	if style := lute.domAttrValue(n, "style"); "" != style { // 比如设置表格列宽
-		style = styleValue(style)
-		node.SetIALAttr("style", style)
-		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
-		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-		node.InsertAfter(ial)
-		insertedIAL = true
-	}
-
-	if atom.Th == n.DataAtom || atom.Td == n.DataAtom {
-		// 设置表格合并单元格
-		colspan := lute.domAttrValue(n, "colspan")
-		if "" != colspan {
-			node.SetIALAttr("colspan", colspan)
-		}
-		rowspan := lute.domAttrValue(n, "rowspan")
-		if "" != rowspan {
-			node.SetIALAttr("rowspan", rowspan)
-		}
-		class := lute.domAttrValue(n, "class")
-		if "" != class {
-			node.SetIALAttr("class", class)
-		}
-		if "" != colspan || "" != rowspan || "" != class {
-			ialTokens := parse.IAL2Tokens(node.KramdownIAL)
-			ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-			node.InsertAfter(ial)
-			insertedIAL = true
-		}
-	}
-
-	if nil != n.Parent && nil != n.Parent.Parent {
-		if parentStyle := lute.domAttrValue(n.Parent.Parent, "style"); "" != parentStyle {
-			if insertedIAL {
-				m := parse.Tokens2IAL(node.Next.Tokens)
-				m = append(m, []string{"parent-style", parentStyle})
-				node.Next.Tokens = parse.IAL2Tokens(m)
-				node.SetIALAttr("parent-style", parentStyle)
-				node.KramdownIAL = m
-			} else {
-				node.SetIALAttr("parent-style", parentStyle)
-				ialTokens := parse.IAL2Tokens(node.KramdownIAL)
-				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-				node.InsertAfter(ial)
-			}
+			node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
 		}
 	}
 }
@@ -1741,73 +1651,73 @@ func (lute *Lute) setSpanIAL(n *html.Node, node *ast.Node) {
 func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	node.SetIALAttr("id", node.ID)
 
-	if refcount := lute.domAttrValue(n, "refcount"); "" != refcount {
+	if refcount := util.DomAttrValue(n, "refcount"); "" != refcount {
 		node.SetIALAttr("refcount", refcount)
 		ialTokens = append(ialTokens, []byte(" refcount=\""+refcount+"\"")...)
 	}
 
-	if bookmark := lute.domAttrValue(n, "bookmark"); "" != bookmark {
+	if bookmark := util.DomAttrValue(n, "bookmark"); "" != bookmark {
 		bookmark = html.UnescapeHTMLStr(bookmark)
 		node.SetIALAttr("bookmark", bookmark)
 		ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
 	}
 
-	if style := lute.domAttrValue(n, "style"); "" != style {
+	if style := util.DomAttrValue(n, "style"); "" != style {
 		style = html.UnescapeHTMLStr(style)
-		style = styleValue(style)
+		style = parse.StyleValue(style)
 		node.SetIALAttr("style", style)
 		ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
 	}
 
-	if name := lute.domAttrValue(n, "name"); "" != name {
+	if name := util.DomAttrValue(n, "name"); "" != name {
 		name = html.UnescapeHTMLStr(name)
 		node.SetIALAttr("name", name)
 		ialTokens = append(ialTokens, []byte(" name=\""+name+"\"")...)
 	}
 
-	if memo := lute.domAttrValue(n, "memo"); "" != memo {
+	if memo := util.DomAttrValue(n, "memo"); "" != memo {
 		memo = html.UnescapeHTMLStr(memo)
 		node.SetIALAttr("memo", memo)
 		ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
 	}
 
-	if alias := lute.domAttrValue(n, "alias"); "" != alias {
+	if alias := util.DomAttrValue(n, "alias"); "" != alias {
 		alias = html.UnescapeHTMLStr(alias)
 		node.SetIALAttr("alias", alias)
 		ialTokens = append(ialTokens, []byte(" alias=\""+alias+"\"")...)
 	}
 
-	if fold := lute.domAttrValue(n, "fold"); "" != fold {
+	if fold := util.DomAttrValue(n, "fold"); "" != fold {
 		node.SetIALAttr("fold", fold)
 		ialTokens = append(ialTokens, []byte(" fold=\""+fold+"\"")...)
 	}
 
-	if headingFold := lute.domAttrValue(n, "heading-fold"); "" != headingFold {
+	if headingFold := util.DomAttrValue(n, "heading-fold"); "" != headingFold {
 		node.SetIALAttr("heading-fold", headingFold)
 		ialTokens = append(ialTokens, []byte(" heading-fold=\""+headingFold+"\"")...)
 	}
 
-	if parentFold := lute.domAttrValue(n, "parent-fold"); "" != parentFold {
+	if parentFold := util.DomAttrValue(n, "parent-fold"); "" != parentFold {
 		node.SetIALAttr("parent-fold", parentFold)
 		ialTokens = append(ialTokens, []byte(" parent-fold=\""+parentFold+"\"")...)
 	}
 
-	if updated := lute.domAttrValue(n, "updated"); "" != updated {
+	if updated := util.DomAttrValue(n, "updated"); "" != updated {
 		node.SetIALAttr("updated", updated)
 		ialTokens = append(ialTokens, []byte(" updated=\""+updated+"\"")...)
 	}
 
-	if linewrap := lute.domAttrValue(n, "linewrap"); "" != linewrap {
+	if linewrap := util.DomAttrValue(n, "linewrap"); "" != linewrap {
 		node.SetIALAttr("linewrap", linewrap)
 		ialTokens = append(ialTokens, []byte(" linewrap=\""+linewrap+"\"")...)
 	}
 
-	if ligatures := lute.domAttrValue(n, "ligatures"); "" != ligatures {
+	if ligatures := util.DomAttrValue(n, "ligatures"); "" != ligatures {
 		node.SetIALAttr("ligatures", ligatures)
 		ialTokens = append(ialTokens, []byte(" ligatures=\""+ligatures+"\"")...)
 	}
 
-	if linenumber := lute.domAttrValue(n, "linenumber"); "" != linenumber {
+	if linenumber := util.DomAttrValue(n, "linenumber"); "" != linenumber {
 		node.SetIALAttr("linenumber", linenumber)
 		ialTokens = append(ialTokens, []byte(" linenumber=\""+linenumber+"\"")...)
 	}
@@ -1820,12 +1730,12 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		}
 	}
 
-	if "NodeTable" == lute.domAttrValue(n, "data-type") {
+	if "NodeTable" == util.DomAttrValue(n, "data-type") {
 		colgroup := lute.domChild(n, atom.Colgroup)
 		var colgroupAttrVal string
 		if nil != colgroup {
 			for col := colgroup.FirstChild; nil != col; col = col.NextSibling {
-				colStyle := lute.domAttrValue(col, "style")
+				colStyle := util.DomAttrValue(col, "style")
 				colgroupAttrVal += colStyle
 				if nil != col.NextSibling {
 					colgroupAttrVal += "|"
@@ -1840,13 +1750,6 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	return ialTokens
 }
 
-func styleValue(style string) (ret string) {
-	ret = strings.TrimSpace(style)
-	ret = strings.ReplaceAll(ret, "\n", "")
-	ret = strings.Join(strings.Fields(ret), " ")
-	return
-}
-
 func processSpanMarkerSpace(n *html.Node, node *ast.Node) {
 	if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
 		n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
@@ -1856,9 +1759,9 @@ func processSpanMarkerSpace(n *html.Node, node *ast.Node) {
 		n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
 		n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
 	}
-	if strings.HasSuffix(n.FirstChild.Data, " "+util.Caret) && nil == n.FirstChild.NextSibling {
-		n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " "+util.Caret)
-		n.InsertAfter(&html.Node{Type: html.TextNode, Data: " " + util.Caret})
+	if strings.HasSuffix(n.FirstChild.Data, " "+editor.Caret) && nil == n.FirstChild.NextSibling {
+		n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " "+editor.Caret)
+		n.InsertAfter(&html.Node{Type: html.TextNode, Data: " " + editor.Caret})
 	}
 	if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
 		n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
@@ -1879,7 +1782,7 @@ func (lute *Lute) removeInnerMarker0(n *html.Node, marker string) {
 	if nil == n {
 		return
 	}
-	if dataRender := lute.domAttrValue(n, "data-render"); "1" == dataRender || "2" == dataRender {
+	if dataRender := util.DomAttrValue(n, "data-render"); "1" == dataRender || "2" == dataRender {
 		return
 	}
 

@@ -163,8 +163,6 @@ func NewHtmlRenderer(tree *parse.Tree, options *Options) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
-	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
-	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
 	return ret
 }
 
@@ -175,21 +173,8 @@ func (r *HtmlRenderer) Render() (output []byte) {
 }
 
 func (r *HtmlRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *HtmlRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<span data-type=\"")
 		r.Write(node.Tokens)
-		r.WriteString("\">")
-	}
-	return ast.WalkContinue
-}
-
-func (r *HtmlRenderer) renderTextMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }

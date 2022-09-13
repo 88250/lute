@@ -17,6 +17,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
@@ -160,8 +161,6 @@ func NewProtyleExportDocxRenderer(tree *parse.Tree, options *Options) *ProtyleEx
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
-	ret.RendererFuncs[ast.NodeTextMarkOpenMarker] = ret.renderTextMarkOpenMarker
-	ret.RendererFuncs[ast.NodeTextMarkCloseMarker] = ret.renderTextMarkCloseMarker
 	return ret
 }
 
@@ -171,21 +170,8 @@ func (r *ProtyleExportDocxRenderer) Render() (output []byte) {
 }
 
 func (r *ProtyleExportDocxRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
-	return ast.WalkContinue
-}
-
-func (r *ProtyleExportDocxRenderer) renderTextMarkOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<span data-type=\"")
 		r.Write(node.Tokens)
-		r.WriteString("\">")
-	}
-	return ast.WalkContinue
-}
-
-func (r *ProtyleExportDocxRenderer) renderTextMarkCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }
@@ -634,7 +620,7 @@ func (r *ProtyleExportDocxRenderer) renderCodeBlock(node *ast.Node, entering boo
 		if noHighlight {
 			var attrs [][]string
 			tokens := html.EscapeHTML(node.FirstChild.Next.Next.Tokens)
-			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+			tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 			tokens = bytes.TrimSpace(tokens)
 			attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 			attrs = append(attrs, []string{"data-subtype", language})
@@ -746,7 +732,7 @@ func (r *ProtyleExportDocxRenderer) renderMathBlock(node *ast.Node, entering boo
 	r.Newline()
 	if entering {
 		tokens := html.EscapeHTML(node.FirstChild.Next.Tokens)
-		tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 		tokens = bytes.TrimSpace(tokens)
 		content := util.BytesToStr(tokens)
 		r.Tag("div", nil, false)

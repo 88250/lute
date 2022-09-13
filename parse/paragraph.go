@@ -13,9 +13,8 @@ package parse
 import (
 	"bytes"
 
-	"github.com/88250/lute/util"
-
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
 )
 
@@ -81,18 +80,18 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 					}
 
 					if (3 == len(tokens) && (bytes.EqualFold(tokens, []byte("[x]")) || bytes.Equal(tokens, []byte("[ ]")))) ||
-						(3 < len(tokens) && (lex.IsWhitespace(tokens[3]) || util.CaretTokens[0] == tokens[3] || util.CaretTokens[0] == tokens[2])) {
+						(3 < len(tokens) && (lex.IsWhitespace(tokens[3]) || editor.CaretTokens[0] == tokens[3] || editor.CaretTokens[0] == tokens[2])) {
 						var caretStartText, caretAfterCloseBracket, caretInBracket bool
 						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
 							closeBracket := bytes.IndexByte(tokens, lex.ItemCloseBracket)
-							if bytes.HasPrefix(tokens, util.CaretTokens) {
-								tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+							if bytes.HasPrefix(tokens, editor.CaretTokens) {
+								tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 								caretStartText = true
-							} else if bytes.HasPrefix(tokens[closeBracket+1:], util.CaretTokens) {
-								tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+							} else if bytes.HasPrefix(tokens[closeBracket+1:], editor.CaretTokens) {
+								tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 								caretAfterCloseBracket = true
-							} else if bytes.Contains(tokens[1:closeBracket], util.CaretTokens) {
-								tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+							} else if bytes.Contains(tokens[1:closeBracket], editor.CaretTokens) {
+								tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 								caretInBracket = true
 							}
 						}
@@ -106,7 +105,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 						if isEditor {
 							p.Tokens = bytes.TrimSpace(p.Tokens)
 							if caretStartText || caretAfterCloseBracket || caretInBracket {
-								p.Tokens = append([]byte(" "+util.Caret), p.Tokens...)
+								p.Tokens = append([]byte(" "+editor.Caret), p.Tokens...)
 							} else {
 								if !context.ParseOption.ProtyleWYSIWYG {
 									p.Tokens = append([]byte(" "), p.Tokens...)

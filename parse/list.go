@@ -15,6 +15,7 @@ import (
 	"strconv"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -231,7 +232,7 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 		}
 
 		if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
-			tokens = bytes.ReplaceAll(tokens, util.CaretTokens, nil)
+			tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 		}
 
 		if 3 <= len(tokens) { // 至少需要 [ ] 或者 [x] 3 个字符
