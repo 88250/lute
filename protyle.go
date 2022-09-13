@@ -26,9 +26,6 @@ import (
 )
 
 func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
-	// TODO: 改进行级元素解析 https://github.com/siyuan-note/siyuan/issues/5787
-	// lute.SetVirtualSpan(true)
-
 	//fmt.Println(ivHTML)
 	markdown := lute.blockDOM2Md(ivHTML)
 	markdown = strings.ReplaceAll(markdown, parse.Zwsp, "")
@@ -52,7 +49,6 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	}
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
-	//lute.ParseOptions.VirtualSpan = false
 	return
 }
 
@@ -1068,7 +1064,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			if lute.ParseOptions.TextMark {
 				node.Type = ast.NodeTextMark
-				node.Tokens = []byte("tag")
+				node.Tokens = []byte(dataType)
 				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 			} else {
 				node.Type = ast.NodeTag
@@ -1089,7 +1085,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			if lute.ParseOptions.TextMark {
 				node.Type = ast.NodeTextMark
-				node.Tokens = []byte("inline-math")
+				node.Tokens = []byte(dataType)
 				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
 				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(content)})
 				node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
@@ -1203,6 +1199,32 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				data = strings.ReplaceAll(data, "\\\\", "\\")
 				node.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: util.StrToBytes(data)})
 			}
+			tree.Context.Tip.AppendChild(node)
+			return
+		} else {
+			// TextMark 节点
+			isCaret, isEmpty := lute.isCaret(n)
+			if isCaret {
+				node.Type = ast.NodeText
+				node.Tokens = util.CaretTokens
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
+			if isEmpty {
+				return
+			}
+
+			content = lute.domAttrValue(n, "data-content")
+			if "" == content {
+				content = strings.ReplaceAll(n.FirstChild.Data, parse.Zwsp, "")
+			}
+			content = html.UnescapeHTMLStr(content)
+
+			node.Type = ast.NodeTextMark
+			node.Tokens = []byte(dataType)
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkOpenMarker})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(content)})
+			node.AppendChild(&ast.Node{Type: ast.NodeTextMarkCloseMarker})
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
