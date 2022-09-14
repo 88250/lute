@@ -138,7 +138,6 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 				typ := tags[len("<span data-type=")+1:]
 				typ = typ[:bytes.Index(typ, []byte("\""))]
 				ret = &ast.Node{Type: ast.NodeTextMark, TextMarkType: string(typ)}
-				ret.Tokens = tokens
 				SetTextMarkNode(ret, nodes[0])
 				ctx.pos += end + closerLen
 				return
@@ -541,7 +540,7 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 		dataType = n.DataAtom.String()
 	}
 	node.TextMarkType = dataType
-	node.Tokens = util.DomHTML(n)
+	node.Tokens = nil
 	types := strings.Split(dataType, " ")
 	for _, typ := range types {
 		switch typ {

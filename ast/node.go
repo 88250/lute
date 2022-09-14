@@ -305,6 +305,8 @@ func (n *Node) Text() (ret string) {
 		switch n.Type {
 		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockRefDynamicText, NodeFileAnnotationRefText, NodeFootnotesRef:
 			buf.Write(n.Tokens)
+		case NodeTextMark:
+			buf.WriteString(n.TextMarkTextContent)
 		}
 		return WalkContinue
 	})
@@ -321,6 +323,8 @@ func (n *Node) TextLen() (ret int) {
 		switch n.Type {
 		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockRefDynamicText, NodeFileAnnotationRefText, NodeFootnotesRef:
 			buf = append(buf, n.Tokens...)
+		case NodeTextMark:
+			buf = append(buf, n.TextMarkTextContent...)
 		}
 		return WalkContinue
 	})
@@ -340,6 +344,8 @@ func (n *Node) Content() (ret string) {
 			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
 			NodeGitConflictContent:
 			buf.Write(n.Tokens)
+		case NodeTextMark:
+			buf.WriteString(n.TextMarkTextContent)
 		}
 		return WalkContinue
 	})
@@ -359,6 +365,8 @@ func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 			NodeHTMLEntity, NodeEmojiAlias, NodeEmojiUnicode, NodeBackslashContent, NodeYamlFrontMatterContent,
 			NodeGitConflictContent:
 			buf = append(buf, n.Tokens...)
+		case NodeTextMark:
+			buf = append(buf, n.TextMarkTextContent...)
 		}
 		if n.IsBlock() {
 			buf = append(buf, ' ')
