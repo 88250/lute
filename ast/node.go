@@ -345,7 +345,12 @@ func (n *Node) Content() (ret string) {
 			NodeGitConflictContent:
 			buf.Write(n.Tokens)
 		case NodeTextMark:
-			buf.WriteString(n.TextMarkTextContent)
+			if "" != n.TextMarkInlineMathContent {
+				buf.WriteString(n.TextMarkInlineMathContent)
+			}
+			if "" != n.TextMarkTextContent {
+				buf.WriteString(n.TextMarkTextContent)
+			}
 		}
 		return WalkContinue
 	})
@@ -366,7 +371,12 @@ func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 			NodeGitConflictContent:
 			buf = append(buf, n.Tokens...)
 		case NodeTextMark:
-			buf = append(buf, n.TextMarkTextContent...)
+			if 0 < len(n.TextMarkInlineMathContent) {
+				buf = append(buf, n.TextMarkInlineMathContent...)
+			}
+			if 0 < len(n.TextMarkTextContent) {
+				buf = append(buf, n.TextMarkTextContent...)
+			}
 		}
 		if n.IsBlock() {
 			buf = append(buf, ' ')
