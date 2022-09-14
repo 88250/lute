@@ -1201,8 +1201,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			parse.SetSpanIAL(tree.Context.Tip.LastChild, img)
 			return
-		} else if "" == "sub" {
-			// TODO
 		} else if "backslash" == dataType {
 			node.Type = ast.NodeBackslash
 			if nil == n.FirstChild {
