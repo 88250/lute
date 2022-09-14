@@ -71,52 +71,6 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 			n = t.parseText(ctx)
 		}
 
-		if t.Context.ParseOption.ProtyleWYSIWYG && nil != n {
-			if ast.NodeKbdCloseMarker == n.Type {
-				var kbd *ast.Node
-				var children []*ast.Node
-				for kbd = block.LastChild; nil != kbd; kbd = kbd.Previous {
-					if ast.NodeKbd == kbd.Type {
-						break
-					}
-					children = append(children, kbd)
-				}
-				if nil == kbd {
-					n.Type = ast.NodeText
-					n.Tokens = []byte("</kbd>")
-				} else {
-					openMarker := kbd.FirstChild
-					for _, c := range children {
-						kbd.PrependChild(c)
-					}
-					kbd.PrependChild(openMarker)
-					kbd.AppendChild(n)
-					continue
-				}
-			} else if ast.NodeUnderlineCloseMarker == n.Type {
-				var underline *ast.Node
-				var children []*ast.Node
-				for underline = block.LastChild; nil != underline; underline = underline.Previous {
-					if ast.NodeUnderline == underline.Type {
-						break
-					}
-					children = append(children, underline)
-				}
-				if nil == underline {
-					n.Type = ast.NodeText
-					n.Tokens = []byte("</u>")
-				} else {
-					openMarker := underline.FirstChild
-					for _, c := range children {
-						underline.PrependChild(c)
-					}
-					underline.PrependChild(openMarker)
-					underline.AppendChild(n)
-					continue
-				}
-			}
-		}
-
 		if nil != n {
 			block.AppendChild(n)
 		}
