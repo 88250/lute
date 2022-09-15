@@ -25,15 +25,15 @@ import (
 	"github.com/88250/lute/util"
 )
 
-// BlockRenderer 描述了 Protyle WYSIWYG Block DOM 渲染器。
-type BlockRenderer struct {
+// ProtyleRenderer 描述了 Protyle WYSIWYG Block DOM 渲染器。
+type ProtyleRenderer struct {
 	*BaseRenderer
 	NodeIndex int
 }
 
-// NewBlockRenderer 创建一个 WYSIWYG Block DOM 渲染器。
-func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
-	ret := &BlockRenderer{BaseRenderer: NewBaseRenderer(tree, options), NodeIndex: options.NodeIndexStart}
+// NewProtyleRenderer 创建一个 WYSIWYG Block DOM 渲染器。
+func NewProtyleRenderer(tree *parse.Tree, options *Options) *ProtyleRenderer {
+	ret := &ProtyleRenderer{BaseRenderer: NewBaseRenderer(tree, options), NodeIndex: options.NodeIndexStart}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -168,7 +168,7 @@ func NewBlockRenderer(tree *parse.Tree, options *Options) *BlockRenderer {
 	return ret
 }
 
-func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
 			if r.Options.AutoSpace {
@@ -209,50 +209,50 @@ func (r *BlockRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<br />")
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderUnderline(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderUnderline(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderUnderlineOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderUnderlineOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<u>")
+		r.Tag("span", [][]string{{"data-type", "u"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderUnderlineCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderUnderlineCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("</u>")
+		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<kbd>")
+		r.Tag("span", [][]string{{"data-type", "kbd"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderKbdCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderKbdCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("</kbd>")
+		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		script := node.ChildByType(ast.NodeBlockQueryEmbedScript)
 		if nil == script {
@@ -273,11 +273,11 @@ func (r *BlockRenderer) renderBlockQueryEmbed(node *ast.Node, entering bool) ast
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockQueryEmbedScript(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
@@ -302,7 +302,7 @@ func (r *BlockRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkStatu
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
@@ -325,7 +325,7 @@ func (r *BlockRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkStatu
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
@@ -350,7 +350,7 @@ func (r *BlockRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
@@ -374,7 +374,7 @@ func (r *BlockRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
+func (r *ProtyleRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
 	src1 := append([]byte(" src=\""), src...)
 	src1 = append(src1, []byte("\"")...)
 	dataSrc1 := append([]byte(" src=\""), dataSrc...)
@@ -386,7 +386,7 @@ func (r *BlockRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
 	return bytes.ReplaceAll(tokens, dataSrc1, src1)
 }
 
-func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idNode := node.ChildByType(ast.NodeBlockRefID)
 		var refText, subtype string
@@ -410,7 +410,7 @@ func (r *BlockRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) escapeRefText(refText string) string {
+func (r *ProtyleRenderer) escapeRefText(refText string) string {
 	refText = strings.ReplaceAll(refText, ">", "&gt;")
 	refText = strings.ReplaceAll(refText, "<", "&lt;")
 	refText = strings.ReplaceAll(refText, "\"", "&quot;")
@@ -418,23 +418,23 @@ func (r *BlockRenderer) escapeRefText(refText string) string {
 	return refText
 }
 
-func (r *BlockRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBlockRefDynamicText(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockRefDynamicText(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idNode := node.ChildByType(ast.NodeFileAnnotationRefID)
 		id := idNode.TokensStr()
@@ -452,23 +452,23 @@ func (r *BlockRenderer) renderFileAnnotationRef(node *ast.Node, entering bool) a
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderFileAnnotationRefID(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderFileAnnotationRefID(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderFileAnnotationRefSpace(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderFileAnnotationRefText(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderGitConflictCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderGitConflictContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderGitConflictContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "git-conflict")
@@ -487,15 +487,15 @@ func (r *BlockRenderer) renderGitConflictContent(node *ast.Node, entering bool) 
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderGitConflictOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderGitConflictOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderGitConflict(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderGitConflict(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.TextAutoSpacePrevious(node)
 	} else {
@@ -504,7 +504,7 @@ func (r *BlockRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus 
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		content := node.Parent.Text()
 		content = strings.ReplaceAll(content, editor.Caret, "")
@@ -513,14 +513,14 @@ func (r *BlockRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.W
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if nil == node.FirstChild {
 			return ast.WalkContinue
@@ -541,19 +541,19 @@ func (r *BlockRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSuperBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSuperBlockLayoutMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSuperBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<div data-block=\"0\" data-type=\"link-ref-defs-block\">")
 	} else {
@@ -562,7 +562,7 @@ func (r *BlockRenderer) renderLinkRefDefBlock(node *ast.Node, entering bool) ast
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if nil == node.FirstChild {
 			return ast.WalkContinue
@@ -579,15 +579,15 @@ func (r *BlockRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkSkipChildren
 }
 
-func (r *BlockRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.TextAutoSpacePrevious(node)
 	} else {
@@ -596,75 +596,75 @@ func (r *BlockRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("mark", nil, false)
+		r.Tag("span", [][]string{{"data-type", "mark"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/mark", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("mark", nil, false)
+		r.Tag("span", [][]string{{"data-type", "mark"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMark2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/mark", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSup(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("sup", nil, false)
+		r.Tag("span", [][]string{{"data-type", "sup"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/sup", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSub(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("sub", nil, false)
+		r.Tag("span", [][]string{{"data-type", "sub"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/sub", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		previewTokens := bytes.TrimSpace(node.Tokens)
 		codeLen := len(previewTokens)
@@ -681,11 +681,11 @@ func (r *BlockRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bo
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString(`<div class="protyle-wysiwyg__block" data-type="yaml-front-matter" data-block="0">`)
 	} else {
@@ -694,7 +694,7 @@ func (r *BlockRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		return ast.WalkContinue
 	}
@@ -715,14 +715,14 @@ func (r *BlockRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBackslashContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Write(html.EscapeHTML(node.Tokens))
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<span data-type=\"backslash\">")
 		r.WriteString("<span>")
@@ -734,11 +734,11 @@ func (r *BlockRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderToC(node *ast.Node, entering bool) ast.WalkStatus {
 	return r.BaseRenderer.renderToC(node, entering)
 }
 
-func (r *BlockRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<div class=\"footnotes-defs-div\">")
 		r.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
@@ -749,7 +749,7 @@ func (r *BlockRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) a
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		// r.WriteString("<li id=\"footnotes-def-" + node.FootnotesRefId + "\">")
 		// 在 li 上带 id 后，Pandoc HTML 转换 Docx 会有问题
@@ -764,7 +764,7 @@ func (r *BlockRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
 		idxStr := strconv.Itoa(idx)
@@ -777,7 +777,7 @@ func (r *BlockRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.Wa
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	noHighlight := false
 	var language string
 	if nil != node.FirstChild && nil != node.FirstChild.Next && 0 < len(node.FirstChild.Next.CodeBlockInfo) {
@@ -820,15 +820,15 @@ func (r *BlockRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeBlockInfoMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		return ast.WalkContinue
 	}
@@ -878,33 +878,33 @@ func (r *BlockRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.W
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmojiAlias(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmojiImg(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Write(node.Tokens)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmojiUnicode(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Write(node.Tokens)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderInlineMath(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if r.Options.AutoSpace {
 			if text := node.PreviousNodeText(); "" != text {
@@ -927,7 +927,7 @@ func (r *BlockRenderer) renderInlineMath(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := html.EscapeHTML(node.Next.Tokens)
 		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
@@ -936,11 +936,11 @@ func (r *BlockRenderer) renderInlineMathOpenMarker(node *ast.Node, entering bool
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("/span", nil, false)
 		if bytes.Contains(node.Previous.Tokens, editor.CaretTokens) {
@@ -950,7 +950,7 @@ func (r *BlockRenderer) renderInlineMathCloseMarker(node *ast.Node, entering boo
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		return ast.WalkContinue
 	}
@@ -974,19 +974,19 @@ func (r *BlockRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMathBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMathBlockContent(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderMathBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
 	tag := "td"
 	if ast.NodeTableHead == node.Parent.Parent.Type {
 		tag = "th"
@@ -1009,7 +1009,7 @@ func (r *BlockRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("tr", nil, false)
 	} else {
@@ -1018,7 +1018,7 @@ func (r *BlockRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("colgroup", nil, false)
 		if colgroup := node.Parent.IALAttr("colgroup"); "" == colgroup {
@@ -1053,7 +1053,7 @@ func (r *BlockRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if nil == node.FirstChild {
 		return ast.WalkSkipChildren
 	}
@@ -1079,7 +1079,7 @@ func (r *BlockRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatu
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.TextAutoSpacePrevious(node)
 	} else {
@@ -1088,47 +1088,47 @@ func (r *BlockRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.W
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("s", nil, false)
+		r.Tag("span", [][]string{{"data-type", "s"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/s", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("s", nil, false)
+		r.Tag("span", [][]string{{"data-type", "s"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrikethrough2CloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/s", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderLinkSpace(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if ast.NodeImage != node.Parent.Type {
 			r.Write(html.EscapeHTML(node.Tokens))
@@ -1137,43 +1137,43 @@ func (r *BlockRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCloseParen(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderOpenParen(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderLess(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderLess(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderGreater(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderGreater(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCloseBrace(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCloseBrace(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderOpenBrace(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderOpenBrace(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCloseBracket(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderOpenBracket(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
 		parentStyle := node.IALAttr("parent-style")
@@ -1260,7 +1260,7 @@ func (r *BlockRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatu
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		dest := node.ChildByType(ast.NodeLinkDest)
 		destTokens := dest.Tokens
@@ -1300,7 +1300,7 @@ func (r *BlockRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatus
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		return ast.WalkContinue
 	}
@@ -1324,7 +1324,7 @@ func (r *BlockRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
 		return ast.WalkContinue
 	}
@@ -1344,11 +1344,11 @@ func (r *BlockRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "p")
@@ -1365,7 +1365,7 @@ func (r *BlockRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var tokens []byte
 		if r.Options.AutoSpace && ast.NodeKbd != node.Parent.Type {
@@ -1388,7 +1388,7 @@ func (r *BlockRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if r.Options.AutoSpace {
 			if text := node.PreviousNodeText(); "" != text {
@@ -1411,14 +1411,14 @@ func (r *BlockRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("code", nil, false)
+		r.Tag("span", [][]string{{"data-type", "code"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := html.EscapeHTML(node.Tokens)
 		r.Write(tokens)
@@ -1426,14 +1426,14 @@ func (r *BlockRenderer) renderCodeSpanContent(node *ast.Node, entering bool) ast
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderCodeSpanCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("</code>")
+		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.TextAutoSpacePrevious(node)
 	} else {
@@ -1442,35 +1442,35 @@ func (r *BlockRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", nil, false)
+		r.Tag("span", [][]string{{"data-type", "em"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/em", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", nil, false)
+		r.Tag("span", [][]string{{"data-type", "em"}}, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderEmUnderscoreCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/em", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.TextAutoSpacePrevious(node)
 	} else {
@@ -1479,37 +1479,39 @@ func (r *BlockRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var attrs [][]string
+		attrs := [][]string{{"data-type", "strong"}}
 		r.spanNodeAttrs(node.Parent, &attrs)
-		r.Tag("strong", attrs, false)
+		r.Tag("span", attrs, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/strong", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("strong", nil, false)
+		attrs := [][]string{{"data-type", "strong"}}
+		r.spanNodeAttrs(node.Parent, &attrs)
+		r.Tag("span", attrs, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("/strong", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "bq")
@@ -1521,11 +1523,11 @@ func (r *BlockRenderer) renderBlockquote(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		if 6 < node.HeadingLevel {
@@ -1547,15 +1549,15 @@ func (r *BlockRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkSta
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderHeadingC8hMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderHeadingID(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		switch node.ListData.Typ {
@@ -1575,7 +1577,7 @@ func (r *BlockRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		class := "li"
 		var attrs [][]string
@@ -1614,7 +1616,7 @@ func (r *BlockRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if node.TaskListItemChecked {
 			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"true\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
@@ -1628,7 +1630,7 @@ func (r *BlockRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) 
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "hr")
@@ -1641,11 +1643,11 @@ func (r *BlockRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.W
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderHardBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	return r.renderBr(node, entering)
 }
 
-func (r *BlockRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
+func (r *ProtyleRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemNewline)
 		if nil != node.Previous && (ast.NodeStrong == node.Previous.Type ||
@@ -1661,11 +1663,11 @@ func (r *BlockRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.WalkS
 	return ast.WalkContinue
 }
 
-func (r *BlockRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
+func (r *ProtyleRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
 	*attrs = append(*attrs, node.KramdownIAL...)
 }
 
-func (r *BlockRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class string) {
+func (r *ProtyleRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class string) {
 	r.nodeID(node, attrs)
 	r.nodeIndex(node, attrs)
 	r.nodeDataType(node, attrs)
@@ -1679,19 +1681,19 @@ func (r *BlockRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class 
 	}
 }
 
-func (r *BlockRenderer) nodeClass(node *ast.Node, attrs *[][]string, class string) {
+func (r *ProtyleRenderer) nodeClass(node *ast.Node, attrs *[][]string, class string) {
 	*attrs = append(*attrs, []string{"class", class})
 }
 
-func (r *BlockRenderer) nodeDataType(node *ast.Node, attrs *[][]string) {
+func (r *ProtyleRenderer) nodeDataType(node *ast.Node, attrs *[][]string) {
 	*attrs = append(*attrs, []string{"data-type", node.Type.String()})
 }
 
-func (r *BlockRenderer) nodeID(node *ast.Node, attrs *[][]string) {
+func (r *ProtyleRenderer) nodeID(node *ast.Node, attrs *[][]string) {
 	*attrs = append(*attrs, []string{"data-node-id", r.NodeID(node)})
 }
 
-func (r *BlockRenderer) nodeIndex(node *ast.Node, attrs *[][]string) {
+func (r *ProtyleRenderer) nodeIndex(node *ast.Node, attrs *[][]string) {
 	if nil == node.Parent || ast.NodeDocument != node.Parent.Type {
 		return
 	}
@@ -1701,12 +1703,12 @@ func (r *BlockRenderer) nodeIndex(node *ast.Node, attrs *[][]string) {
 	return
 }
 
-func (r *BlockRenderer) spellcheck(attrs *[][]string) {
+func (r *ProtyleRenderer) spellcheck(attrs *[][]string) {
 	*attrs = append(*attrs, []string{"spellcheck", "false"})
 	return
 }
 
-func (r *BlockRenderer) contenteditable(node *ast.Node, attrs *[][]string) {
+func (r *ProtyleRenderer) contenteditable(node *ast.Node, attrs *[][]string) {
 	if contenteditable := node.IALAttr("contenteditable"); "" != contenteditable {
 		*attrs = append(*attrs, []string{"contenteditable", contenteditable})
 	} else {
@@ -1715,7 +1717,7 @@ func (r *BlockRenderer) contenteditable(node *ast.Node, attrs *[][]string) {
 	return
 }
 
-func (r *BlockRenderer) renderIAL(node *ast.Node) {
+func (r *ProtyleRenderer) renderIAL(node *ast.Node) {
 	attrs := [][]string{{"class", "protyle-attr"}, {"contenteditable", "false"}}
 	r.Tag("div", attrs, false)
 
@@ -1765,7 +1767,7 @@ func (r *BlockRenderer) renderIAL(node *ast.Node) {
 	r.Tag("/div", nil, false)
 }
 
-func (r *BlockRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
+func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 	attrs = [][]string{{"data-type", node.TextMarkType}}
 
 	types := strings.Split(node.TextMarkType, " ")

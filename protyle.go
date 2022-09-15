@@ -62,7 +62,7 @@ func (lute *Lute) HTML2BlockDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.HTML2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -108,7 +108,7 @@ func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 		tree.Root.AppendChild(n)
 	}
 
-	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
 	output := renderer.Render()
 	vIHTML = util.BytesToStr(output)
 	return
@@ -116,7 +116,7 @@ func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 
 func (lute *Lute) Md2BlockDOM(markdown string) (vHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -127,7 +127,7 @@ func (lute *Lute) Md2BlockDOM(markdown string) (vHTML string) {
 
 func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewBlockRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -191,7 +191,7 @@ func (lute *Lute) BlockDOM2Content(htmlStr string) (text string) {
 }
 
 func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
-	renderer := render.NewBlockRenderer(tree, options)
+	renderer := render.NewProtyleRenderer(tree, options)
 	output := renderer.Render()
 	vHTML = util.BytesToStr(output)
 	vHTML = strings.ReplaceAll(vHTML, editor.Caret, "<wbr>")
@@ -201,7 +201,7 @@ func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTM
 func RenderNodeBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
 	root := &ast.Node{Type: ast.NodeDocument}
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
-	renderer := render.NewBlockRenderer(tree, renderOptions)
+	renderer := render.NewProtyleRenderer(tree, renderOptions)
 	renderer.Writer = &bytes.Buffer{}
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		rendererFunc := renderer.RendererFuncs[n.Type]
