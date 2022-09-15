@@ -13,6 +13,7 @@ package ast
 import (
 	"bytes"
 	"math/rand"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -202,6 +203,26 @@ func randStr(length int) string {
 		b[i] = letter[rand.Intn(len(letter))]
 	}
 	return string(b)
+}
+
+func (n *Node) IsSameTextMarkType(node *Node) bool {
+	if "" == n.TextMarkType || "" == node.TextMarkType {
+		return false
+	}
+
+	a := strings.Split(n.TextMarkType, " ")
+	b := strings.Split(node.TextMarkType, " ")
+	if len(a) != len(b) {
+		return false
+	}
+	sort.Strings(a)
+	sort.Strings(b)
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // ClearIALAttrs 用于删除 name、alias、memo 和 bookmark 以及所有 custom- 前缀属性。

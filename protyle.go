@@ -268,7 +268,9 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 					n.Next.Unlink()
 				}
 			case ast.NodeStrong, ast.NodeEmphasis, ast.NodeStrikethrough, ast.NodeUnderline:
-				lute.MergeSameSpan(n, n.Type)
+				lute.MergeSameSpan(n)
+			case ast.NodeTextMark:
+				lute.MergeSameTextMark(n)
 			case ast.NodeText:
 				n.Tokens = bytes.ReplaceAll(n.Tokens, []byte("\u00a0"), []byte(" "))
 			}
@@ -278,8 +280,40 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	return
 }
 
-func (lute *Lute) MergeSameSpan(n *ast.Node, typ ast.NodeType) {
-	if nil == n.Next || typ != n.Next.Type {
+func (lute *Lute) MergeSameTextMark(n *ast.Node) {
+	if nil == n.Next || n.Type != n.Next.Type || !n.IsSameTextMarkType(n.Next) {
+		return
+	}
+
+	if nil != n.Next.Next && ast.NodeKramdownSpanIAL == n.Next.Next.Type {
+		return
+	}
+
+	types := strings.Split(n.TextMarkType, " ")
+	m := map[string]bool{}
+	for _, t := range types {
+		m[t] = true
+	}
+	var allowMerge []string
+	for k, _ := range m {
+		switch k {
+		case "code", "em", "strong", "s", "mark", "u", "sub", "sup", "kbd":
+			allowMerge = append(allowMerge, k)
+		}
+	}
+	for _, k := range allowMerge {
+		delete(m, k)
+	}
+	if 0 < len(m) {
+		return
+	}
+
+	n.TextMarkTextContent += n.Next.TextMarkTextContent
+	n.Next.Unlink()
+}
+
+func (lute *Lute) MergeSameSpan(n *ast.Node) {
+	if nil == n.Next || n.Type != n.Next.Type {
 		return
 	}
 	if nil != n.Next.Next && ast.NodeKramdownSpanIAL == n.Next.Next.Type {
