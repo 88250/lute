@@ -167,7 +167,17 @@ func NewBlockExportRenderer(tree *parse.Tree, options *Options) *BlockExportRend
 
 func (r *BlockExportRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.Tokens)
+		attrs := r.renderTextMarkAttrs(node)
+		r.spanNodeAttrs(node, &attrs)
+		r.Tag("span", attrs, false)
+		textContent := node.TextMarkTextContent
+		if node.ParentIs(ast.NodeTableCell) {
+			textContent = strings.ReplaceAll(textContent, "\\|", "|")
+			textContent = strings.ReplaceAll(textContent, "\n", "<br />")
+		}
+		r.WriteString(textContent)
+	} else {
+		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }
@@ -1669,4 +1679,35 @@ func (r *BlockExportRenderer) renderIAL(node *ast.Node) {
 	}
 
 	r.Tag("/div", nil, false)
+}
+
+
+func (r *BlockExportRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
+	attrs = [][]string{{"data-type", node.TextMarkType}}
+
+	types := strings.Split(node.TextMarkType, " ")
+	for _, typ := range types {
+		if "block-ref" == typ {
+			attrs = append(attrs, []string{"data-subtype", node.TextMarkBlockRefSubtype})
+			attrs = append(attrs, []string{"data-id", node.TextMarkBlockRefID})
+		} else if "a" == typ {
+			attrs = append(attrs, []string{"data-href", node.TextMarkAHref})
+			if "" != node.TextMarkATitle {
+				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
+			}
+		} else if "inline-math" == typ {
+			attrs = append(attrs, []string{"data-subtype", "math"})
+			inlineMathContent := node.TextMarkInlineMathContent
+			if node.ParentIs(ast.NodeTableCell) {
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
+			}
+			attrs = append(attrs, []string{"data-content", inlineMathContent})
+			attrs = append(attrs, []string{"contenteditable", "false"})
+			attrs = append(attrs, []string{"class", "render-node"})
+		} else if "file-annotation-ref" == typ {
+			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
+		}
+	}
+	return
 }

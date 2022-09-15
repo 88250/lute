@@ -1792,6 +1792,5 @@ func (r *BlockRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
 		}
 	}
-
 	return
 }
