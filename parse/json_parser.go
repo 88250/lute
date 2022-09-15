@@ -48,7 +48,7 @@ func ParseJSON(jsonData []byte, options *Options) (ret *Tree, needFix bool, err 
 		return
 	}
 
-	ret = &Tree{Name: "", ID: root.ID, Root: &ast.Node{Type: ast.NodeDocument, ID: root.ID}, Context: &Context{ParseOption: options}}
+	ret = &Tree{Name: "", ID: root.ID, Root: &ast.Node{Type: ast.NodeDocument, ID: root.ID, Spec: root.Spec}, Context: &Context{ParseOption: options}}
 	ret.Root.KramdownIAL = Map2IAL(root.Properties)
 	for _, kv := range ret.Root.KramdownIAL {
 		if strings.Contains(kv[1], "\n") {
