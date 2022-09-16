@@ -1265,6 +1265,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 
 			tree.Context.Tip.AppendChild(node)
+
+			if "search-mark" == dataType {
+				// 搜索高亮标记认为是普通文本
+				node.Type = ast.NodeText
+				node.Tokens = []byte(util.DomText(n))
+				return
+			}
+
 			parse.SetTextMarkNode(node, n)
 			return
 		}

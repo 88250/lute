@@ -539,13 +539,6 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 	if "" == dataType {
 		dataType = n.DataAtom.String()
 	}
-	if "search-mark" == dataType {
-		// 搜索高亮标记认为是普通文本
-		node.Type = ast.NodeText
-		node.Tokens = []byte(util.DomText(n))
-		return
-	}
-
 	node.TextMarkType = dataType
 	node.Tokens = nil
 	types := strings.Split(dataType, " ")
