@@ -205,6 +205,16 @@ func randStr(length int) string {
 	return string(b)
 }
 
+func (n *Node) IsTextMarkType(typ string) bool {
+	types := strings.Split(n.TextMarkType, " ")
+	for _, t := range types {
+		if typ == t {
+			return true
+		}
+	}
+	return false
+}
+
 func (n *Node) IsSameTextMarkType(node *Node) bool {
 	if "" == n.TextMarkType || "" == node.TextMarkType {
 		return false
