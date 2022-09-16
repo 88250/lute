@@ -161,14 +161,13 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 		return ast.WalkContinue
 	})
 
-	// 将 AST 进行 Markdown 格式化渲染
 	options := render.NewOptions()
 	options.AutoSpace = false
 	options.FixTermTypo = false
 	options.KramdownBlockIAL = true
 	options.KramdownSpanIAL = true
 	options.KeepParagraphBeginningSpace = true
-	renderer := render.NewFormatRenderer(tree, options)
+	renderer := render.NewProtyleExportMdRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = util.BytesToStr(formatted)
 	markdown = strings.ReplaceAll(markdown, editor.Zwsp, "")
