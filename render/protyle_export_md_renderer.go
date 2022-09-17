@@ -215,6 +215,10 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 			} else {
 				ret += "$"
 			}
+		case "inline-memo":
+			if entering {
+				ret += node.TextMarkTextContent
+			}
 		case "strong":
 			ret += "**"
 		case "em":

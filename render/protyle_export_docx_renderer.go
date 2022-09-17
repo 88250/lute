@@ -1360,6 +1360,9 @@ func (r *ProtyleExportDocxRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [
 			attrs = append(attrs, []string{"class", "render-node"})
 		} else if "file-annotation-ref" == typ {
 			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
+		} else if "inline-memo" == typ {
+			inlineMemoContent := node.TextMarkInlineMemoContent
+			attrs = append(attrs, []string{"data-inline-memo-content", inlineMemoContent})
 		}
 	}
 	return

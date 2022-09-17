@@ -29,6 +29,13 @@ func GetTextMarkTextData(n *html.Node) (content string) {
 	return
 }
 
+func GetTextMarkInlineMemoData(n *html.Node) (content string) {
+	content = DomAttrValue(n, "data-inline-memo-content")
+	content = strings.ReplaceAll(content, editor.Zwsp, "")
+	content = html.UnescapeHTMLStr(content)
+	return
+}
+
 func GetTextMarkAData(n *html.Node) (href, title string) {
 	href = DomAttrValue(n, "data-href")
 	title = DomAttrValue(n, "data-title")

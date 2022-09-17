@@ -1126,6 +1126,28 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
 			tree.Context.Tip.AppendChild(node)
 			return
+		} else if "inline-memo" == dataType {
+			isCaret, isEmpty := lute.isCaret(n)
+			if isCaret {
+				node.Type = ast.NodeText
+				node.Tokens = editor.CaretTokens
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
+			if isEmpty {
+				return
+			}
+
+			if lute.ParseOptions.TextMark {
+				tree.Context.Tip.AppendChild(node)
+				parse.SetTextMarkNode(node, n)
+				return
+			}
+
+			node.Type = ast.NodeText
+			node.Tokens = util.StrToBytes(util.DomText(n))
+			tree.Context.Tip.AppendChild(node)
+			return
 		} else if "a" == dataType {
 			if nil == n.FirstChild {
 				// 丢弃没有锚文本的链接

@@ -123,6 +123,7 @@ type Node struct {
 	TextMarkAHref               string `json:",omitempty"` // 文本标记超链接 data-href 属性
 	TextMarkATitle              string `json:",omitempty"` // 文本标记超链接 data-title 属性
 	TextMarkInlineMathContent   string `json:",omitempty"` // 文本标记内联数学公式内容 data-content 属性
+	TextMarkInlineMemoContent   string `json:",omitempty"` // 文本标记内联备注内容 data-inline-memo-content 属性
 	TextMarkBlockRefID          string `json:",omitempty"` // 文本标记块引用 ID data-id 属性
 	TextMarkBlockRefSubtype     string `json:",omitempty"` // 文本标记块引用子类型（静态/动态锚文本） data-subtype 属性
 	TextMarkFileAnnotationRefID string `json:",omitempty"` // 文本标记文件注解引用 ID data-id 属性

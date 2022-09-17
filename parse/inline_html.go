@@ -555,6 +555,9 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 		case "file-annotation-ref":
 			node.TextMarkFileAnnotationRefID = util.GetTextMarkFileAnnotationRefData(n)
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
+		case "inline-memo":
+			node.TextMarkTextContent = util.GetTextMarkTextData(n)
+			node.TextMarkInlineMemoContent = util.GetTextMarkInlineMemoData(n)
 		default:
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
 		}
