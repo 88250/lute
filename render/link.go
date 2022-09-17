@@ -38,8 +38,6 @@ func (r *BaseRenderer) RelativePath(dest []byte) []byte {
 	}
 
 	if !r.isRelativePath(dest) {
-		// 强制将 %5C 即反斜杠 \ 转换为斜杠 / 以兼容 Windows 平台上使用的路径
-		dest = bytes.ReplaceAll(dest, []byte("%5C"), []byte("\\"))
 		return dest
 	}
 

@@ -18,7 +18,7 @@ import (
 
 var linkBaseTests = []parseTest{
 	{"3", "[foo][^label]\n[^label]: bar\n", "<p><sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"http://domain.com/path/#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar <a href=\"#footnotes-ref-1\" class=\"vditor-footnotes__goto-ref\">↩</a></p>\n</li>\n</ol></div>"},
-	{"2", "![foo](D:\\bar.png)\n", "<p><img src=\"D:\\bar.png\" alt=\"foo\" /></p>\n"},
+	{"2", "![foo](D:\\bar.png)\n", "<p><img src=\"D:%5Cbar.png\" alt=\"foo\" /></p>\n"},
 	{"1", "![foo](bar.png)\n", "<p><img src=\"http://domain.com/path/bar.png\" alt=\"foo\" /></p>\n"},
 	{"0", "[foo](bar.png)\n", "<p><a href=\"http://domain.com/path/bar.png\">foo</a></p>\n"},
 }
