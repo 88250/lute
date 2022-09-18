@@ -172,17 +172,43 @@ func (r *ProtylePreviewRenderer) Render() (output []byte) {
 
 func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := r.renderTextMarkAttrs(node)
-		r.spanNodeAttrs(node, &attrs)
-		r.Tag("span", attrs, false)
 		textContent := node.TextMarkTextContent
 		if node.ParentIs(ast.NodeTableCell) {
 			textContent = strings.ReplaceAll(textContent, "\\|", "|")
 			textContent = strings.ReplaceAll(textContent, "\n", "<br />")
 		}
-		r.WriteString(textContent)
+
+		if node.IsTextMarkType("a") {
+			attrs := [][]string{{"href", node.TextMarkAHref}}
+			if "" != node.TextMarkATitle {
+				attrs = append(attrs, []string{"title", node.TextMarkATitle})
+			}
+			r.Tag("a", attrs, false)
+			r.WriteString(textContent)
+		} else if node.IsTextMarkType("inline-memo") {
+			r.WriteString(textContent)
+			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+			if isCJK(lastRune) {
+				r.WriteString("<sup>（")
+				r.WriteString(node.TextMarkInlineMemoContent)
+				r.WriteString("）</sup>")
+			} else {
+				r.WriteString("<sup>(")
+				r.WriteString(node.TextMarkInlineMemoContent)
+				r.WriteString(")</sup>")
+			}
+		} else {
+			attrs := r.renderTextMarkAttrs(node)
+			r.spanNodeAttrs(node, &attrs)
+			r.Tag("span", attrs, false)
+			r.WriteString(textContent)
+		}
 	} else {
-		r.WriteString("</span>")
+		if node.IsTextMarkType("a") {
+			r.WriteString("</a>")
+		} else {
+			r.WriteString("</span>")
+		}
 	}
 	return ast.WalkContinue
 }
