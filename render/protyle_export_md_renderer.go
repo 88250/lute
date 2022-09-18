@@ -171,8 +171,10 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 	if entering {
 		marker := r.renderMdMarker(node, entering)
 		r.WriteString(marker)
-		textContent := node.TextMarkTextContent
-		r.WriteString(textContent)
+		if !node.IsTextMarkType("a") {
+			textContent := node.TextMarkTextContent
+			r.WriteString(textContent)
+		}
 	} else {
 		marker := r.renderMdMarker(node, entering)
 		r.WriteString(marker)
@@ -217,7 +219,12 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 			}
 		case "inline-memo":
 			if entering {
-				ret += node.TextMarkTextContent
+				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+				if isCJK(lastRune) {
+					ret += "^（" + node.TextMarkTextContent + "）^"
+				} else {
+					ret += "^(" + node.TextMarkTextContent + ")^"
+				}
 			}
 		case "strong":
 			ret += "**"

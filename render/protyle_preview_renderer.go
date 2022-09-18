@@ -185,6 +185,7 @@ func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) a
 			}
 			r.Tag("a", attrs, false)
 			r.WriteString(textContent)
+			r.WriteString("</a>")
 		} else if node.IsTextMarkType("inline-memo") {
 			r.WriteString(textContent)
 			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
@@ -202,11 +203,6 @@ func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) a
 			r.spanNodeAttrs(node, &attrs)
 			r.Tag("span", attrs, false)
 			r.WriteString(textContent)
-		}
-	} else {
-		if node.IsTextMarkType("a") {
-			r.WriteString("</a>")
-		} else {
 			r.WriteString("</span>")
 		}
 	}
