@@ -173,6 +173,9 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 		r.WriteString(marker)
 		if !node.IsTextMarkType("a") {
 			textContent := node.TextMarkTextContent
+			if node.IsTextMarkType("code") {
+				textContent = html.UnescapeString(textContent)
+			}
 			r.WriteString(textContent)
 		}
 	} else {
