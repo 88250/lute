@@ -221,7 +221,6 @@ var (
 	formatRendererLock = sync.Mutex{}
 )
 
-// FormatNodeSync 使用指定的 options 格式化 node，返回格式化后的 Markdown 文本。
 func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) (ret string, err error) {
 	formatRendererLock.Lock()
 	defer formatRendererLock.Unlock()
@@ -248,6 +247,40 @@ func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *
 	formatRendererSync.Options = nil
 	formatRendererSync.Writer.Reset()
 	formatRendererSync.NodeWriterStack = nil
+	return
+}
+
+var (
+	protyleExportMdRendererSync = render.NewProtyleExportMdRenderer(nil, nil)
+	protyleExportMdRendererLock = sync.Mutex{}
+)
+
+func ProtyleExportMdNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) (ret string, err error) {
+	protyleExportMdRendererLock.Lock()
+	defer protyleExportMdRendererLock.Unlock()
+	defer util.RecoverPanic(&err)
+
+	root := &ast.Node{Type: ast.NodeDocument}
+	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
+	protyleExportMdRendererSync.Tree = tree
+	protyleExportMdRendererSync.Options = renderOptions
+	protyleExportMdRendererSync.LastOut = lex.ItemNewline
+	protyleExportMdRendererSync.NodeWriterStack = []*bytes.Buffer{protyleExportMdRendererSync.Writer}
+
+	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+		rendererFunc := protyleExportMdRendererSync.RendererFuncs[n.Type]
+		if nil == rendererFunc {
+			err = errors.New("not found renderer for node [type=" + n.Type.String() + "]")
+			return ast.WalkStop
+		}
+		return rendererFunc(n, entering)
+	})
+
+	ret = strings.TrimSpace(protyleExportMdRendererSync.Writer.String())
+	protyleExportMdRendererSync.Tree = nil
+	protyleExportMdRendererSync.Options = nil
+	protyleExportMdRendererSync.Writer.Reset()
+	protyleExportMdRendererSync.NodeWriterStack = nil
 	return
 }
 
