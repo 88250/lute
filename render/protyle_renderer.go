@@ -1776,7 +1776,22 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 			attrs = append(attrs, []string{"data-subtype", node.TextMarkBlockRefSubtype})
 			attrs = append(attrs, []string{"data-id", node.TextMarkBlockRefID})
 		} else if "a" == typ {
-			attrs = append(attrs, []string{"data-href", node.TextMarkAHref})
+			href := node.TextMarkAHref
+			href = string(r.LinkPath([]byte(href)))
+			if strings.HasPrefix(href, "assets/") {
+				if strings.Contains(href, "?") {
+					idx := strings.IndexByte(href, '?')
+					d := strings.ReplaceAll(href[:idx], "#", "%23")
+					href = d + href[idx:]
+				} else {
+					href = strings.ReplaceAll(href, "#", "%23")
+					href = strings.ReplaceAll(href, "&", "&amp;")
+				}
+			} else {
+				href = strings.ReplaceAll(href, "&", "&amp;")
+			}
+
+			attrs = append(attrs, []string{"data-href", href})
 			if "" != node.TextMarkATitle {
 				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
 			}

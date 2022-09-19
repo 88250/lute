@@ -14,7 +14,41 @@ import (
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
 )
+
+var inlineMd2BlockDOM = []parseTest{
+
+	{"0", "~**foo**~\u200b~bar~\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"sub strong\">foo</span>\u200b<span data-type=\"sub\">bar</span>\n</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+func TestInlineMd2BlockDOM(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetTag(true)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+	luteEngine.SetIndentCodeBlock(false)
+	luteEngine.SetEmojiSite("http://127.0.0.1:6806/stage/protyle/images/emoji")
+	luteEngine.SetAutoSpace(true)
+	luteEngine.SetParagraphBeginningSpace(true)
+	luteEngine.SetFileAnnotationRef(true)
+	luteEngine.SetTextMark(true)
+
+	ast.Testing = true
+	for _, test := range inlineMd2BlockDOM {
+		result := luteEngine.InlineMd2BlockDOM(test.from)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+}
 
 var blockDOM2InlineBlockDOM = []parseTest{
 
@@ -56,6 +90,7 @@ func TestBlockDOM2InlineBlockDOM(t *testing.T) {
 
 var blockDOM2StdMd = []parseTest{
 
+	{"9", "<span data-type=\"strong sub\">foo</span><span data-type=\"sub\">bar</span>", "~**foo**~\u200b~bar~\n"},
 	{"8", "<span data-type=\"strong em\">foo</span>", "***foo***\n"},
 	{"7", "<span data-type=\"inline-math\" data-subtype=\"math\" data-content=\"&amp;lt;foo&amp;gt;\" contenteditable=\"false\" class=\"render-node\" data-render=\"true\"><span class=\"katex\"><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height:0.5782em;vertical-align:-0.0391em;\"></span><span class=\"mrel\">&lt;</span><span class=\"mspace\" style=\"margin-right:0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height:0.8889em;vertical-align:-0.1944em;\"></span><span class=\"mord mathnormal\" style=\"margin-right:0.10764em;\">f</span><span class=\"mord mathnormal\">oo</span><span class=\"mspace\" style=\"margin-right:0.2778em;\"></span><span class=\"mrel\">&gt;</span></span></span></span></span>", "$<foo>$\n"},
 	{"6", "  foo", "  foo\n"},
