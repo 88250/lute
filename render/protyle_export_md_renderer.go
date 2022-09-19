@@ -171,7 +171,7 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 	if entering {
 		marker := r.renderMdMarker(node, entering)
 		r.WriteString(marker)
-		if !node.IsTextMarkType("a") {
+		if !node.IsTextMarkType("a") && !node.IsTextMarkType("inline-memo") {
 			textContent := node.TextMarkTextContent
 			if node.IsTextMarkType("code") {
 				textContent = html.UnescapeString(textContent)
@@ -223,10 +223,11 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 		case "inline-memo":
 			if entering {
 				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+				ret += node.TextMarkTextContent
 				if isCJK(lastRune) {
-					ret += "^（" + node.TextMarkTextContent + "）^"
+					ret += "^（" + node.TextMarkInlineMemoContent + "）^"
 				} else {
-					ret += "^(" + node.TextMarkTextContent + ")^"
+					ret += "^(" + node.TextMarkInlineMemoContent + ")^"
 				}
 			}
 		case "strong":
