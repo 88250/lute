@@ -250,15 +250,15 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 			}
 		case "sup":
 			if entering {
-				ret += "<sup>"
+				ret += "^"
 			} else {
-				ret += "</sup>"
+				ret += "^"
 			}
 		case "sub":
 			if entering {
-				ret += "<sub>"
+				ret += "~"
 			} else {
-				ret += "</sub>"
+				ret += "~"
 			}
 		case "kbd":
 			if entering {
