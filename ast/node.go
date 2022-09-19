@@ -384,6 +384,9 @@ func (n *Node) Content() (ret string) {
 			if "" != n.TextMarkTextContent {
 				buf.WriteString(n.TextMarkTextContent)
 			}
+			if "" != n.TextMarkInlineMemoContent {
+				buf.WriteString(n.TextMarkInlineMemoContent)
+			}
 		}
 		return WalkContinue
 	})
@@ -409,6 +412,9 @@ func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 			}
 			if 0 < len(n.TextMarkTextContent) {
 				buf = append(buf, n.TextMarkTextContent...)
+			}
+			if "" != n.TextMarkInlineMemoContent {
+				buf = append(buf, n.TextMarkInlineMemoContent...)
 			}
 		}
 		if n.IsBlock() {
