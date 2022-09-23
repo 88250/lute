@@ -382,7 +382,11 @@ func (n *Node) Content() (ret string) {
 				buf.WriteString(n.TextMarkInlineMathContent)
 			}
 			if "" != n.TextMarkTextContent {
-				buf.WriteString(n.TextMarkTextContent)
+				if n.IsTextMarkType("code") {
+					buf.WriteString(html.UnescapeString(n.TextMarkTextContent))
+				} else {
+					buf.WriteString(n.TextMarkTextContent)
+				}
 			}
 			if "" != n.TextMarkInlineMemoContent {
 				buf.WriteString(n.TextMarkInlineMemoContent)
