@@ -140,6 +140,21 @@ func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 
 // NestedInlines2FlattedSpans 将嵌套的行级节点转换为平铺的文本标记节点。
 func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
+	// 超链接嵌套图片情况下，图片子节点移到超链接节点前面
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeLink == n.Type {
+			img := n.ChildByType(ast.NodeImage)
+			if nil != img {
+				n.InsertBefore(img)
+			}
+		}
+		return ast.WalkContinue
+	})
+
 	var tags []string
 	var unlinks []*ast.Node
 	var span *ast.Node
