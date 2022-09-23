@@ -125,7 +125,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			if bytes.Equal(tags, []byte("<br />")) || bytes.Equal(tags, []byte("<br/>")) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
-			} else if bytes.HasPrefix(tags, []byte("<span ")) {
+			} else if bytes.HasPrefix(tags, []byte("<span data-type=")) {
 				remains := ctx.tokens[ctx.pos:]
 				end := bytes.Index(remains, []byte("</span>"))
 				closerLen := len("</span>")
