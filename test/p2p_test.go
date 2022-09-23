@@ -128,6 +128,37 @@ func TestBlockDOM2StdMd(t *testing.T) {
 	}
 }
 
+var blockDOM2Md = []parseTest{
+
+	{"0", "<div data-node-id=\"20220922151247-vp1f2n4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20220922153740\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"block-ref\" data-subtype=\"d\" data-id=\"20220922151244-p6ask52\">foo</span> bar </div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "((20220922151244-p6ask52 'foo')) bar \n{: id=\"20220922151247-vp1f2n4\" updated=\"20220922153740\"}\n"},
+}
+
+func TestBlockDOM2Md(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetTag(true)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+	luteEngine.SetIndentCodeBlock(false)
+	luteEngine.SetEmojiSite("http://127.0.0.1:6806/stage/protyle/images/emoji")
+	luteEngine.SetAutoSpace(true)
+	luteEngine.SetParagraphBeginningSpace(true)
+	luteEngine.SetFileAnnotationRef(true)
+
+	for _, test := range blockDOM2Md {
+		result := luteEngine.BlockDOM2Md(test.from)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+}
+
 var blockDOM2Content = []parseTest{
 
 	{"6", "foo&lt;&quot;&nbsp;<span data-type=\"inline-math\" data-subtype=\"math\" data-content=\"foo\" contenteditable=\"false\" class=\"render-node\"></span>&nbsp;<strong style=\"color: var(--b3-font-color8);\">bar</strong>&nbsp;&lt;baz&gt;", "foo<\" foo bar <baz>"},

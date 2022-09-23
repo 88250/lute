@@ -228,6 +228,12 @@ func processNestedNode(n *ast.Node, tag string, tags *[]string, unlinks *[]*ast.
 	}
 }
 
+func (lute *Lute) BlockDOM2Md(htmlStr string) (kramdown string) {
+	kramdown = lute.blockDOM2Md(htmlStr)
+	kramdown = strings.ReplaceAll(kramdown, editor.Zwsp, "")
+	return
+}
+
 func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, editor.Zwsp, "")
 
