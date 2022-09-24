@@ -184,7 +184,7 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 			processNestedNode(n, "kbd", &tags, &unlinks, entering)
 		case ast.NodeLink:
 			processNestedNode(n, "a", &tags, &unlinks, entering)
-		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText:
+		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText, ast.NodeBackslash:
 			if 1 > len(tags) {
 				return ast.WalkContinue
 			}
@@ -194,6 +194,10 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 				if ast.NodeInlineMathContent == n.Type {
 					span.TextMarkTextContent = ""
 					span.TextMarkInlineMathContent = string(html.EscapeHTML(n.Tokens))
+				} else if ast.NodeBackslash == n.Type {
+					if c := n.ChildByType(ast.NodeBackslashContent); nil != c {
+						span.TextMarkTextContent = string(html.EscapeHTML(c.Tokens))
+					}
 				}
 				if ast.NodeLinkText == n.Type && !n.ParentIs(ast.NodeImage) {
 					var link *ast.Node

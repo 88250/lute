@@ -20,6 +20,7 @@ import (
 
 var md2BlockDOMTests = []parseTest{
 
+	{"40", "**\\>**", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">&gt;</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"39", "<span id=\"tag\">foo</span>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">&lt;span id=&quot;tag&quot;&gt;foo&lt;/span&gt;</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"38", "`<img>`", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"code\">&lt;img&gt;</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"37", "foo<span data-type=\"inline-memo\" data-inline-memo-content=\"这里是对 bar 的备注\">bar</span>baz", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"inline-memo\" data-inline-memo-content=\"这里是对 bar 的备注\">bar</span>baz</div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div>"},
@@ -80,6 +81,7 @@ func TestMd2BlockDOM(t *testing.T) {
 	luteEngine.SetSanitize(true)
 	luteEngine.SetTextMark(true)
 	luteEngine.SetTag(true)
+	luteEngine.SetTextMark(true)
 
 	ast.Testing = true
 	for _, test := range md2BlockDOMTests {
