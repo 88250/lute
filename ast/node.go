@@ -516,9 +516,14 @@ func (n *Node) Unlink() {
 	n.Previous = nil
 }
 
-// AppendTokens 添加 Tokens。
+// AppendTokens 添加 Tokens 到结尾。
 func (n *Node) AppendTokens(tokens []byte) {
 	n.Tokens = append(n.Tokens, string(tokens)...)
+}
+
+// PrependTokens 添加 Tokens 到开头。
+func (n *Node) PrependTokens(tokens []byte) {
+	n.Tokens = append(tokens, n.Tokens...)
 }
 
 // InsertAfter 在当前节点后插入一个兄弟节点。
