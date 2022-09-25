@@ -151,6 +151,13 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 			if nil != img {
 				n.InsertBefore(img)
 			}
+			if nil == n.ChildByType(ast.NodeLinkText) {
+				if openBracket := n.ChildByType(ast.NodeOpenBracket); nil != openBracket {
+					if dest := n.ChildByType(ast.NodeLinkDest); nil != dest {
+						openBracket.InsertAfter(&ast.Node{Type: ast.NodeLinkText, Tokens: dest.Tokens})
+					}
+				}
+			}
 		}
 		return ast.WalkContinue
 	})
