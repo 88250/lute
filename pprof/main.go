@@ -11,7 +11,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"runtime/pprof"
 
@@ -20,7 +19,7 @@ import (
 
 func main() {
 	spec := "test/commonmark-spec"
-	bytes, err := ioutil.ReadFile(spec + ".md")
+	bytes, err := os.ReadFile(spec + ".md")
 	if nil != err {
 		panic(err)
 	}

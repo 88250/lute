@@ -11,7 +11,7 @@
 package test
 
 import (
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 
@@ -113,7 +113,7 @@ func TestFormat(t *testing.T) {
 }
 
 func TestFormatCases(t *testing.T) {
-	files, err := ioutil.ReadDir(".")
+	files, err := os.ReadDir(".")
 	if nil != err {
 		t.Fatalf("read test dir failed: %s", err)
 	}
@@ -130,7 +130,7 @@ func TestFormatCases(t *testing.T) {
 		}
 
 		caseName := file.Name()[:len(file.Name())-3]
-		bytes, err := ioutil.ReadFile(caseName + ".md")
+		bytes, err := os.ReadFile(caseName + ".md")
 		if nil != err {
 			t.Fatalf("read case failed: %s", err)
 		}
@@ -140,7 +140,7 @@ func TestFormatCases(t *testing.T) {
 		htmlBytes := luteEngine.Format(caseName+".md", bytes)
 		html := string(htmlBytes)
 
-		bytes, err = ioutil.ReadFile(caseName + "-formatted.md")
+		bytes, err = os.ReadFile(caseName + "-formatted.md")
 		if nil != err {
 			t.Fatalf("read case cailed: %s", err)
 		}

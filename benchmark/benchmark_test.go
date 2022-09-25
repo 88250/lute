@@ -11,7 +11,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/88250/lute"
@@ -20,7 +20,7 @@ import (
 const spec = "commonmark-spec"
 
 func BenchmarkLute(b *testing.B) {
-	buf, err := ioutil.ReadFile(spec + ".md")
+	buf, err := os.ReadFile(spec + ".md")
 	if nil != err {
 		b.Fatalf("read spec text failed: " + err.Error())
 	}
@@ -43,7 +43,7 @@ func BenchmarkLute(b *testing.B) {
 	if nil != err {
 		b.Fatalf("unexpected: %s", err)
 	}
-	if err := ioutil.WriteFile(spec+".html", output, 0644); nil != err {
+	if err := os.WriteFile(spec+".html", output, 0644); nil != err {
 		b.Fatalf("write spec html failed: %s", err)
 	}
 

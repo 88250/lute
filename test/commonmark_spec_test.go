@@ -12,7 +12,7 @@ package test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"testing"
 
@@ -29,7 +29,7 @@ type testcase struct {
 }
 
 func TestSpec(t *testing.T) {
-	bytes, err := ioutil.ReadFile("commonmark-spec.json")
+	bytes, err := os.ReadFile("commonmark-spec.json")
 	if nil != err {
 		t.Fatalf("read spec test cases failed: " + err.Error())
 	}

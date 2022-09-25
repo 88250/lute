@@ -11,7 +11,7 @@
 package test
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/88250/lute"
@@ -279,7 +279,7 @@ func TestParse(t *testing.T) {
 }
 
 func TestCase1(t *testing.T) {
-	bytes, err := ioutil.ReadFile("case1.md")
+	bytes, err := os.ReadFile("case1.md")
 	if nil != err {
 		t.Fatalf("read case failed: %s", err)
 	}

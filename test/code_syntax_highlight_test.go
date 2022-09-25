@@ -11,7 +11,7 @@
 package test
 
 import (
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 
@@ -22,7 +22,7 @@ func TestCodeSyntaxHighlightIssue17(t *testing.T) {
 	// 语法高亮支持内联样式 https://github.com/b3log/lute/issues/17
 
 	caseName := "code-syntax-highlight-issue17"
-	data, err := ioutil.ReadFile(caseName + ".md")
+	data, err := os.ReadFile(caseName + ".md")
 	if nil != err {
 		t.Fatalf("read case failed: %s", err)
 	}
@@ -47,14 +47,14 @@ func TestCodeSyntaxHighlightIssue17(t *testing.T) {
 		t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\n", caseName, expected, html)
 	}
 
-	data, err = ioutil.ReadFile(caseName + ".tpl")
+	data, err = os.ReadFile(caseName + ".tpl")
 	if nil != err {
 		t.Fatalf("read template failed: %s", err)
 	}
 	template := string(data)
 	template = strings.ReplaceAll(template, "${style}", style)
 	template = strings.ReplaceAll(template, "${code}", html)
-	ioutil.WriteFile(caseName+".html", []byte(template), 0644)
+	os.WriteFile(caseName+".html", []byte(template), 0644)
 }
 
 var codeSyntaxHighlightLineNumTests = []parseTest{

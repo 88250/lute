@@ -13,7 +13,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"path/filepath"
 	"strings"
 
@@ -30,7 +29,7 @@ func main() {
 	names := styles.Names()
 	for _, name := range names {
 		formatter.WriteCSS(&b, styles.Get(name))
-		ioutil.WriteFile(filepath.Join(dir, name)+".css", b.Bytes(), 0644)
+		os.WriteFile(filepath.Join(dir, name)+".css", b.Bytes(), 0644)
 		b.Reset()
 	}
 

@@ -11,13 +11,21 @@
 package test
 
 //
+//import (
+//	"os"
+//	"sync"
+//	"testing"
+//
+//	"github.com/88250/lute"
+//)
+//
 //func TestParallel(t *testing.T) {
-//	data0, err := ioutil.ReadFile("../test/commonmark-spec.md")
+//	data0, err := os.ReadFile("../test/commonmark-spec.md")
 //	if nil != err {
 //		t.Fatalf("read test text failed: " + err.Error())
 //	}
 //
-//	data1, err := ioutil.ReadFile("../test/case1.md")
+//	data1, err := os.ReadFile("../test/case1.md")
 //	if nil != err {
 //		t.Fatalf("read test text failed: " + err.Error())
 //	}
