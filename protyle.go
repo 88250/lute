@@ -1404,7 +1404,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			tree.Context.Tip.AppendChild(node)
 
-			if "search-mark" == dataType || "virtual-block-ref" == dataType {
+			if lute.isTempMarkSpan(dataType) {
 				// 搜索高亮标记认为是普通文本
 				node.Type = ast.NodeText
 				node.Tokens = []byte(util.DomText(n))
@@ -1979,4 +1979,8 @@ func (lute *Lute) removeInnerMarker0(n *html.Node, marker string) {
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
 		lute.removeInnerMarker0(child, marker)
 	}
+}
+
+func (lute *Lute) isTempMarkSpan(dataType string) bool {
+	return "search-mark" == dataType || "virtual-block-ref" == dataType
 }

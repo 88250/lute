@@ -303,6 +303,18 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 		if html.CommentNode == n.Type {
 			*emptyNodes = append(*emptyNodes, n)
 		}
+	case atom.Span:
+		if lute.isTempMarkSpan(util.DomAttrValue(n, "data-type")) {
+			*emptyNodes = append(*emptyNodes, n)
+			var children []*html.Node
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				children = append(children, c)
+			}
+			for _, c := range children {
+				n.InsertBefore(c)
+			}
+			return
+		}
 	default:
 		if "katex" == util.DomAttrValue(n, "class") {
 			*emptyNodes = append(*emptyNodes, n)
