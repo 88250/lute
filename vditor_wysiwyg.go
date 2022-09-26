@@ -304,7 +304,14 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 			*emptyNodes = append(*emptyNodes, n)
 		}
 	case atom.Span:
+		if lc := n.LastChild; nil != lc && atom.Br == lc.DataAtom {
+			// 如果行级标记节点最后一个子节点是 <br>，则将该 <br> 移动到该行级标记节点的后面
+			// 表格内多个连续的超链接无法换行显示 https://github.com/siyuan-note/siyuan/issues/5966
+			n.InsertAfter(lc)
+		}
+
 		if lute.isTempMarkSpan(util.DomAttrValue(n, "data-type")) {
+			// 将嵌套在临时标记中的节点提升到临时标记节点之前
 			*emptyNodes = append(*emptyNodes, n)
 			var children []*html.Node
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
