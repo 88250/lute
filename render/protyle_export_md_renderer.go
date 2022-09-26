@@ -171,7 +171,7 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 	if entering {
 		marker := r.renderMdMarker(node, entering)
 		r.WriteString(marker)
-		if !node.IsTextMarkType("a") && !node.IsTextMarkType("inline-memo") && !node.IsTextMarkType("block-ref") {
+		if !node.IsTextMarkType("a") && !node.IsTextMarkType("inline-memo") && !node.IsTextMarkType("block-ref") && !node.IsTextMarkType("file-annotation-ref") {
 			textContent := node.TextMarkTextContent
 			if node.IsTextMarkType("code") {
 				textContent = html.UnescapeString(textContent)
@@ -224,6 +224,13 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 					ret += " '" + node.TextMarkTextContent + "'"
 				}
 				ret += "))"
+			}
+		case "file-annotation-ref":
+			if entering {
+				node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
+				ret += "<<" + node.TextMarkFileAnnotationRefID
+				ret += " \"" + node.TextMarkTextContent + "\""
+				ret += ">>"
 			}
 		case "inline-math":
 			if entering {
