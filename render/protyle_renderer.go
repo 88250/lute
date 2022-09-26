@@ -1793,7 +1793,8 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 
 			attrs = append(attrs, []string{"data-href", href})
 			if "" != node.TextMarkATitle {
-				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
+				title := strings.ReplaceAll(node.TextMarkATitle, "\"", "&amp;quot;")
+				attrs = append(attrs, []string{"data-title", title})
 			}
 		} else if "inline-math" == typ {
 			attrs = append(attrs, []string{"data-subtype", "math"})
