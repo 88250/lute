@@ -11,7 +11,6 @@
 package lex
 
 import (
-	"bytes"
 	"unicode"
 )
 
@@ -147,10 +146,10 @@ func SplitWithoutBackslashEscape(tokens []byte, separator byte) (ret [][]byte) {
 			continue
 		}
 
-		if ItemPipe == token && inInlineMath(tokens, i) {
-			line = append(line, token)
-			continue
-		}
+		//if ItemPipe == token && inInlineMath(tokens, i) {
+		//	line = append(line, token)
+		//	continue
+		//}
 
 		ret = append(ret, line)
 		line = []byte{}
@@ -159,37 +158,6 @@ func SplitWithoutBackslashEscape(tokens []byte, separator byte) (ret [][]byte) {
 		ret = append(ret, line)
 	}
 	return
-}
-
-func inInlineMath(tokens []byte, i int) bool {
-	// 表格内公式含有 `|` 符号导致表格异常分割 https://github.com/siyuan-note/siyuan/issues/3168
-	// 表格同一行无法输入两个 `$` https://github.com/siyuan-note/siyuan/issues/3460
-
-	if i+1 >= len(tokens) || i < 1 {
-		return false
-	}
-
-	start := bytes.IndexByte(tokens[:i], ItemDollar)
-	if 1 > start {
-		return false
-	}
-	if ItemBackslash == tokens[:i][start-1] {
-		return false
-	}
-
-	startClosed := 0 == bytes.Count(tokens[:i], []byte{ItemDollar})%2
-	if startClosed {
-		return false
-	}
-
-	end := bytes.IndexByte(tokens[i+1:], ItemDollar)
-	if 1 > end {
-		return false
-	}
-	if ItemBackslash == tokens[i+1:][end-1] {
-		return false
-	}
-	return -1 < start && -1 < end
 }
 
 // ReplaceAll 会将 Tokens 中的所有 old 使用 new 替换。
