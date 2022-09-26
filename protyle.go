@@ -1411,6 +1411,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil == n.FirstChild {
 				return
 			}
+			if nil != n.NextSibling && atom.Span == n.NextSibling.DataAtom && "" != util.DomAttrValue(n.NextSibling, "data-type") {
+				return
+			}
 			if nil == n.FirstChild.NextSibling && html.TextNode == n.FirstChild.Type {
 				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(n.FirstChild.Data)})
 				tree.Context.Tip.AppendChild(node)
@@ -1435,6 +1438,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if isEmpty {
 				return
 			}
+
+			dataType = strings.ReplaceAll(dataType, "backslash", "")
+			dataType = strings.TrimSpace(dataType)
 
 			tree.Context.Tip.AppendChild(node)
 
