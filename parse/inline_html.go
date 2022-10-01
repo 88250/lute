@@ -126,20 +126,13 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
 			} else if bytes.HasPrefix(tags, []byte("<span data-type=")) {
-				remains := ctx.tokens[ctx.pos:]
-				end := bytes.Index(remains, []byte("</span>"))
-				closerLen := len("</span>")
-				tokens = append(tags, remains[:end+closerLen]...)
-				nodes, _ := html.ParseFragment(bytes.NewReader(tokens), &html.Node{Type: html.ElementNode})
-				if 1 != len(nodes) {
-					ctx.pos = startPos + 1
-					return
-				}
-				typ := tags[len("<span data-type=")+1:]
-				typ = typ[:bytes.Index(typ, []byte("\""))]
-				ret = &ast.Node{Type: ast.NodeTextMark, TextMarkType: string(typ)}
-				SetTextMarkNode(ret, nodes[0])
-				ctx.pos += end + closerLen
+				ret = t.processSpanTag(startPos, tags, "<span data-type=", "</span>", ctx)
+				return
+			} else if bytes.Equal(tags, []byte("<kbd>")) {
+				ret = t.processSpanTag(startPos, tags, "<kbd>", "</kbd>", ctx)
+				return
+			} else if bytes.Equal(tags, []byte("<u>")) {
+				ret = t.processSpanTag(startPos, tags, "<u>", "</u>", ctx)
 				return
 			}
 		}
@@ -148,6 +141,36 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	}
 
 	ctx.pos = startPos + 1
+	return
+}
+
+func (t *Tree) processSpanTag(startPos int, tags []byte, startTag, endTag string, ctx *InlineContext) (ret *ast.Node) {
+	remains := ctx.tokens[ctx.pos:]
+	end := bytes.Index(remains, []byte(endTag))
+	closerLen := len(endTag)
+	tokens := append(tags, remains[:end+closerLen]...)
+	nodes, _ := html.ParseFragment(bytes.NewReader(tokens), &html.Node{Type: html.ElementNode})
+	if 1 != len(nodes) {
+		ctx.pos = startPos + 1
+		return
+	}
+	node := nodes[0]
+
+	var typ string
+	startTagLen := len(startTag)
+	if "<kbd>" == startTag || "<u>" == startTag {
+		if !t.Context.ParseOption.HTMLTag2TextMark {
+			ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
+			return
+		}
+		typ = node.Data
+	} else { // <span data-type="a">
+		typ = string(tags[startTagLen+1:])
+		typ = typ[:strings.Index(typ, "\"")]
+	}
+	ret = &ast.Node{Type: ast.NodeTextMark, TextMarkType: typ}
+	SetTextMarkNode(ret, node)
+	ctx.pos += end + closerLen
 	return
 }
 

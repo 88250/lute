@@ -531,6 +531,10 @@ func (lute *Lute) SetTextMark(b bool) {
 	lute.ParseOptions.TextMark = b
 }
 
+func (lute *Lute) SetHTMLTag2TextMark(b bool) {
+	lute.ParseOptions.HTMLTag2TextMark = b
+}
+
 func (lute *Lute) SetParagraphBeginningSpace(b bool) {
 	lute.ParseOptions.ParagraphBeginningSpace = b
 	lute.RenderOptions.KeepParagraphBeginningSpace = b
