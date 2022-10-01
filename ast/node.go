@@ -371,6 +371,7 @@ func (n *Node) Content() (ret string) {
 		if !entering {
 			return WalkContinue
 		}
+
 		switch n.Type {
 		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockRefDynamicText, NodeFileAnnotationRefText, NodeFootnotesRef,
 			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
@@ -394,16 +395,17 @@ func (n *Node) Content() (ret string) {
 		}
 		return WalkContinue
 	})
+
 	return buf.String()
 }
 
-// ContentLen 返回 n 及其所有内容子节点的累计长度。
-func (n *Node) ContentLen() (runeCnt, wordCnt int) {
+func (n *Node) Stat() (runeCnt, wordCnt, linkCnt, imgCnt, refCnt int) {
 	buf := make([]byte, 0, 8192)
 	Walk(n, func(n *Node, entering bool) WalkStatus {
 		if !entering {
 			return WalkContinue
 		}
+
 		switch n.Type {
 		case NodeText, NodeLinkText, NodeBlockRefText, NodeBlockRefDynamicText, NodeFileAnnotationRefText, NodeFootnotesRef,
 			NodeCodeSpanContent, NodeCodeBlockCode, NodeInlineMathContent, NodeMathBlockContent,
@@ -420,14 +422,29 @@ func (n *Node) ContentLen() (runeCnt, wordCnt int) {
 			if "" != n.TextMarkInlineMemoContent {
 				buf = append(buf, n.TextMarkInlineMemoContent...)
 			}
+
+			if n.IsTextMarkType("a") {
+				linkCnt++
+			}
+			if n.IsTextMarkType("block-ref") || n.IsTextMarkType("file-annotation-ref") {
+				refCnt++
+			}
+		case NodeLink:
+			linkCnt++
+		case NodeImage:
+			imgCnt++
+		case NodeBlockRef:
+			refCnt++
 		}
 		if n.IsBlock() {
 			buf = append(buf, ' ')
 		}
 		return WalkContinue
 	})
+
 	buf = bytes.TrimSpace(buf)
-	return util.WordCount(util.BytesToStr(buf))
+	runeCnt, wordCnt = util.WordCount(util.BytesToStr(buf))
+	return
 }
 
 // TokenLen 返回 n 及其子节点 tokens 累计长度。
