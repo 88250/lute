@@ -1411,8 +1411,11 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil == n.FirstChild {
 				return
 			}
-			if nil != n.NextSibling && atom.Span == n.NextSibling.DataAtom && "" != util.DomAttrValue(n.NextSibling, "data-type") {
-				return
+			if nil != n.NextSibling && atom.Span == n.NextSibling.DataAtom {
+				nextDataType := util.DomAttrValue(n.NextSibling, "data-type")
+				if strings.Contains(nextDataType, "code") {
+					return
+				}
 			}
 			if nil == n.FirstChild.NextSibling && html.TextNode == n.FirstChild.Type {
 				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(n.FirstChild.Data)})
