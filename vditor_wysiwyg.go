@@ -323,13 +323,33 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 			return
 		}
 	case atom.Strong, atom.B, atom.Em, atom.I, atom.Del, atom.S, atom.Strike, atom.Mark:
-		if nil != n.FirstChild && atom.Br == n.FirstChild.DataAtom {
-			*emptyNodes = append(*emptyNodes, n.FirstChild)
-			n.InsertBefore(&html.Node{Type: html.ElementNode, DataAtom: atom.Br, Data: "br"})
+		if nil != n.FirstChild {
+			if atom.Br == n.FirstChild.DataAtom {
+				*emptyNodes = append(*emptyNodes, n.FirstChild)
+				n.InsertBefore(&html.Node{Type: html.ElementNode, DataAtom: atom.Br, Data: "br"})
+			}
+			if html.TextNode == n.FirstChild.Type {
+				text := n.FirstChild.Data
+				spaces := lute.prefixSpaces(text)
+				if "" != spaces {
+					n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, "  ")
+					n.InsertBefore(&html.Node{Type: html.TextNode, Data: spaces})
+				}
+			}
 		}
-		if nil != n.LastChild && atom.Br == n.LastChild.DataAtom {
-			*emptyNodes = append(*emptyNodes, n.LastChild)
-			n.InsertAfter(&html.Node{Type: html.ElementNode, DataAtom: atom.Br, Data: "br"})
+		if nil != n.LastChild {
+			if atom.Br == n.LastChild.DataAtom {
+				*emptyNodes = append(*emptyNodes, n.LastChild)
+				n.InsertAfter(&html.Node{Type: html.ElementNode, DataAtom: atom.Br, Data: "br"})
+			}
+			if html.TextNode == n.LastChild.Type {
+				text := n.LastChild.Data
+				spaces := lute.suffixSpaces(text)
+				if "" != spaces {
+					n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "  ")
+					n.InsertAfter(&html.Node{Type: html.TextNode, Data: spaces})
+				}
+			}
 		}
 	default:
 		if "katex" == util.DomAttrValue(n, "class") {
