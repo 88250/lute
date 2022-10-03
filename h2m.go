@@ -16,6 +16,7 @@ import (
 	"unicode"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/parse"
@@ -569,16 +570,17 @@ func appendSpace(n *html.Node, tree *parse.Tree, lute *Lute) {
 		if nextText := util.DomText(n.NextSibling); "" != nextText {
 			if runes := []rune(nextText); !unicode.IsSpace(runes[0]) {
 				if unicode.IsPunct(runes[0]) || unicode.IsSymbol(runes[0]) {
-					tree.Context.Tip.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-					tree.Context.Tip.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+					tree.Context.Tip.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(editor.Zwsp)})
+					tree.Context.Tip.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte(editor.Zwsp)})
 					return
 				}
 
 				if curText := util.DomText(n); "" != curText {
 					runes = []rune(curText)
 					if lastC := runes[len(runes)-1]; unicode.IsPunct(lastC) || unicode.IsSymbol(lastC) {
-						tree.Context.Tip.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-						tree.Context.Tip.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+						text := tree.Context.Tip.ChildByType(ast.NodeText)
+						text.Tokens = append([]byte(editor.Zwsp), text.Tokens...)
+						text.Tokens = append(text.Tokens, []byte(editor.Zwsp)...)
 						return
 					}
 
