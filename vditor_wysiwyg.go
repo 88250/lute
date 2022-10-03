@@ -325,9 +325,11 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 	case atom.Strong, atom.B, atom.Em, atom.I, atom.Del, atom.S, atom.Strike, atom.Mark:
 		if nil != n.FirstChild && atom.Br == n.FirstChild.DataAtom {
 			*emptyNodes = append(*emptyNodes, n.FirstChild)
+			n.InsertBefore(&html.Node{Type: html.ElementNode, DataAtom: atom.Br, Data: "br"})
 		}
 		if nil != n.LastChild && atom.Br == n.LastChild.DataAtom {
 			*emptyNodes = append(*emptyNodes, n.LastChild)
+			n.InsertAfter(&html.Node{Type: html.ElementNode, DataAtom: atom.Br, Data: "br"})
 		}
 	default:
 		if "katex" == util.DomAttrValue(n, "class") {
