@@ -149,9 +149,10 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 		if ast.NodeLink == n.Type {
 			// 超链接嵌套图片情况下，图片子节点移到超链接节点前面
 			img := n.ChildByType(ast.NodeImage)
-			if nil != img {
-				n.InsertBefore(img)
+			if nil == img {
+				return ast.WalkContinue
 			}
+			n.InsertBefore(img)
 			if nil == n.ChildByType(ast.NodeLinkText) {
 				if openBracket := n.ChildByType(ast.NodeOpenBracket); nil != openBracket {
 					if dest := n.ChildByType(ast.NodeLinkDest); nil != dest {

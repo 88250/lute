@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"64", "<a title=\"title\" href=\"url\"><strong>foo</strong></a>", "[**foo**](url \"title\")\n"},
 	{"63", "<strong><br></strong>", "\n"},
 	{"62", "foo<strong><br>bar<br></strong>baz", "foo\n**bar**\nbaz\n"},
 	{"61", "<p><a href=\"baz\"><img src=\"bar\" alt=\"foo\"></a></p>", "[![foo](bar)](baz)\n"},
