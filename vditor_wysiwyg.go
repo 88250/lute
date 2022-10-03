@@ -333,7 +333,12 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 				spaces := lute.prefixSpaces(text)
 				if "" != spaces {
 					n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, "  ")
-					n.InsertBefore(&html.Node{Type: html.TextNode, Data: spaces})
+					if lute.parentIs(n, atom.A) {
+						a := lute.getParent(n, atom.A)
+						a.InsertBefore(&html.Node{Type: html.TextNode, Data: spaces})
+					} else {
+						n.InsertBefore(&html.Node{Type: html.TextNode, Data: spaces})
+					}
 				}
 			}
 		}
@@ -347,7 +352,12 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 				spaces := lute.suffixSpaces(text)
 				if "" != spaces {
 					n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "  ")
-					n.InsertAfter(&html.Node{Type: html.TextNode, Data: spaces})
+					if lute.parentIs(n, atom.A) {
+						a := lute.getParent(n, atom.A)
+						a.InsertAfter(&html.Node{Type: html.TextNode, Data: spaces})
+					} else {
+						n.InsertAfter(&html.Node{Type: html.TextNode, Data: spaces})
+					}
 				}
 			}
 		}
@@ -1472,6 +1482,15 @@ func (lute *Lute) parentIs(n *html.Node, parentTypes ...atom.Atom) bool {
 		}
 	}
 	return false
+}
+
+func (lute *Lute) getParent(n *html.Node, parentType atom.Atom) *html.Node {
+	for p := n.Parent; nil != p; p = p.Parent {
+		if parentType == p.DataAtom {
+			return p
+		}
+	}
+	return nil
 }
 
 func (lute *Lute) isCaret(n *html.Node) (isCaret, isEmptyText bool) {
