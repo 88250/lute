@@ -332,13 +332,7 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 				text := n.FirstChild.Data
 				spaces := lute.prefixSpaces(text)
 				if "" != spaces {
-					n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, "  ")
-					if lute.parentIs(n, atom.A) {
-						a := lute.getParent(n, atom.A)
-						a.InsertBefore(&html.Node{Type: html.TextNode, Data: spaces})
-					} else {
-						n.InsertBefore(&html.Node{Type: html.TextNode, Data: spaces})
-					}
+					n.FirstChild.Data = editor.Zwsp + n.FirstChild.Data
 				}
 			}
 		}
@@ -351,13 +345,7 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 				text := n.LastChild.Data
 				spaces := lute.suffixSpaces(text)
 				if "" != spaces {
-					n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "  ")
-					if lute.parentIs(n, atom.A) {
-						a := lute.getParent(n, atom.A)
-						a.InsertAfter(&html.Node{Type: html.TextNode, Data: spaces})
-					} else {
-						n.InsertAfter(&html.Node{Type: html.TextNode, Data: spaces})
-					}
+					n.FirstChild.Data = n.FirstChild.Data + editor.Zwsp
 				}
 			}
 		}
