@@ -130,7 +130,7 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 	openFence = t.Context.currentLine[t.Context.nextNonspace : t.Context.nextNonspace+fenceLen]
 
 	if t.Context.ParseOption.ProtyleWYSIWYG {
-		str := string(t.Context.currentLine[fenceLen:])
+		str := string(t.Context.currentLine[t.Context.nextNonspace+fenceLen:])
 		for _, c := range str {
 			if "~" == string(c) {
 				return
