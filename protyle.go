@@ -1430,6 +1430,12 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			}
 			tree.Context.Tip.AppendChild(node)
 			return
+		} else if "span" == dataType {
+			// 某些情况下复制过来的 DOM 是该情况，这里按纯文本解析
+			node.Type = ast.NodeText
+			node.Tokens = util.StrToBytes(util.DomText(n))
+			tree.Context.Tip.AppendChild(node)
+			return
 		} else {
 			// TextMark 节点
 			isCaret, isEmpty := lute.isCaret(n)
