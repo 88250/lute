@@ -1233,6 +1233,14 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Span:
 		dataType := util.DomAttrValue(n, "data-type")
+		if strings.Contains(dataType, "span") {
+			// 某些情况下复制过来的 DOM 是该情况，这里按纯文本解析
+			node.Type = ast.NodeText
+			node.Tokens = util.StrToBytes(util.DomText(n))
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
 		if "tag" == dataType {
 			isCaret, isEmpty := lute.isCaret(n)
 			if isCaret {
@@ -1428,12 +1436,6 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				data = strings.ReplaceAll(data, "\\\\", "\\")
 				node.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: util.StrToBytes(data)})
 			}
-			tree.Context.Tip.AppendChild(node)
-			return
-		} else if "span" == dataType {
-			// 某些情况下复制过来的 DOM 是该情况，这里按纯文本解析
-			node.Type = ast.NodeText
-			node.Tokens = util.StrToBytes(util.DomText(n))
 			tree.Context.Tip.AppendChild(node)
 			return
 		} else {
