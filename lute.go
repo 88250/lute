@@ -168,6 +168,9 @@ func (lute *Lute) IsValidLinkDest(str string) bool {
 
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
+	parse.EmojiLock.Lock()
+	defer parse.EmojiLock.Unlock()
+
 	ret = make(map[string]string, len(lute.ParseOptions.AliasEmoji))
 	placeholder := util.BytesToStr(parse.EmojiSitePlaceholder)
 	for k, v := range lute.ParseOptions.AliasEmoji {
@@ -179,12 +182,10 @@ func (lute *Lute) GetEmojis() (ret map[string]string) {
 	return
 }
 
-var emojiLock = sync.Mutex{}
-
 // PutEmojis 将指定的 emojiMap 合并覆盖已有的 Emoji 字典。
 func (lute *Lute) PutEmojis(emojiMap map[string]string) {
-	emojiLock.Lock()
-	defer emojiLock.Unlock()
+	parse.EmojiLock.Lock()
+	defer parse.EmojiLock.Unlock()
 
 	for k, v := range emojiMap {
 		lute.ParseOptions.AliasEmoji[k] = v
@@ -194,6 +195,9 @@ func (lute *Lute) PutEmojis(emojiMap map[string]string) {
 
 // RemoveEmoji 用于删除 str 中的 Emoji Unicode。
 func (lute *Lute) RemoveEmoji(str string) string {
+	parse.EmojiLock.Lock()
+	defer parse.EmojiLock.Unlock()
+
 	for u := range lute.ParseOptions.EmojiAlias {
 		str = strings.ReplaceAll(str, u, "")
 	}

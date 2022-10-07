@@ -11,6 +11,8 @@
 package parse
 
 import (
+	"sync"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 )
@@ -391,6 +393,8 @@ type Options struct {
 	// 不用于 Protyle 自旋过程 https://github.com/siyuan-note/siyuan/issues/5877
 	HTMLTag2TextMark bool
 }
+
+var EmojiLock = sync.Mutex{}
 
 func NewOptions() *Options {
 	return &Options{
