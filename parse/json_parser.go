@@ -27,7 +27,7 @@ func ParseJSONWithoutFix(jsonData []byte, options *Options) (ret *Tree, err erro
 		return
 	}
 
-	ret = &Tree{Name: "", ID: root.ID, Root: &ast.Node{Type: ast.NodeDocument, ID: root.ID}, Context: &Context{ParseOption: options}}
+	ret = &Tree{Name: "", ID: root.ID, Root: &ast.Node{Type: ast.NodeDocument, ID: root.ID, Spec: root.Spec}, Context: &Context{ParseOption: options}}
 	ret.Root.KramdownIAL = Map2IAL(root.Properties)
 	ret.Context.Tip = ret.Root
 	if nil == root.Children {
