@@ -174,6 +174,10 @@ func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkS
 			if r.Options.AutoSpace {
 				if text := node.PreviousNodeText(); "" != text {
 					lastc, _ := utf8.DecodeLastRuneInString(text)
+					if editor.Zwsp == string(lastc) {
+						text = strings.TrimSuffix(text, editor.Zwsp)
+						lastc, _ = utf8.DecodeLastRuneInString(text)
+					}
 					if unicode.IsLetter(lastc) || unicode.IsDigit(lastc) {
 						r.WriteByte(lex.ItemSpace)
 					}
@@ -201,6 +205,10 @@ func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkS
 			if r.Options.AutoSpace {
 				if text := node.NextNodeText(); "" != text {
 					firstc, _ := utf8.DecodeRuneInString(text)
+					if editor.Zwsp == string(firstc) {
+						text = strings.TrimPrefix(text, editor.Zwsp)
+						firstc, _ = utf8.DecodeRuneInString(text)
+					}
 					if unicode.IsLetter(firstc) || unicode.IsDigit(firstc) {
 						r.WriteByte(lex.ItemSpace)
 					}
