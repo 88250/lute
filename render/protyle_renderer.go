@@ -171,6 +171,9 @@ func NewProtyleRenderer(tree *parse.Tree, options *Options) *ProtyleRenderer {
 func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
+			if parse.ContainTextMark(node, "code", "kbd") {
+				r.WriteString(editor.Zwsp)
+			}
 			if r.Options.AutoSpace {
 				if text := node.PreviousNodeText(); "" != text {
 					lastc, _ := utf8.DecodeLastRuneInString(text)
@@ -194,6 +197,9 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 	} else {
 		r.WriteString("</span>")
 		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
+			if parse.ContainTextMark(node, "code", "kbd") {
+				r.WriteString(editor.Zwsp)
+			}
 			if r.Options.AutoSpace {
 				if text := node.NextNodeText(); "" != text {
 					firstc, _ := utf8.DecodeRuneInString(text)
@@ -240,6 +246,7 @@ func (r *ProtyleRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *ProtyleRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.WriteString(editor.Zwsp)
 		r.Tag("span", [][]string{{"data-type", "kbd"}}, false)
 	}
 	return ast.WalkContinue
@@ -248,6 +255,7 @@ func (r *ProtyleRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast
 func (r *ProtyleRenderer) renderKbdCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("</span>")
+		r.WriteString(editor.Zwsp)
 	}
 	return ast.WalkContinue
 }
@@ -1390,6 +1398,9 @@ func (r *ProtyleRenderer) renderText(node *ast.Node, entering bool) ast.WalkStat
 
 func (r *ProtyleRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if node.IsTextMarkType("code") {
+			r.WriteString(editor.Zwsp)
+		}
 		if r.Options.AutoSpace {
 			if text := node.PreviousNodeText(); "" != text {
 				lastc, _ := utf8.DecodeLastRuneInString(text)
@@ -1399,6 +1410,9 @@ func (r *ProtyleRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.Walk
 			}
 		}
 	} else {
+		if node.IsTextMarkType("code") {
+			r.WriteString(editor.Zwsp)
+		}
 		if r.Options.AutoSpace {
 			if text := node.NextNodeText(); "" != text {
 				firstc, _ := utf8.DecodeRuneInString(text)
