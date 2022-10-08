@@ -185,7 +185,7 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 		attrs := r.renderTextMarkAttrs(node)
 		r.spanNodeAttrs(node, &attrs)
 		r.Tag("span", attrs, false)
-		if parse.ContainTextMark(node, "code", "kbd") {
+		if parse.ContainTextMark(node, "code", "kbd", "tag") {
 			r.WriteString(editor.Zwsp)
 		}
 		textContent := node.TextMarkTextContent
@@ -196,10 +196,10 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 		r.WriteString(textContent)
 	} else {
 		r.WriteString("</span>")
+		if parse.ContainTextMark(node, "code", "kbd", "tag") {
+			r.WriteString(editor.Zwsp)
+		}
 		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
-			if parse.ContainTextMark(node, "code", "kbd") {
-				r.WriteString(editor.Zwsp)
-			}
 			if r.Options.AutoSpace {
 				if text := node.NextNodeText(); "" != text {
 					firstc, _ := utf8.DecodeRuneInString(text)
@@ -517,6 +517,7 @@ func (r *ProtyleRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast
 		content := node.Parent.Text()
 		content = strings.ReplaceAll(content, editor.Caret, "")
 		r.Tag("span", [][]string{{"data-type", "tag"}, {"data-content", html.EscapeHTMLStr(content)}}, false)
+		r.WriteString(editor.Zwsp)
 	}
 	return ast.WalkContinue
 }
@@ -524,6 +525,7 @@ func (r *ProtyleRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast
 func (r *ProtyleRenderer) renderTagCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("/span", nil, false)
+		r.WriteString(editor.Zwsp)
 	}
 	return ast.WalkContinue
 }
