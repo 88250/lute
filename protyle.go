@@ -262,7 +262,11 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 				}
 
 				span.KramdownIAL = n.Parent.KramdownIAL
-				n.Parent.InsertBefore(span)
+				if n.IsMarker() {
+					n.Parent.InsertBefore(span)
+				} else {
+					n.InsertBefore(span)
+				}
 			}
 		}
 		return ast.WalkContinue
