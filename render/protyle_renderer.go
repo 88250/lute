@@ -184,6 +184,10 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 		}
 		attrs := r.renderTextMarkAttrs(node)
 		r.spanNodeAttrs(node, &attrs)
+		if nil == node.Previous && parse.ContainTextMark(node, "code", "kbd", "tag") {
+			r.WriteString(editor.Zwsp)
+		}
+
 		r.Tag("span", attrs, false)
 		if parse.ContainTextMark(node, "code", "kbd", "tag") {
 			r.WriteString(editor.Zwsp)
