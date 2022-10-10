@@ -1424,11 +1424,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if nil == n.FirstChild {
 				return
 			}
-			if nil != n.NextSibling && atom.Span == n.NextSibling.DataAtom {
-				nextDataType := util.DomAttrValue(n.NextSibling, "data-type")
-				if strings.Contains(nextDataType, "code") {
-					return
-				}
+			if n.FirstChild == n.LastChild && nil != n.FirstChild.FirstChild {
+				// 转义字符加行级样式后继续输入会出现标记符 https://github.com/siyuan-note/siyuan/issues/6134
+				return
 			}
 			if nil == n.FirstChild.NextSibling && html.TextNode == n.FirstChild.Type {
 				node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(n.FirstChild.Data)})
