@@ -1489,6 +1489,9 @@ func (lute *Lute) isCaret(n *html.Node) (isCaret, isEmptyText bool) {
 	}
 	isCaret = editor.Caret == text || editor.Zwsp+editor.Caret == text || editor.Caret+editor.Zwsp == text
 	isEmptyText = "" == text || editor.Zwsp == text
+	if "" != util.DomAttrValue(n, "data-content") {
+		isEmptyText = false
+	}
 	return
 }
 
