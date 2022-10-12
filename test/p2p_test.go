@@ -19,6 +19,7 @@ import (
 
 var inlineMd2BlockDOM = []parseTest{
 
+	{"1", "<span data-type=\"strong\">foo</span>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"0", "~**foo**~\u200b~bar~\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"sub strong\">foo</span>\u200b<span data-type=\"sub\">bar</span>\n</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 }
 
@@ -161,6 +162,8 @@ func TestBlockDOM2Md(t *testing.T) {
 
 var blockDOM2Content = []parseTest{
 
+	{"9", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>", "foo"},
+	{"8", "<div data-node-id=\"20221012153945-e1aclg3\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20221012153947\"><div contenteditable=\"true\" spellcheck=\"false\">&lt;span&gt;</div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "<span>"},
 	{"7", "<div data-node-id=\"20221011094818-dg6ktfw\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"em\">foo</span><span data-type=\"em inline-math\" data-subtype=\"math\" data-content=\"bar\" contenteditable=\"false\" class=\"render-node\"></span><span data-type=\"em\">baz</span></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div>", "foobarbaz"},
 	{"6", "foo&lt;&quot;&nbsp;<span data-type=\"inline-math\" data-subtype=\"math\" data-content=\"foo\" contenteditable=\"false\" class=\"render-node\"></span>&nbsp;<strong style=\"color: var(--b3-font-color8);\">bar</strong>&nbsp;&lt;baz&gt;", "foo<\" foo bar <baz>"},
 	{"5", "<div data-subtype=\"h1\" data-node-id=\"20220620223803-e5c7fez\" data-node-index=\"1\" data-type=\"NodeHeading\" class=\"h1\" updated=\"20220620231839\"><div contenteditable=\"true\" spellcheck=\"false\">foo&lt;\" <span data-type=\"inline-math\" data-subtype=\"math\" data-content=\"foo\" contenteditable=\"false\" class=\"render-node\" data-render=\"true\"><span class=\"katex\"><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height:0.8889em;vertical-align:-0.1944em;\"></span><span class=\"mord mathnormal\" style=\"margin-right:0.10764em;\">f</span><span class=\"mord mathnormal\">oo</span></span></span></span></span> <strong style=\"color: var(--b3-font-color8);\">bar</strong> &lt;baz&gt;<wbr></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div>", "foo<\" foo bar <baz>‸"},
