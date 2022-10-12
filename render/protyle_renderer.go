@@ -1353,9 +1353,9 @@ func (r *ProtyleRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wa
 		return ast.WalkContinue
 	}
 
-	tokens := html.EscapeHTML(node.Tokens)
-	r.Write(tokens)
-	return ast.WalkContinue
+	// Protyle 中没有行级 HTML，这里转换为 HTML 块渲染
+	node.Type = ast.NodeHTMLBlock
+	return r.renderHTML(node, entering)
 }
 
 func (r *ProtyleRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkStatus {
