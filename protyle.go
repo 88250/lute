@@ -1237,6 +1237,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Span:
 		dataType := util.DomAttrValue(n, "data-type")
+		if "" == dataType {
+			dataType = "text"
+		}
 		if strings.Contains(dataType, "span") {
 			// 某些情况下复制过来的 DOM 是该情况，这里按纯文本解析
 			node.Type = ast.NodeText

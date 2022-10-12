@@ -560,7 +560,11 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 	node.Type = ast.NodeTextMark
 	dataType := util.DomAttrValue(n, "data-type")
 	if "" == dataType {
-		dataType = n.DataAtom.String()
+		if n.DataAtom == atom.Span {
+			dataType = "text"
+		} else {
+			dataType = n.DataAtom.String()
+		}
 	}
 	node.TextMarkType = dataType
 	node.Tokens = nil
