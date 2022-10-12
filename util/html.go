@@ -19,12 +19,17 @@ import (
 	"github.com/88250/lute/html/atom"
 )
 
-func GetTextMarkTextData(n *html.Node) (content string) {
+func GetTextMarkTextDataWithoutEscapeSingleQuote(n *html.Node) (content string) {
 	content = DomText(n)
 	content = strings.ReplaceAll(content, editor.Zwsp, "")
 	content = strings.TrimPrefix(content, "\n")
 	content = strings.TrimSuffix(content, "\n")
 	content = html.EscapeHTMLStr(content)
+	return
+}
+
+func GetTextMarkTextData(n *html.Node) (content string) {
+	content = GetTextMarkTextDataWithoutEscapeSingleQuote(n)
 	content = strings.ReplaceAll(content, "'", "&apos;")
 	return
 }

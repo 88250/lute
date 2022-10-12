@@ -582,7 +582,7 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
 			node.TextMarkInlineMemoContent = util.GetTextMarkInlineMemoData(n)
 		default:
-			node.TextMarkTextContent = util.GetTextMarkTextData(n)
+			node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeSingleQuote(n)
 		}
 	}
 
