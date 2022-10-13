@@ -368,10 +368,18 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		} else if t.Context.ParseOption.Sup && lex.ItemCaret == token && 1 != delimitersCount { // ^Sup^ 标记使用一个 ^
 			canOpen = false
 			canClose = false
-		} else if t.Context.ParseOption.Sub && lex.ItemTilde == token && 1 != delimitersCount { // ~Sub~ 标记使用一个 ~
-			canOpen = false
-			canClose = false
-			if t.Context.ParseOption.GFMStrikethrough && 2 == delimitersCount {
+		} else if t.Context.ParseOption.Sub && lex.ItemTilde == token {
+			if t.Context.ParseOption.GFMStrikethrough && 3 == delimitersCount { // 单独处理 ~~~foo~~~ 的情况，即下标嵌套删除线
+				canOpen = isLeftFlanking
+				canClose = isRightFlanking
+			} else if 1 != delimitersCount { // ~Sub~ 标记使用一个 ~
+				canOpen = false
+				canClose = false
+				if t.Context.ParseOption.GFMStrikethrough && 2 == delimitersCount {
+					canOpen = isLeftFlanking
+					canClose = isRightFlanking
+				}
+			} else {
 				canOpen = isLeftFlanking
 				canClose = isRightFlanking
 			}

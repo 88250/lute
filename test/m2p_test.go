@@ -19,6 +19,7 @@ import (
 
 var md2BlockDOMTests = []parseTest{
 
+	{"51", "~~~foo~~~", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"sub s\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"50", "#foo'bar#", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"tag\">\u200bfoo'bar</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"49", "*foo$bar$baz*", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"em\">foo</span> <span data-type=\"em inline-math\" data-subtype=\"math\" data-content=\"bar\" contenteditable=\"false\" class=\"render-node\"></span> <span data-type=\"em\">baz</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"48", "**`foo`bar`baz`bazz**bazzz", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"strong code\">\u200bfoo</span>\u200b <span data-type=\"strong\">bar</span> <span data-type=\"strong code\">\u200bbaz</span>\u200b <span data-type=\"strong\">bazz</span>bazzz</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
@@ -92,6 +93,8 @@ func TestMd2BlockDOM(t *testing.T) {
 	luteEngine.SetTag(true)
 	luteEngine.SetTextMark(true)
 	luteEngine.SetHTMLTag2TextMark(true)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
 
 	ast.Testing = true
 	for _, test := range md2BlockDOMTests {
