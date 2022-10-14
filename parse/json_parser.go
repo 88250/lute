@@ -155,10 +155,17 @@ func genTreeByJSON(node *ast.Node, tree *Tree, idMap *map[string]bool, needFix *
 }
 
 func fixLegacyData(tip, node *ast.Node, idMap *map[string]bool, needFix *bool) {
-	if node.IsBlock() && "" == node.ID {
-		node.ID = ast.NewNodeID()
-		node.SetIALAttr("id", node.ID)
-		*needFix = true
+	if node.IsBlock() {
+		if "" == node.ID {
+			node.ID = ast.NewNodeID()
+			node.SetIALAttr("id", node.ID)
+			*needFix = true
+		}
+		if 0 < len(node.Children) && ast.NodeBr.String() == node.Children[len(node.Children)-1].TypeStr {
+			// 剔除块尾多余的软换行 https://github.com/siyuan-note/siyuan/issues/6191
+			node.Children = node.Children[:len(node.Children)-1]
+			*needFix = true
+		}
 	}
 	if "" != node.ID {
 		if _, ok := (*idMap)[node.ID]; ok {
