@@ -162,7 +162,7 @@ var (
 		util.StrToBytes("hk"), util.StrToBytes("so"), util.StrToBytes("vip"), util.StrToBytes("ai"), util.StrToBytes("ink"), util.StrToBytes("mobi"), util.StrToBytes("pro"), util.StrToBytes("dev"),
 		util.StrToBytes("pm"), util.StrToBytes("to"), util.StrToBytes("store"), util.StrToBytes("shop"), util.StrToBytes("love"), util.StrToBytes("icu"), util.StrToBytes("ltd"), util.StrToBytes("news"),
 		util.StrToBytes("work"), util.StrToBytes("group"), util.StrToBytes("online"), util.StrToBytes("game"), util.StrToBytes("design"), util.StrToBytes("link"),
-		util.StrToBytes("ch")}
+		util.StrToBytes("ch"), util.StrToBytes("la")}
 )
 
 // AddAutoLinkDomainSuffix 添加自动链接解析域名后缀 suffix。
