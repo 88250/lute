@@ -19,6 +19,7 @@ import (
 
 var inlineMd2BlockDOM = []parseTest{
 
+	{"2", "<kbd>foo</kbd>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"kbd\">\u200bfoo</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"1", "<span data-type=\"strong\">foo</span>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"0", "~**foo**~\u200b~bar~\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"sub strong\">foo</span>\u200b<span data-type=\"sub\">bar</span>\n</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 }
@@ -41,6 +42,7 @@ func TestInlineMd2BlockDOM(t *testing.T) {
 	luteEngine.SetParagraphBeginningSpace(true)
 	luteEngine.SetFileAnnotationRef(true)
 	luteEngine.SetTextMark(true)
+	luteEngine.SetHTMLTag2TextMark(true)
 
 	ast.Testing = true
 	for _, test := range inlineMd2BlockDOM {
@@ -91,6 +93,7 @@ func TestBlockDOM2InlineBlockDOM(t *testing.T) {
 
 var blockDOM2StdMd = []parseTest{
 
+	{"10", "<span data-type=\"kbd\">\u200bfoo</span>", "<kbd>foo</kbd>\n"},
 	{"9", "<span data-type=\"strong sub\">foo</span><span data-type=\"sub\">bar</span>", "~**foo**~\u200b~bar~\n"},
 	{"8", "<span data-type=\"strong em\">foo</span>", "***foo***\n"},
 	{"7", "<span data-type=\"inline-math\" data-subtype=\"math\" data-content=\"&amp;lt;foo&amp;gt;\" contenteditable=\"false\" class=\"render-node\" data-render=\"true\"><span class=\"katex\"><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height:0.5782em;vertical-align:-0.0391em;\"></span><span class=\"mrel\">&lt;</span><span class=\"mspace\" style=\"margin-right:0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height:0.8889em;vertical-align:-0.1944em;\"></span><span class=\"mord mathnormal\" style=\"margin-right:0.10764em;\">f</span><span class=\"mord mathnormal\">oo</span><span class=\"mspace\" style=\"margin-right:0.2778em;\"></span><span class=\"mrel\">&gt;</span></span></span></span></span>", "$<foo>$\n"},
@@ -162,6 +165,7 @@ func TestBlockDOM2Md(t *testing.T) {
 
 var blockDOM2Content = []parseTest{
 
+	{"10", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"kbd\">\u200bfoo</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>", "\u200bfoo\u200b"},
 	{"9", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>", "foo"},
 	{"8", "<div data-node-id=\"20221012153945-e1aclg3\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20221012153947\"><div contenteditable=\"true\" spellcheck=\"false\">&lt;span&gt;</div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "<span>"},
 	{"7", "<div data-node-id=\"20221011094818-dg6ktfw\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"em\">foo</span><span data-type=\"em inline-math\" data-subtype=\"math\" data-content=\"bar\" contenteditable=\"false\" class=\"render-node\"></span><span data-type=\"em\">baz</span></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div>", "foobarbaz"},
