@@ -1957,6 +1957,18 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" linenumber=\""+linenumber+"\"")...)
 	}
 
+	if dataExportMd := util.DomAttrValue(n, "data-export-md"); "" != dataExportMd {
+		dataExportMd = html.UnescapeHTMLStr(dataExportMd)
+		node.SetIALAttr("data-export-md", dataExportMd)
+		ialTokens = append(ialTokens, []byte(" data-export-md=\""+dataExportMd+"\"")...)
+	}
+
+	if dataExportHtml := util.DomAttrValue(n, "data-export-html"); "" != dataExportHtml {
+		dataExportHtml = html.UnescapeHTMLStr(dataExportHtml)
+		node.SetIALAttr("data-export-html", dataExportHtml)
+		ialTokens = append(ialTokens, []byte(" data-export-html=\""+dataExportHtml+"\"")...)
+	}
+
 	if customAttrs := lute.domCustomAttrs(n); nil != customAttrs {
 		for k, v := range customAttrs {
 			v = html.UnescapeHTMLStr(v)
