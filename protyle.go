@@ -216,7 +216,9 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 			processNestedNode(n, "kbd", &tags, &unlinks, entering)
 		case ast.NodeLink:
 			processNestedNode(n, "a", &tags, &unlinks, entering)
-		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText:
+		case ast.NodeBlockRef:
+			processNestedNode(n, "block-ref", &tags, &unlinks, entering)
+		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText, ast.NodeBlockRefID:
 			if 1 > len(tags) {
 				return ast.WalkContinue
 			}
@@ -230,8 +232,21 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 					if c := n.ChildByType(ast.NodeBackslashContent); nil != c {
 						span.TextMarkTextContent = string(html.EscapeHTML(c.Tokens))
 					}
-				}
-				if ast.NodeLinkText == n.Type && !n.ParentIs(ast.NodeImage) {
+				} else if ast.NodeBlockRefID == n.Type {
+					span.TextMarkBlockRefSubtype = "s"
+					span.TextMarkTextContent = n.TokensStr()
+
+					refText := n.Parent.ChildByType(ast.NodeBlockRefText)
+					if nil == refText {
+						refText = n.Parent.ChildByType(ast.NodeBlockRefDynamicText)
+						span.TextMarkBlockRefSubtype = "d"
+					}
+					if nil != refText {
+						span.TextMarkTextContent = refText.TokensStr()
+					}
+
+					span.TextMarkBlockRefID = n.Parent.ChildByType(ast.NodeBlockRefID).TokensStr()
+				} else if ast.NodeLinkText == n.Type && !n.ParentIs(ast.NodeImage) {
 					if next := n.Next; nil != next && ast.NodeLinkText == next.Type {
 						// 合并相邻的链接文本节点
 						n.Next.PrependTokens(n.Tokens)
