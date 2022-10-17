@@ -1176,11 +1176,6 @@ func (r *ProtyleExportMdRenderer) renderParagraph(node *ast.Node, entering bool)
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
 			r.WriteString("　　")
 		}
-
-		if nil == node.FirstChild {
-			// 使用零宽空格占位，避免列表项为空的情况被剔除 https://github.com/siyuan-note/siyuan/issues/6206
-			r.WriteString(editor.Zwsp)
-		}
 	} else {
 		if !r.Options.KeepParagraphBeginningSpace && nil != node.FirstChild {
 			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
@@ -1675,6 +1670,10 @@ func (r *ProtyleExportMdRenderer) renderListItem(node *ast.Node, entering bool) 
 		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
 		indentedLines := bytes.Buffer{}
 		buf := writer.Bytes()
+		if bytes.HasPrefix(buf, []byte("* ")) {
+			// 说明该列表项为空 https://github.com/siyuan-note/siyuan/issues/6206
+			buf = append([]byte(" \n\n"), buf...)
+		}
 		lines := bytes.Split(buf, []byte{lex.ItemNewline})
 		for _, line := range lines {
 			if 0 == len(line) {
