@@ -1176,6 +1176,11 @@ func (r *ProtyleExportMdRenderer) renderParagraph(node *ast.Node, entering bool)
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
 			r.WriteString("　　")
 		}
+
+		if nil == node.FirstChild {
+			// 使用零宽空格占位，避免列表项为空的情况被剔除 https://github.com/siyuan-note/siyuan/issues/6206
+			r.WriteString(editor.Zwsp)
+		}
 	} else {
 		if !r.Options.KeepParagraphBeginningSpace && nil != node.FirstChild {
 			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
