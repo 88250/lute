@@ -18,6 +18,11 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"70", "<code>foo</code><code>bar</code>", "`foo`\u200b`bar`\n"},
+	{"69", "<em>foo</em><strong>bar</strong>", "*foo*\u200b**bar**\n"},
+	{"68", "<strong>foo</strong><em>bar</em>", "**foo**\u200b*bar*\n"},
+	{"67", "<em>foo</em><em>bar</em>", "*foo*\u200b*bar*\n"},
+	{"66", "<strong>foo</strong><strong>bar</strong>", "**foo**\u200b**bar**\n"},
 	{"65", "<a title=\"title\" href=\"url\"><strong>foo&nbsp;</strong></a>bar", "[**foo \u200b**](url \"title\")bar\n"},
 	{"64", "<a title=\"title\" href=\"url\"><strong>foo</strong></a>", "[**foo**](url \"title\")\n"},
 	{"63", "<strong><br></strong>", "\n"},
