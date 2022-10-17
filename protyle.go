@@ -1972,6 +1972,11 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" linenumber=\""+linenumber+"\"")...)
 	}
 
+	if breadcrumb := util.DomAttrValue(n, "breadcrumb"); "" != breadcrumb {
+		node.SetIALAttr("breadcrumb", breadcrumb)
+		ialTokens = append(ialTokens, []byte(" breadcrumb=\""+breadcrumb+"\"")...)
+	}
+
 	if dataExportMd := util.DomAttrValue(n, "data-export-md"); "" != dataExportMd {
 		dataExportMd = html.UnescapeHTMLStr(dataExportMd)
 		node.SetIALAttr("data-export-md", dataExportMd)
