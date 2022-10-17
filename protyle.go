@@ -1264,6 +1264,34 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if nil != tree.Context.Tip && nil != tree.Context.Tip.LastChild {
+			// 行级元素前输入转义符 `\` 导致异常 https://github.com/siyuan-note/siyuan/issues/6237
+			previousEndText := tree.Context.Tip.LastChild.Text()
+			backslashCaret := strings.HasSuffix(previousEndText, "\\"+editor.Caret)
+			if backslashCaret {
+				previousEndText = strings.TrimSuffix(previousEndText, editor.Caret)
+			}
+			if strings.HasSuffix(previousEndText, "\\") {
+				backslashCount := 0
+				for i := len(previousEndText) - 1; i >= 0; i-- {
+					if '\\' == previousEndText[i] {
+						backslashCount++
+					} else {
+						break
+					}
+				}
+				if 0 != backslashCount%2 {
+					if backslashCaret {
+						tree.Context.Tip.LastChild.Tokens = bytes.TrimSuffix(tree.Context.Tip.LastChild.Tokens, []byte(editor.Caret))
+						tree.Context.Tip.LastChild.Tokens = append(tree.Context.Tip.LastChild.Tokens, []byte("\\")...)
+						tree.Context.Tip.LastChild.Tokens = append(tree.Context.Tip.LastChild.Tokens, []byte(editor.Caret)...)
+					} else {
+						tree.Context.Tip.LastChild.Tokens = append(tree.Context.Tip.LastChild.Tokens, []byte("\\")...)
+					}
+				}
+			}
+		}
+
 		if "tag" == dataType {
 			isCaret, isEmpty := lute.isCaret(n)
 			if isCaret {
