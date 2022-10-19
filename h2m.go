@@ -593,8 +593,10 @@ func appendSpace(n *html.Node, tree *parse.Tree, lute *Lute) {
 					runes = []rune(curText)
 					if lastC := runes[len(runes)-1]; unicode.IsPunct(lastC) || unicode.IsSymbol(lastC) {
 						text := tree.Context.Tip.ChildByType(ast.NodeText)
-						text.Tokens = append([]byte(editor.Zwsp), text.Tokens...)
-						text.Tokens = append(text.Tokens, []byte(editor.Zwsp)...)
+						if nil != text {
+							text.Tokens = append([]byte(editor.Zwsp), text.Tokens...)
+							text.Tokens = append(text.Tokens, []byte(editor.Zwsp)...)
+						}
 						return
 					}
 
