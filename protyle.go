@@ -1264,6 +1264,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if strings.Contains(dataType, "img") {
+			dataType = "img"
+		}
+
 		if nil != tree.Context.Tip && nil != tree.Context.Tip.LastChild {
 			// 行级元素前输入转义符 `\` 导致异常 https://github.com/siyuan-note/siyuan/issues/6237
 			previousEndText := tree.Context.Tip.LastChild.Text()
