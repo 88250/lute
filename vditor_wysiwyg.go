@@ -280,6 +280,10 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 		if html.TextNode == n.Type {
 			data := strings.TrimLeft(n.Data, " ")
 			data = strings.TrimRight(data, " ")
+			for strings.Contains(data, "\n\n") {
+				// 浏览器剪藏扩展列表下方段落缩进成为子块 https://github.com/siyuan-note/siyuan/issues/6289
+				data = strings.ReplaceAll(data, "\n\n", "")
+			}
 			if "" == data {
 				*emptyNodes = append(*emptyNodes, n)
 				return

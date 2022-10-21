@@ -18,6 +18,8 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"73", "<p>foo</p>\n<ul>\n<li>bar\n</ul>\n<p>baz</p>", "foo\n\n * bar\n\n baz\n"},
+	{"72", "<p>foo</p>\n\n<ul>\n<li>bar\n</ul>\n\n<p>baz</p>", "foo\n\n* bar\n\nbaz\n"},
 	{"71", "<strong><sup>[1]</sup></strong>1", "**^[1]^**1\n"},
 	{"70", "<code>foo</code><code>bar</code>", "`foo`\u200b`bar`\n"},
 	{"69", "<em>foo</em><strong>bar</strong>", "*foo*\u200b**bar**\n"},
