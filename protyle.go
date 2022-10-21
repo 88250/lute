@@ -1265,6 +1265,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if strings.Contains(dataType, "img") {
+			// 给文字和图片同时设置字体格式后图片丢失 https://github.com/siyuan-note/siyuan/issues/6297
 			dataType = "img"
 		}
 
