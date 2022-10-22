@@ -83,6 +83,7 @@ func isYamlFrontMatterClose(context *Context) bool {
 	if context.ParseOption.KramdownBlockIAL && simpleCheckIsBlockIAL(context.currentLine) {
 		// 判断 IAL 打断
 		if ial := context.parseKramdownBlockIAL(context.currentLine); 0 < len(ial) {
+			context.Tip.ID = IAL2Map(ial)["id"]
 			context.Tip.KramdownIAL = ial
 			context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: context.currentLine})
 			return true

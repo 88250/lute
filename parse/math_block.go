@@ -118,6 +118,7 @@ func (context *Context) isMathBlockClose(tokens []byte) bool {
 	if context.ParseOption.KramdownBlockIAL && simpleCheckIsBlockIAL(tokens) {
 		// 判断 IAL 打断
 		if ial := context.parseKramdownBlockIAL(tokens); 0 < len(ial) {
+			context.Tip.ID = IAL2Map(ial)["id"]
 			context.Tip.KramdownIAL = ial
 			context.Tip.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: tokens})
 			return true
