@@ -277,11 +277,23 @@ func (r *BaseRenderer) TextAutoSpaceNext(node *ast.Node) {
 		return
 	}
 
-	if next := node.Next; nil != next && ast.NodeText == next.Type {
-		nextFirst, _ := utf8.DecodeRune(next.Tokens)
-		last, _ := utf8.DecodeLastRune(tokens)
-		if allowSpace(last, nextFirst) {
-			r.Writer.WriteByte(lex.ItemSpace)
+	if next := node.Next; nil != next {
+		if ast.NodeText == next.Type {
+			nextFirst, _ := utf8.DecodeRune(next.Tokens)
+			last, _ := utf8.DecodeLastRune(tokens)
+			if allowSpace(last, nextFirst) {
+				r.Writer.WriteByte(lex.ItemSpace)
+			}
+		} else if ast.NodeKramdownSpanIAL == next.Type {
+			// 优化排版未处理样式文本 https://github.com/siyuan-note/siyuan/issues/6305
+			next = next.Next
+			if nil != next && ast.NodeText == next.Type {
+				nextFirst, _ := utf8.DecodeRune(next.Tokens)
+				last, _ := utf8.DecodeLastRune(tokens)
+				if allowSpace(last, nextFirst) {
+					next.Tokens = append([]byte{lex.ItemSpace}, next.Tokens...)
+				}
+			}
 		}
 	}
 }
