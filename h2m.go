@@ -19,6 +19,7 @@ import (
 	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/html/atom"
+	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
@@ -122,6 +123,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte{' '})     // 将 \n 转换为空格 https://github.com/siyuan-note/siyuan/issues/6052
+		node.Tokens = lex.EscapeMarkers(node.Tokens)
 		if nil != n.Parent && atom.Span == n.Parent.DataAtom && ("" != util.DomAttrValue(n.Parent, "class")) {
 			if lastc := tree.Context.Tip.LastChild; nil == lastc || (ast.NodeText == lastc.Type && !bytes.HasSuffix(lastc.Tokens, []byte("**"))) {
 				node.Tokens = []byte("**" + util.BytesToStr(node.Tokens) + "**")

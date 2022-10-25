@@ -32,18 +32,14 @@ func (t *Tree) parseText(ctx *InlineContext) *ast.Node {
 
 // isMarker 判断 token 是否是潜在的 Markdown 标记符。
 func (t *Tree) isMarker(token byte) bool {
-	switch token {
-	case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemOpenBracket, lex.ItemBang, lex.ItemNewline, lex.ItemBackslash, lex.ItemBacktick, lex.ItemLess,
-		lex.ItemCloseBracket, lex.ItemAmpersand, lex.ItemTilde, lex.ItemDollar, lex.ItemOpenBrace, lex.ItemOpenParen, lex.ItemEqual, lex.ItemCrosshatch:
+	if lex.IsMarker(token) {
 		return true
-	case lex.ItemCaret:
-		if t.Context.ParseOption.Sup {
-			return true
-		}
-		return false
-	default:
-		return false
 	}
+
+	if t.Context.ParseOption.Sup && lex.ItemCaret == token {
+		return true
+	}
+	return false
 }
 
 var backslash = util.StrToBytes("\\")
