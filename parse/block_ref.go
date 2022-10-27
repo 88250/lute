@@ -119,7 +119,7 @@ func (context *Context) parseBlockRefID(tokens []byte) (passed, remains, id []by
 	}
 	remains = tokens[i:]
 	id = tokens[:i]
-	if 64 < len(id) || 2 > len(remains) {
+	if 2 > len(remains) || !ast.IsNodeIDPattern(string(id)) {
 		return
 	}
 	passed = make([]byte, 0, 64)

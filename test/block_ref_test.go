@@ -18,7 +18,9 @@ import (
 
 var blockRefTests = []parseTest{
 
-	{"1", "((20201105103725-dd01qas \"foo<a>bar\"))", "<p>\"foo&lt;a&gt;bar\"</p>\n"},
+	{"4", "((20221026202632-wqhfhhb 'foo'))", "<p>'foo'</p>\n"},
+	{"3", "((id \"foo<a>bar\"))", "<p>((id &quot;foo<a>bar&quot;))</p>\n"},
+	{"2", "((20201105103725-dd01qas \"foo<a>bar\"))", "<p>\"foo&lt;a&gt;bar\"</p>\n"},
 	{"1", "((20201105103725-dd01qas \"$foo$\"))", "<p>\"$foo$\"</p>\n"},
 	{"0", "((20201105103725-dd01qas \"思源笔记\"))", "<p>\"思源笔记\"</p>\n"},
 }
