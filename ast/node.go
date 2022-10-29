@@ -379,17 +379,15 @@ func (n *Node) Content() (ret string) {
 			NodeGitConflictContent:
 			buf.Write(n.Tokens)
 		case NodeTextMark:
-			if "" != n.TextMarkInlineMathContent {
-				buf.WriteString(n.TextMarkInlineMathContent)
-			}
 			if "" != n.TextMarkTextContent {
 				if n.IsTextMarkType("code") {
 					buf.WriteString(html.UnescapeString(n.TextMarkTextContent))
 				} else {
 					buf.WriteString(n.TextMarkTextContent)
 				}
-			}
-			if "" != n.TextMarkInlineMemoContent {
+			} else if "" != n.TextMarkInlineMathContent {
+				buf.WriteString(n.TextMarkInlineMathContent)
+			} else if "" != n.TextMarkInlineMemoContent {
 				buf.WriteString(n.TextMarkInlineMemoContent)
 			}
 		}
@@ -413,13 +411,11 @@ func (n *Node) Stat() (runeCnt, wordCnt, linkCnt, imgCnt, refCnt int) {
 			NodeGitConflictContent:
 			buf = append(buf, n.Tokens...)
 		case NodeTextMark:
-			if 0 < len(n.TextMarkInlineMathContent) {
-				buf = append(buf, n.TextMarkInlineMathContent...)
-			}
 			if 0 < len(n.TextMarkTextContent) {
 				buf = append(buf, n.TextMarkTextContent...)
-			}
-			if "" != n.TextMarkInlineMemoContent {
+			} else if 0 < len(n.TextMarkInlineMathContent) {
+				buf = append(buf, n.TextMarkInlineMathContent...)
+			} else if "" != n.TextMarkInlineMemoContent {
 				buf = append(buf, n.TextMarkInlineMemoContent...)
 			}
 
