@@ -176,7 +176,13 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 			if node.IsTextMarkType("code") {
 				textContent = html.UnescapeString(textContent)
 			}
+			if strings.HasPrefix(textContent, " ") {
+				r.WriteString(editor.Zwsp) // 填充零宽空格以满足 Markdown 语法 https://github.com/siyuan-note/siyuan/issues/6472
+			}
 			r.WriteString(textContent)
+			if strings.HasSuffix(textContent, " ") {
+				r.WriteString(editor.Zwsp) // 填充零宽空格以满足 Markdown 语法 https://github.com/siyuan-note/siyuan/issues/6472
+			}
 		}
 	} else {
 		marker := r.renderMdMarker(node, entering)
