@@ -387,7 +387,8 @@ func (n *Node) Content() (ret string) {
 				}
 			} else if "" != n.TextMarkInlineMathContent {
 				buf.WriteString(n.TextMarkInlineMathContent)
-			} else if "" != n.TextMarkInlineMemoContent {
+			}
+			if "" != n.TextMarkInlineMemoContent {
 				buf.WriteString(n.TextMarkInlineMemoContent)
 			}
 		}
