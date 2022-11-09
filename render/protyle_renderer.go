@@ -250,6 +250,9 @@ func (r *ProtyleRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *ProtyleRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if nil == node.Previous {
+			r.WriteString(editor.Zwsp)
+		}
 		r.Tag("span", [][]string{{"data-type", "kbd"}}, false)
 		r.WriteString(editor.Zwsp)
 	}
@@ -510,6 +513,9 @@ func (r *ProtyleRenderer) renderGitConflict(node *ast.Node, entering bool) ast.W
 func (r *ProtyleRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.TextAutoSpacePrevious(node)
+		if nil == node.Previous {
+			r.WriteString(editor.Zwsp)
+		}
 	} else {
 		r.TextAutoSpaceNext(node)
 	}
@@ -1411,6 +1417,10 @@ func (r *ProtyleRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.Walk
 					r.WriteByte(lex.ItemSpace)
 				}
 			}
+		}
+
+		if nil == node.Previous {
+			r.WriteString(editor.Zwsp)
 		}
 	} else {
 		if r.Options.AutoSpace {
