@@ -1195,6 +1195,10 @@ func (r *ProtyleRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStat
 
 func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if nil == node.Previous || editor.Caret == node.Previous.Text() {
+			r.WriteString(editor.Zwsp)
+		}
+
 		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
 		parentStyle := node.IALAttr("parent-style")
 		if "" != parentStyle { // 手动设置了位置
