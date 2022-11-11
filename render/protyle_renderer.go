@@ -1297,15 +1297,6 @@ func (r *ProtyleRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStat
 			}
 		}
 		destTokens = r.LinkPath(destTokens)
-		if bytes.HasPrefix(destTokens, []byte("assets/")) {
-			if bytes.Contains(destTokens, []byte("?")) {
-				idx := bytes.IndexByte(destTokens, '?')
-				d := bytes.ReplaceAll(destTokens[:idx], []byte("#"), []byte("%23"))
-				destTokens = append(d, destTokens[idx:]...)
-			} else {
-				destTokens = bytes.ReplaceAll(destTokens, []byte("#"), []byte("%23"))
-			}
-		}
 
 		caretInDest := bytes.Contains(destTokens, editor.CaretTokens)
 		if caretInDest {
@@ -1808,18 +1799,6 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 		} else if "a" == typ {
 			href := node.TextMarkAHref
 			href = string(r.LinkPath([]byte(href)))
-			if strings.HasPrefix(href, "assets/") {
-				if strings.Contains(href, "?") {
-					idx := strings.IndexByte(href, '?')
-					d := strings.ReplaceAll(href[:idx], "#", "%23")
-					href = d + href[idx:]
-				} else {
-					href = strings.ReplaceAll(href, "#", "%23")
-					href = strings.ReplaceAll(href, "&", "&amp;")
-				}
-			} else {
-				href = strings.ReplaceAll(href, "&", "&amp;")
-			}
 
 			attrs = append(attrs, []string{"data-href", href})
 			if "" != node.TextMarkATitle {

@@ -1252,15 +1252,6 @@ func (r *ProtyleExportRenderer) renderLink(node *ast.Node, entering bool) ast.Wa
 		}
 
 		destTokens = r.LinkPath(destTokens)
-		if bytes.HasPrefix(destTokens, []byte("assets/")) {
-			if bytes.Contains(destTokens, []byte("?")) {
-				idx := bytes.IndexByte(destTokens, '?')
-				d := bytes.ReplaceAll(destTokens[:idx], []byte("#"), []byte("%23"))
-				destTokens = append(d, destTokens[idx:]...)
-			} else {
-				destTokens = bytes.ReplaceAll(destTokens, []byte("#"), []byte("%23"))
-			}
-		}
 
 		caretInDest := bytes.Contains(destTokens, editor.CaretTokens)
 		if caretInDest {
