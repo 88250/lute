@@ -1196,7 +1196,17 @@ func (r *ProtyleRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStat
 func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if nil == node.Previous || editor.Caret == node.Previous.Text() {
-			r.WriteString(editor.Zwsp)
+			if nil != node.Next {
+				if ast.NodeKramdownSpanIAL == node.Next.Type {
+					if !bytes.Contains(node.Next.Tokens, []byte("display: block")) {
+						r.WriteString(editor.Zwsp)
+					}
+				} else {
+					r.WriteString(editor.Zwsp)
+				}
+			} else {
+				r.WriteString(editor.Zwsp)
+			}
 		}
 
 		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
