@@ -421,7 +421,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Mark:
 		node.Type = ast.NodeMark
 		marker := "=="
-		node.AppendChild(&ast.Node{Type: ast.NodeMark1OpenMarker, Tokens: util.StrToBytes(marker)})
+		node.AppendChild(&ast.Node{Type: ast.NodeMark2OpenMarker, Tokens: util.StrToBytes(marker)})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -568,7 +568,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		appendSpace(n, tree, lute)
 	case atom.Mark:
 		marker := "=="
-		node.AppendChild(&ast.Node{Type: ast.NodeMark1CloseMarker, Tokens: util.StrToBytes(marker)})
+		node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: util.StrToBytes(marker)})
 		appendSpace(n, tree, lute)
 	case atom.Sup:
 		node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
