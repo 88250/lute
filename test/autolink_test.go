@@ -18,6 +18,7 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"21", "https://scoop.sh/", "<p><a href=\"https://scoop.sh/\">https://scoop.sh/</a></p>\n"},
 	{"20", "https://www.electron.build/", "<p><a href=\"https://www.electron.build/\">https://www.electron.build/</a></p>\n"},
 	{"19", "https://rime.im", "<p><a href=\"https://rime.im\">https://rime.im</a></p>\n"},
 	{"18", "https://bbs.125.la", "<p><a href=\"https://bbs.125.la\">https://bbs.125.la</a></p>\n"},
