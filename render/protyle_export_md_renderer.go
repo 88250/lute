@@ -1417,11 +1417,7 @@ func (r *ProtyleExportMdRenderer) renderCodeBlockCode(node *ast.Node, entering b
 	if entering {
 		tokens := node.Tokens
 		info := node.Parent.ChildByType(ast.NodeCodeBlockFenceInfoMarker)
-		if nil != info &&
-			bytes.Contains(info.CodeBlockInfo, []byte("flowchart")) ||
-			bytes.Contains(info.CodeBlockInfo, []byte("mermaid")) ||
-			bytes.Contains(info.CodeBlockInfo, []byte("graphviz")) ||
-			bytes.Contains(info.CodeBlockInfo, []byte("plantuml")) {
+		if nil != info && NoHighlight(string(info.CodeBlockInfo)) {
 			tokens = html.UnescapeHTML(tokens)
 		}
 		r.Write(tokens)
