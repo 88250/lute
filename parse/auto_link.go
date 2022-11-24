@@ -201,6 +201,12 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			protocol = tokens[i : i+6]
 			i += 6
 		} else if parts := bytes.Split(tokens[i:], []byte("://")); 2 == len(parts) && 0 < len(parts[0]) && 0 < len(parts[1]) && !bytes.Contains(tokens[i:], httpProto) && !bytes.Contains(tokens[i:], httpsProto) && !bytes.Contains(tokens[i:], ftpProto) {
+			if !lex.IsASCIILetterNums(parts[0]) {
+				textEnd++
+				i++
+				continue
+			}
+
 			// 自定义协议均认为是有效的 https://github.com/siyuan-note/siyuan/issues/5865
 			protocol = append(parts[0], []byte("://")...)
 			i += len(parts[0]) + 3

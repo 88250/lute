@@ -18,6 +18,8 @@ import (
 
 var debugTests = []parseTest{
 
+	{"65", "foo：bar://baz", "<p>foo：<a href=\"bar://baz\">bar://baz</a></p>\n"},
+	{"64", "foo bar://baz", "<p>foo <a href=\"bar://baz\">bar://baz</a></p>\n"},
 	{"63", "1. foo\n\nbar\n\n2. baz", "<ol>\n<li>foo</li>\n</ol>\n<p>bar</p>\n<ol start=\"2\">\n<li>baz</li>\n</ol>\n"},
 	{"62", "[请从这里开始](siyuan://blocks/20200812220555-lj3enxa)", "<p><a href=\"siyuan://blocks/20200812220555-lj3enxa\">请从这里开始</a></p>\n"},
 	{"61", "![a](\"<img src=xss onerror=alert(1)>)", "<p>![a](&quot;&lt;img src=xss onerror=alert(1)&gt;)</p>\n"},
