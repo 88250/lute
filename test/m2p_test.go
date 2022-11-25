@@ -19,6 +19,7 @@ import (
 
 var md2BlockDOMTests = []parseTest{
 
+	{"55", "foo\n{: style=\"color: green\"}\n\n{: style=\"color: green\"}\n\nbar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" style=\"color: green\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"2\" data-type=\"NodeParagraph\" class=\"p\" style=\"color: green\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"3\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"54", "foo==bar==baz", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"mark\">bar</span>baz</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"53", "foo\\\\\\~bar\\\\\\~baz", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">foo\\~bar\\~baz</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"52", "<div>\n<details>\n<summary>foo</summary>\n</div>\n{: id=\"20221022222200-2b6wj74\" updated=\"20221022222200\"}\n", "<div data-node-id=\"20221022222200-2b6wj74\" data-node-index=\"1\" data-type=\"NodeHTMLBlock\" class=\"render-node\" updated=\"20221022222200\" data-subtype=\"block\"><div class=\"protyle-icons\"><span class=\"protyle-icon protyle-icon--first protyle-action__edit\"><svg><use xlink:href=\"#iconEdit\"></use></svg></span><span class=\"protyle-icon protyle-action__menu protyle-icon--last\"><svg><use xlink:href=\"#iconMore\"></use></svg></span></div><div><protyle-html data-content=\"&lt;div&gt;\n&lt;details&gt;\n&lt;summary&gt;foo&lt;/summary&gt;\n&lt;/div&gt;\"></protyle-html><span style=\"position: absolute\">\u200b</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
@@ -102,7 +103,7 @@ func TestMd2BlockDOM(t *testing.T) {
 
 	ast.Testing = true
 	for _, test := range md2BlockDOMTests {
-		result := luteEngine.Md2BlockDOM(test.from)
+		result := luteEngine.Md2BlockDOM(test.from, true)
 		if test.to != result {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
 		}

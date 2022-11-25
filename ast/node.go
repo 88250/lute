@@ -285,6 +285,24 @@ func (n *Node) IALAttr(name string) string {
 	return ""
 }
 
+func (n *Node) IsEmptyBlockIAL() bool {
+	if NodeKramdownBlockIAL != n.Type {
+		return false
+	}
+
+	if util.IsDocIAL(n.Tokens) {
+		return false
+	}
+
+	if nil != n.Previous {
+		if NodeKramdownBlockIAL == n.Previous.Type {
+			return true
+		}
+		return false
+	}
+	return true
+}
+
 // TokensStr 返回 n 的 Tokens 字符串。
 func (n *Node) TokensStr() string {
 	return util.BytesToStr(n.Tokens)

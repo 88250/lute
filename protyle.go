@@ -114,9 +114,26 @@ func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 	return
 }
 
-func (lute *Lute) Md2BlockDOM(markdown string) (vHTML string) {
+func (lute *Lute) Md2BlockDOM(markdown string, reserveEmptyParagraph bool) (vHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	lute.NestedInlines2FlattedSpans(tree)
+	if reserveEmptyParagraph {
+		ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if !entering {
+				return ast.WalkContinue
+			}
+
+			if n.IsEmptyBlockIAL() {
+				p := &ast.Node{Type: ast.NodeParagraph}
+				p.KramdownIAL = parse.Tokens2IAL(n.Tokens)
+				p.ID = p.IALAttr("id")
+				n.InsertBefore(p)
+				return ast.WalkContinue
+			}
+			return ast.WalkContinue
+		})
+	}
+
 	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
