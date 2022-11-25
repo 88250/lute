@@ -187,7 +187,7 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 	} else {
 		marker := r.renderMdMarker(node, entering)
 		r.WriteString(marker)
-		if nil != node.Next && (ast.NodeTextMark == node.Next.Type || ast.NodeKramdownSpanIAL == node.Next.Type) {
+		if nil != node.Next && ast.NodeTextMark == node.Next.Type {
 			r.WriteString(editor.Zwsp) // 通过零宽空格来区隔相邻的 Markdown 标记符
 		}
 	}
