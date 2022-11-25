@@ -235,7 +235,7 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 			processNestedNode(n, "a", &tags, &unlinks, entering)
 		case ast.NodeBlockRef:
 			processNestedNode(n, "block-ref", &tags, &unlinks, entering)
-		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText, ast.NodeBlockRefID:
+		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText, ast.NodeBlockRefID, ast.NodeHTMLEntity:
 			if 1 > len(tags) {
 				return ast.WalkContinue
 			}
