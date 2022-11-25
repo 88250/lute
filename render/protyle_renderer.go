@@ -718,20 +718,7 @@ func (r *ProtyleRenderer) renderHtmlEntity(node *ast.Node, entering bool) ast.Wa
 	if !entering {
 		return ast.WalkContinue
 	}
-
-	r.WriteString("<span class=\"protyle-wysiwyg__block\" data-type=\"html-entity\">")
-	r.Tag("code", [][]string{{"data-type", "html-entity"}, {"style", "display: none"}}, false)
-	tokens := node.HtmlEntityTokens
-	r.Write(html.EscapeHTML(tokens))
-	r.WriteString("</code>")
-
-	r.Tag("span", [][]string{{"class", "protyle-wysiwyg__preview"}, {"data-render", "2"}}, false)
-	r.Tag("code", nil, false)
-	previewTokens := bytes.ReplaceAll(node.HtmlEntityTokens, editor.CaretTokens, nil)
-	r.Write(previewTokens)
-	r.Tag("/code", nil, false)
-	r.Tag("/span", nil, false)
-	r.WriteString("</span>")
+	r.Write(html.EscapeHTML(node.Tokens))
 	return ast.WalkContinue
 }
 
