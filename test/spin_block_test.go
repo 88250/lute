@@ -211,6 +211,7 @@ func TestSpinBlockDOM(t *testing.T) {
 	luteEngine.SetFileAnnotationRef(true)
 	luteEngine.SetInlineMathAllowDigitAfterOpenMarker(true)
 	luteEngine.SetTextMark(true)
+	luteEngine.SetSpin(true)
 
 	ast.Testing = true
 	for _, test := range spinBlockDOMTests {

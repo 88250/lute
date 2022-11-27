@@ -50,7 +50,8 @@ func (t *Tree) finalParseBlockIAL() {
 		if "" == n.ID {
 			n.ID = ast.NewNodeID()
 
-			if t.Context.ParseOption.ProtyleWYSIWYG && ast.NodeDocument != n.Type && nil != n.Next && ast.NodeKramdownBlockIAL != n.Next.Type && "" != n.Next.ID {
+			if t.Context.ParseOption.ProtyleWYSIWYG && t.Context.ParseOption.Spin &&
+				ast.NodeDocument != n.Type && nil != n.Next && ast.NodeKramdownBlockIAL != n.Next.Type && "" != n.Next.ID {
 				// 这个节点是 spin 后新生成的，将 n.Next 的 ID 和属性赋予它，并认为 n.Next 是新节点
 				n.ID = n.Next.ID
 				n.KramdownIAL = n.Next.KramdownIAL
@@ -392,6 +393,10 @@ type Options struct {
 	// 这个开关主要用于兼容 Markdown 输入 API 上 https://github.com/siyuan-note/siyuan/issues/6039
 	// 不用于 Protyle 自旋过程 https://github.com/siyuan-note/siyuan/issues/5877
 	HTMLTag2TextMark bool
+	// Spin 设置是否打开自旋解析支持，该选项仅用于 Spin 内部过程，外部请勿设置或使用。
+	// 该选项的引入主要为了解决 finalParseBlockIAL 过程中是否需要移动 IAL 节点的问题，只有处于自旋过程中才需要移动 IAL 节点
+	// 其他情况（比如 API 输入 markdown https://github.com/siyuan-note/siyuan/issues/6725）无需移动处理
+	Spin bool
 }
 
 var EmojiLock = sync.Mutex{}
