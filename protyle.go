@@ -1522,18 +1522,16 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			dataType = strings.ReplaceAll(dataType, "backslash", "")
-			dataType = strings.TrimSpace(dataType)
-
+			dataType = lute.removeTempMark(dataType)
+			tmpDataType := strings.ReplaceAll(dataType, "backslash", "")
+			tmpDataType = strings.TrimSpace(tmpDataType)
 			tree.Context.Tip.AppendChild(node)
-
-			if lute.isTempMarkSpan(dataType) {
-				// 搜索高亮标记认为是普通文本
+			if "" == tmpDataType {
 				node.Type = ast.NodeText
 				node.Tokens = []byte(util.DomText(n))
 				return
 			}
-
+			lute.setDOMAttrValue(n, "data-type", dataType)
 			parse.SetTextMarkNode(node, n)
 			return
 		}
@@ -2123,4 +2121,11 @@ func (lute *Lute) removeInnerMarker0(n *html.Node, marker string) {
 
 func (lute *Lute) isTempMarkSpan(dataType string) bool {
 	return "search-mark" == dataType || "virtual-block-ref" == dataType
+}
+
+func (lute *Lute) removeTempMark(dataType string) (ret string) {
+	ret = strings.ReplaceAll(dataType, "search-mark", "")
+	ret = strings.ReplaceAll(ret, "virtual-block-ref", "")
+	ret = strings.TrimSpace(ret)
+	return
 }
