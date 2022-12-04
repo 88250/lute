@@ -13,6 +13,7 @@ package render
 import (
 	"bytes"
 	"strconv"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -174,7 +175,39 @@ func (r *HtmlRenderer) Render() (output []byte) {
 
 func (r *HtmlRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.Tokens)
+		textContent := node.TextMarkTextContent
+		if node.ParentIs(ast.NodeTableCell) {
+			textContent = strings.ReplaceAll(textContent, "\\|", "|")
+			textContent = strings.ReplaceAll(textContent, "\n", "<br />")
+		}
+
+		if node.IsTextMarkType("a") {
+			attrs := [][]string{{"href", node.TextMarkAHref}}
+			if "" != node.TextMarkATitle {
+				attrs = append(attrs, []string{"title", node.TextMarkATitle})
+			}
+			r.Tag("a", attrs, false)
+			r.WriteString(textContent)
+			r.WriteString("</a>")
+		} else if node.IsTextMarkType("inline-memo") {
+			r.WriteString(textContent)
+			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+			if isCJK(lastRune) {
+				r.WriteString("<sup>（")
+				r.WriteString(node.TextMarkInlineMemoContent)
+				r.WriteString("）</sup>")
+			} else {
+				r.WriteString("<sup>(")
+				r.WriteString(node.TextMarkInlineMemoContent)
+				r.WriteString(")</sup>")
+			}
+		} else {
+			attrs := r.renderTextMarkAttrs(node)
+			r.spanNodeAttrs(node, &attrs)
+			r.Tag("span", attrs, false)
+			r.WriteString(textContent)
+			r.WriteString("</span>")
+		}
 	}
 	return ast.WalkContinue
 }
@@ -1312,4 +1345,41 @@ func (r *HtmlRenderer) handleKramdownBlockIAL(node *ast.Node) {
 		// 第一项必须是 ID
 		node.KramdownIAL[0][0] = r.Options.KramdownIALIDRenderName
 	}
+}
+
+func (r *HtmlRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
+	attrs = [][]string{{"data-type", node.TextMarkType}}
+
+	types := strings.Split(node.TextMarkType, " ")
+	for _, typ := range types {
+		if "block-ref" == typ {
+			attrs = append(attrs, []string{"data-subtype", node.TextMarkBlockRefSubtype})
+			attrs = append(attrs, []string{"data-id", node.TextMarkBlockRefID})
+		} else if "a" == typ {
+			attrs = append(attrs, []string{"data-href", node.TextMarkAHref})
+			if "" != node.TextMarkATitle {
+				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
+			}
+		} else if "inline-math" == typ {
+			attrs = append(attrs, []string{"data-subtype", "math"})
+			inlineMathContent := node.TextMarkInlineMathContent
+			if node.ParentIs(ast.NodeTableCell) {
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
+			}
+			attrs = append(attrs, []string{"data-content", inlineMathContent})
+			attrs = append(attrs, []string{"contenteditable", "false"})
+			attrs = append(attrs, []string{"class", "render-node"})
+		} else if "file-annotation-ref" == typ {
+			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
+		} else if "inline-memo" == typ {
+			inlineMemoContent := node.TextMarkInlineMemoContent
+			attrs = append(attrs, []string{"data-inline-memo-content", inlineMemoContent})
+		}
+	}
+	return
+}
+
+func (r *HtmlRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
+	*attrs = append(*attrs, node.KramdownIAL...)
 }

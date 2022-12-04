@@ -48,7 +48,11 @@ func (t *Tree) finalParseBlockIAL() {
 		}
 
 		if "" == n.ID {
-			n.ID = ast.NewNodeID()
+			id := n.IALAttr("id")
+			if "" == id {
+				id = ast.NewNodeID()
+			}
+			n.ID = id
 
 			if t.Context.ParseOption.ProtyleWYSIWYG && t.Context.ParseOption.Spin &&
 				ast.NodeDocument != n.Type && nil != n.Next && ast.NodeKramdownBlockIAL != n.Next.Type && "" != n.Next.ID {
@@ -73,6 +77,7 @@ func (t *Tree) finalParseBlockIAL() {
 		ial := n.Next
 		if nil == ial || ast.NodeKramdownBlockIAL != ial.Type {
 			if t.Context.ParseOption.ProtyleWYSIWYG {
+				n.SetIALAttr("id", n.ID)
 				n.SetIALAttr("updated", n.ID[:14])
 			}
 			return ast.WalkContinue
