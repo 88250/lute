@@ -198,6 +198,12 @@ func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkS
 				textContent = strings.ReplaceAll(textContent, "<br/>", "")
 			}
 		}
+
+		if r.Options.AutoSpace && !parse.ContainTextMark(node, "block-ref", "code", "inline-math", "kbd", "tag") {
+			// `优化排版` 支持行级元素加粗、斜体等 https://github.com/siyuan-note/siyuan/issues/6800
+			textContent = string(r.Space([]byte(textContent)))
+		}
+
 		r.WriteString(textContent)
 	} else {
 		r.WriteString("</span>")
