@@ -569,6 +569,7 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 	node.TextMarkType = dataType
 	node.Tokens = nil
 	types := strings.Split(dataType, " ")
+	isInlineMath := false
 	for _, typ := range types {
 		switch typ {
 		case "a":
@@ -576,6 +577,7 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
 		case "inline-math":
 			node.TextMarkInlineMathContent = util.GetTextMarkInlineMathData(n)
+			isInlineMath = true
 		case "block-ref":
 			node.TextMarkBlockRefID, node.TextMarkBlockRefSubtype = util.GetTextMarkBlockRefData(n)
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
@@ -586,7 +588,9 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
 			node.TextMarkInlineMemoContent = util.GetTextMarkInlineMemoData(n)
 		default:
-			node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeSingleQuote(n)
+			if !isInlineMath {
+				node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeSingleQuote(n)
+			}
 		}
 	}
 
