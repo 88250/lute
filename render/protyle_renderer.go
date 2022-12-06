@@ -184,7 +184,7 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 		}
 		attrs := r.renderTextMarkAttrs(node)
 		r.spanNodeAttrs(node, &attrs)
-		if nil == node.Previous && parse.ContainTextMark(node, "code", "kbd", "tag") {
+		if (nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type) && parse.ContainTextMark(node, "code", "kbd", "tag") {
 			r.WriteString(editor.Zwsp)
 		}
 
@@ -250,7 +250,7 @@ func (r *ProtyleRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *ProtyleRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if nil == node.Previous {
+		if nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type {
 			r.WriteString(editor.Zwsp)
 		}
 		r.Tag("span", [][]string{{"data-type", "kbd"}}, false)
@@ -513,7 +513,7 @@ func (r *ProtyleRenderer) renderGitConflict(node *ast.Node, entering bool) ast.W
 func (r *ProtyleRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.TextAutoSpacePrevious(node)
-		if nil == node.Previous {
+		if nil == node.Previous || ast.NodeSoftBreak != node.Previous.Type {
 			r.WriteString(editor.Zwsp)
 		}
 	} else {
@@ -1411,7 +1411,7 @@ func (r *ProtyleRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.Walk
 			}
 		}
 
-		if nil == node.Previous {
+		if nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type {
 			r.WriteString(editor.Zwsp)
 		}
 	} else {
