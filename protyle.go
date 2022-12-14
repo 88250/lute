@@ -263,7 +263,7 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 					}
 
 					span.TextMarkBlockRefID = n.Parent.ChildByType(ast.NodeBlockRefID).TokensStr()
-				} else if ast.NodeLinkText == n.Type && !n.ParentIs(ast.NodeImage) {
+				} else if n.ParentIs(ast.NodeLink) && !n.ParentIs(ast.NodeImage) {
 					if next := n.Next; nil != next && ast.NodeLinkText == next.Type {
 						// 合并相邻的链接文本节点
 						n.Next.PrependTokens(n.Tokens)
@@ -287,6 +287,8 @@ func (lute *Lute) NestedInlines2FlattedSpans(tree *parse.Tree) {
 							span.TextMarkATitle = string(title.Tokens)
 						}
 					}
+				} else if ast.NodeCodeSpanContent == n.Type {
+
 				}
 			} else {
 				if next := n.Next; nil != next && ast.NodeLinkText == next.Type {
