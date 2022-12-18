@@ -36,7 +36,7 @@ func ParseJSONWithoutFix(jsonData []byte, options *Options) (ret *Tree, err erro
 
 	idMap := map[string]bool{}
 	for _, child := range root.Children {
-		genTreeByJSON(child, ret, &idMap, nil, true)
+		genTreeByJSON(child, ret, &idMap, nil, nil, true)
 	}
 	return
 }
@@ -68,9 +68,10 @@ func ParseJSON(jsonData []byte, options *Options) (ret *Tree, needFix bool, err 
 		return
 	}
 
+	needMigrate2Spec1 := false
 	idMap := map[string]bool{}
 	for _, child := range root.Children {
-		genTreeByJSON(child, ret, &idMap, &needFix, false)
+		genTreeByJSON(child, ret, &idMap, &needFix, &needMigrate2Spec1, false)
 	}
 
 	if nil == ret.Root.FirstChild {
@@ -78,6 +79,11 @@ func ParseJSON(jsonData []byte, options *Options) (ret *Tree, needFix bool, err 
 		newP := NewParagraph()
 		ret.Root.AppendChild(newP)
 		ret.Root.SetIALAttr("updated", newP.ID[:14])
+	}
+
+	if needMigrate2Spec1 {
+		NestedInlines2FlattedSpans(ret)
+		needFix = true
 	}
 	return
 }
@@ -90,7 +96,7 @@ func NewParagraph() (ret *ast.Node) {
 	return
 }
 
-func genTreeByJSON(node *ast.Node, tree *Tree, idMap *map[string]bool, needFix *bool, ignoreFix bool) {
+func genTreeByJSON(node *ast.Node, tree *Tree, idMap *map[string]bool, needFix, needMigrate2Spec1 *bool, ignoreFix bool) {
 	node.Tokens, node.Type = util.StrToBytes(node.Data), ast.Str2NodeType(node.TypeStr)
 	node.Data, node.TypeStr = "", ""
 	node.KramdownIAL = Map2IAL(node.Properties)
@@ -139,7 +145,7 @@ func genTreeByJSON(node *ast.Node, tree *Tree, idMap *map[string]bool, needFix *
 			}
 		}
 
-		fixLegacyData(tree.Context.Tip, node, idMap, needFix)
+		fixLegacyData(tree.Context.Tip, node, idMap, needFix, needMigrate2Spec1)
 	}
 
 	tree.Context.Tip.AppendChild(node)
@@ -149,12 +155,12 @@ func genTreeByJSON(node *ast.Node, tree *Tree, idMap *map[string]bool, needFix *
 		return
 	}
 	for _, child := range node.Children {
-		genTreeByJSON(child, tree, idMap, needFix, ignoreFix)
+		genTreeByJSON(child, tree, idMap, needFix, needMigrate2Spec1, ignoreFix)
 	}
 	node.Children = nil
 }
 
-func fixLegacyData(tip, node *ast.Node, idMap *map[string]bool, needFix *bool) {
+func fixLegacyData(tip, node *ast.Node, idMap *map[string]bool, needFix, needMigrate2Spec1 *bool) {
 	if node.IsBlock() {
 		if "" == node.ID {
 			node.ID = ast.NewNodeID()
@@ -228,6 +234,10 @@ func fixLegacyData(tip, node *ast.Node, idMap *map[string]bool, needFix *bool) {
 				*needFix = true
 			}
 		}
+	case ast.NodeBlockRef:
+		// 建立索引时无法解析 `v2.2.0-` 版本的块引用 https://github.com/siyuan-note/siyuan/issues/6889
+		// 早先的迁移程序有缺陷，漏迁移了块引用节点，这里检测到块引用节点后标识需要迁移
+		*needMigrate2Spec1 = true
 	}
 
 	for _, kv := range node.KramdownIAL {
