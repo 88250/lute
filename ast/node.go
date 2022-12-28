@@ -236,6 +236,16 @@ func (n *Node) IsSameTextMarkType(node *Node) bool {
 	return true
 }
 
+func (n *Node) SortTextMarkDataTypes() {
+	if "" == n.TextMarkTextContent {
+		return
+	}
+
+	dataTypes := strings.Split(n.TextMarkType, " ")
+	sort.Strings(dataTypes)
+	n.TextMarkType = strings.Join(dataTypes, " ")
+}
+
 // ClearIALAttrs 用于删除 name、alias、memo 和 bookmark 以及所有 custom- 前缀属性。
 func (n *Node) ClearIALAttrs() {
 	tmp := n.KramdownIAL[:0]

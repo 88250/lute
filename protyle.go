@@ -296,11 +296,11 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 }
 
 func (lute *Lute) MergeSameTextMark(n *ast.Node) {
-	if nil == n.Next || n.Type != n.Next.Type || !n.IsSameTextMarkType(n.Next) {
+	if nil == n.Previous || n.Type != n.Previous.Type || !n.IsSameTextMarkType(n.Previous) {
 		return
 	}
 
-	if nil != n.Next.Next && ast.NodeKramdownSpanIAL == n.Next.Next.Type {
+	if ast.NodeKramdownSpanIAL == n.Previous.Type {
 		return
 	}
 
@@ -323,8 +323,9 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 		return
 	}
 
-	n.TextMarkTextContent += n.Next.TextMarkTextContent
-	n.Next.Unlink()
+	n.TextMarkTextContent = n.Previous.TextMarkTextContent + n.TextMarkTextContent
+	n.SortTextMarkDataTypes()
+	n.Previous.Unlink()
 }
 
 func (lute *Lute) MergeSameSpan(n *ast.Node) {
