@@ -232,6 +232,17 @@ func (n *Node) IsSameTextMarkType(node *Node) bool {
 		if a[i] != b[i] {
 			return false
 		}
+
+		switch a[i] {
+		case "block-ref":
+			if n.TextMarkBlockRefID != node.TextMarkBlockRefID {
+				return false
+			}
+		case "a":
+			if n.TextMarkAHref != node.TextMarkAHref || node.TextMarkATitle != node.TextMarkATitle {
+				return false
+			}
+		}
 	}
 	return true
 }
