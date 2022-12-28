@@ -296,12 +296,29 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 }
 
 func (lute *Lute) MergeSameTextMark(n *ast.Node) {
-	if nil == n.Previous || n.Type != n.Previous.Type || !n.IsSameTextMarkType(n.Previous) {
+	if nil == n.Previous {
 		return
 	}
 
+	mergeWithIAL := false
 	if ast.NodeKramdownSpanIAL == n.Previous.Type {
-		return
+		if nil == n.Next || ast.NodeKramdownSpanIAL != n.Next.Type || nil == n.Previous.Previous {
+			return
+		}
+
+		if !bytes.Equal(n.Previous.Tokens, n.Next.Tokens) {
+			return
+		}
+
+		if !n.IsSameTextMarkType(n.Previous.Previous) {
+			return
+		}
+
+		mergeWithIAL = true
+	} else {
+		if n.Type != n.Previous.Type || !n.IsSameTextMarkType(n.Previous) {
+			return
+		}
 	}
 
 	types := strings.Split(n.TextMarkType, " ")
@@ -312,7 +329,7 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 	var allowMerge []string
 	for k, _ := range m {
 		switch k {
-		case "code", "em", "strong", "s", "mark", "u", "sub", "sup", "kbd":
+		case "code", "em", "strong", "s", "mark", "u", "sub", "sup", "kbd", "text":
 			allowMerge = append(allowMerge, k)
 		}
 	}
@@ -323,9 +340,14 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 		return
 	}
 
-	n.TextMarkTextContent = n.Previous.TextMarkTextContent + n.TextMarkTextContent
-	n.SortTextMarkDataTypes()
+	if mergeWithIAL {
+		n.TextMarkTextContent = n.Previous.Previous.TextMarkTextContent + n.TextMarkTextContent
+		n.Previous.Previous.Unlink()
+	} else {
+		n.TextMarkTextContent = n.Previous.TextMarkTextContent + n.TextMarkTextContent
+	}
 	n.Previous.Unlink()
+	n.SortTextMarkDataTypes()
 }
 
 func (lute *Lute) MergeSameSpan(n *ast.Node) {
