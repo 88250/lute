@@ -301,6 +301,7 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 	}
 
 	mergeWithIAL := false
+	mergeWithZwsp := false
 	if ast.NodeKramdownSpanIAL == n.Previous.Type {
 		if nil == n.Next || ast.NodeKramdownSpanIAL != n.Next.Type || nil == n.Previous.Previous {
 			return
@@ -316,8 +317,12 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 
 		mergeWithIAL = true
 	} else {
-		if n.Type != n.Previous.Type || !n.IsSameTextMarkType(n.Previous) {
-			return
+		if ast.NodeText == n.Previous.Type && editor.Zwsp == n.Previous.TokensStr() && nil != n.Previous.Previous && n.IsSameTextMarkType(n.Previous.Previous) {
+			mergeWithZwsp = true
+		} else {
+			if n.Type != n.Previous.Type || !n.IsSameTextMarkType(n.Previous) {
+				return
+			}
 		}
 	}
 
@@ -340,7 +345,7 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 		return
 	}
 
-	if mergeWithIAL {
+	if mergeWithIAL || mergeWithZwsp {
 		n.TextMarkTextContent = n.Previous.Previous.TextMarkTextContent + n.TextMarkTextContent
 		n.Previous.Previous.Unlink()
 	} else {
