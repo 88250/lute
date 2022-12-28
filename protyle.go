@@ -317,7 +317,7 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 
 		mergeWithIAL = true
 	} else {
-		if ast.NodeText == n.Previous.Type && editor.Zwsp == n.Previous.TokensStr() && nil != n.Previous.Previous && n.IsSameTextMarkType(n.Previous.Previous) {
+		if ast.NodeText == n.Previous.Type && !strings.Contains(n.Previous.TokensStr(), " ") && "" == strings.TrimSpace(strings.ReplaceAll(n.Previous.TokensStr(), editor.Zwsp, "")) && nil != n.Previous.Previous && n.IsSameTextMarkType(n.Previous.Previous) {
 			mergeWithZwsp = true
 		} else {
 			if n.Type != n.Previous.Type || !n.IsSameTextMarkType(n.Previous) {
@@ -334,7 +334,7 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 	var allowMerge []string
 	for k, _ := range m {
 		switch k {
-		case "code", "em", "strong", "s", "mark", "u", "sub", "sup", "kbd", "text":
+		case "code", "em", "strong", "s", "mark", "u", "sub", "sup", "kbd", "text", "tag", "block-ref", "a":
 			allowMerge = append(allowMerge, k)
 		}
 	}
