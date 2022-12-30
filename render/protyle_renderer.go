@@ -1722,7 +1722,7 @@ func (r *ProtyleRenderer) nodeIndex(node *ast.Node, attrs *[][]string) {
 }
 
 func (r *ProtyleRenderer) spellcheck(attrs *[][]string) {
-	*attrs = append(*attrs, []string{"spellcheck", "false"})
+	*attrs = append(*attrs, []string{"spellcheck", strconv.FormatBool(r.Options.Spellcheck)})
 	return
 }
 

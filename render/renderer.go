@@ -116,6 +116,8 @@ type Options struct {
 	KeepParagraphBeginningSpace bool
 	// NetImgMarker 设置 Protyle 是否标记网络图片
 	ProtyleMarkNetImg bool
+	// Spellcheck 设置是否启用拼写检查
+	Spellcheck bool
 }
 
 func NewOptions() *Options {
@@ -146,6 +148,7 @@ func NewOptions() *Options {
 		NodeIndexStart:                 1,
 		ProtyleContenteditable:         true,
 		ProtyleMarkNetImg:              true,
+		Spellcheck:                     false,
 	}
 }
 
