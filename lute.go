@@ -552,6 +552,10 @@ func (lute *Lute) SetProtyleMarkNetImg(b bool) {
 	lute.RenderOptions.ProtyleMarkNetImg = b
 }
 
+func (lute *Lute) SetSpellcheck(b bool) {
+	lute.RenderOptions.Spellcheck = b
+}
+
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 	for rendererType, extRenderer := range options["renderers"] {
 		switch extRenderer.Interface().(type) { // 稍微进行一点格式校验
