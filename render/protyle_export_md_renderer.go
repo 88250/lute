@@ -214,7 +214,9 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 		switch typ {
 		case "a":
 			if entering {
-				ret += "[" + node.TextMarkTextContent + "](" + node.TextMarkAHref
+				href := node.TextMarkAHref
+				href = string(r.LinkPath([]byte(href)))
+				ret += "[" + node.TextMarkTextContent + "](" + href
 				if "" != node.TextMarkATitle {
 					ret += " \"" + node.TextMarkATitle + "\""
 				}

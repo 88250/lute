@@ -236,7 +236,10 @@ func (r *FormatRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) 
 			attrs = append(attrs, []string{"data-subtype", node.TextMarkBlockRefSubtype})
 			attrs = append(attrs, []string{"data-id", node.TextMarkBlockRefID})
 		} else if "a" == typ {
-			attrs = append(attrs, []string{"data-href", node.TextMarkAHref})
+			href := node.TextMarkAHref
+			href = string(r.LinkPath([]byte(href)))
+
+			attrs = append(attrs, []string{"data-href", href})
 			if "" != node.TextMarkATitle {
 				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
 			}
