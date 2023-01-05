@@ -494,6 +494,10 @@ func (t *Tree) parseTagName(tokens []byte) (remains, tagName []byte) {
 }
 
 func SetSpanIAL(node *ast.Node, n *html.Node) {
+	if nil == node || nil == n {
+		return
+	}
+
 	insertedIAL := false
 	if style := util.DomAttrValue(n, "style"); "" != style { // 比如设置表格列宽
 		style = StyleValue(style)
