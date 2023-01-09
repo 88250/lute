@@ -531,6 +531,10 @@ func (lute *Lute) SetIndentCodeBlock(b bool) {
 	lute.ParseOptions.IndentCodeBlock = b
 }
 
+func (lute *Lute) SetDataImage(b bool) {
+	lute.ParseOptions.DataImage = b
+}
+
 func (lute *Lute) SetTextMark(b bool) {
 	lute.ParseOptions.TextMark = b
 }
