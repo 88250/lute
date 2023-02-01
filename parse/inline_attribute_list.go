@@ -59,6 +59,11 @@ func IALStart(t *Tree, container *ast.Node) int {
 						t.Context.Tip = p
 						lastMatchedContainer = p
 					}
+				} else if ast.NodeBlockquoteMarker == lastMatchedContainer.Type { // 引述块下没有段落子块，需要构建一个空的段落块挂上去
+					p := &ast.Node{Type: ast.NodeParagraph, Tokens: []byte(" ")}
+					lastMatchedContainer.InsertAfter(p)
+					t.Context.Tip = p
+					lastMatchedContainer = p
 				}
 			}
 		}
