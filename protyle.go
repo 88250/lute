@@ -1115,7 +1115,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 
@@ -1185,7 +1185,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			if lute.ParseOptions.TextMark {
 				tree.Context.Tip.AppendChild(node)
-				parse.SetTextMarkNode(node, n)
+				parse.SetTextMarkNode(node, n, lute.ParseOptions)
 				return
 			}
 
@@ -1205,7 +1205,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			if lute.ParseOptions.TextMark {
 				tree.Context.Tip.AppendChild(node)
-				parse.SetTextMarkNode(node, n)
+				parse.SetTextMarkNode(node, n, lute.ParseOptions)
 				return
 			}
 
@@ -1229,7 +1229,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			if lute.ParseOptions.TextMark {
 				tree.Context.Tip.AppendChild(node)
-				parse.SetTextMarkNode(node, n)
+				parse.SetTextMarkNode(node, n, lute.ParseOptions)
 				return
 			}
 
@@ -1249,7 +1249,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			if lute.ParseOptions.TextMark {
 				tree.Context.Tip.AppendChild(node)
-				parse.SetTextMarkNode(node, n)
+				parse.SetTextMarkNode(node, n, lute.ParseOptions)
 				return
 			}
 
@@ -1271,7 +1271,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			if lute.ParseOptions.TextMark {
 				tree.Context.Tip.AppendChild(node)
-				parse.SetTextMarkNode(node, n)
+				parse.SetTextMarkNode(node, n, lute.ParseOptions)
 				return
 			}
 
@@ -1310,7 +1310,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 			if lute.ParseOptions.TextMark {
 				tree.Context.Tip.AppendChild(node)
-				parse.SetTextMarkNode(node, n)
+				parse.SetTextMarkNode(node, n, lute.ParseOptions)
 				return
 			}
 
@@ -1393,7 +1393,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				return
 			}
 			lute.setDOMAttrValue(n, "data-type", dataType)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 	case atom.Sub:
@@ -1410,7 +1410,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 
@@ -1433,7 +1433,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 
@@ -1456,7 +1456,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 
@@ -1479,7 +1479,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 
@@ -1520,7 +1520,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 
@@ -1587,7 +1587,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 
@@ -1640,7 +1640,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 
@@ -1689,7 +1689,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 		if lute.ParseOptions.TextMark {
 			tree.Context.Tip.AppendChild(node)
-			parse.SetTextMarkNode(node, n)
+			parse.SetTextMarkNode(node, n, lute.ParseOptions)
 			return
 		}
 

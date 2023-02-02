@@ -169,7 +169,7 @@ func (t *Tree) processSpanTag(startPos int, tags []byte, startTag, endTag string
 		typ = typ[:strings.Index(typ, "\"")]
 	}
 	ret = &ast.Node{Type: ast.NodeTextMark, TextMarkType: typ}
-	SetTextMarkNode(ret, node)
+	SetTextMarkNode(ret, node, t.Context.ParseOption)
 	ctx.pos += end + closerLen
 	return
 }
@@ -560,7 +560,7 @@ func ContainTextMark(node *ast.Node, dataTypes ...string) bool {
 	return false
 }
 
-func SetTextMarkNode(node *ast.Node, n *html.Node) {
+func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 	node.Type = ast.NodeTextMark
 	dataType := util.DomAttrValue(n, "data-type")
 	if "" == dataType {
@@ -591,6 +591,11 @@ func SetTextMarkNode(node *ast.Node, n *html.Node) {
 		case "inline-memo":
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
 			node.TextMarkInlineMemoContent = util.GetTextMarkInlineMemoData(n)
+			inlineTree := Inline("", []byte(node.TextMarkInlineMemoContent), options)
+			if nil != inlineTree {
+				node.TextMarkInlineMemoContent = inlineTree.Root.Content()
+				node.TextMarkInlineMemoContent = strings.ReplaceAll(node.TextMarkInlineMemoContent, "\"", "&quot;")
+			}
 		default:
 			if !isInlineMath { // 带有字体样式的公式复制之后内容不正确 https://github.com/siyuan-note/siyuan/issues/6799
 				node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeSingleQuote(n)
