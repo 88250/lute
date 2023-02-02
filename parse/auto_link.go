@@ -149,25 +149,9 @@ func (t *Tree) isValidEmailSegment2(token byte) bool {
 	return lex.IsASCIILetterNumHyphen(token) || lex.ItemDot == token || lex.ItemUnderscore == token
 }
 
-var (
-	httpProto  = util.StrToBytes("http://")
-	httpsProto = util.StrToBytes("https://")
-	ftpProto   = util.StrToBytes("ftp://")
-
-	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
-	validAutoLinkDomainSuffix = [][]byte{util.StrToBytes("top"), util.StrToBytes("com"), util.StrToBytes("net"), util.StrToBytes("org"), util.StrToBytes("edu"), util.StrToBytes("gov"),
-		util.StrToBytes("cn"), util.StrToBytes("io"), util.StrToBytes("me"), util.StrToBytes("biz"), util.StrToBytes("co"), util.StrToBytes("live"), util.StrToBytes("pro"), util.StrToBytes("xyz"),
-		util.StrToBytes("win"), util.StrToBytes("club"), util.StrToBytes("tv"), util.StrToBytes("wiki"), util.StrToBytes("site"), util.StrToBytes("tech"), util.StrToBytes("space"), util.StrToBytes("cc"),
-		util.StrToBytes("name"), util.StrToBytes("social"), util.StrToBytes("band"), util.StrToBytes("pub"), util.StrToBytes("info"), util.StrToBytes("app"), util.StrToBytes("md"), util.StrToBytes("edu"),
-		util.StrToBytes("hk"), util.StrToBytes("so"), util.StrToBytes("vip"), util.StrToBytes("ai"), util.StrToBytes("ink"), util.StrToBytes("mobi"), util.StrToBytes("pro"), util.StrToBytes("dev"),
-		util.StrToBytes("pm"), util.StrToBytes("to"), util.StrToBytes("store"), util.StrToBytes("shop"), util.StrToBytes("love"), util.StrToBytes("icu"), util.StrToBytes("ltd"), util.StrToBytes("news"),
-		util.StrToBytes("work"), util.StrToBytes("group"), util.StrToBytes("online"), util.StrToBytes("game"), util.StrToBytes("design"), util.StrToBytes("link"),
-		util.StrToBytes("ch"), util.StrToBytes("la"), util.StrToBytes("im"), util.StrToBytes("build"), util.StrToBytes("sh")}
-)
-
 // AddAutoLinkDomainSuffix 添加自动链接解析域名后缀 suffix。
 func AddAutoLinkDomainSuffix(suffix string) {
-	validAutoLinkDomainSuffix = append(validAutoLinkDomainSuffix, util.StrToBytes(suffix))
+	validAutoLinkDomainSuffix[suffix] = true
 }
 
 func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
@@ -470,12 +454,7 @@ func (t *Tree) isValidDomain(protocol, domain []byte) bool {
 				}
 			}
 			if !suffixIsDigit { // 如果后缀不是数字的话检查是否在后缀可用名单中
-				for j := 0; j < len(validAutoLinkDomainSuffix); j++ {
-					if bytes.Equal(segment, validAutoLinkDomainSuffix[j]) {
-						validSuffix = true
-						break
-					}
-				}
+				validSuffix = validAutoLinkDomainSuffix[util.BytesToStr(segment)]
 			} else { // 后缀全为数字的话可能是 IPv4 地址
 				validSuffix = true
 			}
@@ -611,3 +590,185 @@ func (t *Tree) addPreviousText(node *ast.Node, tokens []byte) {
 	}
 	node.Previous.AppendTokens(tokens)
 }
+
+var (
+	httpProto  = util.StrToBytes("http://")
+	httpsProto = util.StrToBytes("https://")
+	ftpProto   = util.StrToBytes("ftp://")
+
+	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
+	validAutoLinkDomainSuffix = map[string]bool{
+		"top": true, "net": true, "org": true, "edu": true, "gov": true, "ms": true,
+		"cn": true, "io": true, "biz": true, "live": true, "pro": true, "xyz": true,
+		"win": true, "club": true, "tv": true, "wiki": true, "site": true, "tech": true, "space": true, "cc": true,
+		"name": true, "social": true, "band": true, "pub": true, "info": true, "app": true,
+		"hk": true, "so": true, "vip": true, "ai": true, "ink": true, "mobi": true, "dev": true,
+		"pm": true, "store": true, "shop": true, "love": true, "icu": true, "ltd": true, "news": true,
+		"work": true, "group": true, "online": true, "game": true, "design": true, "link": true,
+		"build": true,
+		"dz":    true,
+		"af":    true,
+		"ar":    true,
+		"ae":    true,
+		"om":    true,
+		"az":    true,
+		"eg":    true,
+		"et":    true,
+		"ie":    true,
+		"ee":    true,
+		"ad":    true,
+		"ao":    true,
+		"at":    true,
+		"au":    true,
+		"bs":    true,
+		"pk":    true,
+		"py":    true,
+		"bh":    true,
+		"pa":    true,
+		"br":    true,
+		"by":    true,
+		"bg":    true,
+		"bj":    true,
+		"be":    true,
+		"is":    true,
+		"ba":    true,
+		"pl":    true,
+		"bo":    true,
+		"bz":    true,
+		"bw":    true,
+		"bf":    true,
+		"bi":    true,
+		"dk":    true,
+		"de":    true,
+		"tl":    true,
+		"tg":    true,
+		"do":    true,
+		"ru":    true,
+		"ec":    true,
+		"fr":    true,
+		"ph":    true,
+		"fj":    true,
+		"fi":    true,
+		"gm":    true,
+		"cg":    true,
+		"cd":    true,
+		"co":    true,
+		"cr":    true,
+		"gl":    true,
+		"gg":    true,
+		"cu":    true,
+		"gy":    true,
+		"kz":    true,
+		"ht":    true,
+		"kr":    true,
+		"nl":    true,
+		"me":    true,
+		"hn":    true,
+		"ki":    true,
+		"dj":    true,
+		"kg":    true,
+		"gh":    true,
+		"ga":    true,
+		"kh":    true,
+		"cz":    true,
+		"zw":    true,
+		"cm":    true,
+		"ci":    true,
+		"kw":    true,
+		"hr":    true,
+		"ke":    true,
+		"ck":    true,
+		"lv":    true,
+		"ls":    true,
+		"la":    true,
+		"lb":    true,
+		"lt":    true,
+		"ly":    true,
+		"li":    true,
+		"lu":    true,
+		"rw":    true,
+		"ro":    true,
+		"mg":    true,
+		"im":    true,
+		"mv":    true,
+		"mt":    true,
+		"mw":    true,
+		"my":    true,
+		"ml":    true,
+		"mk":    true,
+		"mu":    true,
+		"com":   true,
+		"as":    true,
+		"mn":    true,
+		"bd":    true,
+		"pe":    true,
+		"fm":    true,
+		"md":    true,
+		"ma":    true,
+		"mz":    true,
+		"mx":    true,
+		"na":    true,
+		"za":    true,
+		"nr":    true,
+		"ni":    true,
+		"np":    true,
+		"ne":    true,
+		"ng":    true,
+		"nu":    true,
+		"no":    true,
+		"nf":    true,
+		"pt":    true,
+		"jp":    true,
+		"se":    true,
+		"ch":    true,
+		"sv":    true,
+		"ws":    true,
+		"rs":    true,
+		"sl":    true,
+		"sn":    true,
+		"sc":    true,
+		"sa":    true,
+		"sh":    true,
+		"sm":    true,
+		"lk":    true,
+		"sk":    true,
+		"si":    true,
+		"sb":    true,
+		"tj":    true,
+		"th":    true,
+		"tz":    true,
+		"to":    true,
+		"tt":    true,
+		"tr":    true,
+		"tm":    true,
+		"tk":    true,
+		"gt":    true,
+		"ve":    true,
+		"bn":    true,
+		"ug":    true,
+		"ua":    true,
+		"uy":    true,
+		"uz":    true,
+		"es":    true,
+		"gr":    true,
+		"sg":    true,
+		"nz":    true,
+		"hu":    true,
+		"jm":    true,
+		"am":    true,
+		"il":    true,
+		"it":    true,
+		"in":    true,
+		"id":    true,
+		"uk":    true,
+		"jo":    true,
+		"vn":    true,
+		"zm":    true,
+		"je":    true,
+		"td":    true,
+		"gi":    true,
+		"cl":    true,
+		"cf":    true,
+		"tw":    true,
+	}
+)
