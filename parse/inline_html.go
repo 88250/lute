@@ -206,6 +206,9 @@ func (t *Tree) parseCDATA(tokens []byte) (valid bool, remains, content []byte) {
 		}
 	}
 	tokens = tokens[i:]
+	if 3 > len(tokens) {
+		return
+	}
 	if lex.ItemCloseBracket != tokens[0] || lex.ItemCloseBracket != tokens[1] || lex.ItemGreater != tokens[2] {
 		return
 	}
