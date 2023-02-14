@@ -40,3 +40,21 @@ func TestTermTypo(t *testing.T) {
 		}
 	}
 }
+
+var termTypoFormatTests = []parseTest{
+
+	{"0", "这是一个 github 测试", "这是一个 GitHub 测试\n"},
+}
+
+func TestTermTypoFormat(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetAutoSpace(true)
+	luteEngine.SetFixTermTypo(true)
+	luteEngine.PutTerms(map[string]string{"customtest": "CUSTOMtest"})
+	for _, test := range termTypoFormatTests {
+		html := luteEngine.FormatStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
