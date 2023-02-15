@@ -149,6 +149,7 @@ func NewOptions() *Options {
 		ProtyleContenteditable:         true,
 		ProtyleMarkNetImg:              true,
 		Spellcheck:                     false,
+		Terms:                          NewTerms(),
 	}
 }
 

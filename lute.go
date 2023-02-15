@@ -211,10 +211,6 @@ func (lute *Lute) GetTerms() map[string]string {
 
 // PutTerms 将制定的 termMap 合并覆盖已有的术语字典。
 func (lute *Lute) PutTerms(termMap map[string]string) {
-	if nil == lute.RenderOptions.Terms {
-		lute.RenderOptions.Terms = render.NewTerms()
-	}
-
 	for k, v := range termMap {
 		lute.RenderOptions.Terms[k] = v
 	}
