@@ -50,7 +50,7 @@ func TestTermTypoFormat(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetAutoSpace(true)
 	luteEngine.SetFixTermTypo(true)
-	luteEngine.PutTerms(map[string]string{"customtest": "CUSTOMtest"})
+	// luteEngine.PutTerms(map[string]string{"customtest": "CUSTOMtest"})
 	for _, test := range termTypoFormatTests {
 		html := luteEngine.FormatStr(test.name, test.from)
 		if test.to != html {
