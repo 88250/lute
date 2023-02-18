@@ -853,7 +853,8 @@ var (
 )
 
 // 所有顶级域名(Top-Level Domain),
-//一行对应一个,#号开头为注释;  xn--开头的是 Punycode,对应非英语域名
+//一行对应一个,#号开头为注释;
+// xn--开头的是 Punycode,对应非英语域名; 比如中文网址"中国移动.中国" 转换后为 xn--fiq02ib9d179b.xn--fiqs8s
 //来自: List of Top-Level Domains - ICANN
 //https://www.icann.org/resources/pages/tlds-2012-02-25-en
 var allTLDs = `
