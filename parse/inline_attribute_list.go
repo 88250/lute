@@ -53,7 +53,7 @@ func IALStart(t *Tree, container *ast.Node) int {
 					nil != lastMatchedContainer.Parent { // 两个连续的 IAL
 					tokens := IAL2Tokens(ial)
 					if !bytes.HasPrefix(lastMatchedContainer.Tokens, tokens) { // 有的块解析已经做过打断处理
-						// 在两个连续的 IAL 之间插入空段落，这样能够保持空行留白
+						// 在两个连续的 IAL 之间插入空段落，这样能够保持空段落
 						p := &ast.Node{Type: ast.NodeParagraph, Tokens: []byte(" ")}
 						lastMatchedContainer.InsertAfter(p)
 						t.Context.Tip = p
@@ -62,6 +62,12 @@ func IALStart(t *Tree, container *ast.Node) int {
 				} else if ast.NodeBlockquoteMarker == lastMatchedContainer.Type { // 引述块下没有段落子块，需要构建一个空的段落块挂上去
 					p := &ast.Node{Type: ast.NodeParagraph, Tokens: []byte(" ")}
 					lastMatchedContainer.InsertAfter(p)
+					t.Context.Tip = p
+					lastMatchedContainer = p
+				} else if ast.NodeDocument == lastMatchedContainer.Type {
+					// 第一个节点是 IAL 的话需要保留空段落
+					p := &ast.Node{Type: ast.NodeParagraph, Tokens: []byte(" ")}
+					lastMatchedContainer.AppendChild(p)
 					t.Context.Tip = p
 					lastMatchedContainer = p
 				}
