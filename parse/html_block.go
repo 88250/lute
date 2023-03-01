@@ -12,7 +12,6 @@ package parse
 
 import (
 	"bytes"
-
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -57,6 +56,18 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 				return 2
 			} else if bytes.HasPrefix(tokens, []byte("<audio")) && bytes.HasSuffix(tokens, []byte(">")) {
 				t.Context.addChild(ast.NodeAudio)
+				return 2
+			} else if bytes.HasPrefix(tokens, []byte("<div")) &&
+				bytes.Contains(tokens, []byte("data-type=\"NodeAttributeView\"")) &&
+				bytes.Contains(tokens, []byte("data-av-type=\"")) &&
+				bytes.HasSuffix(tokens, []byte("</div>")) {
+				av := t.Context.addChild(ast.NodeAttributeView)
+				avTypeIdx := bytes.Index(tokens, []byte("data-av-type=\"")) + len("data-av-type=\"")
+				avTypeEndIdx := avTypeIdx + bytes.Index(tokens[avTypeIdx:], []byte("\""))
+				av.AttributeViewType = string(tokens[avTypeIdx:avTypeEndIdx])
+				avIdIdx := bytes.Index(tokens, []byte("data-av-id=\"")) + len("data-av-id=\"")
+				avIdEndIdx := avIdIdx + bytes.Index(tokens[avIdIdx:], []byte("\""))
+				av.AttributeViewID = string(tokens[avIdIdx:avIdEndIdx])
 				return 2
 			}
 		}

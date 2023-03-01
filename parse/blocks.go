@@ -285,7 +285,7 @@ func _continue(n *ast.Node, context *Context) int {
 	case ast.NodeGitConflict:
 		return GitConflictContinue(n, context)
 	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed,
-		ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio, ast.NodeWidget:
+		ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio, ast.NodeWidget, ast.NodeAttributeView:
 		return 1
 	}
 	return 0

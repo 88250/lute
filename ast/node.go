@@ -119,6 +119,7 @@ type Node struct {
 	Properties  map[string]string `json:",omitempty"` // 属性
 
 	// 文本标记
+
 	TextMarkType                string `json:",omitempty"` // 文本标记类型
 	TextMarkAHref               string `json:",omitempty"` // 文本标记超链接 data-href 属性
 	TextMarkATitle              string `json:",omitempty"` // 文本标记超链接 data-title 属性
@@ -128,6 +129,11 @@ type Node struct {
 	TextMarkBlockRefSubtype     string `json:",omitempty"` // 文本标记块引用子类型（静态/动态锚文本） data-subtype 属性
 	TextMarkFileAnnotationRefID string `json:",omitempty"` // 文本标记文件注解引用 ID data-id 属性
 	TextMarkTextContent         string `json:",omitempty"` // 文本标记文本内容
+
+	// 属性视图 https://github.com/siyuan-note/siyuan/issues/7535
+
+	AttributeViewID   string `json:",omitempty"` // 属性视图 data-av-id 属性
+	AttributeViewType string `json:",omitempty"` // 属性视图 data-av-type 属性
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
@@ -667,7 +673,8 @@ func (n *Node) IsBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter,
-		NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget:
+		NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget,
+		NodeAttributeView:
 		return true
 	}
 	return false
@@ -700,7 +707,7 @@ func (n *Node) IsMarker() bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio, NodeAttributeView:
 		return true
 	}
 	return false
@@ -710,7 +717,7 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
 	switch n.Type {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio, NodeAttributeView:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
@@ -957,6 +964,10 @@ const (
 	NodeFileAnnotationRefID    NodeType = 541 // 被引用的文件注解 ID（file/annotation）
 	NodeFileAnnotationRefSpace NodeType = 542 // 被引用的文件注解 ID 和文件注解引用锚文本之间的空格
 	NodeFileAnnotationRefText  NodeType = 543 // 文件注解引用锚文本（不能为空，如果为空的话会自动使用 ID 渲染）
+
+	// 属性视图 https://github.com/siyuan-note/siyuan/issues/7535 <div data-type="NodeAttributeView" data-av-type="table" data-av-id="xxx"></div>
+
+	NodeAttributeView NodeType = 550 // 属性视图
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )
