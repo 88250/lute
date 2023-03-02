@@ -179,6 +179,9 @@ func (r *ProtyleRenderer) renderAttributeView(node *ast.Node, entering bool) ast
 		}
 		r.blockNodeAttrs(node, &attrs, "av")
 		r.Tag("div", attrs, false)
+		r.Tag("table", nil, false)
+		r.WriteString("<tr><td></td></tr>")
+		r.WriteString("</table>")
 		r.WriteString("</div>")
 		r.Newline()
 	}
