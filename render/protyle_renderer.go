@@ -179,9 +179,13 @@ func (r *ProtyleRenderer) renderAttributeView(node *ast.Node, entering bool) ast
 		}
 		r.blockNodeAttrs(node, &attrs, "av")
 		r.Tag("div", attrs, false)
-		r.Tag("table", nil, false)
+		attrs = [][]string{}
+		r.contenteditable(node, &attrs)
+		r.spellcheck(&attrs)
+		r.Tag("table", attrs, false)
 		r.WriteString("<tr><td></td></tr>")
 		r.WriteString("</table>")
+		r.renderIAL(node)
 		r.WriteString("</div>")
 		r.Newline()
 	}
