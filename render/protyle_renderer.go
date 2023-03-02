@@ -172,11 +172,13 @@ func NewProtyleRenderer(tree *parse.Tree, options *Options) *ProtyleRenderer {
 func (r *ProtyleRenderer) renderAttributeView(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.Tag("div", [][]string{
+		attrs := [][]string{
 			{"data-type", "NodeAttributeView"},
 			{"data-av-id", node.AttributeViewID},
 			{"data-av-type", node.AttributeViewType},
-		}, false)
+		}
+		r.blockNodeAttrs(node, &attrs, "av")
+		r.Tag("div", attrs, false)
 		r.WriteString("</div>")
 		r.Newline()
 	}

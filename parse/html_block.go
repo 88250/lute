@@ -65,9 +65,14 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 				avTypeIdx := bytes.Index(tokens, []byte("data-av-type=\"")) + len("data-av-type=\"")
 				avTypeEndIdx := avTypeIdx + bytes.Index(tokens[avTypeIdx:], []byte("\""))
 				av.AttributeViewType = string(tokens[avTypeIdx:avTypeEndIdx])
-				avIdIdx := bytes.Index(tokens, []byte("data-av-id=\"")) + len("data-av-id=\"")
-				avIdEndIdx := avIdIdx + bytes.Index(tokens[avIdIdx:], []byte("\""))
-				av.AttributeViewID = string(tokens[avIdIdx:avIdEndIdx])
+				if avIdIdx := bytes.Index(tokens, []byte("data-av-id=\"")); 0 < avIdIdx {
+					avIdIdx = avIdIdx + len("data-av-id=\"")
+					avIdEndIdx := avIdIdx + bytes.Index(tokens[avIdIdx:], []byte("\""))
+					av.AttributeViewID = string(tokens[avIdIdx:avIdEndIdx])
+				} else {
+					av.AttributeViewID = ast.NewNodeID()
+
+				}
 				return 2
 			}
 		}
