@@ -1017,6 +1017,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.parentIs(n, atom.Table) {
+			content = strings.TrimSuffix(content, "\n")
 			if (nil == n.NextSibling && !strings.Contains(content, "\n")) /* 外部内容粘贴到表格中后编辑导致换行丢失  https://github.com/siyuan-note/siyuan/issues/7501 */ ||
 				(nil != n.NextSibling && atom.Br == n.NextSibling.DataAtom && strings.HasPrefix(content, "\n")) /* 表格内存在行级公式时编辑会产生换行 https://github.com/siyuan-note/siyuan/issues/2279 */ {
 				content = strings.ReplaceAll(content, "\n", "")
