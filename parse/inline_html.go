@@ -527,9 +527,14 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 		}
 		if "" != colspan || "" != rowspan || "" != class {
 			ialTokens := IAL2Tokens(node.KramdownIAL)
-			ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-			node.InsertAfter(ial)
-			insertedIAL = true
+			if !insertedIAL {
+				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+				node.InsertAfter(ial)
+				insertedIAL = true
+			} else {
+				// 合并这两个 IAL
+				node.Next.Tokens = IAL2Tokens(node.KramdownIAL)
+			}
 		}
 	}
 

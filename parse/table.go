@@ -89,10 +89,17 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 						if 0 > ialStart {
 							continue
 						}
+
+						if 0 != ialStart && ' ' != td.Tokens[ialStart-1] { // 列属性必须和前面的行级元素存在通过空格分隔
+							// 有图片的表格拖拽后列宽异常 https://github.com/siyuan-note/siyuan/issues/7556
+							continue
+						}
+
 						subTokens := td.Tokens[ialStart:]
 						if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) && len(subTokens) == pos+1 {
 							ialTokens := subTokens[:pos+1]
-							if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
+							if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || // 合并单元格
+								bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
 								td.KramdownIAL = ial
 								td.Tokens = td.Tokens[:len(td.Tokens)-len(ialTokens)]
 								spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
