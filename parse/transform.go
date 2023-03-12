@@ -17,6 +17,161 @@ import (
 	"github.com/88250/lute/html"
 )
 
+// NestedInlines2FlattedSpansHybrid 将嵌套的行级节点转换为平铺的文本标记节点。
+func NestedInlines2FlattedSpansHybrid(tree *Tree) {
+	var unlinks []*ast.Node
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeLink == n.Type {
+			// 超链接嵌套图片情况下，图片子节点移到超链接节点前面
+			img := n.ChildByType(ast.NodeImage)
+			if nil == img {
+				return ast.WalkContinue
+			}
+			n.InsertBefore(img)
+			if nil == n.ChildByType(ast.NodeLinkText) {
+				if openBracket := n.ChildByType(ast.NodeOpenBracket); nil != openBracket {
+					if dest := n.ChildByType(ast.NodeLinkDest); nil != dest {
+						openBracket.InsertAfter(&ast.Node{Type: ast.NodeLinkText, Tokens: dest.Tokens})
+					}
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
+	for _, n := range unlinks {
+		n.Unlink()
+	}
+	unlinks = nil
+
+	var tags []string
+	var span *ast.Node
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		switch n.Type {
+		// case ast.NodeBackslash: Spin 过程中存在转义节点，转义节点本身就是嵌套的，所以需要在这里排除处理
+		case ast.NodeCodeSpan:
+			processNestedNode(n, "code", &tags, &unlinks, entering)
+		case ast.NodeTag:
+			processNestedNode(n, "tag", &tags, &unlinks, entering)
+		case ast.NodeInlineMath:
+			processNestedNode(n, "inline-math", &tags, &unlinks, entering)
+		case ast.NodeEmphasis:
+			processNestedNode(n, "em", &tags, &unlinks, entering)
+		case ast.NodeStrong:
+			processNestedNode(n, "strong", &tags, &unlinks, entering)
+		case ast.NodeStrikethrough:
+			processNestedNode(n, "s", &tags, &unlinks, entering)
+		case ast.NodeMark:
+			processNestedNode(n, "mark", &tags, &unlinks, entering)
+		case ast.NodeUnderline:
+			processNestedNode(n, "u", &tags, &unlinks, entering)
+		case ast.NodeSub:
+			processNestedNode(n, "sub", &tags, &unlinks, entering)
+		case ast.NodeSup:
+			processNestedNode(n, "sup", &tags, &unlinks, entering)
+		case ast.NodeKbd:
+			processNestedNode(n, "kbd", &tags, &unlinks, entering)
+		case ast.NodeLink:
+			processNestedNode(n, "a", &tags, &unlinks, entering)
+		case ast.NodeBlockRef:
+			processNestedNode(n, "block-ref", &tags, &unlinks, entering)
+		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText, ast.NodeBlockRefID, ast.NodeHTMLEntity:
+			if 1 > len(tags) {
+				return ast.WalkContinue
+			}
+
+			if entering {
+				span = &ast.Node{Type: ast.NodeTextMark, TextMarkType: strings.Join(tags, " "), TextMarkTextContent: string(html.EscapeHTML(n.Tokens))}
+				if ast.NodeInlineMathContent == n.Type {
+					span.TextMarkTextContent = ""
+					span.TextMarkInlineMathContent = string(html.EscapeHTML(n.Tokens))
+				} else if ast.NodeBackslash == n.Type {
+					if c := n.ChildByType(ast.NodeBackslashContent); nil != c {
+						span.TextMarkTextContent = string(html.EscapeHTML(c.Tokens))
+					}
+				} else if ast.NodeBlockRefID == n.Type {
+					span.TextMarkBlockRefSubtype = "s"
+					span.TextMarkTextContent = n.TokensStr()
+
+					refText := n.Parent.ChildByType(ast.NodeBlockRefText)
+					if nil == refText {
+						refText = n.Parent.ChildByType(ast.NodeBlockRefDynamicText)
+						span.TextMarkBlockRefSubtype = "d"
+					}
+					if nil != refText {
+						span.TextMarkTextContent = refText.TokensStr()
+					}
+
+					span.TextMarkBlockRefID = n.Parent.ChildByType(ast.NodeBlockRefID).TokensStr()
+				} else if n.ParentIs(ast.NodeLink) && !n.ParentIs(ast.NodeImage) {
+					if next := n.Next; nil != next && ast.NodeLinkText == next.Type {
+						// 合并相邻的链接文本节点
+						n.Next.PrependTokens(n.Tokens)
+						return ast.WalkContinue
+					}
+
+					var link *ast.Node
+					for p := n.Parent; nil != p; p = p.Parent {
+						if ast.NodeLink == p.Type {
+							link = p
+							break
+						}
+					}
+					if nil != link {
+						dest := link.ChildByType(ast.NodeLinkDest)
+						if nil != dest {
+							span.TextMarkAHref = string(dest.Tokens)
+						}
+						title := link.ChildByType(ast.NodeLinkTitle)
+						if nil != title {
+							span.TextMarkATitle = string(title.Tokens)
+						}
+					}
+				}
+			} else {
+				if next := n.Next; nil != next && ast.NodeLinkText == next.Type {
+					return ast.WalkContinue
+				}
+
+				span.KramdownIAL = n.Parent.KramdownIAL
+				if n.IsMarker() {
+					n.Parent.InsertBefore(span)
+				} else {
+					n.InsertBefore(span)
+				}
+			}
+		case ast.NodeTextMark:
+			if 1 > len(tags) {
+				return ast.WalkContinue
+			}
+
+			if entering {
+				contain := false
+				for _, tag := range tags {
+					if n.IsTextMarkType(tag) {
+						contain = true
+						break
+					}
+				}
+				if !contain {
+					tags = append(tags, n.TextMarkType)
+					n.TextMarkType = strings.Join(tags, " ")
+				}
+			}
+
+			return ast.WalkContinue
+		}
+		return ast.WalkContinue
+	})
+
+	for _, n := range unlinks {
+		n.Unlink()
+	}
+}
+
 // NestedInlines2FlattedSpans 将嵌套的行级节点转换为平铺的文本标记节点。
 func NestedInlines2FlattedSpans(tree *Tree) {
 	var unlinks []*ast.Node
@@ -149,8 +304,6 @@ func NestedInlines2FlattedSpans(tree *Tree) {
 							span.TextMarkATitle = string(title.Tokens)
 						}
 					}
-				} else if ast.NodeCodeSpanContent == n.Type {
-
 				}
 			} else {
 				if next := n.Next; nil != next && ast.NodeLinkText == next.Type {
