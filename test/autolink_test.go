@@ -18,6 +18,8 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"28", "www.test.com:8080(测试地址)", "<p><a href=\"http://www.test.com:8080\">www.test.com</a>(测试地址)</p>\n"},
+	{"27", "http://127.0.0.1:8080(测试地址)", "<p><a href=\"http://127.0.0.1:8080\">http://127.0.0.1</a>(测试地址)</p>\n"},
 	{"26", "https://www.baidu.help", "<p><a href=\"https://www.baidu.help\">https://www.baidu.help</a></p>\n"},
 	{"25", "https://www.baidu.wang", "<p><a href=\"https://www.baidu.wang\">https://www.baidu.wang</a></p>\n"},
 	{"24", "https://www.google.com.np/", "<p><a href=\"https://www.google.com.np/\">https://www.google.com.np/</a></p>\n"},

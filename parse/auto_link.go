@@ -225,6 +225,15 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			if (lex.IsWhitespace(token) || lex.ItemLess == token) || (!lex.IsASCIIPunct(token) && !lex.IsASCIILetterNum(token)) {
 				break
 			}
+
+			// 判断端口后部分是否为数字
+			if tmp := bytes.ReplaceAll(url, []byte("://"), nil); bytes.Contains(tmp, []byte(":")) {
+				tmp = tmp[bytes.Index(tmp, []byte(":"))+1:]
+				if !bytes.Contains(tmp, []byte("/")) && !lex.IsDigit(token) {
+					break
+				}
+			}
+
 			url = append(url, token)
 		}
 		if i == j { // 第一个字符就断开了
