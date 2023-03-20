@@ -57,6 +57,14 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 		return &ast.Node{Type: ast.NodeHardBreak, Tokens: []byte{token}}
 	}
 	if lex.IsASCIIPunct(token) {
+		if '<' == token && nil != t.Context.oldtip && ast.NodeTable == t.Context.oldtip.Type {
+			// 表格单元格内存在多行时末尾输入转义符 `\` 导致 `<br />` 暴露 https://github.com/siyuan-note/siyuan/issues/7725
+			isBr := ctx.tokens[ctx.pos:]
+			if bytes.HasPrefix(isBr, []byte("<br />")) {
+				return &ast.Node{Type: ast.NodeText, Tokens: backslash}
+			}
+		}
+
 		ctx.pos++
 		n := &ast.Node{Type: ast.NodeBackslash}
 		block.AppendChild(n)
@@ -70,6 +78,14 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 		if len(caret) < len(tokens) && bytes.HasPrefix(tokens, caret) {
 			token = ctx.tokens[ctx.pos+len(caret)]
 			if lex.IsASCIIPunct(token) {
+				if '<' == token && nil != t.Context.oldtip && ast.NodeTable == t.Context.oldtip.Type {
+					// 表格单元格内存在多行时末尾输入转义符 `\` 导致 `<br />` 暴露 https://github.com/siyuan-note/siyuan/issues/7725
+					isBr := ctx.tokens[ctx.pos+len(caret):]
+					if bytes.HasPrefix(isBr, []byte("<br />")) {
+						return &ast.Node{Type: ast.NodeText, Tokens: backslash}
+					}
+				}
+
 				ctx.pos += len(caret)
 				ctx.pos++
 				n := &ast.Node{Type: ast.NodeBackslash}
