@@ -1027,6 +1027,16 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				content = strings.ReplaceAll(content, "\n", "")
 			}
 
+			if strings.Contains(content, "\\") {
+				// After entering `\` in the table, the next column is merged incorrectly https://github.com/siyuan-note/siyuan/issues/7817
+				tmp := strings.ReplaceAll(content, "\\", "")
+				tmp = strings.TrimSpace(tmp)
+				if "" == tmp {
+					// 仅包含转义字符时转义自身 \
+					content = strings.ReplaceAll(content, "\\", "\\\\")
+				}
+			}
+
 			node.Tokens = util.StrToBytes(strings.ReplaceAll(content, "\n", "<br />"))
 			array := lex.SplitWithoutBackslashEscape(node.Tokens, '|')
 			node.Tokens = nil
