@@ -390,6 +390,23 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					src = dataSrc
 				}
 			}
+			if "" == src {
+				// 处理使用 srcset 属性的情况
+				if srcset := util.DomAttrValue(n, "srcset"); "" != srcset {
+					if strings.Contains(srcset, ",") {
+						src = strings.Split(srcset, ",")[len(strings.Split(srcset, ","))-1]
+						src = strings.TrimSpace(src)
+						if strings.Contains(src, " ") {
+							src = strings.TrimSpace(strings.Split(src, " ")[0])
+						}
+					} else {
+						src = strings.TrimSpace(src)
+						if strings.Contains(src, " ") {
+							src = strings.TrimSpace(strings.Split(srcset, " ")[0])
+						}
+					}
+				}
+			}
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
 			linkTitle := util.DomAttrValue(n, "title")
 			if "" != linkTitle {
