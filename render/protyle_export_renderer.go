@@ -681,19 +681,27 @@ func (r *ProtyleExportRenderer) renderYamlFrontMatterCloseMarker(node *ast.Node,
 }
 
 func (r *ProtyleExportRenderer) renderYamlFrontMatterContent(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		previewTokens := bytes.TrimSpace(node.Tokens)
-		codeLen := len(previewTokens)
-		codeIsEmpty := 1 > codeLen || (len(editor.Caret) == codeLen && editor.Caret == string(node.Tokens))
-		r.Tag("pre", nil, false)
-		r.Tag("code", [][]string{{"data-type", "yaml-front-matter"}}, false)
-		if codeIsEmpty {
-			r.WriteString(editor.FrontEndCaret + "\n")
-		} else {
-			r.Write(html.EscapeHTML(previewTokens))
-		}
-		r.WriteString("</code></pre>")
+	if !entering {
+		return ast.WalkContinue
 	}
+
+	r.Tag("div", [][]string{{"class", "protyle-action"}}, false)
+	attrs := [][]string{{"class", "protyle-action--first protyle-action__language"}, {"contenteditable", "false"}}
+	r.Tag("span", attrs, false)
+	r.WriteString("yaml")
+	r.Tag("/span", nil, false)
+	r.WriteString("<span class=\"fn__flex-1\"></span>")
+	r.Tag("span", [][]string{{"class", "protyle-icon protyle-icon--only protyle-action__copy"}}, false)
+	r.WriteString("<svg><use xlink:href=\"#iconCopy\"></use></svg>")
+	r.Tag("/span", nil, false)
+	r.Tag("/div", nil, false)
+
+	attrs = [][]string{{"class", "hljs"}}
+	r.contenteditable(node, &attrs)
+	r.spellcheck(&attrs)
+	r.Tag("div", attrs, false)
+	r.Write(html.EscapeHTML(node.Tokens))
+	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
 
@@ -703,9 +711,12 @@ func (r *ProtyleExportRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, 
 
 func (r *ProtyleExportRenderer) renderYamlFrontMatter(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString(`<div class="protyle-wysiwyg__block" data-type="yaml-front-matter" data-block="0">`)
+		attrs := [][]string{{"linenumber", "false"}, {"ligatures", "false"}}
+		r.blockNodeAttrs(node, &attrs, "code-block")
+		r.Tag("div", attrs, false)
 	} else {
-		r.WriteString("</div>")
+		r.renderIAL(node)
+		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
 }
