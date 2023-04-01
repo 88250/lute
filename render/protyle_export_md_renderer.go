@@ -220,7 +220,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 	// 将这些元素排到最后，避免输出嵌套标记符影响其语义
 	// 这样排序后标记符会在这些元素外部而不是嵌套在内部
 	sort.Slice(types, func(i, j int) bool {
-		if "code" == types[i] || "inline-math" == types[i] || "kbd" == types[i] || "tag" == types[i] {
+		if "code" == types[i] || "inline-math" == types[i] || "kbd" == types[i] || "tag" == types[i] || "a" == types[i] {
 			return false
 		}
 		return true
