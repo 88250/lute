@@ -18,6 +18,7 @@ import (
 )
 
 // NestedInlines2FlattedSpansHybrid 将嵌套的行级节点转换为平铺的文本标记节点。
+// 该函数不会移除转义节点。
 func NestedInlines2FlattedSpansHybrid(tree *Tree) {
 	var unlinks []*ast.Node
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -173,6 +174,7 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree) {
 }
 
 // NestedInlines2FlattedSpans 将嵌套的行级节点转换为平铺的文本标记节点。
+// 该函数会移除转义节点。
 func NestedInlines2FlattedSpans(tree *Tree) {
 	var unlinks []*ast.Node
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
