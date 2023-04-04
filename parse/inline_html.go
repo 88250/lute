@@ -507,7 +507,11 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 		node.SetIALAttr("style", style)
 		ialTokens := IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-		node.InsertAfter(ial)
+		if ast.NodeTableCell == node.Type {
+			node.PrependChild(ial)
+		} else {
+			node.InsertAfter(ial)
+		}
 		insertedIAL = true
 	}
 
@@ -529,11 +533,11 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 			ialTokens := IAL2Tokens(node.KramdownIAL)
 			if !insertedIAL {
 				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-				node.InsertAfter(ial)
+				node.PrependChild(ial)
 				insertedIAL = true
 			} else {
 				// 合并这两个 IAL
-				node.Next.Tokens = IAL2Tokens(node.KramdownIAL)
+				node.FirstChild.Tokens = IAL2Tokens(node.KramdownIAL)
 			}
 		}
 	}

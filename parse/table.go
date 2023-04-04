@@ -48,26 +48,20 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 				}
 				headRows = append(headRows, headRow)
 				for th := headRow.FirstChild; nil != th; th = th.Next {
-					ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
-					if 0 > ialStart {
-						continue
-					}
-
-					if 0 != ialStart && ' ' != th.Tokens[ialStart-1] { // 列属性必须和前面的行级元素存在通过空格分隔
-						// 有图片的表格拖拽后列宽异常 https://github.com/siyuan-note/siyuan/issues/7556
+					ialStart := bytes.Index(th.Tokens, []byte("{:"))
+					if 0 != ialStart {
 						continue
 					}
 
 					subTokens := th.Tokens[ialStart:]
-					if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) && len(subTokens) == pos+1 {
+					if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
 						ialTokens := subTokens[:pos+1]
 						if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || // 合并单元格
 							bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
 							th.KramdownIAL = ial
-							th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
+							th.Tokens = th.Tokens[len(ialTokens):]
 							spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-							th.InsertAfter(spanIAL)
-							th = th.Next
+							th.PrependChild(spanIAL)
 						}
 					}
 				}
@@ -85,26 +79,20 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 				}
 				if context.ParseOption.KramdownSpanIAL {
 					for td := tableRow.FirstChild; nil != td; td = td.Next {
-						ialStart := bytes.LastIndex(td.Tokens, []byte("{:"))
-						if 0 > ialStart {
-							continue
-						}
-
-						if 0 != ialStart && ' ' != td.Tokens[ialStart-1] { // 列属性必须和前面的行级元素存在通过空格分隔
-							// 有图片的表格拖拽后列宽异常 https://github.com/siyuan-note/siyuan/issues/7556
+						ialStart := bytes.Index(td.Tokens, []byte("{:"))
+						if 0 != ialStart {
 							continue
 						}
 
 						subTokens := td.Tokens[ialStart:]
-						if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) && len(subTokens) == pos+1 {
+						if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
 							ialTokens := subTokens[:pos+1]
 							if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || // 合并单元格
 								bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
 								td.KramdownIAL = ial
-								td.Tokens = td.Tokens[:len(td.Tokens)-len(ialTokens)]
+								td.Tokens = td.Tokens[len(ialTokens):]
 								spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-								td.InsertAfter(spanIAL)
-								td = td.Next
+								td.PrependChild(spanIAL)
 							}
 						}
 					}

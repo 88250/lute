@@ -1206,7 +1206,8 @@ func (r *ProtyleRenderer) renderBang(node *ast.Node, entering bool) ast.WalkStat
 
 func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if nil == node.Previous || editor.Caret == node.Previous.Text() {
+		if nil == node.Previous || editor.Caret == node.Previous.Text() ||
+			(node.ParentIs(ast.NodeTableCell) && nil != node.Previous && nil == node.Previous.Previous) {
 			if nil != node.Next {
 				if ast.NodeKramdownSpanIAL == node.Next.Type {
 					if !bytes.Contains(node.Next.Tokens, []byte("display: block")) {

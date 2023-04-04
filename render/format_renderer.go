@@ -525,12 +525,6 @@ func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) as
 	}
 
 	if entering {
-		if nil != node.Previous && ast.NodeTableCell == node.Previous.Type {
-			// 有图片的表格拖拽后列宽异常 https://github.com/siyuan-note/siyuan/issues/7556
-			if lex.ItemSpace != r.LastOut {
-				r.WriteByte(lex.ItemSpace) // 和前面的行级元素通过空格分隔
-			}
-		}
 		r.Write(node.Tokens)
 	}
 	return ast.WalkContinue
