@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -786,8 +787,21 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		node.Type = ast.NodeHeading
 		level := util.DomAttrValue(n, "data-subtype")[1:]
+		tmp := strings.TrimPrefix(text, " ")
+		if strings.HasPrefix(tmp, "#") {
+			// Allow changing headings with `#` https://github.com/siyuan-note/siyuan/issues/7924
+			if idx := strings.Index(tmp, " "+editor.Caret); 0 < idx {
+				tmp = tmp[:idx]
+				if nil != n.FirstChild && nil != n.FirstChild.FirstChild {
+					headingContent := strings.TrimPrefix(strings.TrimPrefix(n.FirstChild.FirstChild.Data, tmp), " ")
+					n.FirstChild.FirstChild.Data = headingContent
+				}
+				level = fmt.Sprintf("%d", strings.Count(tmp, "#"))
+			}
+		}
+
+		node.Type = ast.NodeHeading
 		node.HeadingLevel, _ = strconv.Atoi(level)
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
