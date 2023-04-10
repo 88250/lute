@@ -259,9 +259,19 @@ func (r *FormatRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) 
 			href := node.TextMarkAHref
 			href = string(r.LinkPath([]byte(href)))
 
+			if node.ParentIs(ast.NodeTableCell) {
+				href = strings.ReplaceAll(href, "\\|", "|")
+				href = strings.ReplaceAll(href, "|", "\\|")
+			}
+
 			attrs = append(attrs, []string{"data-href", href})
 			if "" != node.TextMarkATitle {
-				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
+				title := node.TextMarkATitle
+				if node.ParentIs(ast.NodeTableCell) {
+					title = strings.ReplaceAll(title, "\\|", "|")
+					title = strings.ReplaceAll(title, "|", "\\|")
+				}
+				attrs = append(attrs, []string{"data-title", title})
 			}
 		} else if "inline-math" == typ {
 			attrs = append(attrs, []string{"data-subtype", "math"})
