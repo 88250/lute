@@ -799,6 +799,53 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 				}
 				level = fmt.Sprintf("%d", strings.Count(tmp, "#"))
 			}
+		} else if strings.HasPrefix(tmp, "- ") || strings.HasPrefix(tmp, "* ") || strings.HasPrefix(tmp, "1. ") || strings.HasPrefix(tmp, "[] ") || strings.HasPrefix(tmp, "【】 ") {
+			// Add "- " before the heading then convert it into the list with that heading https://github.com/siyuan-note/siyuan/issues/7972
+			listTyp := 0
+			if strings.HasPrefix(tmp, "- ") || strings.HasPrefix(tmp, "* ") {
+				listTyp = 0
+			} else if strings.HasPrefix(tmp, "1. ") {
+				listTyp = 1
+			} else {
+				listTyp = 3
+			}
+
+			list := &ast.Node{Type: ast.NodeList, ListData: &ast.ListData{Typ: listTyp}, ID: ast.NewNodeID()}
+			list.SetIALAttr("id", list.ID)
+			list.SetIALAttr("updated", list.ID[:14])
+			ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: parse.IAL2Tokens(list.KramdownIAL)}
+			tree.Context.Tip.AppendChild(list)
+			list.InsertAfter(ial)
+			tree.Context.Tip = list
+
+			listItem := &ast.Node{Type: ast.NodeListItem, ListData: &ast.ListData{Typ: listTyp}, ID: ast.NewNodeID()}
+			if 0 == listTyp {
+				listItem.ListData.Marker = []byte("*")
+				listItem.ListData.BulletChar = '*'
+			} else if 1 == listTyp {
+				listItem.ListData.Marker = []byte("1.")
+				listItem.ListData.Num = 1
+				listItem.ListData.Delimiter = '.'
+			} else {
+				listItem.ListData.Marker = []byte("*")
+				listItem.ListData.BulletChar = '*'
+				taskMarker := &ast.Node{Type: ast.NodeTaskListItemMarker}
+				listItem.AppendChild(taskMarker)
+			}
+			listItem.SetIALAttr("id", listItem.ID)
+			listItem.SetIALAttr("updated", listItem.ID[:14])
+			itemIAL := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: parse.IAL2Tokens(listItem.KramdownIAL)}
+			list.AppendChild(listItem)
+			listItem.InsertAfter(itemIAL)
+			tree.Context.Tip = listItem
+
+			if idx := strings.Index(tmp, " "+editor.Caret); 0 < idx {
+				tmp = tmp[:idx]
+				if nil != n.FirstChild && nil != n.FirstChild.FirstChild {
+					headingContent := strings.TrimPrefix(strings.TrimPrefix(n.FirstChild.FirstChild.Data, tmp), " ")
+					n.FirstChild.FirstChild.Data = headingContent
+				}
+			}
 		}
 
 		node.Type = ast.NodeHeading
