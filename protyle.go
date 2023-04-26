@@ -799,13 +799,11 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 				}
 				level = fmt.Sprintf("%d", strings.Count(tmp, "#"))
 			}
-		} else if strings.HasPrefix(tmp, "- ") || strings.HasPrefix(tmp, "* ") || strings.HasPrefix(tmp, "1. ") || strings.HasPrefix(tmp, "[] ") || strings.HasPrefix(tmp, "【】 ") {
+		} else if strings.HasPrefix(tmp, "- ") || strings.HasPrefix(tmp, "* ") || strings.HasPrefix(tmp, "[] ") || strings.HasPrefix(tmp, "【】 ") {
 			// Add "- " before the heading then convert it into the list with that heading https://github.com/siyuan-note/siyuan/issues/7972
 			listTyp := 0
 			if strings.HasPrefix(tmp, "- ") || strings.HasPrefix(tmp, "* ") {
 				listTyp = 0
-			} else if strings.HasPrefix(tmp, "1. ") {
-				listTyp = 1
 			} else {
 				listTyp = 3
 			}
