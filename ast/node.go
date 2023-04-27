@@ -409,11 +409,15 @@ func (n *Node) TextLen() (ret int) {
 	return utf8.RuneCount(buf)
 }
 
-// Content 返回 n 及其所有内容子节点的文本值。
+// Content 返回 n 及其所有内容子节点的文本值，块级节点间通过换行符分隔。
 func (n *Node) Content() (ret string) {
 	buf := &bytes.Buffer{}
 	Walk(n, func(n *Node, entering bool) WalkStatus {
 		if !entering {
+			if nil != n.Next && nil != n.Next.Next && 1 < buf.Len() && n.IsBlock() && buf.Bytes()[buf.Len()-1] != '\n' {
+				// 多个块级节点间使用换行符分隔 https://github.com/siyuan-note/siyuan/issues/8114
+				buf.WriteByte('\n')
+			}
 			return WalkContinue
 		}
 

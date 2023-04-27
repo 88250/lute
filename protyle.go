@@ -971,6 +971,11 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			lute.genASTContenteditable(n, tree)
 			return
 		case atom.U, atom.Code, atom.Strong, atom.Em, atom.Kbd, atom.Mark, atom.S, atom.Sub, atom.Sup, atom.Span:
+			if ast.NodeDocument == tree.Context.Tip.Type {
+				p := &ast.Node{Type: ast.NodeParagraph}
+				tree.Context.Tip.AppendChild(p)
+				tree.Context.Tip = p
+			}
 			lute.genASTContenteditable(n, tree)
 			return
 		}

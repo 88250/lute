@@ -605,7 +605,7 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 			node.TextMarkInlineMemoContent = util.GetTextMarkInlineMemoData(n)
 			inlineTree := Inline("", []byte(node.TextMarkInlineMemoContent), options)
 			if nil != inlineTree {
-				node.TextMarkInlineMemoContent = inlineTree.Root.Content()
+				node.TextMarkInlineMemoContent = strings.ReplaceAll(inlineTree.Root.Content(), "\n", "")
 				node.TextMarkInlineMemoContent = strings.ReplaceAll(node.TextMarkInlineMemoContent, "\"", "&quot;")
 			}
 		default:
