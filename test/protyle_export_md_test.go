@@ -22,6 +22,13 @@ import (
 
 var protyleExportMdTests = []parseTest{
 
+	{"7", "[~\\~foo\\~foo\\~~](bar)", "[~\\~foo\\~foo\\~~](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
+	{"6", "[^\\^foo\\^foo\\^^](bar)", "[^\\^foo\\^foo\\^^](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
+	{"5", "[==\\=foo\\=foo\\===](bar)", "[==\\=foo\\=foo\\===](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
+	{"4", "[~~\\~foo\\~foo\\~~~](bar)", "[~~\\~foo\\~foo\\~~~](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
+	{"3", "[*\\*foo\\*foo\\**](bar)", "[*\\*foo\\*foo\\**](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
+	{"2", "[**\\*foo\\*foo\\***](bar)", "[**\\*foo\\*foo\\***](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
+	{"1", "[`foo`](bar \"baz\")", "[`foo`](bar \"baz\")\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"0", "foo**bar**{: style=\"color: red;\"}baz", "foo**bar**{: style=\"color: red;\"}baz\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 }
 

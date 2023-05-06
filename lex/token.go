@@ -400,19 +400,40 @@ func EscapeMarkers(tokens []byte) []byte {
 	return tokens
 }
 
-func IsMarker(token byte) bool {
+func EscapeProtyleMarkers(tokens []byte) []byte {
+	for i := 0; i < len(tokens); i++ {
+		if IsProtyleInlineMarker(tokens[i]) {
+			remains := append([]byte{ItemBackslash}, tokens[i:]...)
+			tokens = tokens[:i]
+			tokens = append(tokens, remains...)
+			i++
+		}
+	}
+	return tokens
+}
+
+func IsCommonInlineMarker(token byte) bool {
 	switch token {
-	case ItemAsterisk, ItemUnderscore, ItemOpenBracket, ItemBang, ItemNewline, ItemBackslash, ItemBacktick, ItemLess,
-		ItemCloseBracket, ItemAmpersand, ItemTilde, ItemDollar, ItemOpenBrace, ItemOpenParen, ItemEqual, ItemCrosshatch:
+	case ItemAsterisk, ItemUnderscore, ItemBackslash, ItemBacktick, ItemTilde, ItemDollar:
 		return true
 	default:
 		return false
 	}
 }
 
-func IsCommonInlineMarker(token byte) bool {
+func IsProtyleInlineMarker(token byte) bool {
 	switch token {
-	case ItemAsterisk, ItemUnderscore, ItemBackslash, ItemBacktick, ItemTilde, ItemDollar:
+	case ItemAsterisk, ItemUnderscore, ItemBackslash, ItemBacktick, ItemTilde, ItemDollar, ItemEqual, ItemCaret:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsMarker(token byte) bool {
+	switch token {
+	case ItemAsterisk, ItemUnderscore, ItemOpenBracket, ItemBang, ItemNewline, ItemBackslash, ItemBacktick, ItemLess,
+		ItemCloseBracket, ItemAmpersand, ItemTilde, ItemDollar, ItemOpenBrace, ItemOpenParen, ItemEqual, ItemCrosshatch:
 		return true
 	default:
 		return false

@@ -12,7 +12,6 @@ package render
 
 import (
 	"bytes"
-	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -191,7 +190,7 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 	if entering {
 		marker := r.renderMdMarker(node, entering)
 		r.WriteString(marker)
-		if !node.IsTextMarkType("a") && !node.IsTextMarkType("inline-memo") && !node.IsTextMarkType("block-ref") && !node.IsTextMarkType("file-annotation-ref") {
+		if !node.IsTextMarkType("a") && !node.IsTextMarkType("inline-memo") && !node.IsTextMarkType("block-ref") && !node.IsTextMarkType("file-annotation-ref") && !node.IsTextMarkType("inline-math") {
 			textContent := node.TextMarkTextContent
 			if node.IsTextMarkType("code") {
 				textContent = html.UnescapeString(textContent)
@@ -217,33 +216,27 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) (ret string) {
 	types := strings.Split(node.TextMarkType, " ")
 
-	// 将这些元素排到最后，避免输出嵌套标记符影响其语义
-	// 这样排序后标记符会在这些元素外部而不是嵌套在内部
-	sort.Slice(types, func(i, j int) bool {
-		if "code" == types[i] || "inline-math" == types[i] || "kbd" == types[i] || "tag" == types[i] || "a" == types[i] {
-			return false
-		}
-		return true
-	})
-
-	if !entering {
-		reverse(types)
+	if 1 == len(types) {
+		return r.renderMdMarker0(node, types[0], entering)
 	}
 
-	for _, typ := range types {
-		switch typ {
-		case "a":
-			if entering {
+	typ := types[0]
+	if "a" == typ || "inline-memo" == typ || "block-ref" == typ || "file-annotation-ref" == typ || "inline-math" == typ {
+		types := types[1:]
+
+		if entering {
+			switch typ {
+			case "a":
 				href := node.TextMarkAHref
 				href = string(r.LinkPath([]byte(href)))
-				ret += "[" + node.TextMarkTextContent + "](" + href
-				if "" != node.TextMarkATitle {
-					ret += " \"" + node.TextMarkATitle + "\""
+				ret += "["
+
+				for _, typ := range types {
+					ret += r.renderMdMarker1(node, typ, entering)
 				}
-				ret += ")"
-			}
-		case "block-ref":
-			if entering {
+
+				return
+			case "block-ref":
 				node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
 				ret += "((" + node.TextMarkBlockRefID
 				if "s" == node.TextMarkBlockRefSubtype {
@@ -252,22 +245,12 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 					ret += " '" + node.TextMarkTextContent + "'"
 				}
 				ret += "))"
-			}
-		case "file-annotation-ref":
-			if entering {
+			case "file-annotation-ref":
 				node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
 				ret += "<<" + node.TextMarkFileAnnotationRefID
 				ret += " \"" + node.TextMarkTextContent + "\""
 				ret += ">>"
-			}
-		case "inline-math":
-			if entering {
-				ret += "$" + node.TextMarkInlineMathContent
-			} else {
-				ret += "$"
-			}
-		case "inline-memo":
-			if entering {
+			case "inline-memo":
 				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 				ret += node.TextMarkTextContent
 				if isCJK(lastRune) {
@@ -275,43 +258,35 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				} else {
 					ret += "^(" + node.TextMarkInlineMemoContent + ")^"
 				}
+			case "inline-math":
+				ret += "$" + node.TextMarkInlineMathContent + "$"
 			}
-		case "strong":
-			ret += "**"
-		case "em":
-			ret += "*"
-		case "code":
-			ret += "`"
-		case "tag":
-			ret += "#"
-		case "s":
-			ret += "~~"
-		case "mark":
-			ret += "=="
-		case "u":
-			if entering {
-				ret += "<u>"
-			} else {
-				ret += "</u>"
+
+			for _, typ := range types {
+				ret += r.renderMdMarker1(node, typ, entering)
 			}
-		case "sup":
-			if entering {
-				ret += "^"
-			} else {
-				ret += "^"
+		} else {
+			switch typ {
+			case "a":
+				href := node.TextMarkAHref
+				href = string(r.LinkPath([]byte(href)))
+				ret += string(lex.EscapeProtyleMarkers([]byte(node.TextMarkTextContent)))
+				for _, typ := range types {
+					ret += r.renderMdMarker1(node, typ, entering)
+				}
+				ret += "](" + href
+				if "" != node.TextMarkATitle {
+					ret += " \"" + node.TextMarkATitle + "\""
+				}
+				ret += ")"
 			}
-		case "sub":
-			if entering {
-				ret += "~"
-			} else {
-				ret += "~"
-			}
-		case "kbd":
-			if entering {
-				ret += "<kbd>"
-			} else {
-				ret += "</kbd>"
-			}
+		}
+	} else {
+		if !entering {
+			reverse(types)
+		}
+		for _, typ := range types {
+			ret += r.renderMdMarker1(node, typ, entering)
 		}
 	}
 	return
@@ -322,6 +297,101 @@ func reverse(ss []string) {
 	for i := 0; i < len(ss)/2; i++ {
 		ss[i], ss[last-i] = ss[last-i], ss[i]
 	}
+}
+
+func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmarkType string, entering bool) (ret string) {
+	switch currentTextmarkType {
+	case "a":
+		href := node.TextMarkAHref
+		href = string(r.LinkPath([]byte(href)))
+
+		if entering {
+			ret += "[" + node.TextMarkTextContent + "](" + href
+			if "" != node.TextMarkATitle {
+				ret += " \"" + node.TextMarkATitle + "\""
+			}
+			ret += ")"
+		}
+	case "block-ref":
+		if entering {
+			node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
+			ret += "((" + node.TextMarkBlockRefID
+			if "s" == node.TextMarkBlockRefSubtype {
+				ret += " \"" + node.TextMarkTextContent + "\""
+			} else {
+				ret += " '" + node.TextMarkTextContent + "'"
+			}
+			ret += "))"
+		}
+	case "file-annotation-ref":
+		if entering {
+			node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
+			ret += "<<" + node.TextMarkFileAnnotationRefID
+			ret += " \"" + node.TextMarkTextContent + "\""
+			ret += ">>"
+		}
+	case "inline-memo":
+		if entering {
+			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+			ret += node.TextMarkTextContent
+			if isCJK(lastRune) {
+				ret += "^（" + node.TextMarkInlineMemoContent + "）^"
+			} else {
+				ret += "^(" + node.TextMarkInlineMemoContent + ")^"
+			}
+		}
+	case "inline-math":
+		if entering {
+			ret += "$" + node.TextMarkInlineMathContent
+		} else {
+			ret += "$"
+		}
+	default:
+		ret += r.renderMdMarker1(node, currentTextmarkType, entering)
+	}
+	return
+}
+
+func (r *ProtyleExportMdRenderer) renderMdMarker1(node *ast.Node, currentTextmarkType string, entering bool) (ret string) {
+	switch currentTextmarkType {
+	case "strong":
+		ret += "**"
+	case "em":
+		ret += "*"
+	case "code":
+		ret += "`"
+	case "tag":
+		ret += "#"
+	case "s":
+		ret += "~~"
+	case "mark":
+		ret += "=="
+	case "u":
+		if entering {
+			ret += "<u>"
+		} else {
+			ret += "</u>"
+		}
+	case "sup":
+		if entering {
+			ret += "^"
+		} else {
+			ret += "^"
+		}
+	case "sub":
+		if entering {
+			ret += "~"
+		} else {
+			ret += "~"
+		}
+	case "kbd":
+		if entering {
+			ret += "<kbd>"
+		} else {
+			ret += "</kbd>"
+		}
+	}
+	return
 }
 
 func (r *ProtyleExportMdRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
