@@ -51,6 +51,7 @@ func GetTextMarkAData(n *html.Node) (href, title string) {
 
 func GetTextMarkInlineMathData(n *html.Node) (content string) {
 	content = DomAttrValue(n, "data-content")
+	content = html.UnescapeHTMLStr(content)
 	content = strings.ReplaceAll(content, editor.Zwsp, "")
 	return
 }
