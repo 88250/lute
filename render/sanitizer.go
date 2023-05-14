@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"io"
 	"strings"
+	"unicode"
 
 	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
@@ -191,6 +192,7 @@ func sanitizeAttrs(attrs []*html.Attribute) (ret []*html.Attribute) {
 		}
 		if "src" == attr.Key || "srcdoc" == attr.Key || "srcset" == attr.Key {
 			val := strings.TrimSpace(attr.Val)
+			val = removeSpace(val)
 			if strings.HasPrefix(val, "data:image/svg+xml") || strings.HasPrefix(val, "data:text/html") || strings.HasPrefix(val, "javascript") {
 				continue
 			}
@@ -203,6 +205,16 @@ func sanitizeAttrs(attrs []*html.Attribute) (ret []*html.Attribute) {
 		ret = append(ret, attr)
 	}
 	return
+}
+
+func removeSpace(s string) string {
+	rr := make([]rune, 0, len(s))
+	for _, r := range s {
+		if !unicode.IsSpace(r) || ' ' == r {
+			rr = append(rr, r)
+		}
+	}
+	return string(rr)
 }
 
 func allowAttr(attrName string) bool {

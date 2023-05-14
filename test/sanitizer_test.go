@@ -19,6 +19,10 @@ import (
 
 var sanitizerTests = []parseTest{
 
+	{"13", "<iframe src=\"data&NewLine;:text/html,%3Cscript%3Ealert('xss')%3C%2Fscript%3E\"></iframe>", "<iframe></iframe>\n"},
+	{"12", "<iframe src=\"data&Tab;:text/html,%3Cscript%3Ealert('xss')%3C%2Fscript%3E\"></iframe>", "<iframe></iframe>\n"},
+	{"11", "<iframe src=\"java&NewLine;script:alert('xss')\"></iframe>", "<iframe></iframe>\n"},
+	{"10", "<iframe src=\"java&Tab;script:alert('xss')\"></iframe>", "<iframe></iframe>\n"},
 	{"9", "<iframe srcdoc=\"&lt;img src&equals;x onerror&equals;alert&lpar;'xss'&rpar;&gt;\" />", "<iframe/>\n"},
 	{"8", "[xss](javascript:alert(document.domain))", "<p><a href=\"\">xss</a></p>\n"},
 	{"7", "![a](\"<img src=xss onerror=alert(1)>)\n", "<p>![a](&quot;&lt;img src=xss onerror=alert(1)&gt;)</p>\n"},
