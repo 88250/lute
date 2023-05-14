@@ -190,8 +190,8 @@ func sanitizeAttrs(attrs []*html.Attribute) (ret []*html.Attribute) {
 		if !allowAttr(attr.Key) {
 			continue
 		}
-		if "src" == attr.Key || "srcdoc" == attr.Key || "srcset" == attr.Key {
-			val := strings.TrimSpace(attr.Val)
+		if "src" == attr.Key || "srcdoc" == attr.Key || "srcset" == attr.Key || "href" == attr.Key {
+			val := strings.ToLower(strings.TrimSpace(attr.Val))
 			val = removeSpace(val)
 			if strings.HasPrefix(val, "data:image/svg+xml") || strings.HasPrefix(val, "data:text/html") || strings.HasPrefix(val, "javascript") {
 				continue
