@@ -430,6 +430,7 @@ func (n *Node) Content() (ret string) {
 		case NodeTextMark:
 			if "" != n.TextMarkTextContent {
 				if n.IsTextMarkType("code") {
+					// 搜索代码内容转义问题 https://github.com/siyuan-note/siyuan/issues/5927
 					buf.WriteString(html.UnescapeString(n.TextMarkTextContent))
 				} else {
 					buf.WriteString(n.TextMarkTextContent)
@@ -445,6 +446,13 @@ func (n *Node) Content() (ret string) {
 	})
 
 	return buf.String()
+}
+
+// EscapeMarkerContent 返回 n 及其所有内容子节点的文本值（其中的标记符会被转义），块级节点间通过换行符分隔。
+func (n *Node) EscapeMarkerContent() (ret string) {
+	ret = n.Content()
+	ret = string(lex.EscapeProtyleMarkers([]byte(ret)))
+	return
 }
 
 func (n *Node) Stat() (runeCnt, wordCnt, linkCnt, imgCnt, refCnt int) {

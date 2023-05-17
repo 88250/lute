@@ -423,7 +423,7 @@ func IsCommonInlineMarker(token byte) bool {
 
 func IsProtyleInlineMarker(token byte) bool {
 	switch token {
-	case ItemAsterisk, ItemUnderscore, ItemBackslash, ItemBacktick, ItemTilde, ItemDollar, ItemEqual, ItemCaret:
+	case ItemAsterisk, ItemUnderscore, ItemBackslash, ItemBacktick, ItemTilde, ItemDollar, ItemEqual, ItemCaret, ItemLess, ItemGreater:
 		return true
 	default:
 		return false

@@ -210,6 +210,11 @@ func (lute *Lute) BlockDOM2Content(htmlStr string) (text string) {
 	return tree.Root.Content()
 }
 
+func (lute *Lute) BlockDOM2EscapeMarkerContent(htmlStr string) (text string) {
+	tree := lute.BlockDOM2Tree(htmlStr)
+	return tree.Root.EscapeMarkerContent()
+}
+
 func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
 	renderer := render.NewProtyleRenderer(tree, options)
 	output := renderer.Render()
