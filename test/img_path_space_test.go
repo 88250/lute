@@ -18,8 +18,8 @@ import (
 
 var imgPathSpaceTests = []parseTest{
 
-	{"1", "![foo](bar baz.png 'title')", "<p><img src=\"bar%20baz.png\" alt=\"foo\" title=\"title\" /></p>\n"},
-	{"0", "![foo](bar baz.png \"title\")", "<p><img src=\"bar%20baz.png\" alt=\"foo\" title=\"title\" /></p>\n"},
+	{"1", "![foo](bar baz.png 'title')", "<p><img src=\"bar baz.png\" alt=\"foo\" title=\"title\" /></p>\n"},
+	{"0", "![foo](bar baz.png \"title\")", "<p><img src=\"bar baz.png\" alt=\"foo\" title=\"title\" /></p>\n"},
 }
 
 func TestImgPathSpace(t *testing.T) {
