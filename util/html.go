@@ -44,6 +44,7 @@ func GetTextMarkInlineMemoData(n *html.Node) (content string) {
 
 func GetTextMarkAData(n *html.Node) (href, title string) {
 	href = DomAttrValue(n, "data-href")
+	href = html.EscapeHTMLStr(href)
 	title = DomAttrValue(n, "data-title")
 	title = html.EscapeHTMLStr(title)
 	return

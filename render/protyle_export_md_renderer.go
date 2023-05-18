@@ -229,6 +229,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 			case "a":
 				href := node.TextMarkAHref
 				href = string(r.LinkPath([]byte(href)))
+				href = html.UnescapeHTMLStr(href)
 				ret += "["
 
 				for _, typ := range types {
@@ -270,13 +271,14 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 			case "a":
 				href := node.TextMarkAHref
 				href = string(r.LinkPath([]byte(href)))
+				href = html.UnescapeHTMLStr(href)
 				ret += string(lex.EscapeProtyleMarkers([]byte(node.TextMarkTextContent)))
 				for _, typ := range types {
 					ret += r.renderMdMarker1(node, typ, entering)
 				}
 				ret += "](" + href
 				if "" != node.TextMarkATitle {
-					ret += " \"" + node.TextMarkATitle + "\""
+					ret += " \"" + html.UnescapeHTMLStr(node.TextMarkATitle) + "\""
 				}
 				ret += ")"
 			}
@@ -304,11 +306,11 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 	case "a":
 		href := node.TextMarkAHref
 		href = string(r.LinkPath([]byte(href)))
-
+		href = html.UnescapeHTMLStr(href)
 		if entering {
 			ret += "[" + node.TextMarkTextContent + "](" + href
 			if "" != node.TextMarkATitle {
-				ret += " \"" + node.TextMarkATitle + "\""
+				ret += " \"" + html.UnescapeHTMLStr(node.TextMarkATitle) + "\""
 			}
 			ret += ")"
 		}
