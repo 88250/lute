@@ -151,7 +151,8 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 	}
 
 	if nil != passed {
-		if !context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV && !context.ParseOption.ProtyleWYSIWYG {
+		if (!context.ParseOption.VditorWYSIWYG && !context.ParseOption.VditorIR && !context.ParseOption.VditorSV && !context.ParseOption.ProtyleWYSIWYG) &&
+			!context.ParseOption.ImgPathAllowSpace {
 			destination = html.EncodeDestination(html.UnescapeBytes(destination))
 		}
 	}
