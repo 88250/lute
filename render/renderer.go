@@ -77,6 +77,7 @@ type Options struct {
 	// ChineseParagraphBeginningSpace 设置是否使用传统中文排版“段落开头空两格”。
 	ChineseParagraphBeginningSpace bool
 	// Sanitize 设置是否启用 XSS 安全过滤 https://github.com/88250/lute/issues/51
+	// 注意：Lute 目前的实现存在一些漏洞，请不要依赖它来防御 XSS 攻击。
 	Sanitize bool
 	// FixTermTypo 设置是否对普通文本中出现的术语进行修正。
 	// https://github.com/sparanoid/chinese-copywriting-guidelines

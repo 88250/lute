@@ -441,6 +441,8 @@ func (lute *Lute) SetRenderListStyle(b bool) {
 	lute.RenderOptions.RenderListStyle = b
 }
 
+// SetSanitize 设置为 true 时表示对输出进行 XSS 过滤。
+// 注意：Lute 目前的实现存在一些漏洞，请不要依赖它来防御 XSS 攻击。
 func (lute *Lute) SetSanitize(b bool) {
 	lute.RenderOptions.Sanitize = b
 }
