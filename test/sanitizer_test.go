@@ -19,6 +19,7 @@ import (
 
 var sanitizerTests = []parseTest{
 
+	{"16", "<form><input formaction=javascript:alert('xss') type=submit value='click me'></input></form>", "<form><input type=\"submit\" value=\"click me\"></input></form>\n"},
 	{"15", "<meta http-equiv=\"refresh\" content=\"0\" />", "<meta content=\"0\"/>\n"},
 	{"14", "<div><p /><a href=\"javascript:alert('xss')\">click me</a></div>", "<div><p/><a>click me</a></div>\n"},
 	{"13", "<iframe src=\"data&NewLine;:text/html,%3Cscript%3Ealert('xss')%3C%2Fscript%3E\"></iframe>", "<iframe></iframe>\n"},

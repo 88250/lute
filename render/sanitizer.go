@@ -324,4 +324,7 @@ var eventAttrs = map[string]interface{}{
 
 	// meta
 	"http-equiv": nil,
+
+	// input
+	"formaction": nil,
 }
