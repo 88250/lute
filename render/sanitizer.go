@@ -321,4 +321,7 @@ var eventAttrs = map[string]interface{}{
 	"onbegin":  nil,
 	"onend":    nil,
 	"onrepeat": nil,
+
+	// meta
+	"http-equiv": nil,
 }
