@@ -1841,6 +1841,7 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
 			}
+			inlineMathContent = strings.ReplaceAll(inlineMathContent, editor.Caret, "")
 			inlineMathContent = strings.ReplaceAll(inlineMathContent, "\"", "&amp;quot;")
 			attrs = append(attrs, []string{"data-content", inlineMathContent})
 			attrs = append(attrs, []string{"contenteditable", "false"})
