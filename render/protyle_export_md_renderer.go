@@ -164,7 +164,26 @@ func NewProtyleExportMdRenderer(tree *parse.Tree, options *Options) *ProtyleExpo
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
 	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
+	ret.RendererFuncs[ast.NodeCustomBlock] = ret.renderCustomBlock
 	return ret
+}
+
+func (r *ProtyleExportMdRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		r.WriteString(";;;")
+		r.WriteString(node.CustomBlockInfo)
+		r.Newline()
+		r.Write(node.Tokens)
+		r.Newline()
+		r.WriteString(";;;")
+		if !r.isLastNode(r.Tree.Root, node) {
+			if r.withoutKramdownBlockIAL(node) {
+				r.WriteByte(lex.ItemNewline)
+			}
+		}
+	}
+	return ast.WalkContinue
 }
 
 func (r *ProtyleExportMdRenderer) renderAttributeView(node *ast.Node, entering bool) ast.WalkStatus {

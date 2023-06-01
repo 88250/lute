@@ -134,6 +134,11 @@ type Node struct {
 
 	AttributeViewID   string `json:",omitempty"` // 属性视图 data-av-id 属性
 	AttributeViewType string `json:",omitempty"` // 属性视图 data-av-type 属性
+
+	// 自定义块 https://github.com/siyuan-note/siyuan/issues/8418
+
+	CustomBlockFenceOffset int    `json:",omitempty"` // 自定义块标记符起始偏移量
+	CustomBlockInfo        string `json:",omitempty"` // 自定义块信息
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
@@ -686,7 +691,7 @@ func (n *Node) IsBlock() bool {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter,
 		NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget,
-		NodeAttributeView:
+		NodeAttributeView, NodeCustomBlock:
 		return true
 	}
 	return false
@@ -719,7 +724,8 @@ func (n *Node) IsMarker() bool {
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
-	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockQueryEmbed, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio, NodeAttributeView:
+	case NodeParagraph, NodeCodeBlock, NodeHTMLBlock, NodeMathBlock, NodeYamlFrontMatter, NodeBlockQueryEmbed,
+		NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio, NodeAttributeView, NodeCustomBlock:
 		return true
 	}
 	return false
@@ -729,7 +735,8 @@ func (n *Node) AcceptLines() bool {
 // 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
 	switch n.Type {
-	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter, NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio, NodeAttributeView:
+	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter,
+		NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio, NodeAttributeView, NodeCustomBlock:
 		return false
 	case NodeList:
 		return NodeListItem == nodeType
@@ -980,6 +987,10 @@ const (
 	// 属性视图 https://github.com/siyuan-note/siyuan/issues/7535 <div data-type="NodeAttributeView" data-av-type="table" data-av-id="xxx"></div>
 
 	NodeAttributeView NodeType = 550 // 属性视图
+
+	// 自定义块 https://github.com/siyuan-note/siyuan/issues/8418 ;;;info
+
+	NodeCustomBlock NodeType = 560 // 自定义块
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

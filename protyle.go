@@ -963,6 +963,12 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.AttributeViewType = util.DomAttrValue(n, "data-av-type")
 		tree.Context.Tip.AppendChild(node)
 		return
+	case ast.NodeCustomBlock:
+		node.Type = ast.NodeCustomBlock
+		node.CustomBlockInfo = util.DomAttrValue(n, "data-info")
+		node.Tokens = []byte(html.UnescapeHTMLStr(util.DomAttrValue(n, "data-content")))
+		tree.Context.Tip.AppendChild(node)
+		return
 	default:
 		switch n.DataAtom {
 		case 0:
@@ -1011,7 +1017,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 }
 
 func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
-	if ast.NodeCodeBlock == tree.Context.Tip.Type {
+	if ast.NodeCodeBlock == tree.Context.Tip.Type || ast.NodeCustomBlock == tree.Context.Tip.Type {
 		return
 	}
 

@@ -163,7 +163,22 @@ func NewProtyleExportRenderer(tree *parse.Tree, options *Options) *ProtyleExport
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
 	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
+	ret.RendererFuncs[ast.NodeCustomBlock] = ret.renderCustomBlock
 	return ret
+}
+
+func (r *ProtyleExportRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		r.Tag("div", [][]string{
+			{"data-type", "NodeCustomBlock"},
+			{"data-info", node.CustomBlockInfo},
+			{"data-content", string(html.EscapeHTML(node.Tokens))},
+		}, false)
+		r.WriteString("</div>")
+		r.Newline()
+	}
+	return ast.WalkContinue
 }
 
 func (r *ProtyleExportRenderer) renderAttributeView(node *ast.Node, entering bool) ast.WalkStatus {

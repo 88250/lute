@@ -21,6 +21,7 @@ func blockStarts() []blockStartFunc {
 		BlockquoteStart,
 		ATXHeadingStart,
 		FenceCodeBlockStart,
+		CustomBlockStart,
 		SetextHeadingStart,
 		HtmlBlockStart,
 		YamlFrontMatterStart,
@@ -36,7 +37,8 @@ func blockStarts() []blockStartFunc {
 }
 
 // blockStartFunc 定义了用于判断块是否开始的函数签名，返回值：
-//   0：不匹配
-//   1：匹配到容器块，需要继续迭代下降
-//   2：匹配到叶子块
+//
+//	0：不匹配
+//	1：匹配到容器块，需要继续迭代下降
+//	2：匹配到叶子块
 type blockStartFunc func(t *Tree, container *ast.Node) int

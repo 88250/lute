@@ -274,6 +274,8 @@ func (context *Context) finalize(block *ast.Node) {
 		context.superBlockFinalize(block)
 	case ast.NodeGitConflict:
 		context.gitConflictFinalize(block)
+	case ast.NodeCustomBlock:
+		context.customBlockFinalize(block)
 	}
 
 	context.Tip = parent

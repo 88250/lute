@@ -162,13 +162,22 @@ func NewProtylePreviewRenderer(tree *parse.Tree, options *Options) *ProtylePrevi
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
-	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
+	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderCustomBlock
 	return ret
 }
 
-func (r *ProtylePreviewRenderer) Render() (output []byte) {
-	output = r.BaseRenderer.Render()
-	return
+func (r *ProtylePreviewRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		r.Tag("div", [][]string{
+			{"data-type", "NodeCustomBlock"},
+			{"data-info", node.CustomBlockInfo},
+			{"data-content", string(html.EscapeHTML(node.Tokens))},
+		}, false)
+		r.WriteString("</div>")
+		r.Newline()
+	}
+	return ast.WalkContinue
 }
 
 func (r *ProtylePreviewRenderer) renderAttributeView(node *ast.Node, entering bool) ast.WalkStatus {
@@ -1411,4 +1420,9 @@ func (r *ProtylePreviewRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]
 
 func (r *ProtylePreviewRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
 	*attrs = append(*attrs, node.KramdownIAL...)
+}
+
+func (r *ProtylePreviewRenderer) Render() (output []byte) {
+	output = r.BaseRenderer.Render()
+	return
 }
