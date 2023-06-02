@@ -217,16 +217,22 @@ func (lute *Lute) BlockDOM2EscapeMarkerContent(htmlStr string) (text string) {
 
 func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
 	renderer := render.NewProtyleRenderer(tree, options)
+	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
 	output := renderer.Render()
 	vHTML = util.BytesToStr(output)
 	vHTML = strings.ReplaceAll(vHTML, editor.Caret, "<wbr>")
 	return
 }
 
-func RenderNodeBlockDOM(node *ast.Node, parseOptions *parse.Options, renderOptions *render.Options) string {
+func (lute *Lute) RenderNodeBlockDOM(node *ast.Node) string {
 	root := &ast.Node{Type: ast.NodeDocument}
-	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
-	renderer := render.NewProtyleRenderer(tree, renderOptions)
+	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: lute.ParseOptions}}
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
 	renderer.Writer = &bytes.Buffer{}
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		rendererFunc := renderer.RendererFuncs[n.Type]

@@ -20,7 +20,7 @@ import (
 	"github.com/88250/lute/lex"
 )
 
-// CustomBlockStart 判断围栏自定义块（;;;）是否开始。
+// CustomBlockStart 判断围栏自定义块（;;;info）是否开始。
 func CustomBlockStart(t *Tree, container *ast.Node) int {
 	if t.Context.indented {
 		return 0
@@ -92,15 +92,24 @@ func (t *Tree) parseCustomBlock() (ok bool, fenceOffset int, info string) {
 	}
 
 	infoTokens := t.Context.currentLine[t.Context.nextNonspace+fenceLen:]
-	if lex.ItemSemicolon == marker && 0 < bytes.IndexByte(infoTokens, lex.ItemSemicolon) {
+	if 0 < bytes.IndexByte(infoTokens, lex.ItemSemicolon) {
 		// info 部分不能包含 ;
 		return
 	}
+
+	if !bytes.HasSuffix(infoTokens, []byte("\n")) {
+		return
+	}
+
 	info = string(lex.TrimWhitespace(infoTokens))
 	info = html.UnescapeString(info)
 	if idx := strings.IndexByte(info, ' '); 0 <= idx {
 		info = info[:idx]
 	}
+	if 1 > len(strings.ReplaceAll(info, editor.Caret, "")) {
+		return
+	}
+
 	return true, t.Context.indent, info
 }
 
