@@ -21,7 +21,7 @@ func blockStarts() []blockStartFunc {
 		BlockquoteStart,
 		ATXHeadingStart,
 		FenceCodeBlockStart,
-		CustomBlockStart,
+		// CustomBlockStart, // https://github.com/siyuan-note/siyuan/issues/8418
 		SetextHeadingStart,
 		HtmlBlockStart,
 		YamlFrontMatterStart,
