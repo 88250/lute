@@ -191,18 +191,16 @@ func (r *ProtyleRenderer) renderAttributeView(node *ast.Node, entering bool) ast
 	if entering {
 		r.Newline()
 		attrs := [][]string{
-			{"data-type", "NodeAttributeView"},
+			{"contenteditable", "false"},
 			{"data-av-id", node.AttributeViewID},
 			{"data-av-type", node.AttributeViewType},
 		}
 		r.blockNodeAttrs(node, &attrs, "av")
 		r.Tag("div", attrs, false)
 		attrs = [][]string{}
-		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
-		r.Tag("table", attrs, false)
-		r.WriteString("<tr><td></td></tr>")
-		r.WriteString("</table>")
+		r.Tag("div", attrs, false)
+		r.WriteString("</div>")
 		r.renderIAL(node)
 		r.WriteString("</div>")
 		r.Newline()
