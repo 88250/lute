@@ -1244,12 +1244,15 @@ func (r *ProtylePreviewRenderer) renderHeading(node *ast.Node, entering bool) as
 		r.Newline()
 		level := headingLevel[node.HeadingLevel : node.HeadingLevel+1]
 		r.WriteString("<h" + level)
-		id := HeadingID(node)
+		id := node.ID
+		if "" == id {
+			id = HeadingID(node)
+		}
 		if r.Options.ToC || r.Options.HeadingID || r.Options.KramdownBlockIAL {
 			r.WriteString(" id=\"" + id + "\"")
 			if r.Options.KramdownBlockIAL {
 				if "id" != r.Options.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
-					r.WriteString(" " + r.Options.KramdownIALIDRenderName + "=\"" + node.KramdownIAL[0][1] + "\"")
+					r.WriteString(" " + r.Options.KramdownIALIDRenderName + "=\"" + node.HeadingNormalizedID + "\"")
 				}
 				if 1 < len(node.KramdownIAL) {
 					exceptID := node.KramdownIAL[1:]
