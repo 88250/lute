@@ -360,7 +360,6 @@ func (r *ProtylePreviewRenderer) renderGitConflict(node *ast.Node, entering bool
 	r.Newline()
 	if entering {
 		attrs := [][]string{{"class", "language-git-conflict"}}
-		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		r.Tag("div", attrs, false)
 	} else {
@@ -852,7 +851,6 @@ func (r *ProtylePreviewRenderer) renderTableHead(node *ast.Node, entering bool) 
 
 func (r *ProtylePreviewRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.handleKramdownBlockIAL(node)
 		r.Tag("table", node.KramdownIAL, false)
 		r.Newline()
 	} else {
@@ -1080,7 +1078,6 @@ func (r *ProtylePreviewRenderer) renderDocument(node *ast.Node, entering bool) a
 func (r *ProtylePreviewRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.handleKramdownBlockIAL(node)
 		var attrs [][]string
 		attrs = append(attrs, node.KramdownIAL...)
 		r.Tag("p", attrs, false)
@@ -1228,7 +1225,6 @@ func (r *ProtylePreviewRenderer) renderStrongU8eCloseMarker(node *ast.Node, ente
 func (r *ProtylePreviewRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.handleKramdownBlockIAL(node)
 		r.Tag("blockquote", node.KramdownIAL, false)
 		r.Newline()
 	} else {
@@ -1297,7 +1293,6 @@ func (r *ProtylePreviewRenderer) renderList(node *ast.Node, entering bool) ast.W
 		if 0 == node.ListData.BulletChar && 1 != node.ListData.Start {
 			attrs = append(attrs, []string{"start", strconv.Itoa(node.ListData.Start)})
 		}
-		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		r.Tag(tag, attrs, false)
 		r.Newline()
@@ -1312,7 +1307,6 @@ func (r *ProtylePreviewRenderer) renderList(node *ast.Node, entering bool) ast.W
 func (r *ProtylePreviewRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		r.handleKramdownBlockIAL(node)
 		attrs = append(attrs, node.KramdownIAL...)
 		if 3 == node.ListData.Typ && nil != node.FirstChild && ((ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
 			(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
@@ -1373,13 +1367,6 @@ func (r *ProtylePreviewRenderer) renderSoftBreak(node *ast.Node, entering bool) 
 		}
 	}
 	return ast.WalkContinue
-}
-
-func (r *ProtylePreviewRenderer) handleKramdownBlockIAL(node *ast.Node) {
-	if r.Options.KramdownBlockIAL && "id" != r.Options.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
-		// 第一项必须是 ID
-		node.KramdownIAL[0][0] = r.Options.KramdownIALIDRenderName
-	}
 }
 
 func (r *ProtylePreviewRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
