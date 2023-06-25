@@ -126,13 +126,13 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
 			} else if bytes.HasPrefix(tags, []byte("<span data-type=")) {
-				ret = t.processSpanTag(startPos, tags, "<span data-type=", "</span>", ctx)
+				ret = t.processSpanTag(tags, "<span data-type=", "</span>", ctx)
 				return
 			} else if bytes.Equal(tags, []byte("<kbd>")) {
-				ret = t.processSpanTag(startPos, tags, "<kbd>", "</kbd>", ctx)
+				ret = t.processSpanTag(tags, "<kbd>", "</kbd>", ctx)
 				return
 			} else if bytes.Equal(tags, []byte("<u>")) {
-				ret = t.processSpanTag(startPos, tags, "<u>", "</u>", ctx)
+				ret = t.processSpanTag(tags, "<u>", "</u>", ctx)
 				return
 			}
 		}
@@ -144,14 +144,17 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 	return
 }
 
-func (t *Tree) processSpanTag(startPos int, tags []byte, startTag, endTag string, ctx *InlineContext) (ret *ast.Node) {
+func (t *Tree) processSpanTag(tags []byte, startTag, endTag string, ctx *InlineContext) (ret *ast.Node) {
 	remains := ctx.tokens[ctx.pos:]
+	if 1 > len(remains) {
+		return
+	}
+
 	end := bytes.Index(remains, []byte(endTag))
 	closerLen := len(endTag)
 	tokens := append(tags, remains[:end+closerLen]...)
 	nodes, _ := html.ParseFragment(bytes.NewReader(tokens), &html.Node{Type: html.ElementNode})
 	if 1 != len(nodes) {
-		ctx.pos = startPos + 1
 		return
 	}
 	node := nodes[0]

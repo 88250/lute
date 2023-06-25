@@ -122,6 +122,10 @@ func (t *Tree) parseNewline(block *ast.Node, ctx *InlineContext) (ret *ast.Node)
 	return
 }
 
+func (t *Tree) MergeText() {
+	t.mergeText(t.Root)
+}
+
 // mergeText 合并 node 中所有（包括子节点）连续的文本节点。
 // 合并后顺便进行中文排版优化以及 GFM 自动邮件链接识别。
 func (t *Tree) mergeText(node *ast.Node) {
