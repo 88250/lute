@@ -19,6 +19,7 @@ import (
 
 var blockDOM2HTMLTest = []parseTest{
 
+	{"1", "<div data-node-id=\"20230708221830-dbk6i2j\" data-type=\"NodeList\" class=\"list\" data-subtype=\"u\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20230708221825-6cebbvv\" data-type=\"NodeListItem\" class=\"li protyle-wysiwyg--select\" updated=\"20230708221901\" custom-t=\"{&amp;quot;11&amp;quot;}\"><div class=\"protyle-action\" draggable=\"true\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20230708221825-zfrqic3\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20230708221825\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<ul id=\"20230708221830-dbk6i2j\" updated=\"20230708221830\">\n<li id=\"20230708221825-6cebbvv\" updated=\"20230708221901\" custom-t=\"&#123;&quot;11&quot;&#125;\">foo</li>\n</ul>\n"},
 	{"0", "foo <span data-type=\"code\">​bar</span>​ baz", "<p id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\">foo <span data-type=\"code\">bar</span>\u200b baz</p>\n"},
 }
 

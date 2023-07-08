@@ -28,12 +28,16 @@ var (
 
 func UnescapeAttrVal(v string) string {
 	v = strings.ReplaceAll(v, editor.IALValEscNewLine, "\n")
+	v = strings.ReplaceAll(v, "&#123;", "{")
+	v = strings.ReplaceAll(v, "&#125;", "}")
 	return UnescapeString(v)
 }
 
 func EscapeAttrVal(v string) (ret string) {
 	ret = string(EscapeHTML([]byte(v)))
 	ret = strings.ReplaceAll(ret, "\n", editor.IALValEscNewLine)
+	ret = strings.ReplaceAll(ret, "{", "&#123;")
+	ret = strings.ReplaceAll(ret, "}", "&#125;")
 	return
 }
 
