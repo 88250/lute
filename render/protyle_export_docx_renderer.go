@@ -201,44 +201,159 @@ func (r *ProtyleExportDocxRenderer) renderAttributeView(node *ast.Node, entering
 }
 
 func (r *ProtyleExportDocxRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		textContent := node.TextMarkTextContent
-		if node.ParentIs(ast.NodeTableCell) {
-			textContent = strings.ReplaceAll(textContent, "\\|", "|")
-			textContent = strings.ReplaceAll(textContent, "\n", "<br />")
-		}
+	if !entering {
+		return ast.WalkContinue
+	}
 
-		if node.IsTextMarkType("a") {
+	types := strings.Split(node.TextMarkType, " ")
+	for _, typ := range types {
+		r.renderHTMLTag0(node, typ, true)
+	}
+
+	r.WriteString(r.getTextMarkTextContent(node))
+
+	reverse(types)
+	for _, typ := range types {
+		r.renderHTMLTag0(node, typ, false)
+	}
+	return ast.WalkContinue
+}
+
+func (r *ProtyleExportDocxRenderer) renderHTMLTag0(node *ast.Node, currentTextMarkType string, entering bool) {
+	switch currentTextMarkType {
+	case "a":
+		if entering {
 			attrs := [][]string{{"href", node.TextMarkAHref}}
 			if "" != node.TextMarkATitle {
 				attrs = append(attrs, []string{"title", node.TextMarkATitle})
 			}
 			r.Tag("a", attrs, false)
-			r.WriteString(textContent)
+
+		} else {
 			r.WriteString("</a>")
-		} else if node.IsTextMarkType("inline-memo") {
-			r.WriteString(textContent)
-			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
-			if isCJK(lastRune) {
-				r.WriteString("<sup>（")
-				r.WriteString(node.TextMarkInlineMemoContent)
-				r.WriteString("）</sup>")
+		}
+	case "block-ref":
+		if entering {
+			node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
+			r.WriteString("((" + node.TextMarkBlockRefID)
+			if "s" == node.TextMarkBlockRefSubtype {
+				r.WriteString(" \"" + node.TextMarkTextContent + "\"")
 			} else {
+				r.WriteString(" '" + node.TextMarkTextContent + "'")
+			}
+			r.WriteString("))")
+		}
+	case "file-annotation-ref":
+		if entering {
+			node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
+			r.WriteString("<<" + node.TextMarkFileAnnotationRefID)
+			r.WriteString(" \"" + node.TextMarkTextContent + "\"")
+			r.WriteString(">>")
+		}
+	case "inline-memo":
+		if entering {
+			r.WriteString(node.TextMarkTextContent)
+		}
+
+		lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+		if isCJK(lastRune) {
+			if entering {
+				r.WriteString("<sup>（")
+			} else {
+				r.WriteString("）</sup>")
+			}
+		} else {
+			if entering {
 				r.WriteString("<sup>(")
-				r.WriteString(node.TextMarkInlineMemoContent)
+			} else {
 				r.WriteString(")</sup>")
 			}
-		} else if node.IsTextMarkType("inline-math") {
-			r.WriteString("<span>$" + node.TextMarkInlineMathContent + "$</span>")
+		}
+	case "inline-math":
+		if entering {
+			r.WriteString("<span>$")
 		} else {
-			attrs := r.renderTextMarkAttrs(node)
-			r.spanNodeAttrs(node, &attrs)
-			r.Tag("span", attrs, false)
-			r.WriteString(textContent)
-			r.WriteString("</span>")
+			r.WriteString("$</span>")
+		}
+	case "strong":
+		if entering {
+			r.WriteString("<strong>")
+		} else {
+			r.WriteString("</strong>")
+		}
+	case "em":
+		if entering {
+			r.WriteString("<em>")
+		} else {
+			r.WriteString("</em>")
+		}
+	case "code":
+		if entering {
+			r.WriteString("<code>")
+		} else {
+			r.WriteString("</code>")
+		}
+	case "tag":
+		if entering {
+			r.WriteString("<mark>#")
+		} else {
+			r.WriteString("#</mark>")
+		}
+	case "s":
+		if entering {
+			r.WriteString("<s>")
+		} else {
+			r.WriteString("</s>")
+		}
+	case "mark":
+		if entering {
+			r.WriteString("<mark>")
+		} else {
+			r.WriteString("</mark>")
+		}
+	case "u":
+		if entering {
+			r.WriteString("<u>")
+		} else {
+			r.WriteString("</u>")
+		}
+	case "sup":
+		if entering {
+			r.WriteString("<sup>")
+		} else {
+			r.WriteString("</sup>")
+		}
+	case "sub":
+		if entering {
+			r.WriteString("<sub>")
+		} else {
+			r.WriteString("</sub>")
+		}
+	case "kbd":
+		if entering {
+			r.WriteString("<kbd>")
+		} else {
+			r.WriteString("</kbd>")
 		}
 	}
-	return ast.WalkContinue
+	return
+}
+
+func (r *ProtyleExportDocxRenderer) getTextMarkTextContent(node *ast.Node) (ret string) {
+	ret = node.TextMarkTextContent
+	if node.IsTextMarkType("a") || node.IsTextMarkType("block-ref") || node.IsTextMarkType("file-annotation-ref") {
+		ret = node.TextMarkTextContent
+	} else if node.IsTextMarkType("inline-memo") {
+		ret = node.TextMarkInlineMemoContent
+	} else if node.IsTextMarkType("inline-math") {
+		ret = node.TextMarkInlineMathContent
+	}
+
+	if node.ParentIs(ast.NodeTableCell) {
+		ret = strings.ReplaceAll(ret, "\\|", "|")
+		ret = strings.ReplaceAll(ret, "\n", "<br />")
+	}
+	return ret
 }
 
 func (r *ProtyleExportDocxRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
@@ -1374,42 +1489,6 @@ func (r *ProtyleExportDocxRenderer) renderSoftBreak(node *ast.Node, entering boo
 		}
 	}
 	return ast.WalkContinue
-}
-
-func (r *ProtyleExportDocxRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
-	attrs = [][]string{{"data-type", node.TextMarkType}}
-
-	types := strings.Split(node.TextMarkType, " ")
-	for _, typ := range types {
-		if "block-ref" == typ {
-			attrs = append(attrs, []string{"data-subtype", node.TextMarkBlockRefSubtype})
-			attrs = append(attrs, []string{"data-id", node.TextMarkBlockRefID})
-		} else if "a" == typ {
-			href := node.TextMarkAHref
-			href = string(r.LinkPath([]byte(href)))
-
-			attrs = append(attrs, []string{"data-href", href})
-			if "" != node.TextMarkATitle {
-				attrs = append(attrs, []string{"data-title", node.TextMarkATitle})
-			}
-		} else if "inline-math" == typ {
-			attrs = append(attrs, []string{"data-subtype", "math"})
-			inlineMathContent := node.TextMarkInlineMathContent
-			if node.ParentIs(ast.NodeTableCell) {
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
-			}
-			attrs = append(attrs, []string{"data-content", inlineMathContent})
-			attrs = append(attrs, []string{"contenteditable", "false"})
-			attrs = append(attrs, []string{"class", "render-node"})
-		} else if "file-annotation-ref" == typ {
-			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
-		} else if "inline-memo" == typ {
-			inlineMemoContent := node.TextMarkInlineMemoContent
-			attrs = append(attrs, []string{"data-inline-memo-content", inlineMemoContent})
-		}
-	}
-	return
 }
 
 func (r *ProtyleExportDocxRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
