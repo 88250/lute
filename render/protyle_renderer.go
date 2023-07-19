@@ -900,10 +900,10 @@ func (r *ProtyleRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast
 	r.WriteString(language)
 	r.Tag("/span", nil, false)
 	r.WriteString("<span class=\"fn__flex-1\"></span>")
-	r.Tag("span", [][]string{{"class", "protyle-icon protyle-icon--first protyle-action__copy"}}, false)
+	r.Tag("span", [][]string{{"class", "b3-tooltips__nw b3-tooltips protyle-icon protyle-icon--first protyle-action__copy"}}, false)
 	r.WriteString("<svg><use xlink:href=\"#iconCopy\"></use></svg>")
 	r.Tag("/span", nil, false)
-	r.WriteString("<span class=\"protyle-icon protyle-icon--last protyle-action__menu\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
+	r.WriteString("<span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-icon--last protyle-action__menu\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
 	r.Tag("/div", nil, false)
 
 	attrs = [][]string{{"class", "hljs"}}
@@ -1365,7 +1365,7 @@ func (r *ProtyleRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStat
 	attrs = append(attrs, []string{"data-subtype", "block"})
 	r.Tag("div", attrs, false)
 	r.WriteString("<div class=\"protyle-icons\">")
-	r.WriteString("<span class=\"protyle-icon protyle-icon--first protyle-action__edit\"><svg><use xlink:href=\"#iconEdit\"></use></svg></span><span class=\"protyle-icon protyle-action__menu protyle-icon--last\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
+	r.WriteString("<span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-icon--first protyle-action__edit\"><svg><use xlink:href=\"#iconEdit\"></use></svg></span><span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-action__menu protyle-icon--last\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
 	r.WriteString("</div><div>")
 	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
 	r.Tag("protyle-html", attrs, false)
