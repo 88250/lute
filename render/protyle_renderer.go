@@ -1857,6 +1857,7 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
 			}
+			// Improve inline formulas input https://github.com/siyuan-note/siyuan/issues/8972
 			//inlineMathContent = strings.ReplaceAll(inlineMathContent, editor.Caret, "")
 			inlineMathContent = strings.ReplaceAll(inlineMathContent, "\"", "&amp;quot;")
 			attrs = append(attrs, []string{"data-content", inlineMathContent})
