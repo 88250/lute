@@ -117,7 +117,10 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							subTree := Parse("", p.Tokens, context.ParseOption)
 							subBlock := subTree.Root.FirstChild
 							if ast.NodeParagraph != subBlock.Type {
-								listItem.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+								if !context.ParseOption.ProtyleWYSIWYG {
+									// Protyle `Optimize typography` exception in case of task list and heading https://github.com/siyuan-note/siyuan/issues/9035
+									listItem.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+								}
 								if nil != p.FirstChild {
 									listItem.PrependChild(p.FirstChild)
 								}
