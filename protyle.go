@@ -1959,7 +1959,7 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" data-export-html=\""+dataExportHtml+"\"")...)
 	}
 
-	if customAttrs := lute.domCustomAttrs(n); nil != customAttrs {
+	if customAttrs := util.DomCustomAttrs(n); nil != customAttrs {
 		for k, v := range customAttrs {
 			v = html.UnescapeHTMLStr(v)
 			node.SetIALAttr(k, v)

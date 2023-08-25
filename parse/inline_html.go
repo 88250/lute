@@ -505,9 +505,10 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 	}
 
 	insertedIAL := false
-	if style := util.DomAttrValue(n, "style"); "" != style { // 比如设置表格列宽
+	if style := util.DomAttrValue(n, "style"); "" != style { // 比如设置表格列宽，颜色等
 		style = StyleValue(style)
 		node.SetIALAttr("style", style)
+
 		ialTokens := IAL2Tokens(node.KramdownIAL)
 		ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 		if ast.NodeTableCell == node.Type {
@@ -516,6 +517,36 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 			node.InsertAfter(ial)
 		}
 		insertedIAL = true
+	}
+
+	if customAttrs := util.DomCustomAttrs(n); nil != customAttrs {
+		if !insertedIAL {
+			for k, v := range customAttrs {
+				v = html.UnescapeHTMLStr(v)
+				node.SetIALAttr(k, v)
+			}
+
+			ialTokens := IAL2Tokens(node.KramdownIAL)
+			ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+			if ast.NodeTableCell == node.Type {
+				node.PrependChild(ial)
+			} else {
+				node.InsertAfter(ial)
+			}
+			insertedIAL = true
+		} else {
+			for k, v := range customAttrs {
+				v = html.UnescapeHTMLStr(v)
+				node.SetIALAttr(k, v)
+			}
+
+			ialTokens := IAL2Tokens(node.KramdownIAL)
+			ial := node.Next
+			if ast.NodeTableCell == node.Type {
+				ial = node.FirstChild
+			}
+			ial.Tokens = ialTokens
+		}
 	}
 
 	if atom.Th == n.DataAtom || atom.Td == n.DataAtom {
