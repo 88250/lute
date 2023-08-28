@@ -129,7 +129,13 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		return
 	}
 
-	aligns := context.parseTableDelimRow(lex.TrimWhitespace(lines[1]))
+	delimRow := lex.TrimWhitespace(lines[1])
+	if 2 > len(delimRow) {
+		// 换行+冒号会被识别为表格 https://github.com/88250/lute/issues/198
+		return
+	}
+
+	aligns := context.parseTableDelimRow(delimRow)
 	if nil == aligns {
 		return
 	}

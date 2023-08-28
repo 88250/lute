@@ -18,6 +18,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"67", "foo\n:", "<p>foo<br />\n:</p>\n"},
 	{"66", "[foo](<www.bar.com> \"baz\")", "<p><a href=\"www.bar.com\" title=\"baz\">foo</a></p>\n"},
 	{"65", "foo：bar://baz", "<p>foo：<a href=\"bar://baz\">bar://baz</a></p>\n"},
 	{"64", "foo bar://baz", "<p>foo <a href=\"bar://baz\">bar://baz</a></p>\n"},
