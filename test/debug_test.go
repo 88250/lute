@@ -18,6 +18,12 @@ import (
 
 var debugTests = []parseTest{
 
+	{"73", "| $foo\\\\\\|bar$ |\n| - |", "<table>\n<thead>\n<tr>\n<th><span class=\"language-math\">foo\\\\\\|bar</span></th>\n</tr>\n</thead>\n</table>\n"},
+	{"72", "| $foo\\\\|bar$ |\n| - |", "<p>| <span class=\"language-math\">foo\\\\|bar</span> |<br />\n| - |</p>\n"},
+	{"71", "| $foo\\|bar$ |\n| - |", "<table>\n<thead>\n<tr>\n<th><span class=\"language-math\">foo\\|bar</span></th>\n</tr>\n</thead>\n</table>\n"},
+	{"70", "| `foo\\\\\\|bar` |\n| - |", "<table>\n<thead>\n<tr>\n<th><code>foo\\\\|bar</code></th>\n</tr>\n</thead>\n</table>\n"},
+	{"69", "| `foo\\\\|bar` |\n| - |", "<p>| <code>foo\\\\|bar</code> |<br />\n| - |</p>\n"},
+	{"68", "| `foo\\|bar` |\n| - |", "<table>\n<thead>\n<tr>\n<th><code>foo|bar</code></th>\n</tr>\n</thead>\n</table>\n"},
 	{"67", "foo\n:", "<p>foo<br />\n:</p>\n"},
 	{"66", "[foo](<www.bar.com> \"baz\")", "<p><a href=\"www.bar.com\" title=\"baz\">foo</a></p>\n"},
 	{"65", "foo：bar://baz", "<p>foo：<a href=\"bar://baz\">bar://baz</a></p>\n"},
