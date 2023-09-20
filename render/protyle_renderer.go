@@ -1854,7 +1854,8 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 			attrs = append(attrs, []string{"data-subtype", "math"})
 			inlineMathContent := node.TextMarkInlineMathContent
 			if node.ParentIs(ast.NodeTableCell) {
-				//inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|") Improve the handling of inline-level formulas containing escape char \ in the table https://github.com/siyuan-note/siyuan/issues/9227
+				// Improve the handling of inline-level formulas containing escape char \ in the table https://github.com/siyuan-note/siyuan/issues/9227
+				//inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
 			}
 			// Improve inline formulas input https://github.com/siyuan-note/siyuan/issues/8972

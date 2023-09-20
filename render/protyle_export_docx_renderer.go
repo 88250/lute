@@ -350,7 +350,10 @@ func (r *ProtyleExportDocxRenderer) getTextMarkTextContent(node *ast.Node) (ret 
 	}
 
 	if node.ParentIs(ast.NodeTableCell) {
-		ret = strings.ReplaceAll(ret, "\\|", "|")
+		if !node.IsTextMarkType("inline-math") {
+			// Improve the handling of inline-level formulas containing escape char \ in the table https://github.com/siyuan-note/siyuan/issues/9227
+			ret = strings.ReplaceAll(ret, "\\|", "|")
+		}
 		ret = strings.ReplaceAll(ret, "\n", "<br />")
 	}
 	return ret
