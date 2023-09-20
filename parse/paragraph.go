@@ -12,10 +12,10 @@ package parse
 
 import (
 	"bytes"
-
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
+	"github.com/88250/lute/util"
 )
 
 func ParagraphContinue(p *ast.Node, context *Context) int {
@@ -126,7 +126,26 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 								}
 								subBlock.ID = p.ID
 								subBlock.KramdownIAL = p.KramdownIAL
-								p.InsertAfter(subBlock)
+
+								// Incomplete data when pasting task list nested list https://github.com/siyuan-note/siyuan/issues/9239
+								var last *ast.Node
+								var blocks []*ast.Node
+								for b := subBlock; nil != b && ast.NodeDocument != b.Type; b = b.Next {
+									if ast.NodeKramdownBlockIAL == b.Type {
+										if util.IsDocIAL(b.Tokens) {
+											break
+										}
+									}
+
+									last = b
+								}
+								for b := last; nil != b; b = b.Previous {
+									blocks = append(blocks, b)
+								}
+								for _, b := range blocks {
+									p.InsertAfter(b)
+								}
+
 								p.Unlink()
 							}
 						}
