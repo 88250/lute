@@ -22,6 +22,7 @@ import (
 
 var protyleExportMdTests = []parseTest{
 
+	{"9", "| $foo\\\\|bar$ |\n| -- |", "|$foo\\\\|bar$|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"8", "| $foo\\|bar$ |\n| -- |", "|$foo\\|bar$|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"7", "[~\\~foo\\~foo\\~~](bar)", "[~\\~foo\\~foo\\~~](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"6", "[^\\^foo\\^foo\\^^](bar)", "[^\\^foo\\^foo\\^^](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},

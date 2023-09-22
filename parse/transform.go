@@ -89,6 +89,10 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree) {
 				if ast.NodeInlineMathContent == n.Type {
 					span.TextMarkTextContent = ""
 					span.TextMarkInlineMathContent = string(html.EscapeHTML(n.Tokens))
+					if n.ParentIs(ast.NodeTableCell) {
+						// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
+						span.TextMarkInlineMathContent = strings.ReplaceAll(span.TextMarkInlineMathContent, "\\|", "|")
+					}
 				} else if ast.NodeBackslash == n.Type {
 					if c := n.ChildByType(ast.NodeBackslashContent); nil != c {
 						span.TextMarkTextContent = string(html.EscapeHTML(c.Tokens))

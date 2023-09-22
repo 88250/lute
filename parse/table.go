@@ -215,8 +215,29 @@ func (context *Context) newTableHead(headRows []*ast.Node) *ast.Node {
 	return ret
 }
 
+func inInline(tokens []byte, i int, mathOrCodeMarker byte) bool {
+	if i+1 >= len(tokens) || i < 1 {
+		return false
+	}
+
+	start := bytes.IndexByte(tokens[:i], mathOrCodeMarker)
+	startClosed := 0 == bytes.Count(tokens[:i], []byte{mathOrCodeMarker})%2
+	if startClosed {
+		return false
+	}
+	end := bytes.IndexByte(tokens[i+1:], mathOrCodeMarker)
+	return -1 < start && -1 < end
+}
+
 func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *ast.Node) {
 	ret = &ast.Node{Type: ast.NodeTableRow, TableAligns: aligns}
+
+	if idx := bytes.Index(line, []byte("\\|")); 0 < idx {
+		if inInline(line, idx, lex.ItemDollar) || inInline(line, idx, lex.ItemBacktick) {
+			line = bytes.ReplaceAll(line, []byte("\\|"), []byte("&#124;"))
+		}
+	}
+
 	cols := lex.SplitWithoutBackslashEscape(line, lex.ItemPipe)
 	if 1 > len(cols) {
 		return nil
@@ -238,6 +259,11 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	var col []byte
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = lex.TrimWhitespace(cols[i])
+		if !context.ParseOption.ProtyleWYSIWYG {
+			col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("\\|"))
+		} else {
+			col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("|"))
+		}
 		cell := &ast.Node{Type: ast.NodeTableCell, TableCellAlign: aligns[i]}
 		cell.Tokens = col
 		ret.AppendChild(cell)
@@ -281,6 +307,12 @@ func (context *Context) parseTableDelimRow(line []byte) (aligns []int) {
 		}
 	}
 
+	if idx := bytes.Index(line, []byte("\\|")); 0 < idx {
+		if inInline(line, idx, lex.ItemDollar) || inInline(line, idx, lex.ItemBacktick) {
+			line = bytes.ReplaceAll(line, []byte("\\|"), []byte("&#124;"))
+		}
+	}
+
 	cols := lex.SplitWithoutBackslashEscape(line, lex.ItemPipe)
 	if lex.IsBlank(cols[0]) {
 		cols = cols[1:]
@@ -292,6 +324,11 @@ func (context *Context) parseTableDelimRow(line []byte) (aligns []int) {
 	var alignments []int
 	for _, col := range cols {
 		col = lex.TrimWhitespace(col)
+		if !context.ParseOption.ProtyleWYSIWYG {
+			col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("\\|"))
+		} else {
+			col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("|"))
+		}
 		if 1 > length || nil == col {
 			return nil
 		}
