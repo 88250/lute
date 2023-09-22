@@ -234,7 +234,11 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 		}
 		textContent := node.TextMarkTextContent
 		if node.ParentIs(ast.NodeTableCell) {
-			textContent = strings.ReplaceAll(textContent, "\\|", "|")
+			if node.IsTextMarkType("code") {
+				textContent = strings.ReplaceAll(textContent, "|", "&#124;")
+			} else {
+				textContent = strings.ReplaceAll(textContent, "\\|", "|")
+			}
 			textContent = strings.ReplaceAll(textContent, "\n", "<br />")
 		}
 		r.WriteString(textContent)

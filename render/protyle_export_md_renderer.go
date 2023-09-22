@@ -213,6 +213,10 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 			textContent := node.TextMarkTextContent
 			if node.IsTextMarkType("code") {
 				textContent = html.UnescapeString(textContent)
+				if node.ParentIs(ast.NodeTableCell) {
+					// 多加一个转义符 Improve the handling of inline-code containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9252
+					textContent = strings.Replace(textContent, "\\", "\\\\", 1)
+				}
 			}
 			if strings.HasPrefix(textContent, " ") {
 				r.WriteString(editor.Zwsp) // 填充零宽空格以满足 Markdown 语法 https://github.com/siyuan-note/siyuan/issues/6472

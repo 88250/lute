@@ -232,9 +232,13 @@ func inInline(tokens []byte, i int, mathOrCodeMarker byte) bool {
 func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *ast.Node) {
 	ret = &ast.Node{Type: ast.NodeTableRow, TableAligns: aligns}
 
+	inMath := false
 	if idx := bytes.Index(line, []byte("\\|")); 0 < idx {
-		if inInline(line, idx, lex.ItemDollar) || inInline(line, idx, lex.ItemBacktick) {
+		if inInline(line, idx, lex.ItemDollar) {
 			line = bytes.ReplaceAll(line, []byte("\\|"), []byte("&#124;"))
+			inMath = true
+		} else if inInline(line, idx, lex.ItemBacktick) {
+			line = bytes.ReplaceAll(line, []byte("\\|"), []byte("\\&#124;"))
 		}
 	}
 
@@ -260,7 +264,11 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	for ; i < colsLen && i < alignsLen; i++ {
 		col = lex.TrimWhitespace(cols[i])
 		if !context.ParseOption.ProtyleWYSIWYG {
-			col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("\\|"))
+			if !inMath {
+				col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("|"))
+			} else {
+				col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("\\|"))
+			}
 		} else {
 			col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("|"))
 		}
@@ -307,9 +315,13 @@ func (context *Context) parseTableDelimRow(line []byte) (aligns []int) {
 		}
 	}
 
+	inMath := false
 	if idx := bytes.Index(line, []byte("\\|")); 0 < idx {
-		if inInline(line, idx, lex.ItemDollar) || inInline(line, idx, lex.ItemBacktick) {
+		if inInline(line, idx, lex.ItemDollar) {
 			line = bytes.ReplaceAll(line, []byte("\\|"), []byte("&#124;"))
+			inMath = true
+		} else if inInline(line, idx, lex.ItemBacktick) {
+			line = bytes.ReplaceAll(line, []byte("\\|"), []byte("\\&#124;"))
 		}
 	}
 
@@ -325,7 +337,11 @@ func (context *Context) parseTableDelimRow(line []byte) (aligns []int) {
 	for _, col := range cols {
 		col = lex.TrimWhitespace(col)
 		if !context.ParseOption.ProtyleWYSIWYG {
-			col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("\\|"))
+			if !inMath {
+				col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("|"))
+			} else {
+				col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("\\|"))
+			}
 		} else {
 			col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("|"))
 		}

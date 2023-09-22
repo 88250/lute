@@ -152,7 +152,11 @@ func (t *Tree) processSpanTag(tags []byte, startTag, endTag string, ctx *InlineC
 
 	end := bytes.Index(remains, []byte(endTag))
 	closerLen := len(endTag)
-	tokens := append(tags, remains[:end+closerLen]...)
+	endTmp := end + closerLen
+	if len(remains) < endTmp {
+		endTmp = len(remains)
+	}
+	tokens := append(tags, remains[:endTmp]...)
 	nodes, _ := html.ParseFragment(bytes.NewReader(tokens), &html.Node{Type: html.ElementNode})
 	if 1 != len(nodes) {
 		return
@@ -645,6 +649,10 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 		default:
 			if !isInlineMath { // 带有字体样式的公式复制之后内容不正确 https://github.com/siyuan-note/siyuan/issues/6799
 				node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeSingleQuote(n)
+				if node.ParentIs(ast.NodeTableCell) && node.IsTextMarkType("code") {
+					// 表格中的代码中带有管道符时使用 HTML 实体替换管道符 Improve the handling of inline-code containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9252
+					node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "|", "&#124;")
+				}
 			}
 		}
 	}
