@@ -350,7 +350,7 @@ func (r *ProtyleExportDocxRenderer) getTextMarkTextContent(node *ast.Node) (ret 
 	}
 
 	if node.ParentIs(ast.NodeTableCell) {
-		// Improve the handling of inline-level formulas containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
+		// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
 		ret = strings.ReplaceAll(ret, "|", "&#124;")
 		ret = strings.ReplaceAll(ret, "\n", "<br />")
 	}
