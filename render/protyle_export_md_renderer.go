@@ -215,7 +215,7 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 				textContent = html.UnescapeString(textContent)
 				if node.ParentIs(ast.NodeTableCell) {
 					// 多加一个转义符 Improve the handling of inline-code containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9252
-					textContent = strings.Replace(textContent, "\\", "\\\\", 1)
+					textContent = lex.AddBackslashBeforePipe(textContent)
 				}
 			}
 			if strings.HasPrefix(textContent, " ") {
@@ -286,9 +286,8 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				inlineMathContent := node.TextMarkInlineMathContent
 				if node.ParentIs(ast.NodeTableCell) {
 					// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
-					if strings.Contains(inlineMathContent, "|") && !strings.Contains(inlineMathContent, "\\|") {
-						inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "\\|")
-					}
+					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
+					inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "\\|")
 					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
 				}
 				ret += "$" + inlineMathContent + "$"

@@ -11,6 +11,7 @@
 package lex
 
 import (
+	"bytes"
 	"unicode"
 )
 
@@ -386,6 +387,19 @@ func BytesShowLength(bytes []byte) int {
 		}
 	}
 	return length
+}
+
+func AddBackslashBeforePipe(content string) string {
+	buf := bytes.Buffer{}
+	var last byte
+	for i := 0; i < len(content); i++ {
+		b := content[i]
+		if ItemPipe == b && ItemBackslash != last {
+			buf.WriteByte(ItemBackslash)
+		}
+		buf.WriteByte(b)
+	}
+	return buf.String()
 }
 
 func EscapeMarkers(tokens []byte) []byte {
