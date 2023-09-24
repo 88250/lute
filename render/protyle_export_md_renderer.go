@@ -288,6 +288,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 					// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
 					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
 					inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "\\|")
+					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\", "\\\\")
 					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
 				}
 				ret += "$" + inlineMathContent + "$"
@@ -379,6 +380,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 				// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "\\|")
+				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\", "\\\\")
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
 			}
 			ret += "$" + inlineMathContent
