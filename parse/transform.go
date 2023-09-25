@@ -19,7 +19,7 @@ import (
 
 // NestedInlines2FlattedSpansHybrid 将嵌套的行级节点转换为平铺的文本标记节点。
 // 该函数不会移除转义节点。
-func NestedInlines2FlattedSpansHybrid(tree *Tree) {
+func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 	var unlinks []*ast.Node
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering {
@@ -89,6 +89,10 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree) {
 				if ast.NodeInlineMathContent == n.Type {
 					span.TextMarkTextContent = ""
 					span.TextMarkInlineMathContent = string(html.EscapeHTML(n.Tokens))
+					if n.ParentIs(ast.NodeTableCell) && !isExportMd {
+						// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
+						span.TextMarkInlineMathContent = strings.ReplaceAll(span.TextMarkInlineMathContent, "\\|", "|")
+					}
 				} else if ast.NodeBackslash == n.Type {
 					if c := n.ChildByType(ast.NodeBackslashContent); nil != c {
 						span.TextMarkTextContent = string(html.EscapeHTML(c.Tokens))
@@ -175,7 +179,7 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree) {
 
 // NestedInlines2FlattedSpans 将嵌套的行级节点转换为平铺的文本标记节点。
 // 该函数会移除转义节点。
-func NestedInlines2FlattedSpans(tree *Tree) {
+func NestedInlines2FlattedSpans(tree *Tree, isExportMd bool) {
 	var unlinks []*ast.Node
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering {
@@ -264,6 +268,10 @@ func NestedInlines2FlattedSpans(tree *Tree) {
 				if ast.NodeInlineMathContent == n.Type {
 					span.TextMarkTextContent = ""
 					span.TextMarkInlineMathContent = string(html.EscapeHTML(n.Tokens))
+					if n.ParentIs(ast.NodeTableCell) && !isExportMd {
+						// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
+						span.TextMarkInlineMathContent = strings.ReplaceAll(span.TextMarkInlineMathContent, "\\|", "|")
+					}
 				} else if ast.NodeBackslash == n.Type {
 					if c := n.ChildByType(ast.NodeBackslashContent); nil != c {
 						span.TextMarkTextContent = string(html.EscapeHTML(c.Tokens))

@@ -24,7 +24,7 @@ var protyleExportMdTests = []parseTest{
 
 	{"10", "| $foo\\\\\\|bar$ |\n| -- |", "|$foo\\\\\\\\|bar$|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"9", "| $foo\\\\|bar$ |\n| -- |", "|$foo\\\\\\|bar$|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
-	{"8", "| $foo\\|bar$ |\n| -- |", "|$foo\\|bar$|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
+	{"8", "| $foo\\|bar$ |\n| -- |", "|$foo\\\\|bar$|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"7", "[~\\~foo\\~foo\\~~](bar)", "[~\\~foo\\~foo\\~~](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"6", "[^\\^foo\\^foo\\^^](bar)", "[^\\^foo\\^foo\\^^](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"5", "[==\\=foo\\=foo\\===](bar)", "[==\\=foo\\=foo\\===](bar)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
@@ -57,7 +57,7 @@ func TestProtyleExportMd(t *testing.T) {
 	ast.Testing = true
 	for _, test := range protyleExportMdTests {
 		tree := parse.Parse("", []byte(test.from), luteEngine.ParseOptions)
-		parse.NestedInlines2FlattedSpans(tree)
+		parse.NestedInlines2FlattedSpans(tree, true)
 		renderer := render.NewProtyleExportMdRenderer(tree, luteEngine.RenderOptions)
 		output := renderer.Render()
 		kmd := util.BytesToStr(output)

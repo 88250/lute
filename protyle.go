@@ -51,7 +51,7 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 
 	// 使用 Markdown 标记符嵌套行级元素后被还原为纯文本 https://github.com/siyuan-note/siyuan/issues/7637
 	// 这里需要将混合嵌套（比如 <strong><span a></span></strong>）的行级元素拆分为多个平铺的行级元素（<span strong> 和 <span strong a>）
-	parse.NestedInlines2FlattedSpansHybrid(tree)
+	parse.NestedInlines2FlattedSpansHybrid(tree, false)
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
@@ -120,7 +120,7 @@ func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 
 func (lute *Lute) Md2BlockDOM(markdown string, reserveEmptyParagraph bool) (vHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	parse.NestedInlines2FlattedSpans(tree)
+	parse.NestedInlines2FlattedSpans(tree, false)
 	if reserveEmptyParagraph {
 		ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 			if !entering {
@@ -149,7 +149,7 @@ func (lute *Lute) Md2BlockDOM(markdown string, reserveEmptyParagraph bool) (vHTM
 
 func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
-	parse.NestedInlines2FlattedSpans(tree)
+	parse.NestedInlines2FlattedSpans(tree, false)
 	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc

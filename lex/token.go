@@ -413,7 +413,7 @@ func RepeatBackslashBeforePipe(content string) string {
 			if ItemBackslash != last {
 				buf.WriteByte(ItemBackslash)
 			}
-			if 1 < backslashCnt {
+			if 1 <= backslashCnt {
 				buf.WriteByte(ItemBackslash)
 			}
 		}
