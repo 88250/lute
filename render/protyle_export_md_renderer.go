@@ -286,9 +286,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				inlineMathContent := node.TextMarkInlineMathContent
 				if node.ParentIs(ast.NodeTableCell) {
 					// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
-					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
-					inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "\\|")
-					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\", "\\\\")
+					inlineMathContent = lex.RepeatBackslashBeforePipe(inlineMathContent)
 					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
 				}
 				ret += "$" + inlineMathContent + "$"
@@ -378,9 +376,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 			inlineMathContent := node.TextMarkInlineMathContent
 			if node.ParentIs(ast.NodeTableCell) {
 				// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\|", "|")
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "\\|")
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\\", "\\\\")
+				inlineMathContent = lex.RepeatBackslashBeforePipe(inlineMathContent)
 				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
 			}
 			ret += "$" + inlineMathContent
