@@ -406,13 +406,19 @@ func AddBackslashBeforePipe(content string) string {
 func RepeatBackslashBeforePipe(content string) string {
 	buf := bytes.Buffer{}
 	var last byte
+	backslashCnt := 0
 	for i := 0; i < len(content); i++ {
 		b := content[i]
 		if ItemPipe == b {
 			if ItemBackslash != last {
 				buf.WriteByte(ItemBackslash)
+				backslashCnt = 0
+			} else {
+				backslashCnt++
 			}
-			buf.WriteByte(ItemBackslash)
+			if 1 < backslashCnt {
+				buf.WriteByte(ItemBackslash)
+			}
 		}
 		last = b
 		buf.WriteByte(b)
