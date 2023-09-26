@@ -215,7 +215,7 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 				textContent = html.UnescapeString(textContent)
 				if node.ParentIs(ast.NodeTableCell) {
 					// 多加一个转义符 Improve the handling of inline-code containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9252
-					textContent = lex.AddBackslashBeforePipe(textContent)
+					textContent = lex.RepeatBackslashBeforePipe(textContent)
 				}
 			}
 			if strings.HasPrefix(textContent, " ") {
