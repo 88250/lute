@@ -1818,6 +1818,14 @@ func (r *ProtyleRenderer) renderIAL(node *ast.Node) {
 		r.Tag("/div", nil, false)
 	}
 
+	if avs := node.IALAttr("custom-avs"); "" != avs {
+		avs = strings.ReplaceAll(avs, editor.IALValEscNewLine, "\n")
+		avs = html.EscapeHTMLStr(avs)
+		r.Tag("div", [][]string{{"class", "protyle-attr--av"}}, false)
+		r.WriteString("<svg><use xlink:href=\"#iconDatabase\"></use></svg>")
+		r.Tag("/div", nil, false)
+	}
+
 	if refCount := node.IALAttr("refcount"); "" != refCount {
 		refCount = strings.ReplaceAll(refCount, editor.IALValEscNewLine, "\n")
 		refCount = html.EscapeHTMLStr(refCount)
