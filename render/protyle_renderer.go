@@ -172,7 +172,6 @@ func NewProtyleRenderer(tree *parse.Tree, options *Options) *ProtyleRenderer {
 
 func (r *ProtyleRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
 		attrs := [][]string{
 			{"data-type", "NodeCustomBlock"},
 			{"data-info", node.CustomBlockInfo},
@@ -182,14 +181,12 @@ func (r *ProtyleRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.W
 		r.Tag("div", attrs, false)
 		r.renderIAL(node)
 		r.WriteString("</div>")
-		r.Newline()
 	}
 	return ast.WalkContinue
 }
 
 func (r *ProtyleRenderer) renderAttributeView(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
 		attrs := [][]string{
 			{"contenteditable", "false"},
 			{"data-av-id", node.AttributeViewID},
@@ -203,7 +200,6 @@ func (r *ProtyleRenderer) renderAttributeView(node *ast.Node, entering bool) ast
 		r.WriteString("</div>")
 		r.renderIAL(node)
 		r.WriteString("</div>")
-		r.Newline()
 	}
 	return ast.WalkContinue
 }
