@@ -93,6 +93,7 @@ func TestBlockDOM2InlineBlockDOM(t *testing.T) {
 
 var blockDOM2StdMd = []parseTest{
 
+	{"12", "<div data-node-id=\"20231028232041-5dhtaps\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20231028234123\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">foo.</span>bar</div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "**foo.\u200b**bar\n"},
 	{"11", "fo<span data-type=\"text\" id=\"\" style=\"color: var(--b3-font-color8);\">o </span><span data-type=\"inline-math text\" data-subtype=\"math\" data-content=\"2>1\" contenteditable=\"false\" class=\"render-node\" id=\"\" style=\"color: var(--b3-font-color8);\" data-render=\"true\"><span class=\"katex\"><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height:0.6835em;vertical-align:-0.0391em;\"></span><span class=\"mord\">2</span><span class=\"mspace\" style=\"margin-right:0.2778em;\"></span><span class=\"mrel\">&gt;</span><span class=\"mspace\" style=\"margin-right:0.2778em;\"></span></span><span class=\"base\"><span class=\"strut\" style=\"height:0.6444em;\"></span><span class=\"mord\">1</span></span></span></span>​</span><span data-type=\"text\" id=\"\" style=\"color: var(--b3-font-color8);\"> b</span>az", "foo \u200b$2>1$\u200b baz\n"},
 	{"10", "<span data-type=\"kbd\">\u200bfoo</span>", "<kbd>foo</kbd>\n"},
 	{"9", "<span data-type=\"strong sub\">foo</span><span data-type=\"sub\">bar</span>", "**~foo~**\u200b~bar~\n"},

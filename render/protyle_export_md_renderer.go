@@ -218,12 +218,22 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 					textContent = lex.RepeatBackslashBeforePipe(textContent)
 				}
 			}
-			if strings.HasPrefix(textContent, " ") {
-				r.WriteString(editor.Zwsp) // 填充零宽空格以满足 Markdown 语法 https://github.com/siyuan-note/siyuan/issues/6472
+
+			// 填充零宽空格以满足 Markdown 语法 https://ld246.com/article/1597581380183
+			// https://github.com/siyuan-note/siyuan/issues/6472
+			// https://github.com/siyuan-note/siyuan/issues/9542
+			firstRune, _ := utf8.DecodeRuneInString(textContent)
+			beforeIsWhitespace := lex.IsUnicodeWhitespace(firstRune)
+			beforeIsPunct := unicode.IsPunct(firstRune) || unicode.IsSymbol(firstRune)
+			if beforeIsWhitespace || beforeIsPunct {
+				r.WriteString(editor.Zwsp)
 			}
 			r.WriteString(textContent)
-			if strings.HasSuffix(textContent, " ") {
-				r.WriteString(editor.Zwsp) // 填充零宽空格以满足 Markdown 语法 https://github.com/siyuan-note/siyuan/issues/6472
+			lastRune, _ := utf8.DecodeLastRuneInString(textContent)
+			afterIsWhitespace := lex.IsUnicodeWhitespace(lastRune)
+			afterIsPunct := unicode.IsPunct(lastRune) || unicode.IsSymbol(lastRune)
+			if afterIsWhitespace || afterIsPunct {
+				r.WriteString(editor.Zwsp)
 			}
 		}
 	} else {
