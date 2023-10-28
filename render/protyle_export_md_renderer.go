@@ -206,9 +206,10 @@ func (r *ProtyleExportMdRenderer) renderAttributeView(node *ast.Node, entering b
 }
 
 func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
+	isStrongEm := node.IsTextMarkType("strong") || node.IsTextMarkType("em") || node.IsTextMarkType("s")
+
 	if entering {
 		marker := r.renderMdMarker(node, entering)
-		r.WriteString(marker)
 		if !node.IsTextMarkType("a") && !node.IsTextMarkType("inline-memo") && !node.IsTextMarkType("block-ref") && !node.IsTextMarkType("file-annotation-ref") && !node.IsTextMarkType("inline-math") {
 			textContent := node.TextMarkTextContent
 			if node.IsTextMarkType("code") {
@@ -219,28 +220,40 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 				}
 			}
 
-			// 填充零宽空格以满足 Markdown 语法 https://ld246.com/article/1597581380183
-			// https://github.com/siyuan-note/siyuan/issues/6472
-			// https://github.com/siyuan-note/siyuan/issues/9542
-			firstRune, _ := utf8.DecodeRuneInString(textContent)
-			beforeIsWhitespace := lex.IsUnicodeWhitespace(firstRune)
-			beforeIsPunct := unicode.IsPunct(firstRune) || unicode.IsSymbol(firstRune)
-			if beforeIsWhitespace || beforeIsPunct {
-				r.WriteString(editor.Zwsp)
+			if isStrongEm {
+				// 填充空格以满足 Markdown 语法 https://ld246.com/article/1597581380183
+				// https://github.com/siyuan-note/siyuan/issues/6472
+				// https://github.com/siyuan-note/siyuan/issues/9542
+				// 这里无法使用零宽空格，只能用空格，否则 Pandoc 导出会有问题
+				firstRune, _ := utf8.DecodeRuneInString(textContent)
+				beforeIsWhitespace := lex.IsUnicodeWhitespace(firstRune)
+				beforeIsPunct := unicode.IsPunct(firstRune) || unicode.IsSymbol(firstRune)
+				if beforeIsWhitespace || beforeIsPunct {
+					r.WriteByte(lex.ItemSpace)
+				}
 			}
+			r.WriteString(marker)
 			r.WriteString(textContent)
-			lastRune, _ := utf8.DecodeLastRuneInString(textContent)
-			afterIsWhitespace := lex.IsUnicodeWhitespace(lastRune)
-			afterIsPunct := unicode.IsPunct(lastRune) || unicode.IsSymbol(lastRune)
-			if afterIsWhitespace || afterIsPunct {
-				r.WriteString(editor.Zwsp)
-			}
+		} else {
+			r.WriteString(marker)
 		}
 	} else {
 		marker := r.renderMdMarker(node, entering)
 		r.WriteString(marker)
-		if nil != node.Next && ast.NodeTextMark == node.Next.Type {
-			r.WriteString(editor.Zwsp) // 通过零宽空格来区隔相邻的 Markdown 标记符
+		if nil != node.Next {
+			if ast.NodeTextMark == node.Next.Type {
+				r.WriteString(editor.Zwsp) // 通过零宽空格来区隔相邻的 Markdown 标记符
+			} else {
+				if isStrongEm {
+					textContent := node.TextMarkTextContent
+					lastRune, _ := utf8.DecodeLastRuneInString(textContent)
+					afterIsWhitespace := lex.IsUnicodeWhitespace(lastRune)
+					afterIsPunct := unicode.IsPunct(lastRune) || unicode.IsSymbol(lastRune)
+					if afterIsWhitespace || afterIsPunct {
+						r.WriteByte(lex.ItemSpace)
+					}
+				}
+			}
 		}
 	}
 	return ast.WalkContinue
