@@ -976,6 +976,9 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	case ast.NodeAttributeView:
 		node.Type = ast.NodeAttributeView
 		node.AttributeViewID = util.DomAttrValue(n, "data-av-id")
+		if "" == node.AttributeViewID {
+			node.AttributeViewID = ast.NewNodeID()
+		}
 		node.AttributeViewType = util.DomAttrValue(n, "data-av-type")
 		tree.Context.Tip.AppendChild(node)
 		return
