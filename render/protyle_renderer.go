@@ -224,6 +224,13 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 			r.WriteString(editor.Zwsp)
 		}
 
+		if node.IsTextMarkType("code") {
+			if r.Options.Spellcheck {
+				// Spell check should be disabled inside inline and block code https://github.com/siyuan-note/siyuan/issues/9672
+				attrs = append(attrs, []string{"spellcheck", "false"})
+			}
+		}
+
 		r.Tag("span", attrs, false)
 		if parse.ContainTextMark(node, "code", "kbd", "tag") {
 			r.WriteString(editor.Zwsp)
@@ -908,7 +915,8 @@ func (r *ProtyleRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast
 
 	attrs = [][]string{{"class", "hljs"}}
 	r.contenteditable(node, &attrs)
-	r.spellcheck(&attrs)
+	// Spell check should be disabled inside inline and block code https://github.com/siyuan-note/siyuan/issues/9672
+	attrs = append(attrs, []string{"spellcheck", "false"})
 	r.Tag("div", attrs, false)
 	if codeIsEmpty {
 		if caretInInfo {
