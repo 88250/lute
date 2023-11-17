@@ -300,19 +300,22 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 			case "inline-memo":
 				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 				ret += node.TextMarkTextContent
+				content := node.TextMarkInlineMemoContent
+				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 				if isCJK(lastRune) {
-					ret += "^（" + node.TextMarkInlineMemoContent + "）^"
+					ret += "^（" + content + "）^"
 				} else {
-					ret += "^(" + node.TextMarkInlineMemoContent + ")^"
+					ret += "^(" + content + ")^"
 				}
 			case "inline-math":
-				inlineMathContent := node.TextMarkInlineMathContent
+				content := node.TextMarkInlineMathContent
 				if node.ParentIs(ast.NodeTableCell) {
 					// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
-					inlineMathContent = lex.RepeatBackslashBeforePipe(inlineMathContent)
-					inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
+					content = lex.RepeatBackslashBeforePipe(content)
+					content = strings.ReplaceAll(content, "\n", "<br/>")
 				}
-				ret += "$" + inlineMathContent + "$"
+				content = strings.ReplaceAll(content,  editor.IALValEscNewLine, "\n")
+				ret += "$" + content + "$"
 			}
 
 			for _, typ := range types {
@@ -388,21 +391,24 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 		if entering {
 			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 			ret += node.TextMarkTextContent
+			content := node.TextMarkInlineMemoContent
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 			if isCJK(lastRune) {
-				ret += "^（" + node.TextMarkInlineMemoContent + "）^"
+				ret += "^（" + content + "）^"
 			} else {
-				ret += "^(" + node.TextMarkInlineMemoContent + ")^"
+				ret += "^(" + content + ")^"
 			}
 		}
 	case "inline-math":
 		if entering {
-			inlineMathContent := node.TextMarkInlineMathContent
+			content := node.TextMarkInlineMathContent
 			if node.ParentIs(ast.NodeTableCell) {
 				// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
-				inlineMathContent = lex.RepeatBackslashBeforePipe(inlineMathContent)
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
+				content = lex.RepeatBackslashBeforePipe(content)
+				content = strings.ReplaceAll(content, "\n", "<br/>")
 			}
-			ret += "$" + inlineMathContent
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
+			ret += "$" + content
 		} else {
 			ret += "$"
 		}

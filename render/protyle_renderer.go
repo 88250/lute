@@ -1868,23 +1868,25 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 			}
 		} else if "inline-math" == typ {
 			attrs = append(attrs, []string{"data-subtype", "math"})
-			inlineMathContent := node.TextMarkInlineMathContent
+			content := node.TextMarkInlineMathContent
 			if node.ParentIs(ast.NodeTableCell) {
 				// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "&#124;")
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
+				content = strings.ReplaceAll(content, "|", "&#124;")
+				content = strings.ReplaceAll(content, "\n", "<br/>")
 			}
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
 			// Improve inline formulas input https://github.com/siyuan-note/siyuan/issues/8972
-			//inlineMathContent = strings.ReplaceAll(inlineMathContent, editor.Caret, "")
-			inlineMathContent = strings.ReplaceAll(inlineMathContent, "\"", "&amp;quot;")
-			attrs = append(attrs, []string{"data-content", inlineMathContent})
+			//content = strings.ReplaceAll(inlineMathContent, editor.Caret, "")
+			content = strings.ReplaceAll(content, "\"", "&amp;quot;")
+			attrs = append(attrs, []string{"data-content", content})
 			attrs = append(attrs, []string{"contenteditable", "false"})
 			attrs = append(attrs, []string{"class", "render-node"})
 		} else if "file-annotation-ref" == typ {
 			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
 		} else if "inline-memo" == typ {
-			inlineMemoContent := node.TextMarkInlineMemoContent
-			attrs = append(attrs, []string{"data-inline-memo-content", inlineMemoContent})
+			content := node.TextMarkInlineMemoContent
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
+			attrs = append(attrs, []string{"data-inline-memo-content", content})
 		}
 	}
 	return

@@ -19,6 +19,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
@@ -441,10 +442,14 @@ func (n *Node) Content() (ret string) {
 					buf.WriteString(n.TextMarkTextContent)
 				}
 			} else if "" != n.TextMarkInlineMathContent {
-				buf.WriteString(n.TextMarkInlineMathContent)
+				content := n.TextMarkInlineMathContent
+				content = strings.ReplaceAll(content, editor.CaretNewline, " ")
+				buf.WriteString(content)
 			}
 			if "" != n.TextMarkInlineMemoContent {
-				buf.WriteString(n.TextMarkInlineMemoContent)
+				content := n.TextMarkInlineMathContent
+				content = strings.ReplaceAll(content, editor.CaretNewline, " ")
+				buf.WriteString(content)
 			}
 		}
 		return WalkContinue
@@ -477,9 +482,13 @@ func (n *Node) Stat() (runeCnt, wordCnt, linkCnt, imgCnt, refCnt int) {
 			if 0 < len(n.TextMarkTextContent) {
 				buf = append(buf, n.TextMarkTextContent...)
 			} else if 0 < len(n.TextMarkInlineMathContent) {
-				buf = append(buf, n.TextMarkInlineMathContent...)
+				content := n.TextMarkInlineMathContent
+				content = strings.ReplaceAll(content, editor.CaretNewline, " ")
+				buf = append(buf, content...)
 			} else if "" != n.TextMarkInlineMemoContent {
-				buf = append(buf, n.TextMarkInlineMemoContent...)
+				content := n.TextMarkInlineMemoContent
+				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
+				buf = append(buf, content...)
 			}
 
 			if n.IsTextMarkType("a") {

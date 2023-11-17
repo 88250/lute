@@ -17,9 +17,9 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/88250/lute/html"
-
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
@@ -228,7 +228,9 @@ func (r *HtmlRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSta
 			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 			if isCJK(lastRune) {
 				r.WriteString("<sup>（")
-				r.WriteString(node.TextMarkInlineMemoContent)
+				memo := node.TextMarkInlineMemoContent
+				memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
+				r.WriteString(memo)
 				r.WriteString("）</sup>")
 			} else {
 				r.WriteString("<sup>(")
@@ -1399,20 +1401,22 @@ func (r *HtmlRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 			}
 		} else if "inline-math" == typ {
 			attrs = append(attrs, []string{"data-subtype", "math"})
-			inlineMathContent := node.TextMarkInlineMathContent
+			content := node.TextMarkInlineMathContent
 			if node.ParentIs(ast.NodeTableCell) {
 				// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "|", "&#124;")
-				inlineMathContent = strings.ReplaceAll(inlineMathContent, "\n", "<br/>")
+				content = strings.ReplaceAll(content, "|", "&#124;")
+				content = strings.ReplaceAll(content, "\n", "<br/>")
 			}
-			attrs = append(attrs, []string{"data-content", inlineMathContent})
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
+			attrs = append(attrs, []string{"data-content", content})
 			attrs = append(attrs, []string{"contenteditable", "false"})
 			attrs = append(attrs, []string{"class", "render-node"})
 		} else if "file-annotation-ref" == typ {
 			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
 		} else if "inline-memo" == typ {
-			inlineMemoContent := node.TextMarkInlineMemoContent
-			attrs = append(attrs, []string{"data-inline-memo-content", inlineMemoContent})
+			content := node.TextMarkInlineMemoContent
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
+			attrs = append(attrs, []string{"data-inline-memo-content", content})
 		}
 	}
 	return
