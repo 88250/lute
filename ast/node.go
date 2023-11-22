@@ -443,12 +443,12 @@ func (n *Node) Content() (ret string) {
 				}
 			} else if "" != n.TextMarkInlineMathContent {
 				content := n.TextMarkInlineMathContent
-				content = strings.ReplaceAll(content, editor.CaretNewline, " ")
+				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 				buf.WriteString(content)
 			}
 			if "" != n.TextMarkInlineMemoContent {
-				content := n.TextMarkInlineMathContent
-				content = strings.ReplaceAll(content, editor.CaretNewline, " ")
+				content := n.TextMarkInlineMemoContent
+				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 				buf.WriteString(content)
 			}
 		}
@@ -483,7 +483,7 @@ func (n *Node) Stat() (runeCnt, wordCnt, linkCnt, imgCnt, refCnt int) {
 				buf = append(buf, n.TextMarkTextContent...)
 			} else if 0 < len(n.TextMarkInlineMathContent) {
 				content := n.TextMarkInlineMathContent
-				content = strings.ReplaceAll(content, editor.CaretNewline, " ")
+				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 				buf = append(buf, content...)
 			} else if "" != n.TextMarkInlineMemoContent {
 				content := n.TextMarkInlineMemoContent
