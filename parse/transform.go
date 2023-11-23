@@ -27,6 +27,27 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 		}
 
 		if ast.NodeLink == n.Type {
+			var unlinkBackslashes []*ast.Node
+			ast.Walk(n, func(c *ast.Node, entering bool) ast.WalkStatus {
+				if !entering {
+					return ast.WalkContinue
+				}
+
+				if ast.NodeBackslash == c.Type {
+					cont := c.ChildByType(ast.NodeBackslashContent)
+					if nil != cont {
+						linkText := &ast.Node{Type: ast.NodeLinkText, Tokens: cont.Tokens}
+						c.InsertBefore(linkText)
+					}
+
+					unlinkBackslashes = append(unlinkBackslashes, c)
+				}
+				return ast.WalkContinue
+			})
+			for _, backslash := range unlinkBackslashes {
+				backslash.Unlink()
+			}
+
 			// 超链接嵌套图片情况下，图片子节点移到超链接节点前面
 			img := n.ChildByType(ast.NodeImage)
 			if nil == img {
@@ -79,7 +100,7 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 			processNestedNode(n, "a", &tags, &unlinks, entering)
 		case ast.NodeBlockRef:
 			processNestedNode(n, "block-ref", &tags, &unlinks, entering)
-		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText, ast.NodeBlockRefID, ast.NodeHTMLEntity:
+		case ast.NodeText, ast.NodeCodeSpanContent, ast.NodeInlineMathContent, ast.NodeLinkText, ast.NodeBlockRefID, ast.NodeHTMLEntity, ast.NodeBackslash:
 			if 1 > len(tags) {
 				return ast.WalkContinue
 			}

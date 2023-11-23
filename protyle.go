@@ -127,7 +127,7 @@ func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 
 func (lute *Lute) Md2BlockDOM(markdown string, reserveEmptyParagraph bool) (vHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	parse.NestedInlines2FlattedSpans(tree, false)
+	parse.NestedInlines2FlattedSpansHybrid(tree, false)
 	if reserveEmptyParagraph {
 		ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 			if !entering {
@@ -156,7 +156,7 @@ func (lute *Lute) Md2BlockDOM(markdown string, reserveEmptyParagraph bool) (vHTM
 
 func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
-	parse.NestedInlines2FlattedSpans(tree, false)
+	parse.NestedInlines2FlattedSpansHybrid(tree, false)
 	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
