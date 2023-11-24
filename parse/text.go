@@ -91,7 +91,12 @@ func (t *Tree) parseBackslash(block *ast.Node, ctx *InlineContext) *ast.Node {
 				n := &ast.Node{Type: ast.NodeBackslash}
 				block.AppendChild(n)
 				n.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: []byte{token}})
-				block.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: caret})
+				if t.Context.ParseOption.ProtyleWYSIWYG {
+					// Protyle WYSIWYG 模式下插入符移到转义符节点前面
+					n.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: caret})
+				} else {
+					block.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: caret})
+				}
 				return nil
 			}
 		}
