@@ -779,9 +779,6 @@ func (r *ProtyleRenderer) renderBackslashContent(node *ast.Node, entering bool) 
 func (r *ProtyleRenderer) renderBackslash(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteString("<span data-type=\"backslash\">")
-		r.WriteString("<span>")
-		r.WriteByte(lex.ItemBackslash)
-		r.WriteString("</span>")
 	} else {
 		r.WriteString("</span>")
 	}
