@@ -276,6 +276,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				href := node.TextMarkAHref
 				href = string(r.LinkPath([]byte(href)))
 				href = html.UnescapeHTMLStr(href)
+				href = r.EncodeLinkSpace(href)
 				ret += "["
 
 				for _, typ := range types {
@@ -314,7 +315,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 					content = lex.RepeatBackslashBeforePipe(content)
 					content = strings.ReplaceAll(content, "\n", "<br/>")
 				}
-				content = strings.ReplaceAll(content,  editor.IALValEscNewLine, "\n")
+				content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
 				ret += "$" + content + "$"
 			}
 
@@ -327,6 +328,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				href := node.TextMarkAHref
 				href = string(r.LinkPath([]byte(href)))
 				href = html.UnescapeHTMLStr(href)
+				href = r.EncodeLinkSpace(href)
 				ret += string(lex.EscapeProtyleMarkers([]byte(node.TextMarkTextContent)))
 				for _, typ := range types {
 					ret += r.renderMdMarker1(node, typ, entering)
@@ -362,6 +364,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 		href := node.TextMarkAHref
 		href = string(r.LinkPath([]byte(href)))
 		href = html.UnescapeHTMLStr(href)
+		href = r.EncodeLinkSpace(href)
 		if entering {
 			ret += "[" + node.TextMarkTextContent + "](" + href
 			if "" != node.TextMarkATitle {
@@ -1177,6 +1180,7 @@ func (r *ProtyleExportMdRenderer) renderLinkDest(node *ast.Node, entering bool) 
 	if entering {
 		tokens := node.Tokens
 		tokens = r.LinkPath(tokens)
+		tokens = []byte(r.EncodeLinkSpace(string(tokens)))
 		r.Write(tokens)
 	}
 	return ast.WalkContinue

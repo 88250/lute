@@ -12,9 +12,14 @@ package render
 
 import (
 	"bytes"
-
 	"github.com/88250/lute/util"
+	"strings"
 )
+
+func (r *BaseRenderer) EncodeLinkSpace(dest string) string {
+	// Improve export of Markdown hyperlink spaces and markers https://github.com/siyuan-note/siyuan/issues/9792
+	return strings.ReplaceAll(dest, " ", "%20")
+}
 
 func (r *BaseRenderer) LinkPath(dest []byte) []byte {
 	dest = r.RelativePath(dest)

@@ -22,6 +22,7 @@ import (
 
 var protyleExportMdTests = []parseTest{
 
+	{"14", "[foo](bar baz.txt)", "[foo](bar%20baz.txt)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"13", "| `foo\\\\|bar` |\n| -- |", "|`foo\\\\|bar`|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"12", "| `foo\\&#124;bar` |\n| -- |", "|`foo\\|bar`|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"11", "| `foo\\|bar` |\n| -- |", "|`foo\\|bar`|\n| -|\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
@@ -56,6 +57,7 @@ func TestProtyleExportMd(t *testing.T) {
 	luteEngine.SetFileAnnotationRef(true)
 	luteEngine.SetInlineMathAllowDigitAfterOpenMarker(true)
 	luteEngine.SetTextMark(true)
+	luteEngine.SetImgPathAllowSpace(true)
 
 	ast.Testing = true
 	for _, test := range protyleExportMdTests {
