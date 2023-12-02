@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+	"github.com/88250/lute/html"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
@@ -61,6 +62,31 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 
 	ret = &ast.Node{Type: ast.NodeCodeSpan, CodeMarkerLen: n}
 	ret.AppendChild(openMarker)
+
+	if t.Context.ParseOption.ProtyleWYSIWYG {
+		// Improve `inline code` markdown editing https://github.com/siyuan-note/siyuan/issues/9805
+		inlineTree := Inline("", textTokens, t.Context.ParseOption)
+		if nil != inlineTree {
+			content := bytes.Buffer{}
+			ast.Walk(inlineTree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+				if !entering {
+					return ast.WalkContinue
+				}
+
+				if ast.NodeTextMark == n.Type {
+					content.WriteString(n.TextMarkTextContent)
+				} else if ast.NodeText == n.Type {
+					content.Write(n.Tokens)
+				} else if ast.NodeBackslashContent == n.Type {
+					content.WriteString("\\")
+					content.Write(n.Tokens)
+				}
+				return ast.WalkContinue
+			})
+			textTokens = html.UnescapeHTML(content.Bytes())
+		}
+	}
+
 	ret.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: textTokens})
 	ret.AppendChild(closeMarker)
 	ctx.pos = endPos + n
