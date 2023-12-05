@@ -105,8 +105,20 @@ func domText0(n *html.Node, buffer *bytes.Buffer) {
 		return
 	}
 
-	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
-		return
+	if 0 == n.DataAtom && html.ElementNode == n.Type {
+		// 可能是自定义标签
+		parent := n.Parent
+		if nil == parent {
+			return
+		}
+		if atom.Span != parent.DataAtom {
+			return
+		}
+
+		if "search-mark" != DomAttrValue(parent, "data-type") {
+			// Protyle 中的搜索高亮标记需要保留 https://github.com/siyuan-note/siyuan/issues/9821
+			return
+		}
 	}
 
 	switch n.DataAtom {
@@ -119,6 +131,12 @@ func domText0(n *html.Node, buffer *bytes.Buffer) {
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
 		domText0(child, buffer)
 	}
+}
+
+func IsTempMarkSpan(n *html.Node) bool {
+	dataType := DomAttrValue(n, "data-type")
+	return "search-mark" == dataType || "virtual-block-ref" == dataType
+
 }
 
 func DomAttrValue(n *html.Node, attrName string) string {

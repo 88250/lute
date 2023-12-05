@@ -2056,10 +2056,6 @@ func (lute *Lute) removeInnerMarker0(n *html.Node, marker string) {
 	}
 }
 
-func (lute *Lute) isTempMarkSpan(dataType string) bool {
-	return "search-mark" == dataType || "virtual-block-ref" == dataType
-}
-
 func (lute *Lute) removeTempMark(dataType string) (ret string) {
 	ret = strings.ReplaceAll(dataType, "search-mark", "")
 	ret = strings.ReplaceAll(ret, "virtual-block-ref", "")

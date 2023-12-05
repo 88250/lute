@@ -314,7 +314,7 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 			n.InsertAfter(lc)
 		}
 
-		if lute.isTempMarkSpan(util.DomAttrValue(n, "data-type")) {
+		if util.IsTempMarkSpan(n) {
 			// 将嵌套在临时标记中的节点提升到临时标记节点之前
 			*emptyNodes = append(*emptyNodes, n)
 			var children []*html.Node
