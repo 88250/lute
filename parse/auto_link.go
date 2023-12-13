@@ -378,6 +378,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			addr = append(addr, protocol...)
 		}
 		addr = append(addr, domain...)
+		addr = append(addr, port...)
 		addr = append(addr, path...)
 		linkText := addr
 		if bytes.HasPrefix(linkText, []byte("https://github.com/")) && bytes.Contains(linkText, []byte("/issues/")) {
