@@ -410,16 +410,15 @@ var EmojiLock = sync.Mutex{}
 
 func NewOptions() *Options {
 	return &Options{
-		GFMTable:         true,
-		GFMTaskListItem:  true,
-		GFMStrikethrough: true,
-		GFMAutoLink:      true,
-		Footnotes:        true,
-		Emoji:            true,
-		AliasEmoji:       EmojiAliasUnicode,
-		EmojiAlias:       EmojiUnicodeAlias,
-		//EmojiSite:         "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
-		EmojiSite:         "https://unpkg.com/vditor/dist/images/emoji", // 表情图片从 `cdn.jsdelivr.net` 切换到 `unpkg.com` https://github.com/88250/lute/issues/171
+		GFMTable:          true,
+		GFMTaskListItem:   true,
+		GFMStrikethrough:  true,
+		GFMAutoLink:       true,
+		Footnotes:         true,
+		Emoji:             true,
+		AliasEmoji:        EmojiAliasUnicode,
+		EmojiAlias:        EmojiUnicodeAlias,
+		EmojiSite:         "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
 		Setext:            true,
 		YamlFrontMatter:   true,
 		BlockRef:          false,
