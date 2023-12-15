@@ -248,17 +248,17 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					}
 				}
 
-				if atom.Code == n.FirstChild.DataAtom {
-					if nil != n.FirstChild.NextSibling && atom.Code == n.FirstChild.NextSibling.DataAtom {
+				if atom.Code == firstc.DataAtom {
+					if nil != firstc.NextSibling && atom.Code == firstc.NextSibling.DataAtom {
 						// pre.code code 每个 code 为一行的结构，需要在 code 中间插入换行
-						for c := n.FirstChild.NextSibling; nil != c; c = c.NextSibling {
+						for c := firstc.NextSibling; nil != c; c = c.NextSibling {
 							c.InsertBefore(&html.Node{DataAtom: atom.Br})
 						}
 					}
-					if nil != n.FirstChild.FirstChild && atom.Ol == n.FirstChild.FirstChild.DataAtom {
+					if nil != firstc.FirstChild && atom.Ol == firstc.FirstChild.DataAtom {
 						// CSDN 代码块：pre.code.ol.li
-						for li := n.FirstChild.FirstChild.FirstChild; nil != li; li = li.NextSibling {
-							if li != n.FirstChild.FirstChild.FirstChild {
+						for li := firstc.FirstChild.FirstChild; nil != li; li = li.NextSibling {
+							if li != firstc.FirstChild.FirstChild {
 								li.InsertBefore(&html.Node{DataAtom: atom.Br})
 							}
 						}
@@ -266,6 +266,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					if nil != n.LastChild && atom.Ul == n.LastChild.DataAtom {
 						// CSDN 代码块：pre.code,ul
 						n.LastChild.Unlink() // 去掉最后一个代码行号子块 https://github.com/siyuan-note/siyuan/issues/5564
+					}
+				}
+
+				if atom.Pre == firstc.DataAtom && nil != firstc.FirstChild {
+					// pre.code code 每个 code 为一行的结构，需要在 code 中间插入换行
+					for c := firstc.FirstChild.NextSibling; nil != c; c = c.NextSibling {
+						c.InsertBefore(&html.Node{DataAtom: atom.Br})
 					}
 				}
 
