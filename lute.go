@@ -592,6 +592,7 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 			panic("unknown ext renderer func [" + rendererType + "]")
 		}
 
+		extRenderer := extRenderer // https://go.dev/blog/loopvar-preview
 		renderFuncs := extRenderer.Interface().(map[string]interface{})
 		for funcName := range renderFuncs {
 			nodeType := "Node" + funcName[len("render"):]
