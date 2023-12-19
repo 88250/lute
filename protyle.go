@@ -484,29 +484,42 @@ func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild
 
-	var unlinks []*ast.Node
+	var appends, unlinks []*ast.Node
 	for n := node; nil != n; n = n.Next {
 		switch n.Type {
 		case ast.NodeHeading:
 			n.Type = ast.NodeParagraph
 		case ast.NodeBlockquote:
-			// 多选块类型转换 https://github.com/siyuan-note/siyuan/issues/4706
-			//var children []*ast.Node
-			//for c := n.LastChild; nil != c; c = c.Previous {
-			//	if ast.NodeBlockquoteMarker == c.Type {
-			//		unlinks = append(unlinks, c)
-			//		continue
-			//	}
-			//	children = append(children, c)
-			//}
-			//for _, c := range children {
-			//	n.InsertBefore(c)
-			//}
-			//unlinks = append(unlinks, n)
+		// 多选块类型转换 https://github.com/siyuan-note/siyuan/issues/4706
+		//var children []*ast.Node
+		//for c := n.LastChild; nil != c; c = c.Previous {
+		//	if ast.NodeBlockquoteMarker == c.Type {
+		//		unlinks = append(unlinks, c)
+		//		continue
+		//	}
+		//	children = append(children, c)
+		//}
+		//for _, c := range children {
+		//	n.InsertBefore(c)
+		//}
+		//unlinks = append(unlinks, n)
+		case ast.NodeList:
+			for li := n.FirstChild; nil != li; li = li.Next {
+				for c := li.FirstChild; nil != c; c = c.Next {
+					if ast.NodeTaskListItemMarker != c.Type {
+						appends = append(appends, c)
+					}
+				}
+				unlinks = append(unlinks, li)
+			}
+			unlinks = append(unlinks, n)
 		}
 	}
 	for _, n := range unlinks {
 		n.Unlink()
+	}
+	for _, c := range appends {
+		tree.Root.AppendChild(c)
 	}
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
