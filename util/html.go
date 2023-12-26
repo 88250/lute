@@ -72,6 +72,15 @@ func GetTextMarkFileAnnotationRefData(n *html.Node) (id string) {
 	return
 }
 
+func DomChildByType(n *html.Node, dataAtom atom.Atom) *html.Node {
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		if c.DataAtom == dataAtom {
+			return c
+		}
+	}
+	return nil
+}
+
 func DomHTML(n *html.Node) []byte {
 	if nil == n {
 		return nil

@@ -496,6 +496,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Thead:
+		if nil == n.FirstChild {
+			break
+		}
 		node.Type = ast.NodeTableHead
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -507,13 +510,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		table := n.Parent.Parent
 		node.Type = ast.NodeTableRow
-		if atom.Thead != table.FirstChild.DataAtom && n == n.Parent.FirstChild {
+
+		if nil == tree.Context.Tip.ChildByType(ast.NodeTableHead) && nil == util.DomChildByType(table, atom.Thead) {
 			// 补全 thread 节点
 			thead := &ast.Node{Type: ast.NodeTableHead}
 			tree.Context.Tip.AppendChild(thead)
 			tree.Context.Tip = thead
 			defer tree.Context.ParentTip()
 		}
+
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
