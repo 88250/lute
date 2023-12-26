@@ -255,7 +255,7 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</u>", "</u>\n<wbr>\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</span>", "</span>\n<wbr>\n")
 
-	// Improve `inline code` markdown editing https://github.com/siyuan-note/siyuan/issues/9805
+	// Improve `inline code` markdown editing https://github.com/siyuan-note/siyuan/issues/9978
 	// spinBlockDOMTests #212
 	htmlStr = strings.ReplaceAll(htmlStr, "`<wbr></span>", "</span>`<wbr>")
 

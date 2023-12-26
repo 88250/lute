@@ -12,9 +12,8 @@ package parse
 
 import (
 	"bytes"
-	"github.com/88250/lute/html"
-
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
 )
 
@@ -64,22 +63,44 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 	ret.AppendChild(openMarker)
 
 	if t.Context.ParseOption.ProtyleWYSIWYG {
-		// Improve `inline code` markdown editing https://github.com/siyuan-note/siyuan/issues/9805
+		// Improve `inline code` markdown editing https://github.com/siyuan-note/siyuan/issues/9978
 		inlineTree := Inline("", textTokens, t.Context.ParseOption)
 		if nil != inlineTree {
 			content := bytes.Buffer{}
 			ast.Walk(inlineTree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 				if !entering {
-					content.WriteString(n.Marker())
+					content.WriteString(n.Marker(entering))
+					if ast.NodeLinkTitle == n.Type {
+						content.WriteByte(lex.ItemDoublequote)
+					} else if ast.NodeTextMark == n.Type {
+						if "kbd" == n.TextMarkType {
+							content.WriteString("</kbd>")
+						} else if "u" == n.TextMarkType {
+							content.WriteString("</u>")
+						}
+					}
 					return ast.WalkContinue
 				}
 
-				content.WriteString(n.Marker())
+				content.WriteString(n.Marker(entering))
 
 				if ast.NodeTextMark == n.Type {
+					if "kbd" == n.TextMarkType {
+						content.WriteString("<kbd>")
+					} else if "u" == n.TextMarkType {
+						content.WriteString("<u>")
+					}
+
 					content.WriteString(n.TextMarkTextContent)
-				} else if ast.NodeText == n.Type {
+				} else if ast.NodeText == n.Type || ast.NodeLinkText == n.Type || ast.NodeLinkTitle == n.Type || ast.NodeLinkDest == n.Type {
+					if entering {
+						if ast.NodeLinkTitle == n.Type {
+							content.WriteByte(lex.ItemDoublequote)
+						}
+					}
 					content.Write(n.Tokens)
+				} else if ast.NodeLinkSpace == n.Type {
+					content.WriteByte(lex.ItemSpace)
 				} else if ast.NodeBackslashContent == n.Type {
 					content.WriteString("\\")
 					content.Write(n.Tokens)

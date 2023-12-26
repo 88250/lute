@@ -218,18 +218,84 @@ func randStr(length int) string {
 	return string(b)
 }
 
-func (n *Node) Marker() (ret string) {
+func (n *Node) Marker(entering bool) (ret string) {
 	// 该函数尚未完善，仅支持有限的场景
 
+	n.IsMarker()
+
 	switch n.Type {
-	case NodeTag:
-		return "#"
-	case NodeEmphasis:
-		return "*"
-	case NodeStrong:
-		return "**"
-	case NodeStrikethrough:
-		return "~~"
+	case NodeTagOpenMarker, NodeTagCloseMarker:
+		if entering {
+			return "#"
+		}
+	case NodeEmA6kOpenMarker, NodeEmA6kCloseMarker:
+		if entering {
+			return "*"
+		}
+	case NodeEmU8eOpenMarker, NodeEmU8eCloseMarker:
+		if entering {
+			return "_"
+		}
+	case NodeStrongA6kOpenMarker, NodeStrongA6kCloseMarker:
+		if entering {
+			return "**"
+		}
+	case NodeStrongU8eOpenMarker, NodeStrongU8eCloseMarker:
+		if entering {
+			return "__"
+		}
+	case NodeStrikethrough2OpenMarker, NodeStrikethrough2CloseMarker:
+		if entering {
+			return "~~"
+		}
+	case NodeSupOpenMarker, NodeSupCloseMarker:
+		if entering {
+			return "^"
+		}
+	case NodeSubOpenMarker, NodeSubCloseMarker:
+		if entering {
+			return "~"
+		}
+	case NodeKbdOpenMarker:
+		if entering {
+			return "<kbd>"
+		}
+	case NodeKbdCloseMarker:
+		if entering {
+			return "</kbd>"
+		}
+	case NodeUnderlineOpenMarker:
+		if entering {
+			return "<u>"
+		}
+	case NodeUnderlineCloseMarker:
+		if entering {
+			return "</u>"
+		}
+	case NodeMark2OpenMarker, NodeMark2CloseMarker:
+		if entering {
+			return "=="
+		}
+	case NodeBang:
+		if entering {
+			return "!"
+		}
+	case NodeOpenBracket:
+		if entering {
+			return "["
+		}
+	case NodeCloseBracket:
+		if entering {
+			return "]"
+		}
+	case NodeOpenParen:
+		if entering {
+			return "("
+		}
+	case NodeCloseParen:
+		if entering {
+			return ")"
+		}
 	}
 
 	return ""
