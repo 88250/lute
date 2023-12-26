@@ -281,7 +281,29 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()}
 				node.AppendChild(content)
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
-				tree.Context.Tip.AppendChild(node)
+
+				if tree.Context.Tip.ParentIs(ast.NodeTable) {
+					// 表格中不支持添加块级元素，所以这里只能将其转换为多个行级代码元素
+					lines := bytes.Split(content.Tokens, []byte("\n"))
+					for i, line := range lines {
+						if 0 < len(line) {
+							code := &ast.Node{Type: ast.NodeCodeSpan}
+							code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})
+							code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: line})
+							code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
+							tree.Context.Tip.AppendChild(code)
+							if i < len(lines)-1 {
+								if tree.Context.ParseOption.ProtyleWYSIWYG {
+									tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeBr})
+								} else {
+									tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHardBreak, Tokens: []byte("\n")})
+								}
+							}
+						}
+					}
+				} else {
+					tree.Context.Tip.AppendChild(node)
+				}
 			} else {
 				node.Type = ast.NodeHTMLBlock
 				node.Tokens = util.DomHTML(n)
