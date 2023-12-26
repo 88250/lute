@@ -218,6 +218,23 @@ func randStr(length int) string {
 	return string(b)
 }
 
+func (n *Node) Marker() (ret string) {
+	// 该函数尚未完善，仅支持有限的场景
+
+	switch n.Type {
+	case NodeTag:
+		return "#"
+	case NodeEmphasis:
+		return "*"
+	case NodeStrong:
+		return "**"
+	case NodeStrikethrough:
+		return "~~"
+	}
+
+	return ""
+}
+
 func (n *Node) IsTextMarkType(typ string) bool {
 	types := strings.Split(n.TextMarkType, " ")
 	for _, t := range types {

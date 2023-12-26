@@ -70,8 +70,11 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 			content := bytes.Buffer{}
 			ast.Walk(inlineTree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 				if !entering {
+					content.WriteString(n.Marker())
 					return ast.WalkContinue
 				}
+
+				content.WriteString(n.Marker())
 
 				if ast.NodeTextMark == n.Type {
 					content.WriteString(n.TextMarkTextContent)
