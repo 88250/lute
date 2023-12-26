@@ -219,10 +219,6 @@ func randStr(length int) string {
 }
 
 func (n *Node) Marker(entering bool) (ret string) {
-	// 该函数尚未完善，仅支持有限的场景
-
-	n.IsMarker()
-
 	switch n.Type {
 	case NodeTagOpenMarker, NodeTagCloseMarker:
 		if entering {
