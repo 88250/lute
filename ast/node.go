@@ -297,6 +297,18 @@ func (n *Node) Marker(entering bool) (ret string) {
 	return ""
 }
 
+func (n *Node) ContainTextMarkTypes(types ...string) bool {
+	nodeTypes := strings.Split(n.TextMarkType, " ")
+	for _, typ := range types {
+		for _, nodeType := range nodeTypes {
+			if typ == nodeType {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (n *Node) IsTextMarkType(typ string) bool {
 	types := strings.Split(n.TextMarkType, " ")
 	for _, t := range types {

@@ -649,6 +649,18 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 		default:
 			if !isInlineMath { // 带有字体样式的公式复制之后内容不正确 https://github.com/siyuan-note/siyuan/issues/6799
 				node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeSingleQuote(n)
+
+				if node.ContainTextMarkTypes("strong", "em", "s", "mark", "sup", "sub") {
+					// Improve some inline elements Markdown editing https://github.com/siyuan-note/siyuan/issues/9999
+					if spaces := spacesAtStart(node.TextMarkTextContent); 0 < spaces {
+						node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: bytes.Repeat([]byte(" "), spaces)})
+					}
+					if spaces := spacesAtEnd(node.TextMarkTextContent); 0 < spaces {
+						node.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: bytes.Repeat([]byte(" "), spaces)})
+					}
+					node.TextMarkTextContent = strings.TrimSpace(node.TextMarkTextContent)
+				}
+
 				if node.ParentIs(ast.NodeTableCell) && node.IsTextMarkType("code") {
 					// 表格中的代码中带有管道符时使用 HTML 实体替换管道符 Improve the handling of inline-code containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9252
 					node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "|", "&#124;")
@@ -664,5 +676,25 @@ func StyleValue(style string) (ret string) {
 	ret = strings.TrimSpace(style)
 	ret = strings.ReplaceAll(ret, "\n", "")
 	ret = strings.Join(strings.Fields(ret), " ")
+	return
+}
+
+func spacesAtStart(str string) (ret int) {
+	for _, r := range str {
+		if ' ' != r {
+			break
+		}
+		ret++
+	}
+	return
+}
+
+func spacesAtEnd(str string) (ret int) {
+	for i := len(str) - 1; i >= 0; i-- {
+		if ' ' != str[i] {
+			break
+		}
+		ret++
+	}
 	return
 }
