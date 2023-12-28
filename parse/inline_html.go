@@ -623,6 +623,17 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 	node.TextMarkType = dataType
 	node.Tokens = nil
 	types := strings.Split(dataType, " ")
+	// 重新排序，将 a、inline-memo、block-ref、file-annotation-ref、inline-math 放在最前面
+	var tmp []string
+	for i, typ := range types {
+		if "a" == typ || "inline-memo" == typ || "block-ref" == typ || "file-annotation-ref" == typ || "inline-math" == typ {
+			tmp = append(tmp, typ)
+			types = append(types[:i], types[i+1:]...)
+			break
+		}
+	}
+	types = append(tmp, types...)
+
 	isInlineMath := false
 	for _, typ := range types {
 		switch typ {

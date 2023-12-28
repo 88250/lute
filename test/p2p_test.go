@@ -94,6 +94,7 @@ func TestBlockDOM2InlineBlockDOM(t *testing.T) {
 
 var blockDOM2StdMd = []parseTest{
 
+	{"15", "foo <span data-type=\"em inline-math\" data-subtype=\"math\" data-content=\"bar\" contenteditable=\"false\" class=\"render-node\" data-render=\"true\"><span class=\"katex\"><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height:0.6595em;\"></span><span class=\"mord mathnormal\">bar</span></span></span></span></span> baz", "foo *$bar$* baz\n"},
 	{"14", "foo<span data-type=\"strong\">bar </span>bar", "foo**bar** bar\n"},
 	{"13", "<div data-node-id=\"20231028232041-5dhtaps\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20231028234123\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"strong\">.bar</span></div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "foo **.bar**\n"},
 	{"12", "<div data-node-id=\"20231028232041-5dhtaps\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20231028234123\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">foo.</span>bar</div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "**foo.** bar\n"},

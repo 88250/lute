@@ -206,7 +206,7 @@ func (r *ProtyleExportMdRenderer) renderAttributeView(node *ast.Node, entering b
 }
 
 func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
-	isStrongEm := node.IsTextMarkType("strong") || node.IsTextMarkType("em") || node.IsTextMarkType("s")
+	isStrongEm := node.ContainTextMarkTypes("strong", "em", "s") && !node.IsTextMarkType("inline-math")
 
 	if entering {
 		marker := r.renderMdMarker(node, entering)
@@ -266,11 +266,28 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 		return r.renderMdMarker0(node, types[0], entering)
 	}
 
+	// 重新排序，将 a、inline-memo、block-ref、file-annotation-ref、inline-math 放在最前面
+	var tmp []string
+	for i, typ := range types {
+		if "a" == typ || "inline-memo" == typ || "block-ref" == typ || "file-annotation-ref" == typ || "inline-math" == typ {
+			tmp = append(tmp, typ)
+			types = append(types[:i], types[i+1:]...)
+			break
+		}
+	}
+	types = append(tmp, types...)
+
 	typ := types[0]
 	if "a" == typ || "inline-memo" == typ || "block-ref" == typ || "file-annotation-ref" == typ || "inline-math" == typ {
 		types := types[1:]
 
 		if entering {
+			for _, typ := range types {
+				if "code" != typ {
+					ret += r.renderMdMarker1(node, typ, entering)
+				}
+			}
+
 			switch typ {
 			case "a":
 				href := node.TextMarkAHref
@@ -278,11 +295,11 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				href = html.UnescapeHTMLStr(href)
 				href = r.EncodeLinkSpace(href)
 				ret += "["
-
 				for _, typ := range types {
-					ret += r.renderMdMarker1(node, typ, entering)
+					if "code" == typ {
+						ret += r.renderMdMarker1(node, typ, entering)
+					}
 				}
-
 				return
 			case "block-ref":
 				node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
@@ -318,10 +335,6 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
 				ret += "$" + content + "$"
 			}
-
-			for _, typ := range types {
-				ret += r.renderMdMarker1(node, typ, entering)
-			}
 		} else {
 			switch typ {
 			case "a":
@@ -331,13 +344,21 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				href = r.EncodeLinkSpace(href)
 				ret += string(lex.EscapeProtyleMarkers([]byte(node.TextMarkTextContent)))
 				for _, typ := range types {
-					ret += r.renderMdMarker1(node, typ, entering)
+					if "code" == typ {
+						ret += r.renderMdMarker1(node, typ, entering)
+					}
 				}
 				ret += "](" + href
 				if "" != node.TextMarkATitle {
 					ret += " \"" + html.UnescapeHTMLStr(node.TextMarkATitle) + "\""
 				}
 				ret += ")"
+			}
+
+			for _, typ := range types {
+				if "code" != typ {
+					ret += r.renderMdMarker1(node, typ, entering)
+				}
 			}
 		}
 	} else {
