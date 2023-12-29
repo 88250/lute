@@ -332,7 +332,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 					content = lex.RepeatBackslashBeforePipe(content)
 					content = strings.ReplaceAll(content, "\n", "<br/>")
 				}
-				content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
+				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 				ret += "$" + content + "$"
 			}
 		} else {
@@ -431,7 +431,7 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 				content = lex.RepeatBackslashBeforePipe(content)
 				content = strings.ReplaceAll(content, "\n", "<br/>")
 			}
-			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 			ret += "$" + content
 		} else {
 			ret += "$"
@@ -1535,7 +1535,14 @@ func (r *ProtyleExportMdRenderer) renderInlineMathOpenMarker(node *ast.Node, ent
 func (r *ProtyleExportMdRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		tokens := html.UnescapeHTML(node.Tokens)
-		r.Write(tokens)
+		content := string(tokens)
+		if node.ParentIs(ast.NodeTableCell) {
+			// Improve the handling of inline-math containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9227
+			content = lex.RepeatBackslashBeforePipe(content)
+			content = strings.ReplaceAll(content, "\n", "<br/>")
+		}
+		content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
+		r.WriteString(content)
 	}
 	return ast.WalkContinue
 }
