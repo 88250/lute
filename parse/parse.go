@@ -56,7 +56,7 @@ func (t *Tree) finalParseBlockIAL() {
 
 			if t.Context.ParseOption.ProtyleWYSIWYG && t.Context.ParseOption.Spin &&
 				ast.NodeDocument != n.Type && nil != n.Next && ast.NodeKramdownBlockIAL != n.Next.Type && "" != n.Next.ID {
-				// 这个节点是 spin 后新生成的，将 n.Next 的 ID 和属性赋予它，并认为 n.Next 是新节点
+				// 这个节点是 spin 后新生成的，将 n.Next 的 ID 和属性赋予它，并认为 n.Next 是新节点 https://github.com/siyuan-note/siyuan/issues/5723
 				n.ID = n.Next.ID
 				n.KramdownIAL = n.Next.KramdownIAL
 				if "" == n.IALAttr("updated") {
@@ -400,9 +400,11 @@ type Options struct {
 	// 这个开关主要用于兼容 Markdown 输入 API 上 https://github.com/siyuan-note/siyuan/issues/6039
 	// 不用于 Protyle 自旋过程 https://github.com/siyuan-note/siyuan/issues/5877
 	HTMLTag2TextMark bool
-	// Spin 设置是否打开自旋解析支持，该选项仅用于 Spin 内部过程，外部请勿设置或使用。
+	// Spin 设置是否打开自旋解析支持，该选项仅用于 Spin 内部过程，设置时请注意使用场景。
+	//
 	// 该选项的引入主要为了解决 finalParseBlockIAL 过程中是否需要移动 IAL 节点的问题，只有处于自旋过程中才需要移动 IAL 节点
-	// 其他情况（比如 API 输入 markdown https://github.com/siyuan-note/siyuan/issues/6725）无需移动处理
+	// 其他情况，比如标题块软换行分块 https://github.com/siyuan-note/siyuan/issues/5723 以及软换行空行分块 https://ld246.com/article/1703839312585
+	// 的场景需要移动 IAL 节点，但是 API 输入 markdown https://github.com/siyuan-note/siyuan/issues/6725）无需移动
 	Spin bool
 }
 
