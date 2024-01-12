@@ -125,7 +125,12 @@ func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 	return
 }
 
-func (lute *Lute) Md2BlockDOM(markdown string, reserveEmptyParagraph bool) (vHTML string, tree *parse.Tree) {
+func (lute *Lute) Md2BlockDOM(markdown string, reserveEmptyParagraph bool) (vHTML string) {
+	vHTML, _ = lute.Md2BlockDOMTree(markdown, reserveEmptyParagraph)
+	return
+}
+
+func (lute *Lute) Md2BlockDOMTree(markdown string, reserveEmptyParagraph bool) (vHTML string, tree *parse.Tree) {
 	tree = parse.Parse("", []byte(markdown), lute.ParseOptions)
 	parse.NestedInlines2FlattedSpansHybrid(tree, false)
 	if reserveEmptyParagraph {
