@@ -220,6 +220,7 @@ func (r *HtmlRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSta
 			if "" != node.TextMarkATitle {
 				attrs = append(attrs, []string{"title", node.TextMarkATitle})
 			}
+			r.spanNodeAttrs(node, &attrs)
 			r.Tag("a", attrs, false)
 			r.WriteString(textContent)
 			r.WriteString("</a>")

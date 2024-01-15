@@ -212,6 +212,7 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 			if "" != node.TextMarkATitle {
 				attrs = append(attrs, []string{"title", node.TextMarkATitle})
 			}
+			r.spanNodeAttrs(node, &attrs)
 			r.Tag("a", attrs, false)
 			r.WriteString(textContent)
 			r.WriteString("</a>")
