@@ -231,6 +231,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Pre:
 		if firstc := n.FirstChild; nil != firstc {
+			if atom.Div == firstc.DataAtom && nil != firstc.NextSibling && atom.Code == firstc.NextSibling.DataAtom {
+				firstc = firstc.NextSibling
+				n.FirstChild.Unlink()
+			}
+
 			if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom {
 				node.Type = ast.NodeCodeBlock
 				node.IsFencedCodeBlock = true
