@@ -104,6 +104,8 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 				} else if ast.NodeBackslashContent == n.Type {
 					content.WriteString("\\")
 					content.Write(n.Tokens)
+				} else if ast.NodeHTMLEntity == n.Type {
+					content.Write(n.Tokens)
 				}
 				return ast.WalkContinue
 			})
