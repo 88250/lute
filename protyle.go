@@ -1076,7 +1076,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		}
 
 		if html.ElementNode == n.Type {
-			node.Tokens = util.StrToBytes("&lt;" + content + "&gt;")
+			node.Tokens = util.StrToBytes("<" + content + ">")
 		}
 
 		if ast.NodeLink == tree.Context.Tip.Type {
