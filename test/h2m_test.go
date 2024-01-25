@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"88", "<s>foo</s>", "~~foo~~\n"},
 	{"87", "<h2 data-id=\"heading-4\">foo</h2><pre><div class=\"code-block-extension-header\"><div class=\"code-block-extension-headerLeft\"><div class=\"code-block-extension-foldBtn\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M16.924 9.617A1 1 0 0 0 16 9H8a1 1 0 0 0-.707 1.707l4 4a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0 .217-1.09z\" data-name=\"Down\"></path></svg></div></div><div class=\"code-block-extension-headerRight\"><span class=\"code-block-extension-lang\">arduino</span><div class=\"code-block-extension-copyCodeBtn\">复制代码</div></div></div><code class=\"hljs language-arduino code-block-extension-codeShowNum\" lang=\"arduino\"><span class=\"code-block-extension-codeLine\" data-line-num=\"1\">bar</span>\n</code></pre><h2 data-id=\"heading-5\">baz</h2>", "## foo\n\n```arduino\nbar\n```\n\n## baz\n"},
 	{"86", "<img src=\"a_1.png\" >", "![](a_1.png)\n"},
 	{"85", "&lt;img src=\"a_1.png\" &gt;", "<img src=\"a\\_1.png\" >\n"},
@@ -126,7 +127,7 @@ var html2MdTests = []parseTest{
 	{"21", "<h4><a id=\"user-content-id\" class=\"anchor\" aria-hidden=\"true\" href=\"https://github.com/Vanessa219/vditor/blob/master/README.md#id\"><svg class=\"octicon octicon-link\" viewBox=\"0 0 16 16\" version=\"1.1\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z\"></path></svg></a>id</h4>", "#### id\n"},
 	{"20", "<h2 id=\"whats-markdown\">What’s Markdown?<a class=\"anchorjs-link \" aria-label=\"Anchor\" data-anchorjs-icon=\"\uE9CB\" href=\"https://www.markdownguide.org/getting-started/#whats-markdown\"></a></h2>", "## What’s Markdown?\n"},
 	{"19", "<pre><span>`foo`</span></pre>", "```\n`foo`\n```\n"},
-	{"18", "<del>foo</del>", "~foo~\n"},
+	{"18", "<del>foo</del>", "~~foo~~\n"},
 	{"17", "<img src=\"bar.png\" alt=\"foo\">", "![foo](bar.png)\n"},
 	{"16", "foo<br>bar", "foo\nbar\n"},
 	{"15", "<em>foo</em>", "*foo*\n"},
