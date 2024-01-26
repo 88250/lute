@@ -428,6 +428,10 @@ func (r *VditorRenderer) renderInlineMathContent(node *ast.Node, entering bool) 
 	r.Tag("span", [][]string{{"class", "vditor-wysiwyg__preview"}, {"data-render", "2"}}, false)
 	r.Tag("span", [][]string{{"class", "language-math"}}, false)
 	previewTokens = bytes.ReplaceAll(previewTokens, editor.CaretTokens, nil)
+	if node.ParentIs(ast.NodeTableCell) {
+		// Improve the `|` render in the inline math in the table https://github.com/Vanessa219/vditor/issues/1550
+		previewTokens = bytes.ReplaceAll(previewTokens, []byte("\\|"), []byte("|"))
+	}
 	r.Write(html.EscapeHTML(previewTokens))
 	r.Tag("/span", nil, false)
 	r.Tag("/span", nil, false)

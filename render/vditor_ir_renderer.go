@@ -565,12 +565,17 @@ func (r *VditorIRRenderer) renderInlineMathCloseMarker(node *ast.Node, entering 
 
 func (r *VditorIRRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		tokens := html.EscapeHTML(node.Tokens)
+		tokens := node.Tokens
+		tokens = html.EscapeHTML(tokens)
 		r.Write(tokens)
 		r.Tag("/code", nil, false)
 		r.Tag("span", [][]string{{"class", "vditor-ir__preview"}, {"data-render", "2"}}, false)
 		r.Tag("span", [][]string{{"class", "language-math"}}, false)
 		tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
+		if node.ParentIs(ast.NodeTableCell) {
+			// Improve the `|` render in the inline math in the table https://github.com/Vanessa219/vditor/issues/1550
+			tokens = bytes.ReplaceAll(tokens, []byte("\\|"), []byte("|"))
+		}
 		r.Write(tokens)
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
