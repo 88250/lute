@@ -751,7 +751,12 @@ func (r *HtmlRenderer) renderInlineMathCloseMarker(node *ast.Node, entering bool
 
 func (r *HtmlRenderer) renderInlineMathContent(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(html.EscapeHTML(node.Tokens))
+		tokens := node.Tokens
+		if node.ParentIs(ast.NodeTableCell) {
+			// Improve the `|` render in the inline math in the table https://github.com/Vanessa219/vditor/issues/1550
+			tokens = bytes.ReplaceAll(tokens, []byte("\\|"), []byte("|"))
+		}
+		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue
 }
