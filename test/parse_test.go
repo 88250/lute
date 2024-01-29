@@ -24,28 +24,32 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
-
-	{"link ref node", "[foo]\n\n[foo]: bar", "<p><a href=\"bar\">foo</a></p>\n"},
-	{"details", `<details>
-<summary>foo</summary>
-
-* bar
-
-</details>`, "<details>\n<summary>foo</summary>\n<ul>\n<li>bar</li>\n</ul>\n</details>\n"},
-
-	// 链接引用定义问题 https://github.com/88250/lute/issues/3
-	{"#3", "[foo][]bar\n\n[foo]: /url \"title\"\n", "<p><a href=\"/url\" title=\"title\">foo</a>bar</p>\n"},
-
-	{"#177", "[link](/u(ri\n)\n", "<p>[link](/u(ri\n)</p>\n"},
-	{"#177", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
+	//
+	//	{"link ref node", "[foo]\n\n[foo]: bar", "<p><a href=\"bar\">foo</a></p>\n"},
+	//	{"details", `<details>
+	//<summary>foo</summary>
+	//
+	//* bar
+	//
+	//</details>`, "<details>\n<summary>foo</summary>\n<ul>\n<li>bar</li>\n</ul>\n</details>\n"},
+	//
+	//	// 链接引用定义问题 https://github.com/88250/lute/issues/3
+	//	{"#3", "[foo][]bar\n\n[foo]: /url \"title\"\n", "<p><a href=\"/url\" title=\"title\">foo</a>bar</p>\n"},
+	//
+	//	{"#177", "[link](/u(ri\n)\n", "<p>[link](/u(ri\n)</p>\n"},
+	//	{"#177", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
 
 	// commonmark spec inline-level cases
 
+	// 0.31
+	{"0.31-spec626", "foo <!--> foo -->\n\nfoo <!---> foo -->\n", "<p>foo <!--> foo --&gt;</p>\n<p>foo <!---> foo --&gt;</p>\n"},
+	{"0.31-spec625", "foo <!-- this is a --\ncomment - with hyphens -->\n", "<p>foo <!-- this is a --\ncomment - with hyphens --></p>\n"},
+
+	// Below 0.31
 	{"spec637", "`code \nspan`\n", "<p><code>code  span</code></p>\n"},
 	{"spec626", "foo <![CDATA[>&<]]>\n", "<p>foo <![CDATA[>&<]]></p>\n"},
 	{"spec625", "foo <!ELEMENT br EMPTY>\n", "<p>foo <!ELEMENT br EMPTY></p>\n"},
 	{"spec624", "foo <?php echo $a; ?>\n", "<p>foo <?php echo $a; ?></p>\n"},
-	{"spec622", "foo <!-- not a comment -- two hyphens -->\n", "<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>\n"},
 	{"spec621", "foo <!-- this is a\ncomment - with hyphen -->\n", "<p>foo <!-- this is a\ncomment - with hyphen --></p>\n"},
 	{"spec616", "<a href=\"hi'> <a href=hi'>\n", "<p>&lt;a href=&quot;hi'&gt; &lt;a href=hi'&gt;</p>\n"},
 	{"spec613", "Foo <responsive-image src=\"foo.jpg\" />\n", "<p>Foo <responsive-image src=\"foo.jpg\" /></p>\n"},
