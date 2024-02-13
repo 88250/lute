@@ -59,7 +59,9 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 				if nil != node.Previous {
 					// 解析 kramdown 列表时可能出现列表项下面为空（* \n{id:foo}），此时 IAL 应该用于覆盖前一个 List 的
 					node.Previous.SetIALAttr("id", ial[0][1])
+					next := node.Next
 					node.Unlink()
+					node.Next = next
 					return
 				}
 			}
