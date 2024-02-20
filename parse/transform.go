@@ -186,8 +186,9 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 					tags = append(tags, n.TextMarkType)
 					n.TextMarkType = strings.Join(tags, " ")
 				}
+			} else {
+				tags = tags[:len(tags)-1]
 			}
-
 			return ast.WalkContinue
 		}
 		return ast.WalkContinue
