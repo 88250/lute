@@ -362,7 +362,10 @@ func processNestedNode(n *ast.Node, tag string, tags *[]string, unlinks *[]*ast.
 	if entering {
 		*tags = append(*tags, tag)
 	} else {
-		*tags = (*tags)[:len(*tags)-1]
+		if 0 < len(*tags) {
+			*tags = (*tags)[:len(*tags)-1]
+		}
+
 		*unlinks = append(*unlinks, n)
 		for c := n.FirstChild; nil != c; {
 			next := c.Next
