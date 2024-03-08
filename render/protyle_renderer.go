@@ -1824,6 +1824,7 @@ func (r *ProtyleRenderer) renderIAL(node *ast.Node) {
 		avs = html.EscapeHTMLStr(avs)
 		r.Tag("div", [][]string{{"class", "protyle-attr--av"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconDatabase\"></use></svg>")
+		r.WriteString(node.IALAttr("av-names"))
 		r.Tag("/div", nil, false)
 	}
 

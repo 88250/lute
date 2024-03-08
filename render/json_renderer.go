@@ -49,6 +49,7 @@ func (r *JSONRenderer) renderNode(node *ast.Node, entering bool) ast.WalkStatus 
 		node.Data, node.TypeStr = util.BytesToStr(node.Tokens), node.Type.String()
 		node.Properties = ial2Map(node.KramdownIAL)
 		delete(node.Properties, "refcount")
+		delete(node.Properties, "av-names")
 		data, err := json.Marshal(node)
 		node.Data, node.TypeStr = "", ""
 		node.Properties = nil

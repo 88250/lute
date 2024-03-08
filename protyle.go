@@ -1908,6 +1908,11 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" refcount=\""+refcount+"\"")...)
 	}
 
+	if avNames := util.DomAttrValue(n, "av-names"); "" != avNames {
+		node.SetIALAttr("av-names", avNames)
+		ialTokens = append(ialTokens, []byte(" av-names=\""+avNames+"\"")...)
+	}
+
 	if bookmark := util.DomAttrValue(n, "bookmark"); "" != bookmark {
 		bookmark = html.UnescapeHTMLStr(bookmark)
 		node.SetIALAttr("bookmark", bookmark)
