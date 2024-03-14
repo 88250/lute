@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"89", "<pre class=\"Agda\"><a id=\"plfa_plfa-part1-Naturals-114\" class=\"Keyword\">module</a> <a id=\"plfa_plfa-part1-Naturals-121\" href=\"../Naturals/#\" class=\"Module\">plfa.part1.Naturals</a> <a id=\"plfa_plfa-part1-Naturals-141\" class=\"Keyword\">where</a>\n</pre>", "```\nmodule plfa.part1.Naturals where\n```\n"},
 	{"88", "<s>foo</s>", "~~foo~~\n"},
 	{"87", "<h2 data-id=\"heading-4\">foo</h2><pre><div class=\"code-block-extension-header\"><div class=\"code-block-extension-headerLeft\"><div class=\"code-block-extension-foldBtn\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M16.924 9.617A1 1 0 0 0 16 9H8a1 1 0 0 0-.707 1.707l4 4a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0 .217-1.09z\" data-name=\"Down\"></path></svg></div></div><div class=\"code-block-extension-headerRight\"><span class=\"code-block-extension-lang\">arduino</span><div class=\"code-block-extension-copyCodeBtn\">复制代码</div></div></div><code class=\"hljs language-arduino code-block-extension-codeShowNum\" lang=\"arduino\"><span class=\"code-block-extension-codeLine\" data-line-num=\"1\">bar</span>\n</code></pre><h2 data-id=\"heading-5\">baz</h2>", "## foo\n\n```arduino\nbar\n```\n\n## baz\n"},
 	{"86", "<img src=\"a_1.png\" >", "![](a_1.png)\n"},

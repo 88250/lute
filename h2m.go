@@ -236,12 +236,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				n.FirstChild.Unlink()
 			}
 
-			if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom {
+			if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom || atom.A == firstc.DataAtom {
 				node.Type = ast.NodeCodeBlock
 				node.IsFencedCodeBlock = true
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
-				if atom.Code == firstc.DataAtom || atom.Span == firstc.DataAtom {
+				if atom.Code == firstc.DataAtom || atom.Span == firstc.DataAtom || atom.A == firstc.DataAtom {
 					class := util.DomAttrValue(firstc, "class")
 					if !strings.Contains(class, "language-") {
 						class = util.DomAttrValue(n, "class")
