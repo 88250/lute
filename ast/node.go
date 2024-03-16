@@ -389,14 +389,6 @@ func (n *Node) SetIALAttr(name, value string) {
 			return
 		}
 	}
-
-	if typ := n.IALAttr("type"); "doc" == typ {
-		// 让 type="doc" 保持在最后一个
-		n.RemoveIALAttr("type")
-		n.KramdownIAL = append(n.KramdownIAL, []string{name, value})
-		n.KramdownIAL = append(n.KramdownIAL, []string{"type", "doc"})
-		return
-	}
 	n.KramdownIAL = append(n.KramdownIAL, []string{name, value})
 }
 
