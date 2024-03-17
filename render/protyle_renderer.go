@@ -248,7 +248,13 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 	} else {
 		r.WriteString("</span>")
 		if parse.ContainTextMark(node, "code", "kbd", "tag") {
-			r.WriteString(editor.Zwsp)
+			if text := node.NextNodeText(); "" != text {
+				if !strings.HasPrefix(text, editor.Zwsp) {
+					r.WriteString(editor.Zwsp)
+				}
+			} else {
+				r.WriteString(editor.Zwsp)
+			}
 		}
 		if parse.ContainTextMark(node, "code", "inline-math", "kbd") {
 			if r.Options.AutoSpace {
