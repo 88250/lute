@@ -1318,16 +1318,26 @@ func (r *ProtyleExportRenderer) renderLink(node *ast.Node, entering bool) ast.Wa
 }
 
 func (r *ProtyleExportRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		r.Newline()
-		tokens := node.Tokens
-		if r.Options.Sanitize {
-			tokens = sanitize(tokens)
-		}
-		tokens = r.tagSrcPath(tokens)
-		r.Write(tokens)
-		r.Newline()
+	if !entering {
+		return ast.WalkContinue
 	}
+
+	var attrs [][]string
+	r.blockNodeAttrs(node, &attrs, "render-node")
+	tokens := node.Tokens
+	tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
+	attrs = append(attrs, []string{"data-subtype", "block"})
+	r.Tag("div", attrs, false)
+	r.WriteString("<div class=\"protyle-icons\">")
+	r.WriteString("<span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-icon--first protyle-action__edit\"><svg><use xlink:href=\"#iconEdit\"></use></svg></span><span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-action__menu protyle-icon--last\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
+	r.WriteString("</div><div>")
+	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
+	r.Tag("protyle-html", attrs, false)
+	r.Tag("/protyle-html", nil, false)
+	r.WriteString("<span style=\"position: absolute\">" + editor.Zwsp + "</span>")
+	r.WriteString("</div>")
+	r.renderIAL(node)
+	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
 
