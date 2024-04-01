@@ -1328,9 +1328,7 @@ func (r *ProtyleExportRenderer) renderHTML(node *ast.Node, entering bool) ast.Wa
 	tokens = bytes.ReplaceAll(tokens, editor.CaretTokens, nil)
 	attrs = append(attrs, []string{"data-subtype", "block"})
 	r.Tag("div", attrs, false)
-	r.WriteString("<div class=\"protyle-icons\">")
-	r.WriteString("<span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-icon--first protyle-action__edit\"><svg><use xlink:href=\"#iconEdit\"></use></svg></span><span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-action__menu protyle-icon--last\"><svg><use xlink:href=\"#iconMore\"></use></svg></span>")
-	r.WriteString("</div><div>")
+	r.WriteString("<div>")
 	attrs = [][]string{{"data-content", util.BytesToStr(html.EscapeHTML(tokens))}}
 	r.Tag("protyle-html", attrs, false)
 	r.Tag("/protyle-html", nil, false)
