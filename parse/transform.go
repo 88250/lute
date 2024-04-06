@@ -190,7 +190,9 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 					n.TextMarkType = strings.Join(tags, " ")
 				}
 			} else {
-				tags = tags[:len(tags)-1]
+				if nil == n.Next || n.Next.IsCloseMarker() {
+					tags = tags[:len(tags)-1]
+				}
 			}
 			return ast.WalkContinue
 		}
@@ -355,6 +357,29 @@ func NestedInlines2FlattedSpans(tree *Tree, isExportMd bool) {
 					}
 				}
 			}
+		case ast.NodeTextMark:
+			if 1 > len(tags) {
+				return ast.WalkContinue
+			}
+
+			if entering {
+				contain := false
+				for _, tag := range tags {
+					if n.IsTextMarkType(tag) {
+						contain = true
+						break
+					}
+				}
+				if !contain {
+					tags = append(tags, n.TextMarkType)
+					n.TextMarkType = strings.Join(tags, " ")
+				}
+			} else {
+				if nil == n.Next || n.IsCloseMarker() {
+					tags = tags[:len(tags)-1]
+				}
+			}
+			return ast.WalkContinue
 		}
 		return ast.WalkContinue
 	})

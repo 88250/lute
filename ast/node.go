@@ -813,6 +813,18 @@ func (n *Node) IsMarker() bool {
 	return false
 }
 
+// IsCloseMarker 判断 n 是否为闭合标记符。
+func (n *Node) IsCloseMarker() bool {
+	switch n.Type {
+	case NodeHeadingC8hMarker, NodeBlockquoteMarker, NodeCodeBlockFenceCloseMarker, NodeEmA6kCloseMarker, NodeEmU8eCloseMarker,
+		NodeStrongA6kCloseMarker, NodeStrongU8eCloseMarker, NodeCodeSpanCloseMarker, NodeStrikethrough1CloseMarker, NodeStrikethrough2CloseMarker,
+		NodeMathBlockCloseMarker, NodeInlineMathCloseMarker, NodeYamlFrontMatterCloseMarker, NodeMark1CloseMarker, NodeMark2CloseMarker,
+		NodeTagCloseMarker, NodeSuperBlockCloseMarker, NodeSupCloseMarker, NodeSubCloseMarker:
+		return true
+	}
+	return false
+}
+
 // AcceptLines 判断是否节点是否可以接受更多的文本行。比如 HTML 块、代码块和段落是可以接受更多的文本行的。
 func (n *Node) AcceptLines() bool {
 	switch n.Type {
