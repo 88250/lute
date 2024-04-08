@@ -1209,7 +1209,9 @@ func (r *ProtyleExportDocxRenderer) renderParagraph(node *ast.Node, entering boo
 		attrs = append(attrs, node.KramdownIAL...)
 		r.Tag("p", attrs, false)
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
-			r.WriteString("　　")
+			if !r.ParagraphContainImgOnly(node) {
+				r.WriteString("　　")
+			}
 		}
 	} else {
 		r.Tag("/p", nil, false)

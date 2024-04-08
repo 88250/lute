@@ -1363,7 +1363,9 @@ func (r *ProtyleExportMdRenderer) renderDocument(node *ast.Node, entering bool) 
 func (r *ProtyleExportMdRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
-			r.WriteString("　　")
+			if !r.ParagraphContainImgOnly(node) {
+				r.WriteString("　　")
+			}
 		}
 	} else {
 		if !r.Options.KeepParagraphBeginningSpace && nil != node.FirstChild {

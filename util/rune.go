@@ -11,9 +11,16 @@
 package util
 
 import (
+	"github.com/88250/lute/editor"
 	"strings"
 	"unicode/utf8"
 )
+
+func IsEmptyStr(str string) bool {
+	str = strings.ReplaceAll(str, editor.Zwsp, "")
+	str = strings.ReplaceAll(str, editor.Zwj, "")
+	return 0 == len(strings.TrimSpace(str))
+}
 
 func WordCount(str string) (runeCount, wordCount int) {
 	words := strings.Fields(str)

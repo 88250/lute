@@ -1364,7 +1364,9 @@ func (r *ProtyleExportRenderer) renderParagraph(node *ast.Node, entering bool) a
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
-			r.WriteString("　　")
+			if !r.ParagraphContainImgOnly(node) {
+				r.WriteString("　　")
+			}
 		}
 	} else {
 		r.Tag("/div", nil, false)

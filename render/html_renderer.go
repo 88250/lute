@@ -1084,7 +1084,9 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 		var attrs [][]string
 		attrs = append(attrs, node.KramdownIAL...)
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
-			attrs = append(attrs, []string{"class", "indent--2"})
+			if !r.ParagraphContainImgOnly(node) {
+				attrs = append(attrs, []string{"class", "indent--2"})
+			}
 		}
 		r.Tag("p", attrs, false)
 	} else {

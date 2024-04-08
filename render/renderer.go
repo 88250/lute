@@ -735,6 +735,32 @@ func (r *BaseRenderer) Text(node *ast.Node) (ret string) {
 	return
 }
 
+func (r *BaseRenderer) ParagraphContainImgOnly(paragraph *ast.Node) (ret bool) {
+	ret = true
+	containImg := false
+	ast.Walk(paragraph, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeText == n.Type {
+			if !util.IsEmptyStr(string(n.Tokens)) {
+				ret = false
+				return ast.WalkStop
+			}
+		} else if ast.NodeTextMark == n.Type {
+			ret = false
+			return ast.WalkStop
+		} else if ast.NodeImage == n.Type {
+			containImg = true
+		}
+		return ast.WalkContinue
+	})
+
+	ret = containImg && ret
+	return
+}
+
 func RenderHeadingText(n *ast.Node) (ret string) {
 	buf := &bytes.Buffer{}
 	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {
