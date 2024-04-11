@@ -266,16 +266,26 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 		return r.renderMdMarker0(node, types[0], entering)
 	}
 
-	// 重新排序，将 a、inline-memo、block-ref、file-annotation-ref、inline-math 放在最前面
+	// 重新排序，将 a、inline-memo、block-ref、file-annotation-ref、inline-math 放在最前面，将 code 放在最后面
 	var tmp []string
+	var code string
 	for i, typ := range types {
 		if "a" == typ || "inline-memo" == typ || "block-ref" == typ || "file-annotation-ref" == typ || "inline-math" == typ {
 			tmp = append(tmp, typ)
 			types = append(types[:i], types[i+1:]...)
 			break
 		}
+
+		if "code" == typ {
+			code = typ
+			types = append(types[:i], types[i+1:]...)
+			break
+		}
 	}
 	types = append(tmp, types...)
+	if "" != code {
+		types = append(types, code)
+	}
 
 	typ := types[0]
 	if "a" == typ || "inline-memo" == typ || "block-ref" == typ || "file-annotation-ref" == typ || "inline-math" == typ {
@@ -365,8 +375,19 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 		if !entering {
 			reverse(types)
 		}
-		for _, typ := range types {
+		for i, typ := range types {
 			ret += r.renderMdMarker1(node, typ, entering)
+			if entering {
+				if "" != code && len(types)-2 == i { // 最内层是 code 时，需要在渲染 code 前添加零宽空格，然后再渲染 code 标记符
+					ret += editor.Zwsp // Improve exporting inline code markdown element https://github.com/siyuan-note/siyuan/issues/10988
+				}
+			}
+
+			if !entering {
+				if "" != code && 0 == i { // 最内层是 code 时，需要在渲染 code 标记符后添加零宽空格，然后再渲染其他标记符
+					ret += editor.Zwsp
+				}
+			}
 		}
 	}
 	return
