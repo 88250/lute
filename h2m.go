@@ -288,6 +288,21 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
 
 				if tree.Context.Tip.ParentIs(ast.NodeTable) {
+					// 如果表格中只有一行一列，那么丢弃表格直接使用代码块
+					// Improve HTML parsing code blocks https://github.com/siyuan-note/siyuan/issues/11068
+					for table := tree.Context.Tip.Parent; nil != table; table = table.Parent {
+						if ast.NodeTable == table.Type {
+							if nil != table.FirstChild && table.FirstChild == table.LastChild && ast.NodeTableHead == table.FirstChild.Type &&
+								table.FirstChild.FirstChild == table.FirstChild.LastChild &&
+								nil != table.FirstChild.FirstChild.FirstChild && ast.NodeTableCell == table.FirstChild.FirstChild.FirstChild.Type {
+								table.InsertBefore(node)
+								table.Unlink()
+								tree.Context.Tip = node
+								return
+							}
+						}
+					}
+
 					// 表格中不支持添加块级元素，所以这里只能将其转换为多个行级代码元素
 					lines := bytes.Split(content.Tokens, []byte("\n"))
 					for i, line := range lines {
