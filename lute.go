@@ -151,6 +151,11 @@ func (lute *Lute) Space(text string) string {
 
 // IsValidLinkDest 判断 str 是否为合法的链接地址。
 func (lute *Lute) IsValidLinkDest(str string) bool {
+	str = strings.TrimSpace(str)
+	if strings.HasPrefix(str, "[") {
+		return false
+	}
+
 	luteEngine := New()
 	luteEngine.ParseOptions.GFMAutoLink = true
 	tree := parse.Parse("", []byte(str), luteEngine.ParseOptions)
