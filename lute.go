@@ -171,6 +171,23 @@ func (lute *Lute) IsValidLinkDest(str string) bool {
 	return true
 }
 
+func (lute *Lute) GetLinkDest(str string) string {
+	str = strings.TrimSpace(str)
+	luteEngine := New()
+	luteEngine.ParseOptions.GFMAutoLink = true
+	tree := parse.Parse("", []byte(str), luteEngine.ParseOptions)
+	if nil == tree.Root.FirstChild || nil == tree.Root.FirstChild.FirstChild {
+		return ""
+	}
+	if tree.Root.LastChild != tree.Root.FirstChild {
+		return ""
+	}
+	if ast.NodeLink != tree.Root.FirstChild.FirstChild.Type {
+		return ""
+	}
+	return tree.Root.FirstChild.FirstChild.ChildByType(ast.NodeLinkDest).TokensStr()
+}
+
 // GetEmojis 返回 Emoji 别名和对应 Unicode 字符的字典列表。
 func (lute *Lute) GetEmojis() (ret map[string]string) {
 	parse.EmojiLock.Lock()

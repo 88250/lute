@@ -16,6 +16,30 @@ import (
 	"github.com/88250/lute"
 )
 
+func TestGetLinkDest(t *testing.T) {
+	luteEngine := lute.New()
+
+	dest := luteEngine.GetLinkDest("[foo](bar.com)")
+	if "bar.com" != dest {
+		t.Fatalf("get link dest failed")
+	}
+
+	dest = luteEngine.GetLinkDest("[foo](siyuan://blocks/20220817180757-c57m8qi)")
+	if "siyuan://blocks/20220817180757-c57m8qi" != dest {
+		t.Fatalf("get link dest failed")
+	}
+
+	dest = luteEngine.GetLinkDest("[foo](https://abc.to/)")
+	if "https://abc.to/" != dest {
+		t.Fatalf("get link dest failed")
+	}
+
+	dest = luteEngine.GetLinkDest("[foo](https://abc.pm/)")
+	if "https://abc.pm/" != dest {
+		t.Fatalf("get link dest failed")
+	}
+}
+
 func TestIsValidLinkDest(t *testing.T) {
 	luteEngine := lute.New()
 
