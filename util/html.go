@@ -81,6 +81,17 @@ func DomChildByType(n *html.Node, dataAtom atom.Atom) *html.Node {
 	return nil
 }
 
+func DomChildrenByType(n *html.Node, dataAtom atom.Atom) (ret []*html.Node) {
+	// 递归遍历所有子节点
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		if c.DataAtom == dataAtom {
+			ret = append(ret, c)
+		}
+		ret = append(ret, DomChildrenByType(c, dataAtom)...)
+	}
+	return
+}
+
 func DomHTML(n *html.Node) []byte {
 	if nil == n {
 		return nil

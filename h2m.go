@@ -236,6 +236,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				n.FirstChild.Unlink()
 			}
 
+			if atom.Div == firstc.DataAtom && nil == firstc.NextSibling {
+				codes := util.DomChildrenByType(n, atom.Code)
+				if 1 == len(codes) {
+					code := codes[0]
+					// pre 下只有一个 div，且 div 下只有一个 code，那么将 pre.div 替换为 pre.code https://github.com/siyuan-note/siyuan/issues/11131
+					code.Unlink()
+					n.AppendChild(code)
+					firstc.Unlink()
+					firstc = n.FirstChild
+				}
+			}
+
 			if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom || atom.A == firstc.DataAtom {
 				node.Type = ast.NodeCodeBlock
 				node.IsFencedCodeBlock = true
