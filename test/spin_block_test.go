@@ -272,3 +272,40 @@ func TestSpinBlockDOM(t *testing.T) {
 	}
 	ast.Testing = false
 }
+
+var spinBlockDOMStrikethrough1DisabledTests = []parseTest{
+	{"0", "<div data-node-id=\"20240426104632-617yt47\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20240426112128\"><div contenteditable=\"true\" spellcheck=\"false\">~foo~<wbr></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div>", "<div data-node-id=\"20240426104632-617yt47\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20240426112128\"><div contenteditable=\"true\" spellcheck=\"false\">~foo~<wbr></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+func TestSpinBlockDOMStrikethrough1Disabled(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.SetSuperBlock(true)
+	luteEngine.SetTag(true)
+	luteEngine.SetGFMStrikethrough(true)
+	luteEngine.SetGFMStrikethrough1(false)
+	luteEngine.SetSub(false)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+	luteEngine.SetIndentCodeBlock(false)
+	luteEngine.SetEmojiSite("http://127.0.0.1:6806/stage/protyle/images/emoji")
+	luteEngine.SetAutoSpace(true)
+	luteEngine.SetParagraphBeginningSpace(true)
+	luteEngine.SetFileAnnotationRef(true)
+	luteEngine.SetInlineMathAllowDigitAfterOpenMarker(true)
+	luteEngine.SetTextMark(true)
+	luteEngine.SetSpin(true)
+
+	ast.Testing = true
+	for _, test := range spinBlockDOMStrikethrough1DisabledTests {
+		html := luteEngine.SpinBlockDOM(test.from)
+
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+	ast.Testing = false
+}
