@@ -50,6 +50,38 @@ func TestMath(t *testing.T) {
 	}
 }
 
+var inlineMathTests = []parseTest{
+	{"0", "$foo$", "<p><span class=\"language-math\">foo</span></p>\n"},
+}
+
+func TestInlineMath(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetInlineMath(true)
+
+	for _, test := range inlineMathTests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+var inlineMathDisabledTests = []parseTest{
+	{"0", "$foo$", "<p>$foo$</p>\n"},
+}
+
+func TestInlineMathDisabled(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetInlineMath(false)
+
+	for _, test := range inlineMathDisabledTests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
 var inlineMathDigitAllowTests = []parseTest{
 
 	{"1", "$1$2", "<p><span class=\"language-math\">1</span>2</p>\n"},

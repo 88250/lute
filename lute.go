@@ -341,6 +341,10 @@ func (lute *Lute) SetGFMStrikethrough(b bool) {
 	lute.ParseOptions.GFMStrikethrough = b
 }
 
+func (lute *Lute) SetGFMStrikethrough1(b bool) {
+	lute.ParseOptions.GFMStrikethrough1 = b
+}
+
 func (lute *Lute) SetGFMAutoLink(b bool) {
 	lute.ParseOptions.GFMAutoLink = b
 }
@@ -429,6 +433,10 @@ func (lute *Lute) SetVditorIR(b bool) {
 func (lute *Lute) SetVditorSV(b bool) {
 	lute.ParseOptions.VditorSV = b
 	lute.RenderOptions.VditorSV = b
+}
+
+func (lute *Lute) SetInlineMath(b bool) {
+	lute.ParseOptions.InlineMath = b
 }
 
 func (lute *Lute) SetInlineMathAllowDigitAfterOpenMarker(b bool) {

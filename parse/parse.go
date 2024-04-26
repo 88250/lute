@@ -334,6 +334,9 @@ type Options struct {
 	GFMTaskListItem bool
 	// GFMStrikethrough 设置是否打开“GFM 删除线”支持。
 	GFMStrikethrough bool
+	// GFMStrikethrough1 设置是否打开“GFM 删除线”一个标记符 ~ 支持。
+	// GFM 删除线支持两个标记符 ~~，这个选项用于支持一个标记符的删除线。
+	GFMStrikethrough1 bool
 	// GFMAutoLink 设置是否打开“GFM 自动链接”支持。
 	GFMAutoLink bool
 	// Footnotes 设置是否打开“脚注”支持。
@@ -358,6 +361,8 @@ type Options struct {
 	VditorSV bool
 	// Protyle 所见即所得支持。
 	ProtyleWYSIWYG bool
+	// InlineMath 设置是否开启行级公式 $foo$ 支持。
+	InlineMath bool
 	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
 	InlineMathAllowDigitAfterOpenMarker bool
 	// Setext 设置是否解析 Setext 标题 https://github.com/88250/lute/issues/50
@@ -415,12 +420,14 @@ func NewOptions() *Options {
 		GFMTable:          true,
 		GFMTaskListItem:   true,
 		GFMStrikethrough:  true,
+		GFMStrikethrough1: true,
 		GFMAutoLink:       true,
 		Footnotes:         true,
 		Emoji:             true,
 		AliasEmoji:        EmojiAliasUnicode,
 		EmojiAlias:        EmojiUnicodeAlias,
 		EmojiSite:         "https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji",
+		InlineMath:        true,
 		Setext:            true,
 		YamlFrontMatter:   true,
 		BlockRef:          false,

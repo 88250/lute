@@ -194,7 +194,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 						emStrongDelMark.Type = ast.NodeSub
 						openMarker.Type = ast.NodeSubOpenMarker
 						closeMarker.Type = ast.NodeSubCloseMarker
-					} else if t.Context.ParseOption.GFMStrikethrough {
+					} else if t.Context.ParseOption.GFMStrikethrough && t.Context.ParseOption.GFMStrikethrough1 {
 						emStrongDelMark.Type = ast.NodeStrikethrough
 						openMarker.Type = ast.NodeStrikethrough1OpenMarker
 						closeMarker.Type = ast.NodeStrikethrough1CloseMarker

@@ -21,7 +21,7 @@ import (
 var dollar = util.StrToBytes("$")
 
 func (t *Tree) parseInlineMath(ctx *InlineContext) (ret *ast.Node) {
-	if 3 > ctx.tokensLen {
+	if 3 > ctx.tokensLen || !t.Context.ParseOption.InlineMath {
 		ctx.pos++
 		return &ast.Node{Type: ast.NodeText, Tokens: dollar}
 	}
