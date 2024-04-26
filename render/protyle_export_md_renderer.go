@@ -331,9 +331,9 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				content := node.TextMarkInlineMemoContent
 				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 				if isCJK(lastRune) {
-					ret += "^（" + content + "）^"
+					ret += "<sup>（" + content + "）</sup>"
 				} else {
-					ret += "^(" + content + ")^"
+					ret += "<sup>(" + content + ")</sup>"
 				}
 			case "inline-math":
 				content := node.TextMarkInlineMathContent
@@ -439,9 +439,9 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 			content := node.TextMarkInlineMemoContent
 			content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
 			if isCJK(lastRune) {
-				ret += "^（" + content + "）^"
+				ret += "<sup>（" + content + "）</sup>"
 			} else {
-				ret += "^(" + content + ")^"
+				ret += "<sup>(" + content + ")</sup>"
 			}
 		}
 	case "inline-math":
@@ -485,15 +485,15 @@ func (r *ProtyleExportMdRenderer) renderMdMarker1(node *ast.Node, currentTextmar
 		}
 	case "sup":
 		if entering {
-			ret += "^"
+			ret += "<sup>"
 		} else {
-			ret += "^"
+			ret += "</sup>"
 		}
 	case "sub":
 		if entering {
-			ret += "~"
+			ret += "<sub>"
 		} else {
-			ret += "~"
+			ret += "</sub>"
 		}
 	case "kbd":
 		if entering {
@@ -794,14 +794,14 @@ func (r *ProtyleExportMdRenderer) renderSup(node *ast.Node, entering bool) ast.W
 
 func (r *ProtyleExportMdRenderer) renderSupOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("^")
+		r.WriteString("<sup>")
 	}
 	return ast.WalkContinue
 }
 
 func (r *ProtyleExportMdRenderer) renderSupCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("^")
+		r.WriteString("</sup>")
 	}
 	return ast.WalkContinue
 }
@@ -812,14 +812,14 @@ func (r *ProtyleExportMdRenderer) renderSub(node *ast.Node, entering bool) ast.W
 
 func (r *ProtyleExportMdRenderer) renderSubOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("~")
+		r.WriteString("<sub>")
 	}
 	return ast.WalkContinue
 }
 
 func (r *ProtyleExportMdRenderer) renderSubCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("~")
+		r.WriteString("</sub>")
 	}
 	return ast.WalkContinue
 }
