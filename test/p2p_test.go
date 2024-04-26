@@ -19,6 +19,8 @@ import (
 
 var inlineMd2BlockDOM = []parseTest{
 
+	{"4", "<sub>foo</sub>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"sub\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"3", "<sup>foo</sup>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"sup\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"2", "<kbd>foo</kbd>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"kbd\">\u200bfoo</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"1", "<span data-type=\"strong\">foo</span>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"0", "~**foo**~\u200b~bar~\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"sub strong\">foo</span>\u200b<span data-type=\"sub\">bar</span>\n</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},

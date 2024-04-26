@@ -77,6 +77,10 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 							content.WriteString("</kbd>")
 						} else if "u" == n.TextMarkType {
 							content.WriteString("</u>")
+						} else if "sup" == n.TextMarkType {
+							content.WriteString("</sup>")
+						} else if "sub" == n.TextMarkType {
+							content.WriteString("</sub>")
 						}
 					}
 					return ast.WalkContinue
@@ -89,6 +93,10 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 						content.WriteString("<kbd>")
 					} else if "u" == n.TextMarkType {
 						content.WriteString("<u>")
+					} else if "sup" == n.TextMarkType {
+						content.WriteString("<sup>")
+					} else if "sub" == n.TextMarkType {
+						content.WriteString("<sub>")
 					}
 
 					content.WriteString(n.TextMarkTextContent)

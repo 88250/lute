@@ -134,6 +134,12 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			} else if bytes.Equal(tags, []byte("<u>")) {
 				ret = t.processSpanTag(tags, "<u>", "</u>", ctx)
 				return
+			} else if bytes.Equal(tags, []byte("<sup>")) {
+				ret = t.processSpanTag(tags, "<sup>", "</sup>", ctx)
+				return
+			} else if bytes.Equal(tags, []byte("<sub>")) {
+				ret = t.processSpanTag(tags, "<sub>", "</sub>", ctx)
+				return
 			}
 		}
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
@@ -165,7 +171,7 @@ func (t *Tree) processSpanTag(tags []byte, startTag, endTag string, ctx *InlineC
 
 	var typ string
 	startTagLen := len(startTag)
-	if "<kbd>" == startTag || "<u>" == startTag {
+	if "<kbd>" == startTag || "<u>" == startTag || "<sup>" == startTag || "<sub>" == startTag {
 		if !t.Context.ParseOption.HTMLTag2TextMark {
 			ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 			return
