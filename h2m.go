@@ -406,6 +406,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
+		if nil == n.NextSibling {
+			break
+		}
+
 		if tree.Context.ParseOption.ProtyleWYSIWYG && lute.parentIs(n, atom.Table) {
 			node.Type = ast.NodeBr
 		} else {
