@@ -122,7 +122,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte(""))
 		}
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
-		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte{' '})     // 将 \n 转换为空格 https://github.com/siyuan-note/siyuan/issues/6052
+
+		// 将 \n空格空格* 转换为\n
+		for strings.Contains(string(node.Tokens), "\n  ") {
+			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n  "), []byte("\n "))
+		}
+		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n "), []byte("\n"))
+		node.Tokens = bytes.Trim(node.Tokens, "\t\n")
+
+		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte{' '}) // 将 \n 转换为空格 https://github.com/siyuan-note/siyuan/issues/6052
 		if lute.ParseOptions.ProtyleWYSIWYG {
 			node.Tokens = lex.EscapeProtyleMarkers(node.Tokens)
 		} else {
