@@ -44,6 +44,13 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 
 // HTML2Tree 将 HTML 转换为 AST。
 func (lute *Lute) HTML2Tree(dom string) (ret *parse.Tree) {
+	// 将 \n空格空格* 转换为\n
+	for strings.Contains(dom, "\n  ") {
+		dom = strings.ReplaceAll(dom, "\n  ", "\n ")
+	}
+	dom = strings.ReplaceAll(dom, "\n ", "\n")
+	dom = strings.Trim(dom, "\t\n")
+
 	htmlRoot := lute.parseHTML(dom)
 	if nil == htmlRoot {
 		return
@@ -119,7 +126,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				break
 			}
 			node.Tokens = bytes.TrimSpace(node.Tokens)
-			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte(""))
+			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte(" "))
 		}
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 
@@ -614,8 +621,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 	case atom.Font:
 		node.Type = ast.NodeText
-		node.Tokens = []byte(util.DomText(n))
-		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), nil)
+		tokens := []byte(util.DomText(n))
+		for strings.Contains(string(tokens), "\n\n") {
+			tokens = bytes.ReplaceAll(tokens, []byte("\n\n"), []byte("\n"))
+		}
+		tokens = bytes.ReplaceAll(tokens, []byte("\n"), []byte(" "))
+		node.Tokens = tokens
 		tree.Context.Tip.AppendChild(node)
 		return
 	case atom.Details:
