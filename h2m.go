@@ -405,6 +405,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			code = code[bytes.Index(code, []byte(">"))+1:]
 		}
 		code = bytes.TrimSuffix(code, []byte("</code>"))
+
+		if n.FirstChild == n.LastChild && atom.Span == n.FirstChild.DataAtom {
+			// 只有一个 span 子节点，那么直接使用 span 的内容 https://github.com/siyuan-note/siyuan/issues/11281
+			code = []byte(util.DomText(n.FirstChild))
+		}
+
 		unescaped := html.UnescapeString(string(code))
 		code = []byte(unescaped)
 		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: code}
