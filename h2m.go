@@ -263,6 +263,26 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 
+			if atom.Ol == firstc.DataAtom && nil == firstc.NextSibling && nil != firstc.FirstChild && atom.Li == firstc.FirstChild.DataAtom &&
+				nil != firstc.FirstChild.FirstChild && atom.P == firstc.FirstChild.FirstChild.DataAtom &&
+				nil != firstc.FirstChild.FirstChild.FirstChild && atom.Code == firstc.FirstChild.FirstChild.FirstChild.DataAtom {
+				// 将 pre.ol.li.p.code, code, ... code 转换为 pre.code, code, ... code
+				var lis, codes []*html.Node
+				for li := firstc.FirstChild; nil != li; li = li.NextSibling {
+					lis = append(lis, li)
+					codes = append(codes, li.FirstChild.FirstChild)
+				}
+				for _, li := range lis {
+					li.Unlink()
+				}
+				for _, code := range codes {
+					code.Unlink()
+					n.AppendChild(code)
+				}
+				firstc.Unlink()
+				firstc = n.FirstChild
+			}
+
 			if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom || atom.A == firstc.DataAtom {
 				node.Type = ast.NodeCodeBlock
 				node.IsFencedCodeBlock = true
@@ -277,6 +297,24 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 						language := class[strings.Index(class, "language-")+len("language-"):]
 						language = strings.Split(language, " ")[0]
 						node.LastChild.CodeBlockInfo = []byte(language)
+					} else {
+						if atom.Code == firstc.DataAtom {
+							class := util.DomAttrValue(firstc, "class")
+							if !strings.Contains(class, " ") {
+								node.LastChild.CodeBlockInfo = []byte(class)
+							}
+						}
+					}
+
+					if 1 > len(node.LastChild.CodeBlockInfo) {
+						class := util.DomAttrValue(n, "class")
+						if !strings.Contains(class, " ") {
+							node.LastChild.CodeBlockInfo = []byte(class)
+						}
+					}
+
+					if bytes.ContainsAny(node.LastChild.CodeBlockInfo, "-_ ") {
+						node.LastChild.CodeBlockInfo = nil
 					}
 				}
 
