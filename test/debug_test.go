@@ -18,6 +18,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"75", "[foo](bar.com(baz) \"bar.com(baz)\")", "<p><a href=\"bar.com(baz)\" title=\"bar.com(baz)\">foo</a></p>\n"},
 	{"74", "https://foo.com:443/bar/baz", "<p><a href=\"https://foo.com:443/bar/baz\">https://foo.com:443/bar/baz</a></p>\n"},
 	{"73", "| $foo\\\\\\|bar$ |\n| - |", "<table>\n<thead>\n<tr>\n<th><span class=\"language-math\">foo\\\\|bar</span></th>\n</tr>\n</thead>\n</table>\n"},
 	{"72", "| $foo\\\\|bar$ |\n| - |", "<table>\n<thead>\n<tr>\n<th><span class=\"language-math\">foo\\|bar</span></th>\n</tr>\n</thead>\n</table>\n"},

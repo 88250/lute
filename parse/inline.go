@@ -181,6 +181,12 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			openParen = passed[0:1]
 			closeParen = passed[len(passed)-1:]
 			matched = lex.ItemCloseParen == passed[len(passed)-1]
+			if matched && 1 < len(remains) {
+				// 如果 passed 是 ) 结尾，则继续判断 remains 是否以 空格" 开头
+				// 解决 [foo](bar.com(baz) "bar.com(baz)") 这种情况，测试用例 debug_test.go #75
+				matched = !lex.IsWhitespace(remains[0]) && lex.ItemDoublequote != remains[1]
+			}
+
 			if matched {
 				ctx.pos--
 				break
