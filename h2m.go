@@ -263,10 +263,33 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 
+			// 改进两种 pre.ol.li 的代码块解析 https://github.com/siyuan-note/siyuan/issues/11296
+			// 第一种：将 pre.ol.li.p.span, span, ... span 转换为 pre.ol.li.p.code, code, ... code，然后交由第二种处理
+			span2Code := false
+			if atom.Ol == firstc.DataAtom && nil == firstc.NextSibling && nil != firstc.FirstChild && atom.Li == firstc.FirstChild.DataAtom &&
+				nil != firstc.FirstChild.FirstChild && atom.P == firstc.FirstChild.FirstChild.DataAtom &&
+				nil != firstc.FirstChild.FirstChild.FirstChild && atom.Span == firstc.FirstChild.FirstChild.FirstChild.DataAtom {
+				for li := firstc.FirstChild; nil != li; li = li.NextSibling {
+					code := &html.Node{Data: "code", DataAtom: atom.Code, Type: html.ElementNode}
+
+					var spans []*html.Node
+					for span := li.FirstChild.FirstChild; nil != span; span = span.NextSibling {
+						spans = append(spans, span)
+					}
+
+					for _, span := range spans {
+						span.Unlink()
+						code.AppendChild(span)
+					}
+
+					li.FirstChild.AppendChild(code)
+					span2Code = true
+				}
+			}
+			// 第二种：将 pre.ol.li.p.code, code, ... code 转换为 pre.code, code, ... code，然后交由后续处理
 			if atom.Ol == firstc.DataAtom && nil == firstc.NextSibling && nil != firstc.FirstChild && atom.Li == firstc.FirstChild.DataAtom &&
 				nil != firstc.FirstChild.FirstChild && atom.P == firstc.FirstChild.FirstChild.DataAtom &&
 				nil != firstc.FirstChild.FirstChild.FirstChild && atom.Code == firstc.FirstChild.FirstChild.FirstChild.DataAtom {
-				// 将 pre.ol.li.p.code, code, ... code 转换为 pre.code, code, ... code
 				var lis, codes []*html.Node
 				for li := firstc.FirstChild; nil != li; li = li.NextSibling {
 					lis = append(lis, li)
@@ -298,7 +321,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 						language = strings.Split(language, " ")[0]
 						node.LastChild.CodeBlockInfo = []byte(language)
 					} else {
-						if atom.Code == firstc.DataAtom {
+						if atom.Code == firstc.DataAtom && !span2Code {
 							class := util.DomAttrValue(firstc, "class")
 							if !strings.Contains(class, " ") {
 								node.LastChild.CodeBlockInfo = []byte(class)
