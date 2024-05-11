@@ -18,6 +18,7 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"30", "https://foo.com/bar:baz", "<p><a href=\"https://foo.com/bar:baz\">https://foo.com/bar:baz</a></p>\n"},
 	{"29", "www.test.com:8080/bar/baz", "<p><a href=\"http://www.test.com:8080/bar/baz\">www.test.com:8080/bar/baz</a></p>\n"},
 	{"28", "www.test.com:8080(测试地址)", "<p><a href=\"http://www.test.com:8080\">www.test.com:8080</a>(测试地址)</p>\n"},
 	{"27", "http://127.0.0.1:8080(测试地址)", "<p><a href=\"http://127.0.0.1:8080\">http://127.0.0.1:8080</a>(测试地址)</p>\n"},

@@ -227,7 +227,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			}
 
 			// 判断端口后部分是否为数字
-			if tmp := bytes.ReplaceAll(url, []byte("://"), nil); bytes.Contains(tmp, []byte(":")) {
+			if tmp := bytes.ReplaceAll(url, []byte("://"), nil); bytes.Contains(tmp, []byte(":")) && !bytes.Contains(tmp, []byte("/")) {
 				tmp = tmp[bytes.Index(tmp, []byte(":"))+1:]
 				if !bytes.Contains(tmp, []byte("/")) && !lex.IsDigit(token) && lex.ItemSlash != token {
 					break
