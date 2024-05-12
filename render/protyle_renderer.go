@@ -1318,7 +1318,7 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 		r.WriteString(" ")
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
-		if nil == node.Next || editor.Caret == node.Next.Text() {
+		if nil == node.Next || editor.Caret == node.Next.Text() || ast.NodeImage == node.Next.Type {
 			r.WriteString(editor.Zwsp)
 			return ast.WalkContinue
 		}
