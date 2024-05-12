@@ -657,6 +657,11 @@ func (r *ProtyleRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) 
 }
 
 func (r *ProtyleRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
+	if !entering {
+		if nil != node.Previous && ast.NodeImage == node.Previous.Type && nil != node.Next && ast.NodeImage == node.Next.Type {
+			r.WriteString(editor.Zwsp)
+		}
+	}
 	return ast.WalkContinue
 }
 
