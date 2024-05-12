@@ -512,7 +512,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.A:
 		node.Type = ast.NodeLink
 		text := util.DomText(n)
-		if "" == text && nil != n.Parent && (atom.H1 == n.Parent.DataAtom || atom.H2 == n.Parent.DataAtom || atom.H3 == n.Parent.DataAtom || atom.H4 == n.Parent.DataAtom || atom.H5 == n.Parent.DataAtom || atom.H6 == n.Parent.DataAtom) {
+		if "" == text && nil != n.Parent && (atom.H1 == n.Parent.DataAtom || atom.H2 == n.Parent.DataAtom || atom.H3 == n.Parent.DataAtom || atom.H4 == n.Parent.DataAtom || atom.H5 == n.Parent.DataAtom || atom.H6 == n.Parent.DataAtom || atom.Div == n.Parent.DataAtom) {
 			// 丢弃标题中文本为空的链接，这样的链接可能是锚点 https://github.com/Vanessa219/vditor/issues/359
 			return
 		}
