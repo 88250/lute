@@ -203,8 +203,16 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 		lute.adjustVditorDOMListItemInP(c)
 	}
 
-	for c := root.FirstChild; nil != c; c = c.NextSibling {
+	for c := root.FirstChild; nil != c; {
+		next := c.NextSibling
+		lute.removeCodeCode(c)
+		c = next
+	}
+
+	for c := root.FirstChild; nil != c; {
+		next := c.NextSibling
 		lute.adjustVditorDOMCodeA(c)
+		c = next
 	}
 }
 
@@ -467,6 +475,25 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 	}
 }
 
+func (lute *Lute) removeCodeCode(n *html.Node) {
+	if atom.Code == n.DataAtom && nil != n.FirstChild && atom.Code == n.FirstChild.DataAtom {
+		// code.code 重复嵌套，则不处理外层 code
+		for c := n.FirstChild; nil != c; {
+			next := c.NextSibling
+			c.Unlink()
+			n.InsertBefore(c)
+			c = next
+		}
+		n.Unlink()
+		return
+	}
+
+	for c := n.FirstChild; c != nil; {
+		next := c.NextSibling
+		lute.removeCodeCode(c)
+		c = next
+	}
+}
 func (lute *Lute) adjustVditorDOMCodeA(n *html.Node) {
 	// https://github.com/siyuan-note/siyuan/issues/11370
 	if atom.Code == n.DataAtom && nil != n.FirstChild && atom.A == n.FirstChild.DataAtom && n.FirstChild == n.LastChild {
