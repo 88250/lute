@@ -531,6 +531,14 @@ func (r *ProtylePreviewRenderer) renderBlockRef(node *ast.Node, entering bool) a
 	return ast.WalkContinue
 }
 
+func (r *ProtylePreviewRenderer) escapeRefText(refText string) string {
+	refText = strings.ReplaceAll(refText, ">", "&gt;")
+	refText = strings.ReplaceAll(refText, "<", "&lt;")
+	refText = strings.ReplaceAll(refText, "\"", "&quot;")
+	refText = strings.ReplaceAll(refText, "'", "&apos;")
+	return refText
+}
+
 func (r *ProtylePreviewRenderer) renderBlockRefID(node *ast.Node, entering bool) ast.WalkStatus {
 	return ast.WalkContinue
 }
@@ -924,13 +932,9 @@ func (r *ProtylePreviewRenderer) renderLinkSpace(node *ast.Node, entering bool) 
 
 func (r *ProtylePreviewRenderer) renderLinkText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var tokens []byte
-		if r.Options.AutoSpace {
-			tokens = r.Space(node.Tokens)
-		} else {
-			tokens = node.Tokens
+		if ast.NodeImage != node.Parent.Type {
+			r.Write(html.EscapeHTML(node.Tokens))
 		}
-		r.Write(html.EscapeHTML(tokens))
 	}
 	return ast.WalkContinue
 }
@@ -973,48 +977,45 @@ func (r *ProtylePreviewRenderer) renderBang(node *ast.Node, entering bool) ast.W
 
 func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if 0 == r.DisableTags {
-			attrs := [][]string{{"class", "img"}}
-			if style := node.IALAttr("parent-style"); "" != style {
-				attrs = append(attrs, []string{"style", style})
-			}
-			r.Tag("span", attrs, false)
-			r.WriteString("<img src=\"")
-			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
-			destTokens = r.LinkPath(destTokens)
-			if "" != r.Options.ImageLazyLoading {
-				r.Write(html.EscapeHTML(util.StrToBytes(r.Options.ImageLazyLoading)))
-				r.WriteString("\" data-src=\"")
-			}
-			r.Write(html.EscapeHTML(destTokens))
-			r.WriteString("\" alt=\"")
+		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
+		parentStyle := node.IALAttr("parent-style")
+		if "" != parentStyle { // 手动设置了位置
+			attrs = append(attrs, []string{"style", parentStyle})
 		}
-		r.DisableTags++
-		return ast.WalkContinue
-	}
+		r.Tag("span", attrs, false)
+		r.Tag("span", nil, false)
+		r.WriteString(" ")
+		r.Tag("/span", nil, false)
+		r.Tag("span", nil, false)
+		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
+		r.WriteString("<span class=\"protyle-icon protyle-icon--only\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
+		r.Tag("/span", nil, false)
+	} else {
+		destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
+		if r.Options.Sanitize {
+			destTokens = sanitize(destTokens)
+		}
+		destTokens = bytes.ReplaceAll(destTokens, editor.CaretTokens, nil)
+		dataSrcTokens := destTokens
+		dataSrc := util.BytesToStr(dataSrcTokens)
+		src := util.BytesToStr(r.LinkPath(destTokens))
+		attrs := [][]string{{"src", src}, {"data-src", dataSrc}}
+		alt := node.ChildByType(ast.NodeLinkText)
+		if nil != alt && 0 < len(alt.Tokens) {
+			attrs = append(attrs, []string{"alt", util.BytesToStr(alt.Tokens)})
+		}
 
-	r.DisableTags--
-	if 0 == r.DisableTags {
-		r.WriteByte(lex.ItemDoublequote)
 		title := node.ChildByType(ast.NodeLinkTitle)
 		var titleTokens []byte
-		if nil != title && nil != title.Tokens {
-			titleTokens = html.EscapeHTML(title.Tokens)
-			r.WriteString(" title=\"")
-			r.Write(titleTokens)
-			r.WriteByte(lex.ItemDoublequote)
+		if nil != title && 0 < len(title.Tokens) {
+			titleTokens = title.Tokens
+			attrs = append(attrs, []string{"title", r.escapeRefText(string(titleTokens))})
 		}
-		ial := r.NodeAttrsStr(node)
-		if "" != ial {
-			r.WriteString(" " + ial)
+
+		if style := node.IALAttr("style"); "" != style {
+			attrs = append(attrs, []string{"style", style})
 		}
-		r.WriteString(" />")
-		if 0 < len(titleTokens) {
-			r.Tag("span", [][]string{{"class", "protyle-action__title"}}, false)
-			r.Write(titleTokens)
-			r.Tag("/span", nil, false)
-		}
-		r.Tag("/span", nil, false)
+		r.Tag("img", attrs, true)
 
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
@@ -1022,8 +1023,22 @@ func (r *ProtylePreviewRenderer) renderImage(node *ast.Node, entering bool) ast.
 		if r.Options.Sanitize {
 			imgBuf = sanitize(imgBuf)
 		}
+		imgBuf = r.tagSrcPath(imgBuf)
 		r.Writer.Truncate(idx)
 		r.Writer.Write(imgBuf)
+
+		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
+		r.Tag("/span", nil, false)
+
+		attrs = [][]string{{"class", "protyle-action__title"}}
+		r.Tag("span", attrs, false)
+		r.Writer.Write(html.EscapeHTML(titleTokens))
+		r.Tag("/span", nil, false)
+		r.Tag("/span", nil, false)
+		r.Tag("span", nil, false)
+		r.WriteString(" ")
+		r.Tag("/span", nil, false)
+		r.Tag("/span", nil, false)
 	}
 	return ast.WalkContinue
 }
