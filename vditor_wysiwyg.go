@@ -472,6 +472,7 @@ func (lute *Lute) adjustVditorDOMCodeA(n *html.Node) {
 	if atom.Code == n.DataAtom && nil != n.FirstChild && atom.A == n.FirstChild.DataAtom && n.FirstChild == n.LastChild {
 		// code.a 的情况将 a 移到 code 外层，即 a.code
 		prev := n.PrevSibling
+		next := n.NextSibling
 		parent := n.Parent
 		a := n.FirstChild
 		a.Unlink()
@@ -486,17 +487,21 @@ func (lute *Lute) adjustVditorDOMCodeA(n *html.Node) {
 			n.AppendChild(anchorText)
 		}
 		a.AppendChild(n)
-		n = a
+
 		if nil != prev {
-			prev.InsertAfter(n)
+			prev.InsertAfter(a)
+		} else if nil != next {
+			next.InsertBefore(a)
 		} else if nil != parent {
-			parent.AppendChild(n)
+			parent.AppendChild(a)
 		}
 		return
 	}
 
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
+	for c := n.FirstChild; c != nil; {
+		next := c.NextSibling
 		lute.adjustVditorDOMCodeA(c)
+		c = next
 	}
 }
 
