@@ -202,6 +202,10 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustVditorDOMListItemInP(c)
 	}
+
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustVditorDOMCodeA(c)
+	}
 }
 
 // adjustVditorDOMListList 用于将 ul.ul 调整为 ul.li.ul。
@@ -460,6 +464,39 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		lute.adjustVditorDOMListItemInP(c)
+	}
+}
+
+func (lute *Lute) adjustVditorDOMCodeA(n *html.Node) {
+	// https://github.com/siyuan-note/siyuan/issues/11370
+	if atom.Code == n.DataAtom && nil != n.FirstChild && atom.A == n.FirstChild.DataAtom && n.FirstChild == n.LastChild {
+		// code.a 的情况将 a 移到 code 外层，即 a.code
+		prev := n.PrevSibling
+		parent := n.Parent
+		a := n.FirstChild
+		a.Unlink()
+		n.Unlink()
+
+		var anchorTexts []*html.Node
+		for c := a.FirstChild; nil != c; c = c.NextSibling {
+			anchorTexts = append(anchorTexts, c)
+			c.Unlink()
+		}
+		for _, anchorText := range anchorTexts {
+			n.AppendChild(anchorText)
+		}
+		a.AppendChild(n)
+		n = a
+		if nil != prev {
+			prev.InsertAfter(n)
+		} else if nil != parent {
+			parent.AppendChild(n)
+		}
+		return
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		lute.adjustVditorDOMCodeA(c)
 	}
 }
 

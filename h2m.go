@@ -151,7 +151,17 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		if nil != n.Parent && atom.Span == n.Parent.DataAtom && ("" != util.DomAttrValue(n.Parent, "class")) {
 			if lastc := tree.Context.Tip.LastChild; nil == lastc || (ast.NodeText == lastc.Type && !bytes.HasSuffix(lastc.Tokens, []byte("**"))) {
-				node.Tokens = []byte("**" + util.BytesToStr(node.Tokens) + "**")
+				content := string(node.Tokens)
+				prefixSpaces := lute.prefixSpaces(content)
+				suffixSpaces := lute.suffixSpaces(content)
+				content = strings.TrimSpace(content)
+				if "" != prefixSpaces {
+					node.Tokens = []byte(prefixSpaces)
+				}
+				node.Tokens = []byte("**" + content + "**")
+				if "" != suffixSpaces {
+					node.Tokens = append(node.Tokens, []byte(suffixSpaces)...)
+				}
 			}
 		}
 		tree.Context.Tip.AppendChild(node)
