@@ -19,7 +19,22 @@ import (
 func TestGetLinkDest(t *testing.T) {
 	luteEngine := lute.New()
 
-	dest := luteEngine.GetLinkDest("https://foo.com/bar:baz")
+	dest := luteEngine.GetLinkDest("www.bing.com/search?q=\"你好\"")
+	if "http://www.bing.com/search?q=%22%E4%BD%A0%E5%A5%BD%22" != dest {
+		t.Fatalf("get link dest failed")
+	}
+
+	dest = luteEngine.GetLinkDest("www.bing.com/search?q=@Hello")
+	if "http://www.bing.com/search?q=@Hello" != dest {
+		t.Fatalf("get link dest failed")
+	}
+
+	dest = luteEngine.GetLinkDest("www.bing.com/search?q=\"Hello\"")
+	if "http://www.bing.com/search?q=%22Hello%22" != dest {
+		t.Fatalf("get link dest failed")
+	}
+
+	dest = luteEngine.GetLinkDest("https://foo.com/bar:baz")
 	if "https://foo.com/bar:baz" != dest {
 		t.Fatalf("get link dest failed")
 	}

@@ -222,7 +222,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		j = i
 		for ; j < length; j++ {
 			token = tokens[j]
-			if (lex.IsWhitespace(token) || lex.ItemLess == token) || (!lex.IsASCIIPunct(token) && !lex.IsASCIILetterNum(token)) {
+			if lex.IsWhitespace(token) || lex.ItemLess == token {
 				break
 			}
 
@@ -356,8 +356,9 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 			}
 
 			// 如果之前的 ) 或者 ; 没有命中处理，则进行结尾的标点符号规则处理，即标点不计入链接，需要剔掉
-			if !trimmed && lex.IsASCIIPunct(lastToken) && lex.ItemSlash != lastToken &&
-				'}' != lastToken && '{' != lastToken /* 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4 */ {
+			// Trailing punctuation (specifically, ?, !, ., ,, :, *, _, and ~) will not be considered part of the autolink, though they may be included in the interior of the link:
+			// https://github.github.com/gfm/#example-624
+			if !trimmed && ('?' == lastToken || '!' == lastToken || '.' == lastToken || ',' == lastToken || ':' == lastToken || '*' == lastToken || '_' == lastToken || '~' == lastToken) {
 				path = path[:length-1]
 				i--
 			}
