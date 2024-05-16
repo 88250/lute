@@ -121,7 +121,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		if lute.parentIs(n, atom.Table) {
 			if "\n" == n.Data {
-				if nil == n.PrevSibling || nil == n.NextSibling {
+				if nil == tree.Context.Tip.FirstChild || nil == n.NextSibling {
 					break
 				}
 
@@ -180,15 +180,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		if lute.parentIs(n, atom.Table) {
-			if nil == n.PrevSibling || nil == n.NextSibling {
-				break
-			}
-
 			if nil != n.PrevSibling && strings.Contains(n.PrevSibling.Data, "\n") {
 				break
 			}
 
 			if nil != n.NextSibling && strings.Contains(n.NextSibling.Data, "\n") {
+				break
+			}
+
+			if nil == tree.Context.Tip.FirstChild {
 				break
 			}
 
