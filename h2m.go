@@ -44,13 +44,6 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 
 // HTML2Tree 将 HTML 转换为 AST。
 func (lute *Lute) HTML2Tree(dom string) (ret *parse.Tree) {
-	// 将 \n空格空格* 转换为\n
-	for strings.Contains(dom, "\n  ") {
-		dom = strings.ReplaceAll(dom, "\n  ", "\n ")
-	}
-	dom = strings.ReplaceAll(dom, "\n ", "\n")
-	dom = strings.Trim(dom, "\t\n")
-
 	htmlRoot := lute.parseHTML(dom)
 	if nil == htmlRoot {
 		return
@@ -119,6 +112,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.Type = ast.NodeLinkText
 		}
+
+		// 将 \n空格空格* 转换为\n
+		for strings.Contains(string(node.Tokens), "\n  ") {
+			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n  "), []byte("\n "))
+		}
+		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n "), []byte("\n"))
+		node.Tokens = bytes.Trim(node.Tokens, "\t\n")
+
 		if lute.parentIs(n, atom.Table) {
 			if "\n" == n.Data {
 				if nil == tree.Context.Tip.FirstChild || nil == n.NextSibling {
@@ -134,17 +135,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					break
 				}
 			}
+
 			node.Tokens = bytes.TrimSpace(node.Tokens)
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte(" "))
 		}
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
-
-		// 将 \n空格空格* 转换为\n
-		for strings.Contains(string(node.Tokens), "\n  ") {
-			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n  "), []byte("\n "))
-		}
-		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n "), []byte("\n"))
-		node.Tokens = bytes.Trim(node.Tokens, "\t\n")
 
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte{' '}) // 将 \n 转换为空格 https://github.com/siyuan-note/siyuan/issues/6052
 		if lute.ParseOptions.ProtyleWYSIWYG {
@@ -281,178 +276,181 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Pre:
-		if firstc := n.FirstChild; nil != firstc {
-			if atom.Div == firstc.DataAtom && nil != firstc.NextSibling && atom.Code == firstc.NextSibling.DataAtom {
-				firstc = firstc.NextSibling
-				n.FirstChild.Unlink()
-			}
+		firstc := n.FirstChild
+		if nil == firstc {
+			return
+		}
 
-			if atom.Div == firstc.DataAtom && nil == firstc.NextSibling {
-				codes := util.DomChildrenByType(n, atom.Code)
-				if 1 == len(codes) {
-					code := codes[0]
-					// pre 下只有一个 div，且 div 下只有一个 code，那么将 pre.div 替换为 pre.code https://github.com/siyuan-note/siyuan/issues/11131
-					code.Unlink()
-					n.AppendChild(code)
-					firstc.Unlink()
-					firstc = n.FirstChild
-				}
-			}
+		if atom.Div == firstc.DataAtom && nil != firstc.NextSibling && atom.Code == firstc.NextSibling.DataAtom {
+			firstc = firstc.NextSibling
+			n.FirstChild.Unlink()
+		}
 
-			// 改进两种 pre.ol.li 的代码块解析 https://github.com/siyuan-note/siyuan/issues/11296
-			// 第一种：将 pre.ol.li.p.span, span, ... span 转换为 pre.ol.li.p.code, code, ... code，然后交由第二种处理
-			span2Code := false
-			if atom.Ol == firstc.DataAtom && nil == firstc.NextSibling && nil != firstc.FirstChild && atom.Li == firstc.FirstChild.DataAtom &&
-				nil != firstc.FirstChild.FirstChild && atom.P == firstc.FirstChild.FirstChild.DataAtom &&
-				nil != firstc.FirstChild.FirstChild.FirstChild && atom.Span == firstc.FirstChild.FirstChild.FirstChild.DataAtom {
-				for li := firstc.FirstChild; nil != li; li = li.NextSibling {
-					code := &html.Node{Data: "code", DataAtom: atom.Code, Type: html.ElementNode}
-
-					var spans []*html.Node
-					for span := li.FirstChild.FirstChild; nil != span; span = span.NextSibling {
-						spans = append(spans, span)
-					}
-
-					for _, span := range spans {
-						span.Unlink()
-						code.AppendChild(span)
-					}
-
-					li.FirstChild.AppendChild(code)
-					span2Code = true
-				}
-			}
-			// 第二种：将 pre.ol.li.p.code, code, ... code 转换为 pre.code, code, ... code，然后交由后续处理
-			if atom.Ol == firstc.DataAtom && nil == firstc.NextSibling && nil != firstc.FirstChild && atom.Li == firstc.FirstChild.DataAtom &&
-				nil != firstc.FirstChild.FirstChild && atom.P == firstc.FirstChild.FirstChild.DataAtom &&
-				nil != firstc.FirstChild.FirstChild.FirstChild && atom.Code == firstc.FirstChild.FirstChild.FirstChild.DataAtom {
-				var lis, codes []*html.Node
-				for li := firstc.FirstChild; nil != li; li = li.NextSibling {
-					lis = append(lis, li)
-					codes = append(codes, li.FirstChild.FirstChild)
-				}
-				for _, li := range lis {
-					li.Unlink()
-				}
-				for _, code := range codes {
-					code.Unlink()
-					n.AppendChild(code)
-				}
+		if atom.Div == firstc.DataAtom && nil == firstc.NextSibling {
+			codes := util.DomChildrenByType(n, atom.Code)
+			if 1 == len(codes) {
+				code := codes[0]
+				// pre 下只有一个 div，且 div 下只有一个 code，那么将 pre.div 替换为 pre.code https://github.com/siyuan-note/siyuan/issues/11131
+				code.Unlink()
+				n.AppendChild(code)
 				firstc.Unlink()
 				firstc = n.FirstChild
 			}
+		}
 
-			if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom || atom.A == firstc.DataAtom {
-				node.Type = ast.NodeCodeBlock
-				node.IsFencedCodeBlock = true
-				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
-				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
-				if atom.Code == firstc.DataAtom || atom.Span == firstc.DataAtom || atom.A == firstc.DataAtom {
-					class := util.DomAttrValue(firstc, "class")
-					if !strings.Contains(class, "language-") {
-						class = util.DomAttrValue(n, "class")
-					}
-					if strings.Contains(class, "language-") {
-						language := class[strings.Index(class, "language-")+len("language-"):]
-						language = strings.Split(language, " ")[0]
-						node.LastChild.CodeBlockInfo = []byte(language)
-					} else {
-						if atom.Code == firstc.DataAtom && !span2Code {
-							class := util.DomAttrValue(firstc, "class")
-							if !strings.Contains(class, " ") {
-								node.LastChild.CodeBlockInfo = []byte(class)
-							}
-						}
-					}
+		// 改进两种 pre.ol.li 的代码块解析 https://github.com/siyuan-note/siyuan/issues/11296
+		// 第一种：将 pre.ol.li.p.span, span, ... span 转换为 pre.ol.li.p.code, code, ... code，然后交由第二种处理
+		span2Code := false
+		if atom.Ol == firstc.DataAtom && nil == firstc.NextSibling && nil != firstc.FirstChild && atom.Li == firstc.FirstChild.DataAtom &&
+			nil != firstc.FirstChild.FirstChild && atom.P == firstc.FirstChild.FirstChild.DataAtom &&
+			nil != firstc.FirstChild.FirstChild.FirstChild && atom.Span == firstc.FirstChild.FirstChild.FirstChild.DataAtom {
+			for li := firstc.FirstChild; nil != li; li = li.NextSibling {
+				code := &html.Node{Data: "code", DataAtom: atom.Code, Type: html.ElementNode}
 
-					if 1 > len(node.LastChild.CodeBlockInfo) {
-						class := util.DomAttrValue(n, "class")
+				var spans []*html.Node
+				for span := li.FirstChild.FirstChild; nil != span; span = span.NextSibling {
+					spans = append(spans, span)
+				}
+
+				for _, span := range spans {
+					span.Unlink()
+					code.AppendChild(span)
+				}
+
+				li.FirstChild.AppendChild(code)
+				span2Code = true
+			}
+		}
+		// 第二种：将 pre.ol.li.p.code, code, ... code 转换为 pre.code, code, ... code，然后交由后续处理
+		if atom.Ol == firstc.DataAtom && nil == firstc.NextSibling && nil != firstc.FirstChild && atom.Li == firstc.FirstChild.DataAtom &&
+			nil != firstc.FirstChild.FirstChild && atom.P == firstc.FirstChild.FirstChild.DataAtom &&
+			nil != firstc.FirstChild.FirstChild.FirstChild && atom.Code == firstc.FirstChild.FirstChild.FirstChild.DataAtom {
+			var lis, codes []*html.Node
+			for li := firstc.FirstChild; nil != li; li = li.NextSibling {
+				lis = append(lis, li)
+				codes = append(codes, li.FirstChild.FirstChild)
+			}
+			for _, li := range lis {
+				li.Unlink()
+			}
+			for _, code := range codes {
+				code.Unlink()
+				n.AppendChild(code)
+			}
+			firstc.Unlink()
+			firstc = n.FirstChild
+		}
+
+		if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom || atom.A == firstc.DataAtom {
+			node.Type = ast.NodeCodeBlock
+			node.IsFencedCodeBlock = true
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
+			if atom.Code == firstc.DataAtom || atom.Span == firstc.DataAtom || atom.A == firstc.DataAtom {
+				class := util.DomAttrValue(firstc, "class")
+				if !strings.Contains(class, "language-") {
+					class = util.DomAttrValue(n, "class")
+				}
+				if strings.Contains(class, "language-") {
+					language := class[strings.Index(class, "language-")+len("language-"):]
+					language = strings.Split(language, " ")[0]
+					node.LastChild.CodeBlockInfo = []byte(language)
+				} else {
+					if atom.Code == firstc.DataAtom && !span2Code {
+						class := util.DomAttrValue(firstc, "class")
 						if !strings.Contains(class, " ") {
 							node.LastChild.CodeBlockInfo = []byte(class)
 						}
 					}
+				}
 
-					if bytes.ContainsAny(node.LastChild.CodeBlockInfo, "-_ ") {
-						node.LastChild.CodeBlockInfo = nil
+				if 1 > len(node.LastChild.CodeBlockInfo) {
+					class := util.DomAttrValue(n, "class")
+					if !strings.Contains(class, " ") {
+						node.LastChild.CodeBlockInfo = []byte(class)
 					}
 				}
 
-				if atom.Code == firstc.DataAtom {
-					if nil != firstc.NextSibling && atom.Code == firstc.NextSibling.DataAtom {
-						// pre.code code 每个 code 为一行的结构，需要在 code 中间插入换行
-						for c := firstc.NextSibling; nil != c; c = c.NextSibling {
-							c.InsertBefore(&html.Node{DataAtom: atom.Br})
-						}
-					}
-					if nil != firstc.FirstChild && atom.Ol == firstc.FirstChild.DataAtom {
-						// CSDN 代码块：pre.code.ol.li
-						for li := firstc.FirstChild.FirstChild; nil != li; li = li.NextSibling {
-							if li != firstc.FirstChild.FirstChild {
-								li.InsertBefore(&html.Node{DataAtom: atom.Br})
-							}
-						}
-					}
-					if nil != n.LastChild && atom.Ul == n.LastChild.DataAtom {
-						// CSDN 代码块：pre.code,ul
-						n.LastChild.Unlink() // 去掉最后一个代码行号子块 https://github.com/siyuan-note/siyuan/issues/5564
-					}
+				if bytes.ContainsAny(node.LastChild.CodeBlockInfo, "-_ ") {
+					node.LastChild.CodeBlockInfo = nil
 				}
+			}
 
-				if atom.Pre == firstc.DataAtom && nil != firstc.FirstChild {
+			if atom.Code == firstc.DataAtom {
+				if nil != firstc.NextSibling && atom.Code == firstc.NextSibling.DataAtom {
 					// pre.code code 每个 code 为一行的结构，需要在 code 中间插入换行
-					for c := firstc.FirstChild.NextSibling; nil != c; c = c.NextSibling {
+					for c := firstc.NextSibling; nil != c; c = c.NextSibling {
 						c.InsertBefore(&html.Node{DataAtom: atom.Br})
 					}
 				}
+				if nil != firstc.FirstChild && atom.Ol == firstc.FirstChild.DataAtom {
+					// CSDN 代码块：pre.code.ol.li
+					for li := firstc.FirstChild.FirstChild; nil != li; li = li.NextSibling {
+						if li != firstc.FirstChild.FirstChild {
+							li.InsertBefore(&html.Node{DataAtom: atom.Br})
+						}
+					}
+				}
+				if nil != n.LastChild && atom.Ul == n.LastChild.DataAtom {
+					// CSDN 代码块：pre.code,ul
+					n.LastChild.Unlink() // 去掉最后一个代码行号子块 https://github.com/siyuan-note/siyuan/issues/5564
+				}
+			}
 
-				buf := &bytes.Buffer{}
-				buf.WriteString(util.DomText(n))
-				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()}
-				node.AppendChild(content)
-				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
+			if atom.Pre == firstc.DataAtom && nil != firstc.FirstChild {
+				// pre.code code 每个 code 为一行的结构，需要在 code 中间插入换行
+				for c := firstc.FirstChild.NextSibling; nil != c; c = c.NextSibling {
+					c.InsertBefore(&html.Node{DataAtom: atom.Br})
+				}
+			}
 
-				if tree.Context.Tip.ParentIs(ast.NodeTable) {
-					// 如果表格中只有一行一列，那么丢弃表格直接使用代码块
-					// Improve HTML parsing code blocks https://github.com/siyuan-note/siyuan/issues/11068
-					for table := tree.Context.Tip.Parent; nil != table; table = table.Parent {
-						if ast.NodeTable == table.Type {
-							if nil != table.FirstChild && table.FirstChild == table.LastChild && ast.NodeTableHead == table.FirstChild.Type &&
-								table.FirstChild.FirstChild == table.FirstChild.LastChild &&
-								nil != table.FirstChild.FirstChild.FirstChild && ast.NodeTableCell == table.FirstChild.FirstChild.FirstChild.Type {
-								table.InsertBefore(node)
-								table.Unlink()
-								tree.Context.Tip = node
-								return
+			buf := &bytes.Buffer{}
+			buf.WriteString(util.DomText(n))
+			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()}
+			node.AppendChild(content)
+			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
+
+			if tree.Context.Tip.ParentIs(ast.NodeTable) {
+				// 如果表格中只有一行一列，那么丢弃表格直接使用代码块
+				// Improve HTML parsing code blocks https://github.com/siyuan-note/siyuan/issues/11068
+				for table := tree.Context.Tip.Parent; nil != table; table = table.Parent {
+					if ast.NodeTable == table.Type {
+						if nil != table.FirstChild && table.FirstChild == table.LastChild && ast.NodeTableHead == table.FirstChild.Type &&
+							table.FirstChild.FirstChild == table.FirstChild.LastChild &&
+							nil != table.FirstChild.FirstChild.FirstChild && ast.NodeTableCell == table.FirstChild.FirstChild.FirstChild.Type {
+							table.InsertBefore(node)
+							table.Unlink()
+							tree.Context.Tip = node
+							return
+						}
+					}
+				}
+
+				// 表格中不支持添加块级元素，所以这里只能将其转换为多个行级代码元素
+				lines := bytes.Split(content.Tokens, []byte("\n"))
+				for i, line := range lines {
+					if 0 < len(line) {
+						code := &ast.Node{Type: ast.NodeCodeSpan}
+						code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})
+						code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: line})
+						code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
+						tree.Context.Tip.AppendChild(code)
+						if i < len(lines)-1 {
+							if tree.Context.ParseOption.ProtyleWYSIWYG {
+								tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeBr})
+							} else {
+								tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHardBreak, Tokens: []byte("\n")})
 							}
 						}
 					}
-
-					// 表格中不支持添加块级元素，所以这里只能将其转换为多个行级代码元素
-					lines := bytes.Split(content.Tokens, []byte("\n"))
-					for i, line := range lines {
-						if 0 < len(line) {
-							code := &ast.Node{Type: ast.NodeCodeSpan}
-							code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})
-							code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: line})
-							code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
-							tree.Context.Tip.AppendChild(code)
-							if i < len(lines)-1 {
-								if tree.Context.ParseOption.ProtyleWYSIWYG {
-									tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeBr})
-								} else {
-									tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHardBreak, Tokens: []byte("\n")})
-								}
-							}
-						}
-					}
-				} else {
-					tree.Context.Tip.AppendChild(node)
 				}
 			} else {
-				node.Type = ast.NodeHTMLBlock
-				node.Tokens = util.DomHTML(n)
 				tree.Context.Tip.AppendChild(node)
 			}
+		} else {
+			node.Type = ast.NodeHTMLBlock
+			node.Tokens = util.DomHTML(n)
+			tree.Context.Tip.AppendChild(node)
 		}
 		return
 	case atom.Em, atom.I:
@@ -739,6 +737,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		for strings.Contains(string(tokens), "\n\n") {
 			tokens = bytes.ReplaceAll(tokens, []byte("\n\n"), []byte("\n"))
 		}
+
+		for strings.Contains(string(tokens), "\n  ") {
+			tokens = bytes.ReplaceAll(tokens, []byte("\n  "), []byte("\n "))
+		}
+		tokens = bytes.ReplaceAll(tokens, []byte("\n "), []byte("\n"))
+
 		tokens = bytes.ReplaceAll(tokens, []byte("\n"), []byte(" "))
 		node.Tokens = tokens
 		tree.Context.Tip.AppendChild(node)
