@@ -319,6 +319,19 @@ func (n *Node) IsTextMarkType(typ string) bool {
 	return false
 }
 
+func (n *Node) IsNextSameInlineMemo() bool {
+	if nil == n {
+		return false
+	}
+
+	for ; nil != n; n = n.Next {
+		if NodeTextMark == n.Type && n.IsTextMarkType("inline-memo") && nil != n.Next && n.IsTextMarkType("inline-memo") {
+			return true
+		}
+	}
+	return false
+}
+
 func (n *Node) IsSameTextMarkType(node *Node) bool {
 	if "" == n.TextMarkType || "" == node.TextMarkType {
 		return false

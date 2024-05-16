@@ -218,6 +218,11 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 			r.WriteString("</a>")
 		} else if node.IsTextMarkType("inline-memo") {
 			r.WriteString(textContent)
+
+			if node.IsNextSameInlineMemo() {
+				return ast.WalkContinue
+			}
+
 			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 			if isCJK(lastRune) {
 				r.WriteString("<sup>（")

@@ -326,10 +326,15 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 				ret += " \"" + node.TextMarkTextContent + "\""
 				ret += ">>"
 			case "inline-memo":
-				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 				ret += node.TextMarkTextContent
+
+				if node.IsNextSameInlineMemo() {
+					return
+				}
+
 				content := node.TextMarkInlineMemoContent
 				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
+				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 				if isCJK(lastRune) {
 					ret += "<sup>（" + content + "）</sup>"
 				} else {
@@ -434,10 +439,15 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 		}
 	case "inline-memo":
 		if entering {
-			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 			ret += node.TextMarkTextContent
+
+			if node.IsNextSameInlineMemo() {
+				return
+			}
+
 			content := node.TextMarkInlineMemoContent
 			content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
+			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 			if isCJK(lastRune) {
 				ret += "<sup>（" + content + "）</sup>"
 			} else {

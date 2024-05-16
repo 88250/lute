@@ -255,6 +255,10 @@ func (r *ProtyleExportDocxRenderer) renderHTMLTag0(node *ast.Node, currentTextMa
 			r.WriteString(node.TextMarkTextContent)
 		}
 
+		if node.IsNextSameInlineMemo() {
+			return
+		}
+
 		lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
 		if isCJK(lastRune) {
 			if entering {
