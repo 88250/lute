@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"103", "<code class=\"docutils literal notranslate\"><span class=\"pre\">BeautifulSoup(markup,</span> <span class=\"pre\">\"lxml\")</span></code>", "`BeautifulSoup(markup, \"lxml\")`\n"},
 	{"102", "<code><code class=\"idl\"><a data-link-type=\"idl\" href=\"#node\" id=\"ref-for-node③⑧\" aria-expanded=\"false\">Node</a></code> . <code class=\"idl\"><a data-link-type=\"idl\" href=\"#dom-node-element_node\" id=\"ref-for-dom-node-element_node①\">ELEMENT_NODE</a></code></code>", "[`Node`](#node) . [`ELEMENT_NODE`](#dom-node-element_node)\n"},
 	{"101", "<p><code class=\"idl\"><a data-link-type=\"idl\" href=\"#dom-event-capturing_phase\" id=\"ref-for-dom-event-capturing_phase\" aria-expanded=\"false\">CAPTURING_PHASE</a></code> to <code class=\"idl\"><a data-link-type=\"idl\" href=\"#dom-event-bubbling_phase\" id=\"ref-for-dom-event-bubbling_phase\">BUBBLING_PHASE</a></code> </p>", "[`CAPTURING_PHASE`](#dom-event-capturing_phase) to [`BUBBLING_PHASE`](#dom-event-bubbling_phase)\n"},
 	{"100", "<h3 class=\"heading settled\" data-level=\"2.2\" id=\"interface-event\"><span class=\"secno\">2.2. </span><span class=\"content\">Interface <code class=\"idl\"><a data-link-type=\"idl\" href=\"#event\" id=\"ref-for-event①\">Event</a></code></span><a class=\"self-link\" href=\"#interface-event\"></a></h3>", "### 2.2. **Interface** [`Event`](#event)\n"},

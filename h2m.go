@@ -479,6 +479,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		allSpan := true
 		for c := n.FirstChild; nil != c; c = c.NextSibling {
+			if html.TextNode == c.Type {
+				continue
+			}
 			if atom.Span != c.DataAtom {
 				allSpan = false
 				break
