@@ -731,6 +731,22 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild {
 			return
 		}
+
+		// Improve HTML code element clipping https://github.com/siyuan-note/siyuan/issues/11401
+		if "code" == util.DomAttrValue(n, "data-type") {
+			if nil != tree.Context.Tip.LastChild && ast.NodeCodeSpan == tree.Context.Tip.LastChild.Type {
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
+			}
+
+			code := &ast.Node{Type: ast.NodeCodeSpan}
+			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})
+			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: util.StrToBytes(util.DomText(n))})
+			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
+			tree.Context.Tip.AppendChild(code)
+			tree.Context.Tip = code
+			defer tree.Context.ParentTip()
+			return
+		}
 	case atom.Font:
 		node.Type = ast.NodeText
 		tokens := []byte(util.DomText(n))
