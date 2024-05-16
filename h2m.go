@@ -124,6 +124,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				if nil == n.PrevSibling || nil == n.NextSibling {
 					break
 				}
+
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeBr})
 				break
 			} else {
@@ -174,7 +175,24 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div, atom.Section:
-		if lute.parentIs(n, atom.Table) || ast.NodeLink == tree.Context.Tip.Type {
+		if ast.NodeLink == tree.Context.Tip.Type {
+			break
+		}
+
+		if lute.parentIs(n, atom.Table) {
+			if nil == n.PrevSibling || nil == n.NextSibling {
+				break
+			}
+
+			if nil != n.PrevSibling && strings.Contains(n.PrevSibling.Data, "\n") {
+				break
+			}
+
+			if nil != n.NextSibling && strings.Contains(n.NextSibling.Data, "\n") {
+				break
+			}
+
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeBr})
 			break
 		}
 
