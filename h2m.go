@@ -120,10 +120,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			node.Type = ast.NodeLinkText
 		}
 		if lute.parentIs(n, atom.Table) {
-			if "" == strings.TrimSpace(n.Data) {
-				node.Tokens = []byte(" ")
-				tree.Context.Tip.AppendChild(node)
+			if "\n" == n.Data {
+				if nil == n.PrevSibling || nil == n.NextSibling {
+					break
+				}
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeBr})
 				break
+			} else {
+				if "" == strings.TrimSpace(n.Data) {
+					node.Tokens = []byte(" ")
+					tree.Context.Tip.AppendChild(node)
+					break
+				}
 			}
 			node.Tokens = bytes.TrimSpace(node.Tokens)
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte(" "))
