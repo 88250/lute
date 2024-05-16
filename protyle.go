@@ -955,6 +955,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeHTMLBlock
 		content := util.DomAttrValue(n.FirstChild.NextSibling.FirstChild, "data-content")
 		content = html.UnescapeHTMLStr(content)
+		content = html.UnescapeHTMLStr(content) // 这里要反转义两次，因为编辑器会对 HTML 实体进行转义
 		node.Tokens = util.StrToBytes(content)
 		tree.Context.Tip.AppendChild(node)
 		return
