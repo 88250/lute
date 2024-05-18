@@ -191,6 +191,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
+		if ast.NodeHeading == tree.Context.Tip.Type {
+			// h 下存在 div/p/section 则忽略分块
+			break
+		}
+
 		if atom.Div == n.DataAtom {
 			// 解析 GitHub 语法高亮代码块
 			class := util.DomAttrValue(n, "class")
@@ -549,8 +554,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.A:
 		node.Type = ast.NodeLink
 		text := util.DomText(n)
-		if "" == text && nil != n.Parent && (atom.H1 == n.Parent.DataAtom || atom.H2 == n.Parent.DataAtom || atom.H3 == n.Parent.DataAtom || atom.H4 == n.Parent.DataAtom || atom.H5 == n.Parent.DataAtom || atom.H6 == n.Parent.DataAtom || atom.Div == n.Parent.DataAtom) {
-			// 丢弃标题中文本为空的链接，这样的链接可能是锚点 https://github.com/Vanessa219/vditor/issues/359
+		if "" == text && nil != n.Parent && lute.parentIs(n, atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6, atom.Div, atom.Section) {
+			// 丢弃标题中文本为空的链接，这样的链接是没有锚文本的锚点
+			// https://github.com/Vanessa219/vditor/issues/359
+			// https://github.com/siyuan-note/siyuan/issues/11445
 			return
 		}
 		if "" == text && nil == n.FirstChild {
