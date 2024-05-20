@@ -805,6 +805,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					return
 				}
 			}
+			return
 		}
 	case atom.Font:
 		node.Type = ast.NodeText
@@ -836,6 +837,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Noscript:
 		return
+	case atom.Script:
+		if tex := util.DomText(n.FirstChild); "" != tex {
+			appendInlineMath(tree, tex)
+			return
+		}
 	case atom.Figcaption:
 		node.Type = ast.NodeParagraph
 		node.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
