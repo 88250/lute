@@ -782,10 +782,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		// The browser extension supports CSDN formula https://github.com/siyuan-note/siyuan/issues/5624
 		if strings.Contains(strings.ToLower(strings.TrimSpace(util.DomAttrValue(n, "class"))), "katex") {
-			if span := util.DomChildByTypeAndClass(n, atom.Span, "mord", "mathdefault"); nil != span {
+			if span := util.DomChildByTypeAndClass(n, atom.Span, "katex-mathml"); nil != span {
 				if tex := util.DomText(span.FirstChild); "" != tex {
-					appendInlineMath(tree, tex)
-					return
+					tex = strings.TrimSpace(tex)
+					for strings.Contains(tex, "\n ") {
+						tex = strings.ReplaceAll(tex, "\n ", "\n")
+					}
+					// 根据最后 4 个换行符分隔公式内容
+					if idx := strings.LastIndex(tex, "\n\n\n\n"); 0 < idx {
+						tex = tex[idx+4:]
+						tex = strings.TrimSpace(tex)
+						appendInlineMath(tree, tex)
+						return
+					}
 				}
 			}
 		}
