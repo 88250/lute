@@ -81,6 +81,27 @@ func DomChildByType(n *html.Node, dataAtom atom.Atom) *html.Node {
 	return nil
 }
 
+func DomChildByTypeAndClass(n *html.Node, dataAtom atom.Atom, class ...string) *html.Node {
+	if nil == n {
+		return nil
+	}
+
+	if n.DataAtom == dataAtom {
+		for _, c := range class {
+			if strings.Contains(DomAttrValue(n, "class"), c) {
+				return n
+			}
+		}
+	}
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		ret := DomChildByTypeAndClass(c, dataAtom, class...)
+		if nil != ret {
+			return ret
+		}
+	}
+	return nil
+}
+
 func DomChildrenByType(n *html.Node, dataAtom atom.Atom) (ret []*html.Node) {
 	// 递归遍历所有子节点
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
@@ -90,6 +111,25 @@ func DomChildrenByType(n *html.Node, dataAtom atom.Atom) (ret []*html.Node) {
 		ret = append(ret, DomChildrenByType(c, dataAtom)...)
 	}
 	return
+}
+
+func DomExistChildByType(n *html.Node, dataAtom ...atom.Atom) bool {
+	if nil == n {
+		return false
+	}
+
+	for _, a := range dataAtom {
+		if nil != DomChildByType(n, a) {
+			return true
+		}
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		if DomExistChildByType(c, dataAtom...) {
+			return true
+		}
+	}
+	return false
 }
 
 func DomHTML(n *html.Node) []byte {

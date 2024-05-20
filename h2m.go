@@ -196,9 +196,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
+		class := util.DomAttrValue(n, "class")
 		if atom.Div == n.DataAtom {
 			// 解析 GitHub 语法高亮代码块
-			class := util.DomAttrValue(n, "class")
 			language := ""
 			if strings.Contains(class, "-source-") {
 				language = class[strings.LastIndex(class, "-source-")+len("-source-"):]
@@ -219,7 +219,26 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				tree.Context.Tip.AppendChild(node)
 				return
 			}
+
+			// The browser extension supports CSDN formula https://github.com/siyuan-note/siyuan/issues/5624
+			if strings.Contains(class, "MathJax") && nil != n.NextSibling && atom.Script == n.NextSibling.DataAtom && strings.Contains(util.DomAttrValue(n.NextSibling, "type"), "math/tex") {
+				tex := util.DomText(n.NextSibling)
+				appendMathBlock(tree, tex)
+				n.NextSibling.Unlink()
+				return
+			}
 		}
+
+		if strings.Contains(strings.ToLower(class), "mathjax") {
+			return
+		}
+
+		if "" == strings.TrimSpace(util.DomText(n)) {
+			if !util.DomExistChildByType(n, atom.Img, atom.Picture) {
+				return
+			}
+		}
+
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -757,14 +776,26 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		// The browser extension supports Zhihu formula https://github.com/siyuan-note/siyuan/issues/5599
 		if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex {
-			inlineMath := &ast.Node{Type: ast.NodeInlineMath}
-			inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker, Tokens: []byte("$")})
-			inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(tex)})
-			inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker, Tokens: []byte("$")})
-			tree.Context.Tip.AppendChild(inlineMath)
-			tree.Context.Tip = inlineMath
-			defer tree.Context.ParentTip()
+			appendInlineMath(tree, tex)
 			return
+		}
+
+		// The browser extension supports CSDN formula https://github.com/siyuan-note/siyuan/issues/5624
+		if strings.Contains(strings.ToLower(strings.TrimSpace(util.DomAttrValue(n, "class"))), "katex") {
+			if span := util.DomChildByTypeAndClass(n, atom.Span, "mord", "mathdefault"); nil != span {
+				if tex := util.DomText(span.FirstChild); "" != tex {
+					appendInlineMath(tree, tex)
+					return
+				}
+			}
+		}
+		if strings.Contains(strings.ToLower(strings.TrimSpace(util.DomAttrValue(n, "class"))), "mathjax") {
+			if script := util.DomChildByType(n, atom.Script); nil != script {
+				if tex := util.DomText(script.FirstChild); "" != tex {
+					appendInlineMath(tree, tex)
+					return
+				}
+			}
 		}
 	case atom.Font:
 		node.Type = ast.NodeText
@@ -850,6 +881,36 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}
+}
+
+func appendInlineMath(tree *parse.Tree, tex string) {
+	tex = strings.TrimSpace(tex)
+	if "" == tex {
+		return
+	}
+
+	inlineMath := &ast.Node{Type: ast.NodeInlineMath}
+	inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker, Tokens: []byte("$")})
+	inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(tex)})
+	inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker, Tokens: []byte("$")})
+	tree.Context.Tip.AppendChild(inlineMath)
+	tree.Context.Tip = inlineMath
+	defer tree.Context.ParentTip()
+}
+
+func appendMathBlock(tree *parse.Tree, tex string) {
+	tex = strings.TrimSpace(tex)
+	if "" == tex {
+		return
+	}
+
+	mathBlock := &ast.Node{Type: ast.NodeMathBlock}
+	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker, Tokens: []byte("$$")})
+	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: util.StrToBytes(tex)})
+	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: []byte("$$")})
+	tree.Context.Tip.AppendChild(mathBlock)
+	tree.Context.Tip = mathBlock
+	defer tree.Context.ParentTip()
 }
 
 func appendSpace(n *html.Node, tree *parse.Tree, lute *Lute) {
