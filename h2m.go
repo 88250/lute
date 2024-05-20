@@ -754,6 +754,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			defer tree.Context.ParentTip()
 			return
 		}
+
+		// The browser extension supports Zhihu formula https://github.com/siyuan-note/siyuan/issues/5599
+		if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex {
+			inlineMath := &ast.Node{Type: ast.NodeInlineMath}
+			inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker, Tokens: []byte("$")})
+			inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: util.StrToBytes(tex)})
+			inlineMath.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker, Tokens: []byte("$")})
+			tree.Context.Tip.AppendChild(inlineMath)
+			tree.Context.Tip = inlineMath
+			defer tree.Context.ParentTip()
+			return
+		}
 	case atom.Font:
 		node.Type = ast.NodeText
 		tokens := []byte(util.DomText(n))
