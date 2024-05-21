@@ -11,6 +11,7 @@
 package parse
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/88250/lute/ast"
@@ -54,7 +55,8 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 				return ast.WalkContinue
 			}
 			n.InsertBefore(img)
-			if nil == n.ChildByType(ast.NodeLinkText) {
+			linkText := n.ChildByType(ast.NodeLinkText)
+			if nil == linkText || 1 > len(bytes.TrimSpace(linkText.Tokens)) {
 				if openBracket := n.ChildByType(ast.NodeOpenBracket); nil != openBracket {
 					if dest := n.ChildByType(ast.NodeLinkDest); nil != dest {
 						openBracket.InsertAfter(&ast.Node{Type: ast.NodeLinkText, Tokens: dest.Tokens})
@@ -220,7 +222,8 @@ func NestedInlines2FlattedSpans(tree *Tree, isExportMd bool) {
 				return ast.WalkContinue
 			}
 			n.InsertBefore(img)
-			if nil == n.ChildByType(ast.NodeLinkText) {
+			linkText := n.ChildByType(ast.NodeLinkText)
+			if nil == linkText || 1 > len(bytes.TrimSpace(linkText.Tokens)) {
 				if openBracket := n.ChildByType(ast.NodeOpenBracket); nil != openBracket {
 					if dest := n.ChildByType(ast.NodeLinkDest); nil != dest {
 						openBracket.InsertAfter(&ast.Node{Type: ast.NodeLinkText, Tokens: dest.Tokens})

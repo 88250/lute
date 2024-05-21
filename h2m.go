@@ -572,8 +572,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.A:
 		node.Type = ast.NodeLink
-		text := util.DomText(n)
-		if "" == text && nil != n.Parent && lute.parentIs(n, atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6, atom.Div, atom.Section) {
+		text := strings.TrimSpace(util.DomText(n))
+		if "" == text && nil != n.Parent && lute.parentIs(n, atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6, atom.Div, atom.Section) && nil == util.DomChildByType(n, atom.Img) {
 			// 丢弃标题中文本为空的链接，这样的链接是没有锚文本的锚点
 			// https://github.com/Vanessa219/vditor/issues/359
 			// https://github.com/siyuan-note/siyuan/issues/11445
