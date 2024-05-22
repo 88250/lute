@@ -324,10 +324,20 @@ func (n *Node) IsNextSameInlineMemo() bool {
 		return false
 	}
 
-	for ; nil != n; n = n.Next {
-		if NodeTextMark == n.Type && n.IsTextMarkType("inline-memo") && nil != n.Next && n.IsTextMarkType("inline-memo") {
-			return true
+	var nextInlineMemo *Node
+	for node := n.Next; nil != node; node = node.Next {
+		if nil == n.Next || NodeKramdownSpanIAL == node.Type || nil == node.Next || NodeKramdownSpanIAL == node.Next.Type {
+			continue
 		}
+
+		if NodeTextMark == node.Type && node.IsTextMarkType("inline-memo") {
+			nextInlineMemo = node
+			break
+		}
+	}
+
+	if nil != nextInlineMemo && n.TextMarkInlineMemoContent == nextInlineMemo.TextMarkInlineMemoContent {
+		return true
 	}
 	return false
 }
