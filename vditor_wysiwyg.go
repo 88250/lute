@@ -214,6 +214,31 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 		lute.adjustVditorDOMCodeA(c)
 		c = next
 	}
+
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
+		lute.mergeSameStrong(c)
+	}
+}
+
+func (lute *Lute) mergeSameStrong(n *html.Node) {
+	for c := n.FirstChild; nil != c; {
+		next := c.NextSibling
+		if nil != next && atom.Strong == c.DataAtom && atom.Strong == next.DataAtom {
+			for cc := next.FirstChild; nil != cc; {
+				nextChild := cc.NextSibling
+				cc.Unlink()
+				c.AppendChild(cc)
+				cc = nextChild
+			}
+			next.Unlink()
+			next = c.NextSibling
+		}
+		c = next
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		lute.mergeSameStrong(c)
+	}
 }
 
 // adjustVditorDOMListList 用于将 ul.ul 调整为 ul.li.ul。
