@@ -425,7 +425,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 			buf := &bytes.Buffer{}
 			buf.WriteString(util.DomText(n))
-			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()}
+			tokens := buf.Bytes()
+			tokens = bytes.ReplaceAll(tokens, []byte("\u00A0"), []byte(" "))
+			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: tokens}
 			node.AppendChild(content)
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
 

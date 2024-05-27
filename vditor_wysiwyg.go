@@ -218,6 +218,49 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.mergeSameStrong(c)
 	}
+
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustTableCode(c)
+	}
+}
+
+func (lute *Lute) adjustTableCode(n *html.Node) {
+	if atom.Table == n.DataAtom {
+		// 表格类型的代码块进行预处理 https://github.com/siyuan-note/siyuan/issues/11540
+		// 移除 <td class="gutter">
+		// td class="code"> 下的 <div class="container"> 改为 <pre>
+
+		tds := util.DomChildrenByType(n, atom.Td)
+		var unlinks []*html.Node
+		for _, td := range tds {
+			tdClass := util.DomAttrValue(td, "class")
+			if strings.Contains(tdClass, "gutter") {
+				unlinks = append(unlinks, td)
+				continue
+			}
+
+			if strings.Contains(tdClass, "code") {
+				if c := td.FirstChild; nil != c && atom.Div == c.DataAtom {
+					c.DataAtom = atom.Pre
+					c.Data = "pre"
+					lang := util.DomAttrValue(n, "class")
+					lang = strings.ReplaceAll(lang, "syntaxhighlighter", "")
+					lang = strings.TrimSpace(lang)
+					if "" != lang {
+						util.SetDomAttrValue(c, "class", lang)
+					}
+					for div := c.FirstChild; nil != div; div = div.NextSibling {
+						div.DataAtom = atom.Code
+						div.Data = "code"
+					}
+				}
+			}
+		}
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustTableCode(c)
+	}
 }
 
 func (lute *Lute) mergeSameStrong(n *html.Node) {

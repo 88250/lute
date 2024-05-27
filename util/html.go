@@ -206,6 +206,21 @@ func IsTempMarkSpan(n *html.Node) bool {
 
 }
 
+func SetDomAttrValue(n *html.Node, attrName, attrVal string) {
+	if nil == n {
+		return
+	}
+
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			attr.Val = attrVal
+			return
+		}
+	}
+
+	n.Attr = append(n.Attr, &html.Attribute{Key: attrName, Val: attrVal})
+}
+
 func DomAttrValue(n *html.Node, attrName string) string {
 	if nil == n {
 		return ""
