@@ -480,6 +480,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			break
 		}
 
+		if ast.NodeEmphasis == tree.Context.Tip.Type || tree.Context.Tip.ParentIs(ast.NodeEmphasis) {
+			break
+		}
+
 		if nil != tree.Context.Tip.LastChild && (ast.NodeStrong == tree.Context.Tip.LastChild.Type || ast.NodeEmphasis == tree.Context.Tip.LastChild.Type) {
 			// 在两个相邻的加粗或者斜体之间插入零宽空格，避免标记符重复
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
@@ -494,6 +498,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Strong, atom.B:
 		text := util.DomText(n)
 		if "" == strings.TrimSpace(text) {
+			break
+		}
+
+		if ast.NodeStrong == tree.Context.Tip.Type || tree.Context.Tip.ParentIs(ast.NodeStrong) {
 			break
 		}
 
