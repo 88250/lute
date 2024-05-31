@@ -578,7 +578,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.A:
 		node.Type = ast.NodeLink
 		text := strings.TrimSpace(util.DomText(n))
-		if "" == text && nil != n.Parent && lute.parentIs(n, atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6, atom.Div, atom.Section) && nil == util.DomChildByType(n, atom.Img) {
+		if "" == text && nil != n.Parent && lute.parentIs(n, atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6, atom.Div, atom.Section) && nil == util.DomChildrenByType(n, atom.Img) {
 			// 丢弃标题中文本为空的链接，这样的链接是没有锚文本的锚点
 			// https://github.com/Vanessa219/vditor/issues/359
 			// https://github.com/siyuan-note/siyuan/issues/11445
@@ -727,7 +727,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		table := n.Parent.Parent
 		node.Type = ast.NodeTableRow
 
-		if nil == tree.Context.Tip.ChildByType(ast.NodeTableHead) && nil == util.DomChildByType(table, atom.Thead) {
+		if nil == tree.Context.Tip.ChildByType(ast.NodeTableHead) && 1 > len(util.DomChildrenByType(table, atom.Thead)) {
 			// 补全 thread 节点
 			thead := &ast.Node{Type: ast.NodeTableHead}
 			tree.Context.Tip.AppendChild(thead)
@@ -804,7 +804,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 		if strings.Contains(strings.ToLower(strings.TrimSpace(util.DomAttrValue(n, "class"))), "mathjax") {
-			if script := util.DomChildByType(n, atom.Script); nil != script {
+			scripts := util.DomChildrenByType(n, atom.Script)
+			if 0 < len(scripts) {
+				script := scripts[0]
 				if tex := util.DomText(script.FirstChild); "" != tex {
 					appendInlineMath(tree, tex)
 					return
@@ -848,16 +850,20 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 	case atom.Figcaption:
-		node.Type = ast.NodeParagraph
-		node.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
-		node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
-		tree.Context.Tip.AppendChild(node)
-		return
+		if tree.Context.Tip.IsContainerBlock() {
+			node.Type = ast.NodeParagraph
+			node.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
 	case atom.Figure:
-		node.Type = ast.NodeParagraph
-		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
+		if tree.Context.Tip.IsContainerBlock() {
+			node.Type = ast.NodeParagraph
+			tree.Context.Tip.AppendChild(node)
+			tree.Context.Tip = node
+			defer tree.Context.ParentTip()
+		}
 	default:
 	}
 

@@ -72,15 +72,6 @@ func GetTextMarkFileAnnotationRefData(n *html.Node) (id string) {
 	return
 }
 
-func DomChildByType(n *html.Node, dataAtom atom.Atom) *html.Node {
-	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		if c.DataAtom == dataAtom {
-			return c
-		}
-	}
-	return nil
-}
-
 func DomChildByTypeAndClass(n *html.Node, dataAtom atom.Atom, class ...string) *html.Node {
 	if nil == n {
 		return nil
@@ -119,7 +110,7 @@ func DomExistChildByType(n *html.Node, dataAtom ...atom.Atom) bool {
 	}
 
 	for _, a := range dataAtom {
-		if nil != DomChildByType(n, a) {
+		if nil != domChildByType(n, a) {
 			return true
 		}
 	}
@@ -130,6 +121,15 @@ func DomExistChildByType(n *html.Node, dataAtom ...atom.Atom) bool {
 		}
 	}
 	return false
+}
+
+func domChildByType(n *html.Node, dataAtom atom.Atom) *html.Node {
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		if c.DataAtom == dataAtom {
+			return c
+		}
+	}
+	return nil
 }
 
 func DomHTML(n *html.Node) []byte {
