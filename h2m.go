@@ -99,6 +99,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
+	if strings.Contains(class, "mw-editsection") {
+		// 忽略 Wikipedia [编辑] Do not clip the `Edit` element next to Wikipedia headings https://github.com/siyuan-note/siyuan/issues/11600
+		return
+	}
+
 	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			lute.genASTByDOM(c, tree)
