@@ -223,6 +223,7 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 		lute.adjustTableCode(c)
 	}
 
+	// The browser extension supports Wikipedia formula clipping https://github.com/siyuan-note/siyuan/issues/11583
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustWikipediaMath(c)
 	}
@@ -234,6 +235,14 @@ func (lute *Lute) adjustWikipediaMath(n *html.Node) {
 			anno := annos[0]
 			if "application/x-tex" == util.DomAttrValue(anno, "encoding") {
 				util.SetDomAttrValue(n, "data-tex", util.DomText(anno))
+				return
+			}
+		}
+
+		if imgs := util.DomChildrenByType(n, atom.Img); 0 < len(imgs) {
+			img := imgs[0]
+			if mathContent := util.DomAttrValue(img, "alt"); "" != mathContent {
+				util.SetDomAttrValue(n, "data-tex", mathContent)
 				return
 			}
 		}
