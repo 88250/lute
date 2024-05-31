@@ -222,6 +222,26 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustTableCode(c)
 	}
+
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustWikipediaMath(c)
+	}
+}
+
+func (lute *Lute) adjustWikipediaMath(n *html.Node) {
+	if atom.Span == n.DataAtom && "mwe-math-element" == util.DomAttrValue(n, "class") {
+		if annos := util.DomChildrenByType(n, atom.Annotation); 0 < len(annos) {
+			anno := annos[0]
+			if "application/x-tex" == util.DomAttrValue(anno, "encoding") {
+				util.SetDomAttrValue(n, "data-tex", util.DomText(anno))
+				return
+			}
+		}
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustWikipediaMath(c)
+	}
 }
 
 func (lute *Lute) adjustTableCode(n *html.Node) {
