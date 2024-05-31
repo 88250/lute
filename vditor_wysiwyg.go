@@ -230,7 +230,8 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 }
 
 func (lute *Lute) adjustWikipediaMath(n *html.Node) {
-	if atom.Span == n.DataAtom && "mwe-math-element" == util.DomAttrValue(n, "class") {
+	class := util.DomAttrValue(n, "class")
+	if atom.Span == n.DataAtom && strings.Contains(class, "mwe-math-element") || strings.Contains(class, "tex") {
 		if annos := util.DomChildrenByType(n, atom.Annotation); 0 < len(annos) {
 			anno := annos[0]
 			if "application/x-tex" == util.DomAttrValue(anno, "encoding") {
