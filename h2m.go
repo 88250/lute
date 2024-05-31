@@ -234,7 +234,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		if "" == strings.TrimSpace(util.DomText(n)) {
-			if !util.DomExistChildByType(n, atom.Img, atom.Picture) {
+			if !util.DomExistChildByType(n, atom.Img, atom.Picture, atom.Annotation) {
 				return
 			}
 		}
