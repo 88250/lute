@@ -1271,11 +1271,6 @@ func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 			}
 		}
 
-		if node.ParentIs(ast.NodeTableCell) {
-			tokens = bytes.ReplaceAll(tokens, []byte("\\|"), []byte("|"))
-			tokens = bytes.ReplaceAll(tokens, []byte("|"), []byte("&#124;"))
-		}
-
 		r.Write(tokens)
 	}
 	return ast.WalkContinue
