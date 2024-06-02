@@ -231,7 +231,7 @@ func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkS
 		textContent := node.TextMarkTextContent
 		if node.ParentIs(ast.NodeTableCell) {
 			textContent = strings.ReplaceAll(textContent, "\\|", "|")
-			textContent = strings.ReplaceAll(textContent, "|", "\\|")
+			textContent = strings.ReplaceAll(textContent, "|", "&#124;")
 			textContent = strings.ReplaceAll(textContent, "\n", "<br/>")
 			if strings.Contains(node.TextMarkType, "code") {
 				textContent = strings.ReplaceAll(textContent, "<br/>", "")
