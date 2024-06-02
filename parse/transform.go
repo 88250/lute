@@ -231,6 +231,10 @@ func NestedInlines2FlattedSpans(tree *Tree, isExportMd bool) {
 				}
 			}
 		} else if ast.NodeBackslash == n.Type {
+			if n.ParentIs(ast.NodeTableCell) {
+				return ast.WalkContinue
+			}
+
 			// 不再需要反斜杠转义节点
 			if c := n.FirstChild; nil != c {
 				tokens := html.UnescapeHTML(c.Tokens)
@@ -261,7 +265,9 @@ func NestedInlines2FlattedSpans(tree *Tree, isExportMd bool) {
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		switch n.Type {
 		case ast.NodeBackslash:
-			unlinks = append(unlinks, n)
+			if !n.ParentIs(ast.NodeTableCell) {
+				unlinks = append(unlinks, n)
+			}
 		case ast.NodeCodeSpan:
 			processNestedNode(n, "code", &tags, &unlinks, entering)
 		case ast.NodeTag:

@@ -143,8 +143,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 			node.Tokens = bytes.TrimSpace(node.Tokens)
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte(" "))
-			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\\|"), []byte("|"))
-			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("|"), []byte("&#124;"))
 		}
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
 
@@ -163,6 +161,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			node.Tokens = lex.EscapeProtyleMarkers(node.Tokens)
 		} else {
 			node.Tokens = lex.EscapeMarkers(node.Tokens)
+			if lute.parentIs(n, atom.Table) {
+				node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\\|"), []byte("|"))
+				node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("|"), []byte("\\|"))
+			}
 		}
 		if nil != tree.Context.Tip && tree.Context.Tip.IsBlock() && nil != n.Parent && atom.Span != n.Parent.DataAtom && 1 > len(lex.TrimWhitespace(node.Tokens)) {
 			// 块级节点下非 span 包裹需要忽略空白
