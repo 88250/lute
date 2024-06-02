@@ -227,6 +227,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				n.NextSibling.Unlink()
 				return
 			}
+
+			// The browser extension supports Wikipedia formula clipping https://github.com/siyuan-note/siyuan/issues/11583
+			if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex {
+				appendMathBlock(tree, tex)
+				return
+			}
 		}
 
 		if strings.Contains(strings.ToLower(class), "mathjax") {
