@@ -97,6 +97,9 @@ func HtmlBlockContinue(html *ast.Node, context *Context) int {
 	tokens := context.currentLine
 	if context.ParseOption.KramdownBlockIAL && simpleCheckIsBlockIAL(tokens) {
 		// 判断 IAL 打断
+		if context.Tip.ParentIs(ast.NodeListItem) {
+			_, tokens = lex.TrimLeft(tokens)
+		}
 		if ial := context.parseKramdownBlockIAL(tokens); 0 < len(ial) {
 			context.Tip.ID = IAL2Map(ial)["id"]
 			context.Tip.KramdownIAL = ial
