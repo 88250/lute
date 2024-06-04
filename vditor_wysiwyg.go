@@ -249,6 +249,13 @@ func (lute *Lute) adjustWikipediaMath(n *html.Node) {
 		}
 	}
 
+	if strings.Contains(class, "texhtml") {
+		if mathContent := util.DomText(n); "" != mathContent {
+			util.SetDomAttrValue(n, "data-tex", mathContent)
+			return
+		}
+	}
+
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustWikipediaMath(c)
 	}
