@@ -286,6 +286,10 @@ func (lute *Lute) adjustTableCode(n *html.Node) {
 				}
 			}
 		}
+
+		for _, unlink := range unlinks {
+			unlink.Unlink()
+		}
 	}
 
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
