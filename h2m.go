@@ -104,6 +104,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
+	if strings.Contains(class, "citation-comment") {
+		// 忽略 Wikipedia 引用中的注释 https://github.com/siyuan-note/siyuan/issues/11640
+		return
+	}
+
 	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			lute.genASTByDOM(c, tree)
@@ -173,7 +178,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		tree.Context.Tip.AppendChild(node)
-	case atom.P, atom.Div, atom.Section:
+	case atom.P, atom.Div, atom.Section, atom.Dd:
 		if ast.NodeLink == tree.Context.Tip.Type {
 			break
 		}
@@ -654,7 +659,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 
-			// 为维基百科 svg 优化
+			// 为 Wikipedia svg 优化
 			if strings.Contains(src, "wikipedia/commons/thumb/") && strings.Contains(src, ".svg.png") && strings.Contains(src, ".svg/") {
 				src = strings.ReplaceAll(src, "/commons/thumb/", "/commons/")
 				src = strings.ReplaceAll(src, ".svg.png", ".svg")
