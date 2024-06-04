@@ -171,11 +171,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("|"), []byte("\\|"))
 			}
 		}
-		if nil != tree.Context.Tip && tree.Context.Tip.IsBlock() && nil != n.Parent && atom.Span != n.Parent.DataAtom && 1 > len(lex.TrimWhitespace(node.Tokens)) {
-			// 块级节点下非 span 包裹需要忽略空白
-			// 剪藏时列表下方块缩进不正确 https://github.com/siyuan-note/siyuan/issues/6650
-			return
-		}
 
 		tree.Context.Tip.AppendChild(node)
 	case atom.P, atom.Div, atom.Section, atom.Dd:
