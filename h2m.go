@@ -249,6 +249,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
+		if tree.Context.Tip.IsBlock() && !tree.Context.Tip.IsContainerBlock() {
+			tree.Context.ParentTip()
+		}
+
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -649,6 +653,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					}
 				}
 			}
+
+			// 为维基百科 svg 优化
+			if strings.Contains(src, "wikipedia/commons/thumb/") && strings.Contains(src, ".svg.png") && strings.Contains(src, ".svg/") {
+				src = strings.ReplaceAll(src, "/commons/thumb/", "/commons/")
+				src = strings.ReplaceAll(src, ".svg.png", ".svg")
+				idx := strings.Index(src, ".svg/")
+				src = src[:idx+4]
+			}
+
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
 			linkTitle := util.DomAttrValue(n, "title")
 			if "" != linkTitle {
@@ -865,20 +878,23 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 	case atom.Figcaption:
-		if tree.Context.Tip.IsContainerBlock() {
-			node.Type = ast.NodeParagraph
-			node.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
-			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
-			tree.Context.Tip.AppendChild(node)
-			return
+		if tree.Context.Tip.IsBlock() {
+			break
 		}
+
+		node.Type = ast.NodeParagraph
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.Tip.AppendChild(node)
 	case atom.Figure:
-		if tree.Context.Tip.IsContainerBlock() {
-			node.Type = ast.NodeParagraph
-			tree.Context.Tip.AppendChild(node)
-			tree.Context.Tip = node
-			defer tree.Context.ParentTip()
+		if tree.Context.Tip.IsBlock() {
+			break
 		}
+
+		node.Type = ast.NodeParagraph
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	default:
 	}
 

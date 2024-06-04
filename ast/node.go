@@ -790,11 +790,16 @@ func (n *Node) List() (ret []*Node) {
 // ParentIs 判断 n 的类型是否在指定的 nodeTypes 类型列表内。
 func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 	types := append(nodeTypes, nodeType)
+	deep := 0
 	for p := n.Parent; nil != p; p = p.Parent {
 		for _, pt := range types {
 			if pt == p.Type {
 				return true
 			}
+		}
+		deep++
+		if 128 < deep {
+			break
 		}
 	}
 	return false
