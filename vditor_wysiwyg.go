@@ -223,7 +223,6 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 		lute.adjustTableCode(c)
 	}
 
-	// The browser extension supports Wikipedia formula clipping https://github.com/siyuan-note/siyuan/issues/11583
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustMath(c)
 	}
