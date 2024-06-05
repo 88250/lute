@@ -884,7 +884,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Script:
 		if tex := util.DomText(n.FirstChild); "" != tex {
-			appendInlineMath(tree, tex)
+			if tree.Context.Tip.IsContainerBlock() {
+				appendMathBlock(tree, tex)
+			} else {
+				appendInlineMath(tree, tex)
+			}
 			return
 		}
 	case atom.Figcaption:

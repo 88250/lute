@@ -225,11 +225,11 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 
 	// The browser extension supports Wikipedia formula clipping https://github.com/siyuan-note/siyuan/issues/11583
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
-		lute.adjustWikipediaMath(c)
+		lute.adjustMath(c)
 	}
 }
 
-func (lute *Lute) adjustWikipediaMath(n *html.Node) {
+func (lute *Lute) adjustMath(n *html.Node) {
 	class := util.DomAttrValue(n, "class")
 	if ((atom.Span == n.DataAtom || atom.Div == n.DataAtom) && strings.Contains(class, "mwe-math-element")) || strings.Contains(class, "tex") {
 		if annos := util.DomChildrenByType(n, atom.Annotation); 0 < len(annos) {
@@ -256,8 +256,20 @@ func (lute *Lute) adjustWikipediaMath(n *html.Node) {
 		}
 	}
 
+	if strings.Contains(class, "math") {
+		scripts := util.DomChildrenByType(n, atom.Script)
+		if 0 < len(scripts) {
+			script := scripts[0]
+			if "math/tex" == util.DomAttrValue(script, "type") {
+				if mathContent := util.DomText(script); "" != mathContent {
+					util.SetDomAttrValue(n, "data-tex", mathContent)
+				}
+			}
+		}
+	}
+
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		lute.adjustWikipediaMath(c)
+		lute.adjustMath(c)
 	}
 }
 
