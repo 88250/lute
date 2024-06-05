@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"path"
 	"strings"
 	"unicode"
 
@@ -608,6 +609,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if nil != n.FirstChild && atom.Img == n.FirstChild.DataAtom && strings.Contains(util.DomAttrValue(n.FirstChild, "src"), "wikimedia.org") {
+			// Wikipedia 链接嵌套图片的情况只保留图片
+			break
+		}
+
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -654,12 +660,16 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 
-			// 为 Wikipedia svg 优化
-			if strings.Contains(src, "wikipedia/commons/thumb/") && strings.Contains(src, ".svg.png") && strings.Contains(src, ".svg/") {
-				src = strings.ReplaceAll(src, "/commons/thumb/", "/commons/")
-				src = strings.ReplaceAll(src, ".svg.png", ".svg")
-				idx := strings.Index(src, ".svg/")
-				src = src[:idx+4]
+			// Wikipedia 使用图片原图 https://github.com/siyuan-note/siyuan/issues/11640
+			if strings.Contains(src, "wikipedia/commons/thumb/") {
+				ext := path.Ext(src)
+				if strings.Contains(src, ".svg.png") {
+					ext = ".svg"
+				}
+				if idx := strings.Index(src, ext+"/"); 0 < idx {
+					src = src[:idx+len(ext)]
+					src = strings.ReplaceAll(src, "/commons/thumb/", "/commons/")
+				}
 			}
 
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
