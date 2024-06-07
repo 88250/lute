@@ -897,7 +897,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 	case atom.Figcaption:
 		if tree.Context.Tip.IsBlock() {
-			break
+			if ast.NodeDocument != tree.Context.Tip.Type {
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
+				break
+			}
 		}
 
 		node.Type = ast.NodeParagraph
@@ -905,10 +908,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.Tip.AppendChild(node)
 	case atom.Figure:
-		if tree.Context.Tip.IsBlock() {
-			break
-		}
-
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
