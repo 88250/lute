@@ -18,6 +18,7 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"139", "<div id=\"readability-page-1\" class=\"page\">\n    <div class=\"tablet:max-xl:w-mid-content xl:w-content flex\" id=\"post-content\">\n        <div class=\" post-body text-gray-text xl:col-start-1 xl:order-4 order-4 text-lg\">\n            <p><img src=\"https://test.com/foo.png\"\n                    width=\"640\" height=\"366\" alt=\"bar\"></p>\n            <p>baz\n            </p>\n        </div>\n    </div>\n</div>", "![bar](https://test.com/foo.png)\n\nbaz\n"},
 	{"138", "<code class=\"samp docutils literal notranslate\"><em><span class=\"pre\">package_name</span></em><span class=\"pre\">-</span><em><span class=\"pre\">version</span></em><span class=\"pre\">-</span><em><span class=\"pre\">python_tag</span></em><span class=\"pre\">-</span><em><span class=\"pre\">abi_tag</span></em><span class=\"pre\">-</span><em><span class=\"pre\">platform_tag</span></em><span class=\"pre\">.whl</span></code>", "`package_name-version-python_tag-abi_tag-platform_tag.whl`\n"},
 	{"137", "<div><figure>foo<figcaption>bar</figcaption></figure><figure>foo1<figcaption>bar1</figcaption></figure><p>baz</p></div>", "foo\nbar\n\nfoo1\nbar1\n\n\nbaz\n"},
 	{"136", "<figure>foo<figcaption>bar</figcaption></figure><p>baz</p>", "foo\nbar\n\nbaz\n"},
