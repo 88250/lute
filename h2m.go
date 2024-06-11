@@ -555,6 +555,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			if html.TextNode == c.Type {
 				continue
 			}
+			if atom.Em == c.DataAtom || atom.Strong == c.DataAtom {
+				// https://github.com/siyuan-note/siyuan/issues/11682
+				continue
+			}
 			if atom.Span != c.DataAtom {
 				allSpan = false
 				break
