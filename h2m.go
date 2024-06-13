@@ -166,7 +166,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if lute.ParseOptions.ProtyleWYSIWYG {
 			node.Tokens = lex.EscapeProtyleMarkers(node.Tokens)
 		} else {
-			node.Tokens = lex.EscapeMarkers(node.Tokens)
+			node.Tokens = lex.EscapeCommonMarkers(node.Tokens)
 			if lute.parentIs(n, atom.Table) {
 				node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\\|"), []byte("|"))
 				node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("|"), []byte("\\|"))

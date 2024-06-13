@@ -414,7 +414,7 @@ func RepeatBackslashBeforePipe(content string) string {
 	return buf.String()
 }
 
-func EscapeMarkers(tokens []byte) []byte {
+func EscapeCommonMarkers(tokens []byte) []byte {
 	for i := 0; i < len(tokens); i++ {
 		if IsCommonInlineMarker(tokens[i]) {
 			remains := append([]byte{ItemBackslash}, tokens[i:]...)

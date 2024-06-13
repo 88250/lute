@@ -141,6 +141,47 @@ func DomHTML(n *html.Node) []byte {
 	return bytes.ReplaceAll(buf.Bytes(), []byte(editor.Zwsp), nil)
 }
 
+func DomTexhtml(n *html.Node) string {
+	buf := &bytes.Buffer{}
+	if html.TextNode == n.Type {
+		buf.WriteString(n.Data)
+		return buf.String()
+	}
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		domTexhtml0(child, buf)
+	}
+	return buf.String()
+}
+
+func domTexhtml0(n *html.Node, buffer *bytes.Buffer) {
+	if nil == n {
+		return
+	}
+
+	switch n.DataAtom {
+	case 0:
+		buffer.WriteString(escapeMathSymbol(n.Data))
+		return
+	case atom.Sup:
+		buffer.WriteString("^")
+	case atom.Sub:
+		buffer.WriteString("_")
+	}
+
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		domTexhtml0(child, buffer)
+	}
+}
+
+func escapeMathSymbol(s string) string {
+	// 转义 Tex 公式中的符号，比如 _ ^ { }
+	s = strings.ReplaceAll(s, "_", "\\_")
+	s = strings.ReplaceAll(s, "^", "\\^")
+	s = strings.ReplaceAll(s, "{", "\\{")
+	s = strings.ReplaceAll(s, "}", "\\}")
+	return s
+}
+
 func DomText(n *html.Node) string {
 	buf := &bytes.Buffer{}
 	if html.TextNode == n.Type {
