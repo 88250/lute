@@ -570,8 +570,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			code = bytes.ReplaceAll(code, []byte("\u00A0"), []byte(" "))
 		}
 
-		unescaped := html.UnescapeString(string(code))
-		code = []byte(unescaped)
 		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: code}
 		node.Type = ast.NodeCodeSpan
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})

@@ -64,6 +64,12 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 
 	if t.Context.ParseOption.ProtyleWYSIWYG {
 		// Improve `inline code` markdown editing https://github.com/siyuan-note/siyuan/issues/9978
+
+		if !bytes.HasPrefix(textTokens, []byte("<span data-type=\"code\">")) {
+			// HTML 转换 Markdown 时需要转义 HTML 实体
+			textTokens = bytes.ReplaceAll(textTokens, []byte("&"), []byte("&amp;"))
+		}
+
 		inlineTree := Inline("", textTokens, t.Context.ParseOption)
 		if nil != inlineTree {
 			content := bytes.Buffer{}
@@ -113,7 +119,7 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 					content.WriteString("\\")
 					content.Write(n.Tokens)
 				} else if ast.NodeHTMLEntity == n.Type {
-					content.Write(n.Tokens)
+					content.Write(html.EscapeHTML(n.Tokens))
 				}
 				return ast.WalkContinue
 			})
