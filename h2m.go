@@ -410,6 +410,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					}
 				}
 
+				if 1 > len(node.LastChild.CodeBlockInfo) {
+					lang := util.DomAttrValue(n, "data-language")
+					if !strings.Contains(lang, " ") {
+						node.LastChild.CodeBlockInfo = []byte(lang)
+					}
+				}
+
 				if bytes.ContainsAny(node.LastChild.CodeBlockInfo, "-_ ") {
 					node.LastChild.CodeBlockInfo = nil
 				}
