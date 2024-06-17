@@ -245,7 +245,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		if "" == strings.TrimSpace(util.DomText(n)) {
-			if !util.DomExistChildByType(n, atom.Img, atom.Picture, atom.Annotation) {
+			for { // 这里用 for 是为了简化实现
+				if util.DomExistChildByType(n, atom.Img, atom.Picture, atom.Annotation) {
+					break
+				}
+
+				// span 可能是 TextMark 元素，也可能是公式，其他情况则忽略
+				spans := util.DomChildrenByType(n, atom.Span)
+				if 0 < len(spans) {
+					span := spans[0]
+					if "" != util.DomAttrValue(span, "data-type") || "" != util.DomAttrValue(span, "data-tex") {
+						break
+					}
+				}
 				return
 			}
 		}
@@ -806,12 +818,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Colgroup, atom.Col:
 		return
 	case atom.Span:
-		if nil == n.FirstChild {
+		// Improve inline elements pasting https://github.com/siyuan-note/siyuan/issues/11740
+		dataType := util.DomAttrValue(n, "data-type")
+		dataType = strings.Split(dataType, " ")[0] // 简化为只处理第一个类型
+		switch dataType {
+		case "inline-math":
+			mathContent := util.DomAttrValue(n, "data-content")
+			appendInlineMath(tree, mathContent)
 			return
-		}
-
-		// Improve HTML code element clipping https://github.com/siyuan-note/siyuan/issues/11401
-		if "code" == util.DomAttrValue(n, "data-type") {
+		case "code":
 			if nil != tree.Context.Tip.LastChild && ast.NodeCodeSpan == tree.Context.Tip.LastChild.Type {
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
 			}
@@ -821,8 +836,93 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: util.StrToBytes(util.DomText(n))})
 			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
 			tree.Context.Tip.AppendChild(code)
-			tree.Context.Tip = code
-			defer tree.Context.ParentTip()
+			return
+		case "tag":
+			tag := &ast.Node{Type: ast.NodeTag}
+			tag.AppendChild(&ast.Node{Type: ast.NodeTagOpenMarker, Tokens: util.StrToBytes("#")})
+			tag.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			tag.AppendChild(&ast.Node{Type: ast.NodeTagCloseMarker, Tokens: util.StrToBytes("#")})
+			tree.Context.Tip.AppendChild(tag)
+			return
+		case "kbd":
+			if nil != tree.Context.Tip.LastChild && ast.NodeKbd == tree.Context.Tip.LastChild.Type {
+				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
+			}
+
+			kbd := &ast.Node{Type: ast.NodeKbd}
+			kbd.AppendChild(&ast.Node{Type: ast.NodeKbdOpenMarker})
+			kbd.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			kbd.AppendChild(&ast.Node{Type: ast.NodeKbdCloseMarker})
+			tree.Context.Tip.AppendChild(kbd)
+			return
+		case "sub":
+			sub := &ast.Node{Type: ast.NodeSub}
+			sub.AppendChild(&ast.Node{Type: ast.NodeSubOpenMarker})
+			sub.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			sub.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
+			tree.Context.Tip.AppendChild(sub)
+			return
+		case "sup":
+			sup := &ast.Node{Type: ast.NodeSup}
+			sup.AppendChild(&ast.Node{Type: ast.NodeSupOpenMarker})
+			sup.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			sup.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
+			tree.Context.Tip.AppendChild(sup)
+			return
+		case "mark":
+			mark := &ast.Node{Type: ast.NodeMark}
+			mark.AppendChild(&ast.Node{Type: ast.NodeMark2OpenMarker, Tokens: util.StrToBytes("==")})
+			mark.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			mark.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: util.StrToBytes("==")})
+			tree.Context.Tip.AppendChild(mark)
+			return
+		case "s":
+			s := &ast.Node{Type: ast.NodeStrikethrough}
+			s.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker, Tokens: util.StrToBytes("~~")})
+			s.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			s.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: util.StrToBytes("~~")})
+			tree.Context.Tip.AppendChild(s)
+			return
+		case "u":
+			u := &ast.Node{Type: ast.NodeUnderline}
+			u.AppendChild(&ast.Node{Type: ast.NodeUnderlineOpenMarker})
+			u.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			u.AppendChild(&ast.Node{Type: ast.NodeUnderlineCloseMarker})
+			tree.Context.Tip.AppendChild(u)
+			return
+		case "em":
+			em := &ast.Node{Type: ast.NodeEmphasis}
+			em.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: util.StrToBytes("*")})
+			em.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			em.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: util.StrToBytes("*")})
+			tree.Context.Tip.AppendChild(em)
+			return
+		case "strong":
+			strong := &ast.Node{Type: ast.NodeStrong}
+			strong.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: util.StrToBytes("**")})
+			strong.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+			strong.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: util.StrToBytes("**")})
+			tree.Context.Tip.AppendChild(strong)
+			return
+		case "block-ref":
+			ref := &ast.Node{Type: ast.NodeBlockRef}
+			ref.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			ref.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			ref.AppendChild(&ast.Node{Type: ast.NodeBlockRefID, Tokens: util.StrToBytes(util.DomAttrValue(n, "data-id"))})
+			ref.AppendChild(&ast.Node{Type: ast.NodeBlockRefSpace})
+			if "s" == util.DomAttrValue(n, "data-subtype") {
+				ref.AppendChild(&ast.Node{Type: ast.NodeBlockRefText, Tokens: util.StrToBytes(util.DomText(n))})
+			} else {
+				ref.AppendChild(&ast.Node{Type: ast.NodeBlockRefDynamicText, Tokens: util.StrToBytes(util.DomText(n))})
+			}
+			ref.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			ref.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+
+			tree.Context.Tip.AppendChild(ref)
+			return
+		}
+
+		if nil == n.FirstChild {
 			return
 		}
 
