@@ -202,7 +202,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		class := util.DomAttrValue(n, "class")
-		if atom.Div == n.DataAtom {
+		if atom.Div == n.DataAtom || atom.Section == n.DataAtom {
 			// 解析 GitHub 语法高亮代码块
 			language := ""
 			if strings.Contains(class, "-source-") {

@@ -248,6 +248,12 @@ func (lute *Lute) adjustMath(n *html.Node) {
 		}
 	}
 
+	formula := util.DomAttrValue(n, "data-formula")
+	if "" != formula {
+		util.SetDomAttrValue(n, "data-tex", formula)
+		return
+	}
+
 	if strings.Contains(class, "texhtml") {
 		if mathContent := util.DomTexhtml(n); "" != mathContent {
 			util.SetDomAttrValue(n, "data-tex", mathContent)
