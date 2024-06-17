@@ -922,10 +922,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if nil == n.FirstChild {
-			return
-		}
-
 		// The browser extension supports Zhihu formula https://github.com/siyuan-note/siyuan/issues/5599
 		if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex {
 			if strings.HasSuffix(strings.TrimSpace(tex), "\\\\") {
