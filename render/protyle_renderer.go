@@ -1240,17 +1240,7 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 	if entering {
 		if nil == node.Previous || editor.Caret == node.Previous.Text() ||
 			(node.ParentIs(ast.NodeTableCell) && nil != node.Previous && nil == node.Previous.Previous) {
-			if nil != node.Next {
-				if ast.NodeKramdownSpanIAL == node.Next.Type {
-					if !bytes.Contains(node.Next.Tokens, []byte("display: block")) {
-						r.WriteString(editor.Zwsp)
-					}
-				} else {
-					r.WriteString(editor.Zwsp)
-				}
-			} else {
-				r.WriteString(editor.Zwsp)
-			}
+			r.WriteString(editor.Zwsp)
 		}
 
 		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
@@ -1328,9 +1318,6 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 			return ast.WalkContinue
 		}
 		if ast.NodeKramdownSpanIAL == node.Next.Type && (nil == node.Next.Next || editor.Caret == node.Next.Next.Text()) {
-			if bytes.Contains(node.Next.Tokens, []byte("display: block")) {
-				return ast.WalkContinue
-			}
 			r.WriteString(editor.Zwsp)
 			return ast.WalkContinue
 		}
