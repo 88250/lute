@@ -777,6 +777,51 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if nil == n.FirstChild {
 			break
 		}
+
+		tbodys := util.DomChildrenByType(n.Parent, atom.Tbody)
+		if 0 < len(tbodys) {
+			tbody := tbodys[0]
+			// 找到最多的 td 数
+			var tdCount int
+			for tr := tbody.FirstChild; nil != tr; tr = tr.NextSibling {
+				if atom.Tr != tr.DataAtom {
+					continue
+				}
+
+				var count int
+				for td := tr.FirstChild; nil != td; td = td.NextSibling {
+					if atom.Td == td.DataAtom {
+						count++
+					}
+				}
+
+				if count > tdCount {
+					tdCount = count
+				}
+			}
+
+			// 补全 thead 中 tr 的 th
+			for tr := n.FirstChild; nil != tr; tr = tr.NextSibling {
+				if atom.Tr != tr.DataAtom {
+					continue
+				}
+
+				var count int
+				for td := tr.FirstChild; nil != td; td = td.NextSibling {
+					if atom.Th == td.DataAtom {
+						count++
+					}
+				}
+
+				if count < tdCount {
+					for i := count; i < tdCount; i++ {
+						th := &html.Node{Data: "th", DataAtom: atom.Th, Type: html.ElementNode}
+						tr.AppendChild(th)
+					}
+				}
+			}
+		}
+
 		node.Type = ast.NodeTableHead
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
