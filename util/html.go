@@ -168,9 +168,9 @@ func domTexhtml0(n *html.Node, buffer *bytes.Buffer) {
 	case 0:
 		buffer.WriteString(escapeMathSymbol(n.Data))
 	case atom.Sup:
-		buffer.WriteString("^")
+		buffer.WriteString("^{")
 	case atom.Sub:
-		buffer.WriteString("_")
+		buffer.WriteString("_{")
 	}
 
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
@@ -179,9 +179,9 @@ func domTexhtml0(n *html.Node, buffer *bytes.Buffer) {
 
 	switch n.DataAtom {
 	case atom.Sup:
-		buffer.WriteString("^")
+		buffer.WriteString("}")
 	case atom.Sub:
-		buffer.WriteString("_")
+		buffer.WriteString("}")
 	}
 }
 
