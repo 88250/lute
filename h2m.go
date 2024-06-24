@@ -163,7 +163,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				if nil != tree.Context.Tip.LastChild && tree.Context.Tip.LastChild.IsMarker() {
 					node.Tokens = append([]byte(editor.Zwsp), node.Tokens...)
 				}
-			} else if bytes.HasSuffix(node.Tokens, []byte(" ")) && nil == n.NextSibling {
+			}
+			if bytes.HasSuffix(node.Tokens, []byte(" ")) && nil == n.NextSibling {
 				node.Tokens = append(node.Tokens, []byte(editor.Zwsp)...)
 			}
 		}
