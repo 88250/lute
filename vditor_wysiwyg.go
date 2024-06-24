@@ -226,6 +226,39 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustMath(c)
 	}
+
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustNoscriptImg(c)
+	}
+}
+
+func (lute *Lute) adjustNoscriptImg(n *html.Node) {
+	if nil != n.Parent && atom.Figure == n.Parent.DataAtom &&
+		atom.Noscript == n.DataAtom && nil != n.FirstChild && strings.HasPrefix(n.FirstChild.Data, "<img ") {
+		img := n.FirstChild
+		img.Unlink()
+		img.DataAtom = atom.Img
+		fragment, err := html.ParseFragment(strings.NewReader(img.Data), &html.Node{Type: html.ElementNode})
+		if nil != err || 1 > len(fragment) {
+			return
+		}
+		img = fragment[0]
+		n.InsertBefore(img)
+		var unlinks []*html.Node
+		for c := n; nil != c; c = c.NextSibling {
+			if atom.Figcaption == c.DataAtom {
+				continue
+			}
+			unlinks = append(unlinks, c)
+		}
+		for _, unlink := range unlinks {
+			unlink.Unlink()
+		}
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustNoscriptImg(c)
+	}
 }
 
 func (lute *Lute) adjustMath(n *html.Node) {
