@@ -216,6 +216,10 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	}
 
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustCustomTag(c)
+	}
+
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.mergeSameStrong(c)
 	}
 
@@ -229,6 +233,21 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustNoscriptImg(c)
+	}
+}
+
+func (lute *Lute) adjustCustomTag(n *html.Node) {
+	// 将某些自定义标签转换为标准标签
+
+	if html.ElementNode == n.Type && 0 == n.DataAtom {
+		if "ucapcontent" == n.Data {
+			n.DataAtom = atom.Div
+			n.Data = "div"
+		}
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustCustomTag(c)
 	}
 }
 

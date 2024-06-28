@@ -1068,6 +1068,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	default:
+
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
