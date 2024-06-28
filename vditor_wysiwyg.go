@@ -283,6 +283,10 @@ func (lute *Lute) adjustMath(n *html.Node) {
 
 	formula := util.DomAttrValue(n, "data-formula")
 	if "" != formula {
+		if html.ElementNode == n.Type && "mjx-container" == n.Data {
+			n.DataAtom = atom.Span
+		}
+
 		util.SetDomAttrValue(n, "data-tex", formula)
 		return
 	}
