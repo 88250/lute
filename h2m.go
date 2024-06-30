@@ -673,7 +673,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			// 处理使用 data-original 属性的情况 https://github.com/siyuan-note/siyuan/issues/11826
 			dataOriginal := util.DomAttrValue(n, "data-original")
 			if "" != dataOriginal {
-				src = dataOriginal
+				if "" == src || !strings.HasSuffix(src, ".gif") {
+					src = dataOriginal
+				}
 			}
 
 			if "" == src {
