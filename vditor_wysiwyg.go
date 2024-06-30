@@ -242,7 +242,9 @@ func (lute *Lute) adjustCustomTag(n *html.Node) {
 	if html.ElementNode == n.Type && 0 == n.DataAtom {
 		if "ucapcontent" == n.Data {
 			n.DataAtom = atom.Div
-			n.Data = "div"
+		} else if "ucaptitle" == n.Data {
+			n.DataAtom = atom.H2
+			n.Data = "h2"
 		}
 	}
 
