@@ -281,11 +281,24 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 			types = append(types[:i], types[i+1:]...)
 			break
 		}
+
+		if "text" == typ {
+			continue
+		}
 	}
 	types = append(tmp, types...)
 	if "" != code {
 		types = append(types, code)
 	}
+
+	tmp = nil
+	// 过滤掉 text 类型
+	for _, typ := range types {
+		if "text" != typ {
+			tmp = append(tmp, typ)
+		}
+	}
+	types = tmp
 
 	typ := types[0]
 	if "a" == typ || "inline-memo" == typ || "block-ref" == typ || "file-annotation-ref" == typ || "inline-math" == typ {
@@ -510,6 +523,17 @@ func (r *ProtyleExportMdRenderer) renderMdMarker1(node *ast.Node, currentTextmar
 			ret += "<kbd>"
 		} else {
 			ret += "</kbd>"
+		}
+	case "text":
+		if entering {
+			ret += "<span data-type=\"text\""
+			ial := parse.IAL2Map(node.KramdownIAL)
+			for k, v := range ial {
+				ret += " " + k + "=\"" + v + "\""
+			}
+			ret += ">"
+		} else {
+			ret += "</span>"
 		}
 	}
 	return
