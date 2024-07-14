@@ -534,6 +534,7 @@ func (lute *Lute) Blocks2Hs(ivHTML, level string) (ovHTML string) {
 			p.Type = ast.NodeHeading
 			if nil != p.FirstChild {
 				p.FirstChild.Tokens = bytes.ReplaceAll(p.FirstChild.Tokens, []byte("\n"), nil)
+				p.FirstChild.Tokens = bytes.TrimLeft(p.FirstChild.Tokens, " \t\n")
 			}
 			p.HeadingLevel, _ = strconv.Atoi(level)
 		}
