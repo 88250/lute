@@ -499,6 +499,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				for i, line := range lines {
 					if 0 < len(line) {
 						code := &ast.Node{Type: ast.NodeCodeSpan}
+						if bytes.Contains(line, []byte("`")) {
+							node.CodeMarkerLen = 2
+						}
 						code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})
 						code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: line})
 						code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
@@ -599,6 +602,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: code}
 		node.Type = ast.NodeCodeSpan
+		if bytes.Contains(code, []byte("`")) {
+			node.CodeMarkerLen = 2
+		}
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})
 		node.AppendChild(content)
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
@@ -901,8 +907,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			code := &ast.Node{Type: ast.NodeCodeSpan}
+			content := util.StrToBytes(util.DomText(n))
+			if bytes.Contains(content, []byte("`")) {
+				node.CodeMarkerLen = 2
+			}
 			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})
-			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: util.StrToBytes(util.DomText(n))})
+			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanContent, Tokens: content})
 			code.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
 			tree.Context.Tip.AppendChild(code)
 			return
