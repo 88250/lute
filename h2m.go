@@ -1030,6 +1030,17 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 			return
 		}
+	case atom.Kbd:
+		if nil != tree.Context.Tip.LastChild && ast.NodeKbd == tree.Context.Tip.LastChild.Type {
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
+		}
+
+		kbd := &ast.Node{Type: ast.NodeKbd}
+		kbd.AppendChild(&ast.Node{Type: ast.NodeKbdOpenMarker})
+		kbd.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+		kbd.AppendChild(&ast.Node{Type: ast.NodeKbdCloseMarker})
+		tree.Context.Tip.AppendChild(kbd)
+		return
 	case atom.Font:
 		node.Type = ast.NodeText
 		tokens := []byte(util.DomText(n))
