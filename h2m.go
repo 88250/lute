@@ -470,6 +470,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 
+			if atom.P == firstc.DataAtom {
+				// 避免下面 util.DomText 把 p 转换为两个换行
+				firstc.DataAtom = atom.Div
+			}
+
 			buf := &bytes.Buffer{}
 			buf.WriteString(util.DomText(n))
 			tokens := buf.Bytes()

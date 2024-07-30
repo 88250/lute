@@ -246,6 +246,8 @@ func domText0(n *html.Node, buffer *bytes.Buffer) {
 		}
 	case atom.Br:
 		buffer.WriteString("\n")
+	case atom.P:
+		buffer.WriteString("\n\n")
 	}
 
 	for child := n.FirstChild; nil != child; child = child.NextSibling {
