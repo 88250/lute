@@ -683,6 +683,12 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 
 func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	class := util.DomAttrValue(n, "class")
+
+	//Custom dom, which will be omitted when build tree
+	if strings.Contains(class, "protyle-custom") {
+		return
+	}
+
 	if "protyle-attr" == class ||
 		strings.Contains(class, "__copy") ||
 		strings.Contains(class, "protyle-linenumber__rows") {
