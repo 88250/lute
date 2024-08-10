@@ -179,7 +179,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
-		tree.Context.Tip.AppendChild(node)
+		if 1 > len(node.Tokens) {
+			return
+		}
+
+		if ast.NodeListItem == tree.Context.Tip.Type {
+			p := &ast.Node{Type: ast.NodeParagraph}
+			p.AppendChild(node)
+			tree.Context.Tip.AppendChild(p)
+			tree.Context.Tip = p
+		} else {
+			tree.Context.Tip.AppendChild(node)
+		}
 	case atom.P, atom.Div, atom.Section, atom.Dd:
 		if ast.NodeLink == tree.Context.Tip.Type {
 			break
@@ -1086,6 +1097,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		li.AppendChild(node)
 		tree.Context.Tip.AppendChild(li)
 		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	case atom.Iframe, atom.Audio, atom.Video:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = util.DomHTML(n)
