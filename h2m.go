@@ -1090,6 +1090,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+		defer tree.Context.ParentTip()
 	case atom.Summary:
 		li := &ast.Node{Type: ast.NodeListItem}
 		li.ListData = &ast.ListData{Marker: []byte("*"), BulletChar: '*'}
@@ -1097,7 +1098,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		li.AppendChild(node)
 		tree.Context.Tip.AppendChild(li)
 		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
 	case atom.Iframe, atom.Audio, atom.Video:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = util.DomHTML(n)
@@ -1171,6 +1171,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Sub:
 		node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
 		appendSpace(n, tree, lute)
+	case atom.Details:
+		tree.Context.ParentTip()
+	case atom.Summary:
+		tree.Context.ParentTip()
 	}
 }
 
