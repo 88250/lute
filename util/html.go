@@ -289,6 +289,19 @@ func DomAttrValue(n *html.Node, attrName string) string {
 	return ""
 }
 
+func ExistDomAttr(n *html.Node, attrName string) bool {
+	if nil == n {
+		return false
+	}
+
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			return true
+		}
+	}
+	return false
+}
+
 func DomCustomAttrs(n *html.Node) (ret map[string]string) {
 	ret = map[string]string{}
 	for _, attr := range n.Attr {
