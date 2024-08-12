@@ -19,6 +19,7 @@ import (
 
 var md2BlockDOMTests = []parseTest{
 
+	{"87", "foo<kbd>bar</kbd>​baz", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">foo <span data-type=\"kbd\">\u200bbar</span>\u200bbaz</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"86", "    ```\n    foo\n    ```\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">    <span data-type=\"code\">\u200b    foo    </span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"85", "`foo&ZeroWidthSpace;bar`\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"code\">\u200bfoo&amp;ZeroWidthSpace;bar</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"84", "<u>、<sub>…… 输入异常", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">&lt;u&gt;、&lt;sub&gt;…… 输入异常</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
