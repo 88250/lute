@@ -19,6 +19,7 @@ import (
 
 var md2BlockDOMTests = []parseTest{
 
+	{"86", "    ```\n    foo\n    ```\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">    <span data-type=\"code\">\u200b    foo    </span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"85", "`foo&ZeroWidthSpace;bar`\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"code\">\u200bfoo&amp;ZeroWidthSpace;bar</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"84", "<u>、<sub>…… 输入异常", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">&lt;u&gt;、&lt;sub&gt;…… 输入异常</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"83", "* {: updated=\"20240603115819\" id=\"20240603115809-7c2x9yn\"}\n  <div>\n  fooo\n  </div>\n  {: updated=\"20240603115819\" id=\"20240603115809-2uob5by\"}\n  </div>\n{: id=\"20240603115808-cnyfb31\" updated=\"20240603115819\"}", "<div data-subtype=\"u\" data-node-id=\"20240603115808-cnyfb31\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\" updated=\"20240603115819\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20240603115809-7c2x9yn\" data-type=\"NodeListItem\" class=\"li\" updated=\"20240603115819\"><div class=\"protyle-action\" draggable=\"true\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20240603115809-2uob5by\" data-type=\"NodeHTMLBlock\" class=\"render-node\" updated=\"20240603115819\" data-subtype=\"block\"><div class=\"protyle-icons\"><span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-icon--first protyle-action__edit\"><svg><use xlink:href=\"#iconEdit\"></use></svg></span><span class=\"b3-tooltips__nw b3-tooltips protyle-icon protyle-action__menu protyle-icon--last\"><svg><use xlink:href=\"#iconMore\"></use></svg></span></div><div><protyle-html data-content=\"&lt;div&gt;\nfooo\n&lt;/div&gt;\"></protyle-html><span style=\"position: absolute\">\u200b</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">&lt;/div&gt;</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
@@ -129,6 +130,7 @@ func TestMd2BlockDOM(t *testing.T) {
 	luteEngine.SetSub(true)
 	luteEngine.SetSup(true)
 	luteEngine.SetMark(true)
+	luteEngine.SetIndentCodeBlock(false)
 
 	ast.Testing = true
 	for _, test := range md2BlockDOMTests {

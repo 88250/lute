@@ -237,6 +237,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				buf.WriteString(util.DomText(n))
 				tokens := buf.Bytes()
 				tokens = bytes.ReplaceAll(tokens, []byte("\u00A0"), []byte(" "))
+				tokens = bytes.TrimSuffix(tokens, []byte("\n"+editor.Zwsp))
 				content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: tokens}
 				node.AppendChild(content)
 				node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
@@ -279,10 +280,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 				return
 			}
-		}
-
-		if tree.Context.Tip.IsBlock() && !tree.Context.Tip.IsContainerBlock() {
-			tree.Context.ParentTip()
 		}
 
 		node.Type = ast.NodeParagraph
@@ -418,6 +415,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker})
 			if atom.Code == firstc.DataAtom || atom.Span == firstc.DataAtom || atom.A == firstc.DataAtom {
 				class := util.DomAttrValue(firstc, "class")
+				if nil != n.Parent && nil != n.Parent.Parent {
+					parentClass := util.DomAttrValue(n.Parent.Parent, "class")
+					if strings.Contains(parentClass, "language-") {
+						class = parentClass
+					}
+				}
+
 				if !strings.Contains(class, "language-") {
 					class = util.DomAttrValue(n, "class")
 				}
@@ -490,6 +494,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			buf.WriteString(util.DomText(n))
 			tokens := buf.Bytes()
 			tokens = bytes.ReplaceAll(tokens, []byte("\u00A0"), []byte(" "))
+			tokens = bytes.TrimSuffix(tokens, []byte("\n"+editor.Zwsp))
 			content := &ast.Node{Type: ast.NodeCodeBlockCode, Tokens: tokens}
 			node.AppendChild(content)
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceCloseMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
