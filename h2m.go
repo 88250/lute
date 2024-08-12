@@ -120,6 +120,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	node := &ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(n.Data)}
 	switch n.DataAtom {
 	case 0:
+		class := util.DomAttrValue(n.PrevSibling, "class")
+		if "fn__space5" == class {
+			// 链滴剪藏图片时多了长宽显示 https://github.com/siyuan-note/siyuan/issues/10987
+			return
+		}
+
 		if nil != n.Parent && atom.A == n.Parent.DataAtom {
 			node.Type = ast.NodeLinkText
 		}
@@ -914,6 +920,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Colgroup, atom.Col:
 		return
 	case atom.Span:
+		class := util.DomAttrValue(n, "class")
+		if "fn__space5" == class {
+			return
+		}
+
 		// Improve inline elements pasting https://github.com/siyuan-note/siyuan/issues/11740
 		dataType := util.DomAttrValue(n, "data-type")
 		dataType = strings.Split(dataType, " ")[0] // 简化为只处理第一个类型
