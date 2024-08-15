@@ -691,7 +691,8 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 
 	if "protyle-attr" == class ||
 		strings.Contains(class, "__copy") ||
-		strings.Contains(class, "protyle-linenumber__rows") {
+		strings.Contains(class, "protyle-linenumber__rows") ||
+		strings.Contains(class, "hljs") {
 		return
 	}
 
@@ -707,7 +708,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 				language = languageNode.FirstChild.Data
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceInfoMarker, CodeBlockInfo: util.StrToBytes(language)})
-			code := util.DomText(n.NextSibling)
+			code := util.DomText(n.NextSibling.LastChild)
 			if strings.HasSuffix(code, "\n\n"+editor.Caret) {
 				code = strings.TrimSuffix(code, "\n\n"+editor.Caret)
 				code += "\n" + editor.Caret + "\n"
