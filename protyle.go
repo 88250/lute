@@ -1990,11 +1990,6 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 		ialTokens = append(ialTokens, []byte(" linenumber=\""+linenumber+"\"")...)
 	}
 
-	if vscroll := util.DomAttrValue(n, "vscroll"); "" != vscroll {
-		node.SetIALAttr("vscroll", vscroll)
-		ialTokens = append(ialTokens, []byte(" vscroll=\""+vscroll+"\"")...)
-	}
-
 	if breadcrumb := util.DomAttrValue(n, "breadcrumb"); "" != breadcrumb {
 		node.SetIALAttr("breadcrumb", breadcrumb)
 		ialTokens = append(ialTokens, []byte(" breadcrumb=\""+breadcrumb+"\"")...)
