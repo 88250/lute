@@ -245,6 +245,8 @@ func (lute *Lute) adjustCustomTag(n *html.Node) {
 		} else if "ucaptitle" == n.Data {
 			n.DataAtom = atom.H2
 			n.Data = "h2"
+		} else if "markerow8" == n.Data {
+			n.DataAtom = atom.Span
 		}
 	}
 
