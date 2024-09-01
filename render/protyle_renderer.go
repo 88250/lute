@@ -922,12 +922,10 @@ func (r *ProtyleRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast
 	r.Tag("/div", nil, false)
 
 	attrs = [][]string{{"class", "hljs"}}
-	// Spell check should be disabled inside inline and block code https://github.com/siyuan-note/siyuan/issues/9672
-	attrs = append(attrs, []string{"spellcheck", "false"})
 	r.Tag("div", attrs, false)
 	r.Tag("div", nil, false)
 	r.Tag("/div", nil, false)
-	r.Tag("div", [][]string{{"contenteditable", "true"}, {"style", "flex: 1"}}, false)
+	r.Tag("div", [][]string{{"contenteditable", "true"}, {"style", "flex: 1"}, {"spellcheck", "false"}}, false)
 	if codeIsEmpty {
 		if caretInInfo {
 			r.WriteString(editor.FrontEndCaret)
