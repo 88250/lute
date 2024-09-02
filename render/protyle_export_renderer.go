@@ -913,9 +913,10 @@ func (r *ProtyleExportRenderer) renderCodeBlockCode(node *ast.Node, entering boo
 	r.Tag("/div", nil, false)
 
 	attrs = [][]string{{"class", "hljs"}}
-	r.contenteditable(node, &attrs)
-	r.spellcheck(&attrs)
 	r.Tag("div", attrs, false)
+	r.Tag("div", nil, false)
+	r.Tag("/div", nil, false)
+	r.Tag("div", [][]string{{"contenteditable", "false"}, {"style", "flex: 1"}, {"spellcheck", "false"}}, false)
 	if codeIsEmpty {
 		if caretInInfo {
 			r.WriteString(editor.FrontEndCaret)
@@ -923,6 +924,7 @@ func (r *ProtyleExportRenderer) renderCodeBlockCode(node *ast.Node, entering boo
 	} else {
 		r.Write(html.EscapeHTML(node.Tokens))
 	}
+	r.Tag("/div", nil, false)
 	r.Tag("/div", nil, false)
 	return ast.WalkContinue
 }
