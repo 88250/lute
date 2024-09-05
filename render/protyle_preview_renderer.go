@@ -710,6 +710,15 @@ func (r *ProtylePreviewRenderer) renderCodeBlock(node *ast.Node, entering bool) 
 		}
 
 		attrs := [][]string{{"class", "code-block"}, {"data-language", language}}
+		if "true" == node.IALAttr("linewrap") {
+			attrs = append(attrs, []string{"linewrap", "true"})
+		}
+		if "true" == node.IALAttr("ligatures") {
+			attrs = append(attrs, []string{"ligatures", "true"})
+		}
+		if "true" == node.IALAttr("linenumber") {
+			attrs = append(attrs, []string{"linenumber", "true"})
+		}
 		r.Tag("pre", attrs, false)
 		r.WriteString("<code class=\"hljs\">")
 	} else {
