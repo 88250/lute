@@ -658,11 +658,12 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 
 				if node.ContainTextMarkTypes("strong", "em", "s", "mark", "sup", "sub") {
 					// Improve some inline elements Markdown editing https://github.com/siyuan-note/siyuan/issues/9999
-					if spaces := spacesAtStart(node.TextMarkTextContent); 0 < spaces {
-						node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: bytes.Repeat([]byte(" "), spaces)})
+					startBlank, endBlank := startEndBlank(node.TextMarkTextContent)
+					if "" != startBlank {
+						node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(startBlank)})
 					}
-					if spaces := spacesAtEnd(node.TextMarkTextContent); 0 < spaces {
-						node.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: bytes.Repeat([]byte(" "), spaces)})
+					if "" != endBlank {
+						node.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte(endBlank)})
 					}
 					node.TextMarkTextContent = strings.TrimSpace(node.TextMarkTextContent)
 				}
@@ -685,22 +686,18 @@ func StyleValue(style string) (ret string) {
 	return
 }
 
-func spacesAtStart(str string) (ret int) {
+func startEndBlank(str string) (startBlank, endBlank string) {
 	for _, r := range str {
-		if ' ' != r {
+		if ' ' != r && '\t' != r && '\n' != r {
 			break
 		}
-		ret++
+		startBlank += string(r)
 	}
-	return
-}
-
-func spacesAtEnd(str string) (ret int) {
 	for i := len(str) - 1; i >= 0; i-- {
-		if ' ' != str[i] {
+		if ' ' != str[i] && '\t' != str[i] && '\n' != str[i] {
 			break
 		}
-		ret++
+		endBlank = string(str[i]) + endBlank
 	}
 	return
 }

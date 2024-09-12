@@ -22,7 +22,6 @@ import (
 func GetTextMarkTextDataWithoutEscapeSingleQuote(n *html.Node) (content string) {
 	content = DomText(n)
 	content = strings.ReplaceAll(content, editor.Zwsp, "")
-	content = strings.TrimPrefix(content, "\n")
 	content = strings.TrimSuffix(content, "\n")
 	content = html.EscapeHTMLStr(content)
 	for strings.Contains(content, "\n\n") {
@@ -33,6 +32,7 @@ func GetTextMarkTextDataWithoutEscapeSingleQuote(n *html.Node) (content string) 
 
 func GetTextMarkTextData(n *html.Node) (content string) {
 	content = GetTextMarkTextDataWithoutEscapeSingleQuote(n)
+	content = strings.TrimPrefix(content, "\n")
 	content = strings.ReplaceAll(content, "'", "&apos;")
 	for strings.Contains(content, "\n\n") {
 		content = strings.ReplaceAll(content, "\n\n", "\n")
