@@ -389,6 +389,10 @@ type Options struct {
 	Sup bool
 	// Sub 设置是否打开 ~下标~ 支持。
 	Sub bool
+	// InlineAsterisk 设置是否打开行级 * 语法支持（*foo* 和 **foo**）。
+	InlineAsterisk bool
+	// InlineUnderscore 设置是否打开行级 _ 语法支持（_foo_ 和 __foo__）。
+	InlineUnderscore bool
 	// GitConflict 设置是否打开 Git 冲突标记支持。
 	GitConflict bool
 	// LinkRef 设置是否打开“链接引用”支持。
@@ -433,6 +437,8 @@ func NewOptions() *Options {
 		BlockRef:          false,
 		FileAnnotationRef: false,
 		Mark:              false,
+		InlineAsterisk:    true,
+		InlineUnderscore:  true,
 		KramdownBlockIAL:  false,
 		HeadingID:         true,
 		LinkRef:           true,

@@ -146,6 +146,18 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 				}
 			}
 
+			if !t.Context.ParseOption.InlineAsterisk {
+				if lex.ItemAsterisk == closercc {
+					break
+				}
+			}
+
+			if !t.Context.ParseOption.InlineUnderscore {
+				if lex.ItemUnderscore == closercc {
+					break
+				}
+			}
+
 			if t.Context.ParseOption.Mark {
 				if lex.ItemEqual == closercc && opener.num != closer.num {
 					break

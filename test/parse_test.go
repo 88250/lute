@@ -85,6 +85,7 @@ var parseTests = []parseTest{
 	{"spec483", "[link]()\n", "<p><a href=\"\">link</a></p>\n"},
 	{"spec479", "**a<http://foo.bar/?q=**>\n", "<p>**a<a href=\"http://foo.bar/?q=**\">http://foo.bar/?q=**</a></p>\n"},
 	{"spec416", "foo******bar*********baz\n", "<p>foo<strong><strong><strong>bar</strong></strong></strong>***baz</p>\n"},
+	{"spec408", "__foo_ bar_\n", "<p><em><em>foo</em> bar</em></p>\n"},
 	{"spec403", "*foo [bar](/url)*\n", "<p><em>foo <a href=\"/url\">bar</a></em></p>\n"},
 	{"spec353", "* a *\n", "<p>* a *</p>\n"},
 	{"spec352", "a*\"foo\"*\n", "<p>a*&quot;foo&quot;*</p>\n"},

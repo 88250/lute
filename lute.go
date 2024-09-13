@@ -547,6 +547,14 @@ func (lute *Lute) SetSub(b bool) {
 	lute.ParseOptions.Sub = b
 }
 
+func (lute *Lute) SetInlineAsterisk(b bool) {
+	lute.ParseOptions.InlineAsterisk = b
+}
+
+func (lute *Lute) SetInlineUnderscore(b bool) {
+	lute.ParseOptions.InlineUnderscore = b
+}
+
 func (lute *Lute) SetGitConflict(b bool) {
 	lute.ParseOptions.GitConflict = b
 }
