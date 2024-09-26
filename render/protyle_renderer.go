@@ -925,7 +925,9 @@ func (r *ProtyleRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast
 	r.Tag("div", attrs, false)
 	r.Tag("div", nil, false)
 	r.Tag("/div", nil, false)
-	r.Tag("div", [][]string{{"contenteditable", "true"}, {"style", "flex: 1"}, {"spellcheck", "false"}}, false)
+	attrs = [][]string{{"style", "flex: 1"}, {"spellcheck", "false"}}
+	r.contenteditable(node, &attrs)
+	r.Tag("div", attrs, false)
 	if codeIsEmpty {
 		if caretInInfo {
 			r.WriteString(editor.FrontEndCaret)
