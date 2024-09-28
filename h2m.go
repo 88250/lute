@@ -516,6 +516,24 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 							table.InsertBefore(node)
 							table.Unlink()
 							tree.Context.Tip = node
+
+							parent := n.Parent
+							for i := 0; i < 32; i++ {
+								if nil == parent {
+									break
+								}
+
+								class := util.DomAttrValue(parent, "class")
+								if strings.Contains(class, "language-") {
+									node.ChildByType(ast.NodeCodeBlockFenceInfoMarker).CodeBlockInfo = []byte(class[strings.Index(class, "language-")+len("language-"):])
+									break
+								} else if strings.Contains(class, "highlight ") {
+									node.ChildByType(ast.NodeCodeBlockFenceInfoMarker).CodeBlockInfo = []byte(class[strings.Index(class, "highlight ")+len("highlight "):])
+									break
+								}
+								parent = parent.Parent
+							}
+
 							return
 						}
 					}
