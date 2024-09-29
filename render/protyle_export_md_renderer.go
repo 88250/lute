@@ -300,6 +300,10 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 	}
 	types = tmp
 
+	if 1 > len(types) {
+		return
+	}
+
 	typ := types[0]
 	if "a" == typ || "inline-memo" == typ || "block-ref" == typ || "file-annotation-ref" == typ || "inline-math" == typ {
 		types := types[1:]
