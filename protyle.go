@@ -352,7 +352,7 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 	} else {
 		if ast.NodeText == n.Previous.Type &&
 			!strings.Contains(n.Previous.TokensStr(), " ") && !strings.Contains(n.Previous.TokensStr(), "\n") &&
-			"" == strings.TrimSpace(strings.ReplaceAll(n.Previous.TokensStr(), editor.Zwsp, "")) &&
+			"" == strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(n.Previous.TokensStr(), editor.Zwsp, ""), editor.Caret, "")) &&
 			nil != n.Previous.Previous && n.IsSameTextMarkType(n.Previous.Previous) {
 			mergeWithZwsp = true
 		} else {
