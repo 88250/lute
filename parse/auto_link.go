@@ -382,25 +382,44 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		addr = append(addr, port...)
 		addr = append(addr, path...)
 		linkText := addr
-		if bytes.HasPrefix(linkText, []byte("https://github.com/")) && bytes.Contains(linkText, []byte("/issues/")) {
-			// 优化 GitHub Issues 自动链接文本 https://github.com/88250/lute/issues/161
-			repo := linkText[len("https://github.com/"):]
-			repo = repo[:bytes.Index(repo, []byte("/issues/"))]
-			num := bytes.Split(linkText, []byte("/issues/"))[1]
-			num = bytes.Split(num, []byte("?"))[0]
-			if 0 < len(num) {
-				isDigit := true
-				for _, d := range num {
-					if !lex.IsDigit(d) {
-						isDigit = false
-						break
+		if bytes.HasPrefix(linkText, []byte("https://github.com/")) {
+			if bytes.Contains(linkText, []byte("/issues/")) {
+				// 优化 GitHub Issues 自动链接文本 https://github.com/88250/lute/issues/161
+				repo := linkText[len("https://github.com/"):]
+				repo = repo[:bytes.Index(repo, []byte("/issues/"))]
+				num := bytes.Split(linkText, []byte("/issues/"))[1]
+				num = bytes.Split(num, []byte("?"))[0]
+				if 0 < len(num) {
+					isDigit := true
+					for _, d := range num {
+						if !lex.IsDigit(d) {
+							isDigit = false
+							break
+						}
+					}
+					if isDigit {
+						linkText = []byte("Issue #" + string(num) + " · " + string(repo))
 					}
 				}
-				if isDigit {
-					linkText = []byte("Issue #" + string(num) + " · " + string(repo))
+			} else if bytes.Contains(linkText, []byte("/pull/")) {
+				// 优化 GitHub Pull Requests 自动链接文本 https://github.com/88250/lute/issues/208
+				repo := linkText[len("https://github.com/"):]
+				repo = repo[:bytes.Index(repo, []byte("/pull/"))]
+				num := bytes.Split(linkText, []byte("/pull/"))[1]
+				num = bytes.Split(num, []byte("?"))[0]
+				if 0 < len(num) {
+					isDigit := true
+					for _, d := range num {
+						if !lex.IsDigit(d) {
+							isDigit = false
+							break
+						}
+					}
+					if isDigit {
+						linkText = []byte("Pull Request #" + string(num) + " · " + string(repo))
+					}
 				}
 			}
-
 		}
 
 		link := t.newLink(ast.NodeLink, linkText, html.EncodeDestination(dest), nil, 2)

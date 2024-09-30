@@ -18,6 +18,7 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	{"31", "https://github.com/88250/lute/pull/207", "<p><a href=\"https://github.com/88250/lute/pull/207\">Pull Request #207 · 88250/lute</a></p>\n"},
 	{"30", "https://foo.com/bar:baz", "<p><a href=\"https://foo.com/bar:baz\">https://foo.com/bar:baz</a></p>\n"},
 	{"29", "www.test.com:8080/bar/baz", "<p><a href=\"http://www.test.com:8080/bar/baz\">www.test.com:8080/bar/baz</a></p>\n"},
 	{"28", "www.test.com:8080(测试地址)", "<p><a href=\"http://www.test.com:8080\">www.test.com:8080</a>(测试地址)</p>\n"},
