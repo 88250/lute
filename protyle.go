@@ -382,7 +382,12 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 	}
 
 	if mergeWithIAL || mergeWithZwsp {
-		n.TextMarkTextContent = n.Previous.Previous.TextMarkTextContent + n.TextMarkTextContent
+		content := n.TextMarkTextContent
+		n.TextMarkTextContent = n.Previous.Previous.TextMarkTextContent
+		if strings.Contains(n.Previous.TokensStr(), editor.Caret) {
+			n.TextMarkTextContent += editor.Caret
+		}
+		n.TextMarkTextContent += content
 		n.Previous.Previous.Unlink()
 	} else {
 		n.TextMarkTextContent = n.Previous.TextMarkTextContent + n.TextMarkTextContent
