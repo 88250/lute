@@ -1053,6 +1053,25 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		// The browser extension supports Zhihu formula https://github.com/siyuan-note/siyuan/issues/5599
 		if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex {
+			if nil != n.Parent && strings.Contains(util.DomAttrValue(n.Parent, "class"), "math-inline") {
+				appendInlineMath(tree, tex)
+				return
+			}
+
+			parentInline := nil != n.Parent && atom.Span == n.Parent.DataAtom
+			if parentInline && atom.Span == n.DataAtom &&
+				nil == n.Parent.PrevSibling && (nil == n.Parent.NextSibling || (html.TextNode == n.Parent.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.Parent.NextSibling)))) {
+				// 作为独立的公式块转换
+				appendMathBlock(tree, tex)
+				return
+			}
+
+			if !parentInline && nil == n.PrevSibling && (nil == n.NextSibling || (html.TextNode == n.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.NextSibling)))) {
+				// 作为独立的公式块转换
+				appendMathBlock(tree, tex)
+				return
+			}
+
 			if strings.HasSuffix(strings.TrimSpace(tex), "\\\\") || strings.Contains(tex, "\n") {
 				appendMathBlock(tree, tex)
 			} else {
