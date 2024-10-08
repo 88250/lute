@@ -178,7 +178,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		if lute.ParseOptions.ProtyleWYSIWYG {
 			node.Tokens = lex.EscapeProtyleMarkers(node.Tokens)
 		} else {
-			node.Tokens = lex.EscapeCommonMarkers(node.Tokens)
+			if nil != n.Parent && atom.Span == n.Parent.DataAtom && 0 == len(n.Parent.Attr) {
+				// 按原文解析，不处理转义
+			} else {
+				node.Tokens = lex.EscapeCommonMarkers(node.Tokens)
+			}
 			if lute.parentIs(n, atom.Table) {
 				node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\\|"), []byte("|"))
 				node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("|"), []byte("\\|"))
