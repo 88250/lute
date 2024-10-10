@@ -1149,6 +1149,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 		defer tree.Context.ParentTip()
 	case atom.Summary:
+		if ast.NodeList != tree.Context.Tip.Type || nil == n.Parent || atom.Details != n.Parent.DataAtom {
+			return
+		}
+
 		li := &ast.Node{Type: ast.NodeListItem}
 		li.ListData = &ast.ListData{Marker: []byte("*"), BulletChar: '*'}
 		node.Type = ast.NodeParagraph
