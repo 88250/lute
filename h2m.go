@@ -380,11 +380,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		span2Code := false
 		if atom.Ol == firstc.DataAtom && nil == firstc.NextSibling && nil != firstc.FirstChild && atom.Li == firstc.FirstChild.DataAtom &&
 			nil != firstc.FirstChild.FirstChild && atom.P == firstc.FirstChild.FirstChild.DataAtom &&
-			nil != firstc.FirstChild.FirstChild.FirstChild && atom.Span == firstc.FirstChild.FirstChild.FirstChild.DataAtom {
+			nil != firstc.FirstChild.FirstChild.FirstChild && (atom.Span == firstc.FirstChild.FirstChild.FirstChild.DataAtom || html.TextNode == firstc.FirstChild.FirstChild.FirstChild.Type) {
 			for li := firstc.FirstChild; nil != li; li = li.NextSibling {
 				code := &html.Node{Data: "code", DataAtom: atom.Code, Type: html.ElementNode}
 
 				var spans []*html.Node
+				if nil == li.FirstChild {
+					continue
+				}
+
 				for span := li.FirstChild.FirstChild; nil != span; span = span.NextSibling {
 					spans = append(spans, span)
 				}
@@ -405,6 +409,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			var lis, codes []*html.Node
 			for li := firstc.FirstChild; nil != li; li = li.NextSibling {
 				lis = append(lis, li)
+				if nil == li.FirstChild {
+					continue
+				}
 				codes = append(codes, li.FirstChild.FirstChild)
 			}
 			for _, li := range lis {

@@ -247,6 +247,8 @@ func (lute *Lute) adjustCustomTag(n *html.Node) {
 			n.Data = "h2"
 		} else if "markerow8" == n.Data {
 			n.DataAtom = atom.Span
+		} else if "app-document-text" == n.Data {
+			n.DataAtom = atom.Div
 		}
 	}
 
