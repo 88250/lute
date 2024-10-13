@@ -1175,7 +1175,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Script:
 		if tex := util.DomText(n.FirstChild); "" != tex {
-			if tree.Context.Tip.IsContainerBlock() {
+			if tree.Context.Tip.IsContainerBlock() ||
+				(nil != n.Parent && strings.Contains(util.DomAttrValue(n.Parent, "class"), "math display") && n.Parent.LastChild == n) ||
+				strings.Contains(util.DomAttrValue(n, "type"), "mode=display") {
 				appendMathBlock(tree, tex)
 			} else {
 				appendInlineMath(tree, tex)
@@ -1271,7 +1273,13 @@ func appendMathBlock(tree *parse.Tree, tex string) {
 	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker, Tokens: []byte("$$")})
 	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: util.StrToBytes(tex)})
 	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker, Tokens: []byte("$$")})
-	tree.Context.Tip.AppendChild(mathBlock)
+
+	if ast.NodeParagraph == tree.Context.Tip.Type {
+		tree.Context.Tip.InsertAfter(mathBlock)
+		tree.Context.Tip.Unlink()
+	} else {
+		tree.Context.Tip.AppendChild(mathBlock)
+	}
 	tree.Context.Tip = mathBlock
 	defer tree.Context.ParentTip()
 }
