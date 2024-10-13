@@ -122,7 +122,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		ctx.pos += len(tags)
 
 		if t.Context.ParseOption.ProtyleWYSIWYG {
-			if bytes.Equal(tags, []byte("<br />")) || bytes.Equal(tags, []byte("<br/>")) {
+			if bytes.EqualFold(tags, []byte("<br />")) || bytes.EqualFold(tags, []byte("<br/>")) || bytes.EqualFold(tags, []byte("<br>")) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
 			} else if bytes.HasPrefix(tags, []byte("<span data-type=")) {
