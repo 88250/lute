@@ -252,6 +252,10 @@ func (n *Node) Marker(entering bool) (ret string) {
 		if entering {
 			return "~"
 		}
+	case NodeInlineMathOpenMarker, NodeInlineMathCloseMarker:
+		if entering {
+			return "$"
+		}
 	case NodeKbdOpenMarker:
 		if entering {
 			return "<kbd>"

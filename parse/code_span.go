@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/lex"
@@ -120,6 +121,8 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 					content.Write(n.Tokens)
 				} else if ast.NodeHTMLEntity == n.Type {
 					content.Write(html.EscapeHTML(n.Tokens))
+				} else if ast.NodeInlineMathContent == n.Type {
+					content.Write(n.Tokens)
 				}
 				return ast.WalkContinue
 			})
