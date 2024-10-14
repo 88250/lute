@@ -1069,7 +1069,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			parentInline := nil != n.Parent && atom.Span == n.Parent.DataAtom
+			parentInline := nil != n.Parent && (atom.Span == n.Parent.DataAtom || atom.Td == n.Parent.DataAtom || atom.Th == n.Parent.DataAtom || strings.Contains(util.DomAttrValue(n.Parent, "class"), "inline"))
 			if parentInline && atom.Span == n.DataAtom &&
 				nil == n.Parent.PrevSibling && (nil == n.Parent.NextSibling || (html.TextNode == n.Parent.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.Parent.NextSibling)))) {
 				// 作为独立的公式块转换
