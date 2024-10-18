@@ -182,10 +182,15 @@ func IsNodeIDPattern(str string) bool {
 		return false
 	}
 
-	for _, c := range idPart {
-		if !('0' <= c && '9' >= c) {
-			return false
-		}
+	// 检查时间部分的范围是否正确，比如年份为 0000-9999，月份为 01-12，日期为 01-31，小时为 00-23，分钟为 00-59，秒为 00-59
+	year, month, day, hour, minute, second := idPart[:4], idPart[4:6], idPart[6:8], idPart[8:10], idPart[10:12], idPart[12:14]
+	if "0000" > year || "9999" < year ||
+		"01" > month || "12" < month ||
+		"01" > day || "31" < day ||
+		"00" > hour || "23" < hour ||
+		"00" > minute || "59" < minute ||
+		"00" > second || "59" < second {
+		return false
 	}
 
 	randPart := parts[1]
