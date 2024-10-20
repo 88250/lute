@@ -14,7 +14,6 @@ import (
 	"bytes"
 	"math/rand"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -183,36 +182,10 @@ func IsNodeIDPattern(str string) bool {
 		return false
 	}
 
-	// 检查时间部分的范围是否正确，年份为 0000-9999，月份为 01-12，日期为 01-31，小时为 00-23，分钟为 00-59，秒为 00-59
-	year, month, day, hour, minute, second := idPart[:4], idPart[4:6], idPart[6:8], idPart[8:10], idPart[10:12], idPart[12:14]
-	yearInt, err := strconv.Atoi(year)
-	if err != nil || yearInt < 0 || yearInt > 9999 {
-		return false
-	}
-
-	monthInt, err := strconv.Atoi(month)
-	if err != nil || monthInt < 1 || monthInt > 12 {
-		return false
-	}
-
-	dayInt, err := strconv.Atoi(day)
-	if err != nil || dayInt < 1 || dayInt > 31 {
-		return false
-	}
-
-	hourInt, err := strconv.Atoi(hour)
-	if err != nil || hourInt < 0 || hourInt > 23 {
-		return false
-	}
-
-	minuteInt, err := strconv.Atoi(minute)
-	if err != nil || minuteInt < 0 || minuteInt > 59 {
-		return false
-	}
-
-	secondInt, err := strconv.Atoi(second)
-	if err != nil || secondInt < 0 || secondInt > 59 {
-		return false
+	for _, c := range idPart {
+		if !('0' <= c && '9' >= c) {
+			return false
+		}
 	}
 
 	randPart := parts[1]
