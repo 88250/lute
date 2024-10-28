@@ -292,6 +292,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
+		if atom.Div == n.DataAtom || atom.Section == n.DataAtom {
+			break
+		}
+
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
