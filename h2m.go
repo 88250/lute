@@ -599,7 +599,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
 		}
 
-		if !lute.ParseOptions.InlineAsterisk && !lute.ParseOptions.InlineUnderscore {
+		if !lute.ParseOptions.InlineAsterisk || !lute.ParseOptions.InlineUnderscore {
 			node.Type = ast.NodeHTMLTag
 			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<em>")})
 		} else {
@@ -623,7 +623,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
 		}
 
-		if !lute.ParseOptions.InlineAsterisk && !lute.ParseOptions.InlineUnderscore {
+		if !lute.ParseOptions.InlineAsterisk || !lute.ParseOptions.InlineUnderscore {
 			node.Type = ast.NodeHTMLTag
 			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<strong>")})
 		} else {
@@ -1246,7 +1246,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 	switch n.DataAtom {
 	case atom.Em, atom.I:
-		if !lute.ParseOptions.InlineAsterisk && !lute.ParseOptions.InlineUnderscore {
+		if !lute.ParseOptions.InlineAsterisk || !lute.ParseOptions.InlineUnderscore {
 			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</em>")})
 		} else {
 			node.Type = ast.NodeEmphasis
@@ -1254,7 +1254,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		appendSpace(n, tree, lute)
 	case atom.Strong, atom.B:
-		if !lute.ParseOptions.InlineAsterisk && !lute.ParseOptions.InlineUnderscore {
+		if !lute.ParseOptions.InlineAsterisk || !lute.ParseOptions.InlineUnderscore {
 			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</strong>")})
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: util.StrToBytes("**")})
