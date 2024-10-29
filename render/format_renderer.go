@@ -167,7 +167,28 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
 	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
 	ret.RendererFuncs[ast.NodeCustomBlock] = ret.renderCustomBlock
+	ret.RendererFuncs[ast.NodeHTMLTag] = ret.renderHTMLTag
+	ret.RendererFuncs[ast.NodeHTMLTagOpen] = ret.renderHTMLTagOpen
+	ret.RendererFuncs[ast.NodeHTMLTagClose] = ret.renderHTMLTagClose
 	return ret
+}
+
+func (r *FormatRenderer) renderHTMLTag(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderHTMLTagOpen(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
+}
+
+func (r *FormatRenderer) renderHTMLTagClose(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Write(node.Tokens)
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {

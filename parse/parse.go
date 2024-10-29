@@ -405,9 +405,8 @@ type Options struct {
 	DataImage bool
 	// TextMark 设置是否打开通用行级节点解析支持。
 	TextMark bool
-	// HTMLTag2TextMark 设置是否打开 HTML 某些标签解析为 TextMark 节点支持。目前仅支持 <u>、<kbd>、<sub> 和 <sup> 标签。
-	// 这个开关主要用于兼容 Markdown 输入 API 上 https://github.com/siyuan-note/siyuan/issues/6039
-	// 不用于 Protyle 自旋过程 https://github.com/siyuan-note/siyuan/issues/5877
+	// HTMLTag2TextMark 设置是否打开 HTML 某些标签解析为 TextMark 节点支持。
+	// 目前仅支持 <u>、<kbd>、<sub>、<sup>、<strong>/<b>、<em>/<i>、<s>/<del>/<strike> 和 <mark>。
 	HTMLTag2TextMark bool
 	// Spin 设置是否打开自旋解析支持，该选项仅用于 Spin 内部过程，设置时请注意使用场景。
 	//

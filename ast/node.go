@@ -1128,5 +1128,11 @@ const (
 
 	NodeCustomBlock NodeType = 560 // 自定义块
 
+	// HTML 标签，在无法使用 Markdown 标记符的情况下直接使用 HTML 标签
+
+	NodeHTMLTag      NodeType = 570 // HTML 标签
+	NodeHTMLTagOpen  NodeType = 571 // 开始 HTML 标签
+	NodeHTMLTagClose NodeType = 572 // 结束 HTML 标签
+
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

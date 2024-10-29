@@ -599,9 +599,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
 		}
 
-		node.Type = ast.NodeEmphasis
-		marker := "*"
-		node.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: util.StrToBytes(marker)})
+		if !lute.ParseOptions.InlineAsterisk && !lute.ParseOptions.InlineUnderscore {
+			node.Type = ast.NodeHTMLTag
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<em>")})
+		} else {
+			node.Type = ast.NodeEmphasis
+			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker, Tokens: util.StrToBytes("*")})
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -619,9 +623,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(editor.Zwsp)})
 		}
 
-		node.Type = ast.NodeStrong
-		marker := "**"
-		node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: util.StrToBytes(marker)})
+		if !lute.ParseOptions.InlineAsterisk && !lute.ParseOptions.InlineUnderscore {
+			node.Type = ast.NodeHTMLTag
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<strong>")})
+		} else {
+			node.Type = ast.NodeStrong
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: util.StrToBytes("**")})
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -813,28 +821,52 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 	case atom.Del, atom.S, atom.Strike:
-		node.Type = ast.NodeStrikethrough
-		marker := "~~"
-		node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker, Tokens: util.StrToBytes(marker)})
+		if !lute.ParseOptions.GFMStrikethrough {
+			node.Type = ast.NodeHTMLTag
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<s>")})
+		} else {
+			node.Type = ast.NodeStrikethrough
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker, Tokens: util.StrToBytes("~~")})
+		}
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case atom.U:
+		node.Type = ast.NodeHTMLTag
+		node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<u>")})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Mark:
-		node.Type = ast.NodeMark
-		marker := "=="
-		node.AppendChild(&ast.Node{Type: ast.NodeMark2OpenMarker, Tokens: util.StrToBytes(marker)})
+		if !lute.ParseOptions.Mark {
+			node.Type = ast.NodeHTMLTag
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<mark>")})
+		} else {
+			node.Type = ast.NodeMark
+			node.AppendChild(&ast.Node{Type: ast.NodeMark2OpenMarker, Tokens: util.StrToBytes("==")})
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Sup:
-		node.Type = ast.NodeSup
-		node.AppendChild(&ast.Node{Type: ast.NodeSupOpenMarker})
+		if !lute.ParseOptions.Sup {
+			node.Type = ast.NodeHTMLTag
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<sup>")})
+		} else {
+			node.Type = ast.NodeSup
+			node.AppendChild(&ast.Node{Type: ast.NodeSupOpenMarker})
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Sub:
-		node.Type = ast.NodeSub
-		node.AppendChild(&ast.Node{Type: ast.NodeSubOpenMarker})
+		if !lute.ParseOptions.Sub {
+			node.Type = ast.NodeHTMLTag
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagOpen, Tokens: util.StrToBytes("<sub>")})
+		} else {
+			node.Type = ast.NodeSub
+			node.AppendChild(&ast.Node{Type: ast.NodeSubOpenMarker})
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1214,12 +1246,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 	switch n.DataAtom {
 	case atom.Em, atom.I:
-		marker := "*"
-		node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: util.StrToBytes(marker)})
+		if !lute.ParseOptions.InlineAsterisk && !lute.ParseOptions.InlineUnderscore {
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</em>")})
+		} else {
+			node.Type = ast.NodeEmphasis
+			node.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker, Tokens: util.StrToBytes("*")})
+		}
 		appendSpace(n, tree, lute)
 	case atom.Strong, atom.B:
-		marker := "**"
-		node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: util.StrToBytes(marker)})
+		if !lute.ParseOptions.InlineAsterisk && !lute.ParseOptions.InlineUnderscore {
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</strong>")})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: util.StrToBytes("**")})
+		}
 		appendSpace(n, tree, lute)
 	case atom.A:
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
@@ -1232,18 +1271,34 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	case atom.Del, atom.S, atom.Strike:
-		marker := "~~"
-		node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: util.StrToBytes(marker)})
+		if !lute.ParseOptions.GFMStrikethrough {
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</s>")})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker, Tokens: util.StrToBytes("~~")})
+		}
 		appendSpace(n, tree, lute)
+	case atom.U:
+		node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</u>")})
 	case atom.Mark:
-		marker := "=="
-		node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: util.StrToBytes(marker)})
+		if !lute.ParseOptions.Mark {
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</mark>")})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: util.StrToBytes("==")})
+		}
 		appendSpace(n, tree, lute)
 	case atom.Sup:
-		node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
+		if !lute.ParseOptions.Sup {
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</sup>")})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
+		}
 		appendSpace(n, tree, lute)
 	case atom.Sub:
-		node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
+		if !lute.ParseOptions.Sub {
+			node.AppendChild(&ast.Node{Type: ast.NodeHTMLTagClose, Tokens: util.StrToBytes("</sub>")})
+		} else {
+			node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
+		}
 		appendSpace(n, tree, lute)
 	case atom.Details:
 		tree.Context.ParentTip()

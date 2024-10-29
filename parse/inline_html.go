@@ -121,24 +121,48 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		}
 		ctx.pos += len(tags)
 
-		if t.Context.ParseOption.ProtyleWYSIWYG {
+		if t.Context.ParseOption.ProtyleWYSIWYG && nil == ctx.brackets /* 方括号后跟标签的情况不处理 [<strong> */ {
 			if bytes.EqualFold(tags, []byte("<br />")) || bytes.EqualFold(tags, []byte("<br/>")) || bytes.EqualFold(tags, []byte("<br>")) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
 			} else if bytes.HasPrefix(tags, []byte("<span data-type=")) {
 				ret = t.processSpanTag(tags, "<span data-type=", "</span>", ctx)
 				return
-			} else if bytes.Equal(tags, []byte("<kbd>")) {
+			} else if bytes.EqualFold(tags, []byte("<kbd>")) {
 				ret = t.processSpanTag(tags, "<kbd>", "</kbd>", ctx)
 				return
-			} else if bytes.Equal(tags, []byte("<u>")) {
+			} else if bytes.EqualFold(tags, []byte("<u>")) {
 				ret = t.processSpanTag(tags, "<u>", "</u>", ctx)
 				return
-			} else if bytes.Equal(tags, []byte("<sup>")) {
+			} else if bytes.EqualFold(tags, []byte("<sup>")) {
 				ret = t.processSpanTag(tags, "<sup>", "</sup>", ctx)
 				return
-			} else if bytes.Equal(tags, []byte("<sub>")) {
+			} else if bytes.EqualFold(tags, []byte("<sub>")) {
 				ret = t.processSpanTag(tags, "<sub>", "</sub>", ctx)
+				return
+			} else if bytes.EqualFold(tags, []byte("<mark>")) {
+				ret = t.processSpanTag(tags, "<mark>", "</mark>", ctx)
+				return
+			} else if bytes.EqualFold(tags, []byte("<s>")) {
+				ret = t.processSpanTag(tags, "<s>", "</s>", ctx)
+				return
+			} else if bytes.EqualFold(tags, []byte("<del>")) {
+				ret = t.processSpanTag(tags, "<del>", "</del>", ctx)
+				return
+			} else if bytes.EqualFold(tags, []byte("<strike>")) {
+				ret = t.processSpanTag(tags, "<strike>", "</strike>", ctx)
+				return
+			} else if bytes.EqualFold(tags, []byte("<em>")) {
+				ret = t.processSpanTag(tags, "<em>", "</em>", ctx)
+				return
+			} else if bytes.EqualFold(tags, []byte("<i>")) {
+				ret = t.processSpanTag(tags, "<i>", "</i>", ctx)
+				return
+			} else if bytes.EqualFold(tags, []byte("<strong>")) {
+				ret = t.processSpanTag(tags, "<strong>", "</strong>", ctx)
+				return
+			} else if bytes.EqualFold(tags, []byte("<b>")) {
+				ret = t.processSpanTag(tags, "<b>", "</b>", ctx)
 				return
 			}
 		}
@@ -176,12 +200,19 @@ func (t *Tree) processSpanTag(tags []byte, startTag, endTag string, ctx *InlineC
 
 	var typ string
 	startTagLen := len(startTag)
-	if "<kbd>" == startTag || "<u>" == startTag || "<sup>" == startTag || "<sub>" == startTag {
+	if "<kbd>" == startTag || "<u>" == startTag || "<sup>" == startTag || "<sub>" == startTag || "<mark>" == startTag || "<s>" == startTag || "<del>" == startTag || "<strike>" == startTag || "<em>" == startTag || "<i>" == startTag || "<strong>" == startTag || "<b>" == startTag {
 		if !t.Context.ParseOption.HTMLTag2TextMark {
 			ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 			return
 		}
 		typ = node.Data
+		if "b" == typ {
+			typ = "strong"
+		} else if "i" == typ {
+			typ = "em"
+		} else if "del" == typ || "strike" == typ {
+			typ = "s"
+		}
 	} else { // <span data-type="a">
 		typ = string(tags[startTagLen+1:])
 		typ = typ[:strings.Index(typ, "\"")]
@@ -612,7 +643,18 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 		if n.DataAtom == atom.Span {
 			dataType = "text"
 		} else {
-			dataType = n.DataAtom.String()
+			if "" != node.TextMarkType {
+				dataType = node.TextMarkType
+			} else {
+				dataType = n.DataAtom.String()
+				if "b" == dataType {
+					dataType = "strong"
+				} else if "i" == dataType {
+					dataType = "em"
+				} else if "del" == dataType || "strike" == dataType {
+					dataType = "s"
+				}
+			}
 		}
 	}
 	node.TextMarkType = dataType

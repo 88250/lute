@@ -257,7 +257,43 @@ var html2MdTests = []parseTest{
 func TestHTML2Md(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetAutoSpace(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetSub(true)
+	luteEngine.SetMark(true)
+	luteEngine.SetGFMStrikethrough(true)
+	luteEngine.SetInlineAsterisk(true)
+	luteEngine.SetInlineUnderscore(true)
 	for _, test := range html2MdTests {
+		md := luteEngine.HTML2Md(test.from)
+		if test.to != md {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
+		}
+	}
+}
+
+var html2MdDisableSyntaxTests = []parseTest{
+
+	{"7", "<strong><em>foo</em></strong> <em><strong>bar</strong></em>", "<strong><em>foo</em></strong> <em><strong>bar</strong></em>\n"},
+	{"6", "<kbd>foo</kbd>", "<kbd>foo</kbd>\n"},
+	{"5", "<mark>foo</mark>", "<mark>foo</mark>\n"},
+	{"4", "<u>foo</u>", "<u>foo</u>\n"},
+	{"3", "<s>foo</s> <del>bar</del> <strike>baz</strike>", "<s>foo</s> <s>bar</s> <s>baz</s>\n"},
+	{"2", "foo<strong>bar</strong> <b>baz</b>", "foo<strong>bar</strong> <strong>baz</strong>\n"},
+	{"1", "foo<em>bar</em> <i>baz</i>", "foo<em>bar</em> <em>baz</em>\n"},
+	{"0", "foo<sup>bar</sup></span><sub>baz</sub>", "foo<sup>bar</sup><sub>baz</sub>\n"},
+}
+
+func TestHTML2MdDisableSyntax(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetAutoSpace(true)
+	luteEngine.SetSup(false)
+	luteEngine.SetSub(false)
+	luteEngine.SetMark(false)
+	luteEngine.SetGFMStrikethrough(false)
+	luteEngine.SetInlineAsterisk(false)
+	luteEngine.SetInlineUnderscore(false)
+	luteEngine.SetHTMLTag2TextMark(true)
+	for _, test := range html2MdDisableSyntaxTests {
 		md := luteEngine.HTML2Md(test.from)
 		if test.to != md {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)

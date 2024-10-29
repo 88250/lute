@@ -147,3 +147,34 @@ func TestMd2BlockDOM(t *testing.T) {
 	}
 	ast.Testing = false
 }
+
+var md2BlockDOMDisableSyntaxTests = []parseTest{
+
+	{"8", "<kbd>foo</kbd>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"kbd\">\u200bfoo</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"7", "<mark>foo</mark>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"mark\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"6", "<u>foo</u>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"u\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"5", "<s>foo</s> <del>bar</del> <strike>baz</strike>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"s\">foo</span> <span data-type=\"s\">bar</span> <span data-type=\"s\">baz</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"4", "foo<strong>bar</strong> <b>baz</b>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"strong\">bar</span> <span data-type=\"strong\">baz</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"3", "foo<em>bar</em> <i>baz</i>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"em\">bar</span> <span data-type=\"em\">baz</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"2", "foo**bar** *baz*", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo**bar** *baz*</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"1", "foo<sup>bar</sup><sub>baz</sub>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo<span data-type=\"sup\">bar</span><span data-type=\"sub\">baz</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"0", "foo^bar^~baz~", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo^bar^~baz~</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+func TestMd2BlockDOMDisableSyntax(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetSup(false)
+	luteEngine.SetSub(false)
+	luteEngine.SetGFMStrikethrough1(false)
+	luteEngine.SetInlineAsterisk(false)
+	luteEngine.SetHTMLTag2TextMark(true)
+
+	ast.Testing = true
+	for _, test := range md2BlockDOMDisableSyntaxTests {
+		result := luteEngine.Md2BlockDOM(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+}
