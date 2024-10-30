@@ -276,7 +276,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		if "" == strings.TrimSpace(util.DomText(n)) {
 			for { // 这里用 for 是为了简化实现
-				if util.DomExistChildByType(n, atom.Img, atom.Picture, atom.Annotation) {
+				if util.DomExistChildByType(n, atom.Img, atom.Picture, atom.Annotation, atom.Iframe, atom.Video, atom.Audio, atom.Source, atom.Canvas, atom.Svg, atom.Math) {
 					break
 				}
 
@@ -1232,11 +1232,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 	case atom.Figure, atom.Picture:
-		node.Type = ast.NodeParagraph
 		if !tree.Context.Tip.IsContainerBlock() {
 			break
 		}
 
+		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
