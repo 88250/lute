@@ -1231,8 +1231,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeParagraph
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
-	case atom.Figure:
+	case atom.Figure, atom.Picture:
 		node.Type = ast.NodeParagraph
+		if !tree.Context.Tip.IsContainerBlock() {
+			break
+		}
+
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
@@ -1335,7 +1339,9 @@ func appendMathBlock(tree *parse.Tree, tex string) {
 
 	if ast.NodeParagraph == tree.Context.Tip.Type {
 		tree.Context.Tip.InsertAfter(mathBlock)
-		tree.Context.Tip.Unlink()
+		if nil == tree.Context.Tip.FirstChild {
+			tree.Context.Tip.Unlink()
+		}
 	} else {
 		tree.Context.Tip.AppendChild(mathBlock)
 	}
