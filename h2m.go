@@ -670,11 +670,21 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: code}
 		node.Type = ast.NodeCodeSpan
-		if bytes.Contains(code, []byte("`")) {
+		if bytes.Contains(code, []byte("```")) {
+			node.CodeMarkerLen = 2
+		} else if bytes.Contains(code, []byte("``")) {
+			node.CodeMarkerLen = 1
+		} else if bytes.Contains(code, []byte("`")) {
 			node.CodeMarkerLen = 2
 		}
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanOpenMarker, Tokens: []byte("`")})
+		if bytes.Contains(code, []byte("``")) {
+			content.Tokens = append([]byte(" "), content.Tokens...)
+		}
 		node.AppendChild(content)
+		if bytes.Contains(code, []byte("``")) {
+			content.Tokens = append(content.Tokens, ' ')
+		}
 		node.AppendChild(&ast.Node{Type: ast.NodeCodeSpanCloseMarker, Tokens: []byte("`")})
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
