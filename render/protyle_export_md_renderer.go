@@ -207,7 +207,6 @@ func (r *ProtyleExportMdRenderer) renderAttributeView(node *ast.Node, entering b
 
 func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkStatus {
 	isStrongEm := node.ContainTextMarkTypes("strong", "em", "s") && !node.IsTextMarkType("inline-math")
-
 	if entering {
 		marker := r.renderMdMarker(node, entering)
 		if !node.IsTextMarkType("a") && !node.IsTextMarkType("inline-memo") && !node.IsTextMarkType("block-ref") && !node.IsTextMarkType("file-annotation-ref") && !node.IsTextMarkType("inline-math") {
@@ -233,12 +232,21 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 				}
 			}
 			r.WriteString(marker)
+			if "``" == marker {
+				r.WriteByte(' ')
+			}
 			r.WriteString(textContent)
 		} else {
 			r.WriteString(marker)
+			if "``" == marker {
+				r.WriteByte(' ')
+			}
 		}
 	} else {
 		marker := r.renderMdMarker(node, entering)
+		if "``" == marker {
+			r.WriteByte(' ')
+		}
 		r.WriteString(marker)
 		if nil != node.Next {
 			if ast.NodeTextMark == node.Next.Type {
@@ -497,7 +505,11 @@ func (r *ProtyleExportMdRenderer) renderMdMarker1(node *ast.Node, currentTextmar
 	case "em":
 		ret += "*"
 	case "code":
-		ret += "`"
+		if strings.Contains(node.TextMarkTextContent, "`") {
+			ret += "``"
+		} else {
+			ret += "`"
+		}
 	case "tag":
 		ret += "#"
 	case "s":
