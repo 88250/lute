@@ -123,6 +123,10 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 					content.Write(html.EscapeHTML(n.Tokens))
 				} else if ast.NodeInlineMathContent == n.Type {
 					content.Write(n.Tokens)
+				} else if ast.NodeCodeSpanContent == n.Type {
+					content.WriteByte(lex.ItemBacktick)
+					content.Write(n.Tokens)
+					content.WriteByte(lex.ItemBacktick)
 				}
 				return ast.WalkContinue
 			})
