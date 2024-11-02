@@ -22,6 +22,7 @@ import (
 
 var protyleExportMdTests = []parseTest{
 
+	{"17", "` ``foo`` `", "`` `foo` ``\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"16", "`` `foo` ``", "`` `foo` ``\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"15", "`foo`", "`foo`\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"14", "[foo](bar baz.txt)", "[foo](bar%20baz.txt)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},

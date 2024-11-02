@@ -232,19 +232,19 @@ func (r *ProtyleExportMdRenderer) renderTextMark(node *ast.Node, entering bool) 
 				}
 			}
 			r.WriteString(marker)
-			if "``" == marker {
+			if strings.Contains(node.TextMarkTextContent, "`") {
 				r.WriteByte(' ')
 			}
 			r.WriteString(textContent)
 		} else {
 			r.WriteString(marker)
-			if "``" == marker {
+			if strings.Contains(node.TextMarkTextContent, "`") {
 				r.WriteByte(' ')
 			}
 		}
 	} else {
 		marker := r.renderMdMarker(node, entering)
-		if "``" == marker {
+		if strings.Contains(node.TextMarkTextContent, "`") {
 			r.WriteByte(' ')
 		}
 		r.WriteString(marker)
@@ -505,7 +505,9 @@ func (r *ProtyleExportMdRenderer) renderMdMarker1(node *ast.Node, currentTextmar
 	case "em":
 		ret += "*"
 	case "code":
-		if strings.Contains(node.TextMarkTextContent, "`") {
+		if strings.Contains(node.TextMarkTextContent, "``") {
+			ret += "`"
+		} else if strings.Contains(node.TextMarkTextContent, "`") {
 			ret += "``"
 		} else {
 			ret += "`"
