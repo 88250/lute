@@ -25,7 +25,7 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 		if context.ParseOption.ProtyleWYSIWYG {
 			lines := lex.Split(paragraph.Tokens, lex.ItemNewline)
 			delimRowIndex := context.findTableDelimRow(lines)
-			if -1 == delimRowIndex {
+			if 1 > delimRowIndex {
 				return
 			}
 
