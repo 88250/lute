@@ -121,7 +121,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		}
 		ctx.pos += len(tags)
 
-		if t.Context.ParseOption.ProtyleWYSIWYG && nil == ctx.brackets /* 方括号后跟标签的情况不处理 [<strong> */ {
+		if t.Context.ParseOption.ProtyleWYSIWYG {
 			if bytes.EqualFold(tags, []byte("<br />")) || bytes.EqualFold(tags, []byte("<br/>")) || bytes.EqualFold(tags, []byte("<br>")) {
 				ret = &ast.Node{Type: ast.NodeBr}
 				return
