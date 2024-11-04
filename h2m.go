@@ -1115,8 +1115,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			parentInline := nil != n.Parent && (atom.Span == n.Parent.DataAtom || atom.Td == n.Parent.DataAtom || atom.Th == n.Parent.DataAtom || strings.Contains(util.DomAttrValue(n.Parent, "class"), "inline"))
-			if parentInline && atom.Span == n.DataAtom &&
+			parentInline := nil != n.Parent && (lute.parentIs(n, atom.Strong, atom.Em, atom.I, atom.B, atom.Span, atom.P, atom.Td, atom.Th) || strings.Contains(util.DomAttrValue(n.Parent, "class"), "inline"))
+			if parentInline && atom.Span == n.DataAtom && nil == n.PrevSibling && (nil == n.NextSibling || (html.TextNode == n.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.NextSibling)))) &&
 				nil == n.Parent.PrevSibling && (nil == n.Parent.NextSibling || (html.TextNode == n.Parent.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.Parent.NextSibling)))) {
 				// 作为独立的公式块转换
 				appendMathBlock(tree, tex)
