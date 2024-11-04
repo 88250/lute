@@ -367,6 +367,23 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			n.FirstChild.Unlink()
 		}
 
+		if atom.Em == firstc.DataAtom && nil != firstc.NextSibling && atom.Em == firstc.NextSibling.DataAtom {
+			// pre.em,em,code 的情况，这两个 em 是“复制代码”和“隐藏代码” https://github.com/siyuan-note/siyuan/issues/13026
+			code := util.DomChildrenByType(n, atom.Code)
+			if 0 < len(code) {
+				firstc = code[0]
+				if nil != firstc {
+					unlinks := []*html.Node{}
+					for prev := firstc.PrevSibling; nil != prev; prev = prev.PrevSibling {
+						unlinks = append(unlinks, prev)
+					}
+					for _, unlink := range unlinks {
+						unlink.Unlink()
+					}
+				}
+			}
+		}
+
 		if atom.Div == firstc.DataAtom && nil == firstc.NextSibling {
 			codes := util.DomChildrenByType(n, atom.Code)
 			if 1 == len(codes) {
