@@ -606,7 +606,7 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 		}
 	}
 
-	if nil != n.Parent && nil != n.Parent.Parent {
+	if nil != n.Parent && nil != n.Parent.Parent && atom.Img == n.DataAtom {
 		if parentStyle := util.DomAttrValue(n.Parent.Parent, "style"); "" != parentStyle {
 			if insertedIAL {
 				m := Tokens2IAL(node.Next.Tokens)
