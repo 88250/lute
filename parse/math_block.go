@@ -90,6 +90,14 @@ func (context *Context) mathBlockFinalize(mathBlock *ast.Node) {
 	if bytes.HasSuffix(tokens, MathBlockMarker) {
 		tokens = tokens[:len(tokens)-2] // 剔除结尾的 $$
 	}
+	if bytes.Contains(tokens, []byte("<span data-type=")) {
+		// 行级元素转换为块级元素 https://ld246.com/article/1730804245164
+		inlineTree := Inline("", tokens, context.ParseOption)
+		if nil != inlineTree {
+			tokens = []byte(inlineTree.Root.Content())
+		}
+	}
+
 	mathBlock.Tokens = nil
 	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
 	mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: tokens})
