@@ -278,6 +278,7 @@ func TestHTML2Md(t *testing.T) {
 
 var html2MdDisableSyntaxTests = []parseTest{
 
+	{"8", "<span>这两个语素最开始</span><sup data-text=\"大概是春秋战国音吧。\" data-url=\"\" data-numero=\"1\" data-draft-node=\"inline\" data-draft-type=\"reference\" data-tooltip=\"大概是春秋战国音吧。\" data-tooltip-richtext=\"1\" data-tooltip-preset=\"white\" data-tooltip-classname=\"ztext-reference-tooltip\"><a id=\"ref_1_0\" href=\"https://www.zhihu.com/question/2127166482#ref_1\" data-reference-link=\"true\" aria-labelledby=\"ref_1\">[1]</a></sup><span>都很拟声</span>", "这两个语素最开始<sup>[[1]](https://www.zhihu.com/question/2127166482#ref_1)</sup>都很拟声\n"},
 	{"7", "<strong><em>foo</em></strong> <em><strong>bar</strong></em>", "<strong><em>foo</em></strong> <em><strong>bar</strong></em>\n"},
 	{"6", "<kbd>foo</kbd>", "<kbd>foo</kbd>\n"},
 	{"5", "<mark>foo</mark>", "<mark>foo</mark>\n"},

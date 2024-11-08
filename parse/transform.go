@@ -420,3 +420,73 @@ func processNestedNode(n *ast.Node, tag string, tags *[]string, unlinks *[]*ast.
 		}
 	}
 }
+
+func TextMarks2Inlines(tree *Tree) {
+	inlines := func(content string) (ret []*ast.Node) {
+		subTree := Inline("", []byte(content), tree.Context.ParseOption)
+		for c := subTree.Root.FirstChild.FirstChild; nil != c; c = c.Next {
+			ret = append(ret, c)
+		}
+		return
+	}
+
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeTextMark == n.Type {
+			switch n.TextMarkType {
+			case "sup":
+				n.Type = ast.NodeSup
+				n.PrependChild(&ast.Node{Type: ast.NodeSupOpenMarker})
+				nodes := inlines(n.TextMarkTextContent)
+				for _, node := range nodes {
+					n.AppendChild(node)
+				}
+				n.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
+			case "sub":
+				n.Type = ast.NodeSub
+				n.PrependChild(&ast.Node{Type: ast.NodeSubOpenMarker})
+				nodes := inlines(n.TextMarkTextContent)
+				for _, node := range nodes {
+					n.AppendChild(node)
+				}
+				n.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
+			case "em":
+				n.Type = ast.NodeEmphasis
+				n.PrependChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker})
+				nodes := inlines(n.TextMarkTextContent)
+				for _, node := range nodes {
+					n.AppendChild(node)
+				}
+				n.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker})
+			case "strong":
+				n.Type = ast.NodeStrong
+				n.PrependChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker})
+				nodes := inlines(n.TextMarkTextContent)
+				for _, node := range nodes {
+					n.AppendChild(node)
+				}
+				n.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker})
+			case "mark":
+				n.Type = ast.NodeMark
+				n.PrependChild(&ast.Node{Type: ast.NodeMark2OpenMarker})
+				nodes := inlines(n.TextMarkTextContent)
+				for _, node := range nodes {
+					n.AppendChild(node)
+				}
+				n.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker})
+			case "s":
+				n.Type = ast.NodeStrikethrough
+				n.PrependChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker})
+				nodes := inlines(n.TextMarkTextContent)
+				for _, node := range nodes {
+					n.AppendChild(node)
+				}
+				n.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker})
+			}
+		}
+		return ast.WalkContinue
+	})
+}

@@ -151,6 +151,7 @@ func TestMd2BlockDOM(t *testing.T) {
 
 var md2BlockDOMDisableSyntaxTests = []parseTest{
 
+	{"9", "这两个语素最开始<sup>[[1]](https://www.zhihu.com/question/2127166482#ref_1)</sup>都很拟声\\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">这两个语素最开始<span data-type=\"sup a\" data-href=\"https://www.zhihu.com/question/2127166482#ref_1\">[1]</span>都很拟声\\n</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"8", "<kbd>foo</kbd>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"kbd\">\u200bfoo</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"7", "<mark>foo</mark>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"mark\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"6", "<u>foo</u>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"u\">foo</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
