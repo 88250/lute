@@ -757,11 +757,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeBang})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 			if "" != imgAlt {
+				imgAlt = strings.TrimSpace(imgAlt)
+				imgAlt = strings.ReplaceAll(imgAlt, "动图封面", "动图")
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: util.StrToBytes(imgAlt)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 			src := util.DomAttrValue(n, "src")
+			if strings.Contains(class, "ztext-gif") && strings.Contains(src, "zhimg.com") {
+				// 处理知乎动图
+				src = strings.Replace(src, ".jpg", ".webp", 1)
+			}
+
 			if strings.HasPrefix(src, "data:image") {
 				// 处理可能存在的预加载情况
 				if dataSrc := util.DomAttrValue(n, "data-src"); "" != dataSrc {
