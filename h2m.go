@@ -462,7 +462,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				if strings.Contains(class, "language-") {
 					language := class[strings.Index(class, "language-")+len("language-"):]
 					language = strings.Split(language, " ")[0]
-					node.LastChild.CodeBlockInfo = []byte(language)
+					if "fallback" != language && "chroma" != language {
+						node.LastChild.CodeBlockInfo = []byte(language)
+					}
 				} else {
 					if atom.Code == firstc.DataAtom && !span2Code {
 						class := util.DomAttrValue(firstc, "class")
@@ -474,7 +476,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 				if 1 > len(node.LastChild.CodeBlockInfo) {
 					class := util.DomAttrValue(n, "class")
-					if !strings.Contains(class, " ") {
+					if !strings.Contains(class, " ") && "fallback" != class && "chroma" != class {
 						node.LastChild.CodeBlockInfo = []byte(class)
 					}
 				}

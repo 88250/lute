@@ -355,6 +355,20 @@ func (lute *Lute) adjustTableCode(n *html.Node) {
 				continue
 			}
 
+			// 移除 <span class="lnt"> 格式的行号 https://github.com/siyuan-note/siyuan/issues/13242
+			spans := util.DomChildrenByType(td, atom.Span)
+			removed := false
+			for _, span := range spans {
+				if "lnt" == util.DomAttrValue(span, "class") {
+					removed = true
+					break
+				}
+			}
+			if removed {
+				unlinks = append(unlinks, td)
+				continue
+			}
+
 			if strings.Contains(tdClass, "code") {
 				if c := td.FirstChild; nil != c && atom.Div == c.DataAtom {
 					c.DataAtom = atom.Pre
