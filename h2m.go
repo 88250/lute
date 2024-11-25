@@ -1140,13 +1140,16 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			parentInline := nil != n.Parent && (lute.parentIs(n, atom.Strong, atom.Em, atom.I, atom.B, atom.Span, atom.P, atom.Td, atom.Th) || strings.Contains(util.DomAttrValue(n.Parent, "class"), "inline"))
 			if parentInline && atom.Span == n.DataAtom && nil == n.PrevSibling && (nil == n.NextSibling || (html.TextNode == n.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.NextSibling)))) &&
 				nil == n.Parent.PrevSibling && (nil == n.Parent.NextSibling || (html.TextNode == n.Parent.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.Parent.NextSibling)))) {
-				// 作为独立的公式块转换
 				appendMathBlock(tree, tex)
 				return
 			}
 
 			if !parentInline && nil == n.PrevSibling && (nil == n.NextSibling || (html.TextNode == n.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.NextSibling)))) {
-				// 作为独立的公式块转换
+				appendMathBlock(tree, tex)
+				return
+			}
+
+			if atom.Span == n.DataAtom && "katex-display" == util.DomAttrValue(n, "class") {
 				appendMathBlock(tree, tex)
 				return
 			}
