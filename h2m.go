@@ -706,7 +706,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 		return
 	case atom.Br:
-		if ast.NodeLink == tree.Context.Tip.Type {
+		if ast.NodeLink == tree.Context.Tip.Type || ast.NodeHeading == tree.Context.Tip.Type {
 			break
 		}
 
