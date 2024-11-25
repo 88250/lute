@@ -306,6 +306,14 @@ func (lute *Lute) adjustMath(n *html.Node) {
 		}
 	}
 
+	if atom.Img == n.DataAtom && strings.Contains(class, "ma-tex-img") {
+		if mathContent := util.DomAttrValue(n, "alt"); "" != mathContent {
+			n.DataAtom = atom.Span
+			util.SetDomAttrValue(n, "data-tex", mathContent)
+		}
+		return
+	}
+
 	formula := util.DomAttrValue(n, "data-formula")
 	if "" != formula {
 		if html.ElementNode == n.Type && "mjx-container" == n.Data {
