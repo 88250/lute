@@ -1576,6 +1576,7 @@ func (r *FormatRenderer) renderStrongU8eCloseMarker(node *ast.Node, entering boo
 
 func (r *FormatRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.newlineBeforeBlock(node)
 		r.Writer = &bytes.Buffer{}
 		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 	} else {
@@ -1634,6 +1635,7 @@ func (r *FormatRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) a
 
 func (r *FormatRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.newlineBeforeBlock(node)
 		if !node.HeadingSetext {
 			r.Write(bytes.Repeat([]byte{lex.ItemCrosshatch}, node.HeadingLevel))
 			r.WriteByte(lex.ItemSpace)
@@ -1672,6 +1674,7 @@ func (r *FormatRenderer) renderHeadingID(node *ast.Node, entering bool) ast.Walk
 
 func (r *FormatRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.newlineBeforeBlock(node)
 		r.Writer = &bytes.Buffer{}
 		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 	} else {
@@ -1810,4 +1813,10 @@ func (r *FormatRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.Walk
 
 func (r *FormatRenderer) withoutKramdownBlockIAL(node *ast.Node) bool {
 	return !r.Options.KramdownBlockIAL || 0 == len(node.KramdownIAL) || nil == node.Next || ast.NodeKramdownBlockIAL != node.Next.Type
+}
+
+func (r *FormatRenderer) newlineBeforeBlock(node *ast.Node) {
+	if !node.ParentIs(ast.NodeTableCell) && nil != node.Previous && (!node.Previous.IsBlock() && ast.NodeKramdownBlockIAL != node.Previous.Type && ast.NodeTaskListItemMarker != node.Previous.Type) {
+		r.Newline()
+	}
 }
