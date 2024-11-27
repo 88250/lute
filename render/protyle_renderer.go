@@ -422,6 +422,7 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
+		attrs = append(attrs, []string{"loading", "lazy"})
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
 		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
@@ -1274,7 +1275,7 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 		dataSrcTokens := destTokens
 		dataSrc := util.BytesToStr(dataSrcTokens)
 		src := util.BytesToStr(r.LinkPath(destTokens))
-		attrs := [][]string{{"src", src}, {"data-src", dataSrc}}
+		attrs := [][]string{{"src", src}, {"data-src", dataSrc}, {"loading", "lazy"}}
 		alt := node.ChildByType(ast.NodeLinkText)
 		if nil != alt && 0 < len(alt.Tokens) {
 			attrs = append(attrs, []string{"alt", util.BytesToStr(alt.Tokens)})
