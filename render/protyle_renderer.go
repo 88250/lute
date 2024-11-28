@@ -1262,7 +1262,11 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 		r.Tag("span", nil, false)
 		r.WriteString(" ")
 		r.Tag("/span", nil, false)
-		r.Tag("span", nil, false)
+		attrs = [][]string{}
+		if style := node.IALAttr("style"); "" != style {
+			attrs = append(attrs, []string{"style", style})
+		}
+		r.Tag("span", attrs, false)
 		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 		r.WriteString("<span class=\"protyle-icon protyle-icon--only\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/span", nil, false)
@@ -1287,10 +1291,6 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 			titleTokens = title.Tokens
 			attrs = append(attrs, []string{"title", r.escapeRefText(string(titleTokens))})
 		}
-
-		if style := node.IALAttr("style"); "" != style {
-			attrs = append(attrs, []string{"style", style})
-		}
 		r.Tag("img", attrs, true)
 
 		buf := r.Writer.Bytes()
@@ -1312,7 +1312,9 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 
 		attrs = [][]string{{"class", "protyle-action__title"}}
 		r.Tag("span", attrs, false)
+		r.Tag("span", nil, false)
 		r.Writer.Write(html.EscapeHTML(titleTokens))
+		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
 		r.Tag("span", nil, false)

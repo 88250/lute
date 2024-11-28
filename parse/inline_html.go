@@ -606,6 +606,24 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 		}
 	}
 
+	if nil != n.Parent && atom.Img == n.DataAtom {
+		if style := util.DomAttrValue(n.Parent, "style"); "" != style {
+			if insertedIAL {
+				m := Tokens2IAL(node.Next.Tokens)
+				m = append(m, []string{"style", style})
+				node.Next.Tokens = IAL2Tokens(m)
+				node.SetIALAttr("style", style)
+				node.KramdownIAL = m
+			} else {
+				node.SetIALAttr("style", style)
+				ialTokens := IAL2Tokens(node.KramdownIAL)
+				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+				node.InsertAfter(ial)
+			}
+			insertedIAL = true
+		}
+	}
+
 	if nil != n.Parent && nil != n.Parent.Parent && atom.Img == n.DataAtom {
 		if parentStyle := util.DomAttrValue(n.Parent.Parent, "style"); "" != parentStyle {
 			if insertedIAL {
