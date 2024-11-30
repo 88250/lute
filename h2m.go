@@ -818,13 +818,27 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
 			var linkTitle string
-			if nil != n.NextSibling && atom.Figcaption == n.NextSibling.DataAtom {
-				linkTitle = util.DomText(n.NextSibling)
-				n.NextSibling.Unlink()
+
+			var figcaption *html.Node
+			for next := n.NextSibling; nil != next; next = next.NextSibling {
+				if html.TextNode == next.Type && "" == strings.TrimSpace(next.Data) {
+					continue
+				}
+
+				if atom.Figcaption == next.DataAtom {
+					figcaption = next
+					break
+				}
+			}
+
+			if nil != figcaption {
+				linkTitle = util.DomText(figcaption)
+				figcaption.Unlink()
 			}
 			if "" == linkTitle {
 				linkTitle = util.DomAttrValue(n, "title")
 			}
+			linkTitle = strings.TrimSpace(linkTitle)
 			if "" != linkTitle {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
