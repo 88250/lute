@@ -1252,10 +1252,13 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
 		parentStyle := node.IALAttr("parent-style")
 		if "" != parentStyle { // 手动设置了位置
-			attrs = append(attrs, []string{"style", parentStyle})
+			parentStyle = strings.ReplaceAll(parentStyle, "display: block;", "")
+			parentStyle = strings.TrimSpace(parentStyle)
+			if "" != parentStyle {
+				attrs = append(attrs, []string{"style", parentStyle})
+			}
 		}
-		if !strings.Contains(parentStyle, "display") && !strings.Contains(parentStyle, "block") &&
-			r.LastOut == '\n' {
+		if r.LastOut == '\n' {
 			r.WriteString(editor.Zwsp)
 		}
 		r.Tag("span", attrs, false)
