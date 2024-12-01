@@ -610,7 +610,17 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 		if style := util.DomAttrValue(n.Parent, "style"); "" != style {
 			if insertedIAL {
 				m := Tokens2IAL(node.Next.Tokens)
-				m = append(m, []string{"style", style})
+				merged := false
+				for _, kv := range m {
+					if "style" == kv[0] {
+						kv[1] = kv[1] + style
+						merged = true
+						break
+					}
+				}
+				if !merged {
+					m = append(m, []string{"style", style})
+				}
 				node.Next.Tokens = IAL2Tokens(m)
 				node.SetIALAttr("style", style)
 				node.KramdownIAL = m
