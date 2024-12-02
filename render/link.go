@@ -46,6 +46,12 @@ func (r *BaseRenderer) RelativePath(dest []byte) []byte {
 		return dest
 	}
 
+	if strings.HasPrefix(r.Options.LinkBase, "https://assets.b3logfile.com/siyuan/") ||
+		strings.HasPrefix(r.Options.LinkBase, "https://assets.liuyun.io/siyuan/") {
+		// 思源笔记云端图床服务
+		return dest
+	}
+
 	dest = bytes.ReplaceAll(dest, []byte("%5C"), []byte("\\"))
 	linkBase := util.StrToBytes(r.Options.LinkBase)
 	if !bytes.HasSuffix(linkBase, []byte("/")) {
