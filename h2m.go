@@ -358,16 +358,27 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if atom.Div == firstc.DataAtom && nil != firstc.NextSibling && atom.Code == firstc.NextSibling.DataAtom {
-			firstc = firstc.NextSibling
-			n.FirstChild.Unlink()
+		codes := util.DomChildrenByType(n, atom.Code)
+		if 0 < len(codes) {
+			// 删除第一个 code 之前的标签
+			unlinks := []*html.Node{}
+			for prev := codes[0].PrevSibling; nil != prev; prev = prev.PrevSibling {
+				unlinks = append(unlinks, prev)
+			}
+			for _, unlink := range unlinks {
+				unlink.Unlink()
+			}
+			firstc = n.FirstChild
+			if nil == firstc {
+				return
+			}
 		}
 
 		if atom.Em == firstc.DataAtom && nil != firstc.NextSibling && atom.Em == firstc.NextSibling.DataAtom {
 			// pre.em,em,code 的情况，这两个 em 是“复制代码”和“隐藏代码” https://github.com/siyuan-note/siyuan/issues/13026
-			code := util.DomChildrenByType(n, atom.Code)
-			if 0 < len(code) {
-				firstc = code[0]
+
+			if 0 < len(codes) {
+				firstc = codes[0]
 				if nil != firstc {
 					unlinks := []*html.Node{}
 					for prev := firstc.PrevSibling; nil != prev; prev = prev.PrevSibling {
@@ -381,7 +392,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		if atom.Div == firstc.DataAtom && nil == firstc.NextSibling {
-			codes := util.DomChildrenByType(n, atom.Code)
 			if 1 == len(codes) {
 				code := codes[0]
 				// pre 下只有一个 div，且 div 下只有一个 code，那么将 pre.div 替换为 pre.code https://github.com/siyuan-note/siyuan/issues/11131
