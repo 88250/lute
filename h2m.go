@@ -760,10 +760,16 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		imgClass := util.DomAttrValue(n, "class")
 		imgAlt := util.DomAttrValue(n, "alt")
 		if "emoji" == imgClass {
-			node.Type = ast.NodeEmoji
-			emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.EmojiImgTokens(imgAlt, util.DomAttrValue(n, "src"))}
-			emojiImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: util.StrToBytes(":" + imgAlt + ":")})
-			node.AppendChild(emojiImg)
+			if e := parse.EmojiUnicodeAlias[imgAlt]; "" != e {
+				// 直接使用 alt 值（即 emoji 字符）https://github.com/siyuan-note/siyuan/issues/13342
+				node.Type = ast.NodeText
+				node.Tokens = []byte(imgAlt)
+			} else {
+				node.Type = ast.NodeEmoji
+				emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.EmojiImgTokens(imgAlt, util.DomAttrValue(n, "src"))}
+				emojiImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: util.StrToBytes(":" + imgAlt + ":")})
+				node.AppendChild(emojiImg)
+			}
 		} else {
 			node.Type = ast.NodeImage
 			node.AppendChild(&ast.Node{Type: ast.NodeBang})
