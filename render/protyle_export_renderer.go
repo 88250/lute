@@ -1230,13 +1230,37 @@ func (r *ProtyleExportRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		attrs := [][]string{{"contenteditable", "false"}, {"data-type", "img"}, {"class", "img"}}
 		parentStyle := node.IALAttr("parent-style")
 		if "" != parentStyle { // 手动设置了位置
-			attrs = append(attrs, []string{"style", parentStyle})
+			parentStyle = strings.ReplaceAll(parentStyle, "display: block;", "")
+			parentStyle = strings.TrimSpace(parentStyle)
+			if "" != parentStyle {
+				attrs = append(attrs, []string{"style", parentStyle})
+			}
+		}
+		if r.LastOut == '\n' {
+			r.WriteString(editor.Zwsp)
 		}
 		r.Tag("span", attrs, false)
 		r.Tag("span", nil, false)
 		r.WriteString(" ")
 		r.Tag("/span", nil, false)
-		r.Tag("span", nil, false)
+		attrs = [][]string{}
+		if style := node.IALAttr("style"); "" != style {
+			styles := strings.Split(style, ";")
+			var width string
+			for _, s := range styles {
+				if strings.Contains(s, "width") {
+					width = s
+					break
+				}
+			}
+			width = strings.ReplaceAll(width, "vw", "%")
+			width = strings.TrimSpace(width)
+			if "" != width {
+				width += ";"
+				attrs = append(attrs, []string{"style", width})
+			}
+		}
+		r.Tag("span", attrs, false)
 		r.Tag("span", [][]string{{"class", "protyle-action protyle-icons"}}, false)
 		r.WriteString("<span class=\"protyle-icon protyle-icon--only\"><svg class=\"svg\"><use xlink:href=\"#iconMore\"></use></svg></span>")
 		r.Tag("/span", nil, false)
@@ -1249,7 +1273,7 @@ func (r *ProtyleExportRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		dataSrcTokens := destTokens
 		dataSrc := util.BytesToStr(dataSrcTokens)
 		src := util.BytesToStr(r.LinkPath(destTokens))
-		attrs := [][]string{{"src", src}, {"data-src", dataSrc}}
+		attrs := [][]string{{"src", src}, {"data-src", dataSrc}, {"loading", "lazy"}}
 		alt := node.ChildByType(ast.NodeLinkText)
 		if nil != alt && 0 < len(alt.Tokens) {
 			attrs = append(attrs, []string{"alt", util.BytesToStr(alt.Tokens)})
@@ -1261,9 +1285,21 @@ func (r *ProtyleExportRenderer) renderImage(node *ast.Node, entering bool) ast.W
 			titleTokens = title.Tokens
 			attrs = append(attrs, []string{"title", r.escapeRefText(string(titleTokens))})
 		}
-
 		if style := node.IALAttr("style"); "" != style {
-			attrs = append(attrs, []string{"style", style})
+			styles := strings.Split(style, ";")
+			var width string
+			for _, s := range styles {
+				if strings.Contains(s, "width") {
+					width = s
+				}
+			}
+			style = strings.ReplaceAll(style, width+";", "")
+			style = strings.ReplaceAll(style, "flex: 0 0 auto;", "")
+			style = strings.ReplaceAll(style, "display: block;", "")
+			style = strings.TrimSpace(style)
+			if "" != style {
+				attrs = append(attrs, []string{"style", style})
+			}
 		}
 		r.Tag("img", attrs, true)
 
@@ -1286,7 +1322,9 @@ func (r *ProtyleExportRenderer) renderImage(node *ast.Node, entering bool) ast.W
 
 		attrs = [][]string{{"class", "protyle-action__title"}}
 		r.Tag("span", attrs, false)
+		r.Tag("span", nil, false)
 		r.Writer.Write(html.EscapeHTML(titleTokens))
+		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
 		r.Tag("span", nil, false)
