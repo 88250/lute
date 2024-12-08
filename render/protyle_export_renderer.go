@@ -208,6 +208,11 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 		}
 
 		if node.IsTextMarkType("a") {
+			sup := node.ContainTextMarkTypes("sup")
+			if sup {
+				r.Tag("sup", nil, false)
+			}
+
 			attrs := [][]string{{"href", node.TextMarkAHref}}
 			if "" != node.TextMarkATitle {
 				attrs = append(attrs, []string{"title", node.TextMarkATitle})
@@ -216,6 +221,10 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 			r.Tag("a", attrs, false)
 			r.WriteString(textContent)
 			r.WriteString("</a>")
+
+			if sup {
+				r.Tag("/sup", nil, false)
+			}
 		} else if node.IsTextMarkType("inline-memo") {
 			r.WriteString(textContent)
 
