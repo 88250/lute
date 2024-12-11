@@ -181,7 +181,8 @@ func (t *Tree) processSpanTag(tags []byte, startTag, endTag string, ctx *InlineC
 	}
 
 	end := bytes.Index(remains, []byte(endTag))
-	if -1 == end {
+	innerStartTagIndex := bytes.Index(remains, []byte(startTag))
+	if (bytes.Contains(remains, []byte(startTag)) && -1 < end && innerStartTagIndex < end) || -1 == end {
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 		return
 	}
