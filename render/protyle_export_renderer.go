@@ -1282,7 +1282,7 @@ func (r *ProtyleExportRenderer) renderImage(node *ast.Node, entering bool) ast.W
 		dataSrcTokens := destTokens
 		dataSrc := util.BytesToStr(dataSrcTokens)
 		src := util.BytesToStr(r.LinkPath(destTokens))
-		attrs := [][]string{{"src", src}, {"data-src", dataSrc}, {"loading", "lazy"}}
+		attrs := [][]string{{"src", src}, {"data-src", dataSrc}}
 		alt := node.ChildByType(ast.NodeLinkText)
 		if nil != alt && 0 < len(alt.Tokens) {
 			attrs = append(attrs, []string{"alt", util.BytesToStr(alt.Tokens)})
