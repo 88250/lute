@@ -724,9 +724,8 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			buf := bytes.Buffer{}
 			for i, line := range lines {
 				if strings.Contains(line, "```") {
+					line = strings.ReplaceAll(line, editor.Zwj+"```", "```")
 					line = strings.ReplaceAll(line, "```", editor.Zwj+"```")
-				} else {
-					line = strings.ReplaceAll(line, editor.Zwj, "")
 				}
 				buf.WriteString(line)
 				if i < len(lines)-1 {
