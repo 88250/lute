@@ -743,6 +743,28 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 					// 表格中的代码中带有管道符时使用 HTML 实体替换管道符 Improve the handling of inline-code containing `|` in the table https://github.com/siyuan-note/siyuan/issues/9252
 					node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "|", "&#124;")
 				}
+
+				if "u" == node.TextMarkType {
+					// 下划线中支持包含 Markdown 语法 Improve underline element parsing https://github.com/siyuan-note/siyuan/issues/13768
+
+					content := node.TextMarkTextContent
+					if nil != n.FirstChild && "a" == util.DomAttrValue(n.FirstChild, "data-type") {
+						content = "[" + content + "](" + util.DomAttrValue(n.FirstChild, "data-href") + ")"
+					}
+
+					inlineTree := Inline("", []byte(content), options)
+					if nil != inlineTree && nil != inlineTree.Root.FirstChild && nil != inlineTree.Root.FirstChild.FirstChild {
+						node.TextMarkTextContent = inlineTree.Root.FirstChild.Content()
+
+						if nil == inlineTree.Root.FirstChild.FirstChild.Next {
+							// 不支持下划线中包含多个元素
+							if ast.NodeLink == inlineTree.Root.FirstChild.FirstChild.Type {
+								node.TextMarkType += " a"
+								node.TextMarkAHref = inlineTree.Root.FirstChild.FirstChild.ChildByType(ast.NodeLinkDest).TokensStr()
+							}
+						}
+					}
+				}
 			}
 		}
 	}
