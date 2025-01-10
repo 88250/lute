@@ -113,7 +113,29 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 							content.WriteByte(lex.ItemDoublequote)
 						}
 					}
-					content.Write(n.Tokens)
+
+					if spanIdx1 := bytes.Index(n.Tokens, []byte("<span data-type=")); 0 <= spanIdx1 {
+						if spanIdx2 := bytes.Index(n.Tokens[spanIdx1:], []byte(">")); 0 <= spanIdx2 {
+							content.Write(n.Tokens[:spanIdx1])
+							content.Write(n.Tokens[spanIdx1+spanIdx2+1:])
+							if closeIdx := bytes.Index(ctx.tokens[endPos+1:], []byte("</span>{: ")); 0 <= closeIdx {
+								if closeIdx2 := bytes.Index(ctx.tokens[endPos+1+closeIdx:], []byte("}")); 0 <= closeIdx2 {
+									ctx.tokens = append(ctx.tokens[:endPos+1+closeIdx], ctx.tokens[endPos+1+closeIdx+closeIdx2+1:]...)
+									ctx.tokensLen = len(ctx.tokens)
+								} else {
+									ctx.tokens = bytes.Replace(ctx.tokens, []byte("</span>"), nil, 1)
+									ctx.tokensLen = len(ctx.tokens)
+								}
+							} else if closeIdx := bytes.Index(ctx.tokens[endPos+1:], []byte("</span>")); 0 <= closeIdx {
+								ctx.tokens = bytes.Replace(ctx.tokens, []byte("</span>"), nil, 1)
+								ctx.tokensLen -= 7
+							}
+						} else {
+							content.Write(n.Tokens)
+						}
+					} else {
+						content.Write(n.Tokens)
+					}
 				} else if ast.NodeLinkSpace == n.Type {
 					content.WriteByte(lex.ItemSpace)
 				} else if ast.NodeBackslashContent == n.Type {
