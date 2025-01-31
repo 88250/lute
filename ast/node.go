@@ -545,8 +545,9 @@ func (n *Node) Content() (ret string) {
 			buf.Write(n.Tokens)
 		case NodeTextMark:
 			if "" != n.TextMarkTextContent {
-				if n.IsTextMarkType("code") {
+				if n.IsTextMarkType("code") || n.IsTextMarkType("tag") {
 					// 搜索代码内容转义问题 https://github.com/siyuan-note/siyuan/issues/5927
+					// 搜索标签内容转义问题 https://github.com/siyuan-note/siyuan/issues/13919
 					buf.WriteString(html.UnescapeString(n.TextMarkTextContent))
 				} else {
 					buf.WriteString(n.TextMarkTextContent)
