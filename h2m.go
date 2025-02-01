@@ -1179,12 +1179,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			if atom.Span == n.DataAtom && "katex-display" == util.DomAttrValue(n, "class") {
+			if atom.Span == n.DataAtom && "katex-display" == util.DomAttrValue(n, "class") ||
+				nil != util.DomChildByTypeAndClass(n, atom.Span, "MathJax_SVG_Display") {
 				appendMathBlock(tree, tex)
 				return
 			}
 
-			if strings.HasSuffix(strings.TrimSpace(tex), "\\\\") || strings.Contains(tex, "\n") {
+			if strings.HasSuffix(strings.TrimSpace(tex), "\\\\") || strings.Contains(tex, "\n") || strings.Contains(tex, "\\tag{") {
 				appendMathBlock(tree, tex)
 			} else {
 				appendInlineMath(tree, tex)
