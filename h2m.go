@@ -1059,6 +1059,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				tree.Context.Tip.LastChild.TextMarkType = "inline-memo"
 				tree.Context.Tip.LastChild.TextMarkTextContent = tree.Context.Tip.LastChild.TokensStr()
 				tree.Context.Tip.LastChild.TextMarkInlineMemoContent = util.DomText(n)
+				if nil != tree.Context.Tip.LastChild.Previous && ast.NodeText == tree.Context.Tip.LastChild.Previous.Type {
+					tree.Context.Tip.LastChild.Previous.Tokens = bytes.TrimSpace(tree.Context.Tip.LastChild.Previous.Tokens)
+					if 0 == len(tree.Context.Tip.LastChild.Previous.Tokens) {
+						tree.Context.Tip.LastChild.Previous.Unlink()
+					}
+				}
 				return
 			}
 		}
@@ -1070,6 +1076,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			node.TextMarkTextContent = util.DomText(n)
 			node.TextMarkInlineMemoContent = title
 			tree.Context.Tip.AppendChild(node)
+			if nil != tree.Context.Tip.LastChild.Previous && ast.NodeText == tree.Context.Tip.LastChild.Previous.Type {
+				tree.Context.Tip.LastChild.Previous.Tokens = bytes.TrimSpace(tree.Context.Tip.LastChild.Previous.Tokens)
+				if 0 == len(tree.Context.Tip.LastChild.Previous.Tokens) {
+					tree.Context.Tip.LastChild.Previous.Unlink()
+				}
+			}
 			return
 		}
 
