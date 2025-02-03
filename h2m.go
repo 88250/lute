@@ -1052,6 +1052,27 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if "tip" == class {
+			// 转换为行级备注 https://github.com/siyuan-note/siyuan/issues/13998
+			if nil != tree.Context.Tip.LastChild && ast.NodeText == tree.Context.Tip.LastChild.Type {
+				tree.Context.Tip.LastChild.Type = ast.NodeTextMark
+				tree.Context.Tip.LastChild.TextMarkType = "inline-memo"
+				tree.Context.Tip.LastChild.TextMarkTextContent = tree.Context.Tip.LastChild.TokensStr()
+				tree.Context.Tip.LastChild.TextMarkInlineMemoContent = util.DomText(n)
+				return
+			}
+		}
+
+		if title := strings.TrimSpace(util.DomAttrValue(n, "title")); "" != title {
+			// 转换为行级备注 https://github.com/siyuan-note/siyuan/issues/13998
+			node.Type = ast.NodeTextMark
+			node.TextMarkType = "inline-memo"
+			node.TextMarkTextContent = util.DomText(n)
+			node.TextMarkInlineMemoContent = title
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
 		// Improve inline elements pasting https://github.com/siyuan-note/siyuan/issues/11740
 		dataType := util.DomAttrValue(n, "data-type")
 		dataType = strings.Split(dataType, " ")[0] // 简化为只处理第一个类型
