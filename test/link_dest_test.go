@@ -58,6 +58,11 @@ func TestGetLinkDest(t *testing.T) {
 	if "https://abc.pm/" != dest {
 		t.Fatalf("get link dest failed")
 	}
+
+	dest = luteEngine.GetLinkDest("file://D:\\Admin\\Downloads\\隔壁叔叔过年还在玩思源.jpg")
+	if "file://D:\\Admin\\Downloads\\隔壁叔叔过年还在玩思源.jpg" != dest {
+		t.Fatalf("get link dest failed")
+	}
 }
 
 func TestIsValidLinkDest(t *testing.T) {

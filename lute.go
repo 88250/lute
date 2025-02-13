@@ -173,6 +173,10 @@ func (lute *Lute) IsValidLinkDest(str string) bool {
 
 func (lute *Lute) GetLinkDest(str string) string {
 	str = strings.TrimSpace(str)
+	if strings.HasPrefix(str, "file://") {
+		return str
+	}
+
 	luteEngine := New()
 	luteEngine.ParseOptions.GFMAutoLink = true
 	tree := parse.Parse("", []byte(str), luteEngine.ParseOptions)
