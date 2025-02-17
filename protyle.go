@@ -287,8 +287,12 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	htmlStr = strings.Repeat("&nbsp;", startSpaces) + htmlStr + strings.Repeat("&nbsp;", endSpaces)
 
 	// 替换结尾空白，否则 HTML 解析会产生冗余节点导致生成空的代码块
-	htmlStr = strings.ReplaceAll(htmlStr, "\t\n", "\n")
-	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
+	for strings.HasSuffix(htmlStr, "\t\n") {
+		htmlStr = strings.TrimSuffix(htmlStr, "\t\n") + "\n"
+	}
+	for strings.HasSuffix(htmlStr, "    \n") {
+		htmlStr = strings.TrimSuffix(htmlStr, "    \n") + "\n"
+	}
 
 	// 将字符串解析为 DOM 树
 	htmlRoot := lute.parseHTML(htmlStr)
