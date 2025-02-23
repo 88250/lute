@@ -95,10 +95,17 @@ func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 			return ast.WalkContinue
 		}
 
-		if !n.IsBlock() && ast.NodeCodeBlockCode != n.Type && ast.NodeMathBlockContent != n.Type && ast.NodeTaskListItemMarker != n.Type &&
-			ast.NodeTableHead != n.Type && ast.NodeTableRow != n.Type && ast.NodeTableCell != n.Type {
-			inlines = append(inlines, n)
-			return ast.WalkSkipChildren
+		if !n.IsBlock() {
+			if ast.NodeCodeBlockCode != n.Type && ast.NodeMathBlockContent != n.Type && ast.NodeTaskListItemMarker != n.Type &&
+				ast.NodeTableHead != n.Type && ast.NodeTableRow != n.Type && ast.NodeTableCell != n.Type {
+				if ast.NodeBlockquoteMarker == n.Type {
+					inlines = append(inlines, &ast.Node{Type: ast.NodeText, Tokens: []byte(">")})
+					return ast.WalkSkipChildren
+				}
+
+				inlines = append(inlines, n)
+				return ast.WalkSkipChildren
+			}
 		} else if ast.NodeHTMLBlock == n.Type {
 			inlines = append(inlines, &ast.Node{Type: ast.NodeText, Tokens: n.Tokens})
 			return ast.WalkSkipChildren
