@@ -391,13 +391,35 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
-		if atom.Div == firstc.DataAtom && nil == firstc.NextSibling {
-			if 1 == len(codes) {
-				code := codes[0]
-				// pre 下只有一个 div，且 div 下只有一个 code，那么将 pre.div 替换为 pre.code https://github.com/siyuan-note/siyuan/issues/11131
-				code.Unlink()
-				n.AppendChild(code)
-				firstc.Unlink()
+		if atom.Div == firstc.DataAtom {
+			if nil == firstc.NextSibling {
+				if 1 == len(codes) {
+					code := codes[0]
+					// pre 下只有一个 div，且 div 下只有一个 code，那么将 pre.div 替换为 pre.code https://github.com/siyuan-note/siyuan/issues/11131
+					code.Unlink()
+					n.AppendChild(code)
+					firstc.Unlink()
+					firstc = n.FirstChild
+				}
+			} else {
+				// pre 下全是 div，每个 div 为一行代码 https://github.com/siyuan-note/siyuan/issues/14195
+				// 将其转换为 pre.code， code, ... code，每个 div 为一行代码，然后交由后续处理
+				var unlinks, codes []*html.Node
+				for div := firstc; nil != div; div = div.NextSibling {
+					code := &html.Node{Data: "code", DataAtom: atom.Code, Type: html.ElementNode}
+					for child := div.FirstChild; nil != child; child = div.FirstChild {
+						child.Unlink()
+						code.AppendChild(child)
+					}
+					codes = append(codes, code)
+					unlinks = append(unlinks, div)
+				}
+				for _, unlink := range unlinks {
+					unlink.Unlink()
+				}
+				for _, code := range codes {
+					n.AppendChild(code)
+				}
 				firstc = n.FirstChild
 			}
 		}
