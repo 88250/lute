@@ -142,12 +142,17 @@ func DomHTML(n *html.Node) []byte {
 	if nil == n {
 		return nil
 	}
+
 	buf := &bytes.Buffer{}
 	html.Render(buf, n)
 	return bytes.ReplaceAll(buf.Bytes(), []byte(editor.Zwsp), nil)
 }
 
 func DomTexhtml(n *html.Node) string {
+	if nil == n {
+		return ""
+	}
+
 	buf := &bytes.Buffer{}
 	if html.TextNode == n.Type {
 		buf.WriteString(n.Data)
@@ -195,6 +200,10 @@ func escapeMathSymbol(s string) string {
 }
 
 func DomText(n *html.Node) string {
+	if nil == n {
+		return ""
+	}
+
 	buf := &bytes.Buffer{}
 	if html.TextNode == n.Type {
 		buf.WriteString(n.Data)
@@ -210,6 +219,7 @@ func domText0(n *html.Node, buffer *bytes.Buffer) {
 	if nil == n {
 		return
 	}
+
 	if dataRender := DomAttrValue(n, "data-render"); "1" == dataRender || "2" == dataRender {
 		return
 	}
@@ -303,6 +313,10 @@ func ExistDomAttr(n *html.Node, attrName string) bool {
 }
 
 func DomCustomAttrs(n *html.Node) (ret map[string]string) {
+	if nil == n {
+		return nil
+	}
+
 	ret = map[string]string{}
 	for _, attr := range n.Attr {
 		if strings.HasPrefix(attr.Key, "custom-") {
