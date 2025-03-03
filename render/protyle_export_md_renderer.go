@@ -1507,6 +1507,15 @@ func (r *ProtyleExportMdRenderer) renderText(node *ast.Node, entering bool) ast.
 				}
 			}
 		}
+
+		// 导出 Markdown 时去掉图片节点左右的零宽空格 Remove zero-width spaces around image nodes when exporting Markdown https://github.com/siyuan-note/siyuan/issues/14263
+		if nil != node.Previous && ast.NodeImage == node.Previous.Type && editor.Zwsp == string(node.Tokens) {
+			return ast.WalkContinue
+		}
+		if nil != node.Next && ast.NodeImage == node.Next.Type && editor.Zwsp == string(node.Tokens) {
+			return ast.WalkContinue
+		}
+
 		r.Write(tokens)
 	}
 	return ast.WalkContinue
