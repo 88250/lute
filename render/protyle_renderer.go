@@ -1890,6 +1890,9 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 		if "block-ref" == typ {
 			attrs = append(attrs, []string{"data-subtype", node.TextMarkBlockRefSubtype})
 			attrs = append(attrs, []string{"data-id", node.TextMarkBlockRefID})
+			if "" == strings.TrimSpace(strings.ReplaceAll(node.TextMarkTextContent, editor.Zwsp, "")) {
+				node.TextMarkTextContent = node.TextMarkBlockRefID
+			}
 		} else if "a" == typ {
 			href := node.TextMarkAHref
 			href = string(r.LinkPath([]byte(href)))
