@@ -1504,8 +1504,9 @@ func appendSpace(n *html.Node, tree *parse.Tree, lute *Lute) {
 							tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(spaces)})
 						}
 
-						text := tree.Context.Tip.ChildByType(ast.NodeText)
-						text.Tokens = bytes.TrimLeft(text.Tokens, " \u0160")
+						if text := tree.Context.Tip.ChildByType(ast.NodeText); nil != text {
+							text.Tokens = bytes.TrimLeft(text.Tokens, " \u0160")
+						}
 					}
 					spaces = lute.suffixSpaces(curText)
 					if "" != spaces {
