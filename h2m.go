@@ -209,6 +209,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					node.Tokens = node.Tokens[idx+2:]
 				}
 			}
+			if (nil != tree.Context.Tip.ListData && 0 == tree.Context.Tip.ListData.Typ) || (nil != tree.Context.Tip.Parent.ListData && 0 == tree.Context.Tip.Parent.ListData.Typ) {
+				node.Tokens = bytes.TrimSpace(bytes.TrimPrefix(node.Tokens, []byte("•")))
+			}
 		}
 
 		if ast.NodeListItem == tree.Context.Tip.Type {
