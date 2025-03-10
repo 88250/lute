@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"fmt"
 	"path"
 	"strings"
 	"unicode"
@@ -193,6 +194,23 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		if ast.NodeListItem == tree.Context.Tip.Type || (nil != tree.Context.Tip.Parent && ast.NodeListItem == tree.Context.Tip.Parent.Type) {
+			// 去掉文本中开头的列表项标记符 https://github.com/siyuan-note/siyuan/issues/14329
+			if idx := bytes.Index(node.Tokens, []byte(". ")); 0 < idx {
+				num := node.Tokens[:idx]
+				isLi := true
+				for _, b := range num {
+					if !lex.IsDigit(b) {
+						isLi = false
+						break
+					}
+				}
+				if isLi {
+					node.Tokens = node.Tokens[idx+2:]
+				}
+			}
+		}
+
 		if ast.NodeListItem == tree.Context.Tip.Type {
 			p := &ast.Node{Type: ast.NodeParagraph}
 			p.AppendChild(node)
@@ -338,6 +356,17 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				} else {
 					marker = start + "."
 				}
+
+				if nil != tree.Context.Tip.LastChild && ast.NodeListItem == tree.Context.Tip.LastChild.Type && nil != tree.Context.Tip.LastChild.ListData {
+					lastNum := tree.Context.Tip.LastChild.ListData.Marker[:len(tree.Context.Tip.LastChild.ListData.Marker)-1]
+					lastNumInt := 0
+					for _, b := range lastNum {
+						lastNumInt = lastNumInt*10 + int(b-'0')
+					}
+					lastNumInt++
+					marker = fmt.Sprintf("%d.", lastNumInt)
+				}
+
 			} else {
 				marker = "*"
 				bullet = marker[0]
