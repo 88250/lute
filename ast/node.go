@@ -689,10 +689,17 @@ func (n *Node) NextNodeText() string {
 }
 
 func (n *Node) PreviousNodeText() string {
-	if nil == n.Previous {
+	prev := n.Previous
+	if nil == prev {
 		return ""
 	}
-	return n.Previous.Text()
+	if NodeKramdownSpanIAL == prev.Type {
+		prev = prev.Previous
+	}
+	if nil == prev {
+		return ""
+	}
+	return prev.Text()
 }
 
 // Unlink 用于将节点从树上移除，后一个兄弟节点会接替该节点。

@@ -582,7 +582,7 @@ func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) as
 	if entering {
 		r.Write(node.Tokens)
 	} else {
-		if previous := node.Previous; nil != previous && parse.ContainTextMark(previous, "code", "inline-math", "kbd") {
+		if previous := node.Previous; nil != previous && parse.ContainTextMark(previous, "code", "inline-math", "kbd") && r.Options.AutoSpace {
 			if text := node.NextNodeText(); "" != text {
 				firstc, _ := utf8.DecodeRuneInString(text)
 				if editor.Zwsp == string(firstc) {
