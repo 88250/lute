@@ -217,7 +217,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 			if (nil != tree.Context.Tip.ListData && 0 == tree.Context.Tip.ListData.Typ) || (nil != tree.Context.Tip.Parent.ListData && 0 == tree.Context.Tip.Parent.ListData.Typ) {
-				node.Tokens = bytes.TrimSpace(bytes.TrimPrefix(node.Tokens, []byte("•")))
+				if idx := bytes.Index(node.Tokens, []byte("•")); 0 == idx {
+					node.Tokens = bytes.TrimSpace(bytes.TrimPrefix(node.Tokens, []byte("•")))
+				}
 			}
 		}
 
