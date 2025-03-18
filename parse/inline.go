@@ -72,7 +72,13 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 		}
 
 		if nil != n {
-			block.AppendChild(n)
+			var nodes []*ast.Node
+			for node := n; nil != node; node = node.Next {
+				nodes = append(nodes, node)
+			}
+			for _, node := range nodes {
+				block.AppendChild(node)
+			}
 		}
 	}
 	block.Tokens = nil

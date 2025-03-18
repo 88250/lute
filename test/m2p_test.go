@@ -19,6 +19,7 @@ import (
 
 var md2BlockDOMTests = []parseTest{
 
+	{"98", "<strong>foo </strong>bar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">foo</span> bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"97", "((20250305201451-jjziqik '​'))", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"block-ref\" data-subtype=\"d\" data-id=\"20250305201451-jjziqik\">20250305201451-jjziqik</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"96", "<u><span data-type=\"a\" data-href=\"https://link.zhihu.com/?target=https://privacybadger.org/\">Privacy Badger</span></u>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"u a\" data-href=\"https://link.zhihu.com/?target=https://privacybadger.org/\">Privacy Badger</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"95", "<u>[Privacy Badger](https://link.zhihu.com/?target=https%3A//privacybadger.org/)</u>\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"u a\" data-href=\"https://link.zhihu.com/?target=https%3A//privacybadger.org/\">Privacy Badger</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
@@ -122,12 +123,9 @@ var md2BlockDOMTests = []parseTest{
 func TestMd2BlockDOM(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetProtyleWYSIWYG(true)
-	luteEngine.SetToC(true)
-	luteEngine.ParseOptions.BlockRef = true
-	luteEngine.ParseOptions.Tag = true
-	luteEngine.ParseOptions.SuperBlock = true
-	luteEngine.ParseOptions.GitConflict = true
-	luteEngine.ParseOptions.LinkRef = false
+	luteEngine.SetBlockRef(true)
+	luteEngine.SetTag(true)
+	luteEngine.SetSuperBlock(true)
 	luteEngine.SetKramdownIAL(true)
 	luteEngine.SetAutoSpace(true)
 	luteEngine.SetParagraphBeginningSpace(true)
