@@ -227,11 +227,14 @@ func (t *Tree) incorporateLine(line []byte) {
 				}
 			case ast.NodeMathBlock:
 				// 数学公式块标记符没有换行的形式（$$foo$$）需要判断右边结尾的闭合标记符
-				if 3 < len(container.Tokens) &&
-					(bytes.HasSuffix(container.Tokens, MathBlockMarkerNewline) ||
-						bytes.HasSuffix(container.Tokens, MathBlockMarker) ||
-						bytes.HasSuffix(container.Tokens, MathBlockMarkerCaretNewline)) {
-					t.Context.finalize(container)
+
+				if 3 < len(container.Tokens) {
+					tails := container.Tokens[bytes.LastIndex(container.Tokens, MathBlockMarker):]
+					if bytes.HasPrefix(tails, MathBlockMarker) && bytes.HasSuffix(tails, []byte("\n")) {
+						if bytes.Equal(MathBlockMarker, bytes.TrimSpace(tails)) {
+							t.Context.finalize(container)
+						}
+					}
 				}
 			}
 		} else if t.Context.offset < t.Context.currentLineLen && !t.Context.blank {

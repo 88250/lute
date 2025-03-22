@@ -59,9 +59,7 @@ func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 }
 
 var MathBlockMarker = util.StrToBytes("$$")
-var MathBlockMarkerNewline = util.StrToBytes("$$\n")
 var MathBlockMarkerCaret = util.StrToBytes("$$" + editor.Caret)
-var MathBlockMarkerCaretNewline = util.StrToBytes("$$" + editor.Caret + "\n")
 
 func (context *Context) mathBlockFinalize(mathBlock *ast.Node) {
 	if 2 > len(mathBlock.Tokens) {
