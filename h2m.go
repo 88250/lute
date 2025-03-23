@@ -1132,7 +1132,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
-		if title := strings.TrimSpace(util.DomAttrValue(n, "title")); "" != title {
+		if title := strings.TrimSpace(util.DomAttrValue(n, "title")); "" != title && tree.Context.Tip.IsBlock() {
 			// 转换为行级备注 https://github.com/siyuan-note/siyuan/issues/13998
 			node.Type = ast.NodeTextMark
 			node.TextMarkType = "inline-memo"
