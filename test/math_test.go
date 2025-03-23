@@ -51,6 +51,7 @@ func TestMath(t *testing.T) {
 }
 
 var inlineMathTests = []parseTest{
+	{"1", "$123$", "<p>$123$</p>\n"},
 	{"0", "$foo$", "<p><span class=\"language-math\">foo</span></p>\n"},
 }
 
