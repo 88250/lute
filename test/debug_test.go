@@ -136,6 +136,7 @@ var debugTests = []parseTest{
 
 func TestDebug(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetCodeSyntaxHighlightDetectLang(true)
 	luteEngine.SetHeadingID(true)
 	for _, test := range debugTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

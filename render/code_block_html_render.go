@@ -123,7 +123,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				if r.Options.CodeSyntaxHighlightDetectLang {
 					language := detectLanguage(tokens)
 					if "" != language {
-						r.WriteString("<code class=\"language-" + language)
+						r.WriteString("<code class=\"language-" + language + "\">")
 					} else {
 						r.WriteString("<code>")
 					}

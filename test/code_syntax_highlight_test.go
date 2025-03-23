@@ -18,6 +18,50 @@ import (
 	"github.com/88250/lute"
 )
 
+func TestCodeSyntaxHighlightDetectLang(t *testing.T) {
+	// 围栏代码块自动探测语言 https://github.com/88250/lute/issues/22
+
+	luteEngine := lute.New()
+	luteEngine.SetCodeSyntaxHighlightDetectLang(true)
+	for _, test := range issue22Tests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+var issue22Tests = []parseTest{
+	{"0", issue22Case0[0], issue22Case0[1]},
+}
+
+var issue22Case0 = []string{
+	"```" + `
+package lute
+
+func test() {
+	return
+}
+` + "```",
+	"<pre><code class=\"language-go highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kn\">package</span> <span class=\"highlight-nx\">lute</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kd\">func</span> <span class=\"highlight-nf\">test</span><span class=\"highlight-p\">()</span> <span class=\"highlight-p\">{</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\t<span class=\"highlight-k\">return</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-p\">}</span>\n</span></span></code></pre>\n",
+}
+
+func TestCodeSyntaxHighlightDetectLang1(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetCodeSyntaxHighlight(false)
+	luteEngine.SetCodeSyntaxHighlightDetectLang(true)
+	for _, test := range codeSyntaxHighlightDetectLang1Tests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+var codeSyntaxHighlightDetectLang1Tests = []parseTest{
+	{"0", "```\nmysql> SELECT * FROM `test_table`;\n```\n", "<pre><code class=\"language-mysql\">mysql&gt; SELECT * FROM `test_table`;\n</code></pre>\n"},
+}
+
 func TestCodeSyntaxHighlightIssue17(t *testing.T) {
 	// 语法高亮支持内联样式 https://github.com/b3log/lute/issues/17
 
