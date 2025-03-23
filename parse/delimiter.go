@@ -371,35 +371,50 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
 	} else {
-		if t.Context.ParseOption.Mark && lex.ItemEqual == token && 2 != delimitersCount { // ==Mark== 标记使用两个等号
-			canOpen = false
-			canClose = false
-		} else if t.Context.ParseOption.Tag && lex.ItemCrosshatch == token && 1 != delimitersCount { // #Tag# 标记使用一个井号
-			canOpen = false
-			canClose = false
-		} else if t.Context.ParseOption.Sup && lex.ItemCaret == token && 1 != delimitersCount { // ^Sup^ 标记使用一个 ^
-			canOpen = false
-			canClose = false
-		} else if t.Context.ParseOption.Sub && lex.ItemTilde == token {
-			if t.Context.ParseOption.GFMStrikethrough && 3 == delimitersCount { // 单独处理 ~~~foo~~~ 的情况，即下标嵌套删除线
-				canOpen = isLeftFlanking
-				canClose = isRightFlanking
-			} else if 1 != delimitersCount { // ~Sub~ 标记使用一个 ~
-				canOpen = false
-				canClose = false
-				if t.Context.ParseOption.GFMStrikethrough && 2 == delimitersCount {
-					canOpen = isLeftFlanking
-					canClose = isRightFlanking
-				}
+		if lex.ItemEqual == token {
+			if !t.Context.ParseOption.Mark || 2 != delimitersCount /* ==Mark== 标记使用两个等号 */ {
+				canOpen, canClose = false, false
 			} else {
 				canOpen = isLeftFlanking
 				canClose = isRightFlanking
 			}
-		} else if t.Context.ParseOption.GFMStrikethrough && lex.ItemTilde == token {
-			if 1 == delimitersCount {
-				if !t.Context.ParseOption.GFMStrikethrough1 {
-					canOpen = false
-					canClose = false
+		} else if lex.ItemCrosshatch == token {
+			if !t.Context.ParseOption.Tag || 1 != delimitersCount /* #Tag# 标记使用一个井号 */ {
+				canOpen, canClose = false, false
+			} else {
+				canOpen = isLeftFlanking
+				canClose = isRightFlanking
+			}
+		} else if lex.ItemCaret == token {
+			if !t.Context.ParseOption.Sup || 1 != delimitersCount /* ^Sup^ 标记使用一个 ^ */ {
+				canOpen, canClose = false, false
+			} else {
+				canOpen = isLeftFlanking
+				canClose = isRightFlanking
+			}
+		} else if lex.ItemTilde == token {
+			if t.Context.ParseOption.Sub {
+				if t.Context.ParseOption.GFMStrikethrough && 3 == delimitersCount { // 单独处理 ~~~foo~~~ 的情况，即下标嵌套删除线
+					canOpen = isLeftFlanking
+					canClose = isRightFlanking
+				} else if 1 != delimitersCount { // ~Sub~ 标记使用一个 ~
+					canOpen, canClose = false, false
+					if t.Context.ParseOption.GFMStrikethrough && 2 == delimitersCount {
+						canOpen = isLeftFlanking
+						canClose = isRightFlanking
+					}
+				} else {
+					canOpen = isLeftFlanking
+					canClose = isRightFlanking
+				}
+			} else if t.Context.ParseOption.GFMStrikethrough {
+				if 1 == delimitersCount {
+					if !t.Context.ParseOption.GFMStrikethrough1 {
+						canOpen, canClose = false, false
+					} else {
+						canOpen = isLeftFlanking
+						canClose = isRightFlanking
+					}
 				} else {
 					canOpen = isLeftFlanking
 					canClose = isRightFlanking
