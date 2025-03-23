@@ -334,6 +334,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 		}
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket, Tokens: closeBracket})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen, Tokens: openParen})
+		if t.Context.ParseOption.ProtyleWYSIWYG {
+			dest = bytes.ReplaceAll(dest, editor.CaretTokens, nil)
+		}
 		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: dest})
 		if nil != space {
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace, Tokens: space})
