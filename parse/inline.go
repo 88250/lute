@@ -328,6 +328,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			tmp.Unlink()
 			if ast.NodeText == tmp.Type {
 				tmp.Type = ast.NodeLinkText
+				if t.Context.ParseOption.ProtyleWYSIWYG {
+					tmp.Tokens = bytes.ReplaceAll(tmp.Tokens, editor.CaretTokens, nil)
+				}
 			}
 			node.AppendChild(tmp)
 			tmp = next
