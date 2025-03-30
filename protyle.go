@@ -1458,6 +1458,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeBang})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 			alt := util.DomAttrValue(img, "alt")
+			alt = strings.ReplaceAll(alt, editor.Caret, "")
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: util.StrToBytes(alt)})
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
