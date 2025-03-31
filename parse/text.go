@@ -121,6 +121,11 @@ func (t *Tree) parseNewline(block *ast.Node, ctx *InlineContext) (ret *ast.Node)
 	}
 
 	ret = &ast.Node{Type: ast.NodeSoftBreak, Tokens: []byte{ctx.tokens[pos]}}
+	if t.Context.ParseOption.ProtyleWYSIWYG {
+		// Protyle 中的换行符都是软换行 Improve soft line break paste parsing https://github.com/siyuan-note/siyuan/issues/14481
+		return
+	}
+
 	if isHardBreak {
 		ret.Type = ast.NodeHardBreak
 	}
