@@ -1618,6 +1618,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		if nil != n.PrevSibling && "\n" == n.PrevSibling.Data && lute.parentIs(n, atom.Table) {
 			return
 		}
+		if ast.NodeParagraph == tree.Context.Tip.Type {
+			// 将硬换行转换为软换行 https://github.com/siyuan-note/siyuan/issues/14481
+			node.Type = ast.NodeText
+			node.Tokens = []byte("\n")
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
 
 		node.Type = ast.NodeBr
 		tree.Context.Tip.AppendChild(node)
