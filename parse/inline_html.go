@@ -725,7 +725,7 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 			}
 		default:
 			if !isInlineMath { // 带有字体样式的公式复制之后内容不正确 https://github.com/siyuan-note/siyuan/issues/6799
-				node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeSingleQuote(n)
+				node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeQuote(n)
 
 				if node.ContainTextMarkTypes("strong", "em", "s", "mark", "sup", "sub") {
 					// Improve some inline elements Markdown editing https://github.com/siyuan-note/siyuan/issues/9999

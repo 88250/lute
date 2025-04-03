@@ -108,7 +108,9 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 			}
 
 			if entering {
-				span = &ast.Node{Type: ast.NodeTextMark, TextMarkType: strings.Join(tags, " "), TextMarkTextContent: string(html.EscapeHTML(n.Tokens))}
+				content := string(html.EscapeHTML(n.Tokens))
+				content = strings.ReplaceAll(content, "&quot;", "\"") // 粘贴 Markdown 时行级元素中的双引号不再转换为实体 https://github.com/siyuan-note/siyuan/issues/14503
+				span = &ast.Node{Type: ast.NodeTextMark, TextMarkType: strings.Join(tags, " "), TextMarkTextContent: content}
 				if ast.NodeInlineMathContent == n.Type {
 					span.TextMarkTextContent = ""
 					span.TextMarkInlineMathContent = string(html.EscapeHTML(n.Tokens))

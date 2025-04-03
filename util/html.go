@@ -19,11 +19,12 @@ import (
 	"github.com/88250/lute/html/atom"
 )
 
-func GetTextMarkTextDataWithoutEscapeSingleQuote(n *html.Node) (content string) {
+func GetTextMarkTextDataWithoutEscapeQuote(n *html.Node) (content string) {
 	content = DomText(n)
 	content = strings.ReplaceAll(content, editor.Zwsp, "")
 	content = strings.TrimSuffix(content, "\n")
 	content = html.EscapeHTMLStr(content)
+	content = strings.ReplaceAll(content, "&quot;", "\"") // 粘贴 Markdown 时行级元素中的双引号不再转换为实体 https://github.com/siyuan-note/siyuan/issues/14503
 	for strings.Contains(content, "\n\n") {
 		content = strings.ReplaceAll(content, "\n\n", "\n")
 	}
@@ -31,7 +32,7 @@ func GetTextMarkTextDataWithoutEscapeSingleQuote(n *html.Node) (content string) 
 }
 
 func GetTextMarkTextData(n *html.Node) (content string) {
-	content = GetTextMarkTextDataWithoutEscapeSingleQuote(n)
+	content = GetTextMarkTextDataWithoutEscapeQuote(n)
 	content = strings.TrimPrefix(content, "\n")
 	content = strings.ReplaceAll(content, "'", "&apos;")
 	for strings.Contains(content, "\n\n") {
