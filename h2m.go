@@ -918,7 +918,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				linkTitle = util.DomAttrValue(n, "title")
 			}
 			linkTitle = strings.TrimSpace(linkTitle)
-			if "" != linkTitle {
+			if "" != linkTitle && "null" != linkTitle && "undefined" != linkTitle {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
 			}
@@ -1384,6 +1384,27 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 	case atom.Figcaption:
 		if tree.Context.Tip.IsBlock() {
+			if nil != tree.Context.Tip.LastChild && ast.NodeImage == tree.Context.Tip.LastChild.Type {
+				if closeParen := tree.Context.Tip.LastChild.ChildByType(ast.NodeCloseParen); nil != closeParen {
+					if nil != n.FirstChild && atom.Span == n.FirstChild.DataAtom {
+						// 单独处理 <figcaption> 中的 <span leaf> 标签的情况 https://github.com/siyuan-note/siyuan/issues/14507
+						c := n.FirstChild.FirstChild
+						c.Unlink()
+						n.AppendChild(c)
+						n.FirstChild.Unlink()
+					}
+
+					if !util.DomExistChildByType(n, atom.A, atom.Span) { // 图片标题不包含非文本元素，包含的话走下面的逻辑，单独作为一个段落
+						closeParen.InsertBefore(&ast.Node{Type: ast.NodeLinkSpace})
+						linkTitle := util.DomText(n)
+						if "" != linkTitle && "null" != linkTitle && "undefined" != linkTitle {
+							closeParen.InsertBefore(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
+							return
+						}
+					}
+				}
+			}
+
 			if ast.NodeDocument != tree.Context.Tip.Type {
 				tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
 				break
