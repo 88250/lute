@@ -259,18 +259,20 @@ func (r *ProtyleExportDocxRenderer) renderHTMLTag0(node *ast.Node, currentTextMa
 			return
 		}
 
-		lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
-		if isCJK(lastRune) {
-			if entering {
-				r.WriteString("<sup>（")
+		if "" != node.TextMarkInlineMemoContent {
+			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+			if isCJK(lastRune) {
+				if entering {
+					r.WriteString("<sup>（")
+				} else {
+					r.WriteString("）</sup>")
+				}
 			} else {
-				r.WriteString("）</sup>")
-			}
-		} else {
-			if entering {
-				r.WriteString("<sup>(")
-			} else {
-				r.WriteString(")</sup>")
+				if entering {
+					r.WriteString("<sup>(")
+				} else {
+					r.WriteString(")</sup>")
+				}
 			}
 		}
 	case "inline-math":
