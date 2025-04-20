@@ -225,15 +225,9 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 			if sup {
 				r.Tag("/sup", nil, false)
 			}
-		} else if node.IsTextMarkType("inline-memo") {
-			r.WriteString(textContent)
 
-			if node.IsNextSameInlineMemo() {
-				return ast.WalkContinue
-			}
-
-			if "" != node.TextMarkTextContent {
-				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+			if "" != node.TextMarkInlineMemoContent {
+				lastRune, _ := utf8.DecodeLastRuneInString(textContent)
 				if isCJK(lastRune) {
 					r.WriteString("<sup>（")
 					memo := node.TextMarkInlineMemoContent
@@ -250,10 +244,31 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 			}
 		} else {
 			attrs := r.renderTextMarkAttrs(node)
-			r.spanNodeAttrs(node, &attrs)
-			r.Tag("span", attrs, false)
+			justInlineMemo := node.TextMarkType == "inline-memo"
+			if 0 < len(attrs) && !justInlineMemo {
+				r.spanNodeAttrs(node, &attrs)
+				r.Tag("span", attrs, false)
+			}
 			r.WriteString(textContent)
-			r.WriteString("</span>")
+			if 0 < len(attrs) && !justInlineMemo {
+				r.WriteString("</span>")
+			}
+			if "" != node.TextMarkInlineMemoContent {
+				lastRune, _ := utf8.DecodeLastRuneInString(textContent)
+				if isCJK(lastRune) {
+					r.WriteString("<sup>（")
+					memo := node.TextMarkInlineMemoContent
+					memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
+					r.WriteString(memo)
+					r.WriteString("）</sup>")
+				} else {
+					r.WriteString("<sup>(")
+					memo := node.TextMarkInlineMemoContent
+					memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
+					r.WriteString(memo)
+					r.WriteString(")</sup>")
+				}
+			}
 		}
 	}
 	return ast.WalkContinue
