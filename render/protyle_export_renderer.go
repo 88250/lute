@@ -232,19 +232,21 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 				return ast.WalkContinue
 			}
 
-			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
-			if isCJK(lastRune) {
-				r.WriteString("<sup>（")
-				memo := node.TextMarkInlineMemoContent
-				memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
-				r.WriteString(memo)
-				r.WriteString("）</sup>")
-			} else {
-				r.WriteString("<sup>(")
-				memo := node.TextMarkInlineMemoContent
-				memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
-				r.WriteString(memo)
-				r.WriteString(")</sup>")
+			if "" != node.TextMarkTextContent {
+				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+				if isCJK(lastRune) {
+					r.WriteString("<sup>（")
+					memo := node.TextMarkInlineMemoContent
+					memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
+					r.WriteString(memo)
+					r.WriteString("）</sup>")
+				} else {
+					r.WriteString("<sup>(")
+					memo := node.TextMarkInlineMemoContent
+					memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
+					r.WriteString(memo)
+					r.WriteString(")</sup>")
+				}
 			}
 		} else {
 			attrs := r.renderTextMarkAttrs(node)

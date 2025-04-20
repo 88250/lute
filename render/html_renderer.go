@@ -227,16 +227,18 @@ func (r *HtmlRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSta
 		} else if node.IsTextMarkType("inline-memo") {
 			r.WriteString(textContent)
 			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
-			if isCJK(lastRune) {
-				r.WriteString("<sup>（")
-				memo := node.TextMarkInlineMemoContent
-				memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
-				r.WriteString(memo)
-				r.WriteString("）</sup>")
-			} else {
-				r.WriteString("<sup>(")
-				r.WriteString(node.TextMarkInlineMemoContent)
-				r.WriteString(")</sup>")
+			if "" != node.TextMarkInlineMemoContent {
+				if isCJK(lastRune) {
+					r.WriteString("<sup>（")
+					memo := node.TextMarkInlineMemoContent
+					memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, " ")
+					r.WriteString(memo)
+					r.WriteString("）</sup>")
+				} else {
+					r.WriteString("<sup>(")
+					r.WriteString(node.TextMarkInlineMemoContent)
+					r.WriteString(")</sup>")
+				}
 			}
 		} else {
 			attrs := r.renderTextMarkAttrs(node)

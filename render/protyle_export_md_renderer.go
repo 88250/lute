@@ -359,11 +359,13 @@ func (r *ProtyleExportMdRenderer) renderMdMarker(node *ast.Node, entering bool) 
 
 				content := node.TextMarkInlineMemoContent
 				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
-				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
-				if isCJK(lastRune) {
-					ret += "<sup>（" + content + "）</sup>"
-				} else {
-					ret += "<sup>(" + content + ")</sup>"
+				if "" != content {
+					lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+					if isCJK(lastRune) {
+						ret += "<sup>（" + content + "）</sup>"
+					} else {
+						ret += "<sup>(" + content + ")</sup>"
+					}
 				}
 			case "inline-math":
 				content := node.TextMarkInlineMathContent
@@ -472,11 +474,13 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 
 			content := node.TextMarkInlineMemoContent
 			content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
-			lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
-			if isCJK(lastRune) {
-				ret += "<sup>（" + content + "）</sup>"
-			} else {
-				ret += "<sup>(" + content + ")</sup>"
+			if "" != content {
+				lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+				if isCJK(lastRune) {
+					ret += "<sup>（" + content + "）</sup>"
+				} else {
+					ret += "<sup>(" + content + ")</sup>"
+				}
 			}
 		}
 	case "inline-math":
