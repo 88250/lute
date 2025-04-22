@@ -119,6 +119,8 @@ type Options struct {
 	ProtyleMarkNetImg bool
 	// Spellcheck 设置是否启用拼写检查
 	Spellcheck bool
+	// UnorderedListMarker 设置无序列表和任务列表的标记符，默认为 *
+	UnorderedListMarker string
 }
 
 func NewOptions() *Options {
@@ -150,6 +152,7 @@ func NewOptions() *Options {
 		ProtyleContenteditable:         true,
 		ProtyleMarkNetImg:              true,
 		Spellcheck:                     false,
+		UnorderedListMarker:            "*",
 		Terms:                          NewTerms(),
 	}
 }

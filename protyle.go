@@ -210,6 +210,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	options.KramdownBlockIAL = true
 	options.KramdownSpanIAL = true
 	options.KeepParagraphBeginningSpace = true
+	options.UnorderedListMarker = lute.RenderOptions.UnorderedListMarker
 	renderer := render.NewProtyleExportMdRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = util.BytesToStr(formatted)
@@ -694,6 +695,7 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	options.KeepParagraphBeginningSpace = true
 	options.ProtyleWYSIWYG = true
 	options.SuperBlock = true
+	options.UnorderedListMarker = lute.RenderOptions.UnorderedListMarker
 	renderer := render.NewFormatRenderer(tree, options)
 	formatted := renderer.Render()
 	markdown = string(formatted)
