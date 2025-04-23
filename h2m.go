@@ -47,17 +47,21 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 // HTML2Tree 将 HTML 转换为 AST。
 func (lute *Lute) HTML2Tree(dom string) (ret *parse.Tree) {
 	htmlRoot := lute.parseHTML(dom)
-	if nil == htmlRoot {
-		return
+	return lute.HTMLNode2Tree(htmlRoot)
+}
+
+func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
+	if nil == n {
+		return nil
 	}
 
 	// 调整 DOM 结构
-	lute.adjustVditorDOM(htmlRoot)
+	lute.adjustVditorDOM(n)
 
 	// 将 HTML 树转换为 Markdown AST
 	ret = &parse.Tree{Name: "", Root: &ast.Node{Type: ast.NodeDocument}, Context: &parse.Context{ParseOption: lute.ParseOptions}}
 	ret.Context.Tip = ret.Root
-	for c := htmlRoot.FirstChild; nil != c; c = c.NextSibling {
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
 		lute.genASTByDOM(c, ret)
 	}
 
@@ -77,7 +81,7 @@ func (lute *Lute) HTML2Tree(dom string) (ret *parse.Tree) {
 		}
 		return ast.WalkContinue
 	})
-	return
+	return ret
 }
 
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。

@@ -234,6 +234,31 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.adjustNoscriptImg(c)
 	}
+
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustBlockInTable(c)
+	}
+}
+
+func (lute *Lute) adjustBlockInTable(n *html.Node) {
+	if lute.parentIs(n, atom.Td) || lute.parentIs(n, atom.Th) {
+		if n.DataAtom == atom.Ul || n.DataAtom == atom.Ol {
+			div := &html.Node{Type: html.ElementNode, DataAtom: atom.Div}
+			text := &html.Node{Type: html.TextNode}
+			n.InsertBefore(text)
+			n.Unlink()
+			div.AppendChild(n)
+			tree := lute.HTMLNode2Tree(n)
+			if nil != tree {
+				md, _ := FormatNodeSync(tree.Root, lute.ParseOptions, lute.RenderOptions)
+				text.Data = strings.ReplaceAll(md, "\n", "<br />")
+			}
+		}
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		lute.adjustBlockInTable(c)
+	}
 }
 
 func (lute *Lute) adjustCustomTag(n *html.Node) {
