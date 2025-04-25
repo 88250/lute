@@ -348,9 +348,15 @@ func (r *ProtyleExportDocxRenderer) renderHTMLTag0(node *ast.Node, currentTextMa
 func (r *ProtyleExportDocxRenderer) getTextMarkTextContent(node *ast.Node) (ret string) {
 	ret = node.TextMarkTextContent
 	if node.IsTextMarkType("a") || node.IsTextMarkType("block-ref") || node.IsTextMarkType("file-annotation-ref") {
-		content := node.TextMarkTextContent
-		content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
-		ret = content
+		if "" == node.TextMarkInlineMemoContent {
+			content := node.TextMarkTextContent
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
+			ret = content
+		} else {
+			content := node.TextMarkInlineMemoContent
+			content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
+			ret = content
+		}
 	} else if node.IsTextMarkType("inline-memo") {
 		content := node.TextMarkInlineMemoContent
 		content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")
