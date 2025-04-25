@@ -385,7 +385,7 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 	var allowMerge []string
 	for k, _ := range m {
 		switch k {
-		case "code", "em", "strong", "s", "mark", "u", "sub", "sup", "kbd", "text", "tag", "block-ref", "a":
+		case "code", "em", "strong", "s", "mark", "u", "sub", "sup", "kbd", "text", "tag", "block-ref", "a", "inline-memo":
 			allowMerge = append(allowMerge, k)
 		}
 	}

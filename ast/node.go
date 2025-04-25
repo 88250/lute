@@ -372,6 +372,10 @@ func (n *Node) IsSameTextMarkType(node *Node) bool {
 			if n.TextMarkAHref != node.TextMarkAHref || node.TextMarkATitle != node.TextMarkATitle {
 				return false
 			}
+		case "inline-memo":
+			if n.TextMarkInlineMemoContent != node.TextMarkInlineMemoContent {
+				return false
+			}
 		}
 	}
 	return true
