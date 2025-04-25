@@ -1973,7 +1973,11 @@ func (r *ProtyleExportMdRenderer) renderListItem(node *ast.Node, entering bool) 
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			listItemBuf.WriteString(strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter))
 		} else {
-			listItemBuf.WriteString(r.Options.UnorderedListMarker)
+			if "" != r.Options.UnorderedListMarker {
+				listItemBuf.WriteString(r.Options.UnorderedListMarker)
+			} else {
+				listItemBuf.Write(node.ListData.Marker)
+			}
 		}
 		listItemBuf.WriteByte(lex.ItemSpace)
 		buf = append(listItemBuf.Bytes(), buf...)

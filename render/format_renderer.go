@@ -1734,7 +1734,11 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
 			listItemBuf.WriteString(strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter))
 		} else {
-			listItemBuf.Write(node.ListData.Marker)
+			if "" != r.Options.UnorderedListMarker {
+				listItemBuf.WriteString(r.Options.UnorderedListMarker)
+			} else {
+				listItemBuf.Write(node.ListData.Marker)
+			}
 		}
 		listItemBuf.WriteByte(lex.ItemSpace)
 		buf = append(listItemBuf.Bytes(), buf...)

@@ -152,7 +152,6 @@ func NewOptions() *Options {
 		ProtyleContenteditable:         true,
 		ProtyleMarkNetImg:              true,
 		Spellcheck:                     false,
-		UnorderedListMarker:            "*",
 		Terms:                          NewTerms(),
 	}
 }
