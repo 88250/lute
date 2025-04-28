@@ -1385,6 +1385,10 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		} else if "block-ref" == dataType {
 			refText := util.DomText(n)
 			refText = strings.TrimSpace(refText)
+			if "" == refText && "s" == util.DomAttrValue(n, "data-subtype") {
+				// 如果没有锚文本，则使用 * When the block ref anchor text contains only whitespace characters, it will be set as a static anchor text * https://github.com/siyuan-note/siyuan/issues/14704
+				refText = util.DomAttrValue(n, "data-id")
+			}
 			if "" == refText {
 				return
 			}
