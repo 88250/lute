@@ -191,7 +191,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			// 按原文解析，不处理转义
 		} else {
 			if lute.ParseOptions.ProtyleWYSIWYG {
-				node.Tokens = lex.EscapeProtyleMarkers(node.Tokens)
+				if ast.NodeLink != tree.Context.Tip.Type { // a 标签锚文本中的标记符不进行转义 https://github.com/siyuan-note/siyuan/issues/14733
+					node.Tokens = lex.EscapeProtyleMarkers(node.Tokens)
+				}
 			} else {
 				node.Tokens = lex.EscapeCommonMarkers(node.Tokens)
 				if lute.parentIs(n, atom.Table) {
