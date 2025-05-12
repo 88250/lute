@@ -583,6 +583,15 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 						c.InsertBefore(&html.Node{DataAtom: atom.Br})
 					}
 				}
+				if nil != firstc.FirstChild && atom.Span == firstc.FirstChild.DataAtom {
+					// pre.code.span 每个 span 为一行的结构，需要在 span 中间插入换行
+					for c := firstc.FirstChild.NextSibling; nil != c; c = c.NextSibling {
+						if strings.Contains(util.DomAttrValue(c, "class"), "token-line") {
+							c.InsertBefore(&html.Node{DataAtom: atom.Br})
+						}
+					}
+				}
+
 				if nil != firstc.FirstChild && atom.Ol == firstc.FirstChild.DataAtom {
 					// CSDN 代码块：pre.code.ol.li
 					for li := firstc.FirstChild.FirstChild; nil != li; li = li.NextSibling {
