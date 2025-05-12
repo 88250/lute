@@ -706,9 +706,6 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 		case "a":
 			node.TextMarkAHref, node.TextMarkATitle = util.GetTextMarkAData(n)
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
-			if "" == strings.TrimSpace(node.TextMarkTextContent) {
-				node.TextMarkTextContent = "*"
-			}
 		case "inline-math":
 			node.TextMarkInlineMathContent = util.GetTextMarkInlineMathData(n)
 			isInlineMath = true
