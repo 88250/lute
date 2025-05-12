@@ -1709,7 +1709,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
 		indent := len(node.ListData.Marker) + 1
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
+		if 3 == node.ListData.Typ && 0 == node.ListData.BulletChar {
 			indent++
 		}
 		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
@@ -1732,7 +1732,11 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 
 		listItemBuf := bytes.Buffer{}
 		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
-			listItemBuf.WriteString(strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter))
+			if 0 == node.ListData.Num && 0 == node.ListData.Delimiter {
+				listItemBuf.Write(node.ListData.Marker)
+			} else {
+				listItemBuf.WriteString(strconv.Itoa(node.ListData.Num) + string(node.ListData.Delimiter))
+			}
 		} else {
 			if "" != r.Options.UnorderedListMarker {
 				listItemBuf.WriteString(r.Options.UnorderedListMarker)

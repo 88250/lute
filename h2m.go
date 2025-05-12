@@ -395,7 +395,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				marker = "1."
 			}
 		}
-		node.ListData = &ast.ListData{Marker: []byte(marker), BulletChar: bullet}
+		typ := 0
+		if nil != tree.Context.Tip.ListData {
+			typ = tree.Context.Tip.ListData.Typ
+		}
+		node.ListData = &ast.ListData{Typ: typ, Marker: []byte(marker), BulletChar: bullet}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()

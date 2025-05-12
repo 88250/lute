@@ -181,6 +181,9 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 	}
 
 	data.Marker = marker
+	if 1 == data.Typ {
+		data.Marker = append(data.Marker, []byte(".")...)
+	}
 
 	token := ln[t.Context.nextNonspace+markerLength]
 
