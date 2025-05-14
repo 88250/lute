@@ -105,7 +105,7 @@ type Options struct {
 	// LinkBase 设置链接、图片、脚注的基础路径。如果用户在链接或者图片地址中使用相对路径（没有协议前缀且不以 / 开头）并且 LinkBase 不为空则会用该值作为前缀。
 	// 比如 LinkBase 设置为 http://domain.com/，对于 ![foo](bar.png) 则渲染为 <img src="http://domain.com/bar.png" alt="foo" />
 	LinkBase string
-	// LinkPrefix 设置连接、图片的路径前缀。一旦设置该值，链接渲染将强制添加该值作为链接前缀，这有别于 LinkBase。
+	// LinkPrefix 设置链接、图片的路径前缀。一旦设置该值，链接渲染将强制添加该值作为链接前缀，这有别于 LinkBase。
 	// 比如 LinkPrefix 设置为 http://domain.com，对于使用绝对路径的 ![foo](/local/path/bar.png) 则渲染为 <img src="http://domain.com/local/path/bar.png" alt="foo" />；
 	// 在 LinkBase 和 LinkPrefix 同时设置的情况下，会先处理 LinkBase 逻辑，最后再在 LinkBase 处理结果上加上 LinkPrefix。
 	LinkPrefix string
