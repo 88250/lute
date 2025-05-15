@@ -169,6 +169,8 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 				span.KramdownIAL = n.Parent.KramdownIAL
 				if n.IsMarker() {
 					n.Parent.InsertBefore(span)
+				} else if nil != n.Parent && ast.NodeHTMLTag == n.Parent.Type && nil != n.Parent.Parent && ast.NodeLink == n.Parent.Parent.Type { // https://github.com/siyuan-note/siyuan/issues/14788#issuecomment-2882248074
+					n.Parent.Parent.InsertBefore(span)
 				} else {
 					n.InsertBefore(span)
 					if ast.NodeText == n.Type {
