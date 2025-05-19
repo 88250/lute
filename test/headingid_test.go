@@ -55,3 +55,18 @@ func TestHeadingAnchor(t *testing.T) {
 		}
 	}
 }
+
+var headingIDDisableTests = []parseTest{
+	{"0", "# 示例：将 \\( \\frac{17}{10} \\) 转化为连分数", "<h1>示例：将 ( \\frac{17}{10} ) 转化为连分数</h1>\n"},
+}
+
+func TestDisableHeadingID(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetHeadingID(false)
+	for _, test := range headingIDDisableTests {
+		html := luteEngine.MarkdownStr(test.name, test.from)
+		if test.to != html {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
