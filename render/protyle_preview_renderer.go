@@ -1339,8 +1339,10 @@ func (r *ProtylePreviewRenderer) renderHeading(node *ast.Node, entering bool) as
 					r.WriteString(" " + r.Options.KramdownIALIDRenderName + "=\"" + node.HeadingNormalizedID + "\"")
 				}
 				if 1 < len(node.KramdownIAL) {
-					exceptID := node.KramdownIAL[1:]
-					for _, attr := range exceptID {
+					for _, attr := range node.KramdownIAL {
+						if "id" == attr[0] {
+							continue
+						}
 						r.WriteString(" " + attr[0] + "=\"" + attr[1] + "\"")
 					}
 				}
