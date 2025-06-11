@@ -1704,13 +1704,17 @@ func (r *ProtyleRenderer) renderListItem(node *ast.Node, entering bool) ast.Walk
 		r.blockNodeAttrs(node, &attrs, class)
 		r.Tag("div", attrs, false)
 
+		draggable := "true"
+		if !r.Options.ProtyleContenteditable {
+			draggable = "false"
+		}
 		if 0 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-action"}, {"draggable", "true"}}
+			attr := [][]string{{"class", "protyle-action"}, {"draggable", draggable}}
 			r.Tag("div", attr, false)
 			r.WriteString("<svg><use xlink:href=\"#iconDot\"></use></svg>")
 			r.Tag("/div", nil, false)
 		} else if 1 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-action protyle-action--order"}, {"contenteditable", "false"}, {"draggable", "true"}}
+			attr := [][]string{{"class", "protyle-action protyle-action--order"}, {"contenteditable", "false"}, {"draggable", draggable}}
 			r.Tag("div", attr, false)
 			r.WriteString(strconv.Itoa(node.ListData.Num) + ".")
 			r.Tag("/div", nil, false)
@@ -1724,10 +1728,14 @@ func (r *ProtyleRenderer) renderListItem(node *ast.Node, entering bool) ast.Walk
 
 func (r *ProtyleRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		draggable := "true"
+		if !r.Options.ProtyleContenteditable {
+			draggable = "false"
+		}
 		if node.TaskListItemChecked {
-			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"true\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
+			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"" + draggable + "\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
 		} else {
-			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"true\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
+			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"" + draggable + "\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
 		}
 		if nil == node.Next {
 			node.InsertAfter(&ast.Node{ID: ast.NewNodeID(), Type: ast.NodeParagraph})

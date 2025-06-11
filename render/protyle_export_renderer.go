@@ -1669,12 +1669,12 @@ func (r *ProtyleExportRenderer) renderListItem(node *ast.Node, entering bool) as
 		r.Tag("div", attrs, false)
 
 		if 0 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-action"}, {"draggable", "true"}}
+			attr := [][]string{{"class", "protyle-action"}, {"draggable", "false"}}
 			r.Tag("div", attr, false)
 			r.WriteString("<svg><use xlink:href=\"#iconDot\"></use></svg>")
 			r.Tag("/div", nil, false)
 		} else if 1 == node.ListData.Typ {
-			attr := [][]string{{"class", "protyle-action protyle-action--order"}, {"contenteditable", "false"}, {"draggable", "true"}}
+			attr := [][]string{{"class", "protyle-action protyle-action--order"}, {"contenteditable", "false"}, {"draggable", "false"}}
 			r.Tag("div", attr, false)
 			r.WriteString(strconv.Itoa(node.ListData.Num) + ".")
 			r.Tag("/div", nil, false)
