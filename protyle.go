@@ -1468,6 +1468,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
 			if title := util.DomAttrValue(img, "title"); "" != title {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
+				// < 和 > 符号不用转义，可以符合 Markdown 规范 https://github.com/siyuan-note/siyuan/issues/15023
+				title = strings.ReplaceAll(title, "&lt;", "<")
+				title = strings.ReplaceAll(title, "&gt;", ">")
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: util.StrToBytes(title)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
@@ -1890,6 +1893,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			linkTitle := util.DomAttrValue(n, "data-title")
 			if "" != linkTitle {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
+				// < 和 > 符号不用转义，可以符合 Markdown 规范 https://github.com/siyuan-note/siyuan/issues/15023
+				linkTitle = strings.ReplaceAll(linkTitle, "&lt;", "<")
+				linkTitle = strings.ReplaceAll(linkTitle, "&gt;", ">")
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
