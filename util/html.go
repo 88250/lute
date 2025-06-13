@@ -55,8 +55,8 @@ func GetTextMarkAData(n *html.Node) (href, title string) {
 	title = DomAttrValue(n, "data-title")
 	title = html.EscapeHTMLStr(title)
 	// < 和 > 符号不用转义，可以符合 Markdown 规范 https://github.com/siyuan-note/siyuan/issues/15023
-	title = strings.ReplaceAll(title, "&lt;", "<")
-	title = strings.ReplaceAll(title, "&gt;", ">")
+	title = strings.ReplaceAll(title, "&amp;lt;", "<")
+	title = strings.ReplaceAll(title, "&amp;gt;", ">")
 	return
 }
 
