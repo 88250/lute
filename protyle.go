@@ -1469,6 +1469,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			if title := util.DomAttrValue(img, "title"); "" != title {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
 				// < 和 > 符号不用转义，可以符合 Markdown 规范 https://github.com/siyuan-note/siyuan/issues/15023
+				title = strings.ReplaceAll(title, "\"", "&quot;")
 				title = strings.ReplaceAll(title, "&lt;", "<")
 				title = strings.ReplaceAll(title, "&gt;", ">")
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: util.StrToBytes(title)})

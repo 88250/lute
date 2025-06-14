@@ -1268,7 +1268,7 @@ func (r *ProtyleExportMdRenderer) renderStrikethrough2CloseMarker(node *ast.Node
 func (r *ProtyleExportMdRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens)
+		r.Write(node.Tokens) // 这里不进行转义输出 https://github.com/siyuan-note/siyuan/issues/15023
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
