@@ -442,7 +442,11 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 		if entering {
 			ret += "[" + node.TextMarkTextContent + "](" + href
 			if "" != node.TextMarkATitle {
-				ret += " \"" + html.UnescapeHTMLStr(node.TextMarkATitle) + "\""
+				title := html.UnescapeHTMLStr(node.TextMarkATitle)
+				// < 和 > 符号不用转义，可以符合 Markdown 规范 https://github.com/siyuan-note/siyuan/issues/15023
+				title = strings.ReplaceAll(title, "&lt;", "<")
+				title = strings.ReplaceAll(title, "&gt;", ">")
+				ret += " \"" + title + "\""
 			}
 			ret += ")"
 		}
@@ -1268,7 +1272,10 @@ func (r *ProtyleExportMdRenderer) renderStrikethrough2CloseMarker(node *ast.Node
 func (r *ProtyleExportMdRenderer) renderLinkTitle(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemDoublequote)
-		r.Write(node.Tokens) // 这里不进行转义输出 https://github.com/siyuan-note/siyuan/issues/15023
+		// 这里不进行转义输出，仅转义双引号 https://github.com/siyuan-note/siyuan/issues/15023
+		tokens := node.Tokens
+		tokens = bytes.ReplaceAll(tokens, []byte("\""), []byte("&quot;"))
+		r.Write(tokens)
 		r.WriteByte(lex.ItemDoublequote)
 	}
 	return ast.WalkContinue
