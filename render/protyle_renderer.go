@@ -1305,7 +1305,8 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 		var titleTokens []byte
 		if nil != title && 0 < len(title.Tokens) {
 			titleTokens = title.Tokens
-			attrs = append(attrs, []string{"title", r.escapeRefText(string(titleTokens))})
+			titleTokens = []byte(r.escapeRefText(string(titleTokens)))
+			attrs = append(attrs, []string{"title", string(titleTokens)})
 		}
 		if style := node.IALAttr("style"); "" != style {
 			styles := strings.Split(style, ";")
@@ -1345,7 +1346,7 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 		attrs = [][]string{{"class", "protyle-action__title"}}
 		r.Tag("span", attrs, false)
 		r.Tag("span", nil, false)
-		r.Writer.Write(html.EscapeHTML(titleTokens))
+		r.Writer.Write(titleTokens)
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
 		r.Tag("/span", nil, false)
