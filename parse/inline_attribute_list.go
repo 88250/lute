@@ -181,7 +181,7 @@ func (t *Tree) parseKramdownSpanIAL() {
 		}
 
 		switch n.Type {
-		case ast.NodeEmphasis, ast.NodeStrong, ast.NodeCodeSpan, ast.NodeStrikethrough, ast.NodeTag, ast.NodeMark, ast.NodeImage, ast.NodeTextMark:
+		case ast.NodeEmphasis, ast.NodeStrong, ast.NodeCodeSpan, ast.NodeStrikethrough, ast.NodeTag, ast.NodeMark, ast.NodeInlineMath, ast.NodeImage, ast.NodeTextMark:
 			break
 		default:
 			return ast.WalkContinue

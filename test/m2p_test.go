@@ -19,6 +19,7 @@ import (
 
 var md2BlockDOMTests = []parseTest{
 
+	{"103", "$foo${: custom-js=\"bar\"}\n{: custom-foo=\"bar\" id=\"20250618113253-s4y0c38\" updated=\"20250618115520\"}", "<div data-node-id=\"20250618113253-s4y0c38\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" custom-foo=\"bar\" updated=\"20250618115520\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"inline-math\" data-subtype=\"math\" data-content=\"foo\" contenteditable=\"false\" class=\"render-node\" custom-js=\"bar\"></span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"102", "$$ \nfoo\n $$", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeMathBlock\" class=\"render-node\" updated=\"20060102150405\" data-content=\"foo\" data-subtype=\"math\"><div spin=\"1\"></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"101", "#foo\"bar#", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"tag\">\u200bfoo\"bar</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"100", "foo  \nbar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20060102150405\"><div contenteditable=\"true\" spellcheck=\"false\">foo\nbar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
