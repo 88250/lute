@@ -415,6 +415,7 @@ func processNestedNode(n *ast.Node, tag string, tags *[]string, unlinks *[]*ast.
 			next := c.Next
 			if ast.NodeTextMark == c.Type || ast.NodeText == c.Type {
 				n.InsertBefore(c)
+				c.KramdownIAL = n.KramdownIAL
 			} else if ast.NodeLinkDest == c.Type {
 				if nil != n.Previous && ast.NodeTextMark == n.Previous.Type {
 					n.Previous.TextMarkAHref = string(c.Tokens)
