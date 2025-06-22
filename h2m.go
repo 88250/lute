@@ -1534,6 +1534,10 @@ func appendInlineMath(tree *parse.Tree, tex string) {
 
 func appendMathBlock(tree *parse.Tree, tex string) {
 	tex = strings.TrimSpace(tex)
+	tex = strings.TrimPrefix(tex, "\\(")
+	tex = strings.TrimSuffix(tex, "\\)")
+	tex = strings.TrimPrefix(tex, "\\[")
+	tex = strings.TrimSuffix(tex, "\\]")
 	if "" == tex {
 		return
 	}
