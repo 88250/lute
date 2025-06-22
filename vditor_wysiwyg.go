@@ -367,6 +367,11 @@ func (lute *Lute) adjustMath(n *html.Node) {
 				}
 			}
 		}
+
+		if mathContent := util.DomAttrValue(n, "data-custom-copy-text"); "" != mathContent {
+			util.SetDomAttrValue(n, "data-tex", mathContent)
+			return
+		}
 	}
 
 	if strings.Contains(class, "language-math") {
