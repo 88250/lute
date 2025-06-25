@@ -24,6 +24,16 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 	for i := 0; i < length; i++ {
 		if context.ParseOption.ProtyleWYSIWYG {
 			lines := lex.Split(paragraph.Tokens, lex.ItemNewline)
+
+			// 没有 | 的行依旧归入段落中
+			var beforeTableLines [][]byte
+			for j := 0; j < len(lines); j++ {
+				if !bytes.Contains(lines[j], []byte("|")) {
+					beforeTableLines = append(beforeTableLines, lines[j])
+				}
+			}
+			lines = lines[len(beforeTableLines):]
+
 			delimRowIndex := context.findTableDelimRow(lines)
 			if 1 > delimRowIndex {
 				return
@@ -31,12 +41,6 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 
 			aligns := context.parseTableDelimRow(lex.TrimWhitespace(lines[delimRowIndex]))
 			if nil == aligns {
-				return
-			}
-
-			if 2 == length && 1 == len(aligns) && 0 == aligns[0] && !bytes.Contains(tokens, []byte("|")) {
-				// 对于 Protyle 来说，这里应该是可以不必判断的，但为了保险，还是保留该判断逻辑
-				// 具体细节可参考下方 GFM Table 解析的注释
 				return
 			}
 
@@ -98,6 +102,10 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 					}
 				}
 				retTable.AppendChild(tableRow)
+			}
+
+			if 0 < len(beforeTableLines) {
+				retParagraph = &ast.Node{Type: ast.NodeParagraph, Tokens: bytes.Join(beforeTableLines, []byte("\n"))}
 			}
 			return
 		} else {
