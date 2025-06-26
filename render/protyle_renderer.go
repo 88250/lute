@@ -1339,7 +1339,7 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}}, false)
 		r.Tag("/span", nil, false)
 
-		if r.Options.ProtyleMarkNetImg && !bytes.HasPrefix(dataSrcTokens, []byte("assets/")) {
+		if r.Options.ProtyleMarkNetImg && !bytes.HasPrefix(dataSrcTokens, []byte("assets/")) && !bytes.HasPrefix(dataSrcTokens, []byte("api/icon/")) {
 			r.WriteString("<span class=\"img__net\"><svg><use xlink:href=\"#iconLanguage\"></use></svg></span>")
 		}
 
