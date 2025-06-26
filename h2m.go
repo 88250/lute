@@ -207,7 +207,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
-		if ast.NodeListItem == tree.Context.Tip.Type || (nil != tree.Context.Tip.Parent && ast.NodeListItem == tree.Context.Tip.Parent.Type) {
+		if ast.NodeListItem == tree.Context.Tip.Type || (nil != tree.Context.Tip.Parent && ast.NodeListItem == tree.Context.Tip.Parent.Type) ||
+			(nil != tree.Context.Tip.Parent && nil != tree.Context.Tip.Parent.Parent && ast.NodeListItem == tree.Context.Tip.Parent.Parent.Type) {
 			// 去掉文本中开头的列表项标记符 https://github.com/siyuan-note/siyuan/issues/14329
 			if idx := bytes.Index(node.Tokens, []byte(". ")); 0 < idx {
 				num := node.Tokens[:idx]
@@ -222,9 +223,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					node.Tokens = node.Tokens[idx+2:]
 				}
 			}
-			if (nil != tree.Context.Tip.ListData && 0 == tree.Context.Tip.ListData.Typ) || (nil != tree.Context.Tip.Parent.ListData && 0 == tree.Context.Tip.Parent.ListData.Typ) {
+			if (nil != tree.Context.Tip.ListData && 0 == tree.Context.Tip.ListData.Typ) || (nil != tree.Context.Tip.Parent.ListData && 0 == tree.Context.Tip.Parent.ListData.Typ) ||
+				(nil != tree.Context.Tip.Parent && nil != tree.Context.Tip.Parent.Parent.ListData && 0 == tree.Context.Tip.Parent.Parent.ListData.Typ) {
 				if idx := bytes.Index(node.Tokens, []byte("•")); 0 == idx {
 					node.Tokens = bytes.TrimSpace(bytes.TrimPrefix(node.Tokens, []byte("•")))
+				}
+				if idx := bytes.Index(node.Tokens, []byte("●")); 0 == idx {
+					node.Tokens = bytes.TrimSpace(bytes.TrimPrefix(node.Tokens, []byte("●")))
 				}
 			}
 		}
