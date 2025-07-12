@@ -335,7 +335,10 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			if ast.NodeText == tmp.Type {
 				tmp.Type = ast.NodeLinkText
 				if t.Context.ParseOption.ProtyleWYSIWYG {
-					tmp.Tokens = bytes.ReplaceAll(tmp.Tokens, editor.CaretTokens, nil)
+					if bytes.Contains(tmp.Tokens, editor.CaretTokens) {
+						node.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+						tmp.Tokens = bytes.ReplaceAll(tmp.Tokens, editor.CaretTokens, nil)
+					}
 				}
 			}
 			node.AppendChild(tmp)
@@ -344,7 +347,10 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket, Tokens: closeBracket})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen, Tokens: openParen})
 		if t.Context.ParseOption.ProtyleWYSIWYG {
-			dest = bytes.ReplaceAll(dest, editor.CaretTokens, nil)
+			if bytes.Contains(dest, editor.CaretTokens) {
+				node.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+				dest = bytes.ReplaceAll(dest, editor.CaretTokens, nil)
+			}
 		}
 		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: dest})
 		if nil != space {
