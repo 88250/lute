@@ -2075,6 +2075,66 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	return ialTokens
 }
 
+// setBlockIAL2 设置块级 IAL，仅用于 h2m 中。
+func (lute *Lute) setBlockIAL2(n *html.Node, node *ast.Node) (ialTokens []byte) {
+	if bookmark := util.DomAttrValue(n, "bookmark"); "" != bookmark {
+		bookmark = html.UnescapeHTMLStr(bookmark)
+		node.SetIALAttr("bookmark", bookmark)
+		ialTokens = append(ialTokens, []byte(" bookmark=\""+bookmark+"\"")...)
+	}
+
+	if style := util.DomAttrValue(n, "style"); "" != style {
+		style = html.UnescapeHTMLStr(style)
+		style = parse.StyleValue(style)
+		node.SetIALAttr("style", style)
+		ialTokens = append(ialTokens, []byte(" style=\""+style+"\"")...)
+	}
+
+	if name := util.DomAttrValue(n, "name"); "" != name {
+		name = html.UnescapeHTMLStr(name)
+		node.SetIALAttr("name", name)
+		ialTokens = append(ialTokens, []byte(" name=\""+name+"\"")...)
+	}
+
+	if memo := util.DomAttrValue(n, "memo"); "" != memo {
+		memo = html.UnescapeHTMLStr(memo)
+		node.SetIALAttr("memo", memo)
+		ialTokens = append(ialTokens, []byte(" memo=\""+memo+"\"")...)
+	}
+
+	if alias := util.DomAttrValue(n, "alias"); "" != alias {
+		alias = html.UnescapeHTMLStr(alias)
+		node.SetIALAttr("alias", alias)
+		ialTokens = append(ialTokens, []byte(" alias=\""+alias+"\"")...)
+	}
+
+	if fold := util.DomAttrValue(n, "fold"); "" != fold {
+		node.SetIALAttr("fold", fold)
+		ialTokens = append(ialTokens, []byte(" fold=\""+fold+"\"")...)
+	}
+
+	if headingFold := util.DomAttrValue(n, "heading-fold"); "" != headingFold {
+		node.SetIALAttr("heading-fold", headingFold)
+		ialTokens = append(ialTokens, []byte(" heading-fold=\""+headingFold+"\"")...)
+	}
+
+	if parentFold := util.DomAttrValue(n, "parent-fold"); "" != parentFold {
+		node.SetIALAttr("parent-fold", parentFold)
+		ialTokens = append(ialTokens, []byte(" parent-fold=\""+parentFold+"\"")...)
+	}
+
+	if customAttrs := util.DomCustomAttrs(n); nil != customAttrs {
+		for k, v := range customAttrs {
+			v = html.UnescapeHTMLStr(v)
+			node.SetIALAttr(k, v)
+			ialTokens = append(ialTokens, []byte(" "+k+"=\""+v+"\"")...)
+		}
+	}
+
+	ialTokens = parse.IAL2Tokens(node.KramdownIAL)
+	return ialTokens
+}
+
 func processSpanMarkerSpace(n *html.Node, node *ast.Node) {
 	if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
 		n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")

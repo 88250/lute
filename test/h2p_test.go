@@ -19,11 +19,13 @@ import (
 
 var html2BlockDOMTests = []parseTest{
 
+	{"1", "<h2 id=\"---我们的家\" name=\"社区\" updated=\"20210601233355\">🏘️ 我们的家</h2>", "<div data-subtype=\"h2\" data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeHeading\" class=\"h2\" name=\"社区\"><div contenteditable=\"true\" spellcheck=\"false\">🏘️ 我们的家</div><div class=\"protyle-attr\" contenteditable=\"false\"><div class=\"protyle-attr--name\"><svg><use xlink:href=\"#iconN\"></use></svg>社区</div>\u200b</div></div>"},
 	{"0", "<table><tr><td><span data-type=\"inline-math\" data-subtype=\"math\" data-content=\"foo\" contenteditable=\"false\" class=\"render-node\" data-render=\"true\">​<span class=\"katex\"><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height:0.8889em;vertical-align:-0.1944em;\"></span><span class=\"mord mathnormal\" style=\"margin-right:0.10764em;\">f</span><span class=\"mord mathnormal\">oo</span></span></span></span></span>​</td></tr><tr><td></td></tr></table>", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeTable\" class=\"table\"><div contenteditable=\"false\"><table contenteditable=\"true\" spellcheck=\"false\"><colgroup><col /></colgroup><thead><tr><th><span data-type=\"inline-math\" data-subtype=\"math\" data-content=\"foo\" contenteditable=\"false\" class=\"render-node\"></span>\u200b</th></tr></thead><tbody><tr><td></td></tr></tbody></table><div class=\"protyle-action__table\"><div class=\"table__resize\"></div><div class=\"table__select\"></div></div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 }
 
 func TestHTML2BlockDOM(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetKramdownBlockIAL(true)
 
 	ast.Testing = true
 	for _, test := range html2BlockDOMTests {
