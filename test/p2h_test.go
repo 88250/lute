@@ -11,14 +11,15 @@
 package test
 
 import (
-	"github.com/88250/lute/ast"
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
 )
 
 var blockDOM2HTMLTest = []parseTest{
 
+	{"2", "<div data-node-id=\"20250713111927-m1adqgm\" data-node-index=\"11\" data-type=\"NodeMathBlock\" class=\"render-node protyle-wysiwyg--select\" updated=\"20250713111932\" data-content=\"123\" data-subtype=\"math\" data-render=\"true\"><div spin=\"1\"><span contenteditable=\"false\"><span class=\"katex-display\"><span class=\"katex\"><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\" style=\"height:0.6444em;\"></span><span class=\"mord\">123</span></span><span class=\"fn__flex-1\"></span></span></span></span></span><span class=\"protyle-cursor\">​</span></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div>", "<div class=\"language-math\" id=\"20250713111927-m1adqgm\" updated=\"20250713111932\">123</div>\n"},
 	{"1", "<div data-node-id=\"20230708221830-dbk6i2j\" data-type=\"NodeList\" class=\"list\" data-subtype=\"u\"><div data-marker=\"*\" data-subtype=\"u\" data-node-id=\"20230708221825-6cebbvv\" data-type=\"NodeListItem\" class=\"li protyle-wysiwyg--select\" updated=\"20230708221901\" custom-t=\"{&amp;quot;11&amp;quot;}\"><div class=\"protyle-action\" draggable=\"true\"><svg><use xlink:href=\"#iconDot\"></use></svg></div><div data-node-id=\"20230708221825-zfrqic3\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20230708221825\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div><div class=\"protyle-attr\" contenteditable=\"false\"></div></div>", "<ul id=\"20230708221830-dbk6i2j\" updated=\"20230708221830\">\n<li id=\"20230708221825-6cebbvv\" updated=\"20230708221901\" custom-t=\"&#123;&quot;11&quot;&#125;\">foo</li>\n</ul>\n"},
 	{"0", "foo <span data-type=\"code\">​bar</span>​ baz", "<p id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\">foo <span data-type=\"code\">bar</span>\u200b baz</p>\n"},
 }
