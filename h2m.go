@@ -296,6 +296,11 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				language = class[strings.LastIndex(class, "-source-")+len("-source-"):]
 			} else if strings.Contains(class, "-text-html-basic") {
 				language = "html"
+			} else if strings.Contains(class, "language-") && !strings.Contains(class, "-math") {
+				language = class[strings.LastIndex(class, "language-")+len("language-"):]
+				if !render.NoHighlight(language) {
+					language = ""
+				}
 			}
 			if "" != language {
 				node.Type = ast.NodeCodeBlock
