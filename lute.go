@@ -583,6 +583,10 @@ func (lute *Lute) SetSpin(b bool) {
 	lute.ParseOptions.Spin = b
 }
 
+func (lute *Lute) SetHTML2MarkdownAttrs(attrs []string) {
+	lute.ParseOptions.HTML2MarkdownAttrs = attrs
+}
+
 func (lute *Lute) SetHTMLTag2TextMark(b bool) {
 	lute.ParseOptions.HTMLTag2TextMark = b
 }

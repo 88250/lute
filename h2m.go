@@ -124,22 +124,24 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 	node := &ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(n.Data)}
 
-	withIAL := false
-	for _, attr := range n.Attr {
-		if "name" == attr.Key {
-			node.SetIALAttr("name", attr.Val)
-			withIAL = true
+	if 0 < len(lute.ParseOptions.HTML2MarkdownAttrs) {
+		withIAL := false
+		for _, attr := range n.Attr {
+			if util.ContainsStr(attr.Key, lute.ParseOptions.HTML2MarkdownAttrs) {
+				node.SetIALAttr(attr.Key, attr.Val)
+				withIAL = true
+			}
+			if strings.HasPrefix(attr.Key, "custom-*") {
+				node.SetIALAttr(attr.Key, attr.Val)
+				withIAL = true
+			}
 		}
-		if strings.HasPrefix(attr.Key, "custom-") {
-			node.SetIALAttr(attr.Key, attr.Val)
-			withIAL = true
-		}
-	}
 
-	if withIAL {
-		ialTokens := lute.setBlockIAL2(n, node)
-		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
-		defer tree.Context.TipAppendChild(ial)
+		if withIAL {
+			ialTokens := lute.setBlockIAL2(n, node)
+			ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
+			defer tree.Context.TipAppendChild(ial)
+		}
 	}
 
 	switch n.DataAtom {

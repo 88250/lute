@@ -29,6 +29,7 @@ var html2BlockDOMTests = []parseTest{
 func TestHTML2BlockDOM(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetKramdownBlockIAL(true)
+	luteEngine.SetHTML2MarkdownAttrs([]string{"name", "custom-*"})
 
 	ast.Testing = true
 	for _, test := range html2BlockDOMTests {

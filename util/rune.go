@@ -11,10 +11,23 @@
 package util
 
 import (
-	"github.com/88250/lute/editor"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/88250/lute/editor"
 )
+
+func ContainsStr(str string, strs []string) bool {
+	if 0 == len(strs) {
+		return false
+	}
+	for _, s := range strs {
+		if strings.Contains(str, s) {
+			return true
+		}
+	}
+	return false
+}
 
 func IsEmptyStr(str string) bool {
 	str = strings.ReplaceAll(str, editor.Zwsp, "")

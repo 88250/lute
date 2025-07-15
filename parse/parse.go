@@ -414,6 +414,8 @@ type Options struct {
 	// 其他情况，比如标题块软换行分块 https://github.com/siyuan-note/siyuan/issues/5723 以及软换行空行分块 https://ld246.com/article/1703839312585
 	// 的场景需要移动 IAL 节点，但是 API 输入 markdown https://github.com/siyuan-note/siyuan/issues/6725）无需移动
 	Spin bool
+	// HTML2MarkdownAttrs 设置将 HTML 转换为 Markdown 时保留的属性列表
+	HTML2MarkdownAttrs []string
 }
 
 var EmojiLock = sync.Mutex{}
