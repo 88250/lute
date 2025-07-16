@@ -131,7 +131,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				node.SetIALAttr(attr.Key, attr.Val)
 				withIAL = true
 			}
-			if strings.HasPrefix(attr.Key, "custom-*") {
+			if strings.HasPrefix(attr.Key, "custom-") && util.ContainsStr("custom-*", lute.ParseOptions.HTML2MarkdownAttrs) {
 				node.SetIALAttr(attr.Key, attr.Val)
 				withIAL = true
 			}
