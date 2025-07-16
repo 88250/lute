@@ -1064,8 +1064,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
-		if ast.NodeDocument == tree.Context.Tip.Type && nil != tree.Context.Tip.LastChild && !tree.Context.Tip.LastChild.IsBlock() {
-			// 如果文档最后一个节点不是块级元素，那么需要先添加一个换行节点 Improve HTML table clipping https://github.com/siyuan-note/siyuan/issues/15307
+		if nil != tree.Context.Tip.LastChild && !tree.Context.Tip.LastChild.IsBlock() {
+			// 如果上一个节点不是块级元素，那么需要先添加一个换行节点 Improve HTML table clipping https://github.com/siyuan-note/siyuan/issues/15307
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHardBreak})
 		}
 
