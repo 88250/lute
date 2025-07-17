@@ -456,6 +456,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
+		class := util.DomAttrValue(firstc, "class")
+		if strings.Contains(class, "iconfont") {
+			// 处理 pre.i,ol 的情况，i 标签为“复制代码”或“隐藏代码”，ol 标签为“行号”
+			// https://github.com/siyuan-note/siyuan/issues/15314
+			firstc = firstc.NextSibling
+			n.FirstChild.Unlink()
+		}
+
 		if atom.Em == firstc.DataAtom && nil != firstc.NextSibling && atom.Em == firstc.NextSibling.DataAtom {
 			// pre.em,em,code 的情况，这两个 em 是“复制代码”和“隐藏代码” https://github.com/siyuan-note/siyuan/issues/13026
 
@@ -568,6 +576,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					if strings.Contains(parentClass, "language-") {
 						class = parentClass
 					}
+				}
+				if strings.HasPrefix(class, "lang-") {
+					class = strings.ReplaceAll(class, "lang-", "language-")
 				}
 
 				if !strings.Contains(class, "language-") {
