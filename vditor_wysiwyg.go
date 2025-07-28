@@ -216,7 +216,7 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	}
 
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
-		lute.adjustCustomTag(c)
+		lute.adjustTag(c)
 	}
 
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
@@ -261,10 +261,9 @@ func (lute *Lute) adjustBlockInTable(n *html.Node) {
 	}
 }
 
-func (lute *Lute) adjustCustomTag(n *html.Node) {
-	// 将某些自定义标签转换为标准标签
-
+func (lute *Lute) adjustTag(n *html.Node) {
 	if html.ElementNode == n.Type && 0 == n.DataAtom {
+		// 将某些自定义标签转换为标准标签
 		if "ucapcontent" == n.Data {
 			n.DataAtom = atom.Div
 		} else if "ucaptitle" == n.Data {
@@ -275,10 +274,17 @@ func (lute *Lute) adjustCustomTag(n *html.Node) {
 		} else if "app-document-text" == n.Data {
 			n.DataAtom = atom.Div
 		}
+	} else if html.TextNode == n.Type && 0 == n.DataAtom && !lute.parentIs(n, atom.Table) {
+		if lute.ParseOptions.ProtyleWYSIWYG {
+			// 将非表格内的文本节点中的 <br> 转换为 \n https://github.com/siyuan-note/siyuan/issues/15373
+			n.Data = strings.ReplaceAll(n.Data, "<br>", "\n")
+			n.Data = strings.ReplaceAll(n.Data, "<br/>", "\n")
+			n.Data = strings.ReplaceAll(n.Data, "<br />", "\n")
+		}
 	}
 
 	for c := n.FirstChild; nil != c; c = c.NextSibling {
-		lute.adjustCustomTag(c)
+		lute.adjustTag(c)
 	}
 }
 

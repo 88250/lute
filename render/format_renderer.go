@@ -341,7 +341,11 @@ func (r *FormatRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) 
 
 func (r *FormatRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<br />")
+		if node.ParentIs(ast.NodeParagraph, ast.NodeHeading) {
+			r.WriteByte(lex.ItemNewline)
+		} else {
+			r.WriteString("<br />")
+		}
 	}
 	return ast.WalkContinue
 }

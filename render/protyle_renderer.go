@@ -274,7 +274,11 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 
 func (r *ProtyleRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.WriteString("<br />")
+		if node.ParentIs(ast.NodeParagraph, ast.NodeHeading) {
+			r.WriteByte(lex.ItemNewline)
+		} else {
+			r.WriteString("<br />")
+		}
 	}
 	return ast.WalkContinue
 }
