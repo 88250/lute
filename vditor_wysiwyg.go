@@ -262,6 +262,11 @@ func (lute *Lute) adjustBlockInTable(n *html.Node) {
 }
 
 func (lute *Lute) adjustTag(n *html.Node) {
+	if atom.Div == n.DataAtom && "NodeCodeBlock" == util.DomAttrValue(n, "data-type") ||
+		atom.Span == n.DataAtom && "code" == util.DomAttrValue(n, "data-type") {
+		return
+	}
+
 	if html.ElementNode == n.Type && 0 == n.DataAtom {
 		// 将某些自定义标签转换为标准标签
 		if "ucapcontent" == n.Data {
