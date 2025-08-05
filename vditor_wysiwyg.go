@@ -278,6 +278,8 @@ func (lute *Lute) adjustTag(n *html.Node) {
 			n.DataAtom = atom.Span
 		} else if "app-document-text" == n.Data {
 			n.DataAtom = atom.Div
+		} else if "ms-cmark-node" == n.Data {
+			n.DataAtom = atom.Div
 		}
 	} else if html.TextNode == n.Type && 0 == n.DataAtom && !lute.parentIs(n, atom.Table) {
 		if lute.ParseOptions.ProtyleWYSIWYG {
