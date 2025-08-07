@@ -164,6 +164,47 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 			} else if bytes.EqualFold(tags, []byte("<b>")) {
 				ret = t.processSpanTag(tags, "<b>", "</b>", ctx)
 				return
+			} else if bytes.HasPrefix(bytes.ToLower(tags), []byte("<img ")) {
+				nodes, _ := html.ParseFragment(bytes.NewReader(tags), &html.Node{Type: html.ElementNode})
+				if 1 != len(nodes) {
+					ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
+					return
+				}
+				node := nodes[0]
+
+				if atom.Img == node.DataAtom {
+					ret = &ast.Node{Type: ast.NodeImage}
+					ret.AppendChild(&ast.Node{Type: ast.NodeBang})
+					ret.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
+					if text := util.DomAttrValue(node, "alt"); "" != text {
+						ret.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: []byte(text)})
+					}
+					ret.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+					ret.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+					if src := util.DomAttrValue(node, "src"); "" != src {
+						ret.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(src)})
+					}
+					if title := util.DomAttrValue(node, "title"); "" != title {
+						ret.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(title)})
+					}
+					ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+					if width := util.DomAttrValue(node, "width"); "" != width {
+						style := "width: " + width
+						ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: IAL2Tokens([][]string{{"style", style}})}
+						ret.SetIALAttr("style", style)
+						ret.InsertAfter(ial)
+					} else {
+						if height := util.DomAttrValue(node, "height"); "" != height {
+							style := "height: " + height
+							ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: IAL2Tokens([][]string{{"style", style}})}
+							ret.SetIALAttr("style", style)
+							ret.InsertAfter(ial)
+						}
+					}
+
+					return
+				}
+				ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 			}
 		}
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
