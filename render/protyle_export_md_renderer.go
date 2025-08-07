@@ -1375,6 +1375,28 @@ func (r *ProtyleExportMdRenderer) renderBang(node *ast.Node, entering bool) ast.
 }
 
 func (r *ProtyleExportMdRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.Options.ImgTag && entering {
+		var attrs [][]string
+		if altText := node.ChildByType(ast.NodeLinkText); nil != altText {
+			attrs = append(attrs, []string{"alt", util.BytesToStr(altText.Tokens)})
+		}
+		if link := node.ChildByType(ast.NodeLinkDest); nil != link {
+			dest := link.Tokens
+			dest = r.LinkPath(dest)
+			dest = []byte(r.EncodeLinkSpace(string(dest)))
+			attrs = append(attrs, []string{"src", util.BytesToStr(dest)})
+		}
+		if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
+			titleTokens := title.Tokens
+			titleTokens = bytes.ReplaceAll(titleTokens, []byte("\""), []byte("&quot;"))
+			attrs = append(attrs, []string{"title", util.BytesToStr(titleTokens)})
+		}
+		if style := node.IALAttr("style"); "" != style {
+			attrs = append(attrs, []string{"style", style})
+		}
+		r.Tag("img", attrs, true)
+		return ast.WalkSkipChildren
+	}
 	return ast.WalkContinue
 }
 

@@ -121,6 +121,8 @@ type Options struct {
 	Spellcheck bool
 	// UnorderedListMarker 设置无序列表和任务列表的标记符，默认为 *
 	UnorderedListMarker string
+	// ImgTag 设置是否使用 <img> 标签渲染图片
+	ImgTag bool
 }
 
 func NewOptions() *Options {

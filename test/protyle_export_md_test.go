@@ -22,6 +22,7 @@ import (
 
 var protyleExportMdTests = []parseTest{
 
+	{"18", "![foo](bar \"baz\")", "<img alt=\"foo\" src=\"bar\" title=\"baz\" />\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"17", "` ``foo`` `", "`` `foo` ``\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"16", "`` `foo` ``", "`` `foo` ``\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"15", "`foo`", "`foo`\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
@@ -61,6 +62,7 @@ func TestProtyleExportMd(t *testing.T) {
 	luteEngine.SetInlineMathAllowDigitAfterOpenMarker(true)
 	luteEngine.SetTextMark(true)
 	luteEngine.SetImgPathAllowSpace(true)
+	luteEngine.SetImgTag(true)
 
 	ast.Testing = true
 	for _, test := range protyleExportMdTests {
