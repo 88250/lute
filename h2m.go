@@ -201,7 +201,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
-		if ast.NodeParagraph == tree.Context.Tip.Type && bytes.HasPrefix(node.Tokens, []byte("$$")) && bytes.HasSuffix(node.Tokens, []byte("$$")) {
+		if ast.NodeParagraph == tree.Context.Tip.Type && bytes.HasPrefix(node.Tokens, []byte("$$")) && bytes.HasSuffix(node.Tokens, []byte("$$")) && 2 == bytes.Count(node.Tokens, []byte("$$")) {
 			// 将其转换为公式块 https://github.com/siyuan-note/siyuan/issues/14360
 			tex := bytes.TrimSpace(node.Tokens[2 : len(node.Tokens)-2])
 			appendMathBlock(tree, util.BytesToStr(tex))
