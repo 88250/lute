@@ -82,6 +82,23 @@ func GetTextMarkFileAnnotationRefData(n *html.Node) (id string) {
 	return
 }
 
+func GetFormula(n *html.Node) string {
+	if nil == n {
+		return ""
+	}
+
+	if ret := strings.TrimSpace(DomAttrValue(n, "data-tex")); "" != ret {
+		return ret
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		if ret := GetFormula(c); "" != ret {
+			return ret
+		}
+	}
+	return ""
+}
+
 func DomChildByTypeAndClass(n *html.Node, dataAtom atom.Atom, class ...string) *html.Node {
 	if nil == n {
 		return nil

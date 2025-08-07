@@ -347,6 +347,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					break
 				}
 
+				if tex := util.GetFormula(n); "" != tex {
+					// https://github.com/siyuan-note/siyuan/issues/15457
+					appendMathBlock(tree, tex)
+					return
+				}
+
 				// span 可能是 TextMark 元素，也可能是公式，其他情况则忽略
 				spans := util.DomChildrenByType(n, atom.Span)
 				if 0 < len(spans) {
