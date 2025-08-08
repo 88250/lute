@@ -189,13 +189,13 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 					}
 					ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 					if width := util.DomAttrValue(node, "width"); "" != width {
-						style := "width: " + width
+						style := "width: " + width + ";"
 						ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: IAL2Tokens([][]string{{"style", style}})}
 						ret.SetIALAttr("style", style)
 						ret.InsertAfter(ial)
 					} else {
 						if height := util.DomAttrValue(node, "height"); "" != height {
-							style := "height: " + height
+							style := "height: " + height + ";"
 							ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: IAL2Tokens([][]string{{"style", style}})}
 							ret.SetIALAttr("style", style)
 							ret.InsertAfter(ial)
