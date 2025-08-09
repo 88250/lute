@@ -71,3 +71,15 @@ func wordCount0(str string) (runeCount, wordCount int) {
 	}
 	return
 }
+
+func IsDigit(str string) bool {
+	if 0 == len(str) {
+		return false
+	}
+	for _, r := range str {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
+}
