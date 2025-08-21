@@ -990,6 +990,26 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+
+			if width := strings.TrimSpace(util.DomAttrValue(n, "width")); "" != width {
+				if util.IsDigit(width) {
+					width += "px"
+				}
+				style := "width: " + width + ";"
+				ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: parse.IAL2Tokens([][]string{{"style", style}})}
+				node.SetIALAttr("style", style)
+				node.InsertAfter(ial)
+			} else {
+				if height := strings.TrimSpace(util.DomAttrValue(n, "height")); "" != height {
+					if util.IsDigit(height) {
+						height += "px"
+					}
+					style := "height: " + height + ";"
+					ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: parse.IAL2Tokens([][]string{{"style", style}})}
+					node.SetIALAttr("style", style)
+					node.InsertAfter(ial)
+				}
+			}
 		}
 
 		if ast.NodeDocument == tree.Context.Tip.Type {
@@ -998,7 +1018,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip = p
 			defer tree.Context.ParentTip()
 		}
+
+		ial := node.Next
 		tree.Context.Tip.AppendChild(node)
+		if nil != ial {
+			tree.Context.Tip.AppendChild(ial)
+		}
+
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Input:
