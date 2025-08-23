@@ -612,6 +612,10 @@ func (lute *Lute) SetImgTag(b bool) {
 	lute.RenderOptions.ImgTag = b
 }
 
+func (lute *Lute) SetPreventEncodeLinkSpace(b bool) {
+	lute.RenderOptions.PreventEncodeLinkSpace = b
+}
+
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 	for rendererType, extRenderer := range options["renderers"] {
 		switch extRenderer.Interface().(type) { // 稍微进行一点格式校验

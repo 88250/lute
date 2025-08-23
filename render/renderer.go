@@ -122,6 +122,8 @@ type Options struct {
 	UnorderedListMarker string
 	// ImgTag 设置是否使用 <img> 标签渲染图片
 	ImgTag bool
+	// PreventEncodeLinkSpace 设置是否阻止将链接中对空格编码为 %20
+	PreventEncodeLinkSpace bool
 }
 
 func NewOptions() *Options {

@@ -18,6 +18,10 @@ import (
 )
 
 func (r *BaseRenderer) EncodeLinkSpace(dest string) string {
+	if r.Options.PreventEncodeLinkSpace {
+		return dest
+	}
+
 	// Improve export of Markdown hyperlink spaces and markers https://github.com/siyuan-note/siyuan/issues/9792
 	return strings.ReplaceAll(dest, " ", "%20")
 }
