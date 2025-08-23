@@ -12,8 +12,9 @@ package render
 
 import (
 	"bytes"
-	"github.com/88250/lute/util"
 	"strings"
+
+	"github.com/88250/lute/util"
 )
 
 func (r *BaseRenderer) EncodeLinkSpace(dest string) string {
