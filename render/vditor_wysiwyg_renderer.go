@@ -796,6 +796,7 @@ func (r *VditorRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatu
 	if r.Options.Sanitize {
 		tokens = sanitize(tokens)
 	}
+	tokens = r.tagSrcPath(tokens)
 	r.Write(tokens)
 	r.WriteString("</pre></div>")
 	return ast.WalkContinue
