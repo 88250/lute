@@ -998,6 +998,7 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
+		tokens = r.tagSrcPath(tokens)
 		r.Write(tokens)
 		r.WriteString("</pre></div>")
 	}
