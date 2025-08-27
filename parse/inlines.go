@@ -57,11 +57,21 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 				return
 			} else if ial := t.Context.parseKramdownIALInListItem(tokens); 0 < len(ial) {
 				if nil != node.Previous {
-					// 解析 kramdown 列表时可能出现列表项下面为空（* \n{id:foo}），此时 IAL 应该用于覆盖前一个 List 的
-					node.Previous.SetIALAttr("id", ial[0][1])
+					// 解析 kramdown 列表或者引述块时可能出现标记符后为空（* \n{id:foo} 或者 >\n{: custom-b="info" }），此时 IAL 应该进行合并
+					m := IAL2Map(ial)
+					for k, v := range m {
+						node.Previous.SetIALAttr(k, v)
+					}
 					next := node.Next
 					node.Unlink()
 					node.Next = next
+					if nil != node.Next && ast.NodeKramdownBlockIAL == node.Next.Type {
+						mergeMap := IAL2Map(Tokens2IAL(node.Next.Tokens))
+						for k, v := range m {
+							mergeMap[k] = v
+						}
+						node.Next.Tokens = IAL2Tokens(Map2IAL(mergeMap))
+					}
 					return
 				}
 			}
