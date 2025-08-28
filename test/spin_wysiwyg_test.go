@@ -18,6 +18,7 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"160", "<p data-block=\"0\"><sup data-marker=\"^\">foob<wbr></sup></p>", "<p data-block=\"0\"><sup data-marker=\"^\">foob<wbr></sup></p>"},
 	{"159", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li><li data-marker=\"*\" class=\"vditor-task\">[ ] <wbr><br></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> foo</li><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> <wbr></li></ul>"},
 	{"158", "<form ><iframe/src=\"data:text/html,<script>alert('xss');</script>\"></iframe>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;form&gt;&lt;iframe src=&quot;data:text/html,&lt;script&gt;alert('xss');&lt;/script&gt;&quot;&gt;&lt;/iframe&gt;&lt;/form&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><form><iframe></iframe></form></pre></div>"},
 	{"157", "<p>[ToC]</p><h1 data-block=\"0\" id=\"wysiwyg-foo--bar1_1\" data-marker=\"#\">foo <code data-marker=\"`\">​&lt;script&gt;</code>​ bar</h1>", "<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\"><ul><li><span data-target-id=\"wysiwyg-foo--bar\">foo <code>&lt;script&gt;</code> bar</span></li></ul></div><h1 data-block=\"0\" id=\"wysiwyg-foo--bar\" data-marker=\"#\">foo <code data-marker=\"`\">\u200b&lt;script&gt;</code>\u200b bar</h1>"},
@@ -168,7 +169,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"14", ":octocat:", "<p data-block=\"0\"><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},
 	{"13", "<p>1、foo</p>", "<p data-block=\"0\">1、foo</p>"},
 	{"12", "<p><s data-marker=\"~~\">Hi</s> Hello, world!</p>", "<p data-block=\"0\"><s data-marker=\"~~\">Hi</s> Hello, world!</p>"},
-	{"11", "<p><del data-marker=\"~\">Hi</del> Hello, world!</p>", "<p data-block=\"0\"><s data-marker=\"~\">Hi</s> Hello, world!</p>"},
+	{"11", "<p><del data-marker=\"~~\">Hi</del> Hello, world!</p>", "<p data-block=\"0\"><s data-marker=\"~~\">Hi</s> Hello, world!</p>"},
 	{"10", "<ul data-tight=\"true\"><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input checked=\"\" type=\"checkbox\" /> foo<wbr></li></ul>"},
 	{"9", "<ul data-tight=\"true\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> foo<wbr></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" /> foo<wbr></li></ul>"},
 	{"8", "> <wbr>", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr></p></blockquote>"},
@@ -188,7 +189,9 @@ func TestSpinVditorDOM(t *testing.T) {
 	luteEngine.SetVditorWYSIWYG(true)
 	luteEngine.ParseOptions.ToC = true
 	luteEngine.RenderOptions.Sanitize = true
-	luteEngine.ParseOptions.Mark = true
+	luteEngine.SetMark(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetSub(true)
 
 	for _, test := range spinVditorDOMTests {
 		html := luteEngine.SpinVditorDOM(test.from)

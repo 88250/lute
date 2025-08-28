@@ -1535,8 +1535,108 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 				node.Tokens = append(node.Tokens, editor.CaretTokens...)
 			}
 			tree.Context.Tip.AppendChild(node)
+			return
 		}
-		return
+
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
+			return
+		}
+		if lute.startsWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, editor.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(editor.Zwsp + "\n")})
+		}
+		text := strings.TrimSpace(util.DomText(n))
+		if lute.isEmptyText(n) {
+			return
+		}
+		if editor.Caret == text {
+			node.Tokens = editor.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
+		node.Type = ast.NodeSup
+		marker := util.DomAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "^"
+		}
+
+		node.AppendChild(&ast.Node{Type: ast.NodeSupOpenMarker, Tokens: []byte(marker)})
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && editor.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+			node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker, Tokens: []byte(marker)})
+			return
+		}
+
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, editor.Zwsp, "")
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+		}
+
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case atom.Sub:
+		if nil == n.FirstChild || atom.Br == n.FirstChild.DataAtom {
+			return
+		}
+		if lute.startsWithNewline(n.FirstChild) {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, editor.Zwsp+"\n")
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(editor.Zwsp + "\n")})
+		}
+		text := strings.TrimSpace(util.DomText(n))
+		if lute.isEmptyText(n) {
+			return
+		}
+		if editor.Caret == text {
+			node.Tokens = editor.CaretTokens
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+
+		node.Type = ast.NodeSub
+		marker := util.DomAttrValue(n, "data-marker")
+		if "" == marker {
+			marker = "~"
+		}
+
+		node.AppendChild(&ast.Node{Type: ast.NodeSubOpenMarker, Tokens: []byte(marker)})
+		tree.Context.Tip.AppendChild(node)
+
+		if nil != n.FirstChild && editor.Caret == n.FirstChild.Data && nil != n.LastChild && "br" == n.LastChild.Data {
+			// 处理结尾换行
+			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+			node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker, Tokens: []byte(marker)})
+			return
+		}
+
+		n.FirstChild.Data = strings.ReplaceAll(n.FirstChild.Data, editor.Zwsp, "")
+		if strings.HasPrefix(n.FirstChild.Data, " ") && nil == n.FirstChild.PrevSibling {
+			n.FirstChild.Data = strings.TrimLeft(n.FirstChild.Data, " ")
+			node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, " ") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, " ")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: " "})
+		}
+		if strings.HasSuffix(n.FirstChild.Data, "\n") && nil == n.FirstChild.NextSibling {
+			n.FirstChild.Data = strings.TrimRight(n.FirstChild.Data, "\n")
+			n.InsertAfter(&html.Node{Type: html.TextNode, Data: "\n"})
+		}
+
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	case atom.Span:
 		if nil == n.FirstChild {
 			break
@@ -1691,6 +1791,13 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		} else {
 			node.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker, Tokens: []byte(marker)})
 		}
+	case atom.Sup:
+		marker := util.DomAttrValue(n, "data-marker")
+		if "" != marker && "footnotes-ref" != dataType {
+			node.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker, Tokens: []byte(marker)})
+		}
+	case atom.Sub:
+		node.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker, Tokens: []byte("~")})
 	case atom.Details:
 		tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeHTMLBlock, Tokens: []byte("</details>")})
 	}
@@ -1850,6 +1957,7 @@ func (lute *Lute) isInline(n *html.Node) bool {
 		atom.Strong == n.DataAtom || atom.B == n.DataAtom ||
 		atom.Em == n.DataAtom || atom.I == n.DataAtom ||
 		atom.Mark == n.DataAtom ||
+		atom.Sup == n.DataAtom || atom.Sub == n.DataAtom ||
 		atom.Del == n.DataAtom || atom.S == n.DataAtom || atom.Strike == n.DataAtom ||
 		atom.A == n.DataAtom ||
 		atom.Img == n.DataAtom ||

@@ -18,6 +18,7 @@ import (
 
 var spinVditorIRDOMTests = []*parseTest{
 
+	{"53", "<p data-block=\"0\"><span data-type=\"sup\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">^</span><sup data-newline=\"1\">foo</sup><span class=\"vditor-ir__marker\">^b<wbr></span></span></p>", "<p data-block=\"0\"><span data-type=\"sup\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">^</span><sup data-newline=\"1\">foo</sup><span class=\"vditor-ir__marker\">^</span></span>b<wbr></p>"},
 	{"52", "<table data-block=\"0\" data-type=\"table\"><thead><tr><th><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">$</span><code data-newline=\"1\" class=\"vditor-ir__marker vditor-ir__marker--pre\" data-type=\"math-inline\">\\|foo</code><span class=\"vditor-ir__preview\" data-render=\"1\"><span class=\"language-math\" data-math=\"|foo\"><span class=\"katex\"><span class=\"katex-html\" aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\"></span><span class=\"mord\">∣</span><span class=\"mord mathnormal\">f</span><span class=\"mord mathnormal\">oo</span></span></span></span></span></span><span class=\"vditor-ir__marker\">$</span></span>b<wbr></th></tr></thead></table>", "<table data-block=\"0\" data-type=\"table\"><thead><tr><th><span data-type=\"inline-node\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker\">$</span><code data-newline=\"1\" class=\"vditor-ir__marker vditor-ir__marker--pre\" data-type=\"math-inline\">\\|foo</code><span class=\"vditor-ir__preview\" data-render=\"2\"><span class=\"language-math\">|foo</span></span><span class=\"vditor-ir__marker\">$</span></span>b<wbr></th></tr></thead></table>"},
 	{"51", "<p data-block=\"0\"><span data-type=\"a\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__link\">link</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">http://baidu.com?q=test&region=china</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span></p>", "<p data-block=\"0\"><span data-type=\"a\" class=\"vditor-ir__node\"><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">[</span><span class=\"vditor-ir__link\">link</span><span class=\"vditor-ir__marker vditor-ir__marker--bracket\">]</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">(</span><span class=\"vditor-ir__marker vditor-ir__marker--link\">http://baidu.com?q=test&amp;region=china</span><span class=\"vditor-ir__marker vditor-ir__marker--paren\">)</span></span></p>"},
 	{"50", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr><br></p></blockquote>", "<blockquote data-block=\"0\"><p data-block=\"0\"><wbr></p></blockquote>"},
@@ -79,7 +80,9 @@ func TestSpinVditorIRDOM(t *testing.T) {
 	luteEngine.SetVditorIR(true)
 	luteEngine.ParseOptions.ToC = true
 	luteEngine.RenderOptions.Sanitize = true
-	luteEngine.ParseOptions.Mark = true
+	luteEngine.SetMark(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetSub(true)
 
 	for _, test := range spinVditorIRDOMTests {
 		html := luteEngine.SpinVditorIRDOM(test.from)
