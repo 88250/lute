@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
 )
 
@@ -98,6 +99,12 @@ func (t *Tree) finalParseBlockIAL() {
 		p.KramdownIAL = [][]string{{"id", id}, {"updated", id[:14]}}
 		p.ID = id
 		p.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+		if nil != n.Next && ast.NodeKramdownBlockIAL == n.Next.Type &&
+			ast.NodeBlockquote == n.Type && nil != n.FirstChild && ast.NodeBlockquoteMarker == n.FirstChild.Type &&
+			nil == n.FirstChild.Next {
+			text := &ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens}
+			p.AppendChild(text)
+		}
 		n.AppendChild(p)
 	}
 
