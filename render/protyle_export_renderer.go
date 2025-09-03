@@ -351,7 +351,7 @@ func (r *ProtyleExportRenderer) renderVideo(node *ast.Node, entering bool) ast.W
 		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, src, dataSrc)
+		tokens = r.replaceSrc(tokens, string(src))
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -376,7 +376,7 @@ func (r *ProtyleExportRenderer) renderAudio(node *ast.Node, entering bool) ast.W
 		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, src, dataSrc)
+		tokens = r.replaceSrc(tokens, string(src))
 		r.Write(tokens)
 		r.WriteString(editor.Zwsp)
 	} else {
@@ -400,7 +400,7 @@ func (r *ProtyleExportRenderer) renderWidget(node *ast.Node, entering bool) ast.
 		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, src, dataSrc)
+		tokens = r.replaceSrc(tokens, string(src))
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -424,7 +424,7 @@ func (r *ProtyleExportRenderer) renderIFrame(node *ast.Node, entering bool) ast.
 		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, src, dataSrc)
+		tokens = r.replaceSrc(tokens, string(src))
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -434,18 +434,6 @@ func (r *ProtyleExportRenderer) renderIFrame(node *ast.Node, entering bool) ast.
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
-}
-
-func (r *ProtyleExportRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
-	src1 := append([]byte(" src=\""), src...)
-	src1 = append(src1, []byte("\"")...)
-	dataSrc1 := append([]byte(" src=\""), dataSrc...)
-	dataSrc1 = append(dataSrc1, []byte("\"")...)
-	if bytes.Contains(tokens, []byte("data-src=")) {
-		return bytes.ReplaceAll(tokens, dataSrc1, src1)
-	}
-	src1 = append(src1, []byte(" data-src=\""+util.BytesToStr(dataSrc)+"\"")...)
-	return bytes.ReplaceAll(tokens, dataSrc1, src1)
 }
 
 func (r *ProtyleExportRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {

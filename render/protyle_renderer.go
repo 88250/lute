@@ -449,18 +449,6 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *ProtyleRenderer) replaceSrc(tokens []byte, src string) []byte {
-	h := util.ParseHTML(string(tokens))
-	if nil == h {
-		return tokens
-	}
-
-	h = h.FirstChild
-	util.SetDomAttrValue(h, "src", src)
-	util.SetDomAttrValue(h, "data-src", src)
-	return util.DomHTML(h)
-}
-
 func (r *ProtyleRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idNode := node.ChildByType(ast.NodeBlockRefID)

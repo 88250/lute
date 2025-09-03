@@ -630,6 +630,17 @@ func (r *BaseRenderer) tagSrc(tokens []byte) []byte {
 	}
 }
 
+func (r *BaseRenderer) replaceSrc(tokens []byte, src string) []byte {
+	h := util.ParseHTML(string(tokens))
+	if nil == h {
+		return tokens
+	}
+
+	h = h.FirstChild
+	util.SetDomAttrValue(h, "src", src)
+	return util.DomHTML(h)
+}
+
 func (r *BaseRenderer) tagSrcPath(tokens []byte) []byte {
 	if srcIndex := bytes.Index(tokens, []byte("src=\"")); 0 < srcIndex {
 		src := tokens[srcIndex+len("src=\""):]
