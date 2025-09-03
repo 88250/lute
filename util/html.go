@@ -307,6 +307,27 @@ func SetDomAttrValue(n *html.Node, attrName, attrVal string) {
 	n.Attr = append(n.Attr, &html.Attribute{Key: attrName, Val: attrVal})
 }
 
+func RemoveDomAttr(n *html.Node, attrName string) {
+	if nil == n {
+		return
+	}
+
+	for i, attr := range n.Attr {
+		if attr.Key == attrName {
+			n.Attr = append(n.Attr[:i], n.Attr[i+1:]...)
+			return
+		}
+	}
+}
+
+func RemoveDomAttrs(n *html.Node) {
+	if nil == n {
+		return
+	}
+
+	n.Attr = nil
+}
+
 func DomAttrValue(n *html.Node, attrName string) string {
 	if nil == n {
 		return ""

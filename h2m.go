@@ -1463,9 +1463,44 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		li.AppendChild(node)
 		tree.Context.Tip.AppendChild(li)
 		tree.Context.Tip = node
-	case atom.Iframe, atom.Audio, atom.Video:
+	case atom.Iframe, atom.Audio:
 		node.Type = ast.NodeHTMLBlock
 		node.Tokens = util.DomHTML(n)
+		tree.Context.Tip.AppendChild(node)
+		return
+	case atom.Video:
+		htmlContent := util.DomHTML(n)
+		h := lute.parseHTML(string(htmlContent))
+		if nil == h {
+			return
+		}
+		videos := util.DomChildrenByType(h, atom.Video)
+		if 1 > len(videos) {
+			return
+		}
+		if 1 < len(videos) {
+			node.Tokens = htmlContent
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		video := videos[0]
+		sources := util.DomChildrenByType(video, atom.Source)
+		if 1 > len(sources) {
+			node.Tokens = htmlContent
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		if 1 < len(sources) {
+			node.Tokens = htmlContent
+			tree.Context.Tip.AppendChild(node)
+			return
+		}
+		source := sources[0]
+		source.Unlink()
+		util.RemoveDomAttrs(video)
+		util.SetDomAttrValue(video, "src", util.DomAttrValue(source, "src"))
+		util.SetDomAttrValue(video, "controls", "controls")
+		node.Tokens = util.DomHTML(video)
 		tree.Context.Tip.AppendChild(node)
 		return
 	case atom.Noscript:

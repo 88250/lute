@@ -1812,6 +1812,19 @@ func (lute *Lute) hasAttr(n *html.Node, attrName string) bool {
 	return false
 }
 
+func (lute *Lute) domParent(n *html.Node, dataAtom atom.Atom) *html.Node {
+	if nil == n {
+		return nil
+	}
+
+	for p := n.Parent; nil != p; p = p.Parent {
+		if p.DataAtom == dataAtom {
+			return p
+		}
+	}
+	return nil
+}
+
 func (lute *Lute) domChild(n *html.Node, dataAtom atom.Atom) *html.Node {
 	if nil == n {
 		return nil
