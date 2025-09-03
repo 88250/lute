@@ -303,7 +303,7 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	}
 
 	// 将字符串解析为 DOM 树
-	htmlRoot := lute.parseHTML(htmlStr)
+	htmlRoot := util.ParseHTML(htmlStr)
 	if nil == htmlRoot {
 		return
 	}

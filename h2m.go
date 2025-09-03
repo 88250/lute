@@ -46,7 +46,7 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 
 // HTML2Tree 将 HTML 转换为 AST。
 func (lute *Lute) HTML2Tree(dom string) (ret *parse.Tree) {
-	htmlRoot := lute.parseHTML(dom)
+	htmlRoot := util.ParseHTML(dom)
 	return lute.HTMLNode2Tree(htmlRoot)
 }
 
@@ -1470,7 +1470,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	case atom.Video:
 		htmlContent := util.DomHTML(n)
-		h := lute.parseHTML(string(htmlContent))
+		h := util.ParseHTML(string(htmlContent))
 		if nil == h {
 			return
 		}
@@ -1490,11 +1490,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(node)
 			return
 		}
-		if 1 < len(sources) {
-			node.Tokens = htmlContent
-			tree.Context.Tip.AppendChild(node)
-			return
-		}
+
 		source := sources[0]
 		source.Unlink()
 		util.RemoveDomAttrs(video)

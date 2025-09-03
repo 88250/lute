@@ -19,6 +19,18 @@ import (
 	"github.com/88250/lute/html/atom"
 )
 
+func ParseHTML(htmlStr string) *html.Node {
+	reader := strings.NewReader(htmlStr)
+	doc, err := html.Parse(reader)
+	if nil != err {
+		return nil
+	}
+	if "html" != doc.FirstChild.Data {
+		return doc
+	}
+	return doc.FirstChild.LastChild // doc.html.body
+}
+
 func GetTextMarkTextDataWithoutEscapeQuote(n *html.Node) (content string) {
 	content = DomText(n)
 	content = strings.ReplaceAll(content, editor.Zwsp, "")

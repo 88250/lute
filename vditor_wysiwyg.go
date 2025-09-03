@@ -123,7 +123,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
 
 	// 将字符串解析为 DOM 树
-	htmlRoot := lute.parseHTML(htmlStr)
+	htmlRoot := util.ParseHTML(htmlStr)
 	if nil == htmlRoot {
 		return
 	}
@@ -169,18 +169,6 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
-}
-
-func (lute *Lute) parseHTML(htmlStr string) *html.Node {
-	reader := strings.NewReader(htmlStr)
-	doc, err := html.Parse(reader)
-	if nil != err {
-		return nil
-	}
-	if "html" != doc.FirstChild.Data {
-		return doc
-	}
-	return doc.FirstChild.LastChild // doc.html.body
 }
 
 func (lute *Lute) adjustVditorDOM(root *html.Node) {

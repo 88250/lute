@@ -364,7 +364,7 @@ func (r *ProtyleRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkSta
 		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, src, dataSrc)
+		tokens = r.replaceSrc(tokens, string(src))
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -388,7 +388,7 @@ func (r *ProtyleRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkSta
 		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, src, dataSrc)
+		tokens = r.replaceSrc(tokens, string(src))
 		r.Write(tokens)
 		r.WriteString(editor.Zwsp)
 	} else {
@@ -412,7 +412,7 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, src, dataSrc)
+		tokens = r.replaceSrc(tokens, string(src))
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -437,7 +437,7 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 		}
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, src, dataSrc)
+		tokens = r.replaceSrc(tokens, string(src))
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -449,16 +449,16 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 	return ast.WalkContinue
 }
 
-func (r *ProtyleRenderer) replaceSrc(tokens, src, dataSrc []byte) []byte {
-	src1 := append([]byte(" src=\""), src...)
-	src1 = append(src1, []byte("\"")...)
-	dataSrc1 := append([]byte(" src=\""), dataSrc...)
-	dataSrc1 = append(dataSrc1, []byte("\"")...)
-	if bytes.Contains(tokens, []byte("data-src=")) {
-		return bytes.ReplaceAll(tokens, dataSrc1, src1)
+func (r *ProtyleRenderer) replaceSrc(tokens []byte, src string) []byte {
+	h := util.ParseHTML(string(tokens))
+	if nil == h {
+		return tokens
 	}
-	src1 = append(src1, []byte(" data-src=\""+util.BytesToStr(dataSrc)+"\"")...)
-	return bytes.ReplaceAll(tokens, dataSrc1, src1)
+
+	h = h.FirstChild
+	util.SetDomAttrValue(h, "src", src)
+	util.SetDomAttrValue(h, "data-src", src)
+	return util.DomHTML(h)
 }
 
 func (r *ProtyleRenderer) renderBlockRef(node *ast.Node, entering bool) ast.WalkStatus {

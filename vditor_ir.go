@@ -91,7 +91,7 @@ func (lute *Lute) vditorIRDOM2Md(htmlStr string) (markdown string) {
 	htmlStr = strings.ReplaceAll(htmlStr, "    \n", "  \n")
 
 	// 将字符串解析为 DOM 树
-	htmlRoot := lute.parseHTML(htmlStr)
+	htmlRoot := util.ParseHTML(htmlStr)
 	if nil == htmlRoot {
 		return
 	}
