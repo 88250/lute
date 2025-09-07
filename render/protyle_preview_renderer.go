@@ -336,7 +336,10 @@ func (r *ProtylePreviewRenderer) renderIFrame(node *ast.Node, entering bool) ast
 
 func (r *ProtylePreviewRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("div", [][]string{{"class", "iframe"}}, false)
+		var attrs [][]string
+		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, []string{"class", "iframe"})
+		r.Tag("div", attrs, false)
 		tokens := node.Tokens
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
