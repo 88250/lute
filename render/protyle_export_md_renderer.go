@@ -1521,8 +1521,12 @@ func (r *ProtyleExportMdRenderer) renderParagraph(node *ast.Node, entering bool)
 func (r *ProtyleExportMdRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		// 去掉开头的零宽空格 Exported Markdown inline code no longer contains zero-width spaces after it https://github.com/siyuan-note/siyuan/issues/15328
-		if !bytes.Equal(node.Tokens, []byte(editor.Zwsp)) {
+		// When exporting inline code to Markdown, try to remove the trailing zero-width space https://github.com/siyuan-note/siyuan/issues/15854
+		for bytes.HasPrefix(node.Tokens, []byte(editor.Zwsp)) && "" == node.NextNodeText() {
 			node.Tokens = bytes.TrimPrefix(node.Tokens, []byte(editor.Zwsp))
+		}
+		if 1 > len(node.Tokens) {
+			return ast.WalkContinue
 		}
 
 		var tokens []byte
