@@ -917,10 +917,12 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				src = strings.Replace(src, ".jpg", ".webp", 1)
 			}
 
-			if strings.HasPrefix(src, "data:image") {
+			if strings.HasPrefix(src, "data:image") || strings.HasSuffix(src, "img-loading.svg") {
 				// 处理可能存在的预加载情况
 				if dataSrc := util.DomAttrValue(n, "data-src"); "" != dataSrc {
-					src = dataSrc
+					if strings.HasPrefix(dataSrc, "http://") || strings.HasPrefix(dataSrc, "https://") {
+						src = dataSrc
+					}
 				}
 			}
 
