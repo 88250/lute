@@ -261,9 +261,19 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip.AppendChild(p)
 			tree.Context.Tip = p
 		} else {
+			isDt := nil != n.Parent && atom.Dt == n.Parent.DataAtom
+			if isDt {
+				strong := &ast.Node{Type: ast.NodeStrong}
+				strong.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: util.StrToBytes("**")})
+				strong.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+				strong.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: util.StrToBytes("**")})
+				tree.Context.Tip.AppendChild(strong)
+				return
+			}
+			
 			tree.Context.Tip.AppendChild(node)
 		}
-	case atom.P, atom.Div, atom.Section, atom.Dd:
+	case atom.P, atom.Div, atom.Section, atom.Dt, atom.Dd:
 		if ast.NodeLink == tree.Context.Tip.Type {
 			break
 		}
@@ -1556,7 +1566,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	default:
-
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
