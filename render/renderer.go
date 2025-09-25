@@ -626,6 +626,7 @@ func (r *BaseRenderer) tagSrc(tokens []byte) []byte {
 	} else {
 		src := tokens[srcIndex+len("src=\""):]
 		src = src[:bytes.Index(src, []byte("\""))]
+		src = bytes.ReplaceAll(src, []byte("&amp;"), []byte("&"))
 		return src
 	}
 }
