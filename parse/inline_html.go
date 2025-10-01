@@ -778,10 +778,14 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 					// Improve some inline elements Markdown editing https://github.com/siyuan-note/siyuan/issues/9999
 					startBlank, endBlank := startEndBlank(node.TextMarkTextContent)
 					if "" != startBlank {
-						node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(startBlank)})
+						if !strings.HasSuffix(node.PreviousNodeText(), " ") && !strings.HasSuffix(node.PreviousNodeText(), "　") {
+							node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(startBlank)})
+						}
 					}
 					if "" != endBlank {
-						node.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte(endBlank)})
+						if !strings.HasPrefix(node.NextNodeText(), " ") && !strings.HasPrefix(node.NextNodeText(), "　") {
+							node.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: []byte(endBlank)})
+						}
 					}
 					node.TextMarkTextContent = strings.TrimSpace(node.TextMarkTextContent)
 				}
@@ -827,17 +831,19 @@ func StyleValue(style string) (ret string) {
 }
 
 func startEndBlank(str string) (startBlank, endBlank string) {
-	for _, r := range str {
-		if ' ' != r && '\t' != r && '\n' != r {
+	runes := []rune(str)
+	for _, r := range runes {
+		if ' ' != r && '\t' != r && '\n' != r && '　' != r {
 			break
 		}
 		startBlank += string(r)
 	}
-	for i := len(str) - 1; i >= 0; i-- {
-		if ' ' != str[i] && '\t' != str[i] && '\n' != str[i] {
+
+	for i := len(runes) - 1; i >= 0; i-- {
+		if runes[i] != ' ' && runes[i] != '\t' && runes[i] != '\n' && runes[i] != '　' {
 			break
 		}
-		endBlank = string(str[i]) + endBlank
+		endBlank = string(runes[i]) + endBlank
 	}
 	return
 }
