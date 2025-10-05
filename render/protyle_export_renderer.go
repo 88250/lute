@@ -208,6 +208,14 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 		}
 
 		if node.IsTextMarkType("a") {
+			strong := node.ContainTextMarkTypes("strong")
+			if strong {
+				r.Tag("strong", nil, false)
+			}
+			em := node.ContainTextMarkTypes("em")
+			if em {
+				r.Tag("em", nil, false)
+			}
 			sup := node.ContainTextMarkTypes("sup")
 			if sup {
 				r.Tag("sup", nil, false)
@@ -224,6 +232,12 @@ func (r *ProtyleExportRenderer) renderTextMark(node *ast.Node, entering bool) as
 
 			if sup {
 				r.Tag("/sup", nil, false)
+			}
+			if em {
+				r.Tag("/em", nil, false)
+			}
+			if strong {
+				r.Tag("/strong", nil, false)
 			}
 
 			if "" != node.TextMarkInlineMemoContent {
