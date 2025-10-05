@@ -212,6 +212,8 @@ func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) a
 				attrs = append(attrs, []string{"title", node.TextMarkATitle})
 			}
 			r.spanNodeAttrs(node, &attrs)
+			dataType := node.TextMarkType
+			attrs = append(attrs, []string{"data-type", dataType})
 			r.Tag("a", attrs, false)
 			r.WriteString(textContent)
 			r.WriteString("</a>")
