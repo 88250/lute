@@ -1814,7 +1814,7 @@ func (r *ProtyleExportRenderer) renderIAL(node *ast.Node) {
 	if memo := node.IALAttr("memo"); "" != memo {
 		memo = strings.ReplaceAll(memo, editor.IALValEscNewLine, "\n")
 		memo = html.EscapeHTMLStr(memo)
-		r.Tag("div", [][]string{{"class", "protyle-attr--memo b3-tooltips b3-tooltips__nw"}, {"aria-label", memo}}, false)
+		r.Tag("div", [][]string{{"class", "protyle-attr--memo ariaLabel"}, {"aria-label", memo}, {"data-position", "north"}}, false)
 		r.WriteString("<svg><use xlink:href=\"#iconM\"></use></svg>")
 		r.Tag("/div", nil, false)
 	}
