@@ -147,7 +147,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemBacktick != maybeMarker && lex.ItemTilde != maybeMarker && // 代码块
 			lex.ItemSemicolon != maybeMarker && // 定义块
 			lex.ItemCrosshatch != maybeMarker && // ATX 标题
-			lex.ItemGreater != maybeMarker && // 块引用
+			lex.ItemGreater != maybeMarker && // 引述
 			lex.ItemLess != maybeMarker && // HTML 块
 			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
 			lex.ItemDollar != maybeMarker && // 数学公式
@@ -201,7 +201,7 @@ func (t *Tree) incorporateLine(line []byte) {
 		// 空行判断，主要是为了判断列表是紧凑模式还是松散模式
 		lastLineBlank := t.Context.blank &&
 			!(typ == ast.NodeFootnotesDef ||
-				typ == ast.NodeBlockquote || // 块引用行肯定不会是空行因为至少有一个 >
+				typ == ast.NodeBlockquote || typ == ast.NodeCallout || // 引述、提示块肯定不会是空行因为至少有一个 >
 				(typ == ast.NodeCodeBlock && isFenced) || // 围栏代码块不计入空行判断
 				(typ == ast.NodeCustomBlock) || // 自定义块不计入空行判断
 				(typ == ast.NodeMathBlock) || // 数学公式块不计入空行判断
@@ -277,7 +277,7 @@ func (t *Tree) addLine() {
 	}
 }
 
-// _continue 判断节点是否可以继续处理，比如块引用需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。
+// _continue 判断节点是否可以继续处理，比如引述需要 >，缩进代码块需要 4 空格，围栏代码块需要 ```。
 // 如果可以继续处理返回 0，如果不能接续处理返回 1，如果返回 2（仅在围栏代码块、超级块或自定义块闭合时）则说明可以继续下一行处理了。
 func _continue(n *ast.Node, context *Context) int {
 	switch n.Type {
@@ -303,6 +303,8 @@ func _continue(n *ast.Node, context *Context) int {
 		return GitConflictContinue(n, context)
 	case ast.NodeCustomBlock:
 		return CustomBlockContinue(n, context)
+	case ast.NodeCallout:
+		return CalloutContinue(n, context)
 	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed,
 		ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio, ast.NodeWidget, ast.NodeAttributeView:
 		return 1

@@ -18,6 +18,7 @@ import (
 func blockStarts() []blockStartFunc {
 	return []blockStartFunc{
 		GitConflictStart,
+		CalloutStart,
 		BlockquoteStart,
 		ATXHeadingStart,
 		FenceCodeBlockStart,

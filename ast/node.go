@@ -140,6 +140,10 @@ type Node struct {
 
 	CustomBlockFenceOffset int    `json:",omitempty"` // 自定义块标记符起始偏移量
 	CustomBlockInfo        string `json:",omitempty"` // 自定义块信息
+
+	// 提示块 https://github.com/88250/lute/issues/203 > [!Type] Title
+	CalloutType  string `json:",omitempty"` // 提示块类型
+	CalloutTitle string `json:",omitempty"` // 提示块标题
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
@@ -828,7 +832,7 @@ func (n *Node) IsBlock() bool {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter,
 		NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget,
-		NodeAttributeView, NodeCustomBlock:
+		NodeAttributeView, NodeCustomBlock, NodeCallout:
 		return true
 	}
 	return false
@@ -837,7 +841,7 @@ func (n *Node) IsBlock() bool {
 // IsContainerBlock 判断 n 是否为容器块。
 func (n *Node) IsContainerBlock() bool {
 	switch n.Type {
-	case NodeDocument, NodeBlockquote, NodeList, NodeListItem, NodeFootnotesDefBlock, NodeFootnotesDef, NodeSuperBlock:
+	case NodeDocument, NodeBlockquote, NodeList, NodeListItem, NodeFootnotesDefBlock, NodeFootnotesDef, NodeSuperBlock, NodeCallout:
 		return true
 	}
 	return false
@@ -881,7 +885,7 @@ func (n *Node) AcceptLines() bool {
 }
 
 // CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（块级容器）只能包含列表项节点，
-// 块引用节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
+// 引述节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
 	switch n.Type {
 	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter,
@@ -927,8 +931,8 @@ const (
 	NodeHeading                   NodeType = 2  // 标题
 	NodeHeadingC8hMarker          NodeType = 3  // ATX 标题标记符 #
 	NodeThematicBreak             NodeType = 4  // 分隔线
-	NodeBlockquote                NodeType = 5  // 块引用
-	NodeBlockquoteMarker          NodeType = 6  // 块引用标记符 >
+	NodeBlockquote                NodeType = 5  // 引述
+	NodeBlockquoteMarker          NodeType = 6  // 引述标记符 >
 	NodeList                      NodeType = 7  // 列表
 	NodeListItem                  NodeType = 8  // 列表项
 	NodeHTMLBlock                 NodeType = 9  // HTML 块
@@ -1146,6 +1150,10 @@ const (
 	NodeHTMLTag      NodeType = 570 // HTML 标签
 	NodeHTMLTagOpen  NodeType = 571 // 开始 HTML 标签
 	NodeHTMLTagClose NodeType = 572 // 结束 HTML 标签
+
+	// 提示块 https://github.com/88250/lute/issues/203
+
+	NodeCallout NodeType = 580 // 提示块
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

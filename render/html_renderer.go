@@ -166,6 +166,7 @@ func NewHtmlRenderer(tree *parse.Tree, options *Options) *HtmlRenderer {
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
 	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
 	ret.RendererFuncs[ast.NodeCustomBlock] = ret.renderCustomBlock
+	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
 	return ret
 }
 
@@ -173,6 +174,26 @@ func (r *HtmlRenderer) Render() (output []byte) {
 	output = r.BaseRenderer.Render()
 	output = append(output, r.RenderFootnotes()...)
 	return
+}
+
+func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Newline()
+		r.handleKramdownBlockIAL(node)
+		r.Tag("div", node.KramdownIAL, false)
+		r.Newline()
+		r.WriteString("<span>")
+		r.WriteString(node.CalloutType)
+		r.WriteString("</span>")
+		r.WriteString("<span>")
+		r.WriteString(node.CalloutTitle)
+		r.WriteString("</span>")
+	} else {
+		r.Newline()
+		r.WriteString("</div>")
+		r.Newline()
+	}
+	return ast.WalkContinue
 }
 
 func (r *HtmlRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {

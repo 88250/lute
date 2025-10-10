@@ -48,6 +48,12 @@ func (t *Tree) finalParseBlockIAL() {
 			appends = append(appends, n)
 		}
 
+		if ast.NodeCallout == n.Type && nil != n.FirstChild {
+			if nil == n.FirstChild.Next { // title 节点为空且后续没有节点了
+				appends = append(appends, n)
+			}
+		}
+
 		if "" == n.ID {
 			id := n.IALAttr("id")
 			if "" == id {
@@ -283,6 +289,8 @@ func (context *Context) finalize(block *ast.Node) {
 		context.gitConflictFinalize(block)
 	case ast.NodeCustomBlock:
 		context.customBlockFinalize(block)
+	case ast.NodeCallout:
+		context.calloutFinalize(block)
 	}
 
 	context.Tip = parent
@@ -423,6 +431,8 @@ type Options struct {
 	Spin bool
 	// HTML2MarkdownAttrs 设置将 HTML 转换为 Markdown 时保留的属性列表
 	HTML2MarkdownAttrs []string
+	// Callout 设置是否开启提示块支持。
+	Callout bool
 }
 
 var EmojiLock = sync.Mutex{}
@@ -452,6 +462,7 @@ func NewOptions() *Options {
 		LinkRef:           true,
 		IndentCodeBlock:   true,
 		DataImage:         true,
+		Callout:           false,
 	}
 }
 
