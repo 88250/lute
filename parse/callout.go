@@ -36,8 +36,7 @@ func CalloutStart(t *Tree, container *ast.Node) int {
 	t.Context.advanceNextNonspace()
 	t.Context.advanceOffset(1, false)
 
-	content := string(bytes.TrimSpace(t.Context.currentLine))
-	content = strings.TrimSpace(strings.TrimPrefix(content, ">"))
+	content := string(bytes.TrimSpace(t.Context.currentLine[t.Context.offset:]))
 	if !strings.HasPrefix(content, "[!") {
 		return 0
 	}
