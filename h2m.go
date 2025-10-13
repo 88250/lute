@@ -915,6 +915,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
 			if "" != imgAlt {
 				imgAlt = strings.TrimSpace(imgAlt)
+				imgAlt = strings.ReplaceAll(imgAlt, "]", "")
+				imgAlt = strings.ReplaceAll(imgAlt, "\n", " ")
 				imgAlt = strings.ReplaceAll(imgAlt, "动图封面", "动图")
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkText, Tokens: util.StrToBytes(imgAlt)})
 			}
