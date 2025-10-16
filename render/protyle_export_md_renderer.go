@@ -440,7 +440,8 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 		href = html.UnescapeHTMLStr(href)
 		href = r.EncodeLinkSpace(href)
 		if entering {
-			ret += "[" + node.TextMarkTextContent + "](" + href
+			content := strings.ReplaceAll(node.TextMarkTextContent, "]", "\\]")
+			ret += "[" + content + "](" + href
 			if "" != node.TextMarkATitle {
 				title := html.UnescapeHTMLStr(node.TextMarkATitle)
 				// < 和 > 符号不用转义，可以符合 Markdown 规范 https://github.com/siyuan-note/siyuan/issues/15023
@@ -1306,7 +1307,9 @@ func (r *ProtyleExportMdRenderer) renderLinkText(node *ast.Node, entering bool) 
 		} else {
 			tokens = node.Tokens
 		}
-		r.Write(tokens)
+		altTextContent := util.BytesToStr(tokens)
+		altTextContent = strings.ReplaceAll(altTextContent, "]", "\\]")
+		r.WriteString(altTextContent)
 	}
 	return ast.WalkContinue
 }
@@ -1378,7 +1381,9 @@ func (r *ProtyleExportMdRenderer) renderImage(node *ast.Node, entering bool) ast
 	if r.Options.ImgTag && entering {
 		var attrs [][]string
 		if altText := node.ChildByType(ast.NodeLinkText); nil != altText {
-			attrs = append(attrs, []string{"alt", util.BytesToStr(altText.Tokens)})
+			altTextContent := util.BytesToStr(altText.Tokens)
+			altTextContent = strings.ReplaceAll(altTextContent, "]", "\\]")
+			attrs = append(attrs, []string{"alt", altTextContent})
 		}
 		if link := node.ChildByType(ast.NodeLinkDest); nil != link {
 			dest := link.Tokens
