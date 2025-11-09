@@ -22,6 +22,7 @@ import (
 
 var protyleExportMdTests = []parseTest{
 
+	{"19", "[foo & bar](https://baz.com)", "[foo & bar](https://baz.com)\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"18", "![foo](bar \"baz\")", "<img alt=\"foo\" src=\"bar\" title=\"baz\" />\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"17", "` ``foo`` `", "`` `foo` ``\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
 	{"16", "`` `foo` ``", "`` `foo` ``\n\n{: id=\"20060102150405-1a2b3c4\" updated=\"20060102150405\" type=\"doc\"}\n"},
