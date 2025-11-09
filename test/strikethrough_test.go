@@ -11,12 +11,14 @@
 package test
 
 import (
-	"github.com/88250/lute"
 	"testing"
+
+	"github.com/88250/lute"
 )
 
 var strikethroughTests = []parseTest{
 
+	{"2", "*~foo~*bar\n", "<p><em><del>foo</del></em>bar</p>\n"},
 	{"1", "~~foo~~", "<p><del>foo</del></p>\n"},
 	{"0", "~foo~", "<p><del>foo</del></p>\n"},
 }
@@ -34,6 +36,8 @@ func TestStrikethrough(t *testing.T) {
 }
 
 var strikethroughDisabledTests = []parseTest{
+
+	{"2", "~foo~**bar**", "<p>~foo~<strong>bar</strong></p>\n"},
 	{"1", "~~foo~~", "<p>~~foo~~</p>\n"},
 	{"0", "~foo~", "<p>~foo~</p>\n"},
 }
