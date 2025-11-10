@@ -559,6 +559,11 @@ func (t *Tree) newLink(typ ast.NodeType, text, dest, title []byte, linkType int)
 		text = bytes.ReplaceAll(text, editor.CaretTokens, nil)
 		dest = bytes.ReplaceAll(dest, []byte("%E2%80%B8"), nil)
 	}
+	prependCaret := t.Context.ParseOption.ProtyleWYSIWYG && bytes.HasPrefix(text, editor.CaretTokens) && bytes.HasPrefix(dest, []byte("%E2%80%B8"))
+	if prependCaret {
+		text = bytes.ReplaceAll(text, editor.CaretTokens, nil)
+		dest = bytes.ReplaceAll(dest, []byte("%E2%80%B8"), nil)
+	}
 
 	ret = &ast.Node{Type: typ, LinkType: linkType}
 	if ast.NodeImage == typ {
@@ -574,7 +579,10 @@ func (t *Tree) newLink(typ ast.NodeType, text, dest, title []byte, linkType int)
 	}
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
 	if appendCaret {
-		ret.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+		ret.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
+	}
+	if prependCaret {
+		ret.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
 	}
 	if 1 == linkType {
 		ret.LinkRefLabel = text
