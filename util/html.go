@@ -382,3 +382,21 @@ func DomCustomAttrs(n *html.Node) (ret map[string]string) {
 	}
 	return
 }
+
+func DomAttrValuesWithPrefix(n *html.Node, prefix string) (ret map[string]string) {
+	if nil == n {
+		return nil
+	}
+
+	ret = map[string]string{}
+	for _, attr := range n.Attr {
+		if strings.HasPrefix(attr.Key, prefix) {
+			ret[attr.Key] = attr.Val
+		}
+	}
+
+	if 1 > len(ret) {
+		return nil
+	}
+	return
+}

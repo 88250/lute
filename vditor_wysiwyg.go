@@ -176,6 +176,10 @@ func (lute *Lute) adjustVditorDOM(root *html.Node) {
 	lute.removeHighlightJSSpans(root)
 
 	for c := root.FirstChild; nil != c; c = c.NextSibling {
+		lute.removeWbr(c)
+	}
+
+	for c := root.FirstChild; nil != c; c = c.NextSibling {
 		lute.mergeVditorDOMList0(c)
 	}
 
@@ -647,6 +651,28 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 		if "" == text {
 			*emptyNodes = append(*emptyNodes, n)
 		}
+	}
+}
+
+func (lute *Lute) removeWbr(n *html.Node) {
+	var wbrNodes []*html.Node
+	for c := n; nil != c; c = c.NextSibling {
+		lute.searchWbr(c, &wbrNodes)
+	}
+	for _, wbrNode := range wbrNodes {
+		wbrNode.Unlink()
+	}
+}
+
+func (lute *Lute) searchWbr(n *html.Node, wbrNodes *[]*html.Node) {
+	if atom.Wbr == n.DataAtom {
+		if dataAttrs := util.DomAttrValuesWithPrefix(n, "data-v-"); 0 < len(dataAttrs) {
+			*wbrNodes = append(*wbrNodes, n)
+		}
+	}
+
+	for c := n.FirstChild; nil != c; c = c.NextSibling {
+		lute.searchWbr(c, wbrNodes)
 	}
 }
 
