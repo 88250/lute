@@ -1371,6 +1371,17 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 				break
 			}
 
+			isCaret, isEmpty := lute.isCaret(n)
+			if isCaret {
+				node.Type = ast.NodeText
+				node.Tokens = editor.CaretTokens
+				tree.Context.Tip.AppendChild(node)
+				return
+			}
+			if isEmpty {
+				return
+			}
+
 			if lute.ParseOptions.TextMark {
 				tree.Context.Tip.AppendChild(node)
 				parse.SetTextMarkNode(node, n, lute.ParseOptions)
