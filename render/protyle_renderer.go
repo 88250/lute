@@ -401,11 +401,6 @@ func (r *ProtyleRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var attrs [][]string
-		r.blockNodeAttrs(node, &attrs, "iframe")
-		attrs = append(attrs, []string{"data-subtype", "widget"})
-		r.Tag("div", attrs, false)
-
 		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
@@ -414,11 +409,17 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, string(src))
 
-		attrs = [][]string{{"class", "iframe-content"}}
-		if style := r.tokensStyle(tokens); "" != style {
-			attrs = append(attrs, []string{"style", style})
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "iframe")
+		if style := node.IALAttr("style"); "" == style {
+			if style = r.tokensStyle(tokens); "" != style {
+				attrs = append(attrs, []string{"style", style})
+			}
 		}
-
+		
+		attrs = append(attrs, []string{"data-subtype", "widget"})
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"class", "iframe-content"}}
 		r.Tag("div", attrs, false)
 		r.Write(tokens)
 	} else {
@@ -433,11 +434,6 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var attrs [][]string
-		r.blockNodeAttrs(node, &attrs, "iframe")
-		attrs = append(attrs, []string{"loading", "lazy"})
-		r.Tag("div", attrs, false)
-
 		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
@@ -446,11 +442,17 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, string(src))
 
-		attrs = [][]string{{"class", "iframe-content"}}
-		if style := r.tokensStyle(tokens); "" != style {
-			attrs = append(attrs, []string{"style", style})
+		var attrs [][]string
+		r.blockNodeAttrs(node, &attrs, "iframe")
+		if style := node.IALAttr("style"); "" == style {
+			if style = r.tokensStyle(tokens); "" != style {
+				attrs = append(attrs, []string{"style", style})
+			}
 		}
 
+		attrs = append(attrs, []string{"loading", "lazy"})
+		r.Tag("div", attrs, false)
+		attrs = [][]string{{"class", "iframe-content"}}
 		r.Tag("div", attrs, false)
 		r.Write(tokens)
 	} else {
