@@ -411,12 +411,13 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
+		oldStyle := r.tokensStyle(tokens)
 		if style := node.IALAttr("style"); "" == style {
-			if style = r.tokensStyle(tokens); "" != style {
-				attrs = append(attrs, []string{"style", style})
-				tokens = bytes.ReplaceAll(tokens, []byte("style=\""+style+"\""), nil)
+			if "" != oldStyle {
+				attrs = append(attrs, []string{"style", oldStyle})
 			}
 		}
+		tokens = bytes.ReplaceAll(tokens, []byte("style=\""+oldStyle+"\""), nil)
 
 		attrs = append(attrs, []string{"data-subtype", "widget"})
 		r.Tag("div", attrs, false)
@@ -445,12 +446,13 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
+		oldStyle := r.tokensStyle(tokens)
 		if style := node.IALAttr("style"); "" == style {
-			if style = r.tokensStyle(tokens); "" != style {
-				attrs = append(attrs, []string{"style", style})
-				tokens = bytes.ReplaceAll(tokens, []byte("style=\""+style+"\""), nil)
+			if "" != oldStyle {
+				attrs = append(attrs, []string{"style", oldStyle})
 			}
 		}
+		tokens = bytes.ReplaceAll(tokens, []byte("style=\""+oldStyle+"\""), nil)
 
 		attrs = append(attrs, []string{"loading", "lazy"})
 		r.Tag("div", attrs, false)
