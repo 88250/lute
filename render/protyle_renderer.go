@@ -405,7 +405,7 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		attrs = append(attrs, []string{"data-subtype", "widget"})
 		r.Tag("div", attrs, false)
-		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
+
 		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
@@ -413,6 +413,13 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, string(src))
+
+		attrs = [][]string{{"class", "iframe-content"}}
+		if style := r.tokensStyle(tokens); "" != style {
+			attrs = append(attrs, []string{"style", style})
+		}
+
+		r.Tag("div", attrs, false)
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -430,7 +437,7 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		attrs = append(attrs, []string{"loading", "lazy"})
 		r.Tag("div", attrs, false)
-		r.Tag("div", [][]string{{"class", "iframe-content"}}, false)
+
 		tokens := bytes.ReplaceAll(node.Tokens, editor.CaretTokens, nil)
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
@@ -438,6 +445,13 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 		dataSrc := r.tagSrc(tokens)
 		src := r.LinkPath(dataSrc)
 		tokens = r.replaceSrc(tokens, string(src))
+
+		attrs = [][]string{{"class", "iframe-content"}}
+		if style := r.tokensStyle(tokens); "" != style {
+			attrs = append(attrs, []string{"style", style})
+		}
+
+		r.Tag("div", attrs, false)
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -1938,4 +1952,17 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 		}
 	}
 	return
+}
+
+func (r *ProtyleRenderer) tokensStyle(tokens []byte) string {
+	tokensStr := util.BytesToStr(tokens)
+	styleIndex := strings.Index(tokensStr, "style=")
+	if styleIndex != -1 {
+		quoteChar := tokensStr[styleIndex+6 : styleIndex+7]
+		endIndex := strings.Index(tokensStr[styleIndex+7:], quoteChar)
+		if endIndex != -1 {
+			return tokensStr[styleIndex+7 : styleIndex+7+endIndex]
+		}
+	}
+	return ""
 }
