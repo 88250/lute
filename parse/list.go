@@ -156,6 +156,7 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 	ln := t.Context.currentLine
 	if t.Context.ParseOption.ProtyleWYSIWYG {
 		ln = bytes.ReplaceAll(ln, []byte(editor.Caret+". "), []byte(". "+editor.Caret))
+		t.Context.currentLine = ln
 	}
 
 	tokens := ln[t.Context.nextNonspace:]
