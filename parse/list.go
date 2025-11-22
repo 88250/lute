@@ -154,6 +154,10 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 	}
 
 	ln := t.Context.currentLine
+	if t.Context.ParseOption.ProtyleWYSIWYG {
+		ln = bytes.ReplaceAll(ln, []byte(editor.Caret+". "), []byte(". "+editor.Caret))
+	}
+
 	tokens := ln[t.Context.nextNonspace:]
 	data = &ast.ListData{
 		Typ:          0,                // 默认无序列表

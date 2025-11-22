@@ -414,9 +414,10 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 		if style := node.IALAttr("style"); "" == style {
 			if style = r.tokensStyle(tokens); "" != style {
 				attrs = append(attrs, []string{"style", style})
+				tokens = bytes.ReplaceAll(tokens, []byte("style=\""+style+"\""), nil)
 			}
 		}
-		
+
 		attrs = append(attrs, []string{"data-subtype", "widget"})
 		r.Tag("div", attrs, false)
 		attrs = [][]string{{"class", "iframe-content"}}
@@ -447,6 +448,7 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 		if style := node.IALAttr("style"); "" == style {
 			if style = r.tokensStyle(tokens); "" != style {
 				attrs = append(attrs, []string{"style", style})
+				tokens = bytes.ReplaceAll(tokens, []byte("style=\""+style+"\""), nil)
 			}
 		}
 
