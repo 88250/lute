@@ -416,6 +416,16 @@ func (n *Node) RemoveIALAttr(name string) {
 	n.KramdownIAL = tmp
 }
 
+func (n *Node) RemoveIALAttrsByPrefix(prefix string) {
+	tmp := n.KramdownIAL[:0]
+	for _, kv := range n.KramdownIAL {
+		if !strings.HasPrefix(kv[0], prefix) {
+			tmp = append(tmp, kv)
+		}
+	}
+	n.KramdownIAL = tmp
+}
+
 func (n *Node) SetIALAttr(name, value string) {
 	value = html.EscapeAttrVal(value)
 	for _, kv := range n.KramdownIAL {
