@@ -155,8 +155,17 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 
 	ln := t.Context.currentLine
 	if t.Context.ParseOption.ProtyleWYSIWYG {
-		ln = bytes.ReplaceAll(ln, []byte(editor.Caret+". "), []byte(". "+editor.Caret))
-		t.Context.currentLine = ln
+		if beforeDotTokensIdx := bytes.Index(ln, []byte(". ")); -1 < beforeDotTokensIdx {
+			beforeCaretDotTokens := ln[:beforeDotTokensIdx]
+			if -1 < bytes.Index(beforeCaretDotTokens, editor.CaretTokens) {
+				beforeCaretDotTokens = bytes.ReplaceAll(beforeCaretDotTokens, editor.CaretTokens, nil)
+				if util.IsDigit(util.BytesToStr(beforeCaretDotTokens)) {
+					ln = bytes.ReplaceAll(ln, editor.CaretTokens, nil)
+					ln = bytes.Replace(ln, []byte(". "), []byte(". "+editor.Caret), 1)
+					t.Context.currentLine = ln
+				}
+			}
+		}
 	}
 
 	tokens := ln[t.Context.nextNonspace:]
