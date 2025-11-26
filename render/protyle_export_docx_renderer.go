@@ -232,24 +232,6 @@ func (r *ProtyleExportDocxRenderer) renderHTMLTag0(node *ast.Node, currentTextMa
 		} else {
 			r.WriteString("</a>")
 		}
-	case "block-ref":
-		if entering {
-			node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
-			r.WriteString("((" + node.TextMarkBlockRefID)
-			if "s" == node.TextMarkBlockRefSubtype {
-				r.WriteString(" \"" + node.TextMarkTextContent + "\"")
-			} else {
-				r.WriteString(" '" + node.TextMarkTextContent + "'")
-			}
-			r.WriteString("))")
-		}
-	case "file-annotation-ref":
-		if entering {
-			node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "'", "&apos;")
-			r.WriteString("<<" + node.TextMarkFileAnnotationRefID)
-			r.WriteString(" \"" + node.TextMarkTextContent + "\"")
-			r.WriteString(">>")
-		}
 	case "inline-memo":
 		if entering {
 			r.WriteString(node.TextMarkTextContent)
