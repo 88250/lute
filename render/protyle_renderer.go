@@ -1803,8 +1803,7 @@ func (r *ProtyleRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, clas
 	r.nodeClass(node, attrs, class)
 
 	for _, ial := range node.KramdownIAL {
-		// av-names 是临时属性用于生成角标，不写入 HTML
-		if "id" == ial[0] || "av-names" == ial[0] {
+		if "id" == ial[0] {
 			continue
 		}
 		*attrs = append(*attrs, []string{ial[0], strings.ReplaceAll(ial[1], editor.IALValEscNewLine, "\n")})
