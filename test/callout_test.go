@@ -18,6 +18,7 @@ import (
 
 var calloutTests = []parseTest{
 
+	{"5", "> [!Note] ✨ Title1\n> Content1\n", "<div>\n<span>Note</span><span>✨</span><span>Title1</span>\n<p>Content1</p>\n</div>\n"},
 	{"4", "> [!Note] Title1\n> Content1\n> * List\n>    > [!Note] Title2\n>    > Content2\n\n", "<div>\n<span>Note</span><span>Title1</span>\n<p>Content1</p>\n<ul>\n<li>List\n<div>\n<span>Note</span><span>Title2</span>\n<p>Content2</p>\n</div>\n</li>\n</ul>\n</div>\n"},
 	{"3", "> [!Note] Title1\n> Content1\n> > [!Note] Title2\n> > Content2", "<div>\n<span>Note</span><span>Title1</span>\n<p>Content1</p>\n<div>\n<span>Note</span><span>Title2</span>\n<p>Content2</p>\n</div>\n</div>\n"},
 	{"3", "> [!Note] Title1\n> Content1\n> > [!Note] Title2\n> > Content2", "<div>\n<span>Note</span><span>Title1</span>\n<p>Content1</p>\n<div>\n<span>Note</span><span>Title2</span>\n<p>Content2</p>\n</div>\n</div>\n"},

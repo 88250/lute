@@ -68,10 +68,17 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 	p := callout.FirstChild
 	lines := bytes.Split(p.Tokens, []byte("\n"))
 	content := bytes.TrimSpace(lines[0])
-	typ := bytes.TrimSpace(content[2:bytes.IndexByte(content, ']')])
-	title := bytes.TrimSpace(content[bytes.IndexByte(content, ']')+1:])
-	callout.CalloutType = string(typ)
-	callout.CalloutTitle = string(title)
+	typ := string(bytes.TrimSpace(content[2:bytes.IndexByte(content, ']')]))
+	title := string(bytes.TrimSpace(content[bytes.IndexByte(content, ']')+1:]))
+	callout.CalloutType = typ
+	icon := strings.Split(title, " ")[0]
+	if "" != icon {
+		if "" != EmojiUnicodeAlias[icon] {
+			callout.CalloutIcon = icon
+			title = strings.TrimSpace(title[len(icon):])
+		}
+	}
+	callout.CalloutTitle = title
 	p.Tokens = bytes.Join(lines[1:], []byte("\n"))
 	if 1 > len(p.Tokens) {
 		p.Tokens = nil

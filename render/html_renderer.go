@@ -185,6 +185,11 @@ func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStat
 		r.WriteString("<span>")
 		r.WriteString(node.CalloutType)
 		r.WriteString("</span>")
+		if "" != node.CalloutIcon {
+			r.WriteString("<span>")
+			r.WriteString(node.CalloutIcon)
+			r.WriteString("</span>")
+		}
 		r.WriteString("<span>")
 		r.WriteString(node.CalloutTitle)
 		r.WriteString("</span>")

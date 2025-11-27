@@ -142,8 +142,10 @@ type Node struct {
 	CustomBlockInfo        string `json:",omitempty"` // 自定义块信息
 
 	// 提示块 https://github.com/88250/lute/issues/203 > [!Type] Title
-	CalloutType  string `json:",omitempty"` // 提示块类型
-	CalloutTitle string `json:",omitempty"` // 提示块标题
+	CalloutType     string `json:",omitempty"` // 提示块类型
+	CalloutTitle    string `json:",omitempty"` // 提示块标题
+	CalloutIcon     string `json:",omitempty"` // 提示块图标
+	CalloutIconType int    `json:",omitempty"` // 提示块图标类型，0：Emoji Unicode，1：自定义图标
 }
 
 // ListData 用于记录列表或列表项节点的附加信息。
