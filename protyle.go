@@ -710,7 +710,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
-	if "protyle-attr" == class ||
+	if "protyle-attr" == class || "callout-info" == class ||
 		strings.Contains(class, "__copy") ||
 		strings.Contains(class, "protyle-linenumber__rows") ||
 		strings.Contains(class, "hljs") {
@@ -1036,8 +1036,28 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.CustomBlockInfo = util.DomAttrValue(n, "data-info")
 		node.Tokens = []byte(html.UnescapeHTMLStr(util.DomAttrValue(n, "data-content")))
 		tree.Context.Tip.AppendChild(node)
-		return
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
+	case ast.NodeCallout:
+		node.Type = ast.NodeCallout
+		node.CalloutType = util.DomAttrValue(n, "data-subtype")
+		icon := util.DomChildByTypeAndClass(n, atom.Span, "callout-icon").FirstChild
+		if atom.Img == icon.DataAtom {
+			node.CalloutIcon = util.DomAttrValue(icon, "src")
+			node.CalloutIconType = 1
+		} else {
+			node.CalloutIcon = util.DomText(icon)
+		}
+		title := util.DomChildByTypeAndClass(n, atom.Span, "callout-title").FirstChild
+		node.CalloutTitle = util.DomText(title)
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	default:
+		if "callout-content" == class {
+			break
+		}
+		
 		switch n.DataAtom {
 		case 0:
 			node.Type = ast.NodeText

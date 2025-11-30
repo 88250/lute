@@ -162,8 +162,24 @@ func NewProtylePreviewRenderer(tree *parse.Tree, options *Options) *ProtylePrevi
 	ret.RendererFuncs[ast.NodeUnderlineCloseMarker] = ret.renderUnderlineCloseMarker
 	ret.RendererFuncs[ast.NodeBr] = ret.renderBr
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
-	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderCustomBlock
+	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
+	ret.RendererFuncs[ast.NodeCustomBlock] = ret.renderCustomBlock
+	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
 	return ret
+}
+
+func (r *ProtylePreviewRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderBlockquote(node, entering)
+		title := node.CalloutIcon + " " + node.CalloutTitle
+		if strings.TrimSpace(title) != "" {
+			r.WriteString(title)
+			r.Newline()
+		}
+	} else {
+		r.renderBlockquote(node, entering)
+	}
+	return ast.WalkContinue
 }
 
 func (r *ProtylePreviewRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {

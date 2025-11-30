@@ -178,25 +178,14 @@ func (r *HtmlRenderer) Render() (output []byte) {
 
 func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
-		r.handleKramdownBlockIAL(node)
-		r.Tag("div", node.KramdownIAL, false)
-		r.Newline()
-		r.WriteString("<span>")
-		r.WriteString(node.CalloutType)
-		r.WriteString("</span>")
-		if "" != node.CalloutIcon {
-			r.WriteString("<span>")
-			r.WriteString(node.CalloutIcon)
-			r.WriteString("</span>")
+		r.renderBlockquote(node, entering)
+		title := node.CalloutIcon + " " + node.CalloutTitle
+		if strings.TrimSpace(title) != "" {
+			r.WriteString(title)
+			r.Newline()
 		}
-		r.WriteString("<span>")
-		r.WriteString(node.CalloutTitle)
-		r.WriteString("</span>")
 	} else {
-		r.Newline()
-		r.WriteString("</div>")
-		r.Newline()
+		r.renderBlockquote(node, entering)
 	}
 	return ast.WalkContinue
 }

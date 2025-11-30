@@ -164,7 +164,36 @@ func NewProtyleExportRenderer(tree *parse.Tree, options *Options) *ProtyleExport
 	ret.RendererFuncs[ast.NodeTextMark] = ret.renderTextMark
 	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
 	ret.RendererFuncs[ast.NodeCustomBlock] = ret.renderCustomBlock
+	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
 	return ret
+}
+
+func (r *ProtyleExportRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		attrs := [][]string{
+			{"contenteditable", "false"},
+		}
+		r.blockNodeAttrs(node, &attrs, "callout")
+		r.Tag("div", attrs, false)
+		r.WriteString("<div class=\"callout-info\"><span class=\"callout-icon\">")
+		if 0 == node.CalloutIconType {
+			r.WriteString(node.CalloutIcon)
+		} else if 1 == node.CalloutIconType {
+			r.WriteString("<img class=\"callout-img\" src=\"")
+			r.WriteString(node.CalloutIcon)
+			r.WriteString("\" />")
+		}
+
+		r.WriteString("</span><span class=\"callout-title\">")
+		r.WriteString(node.CalloutTitle)
+		r.WriteString("</span></div>")
+		r.WriteString("<div>")
+	} else {
+		r.WriteString("</div>")
+		r.renderIAL(node)
+		r.WriteString("</div>")
+	}
+	return ast.WalkContinue
 }
 
 func (r *ProtyleExportRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {

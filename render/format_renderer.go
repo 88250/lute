@@ -170,7 +170,26 @@ func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
 	ret.RendererFuncs[ast.NodeHTMLTag] = ret.renderHTMLTag
 	ret.RendererFuncs[ast.NodeHTMLTagOpen] = ret.renderHTMLTagOpen
 	ret.RendererFuncs[ast.NodeHTMLTagClose] = ret.renderHTMLTagClose
+	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
 	return ret
+}
+
+func (r *FormatRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.renderBlockquote(node, entering)
+		r.WriteString("[!")
+		r.WriteString(node.CalloutType)
+		r.WriteByte(']')
+		title := node.CalloutIcon + " " + node.CalloutTitle
+		if strings.TrimSpace(title) != "" {
+			r.WriteByte(lex.ItemSpace)
+			r.WriteString(title)
+		}
+		r.Newline()
+	} else {
+		r.renderBlockquote(node, entering)
+	}
+	return ast.WalkContinue
 }
 
 func (r *FormatRenderer) renderHTMLTag(node *ast.Node, entering bool) ast.WalkStatus {

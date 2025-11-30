@@ -47,13 +47,7 @@ func (t *Tree) finalParseBlockIAL() {
 		if ast.NodeBlockquote == n.Type && nil != n.FirstChild && nil == n.FirstChild.Next {
 			appends = append(appends, n)
 		}
-
-		if ast.NodeCallout == n.Type && nil != n.FirstChild {
-			if nil == n.FirstChild.Next { // title 节点为空且后续没有节点了
-				appends = append(appends, n)
-			}
-		}
-
+		
 		if "" == n.ID {
 			id := n.IALAttr("id")
 			if "" == id {
