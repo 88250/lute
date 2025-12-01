@@ -78,6 +78,20 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 			title = strings.TrimSpace(title[len(icon):])
 		}
 	}
+
+	switch typ {
+	case ast.CalloutTypeNote:
+		callout.CalloutIcon = "✏️"
+	case ast.CalloutTypeTip:
+		callout.CalloutIcon = "💡"
+	case ast.CalloutTypeImportant:
+		callout.CalloutIcon = "❗"
+	case ast.CalloutTypeWarning:
+		callout.CalloutIcon = "⚠️"
+	case ast.CalloutTypeCaution:
+		callout.CalloutIcon = "🚨"
+	}
+
 	callout.CalloutTitle = title
 	p.Tokens = bytes.Join(lines[1:], []byte("\n"))
 	if 1 > len(p.Tokens) {
