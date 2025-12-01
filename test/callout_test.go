@@ -18,13 +18,12 @@ import (
 
 var calloutTests = []parseTest{
 
-	{"6", "> [!Note] ✨ Title1\n> Content1\n", "<blockquote>\n✨ Title1\n<p>Content1</p>\n</blockquote>\n"},
-	{"5", "> [!Note] Title1\n> Content1\n> * List\n>    > [!Note] Title2\n>    > Content2\n\n", "<blockquote>\n Title1\n<p>Content1</p>\n<ul>\n<li>List\n<blockquote>\n Title2\n<p>Content2</p>\n</blockquote>\n</li>\n</ul>\n</blockquote>\n"},
-	{"4", "> [!Note] Title1\n> Content1\n> > [!Note] Title2\n> > Content2", "<blockquote>\n Title1\n<p>Content1</p>\n<blockquote>\n Title2\n<p>Content2</p>\n</blockquote>\n</blockquote>\n"},
-	{"3", "* List\n  > [!Type] Title\n  > * Content", "<ul>\n<li>List\n<blockquote>\n Title\n<ul>\n<li>Content</li>\n</ul>\n</blockquote>\n</li>\n</ul>\n"},
-	{"2", "> [!Type] Title\n> * List", "<blockquote>\n Title\n<ul>\n<li>List</li>\n</ul>\n</blockquote>\n"},
-	{"1", "> [!Type] Title\n> Content", "<blockquote>\n Title\n<p>Content</p>\n</blockquote>\n"},
-	{"0", "> [!NOTE]  \n> Content", "<blockquote>\n<p>Content</p>\n</blockquote>\n"},
+	{"5", "> [!Note] ✨ Title1\n> Content1\n", "<blockquote>\n<p>✨ Title1\n</p>\n<p>Content1</p>\n</blockquote>\n"},
+	{"4", "> [!Note] Title1\n> Content1\n> * List\n>    > [!Note] Title2\n>    > Content2\n\n", "<blockquote>\n<p>Title1\n</p>\n<p>Content1</p>\n<ul>\n<li>List\n<blockquote>\n<p>Title2\n</p>\n<p>Content2</p>\n</blockquote>\n</li>\n</ul>\n</blockquote>\n"},
+	{"3", "> [!Note] Title1\n> Content1\n> > [!Note] Title2\n> > Content2", "<blockquote>\n<p>Title1\n</p>\n<p>Content1</p>\n<blockquote>\n<p>Title2\n</p>\n<p>Content2</p>\n</blockquote>\n</blockquote>\n"},
+	{"2", "* List\n  > [!Type] Title\n  > * Content", "<ul>\n<li>List\n<blockquote>\n<p>Title\n</p>\n<ul>\n<li>Content</li>\n</ul>\n</blockquote>\n</li>\n</ul>\n"},
+	{"1", "> [!Type] Title\n> Content", "<blockquote>\n<p>Title\n</p>\n<p>Content</p>\n</blockquote>\n"},
+	{"0", "> [!NOTE]  \n> Content", "<blockquote>\n<p>✏️ Note\n</p>\n<p>Content</p>\n</blockquote>\n"},
 }
 
 func TestCallout(t *testing.T) {

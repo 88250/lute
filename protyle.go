@@ -505,6 +505,50 @@ func (lute *Lute) CancelBlockquote(ivHTML string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) CancelCallout(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	if ast.NodeCallout != tree.Root.FirstChild.Type {
+		return ivHTML
+	}
+
+	co := tree.Root.FirstChild
+	var appends, unlinks []*ast.Node
+
+	p := &ast.Node{Type: ast.NodeParagraph}
+	for _, kv := range co.KramdownIAL {
+		p.SetIALAttr(kv[0], kv[1])
+	}
+	text := &ast.Node{Type: ast.NodeText}
+	if "" != co.CalloutIcon {
+		if 0 == co.CalloutIconType {
+			text.Tokens = []byte(fmt.Sprintf("%s %s", co.CalloutIcon, co.CalloutTitle))
+		} else {
+			img := &ast.Node{Type: ast.NodeImage}
+			img.AppendChild(&ast.Node{Type: ast.NodeBang})
+			img.AppendChild(&ast.Node{Type: ast.NodeOpenBracket})
+			img.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
+			img.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
+			img.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(co.CalloutIcon)})
+			img.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
+			p.AppendChild(img)
+			text.Tokens = []byte(co.CalloutTitle)
+		}
+	}
+	p.AppendChild(text)
+	appends = append(appends, p)
+	for sub := co.FirstChild; nil != sub; sub = sub.Next {
+		appends = append(appends, sub)
+		unlinks = append(unlinks, sub)
+	}
+	for _, c := range appends {
+		tree.Root.AppendChild(c)
+	}
+	co.Unlink()
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
 	tree := lute.BlockDOM2Tree(ivHTML)
 	node := tree.Root.FirstChild
@@ -1057,7 +1101,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		if "callout-content" == class {
 			break
 		}
-		
+
 		switch n.DataAtom {
 		case 0:
 			node.Type = ast.NodeText

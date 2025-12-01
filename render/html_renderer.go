@@ -179,11 +179,35 @@ func (r *HtmlRenderer) Render() (output []byte) {
 func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderBlockquote(node, entering)
-		title := node.CalloutIcon + " " + node.CalloutTitle
+		r.WriteString("<p>")
+		title := node.CalloutTitle
+		if "" == title {
+			switch node.CalloutType {
+			case ast.CalloutTypeNote:
+				title = "Note"
+			case ast.CalloutTypeTip:
+				title = "Tip"
+			case ast.CalloutTypeImportant:
+				title = "Important"
+			case ast.CalloutTypeWarning:
+				title = "Warning"
+			case ast.CalloutTypeCaution:
+				title = "Caution"
+			}
+		}
+		if "" != node.CalloutIcon {
+			if 0 == node.CalloutIconType {
+				title = node.CalloutIcon + " " + title
+			} else {
+				title = "<img src=\"" + node.CalloutIcon + "\" alt=\"\" /> " + title
+			}
+		}
+
 		if strings.TrimSpace(title) != "" {
 			r.WriteString(title)
 			r.Newline()
 		}
+		r.WriteString("</p>")
 	} else {
 		r.renderBlockquote(node, entering)
 	}
