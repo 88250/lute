@@ -1532,6 +1532,11 @@ func (r *ProtyleRenderer) renderText(node *ast.Node, entering bool) ast.WalkStat
 		} else {
 			tokens = node.Tokens
 		}
+
+		if bytes.HasPrefix(tokens, []byte(" "+editor.Zwsp)) && bytes.HasSuffix(r.Writer.Bytes(), []byte(editor.Zwsp)) {
+			tokens = bytes.Replace(tokens, []byte(" "+editor.Zwsp), []byte(" "), 1)
+		}
+
 		if node.ParentIs(ast.NodeTextMark) {
 			if "code" == node.Parent.TokensStr() {
 				if node.ParentIs(ast.NodeTableCell) {
