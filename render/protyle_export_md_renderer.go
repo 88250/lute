@@ -180,6 +180,7 @@ func (r *ProtyleExportMdRenderer) renderCallout(node *ast.Node, entering bool) a
 			r.WriteByte(lex.ItemSpace)
 			r.WriteString(title)
 		}
+		r.Newline()
 	} else {
 		r.renderBlockquote(node, entering)
 	}
