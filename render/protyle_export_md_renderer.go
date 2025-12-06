@@ -175,10 +175,12 @@ func (r *ProtyleExportMdRenderer) renderCallout(node *ast.Node, entering bool) a
 		r.WriteString("[!")
 		r.WriteString(node.CalloutType)
 		r.WriteByte(']')
-		title := node.CalloutIcon + " " + node.CalloutTitle
-		if strings.TrimSpace(title) != "" {
-			r.WriteByte(lex.ItemSpace)
-			r.WriteString(title)
+		if "" != strings.TrimSpace(node.CalloutTitle) || !ast.IsBuiltInCalloutType(node.CalloutType) {
+			title := node.CalloutIcon + " " + node.CalloutTitle
+			if strings.TrimSpace(title) != "" {
+				r.WriteByte(lex.ItemSpace)
+				r.WriteString(title)
+			}
 		}
 		r.Newline()
 	} else {

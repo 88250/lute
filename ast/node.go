@@ -156,6 +156,30 @@ const (
 	CalloutTypeCaution   = "CAUTION"
 )
 
+func IsBuiltInCalloutType(typ string) bool {
+	switch typ {
+	case CalloutTypeNote, CalloutTypeTip, CalloutTypeImportant, CalloutTypeWarning, CalloutTypeCaution:
+		return true
+	}
+	return false
+}
+
+func GetCalloutTitle(typ string) string {
+	switch typ {
+	case CalloutTypeNote:
+		return "Note"
+	case CalloutTypeTip:
+		return "Tip"
+	case CalloutTypeImportant:
+		return "Important"
+	case CalloutTypeWarning:
+		return "Warning"
+	case CalloutTypeCaution:
+		return "Caution"
+	}
+	return ""
+}
+
 // ListData 用于记录列表或列表项节点的附加信息。
 type ListData struct {
 	Typ          int    `json:",omitempty"` // 0：无序列表，1：有序列表，3：任务列表

@@ -191,18 +191,7 @@ func (r *ProtyleRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkS
 		r.WriteString("</span><span class=\"callout-title\">")
 		title := node.CalloutTitle
 		if "" == title {
-			switch node.CalloutType {
-			case ast.CalloutTypeNote:
-				title = "Note"
-			case ast.CalloutTypeTip:
-				title = "Tip"
-			case ast.CalloutTypeImportant:
-				title = "Important"
-			case ast.CalloutTypeWarning:
-				title = "Warning"
-			case ast.CalloutTypeCaution:
-				title = "Caution"
-			}
+			title = ast.GetCalloutTitle(node.CalloutType)
 		}
 		if "" == title {
 			title = node.CalloutType

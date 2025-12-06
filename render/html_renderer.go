@@ -182,18 +182,7 @@ func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStat
 		r.WriteString("<p>")
 		title := node.CalloutTitle
 		if "" == title {
-			switch node.CalloutType {
-			case ast.CalloutTypeNote:
-				title = "Note"
-			case ast.CalloutTypeTip:
-				title = "Tip"
-			case ast.CalloutTypeImportant:
-				title = "Important"
-			case ast.CalloutTypeWarning:
-				title = "Warning"
-			case ast.CalloutTypeCaution:
-				title = "Caution"
-			}
+			title = ast.GetCalloutTitle(node.CalloutType)
 		}
 		if "" != node.CalloutIcon {
 			if 0 == node.CalloutIconType {
