@@ -180,6 +180,23 @@ func (t *Tree) parseKramdownSpanIAL() {
 			return ast.WalkContinue
 		}
 
+		if nil != n.Previous && ast.NodeKramdownSpanIAL == n.Previous.Type && ast.NodeText == n.Type && nil != n.Previous.Previous {
+			tokens := n.Tokens
+			if pos, ial := t.Context.parseKramdownSpanIAL(tokens); 0 < len(ial) {
+				same := true
+				for _, kv := range ial {
+					if n.Previous.Previous.IALAttr(kv[0]) != kv[1] {
+						same = false
+						break
+					}
+				}
+				if same {
+					n.Tokens = tokens[pos+1:]
+				}
+			}
+			return ast.WalkContinue
+		}
+
 		switch n.Type {
 		case ast.NodeEmphasis, ast.NodeStrong, ast.NodeCodeSpan, ast.NodeStrikethrough, ast.NodeTag, ast.NodeMark, ast.NodeInlineMath, ast.NodeImage, ast.NodeTextMark:
 			break
