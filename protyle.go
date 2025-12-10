@@ -777,6 +777,10 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 		return ivHTML
 	}
 
+	if nil == p.Next || nil == p.Next.Next {
+		return ivHTML
+	}
+
 	text := p.FirstChild
 	if nil == text || ast.NodeText != text.Type {
 		return ivHTML
