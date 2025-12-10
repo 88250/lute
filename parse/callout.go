@@ -79,17 +79,8 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 		}
 	}
 
-	switch typ {
-	case ast.CalloutTypeNote:
-		callout.CalloutIcon = "✏️"
-	case ast.CalloutTypeTip:
-		callout.CalloutIcon = "💡"
-	case ast.CalloutTypeImportant:
-		callout.CalloutIcon = "❗"
-	case ast.CalloutTypeWarning:
-		callout.CalloutIcon = "⚠️"
-	case ast.CalloutTypeCaution:
-		callout.CalloutIcon = "🚨"
+	if "" == callout.CalloutIcon && ast.IsBuiltInCalloutType(typ) {
+		callout.CalloutIcon = ast.GetCalloutIcon(typ)
 	}
 
 	callout.CalloutTitle = title

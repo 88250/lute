@@ -164,6 +164,22 @@ func IsBuiltInCalloutType(typ string) bool {
 	return false
 }
 
+func GetCalloutIcon(typ string) string {
+	switch typ {
+	case CalloutTypeNote:
+		return "✏️"
+	case CalloutTypeTip:
+		return "💡"
+	case CalloutTypeImportant:
+		return "❗"
+	case CalloutTypeWarning:
+		return "⚠️"
+	case CalloutTypeCaution:
+		return "🚨"
+	}
+	return ""
+}
+
 func GetCalloutTitle(typ string) string {
 	switch typ {
 	case CalloutTypeNote:

@@ -727,6 +727,82 @@ func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
 	return
 }
 
+func (lute *Lute) Callout2Blockquote(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	co := tree.Root.FirstChild
+
+	if ast.NodeCallout != co.Type {
+		return ivHTML
+	}
+
+	title := co.CalloutTitle
+	if 0 == co.CalloutIconType {
+		title = co.CalloutIcon + " " + title
+	}
+
+	co.Type = ast.NodeBlockquote
+	p := &ast.Node{Type: ast.NodeParagraph}
+	if 1 == co.CalloutIconType {
+		emoji := &ast.Node{Type: ast.NodeEmoji}
+		alt := co.CalloutIcon[strings.Index(co.CalloutIcon, "/emojis/")+len("/emojis/"):]
+		emojiImg := &ast.Node{Type: ast.NodeEmojiImg, Tokens: tree.EmojiImgTokens(alt, co.CalloutIcon)}
+		emojiImg.AppendChild(&ast.Node{Type: ast.NodeEmojiAlias, Tokens: []byte(":" + alt + ":")})
+		emoji.AppendChild(emojiImg)
+		p.AppendChild(emoji)
+	}
+
+	title = strings.TrimSpace(title)
+	if 1 == co.CalloutIconType {
+		title = " " + title
+	}
+	text := &ast.Node{Type: ast.NodeText, Tokens: []byte(title)}
+	p.AppendChild(text)
+	co.PrependChild(p)
+	co.PrependChild(&ast.Node{Type: ast.NodeBlockquoteMarker})
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
+func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	bq := tree.Root.FirstChild
+
+	if ast.NodeBlockquote != bq.Type {
+		return ivHTML
+	}
+
+	p := bq.FirstChild.Next
+	if nil == p || ast.NodeParagraph != p.Type {
+		return ivHTML
+	}
+
+	text := p.FirstChild
+	if nil == text || ast.NodeText != text.Type {
+		return ivHTML
+	}
+
+	content := strings.TrimSpace(text.Text())
+	if !strings.HasPrefix(content, "[!") || !strings.Contains(content, "]") {
+		return ivHTML
+	}
+
+	typ := content[2:strings.Index(content, "]")]
+	if !ast.IsBuiltInCalloutType(typ) {
+		return ivHTML
+	}
+
+	bq.Type = ast.NodeCallout
+	bq.CalloutType = typ
+	bq.CalloutIcon = ast.GetCalloutIcon(typ)
+	bq.FirstChild.Unlink() // 标记符 >
+	bq.FirstChild.Unlink() // 第一个段落 [!TYPE]
+	bq.FirstChild.Unlink() // 第一个段落的 IAL
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	return
+}
+
 func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	tree := lute.BlockDOM2Tree(htmlStr)
 

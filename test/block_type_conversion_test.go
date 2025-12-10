@@ -17,6 +17,65 @@ import (
 	"github.com/88250/lute/ast"
 )
 
+var callout2BlockquoteTest = []*parseTest{
+
+	{"1", "<div contenteditable=\"false\" data-subtype=\"TIP\" data-node-id=\"20251209161642-p40onrf\" data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\" updated=\"20251210104325\"><div class=\"callout-info\"><span class=\"callout-icon\"><img class=\"callout-img\" src=\"/emojis/1/b3log.png\"></span><span class=\"callout-title\">Tip</span></div><div class=\"callout-content\"><div data-node-id=\"20251210104326-j3lech3\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20251210104509\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div></div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "<div data-node-id=\"20251209161642-p40onrf\" data-node-index=\"1\" data-type=\"NodeBlockquote\" class=\"bq\" updated=\"20251210104325\"><div data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><img alt=\"1/b3log.png\" class=\"emoji\" src=\"/emojis/1/b3log.png\" title=\"1/b3log.png\" /> Tip</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20251210104326-j3lech3\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20251210104509\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"0", "<div contenteditable=\"false\" data-subtype=\"NOTE\" data-node-id=\"20251210110326-ev5ejuv\" data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\" updated=\"20251210110327\"><div class=\"callout-info\"><span class=\"callout-icon\">✏️</span><span class=\"callout-title\">Note</span></div><div class=\"callout-content\"><div data-node-id=\"20251210110333-6hbgbiv\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20251210114039\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div></div><div class=\"protyle-attr\" contenteditable=\"false\">​</div></div>", "<div data-node-id=\"20251210110326-ev5ejuv\" data-node-index=\"1\" data-type=\"NodeBlockquote\" class=\"bq\" updated=\"20251210110327\"><div data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">✏️ Note</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20251210110333-6hbgbiv\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20251210114039\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+func TestCallout2Blockquote(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+	luteEngine.SetCallout(true)
+
+	ast.Testing = true
+	for _, test := range callout2BlockquoteTest {
+		ovHTML := luteEngine.Callout2Blockquote(test.from)
+		if test.to != ovHTML {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, ovHTML, test.from)
+		}
+	}
+	ast.Testing = false
+}
+
+var blockquote2CalloutTests = []*parseTest{
+
+	{"0", "<div data-node-id=\"20251210110326-ev5ejuv\" data-node-index=\"1\" data-type=\"NodeBlockquote\" class=\"bq protyle-wysiwyg--select\" updated=\"20251210110327\"><div data-node-id=\"20251210110327-zcyjeb2\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20251210110332\"><div contenteditable=\"true\" spellcheck=\"false\">[!NOTE]</div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div><div data-node-id=\"20251210110333-6hbgbiv\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20251210114039\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "<div contenteditable=\"false\" data-subtype=\"NOTE\" data-node-id=\"20251210110326-ev5ejuv\" data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\" updated=\"20251210110327\"><div class=\"callout-info\"><span class=\"callout-icon\">✏️</span><span class=\"callout-title\">Note</span></div><div class=\"callout-content\"><div data-node-id=\"20251210110333-6hbgbiv\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20251210114039\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+func TestBlockquote2Callout(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.ParseOptions.Mark = true
+	luteEngine.ParseOptions.BlockRef = true
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.ParseOptions.SuperBlock = true
+	luteEngine.SetLinkBase("/siyuan/0/测试笔记/")
+	luteEngine.SetAutoSpace(false)
+	luteEngine.SetSub(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetGitConflict(true)
+	luteEngine.SetCallout(true)
+
+	ast.Testing = true
+	for _, test := range blockquote2CalloutTests {
+		ovHTML := luteEngine.Blockquote2Callout(test.from)
+		if test.to != ovHTML {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, ovHTML, test.from)
+		}
+	}
+	ast.Testing = false
+}
+
 var cancelSuperBlockTests = []*parseTest{
 	{"0", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeSuperBlock\" class=\"sb\" data-sb-layout=\"col\"><div data-node-id=\"20210518185646-hjjhl5p\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210518191256\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20210518191256-m1ij6pn\" data-type=\"NodeParagraph\" class=\"p\" fold=\"0\" updated=\"20210518191257\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20210518185646-pcdktyp\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>", "<div data-node-id=\"20210518185646-hjjhl5p\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20210518191256\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20210518191256-m1ij6pn\" data-node-index=\"2\" data-type=\"NodeParagraph\" class=\"p\" fold=\"0\" updated=\"20210518191257\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div data-node-id=\"20210518185646-pcdktyp\" data-node-index=\"3\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 }
