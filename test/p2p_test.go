@@ -150,6 +150,7 @@ func TestBlockDOM2StdMd(t *testing.T) {
 
 var blockDOM2Md = []parseTest{
 
+	{"1", "<div contenteditable=\"false\" data-subtype=\"TIP\" data-node-id=\"20251209161642-p40onrf\" data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\" updated=\"20251210104325\"><div class=\"callout-info\"><span class=\"callout-icon\">💡</span><span class=\"callout-title\">Tip</span></div><div class=\"callout-content\"><div data-node-id=\"20251210104326-j3lech3\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20251210104509\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div></div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "> [!TIP]\n> foo\n> {: id=\"20251210104326-j3lech3\" updated=\"20251210104509\"}\n{: id=\"20251209161642-p40onrf\" updated=\"20251210104325\"}\n"},
 	{"0", "<div data-node-id=\"20220922151247-vp1f2n4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20220922153740\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"block-ref\" data-subtype=\"d\" data-id=\"20220922151244-p6ask52\">foo</span> bar </div><div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div>", "((20220922151244-p6ask52 'foo')) bar \n{: id=\"20220922151247-vp1f2n4\" updated=\"20220922153740\"}\n"},
 }
 
@@ -170,6 +171,7 @@ func TestBlockDOM2Md(t *testing.T) {
 	luteEngine.SetAutoSpace(true)
 	luteEngine.SetParagraphBeginningSpace(true)
 	luteEngine.SetFileAnnotationRef(true)
+	luteEngine.SetCallout(true)
 
 	for _, test := range blockDOM2Md {
 		result := luteEngine.BlockDOM2Md(test.from)
