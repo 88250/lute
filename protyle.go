@@ -784,7 +784,7 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 
 	content := strings.TrimSpace(text.Text())
 	content = strings.TrimPrefix(content, editor.Caret)
-	
+
 	if !strings.HasPrefix(content, "[!") || !strings.Contains(content, "]") {
 		return ivHTML
 	}
@@ -794,9 +794,11 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 		return ivHTML
 	}
 
+	title := strings.TrimSpace(content[strings.Index(content, "]")+1:])
 	bq.Type = ast.NodeCallout
 	bq.CalloutType = typ
 	bq.CalloutIcon = ast.GetCalloutIcon(typ)
+	bq.CalloutTitle = title
 	bq.FirstChild.Unlink() // 标记符 >
 	bq.FirstChild.Unlink() // 第一个段落 [!TYPE]
 	bq.FirstChild.Unlink() // 第一个段落的 IAL
