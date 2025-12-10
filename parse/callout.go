@@ -65,6 +65,13 @@ func CalloutContinue(callout *ast.Node, context *Context) int {
 }
 
 func (context *Context) calloutFinalize(callout *ast.Node) {
+	if nil == callout.FirstChild.Next && !bytes.Contains(callout.FirstChild.Tokens, []byte("\n")) {
+		// 只有一个子块的话转换为引述
+		callout.Type = ast.NodeBlockquote
+		callout.PrependChild(&ast.Node{Type: ast.NodeBlockquoteMarker})
+		return
+	}
+
 	p := callout.FirstChild
 	lines := bytes.Split(p.Tokens, []byte("\n"))
 	content := bytes.TrimSpace(lines[0])
