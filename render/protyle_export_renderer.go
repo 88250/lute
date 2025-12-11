@@ -172,6 +172,7 @@ func (r *ProtyleExportRenderer) renderCallout(node *ast.Node, entering bool) ast
 	if entering {
 		attrs := [][]string{
 			{"contenteditable", "false"},
+			{"data-subtype", node.CalloutType},
 		}
 		r.blockNodeAttrs(node, &attrs, "callout")
 		r.Tag("div", attrs, false)
@@ -185,9 +186,16 @@ func (r *ProtyleExportRenderer) renderCallout(node *ast.Node, entering bool) ast
 		}
 
 		r.WriteString("</span><span class=\"callout-title\">")
-		r.WriteString(node.CalloutTitle)
+		title := node.CalloutTitle
+		if "" == title {
+			title = ast.GetCalloutTitle(node.CalloutType)
+		}
+		if "" == title {
+			title = node.CalloutType
+		}
+		r.WriteString(title)
 		r.WriteString("</span></div>")
-		r.WriteString("<div>")
+		r.WriteString("<div class=\"callout-content\">")
 	} else {
 		r.WriteString("</div>")
 		r.renderIAL(node)
