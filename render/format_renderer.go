@@ -180,8 +180,9 @@ func (r *FormatRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkSt
 		r.WriteString("[!")
 		r.WriteString(node.CalloutType)
 		r.WriteByte(']')
-
-		if !ast.IsBuiltInCalloutType(node.CalloutType) || node.CalloutTitle != ast.GetCalloutTitle(node.CalloutType) {
+		if !ast.IsBuiltInCalloutType(node.CalloutType) ||
+			node.CalloutTitle != ast.GetCalloutTitle(node.CalloutType) ||
+			node.CalloutIcon != ast.GetCalloutIcon(node.CalloutType) {
 			title := node.CalloutIcon + " " + node.CalloutTitle
 			if strings.TrimSpace(title) != "" {
 				r.WriteByte(lex.ItemSpace)

@@ -171,11 +171,26 @@ func NewProtylePreviewRenderer(tree *parse.Tree, options *Options) *ProtylePrevi
 func (r *ProtylePreviewRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.renderBlockquote(node, entering)
-		title := node.CalloutIcon + " " + node.CalloutTitle
+		r.WriteString("<p>")
+		title := node.CalloutTitle
+		if "" == title {
+			title = ast.GetCalloutTitle(node.CalloutType)
+		}
+		if "" != node.CalloutIcon {
+			if 1 == node.CalloutIconType {
+				icon := ast.GetCalloutIcon(node.CalloutType)
+				if "" == icon {
+					icon = "✏️"
+				}
+			}
+			title = node.CalloutIcon + " " + title
+		}
+
 		if strings.TrimSpace(title) != "" {
 			r.WriteString(title)
 			r.Newline()
 		}
+		r.WriteString("</p>")
 	} else {
 		r.renderBlockquote(node, entering)
 	}
