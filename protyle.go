@@ -28,6 +28,13 @@ import (
 
 func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	//fmt.Println(ivHTML)
+
+	keepEscaped := lute.ParseOptions.KeepEscaped
+	lute.ParseOptions.KeepEscaped = true
+	defer func() {
+		lute.ParseOptions.KeepEscaped = keepEscaped
+	}()
+
 	markdown := lute.blockDOM2Md(ivHTML)
 	markdown = strings.ReplaceAll(markdown, editor.Zwsp, "")
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
@@ -187,11 +194,10 @@ func (lute *Lute) BlockDOM2Md(htmlStr string) (kramdown string) {
 }
 
 func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
-	spin := lute.ParseOptions.Spin
-
-	lute.ParseOptions.Spin = false
+	keepEscaped := lute.ParseOptions.KeepEscaped
+	lute.ParseOptions.KeepEscaped = false
 	defer func() {
-		lute.ParseOptions.Spin = spin
+		lute.ParseOptions.KeepEscaped = keepEscaped
 	}()
 
 	htmlStr = strings.ReplaceAll(htmlStr, editor.Zwsp, "")

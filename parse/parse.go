@@ -47,7 +47,7 @@ func (t *Tree) finalParseBlockIAL() {
 		if ast.NodeBlockquote == n.Type && nil != n.FirstChild && nil == n.FirstChild.Next {
 			appends = append(appends, n)
 		}
-		
+
 		if "" == n.ID {
 			id := n.IALAttr("id")
 			if "" == id {
@@ -427,6 +427,8 @@ type Options struct {
 	HTML2MarkdownAttrs []string
 	// Callout 设置是否开启提示块支持。
 	Callout bool
+	// KeepEscaped 设置是否保留转义内容（不进行反转义）。
+	KeepEscaped bool
 }
 
 var EmojiLock = sync.Mutex{}
