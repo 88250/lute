@@ -788,7 +788,7 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 						}
 					}
 					node.TextMarkTextContent = strings.TrimSpace(node.TextMarkTextContent)
-					if !node.ContainTextMarkTypes("code") {
+					if !options.Spin && !node.ContainTextMarkTypes("code") {
 						// Improve the unescaping of copied block contents https://github.com/siyuan-note/siyuan/issues/16136
 						node.TextMarkTextContent = html.UnescapeHTMLStr(node.TextMarkTextContent)
 					}
