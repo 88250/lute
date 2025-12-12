@@ -187,6 +187,13 @@ func (lute *Lute) BlockDOM2Md(htmlStr string) (kramdown string) {
 }
 
 func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
+	spin := lute.ParseOptions.Spin
+
+	lute.ParseOptions.Spin = false
+	defer func() {
+		lute.ParseOptions.Spin = spin
+	}()
+
 	htmlStr = strings.ReplaceAll(htmlStr, editor.Zwsp, "")
 
 	// DOM 转 AST
