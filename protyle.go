@@ -785,18 +785,26 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 		return ivHTML
 	}
 
-	p := bq.FirstChild.Next
-	if nil == p || ast.NodeParagraph != p.Type {
-		return ivHTML
+	firstChild := bq.FirstChild.Next
+	if nil == firstChild {
+		id := ast.NewNodeID()
+		ialTokens := []byte("{: id=\"" + id + "\"}")
+		newP := &ast.Node{Type: ast.NodeParagraph, ID: id}
+		newP.KramdownIAL = [][]string{{"id", id}, {"updated", id[:14]}}
+		newP.ID = id
+		bq.AppendChild(newP)
+		bq.AppendChild(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
 	}
 
-	text := p.FirstChild
-	if nil == text {
-		p.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("")})
+	var content string
+	if ast.NodeParagraph == firstChild.Type {
+		text := firstChild.FirstChild
+		if nil == text {
+			firstChild.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("")})
+		}
+		content = strings.TrimSpace(text.Text())
+		content = strings.TrimPrefix(content, editor.Caret)
 	}
-
-	content := strings.TrimSpace(text.Text())
-	content = strings.TrimPrefix(content, editor.Caret)
 
 	firstIsType := false
 	typ := "NOTE"
@@ -811,7 +819,7 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 	bq.CalloutTitle = ast.GetCalloutTitle(bq.CalloutType)
 	bq.CalloutIcon = ast.GetCalloutIcon(bq.CalloutType)
 	if firstIsType {
-		if nil == p.Next.Next {
+		if nil == firstChild.Next.Next {
 			id := ast.NewNodeID()
 			ialTokens := []byte("{: id=\"" + id + "\"}")
 			newP := &ast.Node{Type: ast.NodeParagraph, ID: id}
