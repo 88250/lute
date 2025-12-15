@@ -1736,6 +1736,9 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
 		indent := len(node.ListData.Marker) + 1
+		if 1 == node.ListData.Typ && 3 > indent {
+			indent++
+		}
 		if 3 == node.ListData.Typ && 0 == node.ListData.BulletChar {
 			indent++
 		}
