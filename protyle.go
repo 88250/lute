@@ -1190,11 +1190,15 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeCallout
 		node.CalloutType = util.DomAttrValue(n, "data-subtype")
 		icon := util.DomChildByTypeAndClass(n, atom.Span, "callout-icon").FirstChild
-		if atom.Img == icon.DataAtom {
-			node.CalloutIcon = util.DomAttrValue(icon, "src")
-			node.CalloutIconType = 1
+		if nil == icon {
+			node.CalloutIcon = ast.GetCalloutIcon(node.CalloutType)
 		} else {
-			node.CalloutIcon = util.DomText(icon)
+			if atom.Img == icon.DataAtom {
+				node.CalloutIcon = util.DomAttrValue(icon, "src")
+				node.CalloutIconType = 1
+			} else {
+				node.CalloutIcon = util.DomText(icon)
+			}
 		}
 		title := util.DomChildByTypeAndClass(n, atom.Span, "callout-title").FirstChild
 		node.CalloutTitle = util.DomText(title)
