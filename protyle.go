@@ -790,35 +790,42 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 		return ivHTML
 	}
 
-	if nil == p.Next || nil == p.Next.Next {
-		return ivHTML
-	}
-
 	text := p.FirstChild
-	if nil == text || ast.NodeText != text.Type {
-		return ivHTML
+	if nil == text {
+		p.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("")})
 	}
 
 	content := strings.TrimSpace(text.Text())
 	content = strings.TrimPrefix(content, editor.Caret)
 
-	if !strings.HasPrefix(content, "[!") || !strings.Contains(content, "]") {
-		return ivHTML
+	firstIsType := false
+	typ := "NOTE"
+	if strings.HasPrefix(content, "[!") && strings.Contains(content, "]") {
+		typ = content[2:strings.Index(content, "]")]
+		firstIsType = true
 	}
 
-	typ := content[2:strings.Index(content, "]")]
-	if !ast.IsBuiltInCalloutType(typ) {
-		return ivHTML
-	}
-
-	title := strings.TrimSpace(content[strings.Index(content, "]")+1:])
+	bq.FirstChild.Unlink() // 标记符 >
 	bq.Type = ast.NodeCallout
 	bq.CalloutType = typ
-	bq.CalloutIcon = ast.GetCalloutIcon(typ)
-	bq.CalloutTitle = title
-	bq.FirstChild.Unlink() // 标记符 >
-	bq.FirstChild.Unlink() // 第一个段落 [!TYPE]
-	bq.FirstChild.Unlink() // 第一个段落的 IAL
+	bq.CalloutTitle = ast.GetCalloutTitle(bq.CalloutType)
+	bq.CalloutIcon = ast.GetCalloutIcon(bq.CalloutType)
+	if firstIsType {
+		if nil == p.Next.Next {
+			id := ast.NewNodeID()
+			ialTokens := []byte("{: id=\"" + id + "\"}")
+			newP := &ast.Node{Type: ast.NodeParagraph, ID: id}
+			newP.KramdownIAL = [][]string{{"id", id}, {"updated", id[:14]}}
+			newP.ID = id
+			bq.AppendChild(newP)
+			bq.AppendChild(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+		}
+
+		title := strings.TrimSpace(content[strings.Index(content, "]")+1:])
+		bq.CalloutTitle = title
+		bq.FirstChild.Unlink() // 第一个段落 [!TYPE]
+		bq.FirstChild.Unlink() // 第一个段落的 IAL
+	}
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
 	return
