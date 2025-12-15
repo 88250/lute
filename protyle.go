@@ -797,7 +797,7 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 	}
 
 	var content string
-	if ast.NodeParagraph == firstChild.Type {
+	if nil != firstChild && ast.NodeParagraph == firstChild.Type {
 		text := firstChild.FirstChild
 		if nil == text {
 			firstChild.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("")})
