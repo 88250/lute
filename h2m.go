@@ -1446,9 +1446,18 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		style := util.DomAttrValue(n, "style")
 		if strings.Contains(style, "underline") {
 			if nil != tree.Context.Tip.LastChild && ast.NodeHTMLTag != tree.Context.Tip.LastChild.Type {
+				if ast.NodeUnderline == tree.Context.Tip.Type || tree.Context.Tip.ParentIs(ast.NodeUnderline) {
+					break
+				}
+
+				text := util.DomText(n)
+				if "" == text {
+					break
+				}
+
 				u := &ast.Node{Type: ast.NodeUnderline}
 				u.AppendChild(&ast.Node{Type: ast.NodeUnderlineOpenMarker})
-				u.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+				u.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(text)})
 				u.AppendChild(&ast.Node{Type: ast.NodeUnderlineCloseMarker})
 				tree.Context.Tip.AppendChild(u)
 				return
@@ -1457,9 +1466,17 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		if strings.Contains(style, "bold") {
 			if nil != tree.Context.Tip.LastChild && ast.NodeHTMLTag != tree.Context.Tip.LastChild.Type {
+				if ast.NodeStrong == tree.Context.Tip.Type || tree.Context.Tip.ParentIs(ast.NodeStrong) {
+					break
+				}
+				text := util.DomText(n)
+				if "" == text {
+					break
+				}
+
 				strong := &ast.Node{Type: ast.NodeStrong}
 				strong.AppendChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker, Tokens: util.StrToBytes("**")})
-				strong.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(util.DomText(n))})
+				strong.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(text)})
 				strong.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker, Tokens: util.StrToBytes("**")})
 				tree.Context.Tip.AppendChild(strong)
 				return
