@@ -1445,13 +1445,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		style := util.DomAttrValue(n, "style")
 		if strings.Contains(style, "underline") {
+			text := util.DomText(n)
+			if "" == text {
+				break
+			}
+
 			if nil != tree.Context.Tip.LastChild && ast.NodeHTMLTag != tree.Context.Tip.LastChild.Type {
 				if ast.NodeUnderline == tree.Context.Tip.Type || tree.Context.Tip.ParentIs(ast.NodeUnderline) {
-					break
-				}
-
-				text := util.DomText(n)
-				if "" == text {
 					break
 				}
 
@@ -1465,13 +1465,21 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		if strings.Contains(style, "bold") {
+			text := util.DomText(n)
+			if "" == text {
+				break
+			}
+
 			if nil != tree.Context.Tip.LastChild && ast.NodeHTMLTag != tree.Context.Tip.LastChild.Type {
 				if ast.NodeStrong == tree.Context.Tip.Type || tree.Context.Tip.ParentIs(ast.NodeStrong) {
 					break
 				}
-				text := util.DomText(n)
-				if "" == text {
-					break
+
+				if ast.NodeStrong == tree.Context.Tip.LastChild.Type {
+					if nil != tree.Context.Tip.LastChild.LastChild.Previous && ast.NodeText == tree.Context.Tip.LastChild.LastChild.Previous.Type {
+						tree.Context.Tip.LastChild.LastChild.Previous.Tokens = append(tree.Context.Tip.LastChild.LastChild.Previous.Tokens, text...)
+						return
+					}
 				}
 
 				strong := &ast.Node{Type: ast.NodeStrong}
