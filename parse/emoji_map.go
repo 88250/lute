@@ -463,7 +463,7 @@ var EmojiAliasUnicode = map[string]string{
 	"european_post_office":                 "🏤",
 	"european_union":                       "🇪🇺",
 	"evergreen_tree":                       "🌲",
-	"exclamation":                          "❗️",
+	"exclamation":                          "❗",
 	"expressionless":                       "😑",
 	"eye":                                  "👁",
 	"eye_speech_bubble":                    "👁‍🗨",

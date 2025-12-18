@@ -18,6 +18,7 @@ import (
 
 var calloutTests = []parseTest{
 
+	{"7", "> [!IMPORTANT] ❗ foo\n> bar", "<blockquote>\n<p>❗ foo\n</p>\n<p>bar</p>\n</blockquote>\n"},
 	{"6", "> [!Note]\n", "<blockquote>\n<p>[!Note]</p>\n</blockquote>\n"},
 	{"5", "> [!Note] ✨ Title1\n> Content1\n", "<blockquote>\n<p>✨ Title1\n</p>\n<p>Content1</p>\n</blockquote>\n"},
 	{"4", "> [!Note] Title1\n> Content1\n> * List\n>    > [!Note] Title2\n>    > Content2\n\n", "<blockquote>\n<p>Title1\n</p>\n<p>Content1</p>\n<ul>\n<li>List\n<blockquote>\n<p>Title2\n</p>\n<p>Content2</p>\n</blockquote>\n</li>\n</ul>\n</blockquote>\n"},
