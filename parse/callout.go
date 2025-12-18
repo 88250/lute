@@ -88,6 +88,9 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 			if "" != emoji {
 				callout.CalloutIcon = emoji
 				title = strings.TrimSpace(title[len(icon):])
+				if strings.HasPrefix(emoji, "/emojis/") {
+					callout.CalloutIconType = 1
+				}
 			}
 		}
 	}
