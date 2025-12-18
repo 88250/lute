@@ -83,6 +83,12 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 		if "" != EmojiUnicodeAlias[icon] {
 			callout.CalloutIcon = icon
 			title = strings.TrimSpace(title[len(icon):])
+		} else {
+			emoji := EmojiAliasUnicode[strings.ReplaceAll(icon, ":", "")]
+			if "" != emoji {
+				callout.CalloutIcon = emoji
+				title = strings.TrimSpace(title[len(icon):])
+			}
 		}
 	}
 

@@ -178,6 +178,11 @@ func (r *ProtyleExportMdRenderer) renderCallout(node *ast.Node, entering bool) a
 		if !ast.IsBuiltInCalloutType(node.CalloutType) ||
 			node.CalloutTitle != ast.GetCalloutTitle(node.CalloutType) ||
 			node.CalloutIcon != ast.GetCalloutIcon(node.CalloutType) {
+			if 1 == node.CalloutIconType {
+				alt := node.CalloutIcon[strings.Index(node.CalloutIcon, "/emojis/")+len("/emojis/"):]
+				alt = alt[:strings.Index(alt, ".")]
+				node.CalloutIcon = ":" + alt + ":"
+			}
 			title := node.CalloutIcon + " " + node.CalloutTitle
 			if strings.TrimSpace(title) != "" {
 				r.WriteByte(lex.ItemSpace)
