@@ -80,7 +80,7 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 	callout.CalloutType = typ
 	icon := strings.Split(title, " ")[0]
 	if "" != icon {
-		if "" != EmojiUnicodeAlias[icon] {
+		if IsEmoji(icon) {
 			callout.CalloutIcon = icon
 			title = strings.TrimSpace(title[len(icon):])
 		} else {

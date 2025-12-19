@@ -10,6 +10,8 @@
 
 package parse
 
+import "strings"
+
 var EmojiUnicodeAlias map[string]string
 
 func init() {
@@ -17,6 +19,15 @@ func init() {
 	for k, v := range EmojiAliasUnicode {
 		EmojiUnicodeAlias[v] = k
 	}
+}
+
+func IsEmoji(str string) bool {
+	for _, v := range EmojiAliasUnicode {
+		if strings.HasPrefix(v, str) {
+			return true
+		}
+	}
+	return false
 }
 
 var EmojiAliasUnicode = map[string]string{
