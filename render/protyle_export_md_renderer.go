@@ -30,8 +30,8 @@ type ProtyleExportMdRenderer struct {
 	NodeWriterStack []*bytes.Buffer
 }
 
-func NewProtyleExportMdRenderer(tree *parse.Tree, options *Options) *ProtyleExportMdRenderer {
-	ret := &ProtyleExportMdRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
+func NewProtyleExportMdRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *ProtyleExportMdRenderer {
+	ret := &ProtyleExportMdRenderer{BaseRenderer: NewBaseRenderer(tree, options, parseOptions)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

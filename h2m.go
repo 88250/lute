@@ -35,7 +35,7 @@ func (lute *Lute) HTML2Markdown(htmlStr string) (markdown string, err error) {
 
 	// 将 AST 进行 Markdown 格式化渲染
 	var formatted []byte
-	renderer := render.NewFormatRenderer(tree, lute.RenderOptions)
+	renderer := render.NewFormatRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.HTML2MdRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}

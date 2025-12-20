@@ -172,7 +172,7 @@ func TestFormatNodeSync(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetAutoSpace(true)
 	tree := parse.Parse("", []byte(md), luteEngine.ParseOptions)
-	renderer := render.NewFormatRenderer(tree, luteEngine.RenderOptions)
+	renderer := render.NewFormatRenderer(tree, luteEngine.RenderOptions, luteEngine.ParseOptions)
 	output := string(renderer.Render())
 	expected := "foo 中文 bar\n"
 	if expected != output {

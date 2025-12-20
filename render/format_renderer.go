@@ -32,8 +32,8 @@ type FormatRenderer struct {
 }
 
 // NewFormatRenderer 创建一个格式化渲染器。
-func NewFormatRenderer(tree *parse.Tree, options *Options) *FormatRenderer {
-	ret := &FormatRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
+func NewFormatRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *FormatRenderer {
+	ret := &FormatRenderer{BaseRenderer: NewBaseRenderer(tree, options, parseOptions)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

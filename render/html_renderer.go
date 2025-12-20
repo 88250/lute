@@ -31,8 +31,8 @@ type HtmlRenderer struct {
 }
 
 // NewHtmlRenderer 创建一个 HTML 渲染器。
-func NewHtmlRenderer(tree *parse.Tree, options *Options) *HtmlRenderer {
-	ret := &HtmlRenderer{NewBaseRenderer(tree, options)}
+func NewHtmlRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *HtmlRenderer {
+	ret := &HtmlRenderer{NewBaseRenderer(tree, options, parseOptions)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -193,7 +193,21 @@ func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStat
 		}
 
 		if strings.TrimSpace(title) != "" {
-			r.WriteString(title)
+			titleTree := parse.Inline("", []byte(title), r.ParseOptions)
+			if nil != titleTree && nil != titleTree.Root && nil != titleTree.Root.FirstChild {
+				var inlines []*ast.Node
+				for child := titleTree.Root.FirstChild.FirstChild; nil != child; child = child.Next {
+					inlines = append(inlines, child)
+				}
+				titleTree.Root.FirstChild.Unlink()
+				for _, inline := range inlines {
+					titleTree.Root.AppendChild(inline)
+				}
+				data := NewHtmlRenderer(titleTree, r.Options, r.ParseOptions).Render()
+				r.Write(data)
+			} else {
+				r.WriteString(title)
+			}
 			r.Newline()
 		}
 		r.WriteString("</p>")
@@ -702,7 +716,7 @@ func (r *HtmlRenderer) RenderFootnotes() []byte {
 		footnotesTree.Context.Tree = footnotesTree
 		footnotesTree.Root = &ast.Node{Type: ast.NodeDocument}
 		footnotesTree.Root.AppendChild(def)
-		defRenderer := NewHtmlRenderer(footnotesTree, r.Options)
+		defRenderer := NewHtmlRenderer(footnotesTree, r.Options, r.ParseOptions)
 		lc := footnotesTree.Root.LastDeepestChild()
 		for i = len(def.FootnotesRefs) - 1; 0 <= i; i-- {
 			ref := def.FootnotesRefs[i]

@@ -30,8 +30,8 @@ type VditorIRRenderer struct {
 }
 
 // NewVditorIRRenderer 创建一个 Vditor Instant-Rendering DOM 渲染器。
-func NewVditorIRRenderer(tree *parse.Tree, options *Options) *VditorIRRenderer {
-	ret := &VditorIRRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
+func NewVditorIRRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *VditorIRRenderer {
+	ret := &VditorIRRenderer{BaseRenderer: NewBaseRenderer(tree, options, parseOptions)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

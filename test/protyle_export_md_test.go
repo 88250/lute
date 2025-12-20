@@ -69,7 +69,7 @@ func TestProtyleExportMd(t *testing.T) {
 	for _, test := range protyleExportMdTests {
 		tree := parse.Parse("", []byte(test.from), luteEngine.ParseOptions)
 		parse.NestedInlines2FlattedSpans(tree, true)
-		renderer := render.NewProtyleExportMdRenderer(tree, luteEngine.RenderOptions)
+		renderer := render.NewProtyleExportMdRenderer(tree, luteEngine.RenderOptions, luteEngine.ParseOptions)
 		output := renderer.Render()
 		kmd := util.BytesToStr(output)
 		if test.to != kmd {

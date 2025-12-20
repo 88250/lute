@@ -29,8 +29,8 @@ type ProtylePreviewRenderer struct {
 	*BaseRenderer
 }
 
-func NewProtylePreviewRenderer(tree *parse.Tree, options *Options) *ProtylePreviewRenderer {
-	ret := &ProtylePreviewRenderer{NewBaseRenderer(tree, options)}
+func NewProtylePreviewRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *ProtylePreviewRenderer {
+	ret := &ProtylePreviewRenderer{NewBaseRenderer(tree, options, parseOptions)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

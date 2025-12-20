@@ -27,8 +27,8 @@ type KityMinderJSONRenderer struct {
 }
 
 // NewKityMinderJSONRenderer 创建一个 KityMinder JSON 渲染器。
-func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options) Renderer {
-	ret := &KityMinderJSONRenderer{NewBaseRenderer(tree, options)}
+func NewKityMinderJSONRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) Renderer {
+	ret := &KityMinderJSONRenderer{NewBaseRenderer(tree, options, parseOptions)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeCodeBlock] = ret.renderCodeBlock

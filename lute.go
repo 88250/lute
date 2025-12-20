@@ -81,7 +81,7 @@ func New(opts ...ParseOption) (ret *Lute) {
 // Markdown 将 markdown 文本字节数组处理为相应的 html 字节数组。name 参数仅用于标识文本，比如可传入 id 或者标题，也可以传入 ""。
 func (lute *Lute) Markdown(name string, markdown []byte) (html []byte) {
 	tree := parse.Parse(name, markdown, lute.ParseOptions)
-	renderer := render.NewHtmlRenderer(tree, lute.RenderOptions)
+	renderer := render.NewHtmlRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.Md2HTMLRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -99,7 +99,7 @@ func (lute *Lute) MarkdownStr(name, markdown string) (html string) {
 // Format 将 markdown 文本字节数组进行格式化。
 func (lute *Lute) Format(name string, markdown []byte) (formatted []byte) {
 	tree := parse.Parse(name, markdown, lute.ParseOptions)
-	renderer := render.NewFormatRenderer(tree, lute.RenderOptions)
+	renderer := render.NewFormatRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	formatted = renderer.Render()
 	return
 }
@@ -114,7 +114,7 @@ func (lute *Lute) FormatStr(name, markdown string) (formatted string) {
 // TextBundle 将 markdown 文本字节数组进行 TextBundle 处理。
 func (lute *Lute) TextBundle(name string, markdown []byte, linkPrefixes []string) (textbundle []byte, originalLinks []string) {
 	tree := parse.Parse(name, markdown, lute.ParseOptions)
-	renderer := render.NewTextBundleRenderer(tree, linkPrefixes, lute.RenderOptions)
+	renderer := render.NewTextBundleRenderer(tree, linkPrefixes, lute.RenderOptions, lute.ParseOptions)
 	textbundle, originalLinks = renderer.Render()
 	return
 }
@@ -138,7 +138,7 @@ func (lute *Lute) HTML2Text(dom string) string {
 // RenderJSON 用于渲染 JSON 格式数据。
 func (lute *Lute) RenderJSON(markdown string) (json string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewJSONRenderer(tree, lute.RenderOptions)
+	renderer := render.NewJSONRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	output := renderer.Render()
 	json = util.BytesToStr(output)
 	return
@@ -243,7 +243,7 @@ func (lute *Lute) PutTerms(termMap map[string]string) {
 }
 
 var (
-	formatRendererSync = render.NewFormatRenderer(nil, nil)
+	formatRendererSync = render.NewFormatRenderer(nil, nil, nil)
 	formatRendererLock = sync.Mutex{}
 )
 
@@ -256,6 +256,7 @@ func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
 	formatRendererSync.Tree = tree
 	formatRendererSync.Options = renderOptions
+	formatRendererSync.ParseOptions = parseOptions
 	formatRendererSync.LastOut = lex.ItemNewline
 	formatRendererSync.NodeWriterStack = []*bytes.Buffer{formatRendererSync.Writer}
 
@@ -277,7 +278,7 @@ func FormatNodeSync(node *ast.Node, parseOptions *parse.Options, renderOptions *
 }
 
 var (
-	protyleExportMdRendererSync = render.NewProtyleExportMdRenderer(nil, nil)
+	protyleExportMdRendererSync = render.NewProtyleExportMdRenderer(nil, nil, nil)
 	protyleExportMdRendererLock = sync.Mutex{}
 )
 
@@ -290,6 +291,7 @@ func ProtyleExportMdNodeSync(node *ast.Node, parseOptions *parse.Options, render
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: parseOptions}}
 	protyleExportMdRendererSync.Tree = tree
 	protyleExportMdRendererSync.Options = renderOptions
+	protyleExportMdRendererSync.ParseOptions = parseOptions
 	protyleExportMdRendererSync.LastOut = lex.ItemNewline
 	protyleExportMdRendererSync.NodeWriterStack = []*bytes.Buffer{protyleExportMdRendererSync.Writer}
 
@@ -311,15 +313,15 @@ func ProtyleExportMdNodeSync(node *ast.Node, parseOptions *parse.Options, render
 }
 
 // ProtylePreview 使用指定的 options 渲染 tree 为 Protyle 预览 HTML。
-func (lute *Lute) ProtylePreview(tree *parse.Tree, options *render.Options) string {
-	renderer := render.NewProtylePreviewRenderer(tree, options)
+func (lute *Lute) ProtylePreview(tree *parse.Tree, options *render.Options, parseOptions *parse.Options) string {
+	renderer := render.NewProtylePreviewRenderer(tree, options, parseOptions)
 	output := renderer.Render()
 	return util.BytesToStr(output)
 }
 
 // Tree2HTML 使用指定的 options 渲染 tree 为标准 HTML。
-func (lute *Lute) Tree2HTML(tree *parse.Tree, options *render.Options) string {
-	renderer := render.NewHtmlRenderer(tree, options)
+func (lute *Lute) Tree2HTML(tree *parse.Tree, options *render.Options, parseOptions *parse.Options) string {
+	renderer := render.NewHtmlRenderer(tree, options, parseOptions)
 	output := renderer.Render()
 	return util.BytesToStr(output)
 }

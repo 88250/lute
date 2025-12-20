@@ -162,6 +162,7 @@ func NewOptions() *Options {
 // BaseRenderer 描述了渲染器结构。
 type BaseRenderer struct {
 	Options             *Options                         // 渲染选项
+	ParseOptions        *parse.Options                   // 解析选项
 	RendererFuncs       map[ast.NodeType]RendererFunc    // 渲染器
 	DefaultRendererFunc RendererFunc                     // 默认渲染器，在 RendererFuncs 中找不到节点渲染器时会使用该默认渲染器进行渲染
 	ExtRendererFuncs    map[ast.NodeType]ExtRendererFunc // 用户自定义的渲染器
@@ -174,8 +175,8 @@ type BaseRenderer struct {
 }
 
 // NewBaseRenderer 构造一个 BaseRenderer。
-func NewBaseRenderer(tree *parse.Tree, options *Options) *BaseRenderer {
-	ret := &BaseRenderer{RendererFuncs: make(map[ast.NodeType]RendererFunc, 192), ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Options: options, Tree: tree}
+func NewBaseRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *BaseRenderer {
+	ret := &BaseRenderer{RendererFuncs: make(map[ast.NodeType]RendererFunc, 192), ExtRendererFuncs: map[ast.NodeType]ExtRendererFunc{}, Options: options, ParseOptions: parseOptions, Tree: tree}
 	ret.Writer = &bytes.Buffer{}
 	ret.Writer.Grow(4096)
 	return ret

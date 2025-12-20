@@ -32,8 +32,8 @@ type ProtyleRenderer struct {
 }
 
 // NewProtyleRenderer 创建一个 WYSIWYG Block DOM 渲染器。
-func NewProtyleRenderer(tree *parse.Tree, options *Options) *ProtyleRenderer {
-	ret := &ProtyleRenderer{BaseRenderer: NewBaseRenderer(tree, options), NodeIndex: options.NodeIndexStart}
+func NewProtyleRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *ProtyleRenderer {
+	ret := &ProtyleRenderer{BaseRenderer: NewBaseRenderer(tree, options, parseOptions), NodeIndex: options.NodeIndexStart}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -196,7 +196,22 @@ func (r *ProtyleRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkS
 		if "" == title {
 			title = node.CalloutType
 		}
-		r.WriteString(title)
+
+		titleTree := parse.Inline("", []byte(title), r.ParseOptions)
+		if nil != titleTree && nil != titleTree.Root && nil != titleTree.Root.FirstChild {
+			var inlines []*ast.Node
+			for child := titleTree.Root.FirstChild.FirstChild; nil != child; child = child.Next {
+				inlines = append(inlines, child)
+			}
+			titleTree.Root.FirstChild.Unlink()
+			for _, inline := range inlines {
+				titleTree.Root.AppendChild(inline)
+			}
+			data := NewProtyleRenderer(titleTree, r.Options, r.ParseOptions).Render()
+			r.Write(data)
+		} else {
+			r.WriteString(title)
+		}
 		r.WriteString("</span></div>")
 		r.WriteString("<div class=\"callout-content\">")
 	} else {

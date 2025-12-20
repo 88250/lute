@@ -33,8 +33,8 @@ type VditorRenderer struct {
 }
 
 // NewVditorRenderer 创建一个 Vditor WYSIWYG DOM 渲染器。
-func NewVditorRenderer(tree *parse.Tree, options *Options) *VditorRenderer {
-	ret := &VditorRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
+func NewVditorRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *VditorRenderer {
+	ret := &VditorRenderer{BaseRenderer: NewBaseRenderer(tree, options, parseOptions)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

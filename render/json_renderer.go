@@ -22,7 +22,7 @@ type JSONRenderer struct {
 	*BaseRenderer
 }
 
-func NewJSONRenderer(tree *parse.Tree, options *Options) Renderer {
+func NewJSONRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) Renderer {
 	var ials []*ast.Node // 渲染器剔除语法树块级 IAL 节点
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering {
@@ -38,7 +38,7 @@ func NewJSONRenderer(tree *parse.Tree, options *Options) Renderer {
 		ial.Unlink()
 	}
 
-	ret := &JSONRenderer{NewBaseRenderer(tree, options)}
+	ret := &JSONRenderer{NewBaseRenderer(tree, options, parseOptions)}
 	ret.DefaultRendererFunc = ret.renderNode
 	return ret
 }

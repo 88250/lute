@@ -35,7 +35,7 @@ func (lute *Lute) SpinVditorDOM(ivHTML string) (ovHTML string) {
 	ivHTML = strings.ReplaceAll(ivHTML, editor.FrontEndCaret, editor.Caret)
 	markdown := lute.vditorDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorRenderer(tree, lute.RenderOptions)
+	renderer := render.NewVditorRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	output := renderer.Render()
 	ovHTML = strings.ReplaceAll(string(output), editor.Caret, editor.FrontEndCaret)
 	return
@@ -50,7 +50,7 @@ func (lute *Lute) HTML2VditorDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorRenderer(tree, lute.RenderOptions)
+	renderer := render.NewVditorRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.HTML2VditorDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -69,7 +69,7 @@ func (lute *Lute) VditorDOM2HTML(vhtml string) (sHTML string) {
 // Md2VditorDOM 将 markdown 转换为 Vditor DOM，用于从源码模式切换至所见即所得模式。
 func (lute *Lute) Md2VditorDOM(markdown string) (vHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewVditorRenderer(tree, lute.RenderOptions)
+	renderer := render.NewVditorRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.Md2VditorDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -89,7 +89,7 @@ func (lute *Lute) VditorDOM2Md(htmlStr string) (markdown string) {
 // RenderEChartsJSON 用于渲染 ECharts JSON 格式数据。
 func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewEChartsJSONRenderer(tree, lute.RenderOptions)
+	renderer := render.NewEChartsJSONRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	output := renderer.Render()
 	json = string(output)
 	return
@@ -98,7 +98,7 @@ func (lute *Lute) RenderEChartsJSON(markdown string) (json string) {
 // RenderKityMinderJSON 用于渲染 KityMinder JSON 格式数据。
 func (lute *Lute) RenderKityMinderJSON(markdown string) (json string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewKityMinderJSONRenderer(tree, lute.RenderOptions)
+	renderer := render.NewKityMinderJSONRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	output := renderer.Render()
 	json = string(output)
 	return
@@ -165,7 +165,7 @@ func (lute *Lute) vditorDOM2Md(htmlStr string) (markdown string) {
 	options := render.NewOptions()
 	options.AutoSpace = false
 	options.FixTermTypo = false
-	renderer := render.NewFormatRenderer(tree, options)
+	renderer := render.NewFormatRenderer(tree, options, lute.ParseOptions)
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return

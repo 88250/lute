@@ -29,8 +29,8 @@ type ProtyleExportRenderer struct {
 	*BaseRenderer
 }
 
-func NewProtyleExportRenderer(tree *parse.Tree, options *Options) *ProtyleExportRenderer {
-	ret := &ProtyleExportRenderer{BaseRenderer: NewBaseRenderer(tree, options)}
+func NewProtyleExportRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *ProtyleExportRenderer {
+	ret := &ProtyleExportRenderer{BaseRenderer: NewBaseRenderer(tree, options, parseOptions)}
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText

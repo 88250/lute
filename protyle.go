@@ -60,7 +60,7 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	// 这里需要将混合嵌套（比如 <strong><span a></span></strong>）的行级元素拆分为多个平铺的行级元素（<span strong> 和 <span strong a>）
 	parse.NestedInlines2FlattedSpansHybrid(tree, false)
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -73,7 +73,7 @@ func (lute *Lute) HTML2BlockDOM(sHTML string) (vHTML string) {
 	}
 
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
-	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.HTML2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -132,7 +132,7 @@ func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 		tree.Root.AppendChild(n)
 	}
 
-	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	output := renderer.Render()
 	vIHTML = util.BytesToStr(output)
 	vIHTML = strings.TrimSpace(vIHTML)
@@ -166,7 +166,7 @@ func (lute *Lute) Md2BlockDOMTree(markdown string, reserveEmptyParagraph bool) (
 		})
 	}
 
-	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -178,7 +178,7 @@ func (lute *Lute) Md2BlockDOMTree(markdown string, reserveEmptyParagraph bool) (
 func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
 	parse.NestedInlines2FlattedSpansHybrid(tree, false)
-	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -224,7 +224,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	options.KramdownSpanIAL = true
 	options.KeepParagraphBeginningSpace = true
 	options.UnorderedListMarker = lute.RenderOptions.UnorderedListMarker
-	renderer := render.NewProtyleExportMdRenderer(tree, options)
+	renderer := render.NewProtyleExportMdRenderer(tree, options, lute.ParseOptions)
 	formatted := renderer.Render()
 	markdown = util.BytesToStr(formatted)
 	return
@@ -250,8 +250,8 @@ func (lute *Lute) BlockDOM2EscapeMarkerContent(htmlStr string) (text string) {
 	return tree.Root.EscapeMarkerContent()
 }
 
-func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTML string) {
-	renderer := render.NewProtyleRenderer(tree, options)
+func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options, parseOptions *parse.Options) (vHTML string) {
+	renderer := render.NewProtyleRenderer(tree, options, parseOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -264,7 +264,7 @@ func (lute *Lute) Tree2BlockDOM(tree *parse.Tree, options *render.Options) (vHTM
 func (lute *Lute) RenderNodeBlockDOM(node *ast.Node) string {
 	root := &ast.Node{Type: ast.NodeDocument}
 	tree := &parse.Tree{Root: root, Context: &parse.Context{ParseOption: lute.ParseOptions}}
-	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions)
+	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.Md2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
 	}
@@ -461,7 +461,7 @@ func (lute *Lute) CancelSuperBlock(ivHTML string) (ovHTML string) {
 	}
 	sb.Unlink()
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -490,7 +490,7 @@ func (lute *Lute) CancelList(ivHTML string) (ovHTML string) {
 	}
 	list.Unlink()
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -514,7 +514,7 @@ func (lute *Lute) CancelBlockquote(ivHTML string) (ovHTML string) {
 	}
 	bq.Unlink()
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -558,7 +558,7 @@ func (lute *Lute) CancelCallout(ivHTML string) (ovHTML string) {
 	}
 	co.Unlink()
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -598,7 +598,7 @@ func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
 	for _, c := range appends {
 		tree.Root.AppendChild(c)
 	}
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -616,7 +616,7 @@ func (lute *Lute) Blocks2Hs(ivHTML, level string) (ovHTML string) {
 			p.HeadingLevel, _ = strconv.Atoi(level)
 		}
 	}
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -630,7 +630,7 @@ func (lute *Lute) OL2TL(ivHTML string) (ovHTML string) {
 			li.PrependChild(&ast.Node{Type: ast.NodeTaskListItemMarker})
 		}
 	}
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -644,7 +644,7 @@ func (lute *Lute) UL2TL(ivHTML string) (ovHTML string) {
 			li.PrependChild(&ast.Node{Type: ast.NodeTaskListItemMarker})
 		}
 	}
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -671,7 +671,7 @@ func (lute *Lute) TL2OL(ivHTML string) (ovHTML string) {
 		n.Unlink()
 	}
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -695,7 +695,7 @@ func (lute *Lute) TL2UL(ivHTML string) (ovHTML string) {
 		n.Unlink()
 	}
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -714,7 +714,7 @@ func (lute *Lute) OL2UL(ivHTML string) (ovHTML string) {
 		li.ListData.Typ = 0
 	}
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -736,7 +736,7 @@ func (lute *Lute) UL2OL(ivHTML string) (ovHTML string) {
 		num++
 	}
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -773,7 +773,7 @@ func (lute *Lute) Callout2Blockquote(ivHTML string) (ovHTML string) {
 	co.PrependChild(p)
 	co.PrependChild(&ast.Node{Type: ast.NodeBlockquoteMarker})
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -835,7 +835,7 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 		bq.FirstChild.Unlink() // 第一个段落的 IAL
 	}
 
-	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions)
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
 }
 
@@ -852,7 +852,7 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	options.ProtyleWYSIWYG = true
 	options.SuperBlock = true
 	options.UnorderedListMarker = lute.RenderOptions.UnorderedListMarker
-	renderer := render.NewFormatRenderer(tree, options)
+	renderer := render.NewFormatRenderer(tree, options, lute.ParseOptions)
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
@@ -1208,8 +1208,13 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 				node.CalloutIcon = util.DomText(icon)
 			}
 		}
-		title := util.DomChildByTypeAndClass(n, atom.Span, "callout-title").FirstChild
-		node.CalloutTitle = util.DomText(title)
+
+		titleDom := bytes.Buffer{}
+		first := util.DomChildByTypeAndClass(n, atom.Span, "callout-title").FirstChild
+		for c := first; nil != c; c = c.NextSibling {
+			titleDom.Write(util.DomHTML(c))
+		}
+		node.CalloutTitle = strings.TrimSpace(lute.BlockDOM2Md(titleDom.String()))
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
