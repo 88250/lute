@@ -1592,15 +1592,17 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 					if nil != n.FirstChild && atom.Span == n.FirstChild.DataAtom {
 						// 单独处理 <figcaption> 中的 <span leaf> 标签的情况 https://github.com/siyuan-note/siyuan/issues/14507
 						c := n.FirstChild.FirstChild
-						c.Unlink()
-						n.AppendChild(c)
+						if nil != c {
+							c.Unlink()
+							n.AppendChild(c)
+						}
 						n.FirstChild.Unlink()
 					}
 
 					if !util.DomExistChildByType(n, atom.A, atom.Span) { // 图片标题不包含非文本元素，包含的话走下面的逻辑，单独作为一个段落
-						closeParen.InsertBefore(&ast.Node{Type: ast.NodeLinkSpace})
-						linkTitle := util.DomText(n)
+						linkTitle := strings.TrimSpace(util.DomText(n))
 						if "" != linkTitle && "null" != linkTitle && "undefined" != linkTitle {
+							closeParen.InsertBefore(&ast.Node{Type: ast.NodeLinkSpace})
 							closeParen.InsertBefore(&ast.Node{Type: ast.NodeLinkTitle, Tokens: []byte(linkTitle)})
 							return
 						}
