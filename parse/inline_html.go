@@ -769,6 +769,12 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 			if nil != inlineTree {
 				node.TextMarkInlineMemoContent = strings.ReplaceAll(inlineTree.Root.Content(), "\n", editor.IALValEscNewLine)
 				node.TextMarkInlineMemoContent = strings.ReplaceAll(node.TextMarkInlineMemoContent, "\"", "&quot;")
+				if strings.HasPrefix(node.TextMarkInlineMemoContent, "esc_newline_") {
+					node.TextMarkInlineMemoContent = "_" + node.TextMarkInlineMemoContent
+				}
+				if strings.HasSuffix(node.TextMarkInlineMemoContent, "_esc_newline") {
+					node.TextMarkInlineMemoContent = node.TextMarkInlineMemoContent + "_"
+				}
 			}
 		default:
 			if !isInlineMath { // 带有字体样式的公式复制之后内容不正确 https://github.com/siyuan-note/siyuan/issues/6799
