@@ -583,7 +583,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			firstc = n.FirstChild
 		}
 
-		if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom || atom.A == firstc.DataAtom || atom.P == firstc.DataAtom {
+		if html.TextNode == firstc.Type || atom.Span == firstc.DataAtom || atom.Code == firstc.DataAtom || atom.Section == firstc.DataAtom || atom.Pre == firstc.DataAtom || atom.A == firstc.DataAtom || atom.Strong == firstc.DataAtom || atom.B == firstc.DataAtom || atom.I == firstc.DataAtom || atom.P == firstc.DataAtom {
 			node.Type = ast.NodeCodeBlock
 			node.IsFencedCodeBlock = true
 			node.AppendChild(&ast.Node{Type: ast.NodeCodeBlockFenceOpenMarker, Tokens: util.StrToBytes("```"), CodeBlockFenceLen: 3})
