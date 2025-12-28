@@ -17,6 +17,9 @@ import (
 )
 
 var linkBaseTests = []parseTest{
+
+	{"5", "foo<a href=\"mailto:achuan-2@outlook.com\">achuan-2@outlook.com</a>bar\n", "<p>foo<a href=\"mailto:achuan-2@outlook.com\">achuan-2@outlook.com</a>bar</p>\n"},
+	{"4", "foo<span data-type=\"a\" data-href=\"mailto:d@b3log.org\">d@b3log.org</span>bar\n", "<p>foo<span data-type=\"a\" data-href=\"mailto:d@b3log.org\"><a href=\"mailto:d@b3log.org\">d@b3log.org</a></span>bar</p>\n"},
 	{"3", "[foo][^label]\n[^label]: bar\n", "<p><sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"http://domain.com/path/#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar <a href=\"#footnotes-ref-1\" class=\"vditor-footnotes__goto-ref\">↩</a></p>\n</li>\n</ol></div>"},
 	{"2", "![foo](D:\\bar.png)\n", "<p><img src=\"D:%5Cbar.png\" alt=\"foo\" /></p>\n"},
 	{"1", "![foo](bar.png)\n", "<p><img src=\"http://domain.com/path/bar.png\" alt=\"foo\" /></p>\n"},
@@ -26,7 +29,7 @@ var linkBaseTests = []parseTest{
 func TestLinkBase(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetSup(true)
-	luteEngine.RenderOptions.LinkBase = "http://domain.com/path/"
+	luteEngine.SetLinkBase("http://domain.com/path/")
 
 	for _, test := range linkBaseTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)

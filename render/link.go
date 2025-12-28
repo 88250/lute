@@ -76,5 +76,13 @@ func (r *BaseRenderer) isRelativePath(dest []byte) bool {
 	if '/' == dest[0] {
 		return false
 	}
+
+	// 检查特定协议前缀
+	lowerDest := strings.ToLower(string(dest))
+	if strings.HasPrefix(lowerDest, "mailto:") ||
+		strings.HasPrefix(lowerDest, "tel:") ||
+		strings.HasPrefix(lowerDest, "sms:") {
+		return false
+	}
 	return !bytes.Contains(dest, []byte(":/")) && !bytes.Contains(dest, []byte(":\\")) && !bytes.Contains(dest, []byte(":%5C"))
 }

@@ -50,6 +50,13 @@ func (t *Tree) parseGFMAutoLink(node *ast.Node) {
 var mailto = util.StrToBytes("mailto:")
 
 func (t *Tree) parseGFMAutoEmailLink0(node *ast.Node) {
+	if nil != node.Previous && ast.NodeInlineHTML == node.Previous.Type &&
+		nil != node.Next && ast.NodeInlineHTML == node.Next.Type &&
+		bytes.HasPrefix(node.Previous.Tokens, []byte("<a ")) &&
+		bytes.Equal(node.Next.Tokens, []byte("</a>")) {
+		return
+	}
+
 	tokens := node.Tokens
 	if 0 >= bytes.IndexByte(tokens, '@') {
 		return
