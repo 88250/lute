@@ -265,7 +265,14 @@ func (t *Tree) processSpanTag(tags []byte, startTag, endTag string, ctx *InlineC
 		typ = string(tags[startTagLen+1:])
 		typ = typ[:strings.Index(typ, "\"")]
 	}
+
 	ret = &ast.Node{Type: ast.NodeTextMark, TextMarkType: typ}
+
+	if nil != node.FirstChild && typ != node.FirstChild.Data && html.ElementNode == node.FirstChild.Type &&
+		util.ContainsStr(node.FirstChild.Data, []string{"sup", "sub", "em", "strong"}) {
+		ret.TextMarkType += " " + node.FirstChild.Data
+	}
+
 	SetTextMarkNode(ret, node, t.Context.ParseOption)
 	ctx.pos += end + closerLen
 	return

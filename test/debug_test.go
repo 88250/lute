@@ -18,6 +18,7 @@ import (
 
 var debugTests = []parseTest{
 
+	{"77", "*^foo^* ^*bar*^\n", "<p><em><sup>foo</sup></em> <sup><em>bar</em></sup></p>\n"},
 	{"76", ":\n0", "<p>:<br />\n0</p>\n"},
 	{"75", "[foo](bar.com(baz) \"bar.com(baz)\")", "<p><a href=\"bar.com(baz)\" title=\"bar.com(baz)\">foo</a></p>\n"},
 	{"74", "https://foo.com:443/bar/baz", "<p><a href=\"https://foo.com:443/bar/baz\">https://foo.com:443/bar/baz</a></p>\n"},
@@ -138,6 +139,7 @@ func TestDebug(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetCodeSyntaxHighlightDetectLang(true)
 	luteEngine.SetHeadingID(true)
+	luteEngine.SetSup(true)
 	for _, test := range debugTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
