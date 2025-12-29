@@ -18,6 +18,7 @@ import (
 
 var calloutTests = []parseTest{
 
+	{"10", "> [!NOTE] 🏞️ foo\n> bar", "<blockquote>\n<p>🏞️ foo\n</p>\n<p>bar</p>\n</blockquote>\n"},
 	{"9", "> [!IMPORTANT] :smile: foo**bar**baz\n> bar", "<blockquote>\n<p>😄 foo<strong>bar</strong>baz\n</p>\n<p>bar</p>\n</blockquote>\n"},
 	{"8", "> [!IMPORTANT] :smile: foo\n> bar", "<blockquote>\n<p>😄 foo\n</p>\n<p>bar</p>\n</blockquote>\n"},
 	{"7", "> [!IMPORTANT] ❗ foo\n> bar", "<blockquote>\n<p>❗ foo\n</p>\n<p>bar</p>\n</blockquote>\n"},
