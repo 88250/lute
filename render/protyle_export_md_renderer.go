@@ -2018,8 +2018,13 @@ func (r *ProtyleExportMdRenderer) renderListItem(node *ast.Node, entering bool) 
 		writer := r.NodeWriterStack[len(r.NodeWriterStack)-1]
 		r.NodeWriterStack = r.NodeWriterStack[:len(r.NodeWriterStack)-1]
 		indent := len(node.ListData.Marker) + 1
-		if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
+		if 1 == node.ListData.Typ && 3 > indent {
 			indent++
+		}
+		if 3 == node.ListData.Typ {
+			if 0 == node.ListData.BulletChar || (('*' == node.ListData.BulletChar || '-' == node.ListData.BulletChar) && nil != node.FirstChild.Next && ast.NodeCallout == node.FirstChild.Next.Type) {
+				indent += 4
+			}
 		}
 		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
 		indentedLines := bytes.Buffer{}

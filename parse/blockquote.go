@@ -11,6 +11,9 @@
 package parse
 
 import (
+	"bytes"
+	"strings"
+
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 )
@@ -53,4 +56,41 @@ func BlockquoteContinue(blockquote *ast.Node, context *Context) int {
 		return 0
 	}
 	return 1
+}
+
+func (context *Context) blockquoteFinalize(blockquote *ast.Node) {
+	if !context.ParseOption.Callout {
+		return
+	}
+
+	if nil == blockquote.FirstChild || nil == blockquote.FirstChild.Next {
+		return
+	}
+
+	if ast.NodeParagraph != blockquote.FirstChild.Next.Type {
+		return
+	}
+
+	firstTwoLines := bytes.SplitN(blockquote.FirstChild.Next.Tokens, []byte("\n"), 3)
+	if 2 > len(firstTwoLines) {
+		return
+	}
+
+	line1 := string(firstTwoLines[0])
+	if !strings.HasPrefix(line1, "[!") {
+		return
+	}
+
+	idx := strings.Index(line1, "]")
+	if 0 > idx {
+		return
+	}
+
+	if "" == string(firstTwoLines[1]) {
+		return
+	}
+
+	blockquote.Type = ast.NodeCallout
+	blockquote.FirstChild.Unlink()
+	context.calloutFinalize(blockquote)
 }

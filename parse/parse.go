@@ -285,6 +285,8 @@ func (context *Context) finalize(block *ast.Node) {
 		context.customBlockFinalize(block)
 	case ast.NodeCallout:
 		context.calloutFinalize(block)
+	case ast.NodeBlockquote:
+		context.blockquoteFinalize(block)
 	}
 
 	context.Tip = parent

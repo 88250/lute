@@ -1746,9 +1746,12 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 		if 1 == node.ListData.Typ && 3 > indent {
 			indent++
 		}
-		if 3 == node.ListData.Typ && 0 == node.ListData.BulletChar {
-			indent++
+		if 3 == node.ListData.Typ {
+			if 0 == node.ListData.BulletChar || (('*' == node.ListData.BulletChar || '-' == node.ListData.BulletChar) && nil != node.FirstChild.Next && ast.NodeCallout == node.FirstChild.Next.Type) {
+				indent += 4
+			}
 		}
+
 		indentSpaces := bytes.Repeat([]byte{lex.ItemSpace}, indent)
 		indentedLines := bytes.Buffer{}
 		buf := writer.Bytes()
