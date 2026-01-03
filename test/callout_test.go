@@ -18,6 +18,7 @@ import (
 
 var calloutTests = []parseTest{
 
+	{"12", "> [!NOTE] 🖥️ Note\n> foo", "<blockquote>\n<p>🖥️ Note\n</p>\n<p>foo</p>\n</blockquote>\n"},
 	{"12", "- [ ] > [!NOTE]\n      > foo", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> \n<blockquote>\n<p>✏️ Note\n</p>\n<p>foo</p>\n</blockquote>\n</li>\n</ul>\n"},
 	{"11", "- > [!NOTE]\n  > foo\n", "<ul>\n<li>\n<blockquote>\n<p>✏️ Note\n</p>\n<p>foo</p>\n</blockquote>\n</li>\n</ul>\n"},
 	{"10", "> [!NOTE] 🏞️ foo\n> bar", "<blockquote>\n<p>🏞️ foo\n</p>\n<p>bar</p>\n</blockquote>\n"},
