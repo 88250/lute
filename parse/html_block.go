@@ -95,7 +95,7 @@ func HtmlBlockStart(t *Tree, container *ast.Node) int {
 }
 
 func HtmlBlockContinue(html *ast.Node, context *Context) int {
-	tokens := context.currentLine
+	tokens := context.currentLine[context.offset:]
 	if context.ParseOption.KramdownBlockIAL && simpleCheckIsBlockIAL(tokens) {
 		// 判断 IAL 打断
 		if context.Tip.ParentIs(ast.NodeListItem) {
