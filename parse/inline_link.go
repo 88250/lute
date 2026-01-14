@@ -146,7 +146,7 @@ func (context *Context) parseInlineLinkDest(tokens []byte) (passed, remains, des
 		}
 	}
 
-	if (context.ParseOption.ProtyleWYSIWYG || !context.ParseOption.DataImage) && bytes.HasPrefix(bytes.ToLower(destination), []byte("data:image")) {
+	if !context.ParseOption.DataImage && bytes.HasPrefix(bytes.ToLower(destination), []byte("data:image")) {
 		return nil, nil, nil
 	}
 
