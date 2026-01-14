@@ -72,24 +72,28 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		}
 	} else if valid, remains, comment := t.parseHTMLComment(tokens[ctx.pos+1:]); valid {
 		tags = append(tags, comment...)
+		tags = t.replaceCreateTokens(tags, caretInTag, caretLeftSpace)
 		tokens = remains
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 		return
 	} else if valid, remains, ins := t.parseProcessingInstruction(tokens[ctx.pos+1:]); valid {
 		tags = append(tags, ins...)
+		tags = t.replaceCreateTokens(tags, caretInTag, caretLeftSpace)
 		tokens = remains
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 		return
 	} else if valid, remains, decl := t.parseDeclaration(tokens[ctx.pos+1:]); valid {
 		tags = append(tags, decl...)
+		tags = t.replaceCreateTokens(tags, caretInTag, caretLeftSpace)
 		tokens = remains
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
 		return
 	} else if valid, remains, cdata := t.parseCDATA(tokens[ctx.pos+1:]); valid {
 		tags = append(tags, cdata...)
+		tags = t.replaceCreateTokens(tags, caretInTag, caretLeftSpace)
 		tokens = remains
 		ctx.pos += len(tags)
 		ret = &ast.Node{Type: ast.NodeInlineHTML, Tokens: tags}
@@ -113,12 +117,7 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 		if lex.ItemSlash == tokens[0] {
 			tags = append(tags, tokens[1])
 		}
-		if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && caretInTag || t.Context.ParseOption.ProtyleWYSIWYG {
-			if !bytes.Contains(tags, []byte(editor.CaretReplacement+" ")) && !caretLeftSpace {
-				tags = bytes.ReplaceAll(tags, []byte("\" "+editor.CaretReplacement), []byte("\""+editor.CaretReplacement))
-			}
-			tags = bytes.ReplaceAll(tags, []byte(editor.CaretReplacement), editor.CaretTokens)
-		}
+		tags = t.replaceCreateTokens(tags, caretInTag, caretLeftSpace)
 		ctx.pos += len(tags)
 
 		if t.Context.ParseOption.ProtyleWYSIWYG {
@@ -219,6 +218,16 @@ func (t *Tree) parseInlineHTML(ctx *InlineContext) (ret *ast.Node) {
 
 	ctx.pos = startPos + 1
 	return
+}
+
+func (t *Tree) replaceCreateTokens(tokens []byte, caretInTag, caretLeftSpace bool) []byte {
+	if (t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) && caretInTag || t.Context.ParseOption.ProtyleWYSIWYG {
+		if !bytes.Contains(tokens, []byte(editor.CaretReplacement+" ")) && !caretLeftSpace {
+			tokens = bytes.ReplaceAll(tokens, []byte("\" "+editor.CaretReplacement), []byte("\""+editor.CaretReplacement))
+		}
+		tokens = bytes.ReplaceAll(tokens, []byte(editor.CaretReplacement), editor.CaretTokens)
+	}
+	return tokens
 }
 
 func (t *Tree) processSpanTag(tags []byte, startTag, endTag string, ctx *InlineContext) (ret *ast.Node) {
