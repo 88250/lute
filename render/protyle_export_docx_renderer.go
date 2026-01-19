@@ -829,7 +829,11 @@ func (r *ProtyleExportDocxRenderer) renderCodeBlock(node *ast.Node, entering boo
 			return ast.WalkSkipChildren
 		}
 
-		attrs := [][]string{{"class", "code-block"}, {"data-language", language}}
+		class := "code-block"
+		if "" != language {
+			class += " " + language
+		}
+		attrs := [][]string{{"class", class}, {"data-language", language}}
 		r.Tag("pre", attrs, false)
 		r.WriteString("<code class=\"hljs\">")
 	} else {
