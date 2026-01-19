@@ -240,6 +240,12 @@ func (r *ProtyleExportDocxRenderer) renderTextMark(node *ast.Node, entering bool
 }
 
 func (r *ProtyleExportDocxRenderer) renderHTMLTag0(node *ast.Node, currentTextMarkType string, entering bool) {
+	attrs := [][]string{}
+	style := node.IALAttr("style")
+	if "" != style {
+		attrs = append(attrs, []string{"style", style})
+	}
+
 	switch currentTextMarkType {
 	case "a":
 		if entering {
@@ -285,7 +291,7 @@ func (r *ProtyleExportDocxRenderer) renderHTMLTag0(node *ast.Node, currentTextMa
 		}
 	case "strong":
 		if entering {
-			r.WriteString("<strong>")
+			r.Tag("strong", attrs, false)
 		} else {
 			r.WriteString("</strong>")
 		}
@@ -342,6 +348,12 @@ func (r *ProtyleExportDocxRenderer) renderHTMLTag0(node *ast.Node, currentTextMa
 			r.WriteString("<kbd>")
 		} else {
 			r.WriteString("</kbd>")
+		}
+	case "text":
+		if entering {
+			r.Tag("span", attrs, false)
+		} else {
+			r.WriteString("</span>")
 		}
 	}
 	return
@@ -1150,6 +1162,7 @@ func (r *ProtyleExportDocxRenderer) renderImage(node *ast.Node, entering bool) a
 			r.Write(titleTokens)
 			r.WriteString("</figcaption>")
 		}
+		r.WriteString("</figure>")
 
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
