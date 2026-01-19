@@ -1110,11 +1110,11 @@ func (r *ProtyleExportDocxRenderer) renderBang(node *ast.Node, entering bool) as
 func (r *ProtyleExportDocxRenderer) renderImage(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		if 0 == r.DisableTags {
+			r.WriteString("<figure>")
 			attrs := [][]string{{"class", "img"}}
 			if style := node.IALAttr("parent-style"); "" != style {
 				attrs = append(attrs, []string{"style", style})
 			}
-			r.Tag("span", attrs, false)
 			r.WriteString("<img src=\"")
 			destTokens := node.ChildByType(ast.NodeLinkDest).Tokens
 			destTokens = r.LinkPath(destTokens)
@@ -1146,11 +1146,10 @@ func (r *ProtyleExportDocxRenderer) renderImage(node *ast.Node, entering bool) a
 		}
 		r.WriteString(" />")
 		if 0 < len(titleTokens) {
-			r.Tag("span", [][]string{{"class", "protyle-action__title"}}, false)
+			r.WriteString("<figcaption>")
 			r.Write(titleTokens)
-			r.Tag("/span", nil, false)
+			r.WriteString("</figcaption>")
 		}
-		r.Tag("/span", nil, false)
 
 		buf := r.Writer.Bytes()
 		idx := bytes.LastIndex(buf, []byte("<img src="))
