@@ -549,6 +549,12 @@ func (lute *Lute) searchEmptyNodes(n *html.Node, emptyNodes *[]*html.Node) {
 	case 0:
 		if lute.isInline(n.PrevSibling) || lute.isInline(n.NextSibling) || lute.isInline(n.Parent) {
 			// 前节点或者后节点是行级节点的话保留该空白
+			if html.TextNode == n.Type && nil != n.PrevSibling && atom.Strong == n.PrevSibling.DataAtom {
+				// 前节点是加粗节点的话去掉 ZWSP https://github.com/siyuan-note/siyuan/issues/16896
+				data := strings.TrimPrefix(n.Data, editor.Zwsp)
+				data = strings.TrimSuffix(data, editor.Zwsp)
+				n.Data = data
+			}
 			break
 		}
 
