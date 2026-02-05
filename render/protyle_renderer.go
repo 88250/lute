@@ -1979,6 +1979,11 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 			if node.ParentIs(ast.NodeTableCell) {
 				href = strings.ReplaceAll(href, "\\|", "|")
 			}
+
+			if r.Options.Sanitize {
+				href = SanitizeSrc(href)
+			}
+
 			// 超链接元素地址中存在 `"` 字符时粘贴无法正常解析 https://github.com/siyuan-note/siyuan/issues/11385
 			href = strings.ReplaceAll(href, "\"", "&amp;quot;")
 

@@ -38,6 +38,15 @@ var setOfElementsToSkipContent = map[string]interface{}{
 	"title":    nil,
 }
 
+func SanitizeSrc(src string) string {
+	img := strings.ReplaceAll(src, "\"", "__@QUOTE@__")
+	img = "<img src=\"" + img + "\"></img>"
+	img = string(sanitize([]byte(img)))
+	img = string(util.TagSrcStr((img)))
+	img = strings.ReplaceAll(img, "__@QUOTE@__", "\"")
+	return img
+}
+
 func Sanitize(str string) string {
 	return string(sanitize([]byte(str)))
 }
