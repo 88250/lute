@@ -324,7 +324,7 @@ func main() {
 一些细节：
 
 1. lute.js 没有内置语法高亮特性
-2. lute.js 编译后大小为 ~3.5MB，GZip 压缩后大小 ~500KB
+2. lute.js 编译后大小为 ~5MB，GZip 压缩后大小 ~500KB
 
 ## 📜 文档
 
