@@ -361,7 +361,12 @@ func (r *ProtylePreviewRenderer) renderAudio(node *ast.Node, entering bool) ast.
 
 func (r *ProtylePreviewRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("div", [][]string{{"class", "iframe"}}, false)
+		attrs := [][]string{{"class", "iframe"}}
+		style := node.IALAttr("style")
+		if "" != style {
+			attrs = append(attrs, []string{"style", style})
+		}
+		r.Tag("div", attrs, false)
 		tokens := node.Tokens
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
