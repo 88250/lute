@@ -1975,6 +1975,11 @@ func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string)
 			}
 		} else if "a" == typ {
 			href := node.TextMarkAHref
+			if r.Options.Sanitize {
+				if strings.HasPrefix(strings.ToLower(href), "javascript:") {
+					href = ""
+				}
+			}
 			href = string(r.LinkPath([]byte(href)))
 			if node.ParentIs(ast.NodeTableCell) {
 				href = strings.ReplaceAll(href, "\\|", "|")
