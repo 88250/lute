@@ -1008,6 +1008,18 @@ func (r *ProtyleExportDocxRenderer) renderTableHead(node *ast.Node, entering boo
 
 func (r *ProtyleExportDocxRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if r.IsMergedCellTable(node) {
+			// 对于合并单元格的表格直接渲染为 HTML 表格
+			subTree := &parse.Tree{}
+			subTree.Root = node
+			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
+			output := previewRenderer.Render()
+			r.Write(output)
+			return ast.WalkSkipChildren
+		}
+	}
+
+	if entering {
 		r.Tag("table", node.KramdownIAL, false)
 		r.Newline()
 	} else {

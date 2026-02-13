@@ -19,6 +19,17 @@ import (
 	"github.com/88250/lute/html/atom"
 )
 
+func TagAttrVal(tagStr, attr string) string {
+	srcIndex := strings.Index(tagStr, attr+"=\"")
+	if 0 > srcIndex {
+		return ""
+	}
+
+	src := tagStr[srcIndex+len(attr+"=\""):]
+	src = src[:strings.Index(src, "\"")]
+	return src
+}
+
 func ParseHTML(htmlStr string) *html.Node {
 	reader := strings.NewReader(htmlStr)
 	doc, err := html.Parse(reader)

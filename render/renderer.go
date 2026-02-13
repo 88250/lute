@@ -779,6 +779,25 @@ func (r *BaseRenderer) ParagraphContainImgOnly(paragraph *ast.Node) (ret bool) {
 	return
 }
 
+func (r *BaseRenderer) IsMergedCellTable(table *ast.Node) (ret bool) {
+	ast.Walk(table, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering {
+			return ast.WalkContinue
+		}
+
+		if ast.NodeTableCell == n.Type {
+			for _, kv := range n.KramdownIAL {
+				if "colspan" == kv[0] || "rowspan" == kv[0] {
+					ret = true
+					return ast.WalkStop
+				}
+			}
+		}
+		return ast.WalkContinue
+	})
+	return
+}
+
 func RenderHeadingText(n *ast.Node) (ret string) {
 	buf := &bytes.Buffer{}
 	ast.Walk(n, func(n *ast.Node, entering bool) ast.WalkStatus {

@@ -1387,7 +1387,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				return
 			}
 
-			parentInline := nil != n.Parent && (lute.parentIs(n, atom.Strong, atom.Em, atom.I, atom.B, atom.Span, atom.P, atom.Td, atom.Th) || strings.Contains(util.DomAttrValue(n.Parent, "class"), "inline"))
+			parentInline := nil != n.Parent && (lute.parentIs(n, atom.Strong, atom.Em, atom.I, atom.B, atom.Span, atom.Td, atom.Th) || strings.Contains(util.DomAttrValue(n.Parent, "class"), "inline"))
 			if parentInline && atom.Span == n.DataAtom && nil == n.PrevSibling && (nil == n.NextSibling || (html.TextNode == n.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.NextSibling)))) &&
 				nil == n.Parent.PrevSibling && (nil == n.Parent.NextSibling || (html.TextNode == n.Parent.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.Parent.NextSibling)))) {
 				appendMathBlock(tree, tex)
@@ -1397,6 +1397,14 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			if !parentInline && nil == n.PrevSibling && (nil == n.NextSibling || (html.TextNode == n.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.NextSibling)))) {
 				appendMathBlock(tree, tex)
 				return
+			}
+
+			if !parentInline {
+				parentBlock := nil != n.Parent && (lute.parentIs(n, atom.Div, atom.Section, atom.P) || strings.Contains(util.DomAttrValue(n.Parent, "class"), "block"))
+				if parentBlock && atom.Span == n.DataAtom && nil == n.PrevSibling && (nil == n.NextSibling || (html.TextNode == n.NextSibling.Type && "" == strings.TrimSpace(util.DomText(n.NextSibling)))) {
+					appendMathBlock(tree, tex)
+					return
+				}
 			}
 
 			if atom.Span == n.DataAtom && "katex-display" == util.DomAttrValue(n, "class") ||

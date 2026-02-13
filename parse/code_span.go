@@ -149,6 +149,8 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 					content.WriteByte(lex.ItemBacktick)
 					content.Write(n.Tokens)
 					content.WriteByte(lex.ItemBacktick)
+				} else if ast.NodeEmojiAlias == n.Type {
+					content.Write(n.Tokens)
 				}
 				return ast.WalkContinue
 			})

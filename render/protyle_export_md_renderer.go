@@ -1203,6 +1203,16 @@ func (r *ProtyleExportMdRenderer) renderTableHead(node *ast.Node, entering bool)
 
 func (r *ProtyleExportMdRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if r.IsMergedCellTable(node) {
+			// 对于合并单元格的表格直接渲染为 HTML 表格
+			subTree := &parse.Tree{}
+			subTree.Root = node
+			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
+			output := previewRenderer.Render()
+			r.Write(output)
+			return ast.WalkSkipChildren
+		}
+
 		// 遍历单元格算出最大宽度
 
 		var cells [][]*ast.Node

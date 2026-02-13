@@ -346,6 +346,9 @@ func (lute *Lute) adjustMath(n *html.Node) {
 
 	formula := util.DomAttrValue(n, "data-formula")
 	if "" != formula {
+		if nil != n.NextSibling && atom.Script == n.NextSibling.DataAtom && strings.Contains(util.DomAttrValue(n.NextSibling, "type"), "math/tex") {
+			n.NextSibling.Unlink()
+		}
 		if html.ElementNode == n.Type && "mjx-container" == n.Data {
 			n.DataAtom = atom.Span
 		}

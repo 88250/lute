@@ -870,6 +870,17 @@ func (r *ProtylePreviewRenderer) renderMathBlock(node *ast.Node, entering bool) 
 }
 
 func (r *ProtylePreviewRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
+	fnNone := false
+	for _, kv := range node.KramdownIAL {
+		if "class" == kv[0] && strings.Contains(kv[1], "fn__none") {
+			fnNone = true
+			break
+		}
+	}
+	if fnNone {
+		return ast.WalkContinue
+	}
+
 	tag := "td"
 	if ast.NodeTableHead == node.Parent.Parent.Type {
 		tag = "th"
@@ -884,6 +895,7 @@ func (r *ProtylePreviewRenderer) renderTableCell(node *ast.Node, entering bool) 
 		case 3:
 			attrs = append(attrs, []string{"align", "right"})
 		}
+		r.spanNodeAttrs(node, &attrs)
 		r.Tag(tag, attrs, false)
 	} else {
 		r.Tag("/"+tag, nil, false)
@@ -905,15 +917,35 @@ func (r *ProtylePreviewRenderer) renderTableRow(node *ast.Node, entering bool) a
 
 func (r *ProtylePreviewRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.Tag("colgroup", nil, false)
+		if colgroup := node.Parent.IALAttr("colgroup"); "" == colgroup {
+			if nil != node.FirstChild {
+				for th := node.FirstChild.FirstChild; nil != th; th = th.Next {
+					if ast.NodeTableCell == th.Type {
+						if style := th.IALAttr("style"); "" != style {
+							r.Tag("col", [][]string{{"style", style}}, true)
+						} else {
+							r.Tag("col", nil, true)
+						}
+					}
+				}
+			}
+		} else {
+			cols := strings.Split(colgroup, "|")
+			for _, style := range cols {
+				if "" != style {
+					r.Tag("col", [][]string{{"style", style}}, true)
+				} else {
+					r.Tag("col", nil, true)
+				}
+			}
+		}
+		r.Tag("/colgroup", nil, false)
+
 		r.Tag("thead", nil, false)
-		r.Newline()
 	} else {
 		r.Tag("/thead", nil, false)
-		r.Newline()
-		if nil != node.Next {
-			r.Tag("tbody", nil, false)
-		}
-		r.Newline()
+		r.Tag("tbody", nil, false)
 	}
 	return ast.WalkContinue
 }
