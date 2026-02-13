@@ -787,7 +787,7 @@ func (r *BaseRenderer) IsMergedCellTable(table *ast.Node) (ret bool) {
 
 		if ast.NodeTableCell == n.Type {
 			for _, kv := range n.KramdownIAL {
-				if "colspan" == kv[0] || "rowspan" == kv[0] {
+				if ("colspan" == kv[0] || "rowspan" == kv[0]) && "1" != kv[1] {
 					ret = true
 					return ast.WalkStop
 				}
