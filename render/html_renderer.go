@@ -897,6 +897,16 @@ func (r *HtmlRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *HtmlRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if r.IsMergedCellTable(node) {
+			// 对于合并单元格的表格直接渲染为 HTML 表格
+			subTree := &parse.Tree{}
+			subTree.Root = node
+			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
+			output := previewRenderer.Render()
+			r.Write(output)
+			return ast.WalkSkipChildren
+		}
+
 		r.handleKramdownBlockIAL(node)
 		r.Tag("table", node.KramdownIAL, false)
 		r.Newline()
