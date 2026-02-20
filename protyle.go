@@ -2145,6 +2145,12 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	node.SetIALAttr("id", node.ID)
 
+	if caption := util.DomAttrValue(n, "caption"); "" != caption {
+		caption = html.UnescapeHTMLStr(caption)
+		node.SetIALAttr("caption", caption)
+		ialTokens = append(ialTokens, []byte(" caption=\""+caption+"\"")...)
+	}
+
 	if icon := util.DomAttrValue(n, "icon"); "" != icon {
 		node.SetIALAttr("icon", icon)
 		ialTokens = append(ialTokens, []byte(" icon=\""+icon+"\"")...)
