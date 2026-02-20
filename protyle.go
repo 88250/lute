@@ -993,7 +993,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		caption := util.DomAttrValue(n, "caption")
 		table = lute.domChild(tableDiv, atom.Table)
 		if "" != caption && nil != table && atom.Caption == table.FirstChild.DataAtom {
-			node.SetIALAttr("caption", html.EscapeHTMLStr(caption))
+			node.SetIALAttr("caption", caption)
 			table.FirstChild.Unlink()
 		}
 		node.Tokens = nil
