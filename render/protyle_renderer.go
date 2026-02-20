@@ -1203,6 +1203,10 @@ func (r *ProtyleRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSta
 		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
 		r.Tag("table", attrs, false)
+		caption := node.IALAttr("caption")
+		if "" != caption {
+			r.WriteString(html.UnescapeHTMLStr(caption))
+		}
 	} else {
 		r.Tag("/tbody", nil, false)
 		r.Tag("/table", nil, false)

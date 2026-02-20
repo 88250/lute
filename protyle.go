@@ -990,6 +990,12 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 		node.TableAligns = tableAligns
+		caption := util.DomAttrValue(n, "caption")
+		table = lute.domChild(tableDiv, atom.Table)
+		if "" != caption && nil != table && atom.Caption == table.FirstChild.DataAtom {
+			node.SetIALAttr("caption", html.EscapeHTMLStr(caption))
+			table.FirstChild.Unlink()
+		}
 		node.Tokens = nil
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
@@ -2146,7 +2152,6 @@ func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	node.SetIALAttr("id", node.ID)
 
 	if caption := util.DomAttrValue(n, "caption"); "" != caption {
-		caption = html.UnescapeHTMLStr(caption)
 		node.SetIALAttr("caption", caption)
 		ialTokens = append(ialTokens, []byte(" caption=\""+caption+"\"")...)
 	}
