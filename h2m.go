@@ -66,6 +66,7 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 	}
 
 	// 调整树结构
+	var previousLis, unlinks []*ast.Node
 	ast.Walk(ret.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering {
 			if ast.NodeList == n.Type {
@@ -73,14 +74,18 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 				if nil != n.Parent && ast.NodeList == n.Parent.Type {
 					previousLi := n.Previous
 					if nil != previousLi {
-						n.Unlink()
-						previousLi.AppendChild(n)
+						previousLis = append(previousLis, previousLi)
+						unlinks = append(unlinks, n)
 					}
 				}
 			}
 		}
 		return ast.WalkContinue
 	})
+	for i, unlink := range unlinks {
+		unlink.Unlink()
+		previousLis[i].AppendChild(unlink)
+	}
 	return ret
 }
 
