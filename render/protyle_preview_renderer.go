@@ -957,10 +957,16 @@ func (r *ProtylePreviewRenderer) renderTableHead(node *ast.Node, entering bool) 
 
 func (r *ProtylePreviewRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("table", node.KramdownIAL, false)
+		ials := parse.IAL2Map(node.KramdownIAL)
+		delete(ials, "id")
+		delete(ials, "caption")
+		delete(ials, "updated")
+		delete(ials, "colgroup")
+		r.Tag("table", parse.Map2IAL(ials), false)
 		r.Newline()
 		caption := node.IALAttr("caption")
 		if "" != caption {
+			caption = strings.ReplaceAll(caption, "contenteditable=\"false\" ", "")
 			r.WriteString(html.UnescapeHTMLStr(caption))
 		}
 		r.Newline()
