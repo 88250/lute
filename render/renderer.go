@@ -779,13 +779,18 @@ func (r *BaseRenderer) ParagraphContainImgOnly(paragraph *ast.Node) (ret bool) {
 	return
 }
 
-func (r *BaseRenderer) IsMergedCellTable(table *ast.Node) (ret bool) {
+func (r *BaseRenderer) needUseHTMLTable(table *ast.Node) (ret bool) {
 	ast.Walk(table, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if !entering {
 			return ast.WalkContinue
 		}
 
-		if ast.NodeTableCell == n.Type {
+		if ast.NodeTable == n.Type {
+			if "" != n.IALAttr("caption") {
+				ret = true
+				return ast.WalkStop
+			}
+		} else if ast.NodeTableCell == n.Type {
 			for _, kv := range n.KramdownIAL {
 				if ("colspan" == kv[0] || "rowspan" == kv[0]) && "1" != kv[1] {
 					ret = true

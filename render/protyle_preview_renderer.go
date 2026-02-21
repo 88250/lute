@@ -959,6 +959,11 @@ func (r *ProtylePreviewRenderer) renderTable(node *ast.Node, entering bool) ast.
 	if entering {
 		r.Tag("table", node.KramdownIAL, false)
 		r.Newline()
+		caption := node.IALAttr("caption")
+		if "" != caption {
+			r.WriteString(html.UnescapeHTMLStr(caption))
+		}
+		r.Newline()
 	} else {
 		if nil != node.FirstChild.Next {
 			r.Tag("/tbody", nil, false)

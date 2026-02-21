@@ -1203,7 +1203,7 @@ func (r *ProtyleExportMdRenderer) renderTableHead(node *ast.Node, entering bool)
 
 func (r *ProtyleExportMdRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if r.IsMergedCellTable(node) {
+		if r.needUseHTMLTable(node) {
 			// 对于合并单元格的表格直接渲染为 HTML 表格
 			subTree := &parse.Tree{}
 			subTree.Root = node
