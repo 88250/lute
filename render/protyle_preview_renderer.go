@@ -966,8 +966,9 @@ func (r *ProtylePreviewRenderer) renderTable(node *ast.Node, entering bool) ast.
 		r.Newline()
 		caption := node.IALAttr("caption")
 		if "" != caption {
+			caption = html.UnescapeHTMLStr(caption)
 			caption = strings.ReplaceAll(caption, "contenteditable=\"false\" ", "")
-			r.WriteString(html.UnescapeHTMLStr(caption))
+			r.WriteString(caption)
 		}
 		r.Newline()
 	} else {
