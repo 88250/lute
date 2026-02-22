@@ -1182,6 +1182,16 @@ func (r *ProtyleExportRenderer) renderTable(node *ast.Node, entering bool) ast.W
 	}
 
 	if entering {
+		if r.needUseHTMLTable(node) {
+			// 对于合并单元格的表格直接渲染为 HTML 表格
+			subTree := &parse.Tree{}
+			subTree.Root = node
+			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
+			output := previewRenderer.Render()
+			r.Write(output)
+			return ast.WalkSkipChildren
+		}
+
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
