@@ -1202,8 +1202,8 @@ func (r *ProtyleExportMdRenderer) renderTableHead(node *ast.Node, entering bool)
 }
 
 func (r *ProtyleExportMdRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
-	if entering {
-		if r.needUseHTMLTable(node) {
+	if r.needUseHTMLTable(node) {
+		if entering {
 			// 对于合并单元格的表格直接渲染为 HTML 表格
 			subTree := &parse.Tree{}
 			subTree.Root = node
@@ -1212,7 +1212,10 @@ func (r *ProtyleExportMdRenderer) renderTable(node *ast.Node, entering bool) ast
 			r.Write(output)
 			return ast.WalkSkipChildren
 		}
+		return ast.WalkContinue
+	}
 
+	if entering {
 		// 遍历单元格算出最大宽度
 
 		var cells [][]*ast.Node

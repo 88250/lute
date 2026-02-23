@@ -1181,8 +1181,8 @@ func (r *ProtyleExportRenderer) renderTable(node *ast.Node, entering bool) ast.W
 		return ast.WalkSkipChildren
 	}
 
-	if entering {
-		if r.needUseHTMLTable(node) {
+	if r.needUseHTMLTable(node) {
+		if entering {
 			// 对于合并单元格的表格直接渲染为 HTML 表格
 			subTree := &parse.Tree{}
 			subTree.Root = node
@@ -1191,7 +1191,10 @@ func (r *ProtyleExportRenderer) renderTable(node *ast.Node, entering bool) ast.W
 			r.Write(output)
 			return ast.WalkSkipChildren
 		}
+		return ast.WalkContinue
+	}
 
+	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")
 		r.Tag("div", attrs, false)
