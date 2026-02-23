@@ -1009,7 +1009,6 @@ func (r *ProtyleExportDocxRenderer) renderTableHead(node *ast.Node, entering boo
 func (r *ProtyleExportDocxRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if r.needUseHTMLTable(node) {
 		if entering {
-			// 对于合并单元格的表格直接渲染为 HTML 表格
 			subTree := &parse.Tree{}
 			subTree.Root = node
 			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)

@@ -1181,19 +1181,7 @@ func (r *ProtyleExportRenderer) renderTable(node *ast.Node, entering bool) ast.W
 		return ast.WalkSkipChildren
 	}
 
-	if r.needUseHTMLTable(node) {
-		if entering {
-			// 对于合并单元格的表格直接渲染为 HTML 表格
-			subTree := &parse.Tree{}
-			subTree.Root = node
-			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
-			output := previewRenderer.Render()
-			r.Write(output)
-			return ast.WalkSkipChildren
-		}
-		return ast.WalkContinue
-	}
-
+	isHtmlTable := r.needUseHTMLTable(node)
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "table")
@@ -1203,10 +1191,23 @@ func (r *ProtyleExportRenderer) renderTable(node *ast.Node, entering bool) ast.W
 		attrs = [][]string{}
 		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
+
+		if isHtmlTable {
+			subTree := &parse.Tree{}
+			subTree.Root = node
+			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
+			output := previewRenderer.Render()
+			r.Write(output)
+			return ast.WalkSkipChildren
+		}
+
 		r.Tag("table", attrs, false)
 	} else {
-		r.Tag("/tbody", nil, false)
-		r.Tag("/table", nil, false)
+		if !isHtmlTable {
+			r.Tag("/tbody", nil, false)
+			r.Tag("/table", nil, false)
+		}
+
 		r.WriteString("<div class=\"protyle-action__table\"><div class=\"table__resize\"></div><div class=\"table__select\"></div></div>")
 		r.Tag("/div", nil, false)
 		r.renderIAL(node)
