@@ -1442,9 +1442,12 @@ func (r *ProtyleExportDocxRenderer) renderHeadingID(node *ast.Node, entering boo
 
 func (r *ProtyleExportDocxRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	tag := "ul"
-	if 1 == node.ListData.Typ || (3 == node.ListData.Typ && 0 == node.ListData.BulletChar) {
+	if 1 == node.ListData.Typ {
 		tag = "ol"
+	} else if 3 == node.ListData.Typ {
+		tag = "ul"
 	}
+
 	if entering {
 		r.Newline()
 		var attrs [][]string
@@ -1467,18 +1470,6 @@ func (r *ProtyleExportDocxRenderer) renderListItem(node *ast.Node, entering bool
 	if entering {
 		var attrs [][]string
 		attrs = append(attrs, node.KramdownIAL...)
-		if 3 == node.ListData.Typ && nil != node.FirstChild && ((ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
-			(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
-			taskListItemMarker := node.FirstChild.FirstChild
-			if nil == taskListItemMarker {
-				taskListItemMarker = node.FirstChild
-			}
-			taskClass := "protyle-task"
-			if taskListItemMarker.TaskListItemChecked {
-				taskClass += " protyle-task--done"
-			}
-			attrs = append(attrs, []string{"class", taskClass})
-		}
 		r.Tag("li", attrs, false)
 	} else {
 		r.Tag("/li", nil, false)
@@ -1489,12 +1480,11 @@ func (r *ProtyleExportDocxRenderer) renderListItem(node *ast.Node, entering bool
 
 func (r *ProtyleExportDocxRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		var attrs [][]string
 		if node.TaskListItemChecked {
-			attrs = append(attrs, []string{"checked", ""})
+			node.Next.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("☑ ")})
+		} else {
+			node.Next.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte("☐ ")})
 		}
-		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
-		r.Tag("input", attrs, true)
 	}
 	return ast.WalkContinue
 }
