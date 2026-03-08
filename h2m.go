@@ -1173,7 +1173,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 				var count int
 				for td := tr.FirstChild; nil != td; td = td.NextSibling {
-					if atom.Th == td.DataAtom {
+					if atom.Th == td.DataAtom || atom.Td == td.DataAtom {
 						count++
 					}
 				}
@@ -1387,7 +1387,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		// The browser extension supports Zhihu formula https://github.com/siyuan-note/siyuan/issues/5599
 		if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex {
-			if nil != n.Parent && strings.Contains(util.DomAttrValue(n.Parent, "class"), "math-inline") {
+			if (strings.Contains(util.DomAttrValue(n, "class"), "math-inline") && ((nil != n.PrevSibling || nil != n.NextSibling) || lute.parentIs(n, atom.Table))) ||
+				(nil != n.Parent && strings.Contains(util.DomAttrValue(n.Parent, "class"), "math-inline")) {
 				appendInlineMath(tree, tex)
 				return
 			}
