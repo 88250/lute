@@ -571,6 +571,8 @@ func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
 		switch n.Type {
 		case ast.NodeHeading:
 			n.Type = ast.NodeParagraph
+			appends = append(appends, n)
+			unlinks = append(unlinks, n)
 		case ast.NodeBlockquote:
 			for c := n.FirstChild; nil != c; c = c.Next {
 				if ast.NodeBlockquoteMarker == c.Type {
