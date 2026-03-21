@@ -592,6 +592,9 @@ func (lute *Lute) Blocks2Ps(ivHTML string) (ovHTML string) {
 				unlinks = append(unlinks, li)
 			}
 			unlinks = append(unlinks, n)
+		default:
+			appends = append(appends, n)
+			unlinks = append(unlinks, n)
 		}
 	}
 	for _, n := range unlinks {
