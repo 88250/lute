@@ -81,6 +81,7 @@ type Node struct {
 	// 任务列表项 [ ]、[x] 或者 [X]
 
 	TaskListItemChecked bool `json:",omitempty"` // 是否勾选
+	TaskListItemMarker  byte `json:",omitempty"` // 方括号内的原始字符 ' ', 'x', '-', '/', '>', '!' 等
 
 	// 表
 
@@ -146,6 +147,30 @@ type Node struct {
 	CalloutTitle    string `json:",omitempty"` // 提示块标题
 	CalloutIcon     string `json:",omitempty"` // 提示块图标（从 Title 中第一个空格前面的部分进行解析）
 	CalloutIconType int    `json:",omitempty"` // 提示块图标类型，0：Emoji Unicode，1：自定义图标
+}
+
+// EffectiveTaskListItemMarker 返回任务列表项的有效标记字符。
+// 新数据通过 TaskListItemMarker 字段存储；旧数据回退到 TaskListItemChecked 布尔值。
+func (n *Node) EffectiveTaskListItemMarker() byte {
+	if n.TaskListItemMarker != 0 {
+		return n.TaskListItemMarker
+	}
+	if n.TaskListItemChecked {
+		return 'X'
+	}
+	return ' '
+}
+
+// ResolveTaskListItemMarker 从 data-task 属性值和 checked 状态推导任务列表标记字符。
+// 在 HTML → AST 转换中使用，避免重复代码。
+func ResolveTaskListItemMarker(dataTask string, checked bool) byte {
+	if 1 == len(dataTask) {
+		return dataTask[0]
+	}
+	if checked {
+		return 'X'
+	}
+	return ' '
 }
 
 const (

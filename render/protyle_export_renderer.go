@@ -1747,10 +1747,12 @@ func (r *ProtyleExportRenderer) renderListItem(node *ast.Node, entering bool) as
 
 func (r *ProtyleExportRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		marker := node.EffectiveTaskListItemMarker()
+		dataTask := " data-task=\"" + string(marker) + "\""
 		if node.TaskListItemChecked {
-			r.WriteString("<div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
+			r.WriteString("<div class=\"protyle-action protyle-action--task\"" + dataTask + "><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
 		} else {
-			r.WriteString("<div class=\"protyle-action protyle-action--task\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
+			r.WriteString("<div class=\"protyle-action protyle-action--task\"" + dataTask + "><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
 		}
 		if nil == node.Next {
 			node.InsertAfter(&ast.Node{ID: ast.NewNodeID(), Type: ast.NodeParagraph})

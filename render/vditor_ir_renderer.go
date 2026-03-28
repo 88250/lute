@@ -1395,6 +1395,8 @@ func (r *VditorIRRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 			attrs = append(attrs, []string{"checked", ""})
 		}
 		attrs = append(attrs, []string{"type", "checkbox"})
+		marker := node.EffectiveTaskListItemMarker()
+		attrs = append(attrs, []string{"data-task", string(marker)})
 		r.Tag("input", attrs, true)
 	}
 	return ast.WalkContinue

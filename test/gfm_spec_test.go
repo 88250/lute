@@ -27,12 +27,21 @@ var gfmSpecTests = []parseTest{
 	{"gfm203", "| abc | def |\n| --- |\n| bar |\n", "<p>| abc | def |\n| --- |\n| bar |</p>\n"},
 	{"gfm204", "| abc | def |\n| --- | --- |\n| bar |\n| bar | baz | boo |\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>bar</td>\n<td></td>\n</tr>\n<tr>\n<td>bar</td>\n<td>baz</td>\n</tr>\n</tbody>\n</table>\n"},
 	{"gfm205", "| abc | def |\n| --- | --- |\n", "<table>\n<thead>\n<tr>\n<th>abc</th>\n<th>def</th>\n</tr>\n</thead>\n</table>\n"},
-	{"gfm279", "- [ ] foo\n- [x] bar\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> foo</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> bar</li>\n</ul>\n"},
-	{"gfm280", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo\n<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> bar</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" /> baz</li>\n</ul>\n</li>\n<li><input disabled=\"\" type=\"checkbox\" /> bim</li>\n</ul>\n"},
+	{"gfm279", "- [ ] foo\n- [x] bar\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> foo</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> bar</li>\n</ul>\n"},
+	{"gfm280", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> foo\n<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> bar</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> baz</li>\n</ul>\n</li>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> bim</li>\n</ul>\n"},
 	{"task3", "- [ ]foo\n", "<ul>\n<li>[ ]foo</li>\n</ul>\n"},
-	{"task2", "- [ ] foo\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
+	{"task2", "- [ ] foo\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> foo</li>\n</ul>\n"},
 	{"task1", "- [ ] \n", "<ul>\n<li>[ ]</li>\n</ul>\n"},
 	{"task0", "- [ ]\n", "<ul>\n<li>[ ]</li>\n</ul>\n"},
+
+	// multi-state task list items https://github.com/88250/lute/issues/221
+	{"task_cancelled", "- [-] cancelled task\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\"-\" /> cancelled task</li>\n</ul>\n"},
+	{"task_in_progress", "- [/] in progress\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\"/\" /> in progress</li>\n</ul>\n"},
+	{"task_deferred", "- [>] deferred task\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\">\" /> deferred task</li>\n</ul>\n"},
+	{"task_important", "- [!] important task\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\"!\" /> important task</li>\n</ul>\n"},
+	{"task_multi_state_mixed", "- [x] done\n- [ ] todo\n- [-] cancelled\n- [/] in progress\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> done</li>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> todo</li>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\"-\" /> cancelled</li>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\"/\" /> in progress</li>\n</ul>\n"},
+	{"task_custom_marker", "- [?] question\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\"?\" /> question</li>\n</ul>\n"},
+	{"task_no_space_after_bracket", "- [-]no space\n", "<ul>\n<li>[-]no space</li>\n</ul>\n"},
 
 	// gfm spec inline-level cases
 

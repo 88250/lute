@@ -1810,11 +1810,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 func (r *FormatRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemOpenBracket)
-		if node.TaskListItemChecked {
-			r.WriteByte('X')
-		} else {
-			r.WriteByte(lex.ItemSpace)
-		}
+		r.WriteByte(node.EffectiveTaskListItemMarker())
 		r.WriteByte(lex.ItemCloseBracket)
 	} else {
 		r.WriteByte(' ')

@@ -2098,11 +2098,7 @@ func (r *ProtyleExportMdRenderer) renderListItem(node *ast.Node, entering bool) 
 func (r *ProtyleExportMdRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.WriteByte(lex.ItemOpenBracket)
-		if node.TaskListItemChecked {
-			r.WriteByte('X')
-		} else {
-			r.WriteByte(lex.ItemSpace)
-		}
+		r.WriteByte(node.EffectiveTaskListItemMarker())
 		r.WriteByte(lex.ItemCloseBracket)
 	} else {
 		r.WriteByte(' ')
