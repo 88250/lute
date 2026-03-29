@@ -126,8 +126,8 @@ type Options struct {
 	ImgTag bool
 	// PreventEncodeLinkSpace 设置是否阻止将链接中对空格编码为 %20
 	PreventEncodeLinkSpace bool
-	// ExportNormalizeTaskListMarker 设置是否将非标准的任务列表标记符（如 [/]、[>]、[!] 等）统一导出为完成标记 [x]。
-	// 开启后 [ ] 和 [x]/[X] 保持不变，其余标记符均转换为 [x]，以兼容不支持自定义标记符的 Markdown 解析器。
+	// ExportNormalizeTaskListMarker 设置是否将非标准的任务列表标记符（如 [/]、[>]、[!] 等）统一导出为完成标记 [X]。
+	// 开启后 [ ] 和 [X] 保持不变，其余标记符均转换为 [X]，以兼容不支持自定义标记符的 Markdown 解析器。
 	ExportNormalizeTaskListMarker bool
 }
 
