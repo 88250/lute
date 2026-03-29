@@ -52,7 +52,7 @@ type Options struct {
 	CodeSyntaxHighlightDetectLang bool
 	// CodeSyntaxHighlightInlineStyle 设置语法高亮是否为内联样式，默认不内联。
 	CodeSyntaxHighlightInlineStyle bool
-	// CodeSyntaxHightLineNum 设置语法高亮是否显示行号，默认不显示。
+	// CodeSyntaxHighlightLineNum 设置语法高亮是否显示行号，默认不显示。
 	CodeSyntaxHighlightLineNum bool
 	// CodeSyntaxHighlightStyleName 指定语法高亮样式名，默认为 "github"。
 	CodeSyntaxHighlightStyleName string
