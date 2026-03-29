@@ -126,7 +126,7 @@ public class HelloWorld {
 
 #### 任务列表
 
-- [X] 发布 Sym
+- [x] 发布 Sym
 - [X] 发布 Solo
 - [ ] 预约牙医
 
