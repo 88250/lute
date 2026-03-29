@@ -343,6 +343,10 @@ func (lute *Lute) SetGFMTaskListItemClass(class string) {
 	lute.RenderOptions.GFMTaskListItemClass = class
 }
 
+func (lute *Lute) SetDataTask(b bool) {
+	lute.RenderOptions.DataTask = b
+}
+
 func (lute *Lute) SetGFMStrikethrough(b bool) {
 	lute.ParseOptions.GFMStrikethrough = b
 }

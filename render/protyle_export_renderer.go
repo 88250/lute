@@ -1747,8 +1747,11 @@ func (r *ProtyleExportRenderer) renderListItem(node *ast.Node, entering bool) as
 
 func (r *ProtyleExportRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		marker := node.EffectiveTaskListItemMarker()
-		dataTask := " data-task=\"" + string(marker) + "\""
+		dataTask := ""
+		if r.Options.DataTask {
+			marker := node.EffectiveTaskListItemMarker()
+			dataTask = " data-task=\"" + string(marker) + "\""
+		}
 		if node.TaskListItemChecked {
 			r.WriteString("<div class=\"protyle-action protyle-action--task\"" + dataTask + "><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
 		} else {

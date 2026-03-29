@@ -95,6 +95,8 @@ type Options struct {
 	HeadingAnchor bool
 	// GFMTaskListItemClass 作为 GFM 任务列表项类名，默认为 "vditor-task"。
 	GFMTaskListItemClass string
+	// DataTask 设置是否渲染任务列表项的 data-task 属性，用于多状态任务列表。
+	DataTask bool
 	// VditorCodeBlockPreview 设置 Vditor 代码块是否需要渲染预览部分
 	VditorCodeBlockPreview bool
 	// VditorMathBlockPreview 设置 Vditor 数学公式块是否需要渲染预览部分
@@ -146,6 +148,7 @@ func NewOptions() *Options {
 		HeadingID:                      false,
 		KramdownIALIDRenderName:        "id",
 		GFMTaskListItemClass:           "vditor-task",
+		DataTask:                       true,
 		VditorCodeBlockPreview:         true,
 		VditorMathBlockPreview:         true,
 		VditorHTMLBlockPreview:         true,

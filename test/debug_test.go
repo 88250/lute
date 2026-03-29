@@ -64,8 +64,8 @@ var debugTests = []parseTest{
 
 	{"45", "*~foo~*bar\n", "<p><em><del>foo</del></em>bar</p>\n"},
 	{"44", "~~foo~\n", "<p>~~foo~</p>\n"},
-	{"43", "1. [x]\n2. [x] foo\n", "<ol>\n<li>[x]</li>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> foo</li>\n</ol>\n"},
-	{"42", "* [x]\n* [x] foo\n", "<ul>\n<li>[x]</li>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> foo</li>\n</ul>\n"},
+	{"43", "1. [x]\n2. [x] foo\n", "<ol>\n<li>[x]</li>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ol>\n"},
+	{"42", "* [x]\n* [x] foo\n", "<ul>\n<li>[x]</li>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
 	{"41", "f</\n", "<p>f&lt;/</p>\n"},
 
 	// 自动链接解析结尾 } 问题 https://github.com/88250/lute/issues/4
@@ -78,7 +78,7 @@ var debugTests = []parseTest{
 	{"37", "[link](/u(ri\n)\n", "<p>[link](/u(ri<br />\n)</p>\n"},
 	{"36", "[link](/u(ri )\n", "<p>[link](/u(ri )</p>\n"},
 
-	{"35", "* [ ] foo [foo](/bar)\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> foo <a href=\"/bar\">foo</a></li>\n</ul>\n"},
+	{"35", "* [ ] foo [foo](/bar)\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" /> foo <a href=\"/bar\">foo</a></li>\n</ul>\n"},
 	{"34", "[foo](/bar )1\n", "<p><a href=\"/bar\">foo</a>1</p>\n"},
 	{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},
 	{"32", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
@@ -95,7 +95,7 @@ var debugTests = []parseTest{
 	{"24", "[]( https://b3log.org", "<p>[]( <a href=\"https://b3log.org\">https://b3log.org</a></p>\n"},
 
 	// GFM 任务列表 li 加 class="vditor-task" https://github.com/b3log/lute/issues/10
-	{"23", "- [x] foo\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> foo</li>\n</ul>\n"},
+	{"23", "- [x] foo\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
 
 	// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
 	{"22", "0\n-:\n1\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"right\">1</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
