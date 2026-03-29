@@ -148,7 +148,7 @@ func NewOptions() *Options {
 		HeadingID:                      false,
 		KramdownIALIDRenderName:        "id",
 		GFMTaskListItemClass:           "vditor-task",
-		DataTask:                       true,
+		DataTask:                       false,
 		VditorCodeBlockPreview:         true,
 		VditorMathBlockPreview:         true,
 		VditorHTMLBlockPreview:         true,
