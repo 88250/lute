@@ -96,7 +96,9 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 								caretInBracket = true
 							}
 						}
-						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked, TaskListItemMarker: tokens[1]}
+						marker := tokens[1]
+						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3]}
+						taskListItemMarker.ReviveFromMarker(marker)
 						if context.ParseOption.ProtyleWYSIWYG {
 							p.InsertBefore(taskListItemMarker)
 						} else {

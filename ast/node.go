@@ -161,16 +161,25 @@ func (n *Node) EffectiveTaskListItemMarker() byte {
 	return ' '
 }
 
-// ResolveTaskListItemMarker 从 data-task 属性值和 checked 状态推导任务列表标记字符。
-// 在 HTML → AST 转换中使用，避免重复代码。
-func ResolveTaskListItemMarker(dataTask string, checked bool) byte {
+// ReviveFromMarker 通过原始标记字符同时设置 TaskListItemMarker 和 TaskListItemChecked。
+// 方括号内任意非空白字符均视为已完成状态，是任务列表项状态的唯一赋值入口。
+func (n *Node) ReviveFromMarker(marker byte) {
+	n.TaskListItemMarker = marker
+	n.TaskListItemChecked = marker != ' ' && marker != 0
+}
+
+// ReviveFromDataTask 通过 data-task 属性值和 checked 状态推导标记字符，然后调用 ReviveFromMarker。
+// 用于 HTML → AST 路径。
+func (n *Node) ReviveFromDataTask(dataTask string, checked bool) {
+	var marker byte
 	if 1 == len(dataTask) {
-		return dataTask[0]
+		marker = dataTask[0]
+	} else if checked {
+		marker = 'X'
+	} else {
+		marker = ' '
 	}
-	if checked {
-		return 'X'
-	}
-	return ' '
+	n.ReviveFromMarker(marker)
 }
 
 const (
