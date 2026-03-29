@@ -1505,10 +1505,14 @@ func (r *ProtylePreviewRenderer) renderListItem(node *ast.Node, entering bool) a
 func (r *ProtylePreviewRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		if node.TaskListItemChecked {
+		if r.NormalizedTaskListItemChecked(node) {
 			attrs = append(attrs, []string{"checked", ""})
 		}
 		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
+		if r.Options.DataTask {
+			marker := node.EffectiveTaskListItemMarker()
+			attrs = append(attrs, []string{"data-task", string(marker)})
+		}
 		r.Tag("input", attrs, true)
 	}
 	return ast.WalkContinue

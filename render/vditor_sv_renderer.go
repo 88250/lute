@@ -1230,16 +1230,17 @@ func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 		return ast.WalkContinue
 	}
 
+	marker := node.EffectiveTaskListItemMarker()
 	r.Tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)
 	r.WriteByte(lex.ItemOpenBracket)
 	r.Tag("/span", nil, false)
 	if node.TaskListItemChecked {
 		r.Tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--strong"}}, false)
-		r.WriteByte('x')
+		r.WriteByte(marker)
 		r.Tag("/span", nil, false)
 	} else {
 		r.Tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)
-		r.WriteByte(lex.ItemSpace)
+		r.WriteByte(marker)
 		r.Tag("/span", nil, false)
 	}
 	r.Tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)

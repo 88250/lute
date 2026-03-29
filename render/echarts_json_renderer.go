@@ -445,11 +445,8 @@ func (r *EChartsJSONRenderer) renderListItem(node *ast.Node, entering bool) ast.
 func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.openObj()
-		check := " "
-		if node.TaskListItemChecked {
-			check = "X"
-		}
-		r.val("Task List Item Marker\n["+check+"]", node)
+		marker := node.EffectiveTaskListItemMarker()
+		r.val("Task List Item Marker\n["+string(marker)+"]", node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)

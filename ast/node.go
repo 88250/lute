@@ -81,6 +81,7 @@ type Node struct {
 	// 任务列表项 [ ]、[x] 或者 [X]
 
 	TaskListItemChecked bool `json:",omitempty"` // 是否勾选
+	TaskListItemMarker  byte `json:",omitempty"` // 方括号内的原始字符 ' ', 'x', '-', '/', '>', '!' 等
 
 	// 表
 
@@ -146,6 +147,43 @@ type Node struct {
 	CalloutTitle    string `json:",omitempty"` // 提示块标题
 	CalloutIcon     string `json:",omitempty"` // 提示块图标（从 Title 中第一个空格前面的部分进行解析）
 	CalloutIconType int    `json:",omitempty"` // 提示块图标类型，0：Emoji Unicode，1：自定义图标
+}
+
+// EffectiveTaskListItemMarker 返回任务列表项的有效标记字符。
+// 新数据通过 TaskListItemMarker 字段存储；旧数据回退到 TaskListItemChecked 布尔值。
+// 小写 x 统一为大写 X。
+func (n *Node) EffectiveTaskListItemMarker() byte {
+	if n.TaskListItemMarker != 0 {
+		if n.TaskListItemMarker == 'x' {
+			return 'X'
+		}
+		return n.TaskListItemMarker
+	}
+	if n.TaskListItemChecked {
+		return 'X'
+	}
+	return ' '
+}
+
+// ReviveFromMarker 通过原始标记字符同时设置 TaskListItemMarker 和 TaskListItemChecked。
+// 方括号内任意非空白字符均视为已完成状态，是任务列表项状态的唯一赋值入口。
+func (n *Node) ReviveFromMarker(marker byte) {
+	n.TaskListItemMarker = marker
+	n.TaskListItemChecked = marker != ' ' && marker != 0
+}
+
+// ReviveFromDataTask 通过 data-task 属性值和 checked 状态推导标记字符，然后调用 ReviveFromMarker。
+// 用于 HTML → AST 路径。
+func (n *Node) ReviveFromDataTask(dataTask string, checked bool) {
+	var marker byte
+	if 1 == len(dataTask) {
+		marker = dataTask[0]
+	} else if checked {
+		marker = 'X'
+	} else {
+		marker = ' '
+	}
+	n.ReviveFromMarker(marker)
 }
 
 const (

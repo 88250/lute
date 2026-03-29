@@ -80,7 +80,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 						}
 					}
 
-					if (3 == len(tokens) && (bytes.EqualFold(tokens, []byte("[x]")) || bytes.Equal(tokens, []byte("[ ]")))) ||
+					if (3 == len(tokens) && tokens[0] == lex.ItemOpenBracket && tokens[2] == lex.ItemCloseBracket && tokens[1] != lex.ItemCloseBracket) ||
 						(3 < len(tokens) && (lex.IsWhitespace(tokens[3]) || editor.CaretTokens[0] == tokens[3] || editor.CaretTokens[0] == tokens[2])) {
 						var caretStartText, caretAfterCloseBracket, caretInBracket bool
 						if context.ParseOption.VditorWYSIWYG || context.ParseOption.VditorIR || context.ParseOption.VditorSV || context.ParseOption.ProtyleWYSIWYG {
@@ -96,7 +96,9 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 								caretInBracket = true
 							}
 						}
-						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3], TaskListItemChecked: listItem.ListData.Checked}
+						marker := tokens[1]
+						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3]}
+						taskListItemMarker.ReviveFromMarker(marker)
 						if context.ParseOption.ProtyleWYSIWYG {
 							p.InsertBefore(taskListItemMarker)
 						} else {

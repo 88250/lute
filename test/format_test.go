@@ -28,6 +28,11 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
+	// 多状态任务列表格式化 https://github.com/88250/lute/issues/221
+	{"56", "- [-] cancelled\n- [/] in progress\n- [>] deferred\n- [!] important\n", "- [X] cancelled\n- [X] in progress\n- [X] deferred\n- [X] important\n"},
+	{"55", "- [x] done\n- [ ] todo\n- [-] cancelled\n", "- [X] done\n- [ ] todo\n- [X] cancelled\n"},
+	{"54", "- [?] question\n", "- [X] question\n"},
+
 	{"53", "foo$bar$\n", "foo $bar$\n"},
 	{"52", "[foo](bar \"&quot;baz&quot;\")", "[foo](bar \"&quot;baz&quot;\")\n"},
 	{"51", "[foo](bar \"\\\"baz\\\"\")", "[foo](bar \"&quot;baz&quot;\")\n"},
