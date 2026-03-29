@@ -302,6 +302,7 @@ var spinBlockDOMTests = []*parseTest{
 func TestSpinBlockDOM(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetDataTask(true)
 	luteEngine.SetMark(true)
 	luteEngine.SetBlockRef(true)
 	luteEngine.SetKramdownIAL(true)

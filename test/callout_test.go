@@ -39,6 +39,7 @@ var calloutTests = []parseTest{
 func TestCallout(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetCallout(true)
+	luteEngine.SetDataTask(true)
 	for _, test := range calloutTests {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {

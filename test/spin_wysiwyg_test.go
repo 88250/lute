@@ -187,6 +187,7 @@ func TestSpinVditorDOM(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetHeadingID(true)
 	luteEngine.SetVditorWYSIWYG(true)
+	luteEngine.SetDataTask(true)
 	luteEngine.ParseOptions.ToC = true
 	luteEngine.RenderOptions.Sanitize = true
 	luteEngine.SetMark(true)

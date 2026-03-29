@@ -176,6 +176,7 @@ var ul2tlTests = []*parseTest{
 func TestUL2TL(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetDataTask(true)
 	luteEngine.ParseOptions.Mark = true
 	luteEngine.ParseOptions.BlockRef = true
 	luteEngine.SetKramdownIAL(true)
