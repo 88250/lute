@@ -23,15 +23,15 @@ var dataTaskHTMLTests = []parseTest{
 	// 未勾选任务项
 	{"0", "- [ ] foo\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> foo</li>\n</ul>\n"},
 	// 已勾选任务项 (x)
-	{"1", "- [x] bar\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> bar</li>\n</ul>\n"},
+	{"1", "- [x] bar\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"X\" /> bar</li>\n</ul>\n"},
 	// 已勾选任务项 (X)
 	{"2", "- [X] baz\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"X\" /> baz</li>\n</ul>\n"},
 	// 混合列表
-	{"3", "- [ ] foo\n- [x] bar\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> foo</li>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> bar</li>\n</ul>\n"},
+	{"3", "- [ ] foo\n- [x] bar\n", "<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> foo</li>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"X\" /> bar</li>\n</ul>\n"},
 	// 嵌套任务列表
-	{"4", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> foo\n<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> bar</li>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> baz</li>\n</ul>\n</li>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> bim</li>\n</ul>\n"},
+	{"4", "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"X\" /> foo\n<ul>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> bar</li>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"X\" /> baz</li>\n</ul>\n</li>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> bim</li>\n</ul>\n"},
 	// 有序任务列表
-	{"5", "1. [x] ordered\n2. [ ] item\n", "<ol>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> ordered</li>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> item</li>\n</ol>\n"},
+	{"5", "1. [x] ordered\n2. [ ] item\n", "<ol>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"X\" /> ordered</li>\n<li class=\"vditor-task\"><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> item</li>\n</ol>\n"},
 }
 
 func TestDataTaskHTML(t *testing.T) {
@@ -71,7 +71,7 @@ var dataTaskMd2BlockDOMTests = []parseTest{
 	// 未勾选
 	{"0", "* [ ] foo", "<div data-subtype=\"t\" data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\"><div data-marker=\"*\" data-subtype=\"t\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeListItem\" class=\"li\"><div class=\"protyle-action protyle-action--task\" data-task=\" \" draggable=\"true\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div><div data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	// 已勾选
-	{"1", "* [x] bar", "<div data-subtype=\"t\" data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\"><div data-marker=\"*\" data-subtype=\"t\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeListItem\" class=\"li protyle-task--done\"><div class=\"protyle-action protyle-action--task\" data-task=\"x\" draggable=\"true\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div><div data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"1", "* [x] bar", "<div data-subtype=\"t\" data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeList\" class=\"list\"><div data-marker=\"*\" data-subtype=\"t\" data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeListItem\" class=\"li protyle-task--done\"><div class=\"protyle-action protyle-action--task\" data-task=\"X\" draggable=\"true\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div><div data-node-id=\"20060102150405-1a2b3c4\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 }
 
 func TestDataTaskMd2BlockDOM(t *testing.T) {
@@ -93,7 +93,7 @@ func TestDataTaskMd2BlockDOM(t *testing.T) {
 
 var dataTaskNoClassHTMLTests = []parseTest{
 	{"0", "- [ ] foo\n", "<ul>\n<li><input disabled=\"\" type=\"checkbox\" data-task=\" \" /> foo</li>\n</ul>\n"},
-	{"1", "- [x] bar\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"x\" /> bar</li>\n</ul>\n"},
+	{"1", "- [x] bar\n", "<ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"X\" /> bar</li>\n</ul>\n"},
 }
 
 func TestDataTaskNoClassHTML(t *testing.T) {

@@ -126,6 +126,9 @@ type Options struct {
 	ImgTag bool
 	// PreventEncodeLinkSpace 设置是否阻止将链接中对空格编码为 %20
 	PreventEncodeLinkSpace bool
+	// ExportNormalizeTaskListMarker 设置是否将非标准的任务列表标记符（如 [/]、[>]、[!] 等）统一导出为完成标记 [x]。
+	// 开启后 [ ] 和 [x]/[X] 保持不变，其余标记符均转换为 [x]，以兼容不支持自定义标记符的 Markdown 解析器。
+	ExportNormalizeTaskListMarker bool
 }
 
 func NewOptions() *Options {
@@ -149,6 +152,7 @@ func NewOptions() *Options {
 		KramdownIALIDRenderName:        "id",
 		GFMTaskListItemClass:           "vditor-task",
 		DataTask:                       false,
+		ExportNormalizeTaskListMarker:  true,
 		VditorCodeBlockPreview:         true,
 		VditorMathBlockPreview:         true,
 		VditorHTMLBlockPreview:         true,
@@ -175,6 +179,25 @@ type BaseRenderer struct {
 	DisableTags         int                              // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>
 	FootnotesDefs       []*ast.Node                      // 脚注定义集
 	RenderingFootnotes  bool                             // 是否正在渲染脚注定义
+}
+
+// NormalizedTaskListItemMarker 返回规范化后的任务列表标记符。
+// 当 ExportNormalizeTaskListMarker 选项开启时，将非标准标记符（如 /、>、! 等）转为 X。
+// 仅用于 Markdown 文本输出场景（format、export_md），不用于 data-task 属性。
+func (r *BaseRenderer) NormalizedTaskListItemMarker(node *ast.Node) byte {
+	marker := node.EffectiveTaskListItemMarker()
+	if r.Options.ExportNormalizeTaskListMarker {
+		if marker != ' ' && marker != 'X' {
+			marker = 'X'
+		}
+	}
+	return marker
+}
+
+// NormalizedTaskListItemChecked 返回规范化后的任务列表勾选状态。
+func (r *BaseRenderer) NormalizedTaskListItemChecked(node *ast.Node) bool {
+	marker := r.NormalizedTaskListItemMarker(node)
+	return marker != ' '
 }
 
 // NewBaseRenderer 构造一个 BaseRenderer。

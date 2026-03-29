@@ -151,8 +151,12 @@ type Node struct {
 
 // EffectiveTaskListItemMarker 返回任务列表项的有效标记字符。
 // 新数据通过 TaskListItemMarker 字段存储；旧数据回退到 TaskListItemChecked 布尔值。
+// 小写 x 统一为大写 X。
 func (n *Node) EffectiveTaskListItemMarker() byte {
 	if n.TaskListItemMarker != 0 {
+		if n.TaskListItemMarker == 'x' {
+			return 'X'
+		}
 		return n.TaskListItemMarker
 	}
 	if n.TaskListItemChecked {

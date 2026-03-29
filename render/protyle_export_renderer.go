@@ -1752,7 +1752,7 @@ func (r *ProtyleExportRenderer) renderTaskListItemMarker(node *ast.Node, enterin
 			marker := node.EffectiveTaskListItemMarker()
 			dataTask = " data-task=\"" + string(marker) + "\""
 		}
-		if node.TaskListItemChecked {
+		if r.NormalizedTaskListItemChecked(node) {
 			r.WriteString("<div class=\"protyle-action protyle-action--task\"" + dataTask + "><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
 		} else {
 			r.WriteString("<div class=\"protyle-action protyle-action--task\"" + dataTask + "><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")

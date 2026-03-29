@@ -1405,7 +1405,7 @@ func (r *HtmlRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSta
 func (r *HtmlRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		if node.TaskListItemChecked {
+		if r.NormalizedTaskListItemChecked(node) {
 			attrs = append(attrs, []string{"checked", ""})
 		}
 		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})

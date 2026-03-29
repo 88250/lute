@@ -1809,8 +1809,9 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 
 func (r *FormatRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		marker := r.NormalizedTaskListItemMarker(node)
 		r.WriteByte(lex.ItemOpenBracket)
-		r.WriteByte(node.EffectiveTaskListItemMarker())
+		r.WriteByte(marker)
 		r.WriteByte(lex.ItemCloseBracket)
 	} else {
 		r.WriteByte(' ')

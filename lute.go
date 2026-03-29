@@ -347,6 +347,10 @@ func (lute *Lute) SetDataTask(b bool) {
 	lute.RenderOptions.DataTask = b
 }
 
+func (lute *Lute) SetExportNormalizeTaskListMarker(b bool) {
+	lute.RenderOptions.ExportNormalizeTaskListMarker = b
+}
+
 func (lute *Lute) SetGFMStrikethrough(b bool) {
 	lute.ParseOptions.GFMStrikethrough = b
 }
