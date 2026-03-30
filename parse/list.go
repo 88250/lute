@@ -257,7 +257,7 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 				marker := tokens[1]
 				if t.Context.ParseOption.ArbitraryTaskListItemMarker || ' ' == marker || 'x' == marker || 'X' == marker {
 					data.Typ = 3
-					data.Checked = 'x' == marker || 'X' == marker
+					data.Checked = marker != ' '
 				}
 			}
 		}
