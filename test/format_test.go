@@ -28,11 +28,6 @@ type formatTest struct {
 
 var formatTests = []formatTest{
 
-	// 多状态任务列表格式化 https://github.com/88250/lute/issues/221
-	{"56", "- [-] cancelled\n- [/] in progress\n- [>] deferred\n- [!] important\n", "- [X] cancelled\n- [X] in progress\n- [X] deferred\n- [X] important\n"},
-	{"55", "- [x] done\n- [ ] todo\n- [-] cancelled\n", "- [X] done\n- [ ] todo\n- [X] cancelled\n"},
-	{"54", "- [?] question\n", "- [X] question\n"},
-
 	{"53", "foo$bar$\n", "foo $bar$\n"},
 	{"52", "[foo](bar \"&quot;baz&quot;\")", "[foo](bar \"&quot;baz&quot;\")\n"},
 	{"51", "[foo](bar \"\\\"baz\\\"\")", "[foo](bar \"&quot;baz&quot;\")\n"},
@@ -110,6 +105,25 @@ func TestFormat(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetAutoSpace(true)
 	for _, test := range formatTests {
+		formatted := luteEngine.FormatStr(test.name, test.original)
+		if test.formatted != formatted {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.formatted, formatted, test.original)
+		}
+	}
+}
+
+// 多状态任务列表格式化 https://github.com/88250/lute/issues/221
+var formatArbitraryTaskListItemMarkerTests = []formatTest{
+	{"2", "- [-] cancelled\n- [/] in progress\n- [>] deferred\n- [!] important\n", "- [X] cancelled\n- [X] in progress\n- [X] deferred\n- [X] important\n"},
+	{"1", "- [x] done\n- [ ] todo\n- [-] cancelled\n", "- [X] done\n- [ ] todo\n- [X] cancelled\n"},
+	{"0", "- [?] question\n", "- [X] question\n"},
+}
+
+func TestFormatArbitraryTaskListItemMarker(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetAutoSpace(true)
+	luteEngine.SetArbitraryTaskListItemMarker(true)
+	for _, test := range formatArbitraryTaskListItemMarkerTests {
 		formatted := luteEngine.FormatStr(test.name, test.original)
 		if test.formatted != formatted {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.formatted, formatted, test.original)

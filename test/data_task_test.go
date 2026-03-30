@@ -122,6 +122,7 @@ var dataTaskCustomMarkerTests = []parseTest{
 
 func TestDataTaskCustomMarker(t *testing.T) {
 	luteEngine := lute.New()
+	luteEngine.SetArbitraryTaskListItemMarker(true)
 	luteEngine.SetDataTask(true)
 
 	for _, test := range dataTaskCustomMarkerTests {
