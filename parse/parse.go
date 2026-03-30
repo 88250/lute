@@ -431,6 +431,9 @@ type Options struct {
 	Callout bool
 	// KeepEscaped 设置是否保留转义内容（不进行反转义）。
 	KeepEscaped bool
+	// ArbitraryTaskListItemMarker 设置是否打开"任务列表任意标记符"支持。
+	// 默认仅支持 [ ]、[x] 和 [X]，开启后支持 [/]、[>]、[-]、[!] 等任意标记符。
+	ArbitraryTaskListItemMarker bool
 }
 
 var EmojiLock = sync.Mutex{}

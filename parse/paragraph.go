@@ -97,59 +97,61 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							}
 						}
 						marker := tokens[1]
-						taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3]}
-						taskListItemMarker.ReviveFromMarker(marker)
-						if context.ParseOption.ProtyleWYSIWYG {
-							p.InsertBefore(taskListItemMarker)
-						} else {
-							p.PrependChild(taskListItemMarker)
-						}
-						p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
-						if isEditor {
-							p.Tokens = bytes.TrimSpace(p.Tokens)
-							if caretStartText || caretAfterCloseBracket || caretInBracket {
-								p.Tokens = append([]byte(" "+editor.Caret), p.Tokens...)
+						if context.ParseOption.ArbitraryTaskListItemMarker || ' ' == marker || 'x' == marker || 'X' == marker {
+							taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3]}
+							taskListItemMarker.ReviveFromMarker(marker)
+							if context.ParseOption.ProtyleWYSIWYG {
+								p.InsertBefore(taskListItemMarker)
 							} else {
-								if !context.ParseOption.ProtyleWYSIWYG {
-									p.Tokens = append([]byte(" "), p.Tokens...)
+								p.PrependChild(taskListItemMarker)
+							}
+							p.Tokens = tokens[3:] // 剔除开头的 [ ]、[x] 或者 [X]
+							if isEditor {
+								p.Tokens = bytes.TrimSpace(p.Tokens)
+								if caretStartText || caretAfterCloseBracket || caretInBracket {
+									p.Tokens = append([]byte(" "+editor.Caret), p.Tokens...)
+								} else {
+									if !context.ParseOption.ProtyleWYSIWYG {
+										p.Tokens = append([]byte(" "), p.Tokens...)
+									}
 								}
 							}
-						}
 
-						if 0 < len(p.Tokens) {
-							subTree := Parse("", p.Tokens, context.ParseOption)
-							subBlock := subTree.Root.FirstChild
-							if ast.NodeParagraph != subBlock.Type {
-								if !context.ParseOption.ProtyleWYSIWYG {
-									// Protyle `Optimize typography` exception in case of task list and heading https://github.com/siyuan-note/siyuan/issues/9035
-									listItem.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
-								}
-								if nil != p.FirstChild {
-									listItem.PrependChild(p.FirstChild)
-								}
-								subBlock.ID = p.ID
-								subBlock.KramdownIAL = p.KramdownIAL
+							if 0 < len(p.Tokens) {
+								subTree := Parse("", p.Tokens, context.ParseOption)
+								subBlock := subTree.Root.FirstChild
+								if ast.NodeParagraph != subBlock.Type {
+									if !context.ParseOption.ProtyleWYSIWYG {
+										// Protyle `Optimize typography` exception in case of task list and heading https://github.com/siyuan-note/siyuan/issues/9035
+										listItem.PrependChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
+									}
+									if nil != p.FirstChild {
+										listItem.PrependChild(p.FirstChild)
+									}
+									subBlock.ID = p.ID
+									subBlock.KramdownIAL = p.KramdownIAL
 
-								// Incomplete data when pasting task list nested list https://github.com/siyuan-note/siyuan/issues/9239
-								var last *ast.Node
-								var blocks []*ast.Node
-								for b := subBlock; nil != b && ast.NodeDocument != b.Type; b = b.Next {
-									if ast.NodeKramdownBlockIAL == b.Type {
-										if util.IsDocIAL(b.Tokens) {
-											break
+									// Incomplete data when pasting task list nested list https://github.com/siyuan-note/siyuan/issues/9239
+									var last *ast.Node
+									var blocks []*ast.Node
+									for b := subBlock; nil != b && ast.NodeDocument != b.Type; b = b.Next {
+										if ast.NodeKramdownBlockIAL == b.Type {
+											if util.IsDocIAL(b.Tokens) {
+												break
+											}
 										}
+
+										last = b
+									}
+									for b := last; nil != b; b = b.Previous {
+										blocks = append(blocks, b)
+									}
+									for _, b := range blocks {
+										p.InsertAfter(b)
 									}
 
-									last = b
+									p.Unlink()
 								}
-								for b := last; nil != b; b = b.Previous {
-									blocks = append(blocks, b)
-								}
-								for _, b := range blocks {
-									p.InsertAfter(b)
-								}
-
-								p.Unlink()
 							}
 						}
 					}

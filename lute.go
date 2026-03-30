@@ -339,6 +339,10 @@ func (lute *Lute) SetGFMTaskListItem(b bool) {
 	lute.ParseOptions.GFMTaskListItem = b
 }
 
+func (lute *Lute) SetArbitraryTaskListItemMarker(b bool) {
+	lute.ParseOptions.ArbitraryTaskListItemMarker = b
+}
+
 func (lute *Lute) SetGFMTaskListItemClass(class string) {
 	lute.RenderOptions.GFMTaskListItemClass = class
 }
