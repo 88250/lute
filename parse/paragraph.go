@@ -97,7 +97,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							}
 						}
 						marker := tokens[1]
-						if context.ParseOption.ArbitraryTaskListItemMarker || ' ' == marker || 'x' == marker || 'X' == marker {
+						if context.ParseOption.IsValidTaskListItemMarker(marker) {
 							taskListItemMarker := &ast.Node{Type: ast.NodeTaskListItemMarker, Tokens: tokens[:3]}
 							taskListItemMarker.ReviveFromMarker(marker)
 							if context.ParseOption.ProtyleWYSIWYG {

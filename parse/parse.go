@@ -436,6 +436,12 @@ type Options struct {
 	ArbitraryTaskListItemMarker bool
 }
 
+// IsValidTaskListItemMarker 判断 marker 是否是合法的任务列表项标记符。
+// 当 ArbitraryTaskListItemMarker 开启时接受任意非 ] 字符，否则仅接受 ' '、'x' 和 'X'。
+func (options *Options) IsValidTaskListItemMarker(marker byte) bool {
+	return options.ArbitraryTaskListItemMarker || ' ' == marker || 'x' == marker || 'X' == marker
+}
+
 var EmojiLock = sync.Mutex{}
 
 func NewOptions() *Options {
