@@ -11,6 +11,7 @@
 package test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/88250/lute"
@@ -203,5 +204,51 @@ func TestMd2BlockDOMDisableSyntax(t *testing.T) {
 		if test.to != result {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
 		}
+	}
+}
+
+func TestMd2BlockDOMAutoLinkOnDemand(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+
+	markdown := "foo https://b3log.org bar"
+
+	defaultResult := luteEngine.Md2BlockDOM(markdown, true)
+	if strings.Contains(defaultResult, "data-type=\"a\"") {
+		t.Fatalf("default Md2BlockDOM should keep URL as plain text in Protyle mode, got %q", defaultResult)
+	}
+
+	autoLinkResult := luteEngine.Md2BlockDOMWithAutoLink(markdown, true, true)
+	if !strings.Contains(autoLinkResult, "data-type=\"a\"") || !strings.Contains(autoLinkResult, "data-href=\"https://b3log.org\"") {
+		t.Fatalf("Md2BlockDOM with autoLink=true should render URL as link, got %q", autoLinkResult)
+	}
+
+	afterResult := luteEngine.Md2BlockDOM(markdown, true)
+	if strings.Contains(afterResult, "data-type=\"a\"") {
+		t.Fatalf("autoLink should only affect current call, got %q", afterResult)
+	}
+}
+
+func TestMd2BlockDOMAutoLinkWithInlineStyleAndMultiline(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetInlineAsterisk(true)
+
+	inlineMixed := "https://b3log.org **bold** https://b3log.org"
+	inlineResult := luteEngine.Md2BlockDOMWithAutoLink(inlineMixed, true, true)
+	if 2 != strings.Count(inlineResult, "data-type=\"a\"") {
+		t.Fatalf("inline mixed content should contain 2 links, got %q", inlineResult)
+	}
+	if !strings.Contains(inlineResult, "data-type=\"strong\"") {
+		t.Fatalf("inline mixed content should keep bold style, got %q", inlineResult)
+	}
+
+	multiline := "https://b3log.org\n**bold**\nhttps://b3log.org"
+	multiLineResult := luteEngine.Md2BlockDOMWithAutoLink(multiline, true, true)
+	if 2 != strings.Count(multiLineResult, "data-type=\"a\"") {
+		t.Fatalf("multiline content should contain 2 links, got %q", multiLineResult)
+	}
+	if !strings.Contains(multiLineResult, "data-type=\"strong\"") {
+		t.Fatalf("multiline content should keep bold style, got %q", multiLineResult)
 	}
 }
