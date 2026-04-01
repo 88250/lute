@@ -131,6 +131,38 @@ func IAL2MapUnEsc(ial [][]string) (ret map[string]string) {
 	return
 }
 
+func setIALAttrs(node *ast.Node, ial [][]string) {
+	for _, kv := range ial {
+		node.SetIALAttr(kv[0], html.UnescapeAttrVal(kv[1]))
+	}
+}
+
+// mergeIALPreservingOrder 保持属性顺序合并 IAL，语义上等同于 IAL2Map+Map2IAL，
+// 但不会因为 map 无序导致输出属性顺序漂移。
+func mergeIALPreservingOrder(dst, src [][]string) (ret [][]string) {
+	ret = make([][]string, 0, len(dst)+len(src))
+	for _, kv := range dst {
+		ret = append(ret, []string{kv[0], html.UnescapeAttrVal(kv[1])})
+	}
+
+	for _, kv := range src {
+		name := kv[0]
+		value := html.UnescapeAttrVal(kv[1])
+		updated := false
+		for _, existing := range ret {
+			if existing[0] == name {
+				existing[1] = value
+				updated = true
+				break
+			}
+		}
+		if !updated {
+			ret = append(ret, []string{name, value})
+		}
+	}
+	return
+}
+
 func Map2IAL(properties map[string]string) (ret [][]string) {
 	ret = [][]string{}
 	for k, v := range properties {
