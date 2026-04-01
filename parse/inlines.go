@@ -99,7 +99,7 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 
 		editorMode := t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG
 		protyleAutoLink := t.Context.ParseOption.ProtyleWYSIWYG && t.Context.ParseOption.ProtyleWYSIWYGAutoLink
-		if t.Context.ParseOption.GFMAutoLink && (!editorMode || protyleAutoLink) {
+		if (t.Context.ParseOption.GFMAutoLink && !editorMode) || protyleAutoLink {
 			t.parseGFMAutoEmailLink(node)
 			t.parseGFMAutoLink(node)
 		}

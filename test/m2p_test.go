@@ -227,6 +227,12 @@ func TestMd2BlockDOMAutoLinkOnDemand(t *testing.T) {
 	if strings.Contains(afterResult, "data-type=\"a\"") {
 		t.Fatalf("autoLink should only affect current call, got %q", afterResult)
 	}
+
+	luteEngine.SetGFMAutoLink(false)
+	autoLinkWithGFMAutoLinkDisabled := luteEngine.Md2BlockDOMWithAutoLink(markdown, true, true)
+	if !strings.Contains(autoLinkWithGFMAutoLinkDisabled, "data-type=\"a\"") || !strings.Contains(autoLinkWithGFMAutoLinkDisabled, "data-href=\"https://b3log.org\"") {
+		t.Fatalf("Md2BlockDOM with autoLink=true should render URL as link even when GFMAutoLink is disabled, got %q", autoLinkWithGFMAutoLinkDisabled)
+	}
 }
 
 func TestMd2BlockDOMAutoLinkWithInlineStyleAndMultiline(t *testing.T) {
