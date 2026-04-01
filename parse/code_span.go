@@ -71,7 +71,12 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 			textTokens = bytes.ReplaceAll(textTokens, []byte("&"), []byte("&amp;"))
 		}
 
-		inlineTree := Inline("", textTokens, t.Context.ParseOption)
+		// Code span 内容在 Protyle 下会再次调用 Inline 进行行级解析。
+		// 这里拷贝一份 ParseOption，只对这次二次解析关闭 autoLink，
+		// 避免反引号内的内容被自动转换，同时不影响外层普通文本的 autoLink。
+		codeParseOptions := *t.Context.ParseOption
+		codeParseOptions.ProtyleWYSIWYGAutoLink = false
+		inlineTree := Inline("", textTokens, &codeParseOptions)
 		if nil != inlineTree {
 			content := bytes.Buffer{}
 			ast.Walk(inlineTree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
