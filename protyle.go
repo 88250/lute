@@ -1132,7 +1132,6 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeMathBlock
 		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
 		content := util.DomAttrValue(n, "data-content")
-		content = html.UnescapeHTMLStr(content)
 		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: util.StrToBytes(content)})
 		node.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
 		tree.Context.Tip.AppendChild(node)
