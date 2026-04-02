@@ -11,7 +11,6 @@
 package test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/88250/lute"
@@ -207,97 +206,80 @@ func TestMd2BlockDOMDisableSyntax(t *testing.T) {
 	}
 }
 
-func TestMd2BlockDOMAutoLinkOnDemand(t *testing.T) {
+var md2BlockDOMWithAutoLinkTests = []parseTest{
+	{"basic", "foo https://b3log.org bar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"inline-mixed", "https://b3log.org **bold** https://b3log.org", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> <span data-type=\"strong\">bold</span> <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"multiline", "https://b3log.org\n**bold**\nhttps://b3log.org", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span>\n<span data-type=\"strong\">bold</span>\n<span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"inline-code", "`https://b3log.org`", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"code\">\u200bhttps://b3log.org</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"code-block", "```\nhttps://b3log.org\n```", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeCodeBlock\" class=\"code-block\"><div class=\"protyle-action\"><span class=\"protyle-action--first protyle-action__language\" contenteditable=\"false\"></span><span class=\"fn__flex-1\"></span><span class=\"ariaLabel protyle-icon protyle-icon--first protyle-action__copy\" data-position=\"4north\"><svg><use xlink:href=\"#iconCopy\"></use></svg></span><span class=\"ariaLabel protyle-icon protyle-icon--last protyle-action__menu\" data-position=\"4north\"><svg><use xlink:href=\"#iconMore\"></use></svg></span></div><div class=\"hljs\"><div></div><div contenteditable=\"true\" style=\"flex: 1\" spellcheck=\"false\">https://b3log.org\n</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"code-and-mixed", "`https://b3log.org` https://b3log.org **bold** https://b3log.org", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"code\">\u200bhttps://b3log.org</span>\u200b <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> <span data-type=\"strong\">bold</span> <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+var md2BlockDOMWithAutoLinkStateTests = []parseTest{
+	{"plain-text", "foo https://b3log.org bar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo https://b3log.org bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+var md2BlockDOMWithAutoLinkGFMAutoLinkDisabledTests = []parseTest{
+	{"gfm-disabled", "foo https://b3log.org bar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+func TestMd2BlockDOMWithAutoLink(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetInlineAsterisk(true)
+
+	ast.Testing = true
+	defer func() {
+		ast.Testing = false
+	}()
+
+	for _, test := range md2BlockDOMWithAutoLinkTests {
+		result := luteEngine.Md2BlockDOMWithAutoLink(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+}
+
+func TestMd2BlockDOMWithAutoLinkState(t *testing.T) {
 	luteEngine := lute.New()
 	luteEngine.SetProtyleWYSIWYG(true)
 
-	markdown := "foo https://b3log.org bar"
+	ast.Testing = true
+	defer func() {
+		ast.Testing = false
+	}()
 
-	defaultResult := luteEngine.Md2BlockDOM(markdown, true)
-	if strings.Contains(defaultResult, "data-type=\"a\"") {
-		t.Fatalf("default Md2BlockDOM should keep URL as plain text in Protyle mode, got %q", defaultResult)
+	for _, test := range md2BlockDOMWithAutoLinkStateTests {
+		result := luteEngine.Md2BlockDOM(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
 	}
 
-	autoLinkResult := luteEngine.Md2BlockDOMWithAutoLink(markdown, true, true)
-	if !strings.Contains(autoLinkResult, "data-type=\"a\"") || !strings.Contains(autoLinkResult, "data-href=\"https://b3log.org\"") {
-		t.Fatalf("Md2BlockDOM with autoLink=true should render URL as link, got %q", autoLinkResult)
+	_ = luteEngine.Md2BlockDOMWithAutoLink(md2BlockDOMWithAutoLinkStateTests[0].from, true)
+	for _, test := range md2BlockDOMWithAutoLinkStateTests {
+		result := luteEngine.Md2BlockDOM(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s-after-auto-link] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
 	}
+}
 
-	afterResult := luteEngine.Md2BlockDOM(markdown, true)
-	if strings.Contains(afterResult, "data-type=\"a\"") {
-		t.Fatalf("autoLink should only affect current call, got %q", afterResult)
-	}
-
+func TestMd2BlockDOMWithAutoLinkWhenGFMAutoLinkDisabled(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
 	luteEngine.SetGFMAutoLink(false)
-	autoLinkWithGFMAutoLinkDisabled := luteEngine.Md2BlockDOMWithAutoLink(markdown, true, true)
-	if !strings.Contains(autoLinkWithGFMAutoLinkDisabled, "data-type=\"a\"") || !strings.Contains(autoLinkWithGFMAutoLinkDisabled, "data-href=\"https://b3log.org\"") {
-		t.Fatalf("Md2BlockDOM with autoLink=true should render URL as link even when GFMAutoLink is disabled, got %q", autoLinkWithGFMAutoLinkDisabled)
-	}
-}
-
-func TestMd2BlockDOMAutoLinkWithInlineStyleAndMultiline(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetProtyleWYSIWYG(true)
-	luteEngine.SetInlineAsterisk(true)
-
-	inlineMixed := "https://b3log.org **bold** https://b3log.org"
-	inlineResult := luteEngine.Md2BlockDOMWithAutoLink(inlineMixed, true, true)
-	if 2 != strings.Count(inlineResult, "data-type=\"a\"") {
-		t.Fatalf("inline mixed content should contain 2 links, got %q", inlineResult)
-	}
-	if !strings.Contains(inlineResult, "data-type=\"strong\"") {
-		t.Fatalf("inline mixed content should keep bold style, got %q", inlineResult)
-	}
-
-	multiline := "https://b3log.org\n**bold**\nhttps://b3log.org"
-	multiLineResult := luteEngine.Md2BlockDOMWithAutoLink(multiline, true, true)
-	if 2 != strings.Count(multiLineResult, "data-type=\"a\"") {
-		t.Fatalf("multiline content should contain 2 links, got %q", multiLineResult)
-	}
-	if !strings.Contains(multiLineResult, "data-type=\"strong\"") {
-		t.Fatalf("multiline content should keep bold style, got %q", multiLineResult)
-	}
-}
-
-func TestMd2BlockDOMAutoLinkInCodeBlock(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetProtyleWYSIWYG(true)
 
 	ast.Testing = true
+	defer func() {
+		ast.Testing = false
+	}()
 
-	// 内联代码中的链接保留原始内容，不被autoLink处理
-	inlineCode := "`https://b3log.org`"
-	inlineCodeExpected := "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"code\">\u200bhttps://b3log.org</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"
-	inlineCodeResult := luteEngine.Md2BlockDOMWithAutoLink(inlineCode, true, true)
-	if inlineCodeExpected != inlineCodeResult {
-		t.Fatalf("test case [inline code] failed\nexpected\n\t%q\ngot\n\t%q", inlineCodeExpected, inlineCodeResult)
+	for _, test := range md2BlockDOMWithAutoLinkGFMAutoLinkDisabledTests {
+		result := luteEngine.Md2BlockDOMWithAutoLink(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
 	}
-
-	// 代码块中的链接保留原始内容，不被渲染
-	codeBlock := "```\nhttps://b3log.org\n```"
-	codeBlockExpected := "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeCodeBlock\" class=\"code-block\"><div class=\"protyle-action\"><span class=\"protyle-action--first protyle-action__language\" contenteditable=\"false\"></span><span class=\"fn__flex-1\"></span><span class=\"ariaLabel protyle-icon protyle-icon--first protyle-action__copy\" data-position=\"4north\"><svg><use xlink:href=\"#iconCopy\"></use></svg></span><span class=\"ariaLabel protyle-icon protyle-icon--last protyle-action__menu\" data-position=\"4north\"><svg><use xlink:href=\"#iconMore\"></use></svg></span></div><div class=\"hljs\"><div></div><div contenteditable=\"true\" style=\"flex: 1\" spellcheck=\"false\">https://b3log.org\n</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"
-	codeBlockResult := luteEngine.Md2BlockDOMWithAutoLink(codeBlock, true, true)
-	if codeBlockExpected != codeBlockResult {
-		t.Fatalf("test case [code block] failed\nexpected\n\t%q\ngot\n\t%q", codeBlockExpected, codeBlockResult)
-	}
-
-	ast.Testing = false
-}
-
-func TestMd2BlockDOMAutoLinkWithCodeAndMixed(t *testing.T) {
-	luteEngine := lute.New()
-	luteEngine.SetProtyleWYSIWYG(true)
-	luteEngine.SetInlineAsterisk(true)
-
-	ast.Testing = true
-
-	// 测试混合场景：内联代码 + URL + 加粗 + URL，都能正确处理
-	mixedContent := "`https://b3log.org` https://b3log.org **bold** https://b3log.org"
-	mixedExpected := "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"code\">\u200bhttps://b3log.org</span>\u200b <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> <span data-type=\"strong\">bold</span> <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"
-	mixedResult := luteEngine.Md2BlockDOMWithAutoLink(mixedContent, true, true)
-	if mixedExpected != mixedResult {
-		t.Fatalf("test case [mixed: inline code + url + bold + url] failed\nexpected\n\t%q\ngot\n\t%q", mixedExpected, mixedResult)
-	}
-
-	ast.Testing = false
 }
