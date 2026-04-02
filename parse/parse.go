@@ -372,6 +372,8 @@ type Options struct {
 	VditorSV bool
 	// Protyle 所见即所得支持。
 	ProtyleWYSIWYG bool
+	// ProtyleWYSIWYGAutoLink 设置是否在 Protyle 所见即所得模式下启用自动链接解析。
+	ProtyleWYSIWYGAutoLink bool
 	// InlineMath 设置是否开启行级公式 $foo$ 支持。
 	InlineMath bool
 	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38

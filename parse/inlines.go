@@ -97,7 +97,9 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 		// 2. 方便后续功能方面的处理，比如 GFM 自动链接解析
 		t.mergeText(node)
 
-		if t.Context.ParseOption.GFMAutoLink && !t.Context.ParseOption.VditorWYSIWYG && !t.Context.ParseOption.VditorIR && !t.Context.ParseOption.VditorSV && !t.Context.ParseOption.ProtyleWYSIWYG {
+		editorMode := t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG
+		protyleAutoLink := t.Context.ParseOption.ProtyleWYSIWYG && t.Context.ParseOption.ProtyleWYSIWYGAutoLink
+		if (t.Context.ParseOption.GFMAutoLink && !editorMode) || protyleAutoLink {
 			t.parseGFMAutoEmailLink(node)
 			t.parseGFMAutoLink(node)
 		}

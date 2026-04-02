@@ -205,3 +205,85 @@ func TestMd2BlockDOMDisableSyntax(t *testing.T) {
 		}
 	}
 }
+
+var md2BlockDOMWithAutoLinkTests = []parseTest{
+	{"basic", "foo https://b3log.org bar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"inline-mixed", "https://b3log.org **bold** https://b3log.org", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> <span data-type=\"strong\">bold</span> <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"multiline", "https://b3log.org\n**bold**\nhttps://b3log.org", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span>\n<span data-type=\"strong\">bold</span>\n<span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"inline-code", "`https://b3log.org`", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"code\">\u200bhttps://b3log.org</span>\u200b</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"code-block", "```\nhttps://b3log.org\n```", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeCodeBlock\" class=\"code-block\"><div class=\"protyle-action\"><span class=\"protyle-action--first protyle-action__language\" contenteditable=\"false\"></span><span class=\"fn__flex-1\"></span><span class=\"ariaLabel protyle-icon protyle-icon--first protyle-action__copy\" data-position=\"4north\"><svg><use xlink:href=\"#iconCopy\"></use></svg></span><span class=\"ariaLabel protyle-icon protyle-icon--last protyle-action__menu\" data-position=\"4north\"><svg><use xlink:href=\"#iconMore\"></use></svg></span></div><div class=\"hljs\"><div></div><div contenteditable=\"true\" style=\"flex: 1\" spellcheck=\"false\">https://b3log.org\n</div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"code-and-mixed", "`https://b3log.org` https://b3log.org **bold** https://b3log.org", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">\u200b<span data-type=\"code\">\u200bhttps://b3log.org</span>\u200b <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> <span data-type=\"strong\">bold</span> <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+var md2BlockDOMWithAutoLinkStateTests = []parseTest{
+	{"plain-text", "foo https://b3log.org bar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo https://b3log.org bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+var md2BlockDOMWithAutoLinkGFMAutoLinkDisabledTests = []parseTest{
+	{"gfm-disabled", "foo https://b3log.org bar", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">foo <span data-type=\"a\" data-href=\"https://b3log.org\">https://b3log.org</span> bar</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+}
+
+func TestMd2BlockDOMWithAutoLink(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetInlineAsterisk(true)
+
+	ast.Testing = true
+	defer func() {
+		ast.Testing = false
+	}()
+
+	for _, test := range md2BlockDOMWithAutoLinkTests {
+		result := luteEngine.Md2BlockDOMWithAutoLink(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+}
+
+func TestMd2BlockDOMWithAutoLinkState(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+
+	ast.Testing = true
+	defer func() {
+		ast.Testing = false
+	}()
+
+	// 基线校验：Md2BlockDOM 对纯文本 URL 不应自动转成链接。
+	for _, test := range md2BlockDOMWithAutoLinkStateTests {
+		result := luteEngine.Md2BlockDOM(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+
+	// 先调用一次带自动链接能力的入口，用于触发其内部流程。
+	_ = luteEngine.Md2BlockDOMWithAutoLink(md2BlockDOMWithAutoLinkStateTests[0].from, true)
+	// 再次校验：之后调用 Md2BlockDOM 时结果必须与基线一致，
+	// 证明自动链接状态不会泄漏到普通 Md2BlockDOM 调用中。
+	for _, test := range md2BlockDOMWithAutoLinkStateTests {
+		result := luteEngine.Md2BlockDOM(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s-after-auto-link] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+}
+
+func TestMd2BlockDOMWithAutoLinkWhenGFMAutoLinkDisabled(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetGFMAutoLink(false)
+
+	ast.Testing = true
+	defer func() {
+		ast.Testing = false
+	}()
+
+	for _, test := range md2BlockDOMWithAutoLinkGFMAutoLinkDisabledTests {
+		result := luteEngine.Md2BlockDOMWithAutoLink(test.from, true)
+		if test.to != result {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, result, test.from)
+		}
+	}
+}
