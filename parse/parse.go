@@ -373,7 +373,6 @@ type Options struct {
 	// Protyle 所见即所得支持。
 	ProtyleWYSIWYG bool
 	// ProtyleWYSIWYGAutoLink 设置是否在 Protyle 所见即所得模式下启用自动链接解析。
-	// 默认关闭，仅用于按调用临时开启，避免影响既有编辑行为。
 	ProtyleWYSIWYGAutoLink bool
 	// InlineMath 设置是否开启行级公式 $foo$ 支持。
 	InlineMath bool

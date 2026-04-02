@@ -144,14 +144,12 @@ func (lute *Lute) Md2BlockDOM(markdown string, reserveEmptyParagraph bool) (vHTM
 	return
 }
 
-func (lute *Lute) Md2BlockDOMWithAutoLink(markdown string, reserveEmptyParagraph bool, autoLink bool) (vHTML string) {
+func (lute *Lute) Md2BlockDOMWithAutoLink(markdown string, reserveEmptyParagraph bool) (vHTML string) {
 	protyleAutoLink := lute.ParseOptions.ProtyleWYSIWYGAutoLink
 	defer func() {
 		lute.ParseOptions.ProtyleWYSIWYGAutoLink = protyleAutoLink
 	}()
-	if autoLink {
-		lute.ParseOptions.ProtyleWYSIWYGAutoLink = true
-	}
+	lute.ParseOptions.ProtyleWYSIWYGAutoLink = true
 	vHTML, _ = lute.Md2BlockDOMTree(markdown, reserveEmptyParagraph)
 	return
 }
