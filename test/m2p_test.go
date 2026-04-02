@@ -250,6 +250,7 @@ func TestMd2BlockDOMWithAutoLinkState(t *testing.T) {
 		ast.Testing = false
 	}()
 
+	// 基线校验：Md2BlockDOM 对纯文本 URL 不应自动转成链接。
 	for _, test := range md2BlockDOMWithAutoLinkStateTests {
 		result := luteEngine.Md2BlockDOM(test.from, true)
 		if test.to != result {
@@ -257,7 +258,10 @@ func TestMd2BlockDOMWithAutoLinkState(t *testing.T) {
 		}
 	}
 
+	// 先调用一次带自动链接能力的入口，用于触发其内部流程。
 	_ = luteEngine.Md2BlockDOMWithAutoLink(md2BlockDOMWithAutoLinkStateTests[0].from, true)
+	// 再次校验：之后调用 Md2BlockDOM 时结果必须与基线一致，
+	// 证明自动链接状态不会泄漏到普通 Md2BlockDOM 调用中。
 	for _, test := range md2BlockDOMWithAutoLinkStateTests {
 		result := luteEngine.Md2BlockDOM(test.from, true)
 		if test.to != result {
