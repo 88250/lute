@@ -10,7 +10,10 @@
 
 package parse
 
-import "github.com/88250/lute/ast"
+import (
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/html"
+)
 
 // parseInlines 解析并生成行级节点。
 func (t *Tree) parseInlines() {
@@ -56,7 +59,9 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 			} else if ial := t.Context.parseKramdownIALInListItem(tokens); 0 < len(ial) {
 				if nil != node.Previous {
 					// 解析 kramdown 列表或者引述块时可能出现标记符后为空（* \n{id:foo} 或者 >\n{: custom-b="info" }），此时 IAL 应该进行合并
-					setIALAttrs(node.Previous, ial)
+					for _, kv := range ial {
+						node.Previous.SetIALAttr(kv[0], html.UnescapeAttrVal(kv[1]))
+					}
 					next := node.Next
 					node.Unlink()
 					node.Next = next
