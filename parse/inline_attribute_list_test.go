@@ -20,11 +20,11 @@ func TestMergeIALPreservingOrder(t *testing.T) {
 			want: [][]string{{"id", "new"}, {"class", "foo&bar"}, {"updated", "20260405"}, {"title", "a&b"}},
 		},
 		{
-			// 锁定当前兼容行为：dst 中若已有重复 key，只更新第一次出现的位置。
-			name: "updates_only_first_duplicate_key_in_dst",
-			dst:  [][]string{{"id", "old"}, {"id", "shadow"}, {"class", "foo"}},
-			src:  [][]string{{"id", "new"}, {"class", "bar"}},
-			want: [][]string{{"id", "new"}, {"id", "shadow"}, {"class", "bar"}},
+			// 对应 SpinBlockDOM case 262：已有块级属性顺序保持不变，新的 IAL 属性只能追加到末尾。
+			name: "appends_new_attr_after_existing_block_attrs",
+			dst:  [][]string{{"data-node-id", "20250824233004-3qfd5gf"}, {"data-node-index", "1"}, {"data-type", "NodeBlockquote"}, {"class", "bq"}, {"updated", "20250824233509"}},
+			src:  [][]string{{"custom-b", "info"}},
+			want: [][]string{{"data-node-id", "20250824233004-3qfd5gf"}, {"data-node-index", "1"}, {"data-type", "NodeBlockquote"}, {"class", "bq"}, {"updated", "20250824233509"}, {"custom-b", "info"}},
 		},
 	}
 
