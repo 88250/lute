@@ -26,6 +26,14 @@ func TestMergeIALPreservingOrder(t *testing.T) {
 			src:  [][]string{{"custom-b", "info"}},
 			want: [][]string{{"data-node-id", "20250824233004-3qfd5gf"}, {"data-node-index", "1"}, {"data-type", "NodeBlockquote"}, {"class", "bq"}, {"updated", "20250824233509"}, {"custom-b", "info"}},
 		},
+		{
+			// 与旧逻辑的 map 语义对齐：重复 key 需要折叠，最后一个值生效，
+			// 但输出顺序保持稳定，不再随机漂移。
+			name: "collapses_duplicate_attrs_with_stable_order",
+			dst:  [][]string{{"id", "old"}, {"id", "shadow"}, {"class", "foo"}},
+			src:  [][]string{{"class", "bar"}, {"id", "new"}},
+			want: [][]string{{"id", "new"}, {"class", "bar"}},
+		},
 	}
 
 	for _, tt := range tests {
