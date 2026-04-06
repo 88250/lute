@@ -15,6 +15,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/88250/lute/editor"
+	"golang.org/x/text/width"
 )
 
 // Space 会把 tokens 中的中西文之间加上空格。
@@ -67,12 +68,12 @@ func allowSpace(currentChar, nextChar rune) bool {
 	}
 
 	currentIsCJK := isCJK(currentChar)
-	nextIsPunct := '%' != nextChar && '@' != nextChar && (unicode.IsPunct(nextChar) || '~' == nextChar || '=' == nextChar || '#' == nextChar)
+	nextIsPunct := ('%' != nextChar && '@' != nextChar && (unicode.IsPunct(nextChar) || '~' == nextChar || '=' == nextChar || '#' == nextChar)) || isFullWidth(nextChar)
 	if currentIsCJK && nextIsPunct {
 		return false
 	}
 
-	currentIsPunct := '%' != currentChar && '@' != currentChar && (unicode.IsPunct(currentChar) || '~' == currentChar || '=' == currentChar || '#' == currentChar)
+	currentIsPunct := ('%' != currentChar && '@' != currentChar && (unicode.IsPunct(currentChar) || '~' == currentChar || '=' == currentChar || '#' == currentChar)) || isFullWidth(currentChar)
 	nextIsCJK := isCJK(nextChar)
 	if nextIsCJK && currentIsPunct {
 		return false
@@ -88,4 +89,9 @@ func isCJK(r rune) bool {
 	return unicode.Is(unicode.Han, r) || unicode.Is(unicode.Lm, r) ||
 		unicode.Is(unicode.Hiragana, r) || unicode.Is(unicode.Katakana, r) ||
 		unicode.Is(unicode.Hangul, r)
+}
+
+func isFullWidth(r rune) bool {
+	kind := width.LookupRune(r).Kind()
+	return kind == width.EastAsianWide || kind == width.EastAsianFullwidth
 }
