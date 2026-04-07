@@ -1209,6 +1209,9 @@ func (r *ProtyleRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSta
 		r.Tag("table", attrs, false)
 		caption := node.IALAttr("caption")
 		if "" != caption {
+			if r.Options.Sanitize {
+				caption = Sanitize(caption)
+			}
 			r.WriteString(html.UnescapeHTMLStr(caption))
 		}
 	} else {
