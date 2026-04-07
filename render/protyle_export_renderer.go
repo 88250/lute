@@ -863,6 +863,10 @@ func (r *ProtyleExportRenderer) renderToC(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *ProtyleExportRenderer) renderFootnotesDefBlock(node *ast.Node, entering bool) ast.WalkStatus {
+	if !r.Tree.ExistFootnotesDef() {
+		return ast.WalkContinue
+	}
+
 	if entering {
 		r.WriteString("<div class=\"footnotes-defs-div\">")
 		r.WriteString("<hr class=\"footnotes-defs-hr\" />\n")
@@ -892,6 +896,10 @@ func (r *ProtyleExportRenderer) renderFootnotesDef(node *ast.Node, entering bool
 func (r *ProtyleExportRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
+		if 0 == idx {
+			return ast.WalkContinue
+		}
+
 		idxStr := strconv.Itoa(idx)
 		r.Tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
 		r.Tag("a", [][]string{{"href", r.Options.LinkBase + "#footnotes-def-" + idxStr}}, false)
@@ -1195,6 +1203,7 @@ func (r *ProtyleExportRenderer) renderTable(node *ast.Node, entering bool) ast.W
 		if isHtmlTable {
 			subTree := &parse.Tree{}
 			subTree.Root = node
+			subTree.Context = r.Tree.Context
 			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
 			output := previewRenderer.Render()
 			r.Write(output)

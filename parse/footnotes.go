@@ -81,7 +81,7 @@ func FootnotesContinue(footnotesDef *ast.Node, context *Context) int {
 
 func (t *Tree) FindFootnotesDef(label []byte) (pos int, def *ast.Node) {
 	pos = 0
-	if t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG {
+	if nil != t.Context && (t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG) {
 		label = bytes.ReplaceAll(label, editor.CaretTokens, nil)
 	}
 	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -96,4 +96,8 @@ func (t *Tree) FindFootnotesDef(label []byte) (pos int, def *ast.Node) {
 		return ast.WalkContinue
 	})
 	return
+}
+
+func (t *Tree) ExistFootnotesDef() (ret bool) {
+	return 0 < len(t.Root.ChildrenByType(ast.NodeFootnotesDef))
 }
