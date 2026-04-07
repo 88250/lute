@@ -1208,6 +1208,7 @@ func (r *ProtyleExportMdRenderer) renderTable(node *ast.Node, entering bool) ast
 		if entering {
 			subTree := &parse.Tree{}
 			subTree.Root = node
+			subTree.Context = r.Tree.Context
 			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
 			output := previewRenderer.Render()
 			r.Write(output)

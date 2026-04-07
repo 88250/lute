@@ -696,8 +696,8 @@ func (r *ProtylePreviewRenderer) renderToC(node *ast.Node, entering bool) ast.Wa
 
 func (r *ProtylePreviewRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
-		if 0 == idx {
+		idx, def := r.Tree.FindFootnotesDef(node.Tokens)
+		if nil == def {
 			return ast.WalkContinue
 		}
 

@@ -384,6 +384,9 @@ func (r *VditorIRRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 		r.WriteString(editor.Zwsp)
 	}
 	idx, def := r.Tree.FindFootnotesDef(node.Tokens)
+	if nil == def {
+		return ast.WalkContinue
+	}
 	idxStr := strconv.Itoa(idx)
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}

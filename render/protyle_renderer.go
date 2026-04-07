@@ -895,7 +895,11 @@ func (r *ProtyleRenderer) renderFootnotesDef(node *ast.Node, entering bool) ast.
 
 func (r *ProtyleRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
+		idx, def := r.Tree.FindFootnotesDef(node.Tokens)
+		if nil == def {
+			return ast.WalkContinue
+		}
+
 		idxStr := strconv.Itoa(idx)
 		r.Tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
 		r.Tag("a", [][]string{{"href", r.Options.LinkBase + "#footnotes-def-" + idxStr}}, false)

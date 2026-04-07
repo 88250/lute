@@ -779,7 +779,11 @@ func (r *ProtyleExportDocxRenderer) renderToC(node *ast.Node, entering bool) ast
 
 func (r *ProtyleExportDocxRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
+		idx, def := r.Tree.FindFootnotesDef(node.Tokens)
+		if nil == def {
+			return ast.WalkContinue
+		}
+
 		idxStr := strconv.Itoa(idx)
 		r.Tag("sup", [][]string{{"class", "footnotes-ref"}, {"id", "footnotes-ref-" + node.FootnotesRefId}}, false)
 		r.Tag("a", [][]string{{"href", r.Options.LinkBase + "#footnotes-def-" + idxStr}}, false)
@@ -1011,6 +1015,7 @@ func (r *ProtyleExportDocxRenderer) renderTable(node *ast.Node, entering bool) a
 		if entering {
 			subTree := &parse.Tree{}
 			subTree.Root = node
+			subTree.Context = r.Tree.Context
 			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
 			output := previewRenderer.Render()
 			r.Write(output)

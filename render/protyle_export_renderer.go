@@ -895,8 +895,8 @@ func (r *ProtyleExportRenderer) renderFootnotesDef(node *ast.Node, entering bool
 
 func (r *ProtyleExportRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		idx, _ := r.Tree.FindFootnotesDef(node.Tokens)
-		if 0 == idx {
+		idx, def := r.Tree.FindFootnotesDef(node.Tokens)
+		if nil == def {
 			return ast.WalkContinue
 		}
 
@@ -1204,9 +1204,20 @@ func (r *ProtyleExportRenderer) renderTable(node *ast.Node, entering bool) ast.W
 			subTree := &parse.Tree{}
 			subTree.Root = node
 			subTree.Context = r.Tree.Context
+			defBlock := r.Tree.Root.ChildByType(ast.NodeFootnotesDefBlock)
+			if nil != defBlock {
+				subTree.Root.AppendChild(defBlock)
+			}
 			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
 			output := previewRenderer.Render()
+			if idx := bytes.Index(output, []byte("<div class=\"footnotes-defs-div\">")); -1 < idx {
+				output = output[:idx]
+				output = append(output, []byte("</tbody>\n</table>")...)
+			}
 			r.Write(output)
+			if nil != defBlock {
+				r.Tree.Root.AppendChild(defBlock)
+			}
 			return ast.WalkSkipChildren
 		}
 

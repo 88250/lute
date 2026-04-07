@@ -432,6 +432,9 @@ func (r *VditorSVRenderer) renderFootnotesRef(node *ast.Node, entering bool) ast
 	previousNodeText := node.PreviousNodeText()
 	previousNodeText = strings.ReplaceAll(previousNodeText, editor.Caret, "")
 	_, def := r.Tree.FindFootnotesDef(node.Tokens)
+	if nil == def {
+		return ast.WalkContinue
+	}
 	label := def.Text()
 	attrs := [][]string{{"data-type", "footnotes-ref"}}
 	attrs = append(attrs, []string{"class", "b3-tooltips b3-tooltips__s"})
