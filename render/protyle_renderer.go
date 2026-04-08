@@ -1780,13 +1780,13 @@ func (r *ProtyleRenderer) renderListItem(node *ast.Node, entering bool) ast.Walk
 		case 3:
 			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "t"})
-			if node.FirstChild != nil {
+			if node.FirstChild != nil && ast.NodeTaskListItemMarker == node.FirstChild.Type {
 				if node.FirstChild.TaskListItemChecked {
 					class += " protyle-task--done"
 				}
 
 				if r.Options.DataTask {
-					marker := node.EffectiveTaskListItemMarker()
+					marker := node.FirstChild.EffectiveTaskListItemMarker()
 					attrs = append(attrs, []string{"data-task", string(marker)})
 				}
 			}
