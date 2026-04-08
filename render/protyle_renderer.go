@@ -1780,8 +1780,15 @@ func (r *ProtyleRenderer) renderListItem(node *ast.Node, entering bool) ast.Walk
 		case 3:
 			attrs = append(attrs, []string{"data-marker", "*"})
 			attrs = append(attrs, []string{"data-subtype", "t"})
-			if node.FirstChild != nil && node.FirstChild.TaskListItemChecked {
-				class += " protyle-task--done"
+			if node.FirstChild != nil {
+				if node.FirstChild.TaskListItemChecked {
+					class += " protyle-task--done"
+				}
+
+				if r.Options.DataTask {
+					marker := node.EffectiveTaskListItemMarker()
+					attrs = append(attrs, []string{"data-task", string(marker)})
+				}
 			}
 		}
 		r.blockNodeAttrs(node, &attrs, class)
@@ -1815,15 +1822,11 @@ func (r *ProtyleRenderer) renderTaskListItemMarker(node *ast.Node, entering bool
 		if !r.Options.ProtyleContenteditable {
 			draggable = "false"
 		}
-		dataTask := ""
-		if r.Options.DataTask {
-			marker := node.EffectiveTaskListItemMarker()
-			dataTask = " data-task=\"" + string(marker) + "\""
-		}
+
 		if r.NormalizedTaskListItemChecked(node) {
-			r.WriteString("<div class=\"protyle-action protyle-action--task\"" + dataTask + " draggable=\"" + draggable + "\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
+			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"" + draggable + "\"><svg><use xlink:href=\"#iconCheck\"></use></svg></div>")
 		} else {
-			r.WriteString("<div class=\"protyle-action protyle-action--task\"" + dataTask + " draggable=\"" + draggable + "\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
+			r.WriteString("<div class=\"protyle-action protyle-action--task\" draggable=\"" + draggable + "\"><svg><use xlink:href=\"#iconUncheck\"></use></svg></div>")
 		}
 		if nil == node.Next {
 			node.InsertAfter(&ast.Node{ID: ast.NewNodeID(), Type: ast.NodeParagraph})
