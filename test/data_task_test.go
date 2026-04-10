@@ -123,6 +123,8 @@ var dataTaskCustomMarkerTests = []parseTest{
 	{"4", "- [　] not task\n", "<ul>\n<li>[\u3000] not task</li>\n</ul>\n"},
 	// 测试双引号
 	{"5", "- [\"] quote\n", "<ul>\n<li>[&quot;] quote</li>\n</ul>\n"},
+	// 测试 &
+	{"6", "- [&] quote\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"&amp;\" /> quote</li>\n</ul>\n"},
 }
 
 func TestDataTaskCustomMarker(t *testing.T) {

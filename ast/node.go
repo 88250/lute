@@ -149,23 +149,20 @@ type Node struct {
 	CalloutIconType int    `json:",omitempty"` // 提示块图标类型，0：Emoji Unicode，1：自定义图标
 }
 
-// EffectiveTaskListItemMarker 返回任务列表项的有效标记字符。
+// EffectiveTaskListItemMarker 返回任务列表项的有效标记字符（已转义，适用于 HTML 属性值输出）。
 // 新数据通过 TaskListItemMarker 字段存储；旧数据回退到 TaskListItemChecked 布尔值。
 // 小写 x 统一为大写 X。
-func (n *Node) EffectiveTaskListItemMarker() byte {
+func (n *Node) EffectiveTaskListItemMarker() string {
 	if n.TaskListItemMarker != 0 {
 		if n.TaskListItemMarker == 'x' {
-			return 'X'
+			return "X"
 		}
-		if '"' == n.TaskListItemMarker { // 为了安全，如果出现双引号则强制渲染为 X
-			return 'X'
-		}
-		return n.TaskListItemMarker
+		return html.EscapeHTMLStr(string(n.TaskListItemMarker))
 	}
 	if n.TaskListItemChecked {
-		return 'X'
+		return "X"
 	}
-	return ' '
+	return " "
 }
 
 // ReviveFromMarker 通过原始标记字符同时设置 TaskListItemMarker 和 TaskListItemChecked。

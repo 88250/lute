@@ -1787,7 +1787,7 @@ func (r *ProtyleRenderer) renderListItem(node *ast.Node, entering bool) ast.Walk
 
 				if r.Options.DataTask {
 					marker := node.FirstChild.EffectiveTaskListItemMarker()
-					attrs = append(attrs, []string{"data-task", string(marker)})
+					attrs = append(attrs, []string{"data-task", marker})
 				}
 			}
 		}

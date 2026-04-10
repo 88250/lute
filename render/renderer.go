@@ -187,11 +187,11 @@ type BaseRenderer struct {
 func (r *BaseRenderer) NormalizedTaskListItemMarker(node *ast.Node) byte {
 	marker := node.EffectiveTaskListItemMarker()
 	if r.Options.ExportNormalizeTaskListMarker {
-		if marker != ' ' && marker != 'X' {
-			marker = 'X'
+		if marker != " " && marker != "X" {
+			marker = "X"
 		}
 	}
-	return marker
+	return html.UnescapeHTMLStr(marker)[0]
 }
 
 // NormalizedTaskListItemChecked 返回规范化后的任务列表勾选状态。

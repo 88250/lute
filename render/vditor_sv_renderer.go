@@ -1239,11 +1239,11 @@ func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 	r.Tag("/span", nil, false)
 	if node.TaskListItemChecked {
 		r.Tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--strong"}}, false)
-		r.WriteByte(marker)
+		r.WriteString(marker)
 		r.Tag("/span", nil, false)
 	} else {
 		r.Tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)
-		r.WriteByte(marker)
+		r.WriteString(marker)
 		r.Tag("/span", nil, false)
 	}
 	r.Tag("span", [][]string{{"data-type", "task-marker"}, {"class", "vditor-sv__marker--bi"}}, false)

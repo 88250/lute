@@ -1416,7 +1416,7 @@ func (r *HtmlRenderer) renderTaskListItemMarker(node *ast.Node, entering bool) a
 		attrs = append(attrs, []string{"disabled", ""}, []string{"type", "checkbox"})
 		if r.Options.DataTask {
 			marker := node.EffectiveTaskListItemMarker()
-			attrs = append(attrs, []string{"data-task", string(marker)})
+			attrs = append(attrs, []string{"data-task", marker})
 		}
 		r.Tag("input", attrs, true)
 	}

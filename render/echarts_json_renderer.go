@@ -446,7 +446,7 @@ func (r *EChartsJSONRenderer) renderTaskListItemMarker(node *ast.Node, entering 
 	if entering {
 		r.openObj()
 		marker := node.EffectiveTaskListItemMarker()
-		r.val("Task List Item Marker\n["+string(marker)+"]", node)
+		r.val("Task List Item Marker\n["+marker+"]", node)
 		r.openChildren(node)
 	} else {
 		r.closeChildren(node)
