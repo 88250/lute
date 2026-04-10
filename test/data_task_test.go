@@ -121,6 +121,8 @@ var dataTaskCustomMarkerTests = []parseTest{
 	// 测试多字节字符作为任务标记
 	{"3", "- [✓] not task\n", "<ul>\n<li>[✓] not task</li>\n</ul>\n"},
 	{"4", "- [　] not task\n", "<ul>\n<li>[\u3000] not task</li>\n</ul>\n"},
+	// 测试双引号
+	{"5", "- [\"] quote\n", "<ul>\n<li>[&quot;] quote</li>\n</ul>\n"},
 }
 
 func TestDataTaskCustomMarker(t *testing.T) {
