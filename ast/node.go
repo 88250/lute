@@ -157,7 +157,7 @@ func (n *Node) EffectiveTaskListItemMarker() byte {
 		if n.TaskListItemMarker == 'x' {
 			return 'X'
 		}
-		if 34 == n.TaskListItemMarker { // 为了安全，如果出现双引号则强制渲染为 X
+		if '"' == n.TaskListItemMarker { // 为了安全，如果出现双引号则强制渲染为 X
 			return 'X'
 		}
 		return n.TaskListItemMarker
