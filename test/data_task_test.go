@@ -118,6 +118,9 @@ var dataTaskCustomMarkerTests = []parseTest{
 	{"1", "- [?] maybe\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"?\" /> maybe</li>\n</ul>\n"},
 	// "!" 标记 (自定义重要状态)
 	{"2", "- [!] important\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" data-task=\"!\" /> important</li>\n</ul>\n"},
+	// 测试多字节字符作为任务标记
+	{"3", "- [✓] not task\n", "<ul>\n<li>[✓] not task</li>\n</ul>\n"},
+	{"4", "- [　] not task\n", "<ul>\n<li>[\u3000] not task</li>\n</ul>\n"},
 }
 
 func TestDataTaskCustomMarker(t *testing.T) {
