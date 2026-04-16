@@ -466,8 +466,7 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 		oldStyle := r.tokensStyle(tokens)
 		if style := node.IALAttr("style"); "" == style {
 			if "" != oldStyle {
-				os := oldStyle
-				os = strings.ReplaceAll(os, "pointer-events: none;", "")
+				os := strings.ReplaceAll(oldStyle, "pointer-events: none;", "")
 				attrs = append(attrs, []string{"style", os})
 			}
 		}
@@ -503,8 +502,7 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 		oldStyle := r.tokensStyle(tokens)
 		if style := node.IALAttr("style"); "" == style {
 			if "" != oldStyle {
-				os := oldStyle
-				os = strings.ReplaceAll(os, "pointer-events: none;", "")
+				os := strings.ReplaceAll(oldStyle, "pointer-events: none;", "")
 				attrs = append(attrs, []string{"style", os})
 			}
 		}
