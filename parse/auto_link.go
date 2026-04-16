@@ -571,6 +571,7 @@ func (t *Tree) newLink(typ ast.NodeType, text, dest, title []byte, linkType int)
 		text = bytes.ReplaceAll(text, editor.CaretTokens, nil)
 		dest = bytes.ReplaceAll(dest, []byte("%E2%80%B8"), nil)
 	}
+	text = html.DecodeDestination(text)
 
 	ret = &ast.Node{Type: typ, LinkType: linkType}
 	if ast.NodeImage == typ {

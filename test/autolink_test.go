@@ -37,7 +37,7 @@ var autoLinkTests = []parseTest{
 	{"15", "中https://notaurl文\n", "<p>中 https://notaurl 文</p>\n"},
 	{"14", "abc://xyz测试foo", "<p><a href=\"abc://xyz%E6%B5%8B%E8%AF%95foo\">abc://xyz 测试 foo</a></p>\n"},
 	{"13", "siyuan://blocks/20220817180757-c57m8qi测试foo", "<p><a href=\"siyuan://blocks/20220817180757-c57m8qi%E6%B5%8B%E8%AF%95foo\">siyuan://blocks/20220817180757-c57m8qi 测试 foo</a></p>\n"},
-	{"12", "https://github.com/siyuan-note/siyuan/issues/?page=1&q=is%3Aissue+is%3Aopen", "<p><a href=\"https://github.com/siyuan-note/siyuan/issues/?page=1&amp;q=is%3Aissue+is%3Aopen\">https://github.com/siyuan-note/siyuan/issues/?page=1&amp;q=is%3Aissue+is%3Aopen</a></p>\n"},
+	{"12", "https://github.com/siyuan-note/siyuan/issues/?page=1&q=is%3Aissue+is%3Aopen", "<p><a href=\"https://github.com/siyuan-note/siyuan/issues/?page=1&amp;q=is%3Aissue+is%3Aopen\">https://github.com/siyuan-note/siyuan/issues/?page=1&amp;q=is:issue+is:open</a></p>\n"},
 	{"11", "https://github.com/88250/lute/issues/101", "<p><a href=\"https://github.com/88250/lute/issues/101\">Issue #101 · 88250/lute</a></p>\n"},
 	{"10", "https://github.com/pages#标题\nhttps://www.google.com.hk/search?q=博客\nhttps://例子.网站/pages#home\n", "<p><a href=\"https://github.com/pages#%E6%A0%87%E9%A2%98\">https://github.com/pages#标题</a><br />\n<a href=\"https://www.google.com.hk/search?q=%E5%8D%9A%E5%AE%A2\">https://www.google.com.hk/search?q=博客</a><br />\nhttps://例子.网站/pages#home</p>\n"},
 	{"9", "中http://notaurl文\n", "<p>中 http://notaurl 文</p>\n"},
