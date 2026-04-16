@@ -464,10 +464,11 @@ func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkSt
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		oldStyle := r.tokensStyle(tokens)
-		oldStyle = strings.ReplaceAll(oldStyle, "pointer-events: none;", "")
 		if style := node.IALAttr("style"); "" == style {
 			if "" != oldStyle {
-				attrs = append(attrs, []string{"style", oldStyle})
+				os := oldStyle
+				os = strings.ReplaceAll(os, "pointer-events: none;", "")
+				attrs = append(attrs, []string{"style", os})
 			}
 		}
 		tokens = bytes.ReplaceAll(tokens, []byte("style=\""+oldStyle+"\""), nil)
@@ -500,10 +501,11 @@ func (r *ProtyleRenderer) renderIFrame(node *ast.Node, entering bool) ast.WalkSt
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "iframe")
 		oldStyle := r.tokensStyle(tokens)
-		oldStyle = strings.ReplaceAll(oldStyle, "pointer-events: none;", "")
 		if style := node.IALAttr("style"); "" == style {
 			if "" != oldStyle {
-				attrs = append(attrs, []string{"style", oldStyle})
+				os := oldStyle
+				os = strings.ReplaceAll(os, "pointer-events: none;", "")
+				attrs = append(attrs, []string{"style", os})
 			}
 		}
 		tokens = bytes.ReplaceAll(tokens, []byte("style=\""+oldStyle+"\""), nil)
