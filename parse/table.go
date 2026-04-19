@@ -266,7 +266,11 @@ func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (r
 	var i int
 	var col []byte
 	for ; i < colsLen && i < alignsLen; i++ {
-		col = lex.TrimWhitespace(cols[i])
+		if context.ParseOption.ProtyleWYSIWYG {
+			col = cols[i]
+		} else {
+			col = lex.TrimWhitespace(cols[i])
+		}
 		col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("|"))
 		cell := &ast.Node{Type: ast.NodeTableCell, TableCellAlign: aligns[i]}
 		cell.Tokens = col
