@@ -329,7 +329,7 @@ func (context *Context) parseTableDelimRow(line []byte) (aligns []int) {
 	for _, col := range cols {
 		col = lex.TrimWhitespace(col)
 		col = bytes.ReplaceAll(col, []byte("&#124;"), []byte("|"))
-		if 1 > length || nil == col {
+		if nil == col {
 			return nil
 		}
 
