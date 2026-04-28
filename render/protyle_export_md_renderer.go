@@ -1576,6 +1576,9 @@ func (r *ProtyleExportMdRenderer) renderText(node *ast.Node, entering bool) ast.
 		for bytes.HasPrefix(node.Tokens, []byte(editor.Zwsp)) && "" == node.NextNodeText() {
 			node.Tokens = bytes.TrimPrefix(node.Tokens, []byte(editor.Zwsp))
 		}
+		if nil == node.Previous {
+			node.Tokens, _ = bytes.CutPrefix(node.Tokens, []byte(editor.Zwsp))
+		}
 		if 1 > len(node.Tokens) {
 			return ast.WalkContinue
 		}
