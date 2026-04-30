@@ -184,20 +184,25 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 			}
 
 			if entering {
-				contain := false
-				for _, tag := range tags {
-					if n.IsTextMarkType(tag) {
-						contain = true
-						break
+				merged := make([]string, 0, len(tags)+1)
+				merged = append(merged, tags...)
+				for _, typ := range strings.Split(n.TextMarkType, " ") {
+					if "" == typ || "text" == typ {
+						continue
+					}
+					found := false
+					for _, t := range merged {
+						if t == typ {
+							found = true
+							break
+						}
+					}
+					if !found {
+						merged = append(merged, typ)
 					}
 				}
-				if !contain {
-					tags = append(tags, n.TextMarkType)
-					n.TextMarkType = strings.Join(tags, " ")
-				}
-			} else {
-				if nil == n.Next || n.Next.IsCloseMarker() {
-					tags = tags[:len(tags)-1]
+				if 0 < len(merged) {
+					n.TextMarkType = strings.Join(merged, " ")
 				}
 			}
 			return ast.WalkContinue
@@ -376,20 +381,25 @@ func NestedInlines2FlattedSpans(tree *Tree, isExportMd bool) {
 			}
 
 			if entering {
-				contain := false
-				for _, tag := range tags {
-					if n.IsTextMarkType(tag) {
-						contain = true
-						break
+				merged := make([]string, 0, len(tags)+1)
+				merged = append(merged, tags...)
+				for _, typ := range strings.Split(n.TextMarkType, " ") {
+					if "" == typ || "text" == typ {
+						continue
+					}
+					found := false
+					for _, t := range merged {
+						if t == typ {
+							found = true
+							break
+						}
+					}
+					if !found {
+						merged = append(merged, typ)
 					}
 				}
-				if !contain {
-					tags = append(tags, n.TextMarkType)
-					n.TextMarkType = strings.Join(tags, " ")
-				}
-			} else {
-				if nil == n.Next || n.IsCloseMarker() {
-					tags = tags[:len(tags)-1]
+				if 0 < len(merged) {
+					n.TextMarkType = strings.Join(merged, " ")
 				}
 			}
 			return ast.WalkContinue
