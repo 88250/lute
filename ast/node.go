@@ -483,17 +483,6 @@ func (n *Node) SortTextMarkDataTypes() {
 	n.TextMarkType = strings.Join(dataTypes, " ")
 }
 
-// ClearIALAttrs 用于删除 name、alias、memo 和 bookmark 以及所有 custom- 前缀属性。
-func (n *Node) ClearIALAttrs() {
-	tmp := n.KramdownIAL[:0]
-	for _, kv := range n.KramdownIAL {
-		if "name" != kv[0] && "alias" != kv[0] && "memo" != kv[0] && "bookmark" != kv[0] && !strings.HasPrefix(kv[0], "custom-") {
-			tmp = append(tmp, kv)
-		}
-	}
-	n.KramdownIAL = tmp
-}
-
 func (n *Node) RemoveIALAttr(name string) {
 	tmp := n.KramdownIAL[:0]
 	for _, kv := range n.KramdownIAL {
