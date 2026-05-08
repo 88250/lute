@@ -318,6 +318,25 @@ func (lute *Lute) adjustNoscriptImg(n *html.Node) {
 
 func (lute *Lute) adjustMath(n *html.Node) {
 	class := util.DomAttrValue(n, "class")
+	if strings.Contains(class, "katex--display") || strings.Contains(class, "katex--inline") {
+		if span := util.DomChildByTypeAndClass(n, atom.Span, "katex-mathml"); nil != span {
+			if tex := util.DomText(span.FirstChild); "" != tex {
+				tex = strings.TrimSpace(tex)
+				for strings.Contains(tex, "\n ") {
+					tex = strings.ReplaceAll(tex, "\n ", "\n")
+				}
+
+				if idx := strings.LastIndex(tex, "\n\n\n\n"); 0 < idx {
+					// 根据最后 4 个换行符分隔公式内容，适配 CSDN 公式剪藏
+					tex = tex[idx+4:]
+				}
+
+				tex = strings.TrimSpace(tex)
+				util.SetDomAttrValue(n, "data-tex", tex)
+			}
+		}
+	}
+
 	if ((atom.Span == n.DataAtom || atom.Div == n.DataAtom) && strings.Contains(class, "mwe-math-element")) || (strings.Contains(class, "tex") && !strings.Contains(class, "text")) {
 		if annos := util.DomChildrenByType(n, atom.Annotation); 0 < len(annos) {
 			anno := annos[0]
