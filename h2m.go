@@ -822,23 +822,28 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		code = bytes.TrimSuffix(code, []byte("</code>"))
 
 		allSpan := true
-		for c := n.FirstChild; nil != c; c = c.NextSibling {
-			if html.TextNode == c.Type {
-				continue
-			}
-			if atom.Em == c.DataAtom || atom.Strong == c.DataAtom {
-				// https://github.com/siyuan-note/siyuan/issues/11682
-				continue
-			}
-			if atom.Span != c.DataAtom {
-				allSpan = false
-				break
+		if lute.parentIs(n, atom.Table) {
+			allSpan = false
+		} else {
+			for c := n.FirstChild; nil != c; c = c.NextSibling {
+				if html.TextNode == c.Type {
+					continue
+				}
+				if atom.Em == c.DataAtom || atom.Strong == c.DataAtom {
+					// https://github.com/siyuan-note/siyuan/issues/11682
+					continue
+				}
+				if atom.Span != c.DataAtom && atom.Br != c.DataAtom && atom.P != c.DataAtom {
+					allSpan = false
+					break
+				}
 			}
 		}
 		if allSpan {
 			// 如果全部都是 span 子节点，那么直接使用 span 的内容 https://github.com/siyuan-note/siyuan/issues/11281
 			code = []byte(util.DomText(n))
 			code = bytes.ReplaceAll(code, []byte("\u00A0"), []byte(" "))
+			code = bytes.ReplaceAll(code, []byte("\n"), []byte(" "))
 		}
 
 		content := &ast.Node{Type: ast.NodeCodeSpanContent, Tokens: code}
