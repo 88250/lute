@@ -420,6 +420,10 @@ type Options struct {
 	TextMark bool
 	// HTMLTag2TextMark 设置是否打开 HTML 某些标签解析为 TextMark 节点支持。
 	// 目前仅支持 <u>、<kbd>、<sub>、<sup>、<strong>/<b>、<em>/<i>、<s>/<del>/<strike> 和 <mark>。
+	//
+	// * h2m 时就算禁用行级语法，只要启用 HTMLTag2TextMark 则依然转换为 md 标记符，因为 h2m 不走 parse
+	// * 走 parse 时如果遇到 html 标签且 HTMLTag2TextMark 开启则转换为 TextMark 节点
+	// 所以最终以上两种情况都相当于启用行级语法渲染 Protyle DOM
 	HTMLTag2TextMark bool
 	// Spin 设置是否打开自旋解析支持，该选项仅用于 Spin 内部过程，设置时请注意使用场景。
 	//

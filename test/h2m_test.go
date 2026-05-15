@@ -328,6 +328,7 @@ func TestHTML2Md(t *testing.T) {
 	luteEngine.SetInlineAsterisk(true)
 	luteEngine.SetInlineUnderscore(true)
 	luteEngine.SetKramdownIAL(true)
+	luteEngine.SetHTMLTag2TextMark(true)
 	for _, test := range html2MdTests {
 		md := luteEngine.HTML2Md(test.from)
 		if test.to != md {
@@ -338,16 +339,17 @@ func TestHTML2Md(t *testing.T) {
 
 var html2MdDisableSyntaxTests = []parseTest{
 
-	{"9", "<section style=\"-webkit-tap-highlight-color: transparent;margin-bottom: 8px;outline: 0px;letter-spacing: 0.578px;font-family: system-ui, -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Hiragino Sans GB&quot;, &quot;Microsoft YaHei UI&quot;, &quot;Microsoft YaHei&quot;, Arial, sans-serif;background-color: rgb(255, 255, 255);text-align: center;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;font-size: 13px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;color: rgb(13, 52, 117);\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;letter-spacing: 0.5px;text-decoration-style: solid;text-decoration-color: rgb(51, 51, 51);\">现在扫码<strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;font-size: 14px;\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\">👇</em></strong></span></strong></em></span></span><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;font-size: 13px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;color: rgb(255, 0, 0);text-decoration: underline;\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;letter-spacing: 0.5px;\">优先帮你解决卖房难题，</span></strong></em></span></span><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;font-size: 13px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;color: rgb(255, 0, 0);text-decoration: underline;\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;letter-spacing: 0.5px;\">最后5个名额</span></strong></em></span></span><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;color: rgb(255, 0, 0);font-size: 13px;\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;letter-spacing: 0.5px;\">！</span></strong></em></span></section>", "<em><strong>现在扫码<strong><em>👇</em></strong></strong></em><em><strong>优先帮你解决卖房难题，</strong></em><em><strong>最后 5 个名额</strong></em><em><strong>！</strong></em>\n"},
-	{"8", "<span>这两个语素最开始</span><sup data-text=\"大概是春秋战国音吧。\" data-url=\"\" data-numero=\"1\" data-draft-node=\"inline\" data-draft-type=\"reference\" data-tooltip=\"大概是春秋战国音吧。\" data-tooltip-richtext=\"1\" data-tooltip-preset=\"white\" data-tooltip-classname=\"ztext-reference-tooltip\"><a id=\"ref_1_0\" href=\"https://www.zhihu.com/question/2127166482#ref_1\" data-reference-link=\"true\" aria-labelledby=\"ref_1\">[1]</a></sup><span>都很拟声</span>", "这两个语素最开始<sup>[[1]](https://www.zhihu.com/question/2127166482#ref_1)</sup>都很拟声\n"},
-	{"7", "<strong><em>foo</em></strong> <em><strong>bar</strong></em>", "<strong><em>foo</em></strong> <em><strong>bar</strong></em>\n"},
+	{"10", "<sup class=\"ss-footnote\" href=\"\" footnote-id=\"1\" data-title=\"这里，「空白符」是指 Unicode 通用类别（general category）为 Zs (space character) 的字符（即各类空格），再加上制表符（U+0009）、换行符（U+000A）、换页符（U+000C）、回车符（U+000D），以及行首和行尾。「标点符号」是指 Unicode 通用类别为 P (puncuation) 或 S (symbol) 的字符。\" tabindex=\"0\">1<div class=\"sup-tips\"><p>这里，「空白符」是指 Unicode 通用类别（general category）为 Zs (space character) 的字符（即各类空格），再加上制表符（U+0009）、换行符（U+000A）、换页符（U+000C）、回车符（U+000D），以及行首和行尾。「标点符号」是指 Unicode 通用类别为 P (puncuation) 或 S (symbol) 的字符。</p></div></sup>", "^1这里，「空白符」是指 Unicode 通用类别（general category）为 Zs (space character) 的字符（即各类空格），再加上制表符（U+0009）、换行符（U+000A）、换页符（U+000C）、回车符（U+000D），以及行首和行尾。「标点符号」是指 Unicode 通用类别为 P (puncuation) 或 S (symbol) 的字符。\n\n\n^\n"},
+	{"9", "<section style=\"-webkit-tap-highlight-color: transparent;margin-bottom: 8px;outline: 0px;letter-spacing: 0.578px;font-family: system-ui, -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Hiragino Sans GB&quot;, &quot;Microsoft YaHei UI&quot;, &quot;Microsoft YaHei&quot;, Arial, sans-serif;background-color: rgb(255, 255, 255);text-align: center;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;font-size: 13px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;color: rgb(13, 52, 117);\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;letter-spacing: 0.5px;text-decoration-style: solid;text-decoration-color: rgb(51, 51, 51);\">现在扫码<strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;font-size: 14px;\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\">👇</em></strong></span></strong></em></span></span><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;font-size: 13px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;color: rgb(255, 0, 0);text-decoration: underline;\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;letter-spacing: 0.5px;\">优先帮你解决卖房难题，</span></strong></em></span></span><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;font-size: 13px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;color: rgb(255, 0, 0);text-decoration: underline;\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;letter-spacing: 0.5px;\">最后5个名额</span></strong></em></span></span><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;color: rgb(255, 0, 0);font-size: 13px;\"><em style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><strong style=\"-webkit-tap-highlight-color: transparent;outline: 0px;\"><span style=\"-webkit-tap-highlight-color: transparent;outline: 0px;letter-spacing: 0.5px;\">！</span></strong></em></span></section>", "***现在扫码👇***<u>优先帮你解决卖房难题，</u><u>最后 5 个名额</u>***！***\n"},
+	{"8", "<span>这两个语素最开始</span><sup data-text=\"大概是春秋战国音吧。\" data-url=\"\" data-numero=\"1\" data-draft-node=\"inline\" data-draft-type=\"reference\" data-tooltip=\"大概是春秋战国音吧。\" data-tooltip-richtext=\"1\" data-tooltip-preset=\"white\" data-tooltip-classname=\"ztext-reference-tooltip\"><a id=\"ref_1_0\" href=\"https://www.zhihu.com/question/2127166482#ref_1\" data-reference-link=\"true\" aria-labelledby=\"ref_1\">[1]</a></sup><span>都很拟声</span>", "这两个语素最开始^[[1]](https://www.zhihu.com/question/2127166482#ref_1)^都很拟声\n"},
+	{"7", "<strong><em>foo</em></strong> <em><strong>bar</strong></em>", "***foo*** ***bar***\n"},
 	{"6", "<kbd>foo</kbd>", "<kbd>foo</kbd>\n"},
-	{"5", "<mark>foo</mark>", "<mark>foo</mark>\n"},
+	{"5", "<mark>foo</mark>", "==foo==\n"},
 	{"4", "<u>foo</u>", "<u>foo</u>\n"},
-	{"3", "<s>foo</s> <del>bar</del> <strike>baz</strike>", "<s>foo</s> <s>bar</s> <s>baz</s>\n"},
-	{"2", "foo<strong>bar</strong> <b>baz</b>", "foo<strong>bar</strong> <strong>baz</strong>\n"},
-	{"1", "foo<em>bar</em> <i>baz</i>", "foo<em>bar</em> <em>baz</em>\n"},
-	{"0", "foo<sup>bar</sup></span><sub>baz</sub>", "foo<sup>bar</sup><sub>baz</sub>\n"},
+	{"3", "<s>foo</s> <del>bar</del> <strike>baz</strike>", "~~foo~~ ~~bar~~ ~~baz~~\n"},
+	{"2", "foo<strong>bar</strong> <b>baz</b>", "foo**bar** **baz**\n"},
+	{"1", "foo<em>bar</em> <i>baz</i>", "foo*bar* *baz*\n"},
+	{"0", "foo<sup>bar</sup></span><sub>baz</sub>", "foo^bar^~baz~\n"},
 }
 
 func TestHTML2MdDisableSyntax(t *testing.T) {
@@ -360,6 +362,9 @@ func TestHTML2MdDisableSyntax(t *testing.T) {
 	luteEngine.SetInlineAsterisk(false)
 	luteEngine.SetInlineUnderscore(false)
 	luteEngine.SetHTMLTag2TextMark(true)
+
+	// 就算禁用行级语法，只要启用 HTMLTag2TextMark 则依然转换为 md 标记符
+
 	for _, test := range html2MdDisableSyntaxTests {
 		md := luteEngine.HTML2Md(test.from)
 		if test.to != md {
