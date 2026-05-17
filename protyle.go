@@ -1215,8 +1215,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		node.CustomBlockInfo = util.DomAttrValue(n, "data-info")
 		node.Tokens = []byte(html.UnescapeHTMLStr(util.DomAttrValue(n, "data-content")))
 		tree.Context.Tip.AppendChild(node)
-		tree.Context.Tip = node
-		defer tree.Context.ParentTip()
+		return
 	case ast.NodeCallout:
 		node.Type = ast.NodeCallout
 		node.CalloutType = util.DomAttrValue(n, "data-subtype")
