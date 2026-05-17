@@ -225,6 +225,7 @@ func (r *ProtyleRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkS
 func (r *ProtyleRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{
+			{"contenteditable", "false"},
 			{"data-type", "NodeCustomBlock"},
 			{"data-info", node.CustomBlockInfo},
 			{"data-content", string(html.EscapeHTML(node.Tokens))},
