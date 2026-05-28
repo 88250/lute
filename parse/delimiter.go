@@ -372,6 +372,14 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	if t.Context.ParseOption.ProtyleWYSIWYG {
 		// Markdown 中 ** 加粗失效问题 https://ld246.com/article/1597581380183
 		afterIsPunct, beforeIsPunct = false, false
+
+		// _foo_ 优化 https://github.com/siyuan-note/siyuan/issues/17769
+		if lex.ItemUnderscore == token && editor.Caret == string(tokenBefore) {
+			afterIsWhitespace = true
+		}
+		if lex.ItemUnderscore == token && editor.Caret == string(tokenAfter) {
+			afterIsWhitespace = true
+		}
 	}
 
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
