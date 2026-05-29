@@ -472,7 +472,8 @@ func (r *ProtyleExportMdRenderer) renderMdMarker0(node *ast.Node, currentTextmar
 		}
 		href = r.EncodeLinkSpace(href)
 		if entering {
-			content := strings.ReplaceAll(node.TextMarkTextContent, "]", "\\]")
+			content := strings.ReplaceAll(node.TextMarkTextContent, "[", "\\[")
+			content = strings.ReplaceAll(content, "]", "\\]")
 			content = html.UnescapeHTMLStr(content)
 			ret += "[" + content + "](" + href
 			if "" != node.TextMarkATitle {
