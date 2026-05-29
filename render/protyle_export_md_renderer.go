@@ -1354,6 +1354,7 @@ func (r *ProtyleExportMdRenderer) renderLinkText(node *ast.Node, entering bool) 
 			tokens = node.Tokens
 		}
 		altTextContent := util.BytesToStr(tokens)
+		altTextContent = strings.ReplaceAll(altTextContent, "[", "\\[")
 		altTextContent = strings.ReplaceAll(altTextContent, "]", "\\]")
 		r.WriteString(altTextContent)
 	}
@@ -1428,6 +1429,7 @@ func (r *ProtyleExportMdRenderer) renderImage(node *ast.Node, entering bool) ast
 		var attrs [][]string
 		if altText := node.ChildByType(ast.NodeLinkText); nil != altText {
 			altTextContent := util.BytesToStr(altText.Tokens)
+			altTextContent = strings.ReplaceAll(altTextContent, "[", "\\[")
 			altTextContent = strings.ReplaceAll(altTextContent, "]", "\\]")
 			attrs = append(attrs, []string{"alt", altTextContent})
 		}
