@@ -223,6 +223,9 @@ func removeSpace(s string) string {
 }
 
 func allowAttr(attrName string) bool {
+	if strings.HasPrefix(strings.ToLower(attrName), "on") {
+		return false
+	}
 	for name := range eventAttrs {
 		if attrName == name {
 			return false
@@ -231,105 +234,9 @@ func allowAttr(attrName string) bool {
 	return true
 }
 
-// HTML 事件属性。https://www.w3schools.com/tags/ref_eventattributes.asp
+// eventAttrs 包含除事件处理器外的危险属性。
+// 事件处理器属性（以 "on" 开头）由 allowAttr 统一拒绝。
 var eventAttrs = map[string]interface{}{
-	// Window
-	"onafterprint":   nil,
-	"onbeforeprint":  nil,
-	"onbeforeunload": nil,
-	"onerror":        nil,
-	"onhashchange":   nil,
-	"onload":         nil,
-	"onmessage":      nil,
-	"onoffline":      nil,
-	"ononline":       nil,
-	"onpagehide":     nil,
-	"onpageshow":     nil,
-	"onpopstate":     nil,
-	"onresize":       nil,
-	"onstorage":      nil,
-	"onunload":       nil,
-
-	// Form
-	"onblur":        nil,
-	"onchange":      nil,
-	"oncontextmenu": nil,
-	"onfocus":       nil,
-	"oninput":       nil,
-	"oninvalid":     nil,
-	"onreset":       nil,
-	"onsearch":      nil,
-	"onselect":      nil,
-	"onsubmit":      nil,
-
-	// Keyboard
-	"onkeydown":  nil,
-	"onkeypress": nil,
-	"onkeyup":    nil,
-
-	// Mouse
-	"onclick":      nil,
-	"ondblclick":   nil,
-	"onmousedown":  nil,
-	"onmousemove":  nil,
-	"onmouseout":   nil,
-	"onmouseover":  nil,
-	"onmouseleave": nil,
-	"onmouseenter": nil,
-	"onmouseup":    nil,
-	"onmousewheel": nil,
-	"onwheel":      nil,
-
-	// Drag
-	"ondrag":      nil,
-	"ondragend":   nil,
-	"ondragenter": nil,
-	"ondragleave": nil,
-	"ondragover":  nil,
-	"ondragstart": nil,
-	"ondrop":      nil,
-	"onscroll":    nil,
-
-	// Clipboard
-	"oncopy":  nil,
-	"oncut":   nil,
-	"onpaste": nil,
-
-	// Media
-	"onabort":          nil,
-	"oncanplay":        nil,
-	"oncanplaythrough": nil,
-	"oncuechange":      nil,
-	"ondurationchange": nil,
-	"onemptied":        nil,
-	"onended":          nil,
-	"onloadeddata":     nil,
-	"onloadedmetadata": nil,
-	"onloadstart":      nil,
-	"onpause":          nil,
-	"onplay":           nil,
-	"onplaying":        nil,
-	"onprogress":       nil,
-	"onratechange":     nil,
-	"onseeked":         nil,
-	"onseeking":        nil,
-	"onstalled":        nil,
-	"onsuspend":        nil,
-	"ontimeupdate":     nil,
-	"onvolumechange":   nil,
-	"onwaiting":        nil,
-
-	// Misc
-	"ontoggle": nil,
-
-	// SVG
-	"onbegin":  nil,
-	"onend":    nil,
-	"onrepeat": nil,
-
-	// meta
 	"http-equiv": nil,
-
-	// input
 	"formaction": nil,
 }
