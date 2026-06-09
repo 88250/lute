@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"fmt"
 	"path"
+	strconv "strconv"
 	"strings"
 	"unicode"
 
@@ -56,6 +57,7 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 	}
 
 	// 调整 DOM 结构
+	lute.fixTableStructure(n)
 	lute.adjustVditorDOM(n)
 
 	// 将 HTML 树转换为 Markdown AST
@@ -87,6 +89,74 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 		previousLis[i].AppendChild(unlink)
 	}
 	return ret
+}
+
+// fixTableStructure 直接修改传入的 *html.Node 树，完美兼容 th、td 以及 colspan 合并单元格
+func (lute *Lute) fixTableStructure(root *html.Node) {
+	if root == nil {
+		return
+	}
+
+	// 1. 递归查找 root 节点下的所有 tr 节点
+	var trNodes []*html.Node
+	var findTRs func(*html.Node)
+	findTRs = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.DataAtom == atom.Tr {
+			trNodes = append(trNodes, n)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			findTRs(c)
+		}
+	}
+	findTRs(root)
+
+	// 2. 辅助函数：计算某个 tr 节点下的实际占用列数（考虑 colspan 权重）
+	countActualCols := func(tr *html.Node) int {
+		totalCols := 0
+		for c := tr.FirstChild; c != nil; c = c.NextSibling {
+			if c.Type == html.ElementNode && (c.DataAtom == atom.Td || c.DataAtom == atom.Th) {
+				// 默认一个单元格占 1 列
+				colspan := 1
+
+				// 检查是否存在 colspan 属性
+				for _, attr := range c.Attr {
+					if attr.Key == "colspan" {
+						if val, err := strconv.Atoi(attr.Val); err == nil && val > 0 {
+							colspan = val
+						}
+						break
+					}
+				}
+				totalCols += colspan
+			}
+		}
+		return totalCols
+	}
+
+	// 3. 遍历所有 tr，找出表格的真实最大总列数
+	maxCols := 0
+	for _, tr := range trNodes {
+		cols := countActualCols(tr)
+		if cols > maxCols {
+			maxCols = cols
+		}
+	}
+
+	// 4. 为真正缺失列数的 tr 节点补齐空的 td
+	for _, tr := range trNodes {
+		currentCols := countActualCols(tr)
+		missingCount := maxCols - currentCols
+
+		// 只有当计算完 colspan 后依然小于 maxCols，才说明是真的残缺表格，需要补齐
+		for i := 0; i < missingCount; i++ {
+			newTD := &html.Node{
+				Type:     html.ElementNode,
+				DataAtom: atom.Td,
+				Data:     atom.Td.String(),
+			}
+			tr.AppendChild(newTD)
+		}
+	}
 }
 
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
