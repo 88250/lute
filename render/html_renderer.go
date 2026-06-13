@@ -178,41 +178,52 @@ func (r *HtmlRenderer) Render() (output []byte) {
 
 func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.renderBlockquote(node, entering)
-		r.WriteString("<p>")
+		r.Newline()
+		attrs := [][]string{
+			{"class", "callout"},
+			{"data-subtype", node.CalloutType},
+		}
+		r.Tag("div", attrs, false)
+		r.Newline()
+		r.WriteString("<div class=\"callout-info\"><span class=\"callout-icon\">")
+		if 0 == node.CalloutIconType {
+			r.WriteString(node.CalloutIcon)
+		} else if 1 == node.CalloutIconType {
+			r.WriteString("<img class=\"callout-img\" alt=\"\" src=\"")
+			r.WriteString(node.CalloutIcon)
+			r.WriteString("\" />")
+		}
+		r.WriteString("</span><span class=\"callout-title\">")
 		title := node.CalloutTitle
 		if "" == title {
 			title = ast.GetCalloutTitle(node.CalloutType)
 		}
-		if "" != node.CalloutIcon {
-			if 0 == node.CalloutIconType {
-				title = node.CalloutIcon + " " + title
-			} else {
-				title = "<img src=\"" + node.CalloutIcon + "\" alt=\"\" /> " + title
-			}
+		if "" == title {
+			title = node.CalloutType
 		}
-
-		if strings.TrimSpace(title) != "" {
-			titleTree := parse.Inline("", []byte(title), r.ParseOptions)
-			if nil != titleTree && nil != titleTree.Root && nil != titleTree.Root.FirstChild {
-				var inlines []*ast.Node
-				for child := titleTree.Root.FirstChild.FirstChild; nil != child; child = child.Next {
-					inlines = append(inlines, child)
-				}
-				titleTree.Root.FirstChild.Unlink()
-				for _, inline := range inlines {
-					titleTree.Root.AppendChild(inline)
-				}
-				data := NewHtmlRenderer(titleTree, r.Options, r.ParseOptions).Render()
-				r.Write(data)
-			} else {
-				r.WriteString(title)
+		titleTree := parse.Inline("", []byte(title), r.ParseOptions)
+		if nil != titleTree && nil != titleTree.Root && nil != titleTree.Root.FirstChild {
+			var inlines []*ast.Node
+			for child := titleTree.Root.FirstChild.FirstChild; nil != child; child = child.Next {
+				inlines = append(inlines, child)
 			}
-			r.Newline()
+			titleTree.Root.FirstChild.Unlink()
+			for _, inline := range inlines {
+				titleTree.Root.AppendChild(inline)
+			}
+			data := NewHtmlRenderer(titleTree, r.Options, r.ParseOptions).Render()
+			r.Write(data)
+		} else {
+			r.WriteString(title)
 		}
-		r.WriteString("</p>")
+		r.WriteString("</span></div>")
+		r.WriteString("<div class=\"callout-content\">")
 	} else {
-		r.renderBlockquote(node, entering)
+		r.Newline()
+		r.WriteString("</div>")
+		r.Newline()
+		r.WriteString("</div>")
+		r.Newline()
 	}
 	return ast.WalkContinue
 }
