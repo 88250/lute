@@ -91,13 +91,37 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 	return ret
 }
 
-// fixTableStructure 直接修改传入的 *html.Node 树，完美兼容 th、td 以及 colspan 合并单元格
+// fixTableStructure 直接修改传入的 *html.Node 树，完美兼容 th、td 以及 colspan、rowspan 合并单元格。
+// 外部 HTML（如从浏览器、Excel、Word 复制）的合并单元格遵循 HTML 标准：被合并覆盖的位置没有对应的
+// td/th 节点。而思源内部规范需要这些位置存在 class="fn__none" 的占位单元格（见 parse/table.go、
+// spin_block_test.go 用例 112-116）。本函数按表格做二维网格计算，在跨行/跨列覆盖的位置补齐占位 td，
+// 同时保留原“补齐残缺行列数”的行为。
 func (lute *Lute) fixTableStructure(root *html.Node) {
 	if root == nil {
 		return
 	}
 
-	// 1. 递归查找 root 节点下的所有 tr 节点
+	// 1. 递归查找 root 节点下的所有 table 节点，按表格分组处理以避免多表格相互污染列数
+	var tableNodes []*html.Node
+	var findTables func(*html.Node)
+	findTables = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.DataAtom == atom.Table {
+			tableNodes = append(tableNodes, n)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			findTables(c)
+		}
+	}
+	findTables(root)
+
+	for _, table := range tableNodes {
+		lute.fixOneTableStructure(table)
+	}
+}
+
+// fixOneTableStructure 处理单个 table：计算 maxCols 并补齐 fn__none 占位单元格。
+func (lute *Lute) fixOneTableStructure(table *html.Node) {
+	// 收集该 table 下的所有 tr（跨 thead/tbody/tfoot）
 	var trNodes []*html.Node
 	var findTRs func(*html.Node)
 	findTRs = func(n *html.Node) {
@@ -108,55 +132,181 @@ func (lute *Lute) fixTableStructure(root *html.Node) {
 			findTRs(c)
 		}
 	}
-	findTRs(root)
-
-	// 2. 辅助函数：计算某个 tr 节点下的实际占用列数（考虑 colspan 权重）
-	countActualCols := func(tr *html.Node) int {
-		totalCols := 0
-		for c := tr.FirstChild; c != nil; c = c.NextSibling {
-			if c.Type == html.ElementNode && (c.DataAtom == atom.Td || c.DataAtom == atom.Th) {
-				// 默认一个单元格占 1 列
-				colspan := 1
-
-				// 检查是否存在 colspan 属性
-				for _, attr := range c.Attr {
-					if attr.Key == "colspan" {
-						if val, err := strconv.Atoi(attr.Val); err == nil && val > 0 {
-							colspan = val
-						}
-						break
-					}
-				}
-				totalCols += colspan
-			}
-		}
-		return totalCols
+	findTRs(table)
+	if 0 == len(trNodes) {
+		return
 	}
 
-	// 3. 遍历所有 tr，找出表格的真实最大总列数
+	// 辅助函数：读取单元格的 colspan（默认 1，非法值视为 1）
+	readColspan := func(cell *html.Node) int {
+		if cs := util.DomAttrValue(cell, "colspan"); "" != cs {
+			if val, err := strconv.Atoi(cs); err == nil && val > 0 {
+				return val
+			}
+		}
+		return 1
+	}
+	// 辅助函数：读取单元格的 rowspan（默认 1，非法值视为 1）
+	readRowspan := func(cell *html.Node) int {
+		if rs := util.DomAttrValue(cell, "rowspan"); "" != rs {
+			if val, err := strconv.Atoi(rs); err == nil && val > 0 {
+				return val
+			}
+		}
+		return 1
+	}
+
+	// 2. 遍历所有 tr，先用 colspan 权重算出真实最大总列数（保留原逻辑）
 	maxCols := 0
 	for _, tr := range trNodes {
-		cols := countActualCols(tr)
-		if cols > maxCols {
-			maxCols = cols
-		}
-	}
-
-	// 4. 为真正缺失列数的 tr 节点补齐空的 td
-	for _, tr := range trNodes {
-		currentCols := countActualCols(tr)
-		missingCount := maxCols - currentCols
-
-		// 只有当计算完 colspan 后依然小于 maxCols，才说明是真的残缺表格，需要补齐
-		for i := 0; i < missingCount; i++ {
-			newTD := &html.Node{
-				Type:     html.ElementNode,
-				DataAtom: atom.Td,
-				Data:     atom.Td.String(),
+		rowCols := 0
+		for c := tr.FirstChild; c != nil; c = c.NextSibling {
+			if c.Type == html.ElementNode && (c.DataAtom == atom.Td || c.DataAtom == atom.Th) {
+				if "fn__none" == util.DomAttrValue(c, "class") {
+					// 已有的占位单元格不计入逻辑列（它们是被覆盖的位置）
+					continue
+				}
+				rowCols += readColspan(c)
 			}
-			tr.AppendChild(newTD)
+		}
+		if rowCols > maxCols {
+			maxCols = rowCols
 		}
 	}
+	if 0 == maxCols {
+		return
+	}
+
+	// 3. 二维网格：occupied[row][col] 标记被跨行/跨列单元格覆盖的位置
+	// 用模拟 HTML 表格布局的方式补齐占位单元格
+	rowCount := len(trNodes)
+	occupied := make([][]bool, rowCount)
+	for i := range occupied {
+		occupied[i] = make([]bool, maxCols)
+	}
+
+	isCell := func(c *html.Node) bool {
+		return c.Type == html.ElementNode && (c.DataAtom == atom.Td || c.DataAtom == atom.Th)
+	}
+	isPlaceholder := func(c *html.Node) bool {
+		return isCell(c) && "fn__none" == util.DomAttrValue(c, "class")
+	}
+
+	for ri, tr := range trNodes {
+		colIdx := 0
+		// 预先收集本行的真实单元格（跳过已有的占位 td，它们属于被覆盖位置）
+		var realCells []*html.Node
+		for c := tr.FirstChild; c != nil; c = c.NextSibling {
+			if isCell(c) && !isPlaceholder(c) {
+				realCells = append(realCells, c)
+			}
+		}
+
+		for _, cell := range realCells {
+			// 跳过被占用列（被上方 rowspan 覆盖的位置）：在 cell 之前插入 fn__none 占位 td
+			for colIdx < maxCols && occupied[ri][colIdx] {
+				insertPlaceholderBefore(cell)
+				colIdx++
+			}
+			if colIdx >= maxCols {
+				// 超出表格宽度的单元格，忽略（理论上不应发生，maxCols 已按 colspan 算过）
+				break
+			}
+
+			colspan := readColspan(cell)
+			// 读取 rowspan 并截断到表格剩余行数，避免越界
+			rowspan := readRowspan(cell)
+			if remaining := rowCount - ri; rowspan > remaining {
+				rowspan = remaining
+			}
+
+			// 标记二维占用（包含起始格自身）
+			for dr := 0; dr < rowspan && ri+dr < rowCount; dr++ {
+				for dc := 0; dc < colspan && colIdx+dc < maxCols; dc++ {
+					occupied[ri+dr][colIdx+dc] = true
+				}
+			}
+			colIdx += colspan
+		}
+
+		// 行末：补齐到 maxCols
+		for colIdx < maxCols {
+			if occupied[ri][colIdx] {
+				// 被 rowspan 覆盖的位置：插 fn__none 占位 td
+				appendPlaceholder(tr, true)
+			} else {
+				// 行本身列数不足（残缺表格）：补普通空 td，不加 fn__none
+				appendPlaceholder(tr, false)
+			}
+			colIdx++
+		}
+	}
+}
+
+// insertPlaceholderBefore 在 ref 之前插入一个 class="fn__none" 的空 td。
+func insertPlaceholderBefore(ref *html.Node) {
+	td := newPlaceholderTD()
+	ref.InsertBefore(td)
+}
+
+// appendPlaceholder 将一个空 td 追加到 tr 末尾。fnNone 为 true 时标记为 class="fn__none"（合并覆盖占位）。
+func appendPlaceholder(tr *html.Node, fnNone bool) {
+	tr.AppendChild(newTD(fnNone))
+}
+
+// newPlaceholderTD 构造一个 <td class="fn__none"></td> 节点。
+// newPlaceholderTD 构造一个 <td class="fn__none"></td> 节点（合并单元格覆盖占位）。
+func newPlaceholderTD() *html.Node {
+	return newTD(true)
+}
+
+// newTD 构造一个空 <td> 节点。fnNone 为 true 时添加 class="fn__none"。
+func newTD(fnNone bool) *html.Node {
+	td := &html.Node{
+		Type:     html.ElementNode,
+		DataAtom: atom.Td,
+		Data:     atom.Td.String(),
+	}
+	if fnNone {
+		td.Attr = []*html.Attribute{{Key: "class", Val: "fn__none"}}
+	}
+	return td
+}
+
+// setTableCellSpanIAL 为表格单元格节点（th/td）提取 colspan/rowspan/class 属性并写入 KramdownIAL，
+// 同时 Prepend 一个 NodeKramdownSpanIAL 子节点以便渲染器输出 `{: colspan=".." rowspan=".."}`。
+// 与 parse.SetSpanIAL 的区别：本函数用于外部 HTML 转换路径（HTML2Markdown），刻意不提取 style 等
+// 属性，避免外部网页的大量 inline style 噪音污染表格单元格。class 仅在为 "fn__none"（思源合并单元格
+// 占位标记，由 fixTableStructure 插入）时才保留，外部网页的其它样式 class（如 column-1、row-2 odd）
+// 视为噪音丢弃。colspan/rowspan 是合并单元格的核心属性，必须保留。
+func setTableCellSpanIAL(node *ast.Node, n *html.Node) {
+	if nil == node || nil == n {
+		return
+	}
+	if atom.Th != n.DataAtom && atom.Td != n.DataAtom {
+		return
+	}
+
+	colspan := util.DomAttrValue(n, "colspan")
+	if "" != colspan {
+		node.SetIALAttr("colspan", colspan)
+	}
+	rowspan := util.DomAttrValue(n, "rowspan")
+	if "" != rowspan {
+		node.SetIALAttr("rowspan", rowspan)
+	}
+	class := util.DomAttrValue(n, "class")
+	if "fn__none" == class {
+		// 仅保留思源合并单元格占位标记，丢弃外部网页的样式 class
+		node.SetIALAttr("class", class)
+	}
+	if "" == colspan && "" == rowspan && "" == node.IALAttr("class") {
+		return
+	}
+
+	ialTokens := parse.IAL2Tokens(node.KramdownIAL)
+	ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+	node.PrependChild(ial)
 }
 
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
@@ -1301,6 +1451,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		node.TableCellAlign = tableAlign
 		tree.Context.Tip.AppendChild(node)
+		setTableCellSpanIAL(node, n)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Colgroup, atom.Col:
