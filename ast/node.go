@@ -895,6 +895,18 @@ func (n *Node) List() (ret []*Node) {
 	return
 }
 
+// BlockIDs 返回 n 及其所有子节点中块级节点的 ID 列表。
+func (n *Node) BlockIDs() []string {
+	ret := make([]string, 0, 512)
+	Walk(n, func(n *Node, entering bool) WalkStatus {
+		if entering && n.IsBlock() && "" != n.ID {
+			ret = append(ret, n.ID)
+		}
+		return WalkContinue
+	})
+	return ret
+}
+
 // ParentIs 判断 n 的类型是否在指定的 nodeTypes 类型列表内。
 func (n *Node) ParentIs(nodeType NodeType, nodeTypes ...NodeType) bool {
 	types := append(nodeTypes, nodeType)
