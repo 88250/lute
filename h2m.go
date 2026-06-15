@@ -241,6 +241,35 @@ func (lute *Lute) fixOneTableStructure(table *html.Node) {
 			colIdx++
 		}
 	}
+
+	// 4. 处理 thead：如果表格没有 <thead>，且首行含 rowspan>1 的单元格，
+	// 则用 <thead> 包裹首行 rowspan 覆盖的所有行，避免 rowspan 跨越 thead/tbody 边界导致渲染错乱
+	//（siyuan 内部规范要求 rowspan 覆盖的行与起始格在同一 section）
+	if 1 > len(util.DomChildrenByType(table, atom.Thead)) && 0 < len(trNodes) {
+		firstTR := trNodes[0]
+		theadRows := 1
+		for c := firstTR.FirstChild; nil != c; c = c.NextSibling {
+			if html.ElementNode != c.Type || (atom.Th != c.DataAtom && atom.Td != c.DataAtom) {
+				continue
+			}
+			if rs := util.DomAttrValue(c, "rowspan"); "" != rs {
+				if val, err := strconv.Atoi(rs); err == nil && val > theadRows {
+					theadRows = val
+				}
+			}
+		}
+		if theadRows > 1 && theadRows <= len(trNodes) {
+			// 用 <thead> 包裹前 theadRows 个 tr
+			thead := &html.Node{Type: html.ElementNode, DataAtom: atom.Thead, Data: atom.Thead.String()}
+			// 在第一个 tr 之前插入 thead（无论它在 tbody 里还是 table 直接子节点）
+			firstTR.InsertBefore(thead)
+			for i := 0; i < theadRows; i++ {
+				tr := trNodes[i]
+				tr.Parent.RemoveChild(tr)
+				thead.AppendChild(tr)
+			}
+		}
+	}
 }
 
 // insertPlaceholderBefore 在 ref 之前插入一个 class="fn__none" 的空 td。
@@ -1425,7 +1454,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		node.Type = ast.NodeTableRow
 
 		if nil == tree.Context.Tip.ChildByType(ast.NodeTableHead) && 1 > len(util.DomChildrenByType(table, atom.Thead)) {
-			// 补全 thread 节点
+			// 补全 thead 节点
 			thead := &ast.Node{Type: ast.NodeTableHead}
 			tree.Context.Tip.AppendChild(thead)
 			tree.Context.Tip = thead
