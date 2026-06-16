@@ -283,7 +283,6 @@ func appendPlaceholder(tr *html.Node, fnNone bool) {
 	tr.AppendChild(newTD(fnNone))
 }
 
-// newPlaceholderTD 构造一个 <td class="fn__none"></td> 节点。
 // newPlaceholderTD 构造一个 <td class="fn__none"></td> 节点（合并单元格覆盖占位）。
 func newPlaceholderTD() *html.Node {
 	return newTD(true)
@@ -1483,6 +1482,20 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		setTableCellSpanIAL(node, n)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+		// 表头内 colspan>1 的单元格：插入 (colspan-1) 个 fn__none 空占位单元格，使 markdown 分隔行列数正确
+		//（GFM 表格分隔行列数 = 表头单元格数，colspan 单元格只有1个物理格，会导致分隔行列数不足，数据列丢失）
+		if nil != node.Parent && nil != node.Parent.Parent && ast.NodeTableHead == node.Parent.Parent.Type {
+			if cs := util.DomAttrValue(n, "colspan"); "" != cs {
+				if val, err := strconv.Atoi(cs); err == nil && val > 1 {
+					for i := 0; i < val-1; i++ {
+						placeholder := &ast.Node{Type: ast.NodeTableCell}
+						placeholder.SetIALAttr("class", "fn__none")
+						placeholder.PrependChild(&ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: parse.IAL2Tokens(placeholder.KramdownIAL)})
+						node.Parent.AppendChild(placeholder)
+					}
+				}
+			}
+		}
 	case atom.Colgroup, atom.Col:
 		return
 	case atom.Span:
