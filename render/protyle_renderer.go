@@ -676,6 +676,31 @@ func (r *ProtyleRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.Wa
 		}
 		attrs = append(attrs, []string{"data-sb-layout", layout})
 		r.Tag("div", attrs, false)
+
+		// col 布局下手动遍历真实子块，每个非末尾子块后插入手柄，支持拖拽调整子块宽度
+		// https://github.com/siyuan-note/siyuan/issues/9521
+		if "col" == layout {
+			// 真实子块位于 LayoutMarker.Next 到 CloseMarker.Previous 之间
+			var realChildren []*ast.Node
+			for c := node.FirstChild.Next.Next; nil != c && ast.NodeSuperBlockCloseMarker != c.Type; c = c.Next {
+				realChildren = append(realChildren, c)
+			}
+			for i, child := range realChildren {
+				ast.Walk(child, func(n *ast.Node, entering bool) ast.WalkStatus {
+					render := r.RendererFuncs[n.Type]
+					if nil == render {
+						render = r.renderDefault
+					}
+					return render(n, entering)
+				})
+				// 非末尾子块后插入手柄；回流时由 genASTByBlockDOM 按 sb__resize class 忽略，不产生幽灵块
+				if i < len(realChildren)-1 {
+					r.Tag("span", [][]string{{"class", "sb__resize"}, {"contenteditable", "false"}}, false)
+					r.Tag("/span", nil, false)
+				}
+			}
+			return ast.WalkSkipChildren
+		}
 	} else {
 		r.renderIAL(node)
 		r.Tag("/div", nil, false)

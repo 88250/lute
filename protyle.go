@@ -883,6 +883,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 
 	if "protyle-attr" == class || "callout-info" == class ||
 		strings.Contains(class, "__copy") ||
+		strings.Contains(class, "sb__resize") ||
 		strings.Contains(class, "protyle-linenumber__rows") ||
 		strings.Contains(class, "hljs") {
 		return
