@@ -677,26 +677,32 @@ func (r *ProtyleRenderer) renderSuperBlock(node *ast.Node, entering bool) ast.Wa
 		attrs = append(attrs, []string{"data-sb-layout", layout})
 		r.Tag("div", attrs, false)
 
-		// col 布局下手动遍历真实子块，每个非末尾子块后插入手柄，支持拖拽调整子块宽度
+		// col 布局下手动遍历真实子块，每个非末尾块节点后插入手柄，支持拖拽调整子块宽度
 		// https://github.com/siyuan-note/siyuan/issues/9521
 		if "col" == layout {
-			// 真实子块位于 LayoutMarker.Next 到 CloseMarker.Previous 之间
-			var realChildren []*ast.Node
+			// 先统计真实块节点数量（排除 IAL 和标记符），用于判断是否为末尾块
+			blockCount := 0
 			for c := node.FirstChild.Next.Next; nil != c && ast.NodeSuperBlockCloseMarker != c.Type; c = c.Next {
-				realChildren = append(realChildren, c)
+				if ast.NodeKramdownBlockIAL != c.Type {
+					blockCount++
+				}
 			}
-			for i, child := range realChildren {
-				ast.Walk(child, func(n *ast.Node, entering bool) ast.WalkStatus {
+			blockIdx := 0
+			for c := node.FirstChild.Next.Next; nil != c && ast.NodeSuperBlockCloseMarker != c.Type; c = c.Next {
+				ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
 					render := r.RendererFuncs[n.Type]
 					if nil == render {
 						render = r.renderDefault
 					}
 					return render(n, entering)
 				})
-				// 非末尾子块后插入手柄；回流时由 genASTByBlockDOM 按 sb__resize class 忽略，不产生幽灵块
-				if i < len(realChildren)-1 {
-					r.Tag("span", [][]string{{"class", "sb__resize"}, {"contenteditable", "false"}}, false)
-					r.Tag("/span", nil, false)
+				// 仅在块节点（非 IAL）且非末尾块后插入手柄；IAL 节点照常渲染但不作为手柄锚点
+				if ast.NodeKramdownBlockIAL != c.Type {
+					if blockIdx < blockCount-1 {
+						r.Tag("span", [][]string{{"class", "sb__resize"}, {"contenteditable", "false"}}, false)
+						r.Tag("/span", nil, false)
+					}
+					blockIdx++
 				}
 			}
 			return ast.WalkSkipChildren
