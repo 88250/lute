@@ -26,6 +26,15 @@ func ListStart(t *Tree, container *ast.Node) int {
 		return 0
 	}
 
+	// 禁止列表项下直接嵌套子列表 https://github.com/siyuan-note/siyuan/issues/17890
+	if t.Context.ParseOption.DisableListItemNestedList {
+		for c := container; nil != c; c = c.Parent {
+			if ast.NodeListItem == c.Type {
+				return 0
+			}
+		}
+	}
+
 	data, ial := t.parseListMarker(container)
 	if nil == data {
 		return 0
