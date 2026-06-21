@@ -26,21 +26,33 @@ func ListStart(t *Tree, container *ast.Node) int {
 		return 0
 	}
 
-	// 禁止列表项下直接嵌套子列表 https://github.com/siyuan-note/siyuan/issues/17890
-	if t.Context.ParseOption.DisableListItemNestedList {
-		for c := container; nil != c; c = c.Parent {
-			if ast.NodeListItem == c.Type {
-				return 0
-			}
-		}
-	}
-
 	data, ial := t.parseListMarker(container)
 	if nil == data {
 		return 0
 	}
 
+	// 列表项为空时创建子列表前先补一个空段落，避免出现列表项下直接挂列表的结构 https://github.com/siyuan-note/siyuan/issues/17890
+	var emptyListItem *ast.Node
+	if t.Context.ParseOption.EnsureListItemParagraph && ast.NodeListItem == t.Context.Tip.Type {
+		fc := t.Context.Tip.FirstChild
+		if nil == fc || ast.NodeKramdownBlockIAL == fc.Type {
+			emptyListItem = t.Context.Tip
+		}
+	}
+
 	t.Context.closeUnmatchedBlocks()
+
+	if nil != emptyListItem {
+		p := &ast.Node{Type: ast.NodeParagraph}
+		if t.Context.ParseOption.KramdownBlockIAL {
+			id := ast.NewNodeID()
+			ialTokens := []byte("{: id=\"" + id + "\"}")
+			p.ID = id
+			p.KramdownIAL = [][]string{{"id", id}}
+			p.AppendChild(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens})
+		}
+		emptyListItem.AppendChild(p)
+	}
 
 	listsMatch := container.Type == ast.NodeList && t.Context.listsMatch(container.ListData, data)
 	if t.Context.Tip.Type != ast.NodeList || !listsMatch {

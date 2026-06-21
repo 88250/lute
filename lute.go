@@ -634,8 +634,8 @@ func (lute *Lute) SetCallout(b bool) {
 	lute.ParseOptions.Callout = b
 }
 
-func (lute *Lute) SetDisableListItemNestedList(b bool) {
-	lute.ParseOptions.DisableListItemNestedList = b
+func (lute *Lute) SetEnsureListItemParagraph(b bool) {
+	lute.ParseOptions.EnsureListItemParagraph = b
 }
 
 func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {

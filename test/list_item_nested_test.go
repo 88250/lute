@@ -16,19 +16,25 @@ import (
 	"github.com/88250/lute"
 )
 
-// 开关开启：列表项下不解析子列表
+// 开关开启：空列表项下创建子列表前补一个空段落（HTML 渲染会省略空段落，效果与默认一致）
 var disableNestedListTests = []parseTest{
 	{"空列表项-子列表", "-\n  - bar\n",
-		"<ul>\n<li>- bar</li>\n</ul>\n"},
-	{"有内容列表项-子列表", "- foo\n  - bar\n",
-		"<ul>\n<li>foo<br />\n- bar</li>\n</ul>\n"},
+		"<ul>\n<li>\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ul>\n"},
+	{"一行-连写", "- - bar\n",
+		"<ul>\n<li>\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ul>\n"},
+	{"一行*连写", "* * bar\n",
+		"<ul>\n<li>\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ul>\n"},
+	{"一行有序连写", "1. 1. bar\n",
+		"<ol>\n<li>\n<ol>\n<li>bar</li>\n</ol>\n</li>\n</ol>\n"},
+	{"有内容列表项-子列表-不受影响", "- foo\n  - bar\n",
+		"<ul>\n<li>foo\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ul>\n"},
 	{"同级列表-不受影响", "- foo\n- bar\n",
 		"<ul>\n<li>foo</li>\n<li>bar</li>\n</ul>\n"},
 }
 
-func TestDisableListItemNestedList(t *testing.T) {
+func TestEnsureListItemParagraph(t *testing.T) {
 	luteEngine := lute.New()
-	luteEngine.SetDisableListItemNestedList(true)
+	luteEngine.SetEnsureListItemParagraph(true)
 	luteEngine.SetHeadingID(false)
 	luteEngine.SetKramdownIAL(false)
 
@@ -41,7 +47,7 @@ func TestDisableListItemNestedList(t *testing.T) {
 	}
 }
 
-// 开关关闭（默认）：嵌套列表正常解析
+// 开关关闭（默认）：空列表项下直接挂子列表
 var defaultNestedListTests = []parseTest{
 	{"空列表项-子列表", "-\n  - bar\n",
 		"<ul>\n<li>\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ul>\n"},

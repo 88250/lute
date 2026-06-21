@@ -440,9 +440,9 @@ type Options struct {
 	// ArbitraryTaskListItemMarker 设置是否打开"任务列表任意标记符"支持。
 	// 默认仅支持 [ ]、[x] 和 [X]，开启后支持 [/]、[>]、[-]、[!] 等任意标记符。
 	ArbitraryTaskListItemMarker bool
-	// DisableListItemNestedList 设置是否禁止列表项下直接嵌套子列表。
-	// 为 true 时 ListStart 不在 NodeListItem 容器内创建子 NodeList。
-	DisableListItemNestedList bool
+	// EnsureListItemParagraph 为 true 时，空列表项下创建子列表前会补一个空段落，
+	// 避免出现列表项下直接挂列表的结构 https://github.com/siyuan-note/siyuan/issues/17890
+	EnsureListItemParagraph bool
 }
 
 // IsValidTaskListItemMarker 判断 marker 是否是合法的任务列表项标记符。
