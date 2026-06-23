@@ -177,6 +177,33 @@ func (lute *Lute) fixOneTableStructure(table *html.Node) {
 		return
 	}
 
+	// 2.5 首行物理单元格补齐：如果首行物理单元格数 < maxCols，在首行末尾补 td。
+	// 否则 markdown 往返时表头分隔行列数 < maxCols，parse.Parse 重新解析会丢失数据列。
+	//（GFM 表格分隔行列数 = 表头物理单元格数，colspan 单元格只有1个物理格但占多列）
+	// 若首行存在 colspan>1 的单元格，补的 td 用 fn__none（被 colspan 覆盖，渲染时隐藏）；
+	// 否则是普通残缺表格，补普通空 td。
+	if 0 < len(trNodes) {
+		firstRowPhysicalCells := 0
+		firstRowHasColspan := false
+		for c := trNodes[0].FirstChild; c != nil; c = c.NextSibling {
+			if c.Type == html.ElementNode && (c.DataAtom == atom.Td || c.DataAtom == atom.Th) {
+				if "fn__none" == util.DomAttrValue(c, "class") {
+					continue
+				}
+				firstRowPhysicalCells++
+				if cs := util.DomAttrValue(c, "colspan"); "" != cs {
+					if val, err := strconv.Atoi(cs); err == nil && val > 1 {
+						firstRowHasColspan = true
+					}
+				}
+			}
+		}
+		for firstRowPhysicalCells < maxCols {
+			trNodes[0].AppendChild(newTD(firstRowHasColspan))
+			firstRowPhysicalCells++
+		}
+	}
+
 	// 3. 二维网格：occupied[row][col] 标记被跨行/跨列单元格覆盖的位置
 	// 用模拟 HTML 表格布局的方式补齐占位单元格
 	rowCount := len(trNodes)
@@ -1482,20 +1509,6 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		setTableCellSpanIAL(node, n)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
-		// 表头内 colspan>1 的单元格：插入 (colspan-1) 个 fn__none 空占位单元格，使 markdown 分隔行列数正确
-		//（GFM 表格分隔行列数 = 表头单元格数，colspan 单元格只有1个物理格，会导致分隔行列数不足，数据列丢失）
-		if nil != node.Parent && nil != node.Parent.Parent && ast.NodeTableHead == node.Parent.Parent.Type {
-			if cs := util.DomAttrValue(n, "colspan"); "" != cs {
-				if val, err := strconv.Atoi(cs); err == nil && val > 1 {
-					for i := 0; i < val-1; i++ {
-						placeholder := &ast.Node{Type: ast.NodeTableCell}
-						placeholder.SetIALAttr("class", "fn__none")
-						placeholder.PrependChild(&ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: parse.IAL2Tokens(placeholder.KramdownIAL)})
-						node.Parent.AppendChild(placeholder)
-					}
-				}
-			}
-		}
 	case atom.Colgroup, atom.Col:
 		return
 	case atom.Span:
