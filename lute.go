@@ -319,6 +319,13 @@ func (lute *Lute) ProtylePreview(tree *parse.Tree, options *render.Options, pars
 	return util.BytesToStr(output)
 }
 
+// ProtylePreviewStr 接受 string 类型的 markdown，内部 parse 后调用 ProtylePreview 渲染为预览 HTML。
+// 等价于后端导出预览的 markdown → parse → ProtylePreview 链路，供前端 lute.min.js 直接调用。
+func (lute *Lute) ProtylePreviewStr(name, markdown string) string {
+	tree := parse.Parse(name, []byte(markdown), lute.ParseOptions)
+	return lute.ProtylePreview(tree, lute.RenderOptions, lute.ParseOptions)
+}
+
 // Tree2HTML 使用指定的 options 渲染 tree 为标准 HTML。
 func (lute *Lute) Tree2HTML(tree *parse.Tree, options *render.Options, parseOptions *parse.Options) string {
 	renderer := render.NewHtmlRenderer(tree, options, parseOptions)
