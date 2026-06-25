@@ -281,9 +281,20 @@ func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) a
 			// 对于能用 Markdown 标记符表达的行级元素（如加粗），优先输出标记符而非 HTML span，
 			// 但带样式属性（如颜色）的元素 Markdown 无法表达，仍需输出 span。
 			// protylePreviewRenderMdMarker 返回对应标记符，无 style 属性时使用标记符。
-			// 仅在表格单元格内（合并单元格表格以 HTML 输出）时才使用标记符，其余预览场景保持 span
+			// 仅在合并单元格表格（needUseHTMLTable）的单元格内才使用标记符，普通表格预览保持 span
+			useMdMarker := false
+			if node.ParentIs(ast.NodeTable) && "" == node.IALAttr("style") && !node.IsTextMarkType("inline-math") {
+				var tableNode *ast.Node
+				for p := node.Parent; nil != p; p = p.Parent {
+					if ast.NodeTable == p.Type {
+						tableNode = p
+						break
+					}
+				}
+				useMdMarker = nil != tableNode && r.needUseHTMLTable(tableNode)
+			}
 			mdMarker := protylePreviewRenderMdMarker(node)
-			if "" != mdMarker && "" == node.IALAttr("style") && !node.IsTextMarkType("inline-math") && node.ParentIs(ast.NodeTableCell) {
+			if useMdMarker && "" != mdMarker {
 				if node.IsTextMarkType("code") {
 					textContent = html.UnescapeString(textContent)
 					textContent = lex.RepeatBackslashBeforePipe(textContent)
