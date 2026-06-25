@@ -280,10 +280,11 @@ func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) a
 		} else {
 			// 对于能用 Markdown 标记符表达的行级元素（如加粗），优先输出标记符而非 HTML span，
 			// 但带样式属性（如颜色）的元素 Markdown 无法表达，仍需输出 span。
-			// protylePreviewRenderMdMarker 返回对应标记符，无 style 属性时使用标记符
+			// protylePreviewRenderMdMarker 返回对应标记符，无 style 属性时使用标记符。
+			// 仅在表格单元格内（合并单元格表格以 HTML 输出）时才使用标记符，其余预览场景保持 span
 			mdMarker := protylePreviewRenderMdMarker(node)
-			if "" != mdMarker && "" == node.IALAttr("style") && !node.IsTextMarkType("inline-math") {
-				if node.IsTextMarkType("code") && node.ParentIs(ast.NodeTableCell) {
+			if "" != mdMarker && "" == node.IALAttr("style") && !node.IsTextMarkType("inline-math") && node.ParentIs(ast.NodeTableCell) {
+				if node.IsTextMarkType("code") {
 					textContent = html.UnescapeString(textContent)
 					textContent = lex.RepeatBackslashBeforePipe(textContent)
 				}
@@ -303,8 +304,8 @@ func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) a
 }
 
 // protylePreviewRenderMdMarker 返回能用 Markdown 标记符表达的 TextMark 类型的标记符，
-// 用于 ProtylePreviewRenderer（HTML 表格输出）中把能转 Markdown 的行级元素输出为标记符。
-// 只处理开始/结束标记相同的类型（strong/em/s/code/mark），其余返回空串走 span。
+// 用于 ProtylePreviewRenderer 的表格单元格中把行级元素输出为 Markdown 标记符。
+// 处理 strong/em/s/code/mark（开始/结束标记相同的类型），仅在表格单元格内调用。
 func protylePreviewRenderMdMarker(node *ast.Node) string {
 	types := strings.Split(node.TextMarkType, " ")
 	hasMd := false
