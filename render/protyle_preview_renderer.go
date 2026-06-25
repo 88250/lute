@@ -278,77 +278,14 @@ func (r *ProtylePreviewRenderer) renderTextMark(node *ast.Node, entering bool) a
 				}
 			}
 		} else {
-			// 对于能用 Markdown 标记符表达的行级元素（如加粗），优先输出标记符而非 HTML span，
-			// 但带样式属性（如颜色）的元素 Markdown 无法表达，仍需输出 span。
-			// protylePreviewRenderMdMarker 返回对应标记符，无 style 属性时使用标记符。
-			// 仅在合并单元格表格（needUseHTMLTable）的单元格内才使用标记符，普通表格预览保持 span
-			useMdMarker := false
-			if node.ParentIs(ast.NodeTable) && "" == node.IALAttr("style") && !node.IsTextMarkType("inline-math") {
-				var tableNode *ast.Node
-				for p := node.Parent; nil != p; p = p.Parent {
-					if ast.NodeTable == p.Type {
-						tableNode = p
-						break
-					}
-				}
-				useMdMarker = nil != tableNode && r.needUseHTMLTable(tableNode)
-			}
-			mdMarker := protylePreviewRenderMdMarker(node)
-			if useMdMarker && "" != mdMarker {
-				if node.IsTextMarkType("code") {
-					textContent = html.UnescapeString(textContent)
-					textContent = lex.RepeatBackslashBeforePipe(textContent)
-				}
-				r.WriteString(mdMarker)
-				r.WriteString(textContent)
-				r.WriteString(mdMarker)
-			} else {
-				attrs := r.renderTextMarkAttrs(node)
-				r.spanNodeAttrs(node, &attrs)
-				r.Tag("span", attrs, false)
-				r.WriteString(textContent)
-				r.WriteString("</span>")
-			}
+			attrs := r.renderTextMarkAttrs(node)
+			r.spanNodeAttrs(node, &attrs)
+			r.Tag("span", attrs, false)
+			r.WriteString(textContent)
+			r.WriteString("</span>")
 		}
 	}
 	return ast.WalkContinue
-}
-
-// protylePreviewRenderMdMarker 返回能用 Markdown 标记符表达的 TextMark 类型的标记符，
-// 用于 ProtylePreviewRenderer 的表格单元格中把行级元素输出为 Markdown 标记符。
-// 处理 strong/em/s/code/mark（开始/结束标记相同的类型），仅在表格单元格内调用。
-func protylePreviewRenderMdMarker(node *ast.Node) string {
-	types := strings.Split(node.TextMarkType, " ")
-	hasMd := false
-	hasOther := false
-	for _, typ := range types {
-		switch typ {
-		case "strong", "em", "s", "code", "mark":
-			hasMd = true
-		case "text":
-			// text 是辅助标记，忽略
-		default:
-			hasOther = true
-		}
-	}
-	if !hasMd || hasOther {
-		return ""
-	}
-	for _, typ := range types {
-		switch typ {
-		case "strong":
-			return "**"
-		case "em":
-			return "*"
-		case "s":
-			return "~~"
-		case "code":
-			return "`"
-		case "mark":
-			return "=="
-		}
-	}
-	return ""
 }
 
 func (r *ProtylePreviewRenderer) renderBr(node *ast.Node, entering bool) ast.WalkStatus {
@@ -1027,6 +964,14 @@ func (r *ProtylePreviewRenderer) renderTableHead(node *ast.Node, entering bool) 
 }
 
 func (r *ProtylePreviewRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.needUseHTMLTable(node) {
+		if entering {
+			r.renderTableByHTML(node)
+			return ast.WalkSkipChildren
+		}
+		return ast.WalkContinue
+	}
+
 	if entering {
 		ials := parse.IAL2Map(node.KramdownIAL)
 		delete(ials, "id")

@@ -181,6 +181,156 @@ type BaseRenderer struct {
 	RenderingFootnotes  bool                             // 是否正在渲染脚注定义
 }
 
+// renderTableByHTML 渲染合并单元格表格的 HTML 结构（table/colgroup/thead/tbody/tr/td + colspan/rowspan/class）。
+// 单元格内的行级元素由各渲染器自己的 RendererFuncs（renderTextMark 等）通过 ast.Walk 遍历渲染，
+// 因此导出 MD 场景单元格内容输出 Markdown 标记符，预览/导出 HTML 场景输出 HTML 标签。
+func (r *BaseRenderer) renderTableByHTML(node *ast.Node) {
+	// <table>
+	ials := parse.IAL2Map(node.KramdownIAL)
+	delete(ials, "id")
+	delete(ials, "caption")
+	delete(ials, "updated")
+	delete(ials, "colgroup")
+	r.Tag("table", parse.Map2IAL(ials), false)
+	r.Newline()
+	caption := node.IALAttr("caption")
+	if "" != caption {
+		caption = html.UnescapeHTMLStr(caption)
+		caption = strings.ReplaceAll(caption, "contenteditable=\"false\" ", "")
+		r.WriteString(caption)
+	}
+	r.Newline()
+
+	// <colgroup>
+	r.Tag("colgroup", nil, false)
+	if colgroup := node.IALAttr("colgroup"); "" == colgroup {
+		head := node.ChildByType(ast.NodeTableHead)
+		if nil != head && nil != head.FirstChild {
+			for th := head.FirstChild.FirstChild; nil != th; th = th.Next {
+				if ast.NodeTableCell == th.Type {
+					if style := th.IALAttr("style"); "" != style {
+						r.Tag("col", [][]string{{"style", style}}, true)
+					} else {
+						r.Tag("col", nil, true)
+					}
+				}
+			}
+		}
+	} else {
+		cols := strings.Split(colgroup, "|")
+		for _, style := range cols {
+			if "" != style {
+				r.Tag("col", [][]string{{"style", style}}, true)
+			} else {
+				r.Tag("col", nil, true)
+			}
+		}
+	}
+	r.Tag("/colgroup", nil, false)
+
+	// 遍历 thead 和 tbody 的行
+	hasThead := false
+	hasTbody := false
+	for child := node.FirstChild; nil != child; child = child.Next {
+		if ast.NodeTableHead == child.Type {
+			// <thead>
+			r.Tag("thead", nil, false)
+			r.renderTableByHTMLRows(child)
+			r.Tag("/thead", nil, false)
+			hasThead = true
+		} else if ast.NodeTableRow == child.Type {
+			// tbody 行（直接挂在 table 下的行）
+			if !hasTbody {
+				if hasThead {
+					// thead 之后紧跟 tbody（即使为空也输出，与 ProtylePreviewRenderer 行为一致）
+				}
+				r.Tag("tbody", nil, false)
+				r.Newline()
+				hasTbody = true
+			}
+			r.renderTableByHTMLRow(child)
+		}
+	}
+	// 如果有 thead 但没有 tbody 行，仍输出空的 <tbody>（不闭合，与 ProtylePreviewRenderer 行为一致）
+	if hasThead && !hasTbody {
+		r.Tag("tbody", nil, false)
+		r.Newline()
+	}
+	if hasTbody {
+		r.Tag("/tbody", nil, false)
+		r.Newline()
+	}
+	r.Tag("/table", nil, false)
+	r.Newline()
+}
+
+// renderTableByHTMLRows 渲染 thead 下的所有行
+func (r *BaseRenderer) renderTableByHTMLRows(thead *ast.Node) {
+	for row := thead.FirstChild; nil != row; row = row.Next {
+		if ast.NodeTableRow == row.Type {
+			r.renderTableByHTMLRow(row)
+		}
+	}
+}
+
+// renderTableByHTMLRow 渲染一行（tr + td/th），单元格内容通过 ast.Walk + RendererFuncs 遍历
+func (r *BaseRenderer) renderTableByHTMLRow(row *ast.Node) {
+	r.Tag("tr", nil, false)
+	r.Newline()
+	for cell := row.FirstChild; nil != cell; cell = cell.Next {
+		if ast.NodeTableCell != cell.Type && ast.NodeKramdownSpanIAL != cell.Type {
+			continue
+		}
+		if ast.NodeKramdownSpanIAL == cell.Type {
+			continue
+		}
+		// 跳过 fn__none 占位单元格
+		fnNone := false
+		for _, kv := range cell.KramdownIAL {
+			if "class" == kv[0] && strings.Contains(kv[1], "fn__none") {
+				fnNone = true
+				break
+			}
+		}
+		if fnNone {
+			continue
+		}
+
+		tag := "td"
+		if nil != cell.Parent && nil != cell.Parent.Parent && ast.NodeTableHead == cell.Parent.Parent.Type {
+			tag = "th"
+		}
+		var attrs [][]string
+		switch cell.TableCellAlign {
+		case 1:
+			attrs = append(attrs, []string{"align", "left"})
+		case 2:
+			attrs = append(attrs, []string{"align", "center"})
+		case 3:
+			attrs = append(attrs, []string{"align", "right"})
+		}
+		// colspan/rowspan/style 等 IAL 属性
+		for _, kv := range cell.KramdownIAL {
+			if "colspan" == kv[0] || "rowspan" == kv[0] || "style" == kv[0] {
+				attrs = append(attrs, kv)
+			}
+		}
+		r.Tag(tag, attrs, false)
+		// 遍历单元格子节点，由各渲染器的 RendererFuncs 处理行级元素
+		for c := cell.FirstChild; nil != c; c = c.Next {
+			rendererFunc := r.RendererFuncs[c.Type]
+			if nil != rendererFunc {
+				rendererFunc(c, true)
+				rendererFunc(c, false)
+			}
+		}
+		r.Tag("/"+tag, nil, false)
+		r.Newline()
+	}
+	r.Tag("/tr", nil, false)
+	r.Newline()
+}
+
 // NormalizedTaskListItemMarker 返回规范化后的任务列表标记符。
 // 当 ExportNormalizeTaskListMarker 选项开启时，将非标准标记符（如 /、>、! 等）转为 X。
 // 仅用于 Markdown 文本输出场景（format、export_md），不用于 data-task 属性。

@@ -1013,12 +1013,7 @@ func (r *ProtyleExportDocxRenderer) renderTableHead(node *ast.Node, entering boo
 func (r *ProtyleExportDocxRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus {
 	if r.needUseHTMLTable(node) {
 		if entering {
-			subTree := &parse.Tree{}
-			subTree.Root = node
-			subTree.Context = r.Tree.Context
-			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
-			output := previewRenderer.Render()
-			r.Write(output)
+			r.renderTableByHTML(node)
 			return ast.WalkSkipChildren
 		}
 		return ast.WalkContinue

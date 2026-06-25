@@ -914,12 +914,7 @@ func (r *HtmlRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus
 	if r.needUseHTMLTable(node) {
 		if entering {
 			r.handleKramdownBlockIAL(node)
-			subTree := &parse.Tree{}
-			subTree.Root = node
-			subTree.Context = r.Tree.Context
-			previewRenderer := NewProtylePreviewRenderer(subTree, r.Options, r.ParseOptions)
-			output := previewRenderer.Render()
-			r.Write(output)
+			r.renderTableByHTML(node)
 			return ast.WalkSkipChildren
 		}
 		return ast.WalkContinue
