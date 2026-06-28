@@ -42,7 +42,9 @@ func ListStart(t *Tree, container *ast.Node) int {
 
 	t.Context.closeUnmatchedBlocks()
 
-	if nil != emptyListItem {
+	// closeUnmatchedBlocks 可能已触发 listFinalize 给该空列表项补了段落，此时不再重复追加
+	// https://github.com/siyuan-note/siyuan/issues/17890
+	if nil != emptyListItem && nil == emptyListItem.FirstChild {
 		p := &ast.Node{Type: ast.NodeParagraph}
 		if t.Context.ParseOption.KramdownBlockIAL {
 			id := ast.NewNodeID()
