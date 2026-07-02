@@ -185,6 +185,17 @@ func writeLinkableBuf(buff *bytes.Buffer, token *html.Token) {
 	buff.WriteString(tokenBuff.String())
 }
 
+// urlAttrs 列出承载 URL 的属性，这些属性都需要做危险协议（javascript: / data:text/html 等）过滤。
+// 除了常见的 src/srcset/href 外，还包括 <form action> 和 SVG <a xlink:href>，
+// 否则 <form action="javascript:..."> 与 <svg><a xlink:href="javascript:..."> 会绕过过滤。
+var urlAttrs = map[string]interface{}{
+	"src":        nil,
+	"srcset":     nil,
+	"href":       nil,
+	"action":     nil,
+	"xlink:href": nil,
+}
+
 func sanitizeAttrs(attrs []*html.Attribute) (ret []*html.Attribute) {
 	for _, attr := range attrs {
 		if !allowAttr(attr.Key) {
@@ -195,7 +206,7 @@ func sanitizeAttrs(attrs []*html.Attribute) (ret []*html.Attribute) {
 			continue
 		}
 
-		if "src" == attr.Key || "srcset" == attr.Key || "href" == attr.Key {
+		if _, ok := urlAttrs[attr.Key]; ok {
 			val := strings.ToLower(strings.TrimSpace(attr.Val))
 			val = removeSpace(val)
 			if strings.HasPrefix(val, "data:image/svg+xml") || strings.HasPrefix(val, "data:text/html") || strings.HasPrefix(val, "javascript") {
