@@ -233,10 +233,11 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 				break
 			}
 
-			// 判断端口后部分是否为数字
-			if tmp := bytes.ReplaceAll(url, []byte("://"), nil); bytes.Contains(tmp, []byte(":")) && !bytes.Contains(tmp, []byte("/")) {
+			// 判断端口后部分是否为数字：仅当尚未进入路径/查询/片段部分（即 url 中还未出现 / ? #）时才校验端口
+			if tmp := bytes.ReplaceAll(url, []byte("://"), nil); bytes.Contains(tmp, []byte(":")) && !bytes.ContainsAny(tmp, "/?#") {
 				tmp = tmp[bytes.Index(tmp, []byte(":"))+1:]
-				if !bytes.Contains(tmp, []byte("/")) && !lex.IsDigit(token) && lex.ItemSlash != token {
+				// 端口部分仅允许由数字组成，遇到 / ? # 这类路径/查询/片段起始符则结束端口解析
+				if !lex.IsDigit(token) && lex.ItemSlash != token && lex.ItemQuestion != token && lex.ItemCrosshatch != token {
 					break
 				}
 			}
