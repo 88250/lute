@@ -538,6 +538,13 @@ func (n *Node) IsEmptyBlockIAL() bool {
 		}
 		return false
 	}
+
+	// 空块 IAL 只可能直接挂在容器块（文档、列表、列表项、引述等）下。
+	// 若 IAL 挂在叶子块（段落、标题等）内部，它是该块的属性标记，而非空块占位
+	// https://github.com/siyuan-note/siyuan/issues/18169
+	if nil != n.Parent && !n.Parent.IsContainerBlock() {
+		return false
+	}
 	return true
 }
 
