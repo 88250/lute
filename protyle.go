@@ -388,12 +388,15 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 		mergeWithIAL = true
 	} else {
 		previewText := n.Previous.TokensStr()
-		if ast.NodeText == n.Previous.Type &&
-			!strings.Contains(previewText, "　") && !strings.Contains(previewText, " ") && !strings.Contains(previewText, "\n") && !strings.Contains(previewText, "\t") &&
-			"" == strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(previewText, editor.Zwsp, ""), editor.Caret, "")) &&
-			nil != n.Previous.Previous && n.IsSameTextMarkType(n.Previous.Previous) {
-			mergeWithZwsp = true
-		} else {
+			if ast.NodeText == n.Previous.Type &&
+				!strings.Contains(previewText, "　") && !strings.Contains(previewText, " ") && !strings.Contains(previewText, "\n") && !strings.Contains(previewText, "\t") &&
+				"" == strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(previewText, editor.Zwsp, ""), editor.Caret, "")) &&
+				nil != n.Previous.Previous && n.IsSameTextMarkType(n.Previous.Previous) {
+				// 相邻标签之间如果没有插入符（光标位置），则不跨 ZWSP 合并，保留为两个独立的标签 https://github.com/siyuan-note/siyuan/issues/18191
+				if !strings.Contains(n.TextMarkType, "tag") || strings.Contains(previewText, editor.Caret) {
+					mergeWithZwsp = true
+				}
+			} else {
 			if n.Type != n.Previous.Type || !n.IsSameTextMarkType(n.Previous) {
 				return
 			}

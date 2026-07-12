@@ -271,12 +271,15 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 			r.TextAutoSpacePrevious(node)
 		}
 		attrs := r.renderTextMarkAttrs(node)
-		r.spanNodeAttrs(node, &attrs)
-		if (nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type ||
-			(editor.Caret == node.Previous.TokensStr() && (nil == node.Previous.Previous || ast.NodeSoftBreak == node.Previous.Previous.Type))) &&
-			parse.ContainTextMark(node, "code", "kbd", "tag") {
-			r.WriteString(editor.Zwsp)
-		}
+			r.spanNodeAttrs(node, &attrs)
+			if parse.ContainTextMark(node, "tag") && nil != node.Previous && node.Previous.IsTextMarkType("tag") {
+				// 相邻标签之间使用普通空格区隔，避免视觉上连在一起 https://github.com/siyuan-note/siyuan/issues/18191
+				r.WriteByte(lex.ItemSpace)
+			} else if (nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type ||
+				(editor.Caret == node.Previous.TokensStr() && (nil == node.Previous.Previous || ast.NodeSoftBreak == node.Previous.Previous.Type))) &&
+				parse.ContainTextMark(node, "code", "kbd", "tag") {
+				r.WriteString(editor.Zwsp)
+			}
 
 		if node.IsTextMarkType("code") {
 			if r.Options.Spellcheck {
@@ -635,7 +638,10 @@ func (r *ProtyleRenderer) renderGitConflict(node *ast.Node, entering bool) ast.W
 func (r *ProtyleRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.TextAutoSpacePrevious(node)
-		if nil == node.Previous || ast.NodeSoftBreak != node.Previous.Type {
+		if nil != node.Previous && ast.NodeTag == node.Previous.Type {
+			// 相邻标签之间使用普通空格区隔，避免视觉上连在一起 https://github.com/siyuan-note/siyuan/issues/18191
+			r.WriteByte(lex.ItemSpace)
+		} else if nil == node.Previous || ast.NodeSoftBreak != node.Previous.Type {
 			r.WriteString(editor.Zwsp)
 		}
 	} else {
