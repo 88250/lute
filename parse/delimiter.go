@@ -318,6 +318,10 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 	token := ctx.tokens[startPos]
 	delimitersCount := 0
 	for i := ctx.pos; i < ctx.tokensLen && token == ctx.tokens[i]; i++ {
+		// #Tag# 标记使用一个井号，不贪婪合并连续井号，否则相邻标签（如 #foo##bar#）会被错误解析 https://github.com/siyuan-note/siyuan/issues/18191
+		if lex.ItemCrosshatch == token && t.Context.ParseOption.Tag && delimitersCount >= 1 {
+			break
+		}
 		delimitersCount++
 		ctx.pos++
 	}
