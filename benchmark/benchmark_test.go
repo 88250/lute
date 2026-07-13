@@ -22,7 +22,7 @@ const spec = "commonmark-spec"
 func BenchmarkLute(b *testing.B) {
 	buf, err := os.ReadFile(spec + ".md")
 	if nil != err {
-		b.Fatalf("read spec text failed: " + err.Error())
+		b.Fatalf("read spec text failed: %s", err.Error())
 	}
 
 	luteEngine := lute.New()
