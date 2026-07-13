@@ -910,6 +910,21 @@ func (r *FormatRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkContinue
 }
 
+// tableCellStructIALTokens 提取单元格的 colspan/rowspan/fn__none 结构属性并序列化为 IAL tokens，
+// 供 markdown 往返时保留合并单元格信息。无结构属性时返回 nil。
+func tableCellStructIALTokens(node *ast.Node) []byte {
+	var structural [][]string
+	for _, kv := range node.KramdownIAL {
+		if "colspan" == kv[0] || "rowspan" == kv[0] || ("class" == kv[0] && "fn__none" == kv[1]) {
+			structural = append(structural, kv)
+		}
+	}
+	if 0 == len(structural) {
+		return nil
+	}
+	return parse.IAL2Tokens(structural)
+}
+
 func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
 	padding := node.TableCellContentMaxWidth - node.TableCellContentWidth
 	if entering {
@@ -921,6 +936,15 @@ func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding/2))
 			case 3:
 				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
+			}
+		}
+		// 表格合并单元格的 colspan/rowspan/fn__none 是结构属性，必须随 markdown 往返保留。
+		// 当 KramdownSpanIAL 渲染选项关闭时（如思源 html2BlockDOM），renderKramdownSpanIAL 不输出
+		// NodeKramdownSpanIAL 子节点，这里从 KramdownIAL 手动补出，避免合并信息丢失。
+		// 选项开启时由 renderKramdownSpanIAL 统一输出，此处跳过以免重复。
+		if !r.Options.KramdownSpanIAL {
+			if ialTokens := tableCellStructIALTokens(node); nil != ialTokens {
+				r.Write(ialTokens)
 			}
 		}
 	} else {

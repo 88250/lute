@@ -81,23 +81,23 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 				if nil == tableRow {
 					return
 				}
-				if context.ParseOption.KramdownSpanIAL {
-					for td := tableRow.FirstChild; nil != td; td = td.Next {
-						ialStart := bytes.Index(td.Tokens, []byte("{:"))
-						if 0 != ialStart {
-							continue
-						}
+				// 提取数据行单元格的 colspan/rowspan/fn__none 等结构 IAL（与表头行处理保持一致，
+				// 不受 KramdownSpanIAL 选项控制），使合并单元格信息能随 markdown 往返保留。
+				for td := tableRow.FirstChild; nil != td; td = td.Next {
+					ialStart := bytes.Index(td.Tokens, []byte("{:"))
+					if 0 != ialStart {
+						continue
+					}
 
-						subTokens := td.Tokens[ialStart:]
-						if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
-							ialTokens := subTokens[:pos+1]
-							if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || // 合并单元格
-								bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
-								td.KramdownIAL = ial
-								td.Tokens = td.Tokens[len(ialTokens):]
-								spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
-								td.PrependChild(spanIAL)
-							}
+					subTokens := td.Tokens[ialStart:]
+					if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
+						ialTokens := subTokens[:pos+1]
+						if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || // 合并单元格
+							bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
+							td.KramdownIAL = ial
+							td.Tokens = td.Tokens[len(ialTokens):]
+							spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
+							td.PrependChild(spanIAL)
 						}
 					}
 				}
@@ -160,16 +160,19 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		return
 	}
 
-	if context.ParseOption.KramdownSpanIAL {
-		for th := headRow.FirstChild; nil != th; th = th.Next {
-			ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
-			if 0 > ialStart {
-				continue
-			}
-			subTokens := th.Tokens[ialStart:]
-			if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
+	// 提取表头单元格的结构 IAL（colspan/rowspan/fn__none），不受 KramdownSpanIAL 选项控制，
+	// 使合并单元格信息能随 markdown 往返保留。
+	for th := headRow.FirstChild; nil != th; th = th.Next {
+		ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
+		if 0 > ialStart {
+			continue
+		}
+		subTokens := th.Tokens[ialStart:]
+		if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
+			ialTokens := subTokens[:pos+1]
+			if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) ||
+				bytes.Contains(ialTokens, []byte("width:")) {
 				th.KramdownIAL = ial
-				ialTokens := subTokens[:pos+1]
 				th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
 				spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 				th.InsertAfter(spanIAL)
@@ -187,16 +190,18 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		if nil == tableRow {
 			return
 		}
-		if context.ParseOption.KramdownSpanIAL {
-			for th := tableRow.FirstChild; nil != th; th = th.Next {
-				ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
-				if 0 > ialStart {
-					continue
-				}
-				subTokens := th.Tokens[ialStart:]
-				if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
+		// 提取数据行单元格的结构 IAL（同表头），不受 KramdownSpanIAL 选项控制。
+		for th := tableRow.FirstChild; nil != th; th = th.Next {
+			ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
+			if 0 > ialStart {
+				continue
+			}
+			subTokens := th.Tokens[ialStart:]
+			if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
+				ialTokens := subTokens[:pos+1]
+				if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) ||
+					bytes.Contains(ialTokens, []byte("width:")) {
 					th.KramdownIAL = ial
-					ialTokens := subTokens[:pos+1]
 					th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
 					spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 					th.InsertAfter(spanIAL)

@@ -177,35 +177,10 @@ func (lute *Lute) fixOneTableStructure(table *html.Node) {
 		return
 	}
 
-	// 2.5 首行物理单元格补齐：如果首行物理单元格数 < maxCols，在首行末尾补 td。
-	// 否则 markdown 往返时表头分隔行列数 < maxCols，parse.Parse 重新解析会丢失数据列。
-	//（GFM 表格分隔行列数 = 表头物理单元格数，colspan 单元格只有1个物理格但占多列）
-	// 若首行存在 colspan>1 的单元格，补的 td 用 fn__none（被 colspan 覆盖，渲染时隐藏）；
-	// 否则是普通残缺表格，补普通空 td。
-	if 0 < len(trNodes) {
-		firstRowPhysicalCells := 0
-		firstRowHasColspan := false
-		for c := trNodes[0].FirstChild; c != nil; c = c.NextSibling {
-			if c.Type == html.ElementNode && (c.DataAtom == atom.Td || c.DataAtom == atom.Th) {
-				if "fn__none" == util.DomAttrValue(c, "class") {
-					continue
-				}
-				firstRowPhysicalCells++
-				if cs := util.DomAttrValue(c, "colspan"); "" != cs {
-					if val, err := strconv.Atoi(cs); err == nil && val > 1 {
-						firstRowHasColspan = true
-					}
-				}
-			}
-		}
-		for firstRowPhysicalCells < maxCols {
-			trNodes[0].AppendChild(newTD(firstRowHasColspan))
-			firstRowPhysicalCells++
-		}
-	}
-
 	// 3. 二维网格：occupied[row][col] 标记被跨行/跨列单元格覆盖的位置
 	// 用模拟 HTML 表格布局的方式补齐占位单元格
+	// 第 3 步统一处理所有行（含表头）：colspan 单元格后补 fn__none 占位、被 rowspan 覆盖处补占位、行末补齐，
+	// 使每行物理 td 数恰好等于 maxCols，从而 GFM 往返时各行 | 数一致，避免右侧列错位。
 	rowCount := len(trNodes)
 	occupied := make([][]bool, rowCount)
 	for i := range occupied {
@@ -252,6 +227,12 @@ func (lute *Lute) fixOneTableStructure(table *html.Node) {
 				for dc := 0; dc < colspan && colIdx+dc < maxCols; dc++ {
 					occupied[ri+dr][colIdx+dc] = true
 				}
+			}
+			// 单元格跨多列时，在其后补 (colspan-1) 个 fn__none 占位 td，使本行物理 td 数与逻辑列数一致。
+			// 否则 GFM 表格按 | 数对齐时该行会少列，导致 markdown 往返后右侧内容串列。
+			//（与思源内部规范一致：colspan 单元格后跟 fn__none 占位，见 spin_block_test 用例 112/113）
+			for dc := 1; dc < colspan && colIdx+dc <= maxCols; dc++ {
+				appendPlaceholderAfter(cell)
 			}
 			colIdx += colspan
 		}
@@ -308,6 +289,12 @@ func insertPlaceholderBefore(ref *html.Node) {
 // appendPlaceholder 将一个空 td 追加到 tr 末尾。fnNone 为 true 时标记为 class="fn__none"（合并覆盖占位）。
 func appendPlaceholder(tr *html.Node, fnNone bool) {
 	tr.AppendChild(newTD(fnNone))
+}
+
+// appendPlaceholderAfter 在 ref 之后插入一个 class="fn__none" 的空 td，用作 colspan 单元格横向覆盖的占位。
+func appendPlaceholderAfter(ref *html.Node) {
+	td := newPlaceholderTD()
+	ref.InsertAfter(td)
 }
 
 // newPlaceholderTD 构造一个 <td class="fn__none"></td> 节点（合并单元格覆盖占位）。
