@@ -30,7 +30,7 @@ func TestChroma(t *testing.T) {
 	writer := bytes.Buffer{}
 	err := quick.Highlight(&writer, java, "java", "html", "github")
 	if nil != err {
-		t.Fatalf(err.Error())
+		t.Fatalf("%s", err.Error())
 	}
 	if output := writer.String(); expected != output {
 		fmt.Println("unexpected output:\n" + output)

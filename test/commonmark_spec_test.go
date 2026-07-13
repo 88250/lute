@@ -31,12 +31,12 @@ type testcase struct {
 func TestSpec(t *testing.T) {
 	bytes, err := os.ReadFile("commonmark-spec.json")
 	if nil != err {
-		t.Fatalf("read spec test cases failed: " + err.Error())
+		t.Fatalf("read spec test cases failed: %s", err.Error())
 	}
 
 	var testcases []testcase
 	if err = json.Unmarshal(bytes, &testcases); nil != err {
-		t.Fatalf("read spec test caes failed: " + err.Error())
+		t.Fatalf("read spec test case failed: %s", err.Error())
 	}
 
 	luteEngine := lute.New()
