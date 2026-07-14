@@ -11,6 +11,7 @@
 package parse
 
 import (
+	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -116,6 +117,19 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 		if !openerFound {
 			closer = closer.next
 		} else {
+			if lex.ItemCrosshatch == closercc && t.Context.ParseOption.Tag {
+				var tagContent strings.Builder
+				for n := opener.node.Next; nil != n && n != closer.node; n = n.Next {
+					tagContent.WriteString(n.Text())
+				}
+				content := strings.ReplaceAll(tagContent.String(), editor.Caret, "")
+				content = strings.ReplaceAll(content, editor.Zwsp, "")
+				if "" == strings.TrimSpace(content) {
+					closer = closer.next
+					continue
+				}
+			}
+
 			// calculate actual number of delimiters used from closer
 			if closer.num >= 2 && opener.num >= 2 {
 				useDelims = 2
