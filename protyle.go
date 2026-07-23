@@ -484,27 +484,51 @@ func (lute *Lute) CancelList(ivHTML string) (ovHTML string) {
 		return ivHTML
 	}
 
-	list := tree.Root.FirstChild
-
-	var appends, unlinks []*ast.Node
-	for li := list.FirstChild; nil != li; li = li.Next {
-		for c := li.FirstChild; nil != c; c = c.Next {
-			if ast.NodeTaskListItemMarker != c.Type {
-				appends = append(appends, c)
-			}
-		}
-		unlinks = append(unlinks, li)
-	}
-	for _, c := range appends {
-		tree.Root.AppendChild(c)
-	}
-	for _, n := range unlinks {
-		n.Unlink()
-	}
-	list.Unlink()
+	cancelList(tree.Root.FirstChild)
 
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
+}
+
+func (lute *Lute) CancelListRecursively(ivHTML string) (ovHTML string) {
+	tree := lute.BlockDOM2Tree(ivHTML)
+	list := tree.Root.FirstChild
+	if nil == list || ast.NodeList != list.Type || nil == list.ListData {
+		return ivHTML
+	}
+
+	sourceTyp := list.ListData.Typ
+	var lists []*ast.Node
+	ast.Walk(list, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering && ast.NodeList == n.Type && nil != n.ListData && sourceTyp == n.ListData.Typ {
+			lists = append(lists, n)
+		}
+		return ast.WalkContinue
+	})
+	for i := len(lists) - 1; 0 <= i; i-- {
+		cancelList(lists[i])
+	}
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
+	return
+}
+
+func cancelList(list *ast.Node) {
+	var children []*ast.Node
+	for li := list.FirstChild; nil != li; li = li.Next {
+		if ast.NodeListItem != li.Type {
+			continue
+		}
+		for child := li.FirstChild; nil != child; child = child.Next {
+			if ast.NodeTaskListItemMarker != child.Type {
+				children = append(children, child)
+			}
+		}
+	}
+	for _, child := range children {
+		list.InsertBefore(child)
+	}
+	list.Unlink()
 }
 
 func (lute *Lute) CancelBlockquote(ivHTML string) (ovHTML string) {
@@ -636,6 +660,72 @@ func (lute *Lute) Blocks2Hs(ivHTML, level string) (ovHTML string) {
 	}
 	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
 	return
+}
+
+func (lute *Lute) ConvertListType(ivHTML, targetType string) (ovHTML string) {
+	targetTyp := -1
+	switch targetType {
+	case "u":
+		targetTyp = 0
+	case "o":
+		targetTyp = 1
+	case "t":
+		targetTyp = 3
+	default:
+		return ivHTML
+	}
+
+	tree := lute.BlockDOM2Tree(ivHTML)
+	list := tree.Root.FirstChild
+	if nil == list || ast.NodeList != list.Type || nil == list.ListData {
+		return ivHTML
+	}
+
+	sourceTyp := list.ListData.Typ
+	if sourceTyp == targetTyp {
+		return ivHTML
+	}
+
+	var lists []*ast.Node
+	ast.Walk(list, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering && ast.NodeList == n.Type && nil != n.ListData && sourceTyp == n.ListData.Typ {
+			lists = append(lists, n)
+		}
+		return ast.WalkContinue
+	})
+	for _, item := range lists {
+		convertListType(item, targetTyp)
+	}
+
+	ovHTML = lute.Tree2BlockDOM(tree, lute.RenderOptions, lute.ParseOptions)
+	return
+}
+
+func convertListType(list *ast.Node, targetTyp int) {
+	list.ListData.Typ = targetTyp
+	num := 1
+	for li := list.FirstChild; nil != li; li = li.Next {
+		if ast.NodeListItem != li.Type {
+			continue
+		}
+		if nil == li.ListData {
+			li.ListData = &ast.ListData{}
+		}
+		li.ListData.Typ = targetTyp
+		if 1 == targetTyp {
+			li.ListData.Num = num
+			num++
+		}
+
+		taskMarker := li.ChildByType(ast.NodeTaskListItemMarker)
+		if 3 == targetTyp {
+			if nil == taskMarker {
+				li.PrependChild(&ast.Node{Type: ast.NodeTaskListItemMarker})
+			}
+		} else if nil != taskMarker {
+			taskMarker.Unlink()
+		}
+	}
 }
 
 func (lute *Lute) OL2TL(ivHTML string) (ovHTML string) {
