@@ -514,9 +514,10 @@ func (lute *Lute) CancelListRecursively(ivHTML string) (ovHTML string) {
 		return ivHTML
 	}
 
+	sourceTyp := list.ListData.Typ
 	var lists []*ast.Node
 	ast.Walk(list, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if entering && ast.NodeList == n.Type && nil != n.ListData {
+		if entering && ast.NodeList == n.Type && nil != n.ListData && sourceTyp == n.ListData.Typ {
 			lists = append(lists, n)
 		}
 		return ast.WalkContinue

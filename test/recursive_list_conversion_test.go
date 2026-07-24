@@ -101,7 +101,7 @@ func TestCancelListRecursively(t *testing.T) {
 	}
 
 	converted := luteEngine.CancelListRecursively(input)
-	if got, want := listTypes(luteEngine, converted), []int{}; !slices.Equal(got, want) {
+	if got, want := listTypes(luteEngine, converted), []int{1}; !slices.Equal(got, want) {
 		t.Fatalf("unexpected recursive list types: got %v, want %v", got, want)
 	}
 	if got, want := paragraphTexts(luteEngine, converted), []string{"outer", "nested", "ordered", "deep unordered", "tail"}; !slices.Equal(got, want) {
