@@ -1272,8 +1272,8 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case ast.NodeHTMLBlock:
 		node.Type = ast.NodeHTMLBlock
+		// DomAttrValue 已由 HTML 解析器完成属性解码，保留源码中的字面实体。
 		content := util.DomAttrValue(n.FirstChild.NextSibling.FirstChild, "data-content")
-		content = html.UnescapeHTMLStr(content)
 		node.Tokens = util.StrToBytes(content)
 		tree.Context.Tip.AppendChild(node)
 		return
