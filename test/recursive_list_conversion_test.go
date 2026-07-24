@@ -23,14 +23,20 @@ func TestConvertListType(t *testing.T) {
 	input := luteEngine.Md2BlockDOM("1. outer\n   1. nested\n      1. deep\n   - [ ] task\n     1. ordered in task", false)
 	converted := luteEngine.ConvertListType(input, "u")
 
-	if got, want := listTypes(luteEngine, converted), []int{0, 0, 0, 3, 0}; !slices.Equal(got, want) {
+	if got, want := listTypes(luteEngine, converted), []int{0, 0, 0, 0, 0}; !slices.Equal(got, want) {
 		t.Fatalf("unexpected list types: got %v, want %v", got, want)
 	}
-	if got := taskMarkerCount(luteEngine, converted); 1 != got {
-		t.Fatalf("unexpected task marker count: got %d, want 1", got)
+	if got := taskMarkerCount(luteEngine, converted); 0 != got {
+		t.Fatalf("unexpected task marker count: got %d, want 0", got)
 	}
 	if got := luteEngine.ConvertListType(input, "invalid"); input != got {
 		t.Fatalf("invalid target type should keep the original HTML")
+	}
+
+	sameRootTypeInput := luteEngine.Md2BlockDOM("- outer\n  1. nested", false)
+	sameRootTypeConverted := luteEngine.ConvertListType(sameRootTypeInput, "u")
+	if got, want := listTypes(luteEngine, sameRootTypeConverted), []int{0, 0}; !slices.Equal(got, want) {
+		t.Fatalf("unexpected same-root list types: got %v, want %v", got, want)
 	}
 }
 
@@ -95,11 +101,26 @@ func TestCancelListRecursively(t *testing.T) {
 	}
 
 	converted := luteEngine.CancelListRecursively(input)
-	if got, want := listTypes(luteEngine, converted), []int{1}; !slices.Equal(got, want) {
+	if got, want := listTypes(luteEngine, converted), []int{}; !slices.Equal(got, want) {
 		t.Fatalf("unexpected recursive list types: got %v, want %v", got, want)
 	}
 	if got, want := paragraphTexts(luteEngine, converted), []string{"outer", "nested", "ordered", "deep unordered", "tail"}; !slices.Equal(got, want) {
 		t.Fatalf("unexpected paragraph order: got %v, want %v", got, want)
+	}
+}
+
+func TestCancelListKeepsExistingMultipleRootOrder(t *testing.T) {
+	luteEngine := newRecursiveListLute()
+	input := luteEngine.Md2BlockDOM("- list item\n\ntrailing paragraph", false)
+	converted := luteEngine.CancelList(input)
+
+	if got, want := paragraphTexts(luteEngine, converted), []string{"trailing paragraph", "list item"}; !slices.Equal(got, want) {
+		t.Fatalf("unexpected paragraph order: got %v, want %v", got, want)
+	}
+
+	recursivelyConverted := luteEngine.CancelListRecursively(input)
+	if got, want := paragraphTexts(luteEngine, recursivelyConverted), []string{"list item", "trailing paragraph"}; !slices.Equal(got, want) {
+		t.Fatalf("unexpected recursive paragraph order: got %v, want %v", got, want)
 	}
 }
 
