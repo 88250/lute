@@ -12,10 +12,28 @@ package parse
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/lex"
 )
+
+// isTableCellIAL 判断 IAL 是否包含需要随表格单元格往返保留的结构或样式属性。
+func isTableCellIAL(ial [][]string) bool {
+	for _, attr := range ial {
+		switch attr[0] {
+		case "colspan", "rowspan", "style":
+			return true
+		case "class":
+			for _, class := range strings.Fields(attr[1]) {
+				if "fn__none" == class {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
 
 func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable *ast.Node) {
 	var tokens []byte
@@ -60,8 +78,7 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 					subTokens := th.Tokens[ialStart:]
 					if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
 						ialTokens := subTokens[:pos+1]
-						if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || // 合并单元格
-							bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
+						if isTableCellIAL(ial) {
 							th.KramdownIAL = ial
 							th.Tokens = th.Tokens[len(ialTokens):]
 							spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
@@ -81,8 +98,8 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 				if nil == tableRow {
 					return
 				}
-				// 提取数据行单元格的 colspan/rowspan/fn__none 等结构 IAL（与表头行处理保持一致，
-				// 不受 KramdownSpanIAL 选项控制），使合并单元格信息能随 markdown 往返保留。
+				// 提取数据行单元格的结构和样式 IAL（与表头行处理保持一致，不受 KramdownSpanIAL 选项控制），
+				// 使合并信息和单元格样式能随 Markdown 往返保留。
 				for td := tableRow.FirstChild; nil != td; td = td.Next {
 					ialStart := bytes.Index(td.Tokens, []byte("{:"))
 					if 0 != ialStart {
@@ -92,8 +109,7 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 					subTokens := td.Tokens[ialStart:]
 					if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
 						ialTokens := subTokens[:pos+1]
-						if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) || // 合并单元格
-							bytes.Contains(ialTokens, []byte("width:")) /* width: 是为了兼容遗留数据 */ {
+						if isTableCellIAL(ial) {
 							td.KramdownIAL = ial
 							td.Tokens = td.Tokens[len(ialTokens):]
 							spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
@@ -160,8 +176,8 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		return
 	}
 
-	// 提取表头单元格的结构 IAL（colspan/rowspan/fn__none），不受 KramdownSpanIAL 选项控制，
-	// 使合并单元格信息能随 markdown 往返保留。
+	// 提取表头单元格的结构和样式 IAL，不受 KramdownSpanIAL 选项控制，
+	// 使合并信息和单元格样式能随 Markdown 往返保留。
 	for th := headRow.FirstChild; nil != th; th = th.Next {
 		ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
 		if 0 > ialStart {
@@ -170,8 +186,7 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		subTokens := th.Tokens[ialStart:]
 		if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
 			ialTokens := subTokens[:pos+1]
-			if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) ||
-				bytes.Contains(ialTokens, []byte("width:")) {
+			if isTableCellIAL(ial) {
 				th.KramdownIAL = ial
 				th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
 				spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
@@ -190,7 +205,7 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		if nil == tableRow {
 			return
 		}
-		// 提取数据行单元格的结构 IAL（同表头），不受 KramdownSpanIAL 选项控制。
+		// 提取数据行单元格的结构和样式 IAL（同表头），不受 KramdownSpanIAL 选项控制。
 		for th := tableRow.FirstChild; nil != th; th = th.Next {
 			ialStart := bytes.LastIndex(th.Tokens, []byte("{:"))
 			if 0 > ialStart {
@@ -199,8 +214,7 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 			subTokens := th.Tokens[ialStart:]
 			if pos, ial := context.parseKramdownSpanIAL(subTokens); 0 < len(ial) {
 				ialTokens := subTokens[:pos+1]
-				if bytes.Contains(ialTokens, []byte("span")) || bytes.Contains(ialTokens, []byte("fn__none")) ||
-					bytes.Contains(ialTokens, []byte("width:")) {
+				if isTableCellIAL(ial) {
 					th.KramdownIAL = ial
 					th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
 					spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}

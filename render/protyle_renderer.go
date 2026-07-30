@@ -271,24 +271,24 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 			r.TextAutoSpacePrevious(node)
 		}
 		attrs := r.renderTextMarkAttrs(node)
-			r.spanNodeAttrs(node, &attrs)
-			if parse.ContainTextMark(node, "tag") && nil != node.Previous {
-				prevIsTag := node.Previous.IsTextMarkType("tag")
-				prevIsCaretBeforeTag := editor.Caret == node.Previous.TokensStr() &&
-					nil != node.Previous.Previous && node.Previous.Previous.IsTextMarkType("tag")
-				if prevIsTag || prevIsCaretBeforeTag {
-					// 相邻标签之间使用普通空格区隔，避免视觉上连在一起 https://github.com/siyuan-note/siyuan/issues/18191
-					r.WriteByte(lex.ItemSpace)
-				} else if (nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type ||
-					(editor.Caret == node.Previous.TokensStr() && (nil == node.Previous.Previous || ast.NodeSoftBreak == node.Previous.Previous.Type))) &&
-					parse.ContainTextMark(node, "code", "kbd", "tag") {
-					r.WriteString(editor.Zwsp)
-				}
+		r.spanNodeAttrs(node, &attrs)
+		if parse.ContainTextMark(node, "tag") && nil != node.Previous {
+			prevIsTag := node.Previous.IsTextMarkType("tag")
+			prevIsCaretBeforeTag := editor.Caret == node.Previous.TokensStr() &&
+				nil != node.Previous.Previous && node.Previous.Previous.IsTextMarkType("tag")
+			if prevIsTag || prevIsCaretBeforeTag {
+				// 相邻标签之间使用普通空格区隔，避免视觉上连在一起 https://github.com/siyuan-note/siyuan/issues/18191
+				r.WriteByte(lex.ItemSpace)
 			} else if (nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type ||
 				(editor.Caret == node.Previous.TokensStr() && (nil == node.Previous.Previous || ast.NodeSoftBreak == node.Previous.Previous.Type))) &&
 				parse.ContainTextMark(node, "code", "kbd", "tag") {
 				r.WriteString(editor.Zwsp)
 			}
+		} else if (nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type ||
+			(editor.Caret == node.Previous.TokensStr() && (nil == node.Previous.Previous || ast.NodeSoftBreak == node.Previous.Previous.Type))) &&
+			parse.ContainTextMark(node, "code", "kbd", "tag") {
+			r.WriteString(editor.Zwsp)
+		}
 
 		if node.IsTextMarkType("code") {
 			if r.Options.Spellcheck {
@@ -1208,6 +1208,19 @@ func (r *ProtyleRenderer) renderTableRow(node *ast.Node, entering bool) ast.Walk
 	return ast.WalkContinue
 }
 
+func tableCellWidthStyle(style string) string {
+	var ret []string
+	for _, declaration := range strings.Split(style, ";") {
+		declaration = strings.TrimSpace(declaration)
+		property, _, found := strings.Cut(declaration, ":")
+		property = strings.TrimSpace(property)
+		if found && ("width" == property || strings.HasSuffix(property, "-width")) {
+			ret = append(ret, declaration+";")
+		}
+	}
+	return strings.Join(ret, "")
+}
+
 func (r *ProtyleRenderer) renderTableHead(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("colgroup", nil, false)
@@ -1215,7 +1228,7 @@ func (r *ProtyleRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wal
 			if nil != node.FirstChild {
 				for th := node.FirstChild.FirstChild; nil != th; th = th.Next {
 					if ast.NodeTableCell == th.Type {
-						if style := th.IALAttr("style"); "" != style {
+						if style := tableCellWidthStyle(th.IALAttr("style")); "" != style {
 							r.Tag("col", [][]string{{"style", style}}, true)
 						} else {
 							r.Tag("col", nil, true)
