@@ -176,6 +176,11 @@ func (r *HtmlRenderer) Render() (output []byte) {
 	return
 }
 
+// SetTextMarkStandardTag 设置文本标记使用标准 HTML 标签渲染。
+func (r *HtmlRenderer) SetTextMarkStandardTag() {
+	r.RendererFuncs[ast.NodeTextMark] = r.renderTextMarkStandardTag
+}
+
 func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
@@ -300,6 +305,78 @@ func (r *HtmlRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSta
 			r.WriteString(textContent)
 			r.WriteString("</span>")
 		}
+	}
+	return ast.WalkContinue
+}
+
+func (r *HtmlRenderer) renderTextMarkStandardTag(node *ast.Node, entering bool) ast.WalkStatus {
+	if !entering {
+		return ast.WalkContinue
+	}
+
+	style := node.IALAttr("style")
+	if "" != style {
+		r.Tag("span", [][]string{{"style", style}}, false)
+	}
+
+	types := strings.Fields(node.TextMarkType)
+	for _, typ := range types {
+		switch typ {
+		case "a":
+			attrs := [][]string{{"href", string(r.LinkPath([]byte(node.TextMarkAHref)))}}
+			if "" != node.TextMarkATitle {
+				attrs = append(attrs, []string{"title", node.TextMarkATitle})
+			}
+			r.Tag("a", attrs, false)
+		case "strong", "em", "code", "s", "mark", "u", "sup", "sub", "kbd":
+			r.Tag(typ, nil, false)
+		case "tag":
+			r.WriteString("<mark>#")
+		case "inline-math":
+			r.WriteString("<span class=\"language-math\">$")
+		}
+	}
+
+	textContent := node.TextMarkTextContent
+	if node.IsTextMarkType("inline-math") {
+		textContent = node.TextMarkInlineMathContent
+	}
+	if node.ParentIs(ast.NodeTableCell) {
+		if node.IsTextMarkType("code") {
+			textContent = strings.ReplaceAll(textContent, "|", "&#124;")
+		} else {
+			textContent = strings.ReplaceAll(textContent, "\\|", "|")
+		}
+		textContent = strings.ReplaceAll(textContent, "\n", "<br />")
+	}
+	r.WriteString(textContent)
+
+	for i := len(types) - 1; 0 <= i; i-- {
+		switch types[i] {
+		case "a", "strong", "em", "code", "s", "mark", "u", "sup", "sub", "kbd":
+			r.Tag("/"+types[i], nil, false)
+		case "tag":
+			r.WriteString("#</mark>")
+		case "inline-math":
+			r.WriteString("$</span>")
+		}
+	}
+
+	if node.IsTextMarkType("inline-memo") && "" != node.TextMarkInlineMemoContent {
+		lastRune, _ := utf8.DecodeLastRuneInString(node.TextMarkTextContent)
+		if isCJK(lastRune) {
+			r.WriteString("<sup>（")
+			r.WriteString(strings.ReplaceAll(node.TextMarkInlineMemoContent, editor.IALValEscNewLine, " "))
+			r.WriteString("）</sup>")
+		} else {
+			r.WriteString("<sup>(")
+			r.WriteString(strings.ReplaceAll(node.TextMarkInlineMemoContent, editor.IALValEscNewLine, " "))
+			r.WriteString(")</sup>")
+		}
+	}
+
+	if "" != style {
+		r.WriteString("</span>")
 	}
 	return ast.WalkContinue
 }

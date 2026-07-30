@@ -90,7 +90,8 @@ func (lute *Lute) BlockDOM2HTML(vHTML string) (sHTML string) {
 
 func (lute *Lute) BlockDOM2RichHTML(vHTML string) (sHTML string) {
 	tree := lute.BlockDOM2Tree(vHTML)
-	renderer := render.NewProtyleExportDocxRenderer(tree, lute.RenderOptions, lute.ParseOptions)
+	renderer := render.NewHtmlRenderer(tree, lute.RenderOptions, lute.ParseOptions)
+	renderer.SetTextMarkStandardTag()
 	sHTML = util.BytesToStr(renderer.Render())
 	return
 }
