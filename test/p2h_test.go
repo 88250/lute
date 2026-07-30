@@ -57,3 +57,17 @@ func TestBlockDOM2HTML(t *testing.T) {
 		}
 	}
 }
+
+func TestBlockDOM2RichHTML(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.SetTextMark(true)
+
+	blockDOM := `<div data-node-id="20240101000000-abcdefg" data-type="NodeParagraph" class="p"><div contenteditable="true" spellcheck="false">foo <span data-type="strong em">bar</span> <span data-type="a" data-href="https://b3log.org" data-title="B3log">baz</span></div><div class="protyle-attr" contenteditable="false">` + "\u200b" + `</div></div>`
+	expected := "<p id=\"20240101000000-abcdefg\">foo <strong><em>bar</em></strong> <a href=\"https://b3log.org\" title=\"B3log\">baz</a></p>\n"
+	actual := luteEngine.BlockDOM2RichHTML(blockDOM)
+	if expected != actual {
+		t.Fatalf("expected\n\t%q\ngot\n\t%q", expected, actual)
+	}
+}

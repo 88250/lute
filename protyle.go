@@ -88,6 +88,13 @@ func (lute *Lute) BlockDOM2HTML(vHTML string) (sHTML string) {
 	return
 }
 
+func (lute *Lute) BlockDOM2RichHTML(vHTML string) (sHTML string) {
+	tree := lute.BlockDOM2Tree(vHTML)
+	renderer := render.NewProtyleExportDocxRenderer(tree, lute.RenderOptions, lute.ParseOptions)
+	sHTML = util.BytesToStr(renderer.Render())
+	return
+}
+
 func (lute *Lute) BlockDOM2InlineBlockDOM(vHTML string) (vIHTML string) {
 	markdown := lute.blockDOM2Md(vHTML)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
