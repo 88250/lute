@@ -35,7 +35,9 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 		lute.ParseOptions.KeepEscaped = keepEscaped
 	}()
 
-	markdown := lute.blockDOM2Md(ivHTML)
+	blockDOMTree := lute.BlockDOM2Tree(ivHTML)
+	normalizeSpinCaretNewline(blockDOMTree)
+	markdown := lute.blockDOMTree2Md(blockDOMTree)
 	markdown = strings.ReplaceAll(markdown, editor.Zwsp, "")
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
@@ -972,6 +974,11 @@ func (lute *Lute) Blockquote2Callout(ivHTML string) (ovHTML string) {
 
 func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	tree := lute.BlockDOM2Tree(htmlStr)
+	markdown = lute.blockDOMTree2Md(tree)
+	return
+}
+
+func (lute *Lute) blockDOMTree2Md(tree *parse.Tree) (markdown string) {
 
 	// 将 AST 进行 Markdown 格式化渲染
 	options := render.NewOptions()
@@ -987,6 +994,61 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
+}
+
+func normalizeSpinCaretNewline(tree *parse.Tree) {
+	// 浏览器在已有软换行处换行时会把插入符放在两条换行之间，需要先还原插入符对应的实际段落位置
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if !entering || ast.NodeParagraph != n.Type {
+			return ast.WalkContinue
+		}
+
+		for child := n.FirstChild; nil != child; child = child.Next {
+			if ast.NodeText != child.Type {
+				continue
+			}
+
+			content := child.TokensStr()
+			if strings.HasPrefix(content, editor.Caret+"\n") && spinHasContentAfter(child, content, len(editor.Caret)+1) {
+				content = editor.Caret + content[len(editor.Caret)+1:]
+			}
+
+			for offset := 0; ; {
+				index := strings.Index(content[offset:], "\n"+editor.Caret+"\n")
+				if 0 > index {
+					break
+				}
+				index += offset
+				after := index + len("\n"+editor.Caret+"\n")
+				if spinHasContentAfter(child, content, after) {
+					content = content[:index] + "\n\n" + editor.Caret + content[after:]
+					offset = index + len("\n\n"+editor.Caret)
+				} else {
+					offset = after
+				}
+			}
+			child.Tokens = []byte(content)
+		}
+		return ast.WalkSkipChildren
+	})
+}
+
+func spinHasContentAfter(node *ast.Node, content string, offset int) bool {
+	if spinHasContent(content[offset:]) {
+		return true
+	}
+	for next := node.Next; nil != next; next = next.Next {
+		if spinHasContent(next.Text()) {
+			return true
+		}
+	}
+	return false
+}
+
+func spinHasContent(content string) bool {
+	content = strings.ReplaceAll(content, editor.Caret, "")
+	content = strings.ReplaceAll(content, editor.Zwsp, "")
+	return "" != strings.TrimSpace(content)
 }
 
 func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
