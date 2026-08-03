@@ -176,6 +176,29 @@ func TestMd2BlockDOM(t *testing.T) {
 	ast.Testing = false
 }
 
+func TestMd2BlockDOMTaskMarkerFollowedByLink(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetArbitraryTaskListItemMarker(true)
+
+	tests := []struct {
+		markdown string
+		listType int
+	}{
+		{"- [1](siyuan://blocks/20260802201342-8lzm8cy)", 0},
+		{"- [1]", 3},
+		{"- [x] task", 3},
+		{"- [/] task", 3},
+	}
+	for _, test := range tests {
+		_, tree := luteEngine.Md2BlockDOMTree(test.markdown, true)
+		list := tree.Root.FirstChild
+		if nil == list || nil == list.ListData || test.listType != list.ListData.Typ {
+			t.Fatalf("expected list type [%d] for markdown [%s]", test.listType, test.markdown)
+		}
+	}
+}
+
 var md2BlockDOMDisableSyntaxTests = []parseTest{
 
 	{"9", "这两个语素最开始<sup>[[1]](https://www.zhihu.com/question/2127166482#ref_1)</sup>都很拟声\\n", "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\"><div contenteditable=\"true\" spellcheck=\"false\">这两个语素最开始<span data-type=\"sup a\" data-href=\"https://www.zhihu.com/question/2127166482#ref_1\">[1]</span>都很拟声\\n</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},

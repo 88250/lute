@@ -276,7 +276,8 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 		}
 
 		if 3 <= len(tokens) { // 至少需要 [ ] 或者 [x] 3 个字符
-			if lex.ItemOpenBracket == tokens[0] && lex.ItemCloseBracket != tokens[1] && lex.ItemCloseBracket == tokens[2] {
+			if lex.ItemOpenBracket == tokens[0] && lex.ItemCloseBracket != tokens[1] && lex.ItemCloseBracket == tokens[2] &&
+				(3 == len(tokens) || lex.IsWhitespace(tokens[3])) {
 				marker := tokens[1]
 				if t.Context.ParseOption.IsValidTaskListItemMarker(marker) {
 					data.Typ = 3
