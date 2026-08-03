@@ -1083,26 +1083,8 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		code = bytes.TrimSuffix(code, []byte("</code>"))
 
-		allSpan := true
-		if lute.parentIs(n, atom.Table) {
-			allSpan = false
-		} else {
-			for c := n.FirstChild; nil != c; c = c.NextSibling {
-				if html.TextNode == c.Type {
-					continue
-				}
-				if atom.Em == c.DataAtom || atom.Strong == c.DataAtom {
-					// https://github.com/siyuan-note/siyuan/issues/11682
-					continue
-				}
-				if atom.Span != c.DataAtom && atom.Br != c.DataAtom && atom.P != c.DataAtom {
-					allSpan = false
-					break
-				}
-			}
-		}
-		if allSpan {
-			// 如果全部都是 span 子节点，那么直接使用 span 的内容 https://github.com/siyuan-note/siyuan/issues/11281
+		if codeTextOnly(n) {
+			// 代码中的文本修饰元素仅影响 HTML 展示，转换时使用可见文本 https://github.com/siyuan-note/siyuan/issues/18505
 			code = []byte(util.DomText(n))
 			code = bytes.ReplaceAll(code, []byte("\u00A0"), []byte(" "))
 			code = bytes.ReplaceAll(code, []byte("\n"), []byte(" "))
@@ -1978,6 +1960,30 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Summary:
 		tree.Context.ParentTip()
 	}
+}
+
+func codeTextOnly(n *html.Node) bool {
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		if html.TextNode == child.Type {
+			continue
+		}
+		if html.ElementNode != child.Type {
+			return false
+		}
+		if dataRender := util.DomAttrValue(child, "data-render"); "1" == dataRender || "2" == dataRender {
+			return false
+		}
+		switch child.DataAtom {
+		case atom.Abbr, atom.B, atom.Br, atom.Del, atom.Em, atom.I, atom.Kbd, atom.Mark, atom.P, atom.Q, atom.S,
+			atom.Samp, atom.Small, atom.Span, atom.Strike, atom.Strong, atom.Sub, atom.Sup, atom.Time, atom.U, atom.Var:
+		default:
+			return false
+		}
+		if !codeTextOnly(child) {
+			return false
+		}
+	}
+	return true
 }
 
 func appendInlineMath(tree *parse.Tree, tex string) {
