@@ -192,16 +192,16 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == tokens[i] && 't' == tokens[i+1] && 'p' == tokens[i+2] && ':' == tokens[i+3] && '/' == tokens[i+4] && '/' == tokens[i+5] {
 			protocol = tokens[i : i+6]
 			i += 6
-		} else if parts := bytes.Split(tokens[i:], []byte("://")); 2 == len(parts) && 0 < len(parts[0]) && 0 < len(parts[1]) && !bytes.Contains(tokens[i:], httpProto) && !bytes.Contains(tokens[i:], httpsProto) && !bytes.Contains(tokens[i:], ftpProto) {
-			if !lex.IsASCIILetterNums(parts[0]) {
+		} else if idx := bytes.IndexByte(tokens[i:], lex.ItemColon); 0 < idx && 3 < len(tokens[i:])-idx && bytes.HasPrefix(tokens[i+idx:], protoSep) && 0 > bytes.Index(tokens[i+idx+3:], protoSep) && !bytes.Contains(tokens[i:], httpProto) && !bytes.Contains(tokens[i:], httpsProto) && !bytes.Contains(tokens[i:], ftpProto) {
+			// 自定义协议均认为是有效的 https://github.com/siyuan-note/siyuan/issues/5865
+			if !lex.IsASCIILetterNums(tokens[i : i+idx]) {
 				textEnd++
 				i++
 				continue
 			}
 
-			// 自定义协议均认为是有效的 https://github.com/siyuan-note/siyuan/issues/5865
-			protocol = append(parts[0], []byte("://")...)
-			i += len(parts[0]) + 3
+			protocol = append(tokens[i:i+idx], protoSep...)
+			i += idx + 3
 		} else {
 			textEnd++
 			if length-i < minLinkLen { // 剩余字符不足，已经不可能形成链接了
@@ -226,6 +226,7 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		}
 
 		var url []byte
+		var colonSeen, pathSeen bool // 端口校验状态：出现不属于 :// 的冒号且未进入路径/查询/片段部分时才校验端口
 		j = i
 		for ; j < length; j++ {
 			token = tokens[j]
@@ -233,13 +234,17 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 				break
 			}
 
-			// 判断端口后部分是否为数字：仅当尚未进入路径/查询/片段部分（即 url 中还未出现 / ? #）时才校验端口
-			if tmp := bytes.ReplaceAll(url, []byte("://"), nil); bytes.Contains(tmp, []byte(":")) && !bytes.ContainsAny(tmp, "/?#") {
-				tmp = tmp[bytes.Index(tmp, []byte(":"))+1:]
+			if colonSeen && !pathSeen {
 				// 端口部分仅允许由数字组成，遇到 / ? # 这类路径/查询/片段起始符则结束端口解析
 				if !lex.IsDigit(token) && lex.ItemSlash != token && lex.ItemQuestion != token && lex.ItemCrosshatch != token {
 					break
 				}
+			}
+			if !colonSeen && lex.ItemColon == token && !bytes.HasPrefix(tokens[j:], protoSep) {
+				colonSeen = true
+			}
+			if lex.ItemSlash == token || lex.ItemQuestion == token || lex.ItemCrosshatch == token {
+				pathSeen = true
 			}
 
 			url = append(url, token)
@@ -456,51 +461,65 @@ func (t *Tree) isValidDomain(protocol, domain []byte) bool {
 		return true
 	}
 
-	segments := lex.Split(domain, '.')
-	length := len(segments)
-	if 2 > length { // 域名至少被 . 分隔为两部分，小于两部分的话不合法
+	// 与 lex.Split(domain, '.') 的段数保持一致（末尾空段不计）
+	total := bytes.Count(domain, dotBytes) + 1
+	if 0 < len(domain) && lex.ItemDot == domain[len(domain)-1] {
+		total--
+	}
+	if 2 > total { // 域名至少被 . 分隔为两部分，小于两部分的话不合法
 		return false
 	}
 
-	var token byte
-	for i := 0; i < length; i++ {
-		segment := segments[i]
-		segLen := len(segment)
-		if 1 > segLen {
-			continue
+	// 手动按 . 切分并逐段校验，避免分配切片
+	segments := 0
+	length := len(domain)
+	i := 0
+	for {
+		start := i
+		for i < length && lex.ItemDot != domain[i] {
+			i++
 		}
+		segment := domain[start:i]
 
-		for j := 0; j < segLen; j++ {
-			token = segment[j]
-			if !lex.IsASCIILetterNumHyphen(token) {
-				return false
+		if 0 < len(segment) {
+			for j := 0; j < len(segment); j++ {
+				token := segment[j]
+				if !lex.IsASCIILetterNumHyphen(token) {
+					return false
+				}
+				if 2 < segments && (segments == total-2 || segments == total-1) {
+					// 最后两个部分不能包含 _
+					if lex.ItemUnderscore == token {
+						return false
+					}
+				}
 			}
-			if 2 < i && (i == length-2 || i == length-1) {
-				// 最后两个部分不能包含 _
-				if lex.ItemUnderscore == token {
+
+			if segments == total-1 {
+				validSuffix := false
+				suffixIsDigit := true // 校验后缀是否全为数字
+				for _, b := range segment {
+					if !lex.IsDigit(b) {
+						suffixIsDigit = false
+						break
+					}
+				}
+				if !suffixIsDigit { // 如果后缀不是数字的话检查是否在后缀可用名单中
+					validSuffix = validAutoLinkDomainSuffix[util.BytesToStr(segment)]
+				} else { // 后缀全为数字的话可能是 IPv4 地址
+					validSuffix = true
+				}
+				if !validSuffix {
 					return false
 				}
 			}
 		}
 
-		if i == length-1 {
-			validSuffix := false
-			suffixIsDigit := true // 校验后缀是否全为数字
-			for _, b := range segment {
-				if !lex.IsDigit(b) {
-					suffixIsDigit = false
-					break
-				}
-			}
-			if !suffixIsDigit { // 如果后缀不是数字的话检查是否在后缀可用名单中
-				validSuffix = validAutoLinkDomainSuffix[util.BytesToStr(segment)]
-			} else { // 后缀全为数字的话可能是 IPv4 地址
-				validSuffix = true
-			}
-			if !validSuffix {
-				return false
-			}
+		segments++
+		if i >= length {
+			break
 		}
+		i++ // 跳过 .
 	}
 	return true
 }
@@ -643,6 +662,8 @@ var (
 	httpProto  = util.StrToBytes("http://")
 	httpsProto = util.StrToBytes("https://")
 	ftpProto   = util.StrToBytes("ftp://")
+	protoSep   = util.StrToBytes("://")
+	dotBytes   = util.StrToBytes(".")
 
 	// validAutoLinkDomainSuffix 作为 GFM 自动连接解析时校验域名后缀用。
 	validAutoLinkDomainSuffix = getValidDomainSuffixFromStr()

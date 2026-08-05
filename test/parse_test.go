@@ -24,6 +24,9 @@ type parseTest struct {
 }
 
 var parseTests = []parseTest{
+	// 链接引用定义按文档顺序匹配，全折叠比较命中第一个定义 https://spec.commonmark.org/0.30/#example-539
+	{"fold-ss", "[ss]\n\n[ẞ]: /first\n[SS]: /second\n", "<p><a href=\"/first\">ss</a></p>\n"},
+	{"fold-SS", "[SS]\n\n[ẞ]: /first\n[SS]: /second\n", "<p><a href=\"/first\">SS</a></p>\n"},
 	//
 	//	{"link ref node", "[foo]\n\n[foo]: bar", "<p><a href=\"bar\">foo</a></p>\n"},
 	//	{"details", `<details>

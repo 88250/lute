@@ -82,6 +82,9 @@ var debugTests = []parseTest{
 	{"34", "[foo](/bar )1\n", "<p><a href=\"/bar\">foo</a>1</p>\n"},
 	{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},
 	{"32", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
+	// 无管道单列表格，分隔行可只用冒号（居中列）
+	{"33", "foo\n::\nbar\n", "<table>\n<thead>\n<tr>\n<th align=\"center\">foo</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"center\">bar</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"32", "foo\n::\n", "<table>\n<thead>\n<tr>\n<th align=\"center\">foo</th>\n</tr>\n</thead>\n</table>\n"},
 	{"31", "*foo*<br>", "<p><em>foo</em><br></p>\n"},
 	{"30", "https://t.mex .mex 后缀不自动链接", "<p>https://t.mex .mex 后缀不自动链接</p>\n"},
 	{"29", "https://t.me .me 后缀自动链接", "<p><a href=\"https://t.me\">https://t.me</a> .me 后缀自动链接</p>\n"},

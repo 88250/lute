@@ -335,6 +335,12 @@ type Tree struct {
 	Created int64    // 创建时间
 	Updated int64    // 更新时间
 	Hash    string   // 内容哈希
+
+	// 以下字段用于惰性构建链接引用定义和脚注定义索引，避免查找时遍历整棵语法树
+	linkRefDefs        []*linkRefDef // 链接引用定义索引
+	linkRefDefIndexed  bool          // 链接引用定义索引是否已构建
+	footnotesDefs      []*ast.Node   // 脚注定义索引（文档顺序）
+	footnotesDefsIndex bool          // 脚注定义索引是否已构建
 }
 
 // Options 描述了解析选项。

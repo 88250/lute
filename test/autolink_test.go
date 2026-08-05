@@ -18,6 +18,9 @@ import (
 
 var autoLinkTests = []parseTest{
 
+	// 自定义协议分隔符后没有内容时不作为链接，避免文本被截断
+	{"33", "see foo://", "<p>see foo://</p>\n"},
+	{"32", "foo://", "<p>foo://</p>\n"},
 	{"31", "https://github.com/88250/lute/pull/207", "<p><a href=\"https://github.com/88250/lute/pull/207\">Pull Request #207 · 88250/lute</a></p>\n"},
 	{"30", "https://foo.com/bar:baz", "<p><a href=\"https://foo.com/bar:baz\">https://foo.com/bar:baz</a></p>\n"},
 	{"29", "www.test.com:8080/bar/baz", "<p><a href=\"http://www.test.com:8080/bar/baz\">www.test.com:8080/bar/baz</a></p>\n"},

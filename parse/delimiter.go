@@ -42,23 +42,23 @@ type delimiter struct {
 // handleDelim 将分隔符 *_~ 入栈。
 func (t *Tree) handleDelim(block *ast.Node, ctx *InlineContext) {
 	startPos := ctx.pos
-	delim := t.scanDelims(ctx)
+	typ, num, canOpen, canClose := t.scanDelims(ctx)
 
 	text := ctx.tokens[startPos:ctx.pos]
 	node := &ast.Node{Type: ast.NodeText, Tokens: text}
 	block.AppendChild(node)
 
 	// 将这个分隔符入栈
-	if delim.canOpen || delim.canClose {
+	if canOpen || canClose {
 		ctx.delimiters = &delimiter{
-			typ:         delim.typ,
-			num:         delim.num,
-			originalNum: delim.num,
+			typ:         typ,
+			num:         num,
+			originalNum: num,
 			node:        node,
 			previous:    ctx.delimiters,
 			next:        nil,
-			canOpen:     delim.canOpen,
-			canClose:    delim.canClose,
+			canOpen:     canOpen,
+			canClose:    canClose,
 		}
 		if nil != ctx.delimiters.previous {
 			ctx.delimiters.previous.next = ctx.delimiters
@@ -77,7 +77,7 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	var tempStack *delimiter
 	var useDelims int
 	var openerFound bool
-	var openersBottom = map[byte]*delimiter{}
+	var openersBottom [128]*delimiter // 每个分隔符字节对应的查找下限
 	var oddMatch = false
 
 	openersBottom[lex.ItemUnderscore] = stackBottom
@@ -327,10 +327,11 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	}
 }
 
-func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
+// scanDelims 扫描分隔符并判断其左右边界，返回分隔符字节、数量以及能否作为开始和结束分隔符。
+func (t *Tree) scanDelims(ctx *InlineContext) (typ byte, delimitersCount int, canOpen, canClose bool) {
 	startPos := ctx.pos
-	token := ctx.tokens[startPos]
-	delimitersCount := 0
+	typ = ctx.tokens[startPos]
+	token := typ
 	for i := ctx.pos; i < ctx.tokensLen && token == ctx.tokens[i]; i++ {
 		// #Tag# 标记使用一个井号，不贪婪合并连续井号，否则相邻标签（如 #foo##bar#）会被错误解析 https://github.com/siyuan-note/siyuan/issues/18191
 		if lex.ItemCrosshatch == token && t.Context.ParseOption.Tag && delimitersCount >= 1 {
@@ -402,7 +403,6 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
-	var canOpen, canClose bool
 	if lex.ItemUnderscore == token {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
@@ -464,8 +464,7 @@ func (t *Tree) scanDelims(ctx *InlineContext) *delimiter {
 			canClose = isRightFlanking
 		}
 	}
-
-	return &delimiter{typ: token, num: delimitersCount, active: true, canOpen: canOpen, canClose: canClose}
+	return
 }
 
 func (t *Tree) removeDelimiter(delim *delimiter, ctx *InlineContext) (ret *delimiter) {

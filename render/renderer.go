@@ -570,14 +570,16 @@ func normalizeHeadingID(heading *ast.Node) (ret string) {
 
 	id = strings.TrimLeft(id, "#")
 	id = strings.ReplaceAll(id, editor.Caret, "")
+	buf := strings.Builder{}
+	buf.Grow(len(id))
 	for _, r := range id {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
-			ret += string(r)
+			buf.WriteRune(r)
 		} else {
-			ret += "-"
+			buf.WriteByte('-')
 		}
 	}
-	return
+	return buf.String()
 }
 
 type Heading struct {

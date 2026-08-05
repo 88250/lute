@@ -41,6 +41,11 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 	lineCnt := 0
 	for i := 0; i < length; i++ {
 		if context.ParseOption.ProtyleWYSIWYG {
+			if -1 == bytes.IndexByte(paragraph.Tokens, lex.ItemPipe) {
+				// Protyle 模式下列中没有管道符的行都归入段落，所以没有管道符时不可能解析出表格
+				return
+			}
+
 			lines := lex.Split(paragraph.Tokens, lex.ItemNewline)
 
 			// 没有 | 的行依旧归入段落中
@@ -147,6 +152,12 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 }
 
 func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
+	if -1 == bytes.IndexByte(tokens, lex.ItemPipe) && !noPipeSingleColTable(tokens) {
+		// 绝大多数段落中没有管道符，直接跳过切分以提升性能；
+		// 唯一例外是 foo\n---\nbar 形式的多行单列无管道表格
+		return
+	}
+
 	lines := lex.Split(tokens, lex.ItemNewline)
 	length := len(lines)
 	if 2 > length {
@@ -254,6 +265,38 @@ func inInline(tokens []byte, i int, mathOrCodeMarker byte) bool {
 	}
 	end := bytes.IndexByte(tokens[i+1:], mathOrCodeMarker)
 	return -1 < start && -1 < end
+}
+
+// noPipeSingleColTable 判断 tokens 是否可能是单列无管道表格（foo\n---\nbar、0\n-: 或 foo\n::\nbar 形式）。
+// 该函数是解析前的粗略预判，允许误判（误判时走原有的完整解析逻辑），但不能漏判完整解析器能接受的输入。
+func noPipeSingleColTable(tokens []byte) bool {
+	i0 := bytes.IndexByte(tokens, lex.ItemNewline) // 第一行结束位置
+	if 1 > i0 || lex.IsBlank(tokens[:i0]) {
+		return false
+	}
+
+	i1 := bytes.IndexByte(tokens[i0+1:], lex.ItemNewline) // 第二行结束位置
+	if 1 > i1 {
+		// 第二行没有换行结尾时取剩余全部内容
+		i1 = len(tokens) - i0 - 1
+	}
+	if 1 > i1 {
+		return false
+	}
+
+	// 与完整解析器一致：分隔行先做首尾空白裁剪，长度至少 2，且只能由 - : 和空格组成
+	delim := lex.TrimWhitespace(tokens[i0+1 : i0+1+i1])
+	if 2 > len(delim) {
+		return false
+	}
+	for _, c := range delim {
+		switch c {
+		case lex.ItemHyphen, lex.ItemColon, lex.ItemSpace:
+		default:
+			return false
+		}
+	}
+	return true
 }
 
 func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *ast.Node) {

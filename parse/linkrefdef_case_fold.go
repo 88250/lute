@@ -13,36 +13,11 @@
 
 package parse
 
-import (
-	"bytes"
+import "golang.org/x/text/cases"
 
-	"github.com/88250/lute/ast"
-	"github.com/88250/lute/editor"
-	"golang.org/x/text/cases"
-)
+// foldCaser 复用同一个全折叠器，避免每次调用 cases.Fold() 重复构建内部状态。
+var foldCaser = cases.Fold()
 
-func (t *Tree) FindLinkRefDefLink(label []byte) (link *ast.Node) {
-	if !t.Context.ParseOption.LinkRef {
-		return
-	}
-
-	if t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG {
-		label = bytes.ReplaceAll(label, editor.CaretTokens, nil)
-	}
-	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || ast.NodeLinkRefDef != n.Type {
-			return ast.WalkContinue
-		}
-		if bytes.EqualFold(n.Tokens, label) {
-			link = n.FirstChild
-			return ast.WalkStop
-		}
-
-		if c := cases.Fold(); bytes.EqualFold(c.Bytes(label), n.Tokens) || bytes.EqualFold(c.Bytes(n.Tokens), label) {
-			link = n.FirstChild
-			return ast.WalkStop
-		}
-		return ast.WalkContinue
-	})
-	return
+func foldBytes(tokens []byte) []byte {
+	return foldCaser.Bytes(tokens)
 }

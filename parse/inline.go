@@ -72,6 +72,12 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 		}
 
 		if nil != n {
+			if nil == n.Previous && nil == n.Next {
+				// 绝大多数情况下解析函数返回的是没有关联兄弟节点的单个节点，直接挂载
+				block.AppendChild(n)
+				continue
+			}
+
 			var nodes []*ast.Node
 			first := n
 			for ; ; first = first.Previous {

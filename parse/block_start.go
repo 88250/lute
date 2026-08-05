@@ -14,9 +14,13 @@ import (
 	"github.com/88250/lute/ast"
 )
 
-// blockStarts 返回定义好的一系列函数，每个函数用于判断某种块节点是否可以开始。
-func blockStarts() []blockStartFunc {
-	return []blockStartFunc{
+// blockStartsFuncs 是定义好的块起始模式函数切片，每个函数用于判断某种块节点是否可以开始。
+// 该切片是只读的，每个行解析都会引用它，所以复用同一个切片以避免每次分配。
+// 使用 init() 初始化以避免包级变量初始化顺序导致的循环引用。
+var blockStartsFuncs []blockStartFunc
+
+func init() {
+	blockStartsFuncs = []blockStartFunc{
 		GitConflictStart,
 		CalloutStart,
 		BlockquoteStart,
@@ -35,6 +39,11 @@ func blockStarts() []blockStartFunc {
 		BlockQueryEmbedStart,
 		SuperBlockStart,
 	}
+}
+
+// blockStarts 返回块起始模式函数切片。
+func blockStarts() []blockStartFunc {
+	return blockStartsFuncs
 }
 
 // blockStartFunc 定义了用于判断块是否开始的函数签名，返回值：

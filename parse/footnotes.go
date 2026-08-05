@@ -11,10 +11,7 @@
 package parse
 
 import (
-	"bytes"
-
 	"github.com/88250/lute/ast"
-	"github.com/88250/lute/editor"
 	"github.com/88250/lute/lex"
 )
 
@@ -77,25 +74,6 @@ func FootnotesContinue(footnotesDef *ast.Node, context *Context) int {
 
 	context.advanceOffset(4, true)
 	return 0
-}
-
-func (t *Tree) FindFootnotesDef(label []byte) (pos int, def *ast.Node) {
-	pos = 0
-	if nil != t.Context && (t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.ProtyleWYSIWYG) {
-		label = bytes.ReplaceAll(label, editor.CaretTokens, nil)
-	}
-	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
-		if !entering || ast.NodeFootnotesDef != n.Type {
-			return ast.WalkContinue
-		}
-		pos++
-		if bytes.EqualFold(n.Tokens, label) {
-			def = n
-			return ast.WalkStop
-		}
-		return ast.WalkContinue
-	})
-	return
 }
 
 func (t *Tree) ExistFootnotesDef() (ret bool) {
