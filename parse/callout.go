@@ -78,8 +78,13 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 	typ := string(bytes.TrimSpace(content[2:bytes.IndexByte(content, ']')]))
 	title := string(bytes.TrimSpace(content[bytes.IndexByte(content, ']')+1:]))
 	callout.CalloutType = typ
+	if icon, remains, ok := context.parseCalloutImageIcon(title); ok {
+		callout.CalloutIcon = icon
+		callout.CalloutIconType = 1
+		title = remains
+	}
 	icon := strings.Split(title, " ")[0]
-	if "" != icon {
+	if "" == callout.CalloutIcon && "" != icon {
 		if IsEmoji(icon) {
 			callout.CalloutIcon = icon
 			title = strings.TrimSpace(title[len(icon):])
@@ -104,4 +109,20 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 	if 1 > len(p.Tokens) {
 		p.Tokens = nil
 	}
+}
+
+func (context *Context) parseCalloutImageIcon(title string) (icon, remains string, ok bool) {
+	marker := "![" + ast.CalloutIconImageAlt + "]"
+	if !strings.HasPrefix(title, marker) {
+		return
+	}
+
+	passed, rest, destination := context.parseInlineLinkDest([]byte(title[len(marker):]))
+	if nil == passed || !ast.IsValidCalloutImageSrc(string(destination)) {
+		return "", "", false
+	}
+	if 0 < len(rest) && !lex.IsWhitespace(rest[0]) {
+		return "", "", false
+	}
+	return string(destination), strings.TrimSpace(string(rest)), true
 }

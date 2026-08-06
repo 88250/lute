@@ -181,7 +181,7 @@ func (r *ProtyleExportRenderer) renderCallout(node *ast.Node, entering bool) ast
 			r.WriteString(node.CalloutIcon)
 		} else if 1 == node.CalloutIconType {
 			r.WriteString("<img class=\"callout-img\" src=\"")
-			r.WriteString(node.CalloutIcon)
+			r.WriteString(html.EscapeHTMLStr(node.CalloutIcon))
 			r.WriteString("\" />")
 		}
 

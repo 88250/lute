@@ -13,6 +13,7 @@ package ast
 import (
 	"bytes"
 	"math/rand"
+	"net/url"
 	"sort"
 	"strings"
 	"sync"
@@ -145,7 +146,7 @@ type Node struct {
 	// 提示块 https://github.com/88250/lute/issues/203 > [!Type] Title
 	CalloutType     string `json:",omitempty"` // 提示块类型
 	CalloutTitle    string `json:",omitempty"` // 提示块标题
-	CalloutIcon     string `json:",omitempty"` // 提示块图标（从 Title 中第一个空格前面的部分进行解析）
+	CalloutIcon     string `json:",omitempty"` // 提示块图标
 	CalloutIconType int    `json:",omitempty"` // 提示块图标类型，0：Emoji Unicode，1：自定义图标
 }
 
@@ -192,7 +193,17 @@ const (
 	CalloutTypeImportant = "IMPORTANT"
 	CalloutTypeWarning   = "WARNING"
 	CalloutTypeCaution   = "CAUTION"
+	CalloutIconImageAlt  = "callout-icon"
 )
+
+// IsValidCalloutImageSrc 判断图片型提示块图标地址是否受支持。
+func IsValidCalloutImageSrc(src string) bool {
+	if strings.HasPrefix(src, "/emojis/") || strings.HasPrefix(src, "api/icon/") {
+		return true
+	}
+	u, err := url.Parse(src)
+	return nil == err && "" != u.Host && ("http" == strings.ToLower(u.Scheme) || "https" == strings.ToLower(u.Scheme))
+}
 
 func IsBuiltInCalloutType(typ string) bool {
 	switch typ {

@@ -195,7 +195,7 @@ func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStat
 			r.WriteString(node.CalloutIcon)
 		} else if 1 == node.CalloutIconType {
 			r.WriteString("<img class=\"callout-img\" alt=\"\" src=\"")
-			r.WriteString(node.CalloutIcon)
+			r.WriteString(html.EscapeHTMLStr(node.CalloutIcon))
 			r.WriteString("\" />")
 		}
 		r.WriteString("</span><span class=\"callout-title\">")
