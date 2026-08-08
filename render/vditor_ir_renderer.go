@@ -684,8 +684,6 @@ func (r *VditorIRRenderer) renderTableCell(node *ast.Node, entering bool) ast.Wa
 			node.AppendChild(&ast.Node{Type: ast.NodeText, Tokens: []byte(" ")})
 		} else if bytes.Equal(node.FirstChild.Tokens, editor.CaretTokens) {
 			node.FirstChild.Tokens = []byte(editor.Caret + " ")
-		} else {
-			node.FirstChild.Tokens = bytes.TrimSpace(node.FirstChild.Tokens)
 		}
 	} else {
 		r.Tag("/"+tag, nil, false)

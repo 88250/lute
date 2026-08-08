@@ -351,6 +351,31 @@ func setTableCellSpanIAL(node *ast.Node, n *html.Node) {
 	node.PrependChild(ial)
 }
 
+// trimTableCellTextTokens 清理表格单元格文本边界，并保留相邻行级节点之间的一个空格。
+func trimTableCellTextTokens(n *html.Node, tokens []byte) []byte {
+	trimmed := bytes.TrimSpace(tokens)
+	if nil == n.Parent || (atom.Td != n.Parent.DataAtom && atom.Th != n.Parent.DataAtom) {
+		return trimmed
+	}
+	if 0 == len(trimmed) {
+		if nil != n.PrevSibling && nil != n.NextSibling &&
+			(strings.ContainsRune(n.Data, ' ') || strings.ContainsRune(n.Data, '\u00a0')) {
+			return []byte(" ")
+		}
+		return nil
+	}
+	runes := []rune(n.Data)
+	if nil != n.PrevSibling && atom.Br != n.PrevSibling.DataAtom && 0 < len(runes) &&
+		(' ' == runes[0] || '\u00a0' == runes[0]) {
+		trimmed = append([]byte(" "), trimmed...)
+	}
+	if nil != n.NextSibling && atom.Br != n.NextSibling.DataAtom && 0 < len(runes) &&
+		(' ' == runes[len(runes)-1] || '\u00a0' == runes[len(runes)-1]) {
+		trimmed = append(trimmed, ' ')
+	}
+	return trimmed
+}
+
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	if html.CommentNode == n.Type || atom.Meta == n.DataAtom {
@@ -446,7 +471,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 
-			node.Tokens = bytes.TrimSpace(node.Tokens)
+			node.Tokens = trimTableCellTextTokens(n, node.Tokens)
 			node.Tokens = bytes.ReplaceAll(node.Tokens, []byte("\n"), []byte(" "))
 		}
 		node.Tokens = bytes.ReplaceAll(node.Tokens, []byte{194, 160}, []byte{' '}) // 将 &nbsp; 转换为空格
