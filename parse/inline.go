@@ -24,6 +24,11 @@ import (
 // parseInline 解析并生成块节点 block 的行级子节点。
 func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 	for ctx.pos < ctx.tokensLen {
+		if t.Context.ParseOption.FullWidthStrikethrough &&
+			bytes.HasPrefix(ctx.tokens[ctx.pos:], fullWidthTilde) {
+			t.handleFullWidthStrikethroughDelim(block, ctx)
+			continue
+		}
 		token := ctx.tokens[ctx.pos]
 		var n *ast.Node
 		switch token {

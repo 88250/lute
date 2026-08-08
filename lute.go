@@ -370,6 +370,10 @@ func (lute *Lute) SetGFMStrikethrough1(b bool) {
 	lute.ParseOptions.GFMStrikethrough1 = b
 }
 
+func (lute *Lute) SetFullWidthStrikethrough(b bool) {
+	lute.ParseOptions.FullWidthStrikethrough = b
+}
+
 func (lute *Lute) SetGFMAutoLink(b bool) {
 	lute.ParseOptions.GFMAutoLink = b
 }

@@ -354,6 +354,8 @@ type Options struct {
 	// GFMStrikethrough1 设置是否打开“GFM 删除线”一个标记符 ~ 支持。
 	// GFM 删除线支持两个标记符 ~~，这个选项用于支持一个标记符的删除线。
 	GFMStrikethrough1 bool
+	// FullWidthStrikethrough 设置是否将两个全角波浪号作为删除线标记符支持。
+	FullWidthStrikethrough bool
 	// GFMAutoLink 设置是否打开“GFM 自动链接”支持。
 	GFMAutoLink bool
 	// Footnotes 设置是否打开“脚注”支持。

@@ -22,7 +22,8 @@ import (
 func (t *Tree) parseText(ctx *InlineContext) *ast.Node {
 	start := ctx.pos
 	for ; ctx.pos < ctx.tokensLen; ctx.pos++ {
-		if t.isMarker(ctx.tokens[ctx.pos]) {
+		if t.isMarker(ctx.tokens[ctx.pos]) || (t.Context.ParseOption.FullWidthStrikethrough &&
+			bytes.HasPrefix(ctx.tokens[ctx.pos:], fullWidthTilde)) {
 			// 遇到潜在的标记符时需要跳出该文本节点，回到行级解析主循环
 			break
 		}

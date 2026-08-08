@@ -11,6 +11,7 @@
 package parse
 
 import (
+	"bytes"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -24,8 +25,9 @@ import (
 type delimiter struct {
 	node           *ast.Node  // 分隔符对应的文本节点
 	typ            byte       // 分隔符字节 [*_~
-	num            int        // 分隔符字节数
-	originalNum    int        // 原始分隔符字节数
+	num            int        // 分隔符数量
+	originalNum    int        // 原始分隔符数量
+	unitLen        int        // 单个分隔符的 UTF-8 字节数
 	canOpen        bool       // 是否是开始分隔符
 	canClose       bool       // 是否是结束分隔符
 	previous, next *delimiter // 双向链表前后节点
@@ -41,8 +43,19 @@ type delimiter struct {
 
 // handleDelim 将分隔符 *_~ 入栈。
 func (t *Tree) handleDelim(block *ast.Node, ctx *InlineContext) {
+	t.handleDelimByMarker(block, ctx, []byte{ctx.tokens[ctx.pos]}, ctx.tokens[ctx.pos], false)
+}
+
+var fullWidthTilde = []byte("～")
+
+func (t *Tree) handleFullWidthStrikethroughDelim(block *ast.Node, ctx *InlineContext) {
+	t.handleDelimByMarker(block, ctx, fullWidthTilde, lex.ItemTilde, true)
+}
+
+func (t *Tree) handleDelimByMarker(block *ast.Node, ctx *InlineContext, marker []byte, typ byte,
+	fullWidthStrikethrough bool) {
 	startPos := ctx.pos
-	typ, num, canOpen, canClose := t.scanDelims(ctx)
+	num, canOpen, canClose := t.scanDelims(ctx, marker, typ, fullWidthStrikethrough)
 
 	text := ctx.tokens[startPos:ctx.pos]
 	node := &ast.Node{Type: ast.NodeText, Tokens: text}
@@ -54,6 +67,7 @@ func (t *Tree) handleDelim(block *ast.Node, ctx *InlineContext) {
 			typ:         typ,
 			num:         num,
 			originalNum: num,
+			unitLen:     len(marker),
 			node:        node,
 			previous:    ctx.delimiters,
 			next:        nil,
@@ -206,12 +220,20 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 			opener.num -= useDelims
 			closer.num -= useDelims
 
-			openerTokens := openerInl.Tokens[len(openerInl.Tokens)-useDelims:]
-			text := openerInl.Tokens[0 : len(openerInl.Tokens)-useDelims]
+			openerTokenLen := useDelims * opener.unitLen
+			closerTokenLen := useDelims * closer.unitLen
+			openerTokens := openerInl.Tokens[len(openerInl.Tokens)-openerTokenLen:]
+			text := openerInl.Tokens[0 : len(openerInl.Tokens)-openerTokenLen]
 			openerInl.Tokens = text
-			closerTokens := closerInl.Tokens[len(closerInl.Tokens)-useDelims:]
-			text = closerInl.Tokens[0 : len(closerInl.Tokens)-useDelims]
+			closerTokens := closerInl.Tokens[len(closerInl.Tokens)-closerTokenLen:]
+			text = closerInl.Tokens[0 : len(closerInl.Tokens)-closerTokenLen]
 			closerInl.Tokens = text
+			if opener.unitLen > 1 {
+				openerTokens = bytes.Repeat([]byte{lex.ItemTilde}, useDelims)
+			}
+			if closer.unitLen > 1 {
+				closerTokens = bytes.Repeat([]byte{lex.ItemTilde}, useDelims)
+			}
 
 			openMarker := &ast.Node{Tokens: openerTokens, Close: true}
 			emStrongDelMark := &ast.Node{Close: true}
@@ -327,18 +349,17 @@ func (t *Tree) processEmphasis(stackBottom *delimiter, ctx *InlineContext) {
 	}
 }
 
-// scanDelims 扫描分隔符并判断其左右边界，返回分隔符字节、数量以及能否作为开始和结束分隔符。
-func (t *Tree) scanDelims(ctx *InlineContext) (typ byte, delimitersCount int, canOpen, canClose bool) {
+// scanDelims 扫描分隔符并判断其左右边界，返回分隔符数量以及能否作为开始和结束分隔符。
+func (t *Tree) scanDelims(ctx *InlineContext, marker []byte, typ byte,
+	fullWidthStrikethrough bool) (delimitersCount int, canOpen, canClose bool) {
 	startPos := ctx.pos
-	typ = ctx.tokens[startPos]
-	token := typ
-	for i := ctx.pos; i < ctx.tokensLen && token == ctx.tokens[i]; i++ {
+	for ctx.pos < ctx.tokensLen && bytes.HasPrefix(ctx.tokens[ctx.pos:], marker) {
 		// #Tag# 标记使用一个井号，不贪婪合并连续井号，否则相邻标签（如 #foo##bar#）会被错误解析 https://github.com/siyuan-note/siyuan/issues/18191
-		if lex.ItemCrosshatch == token && t.Context.ParseOption.Tag && delimitersCount >= 1 {
+		if lex.ItemCrosshatch == typ && t.Context.ParseOption.Tag && delimitersCount >= 1 {
 			break
 		}
 		delimitersCount++
-		ctx.pos++
+		ctx.pos += len(marker)
 	}
 
 	tokenBefore, tokenAfter := rune(lex.ItemNewline), rune(lex.ItemNewline)
@@ -375,16 +396,16 @@ func (t *Tree) scanDelims(ctx *InlineContext) (typ byte, delimitersCount int, ca
 
 	afterIsWhitespace := lex.IsUnicodeWhitespace(tokenAfter)
 	afterIsPunct := unicode.IsPunct(tokenAfter) || unicode.IsSymbol(tokenAfter)
-	if (lex.ItemAsterisk == token && '~' == tokenAfter) || (lex.ItemTilde == token && '*' == tokenAfter) ||
-		(lex.ItemCaret == token && ('+' == tokenAfter || '-' == tokenAfter)) ||
-		(lex.ItemTilde == token && ('+' == tokenAfter || '-' == tokenAfter)) {
+	if (lex.ItemAsterisk == typ && '~' == tokenAfter) || (lex.ItemTilde == typ && '*' == tokenAfter) ||
+		(lex.ItemCaret == typ && ('+' == tokenAfter || '-' == tokenAfter)) ||
+		(lex.ItemTilde == typ && ('+' == tokenAfter || '-' == tokenAfter)) {
 		afterIsPunct = false
 	}
 	beforeIsWhitespace := lex.IsUnicodeWhitespace(tokenBefore)
 	beforeIsPunct := unicode.IsPunct(tokenBefore) || unicode.IsSymbol(tokenBefore)
-	if (lex.ItemAsterisk == token && '~' == tokenBefore) || (lex.ItemTilde == token && '*' == tokenBefore) ||
-		(lex.ItemCaret == token && ('+' == tokenBefore || '-' == tokenBefore)) ||
-		(lex.ItemTilde == token && ('+' == tokenBefore || '-' == tokenBefore)) {
+	if (lex.ItemAsterisk == typ && '~' == tokenBefore) || (lex.ItemTilde == typ && '*' == tokenBefore) ||
+		(lex.ItemCaret == typ && ('+' == tokenBefore || '-' == tokenBefore)) ||
+		(lex.ItemTilde == typ && ('+' == tokenBefore || '-' == tokenBefore)) {
 		beforeIsPunct = false
 	}
 
@@ -393,42 +414,46 @@ func (t *Tree) scanDelims(ctx *InlineContext) (typ byte, delimitersCount int, ca
 		afterIsPunct, beforeIsPunct = false, false
 
 		// _foo_ 优化 https://github.com/siyuan-note/siyuan/issues/17769
-		if lex.ItemUnderscore == token && editor.Caret == string(tokenBefore) {
+		if lex.ItemUnderscore == typ && editor.Caret == string(tokenBefore) {
 			afterIsWhitespace = true
 		}
-		if lex.ItemUnderscore == token && editor.Caret == string(tokenAfter) {
+		if lex.ItemUnderscore == typ && editor.Caret == string(tokenAfter) {
 			afterIsWhitespace = true
 		}
 	}
 
 	isLeftFlanking := !afterIsWhitespace && (!afterIsPunct || beforeIsWhitespace || beforeIsPunct)
 	isRightFlanking := !beforeIsWhitespace && (!beforeIsPunct || afterIsWhitespace || afterIsPunct)
-	if lex.ItemUnderscore == token {
+	if lex.ItemUnderscore == typ {
 		canOpen = isLeftFlanking && (!isRightFlanking || beforeIsPunct)
 		canClose = isRightFlanking && (!isLeftFlanking || afterIsPunct)
 	} else {
-		if lex.ItemEqual == token {
+		if lex.ItemEqual == typ {
 			if !t.Context.ParseOption.Mark || 2 != delimitersCount /* ==Mark== 标记使用两个等号 */ {
 				canOpen, canClose = false, false
 			} else {
 				canOpen = isLeftFlanking
 				canClose = isRightFlanking
 			}
-		} else if lex.ItemCrosshatch == token {
+		} else if lex.ItemCrosshatch == typ {
 			if !t.Context.ParseOption.Tag || 1 != delimitersCount /* #Tag# 标记使用一个井号 */ {
 				canOpen, canClose = false, false
 			} else {
 				canOpen = isLeftFlanking
 				canClose = isRightFlanking
 			}
-		} else if lex.ItemCaret == token {
+		} else if lex.ItemCaret == typ {
 			if !t.Context.ParseOption.Sup || 1 != delimitersCount /* ^Sup^ 标记使用一个 ^ */ {
 				canOpen, canClose = false, false
 			} else {
 				canOpen = isLeftFlanking
 				canClose = isRightFlanking
 			}
-		} else if lex.ItemTilde == token {
+		} else if lex.ItemTilde == typ {
+			if fullWidthStrikethrough && 2 != delimitersCount {
+				canOpen, canClose = false, false
+				return
+			}
 			if t.Context.ParseOption.Sub {
 				if t.Context.ParseOption.GFMStrikethrough && 3 == delimitersCount { // 单独处理 ~~~foo~~~ 的情况，即下标嵌套删除线
 					canOpen = isLeftFlanking
