@@ -2281,13 +2281,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		} else if "a" == dataType {
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			href := util.DomAttrValue(n, "data-href")
-			if "" != lute.RenderOptions.LinkBase {
-				href = strings.ReplaceAll(href, lute.RenderOptions.LinkBase, "")
-			}
-			if "" != lute.RenderOptions.LinkPrefix {
-				href = strings.ReplaceAll(href, lute.RenderOptions.LinkPrefix, "")
-			}
+			href := lute.trimLinkPath(util.DomAttrValue(n, "data-href"))
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
 			linkTitle := util.DomAttrValue(n, "data-title")
 			if "" != linkTitle {

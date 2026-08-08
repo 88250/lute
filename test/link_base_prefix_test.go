@@ -55,3 +55,52 @@ func TestLinkBasePrefix(t *testing.T) {
 		}
 	}
 }
+
+func TestVditorLinkBaseRoundTrip(t *testing.T) {
+	tests := []struct {
+		name       string
+		linkBase   string
+		linkPrefix string
+		markdown   string
+	}{
+		{"windows-relative-path", "/configured/base", "", `![image.png](.\实现设计.assets\image.png)`},
+		{"relative-link", "/configured/base", "", `[foo](dir/foo.txt)`},
+		{"parent-relative-image", "/configured/base", "", `![foo](../images/foo.png)`},
+		{"trailing-slash", "/configured/base/", "", `![foo](./images/foo.png)`},
+		{"link-prefix", "/configured/base", "prefix:", `[foo](dir/foo.txt)`},
+		{"external-link-containing-base", "/configured/base", "", `[foo](https://example.com/configured/base/foo.txt)`},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			luteEngine := lute.New()
+			luteEngine.SetVditorWYSIWYG(true)
+			luteEngine.SetLinkBase(test.linkBase)
+			luteEngine.SetLinkPrefix(test.linkPrefix)
+
+			irDOM := luteEngine.Md2VditorIRDOM(test.markdown)
+			markdown := luteEngine.VditorIRDOM2Md(irDOM)
+			wysiwygDOM := luteEngine.Md2VditorDOM(markdown)
+			result := luteEngine.VditorDOM2Md(wysiwygDOM)
+			expected := test.markdown + "\n"
+			if expected != result {
+				t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q", test.name, expected, result)
+			}
+		})
+	}
+}
+
+func TestProtyleLinkBaseRoundTrip(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetLinkBase("/configured/base")
+	luteEngine.SetLinkPrefix("prefix:")
+
+	markdown := `[foo](dir/foo.txt)`
+	blockDOM := luteEngine.Md2BlockDOM(markdown, false)
+	result := luteEngine.BlockDOM2StdMd(blockDOM)
+	expected := markdown + "\n"
+	if expected != result {
+		t.Fatalf("expected\n\t%q\ngot\n\t%q", expected, result)
+	}
+}

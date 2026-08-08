@@ -476,6 +476,20 @@ func (lute *Lute) SetLinkPrefix(linkPrefix string) {
 	lute.RenderOptions.LinkPrefix = linkPrefix
 }
 
+func (lute *Lute) trimLinkPath(path string) string {
+	if linkPrefix := lute.RenderOptions.LinkPrefix; "" != linkPrefix {
+		path = strings.TrimPrefix(path, linkPrefix)
+	}
+
+	if linkBase := lute.RenderOptions.LinkBase; "" != linkBase {
+		if !strings.HasSuffix(linkBase, "/") {
+			linkBase += "/"
+		}
+		path = strings.TrimPrefix(path, linkBase)
+	}
+	return path
+}
+
 func (lute *Lute) SetLinkBase(linkBase string) {
 	lute.RenderOptions.LinkBase = linkBase
 }

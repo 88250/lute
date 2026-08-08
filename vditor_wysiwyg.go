@@ -1480,13 +1480,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 			}
 			node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-			src := util.DomAttrValue(n, "src")
-			if "" != lute.RenderOptions.LinkBase {
-				src = strings.ReplaceAll(src, lute.RenderOptions.LinkBase, "")
-			}
-			if "" != lute.RenderOptions.LinkPrefix {
-				src = strings.ReplaceAll(src, lute.RenderOptions.LinkPrefix, "")
-			}
+			src := lute.trimLinkPath(util.DomAttrValue(n, "src"))
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(src)})
 			linkTitle := util.DomAttrValue(n, "title")
 			if "" != linkTitle {
@@ -1810,13 +1804,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	case atom.A:
 		node.AppendChild(&ast.Node{Type: ast.NodeCloseBracket})
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
-		href := util.DomAttrValue(n, "href")
-		if "" != lute.RenderOptions.LinkBase {
-			href = strings.ReplaceAll(href, lute.RenderOptions.LinkBase, "")
-		}
-		if "" != lute.RenderOptions.LinkPrefix {
-			href = strings.ReplaceAll(href, lute.RenderOptions.LinkPrefix, "")
-		}
+		href := lute.trimLinkPath(util.DomAttrValue(n, "href"))
 		node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: []byte(href)})
 		linkTitle := util.DomAttrValue(n, "title")
 		if "" != linkTitle {
