@@ -33,3 +33,37 @@ func TestHTMLBlockDataContentRoundTrip(t *testing.T) {
 		blockDOM = luteEngine.RenderNodeBlockDOM(node)
 	}
 }
+
+func TestHTMLBlockOpenTagConsumesWholeLine(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetSoftBreak2HardBreak(false)
+	tests := []struct {
+		name     string
+		markdown string
+		html     string
+	}{
+		{
+			name:     "inline content after multiple attributes",
+			markdown: "<a href=\"aaa\" target=\"_blank\">**x**</a>\n**y**",
+			html:     "<p><a href=\"aaa\" target=\"_blank\"><strong>x</strong></a>\n<strong>y</strong></p>\n",
+		},
+		{
+			name:     "inline content after single-quoted attributes",
+			markdown: "<a href='aaa' target='_blank'>**x**</a>",
+			html:     "<p><a href='aaa' target='_blank'><strong>x</strong></a></p>\n",
+		},
+		{
+			name:     "type 7 block with multiple attributes",
+			markdown: "<a href=\"aaa\" target=\"_blank\">\n**x**\n</a>",
+			html:     "<a href=\"aaa\" target=\"_blank\">\n**x**\n</a>\n",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if result := luteEngine.MarkdownStr(test.name, test.markdown); test.html != result {
+				t.Fatalf("expected\n\t%q\ngot\n\t%q", test.html, result)
+			}
+		})
+	}
+}

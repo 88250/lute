@@ -310,16 +310,24 @@ func (t *Tree) isOpenTag(tokens []byte) (isOpenTag bool) {
 					return
 				}
 				value = value[:len(value)-1]
-				return !bytes.Contains(value, htmlBlockSinglequote)
+				if bytes.Contains(value, htmlBlockSinglequote) {
+					return
+				}
+				continue
 			}
 			if bytes.HasPrefix(value, htmlBlockDoublequote) && bytes.HasSuffix(value, htmlBlockDoublequote) {
 				if value = value[1:]; 1 > len(value) {
 					return
 				}
 				value = value[:len(value)-1]
-				return !bytes.Contains(value, htmlBlockDoublequote)
+				if bytes.Contains(value, htmlBlockDoublequote) {
+					return
+				}
+				continue
 			}
-			return !bytes.ContainsAny(value, " \t\n") && !bytes.ContainsAny(value, "\"'=<>`")
+			if bytes.ContainsAny(value, " \t\n") || bytes.ContainsAny(value, "\"'=<>`") {
+				return
+			}
 		}
 	}
 	return true
