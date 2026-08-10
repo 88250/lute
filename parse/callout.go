@@ -121,6 +121,9 @@ func (context *Context) parseCalloutImageIcon(title string) (icon, remains strin
 	if nil == passed || !ast.IsValidCalloutImageSrc(string(destination)) {
 		return "", "", false
 	}
+	if 0 < len(rest) && lex.ItemCloseParen == rest[0] {
+		rest = rest[1:]
+	}
 	if 0 < len(rest) && !lex.IsWhitespace(rest[0]) {
 		return "", "", false
 	}

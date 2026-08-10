@@ -42,6 +42,13 @@ func TestCalloutImageIconParse(t *testing.T) {
 			}
 		})
 	}
+
+	callout := parseCallout(t, "> [!NOTE] ![callout-icon](https://example.com/icon.png) Plain\n> Content")
+	if 1 != callout.CalloutIconType || "https://example.com/icon.png" != callout.CalloutIcon ||
+		"Plain" != callout.CalloutTitle {
+		t.Fatalf("unexpected plain callout icon state: type=%d, icon=%q, title=%q", callout.CalloutIconType,
+			callout.CalloutIcon, callout.CalloutTitle)
+	}
 }
 
 func TestCalloutImageIconDoesNotConsumeTitle(t *testing.T) {

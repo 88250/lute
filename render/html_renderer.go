@@ -186,7 +186,7 @@ func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStat
 		r.Newline()
 		attrs := [][]string{
 			{"class", "callout"},
-			{"data-subtype", node.CalloutType},
+			{"data-subtype", html.EscapeHTMLStr(node.CalloutType)},
 		}
 		r.Tag("div", attrs, false)
 		r.Newline()

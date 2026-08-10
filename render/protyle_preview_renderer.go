@@ -171,7 +171,7 @@ func NewProtylePreviewRenderer(tree *parse.Tree, options *Options, parseOptions 
 func (r *ProtylePreviewRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		node.KramdownIAL = append(node.KramdownIAL, []string{"data-type", "callout"})
-		node.KramdownIAL = append(node.KramdownIAL, []string{"data-subtype", node.CalloutType})
+		node.KramdownIAL = append(node.KramdownIAL, []string{"data-subtype", html.EscapeHTMLStr(node.CalloutType)})
 		r.renderBlockquote(node, entering)
 		r.WriteString("<p>")
 		title := node.CalloutTitle

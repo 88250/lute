@@ -15,6 +15,7 @@ import (
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/html"
+	"github.com/88250/lute/parse"
 )
 
 func calloutTitle(node *ast.Node) string {
@@ -33,4 +34,48 @@ func calloutTitle(node *ast.Node) string {
 		}
 	}
 	return strings.TrimSpace(icon + " " + node.CalloutTitle)
+}
+
+func calloutDisplayTitle(node *ast.Node) string {
+	title := node.CalloutTitle
+	if "" == title {
+		title = ast.GetCalloutTitle(node.CalloutType)
+	}
+	if "" == title {
+		title = node.CalloutType
+	}
+	return title
+}
+
+func calloutEditableIcon(node *ast.Node) string {
+	icon := node.CalloutIcon
+	if 1 == node.CalloutIconType {
+		if ast.IsValidCalloutImageSrc(icon) {
+			icon = "![" + ast.CalloutIconImageAlt + "](<" + string(html.EncodeDestination([]byte(icon))) + ">)"
+		} else {
+			icon = ""
+		}
+	}
+	return icon
+}
+
+func calloutEditableInfo(node *ast.Node) string {
+	return strings.TrimSpace(calloutEditableIcon(node) + " " + calloutDisplayTitle(node))
+}
+
+func calloutInlineTree(markdown string, options *parse.Options) *parse.Tree {
+	tree := parse.Inline("", []byte(markdown), options)
+	if nil == tree || nil == tree.Root || nil == tree.Root.FirstChild {
+		return tree
+	}
+
+	var inlines []*ast.Node
+	for child := tree.Root.FirstChild.FirstChild; nil != child; child = child.Next {
+		inlines = append(inlines, child)
+	}
+	tree.Root.FirstChild.Unlink()
+	for _, inline := range inlines {
+		tree.Root.AppendChild(inline)
+	}
+	return tree
 }

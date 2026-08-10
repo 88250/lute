@@ -64,6 +64,7 @@ func NewVditorIRRenderer(tree *parse.Tree, options *Options, parseOptions *parse
 	ret.RendererFuncs[ast.NodeStrongU8eCloseMarker] = ret.renderStrongU8eCloseMarker
 	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
 	ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
+	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
 	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
@@ -1291,6 +1292,49 @@ func (r *VditorIRRenderer) renderBlockquote(node *ast.Node, entering bool) ast.W
 }
 
 func (r *VditorIRRenderer) renderBlockquoteMarker(node *ast.Node, entering bool) ast.WalkStatus {
+	return ast.WalkContinue
+}
+
+func (r *VditorIRRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
+	if entering {
+		r.Tag("blockquote", [][]string{
+			{"data-block", "0"},
+			{"data-type", "callout"},
+			{"data-subtype", html.EscapeHTMLStr(node.CalloutType)},
+			{"class", "callout"},
+		}, false)
+		class := "callout-info vditor-ir__node"
+		if strings.Contains(node.CalloutType+node.CalloutIcon+node.CalloutTitle, editor.Caret) {
+			class += " vditor-ir__node--expand"
+		}
+		r.Tag("p", [][]string{{"data-block", "0"}, {"class", class}}, false)
+		r.Tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+		r.WriteString("[!" + html.EscapeHTMLStr(node.CalloutType) + "] ")
+		r.Tag("/span", nil, false)
+		if "" != node.CalloutIcon {
+			if 1 == node.CalloutIconType {
+				r.Tag("span", [][]string{{"data-render", "2"}}, false)
+				r.Tag("img", [][]string{
+					{"src", html.EscapeHTMLStr(node.CalloutIcon)},
+					{"alt", ast.CalloutIconImageAlt},
+					{"class", "callout-img"},
+				}, true)
+				r.Tag("/span", nil, false)
+				r.Tag("span", [][]string{{"class", "vditor-ir__marker"}}, false)
+				r.WriteString(html.EscapeHTMLStr(calloutEditableIcon(node)))
+				r.Tag("/span", nil, false)
+			} else {
+				r.WriteString(html.EscapeHTMLStr(node.CalloutIcon))
+			}
+			r.WriteByte(lex.ItemSpace)
+		}
+		if titleTree := calloutInlineTree(calloutDisplayTitle(node), r.ParseOptions); nil != titleTree {
+			r.Write(NewVditorIRRenderer(titleTree, r.Options, r.ParseOptions).Render())
+		}
+		r.Tag("/p", nil, false)
+	} else {
+		r.Tag("/blockquote", nil, false)
+	}
 	return ast.WalkContinue
 }
 

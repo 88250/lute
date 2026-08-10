@@ -172,7 +172,7 @@ func (r *ProtyleExportRenderer) renderCallout(node *ast.Node, entering bool) ast
 	if entering {
 		attrs := [][]string{
 			{"contenteditable", "false"},
-			{"data-subtype", node.CalloutType},
+			{"data-subtype", html.EscapeHTMLStr(node.CalloutType)},
 		}
 		r.blockNodeAttrs(node, &attrs, "callout")
 		r.Tag("div", attrs, false)
