@@ -11,6 +11,7 @@
 package test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/88250/lute"
@@ -18,6 +19,8 @@ import (
 
 var linkBaseTests = []parseTest{
 
+	{"7", "![foo](DATA:image/png;base64,AAAA)\n", "<p><img src=\"DATA:image/png;base64,AAAA\" alt=\"foo\" /></p>\n"},
+	{"6", "![foo](data:image/png;base64,AAAA)\n", "<p><img src=\"data:image/png;base64,AAAA\" alt=\"foo\" /></p>\n"},
 	{"5", "foo<a href=\"mailto:achuan-2@outlook.com\">achuan-2@outlook.com</a>bar\n", "<p>foo<a href=\"mailto:achuan-2@outlook.com\">achuan-2@outlook.com</a>bar</p>\n"},
 	{"4", "foo<span data-type=\"a\" data-href=\"mailto:d@b3log.org\">d@b3log.org</span>bar\n", "<p>foo<span data-type=\"a\" data-href=\"mailto:d@b3log.org\"><a href=\"mailto:d@b3log.org\">d@b3log.org</a></span>bar</p>\n"},
 	{"3", "[foo][^label]\n[^label]: bar\n", "<p><sup class=\"footnotes-ref\" id=\"footnotes-ref-1\"><a href=\"http://domain.com/path/#footnotes-def-1\">1</a></sup></p>\n<div class=\"footnotes-defs-div\"><hr class=\"footnotes-defs-hr\" />\n<ol class=\"footnotes-defs-ol\"><li id=\"footnotes-def-1\"><p>bar <a href=\"#footnotes-ref-1\" class=\"vditor-footnotes__goto-ref\">↩</a></p>\n</li>\n</ol></div>"},
@@ -35,6 +38,24 @@ func TestLinkBase(t *testing.T) {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+func TestVditorLinkBaseDataImage(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetVditorWYSIWYG(true)
+	luteEngine.SetLinkBase("http://domain.com/path/")
+
+	markdown := "![foo](data:image/png;base64,AAAA)"
+	expected := `src="data:image/png;base64,AAAA"`
+	tests := map[string]string{
+		"ir":      luteEngine.Md2VditorIRDOM(markdown),
+		"wysiwyg": luteEngine.Md2VditorDOM(markdown),
+	}
+	for name, dom := range tests {
+		if !strings.Contains(dom, expected) {
+			t.Fatalf("test case [%s] failed\nexpected to contain\n\t%q\ngot\n\t%q", name, expected, dom)
 		}
 	}
 }
