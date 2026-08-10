@@ -1660,6 +1660,17 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 		}
 
+		if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex &&
+			util.ContainsStr("language-math", strings.Fields(class)) {
+			if nil != util.DomChildByTypeAndClass(n, atom.Span, "katex-display") ||
+				nil != util.DomChildByTypeAndClass(n, atom.Span, "MathJax_SVG_Display") {
+				appendMathBlock(tree, tex)
+			} else {
+				appendInlineMath(tree, tex)
+			}
+			return
+		}
+
 		// The browser extension supports Zhihu formula https://github.com/siyuan-note/siyuan/issues/5599
 		if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex {
 			if (strings.Contains(util.DomAttrValue(n, "class"), "math-inline") && ((nil != n.PrevSibling || nil != n.NextSibling) || lute.parentIs(n, atom.Table))) ||

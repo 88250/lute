@@ -342,6 +342,39 @@ func TestHTML2Md(t *testing.T) {
 	}
 }
 
+func TestHTML2MdLanguageMath(t *testing.T) {
+	luteEngine := lute.New()
+	roundTripTests := []parseTest{
+		{"7", "$a^2 + b^2 = c^2$", "$a^2 + b^2 = c^2$\n"},
+		{"6", "# $x$", "# $x$\n"},
+		{"5", "*$x$*", "*$x$*\n"},
+		{"4", "[$x$](url)", "[$x$](url)\n"},
+		{"3", "- $x$", "* $x$\n"},
+		{"2", "| $x$ |\n| --- |", "| $x$ |\n| ----- |\n"},
+		{"1", "$$x$$", "$$\nx\n$$\n"},
+	}
+	for _, test := range roundTripTests {
+		html := luteEngine.Md2HTML(test.from)
+		md := luteEngine.HTML2Md(html)
+		if test.to != md {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown\n\t%q\nrendered html\n\t%q", test.name, test.to, md, test.from, html)
+		}
+	}
+
+	htmlTests := []parseTest{
+		{"4", `<p><span class="foo language-math bar">x</span></p>`, "$x$\n"},
+		{"3", `<p><span class="not-language-math">x</span></p>`, "x\n"},
+		{"2", `<p><span class="language-math" data-math="x"><span class="katex-display"><span class="katex">x</span></span></span></p>`, "$$\nx\n$$\n"},
+		{"1", `<pre><code class="language-math">x</code></pre>`, "```math\nx\n```\n"},
+	}
+	for _, test := range htmlTests {
+		md := luteEngine.HTML2Md(test.from)
+		if test.to != md {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, md, test.from)
+		}
+	}
+}
+
 var html2MdDisableSyntaxTests = []parseTest{
 
 	{"10", "<sup class=\"ss-footnote\" href=\"\" footnote-id=\"1\" data-title=\"这里，「空白符」是指 Unicode 通用类别（general category）为 Zs (space character) 的字符（即各类空格），再加上制表符（U+0009）、换行符（U+000A）、换页符（U+000C）、回车符（U+000D），以及行首和行尾。「标点符号」是指 Unicode 通用类别为 P (puncuation) 或 S (symbol) 的字符。\" tabindex=\"0\">1<div class=\"sup-tips\"><p>这里，「空白符」是指 Unicode 通用类别（general category）为 Zs (space character) 的字符（即各类空格），再加上制表符（U+0009）、换行符（U+000A）、换页符（U+000C）、回车符（U+000D），以及行首和行尾。「标点符号」是指 Unicode 通用类别为 P (puncuation) 或 S (symbol) 的字符。</p></div></sup>", "^1这里，「空白符」是指 Unicode 通用类别（general category）为 Zs (space character) 的字符（即各类空格），再加上制表符（U+0009）、换行符（U+000A）、换页符（U+000C）、回车符（U+000D），以及行首和行尾。「标点符号」是指 Unicode 通用类别为 P (puncuation) 或 S (symbol) 的字符。\n\n\n^\n"},
