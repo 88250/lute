@@ -18,6 +18,10 @@ import (
 
 var spinVditorDOMTests = []*parseTest{
 
+	{"164", "<p data-block=\"0\">&lt;https://example.com/%E2%80%B8<wbr>&gt;</p>", "<p data-block=\"0\"><a href=\"https://example.com/%E2%80%B8\">https://example.com/<wbr></a><wbr></p>"},
+	{"163", "<p data-block=\"0\">&lt;mailto:foo@example.com<wbr>&gt;</p>", "<p data-block=\"0\"><a href=\"mailto:foo@example.com\">mailto:foo@example.com</a><wbr></p>"},
+	{"162", "<p data-block=\"0\">&lt;<wbr>https://example.com&gt;</p>", "<p data-block=\"0\"><a href=\"https://example.com\">https://example.com</a><wbr></p>"},
+	{"161", "<p data-block=\"0\">&lt;https://example.com<wbr>&gt;</p>", "<p data-block=\"0\"><a href=\"https://example.com\">https://example.com</a><wbr></p>"},
 	{"160", "<p data-block=\"0\"><sup data-marker=\"^\">foob<wbr></sup></p>", "<p data-block=\"0\"><sup data-marker=\"^\">foob<wbr></sup></p>"},
 	{"159", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\"> foo</li><li data-marker=\"*\" class=\"vditor-task\">[ ] <wbr><br></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" data-task=\" \" /> foo</li><li data-marker=\"*\" class=\"vditor-task\"><input type=\"checkbox\" data-task=\" \" /> <wbr></li></ul>"},
 	{"158", "<form ><iframe/src=\"data:text/html,<script>alert('xss');</script>\"></iframe>", "<div class=\"vditor-wysiwyg__block\" data-type=\"html-block\" data-block=\"0\"><pre><code>&lt;form&gt;&lt;iframe src=&quot;data:text/html,&lt;script&gt;alert('xss');&lt;/script&gt;&quot;&gt;&lt;/iframe&gt;&lt;/form&gt;</code></pre><pre class=\"vditor-wysiwyg__preview\" data-render=\"2\"><form><iframe></iframe></form></pre></div>"},

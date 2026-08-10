@@ -581,15 +581,18 @@ func (t *Tree) parseAutoEmailLink(ctx *InlineContext) (ret *ast.Node) {
 }
 
 func (t *Tree) newLink(typ ast.NodeType, text, dest, title []byte, linkType int) (ret *ast.Node) {
-	appendCaret := t.Context.ParseOption.ProtyleWYSIWYG && bytes.HasSuffix(text, editor.CaretTokens) && bytes.HasSuffix(dest, []byte("%E2%80%B8"))
+	options := t.Context.ParseOption
+	editorMode := options.VditorWYSIWYG || options.VditorIR || options.VditorSV || options.ProtyleWYSIWYG
+	encodedCaretTokens := []byte("%E2%80%B8")
+	appendCaret := editorMode && bytes.HasSuffix(text, editor.CaretTokens) && bytes.HasSuffix(dest, encodedCaretTokens)
 	if appendCaret {
-		text = bytes.ReplaceAll(text, editor.CaretTokens, nil)
-		dest = bytes.ReplaceAll(dest, []byte("%E2%80%B8"), nil)
+		text = bytes.TrimSuffix(text, editor.CaretTokens)
+		dest = bytes.TrimSuffix(dest, encodedCaretTokens)
 	}
-	prependCaret := t.Context.ParseOption.ProtyleWYSIWYG && bytes.HasPrefix(text, editor.CaretTokens) && bytes.HasPrefix(dest, []byte("%E2%80%B8"))
+	prependCaret := editorMode && bytes.HasPrefix(text, editor.CaretTokens) && bytes.HasPrefix(dest, encodedCaretTokens)
 	if prependCaret {
-		text = bytes.ReplaceAll(text, editor.CaretTokens, nil)
-		dest = bytes.ReplaceAll(dest, []byte("%E2%80%B8"), nil)
+		text = bytes.TrimPrefix(text, editor.CaretTokens)
+		dest = bytes.TrimPrefix(dest, encodedCaretTokens)
 	}
 	text = html.DecodeDestination(text)
 
@@ -606,10 +609,7 @@ func (t *Tree) newLink(typ ast.NodeType, text, dest, title []byte, linkType int)
 		ret.AppendChild(&ast.Node{Type: ast.NodeLinkTitle, Tokens: title})
 	}
 	ret.AppendChild(&ast.Node{Type: ast.NodeCloseParen})
-	if appendCaret {
-		ret.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
-	}
-	if prependCaret {
+	if appendCaret || prependCaret {
 		ret.InsertAfter(&ast.Node{Type: ast.NodeText, Tokens: editor.CaretTokens})
 	}
 	if 1 == linkType {
