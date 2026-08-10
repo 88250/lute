@@ -1331,6 +1331,7 @@ func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
+		tokens = escapeSetextHeadingMarkersInListParagraph(node, tokens)
 		if (nil == node.Previous || ast.NodeTaskListItemMarker == node.Previous.Type) &&
 			nil != node.Parent.Parent && nil != node.Parent.Parent.ListData && 3 == node.Parent.Parent.ListData.Typ {
 			if ' ' == r.LastOut {

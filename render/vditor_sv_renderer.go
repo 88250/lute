@@ -911,6 +911,7 @@ func (r *VditorSVRenderer) renderText(node *ast.Node, entering bool) ast.WalkSta
 		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
 		}
+		tokens = escapeSetextHeadingMarkersInListParagraph(node, tokens)
 
 		r.Tag("span", [][]string{{"data-type", "text"}}, false)
 		tokens = bytes.TrimRight(tokens, "\n")
@@ -1256,7 +1257,7 @@ func (r *VditorSVRenderer) renderTaskListItemMarker(node *ast.Node, entering boo
 func (r *VditorSVRenderer) renderThematicBreak(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("span", [][]string{{"class", "vditor-sv__marker"}}, false)
-		r.WriteString("---")
+		r.WriteString("***")
 		r.Tag("/span", nil, false)
 		r.Newline()
 		r.Write(NewlineSV)
