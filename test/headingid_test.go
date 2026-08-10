@@ -14,6 +14,8 @@ import (
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/parse"
+	"github.com/88250/lute/render"
 )
 
 var headingIDTests = []parseTest{
@@ -33,6 +35,28 @@ func TestHeadingID(t *testing.T) {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+func TestHeadingIDRaw(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetHeadingID(true)
+
+	tests := []struct {
+		markdown string
+		expected string
+	}{
+		{"# Heading", ""},
+		{"# Heading {#custom-id}", "#custom-id"},
+		{"# Heading {#raw_custom-ID}", "#raw_custom-ID"},
+		{"# Heading {# 自定义 ID}", "# 自定义 ID"},
+	}
+	for _, test := range tests {
+		tree := parse.Parse("", []byte(test.markdown), luteEngine.ParseOptions)
+		actual := render.HeadingIDRaw(tree.Root.FirstChild)
+		if test.expected != actual {
+			t.Fatalf("expected raw heading ID %q, got %q for markdown %q", test.expected, actual, test.markdown)
 		}
 	}
 }

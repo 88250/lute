@@ -538,6 +538,15 @@ func HeadingID(heading *ast.Node) (ret string) {
 	return heading.HeadingNormalizedID
 }
 
+// HeadingIDRaw 返回标题 ID 语法花括号内的原始文本。
+func HeadingIDRaw(heading *ast.Node) (ret string) {
+	headingID := heading.ChildByType(ast.NodeHeadingID)
+	if nil != headingID {
+		ret = util.BytesToStr(headingID.Tokens)
+	}
+	return
+}
+
 func headingID0(heading *ast.Node) {
 	var root *ast.Node
 	for root = heading.Parent; ast.NodeDocument != root.Type; root = root.Parent {

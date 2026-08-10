@@ -27,6 +27,7 @@ func main() {
 		"WalkSkipChildren":  ast.WalkSkipChildren,
 		"WalkContinue":      ast.WalkContinue,
 		"GetHeadingID":      render.HeadingID,
+		"GetHeadingIDRaw":   render.HeadingIDRaw,
 		"Caret":             editor.Caret,
 		"NewNodeID":         ast.NewNodeID,
 		"EscapeHTMLStr":     html.EscapeHTMLStr,
