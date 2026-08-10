@@ -1006,8 +1006,43 @@ func (r *VditorIRRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkSta
 	return ast.WalkContinue
 }
 
+func isVditorTableCellBr(node *ast.Node) bool {
+	if nil == node || nil == node.Parent || ast.NodeTableCell != node.Parent.Type || ast.NodeInlineHTML != node.Type {
+		return false
+	}
+
+	tokens := bytes.TrimSpace(node.Tokens)
+	return bytes.EqualFold(tokens, []byte("<br>")) || bytes.EqualFold(tokens, []byte("<br/>")) ||
+		bytes.EqualFold(tokens, []byte("<br />"))
+}
+
+// 表格单元格末尾的换行需要额外的占位符，否则转回 Markdown 时会被当作占位符丢弃。
+func ensureVditorTableCellBrPlaceholder(node *ast.Node) {
+	last := node.Parent.LastChild
+	if nil != last && ast.NodeText == last.Type &&
+		0 == len(bytes.TrimSpace(bytes.ReplaceAll(last.Tokens, editor.CaretTokens, nil))) {
+		last = last.Previous
+	}
+	if node != last {
+		return
+	}
+
+	placeholder := &ast.Node{Type: ast.NodeHardBreak}
+	if next := node.Next; nil != next && ast.NodeText == next.Type &&
+		0 == len(bytes.TrimSpace(bytes.ReplaceAll(next.Tokens, editor.CaretTokens, nil))) {
+		next.InsertAfter(placeholder)
+	} else {
+		node.InsertAfter(placeholder)
+	}
+}
+
 func (r *VditorIRRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
+		return ast.WalkContinue
+	}
+	if isVditorTableCellBr(node) {
+		ensureVditorTableCellBrPlaceholder(node)
+		r.Tag("br", nil, true)
 		return ast.WalkContinue
 	}
 
