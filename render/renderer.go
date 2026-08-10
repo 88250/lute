@@ -719,7 +719,8 @@ func headingText(n *ast.Node) (ret string) {
 		}
 
 		switch n.Type {
-		case ast.NodeLinkText, ast.NodeBlockRefText, ast.NodeBlockRefDynamicText, ast.NodeFileAnnotationRefText:
+		case ast.NodeLinkText, ast.NodeBlockRefText, ast.NodeBlockRefDynamicText, ast.NodeFileAnnotationRefText,
+			ast.NodeBackslashContent:
 			buf.Write(n.Tokens)
 		case ast.NodeInlineMathContent:
 			buf.WriteString("<span class=\"language-math\">")

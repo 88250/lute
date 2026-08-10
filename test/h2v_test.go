@@ -36,3 +36,15 @@ func TestHTML2VditorDOM(t *testing.T) {
 		}
 	}
 }
+
+func TestHTML2VditorDOMToC(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetToC(true)
+
+	from := "<p>[ToC]</p><h2>教_程</h2><h2>array_contains</h2>"
+	expected := "<div class=\"vditor-toc\" data-block=\"0\" data-type=\"toc-block\" contenteditable=\"false\"><ul><li><span data-target-id=\"教程\">教_程</span></li><li><span data-target-id=\"arraycontains\">array_contains</span></li></ul></div><h2 data-block=\"0\" id=\"wysiwyg-教程\" data-marker=\"#\">教<span data-type=\"backslash\"><span>\\</span>_</span>程</h2><h2 data-block=\"0\" id=\"wysiwyg-arraycontains\" data-marker=\"#\">array<span data-type=\"backslash\"><span>\\</span>_</span>contains</h2>"
+	result := luteEngine.HTML2VditorDOM(from)
+	if expected != result {
+		t.Fatalf("failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", expected, result, from)
+	}
+}
