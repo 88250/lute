@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"fmt"
 	"path"
+	"slices"
 	strconv "strconv"
 	"strings"
 	"unicode"
@@ -1661,7 +1662,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		if tex := strings.TrimSpace(util.DomAttrValue(n, "data-tex")); "" != tex &&
-			util.ContainsStr("language-math", strings.Fields(class)) {
+			slices.Contains(strings.Fields(class), "language-math") {
 			if nil != util.DomChildByTypeAndClass(n, atom.Span, "katex-display") ||
 				nil != util.DomChildByTypeAndClass(n, atom.Span, "MathJax_SVG_Display") {
 				appendMathBlock(tree, tex)

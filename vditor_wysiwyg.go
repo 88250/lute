@@ -12,6 +12,7 @@ package lute
 
 import (
 	"bytes"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -406,7 +407,7 @@ func (lute *Lute) adjustMath(n *html.Node) {
 		}
 	}
 
-	if util.ContainsStr("language-math", strings.Fields(class)) {
+	if slices.Contains(strings.Fields(class), "language-math") {
 		if mathContent := util.DomAttrValue(n, "data-math"); "" != mathContent {
 			util.SetDomAttrValue(n, "data-tex", mathContent)
 			return
