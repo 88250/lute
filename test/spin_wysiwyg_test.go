@@ -201,3 +201,23 @@ func TestSpinVditorDOM(t *testing.T) {
 		}
 	}
 }
+
+func TestSpinVditorDOMTableInList(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetVditorWYSIWYG(true)
+
+	tests := []*parseTest{
+		{"unordered", "<ul data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\"><p data-block=\"0\">test</p><table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>12<wbr></td></tr></tbody></table></li></ul>", "<ul data-tight=\"true\" data-marker=\"*\" data-block=\"0\"><li data-marker=\"*\">test<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>12<wbr></td></tr></tbody></table></li></ul>"},
+		{"ordered", "<ol data-marker=\"1.\" data-block=\"0\"><li data-marker=\"1.\"><p data-block=\"0\">test</p><table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>12<wbr></td></tr></tbody></table></li></ol>", "<ol data-tight=\"true\" data-marker=\"1.\" data-block=\"0\"><li data-marker=\"1.\">test<table data-block=\"0\"><thead><tr><th>col1</th></tr></thead><tbody><tr><td>12<wbr></td></tr></tbody></table></li></ol>"},
+	}
+	for _, test := range tests {
+		once := luteEngine.SpinVditorDOM(test.from)
+		if test.to != once {
+			t.Fatalf("test case [%s] failed after first spin\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, once, test.from)
+		}
+		twice := luteEngine.SpinVditorDOM(once)
+		if test.to != twice {
+			t.Fatalf("test case [%s] failed after second spin\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, twice, test.from)
+		}
+	}
+}

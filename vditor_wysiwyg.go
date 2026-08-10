@@ -768,7 +768,7 @@ func (lute *Lute) adjustVditorDOMListItemInP(n *html.Node) {
 				continue
 			}
 
-			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom && atom.Div != c.DataAtom {
+			if atom.P != c.DataAtom && atom.Blockquote != c.DataAtom && atom.Ul != c.DataAtom && atom.Ol != c.DataAtom && atom.Div != c.DataAtom && atom.Table != c.DataAtom {
 				spans, nextBlock := lute.forwardNextBlock(c)
 				p := &html.Node{Type: html.ElementNode, Data: "p", DataAtom: atom.P}
 				c.InsertBefore(p)
@@ -849,7 +849,7 @@ func (lute *Lute) adjustVditorDOMCodeA(n *html.Node) {
 func (lute *Lute) forwardNextBlock(spanNode *html.Node) (spans []*html.Node, nextBlock *html.Node) {
 	for next := spanNode; nil != next; next = next.NextSibling {
 		switch next.DataAtom {
-		case atom.Ol, atom.Ul, atom.Div, atom.Blockquote:
+		case atom.Ol, atom.Ul, atom.Div, atom.Blockquote, atom.Table:
 			return
 		}
 		spans = append(spans, next)
