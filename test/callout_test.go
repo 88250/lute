@@ -11,6 +11,7 @@
 package test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/88250/lute"
@@ -44,6 +45,26 @@ func TestCallout(t *testing.T) {
 		html := luteEngine.MarkdownStr(test.name, test.from)
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal markdown text\n\t%q", test.name, test.to, html, test.from)
+		}
+	}
+}
+
+func TestHTML2MdCallout(t *testing.T) {
+	tests := []parseTest{
+		{"nested", `<div class="callout extra" data-subtype="NOTE"><div class="callout-info"><span class="callout-icon">✏️</span><span class="callout-title">Note</span></div><div class="callout-content"><p>Outer</p><div class="callout" data-subtype="WARNING"><div class="callout-info"><span class="callout-icon">⚠️</span><span class="callout-title">Warning</span></div><div class="callout-content"><p>Inner</p></div></div></div></div>`, "> [!NOTE]\n> Outer\n>\n>> [!WARNING]\n>> Inner\n>>\n"},
+		{"custom title", `<div class="callout" data-subtype="TIP"><div class="callout-info"><span class="callout-icon">✨</span><span class="callout-title"><strong>Custom</strong> title</span></div><div class="callout-content"><p>First</p><ul><li>Second</li></ul></div></div>`, "> [!TIP] ✨ **Custom** title\n> First\n>\n> * Second\n"},
+		{"image icon", `<div class="callout" data-subtype="IMPORTANT"><div class="callout-info"><span class="callout-icon"><img class="callout-img" src="https://example.com/icon.png"></span><span class="callout-title">Custom</span></div><div class="callout-content"><p>Content</p></div></div>`, "> [!IMPORTANT] ![callout-icon](<https://example.com/icon.png>) Custom\n> Content\n"},
+	}
+
+	luteEngine := lute.New()
+	luteEngine.SetCallout(true)
+	for _, test := range tests {
+		markdown := luteEngine.HTML2Md(test.from)
+		if test.to != markdown {
+			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, markdown, test.from)
+		}
+		if dom := luteEngine.HTML2VditorDOM(test.from); !strings.Contains(dom, "data-type=\"callout\"") {
+			t.Fatalf("test case [%s] did not generate a Vditor Callout DOM: %q", test.name, dom)
 		}
 	}
 }

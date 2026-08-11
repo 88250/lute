@@ -408,6 +408,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
+	if lute.genASTByCalloutDOM(n, tree) {
+		return
+	}
+
 	if 0 == n.DataAtom && html.ElementNode == n.Type { // 自定义标签
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			lute.genASTByDOM(c, tree)
@@ -1997,6 +2001,60 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	case atom.Summary:
 		tree.Context.ParentTip()
 	}
+}
+
+func (lute *Lute) genASTByCalloutDOM(n *html.Node, tree *parse.Tree) bool {
+	if !lute.ParseOptions.Callout || atom.Div != n.DataAtom || !domClassContains(n, "callout") {
+		return false
+	}
+
+	typ := strings.TrimSpace(util.DomAttrValue(n, "data-subtype"))
+	if "" == typ || strings.ContainsAny(typ, "]\r\n") {
+		return false
+	}
+
+	info := directDomChildByClass(n, "callout-info")
+	content := directDomChildByClass(n, "callout-content")
+	if nil == info || nil == content {
+		return false
+	}
+
+	callout := &ast.Node{Type: ast.NodeCallout, CalloutType: typ}
+	if icon := directDomChildByClass(info, "callout-icon"); nil != icon {
+		images := util.DomChildrenByType(icon, atom.Img)
+		if 0 < len(images) {
+			if src := strings.TrimSpace(util.DomAttrValue(images[0], "src")); ast.IsValidCalloutImageSrc(src) {
+				callout.CalloutIcon = src
+				callout.CalloutIconType = 1
+			}
+		} else {
+			callout.CalloutIcon = strings.TrimSpace(util.DomText(icon))
+		}
+	}
+	if title := directDomChildByClass(info, "callout-title"); nil != title {
+		callout.CalloutTitle = strings.TrimSpace(lute.HTML2Md(string(util.DomHTML(title))))
+	}
+
+	tree.Context.Tip.AppendChild(callout)
+	tree.Context.Tip = callout
+	for child := content.FirstChild; nil != child; child = child.NextSibling {
+		lute.genASTByDOM(child, tree)
+	}
+	tree.Context.ParentTip()
+	return true
+}
+
+func directDomChildByClass(n *html.Node, class string) *html.Node {
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		if domClassContains(child, class) {
+			return child
+		}
+	}
+	return nil
+}
+
+func domClassContains(n *html.Node, class string) bool {
+	return slices.Contains(strings.Fields(util.DomAttrValue(n, "class")), class)
 }
 
 func codeTextOnly(n *html.Node) bool {
