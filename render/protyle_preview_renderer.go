@@ -1565,9 +1565,6 @@ func (r *ProtylePreviewRenderer) renderSoftBreak(node *ast.Node, entering bool) 
 
 func (r *ProtylePreviewRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 	attrs = [][]string{{"data-type", node.TextMarkType}}
-	if "" != node.TextMarkFlashcardOcclusionID {
-		attrs = append(attrs, []string{"data-occlusion-id", node.TextMarkFlashcardOcclusionID})
-	}
 
 	types := strings.Split(node.TextMarkType, " ")
 	for _, typ := range types {

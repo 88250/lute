@@ -1544,9 +1544,6 @@ func (r *HtmlRenderer) handleKramdownBlockIAL(node *ast.Node) {
 
 func (r *HtmlRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 	attrs = [][]string{{"data-type", node.TextMarkType}}
-	if "" != node.TextMarkFlashcardOcclusionID {
-		attrs = append(attrs, []string{"data-occlusion-id", node.TextMarkFlashcardOcclusionID})
-	}
 
 	types := strings.Split(node.TextMarkType, " ")
 	for _, typ := range types {
