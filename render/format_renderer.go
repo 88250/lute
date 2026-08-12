@@ -311,6 +311,9 @@ func (r *FormatRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkS
 
 func (r *FormatRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 	attrs = [][]string{{"data-type", node.TextMarkType}}
+	if "" != node.TextMarkFlashcardOcclusionID {
+		attrs = append(attrs, []string{"data-occlusion-id", node.TextMarkFlashcardOcclusionID})
+	}
 
 	types := strings.Split(node.TextMarkType, " ")
 	for _, typ := range types {

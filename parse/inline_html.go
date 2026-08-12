@@ -750,6 +750,7 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 		}
 	}
 	node.TextMarkType = dataType
+	node.TextMarkFlashcardOcclusionID = util.DomAttrValue(n, "data-occlusion-id")
 	node.Tokens = nil
 	types := strings.Split(dataType, " ")
 	// 重新排序，将 a、inline-memo、block-ref、file-annotation-ref、inline-math 放在最前面

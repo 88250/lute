@@ -450,7 +450,7 @@ func TextMarks2Inlines(tree *Tree) {
 			return ast.WalkContinue
 		}
 
-		if ast.NodeTextMark == n.Type {
+		if ast.NodeTextMark == n.Type && "" == n.TextMarkFlashcardOcclusionID {
 			switch n.TextMarkType {
 			case "sup":
 				n.Type = ast.NodeSup
