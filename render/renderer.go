@@ -318,11 +318,13 @@ func (r *BaseRenderer) renderTableByHTMLRow(row *ast.Node) {
 		r.Tag(tag, attrs, false)
 		// 遍历单元格子节点，由各渲染器的 RendererFuncs 处理行级元素
 		for c := cell.FirstChild; nil != c; c = c.Next {
-			rendererFunc := r.RendererFuncs[c.Type]
-			if nil != rendererFunc {
-				rendererFunc(c, true)
-				rendererFunc(c, false)
-			}
+			ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {
+				rendererFunc := r.RendererFuncs[n.Type]
+				if nil == rendererFunc {
+					return ast.WalkContinue
+				}
+				return rendererFunc(n, entering)
+			})
 		}
 		r.Tag("/"+tag, nil, false)
 		r.Newline()
