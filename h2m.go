@@ -800,6 +800,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Pre:
+		normalizeCodeMirrorPre(n)
 		firstc := n.FirstChild
 		if nil == firstc {
 			return
@@ -2104,6 +2105,48 @@ func directDomChildByClass(n *html.Node, class string) *html.Node {
 
 func domClassContains(n *html.Node, class string) bool {
 	return slices.Contains(strings.Fields(util.DomAttrValue(n, "class")), class)
+}
+
+func normalizeCodeMirrorPre(n *html.Node) {
+	content := domDescendantByClass(n, "cm-content")
+	if nil == content {
+		return
+	}
+
+	var lines []string
+	for child := content.FirstChild; nil != child; child = child.NextSibling {
+		if domClassContains(child, "cm-line") {
+			lines = append(lines, strings.TrimSuffix(util.DomText(child), "\n"))
+		}
+	}
+	if 0 == len(lines) {
+		return
+	}
+
+	code := &html.Node{Data: "code", DataAtom: atom.Code, Type: html.ElementNode}
+	if text := strings.Join(lines, "\n"); "" != text {
+		code.AppendChild(&html.Node{Data: text, Type: html.TextNode})
+	}
+	if language := strings.TrimSpace(util.DomAttrValue(content, "data-language")); "" != language {
+		util.SetDomAttrValue(code, "class", "language-"+language)
+	}
+	for nil != n.FirstChild {
+		n.FirstChild.Unlink()
+	}
+	// CodeMirror 使用 cm-line 元素表示代码行，规范化为 pre.code 以保留换行和语言。
+	n.AppendChild(code)
+}
+
+func domDescendantByClass(n *html.Node, class string) *html.Node {
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		if domClassContains(child, class) {
+			return child
+		}
+		if descendant := domDescendantByClass(child, class); nil != descendant {
+			return descendant
+		}
+	}
+	return nil
 }
 
 func codeTextOnly(n *html.Node) bool {
