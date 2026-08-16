@@ -316,6 +316,43 @@ func newTD(fnNone bool) *html.Node {
 	return td
 }
 
+// extractTableCaption 将外部 HTML 表格标题规范化为思源表格 caption IAL，并从表格 DOM 中移除原节点。
+func extractTableCaption(table *html.Node) string {
+	for caption := table.FirstChild; nil != caption; caption = caption.NextSibling {
+		if atom.Caption != caption.DataAtom {
+			continue
+		}
+
+		title := strings.TrimSpace(util.DomText(caption))
+		style := util.DomAttrValue(caption, "style")
+		caption.Unlink()
+		if "" == title {
+			return ""
+		}
+
+		captionHTML := `<caption contenteditable="false"`
+		if tableCaptionAtBottom(style) {
+			captionHTML += ` style="caption-side: bottom;"`
+		}
+		captionHTML += ">" + html.EscapeHTMLStr(title) + "</caption>"
+		return html.EscapeHTMLStr(captionHTML)
+	}
+	return ""
+}
+
+// tableCaptionAtBottom 判断外部表格标题是否明确设置在表格下方。
+func tableCaptionAtBottom(style string) bool {
+	for _, declaration := range strings.Split(style, ";") {
+		parts := strings.SplitN(declaration, ":", 2)
+		if 2 != len(parts) || !strings.EqualFold(strings.TrimSpace(parts[0]), "caption-side") {
+			continue
+		}
+		value := strings.TrimSpace(strings.TrimSuffix(strings.ToLower(strings.TrimSpace(parts[1])), "!important"))
+		return "bottom" == value
+	}
+	return false
+}
+
 // setTableCellSpanIAL 为表格单元格节点（th/td）提取 colspan/rowspan/class 属性并写入 KramdownIAL，
 // 同时 Prepend 一个 NodeKramdownSpanIAL 子节点以便渲染器输出 `{: colspan=".." rowspan=".."}`。
 // 与 parse.SetSpanIAL 的区别：本函数用于外部 HTML 转换路径（HTML2Markdown），刻意不提取 style 等
@@ -420,25 +457,37 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	node := &ast.Node{Type: ast.NodeText, Tokens: util.StrToBytes(n.Data)}
+	withIAL := false
+	withDOMIAL := false
+	if atom.Table == n.DataAtom {
+		if caption := extractTableCaption(n); "" != caption {
+			node.SetIALAttr("caption", caption)
+			withIAL = true
+		}
+	}
 
 	if 0 < len(lute.ParseOptions.HTML2MarkdownAttrs) {
-		withIAL := false
 		for _, attr := range n.Attr {
 			if util.ContainsStr(attr.Key, lute.ParseOptions.HTML2MarkdownAttrs) {
 				node.SetIALAttr(attr.Key, attr.Val)
 				withIAL = true
+				withDOMIAL = true
 			}
 			if strings.HasPrefix(attr.Key, "custom-") && util.ContainsStr("custom-*", lute.ParseOptions.HTML2MarkdownAttrs) {
 				node.SetIALAttr(attr.Key, attr.Val)
 				withIAL = true
+				withDOMIAL = true
 			}
 		}
+	}
 
-		if withIAL {
-			ialTokens := lute.setBlockIAL2(n, node)
-			ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
-			defer tree.Context.TipAppendChild(ial)
+	if withIAL {
+		ialTokens := parse.IAL2Tokens(node.KramdownIAL)
+		if withDOMIAL {
+			ialTokens = lute.setBlockIAL2(n, node)
 		}
+		ial := &ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: ialTokens}
+		defer tree.Context.TipAppendChild(ial)
 	}
 
 	switch n.DataAtom {

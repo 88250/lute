@@ -41,3 +41,17 @@ func TestHTML2BlockDOM(t *testing.T) {
 		}
 	}
 }
+
+func TestHTML2BlockDOMTableCaption(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetHTML2MarkdownAttrs([]string{"custom-*"})
+
+	ast.Testing = true
+	from := "<table custom-caption-test=\"yes\"><caption style=\"color: red; caption-side: BOTTOM !important\"><strong>A &amp; B</strong></caption><tr><td colspan=\"2\">Wide</td><td>C</td></tr><tr><td>D</td><td>E</td><td>F</td></tr></table>"
+	expected := "<div data-node-id=\"20060102150405-1a2b3c4\" data-node-index=\"1\" data-type=\"NodeTable\" class=\"table\" caption=\"&amp;lt;caption contenteditable=&amp;quot;false&amp;quot; style=&amp;quot;caption-side: bottom;&amp;quot;&amp;gt;A &amp;amp;amp; B&amp;lt;/caption&amp;gt;\" custom-caption-test=\"yes\" updated=\"20060102150405\"><div contenteditable=\"false\"><table contenteditable=\"true\" spellcheck=\"false\"><caption contenteditable=\"false\" style=\"caption-side: bottom;\">A &amp; B</caption><colgroup><col /><col /><col /></colgroup><thead><tr><th colspan=\"2\">Wide</th><th class=\"fn__none\"></th><th>C</th></tr></thead><tbody><tr><td>D</td><td>E</td><td>F</td></tr></tbody></table><div class=\"protyle-action__table\"><div class=\"table__resize\"></div><div class=\"table__select\"></div></div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"
+	if result := luteEngine.HTML2BlockDOM(from); expected != result {
+		t.Fatalf("expected\n\t%q\ngot\n\t%q", expected, result)
+	}
+}
