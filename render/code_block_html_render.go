@@ -24,10 +24,10 @@ import (
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 
-	"github.com/alecthomas/chroma"
-	chromahtml "github.com/alecthomas/chroma/formatters/html"
-	chromalexers "github.com/alecthomas/chroma/lexers"
-	"github.com/alecthomas/chroma/styles"
+	"github.com/alecthomas/chroma/v2"
+	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
+	chromalexers "github.com/alecthomas/chroma/v2/lexers"
+	"github.com/alecthomas/chroma/v2/styles"
 )
 
 func (r *HtmlRenderer) renderCodeBlock(node *ast.Node, entering bool) ast.WalkStatus {
@@ -154,7 +154,7 @@ func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *Html
 	if "" != language {
 		lexer = chromalexers.Get(language)
 	} else {
-		lexer = chromalexers.Analyse(codeBlock)
+		lexer = analyseChroma(codeBlock)
 	}
 	if nil == lexer {
 		lexer = chromalexers.Fallback
@@ -165,7 +165,7 @@ func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *Html
 	iterator, err := lexer.Tokenise(nil, codeBlock)
 	if nil == err {
 		chromahtmlOpts := []chromahtml.Option{
-			chromahtml.PreventSurroundingPre(true),
+			chromahtml.WithPreWrapper(chromaNoopPreWrapper{}),
 			chromahtml.ClassPrefix("highlight-"),
 		}
 		if !r.Options.CodeSyntaxHighlightInlineStyle {
@@ -203,6 +203,16 @@ func highlightChroma(codeNode *ast.Node, tokens []byte, language string, r *Html
 	return
 }
 
+type chromaNoopPreWrapper struct{}
+
+func (chromaNoopPreWrapper) Start(bool, string) string {
+	return ""
+}
+
+func (chromaNoopPreWrapper) End(bool) string {
+	return ""
+}
+
 func isGo(language string) bool {
 	return strings.EqualFold(language, "go") || strings.EqualFold(language, "golang")
 }
@@ -221,9 +231,17 @@ func isGo(language string) bool {
 //}
 
 func detectLanguage(code []byte) string {
-	lexer := chromalexers.Analyse(util.BytesToStr(code))
+	lexer := analyseChroma(util.BytesToStr(code))
 	if nil == lexer {
 		return ""
 	}
 	return lexer.Config().Aliases[0]
+}
+
+func analyseChroma(code string) chroma.Lexer {
+	// 优先识别具有明确包和函数声明的 Go 代码，避免被 GDScript 分析器误判。
+	if strings.Contains(code, "package ") && strings.Contains(code, "\nfunc ") {
+		return chromalexers.Get("go")
+	}
+	return chromalexers.Analyse(code)
 }

@@ -43,7 +43,7 @@ func test() {
 	return
 }
 ` + "```",
-	"<pre><code class=\"language-go highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kn\">package</span> <span class=\"highlight-nx\">lute</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kd\">func</span> <span class=\"highlight-nf\">test</span><span class=\"highlight-p\">()</span> <span class=\"highlight-p\">{</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\">\t<span class=\"highlight-k\">return</span>\n</span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-p\">}</span>\n</span></span></code></pre>\n",
+	"<pre><code class=\"language-go highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kn\">package</span><span class=\"highlight-w\"> </span><span class=\"highlight-nx\">lute</span><span class=\"highlight-w\">\n</span></span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-w\">\n</span></span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kd\">func</span><span class=\"highlight-w\"> </span><span class=\"highlight-nf\">test</span><span class=\"highlight-p\">()</span><span class=\"highlight-w\"> </span><span class=\"highlight-p\">{</span><span class=\"highlight-w\">\n</span></span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-w\">\t</span><span class=\"highlight-k\">return</span><span class=\"highlight-w\">\n</span></span></span><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-p\">}</span><span class=\"highlight-w\">\n</span></span></span></code></pre>\n",
 }
 
 func TestCodeSyntaxHighlightDetectLang1(t *testing.T) {
@@ -78,13 +78,13 @@ func TestCodeSyntaxHighlightIssue17(t *testing.T) {
 	luteEngine.SetCodeSyntaxHighlightStyleName(style)
 	htmlBytes := luteEngine.Markdown(caseName, data)
 	html := string(htmlBytes)
-	expected := `<pre style="color: #f8f8f2; background-color: #272822"><code class="language-go"><span style="display:flex;"><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-</span></span><span style="display:flex;"><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>
-</span></span><span style="display:flex;"><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
-</span></span><span style="display:flex;"><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>
-</span></span><span style="display:flex;"><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello, 世界&#34;</span>)
-</span></span><span style="display:flex;"><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span>}
+	expected := `<pre style="color: #f8f8f2; background-color: #272822"><code class="language-go"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello, 世界&#34;</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span>}
 </span></span></code></pre>
 `
 	if expected != html {
@@ -103,7 +103,7 @@ func TestCodeSyntaxHighlightIssue17(t *testing.T) {
 
 var codeSyntaxHighlightLineNumTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-ln\">1</span><span class=\"highlight-cl\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-n\">i</span><span class=\"highlight-o\">;</span>\n</span></span></code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-ln\">1</span><span class=\"highlight-cl\"><span class=\"highlight-kt\">int</span><span class=\"highlight-w\"> </span><span class=\"highlight-n\">i</span><span class=\"highlight-p\">;</span><span class=\"highlight-w\">\n</span></span></span></code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightLineNum(t *testing.T) {
@@ -120,7 +120,7 @@ func TestCodeSyntaxHighlightLineNum(t *testing.T) {
 
 var codeSyntaxHighlightTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-n\">i</span><span class=\"highlight-o\">;</span>\n</span></span></code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kt\">int</span><span class=\"highlight-w\"> </span><span class=\"highlight-n\">i</span><span class=\"highlight-p\">;</span><span class=\"highlight-w\">\n</span></span></span></code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlight(t *testing.T) {
@@ -136,7 +136,7 @@ func TestCodeSyntaxHighlight(t *testing.T) {
 
 var codeSyntaxHighlightInlineTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre style=\"color: #f8f8f2; background-color: #282a36\"><code class=\"language-java\"><span style=\"display:flex;\"><span><span style=\"color:#8be9fd\">int</span> i<span style=\"color:#ff79c6\">;</span>\n</span></span></code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre style=\"color: #f8f8f2; background-color: #282a36\"><code class=\"language-java\"><span style=\"display:flex;\"><span><span style=\"color:#8be9fd\">int</span> i;\n</span></span></code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightInline(t *testing.T) {
@@ -154,7 +154,7 @@ func TestCodeSyntaxHighlightInline(t *testing.T) {
 
 var codeSyntaxHighlightStyleTests = []parseTest{
 
-	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kt\">int</span> <span class=\"highlight-n\">i</span><span class=\"highlight-o\">;</span>\n</span></span></code></pre>\n"},
+	{"0", "```java\nint i;\n```\n", "<pre><code class=\"language-java highlight-chroma\"><span class=\"highlight-line\"><span class=\"highlight-cl\"><span class=\"highlight-kt\">int</span><span class=\"highlight-w\"> </span><span class=\"highlight-n\">i</span><span class=\"highlight-p\">;</span><span class=\"highlight-w\">\n</span></span></span></code></pre>\n"},
 }
 
 func TestCodeSyntaxHighlightStyle(t *testing.T) {

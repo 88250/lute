@@ -1,11 +1,12 @@
-/* Background */ .highlight-bg { color: #1d2432 }
-/* PreWrapper */ .highlight-chroma { color: #1d2432; }
+/* Background */ .highlight-bg { color: #1d2432; }
+/* PreWrapper */ .highlight-chroma { color: #1d2432; -webkit-text-size-adjust: none; }
 /* Other */ .highlight-chroma .highlight-x { color: #ffffff }
+/* LineLink */ .highlight-chroma .highlight-lnlinks { outline: none; text-decoration: none; color: inherit }
 /* LineTableTD */ .highlight-chroma .highlight-lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
 /* LineTable */ .highlight-chroma .highlight-lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }
 /* LineHighlight */ .highlight-chroma .highlight-hl { background-color: #e5e5e5 }
-/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #8e9198 }
-/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #8e9198 }
+/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #8e9198 }
+/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #8e9198 }
 /* Line */ .highlight-chroma .highlight-line { display: flex; }
 /* Keyword */ .highlight-chroma .highlight-k { color: #ff636f }
 /* KeywordConstant */ .highlight-chroma .highlight-kc { color: #ff636f }
@@ -16,25 +17,25 @@
 /* KeywordType */ .highlight-chroma .highlight-kt { color: #ff636f }
 /* Name */ .highlight-chroma .highlight-n { color: #58a1dd }
 /* NameAttribute */ .highlight-chroma .highlight-na { color: #58a1dd }
-/* NameBuiltin */ .highlight-chroma .highlight-nb { color: #58a1dd }
-/* NameBuiltinPseudo */ .highlight-chroma .highlight-bp { color: #58a1dd }
 /* NameClass */ .highlight-chroma .highlight-nc { color: #58a1dd }
 /* NameConstant */ .highlight-chroma .highlight-no { color: #58a1dd }
 /* NameDecorator */ .highlight-chroma .highlight-nd { color: #58a1dd }
 /* NameEntity */ .highlight-chroma .highlight-ni { color: #58a1dd }
 /* NameException */ .highlight-chroma .highlight-ne { color: #58a1dd }
-/* NameFunction */ .highlight-chroma .highlight-nf { color: #58a1dd }
-/* NameFunctionMagic */ .highlight-chroma .highlight-fm { color: #58a1dd }
 /* NameLabel */ .highlight-chroma .highlight-nl { color: #58a1dd }
 /* NameNamespace */ .highlight-chroma .highlight-nn { color: #58a1dd }
 /* NameOther */ .highlight-chroma .highlight-nx { color: #58a1dd }
 /* NameProperty */ .highlight-chroma .highlight-py { color: #58a1dd }
 /* NameTag */ .highlight-chroma .highlight-nt { color: #58a1dd }
+/* NameBuiltin */ .highlight-chroma .highlight-nb { color: #58a1dd }
+/* NameBuiltinPseudo */ .highlight-chroma .highlight-bp { color: #58a1dd }
 /* NameVariable */ .highlight-chroma .highlight-nv { color: #58a1dd }
 /* NameVariableClass */ .highlight-chroma .highlight-vc { color: #58a1dd }
 /* NameVariableGlobal */ .highlight-chroma .highlight-vg { color: #58a1dd }
 /* NameVariableInstance */ .highlight-chroma .highlight-vi { color: #58a1dd }
 /* NameVariableMagic */ .highlight-chroma .highlight-vm { color: #58a1dd }
+/* NameFunction */ .highlight-chroma .highlight-nf { color: #58a1dd }
+/* NameFunctionMagic */ .highlight-chroma .highlight-fm { color: #58a1dd }
 /* Literal */ .highlight-chroma .highlight-l { color: #a6be9d }
 /* LiteralDate */ .highlight-chroma .highlight-ld { color: #a6be9d }
 /* LiteralString */ .highlight-chroma .highlight-s { color: #a6be9d }
@@ -60,6 +61,7 @@
 /* LiteralNumberOct */ .highlight-chroma .highlight-mo { color: #a6be9d }
 /* Operator */ .highlight-chroma .highlight-o { color: #ff636f }
 /* OperatorWord */ .highlight-chroma .highlight-ow { color: #ff636f }
+/* OperatorReserved */ .highlight-chroma .highlight-or { color: #ff636f }
 /* Comment */ .highlight-chroma .highlight-c { color: #828b96; font-style: italic }
 /* CommentHashbang */ .highlight-chroma .highlight-ch { color: #828b96; font-style: italic }
 /* CommentMultiline */ .highlight-chroma .highlight-cm { color: #828b96; font-style: italic }

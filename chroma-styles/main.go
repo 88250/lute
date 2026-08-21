@@ -17,8 +17,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	chromahtml "github.com/alecthomas/chroma/formatters/html"
-	"github.com/alecthomas/chroma/styles"
+	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
+	"github.com/alecthomas/chroma/v2/styles"
 )
 
 // 生成 Chroma 样式。

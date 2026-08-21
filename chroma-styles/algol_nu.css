@@ -1,11 +1,11 @@
-/* Background */ .highlight-bg { background-color: #ffffff }
-/* PreWrapper */ .highlight-chroma { background-color: #ffffff; }
-/* Error */ .highlight-chroma .highlight-err {  }
+/* Background */ .highlight-bg { background-color: #ffffff; }
+/* PreWrapper */ .highlight-chroma { background-color: #ffffff; -webkit-text-size-adjust: none; }
+/* LineLink */ .highlight-chroma .highlight-lnlinks { outline: none; text-decoration: none; color: inherit }
 /* LineTableTD */ .highlight-chroma .highlight-lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
 /* LineTable */ .highlight-chroma .highlight-lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }
 /* LineHighlight */ .highlight-chroma .highlight-hl { background-color: #e5e5e5 }
-/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
-/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
 /* Line */ .highlight-chroma .highlight-line { display: flex; }
 /* Keyword */ .highlight-chroma .highlight-k { font-weight: bold }
 /* KeywordConstant */ .highlight-chroma .highlight-kc { font-weight: bold }
@@ -14,13 +14,18 @@
 /* KeywordPseudo */ .highlight-chroma .highlight-kp { font-weight: bold }
 /* KeywordReserved */ .highlight-chroma .highlight-kr { font-weight: bold }
 /* KeywordType */ .highlight-chroma .highlight-kt { font-weight: bold }
-/* NameBuiltin */ .highlight-chroma .highlight-nb { font-weight: bold; font-style: italic }
-/* NameBuiltinPseudo */ .highlight-chroma .highlight-bp { font-weight: bold; font-style: italic }
 /* NameClass */ .highlight-chroma .highlight-nc { color: #666666; font-weight: bold; font-style: italic }
 /* NameConstant */ .highlight-chroma .highlight-no { color: #666666; font-weight: bold; font-style: italic }
-/* NameFunction */ .highlight-chroma .highlight-nf { color: #666666; font-weight: bold; font-style: italic }
 /* NameNamespace */ .highlight-chroma .highlight-nn { color: #666666; font-weight: bold; font-style: italic }
+/* NameBuiltin */ .highlight-chroma .highlight-nb { font-weight: bold; font-style: italic }
+/* NameBuiltinPseudo */ .highlight-chroma .highlight-bp { font-weight: bold; font-style: italic }
 /* NameVariable */ .highlight-chroma .highlight-nv { color: #666666; font-weight: bold; font-style: italic }
+/* NameVariableClass */ .highlight-chroma .highlight-vc { color: #666666; font-weight: bold; font-style: italic }
+/* NameVariableGlobal */ .highlight-chroma .highlight-vg { color: #666666; font-weight: bold; font-style: italic }
+/* NameVariableInstance */ .highlight-chroma .highlight-vi { color: #666666; font-weight: bold; font-style: italic }
+/* NameVariableMagic */ .highlight-chroma .highlight-vm { color: #666666; font-weight: bold; font-style: italic }
+/* NameFunction */ .highlight-chroma .highlight-nf { color: #666666; font-weight: bold; font-style: italic }
+/* NameFunctionMagic */ .highlight-chroma .highlight-fm { color: #666666; font-weight: bold; font-style: italic }
 /* LiteralString */ .highlight-chroma .highlight-s { color: #666666; font-style: italic }
 /* LiteralStringAffix */ .highlight-chroma .highlight-sa { color: #666666; font-style: italic }
 /* LiteralStringBacktick */ .highlight-chroma .highlight-sb { color: #666666; font-style: italic }

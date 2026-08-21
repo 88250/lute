@@ -1,11 +1,12 @@
-/* Background */ .highlight-bg { color: #000000 }
-/* PreWrapper */ .highlight-chroma { color: #000000; }
+/* Background */ .highlight-bg { color: #000000; }
+/* PreWrapper */ .highlight-chroma { color: #000000; -webkit-text-size-adjust: none; }
 /* Other */ .highlight-chroma .highlight-x { color: #d5d500 }
+/* LineLink */ .highlight-chroma .highlight-lnlinks { outline: none; text-decoration: none; color: inherit }
 /* LineTableTD */ .highlight-chroma .highlight-lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
 /* LineTable */ .highlight-chroma .highlight-lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }
 /* LineHighlight */ .highlight-chroma .highlight-hl { background-color: #e5e5e5 }
-/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
-/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
 /* Line */ .highlight-chroma .highlight-line { display: flex; }
 /* Keyword */ .highlight-chroma .highlight-k { color: #467faf }
 /* KeywordConstant */ .highlight-chroma .highlight-kc { color: #467faf }
@@ -16,25 +17,25 @@
 /* KeywordType */ .highlight-chroma .highlight-kt { color: #467faf }
 /* Name */ .highlight-chroma .highlight-n { color: #ffffff }
 /* NameAttribute */ .highlight-chroma .highlight-na { color: #ffffff }
-/* NameBuiltin */ .highlight-chroma .highlight-nb { color: #ffffff }
-/* NameBuiltinPseudo */ .highlight-chroma .highlight-bp { color: #ffffff }
 /* NameClass */ .highlight-chroma .highlight-nc { color: #ffffff }
 /* NameConstant */ .highlight-chroma .highlight-no { color: #ffffff }
 /* NameDecorator */ .highlight-chroma .highlight-nd { color: #ffffff }
 /* NameEntity */ .highlight-chroma .highlight-ni { color: #ffffff }
 /* NameException */ .highlight-chroma .highlight-ne { color: #ffffff }
-/* NameFunction */ .highlight-chroma .highlight-nf { color: #ffffff }
-/* NameFunctionMagic */ .highlight-chroma .highlight-fm { color: #ffffff }
 /* NameLabel */ .highlight-chroma .highlight-nl { color: #ffffff }
 /* NameNamespace */ .highlight-chroma .highlight-nn { color: #ffffff }
 /* NameOther */ .highlight-chroma .highlight-nx { color: #ffffff }
 /* NameProperty */ .highlight-chroma .highlight-py { color: #ffffff }
 /* NameTag */ .highlight-chroma .highlight-nt { color: #ffffff }
+/* NameBuiltin */ .highlight-chroma .highlight-nb { color: #ffffff }
+/* NameBuiltinPseudo */ .highlight-chroma .highlight-bp { color: #ffffff }
 /* NameVariable */ .highlight-chroma .highlight-nv { color: #ffffff }
 /* NameVariableClass */ .highlight-chroma .highlight-vc { color: #ffffff }
 /* NameVariableGlobal */ .highlight-chroma .highlight-vg { color: #ffffff }
 /* NameVariableInstance */ .highlight-chroma .highlight-vi { color: #ffffff }
 /* NameVariableMagic */ .highlight-chroma .highlight-vm { color: #ffffff }
+/* NameFunction */ .highlight-chroma .highlight-nf { color: #ffffff }
+/* NameFunctionMagic */ .highlight-chroma .highlight-fm { color: #ffffff }
 /* LiteralString */ .highlight-chroma .highlight-s { color: #a87662 }
 /* LiteralStringAffix */ .highlight-chroma .highlight-sa { color: #a87662 }
 /* LiteralStringBacktick */ .highlight-chroma .highlight-sb { color: #a87662 }
@@ -58,6 +59,7 @@
 /* LiteralNumberOct */ .highlight-chroma .highlight-mo { color: #ffffff }
 /* Operator */ .highlight-chroma .highlight-o { color: #e4e400 }
 /* OperatorWord */ .highlight-chroma .highlight-ow { color: #467faf }
+/* OperatorReserved */ .highlight-chroma .highlight-or { color: #e4e400 }
 /* Comment */ .highlight-chroma .highlight-c { color: #5a8349 }
 /* CommentHashbang */ .highlight-chroma .highlight-ch { color: #5a8349 }
 /* CommentMultiline */ .highlight-chroma .highlight-cm { color: #5a8349 }

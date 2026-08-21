@@ -1,11 +1,12 @@
-/* Background */ .highlight-bg { background-color: #ffffff }
-/* PreWrapper */ .highlight-chroma { background-color: #ffffff; }
+/* Background */ .highlight-bg { background-color: #ffffff; }
+/* PreWrapper */ .highlight-chroma { background-color: #ffffff; -webkit-text-size-adjust: none; }
 /* Error */ .highlight-chroma .highlight-err { color: #a61717; background-color: #e3d2d2 }
+/* LineLink */ .highlight-chroma .highlight-lnlinks { outline: none; text-decoration: none; color: inherit }
 /* LineTableTD */ .highlight-chroma .highlight-lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
 /* LineTable */ .highlight-chroma .highlight-lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }
 /* LineHighlight */ .highlight-chroma .highlight-hl { background-color: #e5e5e5 }
-/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
-/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
+/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #7f7f7f }
 /* Line */ .highlight-chroma .highlight-line { display: flex; }
 /* Keyword */ .highlight-chroma .highlight-k { font-weight: bold }
 /* KeywordConstant */ .highlight-chroma .highlight-kc { font-weight: bold }
@@ -15,15 +16,21 @@
 /* KeywordReserved */ .highlight-chroma .highlight-kr { font-weight: bold }
 /* KeywordType */ .highlight-chroma .highlight-kt { color: #445588; font-weight: bold }
 /* NameAttribute */ .highlight-chroma .highlight-na { color: #008080 }
-/* NameBuiltin */ .highlight-chroma .highlight-nb { color: #999999 }
 /* NameClass */ .highlight-chroma .highlight-nc { color: #445588; font-weight: bold }
 /* NameConstant */ .highlight-chroma .highlight-no { color: #008080 }
 /* NameEntity */ .highlight-chroma .highlight-ni { color: #800080 }
 /* NameException */ .highlight-chroma .highlight-ne { color: #990000; font-weight: bold }
-/* NameFunction */ .highlight-chroma .highlight-nf { color: #990000; font-weight: bold }
 /* NameNamespace */ .highlight-chroma .highlight-nn { color: #555555 }
 /* NameTag */ .highlight-chroma .highlight-nt { color: #000080 }
+/* NameBuiltin */ .highlight-chroma .highlight-nb { color: #999999 }
+/* NameBuiltinPseudo */ .highlight-chroma .highlight-bp { color: #999999 }
 /* NameVariable */ .highlight-chroma .highlight-nv { color: #008080 }
+/* NameVariableClass */ .highlight-chroma .highlight-vc { color: #008080 }
+/* NameVariableGlobal */ .highlight-chroma .highlight-vg { color: #008080 }
+/* NameVariableInstance */ .highlight-chroma .highlight-vi { color: #008080 }
+/* NameVariableMagic */ .highlight-chroma .highlight-vm { color: #008080 }
+/* NameFunction */ .highlight-chroma .highlight-nf { color: #990000; font-weight: bold }
+/* NameFunctionMagic */ .highlight-chroma .highlight-fm { color: #990000; font-weight: bold }
 /* LiteralString */ .highlight-chroma .highlight-s { color: #bb8844 }
 /* LiteralStringAffix */ .highlight-chroma .highlight-sa { color: #bb8844 }
 /* LiteralStringBacktick */ .highlight-chroma .highlight-sb { color: #bb8844 }
@@ -47,6 +54,7 @@
 /* LiteralNumberOct */ .highlight-chroma .highlight-mo { color: #009999 }
 /* Operator */ .highlight-chroma .highlight-o { font-weight: bold }
 /* OperatorWord */ .highlight-chroma .highlight-ow { font-weight: bold }
+/* OperatorReserved */ .highlight-chroma .highlight-or { font-weight: bold }
 /* Comment */ .highlight-chroma .highlight-c { color: #999988; font-style: italic }
 /* CommentHashbang */ .highlight-chroma .highlight-ch { color: #999988; font-style: italic }
 /* CommentMultiline */ .highlight-chroma .highlight-cm { color: #999988; font-style: italic }

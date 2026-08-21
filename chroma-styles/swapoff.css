@@ -1,11 +1,12 @@
-/* Background */ .highlight-bg { color: #e5e5e5; background-color: #000000 }
-/* PreWrapper */ .highlight-chroma { color: #e5e5e5; background-color: #000000; }
+/* Background */ .highlight-bg { color: #e5e5e5; background-color: #000000; }
+/* PreWrapper */ .highlight-chroma { color: #e5e5e5; background-color: #000000; -webkit-text-size-adjust: none; }
 /* Error */ .highlight-chroma .highlight-err { color: #ff0000 }
+/* LineLink */ .highlight-chroma .highlight-lnlinks { outline: none; text-decoration: none; color: inherit }
 /* LineTableTD */ .highlight-chroma .highlight-lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
 /* LineTable */ .highlight-chroma .highlight-lntable { border-spacing: 0; padding: 0; margin: 0; border: 0; }
 /* LineHighlight */ .highlight-chroma .highlight-hl { background-color: #191919 }
-/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #727272 }
-/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #727272 }
+/* LineNumbersTable */ .highlight-chroma .highlight-lnt { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #727272 }
+/* LineNumbers */ .highlight-chroma .highlight-ln { white-space: pre; -webkit-user-select: none; user-select: none; margin-right: 0.4em; padding: 0 0.4em 0 0.4em;color: #727272 }
 /* Line */ .highlight-chroma .highlight-line { display: flex; }
 /* Keyword */ .highlight-chroma .highlight-k { color: #ffffff; font-weight: bold }
 /* KeywordConstant */ .highlight-chroma .highlight-kc { color: #ffffff; font-weight: bold }
@@ -15,8 +16,9 @@
 /* KeywordReserved */ .highlight-chroma .highlight-kr { color: #ffffff; font-weight: bold }
 /* KeywordType */ .highlight-chroma .highlight-kt { color: #ffffff; font-weight: bold }
 /* NameAttribute */ .highlight-chroma .highlight-na { color: #007f7f }
-/* NameBuiltin */ .highlight-chroma .highlight-nb { color: #ffffff; font-weight: bold }
 /* NameTag */ .highlight-chroma .highlight-nt { font-weight: bold }
+/* NameBuiltin */ .highlight-chroma .highlight-nb { color: #ffffff; font-weight: bold }
+/* NameBuiltinPseudo */ .highlight-chroma .highlight-bp { color: #ffffff; font-weight: bold }
 /* LiteralDate */ .highlight-chroma .highlight-ld { color: #ffff00; font-weight: bold }
 /* LiteralString */ .highlight-chroma .highlight-s { color: #00ffff; font-weight: bold }
 /* LiteralStringAffix */ .highlight-chroma .highlight-sa { color: #00ffff; font-weight: bold }
