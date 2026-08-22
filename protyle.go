@@ -1009,7 +1009,8 @@ func normalizeSpinCaretNewline(tree *parse.Tree) {
 			}
 
 			content := child.TokensStr()
-			if strings.HasPrefix(content, editor.Caret+"\n") && spinHasContentAfter(child, content, len(editor.Caret)+1) {
+			if nil == child.Previous && strings.HasPrefix(content, editor.Caret+"\n") &&
+				spinHasContentAfter(child, content, len(editor.Caret)+1) {
 				content = editor.Caret + content[len(editor.Caret)+1:]
 			}
 
