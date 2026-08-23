@@ -188,7 +188,9 @@ func (r *ProtyleRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkS
 			r.WriteString("\" />")
 		}
 
-		r.WriteString("</span><span class=\"callout-title\">")
+		r.WriteString("</span><span contenteditable=\"true\" spellcheck=\"")
+		r.WriteString(strconv.FormatBool(r.Options.Spellcheck))
+		r.WriteString("\" class=\"callout-title\">")
 		title := node.CalloutTitle
 		if "" == title {
 			title = ast.GetCalloutTitle(node.CalloutType)

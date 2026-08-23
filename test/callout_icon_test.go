@@ -81,7 +81,7 @@ func TestCalloutImageIconRoundTrip(t *testing.T) {
 	dom := "<div contenteditable=\"false\" data-subtype=\"NOTE\" data-node-id=\"20260807120000-abcdefg\" " +
 		"data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\"><div class=\"callout-info\">" +
 		"<span class=\"callout-icon\"><img class=\"callout-img\" src=\"" + icon + "\"></span>" +
-		"<span class=\"callout-title\">Note</span></div><div class=\"callout-content\">" +
+		"<span contenteditable=\"true\" spellcheck=\"false\" class=\"callout-title\">Note</span></div><div class=\"callout-content\">" +
 		"<div data-node-id=\"20260807120001-abcdefg\" data-type=\"NodeParagraph\" class=\"p\">" +
 		"<div contenteditable=\"true\" spellcheck=\"false\">Content</div>" +
 		"<div class=\"protyle-attr\" contenteditable=\"false\">&ZeroWidthSpace;</div></div></div>" +
@@ -107,7 +107,7 @@ func TestCalloutImageIconRoundTrip(t *testing.T) {
 
 	blockDOM := luteEngine.Md2BlockDOM(formattedAgain, true)
 	if !strings.Contains(blockDOM, "src=\"https://b3logfile.com/avatar/1734703705652.png?size=64&amp;theme=light\"") ||
-		!strings.Contains(blockDOM, "<span class=\"callout-title\">Note</span>") {
+		!strings.Contains(blockDOM, "<span contenteditable=\"true\" spellcheck=\"false\" class=\"callout-title\">Note</span>") {
 		t.Fatalf("unexpected BlockDOM: %s", blockDOM)
 	}
 }
