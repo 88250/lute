@@ -17,9 +17,3 @@ jobs:
       - name: Run Unit tests
         run: |
           go test -coverprofile=covprofile -coverpkg="github.com/88250/lute" ./...
-      - name: Install goveralls
-        run: go install github.com/mattn/goveralls@latest
-      - name: Send coverage
-        env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=covprofile -service=github
