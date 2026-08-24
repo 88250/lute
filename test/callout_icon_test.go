@@ -78,8 +78,8 @@ func TestCalloutImageIconDoesNotConsumeTitle(t *testing.T) {
 
 func TestCalloutImageIconRoundTrip(t *testing.T) {
 	icon := "https://b3logfile.com/avatar/1734703705652.png?size=64&theme=light"
-	dom := "<div contenteditable=\"false\" data-subtype=\"NOTE\" data-node-id=\"20260807120000-abcdefg\" " +
-		"data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\"><div class=\"callout-info\">" +
+	dom := "<div data-subtype=\"NOTE\" data-node-id=\"20260807120000-abcdefg\" " +
+		"data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\"><div class=\"callout-info\" contenteditable=\"false\">" +
 		"<span class=\"callout-icon\"><img class=\"callout-img\" src=\"" + icon + "\"></span>" +
 		"<span contenteditable=\"true\" spellcheck=\"false\" class=\"callout-title\">Note</span></div><div class=\"callout-content\">" +
 		"<div data-node-id=\"20260807120001-abcdefg\" data-type=\"NodeParagraph\" class=\"p\">" +

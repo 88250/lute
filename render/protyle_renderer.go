@@ -174,12 +174,11 @@ func NewProtyleRenderer(tree *parse.Tree, options *Options, parseOptions *parse.
 func (r *ProtyleRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{
-			{"contenteditable", "false"},
 			{"data-subtype", html.EscapeHTMLStr(node.CalloutType)},
 		}
 		r.blockNodeAttrs(node, &attrs, "callout")
 		r.Tag("div", attrs, false)
-		r.WriteString("<div class=\"callout-info\"><span class=\"callout-icon\">")
+		r.WriteString("<div class=\"callout-info\" contenteditable=\"false\"><span class=\"callout-icon\">")
 		if 0 == node.CalloutIconType {
 			r.WriteString(node.CalloutIcon)
 		} else if 1 == node.CalloutIconType {
