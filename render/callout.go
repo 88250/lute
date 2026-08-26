@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
 	"github.com/88250/lute/parse"
 )
@@ -38,13 +39,20 @@ func calloutTitle(node *ast.Node) string {
 
 func calloutDisplayTitle(node *ast.Node) string {
 	title := node.CalloutTitle
+	caret := ""
+	content := strings.ReplaceAll(title, editor.Caret, "")
+	content = strings.ReplaceAll(content, editor.Zwsp, "")
+	if "" == strings.TrimSpace(content) && strings.Contains(title, editor.Caret) {
+		title = ""
+		caret = editor.Caret
+	}
 	if "" == title {
 		title = ast.GetCalloutTitle(node.CalloutType)
 	}
 	if "" == title {
 		title = node.CalloutType
 	}
-	return title
+	return title + caret
 }
 
 func calloutEditableIcon(node *ast.Node) string {
