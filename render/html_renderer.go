@@ -199,13 +199,7 @@ func (r *HtmlRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkStat
 			r.WriteString("\" />")
 		}
 		r.WriteString("</span><span class=\"callout-title\">")
-		title := node.CalloutTitle
-		if "" == title {
-			title = ast.GetCalloutTitle(node.CalloutType)
-		}
-		if "" == title {
-			title = node.CalloutType
-		}
+		title := calloutDisplayTitle(node)
 		titleTree := parse.Inline("", []byte(title), r.ParseOptions)
 		if nil != titleTree && nil != titleTree.Root && nil != titleTree.Root.FirstChild {
 			var inlines []*ast.Node

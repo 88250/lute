@@ -112,6 +112,33 @@ func TestCalloutImageIconRoundTrip(t *testing.T) {
 	}
 }
 
+func TestCalloutEmptyTitleRoundTrip(t *testing.T) {
+	luteEngine := newCalloutLute()
+	defaultMarkdown := "> [!NOTE]\n> Content"
+	defaultCallout := parseCalloutWithLute(t, luteEngine, defaultMarkdown)
+	if defaultCallout.CalloutTitleExplicit {
+		t.Fatal("default callout title should not be explicit")
+	}
+	defaultBlockDOM := luteEngine.Md2BlockDOM(defaultMarkdown, true)
+	if !strings.Contains(defaultBlockDOM, "class=\"callout-title\">Note</span>") {
+		t.Fatalf("default callout title was not rendered: %s", defaultBlockDOM)
+	}
+
+	emptyTitleMarkdown := "> [!NOTE] ✏️\n> Content\n"
+	emptyTitleCallout := parseCalloutWithLute(t, luteEngine, emptyTitleMarkdown)
+	if !emptyTitleCallout.CalloutTitleExplicit || "" != emptyTitleCallout.CalloutTitle {
+		t.Fatalf("unexpected empty title state: explicit=%v, title=%q",
+			emptyTitleCallout.CalloutTitleExplicit, emptyTitleCallout.CalloutTitle)
+	}
+	emptyTitleBlockDOM := luteEngine.Md2BlockDOM(emptyTitleMarkdown, true)
+	if !strings.Contains(emptyTitleBlockDOM, "class=\"callout-title\"></span>") {
+		t.Fatalf("empty callout title was not rendered: %s", emptyTitleBlockDOM)
+	}
+	if markdown := luteEngine.BlockDOM2StdMd(emptyTitleBlockDOM); emptyTitleMarkdown != markdown {
+		t.Fatalf("empty callout title did not round trip\nexpected\n\t%q\ngot\n\t%q", emptyTitleMarkdown, markdown)
+	}
+}
+
 func parseCallout(t *testing.T, markdown string) *ast.Node {
 	return parseCalloutWithLute(t, newCalloutLute(), markdown)
 }

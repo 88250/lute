@@ -78,6 +78,7 @@ func (context *Context) calloutFinalize(callout *ast.Node) {
 	typ := string(bytes.TrimSpace(content[2:bytes.IndexByte(content, ']')]))
 	title := string(bytes.TrimSpace(content[bytes.IndexByte(content, ']')+1:]))
 	callout.CalloutType = typ
+	callout.CalloutTitleExplicit = "" != title
 	if icon, remains, ok := context.parseCalloutImageIcon(title); ok {
 		callout.CalloutIcon = icon
 		callout.CalloutIconType = 1

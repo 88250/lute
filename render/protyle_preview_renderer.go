@@ -174,10 +174,7 @@ func (r *ProtylePreviewRenderer) renderCallout(node *ast.Node, entering bool) as
 		node.KramdownIAL = append(node.KramdownIAL, []string{"data-subtype", html.EscapeHTMLStr(node.CalloutType)})
 		r.renderBlockquote(node, entering)
 		r.WriteString("<p>")
-		title := node.CalloutTitle
-		if "" == title {
-			title = ast.GetCalloutTitle(node.CalloutType)
-		}
+		title := calloutDisplayTitle(node)
 		if "" != node.CalloutIcon {
 			if 1 == node.CalloutIconType {
 				icon := ast.GetCalloutIcon(node.CalloutType)

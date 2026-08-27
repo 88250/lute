@@ -145,10 +145,11 @@ type Node struct {
 	CustomBlockInfo        string `json:",omitempty"` // 自定义块信息
 
 	// 提示块 https://github.com/88250/lute/issues/203 > [!Type] Title
-	CalloutType     string `json:",omitempty"` // 提示块类型
-	CalloutTitle    string `json:",omitempty"` // 提示块标题
-	CalloutIcon     string `json:",omitempty"` // 提示块图标
-	CalloutIconType int    `json:",omitempty"` // 提示块图标类型，0：Emoji Unicode，1：自定义图标
+	CalloutType          string `json:",omitempty"` // 提示块类型
+	CalloutTitle         string `json:",omitempty"` // 提示块标题
+	CalloutTitleExplicit bool   `json:",omitempty"` // 是否显式设置提示块标题
+	CalloutIcon          string `json:",omitempty"` // 提示块图标
+	CalloutIconType      int    `json:",omitempty"` // 提示块图标类型，0：Emoji Unicode，1：自定义图标
 }
 
 // EffectiveTaskListItemMarker 返回任务列表项的有效标记字符（已转义，适用于 HTML 属性值输出）。

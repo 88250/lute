@@ -186,13 +186,7 @@ func (r *ProtyleExportRenderer) renderCallout(node *ast.Node, entering bool) ast
 		}
 
 		r.WriteString("</span><span class=\"callout-title\">")
-		title := node.CalloutTitle
-		if "" == title {
-			title = ast.GetCalloutTitle(node.CalloutType)
-		}
-		if "" == title {
-			title = node.CalloutType
-		}
+		title := calloutDisplayTitle(node)
 		r.WriteString(title)
 		r.WriteString("</span></div>")
 		r.WriteString("<div class=\"callout-content\">")

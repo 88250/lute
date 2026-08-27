@@ -2083,6 +2083,7 @@ func (lute *Lute) genASTByCalloutDOM(n *html.Node, tree *parse.Tree) bool {
 	}
 	if title := directDomChildByClass(info, "callout-title"); nil != title {
 		callout.CalloutTitle = strings.TrimSpace(lute.HTML2Md(string(util.DomHTML(title))))
+		callout.CalloutTitleExplicit = true
 	}
 
 	tree.Context.Tip.AppendChild(callout)
