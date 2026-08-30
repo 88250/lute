@@ -41,6 +41,9 @@ const (
 	// Zwsp 零宽空格。
 	Zwsp = "\u200b"
 
+	// WordJoiner 单词连接符。
+	WordJoiner = "\u2060"
+
 	// Zwj 零宽连字。
 	Zwj = "\u200d"
 )

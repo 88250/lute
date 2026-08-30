@@ -273,15 +273,10 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 			if prevIsTag || prevIsCaretBeforeTag {
 				// 相邻标签之间使用普通空格区隔，避免视觉上连在一起 https://github.com/siyuan-note/siyuan/issues/18191
 				r.WriteByte(lex.ItemSpace)
-			} else if (nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type ||
-				(editor.Caret == node.Previous.TokensStr() && (nil == node.Previous.Previous || ast.NodeSoftBreak == node.Previous.Previous.Type))) &&
-				parse.ContainTextMark(node, "code", "kbd", "tag") {
-				r.WriteString(editor.Zwsp)
 			}
-		} else if (nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type ||
-			(editor.Caret == node.Previous.TokensStr() && (nil == node.Previous.Previous || ast.NodeSoftBreak == node.Previous.Previous.Type))) &&
-			parse.ContainTextMark(node, "code", "kbd", "tag") {
-			r.WriteString(editor.Zwsp)
+		}
+		if parse.ContainTextMark(node, "code", "kbd", "tag") {
+			r.ensureInlineBoundaryZwsp()
 		}
 
 		if node.IsTextMarkType("code") {
@@ -293,7 +288,7 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 
 		r.Tag("span", attrs, false)
 		if parse.ContainTextMark(node, "code", "kbd", "tag") {
-			r.WriteString(editor.Zwsp)
+			r.WriteString(editor.WordJoiner)
 		}
 		textContent := node.TextMarkTextContent
 		if node.ParentIs(ast.NodeTableCell) {
@@ -367,11 +362,9 @@ func (r *ProtyleRenderer) renderKbd(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *ProtyleRenderer) renderKbdOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		if nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type {
-			r.WriteString(editor.Zwsp)
-		}
+		r.ensureInlineBoundaryZwsp()
 		r.Tag("span", [][]string{{"data-type", "kbd"}}, false)
-		r.WriteString(editor.Zwsp)
+		r.WriteString(editor.WordJoiner)
 	}
 	return ast.WalkContinue
 }
@@ -647,9 +640,8 @@ func (r *ProtyleRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatu
 		if prevIsTag || prevIsCaretBeforeTag {
 			// 相邻标签之间使用普通空格区隔，避免视觉上连在一起 https://github.com/siyuan-note/siyuan/issues/18191
 			r.WriteByte(lex.ItemSpace)
-		} else if nil == node.Previous || ast.NodeSoftBreak != node.Previous.Type {
-			r.WriteString(editor.Zwsp)
 		}
+		r.ensureInlineBoundaryZwsp()
 	} else {
 		r.TextAutoSpaceNext(node)
 	}
@@ -661,7 +653,7 @@ func (r *ProtyleRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast
 		content := node.Parent.Text()
 		content = strings.ReplaceAll(content, editor.Caret, "")
 		r.Tag("span", [][]string{{"data-type", "tag"}, {"data-content", html.EscapeHTMLStr(content)}}, false)
-		r.WriteString(editor.Zwsp)
+		r.WriteString(editor.WordJoiner)
 	}
 	return ast.WalkContinue
 }
@@ -1640,9 +1632,7 @@ func (r *ProtyleRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.Walk
 			}
 		}
 
-		if nil == node.Previous || ast.NodeSoftBreak == node.Previous.Type {
-			r.WriteString(editor.Zwsp)
-		}
+		r.ensureInlineBoundaryZwsp()
 	} else {
 		if r.Options.AutoSpace {
 			if text := node.NextNodeText(); "" != text {
@@ -1659,7 +1649,7 @@ func (r *ProtyleRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.Walk
 func (r *ProtyleRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Tag("span", [][]string{{"data-type", "code"}}, false)
-		r.WriteString(editor.Zwsp)
+		r.WriteString(editor.WordJoiner)
 	}
 	return ast.WalkContinue
 }
@@ -2037,6 +2027,13 @@ func (r *ProtyleRenderer) renderIAL(node *ast.Node) {
 
 	r.WriteString(editor.Zwsp)
 	r.Tag("/div", nil, false)
+}
+
+func (r *ProtyleRenderer) ensureInlineBoundaryZwsp() {
+	// 可编辑行级元素左侧使用零宽空格提供换行与插入符边界。
+	if !bytes.HasSuffix(r.Writer.Bytes(), []byte(editor.Zwsp)) {
+		r.WriteString(editor.Zwsp)
+	}
 }
 
 func (r *ProtyleRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {

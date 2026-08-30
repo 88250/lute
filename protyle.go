@@ -220,10 +220,9 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 		lute.ParseOptions.KeepEscaped = keepEscaped
 	}()
 
-	htmlStr = strings.ReplaceAll(htmlStr, editor.Zwsp, "")
-
 	// DOM 转 AST
 	tree := lute.BlockDOM2Tree(htmlStr)
+	removeBlockDOMZwsp(tree)
 
 	// 将 kramdown IAL 节点内容置空
 	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
@@ -340,6 +339,7 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	if nil == htmlRoot {
 		return
 	}
+	normalizeProtyleInlineCaretPlaceholders(htmlRoot)
 
 	// 调整 DOM 结构
 	lute.adjustVditorDOM(htmlRoot)
@@ -994,6 +994,56 @@ func (lute *Lute) blockDOMTree2Md(tree *parse.Tree) (markdown string) {
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
+}
+
+func normalizeProtyleInlineCaretPlaceholders(n *html.Node) {
+	if isProtyleInlineCaretContainer(n) {
+		trimProtyleInlineCaretPlaceholder(n)
+	}
+
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		normalizeProtyleInlineCaretPlaceholders(child)
+	}
+}
+
+func isProtyleInlineCaretContainer(n *html.Node) bool {
+	if atom.Code == n.DataAtom || atom.Kbd == n.DataAtom {
+		return true
+	}
+	if atom.Span != n.DataAtom {
+		return false
+	}
+
+	for _, typ := range strings.Fields(util.DomAttrValue(n, "data-type")) {
+		if "code" == typ || "kbd" == typ || "tag" == typ {
+			return true
+		}
+	}
+	return false
+}
+
+func trimProtyleInlineCaretPlaceholder(n *html.Node) {
+	firstChild := n.FirstChild
+	if nil == firstChild || html.TextNode != firstChild.Type {
+		return
+	}
+	for _, placeholder := range []string{editor.Zwsp, "\ufeff", editor.WordJoiner} {
+		if strings.HasPrefix(firstChild.Data, placeholder) {
+			firstChild.Data = strings.TrimPrefix(firstChild.Data, placeholder)
+			break
+		}
+	}
+}
+
+func removeBlockDOMZwsp(tree *parse.Tree) {
+	// 在渲染前清理 BlockDOM 文本中的零宽空格，避免误删紧随旧占位符的实际单词连接符。
+	ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+		if entering {
+			n.Tokens = bytes.ReplaceAll(n.Tokens, []byte(editor.Zwsp), nil)
+			n.TextMarkTextContent = strings.ReplaceAll(n.TextMarkTextContent, editor.Zwsp, "")
+		}
+		return ast.WalkContinue
+	})
 }
 
 func normalizeSpinCaretNewline(tree *parse.Tree) {
