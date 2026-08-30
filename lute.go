@@ -582,6 +582,10 @@ func (lute *Lute) SetSuperBlock(b bool) {
 	lute.RenderOptions.SuperBlock = b
 }
 
+func (lute *Lute) SetCustomBlock(b bool) {
+	lute.ParseOptions.CustomBlock = b
+}
+
 func (lute *Lute) SetSup(b bool) {
 	lute.ParseOptions.Sup = b
 }

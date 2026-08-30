@@ -26,7 +26,7 @@ func init() {
 		BlockquoteStart,
 		ATXHeadingStart,
 		FenceCodeBlockStart,
-		// CustomBlockStart, // https://github.com/siyuan-note/siyuan/issues/8418
+		CustomBlockStart,
 		SetextHeadingStart,
 		HtmlBlockStart,
 		YamlFrontMatterStart,

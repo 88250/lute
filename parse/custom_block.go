@@ -22,7 +22,7 @@ import (
 
 // CustomBlockStart 判断围栏自定义块（;;;info）是否开始。
 func CustomBlockStart(t *Tree, container *ast.Node) int {
-	if t.Context.indented {
+	if !t.Context.ParseOption.CustomBlock || t.Context.indented {
 		return 0
 	}
 
@@ -87,12 +87,12 @@ func (t *Tree) parseCustomBlock() (ok bool, fenceOffset int, info string) {
 		fenceLen++
 	}
 
-	if 3 > fenceLen {
+	if 3 != fenceLen {
 		return
 	}
 
 	infoTokens := t.Context.currentLine[t.Context.nextNonspace+fenceLen:]
-	if 0 < bytes.IndexByte(infoTokens, lex.ItemSemicolon) {
+	if 0 <= bytes.IndexByte(infoTokens, lex.ItemSemicolon) {
 		// info 部分不能包含 ;
 		return
 	}
@@ -114,11 +114,7 @@ func (t *Tree) parseCustomBlock() (ok bool, fenceOffset int, info string) {
 }
 
 func (context *Context) isCustomBlockClose(tokens []byte) (ok bool) {
-	closeMarker := tokens[0]
-	if closeMarker != lex.ItemSemicolon {
-		return false
-	}
-	if 3 > lex.Accept(tokens, closeMarker) {
+	if 1 > len(tokens) {
 		return false
 	}
 	tokens = lex.TrimWhitespace(tokens)
@@ -130,10 +126,5 @@ func (context *Context) isCustomBlockClose(tokens []byte) (ok bool) {
 			context.Tip.Tokens = append(context.Tip.Tokens, editor.CaretTokens...)
 		}
 	}
-	for _, token := range tokens {
-		if token != lex.ItemSemicolon {
-			return false
-		}
-	}
-	return true
+	return bytes.Equal(tokens, []byte(";;;"))
 }

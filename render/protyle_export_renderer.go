@@ -201,11 +201,8 @@ func (r *ProtyleExportRenderer) renderCallout(node *ast.Node, entering bool) ast
 func (r *ProtyleExportRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.Tag("div", [][]string{
-			{"data-type", "NodeCustomBlock"},
-			{"data-info", node.CustomBlockInfo},
-			{"data-content", string(html.EscapeHTML(node.Tokens))},
-		}, false)
+		r.Tag("div", customBlockAttrs(node), false)
+		r.renderCustomBlockFallback(node)
 		r.WriteString("</div>")
 		r.Newline()
 	}

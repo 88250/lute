@@ -406,6 +406,8 @@ type Options struct {
 	ImgPathAllowSpace bool
 	// SuperBlock 设置是否支持超级块。 https://github.com/88250/lute/issues/111
 	SuperBlock bool
+	// CustomBlock 设置是否支持自定义块。 https://github.com/siyuan-note/siyuan/issues/8418
+	CustomBlock bool
 	// Sup 设置是否打开 ^上标^ 支持。
 	Sup bool
 	// Sub 设置是否打开 ~下标~ 支持。
@@ -488,6 +490,7 @@ func NewOptions() *Options {
 		IndentCodeBlock:   true,
 		DataImage:         true,
 		Callout:           false,
+		CustomBlock:       false,
 	}
 }
 

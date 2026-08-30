@@ -219,13 +219,12 @@ func (r *ProtyleRenderer) renderCallout(node *ast.Node, entering bool) ast.WalkS
 
 func (r *ProtyleRenderer) renderCustomBlock(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		attrs := [][]string{
-			{"data-type", "NodeCustomBlock"},
-			{"data-info", node.CustomBlockInfo},
-			{"data-content", string(html.EscapeHTML(node.Tokens))},
-		}
+		attrs := append([][]string{{"contenteditable", "false"}}, customBlockDataAttrs(node)...)
 		r.blockNodeAttrs(node, &attrs, "custom-block")
 		r.Tag("div", attrs, false)
+		r.Tag("div", [][]string{{"class", "custom-block__content"}}, false)
+		r.renderCustomBlockFallback(node)
+		r.WriteString("</div>")
 		r.renderIAL(node)
 		r.WriteString("</div>")
 	}
