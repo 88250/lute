@@ -1149,6 +1149,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Code:
+		removeDOMComments(n)
 		if nil == n.FirstChild {
 			return
 		}
@@ -2172,6 +2173,18 @@ func codeTextOnly(n *html.Node) bool {
 		}
 	}
 	return true
+}
+
+func removeDOMComments(n *html.Node) {
+	for child := n.FirstChild; nil != child; {
+		next := child.NextSibling
+		if html.CommentNode == child.Type {
+			child.Unlink()
+		} else {
+			removeDOMComments(child)
+		}
+		child = next
+	}
 }
 
 func appendInlineMath(tree *parse.Tree, tex string) {

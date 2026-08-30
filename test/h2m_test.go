@@ -18,6 +18,11 @@ import (
 
 var html2MdTests = []parseTest{
 
+	{"271", `<code><!--x--><span>text<img src="npm.svg" alt="npm"> install</span><!--y--></code>`, "`<span>text<img src=\"npm.svg\" alt=\"npm\"/> install</span>`\n"},
+	{"270", "<code>&lt;!--x--&gt;visible&lt;!--y--&gt;</code>", "`<!--x-->visible<!--y-->`\n"},
+	{"269", "<pre><code><!--x-->visible<!--y--></code></pre>", "```\nvisible\n```\n"},
+	{"268", "<code><span><!--x-->visible<!--y--></span></code>", "`visible`\n"},
+	{"267", "<code><!--x-->visible<!--y--></code>", "`visible`\n"},
 	{"266", `<p>before</p><pre><div class="relative"><div class="cm-announced">ignored</div><div class="cm-content" data-language="go"><div class="cm-lineNumbers">ignored</div><div class="cm-line"><span class="token">package</span> main</div><div class="cm-line"><br></div><div class="cm-line">if a &lt; b &amp;&amp; c &gt; d {}</div></div></div></pre><p>after</p>`, "before\n\n```go\npackage main\n\nif a < b && c > d {}\n```\n\nafter\n"},
 	{"265", "<table><caption style=\"color: red; caption-side: BOTTOM !important\"><strong>A &amp; B</strong></caption><tr><td colspan=\"2\">Wide</td><td>C</td></tr><tr><td>D</td><td>E</td><td>F</td></tr></table>", "| {: colspan=\"2\"}Wide | {: class=\"fn__none\"} | C |\n| --------------------- | ---------------------- | --- |\n| D                   | E                    | F |\n{: caption=\"&amp;lt;caption contenteditable=&amp;quot;false&amp;quot; style=&amp;quot;caption-side: bottom;&amp;quot;&amp;gt;A &amp;amp;amp; B&amp;lt;/caption&amp;gt;\"}\n"},
 	{"264", "<table style=\"width: 999px\"><caption style=\"font-size: 32px\">元音</caption><colgroup><col style=\"width: 74px\"><col><col></colgroup><tr><td></td><td colspan=\"2\">前</td></tr><tr><td>出位</td><td>ʑ̩</td><td>ʑ̩ʷ</td></tr></table>", "|      | {: colspan=\"2\"}前 | {: class=\"fn__none\"} |\n| ------ | ------------------- | ---------------------- |\n| 出位 | ʑ̩              | ʑ̩ ʷ              |\n{: caption=\"&amp;lt;caption contenteditable=&amp;quot;false&amp;quot;&amp;gt;元音&amp;lt;/caption&amp;gt;\"}\n"},

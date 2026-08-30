@@ -252,6 +252,9 @@ func domText0(n *html.Node, buffer *bytes.Buffer) {
 	if nil == n {
 		return
 	}
+	if html.CommentNode == n.Type {
+		return
+	}
 
 	if dataRender := DomAttrValue(n, "data-render"); "1" == dataRender || "2" == dataRender {
 		return
