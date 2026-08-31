@@ -411,7 +411,9 @@ func (t *Tree) scanDelims(ctx *InlineContext, marker []byte, typ byte,
 
 	if t.Context.ParseOption.ProtyleWYSIWYG {
 		// Markdown 中 ** 加粗失效问题 https://ld246.com/article/1597581380183
-		afterIsPunct, beforeIsPunct = false, false
+		if lex.ItemCrosshatch != typ {
+			afterIsPunct, beforeIsPunct = false, false
+		}
 
 		// _foo_ 优化 https://github.com/siyuan-note/siyuan/issues/17769
 		if lex.ItemUnderscore == typ && editor.Caret == string(tokenBefore) {
