@@ -1170,7 +1170,9 @@ func (r *ProtyleExportRenderer) renderTableHead(node *ast.Node, entering bool) a
 		r.Tag("thead", nil, false)
 	} else {
 		r.Tag("/thead", nil, false)
-		r.Tag("tbody", nil, false)
+		if nil != node.Next {
+			r.Tag("tbody", nil, false)
+		}
 	}
 	return ast.WalkContinue
 }
@@ -1226,7 +1228,9 @@ func (r *ProtyleExportRenderer) renderTable(node *ast.Node, entering bool) ast.W
 		r.Tag("table", attrs, false)
 	} else {
 		if !isHtmlTable {
-			r.Tag("/tbody", nil, false)
+			if nil != node.FirstChild.Next {
+				r.Tag("/tbody", nil, false)
+			}
 			r.Tag("/table", nil, false)
 		}
 

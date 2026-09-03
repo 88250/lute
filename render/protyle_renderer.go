@@ -1237,7 +1237,9 @@ func (r *ProtyleRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wal
 		r.Tag("thead", nil, false)
 	} else {
 		r.Tag("/thead", nil, false)
-		r.Tag("tbody", nil, false)
+		if nil != node.Next {
+			r.Tag("tbody", nil, false)
+		}
 	}
 	return ast.WalkContinue
 }
@@ -1265,7 +1267,9 @@ func (r *ProtyleRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSta
 			r.WriteString(html.UnescapeHTMLStr(caption))
 		}
 	} else {
-		r.Tag("/tbody", nil, false)
+		if nil != node.FirstChild.Next {
+			r.Tag("/tbody", nil, false)
+		}
 		r.Tag("/table", nil, false)
 		r.WriteString("<div class=\"protyle-action__table\"><div class=\"table__resize\"></div><div class=\"table__select\"></div></div>")
 		r.Tag("/div", nil, false)

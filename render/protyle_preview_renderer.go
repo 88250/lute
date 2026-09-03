@@ -952,7 +952,9 @@ func (r *ProtylePreviewRenderer) renderTableHead(node *ast.Node, entering bool) 
 		r.Tag("thead", nil, false)
 	} else {
 		r.Tag("/thead", nil, false)
-		r.Tag("tbody", nil, false)
+		if nil != node.Next {
+			r.Tag("tbody", nil, false)
+		}
 	}
 	return ast.WalkContinue
 }
