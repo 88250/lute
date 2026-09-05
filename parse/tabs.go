@@ -173,7 +173,7 @@ func (context *Context) tabsFinalize(node *ast.Node) {
 		node.InsertAfter(&ast.Node{Type: ast.NodeKramdownBlockIAL, Tokens: IAL2Tokens(node.KramdownIAL), Close: true})
 	}
 	for child := node.FirstChild; nil != child; child = child.Next {
-		if child.IsBlock() && ast.NodeKramdownBlockIAL != child.Type {
+		if child.IsBlock() && ast.NodeKramdownBlockIAL != child.Type && !child.IsTabTitleBlock() {
 			return
 		}
 	}

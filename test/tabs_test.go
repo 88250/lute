@@ -104,7 +104,7 @@ func TestTabItemFragmentAndExport(t *testing.T) {
 		t.Fatalf("item=%q title=%q body=%q", items[0].ID, items[0].TabItemTitle, items[0].FirstChild.ID)
 	}
 	md := l.BlockDOM2StdMd(dom)
-	if strings.Contains(md, "::: tabs") || strings.Contains(md, "@tab") || !strings.Contains(md, "**Title**") || !strings.Contains(md, "Body") {
+	if !strings.Contains(md, "::: tabs") || !strings.Contains(md, "@tab") || !strings.Contains(md, "**Title**") || !strings.Contains(md, "Body") {
 		t.Fatal(md)
 	}
 }
@@ -124,8 +124,8 @@ func TestTabsHTMLAndEmptyInput(t *testing.T) {
 	if strings.Contains(html, "contenteditable") || strings.Contains(html, "display: none") {
 		t.Fatal("HTML must work without enhancement")
 	}
-	if strings.Contains(l.BlockDOM2StdMd(l.Md2BlockDOM(md, false)), "::: tabs") {
-		t.Fatal("standard markdown contains fences")
+	if !strings.Contains(l.BlockDOM2StdMd(l.Md2BlockDOM(md, false)), "::: tabs") {
+		t.Fatal("clipboard markdown lost fences")
 	}
 }
 

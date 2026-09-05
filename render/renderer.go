@@ -39,6 +39,7 @@ type Renderer interface {
 
 // Options 描述了渲染选项。
 type Options struct {
+	TabsMarkdown bool // 剪贴板保留页签结构，文件导出默认平铺。
 	// SoftBreak2HardBreak 设置是否将软换行（\n）渲染为硬换行（<br />）。
 	SoftBreak2HardBreak bool
 	// AutoSpace 设置是否对普通文本中的中西文间自动插入空格。

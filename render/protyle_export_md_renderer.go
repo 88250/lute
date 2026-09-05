@@ -28,6 +28,7 @@ import (
 type ProtyleExportMdRenderer struct {
 	*BaseRenderer
 	NodeWriterStack []*bytes.Buffer
+	tabsFormatter   *FormatRenderer
 }
 
 func NewProtyleExportMdRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *ProtyleExportMdRenderer {
@@ -1506,6 +1507,9 @@ func (r *ProtyleExportMdRenderer) renderDocument(node *ast.Node, entering bool) 
 }
 
 func (r *ProtyleExportMdRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
+	if r.Options.TabsMarkdown && node != r.Tree.Root && node.IsTabTitleBlock() {
+		return ast.WalkSkipChildren
+	}
 	if entering {
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
 			if !r.ParagraphContainImgOnly(node) {

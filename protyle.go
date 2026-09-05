@@ -224,6 +224,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 
 	// DOM 转 AST
 	tree := lute.BlockDOM2Tree(htmlStr)
+	wrapTabItemFragments(tree)
 	removeBlockDOMZwsp(tree)
 
 	// 将 kramdown IAL 节点内容置空
@@ -244,6 +245,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	options.KramdownBlockIAL = true
 	options.KramdownSpanIAL = true
 	options.KeepParagraphBeginningSpace = true
+	options.TabsMarkdown = true
 	options.UnorderedListMarker = lute.RenderOptions.UnorderedListMarker
 	renderer := render.NewProtyleExportMdRenderer(tree, options, lute.ParseOptions)
 	formatted := renderer.Render()
@@ -1220,6 +1222,16 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+		if ast.NodeTabItem == dataType {
+			if info := directDOMChildByClass(n, "tab-item-info"); nil != info {
+				for child := info.FirstChild; nil != child; child = child.NextSibling {
+					if "NodeParagraph" == util.DomAttrValue(child, "data-type") && "true" == util.DomAttrValue(child, "tabs-title") {
+						lute.genASTByBlockDOM(child, tree)
+						break
+					}
+				}
+			}
+		}
 	case ast.NodeBlockQueryEmbed:
 		node.Type = ast.NodeBlockQueryEmbed
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
@@ -2435,7 +2447,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	node.SetIALAttr("id", node.ID)
-	for _, name := range []string{"tabs-active-id", "tabs-position"} {
+	for _, name := range []string{"tabs-active-id", "tabs-position", "tabs-title", "tabs-placeholder"} {
 		if value := util.DomAttrValue(n, name); "" != value {
 			node.SetIALAttr(name, value)
 			ialTokens = append(ialTokens, []byte(" "+name+"=\""+value+"\"")...)

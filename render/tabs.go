@@ -28,7 +28,7 @@ func (r *FormatRenderer) renderTabs(node *ast.Node, entering bool) ast.WalkStatu
 	if "" != node.ID && node.ParentIs(ast.NodeTabs) && node.ID == node.Parent.IALAttr("tabs-active-id") {
 		r.WriteString(":active")
 	}
-	if "" != node.TabItemTitle {
+	if nil == node.TabTitleBlock() && "" != node.TabItemTitle {
 		r.WriteString(" " + strings.ReplaceAll(strings.ReplaceAll(node.TabItemTitle, "\r", " "), "\n", " "))
 	}
 	r.Newline()
@@ -131,7 +131,34 @@ func isTabsParagraphMarker(line []byte) bool {
 
 func (r *ProtyleExportMdRenderer) renderTabs(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
-	if entering && ast.NodeTabItem == node.Type && "" != node.TabItemTitle {
+	if r.Options.TabsMarkdown {
+		if ast.NodeTabs == node.Type {
+			if nil == r.tabsFormatter {
+				r.tabsFormatter = NewFormatRenderer(r.Tree, r.Options, r.ParseOptions)
+			}
+			r.WriteString(strings.Repeat(":", r.tabsFormatter.tabsFenceLength(node)))
+			if entering {
+				r.WriteString(" tabs")
+			}
+			r.WriteString("\n\n")
+		} else if entering {
+			r.WriteString("@tab")
+			if node.ParentIs(ast.NodeTabs) && "" != node.ID && node.ID == node.Parent.IALAttr("tabs-active-id") {
+				r.WriteString(":active")
+			}
+			title := calloutInlineTree(node.TabItemTitle, r.ParseOptions)
+			if paragraph := node.TabTitleBlock(); nil != paragraph {
+				title = &parse.Tree{Root: paragraph}
+			}
+			text := strings.TrimSpace(string(NewProtyleExportMdRenderer(title, r.Options, r.ParseOptions).Render()))
+			if "" != text {
+				r.WriteString(" " + strings.ReplaceAll(strings.ReplaceAll(text, "\r", " "), "\n", " "))
+			}
+			r.WriteString("\n\n")
+		}
+		return ast.WalkContinue
+	}
+	if entering && ast.NodeTabItem == node.Type && nil == node.TabTitleBlock() && "" != node.TabItemTitle {
 		title := calloutInlineTree(node.TabItemTitle, r.ParseOptions)
 		parse.TextMarks2Inlines(title)
 		r.Write(NewProtyleExportMdRenderer(title, r.Options, r.ParseOptions).Render())
@@ -151,6 +178,10 @@ func (r *ProtyleRenderer) renderTabs(node *ast.Node, entering bool) ast.WalkStat
 		r.Tag("div", attrs, false)
 		if ast.NodeTabs == node.Type {
 			r.WriteString("<div class=\"tabs-header protyle-action\" contenteditable=\"false\"></div>")
+		} else if title := node.TabTitleBlock(); nil != title {
+			r.WriteString("<div class=\"tab-item-info callout-info\" contenteditable=\"false\">")
+			r.Write(NewProtyleRenderer(&parse.Tree{Root: title}, r.Options, r.ParseOptions).Render())
+			r.WriteString("</div><div class=\"tab-item-content\">")
 		} else {
 			r.WriteString("<div class=\"tab-item-info callout-info\" contenteditable=\"false\"><span class=\"tab-item-title callout-title\" contenteditable=\"true\" spellcheck=\"")
 			r.WriteString(strconv.FormatBool(r.Options.Spellcheck))
@@ -187,6 +218,10 @@ func (r *BaseRenderer) renderTabsHTML(node *ast.Node, entering bool) ast.WalkSta
 		r.Tag("div", attrs, false)
 		if ast.NodeTabs == node.Type {
 			r.WriteString("<div class=\"tabs-header protyle-action\"></div>")
+		} else if title := node.TabTitleBlock(); nil != title {
+			r.WriteString("<div class=\"tab-item-info callout-info\"><div class=\"tab-item-title callout-title\">")
+			r.Write(NewHtmlRenderer(&parse.Tree{Root: title}, r.Options, r.ParseOptions).Render())
+			r.WriteString("</div></div><div class=\"tab-item-content\">")
 		} else {
 			r.WriteString("<div class=\"tab-item-info callout-info\"><span class=\"tab-item-title callout-title\">")
 			r.Write(NewHtmlRenderer(calloutInlineTree(node.TabItemTitle, r.ParseOptions), r.Options, r.ParseOptions).Render())
@@ -204,7 +239,7 @@ func (r *BaseRenderer) renderTabsHTML(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *BaseRenderer) renderTabsDocx(node *ast.Node, entering bool) ast.WalkStatus {
 	r.Newline()
-	if entering && ast.NodeTabItem == node.Type && "" != node.TabItemTitle {
+	if entering && ast.NodeTabItem == node.Type && nil == node.TabTitleBlock() && "" != node.TabItemTitle {
 		r.WriteString("<p>")
 		r.Write(NewHtmlRenderer(calloutInlineTree(node.TabItemTitle, r.ParseOptions), r.Options, r.ParseOptions).Render())
 		r.WriteString("</p>\n")

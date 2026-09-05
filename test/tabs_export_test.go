@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/88250/lute/parse"
+	"github.com/88250/lute/render"
 )
 
 func TestTabsStandardExportLiteralFences(t *testing.T) {
@@ -24,7 +25,7 @@ func TestTabsStandardExportLiteralFences(t *testing.T) {
 					// 模拟编辑器中没有转义标记节点的普通文字。
 					dom = strings.ReplaceAll(dom, `<span data-type="backslash">:</span>`, ":")
 				}
-				exported := l.BlockDOM2StdMd(dom)
+				exported := string(render.NewProtyleExportMdRenderer(l.BlockDOM2Tree(dom), render.NewOptions(), l.ParseOptions).Render())
 				if !strings.Contains(exported, "\\::: tabs") || strings.Contains(exported, "\\\\::: tabs") {
 					t.Fatalf("literal fence must be escaped exactly once\n%s", exported)
 				}

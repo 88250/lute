@@ -1579,11 +1579,17 @@ func (r *ProtyleRenderer) renderDocument(node *ast.Node, entering bool) ast.Walk
 }
 
 func (r *ProtyleRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
+	if node != r.Tree.Root && node.IsTabTitleBlock() {
+		return ast.WalkSkipChildren
+	}
 	if entering {
 		var attrs [][]string
 		r.blockNodeAttrs(node, &attrs, "p")
 		r.Tag("div", attrs, false)
 		attrs = [][]string{}
+		if "true" == node.IALAttr("tabs-title") {
+			attrs = append(attrs, []string{"class", "tab-item-title callout-title"})
+		}
 		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
 		r.Tag("div", attrs, false)

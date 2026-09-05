@@ -1212,6 +1212,9 @@ func (r *HtmlRenderer) renderDocument(node *ast.Node, entering bool) ast.WalkSta
 }
 
 func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
+	if node != r.Tree.Root && node.IsTabTitleBlock() {
+		return ast.WalkSkipChildren
+	}
 	if grandparent := node.Parent.Parent; nil != grandparent && ast.NodeList == grandparent.Type && grandparent.ListData.Tight { // List.ListItem.Paragraph
 		return ast.WalkContinue
 	}

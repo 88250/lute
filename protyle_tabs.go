@@ -52,6 +52,14 @@ func (lute *Lute) genASTByTabsDOM(dom *html.Node, tree *parse.Tree) bool {
 	tree.Context.Tip.AppendChild(node)
 	tree.Context.Tip = node
 	if ast.NodeTabItem == node.Type {
+		if info := directDOMChildByClass(dom, "tab-item-info"); nil != info {
+			for child := info.FirstChild; nil != child; child = child.NextSibling {
+				if "true" == util.DomAttrValue(child, "tabs-title") {
+					lute.genASTByBlockDOM(child, tree)
+					break
+				}
+			}
+		}
 		if content := directDOMChildByClass(dom, "tab-item-content"); nil != content {
 			for child := content.FirstChild; nil != child; child = child.NextSibling {
 				lute.genASTByDOM(child, tree)

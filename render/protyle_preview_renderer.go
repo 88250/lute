@@ -1257,6 +1257,9 @@ func (r *ProtylePreviewRenderer) renderDocument(node *ast.Node, entering bool) a
 }
 
 func (r *ProtylePreviewRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkStatus {
+	if node != r.Tree.Root && node.IsTabTitleBlock() {
+		return ast.WalkSkipChildren
+	}
 	if entering {
 		r.Newline()
 		var attrs [][]string
