@@ -36,10 +36,12 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	}()
 
 	blockDOMTree := lute.BlockDOM2Tree(ivHTML)
+	tabFragments := wrapTabItemFragments(blockDOMTree)
 	normalizeSpinCaretNewline(blockDOMTree)
 	markdown := lute.blockDOMTree2Md(blockDOMTree)
 	markdown = strings.ReplaceAll(markdown, editor.Zwsp, "")
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
+	unwrapTabItemFragments(tree, tabFragments)
 
 	firstChild := tree.Root.FirstChild
 	lastChildMaybeIAL := tree.Root.LastChild.Previous
@@ -979,6 +981,7 @@ func (lute *Lute) blockDOM2Md(htmlStr string) (markdown string) {
 }
 
 func (lute *Lute) blockDOMTree2Md(tree *parse.Tree) (markdown string) {
+	wrapTabItemFragments(tree)
 
 	// 将 AST 进行 Markdown 格式化渲染
 	options := render.NewOptions()
@@ -1110,7 +1113,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		return
 	}
 
-	if "protyle-attr" == class || "callout-info" == class ||
+	if "protyle-attr" == class || "callout-info" == class || hasDOMClass(n, "tab-item-info") ||
 		strings.Contains(class, "__copy") ||
 		strings.Contains(class, "sb__resize") ||
 		strings.Contains(class, "protyle-linenumber__rows") ||
@@ -1176,6 +1179,23 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 	}
 
 	switch dataType {
+	case ast.NodeTabs, ast.NodeTabItem:
+		node.Type = dataType
+		if ast.NodeTabItem == dataType {
+			info := directDOMChildByClass(n, "tab-item-info")
+			if nil != info {
+				if title := directDOMChildByClass(info, "tab-item-title"); nil != title {
+					var titleDOM bytes.Buffer
+					for child := title.FirstChild; nil != child; child = child.NextSibling {
+						titleDOM.Write(util.DomHTML(child))
+					}
+					node.TabItemTitle = strings.TrimSpace(lute.BlockDOM2Md(titleDOM.String()))
+				}
+			}
+		}
+		tree.Context.Tip.AppendChild(node)
+		tree.Context.Tip = node
+		defer tree.Context.ParentTip()
 	case ast.NodeBlockQueryEmbed:
 		node.Type = ast.NodeBlockQueryEmbed
 		node.AppendChild(&ast.Node{Type: ast.NodeOpenBrace})
@@ -1472,7 +1492,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	default:
-		if "callout-content" == class {
+		if "callout-content" == class || hasDOMClass(n, "tab-item-content") {
 			break
 		}
 
@@ -2391,6 +2411,12 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 
 func (lute *Lute) setBlockIAL(n *html.Node, node *ast.Node) (ialTokens []byte) {
 	node.SetIALAttr("id", node.ID)
+	for _, name := range []string{"tabs-active-id", "tabs-position"} {
+		if value := util.DomAttrValue(n, name); "" != value {
+			node.SetIALAttr(name, value)
+			ialTokens = append(ialTokens, []byte(" "+name+"=\""+value+"\"")...)
+		}
+	}
 
 	if caption := util.DomAttrValue(n, "caption"); "" != caption {
 		node.SetIALAttr("caption", caption)

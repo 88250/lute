@@ -146,6 +146,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			!lex.IsDigit(maybeMarker) && // 有序列表
 			lex.ItemBacktick != maybeMarker && lex.ItemTilde != maybeMarker && // 代码块
 			lex.ItemSemicolon != maybeMarker && // 定义块
+			lex.ItemColon != maybeMarker && // 页签容器
 			lex.ItemCrosshatch != maybeMarker && // ATX 标题
 			lex.ItemGreater != maybeMarker && // 引述
 			lex.ItemLess != maybeMarker && // HTML 块
@@ -164,6 +165,9 @@ func (t *Tree) incorporateLine(line []byte) {
 		i := 0
 		for i < startsLen {
 			res := blockParsers[i](t, container)
+			if res == 3 {
+				return
+			}
 			if res == 1 { // 匹配到容器块，继续迭代下降过程
 				container = t.Context.Tip
 				break

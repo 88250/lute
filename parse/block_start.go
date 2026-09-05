@@ -22,6 +22,7 @@ var blockStartsFuncs []blockStartFunc
 func init() {
 	blockStartsFuncs = []blockStartFunc{
 		GitConflictStart,
+		TabsStart,
 		CalloutStart,
 		BlockquoteStart,
 		ATXHeadingStart,

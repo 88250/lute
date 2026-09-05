@@ -285,6 +285,8 @@ func (context *Context) finalize(block *ast.Node) {
 		context.customBlockFinalize(block)
 	case ast.NodeCallout:
 		context.calloutFinalize(block)
+	case ast.NodeTabs, ast.NodeTabItem:
+		context.tabsFinalize(block)
 	case ast.NodeBlockquote:
 		context.blockquoteFinalize(block)
 	}
@@ -302,6 +304,12 @@ func (context *Context) addChildMarker(nodeType ast.NodeType, tokens []byte) (re
 // addChild 将构造一个 NodeType 节点并作为子节点添加到末梢节点 context.Tip 上。如果末梢不能接受子节点（非块级容器不能添加子节点），则最终化该末梢
 // 节点并向父节点方向尝试，直到找到一个能接受该子节点的节点为止。添加完成后该子节点会被设置为新的末梢节点。
 func (context *Context) addChild(nodeType ast.NodeType) (ret *ast.Node) {
+	if ast.NodeTabs == context.Tip.Type && !context.Tip.CanContain(nodeType) {
+		// 没有页签项标记的正文归入空标题页，避免容错解析将内容移出容器。
+		item := &ast.Node{Type: ast.NodeTabItem}
+		context.Tip.AppendChild(item)
+		context.Tip = item
+	}
 	for !context.Tip.CanContain(nodeType) {
 		context.finalize(context.Tip) // 注意调用 finalize 会向父节点方向进行迭代
 	}
@@ -445,6 +453,9 @@ type Options struct {
 	HTML2MarkdownAttrs []string
 	// Callout 设置是否开启提示块支持。
 	Callout bool
+
+	// Tabs 设置是否开启页签容器支持。
+	Tabs bool
 	// KeepEscaped 设置是否保留转义内容（不进行反转义）。
 	KeepEscaped bool
 	// ArbitraryTaskListItemMarker 设置是否打开"任务列表任意标记符"支持。

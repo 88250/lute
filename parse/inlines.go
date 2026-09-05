@@ -47,7 +47,8 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 		tokens := node.Tokens
 		if ast.NodeParagraph == typ {
 			if nil == tokens && nil == node.FirstChild {
-				if ast.NodeListItem != node.Parent.Type || t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV {
+				if ast.NodeTabItem != node.Parent.Type && (ast.NodeListItem != node.Parent.Type ||
+					t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV) {
 					// 解析 GFM 表节点后段落内容 Tokens 可能会被置换为空，具体可参看函数 Paragraph.Finalize()
 					// 在这里从语法树上移除空段落节点
 					next := node.Next

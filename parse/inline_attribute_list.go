@@ -43,7 +43,8 @@ func IALStart(t *Tree, container *ast.Node) int {
 
 		lastMatchedContainer := t.Context.lastMatchedContainer
 		if t.Context.allClosed {
-			if ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type || ast.NodeBlockquote == lastMatchedContainer.Type || ast.NodeCallout == lastMatchedContainer.Type || ast.NodeSuperBlock == lastMatchedContainer.Type {
+			if ast.NodeDocument == lastMatchedContainer.Type || ast.NodeListItem == lastMatchedContainer.Type || ast.NodeBlockquote == lastMatchedContainer.Type || ast.NodeCallout == lastMatchedContainer.Type || ast.NodeSuperBlock == lastMatchedContainer.Type ||
+				ast.NodeTabs == lastMatchedContainer.Type || ast.NodeTabItem == lastMatchedContainer.Type {
 				lastMatchedContainer = t.Context.Tip.LastChild // 挂到最后一个子块上
 				if nil == lastMatchedContainer {
 					lastMatchedContainer = t.Context.lastMatchedContainer
@@ -64,8 +65,9 @@ func IALStart(t *Tree, container *ast.Node) int {
 					lastMatchedContainer.InsertAfter(p)
 					t.Context.Tip = p
 					lastMatchedContainer = p
-				} else if ast.NodeDocument == lastMatchedContainer.Type {
-					// 第一个节点是 IAL 的话需要保留空段落
+				} else if ast.NodeDocument == lastMatchedContainer.Type ||
+					(ast.NodeTabItem == lastMatchedContainer.Type && !lastMatchedContainer.Close) {
+					// 文档或页签正文的第一个节点是 IAL 时，保留带有该属性的空段落。
 					p := &ast.Node{Type: ast.NodeParagraph, Tokens: []byte(" ")}
 					lastMatchedContainer.AppendChild(p)
 					t.Context.Tip = p

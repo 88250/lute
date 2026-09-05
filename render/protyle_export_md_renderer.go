@@ -166,6 +166,8 @@ func NewProtyleExportMdRenderer(tree *parse.Tree, options *Options, parseOptions
 	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
 	ret.RendererFuncs[ast.NodeCustomBlock] = ret.renderCustomBlock
 	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
+	ret.RendererFuncs[ast.NodeTabs] = ret.renderTabs
+	ret.RendererFuncs[ast.NodeTabItem] = ret.renderTabs
 	return ret
 }
 

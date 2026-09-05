@@ -148,6 +148,7 @@ type Node struct {
 	CalloutType          string `json:",omitempty"` // 提示块类型
 	CalloutTitle         string `json:",omitempty"` // 提示块标题
 	CalloutTitleExplicit bool   `json:",omitempty"` // 是否显式设置提示块标题
+	TabItemTitle         string `json:",omitempty"` // 页签项标题，保存行级 Markdown
 	CalloutIcon          string `json:",omitempty"` // 提示块图标
 	CalloutIconType      int    `json:",omitempty"` // 提示块图标类型，0：Emoji Unicode，1：自定义图标
 }
@@ -954,7 +955,7 @@ func (n *Node) IsBlock() bool {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter,
 		NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget,
-		NodeAttributeView, NodeCustomBlock, NodeCallout:
+		NodeAttributeView, NodeCustomBlock, NodeCallout, NodeTabs, NodeTabItem:
 		return true
 	}
 	return false
@@ -963,7 +964,8 @@ func (n *Node) IsBlock() bool {
 // IsContainerBlock 判断 n 是否为容器块。
 func (n *Node) IsContainerBlock() bool {
 	switch n.Type {
-	case NodeDocument, NodeBlockquote, NodeList, NodeListItem, NodeFootnotesDefBlock, NodeFootnotesDef, NodeSuperBlock, NodeCallout:
+	case NodeDocument, NodeBlockquote, NodeList, NodeListItem, NodeFootnotesDefBlock, NodeFootnotesDef, NodeSuperBlock, NodeCallout,
+		NodeTabs, NodeTabItem:
 		return true
 	}
 	return false
@@ -1009,7 +1011,14 @@ func (n *Node) AcceptLines() bool {
 // CanContain 判断是否能够包含 NodeType 指定类型的节点。 比如列表节点（块级容器）只能包含列表项节点，
 // 引述节点（块级容器）可以包含任意节点；段落节点（叶子块节点）不能包含任何其他块级节点。
 func (n *Node) CanContain(nodeType NodeType) bool {
+	if NodeTabItem == nodeType {
+		return NodeTabs == n.Type
+	}
 	switch n.Type {
+	case NodeTabs:
+		return NodeKramdownBlockIAL == nodeType
+	case NodeTabItem:
+		return NodeDocument != nodeType && NodeListItem != nodeType && NodeFootnotesDef != nodeType
 	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter,
 		NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio, NodeAttributeView, NodeCustomBlock:
 		return false
@@ -1276,6 +1285,9 @@ const (
 	// 提示块 https://github.com/88250/lute/issues/203
 
 	NodeCallout NodeType = 580 // 提示块
+
+	NodeTabs    NodeType = 590 // 页签容器
+	NodeTabItem NodeType = 591 // 页签项
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

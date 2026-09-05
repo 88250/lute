@@ -167,6 +167,8 @@ func NewHtmlRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Opt
 	ret.RendererFuncs[ast.NodeAttributeView] = ret.renderAttributeView
 	ret.RendererFuncs[ast.NodeCustomBlock] = ret.renderCustomBlock
 	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
+	ret.RendererFuncs[ast.NodeTabs] = ret.renderTabsHTML
+	ret.RendererFuncs[ast.NodeTabItem] = ret.renderTabsHTML
 	return ret
 }
 

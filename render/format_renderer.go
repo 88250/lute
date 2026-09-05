@@ -171,6 +171,8 @@ func NewFormatRenderer(tree *parse.Tree, options *Options, parseOptions *parse.O
 	ret.RendererFuncs[ast.NodeHTMLTagOpen] = ret.renderHTMLTagOpen
 	ret.RendererFuncs[ast.NodeHTMLTagClose] = ret.renderHTMLTagClose
 	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
+	ret.RendererFuncs[ast.NodeTabs] = ret.renderTabs
+	ret.RendererFuncs[ast.NodeTabItem] = ret.renderTabs
 	return ret
 }
 

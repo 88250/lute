@@ -663,6 +663,10 @@ func (lute *Lute) SetCallout(b bool) {
 	lute.ParseOptions.Callout = b
 }
 
+func (lute *Lute) SetTabs(b bool) {
+	lute.ParseOptions.Tabs = b
+}
+
 func (lute *Lute) SetEnsureListItemParagraph(b bool) {
 	lute.ParseOptions.EnsureListItemParagraph = b
 }

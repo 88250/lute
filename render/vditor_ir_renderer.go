@@ -65,6 +65,8 @@ func NewVditorIRRenderer(tree *parse.Tree, options *Options, parseOptions *parse
 	ret.RendererFuncs[ast.NodeBlockquote] = ret.renderBlockquote
 	ret.RendererFuncs[ast.NodeBlockquoteMarker] = ret.renderBlockquoteMarker
 	ret.RendererFuncs[ast.NodeCallout] = ret.renderCallout
+	ret.RendererFuncs[ast.NodeTabs] = ret.renderTabsHTML
+	ret.RendererFuncs[ast.NodeTabItem] = ret.renderTabsHTML
 	ret.RendererFuncs[ast.NodeHeading] = ret.renderHeading
 	ret.RendererFuncs[ast.NodeHeadingC8hMarker] = ret.renderHeadingC8hMarker
 	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
