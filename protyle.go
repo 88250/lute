@@ -1063,7 +1063,8 @@ func normalizeSpinCaretNewline(tree *parse.Tree) {
 
 			content := child.TokensStr()
 			if nil == child.Previous && strings.HasPrefix(content, editor.Caret+"\n") &&
-				spinHasContentAfter(child, content, len(editor.Caret)+1) {
+				spinHasContentAfter(child, content, len(editor.Caret)+1) &&
+				!spinStartsTabsFence(content[len(editor.Caret)+1:]) {
 				content = editor.Caret + content[len(editor.Caret)+1:]
 			}
 
@@ -1074,7 +1075,7 @@ func normalizeSpinCaretNewline(tree *parse.Tree) {
 				}
 				index += offset
 				after := index + len("\n"+editor.Caret+"\n")
-				if spinHasContentAfter(child, content, after) {
+				if spinHasContentAfter(child, content, after) && !spinStartsTabsFence(content[after:]) {
 					content = content[:index] + "\n\n" + editor.Caret + content[after:]
 					offset = index + len("\n\n"+editor.Caret)
 				} else {
@@ -1085,6 +1086,15 @@ func normalizeSpinCaretNewline(tree *parse.Tree) {
 		}
 		return ast.WalkSkipChildren
 	})
+}
+
+func spinStartsTabsFence(content string) bool {
+	if index := strings.IndexByte(content, '\n'); 0 <= index {
+		content = content[:index]
+	}
+	content = strings.TrimSpace(content)
+	return ":::" == content || ":::tabs" == content || ":::tab" == content ||
+		strings.HasPrefix(content, ":::tab ") || strings.HasPrefix(content, ":::tab\t")
 }
 
 func spinHasContentAfter(node *ast.Node, content string, offset int) bool {

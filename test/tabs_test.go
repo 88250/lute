@@ -137,3 +137,21 @@ func TestTabsEmptyParagraphIDs(t *testing.T) {
 		dom = l.SpinBlockDOM(dom)
 	}
 }
+
+func TestTabsSlashPreset(t *testing.T) {
+	l := tabsEngine()
+	markdown := ":::tabs\n:::tab\n‸\n:::\n:::tab\n\n:::\n:::\n"
+	dom := l.Md2BlockDOM(markdown, false)
+	if strings.Contains(dom, ":::") {
+		t.Fatal(dom)
+	}
+	tabs, items := tabNodes(l.BlockDOM2Tree(dom).Root)
+	if len(tabs) != 1 || len(items) != 2 || nil == items[0].FirstChild || nil == items[1].FirstChild {
+		t.Fatalf("tabs=%d items=%d\n%s", len(tabs), len(items), dom)
+	}
+	paragraph := `<div data-node-id="20260905134000-paragraph" data-type="NodeParagraph" class="p"><div contenteditable="true">` + markdown + `</div><div class="protyle-attr" contenteditable="false"></div></div>`
+	spun := l.SpinBlockDOM(paragraph)
+	if strings.Contains(spun, ":::") || !strings.Contains(spun, "<wbr>") {
+		t.Fatal(spun)
+	}
+}
