@@ -1600,6 +1600,9 @@ func (r *ProtyleExportMdRenderer) renderText(node *ast.Node, entering bool) ast.
 			return ast.WalkContinue
 		}
 
+		if r.ParseOptions.Tabs {
+			tokens = escapeTabsParagraphMarkers(node, tokens, false)
+		}
 		r.Write(tokens)
 	}
 	return ast.WalkContinue

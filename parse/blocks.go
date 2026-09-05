@@ -80,6 +80,8 @@ func (t *Tree) DocBlockCount() (ret int) {
 
 // incorporateLine 处理文本行 line 并把生成的块级节点挂到树上。
 func (t *Tree) incorporateLine(line []byte) {
+	itemIAL := t.Context.tabsItemIAL
+	t.Context.tabsItemIAL = nil
 	t.Context.oldtip = t.Context.Tip
 	t.Context.offset = 0
 	t.Context.column = 0
@@ -129,6 +131,14 @@ func (t *Tree) incorporateLine(line []byte) {
 
 	t.Context.allClosed = container == t.Context.oldtip
 	t.Context.lastMatchedContainer = container
+	if nil != itemIAL && itemIAL == container && t.Context.ParseOption.KramdownBlockIAL && !t.Context.indented {
+		if ial := t.parseKramdownBlockIAL(); nil != ial && !util.IsDocIAL2(ial) {
+			// 紧接标题的属性属于页签项，空行之后的属性继续按正文块处理。
+			itemIAL.KramdownIAL = ial
+			itemIAL.ID = IAL2MapUnEsc(ial)["id"]
+			return
+		}
+	}
 
 	matchedLeaf := container.Type != ast.NodeParagraph && container.AcceptLines()
 	blockParsers := blockStarts()
@@ -146,7 +156,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			!lex.IsDigit(maybeMarker) && // 有序列表
 			lex.ItemBacktick != maybeMarker && lex.ItemTilde != maybeMarker && // 代码块
 			lex.ItemSemicolon != maybeMarker && // 定义块
-			lex.ItemColon != maybeMarker && // 页签容器
+			lex.ItemColon != maybeMarker && '@' != maybeMarker && // 页签容器
 			lex.ItemCrosshatch != maybeMarker && // ATX 标题
 			lex.ItemGreater != maybeMarker && // 引述
 			lex.ItemLess != maybeMarker && // HTML 块
@@ -309,6 +319,8 @@ func _continue(n *ast.Node, context *Context) int {
 		return CustomBlockContinue(n, context)
 	case ast.NodeCallout:
 		return CalloutContinue(n, context)
+	case ast.NodeTabs:
+		return context.tabsContinue(n)
 	case ast.NodeHeading, ast.NodeThematicBreak, ast.NodeKramdownBlockIAL, ast.NodeLinkRefDefBlock, ast.NodeBlockQueryEmbed,
 		ast.NodeIFrame, ast.NodeVideo, ast.NodeAudio, ast.NodeWidget, ast.NodeAttributeView:
 		return 1

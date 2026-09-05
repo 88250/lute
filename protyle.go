@@ -1093,8 +1093,22 @@ func spinStartsTabsFence(content string) bool {
 		content = content[:index]
 	}
 	content = strings.TrimSpace(content)
-	return ":::" == content || ":::tabs" == content || ":::tab" == content ||
-		strings.HasPrefix(content, ":::tab ") || strings.HasPrefix(content, ":::tab\t")
+	for _, marker := range []string{"@tab", "@tab:active"} {
+		if content == marker || strings.HasPrefix(content, marker+" ") || strings.HasPrefix(content, marker+"\t") {
+			return true
+		}
+	}
+	count := 0
+	for count < len(content) && ':' == content[count] {
+		count++
+	}
+	if count < 3 {
+		return false
+	}
+	if count == len(content) {
+		return true
+	}
+	return (' ' == content[count] || '\t' == content[count]) && "tabs" == strings.TrimSpace(content[count:])
 }
 
 func spinHasContentAfter(node *ast.Node, content string, offset int) bool {

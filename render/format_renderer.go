@@ -28,7 +28,8 @@ import (
 // FormatRenderer 描述了格式化渲染器。
 type FormatRenderer struct {
 	*BaseRenderer
-	NodeWriterStack []*bytes.Buffer // 节点输出缓冲栈
+	NodeWriterStack  []*bytes.Buffer // 节点输出缓冲栈
+	tabsFenceLengths map[*ast.Node]int
 }
 
 // NewFormatRenderer 创建一个格式化渲染器。
@@ -577,7 +578,7 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 		return ast.WalkContinue
 	}
 
-	if nil != node.Previous && ast.NodeListItem == node.Previous.Type {
+	if nil != node.Previous && (ast.NodeListItem == node.Previous.Type || ast.NodeTabItem == node.Previous.Type) {
 		return ast.WalkContinue
 	}
 	if entering {
@@ -1337,6 +1338,9 @@ func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 			tokens = r.FixTermTypo(tokens)
 		}
 		tokens = escapeSetextHeadingMarkersInListParagraph(node, tokens)
+		if r.ParseOptions.Tabs {
+			tokens = escapeTabsParagraphMarkers(node, tokens, true)
+		}
 		if (nil == node.Previous || ast.NodeTaskListItemMarker == node.Previous.Type) &&
 			nil != node.Parent.Parent && nil != node.Parent.Parent.ListData && 3 == node.Parent.Parent.ListData.Typ {
 			if ' ' == r.LastOut {

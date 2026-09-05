@@ -27,6 +27,7 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.parseBlocks()
 	tree.parseInlines()
 	tree.finalParseBlockIAL()
+	tree.finalParseTabs()
 	tree.lexer = nil
 	return
 }
@@ -129,6 +130,7 @@ func Block(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
 	tree.finalParseBlockIAL()
+	tree.finalParseTabs()
 	tree.lexer = nil
 	return
 }
@@ -157,7 +159,9 @@ type Context struct {
 	indented, blank, partiallyConsumedTab, allClosed         bool      // 是否是缩进行、空行等标识
 	lastMatchedContainer                                     *ast.Node // 最后一个匹配的块节点
 
-	rootIAL *ast.Node // 根节点 kramdown IAL
+	rootIAL     *ast.Node                     // 根节点 kramdown IAL
+	tabs        map[*ast.Node]*tabsParseState // 页签围栏和选中项的解析状态
+	tabsItemIAL *ast.Node                     // 上一行页签标题对应的属性归属节点
 }
 
 // InlineContext 描述了行级元素解析上下文。
