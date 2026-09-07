@@ -16,6 +16,7 @@ import (
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 )
@@ -207,5 +208,41 @@ func TestFormatNodeSync(t *testing.T) {
 	expected = "foo中文bar"
 	if expected != output {
 		t.Fatalf("format node [%s] failed\nexpected\n%q\ngot\n%q\n", md, expected, output)
+	}
+}
+
+// 优化排版后，任务列表项中的 HTML 块前不应产生空段落 https://github.com/siyuan-note/siyuan/issues/19182
+func TestFormatTaskListHTMLBlock(t *testing.T) {
+	luteEngine := lute.New()
+	luteEngine.SetProtyleWYSIWYG(true)
+	luteEngine.SetKramdownIAL(true)
+	luteEngine.SetEnsureListItemParagraph(true)
+
+	tree := parse.Parse("", []byte("> - [ ] <div>\n>   Hello\n>   </div>\n"), luteEngine.ParseOptions)
+	for i := 0; i < 2; i++ {
+		if 1 == i {
+			luteEngine.SetAutoSpace(true)
+		}
+		formatted := render.NewFormatRenderer(tree, luteEngine.RenderOptions, luteEngine.ParseOptions).Render()
+		tree = parse.Parse("", formatted, luteEngine.ParseOptions)
+
+		blockquote := tree.Root.ChildByType(ast.NodeBlockquote)
+		if nil == blockquote {
+			t.Fatalf("format pass %d: blockquote not found", i+1)
+		}
+		list := blockquote.ChildByType(ast.NodeList)
+		if nil == list {
+			t.Fatalf("format pass %d: list not found", i+1)
+		}
+		listItem := list.ChildByType(ast.NodeListItem)
+		if nil == listItem || nil == listItem.FirstChild {
+			t.Fatalf("format pass %d: list item content not found", i+1)
+		}
+		if ast.NodeTaskListItemMarker != listItem.FirstChild.Type {
+			t.Fatalf("format pass %d: first list item child is %s", i+1, listItem.FirstChild.Type.String())
+		}
+		if nil == listItem.FirstChild.Next || ast.NodeHTMLBlock != listItem.FirstChild.Next.Type {
+			t.Fatalf("format pass %d: HTML block does not immediately follow the task marker", i+1)
+		}
 	}
 }

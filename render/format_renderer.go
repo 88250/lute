@@ -1238,7 +1238,7 @@ func (r *FormatRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *FormatRenderer) renderHTML(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Newline()
+		r.newlineBeforeBlock(node)
 		tokens := node.Tokens
 		tokens = r.tagSrcPath(tokens)
 		r.Write(tokens)
