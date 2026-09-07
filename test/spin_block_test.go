@@ -18,6 +18,8 @@ import (
 )
 
 var spinBlockDOMTests = []*parseTest{
+	{"289", "<div data-node-id=\"20260907160100-abcdefg\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20260907160100\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">a**b**c<wbr></span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>", "<div data-node-id=\"20260907160100-abcdefg\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20260907160100\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">a</span><span data-type=\"strong\">b</span><span data-type=\"strong\">c<wbr></span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
+	{"288", "<div data-node-id=\"20260907160000-abcdefg\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20260907160000\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">11111`111`111#11#1111<wbr></span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>", "<div data-node-id=\"20260907160000-abcdefg\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20260907160000\"><div contenteditable=\"true\" spellcheck=\"false\"><span data-type=\"strong\">11111</span> \u200b<span data-type=\"strong code\">\u2060111</span>\u200b <span data-type=\"strong\">111</span>\u200b<span data-type=\"strong tag\">\u206011</span>\u200b<span data-type=\"strong\">1111<wbr></span></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 	{"287", "<div data-subtype=\"NOTE\" data-node-id=\"20260827090000-abcdefg\" data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\" updated=\"20260827090000\"><div class=\"callout-info\" contenteditable=\"false\"><span class=\"callout-icon\">✏️</span><span contenteditable=\"true\" spellcheck=\"false\" class=\"callout-title\"><wbr></span></div><div class=\"callout-content\"><div data-node-id=\"20260827090001-abcdefg\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20260827090001\"><div contenteditable=\"true\" spellcheck=\"false\"></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>", "<div data-subtype=\"NOTE\" data-node-id=\"20260827090000-abcdefg\" data-node-index=\"1\" data-type=\"NodeCallout\" class=\"callout\" updated=\"20260827090000\"><div class=\"callout-info\" contenteditable=\"false\"><span class=\"callout-icon\">✏️</span><span contenteditable=\"true\" spellcheck=\"false\" class=\"callout-title\"><wbr></span></div><div class=\"callout-content\"></div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
 
 	{"286", "<div data-node-id=\"20260822120000-abcdefg\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20260822120000\"><div contenteditable=\"true\" spellcheck=\"false\">111<img alt=\"huaji\" class=\"emoji\" src=\"http://127.0.0.1:6806/stage/protyle/images/emoji/huaji.gif\" title=\"huaji\"><wbr>\n222</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>", "<div data-node-id=\"20260822120000-abcdefg\" data-node-index=\"1\" data-type=\"NodeParagraph\" class=\"p\" updated=\"20260822120000\"><div contenteditable=\"true\" spellcheck=\"false\">111<img alt=\"huaji\" class=\"emoji\" src=\"http://127.0.0.1:6806/stage/protyle/images/emoji/huaji.gif\" title=\"huaji\" /><wbr>\n222</div><div class=\"protyle-attr\" contenteditable=\"false\">\u200b</div></div>"},
@@ -338,6 +340,12 @@ func TestSpinBlockDOM(t *testing.T) {
 
 		if test.to != html {
 			t.Fatalf("test case [%s] failed\nexpected\n\t%q\ngot\n\t%q\noriginal html\n\t%q", test.name, test.to, html, test.from)
+		}
+		if "288" == test.name {
+			spunAgain := luteEngine.SpinBlockDOM(html)
+			if html != spunAgain {
+				t.Fatalf("test case [%s] is not idempotent\nfirst\n\t%q\nsecond\n\t%q", test.name, html, spunAgain)
+			}
 		}
 	}
 	ast.Testing = false

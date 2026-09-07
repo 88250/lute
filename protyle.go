@@ -60,6 +60,10 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 		firstChild.InsertBefore(p)
 	}
 
+	// 解析文本标记中的 Markdown 行级语法，使预设样式继承到新生成的行级元素。
+	// https://github.com/siyuan-note/siyuan/issues/19186
+	parse.TextMarks2InlinesWithNestedSyntax(tree)
+
 	// 使用 Markdown 标记符嵌套行级元素后被还原为纯文本 https://github.com/siyuan-note/siyuan/issues/7637
 	// 这里需要将混合嵌套（比如 <strong><span a></span></strong>）的行级元素拆分为多个平铺的行级元素（<span strong> 和 <span strong a>）
 	parse.NestedInlines2FlattedSpansHybrid(tree, false)

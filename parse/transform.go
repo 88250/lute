@@ -110,7 +110,7 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 			if entering {
 				content := string(html.EscapeHTML(n.Tokens))
 				content = strings.ReplaceAll(content, "&quot;", "\"") // 粘贴 Markdown 时行级元素中的双引号不再转换为实体 https://github.com/siyuan-note/siyuan/issues/14503
-				span = &ast.Node{Type: ast.NodeTextMark, TextMarkType: strings.Join(tags, " "), TextMarkTextContent: content}
+				span = &ast.Node{Type: ast.NodeTextMark, TextMarkType: mergeTextMarkTypes(tags), TextMarkTextContent: content}
 				if ast.NodeInlineMathContent == n.Type {
 					span.TextMarkTextContent = ""
 					span.TextMarkInlineMathContent = string(html.EscapeHTML(n.Tokens))
@@ -184,25 +184,8 @@ func NestedInlines2FlattedSpansHybrid(tree *Tree, isExportMd bool) {
 			}
 
 			if entering {
-				merged := make([]string, 0, len(tags)+1)
-				merged = append(merged, tags...)
-				for _, typ := range strings.Split(n.TextMarkType, " ") {
-					if "" == typ || "text" == typ {
-						continue
-					}
-					found := false
-					for _, t := range merged {
-						if t == typ {
-							found = true
-							break
-						}
-					}
-					if !found {
-						merged = append(merged, typ)
-					}
-				}
-				if 0 < len(merged) {
-					n.TextMarkType = strings.Join(merged, " ")
+				if merged := mergeTextMarkTypes(tags, strings.Split(n.TextMarkType, " ")); "" != merged {
+					n.TextMarkType = merged
 				}
 			}
 			return ast.WalkContinue
@@ -309,7 +292,7 @@ func NestedInlines2FlattedSpans(tree *Tree, isExportMd bool) {
 			}
 
 			if entering {
-				span = &ast.Node{Type: ast.NodeTextMark, TextMarkType: strings.Join(tags, " "), TextMarkTextContent: string(html.EscapeHTML(n.Tokens))}
+				span = &ast.Node{Type: ast.NodeTextMark, TextMarkType: mergeTextMarkTypes(tags), TextMarkTextContent: string(html.EscapeHTML(n.Tokens))}
 				if ast.NodeInlineMathContent == n.Type {
 					span.TextMarkTextContent = ""
 					span.TextMarkInlineMathContent = string(html.EscapeHTML(n.Tokens))
@@ -381,25 +364,8 @@ func NestedInlines2FlattedSpans(tree *Tree, isExportMd bool) {
 			}
 
 			if entering {
-				merged := make([]string, 0, len(tags)+1)
-				merged = append(merged, tags...)
-				for _, typ := range strings.Split(n.TextMarkType, " ") {
-					if "" == typ || "text" == typ {
-						continue
-					}
-					found := false
-					for _, t := range merged {
-						if t == typ {
-							found = true
-							break
-						}
-					}
-					if !found {
-						merged = append(merged, typ)
-					}
-				}
-				if 0 < len(merged) {
-					n.TextMarkType = strings.Join(merged, " ")
+				if merged := mergeTextMarkTypes(tags, strings.Split(n.TextMarkType, " ")); "" != merged {
+					n.TextMarkType = merged
 				}
 			}
 			return ast.WalkContinue
@@ -453,11 +419,52 @@ func processNestedNode(n *ast.Node, tag string, tags *[]string, unlinks *[]*ast.
 	}
 }
 
+func mergeTextMarkTypes(typeGroups ...[]string) string {
+	var merged []string
+	for _, types := range typeGroups {
+		for _, typ := range types {
+			if "" == typ || "text" == typ {
+				continue
+			}
+			found := false
+			for _, existing := range merged {
+				if existing == typ {
+					found = true
+					break
+				}
+			}
+			if !found {
+				merged = append(merged, typ)
+			}
+		}
+	}
+	return strings.Join(merged, " ")
+}
+
 func TextMarks2Inlines(tree *Tree) {
-	inlines := func(content string) (ret []*ast.Node) {
+	textMarks2Inlines(tree, false)
+}
+
+// TextMarks2InlinesWithNestedSyntax 仅转换包含可平铺 Markdown 行级语法的文本标记。
+func TextMarks2InlinesWithNestedSyntax(tree *Tree) {
+	textMarks2Inlines(tree, true)
+}
+
+func textMarks2Inlines(tree *Tree, nestedSyntaxOnly bool) {
+	inlines := func(content string) (ret []*ast.Node, hasNested, canFlatten bool) {
+		canFlatten = true
 		subTree := Inline("", []byte(content), tree.Context.ParseOption)
 		for c := subTree.Root.FirstChild.FirstChild; nil != c; c = c.Next {
 			ret = append(ret, c)
+			switch c.Type {
+			case ast.NodeCodeSpan, ast.NodeTag, ast.NodeInlineMath, ast.NodeEmphasis, ast.NodeStrong,
+				ast.NodeStrikethrough, ast.NodeMark, ast.NodeUnderline, ast.NodeSub, ast.NodeSup,
+				ast.NodeKbd, ast.NodeLink, ast.NodeBlockRef, ast.NodeImage, ast.NodeTextMark:
+				hasNested = true
+			case ast.NodeText, ast.NodeHTMLEntity, ast.NodeBackslash:
+			default:
+				canFlatten = false
+			}
 		}
 		return
 	}
@@ -467,58 +474,38 @@ func TextMarks2Inlines(tree *Tree) {
 			return ast.WalkContinue
 		}
 
-		if ast.NodeTextMark == n.Type && "" == n.TextMarkFlashcardOcclusionID {
-			switch n.TextMarkType {
-			case "sup":
-				n.Type = ast.NodeSup
-				n.PrependChild(&ast.Node{Type: ast.NodeSupOpenMarker})
-				nodes := inlines(n.TextMarkTextContent)
-				for _, node := range nodes {
-					n.AppendChild(node)
-				}
-				n.AppendChild(&ast.Node{Type: ast.NodeSupCloseMarker})
-			case "sub":
-				n.Type = ast.NodeSub
-				n.PrependChild(&ast.Node{Type: ast.NodeSubOpenMarker})
-				nodes := inlines(n.TextMarkTextContent)
-				for _, node := range nodes {
-					n.AppendChild(node)
-				}
-				n.AppendChild(&ast.Node{Type: ast.NodeSubCloseMarker})
-			case "em":
-				n.Type = ast.NodeEmphasis
-				n.PrependChild(&ast.Node{Type: ast.NodeEmA6kOpenMarker})
-				nodes := inlines(n.TextMarkTextContent)
-				for _, node := range nodes {
-					n.AppendChild(node)
-				}
-				n.AppendChild(&ast.Node{Type: ast.NodeEmA6kCloseMarker})
-			case "strong":
-				n.Type = ast.NodeStrong
-				n.PrependChild(&ast.Node{Type: ast.NodeStrongA6kOpenMarker})
-				nodes := inlines(n.TextMarkTextContent)
-				for _, node := range nodes {
-					n.AppendChild(node)
-				}
-				n.AppendChild(&ast.Node{Type: ast.NodeStrongA6kCloseMarker})
-			case "mark":
-				n.Type = ast.NodeMark
-				n.PrependChild(&ast.Node{Type: ast.NodeMark2OpenMarker})
-				nodes := inlines(n.TextMarkTextContent)
-				for _, node := range nodes {
-					n.AppendChild(node)
-				}
-				n.AppendChild(&ast.Node{Type: ast.NodeMark2CloseMarker})
-			case "s":
-				n.Type = ast.NodeStrikethrough
-				n.PrependChild(&ast.Node{Type: ast.NodeStrikethrough2OpenMarker})
-				nodes := inlines(n.TextMarkTextContent)
-				for _, node := range nodes {
-					n.AppendChild(node)
-				}
-				n.AppendChild(&ast.Node{Type: ast.NodeStrikethrough2CloseMarker})
-			}
+		if ast.NodeTextMark != n.Type || "" != n.TextMarkFlashcardOcclusionID {
+			return ast.WalkContinue
 		}
+
+		var nodeType, openMarkerType, closeMarkerType ast.NodeType
+		switch n.TextMarkType {
+		case "sup":
+			nodeType, openMarkerType, closeMarkerType = ast.NodeSup, ast.NodeSupOpenMarker, ast.NodeSupCloseMarker
+		case "sub":
+			nodeType, openMarkerType, closeMarkerType = ast.NodeSub, ast.NodeSubOpenMarker, ast.NodeSubCloseMarker
+		case "em":
+			nodeType, openMarkerType, closeMarkerType = ast.NodeEmphasis, ast.NodeEmA6kOpenMarker, ast.NodeEmA6kCloseMarker
+		case "strong":
+			nodeType, openMarkerType, closeMarkerType = ast.NodeStrong, ast.NodeStrongA6kOpenMarker, ast.NodeStrongA6kCloseMarker
+		case "mark":
+			nodeType, openMarkerType, closeMarkerType = ast.NodeMark, ast.NodeMark2OpenMarker, ast.NodeMark2CloseMarker
+		case "s":
+			nodeType, openMarkerType, closeMarkerType = ast.NodeStrikethrough, ast.NodeStrikethrough2OpenMarker, ast.NodeStrikethrough2CloseMarker
+		default:
+			return ast.WalkContinue
+		}
+
+		nodes, hasNested, canFlatten := inlines(n.TextMarkTextContent)
+		if nestedSyntaxOnly && (!hasNested || !canFlatten) {
+			return ast.WalkContinue
+		}
+		n.Type = nodeType
+		n.PrependChild(&ast.Node{Type: openMarkerType})
+		for _, node := range nodes {
+			n.AppendChild(node)
+		}
+		n.AppendChild(&ast.Node{Type: closeMarkerType})
 		return ast.WalkContinue
 	})
 }
