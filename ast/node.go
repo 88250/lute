@@ -86,10 +86,11 @@ type Node struct {
 
 	// 表
 
-	TableAligns              []int `json:",omitempty"` // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
-	TableCellAlign           int   `json:",omitempty"` // 表的单元格对齐方式
-	TableCellContentWidth    int   `json:",omitempty"` // 表的单元格内容宽度（字节数）
-	TableCellContentMaxWidth int   `json:",omitempty"` // 表的单元格内容最大宽度
+	TableAligns              []int          `json:",omitempty"` // 从左到右每个表格节点的对齐方式，0：默认对齐，1：左对齐，2：居中对齐，3：右对齐
+	TableCellAlign           int            `json:",omitempty"` // 表的单元格对齐方式
+	TableCellContentWidth    int            `json:",omitempty"` // 表的单元格内容宽度（字节数）
+	TableCellContentMaxWidth int            `json:",omitempty"` // 表的单元格内容最大宽度
+	TableCellRich            *TableCellRich `json:",omitempty"` // 单元格富文本源，子节点保存行内投影
 
 	// 链接
 

@@ -923,6 +923,11 @@ func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 	padding := node.TableCellContentMaxWidth - node.TableCellContentWidth
 	if entering {
 		r.WriteByte(lex.ItemPipe)
+		if nil != node.TableCellRich {
+			ial := append([][]string(nil), node.KramdownIAL...)
+			ial = append(ial, []string{ast.TableCellRichIAL, node.TableCellRich.Encode()})
+			r.Write(parse.IAL2Tokens(ial))
+		}
 		if !r.Options.ProtyleWYSIWYG {
 			r.WriteByte(lex.ItemSpace)
 			switch node.TableCellAlign {
@@ -936,7 +941,7 @@ func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 		// 当 KramdownSpanIAL 渲染选项关闭时（如思源 html2BlockDOM），renderKramdownSpanIAL 不输出
 		// NodeKramdownSpanIAL 子节点，这里从 KramdownIAL 手动补出，避免合并信息丢失。
 		// 选项开启时由 renderKramdownSpanIAL 统一输出，此处跳过以免重复。
-		if !r.Options.KramdownSpanIAL {
+		if !r.Options.KramdownSpanIAL && nil == node.TableCellRich {
 			if ialTokens := tableCellStructIALTokens(node); nil != ialTokens {
 				r.Write(ialTokens)
 			}

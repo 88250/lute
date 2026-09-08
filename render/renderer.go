@@ -180,6 +180,7 @@ type BaseRenderer struct {
 	DisableTags         int                              // 标签嵌套计数器，用于判断不可能出现标签嵌套的情况，比如语法树允许图片节点包含链接节点，但是 HTML <img> 不能包含 <a>
 	FootnotesDefs       []*ast.Node                      // 脚注定义集
 	RenderingFootnotes  bool                             // 是否正在渲染脚注定义
+	tableCellRichInline bool                             // Markdown 表格仅输出富文本的行内投影
 }
 
 // renderTableByHTML 渲染合并单元格表格的 HTML 结构（table/colgroup/thead/tbody/tr/td + colspan/rowspan/class）。
@@ -192,6 +193,7 @@ func (r *BaseRenderer) renderTableByHTML(node *ast.Node) {
 	delete(ials, "caption")
 	delete(ials, "updated")
 	delete(ials, "colgroup")
+	delete(ials, "custom-sy-table-rich")
 	r.Tag("table", parse.Map2IAL(ials), false)
 	r.Newline()
 	caption := node.IALAttr("caption")
@@ -317,6 +319,16 @@ func (r *BaseRenderer) renderTableByHTMLRow(row *ast.Node) {
 			}
 		}
 		r.Tag(tag, attrs, false)
+		if nil != cell.TableCellRich {
+			if r.tableCellRichInline {
+				r.Write(tableCellRichInlineHTML(cell, r.Options, r.ParseOptions))
+			} else if content, err := TableCellRichHTML(cell.TableCellRich, r.Options); nil == err {
+				r.Write(content)
+			}
+			r.Tag("/"+tag, nil, false)
+			r.Newline()
+			continue
+		}
 		// 遍历单元格子节点，由各渲染器的 RendererFuncs 处理行级元素
 		for c := cell.FirstChild; nil != c; c = c.Next {
 			ast.Walk(c, func(n *ast.Node, entering bool) ast.WalkStatus {

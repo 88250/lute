@@ -1310,6 +1310,13 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 
 		lute.genASTContenteditable(table, tree)
+		ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if entering && nil != n.TableCellRich {
+				node.SetIALAttr("custom-sy-table-rich", "1")
+				return ast.WalkStop
+			}
+			return ast.WalkContinue
+		})
 		return
 	case ast.NodeParagraph:
 		node.Type = ast.NodeParagraph
@@ -1723,6 +1730,13 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		parse.SetSpanIAL(node, n)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
+		for _, attr := range n.Attr {
+			if ast.TableCellRichAttribute == attr.Key {
+				node.TableCellRich = ast.DecodeTableCellRich(attr.Val)
+				_ = parse.ApplyTableCellRichProjection(node)
+				return
+			}
+		}
 	case atom.Code:
 		isCaret, isEmpty := lute.isCaret(n)
 		if isCaret {

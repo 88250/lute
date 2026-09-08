@@ -22,7 +22,7 @@ import (
 func isTableCellIAL(ial [][]string) bool {
 	for _, attr := range ial {
 		switch attr[0] {
-		case "colspan", "rowspan", "style":
+		case "colspan", "rowspan", "style", ast.TableCellRichIAL:
 			return true
 		case "class":
 			for _, class := range strings.Fields(attr[1]) {
@@ -199,7 +199,7 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 			ialTokens := subTokens[:pos+1]
 			if isTableCellIAL(ial) {
 				th.KramdownIAL = ial
-				th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
+				th.Tokens = append(th.Tokens[:ialStart], th.Tokens[ialStart+len(ialTokens):]...)
 				spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 				th.InsertAfter(spanIAL)
 				th = th.Next
@@ -227,7 +227,7 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 				ialTokens := subTokens[:pos+1]
 				if isTableCellIAL(ial) {
 					th.KramdownIAL = ial
-					th.Tokens = th.Tokens[:len(th.Tokens)-len(ialTokens)]
+					th.Tokens = append(th.Tokens[:ialStart], th.Tokens[ialStart+len(ialTokens):]...)
 					spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 					th.InsertAfter(spanIAL)
 					th = th.Next

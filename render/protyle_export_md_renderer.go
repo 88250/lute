@@ -33,6 +33,7 @@ type ProtyleExportMdRenderer struct {
 
 func NewProtyleExportMdRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *ProtyleExportMdRenderer {
 	ret := &ProtyleExportMdRenderer{BaseRenderer: NewBaseRenderer(tree, options, parseOptions)}
+	ret.tableCellRichInline = true
 	ret.RendererFuncs[ast.NodeDocument] = ret.renderDocument
 	ret.RendererFuncs[ast.NodeParagraph] = ret.renderParagraph
 	ret.RendererFuncs[ast.NodeText] = ret.renderText
@@ -1127,6 +1128,10 @@ func (r *ProtyleExportMdRenderer) renderTableCell(node *ast.Node, entering bool)
 			case 3:
 				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
 			}
+		}
+		if nil != node.TableCellRich {
+			r.Write(tableCellRichInlineHTML(node, r.Options, r.ParseOptions))
+			return ast.WalkSkipChildren
 		}
 	} else {
 		if !r.Options.ProtyleWYSIWYG {

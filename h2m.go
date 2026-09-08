@@ -1600,6 +1600,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		node.TableCellAlign = tableAlign
 		tree.Context.Tip.AppendChild(node)
 		setTableCellSpanIAL(node, n)
+		for _, attr := range n.Attr {
+			if ast.TableCellRichAttribute == attr.Key {
+				node.TableCellRich = ast.DecodeTableCellRich(attr.Val)
+				_ = parse.ApplyTableCellRichProjection(node)
+				return
+			}
+		}
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
 	case atom.Colgroup, atom.Col:

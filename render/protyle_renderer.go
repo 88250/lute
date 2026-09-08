@@ -1180,7 +1180,18 @@ func (r *ProtyleRenderer) renderTableCell(node *ast.Node, entering bool) ast.Wal
 			attrs = append(attrs, []string{"align", "right"})
 		}
 		r.spanNodeAttrs(node, &attrs)
+		if nil != node.TableCellRich {
+			attrs = append(attrs, []string{ast.TableCellRichAttribute, node.TableCellRich.Encode()}, []string{"contenteditable", "false"})
+		}
 		r.Tag(tag, attrs, false)
+		if nil != node.TableCellRich {
+			r.Tag("div", [][]string{{"class", "table__cell-rich"}, {"contenteditable", "false"}}, false)
+			if content, err := TableCellRichHTML(node.TableCellRich, r.Options); nil == err {
+				r.Write(content)
+			}
+			r.Tag("/div", nil, false)
+			return ast.WalkSkipChildren
+		}
 	} else {
 		r.Tag("/"+tag, nil, false)
 	}

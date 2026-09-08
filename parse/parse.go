@@ -28,6 +28,7 @@ func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
 	tree.parseInlines()
 	tree.finalParseBlockIAL()
 	tree.finalParseTabs()
+	tree.finalParseTableCellRich()
 	tree.lexer = nil
 	return
 }
@@ -357,6 +358,8 @@ type Tree struct {
 
 // Options 描述了解析选项。
 type Options struct {
+	// DisableTableCellRich 禁止在富文本片段内部递归展开单元格富文本。
+	DisableTableCellRich bool
 	// GFMTable 设置是否打开“GFM 表”支持。
 	GFMTable bool
 	// GFMTaskListItem 设置是否打开“GFM 任务列表项”支持。

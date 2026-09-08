@@ -1129,6 +1129,12 @@ func (r *ProtyleExportRenderer) renderTableCell(node *ast.Node, entering bool) a
 		}
 		r.spanNodeAttrs(node, &attrs)
 		r.Tag(tag, attrs, false)
+		if nil != node.TableCellRich {
+			if content, err := TableCellRichHTML(node.TableCellRich, r.Options); nil == err {
+				r.Write(content)
+			}
+			return ast.WalkSkipChildren
+		}
 	} else {
 		r.Tag("/"+tag, nil, false)
 	}

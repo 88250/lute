@@ -309,7 +309,7 @@ func (r *HtmlRenderer) renderTextMarkStandardTag(node *ast.Node, entering bool) 
 
 	style := node.IALAttr("style")
 	if "" != style {
-		r.Tag("span", [][]string{{"style", style}}, false)
+		r.Tag("span", [][]string{{"style", html.EscapeAttrVal(style)}}, false)
 	}
 
 	types := strings.Fields(node.TextMarkType)
@@ -947,6 +947,12 @@ func (r *HtmlRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkSt
 			attrs = append(attrs, []string{"align", "right"})
 		}
 		r.Tag(tag, attrs, false)
+		if nil != node.TableCellRich {
+			if content, err := TableCellRichHTML(node.TableCellRich, r.Options); nil == err {
+				r.Write(content)
+			}
+			return ast.WalkSkipChildren
+		}
 	} else {
 		r.Tag("/"+tag, nil, false)
 		r.Newline()
