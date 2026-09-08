@@ -447,6 +447,7 @@ func TextMarks2Inlines(tree *Tree) {
 
 // TextMarks2InlinesWithNestedSyntax 仅转换包含可平铺 Markdown 行级语法的文本标记。
 func TextMarks2InlinesWithNestedSyntax(tree *Tree) {
+	parseTextMarkDelimiters(tree)
 	textMarks2Inlines(tree, true)
 }
 
