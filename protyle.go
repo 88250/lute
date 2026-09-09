@@ -1215,11 +1215,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			info := directDOMChildByClass(n, "tab-item-info")
 			if nil != info {
 				if title := directDOMChildByClass(info, "tab-item-title"); nil != title {
-					var titleDOM bytes.Buffer
-					for child := title.FirstChild; nil != child; child = child.NextSibling {
-						titleDOM.Write(util.DomHTML(child))
-					}
-					node.TabItemTitle = strings.TrimSpace(lute.BlockDOM2Md(titleDOM.String()))
+					node.TabItemTitle = lute.tabTitleMarkdown(title, false)
 				}
 			}
 		}

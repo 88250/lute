@@ -1,6 +1,7 @@
 package lute
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/88250/lute/ast"
@@ -8,6 +9,31 @@ import (
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/util"
 )
+
+// tabTitleMarkdown 用边界文本保护标题空白，并以字符实体保留 Markdown 行首、行尾的空格。
+func (lute *Lute) tabTitleMarkdown(title *html.Node, standardHTML bool) string {
+	var dom bytes.Buffer
+	dom.WriteString("LuteTabTitleStart")
+	for child := title.FirstChild; nil != child; child = child.NextSibling {
+		dom.Write(util.DomHTML(child))
+	}
+	dom.WriteString("LuteTabTitleEnd")
+	var markdown string
+	if standardHTML {
+		markdown = lute.HTML2Md(dom.String())
+	} else {
+		markdown = lute.BlockDOM2Md(dom.String())
+	}
+	markdown = strings.TrimSpace(markdown)
+	markdown = strings.TrimPrefix(markdown, "LuteTabTitleStart")
+	markdown = strings.TrimSuffix(markdown, "LuteTabTitleEnd")
+	leading := len(markdown) - len(strings.TrimLeft(markdown, " "))
+	trailing := len(markdown) - len(strings.TrimRight(markdown, " "))
+	if leading == len(markdown) {
+		return strings.Repeat("&#32;", leading)
+	}
+	return strings.Repeat("&#32;", leading) + markdown[leading:len(markdown)-trailing] + strings.Repeat("&#32;", trailing)
+}
 
 func hasDOMClass(node *html.Node, name string) bool {
 	for _, class := range strings.Fields(util.DomAttrValue(node, "class")) {
@@ -36,7 +62,7 @@ func (lute *Lute) genASTByTabsDOM(dom *html.Node, tree *parse.Tree) bool {
 		node.Type = ast.NodeTabItem
 		if info := directDOMChildByClass(dom, "tab-item-info"); nil != info {
 			if title := directDOMChildByClass(info, "tab-item-title"); nil != title {
-				node.TabItemTitle = strings.TrimSpace(lute.HTML2Md(string(util.DomHTML(title))))
+				node.TabItemTitle = lute.tabTitleMarkdown(title, true)
 			}
 		}
 	}
