@@ -1573,7 +1573,7 @@ func (r *HtmlRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 			attrs = append(attrs, []string{"contenteditable", "false"})
 			attrs = append(attrs, []string{"class", "render-node"})
 		} else if "file-annotation-ref" == typ {
-			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
+			attrs = append(attrs, []string{"data-id", html.EscapeHTMLStr(node.TextMarkFileAnnotationRefID)})
 		} else if "inline-memo" == typ {
 			content := node.TextMarkInlineMemoContent
 			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")

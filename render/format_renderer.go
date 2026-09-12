@@ -354,7 +354,7 @@ func (r *FormatRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) 
 			attrs = append(attrs, []string{"contenteditable", "false"})
 			attrs = append(attrs, []string{"class", "render-node"})
 		} else if "file-annotation-ref" == typ {
-			attrs = append(attrs, []string{"data-id", node.TextMarkFileAnnotationRefID})
+			attrs = append(attrs, []string{"data-id", html.EscapeHTMLStr(node.TextMarkFileAnnotationRefID)})
 		} else if "inline-memo" == typ {
 			inlineMemoContent := node.TextMarkInlineMemoContent
 			attrs = append(attrs, []string{"data-inline-memo-content", inlineMemoContent})

@@ -24,12 +24,7 @@ func (t *Tree) parseFileAnnotationRef(ctx *InlineContext) *ast.Node {
 	}
 
 	tokens := ctx.tokens[ctx.pos:]
-	if 48 > len(tokens) || lex.ItemLess != tokens[0] || lex.ItemLess != tokens[1] {
-		return nil
-	}
-
-	idPart := tokens[2:48]
-	if bytes.ContainsAny(idPart, "<>") {
+	if 2 > len(tokens) || lex.ItemLess != tokens[0] || lex.ItemLess != tokens[1] {
 		return nil
 	}
 
@@ -80,6 +75,7 @@ func (t *Tree) parseFileAnnotationRef(ctx *InlineContext) *ast.Node {
 		break
 	}
 	if !matched {
+		ctx.pos = savePos
 		return nil
 	}
 
@@ -122,36 +118,37 @@ func (context *Context) parseFileAnnotationRefID(tokens []byte) (passed, remains
 	}
 	remains = tokens[i:]
 	idPart := tokens[:i]
+	if bytes.ContainsAny(idPart, "<>\"\r\n\\") {
+		return
+	}
 	if !bytes.HasPrefix(idPart, []byte("assets/")) {
 		return nil, nil, nil
 	}
 	idPart = bytes.TrimPrefix(idPart, []byte("assets/"))
-	if !bytes.Contains(idPart, []byte("/")) {
+	// 查询参数和片段属于资源定位信息，不参与文件路径和标注 ID 校验。
+	if query := bytes.IndexAny(idPart, "?#"); 0 <= query {
+		idPart = idPart[:query]
+	}
+	separator := bytes.LastIndexByte(idPart, '/')
+	if 0 >= separator {
 		return
 	}
-	idParts := bytes.Split(idPart, []byte("/"))
-	if 2 != len(idParts) {
+	filePart := idPart[:separator]
+	if !bytes.HasSuffix(bytes.ToLower(filePart), []byte(".pdf")) || 4 >= len(filePart)-bytes.LastIndexByte(filePart, '/')-1 {
 		return
 	}
-	filePart := idParts[0]
-	if !bytes.Contains(filePart, []byte("-")) || !bytes.HasSuffix(bytes.ToLower(filePart), []byte(".pdf")) {
-		return
+	for _, part := range bytes.Split(filePart, []byte("/")) {
+		if 0 == len(part) || bytes.Equal(part, []byte(".")) || bytes.Equal(part, []byte("..")) {
+			return
+		}
 	}
-	fileName := filePart[:len(filePart)-4]
-	if 23 > len(fileName) {
-		return
-	}
-	fileID := fileName[len(fileName)-22:]
-	if !ast.IsNodeIDPattern(string(fileID)) {
-		return
-	}
-	annotationIDPart := idParts[1]
+	annotationIDPart := idPart[separator+1:]
 	if !ast.IsNodeIDPattern(string(annotationIDPart)) {
 		return
 	}
 
 	id = tokens[:i]
-	if 6 > len(remains) {
+	if 2 > len(remains) {
 		return
 	}
 	passed = make([]byte, 0, 1024)
