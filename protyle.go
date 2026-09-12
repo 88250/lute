@@ -310,10 +310,6 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</u>", "</u>\n<wbr>\n")
 	htmlStr = strings.ReplaceAll(htmlStr, "\n<wbr>\n</span>", "</span>\n<wbr>\n")
 
-	// Improve `inline code` markdown editing https://github.com/siyuan-note/siyuan/issues/9978
-	// spinBlockDOMTests #212
-	htmlStr = strings.ReplaceAll(htmlStr, "`<wbr></span>", "</span>`<wbr>")
-
 	htmlStr = strings.ReplaceAll(htmlStr, "<wbr>", editor.Caret)
 
 	var startSpaces, endSpaces int
@@ -347,6 +343,7 @@ func (lute *Lute) BlockDOM2Tree(htmlStr string) (ret *parse.Tree) {
 	if nil == htmlRoot {
 		return
 	}
+	normalizeProtyleInlineCodeCaret(htmlRoot)
 	normalizeProtyleInlineCaretPlaceholders(htmlRoot)
 
 	// 调整 DOM 结构
@@ -1003,6 +1000,19 @@ func (lute *Lute) blockDOMTree2Md(tree *parse.Tree) (markdown string) {
 	formatted := renderer.Render()
 	markdown = string(formatted)
 	return
+}
+
+func normalizeProtyleInlineCodeCaret(n *html.Node) {
+	for child := n.FirstChild; nil != child; child = child.NextSibling {
+		normalizeProtyleInlineCodeCaret(child)
+	}
+	// 行级元素末尾的反引号移到元素外，标题容器中的输入则保留在标题内。
+	if atom.Span != n.DataAtom || hasDOMClass(n, "callout-title") || nil == n.LastChild ||
+		html.TextNode != n.LastChild.Type || !strings.HasSuffix(n.LastChild.Data, "`"+editor.Caret) {
+		return
+	}
+	n.LastChild.Data = strings.TrimSuffix(n.LastChild.Data, "`"+editor.Caret)
+	n.InsertAfter(&html.Node{Type: html.TextNode, Data: "`" + editor.Caret})
 }
 
 func normalizeProtyleInlineCaretPlaceholders(n *html.Node) {
