@@ -107,6 +107,10 @@ func (context *Context) parseFileAnnotationRefID(tokens []byte) (passed, remains
 		if bytes.Contains(editor.CaretTokens, []byte{token}) {
 			continue
 		}
+		// 遇到嵌套起始符立即拒绝，避免连续无效输入反复扫描剩余文本。
+		if lex.ItemLess == token {
+			return
+		}
 
 		if bytes.HasPrefix(tokens[i:], []byte(" \"")) {
 			break
