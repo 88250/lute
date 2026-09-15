@@ -49,6 +49,14 @@ func TestTabsOriginalTitleBlock(t *testing.T) {
 		if strings.Count(html, "abcdefghijklmnop") != 1 || !strings.Contains(html, "Body") {
 			t.Fatalf("HTML duplicated or lost title\n%s", html)
 		}
+		exported := string(render.NewProtyleExportRenderer(tree, options, l.ParseOptions).Render())
+		if strings.Count(exported, "abcdefghijklmnop") != 1 || strings.Count(exported, "Body") != 1 {
+			t.Fatalf("PDF/HTML export duplicated or lost content\n%s", exported)
+		}
+		standalone := string(render.NewProtyleExportRenderer(&parse.Tree{Root: title}, options, l.ParseOptions).Render())
+		if strings.Count(standalone, "abcdefghijklmnop") != 1 {
+			t.Fatalf("standalone title export lost content\n%s", standalone)
+		}
 		back := l.HTML2Md(html)
 		_, htmlItems := tabNodes(parse.Parse("", []byte(back), l.ParseOptions).Root)
 		if len(htmlItems) != 1 || (!strings.Contains(htmlItems[0].TabItemTitle, "abcdefghijklmnop") && htmlItems[0].TabTitleBlock() == nil) {

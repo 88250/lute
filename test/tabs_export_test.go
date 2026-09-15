@@ -4,9 +4,39 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/88250/lute/ast"
 	"github.com/88250/lute/parse"
 	"github.com/88250/lute/render"
 )
+
+func TestTabsExportNestedTitleBlocks(t *testing.T) {
+	l := tabsEngine()
+	tree := parse.Parse("", []byte(":::: tabs\n@tab Outer\n\n::: tabs\n@tab Inner\n\n- Inner\n\n:::\n@tab StringTitle\n\nBody\n\n::::\n"), l.ParseOptions)
+	_, items := tabNodes(tree.Root)
+	if len(items) != 3 {
+		t.Fatalf("expected three tab items, got %d", len(items))
+	}
+	for _, item := range items[:2] {
+		title := parse.Parse("", []byte(item.TabItemTitle), l.ParseOptions).Root.FirstChild
+		title.SetIALAttr("tabs-title", "true")
+		item.PrependChild(title)
+		item.TabItemTitle = ""
+	}
+	exported := string(render.NewProtyleExportRenderer(tree, render.NewOptions(), l.ParseOptions).Render())
+	for content, count := range map[string]int{"Outer": 1, "Inner": 2, "StringTitle": 1, "Body": 1} {
+		if strings.Count(exported, content) != count {
+			t.Fatalf("expected %q %d times\n%s", content, count, exported)
+		}
+	}
+	if !strings.Contains(exported, `data-type="NodeList"`) || !strings.Contains(exported, `data-type="NodeListItem"`) {
+		t.Fatalf("export lost nested list\n%s", exported)
+	}
+	for _, item := range items[:2] {
+		if title := item.TabTitleBlock(); title == nil || title.Type != ast.NodeParagraph {
+			t.Fatal("export changed title blocks")
+		}
+	}
+}
 
 func TestTabsStandardExportLiteralFences(t *testing.T) {
 	for name, markdown := range map[string]string{
