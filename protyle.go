@@ -996,6 +996,7 @@ func (lute *Lute) blockDOMTree2Md(tree *parse.Tree) (markdown string) {
 	options.ProtyleWYSIWYG = true
 	options.SuperBlock = true
 	options.UnorderedListMarker = lute.RenderOptions.UnorderedListMarker
+	options.ExportNormalizeTaskListMarker = false
 	renderer := render.NewFormatRenderer(tree, options, lute.ParseOptions)
 	formatted := renderer.Render()
 	markdown = string(formatted)

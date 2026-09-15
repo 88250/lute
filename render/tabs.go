@@ -19,6 +19,9 @@ func (r *FormatRenderer) renderTabs(node *ast.Node, entering bool) ast.WalkStatu
 			r.WriteString(" tabs")
 		}
 		r.Newline()
+		if !entering && !r.Options.KramdownBlockIAL && "true" == node.IALAttr("tabs-task") {
+			r.WriteString("{: tabs-task=\"true\"}\n")
+		}
 		return ast.WalkContinue
 	}
 	if !entering {
@@ -145,6 +148,9 @@ func (r *ProtyleExportMdRenderer) renderTabs(node *ast.Node, entering bool) ast.
 				r.WriteString(" tabs")
 			}
 			r.WriteString("\n\n")
+			if !entering && "true" == node.IALAttr("tabs-task") {
+				r.WriteString("{: tabs-task=\"true\"}\n\n")
+			}
 		} else if entering {
 			r.WriteString("@tab")
 			if node.ParentIs(ast.NodeTabs) && "" != node.ID && node.ID == node.Parent.IALAttr("tabs-active-id") {
