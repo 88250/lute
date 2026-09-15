@@ -108,6 +108,31 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 	return ret
 }
 
+// escapeHTMLTextMarkers 将 HTML 文本中的标记符保存为转义节点，避免格式扁平化时将转义符混入正文。
+func escapeHTMLTextMarkers(node *ast.Node) {
+	start := 0
+	for i, token := range node.Tokens {
+		if !lex.IsProtyleInlineMarker(token) {
+			continue
+		}
+		if start < i {
+			node.InsertBefore(&ast.Node{Type: node.Type, Tokens: node.Tokens[start:i]})
+		}
+		backslash := &ast.Node{Type: ast.NodeBackslash}
+		backslash.AppendChild(&ast.Node{Type: ast.NodeBackslashContent, Tokens: node.Tokens[i : i+1]})
+		node.InsertBefore(backslash)
+		start = i + 1
+	}
+	if start == 0 {
+		return
+	}
+	if start < len(node.Tokens) {
+		node.Tokens = node.Tokens[start:]
+	} else {
+		node.Unlink()
+	}
+}
+
 // fixTableStructure 直接修改传入的 *html.Node 树，完美兼容 th、td 以及 colspan、rowspan 合并单元格。
 // 外部 HTML（如从浏览器、Excel、Word 复制）的合并单元格遵循 HTML 标准：被合并覆盖的位置没有对应的
 // td/th 节点。而思源内部规范需要这些位置存在 class="fn__none" 的占位单元格（见 parse/table.go、
@@ -591,12 +616,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		escapeMarkers := false
 		if textStyle != "" || (nil != n.Parent && atom.Span == n.Parent.DataAtom && 0 == len(n.Parent.Attr)) {
 			// 按原文解析，不处理转义
 		} else {
 			if lute.ParseOptions.ProtyleWYSIWYG {
 				if ast.NodeLink != tree.Context.Tip.Type { // a 标签锚文本中的标记符不进行转义 https://github.com/siyuan-note/siyuan/issues/14733
-					node.Tokens = lex.EscapeProtyleMarkers(node.Tokens)
+					escapeMarkers = true
 				}
 			} else {
 				node.Tokens = lex.EscapeCommonMarkers(node.Tokens)
@@ -654,6 +680,9 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 			}
 
 			tree.Context.Tip.AppendChild(node)
+		}
+		if escapeMarkers {
+			escapeHTMLTextMarkers(node)
 		}
 	case atom.P, atom.Div, atom.Section, atom.Dt, atom.Dd:
 		if ast.NodeLink == tree.Context.Tip.Type {
