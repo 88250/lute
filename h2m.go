@@ -457,6 +457,7 @@ func trimTableCellTextTokens(n *html.Node, tokens []byte) []byte {
 
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
+	normalizeCodeBlockBanner(n)
 	if lute.genASTByTabsDOM(n, tree) {
 		return
 	}
