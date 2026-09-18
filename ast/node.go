@@ -665,14 +665,8 @@ func (n *Node) Content() (ret string) {
 			buf.Write(n.Tokens)
 		case NodeTextMark:
 			if "" != n.TextMarkTextContent {
-				if n.IsTextMarkType("code") || n.IsTextMarkType("tag") || n.IsTextMarkType("strong") || n.IsTextMarkType("em") || n.IsTextMarkType("a") {
-					// 搜索代码内容转义问题 https://github.com/siyuan-note/siyuan/issues/5927
-					// 搜索标签内容转义问题 https://github.com/siyuan-note/siyuan/issues/13919
-					// 搜索加粗、超链接内容转义问题 https://github.com/siyuan-note/siyuan/issues/14503
-					buf.WriteString(html.UnescapeString(n.TextMarkTextContent))
-				} else {
-					buf.WriteString(n.TextMarkTextContent)
-				}
+				// 所有文本标记的正文均以 HTML 实体保存，提取纯文本时只解码一次。
+				buf.WriteString(html.UnescapeString(n.TextMarkTextContent))
 			} else if "" != n.TextMarkInlineMathContent {
 				content := n.TextMarkInlineMathContent
 				content = strings.ReplaceAll(content, editor.IALValEscNewLine, " ")

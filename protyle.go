@@ -171,6 +171,12 @@ func (lute *Lute) Md2BlockDOMWithAutoLink(markdown string, reserveEmptyParagraph
 }
 
 func (lute *Lute) Md2BlockDOMTree(markdown string, reserveEmptyParagraph bool) (vHTML string, tree *parse.Tree) {
+	keepEscaped := lute.ParseOptions.KeepEscaped
+	lute.ParseOptions.KeepEscaped = true
+	defer func() {
+		lute.ParseOptions.KeepEscaped = keepEscaped
+	}()
+
 	tree = parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	parse.TextMarks2Inlines(tree) // 先将 TextMark 转换为 Inlines https://github.com/siyuan-note/siyuan/issues/13056
@@ -202,6 +208,12 @@ func (lute *Lute) Md2BlockDOMTree(markdown string, reserveEmptyParagraph bool) (
 }
 
 func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
+	keepEscaped := lute.ParseOptions.KeepEscaped
+	lute.ParseOptions.KeepEscaped = true
+	defer func() {
+		lute.ParseOptions.KeepEscaped = keepEscaped
+	}()
+
 	tree := parse.Inline("", []byte(markdown), lute.ParseOptions)
 	parse.NestedInlines2FlattedSpansHybrid(tree, false)
 	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions, lute.ParseOptions)
@@ -214,6 +226,13 @@ func (lute *Lute) InlineMd2BlockDOM(markdown string) (vHTML string) {
 }
 
 func (lute *Lute) BlockDOM2Md(htmlStr string) (kramdown string) {
+	// Kramdown 的文本标记保留 HTML 实体，保证再次解析时正文不会变成标签。
+	keepEscaped := lute.ParseOptions.KeepEscaped
+	lute.ParseOptions.KeepEscaped = true
+	defer func() {
+		lute.ParseOptions.KeepEscaped = keepEscaped
+	}()
+
 	kramdown = lute.blockDOM2Md(htmlStr)
 	kramdown = strings.ReplaceAll(kramdown, editor.Zwsp, "")
 	return
@@ -268,6 +287,12 @@ func (lute *Lute) BlockDOM2TextLen(htmlStr string) int {
 }
 
 func (lute *Lute) BlockDOM2Content(htmlStr string) (text string) {
+	keepEscaped := lute.ParseOptions.KeepEscaped
+	lute.ParseOptions.KeepEscaped = true
+	defer func() {
+		lute.ParseOptions.KeepEscaped = keepEscaped
+	}()
+
 	tree := lute.BlockDOM2Tree(htmlStr)
 	return tree.Root.Content()
 }

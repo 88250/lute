@@ -791,6 +791,10 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 				if node.ContainTextMarkTypes("strong", "em", "s", "mark", "sup", "sub") {
 					// Improve some inline elements Markdown editing https://github.com/siyuan-note/siyuan/issues/9999
 					startBlank, endBlank := startEndBlank(node.TextMarkTextContent)
+					if startBlank == node.TextMarkTextContent {
+						// 纯空白节点只移动一次空白，避免同时作为首尾空白重复插入。
+						endBlank = ""
+					}
 					if "" != startBlank {
 						if !strings.HasSuffix(node.PreviousNodeText(), " ") && !strings.HasSuffix(node.PreviousNodeText(), "　") {
 							node.InsertBefore(&ast.Node{Type: ast.NodeText, Tokens: []byte(startBlank)})
@@ -823,7 +827,9 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 
 					inlineTree := Inline("", []byte(content), options)
 					if nil != inlineTree && nil != inlineTree.Root.FirstChild && nil != inlineTree.Root.FirstChild.FirstChild {
-						node.TextMarkTextContent = inlineTree.Root.FirstChild.Content()
+						// 行级解析得到的是正文，写回文本标记前恢复 HTML 实体。
+						node.TextMarkTextContent = html.EscapeHTMLStr(inlineTree.Root.FirstChild.Content())
+						node.TextMarkTextContent = strings.ReplaceAll(node.TextMarkTextContent, "&quot;", "\"")
 
 						if nil == inlineTree.Root.FirstChild.FirstChild.Next {
 							// 不支持下划线中包含多个元素
