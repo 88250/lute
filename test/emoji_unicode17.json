@@ -1,0 +1,654 @@
+[
+  {
+    "alias": "distorted_face",
+    "emoji": "🫪"
+  },
+  {
+    "alias": "fight_cloud",
+    "emoji": "🫯"
+  },
+  {
+    "alias": "hairy_creature",
+    "emoji": "🫈"
+  },
+  {
+    "alias": "ballet_dancer",
+    "emoji": "🧑‍🩰"
+  },
+  {
+    "alias": "ballet_dancer_light_skin_tone",
+    "emoji": "🧑🏻‍🩰"
+  },
+  {
+    "alias": "ballet_dancer_medium_light_skin_tone",
+    "emoji": "🧑🏼‍🩰"
+  },
+  {
+    "alias": "ballet_dancer_medium_skin_tone",
+    "emoji": "🧑🏽‍🩰"
+  },
+  {
+    "alias": "ballet_dancer_medium_dark_skin_tone",
+    "emoji": "🧑🏾‍🩰"
+  },
+  {
+    "alias": "ballet_dancer_dark_skin_tone",
+    "emoji": "🧑🏿‍🩰"
+  },
+  {
+    "alias": "people_with_bunny_ears_light_skin_tone",
+    "emoji": "👯🏻"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_light_skin_tone",
+    "emoji": "👯🏼"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_skin_tone",
+    "emoji": "👯🏽"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_dark_skin_tone",
+    "emoji": "👯🏾"
+  },
+  {
+    "alias": "people_with_bunny_ears_dark_skin_tone",
+    "emoji": "👯🏿"
+  },
+  {
+    "alias": "men_with_bunny_ears_light_skin_tone",
+    "emoji": "👯🏻‍♂️"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_light_skin_tone",
+    "emoji": "👯🏼‍♂️"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_skin_tone",
+    "emoji": "👯🏽‍♂️"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_dark_skin_tone",
+    "emoji": "👯🏾‍♂️"
+  },
+  {
+    "alias": "men_with_bunny_ears_dark_skin_tone",
+    "emoji": "👯🏿‍♂️"
+  },
+  {
+    "alias": "women_with_bunny_ears_light_skin_tone",
+    "emoji": "👯🏻‍♀️"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_light_skin_tone",
+    "emoji": "👯🏼‍♀️"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_skin_tone",
+    "emoji": "👯🏽‍♀️"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_dark_skin_tone",
+    "emoji": "👯🏾‍♀️"
+  },
+  {
+    "alias": "women_with_bunny_ears_dark_skin_tone",
+    "emoji": "👯🏿‍♀️"
+  },
+  {
+    "alias": "people_with_bunny_ears_light_skin_tone_medium_light_skin_tone",
+    "emoji": "🧑🏻‍🐰‍🧑🏼"
+  },
+  {
+    "alias": "people_with_bunny_ears_light_skin_tone_medium_skin_tone",
+    "emoji": "🧑🏻‍🐰‍🧑🏽"
+  },
+  {
+    "alias": "people_with_bunny_ears_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "🧑🏻‍🐰‍🧑🏾"
+  },
+  {
+    "alias": "people_with_bunny_ears_light_skin_tone_dark_skin_tone",
+    "emoji": "🧑🏻‍🐰‍🧑🏿"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_light_skin_tone_light_skin_tone",
+    "emoji": "🧑🏼‍🐰‍🧑🏻"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_light_skin_tone_medium_skin_tone",
+    "emoji": "🧑🏼‍🐰‍🧑🏽"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "🧑🏼‍🐰‍🧑🏾"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_light_skin_tone_dark_skin_tone",
+    "emoji": "🧑🏼‍🐰‍🧑🏿"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_skin_tone_light_skin_tone",
+    "emoji": "🧑🏽‍🐰‍🧑🏻"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_skin_tone_medium_light_skin_tone",
+    "emoji": "🧑🏽‍🐰‍🧑🏼"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_skin_tone_medium_dark_skin_tone",
+    "emoji": "🧑🏽‍🐰‍🧑🏾"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_skin_tone_dark_skin_tone",
+    "emoji": "🧑🏽‍🐰‍🧑🏿"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_dark_skin_tone_light_skin_tone",
+    "emoji": "🧑🏾‍🐰‍🧑🏻"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "🧑🏾‍🐰‍🧑🏼"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_dark_skin_tone_medium_skin_tone",
+    "emoji": "🧑🏾‍🐰‍🧑🏽"
+  },
+  {
+    "alias": "people_with_bunny_ears_medium_dark_skin_tone_dark_skin_tone",
+    "emoji": "🧑🏾‍🐰‍🧑🏿"
+  },
+  {
+    "alias": "people_with_bunny_ears_dark_skin_tone_light_skin_tone",
+    "emoji": "🧑🏿‍🐰‍🧑🏻"
+  },
+  {
+    "alias": "people_with_bunny_ears_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "🧑🏿‍🐰‍🧑🏼"
+  },
+  {
+    "alias": "people_with_bunny_ears_dark_skin_tone_medium_skin_tone",
+    "emoji": "🧑🏿‍🐰‍🧑🏽"
+  },
+  {
+    "alias": "people_with_bunny_ears_dark_skin_tone_medium_dark_skin_tone",
+    "emoji": "🧑🏿‍🐰‍🧑🏾"
+  },
+  {
+    "alias": "men_with_bunny_ears_light_skin_tone_medium_light_skin_tone",
+    "emoji": "👨🏻‍🐰‍👨🏼"
+  },
+  {
+    "alias": "men_with_bunny_ears_light_skin_tone_medium_skin_tone",
+    "emoji": "👨🏻‍🐰‍👨🏽"
+  },
+  {
+    "alias": "men_with_bunny_ears_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "👨🏻‍🐰‍👨🏾"
+  },
+  {
+    "alias": "men_with_bunny_ears_light_skin_tone_dark_skin_tone",
+    "emoji": "👨🏻‍🐰‍👨🏿"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_light_skin_tone_light_skin_tone",
+    "emoji": "👨🏼‍🐰‍👨🏻"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_light_skin_tone_medium_skin_tone",
+    "emoji": "👨🏼‍🐰‍👨🏽"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "👨🏼‍🐰‍👨🏾"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_light_skin_tone_dark_skin_tone",
+    "emoji": "👨🏼‍🐰‍👨🏿"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_skin_tone_light_skin_tone",
+    "emoji": "👨🏽‍🐰‍👨🏻"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_skin_tone_medium_light_skin_tone",
+    "emoji": "👨🏽‍🐰‍👨🏼"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_skin_tone_medium_dark_skin_tone",
+    "emoji": "👨🏽‍🐰‍👨🏾"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_skin_tone_dark_skin_tone",
+    "emoji": "👨🏽‍🐰‍👨🏿"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_dark_skin_tone_light_skin_tone",
+    "emoji": "👨🏾‍🐰‍👨🏻"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "👨🏾‍🐰‍👨🏼"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_dark_skin_tone_medium_skin_tone",
+    "emoji": "👨🏾‍🐰‍👨🏽"
+  },
+  {
+    "alias": "men_with_bunny_ears_medium_dark_skin_tone_dark_skin_tone",
+    "emoji": "👨🏾‍🐰‍👨🏿"
+  },
+  {
+    "alias": "men_with_bunny_ears_dark_skin_tone_light_skin_tone",
+    "emoji": "👨🏿‍🐰‍👨🏻"
+  },
+  {
+    "alias": "men_with_bunny_ears_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "👨🏿‍🐰‍👨🏼"
+  },
+  {
+    "alias": "men_with_bunny_ears_dark_skin_tone_medium_skin_tone",
+    "emoji": "👨🏿‍🐰‍👨🏽"
+  },
+  {
+    "alias": "men_with_bunny_ears_dark_skin_tone_medium_dark_skin_tone",
+    "emoji": "👨🏿‍🐰‍👨🏾"
+  },
+  {
+    "alias": "women_with_bunny_ears_light_skin_tone_medium_light_skin_tone",
+    "emoji": "👩🏻‍🐰‍👩🏼"
+  },
+  {
+    "alias": "women_with_bunny_ears_light_skin_tone_medium_skin_tone",
+    "emoji": "👩🏻‍🐰‍👩🏽"
+  },
+  {
+    "alias": "women_with_bunny_ears_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "👩🏻‍🐰‍👩🏾"
+  },
+  {
+    "alias": "women_with_bunny_ears_light_skin_tone_dark_skin_tone",
+    "emoji": "👩🏻‍🐰‍👩🏿"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_light_skin_tone_light_skin_tone",
+    "emoji": "👩🏼‍🐰‍👩🏻"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_light_skin_tone_medium_skin_tone",
+    "emoji": "👩🏼‍🐰‍👩🏽"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "👩🏼‍🐰‍👩🏾"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_light_skin_tone_dark_skin_tone",
+    "emoji": "👩🏼‍🐰‍👩🏿"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_skin_tone_light_skin_tone",
+    "emoji": "👩🏽‍🐰‍👩🏻"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_skin_tone_medium_light_skin_tone",
+    "emoji": "👩🏽‍🐰‍👩🏼"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_skin_tone_medium_dark_skin_tone",
+    "emoji": "👩🏽‍🐰‍👩🏾"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_skin_tone_dark_skin_tone",
+    "emoji": "👩🏽‍🐰‍👩🏿"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_dark_skin_tone_light_skin_tone",
+    "emoji": "👩🏾‍🐰‍👩🏻"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "👩🏾‍🐰‍👩🏼"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_dark_skin_tone_medium_skin_tone",
+    "emoji": "👩🏾‍🐰‍👩🏽"
+  },
+  {
+    "alias": "women_with_bunny_ears_medium_dark_skin_tone_dark_skin_tone",
+    "emoji": "👩🏾‍🐰‍👩🏿"
+  },
+  {
+    "alias": "women_with_bunny_ears_dark_skin_tone_light_skin_tone",
+    "emoji": "👩🏿‍🐰‍👩🏻"
+  },
+  {
+    "alias": "women_with_bunny_ears_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "👩🏿‍🐰‍👩🏼"
+  },
+  {
+    "alias": "women_with_bunny_ears_dark_skin_tone_medium_skin_tone",
+    "emoji": "👩🏿‍🐰‍👩🏽"
+  },
+  {
+    "alias": "women_with_bunny_ears_dark_skin_tone_medium_dark_skin_tone",
+    "emoji": "👩🏿‍🐰‍👩🏾"
+  },
+  {
+    "alias": "people_wrestling_light_skin_tone",
+    "emoji": "🤼🏻"
+  },
+  {
+    "alias": "people_wrestling_medium_light_skin_tone",
+    "emoji": "🤼🏼"
+  },
+  {
+    "alias": "people_wrestling_medium_skin_tone",
+    "emoji": "🤼🏽"
+  },
+  {
+    "alias": "people_wrestling_medium_dark_skin_tone",
+    "emoji": "🤼🏾"
+  },
+  {
+    "alias": "people_wrestling_dark_skin_tone",
+    "emoji": "🤼🏿"
+  },
+  {
+    "alias": "men_wrestling_light_skin_tone",
+    "emoji": "🤼🏻‍♂️"
+  },
+  {
+    "alias": "men_wrestling_medium_light_skin_tone",
+    "emoji": "🤼🏼‍♂️"
+  },
+  {
+    "alias": "men_wrestling_medium_skin_tone",
+    "emoji": "🤼🏽‍♂️"
+  },
+  {
+    "alias": "men_wrestling_medium_dark_skin_tone",
+    "emoji": "🤼🏾‍♂️"
+  },
+  {
+    "alias": "men_wrestling_dark_skin_tone",
+    "emoji": "🤼🏿‍♂️"
+  },
+  {
+    "alias": "women_wrestling_light_skin_tone",
+    "emoji": "🤼🏻‍♀️"
+  },
+  {
+    "alias": "women_wrestling_medium_light_skin_tone",
+    "emoji": "🤼🏼‍♀️"
+  },
+  {
+    "alias": "women_wrestling_medium_skin_tone",
+    "emoji": "🤼🏽‍♀️"
+  },
+  {
+    "alias": "women_wrestling_medium_dark_skin_tone",
+    "emoji": "🤼🏾‍♀️"
+  },
+  {
+    "alias": "women_wrestling_dark_skin_tone",
+    "emoji": "🤼🏿‍♀️"
+  },
+  {
+    "alias": "people_wrestling_light_skin_tone_medium_light_skin_tone",
+    "emoji": "🧑🏻‍🫯‍🧑🏼"
+  },
+  {
+    "alias": "people_wrestling_light_skin_tone_medium_skin_tone",
+    "emoji": "🧑🏻‍🫯‍🧑🏽"
+  },
+  {
+    "alias": "people_wrestling_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "🧑🏻‍🫯‍🧑🏾"
+  },
+  {
+    "alias": "people_wrestling_light_skin_tone_dark_skin_tone",
+    "emoji": "🧑🏻‍🫯‍🧑🏿"
+  },
+  {
+    "alias": "people_wrestling_medium_light_skin_tone_light_skin_tone",
+    "emoji": "🧑🏼‍🫯‍🧑🏻"
+  },
+  {
+    "alias": "people_wrestling_medium_light_skin_tone_medium_skin_tone",
+    "emoji": "🧑🏼‍🫯‍🧑🏽"
+  },
+  {
+    "alias": "people_wrestling_medium_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "🧑🏼‍🫯‍🧑🏾"
+  },
+  {
+    "alias": "people_wrestling_medium_light_skin_tone_dark_skin_tone",
+    "emoji": "🧑🏼‍🫯‍🧑🏿"
+  },
+  {
+    "alias": "people_wrestling_medium_skin_tone_light_skin_tone",
+    "emoji": "🧑🏽‍🫯‍🧑🏻"
+  },
+  {
+    "alias": "people_wrestling_medium_skin_tone_medium_light_skin_tone",
+    "emoji": "🧑🏽‍🫯‍🧑🏼"
+  },
+  {
+    "alias": "people_wrestling_medium_skin_tone_medium_dark_skin_tone",
+    "emoji": "🧑🏽‍🫯‍🧑🏾"
+  },
+  {
+    "alias": "people_wrestling_medium_skin_tone_dark_skin_tone",
+    "emoji": "🧑🏽‍🫯‍🧑🏿"
+  },
+  {
+    "alias": "people_wrestling_medium_dark_skin_tone_light_skin_tone",
+    "emoji": "🧑🏾‍🫯‍🧑🏻"
+  },
+  {
+    "alias": "people_wrestling_medium_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "🧑🏾‍🫯‍🧑🏼"
+  },
+  {
+    "alias": "people_wrestling_medium_dark_skin_tone_medium_skin_tone",
+    "emoji": "🧑🏾‍🫯‍🧑🏽"
+  },
+  {
+    "alias": "people_wrestling_medium_dark_skin_tone_dark_skin_tone",
+    "emoji": "🧑🏾‍🫯‍🧑🏿"
+  },
+  {
+    "alias": "people_wrestling_dark_skin_tone_light_skin_tone",
+    "emoji": "🧑🏿‍🫯‍🧑🏻"
+  },
+  {
+    "alias": "people_wrestling_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "🧑🏿‍🫯‍🧑🏼"
+  },
+  {
+    "alias": "people_wrestling_dark_skin_tone_medium_skin_tone",
+    "emoji": "🧑🏿‍🫯‍🧑🏽"
+  },
+  {
+    "alias": "people_wrestling_dark_skin_tone_medium_dark_skin_tone",
+    "emoji": "🧑🏿‍🫯‍🧑🏾"
+  },
+  {
+    "alias": "men_wrestling_light_skin_tone_medium_light_skin_tone",
+    "emoji": "👨🏻‍🫯‍👨🏼"
+  },
+  {
+    "alias": "men_wrestling_light_skin_tone_medium_skin_tone",
+    "emoji": "👨🏻‍🫯‍👨🏽"
+  },
+  {
+    "alias": "men_wrestling_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "👨🏻‍🫯‍👨🏾"
+  },
+  {
+    "alias": "men_wrestling_light_skin_tone_dark_skin_tone",
+    "emoji": "👨🏻‍🫯‍👨🏿"
+  },
+  {
+    "alias": "men_wrestling_medium_light_skin_tone_light_skin_tone",
+    "emoji": "👨🏼‍🫯‍👨🏻"
+  },
+  {
+    "alias": "men_wrestling_medium_light_skin_tone_medium_skin_tone",
+    "emoji": "👨🏼‍🫯‍👨🏽"
+  },
+  {
+    "alias": "men_wrestling_medium_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "👨🏼‍🫯‍👨🏾"
+  },
+  {
+    "alias": "men_wrestling_medium_light_skin_tone_dark_skin_tone",
+    "emoji": "👨🏼‍🫯‍👨🏿"
+  },
+  {
+    "alias": "men_wrestling_medium_skin_tone_light_skin_tone",
+    "emoji": "👨🏽‍🫯‍👨🏻"
+  },
+  {
+    "alias": "men_wrestling_medium_skin_tone_medium_light_skin_tone",
+    "emoji": "👨🏽‍🫯‍👨🏼"
+  },
+  {
+    "alias": "men_wrestling_medium_skin_tone_medium_dark_skin_tone",
+    "emoji": "👨🏽‍🫯‍👨🏾"
+  },
+  {
+    "alias": "men_wrestling_medium_skin_tone_dark_skin_tone",
+    "emoji": "👨🏽‍🫯‍👨🏿"
+  },
+  {
+    "alias": "men_wrestling_medium_dark_skin_tone_light_skin_tone",
+    "emoji": "👨🏾‍🫯‍👨🏻"
+  },
+  {
+    "alias": "men_wrestling_medium_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "👨🏾‍🫯‍👨🏼"
+  },
+  {
+    "alias": "men_wrestling_medium_dark_skin_tone_medium_skin_tone",
+    "emoji": "👨🏾‍🫯‍👨🏽"
+  },
+  {
+    "alias": "men_wrestling_medium_dark_skin_tone_dark_skin_tone",
+    "emoji": "👨🏾‍🫯‍👨🏿"
+  },
+  {
+    "alias": "men_wrestling_dark_skin_tone_light_skin_tone",
+    "emoji": "👨🏿‍🫯‍👨🏻"
+  },
+  {
+    "alias": "men_wrestling_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "👨🏿‍🫯‍👨🏼"
+  },
+  {
+    "alias": "men_wrestling_dark_skin_tone_medium_skin_tone",
+    "emoji": "👨🏿‍🫯‍👨🏽"
+  },
+  {
+    "alias": "men_wrestling_dark_skin_tone_medium_dark_skin_tone",
+    "emoji": "👨🏿‍🫯‍👨🏾"
+  },
+  {
+    "alias": "women_wrestling_light_skin_tone_medium_light_skin_tone",
+    "emoji": "👩🏻‍🫯‍👩🏼"
+  },
+  {
+    "alias": "women_wrestling_light_skin_tone_medium_skin_tone",
+    "emoji": "👩🏻‍🫯‍👩🏽"
+  },
+  {
+    "alias": "women_wrestling_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "👩🏻‍🫯‍👩🏾"
+  },
+  {
+    "alias": "women_wrestling_light_skin_tone_dark_skin_tone",
+    "emoji": "👩🏻‍🫯‍👩🏿"
+  },
+  {
+    "alias": "women_wrestling_medium_light_skin_tone_light_skin_tone",
+    "emoji": "👩🏼‍🫯‍👩🏻"
+  },
+  {
+    "alias": "women_wrestling_medium_light_skin_tone_medium_skin_tone",
+    "emoji": "👩🏼‍🫯‍👩🏽"
+  },
+  {
+    "alias": "women_wrestling_medium_light_skin_tone_medium_dark_skin_tone",
+    "emoji": "👩🏼‍🫯‍👩🏾"
+  },
+  {
+    "alias": "women_wrestling_medium_light_skin_tone_dark_skin_tone",
+    "emoji": "👩🏼‍🫯‍👩🏿"
+  },
+  {
+    "alias": "women_wrestling_medium_skin_tone_light_skin_tone",
+    "emoji": "👩🏽‍🫯‍👩🏻"
+  },
+  {
+    "alias": "women_wrestling_medium_skin_tone_medium_light_skin_tone",
+    "emoji": "👩🏽‍🫯‍👩🏼"
+  },
+  {
+    "alias": "women_wrestling_medium_skin_tone_medium_dark_skin_tone",
+    "emoji": "👩🏽‍🫯‍👩🏾"
+  },
+  {
+    "alias": "women_wrestling_medium_skin_tone_dark_skin_tone",
+    "emoji": "👩🏽‍🫯‍👩🏿"
+  },
+  {
+    "alias": "women_wrestling_medium_dark_skin_tone_light_skin_tone",
+    "emoji": "👩🏾‍🫯‍👩🏻"
+  },
+  {
+    "alias": "women_wrestling_medium_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "👩🏾‍🫯‍👩🏼"
+  },
+  {
+    "alias": "women_wrestling_medium_dark_skin_tone_medium_skin_tone",
+    "emoji": "👩🏾‍🫯‍👩🏽"
+  },
+  {
+    "alias": "women_wrestling_medium_dark_skin_tone_dark_skin_tone",
+    "emoji": "👩🏾‍🫯‍👩🏿"
+  },
+  {
+    "alias": "women_wrestling_dark_skin_tone_light_skin_tone",
+    "emoji": "👩🏿‍🫯‍👩🏻"
+  },
+  {
+    "alias": "women_wrestling_dark_skin_tone_medium_light_skin_tone",
+    "emoji": "👩🏿‍🫯‍👩🏼"
+  },
+  {
+    "alias": "women_wrestling_dark_skin_tone_medium_skin_tone",
+    "emoji": "👩🏿‍🫯‍👩🏽"
+  },
+  {
+    "alias": "women_wrestling_dark_skin_tone_medium_dark_skin_tone",
+    "emoji": "👩🏿‍🫯‍👩🏾"
+  },
+  {
+    "alias": "orca",
+    "emoji": "🫍"
+  },
+  {
+    "alias": "landslide",
+    "emoji": "🛘"
+  },
+  {
+    "alias": "trombone",
+    "emoji": "🪊"
+  },
+  {
+    "alias": "treasure_chest",
+    "emoji": "🪎"
+  }
+]
