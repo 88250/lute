@@ -415,9 +415,7 @@ func (r *ProtyleRenderer) renderVideo(node *ast.Node, entering bool) ast.WalkSta
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
-		dataSrc := r.tagSrc(tokens)
-		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, string(src))
+		tokens = r.mediaControls(tokens, "video")
 		r.Write(tokens)
 	} else {
 		r.Tag("span", [][]string{{"class", "protyle-action__drag"}, {"contenteditable", "false"}}, false)
@@ -439,9 +437,7 @@ func (r *ProtyleRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkSta
 		if r.Options.Sanitize {
 			tokens = sanitize(tokens)
 		}
-		dataSrc := r.tagSrc(tokens)
-		src := r.LinkPath(dataSrc)
-		tokens = r.replaceSrc(tokens, string(src))
+		tokens = r.mediaControls(tokens, "audio")
 		r.Write(tokens)
 		r.WriteString(editor.Zwsp)
 	} else {
@@ -450,6 +446,28 @@ func (r *ProtyleRenderer) renderAudio(node *ast.Node, entering bool) ast.WalkSta
 		r.Tag("/div", nil, false)
 	}
 	return ast.WalkContinue
+}
+
+// mediaControls 为音视频块补齐播放控件，并保留子元素和其他播放属性。
+func (r *ProtyleRenderer) mediaControls(tokens []byte, tag string) []byte {
+	fragment := util.ParseHTML(string(tokens))
+	if nil == fragment || nil == fragment.FirstChild || tag != fragment.FirstChild.Data {
+		return tokens
+	}
+	media := fragment.FirstChild
+	hasControls, hasSrc := false, false
+	for _, attr := range media.Attr {
+		hasControls = hasControls || "controls" == attr.Key
+		hasSrc = hasSrc || "src" == attr.Key
+	}
+	if !hasControls {
+		util.SetDomAttrValue(media, "controls", "controls")
+	}
+	if hasSrc {
+		src := r.LinkPath([]byte(util.DomAttrValue(media, "src")))
+		util.SetDomAttrValue(media, "src", string(src))
+	}
+	return util.DomHTML(media)
 }
 
 func (r *ProtyleRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStatus {
