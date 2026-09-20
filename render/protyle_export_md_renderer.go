@@ -1787,7 +1787,7 @@ func (r *ProtyleExportMdRenderer) renderCodeBlockCode(node *ast.Node, entering b
 	if entering {
 		tokens := node.Tokens
 		info := node.Parent.ChildByType(ast.NodeCodeBlockFenceInfoMarker)
-		if nil != info && NoHighlight(string(info.CodeBlockInfo)) {
+		if nil != info && string(info.CodeBlockInfo) != "mindmap" && NoHighlight(string(info.CodeBlockInfo)) {
 			tokens = html.UnescapeHTML(tokens)
 		}
 		r.Write(tokens)

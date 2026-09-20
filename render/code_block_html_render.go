@@ -69,7 +69,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 		infoWords := lex.Split(node.Previous.CodeBlockInfo, lex.ItemSpace)
 		language = util.BytesToStr(infoWords[0])
 	}
-	preDiv := NoHighlight(language)
+	preDiv := NoHighlight(language) && !(r.Options.ProtyleWYSIWYG && language == "mindmap")
 	if entering {
 		var attrs [][]string
 		r.handleKramdownBlockIAL(node.Parent)
@@ -85,7 +85,7 @@ func (r *HtmlRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.Wa
 				}
 			}
 
-			if "mindmap" == language {
+			if "mindmap" == language && preDiv {
 				json := EChartsMindmap(tokens)
 				r.WriteString("<div data-code=\"")
 				r.Write(json)

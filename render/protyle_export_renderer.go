@@ -909,7 +909,7 @@ func (r *ProtyleExportRenderer) renderCodeBlock(node *ast.Node, entering bool) a
 	if nil != node.FirstChild && nil != node.FirstChild.Next && 0 < len(node.FirstChild.Next.CodeBlockInfo) {
 		language = util.BytesToStr(node.FirstChild.Next.CodeBlockInfo)
 		language = strings.ReplaceAll(language, editor.Caret, "")
-		noHighlight = NoHighlight(language)
+		noHighlight = language != "mindmap" && NoHighlight(language)
 	}
 
 	if entering {
