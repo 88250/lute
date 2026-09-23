@@ -950,7 +950,7 @@ func (n *Node) IsBlock() bool {
 	case NodeDocument, NodeParagraph, NodeHeading, NodeThematicBreak, NodeBlockquote, NodeList, NodeListItem, NodeHTMLBlock,
 		NodeCodeBlock, NodeTable, NodeMathBlock, NodeFootnotesDefBlock, NodeFootnotesDef, NodeToC, NodeYamlFrontMatter,
 		NodeBlockQueryEmbed, NodeKramdownBlockIAL, NodeSuperBlock, NodeGitConflict, NodeAudio, NodeVideo, NodeIFrame, NodeWidget,
-		NodeAttributeView, NodeCustomBlock, NodeCallout, NodeTabs, NodeTabItem:
+		NodeAttributeView, NodeCustomBlock, NodeCallout, NodeTabs, NodeTabItem, NodeMindmap, NodeMindmapItem:
 		return true
 	}
 	return false
@@ -960,7 +960,7 @@ func (n *Node) IsBlock() bool {
 func (n *Node) IsContainerBlock() bool {
 	switch n.Type {
 	case NodeDocument, NodeBlockquote, NodeList, NodeListItem, NodeFootnotesDefBlock, NodeFootnotesDef, NodeSuperBlock, NodeCallout,
-		NodeTabs, NodeTabItem:
+		NodeTabs, NodeTabItem, NodeMindmap, NodeMindmapItem:
 		return true
 	}
 	return false
@@ -1009,11 +1009,18 @@ func (n *Node) CanContain(nodeType NodeType) bool {
 	if NodeTabItem == nodeType {
 		return NodeTabs == n.Type
 	}
+	if NodeMindmapItem == nodeType {
+		return NodeMindmap == n.Type
+	}
 	switch n.Type {
 	case NodeTabs:
 		return NodeKramdownBlockIAL == nodeType
 	case NodeTabItem:
 		return NodeDocument != nodeType && NodeListItem != nodeType && NodeFootnotesDef != nodeType
+	case NodeMindmap:
+		return NodeMindmapItem == nodeType
+	case NodeMindmapItem:
+		return NodeDocument != nodeType && NodeList != nodeType && NodeListItem != nodeType && NodeFootnotesDef != nodeType
 	case NodeCodeBlock, NodeHTMLBlock, NodeParagraph, NodeThematicBreak, NodeTable, NodeMathBlock, NodeYamlFrontMatter,
 		NodeGitConflict, NodeIFrame, NodeWidget, NodeVideo, NodeAudio, NodeAttributeView, NodeCustomBlock:
 		return false
@@ -1281,8 +1288,10 @@ const (
 
 	NodeCallout NodeType = 580 // 提示块
 
-	NodeTabs    NodeType = 590 // 页签容器
-	NodeTabItem NodeType = 591 // 页签项
+	NodeTabs        NodeType = 590 // 页签容器
+	NodeTabItem     NodeType = 591 // 页签项
+	NodeMindmap     NodeType = 600 // 思维导图容器
+	NodeMindmapItem NodeType = 601 // 思维导图节点
 
 	NodeTypeMaxVal NodeType = 1024 // 节点类型最大值
 )

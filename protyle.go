@@ -36,11 +36,27 @@ func (lute *Lute) SpinBlockDOM(ivHTML string) (ovHTML string) {
 	}()
 
 	blockDOMTree := lute.BlockDOM2Tree(ivHTML)
+	mindmapTypes := map[string]ast.NodeType{}
+	ast.Walk(blockDOMTree.Root, func(node *ast.Node, entering bool) ast.WalkStatus {
+		if entering && node.ID != "" && (node.Type == ast.NodeMindmap || node.Type == ast.NodeMindmapItem) {
+			mindmapTypes[node.ID] = node.Type
+		}
+		return ast.WalkContinue
+	})
 	tabFragments := wrapTabItemFragments(blockDOMTree)
 	normalizeSpinCaretNewline(blockDOMTree)
 	markdown := lute.blockDOMTree2Md(blockDOMTree)
 	markdown = strings.ReplaceAll(markdown, editor.Zwsp, "")
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
+	ast.Walk(tree.Root, func(node *ast.Node, entering bool) ast.WalkStatus {
+		if entering && node.ID != "" {
+			if typ, ok := mindmapTypes[node.ID]; ok &&
+				(typ == ast.NodeMindmap && node.Type == ast.NodeList || typ == ast.NodeMindmapItem && node.Type == ast.NodeListItem) {
+				node.Type = typ
+			}
+		}
+		return ast.WalkContinue
+	})
 	unwrapTabItemFragments(tree, tabFragments)
 
 	firstChild := tree.Root.FirstChild
@@ -1217,7 +1233,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 				}
 			}
 			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeCodeBlockCode, Tokens: buf.Bytes()})
-		} else if ast.NodeListItem == tree.Context.Tip.Type {
+		} else if ast.NodeListItem == tree.Context.Tip.Type || ast.NodeMindmapItem == tree.Context.Tip.Type {
 			if 3 == tree.Context.Tip.ListData.Typ { // 任务列表
 				checked := strings.Contains(util.DomAttrValue(n.Parent, "class"), "protyle-task--done")
 				markerNode := &ast.Node{Type: ast.NodeTaskListItemMarker}
@@ -1398,8 +1414,8 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
-	case ast.NodeList:
-		node.Type = ast.NodeList
+	case ast.NodeList, ast.NodeMindmap:
+		node.Type = dataType
 		marker := util.DomAttrValue(n, "data-marker")
 		node.ListData = &ast.ListData{}
 		subType := util.DomAttrValue(n, "data-subtype")
@@ -1414,11 +1430,15 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
-	case ast.NodeListItem:
+	case ast.NodeListItem, ast.NodeMindmapItem:
 		marker := util.DomAttrValue(n, "data-marker")
-		if ast.NodeList != tree.Context.Tip.Type {
+		containerType := ast.NodeList
+		if ast.NodeMindmapItem == dataType {
+			containerType = ast.NodeMindmap
+		}
+		if containerType != tree.Context.Tip.Type {
 			parent := &ast.Node{}
-			parent.Type = ast.NodeList
+			parent.Type = containerType
 			parent.ListData = &ast.ListData{}
 			subType := util.DomAttrValue(n, "data-subtype")
 			if "u" == subType {
@@ -1436,7 +1456,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			tree.Context.Tip = parent
 		}
 
-		node.Type = ast.NodeListItem
+		node.Type = dataType
 		node.ListData = &ast.ListData{}
 		subType := util.DomAttrValue(n, "data-subtype")
 		if "u" == subType {

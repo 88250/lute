@@ -72,6 +72,8 @@ func NewFormatRenderer(tree *parse.Tree, options *Options, parseOptions *parse.O
 	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
+	ret.RendererFuncs[ast.NodeMindmap] = ret.renderList
+	ret.RendererFuncs[ast.NodeMindmapItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
 	ret.RendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
 	ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
@@ -578,7 +580,7 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 		return ast.WalkContinue
 	}
 
-	if nil != node.Previous && (ast.NodeListItem == node.Previous.Type || ast.NodeTabItem == node.Previous.Type) {
+	if nil != node.Previous && (ast.NodeListItem == node.Previous.Type || ast.NodeMindmapItem == node.Previous.Type || ast.NodeTabItem == node.Previous.Type) {
 		return ast.WalkContinue
 	}
 	if entering {
@@ -590,7 +592,7 @@ func (r *FormatRenderer) renderKramdownBlockIAL(node *ast.Node, entering bool) a
 			r.Write(node.Tokens)
 		}
 	} else {
-		if ast.NodeListItem == node.Parent.Type || ast.NodeList == node.Parent.Type {
+		if ast.NodeListItem == node.Parent.Type || ast.NodeMindmapItem == node.Parent.Type || ast.NodeList == node.Parent.Type || ast.NodeMindmap == node.Parent.Type {
 			if !node.Parent.ListData.Tight {
 				r.Newline()
 			}
@@ -1436,7 +1438,7 @@ func (r *FormatRenderer) renderParagraph(node *ast.Node, entering bool) ast.Walk
 		inTightList := false
 		lastListItemLastPara := false
 		if parent := node.Parent; nil != parent {
-			if ast.NodeListItem == parent.Type { // ListItem.Paragraph
+			if ast.NodeListItem == parent.Type || ast.NodeMindmapItem == parent.Type { // ListItem.Paragraph
 				listItem := parent
 				if nil != listItem.Parent && nil != listItem.Parent.ListData {
 					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.Tight
@@ -1895,7 +1897,7 @@ func (r *FormatRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkS
 			liIAL := node.Next
 			r.Write(liIAL.Tokens)
 		}
-		if nil != node.FirstChild && ast.NodeList == node.FirstChild.Type {
+		if nil != node.FirstChild && (ast.NodeList == node.FirstChild.Type || ast.NodeMindmap == node.FirstChild.Type) {
 			r.Newline()
 		}
 	} else {

@@ -72,6 +72,8 @@ func NewVditorIRRenderer(tree *parse.Tree, options *Options, parseOptions *parse
 	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
+	ret.RendererFuncs[ast.NodeMindmap] = ret.renderList
+	ret.RendererFuncs[ast.NodeMindmapItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
 	ret.RendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
 	ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak

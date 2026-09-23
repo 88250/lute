@@ -71,6 +71,8 @@ func NewProtyleRenderer(tree *parse.Tree, options *Options, parseOptions *parse.
 	ret.RendererFuncs[ast.NodeHeadingID] = ret.renderHeadingID
 	ret.RendererFuncs[ast.NodeList] = ret.renderList
 	ret.RendererFuncs[ast.NodeListItem] = ret.renderListItem
+	ret.RendererFuncs[ast.NodeMindmap] = ret.renderList
+	ret.RendererFuncs[ast.NodeMindmapItem] = ret.renderListItem
 	ret.RendererFuncs[ast.NodeThematicBreak] = ret.renderThematicBreak
 	ret.RendererFuncs[ast.NodeHardBreak] = ret.renderHardBreak
 	ret.RendererFuncs[ast.NodeSoftBreak] = ret.renderSoftBreak
@@ -1839,7 +1841,11 @@ func (r *ProtyleRenderer) renderList(node *ast.Node, entering bool) ast.WalkStat
 		case 3:
 			attrs = append(attrs, []string{"data-subtype", "t"})
 		}
-		r.blockNodeAttrs(node, &attrs, "list")
+		class := "list"
+		if ast.NodeMindmap == node.Type {
+			class = "mindmap"
+		}
+		r.blockNodeAttrs(node, &attrs, class)
 		r.Tag("div", attrs, false)
 	} else {
 		r.renderIAL(node)
@@ -1851,6 +1857,9 @@ func (r *ProtyleRenderer) renderList(node *ast.Node, entering bool) ast.WalkStat
 func (r *ProtyleRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		class := "li"
+		if ast.NodeMindmapItem == node.Type {
+			class = "mindmap-item"
+		}
 		var attrs [][]string
 		switch node.ListData.Typ {
 		case 0:
