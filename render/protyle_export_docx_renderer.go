@@ -967,14 +967,8 @@ func (r *ProtyleExportDocxRenderer) renderTableCell(node *ast.Node, entering boo
 	}
 	if entering {
 		var attrs [][]string
-		switch node.TableCellAlign {
-		case 1:
-			attrs = append(attrs, []string{"align", "left"})
-		case 2:
-			attrs = append(attrs, []string{"align", "center"})
-		case 3:
-			attrs = append(attrs, []string{"align", "right"})
-		}
+		r.spanNodeAttrs(node, &attrs)
+		appendTableCellAlignStyle(node, &attrs)
 		r.Tag(tag, attrs, false)
 		if nil != node.TableCellRich {
 			if content, err := TableCellRichHTML(node.TableCellRich, r.Options); nil == err {

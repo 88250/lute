@@ -18,6 +18,46 @@ import (
 	"github.com/88250/lute/lex"
 )
 
+// TableCellStyleAlign 读取单元格行内样式中的水平对齐方式。
+func TableCellStyleAlign(style string) (align int, found bool) {
+	for _, declaration := range strings.Split(style, ";") {
+		property, value, ok := strings.Cut(declaration, ":")
+		if !ok || !strings.EqualFold(strings.TrimSpace(property), "text-align") {
+			continue
+		}
+		found = true
+		value = strings.ToLower(strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(value), "!important")))
+		switch value {
+		case "left":
+			align = 1
+		case "center":
+			align = 2
+		case "right":
+			align = 3
+		default:
+			align = 0
+		}
+	}
+	return
+}
+
+// TableCellAlignValue 兼容旧的 align 属性，并以行内样式为准。
+func TableCellAlignValue(align, style string) int {
+	var value int
+	switch strings.ToLower(strings.TrimSpace(align)) {
+	case "left":
+		value = 1
+	case "center":
+		value = 2
+	case "right":
+		value = 3
+	}
+	if styleValue, found := TableCellStyleAlign(style); found {
+		return styleValue
+	}
+	return value
+}
+
 // isTableCellIAL 判断 IAL 是否包含需要随表格单元格往返保留的结构或样式属性。
 func isTableCellIAL(ial [][]string) bool {
 	for _, attr := range ial {
@@ -85,6 +125,9 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 						ialTokens := subTokens[:pos+1]
 						if isTableCellIAL(ial) {
 							th.KramdownIAL = ial
+							if align, found := TableCellStyleAlign(th.IALAttr("style")); found {
+								th.TableCellAlign = align
+							}
 							th.Tokens = th.Tokens[len(ialTokens):]
 							spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 							th.PrependChild(spanIAL)
@@ -116,6 +159,9 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 						ialTokens := subTokens[:pos+1]
 						if isTableCellIAL(ial) {
 							td.KramdownIAL = ial
+							if align, found := TableCellStyleAlign(td.IALAttr("style")); found {
+								td.TableCellAlign = align
+							}
 							td.Tokens = td.Tokens[len(ialTokens):]
 							spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 							td.PrependChild(spanIAL)
@@ -199,6 +245,9 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 			ialTokens := subTokens[:pos+1]
 			if isTableCellIAL(ial) {
 				th.KramdownIAL = ial
+				if align, found := TableCellStyleAlign(th.IALAttr("style")); found {
+					th.TableCellAlign = align
+				}
 				th.Tokens = append(th.Tokens[:ialStart], th.Tokens[ialStart+len(ialTokens):]...)
 				spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 				th.InsertAfter(spanIAL)
@@ -227,6 +276,9 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 				ialTokens := subTokens[:pos+1]
 				if isTableCellIAL(ial) {
 					th.KramdownIAL = ial
+					if align, found := TableCellStyleAlign(th.IALAttr("style")); found {
+						th.TableCellAlign = align
+					}
 					th.Tokens = append(th.Tokens[:ialStart], th.Tokens[ialStart+len(ialTokens):]...)
 					spanIAL := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 					th.InsertAfter(spanIAL)

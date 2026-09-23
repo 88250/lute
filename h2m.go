@@ -394,12 +394,8 @@ func tableCaptionAtBottom(style string) bool {
 	return false
 }
 
-// setTableCellSpanIAL 为表格单元格节点（th/td）提取 colspan/rowspan/class 属性并写入 KramdownIAL，
-// 同时 Prepend 一个 NodeKramdownSpanIAL 子节点以便渲染器输出 `{: colspan=".." rowspan=".."}`。
-// 与 parse.SetSpanIAL 的区别：本函数用于外部 HTML 转换路径（HTML2Markdown），刻意不提取 style 等
-// 属性，避免外部网页的大量 inline style 噪音污染表格单元格。class 仅在为 "fn__none"（思源合并单元格
-// 占位标记，由 fixTableStructure 插入）时才保留，外部网页的其它样式 class（如 column-1、row-2 odd）
-// 视为噪音丢弃。colspan/rowspan 是合并单元格的核心属性，必须保留。
+// setTableCellSpanIAL 保留表格合并结构和与表头不同的水平对齐样式，忽略外部网页的其它样式。
+// class 仅保留由 fixTableStructure 插入的 fn__none 占位标记。
 func setTableCellSpanIAL(node *ast.Node, n *html.Node) {
 	if nil == node || nil == n {
 		return
@@ -421,13 +417,55 @@ func setTableCellSpanIAL(node *ast.Node, n *html.Node) {
 		// 仅保留思源合并单元格占位标记，丢弃外部网页的样式 class
 		node.SetIALAttr("class", class)
 	}
-	if "" == colspan && "" == rowspan && "" == node.IALAttr("class") {
+	if node.TableCellAlign != tableHeadCellAlign(node) {
+		align := "start"
+		switch node.TableCellAlign {
+		case 1:
+			align = "left"
+		case 2:
+			align = "center"
+		case 3:
+			align = "right"
+		}
+		node.SetIALAttr("style", "text-align: "+align+";")
+	}
+	if "" == colspan && "" == rowspan && "" == node.IALAttr("class") && "" == node.IALAttr("style") {
 		return
 	}
 
 	ialTokens := parse.IAL2Tokens(node.KramdownIAL)
 	ial := &ast.Node{Type: ast.NodeKramdownSpanIAL, Tokens: ialTokens}
 	node.PrependChild(ial)
+}
+
+// tableHeadCellAlign 返回同一视觉列的表头对齐方式，供逐格样式往返使用。
+func tableHeadCellAlign(node *ast.Node) int {
+	if nil == node.Parent {
+		return 0
+	}
+	column := 0
+	for previous := node.Previous; nil != previous; previous = previous.Previous {
+		if ast.NodeTableCell == previous.Type {
+			column++
+		}
+	}
+	table := node.Parent.Parent
+	if nil != table && ast.NodeTableHead == table.Type {
+		table = table.Parent
+	}
+	if nil == table || nil == table.FirstChild || ast.NodeTableHead != table.FirstChild.Type || nil == table.FirstChild.FirstChild {
+		return 0
+	}
+	for cell := table.FirstChild.FirstChild.FirstChild; nil != cell; cell = cell.Next {
+		if ast.NodeTableCell != cell.Type {
+			continue
+		}
+		if 0 == column {
+			return cell.TableCellAlign
+		}
+		column--
+	}
+	return 0
 }
 
 // trimTableCellTextTokens 清理表格单元格文本边界，并保留相邻行级节点之间的一个空格。
@@ -1615,19 +1653,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Th, atom.Td:
 		node.Type = ast.NodeTableCell
-		align := util.DomAttrValue(n, "align")
-		var tableAlign int
-		switch align {
-		case "left":
-			tableAlign = 1
-		case "center":
-			tableAlign = 2
-		case "right":
-			tableAlign = 3
-		default:
-			tableAlign = 0
-		}
-		node.TableCellAlign = tableAlign
+		node.TableCellAlign = parse.TableCellAlignValue(util.DomAttrValue(n, "align"), util.DomAttrValue(n, "style"))
 		tree.Context.Tip.AppendChild(node)
 		setTableCellSpanIAL(node, n)
 		for _, attr := range n.Attr {

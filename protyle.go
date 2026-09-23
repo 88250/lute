@@ -1745,19 +1745,7 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 		defer tree.Context.ParentTip()
 	case atom.Th, atom.Td:
 		node.Type = ast.NodeTableCell
-		align := util.DomAttrValue(n, "align")
-		var tableAlign int
-		switch align {
-		case "left":
-			tableAlign = 1
-		case "center":
-			tableAlign = 2
-		case "right":
-			tableAlign = 3
-		default:
-			tableAlign = 0
-		}
-		node.TableCellAlign = tableAlign
+		node.TableCellAlign = parse.TableCellAlignValue(util.DomAttrValue(n, "align"), util.DomAttrValue(n, "style"))
 		tree.Context.Tip.AppendChild(node)
 		parse.SetSpanIAL(node, n)
 		tree.Context.Tip = node

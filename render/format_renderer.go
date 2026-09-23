@@ -606,6 +606,9 @@ func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) as
 	if !r.Options.KramdownSpanIAL {
 		return ast.WalkContinue
 	}
+	if isTableCellIALNode(node) {
+		return ast.WalkContinue
+	}
 
 	if entering {
 		r.Write(node.Tokens)
@@ -624,6 +627,14 @@ func (r *FormatRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) as
 		}
 	}
 	return ast.WalkContinue
+}
+
+func isTableCellIALNode(node *ast.Node) bool {
+	if nil != node.Parent && ast.NodeTableCell == node.Parent.Type && node == node.Parent.FirstChild && 0 < len(node.Parent.KramdownIAL) {
+		return true
+	}
+	return nil != node.Previous && ast.NodeTableCell == node.Previous.Type && 0 < len(node.Previous.KramdownIAL) &&
+		bytes.Equal(node.Tokens, parse.IAL2Tokens(node.Previous.KramdownIAL))
 }
 
 func (r *FormatRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus {
@@ -904,19 +915,137 @@ func (r *FormatRenderer) renderEmoji(node *ast.Node, entering bool) ast.WalkStat
 	return ast.WalkContinue
 }
 
-// tableCellStructIALTokens 提取单元格的 colspan/rowspan/fn__none 结构属性并序列化为 IAL tokens，
-// 供 markdown 往返时保留合并单元格信息。无结构属性时返回 nil。
+// tableCellStructIALTokens 提取单元格的合并结构与对齐样式，供 Markdown 往返保留。
 func tableCellStructIALTokens(node *ast.Node) []byte {
 	var structural [][]string
+	hasTextAlign := false
+	styleIndex := -1
 	for _, kv := range node.KramdownIAL {
 		if "colspan" == kv[0] || "rowspan" == kv[0] || ("class" == kv[0] && "fn__none" == kv[1]) {
 			structural = append(structural, kv)
+		} else if "style" == kv[0] {
+			keepStyle := false
+			for _, declaration := range strings.Split(kv[1], ";") {
+				property, _, found := strings.Cut(declaration, ":")
+				if !found {
+					continue
+				}
+				property = strings.TrimSpace(property)
+				if strings.EqualFold(property, "text-align") {
+					hasTextAlign = true
+					keepStyle = true
+				} else if strings.EqualFold(property, "vertical-align") {
+					keepStyle = true
+				}
+			}
+			if keepStyle {
+				styleIndex = len(structural)
+				structural = append(structural, kv)
+			}
+		}
+	}
+	if !hasTextAlign && node.TableCellAlign != tableHeadColumnAlign(node) {
+		align := "start"
+		switch node.TableCellAlign {
+		case 1:
+			align = "left"
+		case 2:
+			align = "center"
+		case 3:
+			align = "right"
+		}
+		if 0 <= styleIndex {
+			style := strings.TrimSpace(structural[styleIndex][1])
+			if "" != style && !strings.HasSuffix(style, ";") {
+				style += ";"
+			}
+			structural[styleIndex] = []string{"style", style + " text-align: " + align + ";"}
+		} else {
+			structural = append(structural, []string{"style", "text-align: " + align + ";"})
 		}
 	}
 	if 0 == len(structural) {
 		return nil
 	}
 	return parse.IAL2Tokens(structural)
+}
+
+// tableCellFullIALTokens 输出单元格属性，并为旧格式中的逐格对齐补充样式。
+func tableCellFullIALTokens(node *ast.Node) []byte {
+	ial := make([][]string, len(node.KramdownIAL))
+	for i, kv := range node.KramdownIAL {
+		ial[i] = append([]string(nil), kv...)
+	}
+	if node.TableCellAlign != tableHeadColumnAlign(node) {
+		styleIndex := -1
+		hasTextAlign := false
+		for i, kv := range ial {
+			if "style" != kv[0] {
+				continue
+			}
+			styleIndex = i
+			for _, declaration := range strings.Split(kv[1], ";") {
+				property, _, found := strings.Cut(declaration, ":")
+				if found && strings.EqualFold(strings.TrimSpace(property), "text-align") {
+					hasTextAlign = true
+				}
+			}
+		}
+		if !hasTextAlign {
+			align := "start"
+			switch node.TableCellAlign {
+			case 1:
+				align = "left"
+			case 2:
+				align = "center"
+			case 3:
+				align = "right"
+			}
+			if 0 <= styleIndex {
+				style := strings.TrimSpace(ial[styleIndex][1])
+				if "" != style && !strings.HasSuffix(style, ";") {
+					style += ";"
+				}
+				ial[styleIndex][1] = style + " text-align: " + align + ";"
+			} else {
+				ial = append(ial, []string{"style", "text-align: " + align + ";"})
+			}
+		}
+	}
+	if 0 == len(ial) {
+		return nil
+	}
+	return parse.IAL2Tokens(ial)
+}
+
+// tableHeadColumnAlign 返回旧格式表格在同一列的表头对齐方式。
+func tableHeadColumnAlign(node *ast.Node) int {
+	if nil == node.Parent || nil == node.Parent.Parent {
+		return 0
+	}
+	column := 0
+	for previous := node.Previous; nil != previous; previous = previous.Previous {
+		if ast.NodeTableCell == previous.Type {
+			column++
+		}
+	}
+	table := node.Parent.Parent
+	if ast.NodeTableHead == table.Type {
+		table = table.Parent
+	}
+	if nil == table || nil == table.FirstChild || ast.NodeTableHead != table.FirstChild.Type || nil == table.FirstChild.FirstChild {
+		return 0
+	}
+	for cell := table.FirstChild.FirstChild.FirstChild; nil != cell; cell = cell.Next {
+		if ast.NodeTableCell != cell.Type {
+			continue
+		}
+		if 0 == column {
+			return cell.TableCellAlign
+		}
+		column--
+	}
+	return 0
 }
 
 func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkStatus {
@@ -936,6 +1065,9 @@ func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 			case 3:
 				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
 			}
+		}
+		if r.Options.KramdownSpanIAL && nil == node.TableCellRich {
+			r.Write(tableCellFullIALTokens(node))
 		}
 		// 表格合并单元格的 colspan/rowspan/fn__none 是结构属性，必须随 markdown 往返保留。
 		// 当 KramdownSpanIAL 渲染选项关闭时（如思源 html2BlockDOM），renderKramdownSpanIAL 不输出

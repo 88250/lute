@@ -276,6 +276,42 @@ func (r *BaseRenderer) renderTableByHTMLRows(thead *ast.Node) {
 	}
 }
 
+// appendTableCellAlignStyle 将旧格式的单元格对齐合入行内样式，保留其它样式声明。
+func appendTableCellAlignStyle(node *ast.Node, attrs *[][]string) {
+	var align string
+	switch node.TableCellAlign {
+	case 1:
+		align = "left"
+	case 2:
+		align = "center"
+	case 3:
+		align = "right"
+	default:
+		return
+	}
+	for i, attr := range *attrs {
+		if "style" != attr[0] {
+			continue
+		}
+		for _, declaration := range strings.Split(attr[1], ";") {
+			property, _, found := strings.Cut(declaration, ":")
+			if found && strings.EqualFold(strings.TrimSpace(property), "text-align") {
+				return
+			}
+		}
+		style := strings.TrimSpace(attr[1])
+		if "" != style && !strings.HasSuffix(style, ";") {
+			style += ";"
+		}
+		if "" != style {
+			style += " "
+		}
+		(*attrs)[i] = []string{"style", style + "text-align: " + align + ";"}
+		return
+	}
+	*attrs = append(*attrs, []string{"style", "text-align: " + align + ";"})
+}
+
 // renderTableByHTMLRow 渲染一行（tr + td/th），单元格内容通过 ast.Walk + RendererFuncs 遍历
 func (r *BaseRenderer) renderTableByHTMLRow(row *ast.Node) {
 	r.Tag("tr", nil, false)
@@ -304,20 +340,13 @@ func (r *BaseRenderer) renderTableByHTMLRow(row *ast.Node) {
 			tag = "th"
 		}
 		var attrs [][]string
-		switch cell.TableCellAlign {
-		case 1:
-			attrs = append(attrs, []string{"align", "left"})
-		case 2:
-			attrs = append(attrs, []string{"align", "center"})
-		case 3:
-			attrs = append(attrs, []string{"align", "right"})
-		}
 		// colspan/rowspan/style 等 IAL 属性
 		for _, kv := range cell.KramdownIAL {
 			if "colspan" == kv[0] || "rowspan" == kv[0] || "style" == kv[0] {
 				attrs = append(attrs, kv)
 			}
 		}
+		appendTableCellAlignStyle(cell, &attrs)
 		r.Tag(tag, attrs, false)
 		if nil != cell.TableCellRich {
 			if r.tableCellRichInline {

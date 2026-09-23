@@ -938,14 +938,12 @@ func (r *HtmlRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkSt
 	}
 	if entering {
 		var attrs [][]string
-		switch node.TableCellAlign {
-		case 1:
-			attrs = append(attrs, []string{"align", "left"})
-		case 2:
-			attrs = append(attrs, []string{"align", "center"})
-		case 3:
-			attrs = append(attrs, []string{"align", "right"})
+		for _, kv := range node.KramdownIAL {
+			if kv[0] == "style" {
+				attrs = append(attrs, kv)
+			}
 		}
+		appendTableCellAlignStyle(node, &attrs)
 		r.Tag(tag, attrs, false)
 		if nil != node.TableCellRich {
 			if content, err := TableCellRichHTML(node.TableCellRich, r.Options); nil == err {

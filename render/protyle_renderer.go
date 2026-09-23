@@ -1189,15 +1189,8 @@ func (r *ProtyleRenderer) renderTableCell(node *ast.Node, entering bool) ast.Wal
 	}
 	if entering {
 		var attrs [][]string
-		switch node.TableCellAlign {
-		case 1:
-			attrs = append(attrs, []string{"align", "left"})
-		case 2:
-			attrs = append(attrs, []string{"align", "center"})
-		case 3:
-			attrs = append(attrs, []string{"align", "right"})
-		}
 		r.spanNodeAttrs(node, &attrs)
+		appendTableCellAlignStyle(node, &attrs)
 		if nil != node.TableCellRich {
 			attrs = append(attrs, []string{ast.TableCellRichAttribute, node.TableCellRich.Encode()}, []string{"contenteditable", "false"})
 		}

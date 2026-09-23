@@ -831,6 +831,9 @@ func (r *ProtyleExportMdRenderer) renderKramdownSpanIAL(node *ast.Node, entering
 	if !r.Options.KramdownSpanIAL {
 		return ast.WalkContinue
 	}
+	if isTableCellIALNode(node) {
+		return ast.WalkContinue
+	}
 
 	if entering {
 		r.Write(node.Tokens)
@@ -1120,6 +1123,11 @@ func (r *ProtyleExportMdRenderer) renderTableCell(node *ast.Node, entering bool)
 	padding := node.TableCellContentMaxWidth - node.TableCellContentWidth
 	if entering {
 		r.WriteByte(lex.ItemPipe)
+		if !r.Options.KramdownSpanIAL && nil == node.TableCellRich {
+			if ialTokens := tableCellStructIALTokens(node); nil != ialTokens {
+				r.Write(ialTokens)
+			}
+		}
 		if !r.Options.ProtyleWYSIWYG {
 			r.WriteByte(lex.ItemSpace)
 			switch node.TableCellAlign {
@@ -1128,6 +1136,9 @@ func (r *ProtyleExportMdRenderer) renderTableCell(node *ast.Node, entering bool)
 			case 3:
 				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
 			}
+		}
+		if r.Options.KramdownSpanIAL && nil == node.TableCellRich {
+			r.Write(tableCellFullIALTokens(node))
 		}
 		if nil != node.TableCellRich {
 			r.Write(tableCellRichInlineHTML(node, r.Options, r.ParseOptions))

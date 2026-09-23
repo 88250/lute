@@ -51,7 +51,7 @@ var debugTests = []parseTest{
 	{"52", "https://netlify.app/", "<p><a href=\"https://netlify.app/\">https://netlify.app/</a></p>\n"},
 
 	// 表格和 Setext 标题解析冲突问题 https://github.com/88250/lute/issues/110
-	{"51", "|   foo   | \n| :-----: |\n|   bar   |\n=======\nbaz\n", "<table>\n<thead>\n<tr>\n<th align=\"center\">foo</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"center\">bar</td>\n</tr>\n</tbody>\n</table>\n<p>=======<br />\nbaz</p>\n"},
+	{"51", "|   foo   | \n| :-----: |\n|   bar   |\n=======\nbaz\n", "<table>\n<thead>\n<tr>\n<th style=\"text-align: center;\">foo</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align: center;\">bar</td>\n</tr>\n</tbody>\n</table>\n<p>=======<br />\nbaz</p>\n"},
 
 	// 表格解析异常 https://github.com/88250/lute/issues/52
 	{"50", "foo\nname | age |\n---- | ---\n\nbar", "<p>foo</p>\n<table>\n<thead>\n<tr>\n<th>name</th>\n<th>age</th>\n</tr>\n</thead>\n</table>\n<p>bar</p>\n"},
@@ -83,8 +83,8 @@ var debugTests = []parseTest{
 	{"33", "[foo](/bar \"baz\"\n", "<p>[foo](/bar &quot;baz&quot;</p>\n"},
 	{"32", "пристаням_стремятся_", "<p>пристаням_стремятся_</p>\n"},
 	// 无管道单列表格，分隔行可只用冒号（居中列）
-	{"33", "foo\n::\nbar\n", "<table>\n<thead>\n<tr>\n<th align=\"center\">foo</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"center\">bar</td>\n</tr>\n</tbody>\n</table>\n"},
-	{"32", "foo\n::\n", "<table>\n<thead>\n<tr>\n<th align=\"center\">foo</th>\n</tr>\n</thead>\n</table>\n"},
+	{"33", "foo\n::\nbar\n", "<table>\n<thead>\n<tr>\n<th style=\"text-align: center;\">foo</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align: center;\">bar</td>\n</tr>\n</tbody>\n</table>\n"},
+	{"32", "foo\n::\n", "<table>\n<thead>\n<tr>\n<th style=\"text-align: center;\">foo</th>\n</tr>\n</thead>\n</table>\n"},
 	{"31", "*foo*<br>", "<p><em>foo</em><br></p>\n"},
 	{"30", "https://t.mex .mex 后缀不自动链接", "<p>https://t.mex .mex 后缀不自动链接</p>\n"},
 	{"29", "https://t.me .me 后缀自动链接", "<p><a href=\"https://t.me\">https://t.me</a> .me 后缀自动链接</p>\n"},
@@ -101,11 +101,11 @@ var debugTests = []parseTest{
 	{"23", "- [x] foo\n", "<ul>\n<li class=\"vditor-task vditor-task--done\"><input checked=\"\" disabled=\"\" type=\"checkbox\" /> foo</li>\n</ul>\n"},
 
 	// Empty list following GFM Table makes table broken https://github.com/b3log/lute/issues/9
-	{"22", "0\n-:\n1\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"right\">1</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
-	{"21", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
+	{"22", "0\n-:\n1\n-\n", "<table>\n<thead>\n<tr>\n<th style=\"text-align: right;\">0</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align: right;\">1</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
+	{"21", "0\n-:\n-\n", "<table>\n<thead>\n<tr>\n<th style=\"text-align: right;\">0</th>\n</tr>\n</thead>\n</table>\n<ul>\n<li></li>\n</ul>\n"},
 
 	// GFM Table rendered as h2 https://github.com/b3log/lute/issues/3
-	{"20", "0\n-:\n", "<table>\n<thead>\n<tr>\n<th align=\"right\">0</th>\n</tr>\n</thead>\n</table>\n"},
+	{"20", "0\n-:\n", "<table>\n<thead>\n<tr>\n<th style=\"text-align: right;\">0</th>\n</tr>\n</thead>\n</table>\n"},
 
 	// HTMl 块解析，等号前面空格情况
 	{"19", "<a href =\"https://github.com\">GitHub</a>\n", "<a href =\"https://github.com\">GitHub</a>\n"},
