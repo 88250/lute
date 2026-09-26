@@ -20,11 +20,20 @@ import (
 
 // Parse 会将 markdown 原始文本字节数组解析为一棵语法树。
 func Parse(name string, markdown []byte, options *Options) (tree *Tree) {
+	return parse(name, markdown, options, false)
+}
+
+// parse 的任务列表探测模式仅在首块是普通非空段落时跳过行级解析。
+func parse(name string, markdown []byte, options *Options, taskListProbe bool) (tree *Tree) {
 	tree = &Tree{Name: name, Context: &Context{ParseOption: options}}
 	tree.Context.Tree = tree
 	tree.lexer = lex.NewLexer(markdown)
 	tree.Root = &ast.Node{Type: ast.NodeDocument}
 	tree.parseBlocks()
+	if first := tree.Root.FirstChild; taskListProbe && nil != first && ast.NodeParagraph == first.Type && 0 < len(first.Tokens) {
+		tree.lexer = nil
+		return
+	}
 	tree.parseInlines()
 	tree.finalParseBlockIAL()
 	tree.finalParseTabs()
@@ -350,10 +359,11 @@ type Tree struct {
 	Hash    string   // 内容哈希
 
 	// 以下字段用于惰性构建链接引用定义和脚注定义索引，避免查找时遍历整棵语法树
-	linkRefDefs        []*linkRefDef // 链接引用定义索引
-	linkRefDefIndexed  bool          // 链接引用定义索引是否已构建
-	footnotesDefs      []*ast.Node   // 脚注定义索引（文档顺序）
-	footnotesDefsIndex bool          // 脚注定义索引是否已构建
+	linkRefDefs        map[string]linkRefDef // 链接引用定义的简单折叠索引
+	linkRefDefsFolded  map[string]linkRefDef // 链接引用定义的全折叠索引
+	linkRefDefIndexed  bool                  // 链接引用定义索引是否已构建
+	footnotesDefs      []*ast.Node           // 脚注定义索引（文档顺序）
+	footnotesDefsIndex bool                  // 脚注定义索引是否已构建
 }
 
 // Options 描述了解析选项。

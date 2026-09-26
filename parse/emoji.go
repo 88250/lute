@@ -37,6 +37,9 @@ var emojiDot = util.StrToBytes(".")
 func (t *Tree) emoji0(node *ast.Node) {
 	first := node
 	tokens := node.Tokens
+	if 0 < len(tokens) && 0 > bytes.IndexByte(tokens, lex.ItemColon) {
+		return
+	}
 	node.Tokens = []byte{} // 先清空，后面逐个添加或者添加 Tokens 或者 Emoji 兄弟节点
 	length := len(tokens)
 	var token byte

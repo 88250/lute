@@ -175,6 +175,19 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 	var token byte
 	www := false
 	needUnlink := false
+	// 自定义协议只可能使用最后一个分隔符，并且候选后不能再出现标准协议。
+	customEnd := bytes.LastIndex(tokens, protoSep)
+	customStart := customEnd
+	for 0 < customStart && lex.IsASCIILetterNum(tokens[customStart-1]) {
+		customStart--
+	}
+	lastStandard := bytes.LastIndex(tokens, httpProto)
+	if index := bytes.LastIndex(tokens, httpsProto); lastStandard < index {
+		lastStandard = index
+	}
+	if index := bytes.LastIndex(tokens, ftpProto); lastStandard < index {
+		lastStandard = index
+	}
 	for i < length {
 		token = tokens[i]
 		var protocol []byte
@@ -192,16 +205,10 @@ func (t *Tree) parseGFMAutoLink0(node *ast.Node) {
 		} else if 12 <= tmpLen /* ftp://xxx.xx */ && 'f' == tokens[i] && 't' == tokens[i+1] && 'p' == tokens[i+2] && ':' == tokens[i+3] && '/' == tokens[i+4] && '/' == tokens[i+5] {
 			protocol = tokens[i : i+6]
 			i += 6
-		} else if idx := bytes.IndexByte(tokens[i:], lex.ItemColon); 0 < idx && 3 < len(tokens[i:])-idx && bytes.HasPrefix(tokens[i+idx:], protoSep) && 0 > bytes.Index(tokens[i+idx+3:], protoSep) && !bytes.Contains(tokens[i:], httpProto) && !bytes.Contains(tokens[i:], httpsProto) && !bytes.Contains(tokens[i:], ftpProto) {
+		} else if customStart <= i && i < customEnd && lastStandard < i && customEnd+3 < length {
 			// 自定义协议均认为是有效的 https://github.com/siyuan-note/siyuan/issues/5865
-			if !lex.IsASCIILetterNums(tokens[i : i+idx]) {
-				textEnd++
-				i++
-				continue
-			}
-
-			protocol = append(tokens[i:i+idx], protoSep...)
-			i += idx + 3
+			protocol = tokens[i : customEnd+3]
+			i = customEnd + 3
 		} else {
 			textEnd++
 			if length-i < minLinkLen { // 剩余字符不足，已经不可能形成链接了

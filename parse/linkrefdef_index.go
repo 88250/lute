@@ -12,16 +12,38 @@ package parse
 
 import (
 	"bytes"
+	"strings"
+	"unicode"
 
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
 )
 
-// linkRefDef 描述链接引用定义索引项，folded 为定义 label 的全折叠（full case fold）结果。
+// linkRefDef 保存定义的文档顺序，用于跨大小写索引选择首个匹配。
 type linkRefDef struct {
-	tokens []byte
-	folded []byte
-	link   *ast.Node
+	order int
+	link  *ast.Node
+}
+
+// linkRefFoldKey 用简单大小写折叠环中最小的字符建立与 bytes.EqualFold 一致的键。
+func linkRefFoldKey(tokens []byte) string {
+	var key strings.Builder
+	key.Grow(len(tokens))
+	for _, r := range string(tokens) {
+		if 'a' <= r && r <= 'z' {
+			r -= 'a' - 'A'
+		} else if unicode.MaxASCII < r {
+			minimum := r
+			for folded := unicode.SimpleFold(r); folded != r; folded = unicode.SimpleFold(folded) {
+				if folded < minimum {
+					minimum = folded
+				}
+			}
+			r = minimum
+		}
+		key.WriteRune(r)
+	}
+	return key.String()
 }
 
 // indexLinkRefDefs 惰性构建链接引用定义索引，避免每次查找时都遍历整棵语法树。
@@ -30,10 +52,22 @@ func (t *Tree) indexLinkRefDefs() {
 		return
 	}
 	t.linkRefDefIndexed = true
+	t.linkRefDefs = map[string]linkRefDef{}
+	t.linkRefDefsFolded = map[string]linkRefDef{}
+	order := 0
 
 	ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
 		if entering && ast.NodeLinkRefDef == n.Type {
-			t.linkRefDefs = append(t.linkRefDefs, &linkRefDef{tokens: n.Tokens, folded: foldBytes(n.Tokens), link: n.FirstChild})
+			def := linkRefDef{order: order, link: n.FirstChild}
+			key := linkRefFoldKey(n.Tokens)
+			if _, exists := t.linkRefDefs[key]; !exists {
+				t.linkRefDefs[key] = def
+			}
+			key = linkRefFoldKey(foldBytes(n.Tokens))
+			if _, exists := t.linkRefDefsFolded[key]; !exists {
+				t.linkRefDefsFolded[key] = def
+			}
+			order++
 		}
 		return ast.WalkContinue
 	})
@@ -64,14 +98,20 @@ func (t *Tree) FindLinkRefDefLink(label []byte) (link *ast.Node) {
 	}
 
 	t.indexLinkRefDefs()
-	// 全折叠结果只计算一次，避免每次查找都重复构建折叠状态
-	foldedLabel := foldBytes(label)
-	for _, def := range t.linkRefDefs {
-		// 按定义文档顺序依次比较，保证第一个匹配的定义优先
-		if bytes.EqualFold(def.tokens, label) ||
-			bytes.EqualFold(foldedLabel, def.tokens) || bytes.EqualFold(def.folded, label) {
-			return def.link
-		}
+	if 0 == len(t.linkRefDefs) {
+		return
+	}
+	key := linkRefFoldKey(label)
+	first, found := t.linkRefDefs[key]
+	// 分别查询原文、仅标签全折叠、仅定义全折叠，保持三种匹配及文档顺序。
+	if def, ok := t.linkRefDefs[linkRefFoldKey(foldBytes(label))]; ok && (!found || def.order < first.order) {
+		first, found = def, true
+	}
+	if def, ok := t.linkRefDefsFolded[key]; ok && (!found || def.order < first.order) {
+		first, found = def, true
+	}
+	if found {
+		return first.link
 	}
 	return
 }

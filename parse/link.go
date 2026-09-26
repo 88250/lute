@@ -307,18 +307,11 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 		return
 	}
 
-	passed := make([]byte, 0, len(tokens))
-	passed = append(passed, tokens[0])
-
 	closed := false
 	i := 1
 	for i < length {
 		token := tokens[i]
-		passed = append(passed, token)
 		r, size := utf8.DecodeRune(tokens[i:])
-		for j := 1; j < size; j++ {
-			passed = append(passed, tokens[i+j])
-		}
 		label = append(label, util.StrToBytes(string(r))...)
 		if lex.ItemCloseBracket == token && !lex.IsBackslashEscapePunct(tokens, i) {
 			closed = true
@@ -327,14 +320,12 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 			break
 		}
 		if lex.ItemOpenBracket == token && !lex.IsBackslashEscapePunct(tokens, i) {
-			passed = nil
 			return
 		}
 		i += size
 	}
 
 	if !closed || nil == lex.TrimWhitespace(label) || 999 < len(label) {
-		passed = nil
 		return
 	}
 
@@ -351,6 +342,6 @@ func (context *Context) parseLinkLabel(tokens []byte) (n int, remains, label []b
 			}
 		}
 	}
-	n = len(passed)
+	n = i + 1
 	return
 }

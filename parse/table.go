@@ -198,19 +198,22 @@ func (context *Context) parseTable(paragraph *ast.Node) (retParagraph, retTable 
 }
 
 func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
-	if -1 == bytes.IndexByte(tokens, lex.ItemPipe) && !noPipeSingleColTable(tokens) {
-		// 绝大多数段落中没有管道符，直接跳过切分以提升性能；
-		// 唯一例外是 foo\n---\nbar 形式的多行单列无管道表格
+	// 先检查相邻的表头和分隔行，只有候选成立时才切分后续数据行。
+	headEnd := bytes.IndexByte(tokens, lex.ItemNewline)
+	if 0 > headEnd {
 		return
 	}
-
-	lines := lex.Split(tokens, lex.ItemNewline)
-	length := len(lines)
-	if 2 > length {
-		return
+	body := tokens[headEnd+1:]
+	delimEnd := bytes.IndexByte(body, lex.ItemNewline)
+	if 0 > delimEnd {
+		delimEnd = len(body)
 	}
-
-	delimRow := lex.TrimWhitespace(lines[1])
+	delimRow := lex.TrimWhitespace(body[:delimEnd])
+	if delimEnd < len(body) {
+		body = body[delimEnd+1:]
+	} else {
+		body = nil
+	}
 	if 2 > len(delimRow) {
 		// 换行+冒号会被识别为表格 https://github.com/88250/lute/issues/198
 		return
@@ -221,14 +224,14 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 		return
 	}
 
-	if 2 == length && 1 == len(aligns) && 0 == aligns[0] && !bytes.Contains(tokens, []byte("|")) {
+	if 0 == len(body) && 1 == len(aligns) && 0 == aligns[0] && !bytes.Contains(tokens, []byte("|")) {
 		// 如果只有两行并且对齐方式是默认对齐且没有 | 时（foo\n---）就和 Setext 标题规则冲突了
 		// 但在块级解析时显然已经尝试进行解析 Setext 标题，还能走到这里说明 Setetxt 标题解析失败，
 		// 所以这里也不能当作表进行解析了，返回普通段落
 		return
 	}
 
-	headRow := context.parseTableRow(lex.TrimWhitespace(lines[0]), aligns, true)
+	headRow := context.parseTableRow(lex.TrimWhitespace(tokens[:headEnd]), aligns, true)
 	if nil == headRow {
 		return
 	}
@@ -259,8 +262,8 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 	ret = &ast.Node{Type: ast.NodeTable, TableAligns: aligns}
 	ret.TableAligns = aligns
 	ret.AppendChild(context.newTableHead([]*ast.Node{headRow}))
-	for i := 2; i < length; i++ {
-		line := lex.TrimWhitespace(lines[i])
+	for _, tokens := range lex.Split(body, lex.ItemNewline) {
+		line := lex.TrimWhitespace(tokens)
 		tableRow := context.parseTableRow(line, aligns, false)
 		if nil == tableRow {
 			return
@@ -317,38 +320,6 @@ func inInline(tokens []byte, i int, mathOrCodeMarker byte) bool {
 	}
 	end := bytes.IndexByte(tokens[i+1:], mathOrCodeMarker)
 	return -1 < start && -1 < end
-}
-
-// noPipeSingleColTable 判断 tokens 是否可能是单列无管道表格（foo\n---\nbar、0\n-: 或 foo\n::\nbar 形式）。
-// 该函数是解析前的粗略预判，允许误判（误判时走原有的完整解析逻辑），但不能漏判完整解析器能接受的输入。
-func noPipeSingleColTable(tokens []byte) bool {
-	i0 := bytes.IndexByte(tokens, lex.ItemNewline) // 第一行结束位置
-	if 1 > i0 || lex.IsBlank(tokens[:i0]) {
-		return false
-	}
-
-	i1 := bytes.IndexByte(tokens[i0+1:], lex.ItemNewline) // 第二行结束位置
-	if 1 > i1 {
-		// 第二行没有换行结尾时取剩余全部内容
-		i1 = len(tokens) - i0 - 1
-	}
-	if 1 > i1 {
-		return false
-	}
-
-	// 与完整解析器一致：分隔行先做首尾空白裁剪，长度至少 2，且只能由 - : 和空格组成
-	delim := lex.TrimWhitespace(tokens[i0+1 : i0+1+i1])
-	if 2 > len(delim) {
-		return false
-	}
-	for _, c := range delim {
-		switch c {
-		case lex.ItemHyphen, lex.ItemColon, lex.ItemSpace:
-		default:
-			return false
-		}
-	}
-	return true
 }
 
 func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *ast.Node) {

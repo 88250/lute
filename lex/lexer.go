@@ -10,14 +10,13 @@
 
 package lex
 
-import "unicode/utf8"
+import "bytes"
 
 // Lexer 描述了词法分析器结构。
 type Lexer struct {
 	input  []byte // 输入的文本字节数组
 	length int    // 输入的文本字节数组的长度
 	offset int    // 当前读取字节位置
-	width  int    // 最新一个字符的长度（字节数）
 }
 
 // NewLexer 创建一个词法分析器。
@@ -37,45 +36,34 @@ func (l *Lexer) NextLine() (ret []byte) {
 		return
 	}
 
-	var b, nb byte
+	start := l.offset
+	hasNUL := false
 	i := l.offset
-	for ; i < l.length; i += l.width {
-		b = l.input[i]
+	for ; i < l.length; i++ {
+		b := l.input[i]
 		if ItemNewline == b {
 			i++
 			break
 		} else if ItemCarriageReturn == b {
-			if i < l.length-1 {
-				nb = l.input[i+1]
-				if ItemNewline == nb { // \r\n
-					l.input = append(l.input[:i], l.input[i+1:]...) // 移除 \r，依靠下一个的 \n 切行
-					l.length--                                      // 重新计算总长
-				} else { // \rX
-					l.input[i] = ItemNewline // 将 \r 替换为 \n
-				}
-			} else { // \rEOF
-				l.input[i] = ItemNewline // 将 \r 替换为 \n
-			}
+			// 返回当前行时规范化行尾，并跳过 CRLF 中的 LF，不移动后续行。
+			l.input[i] = ItemNewline
 			i++
+			ret = l.input[start:i]
+			if i < l.length && ItemNewline == l.input[i] {
+				i++
+			}
 			break
-		} else if '\u0000' == b {
-			// 将 \u0000 替换为 \uFFFD
-			l.input = append(l.input, 0, 0)
-			copy(l.input[i+2:], l.input[i:])
-			// \uFFFD 的 UTF-8 编码为 \xEF\xBF\xBD 共三个字节
-			l.input[i], l.input[i+1], l.input[i+2] = '\xEF', '\xBF', '\xBD'
-			l.length += 2 // 重新计算总长
-			l.width = 3
-			continue
-		}
-
-		if utf8.RuneSelf <= b { // 说明占用多个字节
-			_, l.width = utf8.DecodeRune(l.input[i:])
-		} else {
-			l.width = 1
+		} else if 0 == b {
+			hasNUL = true
 		}
 	}
-	ret = l.input[l.offset:i]
+	if nil == ret {
+		ret = l.input[start:i]
+	}
+	if hasNUL {
+		// 只为包含 NUL 的当前行分配替换缓冲，保留其他字节（包括无效 UTF-8）。
+		ret = bytes.ReplaceAll(ret, []byte{0}, []byte("\uFFFD"))
+	}
 	l.offset = i
 	return
 }

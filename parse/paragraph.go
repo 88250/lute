@@ -118,7 +118,7 @@ func paragraphFinalize(p *ast.Node, context *Context) (insertTable bool) {
 							}
 
 							if 0 < len(p.Tokens) {
-								subTree := Parse("", p.Tokens, context.ParseOption)
+								subTree := parse("", p.Tokens, context.ParseOption, true)
 								subBlock := subTree.Root.FirstChild
 								if ast.NodeParagraph != subBlock.Type {
 									if !context.ParseOption.ProtyleWYSIWYG {
