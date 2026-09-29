@@ -1125,7 +1125,7 @@ func (r *ProtyleExportMdRenderer) renderTableCell(node *ast.Node, entering bool)
 	padding := node.TableCellContentMaxWidth - node.TableCellContentWidth
 	if entering {
 		r.WriteByte(lex.ItemPipe)
-		if !r.Options.KramdownSpanIAL && nil == node.TableCellRich {
+		if !r.Options.OmitTableCellIAL && !r.Options.KramdownSpanIAL && nil == node.TableCellRich {
 			if ialTokens := tableCellStructIALTokens(node); nil != ialTokens {
 				r.Write(ialTokens)
 			}
@@ -1139,7 +1139,7 @@ func (r *ProtyleExportMdRenderer) renderTableCell(node *ast.Node, entering bool)
 				r.Write(bytes.Repeat([]byte{lex.ItemSpace}, padding))
 			}
 		}
-		if r.Options.KramdownSpanIAL && nil == node.TableCellRich {
+		if !r.Options.OmitTableCellIAL && r.Options.KramdownSpanIAL && nil == node.TableCellRich {
 			r.Write(tableCellFullIALTokens(node))
 		}
 		if nil != node.TableCellRich {

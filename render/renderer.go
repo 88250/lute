@@ -69,6 +69,8 @@ type Options struct {
 	KramdownBlockIAL bool
 	// KramdownSpanIAL 设置是否打开 kramdown 行级内联属性列表支持。
 	KramdownSpanIAL bool
+	// OmitTableCellIAL 在标准 Markdown 输出中省略管道表格的单元格属性。
+	OmitTableCellIAL bool
 	// SuperBlock 设置是否支持超级块。 https://github.com/88250/lute/issues/111
 	SuperBlock bool
 	// ImageLazyLoading 设置图片懒加载时使用的图片路径，配置该字段后将启用图片懒加载。

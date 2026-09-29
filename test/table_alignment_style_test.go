@@ -28,6 +28,30 @@ func TestTableCellAlignmentUsesInlineStyle(t *testing.T) {
 	}
 }
 
+func TestStandardMarkdownTableOmitsCellAttributes(t *testing.T) {
+	engine := lute.New()
+	engine.SetProtyleWYSIWYG(true)
+	engine.SetKramdownIAL(true)
+	dom := `<div data-type="NodeTable"><div contenteditable="true"><table><thead><tr>` +
+		`<th style="text-align: left;">Header</th><th style="text-align: right;">Other</th>` +
+		`</tr></thead><tbody><tr><td style="text-align: center; background-color: red;"><strong>value</strong></td>` +
+		`<td style="text-align: right;">next</td></tr></tbody></table></div></div>`
+	markdown := engine.BlockDOM2StdMd(dom)
+	for _, unwanted := range []string{"{: ", "style=", "text-align", "background-color"} {
+		if strings.Contains(markdown, unwanted) {
+			t.Fatalf("standard Markdown contains cell attributes %q: %s", unwanted, markdown)
+		}
+	}
+	for _, expected := range []string{"Header", "Other", "**value**", "next", "| :", ": |"} {
+		if !strings.Contains(markdown, expected) {
+			t.Fatalf("standard Markdown lost content or column alignment %q: %s", expected, markdown)
+		}
+	}
+	if saved := engine.BlockDOM2Md(dom); !strings.Contains(saved, "background-color: red;") {
+		t.Fatalf("internal Markdown lost cell styles: %s", saved)
+	}
+}
+
 func TestTableCellInlineStyleOverridesLegacyAlign(t *testing.T) {
 	engine := lute.New()
 	engine.SetProtyleWYSIWYG(true)

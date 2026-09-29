@@ -284,6 +284,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	options.KramdownBlockIAL = true
 	options.KramdownSpanIAL = true
 	options.KeepParagraphBeginningSpace = true
+	options.OmitTableCellIAL = true
 	options.TabsMarkdown = true
 	options.UnorderedListMarker = lute.RenderOptions.UnorderedListMarker
 	renderer := render.NewProtyleExportMdRenderer(tree, options, lute.ParseOptions)
