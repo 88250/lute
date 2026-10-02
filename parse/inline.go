@@ -297,11 +297,12 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 				if idx, footnotesDef := t.FindFootnotesDef(reflabel); nil != footnotesDef {
 					t.removeBracket(ctx)
 
-					if t.Context.ParseOption.Sup && nil != opener.node.Next.Next {
-						opener.node.Next.Next.Unlink() // label
-						opener.node.Next.Unlink()      // ^
-					} else {
-						opener.node.Next.Unlink() // ^label
+					// 脚注标签按字面匹配，清除标签内的分隔符及全部行级节点。
+					for nil != ctx.delimiters && ctx.delimiters != opener.previousDelimiter {
+						t.removeDelimiter(ctx.delimiters, ctx)
+					}
+					for nil != opener.node.Next {
+						opener.node.Next.Unlink()
 					}
 					opener.node.Unlink() // [
 

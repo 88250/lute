@@ -11,10 +11,38 @@
 package test
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/88250/lute"
 )
+
+func TestFootnoteLabelInlineTokens(t *testing.T) {
+	const ref = `<sup class="footnotes-ref" id="footnotes-ref-1"><a href="#footnotes-def-1">1</a></sup>`
+	for _, protyle := range []bool{false, true} {
+		for _, sup := range []bool{false, true} {
+			for _, label := range []string{"a_b", "a*b", "a&b", "a<b", "a=b", "a~b", "a^b", "a$b", "a#b", "a!b", "a(b)", "a`b", "a&amp;b"} {
+				t.Run(fmt.Sprintf("protyle=%v/sup=%v/label=%s", protyle, sup, label), func(t *testing.T) {
+					engine := lute.New()
+					engine.SetProtyleWYSIWYG(protyle)
+					engine.SetSup(sup)
+					for _, scenario := range []struct{ source, paragraph string }{
+						{"Text[^%s] and *after*.", "<p>Text" + ref + " and <em>after</em>.</p>\n"},
+						{"*before[^%s] after*.", "<p><em>before" + ref + " after</em>.</p>\n"},
+						{"Text[caption_*][^%s].", "<p>Text" + ref + ".</p>\n"},
+					} {
+						markdown := fmt.Sprintf(scenario.source, label) + "\n\n[^" + label + "]: body\n"
+						output := engine.MarkdownStr("", markdown)
+						if !strings.HasPrefix(output, scenario.paragraph) {
+							t.Fatalf("label altered surrounding content:\nsource: %q\nwant: %s\ngot: %s", markdown, scenario.paragraph, output)
+						}
+					}
+				})
+			}
+		}
+	}
+}
 
 var fnTests = []parseTest{
 
