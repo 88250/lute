@@ -287,6 +287,7 @@ func (lute *Lute) BlockDOM2StdMd(htmlStr string) (markdown string) {
 	options.OmitTableCellIAL = true
 	options.TabsMarkdown = true
 	options.UnorderedListMarker = lute.RenderOptions.UnorderedListMarker
+	options.ExportNormalizeTaskListMarker = lute.RenderOptions.ExportNormalizeTaskListMarker
 	renderer := render.NewProtyleExportMdRenderer(tree, options, lute.ParseOptions)
 	formatted := renderer.Render()
 	markdown = util.BytesToStr(formatted)

@@ -139,3 +139,25 @@ func TestDataTaskCustomMarker(t *testing.T) {
 		}
 	}
 }
+
+func TestBlockDOM2StdMdTaskMarkerNormalization(t *testing.T) {
+	engine := lute.New()
+	engine.SetProtyleWYSIWYG(true)
+	engine.SetDataTask(true)
+	engine.SetArbitraryTaskListItemMarker(true)
+	engine.SetUnorderedListMarker("-")
+	markdown := "- [ ] todo\n- [/] progress\n\n  - [-] canceled\n- [X] done\n- [!] custom\n"
+	dom := engine.Md2BlockDOM(markdown, true)
+	normalized := "- [ ] todo\n- [X] progress\n\n  - [X] canceled\n- [X] done\n- [X] custom\n"
+	if got := engine.BlockDOM2StdMd(dom); got != normalized {
+		t.Fatalf("default export: got %q, want %q", got, normalized)
+	}
+	engine.SetExportNormalizeTaskListMarker(false)
+	if got := engine.BlockDOM2StdMd(dom); got != markdown {
+		t.Fatalf("preserved copy: got %q, want %q", got, markdown)
+	}
+	engine.SetExportNormalizeTaskListMarker(true)
+	if got := engine.BlockDOM2StdMd(dom); got != normalized {
+		t.Fatalf("standard export: got %q, want %q", got, normalized)
+	}
+}
