@@ -2031,7 +2031,15 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 			node.AppendChild(&ast.Node{Type: ast.NodeOpenParen})
 			src := strings.TrimSpace(util.DomAttrValue(img, "data-src"))
 			node.AppendChild(&ast.Node{Type: ast.NodeLinkDest, Tokens: util.StrToBytes(src)})
-			if title := util.DomAttrValue(img, "title"); "" != title {
+			title := util.DomAttrValue(img, "title")
+			// 编辑器使用数据属性保存标题，避免同时触发浏览器原生提示。
+			for _, attr := range img.Attr {
+				if "data-title" == attr.Key {
+					title = attr.Val
+					break
+				}
+			}
+			if "" != title {
 				node.AppendChild(&ast.Node{Type: ast.NodeLinkSpace})
 				// < 和 > 符号不用转义，可以符合 Markdown 规范 https://github.com/siyuan-note/siyuan/issues/15023
 				title = strings.ReplaceAll(title, "\"", "&quot;")
