@@ -76,6 +76,7 @@ func (t *Tree) parseCodeSpan(block *ast.Node, ctx *InlineContext) (ret *ast.Node
 		// 避免反引号内的内容被自动转换，同时不影响外层普通文本的 autoLink。
 		codeParseOptions := *t.Context.ParseOption
 		codeParseOptions.ProtyleWYSIWYGAutoLink = false
+		codeParseOptions.inlineCodeHTML = true
 		inlineTree := Inline("", textTokens, &codeParseOptions)
 		if nil != inlineTree {
 			content := bytes.Buffer{}

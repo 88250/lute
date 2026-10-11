@@ -61,11 +61,28 @@ func TestHTMLBackgroundShorthand(t *testing.T) {
 		{"background:blue!important;background-color:red", "blue"},
 		{"background-color:red!important;background:blue", "red"},
 		{"background:rgb(255,165,61)", "rgb(255,165,61)"},
+		{"background:var(--b3-font-background6)", "var(--b3-font-background6)"},
+		{"background-color:red;background:var(--b3-font-background6)", "var(--b3-font-background6)"},
 		{"background:url(https://example.com/image.png)", ""},
 	} {
 		got := ResolveHTMLTextStyle(&html.Node{Attr: []*html.Attribute{{Key: "style", Val: tc.css}}}, HTMLTextStyle{})
 		if got.Background != tc.expected {
 			t.Errorf("%s: got %q, want %q", tc.css, got.Background, tc.expected)
+		}
+	}
+}
+
+func TestHTMLTextThemeColors(t *testing.T) {
+	for _, value := range []string{"var(--b3-font-color6)", "var(--b3-font-background13)", "VAR( --b3-font-color10 )"} {
+		got := ResolveHTMLTextStyle(&html.Node{Attr: []*html.Attribute{{Key: "style", Val: "color:" + value + ";background-color:" + value}}}, HTMLTextStyle{})
+		if got.Color != value || got.Background != value {
+			t.Errorf("lost theme color %q: %#v", value, got)
+		}
+	}
+	for _, value := range []string{"var(--other)", "var(--B3-font-color6)", "var(--b3-font-color0)", "var(--b3-font-color6, url(https://example.com))", "var(--b3-font-color6) url(https://example.com)", "var(--b3-font-color6"} {
+		got := ResolveHTMLTextStyle(&html.Node{Attr: []*html.Attribute{{Key: "style", Val: "color:" + value}}}, HTMLTextStyle{})
+		if got.Color != "" {
+			t.Errorf("accepted unsupported color %q: %#v", value, got)
 		}
 	}
 }

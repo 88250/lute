@@ -30,7 +30,13 @@ type HTMLTextStyle struct {
 }
 
 var htmlTextColor = regexp.MustCompile(`(?i)^(#[0-9a-f]{3,4}|#[0-9a-f]{6}|#[0-9a-f]{8}|[a-z]+|(?:rgb|rgba|hsl|hsla)\([0-9.,%+ /-]+\))$`)
+var htmlTextThemeColor = regexp.MustCompile(`^(?i:var)\(\s*--b3-font-(?:color|background)[1-9][0-9]*\s*\)$`)
 var htmlTextSize = regexp.MustCompile(`^([0-9]*\.?[0-9]+)(px|pt|pc|in|cm|mm|em|rem|%)$`)
+
+// isHTMLTextColor 保留内置主题色引用，使复制的文本样式随主题切换。
+func isHTMLTextColor(value string) bool {
+	return htmlTextColor.MatchString(value) || htmlTextThemeColor.MatchString(value)
+}
 
 // HTMLStyleDeclarations 在引号和括号之外拆分声明，保留同一属性的优先级。
 func HTMLStyleDeclarations(style string) map[string]string {
@@ -78,7 +84,7 @@ func HTMLStyleDeclarations(style string) map[string]string {
 			priority, value = true, strings.TrimSpace(value[:idx])
 		}
 		// WPS 使用纯色 background 简写；转换为背景色后仍按声明顺序及优先级处理。
-		if key == "background" && htmlTextColor.MatchString(value) {
+		if key == "background" && isHTMLTextColor(value) {
 			key = "background-color"
 		}
 		if !important[key] || priority {
@@ -146,7 +152,7 @@ func ResolveHTMLTextStyle(n *html.Node, parent HTMLTextStyle) HTMLTextStyle {
 			if safeHTMLFontFamily(value) {
 				*dst = value
 			}
-		} else if htmlTextColor.MatchString(value) {
+		} else if isHTMLTextColor(value) {
 			*dst = value
 		}
 	}

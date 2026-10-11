@@ -24,6 +24,16 @@ func (t *Tree) parseInlines() {
 	}
 	if t.Context.ParseOption.ProtyleWYSIWYG {
 		NormalizeInlineHTMLTextStyles(t)
+		// 未转换的标签仍作为字面文本呈现，避免未闭合或不支持的 HTML 进入编辑器。
+		ast.Walk(t.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if entering && n.Type == ast.NodeInlineHTML {
+				n.Type = ast.NodeText
+			}
+			if !entering && (n.Type == ast.NodeParagraph || n.Type == ast.NodeHeading || n.Type == ast.NodeTableCell) {
+				t.mergeText(n)
+			}
+			return ast.WalkContinue
+		})
 	}
 }
 

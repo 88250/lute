@@ -17,6 +17,7 @@ import (
 	"github.com/88250/lute/ast"
 	"github.com/88250/lute/editor"
 	"github.com/88250/lute/html"
+	"github.com/88250/lute/html/atom"
 	"github.com/88250/lute/lex"
 	"github.com/88250/lute/util"
 )
@@ -52,8 +53,10 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 					if n = t.parseFileAnnotationRef(ctx); nil == n {
 						n = t.parseInlineHTML(ctx)
 						if t.Context.ParseOption.ProtyleWYSIWYG && nil != n && ast.NodeInlineHTML == n.Type {
-							// Protyle 中不存在内联 HTML，使用文本
-							n.Type = ast.NodeText
+							// span 保留到配对样式转换结束，其他内联 HTML 使用文本。
+							if dom, _ := inlineStyleTag(n); t.Context.ParseOption.inlineCodeHTML || dom == nil || dom.DataAtom != atom.Span {
+								n.Type = ast.NodeText
+							}
 						}
 					}
 				}
