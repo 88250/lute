@@ -158,8 +158,9 @@ func Inline(name string, markdown []byte, options *Options) (tree *Tree) {
 
 // Context 用于维护块级元素解析过程中使用到的公共数据。
 type Context struct {
-	Tree        *Tree    // 关联的语法树
-	ParseOption *Options // 解析选项
+	Tree             *Tree                // 关联的语法树
+	ParseOption      *Options             // 解析选项
+	TableCellSources map[*ast.Node]string // 外部导入时短暂保留单元格原文，转换完成后释放
 
 	Tip                                                      *ast.Node // 末梢节点
 	oldtip                                                   *ast.Node // 老的末梢节点
@@ -368,6 +369,8 @@ type Tree struct {
 
 // Options 描述了解析选项。
 type Options struct {
+	// PreserveTableCellSource 仅在外部 Markdown 导入时保留单元格原文供结构恢复。
+	PreserveTableCellSource bool
 	// 代码内容的二次解析保留普通 HTML 标签，不把字面样式转换为文本标记。
 	inlineCodeHTML bool
 

@@ -93,6 +93,12 @@ func (t *Tree) walkParseInline(node *ast.Node) {
 		}
 
 		ctx := &InlineContext{tokens: tokens, tokensLen: length}
+		if typ == ast.NodeTableCell && t.Context.ParseOption.PreserveTableCellSource {
+			if t.Context.TableCellSources == nil {
+				t.Context.TableCellSources = map[*ast.Node]string{}
+			}
+			t.Context.TableCellSources[node] = string(tokens)
+		}
 
 		// 生成该块节点的行级子节点
 		t.parseInline(node, ctx)

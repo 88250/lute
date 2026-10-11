@@ -94,8 +94,8 @@ func TestTableRichClipboardAndMergedExport(t *testing.T) {
 		t.Fatalf("HTML clipboard lost merged rich cell: %s", clipboard)
 	}
 	markdown := engine.BlockDOM2StdMd(dom)
-	if !strings.Contains(markdown, "first") || !strings.Contains(markdown, "<code>a &#124; b<br />c</code>") || strings.Contains(markdown, "table-cell-rich") || strings.Contains(markdown, "<ul>") {
-		t.Fatalf("merged Markdown export did not use its readable inline projection: %s", markdown)
+	if !strings.Contains(markdown, "first") || !strings.Contains(markdown, "a &#124; b&#10;c&#10;</code>") || strings.Contains(markdown, "table-cell-rich") || !strings.Contains(markdown, "<ul>") {
+		t.Fatalf("merged Markdown export lost cell structure: %s", markdown)
 	}
 	html := engine.BlockDOM2RichHTML(dom)
 	if !strings.Contains(html, "<ul>") || !strings.Contains(html, "<code") || strings.Contains(html, "data-sy-table-cell-rich") {
@@ -131,7 +131,7 @@ func TestTableRichCodeProjectionEscapesMarkup(t *testing.T) {
 			t.Fatalf("%s interpreted literal code as markup: %s", name, output)
 		}
 	}
-	if !strings.Contains(markdown, "a &#124; b &amp; c</code>") || strings.Contains(markdown, "\na |") {
+	if !strings.Contains(markdown, "a &#124; b &amp; c&#10;</code>") || strings.Contains(markdown, "\na |") {
 		t.Fatalf("code content broke its Markdown table cell: %s", markdown)
 	}
 }

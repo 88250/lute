@@ -193,7 +193,10 @@ func (lute *Lute) Md2BlockDOMTree(markdown string, reserveEmptyParagraph bool) (
 		lute.ParseOptions.KeepEscaped = keepEscaped
 	}()
 
-	tree = parse.Parse("", []byte(markdown), lute.ParseOptions)
+	parseOptions := *lute.ParseOptions
+	parseOptions.PreserveTableCellSource = true
+	tree = parse.Parse("", []byte(markdown), &parseOptions)
+	NormalizeMarkdownTableCells(tree)
 
 	parse.TextMarks2Inlines(tree) // 先将 TextMark 转换为 Inlines https://github.com/siyuan-note/siyuan/issues/13056
 	parse.NestedInlines2FlattedSpansHybrid(tree, false)

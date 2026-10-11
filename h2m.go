@@ -58,6 +58,9 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 	}
 
 	// 调整 DOM 结构
+	if lute.ParseOptions.ProtyleWYSIWYG && !lute.ParseOptions.DisableTableCellRich {
+		preserveHTMLTableCellStructure(n)
+	}
 	lute.fixTableStructure(n)
 	lute.adjustVditorDOM(n)
 
@@ -752,6 +755,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 
 		class := util.DomAttrValue(n, "class")
 		if atom.Div == n.DataAtom || atom.Section == n.DataAtom {
+			if class == "language-math" && util.DomAttrValue(n, "data-math") == "" && n.FirstChild != nil && n.FirstChild.Type == html.TextNode && n.FirstChild.NextSibling == nil {
+				appendMathBlock(tree, util.DomText(n))
+				return
+			}
 			// 解析 GitHub 语法高亮代码块
 			language := ""
 			if strings.Contains(class, "-source-") {

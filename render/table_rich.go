@@ -7,8 +7,13 @@ import (
 	"github.com/88250/lute/parse"
 )
 
-// tableCellRichInlineHTML 在 Markdown 单元格中保留行内格式，用硬换行承接片段的段落和代码行。
+// tableCellRichInlineHTML 将块结构写入单行 HTML，实体编码防止换行和管道符拆分表格。
 func tableCellRichInlineHTML(cell *ast.Node, options *Options, parseOptions *parse.Options) []byte {
+	if content, err := TableCellRichHTML(cell.TableCellRich, options); err == nil {
+		content = bytes.ReplaceAll(content, []byte("|"), []byte("&#124;"))
+		content = bytes.ReplaceAll(content, []byte("\r"), []byte("&#13;"))
+		return bytes.ReplaceAll(content, []byte("\n"), []byte("&#10;"))
+	}
 	inline := parse.CloneTableCellInline(cell)
 	inline.TableCellRich = nil
 	opt := *options
@@ -47,5 +52,6 @@ func TableCellRichHTML(rich *ast.TableCellRich, options *Options) ([]byte, error
 	opt.CodeSyntaxHighlight = false
 	opt.Sanitize = true
 	opt.HeadingID = false
+	opt.DataTask = true
 	return NewHtmlRenderer(tree, &opt, tree.Context.ParseOption).Render(), nil
 }
