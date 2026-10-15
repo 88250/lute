@@ -1329,6 +1329,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 			return
 		}
 
+		normalizeProtyleTableSpans(table)
 		thead := lute.domChild(table, atom.Thead)
 		if nil == thead || nil == thead.FirstChild || nil == thead.FirstChild.FirstChild {
 			node.Type = ast.NodeParagraph
