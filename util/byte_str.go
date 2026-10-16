@@ -8,6 +8,7 @@
 // THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+//go:build !javascript
 // +build !javascript
 
 package util
@@ -19,10 +20,7 @@ func BytesToStr(bytes []byte) string {
 	return *(*string)(unsafe.Pointer(&bytes))
 }
 
-// StrToBytes 快速转换 string 为 []byte。
+// StrToBytes 返回字符串的只读字节切片，保留底层数据的指针供逃逸分析和 GC 跟踪。
 func StrToBytes(str string) []byte {
-	x := (*[2]uintptr)(unsafe.Pointer(&str))
-	h := [3]uintptr{x[0], x[1], x[1]}
-	return *(*[]byte)(unsafe.Pointer(&h))
+	return unsafe.Slice(unsafe.StringData(str), len(str))
 }
-
