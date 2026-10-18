@@ -289,7 +289,7 @@ func (r *HtmlRenderer) renderTextMark(node *ast.Node, entering bool) ast.WalkSta
 					r.WriteString("）</sup>")
 				} else {
 					r.WriteString("<sup>(")
-					r.WriteString(node.TextMarkInlineMemoContent)
+					r.WriteString(strings.ReplaceAll(node.TextMarkInlineMemoContent, editor.IALValEscNewLine, " "))
 					r.WriteString(")</sup>")
 				}
 			}
@@ -1577,7 +1577,7 @@ func (r *HtmlRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 		} else if "inline-memo" == typ {
 			content := node.TextMarkInlineMemoContent
 			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
-			attrs = append(attrs, []string{"data-inline-memo-content", content})
+			attrs = append(attrs, []string{"data-inline-memo-content", html.EscapeHTMLStr(content)})
 		}
 	}
 	return

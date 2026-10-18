@@ -1598,7 +1598,7 @@ func (r *ProtylePreviewRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]
 		} else if "inline-memo" == typ {
 			content := node.TextMarkInlineMemoContent
 			content = strings.ReplaceAll(content, editor.IALValEscNewLine, "\n")
-			attrs = append(attrs, []string{"data-inline-memo-content", content})
+			attrs = append(attrs, []string{"data-inline-memo-content", html.EscapeHTMLStr(content)})
 		}
 	}
 	return

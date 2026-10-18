@@ -783,7 +783,6 @@ func SetTextMarkNode(node *ast.Node, n *html.Node, options *Options) {
 			node.TextMarkTextContent = util.GetTextMarkTextData(n)
 			node.TextMarkInlineMemoContent = util.GetTextMarkInlineMemoData(n)
 			node.TextMarkInlineMemoContent = strings.ReplaceAll(node.TextMarkInlineMemoContent, "\n", editor.IALValEscNewLine)
-			node.TextMarkInlineMemoContent = strings.ReplaceAll(node.TextMarkInlineMemoContent, "\"", "&quot;")
 		default:
 			if !isInlineMath { // 带有字体样式的公式复制之后内容不正确 https://github.com/siyuan-note/siyuan/issues/6799
 				node.TextMarkTextContent = util.GetTextMarkTextDataWithoutEscapeQuote(n)

@@ -65,7 +65,6 @@ func GetTextMarkInlineMemoData(n *html.Node) (content string) {
 	content = DomAttrValue(n, "data-inline-memo-content")
 	content = strings.ReplaceAll(content, editor.Zwsp, "")
 	content = strings.ReplaceAll(content, "\n", editor.IALValEscNewLine)
-	content = html.UnescapeHTMLStr(content)
 	return
 }
 
