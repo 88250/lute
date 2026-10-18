@@ -25,10 +25,18 @@ func ParseHTML(htmlStr string) *html.Node {
 	if nil != err {
 		return nil
 	}
-	if "html" != doc.FirstChild.Data {
-		return doc
+	for element := doc.FirstChild; nil != element; element = element.NextSibling {
+		if html.ElementNode != element.Type || atom.Html != element.DataAtom {
+			continue
+		}
+		for child := element.FirstChild; nil != child; child = child.NextSibling {
+			if html.ElementNode == child.Type && atom.Body == child.DataAtom {
+				return child
+			}
+		}
+		return element
 	}
-	return doc.FirstChild.LastChild // doc.html.body
+	return doc
 }
 
 func GetTextMarkTextDataWithoutEscapeQuote(n *html.Node) (content string) {
