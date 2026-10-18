@@ -1481,6 +1481,7 @@ func (r *ProtyleRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSta
 				attrs = append(attrs, []string{"style", style})
 			}
 		}
+		attrs = append(attrs, imageCustomAttrs(node)...)
 		r.Tag("img", attrs, true)
 
 		buf := r.Writer.Bytes()

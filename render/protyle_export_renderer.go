@@ -1415,6 +1415,7 @@ func (r *ProtyleExportRenderer) renderImage(node *ast.Node, entering bool) ast.W
 				attrs = append(attrs, []string{"style", style})
 			}
 		}
+		attrs = append(attrs, imageCustomAttrs(node)...)
 		r.Tag("img", attrs, true)
 
 		buf := r.Writer.Bytes()
