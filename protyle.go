@@ -448,6 +448,10 @@ func (lute *Lute) MergeSameTextMark(n *ast.Node) {
 
 		mergeWithIAL = true
 	} else {
+		// 带属性的行级节点只能与具有相同属性列表的前置节点合并。
+		if nil != n.Next && ast.NodeKramdownSpanIAL == n.Next.Type {
+			return
+		}
 		previewText := n.Previous.TokensStr()
 		if ast.NodeText == n.Previous.Type &&
 			!strings.Contains(previewText, "　") && !strings.Contains(previewText, " ") && !strings.Contains(previewText, "\n") && !strings.Contains(previewText, "\t") &&
