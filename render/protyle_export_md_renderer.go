@@ -1785,7 +1785,7 @@ func (r *ProtyleExportMdRenderer) renderMathBlock(node *ast.Node, entering bool)
 func (r *ProtyleExportMdRenderer) renderCodeBlockCloseMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.Write(node.Tokens)
+		r.Write(r.codeBlockFence(node.Parent))
 		r.Newline()
 		if !r.isLastNode(r.Tree.Root, node) {
 			if r.withoutKramdownBlockIAL(node.Parent) {
@@ -1798,12 +1798,7 @@ func (r *ProtyleExportMdRenderer) renderCodeBlockCloseMarker(node *ast.Node, ent
 
 func (r *ProtyleExportMdRenderer) renderCodeBlockCode(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		tokens := node.Tokens
-		info := node.Parent.ChildByType(ast.NodeCodeBlockFenceInfoMarker)
-		if nil != info && string(info.CodeBlockInfo) != "mindmap" && NoHighlight(string(info.CodeBlockInfo)) {
-			tokens = html.UnescapeHTML(tokens)
-		}
-		r.Write(tokens)
+		r.Write(protyleExportCodeBlockContent(node))
 	}
 	return ast.WalkContinue
 }
@@ -1818,7 +1813,7 @@ func (r *ProtyleExportMdRenderer) renderCodeBlockInfoMarker(node *ast.Node, ente
 
 func (r *ProtyleExportMdRenderer) renderCodeBlockOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Write(node.Tokens)
+		r.Write(r.codeBlockFence(node.Parent))
 	}
 	return ast.WalkContinue
 }
@@ -1827,10 +1822,12 @@ func (r *ProtyleExportMdRenderer) renderCodeBlock(node *ast.Node, entering bool)
 	if entering {
 		r.Newline()
 		if !node.IsFencedCodeBlock {
-			r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
+			fence := r.codeBlockFence(node)
+			r.Write(fence)
 			r.WriteByte(lex.ItemNewline)
 			r.Write(node.FirstChild.Tokens)
-			r.Write(bytes.Repeat([]byte{lex.ItemBacktick}, 3))
+			r.Newline()
+			r.Write(fence)
 			r.Newline()
 			if !r.isLastNode(r.Tree.Root, node) {
 				if r.withoutKramdownBlockIAL(node) {
@@ -1841,6 +1838,44 @@ func (r *ProtyleExportMdRenderer) renderCodeBlock(node *ast.Node, entering bool)
 		}
 	}
 	return ast.WalkContinue
+}
+
+func protyleExportCodeBlockContent(node *ast.Node) []byte {
+	if nil == node {
+		return nil
+	}
+	tokens := node.Tokens
+	info := node.Parent.ChildByType(ast.NodeCodeBlockFenceInfoMarker)
+	if nil != info && string(info.CodeBlockInfo) != "mindmap" && NoHighlight(string(info.CodeBlockInfo)) {
+		tokens = html.UnescapeHTML(tokens)
+	}
+	return tokens
+}
+
+// 根据实际导出内容扩展围栏，保留原有围栏类型和长度，不修改源树。
+func (r *ProtyleExportMdRenderer) codeBlockFence(node *ast.Node) []byte {
+	marker, length := byte(lex.ItemBacktick), 3
+	if open := node.ChildByType(ast.NodeCodeBlockFenceOpenMarker); nil != open && len(open.Tokens) > 0 {
+		marker = open.Tokens[0]
+		if len(open.Tokens) > length {
+			length = len(open.Tokens)
+		}
+	}
+	if close := node.ChildByType(ast.NodeCodeBlockFenceCloseMarker); nil != close && len(close.Tokens) > length {
+		length = len(close.Tokens)
+	}
+	run := 0
+	for _, token := range protyleExportCodeBlockContent(node.ChildByType(ast.NodeCodeBlockCode)) {
+		if token == marker {
+			run++
+			if run >= length {
+				length = run + 1
+			}
+		} else {
+			run = 0
+		}
+	}
+	return bytes.Repeat([]byte{marker}, length)
 }
 
 func (r *ProtyleExportMdRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkStatus {

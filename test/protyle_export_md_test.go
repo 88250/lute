@@ -11,6 +11,10 @@
 package test
 
 import (
+	"bytes"
+	"fmt"
+	"html"
+	"strings"
 	"testing"
 
 	"github.com/88250/lute"
@@ -19,6 +23,64 @@ import (
 	"github.com/88250/lute/render"
 	"github.com/88250/lute/util"
 )
+
+func TestProtyleExportCodeBlockFence(t *testing.T) {
+	for _, tc := range []struct {
+		name, content, language, fence string
+	}{
+		{"ordinary", "hello\n", "text", "```"},
+		{"three backticks", "before\n```\nafter\n", "markdown", "````"},
+		{"longest run", "```\n`````\n````\n", "text", "``````"},
+		{"inline run", "const ticks = \"````\";\n", "js", "`````"},
+		{"editor joiner", "\u200d```\n", "text", "````"},
+		{"empty", "", "", "```"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			engine := lute.New()
+			engine.SetProtyleWYSIWYG(true)
+			dom := fmt.Sprintf(`<div data-type="NodeCodeBlock" class="code-block"><div class="protyle-action"><span class="protyle-action__language">%s</span></div><div contenteditable="true">%s</div></div>`,
+				tc.language, html.EscapeString(tc.content))
+			markdown := engine.BlockDOM2StdMd(dom)
+			if !strings.HasPrefix(markdown, tc.fence+tc.language+"\n") || !strings.HasSuffix(strings.TrimSpace(markdown), tc.fence) {
+				t.Fatalf("unsafe exported fence: %q", markdown)
+			}
+			// 前端复制会去掉防输入识别的零宽连接符，清理后仍应保留一个完整代码块。
+			cleaned := strings.ReplaceAll(markdown, "\u200d```", "```")
+			tree := parse.Parse("", []byte(cleaned), engine.ParseOptions)
+			code := tree.Root.FirstChild
+			if code == nil || code.Type != ast.NodeCodeBlock || code.Next != nil {
+				t.Fatalf("export no longer parses as one code block: %q", cleaned)
+			}
+			expected := strings.ReplaceAll(tc.content, "\u200d```", "```")
+			if got := string(code.ChildByType(ast.NodeCodeBlockCode).Tokens); got != expected {
+				t.Fatalf("code content changed: got %q, want %q", got, expected)
+			}
+		})
+	}
+}
+
+func TestProtyleExportCodeBlockFencePreservesSource(t *testing.T) {
+	for _, source := range []string{
+		"~~~~~~text\n````\n~~~~\n~~~~~~\n",
+		"``````text\n```\n``````\n",
+		"    before\n    ```\n    after\n",
+		"> ````text\n> ```\n> ````\n",
+		"- ````text\n  ```\n  ````\n",
+	} {
+		engine := lute.New()
+		tree := parse.Parse("", []byte(source), engine.ParseOptions)
+		before := render.NewFormatRenderer(tree, engine.RenderOptions, engine.ParseOptions).Render()
+		exported := render.NewProtyleExportMdRenderer(tree, engine.RenderOptions, engine.ParseOptions).Render()
+		after := render.NewFormatRenderer(tree, engine.RenderOptions, engine.ParseOptions).Render()
+		if !bytes.Equal(before, after) {
+			t.Fatalf("export mutated the source tree: %q", source)
+		}
+		originalHTML := engine.MarkdownStr("", source)
+		if got := engine.MarkdownStr("", string(exported)); got != originalHTML {
+			t.Fatalf("export changed code structure: source %q, export %q, html %q", source, exported, got)
+		}
+	}
+}
 
 var protyleExportMdTests = []parseTest{
 
