@@ -148,13 +148,15 @@ func TestBlockDOM2StdMdTaskMarkerNormalization(t *testing.T) {
 	engine.SetUnorderedListMarker("-")
 	markdown := "- [ ] todo\n- [/] progress\n\n  - [-] canceled\n- [X] done\n- [!] custom\n"
 	dom := engine.Md2BlockDOM(markdown, true)
-	normalized := "- [ ] todo\n- [X] progress\n\n  - [X] canceled\n- [X] done\n- [X] custom\n"
+	// BlockDOM 不包含列表松紧信息，导出统一收紧：只有紧凑形式会改变结构时才保留空行
+	tightened := "- [ ] todo\n- [/] progress\n  - [-] canceled\n- [X] done\n- [!] custom\n"
+	normalized := "- [ ] todo\n- [X] progress\n  - [X] canceled\n- [X] done\n- [X] custom\n"
 	if got := engine.BlockDOM2StdMd(dom); got != normalized {
 		t.Fatalf("default export: got %q, want %q", got, normalized)
 	}
 	engine.SetExportNormalizeTaskListMarker(false)
-	if got := engine.BlockDOM2StdMd(dom); got != markdown {
-		t.Fatalf("preserved copy: got %q, want %q", got, markdown)
+	if got := engine.BlockDOM2StdMd(dom); got != tightened {
+		t.Fatalf("preserved copy: got %q, want %q", got, tightened)
 	}
 	engine.SetExportNormalizeTaskListMarker(true)
 	if got := engine.BlockDOM2StdMd(dom); got != normalized {

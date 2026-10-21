@@ -29,6 +29,16 @@ type ProtyleExportMdRenderer struct {
 	*BaseRenderer
 	NodeWriterStack []*bytes.Buffer
 	tabsFormatter   *FormatRenderer
+	tightLists      map[*ast.Node]bool // 本次渲染的列表紧凑判定缓存，不写回语法树
+}
+
+// Render 渲染整棵语法树，列表紧凑判定在每次渲染开始时重新计算。
+func (r *ProtyleExportMdRenderer) Render() (output []byte) {
+	r.tightLists = nil
+	defer func() {
+		r.tightLists = nil
+	}()
+	return r.BaseRenderer.Render()
 }
 
 func NewProtyleExportMdRenderer(tree *parse.Tree, options *Options, parseOptions *parse.Options) *ProtyleExportMdRenderer {
@@ -808,6 +818,17 @@ func (r *ProtyleExportMdRenderer) renderKramdownBlockIAL(node *ast.Node, enterin
 	if nil != node.Previous && ast.NodeListItem == node.Previous.Type {
 		return ast.WalkContinue
 	}
+	if 0 == len(node.Tokens) {
+		// 导出标准 Markdown 时块属性已被剥离，只保留块之间的必要换行：
+		// 紧凑列表内不留空行，其余情况保留一个空行
+		if !entering {
+			r.Newline()
+			if !r.inTightList(node.Parent) {
+				r.WriteByte(lex.ItemNewline)
+			}
+		}
+		return ast.WalkContinue
+	}
 	if entering {
 		r.Newline()
 		if r.Options.KramdownBlockIAL {
@@ -817,11 +838,8 @@ func (r *ProtyleExportMdRenderer) renderKramdownBlockIAL(node *ast.Node, enterin
 			r.Write(node.Tokens)
 		}
 	} else {
-		if ast.NodeListItem == node.Parent.Type || ast.NodeList == node.Parent.Type {
-			if !node.Parent.ListData.Tight {
-				r.Newline()
-			}
-		} else {
+		// 紧凑列表内块之间只留一个换行，其余情况在块属性后留一个空行
+		if !r.inTightList(node.Parent) {
 			r.Newline()
 		}
 		r.WriteByte(lex.ItemNewline)
@@ -829,6 +847,7 @@ func (r *ProtyleExportMdRenderer) renderKramdownBlockIAL(node *ast.Node, enterin
 	return ast.WalkContinue
 }
 
+// inTightList 判断块属性所属的容器是否为紧凑列表。
 func (r *ProtyleExportMdRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	if !r.Options.KramdownSpanIAL {
 		return ast.WalkContinue
@@ -1556,9 +1575,8 @@ func (r *ProtyleExportMdRenderer) renderParagraph(node *ast.Node, entering bool)
 			if ast.NodeListItem == parent.Type { // ListItem.Paragraph
 				listItem := parent
 				if nil != listItem.Parent && nil != listItem.Parent.ListData {
-					// 必须通过列表（而非列表项）上的紧凑标识判断，因为在设置该标识时仅设置了 List.Tight
-					// 设置紧凑标识的具体实现可参考函数 List.Finalize()
-					inTightList = listItem.Parent.ListData.Tight
+					// 紧凑标识按列表项实际所属的列表计算，不依赖 ListData.Tight
+					inTightList = r.inTightList(listItem)
 
 					if nextItem := listItem.Next; nil == nextItem {
 						nextPara := node.Next
@@ -2141,7 +2159,12 @@ func (r *ProtyleExportMdRenderer) renderListItem(node *ast.Node, entering bool) 
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) {
-			r.WriteString("\n")
+			if r.inTightList(node.Parent) {
+				r.WriteString("\n")
+			} else {
+				// 松散列表在列表项之间留一个空行
+				r.WriteString("\n\n")
+			}
 		}
 	}
 	return ast.WalkContinue
