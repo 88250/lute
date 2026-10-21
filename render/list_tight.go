@@ -38,9 +38,21 @@ func (r *ProtyleExportMdRenderer) listTight(list *ast.Node) bool {
 }
 
 // inTightList 判断节点所属的列表是否按紧凑形式渲染。
-// 按节点渲染时不会经过列表节点，因此需要由列表项反查其所属列表。
+// 只使用本次已进入的列表或列表项的判定，不扫描渲染范围以外的节点。
 func (r *ProtyleExportMdRenderer) inTightList(node *ast.Node) bool {
-	return r.listTight(enclosingList(node))
+	list := enclosingList(node)
+	if nil == list {
+		return false
+	}
+	if tight, ok := r.tightLists[list]; ok {
+		return tight
+	}
+	if tight, ok := r.tightLists[node]; ok {
+		return tight
+	}
+	// 未进入列表或列表项时，正在单独渲染其段落等片段。片段末尾的换行会被
+	// 调用方裁掉，无需扫描未渲染的兄弟块来决定列表整体的松紧。
+	return true
 }
 
 // enclosingList 返回节点所属的列表节点，节点本身是列表时返回自身。
@@ -74,31 +86,78 @@ func listNeedsLoose(list *ast.Node) bool {
 		if ast.NodeListItem != item.Type && ast.NodeMindmapItem != item.Type {
 			continue
 		}
-
-		var prev *ast.Node
-		blocks, paragraphs := 0, 0
-		for child := item.FirstChild; nil != child; child = child.Next {
-			if ast.NodeKramdownBlockIAL == child.Type || ast.NodeTaskListItemMarker == child.Type {
-				continue
-			}
-
-			blocks++
-			if ast.NodeParagraph == child.Type {
-				// 列表项内第二个及之后的段落必须用空行分隔
-				paragraphs++
-				if 1 < paragraphs {
-					return true
-				}
-			} else if nil != prev && ast.NodeParagraph == prev.Type && needsBlankLineAfterParagraph(child) {
-				return true
-			}
-			prev = child
-		}
-
-		// 空列表项在紧凑形式下会和相邻块合并，丢失原有层级
-		if 0 == blocks {
+		if listItemNeedsLoose(item) {
 			return true
 		}
+	}
+	return false
+}
+
+func listItemNeedsLoose(item *ast.Node) bool {
+	layout := listItemLayout{}
+	if layout.needsLoose(item) {
+		return true
+	}
+	return 0 == layout.blocks
+}
+
+type listItemLayout struct {
+	previous   *ast.Node
+	blocks     int
+	paragraphs int
+}
+
+func (layout *listItemLayout) needsLoose(container *ast.Node) bool {
+	for child := container.FirstChild; nil != child; child = child.Next {
+		if ast.NodeSuperBlock == child.Type {
+			// 标准 Markdown 会展开超级块，必须检查展开后的块边界。
+			if layout.needsLoose(child) {
+				return true
+			}
+			continue
+		}
+		if !child.IsBlock() || ast.NodeKramdownBlockIAL == child.Type {
+			continue
+		}
+		layout.blocks++
+		if ast.NodeParagraph == child.Type {
+			layout.paragraphs++
+			if 1 < layout.paragraphs {
+				return true
+			}
+		}
+		if nil != layout.previous && blocksNeedBlankLine(layout.previous, child) {
+			return true
+		}
+		layout.previous = child
+	}
+	return false
+}
+
+func blocksNeedBlankLine(previous, next *ast.Node) bool {
+	// HTML 块可能延续到下一个空行，表格也不能与相邻的段落或表格拼接。
+	// 页签可能展开为标题和正文，保守保留其与相邻块的分隔。
+	switch previous.Type {
+	case ast.NodeHTMLBlock, ast.NodeTable, ast.NodeTabs:
+		return true
+	case ast.NodeList, ast.NodeMindmap:
+		switch next.Type {
+		case ast.NodeParagraph, ast.NodeThematicBreak, ast.NodeList, ast.NodeMindmap:
+			return true
+		}
+	case ast.NodeBlockquote, ast.NodeCallout:
+		if ast.NodeBlockquote == next.Type || ast.NodeCallout == next.Type {
+			return true
+		}
+	case ast.NodeParagraph, ast.NodeHeading:
+		// 任务列表的首个标题前还会输出任务标记，需保留与段落相同的歧义边界。
+		if needsBlankLineAfterParagraph(next) {
+			return true
+		}
+	}
+	switch next.Type {
+	case ast.NodeHTMLBlock, ast.NodeTable, ast.NodeTabs:
+		return true
 	}
 	return false
 }
@@ -109,7 +168,8 @@ func needsBlankLineAfterParagraph(block *ast.Node) bool {
 	case ast.NodeList, ast.NodeMindmap:
 		// 有序列表只有从 1 开始时才能中断段落
 		return !listInterruptsParagraph(block)
-	case ast.NodeParagraph:
+	case ast.NodeParagraph, ast.NodeThematicBreak:
+		// 分隔线导出为 ---，紧跟段落会被解析为 Setext 标题。
 		return true
 	case ast.NodeTable, ast.NodeHTMLBlock:
 		// 表格和 HTML 块无法可靠中断段落，保守留空行
@@ -118,28 +178,35 @@ func needsBlankLineAfterParagraph(block *ast.Node) bool {
 	return false
 }
 
-// listInterruptsParagraph 判断列表能否中断段落：无序列表和任务列表总是可以，
-// 有序列表仅在首项有内容且序号为 1 时可以。
+// listInterruptsParagraph 判断列表能否中断段落：首项必须有内容，
+// 有序列表还必须从 1 开始。
 func listInterruptsParagraph(list *ast.Node) bool {
 	if nil == list.ListData {
 		return false
 	}
-	if 1 != list.ListData.Typ {
-		return true
-	}
-
 	for item := list.FirstChild; nil != item; item = item.Next {
 		if ast.NodeListItem != item.Type && ast.NodeMindmapItem != item.Type {
 			continue
 		}
-		if nil == item.ListData || 1 != item.ListData.Num {
+		if nil == item.ListData || ((1 == item.ListData.Typ || (3 == item.ListData.Typ && 0 == item.ListData.BulletChar)) && 1 != item.ListData.Num) {
 			return false
 		}
 		for child := item.FirstChild; nil != child; child = child.Next {
 			if ast.NodeKramdownBlockIAL == child.Type || ast.NodeTaskListItemMarker == child.Type {
 				continue
 			}
-			return ast.NodeParagraph == child.Type && "" != strings.TrimSpace(child.Text())
+			if ast.NodeParagraph != child.Type {
+				return false
+			}
+			for inline := child.FirstChild; nil != inline; inline = inline.Next {
+				if ast.NodeKramdownBlockIAL == inline.Type || ast.NodeKramdownSpanIAL == inline.Type {
+					continue
+				}
+				if ast.NodeText != inline.Type || "" != strings.TrimSpace(inline.TokensStr()) {
+					return true
+				}
+			}
+			return false
 		}
 		return false
 	}

@@ -847,7 +847,6 @@ func (r *ProtyleExportMdRenderer) renderKramdownBlockIAL(node *ast.Node, enterin
 	return ast.WalkContinue
 }
 
-// inTightList 判断块属性所属的容器是否为紧凑列表。
 func (r *ProtyleExportMdRenderer) renderKramdownSpanIAL(node *ast.Node, entering bool) ast.WalkStatus {
 	if !r.Options.KramdownSpanIAL {
 		return ast.WalkContinue
@@ -2068,6 +2067,7 @@ func (r *ProtyleExportMdRenderer) renderHeadingID(node *ast.Node, entering bool)
 
 func (r *ProtyleExportMdRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		r.listTight(node)
 		r.Writer = &bytes.Buffer{}
 		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 	} else {
@@ -2089,6 +2089,13 @@ func (r *ProtyleExportMdRenderer) renderList(node *ast.Node, entering bool) ast.
 
 func (r *ProtyleExportMdRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
+		if _, ok := r.tightLists[enclosingList(node)]; !ok {
+			if nil == r.tightLists {
+				r.tightLists = map[*ast.Node]bool{}
+			}
+			// 单独导出列表项时，只判断本次渲染的内容，不扫描其他列表项。
+			r.tightLists[node] = !listItemNeedsLoose(node)
+		}
 		r.Writer = &bytes.Buffer{}
 		r.NodeWriterStack = append(r.NodeWriterStack, r.Writer)
 		if r.Options.KramdownBlockIAL && nil != node.Next && ast.NodeKramdownBlockIAL == node.Next.Type {
@@ -2159,7 +2166,7 @@ func (r *ProtyleExportMdRenderer) renderListItem(node *ast.Node, entering bool) 
 		r.Writer.Reset()
 		r.Write(buf)
 		if !node.ParentIs(ast.NodeTableCell) {
-			if r.inTightList(node.Parent) {
+			if r.inTightList(node) {
 				r.WriteString("\n")
 			} else {
 				// 松散列表在列表项之间留一个空行

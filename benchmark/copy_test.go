@@ -16,6 +16,8 @@ import (
 	"testing"
 
 	"github.com/88250/lute"
+	"github.com/88250/lute/ast"
+	"github.com/88250/lute/parse"
 )
 
 var (
@@ -128,5 +130,35 @@ func BenchmarkCopyMixed(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		_ = copyEngine.BlockDOM2StdMd(copyMixedDOM)
+	}
+}
+
+// BenchmarkExportListNodes 覆盖内核逐块索引时逐个导出列表项和段落的路径。
+// 每次迭代导出整份列表中的全部节点，以观察总耗时随列表规模的增长。
+func BenchmarkExportListNodes(b *testing.B) {
+	for _, size := range []int{100, 1000, 10000} {
+		for _, typ := range []ast.NodeType{ast.NodeListItem, ast.NodeParagraph} {
+			b.Run(strconv.Itoa(size)+"/"+typ.String(), func(b *testing.B) {
+				engine := lute.New()
+				tree := parse.Parse("", []byte(strings.Repeat("- item\n", size)), engine.ParseOptions)
+				var nodes []*ast.Node
+				for item := tree.Root.FirstChild.FirstChild; nil != item; item = item.Next {
+					if ast.NodeListItem == typ {
+						nodes = append(nodes, item)
+					} else {
+						nodes = append(nodes, item.FirstChild)
+					}
+				}
+				b.ReportAllocs()
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					for _, node := range nodes {
+						if _, err := lute.ProtyleExportMdNodeSync(node, engine.ParseOptions, engine.RenderOptions); nil != err {
+							b.Fatal(err)
+						}
+					}
+				}
+			})
+		}
 	}
 }
