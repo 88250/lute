@@ -294,6 +294,7 @@ func ProtyleExportMdNodeSync(node *ast.Node, parseOptions *parse.Options, render
 	protyleExportMdRendererSync.ParseOptions = parseOptions
 	protyleExportMdRendererSync.LastOut = lex.ItemNewline
 	protyleExportMdRendererSync.NodeWriterStack = []*bytes.Buffer{protyleExportMdRendererSync.Writer}
+	protyleExportMdRendererSync.ResetListTight()
 
 	ast.Walk(node, func(n *ast.Node, entering bool) ast.WalkStatus {
 		rendererFunc := protyleExportMdRendererSync.RendererFuncs[n.Type]
