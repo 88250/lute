@@ -48,10 +48,13 @@ GOTOOLCHAIN=go1.21.13 GOBIN="$PWD/.build/bin" go install github.com/gopherjs/gop
 
 # 3. 准备 GOPATH：本仓库与全部依赖链接到 $GOPATH/src/<module path>
 #    依赖目录可用 go list -m -f '{{.Path}} {{.Dir}}' all 获取
+#    排除上述列表中的 github.com/gopherjs/gopherjs，改用与编译器一致的 v1.21.0
+#    将以下命令输出的目录链接到 $GOPATH/src/github.com/gopherjs/gopherjs
+go list -m -f '{{.Dir}}' github.com/gopherjs/gopherjs@v1.21.0
 
-# 4. 构建
+# 4. 在仓库根目录构建 JavaScript 入口包
 GOTOOLCHAIN=local GOPATH=... GOROOT=... GO111MODULE=off GOOS=js GOARCH=ecmascript \
-  .build/bin/gopherjs build --tags javascript -o lute.min.js -m
+  .build/bin/gopherjs build --tags javascript -o javascript/lute.min.js -m github.com/88250/lute/javascript
 ```
 
 ## 验证
