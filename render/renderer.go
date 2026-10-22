@@ -316,7 +316,7 @@ func appendTableCellAlignStyle(node *ast.Node, attrs *[][]string) {
 
 // renderTableByHTMLRow 渲染一行（tr + td/th），单元格内容通过 ast.Walk + RendererFuncs 遍历
 func (r *BaseRenderer) renderTableByHTMLRow(row *ast.Node) {
-	r.Tag("tr", nil, false)
+	r.Tag("tr", row.KramdownIAL, false)
 	r.Newline()
 	for cell := row.FirstChild; nil != cell; cell = cell.Next {
 		if ast.NodeTableCell != cell.Type && ast.NodeKramdownSpanIAL != cell.Type {

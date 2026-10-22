@@ -1138,7 +1138,7 @@ func (r *ProtyleExportRenderer) renderTableCell(node *ast.Node, entering bool) a
 
 func (r *ProtyleExportRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("tr", nil, false)
+		r.Tag("tr", node.KramdownIAL, false)
 	} else {
 		r.Tag("/tr", nil, false)
 	}

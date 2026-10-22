@@ -297,7 +297,7 @@ func (context *Context) parseTable0(tokens []byte) (ret *ast.Node) {
 func (context *Context) newTableHead(headRows []*ast.Node) *ast.Node {
 	ret := &ast.Node{Type: ast.NodeTableHead}
 	for _, headRow := range headRows {
-		tr := &ast.Node{Type: ast.NodeTableRow}
+		tr := &ast.Node{Type: ast.NodeTableRow, KramdownIAL: headRow.KramdownIAL}
 		ret.AppendChild(tr)
 		for c := headRow.FirstChild; nil != c; {
 			next := c.Next
@@ -324,6 +324,19 @@ func inInline(tokens []byte, i int, mathOrCodeMarker byte) bool {
 
 func (context *Context) parseTableRow(line []byte, aligns []int, isHead bool) (ret *ast.Node) {
 	ret = &ast.Node{Type: ast.NodeTableRow, TableAligns: aligns}
+	// 内部 Markdown 在行尾保存行样式；只识别完整的专用 IAL，保留普通单元格中的字面文本。
+	if context.ParseOption.ProtyleWYSIWYG || context.ParseOption.KramdownSpanIAL {
+		if start := bytes.LastIndex(line, []byte("{: row-style=")); 0 < start {
+			prefix := lex.TrimWhitespace(line[:start])
+			if bytes.HasSuffix(prefix, []byte("|")) {
+				if pos, ial := context.parseKramdownSpanIAL(line[start:]); 1 == len(ial) &&
+					"row-style" == ial[0][0] && lex.IsBlank(line[start+pos+1:]) {
+					ret.SetIALAttr("style", ial[0][1])
+					line = prefix
+				}
+			}
+		}
+	}
 
 	if idx := bytes.Index(line, []byte("\\|")); 0 < idx {
 		if inInline(line, idx, lex.ItemDollar) || inInline(line, idx, lex.ItemBacktick) {

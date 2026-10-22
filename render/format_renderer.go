@@ -1097,7 +1097,11 @@ func (r *FormatRenderer) renderTableCell(node *ast.Node, entering bool) ast.Walk
 
 func (r *FormatRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if !entering {
-		r.WriteString("|\n")
+		r.WriteByte(lex.ItemPipe)
+		if style := node.IALAttr("style"); r.Options.KramdownSpanIAL && "" != style {
+			r.Write(parse.IAL2Tokens([][]string{{"row-style", style}}))
+		}
+		r.Newline()
 	}
 	return ast.WalkContinue
 }

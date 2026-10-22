@@ -916,7 +916,7 @@ func (r *ProtylePreviewRenderer) renderTableCell(node *ast.Node, entering bool) 
 
 func (r *ProtylePreviewRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("tr", nil, false)
+		r.Tag("tr", node.KramdownIAL, false)
 		r.Newline()
 	} else {
 		r.Tag("/tr", nil, false)

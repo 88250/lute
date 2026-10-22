@@ -962,7 +962,7 @@ func (r *HtmlRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *HtmlRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("tr", nil, false)
+		r.Tag("tr", node.KramdownIAL, false)
 		r.Newline()
 	} else {
 		r.Tag("/tr", nil, false)

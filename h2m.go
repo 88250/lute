@@ -1646,6 +1646,13 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		}
 		table := n.Parent.Parent
 		node.Type = ast.NodeTableRow
+		// 外部 HTML 只引入行高，避免把网页复制时附带的整套计算样式写入表格。
+		for _, declaration := range strings.Split(util.DomAttrValue(n, "style"), ";") {
+			property, value, found := strings.Cut(declaration, ":")
+			if found && strings.EqualFold(strings.TrimSpace(property), "height") && "" != strings.TrimSpace(value) {
+				node.SetIALAttr("style", parse.StyleValue("height: "+strings.TrimSpace(value)+";"))
+			}
+		}
 
 		if nil == tree.Context.Tip.ChildByType(ast.NodeTableHead) && 1 > len(util.DomChildrenByType(table, atom.Thead)) {
 			// 补全 thead 节点

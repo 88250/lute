@@ -1770,6 +1770,9 @@ func (lute *Lute) genASTContenteditable(n *html.Node, tree *parse.Tree) {
 	case atom.Tbody:
 	case atom.Tr:
 		node.Type = ast.NodeTableRow
+		if style := util.DomAttrValue(n, "style"); "" != style {
+			node.SetIALAttr("style", parse.StyleValue(style))
+		}
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node
 		defer tree.Context.ParentTip()
