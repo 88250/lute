@@ -111,6 +111,50 @@ c
 	}
 }
 
+func TestHTMLTableRichLineBreaks(t *testing.T) {
+	for name, content := range map[string]string{
+		"soft breaks":         `<p>first<br>second<br>third</p>`,
+		"formatted breaks":    `<p>a. <strong>first</strong><br>b. <strong>second</strong><br>c. <strong>third</strong></p>`,
+		"linked breaks":       `<p><a href="https://example.com"><strong>first<br>second</strong></a><br>third</p>`,
+		"empty line":          `<p>first<br><br>third</p>`,
+		"separate paragraphs": `<p>first</p><p>second</p><p>third</p>`,
+	} {
+		t.Run(name, func(t *testing.T) {
+			engine := newTableRichLute()
+			html := `<table><thead><tr><th><p>title</p></th><th><p>details</p></th></tr></thead>` +
+				`<tbody><tr><td><p>value</p></td><td>` + content + `</td></tr></tbody></table>`
+			original := engine.HTML2Tree(html).Root.FirstChild.LastChild.LastChild.TableCellRich
+			if original == nil {
+				t.Fatal("HTML fixture did not create a rich cell")
+			}
+			dom := engine.HTML2BlockDOM(html)
+			for round := 0; round < 3; round++ {
+				tree := engine.BlockDOM2Tree(dom)
+				table := tree.Root.ChildByType(ast.NodeTable)
+				rows, cells := 0, 0
+				ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+					if entering && n.Type == ast.NodeTableRow {
+						rows++
+					}
+					if entering && n.Type == ast.NodeTableCell {
+						cells++
+					}
+					return ast.WalkContinue
+				})
+				if table == nil || rows != 2 || cells != 4 || strings.Contains(tree.Root.Text(), "table-cell-rich") {
+					t.Fatalf("round %d changed the table grid or leaked metadata: %s", round, dom)
+				}
+				cell := table.LastChild.LastChild
+				if cell.TableCellRich == nil || cell.TableCellRich.Encode() != original.Encode() {
+					t.Fatalf("round %d changed the rich source: %#v", round, cell.TableCellRich)
+				}
+				markdown := engine.BlockDOM2Md(dom)
+				dom = engine.Md2BlockDOM(markdown, false)
+			}
+		})
+	}
+}
+
 func TestMarkdownTableStructureBoundaries(t *testing.T) {
 	engine := newTableRichLute()
 	for _, source := range []string{

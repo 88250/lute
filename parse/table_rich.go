@@ -96,6 +96,11 @@ func CloneTableCellInline(node *ast.Node) *ast.Node {
 	clone.Parent, clone.Previous, clone.Next, clone.FirstChild, clone.LastChild = nil, nil, nil, nil, nil
 	clone.Children = nil
 	clone.Tokens = append([]byte(nil), node.Tokens...)
+	// 投影中的换行使用表格内标记，保证中间 Markdown 的每一行仍对应一个表格行。
+	if clone.Type == ast.NodeSoftBreak || clone.Type == ast.NodeHardBreak {
+		clone.Type = ast.NodeBr
+		clone.Tokens = []byte("<br />")
+	}
 	clone.KramdownIAL = nil
 	for _, ial := range node.KramdownIAL {
 		clone.KramdownIAL = append(clone.KramdownIAL, append([]string(nil), ial...))
