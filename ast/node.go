@@ -34,10 +34,11 @@ type Node struct {
 
 	// 节点基础结构
 
-	ID   string `json:",omitempty"` // 节点的唯一标识
-	Box  string `json:"-"`          // 容器
-	Path string `json:"-"`          // 路径
-	Spec string `json:",omitempty"` // 规范版本号
+	ID            string         `json:",omitempty"` // 节点的唯一标识
+	Box           string         `json:"-"`          // 容器
+	Path          string         `json:"-"`          // 路径
+	Spec          string         `json:",omitempty"` // 规范版本号
+	DocumentTitle *DocumentTitle `json:",omitempty"` // 文档标题的完整行级源，不属于正文子节点
 
 	Type       NodeType `json:"-"`              // 节点类型
 	Parent     *Node    `json:"-"`              // 父节点
