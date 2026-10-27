@@ -1,12 +1,14 @@
 package lute_test
 
 import (
+	"html"
 	"regexp"
 	"strings"
 	"testing"
 
 	"github.com/88250/lute"
 	"github.com/88250/lute/ast"
+	"github.com/88250/lute/parse"
 )
 
 func TestLatexMathMarkdown(t *testing.T) {
@@ -22,6 +24,9 @@ func TestLatexMathMarkdown(t *testing.T) {
 		{"display row spacing", "\\[\n\\begin{aligned}\nx &= 1 \\\\[1em]\ny &= 2\n\\end{aligned}\n\\]", 0, 1},
 		{"display quote", "> \\[\n> x\n> \\]", 0, 1},
 		{"display list", "- \\[\n  x\n  \\]", 0, 1},
+		{"display quote in list", "- > \\[\n  > x\n  > \\]", 0, 1},
+		{"display list in quote", "> - \\[\n>   x\n>   \\]", 0, 1},
+		{"display nested list", "- Outer\n  - \\[\n    x\n    \\]", 0, 1},
 		{"unclosed", "\\[\nx\n\n# Keep heading\n\\(y", 0, 0},
 		{"empty", `\( \) \[\]`, 0, 0},
 		{"escaped", `\\(x\\)`, 0, 0},
@@ -68,6 +73,19 @@ func TestLatexMathHTML(t *testing.T) {
 		{"nested table formula", `<table><tr><th>Formula</th></tr><tr><td><p><span><span data-math-source="x+y" data-math-display="false">\(x+y\)</span></span></p></td></tr></table>`, 1, 0, `data-content="x+y"`},
 		{"nested paragraph formula", `<p><span><span>\(x+y\)</span></span></p>`, 1, 0, `data-content="x+y"`},
 		{"styled table formulas", `<table><tr><th>Formula</th></tr><tr><td><p><strong><span>\(x+y\)</span></strong></p><p><em><span>\(z\)</span></em></p></td></tr></table>`, 2, 0, `data-content="x+y"`},
+		{"bold formula", `<p><strong>\(x+y\)</strong></p>`, 1, 0, `data-type="strong inline-math"`},
+		{"nested styled formula", `<p><span data-type="strong">\(x+y\)</span></p>`, 1, 0, `data-content="x+y"`},
+		{"nested existing styled formula", `<p><span data-type="strong em"><span data-type="inline-math" data-content="x+y"></span></span></p>`, 1, 0, `data-content="x+y"`},
+		{"multiple split formulas", `<p>\(a<strong>+b\) then \(c</strong>+d\)</p>`, 2, 0, "then"},
+		{"highlight split formula", `<p>\(x<mark>+y</mark>\)</p>`, 1, 0, `data-content="x+y"`},
+		{"highlight display", `<p><mark>\[x+y\]</mark></p>`, 0, 1, `data-content="x+y"`},
+		{"heading", `<h2><span>\(x+y\)</span></h2>`, 1, 0, `data-type="NodeHeading"`},
+		{"list", `<ul><li><p><span>\(x+y\)</span></p></li></ul>`, 1, 0, `data-type="NodeList"`},
+		{"quote", `<blockquote><p><span>\(x+y\)</span></p></blockquote>`, 1, 0, `data-type="NodeBlockquote"`},
+		{"empty wrappers before existing math", `<p><span></span><span><span data-type="inline-math" data-content="x+y"></span></span></p>`, 1, 0, `data-content="x+y"`},
+		{"link label", `<p><a href="https://example.com">\(x+y\)</a></p>`, 0, 0, "x+y"},
+		{"unicode and entities", `<p>前 \(α+β\) 后 <span>\(x &lt; y\)</span></p>`, 2, 0, `data-content="x &lt; y"`},
+		{"code boundary", `<p>\(x<code>+y</code>\)</p>`, 0, 0, "x"},
 		{"display", `<p>\[x+y\]</p>`, 0, 1, `data-content="x+y"`},
 		{"breaks", `<p>\[<br>\begin{aligned}<br>x&amp;=1\\<br>y&amp;=2<br>\end{aligned}<br>\]</p>`, 0, 1, `x&amp;=1`},
 		{"split inline", `<p><strong>before \(x</strong><em>+y\) after</em></p>`, 1, 0, `data-content="x+y"`},
@@ -98,12 +116,13 @@ func TestLatexMathHTML(t *testing.T) {
 			if len(inlineMath.FindAllString(dom, -1)) != tc.inline || strings.Count(dom, `data-type="NodeMathBlock"`) != tc.block || !strings.Contains(dom, tc.contains) {
 				t.Fatalf("unexpected conversion: %s", dom)
 			}
-			if strings.Contains(tc.name, "table") || tc.name == "nested paragraph formula" {
+			for range 3 {
 				engine.SetLatexMath(false)
 				spun := engine.SpinBlockDOM(dom)
-				if len(inlineMath.FindAllString(spun, -1)) != tc.inline || strings.Count(spun, `data-type="NodeMathBlock"`) != tc.block {
+				if len(inlineMath.FindAllString(spun, -1)) != tc.inline || strings.Count(spun, `data-type="NodeMathBlock"`) != tc.block || !strings.Contains(html.UnescapeString(spun), html.UnescapeString(tc.contains)) {
 					t.Fatalf("canonical editing round trip changed formulas: %s", spun)
 				}
+				dom = spun
 			}
 		})
 	}
@@ -123,5 +142,53 @@ func TestLatexMathOptIn(t *testing.T) {
 	}
 	if markdown := engine.BlockDOM2StdMd(engine.Md2BlockDOM(`\[x+y\]`, false)); !strings.Contains(markdown, "$$\nx+y\n$$") {
 		t.Fatalf("export must use canonical dollar delimiters: %s", markdown)
+	}
+}
+
+func TestLatexMathRichTableImport(t *testing.T) {
+	for _, enabled := range []bool{true, false} {
+		engine := lute.New()
+		engine.SetProtyleWYSIWYG(true)
+		engine.SetTextMark(true)
+		engine.SetKramdownIAL(true)
+		engine.SetLatexMath(enabled)
+		engine.ParseOptions.PreserveTableCellSource = true
+		source := "| Formula |\n| --- |\n| <p><span>\\(x+y\\)</span></p><p>\\[z\\]</p><pre><code>\\(code\\)</code></pre> |"
+		tree := parse.Parse("", []byte(source), engine.ParseOptions)
+		lute.NormalizeMarkdownTableCells(tree)
+		var rich *ast.TableCellRich
+		ast.Walk(tree.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if entering && n.Type == ast.NodeTableCell && n.TableCellRich != nil {
+				rich = n.TableCellRich
+			}
+			return ast.WalkContinue
+		})
+		if rich == nil {
+			t.Fatal("missing rich table cell")
+		}
+		fragment, err := parse.ParseTableCellRich(rich)
+		if err != nil {
+			t.Fatal(err)
+		}
+		inline, block := 0, 0
+		ast.Walk(fragment.Root, func(n *ast.Node, entering bool) ast.WalkStatus {
+			if entering && n.Type == ast.NodeTextMark && n.ContainTextMarkTypes("inline-math") {
+				inline++
+			}
+			if entering && n.Type == ast.NodeMathBlock {
+				block++
+			}
+			return ast.WalkContinue
+		})
+		want := 0
+		if enabled {
+			want = 1
+		}
+		if inline != want || block != want || !strings.Contains(rich.Content, `\(code\)`) {
+			t.Fatalf("enabled=%v inline=%d block=%d content=%s", enabled, inline, block, rich.Content)
+		}
+		if parse.TableCellRichOptions().LatexMath {
+			t.Fatal("import syntax leaked into stored rich table parsing")
+		}
 	}
 }

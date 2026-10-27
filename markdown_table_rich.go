@@ -25,7 +25,7 @@ func NormalizeMarkdownTableCells(tree *parse.Tree) {
 		source := strings.TrimSpace(tree.Context.TableCellSources[cell])
 		var content string
 		if isMarkdownTableCellBlockHTML(source) {
-			content = markdownTableCellHTMLContent(source)
+			content = markdownTableCellHTMLContent(source, tree.Context.ParseOption.LatexMath, tree.Context.ParseOption.InlineMath)
 		} else if isMarkdownTableCellTask(source) {
 			content = markdownTableCellBreaks(source)
 		} else {
@@ -49,9 +49,11 @@ func NormalizeMarkdownTableCells(tree *parse.Tree) {
 	})
 }
 
-func markdownTableCellHTMLContent(source string) string {
+func markdownTableCellHTMLContent(source string, latexMath, inlineMath bool) string {
 	engine := New()
 	engine.ParseOptions = parse.TableCellRichOptions()
+	engine.SetLatexMath(latexMath)
+	engine.SetInlineMath(inlineMath)
 	engine.SetKramdownIAL(true)
 	engine.SetAutoSpace(false)
 	engine.SetExportNormalizeTaskListMarker(false)
@@ -73,7 +75,7 @@ func preserveHTMLTableCellStructure(n *html.Node) {
 		}
 		if fragment := strings.TrimSpace(source.String()); isMarkdownTableCellBlockHTML(fragment) {
 			rich := &ast.TableCellRich{Spec: ast.TableCellRichSpec, Format: ast.TableCellRichFormat,
-				Content: markdownTableCellHTMLContent(fragment)}
+				Content: markdownTableCellHTMLContent(fragment, false, true)}
 			if _, err := parse.ParseTableCellRich(rich); err == nil {
 				n.Attr = append(n.Attr, &html.Attribute{Key: ast.TableCellRichAttribute, Val: rich.Encode()})
 			}

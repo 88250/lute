@@ -101,7 +101,7 @@ func domAttr(n *html.Node, name string) string {
 
 func isLatexMathInlineDOM(n *html.Node) bool {
 	switch n.DataAtom {
-	case atom.Span, atom.Strong, atom.B, atom.Em, atom.I, atom.U, atom.S, atom.Del, atom.Sub, atom.Sup, atom.Font, atom.Small:
+	case atom.Span, atom.Strong, atom.B, atom.Em, atom.I, atom.U, atom.S, atom.Del, atom.Sub, atom.Sup, atom.Font, atom.Small, atom.Mark:
 		return true
 	}
 	return false
