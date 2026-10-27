@@ -24,6 +24,13 @@ func MathBlockStart(t *Tree, container *ast.Node) int {
 	if t.Context.indented {
 		return 0
 	}
+	if t.Context.ParseOption.LatexMath && t.latexMathBlockClosed(container) {
+		t.Context.closeUnmatchedBlocks()
+		block := t.Context.addChild(ast.NodeMathBlock)
+		block.MathBlockDollarOffset = t.Context.indent
+		t.Context.advanceNextNonspace()
+		return 2
+	}
 
 	if ok, mathBlockDollarOffset := t.parseMathBlock(); ok {
 		t.Context.closeUnmatchedBlocks()
@@ -39,6 +46,10 @@ func MathBlockStart(t *Tree, container *ast.Node) int {
 func MathBlockContinue(mathBlock *ast.Node, context *Context) int {
 	ln := context.currentLine
 	indent := context.indent
+	if bytes.HasPrefix(mathBlock.Tokens, []byte(`\[`)) {
+		// Keep the closing line in Tokens; the ordinary post-addLine path finalizes it.
+		return 0
+	}
 	if 3 >= indent && context.isMathBlockClose(ln[context.nextNonspace:]) {
 		context.finalize(mathBlock)
 		return 2
@@ -62,6 +73,19 @@ var MathBlockMarker = util.StrToBytes("$$")
 var MathBlockMarkerCaret = util.StrToBytes("$$" + editor.Caret)
 
 func (context *Context) mathBlockFinalize(mathBlock *ast.Node) {
+	if bytes.HasPrefix(mathBlock.Tokens, []byte(`\[`)) {
+		content, consumed := MatchLatexMath(bytes.TrimSpace(mathBlock.Tokens), true)
+		if consumed == 0 {
+			// A container can end before the matching delimiter. Preserve its original text.
+			mathBlock.Type = ast.NodeParagraph
+			return
+		}
+		mathBlock.Tokens = nil
+		mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockOpenMarker})
+		mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockContent, Tokens: bytes.TrimSpace(content)})
+		mathBlock.AppendChild(&ast.Node{Type: ast.NodeMathBlockCloseMarker})
+		return
+	}
 	if 2 > len(mathBlock.Tokens) {
 		/*
 			- foo

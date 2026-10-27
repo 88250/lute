@@ -56,6 +56,9 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 	if nil == n {
 		return nil
 	}
+	if lute.ParseOptions.LatexMath {
+		normalizeLatexMathDOM(n, lute.ParseOptions.InlineMath)
+	}
 
 	// 调整 DOM 结构
 	if lute.ParseOptions.ProtyleWYSIWYG && !lute.ParseOptions.DisableTableCellRich {
@@ -499,6 +502,7 @@ func trimTableCellTextTokens(n *html.Node, tokens []byte) []byte {
 // genASTByDOM 根据指定的 DOM 节点 n 进行深度优先遍历并逐步生成 Markdown 语法树 tree。
 func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 	normalizeCodeBlockBanner(n)
+	normalizeNestedTextMarkDOM(n)
 	if lute.genASTByTabsDOM(n, tree) {
 		return
 	}
@@ -821,12 +825,10 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 				}
 
 				// span 可能是 TextMark 元素，也可能是公式，其他情况则忽略
-				spans := util.DomChildrenByType(n, atom.Span)
-				if 0 < len(spans) {
-					span := spans[0]
-					if "" != util.DomAttrValue(span, "data-type") || "" != util.DomAttrValue(span, "data-tex") {
-						break
-					}
+				if slices.ContainsFunc(util.DomChildrenByType(n, atom.Span), func(span *html.Node) bool {
+					return "" != util.DomAttrValue(span, "data-type") || "" != util.DomAttrValue(span, "data-tex")
+				}) {
+					break
 				}
 				return
 			}
@@ -2314,6 +2316,50 @@ func removeDOMComments(n *html.Node) {
 			removeDOMComments(child)
 		}
 		child = next
+	}
+}
+
+// normalizeNestedTextMarkDOM 将包含子元素的纯样式文本标记还原为语义标签，保留子公式等行内内容。
+func normalizeNestedTextMarkDOM(n *html.Node) {
+	if n.DataAtom != atom.Span {
+		return
+	}
+	hasElement := false
+	for child := n.FirstChild; child != nil; child = child.NextSibling {
+		if child.Type == html.ElementNode {
+			hasElement = true
+			break
+		}
+	}
+	if !hasElement {
+		return
+	}
+	types := strings.Fields(util.DomAttrValue(n, "data-type"))
+	if len(types) == 0 {
+		return
+	}
+	for _, typ := range types {
+		switch typ {
+		case "strong", "em", "u", "s", "mark", "sub", "sup":
+		default:
+			return
+		}
+	}
+	n.Data, n.DataAtom = types[0], atom.Lookup([]byte(types[0]))
+	for i, attr := range n.Attr {
+		if attr.Key == "data-type" {
+			n.Attr = append(n.Attr[:i], n.Attr[i+1:]...)
+			break
+		}
+	}
+	for _, typ := range types[1:] {
+		wrapper := &html.Node{Type: html.ElementNode, Data: typ, DataAtom: atom.Lookup([]byte(typ))}
+		for n.FirstChild != nil {
+			child := n.FirstChild
+			n.RemoveChild(child)
+			wrapper.AppendChild(child)
+		}
+		n.AppendChild(wrapper)
 	}
 }
 

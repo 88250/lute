@@ -162,6 +162,7 @@ func (t *Tree) incorporateLine(line []byte) {
 			lex.ItemLess != maybeMarker && // HTML 块
 			lex.ItemUnderscore != maybeMarker && lex.ItemEqual != maybeMarker && // Setext 标题
 			lex.ItemDollar != maybeMarker && // 数学公式
+			!(t.Context.ParseOption.LatexMath && lex.ItemBackslash == maybeMarker) &&
 			lex.ItemOpenBracket != maybeMarker && // 脚注
 			lex.ItemOpenBrace != maybeMarker && // kramdown 内联属性列表或超级块开始
 			lex.ItemCloseBrace != maybeMarker && // 超级块闭合
@@ -240,6 +241,14 @@ func (t *Tree) incorporateLine(line []byte) {
 					}
 				}
 			case ast.NodeMathBlock:
+				if bytes.HasPrefix(container.Tokens, []byte(`\[`)) {
+					if bytes.HasSuffix(bytes.TrimSpace(container.Tokens), []byte(`\]`)) {
+						if _, consumed := MatchLatexMath(bytes.TrimSpace(container.Tokens), true); consumed > 0 {
+							t.Context.finalize(container)
+						}
+					}
+					break
+				}
 				// 数学公式块标记符没有换行的形式（$$foo$$）需要判断右边结尾的闭合标记符
 				if 3 > len(container.Tokens) {
 					break

@@ -96,7 +96,12 @@ func (lute *Lute) HTML2BlockDOM(sHTML string) (vHTML string) {
 		return
 	}
 
-	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
+	parseOptions := *lute.ParseOptions
+	// HTML 正文已完成公式归一化，中间 Markdown 不再解释链接等受保护区域中的替代分隔符。
+	parseOptions.LatexMath = false
+	tree := parse.Parse("", []byte(markdown), &parseOptions)
+	parse.TextMarks2Inlines(tree)
+	parse.NestedInlines2FlattedSpansHybrid(tree, false)
 	renderer := render.NewProtyleRenderer(tree, lute.RenderOptions, lute.ParseOptions)
 	for nodeType, rendererFunc := range lute.HTML2BlockDOMRendererFuncs {
 		renderer.ExtRendererFuncs[nodeType] = rendererFunc
