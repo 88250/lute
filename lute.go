@@ -470,6 +470,11 @@ func (lute *Lute) SetInlineMath(b bool) {
 	lute.ParseOptions.InlineMath = b
 }
 
+// SetLatexMath enables \(...\) and \[...\] for external input. Existing dollar syntax is unchanged.
+func (lute *Lute) SetLatexMath(b bool) {
+	lute.ParseOptions.LatexMath = b
+}
+
 func (lute *Lute) SetInlineMathAllowDigitAfterOpenMarker(b bool) {
 	lute.ParseOptions.InlineMathAllowDigitAfterOpenMarker = b
 }

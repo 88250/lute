@@ -34,7 +34,18 @@ func (t *Tree) parseInline(block *ast.Node, ctx *InlineContext) {
 		var n *ast.Node
 		switch token {
 		case lex.ItemBackslash:
-			n = t.parseBackslash(block, ctx)
+			if t.Context.ParseOption.LatexMath && t.Context.ParseOption.InlineMath {
+				if content, consumed := MatchLatexMath(ctx.tokens[ctx.pos:], false); consumed > 0 {
+					n = &ast.Node{Type: ast.NodeInlineMath}
+					n.AppendChild(&ast.Node{Type: ast.NodeInlineMathOpenMarker})
+					n.AppendChild(&ast.Node{Type: ast.NodeInlineMathContent, Tokens: content})
+					n.AppendChild(&ast.Node{Type: ast.NodeInlineMathCloseMarker})
+					ctx.pos += consumed
+				}
+			}
+			if n == nil {
+				n = t.parseBackslash(block, ctx)
+			}
 		case lex.ItemBacktick:
 			n = t.parseCodeSpan(block, ctx)
 		case lex.ItemAsterisk, lex.ItemUnderscore, lex.ItemTilde, lex.ItemEqual, lex.ItemCrosshatch:

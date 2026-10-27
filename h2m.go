@@ -56,6 +56,9 @@ func (lute *Lute) HTMLNode2Tree(n *html.Node) (ret *parse.Tree) {
 	if nil == n {
 		return nil
 	}
+	if lute.ParseOptions.LatexMath {
+		normalizeLatexMathDOM(n, lute.ParseOptions.InlineMath)
+	}
 
 	// 调整 DOM 结构
 	if lute.ParseOptions.ProtyleWYSIWYG && !lute.ParseOptions.DisableTableCellRich {

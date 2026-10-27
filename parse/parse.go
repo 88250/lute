@@ -415,6 +415,8 @@ type Options struct {
 	ProtyleWYSIWYGAutoLink bool
 	// InlineMath 设置是否开启行级公式 $foo$ 支持。
 	InlineMath bool
+	// LatexMath enables alternate LaTeX delimiters for external input only. It defaults to false.
+	LatexMath bool
 	// InlineMathAllowDigitAfterOpenMarker 设置内联数学公式是否允许起始 $ 后紧跟数字 https://github.com/b3log/lute/issues/38
 	InlineMathAllowDigitAfterOpenMarker bool
 	// Setext 设置是否解析 Setext 标题 https://github.com/88250/lute/issues/50
