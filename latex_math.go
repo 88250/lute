@@ -175,6 +175,8 @@ func replaceLatexMathDOMRun(root *html.Node, refs []latexMathDOMText, text strin
 			root.AppendChild(math)
 			return
 		}
+		// 保留公式文本，避免外层段落及单元格富文本转换将嵌套行内包装误判为空内容。
+		math.AppendChild(&html.Node{Type: html.TextNode, Data: m.content})
 		inserted := false
 		for _, ref := range refs {
 			if ref.end <= m.start || ref.start >= m.end {

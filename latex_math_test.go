@@ -1,6 +1,7 @@
 package lute_test
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 
@@ -56,6 +57,7 @@ func TestLatexMathMarkdown(t *testing.T) {
 }
 
 func TestLatexMathHTML(t *testing.T) {
+	inlineMath := regexp.MustCompile(`data-type="(?:[^" ]+ )*inline-math(?: [^" ]+)*"`)
 	for _, tc := range []struct {
 		name, source  string
 		inline, block int
@@ -63,6 +65,9 @@ func TestLatexMathHTML(t *testing.T) {
 	}{
 		{"inline", `<p>before \(x+y\) after \(z\)</p>`, 2, 0, "after"},
 		{"table", `<table><tr><th>Formula</th></tr><tr><td>\(\hat VY\)</td></tr></table>`, 1, 0, `data-type="NodeTable"`},
+		{"nested table formula", `<table><tr><th>Formula</th></tr><tr><td><p><span><span data-math-source="x+y" data-math-display="false">\(x+y\)</span></span></p></td></tr></table>`, 1, 0, `data-content="x+y"`},
+		{"nested paragraph formula", `<p><span><span>\(x+y\)</span></span></p>`, 1, 0, `data-content="x+y"`},
+		{"styled table formulas", `<table><tr><th>Formula</th></tr><tr><td><p><strong><span>\(x+y\)</span></strong></p><p><em><span>\(z\)</span></em></p></td></tr></table>`, 2, 0, `data-content="x+y"`},
 		{"display", `<p>\[x+y\]</p>`, 0, 1, `data-content="x+y"`},
 		{"breaks", `<p>\[<br>\begin{aligned}<br>x&amp;=1\\<br>y&amp;=2<br>\end{aligned}<br>\]</p>`, 0, 1, `x&amp;=1`},
 		{"split inline", `<p><strong>before \(x</strong><em>+y\) after</em></p>`, 1, 0, `data-content="x+y"`},
@@ -90,8 +95,15 @@ func TestLatexMathHTML(t *testing.T) {
 				}
 				return ast.WalkContinue
 			})
-			if strings.Count(dom, `data-type="inline-math"`) != tc.inline || strings.Count(dom, `data-type="NodeMathBlock"`) != tc.block || !strings.Contains(dom, tc.contains) {
+			if len(inlineMath.FindAllString(dom, -1)) != tc.inline || strings.Count(dom, `data-type="NodeMathBlock"`) != tc.block || !strings.Contains(dom, tc.contains) {
 				t.Fatalf("unexpected conversion: %s", dom)
+			}
+			if strings.Contains(tc.name, "table") || tc.name == "nested paragraph formula" {
+				engine.SetLatexMath(false)
+				spun := engine.SpinBlockDOM(dom)
+				if len(inlineMath.FindAllString(spun, -1)) != tc.inline || strings.Count(spun, `data-type="NodeMathBlock"`) != tc.block {
+					t.Fatalf("canonical editing round trip changed formulas: %s", spun)
+				}
 			}
 		})
 	}
