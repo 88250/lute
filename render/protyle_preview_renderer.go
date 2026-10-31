@@ -916,7 +916,7 @@ func (r *ProtylePreviewRenderer) renderTableCell(node *ast.Node, entering bool) 
 
 func (r *ProtylePreviewRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("tr", node.KramdownIAL, false)
+		r.Tag("tr", safeIALAttrs(node.KramdownIAL), false)
 		r.Newline()
 	} else {
 		r.Tag("/tr", nil, false)
@@ -933,7 +933,7 @@ func (r *ProtylePreviewRenderer) renderTableHead(node *ast.Node, entering bool) 
 				for th := node.FirstChild.FirstChild; nil != th; th = th.Next {
 					if ast.NodeTableCell == th.Type {
 						if style := th.IALAttr("style"); "" != style {
-							r.Tag("col", [][]string{{"style", style}}, true)
+							r.Tag("col", [][]string{{"style", escapeHTMLAttrVal(style)}}, true)
 						} else {
 							r.Tag("col", nil, true)
 						}
@@ -944,7 +944,7 @@ func (r *ProtylePreviewRenderer) renderTableHead(node *ast.Node, entering bool) 
 			cols := strings.Split(colgroup, "|")
 			for _, style := range cols {
 				if "" != style {
-					r.Tag("col", [][]string{{"style", style}}, true)
+					r.Tag("col", [][]string{{"style", escapeHTMLAttrVal(style)}}, true)
 				} else {
 					r.Tag("col", nil, true)
 				}
@@ -977,13 +977,10 @@ func (r *ProtylePreviewRenderer) renderTable(node *ast.Node, entering bool) ast.
 		delete(ials, "caption")
 		delete(ials, "updated")
 		delete(ials, "colgroup")
-		r.Tag("table", parse.Map2IAL(ials), false)
+		r.Tag("table", safeIALAttrs(parse.Map2IAL(ials)), false)
 		r.Newline()
-		caption := node.IALAttr("caption")
-		if "" != caption {
-			caption = html.UnescapeHTMLStr(caption)
-			caption = strings.ReplaceAll(caption, "contenteditable=\"false\" ", "")
-			r.WriteString(caption)
+		if caption := node.IALAttr("caption"); "" != caption {
+			r.WriteString(renderTableCaption(caption, false))
 		}
 		r.Newline()
 	} else {

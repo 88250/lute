@@ -1138,7 +1138,7 @@ func (r *ProtyleExportRenderer) renderTableCell(node *ast.Node, entering bool) a
 
 func (r *ProtyleExportRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("tr", node.KramdownIAL, false)
+		r.Tag("tr", safeIALAttrs(node.KramdownIAL), false)
 	} else {
 		r.Tag("/tr", nil, false)
 	}
@@ -1152,7 +1152,7 @@ func (r *ProtyleExportRenderer) renderTableHead(node *ast.Node, entering bool) a
 			for th := node.FirstChild.FirstChild; nil != th; th = th.Next {
 				if ast.NodeTableCell == th.Type {
 					if style := th.IALAttr("style"); "" != style {
-						r.Tag("col", [][]string{{"style", style}}, true)
+						r.Tag("col", [][]string{{"style", escapeHTMLAttrVal(style)}}, true)
 					} else {
 						r.Tag("col", nil, true)
 					}
@@ -1162,7 +1162,7 @@ func (r *ProtyleExportRenderer) renderTableHead(node *ast.Node, entering bool) a
 			cols := strings.Split(colgroup, "|")
 			for _, style := range cols {
 				if "" != style {
-					r.Tag("col", [][]string{{"style", style}}, true)
+					r.Tag("col", [][]string{{"style", escapeHTMLAttrVal(style)}}, true)
 				} else {
 					r.Tag("col", nil, true)
 				}

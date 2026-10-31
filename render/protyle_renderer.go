@@ -1213,7 +1213,7 @@ func (r *ProtyleRenderer) renderTableCell(node *ast.Node, entering bool) ast.Wal
 
 func (r *ProtyleRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("tr", node.KramdownIAL, false)
+		r.Tag("tr", safeIALAttrs(node.KramdownIAL), false)
 	} else {
 		r.Tag("/tr", nil, false)
 	}
@@ -1241,7 +1241,7 @@ func (r *ProtyleRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wal
 				for th := node.FirstChild.FirstChild; nil != th; th = th.Next {
 					if ast.NodeTableCell == th.Type {
 						if style := tableCellWidthStyle(th.IALAttr("style")); "" != style {
-							r.Tag("col", [][]string{{"style", style}}, true)
+							r.Tag("col", [][]string{{"style", escapeHTMLAttrVal(style)}}, true)
 						} else {
 							r.Tag("col", nil, true)
 						}
@@ -1252,7 +1252,7 @@ func (r *ProtyleRenderer) renderTableHead(node *ast.Node, entering bool) ast.Wal
 			cols := strings.Split(colgroup, "|")
 			for _, style := range cols {
 				if "" != style {
-					r.Tag("col", [][]string{{"style", style}}, true)
+					r.Tag("col", [][]string{{"style", escapeHTMLAttrVal(style)}}, true)
 				} else {
 					r.Tag("col", nil, true)
 				}
@@ -1285,12 +1285,8 @@ func (r *ProtyleRenderer) renderTable(node *ast.Node, entering bool) ast.WalkSta
 		r.contenteditable(node, &attrs)
 		r.spellcheck(&attrs)
 		r.Tag("table", attrs, false)
-		caption := node.IALAttr("caption")
-		if "" != caption {
-			if r.Options.Sanitize {
-				caption = Sanitize(caption)
-			}
-			r.WriteString(html.UnescapeHTMLStr(caption))
+		if caption := node.IALAttr("caption"); "" != caption {
+			r.WriteString(renderTableCaption(caption, true))
 		}
 	} else {
 		if nil != node.FirstChild.Next {
@@ -1961,7 +1957,7 @@ func (r *ProtyleRenderer) renderSoftBreak(node *ast.Node, entering bool) ast.Wal
 }
 
 func (r *ProtyleRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
-	*attrs = append(*attrs, node.KramdownIAL...)
+	*attrs = append(*attrs, safeIALAttrs(node.KramdownIAL)...)
 }
 
 func (r *ProtyleRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class string) {
@@ -1971,10 +1967,11 @@ func (r *ProtyleRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, clas
 	r.nodeClass(node, attrs, class)
 
 	for _, ial := range node.KramdownIAL {
-		if "id" == ial[0] {
+		if "id" == ial[0] || !safeHTMLAttrName(ial[0]) {
 			continue
 		}
-		*attrs = append(*attrs, []string{ial[0], strings.ReplaceAll(ial[1], editor.IALValEscNewLine, "\n")})
+		value := strings.ReplaceAll(ial[1], editor.IALValEscNewLine, "\n")
+		*attrs = append(*attrs, []string{ial[0], escapeHTMLAttrVal(value)})
 	}
 }
 

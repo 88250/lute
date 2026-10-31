@@ -196,13 +196,10 @@ func (r *BaseRenderer) renderTableByHTML(node *ast.Node) {
 	delete(ials, "updated")
 	delete(ials, "colgroup")
 	delete(ials, "custom-sy-table-rich")
-	r.Tag("table", parse.Map2IAL(ials), false)
+	r.Tag("table", safeIALAttrs(parse.Map2IAL(ials)), false)
 	r.Newline()
-	caption := node.IALAttr("caption")
-	if "" != caption {
-		caption = html.UnescapeHTMLStr(caption)
-		caption = strings.ReplaceAll(caption, "contenteditable=\"false\" ", "")
-		r.WriteString(caption)
+	if caption := node.IALAttr("caption"); "" != caption {
+		r.WriteString(renderTableCaption(caption, false))
 	}
 	r.Newline()
 
@@ -214,7 +211,7 @@ func (r *BaseRenderer) renderTableByHTML(node *ast.Node) {
 			for th := head.FirstChild.FirstChild; nil != th; th = th.Next {
 				if ast.NodeTableCell == th.Type {
 					if style := th.IALAttr("style"); "" != style {
-						r.Tag("col", [][]string{{"style", style}}, true)
+						r.Tag("col", [][]string{{"style", escapeHTMLAttrVal(style)}}, true)
 					} else {
 						r.Tag("col", nil, true)
 					}
@@ -316,7 +313,7 @@ func appendTableCellAlignStyle(node *ast.Node, attrs *[][]string) {
 
 // renderTableByHTMLRow 渲染一行（tr + td/th），单元格内容通过 ast.Walk + RendererFuncs 遍历
 func (r *BaseRenderer) renderTableByHTMLRow(row *ast.Node) {
-	r.Tag("tr", row.KramdownIAL, false)
+	r.Tag("tr", safeIALAttrs(row.KramdownIAL), false)
 	r.Newline()
 	for cell := row.FirstChild; nil != cell; cell = cell.Next {
 		if ast.NodeTableCell != cell.Type && ast.NodeKramdownSpanIAL != cell.Type {
@@ -345,7 +342,7 @@ func (r *BaseRenderer) renderTableByHTMLRow(row *ast.Node) {
 		// colspan/rowspan/style 等 IAL 属性
 		for _, kv := range cell.KramdownIAL {
 			if "colspan" == kv[0] || "rowspan" == kv[0] || "style" == kv[0] {
-				attrs = append(attrs, kv)
+				attrs = append(attrs, []string{kv[0], escapeHTMLAttrVal(kv[1])})
 			}
 		}
 		appendTableCellAlignStyle(cell, &attrs)
@@ -698,6 +695,44 @@ func (r *BaseRenderer) Tag(name string, attrs [][]string, selfclosing bool) {
 		r.WriteString(" /")
 	}
 	r.WriteString(">")
+}
+
+// safeHTMLAttrName 判断 IAL 属性名是否可以写入 HTML，拒绝事件属性和不能出现在属性名中的字符。
+func safeHTMLAttrName(name string) bool {
+	if "" == name {
+		return false
+	}
+	lower := strings.ToLower(name)
+	if strings.HasPrefix(lower, "on") {
+		return false
+	}
+	for i, c := range lower {
+		if ':' == c || '_' == c || '-' == c || '.' == c ||
+			('a' <= c && c <= 'z') ||
+			(0 < i && '0' <= c && c <= '9') {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+// escapeHTMLAttrVal 转义属性值中的标签定界符和引号，防止未转义的 IAL 值闭合属性并注入 HTML。
+func escapeHTMLAttrVal(value string) string {
+	value = strings.ReplaceAll(value, "<", "&lt;")
+	value = strings.ReplaceAll(value, ">", "&gt;")
+	return strings.ReplaceAll(value, "\"", "&quot;")
+}
+
+// safeIALAttrs 过滤 IAL 属性名并转义属性值，供直接写入 HTML 的 IAL 使用。
+func safeIALAttrs(attrs [][]string) (ret [][]string) {
+	for _, attr := range attrs {
+		if 2 > len(attr) || !safeHTMLAttrName(attr[0]) {
+			continue
+		}
+		ret = append(ret, []string{attr[0], escapeHTMLAttrVal(attr[1])})
+	}
+	return
 }
 
 func (r *BaseRenderer) headings() (ret []*Heading) {
