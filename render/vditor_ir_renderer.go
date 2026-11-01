@@ -151,7 +151,9 @@ func (r *VditorIRRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.W
 		if editor.Caret != destStr {
 			r.WriteString(" ")
 		}
-		r.WriteString(destStr + "\n")
+		r.WriteString(destStr)
+		r.renderVditorLinkRefTitle(node)
+		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkSkipChildren
 }
@@ -934,7 +936,9 @@ func (r *VditorIRRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 			node.ChildByType(ast.NodeLinkDest).Unlink()
 			if linkSpace := node.ChildByType(ast.NodeLinkSpace); nil != linkSpace {
 				linkSpace.Unlink()
-				node.ChildByType(ast.NodeLinkTitle).Unlink()
+			}
+			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
+				title.Unlink()
 			}
 			node.ChildByType(ast.NodeCloseParen).Unlink()
 		}

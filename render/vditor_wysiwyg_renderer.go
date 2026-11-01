@@ -154,7 +154,9 @@ func (r *VditorRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.Wal
 		if editor.Caret != destStr {
 			r.WriteString(" ")
 		}
-		r.WriteString(destStr + "\n")
+		r.WriteString(destStr)
+		r.renderVditorLinkRefTitle(node)
+		r.WriteByte(lex.ItemNewline)
 	}
 	return ast.WalkSkipChildren
 }

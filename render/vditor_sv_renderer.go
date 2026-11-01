@@ -195,6 +195,7 @@ func (r *VditorSVRenderer) renderLinkRefDef(node *ast.Node, entering bool) ast.W
 		}
 		r.WriteString("</span>")
 		r.WriteString(destStr)
+		r.renderVditorLinkRefTitle(node)
 		r.Newline()
 		r.Write(NewlineSV)
 	}
@@ -836,7 +837,9 @@ func (r *VditorSVRenderer) renderImage(node *ast.Node, entering bool) ast.WalkSt
 			node.ChildByType(ast.NodeLinkDest).Unlink()
 			if linkSpace := node.ChildByType(ast.NodeLinkSpace); nil != linkSpace {
 				linkSpace.Unlink()
-				node.ChildByType(ast.NodeLinkTitle).Unlink()
+			}
+			if title := node.ChildByType(ast.NodeLinkTitle); nil != title {
+				title.Unlink()
 			}
 			node.ChildByType(ast.NodeCloseParen).Unlink()
 		}
