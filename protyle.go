@@ -1600,7 +1600,7 @@ func (lute *Lute) genASTByBlockDOM(n *html.Node, tree *parse.Tree) {
 		for c := first; nil != c; c = c.NextSibling {
 			titleDom.Write(util.DomHTML(c))
 		}
-		node.CalloutTitle = strings.TrimSpace(lute.BlockDOM2Md(titleDom.String()))
+		node.CalloutTitle = strings.TrimSpace(lute.BlockDOM2Md(`<div contenteditable="true">` + titleDom.String() + `</div>`))
 		node.CalloutTitleExplicit = true
 		tree.Context.Tip.AppendChild(node)
 		tree.Context.Tip = node

@@ -22,7 +22,8 @@ func (lute *Lute) tabTitleMarkdown(title *html.Node, standardHTML bool) string {
 	if standardHTML {
 		markdown = lute.HTML2Md(dom.String())
 	} else {
-		markdown = lute.BlockDOM2Md(dom.String())
+		// 标题内联节点需要经过可编辑内容解析，保留自定义表情及文本标记的语义。
+		markdown = lute.BlockDOM2Md(`<div contenteditable="true">` + dom.String() + `</div>`)
 	}
 	markdown = strings.TrimSpace(markdown)
 	markdown = strings.TrimPrefix(markdown, "LuteTabTitleStart")
