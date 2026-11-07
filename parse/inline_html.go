@@ -12,6 +12,7 @@ package parse
 
 import (
 	"bytes"
+	"sort"
 	"strings"
 
 	"github.com/88250/lute/ast"
@@ -614,9 +615,15 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 	}
 
 	if customAttrs := util.DomCustomAttrs(n); nil != customAttrs {
+		// Stable attribute order is required for Markdown round trips to converge.
+		keys := make([]string, 0, len(customAttrs))
+		for key := range customAttrs {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
 		if !insertedIAL {
-			for k, v := range customAttrs {
-				v = html.UnescapeHTMLStr(v)
+			for _, k := range keys {
+				v := html.UnescapeHTMLStr(customAttrs[k])
 				node.SetIALAttr(k, v)
 			}
 
@@ -629,8 +636,8 @@ func SetSpanIAL(node *ast.Node, n *html.Node) {
 			}
 			insertedIAL = true
 		} else {
-			for k, v := range customAttrs {
-				v = html.UnescapeHTMLStr(v)
+			for _, k := range keys {
+				v := html.UnescapeHTMLStr(customAttrs[k])
 				node.SetIALAttr(k, v)
 			}
 
