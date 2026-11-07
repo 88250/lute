@@ -39,6 +39,10 @@ func TestProtyleInlinePlaceholderRendering(t *testing.T) {
 		{"combined-code", "a**`code`**b", "strong code", "code"},
 		{"kbd", "a<kbd>key</kbd>b", "kbd", "key"},
 		{"tag", "a#tag#b", "tag", "tag"},
+		{"sup", "a^2^b", "sup", "2"},
+		{"sub", "a~2~b", "sub", "2"},
+		{"combined-sup", "a**^2^**b", "strong sup", "2"},
+		{"combined-sub", "a**~2~**b", "strong sub", "2"},
 	}
 
 	for _, test := range tests {
@@ -76,6 +80,12 @@ func TestBlockDOMInlinePlaceholderCompatibility(t *testing.T) {
 		{"kbd", "<kbd>", "</kbd>"},
 		{"tag", `<span data-type="tag">`, "</span>"},
 		{"code-element", "<code>", "</code>"},
+		{"sup-span", `<span data-type="sup">`, "</span>"},
+		{"sub-span", `<span data-type="sub">`, "</span>"},
+		{"combined-sup", `<span data-type="strong sup">`, "</span>"},
+		{"combined-sub", `<span data-type="strong sub">`, "</span>"},
+		{"sup", "<sup>", "</sup>"},
+		{"sub", "<sub>", "</sub>"},
 	}
 
 	for _, marker := range markers {
@@ -240,11 +250,44 @@ func TestBlockDOMInlinePlaceholderPreservesRealWordJoiners(t *testing.T) {
 	}
 }
 
+func TestProtyleScriptBoundaryRoundTrip(t *testing.T) {
+	luteEngine := newProtylePlaceholderLute()
+	for _, typ := range []string{"sup", "sub", "strong sup", "em sub"} {
+		t.Run(typ, func(t *testing.T) {
+			content := "2" + editor.WordJoiner + "3"
+			legacy := protylePlaceholderBlockDOM(`before<span data-type="` + typ + `">` + content + `</span>after`)
+			spun := luteEngine.SpinBlockDOM(legacy)
+			if expected := `<span data-type="` + typ + `">` + editor.WordJoiner + content + `</span>`; !strings.Contains(spun, expected) {
+				t.Fatalf("script boundary missing from %q", spun)
+			}
+			if again := luteEngine.SpinBlockDOM(spun); spun != again {
+				t.Fatalf("script boundaries changed after another spin\nfirst %q\nsecond %q", spun, again)
+			}
+			for _, dom := range []string{legacy, spun} {
+				outputs := map[string]string{
+					"ast":       luteEngine.BlockDOM2Tree(dom).Root.Text(),
+					"markdown":  luteEngine.BlockDOM2Md(dom),
+					"standard":  luteEngine.BlockDOM2StdMd(dom),
+					"html":      luteEngine.BlockDOM2HTML(dom),
+					"rich-html": luteEngine.BlockDOM2RichHTML(dom),
+				}
+				for name, output := range outputs {
+					if strings.Count(output, editor.WordJoiner) != 1 || !strings.Contains(output, content) {
+						t.Fatalf("%s changed script content or leaked a placeholder: %q", name, output)
+					}
+				}
+			}
+		})
+	}
+}
+
 func newProtylePlaceholderLute() *lute.Lute {
 	luteEngine := lute.New()
 	luteEngine.SetProtyleWYSIWYG(true)
 	luteEngine.SetKramdownIAL(true)
 	luteEngine.SetTag(true)
+	luteEngine.SetSup(true)
+	luteEngine.SetSub(true)
 	luteEngine.SetTextMark(true)
 	luteEngine.SetHTMLTag2TextMark(true)
 	luteEngine.SetAutoSpace(false)

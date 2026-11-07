@@ -279,7 +279,7 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 				r.WriteByte(lex.ItemSpace)
 			}
 		}
-		if parse.ContainTextMark(node, "code", "kbd", "tag") {
+		if parse.ContainTextMark(node, "code", "kbd", "tag", "sup", "sub") {
 			r.ensureInlineBoundaryZwsp()
 		}
 
@@ -291,7 +291,7 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 		}
 
 		r.Tag("span", attrs, false)
-		if parse.ContainTextMark(node, "code", "kbd", "tag") {
+		if parse.ContainTextMark(node, "code", "kbd", "tag", "sup", "sub") {
 			r.WriteString(editor.WordJoiner)
 		}
 		textContent := node.TextMarkTextContent
@@ -306,7 +306,7 @@ func (r *ProtyleRenderer) renderTextMark(node *ast.Node, entering bool) ast.Walk
 		r.WriteString(textContent)
 	} else {
 		r.WriteString("</span>")
-		if parse.ContainTextMark(node, "code", "kbd", "tag") {
+		if parse.ContainTextMark(node, "code", "kbd", "tag", "sup", "sub") {
 			if text := node.NextNodeText(); "" != text {
 				if !strings.HasPrefix(text, editor.Zwsp) {
 					r.WriteString(editor.Zwsp)

@@ -1082,7 +1082,7 @@ func normalizeProtyleInlineCaretPlaceholders(n *html.Node) {
 }
 
 func isProtyleInlineCaretContainer(n *html.Node) bool {
-	if atom.Code == n.DataAtom || atom.Kbd == n.DataAtom {
+	if atom.Code == n.DataAtom || atom.Kbd == n.DataAtom || atom.Sup == n.DataAtom || atom.Sub == n.DataAtom {
 		return true
 	}
 	if atom.Span != n.DataAtom {
@@ -1090,7 +1090,7 @@ func isProtyleInlineCaretContainer(n *html.Node) bool {
 	}
 
 	for _, typ := range strings.Fields(util.DomAttrValue(n, "data-type")) {
-		if "code" == typ || "kbd" == typ || "tag" == typ {
+		if "code" == typ || "kbd" == typ || "tag" == typ || "sup" == typ || "sub" == typ {
 			return true
 		}
 	}
