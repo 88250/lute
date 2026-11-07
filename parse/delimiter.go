@@ -440,6 +440,9 @@ func (t *Tree) scanDelims(ctx *InlineContext, marker []byte, typ byte,
 		} else if lex.ItemCrosshatch == typ {
 			if !t.Context.ParseOption.Tag || 1 != delimitersCount /* #Tag# 标记使用一个井号 */ {
 				canOpen, canClose = false, false
+			} else if unicode.Is(unicode.Quotation_Mark, tokenBefore) && unicode.Is(unicode.Quotation_Mark, tokenAfter) {
+				// 引号紧邻包围的单个井号是字面文本，避免跨引用内容配对为标签。
+				canOpen, canClose = false, false
 			} else {
 				canOpen = isLeftFlanking
 				canClose = isRightFlanking

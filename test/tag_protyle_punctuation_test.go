@@ -32,14 +32,24 @@ func TestProtyleTagPunctuationBoundary(t *testing.T) {
 		"Per the exit condition, #83 shifts state. Escalated via the close (`20260819002715-enfbv43`, Routine Close), and whether this warrants breaking the standing \"#83 has no dedicated card\" convention.",
 		"#83 shifts state. See (#113)",
 		"#83 shifts state. See [#113]",
+		"маркер «#» и код `bare_guille` между «#» и «#» же.",
+		"маркер „#“ и код `bare_lapki` между „#“ и „#“ же.",
+		"marker \"#\" and code `bare_ascii` between \"#\" and \"#\".",
+		"marker ‘#’ and code `bare_single` between ‘#’ and ‘#’.",
+		"marker ‹#› and code `bare_single_guille` between ‹#› and ‹#›.",
+		"marker «#83» and code `number` between «#113» and «#114».",
 	}
 	for _, input := range inputs {
 		dom := luteEngine.Md2BlockDOM(input, false)
 		if strings.Contains(dom, `data-type="tag`) {
 			t.Fatalf("tag should not span a punctuation-prefixed hash reference\ninput\n\t%q\ngot\n\t%q", input, dom)
 		}
-		if markdown := strings.TrimSpace(luteEngine.BlockDOM2StdMd(dom)); input != markdown {
-			t.Fatalf("markdown should round-trip unchanged\nexpected\n\t%q\ngot\n\t%q", input, markdown)
+		for round := 0; round < 3; round++ {
+			markdown := strings.TrimSpace(luteEngine.BlockDOM2StdMd(dom))
+			if input != markdown {
+				t.Fatalf("markdown should round-trip unchanged\nexpected\n\t%q\ngot\n\t%q", input, markdown)
+			}
+			dom = luteEngine.Md2BlockDOM(markdown, false)
 		}
 	}
 }
@@ -51,7 +61,7 @@ func TestProtyleTagPunctuationBoundaryKeepsValidSyntax(t *testing.T) {
 	luteEngine.SetKramdownIAL(true)
 	luteEngine.SetTag(true)
 
-	for _, input := range []string{"#foo#", "(#foo#)", `"#foo#"`, "#foo bar#"} {
+	for _, input := range []string{"#foo#", "(#foo#)", `"#foo#"`, "#foo bar#", "«#foo#»", "„#foo#“", "#«foo»#"} {
 		dom := luteEngine.Md2BlockDOM(input, false)
 		if !strings.Contains(dom, `data-type="tag"`) {
 			t.Fatalf("valid tag syntax should remain supported\ninput\n\t%q\ngot\n\t%q", input, dom)
