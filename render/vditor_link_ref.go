@@ -24,6 +24,17 @@ func (r *BaseRenderer) renderVditorLinkRefTitle(definition *ast.Node) {
 	if nil == title {
 		return
 	}
+	if "//" == string(definition.Tokens) && "#" == string(definition.FirstChild.ChildByType(ast.NodeLinkDest).Tokens) {
+		r.WriteString(" (")
+		for i, token := range title.Tokens {
+			if ('(' == token || ')' == token) && !lex.IsBackslashEscapePunct(title.Tokens, i) {
+				r.WriteByte(lex.ItemBackslash)
+			}
+			r.Write(html.EscapeHTML([]byte{token}))
+		}
+		r.WriteByte(')')
+		return
+	}
 
 	tokens := make([]byte, 0, len(title.Tokens))
 	for i, token := range title.Tokens {
