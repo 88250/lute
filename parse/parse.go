@@ -71,13 +71,15 @@ func (t *Tree) finalParseBlockIAL() {
 				// 这个节点是 spin 后新生成的，将 n.Next 的 ID 和属性赋予它，并认为 n.Next 是新节点 https://github.com/siyuan-note/siyuan/issues/5723
 				n.ID = n.Next.ID
 				n.KramdownIAL = n.Next.KramdownIAL
-				if "" == n.IALAttr("updated") {
+				if "" == n.IALAttr("updated") && 14 <= len(n.ID) {
 					n.SetIALAttr("updated", n.ID[:14])
 				}
 				n.Next.ID = ast.NewNodeID()
 				n.Next.KramdownIAL = nil
 				n.Next.SetIALAttr("id", n.Next.ID)
-				n.Next.SetIALAttr("updated", n.Next.ID[:14])
+				if 14 <= len(n.Next.ID) {
+					n.Next.SetIALAttr("updated", n.Next.ID[:14])
+				}
 				if nil != n.Next.Next && ast.NodeKramdownBlockIAL == n.Next.Next.Type {
 					n.Next.Next.Tokens = IAL2Tokens(n.Next.KramdownIAL)
 				}
@@ -90,13 +92,15 @@ func (t *Tree) finalParseBlockIAL() {
 		if nil == ial || ast.NodeKramdownBlockIAL != ial.Type {
 			if t.Context.ParseOption.ProtyleWYSIWYG {
 				n.SetIALAttr("id", n.ID)
-				n.SetIALAttr("updated", n.ID[:14])
+				if 14 <= len(n.ID) {
+					n.SetIALAttr("updated", n.ID[:14])
+				}
 			}
 			return ast.WalkContinue
 		}
 
 		n.KramdownIAL = Tokens2IAL(ial.Tokens)
-		if "" == n.IALAttr("updated") && t.Context.ParseOption.ProtyleWYSIWYG {
+		if "" == n.IALAttr("updated") && t.Context.ParseOption.ProtyleWYSIWYG && 14 <= len(n.ID) {
 			n.SetIALAttr("updated", n.ID[:14])
 			ial.Tokens = IAL2Tokens(n.KramdownIAL)
 		}
