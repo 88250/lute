@@ -1718,9 +1718,9 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		}
 
 		var codeTokens []byte
-		if editor.Zwsp == n.FirstChild.Data && "" == util.DomAttrValue(n, "style") && nil != n.FirstChild.NextSibling {
+		if editor.Zwsp == n.FirstChild.Data && "" == util.DomAttrValue(n, "style") && nil != n.FirstChild.NextSibling && nil != n.FirstChild.NextSibling.FirstChild {
 			codeTokens = []byte(n.FirstChild.NextSibling.FirstChild.Data)
-		} else if atom.Code == n.FirstChild.DataAtom {
+		} else if atom.Code == n.FirstChild.DataAtom && nil != n.FirstChild.FirstChild {
 			codeTokens = []byte(n.FirstChild.FirstChild.Data)
 			if editor.Zwsp == string(codeTokens) {
 				break
