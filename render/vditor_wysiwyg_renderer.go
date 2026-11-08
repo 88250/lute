@@ -769,9 +769,14 @@ func (r *VditorRenderer) renderLink(node *ast.Node, entering bool) ast.WalkStatu
 			}
 		}
 		destTokens = r.LinkPath(destTokens)
+		destTokens = []byte(r.EncodeLinkSpace(string(destTokens)))
 		caretInDest := bytes.Contains(destTokens, editor.CaretTokens)
 		if caretInDest {
 			text := node.ChildByType(ast.NodeLinkText)
+			if nil == text {
+				text = &ast.Node{Type: ast.NodeLinkText}
+				node.ChildByType(ast.NodeCloseBracket).InsertBefore(text)
+			}
 			text.Tokens = append(text.Tokens, editor.CaretTokens...)
 			destTokens = bytes.ReplaceAll(destTokens, editor.CaretTokens, nil)
 		}

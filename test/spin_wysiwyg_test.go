@@ -166,7 +166,7 @@ var spinVditorDOMTests = []*parseTest{
 	{"21", "<p>[foo](/bar \"baz\")</p>", "<p data-block=\"0\"><a href=\"/bar\" title=\"baz\">foo</a></p>"},
 	{"20", "<p>[foo](/bar)</p>", "<p data-block=\"0\"><a href=\"/bar\">foo</a></p>"},
 	{"19", "<p>[foo]()</p>", "<p data-block=\"0\"><a href=\"\">foo</a></p>"},
-	{"18", "<p>[](/bar)</p>", "<p data-block=\"0\">[](/bar)</p>"},
+	{"18", "<p>[](/bar)</p>", "<p data-block=\"0\"><a href=\"/bar\"></a></p>"},
 	{"17", "<p>[]()</p>", "<p data-block=\"0\">[]()</p>"},
 	{"16", "<p>[](</p>", "<p data-block=\"0\">[](</p>"},
 	{"15", "<p><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>", "<p data-block=\"0\"><img alt=\"octocat\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/octocat.png\" title=\"octocat\" /></p>"},

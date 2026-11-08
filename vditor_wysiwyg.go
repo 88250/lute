@@ -1446,7 +1446,7 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 	case atom.A:
 		if n.FirstChild == nil || n.FirstChild.Type == html.TextNode {
 			text := util.DomText(n)
-			if "" == text || editor.Zwsp == text {
+			if ("" == text || editor.Zwsp == text) && "" == util.DomAttrValue(n, "href") {
 				return
 			}
 		}

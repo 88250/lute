@@ -810,6 +810,7 @@ func (r *VditorIRRenderer) renderLinkDest(node *ast.Node, entering bool) ast.Wal
 				dest = nil
 			}
 		}
+		dest = []byte(r.EncodeLinkSpace(string(dest)))
 		dest = html.EscapeHTML(dest)
 		r.Write(dest)
 		r.Tag("/span", nil, false)

@@ -211,7 +211,9 @@ func (t *Tree) parseCloseBracket(ctx *InlineContext) *ast.Node {
 			}
 			if t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG {
 				if !isImage && nil == opener.node.Next {
-					break
+					if t.Context.ParseOption.ProtyleWYSIWYG || t.Context.ParseOption.VditorSV || 0 == len(dest) {
+						break
+					}
 				}
 			}
 			ctx.pos += len(passed)

@@ -1264,6 +1264,9 @@ func (r *FormatRenderer) renderLinkDest(node *ast.Node, entering bool) ast.WalkS
 	if entering {
 		tokens := node.Tokens
 		tokens = r.LinkPath(tokens)
+		if r.ParseOptions.VditorWYSIWYG || r.ParseOptions.VditorIR {
+			tokens = []byte(r.EncodeLinkSpace(string(tokens)))
+		}
 		r.Write(tokens)
 	}
 	return ast.WalkContinue
