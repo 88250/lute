@@ -819,6 +819,10 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	if !entering {
 		return ast.WalkContinue
 	}
+	if pairedVditorEmphasisHTML(node) {
+		r.Write(node.Tokens)
+		return ast.WalkContinue
+	}
 
 	if bytes.Equal(node.Tokens, []byte("<br />")) && node.ParentIs(ast.NodeTableCell) {
 		r.Write(node.Tokens)
