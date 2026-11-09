@@ -1755,6 +1755,19 @@ func (lute *Lute) genASTByVditorDOM(n *html.Node, tree *parse.Tree) {
 		node.Tokens = bytes.SplitAfter(node.Tokens, []byte("</summary>"))[0]
 		tree.Context.Tip.AppendChild(node)
 	case atom.Kbd:
+		if nil != n.PrevSibling && nil != n.NextSibling &&
+			strings.Contains(" "+util.DomAttrValue(n.PrevSibling, "class")+" ", " vditor-wysiwyg__kbd-marker ") &&
+			strings.Contains(" "+util.DomAttrValue(n.NextSibling, "class")+" ", " vditor-wysiwyg__kbd-marker ") {
+			break
+		}
+		if 0 == len(n.Attr) {
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("<kbd>")})
+			for child := n.FirstChild; nil != child; child = child.NextSibling {
+				lute.genASTByVditorDOM(child, tree)
+			}
+			tree.Context.Tip.AppendChild(&ast.Node{Type: ast.NodeInlineHTML, Tokens: []byte("</kbd>")})
+			return
+		}
 		node.Type = ast.NodeInlineHTML
 		node.Tokens = util.DomHTML(n)
 		tree.Context.Tip.AppendChild(node)

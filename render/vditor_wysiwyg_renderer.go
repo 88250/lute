@@ -819,6 +819,19 @@ func (r *VditorRenderer) renderInlineHTML(node *ast.Node, entering bool) ast.Wal
 	if !entering {
 		return ast.WalkContinue
 	}
+	if pairedVditorHTMLTag(node, "<kbd>", "</kbd>") {
+		opening := bytes.Equal(node.Tokens, []byte("<kbd>"))
+		if !opening {
+			r.WriteString("</kbd>")
+		}
+		r.Tag("code", [][]string{{"data-type", "html-inline"}, {"class", "vditor-wysiwyg__kbd-marker"}}, false)
+		r.Write(html.EscapeHTML(node.Tokens))
+		r.WriteString("</code>")
+		if opening {
+			r.WriteString("<kbd>")
+		}
+		return ast.WalkContinue
+	}
 	if pairedVditorEmphasisHTML(node) {
 		r.Write(node.Tokens)
 		return ast.WalkContinue

@@ -18,6 +18,21 @@ func pairedVditorEmphasisHTML(node *ast.Node) bool {
 	default:
 		return false
 	}
+	if forward {
+		return pairedVditorHTMLTag(node, tag, counterpart)
+	}
+	return pairedVditorHTMLTag(node, counterpart, tag)
+}
+
+func pairedVditorHTMLTag(node *ast.Node, open, close string) bool {
+	tag := string(node.Tokens)
+	forward := tag == open
+	counterpart := open
+	if forward {
+		counterpart = close
+	} else if tag != close {
+		return false
+	}
 	depth := 1
 	for sibling := node; nil != sibling; {
 		if forward {
