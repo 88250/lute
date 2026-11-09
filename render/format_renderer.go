@@ -28,8 +28,9 @@ import (
 // FormatRenderer 描述了格式化渲染器。
 type FormatRenderer struct {
 	*BaseRenderer
-	NodeWriterStack  []*bytes.Buffer // 节点输出缓冲栈
-	tabsFenceLengths map[*ast.Node]int
+	NodeWriterStack        []*bytes.Buffer // 节点输出缓冲栈
+	tabsFenceLengths       map[*ast.Node]int
+	PreserveTextCodeFences bool // 保留普通文本中的围栏字符，编辑输入转换时不启用
 }
 
 // NewFormatRenderer 创建一个格式化渲染器。
@@ -1482,6 +1483,9 @@ func (r *FormatRenderer) renderText(node *ast.Node, entering bool) ast.WalkStatu
 
 		if r.Options.FixTermTypo {
 			tokens = r.FixTermTypo(tokens)
+		}
+		if r.PreserveTextCodeFences {
+			tokens = escapeTextCodeFences(node, tokens)
 		}
 		tokens = escapeSetextHeadingMarkersInListParagraph(node, tokens)
 		if r.ParseOptions.Tabs {
