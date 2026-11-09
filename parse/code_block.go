@@ -145,7 +145,8 @@ func (t *Tree) parseFencedCode() (ok bool, fenceChar byte, fenceLen int, fenceOf
 	}
 	info := lex.TrimWhitespace(infoTokens)
 	info = html.UnescapeBytes(info)
-	if idx := bytes.IndexByte(info, ' '); 0 <= idx {
+	// 只保留 info 的第一个词，词以空格或制表符分隔
+	if idx := bytes.IndexAny(info, " \t"); 0 <= idx {
 		info = info[:idx]
 	}
 	return true, fenceChar, fenceLen, t.Context.indent, openFence, info
