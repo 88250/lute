@@ -1831,7 +1831,7 @@ func (r *ProtyleExportRenderer) renderSoftBreak(node *ast.Node, entering bool) a
 }
 
 func (r *ProtyleExportRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
-	*attrs = append(*attrs, node.KramdownIAL...)
+	*attrs = append(*attrs, safeIALAttrs(node.KramdownIAL)...)
 }
 
 func (r *ProtyleExportRenderer) blockNodeAttrs(node *ast.Node, attrs *[][]string, class string) {

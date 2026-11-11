@@ -504,7 +504,7 @@ func (r *HtmlRenderer) renderGitConflict(node *ast.Node, entering bool) ast.Walk
 	if entering {
 		attrs := [][]string{{"class", "language-git-conflict"}}
 		r.handleKramdownBlockIAL(node)
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		r.Tag("div", attrs, false)
 	} else {
 		r.Tag("/div", nil, false)
@@ -547,7 +547,7 @@ func (r *HtmlRenderer) renderTag(node *ast.Node, entering bool) ast.WalkStatus {
 
 func (r *HtmlRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", node.Parent.KramdownIAL, false)
+		r.Tag("em", safeIALAttrs(node.Parent.KramdownIAL), false)
 		r.WriteByte(lex.ItemCrosshatch)
 	}
 	return ast.WalkContinue
@@ -580,7 +580,7 @@ func (r *HtmlRenderer) renderMark(node *ast.Node, entering bool) ast.WalkStatus 
 
 func (r *HtmlRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("mark", node.Parent.KramdownIAL, false)
+		r.Tag("mark", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -594,7 +594,7 @@ func (r *HtmlRenderer) renderMark1CloseMarker(node *ast.Node, entering bool) ast
 
 func (r *HtmlRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("mark", node.Parent.KramdownIAL, false)
+		r.Tag("mark", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -733,7 +733,7 @@ func (r *HtmlRenderer) renderYamlFrontMatterContent(node *ast.Node, entering boo
 func (r *HtmlRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"class", "vditor-yml-front-matter"}}
-		attrs = append(attrs, node.Parent.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.Parent.KramdownIAL)...)
 		r.Tag("pre", attrs, false)
 		r.WriteString("<code class=\"language-yaml\">")
 	}
@@ -927,7 +927,7 @@ func (r *HtmlRenderer) renderMathBlock(node *ast.Node, entering bool) ast.WalkSt
 	if entering {
 		attrs := [][]string{{"class", "language-math"}}
 		r.handleKramdownBlockIAL(node)
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		r.Tag("div", attrs, false)
 	}
 	return ast.WalkContinue
@@ -962,7 +962,7 @@ func (r *HtmlRenderer) renderTableCell(node *ast.Node, entering bool) ast.WalkSt
 
 func (r *HtmlRenderer) renderTableRow(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("tr", node.KramdownIAL, false)
+		r.Tag("tr", safeIALAttrs(node.KramdownIAL), false)
 		r.Newline()
 	} else {
 		r.Tag("/tr", nil, false)
@@ -998,7 +998,7 @@ func (r *HtmlRenderer) renderTable(node *ast.Node, entering bool) ast.WalkStatus
 
 	if entering {
 		r.handleKramdownBlockIAL(node)
-		r.Tag("table", node.KramdownIAL, false)
+		r.Tag("table", safeIALAttrs(node.KramdownIAL), false)
 		r.Newline()
 	} else {
 		if nil != node.FirstChild.Next {
@@ -1022,7 +1022,7 @@ func (r *HtmlRenderer) renderStrikethrough(node *ast.Node, entering bool) ast.Wa
 
 func (r *HtmlRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("del", node.Parent.KramdownIAL, false)
+		r.Tag("del", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1036,7 +1036,7 @@ func (r *HtmlRenderer) renderStrikethrough1CloseMarker(node *ast.Node, entering 
 
 func (r *HtmlRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("del", node.Parent.KramdownIAL, false)
+		r.Tag("del", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1229,7 +1229,7 @@ func (r *HtmlRenderer) renderParagraph(node *ast.Node, entering bool) ast.WalkSt
 		r.Newline()
 		r.handleKramdownBlockIAL(node)
 		var attrs [][]string
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
 			if !r.ParagraphContainImgOnly(node) {
 				attrs = append(attrs, []string{"class", "indent--2"})
@@ -1285,7 +1285,7 @@ func (r *HtmlRenderer) renderCodeSpan(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *HtmlRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("code", node.Parent.KramdownIAL, false)
+		r.Tag("code", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1315,7 +1315,7 @@ func (r *HtmlRenderer) renderEmphasis(node *ast.Node, entering bool) ast.WalkSta
 
 func (r *HtmlRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", node.Parent.KramdownIAL, false)
+		r.Tag("em", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1329,7 +1329,7 @@ func (r *HtmlRenderer) renderEmAsteriskCloseMarker(node *ast.Node, entering bool
 
 func (r *HtmlRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", node.Parent.KramdownIAL, false)
+		r.Tag("em", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1352,7 +1352,7 @@ func (r *HtmlRenderer) renderStrong(node *ast.Node, entering bool) ast.WalkStatu
 
 func (r *HtmlRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("strong", node.Parent.KramdownIAL, false)
+		r.Tag("strong", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1366,7 +1366,7 @@ func (r *HtmlRenderer) renderStrongA6kCloseMarker(node *ast.Node, entering bool)
 
 func (r *HtmlRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("strong", node.Parent.KramdownIAL, false)
+		r.Tag("strong", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1382,7 +1382,7 @@ func (r *HtmlRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkS
 	if entering {
 		r.Newline()
 		r.handleKramdownBlockIAL(node)
-		r.Tag("blockquote", node.KramdownIAL, false)
+		r.Tag("blockquote", safeIALAttrs(node.KramdownIAL), false)
 		r.Newline()
 	} else {
 		r.Newline()
@@ -1408,10 +1408,10 @@ func (r *HtmlRenderer) renderHeading(node *ast.Node, entering bool) ast.WalkStat
 			r.WriteString(" id=\"" + id + "\"")
 			if r.Options.KramdownBlockIAL {
 				if "id" != r.Options.KramdownIALIDRenderName && 0 < len(node.KramdownIAL) {
-					r.WriteString(" " + r.Options.KramdownIALIDRenderName + "=\"" + node.KramdownIAL[0][1] + "\"")
+					r.WriteString(" " + r.Options.KramdownIALIDRenderName + "=\"" + escapeHTMLAttrVal(node.KramdownIAL[0][1]) + "\"")
 				}
 				if 1 < len(node.KramdownIAL) {
-					for _, attr := range node.KramdownIAL {
+					for _, attr := range safeIALAttrs(node.KramdownIAL) {
 						if "id" == attr[0] {
 							continue
 						}
@@ -1455,7 +1455,7 @@ func (r *HtmlRenderer) renderList(node *ast.Node, entering bool) ast.WalkStatus 
 			attrs = append(attrs, []string{"start", strconv.Itoa(node.ListData.Start)})
 		}
 		r.handleKramdownBlockIAL(node)
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		r.Tag(tag, attrs, false)
 		r.Newline()
 	} else {
@@ -1470,7 +1470,7 @@ func (r *HtmlRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkSta
 	if entering {
 		var attrs [][]string
 		r.handleKramdownBlockIAL(node)
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		if 3 == node.ListData.Typ && "" != r.Options.GFMTaskListItemClass && nil != node.FirstChild &&
 			((ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
 				(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
@@ -1584,5 +1584,5 @@ func (r *HtmlRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]string) {
 }
 
 func (r *HtmlRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
-	*attrs = append(*attrs, node.KramdownIAL...)
+	*attrs = append(*attrs, safeIALAttrs(node.KramdownIAL)...)
 }

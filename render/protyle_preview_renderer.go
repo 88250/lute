@@ -379,7 +379,7 @@ func (r *ProtylePreviewRenderer) renderIFrame(node *ast.Node, entering bool) ast
 func (r *ProtylePreviewRenderer) renderWidget(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		attrs = append(attrs, []string{"class", "iframe"})
 		r.Tag("div", attrs, false)
 		tokens := node.Tokens
@@ -421,7 +421,7 @@ func (r *ProtylePreviewRenderer) renderGitConflict(node *ast.Node, entering bool
 	r.Newline()
 	if entering {
 		attrs := [][]string{{"class", "language-git-conflict"}}
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		r.Tag("div", attrs, false)
 	} else {
 		r.Tag("/div", nil, false)
@@ -464,7 +464,7 @@ func (r *ProtylePreviewRenderer) renderTag(node *ast.Node, entering bool) ast.Wa
 
 func (r *ProtylePreviewRenderer) renderTagOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", node.Parent.KramdownIAL, false)
+		r.Tag("em", safeIALAttrs(node.Parent.KramdownIAL), false)
 		r.WriteByte(lex.ItemCrosshatch)
 	}
 	return ast.WalkContinue
@@ -497,7 +497,7 @@ func (r *ProtylePreviewRenderer) renderMark(node *ast.Node, entering bool) ast.W
 
 func (r *ProtylePreviewRenderer) renderMark1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("mark", node.Parent.KramdownIAL, false)
+		r.Tag("mark", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -511,7 +511,7 @@ func (r *ProtylePreviewRenderer) renderMark1CloseMarker(node *ast.Node, entering
 
 func (r *ProtylePreviewRenderer) renderMark2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("mark", node.Parent.KramdownIAL, false)
+		r.Tag("mark", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -658,7 +658,7 @@ func (r *ProtylePreviewRenderer) renderYamlFrontMatterContent(node *ast.Node, en
 func (r *ProtylePreviewRenderer) renderYamlFrontMatterOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		attrs := [][]string{{"class", "vditor-yml-front-matter"}}
-		attrs = append(attrs, node.Parent.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.Parent.KramdownIAL)...)
 		r.Tag("pre", attrs, false)
 		r.WriteString("<code class=\"language-yaml\">")
 	}
@@ -757,7 +757,7 @@ func (r *ProtylePreviewRenderer) renderCodeBlock(node *ast.Node, entering bool) 
 			tokens = bytes.TrimSpace(tokens)
 			attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 			attrs = append(attrs, []string{"data-subtype", language})
-			attrs = append(attrs, node.KramdownIAL...)
+			attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 			r.Tag("div", attrs, false)
 			r.Tag("div", [][]string{{"spin", "1"}}, false)
 			r.Tag("/div", nil, false)
@@ -766,7 +766,7 @@ func (r *ProtylePreviewRenderer) renderCodeBlock(node *ast.Node, entering bool) 
 		}
 
 		attrs := [][]string{{"class", "code-block"}, {"data-language", language}}
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		r.Tag("pre", attrs, false)
 		r.WriteString("<code class=\"hljs\">")
 	} else {
@@ -870,7 +870,7 @@ func (r *ProtylePreviewRenderer) renderMathBlock(node *ast.Node, entering bool) 
 		tokens = bytes.TrimSpace(tokens)
 		attrs = append(attrs, []string{"data-content", util.BytesToStr(tokens)})
 		attrs = append(attrs, []string{"data-subtype", "math"})
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		r.Tag("div", attrs, false)
 		r.Tag("div", [][]string{{"spin", "1"}}, false)
 		r.Tag("/div", nil, false)
@@ -1005,7 +1005,7 @@ func (r *ProtylePreviewRenderer) renderStrikethrough(node *ast.Node, entering bo
 
 func (r *ProtylePreviewRenderer) renderStrikethrough1OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("del", node.Parent.KramdownIAL, false)
+		r.Tag("del", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1019,7 +1019,7 @@ func (r *ProtylePreviewRenderer) renderStrikethrough1CloseMarker(node *ast.Node,
 
 func (r *ProtylePreviewRenderer) renderStrikethrough2OpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("del", node.Parent.KramdownIAL, false)
+		r.Tag("del", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1262,7 +1262,7 @@ func (r *ProtylePreviewRenderer) renderParagraph(node *ast.Node, entering bool) 
 	if entering {
 		r.Newline()
 		var attrs [][]string
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		r.Tag("p", attrs, false)
 		if r.Options.ChineseParagraphBeginningSpace && ast.NodeDocument == node.Parent.Type {
 			if !r.ParagraphContainImgOnly(node) {
@@ -1314,7 +1314,7 @@ func (r *ProtylePreviewRenderer) renderCodeSpan(node *ast.Node, entering bool) a
 
 func (r *ProtylePreviewRenderer) renderCodeSpanOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("code", node.Parent.KramdownIAL, false)
+		r.Tag("code", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1344,7 +1344,7 @@ func (r *ProtylePreviewRenderer) renderEmphasis(node *ast.Node, entering bool) a
 
 func (r *ProtylePreviewRenderer) renderEmAsteriskOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", node.Parent.KramdownIAL, false)
+		r.Tag("em", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1358,7 +1358,7 @@ func (r *ProtylePreviewRenderer) renderEmAsteriskCloseMarker(node *ast.Node, ent
 
 func (r *ProtylePreviewRenderer) renderEmUnderscoreOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("em", node.Parent.KramdownIAL, false)
+		r.Tag("em", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1381,7 +1381,7 @@ func (r *ProtylePreviewRenderer) renderStrong(node *ast.Node, entering bool) ast
 
 func (r *ProtylePreviewRenderer) renderStrongA6kOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("strong", node.Parent.KramdownIAL, false)
+		r.Tag("strong", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1395,7 +1395,7 @@ func (r *ProtylePreviewRenderer) renderStrongA6kCloseMarker(node *ast.Node, ente
 
 func (r *ProtylePreviewRenderer) renderStrongU8eOpenMarker(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
-		r.Tag("strong", node.Parent.KramdownIAL, false)
+		r.Tag("strong", safeIALAttrs(node.Parent.KramdownIAL), false)
 	}
 	return ast.WalkContinue
 }
@@ -1410,7 +1410,7 @@ func (r *ProtylePreviewRenderer) renderStrongU8eCloseMarker(node *ast.Node, ente
 func (r *ProtylePreviewRenderer) renderBlockquote(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		r.Newline()
-		r.Tag("blockquote", node.KramdownIAL, false)
+		r.Tag("blockquote", safeIALAttrs(node.KramdownIAL), false)
 		r.Newline()
 	} else {
 		r.Newline()
@@ -1483,7 +1483,7 @@ func (r *ProtylePreviewRenderer) renderList(node *ast.Node, entering bool) ast.W
 		if 0 == node.ListData.BulletChar && 1 != node.ListData.Start {
 			attrs = append(attrs, []string{"start", strconv.Itoa(node.ListData.Start)})
 		}
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		r.Tag(tag, attrs, false)
 		r.Newline()
 	} else {
@@ -1497,7 +1497,7 @@ func (r *ProtylePreviewRenderer) renderList(node *ast.Node, entering bool) ast.W
 func (r *ProtylePreviewRenderer) renderListItem(node *ast.Node, entering bool) ast.WalkStatus {
 	if entering {
 		var attrs [][]string
-		attrs = append(attrs, node.KramdownIAL...)
+		attrs = append(attrs, safeIALAttrs(node.KramdownIAL)...)
 		if 3 == node.ListData.Typ && nil != node.FirstChild && ((ast.NodeTaskListItemMarker == node.FirstChild.Type) ||
 			(nil != node.FirstChild.FirstChild && ast.NodeTaskListItemMarker == node.FirstChild.FirstChild.Type)) {
 			taskListItemMarker := node.FirstChild.FirstChild
@@ -1603,7 +1603,7 @@ func (r *ProtylePreviewRenderer) renderTextMarkAttrs(node *ast.Node) (attrs [][]
 }
 
 func (r *ProtylePreviewRenderer) spanNodeAttrs(node *ast.Node, attrs *[][]string) {
-	*attrs = append(*attrs, node.KramdownIAL...)
+	*attrs = append(*attrs, safeIALAttrs(node.KramdownIAL)...)
 }
 
 func (r *ProtylePreviewRenderer) Render() (output []byte) {
