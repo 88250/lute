@@ -2026,6 +2026,7 @@ func (lute *Lute) genASTByDOM(n *html.Node, tree *parse.Tree) {
 		tree.Context.Tip.AppendChild(node)
 		return
 	case atom.Video:
+		node.Type = ast.NodeVideo
 		htmlContent := util.DomHTML(n)
 		h := util.ParseHTML(string(htmlContent))
 		if nil == h {
