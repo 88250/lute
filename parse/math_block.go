@@ -37,7 +37,6 @@ func MathBlockStart(t *Tree, container *ast.Node) int {
 		block := t.Context.addChild(ast.NodeMathBlock)
 		block.MathBlockDollarOffset = mathBlockDollarOffset
 		t.Context.advanceNextNonspace()
-		t.Context.advanceOffset(mathBlockDollarOffset, false)
 		return 2
 	}
 	return 0

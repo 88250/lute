@@ -17,6 +17,8 @@ import (
 )
 
 var mathTests = []parseTest{
+	{"indented single-line math followed by an image", " $$ \\boldsymbol{F}_{1}=-\\boldsymbol{F}_{2} $$ \n\n![Diagram](assets/figure.jpg)\n\n$$y$$\n", "<div class=\"language-math\">\\boldsymbol{F}_{1}=-\\boldsymbol{F}_{2} </div>\n<p><img src=\"assets/figure.jpg\" alt=\"Diagram\" /></p>\n<div class=\"language-math\">y</div>\n"},
+	{"three-space-indented multiline math", "   $$\n   x+y\n   $$\n\ntext\n", "<div class=\"language-math\">x+y</div>\n<p>text</p>\n"},
 
 	{"14", "$ $\n", "<p>$ $</p>\n"},
 
