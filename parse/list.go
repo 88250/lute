@@ -230,8 +230,15 @@ func (t *Tree) parseListMarker(container *ast.Node) (data *ast.ListData, ial [][
 	}
 
 	// 如果要打断段落，则列表项内容部分不能为空
-	if container.Type == ast.NodeParagraph && lex.ItemNewline == token {
-		return nil, nil
+	if container.Type == ast.NodeParagraph {
+		if lex.ItemNewline == token {
+			return nil, nil
+		}
+		// 标记符后仅有空白的列表项同样是空的，不能打断段落；编辑器模式下保留原有行为，以便输入 "* " 后换行继续编辑
+		editorMode := t.Context.ParseOption.VditorWYSIWYG || t.Context.ParseOption.VditorIR || t.Context.ParseOption.VditorSV || t.Context.ParseOption.ProtyleWYSIWYG
+		if !editorMode && lex.IsBlankLine(ln[t.Context.nextNonspace+markerLength:]) {
+			return nil, nil
+		}
 	}
 
 	// 到这里说明满足列表规则，开始解析并计算内部缩进空格数
